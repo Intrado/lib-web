@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#system_administration/blocking_phone_numbers.htm
+This page lets you block certain phone numbers from being called. You can also view phone numbers which are currently blocked and unblock them by clicking Delete.

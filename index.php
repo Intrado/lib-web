@@ -1,0 +1,90 @@
+<?
+$isindexpage = true;
+require_once("inc/common.inc.php");
+include_once("inc/html.inc.php");
+include_once("inc/form.inc.php");
+
+$badlogin = false;
+if (isset($_GET['logout'])) {
+	@session_destroy();
+} elseif (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
+	$_SESSION = array();
+	@session_destroy();
+	@session_start();
+	$login = DBSafe($_GET['login']);
+	User::forceLogin($login,$CUSTOMERURL);
+	$USER = $_SESSION['user'] = DBFind('User',"from user where login = '$login'");
+	$_SESSION['access'] = new Access($USER->accessid);
+	$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
+	redirect("start.php");
+} elseif (isset($_SESSION['user'])) {
+	$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
+	unset($_SESSION['lasturi']);
+	redirect($redirpage);
+} elseif (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
+
+	$id = User::doLogin(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'], get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'],$CUSTOMERURL);
+	if ($id) {
+		$newuser = new User($id);
+		$newaccess = new Access($newuser->accessid);
+		if($newuser->enabled && $newaccess->getValue('loginweb')) {
+			$USER = $_SESSION['user'] = $newuser;
+			$ACCESS = $_SESSION['access'] = $newaccess;
+			$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
+			$USER->lastlogin = QuickQuery("select now()");
+			$USER->update(array("lastlogin"));
+			redirect("start.php");
+		} else {
+			$badlogin = true;
+		}
+	} else {
+		$badlogin = true;
+	}
+}
+
+?>
+
+<html>
+<head>
+<title>SchoolMessenger Login</title>
+	<script src='script/utils.js'></script>
+	<script src='script/nav.js'></script>
+	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
+	<link href='css/style.css' type='text/css' rel='stylesheet' media='screen'>
+</head>
+<body>
+
+<form action="index.php" method="POST">
+<?
+$logofilename = "img/customlogo.gif";
+if (file_exists($logofilename) ) {
+?>
+<img style="margin: 15px; border: solid 15px  white;" src="<?= $logofilename ?>">
+<? } else { ?>
+<br><br><br><br>
+<? } ?>
+<table align="center" cellpadding="8" cellspacing="0" style="border: 7px solid #9B9B9B;">
+	<tr>
+		<td bgcolor="#365F8D"><img src="img/school_messenger.gif"></td>
+	</tr>
+	<tr>
+		<td>
+			<table border="0" cellpadding="10" cellspacing="0" id="login">
+				<tr>
+					<td colspan="2">
+<? if ($badlogin) { ?>
+						<div style="color: red;">Incorrect username/password. Please try again.</div>
+<? } else { ?>
+						Please log in here.
+<? } ?>
+					</td>
+				</tr>
+				<tr><td align="right" style="padding: 2px;" width="165">Login:</td><td><input type="text" name="login" size="35"></td></tr>
+				<tr><td align="right" style="padding: 2px;">Password:</td><td><input type="password" name="password" size="35"></td></tr>
+				<tr><td colspan="2" align="right"><? print submit('login', 'main', 'signin', 'signin'); ?></td></tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+<html>

@@ -1,0 +1,1 @@
+To upload a Comma Separated Values (CSV) call list file click the Upload button. The fields in the file must be in the order First Name, Last Name, Phone w/ Area Code, Email (optional).

@@ -1,0 +1,14 @@
+@help/schoolmessenger_help.htm#reports/creating_notification_reports.htm
+People: The number of people targeted to receive phone notifications included in this report
+
+% Completed: The percent of the total that has been attempted thus far
+
+Succeeded: The number of successful deliveries completed thus far
+
+Failed: The number of failed attempts thus far
+
+Remaining: The number of people targeted to receive phone notifications who have not been attempted thus far.
+
+Success Rate: The percentage of attempted calls that were successful
+
+Total Attempts: The total number of call attempts included in this report

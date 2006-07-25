@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#system_administration/managing_user_accounts.htm
+To create a new user account click the Add New User button. This will open the User Editor window for the new account where you can modify the settings for this user account.

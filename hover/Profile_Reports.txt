@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#system_administration/managing_access_profiles.htm
+Unchecking this option will hide the Reports tab from these users.

@@ -1,0 +1,99 @@
+
+#shadowcontent {
+	width: 100%;
+}
+
+
+.content {
+    
+}
+
+.step {
+	
+}
+
+div.step a {
+	font-size: x-small;
+	color: black;
+}
+
+h1,h2,h3,h4,h5,h6 {
+	color: #336699;
+	font-family: verdana;
+}
+
+h1 {
+    font-size: 2em;   
+}
+
+li a {
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: xx-small;
+    color: #666666;
+}
+
+li h2 {
+    font-family: verdana, arial, helvetica, sans-serif;
+	font-size: xx-small;
+	color: #666666;
+}
+
+p {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: x-small;
+    color: #666666;
+}
+
+
+img {
+	border: 0px;
+}
+
+
+table {
+	font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif;
+	font-size: 10px;
+	border: none;
+	background: #FFFFFF;
+}
+
+table.form {
+	border: #B2B2B2 1px solid;
+}
+
+table.form td {
+	background-color: #f5f5f5;
+	text-align: left;
+	padding: 1px 5px 2px 3px;
+}
+
+table.form td.header {
+	color: white;
+	text-align: center;
+	background-color: #375E8C;
+}
+
+table.form td.headerItem {
+	color: white;
+	text-align: right;
+	background-color: #375E8C;
+}
+
+table.form td.headerGrey {
+	background-color: #e1e1e1;
+}
+
+
+a, a:active, a:visited {
+    font-family: verdana, arial, helvetica, sans-serif;
+	font-size: xx-small;
+	color: #666666;
+}
+
+a:hover {
+    font-family: verdana, arial, helvetica, sans-serif;
+	font-size: xx-small;
+	color: #375E8C;
+}
+
+

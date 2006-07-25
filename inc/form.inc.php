@@ -1,0 +1,560 @@
+<?
+/*
+alpha
+alphanumeric
+xalphanumeric
+text
+
+number
+float
+bool
+
+ipaddr
+
+array
+*/
+
+
+/***************** NewForm *****************
+
+*/
+
+function NewForm($formname) {
+
+	echo "<form method=\"post\" action=\"" . $_SERVER["REQUEST_URI"] . "\" enctype=\"multipart/form-data\">";
+	echo "<input type=\"hidden\" name=\"frm[" . $formname . "][timestamp]\" value=\""
+			. $_SESSION['formdata'][$formname]['timestamp'] . "\">";
+}
+
+/***************** EndForm *****************
+
+*/
+function EndForm() {
+	echo "</form>\n";
+}
+
+
+/***************** Inputs *****************
+prints various types of inputs based on formdata.
+calls CheckFormItem, puts red * for bad/missing values
+*/
+
+function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="nooption", $extrahtml = "") {
+	switch($type) {
+	case "text":
+		echo "<input $extrahtml type=\"text\" name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value]\" value=\""
+				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
+				. "maxlength=\"" . ($optionvalue == 'nooption' ? $option : $optionvalue) . "\">";
+		break;
+	case "hidden":
+		echo "<input $extrahtml type=\"hidden\" name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value]\" value=\""
+				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\">";
+		break;
+	case "textarea":
+		echo "<textarea $extrahtml name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value]\" "
+				. "cols=\"" . $option . "\" rows=\"" . $option/6 . "\">";
+		echo htmlentities($_SESSION['formdata'][$form][$section][$item]['value']);
+		echo "</textarea>";
+		break;
+	case "password":
+		echo "<input $extrahtml type=\"password\" name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value]\" value=\""
+				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
+				. "maxlength=\"" . ($optionvalue == 'nooption' ? $option : $optionvalue) . "\">";
+		break;
+	case "checkbox":
+		echo "<input $extrahtml type=\"checkbox\" name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value]\" value=\""
+				. $_SESSION['formdata'][$form][$section][$item]['maxval'] . "\" ";
+
+		if($_SESSION['formdata'][$form][$section][$item]['value'] ==
+			$_SESSION['formdata'][$form][$section][$item]['maxval'])
+		echo "checked";
+		echo ">";
+
+		//this is a hack for checkboxes. we must preset the value in formdata
+		//because if check box is not checked, it will not return anything.
+		//this causes checkboxes to be sticky.
+
+		$_SESSION['formdata'][$form][$section][$item]['value'] = $_SESSION['formdata'][$form][$section][$item]['minval'];
+
+		//now checkbox is set correctly in form
+		//when user submits form and if unchecked, will not have a checked value.
+
+		break;
+	case "radio":
+
+		//allow override on items formdata value. this is almost always the case for radio inputs
+		if($optionvalue=="nooption") {
+			$usevalue = $_SESSION['formdata'][$form][$section][$item]['value'];
+		} else {
+			$usevalue = $optionvalue;
+		}
+
+		echo "<input $extrahtml type=\"radio\" name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value]\" value=\""
+				. htmlentities($usevalue) . "\" ";
+
+		if(	$usevalue == $_SESSION['formdata'][$form][$section][$item]['value'] ) {
+			echo "checked";
+		}
+
+		echo ">";
+
+		break;
+	case "selectstart":
+		echo "<select $extrahtml name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value]\">";
+
+		break;
+	case "selectoption":
+		//allow override on items formdata value. this is almost always the case for select inputs
+		if($optionvalue=="nooption") {
+			$usevalue = $_SESSION['formdata'][$form][$section][$item]['value'];
+		}
+		else {
+			$usevalue = $optionvalue;
+		}
+
+		//use custom display value. this is almost always the case for select inputs
+		if($option==40) {
+			$usename = $optionvalue;
+		}
+		else {
+			$usename = $option;
+		}
+
+
+		echo "<option value=\"" . htmlentities($usevalue) . "\" ";
+
+		if(	$usevalue == $_SESSION['formdata'][$form][$section][$item]['value'] ) {
+			echo "selected";
+		}
+
+		echo ">";
+
+		echo htmlentities($usename) . "</option>";
+
+		break;
+	case "selectend":
+		echo "</select>";
+		break;
+
+	case "selectmultiple":
+		//option is the size of the select box
+		//optionvalue is the map of name => value pairs
+
+		$usevalue = $_SESSION['formdata'][$form][$section][$item]['value'];
+		//this is a hack for multiselects. we must unset the value in formdata
+		//because if nothing is selected the old data will not be overwritten.
+		unset($_SESSION['formdata'][$form][$section][$item]['value']);
+
+		if ($usevalue == null)
+			$usevalue = array();
+
+		if ($option == 40) {
+			$useoption = min(5,count($optionvalue));
+		} else {
+			$useoption = min($option,count($optionvalue));
+		}
+
+		echo "<select $extrahtml size=\"" . $useoption . "\" multiple name=\"frm[" . $form . "][" . $section
+				. "][" . $item . "][value][]\">";
+		foreach ($optionvalue as $name => $value) {
+			echo "<option value=\"" . htmlentities($value) . "\" ";
+			if (in_array($value,$usevalue)) {
+				echo "selected";
+			}
+			echo ">";
+			echo htmlentities($name) . "</option>";
+		}
+		echo "</select>";
+
+		break;
+	case "image":
+		$n = $option==40 ? $item : $option;
+		echo '<input alt="' . $n . '" type="image" name="submit[' . $form . '][' . $section . ']" src="img/b1_' . $n . '.gif" onMouseOver="this.src=\'img/b2_' . $n . '.gif\';" onMouseOut="this.src=\'img/b1_' . $n . '.gif\';">';
+		break;
+	case "submit":
+		echo "<input $extrahtml type=submit value=\"" . ($item ? $item : "Submit") . "\" name=submit[" . $form . "][" . $section . "]>";
+		break;
+	case "reset":
+		echo "<input $extrahtml type=\"reset\" name=\"Reset\" value=\"Reset\">";
+		break;
+
+	}
+
+	if( $type != "submit" &&
+		$type != "reset" &&
+		$type != "selectoption" &&
+		$type != "image" &&
+		$type != "selectstart") {
+		if($err = CheckFormItem($form,$section,$item)) {
+			echo "<font color=#FF0000>";
+			switch($err)
+			{
+			case "range":
+				echo "* Out of Range";
+				break;
+			case "type":
+				echo "* Invalid Data";
+				break;
+			case "missing":
+				echo "* Required";
+				break;
+			}
+			echo "</font>";
+		}
+	}
+
+	echo "\n";
+}
+
+/***************** NewFormSelect *****************
+
+*/
+
+function NewFormSelect ($f,$s,$item,$map) {
+	NewFormItem($f,$s,$item,"selectstart");
+
+	foreach ($map as $value => $name) {
+		NewFormItem($f,$s,$item,"selectoption",$name,$value);
+	}
+	NewFormItem($f,$s,$item,"selectend");
+}
+
+/***************** GetFormData *****************
+
+*/
+
+function GetFormData ($form, $section, $item) {
+
+	return $_SESSION['formdata'][$form][$section][$item]['value'];
+}
+
+/***************** PutFormData *****************
+
+*/
+
+function PutFormData ($form, $section, $item,
+						$value		="",
+						$datatype	="referencedata",
+						$min		="nomin",
+						$max		="nomax",
+						$req		= false,
+						$lastmod	= "now" ) {
+
+	$_SESSION['formdata'][$form][$section][$item] = array();
+
+	$_SESSION['formdata'][$form][$section][$item]['value'] = $value;
+	$_SESSION['formdata'][$form][$section][$item]['datatype'] = $datatype;
+	$_SESSION['formdata'][$form][$section][$item]['maxval'] = $max;
+	$_SESSION['formdata'][$form][$section][$item]['minval'] = $min;
+	$_SESSION['formdata'][$form][$section][$item]['required'] = $req;
+	$_SESSION['formdata'][$form][$section][$item]['lastmodtime'] = $lastmod;
+
+
+	//set default min, max for bool to 0,1
+	if($datatype == "bool" &&
+		$min == "nomin" &&
+		$max == "nomax") {
+		$_SESSION['formdata'][$form][$section][$item]['minval'] = 0;
+		$_SESSION['formdata'][$form][$section][$item]['maxval'] = 1;
+	}
+}
+
+function SetRequired ($form, $section, $item, $req) {
+	$_SESSION['formdata'][$form][$section][$item]['required'] = $req;
+}
+
+/***************** CheckFormSubmit *****************
+
+*/
+
+function CheckFormSubmit ($form, $section) {
+	return isset($_POST['submit'][$form][$section]);
+}
+
+/***************** CheckFormInvalid *****************
+
+*/
+
+function CheckFormInvalid ($form) {
+	return ($_SESSION['formdata'][$form]['timestamp'] != $_POST['frm'][$form]['timestamp']);
+}
+
+/***************** CheckFormItem *****************
+checks values with ranges and things
+
+returns 0 if everything is good
+otherwise returns:
+"range"
+"missing"
+"type"
+
+
+*/
+function CheckFormItem($form, $section, $item) {
+
+	$theitem = $_SESSION['formdata'][$form][$section][$item];
+
+	//check for missing data
+	if($theitem['required']) {
+		if(!isset($theitem['value']) || $theitem['value'] == "") {
+			return "missing";
+		}
+	} else {
+	 //if no data required dont check data unless there is data
+		if(!isset($theitem['value']) || $theitem['value'] == "") {
+			return 0;
+		}
+	}
+
+	switch($theitem['datatype']) {
+
+	//### start textish types ###
+	case "alpha":
+		if(!ereg("^[a-zA-Z]*$", $theitem['value'])) {
+			return "type";
+		}
+		//###overflow to next (will match if this matched)
+	case "alphanumeric":
+		if(!ereg("^[a-zA-Z0-9]*$", $theitem['value'])) {
+			return "type";
+		}
+		//###overflow to next (will match if this matched)
+	case "xalphanumeric":
+		if(!ereg("^[a-zA-Z0-9\.\_\-]*$", $theitem['value'])) {
+			return "type";
+		}
+		//###overflow to next (will match if this matched)
+	case "text":
+
+		if($theitem['minval'] != "nomin") {
+			if(strlen($theitem['value']) < $theitem['minval']) {
+				return "range";
+			}
+		}
+
+		if($theitem['maxval'] != "nomax") {
+			if(strlen($theitem['value']) > $theitem['maxval']) {
+				return "range";
+			}
+		}
+		break;
+
+	case "phone":
+		$phone = $theitem['value'];
+		if(empty($phone)) {
+			return 'type';
+		}
+
+		// Somewhat basic algorithm chosen for simplicty.
+		// The algorithm is to strip all customary phone number formatting chars from
+		//	the string and ensure that what remains is a number from 7-13 chars long.
+		$phone = ereg_replace("([ 	]+)", "", $phone); // Strip spaces or tabs from string
+		$phone = ereg_replace("[^0-9]*","",$phone); // Strip all non-numeric chars from string
+
+		$testString = eregi_replace("([0-9]+)", "", $phone);
+		if( !empty($testString) ) { // Make sure it's all numbers now
+			return 'type';
+		}
+
+		if (strlen($phone) != 10) {
+			return 'range';
+		}
+
+		break;
+
+	case "email":
+		$email = $theitem['value'];
+		
+		if (!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email)) {
+			return 'type';
+		}
+
+		break;
+	//### start number types ###
+	case "number":
+		if(!ereg("^[0-9]*$", $theitem['value'])) {
+			return "type";
+		}
+		//###overflow to next (will match if this matched)
+	case "float":
+		if(!ereg("^[0-9\.]*$", $theitem['value'])) {
+			return "type";
+		}
+
+		if($theitem['minval'] != "nomin") {
+			if($theitem['value'] < $theitem['minval']) {
+				return "range";
+			}
+		}
+
+		if($theitem['maxval'] != "nomax") {
+			if($theitem['value'] > $theitem['maxval']) {
+				return "range";
+			}
+		}
+		break;
+	//### start network types ###
+	case "ipaddr":
+		if(!ereg("^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$",
+						$theitem['value'],
+						$regs_array)) {
+			return "type";
+		}
+
+		//max 255.255.255.255
+		if($regs_array[1] > 255 || $regs_array[2] > 255 ||
+				$regs_array[3] > 255 || $regs_array[4] > 255 ) {
+			return "range";
+		}
+
+		if($theitem['minval'] != "nomin") {
+			$minoctets = explode (".", $theitem['minval']);
+			$octets = explode (".", $theitem['value']);
+
+			if( ($octets[0] < $minoctets[0]) ||
+				 ($octets[1] < $minoctets[1]) ||
+				 ($octets[2] < $minoctets[2]) ||
+				 ($octets[3] < $minoctets[3]) ) {
+				return "range";
+			}
+		}
+
+		if($theitem['maxval'] != "nomax") {
+			$maxoctets = explode (".", $theitem['maxval']);
+			$octets = explode (".", $theitem['value']);
+
+			if( ($octets[0] > $maxoctets[0]) ||
+				 ($octets[1] > $maxoctets[1]) ||
+				 ($octets[2] > $maxoctets[2]) ||
+				 ($octets[3] > $maxoctets[3]) ) {
+				return "range";
+			}
+		}
+
+		break;
+	//### start misc types ###
+	case "bool":
+
+		if( ($theitem['value'] != $theitem['minval']) &&
+			($theitem['value'] != $theitem['maxval']) ) {
+			return "type";
+		}
+
+
+		break;
+	case "array":
+
+		if (!is_array($theitem['value']))
+			return "type";
+
+		if ($theitem['minval'] != "nomin" && is_array($theitem['minval'])) {
+
+			foreach ($theitem['value'] as $value) {
+				if (!in_array($value,$theitem['minval'])) {
+					return "type";
+				}
+			}
+		}
+
+		break;
+	}
+
+	return 0;
+}
+
+/***************** CheckFormSection *****************
+
+calls CheckFormItem for all items in section of form
+returns 0 if all is good
+otherwise returns 1
+*/
+function CheckFormSection($form, $section) {
+	if(isset($_SESSION['formdata'][$form][$section])) {
+		foreach($_SESSION['formdata'][$form][$section] as $key => $value) {
+			if(CheckFormItem($form, $section, $key) !== 0) {
+				//error("Fail on $key");
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+/***************** MergeSectionFormData *****************
+
+*/
+
+function MergeSectionFormData ($form, $section) {
+
+	$frm = $_POST['frm'];
+
+	if(isset($frm[$form][$section])) {
+		//for each item in frm
+		foreach ($frm[$form][$section] as $keyitem => $valueitem) {
+			//for each param in item
+			foreach($frm[$form][$section][$keyitem] as $keyparam => $valueparam) {
+
+				if (is_array($valueparam)) {
+					$_SESSION['formdata'][$form][$section][$keyitem][$keyparam] = array();
+					foreach ($valueparam as $valueparamitem) {
+						if(get_magic_quotes_gpc()) {
+							$_SESSION['formdata'][$form][$section][$keyitem][$keyparam][] = stripslashes($valueparamitem);
+						} else {
+							$_SESSION['formdata'][$form][$section][$keyitem][$keyparam][] = $valueparamitem;
+						}
+					}
+				} else {
+					if(get_magic_quotes_gpc()) {
+						$_SESSION['formdata'][$form][$section][$keyitem][$keyparam] = stripslashes($valueparam);
+					} else {
+						$_SESSION['formdata'][$form][$section][$keyitem][$keyparam] = $valueparam;
+					}
+				}
+			}
+		}
+	}
+}
+
+/***************** ClearFormData *****************
+resets the formdata for specified form
+*/
+function ClearFormData($form) {
+	$_SESSION['formdata'][$form] = array();
+
+	$_SESSION['formdata'][$form]['timestamp'] = time();
+}
+
+
+/***************** PopulateObject *****************
+
+*/
+function PopulateObject ($form, $section, &$obj, $items) {
+	foreach ($items as $item) {
+		$obj->$item = GetFormData($form,$section, $item);
+	}
+}
+
+/***************** PopulateForm *****************
+0 = form and object field name
+1 = type
+2 = min
+3 = max
+4 = requried
+*/
+function PopulateForm ($form, $section, $obj, $fields) {
+	foreach ($fields as $field) {
+		$fieldname = $field[0];
+		PutFormData($form,$section,$fieldname,$obj->$fieldname,
+			$field[1],$field[2],$field[3],$field[4]);
+	}
+}
+
+
+?>

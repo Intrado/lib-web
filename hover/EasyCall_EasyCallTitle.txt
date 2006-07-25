@@ -1,0 +1,3 @@
+@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_job_with_easycall.htm
+To use EasyCall, specify the type of notification you are sending and select an existing list to call. Enter the phone number where you are currently located then click the Call Me to Record button. When the system calls you, answer and follow the prompts to record your message.
+Important: The phone number you enter must be a direct dial number to your current location.

@@ -1,0 +1,26 @@
+.navbox {
+	border: solid 1px;
+	margin: 10px;
+	padding: 10px;
+	min-height: 250px; /* only on mozilla */
+}
+
+.explorer {
+	display: list-item;
+	position: relative;
+	margin-left: 20px;
+	list-style-type: disc;
+}
+
+.explorer_item {
+	display: list-item;
+	position: relative;
+	margin-left: 20px;
+	list-style-type: none;
+}
+
+
+.hidden {
+	display:none;
+}
+

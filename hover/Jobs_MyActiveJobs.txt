@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_notification_job/jobsoverview.htm
+The Active and Pending Jobs area displays a list of all notification jobs for the current user that have been submitted for processing or that have been created but not submitted yet.

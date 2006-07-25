@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#system_administration/managing_access_profiles.htm
+These options enable or disable user access to the three system tabs - Active Jobs, Completed Jobs, and Repeating Jobs. Disabling these options does not affect the viewing of jobs sent by the user's own account, only the viewing of other jobs on the system. 

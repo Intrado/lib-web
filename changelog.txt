@@ -1,0 +1,18 @@
+changelog ASP
+
+
+DB from 4.1 to 5.0
+PHP from 5.0 to 5.1
+
+schema changes
+
+chaging everything to soft delete that affects back-end. 
+checks deleting security profiles for in use
+priorities are soft deleted. they will still show in reports with (deleted) so that reports can be generated.
+added error message in case javascipt is disabled for places that use error() to communicate with the user. uses systemwide alert message style
+added clear data to metadata manager so that it is possible to clear an F field.
+username/accesscode per customer
+URL support added. requires wildcard apache configs. uses the path component right after root dir. alphanumeric. ex: http://asp.schoolmessenger.com/myschool555/
+added customer creation script
+
+

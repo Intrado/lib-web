@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#system_administration/the_metadata_manager.htm
+Non-searchable metadata fields are generally fields that contain multiple values per record or non-list type data such as currency. An example of a multi-value data field would be an absence field containing all the periods missed for a single day.

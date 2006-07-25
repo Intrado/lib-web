@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
+Directs the system to call every available number for each person in the call list.

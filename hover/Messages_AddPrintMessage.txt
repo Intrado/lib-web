@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_print_message.htm
+To create a new print message click the Create New Print Message button. This will open the print message editor where you can edit the content of your print message.

@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_list/adding_people_manually.htm
+To manually add a contact to this list enter the necessary contact information and then click the Add button to the right. The person you added will display in the Additions section above.

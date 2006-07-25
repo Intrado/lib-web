@@ -1,0 +1,350 @@
+<?
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
+include_once("inc/common.inc.php");
+include_once("inc/securityhelper.inc.php");
+include_once("inc/table.inc.php");
+include_once("inc/html.inc.php");
+include_once("inc/utils.inc.php");
+include_once("inc/form.inc.php");
+include_once("inc/text.inc.php");
+include_once("obj/Access.obj.php");
+include_once("obj/Permission.obj.php");
+include_once("obj/JobType.obj.php");
+include_once("obj/User.obj.php");
+include_once("obj/FieldMap.obj.php");
+include_once("obj/Phone.obj.php");
+
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+
+if (!$USER->authorize('manageaccount')) {
+	redirect('unauthorized.php');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+//get the message to edit from the request params or session
+if (isset($_GET['id'])) {
+	$id = DBSafe($_GET['id']);
+	if (customerOwns("user",$id)) {
+		$_SESSION['userid'] = $_GET['id'] == 'new' ? NULL : $_GET['id'];
+	}
+	redirect();
+}
+
+if ($_POST['id'] == 'new' || isset($_POST['adduser_x'])) {
+	$_SESSION['userid'] = NULL;
+}
+
+if($_GET['deleterule']) {
+	$query = "delete from userrule where userid = " . $_SESSION['userid'] . " and ruleid = '" . DBSafe($_GET['deleterule'] . "'");
+	QuickUpdate($query);
+	redirect();
+}
+
+/****************** main message section ******************/
+
+$f = "user";
+$s = "main";
+$reloadform = 0;
+
+/**
+	Function to validate that a text string used as a form item meets
+		basic requirements.
+	Essentially, must be minimum of 4 characters with no spaces.
+*/
+function isValidTextItem($text) {
+	if ( ($text != null && strlen($text) < 4) || strpos($text, ' ') !== false) {
+		return false;
+	}
+
+	return true;
+}
+
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be able to differentiate between a submit and an add button click
+{
+	//check to see if formdata is valid
+	if(CheckFormInvalid($f))
+	{
+		error('Form was edited in another window, reloading data');
+		$reloadform = 1;
+	}
+	else
+	{
+		MergeSectionFormData($f, $s);
+		$phone = preg_replace('/[^\\d]/', '', GetFormData($f,$s,"phone"));
+
+		// If a user has also submitted dataview rules then prepare an error message in case
+		//	those rules get lost, which is what happens when there is an error() call below.
+		if (GetFormData($f, $s, "newrulefieldnum") != "" && GetFormData($f, $s, "newrulefieldnum") != -1) {
+			$extraMsg = " - You will also need to choose your data view rules again";
+		}
+
+		// do check
+		if( CheckFormSection($f, $s) ) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
+		} elseif( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
+			error('Password confirmation does not match' . $extraMsg);
+		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
+			error('IVR Password confirmation does not match' . $extraMsg);
+		} elseif (!isValidTextItem(GetFormData($f, $s, 'login'))) {
+			error('Invalid username' . $extraMsg);
+		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $_SESSION['userid'])) {
+			error('This username already exists, please choose another' . $extraMsg);
+		} elseif (!isValidTextItem(GetFormData($f, $s, 'password'))) {
+			error('Invalid password' . $extraMsg);
+		} elseif (!isValidTextItem(GetFormData($f, $s, 'accesscode'))) {
+			error('Invalid telephone user ID' . $extraMsg);
+		} elseif (User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
+			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid'],  $USER->customerid);
+			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax', true); // Repopulate the form/session data with the generated code
+			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
+		} elseif (!isValidTextItem(GetFormData($f, $s, 'pincode'))) {
+			error('Invalid telephone PIN code' . $extraMsg);
+		} else if ($phone != null && (strlen($phone) < 2 || (strlen($phone) > 6 && strlen($phone) != 10) ) ) {
+			error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
+		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
+			error('Please select a field');
+		} else {
+			// Submit changes
+			$usr = new User($_SESSION['userid']);
+			if ($usr->id == NULL) {
+				$usr->enabled = 1;
+			}
+
+			PopulateObject($f,$s,$usr,array("accessid","login","accesscode","firstname","lastname","email"));
+			$usr->customerid = $USER->customerid;
+			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
+			$usr->update();
+
+			QuickUpdate("delete from userjobtypes where userid = $usr->id");
+			if(GetFormData($f,$s,"restricttypes") && count(GetFormData($f,$s,'jobtypes')) > 0)
+			foreach(GetFormData($f,$s,'jobtypes') as $type)
+				QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($type) . "')");
+
+			$_SESSION['userid'] = $usr->id;
+
+			// If the password is all 0 characters then it was a default form value, so ignore it
+			$password = GetFormData($f, $s, 'password');
+			if (!ereg("^0*$", $password)) {
+				$usr->setPassword($password);
+			}
+			// If the pincode is all 0 characters then it was a default form value, so ignore it
+			$pincode = GetFormData($f, $s, 'pincode');
+			if (!ereg("^0*$", $pincode)) {
+				$usr->setPincode($pincode);
+			}
+
+			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
+			if ($fieldnum != -1 && $usr->id) {
+				$type = GetFormData($f,$s,"newruletype");
+				$logic = GetFormData($f,$s,"newrulelogical_$type");
+				$op = GetFormData($f,$s,"newruleoperator_$type");
+				$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
+				if (count($value) > 0) {
+					$rule = new Rule();
+					$rule->logical = $logic;
+					$rule->op = $op;
+					$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
+					$rule->fieldnum = $fieldnum;
+
+					$rule->create();
+					//FIXME use UserRule.obj
+					$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
+					Query($query);
+				}
+				$reloadform = 1;
+			} else {
+				redirect('users.php');
+			}
+		}
+	}
+} else {
+	$reloadform = 1;
+}
+
+$RULEMODE = array('multisearch' => true, 'text' => false, 'reldate' => false);
+$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
+if( $reloadform )
+{
+	ClearFormData($f);
+
+	if (isset($_POST['adduser_x'])) {
+		$_SESSION['userid'] = NULL;
+		$usr = new User();
+		$usr->firstname = get_magic_quotes_gpc() ? stripslashes($_POST['adduserfirst']) : $_POST['adduserfirst'];
+		$usr->lastname = get_magic_quotes_gpc() ? stripslashes($_POST['adduserlast']) : $_POST['adduserlast'];
+		$usr->enabled = 1;
+	} else {
+		$usr = new User($_SESSION['userid']);
+	}
+
+	$fields = array(
+			array("accessid","number","nomin","nomax"),
+			array("login","text",1,20,true),
+			array("accesscode","number",1000,"nomax"),
+			array("firstname","text",1,50,true),
+			array("lastname","text",1,50,true),
+			array("email","email",0,100),
+			);
+
+	PopulateForm($f,$s,$usr,$fields);
+	PutFormData($f,$s,"phone",Phone::format($usr->phone),"text",2, 20);
+
+	$pass = $usr->id ? '00000000' : '';
+	PutFormData($f,$s,"password",$pass,"text",1,50,true);
+	PutFormData($f,$s,"passwordconfirm",$pass,"text",1,50,true);
+	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
+	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
+
+	$types = QuickQueryList("select jobtypeid from userjobtypes where userid = $usr->id");
+
+	PutFormData($f,$s,"jobtypes",$types,"array");
+	PutFormData($f,$s,"restricttypes",(bool)count($types),"bool",0,1);
+	PutFormData($f,$s,"restrictpeople",(bool)count($RULES),"bool",0,1);
+
+	PutFormData($f,$s,"newrulefieldnum","");
+	PutFormData($f,$s,"newruletype","text","text",1,50);
+	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
+	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
+	PutFormData($f,$s,"newruleoperator_text","eq","text",1,50);
+	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
+$PAGE = "admin:users";
+$TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : GetFormData($f,$s,"firstname") . ' ' . GetFormData($f,$s,"lastname"));
+include_once("nav.inc.php");
+NewForm($f);
+buttons(submit($f, 'submitbutton', 'save', 'save'));
+
+startWindow('User Information');
+?>
+			<table border="0" cellpadding="3" cellspacing="0" width="100%">
+				<tr>
+					<th valign="top" width="70" class="windowRowHeader<? if($USER->authorize('manageaccount')) print ' bottomBorder'; ?>" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('User_AccessCredentials', NULL, 'grey'); ?></th>
+					<td class="<? if($USER->authorize('manageaccount')) print 'bottomBorder'; ?>">
+						<table border="0" cellpadding="1" cellspacing="0">
+							<tr>
+								<td align="right">First Name:</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'firstname', 'text', 20, 50); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Last Name:</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'lastname', 'text', 20, 50); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Username:</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'login', 'text', 20); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Password:</td>
+								<td><? NewFormItem($f,$s, 'password', 'password', 20,50); ?></td>
+								<td>&nbsp;</td>
+								<td align="right">Confirm Password:</td>
+								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Telephone User ID#:</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'accesscode', 'text', 10); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Telephone Pin Code #:</td>
+								<td><? NewFormItem($f,$s, 'pincode', 'password', 20,100); ?></td>
+								<td>&nbsp;</td>
+								<td align="right">Telephone Pin Code #:</td>
+								<td><? NewFormItem($f,$s, 'pincodeconfirm', 'password', 20,100); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Email:</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 20, 100); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Phone:</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'phone', 'text', 20); ?></td>
+							</tr>
+						</table>
+
+						<br>Please note: username and password are case-sensitive and must be a minimum of 4 characters long with no spaces.
+						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
+					</td>
+				</tr>
+				<? if($USER->authorize('manageaccount')) { ?>
+				<tr>
+					<th valign="top" align="right" class="windowRowHeader bottomBorder" width="70">Restrictions:<br><? print help('User_Restrictions', NULL, 'grey'); ?></th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="1" cellspacing="0">
+							<tr>
+								<td align="right" valign="top" style="padding-top: 4px;">
+								 	Access Profile:
+								</td>
+								<td>
+								<?
+								NewFormItem($f,$s,'accessid','selectstart');
+								$accss = DBFindMany('Access', "from access where customerid = $USER->customerid");
+								if(count($accss))
+									foreach($accss as $acc)
+										NewFormItem($f,$s,'accessid','selectoption',$acc->name,$acc->id);
+								else
+									NewFormItem($f,$s,'accessid','selectoption','No Access Profiles Defined',0);
+								NewFormItem($f,$s,'accessid','selectend');
+								?>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<table>
+										<tr>
+											<td>
+												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,'id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?>
+											</td>
+											<td>
+												Restrict this user to the following types of jobs
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td align="right" valign="top" style="padding-top: 4px;">Job Types:</td>
+								<td>
+								<?
+									$options = QuickQueryList("select name, id from jobtype where customerid=$USER->customerid and deleted=0 order by priority asc", true);
+									if(!count($options))
+										$options['No Job Types Defined'] = 0;
+									NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,'id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');
+								?>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<th valign="top" align="right" class="windowRowHeader">Data View:<br><? print help('User_DataView', NULL, 'grey'); ?></th>
+					<td>
+						<table>
+							<tr>
+								<td>
+									Restrict this user's access to the following data
+								</td>
+							</tr>
+						</table>
+					<?
+					include('ruleeditform.inc.php');
+					?>
+					</td>
+				</tr>
+				<? } ?>
+			</table>
+		<?
+endWindow();
+buttons();
+EndForm();
+include_once("navbottom.inc.php");
+?>

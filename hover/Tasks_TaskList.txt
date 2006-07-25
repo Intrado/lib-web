@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#system_administration/the_import_manager.htm
+The Import Manager displays all the tasks that have been configured on the system. You may edit or delete and task by clicking the links to the right of the name. You can also manually run any task by clicking the Run Now link.

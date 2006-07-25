@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#system_administration/managing_global_system_settings.htm
+This setting will prevent all repeating jobs from running.
