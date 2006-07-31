@@ -141,6 +141,7 @@ if (!$fp || filesize($importfile) == 0) {
 	wlog("No input file or file empty: $importfile");
 	exit(-1);
 }
+
 $imported = 0;
 $ignored = 0;
 $count = 0;
@@ -520,7 +521,7 @@ if ($doupdatepdvalues) {
 					'$field' as fieldnum,
 					pd.$field as value,
 					count(*)
-					from persondata pd, person p
+					from persondata pd, person p use index (ownership)
 					where p.customerid=$custid and p.id=pd.personid and p.userid is null
 					group by value");
 			wlog("there are $count $fieldmap->name pd values");
