@@ -915,4 +915,28 @@ ADD `nextattempt` BIGINT NULL AFTER `lastattempt` ;
 
 -- aproximately recreate the lastattempt for reporting
 update jobtask jt inner join calllog cl on (cl.jobtaskid = jt.id and jt.numattempts-1 = cl.callattempt)
-set jt.lastattempt = cl.starttime
+set jt.lastattempt = cl.starttime;
+
+
+
+
+------------ after on asp 7/25 --------------
+
+
+ALTER TABLE `jobworkitem` ADD `currentjobtaskid` BIGINT NULL AFTER `status` ;
+
+ALTER TABLE `schedule` CHANGE `trigger` `triggertype` ENUM( 'import', 'job' ) NOT NULL DEFAULT 'import';
+
+
+
+
+
+
+------------ after on asp 7/26 --------------
+
+
+ALTER TABLE `customer` ADD `inboundnumber` VARCHAR( 20 ) NOT NULL AFTER `hostname` ;
+
+
+ALTER TABLE `jobtask` ADD INDEX `waiting` ( `id` , `nextattempt` ) 
+

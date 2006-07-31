@@ -34,3 +34,4 @@ limit 1000
 
 update jobworkitem set status='assigned' where id in (...)
 
+ALTER TABLE `jobtask` ADD INDEX `waiting` ( `id` , `nextattempt` ) 
