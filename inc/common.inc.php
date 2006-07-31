@@ -18,6 +18,7 @@ $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 session_name($CUSTOMERURL . "_session");
 session_start();
 
+$IS_COMMSUITE = false; //TODO make this a config or something
 
 
 if (!isset($isindexpage) || !$isindexpage) {
