@@ -8,6 +8,7 @@ include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
+include_once("inc/content.inc.php");
 include_once("obj/AudioFile.obj.php");
 include_once("obj/Content.obj.php");
 
@@ -79,7 +80,7 @@ if(CheckFormSubmit($f,$s))
 				}
 
 				$audio->recorddate = date("Y-m-d H:i:s");
-				$content = new Content();
+
 				$source = getcwd() . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . 'orig.' . $ext;
 				$dest = getcwd() . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
 				if(!move_uploaded_file($_FILES['audio']['tmp_name'],$source)) {
@@ -96,18 +97,30 @@ if(CheckFormSubmit($f,$s))
 						@unlink($source);
 						@unlink($dest);
 					} else {
-						$content->data = base64_encode(file_get_contents($dest));
-						$content->contenttype = "audio/wav";
-						$content->update();
-						$audio->contentid = $content->id;
-						$audio->update();
+						if ($IS_COMMSUITE) {
+
+							$content = new Content();
+							$content->data = base64_encode(file_get_contents($dest));
+							$content->contenttype = "audio/wav";
+							$content->update();
+							$contentid = $content->id;
+						} else {
+							$contentid = contentPut($dest,"audio/wav");
+						}
 
 						@unlink($source);
 						@unlink($dest);
 
-						setCurrentAudio($audio->id);
-						ClearFormData($f);
-						redirect('audio.php');
+						if ($contentid) {
+							$audio->contentid = $contentid;
+							$audio->update();
+							setCurrentAudio($audio->id);
+
+							ClearFormData($f);
+							redirect('audio.php');
+						} else {
+							error('There was an error uploading your audio file','Please try again');
+						}
 					}
 				}
 			} else {
