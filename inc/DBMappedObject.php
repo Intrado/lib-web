@@ -180,9 +180,9 @@ class DBMappedObject {
 			$list = array();
 			foreach ($specificfields as $name) {
 				if ($this->_allownulls && $this->$name === NULL)
-					$list[] = "$name=NULL";
+					$list[] = "`$name`=NULL";
 				else
-					$list[] = "$name='" . mysql_real_escape_string($this->$name) . "'";
+					$list[] = "`$name`='" . mysql_real_escape_string($this->$name) . "'";
 			}
 
 			//put them into an update list
@@ -273,9 +273,9 @@ class DBMappedObject {
 			$list = $fieldlist;
 		}
 		if ($alias) {
-			return "$alias." . implode(",$alias.", $list);
+			return "`$alias`.`" . implode("`,`$alias`.`", $list) . "`";
 		} else {
-			return implode(",", $list);
+			return "`" . implode("`,`", $list) . "`";
 		}
 	}
 
