@@ -61,7 +61,7 @@ function setIfOwnsOrNew ($id,$name, $type, $checkcustomer = false) {
 	if ($id == "new") {
 		$_SESSION[$name] = NULL;
 	} else {
-		if ($checkcustomer && customerOwns($typem,$id)) {
+		if ($checkcustomer && customerOwns($type,$id)) {
 			$_SESSION[$name] = $newid;
 		} else if (userOwns($type,$newid)) {
 			$_SESSION[$name] = $newid;
