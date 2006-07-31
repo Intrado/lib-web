@@ -29,7 +29,7 @@ if (!$USER->authorize('managetasks')) {
 
 if (isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
-	if (customerOwns("import",$id) {
+	if (customerOwns("import",$id)) {
 		$_SESSION['importid'] = $id;
 		$_SESSION['importcols'] = NULL;
 	}
