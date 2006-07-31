@@ -101,7 +101,7 @@ if(CheckFormSubmit($form, $section))
 
 				$schedule = new Schedule($IMPORT->scheduleid);
 				$schedule->userid = $USER->id;
-				$schedule->trigger = 'import';
+				$schedule->triggertype = 'import';
 				$schedule->type = 'R';
 				if (GetFormData($form, $section,"scheduletime")) {
 					$time = GetFormData($form, $section,"scheduletime");
