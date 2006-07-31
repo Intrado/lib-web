@@ -64,8 +64,8 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 			$range1 = @strtotime($_GET['jobtype_range_range1'] ? $_GET['jobtype_range_range1'] : "today");
 			$range2 = @strtotime($_GET['jobtype_range_range2'] ? $_GET['jobtype_range_range2'] : "today");
 
-			$range1 = ($range1 === -1) ? time() : $range1;
-			$range2 = ($range2 === -1) ? time() : $range2;
+			$range1 = ($range1 === -1 || $range1 === false) ? time() : $range1;
+			$range2 = ($range2 === -1 || $range2 === false) ? time() : $range2;
 
 			//auto arrange in correct order
 			if ($range2 < $range1) {
@@ -297,7 +297,7 @@ select
 	inner join jobworkitem wi on (wi.jobid=j.id)
 	inner join user u on (u.id = j.userid)
 	left join	jobtask jt on
-					(jt.jobworkitemid=wi.id)
+					(jt.id=wi.currentjobtaskid)
 	left join	person p on
 					(p.id=wi.personid)
 	left join	calllog cl on
@@ -360,7 +360,7 @@ select SQL_CALC_FOUND_ROWS
 	left join	persondata pd on
 					(pd.personid=p.id)
 	left join	jobtask jt on
-					(jt.jobworkitemid=wi.id)
+					(jt.id=wi.currentjobtaskid)
 	left join	calllog cl on
 					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
 	left join	phone ph on
@@ -403,10 +403,13 @@ echo mysql_error();
 		$row[6] = (isset($row[6]) ? $row[6] : "");
 		$row[10] = $row[3] == "phone" ? $row[10] : 1;
 
-		if (isset($row[7]) &&  ($time = strtotime($row[7])) !== -1)
-			$row[7] =  date("m/d/Y H:i",$time);
-		else
+		if (isset($row[7])) {
+			$time = strtotime($row[7]);
+			if ($time !== -1 && $time !== false)
+				$row[7] = date("m/d/Y H:i",$time);
+		} else {
 			$row[7] = "";
+		}
 		$row[8] = fmt_result($row,8);
 
 		echo '"' . implode('","', array($row[12],$row[11],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[10],$row[7],$row[8])) . '"' . "\r\n";
