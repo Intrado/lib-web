@@ -64,6 +64,9 @@ if(CheckFormSubmit($f,$s)) {
 	if (getSetting('callerid') != "")
 		$job->options .= ",callerid=" . getSetting('callerid');
 
+	if (getSetting('retry') != "")
+		$job->options .= ",retry=" . getSetting('retry');
+
 	$job->status = "new";
 	$job->userid = $USER->id;
 	$job->createdate = QuickQuery("select now()");
