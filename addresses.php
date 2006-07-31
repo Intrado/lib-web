@@ -109,7 +109,7 @@ if ($_SESSION['addressOrigin'] == 'list' && $_SESSION['listid'] == null) {
 									) as address,
 									addr1, addr2, city, state, zip
 					from person
-						left join phone on person.id = phone.personid
+						left join phone on (person.id = phone.personid and phone.sequence=0)
 						left join email on person.id = email.personid
 						left join address on person.id = address.personid
 						left join persondata on person.id = persondata.personid
