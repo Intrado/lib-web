@@ -72,14 +72,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if ($JOBTYPE == 'normal' && strtotime(GetFormData($f,$s,"startdate")) === -1) {
+		} else if ($JOBTYPE == 'normal' && (strtotime(GetFormData($f,$s,"startdate")) === -1 || strtotime(GetFormData($f,$s,"startdate")) === false)) {
 			error('The start date is invalid');
-		} else if (strtotime(GetFormData($f,$s,"starttime")) === -1) {
+		} else if (strtotime(GetFormData($f,$s,"starttime")) === -1 || strtotime(GetFormData($f,$s,"starttime")) === false) {
 			error('The start time is invalid');
-		} else if (strtotime(GetFormData($f,$s,"endtime")) === -1) {
+		} else if (strtotime(GetFormData($f,$s,"endtime")) === -1 || strtotime(GetFormData($f,$s,"endtime")) === false) {
 			error('The end time is invalid');
-		} else if ($JOBTYPE == 'normal' && GetFormData($f,$s,"numdays") == 1 &&
-				strtotime(GetFormData($f,$s,"endtime")) < strtotime(GetFormData($f,$s,"starttime")) ) {
+		} else if (strtotime(GetFormData($f,$s,"endtime")) < strtotime(GetFormData($f,$s,"starttime")) ) {
 			error('The end time cannot be before the start time');
 		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
@@ -161,10 +160,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->setOptionValue("callerid", $callerid);
 			}
 
+			if (getSetting('retry') != "")
+				$job->setOptionValue("retry=",getSetting('retry'));
+
 			if ($JOBTYPE == "repeating") {
 				$schedule = new Schedule($job->scheduleid);
 				$schedule->time = date("H:i", strtotime(GetFormData($f,$s,"scheduletime")));
-				$schedule->trigger = "job";
+				$schedule->triggertype = "job";
 				$schedule->type = "R";
 				$schedule->userid = $USER->id;
 				$schedule->update();
