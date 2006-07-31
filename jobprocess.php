@@ -57,6 +57,9 @@ if ($job->status=="repeating") {
 	$newjob->startdate = date("Y-m-d", time());
 	$newjob->enddate = date("Y-m-d", time() + $daydiff);
 
+	if (getSetting('retry') != "")
+		$job->setOptionValue("retry=",getSetting('retry'));
+
 	$newjob->create();
 
 	//copy all the job language settings
