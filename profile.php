@@ -78,7 +78,6 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("calllate", GetFormData($form, $section, 'calllate'));
 			$accss->setPermission("callmax", GetFormData($form, $section, 'callmax'));
 			$accss->setPermission("sendemail", (bool)GetFormData($form, $section, 'sendemail'));
-			$accss->setPermission("sendprint", (bool)GetFormData($form, $section, 'sendprint'));
 			$accss->setPermission("sendmulti", (bool)GetFormData($form, $section, 'sendmulti'));
 			$accss->setPermission("createlist", (bool)GetFormData($form, $section, 'createlist'));
 			$accss->setPermission("listuploadids", (bool)GetFormData($form, $section, 'listuploadids'));
@@ -97,8 +96,11 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("manageprofile", (bool)GetFormData($form, $section, 'manageprofile'));
 			$accss->setPermission("managesystem", (bool)GetFormData($form, $section, 'managesystem'));
 			$accss->setPermission("viewcontacts", (bool)GetFormData($form, $section, 'viewcontacts'));
-			$accss->setPermission("metadata", (bool)GetFormData($form, $section, 'metadata'));
-			$accss->setPermission("managetasks", (bool)GetFormData($form, $section, 'managetasks'));
+			if ($IS_COMMSUITE) {
+				$accss->setPermission("sendprint", (bool)GetFormData($form, $section, 'sendprint'));
+				$accss->setPermission("metadata", (bool)GetFormData($form, $section, 'metadata'));
+				$accss->setPermission("managetasks", (bool)GetFormData($form, $section, 'managetasks'));
+			}
 			$accss->setPermission("viewsystemactive", (bool)GetFormData($form, $section, 'viewsystemactive'));
 			$accss->setPermission("viewsystemrepeating", (bool)GetFormData($form, $section, 'viewsystemrepeating'));
 			$accss->setPermission("viewsystemcompleted", (bool)GetFormData($form, $section, 'viewsystemcompleted'));
@@ -278,10 +280,12 @@ startWindow('Allowed Functions');
 					<td><? NewFormItem($form,$section,"sendemail","checkbox"); ?></td>
 					<td>Send emails</td>
 				</tr>
+<? if ($IS_COMMSUITE) { ?>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendprint","checkbox"); ?></td>
 					<td>Send printed letters</td>
 				</tr>
+<? } ?>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendmulti","checkbox"); ?></td>
 					<td>Send multi-language messages</td>
@@ -416,6 +420,7 @@ startWindow('Allowed Functions');
 					<td><? NewFormItem($form, $section, "managesystemjobs", "checkbox", 40, 'nopotion', 'id="managesystemjobs"'); ?></td>
 					<td>Manage systemwide jobs</td>
 				</tr>
+<? if ($IS_COMMSUITE) { ?>
 				<tr>
 					<td><? NewFormItem($form,$section,"metadata","checkbox"); ?></td>
 					<td>Manage Metadata</td>
@@ -424,6 +429,7 @@ startWindow('Allowed Functions');
 					<td><? NewFormItem($form,$section,"managetasks","checkbox"); ?></td>
 					<td>Manage Imports</td>
 				</tr>
+<? } ?>
 				<tr>
 					<td><? NewFormItem($form,$section,"blocknumbers","checkbox", null, null, "id='blocknumbers'"); ?></td>
 					<td>Access systemwide blocked numbers list
