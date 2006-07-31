@@ -134,12 +134,12 @@ include_once("navbottom.inc.php");
 function fmt_job_date ($row,$index) {
 	if (isset($row[$index + 1])) { // Check job.finishdate field first
 		$time = strtotime($row[$index + 1]);
-		if ($time !== -1) {
+		if ($time !== -1 && $time !== false) {
 			return date("M j, g:i a", $time);
 		}
 	} else {
 		$time = strtotime($row[$index]);
-		if ($time !== -1) {
+		if ($time !== -1 && $time !== false) {
 			return date("M j, g:i a", $time);
 		}
 	}
