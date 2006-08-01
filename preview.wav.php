@@ -11,9 +11,52 @@ include_once("obj/FieldMap.obj.php");
 
 
 function writeWav ($data) {
-	$name = tempnam("tmp","preview_parts");
+	$name = secure_tmpname("tmp","preview_parts",".wav");
 	if (file_put_contents($name,$data))
 		return $name;
+}
+
+
+//from php.net comments
+function secure_tmpname($dir = null, $prefix = 'tmp', $postfix = '.wav') {
+   // validate arguments
+   if (! (isset($postfix) && is_string($postfix))) {
+       return false;
+   }
+   if (! (isset($prefix) && is_string($prefix))) {
+       return false;
+   }
+   if (! isset($dir)) {
+       $dir = getcwd();
+   }
+
+   // find a temporary name
+   $tries = 1;
+   do {
+       // get a known, unique temporary file name
+       $sysFileName = tempnam($dir, $prefix);
+       if ($sysFileName === false) {
+           return false;
+       }
+
+       // tack on the extension
+       $newFileName = $sysFileName . $postfix;
+       if ($sysFileName == $newFileName) {
+           return $sysFileName;
+       }
+
+       // move or point the created temporary file to the new filename
+       // NOTE: these fail if the new file name exist
+       $newFileCreated = @rename($sysFileName, $newFileName);
+       if ($newFileCreated) {
+           return $newFileName;
+       }
+
+       unlink ($sysFileName);
+       $tries++;
+   } while ($tries <= 5);
+
+   return false;
 }
 
 if(isset($_GET['id'])) {
@@ -67,28 +110,48 @@ if(isset($_GET['id'])) {
 		$wavfiles = array();
 		foreach ($renderedparts as $part) {
 			if ($part[0] == "a") {
-				$wavfiles[] = writeWav(contentGet($part[1]));
+				list($contenttype,$data) = contentGet($part[1]);
+				$wavfiles[] = writeWav($data);
 			} else if ($part[0] == "t") {
 				$voice = $voices[$part[2]];
-				$wavfiles[] = writeWav(renderTts($part[1],$voice->language,$voice->gender));
+				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
+				$wavfiles[] = writeWav($data);
 			}
 		}
 
 		//finally, merge the wav files
-		$outname = tempnam("tmp","preview");
+		$outname = secure_tmpname("tmp","preview",".wav");
 		$cmd = 'sox "' . implode('" "',$wavfiles) . '" "' . $outname . '"';
+
 		$result = exec($cmd, $res1,$res2);
 
-		if($res2 || !file_exists($dest)) {
-			exit("oops!"); //TODO play error message?
-		}
 
 		foreach ($wavfiles as $file)
 			@unlink($file);
 
+		if(!$res2 && file_exists($outname)) {
 
-		header("Content-Type: audio/wav");
-		readfile($outname);
+
+			$data = file_get_contents ($outname); //readfile seems to cause problems
+
+			header("HTTP/1.0 200 OK");
+			if ($_GET['download'])
+				header('Content-type: application/x-octet-stream');
+			else
+				header("Content-Type: audio/wav");
+
+
+			header('Pragma: private');
+			header('Cache-control: private, must-revalidate');
+			header("Content-Length: " . strlen($data));
+			header("Connection: close");
+
+			echo $data;
+
+		} else {
+			echo "oops";
+		}
+
 		@unlink($outname);
 	}
 }
