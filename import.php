@@ -64,7 +64,7 @@ function wlog ($str) {
 	fwrite($logfp, date("Y-m-d h:i:s") . " - $str\r\n");
 }
 
-$logfp = fopen("import_log.txt","a") or $logfp = fopen("import_log2.txt","a");
+$logfp = fopen("/usr/commsuite/logs/import_log.txt","a") or $logfp = fopen("/usr/commsuite/logs/import_log2.txt","a");
 if (!$logfp) {
 	exit(-1);
 }
@@ -146,6 +146,8 @@ $imported = 0;
 $ignored = 0;
 $count = 0;
 while (($row = fgetcsv($fp,4096)) !== FALSE) {
+	if (count($row) == 0)
+		continue;
 	$count++;
 	//try to use mapped key
 	if (strlen($row[$importfields['key']->mapfrom]) > 0) {
