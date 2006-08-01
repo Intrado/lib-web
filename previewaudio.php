@@ -17,7 +17,7 @@ TYPE="application/x-oleobject">
 </OBJECT>
 
 
-<br><a href="audio.wav.php/download_preview.wav?id=<? print $_GET['id']; ?>">Click here to download</a>
+<br><a href="audio.wav.php/download_preview.wav?id=<? print $_GET['id']; ?>&download=true">Click here to download</a>
 </div>
 <?
 include_once('popupbottom.inc.php');

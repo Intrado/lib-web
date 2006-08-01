@@ -41,7 +41,11 @@ if(isset($_GET['id'])) {
 			$size = strlen($data);
 
 			header("HTTP/1.0 200 OK");
-			header('Content-type: ' . $contenttype);
+			if ($_GET['download'])
+				header('Content-type: application/x-octet-stream');
+			else
+				header('Content-type: ' . $contenttype);
+
 			header('Pragma: private');
 			header('Cache-control: private, must-revalidate');
 			header("Content-Length: $size");
