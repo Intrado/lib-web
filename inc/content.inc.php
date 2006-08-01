@@ -1,7 +1,7 @@
 <?
 
 $CONTENT_SERVERS = array(array("localhost","80"));
-$CONTENT_URLS = array("get" => "/foobar/dumprequest.php", "put" => "/foobar/dumprequest.php","tts" => "/foobar/dumprequest.php");
+$CONTENT_URLS = array("get" => "/foobar/xxx-get.php", "put" => "/foobar/xxx-put.php","tts" => "/foobar/dumprequest.php");
 
 function connectToContentServer() {
 	global $CONTENT_SERVERS;
