@@ -1,14 +1,16 @@
 <?
 
-$CONTENT_SERVERS = array(array("localhost","80"));
-$CONTENT_URLS = array("get" => "/foobar/xxx-get.php", "put" => "/foobar/xxx-put.php","tts" => "/foobar/dumprequest.php");
+$CONTENT_URLS = array("get" => array(array("localhost","80","/foobar/xxx-get.php")),
+					"put" => array(array("localhost","80","/foobar/xxx-put.php")),
+					"tts" => array(array("localhost","8080","/phone/Tts"))
+				);
 
-function connectToContentServer() {
-	global $CONTENT_SERVERS;
-	foreach ($CONTENT_SERVERS as $server) {
-		list($ip,$port) = $server;
+function connectToContentServer($type) {
+	global $CONTENT_URLS;
+	foreach ($CONTENT_URLS[$type] as $server) {
+		list($ip,$port,$path) = $server;
 		if ($fp = fsockopen($ip,$port,$errno,$errstr,0.5))
-			return $fp;
+			return array($fp,$server);
 	}
 }
 
@@ -34,8 +36,10 @@ function getHttpResponseContents ($fp) {
 
 function contentGet ($cmid) {
 	global $CONTENT_URLS;
-	if ($fp = connectToContentServer()) {
-		$req = "GET " . $CONTENT_URLS['get'] . "?cmid=$cmid" . " HTTP/1.0\r\nConnection: close\r\n\r\n";
+	list($fp,$server) = connectToContentServer("get");
+	list($host,$port,$path) = $server;
+	if ($fp) {
+		$req = "GET " . $path . "?cmid=$cmid" . " HTTP/1.0\r\nConnection: close\r\n\r\n";
 		if (fwrite($fp,$req))
 			$data = getHttpResponseContents($fp);
 			fclose($fp);
@@ -50,8 +54,11 @@ function contentPut ($filename,$contenttype) {
 
 	if (is_file($filename) && is_readable($filename) && ($filesize = filesize($filename)) > 0) {
 		if ($fp_file = fopen($filename,"r")) {
-			if ($fpc = connectToContentServer()) {
-				$req = "POST " . $CONTENT_URLS['put'] . " HTTP/1.0\r\nContent-Length: $filesize\r\nContent-Type: $contenttype\r\nConnection: close\r\n\r\n";
+
+			list($fpc,$server) = connectToContentServer("put");
+			list($host,$port,$path) = $server;
+			if ($fpc) {
+				$req = "POST " . $path . " HTTP/1.0\r\nContent-Length: $filesize\r\nContent-Type: $contenttype\r\nConnection: close\r\n\r\n";
 				fwrite($fpc,$req);
 				while ($data = fread($fp_file,8192)) {
 					fwrite($fpc,$data);
@@ -69,8 +76,10 @@ function contentPut ($filename,$contenttype) {
 
 function renderTts ($text,$language,$gender) {
 	global $CONTENT_URLS;
-	if ($fp = connectToContentServer()) {
-		$req = "POST " . $CONTENT_URLS['tts'] . "?language=" . urlencode($language)
+	list($fp,$server) = connectToContentServer("tts");
+	list($host,$port,$path) = $server;
+	if ($fp) {
+		$req = "POST " . $path. "?language=" . urlencode($language)
 				. "&gender=" . urlencode($gender) . " HTTP/1.0\r\nContent-Length: " . strlen($text) . "\r\nConnection: close\r\n\r\n" . $text;
 		if (fwrite($fp,$req)) {
 			$data = getHttpResponseContents($fp);
