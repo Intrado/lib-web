@@ -1,9 +1,9 @@
 <?
 
-$_dbcon = mysql_connect('localhost:3307', 'sharpteeth', 'sharpteeth202')
+$_dbcon = mysql_connect($SETTINGS['db']['host'], $SETTINGS['db']['user'], $SETTINGS['db']['pass'])
     or die('Could not connect: ' . mysql_error());
 
-mysql_select_db('dialerasp') or die('Could not select database');
+mysql_select_db($SETTINGS['db']['db']) or die('Could not select database');
 
 
 function DBClose () {

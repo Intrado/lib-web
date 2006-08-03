@@ -1,14 +1,12 @@
 <?
 
-$CONTENT_URLS = array("get" => array(array("localhost","80","/foobar/xxx-get.php")),
-					"put" => array(array("localhost","80","/foobar/xxx-put.php")),
-					"tts" => array(array("localhost","8080","/phone/Tts"))
-				);
-
 function connectToContentServer($type) {
-	global $CONTENT_URLS;
-	foreach ($CONTENT_URLS[$type] as $server) {
-		list($ip,$port,$path) = $server;
+	global $SETTINGS;
+
+	$serversstr = explode(";",$SETTINGS['content'][$type]);
+
+	foreach($serversstr as $str) {
+		list($ip,$port,$path) = explode(",",$str);
 		if ($fp = fsockopen($ip,$port,$errno,$errstr,0.5))
 			return array($fp,$server);
 	}
@@ -35,7 +33,6 @@ function getHttpResponseContents ($fp) {
 }
 
 function contentGet ($cmid) {
-	global $CONTENT_URLS;
 	list($fp,$server) = connectToContentServer("get");
 	list($host,$port,$path) = $server;
 	if ($fp) {
@@ -49,7 +46,6 @@ function contentGet ($cmid) {
 }
 
 function contentPut ($filename,$contenttype) {
-	global $CONTENT_URLS;
 	$result = false;
 
 	if (is_file($filename) && is_readable($filename) && ($filesize = filesize($filename)) > 0) {
@@ -75,7 +71,6 @@ function contentPut ($filename,$contenttype) {
 }
 
 function renderTts ($text,$language,$gender) {
-	global $CONTENT_URLS;
 	list($fp,$server) = connectToContentServer("tts");
 	list($host,$port,$path) = $server;
 	if ($fp) {

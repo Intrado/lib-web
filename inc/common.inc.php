@@ -1,5 +1,7 @@
 <?
 
+$SETTINGS = parse_ini_file("settings.ini.php",true);
+
 require_once("db.inc.php");
 require_once("DBMappedObject.php");
 require_once("DBRelationMap.php");
@@ -18,7 +20,7 @@ $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 session_name($CUSTOMERURL . "_session");
 session_start();
 
-$IS_COMMSUITE = false; //TODO make this a config or something
+$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 
 if (!isset($isindexpage) || !$isindexpage) {

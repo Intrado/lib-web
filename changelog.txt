@@ -35,5 +35,4 @@ fixed reports. was showing 1 line per phone #, now shows last phone # called
 fixed typo in import mapping page.
 fixed typo in upload audio.
 
-
-
+changed the way settings are handled. settings are now stored in an ini file (inc/settings.ini.php) and read everywhere else. this way you don't need to edit php files after upgrading, the settings.ini.php file can simply be removed from the update source.
