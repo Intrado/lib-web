@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='windows-1252' ?>
+<indexdata>
+<key name="System" >
+  <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
+  <topic name="Managing Global System Settings" url="the_admin_tab/managing_global_system_settings.htm" />
+  <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
+  <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
+  <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
+  <key name="add new user" >
+    <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
+  </key>
+  <key name="block phone number" >
+    <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
+  </key>
+  <key name="contact database" >
+    <topic name="The Contact Database" url="the_system_tab/the_contact_database.htm" />
+  </key>
+  <key name="create access profile" >
+    <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
+  </key>
+  <key name="edit access profile" >
+    <topic name="The_Edit_Access_Profile_Screen" url="the_admin_tab/managing_access_profiles.htm#The_Edit_Access_Profile_Screen" />
+  </key>
+  <key name="global system settings" >
+    <topic name="Managing Global System Settings" url="the_admin_tab/managing_global_system_settings.htm" />
+  </key>
+  <key name="reports" >
+    <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
+  </key>
+  <key name="searchable" >
+    <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
+  </key>
+  <key name="security" >
+    <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
+  </key>
+  <key name="user editor" >
+    <topic name="The User Editor Screen" url="the_admin_tab/managing_user_accounts.htm#The User Editor Screen" />
+  </key>
+  <key name="view users" >
+    <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
+  </key>
+</key>
+
+</indexdata>
