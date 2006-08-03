@@ -47,7 +47,7 @@ if(CheckFormSubmit($f,$s))
 		} else {
 			//submit changes
 			$audio = new AudioFile(getCurrentAudio());
-			$testname = DBSafe(GetFormData($f, $s, 'name'));
+			$testname = GetFormData($f, $s, 'name');
 			// Strip extra whitespace from name
 			$words = explode(' ', $testname);
 			$testname = '';
@@ -60,9 +60,9 @@ if(CheckFormSubmit($f,$s))
 			PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
 
 			if (QuickQuery("select * from audiofile where userid = {$USER->id} and deleted = 0 and name = '" .
-				  $testname . "' and id != '" . $audio->id. "'")) {
+				  DBSafe($testname) . "' and id != '" . $audio->id. "'")) {
 				error('This audio file name is already in use, a unique one was generated');
-				$testname = DBSafe(GetFormData($f, $s, 'name')) . ' ' . date("F jS, Y h:i a");
+				$testname = GetFormData($f, $s, 'name') . ' ' . date("F jS, Y h:i a");
 				PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
 			}
 
