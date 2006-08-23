@@ -15,6 +15,8 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("inc/ftpfile.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -77,6 +79,8 @@ if(CheckFormSubmit($form, $section))
 				}
 			}
 
+			//get rid of any mappings that are beyond the scope of the current file
+			QuickUpdate("delete from importfield where importid='" . $_SESSION['importid'] . "' and mapfrom >= $x");
 
 			//$reloadform = true;
 			redirect("tasks.php");
@@ -146,8 +150,15 @@ foreach ($fieldmaps as $fieldmap) {
 }
 
 //scan the file
-if (is_file($IMPORT->path) && is_readable($IMPORT->path))
-	$fp = @fopen($IMPORT->path, "r");
+
+
+if ($IS_COMMSUITE)
+	$importfile = $IMPORT->path;
+else
+	$importfile = getImportFileURL($IMPORT->customerid,$IMPORT->id);
+
+if (is_file($importfile ))
+	$fp = @fopen($importfile , "r");
 else
 	$fp = null;
 if ($fp) {
@@ -181,7 +192,7 @@ startWindow('Field Mapping');
 ?>
 <br>
 <? if ($noimportdata) { ?>
-			<br><h3>The import file could not be found or read. Please make sure that they file path is correct and that the file has read access.</h3><br>
+			<br><h3>The import file could not be found. Please make sure that the file exists.</h3><br>
 <? } else { ?>
 
 <?

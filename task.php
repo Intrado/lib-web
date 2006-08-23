@@ -31,9 +31,11 @@ if (isset($_GET['delete'])) {
 		$deleteimport = DBFind("Import", "from import where id = '$delete' and customerid = '$USER->customerid'");
 		$schedule = DBFind("Schedule", "from schedule where id = '$deleteimport->scheduleid'");
 
-		QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
+		if ($schedule) {
+			QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
+			$schedule->destroy();
+		}
 		QuickUpdate("delete from importfield where importid=$deleteimport->id");
-		$schedule->destroy();
 		$deleteimport->destroy();
 	}
 
@@ -43,10 +45,14 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['run'])) {
 	$run = DBSafe($_GET['run']);
 	if(customerOwns("import",$run)) {
-		$runimport = DBFind("Import", "from import where id = '$run' and customerid = '$USER->customerid'");
-		$schedule = DBFind("Schedule", "from schedule where id = '$runimport->scheduleid'");
-		$schedule->nextrun = QuickQuery('select now()');
-		$schedule->update();
+		if (isset($_SERVER['WINDIR'])) {
+			$cmd = "start php import.php -import=$run";
+			pclose(popen($cmd,"r"));
+		} else {
+			$cmd = "php import.php -import=$run > /dev/null &";
+			exec($cmd);
+		}
+
 	}
 	redirectToReferrer();
 }
@@ -88,52 +94,68 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->customerid = $USER->customerid;
 				$IMPORT->name = DBSafe(GetFormData($form, $section, 'name'));
 				$IMPORT->description = DBSafe(GetFormData($form, $section, 'description'));
-				$IMPORT->path = DBSafe(GetFormData($form, $section, 'path'));
+
+
+
 				$IMPORT->updatemethod = DBSafe(GetFormData($form, $section, 'updatemethod'));
 				$IMPORT->status = 'idle';
 				$IMPORT->ownertype = 'system';
 
-				if (GetFormData($form, $section, 'isscheduled')) {
-					$IMPORT->type = 'automatic';
-				} else {
-					$IMPORT->type = 'manual';
-				}
 
-				$schedule = new Schedule($IMPORT->scheduleid);
-				$schedule->userid = $USER->id;
-				$schedule->triggertype = 'import';
-				$schedule->type = 'R';
-				if (GetFormData($form, $section,"scheduletime")) {
-					$time = GetFormData($form, $section,"scheduletime");
-				} else {
-					$time = '12:00 am';	// Default if none was chosen in the UI
-				}
-				$schedule->time = date("H:i", strtotime($time));
-				$schedule->update(); // Make sure the schedule object has a valid ID
-				$IMPORT->scheduleid = $schedule->id;
-				$IMPORT->update();
 
-				// If the task is scheduled, set up the schedule data
-				if (GetFormData($form, $section, 'isscheduled')) {
-					$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
-					for ($x = 1; $x < 8; $x++) {
-						if(GetFormData($form, $section,"dow$x")) {
-							if (!in_array($x,$data)) {
-								QuickUpdate("insert into scheduleday (scheduleid, dow) values ($schedule->id,$x)");
-							}
-						} else {
-							if (in_array($x,$data)) {
-								QuickUpdate("delete from scheduleday where scheduleid=$schedule->id and dow=$x");
+				if ($IS_COMMSUITE) {
+					$IMPORT->path = DBSafe(GetFormData($form, $section, 'path'));
+
+					if (GetFormData($form, $section, 'isscheduled')) {
+						$IMPORT->type = 'automatic';
+					} else {
+						$IMPORT->type = 'manual';
+					}
+
+					$schedule = new Schedule($IMPORT->scheduleid);
+					$schedule->userid = $USER->id;
+					$schedule->triggertype = 'import';
+					$schedule->type = 'R';
+					if (GetFormData($form, $section,"scheduletime")) {
+						$time = GetFormData($form, $section,"scheduletime");
+					} else {
+						$time = '12:00 am';	// Default if none was chosen in the UI
+					}
+					$schedule->time = date("H:i", strtotime($time));
+					$schedule->update(); // Make sure the schedule object has a valid ID
+					$IMPORT->scheduleid = $schedule->id;
+
+					$IMPORT->update();
+
+
+
+					// If the task is scheduled, set up the schedule data
+					if (GetFormData($form, $section, 'isscheduled')) {
+						$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
+						for ($x = 1; $x < 8; $x++) {
+							if(GetFormData($form, $section,"dow$x")) {
+								if (!in_array($x,$data)) {
+									QuickUpdate("insert into scheduleday (scheduleid, dow) values ($schedule->id,$x)");
+								}
+							} else {
+								if (in_array($x,$data)) {
+									QuickUpdate("delete from scheduleday where scheduleid=$schedule->id and dow=$x");
+								}
 							}
 						}
+					} else { // Delete the schedule data
+						QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
+						$schedule->type = 'O'; // Letter O as in "Oh", short for "Once" - If the task IS NOT scheduled set the schedule type to ONCE
 					}
-				} else { // Delete the schedule data
-					QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
-					$schedule->type = 'O'; // Letter O as in "Oh", short for "Once" - If the task IS NOT scheduled set the schedule type to ONCE
-				}
 
-				$schedule->nextrun = $schedule->calcNextRun();
-				$schedule->update();
+					$schedule->nextrun = $schedule->calcNextRun();
+					$schedule->update();
+
+
+				} else {
+					$IMPORT->type = 'manual';
+					$IMPORT->update();
+				}
 
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
 				redirect("tasks.php");
@@ -149,23 +171,28 @@ if( $reloadform )
 	ClearFormData($form);
 	PutFormData($form, $section, 'name', $IMPORT->name, 'text', 1, 50, true);
 	PutFormData($form, $section, 'description', $IMPORT->description, 'text', 1, 50);
-	PutFormData($form, $section, 'path', $IMPORT->path, 'text', 1, 1000, true);
-	PutFormData($form, $section, 'isscheduled', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
 	PutFormData($form, $section, 'updatemethod', ($IMPORT->updatemethod != null ? $IMPORT->updatemethod : 'updateonly'), 'text');
 
-	$schedule = new Schedule($IMPORT->scheduleid);
-	$scheduledows = array();
-	$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
-	for ($x = 1; $x < 8; $x++) {
-		$scheduledows[$x] = in_array($x,$data);
-	}
-	for ($x = 1; $x < 8; $x++) {
-		PutFormData($form, $section, "dow$x",$scheduledows[$x],"bool",0,1);
-	}
-	if ($schedule->time != null) {
-		PutFormData($form, $section, "scheduletime",date("g:i a", strtotime($schedule->time)),"text",1,50,true);
-	} else {
-		PutFormData($form, $section, "scheduletime",date("g:i a", strtotime('12:00 am')),"text",1,50,true);
+
+	if ($IS_COMMSUITE) {
+		PutFormData($form, $section, 'path', $IMPORT->path, 'text', 1, 1000, true);
+		PutFormData($form, $section, 'isscheduled', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
+
+
+		$schedule = new Schedule($IMPORT->scheduleid);
+		$scheduledows = array();
+		$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
+		for ($x = 1; $x < 8; $x++) {
+			$scheduledows[$x] = in_array($x,$data);
+		}
+		for ($x = 1; $x < 8; $x++) {
+			PutFormData($form, $section, "dow$x",$scheduledows[$x],"bool",0,1);
+		}
+		if ($schedule->time != null) {
+			PutFormData($form, $section, "scheduletime",date("g:i a", strtotime($schedule->time)),"text",1,50,true);
+		} else {
+			PutFormData($form, $section, "scheduletime",date("g:i a", strtotime('12:00 am')),"text",1,50,true);
+		}
 	}
 }
 
@@ -198,10 +225,12 @@ startWindow('Import Information ');
 					<td>Description:</td>
 					<td><? NewFormItem($form, $section,"description","text", 50); ?></td>
 				</tr>
+<? if ($IS_COMMSUITE) { ?>
 				<tr>
 					<td>File:</td>
 					<td><? NewFormItem($form, $section,"path","text", 100); ?></td>
 				</tr>
+<? } ?>
 				<tr>
 					<td>Update Method:</td>
 					<td><?
@@ -216,6 +245,7 @@ startWindow('Import Information ');
 			</table>
 		</td>
 	</tr>
+<? if ($IS_COMMSUITE) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Schedule:</th>
 		<td class="bottomBorder">
@@ -252,6 +282,7 @@ startWindow('Import Information ');
 			</table>
 		</td>
 	</tr>
+<? } ?>
 </table>
 <?
 endWindow();
