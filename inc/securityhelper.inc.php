@@ -130,4 +130,13 @@ function getCurrentImport() {
 	return $_SESSION['accessid'];
 }
 
+
+function setCurrentUser ($newid) {
+	return setIfOwnsOrNew($newid, "userid", "user", true);
+}
+
+function getCurrentUser() {
+	return $_SESSION['userid'];
+}
+
 ?>
