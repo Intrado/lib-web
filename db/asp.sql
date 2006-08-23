@@ -940,3 +940,21 @@ ALTER TABLE `customer` ADD `inboundnumber` VARCHAR( 20 ) NOT NULL AFTER `hostnam
 
 ALTER TABLE `jobtask` ADD INDEX `waiting` ( `id` , `nextattempt` ) 
 
+---------------- after 8/16 ---------------
+
+CREATE TABLE `sessiondata` (
+`id` CHAR( 255 ) NOT NULL ,
+`lastused` TIMESTAMP NOT NULL ,
+`data` BLOB NOT NULL ,
+PRIMARY KEY ( `id` ) ,
+INDEX ( `lastused` )
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE `import` ADD `uploadkey` VARCHAR( 255 ) NULL AFTER `id` ;
+
+ALTER TABLE `import` ADD UNIQUE (
+`uploadkey`
+);
+
+ALTER TABLE `sessiondata` ADD `customerid` INT NOT NULL AFTER `id` ;
+ALTER TABLE `sessiondata` CHANGE `data` `data` TEXT NOT NULL 
