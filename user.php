@@ -29,10 +29,7 @@ if (!$USER->authorize('manageaccount')) {
 ////////////////////////////////////////////////////////////////////////////////
 //get the message to edit from the request params or session
 if (isset($_GET['id'])) {
-	$id = DBSafe($_GET['id']);
-	if (customerOwns("user",$id)) {
-		$_SESSION['userid'] = $_GET['id'] == 'new' ? NULL : $_GET['id'];
-	}
+	setCurrentUser($_GET['id']);
 	redirect();
 }
 
@@ -41,8 +38,12 @@ if ($_POST['id'] == 'new' || isset($_POST['adduser_x'])) {
 }
 
 if($_GET['deleterule']) {
-	$query = "delete from userrule where userid = " . $_SESSION['userid'] . " and ruleid = '" . DBSafe($_GET['deleterule'] . "'");
-	QuickUpdate($query);
+	$deleterule = DBSafe($_GET['deleterule']);
+	if (customerOwns("user",$_SESSION['userid'])) {
+		$query = "delete from userrule where userid = " . $_SESSION['userid'] . " and ruleid = '$deleterule'";
+		QuickUpdate($query);
+	}
+
 	redirect();
 }
 
