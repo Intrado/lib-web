@@ -1,4 +1,4 @@
-@help/schoolmessenger_help.htm#system_administration/the_import_manager.htm
+@help/schoolmessenger_help.htm#the_admin_tab/the_import_manager.htm
 An import can be configured as one of the following types:
 
 Scheduled: Set to automatically run on certain days at a specified time

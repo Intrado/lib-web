@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#system_administration/managing_access_profiles.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
 Enables or disables user access to the system level Contacts tab.

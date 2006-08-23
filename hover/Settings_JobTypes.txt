@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#system_administration/managing_global_system_settings.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
 Job Types determine the priority in which notification jobs are processed. Priority level 1 is the highest priority. Security profiles are used to determine which job types are available to each user when sending a notification. Priority levels can be changed at any time, but any changes will not affect jobs already in progress.

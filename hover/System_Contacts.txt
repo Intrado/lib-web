@@ -1,4 +1,4 @@
-@help/schoolmessenger_help.htm#system_administration/the_contact_database.htm
+@help/schoolmessenger_help.htm#the_system_tab/the_contact_database.htm
 To locate individuals perform the following steps:
 
 1. Select the field you wish to filter on.

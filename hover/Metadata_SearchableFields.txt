@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#system_administration/the_metadata_manager.htm
+@help/schoolmessenger_help.htm#the_admin_tab/the_metadata_manager.htm
 Searchable metadata fields are either list type fields such as grade level or school ID number, text fields such as first or last name, or date fields. The first three searchable fields (First Name, Last Name, and Language) are reserved by the system and cannot be edited or deleted.

@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#system_administration/managing_user_accounts.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_user_accounts.htm
 The Inactive Users section displays a list of all disabled user accounts. From here you can edit account properties, enable accounts or delete accounts that are no longer needed.
