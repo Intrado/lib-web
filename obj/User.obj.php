@@ -148,10 +148,10 @@ class User extends DBMappedObject {
 
 
 	//see if the login is used
-	function checkDuplicateLogin ($newlogin, $customerid, $id = 0) {
+	function checkDuplicateLogin ($newlogin, $customerid, $id) {
 		$newlogin = DBSafe($newlogin);
 
-		if (QuickQuery("select count(*) from user where customerid=$customerid and id!=$id and login='$newlogin'") > 0 )
+		if (QuickQuery("select count(*) from user where customerid=$customerid and id!=$id and login='$newlogin' and deleted=0") > 0 )
 			return true;
 		else
 			return false;
