@@ -141,7 +141,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$import->userid = $USER->id;
 			$import->listid = $list->id;
 			$import->name = "User list import (" . $USER->login . ")";
-			$import->description = "Created automatically to import a list (" . $list->name . ")";
+			$import->description = substr("list (" . $list->name . ")", 0,50);
 			$import->status = "idle";
 			$import->type = "upload";
 			$import->path = $curfilename;
@@ -180,7 +180,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$import = new Import($importid);
 			$import->path = $curfilename;
 			$import->name = "User list import (" . $USER->login . ")";
-			$import->description = "Created automatically to import a list (" . $list->name . ")";
+			$import->description = substr("list (" . $list->name . ")", 0,50);
 			$import->update();
 		}
 
