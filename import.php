@@ -73,14 +73,13 @@ if (!$logfp) {
 	exit(-1);
 }
 
-wlog("start");
-
 set_time_limit (0);
 
 
 
 if (count($argv) < 2) {
 	echo "usage: import.php -import=<importid>";
+	wlog("bad usage");
 	exit(-1);
 }
 
@@ -89,6 +88,7 @@ if (strpos($argv[1], "-import=") !== false) {
 	list($dummy,$importid) = explode("=",$argv[1]);
 	$importid = DBSafe($importid);
 } else {
+	wlog("missing parameters");
 	exit(-1);
 }
 
@@ -97,6 +97,8 @@ if (strpos($argc[2],"-debug") !== false) {
 } else {
 	$debug = false;
 }
+
+wlog("start id=$importid");
 
 
 //get the import from the DB
@@ -134,7 +136,7 @@ $timezone = QuickQuery("select timezone from customer where id=$custid");
 date_default_timezone_set($timezone);
 QuickUpdate("set time_zone='" . $timezone . "'");
 
-if ($IS_COMMSUITE)
+if ($IS_COMMSUITE || $import->type == "upload")
 	$importfile = $import->path;
 else
 	$importfile = getImportFileURL($import->customerid,$import->id);
@@ -153,9 +155,8 @@ $imported = 0;
 $ignored = 0;
 $count = 0;
 while (($row = fgetcsv($fp,4096)) !== FALSE) {
-
-	//per fgetcsv docs: Note:  A blank line in a CSV file will be returned as an array comprising a single null field, and will not be treated as an error.
-	if ($row[0] === null || count($row) == 0)
+	//skip blank lines
+	if (count($row) == 1 and $row[0] === "")
 		continue;
 	$count++;
 	//try to use mapped key
