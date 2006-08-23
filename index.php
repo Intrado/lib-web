@@ -9,14 +9,20 @@ if (isset($_GET['logout'])) {
 	@session_destroy();
 } elseif (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
 	$_SESSION = array();
-	@session_destroy();
-	@session_start();
+//	@session_destroy();
+//	@session_name($CUSTOMERURL . "_session");
+//	@session_start();
 	$login = DBSafe($_GET['login']);
-	User::forceLogin($login,$CUSTOMERURL);
-	$USER = $_SESSION['user'] = DBFind('User',"from user where login = '$login'");
-	$_SESSION['access'] = new Access($USER->accessid);
-	$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
-	redirect("start.php");
+	$id = User::forceLogin($login,$CUSTOMERURL);
+
+	if ($id) {
+		$USER = $_SESSION['user'] = new User($id);
+		$_SESSION['access'] = new Access($USER->accessid);
+		$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
+		redirect("start.php");
+	} else {
+		$badlogin = true;
+	}
 } elseif (isset($_SESSION['user'])) {
 	$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
 	unset($_SESSION['lasturi']);
@@ -42,6 +48,9 @@ if (isset($_GET['logout'])) {
 	}
 }
 
+//try to find the customer's name
+$custname = QuickQuery("select name from customer where hostname='" . DBSafe($CUSTOMERURL) . "'");
+
 ?>
 
 <html>
@@ -65,7 +74,7 @@ if (file_exists($logofilename) ) {
 <? } ?>
 <table align="center" cellpadding="8" cellspacing="0" style="border: 7px solid #9B9B9B;">
 	<tr>
-		<td bgcolor="#365F8D"><img src="img/school_messenger.gif"></td>
+		<td bgcolor="#365F8D"><div id='orgtitle'><?= htmlentities($custname) ?></div><img src="img/school_messenger.gif"></td>
 	</tr>
 	<tr>
 		<td>
