@@ -1,9 +1,11 @@
 <?
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
+$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("inc/db.inc.php");
 require_once("inc/DBMappedObject.php");
 require_once("inc/DBRelationMap.php");
+require_once("inc/ftpfile.inc.php");
 require_once("obj/User.obj.php");
 require_once("obj/UserRule.obj.php");
 require_once("obj/Access.obj.php");
@@ -78,7 +80,7 @@ set_time_limit (0);
 
 
 if (count($argv) < 2) {
-	echo "usage: import.php [-import=<importid> | -scan]";
+	echo "usage: import.php -import=<importid>";
 	exit(-1);
 }
 
@@ -132,7 +134,10 @@ $timezone = QuickQuery("select timezone from customer where id=$custid");
 date_default_timezone_set($timezone);
 QuickUpdate("set time_zone='" . $timezone . "'");
 
-$importfile = $import->path;
+if ($IS_COMMSUITE)
+	$importfile = $import->path;
+else
+	$importfile = getImportFileURL($import->customerid,$import->id);
 
 $now = QuickQuery("select now()");
 
@@ -148,7 +153,9 @@ $imported = 0;
 $ignored = 0;
 $count = 0;
 while (($row = fgetcsv($fp,4096)) !== FALSE) {
-	if (count($row) == 0)
+
+	//per fgetcsv docs: Note:  A blank line in a CSV file will be returned as an array comprising a single null field, and will not be treated as an error.
+	if ($row[0] === null || count($row) == 0)
 		continue;
 	$count++;
 	//try to use mapped key
@@ -164,8 +171,6 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 	} else {
 		$username = false;
 	}
-
-
 
 	if ($key === false && $username === false && $import->ownertype != "user") {
 		wlog("ignoring row $count, no key or user found");
