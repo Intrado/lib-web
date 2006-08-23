@@ -3,8 +3,6 @@ include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 header ("Content-type: image/png");
 
-//FIXME if this is a system person, then check the user's dataview rules.
-
 $id = DBSafe($_GET['id']);
 if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid'])) {
 	if ($_GET['type'] == "add") {
@@ -15,7 +13,9 @@ if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid']
 					from 		person p
 								left join	persondata pd on
 										(p.id=pd.personid)
-					where p.id='$id' and $usersql
+					where p.id='$id' and (($usersql) or
+											(p.userid = 0 and p.customerid=$USER->customerid) or
+											p.userid = $USER->id)
 				";
 			if ($personid = QuickQuery($query)) {
 				QuickUpdate("insert into listentry (listid,type,personid)"
