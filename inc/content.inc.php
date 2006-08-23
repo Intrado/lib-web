@@ -6,7 +6,7 @@ function connectToContentServer($type) {
 	$serversstr = explode(";",$SETTINGS['content'][$type]);
 
 	foreach($serversstr as $str) {
-		list($ip,$port,$path) = explode(",",$str);
+		list($ip,$port,$path) = $server = explode(",",$str);
 		if ($fp = fsockopen($ip,$port,$errno,$errstr,0.5))
 			return array($fp,$server);
 	}
