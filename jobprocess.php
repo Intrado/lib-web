@@ -1,5 +1,6 @@
 <?
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
+$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("inc/db.inc.php");
 require_once("inc/DBMappedObject.php");
@@ -59,7 +60,7 @@ if ($job->status=="repeating") {
 	$newjob->enddate = date("Y-m-d", time() + $daydiff);
 
 	if (getSetting('retry') != "")
-		$job->setOptionValue("retry=",getSetting('retry'));
+		$job->setOptionValue("retry",getSetting('retry'));
 
 	$newjob->create();
 

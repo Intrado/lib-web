@@ -161,7 +161,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			}
 
 			if (getSetting('retry') != "")
-				$job->setOptionValue("retry=",getSetting('retry'));
+				$job->setOptionValue("retry",getSetting('retry'));
 
 			if ($JOBTYPE == "repeating") {
 				$schedule = new Schedule($job->scheduleid);
