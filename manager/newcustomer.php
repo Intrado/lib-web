@@ -5,12 +5,15 @@ include_once("common.inc.php");
 
 
 if ($_POST['submit']) {
-	if ($_POST['code'] != "joplin555") exit("bad code");
-	if ($_POST['password'] != $_POST['password']) exit("passwords do not match");
-	if (QuickQuery("select count(*) from user where login='" . DBSafe($_POST['user']) . "' and deleted=0") > 0)
-		exit("username exists");
 
-	$query = "insert into customer (name,enabled,timezone,hostname) values ('$_POST[name]',1,'$_POST[timezone]','$_POST[hostname]')";
+
+	if (!$_POST['name']) exit ("missing name");
+	if (!$_POST['hostname']) exit ("missing url path");
+	if ($_POST['code'] != "joplin555") exit("bad secret code");
+	if ($_POST['password'] != $_POST['password']) exit("passwords do not match");
+	if (strlen($_POST['inboundnumber']) > 0 && !ereg("[0-9]{10}",$_POST['inboundnumber'])) exit ("bad 800 number format");
+
+	$query = "insert into customer (name,enabled,timezone,hostname,inboundnumber) values ('$_POST[name]',1,'$_POST[timezone]','$_POST[hostname]','$_POST[inboundnumber]')";
 	QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 	$custid = mysql_insert_id();
 
@@ -68,7 +71,7 @@ if ($_POST['submit']) {
 
 	$query = "
 		INSERT INTO `language` (`customerid`, `name`, `code`) VALUES
-		(123, 'English', ''),(123, 'Spanish', '');
+		($custid, 'English', ''),($custid, 'Spanish', '');
 		";
 	QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 
@@ -84,21 +87,35 @@ if ($_POST['submit']) {
 	exit("All done!");
 
 } else {
+
+function genpassword() {
+	$digits = 6;
+	$passwd = "";
+	$chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+	while ($digits--) {
+		$passwd .= $chars[mt_rand(0,strlen($chars)-1)];
+	}
+	return $passwd;
+}
+
+$password = genpassword();
+
 ?>
 
 
 <html>
 <body>
 <form method="POST">
+<table>
+<tr><td>Customer display name: </td><td> <input name="name" type="text"></td></tr>
+<tr><td>URL path name: </td><td><input name="hostname" type="text"> (should be >= 5 characters, try not to use acronyms exclusively)</td></tr>
+<tr><td>800 inbound number: </td><td><input name="inboundnumber" type="text" maxlength="10"> (be sure this isn't used already!) </td></tr>
+<tr><td>Admin username: </td><td><input name="user" type="text" value="admin"> (admin is ok)</td></tr>
+<tr><td>Admin password: </td><td><input name="password" type="text" value="<?= $password ?>"> (generated automatically, be sure to write this down)</td></tr>
+<tr><td>Password verify:</td><td><input name="password2" type="text" value="<?= $password ?>"></td></tr>
 
-Customer name: <input name="name" type="text"><br>
-URL name: <input name="hostname" type="text"><br>
-Admin username: <input name="user" type="text"><br>
-Admin password: <input name="password" type="password"><br>
-Password verify:<input name="password2" type="password"><br>
-
-Reliance secret code:<input name="code" type="password"><br>
-<select name="timezone">
+<tr><td>Reliance secret code: </td><td><input name="code" type="password"></td></tr>
+<tr><td>Timezone: </td><td><select name="timezone">
 <option value="US/Alaska">US/Alaska</option>
 <option value="US/Aleutian">US/Aleutian</option>
 <option value="US/Arizona">US/Arizona</option>
@@ -110,172 +127,11 @@ Reliance secret code:<input name="code" type="password"><br>
 <option value="US/Michigan">US/Michigan</option>
 <option value="US/Mountain">US/Mountain</option>
 <option value="US/Pacific">US/Pacific</option>
-<!-- <option value="US/Pacific-New">US/Pacific-New</option> -->
 <option value="US/Samoa">US/Samoa</option>
-<option value="America/Adak">America/Adak</option>
-<option value="America/Anchorage">America/Anchorage</option>
-<option value="America/Anguilla">America/Anguilla</option>
-<option value="America/Antigua">America/Antigua</option>
-<option value="America/Araguaina">America/Araguaina</option>
-<option value="America/Argentina/Buenos_Aires">America/Argentina/Buenos_Aires</option>
-<option value="America/Argentina/Catamarca">America/Argentina/Catamarca</option>
-<option value="America/Argentina/ComodRivadavia">America/Argentina/ComodRivadavia</option>
-<option value="America/Argentina/Cordoba">America/Argentina/Cordoba</option>
-<option value="America/Argentina/Jujuy">America/Argentina/Jujuy</option>
-<option value="America/Argentina/La_Rioja">America/Argentina/La_Rioja</option>
-<option value="America/Argentina/Mendoza">America/Argentina/Mendoza</option>
-<option value="America/Argentina/Rio_Gallegos">America/Argentina/Rio_Gallegos</option>
-<option value="America/Argentina/San_Juan">America/Argentina/San_Juan</option>
-<option value="America/Argentina/Tucuman">America/Argentina/Tucuman</option>
-<option value="America/Argentina/Ushuaia">America/Argentina/Ushuaia</option>
-<option value="America/Aruba">America/Aruba</option>
-<option value="America/Asuncion">America/Asuncion</option>
-<option value="America/Atka">America/Atka</option>
-<option value="America/Bahia">America/Bahia</option>
-<option value="America/Barbados">America/Barbados</option>
-<option value="America/Belem">America/Belem</option>
-<option value="America/Belize">America/Belize</option>
-<option value="America/Boa_Vista">America/Boa_Vista</option>
-<option value="America/Bogota">America/Bogota</option>
-<option value="America/Boise">America/Boise</option>
-<option value="America/Buenos_Aires">America/Buenos_Aires</option>
-<option value="America/Cambridge_Bay">America/Cambridge_Bay</option>
-<option value="America/Campo_Grande">America/Campo_Grande</option>
-<option value="America/Cancun">America/Cancun</option>
-<option value="America/Caracas">America/Caracas</option>
-<option value="America/Catamarca">America/Catamarca</option>
-<option value="America/Cayenne">America/Cayenne</option>
-<option value="America/Cayman">America/Cayman</option>
-<option value="America/Chicago">America/Chicago</option>
-<option value="America/Chihuahua">America/Chihuahua</option>
-<option value="America/Coral_Harbour">America/Coral_Harbour</option>
-<option value="America/Cordoba">America/Cordoba</option>
-<option value="America/Costa_Rica">America/Costa_Rica</option>
-<option value="America/Cuiaba">America/Cuiaba</option>
-<option value="America/Curacao">America/Curacao</option>
-<option value="America/Danmarkshavn">America/Danmarkshavn</option>
-<option value="America/Dawson">America/Dawson</option>
-<option value="America/Dawson_Creek">America/Dawson_Creek</option>
-<option value="America/Denver">America/Denver</option>
-<option value="America/Detroit">America/Detroit</option>
-<option value="America/Dominica">America/Dominica</option>
-<option value="America/Edmonton">America/Edmonton</option>
-<option value="America/Eirunepe">America/Eirunepe</option>
-<option value="America/El_Salvador">America/El_Salvador</option>
-<option value="America/Ensenada">America/Ensenada</option>
-<option value="America/Fort_Wayne">America/Fort_Wayne</option>
-<option value="America/Fortaleza">America/Fortaleza</option>
-<option value="America/Glace_Bay">America/Glace_Bay</option>
-<option value="America/Godthab">America/Godthab</option>
-<option value="America/Goose_Bay">America/Goose_Bay</option>
-<option value="America/Grand_Turk">America/Grand_Turk</option>
-<option value="America/Grenada">America/Grenada</option>
-<option value="America/Guadeloupe">America/Guadeloupe</option>
-<option value="America/Guatemala">America/Guatemala</option>
-<option value="America/Guayaquil">America/Guayaquil</option>
-<option value="America/Guyana">America/Guyana</option>
-<option value="America/Halifax">America/Halifax</option>
-<option value="America/Havana">America/Havana</option>
-<option value="America/Hermosillo">America/Hermosillo</option>
-<option value="America/Indiana/Indianapolis">America/Indiana/Indianapolis</option>
-<option value="America/Indiana/Knox">America/Indiana/Knox</option>
-<option value="America/Indiana/Marengo">America/Indiana/Marengo</option>
-<option value="America/Indiana/Vevay">America/Indiana/Vevay</option>
-<option value="America/Indianapolis">America/Indianapolis</option>
-<option value="America/Inuvik">America/Inuvik</option>
-<option value="America/Iqaluit">America/Iqaluit</option>
-<option value="America/Jamaica">America/Jamaica</option>
-<option value="America/Jujuy">America/Jujuy</option>
-<option value="America/Juneau">America/Juneau</option>
-<option value="America/Kentucky/Louisville">America/Kentucky/Louisville</option>
-<option value="America/Kentucky/Monticello">America/Kentucky/Monticello</option>
-<option value="America/Knox_IN">America/Knox_IN</option>
-<option value="America/La_Paz">America/La_Paz</option>
-<option value="America/Lima">America/Lima</option>
-<option value="America/Los_Angeles">America/Los_Angeles</option>
-<option value="America/Louisville">America/Louisville</option>
-<option value="America/Maceio">America/Maceio</option>
-<option value="America/Managua">America/Managua</option>
-<option value="America/Manaus">America/Manaus</option>
-<option value="America/Martinique">America/Martinique</option>
-<option value="America/Mazatlan">America/Mazatlan</option>
-<option value="America/Mendoza">America/Mendoza</option>
-<option value="America/Menominee">America/Menominee</option>
-<option value="America/Merida">America/Merida</option>
-<option value="America/Mexico_City">America/Mexico_City</option>
-<option value="America/Miquelon">America/Miquelon</option>
-<option value="America/Monterrey">America/Monterrey</option>
-<option value="America/Montevideo">America/Montevideo</option>
-<option value="America/Montreal">America/Montreal</option>
-<option value="America/Montserrat">America/Montserrat</option>
-<option value="America/Nassau">America/Nassau</option>
-<option value="America/New_York">America/New_York</option>
-<option value="America/Nipigon">America/Nipigon</option>
-<option value="America/Nome">America/Nome</option>
-<option value="America/Noronha">America/Noronha</option>
-<option value="America/North_Dakota/Center">America/North_Dakota/Center</option>
-<option value="America/Panama">America/Panama</option>
-<option value="America/Pangnirtung">America/Pangnirtung</option>
-<option value="America/Paramaribo">America/Paramaribo</option>
-<option value="America/Phoenix">America/Phoenix</option>
-<option value="America/Port-au-Prince">America/Port-au-Prince</option>
-<option value="America/Port_of_Spain">America/Port_of_Spain</option>
-<option value="America/Porto_Acre">America/Porto_Acre</option>
-<option value="America/Porto_Velho">America/Porto_Velho</option>
-<option value="America/Puerto_Rico">America/Puerto_Rico</option>
-<option value="America/Rainy_River">America/Rainy_River</option>
-<option value="America/Rankin_Inlet">America/Rankin_Inlet</option>
-<option value="America/Recife">America/Recife</option>
-<option value="America/Regina">America/Regina</option>
-<option value="America/Rio_Branco">America/Rio_Branco</option>
-<option value="America/Rosario">America/Rosario</option>
-<option value="America/Santiago">America/Santiago</option>
-<option value="America/Santo_Domingo">America/Santo_Domingo</option>
-<option value="America/Sao_Paulo">America/Sao_Paulo</option>
-<option value="America/Scoresbysund">America/Scoresbysund</option>
-<option value="America/Shiprock">America/Shiprock</option>
-<option value="America/St_Johns">America/St_Johns</option>
-<option value="America/St_Kitts">America/St_Kitts</option>
-<option value="America/St_Lucia">America/St_Lucia</option>
-<option value="America/St_Thomas">America/St_Thomas</option>
-<option value="America/St_Vincent">America/St_Vincent</option>
-<option value="America/Swift_Current">America/Swift_Current</option>
-<option value="America/Tegucigalpa">America/Tegucigalpa</option>
-<option value="America/Thule">America/Thule</option>
-<option value="America/Thunder_Bay">America/Thunder_Bay</option>
-<option value="America/Tijuana">America/Tijuana</option>
-<option value="America/Toronto">America/Toronto</option>
-<option value="America/Tortola">America/Tortola</option>
-<option value="America/Vancouver">America/Vancouver</option>
-<option value="America/Virgin">America/Virgin</option>
-<option value="America/Whitehorse">America/Whitehorse</option>
-<option value="America/Winnipeg">America/Winnipeg</option>
-<option value="America/Yakutat">America/Yakutat</option>
-<option value="America/Yellowknife">America/Yellowknife</option>
+</select></td></tr>
 
-<!-- <option value="Brazil/Acre">Brazil/Acre</option>
-<option value="Brazil/DeNoronha">Brazil/DeNoronha</option>
-<option value="Brazil/East">Brazil/East</option>
-<option value="Brazil/West">Brazil/West</option>
-<option value="Canada/Atlantic">Canada/Atlantic</option>
-<option value="Canada/Central">Canada/Central</option>
-<option value="Canada/East-Saskatchewan">Canada/East-Saskatchewan</option>
-<option value="Canada/Eastern">Canada/Eastern</option>
-<option value="Canada/Mountain">Canada/Mountain</option>
-<option value="Canada/Newfoundland">Canada/Newfoundland</option>
-<option value="Canada/Pacific">Canada/Pacific</option>
-<option value="Canada/Saskatchewan">Canada/Saskatchewan</option>
-<option value="Canada/Yukon">Canada/Yukon</option>
-<option value="Chile/Continental">Chile/Continental</option>
-<option value="Chile/EasterIsland">Chile/EasterIsland</option>
-<option value="Mexico/BajaNorte">Mexico/BajaNorte</option>
-<option value="Mexico/BajaSur">Mexico/BajaSur</option>
-<option value="Mexico/General">Mexico/General</option>
--->
-
-</select><br>
-
-<input name="submit" type="submit">
+<tr><td colspan=2><input name="submit" type="submit"></td></tr>
+</table>
 
 </form>
 </body>
