@@ -16,7 +16,7 @@ if (isset($_SERVER['WINDIR'])) {
 	exec($cmd);
 }
 
-sleep(1);
+sleep(3);
 
 
 if ($_REQUEST['close']) {
