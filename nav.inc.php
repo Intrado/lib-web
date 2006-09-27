@@ -13,6 +13,8 @@ $ACTIVEMAINTABTITLE = "";
 
 $SHORTCUTS = array();
 
+if ($_GET['debug'])
+	$PAGETIME = microtime(true);
 
 if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))) {
 	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
@@ -32,7 +34,7 @@ if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['-- Reports & Status --'] = "false;";
 	if ($USER->authorize('createreport'))
 		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "window.location='reportoptions.php'";
-	if ($USER->authorize('viewsystemreports')) {
+	if ($USER->authorize('viewsystemreports') && $IS_COMMSUITE) {
 		$SHORTCUTS['&nbsp;&nbsp;Usage Stats'] = "window.location='reportsystem.php'";
 		$SHORTCUTS['&nbsp;&nbsp;Call Distribution'] = "window.location='reportsystemdistribution.php'";
 	}
@@ -187,7 +189,7 @@ function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 	<link href='css/style.css' type='text/css' rel='stylesheet' media='screen'>
 </head>
 <body>
-	<IFRAME id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
+	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
 	<div id='container'>
 		<div id='accountnav'>
 			<div id='shortcuts'><? doShortcuts($SHORTCUTS) ?></div>
