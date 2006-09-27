@@ -49,15 +49,22 @@ function fmt_actions ($obj,$name) {
 				having cnt = 1 and mp.type='A' ";
 	$audiofileid = QuickQuery($query);
 
-	$playbtn = button("play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 350);");
+
+
+	$simpleplaybtn = button("play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 350);");
+	$advancedplaybtn = button("play", "popup('previewmessage.php?close=1&id=$obj->id', 400, 500);");
 	$editbtn = '<a href="message' . $obj->type . '.php?id=' . $obj->id . '">Edit</a>';
 	$deletebtn = '<a href="messages.php?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 	$renamebtn = '<a href="messagerename.php?id=' . $obj->id . '">Rename</a>';
 
 	if ($audiofileid) {
-		return  "$playbtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
+		return  "$simpleplaybtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
 	} else {
-		return "$editbtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
+		if ($obj->type == "phone") {
+			return "$advancedplaybtn&nbsp;|&nbsp;$editbtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
+		} else {
+			return "$editbtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
+		}
 	}
 }
 
