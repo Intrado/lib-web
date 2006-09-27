@@ -52,7 +52,7 @@ button_bar(button('done', 'window.close()'),
 
 //startWindow('Job Status', 'padding: 3px;');
 
-?><img id="realtime" src="graph_job.png.php?jobid=<?=$_GET['jobid']?>" /><?
+?><img id="realtime" src="graph_job.png.php?jobid=<?=$_GET['jobid']?>&junk=<?= rand() ?>" /><?
 
 //endWindow();
 print('<br>');
