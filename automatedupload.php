@@ -10,6 +10,8 @@ require_once("inc/date.inc.php");
 require_once("inc/ftpfile.inc.php");
 require_once("obj/User.obj.php");
 require_once("obj/Customer.obj.php");
+require_once("obj/Import.obj.php");
+
 
 //load session data
 function loadSessionData ($sessionid) {
@@ -173,6 +175,18 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 						"errorMsg" => "There was an error uploading the file",
 						"errorCode" => "UPLOAD_ERROR");
 		@unlink($sess['filename']);
+
+		//should we kick off the import?
+		$import = new Import($sess['importid']);
+		if ($import->type == "automatic") {
+			if (isset($_SERVER['WINDIR'])) {
+				$cmd = "start php import.php -import=" . $sess['importid'];
+				pclose(popen($cmd,"r"));
+			} else {
+				$cmd = "php import.php -import=" . $sess['importid'] . " > /dev/null &";
+				exec($cmd);
+			}
+		}
 
 		//save the session data, clear the authcode
 		unset($sess['authcode']);
