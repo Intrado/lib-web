@@ -201,10 +201,18 @@ function fmt_job_enddate ($obj,$name) {
 		return date("M j, g:i a",strtotime($obj->enddate . " " . $obj->endtime));
 }
 
+function fmt_job_startdate ($obj,$name) {
+	return date("M j, g:i a",strtotime($obj->startdate . " " . $obj->starttime));
+}
+
 function fmt_status($obj, $name) {
 	global $USER;
 	if ($obj->status == 'new') {
-		return 'Not Submitted';
+		$assigned = QuickQuery("select assigned from job where id='$obj->id'");
+		if (!$assigned)
+			return 'Not Submitted';
+		else
+			return "Processing";
 	} else {
 		if ($obj->cancelleduserid && $obj->cancelleduserid != $USER->id) {
 			$usr = new User($obj->cancelleduserid);
@@ -223,12 +231,21 @@ function fmt_status($obj, $name) {
 function fmt_jobs_actions_customer($row, $index) {
 	global $USER;
 	//return fmt_jobs_generic($row[$index], $row[$index + 1], $row[$index + 2]);
-	$id = $row[$index];
-	$status = $row[$index + 1];
-	$deleted = $row[$index + 2];
-	$jobowner = $row[$index + 3];
+	if ($row instanceof Job) {
 
-	if ($USER->login == $jobowner) {
+		$id = $row->id;
+		$status = $row->status;
+		$deleted = $row->deleted;
+		$jobowner = new User($row->userid);
+		$jobowner = $jobowner->id;
+	} else {
+		$id = $row[$index];
+		$status = $row[$index + 1];
+		$deleted = $row[$index + 2];
+		$jobowner = $row[$index + 4];//change to id
+	}
+
+	if ($USER->id == $jobowner) {
 		$editLink = '<a href="job.php?id=' . $id . '">Edit</a>';
 	} elseif ($USER->authorize('manageaccount')) {
 		$editLink = '<a href="./?login=' . $jobowner . '">Login&nbsp;as&nbsp;this&nbsp;user</a>';
