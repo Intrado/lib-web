@@ -56,7 +56,7 @@ if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name'])
 				redirect("tasks.php");
 			} else {
 				if (uploadImportFile($newname,$import->customerid,$import->id))
-					redirect("tasks.php");
+					redirect("taskmap.php?id=$import->id");
 				else
 					error('cant upload, Unable to complete file upload. Please try again.');
 			}
