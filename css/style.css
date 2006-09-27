@@ -448,6 +448,13 @@ a.sublink:hover {
 	color: gray;
 }
 
+#termsinfo {
+	padding-left: 20px;
+	float: right;
+	text-align: right;
+	font-size: xx-small;
+	color: gray;
+}
 
 
 .alertmessage {
