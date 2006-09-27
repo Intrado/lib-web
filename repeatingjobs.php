@@ -42,7 +42,7 @@ $limit = 100;
 
 // jobworkitem columns are: id jobid type priority personid messageid status resultdata assignedto
 $result = Query(
-			"select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.status, j.deleted, jobowner.login, name+0 as foo
+			"select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.status, j.deleted, jobowner.login, jobowner.id, name+0 as foo
             	from job j
             	left join user jobowner
             		on j.userid = jobowner.id,
