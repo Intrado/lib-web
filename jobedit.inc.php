@@ -286,10 +286,8 @@ if( $reloadform )
 	if ($job->id == NULL) {
 		$job->startdate = date("F jS, Y", strtotime("today"));
 		$job->enddate = date("F jS, Y", strtotime("today"));
-		$job->starttime = $ACCESS->getValue('callearly');
-		$job->starttime = $job->starttime ? $job->starttime : "8:00 am";
-		$job->endtime = $ACCESS->getValue('calllate');
-		$job->endtime = $job->endtime ? $job->endtime : "9:00 pm";
+		$job->starttime = $USER->getCallEarly();
+		$job->endtime = $USER->getCallLate();
 		$job->jobtypeid = end($VALIDJOBTYPES)->id;
 		$job->maxcallattempts = min(3,$ACCESS->getValue('callmax'));
 	} else {
@@ -335,8 +333,7 @@ if( $reloadform )
 
 		$scheduledows = array();
 		if ($schedule->id == NULL) {
-			$schedule->time = $ACCESS->getValue('callearly');
-			$schedule->time = $schedule->time ? $schedule->time : "8:00 am";
+			$schedule->time = $USER->getCallEarly();
 		} else {
 			$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
 			for ($x = 1; $x < 8; $x++)

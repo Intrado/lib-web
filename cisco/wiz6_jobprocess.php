@@ -44,11 +44,9 @@ $job->jobtypeid = $_SESSION['newjob']['jobtypeid'];
 $job->startdate = date("Y-m-d", strtotime("today"));
 $job->enddate = date("Y-m-d", strtotime("tomorrow"));
 
-$job->starttime = $ACCESS->getValue('callearly');
-$job->starttime = date("H:i", strtotime($job->starttime ? $job->starttime : "8:00 am"));
+$job->starttime = $USER->getCallEarly();
 
-$job->endtime = $ACCESS->getValue('calllate');
-$job->endtime = date("H:i", strtotime($job->endtime ? $job->endtime : "9:00 pm"));
+$job->endtime = $USER->getCallLate();
 
 $job->maxcallattempts = min(3,$ACCESS->getValue('callmax'));
 

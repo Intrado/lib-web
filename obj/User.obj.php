@@ -17,7 +17,6 @@ class User extends DBMappedObject {
 
 	var $customer = null;
 
-
 	//new constructor
 	function User ($id = NULL) {
 		$this->_allownulls = true;
@@ -163,6 +162,100 @@ class User extends DBMappedObject {
 			return true;
 		else
 			return false;
+	}
+
+
+
+	/* user settings */
+
+	function getSetting ($name, $refresh = false) {
+		static $settings = null;
+
+		if ($settings === null || $refresh) {
+			$settings = array();
+			if ($res = Query("select name,value from usersetting where userid='$this->id'")) {
+				while ($row = DBGetRow($res)) {
+					$settings[$row[0]] = $row[1];
+				}
+			}
+		}
+
+		if (isset($settings[$name]))
+			return $settings[$name];
+		else
+			return false;
+	}
+
+	function setSetting ($name, $value) {
+		$old = $this->getSetting($name, true);
+
+		if ($old === false) {
+			$settings[$name] = $value;
+			if ($value)
+				QuickUpdate("insert into usersetting (userid,name,value) values ($this->id,'" . DBSafe($name) . "','" . DBSafe($value) . "')");
+		} else {
+			if ($value !== false && $value !== '' && $value !== null) {
+				QuickUpdate("update usersetting set value='" . DBSafe($value) . "' where userid=$this->id and name='" . DBSafe($name) . "'");
+			} else {
+				QuickUpdate("delete from usersetting where userid=$this->id and name='" . DBSafe($name) . "'");
+
+			}
+		}
+	}
+
+	//gets a user setting or access profile setting.
+	//if no user setting exists, gets the value of the access profile, if nether exist, returns the $def param
+	function getDefaultAccessPref ($setting, $def) {
+		global $ACCESS;
+
+		$profile = $ACCESS->getValue($setting);
+		$pref = $this->getSetting($setting);
+
+		if ($profile === false && $pref === false)
+			return $def;
+		else if ($pref !== false)
+			return $pref;
+		else
+			return $profile;
+	}
+
+
+	function getCallEarly () {
+		global $ACCESS;
+
+		$profile = $ACCESS->getValue("callearly");
+		$pref = $this->getSetting("callearly");
+
+		if (!$profile && !$pref)
+			return "8:00 am"; //default
+		else if ($pref && profile) {
+			if (strtotime($pref) < strtotime($profile)) //use profile if pref is too early
+				return $profile;
+			else
+				return $pref;
+		} else if ($pref)
+			return $pref; //no profile restriction, use pref
+		else
+			return $profile; //no pref, use profile
+	}
+
+	function getCallLate () {
+		global $ACCESS;
+
+		$profile = $ACCESS->getValue("calllate");
+		$pref = $this->getSetting("calllate");
+
+		if (!$profile && !$pref)
+			return "9:00 pm"; //default
+		else if ($pref && profile) {
+			if (strtotime($pref) > strtotime($profile)) //use profile if pref is too late
+				return $profile;
+			else
+				return $pref;
+		} else if ($pref)
+			return $pref; //no profile restriction, use pref
+		else
+			return $profile; //no pref, use profile
 	}
 }
 
