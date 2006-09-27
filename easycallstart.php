@@ -41,13 +41,16 @@ if(CheckFormSubmit($f,$s))
 	{
 		MergeSectionFormData($f, $s);
 
-		$phone = preg_replace('/[^\\d]/', '', GetFormData($f,$s,"phone"));
+		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (strlen($phone) < 2 || (strlen($phone) > 6 && strlen($phone) != 10)) {
-			error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+		} else if (!Phone::validate($phone)) {
+			if ($IS_COMMSUITE)
+				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+			else
+				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 		} else if (GetFormData($f,$s,"listid") <=0 ) {
 			error('Please choose a list');
 		} else {
@@ -56,11 +59,12 @@ if(CheckFormSubmit($f,$s))
 			$task->type = 'EasyCall';
 			$task->setData('phonenumber', $phone);
 
-			$testname = DBSafe(GetFormData($f, $s, 'name'));
+			$testname = GetFormData($f, $s, 'name');
 			if (QuickQuery("select * from audiofile where userid = {$USER->id} and deleted = 0 and name = '" .
-				  $testname . "' and id != '" . $audio->id. "'")) {
+				  DBSafe($testname) . "' and id != '" . $audio->id. "'")) {
 				error('This audio file name is already in use, a unique one was generated');
-				$testname = DBSafe(GetFormData($f, $s, 'name')) . ' ' . date("F jS, Y h:i a");
+
+				$testname = GetFormData($f, $s, 'name') . ' ' . date("F jS, Y h:i a");
 				PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
 			}
 
@@ -122,11 +126,11 @@ startWindow("EasyCall");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="400">
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Name: <?= help("EasyCall_Name", null, 'small'); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Job&nbsp;Name:&nbsp;<?= help("EasyCall_Name", null, 'small'); ?></td>
 			<td class="bottomBorder"><? NewFormItem($f,$s,"name","text",30); ?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Priority: <?= help('EasyCall_Priority', NULL, "small"); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Priority:&nbsp;<?= help('EasyCall_Priority', NULL, "small"); ?></td>
 			<td class="bottomBorder">
 
 <?
@@ -140,7 +144,7 @@ startWindow("EasyCall");
 		</tr>
 
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">List: <?= help('EasyCall_List', NULL, "small"); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">List: <?= help('EasyCall_List', NULL, "small"); ?></td>
 			<td class="bottomBorder">
 
 <?
@@ -156,10 +160,10 @@ startWindow("EasyCall");
 		</tr>
 
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Phone&nbsp;Number: <?= help("EasyCall_PhoneNumber", null, 'small'); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Call&nbsp;Me&nbsp;At:&nbsp;<?= help("EasyCall_PhoneNumber", null, 'small'); ?></td>
 			<td class="bottomBorder"><? NewFormItem($f,$s,"phone","text",20); ?></td>
 		</tr>
-		<tr><td colspan=3 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr>
+		<tr><td colspan=2 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr>
 	</table>
 
 <?

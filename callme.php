@@ -35,17 +35,20 @@ if(CheckFormSubmit($f,$s))
 	{
 		MergeSectionFormData($f, $s);
 
-		$phone = preg_replace('/[^\\d]/', '', GetFormData($f,$s,"phone"));
+		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (strlen($phone) < 2 || (strlen($phone) > 6 && strlen($phone) != 10)) {
-			error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+		} else if (!Phone::validate($phone)) {
+			if ($IS_COMMSUITE)
+				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+			else
+				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 		} else if (QuickQuery("select * from audiofile where userid = {$USER->id} and deleted = 0 and name = '" .
 				   DBSafe(GetFormData($f, $s, 'name')) . "'")) {
 			error('This audio file name is already in use, so a unique one was generated');
-			$testname = DBSafe(GetFormData($f, $s, 'name')) . ' ' . date("Y-m-d_H:i:s");
+			$testname = GetFormData($f, $s, 'name') . ' ' . date("Y-m-d_H:i:s");
 			PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
 //		} else if (strlen(GetFormData($f,$s,"name")) <= 0) {
 //			error ("Please name your message");
