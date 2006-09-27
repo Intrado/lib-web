@@ -4,10 +4,23 @@ require_once("inc/common.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/form.inc.php");
 
-$badlogin = false;
-if (isset($_GET['logout'])) {
+if (isset($_GET['logout']))
 	@session_destroy();
-} elseif (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
+
+if ($SETTINGS['feature']['has_ssl']) {
+	if ($IS_COMMSUITE)
+		$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/index.php";
+	else
+		$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/index.php";
+
+	if ($SETTINGS['feature']['force_ssl'] && !$_SERVER["HTTPS"]) {
+		redirect($secureurl);
+	}
+}
+
+
+$badlogin = false;
+if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
 	$_SESSION = array();
 //	@session_destroy();
 //	@session_name($CUSTOMERURL . "_session");
@@ -37,6 +50,8 @@ if (isset($_GET['logout'])) {
 			$USER = $_SESSION['user'] = $newuser;
 			$ACCESS = $_SESSION['access'] = $newaccess;
 			$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
+			$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
+			QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 			$USER->lastlogin = QuickQuery("select now()");
 			$USER->update(array("lastlogin"));
 			redirect("start.php");
@@ -91,6 +106,20 @@ if (file_exists($logofilename) ) {
 				<tr><td align="right" style="padding: 2px;" width="165">Login:</td><td><input type="text" name="login" size="35"></td></tr>
 				<tr><td align="right" style="padding: 2px;">Password:</td><td><input type="password" name="password" size="35"></td></tr>
 				<tr><td colspan="2" align="right"><? print submit('login', 'main', 'signin', 'signin'); ?></td></tr>
+<? if ($SETTINGS['feature']['has_ssl'] && !$_SERVER["HTTPS"]) { ?>
+				<tr><td colspan="2" align="right"><a href="<?= $secureurl?>"><img src="img/padlock.gif"> Switch to Secure Login</a></td></tr>
+<? } ?>
+<? if ($_SERVER["HTTPS"] && !$IS_COMMSUITE) { ?>
+				<tr><td colspan="2" align="right">
+					<table width="135" border="0" cellpadding="2" cellspacing="0">
+					<tr>
+					<td width="135" align="center" valign="top"><script src=https://seal.verisign.com/getseal?host_name=asp.schoolmessenger.com&size=S&use_flash=NO&use_transparent=NO&lang=en></script><br />
+					<a href="http://www.verisign.com/ssl-certificate/" target="_blank"  style="color:#000000; text-decoration:none; font:bold 7px verdana,sans-serif; letter-spacing:.5px; text-align:center; margin:0px; padding:0px;">About SSL Certificates</a></td>
+					</tr>
+					</table>
+				</td></tr>
+<? } ?>
+
 			</table>
 		</td>
 	</tr>
