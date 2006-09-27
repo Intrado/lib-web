@@ -18,11 +18,12 @@ if (isset($_GET['id'])) {
 
 /****************** main message section ******************/
 
+$dopreview = 0;
 $form = "message";
 $section = "main". $MESSAGETYPE;
 $reloadform = 0;
 
-if(CheckFormSubmit($form,$section))
+if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($form))
@@ -79,7 +80,13 @@ if(CheckFormSubmit($form,$section))
 
 
 				$_SESSION['messageid'] = $message->id;
-				redirect('messages.php');
+
+				if (CheckFormSubmit($form,"preview")) {
+					$reloadform = 1;
+					$dopreview = 1;
+				} else {
+					redirect('messages.php');
+				}
 			}
 		}
 	}
@@ -159,7 +166,7 @@ $ICON = $MESSAGETYPE . ".gif";
 include_once("nav.inc.php");
 
 NewForm($form);
-buttons( /*button('preview'),*/ submit($form, $section, 'save', 'save'));
+buttons(  submit($form, $section, 'save', 'save') /*, submit($form, 'preview', 'play', 'play')*/);
 startWindow('Message Information', 'padding: 3px;');
 print 'Name: ';
 NewFormItem($form,$section,"name","text", 30,50);
@@ -337,6 +344,7 @@ endWindow();
 buttons();
 EndForm();
 include_once("navbottom.inc.php");
+
 ?>
 
 <script language="javascript">
