@@ -190,16 +190,15 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 		$persondata = false;
 		$persondatafields = array("personid");
 		$address = false;
-		$phones = array(NULL,NULL,NULL,NULL);
-		$emails = array(NULL,NULL);
-
+		$phones = array();
+		$emails = array();
 
 
 		if ($key !== false) {
 			//try to find the person in question
 			//and all of their data
 
-			$query = "select p.id, pd.id, ph.id, ph.sequence, e.id, e.sequence, a.id
+			$query = "select p.id, pd.id, ph.id, ph.sequence, e.id, e.sequence, a.id, ph.phone, e.email
 						from person p
 						left join persondata pd on (p.id=pd.personid)
 						left join phone ph on (p.id=ph.personid)
@@ -209,18 +208,31 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 						and p.customerid='" . $custid . "'
 						";
 
-
 			$result = Query($query);
 			while ($personrow = DBGetRow($result)) {
 				$personid = $personrow[0];
 				$persondataid = $personrow[1];
 				$addressid = $personrow[6];
 
-				if ($personrow[3] !== NULL && $personrow[2] !== NULL)
-					$phones[$personrow[3]] = $personrow[2];
+				if ($personrow[3] !== NULL && $personrow[2] !== NULL) {
+					$phone = new Phone();
+					$phone->id = $personrow[2];
+					$phone->personid = $personid;
+					$phone->phone = $personrow[7];
+					$phone->sequence = $personrow[3];
 
-				if ($personrow[5] !== NULL && $personrow[4] !== NULL)
-					$emails[$personrow[5]] = $personrow[4];
+					$phones[$personrow[3]] = $phone;
+				}
+
+				if ($personrow[5] !== NULL && $personrow[4] !== NULL) {
+					$email = new Email();
+					$email->id = $personrow[4];
+					$email->personid = $personid;
+					$email->email = $personrow[8];
+					$email->sequence = $personrow[5];
+
+					$emails[$personrow[5]] = $email;
+				}
 			}
 		} //end if key !== false
 
@@ -300,18 +312,25 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 				case "p":
 					$seq = substr($to,1) ;
 					if (strlen(Phone::parse($row[$fieldmap->mapfrom])) == 10) {
-						$phone = new Phone();
-						$phone->id = $phones[$seq];
-						$phone->personid = $personid;
-						$phone->sequence = $seq ;
-						$phone->phone = Phone::parse($row[$fieldmap->mapfrom]);
-						$phone->update();
+						if (isset($phones[$seq])) {
+							$phones[$seq]->phone = Phone::parse($row[$fieldmap->mapfrom]);
+						} else {
+							$phone = new Phone();
+							$phone->personid = $personid;
+							$phone->sequence = $seq ;
+							$phone->phone = Phone::parse($row[$fieldmap->mapfrom]);
+							$phones[$seq] = $phone;
+						}
 					} else if (isset($phones[$seq])) {
-						$phone = new Phone();
-						$phone->id = $phones[$seq];
-						//$phone->destroy();
-						$phone->personid = -1;
-						$phone->update(array("personid"));
+						if (isset($phones[$seq])) {
+							$phones[$seq]->phone = "";
+						} else {
+							$phone = new Phone();
+							$phone->personid = $personid;
+							$phone->sequence = $seq ;
+							$phone->phone = "";
+							$phones[$seq] = $phone;
+						}
 					}
 
 					if (strlen($row[$fieldmap->mapfrom]) < 10 &&
@@ -323,23 +342,66 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 				case "e":
 					$seq = substr($to,1) ;
 					if (strlen($row[$fieldmap->mapfrom]) > 0) {
-						$email = new Email();
-						$email->id = $emails[$seq];
-						$email->personid = $personid;
-						$email->sequence = $seq;
-						$email->email = $row[$fieldmap->mapfrom];
-						$email->update();
+						if (isset($emails[$seq])) {
+							$emails[$seq]->email = $row[$fieldmap->mapfrom];
+						} else {
+							$email = new Email();
+							$email->personid = $personid;
+							$email->sequence = $seq;
+							$email->email = $row[$fieldmap->mapfrom];
+							$emails[$seq] = $email;
+						}
 					} else if (isset($emails[$seq])) {
-						$email = new Email();
-						$email->id = $emails[$seq];
-						//$email->destroy();
-						$email->personid = -1;
-						$email->update(array("personid"));
+						if (isset($emails[$seq])) {
+							$emails[$seq]->email = "";
+						} else {
+							$email = new Email();
+							$email->personid = $personid;
+							$email->sequence = $seq ;
+							$email->email = "";
+							$emails[$seq] = $email;
+						}
 					}
 
 					break;
 			}
 		}
+
+		//fill in all missing phones with blanks, and save them all
+
+		$maxphoneseq = -1;
+		foreach ($phones as $phone)
+			$maxphoneseq = max($maxphoneseq,$phone->sequence);
+		for ($x = 0; $x <= $maxphoneseq; $x++) {
+			echo ".";
+			if (!isset($phones[$x])) {
+				echo "max $maxphoneseq, phone not there, making new one for $personid\n";
+				$phone = new Phone();
+				$phone->sequence = $x;
+				$phone->personid = $personid;
+				$phone->phone = "";
+				$phones[$x] = $phone;
+			}
+			$phones[$x]->update();
+			echo mysql_error();
+		}
+
+		//same for email
+		$maxemailseq = -1;
+		foreach ($emails as $email)
+			$maxemailseq  = max($maxemailseq,$email->sequence);
+		for ($x = 0; $x <= $maxemailseq; $x++) {
+			if (!isset($emails[$x])) {
+				$email = new Email();
+				$email->sequence = $x;
+				$email->personid = $personid;
+				$email->email = "";
+				$emails[$x] = $email;
+			}
+			$emails[$x]->update();
+		}
+
+
 		if ($persondata)
 			$persondata->update($persondatafields);
 		if ($address)
@@ -499,7 +561,7 @@ if ($dotrimoldrecords) {
 
 */
 
-	$count = QuickUpdate("update person p set p.customerid=customerid * -1 where p.lastimport < '$now' and p.customerid='$custid' and p.importid=$importid");
+	$count = QuickUpdate("update person p set p.customerid=customerid * -1 where p.lastimport != '$now' and p.customerid='$custid' and p.importid=$importid");
 	wlog("deactivated $count old people records");
 
 
