@@ -15,14 +15,23 @@ require_once("obj/Rule.obj.php"); //for search and sec profile rules
 
 
 //get the customer URL
-$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+
+if (!$IS_COMMSUITE) {
+	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+} else {
+	$CUSTOMERURL = "default";
+}
 
 session_name($CUSTOMERURL . "_session");
 session_start();
 
 if (!isset($isindexpage) || !$isindexpage) {
 
+	//force ssl?
+	if ($SETTINGS['feature']['force_ssl'] && !$_SERVER["HTTPS"]) {
+		redirect("index.php?logout=1"); //the index page will redirect to https
+	}
 
 	if (!isset($_SESSION['user']) || !isset($_SESSION['access'])) {
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
@@ -36,6 +45,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 		if($USER->accessid != $ACCESS->id || $ACCESS->modified < QuickQuery("select modified from access where id = $ACCESS->id"))
 			$ACCESS->refresh(NULL, true);
 
+		//FIXME should this be removed because it is already set from login?
 		if (!isset($_SESSION['timezone'])) {
 			$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
 		}
@@ -45,6 +55,8 @@ if (!isset($isindexpage) || !$isindexpage) {
 		}
 	}
 }
+
+
 
 if (isset($_SESSION['timezone'])) {
 	@date_default_timezone_set($_SESSION['timezone']);
