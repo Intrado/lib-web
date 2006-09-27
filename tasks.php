@@ -42,10 +42,15 @@ include_once("nav.inc.php");
 startWindow('System Imports ' . help('Tasks_SystemTasks', NULL, 'blue'), 'padding: 3px;');
 button_bar(button('addnewimport', null, "task.php?id=new"));
 
-
-function fmt_updatemethod ($import,$dummy) {
-	return ($import->updatemethod == "updateonly" ? "Update Only" : ucfirst($import->updatemethod));
+function fmt_updatemethod ($import,$field) {
+	if ($import->$field == "full")
+		return "Update, create, delete";
+	else if ($import->$field == "update")
+		return "Update & create";
+	else if ($import->$field == "updateonly")
+		return "Update only";
 }
+
 
 function fmt_fileexists ($import,$dummy) {
 	global $IS_COMMSUITE;
@@ -54,17 +59,25 @@ function fmt_fileexists ($import,$dummy) {
 	else
 		$importfile = getImportFileURL($import->customerid,$import->id);
 
-	return (is_readable($importfile) && is_file($importfile) ? "Exists" : "Not Found");
+	if (is_readable($importfile) && is_file($importfile)) {
+		return "Exists (" . date("M j, g:i a",filemtime($importfile)) . ")";
+	} else {
+		return "Not Found";
+	}
 }
 
 function fmt_actions ($import,$dummy) {
-	return "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;<a href=\"task.php?run=$import->id\">Run&nbsp;Now</a>&nbsp;|&nbsp;<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>&nbsp;|&nbsp;<a href=\"task.php?delete=$import->id\" onclick=\"return confirmDelete();\">Delete</a>";
+	return "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;<a href=\"task.php?run=$import->id\">Run&nbsp;Now</a>&nbsp;|&nbsp;<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>";
+
+	//disabled delete
+	//&nbsp;|&nbsp;<a href=\"task.php?delete=$import->id\" onclick=\"return confirmDelete();\">Delete</a>
 }
 
 
 $titles = array("name" => "#Name",
 				"description" => "#Description",
 				"updatemethod" => "#Type",
+				"uploadkey" => "Upload Key",
 				"status" => "#Status",
 				"file" => "#File");
 if ($IS_COMMSUITE)
@@ -76,6 +89,7 @@ $titles['Actions'] = "Actions";
 $formatters = array("updatemethod" => "fmt_updatemethod",
 					"nextrun" => "fmt_nextrun",
 					"status" => "fmt_ucfirst",
+					"updatemethod" => "fmt_updatemethod",
 					"file" => "fmt_fileexists",
 					"Actions" => "fmt_actions");
 
