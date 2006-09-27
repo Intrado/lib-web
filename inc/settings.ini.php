@@ -8,7 +8,8 @@ db="dialerasp"
 
 [feature]
 is_commsuite=false
-
+has_ssl=true
+force_ssl=false
 
 [content]
 ; format is "host,port,path;host2,port2,path2;..." reserved chars= ';' and ','
@@ -27,6 +28,7 @@ ftphost=127.0.0.1
 ftpport=21
 ftpuser=anonymous
 ftppass=anonymous
+
 
 
 ;*/?>
