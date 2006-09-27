@@ -63,8 +63,20 @@ function getNextAvailableAccessCode($currentCode, $userid, $customerid) {
 
 function getSystemSetting($name) {
 	global $USER;
-	$name = DBSafe($name);
-	return QuickQuery("select value from setting where customerid = $USER->customerid and name = '$name'");
+	static $settings = array();
+
+	if (isset($settings[$name]))
+		return $settings[$name];
+
+	$value = QuickQuery("select value from setting where customerid = $USER->customerid and name = '" . DBSafe($name) . "'");
+	return $settings[$name] = $value;
+}
+
+function isvalidtimestamp ($time) {
+	if ($time === -1 || $time === false)
+		return false;
+	else
+		return true;
 }
 
 ?>
