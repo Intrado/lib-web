@@ -27,8 +27,8 @@ $titles = array(
 				"3" => "First Name",
 				"4" => "Last Name",
 				"5" => "Language",
-				"6" => "Phone",
-				"7" => "Email",
+				"6" => "Primary Phone",
+				"7" => "Primary Email",
 				"8" => "Address");
 
 $formatters = array(
