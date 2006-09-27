@@ -52,7 +52,7 @@ $result = Query(
             	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='phone') as remaining_phone,
             	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='email') as remaining_email,
             	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='print') as remaining_print,
-            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login
+            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id
             from user u, job j
             left join jobworkitem wi
             	on j.id = wi.jobid
