@@ -294,7 +294,7 @@ function DBFindMany ($classname, $query, $alias = false) {
 	$many = array();
 
 	$query = "select " . DBMappedObject::getFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
-	if ($result = Query($query)) {
+	if ($result = mysql_query($query)) {
 		while($row = DBGetRow($result)) {
 			$newobj = new $classname();
 
@@ -318,7 +318,7 @@ function DBFind ($classname, $query, $alias = false) {
 	$newobj = new $classname();
 
 	$query = "select " . DBMappedObject::getFieldList(true,$newobj->_fieldlist,$alias) ." ". $query;
-	if ($result = Query($query)) {
+	if ($result = mysql_query($query)) {
 		if ($row = DBGetRow($result)) {
 			$newobj->id = $row[0];
 			foreach ($newobj->_fieldlist as $index => $field) {
