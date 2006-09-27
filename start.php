@@ -53,7 +53,7 @@ if ($USER->authorize("startstats")) {
 <?
 			if ($USER->authorize("starteasy")) {
 			?><tr><td><?
-				startWindow('EasyCall', 'padding: 3px;');
+				startWindow('EasyCall ' . help('Start_EasyCall', NULL, 'blue'), 'padding: 3px;');
 				?><div align="center"><?= button('easycall2',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);"); ?></div><?
 				endWindow();
 			?><br></td></tr><?
@@ -61,10 +61,9 @@ if ($USER->authorize("startstats")) {
 ?>
 			<tr><td><?
 				startWindow('My Active Calls', 'padding: 3px;');
-				?><div align="center"><img src="graph_start_actrive_breakdown.png.php" /></div><?
+				echo button('refresh', 'window.location.reload()');
+				?><br><br><div align="center"><img src="graph_start_actrive_breakdown.png.php" /></div><?
 				endWindow();
-
-
 ?>
 				</td>
 			</tr>
@@ -76,40 +75,31 @@ if ($USER->authorize("startstats")) {
 
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
-			startWindow('Recent Jobs', 'padding: 3px;');
+			startWindow('My Active and Pending Jobs ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
 
-?>
-			<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><th class="listBoxHeader">My Active and Pending Jobs <? print help('Start_MyActiveJobs', NULL, 'dkgrey'); ?></th></tr>
-				<tr><td>
-<?
-					$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new') order by id desc limit $limit");
-					$titles = array(	"name" => "Name",
-										"Status" => "Status",
-										"Actions" => "Actions"
-										);
-					$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
-					showObjects($data, $titles, $formatters);
-		?>
-				</td></tr>
-				<tr><td align="right" style="padding-top: 3px;"><a href="jobs.php" style="font-size: xx-small;">More...</a></td></tr>
-			</table>
-			<br>
-			<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><th class="listBoxHeader">My Completed Jobs <? print help('Start_MyCompletedJobs', NULL, 'dkgrey'); ?></th></tr>
-				<tr><td>
-		<?
-					$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and deleted = 0 order by finishdate desc limit $limit");
-					$titles = array(	"name" => "Name",
-										"Status" => "Status",
-										"enddate" => "End Date",
-										"Actions" => "Actions"
-										);
-					$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
-					showObjects($data, $titles, $formatters);
-		?>
-				</td></tr>
-				<tr><td align="right" style="padding-top: 3px;"><a href="jobs.php" style="font-size: xx-small;">More...</a></td></tr>
-			</table>
-		<?
+
+			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new') order by id desc limit $limit");
+			$titles = array(	"name" => "Name",
+								"Status" => "Status",
+								"Actions" => "Actions"
+								);
+			$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
+			showObjects($data, $titles, $formatters);
+			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
+			endWindow();
+
+
+
+			startWindow('My Completed Jobs ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;');
+			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and deleted = 0 order by finishdate desc limit $limit");
+			$titles = array(	"name" => "Name",
+								"Status" => "Status",
+								"enddate" => "End Date",
+								"Actions" => "Actions"
+								);
+			$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
+			showObjects($data, $titles, $formatters);
+			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
 
 	?></td></tr></table><?
