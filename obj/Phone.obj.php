@@ -19,11 +19,22 @@ class Phone extends DBMappedObject {
 		else if (strlen($phone) == 7)
 			return  substr($phone,0,3) . "-" . substr($phone,3,4);
 		else
-			return $phone;	
+			return $phone;
 	}
 
 	function parse ($phone) {
 		return ereg_replace("[^0-9]*","",$phone);
+	}
+
+	function validate ($phone, $iseasycall = false) {
+		global $IS_COMMSUITE;
+
+		$phone = Phone::parse($phone);
+		if ($iseasycall && $IS_COMMSUITE) {
+			return (strlen($phone) >= 2 && strlen($phone) <= 6) || strlen($phone) == 10;
+		} else {
+			return strlen($phone) == 10;
+		}
 	}
 }
 
