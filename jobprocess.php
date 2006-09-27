@@ -160,7 +160,7 @@ foreach ($defaultmessages as $type => $defmsgid) {
 			left join jobworkitem wi2 on (p2.personid = wi2.personid)
 			where wi.jobid = $jobid and wi.type='phone'
 			and wi2.jobid = $jobid and wi2.type='phone'
-			and p.sequence = 0 and p2.sequence = 0
+			and p.sequence = 0 and p2.sequence = 0 and p.phone != ''
 			group by p.phone, wi.id
 			";
 			$result = Query($query);
