@@ -129,6 +129,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSetting('disablerepeat', GetFormData($f, $s, 'disablerepeat'));
 				setSetting('alertmessage', GetFormData($f, $s, 'alertmessage'));
 
+				setSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
+				setSetting('autoreport_replyname', GetFormData($f, $s, 'autoreport_replyname'));
+
 				redirect();
 
 				$reloadform = 1;
@@ -149,6 +152,11 @@ if( $reloadform )
 	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 0, 20);
 	PutFormData($f, $s, "disablerepeat", getSetting('disablerepeat'), 'bool');
 	PutFormData($f, $s, "alertmessage", getSetting('alertmessage'), 'text',0,255);
+
+
+	PutFormData($f, $s, "autoreport_replyemail", getSetting('autoreport_replyemail'), 'email',0,100);
+	PutFormData($f, $s, "autoreport_replyname", getSetting('autoreport_replyname'), 'text',0,100);
+
 
 	//do some custom stuff for the options
 }
@@ -260,6 +268,22 @@ startWindow('Global System Settings');
 								</td>
 							</tr>
 						</table>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Autoreport Email address
+					</th>
+					<td>
+					<? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 30,100);  ?>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Autoreport Email Name
+					</th>
+					<td>
+					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
 					</td>
 				</tr>
 				<tr>
