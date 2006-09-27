@@ -47,7 +47,7 @@ if(CheckFormSubmit($f,$s))
 	{
 		MergeSectionFormData($f, $s);
 
-		$phone = preg_replace('/[^\\d]/', '', GetFormData($f,$s,"phone"));
+		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 
 		//do check
 		if (strlen(GetFormData($f, $s, 'pincode')) < 4) {
@@ -58,8 +58,11 @@ if(CheckFormSubmit($f,$s))
 			error('Password confirmation does not match');
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
 			error('Telephone Pin Code confirmation does not match');
-		} else if ($phone != null && strlen($phone) < 2 || (strlen($phone) > 6 && strlen($phone) != 10)) {
-			error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+		} else if ($phone != null && !Phone::validate($phone)) {
+			if ($IS_COMMSUITE)
+				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+			else
+				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $USER->id)) {
 			error('This username already exists, please choose another');
 		} elseif (User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $USER->id)) {
@@ -80,6 +83,12 @@ if(CheckFormSubmit($f,$s))
 			$newpin = GetFormData($f, $s, 'pincode');
 			if (isValidPass($newpin))
 				$USER->setPincode($newpin);
+
+
+			//save prefs
+
+
+
 
 			redirect("start.php");
 		}
@@ -110,6 +119,44 @@ if( $reloadform )
 	PutFormData($f,$s,"passwordconfirm",$pass,"text",4,50,true);
 	PutFormData($f,$s,"pincode",$pass,"number",1000,"nomax",true);
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number",1000,"nomax",true);
+
+	//prefs
+
+	//Preferred message delivery window:
+	PutFormData($f,$s,"callearly", $USER->getCallEarly() , "text",1,50,true);
+	PutFormData($f,$s,"calllate", $USER->getCallLate(), "text",1,50,true);
+
+	//Maximum call attempts
+	if (($callmax = $USER->getSetting("callmax")) === false) {
+		$callmax = min(3,$ACCESS->getValue('maxjobdays'));
+	} else {
+		$callmax = min($USER->getSetting("callmax"), $ACCESS->getValue('maxjobdays'));
+	}
+	PutFormData($f,$s,"callmax", $callmax, "text",1,50,true);
+
+	//Number of days for jobs to run
+
+
+	if (($maxjobdays = $USER->getSetting("maxjobdays")) === false) {
+		$maxjobdays = min(2,$ACCESS->getValue('maxjobdays'));
+	} else {
+		$maxjobdays = min($USER->getSetting("maxjobdays"), $ACCESS->getValue('maxjobdays'));
+	}
+
+	PutFormData($f, $s, 'maxjobdays', $maxjobdays, 'number', 1, 7, true);
+
+	//Call every available phone number for each person
+	PutFormData($f,$s,"callall",$USER->getDefaultAccessPref("callall","0"), "bool",0,1);
+
+	//Default caller ID
+
+	if ($USER->authorize('setcallerid') && $USER->getSetting("callerid") )
+		$callerid = $USER->getSetting("callerid");
+	else
+		$callerid = getSystemSetting('callerid');
+	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,8 +175,8 @@ startWindow('User Information');
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('User_AccessCredentials', NULL, 'grey'); ?></th>
-					<td>
+					<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('User_AccessCredentials', NULL, 'grey'); ?></th>
+					<td class="bottomBorder">
 						<table border="0" cellpadding="1" cellspacing="0">
 							<tr>
 								<td align="right">First Name:</td>
@@ -173,6 +220,60 @@ startWindow('User Information');
 						</table>
 						<br>Please note: username and password are case-sensitive and must be a minimum of 4 characters long with no spaces.
 						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
+					</td>
+				</tr>
+				<tr>
+					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Preferences:</th>
+					<td>
+						<table border="0" cellpadding="1" cellspacing="0">
+
+							<tr>
+								<td colspan="2">Delivery Window:</td>
+							<tr>
+								<td>&nbsp;&nbsp;Earliest <?= help('Account_PhoneEarliestTime', NULL, 'small') ?></td>
+								<td><? time_select($f,$s,"callearly", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
+							</tr>
+							<tr>
+								<td>&nbsp;&nbsp;Latest <?= help('Account_PhoneLatestTime', NULL, 'small') ?></td>
+								<td><? time_select($f,$s,"calllate", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
+							</tr>
+							<tr>
+								<td>Maximum call attempts <?= help('Account_PhoneMaxAttempts', NULL, 'small')  ?></td>
+								<td>
+									<?
+									$max = first($ACCESS->getValue('callmax'), 1);
+									NewFormItem($f,$s,"callmax","selectstart");
+									for($i = 1; $i <= $max; $i++)
+									NewFormItem($f,$s,"callmax","selectoption",$i,$i);
+									NewFormItem($f,$s,"callmax","selectend");
+									?>
+								</td>
+							</tr>
+
+							<tr>
+								<td>Number of days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
+								<td>
+								<?
+								NewFormItem($f, $s, 'maxjobdays', "selectstart");
+								$maxdays = $ACCESS->getValue('maxjobdays');
+								if ($maxdays == null) {
+									$maxdays = 7; // Max out at 7 days if the permission is not set.
+								}
+								for ($i = 1; $i <= $maxdays; $i++) {
+									NewFormItem($f, $s, 'maxjobdays', "selectoption", $i, $i);
+								}
+								NewFormItem($f, $s, 'maxjobdays', "selectend");
+								?>
+								</td>
+							</tr>
+<? if ($USER->authorize('setcallerid')) { ?>
+							<tr>
+									<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
+									<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : "")); ?></td>
+							</tr>
+<? } ?>
+
+						</table>
 					</td>
 				</tr>
 			</table>
