@@ -125,12 +125,27 @@ $maptofields["key"] = "Unique ID";
 foreach ($fieldmaps as $fieldmap)
 	$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 
-$maptofields["p0"] = "Phone";
-$maptofields["p1"] = "Phone 2";
-$maptofields["p2"] = "Phone 3";
-$maptofields["p3"] = "Phone 4";
-$maptofields["e0"] = "Email";
-$maptofields["e1"] = "Email 2";
+
+if (!$maxphones = getSystemSetting("maxphones"))
+	$maxphones = 4;
+
+for ($x = 0; $x < $maxphones; $x++) {
+	if ($x == 0)
+		$maptofields["p0"] = "Phone";
+	else
+		$maptofields["p$x"] = "Phone " . ($x + 1);
+}
+
+if (!$maxemails = getSystemSetting("maxemails"))
+	$maxemails = 2;
+
+for ($x = 0; $x < $maxemails; $x++) {
+	if ($x == 0)
+		$maptofields["e0"] = "Email";
+	else
+		$maptofields["e$x"] = "Email " . ($x + 1);
+}
+
 $maptofields["a6"] = "Address ATTN";
 $maptofields["a1"] = "Address 1";
 $maptofields["a2"] = "Address 2";
