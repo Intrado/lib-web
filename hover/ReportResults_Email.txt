@@ -1,4 +1,4 @@
-@help/schoolmessenger_help.htm#reports/creating_notification_reports.htm
+@help/schoolmessenger_help.htm#reports/understanding_report_results.htm
 Total: The number of emails notifications included in this report
 
 % Completed: The percent of the total that has been sent thus far.

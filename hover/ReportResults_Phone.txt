@@ -1,14 +1,16 @@
-@help/schoolmessenger_help.htm#reports/creating_notification_reports.htm
+@help/schoolmessenger_help.htm#reports/understanding_report_results.htm
 People: The number of people targeted to receive phone notifications included in this report
 
-% Completed: The percent of the total that has been attempted thus far
+Phone # Duplicates Removed: The number of duplicate phone numbers removed from this list
 
-Succeeded: The number of successful deliveries completed thus far
+% Completed: The percent of the total calls that have been completed thus far
 
-Failed: The number of failed attempts thus far
+Delivered: The number of successful deliveries completed thus far
 
-Remaining: The number of people targeted to receive phone notifications who have not been attempted thus far.
+Undelivered: The number of unsuccessful deliveries at the completion of the job due to no phone number, busy signals, no answers, disconnected numbers, and any other failed delivery attempts
 
-Success Rate: The percentage of attempted calls that were successful
+Remaining: The number of people targeted to receive phone notifications who have not been contacted thus far.
 
-Total Attempts: The total number of call attempts included in this report
+Success Rate: The percentage of attempted calls that were successfully delivered
+
+Total Call Attempts: The total number of call attempts included in this report
