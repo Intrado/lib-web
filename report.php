@@ -5,6 +5,7 @@
 require_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
+require_once("obj/Phone.obj.php");
 require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
@@ -180,8 +181,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 
 	if (isset($_GET['filter_phone']) && $_GET['filter_phone'] &&
 		isset($_GET['filter_phone_data'])) {
-		$phone = DBSafe($_GET['filter_phone_data']);
-		$phone = preg_replace('/[^\\d]/', '', $phone);
+		$phone = DBSafe(Phone::parse($_GET['filter_phone_data']));
 
 		$_SESSION['reportsql'] .= " and cl.phonenumber like '%$phone%'";
 	}
@@ -290,7 +290,19 @@ select
 	sum(wi.status not in ('success','fail','duplicate')) as in_progress,
 	sum(wi.status = 'duplicate') as duplicate,
 	sum(wi.status='success') / (sum(wi.status='success' or wi.status='fail' or (jt.numattempts>0 and wi.status = 'queued' or wi.status='scheduled')) +0.00) as success_rate,
-	sum(jt.numattempts) as total_attempts,
+
+
+-- crazy subselect merge query below
+
+
+	sum((	select count(*)
+			from jobtask jt2, calllog cl2
+			where wi.id = jt2.jobworkitemid
+			and cl2.jobtaskid=jt2.id
+		)) as total_attempts,
+
+
+
 	j.userid, j.name, u.firstname, u.lastname, u.login
 
 	from 		job j
@@ -360,7 +372,7 @@ select SQL_CALC_FOUND_ROWS
 	left join	persondata pd on
 					(pd.personid=p.id)
 	left join	jobtask jt on
-					(jt.id=wi.currentjobtaskid)
+					(jt.jobworkitemid=wi.id)
 	left join	calllog cl on
 					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
 	left join	phone ph on
@@ -396,8 +408,6 @@ if ($_GET['csv']) {
 
 	$result = Query($detailquery);
 
-echo mysql_error();
-
 	while ($row = DBGetRow($result)) {
 		$row[5] = html_entity_decode(fmt_destination($row,5));
 		$row[6] = (isset($row[6]) ? $row[6] : "");
@@ -420,8 +430,6 @@ echo mysql_error();
 	//load page to memory
 	$data = array();
 	$result = Query($summaryquery);
-
-echo mysql_error();
 
 	while ($row = DBGetRow($result)) {
 		$data[] = $row;
@@ -460,7 +468,7 @@ echo mysql_error();
 	?>
 					<tr>
 						<th class="windowRowHeader bottomBorder" align="right">Phone:<br><? print help('ReportResults_Phone', NULL, 'grey'); ?></th>
-						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "People", 6 => "Removed Duplicates", 2 => "% Completed", 3 => "Succeeded", 4 => "Failed", 5 => "Remaining", 7 => "Success Rate", 8 => "Total Attempts"),array(2=>"fmt_percent", 7=>"fmt_percent")); ?></table></td>
+						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "People", 6 => "Phone # Duplicates Removed", 2 => "% Completed", 3 => "Delivered", 4 => "Undelivered", 5 => "Remaining", 7 => "Success Rate", 8 => "Total Call Attempts"),array(2=>"fmt_percent", 7=>"fmt_percent")); ?></table></td>
 					</tr>
 	<?
 					break;
@@ -494,9 +502,6 @@ echo mysql_error();
 	//load page to memory
 	$data = array();
 	$result = Query($detailquery);
-
-echo mysql_error();
-
 	while ($row = DBGetRow($result)) {
 		$data[] = $row;
 	}
