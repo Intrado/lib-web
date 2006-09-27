@@ -920,7 +920,7 @@ set jt.lastattempt = cl.starttime;
 
 
 
------------- after on asp 7/25 --------------
+--  after on asp 7/25 --------------
 
 
 ALTER TABLE `jobworkitem` ADD `currentjobtaskid` BIGINT NULL AFTER `status` ;
@@ -932,15 +932,15 @@ ALTER TABLE `schedule` CHANGE `trigger` `triggertype` ENUM( 'import', 'job' ) NO
 
 
 
------------- after on asp 7/26 --------------
+-- after on asp 7/26 --------------
 
 
 ALTER TABLE `customer` ADD `inboundnumber` VARCHAR( 20 ) NOT NULL AFTER `hostname` ;
 
 
-ALTER TABLE `jobtask` ADD INDEX `waiting` ( `id` , `nextattempt` ) 
+ALTER TABLE `jobtask` ADD INDEX `waiting` ( `id` , `nextattempt` ) ;
 
----------------- after 8/16 ---------------
+-- after 8/16 ---------------
 
 
 ALTER TABLE `import` ADD `uploadkey` VARCHAR( 255 ) NULL AFTER `id` ;
@@ -958,4 +958,22 @@ CREATE TABLE `sessiondata` (
   PRIMARY KEY  (`id`),
   KEY `lastused` (`lastused`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+-- after 9/21
+
+CREATE TABLE `usersetting` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `usersetting` (`userid`,`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8  ;
+
+
+-- make login case sensitive
+ALTER TABLE `user` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL 
+
+
 
