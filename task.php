@@ -25,6 +25,8 @@ if (!$USER->authorize('managetasks')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
+//disable delete
 if (isset($_GET['delete'])) {
 	$delete = DBSafe($_GET['delete']);
 	if(customerOwns("import",$delete)) {
@@ -41,7 +43,7 @@ if (isset($_GET['delete'])) {
 
 	redirectToReferrer();
 }
-
+*/
 if (isset($_GET['run'])) {
 	$run = DBSafe($_GET['run']);
 	if(customerOwns("import",$run)) {
@@ -92,19 +94,19 @@ if(CheckFormSubmit($form, $section))
 			} else {
 				$IMPORT->userid = $USER->id;
 				$IMPORT->customerid = $USER->customerid;
-				$IMPORT->name = DBSafe(GetFormData($form, $section, 'name'));
-				$IMPORT->description = DBSafe(GetFormData($form, $section, 'description'));
+				$IMPORT->name = GetFormData($form, $section, 'name');
+				$IMPORT->description = GetFormData($form, $section, 'description');
 
+				if (!$IS_COMMSUITE && $IMPORT->id == null)
+					$IMPORT->uploadkey = substr(md5($CUSTOMERURL . microtime()),5,12);
 
-
-				$IMPORT->updatemethod = DBSafe(GetFormData($form, $section, 'updatemethod'));
+				$IMPORT->updatemethod = GetFormData($form, $section, 'updatemethod');
 				$IMPORT->status = 'idle';
 				$IMPORT->ownertype = 'system';
 
 
-
 				if ($IS_COMMSUITE) {
-					$IMPORT->path = DBSafe(GetFormData($form, $section, 'path'));
+					$IMPORT->path = GetFormData($form, $section, 'path');
 
 					if (GetFormData($form, $section, 'isscheduled')) {
 						$IMPORT->type = 'automatic';
@@ -153,7 +155,7 @@ if(CheckFormSubmit($form, $section))
 
 
 				} else {
-					$IMPORT->type = 'manual';
+					$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
 					$IMPORT->update();
 				}
 
@@ -193,6 +195,8 @@ if( $reloadform )
 		} else {
 			PutFormData($form, $section, "scheduletime",date("g:i a", strtotime('12:00 am')),"text",1,50,true);
 		}
+	} else {
+		PutFormData($form, $section, 'automaticimport', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
 	}
 }
 
@@ -235,9 +239,9 @@ startWindow('Import Information ');
 					<td>Update Method:</td>
 					<td><?
 							NewFormItem($form, $section, 'updatemethod', 'selectstart');
-							NewFormItem($form, $section, 'updatemethod', 'selectoption', 'Update Only', 'updateonly');
-							NewFormItem($form, $section, 'updatemethod', 'selectoption', 'Update', 'update');
-							NewFormItem($form, $section, 'updatemethod', 'selectoption', 'Full', 'full');
+							NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update only", 'updateonly');
+							NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update & create", 'update');
+							NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update, create, delete", 'full');
 							NewFormItem($form, $section, 'updatemethod', 'selectend');
 						?>
 					</td>
@@ -278,6 +282,16 @@ startWindow('Import Information ');
 							</tr>
 						</table>
 					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<? } else { ?>
+	<tr valign="top">
+		<th align="right" class="windowRowHeader">Automated upload:</th>
+		<td class="">
+			<table border="0" cellspacing="0" cellpadding="2">
+				<tr><td>Import when uploaded</td><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox', null, null, 'onclick="toggleDayState(this.checked)"'); ?> Import when remote uploads are complete <br>(uncheck this box when configuring import mapping or changing data fields)</td>
 				</tr>
 			</table>
 		</td>
