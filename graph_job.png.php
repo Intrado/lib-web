@@ -18,6 +18,22 @@ if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && custom
 }
 
 
+$query = "
+select count(*) as cnt,
+		coalesce(if (wi.status='waiting', 'retry', cl.callprogress),
+			if (wi.status not in ('fail','duplicate','scheduled'), 'inprogress',wi.status))
+			as callprogress2
+from jobworkitem wi
+left join	jobtask jt on
+					(jt.jobworkitemid=wi.id)
+left join	calllog cl on
+					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
+where wi.jobid='$jobid' and wi.type='phone'
+group by callprogress2
+
+";
+
+
 $cpcolors = array(
 	"A" => "lightgreen",
 	"M" => "#1DC10",
@@ -27,9 +43,11 @@ $cpcolors = array(
 	"F" => "red",
 	"C" => "yellow",
 	"duplicate" => "lightgray",
-	"fail" => "red",
-	"queued" => "blue",
-	"inprogress" => "blue"
+	"fail" => "#aaaaaa",
+	"inprogress" => "blue",
+	"retry" => "cyan",
+	"scheduled" => "darkblue"
+
 );
 
 $cpcodes = array(
@@ -41,40 +59,52 @@ $cpcodes = array(
 	"F" => "Failed",
 	"C" => "Calling",
 	"duplicate" => "Duplicate",
-	"fail" => "Failed",
-	"queued" => "In Progress",
-	"inprogress" => "In Progress"
+	"fail" => "No Phone #",
+	"inprogress" => "Queued",
+	"retry" => "Retrying",
+	"scheduled" => "Scheduled"
 );
 
-
-$query = "
-select count(*) as cnt,
-		coalesce(callprogress,
-			if (wi.status not in ('fail','duplicate'), 'inprogress',wi.status))
-			as callprogress
-from jobworkitem wi
-left join	jobtask jt on
-					(jt.jobworkitemid=wi.id)
-left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
-where wi.jobid='$jobid' and wi.type='phone'
-group by wi.jobid, callprogress
-order by cnt asc
-";
-
-
-$data = array();
-$legend = array();
-$colors = array();
+//preset array positions
+$data = array(
+	"scheduled" => false,
+	"inprogress" => false,
+	"retry" => false,
+	"C" => false,
+	"A" => false,
+	"M" => false,
+	"B" => false,
+	"N" => false,
+	"X" => false,
+	"duplicate" => false,
+	"fail" => false,
+	"F" => false
+);
+$legend = $data;
+$colors = $data;
 
 if ($result = Query($query)) {
 	while ($row = DBGetRow($result)) {
-		$data[] = $row[0];
+		$data[$row[1]] = $row[0];
 
-		$legend[] = $cpcodes[$row[1]] . ": %d";
-		$colors[] = $cpcolors[$row[1]];
+		$legend[$row[1]] = $cpcodes[$row[1]] . ": %d";
+		$colors[$row[1]] = $cpcolors[$row[1]];
 	}
 }
+
+foreach ($data as $k => $v) {
+	if ($v === false) {
+		unset($data[$k]);
+		unset($legend[$k]);
+		unset($colors[$k]);
+	}
+}
+
+
+$data = array_values($data);
+$legend = array_values($legend);
+$colors = array_values($colors);
+
 
 //var_dump($data);
 //var_dump($legend);
