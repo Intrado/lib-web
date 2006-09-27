@@ -64,12 +64,28 @@ class Rule extends DBMappedObject {
 				//split the values
 				$values = explode("|",$this->val);
 				if (count($values) > 0) {
+
+					$sql .= "(";
+
 					//make the values safe
+					$safevales = array();
 					foreach ($values as $index => $val) {
-						$values[$index] = DBSafe($val);
+						$safevales[$index] = DBSafe($val);
 					}
 					//make a big or group of the possible values
-					$sql .= "($f='" . implode($values, "' or $f='") . "')";
+					$sql .= "($f='" . implode($safevales, "' or $f='") . "')";
+
+					//also check for nulls/blanks
+					$nullvalues = array();
+					foreach ($values as $val) {
+						if ($val === "") {
+							$sql .= " or $f is null";
+							break;
+						}
+					}
+
+
+					$sql .= ")";
 				} else {
 					$sql .= "0";
 				}
