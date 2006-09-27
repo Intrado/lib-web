@@ -115,7 +115,7 @@ include_once("nav.inc.php");
 
 NewForm($f, "jobsubmit.php?jobid=$jobid");
 if ($renderedlist->total > 0)
-	buttons(button('submit_job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']),button('cancel',null, 'job.php'));
+	buttons(button('submit_job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']),button('back',null, 'job.php'));
 else
 	buttons(button('cancel',null, 'job.php'));
 
@@ -128,42 +128,42 @@ startWindow("Confirmation &amp; Submit");
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td width="30%" >Name</td>
-					<td><?= htmlentities($job->name); ?></td>
+					<td class="bottomBorder" width="30%" >Name</td>
+					<td class="bottomBorder" ><?= htmlentities($job->name); ?></td>
 				</tr>
 				<tr>
-					<td>Description</td>
-					<td><?= htmlentities($job->description); ?></td>
+					<td class="bottomBorder" >Description</td>
+					<td class="bottomBorder" ><?= htmlentities($job->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
-					<td>Priority</td>
-					<td><?= htmlentities($jobtype->name); ?></td>
+					<td class="bottomBorder" >Priority</td>
+					<td class="bottomBorder" ><?= htmlentities($jobtype->name); ?></td>
 				</tr>
 				<tr>
-					<td>List</td>
-					<td><?= htmlentities($list->name); ?></td>
+					<td class="bottomBorder" >List</td>
+					<td class="bottomBorder" ><?= htmlentities($list->name); ?></td>
 				</tr>
 				<tr>
-					<td>Total people in list:</td>
-					<td><?= $renderedlist->total ?></td>
+					<td class="bottomBorder" >Total people in list:</td>
+					<td class="bottomBorder" ><?= $renderedlist->total ?></td>
 				</tr>
 				<tr>
-					<td>Start Date</td>
-					<td><?= htmlentities(date("F jS, Y", strtotime($job->startdate))); ?></td>
+					<td class="bottomBorder" >Start Date</td>
+					<td class="bottomBorder" ><?= htmlentities(date("F jS, Y", strtotime($job->startdate))); ?></td>
 				</tr>
 				<tr>
-					<td>Number of days to run</td>
-					<td><?= 1+ (strtotime($job->enddate) - strtotime($job->startdate))/86400 ?></td>
+					<td class="bottomBorder" >Number of days to run</td>
+					<td class="bottomBorder" ><?= 1+ (strtotime($job->enddate) - strtotime($job->startdate))/86400 ?></td>
 				</tr>
 				<tr>
 					<td colspan="2">Delivery Window:</td>
 				<tr>
-					<td>&nbsp;&nbsp;Earliest</td>
-					<td><?= htmlentities(date("g:i a", strtotime($job->starttime))); ?></td>
+					<td class="bottomBorder" >&nbsp;&nbsp;Earliest</td>
+					<td class="bottomBorder" ><?= htmlentities(date("g:i a", strtotime($job->starttime))); ?></td>
 				</tr>
 				<tr>
-					<td>&nbsp;&nbsp;Latest</td>
-					<td><?= htmlentities(date("g:i a", strtotime($job->endtime))); ?></td>
+					<td class="bottomBorder" >&nbsp;&nbsp;Latest</td>
+					<td class="bottomBorder" ><?= htmlentities(date("g:i a", strtotime($job->endtime))); ?></td>
 				</tr>
 				<tr>
 					<td>Email a report when the job completes</td>
@@ -178,8 +178,8 @@ startWindow("Confirmation &amp; Submit");
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td width="30%" >Default Message</td>
-					<td>
+					<td class="bottomBorder"  width="30%" >Default Message</td>
+					<td class="bottomBorder" >
 <?
 $phonemessage = new Message($job->phonemessageid);
 echo htmlentities($phonemessage->name);
@@ -189,24 +189,24 @@ echo htmlentities($phonemessage->name);
 <? if($USER->authorize('sendmulti')) { ?>
 
 				<tr>
-					<td>Multilingual message options</td>
-					<td><? alternate('phone'); ?></td>
+					<td class="bottomBorder" >Multilingual message options</td>
+					<td class="bottomBorder" ><? alternate('phone'); ?></td>
 				</tr>
 <? } ?>
 				<tr>
-					<td>Maximum attempts</td>
-					<td><?= htmlentities($job->maxcallattempts); ?></td>
+					<td class="bottomBorder" >Maximum attempts</td>
+					<td class="bottomBorder" ><?= htmlentities($job->maxcallattempts); ?></td>
 				</tr>
 				<? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
-							<td>Caller&nbsp;ID</td>
-							<td><?= Phone::format($job->getOptionValue("callerid")) ?></td>
+						<td class="bottomBorder" >Caller&nbsp;ID</td>
+						<td class="bottomBorder" ><?= Phone::format($job->getOptionValue("callerid")) ?>&nbsp;</td>
 					</tr>
 				<? } ?>
 
 				<tr>
-					<td>Skip Duplicate Phone Numbers</td>
-					<td><input type="checkbox" disabled <?= $job->isOption("skipduplicates") ? "checked":"" ?>>Skip Duplicates</td>
+					<td class="bottomBorder" >Skip Duplicate Phone Numbers</td>
+					<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("skipduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
 				<tr>
 					<td>Call every available phone number for each person</td>
@@ -222,8 +222,8 @@ echo htmlentities($phonemessage->name);
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td width="30%" >Default Message</td>
-					<td>
+					<td class="bottomBorder"  width="30%" >Default Message</td>
+					<td class="bottomBorder" >
 <?
 $emailmessage = new Message($job->emailmessageid);
 echo htmlentities($emailmessage->name);
@@ -247,8 +247,8 @@ echo htmlentities($emailmessage->name);
 		<td>
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td width="30%" >Default Message </td>
-					<td>
+					<td class="bottomBorder"  width="30%" >Default Message </td>
+					<td class="bottomBorder" >
 <?
 $printmessage = new Message($job->printmessageid);
 echo htmlentities($printmessage->name);
