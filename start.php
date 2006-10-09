@@ -61,8 +61,8 @@ if ($USER->authorize("startstats")) {
 ?>
 			<tr><td><?
 				startWindow('My Active Calls', 'padding: 3px;');
-				echo button('refresh', 'window.location.reload()');
-				?><br><br><div align="center"><img src="graph_start_actrive_breakdown.png.php" /></div><?
+				button_bar(button('refresh', 'window.location.reload()'));
+				?><div align="center"><img src="graph_start_actrive_breakdown.png.php" /></div><?
 				endWindow();
 ?>
 				</td>
@@ -73,10 +73,11 @@ if ($USER->authorize("startstats")) {
 <?
 
 
+
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
 			startWindow('My Active and Pending Jobs ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
-
+			button_bar(button('refresh', 'window.location.reload()'));
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new') order by id desc limit $limit");
 			$titles = array(	"name" => "Name",
@@ -91,6 +92,8 @@ if ($USER->authorize("startstats")) {
 
 
 			startWindow('My Completed Jobs ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;');
+			button_bar(button('refresh', 'window.location.reload()'));
+
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Name",
 								"Status" => "Status",
