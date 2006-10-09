@@ -66,6 +66,7 @@ $NAVTREE = array (
 		array("Report Builder","reportoptions.php","createreport",$SUBTAB=="builder"),
 		//give the report viewer the default of a "today" report if there was no previous report
 		array("View Report","report.php" . ($_SESSION['reportsql'] ? "" : "?reporttype=relative&jobtype_relative_data=today"),"createreport",$SUBTAB=="view"),
+		array("Job Summary","reportsummary.php","createreport",$SUBTAB=="jobsummary"),
 
 		array("Usage Stats","reportsystem.php",$IS_COMMSUITE ? "viewsystemreports" : "dummy",$SUBTAB=="system"),
 		array("Call Distribution","reportsystemdistribution.php",$IS_COMMSUITE ? "viewsystemreports" : "dummy",$SUBTAB=="distribution")
@@ -193,9 +194,9 @@ function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 	<div id='container'>
 		<div id='accountnav'>
 			<div id='shortcuts'><? doShortcuts($SHORTCUTS) ?></div>
-			<div id='myaddressbook'><a class='accountlink' href='#' onClick="popup('addresses.php?origin=nav',800,400);"><img src='img/myaccount.gif' class='btnleftfloat' align='middle'/>My Address Book</a></div>
+			<div id='myaddressbook'><a class='accountlink' href='#' onClick="popup('addresses.php?origin=nav',800,400);"><img src='img/address_button.gif' class='btnleftfloat' align='middle'/>My Address Book</a></div>
 			<? if ($USER->authorize('managemyaccount')) { ?>
-				<div id='myaccount'><a class='accountlink' href='account.php'><img src='img/myaccount.gif' class='btnleftfloat' align='middle'/>My Account</a></div>
+				<div id='myaccount'><a class='accountlink' href='account.php'><img src='img/account_button.gif' class='btnleftfloat' align='middle'/>My Account</a></div>
 			<? } ?>
 			<div id='help'><a class='accountlink' href='#' onclick="window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"><img src='img/helpcenter.gif' class='btnleftfloat' align='middle'/>Help</a></div>
 			<div id='logout'><a class='accountlink' href='index.php?logout=1'><img src='img/logout.gif' class='btnleftfloat' align='middle' />Logout</a></div>
