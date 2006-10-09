@@ -152,7 +152,7 @@ function fmt_jobs_generic ($id, $status, $deleted) {
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 
 	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
-	$reportbtn = '<a href="report.php?reporttype=job&jobid=' . $id . '">Report</a>';
+	$reportbtn = '<a href="reportsummary.php?jobid=' . $id . '">Report</a>';
 	$monitorbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '\', 500, 450);" >Monitor</a>';
 	$graphbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '&noupdate\', 500, 450);" >Graph</a>';
 
@@ -252,7 +252,7 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->authorize('viewsystemreports')) {
-		$reportLink = '&nbsp;|&nbsp;<a href="report.php?reporttype=job&jobid=' . $id . '">Report</a>';
+		$reportLink = '&nbsp;|&nbsp;<a href="reportsummary.php?jobid=' . $id . '">Report</a>';
 	} else {
 		$reportLink = '';
 	}
