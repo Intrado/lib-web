@@ -475,6 +475,13 @@ a.sublink:hover {
 	background-color: #999999;
 }
 
+.floatingreportdata {
+	float: left; 
+	margin: 5px;
+	text-align: center;
+	font-weight: bold;
+}
+
 /* 
 dark blue #365F8D
 light blue #D4DDE2
