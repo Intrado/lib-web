@@ -65,7 +65,7 @@ Name: <input type="text" name="name" size="30"> &nbsp;&nbsp; Description: <input
 			<td><div id="jobid"><select name="jobid" id='jobid_select'>
 					<option value='0'>Not selected</option>
 <?
-$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 order by id desc");
+$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status!='repeating' order by id desc");
 foreach ($jobs as $job) {
 	echo '<option value="' . $job->id . '">' . htmlentities($job->name) . '</option>';
 }
@@ -74,7 +74,7 @@ foreach ($jobs as $job) {
 			<td><div id="jobid_archived" style="display: none"><select name="jobid_archived" id='jobid_archived_select'>
 					<option value='0'>Not selected</option>
 <?
-$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 order by id desc");
+$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 and status!='repeating' order by id desc");
 foreach ($jobs as $job) {
 	echo '<option value="' . $job->id . '">' . htmlentities($job->name) . '</option>';
 }
