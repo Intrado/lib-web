@@ -60,7 +60,7 @@ function fmt_fileexists ($import,$dummy) {
 		$importfile = getImportFileURL($import->customerid,$import->id);
 
 	if (is_readable($importfile) && is_file($importfile)) {
-		return "Exists (" . date("M j, g:i a",filemtime($importfile)) . ")";
+		return date("M j, g:i a",filemtime($importfile));
 	} else {
 		return "Not Found";
 	}
@@ -79,7 +79,8 @@ $titles = array("name" => "#Name",
 				"updatemethod" => "#Type",
 				"uploadkey" => "Upload Key",
 				"status" => "#Status",
-				"file" => "#File");
+				"lastrun" => "Last Run",
+				"file" => "#File Date");
 if ($IS_COMMSUITE)
 	$titles['nextrun'] = "#Next Scheduled Run";
 
@@ -89,6 +90,7 @@ $titles['Actions'] = "Actions";
 $formatters = array("updatemethod" => "fmt_updatemethod",
 					"nextrun" => "fmt_nextrun",
 					"status" => "fmt_ucfirst",
+					"lastrun" => "fmt_obj_date",
 					"updatemethod" => "fmt_updatemethod",
 					"file" => "fmt_fileexists",
 					"Actions" => "fmt_actions");
