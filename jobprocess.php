@@ -113,13 +113,16 @@ foreach ($defaultmessages as $type => $defmsgid) {
 
 	if ($defmsgid != NULL) {
 
+//skip dedupe for new dedupe in messagedigester
+/*
 		//should we immediately start rendering messages or do we need to check first (ie dedupe)?
 		if ($type == "phone" && $job->isOption("skipduplicates")) {
 			$status = "checking";
 		} else {
 			$status = "new";
 		}
-
+*/
+	$status = "new";
 		$query = "
 		insert into jobworkitem (jobid, type,personid, messageid, priority, systempriority, status)
 		(select $jobid as jobid, '$type' as type, p.id as personid,
@@ -147,6 +150,8 @@ foreach ($defaultmessages as $type => $defmsgid) {
 
 		$count += QuickUpdate($query);
 
+//skip dedupe for new dedupe in messagedigester
+/*
 		//do we need to dedupe?
 		if ($type == "phone" && $job->isOption("skipduplicates")) {
 
@@ -185,6 +190,7 @@ foreach ($defaultmessages as $type => $defmsgid) {
 		if ($status == "checking") {
 			QuickUpdate("update jobworkitem wi set wi.status='new' where wi.jobid=$jobid and wi.status='checking'");
 		}
+*/
 	}
 }
 
@@ -193,7 +199,7 @@ if ($count == 0 && $isrepeating) {
 	QuickUpdate("delete from joblanguage where jobid=$deletedid");
 	$job->destroy();
 } else {
-	QuickUpdate("update job set status='active' where id=$jobid");
+	QuickUpdate("update job set status='active', assigned = null where id=$jobid");
 
 	//update the listlastused field
 	//FIXME there is no list.lastused field and modified is not used so we are going to use that instead
