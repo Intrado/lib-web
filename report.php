@@ -251,15 +251,10 @@ function fmt_message ($row,$index) {
 	return '<img src="img/icon_' . $row[$index] . '_12.gif" align="bottom" />&nbsp;' . htmlentities($row[$index+1]);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Display
-////////////////////////////////////////////////////////////////////////////////
-
 $starttime = microtime_float();
-
-//TODO these need to come from a form or something
-
 $usersql = "p.customerid=" . $USER->customerid;
+
+////////// paging ///////////
 
 $limit=500;
 $start=0 + $_GET['pagestart'];
@@ -280,6 +275,13 @@ if ($USER->authorize('viewsystemreports')) {
 	$userJoin = " and j.userid = $USER->id ";
 }
 
+
+
+//TODO
+//total people, notified, unnotified, remaining
+//total calls, delivered, undelivered, remaining
+//total attempts, answered, machine, busy, no answer,
+
 $summaryquery = "
 select
 	wi.type,
@@ -289,19 +291,9 @@ select
 	sum(wi.status='fail') as fail,
 	sum(wi.status not in ('success','fail','duplicate')) as in_progress,
 	sum(wi.status = 'duplicate') as duplicate,
-	sum(wi.status='success') / (sum(wi.status='success' or wi.status='fail' or (jt.numattempts>0 and wi.status = 'queued' or wi.status='scheduled')) +0.00) as success_rate,
+	0 as success_rate,
 
-
--- crazy subselect merge query below
-
-
-	sum((	select count(*)
-			from jobtask jt2, calllog cl2
-			where wi.id = jt2.jobworkitemid
-			and cl2.jobtaskid=jt2.id
-		)) as total_attempts,
-
-
+	0 as total_attempts,
 
 	j.userid, j.name, u.firstname, u.lastname, u.login
 
@@ -394,9 +386,9 @@ select SQL_CALC_FOUND_ROWS
 ";
 
 
-///////////// Statistics /////////////
-
-
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
 
 
 if ($_GET['csv']) {
@@ -468,7 +460,7 @@ if ($_GET['csv']) {
 	?>
 					<tr>
 						<th class="windowRowHeader bottomBorder" align="right">Phone:<br><? print help('ReportResults_Phone', NULL, 'grey'); ?></th>
-						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "People", 6 => "Phone # Duplicates Removed", 2 => "% Completed", 3 => "Delivered", 4 => "Undelivered", 5 => "Remaining", 7 => "Success Rate", 8 => "Total Call Attempts"),array(2=>"fmt_percent", 7=>"fmt_percent")); ?></table></td>
+						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "People", 6 => "Phone # Duplicates Removed", 2 => "% Contacted", 3 => "Delivered", 4 => "Undelivered", 5 => "Remaining"),array(2=>"fmt_percent", 7=>"fmt_percent")); ?></table></td>
 					</tr>
 	<?
 					break;
@@ -533,7 +525,7 @@ if ($_GET['csv']) {
 
 	endWindow();
 ?>
-	<br><a href="report.php/report.csv?csv=true" class="noprint">Click here to download a CSV report</a>
+	<br><a href="report.php/report.csv?csv=true" class="noprint">Click here to download report data in CSV format</a>
 <?
 
 
