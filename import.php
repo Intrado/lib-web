@@ -101,10 +101,14 @@ if (strpos($argc[2],"-debug") !== false) {
 wlog("start id=$importid");
 
 
+$now = QuickQuery("select now()");
+
 //get the import from the DB
 $import = new Import($importid);
 $import->status="running";
-$import->update(array("status"));
+$import->lastrun = $now;
+$import->update(array("status","lastrun"));
+
 $temp = DBFindMany("ImportField", "from importfield where importid='$importid'");
 
 $importfields = array();
@@ -141,11 +145,10 @@ if ($IS_COMMSUITE || $import->type == "upload")
 else
 	$importfile = getImportFileURL($import->customerid,$import->id);
 
-$now = QuickQuery("select now()");
 
 $fp = fopen($importfile, "r");
 if (!$fp || filesize($importfile) == 0) {
-	$import->status="error";
+	$import->status = "error";
 	$import->update(array("status"));
 	wlog("No input file or file empty: $importfile");
 	exit(-1);
@@ -373,7 +376,6 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 		foreach ($phones as $phone)
 			$maxphoneseq = max($maxphoneseq,$phone->sequence);
 		for ($x = 0; $x <= $maxphoneseq; $x++) {
-			echo ".";
 			if (!isset($phones[$x])) {
 				echo "max $maxphoneseq, phone not there, making new one for $personid\n";
 				$phone = new Phone();
@@ -383,7 +385,6 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 				$phones[$x] = $phone;
 			}
 			$phones[$x]->update();
-			echo mysql_error();
 		}
 
 		//same for email
