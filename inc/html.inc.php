@@ -102,9 +102,9 @@ function buttons() {
 	static $buttons;
 	if(!$buttons) {
 		$buttons = func_get_args();
-		print '<table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 5px;" class="noprint"><tr><td>' .  implode('</td><td>', $buttons) . '</td><tr></table>';
+		print '<table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 5px;" class="noprint"><tr><td>' .  implode('</td><td>', $buttons) . '</td></tr></table>';
 	} else
-		print '<table border="0" cellspacing="0" cellpadding="0" style="margin-top: 5px;" class="noprint"><tr><td>' .  implode('</td><td>', $buttons) . '</td><tr></table>';
+		print '<table border="0" cellspacing="0" cellpadding="0" style="margin-top: 5px;" class="noprint"><tr><td>' .  implode('</td><td>', $buttons) . '</td></tr></table>';
 }
 
 /*
