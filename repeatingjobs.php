@@ -41,14 +41,16 @@ $start = 0 + $_GET['pagestart'];
 $limit = 100;
 
 // jobworkitem columns are: id jobid type priority personid messageid status resultdata assignedto
-$result = Query(
-			"select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.status, j.deleted, jobowner.login, jobowner.id, name+0 as foo
-            	from job j
-            	left join user jobowner
-            		on j.userid = jobowner.id,
-            	user u, schedule
-            	where u.customerid = $USER->customerid and j.userid = u.id and j.status = 'repeating' and j.scheduleid = schedule.id
-            	group by j.id order by u.login,foo,name limit $start, $limit");
+$query = "select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.status, j.deleted, jobowner.login, jobowner.id, name+0 as foo
+			from job j
+			left join user jobowner
+				on j.userid = jobowner.id,
+			user u, schedule
+			where u.customerid = $USER->customerid and j.userid = u.id and j.status = 'repeating' and j.scheduleid = schedule.id
+			group by j.id order by u.login,foo,name limit $start, $limit
+";
+
+$result = Query($query);
 
 while ($row = DBGetRow($result)) {
 	$data[] = $row;
