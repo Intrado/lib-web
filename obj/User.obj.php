@@ -13,6 +13,7 @@ class User extends DBMappedObject {
 	var $email = "";
 	var $enabled = 0;
 	var $lastlogin;
+	var $deleted;
 
 
 	var $customer = null;
@@ -22,7 +23,7 @@ class User extends DBMappedObject {
 		$this->_allownulls = true;
 		$this->_tablename = "user";
 		$this->_fieldlist = array("accessid", "login", "accesscode", "customerid", "firstname",
-								"lastname", "email", "phone", "enabled","lastlogin");
+								"lastname", "email", "phone", "enabled","lastlogin","deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -166,9 +167,9 @@ class User extends DBMappedObject {
 
 
 
-	/* user settings */
+/* user settings */
 
-	function getSetting ($name, $refresh = false) {
+	function getSetting ($name, $defaultvalue = false, $refresh = false) {
 		static $settings = null;
 
 		if ($settings === null || $refresh) {
@@ -183,11 +184,11 @@ class User extends DBMappedObject {
 		if (isset($settings[$name]))
 			return $settings[$name];
 		else
-			return false;
+			return $defaultvalue;
 	}
 
 	function setSetting ($name, $value) {
-		$old = $this->getSetting($name, true);
+		$old = $this->getSetting($name,false,true);
 
 		if ($old === false) {
 			$settings[$name] = $value;
