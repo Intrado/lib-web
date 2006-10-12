@@ -54,7 +54,7 @@ if (isset($_GET['run'])) {
 			$cmd = "php import.php -import=$run > /dev/null &";
 			exec($cmd);
 		}
-
+		sleep(3);
 	}
 	redirectToReferrer();
 }
