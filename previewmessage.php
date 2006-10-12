@@ -71,6 +71,8 @@ if(CheckFormSubmit($f,$s)) {
 			$previewdata .= "&$fieldmap->fieldnum=" . urlencode(GetFormData($f,$s,$fieldmap->fieldnum));
 		}
 
+		//add something so that QT player doesn't barf if last char is a period
+		$previewdata .= "&qt=" . urlencode(" ");
 		$dopreview = 1;
 	}
 } else {
@@ -127,7 +129,7 @@ startWindow('Preview Options', 'padding: 3px;');
 <?
 		if($fieldmap->isOptionEnabled("text")) {
 
-			NewFormItem($f,$s,$fieldnum,"text",20);
+			NewFormItem($f,$s,$fieldnum,"text",20,255);
 
 		} elseif($fieldmap->isOptionEnabled("reldate")) {
 			NewFormItem($f, $s,$fieldnum, "selectstart");
