@@ -198,7 +198,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 	}
 
 	function rcp_closesession ($method_name, $params, $app_data) {
-
+		$sessionid = $params[0];
 		if (!$sess = loadSessionData($sessionid))
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Unknown session",

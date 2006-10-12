@@ -35,12 +35,10 @@ function customerOwns($type, $id) {
 		case "persondatavalues":
 		case "setting":
 			return QuickQuery("select count(*) from `$type` where id = '$id' and customerid=$USER->customerid");
-			break;
 		case "access":
 		case "person":
 		case "user":
 			return QuickQuery("select count(*) from `$type` where id = '$id' and customerid=$USER->customerid and deleted=0");
-			break;
 		case "job":
 			return QuickQuery("select count(*) from job, user where job.id = '$id' and user.customerid = $USER->customerid and user.id = job.userid");
 		default:

@@ -77,7 +77,6 @@ class ReportGenerator {
 			case "web":
 			case "html":
 				return ".html";
-				break;
 			default:
 				return "." . $this->format;
 		}

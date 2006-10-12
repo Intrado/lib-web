@@ -41,7 +41,7 @@ class ReportSubscription extends DBMappedObject {
 
 	function setReportInstance ($reportinstanceobj) {
 		//$this->$reportinstance = $reportinstanceobj; // doesnt make sence in this context, subscriptions are children of reportinstance
-		$this->$reportinstanceid = $reportinstanceobj->id;
+		$this->reportinstanceid = $reportinstanceobj->id;
 	}
 }
 

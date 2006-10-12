@@ -140,10 +140,10 @@ class User extends DBMappedObject {
 	}
 
 	function getCustomer () {
-		if ($customer == null)
-			$customer = new Customer($this->customerid);
+		if ($this->customer == null)
+			$this->customer = new Customer($this->customerid);
 
-		return $customer;
+		return $this->customer;
 	}
 
 
