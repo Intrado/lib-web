@@ -100,14 +100,8 @@ if (strpos($argc[2],"-debug") !== false) {
 
 wlog("start id=$importid");
 
-
-$now = QuickQuery("select now()");
-
 //get the import from the DB
 $import = new Import($importid);
-$import->status="running";
-$import->lastrun = $now;
-$import->update(array("status","lastrun"));
 
 $temp = DBFindMany("ImportField", "from importfield where importid='$importid'");
 
@@ -133,12 +127,18 @@ if ($import->ownertype == "user") {
 	}
 }
 
-
 $custid = $import->customerid;
 
 $timezone = QuickQuery("select timezone from customer where id=$custid");
 date_default_timezone_set($timezone);
 QuickUpdate("set time_zone='" . $timezone . "'");
+$now = QuickQuery("select now()");
+
+//update the status and lastrun info now that timezone is set
+$import->status="running";
+$import->lastrun = $now;
+$import->update(array("status","lastrun"));
+
 
 if ($IS_COMMSUITE || $import->type == "upload")
 	$importfile = $import->path;
