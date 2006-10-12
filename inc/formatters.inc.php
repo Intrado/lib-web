@@ -159,6 +159,8 @@ function fmt_jobs_generic ($id, $status, $deleted) {
 	$deletebtn = '<a href="jobs.php?delete=' . $id . '" onclick="return confirmDelete();">Delete</a>';
 	$archivebtn = '<a href="jobs.php?archive=' . $id . '">Archive</a>';
 
+	$runrepeatbtn = '<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
+
 	switch ($status) {
 		case "new":
 			$buttons = array($editbtn,$cancelbtn);
@@ -182,7 +184,7 @@ function fmt_jobs_generic ($id, $status, $deleted) {
 				$buttons = array($editbtn,$usedelbtn);
 			break;
 		case "repeating":
-			$buttons = array($editrepeatingbtn,$deletebtn);
+			$buttons = array($editrepeatingbtn,$runrepeatbtn,$deletebtn);
 			break;
 		default:
 			if ($USER->authorize('createreport'))
@@ -237,18 +239,20 @@ function fmt_jobs_actions_customer($row, $index) {
 		$status = $row->status;
 		$deleted = $row->deleted;
 		$jobowner = new User($row->userid);
-		$jobowner = $jobowner->id;
+		$jobownerlogin = $jobowner->login;
+		$jobownerid = $jobowner->id;
 	} else {
 		$id = $row[$index];
 		$status = $row[$index + 1];
 		$deleted = $row[$index + 2];
-		$jobowner = $row[$index + 4];//change to id
+		$jobownerlogin = $row[$index + 3];
+		$jobownerid = $row[$index + 4];//change to id
 	}
 
-	if ($USER->id == $jobowner) {
+	if ($USER->id == $jobownerid) {
 		$editLink = '<a href="job.php?id=' . $id . '">Edit</a>';
 	} elseif ($USER->authorize('manageaccount')) {
-		$editLink = '<a href="./?login=' . $jobowner . '">Login&nbsp;as&nbsp;this&nbsp;user</a>';
+		$editLink = '<a href="./?login=' . $jobownerlogin . '">Login&nbsp;as&nbsp;this&nbsp;user</a>';
 	}
 
 	if ($USER->authorize('viewsystemreports')) {
@@ -267,6 +271,8 @@ function fmt_jobs_actions_customer($row, $index) {
 		$deleteLink = '';
 	}
 
+	$runrepeatLink = '&nbsp;|&nbsp;<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
+
 	switch ($status) {
 		case "new":
 			return "$editLink$cancelLink";
@@ -280,10 +286,10 @@ function fmt_jobs_actions_customer($row, $index) {
 				return "$editLink$reportLink$archiveLink";
 			}
 		case "repeating":
-			if ($USER->login == $jobowner) {
+			if ($USER->id == $jobownerid) {
 				$editLink = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 			}
-			return "$editLink$deleteLink";
+			return "$editLink$runrepeatLink$deleteLink";
 		default:
 			return "$editLink$reportLink";
 	}
