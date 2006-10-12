@@ -156,12 +156,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
 			} else {
-				$callerid = getSetting('callerid');
+				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 				$job->setOptionValue("callerid", $callerid);
 			}
 
-			if (getSetting('retry') != "")
-				$job->setOptionValue("retry",getSetting('retry'));
+			if (getSystemSetting('retry') != "")
+				$job->setOptionValue("retry",getSystemSetting('retry'));
 
 			if ($JOBTYPE == "repeating") {
 				$schedule = new Schedule($job->scheduleid);
@@ -289,7 +289,7 @@ if( $reloadform )
 		$job->starttime = $USER->getCallEarly();
 		$job->endtime = $USER->getCallLate();
 		$job->jobtypeid = end($VALIDJOBTYPES)->id;
-		$job->maxcallattempts = min(3,$ACCESS->getValue('callmax'));
+		$job->maxcallattempts = min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","3"));
 	} else {
 		//beautify the dates & times
 		$job->startdate = date("F jS, Y", strtotime($job->startdate));
@@ -309,7 +309,7 @@ if( $reloadform )
 	array("printmessageid","number","nomin","nomax"),
 	array("starttime","text",1,50,true),
 	array("endtime","text",1,50,true),
-	array("maxcallattempts","text",1,50,true),
+	array("maxcallattempts","numeric",1,$ACCESS->getValue('callmax'),true),
 	array("sendphone","bool",0,1),
 	array("sendemail","bool",0,1),
 	array("sendprint","bool",0,1)
@@ -317,11 +317,16 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
-	PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
+	if ($job->id != null) {
+		PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
+	} else {
+		PutFormData($f,$s,"callall",$USER->getSetting("callall") + 0, "bool",0,1);
+	}
+
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 
-	$callerid = getSetting('callerid');
+	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 	if ($USER->authorize('setcallerid') && $job->getOptionValue("callerid")) {
 		$callerid = $job->getOptionValue("callerid"); // Override default with custom value if available
 	}
@@ -349,9 +354,9 @@ if( $reloadform )
 
 	// Default to a 2 day run interval on a new job
 	if ($job->id != null) {
-		PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, 7, true);
+		PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
 	} else {
-		PutFormData($f, $s, 'numdays', 2, 'number', 1, 7, true); // Default to 2
+		PutFormData($f, $s, 'numdays', min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2")), 'number', 1, $ACCESS->getValue('maxjobdays'), true); // Default to 2
 	}
 
 }
@@ -695,12 +700,6 @@ endWindow();
 buttons();
 EndForm();
 include_once("navbottom.inc.php");
-
-function getSetting($name) {
-	global $USER;
-	$name = DBSafe($name);
-	return QuickQuery("select value from setting where customerid = $USER->customerid and name = '$name'");
-}
 
 ?>
 <script language="javascript">
