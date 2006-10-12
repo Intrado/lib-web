@@ -35,7 +35,7 @@ $graph = new PieGraph(250,100,"auto");
 $graph->SetFrame(false);
 $graph->SetAntiAliasing();
 
-$graph->title->Set("Emails to send: " . number_format($emailstats['totalemails']));
+$graph->title->Set("Emails to Send: " . number_format($emailstats['totalemails']));
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 $graph->legend->Pos(0.00,0.3,"right","top");

@@ -72,7 +72,7 @@ $graph = new PieGraph(250,160,"auto");
 $graph->SetFrame(false);
 $graph->SetAntiAliasing();
 
-$graph->title->Set("Phone Numbers to Call: " . number_format($phonestats['totalcalls']));
+$graph->title->Set("Numbers to Call: " . number_format($phonestats['totalcalls']));
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 $graph->legend->Pos(0.00,0.55,"right","center");
