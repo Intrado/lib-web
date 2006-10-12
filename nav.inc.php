@@ -32,8 +32,10 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))
 
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['-- Reports & Status --'] = "false;";
-	if ($USER->authorize('createreport'))
+	if ($USER->authorize('createreport')) {
 		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "window.location='reportoptions.php'";
+		$SHORTCUTS['&nbsp;&nbsp;View Job Summary'] = "window.location='reportsummary.php'";
+	}
 	if ($USER->authorize('viewsystemreports') && $IS_COMMSUITE) {
 		$SHORTCUTS['&nbsp;&nbsp;Usage Stats'] = "window.location='reportsystem.php'";
 		$SHORTCUTS['&nbsp;&nbsp;Call Distribution'] = "window.location='reportsystemdistribution.php'";
