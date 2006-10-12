@@ -50,20 +50,26 @@ if(CheckFormSubmit($f,$s)) {
 	$job->sendphone = true;
 
 	$job->startdate = date("Y-m-d", strtotime("today"));
-	$job->enddate = date("Y-m-d", strtotime("tomorrow"));
+
+	$numdays = min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2"));
+
+	$job->enddate = date("Y-m-d", strtotime("+ $numdays day"));
 
 	$job->starttime = $USER->getCallEarly();
-
 	$job->endtime = $USER->getCallLate();
 
-	$job->maxcallattempts = min(3,$ACCESS->getValue('callmax'));
+	$job->maxcallattempts =  min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","3"));
 	$job->type = "phone";
-	$job->options = "callfirst,skipduplicates,sendreport";
-	if (getSetting('callerid') != "")
-		$job->options .= ",callerid=" . getSetting('callerid');
 
-	if (getSetting('retry') != "")
-		$job->options .= ",retry=" . getSetting('retry');
+	$job->setOption("callall",$USER->getSetting("callall"));
+	$job->setOption("callfirst",!$USER->getSetting("callall") + 0);
+	$job->setOption("skipduplicates",1);
+	$job->setOption("sendreport",1);
+
+	$job->setOptionValue("callerid", $USER->getSetting("callerid",getSystemSetting("callerid")));
+
+	if (getSystemSetting('retry') != "")
+		$job->setOptionValue("retry",getSystemSetting('retry'));
 
 	$job->status = "new";
 	$job->userid = $USER->id;
