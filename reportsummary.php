@@ -15,7 +15,7 @@ require_once("inc/formatters.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports')) {
+if (!$USER->authorize('createreport') || !$USER->authorize('viewsystemreports')) {
 	redirect('unauthorized.php');
 }
 
