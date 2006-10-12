@@ -14,7 +14,7 @@ include_once("inc/form.inc.php");
 include_once('inc/table.inc.php');
 
 if (!$USER->authorize("starteasy")) {
-	redirect("unauthorized.php");	
+	redirect("unauthorized.php");
 }
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
@@ -66,16 +66,17 @@ if ($specialtask->getData('error') == 'true') {
 		if (success)
 			alert("Your message has been saved and should be automatically selected in the menu");
 		else
-			alert("Your message has been saved. You may need to reload the page for it to appear in the menu");
-		
+			alert("Your message has been saved.");
+
 		<?
 			if ($specialtask->getData('origin') == 'message') {
-				print 'window.opener.document.location.reload; window.close()';	
+				print 'window.opener.document.location.reload(); window.close()';
 			} else {
-				print 'window.close()';	
+				print 'window.close()';
 			}
 		?>
 	</script>
+	Your message has been saved.
 <?
 
 } else {
