@@ -87,8 +87,16 @@ if(CheckFormSubmit($f,$s))
 
 			//save prefs
 
+			$USER->setSetting("callearly",GetFormData($f, $s, 'callearly'));
+			$USER->setSetting("calllate",GetFormData($f, $s, 'calllate'));
+			$USER->setSetting("callmax",GetFormData($f, $s, 'callmax'));
+			$USER->setSetting("maxjobdays",GetFormData($f, $s, 'maxjobdays'));
+			$USER->setSetting("callall",GetFormData($f, $s, 'callall'));
 
-
+			//dont save any callerid stuff if they don't have access to change it
+			$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
+			if ($USER->authorize('setcallerid'))
+				$USER->setSetting("callerid",$callerid);
 
 			redirect("start.php");
 		}
@@ -128,9 +136,9 @@ if( $reloadform )
 
 	//Maximum call attempts
 	if (($callmax = $USER->getSetting("callmax")) === false) {
-		$callmax = min(3,$ACCESS->getValue('maxjobdays'));
+		$callmax = min(3,$ACCESS->getValue('callmax'));
 	} else {
-		$callmax = min($USER->getSetting("callmax"), $ACCESS->getValue('maxjobdays'));
+		$callmax = min($USER->getSetting("callmax"), $ACCESS->getValue('callmax'));
 	}
 	PutFormData($f,$s,"callmax", $callmax, "text",1,50,true);
 
@@ -149,14 +157,9 @@ if( $reloadform )
 	PutFormData($f,$s,"callall",$USER->getDefaultAccessPref("callall","0"), "bool",0,1);
 
 	//Default caller ID
-
-	if ($USER->authorize('setcallerid') && $USER->getSetting("callerid") )
-		$callerid = $USER->getSetting("callerid");
-	else
-		$callerid = getSystemSetting('callerid');
+	//default to system setting unless user has a pref
+	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
-
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -273,6 +276,10 @@ startWindow('User Information');
 							</tr>
 <? } ?>
 
+							<tr>
+								<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
+								<td><? NewFormItem($f,$s,"callall","checkbox",1); ?>Call all phone numbers</td>
+							</tr>
 						</table>
 					</td>
 				</tr>
