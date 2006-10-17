@@ -300,7 +300,7 @@ if( $reloadform )
 
 	//TODO break out options
 	$fields = array(
-	array("name","text",1,50,true),
+	array("name","text",1,$JOBTYPE == "repeating" ? 30: 50,true),
 	array("description","text",1,50,false),
 	array("jobtypeid","number","nomin","nomax"),
 	array("listid","number","nomin","nomax",true),
@@ -309,7 +309,7 @@ if( $reloadform )
 	array("printmessageid","number","nomin","nomax"),
 	array("starttime","text",1,50,true),
 	array("endtime","text",1,50,true),
-	array("maxcallattempts","numeric",1,$ACCESS->getValue('callmax'),true),
+	array("maxcallattempts","number",1,$ACCESS->getValue('callmax'),true),
 	array("sendphone","bool",0,1),
 	array("sendemail","bool",0,1),
 	array("sendprint","bool",0,1)
@@ -484,7 +484,7 @@ startWindow('Job Information');
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
 					<td width="30%" >Name</td>
-					<td><? NewFormItem($f,$s,"name","text", 30,50); ?></td>
+					<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
 				</tr>
 				<tr>
 					<td>Description</td>
