@@ -126,7 +126,7 @@ startWindow('My Active and Pending Jobs ' . help('Jobs_MyActiveJobs', NULL, 'blu
 
 button_bar(button('createjob', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('easycall',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);") . help('Start_EasyCall') : ''));
 
-showObjects($data, $titles, array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status'), $scroll, true);
+showObjects($data, $titles, array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "startdate" => "fmt_job_startdate"), $scroll, true);
 endWindow();
 
 
@@ -137,6 +137,7 @@ if ($USER->authorize('createrepeat')) {
 	$titles = array(	"name" => "#Name",
 						"description" => "#Description",
 						"startdate" => "#Next Scheduled Run",
+						"finishdate" => "#Last Run",
 						"Actions" => "Actions"
 						);
 
@@ -150,7 +151,7 @@ if ($USER->authorize('createrepeat')) {
 	button_bar(button('createrepeatjob', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
 
 
-	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "Actions" => "fmt_jobs_actions"), $scroll, true);
+	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
 	endWindow();
 	print '<br>';
 }
@@ -164,7 +165,7 @@ $titles = array(	"name" => "#Name",
 					"enddate" => "#End Date",
 					"Actions" => "Actions"
 					);
-$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "enddate" => "fmt_job_enddate");
+$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "startdate" => "fmt_job_startdate", "enddate" => "fmt_job_enddate");
 
 $scroll = false;
 if (count($data) > $scrollThreshold) {
