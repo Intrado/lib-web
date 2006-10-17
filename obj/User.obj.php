@@ -13,10 +13,7 @@ class User extends DBMappedObject {
 	var $email = "";
 	var $enabled = 0;
 	var $lastlogin;
-	var $deleted;
-
-
-	var $customer = null;
+	var $deleted = 0;
 
 	//new constructor
 	function User ($id = NULL) {
@@ -140,10 +137,11 @@ class User extends DBMappedObject {
 	}
 
 	function getCustomer () {
-		if ($this->customer == null)
-			$this->customer = new Customer($this->customerid);
+		static $customer = null;
+		if ($customer == null)
+			$customer = new Customer($this->customerid);
 
-		return $this->customer;
+		return $customer;
 	}
 
 
@@ -229,7 +227,7 @@ class User extends DBMappedObject {
 
 		if (!$profile && !$pref)
 			return "8:00 am"; //default
-		else if ($pref && profile) {
+		else if ($pref && $profile) {
 			if (strtotime($pref) < strtotime($profile)) //use profile if pref is too early
 				return $profile;
 			else
@@ -248,7 +246,7 @@ class User extends DBMappedObject {
 
 		if (!$profile && !$pref)
 			return "9:00 pm"; //default
-		else if ($pref && profile) {
+		else if ($pref && $profile) {
 			if (strtotime($pref) > strtotime($profile)) //use profile if pref is too late
 				return $profile;
 			else
