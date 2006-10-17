@@ -58,10 +58,10 @@ if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name'])
 				if (uploadImportFile($newname,$import->customerid,$import->id))
 					redirect("taskmap.php?id=$import->id");
 				else
-					error('cant upload, Unable to complete file upload. Please try again.');
+					error('Unable to complete file upload. Please try again.');
 			}
 		} else {
-			error('file not readable, Unable to complete file upload. Please try again.');
+			error('Unable to complete file upload. Please try again.');
 		}
 	}
 } else if (CheckFormSubmit($f,'upload')) {
