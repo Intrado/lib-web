@@ -100,7 +100,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Invalid password' . $extraMsg);
 		} elseif (!isValidTextItem(GetFormData($f, $s, 'accesscode'))) {
 			error('Invalid telephone user ID' . $extraMsg);
-		} elseif (User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
+		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid'],  $USER->customerid);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax', true); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
@@ -142,6 +142,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			if (!ereg("^0*$", $pincode)) {
 				$usr->setPincode($pincode);
 			}
+
+			$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
+			if (strlen($callerid) == 0 )
+				$callerid = false;
+			$usr->setSetting("callerid",$callerid);
 
 			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
 			if ($fieldnum != -1 && $usr->id) {
@@ -217,6 +222,8 @@ if( $reloadform )
 	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
 	PutFormData($f,$s,"newruleoperator_text","eq","text",1,50);
 	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
+
+	PutFormData($f,$s,"callerid", Phone::format($usr->getSetting("callerid","")), "text", 0, 20);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -273,6 +280,12 @@ startWindow('User Information');
 								<td align="right">Phone:</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'phone', 'text', 20); ?></td>
 							</tr>
+
+							<tr>
+								<td align="right">Caller&nbsp;ID:</td>
+								<td colspan="4"><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
+							</tr>
+
 						</table>
 
 						<br>Please note: username and password are case-sensitive and must be a minimum of 4 characters long with no spaces.
