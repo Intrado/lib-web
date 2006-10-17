@@ -43,13 +43,17 @@ if ($job->status=="repeating") {
 	if (getSystemSetting("disablerepeat"))
 		exit(-4);
 
+	//update the finishdate (reused as last run for repeating jobs)
+	QuickUpdate("update job set finishdate=now() where id='$jobid'");
+
 	//make a copy of this job and run it
 	$newjob = new Job($jobid);
 	$newjob->id = NULL;
-	$newjob->name .= " - " . date("F jS, Y");
+	$newjob->name .= " - " . date("M j, g:i a");
 	$newjob->status = "new";
 	$newjob->assigned = NULL;
 	$newjob->scheduleid = NULL;
+	$newjob->finishdate = NULL;
 
 	$newjob->createdate = QuickQuery("select now()");
 
