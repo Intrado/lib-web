@@ -99,7 +99,7 @@ if(isset($_GET['id'])) {
 					//just append to the last one
 					$renderedparts[$curpart][1] .= " " . $value;
 				} else {
-					$renderedparts[++$curpart] = array("t",$valuet,$part->voiceid);
+					$renderedparts[++$curpart] = array("t",$value,$part->voiceid);
 					$lastVoice = $part->voiceid;
 				}
 				break;
