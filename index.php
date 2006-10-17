@@ -119,7 +119,9 @@ if (file_exists($logofilename) ) {
 					</table>
 				</td></tr>
 <? } ?>
-
+				<tr>
+					<td colspan="2" style="font-size: x-small; font-weight: normal;">Usernames and passwords are case-sensitive.</td>
+				</tr>
 			</table>
 		</td>
 	</tr>
