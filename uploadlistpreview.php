@@ -52,6 +52,7 @@ $listpreviewdata = array();
 $notfound = 0;
 $notfounddata = array();
 $errormsg = false;
+$defaultareacode = getSystemSetting("defaultareacode");
 $usersql = $USER->userSQL("p", "pd");
 if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 
@@ -64,7 +65,10 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 				if (count($row) == 1 && $row[0] == "")
 					continue;
 				$phone = Phone::parse($row[2]);
+				if ($defaultareacode && strlen($phone) == 7)
+					$phone = Phone::parse($defaultareacode . $phone);
 				$phone = strlen($phone) == 10 ? Phone::format($phone) : "Invalid";
+
 				$listpreviewdata[] = array($row[0],$row[1],$phone,$row[3]) ;
 				$colcount = max($colcount,count($row));
 			}
