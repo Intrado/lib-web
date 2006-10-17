@@ -126,6 +126,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('retry', GetFormData($f, $s, 'retry'));
 				setSetting('callerid', Phone::parse(GetFormData($f, $s, 'callerid')));
+
+				setSetting('defaultareacode', GetFormData($f, $s, 'defaultareacode'));
+
+
 				setSetting('disablerepeat', GetFormData($f, $s, 'disablerepeat'));
 				setSetting('alertmessage', GetFormData($f, $s, 'alertmessage'));
 
@@ -150,6 +154,10 @@ if( $reloadform )
 
 	PutFormData($f,$s,"retry",getSetting('retry'),"number","5","240");
 	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 0, 20);
+
+	PutFormData($f, $s, "defaultareacode", getSetting('defaultareacode'), 'number',200,999);
+
+
 	PutFormData($f, $s, "disablerepeat", getSetting('disablerepeat'), 'bool');
 	PutFormData($f, $s, "alertmessage", getSetting('alertmessage'), 'text',0,255);
 
@@ -272,22 +280,6 @@ startWindow('Global System Settings');
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Autoreport Email address
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 30,100);  ?>
-					</td>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Autoreport Email Name
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
-					</td>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
 						Disable Repeating Jobs<br><? print help('Settings_DisableRepeat', NULL, 'grey'); ?>
 					</th>
 					<td>
@@ -304,6 +296,31 @@ startWindow('Global System Settings');
 					</th>
 					<td>
 					<? NewFormItem($f, $s, 'callerid', 'text', 20);  ?>
+					</td>
+				</tr>
+
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Default Local Area Code<br><? print help('Settings_DefaultLocalAreaCode', NULL, 'grey'); ?>
+					</th>
+					<td>
+					<? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Autoreport Email address
+					</th>
+					<td>
+					<? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 30,100);  ?>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Autoreport Email Name
+					</th>
+					<td>
+					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
 					</td>
 				</tr>
 				<tr>
