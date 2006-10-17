@@ -95,6 +95,8 @@ if(CheckFormSubmit($f,$s))
 
 			//dont save any callerid stuff if they don't have access to change it
 			$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
+			if (strlen($callerid) == 0 )
+				$callerid = false;
 			if ($USER->authorize('setcallerid'))
 				$USER->setSetting("callerid",$callerid);
 
@@ -158,7 +160,7 @@ if( $reloadform )
 
 	//Default caller ID
 	//default to system setting unless user has a pref
-	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
+	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
 }
 
@@ -272,7 +274,7 @@ startWindow('User Information');
 <? if ($USER->authorize('setcallerid')) { ?>
 							<tr>
 									<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
-									<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : "")); ?></td>
+									<td><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
 							</tr>
 <? } ?>
 
