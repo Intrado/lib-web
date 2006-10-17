@@ -129,6 +129,8 @@ if ($import->ownertype == "user") {
 
 $custid = $import->customerid;
 
+$defaultareacode = QuickQuery("select value from setting where customerid='$custid' and name='defaultareacode'");
+
 $timezone = QuickQuery("select timezone from customer where id=$custid");
 date_default_timezone_set($timezone);
 QuickUpdate("set time_zone='" . $timezone . "'");
@@ -314,14 +316,18 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 					break;
 				case "p":
 					$seq = substr($to,1) ;
-					if (strlen(Phone::parse($row[$fieldmap->mapfrom])) == 10) {
+					$parsedphone = Phone::parse($row[$fieldmap->mapfrom]);
+					if ($defaultareacode && strlen($parsedphone) == 7)
+						$parsedphone = Phone::parse($defaultareacode . $parsedphone);
+
+					if (strlen($parsedphone) == 10) {
 						if (isset($phones[$seq])) {
-							$phones[$seq]->phone = Phone::parse($row[$fieldmap->mapfrom]);
+							$phones[$seq]->phone = $parsedphone;
 						} else {
 							$phone = new Phone();
 							$phone->personid = $personid;
 							$phone->sequence = $seq ;
-							$phone->phone = Phone::parse($row[$fieldmap->mapfrom]);
+							$phone->phone = $parsedphone;
 							$phones[$seq] = $phone;
 						}
 					} else if (isset($phones[$seq])) {
