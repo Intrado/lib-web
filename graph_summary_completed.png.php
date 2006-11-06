@@ -30,6 +30,9 @@ $colors = array("lightgreen", "blue");
 //var_dump($colors);
 //exit();
 
+if (array_sum($data) == 0)
+	exit();
+
 $graph = new PieGraph(300,100,"auto");
 //$graph->SetShadow();
 $graph->SetFrame(false);

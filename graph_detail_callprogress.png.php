@@ -67,6 +67,9 @@ foreach ($cpcodes as $code => $title) {
 //var_dump($colors);
 //exit();
 
+if (array_sum($data) == 0)
+	exit();
+
 $graph = new PieGraph(250,160,"auto");
 //$graph->SetShadow();
 $graph->SetFrame(false);
