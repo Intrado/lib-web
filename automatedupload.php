@@ -8,48 +8,12 @@ require_once("inc/DBRelationMap.php");
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
 require_once("inc/ftpfile.inc.php");
+require_once("inc/sessiondata.inc.php");
 require_once("obj/User.obj.php");
 require_once("obj/Customer.obj.php");
 require_once("obj/Import.obj.php");
 
 
-//load session data
-function loadSessionData ($sessionid) {
-	//escape the sessionid!
-	$query = "select data from sessiondata where id='" . DBSafe($sessionid) . "'";
-	$data = QuickQuery($query);
-
-//	error_log($data . " --- " . unserialize($data));
-	if ($data !== false)
-		return unserialize($data);
-	else
-		return false;
-}
-
-//store session data
-function storeSessionData ($sessionid, $customerid, $data) {
-	if (loadSessionData($sessionid)) {
-		$query = "update sessiondata set data='"
-					. DBSafe(serialize($data)) . "' where id='"
-					. DBSafe($sessionid) . "'";
-//		error_log($query);
-		QuickUpdate($query);
-	} else {
-		$query = "insert into sessiondata (id,customerid,data) values ('"
-				. DBSafe($sessionid) . "', '"
-				 . DBSafe($customerid) . "', '"
-				 . DBSafe(serialize($data)) . "')";
-
-//		error_log($query);
-		QuickUpdate($query);
-
-	}
-}
-
-//erase session data
-function eraseSessionData ($sessionid) {
-
-}
 
 //1st, see if this is a POST with some raw post data, if so we should check the sessionid and make sure it is valid, then append/create the file
 if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
@@ -65,7 +29,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 	if (!$fp = fopen($sess['filename'],"ab"))
 		exit("error Can't write file");
 
-	error_log("writing to file " . $sess['filename']);
+//	error_log("writing to file " . $sess['filename']);
 
 	if (false !== ($numbytes = fwrite($fp,$HTTP_RAW_POST_DATA)))
 		exit("ok $numbytes written");
@@ -207,7 +171,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		if (isset($sess['filename']))
 			@unlink($sess['filename']);
 		//delete the session
-		deleteSessionData($sessionid);
+		eraseSessionData($sessionid);
 	}
 
 	//do the xmlrpc stuff
