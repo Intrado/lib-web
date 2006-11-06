@@ -6,6 +6,8 @@ include_once('inc/content.inc.php');
 include_once('obj/AudioFile.obj.php');
 include_once('obj/Content.obj.php');
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
 if(isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
 	if (userOwns("audiofile",$id)) {
