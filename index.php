@@ -13,7 +13,7 @@ if ($SETTINGS['feature']['has_ssl']) {
 	else
 		$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/index.php";
 
-	if ($SETTINGS['feature']['force_ssl'] && !$_SERVER["HTTPS"]) {
+	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		redirect($secureurl);
 	}
 }

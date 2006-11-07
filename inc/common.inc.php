@@ -29,7 +29,7 @@ session_start();
 if (!isset($isindexpage) || !$isindexpage) {
 
 	//force ssl?
-	if ($SETTINGS['feature']['force_ssl'] && !$_SERVER["HTTPS"]) {
+	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		redirect("index.php?logout=1"); //the index page will redirect to https
 	}
 
