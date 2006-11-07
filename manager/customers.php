@@ -1,0 +1,48 @@
+<?
+include_once("common.inc.php");
+include_once("../obj/Customer.obj.php");
+
+$customers = DBFindMany("Customer", "FROM customer");
+
+include_once("nav.inc.php");
+?>
+
+<table border=1>
+<tr><td>Customer ID</td>
+<td>Customer Name</td>
+<td>Customer URL</td>
+<td>Outbound Number</td>
+<td>Timezone</td>
+<td>Active Users</td>
+<td>Active Jobs</td></tr>
+
+<?
+//Finds the necessary fields for each customer account
+foreach($customers as $cust) {
+
+	$custfields = QuickQueryRow("SELECT hostname, inboundnumber, timezone FROM customer WHERE customer.id = $cust->id");
+	$usercount = QuickQuery("SELECT COUNT(*) FROM user WHERE user.customerid = $cust->id
+	                         AND user.enabled = '1'");
+	$jobcount = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
+							WHERE user.customerid = $cust->id
+							AND job.status = 'active'");
+?>
+	<tr><td><?= $cust->id ?></td>
+	<td><?= $cust->name ?></td>
+	<td><?= $custfields[0] ?></td>
+	<td><?= $custfields[1] ?></td>
+	<td><?= $custfields[2] ?></td>
+	<td><?= $usercount ?></td>
+	<td><?= $jobcount ?></td>
+	<td><a href="customeredit.php?id=<?=$cust->id ?>">Edit</a>&nbsp;|&nbsp;<a href="customercalls.php?customer=<?= $cust->id ?>">Calls</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust->id ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust->id?>">Customer&nbsp;Imports</a></td>
+	</tr>
+
+<?
+}
+?>
+</table>
+<?
+//<a href="newcustomer.php">New Customer</a>
+
+include_once("navbottom.inc.php");
+?>
