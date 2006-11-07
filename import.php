@@ -165,7 +165,7 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 		continue;
 	$count++;
 	//try to use mapped key
-	if (strlen($row[$importfields['key']->mapfrom]) > 0) {
+	if (isset($importfields['key']) && strlen($row[$importfields['key']->mapfrom]) > 0) {
 		$key = $row[$importfields['key']->mapfrom];
 	} else {
 		$key = false;
@@ -267,6 +267,11 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 		}
 
 		foreach ($importfields as $to => $fieldmap) {
+
+			//if a row doesnt exist in the import, assume it is an empty string.
+			if (!isset($row[$fieldmap->mapfrom]))
+				$row[$fieldmap->mapfrom] = "";
+
 			$fieldtype = substr($to,0,1);
 			switch ($fieldtype) {
 				case "f":
