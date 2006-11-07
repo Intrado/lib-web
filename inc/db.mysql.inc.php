@@ -1,10 +1,29 @@
 <?
 
-$_dbcon = mysql_connect($SETTINGS['db']['host'], $SETTINGS['db']['user'], $SETTINGS['db']['pass'])
-    or die('Could not connect: ' . mysql_error());
+$dbs = array($SETTINGS['db']);
+if (isset($SETTINGS['db2']))
+	$dbs[] = $SETTINGS['db2'];
 
-mysql_select_db($SETTINGS['db']['db']) or die('Could not select database');
 
+foreach ($dbs as $db) {
+
+	if ($db['persistent'])
+		$_dbcon = mysql_pconnect($db['host'], $db['user'], $db['pass']);
+	else
+		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
+	if (!$_dbcon) {
+		error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
+		continue;
+	}
+
+	if (mysql_select_db($db['db'])) {
+		break; //got one!
+	} else {
+		error_log("Problem selecting databse for " . $db['host'] . " error:" . mysql_error());
+	}
+}
+
+unset($dbs);
 
 function DBClose () {
 	global $_dbcon;
