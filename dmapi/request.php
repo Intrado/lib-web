@@ -11,6 +11,8 @@ require_once("../inc/sessiondata.inc.php");
 
 include_once("XmlToArray.obj.php");
 
+	ob_start();
+
 $xmlparser = new XmlToArray();
 if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 ?>
@@ -19,10 +21,6 @@ if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 	</bfxml>
 <?
 } else {
-
-
-	ob_start();
-
 ?>
 	<bfxml>
 <?
@@ -49,16 +47,18 @@ if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 ?>
 	</bfxml>
 <?
+}
+
 	$stuff = ob_get_flush();
 	ob_end_flush();
 
 	$fp = fopen("output.txt","a");
 	fwrite($fp,"------" . date("Y-m-d H:i:s") . "------\n");
+	fwrite($fp,$HTTP_RAW_POST_DATA);
+	fwrite($fp,"-------------RESPONSE----------\n");
 	fwrite($fp,$stuff);
 	fwrite($fp,"time: " . (microtime(true) - $time) . "\n");
 	fwrite($fp,"-------------------------------\n");
 	fclose($fp);
-}
-
 
 ?>

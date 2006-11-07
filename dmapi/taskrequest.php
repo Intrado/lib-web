@@ -9,7 +9,7 @@ function setNextPage ($thepage) {
 
 function forwardToPage ($thepage, $setpage = true) {
 	//NOTE: must declare any globals to share with the script
-	global $BFXML_ELEMENT, $BFXML_VARS, $SESSIONID, $SESSIONDATA, $REQUEST_TYPE;
+	global $BFXML_ELEMENT, $BFXML_VARS, $SESSIONID, $SESSIONDATA, $REQUEST_TYPE, $RESOURCEID, $SETTINGS;
 
 	if ($setpage)
 		setNextPage($thepage);
@@ -38,6 +38,8 @@ if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
 }
 
 $REQUEST_TYPE = $BFXML_ELEMENT['attrs']['REQUEST'];
+$RESOURCEID = $BFXML_ELEMENT['attrs']['RESOURCEID'];
+
 
 //var_dump($BFXML_ELEMENT);
 
@@ -68,10 +70,13 @@ if ($REQUEST_TYPE) {
 	}
 }
 
-//save the session data
-if ($SESSIONDATA === null)
-	eraseSessionData($SESSIONID);
-else
-	storeSessionData ($SESSIONID, 0, $SESSIONDATA);
+//a SESSIONID was generated, but perhaps the script has opted to not used it
+if ($SESSIONID != null) {
+	//save or delete the session data
+	if ($SESSIONDATA === null)
+		eraseSessionData($SESSIONID);
+	else
+		storeSessionData ($SESSIONID, 0, $SESSIONDATA);
+}
 
 ?>
