@@ -395,6 +395,7 @@ if ($_GET['csv']) {
 
 	header("Content-type: application/vnd.ms-excel");
 
+	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 	echo '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Max Attempts","Last Attempt","Last Result"' . "\r\n";
 

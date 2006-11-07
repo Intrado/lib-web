@@ -9,6 +9,7 @@ include_once("obj/AudioFile.obj.php");
 include_once("obj/Voice.obj.php");
 include_once("obj/FieldMap.obj.php");
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 function writeWav ($data) {
 	$name = secure_tmpname("tmp","preview_parts",".wav");
