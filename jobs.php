@@ -76,7 +76,7 @@ if (isset($_GET['runrepeating'])) {
 		$job = new Job($runnow);
 		if ($job->status=="repeating") {
 			if (isset($_SERVER['WINDIR'])) {
-				$cmd = "php jobprocess.php $runnow";
+				$cmd = "start php jobprocess.php $runnow";
 				pclose(popen($cmd,"r"));
 			} else {
 				$cmd = "php jobprocess.php $runnow > /dev/null &";
