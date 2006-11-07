@@ -11,11 +11,10 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/formatters.inc.php");
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createreport') || !$USER->authorize('viewsystemreports')) {
+if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports')) {
 	redirect('unauthorized.php');
 }
 
@@ -111,7 +110,7 @@ if ($jobid) {
 
 			$jobstats["phone"]["remainingcalls"] = $remainingcalls;
 			$jobstats["phone"]["totalcalls"] = $totalcalls;
-			$jobstats["phone"]["percentcomplete"] = ($totalcalls - $remainingcalls)/$totalcalls;
+			$jobstats["phone"]["percentcomplete"] = $totalcalls ? ($totalcalls - $remainingcalls)/$totalcalls : 0;
 
 		}
 		//-------------------------------------
@@ -185,7 +184,7 @@ startWindow("Select", NULL, false);
 	<td width="1%"><select name="jobid" id="jobid" onchange="location.href='?jobid=' + this.value">
 			<option value='0'>-- Select a Job --</option>
 <?
-$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status!='repeating' order by id desc");
+$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status in ('active','complete','cancelled') order by id desc");
 foreach ($jobs as $job) {
 echo '<option value="' . $job->id . '">' . htmlentities($job->name) . '</option>';
 }
