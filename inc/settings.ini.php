@@ -1,10 +1,30 @@
 ;<?/* this prevents browsers from seeing anything
 
 [db]
+persistent=true
 host="localhost:3307"
 user="sharpteeth"
 pass="sharpteeth202"
 db="dialerasp"
+
+
+;optional backup server
+[db2]
+persistent=false
+host="localhost:3307"
+user="sharpteeth"
+pass="sharpteeth202"
+db="dialerasp"
+
+
+;optional seperate server for outbound notifications
+[dmapidb]
+persistent=true
+host="localhost:3307"
+user="sharpteeth"
+pass="sharpteeth202"
+db="dialerasp"
+
 
 [feature]
 is_commsuite=false
@@ -28,6 +48,8 @@ ftphost=127.0.0.1
 ftpport=21
 ftpuser=anonymous
 ftppass=anonymous
+
+
 
 
 
