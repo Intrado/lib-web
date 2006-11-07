@@ -53,10 +53,10 @@ if(CheckFormSubmit($f,$s)) {
 
 	$numdays = min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2"));
 
-	$job->enddate = date("Y-m-d", strtotime("+ $numdays day"));
+	$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 
-	$job->starttime = $USER->getCallEarly();
-	$job->endtime = $USER->getCallLate();
+	$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
+	$job->endtime = date("H:i", strtotime($USER->getCallLate()));
 
 	$job->maxcallattempts =  min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","3"));
 	$job->type = "phone";
