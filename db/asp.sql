@@ -824,6 +824,10 @@ CREATE TABLE `ttsvoice` (
 -- Dumping data for table `ttsvoice`
 -- 
 
+INSERT INTO `ttsvoice` (`id`, `ttsname`, `name`, `language`, `gender`) VALUES (1, '', '', 'english', 'male');
+INSERT INTO `ttsvoice` (`id`, `ttsname`, `name`, `language`, `gender`) VALUES (2, '', '', 'english', 'female');
+INSERT INTO `ttsvoice` (`id`, `ttsname`, `name`, `language`, `gender`) VALUES (3, '', '', 'spanish', 'male');
+INSERT INTO `ttsvoice` (`id`, `ttsname`, `name`, `language`, `gender`) VALUES (4, '', '', 'spanish', 'female');
 
 -- --------------------------------------------------------
 
@@ -973,7 +977,34 @@ CREATE TABLE `usersetting` (
 
 
 -- make login case sensitive
-ALTER TABLE `user` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL 
+ALTER TABLE `user` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL ;
+
+
+-- after 11/15
+
+
+ALTER TABLE `jobworkitem` ADD INDEX `digest` ( `status` , `jobid` ) ;
+
+ALTER TABLE `job` CHANGE `status` `status` ENUM( 'new', 'active', 'complete', 'cancelled', 'cancelling', 'repeating' ) NOT NULL DEFAULT 'new';
+
+-- for customer load balancing
+ALTER TABLE `jobworkitem` ADD `customerid` INT NOT NULL AFTER `jobid` ;
+
+-- set all existing workitems customerid
+update jobworkitem wi, job j, user u
+set wi.customerid=u.customerid
+where
+j.id = wi.jobid and u.id = j.userid;
+
+
+
+
+
+
+ALTER TABLE `jobworkitem` ADD INDEX `assign` ( `status` , `type` , `systempriority` , `priority` ) ;
+
+
+ALTER TABLE `jobworkitem` ADD INDEX `assign2` ( `status` , `customerid` , `type` , `systempriority` , `priority` ) ;
 
 
 
