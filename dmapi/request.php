@@ -52,6 +52,14 @@ if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 	$stuff = ob_get_flush();
 	ob_end_flush();
 
+	//rotate log?
+
+	if (filesize("output.txt") > 1000000000) {
+		if (file_exists("output.txt.1"))
+			unlink("output.txt.1");
+		rename("output.txt","output.txt.1");
+	}
+
 	$fp = fopen("output.txt","a");
 	fwrite($fp,"------" . date("Y-m-d H:i:s") . "------\n");
 	fwrite($fp,$HTTP_RAW_POST_DATA);
