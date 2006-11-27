@@ -173,6 +173,7 @@ function fmt_jobs_generic ($id, $status, $deleted) {
 			break;
 		case "complete":
 		case "cancelled":
+		case "cancelling":
 			if ($deleted == 2)
 				$usedelbtn = $deletebtn;
 			else
@@ -280,6 +281,7 @@ function fmt_jobs_actions_customer($row, $index) {
 			return "$editLink$reportLink$cancelLink";
 		case "complete":
 		case "cancelled":
+		case "cancelling":
 			if ($deleted == 2) {
 				return "$editLink$reportLink$deleteLink";
 			} else {

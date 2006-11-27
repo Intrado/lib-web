@@ -31,7 +31,7 @@ if ($jobid != NULL) {
 	//TODO also check that the job is not sent
 	$job = new Job($_SESSION['jobid']);
 
-	if ('complete' == $job->status || 'cancelled' == $job->status) {
+	if ('complete' == $job->status || 'cancelled' == $job->status || 'cancelling' == $job->status) {
 		$completedmode = true;
 	}
 

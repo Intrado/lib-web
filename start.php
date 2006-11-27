@@ -79,7 +79,7 @@ if ($USER->authorize("startstats")) {
 			startWindow('My Active and Pending Jobs ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
 			button_bar(button('refresh', 'window.location.reload()'));
 
-			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new') order by id desc limit $limit");
+			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling') and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Name",
 								"Status" => "Status",
 								"Actions" => "Actions"

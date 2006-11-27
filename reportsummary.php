@@ -184,7 +184,7 @@ startWindow("Select", NULL, false);
 	<td width="1%"><select name="jobid" id="jobid" onchange="location.href='?jobid=' + this.value">
 			<option value='0'>-- Select a Job --</option>
 <?
-$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status in ('active','complete','cancelled') order by id desc");
+$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status in ('active','complete','cancelled','cancelling') order by id desc");
 foreach ($jobs as $job) {
 echo '<option value="' . $job->id . '">' . htmlentities($job->name) . '</option>';
 }

@@ -28,9 +28,14 @@ if (isset($_GET['cancel'])) {
 	$cancelid = DBSafe($_GET['cancel']);
 	if (userOwns("job",$cancelid) || (customerOwnsJob($cancelid) && $USER->authorize('managesystemjobs'))) {
 		$job = new Job($cancelid);
-		$job->status = "cancelled";
 		$job->cancelleduserid = $USER->id;
-		$job->finishdate = QuickQuery("select now()");
+
+		if ($job->status = "active") {
+			$job->status = "cancelling";
+		} else if ($job->status = "new") {
+			$job->status = "cancelled";
+			$job->finishdate = QuickQuery("select now()");
+		}
 		$job->update();
 	}
 	redirectToReferrer();
@@ -40,7 +45,7 @@ if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
 	if (userOwns("job",$deleteid) || (customerOwnsJob($deleteid) && $USER->authorize('managesystemjobs'))) {
 		$job = new Job($deleteid);
-		if ($job->status == "cancelled" || $job->status == "complete") {
+		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 1;
 			$job->update();
 		} else if ($job->status == "repeating") {
@@ -60,7 +65,7 @@ if (isset($_GET['archive'])) {
 	$archiveid = DBSafe($_GET['archive']);
 	if (userOwns("job",$archiveid) || (customerOwnsJob($archiveid) && $USER->authorize('managesystemjobs'))) {
 		$job = new Job($archiveid);
-		if ($job->status == "cancelled" || $job->status == "complete") {
+		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 2;
 			$job->update();
 		}
@@ -109,7 +114,7 @@ function fmt_nextrun ($obj, $name) {
 }
 
 
-$data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='active') order by id desc");
+$data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='active' or status='cancelling') and deleted=0 order by id desc");
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
 					"startdate" => "#Start date",
