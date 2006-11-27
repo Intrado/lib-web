@@ -29,6 +29,9 @@ CREATE TABLE `monitor` (
 
 
 
+
+-- survey
+
 ALTER TABLE `job` ADD `surveymode` TINYINT DEFAULT '0' NOT NULL AFTER `status` ;
 
 CREATE TABLE `surveyresult` (
