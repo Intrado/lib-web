@@ -128,8 +128,8 @@ foreach ($defaultmessages as $type => $defmsgid) {
 */
 	$status = "new";
 		$query = "
-		insert into jobworkitem (jobid, type,personid, messageid, priority, systempriority, status)
-		(select $jobid as jobid, '$type' as type, p.id as personid,
+		insert into jobworkitem (jobid, customerid, type,personid, messageid, priority, systempriority, status)
+		(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
 			coalesce(jl.messageid,$defmsgid) as messageid, ifnull(jt.priority,100000) as priority, ifnull(jt.systempriority,3) as systempriority,
 			'$status' as status
 		from person p left join persondata pd on (p.id=pd.personid)
@@ -141,7 +141,7 @@ foreach ($defaultmessages as $type => $defmsgid) {
 
 		union all
 
-		(select $jobid as jobid, '$type' as type, p.id as personid,
+		(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
 			coalesce(jl.messageid,$defmsgid) as messageid, ifnull(jt.priority,100000) as priority, ifnull(jt.systempriority,3) as systempriority,
 			'$status' as status
 		from person p left join persondata pd on (p.id=pd.personid)
@@ -152,7 +152,12 @@ foreach ($defaultmessages as $type => $defmsgid) {
 		where p.customerid = $USER->customerid)
 		";
 
-		$count += QuickUpdate($query);
+		$res = QuickUpdate($query);
+
+		if ($res === false)
+			error_log("Problem inserting job: " . mysql_error());
+
+		$count += $res;
 
 //skip dedupe for new dedupe in messagedigester
 /*
