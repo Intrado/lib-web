@@ -131,7 +131,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 
 				setSetting('disablerepeat', GetFormData($f, $s, 'disablerepeat'));
-				setSetting('alertmessage', GetFormData($f, $s, 'alertmessage'));
+				setSetting('alertmessage', trim(GetFormData($f, $s, 'alertmessage')));
 
 				setSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
 				setSetting('autoreport_replyname', GetFormData($f, $s, 'autoreport_replyname'));
