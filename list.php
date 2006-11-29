@@ -87,7 +87,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 
 			$list = new PeopleList($_SESSION['listid']);
 
-			//TODO check that the message->userid == user->id so that there is no chance of hijacking
 			PopulateObject($f,$s,$list,array("name","description"));
 
 			$list->userid = $USER->id;
@@ -269,14 +268,9 @@ endWindow();
 print '<br>';
 
 if (!$list->id) {
-
-	echo "<div style=\"margin-left: 10px;\"><img src=\"img/bug_important.gif\" > Please name your list and then click Save to continue.</div><br>";
-
 ?>
-
-
+	<div style="margin-left: 10px;"><img src="img/bug_important.gif" > Please name your list and then click Save to continue.</div><br>
 <?
-
 } else {
 
 StartWindow("List Content");
