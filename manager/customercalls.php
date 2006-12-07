@@ -1,4 +1,5 @@
 <?
+//foo
 include_once("common.inc.php");
 include_once("../obj/User.obj.php");
 include_once("../obj/Access.obj.php");
