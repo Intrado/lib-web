@@ -3,6 +3,7 @@ include_once("common.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
+include_once("AspAdminUser.obj.php");
 
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",
@@ -17,17 +18,6 @@ $timezones = array(	"US/Alaska",
 					"US/Pacific",
 					"US/Samoa"	);
 
-
-function genpassword() {
-	$digits = 6;
-	$passwd = "";
-	$chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
-	while ($digits--) {
-		$passwd .= $chars[mt_rand(0,strlen($chars)-1)];
-	}
-	return $passwd;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,6 +26,8 @@ $f = "customer";
 $s = "main";
 
 $reloadform = 0;
+$user = "schoolmessenger";
+$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 // If user submitted the form
 if (CheckFormSubmit($f,$s)){
@@ -51,17 +43,15 @@ if (CheckFormSubmit($f,$s)){
 		$timezone = GetFormData($f, $s, "timezone");
 		$hostname = GetFormData($f, $s, "hostname");
 		$inboundnum = GetFormData($f, $s, "inboundnumber");
-		$user = GetFormData($f, $s, "user");
 		$cust_pass = GetFormData($f, $s, "password");
-		$autoname = GetFormData($f,$s,"autoname");
-		$autoemail = GetFormData($f,$s,"autoemail");
+		$code = GetFormData($f, $s, "code");
 
 		if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 			error('Entered 800 Number Already being used', 'Please Enter Another');
 		} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."'")) {
 			error('URL Path Already exists', 'Please Enter Another');
-		} else if (GetFormData($f,$s,"code") != "joplin555") {
-			error('Bad Secret Code', 'Try Again');
+		} else if(!$accountcreator->runCheck($code)) {
+			error('Bad Code');
 		} else if ($cust_pass != GetFormData($f,$s,"password2")) {
 			error('Password and Confirmation Password do not match', 'Try Again');
 		} else if (strlen($inboundnum) > 0 && !ereg("[0-9]{10}",$inboundnum)) {
@@ -119,10 +109,11 @@ if (CheckFormSubmit($f,$s)){
 					;
 			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 
-			$query = "INSERT INTO `user` (`accessid`, `login`, `password`, `customerid`, `firstname`, `lastname`, `enabled`, `deleted`) VALUES
-						( $accessid , '" . DBSafe($user) . "',
+			$query = "INSERT INTO `user` (`accessid`, `login`, `password`, `customerid`,
+						`firstname`, `lastname`, `enabled`, `deleted`) VALUES
+						( '$accessid' , '$user',
 						password('" . DBSafe($cust_pass) . "') ,
-						$custid, 'System', 'Administrator', 1 ,0)";
+						'$custid', 'System', 'Administrator', 1 ,0)";
 			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 
 			$query = "INSERT INTO `fieldmap` (`customerid`, `fieldnum`, `name`, `options`) VALUES
@@ -159,60 +150,46 @@ if( $reloadform ){
 
 	ClearFormData($f);
 
-	PutFormData($f,$s,'name',"","text",1,50,true);
-	PutFormData($f,$s,'hostname',"","text",5,255,true);
+	PutFormData($f,$s,'name',"","text",1,50);
+	PutFormData($f,$s,'hostname',"","text",5,255);
 	PutFormData($f,$s,'inboundnumber',"","text",10,10);
-	PutFormData($f,$s,'user', "","text",1,20,true);
-	$password = genpassword();
-	PutFormData($f,$s,'password',$password,"text",1,255,true);
-	PutFormData($f,$s,'password2',$password,"text",1,255,true);
-	PutFormData($f,$s,'code', "","password",1,9,true);
-	PutFormData($f,$s,'autoname', "","text",1,50);
-	PutFormData($f,$s,'autoemail', "","email",1,255);
-
+	PutFormData($f,$s,'password',"","text",1,255);
+	PutFormData($f,$s,'password2',"","text",1,255);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Display
-////////////////////////////////////////////////////////////////////////////////
 include_once("nav.inc.php");
 
-?>
-<html>
-<body>
-
-<?
 
 NewForm($f);
-buttons(submit($f, $s));
+NewFormItem($f, $s,"", 'submit');
 
 ?>
 
 <table>
 <tr><td>Customer display name: </td><td> <? NewFormItem($f, $s, 'name', 'text', 25, 50); ?></td></tr>
 <tr><td>URL path name: </td><td><? NewFormItem($f, $s, 'hostname', 'text', 25, 255); ?> (Must be 5 or more characters)</td></tr>
-<tr><td>800 inbound number: </td><td><? NewFormItem($f, $s, 'inboundnumber', 'text', 10, 10); ?></td></tr>
-<tr><td>Admin username: </td><td><? NewFormItem($f, $s, 'user', 'text', 20); ?> (admin is ok)</td></tr>
-<tr><td>Admin password: </td><td><? NewFormItem($f, $s, 'password', 'text', 25,255); ?> (generated automatically, be sure to write this down)</td></tr>
+<tr><td>Toll Free Inbound Number: </td><td><? NewFormItem($f, $s, 'inboundnumber', 'text', 10, 10); ?> Make Sure Not Taken</td></tr>
+<tr><td>Admin username: </td><td>schoolmessenger</td></tr>
+<tr><td>Admin password: </td><td><? NewFormItem($f, $s, 'password', 'text', 25,255); ?></td></tr>
 <tr><td>Password verify:</td><td><? NewFormItem($f, $s, 'password2', 'text', 25,255); ?> </td></tr>
 
-<tr><td>Reliance secret code: </td><td><? NewFormItem($f, $s, 'code', 'password', 25); ?></td></tr>
+
 <tr><td>Timezone: </td><td>
-<? NewFormItem($f, $s, 'timezone', "selectstart");
-   foreach($timezones as $timezone)
-       NewFormItem($f, $s, 'timezone', "selectoption", $timezone, $timezone);
-   NewFormItem($f, $s, 'timezone', "selectend");
+<?
+	NewFormItem($f, $s, 'timezone', "selectstart");
+	foreach($timezones as $timezone) {
+	   NewFormItem($f, $s, 'timezone', "selectoption", $timezone, $timezone);
+	}
+	NewFormItem($f, $s, 'timezone', "selectend");
 ?>
 </td></tr>
-
-<tr><td>AutoReport Name: </td><td><? NewFormItem($f,$s,'autoname','text',25,50); ?></td></tr>
-<tr><td>AutoReport Email: </td><td><? NewFormItem($f,$s,'autoemail','text',25,255); ?></td></tr>
 
 </table>
 
 <?
 
-buttons();
+NewFormItem($f, $s,"", 'submit');
+?><p>Manager Code: </td><td><? NewFormItem($f, $s, 'code', 'password', 25); ?><p><?
 EndForm();
 
 if(isset($ERRORS) && is_array($ERRORS)) {
@@ -221,10 +198,7 @@ if(isset($ERRORS) && is_array($ERRORS)) {
 	}
 	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
 }
-?>
-</body>
-</html>
-<?
+
 include_once("navbottom.inc.php");
 ?>
 
