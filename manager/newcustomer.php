@@ -31,115 +31,119 @@ $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 // If user submitted the form
 if (CheckFormSubmit($f,$s)){
-
-	MergeSectionFormData($f,$s);
-
-	// Checks to see if user left out any of the required fields
-	if( CheckFormSection($f, $s) ) {
-		error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-	}else{
-
-		$displayname = GetFormData($f,$s,"name");
-		$timezone = GetFormData($f, $s, "timezone");
-		$hostname = GetFormData($f, $s, "hostname");
-		$inboundnum = GetFormData($f, $s, "inboundnumber");
-		$cust_pass = GetFormData($f, $s, "password");
-		$code = GetFormData($f, $s, "code");
-
-		if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
-			error('Entered 800 Number Already being used', 'Please Enter Another');
-		} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."'")) {
-			error('URL Path Already exists', 'Please Enter Another');
-		} else if(!$accountcreator->runCheck($code)) {
-			error('Bad Code');
-		} else if ($cust_pass != GetFormData($f,$s,"password2")) {
-			error('Password and Confirmation Password do not match', 'Try Again');
-		} else if (strlen($inboundnum) > 0 && !ereg("[0-9]{10}",$inboundnum)) {
-			error('Bad 800 Number Format', 'Try Again');
-		} else if (strlen($autoemail) > 0 && CheckFormItem($f,$s,"autoemail") != 0) {
-			error('Bad E-mail Format', 'Try Again');
-		} else {
-
-			$query = "insert into customer (name,enabled,timezone,hostname,inboundnumber) VALUES
-						('" . DBSafe($displayname) . "',1,
-						'" . DBSafe($timezone) . "',
-						'" . DBSafe($hostname) . "',
-						'" . DBSafe($inboundnum) . "')";
-			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-			$custid = mysql_insert_id();
-
-			$query = "insert into access (name,customerid) values ('System Administrators', $custid)";
-			QuickUpdate($query) or die( "ERROR:" . mysql_error());
-			$accessid = mysql_insert_id();
-
-			$query = "INSERT INTO `permission` (accessid,name,value) VALUES "
-					. "($accessid, 'loginweb', '1'),"
-					. "($accessid, 'manageprofile', '1'),"
-					. "($accessid, 'manageaccount', '1'),"
-					. "($accessid, 'manageaccount', '1'),"
-					. "($accessid, 'managesystem', '1'),"
-					. "($accessid, 'loginphone', '1'),"
-					. "($accessid, 'startstats', '1'),"
-					. "($accessid, 'startshort', '1'),"
-					. "($accessid, 'starteasy', '1'),"
-					. "($accessid, 'sendprint', '0'),"
-					. "($accessid, 'callmax', '10'),"
-					. "($accessid, 'sendemail', '1'),"
-					. "($accessid, 'sendphone', '1'),"
-					. "($accessid, 'sendmulti', '1'),"
-					. "($accessid, 'createlist', '1'),"
-					. "($accessid, 'createrepeat', '1'),"
-					. "($accessid, 'createreport', '1'),"
-					. "($accessid, 'datafields', 'f01|f02|f03'),"
-					. "($accessid, 'maxjobdays', '7'),"
-					. "($accessid, 'viewsystemreports', '1'),"
-					. "($accessid, 'managesystemjobs', '1'),"
-					. "($accessid, 'managemyaccount', '1'),"
-					. "($accessid, 'viewcontacts', '1'),"
-					. "($accessid, 'viewsystemactive', '1'),"
-					. "($accessid, 'viewsystemrepeating', '1'),"
-					. "($accessid, 'viewsystemcompleted', '1'),"
-					. "($accessid, 'listuploadids', '1'),"
-					. "($accessid, 'listuploadcontacts', '1'),"
-					. "($accessid, 'setcallerid', '1'),"
-					. "($accessid, 'blocknumbers', '1'),"
-					. "($accessid, 'callblockingperms', 'editall'),"
-					. "($accessid, 'metadata', '1'),"
-					. "($accessid, 'managetasks', '1');"
-					;
-			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-
-			$query = "INSERT INTO `user` (`accessid`, `login`, `password`, `customerid`,
-						`firstname`, `lastname`, `enabled`, `deleted`) VALUES
-						( '$accessid' , '$user',
-						password('" . DBSafe($cust_pass) . "') ,
-						'$custid', 'System', 'Administrator', 1 ,0)";
-			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-
-			$query = "INSERT INTO `fieldmap` (`customerid`, `fieldnum`, `name`, `options`) VALUES
-						($custid, 'f01', 'First Name', 'searchable,text'),
-						($custid, 'f02', 'Last Name', 'searchable,text'),
-						($custid, 'f03', 'Language', 'searchable,multisearch')";
-			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-
-			$query = "INSERT INTO `language` (`customerid`, `name`, `code`) VALUES
-						($custid, 'English', ''),
-						($custid, 'Spanish', '')";
-			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-
-
-			$query = "INSERT INTO `jobtype` (`customerid`, `name`, `priority`, `systempriority`, `deleted`) VALUES
-						($custid, 'Emergency', 10000, 1, 0),
-						($custid, 'Attendance', 20000, 2, 0),
-						($custid, 'General', 30000, 3, 0)";
-			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-
-			$query = "INSERT INTO `setting` (`customerid`, `name`, `value`) VALUES
-						($custid, 'autoreport_replyemail', '" . DBSafe($autoemail) ."'),
-						($custid, 'autoreport_replyname', '" . DBSafe($autoname) . "')";
-			QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-
-			redirect("customers.php");
+	if(CheckFormInvalid($f)) {
+		error('Form was edited in another window, reloading data');
+		$reloadform = 1;
+	} else {
+		MergeSectionFormData($f,$s);
+	
+		// Checks to see if user left out any of the required fields
+		if( CheckFormSection($f, $s) ) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		}else{
+	
+			$displayname = GetFormData($f,$s,"name");
+			$timezone = GetFormData($f, $s, "timezone");
+			$hostname = GetFormData($f, $s, "hostname");
+			$inboundnum = GetFormData($f, $s, "inboundnumber");
+			$cust_pass = GetFormData($f, $s, "password");
+			$code = GetFormData($f, $s, "code");
+	
+			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
+				error('Entered 800 Number Already being used', 'Please Enter Another');
+			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."'")) {
+				error('URL Path Already exists', 'Please Enter Another');
+			} else if(!$accountcreator->runCheck($code)) {
+				error('Bad Code');
+			} else if ($cust_pass != GetFormData($f,$s,"password2")) {
+				error('Password and Confirmation Password do not match', 'Try Again');
+			} else if (strlen($inboundnum) > 0 && !ereg("[0-9]{10}",$inboundnum)) {
+				error('Bad 800 Number Format', 'Try Again');
+			} else if (strlen($autoemail) > 0 && CheckFormItem($f,$s,"autoemail") != 0) {
+				error('Bad E-mail Format', 'Try Again');
+			} else {
+	
+				$query = "insert into customer (name,enabled,timezone,hostname,inboundnumber) VALUES
+							('" . DBSafe($displayname) . "',1,
+							'" . DBSafe($timezone) . "',
+							'" . DBSafe($hostname) . "',
+							'" . DBSafe($inboundnum) . "')";
+				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+				$custid = mysql_insert_id();
+	
+				$query = "insert into access (name,customerid) values ('System Administrators', $custid)";
+				QuickUpdate($query) or die( "ERROR:" . mysql_error());
+				$accessid = mysql_insert_id();
+	
+				$query = "INSERT INTO `permission` (accessid,name,value) VALUES "
+						. "($accessid, 'loginweb', '1'),"
+						. "($accessid, 'manageprofile', '1'),"
+						. "($accessid, 'manageaccount', '1'),"
+						. "($accessid, 'manageaccount', '1'),"
+						. "($accessid, 'managesystem', '1'),"
+						. "($accessid, 'loginphone', '1'),"
+						. "($accessid, 'startstats', '1'),"
+						. "($accessid, 'startshort', '1'),"
+						. "($accessid, 'starteasy', '1'),"
+						. "($accessid, 'sendprint', '0'),"
+						. "($accessid, 'callmax', '10'),"
+						. "($accessid, 'sendemail', '1'),"
+						. "($accessid, 'sendphone', '1'),"
+						. "($accessid, 'sendmulti', '1'),"
+						. "($accessid, 'createlist', '1'),"
+						. "($accessid, 'createrepeat', '1'),"
+						. "($accessid, 'createreport', '1'),"
+						. "($accessid, 'datafields', 'f01|f02|f03'),"
+						. "($accessid, 'maxjobdays', '7'),"
+						. "($accessid, 'viewsystemreports', '1'),"
+						. "($accessid, 'managesystemjobs', '1'),"
+						. "($accessid, 'managemyaccount', '1'),"
+						. "($accessid, 'viewcontacts', '1'),"
+						. "($accessid, 'viewsystemactive', '1'),"
+						. "($accessid, 'viewsystemrepeating', '1'),"
+						. "($accessid, 'viewsystemcompleted', '1'),"
+						. "($accessid, 'listuploadids', '1'),"
+						. "($accessid, 'listuploadcontacts', '1'),"
+						. "($accessid, 'setcallerid', '1'),"
+						. "($accessid, 'blocknumbers', '1'),"
+						. "($accessid, 'callblockingperms', 'editall'),"
+						. "($accessid, 'metadata', '1'),"
+						. "($accessid, 'managetasks', '1');"
+						;
+				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+	
+				$query = "INSERT INTO `user` (`accessid`, `login`, `password`, `customerid`,
+							`firstname`, `lastname`, `enabled`, `deleted`) VALUES
+							( '$accessid' , '$user',
+							password('" . DBSafe($cust_pass) . "') ,
+							'$custid', 'System', 'Administrator', 1 ,0)";
+				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+	
+				$query = "INSERT INTO `fieldmap` (`customerid`, `fieldnum`, `name`, `options`) VALUES
+							($custid, 'f01', 'First Name', 'searchable,text'),
+							($custid, 'f02', 'Last Name', 'searchable,text'),
+							($custid, 'f03', 'Language', 'searchable,multisearch')";
+				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+	
+				$query = "INSERT INTO `language` (`customerid`, `name`, `code`) VALUES
+							($custid, 'English', ''),
+							($custid, 'Spanish', '')";
+				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+	
+	
+				$query = "INSERT INTO `jobtype` (`customerid`, `name`, `priority`, `systempriority`, `deleted`) VALUES
+							($custid, 'Emergency', 10000, 1, 0),
+							($custid, 'Attendance', 20000, 2, 0),
+							($custid, 'General', 30000, 3, 0)";
+				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+	
+				$query = "INSERT INTO `setting` (`customerid`, `name`, `value`) VALUES
+							($custid, 'autoreport_replyemail', '" . DBSafe($autoemail) ."'),
+							($custid, 'autoreport_replyname', '" . DBSafe($autoname) . "')";
+				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+	
+				redirect("customers.php");
+			}
 		}
 	}
 } else {
