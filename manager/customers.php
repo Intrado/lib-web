@@ -8,13 +8,15 @@ include_once("nav.inc.php");
 ?>
 
 <table border=1>
-<tr><td>Customer ID</td>
+<tr>
+<td>Customer ID</td>
 <td>Customer Name</td>
 <td>Customer URL</td>
-<td>Outbound Number</td>
+<td>Toll Free Number</td>
 <td>Timezone</td>
 <td>Active Users</td>
-<td>Active Jobs</td></tr>
+<td>Active Jobs</td>
+</tr>
 
 <?
 //Finds the necessary fields for each customer account
@@ -34,7 +36,7 @@ foreach($customers as $cust) {
 	<td><?= $custfields[2] ?></td>
 	<td><?= $usercount ?></td>
 	<td><?= $jobcount ?></td>
-	<td><a href="customeredit.php?id=<?=$cust->id ?>">Edit</a>&nbsp;|&nbsp;<a href="customercalls.php?customer=<?= $cust->id ?>">Calls</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust->id ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust->id?>">Customer&nbsp;Imports</a></td>
+	<td><a href="customeredit.php?id=<?=$cust->id ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust->id ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust->id?>">Customer&nbsp;Imports</a></td>
 	</tr>
 
 <?
