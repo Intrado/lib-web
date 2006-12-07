@@ -1,21 +1,21 @@
 <?
-$isasplogin=1;
 include_once("common.inc.php");
 include_once("../inc/ftpfile.inc.php");
 include_once("../inc/formatters.inc.php");
 
-$customerID = $_GET["customer"]+0;
+$customerID = $_GET['customer']+0;
 
-if(isset($_GET["customer"])){
+if(isset($_GET['customer'])){
 	$queryextra = "AND customerID='$customerID'";
 } else {
 	$queryextra="";
 }
-$query = "SELECT  import.customerID, import.id, customer.name,
+$query = "SELECT  import.customerID, customer.name, import.id,
 			import.name, import.status, import.lastrun
 			FROM import, customer
 			WHERE import.customerID=customer.id
-			$queryextra";
+			$queryextra
+			order by import.customerID";
 
 $list = Query($query);
 
@@ -25,6 +25,7 @@ include("nav.inc.php");
 	<tr>
 		<td>Customer ID</td>
 		<td>Customer Name</td>
+		<td>Import ID </td>
 		<td>Import Name</td>
 		<td>Status</td>
 		<td>Last Run</td>
@@ -43,6 +44,7 @@ while($row = DBGetRow($list)){
 ?>
 	<tr>
 		<td><?=$row[0]?></td>
+		<td><?=$row[1]?></td>
 		<td><?=$row[2]?></td>
 		<td><?=$row[3]?></td>
 		<td><?=$row[4]?></td>
