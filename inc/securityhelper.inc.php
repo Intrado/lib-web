@@ -15,6 +15,7 @@ function userOwns ($type,$id) {
 		case "job":
 		case "audiofile":
 		case "person":
+		case "surveyquestionnaire":
 			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id'");
 		case "message":
 			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id' and deleted=0");
@@ -81,6 +82,22 @@ function setCurrentMessage ($newid) {
 
 function getCurrentMessage() {
 	return $_SESSION['messageid'];
+}
+
+function setCurrentQuestionnaire ($newid) {
+	setIfOwnsOrNew($newid, "surveyquestionnaireid", "surveyquestionnaire");
+}
+
+function getCurrentQuestionnaire() {
+	return $_SESSION['surveyquestionnaireid'];
+}
+
+function setCurrentSurvey ($newid) {
+	setIfOwnsOrNew($newid, "surveyid", "job");
+}
+
+function getCurrentSurvey() {
+	return $_SESSION['surveyid'];
 }
 
 function setCurrentJob ($newid) {
