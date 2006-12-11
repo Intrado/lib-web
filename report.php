@@ -393,6 +393,10 @@ select SQL_CALC_FOUND_ROWS
 
 if ($_GET['csv']) {
 
+
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-disposition: attachment; filename=report.csv");
 	header("Content-type: application/vnd.ms-excel");
 
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
@@ -526,7 +530,7 @@ if ($_GET['csv']) {
 
 	endWindow();
 ?>
-	<br><a href="report.php/report.csv?csv=true" class="noprint">Click here to download report data in CSV format</a>
+	<br><a href="report.php/report.csv?csv=true&t=<?= time() ?>" class="noprint">Click here to download report data in CSV format</a>
 <?
 
 
