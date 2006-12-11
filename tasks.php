@@ -102,15 +102,4 @@ showObjects($IMPORTS, $titles,$formatters, false,  true);
 endWindow();
 
 include_once("navbottom.inc.php");
-
-
-function fmt_nextrun ($obj) {
-	$nextrun = QuickQuery("select nextrun from schedule where id=$obj->scheduleid");
-	if ($nextrun == null) {
-		$nextrun = "- Never -";
-	} else {
-		$nextrun = date("F jS, Y h:i a", strtotime($nextrun));
-	}
-	return $nextrun;
-}
 ?>
