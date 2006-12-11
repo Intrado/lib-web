@@ -110,7 +110,7 @@ class DBMappedObject {
 
 		$query = "select " . $this->getFieldList(false, $specificfields)
 				." from " . $this->_tablename
-				." where id='" . $this->id . "'";
+				." where id='" . mysql_real_escape_string($this->id) . "'";
 		$this->_lastsql = $query;
 		if ($result = mysql_query($query)) {
 			if ($row = mysql_fetch_row($result)) {
@@ -187,7 +187,7 @@ class DBMappedObject {
 
 			//put them into an update list
 			$query .= implode(",", $list);
-			$query .= " where id=$this->id";
+			$query .= " where id='" . mysql_real_escape_string($this->id) . "'";
 			$this->_lastsql = $query;
 			if ($result = mysql_query($query)) {
 				if (mysql_affected_rows())
@@ -225,7 +225,7 @@ class DBMappedObject {
 
 		if (isset($this->id)) {
 			$query = "delete from " . $this->_tablename
-					." where id=" . $this->id;
+					." where id='" . mysql_real_escape_string($this->id) . "'";
 			$this->_lastsql = $query;
 			mysql_query($query);
 			$this->id = 0;

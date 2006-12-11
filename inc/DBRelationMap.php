@@ -27,10 +27,10 @@ class DBRelationMap {
 	var $_linkidvar; //the field/var that we are linking on (external key)
 	var $_parentid; //parent's id
 	var $_tablename; //child table (to get ids from)
-	
+
 	var $children; //set to reference of array to store children
 
-	
+
 	function DBRelationMap ($class, &$childrenarray, $linkidvar, &$parentid) {
 		$this->_objectclass = $class;
 		$this->_linkidvar = $linkidvar;
@@ -38,23 +38,23 @@ class DBRelationMap {
 		$this->_parentid = &$parentid; //reference the parent id var
 		$proto = new $this->_objectclass();
 		$this->_tablename = $proto->_tablename;
-		
+
 		if ($this->_parentid) {
 			$this->refresh();
 		}
 	}
-	
+
 	function getIDs () {
 		$ids = array();
 		foreach ($this->children as $child) {
 			$ids[] = $child->id;
 		}
-		
+
 		return $ids;
 	}
-	
+
 	function add (&$child) {
-		
+
 		if (strtolower(get_class($child)) != strtolower($this->_objectclass)) {
 			return false;
 		}
@@ -64,48 +64,48 @@ class DBRelationMap {
 		$this->children[] = &$child;
 		return true;
 	}
-	
+
 	function update () {
-				
+
 		//parent's id must not be 0
 		if (!$this->_parentid)
 			return false;
 		//update or create the objects we have
-		
+
 		//first get a list of the current objects in the db
-		$query = "select id from " . $this->_tablename 
-				." where " . $this->_linkidvar . "=" . $this->_parentid;
-		$dblist = QuickQueryList($query);	
-		$newlist = $this->getIDs($this->children);	
+		$query = "select id from " . $this->_tablename
+				." where `" . $this->_linkidvar . "`='" . mysql_real_escape_string($this->_parentid) . "'";
+		$dblist = QuickQueryList($query);
+		$newlist = $this->getIDs($this->children);
 		if ($dblist)
 			$this->destroychildren( array_diff($dblist, $newlist));
-		
+
 		//use $this->children[index], otherwise we work only on a copy
 		//foreach makes copies, not references
 		foreach (array_keys($this->children) as $index) {
 			$linkidvar = $this->_linkidvar;
 			$this->children[$index]->$linkidvar = $this->_parentid;
-			
+
 			if (!$this->children[$index]->update(NULL,true)) {
 				//failed to update
 				//echo "failed to update ". get_class($this->children[$index]) . "<br>";
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	function refresh () {
-				
+
 		//parent's id must not be 0
 		if (!$this->_parentid)
-			return false;	
-		
+			return false;
+
 		//first get a list of the current objects in the db
-		$query = "select id from " . $this->_tablename 
-				." where " . $this->_linkidvar . "=" . $this->_parentid;
+		$query = "select id from " . $this->_tablename
+				." where `" . $this->_linkidvar . "`='" . mysql_real_escape_string($this->_parentid) . "'";
 		$dblist = QuickQueryList($query);
-		
+
 		//check to see if we need to remove some children from the array
 		//and update the others currenting in the array
 		foreach (array_keys($this->children) as $index) {
@@ -115,37 +115,37 @@ class DBRelationMap {
 				$this->children[$index]->refresh(NULL,true);
 			}
 		}
-		
+
 		//now see which ones need to be created
 		$currentlist = $this->getIDs($this->children);
 		if ($dblist)
 			$addlist = array_diff($dblist, $currentlist);
 		else
 			$addlist = $currentlist;
-		
+
 		foreach ($addlist as $id) {
 			$newchild = new $this->_objectclass($id);
 			$linkidvar = $this->_linkidvar;
 			$newchild->$linkidvar = $this->_parentid;
-			
+
 			$this->children[] = $newchild;
 		}
-		
+
 		return true;
 	}
-	
-	//deletes from an array of ids 
+
+	//deletes from an array of ids
 	//(used for cleaning the db)
 	function destroychildren ($idarray) {
 		foreach ($idarray as $id) {
-			$query = "delete from " . $this->_tablename 
-				." where id=" . $id;
+			$query = "delete from " . $this->_tablename
+				." where id='" . mysql_real_escape_string($id) . "'";
 			QuickUpdate($query);
 		}
 	}
-	
+
 	function destroy () {
-		
+
 		foreach (array_keys($this->children) as $index) {
 			$this->children[$index]->destroy(true);
 			unset($this->children[$index]);
