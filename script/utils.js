@@ -146,13 +146,13 @@ function clearAll (select){
 }
 
 //Note: this only works when call by popup windows
-function insertAndSelectItem ($select,$name,$value) {
-	var sel = opener.document.getElementById($select);
+function insertAndSelectItem (select,name,value) {
+	var sel = opener.document.getElementById(select);
 	if(sel) {
 		var index = -1;
 		//try to find existing item first
 		for(var i = 0; i < sel.options.length; i++) {
-			if(sel.options[i].value == $value) {
+			if(sel.options[i].value == value) {
 				sel.selectedIndex = index = i;
 				break;
 			}
@@ -160,12 +160,12 @@ function insertAndSelectItem ($select,$name,$value) {
 		//otherwise, make a new one and select it
 		if(index == -1) {
 			var opt = document.createElement('OPTION');
-			opt.text = $name;
-			opt.value = $value;
+			opt.text = name;
+			opt.value = value;
 			sel.options.add(opt);
 			sel.selectedIndex = sel.options.length - 1;
 		} else {
-			//sel.options[index].text = $name;
+			//sel.options[index].text = name;
 		}
 		return true;
 	} else {
@@ -224,4 +224,38 @@ function syncCheckboxState(sources, targets)
 
 function confirmDelete () {
 	return confirm('Are you sure you want to delete this item?');
+}
+
+
+/* traverses the DOM looking for 
+parent = the parent element
+marker = which value to look for in the "dependson" attribute.
+visability = true|false
+*/
+
+function setDependantVisibility (parent,marker,visability) {
+	var setvisability = function(obj) { obj.style.display = visability ? "block" : "none";};
+	modifyMarkedNodes(parent,'dependson',marker,setvisability);
+}
+
+function setColVisability (table,col,visability) {
+	//visible table cells use "" for display property, not "block"
+	var newdisplay = visability ? "" : "none";
+	var rows = table.rows;
+	for (var i = 0, length = rows.length; i < length ; i++) {
+		rows[i].cells[col].style.display = newdisplay;
+	}
+}
+
+function modifyMarkedNodes (parent,attribute,marker,callback) {
+	var children = parent.childNodes;
+	for (var i = 0, length = children.length; i < length; i++) {
+		var curchild = children[i];
+		if(curchild.getAttribute && curchild.getAttribute(attribute) == marker) {
+			callback(curchild);
+		} else if (curchild.childNodes.length > 0) {
+			modifyMarkedNodes(curchild,attribute,marker,callback);
+		}
+	}
+
 }
