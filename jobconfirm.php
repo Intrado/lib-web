@@ -57,12 +57,12 @@ $renderedlist = new RenderedList($list);
 $renderedlist->calcStats();
 
 if ($renderedlist->total == 0)
-	error("The list you selected does not have any people in it","Click Cancel to return to the Job configuration page");
+	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 
-$joblangs = array("asdf");
+$joblangs = array();
 $joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
 $joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 $joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
@@ -76,6 +76,9 @@ function alternate($type) {
 		<tr class="listHeader" align="left" valign="bottom">
 			<th>Language Preference</th>
 			<th>Message to Send</th>
+<? if ($type == "phone") { ?>
+			<th>&nbsp;</th>
+<? } ?>
 		</tr>
 <?
 $id = $type . 'messageid';
@@ -90,7 +93,11 @@ foreach($joblangs[$type] as $joblang) {
 			<tr valign="middle">
 				<td><?= $joblang->language ?>
 				</td>
-				<td><?= $message->name ?></td>
+				<td><?= htmlentities($message->name) ?></td>
+<? if ($type == "phone") { ?>
+				<td>&nbsp;<?= button('play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);"); ?></td>
+<? } ?>
+				</td>
 			</tr>
 <?
 }
@@ -183,6 +190,7 @@ startWindow("Confirmation &amp; Submit");
 <?
 $phonemessage = new Message($job->phonemessageid);
 echo htmlentities($phonemessage->name);
+echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);");
 ?>
 					</td>
 				</tr>
