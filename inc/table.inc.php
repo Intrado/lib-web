@@ -1,6 +1,9 @@
 <?
 function showObjects ($data, $titles, $formatters = array(), $scrolling = false, $sorttable = false) {
-	static $sortableid = 123;
+	static $tablecounter = 100;
+
+	$tableid = "tableid" . $tablecounter++;
+
 	if(is_string($data[0]) && is_string($data[1]) && is_int($data[2]))
 	{
 		$count = QuickQuery('select COUNT(id) ' . $data[1]);
@@ -26,20 +29,20 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	}
 
 	echo '<div ' . ($scrolling ? 'class="scrollTableContainer"' : '') . '>';
-	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list' . ($sorttable ? " sortable" : "")  . '" ' . ($sorttable ? 'id="sortable_' . $sortableid++ . '"' : "") . '>';
+	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list' . ($sorttable ? " sortable" : "")  . '" id="' . $tableid . '">';
 	echo '<tr class="listHeader">';
 	foreach ($titles as $title) {
 		//make column sortable?
 		if (!$sorttable || strpos($title,"#") === false) {
-			echo '<td align="left" class="nosort">' ;
+			echo '<th align="left" class="nosort">' ;
 		} else {
-			echo '<td align="left">';
+			echo '<th align="left">';
 		}
 
 		if (strpos($title,"#") === 0)
 			$title = substr($title,1);
 
-		 echo htmlentities($title) . '</td>';
+		 echo htmlentities($title) . '</th>';
 	}
 	echo "</tr>\n";
 
@@ -54,11 +57,14 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 			else $cel = "";
 
 			$cel = htmlentities($cel);
+
+			//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
+			echo "<td>";
 			if (isset($formatters[$index])) {
 				$fn = $formatters[$index];
 				$cel = $fn($obj,$index);
 			}
-			echo "<td>" . $cel . "</td>";
+			echo $cel . "</td>";
 		}
 
 		echo "</tr>\n";
@@ -66,6 +72,7 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	echo "</table>";
 	echo '</div>';
 	echo $pagination;
+	return $tableid;
 }
 
 function showTable ($data, $titles, $formatters = array()) {
@@ -74,9 +81,9 @@ function showTable ($data, $titles, $formatters = array()) {
 
 		//make column sortable?
 		if (strpos($title,"#") === false) {
-			echo '<th class="nosort">' ;
+			echo '<th align="left" class="nosort">' ;
 		} else {
-			echo '<th>';
+			echo '<th align="left">';
 		}
 
 		if (strpos($title,"#") === 0)
@@ -95,11 +102,14 @@ function showTable ($data, $titles, $formatters = array()) {
 				$cel = $row[$index];
 
 				$cel = htmlentities($cel);
+
+				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
+				echo "<td>";
 				if (isset($formatters[$index])) {
 					$fn = $formatters[$index];
 					$cel = $fn($row,$index);
 				}
-				echo "<td>" . $cel . "</td>";
+				echo $cel . "</td>";
 			}
 
 			echo "</tr>\n";
@@ -107,13 +117,14 @@ function showTable ($data, $titles, $formatters = array()) {
 	}
 }
 
-function startWindow($title, $style = NULL, $minimize = false, $display = true)
+function startWindow($title, $style = NULL, $minimize = false, $usestate = true)
 {
 	static $id;
 	$id++;
-	if(state('window_' . $id))
+	if($usestate && state('window_' . $id))
 		$display = state('window_' . $id) == 'closed' ? false : true;
-
+	else
+		$display = true;
 	if($minimize) {
 ?><div  id="_window_off_<? print $id;?>" <? if($display) print 'style="display: none;"' ?> >
 	<table width="100%" cellpadding="0" cellspacing="1" class="window noprint">
