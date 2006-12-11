@@ -52,7 +52,7 @@ $result = Query(
             	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='phone') as remaining_phone,
             	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='email') as remaining_email,
             	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='print') as remaining_print,
-            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id
+            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
             from user u, job j
             left join jobworkitem wi
             	on j.id = wi.jobid
@@ -96,12 +96,14 @@ function fmt_remaining ($row, $index) {
 $titles = array(
 				"0" => 'Submitted by',
 				"1" => 'Job Name',
+				"18" => "Type",
 				"2" => 'Status',
 				"3" => 'Total',
 				"9" => 'Remaining',
 				"12" => 'Scheduled Start',
 				"13" => 'Actions');
 $formatters = array(
+				"18" => "fmt_csv_list",
 				"2" => 'fmt_status_index',
 				"3" => 'fmt_total',
 				"9" => 'fmt_remaining',

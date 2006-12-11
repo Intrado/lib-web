@@ -104,6 +104,7 @@ function fmt_rate ($obj, $name) {
 
 $titles = array ("Owner" => "Submitted by",
 				"name" => 'Job Name',
+				"type" => "Type",
 				"status" => 'Status',
 				"Total" => 'Total',
 				"Rate" => 'Success Rate',
@@ -111,6 +112,7 @@ $titles = array ("Owner" => "Submitted by",
 				"enddate" => 'End Date',
 				"Actions" => 'Actions');
 $formatters = array(
+				"type" => "fmt_obj_csv_list",
 				"Owner" => 'fmt_job_owner',
 				"startdate" => 'fmt_job_startdate',
 				"status" => "fmt_ucfirst",
