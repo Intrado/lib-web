@@ -81,10 +81,11 @@ if ($USER->authorize("startstats")) {
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling') and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Name",
+								"type" => "Type",
 								"Status" => "Status",
 								"Actions" => "Actions"
 								);
-			$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
+			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
 			showObjects($data, $titles, $formatters);
 			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
@@ -96,11 +97,12 @@ if ($USER->authorize("startstats")) {
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Name",
+								"type" => "Type",
 								"Status" => "Status",
 								"enddate" => "End Date",
 								"Actions" => "Actions"
 								);
-			$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
+			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
 			showObjects($data, $titles, $formatters);
 			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
