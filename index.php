@@ -103,7 +103,7 @@ if (file_exists($logofilename) ) {
 <? } ?>
 					</td>
 				</tr>
-				<tr><td align="right" style="padding: 2px;" width="165">Login:</td><td><input type="text" name="login" size="35"></td></tr>
+				<tr><td align="right" style="padding: 2px;" width="165">Login:</td><td><input type="text" name="login" size="35" id="logintext"></td></tr>
 				<tr><td align="right" style="padding: 2px;">Password:</td><td><input type="password" name="password" size="35"></td></tr>
 				<tr><td colspan="2" align="right"><? print submit('login', 'main', 'signin', 'signin'); ?></td></tr>
 <? if ($SETTINGS['feature']['has_ssl'] && !$_SERVER["HTTPS"]) { ?>
@@ -127,4 +127,10 @@ if (file_exists($logofilename) ) {
 	</tr>
 </table>
 </form>
+
+<script langauge="javascript">
+new getObj('logintext').obj.focus();
+</script>
+
+</script>
 <html>
