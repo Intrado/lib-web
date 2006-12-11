@@ -80,26 +80,27 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('The end time is invalid');
 		} else if (strtotime(GetFormData($f,$s,"endtime")) < strtotime(GetFormData($f,$s,"starttime")) ) {
 			error('The end time cannot be before the start time');
-		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
+		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else {
 			//submit changes
 
-			$job = new Job($_SESSION['jobid']);
+			if ($_SESSION['jobid'] == null)
+				$job = Job::jobWithDefaults();
+			else
+				$job = new Job($_SESSION['jobid']);
 
-			//TODO set options
-
+			//TODO check userowns on all messages, lists, etc
 			//only allow editing some fields
 			if ($completedmode) {
 				PopulateObject($f,$s,$job,array("name", "description"));
 			}
 			else if ($submittedmode) {
 				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime",
-				"maxcallattempts","options"));
+				"maxcallattempts"));
 			} else {
-
 				$fieldsarray = array("name", "jobtypeid", "description", "listid", "phonemessageid",
 				"emailmessageid","printmessageid", "starttime", "endtime",
 				"maxcallattempts", "sendphone", "sendemail", "sendprint",
@@ -272,31 +273,18 @@ if( $reloadform )
 {
 	ClearFormData($f);
 
-	//check to see if the name & desc is prepopulated from another form
 	if ($_SESSION['jobid'] == NULL) {
 		$jobid = NULL;
-		$job = new Job();
-		$job->options = "skipduplicates,callfirst,sendreport"; //default to have remove dupes on and call first
-		if(QuickQuery("select id from job where deleted = 0 and name = '" . DBSafe($job->name) . "' and status = 'active' and userid = $USER->id"))
-		error("A job named '$job->name' already exists");
+		$job = Job::jobWithDefaults();
 	} else {
 		$job = new Job($_SESSION['jobid']);
 	}
 
-	if ($job->id == NULL) {
-		$job->startdate = date("F jS, Y", strtotime("today"));
-		$job->enddate = date("F jS, Y", strtotime("today"));
-		$job->starttime = $USER->getCallEarly();
-		$job->endtime = $USER->getCallLate();
-		$job->jobtypeid = end($VALIDJOBTYPES)->id;
-		$job->maxcallattempts = min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","3"));
-	} else {
-		//beautify the dates & times
-		$job->startdate = date("F jS, Y", strtotime($job->startdate));
-		$job->enddate = date("F jS, Y", strtotime($job->enddate));
-		$job->starttime = date("g:i a", strtotime($job->starttime));
-		$job->endtime = date("g:i a", strtotime($job->endtime));
-	}
+	//beautify the dates & times
+	$job->startdate = date("F jS, Y", strtotime($job->startdate));
+	$job->enddate = date("F jS, Y", strtotime($job->enddate));
+	$job->starttime = date("g:i a", strtotime($job->starttime));
+	$job->endtime = date("g:i a", strtotime($job->endtime));
 
 	//TODO break out options
 	$fields = array(
@@ -317,21 +305,11 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
-	if ($job->id != null) {
-		PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
-	} else {
-		PutFormData($f,$s,"callall",$USER->getSetting("callall") + 0, "bool",0,1);
-	}
-
+	PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
-
-	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-	if ($USER->authorize('setcallerid') && $job->getOptionValue("callerid")) {
-		$callerid = $job->getOptionValue("callerid"); // Override default with custom value if available
-	}
-
-	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
+	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
+	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
 
 	if ($JOBTYPE == "repeating") {
 		$schedule = new Schedule($job->scheduleid);
@@ -351,14 +329,6 @@ if( $reloadform )
 	} else {
 		PutFormData($f, $s, 'startdate', $job->startdate, 'text', 1, 50, true);
 	}
-
-	// Default to a 2 day run interval on a new job
-	if ($job->id != null) {
-		PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
-	} else {
-		PutFormData($f, $s, 'numdays', min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2")), 'number', 1, $ACCESS->getValue('maxjobdays'), true); // Default to 2
-	}
-
 }
 
 $messages = array();
@@ -388,6 +358,9 @@ function message_select($type, $form, $section, $name) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
 	}
 	NewFormItem($form,$section,$name, "selectend");
+
+	if ($type == "phone")
+		echo button('play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
 }
 
 function language_select($form, $section, $name, $skipusedtype) {
