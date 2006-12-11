@@ -195,7 +195,7 @@ switch($MESSAGETYPE)
 									<? audio('audio'); ?>
 								</td>
 								<td><? print button('insert', "sel = new getObj('audio').obj; if (sel.options[sel.selectedIndex].value > 0) {  insert('{{' + sel.options[sel.selectedIndex].text + '}}', new getObj('bodytext').obj);}"); ?></td>
-								<td><? print button('play', "var audio = new getObj('audio').obj; if(audio.selectedIndex >= 1) popup('previewaudio.php?close=1&id=' + audio.options[audio.selectedIndex].value, 400, 350);"); ?></td>
+								<td><? print button('play', "var audio = new getObj('audio').obj; if(audio.selectedIndex >= 1) popup('previewaudio.php?close=1&id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
 							</tr>
 						</table>
 					</td>
