@@ -103,24 +103,18 @@ $TITLE = "Notification Jobs";
 
 include_once("nav.inc.php");
 
-function fmt_nextrun ($obj, $name) {
-	$nextrun = QuickQuery("select nextrun from schedule where id=$obj->scheduleid");
-	if ($nextrun === NULL)
-
-		$nextrun = "- Never -";
-	else
-		$nextrun = date("F jS, Y h:i a", strtotime($nextrun));
-	return $nextrun;
-}
-
-
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='active' or status='cancelling') and deleted=0 order by id desc");
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
+					"type" => "Type",
 					"startdate" => "#Start date",
 					"Status" => "#Status",
 					"Actions" => "Actions"
 					);
+$formatters = array("Actions" => "fmt_jobs_actions",
+					'Status' => 'fmt_status',
+					"type" => "fmt_obj_csv_list",
+					"startdate" => "fmt_job_startdate");
 
 $scrollThreshold = 8;
 $scroll = false;
@@ -131,7 +125,7 @@ startWindow('My Active and Pending Jobs ' . help('Jobs_MyActiveJobs', NULL, 'blu
 
 button_bar(button('createjob', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('easycall',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);") . help('Start_EasyCall') : ''));
 
-showObjects($data, $titles, array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "startdate" => "fmt_job_startdate"), $scroll, true);
+showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
 
 
@@ -141,6 +135,7 @@ if ($USER->authorize('createrepeat')) {
 	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' order by foo,name desc");
 	$titles = array(	"name" => "#Name",
 						"description" => "#Description",
+						"type" => "Type",
 						"startdate" => "#Next Scheduled Run",
 						"finishdate" => "#Last Run",
 						"Actions" => "Actions"
@@ -156,7 +151,7 @@ if ($USER->authorize('createrepeat')) {
 	button_bar(button('createrepeatjob', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
 
 
-	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
+	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "type" => "fmt_obj_csv_list","finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
 	endWindow();
 	print '<br>';
 }
@@ -165,12 +160,13 @@ if ($USER->authorize('createrepeat')) {
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and deleted = 0 order by finishdate desc");
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
+					"type" => "Type",
 					"startdate" => "#Start Date",
 					"Status" => "#Status",
 					"enddate" => "#End Date",
 					"Actions" => "Actions"
 					);
-$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "startdate" => "fmt_job_startdate", "enddate" => "fmt_job_enddate");
+$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "startdate" => "fmt_job_startdate", "enddate" => "fmt_job_enddate","type" => "fmt_obj_csv_list");
 
 $scroll = false;
 if (count($data) > $scrollThreshold) {
