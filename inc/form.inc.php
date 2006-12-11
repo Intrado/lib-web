@@ -53,9 +53,10 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\">";
 		break;
 	case "textarea":
+		$rows = ($optionvalue == "nooption" || $optionvalue == NULL) ? $option/6 : $optionvalue;
 		echo "<textarea $extrahtml name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" "
-				. "cols=\"" . $option . "\" rows=\"" . $option/6 . "\">";
+				. "cols=\"" . $option . "\" rows=\"" . $rows . "\">";
 		echo htmlentities($_SESSION['formdata'][$form][$section][$item]['value']);
 		echo "</textarea>";
 		break;
@@ -371,7 +372,7 @@ function CheckFormItem($form, $section, $item) {
 
 	case "email":
 		$email = $theitem['value'];
-		
+
 		if (!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email)) {
 			return 'type';
 		}
