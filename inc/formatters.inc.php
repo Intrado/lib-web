@@ -130,25 +130,22 @@ function fmt_checkbox($row,$index) {
 	return $result . '</div>';
 }
 
-/**
-	Function to perform formatting based on a numeric index rather than an object field name
-*/
-function fmt_jobs_actions_index($row, $index) {
-	return fmt_jobs_generic($row[$index], $row[$index + 1], $row[$index + 2]);
-}
-
 function fmt_jobs_actions ($obj, $name) {
-	return fmt_jobs_generic($obj->id, $obj->status, $obj->deleted);
+	return fmt_jobs_generic($obj->id, $obj->status, $obj->deleted, $obj->type);
 }
 
 /**
 	Generalized formatting function handle formatting using the pertinent fields
 */
-function fmt_jobs_generic ($id, $status, $deleted) {
+function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	//return "$id, $status, $deleted";
 	global $USER;
 
-	$editbtn = '<a href="job.php?id=' . $id . '">Edit</a>';
+	if ($type == "survey")
+		$editbtn = '<a href="survey.php?id=' . $id . '">Edit</a>';
+	else
+		$editbtn = '<a href="job.php?id=' . $id . '">Edit</a>';
+
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 
 	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
@@ -304,6 +301,19 @@ function fmt_status_index($row, $index) {
 	return $row[$index] == 'new' ? 'Not Submitted' : ucfirst($row[$index]);
 }
 
+function fmt_csv_list ($row,$index) {
+	$data = explode(",", $row[$index]);
+	$data = array_map("ucfirst",$data);
+	return implode(", ", $data);
+}
+
+function fmt_obj_csv_list ($obj, $name) {
+	$data = explode(",", $obj->$name);
+	$data = array_map("ucfirst",$data);
+	return implode(", ", $data);
+}
+
+
 function fmt_ucfirst($obj, $name) {
 	return ucfirst($obj->status);
 }
@@ -317,6 +327,16 @@ function fmt_next_repeat($row, $index) {
 		$nextrun = date("F jS, Y h:i a", strtotime($row[$index]));
 	}
 
+	return $nextrun;
+}
+
+
+function fmt_nextrun ($obj, $name) {
+	$nextrun = QuickQuery("select nextrun from schedule where id=$obj->scheduleid");
+	if ($nextrun === NULL)
+		$nextrun = "- Never -";
+	else
+		$nextrun = date("F jS, Y h:i a", strtotime($nextrun));
 	return $nextrun;
 }
 
