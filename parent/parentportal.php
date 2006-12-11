@@ -105,7 +105,14 @@ include("nav.inc.php");
 		<?
 		for($itor=0;$itor< count($allchildrenpd); $itor++) {
 			$name = $allchildrenpd[$itor]->$firstname . " " .$allchildrenpd[$itor]->$lastname;
-			?><tr><td><a href="parentportal.php?sid=<?=$allchildrenpd[$itor]->personid?>"><?=$name." ".$allchildrenid[$itor]->pkey?></a></td></tr><?
+			if($allchildrenpd[$itor]->personid == $_SESSION[currentsid]) {
+				?><tr bgcolor="#CCCCCC"><?
+			} else {
+				?><tr><?
+			}
+			?>
+			<td><a href="parentportal.php?sid=<?=$allchildrenpd[$itor]->personid?>"><?=$name." ".$allchildrenid[$itor]->pkey?></a></td></tr>
+			<?
 		}
 		?>
 		</table>
