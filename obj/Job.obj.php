@@ -13,6 +13,7 @@ class Job extends DBMappedObject {
 	var $phonemessageid;
 	var $emailmessageid;
 	var $printmessageid;
+	var $questionnaireid;
 	var $type;
 	var $createdate;
 	var $startdate;
@@ -36,12 +37,54 @@ class Job extends DBMappedObject {
 	function Job ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
-		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description", "listid", "phonemessageid", "emailmessageid",
-					"printmessageid", "type", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
-					"maxcallattempts", "options", "status", "deleted","cancelleduserid");
+		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description", "listid",
+				"phonemessageid", "emailmessageid", "printmessageid", "questionnaireid",
+				"type", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
+				"maxcallattempts", "options", "status", "deleted","cancelleduserid");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
+
+
+	//creates a new job object prepopulated with all of the user/system defaults
+	//date/time values are in DB format and should be beautified for forms
+	function jobWithDefaults () {
+		global $USER, $ACCESS;
+		$job = new Job();
+		//basic job info -- not used/visible on forms, these need to set this again after post data
+		$job->status = "new";
+		$job->userid = $USER->id;
+		$job->createdate = QuickQuery("select now()");
+
+		//job type
+		$VALIDJOBTYPES = JobType::getUserJobTypes();
+		$job->jobtypeid = end($VALIDJOBTYPES)->id;
+
+		//call settings
+		$job->maxcallattempts = min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","3"));
+		if (getSystemSetting('retry') != "")
+			$job->setOptionValue("retry",getSystemSetting('retry'));
+
+		//options
+		$job->setOption("callall",$USER->getSetting("callall"));
+		$job->setOption("callfirst",!$USER->getSetting("callall") + 0);
+		$job->setOption("skipduplicates",1);
+		$job->setOption("sendreport",1);
+
+		//date/time/numer of days
+		$job->startdate = date("Y-m-d", strtotime("today"));
+		$numdays = min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2"));
+		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
+		$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
+		$job->endtime = date("H:i", strtotime($USER->getCallLate()));
+
+		//callerid
+		$job->setOptionValue("callerid", $USER->getSetting("callerid",getSystemSetting('callerid')));
+
+		return $job;
+	}
+
+
 
 	function refresh() {
 		parent::refresh();
