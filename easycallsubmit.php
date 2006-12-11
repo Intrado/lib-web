@@ -35,7 +35,7 @@ $reloadform = 0;
 if(CheckFormSubmit($f,$s)) {
 	redirect("jobsubmit.php?jobid=" . $specialtask->getData('jobid') . "&close=1");
 } else if (!$specialtask->getData('jobid')) {
-	$job = new Job();
+	$job = Job::jobWithDefaults();
 	//get the job name, type, and messageid
 
 	$name = $specialtask->getData('name');
@@ -49,31 +49,6 @@ if(CheckFormSubmit($f,$s)) {
 	$job->phonemessageid = $specialtask->getData('messageid');
 	$job->sendphone = true;
 
-	$job->startdate = date("Y-m-d", strtotime("today"));
-
-	$numdays = min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2"));
-
-	$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
-
-	$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
-	$job->endtime = date("H:i", strtotime($USER->getCallLate()));
-
-	$job->maxcallattempts =  min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","3"));
-	$job->type = "phone";
-
-	$job->setOption("callall",$USER->getSetting("callall"));
-	$job->setOption("callfirst",!$USER->getSetting("callall") + 0);
-	$job->setOption("skipduplicates",1);
-	$job->setOption("sendreport",1);
-
-	$job->setOptionValue("callerid", $USER->getSetting("callerid",getSystemSetting("callerid")));
-
-	if (getSystemSetting('retry') != "")
-		$job->setOptionValue("retry",getSystemSetting('retry'));
-
-	$job->status = "new";
-	$job->userid = $USER->id;
-	$job->createdate = QuickQuery("select now()");
 	$job->create();
 
 	$specialtask->setData('jobid', $job->id);
