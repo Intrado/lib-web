@@ -62,7 +62,6 @@ function isValidTextItem($text) {
 	if ( ($text != null && strlen($text) < 4) || strpos($text, ' ') !== false) {
 		return false;
 	}
-
 	return true;
 }
 
@@ -84,7 +83,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		if (GetFormData($f, $s, "newrulefieldnum") != "" && GetFormData($f, $s, "newrulefieldnum") != -1) {
 			$extraMsg = " - You will also need to choose your data view rules again";
 		}
-
 		// do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
@@ -92,20 +90,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Password confirmation does not match' . $extraMsg);
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
 			error('IVR Password confirmation does not match' . $extraMsg);
-		} elseif (!isValidTextItem(GetFormData($f, $s, 'login'))) {
-			error('Invalid username' . $extraMsg);
+		} elseif (strlen(GetFormData($f, $s, 'login')) < 5) {
+			error('Username must be atleast 5 characters' . $extraMsg);
 		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
-		} elseif (!isValidTextItem(GetFormData($f, $s, 'password'))) {
-			error('Invalid password' . $extraMsg);
-		} elseif (!isValidTextItem(GetFormData($f, $s, 'accesscode'))) {
-			error('Invalid telephone user ID' . $extraMsg);
-		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
+		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid'],  $USER->customerid);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax', true); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
-		} elseif (!isValidTextItem(GetFormData($f, $s, 'pincode'))) {
-			error('Invalid telephone PIN code' . $extraMsg);
 		} else if ($phone != null && !Phone::validate($phone) ) {
 			if ($IS_COMMSUITE)
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
@@ -113,6 +105,20 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
+		} elseif(isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) {
+			error('Firstname, Lastname, User, and Password must all be different');
+		} elseif($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))){
+			error($iscomplex);
+		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+			error('User ID and Pin code cannot be the same');
+		} elseif((strlen(GetFormData($f, $s, 'accesscode')) < 4 || strlen(GetformData($f, $s, 'pincode')) < 4) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+			error('User ID and Pin code must have length greater than 4.');
+		} elseif ((!ereg("^[0-9]*$", GetFormData($f, $s, 'accesscode')) || !ereg("^[0-9]*$", GetformData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+			error('User ID and Pin code must all be numeric');
+		} elseif((isAllSameDigit(GetFormData($f, $s, 'accesscode')) || isAllSameDigit(GetFormData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+			error('User ID and Pin code cannot have all the same digits');
+		} elseif(isSequential(GetFormData($f, $s, 'accesscode')) || isSequential(GetFormData($f, $s, 'pincode'))) {
+			error('Cannot have sequential numbers for User ID or Pin code');
 		} else {
 			// Submit changes
 			$usr = new User($_SESSION['userid']);
@@ -195,7 +201,7 @@ if( $reloadform )
 	$fields = array(
 			array("accessid","number","nomin","nomax"),
 			array("login","text",1,20,true),
-			array("accesscode","number",1000,"nomax"),
+			array("accesscode","number","nomin","nomax"),
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
 			array("email","email",0,100),
@@ -288,7 +294,7 @@ startWindow('User Information');
 
 						</table>
 
-						<br>Please note: username and password are case-sensitive and must be a minimum of 4 characters long with no spaces.
+						<br>Please note: username and password are case-sensitive and must be a minimum of 5 characters long with no spaces.
 						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
 					</td>
 				</tr>
