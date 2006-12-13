@@ -78,5 +78,113 @@ function isvalidtimestamp ($time) {
 	else
 		return true;
 }
+/**
+	Checks to see if all digits in number are all the same.
+*/
+function isAllSameDigit($number){
+	//if all 0's, default setting so ignore it.
+	if (ereg("^0*$", $number)) {
+		return false;
+	}
+	$same = 0;
+	for($itor=0;$itor<strlen($number)-1;$itor++){
+		if($number[$itor] == $number[$itor+1]){
+			$same = 1;
+		} else {
+			$same = 0;
+			break;
+		}
+	}
+	if($same == 1){
+		return true;
+	}
+	return false;
+}
 
+/**
+	Function to test if the user, pass, firstname, and last name are
+	the same thing.
+*/
+function isSameUserPass($user, $pass, $firstname, $lastname) {
+	if($user == $pass || $user == $firstname || $user == $lastname
+			|| $pass == $firstname || $pass == $lastname) {
+		return true;
+	}
+	return false;
+}
+
+/**
+	returns false if password is complex
+	returns msg string if password is not complex
+*/
+function isNotComplexPass($pass) {
+	//if all 0's, default pass so ignore it.
+	if (ereg("^0*$", $pass)) {
+		return false;
+	}
+	if(strlen($pass) < 5){
+		return("Password must be atleast 5 characters long");
+	}
+	// Perform password check
+	$check = crack_check($pass);
+	if($check) {
+		return false;
+	} else {
+		$diag = crack_getlastmessage();
+		switch($diag){
+			case "it is based on a dictionary word":
+				return("The password is based on a word from the dictionary");
+				break;
+			case "it is based on a (reversed) dictionary word":
+				return("The password is based on a reversed word from the dictionary");
+				break;
+			case "it looks like a National Insurance number.":
+				return("The password looks like a National Insurance number.");
+				break;
+			case "it is too simplistic/systematic":
+				return("The password is too simplistic/systematic");
+				break;
+			case "it is all whitespace":
+				return("The password cannot contain spaces.");
+				break;
+			case "it does not contain enough DIFFERENT characters":
+				return("The password needs more different characters.");
+				break;
+			case "it is too short":
+				return false;
+				break;
+			case "it's WAY too short":
+				return("The password needs to be longer");
+				break;
+			default:
+				return("Password is too weak");
+				break;
+		}
+	}
+}
+
+function isSequential($number){
+	$isseq = 0;
+	$neg=0;
+	if($number[$itor]-$number[$itor+1] == -1){
+		$isseq=1;
+		$neg = 0;
+	} elseif($number[$itor]-$number[$itor+1] == 1){
+		$isseq=1;
+		$neg = 1;
+	} else {
+		return $isseq;
+	}
+	for($itor = 1;$itor<strlen($number)-1;$itor++){
+		if($number[$itor]-$number[$itor+1] == -1 && $neg==0){
+			$isseq=1;
+		} elseif($number[$itor]-$number[$itor+1] == 1 && $neg == 1){
+			$isseq=1;
+		} else {
+			$isseq=0;
+			break;
+		}
+	}
+	return $isseq;
+}
 ?>
