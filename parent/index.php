@@ -6,6 +6,7 @@ require_once("../inc/form.inc.php");
 
 if(isset($_GET["logout"])) {
 	@session_destroy();
+	redirect();
 }
 
 $badlogin=false;
