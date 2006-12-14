@@ -18,7 +18,7 @@ if (!$IS_COMMSUITE) {
 	$CUSTOMERURL = "default";
 }
 
-session_name($CUSTOMERURL . "_session");
+session_name($CUSTOMERURL . "_parentsession");
 session_start();
 
 if(!isset($isparentlogin) || !$isparentlogin){
