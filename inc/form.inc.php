@@ -348,24 +348,29 @@ function CheckFormItem($form, $section, $item) {
 		break;
 
 	case "phone":
-		$phone = $theitem['value'];
-		if(empty($phone)) {
-			return 'type';
-		}
-
+		
 		// Somewhat basic algorithm chosen for simplicty.
 		// The algorithm is to strip all customary phone number formatting chars from
-		//	the string and ensure that what remains is a number from 7-13 chars long.
-		$phone = ereg_replace("([ 	]+)", "", $phone); // Strip spaces or tabs from string
-		$phone = ereg_replace("[^0-9]*","",$phone); // Strip all non-numeric chars from string
+		//	the string and ensure that what remains is a number that is between minval and
+		//  maxval if they are specified.  If unspecified, unlimited len is permitted.
+		// jjl
+		$phone = ereg_replace("[^0-9]*","",$theitem['value']); // Strip all non-numeric chars from string
+		$phonelen = strlen($phone);
 
-		$testString = eregi_replace("([0-9]+)", "", $phone);
-		if( !empty($testString) ) { // Make sure it's all numbers now
-			return 'type';
+		// Check for input that does not contain any numbers.
+		if(!$phonelen && strlen($theitem['value']))
+			return "type";
+
+		if($theitem['minval'] != "nomin") {
+			if($phonelen < $theitem['minval']) {
+				return "range";
+			}
 		}
 
-		if (strlen($phone) != 10) {
-			return 'range';
+		if($theitem['maxval'] != "nomax") {
+			if($phonelen > $theitem['maxval']) {
+				return "range";
+			}
 		}
 
 		break;
