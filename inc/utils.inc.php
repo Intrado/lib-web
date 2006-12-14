@@ -60,16 +60,22 @@ function getNextAvailableAccessCode($currentCode, $userid, $customerid) {
 
 	return $nextCode;
 }
-
-function getSystemSetting($name) {
-	global $USER;
+function getCustomerSystemSetting($name, $customerid, $defaultvalue=false) {
 	static $settings = array();
 
 	if (isset($settings[$name]))
 		return $settings[$name];
 
-	$value = QuickQuery("select value from setting where customerid = $USER->customerid and name = '" . DBSafe($name) . "'");
+	$value = QuickQuery("select value from setting where customerid = $customerid and name = '" . DBSafe($name) . "'");
+	if($value === false) {
+		$value = $defaultvalue;
+	}
 	return $settings[$name] = $value;
+}
+
+function getSystemSetting($name) {
+	global $USER;
+	return getCustomerSystemSetting($name, $USER->customerid);
 }
 
 function isvalidtimestamp ($time) {
@@ -82,10 +88,6 @@ function isvalidtimestamp ($time) {
 	Checks to see if all digits in number are all the same.
 */
 function isAllSameDigit($number){
-	//if all 0's, default setting so ignore it.
-	if (ereg("^0*$", $number)) {
-		return false;
-	}
 	$same = 0;
 	for($itor=0;$itor<strlen($number)-1;$itor++){
 		if($number[$itor] == $number[$itor+1]){
