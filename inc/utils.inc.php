@@ -54,7 +54,8 @@ function getNextAvailableAccessCode($currentCode, $userid, $customerid) {
 	$result=1;
 	while($result !=0) {
 		$nextCode = rand(1000,999999);
-		$result = QuickQuery("select count(*) from user where accesscode = '$nextCode' and id != '$userid' and customerid = '$customerid'");
+		$result = QuickQuery("select count(*) from user where accesscode = '$nextCode' and id != '$userid' and customerid = '$customerid'
+								AND enabled = '1'");
 	}
 	return $nextCode;
 }
