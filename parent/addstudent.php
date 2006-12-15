@@ -9,7 +9,7 @@ include_once("../obj/Person.obj.php");
 include_once("../obj/PersonData.obj.php");
 
 
-$parentvalidationfield = DBSafe(getCustomerSystemSetting("parentvalidationfield", $PARENTUSER->customerid));
+$parentvalidationfield =getCustomerSystemSetting("parentvalidationfield", $PARENTUSER->customerid);
 
 $f = "add";
 $s = "main";
@@ -28,8 +28,8 @@ if (CheckFormSubmit($f,$s)) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 
-			$studentkey = DBSafe(GetFormData($f, $s, 'studentid'));
-			$parentcode = DBsafe(GetFormData($f, $s, 'parentvalid'));
+			$studentkey = GetFormData($f, $s, 'studentid');
+			$parentcode = GetFormData($f, $s, 'parentvalid');
 
 			$student = Person::findPerson($PARENTUSER->customerid, $studentkey);
 			$studentdata = new PersonData($student->id);
@@ -49,21 +49,18 @@ if (CheckFormSubmit($f,$s)) {
 			}
 			if($validated && $studentid){
 				if(in_array($studentid, $CHILDLIST)){
-					?> <div style="color: red;">You already added that student.</div> <?
+					error("You already added that student");
 					$alreadyadded = true;
 				}
 				if(!$alreadyadded) {
 					$query = "INSERT INTO personparent (parentuserid, personid) VALUES ('$parentid', '$studentid')";
-					if(Query($query)) {
-						$CHILDLIST=NULL;
-						$_SESSION['childlist']=NULL;
-						redirect("parentportal.php");
-					} else {
-						?> <div style="color: red;">Problem adding to link table.</div> <?
-					}
+					QuickUpdate($query);
+					$CHILDLIST=NULL;
+					$_SESSION['childlist']=NULL;
+					redirect("parentportal.php");
 				}
 			} else {
-				?> <div style="color: red;">Incorrect StudentID/security code combination. Please try again.</div> <?
+				error("Incorrect StudentID/security code combination. Please try again");
 			}
 		}
 	}
@@ -90,14 +87,7 @@ if($parentvalidationfield) {
 }
 NewFormItem($f, $s,"", 'submit');
 EndForm();
-?><a href="index.php">Back</a><?
 
-if(isset($ERRORS) && is_array($ERRORS)) {
-	foreach($ERRORS as $key => $value) {
-		$ERRORS[$key] = addslashes($value);
-	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-}
 
 include("navbottom.inc.php");
 ?>
