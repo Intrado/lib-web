@@ -39,7 +39,7 @@ if ($badlogin) {
 ?>
 	<p> Please log in </p>
 	<form method="POST" action="index.php">
-		<p>Login: <input type="text" name="login" /> </p>
+		<p>Email: <input type="text" name="login" /> </p>
 		<p>Password: <input type="password" name="password" /> </p>
 		<input type="submit" value="Submit" name="submit" />
 	</form>
