@@ -1,5 +1,5 @@
 <?
-$isparentlogin=1;
+$parentloginbypass=1;
 
 require_once("common.inc.php");
 require_once("../inc/form.inc.php");
@@ -11,20 +11,20 @@ if(isset($_GET["logout"])) {
 
 $badlogin=false;
 
-if(isset($_SESSION["parentloginid"]))
+if(isset($_SESSION["parentuser"]))
 	redirect("parentportal.php");
 
 if(isset($_POST["submit"])) {
 
 	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
-	$login = dbsafe($login);
-	$password = dbsafe($password);
+	$login = $login;
+	$password = $password;
 
 	$id = ParentUser::doLogin($login, $password, $CUSTOMERURL);
 	if($id){
-		$_SESSION['parentloginid'] = new ParentUser($id);
-		$PARENTUSER = $_SESSION['parentloginid'];
+		$_SESSION['parentuser'] = new ParentUser($id);
+		$PARENTUSER = $_SESSION['parentuser'];
 		redirect("parentportal.php");
 	} else {
 		$badlogin = true;
