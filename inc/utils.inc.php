@@ -51,13 +51,11 @@ function getChildObject($person, $type, $table) {
 	@param customerid The customer ID under which we are trying to find and access code
 */
 function getNextAvailableAccessCode($currentCode, $userid, $customerid) {
-	$nextCode = $currentCode + 0;
-	$result = 1;
-	while ($result != 0) {
-		$nextCode++;
+	$result=1;
+	while($result !=0) {
+		$nextCode = rand(1000,999999);
 		$result = QuickQuery("select count(*) from user where accesscode = '$nextCode' and id != '$userid' and customerid = '$customerid'");
 	}
-
 	return $nextCode;
 }
 function getCustomerSystemSetting($name, $customerid, $defaultvalue=false) {
@@ -108,9 +106,18 @@ function isAllSameDigit($number){
 	the same thing.
 */
 function isSameUserPass($user, $pass, $firstname, $lastname) {
-	if($user == $pass || $user == $firstname || $user == $lastname
-			|| $pass == $firstname || $pass == $lastname) {
-		return true;
+	$user = strtolower($user);
+	$pass = strtolower($pass);
+	$firstname = strtolower($firstname);
+	$lastname = strtolower($lastname);
+	if(strpos($pass, $user)!==FALSE) {
+		return("Username and password are too similiar");
+	}
+	if(strlen($firstname)>=3 && strpos($pass, $firstname)!==FALSE) {
+		return("Firstname and password are too similiar");
+	}
+	if(strlen($lastname) >=3 && strpos($pass, $lastname)!==FALSE) {
+		return("Lastname and password are too similiar");
 	}
 	return false;
 }
@@ -120,13 +127,13 @@ function isSameUserPass($user, $pass, $firstname, $lastname) {
 	returns msg string if password is not complex
 */
 function isNotComplexPass($pass) {
-	//if all 0's, default pass so ignore it.
-	if (ereg("^0*$", $pass)) {
-		return false;
-	}
 	if(strlen($pass) < 5){
 		return("Password must be atleast 5 characters long");
 	}
+	if(strlen($pass) < 6){
+		$pass = $pass."a";
+	}
+	
 	// Perform password check
 	$check = crack_check($pass);
 	if($check) {
@@ -136,31 +143,22 @@ function isNotComplexPass($pass) {
 		switch($diag){
 			case "it is based on a dictionary word":
 				return("The password is based on a word from the dictionary");
-				break;
 			case "it is based on a (reversed) dictionary word":
 				return("The password is based on a reversed word from the dictionary");
-				break;
-			case "it looks like a National Insurance number.":
-				return("The password looks like a National Insurance number.");
-				break;
 			case "it is too simplistic/systematic":
 				return("The password is too simplistic/systematic");
-				break;
 			case "it is all whitespace":
 				return("The password cannot contain spaces.");
-				break;
 			case "it does not contain enough DIFFERENT characters":
 				return("The password needs more different characters.");
-				break;
 			case "it is too short":
-				return false;
-				break;
+				return("The password needs to be atleast 5 characters long");
 			case "it's WAY too short":
-				return("The password needs to be longer");
-				break;
+				return("The password needs to be atleast 5 characters long");
+			case "it looks like a National Insurance number.":
+				return false;
 			default:
 				return("Password is too weak");
-				break;
 		}
 	}
 }
@@ -168,10 +166,10 @@ function isNotComplexPass($pass) {
 function isSequential($number){
 	$isseq = 0;
 	$neg=0;
-	if($number[$itor]-$number[$itor+1] == -1){
+	if($number[0]-$number[1] == -1){
 		$isseq=1;
 		$neg = 0;
-	} elseif($number[$itor]-$number[$itor+1] == 1){
+	} elseif($number[0]-$number[1] == 1){
 		$isseq=1;
 		$neg = 1;
 	} else {
@@ -189,4 +187,5 @@ function isSequential($number){
 	}
 	return $isseq;
 }
+
 ?>
