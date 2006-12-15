@@ -21,11 +21,11 @@ if (!$IS_COMMSUITE) {
 session_name($CUSTOMERURL . "_parentsession");
 session_start();
 
-if(!isset($isparentlogin) || !$isparentlogin){
-	if(!isset($_SESSION["parentloginid"])) {
+if(!isset($parentloginbypass) || !$parentloginbypass){
+	if(!isset($_SESSION["parentuser"])) {
 		redirect("index.php?logout=1");
 	} else {
-		$PARENTUSER = $_SESSION['parentloginid'];
+		$PARENTUSER = $_SESSION['parentuser'];
 		$PARENTUSER->refresh();
 		$CHILDLIST = $_SESSION['childlist'];
 	}
