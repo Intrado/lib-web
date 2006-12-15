@@ -1,5 +1,5 @@
 <?
-$isparentlogin=1;
+$parentloginbypass=1;
 
 include_once("common.inc.php");
 include_once("ParentUser.obj.php");
@@ -24,19 +24,19 @@ if (CheckFormSubmit($f,$s)){
 		if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			$login = DBSafe(GetFormData($f,$s,"login"));
-			$password = DBSafe(GetFormData($f, $s, "password"));
-			$firstname = DBSafe(GetFormData($f, $s, "firstname"));
-			$lastname = DBSafe(GetFormData($f, $s, "lastname"));
+			$login = GetFormData($f,$s,"login");
+			$password = GetFormData($f, $s, "password");
+			$firstname = GetFormData($f, $s, "firstname");
+			$lastname = GetFormData($f, $s, "lastname");
 			
 			$customerid = QuickQuery("Select id from customer where customer.hostname = '$CUSTOMERURL'");
 			if(!$customerid){
-					error('Bad Customer URL');
+				error('Please check your school url');
 			} else {
-				$query = "Select count(*) from parentuser where login= '$login'";
+				$query = "Select count(*) from parentuser where login='". DBSafe($login)."' AND customerid='$customerid'";
 				$same = QuickQuery($query);
 				if( $same > 1) {
-					error('That email address is already being used.');
+					error('That email address is already being used');
 				} else {
 					$parent = new ParentUser();
 					$parent->login = $login;
@@ -66,7 +66,7 @@ if($reloadform) {
 }
 
 NewForm($f);
-
+include("nav.inc.php");
 
 ?>
 <table>
@@ -81,12 +81,6 @@ NewForm($f);
 NewFormItem($f, $s,"", 'submit');
 EndForm();
 
-if(isset($ERRORS) && is_array($ERRORS)) {
-	foreach($ERRORS as $key => $value) {
-		$ERRORS[$key] = addslashes($value);
-	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-}
-?>
-<a href="index.php">Back</a>
+include("navbottom.inc.php");
 
+?>
