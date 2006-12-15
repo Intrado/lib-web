@@ -70,7 +70,7 @@ include("nav.inc.php");
 
 ?>
 <table>
-<tr><td>Your Email/Login: </td><td> <? NewFormItem($f, $s, 'login', 'text', 25, 255); ?></td></tr>
+<tr><td>Your Email: </td><td> <? NewFormItem($f, $s, 'login', 'text', 25, 255); ?></td></tr>
 <tr><td>Password: </td><td><? NewFormItem($f, $s, 'password', 'password', 25, 255); ?></td></tr>
 <tr><td>First Name: </td><td><? NewFormItem($f, $s, 'firstname', 'text', 25, 255); ?></td></tr>
 <tr><td>Last Name: </td><td><? NewFormItem($f, $s, 'lastname', 'text', 25,255); ?></td></tr>
