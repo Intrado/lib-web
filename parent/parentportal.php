@@ -19,8 +19,8 @@ if (isset($_GET['sid'])) {
 }
 
 if(!$_SESSION['childlist'] || $_SESSION['childlist']===NULL ) {
-	$CHILDLIST = ParentUser::findChildren($PARENTUSER->id);
-	$_SESSION['childlist'] = $CHILDLIST;
+	$_SESSION['childlist'] = $_SESSION['parentuser']->findChildren();
+	$CHILDLIST = $_SESSION['childlist'];
 }
 
 
@@ -96,7 +96,6 @@ if($reloadform) {
 	PutFormData($f, $s, 'checkbox', "", "checkbox", 0);
 }
 
-//var_dump($emaillist);
 include("nav.inc.php");
 ?>
 <table border=1>
@@ -168,13 +167,6 @@ include("nav.inc.php");
 			?>Apply to All Students<?
 			NewFormItem($f, $s,'checkbox', 'checkbox');
 			EndForm();
-
-			if(isset($ERRORS) && is_array($ERRORS)) {
-				foreach($ERRORS as $key => $value) {
-					$ERRORS[$key] = addslashes($value);
-				}
-				print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-			}
 			?>
 		</table>
 	</td>
