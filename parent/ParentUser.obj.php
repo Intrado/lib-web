@@ -36,8 +36,8 @@ class ParentUser extends DBMappedObject{
 		QuickUpdate($query);
 	}
 
-	function findChildren($parentid){
-
+	function findChildren(){
+		$parentid = $this->id;
 		$query = "Select person.id from person, personparent
 					where personparent.parentuserid = '$parentid'
 					AND personparent.personid = person.id
