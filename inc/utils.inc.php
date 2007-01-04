@@ -126,6 +126,11 @@ function isSameUserPass($user, $pass, $firstname, $lastname) {
 /**
 	returns false if password is complex
 	returns msg string if password is not complex
+	Php.ini setup:
+		extension=php_crack.dll must not be commented out
+		To add default crack library, add this line to php.ini:
+			crack.default_dictionary = "/usr/share/cracklib"
+		The location of the cracklib directory may differ.
 */
 function isNotComplexPass($pass) {
 	if(strlen($pass) < 5){
