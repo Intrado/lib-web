@@ -150,7 +150,8 @@ foreach ($jobs as $job) {
 		<?
 		$jobpriorities = DBFindMany("JobType","from jobtype where customerid=$USER->customerid");
 		foreach ($jobpriorities as $jobpriority) {
-			echo '<option value="' . $jobpriority->id . '">' . htmlentities($jobpriority->name . ($jobpriority->deleted ? " (deleted)" : "")) . '</option>';
+			if(!$jobpriority->deleted)
+				echo '<option value="' . $jobpriority->id . '">' . htmlentities($jobpriority->name) . '</option>';
 		}
 		?>
 		</select>
