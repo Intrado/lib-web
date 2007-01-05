@@ -318,7 +318,7 @@ startWindow('Allowed Functions');
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr valign="top">
 					<td><? NewFormItem($form,$section,"datafield","checkbox",NULL,NULL,'id="datafield" onclick="clearAllIfNotChecked(this,\'datafieldselect\');"'); ?></td>
-					<td>Allow user to build lists and construct messages using the following fields:</td>
+					<td>Restrict user access to only those fields that are selected:</td>
 					<td>
 						<?
 						NewFormItem($form,$section,"datafields","selectmultiple",count($FIELDMAP),array_flip($FIELDMAP), 'id="datafieldselect" onmousedown="setChecked(\'datafield\');"');
