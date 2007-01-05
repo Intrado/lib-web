@@ -163,8 +163,14 @@ startWindow("EasyCall");
 			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Call&nbsp;Me&nbsp;At:&nbsp;<?= help("EasyCall_PhoneNumber", null, 'small'); ?></td>
 			<td class="bottomBorder"><? NewFormItem($f,$s,"phone","text",20); ?></td>
 		</tr>
-		<tr><td colspan=2 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr>
-	</table>
+<?
+		if($IS_COMMSUITE){
+			?> <tr><td colspan=3 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr> <?
+		} else {
+			?> <tr><td colspan=3 style="padding: 10px;">Enter the 10-digit direct-dial phone number where you are currently located.</td><tr> <?
+		}
+?>
+		</table>
 
 <?
 endWindow();
