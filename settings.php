@@ -123,7 +123,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 							QuickUpdate("update jobtype set name = '$name' , systempriority='$systempriority' where id = $id");
 					}
 				}
-
+				$custname= DBSafe(GetFormData($f, $s, 'custdisplayname'));
+				if($custname != "" || $custname != $_SESSION['custname']){
+					$query="UPDATE customer SET name='$custname'
+							WHERE id='" . DBSafe($USER->customerid) . "'";
+					QuickUpdate($query);
+					$_SESSION['custname']=$custname;
+				}
 				setSetting('retry', GetFormData($f, $s, 'retry'));
 				setSetting('callerid', Phone::parse(GetFormData($f, $s, 'callerid')));
 
@@ -151,8 +157,10 @@ if( $reloadform )
 	ClearFormData($f);
 
 	//check for new setting name/desc from settings.php
-
-	PutFormData($f,$s,"retry",getSetting('retry'),"number","5","240");
+	
+	$custname= QuickQuery("Select name from customer where id = '" . DBSafe($USER->customerid) . "'");
+	PutFormData($f, $s,"custdisplayname", $custname, 'text', 0, 50);
+	PutFormData($f,$s,"retry",getSetting('retry'),"number",5,240);
 	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 0, 20);
 
 	PutFormData($f, $s, "defaultareacode", getSetting('defaultareacode'), 'number',200,999);
@@ -253,6 +261,13 @@ startWindow('Global System Settings');
 						</table>
 					</td>
 				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Customer Display Name <br>
+					</th>
+					<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 20, 50);  ?></td>
+				<tr>
+						
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Retry Setting:<br><? print help('Settings_RetrySetting', NULL, 'grey'); ?></th>
 					<td>
