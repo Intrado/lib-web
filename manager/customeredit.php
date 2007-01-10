@@ -5,6 +5,7 @@ include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
 include_once("../obj/Phone.obj.php");
+include_once("AspAdminUser.obj.php");
 
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
@@ -14,6 +15,7 @@ if (isset($_GET['id'])) {
 $f = "customer";
 $s = "edit";
 $currentid = $_SESSION['currentid'];
+$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",
@@ -60,6 +62,7 @@ if(CheckFormSubmit($f,$s)) {
 			$autoemail = GetFormData($f, $s, 'autoemail');
 			$renewaldate = GetFormData($f, $s, 'renewaldate');
 			$callspurchased = GetFormData($f, $s, 'callspurchased');
+			$managerpassword = GetFormData($f, $s, 'managerpassword');
 
 			$currmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4);
 			$currmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2);
@@ -70,6 +73,8 @@ if(CheckFormSubmit($f,$s)) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if (strlen($inboundnumber) > 0 && !ereg("[0-9]{10}",$inboundnumber)) {
 				error('Bad Toll Free Number Format, Try Again');
+			} else if(!$accountcreator->runCheck($managerpassword)) {
+				error('Bad Manager Password');
 			} else {
 				$query="UPDATE customer SET name='" . DBSafe($displayname) . "',
 						hostname='" . DBSafe($hostname) . "',
@@ -177,6 +182,7 @@ NewFormItem($f, $s,"", 'submit');
 <?
 
 NewFormItem($f, $s,"", 'submit');
+?><p>Manager Password: </td><td><? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?><p><?
 EndForm();
 
 if(isset($ERRORS) && is_array($ERRORS)) {
