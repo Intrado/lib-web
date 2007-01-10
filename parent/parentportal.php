@@ -186,12 +186,14 @@ function updatePhonesEmails($phonelist, $emaillist, $editphonecount, $editemailc
 		if($count < count($phonelist)) {
 			$phonelist[$count]->phone = Phone::parse($editphone);
 			$phonelist[$count]->update();
+			$phonelock = $phonelock . " OR id = '" . DBSafe($phonelist[$count]->id) . "'";
 		} else {
 			$phone = new Phone;
 			$phone->phone = Phone::parse($editphone);
 			$phone->personid = $id;
 			$phone->sequence = $count;
 			$phone->update();
+			$phonelock = $phonelock . " OR id = '" . DBSafe($phone->id) . "'";
 		}
 	}
 	for($count=0;$count < $emaileditmax;$count++) {
@@ -199,37 +201,50 @@ function updatePhonesEmails($phonelist, $emaillist, $editphonecount, $editemailc
 		if($count < count($emaillist)) {
 			$emaillist[$count]->email = $editemail;
 			$emaillist[$count]->update();
+			$emaillock = $emaillock . " OR id = '" . DBSafe($emaillist[$count]->id) . "'";
 		} else {
 			$email = new Email;
 			$email->email = $editemail;
 			$email->personid = $id;
 			$email->sequence = $count;
 			$email->update();
+			$emaillock = $emaillock . " OR id = '" . DBSafe($email->id) . "'";
 		}
 	}
 	if($newphone=GetFormData($f, $s, "newphone")) {
 		if($editphonecount < count($phonelist)) {
 			$phonelist[$editphonecount]->phone = $newphone;
 			$phonelist[$editphonecount]->update();
+			$phonelock = $phonelock . " OR id = '" . DBSafe($phonelist[$editphonecount]->id)."'";
 		} else {
 			$phone = new Phone;
 			$phone->personid = $id;
 			$phone->phone = Phone::parse($newphone);
 			$phone->sequence = $editphonecount;
 			$phone->update();
+			$phonelock = $phonelock . " OR id = '" . DBSafe($phone->id) . "'";
 		}
 	}
 	if($newemail=GetFormData($f, $s, "newemail")) {
 		if($editemailcount < count($emaillist)) {
 			$emaillist[$editemailcount]->email = $newemail;
 			$emaillist[$editemailcount]->update();
+			$emaillock = $emaillock . " OR id = '" . DBSafe($emaillist[$editemailcount]->id) . "'";
 		} else {
 			$email = new Email;
 			$email->personid = $id;
 			$email->email = $newemail;
 			$email->sequence = $editemailcount;
 			$email->update();
+			$emaillock = $emaillock . " OR id = '" . DBSafe($emaillist[$editemailcount]->id) . "'";
 		}
+	}
+	
+	if($phonelock){
+		QuickUpdate("UPDATE phone SET editlock='1' WHERE 1 AND (0 $phonelock )");
+	}
+	if($emaillock){
+		QuickUpdate("UPDATE email SET editlock='1' WHERE 1 AND (0 $emaillock )");
 	}
 }
 ?>
