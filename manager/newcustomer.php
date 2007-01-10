@@ -47,14 +47,14 @@ if (CheckFormSubmit($f,$s)){
 			$hostname = GetFormData($f, $s, "hostname");
 			$inboundnum = GetFormData($f, $s, "inboundnumber");
 			$cust_pass = GetFormData($f, $s, "password");
-			$code = GetFormData($f, $s, "code");
+			$managerpassword = GetFormData($f, $s, "managerpassword");
 	
 			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."'")) {
 				error('URL Path Already exists', 'Please Enter Another');
-			} else if(!$accountcreator->runCheck($code)) {
-				error('Bad Code');
+			} else if(!$accountcreator->runCheck($managerpassword)) {
+				error('Bad Manager Password');
 			} else if ($cust_pass != GetFormData($f,$s,"password2")) {
 				error('Password and Confirmation Password do not match', 'Try Again');
 			} else if (strlen($inboundnum) > 0 && !ereg("[0-9]{10}",$inboundnum)) {
@@ -193,7 +193,7 @@ NewFormItem($f, $s,"", 'submit');
 <?
 
 NewFormItem($f, $s,"", 'submit');
-?><p>Manager Code: </td><td><? NewFormItem($f, $s, 'code', 'password', 25); ?><p><?
+?><p>Manager Password: </td><td><? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?><p><?
 EndForm();
 
 if(isset($ERRORS) && is_array($ERRORS)) {
