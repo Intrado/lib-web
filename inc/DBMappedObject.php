@@ -86,7 +86,7 @@ class DBMappedObject {
 				. $this->getFieldList(false, $specificfields) . ") "
 				."values (" . $this->getValueList($specificfields) . ")";
 		$this->_lastsql = $query;
-		if ($result = mysql_query($query)) {
+		if ($result = Query($query)) {
 			$this->id = mysql_insert_id();
 		} else {
 			return false;
@@ -112,8 +112,8 @@ class DBMappedObject {
 				." from " . $this->_tablename
 				." where id='" . mysql_real_escape_string($this->id) . "'";
 		$this->_lastsql = $query;
-		if ($result = mysql_query($query)) {
-			if ($row = mysql_fetch_row($result)) {
+		if ($result = Query($query)) {
+			if ($row = DBGetRow($result)) {
 				foreach ($this->_fieldlist as $index => $name) {
 					if ($this->_allownulls && $row[$index] === NULL)
 						$this->$name = NULL;
@@ -189,7 +189,7 @@ class DBMappedObject {
 			$query .= implode(",", $list);
 			$query .= " where id='" . mysql_real_escape_string($this->id) . "'";
 			$this->_lastsql = $query;
-			if ($result = mysql_query($query)) {
+			if ($result = Query($query)) {
 				if (mysql_affected_rows())
 					$isupdated = true;
 			}
@@ -227,7 +227,7 @@ class DBMappedObject {
 			$query = "delete from " . $this->_tablename
 					." where id='" . mysql_real_escape_string($this->id) . "'";
 			$this->_lastsql = $query;
-			mysql_query($query);
+			Query($query);
 			$this->id = 0;
 		}
 	}
@@ -294,7 +294,7 @@ function DBFindMany ($classname, $query, $alias = false) {
 	$many = array();
 
 	$query = "select " . DBMappedObject::getFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
-	if ($result = mysql_query($query)) {
+	if ($result = Query($query)) {
 		while($row = DBGetRow($result)) {
 			$newobj = new $classname();
 
@@ -318,7 +318,7 @@ function DBFind ($classname, $query, $alias = false) {
 	$newobj = new $classname();
 
 	$query = "select " . DBMappedObject::getFieldList(true,$newobj->_fieldlist,$alias) ." ". $query;
-	if ($result = mysql_query($query)) {
+	if ($result = Query($query)) {
 		if ($row = DBGetRow($result)) {
 			$newobj->id = $row[0];
 			foreach ($newobj->_fieldlist as $index => $field) {
