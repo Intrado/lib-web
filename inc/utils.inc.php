@@ -194,4 +194,10 @@ function isSequential($number){
 	return $isseq;
 }
 
+//returns an adapted url safe base64 string.
+function base64url_encode($data)
+{
+	return rtrim(strtr(base64_encode($data), '+/', '-_'),"=");
+}
+
 ?>
