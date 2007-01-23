@@ -30,6 +30,9 @@ if(isset($_GET['name']))
 	$_SESSION['reportname'] = get_magic_quotes_gpc() ? stripslashes($_GET['name']) : $_GET['name'];
 
 if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_archived'])) {
+
+	$_SESSION['reportjobid']; //reset the jobid in case this isn't a job report
+
 	//get all the report options and store in session as SQL
 	switch ($_GET['reporttype']) {
 		default:
@@ -47,6 +50,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 
 			if (userOwns("job",$jobid) || (customerOwnsJob($jobid) && $USER->authorize('viewsystemreports'))) {
 				$_SESSION['reportsql'] = "and j.id='$jobid'" ;
+				$_SESSION['reportjobid'] = $jobid;
 			} else {
 				$jobid = QuickQuery("select max(id) from job where userid=$USER->id");
 				$_SESSION['reportsql'] = "and j.id='$jobid'" ;
@@ -355,7 +359,10 @@ select SQL_CALC_FOUND_ROWS
 			wi.status) as result,
 	wi.status,
 	j.maxcallattempts,
-	u.login, j.name
+	u.login,
+	j.name,
+	cl.resultdata,
+	sec.resultdata
 
 	from 		person p
 	inner join jobworkitem wi on (p.id = wi.personid)
@@ -375,6 +382,7 @@ select SQL_CALC_FOUND_ROWS
 					(a.id=jt.addressid and wi.type='print')
 	left join	message m on
 					(m.id = wi.messageid)
+	left join	surveyemailcode sec on (sec.jobworkitemid = wi.id and j.type='survey' and wi.type='email')
 
 	where 1
 		$userJoin
@@ -401,7 +409,25 @@ if ($_GET['csv']) {
 
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-	echo '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Max Attempts","Last Attempt","Last Result"' . "\r\n";
+
+	$issurvey = false;
+	if ($_SESSION['reportjobid']) {
+		$job = new Job($_SESSION['reportjobid']);
+		if ($job->questionnaireid) {
+			$issurvey = true;
+			$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
+		}
+	}
+
+
+	//generate the CSV header
+	echo '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Max Attempts","Last Attempt","Last Result"';
+	if ($issurvey) {
+		for ($x = 1; $x <= $numquestions; $x++) {
+			echo ",Question $x";
+		}
+	}
+	echo "\r\n";
 
 	$result = Query($detailquery);
 
@@ -419,7 +445,27 @@ if ($_GET['csv']) {
 		}
 		$row[8] = fmt_result($row,8);
 
-		echo '"' . implode('","', array($row[12],$row[11],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[10],$row[7],$row[8])) . '"' . "\r\n";
+
+		$reportarray = array($row[12],$row[11],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[10],$row[7],$row[8]);
+
+		if ($issurvey) {
+			//fill in survey result data, be sure to fill in an array element for all questions, even if blank
+			$startindex = count($reportarray);
+
+			$questiondata = array();
+			if ($row[3] == "phone")
+				parse_str($row[13],$questiondata);
+			else if ($row[3] == "email")
+				parse_str($row[14],$questiondata);
+
+			//add data to the report for each question
+			for ($x = 0; $x < $numquestions; $x++) {
+				$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
+			}
+		}
+
+
+		echo '"' . implode('","', $reportarray) . '"' . "\r\n";
 	}
 
 
