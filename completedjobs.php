@@ -4,6 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
 include_once("obj/Job.obj.php");
+include_once("obj/SurveyQuestionnaire.obj.php");
 include_once("obj/Schedule.obj.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
@@ -74,6 +75,22 @@ if ($total == 0) {
 	$jobs = DBFindMany("Job", "from job where id in ($jobidlist) order by finishdate desc");
 }
 
+function getJobTypes($job) {
+	$types = array();
+		if ($job->type == "survey") {
+			$questionnaire = new SurveyQuestionnaire($job->questionnaireid);
+
+			if ($questionnaire->hasphone)
+				$types[] = "phone";
+			if ($questionnaire->hasweb)
+				$types[] = "email";
+		} else {
+			if ($job->type)
+				$types = explode(",",$job->type);
+	}
+	return $types;
+}
+
 function fmt_job_owner ($obj, $name) {
 	static $users = array();
 	if (isset($users[$obj->userid])) {
@@ -87,9 +104,8 @@ function fmt_job_owner ($obj, $name) {
 
 function fmt_total ($obj, $name) {
 	global $jobstats;
-
 	$total = "";
-	foreach (explode(",",$obj->type) as $type)
+	foreach (getJobTypes($obj) as $type)
 		$total .= ucfirst($type) . ": " . $jobstats[$obj->id][$type]['total'] . "<br>";
 	return $total;
 }
@@ -97,9 +113,16 @@ function fmt_rate ($obj, $name) {
 	global $jobstats;
 
 	$rate = "";
-	foreach (explode(",",$obj->type) as $type)
+	foreach (getJobTypes($obj) as $type)
 		$rate .= ucfirst($type) . ": " . sprintf("%0.2f",$jobstats[$obj->id][$type]['rate']) . "%<br>";
 	return $rate;
+}
+
+function fmt_jobtype ($obj,$name) {
+	if ($obj->type == "survey")
+		return "Survey";
+	else
+		return "Notification";
 }
 
 $titles = array ("Owner" => "Submitted by",
@@ -112,7 +135,7 @@ $titles = array ("Owner" => "Submitted by",
 				"enddate" => 'End Date',
 				"Actions" => 'Actions');
 $formatters = array(
-				"type" => "fmt_obj_csv_list",
+				"type" => "fmt_jobtype",
 				"Owner" => 'fmt_job_owner',
 				"startdate" => 'fmt_job_startdate',
 				"status" => "fmt_ucfirst",

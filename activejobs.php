@@ -66,6 +66,14 @@ while ($row = DBGetRow($result)) {
 }
 
 
+function fmt_job_type ($row,$index) {
+	if ($row[18] == "survey")
+		return "Survey";
+	else
+		return "Notification";
+}
+
+
 function fmt_total ($row, $index) {
 	$data = array();
 
@@ -103,7 +111,7 @@ $titles = array(
 				"12" => 'Scheduled Start',
 				"13" => 'Actions');
 $formatters = array(
-				"18" => "fmt_csv_list",
+				"18" => "fmt_job_type",
 				"2" => 'fmt_status_index',
 				"3" => 'fmt_total',
 				"9" => 'fmt_remaining',
