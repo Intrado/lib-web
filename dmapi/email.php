@@ -7,7 +7,7 @@ include_once("notifications.inc.php");
 
 if ($REQUEST_TYPE == "new") {
 
-	$foundid = assignTask("phone",$RESOURCEID, $dmapidb);
+	$foundid = assignTask("email",$RESOURCEID,$dmapidb);
 	if ($foundid) {
 		//we assigned one, now grab it from the DB and send it out
 
@@ -20,41 +20,20 @@ if ($REQUEST_TYPE == "new") {
 		$messagedata = $row[0];
 		mysql_free_result($res);
 
-		//add the sessionid to the voice tag
-		echo str_replace("<voice>","<voice sessionid=\"$foundid\">",$messagedata);
+		//add the sessionid to the email tag
+		echo str_replace("<email>","<email sessionid=\"$foundid\">",$messagedata);
 
 	} else {
 ?>
 		<notask />
 <?
 	}
-} else if ($REQUEST_TYPE == "continue") {
-?>
-	<voice sessionid="<?= $SESSIONID ?>">
-		<message name="hangup">
-			<hangup />
-		</message>
-	</voice>
-<?
-} else {
+} else if ($REQUEST_TYPE == "result") {
 
 	//now we should update the task info with the results
 
-	$cpcodes = array("answered" => "A",
-					"machine" => "M",
-					"failed" => "F",
-					"busy" => "B",
-					"noanswer" => "N",
-					"trunkbusy" => "F",
-					);
+	//TODO read and do something with the email sent=true|false info, for now just don't report on it
 
-	if (isset($cpcodes[$BFXML_VARS['callprogress']])) {
-		$callprogress = $cpcodes[$BFXML_VARS['callprogress']];
-	} else {
-		$callprogress = "F";
-	}
-
-	$callduration = $BFXML_VARS['callduration'] + 0;
 	$resultdata = mysql_real_escape_string(http_build_query($BFXML_VARS,'','&'),$dmapidb);
 
 	//try to find this sessionid first
@@ -63,9 +42,8 @@ if ($REQUEST_TYPE == "new") {
 	$row = mysql_fetch_row($res);
 	if ($row[0]) {
 
-		$query = "update jobtaskactive set
-				callprogress='$callprogress', resultdata='$resultdata', duration='$callduration',
-				status='done' where id='" . mysql_real_escape_string($SESSIONID,$dmapidb) . "'";
+		$query = "update jobtaskactive set resultdata='$resultdata', status='done' "
+				. "where id='" . mysql_real_escape_string($SESSIONID,$dmapidb) . "'";
 		$res = mysql_query($query);
 		$rowsaffected = mysql_affected_rows();
 		if ($rowsaffected != 1) {
@@ -80,6 +58,8 @@ if ($REQUEST_TYPE == "new") {
 <?
 	}
 
+} else {
+	//no continue requests for email
 }
 
 $SESSIONID = NULL; //tell session machine we dont need to store session data

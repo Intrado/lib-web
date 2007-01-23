@@ -54,7 +54,7 @@ if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 
 	//rotate log?
 
-	if (filesize("output.txt") > 1000000000) {
+	if (file_exists("output.txt") && filesize("output.txt") > 1000000000) {
 		if (file_exists("output.txt.1"))
 			unlink("output.txt.1");
 		rename("output.txt","output.txt.1");

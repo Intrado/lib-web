@@ -30,3 +30,12 @@ CREATE TABLE IF NOT EXISTS  `sessiondata` (
   PRIMARY KEY  (`id`),
   KEY `lastused` (`lastused`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+-- for survey stuff
+ALTER TABLE `jobtaskactive` ADD `personid` INT NOT NULL AFTER `jobworkitemid` ;
+
+ALTER TABLE `jobtaskactive` ADD `issurvey` TINYINT NOT NULL DEFAULT '0' AFTER `status` ;
+
+

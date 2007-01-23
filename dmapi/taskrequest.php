@@ -44,7 +44,7 @@ $RESOURCEID = $BFXML_ELEMENT['attrs']['RESOURCEID'];
 //var_dump($BFXML_ELEMENT);
 
 //is this a new task request?
-if ($REQUEST_TYPE) {
+if ($REQUEST_TYPE) { //TODO also check for new request type
 	switch($BFXML_ELEMENT['attrs']['TYPE']) {
 		case "voice":
 			forwardToPage("phoneoutbound.php");
