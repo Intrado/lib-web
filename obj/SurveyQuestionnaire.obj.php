@@ -12,14 +12,17 @@ class SurveyQuestionnaire extends DBMappedObject {
 	var $emailmessageid;
 	var $intromessageid;
 	var $exitmessageid;
+	var $webpagetitle;
+	var $webexitmessage;
 	var $deleted = 0;
+	var $usehtml = 0;
 
 	function SurveyQuestionnaire ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "surveyquestionnaire";
 		$this->_fieldlist = array("userid", "name", "description", "hasphone", "hasweb",
 			"dorandomizeorder", "machinemessageid", "emailmessageid","intromessageid",
-			"exitmessageid", "deleted");
+			"exitmessageid", "webpagetitle", "webexitmessage", "usehtml", "deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
