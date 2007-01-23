@@ -21,12 +21,13 @@ if ($SETTINGS['feature']['has_ssl']) {
 
 $badlogin = false;
 if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
+	$olduser = $_SESSION['user'];
 	$_SESSION = array();
 //	@session_destroy();
 //	@session_name($CUSTOMERURL . "_session");
 //	@session_start();
 	$login = DBSafe($_GET['login']);
-	$id = User::forceLogin($login,$CUSTOMERURL);
+	$id = User::forceLogin($login,$CUSTOMERURL,$olduser->customerid);
 
 	if ($id) {
 		$USER = $_SESSION['user'] = new User($id);
@@ -43,6 +44,7 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 } elseif (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 
 	$id = User::doLogin(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'], get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'],$CUSTOMERURL);
+
 	if ($id) {
 		$newuser = new User($id);
 		$newaccess = new Access($newuser->accessid);

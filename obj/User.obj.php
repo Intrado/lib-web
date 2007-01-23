@@ -60,18 +60,13 @@ class User extends DBMappedObject {
 
 	}
 
-	function forceLogin ($username, $url=null) {
+	function forceLogin ($username, $url, $customerid) {
 		$username = dbsafe($username);
+		$url = DBSafe($url);
+		$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.hostname='$url') "
+				."where u.enabled=1 and c.enabled=1 and u.deleted=0 and "
+				."login='$username' and c.id=$customerid";
 
-		if (isset($url)) {
-			$url = DBSafe($url);
-			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.hostname='$url') "
-					."where u.enabled=1 and c.enabled=1 and u.deleted=0 and "
-					."login='$username'";
-		} else {
-			$query = "select id from user where enabled=1 and deleted=0 and "
-					."login='$username'";
-		}
 		return QuickQuery($query);
 	}
 
