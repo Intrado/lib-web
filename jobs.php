@@ -103,7 +103,7 @@ $TITLE = "Notification Jobs";
 
 include_once("nav.inc.php");
 
-$data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='active' or status='cancelling') and deleted=0 order by id desc");
+$data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by id desc");
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
 					"type" => "Type",
@@ -121,7 +121,7 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Active and Pending Jobs ' . help('Jobs_MyActiveJobs', NULL, 'blue'), 'padding: 3px;', true, true);
+startWindow('My Active and Pending Notification Jobs ' . help('Jobs_MyActiveJobs', NULL, 'blue'), 'padding: 3px;', true, true);
 
 button_bar(button('createjob', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('easycall',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);") . help('Start_EasyCall') : ''));
 
@@ -132,7 +132,7 @@ endWindow();
 print '<br>';
 if ($USER->authorize('createrepeat')) {
 
-	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' order by foo,name desc");
+	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type != 'survey' order by foo,name desc");
 	$titles = array(	"name" => "#Name",
 						"description" => "#Description",
 						"type" => "Type",
@@ -145,7 +145,7 @@ if ($USER->authorize('createrepeat')) {
 	if (count($data) > $scrollThreshold) {
 		$scroll = true;
 	}
-	startWindow('My Repeating Jobs ' . help('Jobs_MyRepeatingJobs', NULL, 'blue'), 'padding: 3px;', true, true);
+	startWindow('My Repeating Notification Jobs ' . help('Jobs_MyRepeatingJobs', NULL, 'blue'), 'padding: 3px;', true, true);
 
 
 	button_bar(button('createrepeatjob', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
@@ -157,7 +157,7 @@ if ($USER->authorize('createrepeat')) {
 }
 
 
-$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and deleted = 0 order by finishdate desc");
+$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc");
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
 					"type" => "Type",
@@ -172,7 +172,7 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Completed Jobs ' . help('Jobs_MyCompletedJobs', NULL, 'blue'),'padding: 3px;', true, true);
+startWindow('My Completed Notification Jobs ' . help('Jobs_MyCompletedJobs', NULL, 'blue'),'padding: 3px;', true, true);
 showObjects($data, $titles, $formatters, $scroll, true);
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
