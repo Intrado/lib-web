@@ -998,13 +998,16 @@ j.id = wi.jobid and u.id = j.userid;
 
 
 
-
-
-
 ALTER TABLE `jobworkitem` ADD INDEX `assign` ( `status` , `type` , `systempriority` , `priority` ) ;
 
 
 ALTER TABLE `jobworkitem` ADD INDEX `assign2` ( `status` , `customerid` , `type` , `systempriority` , `priority` ) ;
 
 
+-- using dispatch for more than phone 1/3/2007
 
+ALTER TABLE `jobtaskactive` ADD `type` ENUM( 'phone', 'email', 'print' ) NOT NULL AFTER `status` ;
+
+ALTER TABLE `jobtaskactive` ADD `subtype` VARCHAR( 20 ) NOT NULL DEFAULT 'notification' AFTER `type` ;
+
+ALTER TABLE `jobtaskactive` CHANGE `phone` `phone` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL ;
