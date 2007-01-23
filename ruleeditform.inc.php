@@ -192,10 +192,10 @@ foreach ($fieldmaps as $fieldmap) {
 			}
 
 			$limit = DBFind('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $USER->id and fieldnum = '$fieldnum'");
-			//FIXME whats wrong with the SQL generating code in Rule.obj?
-			$limitsql = $limit ? "and value in ('" . implode("','", explode('|', $limit->val)) . "')" : NULL;
+			$limitsql = $limit ? $limit->toSQL(false,"value") : "";
 			$query = "select value from persondatavalues
 						where fieldnum='$fieldnum' and customerid='" . $USER->customerid . "' $limitsql order by value";
+
 			$values = QuickQueryList($query);
 			if (count($values) > 1) {
 				NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"selectmultiple",5,@array_combine($values,$values));
