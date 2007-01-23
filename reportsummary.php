@@ -6,6 +6,8 @@ require_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
 require_once("obj/Phone.obj.php");
+require_once("obj/SurveyQuestionnaire.obj.php");
+require_once("obj/SurveyQuestion.obj.php");
 require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
@@ -43,8 +45,57 @@ if ($jobid) {
 		$validstamp = time();
 		$jobstats = array ("validstamp" => $validstamp);
 
+		$jobtypes = explode(",",$job->type);
+
+		//--------------- SURVEY ---------------
+		if(in_array("survey",$jobtypes) !== false) {
+
+			$questionnaire = new SurveyQuestionnaire($job->questionnaireid);
+			if ($questionnaire->hasphone)
+				$jobtypes[] = "phone";
+			if ($questionnaire->hasweb)
+				$jobtypes[] = "email";
+
+
+			//stats:
+
+			//% people participated (subset of contacted)
+			$query = "select count(*) as cnt
+						from jobworkitem wi inner join jobtask jt on
+								(jt.jobworkitemid = wi.id)
+						inner join	calllog cl on
+								(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
+						where wi.jobid='$jobid'
+						and wi.status='success' and cl.callprogress='A' and cl.participated=1";
+			$phoneparticipants = QuickQuery($query);
+
+
+			$query = "select count(*) from surveyemailcode sec
+					inner join jobworkitem wi on (sec.jobworkitemid = wi.id)
+					where sec.isused=1 and wi.jobid=$jobid";
+
+			$emailparticipants = QuickQuery($query);
+
+			$query = "select sr.questionnumber, sr.answer, sr.tally, sq.reportlabel from surveyresponse sr left join surveyquestion sq on (sr.questionnumber = sq.questionnumber and sq.questionnaireid=$questionnaire->id) where sr.jobid=$jobid order by questionnumber, answer";
+			$res = Query($query);
+			echo mysql_error();
+
+			$questions = array();
+			while ($row = DBGetRow($res)) {
+				$questions[$row[0]]['answers'][$row[1]] = $row[2];
+				$questions[$row[0]]['label'] = $row[3] != NULL ? $row[3] : ("Question " . ($row[0] + 1));
+			}
+
+			$jobstats['survey'] = array();
+			$jobstats['survey']['phoneparticipants'] = $phoneparticipants;
+			$jobstats['survey']['emailparticipants'] = $emailparticipants;
+			$jobstats['survey']['questions'] = $questions;
+		}
+		//-------------------------------------
+
+
 		//--------------- PHONE ---------------
-		if(strpos($job->type,"phone") !== false) {
+		if(in_array("phone",$jobtypes) !== false) {
 			//people, dupes, contacted, notcontacted, %complete (actually from phone)
 
 			$query = "select count(*) as cnt, status
@@ -69,7 +120,7 @@ if ($jobid) {
 			}
 
 			//phones by cp
-			$query = "select count(*) as cnt, cl.callprogress, sum(wi.status not in ('success','fail') and jt.numattempts < 3) as remaining
+			$query = "select count(*) as cnt, cl.callprogress, sum(wi.status not in ('success','fail') and jt.numattempts < $job->maxcallattempts) as remaining
 						from jobworkitem wi inner join jobtask jt on
 								(jt.jobworkitemid = wi.id)
 						left join	calllog cl on
@@ -116,7 +167,7 @@ if ($jobid) {
 		//-------------------------------------
 
 		//--------------- EMAIL ---------------
-		if(strpos($job->type,"email") !== false) {
+		if(in_array("email",$jobtypes) !== false) {
 			//email people, emails, % sent
 			$query = "select count(*)
 						from jobworkitem wi
@@ -141,7 +192,7 @@ if ($jobid) {
 		//-------------------------------------
 
 		//--------------- PRINT ---------------
-		if(strpos($job->type,"print") !== false) {
+		if(in_array("print",$jobtypes) !== false) {
 			//print people %sent
 			$query = "select count(*) as totoal, sum(wi.status='success') as printed
 						from jobworkitem wi
@@ -221,36 +272,93 @@ if ($jobid && $isprocessing) {
 
 	//--------------- Summary ---------------
 	startWindow("Report Summary", NULL, false);
-	?>
+?>
 
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<? if (isset($jobstats["phone"])) { ?>
+<? if (isset($jobstats["phone"])) { ?>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Phone:</th>
 			<td class="bottomBorder"><img src="graph_summary_contacted.png.php?<?= $urloptions ?>"><img src="graph_summary_completed.png.php?<?= $urloptions ?>"></td>
 		</tr>
-	<? } ?>
+<? } ?>
 
-	<? if (isset($jobstats["email"])) { ?>
+<? if (isset($jobstats["email"])) { ?>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Email:</th>
 			<td class="bottomBorder"><img src="graph_summary_email.png.php?<?= $urloptions ?>"></td>
 		</tr>
-	<? } ?>
+<? } ?>
 
 
 	</table>
 
-
-
-	<?
+<?
 	endWindow();
+
+if (isset($jobstats['survey'])) {
+	echo "<br>";
+//--------------- Survey ---------------
+	startWindow("Survey Results", NULL, false);
+?>
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Participation</th>
+			<td class="bottomBorder">
+<? if ($jobstats['survey']['phoneparticipants'] || $jobstats['survey']['emailparticipants']) { ?>
+				<img src="graph_survey_participation.png.php?<?= $urloptions ?>">
+<? } else { ?>
+				No one has yet participated in this survey.
+<? } ?>
+			</td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Responses</th>
+			<td class="bottomBorder">
+<? if (count($jobstats['survey']['questions'])) { ?>
+
+			<div id="surveyquestion_graph"><a href="#" onclick="hide('surveyquestion_graph'); show('surveyquestion_table');">Show Table</a><br><img src="graph_survey_questions.png.php?<?= $urloptions ?>"></div>
+
+
+			<div id="surveyquestion_table" style="display: none;"><a href="#" onclick="hide('surveyquestion_table'); show('surveyquestion_graph');">Show Graphs</a>
+			<table width="100%" cellpadding="3" cellspacing="1" class="list">
+<?
+			$titles = array("Question");
+			for ($x = 1; $x <= 9; $x++)
+				$titles[] = " #$x";
+			$titles[10] = "Total";
+
+			$data = array();
+			foreach ($jobstats['survey']['questions'] as $question) {
+				$line = array_fill(1,9,"");
+				$line[0] = $question['label'];
+				foreach ($question['answers'] as $answer => $tally) {
+					$line[$answer] = $tally;
+				}
+				$line[10] = array_sum($line);
+				$data[] = $line;
+			}
+
+			showtable($data,$titles,array());
+
+
+?>
+			</table>
+			</div>
+
+
+<? } ?>
+			</td>
+		</tr>
+	</table>
+<?
+	endWindow();
+}
 	echo "<br>";
 	//--------------- Detail ---------------
 	startWindow("Report Detail", NULL, false);
-	?>
+?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<? if (isset($jobstats["phone"])) { ?>
+<? if (isset($jobstats["phone"])) { ?>
 
 	<!--
 		<tr>
@@ -283,9 +391,9 @@ if ($jobid && $isprocessing) {
 			<td class="bottomBorder" align="left"><img src="graph_detail_callprogress.png.php?<?= $urloptions ?>"></td>
 		</tr>
 
-	<? } ?>
+<? } ?>
 
-	<? if (isset($jobstats["email"])) { ?>
+<? if (isset($jobstats["email"])) { ?>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Email:</th>
 			<td class="bottomBorder" >
@@ -296,7 +404,7 @@ if ($jobid && $isprocessing) {
 			</td>
 			<td class="bottomBorder" align="left"><img src="graph_summary_email.png.php?<?= $urloptions ?>"></td>
 		</tr>
-	<? } ?>
+<? } ?>
 
 		<tr>
 			<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Contact Log:</th>
@@ -306,7 +414,7 @@ if ($jobid && $isprocessing) {
 
 	</table>
 
-	<?
+<?
 	endWindow();
 }
 
