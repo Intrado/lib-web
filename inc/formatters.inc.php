@@ -340,4 +340,22 @@ function fmt_nextrun ($obj, $name) {
 	return $nextrun;
 }
 
+function fmt_questionnairetype ($obj,$name) {
+	$types = array();
+	if ($obj->hasphone)
+		$types[] = "Phone";
+	if ($obj->hasweb)
+		$types[] = "Web";
+	return implode(" &amp; ", $types);
+}
+
+function fmt_surveytype ($obj,$name) {
+	$questionnaire = new SurveyQuestionnaire($obj->questionnaireid);
+	return fmt_questionnairetype($questionnaire,"type");
+}
+
+function fmt_numquestions ($obj,$name) {
+	return QuickQuery("select count(*) from surveyquestion where questionnaireid=$obj->id");
+}
+
 ?>
