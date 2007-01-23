@@ -104,6 +104,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("viewsystemactive", (bool)GetFormData($form, $section, 'viewsystemactive'));
 			$accss->setPermission("viewsystemrepeating", (bool)GetFormData($form, $section, 'viewsystemrepeating'));
 			$accss->setPermission("viewsystemcompleted", (bool)GetFormData($form, $section, 'viewsystemcompleted'));
+			$accss->setPermission("survey", (bool)GetFormData($form, $section, 'survey'));
 
 			$_SESSION['accessid'] = $accss->id;
 
@@ -168,7 +169,8 @@ if( $reloadform )
 				array("managetasks","bool",0,1),
 				array("viewsystemactive","bool",0,1),
 				array("viewsystemrepeating","bool",0,1),
-				array("viewsystemcompleted","bool",0,1));
+				array("viewsystemcompleted","bool",0,1),
+				array("survey","bool",0,1));
 
 	foreach($permissions as $field) {
 		PutFormData($form, $section, $field[0], $accss->getValue($field[0]),$field[1],$field[2],$field[3]);
@@ -335,6 +337,10 @@ startWindow('Allowed Functions');
 				<tr>
 					<td><? NewFormItem($form,$section,"createrepeat","checkbox"); ?></td>
 					<td>Create Repeating Jobs</td>
+				</tr>
+				<tr>
+					<td><? NewFormItem($form,$section,"survey","checkbox"); ?></td>
+					<td>Create Survey Jobs</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form,$section,"setcallerid","checkbox"); ?></td>
