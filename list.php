@@ -295,6 +295,7 @@ include("ruleeditform.inc.php");
 <?
 if ($list->id) {
 	$renderedlist->mode = "add";
+	$renderedlist->hasstats = false;//reset the totals stats
 //	$renderedlist->pagelimit = -1;
 	$doscrolling = true;
 	$showpagemenu = true;
