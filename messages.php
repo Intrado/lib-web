@@ -40,15 +40,17 @@ if (isset($_GET['delete'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_actions ($obj,$name) {
-
-	$query = "select mp.audiofileid, count(*) as cnt, mp.type, mp.id
-				from message m, messagepart mp
-				where m.id=mp.messageid
-				and m.id='" . DBSafe($obj->id) . "'
-				group by m.id
-				having cnt = 1 and mp.type='A' ";
-	$audiofileid = QuickQuery($query);
-
+	if ($obj->type == "phone") {
+		$query = "select mp.audiofileid, count(*) as cnt, mp.type, mp.id
+					from message m, messagepart mp
+					where m.id=mp.messageid
+					and m.id='" . DBSafe($obj->id) . "'
+					group by m.id
+					having cnt = 1 and mp.type='A' ";
+		$audiofileid = QuickQuery($query);
+	} else {
+		$audiofileid = null;
+	}
 
 
 	$simpleplaybtn = button("play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 350);");
