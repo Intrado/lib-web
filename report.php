@@ -481,7 +481,7 @@ if ($_GET['csv']) {
 	$PAGE = "reports:view";
 	$TITLE = ($_SESSION['reportname'] != "" ? $_SESSION['reportname'] : "Custom Report");
 
-	$DESCRIPTION = $_SESSION['reportdesc'] . $_SESSION['reportrange'];
+	$DESCRIPTION = $_SESSION['reportdesc'] ." - ". $_SESSION['reportrange'];
 	/*
 	Show this info if:
 	1. The user running the report is different than the user that owns the job.
