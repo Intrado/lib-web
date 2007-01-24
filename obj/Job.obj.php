@@ -61,7 +61,7 @@ class Job extends DBMappedObject {
 		$job->jobtypeid = end($VALIDJOBTYPES)->id;
 
 		//call settings
-		$job->maxcallattempts = min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","3"));
+		$job->maxcallattempts = min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4"));
 		if (getSystemSetting('retry') != "")
 			$job->setOptionValue("retry",getSystemSetting('retry'));
 
