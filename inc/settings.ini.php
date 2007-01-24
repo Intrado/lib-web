@@ -2,9 +2,9 @@
 
 [db]
 persistent=true
-host="localhost:3307"
-user="sharpteeth"
-pass="sharpteeth202"
+host="localhost:3306"
+user="root"
+pass=""
 db="dialerasp"
 
 
@@ -30,6 +30,9 @@ db="dialerasp"
 is_commsuite=false
 has_ssl=true
 force_ssl=false
+log_dir="/commsuite/logs/import_log.txt"
+log_dir2="/commsuite/logs/import_log2.txt"
+
 
 [content]
 ; format is "host,port,path;host2,port2,path2;..." reserved chars= ';' and ','
@@ -49,6 +52,10 @@ ftpport=21
 ftpuser=anonymous
 ftppass=anonymous
 
+[ldap]
+is_ldap=false
+ldapconnect="192.168.174.2"
+ldapextension="@adtest.net"
 
 
 
