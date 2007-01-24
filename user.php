@@ -63,17 +63,24 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 	}
 	else
 	{
+		$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast 5 characters.";
+
 		MergeSectionFormData($f, $s);
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
+		$usr = new User($_SESSION['userid']);
 
 		// If a user has also submitted dataview rules then prepare an error message in case
 		//	those rules get lost, which is what happens when there is an error() call below.
 		if (GetFormData($f, $s, "newrulefieldnum") != "" && GetFormData($f, $s, "newrulefieldnum") != -1) {
 			$extraMsg = " - You will also need to choose your data view rules again";
 		}
-		// do check
+				// do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
+		} elseif( !GetFormData($f,$s,'ldap')&& (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
+			error('You must enter a password');
+		} elseif(!GetFormData($f,$s,'ldap') && (GetFormData($f, $s, 'password') == '00000000') && $usr->ldap && $IS_LDAP) {
+			error('You must enter a password');
 		} elseif( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match' . $extraMsg);
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
@@ -93,24 +100,24 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
-		} elseif(($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password'))){
-			error($iscomplex);
-		} elseif($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) {
-			error($issame);
+		} elseif(($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f,$s,'ldap')){
+			error($iscomplex, $securityrules);
+		} elseif($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !GetFormData($f,$s,'ldap')) {
+			error($issame, $securityrules);
 		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code cannot be the same');
 		} elseif((strlen(GetFormData($f, $s, 'accesscode')) < 4 || strlen(GetformData($f, $s, 'pincode')) < 4) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code must have length greater than 4.');
 		} elseif ((!ereg("^[0-9]*$", GetFormData($f, $s, 'accesscode')) || !ereg("^[0-9]*$", GetformData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code must all be numeric');
-		} elseif((isAllSameDigit(GetFormData($f, $s, 'accesscode')) || isAllSameDigit(GetFormData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== "")) 
+		} elseif((isAllSameDigit(GetFormData($f, $s, 'accesscode')) || isAllSameDigit(GetFormData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))
 					&& (!ereg("^0*$", $number))){
 			error('User ID and Pin code cannot have all the same digits');
-		} elseif(isSequential(GetFormData($f, $s, 'pincode'))) {
+		} elseif(isSequential(GetFormData($f, $s, 'pincode')) && !$IS_COMMSUITE) {
 			error('Cannot have sequential numbers for User ID or Pin code');
 		} else {
 			// Submit changes
-			$usr = new User($_SESSION['userid']);
+			
 			if ($usr->id == NULL) {
 				$usr->enabled = 1;
 			}
@@ -118,6 +125,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			PopulateObject($f,$s,$usr,array("accessid","login","accesscode","firstname","lastname","email"));
 			$usr->customerid = $USER->customerid;
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
+			if($IS_LDAP){
+				if(GetFormData($f, $s, "ldap")) {
+					$usr->ldap=1;
+				} else {
+					$usr->ldap=0;
+				}
+			}
 			$usr->update();
 
 			QuickUpdate("delete from userjobtypes where userid = $usr->id");
@@ -127,11 +141,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 
 			$_SESSION['userid'] = $usr->id;
 
-			// If the password is all 0 characters then it was a default form value, so ignore it
-			$password = GetFormData($f, $s, 'password');
-			if (!ereg("^0*$", $password)) {
-				$usr->setPassword($password);
+			if((!$usr->ldap && $IS_LDAP) || !$IS_LDAP){
+				// If the password is all 0 characters then it was a default form value, so ignore it
+				$password = GetFormData($f, $s, 'password');
+				if (!ereg("^0*$", $password)) {
+					$usr->setPassword($password);
+				}
 			}
+		
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
 			$pincode = GetFormData($f, $s, 'pincode');
 			if (!ereg("^0*$", $pincode)) {
@@ -199,9 +216,11 @@ if( $reloadform )
 	PopulateForm($f,$s,$usr,$fields);
 	PutFormData($f,$s,"phone",Phone::format($usr->phone),"text",2, 20);
 
+	$checked = false;
 	$pass = $usr->id ? '00000000' : '';
-	PutFormData($f,$s,"password",$pass,"text",1,50,true);
-	PutFormData($f,$s,"passwordconfirm",$pass,"text",1,50,true);
+	PutFormData($f,$s,"password",$pass,"text",1,50);
+	PutFormData($f,$s,"passwordconfirm",$pass,"text",1,50);
+
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
 
@@ -211,14 +230,19 @@ if( $reloadform )
 	PutFormData($f,$s,"restricttypes",(bool)count($types),"bool",0,1);
 	PutFormData($f,$s,"restrictpeople",(bool)count($RULES),"bool",0,1);
 
+	if($IS_LDAP) {
+		if($usr->ldap){
+			$checked = true;
+		}
+		PutFormData($f,$s,"ldap",(bool)$checked, "bool", 0, 1);
+	}
 	PutFormData($f,$s,"newrulefieldnum","");
 	PutFormData($f,$s,"newruletype","text","text",1,50);
 	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
 	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
 	PutFormData($f,$s,"newruleoperator_text","eq","text",1,50);
 	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
-
-	PutFormData($f,$s,"callerid", Phone::format($usr->getSetting("callerid","")), "text", 0, 20);
+	PutFormData($f,$s,"callerid", Phone::format($usr->getSetting("callerid","",true)), "text", 0, 20);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,11 +275,17 @@ startWindow('User Information');
 							</tr>
 							<tr>
 								<td align="right">Password:</td>
-								<td><? NewFormItem($f,$s, 'password', 'password', 20,50); ?></td>
+								<td><? NewFormItem($f,$s, 'password', 'password', 20,50, 'id="passwordfield1"'); ?></td>
 								<td>&nbsp;</td>
 								<td align="right">Confirm Password:</td>
-								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50); ?></td>
+								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50, 'id="passwordfield2"'); ?></td>
 							</tr>
+							<? if(GetFormData($f,$s,'ldap') && $IS_LDAP) { ?>
+								<script>
+								new getObj('passwordfield1').obj.disabled=1;
+								new getObj('passwordfield2').obj.disabled=1;
+								</script>
+							<? } ?>
 							<tr>
 								<td align="right">Telephone User ID#:</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'accesscode', 'text', 10); ?></td>
@@ -280,6 +310,16 @@ startWindow('User Information');
 								<td align="right">Caller&nbsp;ID:</td>
 								<td colspan="4"><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
 							</tr>
+							<?
+								if($IS_LDAP) {
+							?>
+								<tr>
+									<td> LDAP Enabled:</td>
+									<td><? NewFormItem($f,$s,'ldap','checkbox',NULL,NULL,"onchange=\"new getObj('passwordfield1').obj.disabled=this.checked; new getObj('passwordfield2').obj.disabled=this.checked\"" ); ?></td>
+								</tr>
+							<?
+								}
+							?>
 
 						</table>
 
