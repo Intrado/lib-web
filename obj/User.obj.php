@@ -14,13 +14,14 @@ class User extends DBMappedObject {
 	var $enabled = 0;
 	var $lastlogin;
 	var $deleted = 0;
+	var $ldap=0;
 
 	//new constructor
 	function User ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "user";
 		$this->_fieldlist = array("accessid", "login", "accesscode", "customerid", "firstname",
-								"lastname", "email", "phone", "enabled","lastlogin","deleted");
+								"lastname", "email", "phone", "enabled","lastlogin","deleted", "ldap");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -28,9 +29,34 @@ class User extends DBMappedObject {
 /* static functions */
 
 	function doLogin ($username, $password, $url = null) {
-			$username = dbsafe($username);
-			$password = dbsafe($password);
-
+			
+		$username = dbsafe($username);
+		$password = dbsafe($password);
+		GLOBAL $LDAP_CONNECT;
+		GLOBAL $IS_LDAP;
+		GLOBAL $CUSTOMERURL;
+		GLOBAL $LDAP_EXTENSION;
+		
+		
+		$userldap = QuickQuery("select user.ldap from user, customer where user.login='$username'
+					and user.customerid = customer.id and customer.hostname = '$CUSTOMERURL'");
+		if($IS_LDAP && $userldap){
+			if(!ereg('@',$username)){
+				$ldapusername = $username.$LDAP_EXTENSION;
+			}
+			if($ds=ldap_connect($LDAP_CONNECT)) {
+				if(@ldap_bind($ds,$ldapusername,$password) && $password) {
+					$query = "select id from user where user.login='$username'";
+					return QuickQuery($query);
+				} else {
+					return false;
+				}
+				ldap_close($ds);
+			}
+		}
+		if($password == ""){
+			return false;
+		}
 		if (isset($url)) {
 			$url = DBSafe($url);
 			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.hostname='$url') "
