@@ -79,7 +79,6 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'loginweb', '1'),"
 						. "($accessid, 'manageprofile', '1'),"
 						. "($accessid, 'manageaccount', '1'),"
-						. "($accessid, 'manageaccount', '1'),"
 						. "($accessid, 'managesystem', '1'),"
 						. "($accessid, 'loginphone', '1'),"
 						. "($accessid, 'startstats', '1'),"
