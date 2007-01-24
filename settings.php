@@ -123,10 +123,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 							QuickUpdate("update jobtype set name = '$name' , systempriority='$systempriority' where id = $id");
 					}
 				}
-				$custname= DBSafe(GetFormData($f, $s, 'custdisplayname'));
+				$custname= GetFormData($f, $s, 'custdisplayname');
 				if($custname != "" || $custname != $_SESSION['custname']){
-					$query="UPDATE customer SET name='$custname'
-							WHERE id='" . DBSafe($USER->customerid) . "'";
+					$query="UPDATE customer SET name='" . DBSafe($custname) . "'
+							WHERE id='$USER->customerid'";
 					QuickUpdate($query);
 					$_SESSION['custname']=$custname;
 				}
