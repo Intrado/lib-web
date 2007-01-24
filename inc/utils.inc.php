@@ -154,9 +154,9 @@ function isNotComplexPass($pass) {
 			case "it is too simplistic/systematic":
 				return("The password is too simplistic/systematic");
 			case "it is all whitespace":
-				return("The password cannot contain spaces.");
+				return("The password cannot contain spaces");
 			case "it does not contain enough DIFFERENT characters":
-				return("The password needs more different characters.");
+				return("The password needs more different characters");
 			case "it is too short":
 				return("The password needs to be atleast 5 characters long");
 			case "it's WAY too short":
