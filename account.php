@@ -45,6 +45,8 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} elseif( !$USER->ldap && (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
+			error('You must enter a password');		
 		} elseif ( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match');
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
@@ -54,7 +56,7 @@ if(CheckFormSubmit($f,$s))
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-		} elseif (strlen(GetFormData($f, $s, 'login')) < 5) {
+		} elseif (!$USER->ldap && strlen(GetFormData($f, $s, 'login')) < 5) {
 			error('Username must be atleast 5 characters' . $extraMsg);
 		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $USER->id)) {
 			error('This username already exists, please choose another');
@@ -62,9 +64,9 @@ if(CheckFormSubmit($f,$s))
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $USER->id,  $USER->customerid);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
-		} elseif(($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password'))){
+		} elseif(($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !$USER->ldap){
 			error($iscomplex);
-		} elseif($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) {
+		} elseif($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !$USER->ldap) {
 			error($issame);
 		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code cannot be the same');
@@ -84,9 +86,11 @@ if(CheckFormSubmit($f,$s))
 			$USER->update();
 
 			// If the password is all 0 characters then it was a default form value, so ignore it
-			$newpassword = GetFormData($f, $s, 'password');
-			if (!ereg("^0*$", $newpassword))
-				$USER->setPassword($newpassword);
+			if((!$USER->ldap && $IS_LDAP )|| !$IS_LDAP) {
+				$newpassword = GetFormData($f, $s, 'password');
+				if (!ereg("^0*$", $newpassword))
+					$USER->setPassword($newpassword);
+			}
 				
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
 			$newpin = GetFormData($f, $s, 'pincode');
@@ -134,8 +138,8 @@ if( $reloadform )
 	PutFormData($f,$s,"phone",Phone::format($USER->phone),"text",2, 20);
 
 	$pass = $USER->id ? '00000000' : '';
-	PutFormData($f,$s,"password",$pass,"text",4,50,true);
-	PutFormData($f,$s,"passwordconfirm",$pass,"text",4,50,true);
+	PutFormData($f,$s,"password",$pass,"text",4,50);
+	PutFormData($f,$s,"passwordconfirm",$pass,"text",4,50);
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
 
@@ -147,7 +151,7 @@ if( $reloadform )
 
 	//Maximum call attempts
 	if (($callmax = $USER->getSetting("callmax")) === false) {
-		$callmax = min(3,$ACCESS->getValue('callmax'));
+		$callmax = min(4,$ACCESS->getValue('callmax'));
 	} else {
 		$callmax = min($USER->getSetting("callmax"), $ACCESS->getValue('callmax'));
 	}
@@ -204,13 +208,19 @@ startWindow('User Information');
 								<td align="right">Username:</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'login', 'text', 20); ?></td>
 							</tr>
-							<tr>
-								<td align="right">Password:</td>
-								<td><? NewFormItem($f,$s, 'password', 'password', 20,50); ?></td>
-								<td>&nbsp;</td>
-								<td align="right">Confirm Password:</td>
-								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50); ?></td>
-							</tr>
+							<?
+								if((!$USER->ldap && $IS_LDAP) || !$IS_LDAP) {
+							?>
+								<tr>
+									<td align="right">Password:</td>
+									<td><? NewFormItem($f,$s, 'password', 'password', 20,50); ?></td>
+									<td>&nbsp;</td>
+									<td align="right">Confirm Password:</td>
+									<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50); ?></td>
+								</tr>
+							<?
+								}
+							?>
 							<tr>
 								<td align="right">Telephone User ID#:</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'accesscode', 'text', 10); ?></td>
