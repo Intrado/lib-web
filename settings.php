@@ -141,6 +141,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
 				setSetting('autoreport_replyname', GetFormData($f, $s, 'autoreport_replyname'));
+				
+				$checkpassword = GetFormData($f, $s, 'checkpassword') ? 1 : 0;
+				setSetting('checkpassword', GetFormData($f, $s, 'checkpassword'));
+				
+				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
+				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
 
 				redirect();
 
@@ -172,6 +178,10 @@ if( $reloadform )
 
 	PutFormData($f, $s, "autoreport_replyemail", getSetting('autoreport_replyemail'), 'email',0,100);
 	PutFormData($f, $s, "autoreport_replyname", getSetting('autoreport_replyname'), 'text',0,100);
+	
+	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), number, 0, 10);
+	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), number, 0, 10);
+	PutFormData($f,$s,"checkpassword",(bool)getSetting('checkpassword'), "bool", 0, 1);
 
 
 	//do some custom stuff for the options
@@ -338,6 +348,31 @@ startWindow('Global System Settings');
 					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
 					</td>
 				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Minimum Username Length:
+					</th>
+					<td>
+					<? NewFormItem($f, $s, 'usernamelength', 'text', 30,100);  ?>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Minimum Password Length:
+					</th>
+					<td>
+					<? NewFormItem($f, $s, 'passwordlength', 'text', 30,100);  ?>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Very Secure Passwords:
+					</th>
+					<td>
+					<? NewFormItem($f,$s,'checkpassword','checkbox') ?>
+					</td>
+				</tr>
+			
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
 						Systemwide Alert Message
