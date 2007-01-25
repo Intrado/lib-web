@@ -47,6 +47,8 @@ if($_GET['deleterule']) {
 	redirect();
 }
 
+
+
 /****************** main message section ******************/
 
 $f = "user";
@@ -63,8 +65,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 	}
 	else
 	{
-		$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast 5 characters.";
-
+		$checkpassword = (getSystemSetting("checkpassword","",true)==0) ? getSystemSetting("checkpassword") : 1;
+		$usernamelength = getSystemSetting("usernamelength","",true) ? getSystemSetting("usernamelength") : 5;
+		$passwordlength = getSystemSetting("passwordlength","",true) ? getSystemSetting("passwordlength") : 5;
+		
+		if($checkpassword){
+			$passwordlength = $passwordlength ? $passwordlength : 6;
+			$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+		} else {
+			$securityrules = "The password cannot be made from your username/fristname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+		}
 		MergeSectionFormData($f, $s);
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$usr = new User($_SESSION['userid']);
@@ -79,7 +89,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
 		} elseif( !GetFormData($f,$s,'ldap')&& (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
 			error('You must enter a password');
-		} elseif(!GetFormData($f,$s,'ldap') && (GetFormData($f, $s, 'password') == '00000000') && $usr->ldap && $IS_LDAP) {
+		} elseif(!GetFormData($f,$s,'ldap') && ereg("^0*$", GetFormData($f,$s,'password')) && $usr->ldap && $IS_LDAP) {
 			error('You must enter a password');
 		} elseif( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match' . $extraMsg);
@@ -90,8 +100,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
-		} elseif (strlen(GetFormData($f, $s, 'login')) < 5) {
-			error('Username must be atleast 5 characters' . $extraMsg);
+		} elseif (strlen(GetFormData($f, $s, 'login')) < $usernamelength) {
+			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
+		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
+			error('Password must be atleast ' . $passwordlength . ' characters long');
 		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
 		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
@@ -100,10 +112,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
-		} elseif(($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f,$s,'ldap')){
-			error($iscomplex, $securityrules);
-		} elseif($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !GetFormData($f,$s,'ldap')) {
+		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
+			error('Your password must contain atleast one letter and one number', $securityrules);
+		} elseif(($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) && !GetFormData($f,$s,'ldap')) {
 			error($issame, $securityrules);
+		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f,$s,'ldap')){
+			error($iscomplex, $securityrules);
 		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code cannot be the same');
 		} elseif((strlen(GetFormData($f, $s, 'accesscode')) < 4 || strlen(GetformData($f, $s, 'pincode')) < 4) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {

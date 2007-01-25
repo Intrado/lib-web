@@ -38,6 +38,17 @@ if(CheckFormSubmit($f,$s))
 	}
 	else
 	{
+		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
+		$usernamelength = getSystemSetting("usernamelength") ? getSystemSetting("usernamelength") : 5;
+		$passwordlength = getSystemSetting("passwordlength") ? getSystemSetting("passwordlength") : 5;
+		
+		if($checkpassword){
+			$passwordlength = $passwordlength ? $passwordlength : 6;
+			$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+		} else {
+			$securityrules = "The password cannot be made from your username/fristname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+		}
+	
 		MergeSectionFormData($f, $s);
 
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
@@ -56,18 +67,22 @@ if(CheckFormSubmit($f,$s))
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-		} elseif (!$USER->ldap && strlen(GetFormData($f, $s, 'login')) < 5) {
-			error('Username must be atleast 5 characters' . $extraMsg);
+		} elseif (strlen(GetFormData($f, $s, 'login')) < $usernamelength) {
+			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
+		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
+			error('Password must be atleast ' . $passwordlength . ' characters long');
 		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $USER->id)) {
 			error('This username already exists, please choose another');
 		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $USER->id)) {
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $USER->id,  $USER->customerid);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
-		} elseif(($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !$USER->ldap){
-			error($iscomplex);
+		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
+			error('Your password must contain atleast one letter and one number', $securityrules);
 		} elseif($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !$USER->ldap) {
-			error($issame);
+			error($issame, $securityrules);
+		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !$USER->ldap){
+			error($iscomplex, $securityrules);
 		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code cannot be the same');
 		} elseif((strlen(GetFormData($f, $s, 'accesscode')) < 4 || strlen(GetformData($f, $s, 'pincode')) < 4) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
