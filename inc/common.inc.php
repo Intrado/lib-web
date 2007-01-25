@@ -2,9 +2,7 @@
 
 $SETTINGS = parse_ini_file("settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
-$IS_LDAP = $SETTINGS['ldap']['is_ldap'];
-$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
-$LDAP_EXTENSION = $SETTINGS['ldap']['ldapextension'];
+$IS_LDAP = $SETTINGS['ldap']['is_ldap'];;
 
 require_once("db.inc.php");
 require_once("DBMappedObject.php");
