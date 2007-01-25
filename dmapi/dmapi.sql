@@ -4,13 +4,17 @@ CREATE TABLE `jobtaskactive` (
   `id` varchar(50) collate utf8_bin NOT NULL,
   `jobtaskid` bigint(20) NOT NULL,
   `jobworkitemid` bigint(20) NOT NULL,
+  `personid` int(11) NOT NULL,
   `jobid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `customerid` int(11) NOT NULL,
   `assignmentgroup` tinyint(4) NOT NULL,
   `status` enum('new','calling','done') collate utf8_bin NOT NULL,
+  `type` enum('phone','email','print') collate utf8_bin NOT NULL,
+  `subtype` varchar(20) collate utf8_bin NOT NULL default 'notification',
+  `issurvey` tinyint(4) NOT NULL default '0',
   `tasktime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `phone` varchar(20) collate utf8_bin NOT NULL,
+  `phone` varchar(20) collate utf8_bin default NULL,
   `numattempts` tinyint(4) NOT NULL,
   `starttime` bigint(20) NOT NULL default '0',
   `duration` float NOT NULL default '0',
@@ -38,4 +42,13 @@ ALTER TABLE `jobtaskactive` ADD `personid` INT NOT NULL AFTER `jobworkitemid` ;
 
 ALTER TABLE `jobtaskactive` ADD `issurvey` TINYINT NOT NULL DEFAULT '0' AFTER `status` ;
 
+-- tweak specialtask
+
+ALTER TABLE `jobtaskactive` DROP `subtype` ;
+
+CREATE TABLE `tasksyncdata` (
+`name` VARCHAR( 50 ) NOT NULL ,
+`value` VARCHAR( 50 ) NOT NULL ,
+PRIMARY KEY ( `name` )
+) ENGINE = MYISAM ;
 
