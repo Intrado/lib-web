@@ -133,12 +133,6 @@ function isSameUserPass($user, $pass, $firstname, $lastname) {
 		The location of the cracklib directory may differ.
 */
 function isNotComplexPass($pass) {
-	if(strlen($pass) < 5){
-		return("Password must be atleast 5 characters long");
-	}
-	if(strlen($pass) < 6){
-		$pass = $pass."a";
-	}
 	
 	// Perform password check
 	$check = crack_check($pass);
@@ -158,9 +152,9 @@ function isNotComplexPass($pass) {
 			case "it does not contain enough DIFFERENT characters":
 				return("The password needs more different characters");
 			case "it is too short":
-				return("The password needs to be atleast 5 characters long");
+				return("The password needs to be atleast 6 characters long");
 			case "it's WAY too short":
-				return("The password needs to be atleast 5 characters long");
+				return("The password needs to be atleast 6 characters long");
 			case "it looks like a National Insurance number.":
 				return false;
 			default:
