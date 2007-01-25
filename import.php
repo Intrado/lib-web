@@ -1,8 +1,6 @@
 <?
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
-$LOG_DIR = $SETTINGS['feature']['log_dir'];
-$LOG_DIR2 = $SETTINGS['feature']['log_dir2'];
 
 require_once("inc/db.inc.php");
 require_once("inc/DBMappedObject.php");
@@ -70,7 +68,7 @@ function wlog ($str) {
 	fwrite($logfp, date("Y-m-d h:i:s") . " - $str\r\n");
 }
 
-$logfp = fopen($LOG_DIR,"a") or $logfp = fopen($LOG_DIR2,"a");
+$logfp = fopen($SETTINGS['feature']['log_dir']."import_log.txt","a") or $logfp = fopen($SETTINGS['feature']['log_dir']."import_log2.txt","a");
 if (!$logfp) {
 	exit(-1);
 }
