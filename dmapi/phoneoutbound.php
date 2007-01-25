@@ -7,12 +7,27 @@ include_once("notifications.inc.php");
 
 if ($REQUEST_TYPE == "new") {
 
-	$foundid = assignTask("phone",$RESOURCEID, $dmapidb);
-	if ($foundid) {
+	//check for specialtasks
+	if ($specialtask = assignSpecialTask(array("EasyCall", "CallMe"),$dmapidb)) {
+		list($id,$type) = $specialtask;
+		$SESSIONDATA['specialtaskid'] = $id;
+
+		switch ($type) {
+			case "EasyCall":
+				forwardToPage("easycall.php");
+				return;
+			case "CallMe":
+				forwardToPage("callme.php");
+				return;
+			default:
+?>
+			<error>Wrong specialtask type</error>
+<?
+		}
+	//check for normal tasks
+	} else if ($foundid = assignTask("phone",$RESOURCEID, $dmapidb)) {
+
 		//we assigned one, now grab it from the DB and send it out
-
-		//TODO handle specialtasks (hand off to another file) we can tell by the subtype != notification
-
 		$query = "select renderedmessage from jobtaskactive where id='" . mysql_real_escape_string($foundid,$dmapidb) . "'";
 
 		$res = mysql_query($query,$dmapidb);
