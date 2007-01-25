@@ -3,9 +3,24 @@
 /*
 
 
+//new
+
+surveyresponse
+	jobid
+	questionnumber
+	answer
+	tally
+
+unique/primary key on jobid,questionnumber,answer
+
+
+//old
 surveyresponse
 	id
-	jobworkitemid (should be unique, only allowed to have 1 response per person)
+	personid
+	jobid	 (personid + jobid should be unique, only allowed to have 1 response per person)
+	jobworkitemid
+	responsedate
 	type = phone|web
 
 surveyanswer
@@ -15,14 +30,18 @@ surveyanswer
 	answer (1-9|null, null means they did not choose an option on the web form)
 
 
-//summary stats calulated and stored if the status is active and they dont exist yet
-surveysummaryresults
-	id
-	surveyid
-	questionnumber
-	answer (1-9|null, null means hangup)
-	total (count that picked this A for this Q)
+jobtaskactive -- add
+	personid
+	issurvey
 
+
+gather all survey responses
+bulk insert into surveyresponse -- but what about existing email responses???
+get a list/map of all of the new surveyresponse ids.
+bulk insert all of the answers, ref responseid. insert an answer for anything that has "q[0-9]+"
+
+
+should we do this before or after deleting the data from jobtaskactive? probability of failure... what about distributed transaction manager?
 
 */
 
@@ -48,7 +67,7 @@ include_once("obj/Phone.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('survey') && 0) {
+if (!$USER->authorize('survey')) {
 	redirect('unauthorized.php');
 }
 
@@ -58,8 +77,26 @@ if (!$USER->authorize('survey') && 0) {
 
 if (isset($_GET['id'])) {
 	setCurrentSurvey($_GET['id']);
+	if ($jobid = getCurrentSurvey()) {
+		$job = new Job($jobid);
+		$_SESSION['scheduletemplate'] = $job->questionnaireid;
+	}
 	redirect();
 }
+
+if (isset($_GET['scheduletemplate'])) {
+	$questionnaireid = $_GET['scheduletemplate'] + 0;
+
+	if (userOwns("surveyquestionnaire",$questionnaireid)) {
+		$_SESSION['scheduletemplate'] = $questionnaireid;
+		setCurrentSurvey("new");
+	}
+	redirect();
+}
+
+//dont allow creating a new survey if the template hasn't been specified
+if (!getCurrentSurvey() && !$_SESSION['scheduletemplate'])
+	redirect("surveys.php");
 
 $completedmode = false;
 $submittedmode = false;
@@ -78,7 +115,7 @@ if (getCurrentSurvey() != NULL) {
 
 $VALIDJOBTYPES = JobType::getUserJobTypes();
 $PEOPLELISTS = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
-$QUESTIONNAIRES = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
+$QUESTIONNAIRE = new SurveyQuestionnaire($_SESSION['scheduletemplate']);
 
 /****************** main message section ******************/
 
@@ -119,6 +156,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$jobid = getCurrentSurvey();
 			if ($jobid == null) {
 				$job = Job::jobWithDefaults();
+				$job->questionnaireid = $_SESSION['scheduletemplate'];
 			} else {
 				$job = new Job($jobid);
 			}
@@ -143,11 +181,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			if ($completedmode) {
 				PopulateObject($f,$s,$job,array("name", "description"));
 			} else if ($submittedmode) {
-				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime",
-				"maxcallattempts"));
+				$fieldsarray = array("name", "description","startdate", "starttime", "endtime");
+				if ($QUESTIONNAIRE->hasphone)
+					$fieldsarray[] = "maxcallattempts";
+				PopulateObject($f,$s,$job,$fieldsarray);
+				$job->startdate = GetFormData($f, $s, 'startdate');
+								$numdays = GetFormData($f, $s, 'numdays');
+				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			} else {
-				$fieldsarray = array("name", "jobtypeid", "description", "listid", "questionnaireid",
-							"starttime", "endtime","maxcallattempts","startdate");
+				$fieldsarray = array("name", "jobtypeid", "description", "listid",
+							"starttime", "endtime","startdate");
+				if ($QUESTIONNAIRE->hasphone)
+					$fieldsarray[] = "maxcallattempts";
 				PopulateObject($f,$s,$job,$fieldsarray);
 
 				$job->startdate = GetFormData($f, $s, 'startdate');
@@ -155,16 +200,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			}
 
-			if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
+			if ($QUESTIONNAIRE->hasphone && $USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
-			} else {
+			} else if ($QUESTIONNAIRE->hasphone) {
 				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 				$job->setOptionValue("callerid", $callerid);
 			}
 
 			if (getSystemSetting('retry') != "")
 				$job->setOptionValue("retry",getSystemSetting('retry'));
-
 
 			//reformat the dates & times to DB friendly format
 			$job->startdate = date("Y-m-d", strtotime($job->startdate));
@@ -173,6 +217,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$job->endtime = date("H:i", strtotime($job->endtime));
 
 			$job->update();
+
+			echo mysql_error();
 
 			setCurrentSurvey($job->id);
 
@@ -194,6 +240,8 @@ if( $reloadform )
 	$jobid = getCurrentSurvey();
 	if ($jobid == null) {
 		$job = Job::jobWithDefaults();
+		$job->name = $QUESTIONNAIRE->name;
+		$job->description = $QUESTIONNAIRE->description;
 	} else {
 		$job = new Job($jobid);
 	}
@@ -210,19 +258,20 @@ if( $reloadform )
 		array("description","text",1,50,false),
 		array("jobtypeid","number","nomin","nomax"),
 		array("listid","number","nomin","nomax",true),
-		array("questionnaireid","number","nomin","nomax",true),
 		array("starttime","text",1,50,true),
 		array("endtime","text",1,50,true),
-		array("maxcallattempts","number",1,$ACCESS->getValue('callmax'),true),
 		array('startdate','text', 1, 50, true)
 	);
+
+	if ($QUESTIONNAIRE->hasphone) {
+		$fields[] = array("maxcallattempts","number",1,$ACCESS->getValue('callmax'),true);
+		PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
+	}
 
 	PopulateForm($f,$s,$job,$fields);
 
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
-	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
-
 }
 
 
@@ -233,7 +282,8 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:survey";
-$TITLE = "Survey Builder: " . (getCurrentSurvey() == NULL ? "New Survey" : $job->name);
+$TITLE = "Survey Editor: " . (getCurrentSurvey() == NULL ? "New Survey" : $job->name);
+$DESCRIPTION = "Survey using $QUESTIONNAIRE->name";
 
 include_once("nav.inc.php");
 NewForm($f);
@@ -285,20 +335,6 @@ startWindow('Survey Information');
 					</td>
 				</tr>
 				<tr>
-					<td>Questionnaire </td>
-					<td>
-						<?
-						NewFormItem($f,$s,"questionnaireid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
-						NewFormItem($f,$s,"questionnaireid", "selectoption", "-- Select a questionnaire --", NULL);
-						foreach ($QUESTIONNAIRES as $questionnaire) {
-							NewFormItem($f,$s,"questionnaireid", "selectoption", $questionnaire->name, $questionnaire->id);
-						}
-						NewFormItem($f,$s,"questionnaireid", "selectend");
-						?>
-					</td>
-				</tr>
-
-				<tr>
 					<td>Start Date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
 					<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "")); ?></td>
 				</tr>
@@ -335,7 +371,7 @@ startWindow('Survey Information');
 			</table>
 		</td>
 	</tr>
-<? if(1 /* TODO check to see if the questionnaire has phone */) { ?>
+<? if($QUESTIONNAIRE->hasphone) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader">Phone:</th>
 		<td>

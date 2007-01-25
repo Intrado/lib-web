@@ -49,8 +49,7 @@ $list = new PeopleList($job->listid);
 $renderedlist = new RenderedList($list);
 $renderedlist->calcStats();
 $questionnaire = new SurveyQuestionnaire($job->questionnaireid);
-$questions = DBFindMany("SurveyQuestion", "from surveyquestion where surveyid = $job->questionnaireid order by questionnumber");
-
+$questions = DBFindMany("SurveyQuestion", "from surveyquestion where questionnaireid = $job->questionnaireid order by questionnumber");
 
 if ($renderedlist->total == 0)
 	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
@@ -71,7 +70,7 @@ include_once("nav.inc.php");
 NewForm($f);
 
 if ($renderedlist->total > 0 && count($questions) > 0)
-	buttons(button('submit_job',null, 'jobsubmit.php?jobid=' . $jobid),button('back',null, 'job.php'));
+	buttons(button('schedule_survey',null, 'jobsubmit.php?jobid=' . $jobid),button('back',null, 'survey.php'));
 else
 	buttons(button('cancel',null, 'survey.php'));
 
@@ -128,7 +127,7 @@ startWindow("Confirmation &amp; Submit");
 		</td>
 	</tr>
 
-<? if(1 /* TODO check questionnaire type*/) { ?>
+<? if($questionnaire->hasphone) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
@@ -149,8 +148,8 @@ startWindow("Confirmation &amp; Submit");
 <? } ?>
 
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Questionnaire:</th>
-		<td class="bottomBorder">
+		<th align="right" class="windowRowHeader">Questionnaire:</th>
+		<td >
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
 					<td width="30%" class="bottomBorder" >Name</td>
@@ -182,46 +181,6 @@ startWindow("Confirmation &amp; Submit");
 
 </table>
 <?
-
-/*
-
-Description
-Priority
-List
-Questionnaire
-Start Date
-Number of days to run
-Survey Time Window:
-&nbsp;&nbsp;Earliest
-&nbsp;&nbsp;Latest
-Email a report when the survey completes
-
---
-
-Phone
-Maximum attempts
-<? if ($USER->authorize('setcallerid')) { ?>
-Caller&nbsp;ID
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*/
-
-
-
-
 
 endWindow();
 

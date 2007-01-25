@@ -14,6 +14,7 @@ include_once("obj/PeopleList.obj.php");
 include_once("obj/Message.obj.php");
 include_once("obj/AudioFile.obj.php");
 include_once("obj/FieldMap.obj.php");
+include_once("obj/SurveyQuestionnaire.obj.php");
 require_once("inc/formatters.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +34,18 @@ if (isset($_GET['id'])) {
 
 if ($USER->authorize("loginweb") === false) {
 	redirect('unauthorized');
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Display Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function fmt_surveyactions ($obj,$name) {
+
+	return '<a href="surveytemplate.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
+			. '<a href="survey.php?scheduletemplate=' . $obj->id . '">Schedule</a>&nbsp;|&nbsp;'
+			. '<a href="surveys.php?deletetemplate=' . $obj->id . '">Delete</a>';
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +89,10 @@ if ($USER->authorize("startstats")) {
 
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
-			startWindow('My Active and Pending Jobs ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
+			startWindow('My Active and Pending Notification Jobs ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
 			button_bar(button('refresh', 'window.location.reload()'));
 
-			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling') and deleted = 0 order by id desc limit $limit");
+			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling') and type != 'survey' and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Name",
 								"type" => "Type",
 								"Status" => "Status",
@@ -92,10 +105,10 @@ if ($USER->authorize("startstats")) {
 
 
 
-			startWindow('My Completed Jobs ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;');
+			startWindow('My Completed Notification Jobs ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;');
 			button_bar(button('refresh', 'window.location.reload()'));
 
-			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and deleted = 0 order by finishdate desc limit $limit");
+			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Name",
 								"type" => "Type",
 								"Status" => "Status",
@@ -106,6 +119,43 @@ if ($USER->authorize("startstats")) {
 			showObjects($data, $titles, $formatters);
 			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
+
+
+			if ($USER->authorize("survey")) {
+
+				startWindow('My Active and Pending Survey Jobs ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
+				button_bar(button('refresh', 'window.location.reload()'));
+
+				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling') and type='survey' and deleted = 0 order by id desc limit $limit");
+				$titles = array(	"name" => "Name",
+									"type" => "Type",
+									"Status" => "Status",
+									"Actions" => "Actions"
+									);
+				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
+				showObjects($data, $titles, $formatters);
+				?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
+				endWindow();
+
+
+
+				startWindow('My Completed Survey Jobs ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;');
+				button_bar(button('refresh', 'window.location.reload()'));
+
+				$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type='survey' and deleted = 0 order by finishdate desc limit $limit");
+				$titles = array(	"name" => "Name",
+									"type" => "Type",
+									"Status" => "Status",
+									"enddate" => "End Date",
+									"Actions" => "Actions"
+									);
+				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
+				showObjects($data, $titles, $formatters);
+				?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
+				endWindow();
+			}
+
+
 
 	?></td></tr></table><?
 
