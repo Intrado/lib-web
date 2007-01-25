@@ -281,11 +281,11 @@ endWindow();
 buttons();
 EndForm();
 
-$callearly = $USER->getSetting("callearly", "8:00 am");
-$calllate = $USER->getSetting("calllate", "9:00 pm");
-if((strtotime($job->starttime) >= strtotime($calllate)) || (strtotime($job->endtime) <= strtotime($callearly))
-	|| (strtotime($job->starttime) <= strtotime($callearly)) || (strtotime($job->endtime) >= strtotime($calllate)) )
-	print '<script language="javascript">window.alert(\'Your message will be delivered between '. date("g:i a", strtotime($job->starttime)) .' and '. date("g:i a", strtotime($job->endtime)) .'\');</script>';
+$warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
+$warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
+if((strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
+	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) )
+	print '<script language="javascript">window.alert(\'WARNING: Your message is being sent at odd hours. '. date("g:i a", strtotime($job->starttime)) .' - '. date("g:i a", strtotime($job->endtime)) .'\');</script>';
 
 
 include_once("navbottom.inc.php");
