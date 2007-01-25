@@ -38,25 +38,23 @@ class User extends DBMappedObject {
 		
 		$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
 		$LDAP_EXTENSION = $SETTINGS['ldap']['ldapextension'];
-		if($IS_COMMSUITE) {
-			$userldap = QuickQuery("select user.ldap from user where user.login='$username'");
-		} else {
+		if($IS_COMMSUITE && $IS_LDAP){
 			$userldap = QuickQuery("select user.ldap from user, customer where user.login='$username'
-					and user.customerid = customer.id and customer.hostname = '$url'");
-		}	
-		
-		if($IS_LDAP && $userldap){
-			if(strpos('@',$username)!== false){
-				$ldapusername = $username.$LDAP_EXTENSION;
-			}
-			if($ds=ldap_connect($LDAP_CONNECT)) {
-				if(@ldap_bind($ds,$ldapusername,$password) && $password) {
-					$query = "select id from user where user.login='$username'";
-					return QuickQuery($query);
-				} else {
-					return false;
+				and user.customerid = customer.id and customer.hostname = '" . dbsafe($url) . "'");
+			
+			if($userldap){
+				if(strpos('@',$username)!== false){
+					$ldapusername = $username.$LDAP_EXTENSION;
 				}
-				ldap_close($ds);
+				if($ds=ldap_connect($LDAP_CONNECT)) {
+					if(@ldap_bind($ds,$ldapusername,$password) && $password) {
+						$query = "select id from user where user.login='$username'";
+						return QuickQuery($query);
+					} else {
+						return false;
+					}
+					ldap_close($ds);
+				}
 			}
 		}
 		if($password == ""){
