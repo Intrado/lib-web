@@ -30,9 +30,9 @@ db="dialerasp"
 is_commsuite=false
 has_ssl=true
 force_ssl=false
-log_dir="/commsuite/logs/import_log.txt"
-log_dir2="/commsuite/logs/import_log2.txt"
-
+log_dir="/commsuite/logs/"
+warn_earliest=
+warn_latest=
 
 [content]
 ; format is "host,port,path;host2,port2,path2;..." reserved chars= ';' and ','
@@ -53,7 +53,7 @@ ftpuser=anonymous
 ftppass=anonymous
 
 [ldap]
-is_ldap=false
+is_ldap=true
 ldapconnect="192.168.174.2"
 ldapextension="@adtest.net"
 
