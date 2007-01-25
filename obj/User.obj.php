@@ -29,19 +29,24 @@ class User extends DBMappedObject {
 /* static functions */
 
 	function doLogin ($username, $password, $url = null) {
-			
+		
+		GLOBAL $IS_LDAP;
+		GLOBAL $SETTINGS;
+		GLOBAL $IS_COMMSUITE;
 		$username = dbsafe($username);
 		$password = dbsafe($password);
-		GLOBAL $LDAP_CONNECT;
-		GLOBAL $IS_LDAP;
-		GLOBAL $CUSTOMERURL;
-		GLOBAL $LDAP_EXTENSION;
 		
+		$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
+		$LDAP_EXTENSION = $SETTINGS['ldap']['ldapextension'];
+		if($IS_COMMSUITE) {
+			$userldap = QuickQuery("select user.ldap from user where user.login='$username'");
+		} else {
+			$userldap = QuickQuery("select user.ldap from user, customer where user.login='$username'
+					and user.customerid = customer.id and customer.hostname = '$url'");
+		}	
 		
-		$userldap = QuickQuery("select user.ldap from user, customer where user.login='$username'
-					and user.customerid = customer.id and customer.hostname = '$CUSTOMERURL'");
 		if($IS_LDAP && $userldap){
-			if(!ereg('@',$username)){
+			if(strpos('@',$username)!== false){
 				$ldapusername = $username.$LDAP_EXTENSION;
 			}
 			if($ds=ldap_connect($LDAP_CONNECT)) {
