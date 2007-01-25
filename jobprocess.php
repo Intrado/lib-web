@@ -12,8 +12,11 @@ require_once("obj/Access.obj.php");
 require_once("obj/Permission.obj.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobLanguage.obj.php");
+require_once("obj/JobType.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/SurveyQuestionnaire.obj.php");
+
 
 set_time_limit(0);
 
@@ -26,6 +29,10 @@ if ($jobid == 0)
 
 $job = new Job($jobid);
 $USER = new User($job->userid);
+$jobtype = new JobType($job->jobtypeid);
+
+$priority = $jobtype->priority ? $jobtype->priority : 30000;
+$systempriority = $jobtype->systempriority ? $jobtype->systempriority : 3;
 
 //check the user permissions
 $ACCESS = new Access($USER->accessid);
@@ -33,7 +40,6 @@ $_SESSION['access'] = $ACCESS;
 if (!$USER->enabled) {
 	exit(-4);
 }
-
 
 $timezone = QuickQuery("select timezone from customer where id=$USER->customerid");
 date_default_timezone_set($timezone);
@@ -48,7 +54,7 @@ if ($job->status=="repeating") {
 
 	//make a copy of this job and run it
 	$newjob = new Job($jobid);
-	$newjob->id = NULL;
+	$newf = NULL;
 	$newjob->name .= " - " . date("M j, g:i a");
 	$newjob->status = "new";
 	$newjob->assigned = NULL;
@@ -83,14 +89,11 @@ if ($job->status=="repeating") {
 //assign the job to this instance of jobprocess
 $code = DBSafe(md5(microtime().mt_rand()));
 $query = "update job set assigned='$code' where assigned is null and status='new' and id=$jobid";
-//echo $query;
 QuickUpdate($query);
 if (!QuickQuery("select count(*) from job where assigned='$code' and id=$jobid"))
 	exit(-2); //not me!
-//echo "got job";
+
 $usersql = $USER->userSQL("p","pd");
-
-
 //get and compose list rules
 $listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
 		and le.ruleid=r.id and le.listid='" . $job->listid .  "' order by le.sequence", "r");
@@ -103,103 +106,90 @@ else
 //then union all with all the people that have add records
 
 $langfield = FieldMap::getLanguageField();
-
-$defaultmessages = array("phone" => $job->phonemessageid,
-						"email" => $job->emailmessageid,
-						"print" => $job->printmessageid);
-
 $count = 0;
-foreach ($defaultmessages as $type => $defmsgid) {
 
-//TODO disable this for now so that locked down profiles still work (ex attendance)
-//	if (!$USER->authorize('send' . $type))
-//		continue;
+if ($job->type == "survey") {
 
-	if ($defmsgid != NULL) {
+	$questionnaire = new SurveyQuestionnaire($job->questionnaireid);
 
-//skip dedupe for new dedupe in messagedigester
-/*
-		//should we immediately start rendering messages or do we need to check first (ie dedupe)?
-		if ($type == "phone" && $job->isOption("skipduplicates")) {
-			$status = "checking";
-		} else {
-			$status = "new";
-		}
-*/
-	$status = "new";
+	$surveytypes = array("phone" => $questionnaire->hasphone,
+						"email" => $questionnaire->hasweb);
+
+	foreach ($surveytypes as $type => $hastype) {
+		if (!$hastype)
+			continue;
+
+		//insert the workitems with no messageid, messagedigester will pick up that this is a survey and go from there
+		echo "$type\n";
 		$query = "
-		insert into jobworkitem (jobid, customerid, type,personid, messageid, priority, systempriority, status)
-		(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
-			coalesce(jl.messageid,$defmsgid) as messageid, ifnull(jt.priority,100000) as priority, ifnull(jt.systempriority,3) as systempriority,
-			'$status' as status
-		from person p left join persondata pd on (p.id=pd.personid)
-		left join listentry le on (p.id=le.personid and le.listid=$job->listid)
-		left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$job->id and jl.type='$type')
-		left join job j on (j.id = $jobid)
-		left join jobtype jt on (jt.id = j.jobtypeid)
-		where $usersql and $listsql and le.type is null and p.userid is null)
+			insert into jobworkitem (jobid, customerid, type, personid, priority, systempriority, status)
+			(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+				$priority as priority, $systempriority as systempriority, 'new' as status
+			from person p left join persondata pd on (p.id=pd.personid)
+			left join listentry le on (p.id=le.personid and le.listid=$job->listid)
+			where $usersql and $listsql and le.type is null and p.userid is null order by p.id)
 
-		union all
+			union all
 
-		(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
-			coalesce(jl.messageid,$defmsgid) as messageid, ifnull(jt.priority,100000) as priority, ifnull(jt.systempriority,3) as systempriority,
-			'$status' as status
-		from person p left join persondata pd on (p.id=pd.personid)
-		inner join listentry le on (le.listid=$job->listid and p.id=le.personid and le.type='A')
-		left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$job->id and jl.type='$type')
-		left join job j on (j.id = $jobid)
-		left join jobtype jt on (jt.id = j.jobtypeid)
-		where p.customerid = $USER->customerid)
+			(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+				$priority as priority, $systempriority as systempriority, 'new' as status
+			from listentry le
+			straight_join person p on (p.id=le.personid)
+			left join persondata pd on (le.personid=pd.personid)
+			left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
+			where p.customerid = $USER->customerid
+			and le.listid=$job->listid and le.type='A'
+			order by le.id)
 		";
 
 		$res = QuickUpdate($query);
 
 		if ($res === false)
-			error_log("Problem inserting job: " . mysql_error());
+			error_log("Problem inserting survey job $jobid: " . mysql_error() . " Query was:\n\n" . $query . "\n\n");
 
 		$count += $res;
+	}
+} else {
+	//do regular notification job
+	$defaultmessages = array("phone" => $job->phonemessageid,
+							"email" => $job->emailmessageid,
+							"print" => $job->printmessageid);
 
-//skip dedupe for new dedupe in messagedigester
-/*
-		//do we need to dedupe?
-		if ($type == "phone" && $job->isOption("skipduplicates")) {
+	foreach ($defaultmessages as $type => $defmsgid) {
 
-			//find everyone that has a duplicate phone number.
-
+		if ($defmsgid != NULL) {
 			$query = "
-			select wi.id,p.phone
-			from jobworkitem wi
-			left join phone p on (wi.personid = p.personid)
-			left join phone p2  on (p.phone=p2.phone and p2.personid != wi.personid)
-			left join jobworkitem wi2 on (p2.personid = wi2.personid)
-			where wi.jobid = $jobid and wi.type='phone'
-			and wi2.jobid = $jobid and wi2.type='phone'
-			and p.sequence = 0 and p2.sequence = 0 and p.phone != ''
-			group by p.phone, wi.id
+				insert into jobworkitem (jobid, customerid, type,personid, messageid, priority, systempriority, status)
+				(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+					coalesce(jl.messageid,$defmsgid) as messageid, $priority as priority, $systempriority as systempriority,
+					'new' as status
+				from person p left join persondata pd on (p.id=pd.personid)
+				left join listentry le on (p.id=le.personid and le.listid=$job->listid)
+				left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
+				where $usersql and $listsql and le.type is null and p.userid is null
+				order by p.id)
+
+				union all
+
+				(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+					coalesce(jl.messageid,$defmsgid) as messageid, $priority as priority, $systempriority as systempriority,
+					'new' as status
+				from listentry le
+				straight_join person p on (p.id=le.personid)
+				left join persondata pd on (le.personid=pd.personid)
+				left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
+				where p.customerid = $USER->customerid
+				and le.listid=$job->listid and le.type='A'
+				order by le.id)
 			";
-			$result = Query($query);
 
-			//go through results and let the first one though, set the others to duplicate
-			$lastphone = false;
-			$dedupedid = false;
-			while ($row = DBGetRow($result)) {
-				if ($lastphone != $row[1]) {
-					$lastphone = $row[1];
-					$dedupedpersonid = $row[0];
-					$query = "update jobworkitem wi set wi.status='new' where wi.id=$dedupedpersonid";
-					QuickUpdate($query);
-				} else {
-					$query = "update jobworkitem wi set wi.status='duplicate',wi.duplicateid=$dedupedpersonid where wi.id=" . $row[0];
-					QuickUpdate($query);
-				}
-			}
-		}
+			$res = QuickUpdate($query);
 
-		//do we need to update the rest from "checking" status?
-		if ($status == "checking") {
-			QuickUpdate("update jobworkitem wi set wi.status='new' where wi.jobid=$jobid and wi.status='checking'");
+			if ($res === false)
+				error_log("Problem inserting job $jobid: " . mysql_error() . " Query was:\n\n" . $query . "\n\n");
+
+			$count += $res;
 		}
-*/
 	}
 }
 
