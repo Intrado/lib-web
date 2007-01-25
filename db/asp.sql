@@ -1,20 +1,20 @@
 -- phpMyAdmin SQL Dump
 -- version 2.6.3-pl1
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost:3307
 -- Generation Time: Jul 20, 2006 at 03:08 PM
 -- Server version: 5.0.22
 -- PHP Version: 5.0.4
--- 
+--
 -- Database: `dialerasp`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `access`
--- 
+--
 
 CREATE TABLE `access` (
   `id` int(11) NOT NULL auto_increment,
@@ -29,16 +29,16 @@ CREATE TABLE `access` (
   KEY `id` (`id`,`deleted`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `access`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `address`
--- 
+--
 
 CREATE TABLE `address` (
   `id` int(11) NOT NULL auto_increment,
@@ -54,16 +54,16 @@ CREATE TABLE `address` (
   KEY `personid` (`personid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `address`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `audiofile`
--- 
+--
 
 CREATE TABLE `audiofile` (
   `id` int(11) NOT NULL auto_increment,
@@ -77,16 +77,16 @@ CREATE TABLE `audiofile` (
   KEY `list` (`userid`,`deleted`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `audiofile`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `blockednumber`
--- 
+--
 
 CREATE TABLE `blockednumber` (
   `id` int(11) NOT NULL auto_increment,
@@ -98,16 +98,16 @@ CREATE TABLE `blockednumber` (
   KEY `customerid` (`customerid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `blockednumber`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `calllog`
--- 
+--
 
 CREATE TABLE `calllog` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -123,16 +123,16 @@ CREATE TABLE `calllog` (
   KEY `phonenumber` (`phonenumber`,`jobtaskid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `calllog`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `content`
--- 
+--
 
 CREATE TABLE `content` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -141,16 +141,16 @@ CREATE TABLE `content` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `content`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `customer`
--- 
+--
 
 CREATE TABLE `customer` (
   `id` int(11) NOT NULL auto_increment,
@@ -162,16 +162,16 @@ CREATE TABLE `customer` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `customer`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `email`
--- 
+--
 
 CREATE TABLE `email` (
   `id` int(11) NOT NULL auto_increment,
@@ -183,16 +183,16 @@ CREATE TABLE `email` (
   KEY `personid` (`personid`,`sequence`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `email`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `fieldmap`
--- 
+--
 
 CREATE TABLE `fieldmap` (
   `id` int(11) NOT NULL auto_increment,
@@ -204,16 +204,16 @@ CREATE TABLE `fieldmap` (
   KEY `getfieldname` (`customerid`,`fieldnum`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `fieldmap`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `import`
--- 
+--
 
 CREATE TABLE `import` (
   `id` int(11) NOT NULL auto_increment,
@@ -233,16 +233,16 @@ CREATE TABLE `import` (
   KEY `scheduleid` (`scheduleid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `import`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `importfield`
--- 
+--
 
 CREATE TABLE `importfield` (
   `id` int(11) NOT NULL auto_increment,
@@ -252,16 +252,16 @@ CREATE TABLE `importfield` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `importfield`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `job`
--- 
+--
 
 CREATE TABLE `job` (
   `id` int(11) NOT NULL auto_increment,
@@ -297,16 +297,16 @@ CREATE TABLE `job` (
   KEY `scheduleid` (`scheduleid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `job`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `joblanguage`
--- 
+--
 
 CREATE TABLE `joblanguage` (
   `id` int(11) NOT NULL auto_increment,
@@ -318,16 +318,16 @@ CREATE TABLE `joblanguage` (
   KEY `jobid` (`jobid`,`language`(50))
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `joblanguage`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtask`
--- 
+--
 
 CREATE TABLE `jobtask` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -345,16 +345,16 @@ CREATE TABLE `jobtask` (
   KEY `blockednumbers` (`phoneid`,`jobworkitemid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `jobtask`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtype`
--- 
+--
 
 CREATE TABLE `jobtype` (
   `id` int(11) NOT NULL auto_increment,
@@ -365,16 +365,16 @@ CREATE TABLE `jobtype` (
   KEY `customerid` (`customerid`,`priority`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `jobtype`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobworkitem`
--- 
+--
 
 CREATE TABLE `jobworkitem` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -395,16 +395,16 @@ CREATE TABLE `jobworkitem` (
   KEY `assign` (`status`,`type`,`systempriority`,`priority`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `jobworkitem`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `language`
--- 
+--
 
 CREATE TABLE `language` (
   `id` int(11) NOT NULL auto_increment,
@@ -415,16 +415,16 @@ CREATE TABLE `language` (
   KEY `customerid` (`customerid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `language`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `list`
--- 
+--
 
 CREATE TABLE `list` (
   `id` int(11) NOT NULL auto_increment,
@@ -439,16 +439,16 @@ CREATE TABLE `list` (
   KEY `userid` (`userid`,`name`,`deleted`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `list`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `listentry`
--- 
+--
 
 CREATE TABLE `listentry` (
   `id` int(11) NOT NULL auto_increment,
@@ -461,16 +461,16 @@ CREATE TABLE `listentry` (
   KEY `type` (`personid`,`listid`,`type`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `listentry`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `message`
--- 
+--
 
 CREATE TABLE `message` (
   `id` int(11) NOT NULL auto_increment,
@@ -487,16 +487,16 @@ CREATE TABLE `message` (
   KEY `userid` (`userid`,`type`,`deleted`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `message`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `messagepart`
--- 
+--
 
 CREATE TABLE `messagepart` (
   `id` int(11) NOT NULL auto_increment,
@@ -512,16 +512,16 @@ CREATE TABLE `messagepart` (
   KEY `messageid` (`messageid`,`sequence`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `messagepart`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `permission`
--- 
+--
 
 CREATE TABLE `permission` (
   `id` int(11) NOT NULL auto_increment,
@@ -531,16 +531,16 @@ CREATE TABLE `permission` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `permission`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `person`
--- 
+--
 
 CREATE TABLE `person` (
   `id` int(11) NOT NULL auto_increment,
@@ -559,16 +559,16 @@ CREATE TABLE `person` (
   KEY `ownership` (`userid`,`customerid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `person`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `persondata`
--- 
+--
 
 CREATE TABLE `persondata` (
   `id` int(11) NOT NULL auto_increment,
@@ -617,16 +617,16 @@ CREATE TABLE `persondata` (
   KEY `f20b` (`f20`(25),`personid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `persondata`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `persondatavalues`
--- 
+--
 
 CREATE TABLE `persondatavalues` (
   `id` int(11) NOT NULL auto_increment,
@@ -640,16 +640,16 @@ CREATE TABLE `persondatavalues` (
   KEY `name` (`customerid`,`fieldnum`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `persondatavalues`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `phone`
--- 
+--
 
 CREATE TABLE `phone` (
   `id` int(11) NOT NULL auto_increment,
@@ -662,16 +662,16 @@ CREATE TABLE `phone` (
   KEY `dedupe` (`phone`,`sequence`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `phone`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `renderedmessage`
--- 
+--
 
 CREATE TABLE `renderedmessage` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -680,16 +680,16 @@ CREATE TABLE `renderedmessage` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `renderedmessage`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportcompleted`
--- 
+--
 
 CREATE TABLE `reportcompleted` (
   `jobid` int(11) NOT NULL default '0',
@@ -697,16 +697,16 @@ CREATE TABLE `reportcompleted` (
   UNIQUE KEY `jobid` (`jobid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `reportcompleted`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rule`
--- 
+--
 
 CREATE TABLE `rule` (
   `id` int(11) NOT NULL auto_increment,
@@ -717,16 +717,16 @@ CREATE TABLE `rule` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `rule`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `schedule`
--- 
+--
 
 CREATE TABLE `schedule` (
   `id` int(11) NOT NULL auto_increment,
@@ -738,16 +738,16 @@ CREATE TABLE `schedule` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `schedule`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `scheduleday`
--- 
+--
 
 CREATE TABLE `scheduleday` (
   `id` int(11) NOT NULL auto_increment,
@@ -757,16 +757,16 @@ CREATE TABLE `scheduleday` (
   KEY `scheduleid` (`scheduleid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `scheduleday`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `setting`
--- 
+--
 
 CREATE TABLE `setting` (
   `id` int(11) NOT NULL auto_increment,
@@ -778,16 +778,16 @@ CREATE TABLE `setting` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `setting`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `specialtask`
--- 
+--
 
 CREATE TABLE `specialtask` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -800,16 +800,16 @@ CREATE TABLE `specialtask` (
   KEY `assignedto` (`assignedto`,`status`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `specialtask`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `ttsvoice`
--- 
+--
 
 CREATE TABLE `ttsvoice` (
   `id` int(11) NOT NULL auto_increment,
@@ -820,9 +820,9 @@ CREATE TABLE `ttsvoice` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `ttsvoice`
--- 
+--
 
 INSERT INTO `ttsvoice` (`id`, `ttsname`, `name`, `language`, `gender`) VALUES (1, '', '', 'english', 'male');
 INSERT INTO `ttsvoice` (`id`, `ttsname`, `name`, `language`, `gender`) VALUES (2, '', '', 'english', 'female');
@@ -831,9 +831,9 @@ INSERT INTO `ttsvoice` (`id`, `ttsname`, `name`, `language`, `gender`) VALUES (4
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `user`
--- 
+--
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL auto_increment,
@@ -856,16 +856,16 @@ CREATE TABLE `user` (
   KEY `login` (`login`,`password`,`enabled`,`deleted`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `user`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `userjobtypes`
--- 
+--
 
 CREATE TABLE `userjobtypes` (
   `userid` int(11) NOT NULL default '0',
@@ -873,16 +873,16 @@ CREATE TABLE `userjobtypes` (
   PRIMARY KEY  (`userid`,`jobtypeid`)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `userjobtypes`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `userrule`
--- 
+--
 
 CREATE TABLE `userrule` (
   `userid` int(11) NOT NULL default '0',
@@ -890,9 +890,9 @@ CREATE TABLE `userrule` (
   `sequence` tinyint(11) NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- 
+--
 -- Dumping data for table `userrule`
--- 
+--
 
 
 
@@ -998,9 +998,6 @@ j.id = wi.jobid and u.id = j.userid;
 
 
 
-ALTER TABLE `jobworkitem` ADD INDEX `assign` ( `status` , `type` , `systempriority` , `priority` ) ;
-
-
 ALTER TABLE `jobworkitem` ADD INDEX `assign2` ( `status` , `customerid` , `type` , `systempriority` , `priority` ) ;
 
 
@@ -1011,3 +1008,13 @@ ALTER TABLE `jobtaskactive` ADD `type` ENUM( 'phone', 'email', 'print' ) NOT NUL
 ALTER TABLE `jobtaskactive` ADD `subtype` VARCHAR( 20 ) NOT NULL DEFAULT 'notification' AFTER `type` ;
 
 ALTER TABLE `jobtaskactive` CHANGE `phone` `phone` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL ;
+
+
+
+ALTER TABLE `specialtask` DROP `assignedto` ;
+ALTER TABLE `specialtask` CHANGE `status` `status` ENUM( 'new', 'queued', 'assigned', 'done' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
+
+ALTER TABLE `specialtask` DROP INDEX `assignedto` ,
+ADD INDEX `status` ( `status` , `type` ) ;
+
+ALTER TABLE `specialtask`  ENGINE = innodb;
