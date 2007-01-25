@@ -1,2 +1,2 @@
 -- 1/24
-ALTER TABLE `user` ADD `ldap` TINYINT( 10 ) NULL ;
+ALTER TABLE `user` ADD `ldap` TINYINT( 10 ) NOT NULL DEFAULT 0;
