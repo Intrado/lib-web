@@ -1,6 +1,6 @@
 <?
 $code = $_GET['s'];
-if (strlen($code) > 50)
+if (strlen($code) > 50 || strlen($CUSTOMERURL) > 50)
 	exit();
 
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -21,6 +21,8 @@ include_once("../obj/Job.obj.php");
 include_once("../obj/SurveyQuestionnaire.obj.php");
 include_once("../obj/SurveyQuestion.obj.php");
 
+
+$custname = QuickQuery("select name from customer where hostname='" . DBSafe($CUSTOMERURL) . "'");
 
 //see if this code exists and has not already been used
 $query = "select jobworkitemid, isused from surveyemailcode where code='" . DBSafe($code) . "'";
@@ -103,7 +105,7 @@ if ($_POST['submit'] && $exists && !$isused && $job->status == "active") {
 <body>
 <div id='container'>
 <div id='mainscreen'>
-<div id='orgtitle'>foobar</div>
+<div id='orgtitle'><?= htmlentities($custname) ?></div>
 			<img id='brand' src='../img/school_messenger.gif' /><img src='img/spacer.gif' width="1" height="40" />
 
 <div id="contentbody">
