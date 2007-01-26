@@ -36,7 +36,7 @@ if ($REQUEST_TYPE == "new") {
 		mysql_free_result($res);
 
 		//add the sessionid to the voice tag
-		echo str_replace("<voice>","<voice sessionid=\"$foundid\">",$messagedata);
+		echo str_replace("<voice>","<voice sessionid=\"outbound_$foundid\">",$messagedata);
 
 	} else {
 ?>
@@ -54,6 +54,9 @@ if ($REQUEST_TYPE == "new") {
 } else {
 
 	//now we should update the task info with the results
+
+	//trim off the "outbound_" marker from the sessionid
+	$taskid = substr($SESSIONID,9); //trim off "outbound_" from the sessionid
 
 	$cpcodes = array("answered" => "A",
 					"machine" => "M",
@@ -73,18 +76,18 @@ if ($REQUEST_TYPE == "new") {
 	$resultdata = mysql_real_escape_string(http_build_query($BFXML_VARS,'','&'),$dmapidb);
 
 	//try to find this sessionid first
-	$query = "select count(*) from jobtaskactive where id='" . mysql_real_escape_string($SESSIONID,$dmapidb) . "'";
+	$query = "select count(*) from jobtaskactive where id='" . mysql_real_escape_string($taskid,$dmapidb) . "'";
 	$res = mysql_query($query,$dmapidb);
 	$row = mysql_fetch_row($res);
 	if ($row[0]) {
 
 		$query = "update jobtaskactive set
 				callprogress='$callprogress', resultdata='$resultdata', duration='$callduration',
-				status='done' where id='" . mysql_real_escape_string($SESSIONID,$dmapidb) . "'";
+				status='done' where id='" . mysql_real_escape_string($taskid,$dmapidb) . "'";
 		$res = mysql_query($query);
 		$rowsaffected = mysql_affected_rows();
 		if ($rowsaffected != 1) {
-			error_log("Something bad happened to the data while we were trying to post results! sesisonid=$SESSIONID. rows affected: $rowsaffected. mysql_error:" . mysql_error());
+			error_log("Something bad happened to the data while we were trying to post results! sesisonid=$taskid. rows affected: $rowsaffected. mysql_error:" . mysql_error());
 		}
 ?>
 			<ok />

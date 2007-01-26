@@ -29,12 +29,15 @@ if ($data = findChild($BFXML_ELEMENT,"DATA")) {
 }
 
 //look for a sessionid on the taskrequest, if so, load the session data from the DB
+$SESSIONDATA = array();
 if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
 	$SESSIONID = $BFXML_ELEMENT['attrs']['SESSIONID'];
-	$SESSIONDATA = loadSessionData($SESSIONID);
+
+	//only load sessiondata if the sessionid doesn't have the "outbound_" marker
+	if (strpos("outbound_",$SESSIONID) === false)
+		$SESSIONDATA = loadSessionData($SESSIONID);
 } else {
 	$SESSIONID = uniqid(mt_rand(), true);
-	$SESSIONDATA = array();
 }
 
 $REQUEST_TYPE = $BFXML_ELEMENT['attrs']['REQUEST'];
@@ -44,7 +47,7 @@ $RESOURCEID = $BFXML_ELEMENT['attrs']['RESOURCEID'];
 //var_dump($BFXML_ELEMENT);
 
 //is this a new task request?
-if ($REQUEST_TYPE) { //TODO also check for new request type
+if ($REQUEST_TYPE == "new") {
 	switch($BFXML_ELEMENT['attrs']['TYPE']) {
 		case "voice":
 			forwardToPage("phoneoutbound.php");
@@ -59,6 +62,9 @@ if ($REQUEST_TYPE) { //TODO also check for new request type
 			forwardToPage("print.php");
 			break;
 	}
+//check for phone outbound, it doesnt have any sessiondata so we need to check and forward directly to it
+} else if (strpos("outbound_",$SESSIONID) === 0) {
+	forwardToPage("phoneoutbound.php");
 } else {
 	//do we have a current page set? I hope so!
 	if (isset($SESSIONDATA['_nav_curpage']) && $SESSIONDATA['_nav_curpage']) {
