@@ -72,13 +72,13 @@ class User extends DBMappedObject {
 		return QuickQuery($query);
 	}
 
-	function doLoginPhone ($accesscode, $pin, $url = null) {
+	function doLoginPhone ($accesscode, $pin, $inboundnumber = null) {
 		$accesscode = DBSafe($accesscode);
 		$pin = DBSafe($pin);
 
-		if (isset($url)) {
-			$url = DBSafe($url);
-			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.hostname='$url') "
+		if (isset($inboundnumber)) {
+			$inboundnumber = DBSafe($inboundnumber);
+			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.inboundnumber='$inboundnumber') "
 					."where u.enabled=1 and c.enabled=1 and u.deleted=0 and "
 					."accesscode='$accesscode' and pincode=password('$pin')";
 		} else {
@@ -86,7 +86,6 @@ class User extends DBMappedObject {
 					."accesscode='$accesscode' and pincode=password('$pin')";
 		}
 		return QuickQuery($query);
-
 	}
 
 	function forceLogin ($username, $url, $customerid) {
