@@ -1018,3 +1018,9 @@ ALTER TABLE `specialtask` DROP INDEX `assignedto` ,
 ADD INDEX `status` ( `status` , `type` ) ;
 
 ALTER TABLE `specialtask`  ENGINE = innodb;
+
+
+-- support multiple emails
+ALTER TABLE `user` CHANGE `email` `email` TEXT CHARACTER SET latin1 COLLATE latin1_bin NOT NULL ;
+
+
