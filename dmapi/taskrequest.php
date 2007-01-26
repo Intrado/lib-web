@@ -62,9 +62,16 @@ if ($REQUEST_TYPE == "new") {
 			forwardToPage("print.php");
 			break;
 	}
-//check for phone outbound, it doesnt have any sessiondata so we need to check and forward directly to it
+//check for outbound, it doesnt have any sessiondata so we need to check and forward directly to it
 } else if (strpos("outbound_",$SESSIONID) === 0) {
-	forwardToPage("phoneoutbound.php");
+	switch($BFXML_ELEMENT['attrs']['TYPE']) {
+		case "voice":
+			forwardToPage("phoneoutbound.php");
+			break;
+		case "email":
+			forwardToPage("email.php");
+			break;
+	}
 } else {
 	//do we have a current page set? I hope so!
 	if (isset($SESSIONDATA['_nav_curpage']) && $SESSIONDATA['_nav_curpage']) {
