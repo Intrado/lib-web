@@ -985,6 +985,13 @@ ALTER TABLE `user` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLA
 
 ALTER TABLE `jobworkitem` ADD INDEX `digest` ( `status` , `jobid` ) ;
 
+
+
+
+-- Queries after this need to be applied to ASP
+
+
+
 ALTER TABLE `job` CHANGE `status` `status` ENUM( 'new', 'active', 'complete', 'cancelled', 'cancelling', 'repeating' ) NOT NULL DEFAULT 'new';
 
 -- for customer load balancing
