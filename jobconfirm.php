@@ -59,6 +59,12 @@ $renderedlist->calcStats();
 if ($renderedlist->total == 0)
 	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
 
+$warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
+$warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
+if((strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
+	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) )
+	error("WARNING: Your message is being sent at odd hours: ". date("g:i a", strtotime($job->starttime)) ." - ". date("g:i a", strtotime($job->endtime)));
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 
@@ -281,11 +287,6 @@ endWindow();
 buttons();
 EndForm();
 
-$warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
-$warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
-if((strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
-	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) )
-	error("WARNING: Your message is being sent at odd hours: ". date("g:i a", strtotime($job->starttime)) ." - ". date("g:i a", strtotime($job->endtime)));
 
 
 include_once("navbottom.inc.php");
