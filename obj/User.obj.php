@@ -14,7 +14,7 @@ class User extends DBMappedObject {
 	var $enabled = 0;
 	var $lastlogin;
 	var $deleted = 0;
-	var $ldap;
+	var $ldap = 0;
 
 	//new constructor
 	function User ($id = NULL) {
