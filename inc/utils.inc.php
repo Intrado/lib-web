@@ -194,4 +194,23 @@ function base64url_encode($data)
 	return rtrim(strtr(base64_encode($data), '+/', '-_'),"=");
 }
 
+//checks emails seperated by ";" in a single string
+function checkemails($emaillist) {
+	if($emaillist=="")
+		return false;
+	$bademaillist=array();
+	$emails = explode(";", $emaillist);
+	$i=0;
+	foreach($emails as $email){
+		if($email=="")
+			continue;
+		if (!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email)) {
+			$bademaillist[$i] = $email;
+			$i++;
+		}
+	}
+	return $bademaillist;
+}
+
+
 ?>
