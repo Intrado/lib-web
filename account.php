@@ -28,6 +28,19 @@ $f = "user";
 $s = "main";
 $reloadform = 0;
 
+$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
+$usernamelength = getSystemSetting("usernamelength") ? getSystemSetting("usernamelength") : 5;
+$passwordlength = getSystemSetting("passwordlength") ? getSystemSetting("passwordlength") : 5;
+
+if($checkpassword){
+	if($passwordlength < 6) {
+		$passwordlength = 6;
+	}
+	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+} else {
+	$securityrules = "The password cannot be made from your username/fristname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+}
+
 if(CheckFormSubmit($f,$s))
 {
 	//check to see if formdata is valid
@@ -38,17 +51,6 @@ if(CheckFormSubmit($f,$s))
 	}
 	else
 	{
-		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
-		$usernamelength = getSystemSetting("usernamelength") ? getSystemSetting("usernamelength") : 5;
-		$passwordlength = getSystemSetting("passwordlength") ? getSystemSetting("passwordlength") : 5;
-		
-		if($checkpassword){
-			$passwordlength = $passwordlength ? $passwordlength : 6;
-			$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
-		} else {
-			$securityrules = "The password cannot be made from your username/fristname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
-		}
-	
 		MergeSectionFormData($f, $s);
 
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
@@ -94,6 +96,8 @@ if(CheckFormSubmit($f,$s))
 			error('User ID and Pin code cannot have all the same digits');
 		} elseif( isSequential(GetFormData($f, $s, 'pincode'))) {
 			error('Cannot have sequential numbers for User ID or Pin code');
+		} elseif($bademaillist = checkemails(GetFormData($f,$s,"email"))) {
+			error("Some emails are invalid", $bademaillist);
 		} else {
 			//submit changes
 			PopulateObject($f,$s,$USER,array("login","accesscode","firstname","lastname","email"));
@@ -257,7 +261,7 @@ startWindow('User Information');
 							</tr>
 
 						</table>
-						<br>Please note: username and password are case-sensitive and must be a minimum of 5 characters.
+						<br>Please note: username and password are case-sensitive and must be a minimum of <?=$passwordlength?> characters.
 						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
 					</td>
 				</tr>
