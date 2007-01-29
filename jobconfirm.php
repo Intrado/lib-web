@@ -285,7 +285,7 @@ $warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_
 $warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
 if((strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
 	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) )
-	print '<script language="javascript">window.alert(\'WARNING: Your message is being sent at odd hours. '. date("g:i a", strtotime($job->starttime)) .' - '. date("g:i a", strtotime($job->endtime)) .'\');</script>';
+	error("WARNING: Your message is being sent at odd hours: ". date("g:i a", strtotime($job->starttime)) ." - ". date("g:i a", strtotime($job->endtime)));
 
 
 include_once("navbottom.inc.php");
