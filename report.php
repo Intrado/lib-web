@@ -344,7 +344,9 @@ select SQL_CALC_FOUND_ROWS
 	pd.f02,
 	wi.type,
 	m.name,
-	coalesce(ph.phone,
+	coalesce(jt.phone,
+				ph.phone,
+				jt.email,
 				e.email,
 				concat(
 					coalesce(a.addr1,''), ' ',
