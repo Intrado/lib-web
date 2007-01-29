@@ -1027,7 +1027,12 @@ ADD INDEX `status` ( `status` , `type` ) ;
 ALTER TABLE `specialtask`  ENGINE = innodb;
 
 
--- support multiple emails
+-- support multiple emails for autoreports
 ALTER TABLE `user` CHANGE `email` `email` TEXT CHARACTER SET latin1 COLLATE latin1_bin NOT NULL ;
+
+
+-- dedupe emails, and accurate reporting
+
+ALTER TABLE `jobtask` ADD `email` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_bin NULL AFTER `emailid` ;
 
 
