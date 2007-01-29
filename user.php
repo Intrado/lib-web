@@ -55,6 +55,19 @@ $f = "user";
 $s = "main";
 $reloadform = 0;
 
+$checkpassword = (getSystemSetting("checkpassword","",true)==0) ? getSystemSetting("checkpassword") : 1;
+$usernamelength = getSystemSetting("usernamelength","",true) ? getSystemSetting("usernamelength") : 5;
+$passwordlength = getSystemSetting("passwordlength","",true) ? getSystemSetting("passwordlength") : 5;
+	
+if($checkpassword){
+	if($passwordlength < 6) {
+		$passwordlength = 6;
+	}
+	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+} else {
+	$securityrules = "The password cannot be made from your username/firstname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+}
+
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be able to differentiate between a submit and an add button click
 {
 	//check to see if formdata is valid
@@ -64,17 +77,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		$reloadform = 1;
 	}
 	else
-	{
-		$checkpassword = (getSystemSetting("checkpassword","",true)==0) ? getSystemSetting("checkpassword") : 1;
-		$usernamelength = getSystemSetting("usernamelength","",true) ? getSystemSetting("usernamelength") : 5;
-		$passwordlength = getSystemSetting("passwordlength","",true) ? getSystemSetting("passwordlength") : 5;
-		
-		if($checkpassword){
-			$passwordlength = $passwordlength ? $passwordlength : 6;
-			$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
-		} else {
-			$securityrules = "The password cannot be made from your username/fristname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
-		}
+	{	
 		MergeSectionFormData($f, $s);
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$usr = new User($_SESSION['userid']);
@@ -128,14 +131,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 					&& (!ereg("^0*$", $number))){
 			error('User ID and Pin code cannot have all the same digits');
 		} elseif(isSequential(GetFormData($f, $s, 'pincode')) && !$IS_COMMSUITE) {
-			error('Cannot have sequential numbers for User ID or Pin code');
+			error('Cannot have sequential numbers for Pin code');
+		} elseif($bademaillist = checkemails(GetFormData($f,$s,"email"))) {
+			error("Some emails are invalid", $bademaillist);
 		} else {
 			// Submit changes
 			
 			if ($usr->id == NULL) {
 				$usr->enabled = 1;
 			}
-
+			
 			PopulateObject($f,$s,$usr,array("accessid","login","accesscode","firstname","lastname","email"));
 			$usr->customerid = $USER->customerid;
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
@@ -224,7 +229,7 @@ if( $reloadform )
 			array("accesscode","number","nomin","nomax"),
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
-			array("email","email",0,100),
+			array("email","text","nomin","nomax"),
 			);
 
 	PopulateForm($f,$s,$usr,$fields);
@@ -337,7 +342,7 @@ startWindow('User Information');
 
 						</table>
 
-						<br>Please note: username and password are case-sensitive and must be a minimum of 5 characters long.
+						<br>Please note: username and password are case-sensitive and must be a minimum of <?=$passwordlength?> characters long.
 						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
 					</td>
 				</tr>
