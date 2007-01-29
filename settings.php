@@ -353,7 +353,7 @@ startWindow('Global System Settings');
 						Minimum Username Length:
 					</th>
 					<td>
-					<? NewFormItem($f, $s, 'usernamelength', 'text', 30,100);  ?>
+					<? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?>
 					</td>
 				</tr>
 				<tr>
@@ -361,7 +361,7 @@ startWindow('Global System Settings');
 						Minimum Password Length:
 					</th>
 					<td>
-					<? NewFormItem($f, $s, 'passwordlength', 'text', 30,100);  ?>
+					<? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?>
 					</td>
 				</tr>
 				<tr>
