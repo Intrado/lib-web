@@ -38,24 +38,25 @@ function assignTask ($type, $resourceid, $dmapidb) {
 
 function assignSpecialTask ($types, $dmapidb) {
 	$success = false;
-	//when was the last time we checked the specialtasks table? We shouldn't check more than once every 5 seconds
-	if (QuickQuery("select count(*) from from tasksyncdata where name='specialtaskcheck' and value > (now() - interval 5 second)") == 0) {
-		//check for a special task, if we dont fine one, update the table
-
-		QuickUpdate("begin transaction");
-		$res = QuickQuery("select id, type from specialtask where status='queued' and type in ('" . implode("','",$types) . "')");
-		if ($res) {
-			list($id,$type) = $res;
-			if (QuickUpdate("update specialtask set status='assigned' where id=$id")) {
-				$success = true;
+	foreach($types as $specialtype) {
+		//when was the last time we checked the specialtasks table? We shouldn't check more than once every 5 seconds
+		if (QuickQuery("select count(*) from tasksyncdata where name='specialtaskcheck_" . $specialtype ."' and value > (now() - interval 5 second)") == 0) {
+			//check for a special task, if we dont fine one, update the table
+	
+			QuickUpdate("begin transaction");
+			$res = QuickQueryRow("select id, type from specialtask where status='queued' and type in ('$specialtype')");
+			if ($res) {
+				list($id,$type) = $res;
+				if (QuickUpdate("update specialtask set status='assigned' where id=$id")) {
+					$success = true;
+				}
 			} else {
 				QuickUpdate("insert into tasksyncdata (name,value) values
-					('specialtaskcheck',now()) on duplicate key update value=now()");
+						('specialtaskcheck_" . $specialtype ."',now()) on duplicate key update value=now()");
 			}
+			QuickUpdate("commit");
 		}
-		QuickUpdate("commit");
 	}
-
 	if (!$success)
 		return false;
 	else
