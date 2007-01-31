@@ -8,10 +8,14 @@ include_once("obj/Message.obj.php");
 include_once("obj/MessagePart.obj.php");
 include_once("obj/AudioFile.obj.php");
 include_once("obj/FieldMap.obj.php");
+include_once("obj/SurveyQuestionnaire.obj.php");
+include_once("obj/SurveyQuestion.obj.php");
 include_once("inc/html.inc.php");
 include_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/formatters.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -34,6 +38,15 @@ if (isset($_GET['delete'])) {
 	}
 }
 
+if (isset($_GET['deletetemplate'])) {
+	$id = $_GET['deletetemplate'] + 0;
+	if (userOwns("surveyquestionnaire",$id)) {
+		$questionnaire = new SurveyQuestionnaire($id);
+		$questionnaire->deleted = 1;
+		$questionnaire->update();
+	}
+	redirectToReferrer();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -94,12 +107,19 @@ function fmt_creator ($obj,$name) {
 }
 
 
+function fmt_surveyactions ($obj,$name) {
+
+	return '<a href="surveytemplate.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
+			. '<a href="survey.php?scheduletemplate=' . $obj->id . '">Schedule</a>&nbsp;|&nbsp;'
+			. '<a href="messages.php?deletetemplate=' . $obj->id . '">Delete</a>';
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = "Message Builder";
+$TITLE = "Message " . ($USER->authorize('survey') ? "& Survey Template " : "") . "Builder";
 
 include_once("nav.inc.php");
 
@@ -169,6 +189,29 @@ if($USER->authorize('sendprint')) {
 	startWindow('My Print Messages ' . help('Messages_MyPrintMessages', NULL, 'blue'), 'padding: 3px;', true, true);
 	button_bar(button('createprint', NULL,'messageprint.php?id=new') . help('Messages_AddprintMessage'));
 	showObjects($data, $titles, array("Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
+	endWindow();
+	echo '<br>';
+}
+
+
+if($USER->authorize('survey')) {
+
+	startWindow('My Survey Templates','padding: 3px;', true, true);
+	button_bar(button('create_new_survey', null,"surveytemplate.php?id=new") );
+
+	$questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
+
+	$titles = array("name" => "#Name",
+					"description" => "#Description",
+					"Type" => "#Type",
+					"Questions" => "#Questions",
+					"Actions" => "Actions");
+	$formatters = array("Type" => "fmt_questionnairetype",
+					"Questions" => "fmt_numquestions",
+					"Actions" => "fmt_surveyactions");
+
+	showObjects($questionnaires,$titles,$formatters, count($questionnaires) > 8,true);
+
 	endWindow();
 }
 
