@@ -132,9 +132,7 @@ function startWindow($title, $style = NULL, $minimize = false, $usestate = true)
 			<td colspan="2" style="padding: 0px;"><table border="0" cellpadding="0" cellspacing="0" class="windowHeader" width="100%">
 					<tr>
 						<th align="left" style="padding: 1px 3px 1px 3px;"><div class="windowTitle"><? print $title; ?></div></th>
-						<th align="right" height="21"><img class="noprint" src="img/collapse_down.gif"
-								onMouseOver="this.style.cursor='hand';"
-								onMouseOut="this.style.cursor='default';"
+						<th align="right" height="21"><img class="noprint clickable" src="img/collapse_down.gif"
 								onClick="hide('_window_off_<? print $id;?>'); show('_window_on_<? print $id; ?>'); setState('window_<? print $id; ?>', 'open');"
 								></th>
 					</tr>
@@ -149,9 +147,7 @@ function startWindow($title, $style = NULL, $minimize = false, $usestate = true)
 			<td style="padding: 0px;"><table border="0" cellpadding="0" cellspacing="0" class="windowHeader" width="100%">
 				<tr>
 						<th align="left" style="padding: 1px 3px 1px 3px;"><div class="windowTitle"><? print $title; ?></div></th>
-						<th align="right" height="21"><? if($minimize) { ?><img class="noprint" src="img/collapse_up.gif"
-								onMouseOver="this.style.cursor='hand';"
-								onMouseOut="this.style.cursor='default';"
+						<th align="right" height="21"><? if($minimize) { ?><img class="noprint clickable" src="img/collapse_up.gif"
 								onClick="hide('_window_on_<? print $id; ?>'); show('_window_off_<? print $id; ?>'); setState('window_<? print $id; ?>', 'closed');"
 								><? } ?></th>
 				</tr>
