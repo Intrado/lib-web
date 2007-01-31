@@ -34,7 +34,7 @@ if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
 	$SESSIONID = $BFXML_ELEMENT['attrs']['SESSIONID'];
 
 	//only load sessiondata if the sessionid doesn't have the "outbound_" marker
-	if (strpos("outbound_",$SESSIONID) === false)
+	if (strpos($SESSIONID,"outbound_") === false)
 		$SESSIONDATA = loadSessionData($SESSIONID);
 } else {
 	$SESSIONID = uniqid(mt_rand(), true);
@@ -63,7 +63,7 @@ if ($REQUEST_TYPE == "new") {
 			break;
 	}
 //check for outbound, it doesnt have any sessiondata so we need to check and forward directly to it
-} else if (strpos("outbound_",$SESSIONID) === 0) {
+} else if (strpos($SESSIONID,"outbound_") === 0) {
 	switch($BFXML_ELEMENT['attrs']['TYPE']) {
 		case "voice":
 			forwardToPage("phoneoutbound.php");
@@ -80,6 +80,7 @@ if ($REQUEST_TYPE == "new") {
 ?>
 	<error>No page set!</error>
 <?
+	$SESSIONDATA = null;
 	}
 }
 
