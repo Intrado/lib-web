@@ -135,9 +135,9 @@ if ($USER->authorize('createrepeat')) {
 	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type != 'survey' order by foo,name desc");
 	$titles = array(	"name" => "#Name",
 						"description" => "#Description",
-						"type" => "Type",
-						"startdate" => "#Next Scheduled Run",
-						"finishdate" => "#Last Run",
+						"type" => "#Type",
+						"startdate" => "Next Scheduled Run",
+						"finishdate" => "Last Run",
 						"Actions" => "Actions"
 						);
 
@@ -161,9 +161,9 @@ $data = DBFindMany("Job","from job where userid=$USER->id and (status='complete'
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
 					"type" => "Type",
-					"startdate" => "#Start Date",
+					"startdate" => "Start Date",
 					"Status" => "#Status",
-					"enddate" => "#End Date",
+					"enddate" => "End Date",
 					"Actions" => "Actions"
 					);
 $formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "startdate" => "fmt_job_startdate", "enddate" => "fmt_job_enddate","type" => "fmt_obj_csv_list");

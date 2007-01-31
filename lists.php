@@ -58,7 +58,7 @@ include_once("nav.inc.php");
 $data = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
 $titles = array(	"name" => "#List Name",
 					"description" => "#Description",
-					"modified" => "#Last Used",
+					"modified" => "Last Used",
 					"Actions" => "Actions"
 					);
 
