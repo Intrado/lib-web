@@ -11,7 +11,7 @@
 </div>
 <div id="termsinfo">Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
 <br>
-&copy; 2006 Reliance Communications, Inc.
+&copy; 2006-2007 Reliance Communications, Inc.
 
 </div>
 <?
