@@ -80,6 +80,8 @@ if (isset($_GET['id'])) {
 	if ($jobid = getCurrentSurvey()) {
 		$job = new Job($jobid);
 		$_SESSION['scheduletemplate'] = $job->questionnaireid;
+	} else {
+		$_SESSION['scheduletemplate'] = null;
 	}
 	redirect();
 }
@@ -93,10 +95,6 @@ if (isset($_GET['scheduletemplate'])) {
 	}
 	redirect();
 }
-
-//dont allow creating a new survey if the template hasn't been specified
-if (!getCurrentSurvey() && !$_SESSION['scheduletemplate'])
-	redirect("surveys.php");
 
 $completedmode = false;
 $submittedmode = false;
@@ -115,7 +113,8 @@ if (getCurrentSurvey() != NULL) {
 
 $VALIDJOBTYPES = JobType::getUserJobTypes();
 $PEOPLELISTS = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
-$QUESTIONNAIRE = new SurveyQuestionnaire($_SESSION['scheduletemplate']);
+$QUESTIONNAIRES = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
+
 
 /****************** main message section ******************/
 
@@ -152,14 +151,22 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else {
+
+			$questionnaireid = GetFormData($f,$s,"questionnaireid") + 0;
+			if (!userOwns("surveyquestionnaire",$questionnaireid))
+				exit();
+
+			$questionnaire = new SurveyQuestionnaire($questionnaireid);
+
 			//submit changes
 			$jobid = getCurrentSurvey();
 			if ($jobid == null) {
 				$job = Job::jobWithDefaults();
-				$job->questionnaireid = $_SESSION['scheduletemplate'];
 			} else {
 				$job = new Job($jobid);
 			}
+
+			$job->questionnaireid = $questionnaireid;
 
 			//set unchangable fields
 			$job->type="survey";
@@ -182,7 +189,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				PopulateObject($f,$s,$job,array("name", "description"));
 			} else if ($submittedmode) {
 				$fieldsarray = array("name", "description","startdate", "starttime", "endtime");
-				if ($QUESTIONNAIRE->hasphone)
+				if ($questionnaire->hasphone)
 					$fieldsarray[] = "maxcallattempts";
 				PopulateObject($f,$s,$job,$fieldsarray);
 				$job->startdate = GetFormData($f, $s, 'startdate');
@@ -191,7 +198,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			} else {
 				$fieldsarray = array("name", "jobtypeid", "description", "listid",
 							"starttime", "endtime","startdate");
-				if ($QUESTIONNAIRE->hasphone)
+				if ($questionnaire->hasphone)
 					$fieldsarray[] = "maxcallattempts";
 				PopulateObject($f,$s,$job,$fieldsarray);
 
@@ -200,9 +207,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			}
 
-			if ($QUESTIONNAIRE->hasphone && $USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
+			if ($questionnaire->hasphone && $USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
-			} else if ($QUESTIONNAIRE->hasphone) {
+			} else if ($questionnaire->hasphone) {
 				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 				$job->setOptionValue("callerid", $callerid);
 			}
@@ -217,8 +224,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$job->endtime = date("H:i", strtotime($job->endtime));
 
 			$job->update();
-
-			echo mysql_error();
 
 			setCurrentSurvey($job->id);
 
@@ -240,8 +245,7 @@ if( $reloadform )
 	$jobid = getCurrentSurvey();
 	if ($jobid == null) {
 		$job = Job::jobWithDefaults();
-		$job->name = $QUESTIONNAIRE->name;
-		$job->description = $QUESTIONNAIRE->description;
+		$job->questionnaireid = $_SESSION['scheduletemplate'];
 	} else {
 		$job = new Job($jobid);
 	}
@@ -257,16 +261,16 @@ if( $reloadform )
 		array("name","text",1,50,true),
 		array("description","text",1,50,false),
 		array("jobtypeid","number","nomin","nomax"),
+		array("questionnaireid","number","nomin","nomax",true),
 		array("listid","number","nomin","nomax",true),
 		array("starttime","text",1,50,true),
 		array("endtime","text",1,50,true),
-		array('startdate','text', 1, 50, true)
+		array('startdate','text', 1, 50, true),
+		array("maxcallattempts","number",1,$ACCESS->getValue('callmax'),true)
 	);
 
-	if ($QUESTIONNAIRE->hasphone) {
-		$fields[] = array("maxcallattempts","number",1,$ACCESS->getValue('callmax'),true);
-		PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
-	}
+
+	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "phone", 10, 10, false);
 
 	PopulateForm($f,$s,$job,$fields);
 
@@ -274,16 +278,11 @@ if( $reloadform )
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
 }
 
-
-//TODO make some js to show/hide the phone section based on type of questionnaire selected
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:survey";
-$TITLE = "Survey Editor: " . (getCurrentSurvey() == NULL ? "New Survey" : $job->name);
-$DESCRIPTION = "Survey using $QUESTIONNAIRE->name";
+$TITLE = "Survey Scheduler: " . (getCurrentSurvey() == NULL ? "New Survey" : $job->name);
 
 include_once("nav.inc.php");
 NewForm($f);
@@ -301,7 +300,7 @@ startWindow('Survey Information');
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td width="30%" >Name</td>
+					<td width="30%" >Survey Name</td>
 					<td><? NewFormItem($f,$s,"name","text", 30,50); ?></td>
 				</tr>
 				<tr>
@@ -318,6 +317,19 @@ startWindow('Survey Information');
 							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
 						}
 						NewFormItem($f,$s,"jobtypeid", "selectend");
+						?>
+					</td>
+				</tr>
+				<tr>
+					<td>Survey Template</td>
+					<td>
+						<?
+						NewFormItem($f,$s,"questionnaireid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : 'id="questionnaireselect" onchange="checkphonesurvey(this.options[this.selectedIndex].value);"'));
+						NewFormItem($f,$s,"questionnaireid", "selectoption", "-- Select a Template --", NULL);
+						foreach ($QUESTIONNAIRES as $questionnaire) {
+							NewFormItem($f,$s,"questionnaireid", "selectoption", $questionnaire->name, $questionnaire->id);
+						}
+						NewFormItem($f,$s,"questionnaireid", "selectend");
 						?>
 					</td>
 				</tr>
@@ -371,7 +383,6 @@ startWindow('Survey Information');
 			</table>
 		</td>
 	</tr>
-<? if($QUESTIONNAIRE->hasphone) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader">Phone:</th>
 		<td>
@@ -381,7 +392,7 @@ startWindow('Survey Information');
 					<td>
 						<?
 						$max = first($ACCESS->getValue('callmax'), 1);
-						NewFormItem($f,$s,"maxcallattempts","selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
+						NewFormItem($f,$s,"maxcallattempts","selectstart", NULL, NULL, ($completedmode ? "DISABLED" : 'dependson="phonesurvey"'));
 						for($i = 1; $i <= $max; $i++) {
 							NewFormItem($f,$s,"maxcallattempts","selectoption",$i,$i);
 						}
@@ -392,13 +403,12 @@ startWindow('Survey Information');
 <? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
 						<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
-						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : "")); ?></td>
+						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : 'dependson="phonesurvey"')); ?></td>
 					</tr>
 <? } ?>
 			</table>
 		</td>
 	</tr>
-<? } ?>
 </table>
 <?
 endWindow();
@@ -406,5 +416,33 @@ endWindow();
 
 buttons();
 EndForm();
+
+
+
+$ids = array();
+foreach ($QUESTIONNAIRES as $questionnaire) {
+	$ids[] = $questionnaire->id . ":" . ($questionnaire->hasphone ? "true" : "false");
+}
+
+?>
+
+<script>
+
+var ids = {<?= implode(",",$ids) ?>};
+
+function checkphonesurvey(id) {
+	var callback = function(obj) {obj.disabled = !ids[id];};
+	modifyMarkedNodes (document.forms[0],"dependson","phonesurvey",callback)
+}
+
+var q = new getObj('questionnaireselect');
+if (q.obj.selectedIndex)
+	checkphonesurvey(q.obj.options[q.obj.selectedIndex].value);
+
+</script>
+
+
+
+<?
 include_once("navbottom.inc.php");
 ?>
