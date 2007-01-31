@@ -1036,3 +1036,10 @@ ALTER TABLE `user` CHANGE `email` `email` TEXT CHARACTER SET latin1 COLLATE lati
 ALTER TABLE `jobtask` ADD `email` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_bin NULL AFTER `emailid` ;
 
 
+ALTER TABLE `job` ADD `ranautoreport` TINYINT NOT NULL DEFAULT '0' AFTER `deleted` ;
+
+-- update all jobs ranautoreport field from teh reportcompleted table
+
+update job j inner join reportcompleted rc on (rc.jobid = j.id) set j.ranautoreport=1
+
+ALTER TABLE `job` ADD INDEX ( `ranautoreport` , `status` ) 
