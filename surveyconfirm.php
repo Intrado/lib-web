@@ -70,7 +70,7 @@ include_once("nav.inc.php");
 NewForm($f);
 
 if ($renderedlist->total > 0 && count($questions) > 0)
-	buttons(button('schedule_survey',null, 'jobsubmit.php?jobid=' . $jobid),button('back',null, 'survey.php'));
+	buttons(button('submitsurvey',null, 'jobsubmit.php?jobid=' . $jobid),button('back',null, 'survey.php'));
 else
 	buttons(button('cancel',null, 'survey.php'));
 
@@ -82,7 +82,7 @@ startWindow("Confirmation &amp; Submit");
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td class="bottomBorder" width="30%" >Name</td>
+					<td class="bottomBorder" width="30%" >Survey Name</td>
 					<td class="bottomBorder" ><?= htmlentities($job->name); ?></td>
 				</tr>
 				<tr>
@@ -148,16 +148,16 @@ startWindow("Confirmation &amp; Submit");
 <? } ?>
 
 	<tr valign="top">
-		<th align="right" class="windowRowHeader">Questionnaire:</th>
+		<th align="right" class="windowRowHeader">Survey Template:</th>
 		<td >
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td width="30%" class="bottomBorder" >Name</td>
+					<td width="30%" class="bottomBorder" >Template Name</td>
 					<td class="bottomBorder" ><?= htmlentities($questionnaire->name); ?></td>
 				</tr>
 				<tr>
-					<td class="bottomBorder" >Desription</td>
-					<td class="bottomBorder" ><?= htmlentities($questionnaire->description); ?></td>
+					<td class="bottomBorder" >Description</td>
+					<td class="bottomBorder" ><?= htmlentities($questionnaire->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Randomize Question Order</td>
