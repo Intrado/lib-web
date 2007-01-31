@@ -13,12 +13,11 @@ function help($title, $extrahtml = NULL, $color = NULL) {
 
 	$contents = nl2br($contents);
 
-	$hover = '<span class="hoverhelpicon" ' . $extrahtml . '>';
+	$hover = '<span class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
 	$hover .= '<img align="absmiddle" src="img/helpcenter' . ($color ? '_' . $color : "") . '.gif"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	if ($link != "")
-
 		$hover .= " onclick=\"window.open('$link', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');\"";
 	$hover .= '><div class="hoverhelp" >' . $contents . '</div></span>';
 
@@ -78,7 +77,7 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 		$btn .= '<a href="' . htmlentities($href) . '">';
 	}
 
-	$btn .= '<img class="button" alt="' . $name . '" src="img/b1_' . $name . '.gif" ' . $extrahtml . ' border="0" align="absmiddle" onMouseOver="this.src=\'img/b2_' . $name . '.gif\'; this.style.cursor=\'hand\';" onMouseOut="this.src=\'img/b1_' . $name . '.gif\'; this.style.cursor=\'default\';" ' . (isset($onclick) ? 'onClick="' . $onclick . '"' : "") . '>';
+	$btn .= '<img class="button" alt="' . $name . '" src="img/b1_' . $name . '.gif" ' . $extrahtml . ' border="0" align="absmiddle" onMouseOver="this.src=\'img/b2_' . $name . '.gif\';" onMouseOut="this.src=\'img/b1_' . $name . '.gif\';" ' . (isset($onclick) ? 'onClick="' . $onclick . '"' : "") . '>';
 
 	if ($href !== NULL) {
 		$btn .= '</a>';
