@@ -1,4 +1,8 @@
 <?
+
+require_once("../obj/SpecialTask.obj.php");
+
+
 //remember to embed the $SESSIONID manually in each task element
 //when you are done with the session, set $SESSIONDATA to null
 
@@ -18,17 +22,17 @@ if ($REQUEST_TYPE == "new") {
 				$toemail = $specialtask->getData("toemail$x");
 				$toname = $specialtask->getData("toname$x");
 ?>
-				<emailaddress name="<?= htmlentities($toname) ?>" address="<?= htmlentites($toemail) ?>" />
+				<emailaddress name="<?= htmlentities($toname) ?>" address="<?= htmlentities($toemail) ?>" />
 <?
 			}
 ?>
 		</to>
 		<from>
-			<emailaddress name="<?= htmlentites($specialtask->getData("fromname")) ?>"
-						address="<?= htmlentites($specialtask->getData("fromemail")) ?>" />
+			<emailaddress name="<?= htmlentities($specialtask->getData("fromname")) ?>"
+						address="<?= htmlentities($specialtask->getData("fromemail")) ?>" />
 		</from>
-		<subject><?= htmlentites($specialtask->getData("subject")) ?></subject>
-		<body><?= htmlentites($specialtask->getData("body")) ?></body>
+		<subject><?= htmlentities($specialtask->getData("subject")) ?></subject>
+		<body><?= htmlentities($specialtask->getData("body")) ?></body>
 <?
 		$x = 1;
 		while ($specialtask->getData("attachmentcmid$x")) {
@@ -40,7 +44,6 @@ if ($REQUEST_TYPE == "new") {
 		}
 ?>
 	</email>
-
 <?
 } else if ($REQUEST_TYPE == "continue") {
 ?>
