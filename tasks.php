@@ -80,9 +80,9 @@ $titles = array("name" => "#Name",
 				"uploadkey" => "Upload Key",
 				"status" => "#Status",
 				"lastrun" => "Last Run",
-				"file" => "#File Date");
+				"file" => "File Date");
 if ($IS_COMMSUITE)
-	$titles['nextrun'] = "#Next Scheduled Run";
+	$titles['nextrun'] = "Next Scheduled Run";
 
 $titles['Actions'] = "Actions";
 
