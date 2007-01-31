@@ -253,7 +253,8 @@ function modifyMarkedNodes (parent,attribute,marker,callback) {
 		var curchild = children[i];
 		if(curchild.getAttribute && curchild.getAttribute(attribute) == marker) {
 			callback(curchild);
-		} else if (curchild.childNodes.length > 0) {
+		}
+		if (curchild.childNodes.length > 0) {
 			modifyMarkedNodes(curchild,attribute,marker,callback);
 		}
 	}
