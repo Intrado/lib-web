@@ -1,5 +1,5 @@
-/* Taken from http://kryogenix.org/code/browser/sorttable/ */
-/* Modified by Ben Hencke 4/21/2006 */
+/* Taken from http://kryogenix.org/code/browser/sorttable/ under the MIT license */
+/* Modified by Ben Hencke 4/21/2006,1/31/2007 */
 
 addEvent(window, "load", sortables_init);
 
@@ -31,10 +31,21 @@ function ts_makeSortable(table) {
         if ((' '+cell.className+' ').indexOf("nosort") != -1)
         	continue;
         
-        var txt = ts_getInnerText(cell);
-        cell.innerHTML = '<a href="#" class="sortheader" '+ 
-        'onclick="ts_resortTable(this, '+i+');return false;">' + 
-        txt+'<span class="sortarrow">&nbsp;&nbsp;&nbsp;</span></a>';
+        cell._cellIndex = i;
+        cell.onclick = function () { ts_resortTable(this, this._cellIndex); return false; };
+        cell.className = cell.className + " clickable";
+        
+        var span = document.createElement("span");
+        span.innerHTML = "&nbsp;&nbsp;&nbsp;";
+        span.className = "sortarrow";
+        
+        cell.appendChild(span);
+    }
+    
+    //save the style for 1st (odd) and 2nd (even) rows if there are at least 2 rows (otherwise leave them undefined)
+    if (table.rows[1] && table.rows[2]) {
+    	table._oddrowstyle = table.rows[1].className;
+    	table._evenrowstyle = table.rows[2].className;
     }
 }
 
@@ -66,10 +77,9 @@ function ts_resortTable(lnk,clid) {
         if (lnk.childNodes[ci].tagName && lnk.childNodes[ci].tagName.toLowerCase() == 'span') span = lnk.childNodes[ci];
     }
     var spantext = ts_getInnerText(span);
-    var td = lnk.parentNode;
+    var td = lnk;
     var column = clid || td.cellIndex;
     var table = getParent(td,'TABLE');
-    
     // Work out a type for the column
     if (table.rows.length <= 1) return;
     var itm = ts_getInnerText(table.rows[1].cells[column]);
@@ -97,9 +107,21 @@ function ts_resortTable(lnk,clid) {
     
     // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
     // don't do sortbottom rows
-    for (i=0;i<newRows.length;i++) { if (!newRows[i].className || (newRows[i].className && (newRows[i].className.indexOf('sortbottom') == -1))) table.tBodies[0].appendChild(newRows[i]);}
+    for (i=0;i<newRows.length;i++) { 
+    	if (!newRows[i].className || (newRows[i].className && (newRows[i].className.indexOf('sortbottom') == -1))) 
+    		table.tBodies[0].appendChild(newRows[i]);
+    }
     // do sortbottom rows only
-    for (i=0;i<newRows.length;i++) { if (newRows[i].className && (newRows[i].className.indexOf('sortbottom') != -1)) table.tBodies[0].appendChild(newRows[i]);}
+    for (i=0;i<newRows.length;i++) { 
+    	if (newRows[i].className && (newRows[i].className.indexOf('sortbottom') != -1)) 
+    		table.tBodies[0].appendChild(newRows[i]);
+    }
+    
+    //redo all the row styles if we have styles for them
+    if (table._oddrowstyle || table._evenrowstyle)
+	for (j=1;j<table.rows.length;j++) {
+		table.rows[j].className = j%2 == 0 ? table._evenrowstyle : table._oddrowstyle;
+	}
     
     // Delete any other arrows there may be showing
     var allspans = document.getElementsByTagName("span");
