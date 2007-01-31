@@ -44,7 +44,7 @@ function assignSpecialTask ($types, $dmapidb) {
 			//check for a special task, if we dont fine one, update the table
 	
 			QuickUpdate("begin transaction");
-			$res = QuickQueryRow("select id, type from specialtask where status='queued' and type in ('$specialtype')");
+			$res = QuickQueryRow("select id, type from specialtask where status='queued' and type in ('$specialtype') limit 1");
 			if ($res) {
 				list($id,$type) = $res;
 				if (QuickUpdate("update specialtask set status='assigned' where id=$id")) {
@@ -56,6 +56,8 @@ function assignSpecialTask ($types, $dmapidb) {
 			}
 			QuickUpdate("commit");
 		}
+		if($success)
+			break;
 	}
 	if (!$success)
 		return false;
