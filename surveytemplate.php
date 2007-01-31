@@ -81,8 +81,6 @@ validation:
 
 
 
-
-
 /****************** main message section ******************/
 
 $f = "questionnaire";
@@ -101,18 +99,50 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 	{
 		MergeSectionFormData($f, $s);
 
-		//do check
 
+		$hasphone = (bool) GetFormData($f,$s,"hasphone");
+		$hasweb = (bool) GetFormData($f,$s,"hasweb");
+		$numquestions = GetFormData($f,$s,"numquestions");
+
+		//set the emailmessage to required if they are doing a web survey
+		SetRequired($f,$s,"emailmessageid",$hasweb);
+
+		//need to check that if hasphone, then require a messageid on each question
+		//if hasweeb, require some text for each question
+		for ($i = 0; $i < $numquestions; $i++) {
+			//is this the new question?
+			if ($i == $numquestions - 1) {
+				//if they hit the add button, or partially filled out the form, set the appropriate fields to required
+				if (($hasphone && GetFormData($f,$s,"phonemessageid_$i")) ||
+						($hasweb && GetFormData($f,$s,"webmessage_$i")) ||
+						CheckFormSubmit($f,'add')) {
+					SetRequired($f,$s,"webmessage_$i",$hasweb);
+					SetRequired($f,$s,"phonemessageid_$i",$hasphone);
+				} else {
+					//otherwise, don't require fields for the new question
+					SetRequired($f,$s,"webmessage_$i",false);
+					SetRequired($f,$s,"phonemessageid_$i",false);
+				}
+			} else {
+				//simple validation for existing questions, just require the appropriate fields
+				SetRequired($f,$s,"webmessage_$i",$hasweb);
+				SetRequired($f,$s,"phonemessageid_$i",$hasphone);
+			}
+		}
+
+		//set required on the optional checkbox controlled menus
+		SetRequired($f,$s,"machinemessageid", GetFormData($f,$s,"hasmachine") && $hasphone);
+		SetRequired($f,$s,"intromessageid",(bool) GetFormData($f,$s,"hasintro") && $hasphone);
+		SetRequired($f,$s,"exitmessageid",(bool) GetFormData($f,$s,"hasexit") && $hasphone);
+
+		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			$hasphone = GetFormData($f,$s,"hasphone");
-			$hasweb = GetFormData($f,$s,"hasweb");
 
 			if (!$hasphone && !$hasweb) {
 				error('You must select at least one survey type');
 			} else {
-
 
 				//save changes
 
@@ -146,8 +176,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 				setCurrentQuestionnaire($questionnaire->id);
 
 				//sync questions
-				$numquestions = min(GetFormData($f,$s,"numquestions"), 20);
-
 				for ($i = 0; $i < $numquestions; $i++) {
 					if (isset($questions[$i]))
 						$question = $questions[$i];
@@ -182,7 +210,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 				} else if (CheckFormSubmit($f,'add')) {
 					$reloadform = 1;
 				} else {
-					redirect("surveys.php");
+					redirect("messages.php");
 				}
 			}
 		}
@@ -247,11 +275,11 @@ if( $reloadform )
 		$qn = $question->questionnumber;
 		PutFormData($f,$s,"webmessage_$qn",$question->webmessage,"text");
 		PutFormData($f,$s,"phonemessageid_$qn",$question->phonemessageid,"number");
-		PutFormData($f,$s,"validresponse_$qn",$question->validresponse,"text");
+		PutFormData($f,$s,"validresponse_$qn",$question->validresponse,"number",2,9,true);
 		PutFormData($f,$s,"reportlabel_$qn",$question->reportlabel,"text",1,30,false);
 	}
 
-	PutFormData($f,$s,"numquestions",count($questions));
+	PutFormData($f,$s,"numquestions",count($questions)); //will always be the number of questions +1 because of the new question that is always added to the array
 }
 
 
@@ -275,11 +303,11 @@ $MESSAGES['email'] = DBFindMany("Message","from message where userid=" . $USER->
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function message_select($type, $form, $section, $name) {
+function message_select($type, $form, $section, $name, $extrahtml = "") {
 	global $MESSAGES;
 
-	NewFormItem($form,$section,$name, "selectstart",NULL,NULL,'id="' . $name . '"');
-	NewFormItem($form,$section,$name, "selectoption", '- Select a Message -', "0");
+	NewFormItem($form,$section,$name, "selectstart",NULL,NULL,'id="' . $name . '" ' . $extrahtml);
+	NewFormItem($form,$section,$name, "selectoption", '- Select a Message -', "");
 	foreach ($MESSAGES[$type] as $message) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
 	}
@@ -349,7 +377,7 @@ function fmt_actions($obj,$name) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "notifications:survey";
+$PAGE = "notifications:messages";
 $TITLE = "Survey Template Editor";
 
 include_once("nav.inc.php");
@@ -384,15 +412,15 @@ startWindow('Survey Template Information',NULL,true, false);
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
 					<td width="30%">Phone Survey</td>
-					<td><? NewFormItem($f,$s,"hasphone","checkbox",NULL,NULL,"onclick=\"setColVisability(questionstable,2,this.checked);\""); ?></td>
+					<td><? NewFormItem($f,$s,"hasphone","checkbox",NULL,NULL,"onclick=\"setColVisability(questionstable,2,this.checked); checkphone(this.checked);\""); ?></td>
 				</tr>
 				<tr>
 					<td>Leave message on answering machines</td>
 					<td>
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
-							<td><? NewFormItem($f,$s,"hasmachine","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'machinemessage');\""); ?></td>
-							<td id="machinemessage" <?= ($hasmachine ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"machinemessageid"); ?></td>
+							<td><? NewFormItem($f,$s,"hasmachine","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'machinemessage');\" dependson=\"phonesurvey\""); ?></td>
+							<td id="machinemessage" <?= ($hasmachine ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"machinemessageid",'dependson="phonesurvey"'); echo button('play', "var audio = new getObj('machinemessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
 						</tr>
 						</table>
 					</td>
@@ -402,8 +430,8 @@ startWindow('Survey Template Information',NULL,true, false);
 					<td>
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
-							<td><? NewFormItem($f,$s,"hasintro","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'intromessage');\""); ?></td>
-							<td id="intromessage" <?= ($hasintro ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"intromessageid"); echo button('play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
+							<td><? NewFormItem($f,$s,"hasintro","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'intromessage');\" dependson=\"phonesurvey\""); ?></td>
+							<td id="intromessage" <?= ($hasintro ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"intromessageid",'dependson="phonesurvey"'); echo button('play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
 						</tr>
 						</table>
 					</td>
@@ -413,8 +441,8 @@ startWindow('Survey Template Information',NULL,true, false);
 					<td>
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
-							<td><? NewFormItem($f,$s,"hasexit","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'exitmessage');\""); ?></td>
-							<td id="exitmessage" <?= ($hasexit ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"exitmessageid"); echo button('play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
+							<td><? NewFormItem($f,$s,"hasexit","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'exitmessage');\" dependson=\"phonesurvey\""); ?></td>
+							<td id="exitmessage" <?= ($hasexit ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"exitmessageid",'dependson="phonesurvey"'); echo button('play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
 						</tr>
 						</table>
 					</td>
@@ -429,23 +457,23 @@ startWindow('Survey Template Information',NULL,true, false);
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
 					<td width="30%">Web Survey</td>
-					<td><? NewFormItem($f,$s,"hasweb","checkbox",NULL,NULL,"onclick=\"setColVisability(questionstable,3,this.checked);\""); ?></td>
+					<td><? NewFormItem($f,$s,"hasweb","checkbox",NULL,NULL,"onclick=\"setColVisability(questionstable,3,this.checked); checkweb(this.checked);\""); ?></td>
 				</tr>
 				<tr>
 					<td>Email Message</td>
-					<td><? message_select("email",$f,$s,"emailmessageid"); ?></td>
+					<td><? message_select("email",$f,$s,"emailmessageid",'dependson="websurvey"'); ?></td>
 				</tr>
 				<tr>
 					<td>Web Page Title</td>
-					<td><? NewFormItem($f,$s,"webpagetitle","text", 30,50); ?></td>
+					<td><? NewFormItem($f,$s,"webpagetitle","text", 30,50,'dependson="websurvey"'); ?></td>
 				</tr>
 				<tr>
 					<td>Web thank you message</td>
-					<td><? NewFormItem($f, $s,"webexitmessage","textarea",40,4); ?></td>
+					<td><? NewFormItem($f, $s,"webexitmessage","textarea",40,4,'dependson="websurvey"'); ?></td>
 				</tr>
 				<tr>
 					<td>Use HTML in Web Survey</td>
-					<td><? NewFormItem($f,$s,"usehtml","checkbox"); ?></td>
+					<td><? NewFormItem($f,$s,"usehtml","checkbox",null,null,'dependson="phonesurvey"'); ?></td>
 				</tr>
 			</table>
 		</td>
@@ -491,6 +519,22 @@ var questionstable = new getObj('<?= $questiondtableid ?>').obj;
 <? if (!$hasweb) { ?>
 	setColVisability(questionstable,3,false)
 <? } ?>
+
+function checkphone (state) {
+	var callback = function(obj) {obj.disabled = !state;};
+	modifyMarkedNodes (document.forms[0],"dependson","phonesurvey",callback)
+}
+
+checkphone (<?= $hasphone ? "true" : "false"?>);
+
+function checkweb (state) {
+	var callback = function(obj) {obj.disabled = !state;};
+	modifyMarkedNodes (document.forms[0],"dependson","websurvey",callback)
+}
+
+checkweb (<?= $hasweb ? "true" : "false"?>);
+
+
 </script>
 
 <?
