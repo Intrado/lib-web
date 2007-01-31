@@ -482,6 +482,20 @@ a.sublink:hover {
 	font-weight: bold;
 }
 
+.helpclick {
+	cursor: help;
+}
+
+.button {
+	cursor: pointer;
+	cursor: hand;
+}
+
+.clickable {
+	cursor: pointer;
+	cursor: hand;
+}
+
 /* 
 dark blue #365F8D
 light blue #D4DDE2
