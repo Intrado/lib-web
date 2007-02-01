@@ -141,10 +141,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
 				setSetting('autoreport_replyname', GetFormData($f, $s, 'autoreport_replyname'));
-				
+
 				$checkpassword = GetFormData($f, $s, 'checkpassword') ? 1 : 0;
 				setSetting('checkpassword', GetFormData($f, $s, 'checkpassword'));
-				
+
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
 
@@ -163,11 +163,11 @@ if( $reloadform )
 	ClearFormData($f);
 
 	//check for new setting name/desc from settings.php
-	
+
 	$custname= QuickQuery("Select name from customer where id = '" . DBSafe($USER->customerid) . "'");
 	PutFormData($f, $s,"custdisplayname", $custname, 'text', 0, 50);
 	PutFormData($f,$s,"retry",getSetting('retry'),"number",5,240);
-	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 0, 20);
+	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 10, 10);
 
 	PutFormData($f, $s, "defaultareacode", getSetting('defaultareacode'), 'number',200,999);
 
@@ -178,7 +178,7 @@ if( $reloadform )
 
 	PutFormData($f, $s, "autoreport_replyemail", getSetting('autoreport_replyemail'), 'email',0,100);
 	PutFormData($f, $s, "autoreport_replyname", getSetting('autoreport_replyname'), 'text',0,100);
-	
+
 	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), number, 0, 10);
 	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), number, 0, 10);
 	PutFormData($f,$s,"checkpassword",(bool)getSetting('checkpassword'), "bool", 0, 1);
@@ -277,7 +277,7 @@ startWindow('Global System Settings');
 					</th>
 					<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 20, 50);  ?></td>
 				<tr>
-						
+
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Retry Setting:<br><? print help('Settings_RetrySetting', NULL, 'grey'); ?></th>
 					<td>
@@ -372,7 +372,7 @@ startWindow('Global System Settings');
 					<? NewFormItem($f,$s,'checkpassword','checkbox') ?>
 					</td>
 				</tr>
-			
+
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
 						Systemwide Alert Message
