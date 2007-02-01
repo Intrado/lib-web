@@ -93,7 +93,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 
 			$list->update();
 
-			if(CheckFormSubmit($f,'add')) {
+			if(GetFormData($f,$s,FieldMap::getFirstNameField()) ||
+					GetFormData($f,$s,FieldMap::getLastNameField()) ||
+					GetFormData($f,$s,"phone")) {
 				//submit changes
 				$person = new Person();
 				$person->userid = GetFormData($f,$s,"manualsave") ? $USER->id : 0;
@@ -213,7 +215,7 @@ if( $reloadform )
 	PutFormData($f,$s,"city","","text",1,50);
 	PutFormData($f,$s,"state","","text",1,2);
 	PutFormData($f,$s,"zip","","text",1,10);
-	PutFormData($f,$s,"phone","","phone",1,20);
+	PutFormData($f,$s,"phone","","phone",10,10);
 	PutFormData($f,$s,"email","","email",1,100);
 
 	PopulateForm($f,$s,$list,$fields);
