@@ -68,7 +68,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 	else
 	{
 		MergeSectionFormData($f, $s);
-		
+		foreach (array("phone","email","print") as $type)
+			MergeSectionFormData($f, $type);
+
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -157,6 +159,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->setOption("callall",GetFormData($f,$s,"callall"));
 			$job->setOption("callfirst",!GetFormData($f,$s,"callall"));
 			$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
+			$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
+
 			$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 			if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
@@ -230,28 +234,22 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 
 			//now add any language options
+			$addlang = false;
 			if($USER->authorize('sendmulti')) {
-				$addlang = false;
-				if (CheckFormSubmit($f,'phone')) {
-					$addlang = true;
-					$type = "phone";
-				} else if (CheckFormSubmit($f,'email')) {
-					$addlang = true;
-					$type = "email";
-				} else if (CheckFormSubmit($f,'print')) {
-					$addlang = true;
-					$type = "print";
-				}
+				foreach (array("phone","email","print") as $type) {
+					if (CheckFormSubmit($f,$type))
+						$addlang = true;
 
-				if ($addlang) {
-					MergeSectionFormData($f, $type);
-					$joblang = new JobLanguage();
-					$joblang->type = $type;
-					$joblang->language = GetFormData($f,$type,"newlang" . $type);
-					$joblang->messageid = GetFormData($f,$type,"newmess" . $type);
-					$joblang->jobid = $job->id;
-					if ($joblang->language && $joblang->messageid)
-					$joblang->create();
+					if (GetFormData($f,$type,"newlang" . $type) && GetFormData($f,$type,"newmess" . $type)) {
+						MergeSectionFormData($f, $type);
+						$joblang = new JobLanguage();
+						$joblang->type = $type;
+						$joblang->language = GetFormData($f,$type,"newlang" . $type);
+						$joblang->messageid = GetFormData($f,$type,"newmess" . $type);
+						$joblang->jobid = $job->id;
+						if ($joblang->language && $joblang->messageid)
+						$joblang->create();
+					}
 				}
 			}
 
@@ -311,6 +309,8 @@ if( $reloadform )
 
 	PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
+	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
+
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
@@ -635,6 +635,10 @@ startWindow('Job Information');
 					<td><? alternate('email'); ?></td>
 				</tr>
 <? } ?>
+				<tr>
+					<td>Skip Duplicate Email Addresses</td>
+					<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
+				</tr>
 			</table>
 		</td>
 	</tr>
