@@ -69,6 +69,7 @@ class Job extends DBMappedObject {
 		$job->setOption("callall",$USER->getSetting("callall"));
 		$job->setOption("callfirst",!$USER->getSetting("callall") + 0);
 		$job->setOption("skipduplicates",1);
+		$job->setOption("skipemailduplicates",1);
 		$job->setOption("sendreport",1);
 
 		//date/time/numer of days
