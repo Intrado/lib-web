@@ -2,9 +2,9 @@
 
 [db]
 persistent=true
-host="localhost:3306"
-user="root"
-pass=""
+host="localhost"
+user="sharpteeth"
+pass="sharpteeth202"
 db="dialerasp"
 
 
@@ -20,7 +20,7 @@ db="dialerasp"
 ;optional seperate server for outbound notifications
 [dmapidb]
 persistent=true
-host="localhost:3307"
+host="localhost"
 user="sharpteeth"
 pass="sharpteeth202"
 db="dialerasp"
@@ -31,6 +31,9 @@ is_commsuite=false
 has_ssl=true
 force_ssl=false
 log_dir="/commsuite/logs/"
+log_db_errors=true
+log_db_queries=true
+
 warn_earliest=
 warn_latest=
 
@@ -38,7 +41,7 @@ warn_latest=
 ; format is "host,port,path;host2,port2,path2;..." reserved chars= ';' and ','
 get="localhost,80,/foobar/xxx-get.php"
 put="localhost,80,/foobar/xxx-put.php"
-tts="localhost,8080,/phone/Tts"
+tts="devbox2,9000,/tts.yaws"
 
 
 [import]
@@ -53,7 +56,7 @@ ftpuser=anonymous
 ftppass=anonymous
 
 [ldap]
-is_ldap=true
+is_ldap=false
 ldapconnect="192.168.174.2"
 ldapextension="@adtest.net"
 
