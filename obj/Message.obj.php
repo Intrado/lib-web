@@ -3,6 +3,7 @@ class Message extends DBMappedObject {
 
 	var $userid;
 	var $name;
+	var $description;
 	var $options;
 	var $data; //for headers
 
@@ -21,7 +22,7 @@ class Message extends DBMappedObject {
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
-	
+
 	function readHeaders () {
 		parse_str($this->data, $data);
 		foreach($data as $key => $value)
@@ -40,7 +41,7 @@ class Message extends DBMappedObject {
 			$this->data = 'header1=' . urlencode($this->header1) . '&header2=' .  urlencode($this->header2) . '&header3=' . urlencode($this->header3) . '&fromaddress=' . urlencode($this->fromaddress);
 		}
 	}
-	
+
 	function firstVoiceID() {
 		return QuickQuery("select voiceid from messagepart where messageid = $this->id order by sequence limit 1");
 	}
@@ -146,7 +147,7 @@ class Message extends DBMappedObject {
 			//skip the end if we found it
 			if ($length)
 				$skip = $pos + $length +2;
-			else 
+			else
 				$skip = $pos + $length ;
 
 			$data = substr($data,$skip );
@@ -164,9 +165,9 @@ class Message extends DBMappedObject {
 
 		return $parts;
 	}
-	
+
 	function format ($parts) {
-		
+
 		$map = FieldMap::getMapNames();
 		$data = "";
 		foreach ($parts as $part) {
@@ -180,14 +181,14 @@ class Message extends DBMappedObject {
 				break;
 			case 'V':
 				$data .= "<<" . $map[$part->fieldnum];
-				
+
 				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
 					$data .= ":" . $part->defaultvalue;
 				$data .= ">>";
 				break;
 			}
 		}
-		
+
 		return $data;
 	}
 }
