@@ -42,7 +42,7 @@ $reloadform = 0;
 
 $fieldmaps = DBFindMany("FieldMap", "from fieldmap where customerid='" . $USER->customerid . "'");
 
-if(CheckFormSubmit($f,$s))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'refresh'))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -135,7 +135,7 @@ $TITLE = 'Contact Database';
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, 'showallcontacts','showallcontacts','showallcontacts'));
+buttons(submit($f,'refresh','refresh','refresh'),submit($f, 'showallcontacts','showallcontacts','showallcontacts'));
 
 startWindow('Search for ' . help('System_Contacts',NULL,'blue'));
 echo "Select your search criteria: ";
