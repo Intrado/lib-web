@@ -77,8 +77,8 @@ if(CheckFormSubmit($form, $section))
 if( $reloadform )
 {
 	ClearFormData($form);
-	PutFormData($form, $section,"number", GetFormData($form, $section, 'number'), "text", 1, 20);
-	PutFormData($form, $section,"reason", GetFormData($form, $section, 'reason'), "text", 1, 100);
+	PutFormData($form, $section,"number", "", "text", 1, 20);
+	PutFormData($form, $section,"reason", "", "text", 1, 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
