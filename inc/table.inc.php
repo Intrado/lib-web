@@ -4,30 +4,6 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 
 	$tableid = "tableid" . $tablecounter++;
 
-	if(is_string($data[0]) && is_string($data[1]) && is_int($data[2]))
-	{
-		$count = QuickQuery('select COUNT(id) ' . $data[1]);
-		$show = $data[2];
-		$start = state('start');
-		$data = DBFindMany($data[0], $data[1] . ' limit ' . (int)$start . ',' . $show);
-		if($count) {
-			ob_start();
-	 ?>
-	 <div align="right">
-	 	<? print $start + 1; ?>-<? print ($start + $show < $count) ? $start + $show : $count; ?> of <? print $count; if($count > $show) { ?>
-		<select name="start" onclick="this.blur();" onchange="setState('start', this.options[this.selectedIndex].value);">
-		<? for($i = 0; $i * $show < $count; $i++) { ?>
-			<option value="<? print $i * $show; ?>"<? if($i * $show == $start) print ' selected'; ?>>Page <? print $i + 1; ?></option>
-		<? } ?>
-		</select>
-	</div>
-	 <?
-	 		}
-			$pagination = ob_get_contents();
-			ob_end_flush();
-		}
-	}
-
 	echo '<div ' . ($scrolling ? 'class="scrollTableContainer"' : '') . '>';
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list' . ($sorttable ? " sortable" : "")  . '" id="' . $tableid . '">';
 	echo '<tr class="listHeader">';
@@ -71,7 +47,6 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	}
 	echo "</table>";
 	echo '</div>';
-	echo $pagination;
 	return $tableid;
 }
 
