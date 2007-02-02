@@ -59,7 +59,7 @@ if(CheckFormSubmit($f,$s))
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} elseif( !$USER->ldap && (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
-			error('You must enter a password');		
+			error('You must enter a password');
 		} elseif ( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match');
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
@@ -110,7 +110,7 @@ if(CheckFormSubmit($f,$s))
 				if (!ereg("^0*$", $newpassword))
 					$USER->setPassword($newpassword);
 			}
-				
+
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
 			$newpin = GetFormData($f, $s, 'pincode');
 			if (!ereg("^0*$", $newpin))
@@ -139,8 +139,6 @@ if(CheckFormSubmit($f,$s))
 	$reloadform = 1;
 }
 
-$RULEMODE = array('multisearch' => true, 'text' => false, 'reldate' => false);
-$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
 if( $reloadform )
 {
 	ClearFormData($f);
@@ -199,14 +197,12 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "start";
+$PAGE = "start:account";
 $TITLE = "Account Information: $USER->firstname $USER->lastname";
 
 include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, 'save'));
-
-$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $usr->id");
 
 startWindow('User Information');
 ?>
