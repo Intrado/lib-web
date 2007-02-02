@@ -20,17 +20,6 @@ require_once("inc/formatters.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-if ($_GET['id'] == 'new') {
-	$_SESSION['listid'] = NULL;
-	redirect("list.php");
-}
-
-//get the message to edit from the request params or session
-if (isset($_GET['id'])) {
-	setCurrentList($_GET['id']);
-	redirect();
-}
-
 
 if ($USER->authorize("loginweb") === false) {
 	redirect('unauthorized');
