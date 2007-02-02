@@ -56,7 +56,8 @@ function DBQueryWrapper($query, $dbcon) {
 			$logfp = fopen($SETTINGS['feature']['log_dir'] . "dberrors.txt","a");
 			$initdblog = true;
 		}
-		$errorstr = date("Y-m-d H:i:") . sprintf("%.3f",$usec + ($sec %60)) . " t:" . mysql_thread_id() . " e:" . mysql_error() . " q:" . preg_replace('/\s\s+/', ' ',$query);
+		list($usec,$sec) = explode(" ", microtime());
+		$errorstr = "\n" . date("Y-m-d H:i:") . sprintf("%.3f",$usec + ($sec %60)) . " t:" . mysql_thread_id() . " e:" . mysql_error() . " q:" . preg_replace('/\s\s+/', ' ',$query);
 		fwrite($logfp, $errorstr);
 	}
 	return $res;
