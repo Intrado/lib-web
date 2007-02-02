@@ -232,7 +232,6 @@ function NewFormSelect ($f,$s,$item,$map) {
 */
 
 function GetFormData ($form, $section, $item) {
-
 	return $_SESSION['formdata'][$form][$section][$item]['value'];
 }
 
@@ -348,7 +347,7 @@ function CheckFormItem($form, $section, $item) {
 		break;
 
 	case "phone":
-		
+
 		// Somewhat basic algorithm chosen for simplicty.
 		// The algorithm is to strip all customary phone number formatting chars from
 		//	the string and ensure that what remains is a number that is between minval and
@@ -456,16 +455,16 @@ function CheckFormItem($form, $section, $item) {
 
 		break;
 	case "array":
-
-		if (!is_array($theitem['value']))
-			return "type";
-
 		if ($theitem['minval'] != "nomin" && is_array($theitem['minval'])) {
-
-			foreach ($theitem['value'] as $value) {
-				if (!in_array($value,$theitem['minval'])) {
-					return "type";
+			if (is_array($theitem['value'])) {
+				foreach ($theitem['value'] as $value) {
+					if (!in_array($value,$theitem['minval'])) {
+						return "type";
+					}
 				}
+			} else {
+				if (!in_array($theitem['value'],$theitem['minval']))
+					return "type";
 			}
 		}
 
@@ -557,8 +556,12 @@ function PopulateObject ($form, $section, &$obj, $items) {
 function PopulateForm ($form, $section, $obj, $fields) {
 	foreach ($fields as $field) {
 		$fieldname = $field[0];
+
 		PutFormData($form,$section,$fieldname,$obj->$fieldname,
-			$field[1],$field[2],$field[3],$field[4]);
+			$field[1],
+			(isset($field[2]) ? $field[2] : "nomin"),
+			(isset($field[3]) ? $field[3] : "nomax"),
+			(isset($field[4]) ? $field[4] : false));
 	}
 }
 
