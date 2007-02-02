@@ -20,8 +20,10 @@ include_once("obj/Language.obj.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-setCurrentPerson($_GET['id']);
-
+if (isset($_GET['id'])) {
+	setCurrentPerson($_GET['id']);
+	redirect();
+}
 /****************** main message section ******************/
 
 $f = "person";
@@ -89,20 +91,12 @@ if( $reloadform )
 {
 	ClearFormData($f);
 
-	if($_POST['addperson'] || $_POST['addperson_x']) {
-		$_SESSION['personid'] = NULL;
-		$person = new Person();
-
-		PutFormData($f, $s, FieldMap::getFirstNameField(), get_magic_quotes_gpc() ? stripslashes($_POST['firstname']) : $_POST['firstname'], "text", 1, 255, true);
-		PutFormData($f, $s, FieldMap::getLastNameField(), get_magic_quotes_gpc() ? stripslashes($_POST['lastname']) : $_POST['lastname'], "text", 1, 255, true);
-	} else {
-		$person = new Person($_SESSION['personid']);
-		$data = getChildObject($person->id, 'PersonData', 'persondata');
-		PopulateForm($f,$s,$data,array(array(FieldMap::getFirstNameField(),"text",1,255),
-									   array(FieldMap::getLastNameField(),"text",1,255),
-									   array(FieldMap::getLanguageField(),"text",1,255))
-									   );
-	}
+	$person = new Person($_SESSION['personid']);
+	$data = getChildObject($person->id, 'PersonData', 'persondata');
+	PopulateForm($f,$s,$data,array(array(FieldMap::getFirstNameField(),"text",1,255),
+								   array(FieldMap::getLastNameField(),"text",1,255),
+								   array(FieldMap::getLanguageField(),"text",1,255))
+								   );
 
 	$address = getChildObject($person->id, 'Address', 'address');
 	PopulateForm($f,$s,$address,array(array("addr1","text",1,50),

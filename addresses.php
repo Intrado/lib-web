@@ -32,10 +32,11 @@ if (isset($_GET['delete'])) {
 }
 
 // Check if the address book was clicked from the nav bar or the list page
-if ($_GET['origin'] == 'nav') {
+
+if (isset($_GET['origin']) && $_GET['origin'] == 'nav') {
 	$fromNav = true;
 	$_SESSION['addressOrigin'] = 'nav';
-} else if ($_GET['origin'] == 'list') {
+} else if (isset($_GET['origin']) && $_GET['origin'] == 'list') {
 	$fromNav = false;
 	$_SESSION['addressOrigin'] = 'list';
 } else {
@@ -86,11 +87,10 @@ if ($_SESSION['addressOrigin'] == 'list' && $_SESSION['listid'] == null) {
 	</table>
 	<?
 	startWindow('Addresses','padding: 3px;');
-	echo '<form method="post" action="address.php">';
 	?>
 	<table border="0" cellpadding="0" cellspacing="0" style="margin-top: 3px;">
 		<tr>
-			<td><? button_bar(add('addperson', 'addcontact')); ?></td>
+			<td><? button_bar(button('addcontact', NULL,"address.php?id=new")); ?></td>
 		</tr>
 	</table>
 
@@ -167,7 +167,6 @@ if ($_SESSION['addressOrigin'] == 'list' && $_SESSION['listid'] == null) {
 
 	showTable($data, $titles,$formatters);
 	echo '</table>';
-	echo '</form>';
 
 	endWindow();
 
