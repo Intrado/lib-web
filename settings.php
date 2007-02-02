@@ -38,13 +38,18 @@ if (isset($_GET['deletetype'])) {
 }
 
 
-if($priority = $_GET['moveup'] + $_GET['movedn']) {
-	movePriority($priority, $_GET['movedn']);
+if (isset($_GET['moveup'])) {
+	movePriority($_GET['moveup'], false);
+	redirect();
+}
+if (isset($_GET['movedn'])) {
+	movePriority($_GET['movedn'], true);
 	redirect();
 }
 
 function movePriority($priority, $down = true) {
 	global $USER;
+	$priority = 0 + $priority;
 	$op = $down ? array('>','') : array('<','desc');
 	$swap = QuickQueryRow("select id, priority from jobtype where customerid = $USER->customerid and priority $op[0] '$priority' and deleted =0 order by priority $op[1] limit 1");
 	if ($swap) {
@@ -104,23 +109,21 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 		} else {
 			//check the parsing
 
-			if (count($errors) > 0) {
+			if (isset($errors) && count($errors) > 0) {
 				error('There was an error parsing the setting', implode("",$errors));
 			} else {
 				//submit changes
-				//TODO check that the setting->userid == user->id so that there is no chance of hijacking
-				if ($setting->id && !customerOwns("setting",$setting->id)) {
-					die("Unauthorized");
-				}
-
 				if($types = $_POST['jobtype']) {
 					foreach($types as $id => $name) {
 						$name = DBSafe($name);
+						$id = DBSafe($id);
 						$systempriority = DBSafe((isset($_POST['systempriority'][$id]) ? $_POST['systempriority'][$id] : "3"));
 						if($id == 'new' && $name)
 							QuickUpdate("insert into jobtype (name, priority, systempriority, customerid) values ('$name', " . (QuickQuery("select max(priority) from jobtype where customerid = $USER->customerid and deleted=0") + 10000) . ", '$systempriority', $USER->customerid)");
-						else
-							QuickUpdate("update jobtype set name = '$name' , systempriority='$systempriority' where id = $id");
+						else {
+							if (customerOwns("setting",$id))
+								QuickUpdate("update jobtype set name = '$name' , systempriority='$systempriority' where id = '$id'");
+						}
 					}
 				}
 				$custname= GetFormData($f, $s, 'custdisplayname');
@@ -179,8 +182,8 @@ if( $reloadform )
 	PutFormData($f, $s, "autoreport_replyemail", getSetting('autoreport_replyemail'), 'email',0,100);
 	PutFormData($f, $s, "autoreport_replyname", getSetting('autoreport_replyname'), 'text',0,100);
 
-	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), number, 0, 10);
-	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), number, 0, 10);
+	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), "number", 0, 10);
+	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), "number", 0, 10);
 	PutFormData($f,$s,"checkpassword",(bool)getSetting('checkpassword'), "bool", 0, 1);
 
 
@@ -197,7 +200,7 @@ function fmt_priority($obj, $name) {
 
 function fmt_name($obj, $name) {
 	global $f, $s;
-	if($_GET['edittype'] == $obj->id || $obj->id == 'new') {
+	if((isset($_GET['edittype']) && $_GET['edittype'] == $obj->id) || $obj->id == 'new') {
 		return '<input type="text" name="jobtype[' . $obj->id . ']" width="100%" value="' . htmlentities($obj->name) . '">';
 	} else {
 		return $obj->name;
@@ -206,7 +209,7 @@ function fmt_name($obj, $name) {
 
 function fmt_systempriority($obj, $name) {
 	global $f, $s, $USER;
-	if($_GET['edittype'] == $obj->id || $obj->id == 'new') {
+	if((isset($_GET['edittype']) && $_GET['edittype'] == $obj->id) || $obj->id == 'new') {
 		$result =  '<select name="systempriority[' . $obj->id . ']">';
 		foreach ($USER->getCustomer()->getSystemPriorities() as $index => $name)
 			$result .= '<option ' . ($obj->systempriority == $index ? "selected" : "") . ' value="' . $index . '">' . htmlentities($name) . '</option>';
@@ -218,7 +221,7 @@ function fmt_systempriority($obj, $name) {
 }
 function fmt_edit($obj, $name) {
 	global $f, $s;
-	if($_GET['edittype'] == $obj->id)
+	if(isset($_GET['edittype']) && $_GET['edittype'] == $obj->id)
 		return '<div align="center">' . submit($f, $s, 'save', 'save') . '</div>';
 	if($obj->id == 'new')
 		return '<div align="center">' . submit($f, $s, 'add', 'add') . '</div>';
