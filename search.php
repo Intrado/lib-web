@@ -42,7 +42,7 @@ $reloadform = 0;
 
 $fieldmaps = DBFindMany("FieldMap", "from fieldmap where customerid='" . $USER->customerid . "'");
 
-if(CheckFormSubmit($f,$s))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'refresh'))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -60,7 +60,7 @@ if(CheckFormSubmit($f,$s))
 		} else {
 			//submit changes
 			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-			if ($fieldnum != "") {
+			if ($fieldnum != "" && $fieldnum != -1) {
 				$type = GetFormData($f,$s,"newruletype");
 
 				if ($type == "text")
@@ -136,7 +136,7 @@ $TITLE = 'List Search: ' . QuickQuery("select name from list where id = $_SESSIO
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(button("done","","list.php"), submit($f, 'showall','showallcontacts','showallcontacts'));
+buttons(button("done","","list.php"), submit($f,'refresh','refresh','refresh'), submit($f, 'showall','showallcontacts','showallcontacts'));
 
 startWindow('Search for ' . help('SearchList_SearchFor', NULL, 'blue'));
 

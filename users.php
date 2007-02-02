@@ -89,7 +89,7 @@ $titles = array(	"firstname" => "#First Name",
 					"Actions" => "Actions"
 					);
 
-startWindow('Active Users ' . help('Users_ActiveUsersList', NULL, blue), 'padding: 3px;');
+startWindow('Active Users ' . help('Users_ActiveUsersList', NULL, "blue"), 'padding: 3px;');
 
 button_bar(button('adduser', NULL,"user.php?id=new") . help('Users_UserAdd'));
 
@@ -99,7 +99,7 @@ endWindow();
 
 print '<br>';
 
-startWindow('Inactive Users ' . help('Users_InactiveUsersList', NULL, blue), 'padding: 3px;');
+startWindow('Inactive Users ' . help('Users_InactiveUsersList', NULL, "blue"), 'padding: 3px;');
 $data = DBFindMany("User","from user where customerid=$USER->customerid and not enabled and deleted=0 order by lastname, firstname");
 showObjects($data, $titles, array('AccessProfile' => 'fmt_acc_profile', "Actions" => "fmt_actions_dis", "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
 endWindow();

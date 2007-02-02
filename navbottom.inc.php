@@ -25,6 +25,6 @@ if(isset($ERRORS) && is_array($ERRORS)) {
 }
 ?>
 <img id="state" src="img/spacer.gif" width="1" height="1">
-<? if ($_GET['debug']) printf("<!-- %0.2f -->", microtime(true) - $PAGETIME) ?>
+<? if (isset($_GET['timer'])) printf("<!-- %0.2f -->", microtime(true) - $PAGETIME) ?>
 </body>
 </html>

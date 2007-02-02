@@ -45,6 +45,11 @@ if (isset($_GET['clear'])) {
 
 $VALID_TYPES = array('text', 'reldate', 'multisearch');
 $FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where customerid = $USER->customerid order by fieldnum");
+$availablefields = array();
+for ($x = 1; $x <= 20; $x++)
+	$availablefields[] = sprintf("%02d",$x);
+
+$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap where customerid = $USER->customerid"));
 
 /****************** main message section ******************/
 $form = "datamanager";
@@ -154,14 +159,12 @@ if( $reloadform )
 	PutFormData($form, $section, 'newfield_name', '', 'text', 1, 20, false); // This item is only required on an add operation
 	PutFormData($form, $section, 'newfield_type', 'text', 'text');
 	PutFormData($form, $section, 'newfield_searchable', '1', 'bool');
+
+
+	PutFormData($form,$section,"newfield_fieldnum","array",$availablefields);
 }
 
 
-$availablefields = array();
-for ($x = 1; $x <= 20; $x++)
-	$availablefields[] = sprintf("%02d",$x);
-
-$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap where customerid = $USER->customerid"));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display

@@ -37,7 +37,7 @@ include_once("nav.inc.php");
 
 startWindow('Repeating Notification Jobs ' . help('System_RepeatingJobs', NULL, 'blue'), 'padding: 3px;');
 
-$start = 0 + $_GET['pagestart'];
+$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
 // jobworkitem columns are: id jobid type priority personid messageid status resultdata assignedto
@@ -52,6 +52,7 @@ $query = "select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.
 
 $result = Query($query);
 
+$data = array();
 while ($row = DBGetRow($result)) {
 	$data[] = $row;
 }

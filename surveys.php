@@ -39,7 +39,6 @@ $PAGE = "notifications:survey";
 $TITLE = "Survey Builder";
 
 include_once("nav.inc.php");
-NewForm($f);
 
 
 startWindow('My Active and Pending Surveys','padding: 3px;',true, true);
@@ -90,6 +89,5 @@ showObjects($data, $titles, $actions, count($data) > 8, true);
 
 endWindow();
 
-EndForm();
 include_once("navbottom.inc.php");
 ?>

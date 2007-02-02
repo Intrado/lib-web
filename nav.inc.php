@@ -13,7 +13,7 @@ $ACTIVEMAINTABTITLE = "";
 
 $SHORTCUTS = array();
 
-if ($_GET['debug'])
+if (isset($_GET['timer']))
 	$PAGETIME = microtime(true);
 
 if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))) {
@@ -68,7 +68,7 @@ $NAVTREE = array (
 	array("Reports","reportoptions.php",array('createreport','viewsystemreports'),$MAINTAB=="reports",array(
 		array("Report Builder","reportoptions.php","createreport",$SUBTAB=="builder"),
 		//give the report viewer the default of a "today" report if there was no previous report
-		array("View Report","report.php" . ($_SESSION['reportsql'] ? "" : "?reporttype=relative&jobtype_relative_data=today"),"createreport",$SUBTAB=="view"),
+		array("View Report","report.php" . (isset($_SESSION['reportsql']) ? "" : "?reporttype=relative&jobtype_relative_data=today"),"createreport",$SUBTAB=="view"),
 		array("Job Summary","reportsummary.php","createreport",$SUBTAB=="jobsummary"),
 
 		array("Usage Stats","reportsystem.php",$IS_COMMSUITE ? "viewsystemreports" : "dummy",$SUBTAB=="system"),

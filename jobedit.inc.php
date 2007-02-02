@@ -327,12 +327,20 @@ if( $reloadform )
 			$scheduledows[$x] = in_array($x,$data);
 		}
 		for ($x = 1; $x < 8; $x++) {
-			PutFormData($f,$s,"dow$x",$scheduledows[$x],"bool",0,1);
+			PutFormData($f,$s,"dow$x",(isset($scheduledows[$x]) ? $scheduledows[$x] : 0),"bool",0,1);
 		}
 		PutFormData($f,$s,"scheduletime",date("g:i a", strtotime($schedule->time)),"text",1,50,true);
 	} else {
 		PutFormData($f, $s, 'startdate', $job->startdate, 'text', 1, 50, true);
 	}
+
+	PutFormData($f,"phone","newlangphone","");
+	PutFormData($f,"phone","newmessphone","");
+	PutFormData($f,"email","newlangemail","");
+	PutFormData($f,"email","newmessemail","");
+	PutFormData($f,"print","newlangprint","");
+	PutFormData($f,"print","newmessprint","");
+
 }
 
 $messages = array();

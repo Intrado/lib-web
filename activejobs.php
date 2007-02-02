@@ -37,7 +37,7 @@ include_once("nav.inc.php");
 
 startWindow('Active & Pending Notification Jobs ' . help('System_ActiveJobs', NULL, 'blue'), 'padding: 3px;');
 
-$start = 0 + $_GET['pagestart'];
+$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
 // jobworkitem columns are: id jobid type priority personid messageid status resultdata assignedto

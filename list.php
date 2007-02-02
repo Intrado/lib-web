@@ -139,7 +139,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 			if ($list->id) {
 				//now see if there is a new list rule
 				$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-				if ($fieldnum != "") {
+				if ($fieldnum != "" && $fieldnum != -1) {
 					$type = GetFormData($f,$s,"newruletype");
 					$logic = GetFormData($f,$s,"newrulelogical_$type");
 					$op = GetFormData($f,$s,"newruleoperator_$type");
@@ -254,7 +254,8 @@ NewForm($f);
 if (!$list->id)
 	buttons(submit($f,'refresh','save','save'));
 else
-	buttons(submit($f,'search','search','search') , submit($f, 'preview','preview','preview'), submit($f,'refresh','refresh','refresh'), submit($f,'save','done','done'));
+	buttons(submit($f,'refresh','refresh','refresh'), submit($f,'save','done','done'),
+		submit($f,'search','search','search') , submit($f, 'preview','preview','preview'));
 
 startWindow('List Information', 'padding: 3px;');
 print 'Name: ';
@@ -262,9 +263,10 @@ NewFormItem($f,$s,"name","text", 20,50);
 print '&nbsp;&nbsp;Description: ';
 NewFormItem($f,$s,"description","text", 20,50);
 
-$renderedlist->calcStats();
-print("&nbsp;&nbsp; Total People in List: <b>$renderedlist->total</b>");
-
+if ($list->id) {
+	$renderedlist->calcStats();
+	print("&nbsp;&nbsp; Total People in List: <b>$renderedlist->total</b>");
+}
 endWindow();
 
 print '<br>';

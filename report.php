@@ -31,7 +31,7 @@ if(isset($_GET['name']))
 
 if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_archived'])) {
 
-	$_SESSION['reportjobid']; //reset the jobid in case this isn't a job report
+	unset($_SESSION['reportjobid']); //reset the jobid in case this isn't a job report
 
 	//get all the report options and store in session as SQL
 	switch ($_GET['reporttype']) {
@@ -261,8 +261,8 @@ $usersql = "p.customerid=" . $USER->customerid;
 ////////// paging ///////////
 
 $limit=500;
-$start=0 + $_GET['pagestart'];
-$pagesql = $_GET['csv'] ? "" : "limit $start,$limit";
+$start=0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+$pagesql = isset($_GET['csv']) ? "" : "limit $start,$limit";
 
 $reportsql = $_SESSION['reportsql'];
 $ordersql = $_SESSION['reportordersql'];
@@ -401,7 +401,7 @@ select SQL_CALC_FOUND_ROWS
 ////////////////////////////////////////////////////////////////////////////////
 
 
-if ($_GET['csv']) {
+if (isset($_GET['csv'])) {
 
 
 	header("Pragma: private");
@@ -481,10 +481,11 @@ if ($_GET['csv']) {
 	}
 
 	$PAGE = "reports:view";
-	$TITLE = ($_SESSION['reportname'] != "" ? $_SESSION['reportname'] : "Custom Report");
+	$TITLE = (isset($_SESSION['reportname']) && $_SESSION['reportname'] != "" ? $_SESSION['reportname'] : "Custom Report");
 
-	$DESCRIPTION = $_SESSION['reportdesc'] ." - ". $_SESSION['reportrange'];
+	$DESCRIPTION = (isset($_SESSION['reportdesc']) ? $_SESSION['reportdesc'] . " - " : "") . $_SESSION['reportrange'];
 	/*
+	TODO FIXME this breaks if the user clears the GET request data, ex by paging or clicking on "view report"
 	Show this info if:
 	1. The user running the report is different than the user that owns the job.
 	2. The user has permission to view systemwide reports.

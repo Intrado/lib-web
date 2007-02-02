@@ -173,10 +173,11 @@ foreach ($fieldmaps as $fieldmap) {
 		echo '<div id="rule_' . $fieldnum . '" style="display: none">';
 
 		if(showmode("text")) {
-
+			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","text");
 			NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",20);
 
 		} elseif(showmode("reldate")) {
+			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","array",array_keys($RELDATE_OPTIONS));
 			NewFormItem($f, $s, "newrulevalue_" . $fieldnum, "selectstart");
 			foreach($RELDATE_OPTIONS as $name => $value) {
 				NewFormItem($f, $s, "newrulevalue_" . $fieldnum, "selectoption",$value,$name);
@@ -197,6 +198,7 @@ foreach ($fieldmaps as $fieldmap) {
 						where fieldnum='$fieldnum' and customerid='" . $USER->customerid . "' $limitsql order by value";
 
 			$values = QuickQueryList($query);
+			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","array",$values);
 			if (count($values) > 1) {
 				NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"selectmultiple",5,@array_combine($values,$values));
 			} else {

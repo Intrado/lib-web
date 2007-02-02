@@ -63,8 +63,20 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 				if ($message->id && !userOwns("message",$message->id)) {
 					exit("nope!"); //TODO
 				}
+				$fields = array("name","description","body");
+				if ($MESSAGETYPE == "email") {
+					$fields[] = "subject";
+					$fields[] = "fromname";
+					$fields[] = "fromemail";
+				}
+				if ($MESSAGETYPE == "print") {
+					$fields[] = "header1";
+					$fields[] = "header2";
+					$fields[] = "header3";
+					$fields[] = "fromaddress";
+				}
 
-				PopulateObject($form,$section,$message,array("name", "description", "body", "subject", "fromname", "fromemail", "header1", "header2", "header3", "fromaddress"));
+				PopulateObject($form,$section,$message,$fields);
 				$message->userid = $USER->id;
 
 				$message->stuffHeaders();
