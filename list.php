@@ -254,8 +254,8 @@ NewForm($f);
 if (!$list->id)
 	buttons(submit($f,'refresh','save','save'));
 else
-	buttons(submit($f,'refresh','refresh','refresh'), submit($f,'save','done','done'),
-		submit($f,'search','search','search') , submit($f, 'preview','preview','preview'));
+	buttons(submit($f,'refresh','refresh','refresh'),
+		submit($f,'search','search','search') , submit($f, 'preview','preview','preview'),submit($f,'save','done','done'));
 
 startWindow('List Information', 'padding: 3px;');
 print 'Name: ';
