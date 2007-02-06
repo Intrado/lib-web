@@ -13,21 +13,14 @@ if(isset($_GET['id'])) {
 	if (userOwns("audiofile",$id)) {
 		$af = new AudioFile($id);
 
-		if ($IS_COMMSUITE) {
-
-			$c = new Content($af->contentid);
-			$contenttype = $c->contenttype;
-			$data = base64_decode($c->data);
-		} else {
-			 if ($c = contentGet($af->contentid))
-				 list($contenttype,$data) = $c;
-		}
+		if ($c = contentGet($af->contentid))
+			list($contenttype,$data) = $c;
 
 		if ($data) {
 			$size = strlen($data);
 
 			header("HTTP/1.0 200 OK");
-			if ($_GET['download'])
+			if (isset($_GET['download']))
 				header('Content-type: application/x-octet-stream');
 			else
 				header('Content-type: ' . $contenttype);

@@ -9,18 +9,9 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 
 $customer = new Customer($USER->customerid);
 if (isset($customer->logocontentid) && 0) {
-	if ($IS_COMMSUITE) {
-
-		$c = new Content($customer->logocontentid);
-		header('Content-type: ' . $c->contenttype);
-		$data = base64_decode($c->data);
-		$size = strlen($data);
-		echo $data;
-	} else {
-		list($contenttype,$data) = contentGet($customer->logocontentid);
-		header('Content-type: ' . $contenttype);
-		echo $data;
-	}
+	list($contenttype,$data) = contentGet($customer->logocontentid);
+	header('Content-type: ' . $contenttype);
+	echo $data;
 } else {
 	header('Content-type: image/GIF');
 	readfile("img/spacer.gif");
