@@ -42,8 +42,8 @@ function assignSpecialTask ($types, $dmapidb) {
 		//when was the last time we checked the specialtasks table? We shouldn't check more than once every 5 seconds
 		if (QuickQuery("select count(*) from tasksyncdata where name='specialtaskcheck_" . $specialtype ."' and value > (now() - interval 5 second)") == 0) {
 			//check for a special task, if we dont fine one, update the table
-	
-			QuickUpdate("begin transaction");
+
+			QuickUpdate("begin");
 			$res = QuickQueryRow("select id, type from specialtask where status='queued' and type in ('$specialtype') limit 1");
 			if ($res) {
 				list($id,$type) = $res;
