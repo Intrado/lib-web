@@ -55,6 +55,7 @@ $list = new PeopleList($_SESSION['listid']);
 
 $renderedlist = new RenderedList($list);
 $renderedlist->mode = "preview";
+$renderedlist->pagelimit = 500;
 $showpagemenu = true;
 
 startWindow("Preview " . help('ShowList_Preview', NULL, 'blue'));
