@@ -65,12 +65,11 @@ $NAVTREE = array (
 		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone'),$SUBTAB=="jobs"),
 		array("Surveys","surveys.php","survey",$SUBTAB=="survey")
 		)),
-	array("Reports","reportoptions.php",array('createreport','viewsystemreports'),$MAINTAB=="reports",array(
+	array("Reports","reportsummary.php",array('createreport','viewsystemreports'),$MAINTAB=="reports",array(
+		array("Job Report","reportsummary.php","createreport",$SUBTAB=="jobsummary"),
 		array("Report Builder","reportoptions.php","createreport",$SUBTAB=="builder"),
 		//give the report viewer the default of a "today" report if there was no previous report
 		array("View Report","report.php" . (isset($_SESSION['reportsql']) ? "" : "?reporttype=relative&jobtype_relative_data=today"),"createreport",$SUBTAB=="view"),
-		array("Job Summary","reportsummary.php","createreport",$SUBTAB=="jobsummary"),
-
 		array("Usage Stats","reportsystem.php",$IS_COMMSUITE ? "viewsystemreports" : "dummy",$SUBTAB=="system"),
 		array("Call Distribution","reportsystemdistribution.php",$IS_COMMSUITE ? "viewsystemreports" : "dummy",$SUBTAB=="distribution")
 
