@@ -23,6 +23,7 @@ force_ssl=false
 log_dir="/commsuite/logs/"
 log_db_errors=true
 log_db_queries=true
+log_dmapi=true
 
 warn_earliest=
 warn_latest=
