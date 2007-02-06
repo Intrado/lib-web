@@ -11,6 +11,7 @@ require_once("../inc/sessiondata.inc.php");
 
 include_once("XmlToArray.obj.php");
 
+if ($SETTINGS['feature']['log_dmapi'])
 	ob_start();
 
 $xmlparser = new XmlToArray();
@@ -49,24 +50,27 @@ if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 <?
 }
 
-	$stuff = ob_get_flush();
-	ob_end_flush();
+	if ($SETTINGS['feature']['log_dmapi']) {
+		$rawoutput = ob_get_flush();
+		ob_end_flush();
 
-	//rotate log?
+		$logfilename = $SETTINGS['feature']['log_dir'] . "output.txt";
 
-	if (file_exists("output.txt") && filesize("output.txt") > 1000000000) {
-		if (file_exists("output.txt.1"))
-			unlink("output.txt.1");
-		rename("output.txt","output.txt.1");
+		//rotate log?
+
+		if (file_exists($logfilename) && filesize($logfilename) > 1000000000) {
+			if (file_exists($logfilename . ".1"))
+				unlink($logfilename . ".1");
+			rename($logfilename,$logfilename . ".1");
+		}
+
+		$fp = fopen($logfilename,"a");
+		fwrite($fp,"------" . date("Y-m-d H:i:s") . "------\n");
+		fwrite($fp,$HTTP_RAW_POST_DATA);
+		fwrite($fp,"-------------RESPONSE----------\n");
+		fwrite($fp,$rawoutput);
+		fwrite($fp,"time: " . (microtime(true) - $time) . "\n");
+		fwrite($fp,"-------------------------------\n");
+		fclose($fp);
 	}
-
-	$fp = fopen("output.txt","a");
-	fwrite($fp,"------" . date("Y-m-d H:i:s") . "------\n");
-	fwrite($fp,$HTTP_RAW_POST_DATA);
-	fwrite($fp,"-------------RESPONSE----------\n");
-	fwrite($fp,$stuff);
-	fwrite($fp,"time: " . (microtime(true) - $time) . "\n");
-	fwrite($fp,"-------------------------------\n");
-	fclose($fp);
-
 ?>
