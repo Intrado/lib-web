@@ -19,6 +19,8 @@ function dolistbox (img, type, init, id) {
 
 if (!$showpagemenu)
 	$renderedlist->pagelimit = -1;
+else
+	$renderedlist->pagelimit = 500;
 $pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
 
 $data = $renderedlist->getPage($pagestart, $renderedlist->pagelimit, true);
