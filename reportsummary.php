@@ -216,7 +216,7 @@ if ($jobid) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:jobsummary";
-$TITLE = "Report Summary" . ($jobid ? " - " . $job->name : "");
+$TITLE = "Standard Job Report" . ($jobid ? " - " . $job->name : "");
 
 include_once("nav.inc.php");
 //TODO buttons for notification log: download csv, view call details

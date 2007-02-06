@@ -25,7 +25,7 @@ if (!$USER->authorize('createreport')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:builder";
-$TITLE = "Report Builder";
+$TITLE = "Custom Report Builder";
 
 include_once("nav.inc.php");
 ?>
