@@ -1,5 +1,5 @@
 <?
-$pagetitle = preg_replace('/\\<.+>/','',$TITLE);
+$pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 ?>
 <html>
 <head>
@@ -18,7 +18,7 @@ $pagetitle = preg_replace('/\\<.+>/','',$TITLE);
 		</div>
 		<div id="contentbody">
 			<div>
-				<div id="navtitle"><?= $TITLE ?></div>
+				<div id="navtitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
 				<div id="navdesc"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 			</div>
 			<div id="shadowblock">

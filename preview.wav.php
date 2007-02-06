@@ -3,6 +3,7 @@ include_once("inc/common.inc.php");
 
 include_once('inc/securityhelper.inc.php');
 include_once('inc/content.inc.php');
+include_once("obj/Content.obj.php");
 include_once("obj/Message.obj.php");
 include_once("obj/MessagePart.obj.php");
 include_once("obj/AudioFile.obj.php");
@@ -136,7 +137,7 @@ if(isset($_GET['id'])) {
 			$data = file_get_contents ($outname); //readfile seems to cause problems
 
 			header("HTTP/1.0 200 OK");
-			if ($_GET['download'])
+			if (isset($_GET['download']))
 				header('Content-type: application/x-octet-stream');
 			else
 				header("Content-Type: audio/wav");
