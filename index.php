@@ -10,8 +10,11 @@ if (isset($_GET['logout']))
 if ($SETTINGS['feature']['has_ssl']) {
 	if ($IS_COMMSUITE)
 		$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/index.php";
+	/*CSDELETEMARKER_START*/
 	else
 		$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/index.php";
+	/*CSDELETEMARKER_END*/
+
 
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		redirect($secureurl);
@@ -91,15 +94,18 @@ if (file_exists($logofilename) ) {
 <? } ?>
 <table align="center" cellpadding="8" cellspacing="0" style="border: 7px solid #9B9B9B;">
 	<tr>
-		<td bgcolor="#365F8D"><div id='orgtitle'><?= htmlentities($custname) ?></div><img src="img/school_messenger.gif"></td>
+		<td bgcolor="#365F8D"><img id='brand' src='img/school_messenger.gif' /></td>
+		<td bgcolor="#365F8D"><div id='orgtitle'><?= htmlentities($custname) ?></div></td>
 	</tr>
 	<tr>
-		<td>
+		<td colspan="2">
 			<table border="0" cellpadding="10" cellspacing="0" id="login">
 				<tr>
 					<td colspan="2">
 <? if ($badlogin) { ?>
 						<div style="color: red;">Incorrect username/password. Please try again.</div>
+<? } else if ($custname === false) { ?>
+						<div style="color: red;">Invalid customer URL. Please check the URL and try again.</div>
 <? } else { ?>
 						Please log in here.
 <? } ?>
@@ -108,10 +114,10 @@ if (file_exists($logofilename) ) {
 				<tr><td align="right" style="padding: 2px;" width="165">Login:</td><td><input type="text" name="login" size="35" id="logintext"></td></tr>
 				<tr><td align="right" style="padding: 2px;">Password:</td><td><input type="password" name="password" size="35"></td></tr>
 				<tr><td colspan="2" align="right"><? print submit('login', 'main', 'signin', 'signin'); ?></td></tr>
-<? if ($SETTINGS['feature']['has_ssl'] && !$_SERVER["HTTPS"]) { ?>
+<? if ($SETTINGS['feature']['has_ssl'] && !isset($_SERVER["HTTPS"])) { ?>
 				<tr><td colspan="2" align="right"><a href="<?= $secureurl?>"><img src="img/padlock.gif"> Switch to Secure Login</a></td></tr>
 <? } ?>
-<? if ($_SERVER["HTTPS"] && !$IS_COMMSUITE) { ?>
+<? /*CSDELETEMARKER_START*/ if (isset($_SERVER["HTTPS"]) && !$IS_COMMSUITE) { ?>
 				<tr><td colspan="2" align="right">
 					<table width="135" border="0" cellpadding="2" cellspacing="0">
 					<tr>
@@ -120,7 +126,7 @@ if (file_exists($logofilename) ) {
 					</tr>
 					</table>
 				</td></tr>
-<? } ?>
+<? } /*CSDELETEMARKER_END*/ ?>
 				<tr>
 					<td colspan="2" style="font-size: x-small; font-weight: normal;">Usernames and passwords are case-sensitive.</td>
 				</tr>
