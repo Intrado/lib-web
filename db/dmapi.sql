@@ -36,12 +36,6 @@ CREATE TABLE IF NOT EXISTS  `sessiondata` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
-
--- for survey stuff
-ALTER TABLE `jobtaskactive` ADD `personid` INT NOT NULL AFTER `jobworkitemid` ;
-
-ALTER TABLE `jobtaskactive` ADD `issurvey` TINYINT NOT NULL DEFAULT '0' AFTER `status` ;
-
 -- tweak specialtask
 
 ALTER TABLE `jobtaskactive` DROP `subtype` ;
@@ -51,4 +45,3 @@ CREATE TABLE `tasksyncdata` (
 `value` VARCHAR( 50 ) NOT NULL ,
 PRIMARY KEY ( `name` )
 ) ENGINE = MYISAM ;
-
