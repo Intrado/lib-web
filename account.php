@@ -148,7 +148,7 @@ if( $reloadform )
 			array("accesscode","number","nomin","nomax"),
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
-			array("email","text",0,100)
+			array("email","text")
 			);
 
 	PopulateForm($f,$s,$USER,$fields);
@@ -208,7 +208,7 @@ startWindow('User Information');
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-					<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('User_AccessCredentials', NULL, 'grey'); ?></th>
+					<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('Account_AccessCredentials', NULL, 'grey'); ?></th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="1" cellspacing="0">
 							<tr>
@@ -248,8 +248,8 @@ startWindow('User Information');
 								<td><? NewFormItem($f,$s, 'pincodeconfirm', 'password', 20,100); ?></td>
 							</tr>
 							<tr>
-								<td align="right">Email:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 20, 100); ?></td>
+								<td align="right">Email(s):</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 72,10000); ?></td>
 							</tr>
 							<tr>
 								<td align="right">Phone:</td>
@@ -269,7 +269,7 @@ startWindow('User Information');
 							<tr>
 								<td colspan="2">Delivery Window:</td>
 							<tr>
-								<td>&nbsp;&nbsp;Earliest <?= help('Account_PhoneEarliestTime', NULL, 'small') ?></td>
+								<td width="30%">&nbsp;&nbsp;Earliest <?= help('Account_PhoneEarliestTime', NULL, 'small') ?></td>
 								<td><? time_select($f,$s,"callearly", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
 							</tr>
 							<tr>
