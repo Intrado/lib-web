@@ -24,6 +24,7 @@ if ($REQUEST_TYPE == "new") {
 ?>
 				<emailaddress name="<?= htmlentities($toname) ?>" address="<?= htmlentities($toemail) ?>" />
 <?
+				$x++;
 			}
 ?>
 		</to>
@@ -41,6 +42,7 @@ if ($REQUEST_TYPE == "new") {
 ?>
 			<attachment name="<?= htmlentities($attachmentname)?>" cmid="<?= htmlentities($attachmentcmid)?>" />
 <?
+			$x++;
 		}
 ?>
 	</email>
