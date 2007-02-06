@@ -415,8 +415,14 @@ foreach($joblangs[$type] as $joblang) {
 			<tr valign="middle">
 				<td><?= $joblang->language ?>
 				</td>
-				<td><?= $messages[$type][$joblang->messageid]->name ?></td>
-				<td><? if (!$submittedmode) { ?>
+				<td>
+<? if ($type == "phone") { ?>
+					<div style="float: right;"><?= button('play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
+<? } ?>
+					<?= $messages[$type][$joblang->messageid]->name ?>
+				</td>
+				<td>
+				<? if (!$submittedmode) { ?>
 							<a href="<?= ($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php") ?>?deletejoblang=<?= $joblang->id ?>">Delete</a>
 					<? } ?>
 				</td>

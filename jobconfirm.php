@@ -82,9 +82,6 @@ function alternate($type) {
 		<tr class="listHeader" align="left" valign="bottom">
 			<th>Language Preference</th>
 			<th>Message to Send</th>
-<? if ($type == "phone") { ?>
-			<th>&nbsp;</th>
-<? } ?>
 		</tr>
 <?
 $id = $type . 'messageid';
@@ -99,10 +96,11 @@ foreach($joblangs[$type] as $joblang) {
 			<tr valign="middle">
 				<td><?= $joblang->language ?>
 				</td>
-				<td><?= htmlentities($message->name) ?></td>
+				<td>
 <? if ($type == "phone") { ?>
-				<td>&nbsp;<?= button('play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);"); ?></td>
+					<div style="float: right;"><?= button('play', "popup('previewmessage.php?id=" . $message->id . "', 400, 400);"); ?></div>
 <? } ?>
+					<?= htmlentities($message->name) ?>
 				</td>
 			</tr>
 <?
@@ -128,7 +126,7 @@ include_once("nav.inc.php");
 
 NewForm($f, "jobsubmit.php?jobid=$jobid");
 if ($renderedlist->total > 0)
-	buttons(button('submit_job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']),button('back',null, 'job.php'));
+	buttons(button('back',null, 'job.php'),button('submit_job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
 else
 	buttons(button('cancel',null, 'job.php'));
 
