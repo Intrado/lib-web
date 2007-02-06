@@ -70,7 +70,7 @@ if(CheckFormSubmit($f,$s))
 			$audio->userid = $USER->id;
 			$audio->deleted = 0;
 
-			if($_FILES['audio']) {
+			if(isset($_FILES['audio'])) {
 				$path_parts = pathinfo($_FILES['audio']['name']);
 
 				$ext = $path_parts['extension'];
@@ -97,16 +97,7 @@ if(CheckFormSubmit($f,$s))
 						@unlink($source);
 						@unlink($dest);
 					} else {
-						if ($IS_COMMSUITE) {
-
-							$content = new Content();
-							$content->data = base64_encode(file_get_contents($dest));
-							$content->contenttype = "audio/wav";
-							$content->update();
-							$contentid = $content->id;
-						} else {
-							$contentid = contentPut($dest,"audio/wav");
-						}
+						$contentid = contentPut($dest,"audio/wav");
 
 						@unlink($source);
 						@unlink($dest);
