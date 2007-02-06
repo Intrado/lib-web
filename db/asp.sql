@@ -1130,7 +1130,11 @@ ADD UNIQUE `jobworkitemid` ( `jobworkitemid` ) ;
 ALTER TABLE `job` CHANGE `type` `type` SET( 'phone', 'email', 'print', 'survey' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'phone';
 
 
+-- update all jobtasks phone entries for old records
+update jobtask jt join calllog cl on (cl.jobtaskid = jt.id) set jt.phone = cl.phonenumber where cl.phonenumber is not null;
 
 
+--update jobtask emails
+update jobtask jt join email e on (jt.emailid = e.id) set jt.email = e.email where e.email is not null;
 
 
