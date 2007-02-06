@@ -32,7 +32,7 @@ if ($IS_COMMSUITE) {
 	and cl.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
 	group by dayofweek, cl.callprogress
 	";
-} else {
+} /*CSDELETEMARKER_START*/ else {
 	$query = "
 	select count(*)/4 as cnt,
 		dayofweek(from_unixtime(cl.starttime/1000)) as dayofweek, cl.callprogress
@@ -42,7 +42,7 @@ if ($IS_COMMSUITE) {
 	and cl.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
 	group by dayofweek, cl.callprogress
 	";
-}
+} /*CSDELETEMARKER_END*/
 
 
 

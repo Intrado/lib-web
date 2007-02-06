@@ -17,12 +17,12 @@ require_once("obj/Rule.obj.php"); //for search and sec profile rules
 
 //get the customer URL
 
-if (!$IS_COMMSUITE) {
+if ($IS_COMMSUITE) {
+	$CUSTOMERURL = "default";
+} /*CSDELETEMARKER_START*/ else {
 	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
-} else {
-	$CUSTOMERURL = "default";
-}
+} /*CSDELETEMARKER_END*/
 
 session_name($CUSTOMERURL . "_session");
 session_start();

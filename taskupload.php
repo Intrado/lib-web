@@ -54,12 +54,12 @@ if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name'])
 				$import->path = $newname;
 				$import->update();
 				redirect("tasks.php");
-			} else {
+			} /*CSDELETEMARKER_START*/ else {
 				if (uploadImportFile($newname,$import->customerid,$import->id))
 					redirect("taskmap.php?id=$import->id");
 				else
 					error('Unable to complete file upload. Please try again.');
-			}
+			} /*CSDELETEMARKER_END*/
 		} else {
 			error('Unable to complete file upload. Please try again.');
 		}

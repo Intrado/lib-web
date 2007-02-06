@@ -97,8 +97,10 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->name = GetFormData($form, $section, 'name');
 				$IMPORT->description = GetFormData($form, $section, 'description');
 
+				/*CSDELETEMARKER_START*/
 				if (!$IS_COMMSUITE && $IMPORT->id == null)
 					$IMPORT->uploadkey = substr(md5($CUSTOMERURL . microtime()),5,12);
+				/*CSDELETEMARKER_END*/
 
 				$IMPORT->updatemethod = GetFormData($form, $section, 'updatemethod');
 				$IMPORT->status = 'idle';

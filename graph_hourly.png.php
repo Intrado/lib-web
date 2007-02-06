@@ -33,7 +33,7 @@ where callprogress in ('A','M','B','N')
 and starttime > 1000 * unix_timestamp(date_sub(now(),interval 30 day))
 group by hour, callprogress
 ";
-} else {
+} /*CSDELETEMARKER_START*/ else {
 $query = "
 select count(*)/30 as cnt,
 	hour( from_unixtime(cl.starttime/1000)) as hour,
@@ -45,7 +45,7 @@ and callprogress in ('A','M','B','N')
 and cl.starttime > 1000 * unix_timestamp(date_sub(now(),interval 30 day))
 group by hour, cl.callprogress
 ";
-}
+} /*CSDELETEMARKER_END*/
 
 $result = Query($query);
 
