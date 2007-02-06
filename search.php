@@ -136,7 +136,7 @@ $TITLE = 'List Search: ' . QuickQuery("select name from list where id = $_SESSIO
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(button("done","","list.php"), submit($f,'refresh','refresh','refresh'), submit($f, 'showall','showallcontacts','showallcontacts'));
+buttons(submit($f,'refresh','refresh','refresh'), submit($f, 'showall','showallcontacts','showallcontacts'),button("done","","list.php"));
 
 startWindow('Search for ' . help('SearchList_SearchFor', NULL, 'blue'));
 
@@ -156,6 +156,7 @@ endWindow();
 $list = new PeopleList($_SESSION['listid']);
 $renderedlist = new RenderedList($list);
 $renderedlist->setSearch($RULES);
+$renderedlist->pagelimit=500;
 $showpagemenu = true;
 
 startWindow('Search Results ' . help('SearchList_SearchResults', NULL, 'blue'), 'padding: 3px;');
