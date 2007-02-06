@@ -27,44 +27,62 @@ function getHttpResponseContents ($fp) {
 			$contenttype = trim($header[1]);
 	}
 	if ($data = stream_get_contents($fp))
-		return array($contenttype,$data);
+		return array((isset($contenttype) ? $contenttype : NULL),$data);
 	else
 		return false;
 }
 
 function contentGet ($cmid) {
-	list($fp,$server) = connectToContentServer("get");
-	list($host,$port,$path) = $server;
-	if ($fp) {
-		$req = "GET " . $path . "?cmid=$cmid" . " HTTP/1.0\r\nConnection: close\r\n\r\n";
-		if (fwrite($fp,$req))
-			$data = getHttpResponseContents($fp);
-			fclose($fp);
-			return $data;
+	global $SETTINGS;
+	if (!$SETTINGS['content']['externalcontent']) {
+		$c = new Content($cmid);
+		$contenttype = $c->contenttype;
+		$data = base64_decode($c->data);
+		return array($contenttype,$data);
+	} else {
+		list($fp,$server) = connectToContentServer("get");
+		list($host,$port,$path) = $server;
+		if ($fp) {
+			$req = "GET " . $path . "?cmid=$cmid" . " HTTP/1.0\r\nConnection: close\r\n\r\n";
+			if (fwrite($fp,$req))
+				$data = getHttpResponseContents($fp);
+				fclose($fp);
+				return $data;
+		}
 	}
 	return false;
 }
 
 function contentPut ($filename,$contenttype) {
+	global $SETTINGS;
 	$result = false;
 
-	if (is_file($filename) && is_readable($filename) && ($filesize = filesize($filename)) > 0) {
-		if ($fp_file = fopen($filename,"r")) {
+	if (!$SETTINGS['content']['externalcontent']) {
+		$content = new Content();
+		$content->data = base64_encode(file_get_contents($filename));
+		$content->contenttype = $contenttype;
+		if ($content->update()) {
+			$result = $content->id;
+		}
+	} else {
+		if (is_file($filename) && is_readable($filename) && ($filesize = filesize($filename)) > 0) {
+			if ($fp_file = fopen($filename,"r")) {
 
-			list($fpc,$server) = connectToContentServer("put");
-			list($host,$port,$path) = $server;
-			if ($fpc) {
-				$req = "POST " . $path . " HTTP/1.0\r\nContent-Length: $filesize\r\nContent-Type: $contenttype\r\nConnection: close\r\n\r\n";
-				fwrite($fpc,$req);
-				while ($data = fread($fp_file,8192)) {
-					fwrite($fpc,$data);
+				list($fpc,$server) = connectToContentServer("put");
+				list($host,$port,$path) = $server;
+				if ($fpc) {
+					$req = "POST " . $path . " HTTP/1.0\r\nContent-Length: $filesize\r\nContent-Type: $contenttype\r\nConnection: close\r\n\r\n";
+					fwrite($fpc,$req);
+					while ($data = fread($fp_file,8192)) {
+						fwrite($fpc,$data);
+					}
+
+					$result = getHttpResponseContents($fpc);
+					$result = (int)$result[1];
+					fclose($fpc);
 				}
-
-				$result = getHttpResponseContents($fpc);
-				$result = (int)$result[1];
-				fclose($fpc);
+				fclose($fp_file);
 			}
-			fclose($fp_file);
 		}
 	}
 	return $result;
