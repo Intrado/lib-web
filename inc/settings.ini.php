@@ -2,17 +2,17 @@
 
 [db]
 persistent=true
-host="localhost"
-user="sharpteeth"
-pass="sharpteeth202"
+host="localhost:3306"
+user="root"
+pass=""
 db="dialerasp"
 
 ;optional seperate server for outbound notifications
 [dmapidb]
 persistent=true
-host="localhost"
-user="sharpteeth"
-pass="sharpteeth202"
+host="localhost:3306"
+user="root"
+pass=""
 db="dialerasp"
 
 
@@ -25,6 +25,8 @@ log_db_errors=true
 log_db_queries=true
 log_dmapi=true
 
+//if not set, warn_earliest is set to "7:00 am"
+//and warn_latest is set to "9:00 pm"
 warn_earliest=
 warn_latest=
 
