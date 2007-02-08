@@ -123,7 +123,7 @@ if (count($data) > $scrollThreshold) {
 }
 startWindow('My Active and Pending Notification Jobs ' . help('Jobs_MyActiveJobs', NULL, 'blue'), 'padding: 3px;', true, true);
 
-button_bar(button('createjob', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('easycall',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);") . help('Start_EasyCall') : ''));
+button_bar(button('createjob', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('easycall',"var namefield = new getObj('easycallname');popup('easycallstart.php?id=new',500,450);") . help('Start_EasyCall') : ''));
 
 showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();

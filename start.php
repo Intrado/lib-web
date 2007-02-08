@@ -56,7 +56,7 @@ if ($USER->authorize("startstats")) {
 			if ($USER->authorize("starteasy")) {
 			?><tr><td><?
 				startWindow('EasyCall ' . help('Start_EasyCall', NULL, 'blue'), 'padding: 3px;');
-				?><div align="center"><?= button('easycall2',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);"); ?></div><?
+				?><div align="center"><?= button('easycall2',"var namefield = new getObj('easycallname');popup('easycallstart.php?id=new',500,450);"); ?></div><?
 				endWindow();
 			?><br></td></tr><?
 			}
