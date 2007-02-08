@@ -19,17 +19,23 @@ class SpecialTask extends DBMappedObject {
 	function getData($field) {
 		$data = array();
 		parse_str($this->data, $data);
-		return $data[$field];
+		return get_magic_quotes_gpc() ? stripslashes($data[$field]) : $data[$field];
 	}
 
-	function setData($field, $value) {
+	function setData($field, $inputvalue) {
 		$data = array();
 		parse_str($this->data, $data);
-
-		$data[$field] = $value;
+		
+		$cleanarray = array();
+		foreach($data as $key => $value) {
+			$cleankey = get_magic_quotes_gpc() ? stripslashes($key) : $key;
+			$cleanvalue =  get_magic_quotes_gpc() ? stripslashes($value) : $value;
+			$cleanarray[$cleankey] = $cleanvalue;
+		}
+		$cleanarray[$field] = $inputvalue;
 
 		$pairs = array();
-		foreach($data as $key => $value)
+		foreach($cleanarray as $key => $value)
 			$pairs[] = urlencode($key) . '=' . urlencode($value);
 		$this->data = implode('&',$pairs);
 	}
