@@ -17,33 +17,25 @@ if (!$USER->authorize("starteasy")) {
 	redirect("unauthorized.php");
 }
 
+
 $specialtask = new SpecialTask($_REQUEST['taskid']);
-if($afid = $specialtask->getData('audiofileid')) {
+//$messagelangs =$specialtask->getData('messagelangs');
+//var_dump($messagelangs);
 
-	//we got it
-
-	//then make a message
-	$message = new Message();
-	$message->name = $specialtask->getData('name');
-	$message->type = "phone";
-	$message->userid = $USER->id;
-	$message->create();
-
-	$part = new MessagePart();
-	$part->messageid = $message->id;
-	$part->type = "A";
-	$part->audiofileid = $afid;
-	$part->sequence = 0;
-
-	$part->create();
-
-	$specialtask->setData('messageid',$message->id);
-	$specialtask->update();
-
+if($specialtask->getData("progress") == "Done") {
 	redirect("easycallsubmit.php?taskid=" . $_REQUEST['taskid']);
 } else {
+	$currlang = $specialtask->getData("currlang");
+	$progress = $specialtask->getData("progress");
+	
+	if($progress == "Hung up") {
+		$specialtask->setData('error', "Hung up early");
+	}
+	
 	$specialtask->lastcheckin = date("Y-m-d H:i:s");
 	$specialtask->update();
+	
+	
 }
 
 $error = $specialtask->getData('error');
@@ -58,18 +50,22 @@ if (!$error) {
 ?>
 <div style="text-align: center; width: 400px; padding: 3px;">
 
-	<h3>Recording session with <?= Phone::format($specialtask->getData("phonenumber")) ?> in progress</h3>
+	<h3>Recording session with <?= Phone::format($specialtask->getData("phonenumber")) ?></h3>
+	<h3> Progress: <?=$progress?></h3>
+	<h3> Language: <?=$currlang?></h3>
 	<img src="img/progressbar.gif?date=<?= time() ?>">
 	<hr>
-	<img src="img/bug_important.gif" > You should receive a call shortly. After you save your message and hangup, you will need to <b>Confirm &amp; Submit</b> your job in the next screen.
+	<img src="img/bug_important.gif" > You should receive a call shortly. After you save your message(s) and hangup, you will need to <b>Confirm &amp; Submit</b> your job in the next screen.
 
 </div>
 	<meta http-equiv="refresh" content="2;url=easycallrecord.php?taskid=<?= $_REQUEST['taskid'] ?>&toggle=<?= !$_REQUEST['toggle'] ?>">
+
 <?
+
 } else {
 ?>
 	<div style="text-align: center; width: 400px; padding: 3px;">
-		<span style="color: red;">There was an error during the call.</span><br>
+		<span style="color: red;">There was an error during the call: <?=$error?>.</span><br>
 		Please check the phone number and <a href="easycallstart.php?retry=<?= $specialtask->id ?>">try again</a></span>
 	</div>
 <?
