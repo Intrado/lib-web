@@ -47,24 +47,26 @@ if(CheckFormSubmit($f,$s)) {
 	$job->type = "phone";
 
 	$messagelangs = unserialize($specialtask->getData('messagelangs'));
-	
-	foreach($messagelangs as $lang => $message){
-		if($lang == "Default"){
-			$job->phonemessageid = $message;
-			$job->create();
-		} else {
-			$joblang = new JobLanguage();
-			$joblang->type = "phone";
-			$joblang->language = $lang;
-			$joblang->messageid = $message;
-			$joblang->jobid = $job->id;
-			if ($joblang->language && $joblang->messageid) {
-				$joblang->create();
+	if($messagelangs) {
+		foreach($messagelangs as $lang => $message){
+			if($lang == "Default"){
+				$job->phonemessageid = $message;
+				$job->create();
+			} else {
+				$joblang = new JobLanguage();
+				$joblang->type = "phone";
+				$joblang->language = $lang;
+				$joblang->messageid = $message;
+				$joblang->jobid = $job->id;
+				if ($joblang->language && $joblang->messageid) {
+					$joblang->create();
+				}
 			}
 		}
 	}
-	
-	$specialtask->setData('jobid', $job->id);
+	if($job->id){
+		$specialtask->setData('jobid', $job->id);
+	}
 	$specialtask->update();
 } else {
 	$job = new Job($specialtask->getData('jobid'));
