@@ -59,7 +59,7 @@ if(CheckFormSubmit($f,$s))
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} elseif( !$USER->ldap && (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
-			error('You must enter a password');
+			error('You must enter a password');		
 		} elseif ( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match');
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
@@ -92,7 +92,7 @@ if(CheckFormSubmit($f,$s))
 		} elseif ((!ereg("^[0-9]*$", GetFormData($f, $s, 'accesscode')) || !ereg("^[0-9]*$", GetformData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code must all be numeric');
 		} elseif((isAllSameDigit(GetFormData($f, $s, 'accesscode')) || isAllSameDigit(GetFormData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))
-			&& (!ereg("^0*$", $number))){
+			&& (!ereg("^0*$", GetFormData($f, $s, 'pincode')))){
 			error('User ID and Pin code cannot have all the same digits');
 		} elseif( isSequential(GetFormData($f, $s, 'pincode'))) {
 			error('Cannot have sequential numbers for User ID or Pin code');
@@ -110,7 +110,7 @@ if(CheckFormSubmit($f,$s))
 				if (!ereg("^0*$", $newpassword))
 					$USER->setPassword($newpassword);
 			}
-
+				
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
 			$newpin = GetFormData($f, $s, 'pincode');
 			if (!ereg("^0*$", $newpin))
