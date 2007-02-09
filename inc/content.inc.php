@@ -32,12 +32,15 @@ function getHttpResponseContents ($fp) {
 		return false;
 }
 
-function contentGet ($cmid) {
+function contentGet ($cmid, $base64 = false) {
 	global $SETTINGS;
 	if (!$SETTINGS['content']['externalcontent']) {
 		$c = new Content($cmid);
 		$contenttype = $c->contenttype;
-		$data = base64_decode($c->data);
+		if (!$base64)
+			$data = base64_decode($c->data);
+		else
+			$data = $c->data;
 		return array($contenttype,$data);
 	} else {
 		list($fp,$server) = connectToContentServer("get");
@@ -47,19 +50,27 @@ function contentGet ($cmid) {
 			if (fwrite($fp,$req))
 				$data = getHttpResponseContents($fp);
 				fclose($fp);
-				return $data;
+				if (!$base64)
+					return $data;
+				else
+					return base64_encode($data);
 		}
 	}
 	return false;
 }
 
-function contentPut ($filename,$contenttype) {
+function contentPut ($filename,$contenttype, $base64 = false) {
 	global $SETTINGS;
 	$result = false;
 
 	if (!$SETTINGS['content']['externalcontent']) {
 		$content = new Content();
-		$content->data = base64_encode(file_get_contents($filename));
+
+		if (!$base64)
+			$content->data = base64_encode(file_get_contents($filename));
+		else
+			$content->data = file_get_contents($filename);
+
 		$content->contenttype = $contenttype;
 		if ($content->update()) {
 			$result = $content->id;
@@ -73,9 +84,13 @@ function contentPut ($filename,$contenttype) {
 				if ($fpc) {
 					$req = "POST " . $path . " HTTP/1.0\r\nContent-Length: $filesize\r\nContent-Type: $contenttype\r\nConnection: close\r\n\r\n";
 					fwrite($fpc,$req);
-					while ($data = fread($fp_file,8192)) {
-						fwrite($fpc,$data);
-					}
+
+					if (!$base64)
+						$data = file_get_contents($filename);
+					else
+						$data = base64_decode(file_get_contents($filename));
+
+					fwrite($fpc,$data);
 
 					$result = getHttpResponseContents($fpc);
 					$result = (int)$result[1];
