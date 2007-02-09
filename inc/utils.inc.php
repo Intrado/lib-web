@@ -133,7 +133,7 @@ function isSameUserPass($user, $pass, $firstname, $lastname) {
 		The location of the cracklib directory may differ.
 */
 function isNotComplexPass($pass) {
-	
+
 	// Perform password check
 	$check = crack_check($pass);
 	if($check) {
@@ -212,5 +212,63 @@ function checkemails($emaillist) {
 	return $bademaillist;
 }
 
+//from php.net comments
+function secure_tmpname($dir = "tmp", $prefix = 'tmp', $postfix = '.dat') {
+   // validate arguments
+   if (! (isset($postfix) && is_string($postfix))) {
+       return false;
+   }
+   if (! (isset($prefix) && is_string($prefix))) {
+       return false;
+   }
+
+   // find a temporary name
+   $tries = 1;
+   do {
+       // get a known, unique temporary file name
+       $sysFileName = tempnam($dir, $prefix);
+       if ($sysFileName === false) {
+           return false;
+       }
+
+       // tack on the extension
+       $newFileName = $sysFileName . $postfix;
+       if ($sysFileName == $newFileName) {
+           return $sysFileName;
+       }
+
+       // move or point the created temporary file to the new filename
+       // NOTE: these fail if the new file name exist
+       $newFileCreated = @rename($sysFileName, $newFileName);
+       if ($newFileCreated) {
+           return $newFileName;
+       }
+
+       unlink ($sysFileName);
+       $tries++;
+   } while ($tries <= 5);
+
+   return false;
+}
+
+
+function makeparentdirectories ($filepath) {
+	$parts = preg_split("/(\/|\\\)+/",$filepath);
+
+	if (count($parts) <= 1) {
+		return;
+	}
+
+	$path = false;
+	$file = array_pop($parts);
+	foreach ($parts as $part) {
+		if ($path === false)
+			$path .= $part;
+		else
+			$path .= "/" . $part;
+		if (!is_dir($path))
+			mkdir($path);
+	}
+}
 
 ?>
