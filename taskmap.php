@@ -167,10 +167,10 @@ foreach ($fieldmaps as $fieldmap) {
 //scan the file
 
 
-if ($IS_COMMSUITE)
-	$importfile = $IMPORT->path;
-else
+if ($SETTINGS['import']['type'] == "ftp")
 	$importfile = getImportFileURL($IMPORT->customerid,$IMPORT->id);
+else if ($SETTINGS['import']['type'] == "file")
+	$importfile = $SETTINGS['import']['filedir'] . "/" . $IMPORT->path;
 
 if (is_file($importfile ))
 	$fp = @fopen($importfile , "r");
@@ -226,7 +226,8 @@ startWindow('Field Mapping');
 ?>
 				</th></tr>
 <?
-			foreach ($importdata[$x] as $cel) {
+			for ($ci = 0; $ci < 10; $ci++) {
+				$cel = $importdata[$x][$ci];
 				echo "</tr><td>" . ($cel == "" ? "&nbsp;" : htmlentities($cel)) . "</td></tr>";
 			}
 ?>

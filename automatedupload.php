@@ -81,7 +81,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 			$sess['authcode'] = $newauthcode;
 			$sess['length'] = $sess['remaining'] = $length;
 			$sess['md5'] = $md5checksum;
-			$sess['filename'] = tempnam("/tmp","autoupload");
+			$sess['filename'] = secure_tmpname("/tmp","autoupload",".csv");
 			storeSessionData($sessionid,$sess['customerid'],$sess);
 
 			return array ("authCode" => $newauthcode,
@@ -95,6 +95,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 	}
 
 	function rcp_requestuploadconfirmation ($method_name, $params, $app_data) {
+		global $SETTINGS;
 		$sessionid = $params[0];
 		$authcode = $params[1];
 
@@ -132,16 +133,30 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Md5 is different. Request mdd5 = " . $sess['md5'] . " Md5 of file on server: $currentmd5",
 						"errorCode" => "CHECHSUM_FAILURE");
-		//do the upload
 
-		if (!uploadImportFile($sess['filename'],$sess['customerid'],$sess['importid']))
+		//do the upload
+		if ($SETTINGS['import']['type'] == "ftp") {
+			$res = uploadImportFile($sess['filename'],$sess['customerid'],$sess['importid']);
+		} else if ($SETTINGS['import']['type'] == "file"){
+			$destfile = $SETTINGS['import']['filedir'] . "/" . $sess['customerid'] . "/" . $sess['importid'] . "/data.csv";
+			makeparentdirectories($destfile);
+			$res = copy($sess['filename'],$destfile);
+		} else {
+			$res = false;
+		}
+
+		if (!$res)
 			return array ("resumeLength" => "0",
 						"errorMsg" => "There was an error uploading the file",
 						"errorCode" => "UPLOAD_ERROR");
+
 		@unlink($sess['filename']);
 
 		//should we kick off the import?
 		$import = new Import($sess['importid']);
+		$import->path = $sess['customerid'] . "/" . $sess['importid'] . "/data.csv";
+		$import->update();
+
 		if ($import->type == "automatic") {
 			if (isset($_SERVER['WINDIR'])) {
 				$cmd = "start php import.php -import=" . $sess['importid'];

@@ -17,8 +17,7 @@ include_once("obj/PeopleList.obj.php");
 include_once("obj/PersonData.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
-
-
+require_once("inc/ftpfile.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -147,8 +146,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$import->name = "User list import (" . $USER->login . ")";
 			$import->description = substr("list (" . $list->name . ")", 0,50);
 			$import->status = "idle";
-			$import->type = "upload";
-			$import->path = $curfilename;
+			$import->type = "list";
 			$import->scheduleid = NULL;
 			$import->ownertype = "user";
 			$import->updatemethod = "full";
@@ -182,22 +180,40 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 
 		} else {
 			$import = new Import($importid);
-			$import->path = $curfilename;
 			$import->name = "User list import (" . $USER->login . ")";
 			$import->description = substr("list (" . $list->name . ")", 0,50);
 			$import->update();
 		}
 
-		if (isset($_SERVER['WINDIR'])) {
-			$cmd = "start php import.php -import=$importid";
-			exec($cmd);
-			//pclose(popen($cmd,"r"));
+		//upload or copy the file to the main import location
+		if ($SETTINGS['import']['type'] == "ftp") {
+			$res = uploadImportFile($curfilename,$import->customerid,$import->id);
+		} else if ($SETTINGS['import']['type'] == "file"){
+			$destfile = $SETTINGS['import']['filedir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv";
+			makeparentdirectories($destfile);
+			$res = copy($curfilename,$destfile);
 		} else {
-			$cmd = "php import.php -import=$importid";
-			$tmp = exec($cmd);
+			$res = false;
 		}
 
-		sleep(3);
+		if ($res) {
+			$import->path = $import->customerid . "/" . $import->id . "/data.csv";
+			$import->update();
+
+			if (isset($_SERVER['WINDIR'])) {
+				$cmd = "start php import.php -import=$importid";
+				exec($cmd);
+				//pclose(popen($cmd,"r"));
+			} else {
+				$cmd = "php import.php -import=$importid";
+				$tmp = exec($cmd);
+			}
+
+			sleep(3);
+		} else {
+			$errormsg = 'Unable to complete file upload. Please try again.';
+		}
+
 	} else {
 		//just sync the IDs
 

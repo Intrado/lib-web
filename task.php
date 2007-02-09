@@ -97,69 +97,16 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->name = GetFormData($form, $section, 'name');
 				$IMPORT->description = GetFormData($form, $section, 'description');
 
-				/*CSDELETEMARKER_START*/
-				if (!$IS_COMMSUITE && $IMPORT->id == null)
+				if (!$IMPORT->id)
 					$IMPORT->uploadkey = substr(md5($CUSTOMERURL . microtime()),5,12);
-				/*CSDELETEMARKER_END*/
 
 				$IMPORT->updatemethod = GetFormData($form, $section, 'updatemethod');
 				$IMPORT->status = 'idle';
 				$IMPORT->ownertype = 'system';
 
+				$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
+				$IMPORT->update();
 
-				if ($IS_COMMSUITE) {
-					$IMPORT->path = GetFormData($form, $section, 'path');
-
-					if (GetFormData($form, $section, 'isscheduled')) {
-						$IMPORT->type = 'automatic';
-					} else {
-						$IMPORT->type = 'manual';
-					}
-
-					$schedule = new Schedule($IMPORT->scheduleid);
-					$schedule->userid = $USER->id;
-					$schedule->triggertype = 'import';
-					$schedule->type = 'R';
-					if (GetFormData($form, $section,"scheduletime")) {
-						$time = GetFormData($form, $section,"scheduletime");
-					} else {
-						$time = '12:00 am';	// Default if none was chosen in the UI
-					}
-					$schedule->time = date("H:i", strtotime($time));
-					$schedule->update(); // Make sure the schedule object has a valid ID
-					$IMPORT->scheduleid = $schedule->id;
-
-					$IMPORT->update();
-
-
-
-					// If the task is scheduled, set up the schedule data
-					if (GetFormData($form, $section, 'isscheduled')) {
-						$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
-						for ($x = 1; $x < 8; $x++) {
-							if(GetFormData($form, $section,"dow$x")) {
-								if (!in_array($x,$data)) {
-									QuickUpdate("insert into scheduleday (scheduleid, dow) values ($schedule->id,$x)");
-								}
-							} else {
-								if (in_array($x,$data)) {
-									QuickUpdate("delete from scheduleday where scheduleid=$schedule->id and dow=$x");
-								}
-							}
-						}
-					} else { // Delete the schedule data
-						QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
-						$schedule->type = 'O'; // Letter O as in "Oh", short for "Once" - If the task IS NOT scheduled set the schedule type to ONCE
-					}
-
-					$schedule->nextrun = $schedule->calcNextRun();
-					$schedule->update();
-
-
-				} else {
-					$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
-					$IMPORT->update();
-				}
 
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
 				redirect("tasks.php");
@@ -177,29 +124,7 @@ if( $reloadform )
 	PutFormData($form, $section, 'description', $IMPORT->description, 'text', 1, 50);
 	PutFormData($form, $section, 'updatemethod', ($IMPORT->updatemethod != null ? $IMPORT->updatemethod : 'updateonly'), 'text');
 
-
-	if ($IS_COMMSUITE) {
-		PutFormData($form, $section, 'path', $IMPORT->path, 'text', 1, 1000, true);
-		PutFormData($form, $section, 'isscheduled', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
-
-
-		$schedule = new Schedule($IMPORT->scheduleid);
-		$scheduledows = array();
-		$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
-		for ($x = 1; $x < 8; $x++) {
-			$scheduledows[$x] = in_array($x,$data);
-		}
-		for ($x = 1; $x < 8; $x++) {
-			PutFormData($form, $section, "dow$x",$scheduledows[$x],"bool",0,1);
-		}
-		if ($schedule->time != null) {
-			PutFormData($form, $section, "scheduletime",date("g:i a", strtotime($schedule->time)),"text",1,50,true);
-		} else {
-			PutFormData($form, $section, "scheduletime",date("g:i a", strtotime('12:00 am')),"text",1,50,true);
-		}
-	} else {
-		PutFormData($form, $section, 'automaticimport', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
-	}
+	PutFormData($form, $section, 'automaticimport', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
 }
 
 
@@ -231,12 +156,6 @@ startWindow('Import Information ');
 					<td>Description:</td>
 					<td><? NewFormItem($form, $section,"description","text", 50); ?></td>
 				</tr>
-<? if ($IS_COMMSUITE) { ?>
-				<tr>
-					<td>File:</td>
-					<td><? NewFormItem($form, $section,"path","text", 100); ?></td>
-				</tr>
-<? } ?>
 				<tr>
 					<td>Update Method:</td>
 					<td><?
@@ -251,84 +170,21 @@ startWindow('Import Information ');
 			</table>
 		</td>
 	</tr>
-<? if ($IS_COMMSUITE) { ?>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Schedule:</th>
-		<td class="bottomBorder">
-			<table border="0" cellspacing="0" cellpadding="2">
-				<tr><td colspan="9"><? NewFormItem($form, $section, 'isscheduled', 'checkbox', null, null, 'onclick="toggleDayState(this.checked)"'); ?></td><td>Scheduled &nbsp; </td>
-					<td colspan="9">Repeat this task every:</td>
-					<td>
-						<table border="0" cellpadding="2" cellspacing="1" class="list" width=100%>
-							<tr class="listHeader" align="left" valign="bottom"><td>Su</td>
-								<th>M</th>
-								<th>Tu</th>
-								<th>W</th>
-								<th>Th</th>
-								<th>F</th>
-								<th>Sa</th>
-								<th>Time</th>
-							</tr>
-							<tr>
-								<? if ($IMPORT->type != 'automatic') {
-										$isDisabled = 'DISABLED';
-									} ?>
-								<td><? NewFormItem($form, $section,"dow1","checkbox", null, null, 'id="dow1" ' . $isDisabled); ?></td>
-								<td><? NewFormItem($form, $section,"dow2","checkbox", null, null, 'id="dow2" ' . $isDisabled); ?></td>
-								<td><? NewFormItem($form, $section,"dow3","checkbox", null, null, 'id="dow3" ' . $isDisabled); ?></td>
-								<td><? NewFormItem($form, $section,"dow4","checkbox", null, null, 'id="dow4" ' . $isDisabled); ?></td>
-								<td><? NewFormItem($form, $section,"dow5","checkbox", null, null, 'id="dow5" ' . $isDisabled); ?></td>
-								<td><? NewFormItem($form, $section,"dow6","checkbox", null, null, 'id="dow6" ' . $isDisabled); ?></td>
-								<td><? NewFormItem($form, $section,"dow7","checkbox", null, null, 'id="dow7" ' . $isDisabled); ?></td>
-								<td><? time_select($form, $section,"scheduletime", null, null, null, null, $isDisabled); ?></td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-<? } else { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader">Automated upload:</th>
 		<td class="">
 			<table border="0" cellspacing="0" cellpadding="2">
-				<tr><td>Import when uploaded</td><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox', null, null, 'onclick="toggleDayState(this.checked)"'); ?> Import when remote uploads are complete <br>(uncheck this box when configuring import mapping or changing data fields)</td>
+				<tr><td>Import when uploaded</td><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox'); ?> Import when remote uploads are complete <br>(uncheck this box when configuring import mapping or changing data fields)</td>
 				</tr>
 			</table>
 		</td>
 	</tr>
-<? } ?>
 </table>
 <?
 endWindow();
 buttons();
 EndForm();
-?>
 
-<script language="javascript">
-function toggleDayState(isChecked) {
-	if (isChecked) { // Enable
-		for (i = 1; i < 8; i++) {
-			var box = new getObj('dow' + i);
-			box.obj.disabled = false;
-		}
-
-		var time = new getObj('scheduletime');
-		time.obj.disabled = false;
-	} else { // Disable
-		for (i = 1; i < 8; i++) {
-			var box = new getObj('dow' + i);
-			box.obj.checked = false;
-			box.obj.disabled = true;
-		}
-
-		var time = new getObj('scheduletime');
-		time.obj.disabled = true;
-	}
-}
-</script>
-<?
 include_once("navbottom.inc.php");
 
 ?>

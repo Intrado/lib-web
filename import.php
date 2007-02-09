@@ -142,38 +142,40 @@ $import->lastrun = $now;
 $import->update(array("status","lastrun"));
 
 
-if ($IS_COMMSUITE || $import->type == "upload")
-	$importfile = $import->path;
-else
+if ($SETTINGS['import']['type'] == "ftp")
 	$importfile = getImportFileURL($import->customerid,$import->id);
+else if ($SETTINGS['import']['type'] == "file")
+	$importfile = $SETTINGS['import']['filedir'] . "/" . $import->path;
 
 
 $fp = fopen($importfile, "r");
-if (!$fp || filesize($importfile) == 0) {
+if (!$fp) {
 	$import->status = "error";
 	$import->update(array("status"));
-	wlog("No input file or file empty: $importfile");
+	wlog("No input file: $importfile");
 	exit(-1);
 }
 
 $imported = 0;
 $ignored = 0;
 $count = 0;
+$anydata = false;
 while (($row = fgetcsv($fp,4096)) !== FALSE) {
+	$anydata = true;
 	//skip blank lines
-	if (count($row) == 1 and $row[0] === "")
+	if (count($row) == 1 and trim($row[0]) === "")
 		continue;
 	$count++;
 	//try to use mapped key
 	if (isset($importfields['key']) && strlen($row[$importfields['key']->mapfrom]) > 0) {
-		$key = $row[$importfields['key']->mapfrom];
+		$key = trim($row[$importfields['key']->mapfrom]);
 	} else {
 		$key = false;
 	}
 
 	if (isset($importfields['user']) &&
-		strlen($row[$importfields['user']->mapfrom]) > 0) {
-		$username = $row[$importfields['user']->mapfrom];
+		strlen(trim($row[$importfields['user']->mapfrom])) > 0) {
+		$username = trim($row[$importfields['user']->mapfrom]);
 	} else {
 		$username = false;
 	}
@@ -542,36 +544,18 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 
 fclose($fp);
 
+if (!$anydata) {
+	$import->status = "error";
+	$import->update(array("status"));
+	wlog("Input file was totally empty, refusing to coninue processing: $importfile");
+	exit(-1);
+}
+
+
 wlog("imported total: $imported of $count");
 if ($debug) echo date("Y-m-d h:i:s") . " imported total: $imported\n";
 
 if ($dotrimoldrecords) {
-
-/*
-	QuickUpdate("update address a right join person p on (a.personid=p.id)
-			set a.personid=-1 where p.lastimport < '$now' and p.customerid='$custid'");
-	$count = QuickUpdate("delete from address where personid=-1");
-	wlog("deleted $count old addresses");
-
-	QuickUpdate("update email a right join person p on (a.personid=p.id)
-			set a.personid=-1 where p.lastimport < '$now' and p.customerid='$custid'");
-	$count = QuickUpdate("delete from email where personid=-1");
-	wlog("deleted $count old emails");
-
-	QuickUpdate("update phone a right join person p on (a.personid=p.id)
-			set a.personid=-1 where p.lastimport < '$now' and p.customerid='$custid'");
-	$count = QuickUpdate("delete from phone where personid=-1");
-	wlog("deleted $count old phones");
-
-	QuickUpdate("update persondata a right join person p on (a.personid=p.id)
-			set a.personid=-1 where p.lastimport < '$now' and p.customerid='$custid'");
-	$count = QuickUpdate("delete from persondata where personid=-1");
-	wlog("deleted $count old persondata");
-
-	$count = QuickUpdate("delete from person where lastimport < '$now' and customerid='$custid'");
-	wlog("deleted $count old people");
-
-*/
 
 	$count = QuickUpdate("update person p set p.customerid=customerid * -1 where p.lastimport != '$now' and p.customerid='$custid' and p.importid=$importid");
 	wlog("deactivated $count old people records");

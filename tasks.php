@@ -53,11 +53,12 @@ function fmt_updatemethod ($import,$field) {
 
 
 function fmt_fileexists ($import,$dummy) {
-	global $IS_COMMSUITE;
-	if ($IS_COMMSUITE)
-		$importfile = $import->path;
-	else
+	global $SETTINGS;
+	if ($SETTINGS['import']['type'] == "ftp")
 		$importfile = getImportFileURL($import->customerid,$import->id);
+	else if ($SETTINGS['import']['type'] == "file")
+		$importfile = $SETTINGS['import']['filedir'] . "/" . $import->path;
+
 
 	if (is_readable($importfile) && is_file($importfile)) {
 		return date("M j, g:i a",filemtime($importfile));
