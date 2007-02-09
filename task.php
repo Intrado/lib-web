@@ -25,35 +25,11 @@ if (!$USER->authorize('managetasks')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-//disable delete
-if (isset($_GET['delete'])) {
-	$delete = DBSafe($_GET['delete']);
-	if(customerOwns("import",$delete)) {
-		$deleteimport = DBFind("Import", "from import where id = '$delete' and customerid = '$USER->customerid'");
-		$schedule = DBFind("Schedule", "from schedule where id = '$deleteimport->scheduleid'");
-
-		if ($schedule) {
-			QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
-			$schedule->destroy();
-		}
-		QuickUpdate("delete from importfield where importid=$deleteimport->id");
-		$deleteimport->destroy();
-	}
-
-	redirectToReferrer();
-}
-*/
 if (isset($_GET['run'])) {
-	$run = DBSafe($_GET['run']);
+	$run = $_GET['run'] + 0;
 	if(customerOwns("import",$run)) {
-		if (isset($_SERVER['WINDIR'])) {
-			$cmd = "start php import.php -import=$run";
-			pclose(popen($cmd,"r"));
-		} else {
-			$cmd = "php import.php -import=$run > /dev/null &";
-			exec($cmd);
-		}
+		$import = new Import($run);
+		$import->runNow();
 		sleep(3);
 	}
 	redirectToReferrer();
