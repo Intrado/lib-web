@@ -266,8 +266,8 @@ function makeparentdirectories ($filepath) {
 			$path .= $part;
 		else
 			$path .= "/" . $part;
-		if (!is_dir($path))
-			mkdir($path);
+
+		@mkdir($path);
 	}
 }
 
