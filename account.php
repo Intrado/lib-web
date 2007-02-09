@@ -71,7 +71,7 @@ if(CheckFormSubmit($f,$s))
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-		} elseif (strlen() < $usernamelength) {
+		} elseif (strlen($login) < $usernamelength) {
 			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
 			error('Password must be atleast ' . $passwordlength . ' characters long');
