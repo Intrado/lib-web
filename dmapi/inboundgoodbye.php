@@ -8,9 +8,9 @@ function goodbye()
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="goodbye">
 		<audio cmid="file://prompts/GoodBye.wav" />
-		<hangup/>
+		<hangup />
 	</message>
-</voice>	
+</voice>
 <?
 }
 
