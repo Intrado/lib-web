@@ -46,6 +46,7 @@ if (count($messagefields) > 0) {
 		$fields[$fieldmap->fieldnum] = $fieldmap;
 } else {
 	$dopreview = 1; //go ahead and preview w/o submiting form if there are no fields in the message
+	$previewdata = "&qt=";
 }
 
 /****************** main message section ******************/
