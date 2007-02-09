@@ -58,7 +58,7 @@ $reloadform = 0;
 $checkpassword = (getSystemSetting("checkpassword","",true)==0) ? getSystemSetting("checkpassword") : 1;
 $usernamelength = getSystemSetting("usernamelength","",true) ? getSystemSetting("usernamelength") : 5;
 $passwordlength = getSystemSetting("passwordlength","",true) ? getSystemSetting("passwordlength") : 5;
-	
+
 if($checkpassword){
 	if($passwordlength < 6) {
 		$passwordlength = 6;
@@ -77,10 +77,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		$reloadform = 1;
 	}
 	else
-	{	
+	{
 		MergeSectionFormData($f, $s);
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$usr = new User($_SESSION['userid']);
+
+		$login = trim(GetFormData($f, $s, 'login'));
 
 		// If a user has also submitted dataview rules then prepare an error message in case
 		//	those rules get lost, which is what happens when there is an error() call below.
@@ -103,11 +105,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
-		} elseif (strlen(GetFormData($f, $s, 'login')) < $usernamelength) {
+		} elseif (strlen($login) < $usernamelength) {
 			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
 			error('Password must be atleast ' . $passwordlength . ' characters long');
-		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $_SESSION['userid'])) {
+		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
 		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid'],  $USER->customerid);
@@ -117,7 +119,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Please select a field');
 		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
 			error('Your password must contain atleast one letter and one number', $securityrules);
-		} elseif(($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) && !GetFormData($f,$s,'ldap')) {
+		} elseif(($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) && !GetFormData($f,$s,'ldap')) {
 			error($issame, $securityrules);
 		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f,$s,'ldap')){
 			error($iscomplex, $securityrules);
@@ -136,12 +138,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error("Some emails are invalid", $bademaillist);
 		} else {
 			// Submit changes
-			
+
 			if ($usr->id == NULL) {
 				$usr->enabled = 1;
 			}
-			
-			PopulateObject($f,$s,$usr,array("accessid","login","accesscode","firstname","lastname","email"));
+
+			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname","email"));
+			$usr->login = $login;
 			$usr->customerid = $USER->customerid;
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
 			if($IS_LDAP){
@@ -167,7 +170,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 					$usr->setPassword($password);
 				}
 			}
-		
+
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
 			$pincode = GetFormData($f, $s, 'pincode');
 			if (!ereg("^0*$", $pincode)) {
@@ -208,7 +211,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 }
 
 $RULEMODE = array('multisearch' => true, 'text' => false, 'reldate' => false);
-$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
+if ($_SESSION[userid])
+	$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
+else
+	$RULES = array();
+
 if( $reloadform )
 {
 	ClearFormData($f);
@@ -243,7 +250,10 @@ if( $reloadform )
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
 
-	$types = QuickQueryList("select jobtypeid from userjobtypes where userid = $usr->id");
+	if ($usr->id)
+		$types = QuickQueryList("select jobtypeid from userjobtypes where userid = $usr->id");
+	else
+		$types = array();
 
 	PutFormData($f,$s,"jobtypes",$types,"array");
 	PutFormData($f,$s,"restricttypes",(bool)count($types),"bool",0,1);

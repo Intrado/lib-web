@@ -55,11 +55,13 @@ if(CheckFormSubmit($f,$s))
 
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 
+		$login = trim(GetFormData($f, $s, 'login'));
+
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} elseif( !$USER->ldap && (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
-			error('You must enter a password');		
+			error('You must enter a password');
 		} elseif ( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match');
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
@@ -69,11 +71,11 @@ if(CheckFormSubmit($f,$s))
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-		} elseif (strlen(GetFormData($f, $s, 'login')) < $usernamelength) {
+		} elseif (strlen() < $usernamelength) {
 			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
 			error('Password must be atleast ' . $passwordlength . ' characters long');
-		} elseif (User::checkDuplicateLogin(GetFormData($f,$s,"login"), $USER->customerid, $USER->id)) {
+		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $USER->id)) {
 			error('This username already exists, please choose another');
 		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $USER->id)) {
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $USER->id,  $USER->customerid);
@@ -81,7 +83,7 @@ if(CheckFormSubmit($f,$s))
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
 			error('Your password must contain atleast one letter and one number', $securityrules);
-		} elseif($issame=isSameUserPass(GetFormData($f,$s,'login'), GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !$USER->ldap) {
+		} elseif($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !$USER->ldap) {
 			error($issame, $securityrules);
 		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !$USER->ldap){
 			error($iscomplex, $securityrules);
@@ -100,7 +102,8 @@ if(CheckFormSubmit($f,$s))
 			error("Some emails are invalid", $bademaillist);
 		} else {
 			//submit changes
-			PopulateObject($f,$s,$USER,array("login","accesscode","firstname","lastname","email"));
+			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname","email"));
+			$USER->login = $login;
 			$USER->phone = Phone::parse(GetFormData($f,$s,"phone"));
 			$USER->update();
 
@@ -110,7 +113,7 @@ if(CheckFormSubmit($f,$s))
 				if (!ereg("^0*$", $newpassword))
 					$USER->setPassword($newpassword);
 			}
-				
+
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
 			$newpin = GetFormData($f, $s, 'pincode');
 			if (!ereg("^0*$", $newpin))
