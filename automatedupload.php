@@ -158,13 +158,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		$import->update();
 
 		if ($import->type == "automatic") {
-			if (isset($_SERVER['WINDIR'])) {
-				$cmd = "start php import.php -import=" . $sess['importid'];
-				pclose(popen($cmd,"r"));
-			} else {
-				$cmd = "php import.php -import=" . $sess['importid'] . " > /dev/null &";
-				exec($cmd);
-			}
+			$import->runNow();
 		}
 
 		//save the session data, clear the authcode

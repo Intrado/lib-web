@@ -1,6 +1,7 @@
 <?
 include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
+include_once("obj/Job.obj.php");
 
 $jobid = $_GET['jobid'] + 0;
 
@@ -8,14 +9,8 @@ if (!userOwns("job",$jobid))
 	redirect('unauthorized.php');
 
 
-if (isset($_SERVER['WINDIR'])) {
-	$cmd = "start php jobprocess.php $jobid";
-	pclose(popen($cmd,"r"));
-} else {
-	$cmd = "php jobprocess.php $jobid > /dev/null &";
-	exec($cmd);
-}
 
+Job::runNow($jobid);
 sleep(3);
 
 

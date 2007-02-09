@@ -187,13 +187,10 @@ function commitJob()
 
 		// now we submit this job
 		glog("now submit the job to process ".$jobid);
-		if (isset($_SERVER['WINDIR'])) {
-			$cmd = "start php ..\jobprocess.php $jobid";
-			pclose(popen($cmd,"r"));
-		} else {
-			$cmd = "php ../jobprocess.php $jobid > /dev/null &";
-			exec($cmd);
-		}
+
+
+		chdir("../"); //bph
+		$job->runNow(); //bph
 
 		return true;
 	}

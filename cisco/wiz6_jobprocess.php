@@ -66,15 +66,9 @@ $job->create();
 echo mysql_error();
 
 chdir("../");
-//kick of the job
-if (isset($_SERVER['WINDIR'])) {
-	$cmd = "php jobprocess.php $job->id";
-	pclose(popen($cmd,"r"));
-} else {
-	$cmd = "php jobprocess.php $job->id > /dev/null &";
-	exec($cmd);
-}
 
+//kick of the job
+$job->runNow();
 
 unset($_SESSION['newjob']);
 

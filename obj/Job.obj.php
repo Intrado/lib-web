@@ -45,6 +45,18 @@ class Job extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	function runNow($jobid = null) {
+		if (!isset($jobid))
+			$jobid = $this->id;
+
+		if (isset($_SERVER['WINDIR'])) {
+			$cmd = "start /b php jobprocess.php $jobid";
+			pclose(popen($cmd,"r"));
+		} else {
+			$cmd = "php jobprocess.php $jobid > /dev/null &";
+			exec($cmd);
+		}
+	}
 
 	//creates a new job object prepopulated with all of the user/system defaults
 	//date/time values are in DB format and should be beautified for forms
@@ -176,6 +188,7 @@ class Job extends DBMappedObject {
 
 		$this->options = substr($this->options,0,strlen($this->options) -1);
 	}
+
 }
 
 ?>

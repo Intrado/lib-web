@@ -24,6 +24,19 @@ class Import extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	function runNow($importid = null) {
+		if (!isset($importid))
+			$importid = $this->id;
+
+		if (isset($_SERVER['WINDIR'])) {
+			$cmd = "start /b php import.php -import=$importid";
+			pclose(popen($cmd,"r"));
+		} else {
+			$cmd = "php import.php -import=$importid > /dev/null &";
+			exec($cmd);
+		}
+	}
+
 }
 
 ?>

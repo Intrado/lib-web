@@ -73,20 +73,12 @@ if (isset($_GET['archive'])) {
 	redirectToReferrer();
 }
 
-
-
 if (isset($_GET['runrepeating'])) {
-	$runnow = DBSafe($_GET['runrepeating']);
+	$runnow = $_GET['runrepeating'] + 0;
 	if (userOwns("job",$runnow) || (customerOwnsJob($runnow) && $USER->authorize('managesystemjobs'))) {
 		$job = new Job($runnow);
 		if ($job->status=="repeating") {
-			if (isset($_SERVER['WINDIR'])) {
-				$cmd = "start php jobprocess.php $runnow";
-				pclose(popen($cmd,"r"));
-			} else {
-				$cmd = "php jobprocess.php $runnow > /dev/null &";
-				exec($cmd);
-			}
+			$job->runNow();
 			sleep(3);
 		}
 	}

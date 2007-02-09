@@ -199,16 +199,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		if ($res) {
 			$import->path = $import->customerid . "/" . $import->id . "/data.csv";
 			$import->update();
-
-			if (isset($_SERVER['WINDIR'])) {
-				$cmd = "start php import.php -import=$importid";
-				exec($cmd);
-				//pclose(popen($cmd,"r"));
-			} else {
-				$cmd = "php import.php -import=$importid";
-				$tmp = exec($cmd);
-			}
-
+			$import->runNow();
 			sleep(3);
 		} else {
 			$errormsg = 'Unable to complete file upload. Please try again.';
