@@ -18,6 +18,7 @@ db="dialerasp"
 
 [feature]
 is_commsuite=false
+disable_inbound_check=false
 has_ssl=true
 force_ssl=false
 log_dir="/commsuite/logs/"
