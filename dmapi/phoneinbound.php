@@ -26,8 +26,7 @@ function welcome()
 if ($REQUEST_TYPE == "new") {
 	glog("///////////////////////");
 
-	// TODO $inboundNumber = $BFXML_VARS['exten']; // exten is NULL, so is callerid and callername info - needs setup
-	$inboundNumber = "8316001095";
+	$inboundNumber = $BFXML_VARS['exten'];
 	glog("inboundNumber: ".$inboundNumber);
 	$SESSIONDATA['inboundNumber'] = $inboundNumber;
 

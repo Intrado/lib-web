@@ -209,6 +209,7 @@ function commitMessage($contentid)
 	$langi = $SESSIONDATA['langindex'];
 	$language = $languages[$langi];
 
+	loadTimezone();
 	$now = QuickQuery("select now()");
 	$name = "Call In (".$language.") - ".$now;
 

@@ -69,14 +69,6 @@ function login($playerror)
 			if ($access->getPermission("loginphone") &&
 				$access->getPermission("sendphone")) {
 
-// TODO set timezone based on customer
-/*
-if (isset($_SESSION['timezone'])) {
-	@date_default_timezone_set($_SESSION['timezone']);
-	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-}
-*/
-
 				// successful login, save the userid and move on
 				$SESSIONDATA['userid'] = $userid;
 				forwardToPage("inboundmessage.php");

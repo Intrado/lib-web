@@ -20,22 +20,19 @@ function loadLists($incr)
 	global $SESSIONDATA, $PAGESIZE;
 	if (!isset($PAGESIZE)) $PAGESIZE = 3; // this is strange... why isnt it set the first time from above???
 	glog("pagesize: ".$PAGESIZE);
-/*
-	// TODO should find way to save lists on the sessiondata, do not want to query database more than once
 
+	// TODO should find way to save lists on the sessiondata, do not want to query database more than once
+/*
 	// if we have not loaded the full list of lists from the database (we only want to query the database once)
 	if (!isset($SESSIONDATA['allLists'])) {
-		glog("load allLists");
-		$SESSIONDATA['allLists'] = DBFindMany("PeopleList",", (name +0) as foo from list where userid=".$SESSIONDATA['userid']." and deleted=0 order by foo,name");
-		$SESSIONDATA['currentListPage'] = 0;
+		$allLists = array_values(loadListsDB()); // convert indexes to 0, 1, 2, ...
+
+		$SESSIONDATA['allLists'] = $allLists;
 	} else {
-		$SESSIONDATA['currentListPage']++;
+		$allLists = $SESSIONDATA['allLists'];
 	}
 */
-
 	$allLists = array_values(loadListsDB()); // convert indexes to 0, 1, 2, ...
-	var_dump($allLists);
-	//$allLists = loadListsDB();
 
 	// if first time, set to 0
 	if (!isset($SESSIONDATA['currentListPage'])) {
@@ -55,12 +52,8 @@ function loadLists($incr)
 	if (count($allLists) > $PAGESIZE) {
 		$SESSIONDATA['hasPaging'] = true;
 	}
-	var_dump($allLists);
-	glog("pagesize: ".$PAGESIZE);
 	// group lists into sets of 9 (digits 1-9 on the phone)
 	$listSubset = array_slice($allLists, $SESSIONDATA['currentListPage']*$PAGESIZE, $PAGESIZE, true);
-	glog("listSubset count: ".count($listSubset));
-	var_dump($listSubset);
 	return $listSubset; // the list of lists for this user, page includes no more than 9
 }
 

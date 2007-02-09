@@ -84,7 +84,7 @@ function jobOptions()
 
 function jobConfirm($listname, $priority, $numdays=1)
 {
-	global $SESSIONID;
+	global $SESSIONID, $SESSIONDATA;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="jobconfirm">
@@ -104,6 +104,12 @@ function jobConfirm($listname, $priority, $numdays=1)
 					<audio cmid="file://prompts/inbound/DaySingle.wav" />
 <?				} ?>
 
+				<tts gender="female">between the hours of</tts>
+				<tts gender="female"><?= $SESSIONDATA['starttime'] ?></tts>
+				<tts gender="female">and</tts>
+				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
+
+				<!-- TODO add info about changing call window into conf4.wav -->
 				<audio cmid="file://prompts/inbound/Confirmation4.wav" />
 
 			</prompt>
@@ -129,6 +135,163 @@ function jobConfirm($listname, $priority, $numdays=1)
 <?
 }
 
+function confirmCallWindow()
+{
+	global $SESSIONID, $SESSIONDATA;
+
+	loadUser();
+	global $USER, $ACCESS;
+
+	$SESSIONDATA['starttime'] = $USER->getCallEarly();
+	$SESSIONDATA['stoptime'] = $USER->getCallLate();
+
+?>
+<voice sessionid="<?= $SESSIONID ?>">
+	<message name="confirmcallwindow">
+		<field name="usecallwin" type="menu" timeout="5000" sticky="true">
+			<prompt repeat="1">
+				<tts gender="female">The call window for this job is currently set between the hours of </tts>
+
+				<tts gender="female"><?= $USER->getCallEarly(); ?></tts>
+
+				<tts gender="female"> and </tts>
+
+				<tts gender="female"><?= $USER->getCallLate(); ?></tts>
+
+				<tts gender="female">To accept these settings press 1 to change the call times press 2</tts>
+
+			</prompt>
+
+			<choice digits="1" />
+			<choice digits="2" />
+
+			<default>
+				<audio cmid="file://prompts/ImSorry.wav" />
+			</default>
+			<timeout>
+				<goto message="error" />
+			</timeout>
+		</field>
+	</message>
+</voice>
+<?
+}
+
+function promptStartTime($playinvalid=false, $playmismatch=false)
+{
+	global $SESSIONID;
+
+	// check user restriction
+	loadUser();
+	global $USER, $ACCESS;
+
+	glog("access early ".$ACCESS->getValue("callearly"));
+	glog("access late  ".$ACCESS->getValue("calllate"));
+
+	$playrestriction = ($ACCESS->getValue("callearly") | $ACCESS->getValue("calllate"));
+	glog("playrestrict: ".$playrestriction);
+	// if one restricted but the other is not, set default
+	$early = $ACCESS->getValue("callearly");
+	if (!$early) {
+		$early = "12:00am";
+	}
+	$late = $ACCESS->getValue("calllate");
+	if (!$late) {
+		$late = "11:59pm";
+	}
+
+?>
+<voice sessionid="<?= $SESSIONID ?>">
+	<message name="promptstarttime">
+
+<?	if ($playinvalid) { ?>
+		<tts gender="female">I am sorry but you entered an invalid time </tts>
+<?	} ?>
+
+<?	if ($playmismatch) { ?>
+		<tts gender="female">The stop time must be after the start time </tts>
+<?	} ?>
+
+<?	if ($playrestriction) { ?>
+		<tts gender="female">You may enter start and stop times between the following hours </tts>
+
+		<tts gender="female"><?= $early ?></tts>
+
+		<tts gender="female"> and </tts>
+
+		<tts gender="female"><?= $late ?></tts>
+<?	} ?>
+
+		<field name="starttime" type="dtmf" timeout="5000" max="20">
+			<prompt repeat="2">
+				<tts gender="female">Enter the time you want your calls to begin followed by the pound key.  For example to start your calls at 5 in the afternoon enter 5 0 0 pound. </tts>
+
+			</prompt>
+
+			<timeout>
+				<goto message="error" />
+			</timeout>
+		</field>
+
+		<field name="startampm" type="menu" timeout="5000" sticky="true">
+			<prompt repeat="1">
+				<tts gender="female">press 1 for am or 2 for pm</tts>
+
+			</prompt>
+
+			<choice digits="1" />
+			<choice digits="2" />
+
+			<default>
+				<audio cmid="file://prompts/ImSorry.wav" />
+			</default>
+			<timeout>
+				<goto message="error" />
+			</timeout>
+		</field>
+	</message>
+
+</voice>
+<?
+}
+function promptStopTime()
+{
+	global $SESSIONID;
+?>
+<voice sessionid="<?= $SESSIONID ?>">
+	<message name="promptstoptime">
+		<field name="stoptime" type="dtmf" timeout="5000" max="20">
+			<prompt repeat="2">
+				<tts gender="female">Enter the time you want your calls to stop followed by the pound key</tts>
+
+			</prompt>
+
+			<timeout>
+				<goto message="error" />
+			</timeout>
+		</field>
+
+		<field name="stopampm" type="menu" timeout="5000" sticky="true">
+			<prompt repeat="1">
+				<tts gender="female">press 1 for am or 2 for pm</tts>
+
+			</prompt>
+
+			<choice digits="1" />
+			<choice digits="2" />
+
+			<default>
+				<audio cmid="file://prompts/ImSorry.wav" />
+			</default>
+			<timeout>
+				<goto message="error" />
+			</timeout>
+		</field>
+	</message>
+
+</voice>
+<?
+}
 function commitJob()
 {
 	global $SESSIONDATA;
@@ -136,14 +299,11 @@ function commitJob()
 	$numdays = $SESSIONDATA['numdays'];
 	$priority = $SESSIONDATA['priority'];
 
-	$userid = $SESSIONDATA['userid'];
-
-	$now = QuickQuery("select now()");
-
+	loadUser();
 	global $USER, $ACCESS;
 
-	$USER = new User($SESSIONDATA['userid']);
-	$ACCESS = new Access($USER->accessid);
+	loadTimezone();
+	$now = QuickQuery("select now()");
 
 	// now create the job
 	$job= Job::jobWithDefaults();
@@ -154,6 +314,13 @@ function commitJob()
 	$job->createdate = $now;
 	$job->startdate = date("Y-m-d", strtotime("today"));
 	$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
+	if (isset($SESSIONDATA['starttime'])) {
+		$job->starttime = date("H:i", strtotime($SESSIONDATA['starttime']));
+	}
+	if (isset($SESSIONDATA['stoptime'])) {
+		$job->endtime = date("H:i", strtotime($SESSIONDATA['stoptime']));
+	}
+
 
 	$job->listid = $SESSIONDATA['listid'];
 	$job->phonemessageid = $SESSIONDATA['messageid'];
@@ -187,10 +354,13 @@ function commitJob()
 
 		// now we submit this job
 		glog("now submit the job to process ".$jobid);
-
-
-		chdir("../"); //bph
-		$job->runNow(); //bph
+		if (isset($_SERVER['WINDIR'])) {
+			$cmd = "start php ..\jobprocess.php $jobid";
+			pclose(popen($cmd,"r"));
+		} else {
+			$cmd = "php ../jobprocess.php $jobid > /dev/null &";
+			exec($cmd);
+		}
 
 		return true;
 	}
@@ -219,12 +389,93 @@ function commitJob()
 
 			$SESSIONDATA['priority'] = $priority; // this is a string, not an int
 
-			$listname = $SESSIONDATA['listname'];
-			$numdays = $SESSIONDATA['numdays'];
+			confirmCallWindow();
 
-			jobConfirm($listname, $priority, $numdays);
+	// if they listened to their call window options
+	} else if (isset($BFXML_VARS['usecallwin'])) {
 
-	// if they listed to confirmation
+			if ($BFXML_VARS['usecallwin'] == "1") {
+				$listname = $SESSIONDATA['listname'];
+				$priority = $SESSIONDATA['priority'];
+				$numdays = $SESSIONDATA['numdays'];
+				jobConfirm($listname, $priority, $numdays);
+			} else {
+				promptStartTime();
+			}
+
+	// if they entered their start time
+	} else if (isset($BFXML_VARS['starttime'])) {
+
+			// validate start time
+			$starttime = $BFXML_VARS['starttime'];
+			$starttime = substr($starttime, 0, strlen($starttime)-2) . ":" . substr($starttime, strlen($starttime)-2);
+			if ($BFXML_VARS['startampm'] == "1") {
+				$starttime = $starttime."am";
+			} else {
+				$starttime = $starttime."pm";
+			}
+			glog("starttime: ".$starttime);
+
+			$isValid = strtotime($starttime);
+
+			if ($isValid) {
+				// check user call restriction
+				loadUser();
+				global $USER, $ACCESS;
+				if ($ACCESS->getValue("callearly")) {
+					$isValid = ((strtotime($starttime) - strtotime($ACCESS->getValue("callearly"))) >= 0);
+				}
+			}
+
+			if ($isValid) {
+				$SESSIONDATA['starttime'] = $starttime;
+				promptStopTime();
+			} else {
+				promptStartTime(true);
+			}
+
+
+	// if they entered their stop time
+	} else if (isset($BFXML_VARS['stoptime'])) {
+
+			// validate stop time
+			$stoptime = $BFXML_VARS['stoptime'];
+			$stoptime = substr($stoptime, 0, strlen($stoptime)-2) . ":" . substr($stoptime, strlen($stoptime)-2);
+			if ($BFXML_VARS['stopampm'] == "1") {
+				$stoptime = $stoptime."am";
+			} else {
+				$stoptime = $stoptime."pm";
+			}
+			glog("stoptime: ".$stoptime);
+
+			$isMismatch = false;
+			$isValid = strtotime($stoptime);
+
+			if ($isValid) {
+				// check user call restriction
+				loadUser();
+				global $USER, $ACCESS;
+				if ($ACCESS->getValue("calllate")) {
+					$isValid = ((strtotime($stoptime) - strtotime($ACCESS->getValue("calllate"))) <= 0);
+				}
+				if ($isValid) {
+					// check that start is earlier than stop
+					$isValid = ((strtotime($SESSIONDATA['starttime']) - strtotime($stoptime)) < 0);
+					$isMismatch = !$isValid;
+				}
+			}
+
+			if ($isValid) {
+				$SESSIONDATA['stoptime'] = $stoptime;
+				$listname = $SESSIONDATA['listname'];
+				$priority = $SESSIONDATA['priority'];
+				$numdays = $SESSIONDATA['numdays'];
+				jobConfirm($listname, $priority, $numdays);
+			} else {
+				promptStartTime(true, $isMismatch);
+			}
+
+	// if they listened to confirmation
 	} else if (isset($BFXML_VARS['sendjob'])) {
 
 			// send the job
