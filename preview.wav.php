@@ -18,49 +18,6 @@ function writeWav ($data) {
 		return $name;
 }
 
-
-//from php.net comments
-function secure_tmpname($dir = null, $prefix = 'tmp', $postfix = '.wav') {
-   // validate arguments
-   if (! (isset($postfix) && is_string($postfix))) {
-       return false;
-   }
-   if (! (isset($prefix) && is_string($prefix))) {
-       return false;
-   }
-   if (! isset($dir)) {
-       $dir = getcwd();
-   }
-
-   // find a temporary name
-   $tries = 1;
-   do {
-       // get a known, unique temporary file name
-       $sysFileName = tempnam($dir, $prefix);
-       if ($sysFileName === false) {
-           return false;
-       }
-
-       // tack on the extension
-       $newFileName = $sysFileName . $postfix;
-       if ($sysFileName == $newFileName) {
-           return $sysFileName;
-       }
-
-       // move or point the created temporary file to the new filename
-       // NOTE: these fail if the new file name exist
-       $newFileCreated = @rename($sysFileName, $newFileName);
-       if ($newFileCreated) {
-           return $newFileName;
-       }
-
-       unlink ($sysFileName);
-       $tries++;
-   } while ($tries <= 5);
-
-   return false;
-}
-
 if(isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
 	if (userOwns("message",$id)) {
