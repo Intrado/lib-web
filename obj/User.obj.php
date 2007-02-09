@@ -76,6 +76,12 @@ class User extends DBMappedObject {
 		$accesscode = DBSafe($accesscode);
 		$pin = DBSafe($pin);
 
+		global $SETTINGS;
+		if (isset($SETTINGS['feature']['disable_inbound_check']) &&
+			$SETTINGS['feature']['disable_inbound_check']) {
+			$inboundnumber = null;
+		}
+
 		if (isset($inboundnumber)) {
 			$inboundnumber = DBSafe($inboundnumber);
 			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.inboundnumber='$inboundnumber') "
