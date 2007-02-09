@@ -1155,3 +1155,7 @@ ALTER TABLE `import` CHANGE `type` `type` ENUM( 'manual', 'automatic', 'list', '
 -- set all list uploads to list type
 update import set type = 'list' where listid is not null;
 
+-- generate upload keys for all imports that don't have them
+
+update import set uploadkey=mid(md5(rand()),3,12) where type != 'list' and (uploadkey is null or uploadkey = '');
+
