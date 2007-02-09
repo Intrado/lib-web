@@ -17,8 +17,14 @@ function login($playerror)
 	<message name="login">
 
 <?	if ($playerror) { ?>
-		<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
+		<setvar name="playerror" value="true" />
 <?	} ?>
+
+		<if name="playerror" value="true">
+			<then>
+				<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
+			</then>
+		</if>
 
 		<field name="code" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
@@ -39,6 +45,19 @@ function login($playerror)
 				<goto message="error" />
 			</timeout>
 		</field>
+
+		<if name="code" value="">
+			<then>
+				<setvar name="playerror" value="true" />
+				<goto message="login" />
+			</then>
+		</if>
+		<if name="pin" value="">
+			<then>
+				<setvar name="playerror" value="true" />
+				<goto message="login" />
+			</then>
+		</if>
 	</message>
 
 	<message name="error">
