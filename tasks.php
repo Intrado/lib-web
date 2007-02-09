@@ -82,14 +82,11 @@ $titles = array("name" => "#Name",
 				"status" => "#Status",
 				"lastrun" => "Last Run",
 				"file" => "File Date");
-if ($IS_COMMSUITE)
-	$titles['nextrun'] = "Next Scheduled Run";
 
 $titles['Actions'] = "Actions";
 
 
 $formatters = array("updatemethod" => "fmt_updatemethod",
-					"nextrun" => "fmt_nextrun",
 					"status" => "fmt_ucfirst",
 					"lastrun" => "fmt_obj_date",
 					"updatemethod" => "fmt_updatemethod",
