@@ -1138,3 +1138,20 @@ update jobtask jt join calllog cl on (cl.jobtaskid = jt.id) set jt.phone = cl.ph
 update jobtask jt join email e on (jt.emailid = e.id) set jt.email = e.email where e.email is not null;
 
 
+
+
+-- WARNING! run this only on commsuite systems, it will disable all auto importing upload imports if run on the ASP
+-- update import set type='manual' where listid is null;
+
+-- get rid of import schedules
+update scheduleday sd inner join schedule s on (s.id = sd.scheduleid) set sd.scheduleid = -1 where s.triggertype='import';
+update scheduleday sd inner join import i on (i.scheduleid = sd.scheduleid) set sd.scheduleid = -1 where i.scheduleid is not null;
+delete from scheduleday where scheduleid=-1;;
+delete from schedule where triggertype='import';
+update import set scheduleid= null;
+
+ALTER TABLE `import` CHANGE `type` `type` ENUM( 'manual', 'automatic', 'list', 'addressbook' ) NOT NULL DEFAULT 'manual';
+
+-- set all list uploads to list type
+update import set type = 'list' where listid is not null;
+
