@@ -50,17 +50,19 @@ if(CheckFormSubmit($f,$s))
 			error('This audio file name is already in use, so a unique one was generated');
 			$testname = GetFormData($f, $s, 'name') . ' ' . date("Y-m-d_H:i:s");
 			PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
-//		} else if (strlen(GetFormData($f,$s,"name")) <= 0) {
-//			error ("Please name your message");
 		} else {
 			$task = new SpecialTask();
-			$task->type = 'EasyCall';
+			$task->type = 'CallMe';
 			$task->setData('phonenumber', $phone);
 			$task->setData('name', GetFormData($f,$s,"name"));
 			$task->setData('origin', GetFormData($f,$s,"origin"));
 			$task->setData('userid', $USER->id);
+			$task->setData('progress', "Calling");
+			$task->lastcheckin = date("Y-m-d H:i:s");
+			$task->status = "queued";
+			$task->customerid=$USER->customerid;
+			
 			$task->create();
-
 			redirect('callme2.php?taskid=' . $task->id);
 		}
 	}
@@ -78,7 +80,8 @@ if( $reloadform )
 		$phone = "";
 
 	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
-	PutFormData($f,$s,"name","","text","1","50",false);
+	PutFormData($f,$s,"name","","text","1","50",true);
+	PutFormData($f,$s,"size","","text");
 	PutFormData($f,$s,"origin",$_REQUEST['origin']);
 }
 
@@ -107,6 +110,7 @@ startWindow("Call Me to Record");
 			<th align="right" class="windowRowHeader bottomBorder">Phone&nbsp;Number:</td>
 			<td class="bottomBorder"><? NewFormItem($f,$s,"phone","text",20); ?></td>
 		</tr>
+		
 <? 
 		if($IS_COMMSUITE){
 			?> <tr><td colspan=3 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr> <?
