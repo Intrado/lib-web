@@ -16,7 +16,7 @@ if($REQUEST_TYPE == "new") {
 	$specialtask->update();
 	?>
 	<voice sessionid="<?= $SESSIONID ?>">
-		<dial><?=$phone?></dial>
+		<dial amdhint="disable"><?=$phone?></dial>
 
 		<message name="intro">
 			<field name="dummy" type="menu" timeout="10000">
@@ -49,19 +49,4 @@ if($REQUEST_TYPE == "new") {
 }
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+?>
