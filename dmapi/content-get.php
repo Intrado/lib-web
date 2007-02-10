@@ -6,6 +6,7 @@ include_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 include_once("../obj/Content.obj.php");
 
+$cmid = $_GET['cmid'] + 0;
 
 if ($c = contentGet($cmid, false)) {
 	list($contenttype,$data) = $c;
