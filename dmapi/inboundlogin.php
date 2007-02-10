@@ -17,14 +17,8 @@ function login($playerror)
 	<message name="login">
 
 <?	if ($playerror) { ?>
-		<setvar name="playerror" value="true" />
+		<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
 <?	} ?>
-
-		<if name="playerror" value="true">
-			<then>
-				<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
-			</then>
-		</if>
 
 		<field name="code" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
@@ -45,19 +39,6 @@ function login($playerror)
 				<goto message="error" />
 			</timeout>
 		</field>
-
-		<if name="code" value="">
-			<then>
-				<setvar name="playerror" value="true" />
-				<goto message="login" />
-			</then>
-		</if>
-		<if name="pin" value="">
-			<then>
-				<setvar name="playerror" value="true" />
-				<goto message="login" />
-			</then>
-		</if>
 	</message>
 
 	<message name="error">
@@ -68,7 +49,19 @@ function login($playerror)
 <?
 }
 
+
 ///////////////////////////////////
+
+	// count authorization attempts, kick them out after 3
+	if (isset($SESSIONDATA['authcount'])) {
+		$SESSIONDATA['authcount']++; // increment
+	} else {
+		$SESSIONDATA['authcount'] = 0;
+	}
+	// only allow 3 attempts to login, then hangup
+	if ($SESSIONDATA['authcount'] > 3) {
+		forwardToPage("inboundgoodbye.php");
+	}
 
 	// if login prompt has played, gather code/pin to authenticate
 	if (isset($BFXML_VARS['code'])) {
@@ -93,19 +86,9 @@ function login($playerror)
 				forwardToPage("inboundmessage.php");
 			}
 		}
-		// authentication failure
-		if (!isset($SESSIONDATA['userid'])) {
-			$SESSIONDATA['authcount']++;
-			// only allow 3 attempts to login, then hangup
-			if ($SESSIONDATA['authcount'] >= 3) {
-				forwardToPage("inboundgoodbye.php");
-			} else {
-				login(true);  // true, playback auth error and relogin
-			}
-		}
-	// else play login prompt
-	} else {
-		login(false);  // this is likely the first login prompt
-		$SESSIONDATA['authcount'] = 0;
 	}
+
+	// play the prompt
+	login($SESSIONDATA['authcount'] > 0);
+
 ?>
