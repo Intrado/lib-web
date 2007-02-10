@@ -44,62 +44,53 @@ if($REQUEST_TYPE == "new") {
 		$BFXML_VARS['audiofileid'] = $audio->id;
 		$BFXML_VARS['saveaudio']=NULL;
 		$BFXML_VARS['recordaudio']=NULL;
-		
-		//then make a message if not from audio
-		if($BFXML_VARS['origin'] != "audio"){
 			
-			$message = new Message();
-			$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
-			if(QuickQuery("Select count(*) from message where userid=$USER->id and deleted = '0' 
-							and name = '$messagename'")) 
-				$messagename = $messagename . " - " . date("M d, Y G:i:s");
-			$message->name = $messagename;
-			$message->type = "phone";
-			$message->userid = $user->id;
-			$message->create();
-		
-			$part = new MessagePart();
-			$part->messageid = $message->id;
-			$part->type = "A";
-			$part->audiofileid = $audio->id;
-			$part->sequence = 0;
-		
-			$part->create();
-		
-			if(!$tempmessage=$specialtask->getData('messagelangs')) {
-				$messagelangs = array();
-			} else {
-				$messagelangs = unserialize($tempmessage);
-			}
-			$messagelangs[$specialtask->getData('currlang')] = $message->id;
-			$messagelangstring = serialize($messagelangs);
-			$specialtask->setData('messagelangs', $messagelangstring);
-			$specialtask->update();
+		$message = new Message();
+		$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
+		if(QuickQuery("Select count(*) from message where userid=$USER->id and deleted = '0' 
+						and name = '$messagename'")) 
+			$messagename = $messagename . " - " . date("M d, Y G:i:s");
+		$message->name = $messagename;
+		$message->type = "phone";
+		$message->userid = $user->id;
+		$message->create();
+	
+		$part = new MessagePart();
+		$part->messageid = $message->id;
+		$part->type = "A";
+		$part->audiofileid = $audio->id;
+		$part->sequence = 0;
+	
+		$part->create();
+	
+		if(!$tempmessage=$specialtask->getData('messagelangs')) {
+			$messagelangs = array();
+		} else {
+			$messagelangs = unserialize($tempmessage);
 		}
+		$messagelangs[$specialtask->getData('currlang')] = $message->id;
+		$messagelangstring = serialize($messagelangs);
+		$specialtask->setData('messagelangs', $messagelangstring);
+		$specialtask->update();
+
 	}
 	
-	if($langlist = $specialtask->getData('languagelist')) {
-		$langlist = explode("|", $langlist);
+	$langlist = $specialtask->getData('languagelist');
+	$langlist = explode("|", $langlist);
+	$count = $specialtask->getData("count");
+	if($count==null){
+		$count = 0;
+	}
+	if($count < count($langlist)) {
+		
 		//shifts off first array entry
-		$currlang = array_shift($langlist);
+		
+		$currlang = $langlist[$count];
 		$specialtask->setData('currlang', $currlang);
 		
-		if($usedlangs = $specialtask->getData('usedlangs')) {
-			$usedlangs = explode("|", $usedlangs);
-		} else {
-			$usedlangs = array();
-		}
-		$usedlangs[] = $currlang;
-		$usedlangs = implode("|", $usedlangs);
-		$specialtask->setData('usedlangs', $usedlangs);
-	
-		//implode the array even if empty, becomes an empty string
-		//which is ok
-		$langlist = implode("|", $langlist);
-		$specialtask->setData('languagelist', $langlist);
-	
 		//output the audio since there is a current language
-		
+		$count++;
+		$specialtask->setData("count", $count);
 		$specialtask->setData("progress", "recording");
 		$specialtask->update();
 		?>
@@ -109,7 +100,17 @@ if($REQUEST_TYPE == "new") {
 			<message name="record">
 				<field name="recordaudio" type="record" max="300">
 					<prompt>
-						<tts gender="female" language="english">Now recording <?=$currlang?> </tts>
+					<? 
+						$tempmess = $specialtask->getData("languagelist");
+						if($tempmess){
+							$tempmess = explode("|", $tempmess);
+							if(count($tempmess) > 1){
+							?>
+								<tts gender="female" language="english">Now recording <?=$currlang?> </tts>
+							<?
+							}
+						}
+					?>
 						<audio cmid="file://prompts/Record.wav" />
 					</prompt>
 				</field>
@@ -158,10 +159,23 @@ if($REQUEST_TYPE == "new") {
 		forwardToPage("easycall3.php");
 	}
 } else if($REQUEST_TYPE == "result") {
-	$specialtask->status = "done";
-	$specialtask->setData("progress", "Done");
-	$specialtask->update();
-	forwardToPage("easycall3.php");
+	$messages = $specialtask->getData('messagelangs');
+	if($messages)
+		$messages = unserialize($messages);
+	$lang = $specialtask->getData('languagelist');
+	if($lang)
+		$lang = explode("|", $lang);
+	if(count($lang) > count($messages)) {
+		$specialtask->status = "done";
+		$specialtask->setData("progress", "Hung up");
+		$specialtask->update();
+		forwardToPage("easycall3.php");
+	} else {
+		$specialtask->status = "done";
+		$specialtask->setData("progress", "Done");
+		$specialtask->update();
+		forwardToPage("easycall3.php");
+	}
 }
 
 /*
