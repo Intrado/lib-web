@@ -22,7 +22,6 @@ if (!$USER->authorize("starteasy")) {
 }
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
-
 $f = "easycall";
 $s = "submit";
 $reloadform = 0;
@@ -45,9 +44,9 @@ if(CheckFormSubmit($f,$s)) {
 	$job->jobtypeid = $type;
 	$job->sendphone = true;
 	$job->type = "phone";
-
-	$messagelangs = unserialize($specialtask->getData('messagelangs'));
+	$messagelangs = $specialtask->getData('messagelangs');
 	if($messagelangs) {
+		$messagelangs = unserialize($messagelangs);
 		foreach($messagelangs as $lang => $message){
 			if($lang == "Default"){
 				$job->phonemessageid = $message;
@@ -87,20 +86,23 @@ function alternatelangs($messagelangs) {
 			<th>&nbsp;</th>
 		</tr>
 		<?
-		if (count($messagelangs) == 0)
+		
+		if (count($messagelangs) == 1)
 			echo "<tr><td colspan='2'>No alternate language and message combinations defined</td></tr>";
 		else
-			foreach($messagelangs as $lang => $messageid) {
-				if($lang == "Default")
-					continue;
-				$message = new Message($messageid);
-				?>
-					<tr valign="middle">
-						<td><?= $lang ?> </td>
-						<td><?= htmlentities($message->name) ?></td>
-						<td>&nbsp;<?= button('play', "popup('previewmessage.php?id=" . $messageid . "', 400, 400);"); ?></td>
-					</tr>
-				<?
+			if($messagelangs){
+				foreach($messagelangs as $lang => $messageid) {
+					if($lang == "Default")
+						continue;
+					$message = new Message($messageid);
+					?>
+						<tr valign="middle">
+							<td><?= $lang ?> </td>
+							<td><?= htmlentities($message->name) ?></td>
+							<td>&nbsp;<?= button('play', "popup('previewmessage.php?id=" . $messageid . "', 400, 400);"); ?></td>
+						</tr>
+					<?
+				}
 			}
 		?>
 	</table>
@@ -168,16 +170,15 @@ startWindow("Confirmation &amp; Submit");
 			<?
 			$messagelangs = unserialize($specialtask->getData('messagelangs'));
 			$phonemessage = new Message($messagelangs["Default"]);
-			$altlanguages = false;
-			if(count($messagelangs) > 1){
-				$altlanguages = true;
-			}
 			echo htmlentities($phonemessage->name);
-			echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);");
+			if($messagelangs)
+				echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);");
+			else
+				echo "&nbsp;";
 			?>
 		</td>
 	</tr>
-	<? if($USER->authorize('sendmulti') && $altlanguages) { ?>
+	<? if($USER->authorize('sendmulti')) { ?>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder">Multilingual message options:</td>
 			<td class="bottomBorder" ><? alternatelangs($messagelangs); ?></td>
