@@ -6,7 +6,7 @@ include_once("../obj/PeopleList.obj.php");
 
 global $SESSIONDATA, $BFXML_VARS;
 
-$PAGESIZE = 3; // TODO set this to 9
+$PAGESIZE = 9;
 
 
 function loadListsDB()
@@ -62,11 +62,16 @@ function playLists($incr)
 	global $SESSIONDATA;
 
 	$lists = loadLists($incr);
-
+// TODO need .wav for listsize0
 	global $SESSIONID;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="listdirectory">
+<?	if (count($lists) == 0) { ?>
+		<tts gender="female">I am sorry, but you have 0 lists. use web interface to create a list. goodbye </tts>
+		<hangup />
+<?	} ?>
+
 		<field name="listnumber" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
 				<audio cmid="file://prompts/inbound/PleaseSelectList.wav" />
