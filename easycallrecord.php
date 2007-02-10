@@ -19,8 +19,6 @@ if (!$USER->authorize("starteasy")) {
 
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
-//$messagelangs =$specialtask->getData('messagelangs');
-//var_dump($messagelangs);
 
 if($specialtask->getData("progress") == "Done") {
 	redirect("easycallsubmit.php?taskid=" . $_REQUEST['taskid']);
@@ -34,8 +32,6 @@ if($specialtask->getData("progress") == "Done") {
 	
 	$specialtask->lastcheckin = date("Y-m-d H:i:s");
 	$specialtask->update();
-	
-	
 }
 
 $error = $specialtask->getData('error');
