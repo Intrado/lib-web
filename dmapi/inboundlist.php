@@ -18,7 +18,7 @@ function loadListsDB()
 function loadLists($incr)
 {
 	global $SESSIONDATA, $PAGESIZE;
-	if (!isset($PAGESIZE)) $PAGESIZE = 3; // this is strange... why isnt it set the first time from above???
+	if (!isset($PAGESIZE)) $PAGESIZE = 9; // this is strange... why isnt it set the first time from above???
 	glog("pagesize: ".$PAGESIZE);
 
 	// TODO should find way to save lists on the sessiondata, do not want to query database more than once
