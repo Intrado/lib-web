@@ -8,19 +8,6 @@ include_once("inboundutils.inc.php");
 global $SESSIONDATA, $BFXML_VARS;
 
 
-function welcome()
-{
-	global $SESSIONID;
-?>
-<voice sessionid="<?= $SESSIONID ?>">
-	<message name="welcome">
-		<audio cmid="file://prompts/inbound/Welcome.wav" />
-	</message>
-</voice>
-<?
-}
-
-
 ////////////////////////////////////////
 
 if ($REQUEST_TYPE == "new") {
@@ -30,11 +17,9 @@ if ($REQUEST_TYPE == "new") {
 	glog("inboundNumber: ".$inboundNumber);
 	$SESSIONDATA['inboundNumber'] = $inboundNumber;
 
-	welcome();
-
-	setNextPage("inboundlogin.php");
+	forwardToPage("inboundlogin.php");
 } else {
-	setNextPage("inboundgoodbye.php");
+	forwardToPage("inboundgoodbye.php");
 }
 
 ?>
