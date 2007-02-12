@@ -15,13 +15,13 @@ function login($playerror)
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="login">
-
-<?	if ($playerror) { ?>
-		<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
-<?	} ?>
-
 		<field name="code" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
+
+<?			if ($playerror) { ?>
+				<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
+<?			} ?>
+
 <?
 			if ($SESSIONDATA['authcount'] == 0) { ?>
 				<audio cmid="file://prompts/inbound/Welcome.wav" />
@@ -55,17 +55,6 @@ function login($playerror)
 
 ///////////////////////////////////
 
-	// count authorization attempts, kick them out after 3
-	if (isset($SESSIONDATA['authcount'])) {
-		$SESSIONDATA['authcount']++; // increment
-	} else {
-		$SESSIONDATA['authcount'] = 0;
-	}
-	// only allow 3 attempts to login, then hangup
-	if ($SESSIONDATA['authcount'] > 3) {
-		forwardToPage("inboundgoodbye.php");
-	}
-
 	// if login prompt has played, gather code/pin to authenticate
 	if (isset($BFXML_VARS['code'])) {
 		$code = $BFXML_VARS['code'];
@@ -89,6 +78,17 @@ function login($playerror)
 				forwardToPage("inboundmessage.php");
 			}
 		}
+	}
+
+	// count authorization attempts, kick them out after 3
+	if (isset($SESSIONDATA['authcount'])) {
+		$SESSIONDATA['authcount']++; // increment
+	} else {
+		$SESSIONDATA['authcount'] = 0;
+	}
+	// only allow 3 attempts to login, then hangup
+	if ($SESSIONDATA['authcount'] >= 3) {
+		forwardToPage("inboundgoodbye.php");
 	}
 
 	// play the prompt
