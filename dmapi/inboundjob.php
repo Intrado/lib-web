@@ -494,6 +494,20 @@ function commitJob()
 			{
 				jobOptions();
 			}
+
+	// they already entered job options, but returned to select a different list
+	// so keep their options and reply the confirm
+	} else if ( isset($SESSIONDATA['listname']) &&
+				isset($SESSIONDATA['priority']) &&
+				isset($SESSIONDATA['numdays']) &&
+				isset($SESSIONDATA['starttime']) &&
+				isset($SESSIONDATA['stoptime'])) {
+
+				$listname = $SESSIONDATA['listname'];
+				$priority = $SESSIONDATA['priority'];
+				$numdays = $SESSIONDATA['numdays'];
+				jobConfirm($listname, $priority, $numdays);
+
 	// play the job options
 	} else {
 		jobOptions();
