@@ -11,7 +11,7 @@ global $SESSIONDATA, $BFXML_VARS;
 
 function login($playerror)
 {
-	global $SESSIONID;
+	global $SESSIONID, $SESSIONDATA;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="login">
@@ -22,8 +22,11 @@ function login($playerror)
 
 		<field name="code" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
+<?
+			if ($SESSIONDATA['authcount'] == 0) { ?>
+				<audio cmid="file://prompts/inbound/Welcome.wav" />
+<? 			} ?>
 				<audio cmid="file://prompts/inbound/EnterUserID.wav" />
-
 			</prompt>
 			<timeout>
 				<goto message="error" />
