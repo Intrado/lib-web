@@ -109,14 +109,17 @@ function jobConfirm($listname, $priority, $numdays=1)
 				<tts gender="female">and</tts>
 				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
 
-				<!-- TODO add info about changing call window into conf4.wav -->
 				<audio cmid="file://prompts/inbound/Confirmation4.wav" />
+
+				<!-- TODO add info about changing call window into conf4.wav -->
+				<tts gender="female"> to change the call time settings press 4  </tts>
 
 			</prompt>
 
 			<choice digits="1" />
 			<choice digits="2" />
 			<choice digits="3" />
+			<choice digits="4" />
 
 			<default>
 				<audio cmid="file://prompts/ImSorry.wav" />
@@ -203,6 +206,8 @@ function promptStartTime($playinvalid=false, $playmismatch=false)
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="promptstarttime">
+		<field name="starttime" type="dtmf" timeout="5000" max="20">
+			<prompt repeat="2">
 
 <?	if ($playinvalid) { ?>
 		<tts gender="female">I am sorry but you entered an invalid time </tts>
@@ -222,8 +227,6 @@ function promptStartTime($playinvalid=false, $playmismatch=false)
 		<tts gender="female"><?= $late ?></tts>
 <?	} ?>
 
-		<field name="starttime" type="dtmf" timeout="5000" max="20">
-			<prompt repeat="2">
 				<tts gender="female">Enter the time you want your calls to begin followed by the pound key.  For example to start your calls at 5 in the afternoon enter 5 0 0 pound. </tts>
 
 			</prompt>
@@ -389,7 +392,19 @@ function commitJob()
 
 			$SESSIONDATA['priority'] = $priority; // this is a string, not an int
 
-			confirmCallWindow();
+			// if they are reentering job options, jump ahead to job confirm
+			if (isset($SESSIONDATA['starttime']) &&
+				isset($SESSIONDATA['stoptime'])) {
+
+				$listname = $SESSIONDATA['listname'];
+				$priority = $SESSIONDATA['priority'];
+				$numdays = $SESSIONDATA['numdays'];
+				jobConfirm($listname, $priority, $numdays);
+
+			// otherwise confirm call window and proceed
+			} else {
+				confirmCallWindow();
+			}
 
 	// if they listened to their call window options
 	} else if (isset($BFXML_VARS['usecallwin'])) {
@@ -493,6 +508,11 @@ function commitJob()
 			else if ($BFXML_VARS['sendjob'] == "3")
 			{
 				jobOptions();
+			}
+			// replay call window
+			else if ($BFXML_VARS['sendjob'] == "4")
+			{
+				promptStartTime();
 			}
 
 	// they already entered job options, but returned to select a different list
