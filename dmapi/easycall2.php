@@ -32,7 +32,7 @@ if($REQUEST_TYPE == "new") {
 				$BFXML_VARS['name'] = "Audio - "  . date("M d, Y G:i:s");
 			}
 		}
-		if(QuickQuery("select * from audiofile where userid = '$USER->id' and deleted = 0 
+		if(QuickQuery("select * from audiofile where userid = '$user->id' and deleted = 0 
 					and name = '" . DBSafe($BFXML_VARS['name']) ."'"))
 			$BFXML_VARS['name'] = $BFXML_VARS['name']."-".date("M d, Y G:i:s");
 		
@@ -47,7 +47,7 @@ if($REQUEST_TYPE == "new") {
 			
 		$message = new Message();
 		$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
-		if(QuickQuery("Select count(*) from message where userid=$USER->id and deleted = '0' 
+		if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0' 
 						and name = '$messagename'")) 
 			$messagename = $messagename . " - " . date("M d, Y G:i:s");
 		$message->name = $messagename;
