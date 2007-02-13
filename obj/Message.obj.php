@@ -25,7 +25,8 @@ class Message extends DBMappedObject {
 	}
 	
 	function readHeaders () {
-		parse_str($this->data, $data);
+		//parse_str($this->data, $data);
+		$data = sane_parsestr($this->data);
 		foreach($data as $key => $value)
 		{
 			$this->$key = $value;
