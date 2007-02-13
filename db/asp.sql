@@ -1131,7 +1131,7 @@ ADD UNIQUE `jobworkitemid` ( `jobworkitemid` ) ;
 update jobtask jt join calllog cl on (cl.jobtaskid = jt.id) set jt.phone = cl.phonenumber where cl.phonenumber is not null;
 
 
---update jobtask emails
+-- update jobtask emails
 update jobtask jt join email e on (jt.emailid = e.id) set jt.email = e.email where e.email is not null;
 
 
