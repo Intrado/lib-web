@@ -77,8 +77,8 @@ class User extends DBMappedObject {
 		$pin = DBSafe($pin);
 
 		global $SETTINGS;
-		if (isset($SETTINGS['feature']['disable_inbound_check']) &&
-			$SETTINGS['feature']['disable_inbound_check']) {
+		if (isset($SETTINGS['feature']['disable_inbound_number_verification']) &&
+			$SETTINGS['feature']['disable_inbound_number_verification']) {
 			$inboundnumber = null;
 		}
 

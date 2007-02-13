@@ -18,7 +18,9 @@ db="dialerasp"
 
 [feature]
 is_commsuite=false
-disable_inbound_check=false
+; commsuite users may need to disable the inbound number verification
+; if true, only validates user/pass and not inbound phone number
+disable_inbound_number_verification=false
 has_ssl=true
 force_ssl=false
 log_dir="/commsuite/logs/"
