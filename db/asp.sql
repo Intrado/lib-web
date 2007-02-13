@@ -1076,7 +1076,7 @@ CREATE TABLE `surveyquestion` (
 
 -- add survey types to job
 
-ALTER TABLE `job` CHANGE `type` `type` SET( 'phone', 'email', 'print', 'surveyemail', 'surveyphone' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'phone';
+ALTER TABLE `job` CHANGE `type` `type` SET( 'phone', 'email', 'print', 'survey' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'phone';
 
 ALTER TABLE `job` ADD `questionnaireid` INT NULL AFTER `printmessageid` ;
 
@@ -1127,9 +1127,6 @@ ALTER TABLE `surveyemailcode` DROP INDEX `jobworkitemid` ,
 ADD UNIQUE `jobworkitemid` ( `jobworkitemid` ) ;
 
 
-ALTER TABLE `job` CHANGE `type` `type` SET( 'phone', 'email', 'print', 'survey' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'phone';
-
-
 -- update all jobtasks phone entries for old records
 update jobtask jt join calllog cl on (cl.jobtaskid = jt.id) set jt.phone = cl.phonenumber where cl.phonenumber is not null;
 
@@ -1159,3 +1156,20 @@ update import set type = 'list' where listid is not null;
 
 update import set uploadkey=mid(md5(rand()),3,12) where type != 'list' and (uploadkey is null or uploadkey = '');
 
+
+-- add customerid to calllog
+
+ALTER TABLE `calllog` ADD `customerid` INT NOT NULL AFTER `jobtaskid` ;
+
+-- update exiting records w/ customerid
+
+update calllog cl 
+join jobtask jt on (cl.jobtaskid = jt.id)
+join jobworkitem wi on (jt.jobworkitemid = wi.id)
+join job j on (wi.jobid = j.id)
+join user u on (j.userid = u.id)
+set cl.customerid = u.customerid;
+
+
+ALTER TABLE `calllog` DROP INDEX `phonenumber` ;
+ALTER TABLE `calllog` ADD INDEX `callreport` ( `customerid` , `starttime` ) ;
