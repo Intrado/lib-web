@@ -38,9 +38,8 @@ $query = "
 select count(*)/30 as cnt,
 	hour( from_unixtime(cl.starttime/1000)) as hour,
 	cl.callprogress
-from calllog cl, jobtask jt, jobworkitem wi, job j, user u
-where cl.jobtaskid = jt.id and jt.jobworkitemid = wi.id and wi.jobid = j.id and j.userid = u.id and u.customerid = $USER->customerid
-
+from calllog cl
+where cl.customerid = $USER->customerid
 and callprogress in ('A','M','B','N')
 and cl.starttime > 1000 * unix_timestamp(date_sub(now(),interval 30 day))
 group by hour, cl.callprogress

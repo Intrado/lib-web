@@ -274,9 +274,9 @@ $ordersql = $_SESSION['reportordersql'];
 //if this user can see systemwide reports, then lock them to the customerid
 //otherwise lock them to jobs that they own
 if ($USER->authorize('viewsystemreports')) {
-	$userJoin = " and u.customerid = $USER->customerid ";
+	$userJoin = " and u.customerid = $USER->customerid and cl.customerid = $USER->customerid";
 } else {
-	$userJoin = " and j.userid = $USER->id ";
+	$userJoin = " and j.userid = $USER->id and cl.customerid = $USER->customerid";
 }
 
 

@@ -36,8 +36,8 @@ if ($IS_COMMSUITE) {
 	$query = "
 	select count(*)/4 as cnt,
 		dayofweek(from_unixtime(cl.starttime/1000)) as dayofweek, cl.callprogress
-	from calllog cl, jobtask jt, jobworkitem wi, job j, user u
-	where cl.jobtaskid = jt.id and jt.jobworkitemid = wi.id and wi.jobid = j.id and j.userid = u.id and u.customerid = $USER->customerid
+	from calllog cl
+	where cl.customerid = $USER->customerid
 	and cl.callprogress in ('A','M','B','N')
 	and cl.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
 	group by dayofweek, cl.callprogress

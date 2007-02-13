@@ -6,6 +6,8 @@ include_once("obj/Job.obj.php");
 
 include ("jpgraph/jpgraph.php");
 include ("jpgraph/jpgraph_bar.php");
+include ("jpgraph/jpgraph_canvas.php");
+
 
 $big = isset($_GET['big']) ? true : false;
 
@@ -36,6 +38,20 @@ $data = array();
 while ($row = DBGetRow($result)) {
 	$data[] = $row[0];
 	$y_titles[] = limit_str($row[1],20) . " (" . $row[2] . ")";
+}
+
+
+if (count($data) == 0) {
+	$graph = new CanvasGraph(400,300,"auto");
+	$t1 = new Text("Sorry, there is no data to display");
+	$t1->SetPos(0.05,0.5);
+	$t1->SetOrientation("h");
+	$t1->SetFont(FF_FONT1,FS_NORMAL);
+	$t1->SetBox("white","black",'gray');
+	$t1->SetColor("black");
+	$graph->AddText($t1);
+	$graph->Stroke();
+	exit();
 }
 
 //var_dump($data);

@@ -36,7 +36,7 @@ if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "window.location='reportoptions.php'";
 		$SHORTCUTS['&nbsp;&nbsp;View Job Summary'] = "window.location='reportsummary.php'";
 	}
-	if ($USER->authorize('viewsystemreports') && $IS_COMMSUITE) {
+	if ($USER->authorize('viewsystemreports')) {
 		$SHORTCUTS['&nbsp;&nbsp;Usage Stats'] = "window.location='reportsystem.php'";
 		$SHORTCUTS['&nbsp;&nbsp;Call Distribution'] = "window.location='reportsystemdistribution.php'";
 	}
@@ -70,8 +70,8 @@ $NAVTREE = array (
 		array("Report Builder","reportoptions.php","createreport",$SUBTAB=="builder"),
 		//give the report viewer the default of a "today" report if there was no previous report
 		array("View Report","report.php" . (isset($_SESSION['reportsql']) ? "" : "?reporttype=relative&jobtype_relative_data=today"),"createreport",$SUBTAB=="view"),
-		array("Usage Stats","reportsystem.php",$IS_COMMSUITE ? "viewsystemreports" : "dummy",$SUBTAB=="system"),
-		array("Call Distribution","reportsystemdistribution.php",$IS_COMMSUITE ? "viewsystemreports" : "dummy",$SUBTAB=="distribution")
+		array("Usage Stats","reportsystem.php","viewsystemreports",$SUBTAB=="system"),
+		array("Call Distribution","reportsystemdistribution.php","viewsystemreports",$SUBTAB=="distribution")
 
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
