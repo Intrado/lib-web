@@ -23,11 +23,11 @@ if($REQUEST_TYPE == "new") {
 				<prompt repeat="1">
 					<audio cmid="file://prompts/Intro.wav" />
 				</prompt>
+				<timeout>
+					<audio cmid="file://prompts/GoodBye.wav" />
+					<hangup />
+				</timeout>
 			</field>
-			<timeout>
-				<audio cmid="file://prompts/GoodBye.wav" />
-				<hangup />
-			</timeout>
 		</message>
 	</voice>
 	<?
