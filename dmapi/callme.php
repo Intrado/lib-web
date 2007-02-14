@@ -44,7 +44,7 @@ if($REQUEST_TYPE == "new") {
 	<?
 	$SESSIONDATA = null;
 } else {
-	$BFXML_VARS['recordnext'] = true;
+	$BFXML_VARS['continue'] = true;
 	forwardToPage("callme2.php");
 	return;
 }
