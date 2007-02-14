@@ -5,6 +5,8 @@ $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 include_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 include_once("../obj/Content.obj.php");
+include_once("../inc/utils.inc.php");
+include_once("../inc/content.inc.php");
 
 $cmid = $_GET['cmid'] + 0;
 
