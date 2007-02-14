@@ -514,7 +514,7 @@ if (isset($_GET['csv'])) {
 	?>
 					<tr>
 						<th class="windowRowHeader bottomBorder" align="right">Phone:<br><? print help('ReportResults_Phone', NULL, 'grey'); ?></th>
-						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "People", 6 => "Phone # Duplicates Removed", 2 => "% Complete", 3 => "Delivered", 4 => "Undelivered", 5 => "Remaining"),array(2=>"fmt_percent", 7=>"fmt_percent")); ?></table></td>
+						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "People", 6 => "Duplicates Removed", 2 => "% Complete", 3 => "Delivered", 4 => "Undelivered", 5 => "Remaining"),array(2=>"fmt_percent", 7=>"fmt_percent")); ?></table></td>
 					</tr>
 	<?
 					break;

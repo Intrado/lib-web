@@ -60,8 +60,8 @@ if ($total == 0) {
 	$query = "select wi.jobid,
 					wi.type,
 					count(*) as total,
-					100 * sum(wi.status='success') / (sum(wi.status='success' or wi.status='fail' or (jt.numattempts>0 and wi.status = 'queued' or wi.status='scheduled')) +0.00) as success_rate
-	from jobworkitem wi left join jobtask jt on (jt.jobworkitemid=wi.id)
+					100 * sum(wi.status='success') / (sum(wi.status != 'duplicate')) +0.00) as success_rate
+	from jobworkitem wi
 	where wi.jobid in ($jobidlist)
 	group by wi.jobid, wi.type
 	";
@@ -130,7 +130,7 @@ $titles = array ("Owner" => "Submitted by",
 				"type" => "Type",
 				"status" => 'Status',
 				"Total" => 'Total',
-				"Rate" => 'Success Rate',
+				"Rate" => '% Contacted',
 				"startdate" => 'Start Date',
 				"enddate" => 'End Date',
 				"Actions" => 'Actions');
