@@ -35,14 +35,12 @@ if(isset($_REQUEST['id'])) {
 $f = "easycall";
 $s = "main";
 $reloadform = 0;
-
 foreach($languages as $lang){
 	if(CheckFormSubmit($f, 'remove_'.$lang->name)) {
 		$removedlang = true;
 		break;
 	}
 }
-
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 {
 	//check to see if formdata is valid
@@ -102,14 +100,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 			$task->setData('listid', GetFormData($f,$s,"listid"));			
 			$task->setData('jobtypeid', GetFormData($f,$s,"jobtypeid"));
 			$task->setData('progress', "Creating Call");	
-			$task->setData('count', "0");	
+			$task->setData('count', 0);	
 			$task->lastcheckin = date("Y-m-d H:i:s");
 			if(CheckFormSubmit($f, 'add') || $removedlang)				
 				$task->status = "new";
 			else			
 				$task->status = "queued";
 			$task->customerid=$USER->customerid;
-			if($USER->authorize('sendmulti')) {
+			if($USER->authorize('sendmulti') && GetFormData($f, $s,"addlangs")) {
 				$langlist = $task->getData('languagelist');
 				if($langlist == null) {
 					$languagearray = array();
@@ -118,7 +116,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 					$languagearray = explode("|", $langlist);
 				}
 				$selectedlangs = getFormData($f, $s, "newlang");
-				if($selectedlangs && CheckFormSubmit($f, 'add')){
+				if($selectedlangs && CheckFormSubmit($f, 'add') || $selectedlangs && CheckFormSubmit($f, $s)){
 					$used = false;
 					if(isset($languagearray)) {
 						foreach ($languagearray as $lang) {
@@ -147,7 +145,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				$task->setData('languagelist', $languagelist);
 			} else {
 				$task->setData('languagelist', "Default");
-			}		
+			}
+			
 			if($task->id){
 				$task->update();
 			} else {
@@ -156,8 +155,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 			$_SESSION['easycallid'] = $task->id;
 			if(!CheckFormSubmit($f, 'add') && !$removedlang)
 				redirect('easycallrecord.php?taskid=' . $task->id);
-			else
-				$reloadform = 1;
 		}
 	}
 } else {
@@ -165,6 +162,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 }
 
 if($reloadform == 1) {
+	
 	ClearFormData($f);
 
 	if (isset($_GET['retry'])){
@@ -176,7 +174,11 @@ if($reloadform == 1) {
 		else 
 			$specialtask = false;
 	}
-
+	$checked=false;
+	if(GetFormData($f, $s, "addlangs"))
+		$checked = true;
+	PutFormData($f,$s,"addlangs",(bool)$checked, "bool", 0, 1);
+	
 	PutFormData($f,$s,"listid",$specialtask ? $specialtask->getData('listid') : 0);
 	PutFormData($f,$s,"jobtypeid",$specialtask ? $specialtask->getData('jobtypeid') : end($VALIDJOBTYPES)->id);
 
@@ -192,6 +194,15 @@ if($reloadform == 1) {
 	}
 	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
 	PutFormData($f,$s,"newlang", "");
+	if($specialtask){
+		$langlist = $specialtask->getData('languagelist');
+		if($langlist == null) {
+			$languagearray = array();
+			$languagearray[] = "Default";
+		} else {
+			$languagearray = explode("|", $langlist);
+		}
+	}
 }
 
 
@@ -200,35 +211,37 @@ if($reloadform == 1) {
 
 function language_select($form, $section, $name, $type) {
 	global $languages, $languagearray;
-	
-	if((count($languagearray) == 1 || count($languagearray) == 0) && ($type == "remove"))
-		return 1;
 
-	if((count($languages) == (count($languagearray)-1)) && ($type == "add"))
-		return 1;
+	NewFormItem($form, $section, $name, 'selectstart', NULL, NULL, 'id="addlang"');
 	
-	NewFormItem($form, $section, $name, 'selectstart', NULL, NULL, "");
+	$languagenamearray = array();
+	foreach($languages as $language)
+		$languagenamearray[] = $language->name;
+	/*
+	if($languagearray)
+	$diff = array_diff($languagenamearray, $languagearray);
+	if(count($diff) == 1 && $diff[0] == "English")
+		return 1;
+	*/
+
 	if($type == "add"){
-		NewFormItem($form, $section, $name, 'selectoption',"Languages to Add","");
-	} else {
-		NewFormItem($form, $section, $name, 'selectoption',"Languages Selected","");
+		NewFormItem($form, $section, $name, 'selectoption'," - Select a Language - ");
 	}
-	foreach ($languages as $language) {
+	foreach ($languagenamearray as $language) {
 		$used = ($type == "add") ? false : true;
 		if(isset($languagearray)) {
 			foreach ($languagearray as $lang) {
-				if ($lang == $language->name) {
+				if ($lang == $language) {
 					$used = ($type == "add") ? true : false;
 					break;
 				}
 			}
 		}
-		if ($used)
-		continue;
-		NewFormItem($form, $section, $name, 'selectoption', $language->name, $language->name);
+		if($used) continue;
+		if($language == "English") continue;
+		NewFormItem($form, $section, $name, 'selectoption', $language, $language);
 	}
 	NewFormItem($form, $section, $name, 'selectend');
-	return 0;
 }
 
 
@@ -286,44 +299,57 @@ startWindow("EasyCall");
 		if($USER->authorize('sendmulti')) {
 			?>
 			<tr>
-				<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Multilingual Language Option:</td>
+				<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Record in Additional Languages:</td>
 				<td class="bottomBorder">
-				<table border="0" cellpadding="2" cellspacing="1" class="list">
-					<tr class="listHeader" align="left" valign="bottom">
-						<th>Language Preference</th>
-						<? if(!isset($_GET['retry'])){ ?>
-							<th>&nbsp;</th>
-						<? } ?>
-					</tr>
-					<?	
-						if(isset($languagearray)) {
-							foreach($languagearray as $lang){
-								if($lang == "Default") continue;
-								?>
-								<tr>
-									<td><?=$lang ?></td>
-									<td>
-										<?
-										if(!isset($_GET['retry']))
-											echo submit($f, 'remove_'.$lang, 'delete', 'delete');
-										?>
-									</td>
-								</tr>
-								<?
-							}
-						}
-					?>
-					
-					<tr><td>
-						<?
-						if(!language_select($f,$s,"newlang", "add")) {
-						 	?></td><td><?
-						 	if(!isset($_GET['retry']))
-								echo submit($f, 'add', 'Add', 'add');
-						}
-						?>
+				<table>
+					<tr><td><? $langcount = count($languagearray) ? count($languagearray) : 1;
+								if(!isset($_GET['retry']))
+									NewFormItem($f,$s,'addlangs','checkbox',NULL,NULL,"id='add'; onchange=\"new getObj('addlang').obj.disabled=!this.checked; 
+											setColVisability(new getObj('additionallangs').obj, 1, this.checked);
+											hideNumberofRows(new getObj('additionallangs').obj,".$langcount.", this.checked); \"" ); ?>
 					</td></tr>
-				</table>
+					<tr><td><table id="additionallangs" border="0" cellpadding="2" cellspacing="1" class="list">
+						
+						<tr>
+							<td class="bottomBorder">Default - English</td>
+							<td class="bottomBorder">&nbsp;</td>
+						</tr>
+						<?	
+							if(isset($languagearray)) {
+								foreach($languagearray as $lang){
+									if($lang == "Default") continue;
+									?>
+									<tr class="bottomBorder">
+										<td class="bottomBorder"><?=$lang ?></td>
+										<td class="bottomBorder">
+											<?
+											if(!isset($_GET['retry']))
+												echo submit($f, 'remove_'.$lang, 'delete', 'delete', 'id="delbutton"');
+											?>
+										</td>
+									</tr>
+									<?
+								}
+							}
+						?>
+					
+						<tr class="bottomBorder">
+							<td><? language_select($f,$s,"newlang", "add")?></td>
+							<td><?
+								if(!isset($_GET['retry']))
+									echo submit($f, 'add', 'Add', 'add');
+								?>
+							</td>
+						</tr>	
+						
+						<script>
+							var box = new getObj('add').obj;
+							setColVisability(new getObj('additionallangs').obj, 1, box.checked);
+							hideNumberofRows(new getObj('additionallangs').obj, <?=$langcount?>, box.checked);
+							new getObj('addlang').obj.disabled=!box.checked;
+						</script>
+					</table>
+				</td></tr></table>
 				</td>
 			</tr>
 			<?
