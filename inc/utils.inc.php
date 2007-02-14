@@ -271,4 +271,25 @@ function makeparentdirectories ($filepath) {
 	}
 }
 
+function sane_parsestr($url) {
+	$data = array();
+
+	$pairs = explode("&",$url);
+	foreach ($pairs as $pair) {
+		$parts = explode("=",$pair);
+		if (count($parts) == 2) {
+			$name = urldecode($parts[0]);
+			$value = urldecode($parts[1]);
+			$data[$name] = $value;
+		} else if (count($parts) == 1) {
+			$name = urldecode($parts[0]);
+			$data[$name] = "";
+		}
+	}
+
+	return $data;
+}
+
+
+
 ?>
