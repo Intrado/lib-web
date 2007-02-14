@@ -259,10 +259,3 @@ function modifyMarkedNodes (parent,attribute,marker,callback) {
 		}
 	}
 }
-function hideNumberofRows(table, number, visability){
-	var newdisplay = visability ? "" : "none";
-	var rows = table.rows;
-	for(var i = 0; i < number; i++){
-		rows[i].style.display = newdisplay;
-	}
-}
