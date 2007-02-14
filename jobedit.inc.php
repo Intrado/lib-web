@@ -434,7 +434,8 @@ foreach($joblangs[$type] as $joblang) {
 			<td><? language_select($f,$type,"newlang" . $type, $type); ?>
 			</td>
 			<td><? message_select($type, $f, $type, 'newmess' . $type); ?></td>
-			<td><? NewFormItem($f, $type, 'Add', 'submit', NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
+			<td><? 	if (!$submittedmode)
+						echo submit($f, $type, 'Add', 'add'); ?></td>
 		</tr>
 	</table>
 
