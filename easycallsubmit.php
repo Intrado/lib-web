@@ -88,7 +88,7 @@ function alternatelangs($messagelangs) {
 		<?
 		
 		if (count($messagelangs) == 1)
-			echo "<tr><td colspan='2'>No alternate language and message combinations defined</td></tr>";
+			echo "<tr><td colspan='2'>No additional language and message combinations defined</td></tr>";
 		else
 			if($messagelangs){
 				foreach($messagelangs as $lang => $messageid) {
@@ -180,7 +180,7 @@ startWindow("Confirmation &amp; Submit");
 	</tr>
 	<? if($USER->authorize('sendmulti')) { ?>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Multilingual message options:</td>
+			<th align="right" class="windowRowHeader bottomBorder">Additional Languages:</td>
 			<td class="bottomBorder" ><? alternatelangs($messagelangs); ?></td>
 		</tr>
 	<? } ?>
