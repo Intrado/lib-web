@@ -95,8 +95,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				}
 				$task->type = 'EasyCall';
 				$task->setData('phonenumber', $phone);	
-				$task->setData('callerid', getSystemSetting('callerid'));				
-				$task->setData('name', GetFormData($f, $s, 'name'));	
+				$task->setData('callerid', getSystemSetting('callerid'));
+				$name = GetFormData($f, $s, 'name');
+				if($name == "")
+					$name = "EasyCall - " . date("Y-m-d");				
+				$task->setData('name', $name);	
 				$task->setData('origin', "start");			
 				$task->setData('userid', $USER->id);				
 				$task->setData('listid', GetFormData($f,$s,"listid"));			
@@ -188,18 +191,6 @@ if($reloadform == 1) {
 	if ($specialtask) {
 		$phone = Phone::format($specialtask->getData('phonenumber'));
 		PutFormData($f,$s,"name",$specialtask->getData('name'),"text",1,20);
-	} else {
-		if ($USER->phone)
-			$phone = Phone::format($USER->phone);
-		else
-			$phone = "";
-	}
-	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
-	$name = GetFormData($f, $s, 'name');
-	if($name == "")
-		$name = "EasyCall - " . date("Y-m-d");
-	PutFormData($f, $s, 'name',  $name , 'text', 1, 50, true);
-	if($specialtask){
 		$langlist = $specialtask->getData('languagelist');
 		if($langlist == null) {
 			$languagearray = array();
@@ -207,6 +198,14 @@ if($reloadform == 1) {
 		} else {
 			$languagearray = explode("|", $langlist);
 		}
+	} else {
+		PutFormData($f, $s, 'name', GetFormData($f, $s, 'name') , 'text', 1, 50);
+		
+		if ($USER->phone)
+			$phone = Phone::format($USER->phone);
+		else
+			$phone = "";
+		PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
 	}
 }
 
