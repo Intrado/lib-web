@@ -36,11 +36,7 @@ if($REQUEST_TYPE == "new") {
 	$specialtask->setData("progress", "Hung up");
 	$specialtask->update();
 	?>
-		<voice sessionid="<?= $SESSIONID ?>">
-			<message>
-				<hangup/>
-			</message>
-		</voice>
+		<ok />
 	<?
 	$SESSIONDATA = null;
 } else {
