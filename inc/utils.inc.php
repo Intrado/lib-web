@@ -273,7 +273,8 @@ function makeparentdirectories ($filepath) {
 
 function sane_parsestr($url) {
 	$data = array();
-
+	if($url == "")
+		return $data;
 	$pairs = explode("&",$url);
 	foreach ($pairs as $pair) {
 		$parts = explode("=",$pair);
