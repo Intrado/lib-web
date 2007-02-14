@@ -71,6 +71,14 @@ if($REQUEST_TYPE == "new") {
 		$messagelangs[$specialtask->getData('currlang')] = $message->id;
 		$messagelangstring = serialize($messagelangs);
 		$specialtask->setData('messagelangs', $messagelangstring);
+		
+		$langlist = $specialtask->getData('languagelist');
+		$langlist = explode("|", $langlist);
+		$count = $specialtask->getData("count");
+		
+		$count++;
+		$specialtask->setData("count", $count);
+		$specialtask->setData("progress", "recording");
 		$specialtask->update();
 
 	}
@@ -89,8 +97,6 @@ if($REQUEST_TYPE == "new") {
 			$specialtask->update();
 			forwardToPage("easycall3.php");
 		} else {
-			$specialtask->setData("countlang", count($lang));
-			$specialtask->setData("countmessages", count($messages));
 			$specialtask->status = "done";
 			$specialtask->setData("progress", "Done");
 			$specialtask->update();
@@ -104,16 +110,8 @@ if($REQUEST_TYPE == "new") {
 			$count = 0;
 		}
 		if($count < count($langlist)) {
-			
-			//shifts off first array entry
-			
 			$currlang = $langlist[$count];
 			$specialtask->setData('currlang', $currlang);
-			
-			//output the audio since there is a current language
-			$count++;
-			$specialtask->setData("count", $count);
-			$specialtask->setData("progress", "recording");
 			$specialtask->update();
 			?>
 			

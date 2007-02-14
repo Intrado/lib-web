@@ -71,7 +71,10 @@ if($REQUEST_TYPE == "new") {
 			} else {
 				$messages = unserialize($tempmessage);
 			}
-			$messages[$specialtask->getData('count')] = $message->id;
+			$count = $specialtask->getData('count');	
+			$messages[$count] = $message->id;
+			$count++;
+			$specialtask->setData('count', $count);
 			$messagestring = serialize($messages);
 			$specialtask->setData('messages', $messagestring);
 			$specialtask->update();
@@ -81,7 +84,10 @@ if($REQUEST_TYPE == "new") {
 			} else {
 				$messages = unserialize($tempmessage);
 			}
+			$count = $specialtask->getData('count');
 			$messages[$specialtask->getData('count')] = $audio->id;
+			$count++;
+			$specialtask->setData('count', $count);
 			$messagestring = serialize($messages);
 			$specialtask->setData('messages', $messagestring);
 			$specialtask->update();
@@ -90,12 +96,6 @@ if($REQUEST_TYPE == "new") {
 	
 	if($BFXML_VARS['recordnext'] == 1 || $BFXML_VARS['continue']==1) {
 		$count = $specialtask->getData('count');
-		if($count != null){
-			$count++;
-		} else {
-			$count = 1;
-		}
-		$specialtask->setData('count', $count);
 		$specialtask->setData("progress", "recording");
 		$specialtask->update();
 		?>

@@ -58,6 +58,7 @@ if(CheckFormSubmit($f,$s))
 			$task->setData('origin', GetFormData($f,$s,"origin"));
 			$task->setData('userid', $USER->id);
 			$task->setData('progress', "Calling");
+			$task->setData('count', 1);
 			$task->lastcheckin = date("Y-m-d H:i:s");
 			$task->status = "queued";
 			$task->customerid=$USER->customerid;
