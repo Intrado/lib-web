@@ -16,9 +16,8 @@ if($REQUEST_TYPE == "new") {
 	?>
 	<error> Got new when wanted continue </error>
 	<?	
-} else if($REQUEST_TYPE == "continue") {
+} else{
 
-	//TODO Store Audio
 	if($BFXML_VARS['saveaudio'] == 1){
 		$user = new user($specialtask->getData('userid'));
 		$audio = new AudioFile();
@@ -89,7 +88,7 @@ if($REQUEST_TYPE == "new") {
 		}
 	}
 	
-	if($BFXML_VARS['recordnext'] == 1) {
+	if($BFXML_VARS['recordnext'] == 1 || $BFXML_VARS['continue']==1) {
 		$count = $specialtask->getData('count');
 		if($count != null){
 			$count++;
@@ -102,11 +101,27 @@ if($REQUEST_TYPE == "new") {
 		?>
 		
 		<voice sessionid="<?=$SESSIONID ?>">
-	
+			<? if($BFXML_VARS['recordnext']==1){ ?>
+				<message name="ready">
+					<field name="ready" type="menu" timeout="20000" sticky="true">
+						<prompt repeat="1">
+							<tts gender="female" language="english">When you're ready to record your next message, press 1 and follow the prompts.</tts>
+						</prompt>
+						<choice digits="1">
+							<goto message="record" />
+						</choice>
+					</field>
+				</message>
+			<? } ?>
+			
 			<message name="record">
 				<field name="recordaudio" type="record" max="300">
 					<prompt>
-						<tts gender="female" language="english">Now recording message <?=$count?> </tts>
+						<? 
+						if($count != 1){
+							?><tts gender="female" language="english">Now recording message <?=$count?> </tts><?
+						}
+						?>
 						<audio cmid="file://prompts/Record.wav" />
 					</prompt>
 				</field>
@@ -130,7 +145,7 @@ if($REQUEST_TYPE == "new") {
 	
 					<choice digits="1">
 						<uploadaudio name="recordaudio" />
-						<tts gender="female" language="english">Saving Message. </tts>
+						<tts gender="female" language="english">Your message has been saved. </tts>
 						<goto message="continue" />
 					</choice>
 	
@@ -151,22 +166,18 @@ if($REQUEST_TYPE == "new") {
 			<message name="continue">
 				<field name="recordnext" type="menu" timeout="5000" sticky="true">
 					<prompt repeat="1">
-						<tts gender="female" language="english">Press 1 to record another message.</tts>
-					</prompt>
+						<tts gender="female" language="english">If you'd like to record another message, press 1.</tts>
+						<tts gender="female" language="english">If you're finished recording, press 2 to exit the system.</tts>
+					</prompt>				
 				</field>
 			</message>
 		</voice>
-<?
+	<?
 	} else {
 		$specialtask->setData('progress', 'Done');
 		$specialtask->status = "done";
 		$specialtask->update();
 		forwardToPage("callme3.php");
 	}
-} else if ($REQUEST_TYPE == "result") {
-	$specialtask->setData('progress', 'Done');
-	$specialtask->status = "done";
-	$specialtask->update();
-	forwardToPage("callme3.php");
 }
 ?>
