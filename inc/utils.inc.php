@@ -42,6 +42,10 @@ function getChildObject($person, $type, $table) {
 	$obj = DBFind($table, "from $table where personid = $person");
 	return $obj ? $obj : new $type();
 }
+function getChildObjectSeq($person, $type, $table, $sequence) {
+	$obj = DBFind($table, "from $table where personid = $person and sequence = ".$sequence);
+	return $obj ? $obj : new $type();
+}
 
 
 /*
