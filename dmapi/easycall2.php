@@ -16,7 +16,7 @@ if($REQUEST_TYPE == "new") {
 	?>
 	<error> Got new when wanted continue </error>
 	<?	
-} if($REQUEST_TYPE == "continue") {
+} else {
 	
 	if($BFXML_VARS['saveaudio'] == 1){
 		$user = new user($specialtask->getData('userid'));
@@ -74,146 +74,113 @@ if($REQUEST_TYPE == "new") {
 		$specialtask->update();
 
 	}
-	
-	$langlist = $specialtask->getData('languagelist');
-	$langlist = explode("|", $langlist);
-	$count = $specialtask->getData("count");
-	if($count==null){
-		$count = 0;
-	}
-	if($count < count($langlist)) {
+	if($REQUEST_TYPE == "result") {
+		$messages = $specialtask->getData('messagelangs');
+		if($messages)
+			$messages = unserialize($messages);
+		$lang = $specialtask->getData('languagelist');
+		if($lang)
+			$lang = explode("|", $lang);
 		
-		//shifts off first array entry
-		
-		$currlang = $langlist[$count];
-		$specialtask->setData('currlang', $currlang);
-		
-		//output the audio since there is a current language
-		$count++;
-		$specialtask->setData("count", $count);
-		$specialtask->setData("progress", "recording");
 		$specialtask->update();
-		?>
+		if(count($lang) > count($messages)) {
+			$specialtask->status = "done";
+			$specialtask->setData("progress", "Hung up");
+			$specialtask->update();
+			forwardToPage("easycall3.php");
+		} else {
+			$specialtask->setData("countlang", count($lang));
+			$specialtask->setData("countmessages", count($messages));
+			$specialtask->status = "done";
+			$specialtask->setData("progress", "Done");
+			$specialtask->update();
+			forwardToPage("easycall3.php");
+		}
+	} else {	
+		$langlist = $specialtask->getData('languagelist');
+		$langlist = explode("|", $langlist);
+		$count = $specialtask->getData("count");
+		if($count==null){
+			$count = 0;
+		}
+		if($count < count($langlist)) {
+			
+			//shifts off first array entry
+			
+			$currlang = $langlist[$count];
+			$specialtask->setData('currlang', $currlang);
+			
+			//output the audio since there is a current language
+			$count++;
+			$specialtask->setData("count", $count);
+			$specialtask->setData("progress", "recording");
+			$specialtask->update();
+			?>
+			
+			<voice sessionid="<?=$SESSIONID ?>">
 		
-		<voice sessionid="<?=$SESSIONID ?>">
-	
-			<message name="record">
-				<field name="recordaudio" type="record" max="300">
-					<prompt>
-					<? 
-						$tempmess = $specialtask->getData("languagelist");
-						if($tempmess){
-							$tempmess = explode("|", $tempmess);
-							if(count($tempmess) > 1){
-							?>
-								<tts gender="female" language="english">Now recording <?=$currlang?> </tts>
-							<?
+				<message name="record">
+					<field name="recordaudio" type="record" max="300">
+						<prompt>
+						<? 
+							$tempmess = $specialtask->getData("languagelist");
+							if($tempmess){
+								$tempmess = explode("|", $tempmess);
+								if(count($tempmess) > 1){
+								?>
+									<tts gender="female" language="english">Now recording <?=$currlang?> </tts>
+								<?
+								}
 							}
-						}
-					?>
-						<audio cmid="file://prompts/Record.wav" />
-					</prompt>
-				</field>
-				<goto message="confirm" />
-			</message>
-	
-			<message name="confirm">
-				<setvar name="playedprompt" value="no" />
-				<field name="saveaudio" type="menu" timeout="5000" sticky="true">
-					<prompt repeat="2">
-						<if name="playedprompt" value="no">
-							<then>
-								<audio cmid="file://prompts/PlayBack.wav" />
-								<audio var="recordaudio" />
-							</then>
-							<else />
-						</if>
-						<audio cmid="file://prompts/Confirm.wav" />
-						<setvar name="playedprompt" value="yes" />
-					</prompt>
-	
-					<choice digits="1">
-						<uploadaudio name="recordaudio" />
-						<tts gender="female" language="english">Saving Message. </tts>
-					</choice>
-	
-					<choice digits="2">
-						<goto message="confirm" />
-					</choice>
-	
-					<choice digits="3">
-						<goto message="record" />
-					</choice>
-	
-					<default>
-						<audio cmid="file://prompts/ImSorry.wav" />
-					</default>
-				</field>
-			</message>
-		</voice>
-<?
-	} else {
-		$specialtask->status = "done";
-		$specialtask->setData("progress", "Done");
-		$specialtask->update();
-		forwardToPage("easycall3.php");
-	}
-} else if($REQUEST_TYPE == "result") {
-	$messages = $specialtask->getData('messagelangs');
-	if($messages)
-		$messages = unserialize($messages);
-	$lang = $specialtask->getData('languagelist');
-	if($lang)
-		$lang = explode("|", $lang);
-	if(count($lang) > count($messages)) {
-		$specialtask->status = "done";
-		$specialtask->setData("progress", "Hung up");
-		$specialtask->update();
-		forwardToPage("easycall3.php");
-	} else {
-		$specialtask->status = "done";
-		$specialtask->setData("progress", "Done");
-		$specialtask->update();
-		forwardToPage("easycall3.php");
+						?>
+							<audio cmid="file://prompts/Record.wav" />
+						</prompt>
+					</field>
+					<goto message="confirm" />
+				</message>
+		
+				<message name="confirm">
+					<setvar name="playedprompt" value="no" />
+					<field name="saveaudio" type="menu" timeout="5000" sticky="true">
+						<prompt repeat="2">
+							<if name="playedprompt" value="no">
+								<then>
+									<audio cmid="file://prompts/PlayBack.wav" />
+									<audio var="recordaudio" />
+								</then>
+								<else />
+							</if>
+							<audio cmid="file://prompts/Confirm.wav" />
+							<setvar name="playedprompt" value="yes" />
+						</prompt>
+		
+						<choice digits="1">
+							<uploadaudio name="recordaudio" />
+							<tts gender="female" language="english">Your message has been saved. </tts>
+						</choice>
+		
+						<choice digits="2">
+							<goto message="confirm" />
+						</choice>
+		
+						<choice digits="3">
+							<goto message="record" />
+						</choice>
+		
+						<default>
+							<audio cmid="file://prompts/ImSorry.wav" />
+						</default>
+					</field>
+				</message>
+			</voice>
+	<?
+		} else {
+			$specialtask->status = "done";
+			$specialtask->setData("progress", "Done");
+			$specialtask->update();
+			forwardToPage("easycall3.php");
+		}
 	}
 }
-
-/*
-if($BFXML_VARS['origin'] == "cisco") {
-	$message = new Message();
-	$message->data = "";
-	$message->name = $audio->name;
-	$message->type = "phone";
-	$message->userid = $user->id;
-
-	$part = new MessagePart();
-	$part->audiofileid = $audio->id;
-	$part->sequence = 0;
-	$part->type = "A";
-
-	QuickUpdate("delete from messagepart where messageid=$message->id");
-
-	$message->update();
-	$part->messageid=$message->id;
-	$part->create();
-
-	$numdays = $BFXML_VARS['jobdays'];
-	if($numdays < 1)
-		$numdays = 1;
-	if($numdays > 7)
-		$numdays = 7;
-
-	$start = date("Y-m-d",strtotime("today"));
-	$end = date("Y-m-d",strtotime("today")+(86400*($numdays-1)));
-
-	$job = Job::jobWithDefaults();
-	$job->name = $specialtask->getData("name");
-	$job->description = $specialtask->getData("jobdesc");
-	$job->phonemessageid = $message->id;
-	$job->type = "phone";
-	$job->update;
-
-}
-*/
 
 ?>
