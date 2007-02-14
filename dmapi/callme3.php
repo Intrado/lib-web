@@ -15,13 +15,7 @@ if($REQUEST_TYPE == "new"){
 	<error>Easycall3: wanted result, got new </error>
 	<?
 } else if($REQUEST_TYPE == "result"){
-	?> 
-		<voice sessionid="<?= $SESSIONID ?>">
-			<message>
-				<hangup />
-			</message>
-		</voice>
-	<?
+	
 	$SESSIONDATA = null;
 	?> <ok /> <?
 
