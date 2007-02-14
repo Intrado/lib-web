@@ -148,7 +148,9 @@ if($REQUEST_TYPE == "new") {
 								</then>
 								<else />
 							</if>
-							<audio cmid="file://prompts/Confirm.wav" />
+							<tts gender="female" language="english">If you'd like to save this message, press 1.</tts>
+							<tts gender="female" language="english">If you'd like to replay this message, press 2.</tts>
+							<tts gender="female" language="english">If you'd like to rerecord this message, press 3.</tts>
 							<setvar name="playedprompt" value="yes" />
 						</prompt>
 		
