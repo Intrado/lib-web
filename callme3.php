@@ -20,7 +20,8 @@ $f = "callme";
 $s = "main";
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
-$messages = unserialize($specialtask->getData("messages"));
+if($messarray = $specialtask->getData("messages"))
+	$messages = unserialize($messarray);
 $reloadform = 0;
 
 if(CheckFormSubmit($f, $s)){
@@ -33,16 +34,20 @@ if(CheckFormSubmit($f, $s)){
 	{
 		MergeSectionFormData($f, $s);
 		if($specialtask->getData("origin") == "message"){
-			foreach($messages as $key => $message) {
-				$mess = new Message($message);
-				$mess->name = GetFormData($f,$s,"message ".$key);
-				$mess->update();
+			if($messages){
+				foreach($messages as $key => $message) {
+					$mess = new Message($message);
+					$mess->name = GetFormData($f,$s,"message ".$key);
+					$mess->update();
+				}
 			}
 		} else if($specialtask->getData("origin") == "audio") {
-			foreach($messages as $key => $message) {
-				$mess = new AudioFile($message);
-				$mess->name = GetFormData($f,$s,"message ".$key);
-				$mess->update();
+			if($messages){
+				foreach($messages as $key => $message) {
+					$mess = new AudioFile($message);
+					$mess->name = GetFormData($f,$s,"message ".$key);
+					$mess->update();
+				}
 			}
 		}
 		if ($specialtask->getData('origin') == "audio") {
@@ -68,14 +73,18 @@ if(CheckFormSubmit($f, $s)){
 
 if ($reloadform) {
 	if($specialtask->getData("origin") == "message"){
-		foreach($messages as $key => $message){
-			$mess = new Message($message);
-			PutFormData($f, $s, "message ".$key, $mess->name);
+		if($messages){
+			foreach($messages as $key => $message){
+				$mess = new Message($message);
+				PutFormData($f, $s, "message ".$key, $mess->name);
+			}
 		}
 	} else if($specialtask->getData("origin") == "audio") {
-		foreach($messages as $key => $message){
-			$mess = new AudioFile($message);
-			PutFormData($f, $s, "message ".$key, $mess->name);
+		if($messages){
+			foreach($messages as $key => $message){
+				$mess = new AudioFile($message);
+				PutFormData($f, $s, "message ".$key, $mess->name);
+			}
 		}
 	}
 }
@@ -99,17 +108,19 @@ startWindow("Rename Files");
 		
 			<th align="left" class="windowRowHeader bottomBorder">Name</td>
 			<?
-			foreach($messages as $key => $message){
-				?>
-				<tr>
-					<td>
-						<? 
-							NewFormItem($f, $s, "message ".$key, "text");
-							echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $message . "', 400, 400);");
-						?>
-					</td>
-				</tr>
-				<?
+			if($messages){
+				foreach($messages as $key => $message){
+					?>
+					<tr>
+						<td>
+							<? 
+								NewFormItem($f, $s, "message ".$key, "text");
+								echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $message . "', 400, 400);");
+							?>
+						</td>
+					</tr>
+					<?
+				}
 			}
 		?>
 		
