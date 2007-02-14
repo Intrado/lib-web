@@ -110,7 +110,7 @@ if ($_SESSION['addressOrigin'] == 'list' && $_SESSION['listid'] == null) {
 									addr1, addr2, city, state, zip
 					from person
 						left join phone on (person.id = phone.personid and phone.sequence=0)
-						left join email on person.id = email.personid
+						left join email on (person.id = email.personid and email.sequence=0)
 						left join address on person.id = address.personid
 						left join persondata on person.id = persondata.personid
 					where userid = $USER->id and not deleted
