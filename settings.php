@@ -133,6 +133,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 					QuickUpdate($query);
 					$_SESSION['custname']=$custname;
 				}
+				if($IS_COMMSUITE){
+					setSetting('surveyurl', GetFormData($f, $s, 'surveyurl'));
+				}
 				setSetting('retry', GetFormData($f, $s, 'retry'));
 				setSetting('callerid', Phone::parse(GetFormData($f, $s, 'callerid')));
 
@@ -169,6 +172,8 @@ if( $reloadform )
 
 	$custname= QuickQuery("Select name from customer where id = '" . DBSafe($USER->customerid) . "'");
 	PutFormData($f, $s,"custdisplayname", $custname, 'text', 0, 50);
+	if($IS_COMMSUITE)
+		PutFormData($f, $s, "surveyurl", getSetting('surveyurl'), 'text', 0, 100);
 	PutFormData($f,$s,"retry",getSetting('retry'),"number",5,240);
 	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 10, 10);
 
@@ -280,7 +285,18 @@ startWindow('Global System Settings');
 					</th>
 					<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 20, 50);  ?></td>
 				<tr>
-
+<?
+				if($IS_COMMSUITE){
+?>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+						Survey URL <br>
+					</th>
+					<td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100);  ?></td>
+				<tr>
+<?
+				}
+?>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Retry Setting:<br><? print help('Settings_RetrySetting', NULL, 'grey'); ?></th>
 					<td>

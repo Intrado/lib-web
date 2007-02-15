@@ -63,6 +63,7 @@ if(CheckFormSubmit($f,$s)) {
 			$renewaldate = GetFormData($f, $s, 'renewaldate');
 			$callspurchased = GetFormData($f, $s, 'callspurchased');
 			$managerpassword = GetFormData($f, $s, 'managerpassword');
+			$surveyurl = GetFormData($f, $s, 'surveyurl');
 
 			$currmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4);
 			$currmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2);
@@ -89,6 +90,7 @@ if(CheckFormSubmit($f,$s)) {
 				setCustomerSystemSetting('defaultareacode', $areacode, $currentid);
 				setCustomerSystemSetting('autoreport_replyname', $autoname, $currentid);
 				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $currentid);
+				setCustomerSystemSetting('surveyurl', $surveyurl);
 
 				if($renewaldate != "" || $renewaldate != NULL){
 					if($renewaldate = strtotime($renewaldate)) {
@@ -133,6 +135,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', $currentid), "number");
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', $currentid),"number",5,240);
+	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', $currentid), "text", 0, 100);
 }
 
 include_once("nav.inc.php");
@@ -159,6 +162,7 @@ NewFormItem($f, $s,"", 'submit');
 <tr><td>Default Area Code: </td><td> <? NewFormItem($f, $s, 'areacode', 'text', 25, 255) ?></td></tr>
 <tr><td>AutoReport Name: </td><td><? NewFormItem($f,$s,'autoname','text',25,50); ?></td></tr>
 <tr><td>AutoReport Email: </td><td><? NewFormItem($f,$s,'autoemail','text',25,255); ?></td></tr>
+<tr><td>Survey URL: </td><td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100); ?></td></tr>
 <tr><td>Max Phones: </td><td> <? NewFormItem($f, $s, 'maxphones', 'text', 25, 255) ?></td></tr>
 <tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 25, 255) ?></td></tr>
 <tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
