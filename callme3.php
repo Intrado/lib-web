@@ -99,7 +99,7 @@ $TITLE = 'Call Me';
 include_once('popup.inc.php');
 
 NewForm($f);
-buttons(submit($f, $s, 'submit','Save'));
+buttons(submit($f, $s, 'submit','save'));
 startWindow("Rename Files");
 
 ?>
