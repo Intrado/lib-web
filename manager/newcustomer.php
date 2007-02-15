@@ -135,10 +135,12 @@ if (CheckFormSubmit($f,$s)){
 							($custid, 'Attendance', 20000, 2, 0),
 							($custid, 'General', 30000, 3, 0)";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-	
+				
+				$surveyurl = "http://asp.schoolmessenger.com/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`customerid`, `name`, `value`) VALUES
 							($custid, 'autoreport_replyemail', '" . DBSafe($autoemail) ."'),
-							($custid, 'autoreport_replyname', '" . DBSafe($autoname) . "')";
+							($custid, 'autoreport_replyname', '" . DBSafe($autoname) . "'),
+							($custid, 'surveyurl', '" . DBSafe($surveyurl) . "')";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 	
 				redirect("customers.php");
