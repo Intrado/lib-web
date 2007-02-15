@@ -63,9 +63,9 @@ if($checkpassword){
 	if($passwordlength < 6) {
 		$passwordlength = 6;
 	}
-	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 } else {
-	$securityrules = "The password cannot be made from your username/firstname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+	$securityrules = "The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 }
 
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be able to differentiate between a submit and an add button click
@@ -80,6 +80,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 	{
 		MergeSectionFormData($f, $s);
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
+		$callerid = Phone::parse(GetFormData($f,$s, "callerid"));
 		$usr = new User($_SESSION['userid']);
 
 		$login = trim(GetFormData($f, $s, 'login'));
@@ -105,10 +106,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
+		} elseif ( $callerid!=null && !Phone::validate($callerid)){
+			error('The caller id must be exactly 10 digits long');
 		} elseif (strlen($login) < $usernamelength) {
-			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
+			error('Username must be at least ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
-			error('Password must be atleast ' . $passwordlength . ' characters long');
+			error('Password must be at least ' . $passwordlength . ' characters long');
 		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
 		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
@@ -118,7 +121,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
 		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
-			error('Your password must contain atleast one letter and one number', $securityrules);
+			error('Your password must contain at least one letter and one number', $securityrules);
 		} elseif(($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) && !GetFormData($f,$s,'ldap')) {
 			error($issame, $securityrules);
 		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f,$s,'ldap')){
@@ -177,7 +180,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 				$usr->setPincode($pincode);
 			}
 
-			$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
 			if (strlen($callerid) == 0 )
 				$callerid = false;
 			$usr->setSetting("callerid",$callerid);
@@ -344,7 +346,7 @@ startWindow('User Information');
 							?>
 								<tr>
 									<td> LDAP Enabled:</td>
-									<td><? NewFormItem($f,$s,'ldap','checkbox',NULL,NULL,"onchange=\"new getObj('passwordfield1').obj.disabled=this.checked; new getObj('passwordfield2').obj.disabled=this.checked\"" ); ?></td>
+									<td><? NewFormItem($f,$s,'ldap','checkbox',NULL,NULL,"onclick=\"new getObj('passwordfield1').obj.disabled=this.checked; new getObj('passwordfield2').obj.disabled=this.checked\"" ); ?></td>
 								</tr>
 							<?
 								}
