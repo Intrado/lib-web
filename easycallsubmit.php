@@ -122,7 +122,7 @@ $TITLE = 'EasyCall';
 
 include_once('popup.inc.php');
 
-NewForm(f);
+NewForm($f);
 buttons(submit($f,$s, 'submit','submit_job'), button('modifyjobsetting', "window.opener.document.location='job.php?id=$job->id'; window.close();"), button('saveforlater', 'window.opener.document.location.reload(); window.close(); '));
 
 startWindow("Confirmation &amp; Submit");
