@@ -15,6 +15,7 @@ include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
+include_once("obj/ListEntry.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -24,6 +25,24 @@ if (isset($_GET['id'])) {
 	setCurrentPerson($_GET['id']);
 	redirect();
 }
+
+// Check if the address edit was clicked from the address book (nav) or the list page (manual add)
+
+if (isset($_GET['origin']) && $_GET['origin'] == 'nav') {
+	$fromNav = true;
+	$_SESSION['addressOrigin'] = 'nav';
+} else if (isset($_GET['origin']) && $_GET['origin'] == 'list') {
+	$fromNav = false;
+	$_SESSION['addressOrigin'] = 'list';
+	if (isset($_GET['listid'])) {
+		$_SESSION['listid'] = $_GET['listid'];
+	}
+} else {
+	$fromNav = ($_SESSION['addressOrigin'] == 'nav');
+}
+
+
+
 /****************** main message section ******************/
 
 $f = "person";
@@ -38,7 +57,7 @@ if (!$maxemails = getSystemSetting("maxemails"))
 	$maxemails = 2;
 
 
-if(CheckFormSubmit($f,$s))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmit($f,'savedone'))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -53,11 +72,15 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if (!GetFormData($f,$s,FieldMap::getFirstNameField()) &&
+				   !GetFormData($f,$s,FieldMap::getLastNameField())) {
+			error('First Name or Last Name is required');
 		} else {
+			global $fromNav;
 
 			//submit changes
 			$person = new Person($_SESSION['personid']);
-			$person->userid = $USER->id;
+			$person->userid = $fromNav ? $USER->id : GetFormData($f,$s,"manualsave") ? $USER->id : 0; //$USER->id;
 			$person->customerid = $USER->customerid;
 			$person->deleted = 0;
 			$person->update();
@@ -110,7 +133,30 @@ if(CheckFormSubmit($f,$s))
 				$email2->update();
 			}
 
-			redirect('addresses.php');
+			if (!$fromNav && isset($_SESSION['listid'])) {
+				$le = new ListEntry();
+				$le->listid = $_SESSION['listid'];
+				$le->type = "A";
+				$le->personid = $person->id;
+				$le->create();
+			}
+
+			if (CheckFormSubmit($f,'saveanother')) {
+				// save and add another
+				$reloadform = 1;
+			} else if (CheckFormSubmit($f,'savedone')) {
+				// save and done
+				if ($fromNav) {
+					redirect('addresses.php');
+				} else {
+?>
+<script>
+					window.opener.document.location.reload();
+					window.close();
+</script>
+<?
+				}
+			} // else unexpected programmer error
 		}
 	}
 } else {
@@ -120,6 +166,10 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
+
+	if (!$fromNav) {
+		PutFormData($f,$s,"manualsave",1,"bool",0,1,false);
+	}
 
 	$person = new Person($_SESSION['personid']);
 	$data = getChildObject($person->id, 'PersonData', 'persondata');
@@ -164,12 +214,17 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $name = GetFormData($f, $s, FieldMap::getFirstNameField()) . ' ' . GetFormData($f, $s, FieldMap::getLastNameField());
-$TITLE = "Edit Address: " . $name;
+$TITLE = "Enter Contact Information: " . $name;
 
 include_once("popup.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'save', 'save'));
-startWindow("Address Information");
+if ($fromNav) {
+	buttons(submit($f, 'saveanother', 'save', 'save'), submit($f, 'savedone', 'done', 'done'), button('cancel','window.history.go(-window.history.length); '));
+} else {
+	// TODO need new button images
+	buttons(submit($f, 'saveanother', 'save', 'save'), submit($f, 'savedone', 'done', 'done'), button('cancel','window.opener.document.location.reload(); window.close(); '));
+}
+startWindow("Contact");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
@@ -192,7 +247,7 @@ startWindow("Address Information");
 		</td>
 	</tr>
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Primary Phone:</th>
 		<td class="bottomBorder"><? NewFormItem($f, $s, 'phone', 'text', 20); ?></td>
 	</tr>
 
@@ -208,7 +263,7 @@ for ($x = 1; $x < $maxphones; $x++) {
 <? } ?>
 
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Primary Email:</th>
 		<td class="bottomBorder"><? NewFormItem($f, $s, 'email', 'text', 50, 100); ?></td>
 	</tr>
 
@@ -246,6 +301,13 @@ for ($x = 1; $x < $maxemails; $x++) {
 			</table>
 		</td>
 	</tr>
+
+<? if (!$fromNav) {	?>
+	<tr>
+		<td colspan="6"><div><? NewFormItem($f,$s,"manualsave","checkbox"); ?>Save to My Address Book <?= help('List_AddressBookAdd',NULL,"small"); ?></div></td>
+	</tr>
+<? } ?>
+
 </table>
 <?
 endWindow();
