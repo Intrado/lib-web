@@ -38,16 +38,6 @@ function first() {
 			return $val;
 }
 
-function getChildObject($person, $type, $table) {
-	$obj = DBFind($table, "from $table where personid = $person");
-	return $obj ? $obj : new $type();
-}
-function getChildObjectSeq($person, $type, $table, $sequence) {
-	$obj = DBFind($table, "from $table where personid = $person and sequence = ".$sequence);
-	return $obj ? $obj : new $type();
-}
-
-
 /*
 	Function to find the next seuential access code in a phone system
 	@param currentCode The current access code for which we are trying to find a replacement
@@ -63,6 +53,7 @@ function getNextAvailableAccessCode($currentCode, $userid, $customerid) {
 	}
 	return $nextCode;
 }
+
 function getCustomerSystemSetting($name, $customerid, $defaultvalue=false) {
 	static $settings = array();
 

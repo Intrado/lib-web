@@ -78,10 +78,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if (QuickQuery('select id from list where name = \'' . DBSafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and deleted=0 and id != " . (0 + $_SESSION['listid']))) {
 			error('A list named \'' . GetFormData($f,$s,"name") . '\' already exists');
-		} else if(CheckFormSubmit($f,'add') && !GetFormData($f,$s,FieldMap::getFirstNameField())) {
-			error('First Name is required to manually add');
-		} else if (CheckFormSubmit($f,'add') && !GetFormData($f,$s,FieldMap::getLastNameField())) {
-			error('Last Name is required to manually add');
 		} else {
 			//submit changes
 
@@ -92,48 +88,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 			$list->userid = $USER->id;
 
 			$list->update();
-
-			if(GetFormData($f,$s,FieldMap::getFirstNameField()) ||
-					GetFormData($f,$s,FieldMap::getLastNameField()) ||
-					GetFormData($f,$s,"phone")) {
-				//submit changes
-				$person = new Person();
-				$person->userid = GetFormData($f,$s,"manualsave") ? $USER->id : 0;
-				$person->customerid = $USER->customerid;
-				$person->deleted = 0;
-				$person->update();
-
-				$data = getChildObject($person->id, 'PersonData', 'persondata');
-				PopulateObject($f,$s,$data,array(FieldMap::getFirstNameField(),
-												FieldMap::getLastNameField(),
-												FieldMap::getLanguageField()));
-				$data->personid = $person->id;
-				$data->update();
-
-				$address = getChildObject($person->id, 'Address', 'address');
-				PopulateObject($f,$s,$address,array('addr1','addr2','city','state','zip'));
-				$address->personid = $person->id;
-				$address->update();
-
-				$phone = getChildObject($person->id, 'Phone', 'phone');
-				PopulateObject($f,$s,$phone,array('phone'));
-				$phone->personid = $person->id;
-				$phone->sequence = 0;
-				$phone->phone = Phone::parse($phone->phone);
-				$phone->update();
-
-				$email = getChildObject($person->id, 'Email', 'email');
-				PopulateObject($f,$s,$email,array('email'));
-				$email->personid = $person->id;
-				$email->sequence = 0;
-				$email->update();
-
-				$le = new ListEntry();
-				$le->listid = $list->id;
-				$le->type = "A";
-				$le->personid = $person->id;
-				$le->create();
-			}
 
 			$fieldaddsubmit = false;
 			if ($list->id) {
@@ -203,21 +157,6 @@ if( $reloadform )
 				array("name","text",1,50,true),
 				array("description","text",1,50,false)
 				);
-
-	PutFormData($f,$s,"manualsave",1,"bool",0,1,false);
-
-	PutFormData($f,$s,FieldMap::getFirstNameField(),"","text",1,255, false);
-	PutFormData($f,$s,FieldMap::getLastNameField(),"","text",1,255, false);
-	PutFormData($f,$s,FieldMap::getLanguageField(),"","text",1,255);
-
-	PutFormData($f,$s,"addr1","","text",1,50);
-	PutFormData($f,$s,"addr2","","text",1,50);
-	PutFormData($f,$s,"city","","text",1,50);
-	PutFormData($f,$s,"state","","text",1,2);
-	PutFormData($f,$s,"zip","","text",1,10);
-	PutFormData($f,$s,"phone","","phone",10,10);
-	PutFormData($f,$s,"email","","email",1,100);
-
 	PopulateForm($f,$s,$list,$fields);
 
 	PutFormData($f,$s,"newrulefieldnum","");
@@ -360,66 +299,6 @@ if ($list->id) {
 		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
 		<td style="padding: 5px;"><?= button("enter_contacts","popup('address.php?origin=list&listid=$list->id',600,600);")?></td>
 	</tr>
-
-<?
-/*
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;">
-			<table border="0" cellpadding="2" cellspacing="1" class="list">
-				<tr class="listHeader" align="left" valign="bottom">
-					<th>First Name*</th>
-					<th>Last Name*</th>
-					<th>Language Preference</th>
-					<th>Phone</th>
-					<th>Email</th>
-					<th>Address</th>
-				</tr>
-				<tr valign="top">
-					<td><? NewFormItem($f,$s,FieldMap::getFirstNameField(),"text", 10,50); ?></td>
-					<td><? NewFormItem($f,$s,FieldMap::getLastNameField(),"text", 10,50); ?></td>
-					<td>
-						<?
-						NewFormItem($f,$s,FieldMap::getLanguageField(),"selectstart");
-						$data = DBFindMany('Language', "from language where customerid='$USER->customerid' order by name");
-						foreach($data as $language)
-							NewFormItem($f,$s,FieldMap::getLanguageField(),"selectoption",$language->name,$language->name);
-						NewFormItem($f,$s,FieldMap::getLanguageField(),"selectend");
-						?>
-					</td>
-					<td><? NewFormItem($f,$s,"phone","text", 10,20); ?></td>
-					<td><? NewFormItem($f,$s,"email","text", 10, 100); ?></td>
-					<td rowspan="2">
-						<table border="0" cellpadding="">
-							<tr>
-								<td nowrap>Line 1:</td>
-								<td nowrap><? NewFormItem($f,$s,"addr1","text", 33,50); ?></td>
-							</tr>
-							<tr>
-								<td nowrap align="right">Line 2:</td>
-								<td nowrap><? NewFormItem($f,$s,"addr2","text", 33,50); ?></td>
-							</tr>
-							<tr>
-								<td align="right">City:</td>
-								<td nowrap>
-									<? NewFormItem($f,$s,"city","text", 8,50); ?>
-									State:<? NewFormItem($f,$s,"state","text", 2); ?>
-									Zip:<? NewFormItem($f,$s,"zip","text", 5, 5); ?>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="6"><div><? NewFormItem($f,$s,"manualsave","checkbox"); ?>Save to My Address Book <?= help('List_AddressBookAdd',NULL,"small"); ?>&nbsp;&nbsp;&nbsp;<span style="vertical-align: middle;"><?= submit($f,'add','add','add'); ?></span></div></td>
-				</tr>
-			</table>
-			* Required field
-		</td>
-	</tr>
-
-*/
-?>
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Address Book<br><? print help('List_AddressBookAdd', NULL, 'grey'); ?></th>
