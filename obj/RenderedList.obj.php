@@ -11,7 +11,7 @@ class RenderedList {
 
 	var $searchrules = array();
 
-	var $mode = "preview"; //add,remove
+	var $mode = "preview"; //add,remove,totals
 	var $pageoffset = 0;
 	var $pagelimit = 100;
 	var $orderby = "";
@@ -328,6 +328,10 @@ class RenderedList {
 		if ($this->mode == "remove") {
 			$modesql1 = "and le.type = 'N'"; //only get the removed items
 			$modesql2 = "and 0"; //and ignore adds
+		}
+		if ($this->mode == "totals") {
+			$modesql1 = "and le.type = 'N'"; //only get the removed items
+			$modesql2 = ""; // also calc the added items (not in rules)
 		}
 
 		$usersql = $USER->userSQL("p", "pd");

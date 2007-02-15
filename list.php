@@ -294,19 +294,15 @@ include("ruleeditform.inc.php");
 	</tr>
 
 <?
-$numAdd = 1;
-$numSkip = 1;
+$numAdd = 0;
+$numSkip = 0;
 
 if ($list->id) {
-	$renderedlist->mode = "add";
+	$renderedlist->mode = "totals";
 	$renderedlist->hasstats = false;//reset the totals stats
-	$data = $renderedlist->getPage(0, 5);
-	$numAdd = count($data);
-
-	$renderedlist->mode = "remove";
-	$renderedlist->hasstats = false;//reset the totals stats
-	$data = $renderedlist->getPage(0, 5);
-	$numSkip = count($data);
+	$renderedlist->calcStats();
+	$numAdd = $renderedlist->totaladded;
+	$numSkip = $renderedlist->totalremoved;
 }
 
 // if list additions, then show them, otherwise hide section
@@ -322,7 +318,7 @@ if ($list->id) {
 	$renderedlist->hasstats = false;//reset the totals stats
 	//$renderedlist->pagelimit = -1;
 	$doscrolling = true;
-	$showpagemenu = true;
+	$showpagemenu = ($numAdd > $renderedlist->pagelimit);
 	include("list.inc.php"); //expects $renderedlist, $showpagemenu to be set
 }
 ?>
