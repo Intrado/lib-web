@@ -300,10 +300,10 @@ startWindow("EasyCall");
 						<td>
 <? 
 						$langcount = count($languagearray) ? count($languagearray) : 1;
-							NewFormItem($f,$s,'addlangs','checkbox',NULL,NULL,"id='add'; onchange=\"new getObj('addlang').obj.disabled=!this.checked; 
+							NewFormItem($f,$s,'addlangs','checkbox',NULL,NULL,"id='add'; onclick=\"new getObj('addlang').obj.disabled=!this.checked; 
 								setVisibleIfChecked(this,'shownifchecked');
-								setHiddenIfChecked(box,'hiddenifchecked');
-								new getObj('hiddendropdown').obj.disabled=!box.checked;\"" ); 
+								setHiddenIfChecked(this,'hiddenifchecked');
+								new getObj('hiddendropdown').obj.disabled=!this.checked;\"" ); 
 ?>
 						</td>
 					</tr>
@@ -346,7 +346,7 @@ startWindow("EasyCall");
 								</tr>	
 								
 							</table>
-							</div
+							</div>
 							<div id="hiddenifchecked">
 							<table>
 								<tr>
