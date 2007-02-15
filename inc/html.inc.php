@@ -115,18 +115,22 @@ function button_bar() {
 	print '<div class="buttonbar" style="margin-bottom: 5px;"><table border="0" cellspacing="0" cellpadding="0" class="noprint"><tr><td class="buttonbaritem">' .  implode('</td><td class="buttonbaritem">', $buttons) . '</td><tr></table></div>';
 }
 
-function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL) {
+function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL, $customtime = NULL) {
 	if(!$inc) $inc = 15;
 	if(!$start) $start = '12:00 am';
 	if(!$stop) $stop = '11:45 pm';
 	$current = strtotime($start);
 	$end = strtotime($stop);
+	$customtime = strtotime($customtime);
 	NewFormItem($form, $section, $field, 'selectstart', NULL, NULL, "id=\"$field\"" . " $extraHtml ");
 	if($none)
 		NewFormItem($form, $section, $field, 'selectoption', $none, '');
 	while($current <= $end)
 	{
 		NewFormItem($form, $section, $field, 'selectoption', date('g:i a', $current), date('g:i a', $current));
+		if( ($customtime > $current) && ($customtime < ($current+($inc *60))) ) {
+			NewFormItem($form, $section, $field, 'selectoption', date('g:i a', $customtime), date('g:i a', $customtime));
+		}
 		$current += $inc *60;
 	}
 	NewFormItem($form, $section, $field, 'selectend');
