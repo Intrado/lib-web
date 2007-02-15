@@ -20,8 +20,12 @@ $f = "callme";
 $s = "main";
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
-if($messarray = $specialtask->getData("messages"))
-	$messages = unserialize($messarray);
+$messages = array();
+for($i = 1; $i < $specialtask->getData('count'); $i++){
+	$messnum = "message".$i;
+	$messages[$i] = $specialtask->getData($messnum);
+}
+
 $reloadform = 0;
 
 if(CheckFormSubmit($f, $s)){
@@ -111,14 +115,15 @@ startWindow("Rename Files");
 			if($messages){
 				foreach($messages as $key => $message){
 					?>
-					<tr>
-						<td>
-							<? 
-								NewFormItem($f, $s, "message ".$key, "text");
+					<tr><td>
+						<? 
+							NewFormItem($f, $s, "message ".$key, "text");
+							if($specialtask->getData("origin") == "message")
 								echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $message . "', 400, 400);");
-							?>
-						</td>
-					</tr>
+							else
+								echo "&nbsp;" . button('play', "popup('previewaudio.php?id=" . $message . "&close=1', 400, 400);");
+						?>
+					</td></tr>
 					<?
 				}
 			}
