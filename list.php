@@ -356,8 +356,13 @@ if ($list->id) {
 ?>
 
 	<tr>
+		<th align="right" valign="top" class="windowRowHeader">Search Database:<br><? print help('search', NULL, 'grey'); ?></th>
+		<td style="padding: 5px;"><?= submit($f,'search','search','search_add') ?></td>
+	</tr>
+
+	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("openaddbook","popup('address.php?origin=list&listid=$list->id',600,600);")?></td>
+		<td style="padding: 5px;"><?= button("enter_contacts","popup('address.php?origin=list&listid=$list->id',600,600);")?></td>
 	</tr>
 
 <?

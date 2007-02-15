@@ -219,10 +219,10 @@ $TITLE = "Enter Contact Information: " . $name;
 include_once("popup.inc.php");
 NewForm($f);
 if ($fromNav) {
-	buttons(submit($f, 'saveanother', 'save', 'save'), submit($f, 'savedone', 'done', 'done'), button('cancel','window.history.go(-window.history.length); '));
+	buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'), submit($f, 'savedone', 'done', 'save_done'), button('cancel','window.history.go(-window.history.length); '));
 } else {
 	// TODO need new button images
-	buttons(submit($f, 'saveanother', 'save', 'save'), submit($f, 'savedone', 'done', 'done'), button('cancel','window.opener.document.location.reload(); window.close(); '));
+	buttons(submit($f, 'saveanother', 'save', 'save_add_another'), submit($f, 'savedone', 'done', 'save_done'), button('cancel','window.opener.document.location.reload(); window.close(); '));
 }
 startWindow("Contact");
 ?>
