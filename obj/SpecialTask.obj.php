@@ -33,6 +33,18 @@ class SpecialTask extends DBMappedObject {
 		}
 		$this->data = implode('&',$pairs);
 	}
+	
+	function delData($field) {
+		$cleanarray = sane_parsestr($this->data);
+
+		$pairs = array();
+		foreach($cleanarray as $key => $value) {
+			if($key == $field) continue;
+			$pair = urlencode($key) . '=' . urlencode($value);
+			$pairs[] = $pair;
+		}
+		$this->data = implode('&',$pairs);
+	}
 }
 
 ?>
