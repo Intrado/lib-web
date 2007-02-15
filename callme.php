@@ -45,16 +45,19 @@ if(CheckFormSubmit($f,$s))
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-		} else if (QuickQuery("select * from audiofile where userid = {$USER->id} and deleted = 0 and name = '" .
+		} else if (QuickQuery("select * from audiofile where userid = '$USER->id' and deleted = 0 and name = '" .
 				   DBSafe(GetFormData($f, $s, 'name')) . "'")) {
 			error('This audio file name is already in use, so a unique one was generated');
-			$testname = GetFormData($f, $s, 'name') . ' ' . date("Y-m-d_H:i:s");
-			PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
+			$testname = GetFormData($f, $s, 'name') . ' ' . date("Y-m-d H:i");
+			PutFormData($f, $s, 'name', $testname, 'text', 1, 50); // Repopulate the form/session data with the generated name
 		} else {
 			$task = new SpecialTask();
 			$task->type = 'CallMe';
 			$task->setData('phonenumber', $phone);
-			$task->setData('name', GetFormData($f,$s,"name"));
+			$name = GetFormData($f,$s,"name");
+			if($name == "")
+				$name = "Call Me - " . date("M d, Y G:i:s");
+			$task->setData('name', $name);
 			$task->setData('origin', GetFormData($f,$s,"origin"));
 			$task->setData('userid', $USER->id);
 			$task->setData('progress', "Calling");
@@ -81,7 +84,7 @@ if( $reloadform )
 		$phone = "";
 
 	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
-	PutFormData($f,$s,"name","","text","1","50",true);
+	PutFormData($f,$s,"name","","text","1","50");
 	PutFormData($f,$s,"size","","text");
 	PutFormData($f,$s,"origin",$_REQUEST['origin']);
 }

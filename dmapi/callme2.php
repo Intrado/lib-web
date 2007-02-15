@@ -22,21 +22,12 @@ if($REQUEST_TYPE == "new") {
 		$user = new user($specialtask->getData('userid'));
 		$audio = new AudioFile();
 		$audio->userid =$specialtask->getData('userid');
-	
-		if(!isset($BFXML_VARS['name']) || $BFXML_VARS['name']=="" || $BFXML_VARS['name']==null) {
-			if($BFXML_VARS['origin'] == "start") {
-				$BFXML_VARS['name'] = $specialtask->getData('name');
-			} else if ($BFXML_VARS['origin'] == "cisco") {
-				$BFXML_VARS['name'] = "IP phone - " . date("M d, Y G:i:s");
-			} else {
-				$BFXML_VARS['name'] = $specialtask->getData('name');
-			}
-		}
-		if(QuickQuery("select * from audiofile where userid = '$USER->id' and deleted = 0 
-					and name = '" . DBSafe($BFXML_VARS['name']) ."'"))
-			$BFXML_VARS['name'] = $BFXML_VARS['name']."-".date("M d, Y G:i:s");
+		$name = $specialtask->getData('name') . " - " . $specialtask->getData('count');
+		if(QuickQuery("select * from audiofile where userid = '$user->id' and deleted = 0 
+					and name = '" . DBSafe($name) ."'"))
+			$name = $name ." - ". date("M d, Y G:i:s");
 		
-		$audio->name = $BFXML_VARS['name'] . "-" . $specialtask->getData('count');
+		$audio->name = $name;
 		$audio->contentid = $BFXML_VARS['recordaudio'];
 		$audio->recorddate = date("Y-m-d G:i:s");
 		$audio->update();
@@ -46,11 +37,12 @@ if($REQUEST_TYPE == "new") {
 		$BFXML_VARS['recordaudio']=NULL;
 		
 		//then make a message if not from audio
-		if($BFXML_VARS['origin'] != "audio"){
+		$origin = $specialtask->getData('origin');
+		if($origin != "audio"){
 			
 			$message = new Message();
 			$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('count');
-			if(QuickQuery("Select count(*) from message where userid=$USER->id and deleted = '0' 
+			if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0' 
 							and name = '$messagename'")) 
 				$messagename = $messagename . " - " . date("M d, Y G:i:s");
 			$message->name = $messagename;
@@ -66,30 +58,20 @@ if($REQUEST_TYPE == "new") {
 		
 			$part->create();
 		
-			if(!$tempmessage=$specialtask->getData('messages')) {
-				$messages = array();
-			} else {
-				$messages = unserialize($tempmessage);
-			}
 			$count = $specialtask->getData('count');	
-			$messages[$count] = $message->id;
+			$message = $message->id;
+			$messnum = "message" . $count;
 			$count++;
 			$specialtask->setData('count', $count);
-			$messagestring = serialize($messages);
-			$specialtask->setData('messages', $messagestring);
+			$specialtask->setData($messnum, $message);
 			$specialtask->update();
 		} else {
-			if(!$tempmessage=$specialtask->getData('messages')) {
-				$messages = array();
-			} else {
-				$messages = unserialize($tempmessage);
-			}
 			$count = $specialtask->getData('count');
-			$messages[$specialtask->getData('count')] = $audio->id;
+			$message = $audio->id;
+			$messnum = "message" . $count;
 			$count++;
 			$specialtask->setData('count', $count);
-			$messagestring = serialize($messages);
-			$specialtask->setData('messages', $messagestring);
+			$specialtask->setData($messnum, $message);
 			$specialtask->update();
 		}
 	}

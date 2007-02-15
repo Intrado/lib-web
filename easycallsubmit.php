@@ -22,6 +22,15 @@ if (!$USER->authorize("starteasy")) {
 }
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
+$messages = array();
+$languages = array();
+$count = $specialtask->getData("count");
+for($i = 0; $i < $count; $i++){
+	$messnum = "message" . $i;
+	$messages[$i] = $specialtask->getData($messnum);
+	$langnum = "language" . $i;
+	$languages[$i] = $specialtask->getData($langnum);
+}
 $f = "easycall";
 $s = "submit";
 $reloadform = 0;
@@ -44,17 +53,17 @@ if(CheckFormSubmit($f,$s)) {
 	$job->jobtypeid = $type;
 	$job->sendphone = true;
 	$job->type = "phone";
-	$messagelangs = $specialtask->getData('messagelangs');
-	if($messagelangs) {
-		$messagelangs = unserialize($messagelangs);
-		foreach($messagelangs as $lang => $message){
-			if($lang == "Default"){
+	
+	if($messages) {
+		
+		foreach($messages as $index => $message){
+			if($languages[$index] == "Default"){
 				$job->phonemessageid = $message;
 				$job->create();
 			} else {
 				$joblang = new JobLanguage();
 				$joblang->type = "phone";
-				$joblang->language = $lang;
+				$joblang->language = $languages[$index];
 				$joblang->messageid = $message;
 				$joblang->jobid = $job->id;
 				if ($joblang->language && $joblang->messageid) {
@@ -77,7 +86,7 @@ $list = new PeopleList($specialtask->getData("listid"));
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
-function alternatelangs($messagelangs) {
+function alternatelangs($languages, $messages) {
 	?>
 	<table border="0" cellpadding="2" cellspacing="1" class="list">
 		<tr class="listHeader" align="left" valign="bottom">
@@ -87,11 +96,12 @@ function alternatelangs($messagelangs) {
 		</tr>
 		<?
 		
-		if (count($messagelangs) == 1)
+		if (count($messages) == 1)
 			echo "<tr><td colspan='2'>No additional language and message combinations defined</td></tr>";
 		else
-			if($messagelangs){
-				foreach($messagelangs as $lang => $messageid) {
+			if($messages){
+				foreach($messages as $index => $messageid) {
+					$lang = $languages[$index];
 					if($lang == "Default")
 						continue;
 					$message = new Message($messageid);
@@ -168,10 +178,14 @@ startWindow("Confirmation &amp; Submit");
 		<th align="right" class="windowRowHeader bottomBorder">Default Message:</td>
 		<td class="bottomBorder" >
 			<?
-			$messagelangs = unserialize($specialtask->getData('messagelangs'));
-			$phonemessage = new Message($messagelangs["Default"]);
+			for($i = 0; $i < $count; $i++){
+				if($languages[$i] == "Default"){
+					$phonemessage = new Message($messages[$i]);
+					break;
+				}
+			}
 			echo htmlentities($phonemessage->name);
-			if($messagelangs)
+			if($messages)
 				echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);");
 			else
 				echo "&nbsp;";
@@ -181,7 +195,7 @@ startWindow("Confirmation &amp; Submit");
 	<? if($USER->authorize('sendmulti')) { ?>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder">Additional Languages:</td>
-			<td class="bottomBorder" ><? alternatelangs($messagelangs); ?></td>
+			<td class="bottomBorder" ><? alternatelangs($languages, $messages); ?></td>
 		</tr>
 	<? } ?>
 		

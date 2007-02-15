@@ -19,12 +19,8 @@ if (!$USER->authorize("starteasy")) {
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
 
-if($specialtask->getData('progress')=="Done") {
+if($specialtask->getData('progress')=="Done" || $specialtask->getData('progress') =="Hung Up") {
 	redirect('callme3.php?taskid=' . $specialtask->id);
-	//we got it
-} else if ($specialtask->getData('progress') =="Hung Up"){
-	
-
  
 } else {
 	$progress = $specialtask->getData('progress');
