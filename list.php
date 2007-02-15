@@ -293,6 +293,26 @@ include("ruleeditform.inc.php");
 		</td>
 	</tr>
 
+<?
+$numAdd = 1;
+$numSkip = 1;
+
+if ($list->id) {
+	$renderedlist->mode = "add";
+	$renderedlist->hasstats = false;//reset the totals stats
+	$data = $renderedlist->getPage(0, 5);
+	$numAdd = count($data);
+
+	$renderedlist->mode = "remove";
+	$renderedlist->hasstats = false;//reset the totals stats
+	$data = $renderedlist->getPage(0, 5);
+	$numSkip = count($data);
+}
+
+// if list additions, then show them, otherwise hide section
+if ($numAdd > 0) {
+?>
+
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Additions:<br><? print help('List_Additions', NULL, 'grey'); ?></th>
 		<td style="padding: 5px;">
@@ -300,7 +320,7 @@ include("ruleeditform.inc.php");
 if ($list->id) {
 	$renderedlist->mode = "add";
 	$renderedlist->hasstats = false;//reset the totals stats
-//	$renderedlist->pagelimit = -1;
+	//$renderedlist->pagelimit = -1;
 	$doscrolling = true;
 	$showpagemenu = true;
 	include("list.inc.php"); //expects $renderedlist, $showpagemenu to be set
@@ -308,6 +328,13 @@ if ($list->id) {
 ?>
 		</td>
 	</tr>
+<?
+// end of list additions
+}
+
+// if list skips, then show them, otherwise hide section
+if ($numSkip > 0) {
+?>
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Skip:<br><? print help('List_Skip', NULL, 'grey'); ?></th>
@@ -323,7 +350,18 @@ if ($list->id) {
 ?>
 		</td>
 	</tr>
+<?
+// end of list skips
+}
+?>
 
+	<tr>
+		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
+		<td style="padding: 5px;"><?= button("openaddbook","popup('address.php?origin=list&listid=$list->id',600,600);")?></td>
+	</tr>
+
+<?
+/*
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
 		<td style="padding: 5px;">
@@ -378,9 +416,13 @@ if ($list->id) {
 			* Required field
 		</td>
 	</tr>
+
+*/
+?>
+
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Address Book<br><? print help('List_AddressBookAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("openaddbook","popup('addresses.php?origin=list',600,400);")?></td>
+		<td style="padding: 5px;"><?= button("openaddbook","popup('addresses.php?origin=list',600,600);")?></td>
 	</tr>
 
 <? if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) { ?>
