@@ -127,6 +127,9 @@ function fmt_checkbox($row,$index) {
 		$result .= " onclick=\"dolistbox(this,'add',";
 	}
 	$result .=  (($checked) ? "true":"false") . "," . $row[1] . ');" />';
+
+	// TODO fix this with pencil/glass to edit/view
+	$result .= "<a href=\"addresspreview.php?id=$row[1]\">  G</a>";
 	return $result . '</div>';
 }
 
