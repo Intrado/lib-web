@@ -60,7 +60,7 @@ if ($total == 0) {
 	$query = "select wi.jobid,
 					wi.type,
 					count(*) as total,
-					100 * sum(wi.status='success') / (sum(wi.status != 'duplicate')) +0.00) as success_rate
+					100 * sum(wi.status='success') / (sum(wi.status != 'duplicate') +0.00) as success_rate
 	from jobworkitem wi
 	where wi.jobid in ($jobidlist)
 	group by wi.jobid, wi.type
