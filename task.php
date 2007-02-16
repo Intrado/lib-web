@@ -13,6 +13,8 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/Import.obj.php");
 require_once("obj/Schedule.obj.php");
+require_once("obj/Job.obj.php");
+require_once("obj/ImportJob.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -43,7 +45,15 @@ if (isset($_GET['id'])) {
 $id = $_SESSION['importid'];
 $IMPORT = new Import($id);
 
+$repeatingjobs = DBFindMany("Job","from job where scheduleid is not null");
+$associatedjobs = DBFindMany("ImportJob","from importjob where importid = '$IMPORT->id'");
+$temparray = array();
+foreach($associatedjobs as $jobs){
+	$temparray[] = $jobs->jobid;
+}
+$associatedjobids = $temparray;
 
+	
 /****************** main message section ******************/
 $form = "taskeditor";
 $section = "main";
@@ -82,7 +92,35 @@ if(CheckFormSubmit($form, $section))
 
 				$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
 				$IMPORT->update();
-
+				
+				$associated = GetFormData($form, $section, 'associatedjobs');
+				if($associatedjobs){
+					foreach($associatedjobs as $alreadyassociated){
+						$notused = null;
+						if($associated){
+							$notused = array_search($alreadyassociated->jobid, $associated);
+						}
+						if($notused === null || $notused === false)
+							$alreadyassociated->destroy();
+					}
+				}
+				if($associated){
+					foreach($associated as $job) {
+						$used=false;
+						if($associatedjobs){
+							foreach($associatedjobs as $alreadyassociated){
+								if($job == $alreadyassociated->jobid)
+									$used = true;
+							}
+						}
+						if($used != true){
+							$importjob = new ImportJob();
+							$importjob->jobid = $job;
+							$importjob->importid = $IMPORT->id;
+							$importjob->create();
+						}
+					}
+				}
 
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
 				redirect("tasks.php");
@@ -101,6 +139,11 @@ if( $reloadform )
 	PutFormData($form, $section, 'updatemethod', ($IMPORT->updatemethod != null ? $IMPORT->updatemethod : 'updateonly'), 'text');
 
 	PutFormData($form, $section, 'automaticimport', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
+	PutFormData($form, $section, 'associatedjobs', $associatedjobids);
+	$checked = false;
+	if($associatedjobids)
+		$checked = true;
+	PutFormData($form, $section, 'trigger_checkbox', (bool)$checked,"bool",0,1);
 }
 
 
@@ -147,12 +190,35 @@ startWindow('Import Information ');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader">Automated upload:</th>
-		<td class="">
+		<th align="right" class="windowRowHeader bottomBorder">Automated upload:</th>
+		<td class="bottomBorder">
 			<table border="0" cellspacing="0" cellpadding="2">
 				<tr><td>Import when uploaded</td><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox'); ?> Import when remote uploads are complete <br>(uncheck this box when configuring import mapping or changing data fields)</td>
 				</tr>
 			</table>
+		</td>
+	</tr>
+	<tr>
+		<th align="right" class="windowRowHeader">Associated Jobs</th>
+		<td >
+		<table>
+			<tr>
+				<td>
+					<?
+					NewFormItem($form, $section, "trigger_checkbox", "checkbox", null, null, "id='trigger_checkbox' onclick=\"clearAllIfNotChecked(this,'associated_jobs');\"");
+					?>
+				</td>
+				<td style="vertical-align: top">
+					<?
+						$jobnames = array();
+						foreach($repeatingjobs as $job){
+							$jobnames[$job->name] = $job->id;
+						}
+						NewFormItem($form, $section,"associatedjobs", "selectmultiple", null, $jobnames, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
+					?>
+				</td>
+			</tr>
+		</table>
 		</td>
 	</tr>
 </table>
