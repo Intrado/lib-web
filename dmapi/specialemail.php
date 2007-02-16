@@ -1,6 +1,7 @@
 <?
 
 require_once("../obj/SpecialTask.obj.php");
+include_once("../inc/utils.inc.php");
 
 
 //remember to embed the $SESSIONID manually in each task element
