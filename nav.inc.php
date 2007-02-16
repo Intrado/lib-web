@@ -47,7 +47,7 @@ if ($USER->authorize("createlist")) {
 	$SHORTCUTS['&nbsp;&nbsp;New List'] = "window.location='list.php?id=new'";
 	$SHORTCUTS['&nbsp;&nbsp;My Lists'] = "window.location='lists.php'";
 }
-$SHORTCUTS['&nbsp;&nbsp;My Address Book'] = "popup('addresses.php?origin=nav',800,550);";
+$SHORTCUTS['&nbsp;&nbsp;My Address Book'] = "popup('addresses.php',800,550);";
 if ($USER->authorize("viewcontacts"))
 	$SHORTCUTS['&nbsp;&nbsp;System Contacts'] = "window.location='contacts.php'";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
@@ -196,7 +196,7 @@ function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 	<div id='container'>
 		<div id='accountnav'>
 			<div id='shortcuts'><? doShortcuts($SHORTCUTS) ?></div>
-			<div id='myaddressbook'><a class='accountlink' href='#' onClick="popup('addresses.php?origin=nav',800,550);"><img src='img/address_button.gif' class='btnleftfloat' align='middle'/>My Address Book</a></div>
+			<div id='myaddressbook'><a class='accountlink' href='#' onClick="popup('addresses.php',800,550);"><img src='img/address_button.gif' class='btnleftfloat' align='middle'/>My Address Book</a></div>
 			<? if ($USER->authorize('managemyaccount')) { ?>
 				<div id='myaccount'><a class='accountlink' href='account.php'><img src='img/account_button.gif' class='btnleftfloat' align='middle'/>My Account</a></div>
 			<? } ?>
