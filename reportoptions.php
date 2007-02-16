@@ -84,6 +84,8 @@ foreach ($jobs as $job) {
 			Show archived jobs</td>
 			</tr>
 			</table>
+
+
 		</td>
 	</tr>
 	<tr>
@@ -179,7 +181,11 @@ foreach ($jobs as $job) {
 		<select id="option_jobtype_select" name="option_jobtype_data[]" multiple onmousedown="setChecked('option_jobtype');">
 			<option value="phone">Phone</option>
 			<option value="email">Email</option>
-			<option value="print">Print</option>
+<?
+			if($IS_COMMSUITE && $USER->authorize('sendprint')){
+				?><option value="print">Print</option><?
+			}
+?>
 		</select>
 		</td>
 		<td style="width: 60">&nbsp;</td>
