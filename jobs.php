@@ -11,6 +11,7 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+include_once("obj/ImportJob.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,6 +54,10 @@ if (isset($_GET['delete'])) {
 				$schedule = new Schedule($job->scheduleid);
 				QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
 				$schedule->destroy();
+			}
+			$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$deleteid'");
+			foreach($associatedimports as $importjob){
+				$importjob->destroy();
 			}
 			QuickUpdate("delete from joblanguage where jobid='$deletedid'");
 			$job->destroy();
