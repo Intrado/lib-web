@@ -49,7 +49,7 @@ $availablefields = array();
 for ($x = 1; $x <= 20; $x++)
 	$availablefields[] = sprintf("%02d",$x);
 
-$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap where customerid = $USER->customerid"));
+
 
 /****************** main message section ******************/
 $form = "datamanager";
@@ -131,6 +131,9 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 } else {
 	$reloadform = true;
 }
+
+//load this after possibly saving a new field
+$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap where customerid = $USER->customerid"));
 
 if( $reloadform )
 {
