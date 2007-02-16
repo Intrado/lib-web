@@ -19,9 +19,14 @@ if (!$USER->authorize("starteasy")) {
 
 $specialtask = new SpecialTask($_REQUEST['taskid']);
 
-if($specialtask->getData('progress')=="Done" || $specialtask->getData('progress') =="Hung Up") {
-	redirect('callme3.php?taskid=' . $specialtask->id);
- 
+if($specialtask->getData('progress')=="Done") {
+	
+	if($specialtask->getData("message1")){
+		redirect('callme3.php?taskid=' . $specialtask->id);
+	} else {
+		$specialtask->setData('error', 'No messages saved');
+		$specialtask->update();
+	}
 } else {
 	$progress = $specialtask->getData('progress');
 	$currnum = $specialtask->getData('count');
@@ -36,8 +41,13 @@ include_once('popup.inc.php');
 
 startWindow("Recording session in progress");
 
-if ($specialtask->getData('error') == 'true') {
-	echo "There was an error trying to call you. Please try again";
+if ($error = $specialtask->getData('error')) {
+	?>
+		<div style="text-align: center; width: 400px; padding: 3px;">
+			<span style="color: red;">There was an error during the call: <?=$error?>.</span><br>
+			Please check the phone number and <a href="callme.php?origin=<?=$specialtask->getData('origin')?>">try again.</a>
+		</div>
+	<?
 } else {
 ?>
 <div style="text-align: center; width: 400px; padding: 3px;">
