@@ -1173,3 +1173,11 @@ set cl.customerid = u.customerid;
 
 ALTER TABLE `calllog` DROP INDEX `phonenumber` ;
 ALTER TABLE `calllog` ADD INDEX `callreport` ( `customerid` , `starttime` ) ;
+
+-- new table for trigger based jobs from imports
+
+CREATE TABLE `importjob` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `importid` INT NOT NULL ,
+  `jobid` INT NOT NULL
+) ENGINE = MYISAM ;
