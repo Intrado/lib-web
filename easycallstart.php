@@ -54,8 +54,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 	{
 		MergeSectionFormData($f, $s);
 
+		
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
-
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -75,6 +75,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 		} else {
 			if (isset($_GET['retry'])) {
 				$task = new SpecialTask($_GET['retry']);
+				$task->setData('phonenumber', $phone);
 				$task->setData('progress', 'Creating Call');
 				$task->setData('error', "0");
 				$task->status = "queued";
@@ -393,7 +394,6 @@ startWindow("EasyCall");
 									new getObj('jobtype').obj.disabled=true;
 									new getObj('list').obj.disabled=true;
 									new getObj('name').obj.disabled=true;
-									new getObj('phone').obj.disabled=true;
 									new getObj('addlang').obj.disabled=true;
 <?
 								}
