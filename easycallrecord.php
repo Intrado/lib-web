@@ -62,7 +62,7 @@ if (!$error) {
 ?>
 	<div style="text-align: center; width: 400px; padding: 3px;">
 		<span style="color: red;">There was an error during the call: <?=$error?>.</span><br>
-		Please check the phone number and <a href="easycallstart.php?retry=<?= $specialtask->id ?>">try again</a></span>
+		Please check the phone number and <a href="easycallstart.php?retry=<?= $specialtask->id ?>">try again</a>
 	</div>
 <?
 }
