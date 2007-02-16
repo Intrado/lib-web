@@ -18,7 +18,7 @@ class SpecialTask extends DBMappedObject {
 
 	function getData($field) {
 		$data = sane_parsestr($this->data);
-		return $data[$field];
+		return (isset($data[$field]) ? $data[$field] : false);
 	}
 
 	function setData($field, $inputvalue) {
