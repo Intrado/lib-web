@@ -33,7 +33,7 @@ if($REQUEST_TYPE == "new") {
 	<?
 } else if($REQUEST_TYPE == "result") {
 	$specialtask->status = "done";
-	$specialtask->setData("progress", "Hung up");
+	$specialtask->setData("progress", "Done");
 	$specialtask->update();
 	?>
 		<ok />
