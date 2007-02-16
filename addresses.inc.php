@@ -35,8 +35,6 @@ if (isset($_GET['delete'])) {
 
 // Check if the address book was clicked from the nav bar or the list page
 $fromNav = ($ORIGINTYPE === "nav");
-echo("origin: ".$ORIGINTYPE);
-echo("fromNav:".$fromNav);
 
 // set the pagename to jump to when editing selected contact
 $addressPagename = $fromNav ? "address.php" : (($ORIGINTYPE === "manualadd") ? "addressmanualaddbook.php" : "addressmanualadd.php");
@@ -54,15 +52,18 @@ function fmt_actions($row, $name) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+$PAGE = $fromNav ? "start:addressbook" : "notifications:lists";
 $TITLE = "My Address Book " . ($fromNav ? '' : help('AddressBook_MyAddressBook'));
 
-include_once("popup.inc.php");
+include_once("nav.inc.php");
 
 if (!$fromNav && $_SESSION['listid'] == null) {
 	echo "<font color=#FF0000>";
 	print("Please make sure to first save your list before adding entries to it from your address book");
 	echo "</font>";
 } else {
+
+NewForm($f);
 
 	?>
 	<script langauge="javascript">
@@ -79,7 +80,7 @@ if (!$fromNav && $_SESSION['listid'] == null) {
 
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding-bottom: 5px;">
 		<tr>
-			<td align="left"><? buttons(button('done', $fromNav ? 'window.close(); ' : 'window.opener.document.location.reload(); window.close(); ')); ?></td>
+			<td align="left"><? buttons(button('done', NULL, $fromNav ? 'start.php' : 'list.php')); ?></td>
 			<td align="right" valign="bottom">
 				<?= ($fromNav) ? '' : 'Select the individuals you want to add to your list.'?>
 			</td>
@@ -171,7 +172,7 @@ if (!$fromNav && $_SESSION['listid'] == null) {
 	endWindow();
 
 	buttons();
-
+EndForm();
 } //end if no list
 
-include_once("popupbottom.inc.php");
+include_once("navbottom.inc.php");

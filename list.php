@@ -297,12 +297,12 @@ if ($list->id) {
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("enter_contacts","popup('addressmanualadd.php',600,600);")?></td>
+		<td style="padding: 5px;"><?= button("enter_contacts",NULL,"addressmanualadd.php")?></td>
 	</tr>
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Address Book<br><? print help('List_AddressBookAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("openaddbook","popup('addressesmanualadd.php',600,600);")?></td>
+		<td style="padding: 5px;"><?= button("openaddbook",NULL,"addressesmanualadd.php"); ?></td>
 	</tr>
 
 <? if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) { ?>

@@ -29,6 +29,7 @@ if (isset($_POST['addperson_x'])) {
 
 if (isset($_GET['id'])) {
 	setCurrentPerson($_GET['id']);
+	$_SESSION['previewreferer'] = $_SERVER['HTTP_REFERER'];
 	redirect();
 }
 
@@ -69,8 +70,16 @@ if (isset($personid) &&
 	$data = DBFind("PersonData", "from persondata where personid = " . $personid);
 	$address = DBFind("Address", "from address where personid = " . $personid);
 
-	$phones = DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence");
-	$emails = DBFindMany("Email", "from email where personid=" . $personid . " order by sequence");
+	// get existing phones from db, then create any additional based on the max allowed
+	// TODO what if the max is less than the number they already have?
+	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
+	for ($i=count($phones); $i<$maxphones; $i++) {
+		$phones[$i] = new Phone();
+	}
+	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
+	for ($i=count($emails); $i<$maxemails; $i++) {
+		$emails[$i] = new Email();
+	}
 } else {
 	// creating new person
 	clearDataFields();
@@ -165,17 +174,22 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				$reloadform = 1;
 			} else if (CheckFormSubmit($f,'savedone')) {
 				// save and done
-				if ($fromNav) {
-					redirect('addresses.php');
-				} else if ($ORIGINTYPE === "manualaddbook") {
-					redirect('addressesmanualadd.php');
-				} else {
-?>
-<script>
-					window.opener.document.location.reload();
-					window.close();
-</script>
-<?
+				switch ($ORIGINTYPE) {
+					case "nav":
+						redirect('addresses.php');
+						break;
+					case "manuaddbook":
+						redirect('addressesmanualadd.php');
+						break;
+					case "manualadd":
+						redirect('list.php');
+						break;
+					case "preview":
+						redirect($_SESSION['previewreferer']);
+						break;
+					default:
+					// TODO yikes!
+					break;
 				}
 			} // else unexpected programmer error
 		}
@@ -224,20 +238,27 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
+$PAGE = $fromNav ? "start:addressbook" : "notifications:lists";
+
 $name = GetFormData($f, $s, FieldMap::getFirstNameField()) . ' ' . GetFormData($f, $s, FieldMap::getLastNameField());
 if (strlen(trim($name)) == 0) $name = "New Contact";
 $TITLE = "Enter Contact Information: " . $name;
 
-include_once("popup.inc.php");
+include_once("nav.inc.php");
 NewForm($f);
 
-$cancelAction = "window.history.go(-window.history.length);";
-if (!$fromNav && ($ORIGINTYPE != "manualaddbook")) { // return to lists page
-	$cancelAction = "window.opener.document.location.reload(); window.close();";
-}
-buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'),
+if ($ORIGINTYPE === "preview") {
+	buttons(submit($f, 'savedone', 'savedone', 'save'),
+		button('cancel',NULL,$_SESSION['previewreferer']));
+} else {
+	$cancelAction = $fromNav ? "addresses.php" : "addressesmanualadd.php";
+	if ($ORIGINTYPE === "manualadd") { // return to lists page
+		$cancelAction = "list.php";
+	}
+	buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'),
 		submit($f, 'savedone', 'savedone', 'save_done'),
-		button('cancel',$cancelAction));
+		button('cancel',NULL,$cancelAction));
+}
 
 startWindow("Contact");
 ?>
@@ -327,5 +348,5 @@ startWindow("Contact");
 endWindow();
 buttons();
 EndForm();
-include_once("popupbottom.inc.php");
+include_once("navbottom.inc.php");
 ?>
