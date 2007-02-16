@@ -74,12 +74,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 		
 		} else {
 			if (isset($_GET['retry'])) {
-				$task = new SpecialTask($_GET['retry']);
+				$oldtask = new SpecialTask($_GET['retry']);
+				$task = new SpecialTask();
+				$task->data = $oldtask->data;
+				$task->type = $oldtask->type;
+				$task->customerid = $oldtask->customerid;
 				$task->setData('phonenumber', $phone);
 				$task->setData('progress', 'Creating Call');
 				$task->setData('error', "0");
 				$task->status = "queued";
-				$task->update();
+				$task->create();
 				redirect('easycallrecord.php?taskid=' . $task->id);
 			} else {
 				
