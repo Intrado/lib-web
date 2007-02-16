@@ -104,7 +104,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 
 			//submit changes
 			$person = new Person($personid);
-			$person->userid = $fromNav ? $USER->id : GetFormData($f,$s,"manualsave") ? $USER->id : 0; //$USER->id;
+			$person->userid = $fromNav ? $USER->id : (GetFormData($f,$s,"manualsave") ? $USER->id : 0);
 			$person->customerid = $USER->customerid;
 			$person->deleted = 0;
 			$person->update();
@@ -144,10 +144,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				$x++;
 			}
 
-			if (!$fromNav && isset($_SESSION['listid'])) {
+			// if manual add to a list, and entry not found, then create one
+			// (otherwise they edit existing contact on the list)
+			if (!$fromNav && isset($_SESSION['listid']) &&
+				!DBFind("ListEntry", "from listentry where listid=".$_SESSION['listid']." and personid=".$person->id)) {
 				$le = new ListEntry();
 				$le->listid = $_SESSION['listid'];
 				$le->type = "A";
+				$le->sequence = 0;
 				$le->personid = $person->id;
 				$le->create();
 			}
@@ -163,6 +167,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				// save and done
 				if ($fromNav) {
 					redirect('addresses.php');
+				} else if ($ORIGINTYPE === "manualaddbook") {
+					redirect('addressesmanualadd.php');
 				} else {
 ?>
 <script>
@@ -226,7 +232,7 @@ include_once("popup.inc.php");
 NewForm($f);
 
 $cancelAction = "window.history.go(-window.history.length);";
-if (!$fromNav) { // return to lists page
+if (!$fromNav && ($ORIGINTYPE != "manualaddbook")) { // return to lists page
 	$cancelAction = "window.opener.document.location.reload(); window.close();";
 }
 buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'),
@@ -310,7 +316,7 @@ startWindow("Contact");
 		</td>
 	</tr>
 
-<? if (!$fromNav) {	?>
+<? if ($ORIGINTYPE === "manualadd") {	?>
 	<tr>
 		<td colspan="6"><div><? NewFormItem($f,$s,"manualsave","checkbox"); ?>Save to My Address Book <?= help('List_AddressBookAdd',NULL,"small"); ?></div></td>
 	</tr>

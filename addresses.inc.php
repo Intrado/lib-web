@@ -35,9 +35,11 @@ if (isset($_GET['delete'])) {
 
 // Check if the address book was clicked from the nav bar or the list page
 $fromNav = ($ORIGINTYPE === "nav");
+echo("origin: ".$ORIGINTYPE);
+echo("fromNav:".$fromNav);
 
 // set the pagename to jump to when editing selected contact
-$addressPagename = $fromNav ? "address.php" : "addressmanualadd.php";
+$addressPagename = $fromNav ? "address.php" : (($ORIGINTYPE === "manualadd") ? "addressmanualaddbook.php" : "addressmanualadd.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
