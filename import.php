@@ -20,6 +20,7 @@ require_once("obj/Address.obj.php");
 require_once("obj/Import.obj.php");
 require_once("obj/ImportField.obj.php");
 require_once("obj/ListEntry.obj.php");
+require_once("obj/ImportJob.obj.php");
 
 
 /*
@@ -594,6 +595,14 @@ if ($doupdatepdvalues) {
 					group by value");
 			wlog("there are $count $fieldmap->name pd values");
 		}
+	}
+}
+
+$associatedjobs = DBFindMany("ImportJob", "from importjob where importid = '$importid'");
+if($associatedjobs){
+	foreach($associatedjobs as $job) {
+		$jobid = $job->jobid;
+		exec("php jobprocess.php $jobid");
 	}
 }
 
