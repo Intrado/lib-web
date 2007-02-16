@@ -342,7 +342,7 @@ startWindow('User Information');
 								<td colspan="4"><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
 							</tr>
 							<?
-								if($IS_LDAP) {
+								if($IS_LDAP && $IS_COMMSUITE) {
 							?>
 								<tr>
 									<td> LDAP Enabled:</td>
