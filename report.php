@@ -233,6 +233,8 @@ function fmt_result ($row,$index) {
 			return "Success";
 		else if ($row[9] == "fail")
 			return "Failed";
+		else if ($row[9] == "duplicate")
+			return "Duplicate";
 		else
 			return "In Progress";
 	}
@@ -274,9 +276,9 @@ $ordersql = $_SESSION['reportordersql'];
 //if this user can see systemwide reports, then lock them to the customerid
 //otherwise lock them to jobs that they own
 if ($USER->authorize('viewsystemreports')) {
-	$userJoin = " and u.customerid = $USER->customerid and cl.customerid = $USER->customerid";
+	$userJoin = " and u.customerid = $USER->customerid ";
 } else {
-	$userJoin = " and j.userid = $USER->id and cl.customerid = $USER->customerid";
+	$userJoin = " and j.userid = $USER->id ";
 }
 
 
@@ -309,7 +311,7 @@ select
 	left join	person p on
 					(p.id=wi.personid)
 	left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
+					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1) and cl.customerid = $USER->customerid)
 	where  1
 	$userJoin
 	$reportsql
@@ -375,7 +377,7 @@ select SQL_CALC_FOUND_ROWS
 	left join	jobtask jt on
 					(jt.jobworkitemid=wi.id)
 	left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
+					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1) and cl.customerid = $USER->customerid)
 	left join	phone ph on
 					(ph.id=jt.phoneid and wi.type='phone')
 	left join	email e on
