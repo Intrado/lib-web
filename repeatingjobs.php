@@ -41,7 +41,7 @@ $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
 // jobworkitem columns are: id jobid type priority personid messageid status resultdata assignedto
-$query = "select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.status, j.deleted, jobowner.login, jobowner.id, name+0 as foo, j.type
+$query = "select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.status, j.deleted, jobowner.login, jobowner.id, name+0 as foo, j.type, j.finishdate
 			from job j
 			left join user jobowner
 				on j.userid = jobowner.id,
@@ -62,11 +62,13 @@ $titles = array(
 				"1" => 'Job Name',
 				"9" => "Type",
 				"2" => 'Next Scheduled Run',
+				"10" => "Last Run",
 				"3" => 'Actions');
 $formatters = array(
 				"9" => "fmt_csv_list",
 				"2" => 'fmt_next_repeat',
-				"3" => 'fmt_jobs_actions_customer');
+				"3" => 'fmt_jobs_actions_customer',
+				"10" => "fmt_date");
 
 $query = "select FOUND_ROWS()";
 $total = QuickQuery($query);
