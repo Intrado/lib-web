@@ -4,7 +4,6 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
-include_once("obj/Schedule.obj.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
@@ -15,6 +14,7 @@ require_once("obj/Import.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("obj/Job.obj.php");
 require_once("obj/ImportJob.obj.php");
+require_once("obj/ScheduleDay.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -45,7 +45,15 @@ if (isset($_GET['id'])) {
 $id = $_SESSION['importid'];
 $IMPORT = new Import($id);
 
-$repeatingjobs = DBFindMany("Job","from job where scheduleid is not null");
+$query= "select job.id, job.name from job, user
+				where user.customerid = '$USER->customerid'
+				and job.userid = user.id
+				and job.status = 'repeating'";
+$joblist = Query($query);
+$repeatingjobs = array();
+while($row = DBGetRow($joblist)){
+	$repeatingjobs[$row[1]] = $row[0];
+}
 $associatedjobs = DBFindMany("ImportJob","from importjob where importid = '$IMPORT->id'");
 $temparray = array();
 foreach($associatedjobs as $jobs){
@@ -74,7 +82,7 @@ if(CheckFormSubmit($form, $section))
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if (CheckFormSubmit($form, $section)) {
-			if (QuickQuery("select * from import where name = '" . DBSafe(GetFormData($form, $section, 'name')) .
+			if (QuickQuery("select count(*) from import where name = '" . DBSafe(GetFormData($form, $section, 'name')) .
 							"' and customerid = '$USER->customerid' and id != '$IMPORT->id'")) {
 				error("Please choose a unique import task name. This one is already in use.");
 			} else {
@@ -100,8 +108,9 @@ if(CheckFormSubmit($form, $section))
 						if($associated){
 							$notused = array_search($alreadyassociated->jobid, $associated);
 						}
-						if($notused === null || $notused === false)
+						if($notused === null || $notused === false) {
 							$alreadyassociated->destroy();
+						}
 					}
 				}
 				if($associated){
@@ -114,16 +123,25 @@ if(CheckFormSubmit($form, $section))
 							}
 						}
 						if($used != true){
-							$importjob = new ImportJob();
-							$importjob->jobid = $job;
-							$importjob->importid = $IMPORT->id;
-							$importjob->create();
+							if(customerOwns("job", $job)) {
+								$newjob = new Job($job);
+								$scheduledays = DBFindMany("ScheduleDay", "from scheduleday
+												 where scheduleid = '$newjob->scheduleid'");
+								foreach($scheduledays as $scheduleday)
+									$scheduleday->destroy();
+								
+								Query("Update schedule set nextrun = null where schedule.id = '$newjob->scheduleid'");
+								$importjob = new ImportJob();
+								$importjob->jobid = $job;
+								$importjob->importid = $IMPORT->id;
+								$importjob->create();
+							}
 						}
 					}
 				}
 
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
-				redirect("tasks.php");
+				//redirect("tasks.php");
 			}
 		}
 	}
@@ -211,8 +229,8 @@ startWindow('Import Information ');
 				<td style="vertical-align: top">
 					<?
 						$jobnames = array();
-						foreach($repeatingjobs as $job){
-							$jobnames[$job->name] = $job->id;
+						foreach($repeatingjobs as $key => $jobid){
+							$jobnames[$key] = $jobid;
 						}
 						NewFormItem($form, $section,"associatedjobs", "selectmultiple", null, $jobnames, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
 					?>
