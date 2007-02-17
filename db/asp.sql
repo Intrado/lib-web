@@ -1175,7 +1175,7 @@ ALTER TABLE `calllog` DROP INDEX `phonenumber` ;
 ALTER TABLE `calllog` ADD INDEX `callreport` ( `customerid` , `starttime` ) ;
 
 -- fix hibernate incompatability w/ utf8_bin
-ALTER TABLE `user` CHANGE `email` `email` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+ALTER TABLE `user` CHANGE `email` `email` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
 
 -- new table for trigger based jobs from imports
 
