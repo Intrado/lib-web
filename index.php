@@ -95,11 +95,11 @@ if (file_exists($logofilename) ) {
 <table align="center" cellpadding="8" cellspacing="0" style="border: 7px solid #9B9B9B;">
 	<tr>
 		<td bgcolor="#365F8D"><img id='brand' src='img/school_messenger.gif' /></td>
-		<td bgcolor="#365F8D"><div id='orgtitle'><?= htmlentities($custname) ?></div></td>
+		<td bgcolor="#365F8D" align="center"><div id='orgtitle'><?= htmlentities($custname) ?></div></td>
 	</tr>
 	<tr>
 		<td colspan="2">
-			<table border="0" cellpadding="10" cellspacing="0" id="login">
+			<table border="0" cellpadding="10" cellspacing="0" id="login" align="center">
 				<tr>
 					<td colspan="2">
 <? if ($badlogin) { ?>
