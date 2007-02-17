@@ -29,19 +29,19 @@ class User extends DBMappedObject {
 /* static functions */
 
 	function doLogin ($username, $password, $url = null) {
-
+		
 		GLOBAL $IS_LDAP;
 		GLOBAL $SETTINGS;
 		GLOBAL $IS_COMMSUITE;
 		$username = dbsafe(trim($username));
 		$password = dbsafe($password);
-
+		
 		$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
 		$LDAP_EXTENSION = $SETTINGS['ldap']['ldapextension'];
 		if($IS_COMMSUITE && $IS_LDAP){
 			$userldap = QuickQuery("select user.ldap from user, customer where user.login='$username'
 				and user.customerid = customer.id and customer.hostname = '" . dbsafe($url) . "'");
-
+			
 			if($userldap){
 				if(strpos('@',$username)!== false){
 					$ldapusername = $username.$LDAP_EXTENSION;
@@ -49,12 +49,14 @@ class User extends DBMappedObject {
 				if($ds=ldap_connect($LDAP_CONNECT)) {
 					if(@ldap_bind($ds,$ldapusername,$password) && $password) {
 						$query = "select id from user where user.login='$username'";
+						ldap_close($ds);
 						return QuickQuery($query);
 					} else {
+						ldap_close($ds);
 						return false;
 					}
-					ldap_close($ds);
 				}
+				return false;
 			}
 		}
 		if($password == ""){
@@ -73,15 +75,49 @@ class User extends DBMappedObject {
 	}
 
 	function doLoginPhone ($accesscode, $pin, $inboundnumber = null) {
+		$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+		$IS_LDAP = $SETTINGS['ldap']['is_ldap'];
+		
 		$accesscode = DBSafe($accesscode);
 		$pin = DBSafe($pin);
 
-		global $SETTINGS;
+		if($IS_LDAP){
+			$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
+			$ldapusername = $SETTINGS['ldap']['ldapusername'];
+			$ldappassword = $SETTINGS['ldap']['ldappassword'];
+			
+			$query = "select login, id, ldap from user where enabled=1 and deleted=0 and "
+					."accesscode='$accesscode' and pincode=password('$pin')";
+			$user = Query($query);
+			$user = DBGetRow($user);
+			if($user[2]){
+				if($ds=ldap_connect($LDAP_CONNECT)) {
+					if(@ldap_bind($ds,$ldapusername,$ldappassword)) {
+						$ad = "adtest";
+						$com = "net";
+						$cn = "users";
+						$sr=ldap_search($ds, "cn=$cn, dc=$ad, dc=$com", "sAMAccountName=".$user[0]);
+						$info = ldap_get_entries($ds, $sr);
+						if(!($info[0]["useraccountcontrol"][0] & 2)){
+							ldap_close($ds);
+							return $user[1];
+						} else {
+							ldap_close($ds);
+							return false;
+						}
+					}
+					ldap_close($ds);
+					return false;
+				}
+				return false;
+			}
+		}
+
+
 		if (isset($SETTINGS['feature']['disable_inbound_number_verification']) &&
 			$SETTINGS['feature']['disable_inbound_number_verification']) {
 			$inboundnumber = null;
 		}
-
 		if (isset($inboundnumber)) {
 			$inboundnumber = DBSafe($inboundnumber);
 			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.inboundnumber='$inboundnumber') "
