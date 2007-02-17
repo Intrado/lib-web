@@ -265,12 +265,12 @@ startWindow('User Information');
 					</td>
 				</tr>
 				<tr>
-					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Preferences:</th>
+					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Notification Defaults:</th>
 					<td>
 						<table border="0" cellpadding="1" cellspacing="0">
 
 							<tr>
-								<td colspan="2">Delivery Window:</td>
+								<td colspan="2">Default Delivery Window:</td>
 							<tr>
 								<td width="30%">&nbsp;&nbsp;Earliest <?= help('Account_PhoneEarliestTime', NULL, 'small') ?></td>
 								<td><? time_select($f,$s,"callearly", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
@@ -280,7 +280,7 @@ startWindow('User Information');
 								<td><? time_select($f,$s,"calllate", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
 							</tr>
 							<tr>
-								<td>Maximum call attempts <?= help('Account_PhoneMaxAttempts', NULL, 'small')  ?></td>
+								<td>Call attempts <?= help('Account_PhoneMaxAttempts', NULL, 'small')  ?></td>
 								<td>
 									<?
 									$max = first($ACCESS->getValue('callmax'), 1);
@@ -293,7 +293,7 @@ startWindow('User Information');
 							</tr>
 
 							<tr>
-								<td>Number of days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
+								<td>Days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
 								<td>
 								<?
 								NewFormItem($f, $s, 'maxjobdays', "selectstart");
