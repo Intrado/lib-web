@@ -17,7 +17,7 @@ db="dialerasp"
 
 
 [feature]
-is_commsuite=false
+is_commsuite=true
 ; commsuite users may need to disable the inbound number verification
 ; if true, only validates user/pass and not inbound phone number
 disable_inbound_number_verification=false
@@ -56,9 +56,11 @@ ftpuser=anonymous
 ftppass=anonymous
 
 [ldap]
-is_ldap=false
+is_ldap=true;
 ldapconnect="192.168.174.2"
 ldapextension="@adtest.net"
+ldapusername="testbed"
+ldappassword="testbed"
 
 
 ;*/?>
