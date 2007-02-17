@@ -894,7 +894,7 @@ CREATE TABLE `userrule` (
 -- Dumping data for table `userrule`
 --
 
-
+-- everything past this point should be complete upgrade SQL (nickolas, use this)
 
 
 
@@ -1163,7 +1163,7 @@ ALTER TABLE `calllog` ADD `customerid` INT NOT NULL AFTER `jobtaskid` ;
 
 -- update exiting records w/ customerid
 
-update calllog cl 
+update calllog cl
 join jobtask jt on (cl.jobtaskid = jt.id)
 join jobworkitem wi on (jt.jobworkitemid = wi.id)
 join job j on (wi.jobid = j.id)
@@ -1173,6 +1173,9 @@ set cl.customerid = u.customerid;
 
 ALTER TABLE `calllog` DROP INDEX `phonenumber` ;
 ALTER TABLE `calllog` ADD INDEX `callreport` ( `customerid` , `starttime` ) ;
+
+-- fix hibernate incompatability w/ utf8_bin
+ALTER TABLE `user` CHANGE `email` `email` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
 
 -- new table for trigger based jobs from imports
 
