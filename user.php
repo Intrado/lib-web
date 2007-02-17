@@ -238,7 +238,7 @@ if( $reloadform )
 			array("accesscode","number","nomin","nomax"),
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
-			array("email","text","nomin","nomax"),
+			array("email","text"),
 			);
 
 	PopulateForm($f,$s,$usr,$fields);
@@ -330,7 +330,7 @@ startWindow('User Information');
 							</tr>
 							<tr>
 								<td align="right">Email:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 20, 100); ?></td>
+								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 72, 10000); ?></td>
 							</tr>
 							<tr>
 								<td align="right">Phone:</td>
