@@ -28,3 +28,33 @@ CREATE TABLE `monitor` (
 ) TYPE=MyISAM;
 
 
+
+
+
+-- dmstatus
+
+CREATE TABLE `dmstatus` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`passcode` VARCHAR( 50 ) NOT NULL ,
+`name` VARCHAR( 255 ) NOT NULL ,
+`ip` VARCHAR( 15 ) NOT NULL ,
+`lastseen` DATETIME NOT NULL
+) ENGINE = MYISAM ;
+
+
+CREATE TABLE `dmresourcestatus` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`dmstatusid` INT NOT NULL ,
+`state` VARCHAR( 50 ) NOT NULL ,
+`status` VARCHAR( 50 ) NOT NULL ,
+`lastseen` DATETIME NOT NULL ,
+`resourceid` INT NOT NULL
+) ENGINE = MYISAM ;
+
+
+CREATE TABLE `dmauth` (
+`passcode` VARCHAR( 50 ) NOT NULL ,
+`customerid` INT NOT NULL ,
+`type` ENUM( 'disabled', 'nonemergency', 'all' ) NOT NULL ,
+PRIMARY KEY ( `passcode` )
+) ENGINE = MYISAM ;
