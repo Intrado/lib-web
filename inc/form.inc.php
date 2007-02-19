@@ -164,7 +164,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 
 		echo "<select $extrahtml size=\"" . $useoption . "\" multiple name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value][]\">";
-		foreach ($optionvalue as $name => $value) {
+		foreach ($optionvalue as $value => $name) {
 			echo "<option value=\"" . htmlentities($value) . "\" ";
 			if (in_array($value,$usevalue)) {
 				echo "selected";
