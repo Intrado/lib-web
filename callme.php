@@ -40,11 +40,22 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (!Phone::validate($phone)) {
-			if ($IS_COMMSUITE)
-				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-			else
-				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+		} else if (!Phone::validate($phone, true)) {
+			$min = getSystemSetting('easycallmin', $IS_COMMSUITE ? 2 : 10);
+			$max = getSystemSetting('easycallmax', 10);
+				if($min == $max) {
+					if($max == 10) {
+						error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+					} else {
+						error('The phone number must be '. $max .' digits or 10 digits long (including area code)','You do not need to include a 1 for long distance');
+					}
+				} else {
+					if($max == 10 || $max == 9) {
+						error('The phone number must be '. $min .'-10 digits long (including area code)','You do not need to include a 1 for long distance');
+					} else {
+						error('The phone number must be '. $min .'-'.$max .' digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+					}
+				}
 		} else if (QuickQuery("select * from audiofile where userid = '$USER->id' and deleted = 0 and name = '" .
 				   DBSafe(GetFormData($f, $s, 'name')) . "'")) {
 			error('This audio file name is already in use, so a unique one was generated');
@@ -60,6 +71,7 @@ if(CheckFormSubmit($f,$s))
 			$task->setData('name', $name);
 			$task->setData('origin', GetFormData($f,$s,"origin"));
 			$task->setData('userid', $USER->id);
+			$task->setData('callerid', getSystemSetting('callerid'));
 			$task->setData('progress', "Calling");
 			$task->setData('count', 1);
 			$task->lastcheckin = date("Y-m-d H:i:s");

@@ -59,15 +59,25 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (!Phone::validate($phone)) {
-			if ($IS_COMMSUITE)
-				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-			else
-				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+		} else if (!Phone::validate($phone, true)) {
+			$min = getSystemSetting('easycallmin', $IS_COMMSUITE ? 2 : 10);
+			$max = getSystemSetting('easycallmax', 10);
+			if($min == $max) {
+				if($max == 10) {
+					error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+				} else {
+					error('The phone number must be '. $max .' digits or 10 digits long (including area code)','You do not need to include a 1 for long distance');
+				}
+			} else {
+				if($max == 10 || $max == 9) {
+					error('The phone number must be '. $min .'-10 digits long (including area code)','You do not need to include a 1 for long distance');
+				} else {
+					error('The phone number must be '. $min .'-'.$max .' digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+				}
+			}
 		} else if (GetFormData($f,$s,"listid") <=0 ) {
-			error('Please choose a list');
-			
-		} else if(QuickQuery("select * from job where userid = '$USER->id' and deleted = 0 
+			error('Please choose a list');	
+		} else if(QuickQuery("select count(*) from job where userid = '$USER->id' and deleted = 0 
 					and name = '" . DBSafe(GetFormData($f, $s, 'name')) ."'
 					and status!='cancelling' and status !='complete' and status != 'cancelled'")) {
 			error('This job name is already in use, please make another');
