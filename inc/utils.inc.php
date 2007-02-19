@@ -67,9 +67,9 @@ function getCustomerSystemSetting($name, $customerid, $defaultvalue=false) {
 	return $settings[$name] = $value;
 }
 
-function getSystemSetting($name) {
+function getSystemSetting($name, $defaultvalue=false) {
 	global $USER;
-	return getCustomerSystemSetting($name, $USER->customerid);
+	return getCustomerSystemSetting($name, $USER->customerid, $defaultvalue);
 }
 
 function isvalidtimestamp ($time) {
