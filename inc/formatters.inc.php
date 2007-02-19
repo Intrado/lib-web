@@ -128,8 +128,14 @@ function fmt_checkbox($row,$index) {
 	}
 	$result .=  (($checked) ? "true":"false") . "," . $row[1] . ');" />';
 
-	// TODO fix this with pencil/glass to edit/view
-	$result .= "<a href=\"addresspreview.php?id=$row[1]\">  G</a>";
+	// TODO must I load the person in order to get the person->userid ?
+	$person = new Person($row[1]);
+	if ($person->userid == NULL) {
+		$result .= "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/magnify.gif\"></a>";
+	} else {
+		$result .= "<a href=\"addresspreview.php?id=$row[1]\">  <img src=\"img/pencil.png\"></a>";
+	}
+
 	return $result . '</div>';
 }
 
