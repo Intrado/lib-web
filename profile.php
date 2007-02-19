@@ -19,6 +19,7 @@ if (!$USER->authorize('manageprofile')) {
 	redirect('unauthorized.php');
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +97,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("manageprofile", (bool)GetFormData($form, $section, 'manageprofile'));
 			$accss->setPermission("managesystem", (bool)GetFormData($form, $section, 'managesystem'));
 			$accss->setPermission("viewcontacts", (bool)GetFormData($form, $section, 'viewcontacts'));
-			if ($IS_COMMSUITE) {
+			if ($SETTINGS['feature']['has_print']) {
 				$accss->setPermission("sendprint", (bool)GetFormData($form, $section, 'sendprint'));
 			}
 			$accss->setPermission("metadata", (bool)GetFormData($form, $section, 'metadata'));
@@ -282,7 +283,7 @@ startWindow('Allowed Functions');
 					<td><? NewFormItem($form,$section,"sendemail","checkbox"); ?></td>
 					<td>Send emails</td>
 				</tr>
-<? if ($IS_COMMSUITE) { ?>
+<? if ($SETTINGS['feature']['has_print']) { ?>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendprint","checkbox"); ?></td>
 					<td>Send printed letters</td>
@@ -323,7 +324,8 @@ startWindow('Allowed Functions');
 					<td>Restrict user access to only those fields that are selected:</td>
 					<td>
 						<?
-						NewFormItem($form,$section,"datafields","selectmultiple",count($FIELDMAP),array_flip($FIELDMAP), 'id="datafieldselect" onmousedown="setChecked(\'datafield\');"');
+						// removed array_flip on $FIELDMAP; jjl
+						NewFormItem($form,$section,"datafields","selectmultiple",count($FIELDMAP),$FIELDMAP, 'id="datafieldselect" onmousedown="setChecked(\'datafield\');"');
 						?>
 					</td>
 				</tr>
