@@ -115,12 +115,13 @@ function button_bar() {
 	print '<div class="buttonbar" style="margin-bottom: 5px;"><table border="0" cellspacing="0" cellpadding="0" class="noprint"><tr><td class="buttonbaritem">' .  implode('</td><td class="buttonbaritem">', $buttons) . '</td><tr></table></div>';
 }
 
-function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL, $customtime = NULL) {
+function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL) {
 	if(!$inc) $inc = 15;
 	if(!$start) $start = '12:00 am';
 	if(!$stop) $stop = '11:45 pm';
 	$current = strtotime($start);
 	$end = strtotime($stop);
+	$customtime = GetFormData($form, $section, $field);
 	$customtime = strtotime($customtime);
 	NewFormItem($form, $section, $field, 'selectstart', NULL, NULL, "id=\"$field\"" . " $extraHtml ");
 	if($none)
