@@ -70,7 +70,7 @@ include_once("nav.inc.php");
 NewForm($f);
 
 if ($renderedlist->total > 0 && count($questions) > 0)
-	buttons(button('submitsurvey',null, 'jobsubmit.php?jobid=' . $jobid),button('back',null, 'survey.php'));
+	buttons(button('back',null, 'survey.php'), button('submitsurvey',null, 'jobsubmit.php?jobid=' . $jobid));
 else
 	buttons(button('cancel',null, 'survey.php'));
 
