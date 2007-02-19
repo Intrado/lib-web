@@ -28,10 +28,13 @@ class Phone extends DBMappedObject {
 
 	function validate ($phone, $iseasycall = false) {
 		global $IS_COMMSUITE;
-
+		
 		$phone = Phone::parse($phone);
-		if ($iseasycall && $IS_COMMSUITE) {
-			return (strlen($phone) >= 2 && strlen($phone) <= 6) || strlen($phone) == 10;
+		if ($iseasycall) {
+			$minimumdigits = getSystemSetting('easycallmin', $IS_COMMSUITE ? 2 : 10);
+			$maximumdigits = getSystemSetting('easycallmax', 10);
+			$length = strlen($phone);
+			return ($length >= $minimumdigits && $length <= $maximumdigits) || $length == 10;
 		} else {
 			return strlen($phone) == 10;
 		}
