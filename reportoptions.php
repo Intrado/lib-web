@@ -19,6 +19,7 @@ require_once("inc/formatters.inc.php");
 if (!$USER->authorize('createreport')) {
 	redirect('unauthorized.php');
 }
+$has_print = $SETTINGS['feature']['has_print'];
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -182,7 +183,7 @@ foreach ($jobs as $job) {
 			<option value="phone">Phone</option>
 			<option value="email">Email</option>
 <?
-			if($IS_COMMSUITE && $USER->authorize('sendprint')){
+			if($SETTINGS['feature']['has_print'] && $USER->authorize('sendprint')){
 				?><option value="print">Print</option><?
 			}
 ?>
