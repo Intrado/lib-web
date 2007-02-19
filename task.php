@@ -45,21 +45,18 @@ if (isset($_GET['id'])) {
 $id = $_SESSION['importid'];
 $IMPORT = new Import($id);
 
-$query= "select job.id, job.name from job, user
+$query= "select job.id, concat(job.name, ' (', user.login, ')' ) from job, user
 				where user.customerid = '$USER->customerid'
 				and job.userid = user.id
 				and job.status = 'repeating'";
-$joblist = Query($query);
-$repeatingjobs = array();
-while($row = DBGetRow($joblist)){
-	$repeatingjobs[$row[1]] = $row[0];
-}
+$repeatingjobs = QuickQueryList($query, true);
+
 $associatedjobs = DBFindMany("ImportJob","from importjob where importid = '$IMPORT->id'");
-$temparray = array();
-foreach($associatedjobs as $jobs){
-	$temparray[] = $jobs->jobid;
+$associatedjobids = array();
+foreach($associatedjobs as $importjob){
+	//import job id used on both sides because of form.inc.php's multiselect uses in_array()
+	$associatedjobids[$importjob->jobid] = $importjob->jobid;
 }
-$associatedjobids = $temparray;
 
 	
 /****************** main message section ******************/
@@ -102,46 +99,31 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->update();
 				
 				$associated = GetFormData($form, $section, 'associatedjobs');
-				if($associatedjobs){
-					foreach($associatedjobs as $alreadyassociated){
-						$notused = null;
-						if($associated){
-							$notused = array_search($alreadyassociated->jobid, $associated);
-						}
-						if($notused === null || $notused === false) {
-							$alreadyassociated->destroy();
-						}
-					}
-				}
-				if($associated){
-					foreach($associated as $job) {
-						$used=false;
-						if($associatedjobs){
-							foreach($associatedjobs as $alreadyassociated){
-								if($job == $alreadyassociated->jobid)
-									$used = true;
-							}
-						}
-						if($used != true){
-							if(customerOwns("job", $job)) {
-								$newjob = new Job($job);
-								$scheduledays = DBFindMany("ScheduleDay", "from scheduleday
-												 where scheduleid = '$newjob->scheduleid'");
-								foreach($scheduledays as $scheduleday)
-									$scheduleday->destroy();
-								
-								Query("Update schedule set nextrun = null where schedule.id = '$newjob->scheduleid'");
-								$importjob = new ImportJob();
-								$importjob->jobid = $job;
-								$importjob->importid = $IMPORT->id;
-								$importjob->create();
-							}
-						}
-					}
+				$query = "Delete from importjob where importid = '$IMPORT->id' 
+							and jobid not in (". implode(',', $associated) . " )";
+				QuickUpdate($query);
+				
+				$existingids = QuickQueryList("Select jobid from importjobs where importid = '$IMPORT->id' 
+												and jobid in (". implode(',', $associated) . " )" );
+				$newjobids = array_diff($associated, $existingids);
+				
+				foreach($newjobids as $jobid) {
+					$newjob = new Job($jobid);
+
+					QuickUpdate("delete from scheduleday where scheduleid= $newjob->scheduleid");
+					
+					$schedule = new Schedule($newjob->scheduleid);
+					$schedule->nextrun = null;
+					$schedule->update();
+					
+					$importjob = new ImportJob();
+					$importjob->jobid = $jobid;
+					$importjob->importid = $IMPORT->id;
+					$importjob->create();
 				}
 
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
-				//redirect("tasks.php");
+				redirect("tasks.php");
 			}
 		}
 	}
@@ -157,9 +139,9 @@ if( $reloadform )
 	PutFormData($form, $section, 'updatemethod', ($IMPORT->updatemethod != null ? $IMPORT->updatemethod : 'updateonly'), 'text');
 
 	PutFormData($form, $section, 'automaticimport', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
-	PutFormData($form, $section, 'associatedjobs', $associatedjobids);
+	PutFormData($form, $section, 'associatedjobs', $associatedjobids, "array", array_keys($repeatingjobs));
 	$checked = false;
-	if($associatedjobids)
+	if(count($associatedjobids))
 		$checked = true;
 	PutFormData($form, $section, 'trigger_checkbox', (bool)$checked,"bool",0,1);
 }
@@ -228,11 +210,7 @@ startWindow('Import Information ');
 				</td>
 				<td style="vertical-align: top">
 					<?
-						$jobnames = array();
-						foreach($repeatingjobs as $key => $jobid){
-							$jobnames[$key] = $jobid;
-						}
-						NewFormItem($form, $section,"associatedjobs", "selectmultiple", null, $jobnames, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
+						NewFormItem($form, $section,"associatedjobs", "selectmultiple", null, $repeatingjobs, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
 					?>
 				</td>
 			</tr>
