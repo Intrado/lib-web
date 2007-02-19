@@ -106,6 +106,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if(GetFormData($f, $s, "easycallmin") > GetFormData($f, $s, "easycallmax")){
+			error('The minimum extensions length has to be less than than the maximum');
 		} else {
 			//check the parsing
 
@@ -153,7 +155,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
-
+				
+				if($IS_COMMSUITE){
+					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
+					setSetting('easycallmax', GetFormData($f, $s, 'easycallmax'));
+				}
 				redirect();
 
 				$reloadform = 1;
@@ -190,8 +196,10 @@ if( $reloadform )
 	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), "number", 0, 10);
 	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), "number", 0, 10);
 	PutFormData($f,$s,"checkpassword",(bool)getSetting('checkpassword'), "bool", 0, 1);
-
-
+	if($IS_COMMSUITE){
+		PutFormData($f, $s, "easycallmin", getSetting('easycallmin'), "number", 0, 10);
+		PutFormData($f, $s, "easycallmax", getSetting('easycallmax'), "number", 0, 10);
+	}
 	//do some custom stuff for the options
 }
 
@@ -367,6 +375,28 @@ startWindow('Global System Settings');
 					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
 					</td>
 				</tr>
+<? 
+				if($IS_COMMSUITE){ 
+?>
+					<tr>
+						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+							Minimum Extensions Length:
+						</th>
+						<td>
+						<? NewFormItem($f, $s, 'easycallmin', 'text', 3,3);  ?>
+						</td>
+					</tr>
+					<tr>
+						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
+							Maximum Extensions Length:
+						</th>
+						<td>
+						<? NewFormItem($f, $s, 'easycallmax', 'text', 3,3);  ?>
+						</td>
+					</tr>
+<?
+				}
+?>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
 						Minimum Username Length:
@@ -391,6 +421,8 @@ startWindow('Global System Settings');
 					<? NewFormItem($f,$s,'checkpassword','checkbox') ?>
 					</td>
 				</tr>
+				
+				
 
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
