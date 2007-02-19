@@ -82,6 +82,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$callerid = Phone::parse(GetFormData($f,$s, "callerid"));
 		$usr = new User($_SESSION['userid']);
+		$emaillist = GetFormData($f, $s, "email");
+		$emaillist = preg_replace('[,]' , ';', $emaillist);
 
 		$login = trim(GetFormData($f, $s, 'login'));
 
@@ -137,7 +139,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('User ID and Pin code cannot have all the same digits');
 		} elseif(isSequential(GetFormData($f, $s, 'pincode')) && !$IS_COMMSUITE) {
 			error('Cannot have sequential numbers for Pin code');
-		} elseif($bademaillist = checkemails(GetFormData($f,$s,"email"))) {
+		} elseif($bademaillist = checkemails($emaillist)) {
 			error("Some emails are invalid", $bademaillist);
 		} else {
 			// Submit changes
@@ -146,7 +148,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 				$usr->enabled = 1;
 			}
 
-			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname","email"));
+			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname"));
+			$usr->email = $emaillist;
 			$usr->login = $login;
 			$usr->customerid = $USER->customerid;
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
@@ -398,7 +401,8 @@ startWindow('User Information');
 								<td align="right" valign="top" style="padding-top: 4px;">Job Types:</td>
 								<td>
 								<?
-									$options = QuickQueryList("select name, id from jobtype where customerid=$USER->customerid and deleted=0 order by priority asc", true);
+									// changed query from name, id to id, name; jjl
+									$options = QuickQueryList("select id, name from jobtype where customerid=$USER->customerid and deleted=0 order by priority asc", true);
 									if(!count($options))
 										$options['No Job Types Defined'] = 0;
 									NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,'id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');
