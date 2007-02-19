@@ -18,7 +18,18 @@ function jobOptions()
 	global $SESSIONDATA;
 	$maxdays = QuickQuery("SELECT permission.value FROM permission, user WHERE permission.accessid = user.accessid and permission.name='maxjobdays' and user.id=".$SESSIONDATA['userid']);
 	glog("maxdays".$maxdays);
-
+/*
+	// check if current time is past the latest call time - must select at least 2 days then (to process tomorrow)
+	loadUser();
+	global $USER, $ACCESS;
+	$isValid = true; // numdays=1 is valid most of the time
+	if ($ACCESS->getValue("calllate")) {
+		loadTimezone();
+		$now = QuickQuery("select now()");
+		$nowtime = substr($now, 11);
+		$isValid = ((strtotime($nowtime) - strtotime($ACCESS->getValue("calllate"))) < 0);
+	}
+*/
 	global $SESSIONID;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
@@ -85,10 +96,28 @@ function jobOptions()
 function jobConfirm($listname, $priority, $numdays=1)
 {
 	global $SESSIONID, $SESSIONDATA;
+
+	// if job is one day, and stop time is in the past... warn them about a job that is ineffective
+	$isValid = true;
+	if ($numdays == 1) {
+		loadUser();
+		global $USER, $ACCESS;
+		loadTimezone();
+		$now = QuickQuery("select now()");
+		$nowtime = substr($now, 11);
+		$isValid = ((strtotime($nowtime) - strtotime($SESSIONDATA['stoptime'])) < 0);
+	}
+
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
-	<message name="jobconfirm">
 
+<?	if (!$isValid) { ?>
+		<message name="jobexpired">
+		<tts gender="female"> Warning, the call window for this job has expired </tts>
+		</message>
+<?	} ?>
+
+	<message name="jobconfirm">
 		<field name="sendjob" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
 				<audio cmid="file://prompts/inbound/Confirmation1.wav" />
@@ -180,7 +209,7 @@ function confirmCallWindow()
 <?
 }
 
-function promptStartTime($playinvalid=false, $playmismatch=false)
+function promptStartTime($playinvalid=false, $invalidreason="none")
 {
 	global $SESSIONID;
 
@@ -202,7 +231,6 @@ function promptStartTime($playinvalid=false, $playmismatch=false)
 	if (!$late) {
 		$late = "11:59pm";
 	}
-
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="promptstarttime">
@@ -213,8 +241,12 @@ function promptStartTime($playinvalid=false, $playmismatch=false)
 		<tts gender="female">I am sorry but you entered an invalid time </tts>
 <?	} ?>
 
-<?	if ($playmismatch) { ?>
+<?	if (!strcmp($invalidreason, "mismatch")) { ?>
 		<tts gender="female">The stop time must be after the start time </tts>
+<?	} ?>
+
+<?	if (!strcmp($invalidreason, "past")) { ?>
+		<tts gender="female">The stop time must be after the current time </tts>
 <?	} ?>
 
 <?	if ($playrestriction) { ?>
@@ -463,7 +495,7 @@ function commitJob()
 			}
 			glog("stoptime: ".$stoptime);
 
-			$isMismatch = false;
+			$invalidreason = "none";
 			$isValid = strtotime($stoptime);
 
 			if ($isValid) {
@@ -476,7 +508,22 @@ function commitJob()
 				if ($isValid) {
 					// check that start is earlier than stop
 					$isValid = ((strtotime($SESSIONDATA['starttime']) - strtotime($stoptime)) < 0);
-					$isMismatch = !$isValid;
+					if (!$isValid) $invalidreason = "mismatch";
+					/*
+					 // TODO Ben suggests not check numdays here, but rather check along with default callwindow at the end.. discussion pending...
+					if ($isValid && ($SESSIONDATA['numdays'] == "1")) {
+						// check that current time is earlier than stop time, if numdays=1
+						loadUser();
+						global $USER, $ACCESS;
+
+						loadTimezone();
+						$now = QuickQuery("select now()");
+						$nowtime = substr($now, 11);
+
+						$isValid = ((strtotime($nowtime) - strtotime($stoptime)) < 0);
+						if (!$isValid) $invalidreason = "past";
+					}
+					*/
 				}
 			}
 
@@ -487,7 +534,7 @@ function commitJob()
 				$numdays = $SESSIONDATA['numdays'];
 				jobConfirm($listname, $priority, $numdays);
 			} else {
-				promptStartTime(true, $isMismatch);
+				promptStartTime(true, $invalidreason);
 			}
 
 	// if they listened to confirmation
