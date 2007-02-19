@@ -10,13 +10,14 @@ include_once("../obj/AudioFile.obj.php");
 
 $specialtask = new specialtask($SESSIONDATA['specialtaskid']);
 $phone = $specialtask->getData('phonenumber');
+$callerid = $specialtask->getData('callerid');
 
 if($REQUEST_TYPE == "new") {
 	$specialtask->setData("progress", "Calling");
 	$specialtask->update();
 	?>
 	<voice sessionid="<?= $SESSIONID ?>">
-		<dial amdhint="disable"><?=$phone?></dial>
+		<dial callerid="<?=$callerid?>" amdhint="disable"><?=$phone?></dial>
 
 		<message name="intro">
 			<field name="dummy" type="menu" timeout="10000">
