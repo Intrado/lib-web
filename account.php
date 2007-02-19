@@ -56,6 +56,8 @@ if(CheckFormSubmit($f,$s))
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 
 		$login = trim(GetFormData($f, $s, 'login'));
+		$emaillist = GetFormData($f, $s, "email");
+		$emaillist = preg_replace('[,]' , ';', $emaillist);
 
 		//do check
 		if( CheckFormSection($f, $s) ) {
@@ -98,13 +100,14 @@ if(CheckFormSubmit($f,$s))
 			error('User ID and Pin code cannot have all the same digits');
 		} elseif( isSequential(GetFormData($f, $s, 'pincode'))) {
 			error('Cannot have sequential numbers for User ID or Pin code');
-		} elseif($bademaillist = checkemails(GetFormData($f,$s,"email"))) {
+		} elseif($bademaillist = checkemails($emaillist)) {
 			error("Some emails are invalid", $bademaillist);
 		} else {
 			//submit changes
-			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname","email"));
+			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
 			$USER->login = $login;
 			$USER->phone = Phone::parse(GetFormData($f,$s,"phone"));
+			$USER->email = $emaillist;
 			$USER->update();
 
 			// If the password is all 0 characters then it was a default form value, so ignore it
