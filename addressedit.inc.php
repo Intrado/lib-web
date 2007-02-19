@@ -1,5 +1,5 @@
 <?
-// main panel to view/edit an address (aka contact, aka person)
+// main panel to view/edit an address (aka person)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
@@ -71,7 +71,7 @@ if (isset($personid) &&
 	$address = DBFind("Address", "from address where personid = " . $personid);
 
 	// get existing phones from db, then create any additional based on the max allowed
-	// TODO what if the max is less than the number they already have?
+	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
 	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
 	for ($i=count($phones); $i<$maxphones; $i++) {
 		$phones[$i] = new Phone();
@@ -166,7 +166,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			}
 
 			// unset this for next popup edit
-			unset($_SESSION['personid']);
+			setCurrentPerson("new");
 
 			if (CheckFormSubmit($f,'saveanother')) {
 				// save and add another
