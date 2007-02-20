@@ -111,7 +111,7 @@ if( $reloadform )
 	foreach ($phones as $phone) {
 		$itemname = "phone".($x+1);
 		$phone->$itemname = Phone::format($phone->phone);
-		PopulateForm($f,$s,$phone,array(array($itemname,"phone",1,20)));
+		PopulateForm($f,$s,$phone,array(array($itemname,"phone",10,10)));
 		$x++;
 	}
 

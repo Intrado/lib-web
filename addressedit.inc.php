@@ -155,8 +155,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 
 			// if manual add to a list, and entry not found, then create one
 			// (otherwise they edit existing contact on the list)
+
 			if (!$fromNav && isset($_SESSION['listid']) &&
 				!DBFind("ListEntry", "from listentry where listid=".$_SESSION['listid']." and personid=".$person->id)) {
+
 				$le = new ListEntry();
 				$le->listid = $_SESSION['listid'];
 				$le->type = "A";
@@ -178,7 +180,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 					case "nav":
 						redirect('addresses.php');
 						break;
-					case "manuaddbook":
+					case "manualaddbook":
 						redirect('addressesmanualadd.php');
 						break;
 					case "manualadd":
@@ -221,7 +223,7 @@ if( $reloadform )
 	foreach ($phones as $phone) {
 		$itemname = "phone".($x+1);
 		$phone->$itemname = Phone::format($phone->phone);
-		PopulateForm($f,$s,$phone,array(array($itemname,"phone",1,20)));
+		PopulateForm($f,$s,$phone,array(array($itemname,"phone",10,10)));
 		$x++;
 	}
 
