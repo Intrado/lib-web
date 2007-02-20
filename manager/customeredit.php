@@ -90,7 +90,7 @@ if(CheckFormSubmit($f,$s)) {
 				setCustomerSystemSetting('defaultareacode', $areacode, $currentid);
 				setCustomerSystemSetting('autoreport_replyname', $autoname, $currentid);
 				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $currentid);
-				setCustomerSystemSetting('surveyurl', $surveyurl);
+				setCustomerSystemSetting('surveyurl', $surveyurl, $currentid);
 
 				if($renewaldate != "" || $renewaldate != NULL){
 					if($renewaldate = strtotime($renewaldate)) {
