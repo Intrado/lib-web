@@ -18,18 +18,7 @@ function jobOptions()
 	global $SESSIONDATA;
 	$maxdays = QuickQuery("SELECT permission.value FROM permission, user WHERE permission.accessid = user.accessid and permission.name='maxjobdays' and user.id=".$SESSIONDATA['userid']);
 	glog("maxdays".$maxdays);
-/*
-	// check if current time is past the latest call time - must select at least 2 days then (to process tomorrow)
-	loadUser();
-	global $USER, $ACCESS;
-	$isValid = true; // numdays=1 is valid most of the time
-	if ($ACCESS->getValue("calllate")) {
-		loadTimezone();
-		$now = QuickQuery("select now()");
-		$nowtime = substr($now, 11);
-		$isValid = ((strtotime($nowtime) - strtotime($ACCESS->getValue("calllate"))) < 0);
-	}
-*/
+
 	global $SESSIONID;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
@@ -98,6 +87,7 @@ function jobConfirm($listname, $priority, $numdays=1)
 	global $SESSIONID, $SESSIONDATA;
 
 	// if job is one day, and stop time is in the past... warn them about a job that is ineffective
+	// NOTE this case should not exist, should be handled by checkExpirationThenConfirm() method
 	$isValid = true;
 	if ($numdays == 1) {
 		loadUser();
@@ -289,6 +279,7 @@ function promptStartTime($playinvalid=false, $invalidreason="none")
 </voice>
 <?
 }
+
 function promptStopTime()
 {
 	global $SESSIONID;
@@ -327,6 +318,7 @@ function promptStopTime()
 </voice>
 <?
 }
+
 function commitJob()
 {
 	global $SESSIONDATA;
@@ -403,6 +395,33 @@ function commitJob()
 	return false;
 }
 
+function checkExpirationThenConfirm()
+{
+	global $SESSIONDATA;
+
+	$invalidreason = "none";
+	$isValid = true;
+	if ($SESSIONDATA['numdays'] == "1") {
+		// check that current time is earlier than stop time, if numdays=1
+		loadUser();
+		global $USER, $ACCESS;
+
+		loadTimezone();
+		$now = QuickQuery("select now()");
+		$nowtime = substr($now, 11);
+
+		$isValid = ((strtotime($nowtime) - strtotime($SESSIONDATA['stoptime'])) < 0);
+		if (!$isValid) $invalidreason = "past";
+	}
+	if ($isValid) {
+		$listname = $SESSIONDATA['listname'];
+		$priority = $SESSIONDATA['priority'];
+		$numdays = $SESSIONDATA['numdays'];
+		jobConfirm($listname, $priority, $numdays);
+	} else {
+		promptStartTime(true, $invalidreason);
+	}
+}
 
 //////////////////////////////
 
@@ -428,10 +447,7 @@ function commitJob()
 			if (isset($SESSIONDATA['starttime']) &&
 				isset($SESSIONDATA['stoptime'])) {
 
-				$listname = $SESSIONDATA['listname'];
-				$priority = $SESSIONDATA['priority'];
-				$numdays = $SESSIONDATA['numdays'];
-				jobConfirm($listname, $priority, $numdays);
+				checkExpirationThenConfirm();
 
 			// otherwise confirm call window and proceed
 			} else {
@@ -442,10 +458,7 @@ function commitJob()
 	} else if (isset($BFXML_VARS['usecallwin'])) {
 
 			if ($BFXML_VARS['usecallwin'] == "1") {
-				$listname = $SESSIONDATA['listname'];
-				$priority = $SESSIONDATA['priority'];
-				$numdays = $SESSIONDATA['numdays'];
-				jobConfirm($listname, $priority, $numdays);
+				checkExpirationThenConfirm();
 			} else {
 				promptStartTime();
 			}
@@ -509,30 +522,12 @@ function commitJob()
 					// check that start is earlier than stop
 					$isValid = ((strtotime($SESSIONDATA['starttime']) - strtotime($stoptime)) < 0);
 					if (!$isValid) $invalidreason = "mismatch";
-					/*
-					 // TODO Ben suggests not check numdays here, but rather check along with default callwindow at the end.. discussion pending...
-					if ($isValid && ($SESSIONDATA['numdays'] == "1")) {
-						// check that current time is earlier than stop time, if numdays=1
-						loadUser();
-						global $USER, $ACCESS;
-
-						loadTimezone();
-						$now = QuickQuery("select now()");
-						$nowtime = substr($now, 11);
-
-						$isValid = ((strtotime($nowtime) - strtotime($stoptime)) < 0);
-						if (!$isValid) $invalidreason = "past";
-					}
-					*/
 				}
 			}
 
 			if ($isValid) {
 				$SESSIONDATA['stoptime'] = $stoptime;
-				$listname = $SESSIONDATA['listname'];
-				$priority = $SESSIONDATA['priority'];
-				$numdays = $SESSIONDATA['numdays'];
-				jobConfirm($listname, $priority, $numdays);
+				checkExpirationThenConfirm();
 			} else {
 				promptStartTime(true, $invalidreason);
 			}
@@ -570,10 +565,7 @@ function commitJob()
 				isset($SESSIONDATA['starttime']) &&
 				isset($SESSIONDATA['stoptime'])) {
 
-				$listname = $SESSIONDATA['listname'];
-				$priority = $SESSIONDATA['priority'];
-				$numdays = $SESSIONDATA['numdays'];
-				jobConfirm($listname, $priority, $numdays);
+				checkExpirationThenConfirm();
 
 	// play the job options
 	} else {
