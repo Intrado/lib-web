@@ -23,6 +23,7 @@ function promptRecordMessage()
 			<else>
 				<field name="dummy" type="menu" timeout="10000">
 					<prompt repeat="1">
+						<audio cmid="file://prompts/inbound/Welcome.wav" />
 						<audio cmid="file://prompts/inbound/BeginRecording.wav" />
 					</prompt>
 					<timeout>

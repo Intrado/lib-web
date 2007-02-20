@@ -22,10 +22,6 @@ function login($playerror)
 				<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
 <?			} ?>
 
-<?
-			if ($SESSIONDATA['authcount'] == 0) { ?>
-				<audio cmid="file://prompts/inbound/Welcome.wav" />
-<? 			} ?>
 				<audio cmid="file://prompts/inbound/EnterUserID.wav" />
 			</prompt>
 			<timeout>
@@ -71,6 +67,18 @@ function authFailure()
 <?
 }
 
+function welcome()
+{
+	global $SESSIONID;
+?>
+
+<voice sessionid="<?= $SESSIONID ?>">
+	<message name="welcome">
+		<audio cmid="file://prompts/inbound/Welcome.wav" />
+	</message>
+</voice>
+<?
+}
 
 ///////////////////////////////////
 
