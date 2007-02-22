@@ -297,7 +297,7 @@ if ($list->id) {
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("enter_contacts",NULL,"addressmanualadd.php")?></td>
+		<td style="padding: 5px;"><?= button("enter_contacts",NULL,"addressmanualadd.php&id=new")?></td>
 	</tr>
 
 	<tr>
