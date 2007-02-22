@@ -99,27 +99,33 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->update();
 				
 				$associated = GetFormData($form, $section, 'associatedjobs');
-				$query = "Delete from importjob where importid = '$IMPORT->id' 
-							and jobid not in (". implode(',', $associated) . " )";
-				QuickUpdate($query);
 				
-				$existingids = QuickQueryList("Select jobid from importjobs where importid = '$IMPORT->id' 
-												and jobid in (". implode(',', $associated) . " )" );
-				$newjobids = array_diff($associated, $existingids);
+				if(!$associated) {
+					$query = "Delete from importjob where importid = '$IMPORT->id'";
+					QuickUpdate($query);
+				} else {
+					$query = "Delete from importjob where importid = '$IMPORT->id' 
+								and jobid not in (". implode(',', $associated) . " )";
+					QuickUpdate($query);
+					
+					$existingids = QuickQueryList("Select jobid from importjob where importid = '$IMPORT->id' 
+														and jobid in (". implode(',', $associated) . " )" );
+					$newjobids = array_diff($associated, $existingids);
 				
-				foreach($newjobids as $jobid) {
-					$newjob = new Job($jobid);
-
-					QuickUpdate("delete from scheduleday where scheduleid= $newjob->scheduleid");
-					
-					$schedule = new Schedule($newjob->scheduleid);
-					$schedule->nextrun = null;
-					$schedule->update();
-					
-					$importjob = new ImportJob();
-					$importjob->jobid = $jobid;
-					$importjob->importid = $IMPORT->id;
-					$importjob->create();
+					foreach($newjobids as $jobid) {
+						$newjob = new Job($jobid);
+	
+						QuickUpdate("delete from scheduleday where scheduleid= $newjob->scheduleid");
+						
+						$schedule = new Schedule($newjob->scheduleid);
+						$schedule->nextrun = null;
+						$schedule->update();
+						
+						$importjob = new ImportJob();
+						$importjob->jobid = $jobid;
+						$importjob->importid = $IMPORT->id;
+						$importjob->create();
+					}
 				}
 
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
