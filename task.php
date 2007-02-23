@@ -100,7 +100,7 @@ if(CheckFormSubmit($form, $section))
 				
 				$associated = GetFormData($form, $section, 'associatedjobs');
 				
-				if(!$associated) {
+				if(count($associated)==0) {
 					$query = "Delete from importjob where importid = '$IMPORT->id'";
 					QuickUpdate($query);
 				} else {
