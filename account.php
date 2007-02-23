@@ -54,7 +54,7 @@ if(CheckFormSubmit($f,$s))
 		MergeSectionFormData($f, $s);
 
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
-
+		$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
 		$login = trim(GetFormData($f, $s, 'login'));
 		$emaillist = GetFormData($f, $s, "email");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
@@ -73,6 +73,8 @@ if(CheckFormSubmit($f,$s))
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
+		} elseif ( $callerid!=null && !Phone::validate($callerid)){
+			error('The caller id must be exactly 10 digits long');
 		} elseif (strlen($login) < $usernamelength) {
 			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
@@ -132,7 +134,6 @@ if(CheckFormSubmit($f,$s))
 			$USER->setSetting("callall",GetFormData($f, $s, 'callall'));
 
 			//dont save any callerid stuff if they don't have access to change it
-			$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
 			if (strlen($callerid) == 0 )
 				$callerid = false;
 			if ($USER->authorize('setcallerid'))
