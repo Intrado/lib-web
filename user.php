@@ -110,7 +110,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
 		} elseif ( $callerid!=null && !Phone::validate($callerid)){
 			error('The caller id must be exactly 10 digits long');
-		} elseif (strlen($login) < $usernamelength && GetFormData($f, $s, "ldap")) {
+		} elseif (strlen($login) < $usernamelength && !GetFormData($f, $s, "ldap")) {
 			error('Username must be at least ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
 			error('Password must be at least ' . $passwordlength . ' characters long');
