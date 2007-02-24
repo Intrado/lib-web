@@ -87,7 +87,7 @@ if($REQUEST_TYPE == "new") {
 				<message name="ready">
 					<field name="ready" type="menu" timeout="20000" sticky="true">
 						<prompt repeat="1">
-							<tts gender="female" language="english">When you're ready to record your next message, press 1 and follow the prompts.</tts>
+							<audio cmid="file://prompts/RecordNextMessage.wav" />
 						</prompt>
 						<choice digits="1">
 							<goto message="record" />
@@ -99,11 +99,6 @@ if($REQUEST_TYPE == "new") {
 			<message name="record">
 				<field name="recordaudio" type="record" max="300">
 					<prompt>
-						<? 
-						if($count != 1){
-							?><tts gender="female" language="english">Now recording message <?=$count?> </tts><?
-						}
-						?>
 						<audio cmid="file://prompts/Record.wav" />
 					</prompt>
 				</field>
@@ -121,15 +116,13 @@ if($REQUEST_TYPE == "new") {
 							</then>
 							<else />
 						</if>
-						<tts gender="female" language="english">If you'd like to save this message, press 1.</tts>
-						<tts gender="female" language="english">If you'd like to replay this message, press 2.</tts>
-						<tts gender="female" language="english">If you'd like to rerecord this message, press 3.</tts>
+						<audio cmid="file://prompts/inbound/SaveMessage2.wav" />
 						<setvar name="playedprompt" value="yes" />
 					</prompt>
 	
 					<choice digits="1">
 						<uploadaudio name="recordaudio" />
-						<tts gender="female" language="english">Your message has been saved. </tts>
+						<audio cmid="file://prompts/Saved.wav" />
 						<goto message="continue" />
 					</choice>
 	
@@ -150,8 +143,7 @@ if($REQUEST_TYPE == "new") {
 			<message name="continue">
 				<field name="recordnext" type="menu" timeout="5000" sticky="true">
 					<prompt repeat="1">
-						<tts gender="female" language="english">If you'd like to record another message, press 1.</tts>
-						<tts gender="female" language="english">If you're finished recording, press 2 to exit the system.</tts>
+						<audio cmid="file://prompts/AnotherRecording.wav" />
 					</prompt>				
 				</field>
 			</message>
