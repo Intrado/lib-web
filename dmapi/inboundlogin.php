@@ -52,14 +52,11 @@ function authFailure()
 {
 	global $SESSIONID;
 
-	// TODO need tts message
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="goodbye">
 		<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
-
-		<tts gender="female">Please check your I D and pin and try again later</tts>
-
+		<audio cmid="file://prompts/inbound/CheckIDandTryLater.wav" />
 		<audio cmid="file://prompts/GoodBye.wav" />
 		<hangup />
 	</message>

@@ -51,12 +51,11 @@ function jobOptions()
 		<field name="numdays" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
 				<audio cmid="file://prompts/inbound/SelectDays.wav" />
-				<audio cmid="file://prompts/inbound/<?= $maxdays ?>.wav" />
 
 <?				if ($maxdays > 1) { ?>
-					<audio cmid="file://prompts/inbound/DaysPlural.wav" />
+					<audio cmid="file://prompts/inbound/<?= $maxdays ?>Days.wav" />
 <?				} else { ?>
-					<audio cmid="file://prompts/inbound/DaySingle.wav" />
+					<audio cmid="file://prompts/inbound/1Day.wav" />
 <?				} ?>
 
 			</prompt>
@@ -115,23 +114,20 @@ function jobConfirm($listname, $priority, $numdays=1)
 				<audio cmid="file://prompts/inbound/Confirmation2.wav" />
 				<tts gender="female"><?= htmlentities($priority) ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation3.wav" />
-				<audio cmid="file://prompts/inbound/<?= $numdays ?>.wav" />
 
 <?				if ($numdays > 1) { ?>
-					<audio cmid="file://prompts/inbound/DaysPlural.wav" />
+					<audio cmid="file://prompts/inbound/<?= $numdays ?>Days.wav" />
 <?				} else { ?>
-					<audio cmid="file://prompts/inbound/DaySingle.wav" />
+					<audio cmid="file://prompts/inbound/1Day.wav" />
 <?				} ?>
 
-				<tts gender="female">between the hours of</tts>
+				<audio cmid="file://prompts/inbound/BetweenTheHoursOf.wav" />
 				<tts gender="female"><?= $SESSIONDATA['starttime'] ?></tts>
-				<tts gender="female">and</tts>
+				<audio cmid="file://prompts/inbound/And.wav" />
 				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
 
 				<audio cmid="file://prompts/inbound/Confirmation4.wav" />
-
-				<!-- TODO add info about changing call window into conf4.wav -->
-				<tts gender="female"> to change the call time settings press 4  </tts>
+				<audio cmid="file://prompts/inbound/ConfirmationTimeSetting.wav" />
 
 			</prompt>
 
@@ -172,11 +168,11 @@ function confirmCallWindow()
 	<message name="confirmcallwindow">
 		<field name="usecallwin" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
-				<tts gender="female">The call window for this job is currently set between the hours of </tts>
+				<audio cmid="file://prompts/inbound/CallWindowSet.wav" />
 
 				<tts gender="female"><?= $USER->getCallEarly(); ?></tts>
 
-				<tts gender="female"> and </tts>
+				<audio cmid="file://prompts/inbound/And.wav" />
 
 				<tts gender="female"><?= $USER->getCallLate(); ?></tts>
 
@@ -244,12 +240,12 @@ function promptStartTime($playinvalid=false, $invalidreason="none")
 
 		<tts gender="female"><?= $early ?></tts>
 
-		<tts gender="female"> and </tts>
+		<audio cmid="file://prompts/inbound/And.wav" />
 
 		<tts gender="female"><?= $late ?></tts>
 <?	} ?>
 
-				<tts gender="female">Enter the time you want your calls to begin followed by the pound key.  For example to start your calls at 5 in the afternoon enter 5 0 0 pound. </tts>
+				<audio cmid="file://prompts/inbound/EnterStartTime.wav" />
 
 			</prompt>
 
@@ -260,7 +256,7 @@ function promptStartTime($playinvalid=false, $invalidreason="none")
 
 		<field name="startampm" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
-				<tts gender="female">press 1 for am or 2 for pm</tts>
+				<audio cmid="file://prompts/inbound/EnterAMorPM.wav" />
 
 			</prompt>
 
@@ -288,8 +284,7 @@ function promptStopTime()
 	<message name="promptstoptime">
 		<field name="stoptime" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
-				<tts gender="female">Enter the time you want your calls to stop followed by the pound key</tts>
-
+				<audio cmid="file://prompts/inbound/EnterStopTime.wav" />
 			</prompt>
 
 			<timeout>
@@ -299,8 +294,7 @@ function promptStopTime()
 
 		<field name="stopampm" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
-				<tts gender="female">press 1 for am or 2 for pm</tts>
-
+				<audio cmid="file://prompts/inbound/EnterAMorPM.wav" />
 			</prompt>
 
 			<choice digits="1" />
