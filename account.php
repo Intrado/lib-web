@@ -103,7 +103,7 @@ if(CheckFormSubmit($f,$s))
 		} elseif( isSequential(GetFormData($f, $s, 'pincode'))) {
 			error('Cannot have sequential numbers for User ID or Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
-			error("Some emails are invalid", $bademaillist);
+			error("These emails are invalid", $bademaillist);
 		} else {
 			//submit changes
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
