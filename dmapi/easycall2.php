@@ -24,7 +24,7 @@ if($REQUEST_TYPE == "new") {
 		$audio->userid =$specialtask->getData('userid');
 		$name = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
 		if(QuickQuery("select * from audiofile where userid = '$user->id' and deleted = 0 
-					and name = '" . DBSafe($BFXML_VARS['name']) ."'"))
+					and name = '" . DBSafe($name) ."'"))
 			$name = $name ."-". date("M d, Y G:i:s");
 		
 		$audio->name = $name;
@@ -115,15 +115,13 @@ if($REQUEST_TYPE == "new") {
 								</then>
 								<else />
 							</if>
-							<tts gender="female" language="english">If you'd like to save this message, press 1.</tts>
-							<tts gender="female" language="english">If you'd like to replay this message, press 2.</tts>
-							<tts gender="female" language="english">If you'd like to rerecord this message, press 3.</tts>
+							<audio cmid="file://prompts/inbound/SaveMessage2.wav" />
 							<setvar name="playedprompt" value="yes" />
 						</prompt>
 		
 						<choice digits="1">
 							<uploadaudio name="recordaudio" />
-							<tts gender="female" language="english">Your message has been saved. </tts>
+							<audio cmid="file://prompts/Saved.wav" />
 						</choice>
 		
 						<choice digits="2">
