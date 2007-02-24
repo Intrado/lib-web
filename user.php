@@ -332,7 +332,7 @@ startWindow('User Information');
 								<td><? NewFormItem($f,$s, 'pincodeconfirm', 'password', 20,100); ?></td>
 							</tr>
 							<tr>
-								<td align="right">Email:</td>
+								<td align="right">Email(s):</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 72, 10000); ?></td>
 							</tr>
 							<tr>
