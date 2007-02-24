@@ -19,7 +19,6 @@ require_once("inc/formatters.inc.php");
 if (!$USER->authorize('createreport')) {
 	redirect('unauthorized.php');
 }
-$has_print = $SETTINGS['feature']['has_print'];
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
