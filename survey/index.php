@@ -91,7 +91,7 @@ if ($_POST['submit'] && $exists && !$isused && $job->status == "active") {
 					."wi_phone.status in ('queued','scheduled','waiting')");
 	}
 
-	header("Location: " . $_SERVER["REQUEST_URI"]);
+	header("Location: " . $_SERVER["REQUEST_URI"] . "&thanks");
 }
 
 
@@ -123,14 +123,18 @@ if (!$exists) {
 <?
 } else if ($isused) {
 	//if already taken, show thanks page
-	if ($questionnaire->webexitmessage )
+	if ($questionnaire->webexitmessage && isset($_GET['thanks']))
 		if ($questionnaire->usehtml)
 			echo $questionnaire->webexitmessage;
 		else
 			echo nl2br(htmlentities($questionnaire->webexitmessage));
-	else {
+	else if (isset($_GET['thanks'])) {
 ?>
 	<h3>Your response has been recorded. Thank you for participating in this survey.</h3>
+<?
+	} else {
+?>
+	<h3>Your responses to this survey were previously noted. Thank you for your particiaption.</h3>
 <?
 	}
 } else if ($job->status != "active") {
