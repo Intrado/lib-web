@@ -139,6 +139,14 @@ function fmt_checkbox($row,$index) {
 	return $result . '</div>';
 }
 
+function fmt_idmagnify ($row,$index) {
+
+	$result = "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/magnify.gif\"></a>";
+	$result .= "&nbsp;".$row[$index];
+	return $result;
+}
+
+
 function fmt_jobs_actions ($obj, $name) {
 	return fmt_jobs_generic($obj->id, $obj->status, $obj->deleted, $obj->type);
 }

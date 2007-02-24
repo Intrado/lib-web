@@ -34,6 +34,7 @@ $titles = array(
 				"8" => "Address");
 
 $formatters = array(
+					"2" => "fmt_idmagnify",
 					"6" => "fmt_phone",
 					"7" => "fmt_email",
 					"8" => "fmt_null");
