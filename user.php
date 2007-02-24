@@ -102,18 +102,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		} elseif( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match' . $extraMsg);
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
-			error('Telephone Pin Code confirmation does not match');
+			error('Telephone Pin Code confirmation does not match' . $extraMsg);
 		} else if ($phone != null && !Phone::validate($phone) ) {
 			if ($IS_COMMSUITE)
 				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
 			else
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
 		} elseif ( $callerid!=null && !Phone::validate($callerid)){
-			error('The caller id must be exactly 10 digits long');
+			error('The caller id must be exactly 10 digits long' . $extraMsg);
 		} elseif (strlen($login) < $usernamelength && !GetFormData($f, $s, "ldap")) {
-			error('Username must be at least ' . $usernamelength . '  characters' . $extraMsg);
+			error('Username must be at least ' . $usernamelength . ' characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
-			error('Password must be at least ' . $passwordlength . ' characters long');
+			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
 		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
 		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
@@ -140,7 +140,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		} elseif(isSequential(GetFormData($f, $s, 'pincode')) && !$IS_COMMSUITE) {
 			error('Cannot have sequential numbers for Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
-			error("Some emails are invalid", $bademaillist);
+			error("These emails are invalid", $bademaillist);
 		} else {
 			// Submit changes
 
