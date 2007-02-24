@@ -107,7 +107,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(GetFormData($f, $s, "easycallmin") > GetFormData($f, $s, "easycallmax")){
-			error('The minimum extensions length has to be less than than the maximum');
+			error('The minimum extensions length has to be less than or equal to the maximum');
 		} else {
 			//check the parsing
 
