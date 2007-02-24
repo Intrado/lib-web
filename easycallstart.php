@@ -36,6 +36,7 @@ $f = "easycall";
 $s = "main";
 $reloadform = 0;
 
+$removedlang = false;
 foreach($languages as $lang){
 	if(CheckFormSubmit($f, 'remove_'.$lang->name)) {
 		$removedlang = true;
@@ -187,7 +188,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 					$task->setData("language0", "Default");
 					$task->setData("totalamount", 1);
 				}
-				
+				$task->setData('currlang', $task->getdata('language0'));
 				$task->setData('langchkbox', GetFormData($f, $s, 'addlangs'));
 				
 				if($task->id){
