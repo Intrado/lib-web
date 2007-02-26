@@ -63,9 +63,9 @@ if($checkpassword){
 	if($passwordlength < 6) {
 		$passwordlength = 6;
 	}
-	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be atleast " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 } else {
-	$securityrules = "The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be atleast " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 }
 
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be able to differentiate between a submit and an add button click
@@ -111,7 +111,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		} elseif ( $callerid!=null && !Phone::validate($callerid)){
 			error('The caller id must be exactly 10 digits long' . $extraMsg);
 		} elseif (strlen($login) < $usernamelength && !GetFormData($f, $s, "ldap")) {
-			error('Username must be at least ' . $usernamelength . ' characters' . $extraMsg);
+			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
 			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
 		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $_SESSION['userid'])) {
