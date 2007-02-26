@@ -23,7 +23,7 @@ if($REQUEST_TYPE == "new") {
 		$audio = new AudioFile();
 		$audio->userid =$specialtask->getData('userid');
 		$name = $specialtask->getData('name') . " - " . $specialtask->getData('count');
-		if(QuickQuery("select * from audiofile where userid = '$user->id' and deleted = 0 
+		if(QuickQuery("select count(*) from audiofile where userid = '$user->id' and deleted = 0 
 					and name = '" . DBSafe($name) ."'"))
 			$name = $name ." - ". date("M d, Y G:i:s");
 		

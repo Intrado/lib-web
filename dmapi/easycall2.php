@@ -23,7 +23,7 @@ if($REQUEST_TYPE == "new") {
 		$audio = new AudioFile();
 		$audio->userid =$specialtask->getData('userid');
 		$name = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
-		if(QuickQuery("select * from audiofile where userid = '$user->id' and deleted = 0 
+		if(QuickQuery("select count(*) from audiofile where userid = '$user->id' and deleted = 0 
 					and name = '" . DBSafe($name) ."'"))
 			$name = $name ."-". date("M d, Y G:i:s");
 		
@@ -92,7 +92,7 @@ if($REQUEST_TYPE == "new") {
 					<field name="recordaudio" type="record" max="300">
 						<prompt>
 						<? 
-							if($specialtask->getData('totalamount') > 1){
+							if($currlang != "Default"){
 								?>
 									<tts gender="female" language="english">Now recording <?=$currlang?> </tts>
 								<?
