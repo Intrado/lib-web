@@ -71,7 +71,7 @@ function setSetting($name, $value) {
 	$old = getSetting($name);
 	$name = DBSafe($name);
 	$value = DBSafe($value);
-	if($old === false) {
+	if($old === false && $value !== '' && $value !==NULL) {
 		QuickUpdate("insert into setting (name, value, customerid) values ('$name', '$value', $USER->customerid)");
 	} else {
 		if($value === '' || $value === NULL)
@@ -106,7 +106,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "easycallmin") > GetFormData($f, $s, "easycallmax")){
+		} else if(GetFormData($f, $s, "easycallmin") > GetFormData($f, $s, "easycallmax") && (GetFormData($f, $s, "easycallmax") != "")){
 			error('The minimum extensions length has to be less than or equal to the maximum');
 		} else {
 			//check the parsing
