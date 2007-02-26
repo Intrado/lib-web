@@ -1184,3 +1184,9 @@ CREATE TABLE `importjob` (
   `importid` INT NOT NULL ,
   `jobid` INT NOT NULL
 ) ENGINE = MYISAM ;
+
+
+-- asp has 1k settings, this should avoid table scans
+
+ALTER TABLE `setting` ADD INDEX `lookup` ( `customerid` , `name` ) 
+
