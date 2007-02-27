@@ -117,16 +117,15 @@ function promptMultiLang()
 	<message name="chooselang">
 		<field name="langtorecord" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
+				<tts gender="female">Please select the language you wish to record</tts>
 
 <?
 			$listindex = 1;
 			foreach ($languages as $lang)
 			{
 ?>
-				<audio cmid="file://prompts/inbound/RecordInLanguage.wav" />
+				<audio cmid="file://prompts/inbound/Press<?= $listindex ?>For.wav" />
 				<tts gender="female"><?= htmlentities($lang) ?></tts>
-				<audio cmid="file://prompts/inbound/PressMiddle.wav" />
-				<audio cmid="file://prompts/inbound/<?= $listindex ?>.wav" />
 <?
 				$listindex++;
 			}
