@@ -1185,8 +1185,29 @@ CREATE TABLE `importjob` (
   `jobid` INT NOT NULL
 ) ENGINE = MYISAM ;
 
-
 -- asp has 1k settings, this should avoid table scans
 
 ALTER TABLE `setting` ADD INDEX `lookup` ( `customerid` , `name` ) 
+
+-- add type column to specify how person was added to system, update userid to reflect who entered it (do not set 0 anymore)
+
+alter table `person` add `type` enum ('system', 'addressbook', 'manualadd', 'upload') not null default 'system' after `lastimport`;
+
+UPDATE person SET TYPE = 'addressbook' WHERE userid is not null;
+
+UPDATE person SET TYPE = 'manualadd' WHERE userid = 0 and importid is null;
+
+UPDATE person SET TYPE = 'upload' WHERE userid = 0 and importid is not null;
+
+update person p
+  join import i on (p.importid = i.id)
+  set p.userid = i.userid
+  where p.userid = 0;
+
+update person p
+  join listentry le on (p.id = le.personid)
+  join list l on (le.listid = l.id)
+  set p.userid = l.userid
+  where p.userid = 0;
+
 
