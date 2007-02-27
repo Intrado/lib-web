@@ -286,32 +286,5 @@ function sane_parsestr($url) {
 	return $data;
 }
 
-function phoneErrors($phone) {
-	Global $IS_COMMSUITE;
-	$error = array();
-	if(!Phone::validate($phone, true)) {
-		$min = getSystemSetting('easycallmin', $IS_COMMSUITE ? 2 : 10);
-		$max = getSystemSetting('easycallmax', 10);
-		if($min == $max) {
-			if($max == 10) {
-				$error[] = 'The phone number must be exactly 10 digits long (including area code)';
-				$error[] = 'You do not need to include a 1 for long distance';
-			} else {
-				$error[] = 'The phone number must be '. $max .' or 10 digits long (including area code)';
-				$error[] = 'You do not need to include a 1 for long distance';
-			}
-		} else {
-			if($max == 10 || $max == 9) {
-				$error[] = 'The phone number must be '. $min .'-10 digits long (including area code)';
-				$error[] = 'You do not need to include a 1 for long distance';
-			} else {
-				$error[] = 'The phone number must be '. $min .' - '. $max .' digits or exactly 10 digits long (including area code)';
-				$error[] = 'You do not need to include a 1 for long distance';
-			}
-		}
-	}
-	return $error;
-}
-
 
 ?>
