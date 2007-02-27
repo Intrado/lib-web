@@ -103,13 +103,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Password confirmation does not match' . $extraMsg);
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
 			error('Telephone Pin Code confirmation does not match' . $extraMsg);
-		} else if ($phone != null && !Phone::validate($phone) ) {
-			if ($IS_COMMSUITE)
-				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
-			else
-				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance' . $extraMsg);
-		} elseif ( $callerid!=null && !Phone::validate($callerid)){
-			error('The caller id must be exactly 10 digits long' . $extraMsg);
+		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
+			error($error);
+		} elseif (($callerid != "") && (strlen($callerid)!=10)){
+			error('Caller ID must be 10 digits long' , 'You do not need to include a 1 for long distance');
 		} elseif (strlen($login) < $usernamelength && !GetFormData($f, $s, "ldap")) {
 			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){

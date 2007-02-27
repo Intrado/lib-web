@@ -58,7 +58,6 @@ if(CheckFormSubmit($f,$s))
 		$login = trim(GetFormData($f, $s, 'login'));
 		$emaillist = GetFormData($f, $s, "email");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
-
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -68,13 +67,10 @@ if(CheckFormSubmit($f,$s))
 			error('Password confirmation does not match');
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
 			error('Telephone Pin Code confirmation does not match');
-		} elseif ($phone != null && !Phone::validate($phone)) {
-			if ($IS_COMMSUITE)
-				error('The phone number must be 2-6 digits or exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-			else
-				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-		} elseif ( $callerid!=null && !Phone::validate($callerid)){
-			error('The caller id must be exactly 10 digits long');
+		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
+			error($error);
+		} elseif (($callerid != "") && (strlen($callerid)!=10)){
+			error('Caller ID must be 10 digits long', 'You do not need to include a 1 for long distance');
 		} elseif (strlen($login) < $usernamelength) {
 			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
