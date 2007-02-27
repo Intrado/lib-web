@@ -42,6 +42,7 @@ $titles = array("0" => "In List",
 				"7" => "Primary Email",
 				"8" => "Address");
 $formatters = array("0" => "fmt_checkbox",
+					"2" => "fmt_idmagnify",
 					"6" => "fmt_phone",
 					"7" => "fmt_email",
 					"8" => "fmt_null");
