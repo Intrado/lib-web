@@ -83,66 +83,26 @@ if (isset($personid)) {
 
 $f = "person";
 $s = "main";
-$reloadform = 1;
 
-if( $reloadform )
-{
-	ClearFormData($f);
-
-	PopulateForm($f,$s,$data,array(array(FieldMap::getFirstNameField(),"text",1,255),
-								   array(FieldMap::getLastNameField(),"text",1,255),
-								   array(FieldMap::getLanguageField(),"text",1,255))
-								   );
-
-	PopulateForm($f,$s,$address,array(array("addr1","text",1,50),
-										array("addr2","text",1,50),
-										array("city","text",1,50),
-										array("state","text",1,2),
-										array("zip","text",1,10)));
-
-	$x = 0;
-	foreach ($phones as $phone) {
-		$itemname = "phone".($x+1);
-		$phone->$itemname = Phone::format($phone->phone);
-		PopulateForm($f,$s,$phone,array(array($itemname,"phone",10,10)));
-		$x++;
-	}
-
-	$x = 0;
-	foreach ($emails as $email) {
-		$itemname = "email".($x+1);
-		$email->$itemname = $email->email;
-		PopulateForm($f,$s,$email,array(array($itemname,"email",1,20)));
-		$x++;
-	}
-
-$fieldmaps = FieldMap::getAuthorizedFieldMaps();
-foreach ($fieldmaps as $map) {
-	$fname = $map->fieldnum;
-	$header = $map->name;
-	$fval = $data->$fname;
-
-	if (!strcmp($fname, FieldMap::getFirstNameField()) ||
-		!strcmp($fname, FieldMap::getLastNameField()) ||
-		!strcmp($fname, FieldMap::getLanguageField())) {
-			continue; // skip field, it was in layout above
-	}
-	PopulateForm($f,$s,$data,array(array($fname,"text",1,20)));
+function displayValue($s) {
+	echo($s."&nbsp;");
 }
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-
+// where did we come from, list preview or contact tab
 $PAGE = "notifications:lists";
+if (strpos($_SERVER['HTTP_REFERER'],"contacts.php") !== false) $PAGE = "system:contacts";
 
-$name = GetFormData($f, $s, FieldMap::getFirstNameField()) . ' ' . GetFormData($f, $s, FieldMap::getLastNameField());
-if (strlen(trim($name)) == 0) $name = "";
-$TITLE = "View Contact Information: " . $name;
+$contactFullName = "";
+$f = FieldMap::getFirstNameField();
+$contactFullName .= $data->$f;
+$f = FieldMap::getLastNameField();
+$contactFullName .= " ".$data->$f;
+
+$TITLE = "View Contact Information: " . $contactFullName;
 
 include_once("nav.inc.php");
 
@@ -157,20 +117,13 @@ startWindow('Contact', 'padding: 3px;');
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Name:</th>
 		<td class="bottomBorder">
-			First: <? NewFormItem($f, $s, FieldMap::getFirstNameField(), 'text',20,50,"disabled"); ?>
-			Last: <? NewFormItem($f, $s, FieldMap::getLastNameField(), 'text',20,50,"disabled"); ?>
+			<? displayValue($contactFullName); ?>
 		</td>
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Language Preference:</th>
 		<td  class="bottomBorder">
-			<?
-			NewFormItem($f,$s,FieldMap::getLanguageField(),"selectstart", 40, "nooption", "disabled");
-			$langdata = DBFindMany('Language', "from language where customerid='$USER->customerid' order by name");
-			foreach($langdata as $language)
-				NewFormItem($f,$s,FieldMap::getLanguageField(),"selectoption",$language->name,$language->name, 40, "nooption", "disabled");
-			NewFormItem($f,$s,FieldMap::getLanguageField(),"selectend", 40, "nooption", "disabled");
-			?>
+			<? $f=FieldMap::getLanguageField(); displayValue($data->$f); ?>
 		</td>
 	</tr>
 
@@ -183,7 +136,7 @@ startWindow('Contact', 'padding: 3px;');
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 20, "nooption", "disabled"); ?></td>
+		<td class="bottomBorder"><? displayValue(Phone::format($phone->phone)); ?></td>
 	</tr>
 <?
 		$x++;
@@ -197,7 +150,7 @@ startWindow('Contact', 'padding: 3px;');
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 50, 100, "disabled"); ?></td>
+		<td class="bottomBorder"><? displayValue($email->email); ?></td>
 	</tr>
 <?
 		$x++;
@@ -209,19 +162,23 @@ startWindow('Contact', 'padding: 3px;');
 		<td class="bottomBorder">
 			<table border="0">
 				<tr>
-					<td align="right">Line 1:</td>
-					<td><? NewFormItem($f, $s, 'addr1', 'text',33,50, "disabled"); ?></td>
+					<td><? displayValue($address->addr1); ?></td>
 				</tr>
 				<tr>
-					<td align="right">Line 2:</td>
-					<td><? NewFormItem($f, $s, 'addr2', 'text',33,50, "disabled"); ?></td>
+					<td><? displayValue($address->addr2); ?></td>
 				</tr>
 				<tr>
-					<td align="right">City:</td>
 					<td>
-						<? NewFormItem($f, $s, 'city', 'text',8,50, "disabled"); ?>&nbsp;
-						State: <? NewFormItem($f, $s, 'state', 'text',2, "nooption", "disabled"); ?>&nbsp;
-						Zip: <? NewFormItem($f, $s, 'zip', 'text', 5, 5, "disabled"); ?>&nbsp;
+						<?
+							if (strlen(trim($address->city)) == 0 &&
+								strlen(trim($address->state)) == 0) {
+									displayValue($address->zip);
+								} else {
+						 			displayValue($address->city.",");
+						 			displayValue($address->state." ");
+						 			displayValue($address->zip);
+								}
+						 ?>
 					</td>
 				</tr>
 			</table>
@@ -246,7 +203,7 @@ foreach ($fieldmaps as $map) {
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? NewFormItem($f, $s, $fname, 'text', 50, 100, "disabled"); ?></td>
+		<td class="bottomBorder"><? displayValue($fval); ?></td>
 	</tr>
 <?
 }

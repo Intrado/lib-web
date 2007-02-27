@@ -76,43 +76,32 @@ if (!$maxphones = getSystemSetting("maxphones"))
 if (!$maxemails = getSystemSetting("maxemails"))
 	$maxemails = 2;
 
-function clearDataFields()
-{
-	global $maxphones, $maxemails;
-	global $data, $address, $phones, $emails;
-
+if ($personid == NULL) {
+	// create a new person with empty data
 	$data = new PersonData();
 	$address = new Address();
 
 	$phones = array();
-	for ($i=0; $i<$maxphones; $i++) {
-		$phones[$i] = new Phone();
-	}
 	$emails = array();
-	for ($i=0; $i<$maxemails; $i++) {
-		$emails[$i] = new Email();
-	}
-}
-	if (isset($personid)) {
-		// editing existing person
-		$data = DBFind("PersonData", "from persondata where personid = " . $personid);
-		$address = DBFind("Address", "from address where personid = " . $personid);
-		if ($address === false) $address = new Address();
+} else {
+	// editing existing person
+	$data = DBFind("PersonData", "from persondata where personid = " . $personid);
+	$address = DBFind("Address", "from address where personid = " . $personid);
+	if ($address === false) $address = new Address(); // contact was imported/uploaded without any address data, create one now
 
-		// get existing phones from db, then create any additional based on the max allowed
-		// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
-		$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
-		for ($i=count($phones); $i<$maxphones; $i++) {
-			$phones[$i] = new Phone();
-		}
-		$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
-		for ($i=count($emails); $i<$maxemails; $i++) {
-			$emails[$i] = new Email();
-		}
-	} else {
-		// 	creating new person
-		clearDataFields();
-	}
+	// get existing phones from db, then create any additional based on the max allowed
+	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
+	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
+	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
+}
+
+for ($i=count($phones); $i<$maxphones; $i++) {
+	$phones[$i] = new Phone();
+}
+for ($i=count($emails); $i<$maxemails; $i++) {
+	$emails[$i] = new Email();
+}
+
 
 /****************** main message section ******************/
 
@@ -176,11 +165,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			$x = 0;
 			foreach ($phones as $phone) {
 				$itemname = "phone".($x+1);
-
-				PopulateObject($f,$s,$phone,array($itemname));
 				$phone->personid = $person->id;
 				$phone->sequence = $x;
-				$phone->phone = Phone::parse($phone->$itemname);
+				$phone->phone = Phone::parse(GetFormData($f,$s,$itemname));
 				$phone->update();
 				$x++;
 			}
@@ -188,11 +175,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			$x = 0;
 			foreach ($emails as $email) {
 				$itemname = "email".($x+1);
-
-				PopulateObject($f,$s,$email,array($itemname));
 				$email->personid = $person->id;
 				$email->sequence = $x;
-				$email->email = $email->$itemname;
+				$email->email = GetFormData($f,$s,$itemname);
 				$email->update();
 				$x++;
 			}
@@ -251,16 +236,14 @@ if( $reloadform )
 	$x = 0;
 	foreach ($phones as $phone) {
 		$itemname = "phone".($x+1);
-		$phone->$itemname = Phone::format($phone->phone);
-		PopulateForm($f,$s,$phone,array(array($itemname,"phone",10,10)));
+		PutFormData($f,$s,$itemname,Phone::format($phone->phone),"phone",10,10);
 		$x++;
 	}
 
 	$x = 0;
 	foreach ($emails as $email) {
 		$itemname = "email".($x+1);
-		$email->$itemname = $email->email;
-		PopulateForm($f,$s,$email,array(array($itemname,"email",1,20)));
+		PutFormData($f,$s,$itemname,$email->email,"email",5,100);
 		$x++;
 	}
 }
@@ -293,8 +276,8 @@ startWindow("Contact");
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Name:</th>
 		<td class="bottomBorder">
-			First: <? NewFormItem($f, $s, FieldMap::getFirstNameField(), 'text',20,50); ?>
-			Last: <? NewFormItem($f, $s, FieldMap::getLastNameField(), 'text',20,50); ?>
+			First: <? NewFormItem($f, $s, FieldMap::getFirstNameField(), 'text',20,255); ?>
+			Last: <? NewFormItem($f, $s, FieldMap::getLastNameField(), 'text',20,255); ?>
 		</td>
 	</tr>
 	<tr>
@@ -319,7 +302,7 @@ startWindow("Contact");
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 20); ?></td>
+		<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?></td>
 	</tr>
 <?
 		$x++;
@@ -357,7 +340,7 @@ startWindow("Contact");
 					<td>
 						<? NewFormItem($f, $s, 'city', 'text',8,50); ?>&nbsp;
 						State: <? NewFormItem($f, $s, 'state', 'text',2); ?>&nbsp;
-						Zip: <? NewFormItem($f, $s, 'zip', 'text', 5, 5); ?>&nbsp;
+						Zip: <? NewFormItem($f, $s, 'zip', 'text', 5, 10); ?>&nbsp;
 					</td>
 				</tr>
 			</table>
