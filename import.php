@@ -115,16 +115,18 @@ $dotrimoldrecords = $import->updatemethod == "full";
 $doinsertnewrecords = $import->updatemethod != "updateonly";
 $dosetimportid = ($import->updatemethod == "full") || ($import->ownertype == "user");
 $setuserid = NULL;
+$setpersontype = "system";
 $doupdatepdvalues = true;
 
 if ($import->ownertype == "user") {
 	$doupdatepdvalues = false; //no list value fields allowed in user import
+	$setuserid = $import->userid;
 	if ($import->listid != NULL) {
-		//import to list, don't add to address book.
-		$setuserid = 0;
+		//import to list, don't add to address book (aka "manualadd")
+		$setpersontype = "upload";
 	} else {
 		//import to address book
-		$setuserid = $import->userid;
+		$setpersontype = "addressbook";
 	}
 }
 
@@ -256,6 +258,7 @@ while (($row = fgetcsv($fp,4096)) !== FALSE) {
 			$person->deleted = 0;
 			$person->pkey = $import->ownertype == "user" ? NULL : $key;
 			$person->customerid = $custid;
+			$person->type = $setpersontype;
 			$person->create();
 			$personid = $person->id;
 
