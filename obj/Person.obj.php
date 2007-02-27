@@ -7,12 +7,13 @@ class Person extends DBMappedObject {
 	var $pkey;
 	var $importid;
 	var $lastimport;
+	var $type = "system"; // enum (system, addressbook, manualadd, upload)
 	var $deleted = 0;
 
 	function Person ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "person";
-		$this->_fieldlist = array("customerid", "userid", "pkey", "importid", "lastimport", "deleted");
+		$this->_fieldlist = array("customerid", "userid", "pkey", "importid", "lastimport", "type", "deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -26,7 +27,7 @@ class Person extends DBMappedObject {
 		else
 			return false;
 	}
-	
+
 	function getData () {
 		return DBFind('PersonData', "from persondata where personid=$this->id");
 	}
