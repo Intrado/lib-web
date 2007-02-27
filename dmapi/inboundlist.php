@@ -62,13 +62,12 @@ function playLists($incr)
 	global $SESSIONDATA;
 
 	$lists = loadLists($incr);
-// TODO need .wav for listsize0
 	global $SESSIONID;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="listdirectory">
 <?	if (count($lists) == 0) { ?>
-		<tts gender="female">I am sorry, but you have 0 lists. use web interface to create a list. goodbye </tts>
+		<audio cmid="file://prompts/inbound/NoLists.wav" />
 		<hangup />
 <?	} ?>
 
@@ -80,9 +79,7 @@ function playLists($incr)
 				foreach ($lists as $list)
 				{
 ?>
-					<audio cmid="file://prompts/inbound/PressMiddle2.wav" />
-					<audio cmid="file://prompts/inbound/<?= $listindex ?>.wav" />
-					<audio cmid="file://prompts/inbound/For.wav" />
+					<audio cmid="file://prompts/inbound/Press<?= $listindex ?>For.wav" />
 					<tts gender="female"><?= htmlentities($list->name) ?></tts>
 <?
 					$listindex++;

@@ -169,15 +169,10 @@ function confirmCallWindow()
 		<field name="usecallwin" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
 				<audio cmid="file://prompts/inbound/CallWindowSet.wav" />
-
 				<tts gender="female"><?= $USER->getCallEarly(); ?></tts>
-
 				<audio cmid="file://prompts/inbound/And.wav" />
-
 				<tts gender="female"><?= $USER->getCallLate(); ?></tts>
-
-				<tts gender="female">To accept these settings press 1 to change the call times press 2</tts>
-
+				<audio cmid="file://prompts/inbound/AcceptTimes.wav" />
 			</prompt>
 
 			<choice digits="1" />
@@ -224,29 +219,25 @@ function promptStartTime($playinvalid=false, $invalidreason="none")
 			<prompt repeat="2">
 
 <?	if ($playinvalid) { ?>
-		<tts gender="female">I am sorry but you entered an invalid time </tts>
+		<audio cmid="file://prompts/inbound/InvalidTime.wav" />
 <?	} ?>
 
 <?	if (!strcmp($invalidreason, "mismatch")) { ?>
-		<tts gender="female">The stop time must be after the start time </tts>
+		<audio cmid="file://prompts/inbound/StopTimeAfterStartTime.wav" />
 <?	} ?>
 
 <?	if (!strcmp($invalidreason, "past")) { ?>
-		<tts gender="female">The stop time must be after the current time </tts>
+		<audio cmid="file://prompts/inbound/StopTimeAfterCurrentTime.wav" />
 <?	} ?>
 
 <?	if ($playrestriction) { ?>
-		<tts gender="female">You may enter start and stop times between the following hours </tts>
-
+		<audio cmid="file://prompts/inbound/EnterTimeBetweenAllowedHours.wav" />
 		<tts gender="female"><?= $early ?></tts>
-
 		<audio cmid="file://prompts/inbound/And.wav" />
-
 		<tts gender="female"><?= $late ?></tts>
 <?	} ?>
 
 				<audio cmid="file://prompts/inbound/EnterStartTime.wav" />
-
 			</prompt>
 
 			<timeout>

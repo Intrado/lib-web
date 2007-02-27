@@ -10,20 +10,17 @@ include_once("../obj/MessagePart.obj.php");
 global $SESSINDATA, $BFXML_VARS;
 
 
-function promptRecordMessage()
+function promptRecordMessage($skipwelcome=false)
 {
 	global $SESSIONID;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="intro">
-		<if name="skipintro" value="true">
-			<then>
-				<goto message="record" />
-			</then>
-			<else>
 				<field name="dummy" type="menu" timeout="10000">
 					<prompt repeat="1">
+<? if (!$skipwelcome) { ?>
 						<audio cmid="file://prompts/inbound/Welcome.wav" />
+<? } ?>
 						<audio cmid="file://prompts/inbound/BeginRecording.wav" />
 					</prompt>
 					<timeout>
@@ -32,8 +29,6 @@ function promptRecordMessage()
 					</timeout>
 				</field>
 				<goto message="record" />
-			</else>
-		</if>
 	</message>
 
 	<message name="record">
@@ -302,7 +297,7 @@ function commitMessage($contentid)
 			$selectedLang != 0 && $selectedLang <= count($languages))
 		{
 			$SESSIONDATA['langindex'] = $selectedLang-1;
-			promptRecordMessage();
+			promptRecordMessage(true);
 		}
 		else
 		{
