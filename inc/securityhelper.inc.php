@@ -110,14 +110,7 @@ function getCurrentJob() {
 }
 
 function setCurrentPerson ($newid) {
-	// check that customer owns, rather than common usage where user owns
-	// because a person userid=0 is from manual add to list
-	// but this will allow imported persons (userid=null) to be set - not really desired
-	//
-	// a person with userid=validuser is from the addressbook
-	// userid=0 is a manual add
-	// userid=null is from imported data
-	setIfOwnsOrNew($newid, "personid", "person", true);
+	setIfOwnsOrNew($newid, "personid", "person");
 }
 
 function getCurrentPerson() {
