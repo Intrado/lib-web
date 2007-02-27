@@ -216,7 +216,7 @@ startWindow('Import Information ');
 				</td>
 				<td style="vertical-align: top">
 					<?
-						NewFormItem($form, $section,"associatedjobs", "selectmultiple", null, $repeatingjobs, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
+						NewFormItem($form, $section,"associatedjobs", "selectmultiple", "20", $repeatingjobs, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
 					?>
 				</td>
 			</tr>
