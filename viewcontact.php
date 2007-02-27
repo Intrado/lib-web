@@ -18,27 +18,39 @@ include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
 
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+/*
+//TODO
+if (!$USER->authorize('viewcontacts')) {
+	redirect('unauthorized.php');
+}
+*/
+
+if (isset($_GET['id'])) {
+	$personid = $_GET['id'];
+
+	// validate user has rights to view this contact
+	$usersql = $USER->userSQL("p", "pd");
+
+	$query = "
+		select p.id
+		from 		person p
+					left join	persondata pd on
+							(p.id=pd.personid)
+		where p.id='$personid' and $usersql
+	";
+
+	if (!($personid = QuickQuery($query))) {
+		// bad
+		redirect('unauthorized.php');
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
-if (isset($_POST['addperson_x'])) {
-	$_SESSION['personid'] = NULL;
-}
-
-if (isset($_GET['id'])) {
-	// TODO an imported person has userid null, setcurrentperson will not set in this case
-	//setCurrentPerson($_GET['id']);
-	$_SESSION['personid'] = $_GET['id']; // TODO need validation
-
-	$_SESSION['viewreferer'] = $_SERVER['HTTP_REFERER']; // return to calling page when done
-	redirect();
-}
-
-$personid = $_SESSION['personid'];
-
-$person = new Person($personid);
 
 // prepopulate person phone and email lists
 if (!$maxphones = getSystemSetting("maxphones"))
@@ -46,27 +58,8 @@ if (!$maxphones = getSystemSetting("maxphones"))
 
 if (!$maxemails = getSystemSetting("maxemails"))
 	$maxemails = 2;
-//TODO move to utils, shared with addressedit
-function clearDataFields()
-{
-	global $maxphones, $maxemails;
-	global $data, $address, $phones, $emails;
 
-	$data = new PersonData();
-	$address = new Address();
-
-	$phones = array();
-	for ($i=0; $i<$maxphones; $i++) {
-		$phones[$i] = new Phone();
-	}
-	$emails = array();
-	for ($i=0; $i<$maxemails; $i++) {
-		$emails[$i] = new Email();
-	}
-}
-
-if (isset($personid) &&
-	DBFind("Person", "from person where id=" . $personid)) {
+if (isset($personid)) {
 	// editing existing person
 	$data = DBFind("PersonData", "from persondata where personid = " . $personid);
 	$address = DBFind("Address", "from address where personid = " . $personid);
@@ -82,8 +75,8 @@ if (isset($personid) &&
 		$emails[$i] = new Email();
 	}
 } else {
-	// creating new person
-	clearDataFields();
+	// error, person should always be set, this is a viewing page!
+	redirect('unauthorized.php');
 }
 
 /****************** main message section ******************/
@@ -155,7 +148,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-button_bar(button('done', NULL,$_SESSION['viewreferer']));
+button_bar(button('done', NULL,$_SERVER['HTTP_REFERER']));
 
 startWindow('Contact', 'padding: 3px;');
 

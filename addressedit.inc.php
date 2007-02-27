@@ -20,24 +20,54 @@ include_once("obj/Language.obj.php");
 include_once("obj/ListEntry.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+/*
+ // TODO
+
+if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))) {
+	redirect('unauthorized.php');
+}
+*/
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_POST['addperson_x'])) {
-	$_SESSION['personid'] = NULL;
-}
-
 if (isset($_GET['id'])) {
 	setCurrentPerson($_GET['id']);
+	if ((getCurrentPerson() != $_GET['id']) &&
+		$_GET['id'] != "new") {
+		redirect('unauthorized.php');
+	}
+
 	$_SESSION['previewreferer'] = $_SERVER['HTTP_REFERER'];
 	redirect();
 }
 
 // null if new person, otherwise we edit existing
-$personid = $_SESSION['personid'];
+$personid = getCurrentPerson();
 
-// Check if the address edit was clicked from the address book (nav) or the list page (manual add)
-$fromNav = ($ORIGINTYPE === "nav");
+// set the redirect page, used by done or cancel button
+switch ($ORIGINTYPE) {
+case "nav":
+	$redirectPage = "addresses.php";
+	break;
+case "manualaddbook":
+	$redirectPage = "addressesmanualadd.php";
+	break;
+case "manualadd":
+	$redirectPage = "list.php";
+	break;
+case "preview":
+	$redirectPage =  $_SESSION['previewreferer'];
+	break;
+default:
+	// TODO yikes! programmer error
+	redirect('unauthorized.php');
+	break;
+}
 
 // prepopulate person phone and email lists
 if (!$maxphones = getSystemSetting("maxphones"))
@@ -63,27 +93,26 @@ function clearDataFields()
 		$emails[$i] = new Email();
 	}
 }
+	if (isset($personid)) {
+		// editing existing person
+		$data = DBFind("PersonData", "from persondata where personid = " . $personid);
+		$address = DBFind("Address", "from address where personid = " . $personid);
+		if ($address === false) $address = new Address();
 
-if (isset($personid) &&
-	DBFind("Person", "from person where id=" . $personid)) {
-	// editing existing person
-	$data = DBFind("PersonData", "from persondata where personid = " . $personid);
-	$address = DBFind("Address", "from address where personid = " . $personid);
-
-	// get existing phones from db, then create any additional based on the max allowed
-	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
-	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
-	for ($i=count($phones); $i<$maxphones; $i++) {
-		$phones[$i] = new Phone();
+		// get existing phones from db, then create any additional based on the max allowed
+		// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
+		$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
+		for ($i=count($phones); $i<$maxphones; $i++) {
+			$phones[$i] = new Phone();
+		}
+		$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
+		for ($i=count($emails); $i<$maxemails; $i++) {
+			$emails[$i] = new Email();
+		}
+	} else {
+		// 	creating new person
+		clearDataFields();
 	}
-	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
-	for ($i=count($emails); $i<$maxemails; $i++) {
-		$emails[$i] = new Email();
-	}
-} else {
-	// creating new person
-	clearDataFields();
-}
 
 /****************** main message section ******************/
 
@@ -113,8 +142,23 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 
 			//submit changes
 			$person = new Person($personid);
-			$person->userid = $fromNav ? $USER->id : (GetFormData($f,$s,"manualsave") ? $USER->id : 0);
+			$person->userid = $USER->id;
 			$person->customerid = $USER->customerid;
+			if (!isset($personid)) {
+				switch ($ORIGINTYPE) {
+					case "nav":
+						$person->type="addressbook";
+						break;
+					case "manualaddbook":
+					case "manualadd":
+						$person->type = GetFormData($f,$s,"manualsave") ? "addressbook" : "manualadd";
+						break;
+					case "preview":
+					default:
+					// TODO yikes! how did we get here?
+					break;
+				}
+			}
 			$person->deleted = 0;
 			$person->update();
 
@@ -156,7 +200,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			// if manual add to a list, and entry not found, then create one
 			// (otherwise they edit existing contact on the list)
 
-			if (!$fromNav && isset($_SESSION['listid']) &&
+			if (($ORIGINTYPE != "nav") && isset($_SESSION['listid']) &&
 				!DBFind("ListEntry", "from listentry where listid=".$_SESSION['listid']." and personid=".$person->id)) {
 
 				$le = new ListEntry();
@@ -172,39 +216,24 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 
 			if (CheckFormSubmit($f,'saveanother')) {
 				// save and add another
-				clearDataFields();
 				$reloadform = 1;
 			} else if (CheckFormSubmit($f,'savedone')) {
 				// save and done
-				switch ($ORIGINTYPE) {
-					case "nav":
-						redirect('addresses.php');
-						break;
-					case "manualaddbook":
-						redirect('addressesmanualadd.php');
-						break;
-					case "manualadd":
-						redirect('list.php');
-						break;
-					case "preview":
-						redirect($_SESSION['previewreferer']);
-						break;
-					default:
-					// TODO yikes!
-					break;
-				}
-			} // else unexpected programmer error
+				redirect($redirectPage);
+			}
 		}
 	}
 } else {
 	$reloadform = 1;
 }
 
+
 if( $reloadform )
 {
 	ClearFormData($f);
 
-	if (!$fromNav) {
+	if ($ORIGINTYPE != "nav") {
+		// add to addressbook checkbox
 		PutFormData($f,$s,"manualsave",1,"bool",0,1,false);
 	}
 
@@ -240,26 +269,22 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = $fromNav ? "start:addressbook" : "notifications:lists";
+$PAGE = ($ORIGINTYPE == "nav") ? "start:addressbook" : "notifications:lists";
 
 $name = GetFormData($f, $s, FieldMap::getFirstNameField()) . ' ' . GetFormData($f, $s, FieldMap::getLastNameField());
-if (strlen(trim($name)) == 0) $name = "New Contact";
+if (!$personid) $name = "New Contact";
 $TITLE = "Enter Contact Information: " . $name;
 
 include_once("nav.inc.php");
 NewForm($f);
 
-if ($ORIGINTYPE === "preview") {
+if ($ORIGINTYPE == "preview") {
 	buttons(submit($f, 'savedone', 'savedone', 'save'),
 		button('cancel',NULL,$_SESSION['previewreferer']));
 } else {
-	$cancelAction = $fromNav ? "addresses.php" : "addressesmanualadd.php";
-	if ($ORIGINTYPE === "manualadd") { // return to lists page
-		$cancelAction = "list.php";
-	}
 	buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'),
 		submit($f, 'savedone', 'savedone', 'save_done'),
-		button('cancel',NULL,$cancelAction));
+		button('cancel',NULL,$redirectPage));
 }
 
 startWindow("Contact");
@@ -339,7 +364,7 @@ startWindow("Contact");
 		</td>
 	</tr>
 
-<? if ($ORIGINTYPE === "manualadd") {	?>
+<? if ($ORIGINTYPE == "manualadd") {	?>
 	<tr>
 		<td colspan="6"><div><? NewFormItem($f,$s,"manualsave","checkbox"); ?>Save to My Address Book <?= help('List_AddressBookAdd',NULL,"small"); ?></div></td>
 	</tr>
