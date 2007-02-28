@@ -1143,7 +1143,7 @@ update jobtask jt join email e on (jt.emailid = e.id) set jt.email = e.email whe
 -- get rid of import schedules
 update scheduleday sd inner join schedule s on (s.id = sd.scheduleid) set sd.scheduleid = -1 where s.triggertype='import';
 update scheduleday sd inner join import i on (i.scheduleid = sd.scheduleid) set sd.scheduleid = -1 where i.scheduleid is not null;
-delete from scheduleday where scheduleid=-1;;
+delete from scheduleday where scheduleid=-1;
 delete from schedule where triggertype='import';
 update import set scheduleid= null;
 
@@ -1187,7 +1187,7 @@ CREATE TABLE `importjob` (
 
 -- asp has 1k settings, this should avoid table scans
 
-ALTER TABLE `setting` ADD INDEX `lookup` ( `customerid` , `name` ) 
+ALTER TABLE `setting` ADD INDEX `lookup` ( `customerid` , `name` );
 
 -- add type column to specify how person was added to system, update userid to reflect who entered it (do not set 0 anymore)
 
