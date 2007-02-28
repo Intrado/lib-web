@@ -354,7 +354,7 @@ startWindow('User Information');
 
 						</table>
 
-						<br>Please note: username and password are case-sensitive and must be a minimum of <?=$passwordlength?> characters long.
+						<br>Please note: Username and password are case-sensitive. The username must be a minimum of <?=$usernamelength?> characters long and the password <?=$passwordlength?> characters long.
 						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
 					</td>
 				</tr>
