@@ -147,9 +147,9 @@ function isNotComplexPass($pass) {
 			case "it does not contain enough DIFFERENT characters":
 				return("The password needs more different characters");
 			case "it is too short":
-				return("The password needs to be atleast 6 characters long");
+				return("The password needs to be at least 6 characters long");
 			case "it's WAY too short":
-				return("The password needs to be atleast 6 characters long");
+				return("The password needs to be at least 6 characters long");
 			case "it looks like a National Insurance number.":
 				return false;
 			default:
