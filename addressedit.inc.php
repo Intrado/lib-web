@@ -202,6 +202,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			if (CheckFormSubmit($f,'saveanother')) {
 				// save and add another
 				$reloadform = 1;
+				redirect();
 			} else if (CheckFormSubmit($f,'savedone')) {
 				// save and done
 				redirect($redirectPage);
