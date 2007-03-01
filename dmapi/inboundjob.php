@@ -524,6 +524,7 @@ function checkExpirationThenConfirm()
 			if ($BFXML_VARS['sendjob'] == "1" &&
 				commitJob())
 			{
+				$SESSIONDATA['jobSubmit'] = true;
 				forwardToPage("inboundgoodbye.php");
 			}
 			// replay list selection

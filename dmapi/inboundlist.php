@@ -9,6 +9,41 @@ global $SESSIONDATA, $BFXML_VARS;
 $PAGESIZE = 9;
 
 
+function confirmContinue()
+{
+	global $SESSIONID;
+?>
+<voice sessionid="<?= $SESSIONID ?>">
+	<message name="confirmContinueList">
+		<field name="confirmContinue" type="menu" timeout="5000" sticky="true">
+			<prompt repeat="1">
+				<audio cmid="file://prompts/inbound/SelectList.wav" />
+			</prompt>
+			<choice digits="1" />
+			<default>
+				<audio cmid="file://prompts/ImSorry.wav" />
+			</default>
+			<timeout>
+				<goto message="error2" />
+			</timeout>
+		</field>
+
+	</message>
+
+	<message name="error">
+		<audio cmid="file://prompts/inbound/Error.wav" />
+		<hangup />
+	</message>
+
+	<message name="error2">
+		<audio cmid="file://prompts/inbound/Saved.wav" />
+		<audio cmid="file://prompts/GoodBye.wav" />
+		<hangup />
+	</message>
+</voice>
+<?
+}
+
 function loadListsDB()
 {
 	global $SESSIONDATA;
@@ -200,7 +235,10 @@ function confirmList($listname)
 			playLists(false); // do not increment the page
 		}
 	// play the current page of lists
-	} else {
+	} else if (isset($BFXML_VARS['confirmContinue'])) {
 		playLists(true);
+	// confirm that they wish to continue setting up their job, or they exit after recording messages
+	} else {
+		confirmContinue();
 	}
 ?>

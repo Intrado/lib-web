@@ -112,7 +112,6 @@ function welcome()
 	}
 	// only allow 3 attempts to login, then hangup
 	if ($SESSIONDATA['authcount'] >= 3) {
-		//forwardToPage("inboundgoodbye.php");
 		authFailure();
 	}
 
