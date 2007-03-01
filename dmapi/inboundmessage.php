@@ -117,7 +117,7 @@ function promptMultiLang()
 	<message name="chooselang">
 		<field name="langtorecord" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
-				<tts gender="female">Please select the language you wish to record</tts>
+				<audio cmid="file://prompts/inbound/SelectLanguage.wav" />
 
 <?
 			$listindex = 1;
