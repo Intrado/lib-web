@@ -36,9 +36,9 @@ if($checkpassword){
 	if($passwordlength < 6) {
 		$passwordlength = 6;
 	}
-	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 } else {
-	$securityrules = "The password cannot be made from your username/fristname/lastname.  It must be atleast " . $passwordlength . " characters.  It must contain atleast one letter and number";
+	$securityrules = "The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 }
 
 if(CheckFormSubmit($f,$s))
@@ -72,9 +72,9 @@ if(CheckFormSubmit($f,$s))
 		} elseif (($callerid != "") && (strlen($callerid)!=10)){
 			error('Caller ID must be 10 digits long', 'You do not need to include a 1 for long distance');
 		} elseif (strlen($login) < $usernamelength) {
-			error('Username must be atleast ' . $usernamelength . '  characters' . $extraMsg);
+			error('Username must be at least ' . $usernamelength . '  characters' . $extraMsg);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
-			error('Password must be atleast ' . $passwordlength . ' characters long');
+			error('Password must be at least ' . $passwordlength . ' characters long');
 		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $USER->id)) {
 			error('This username already exists, please choose another');
 		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $USER->id)) {
@@ -82,7 +82,7 @@ if(CheckFormSubmit($f,$s))
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
-			error('Your password must contain atleast one letter and one number', $securityrules);
+			error('Your password must contain at least one letter and one number', $securityrules);
 		} elseif($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !$USER->ldap) {
 			error($issame, $securityrules);
 		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !$USER->ldap){
