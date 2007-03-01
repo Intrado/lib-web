@@ -83,18 +83,6 @@ if($REQUEST_TYPE == "new") {
 		?>
 		
 		<voice sessionid="<?=$SESSIONID ?>">
-			<? if($BFXML_VARS['recordnext']==1){ ?>
-				<message name="ready">
-					<field name="ready" type="menu" timeout="20000" sticky="true">
-						<prompt repeat="1">
-							<audio cmid="file://prompts/RecordNextMessage.wav" />
-						</prompt>
-						<choice digits="1">
-							<goto message="record" />
-						</choice>
-					</field>
-				</message>
-			<? } ?>
 			
 			<message name="record">
 				<field name="recordaudio" type="record" max="300">
