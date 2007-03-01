@@ -114,7 +114,7 @@ NewForm($f);
 						left join email on (person.id = email.personid and email.sequence=0)
 						left join address on person.id = address.personid
 						left join persondata on person.id = persondata.personid
-					where userid = $USER->id and not deleted
+					where userid = $USER->id and type = 'addressbook' and not deleted
 					order by $last, $first
 					");
 
