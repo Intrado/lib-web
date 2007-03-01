@@ -63,9 +63,9 @@ if($checkpassword){
 	if($passwordlength < 6) {
 		$passwordlength = 6;
 	}
-	$securityrules = "The username must be atleast " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 } else {
-	$securityrules = "The username must be atleast " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 }
 
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be able to differentiate between a submit and an add button click
