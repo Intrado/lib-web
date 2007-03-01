@@ -26,6 +26,9 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 	if ($sess['authcode'] != $_GET['authCode'])
 		exit("error Bad authcode");
 
+	if ($sess['uploadsuccess'])
+		exit("already uploaded");
+
 	if (!$fp = fopen($sess['filename'],"ab"))
 		exit("error Can't write file");
 
@@ -79,6 +82,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 
 			$newauthcode = md5(mt_rand() . microtime() . $_SERVER['REMOTE_ADDR']);
 			$sess['authcode'] = $newauthcode;
+			$sess['uploadsuccess'] = false;
 			$sess['length'] = $sess['remaining'] = $length;
 			$sess['md5'] = $md5checksum;
 			$sess['filename'] = secure_tmpname("/tmp","autoupload",".csv");
@@ -109,6 +113,13 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Unknown authcode",
 						"errorCode" => "UNAUTHORIZED");
+
+		//have we already uploaded? (handle duplicate confirmation requests)
+		if ($sess['uploadsuccess']) {
+			return array ("resumeLength" => "0",
+						"errorMsg" => "",
+						"errorCode" => "NO_ERROR");
+		}
 
 		//check for the file
 		if (!(isset($sess['filename']) && file_exists($sess['filename'])))
@@ -161,8 +172,10 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 			$import->runNow();
 		}
 
-		//save the session data, clear the authcode
-		unset($sess['authcode']);
+		//save the session data
+		//set uploadsuccess in case the client misses our reply
+		$sess['uploadsuccess'] = true;
+
 		storeSessionData($sessionid,$sess['customerid'],$sess);
 
 		return array ("resumeLength" => "0",
