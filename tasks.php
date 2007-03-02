@@ -71,12 +71,9 @@ function fmt_actions ($import,$dummy) {
 	$associatedjobcount = QuickQuery("Select count(*) from importjob where importid = '$import->id'");
 	$confirm = "Are you sure you want to run this import now?";
 	if($associatedjobcount > 0){
-		$extra1 = 'W A R N I N G:\n';
-		if($associatedjobcount == 1)
-			$extra2 = 'This import has ' . "$associatedjobcount" .' repeating job linked to it.\n';
-		else
-			$extra2 = 'This import has ' . "$associatedjobcount" .' repeating jobs linked to it.\n';
-		$confirm = $extra1 . $extra2 . $confirm;
+		$confirm = "Are you sure you want to run this import and the linked repeating job(s) now?";
+		$extra = 'W A R N I N G:\nThis import has ' . "$associatedjobcount" .' repeating job(s) linked to it that will automatically run if you click OK.\n';
+		$confirm = $extra. $confirm;
 	}
 	return "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>";
 
