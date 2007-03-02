@@ -110,7 +110,24 @@ $count = 0;
 
 if ($job->type == "survey") {
 
+
 	$questionnaire = new SurveyQuestionnaire($job->questionnaireid);
+
+	// we need to make a copy of this questionnaire for this job so that if they edit it, it won't affect reporting
+	$questionnaire->id = null;
+	$questionnaire->deleted = 1; //default to deleted so it doesnt show up in UI
+	$questionnaire->create(); //save a copy w/ new ID
+
+	//update the job reference
+	$oldquestionnaireid = $job->questionnaireid;
+	$job->questionnaireid = $questionnaire->id;
+	$job->update(array("questionnaireid"));
+
+	//now copy over the questions
+	QuickUpdate("insert into surveyquestion (questionnaireid, questionnumber,
+						webmessage, phonemessageid, reportlabel, validresponse)
+				select $questionnaire->id as questionnaireid, questionnumber, webmessage, phonemessageid, reportlabel, validresponse
+				from surveyquestion where questionnaireid = $oldquestionnaireid");
 
 	$surveytypes = array("phone" => $questionnaire->hasphone,
 						"email" => $questionnaire->hasweb);
