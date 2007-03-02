@@ -50,7 +50,7 @@ class Job extends DBMappedObject {
 			$jobid = $this->id;
 
 		if (isset($_SERVER['WINDIR'])) {
-			$cmd = "start /b php jobprocess.php $jobid";
+			$cmd = "start php jobprocess.php $jobid";
 			pclose(popen($cmd,"r"));
 		} else {
 			$cmd = "php jobprocess.php $jobid > /dev/null &";
@@ -107,14 +107,14 @@ class Job extends DBMappedObject {
 		$this->sendprint = (bool)$this->printmessageid;
 	}
 
-	function update() {
+	function update($specificfields = NULL) {
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
-		parent::update();
+		parent::update($specificfields);
 	}
 
 	function create() {
