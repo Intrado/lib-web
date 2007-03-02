@@ -36,6 +36,8 @@ if (isset($_GET['cancel'])) {
 		} else if ($job->status = "new") {
 			$job->status = "cancelled";
 			$job->finishdate = QuickQuery("select now()");
+			//skip running autoreports for this job since there is nothing to report on
+			QuickUpdate("update job set ranautoreport=1 where jobid='$cancelid'");
 		}
 		$job->update();
 	}
