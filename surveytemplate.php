@@ -473,7 +473,7 @@ startWindow('Survey Template Information',NULL,true, false);
 				</tr>
 				<tr>
 					<td>Use HTML in Web Survey</td>
-					<td><? NewFormItem($f,$s,"usehtml","checkbox",null,null,'dependson="phonesurvey"'); ?></td>
+					<td><? NewFormItem($f,$s,"usehtml","checkbox",null,null,'dependson="websurvey"'); ?></td>
 				</tr>
 			</table>
 		</td>
