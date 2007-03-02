@@ -2,6 +2,7 @@
 /*
 
 From bbellwfu at gmail dot com on the php forums.
+Modified by Ben Hencke
 
 Usage
  Grab some XML data, either from a file, URL, etc. however you want. Assume storage in $strYourXML;
