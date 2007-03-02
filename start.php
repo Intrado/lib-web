@@ -122,7 +122,7 @@ if ($USER->authorize("startstats")) {
 									);
 				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
 				showObjects($data, $titles, $formatters);
-				?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
+				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
 				endWindow();
 
 
@@ -138,7 +138,7 @@ if ($USER->authorize("startstats")) {
 									);
 				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
 				showObjects($data, $titles, $formatters);
-				?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
+				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
 				endWindow();
 			}
 
