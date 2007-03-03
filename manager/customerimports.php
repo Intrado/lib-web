@@ -30,13 +30,15 @@ include("nav.inc.php");
 		<td>Status</td>
 		<td>Last Run</td>
 		<td>File Date</td>
+		<td>File Size in Bytes</td>
 	</tr>
 <?
 while($row = DBGetRow($list)){
-	$importfile = getImportFileURL($row[0],$row[1]);
+	$importfile = getImportFileURL($row[0],$row[2]);
 
 	if (is_readable($importfile) && is_file($importfile)) {
 		$row[6]=date("M j, g:i a",filemtime($importfile));
+		$row[7]=filesize($importfile);
 	} else {
 		$row[6]="Not Found";
 	}
@@ -50,6 +52,7 @@ while($row = DBGetRow($list)){
 		<td><?=$row[4]?></td>
 		<td><?=$row[5]?></td>
 		<td><?=$row[6]?></td>
+		<td><?=$row[7]?></td>
 	</tr>
 <?
 }
