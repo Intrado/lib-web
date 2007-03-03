@@ -57,6 +57,15 @@ if ($renderedlist->total == 0)
 if (count($questions) == 0)
 	error("The questionnaire you've selected does not contain any questions","Click Cancel to return to the Survey configuration page");
 
+$warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
+$warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
+if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
+	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) ) && $questionnaire->hasphone != 0)
+	{
+		error("WARNING: The call window for this survey is set for: ". date("g:i a", strtotime($job->starttime)) . " - " . date("g:i a", strtotime($job->endtime)));
+		error("These times fall outside the range of typical calling hours");
+	}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
