@@ -260,6 +260,16 @@ startWindow('User Information');
 							</tr>
 
 						</table>
+						
+<?
+						if($USER->authorize('loginphone') && !$IS_COMMSUITE) {
+							$query = "Select inboundnumber from customer where customer.id='$USER->customerid'";
+							$tollfree = Phone::format(QuickQuery($query));
+?>
+							<br>Your toll free number is: <?=$tollfree?>
+<?
+						}
+?>
 						<br>Please note: username and password are case-sensitive and must be a minimum of <?=$passwordlength?> characters.
 						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
 					</td>
