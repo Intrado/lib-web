@@ -31,11 +31,11 @@ class Phone extends DBMappedObject {
 		
 		$phone = Phone::parse($phone);
 		if ($iseasycall) {
-			$min = getSystemSetting('easycallmin', $IS_COMMSUITE ? 2 : 10);
+			$min = getSystemSetting('easycallmin', 10);
 			$max = getSystemSetting('easycallmax', 10);
 		} else {
-			$min = getSystemSetting('easycallmin', $IS_COMMSUITE ? 2 : 10);
-			$max = getSystemSetting('easycallmax', $IS_COMMSUITE ? 6 : 10);
+			$min = 10;
+			$max = 10;
 		}
 		$length = strlen($phone);
 		$error=array();
