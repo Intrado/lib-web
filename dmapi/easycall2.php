@@ -59,7 +59,6 @@ if($REQUEST_TYPE == "new") {
 		$specialtask->setData($messnum, $messageid);
 		$count++;
 		$specialtask->setData("count", $count);
-		$specialtask->setData("progress", "recording");
 		$specialtask->update();
 
 	}
@@ -82,6 +81,7 @@ if($REQUEST_TYPE == "new") {
 		$langnum = "language" . $count;
 		$currlang = $specialtask->getData($langnum);
 		if($currlang) {
+			$specialtask->setData("progress", "recording");
 			$specialtask->setData('currlang', $currlang);
 			$specialtask->update();
 			?>
