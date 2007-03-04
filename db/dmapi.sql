@@ -45,3 +45,7 @@ CREATE TABLE `tasksyncdata` (
 `value` VARCHAR( 50 ) NOT NULL ,
 PRIMARY KEY ( `name` )
 ) ENGINE = MYISAM ;
+
+-- tweak tasksyncdata
+
+ALTER TABLE 'tasksyncdata' ENGINE = InnoDB;
