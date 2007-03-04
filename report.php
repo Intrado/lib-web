@@ -82,8 +82,8 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 			$range1 = date("Y-m-d",$range1);
 			$range2 = date("Y-m-d",$range2);
 
-			$_SESSION['reportsql'] = "and jt.lastattempt >= unix_timestamp('$range1') * 1000 and jt.lastattempt <= unix_timestamp(date_add('$range2',interval 1 day)) * 1000 
-									or jt.lastattempt = null and j.finishdate >= unix_timestamp('$range1') and j.startdate <= unix_timestamp(date_add('$range2',interval 1 day))" ;
+			$_SESSION['reportsql'] = "and ( (jt.lastattempt >= unix_timestamp('$range1') * 1000 and jt.lastattempt <= unix_timestamp(date_add('$range2',interval 1 day)) * 1000 )
+									or jt.lastattempt = null) and ifnull(j.finishdate, j.enddate) >= '$range1' and j.startdate <= date_add('$range2',interval 1 day)" ;
 			$_SESSION['reportrange'] = "Range $range1 to $range2";
 			break;
 		case "relative":
@@ -92,14 +92,10 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 				default:
 				case "today":
 					$targetdate = QuickQuery("select curdate()");
-					$_SESSION['reportsql'] = "and jt.lastattempt >= unix_timestamp('$targetdate') * 1000 and jt.lastattempt < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000  
-												or jt.lastattempt = null and j.finishdate >= unix_timestamp('$targetdate') and j.startdate <= unix_timestamp(date_add('$targetdate',interval 1 day))";
 					$_SESSION['reportrange'] = "Today ($targetdate)";
 					break;
 				case "yesterday":
 					$targetdate = QuickQuery("select date_sub(curdate(),interval 1 day)");
-					$_SESSION['reportsql'] = "and jt.lastattempt >= unix_timestamp('$targetdate') * 1000 and jt.lastattempt < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000 
-												or jt.lastattempt = null and j.finishdate >= unix_timestamp('$targetdate') and j.startdate <= unix_timestamp(date_add('$targetdate',interval 1 day))";
 					$_SESSION['reportrange'] = "Yesterday ($targetdate)";
 					break;
 				case "lastweekday":
@@ -116,15 +112,14 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 						$daydiff = 3;
 
 					$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
-					$_SESSION['reportsql'] = "and jt.lastattempt >= unix_timestamp('$targetdate') * 1000 and jt.lastattempt < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000
-												or jt.lastattempt = null and j.finishdate >= unix_timestamp('$targetdate') and j.startdate <= unix_timestamp(date_add('$targetdate',interval 1 day)) ";
-
+					
 					if(!isset($_GET['name']) || !$_GET['name'])
 						$_SESSION['reportname'] = "Relative date Report";
 					$_SESSION['reportrange'] = "Last Week Day ($targetdate)";
 					break;
 			}
-
+			$_SESSION['reportsql'] = "and ( (jt.lastattempt >= unix_timestamp('$targetdate') * 1000 and jt.lastattempt < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000 )
+												or jt.lastattempt = null) and ifnull(j.finishdate, j.enddate) >= unix_timestamp('$targetdate') and j.startdate <= unix_timestamp(date_add('$targetdate',interval 1 day)) ";	
 			break;
 	}
 
