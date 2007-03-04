@@ -40,21 +40,29 @@ function assignSpecialTask ($types, $dmapidb) {
 	$success = false;
 	foreach($types as $specialtype) {
 		//when was the last time we checked the specialtasks table? We shouldn't check more than once every 5 seconds
-		if (QuickQuery("select count(*) from tasksyncdata where name='specialtaskcheck_" . $specialtype ."' and value > (now() - interval 5 second)") == 0) {
+		$query = "select count(*) from tasksyncdata where name='specialtaskcheck_" . $specialtype ."' and value > (now() - interval 5 second)";
+		$res = mysql_query($query, $dmapidb);
+		$row = mysql_fetch_row($res);
+		if ($row[0] == 0) {
 			//check for a special task, if we dont fine one, update the table
 
-			QuickUpdate("begin");
-			$res = QuickQueryRow("select id, type from specialtask where status='queued' and type in ('$specialtype') limit 1");
-			if ($res) {
-				list($id,$type) = $res;
-				if (QuickUpdate("update specialtask set status='assigned' where id=$id")) {
+			mysql_query("begin", $dmapidb);
+			$query = "select id, type from specialtask where status='queued' and type in ('$specialtype') limit 1";
+			$res = mysql_query($query, $dmapidb);
+			$row = mysql_fetch_row($res);
+			if ($row) {
+				list($id,$type) = $row;
+				$query = "update specialtask set status='assigned' where id=$id";
+				$res = mysql_query($query, $dmapidb);
+				if ($res) {
 					$success = true;
 				}
 			} else {
-				QuickUpdate("insert into tasksyncdata (name,value) values
-						('specialtaskcheck_" . $specialtype ."',now()) on duplicate key update value=now()");
+				$query = "insert into tasksyncdata (name,value) values 
+							('specialtaskcheck_" . $specialtype ."',now()) on duplicate key update value=now()";
+				mysql_query($query, $dmapidb);
 			}
-			QuickUpdate("commit");
+			mysql_query("commit", $dmapidb);
 		}
 		if($success)
 			break;
