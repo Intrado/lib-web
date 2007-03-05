@@ -29,7 +29,7 @@ class Import extends DBMappedObject {
 			$importid = $this->id;
 
 		if (isset($_SERVER['WINDIR'])) {
-			$cmd = "start /b php import.php -import=$importid";
+			$cmd = "start php import.php -import=$importid";
 			pclose(popen($cmd,"r"));
 		} else {
 			$cmd = "php import.php -import=$importid > /dev/null &";
