@@ -247,13 +247,18 @@ echo htmlentities($emailmessage->name);
 <? if($USER->authorize('sendmulti')) { ?>
 
 				<tr>
-					<td>Multilingual message options</td>
-					<td><? alternate('email'); ?></td>
+					<td class="bottomBorder" >Multilingual message options</td>
+					<td class="bottomBorder" ><? alternate('email'); ?></td>
 				</tr>
 <? } ?>
+				<tr>
+					<td class="bottomBorder" >Skip Duplicate Emails</td>
+					<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("skipemailduplicates") ? "checked":"" ?>>Skip Duplicates</td>
+				</tr>
 			</table>
 		</td>
 	</tr>
+	
 <? } ?>
 <? if(strpos($job->type,"print") !== false) { ?>
 	<tr valign="top">
