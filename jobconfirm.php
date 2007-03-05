@@ -252,8 +252,8 @@ echo htmlentities($emailmessage->name);
 				</tr>
 <? } ?>
 				<tr>
-					<td class="bottomBorder" >Skip Duplicate Emails</td>
-					<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("skipemailduplicates") ? "checked":"" ?>>Skip Duplicates</td>
+					<td>Skip Duplicate Emails</td>
+					<td><input type="checkbox" disabled <?= $job->isOption("skipemailduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
 			</table>
 		</td>
