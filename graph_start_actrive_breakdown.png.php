@@ -9,6 +9,10 @@ include ("jpgraph/jpgraph_pie.php");
 include ("jpgraph/jpgraph_pie3d.php");
 include ("jpgraph/jpgraph_canvas.php");
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
 $query = "
 select count(*) as cnt,
 		coalesce(if (wi.status='waiting', 'retry', cl.callprogress),

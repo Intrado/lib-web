@@ -7,6 +7,8 @@ include_once("obj/Job.obj.php");
 include ("jpgraph/jpgraph.php");
 include ("jpgraph/jpgraph_bar.php");
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
 $big = isset($_GET['big']) ? true : false;
 
 $cpcolors = array(
