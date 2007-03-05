@@ -31,13 +31,13 @@ if (isset($_GET['cancel'])) {
 		$job = new Job($cancelid);
 		$job->cancelleduserid = $USER->id;
 
-		if ($job->status = "active") {
+		if ($job->status == "active") {
 			$job->status = "cancelling";
-		} else if ($job->status = "new") {
+		} else if ($job->status == "new") {
 			$job->status = "cancelled";
 			$job->finishdate = QuickQuery("select now()");
 			//skip running autoreports for this job since there is nothing to report on
-			QuickUpdate("update job set ranautoreport=1 where jobid='$cancelid'");
+			QuickUpdate("update job set ranautoreport=1 where id='$cancelid'");
 		}
 		$job->update();
 	}
