@@ -72,7 +72,7 @@ if ($REQUEST_TYPE == "new") {
 		$callprogress = "F";
 	}
 
-	$callduration = $BFXML_VARS['callduration'] + 0;
+	$callduration = (isset($BFXML_VARS['callduration']) ? $BFXML_VARS['callduration'] + 0 : 0);
 	$resultdata = mysql_real_escape_string(http_build_query($BFXML_VARS,'','&'),$dmapidb);
 
 	//try to find this sessionid first

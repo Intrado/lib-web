@@ -22,7 +22,7 @@ if ($data = findChild($BFXML_ELEMENT,"DATA")) {
 	if ($datums = findChildren($data,"DATUM")) {
 		foreach ($datums as $datum) {
 			$name = $datum['attrs']['NAME'];
-			$value = $datum['txt'];
+			$value = (isset($datum['txt']) ? $datum['txt'] : "");
 			$BFXML_VARS[$name] = $value;
 		}
 	}
