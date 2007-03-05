@@ -81,7 +81,7 @@ if($REQUEST_TYPE == "new") {
 		$langnum = "language" . $count;
 		$currlang = $specialtask->getData($langnum);
 		if($currlang) {
-			$specialtask->setData("progress", "recording");
+			$specialtask->setData("progress", "Recording");
 			$specialtask->setData('currlang', $currlang);
 			$specialtask->update();
 			?>

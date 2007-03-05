@@ -78,7 +78,7 @@ if($REQUEST_TYPE == "new") {
 	
 	if($BFXML_VARS['recordnext'] == 1 || $BFXML_VARS['continue']==1) {
 		$count = $specialtask->getData('count');
-		$specialtask->setData("progress", "recording");
+		$specialtask->setData("progress", "Recording");
 		$specialtask->update();
 		?>
 		
