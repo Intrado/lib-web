@@ -119,7 +119,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 					break;
 			}
 			$_SESSION['reportsql'] = "and ( (jt.lastattempt >= unix_timestamp('$targetdate') * 1000 and jt.lastattempt < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000 )
-												or jt.lastattempt = null) and ifnull(j.finishdate, j.enddate) >= unix_timestamp('$targetdate') and j.startdate <= unix_timestamp(date_add('$targetdate',interval 1 day)) ";	
+												or jt.lastattempt = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";	
 			break;
 	}
 
