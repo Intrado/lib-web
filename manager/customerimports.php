@@ -41,6 +41,7 @@ while($row = DBGetRow($list)){
 		$row[7]=filesize($importfile);
 	} else {
 		$row[6]="Not Found";
+		$row[7]="-";
 	}
 	$row[5] = fmt_date($row, 5);
 ?>
