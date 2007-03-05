@@ -79,6 +79,8 @@ if (!$maxemails = getSystemSetting("maxemails"))
 if ($personid == NULL) {
 	// create a new person with empty data
 	$data = new PersonData();
+	$f = FieldMap::getLanguageField();
+	$data->$f = "English"; // default language, so that first in alphabet is not selected (example, Chinese)
 	$address = new Address();
 
 	$phones = array();
@@ -185,7 +187,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			// if manual add to a list, and entry not found, then create one
 			// (otherwise they edit existing contact on the list)
 
-			if (($ORIGINTYPE != "nav") && isset($_SESSION['listid']) &&
+			if (!isset($personid) && ($ORIGINTYPE != "nav") && isset($_SESSION['listid']) &&
 				!DBFind("ListEntry", "from listentry where listid=".$_SESSION['listid']." and personid=".$person->id)) {
 
 				$le = new ListEntry();

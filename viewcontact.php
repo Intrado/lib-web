@@ -29,7 +29,11 @@ if (!$USER->authorize('viewcontacts')) {
 */
 
 if (isset($_GET['id'])) {
-	$personid = $_GET['id'];
+	$personid = DBSafe($_GET['id']);
+	if ($personid == "") {
+		// bad
+		redirect('unauthorized.php');
+	}
 
 	// validate user has rights to view this contact
 	$usersql = $USER->userSQL("p", "pd");
@@ -105,8 +109,6 @@ $contactFullName .= " ".$data->$f;
 $TITLE = "View Contact Information: " . $contactFullName;
 
 include_once("nav.inc.php");
-
-NewForm($f);
 
 button_bar(button('done', NULL,$_SERVER['HTTP_REFERER']));
 
@@ -213,7 +215,6 @@ foreach ($fieldmaps as $map) {
 
 
 endWindow();
-EndForm();
 
 include_once("navbottom.inc.php");
 

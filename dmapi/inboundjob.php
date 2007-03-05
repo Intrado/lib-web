@@ -315,16 +315,15 @@ function commitJob()
 	global $USER, $ACCESS;
 
 	loadTimezone();
-	$now = QuickQuery("select now()");
 
 	// now create the job
 	$job= Job::jobWithDefaults();
 
-	$job->name = "Call In - ".$now;
+	$job->name = "Call In - " . date("M d, Y G:i:s");
 	$job->type = "phone";
 
-	$job->createdate = $now;
-	$job->startdate = date("Y-m-d", strtotime("today"));
+	$job->createdate = date("Y-m-d");
+	$job->startdate = date("Y-m-d");
 	$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 	if (isset($SESSIONDATA['starttime'])) {
 		$job->starttime = date("H:i", strtotime($SESSIONDATA['starttime']));

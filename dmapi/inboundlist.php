@@ -36,7 +36,6 @@ function confirmContinue()
 	</message>
 
 	<message name="error2">
-		<audio cmid="file://prompts/inbound/Saved.wav" />
 		<audio cmid="file://prompts/GoodBye.wav" />
 		<hangup />
 	</message>

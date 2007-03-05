@@ -205,15 +205,14 @@ function commitMessage($contentid)
 	$language = $languages[$langi];
 
 	loadTimezone();
-	$now = QuickQuery("select now()");
-	$name = "Call In (".$language.") - ".$now;
+	$name = "Call In (".$language.") - ".date("M d, Y G:i:s");
 
 	$audioFile = new AudioFile();
 	$audioFile->userid = $SESSIONDATA['userid'];
 	$audioFile->name = $name;
 	$audioFile->description = "";
 	$audioFile->contentid = $contentid; //$BFXML_VARS['recordaudio'];
-	$audioFile->recordDate = $now;
+	$audioFile->recordDate = date("Y-m-d G:i:s");
 
 	$message = new Message();
 	$message->userid = $SESSIONDATA['userid'];

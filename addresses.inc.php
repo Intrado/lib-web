@@ -53,7 +53,7 @@ function fmt_actions($row, $name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = $fromNav ? "start:addressbook" : "notifications:lists";
-$TITLE = "My Address Book " . ($fromNav ? '' : help('AddressBook_MyAddressBook'));
+$TITLE = "My Address Book ";
 
 include_once("nav.inc.php");
 
@@ -87,7 +87,8 @@ NewForm($f);
 		</tr>
 	</table>
 	<?
-	startWindow('Addresses','padding: 3px;');
+	$help = ($fromNav ? '' : help('AddressBook_MyAddressBook', NULL, 'blue'));
+	startWindow('Addresses ' . $help,'padding: 3px;');
 	?>
 	<table border="0" cellpadding="0" cellspacing="0" style="margin-top: 3px;">
 		<tr>
