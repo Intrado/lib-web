@@ -75,7 +75,7 @@ class User extends DBMappedObject {
 	}
 
 	function doLoginPhone ($accesscode, $pin, $inboundnumber = null) {
-		$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+		GLOBAL $SETTINGS;
 		$IS_LDAP = $SETTINGS['ldap']['is_ldap'];
 		
 		$accesscode = DBSafe($accesscode);
