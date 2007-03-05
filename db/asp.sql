@@ -1211,3 +1211,9 @@ update person p
   where p.userid = 0;
 
 
+
+
+-- speeds up date range reports slightly because mysql query optimizer can take statistics into account (that user->customer is a many to one)
+ALTER TABLE `user` ADD INDEX ( `customerid` ) ;
+
+
