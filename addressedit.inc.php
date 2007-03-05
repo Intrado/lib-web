@@ -20,11 +20,6 @@ include_once("obj/Language.obj.php");
 include_once("obj/ListEntry.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
-// Authorization
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -260,9 +255,12 @@ NewForm($f);
 if ($ORIGINTYPE == "preview") {
 	buttons(submit($f, 'savedone', 'savedone', 'save'),
 		button('cancel',NULL,$_SESSION['previewreferer']));
-} else {
+} else if (!isset($personid)) {
 	buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'),
 		submit($f, 'savedone', 'savedone', 'save_done'),
+		button('cancel',NULL,$redirectPage));
+} else {
+	buttons(submit($f, 'savedone', 'savedone', 'save_done'),
 		button('cancel',NULL,$redirectPage));
 }
 
