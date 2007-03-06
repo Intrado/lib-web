@@ -61,6 +61,7 @@ if (isset($personid)) {
 	// editing existing person
 	$data = DBFind("PersonData", "from persondata where personid = " . $personid);
 	$address = DBFind("Address", "from address where personid = " . $personid);
+	if ($address === false) $address = new Address(); // contact was imported/uploaded without any address data, create one now
 
 	// get existing phones from db, then create any additional based on the max allowed
 	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)

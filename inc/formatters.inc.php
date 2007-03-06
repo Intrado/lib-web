@@ -132,13 +132,12 @@ function fmt_checkbox($row,$index) {
 }
 
 function fmt_idmagnify ($row,$index) {
-
 	// TODO must I load the person in order to get the person->userid ?
 	$person = new Person($row[1]);
 	if ($person->userid == NULL) {
-		$result .= "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/magnify.gif\"></a>";
+		$result = "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/magnify.gif\"></a>";
 	} else {
-		$result .= "<a href=\"addresspreview.php?id=$row[1]\">  <img src=\"img/pencil.png\"></a>";
+		$result = "<a href=\"addresspreview.php?id=$row[1]\">  <img src=\"img/pencil.png\"></a>";
 	}
 	$result .= "&nbsp;".$row[$index];
 	return $result;

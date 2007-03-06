@@ -33,12 +33,11 @@ if (isset($_GET['delete'])) {
 	redirect();
 }
 
-// Check if the address book was clicked from the nav bar or the list page
-$fromNav = ($ORIGINTYPE === "nav");
-
 // set the pagename to jump to when editing selected contact
-$addressPagename = $fromNav ? "address.php" : (($ORIGINTYPE === "manualadd") ? "addressmanualaddbook.php" : "addressmanualadd.php");
-
+$addressPagename = "address.php";
+if ($ORIGINTYPE == "manualadd") {
+	$addressPagename = "addressmanualaddbook.php";
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -52,19 +51,16 @@ function fmt_actions($row, $name) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = $fromNav ? "start:addressbook" : "notifications:lists";
+$PAGE = ($ORIGINTYPE == "nav") ? "start:addressbook" : "notifications:lists";
 $TITLE = "My Address Book ";
 
 include_once("nav.inc.php");
 
-if (!$fromNav && $_SESSION['listid'] == null) {
+if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 	echo "<font color=#FF0000>";
 	print("Please make sure to first save your list before adding entries to it from your address book");
 	echo "</font>";
 } else {
-
-NewForm($f);
-
 	?>
 	<script langauge="javascript">
 
@@ -80,14 +76,14 @@ NewForm($f);
 
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding-bottom: 5px;">
 		<tr>
-			<td align="left"><? buttons(button('done', NULL, $fromNav ? 'start.php' : 'list.php')); ?></td>
+			<td align="left"><? buttons(button('done', NULL, ($ORIGINTYPE == "nav") ? 'start.php' : 'list.php')); ?></td>
 			<td align="right" valign="bottom">
-				<?= ($fromNav) ? '' : 'Select the individuals you want to add to your list.'?>
+				<?= ($ORIGINTYPE == "nav") ? '' : 'Select the individuals you want to add to your list.'?>
 			</td>
 		</tr>
 	</table>
 	<?
-	$help = ($fromNav ? '' : help('AddressBook_MyAddressBook', NULL, 'blue'));
+	$help = (($ORIGINTYPE == "nav") ? '' : help('AddressBook_MyAddressBook', NULL, 'blue'));
 	startWindow('Addresses ' . $help,'padding: 3px;');
 	?>
 	<table border="0" cellpadding="0" cellspacing="0" style="margin-top: 3px;">
@@ -126,22 +122,24 @@ NewForm($f);
 		$onpageids[] = $row[0];
 	}
 
-	//fmt_checkbox_addrbook needs $inlistids to be set
-	$listid = $_SESSION['listid'];
-	$inlistids = array();
-	if (count($onpageids) > 0) {
-		$query = "
-		select le.personid
-		from listentry le
-		where le.listid = $listid and le.type='A'
-		and (le.personid = " . implode(" or le.personid =", $onpageids) . ")
-		";
-		$inlistids = QuickQueryList($query);
-	}
-
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
 
-	if (!$fromNav) {
+	// strange condition for listid to be null if origin is manualadd, user may have typed into url
+	// check listid anyway for sql query to function properly
+	if ($ORIGINTYPE == "manualadd" && $_SESSION['listid'] != null) {
+		//fmt_checkbox_addrbook needs $inlistids to be set
+		$listid = $_SESSION['listid'];
+		$inlistids = array();
+		if (count($onpageids) > 0) {
+			$query = "
+			select le.personid
+			from listentry le
+			where le.listid = $listid and le.type='A'
+			and (le.personid = " . implode(" or le.personid =", $onpageids) . ")
+			";
+			$inlistids = QuickQueryList($query);
+		}
+
 		$titles = array(1 => "In List",
 						2 => "First Name",
 						3 => "Last Name",
@@ -173,7 +171,6 @@ NewForm($f);
 	endWindow();
 
 	buttons();
-EndForm();
 } //end if no list
 
 include_once("navbottom.inc.php");
