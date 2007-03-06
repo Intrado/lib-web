@@ -28,7 +28,7 @@ if(isset($_REQUEST['id'])) {
 	$_SESSION['easycallid'] = null;
 	redirect();
 }
-$languages = DBFindMany("Language","from language where customerid=" . $USER->customerid);
+$languages = DBFindMany("Language","from language where customerid= '$USER->customerid' order by name");
 
 
 // FORM HANDLING
