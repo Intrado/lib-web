@@ -68,9 +68,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managerpassword = GetFormData($f, $s, 'managerpassword');
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
 
-			$currmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4);
-			$currmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2);
-
 			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnumber) . " AND id != $currentid")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."' AND id != $currentid")) {
@@ -146,10 +143,10 @@ if( $reloadform ) {
 	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', $currentid),"phone", 3, 3);
 
 
-	$currentmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4);
-	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",$currentmaxphone,"nomax",true);
-	$currentmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2);
-	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",$currentmaxemail,"nomax",true);
+	$currentmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4, true);
+	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",4,"nomax",true);
+	$currentmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2, true);
+	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",2,"nomax",true);
 
 	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', $currentid),"text",1,255);
 	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', $currentid),"email",1,255);
