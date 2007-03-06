@@ -99,32 +99,32 @@ class Job extends DBMappedObject {
 
 
 
-	function refresh() {
-		parent::refresh();
+	function refresh($specificfields = NULL, $refreshchildren = false) {
+		parent::refresh($specificfields, $refreshchildren);
 		$this->optionsarray = false;
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
 	}
 
-	function update($specificfields = NULL) {
+	function update($specificfields = NULL, $updatechildren = false) {
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
-		parent::update($specificfields);
+		parent::update($specificfields,$updatechildren);
 	}
 
-	function create() {
+	function create($specificfields = NULL, $createchildren = false) {
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
-		parent::create();
+		parent::create($specificfields, $createchildren);
 	}
 
 	function isOption ($option) {
