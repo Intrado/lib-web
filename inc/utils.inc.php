@@ -24,7 +24,7 @@ function redirect($url = NULL) {
 		the HTTP_REFERER is null, as in when someone types in a URL.
 */
 function redirectToReferrer($fallbackUrl = NULL) {
-	if (!fallbackUrl) {
+	if (!$fallbackUrl) {
 		$fallbackUrl = $_SERVER['SCRIPT_NAME'];
 	}
 
@@ -54,10 +54,10 @@ function getNextAvailableAccessCode($currentCode, $userid, $customerid) {
 	return $nextCode;
 }
 
-function getCustomerSystemSetting($name, $customerid, $defaultvalue=false) {
+function getCustomerSystemSetting($name, $customerid, $defaultvalue=false, $refresh=false) {
 	static $settings = array();
 
-	if (isset($settings[$name]))
+	if (isset($settings[$name]) && !$refresh)
 		return $settings[$name];
 
 	$value = QuickQuery("select value from setting where customerid = $customerid and name = '" . DBSafe($name) . "'");
