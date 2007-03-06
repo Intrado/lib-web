@@ -61,7 +61,7 @@ if (isset($_GET['delete'])) {
 			foreach($associatedimports as $importjob){
 				$importjob->destroy();
 			}
-			QuickUpdate("delete from joblanguage where jobid='$deletedid'");
+			QuickUpdate("delete from joblanguage where jobid='$deleteid'");
 			$job->destroy();
 		}
 	}
