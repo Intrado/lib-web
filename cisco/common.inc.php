@@ -12,12 +12,21 @@ require_once("../obj/Permission.obj.php");
 require_once("../obj/Rule.obj.php"); //for search and sec profile rules
 
 //get the customer URL
-$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+if ($IS_COMMSUITE) {
+	$CUSTOMERURL = "default";
+} /*CSDELETEMARKER_START*/ else {
+	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+} /*CSDELETEMARKER_END*/
+
 
 session_name($CUSTOMERURL . "_session");
 session_start();
 
+if (isset($_SESSION['timezone'])) {
+	@date_default_timezone_set($_SESSION['timezone']);
+	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
+}
 
 if (isset($_SERVER['HTTP_X_CISCOIPPHONEMODELNAME']))
 	$_SESSION['HTTP_X_CISCOIPPHONEMODELNAME'] = $_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'];
@@ -42,10 +51,6 @@ if (!$isindexpage) {
 		if($ACCESS->modified < QuickQuery("select modified from access where id = $ACCESS->id"))
 			$ACCESS->refresh(NULL, true);
 
-		if (!isset($_SESSION['timezone'])) {
-			$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
-		}
-
 		if (!$USER->enabled || !$USER->authorize('loginphone')) {
 			header("Location: $URL/index.php?logout=1");
 			exit();
@@ -53,10 +58,6 @@ if (!$isindexpage) {
 	}
 }
 
-if (isset($_SESSION['timezone'])) {
-	@date_default_timezone_set($_SESSION['timezone']);
-	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-}
 
 $fp = fopen("foo.txt","w");
 ob_start();

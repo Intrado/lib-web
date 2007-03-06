@@ -27,6 +27,11 @@ if ($IS_COMMSUITE) {
 session_name($CUSTOMERURL . "_session");
 session_start();
 
+if (isset($_SESSION['timezone'])) {
+	@date_default_timezone_set($_SESSION['timezone']);
+	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
+}
+
 if (!isset($isindexpage) || !$isindexpage) {
 
 	//force ssl?
@@ -46,23 +51,12 @@ if (!isset($isindexpage) || !$isindexpage) {
 		if($USER->accessid != $ACCESS->id || $ACCESS->modified < QuickQuery("select modified from access where id = $ACCESS->id"))
 			$ACCESS->refresh(NULL, true);
 
-		//FIXME should this be removed because it is already set from login?
-		if (!isset($_SESSION['timezone'])) {
-			$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
-		}
-
 		if (!$USER->enabled || $USER->deleted || !$USER->authorize('loginweb')) {
 			redirect("./?logout=1");
 		}
 	}
 }
 
-
-
-if (isset($_SESSION['timezone'])) {
-	@date_default_timezone_set($_SESSION['timezone']);
-	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-}
 
 
 ?>
