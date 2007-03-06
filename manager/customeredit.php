@@ -35,16 +35,10 @@ $reloadform = 0;
 if( !QuickQuery("SELECT COUNT(*) FROM customer WHERE id = $currentid")) {
 	exit("Cannot find record of customer in database");
 }
+$refreshlangs = 0;
+$languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
 
-$langs = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
-$languages = array();
-$count = 1;
-foreach($langs as $language){
-	$languages[$count] = $language;
-	$count++;
-}
-
-if(CheckFormSubmit($f,$s)) {
+if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 	if(CheckFormInvalid($f))
 	{
 		error('Form was edited in another window, reloading data');
@@ -108,13 +102,14 @@ if(CheckFormSubmit($f,$s)) {
 				}
 				setCustomerSystemSetting('_renewaldate', $renewaldate, $currentid);
 				setCustomerSystemSetting('_callspurchased', $callspurchased, $currentid);
-				for($count=1; $count <= count($languages); $count++){
-					$lang = "Language" . $count;
-					if(GetFormData($f, $s, $lang) == "") {
-						$languages[$count]->destroy();
+				$oldlanguages = GetFormData($f, $s, "oldlanguages");
+				foreach($oldlanguages as $oldlanguage){
+					$lang = "Language" . $oldlanguage;
+					if(GetFormData($f, $s, $lang) === "") {
+						$languages[$oldlanguage]->destroy();
 					} else {
-						$languages[$count]->name= GetFormData($f, $s, $lang);
-						$languages[$count]->update();
+						$languages[$oldlanguage]->name= GetFormData($f, $s, $lang);
+						$languages[$oldlanguage]->update();
 					}
 				}
 				if(GetFormData($f,$s, "newlang")!=""){
@@ -123,10 +118,12 @@ if(CheckFormSubmit($f,$s)) {
 					$newlang->customerid = $currentid;
 					$newlang->create();
 				}
-				
-				
-				
-				redirect("customers.php");
+				if(CheckFormSubmit($f, "Return")){
+					redirect("customers.php");
+				} else {
+					$reloadform=1;
+					$refreshlangs = 1;
+				}
 			}
 
 		}
@@ -162,11 +159,16 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', $currentid),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', $currentid), "text", 0, 100);
-	
-	for($count = 1; $count <= count($languages); $count++){
-		$lang = "Language" . $count;
-		PutFormData($f, $s, $lang, $languages[$count]->name, "text");
+	if($refreshlangs){
+		$languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
 	}
+	$oldlanguages = array();
+	foreach($languages as $language){
+		$oldlanguages[] = $language->id;
+		$lang = "Language" . $language->id;
+		PutFormData($f, $s, $lang, $language->name, "text");
+	}
+	PutFormData($f, $s, "oldlanguages", $oldlanguages);
 }
 
 include_once("nav.inc.php");
@@ -201,8 +203,8 @@ NewFormItem($f, $s,"", 'submit');
 
 <?
 	
-	for($count = 1; $count <= count($languages); $count++){
-		$lang = "Language" . $count;
+	foreach($languages as $language){
+		$lang = "Language" . $language->id;
 		?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50) ?></td></tr><?
 	}
 ?>
@@ -220,16 +222,17 @@ NewFormItem($f, $s,"", 'submit');
 		NewFormItem($f,$s,'retry','selectoption',90,90);
 		NewFormItem($f,$s,'retry','selectoption',120,120);
 	NewFormItem($f,$s,'retry','selectend');
+
+
 ?>
-
-
+<tr>
+	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
+	<td><? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
+</tr>
 
 </table>
 
-<?
-
-NewFormItem($f, $s,"", 'submit');
-?><p>Manager Password: </td><td><? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?><p><?
+<p>Manager Password: </td><td><? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?><p><?
 EndForm();
 
 if(isset($ERRORS) && is_array($ERRORS)) {
