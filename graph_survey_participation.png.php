@@ -62,8 +62,19 @@ if ($jobstats['email']) {
 //var_dump($colors);
 //exit();
 
-if (array_sum($data) == 0)
+if (array_sum($data) == 0) {
+	$graph = new CanvasGraph(350,100,"auto");
+	$t1 = new Text("Sorry, there is no data to display");
+	$t1->SetPos(0.05,0.5);
+	$t1->SetOrientation("h");
+	$t1->SetFont(FF_FONT1,FS_NORMAL);
+	$t1->SetBox("white","black",'gray');
+	$t1->SetColor("black");
+	$graph->AddText($t1);
+	$graph->Stroke();
 	exit();
+}
+
 
 $graph = new PieGraph(350,100,"auto");
 //$graph->SetShadow();

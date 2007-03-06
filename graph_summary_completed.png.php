@@ -32,8 +32,10 @@ $colors = array("lightgreen", "blue");
 //var_dump($colors);
 //exit();
 
-if (array_sum($data) == 0)
-	exit();
+if (array_sum($data) == 0) {
+	redirect("img/spacer.gif");
+}
+
 
 $graph = new PieGraph(300,100,"auto");
 //$graph->SetShadow();

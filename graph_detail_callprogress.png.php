@@ -69,8 +69,9 @@ foreach ($cpcodes as $code => $title) {
 //var_dump($colors);
 //exit();
 
-if (array_sum($data) == 0)
-	exit();
+if (array_sum($data) == 0) {
+	redirect("img/spacer.gif");
+}
 
 $graph = new PieGraph(250,160,"auto");
 //$graph->SetShadow();
