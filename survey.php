@@ -146,6 +146,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			error('The end time is invalid');
 		} else if (strtotime(GetFormData($f,$s,"endtime")) < strtotime(GetFormData($f,$s,"starttime")) ) {
 			error('The end time cannot be before the start time');
+		} else if ((strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) < strtotime("today")) && !$completedmode){
+			error('The end date has already passed. Please correct this problem before proceeding');
+		} else if ( (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
+			error('The end time has already passed. Please correct this problem before proceeding');
 		} else if (QuickQuery("select count(*) from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','active','repeating') and id!= " . (0 + getCurrentSurvey()))) {
 			error('A job or survey named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
