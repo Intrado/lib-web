@@ -6,6 +6,7 @@ include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
 include_once("../obj/Phone.obj.php");
 include_once("AspAdminUser.obj.php");
+include_once("../obj/Language.obj.php");
 
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
@@ -33,6 +34,14 @@ $reloadform = 0;
 // Checking to see if customer id is in the database
 if( !QuickQuery("SELECT COUNT(*) FROM customer WHERE id = $currentid")) {
 	exit("Cannot find record of customer in database");
+}
+
+$langs = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
+$languages = array();
+$count = 1;
+foreach($langs as $language){
+	$languages[$count] = $language;
+	$count++;
 }
 
 if(CheckFormSubmit($f,$s)) {
@@ -99,8 +108,25 @@ if(CheckFormSubmit($f,$s)) {
 				}
 				setCustomerSystemSetting('_renewaldate', $renewaldate, $currentid);
 				setCustomerSystemSetting('_callspurchased', $callspurchased, $currentid);
-
-				redirect();
+				for($count=1; $count <= count($languages); $count++){
+					$lang = "Language" . $count;
+					if(GetFormData($f, $s, $lang) == "") {
+						$languages[$count]->destroy();
+					} else {
+						$languages[$count]->name= GetFormData($f, $s, $lang);
+						$languages[$count]->update();
+					}
+				}
+				if(GetFormData($f,$s, "newlang")!=""){
+					$newlang = new Language();
+					$newlang->name = GetFormData($f, $s, "newlang");
+					$newlang->customerid = $currentid;
+					$newlang->create();
+				}
+				
+				
+				
+				redirect("customers.php");
 			}
 
 		}
@@ -136,6 +162,11 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', $currentid),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', $currentid), "text", 0, 100);
+	
+	for($count = 1; $count <= count($languages); $count++){
+		$lang = "Language" . $count;
+		PutFormData($f, $s, $lang, $languages[$count]->name, "text");
+	}
 }
 
 include_once("nav.inc.php");
@@ -167,6 +198,16 @@ NewFormItem($f, $s,"", 'submit');
 <tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 25, 255) ?></td></tr>
 <tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
+
+<?
+	
+	for($count = 1; $count <= count($languages); $count++){
+		$lang = "Language" . $count;
+		?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50) ?></td></tr><?
+	}
+?>
+<tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
+
 <tr><td>Retry:
 
 <?
@@ -180,7 +221,9 @@ NewFormItem($f, $s,"", 'submit');
 		NewFormItem($f,$s,'retry','selectoption',120,120);
 	NewFormItem($f,$s,'retry','selectend');
 ?>
-</td></tr>
+
+
+
 </table>
 
 <?
@@ -210,5 +253,6 @@ function setCustomerSystemSetting($name, $value, $currid) {
 
 	}
 }
+	
 
 ?>
