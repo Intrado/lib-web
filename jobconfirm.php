@@ -252,7 +252,7 @@ echo htmlentities($emailmessage->name);
 				</tr>
 <? } ?>
 				<tr>
-					<td>Skip Duplicate Emails</td>
+					<td>Skip Duplicate Email Addresses</td>
 					<td><input type="checkbox" disabled <?= $job->isOption("skipemailduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
 			</table>
