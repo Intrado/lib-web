@@ -1,5 +1,18 @@
 <?
-$code = $_GET['s'];
+
+$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
+
+
+if ($IS_COMMSUITE) {
+	$CUSTOMERURL = "default";
+} /*CSDELETEMARKER_START*/ else {
+	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+} /*CSDELETEMARKER_END*/
+
+
+$code = (isset($_GET['s']) ? $_GET['s'] : "");
 if (strlen($code) > 50 || strlen($CUSTOMERURL) > 50)
 	exit();
 
@@ -9,8 +22,6 @@ header("Cache-Control: post-check=0,pre-check=0");
 header("Cache-Control: max-age=0");
 header("Pragma: no-cache");
 
-$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
@@ -26,7 +37,7 @@ $custname = QuickQuery("select name from customer where hostname='" . DBSafe($CU
 
 //see if this code exists and has not already been used
 $query = "select jobworkitemid, isused from surveyemailcode where code='" . DBSafe($code) . "'";
-if ($row = QuickQueryRow($query)) {
+if (strlen($code) > 0 && $row = QuickQueryRow($query)) {
 	$exists = true;
 	list($workitemid, $isused) = $row;
 
@@ -57,7 +68,7 @@ if ($row = QuickQueryRow($query)) {
 	$exists = false;
 }
 
-if ($_POST['submit'] && $exists && !$isused && $job->status == "active") {
+if (isset($_POST['submit']) && $exists && !$isused && $job->status == "active") {
 
 	$resultsql = array();
 	$results = array();
@@ -109,7 +120,7 @@ if ($_POST['submit'] && $exists && !$isused && $job->status == "active") {
 			<img id='brand' src='../img/school_messenger.gif' /><img src='img/spacer.gif' width="1" height="40" />
 
 <div id="contentbody">
-<div id="navtitle"><?= htmlentities($questionnaire->webpagetitle) ?></div>
+<div id="navtitle"><?= htmlentities(isset($questionnaire->webpagetitle) ? $questionnaire->webpagetitle : "") ?></div>
 
 <div id='shadowblock'>
 	<table width='100%' border='0' cellpadding='0' cellspacing='0'>
@@ -119,7 +130,7 @@ if ($_POST['submit'] && $exists && !$isused && $job->status == "active") {
 //if no survey found, display error page
 if (!$exists) {
 ?>
-	<h3>Sorry, the survey link has expired or is invalid</h3>
+	<br><br>Sorry, the survey link has expired or is invalid<br><br>
 <?
 } else if ($isused) {
 	//if already taken, show thanks page
@@ -130,11 +141,11 @@ if (!$exists) {
 			echo nl2br(htmlentities($questionnaire->webexitmessage));
 	else if (isset($_GET['thanks'])) {
 ?>
-	<h3>Your response has been recorded. Thank you for participating in this survey.</h3>
+	<br><br>Your response has been recorded. Thank you for participating in this survey.<br><br>
 <?
 	} else {
 ?>
-	<h3>Your responses to this survey were previously noted. Thank you for your particiaption.</h3>
+	<br><br>Your responses to this survey were previously noted. Thank you for your participation.<br><br>
 <?
 	}
 } else if ($job->status != "active") {
