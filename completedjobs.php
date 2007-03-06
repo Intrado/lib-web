@@ -106,7 +106,7 @@ function fmt_total ($obj, $name) {
 	global $jobstats;
 	$total = "";
 	foreach (getJobTypes($obj) as $type)
-		$total .= ucfirst($type) . ": " . $jobstats[$obj->id][$type]['total'] . "<br>";
+		$total .= ucfirst($type) . ": " . (isset($jobstats[$obj->id][$type]['total']) ? $jobstats[$obj->id][$type]['total'] : "") . "<br>";
 	return $total;
 }
 function fmt_rate ($obj, $name) {
@@ -114,7 +114,7 @@ function fmt_rate ($obj, $name) {
 
 	$rate = "";
 	foreach (getJobTypes($obj) as $type)
-		$rate .= ucfirst($type) . ": " . sprintf("%0.2f",$jobstats[$obj->id][$type]['rate']) . "%<br>";
+		$rate .= ucfirst($type) . ": " . sprintf("%0.2f",(isset($jobstats[$obj->id][$type]['rate']) ? $jobstats[$obj->id][$type]['rate'] : "")) . "%<br>";
 	return $rate;
 }
 

@@ -33,11 +33,7 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
-if ($_POST['id'] == 'new' || isset($_POST['adduser_x'])) {
-	$_SESSION['userid'] = NULL;
-}
-
-if($_GET['deleterule']) {
+if(isset($_GET['deleterule'])) {
 	$deleterule = DBSafe($_GET['deleterule']);
 	if (customerOwns("user",$_SESSION['userid'])) {
 		$query = "delete from userrule where userid = " . $_SESSION['userid'] . " and ruleid = '$deleterule'";
@@ -213,7 +209,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 }
 
 $RULEMODE = array('multisearch' => true, 'text' => false, 'reldate' => false);
-if ($_SESSION[userid])
+if ($_SESSION['userid'])
 	$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
 else
 	$RULES = array();
@@ -311,7 +307,7 @@ startWindow('User Information');
 								<td align="right">Confirm Password:</td>
 								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50, 'id="passwordfield2"'); ?></td>
 							</tr>
-							<? if(GetFormData($f,$s,'ldap') && $IS_LDAP) { ?>
+							<? if($IS_LDAP && GetFormData($f,$s,'ldap')) { ?>
 								<script>
 								new getObj('passwordfield1').obj.disabled=1;
 								new getObj('passwordfield2').obj.disabled=1;

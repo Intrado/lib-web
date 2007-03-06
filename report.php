@@ -34,7 +34,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 	unset($_SESSION['reportjobid']); //reset the jobid in case this isn't a job report
 
 	//get all the report options and store in session as SQL
-	switch ($_GET['reporttype']) {
+	switch ((isset($_GET['reporttype']) ? $_GET['reporttype'] : null)) {
 		default:
 		case "job":
 			if (isset($_GET['check_archived']) && $_GET['check_archived']) {
@@ -112,7 +112,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 						$daydiff = 3;
 
 					$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
-					
+
 					if(!isset($_GET['name']) || !$_GET['name'])
 						$_SESSION['reportname'] = "Relative date Report";
 					$_SESSION['reportrange'] = "Last Week Day ($targetdate)";
@@ -492,7 +492,7 @@ if (isset($_GET['csv'])) {
 	2. The user has permission to view systemwide reports.
 	3. The report is in job mode. ($_GET['reporttype'] == "job")
 	*/
-	if ($USER->authorize('viewsystemreports') && $_GET['reporttype'] == "job" && $USER->id != $data[0][9] && $data[0][10] != null) { // Check for non-null report name
+	if ($USER->authorize('viewsystemreports') && (isset($_GET['reporttype']) ? $_GET['reporttype'] : "") == "job" && $USER->id != $data[0][9] && $data[0][10] != null) { // Check for non-null report name
 		$DESCRIPTION .= "<br>Created by {$data[0][11]} {$data[0][12]} ({$data[0][13]})";
 	}
 	include_once("nav.inc.php");

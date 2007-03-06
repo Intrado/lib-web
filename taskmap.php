@@ -103,14 +103,6 @@ else
 	$IMPORTFIELDS = array();
 
 
-if( $reloadform )
-{
-	ClearFormData($form);
-
-	foreach ($IMPORTFIELDS as $importfield) {
-		PutFormData($form,$section, "mapto_" . $importfield->mapfrom, $importfield->mapto);
-	}
-}
 
 
 //make a menu of all available fields
@@ -187,10 +179,27 @@ if ($fp) {
 	}
 	$_SESSION['importcols'] = $colcount;
 	fclose($fp);
+	$noimportdata = false;
 } else {
 	$_SESSION['importcols'] = 0;
 	$noimportdata = true;
 }
+
+
+if( $reloadform )
+{
+	ClearFormData($form);
+
+	//set defaults to unmapped
+	for ($x = 0; $x < $colcount; $x++) {
+		PutFormData($form,$section, "mapto_" . $x, "");
+	}
+
+	foreach ($IMPORTFIELDS as $importfield) {
+		PutFormData($form,$section, "mapto_" . $importfield->mapfrom, $importfield->mapto);
+	}
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
