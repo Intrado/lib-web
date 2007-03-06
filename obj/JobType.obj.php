@@ -13,7 +13,7 @@ class JobType extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function getUserJobTypes() {
+	static function getUserJobTypes() {
 		global $USER;
 		$jobtypes = DBFindMany("JobType","from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=$USER->id and jt.deleted=0 order by priority","jt");
 

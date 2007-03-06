@@ -14,7 +14,7 @@ class Rule extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function makeQuery ($rulesarray, $alias, $fieldoverride = false) {
+	static function makeQuery ($rulesarray, $alias, $fieldoverride = false) {
 		$query = "";
 		if(is_array($rulesarray))
 			foreach ($rulesarray as $rule)

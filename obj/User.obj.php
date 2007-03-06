@@ -28,20 +28,20 @@ class User extends DBMappedObject {
 
 /* static functions */
 
-	function doLogin ($username, $password, $url = null) {
-		
+	static function doLogin ($username, $password, $url = null) {
+
 		GLOBAL $IS_LDAP;
 		GLOBAL $SETTINGS;
 		GLOBAL $IS_COMMSUITE;
 		$username = dbsafe(trim($username));
 		$password = dbsafe($password);
-		
+
 		$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
 		$LDAP_EXTENSION = $SETTINGS['ldap']['ldapextension'];
 		if($IS_COMMSUITE && $IS_LDAP){
 			$userldap = QuickQuery("select user.ldap from user, customer where user.login='$username'
 				and user.customerid = customer.id and customer.hostname = '" . dbsafe($url) . "'");
-			
+
 			if($userldap){
 				if(strpos('@',$username)!== false){
 					$ldapusername = $username.$LDAP_EXTENSION;
@@ -74,10 +74,10 @@ class User extends DBMappedObject {
 		return QuickQuery($query);
 	}
 
-	function doLoginPhone ($accesscode, $pin, $inboundnumber = null) {
+	static function doLoginPhone ($accesscode, $pin, $inboundnumber = null) {
 		GLOBAL $SETTINGS;
 		$IS_LDAP = $SETTINGS['ldap']['is_ldap'];
-		
+
 		$accesscode = DBSafe($accesscode);
 		$pin = DBSafe($pin);
 
@@ -85,7 +85,7 @@ class User extends DBMappedObject {
 			$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
 			$ldapusername = $SETTINGS['ldap']['ldapusername'];
 			$ldappassword = $SETTINGS['ldap']['ldappassword'];
-			
+
 			$query = "select login, id, ldap from user where enabled=1 and deleted=0 and "
 					."accesscode='$accesscode' and pincode=password('$pin')";
 			$user = Query($query);
@@ -130,7 +130,7 @@ class User extends DBMappedObject {
 		return QuickQuery($query);
 	}
 
-	function forceLogin ($username, $url, $customerid) {
+	static function forceLogin ($username, $url, $customerid) {
 		$username = dbsafe($username);
 		$url = DBSafe($url);
 		$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.hostname='$url') "

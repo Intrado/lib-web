@@ -23,20 +23,20 @@ class FieldMap extends DBMappedObject {
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
-	
-	function getFirstNameField() {
+
+	static function getFirstNameField() {
 		return 'f01';
 	}
-	
-	function getLastNameField() {
+
+	static function getLastNameField() {
 		return 'f02';
 	}
-	
-	function getLanguageField() {
+
+	static function getLanguageField() {
 		return 'f03';
 	}
 
-	function getMapNames () {
+	static function getMapNames () {
 		global $USER;
 		$map = array();
 		$query = "select name,fieldnum from fieldmap where customerid='" . $USER->customerid . "'"
@@ -48,8 +48,8 @@ class FieldMap extends DBMappedObject {
 		}
 		return $map;
 	}
-	
-	function getAuthorizedMapNames () {
+
+	static function getAuthorizedMapNames () {
 		global $USER;
 		$map = array();
 		$query = "select name,fieldnum from fieldmap where customerid='" . $USER->customerid . "'"
@@ -61,9 +61,9 @@ class FieldMap extends DBMappedObject {
 			}
 		}
 		return $map;
-	}	
-	
-	function getAuthorizedFieldMaps () {
+	}
+
+	static function getAuthorizedFieldMaps () {
 		global $USER;
 		$fieldmaps = DBFindMany("FieldMap", "from fieldmap where customerid='" . $USER->customerid . "'");
 		foreach($fieldmaps as $key => $fieldmap)
@@ -72,7 +72,7 @@ class FieldMap extends DBMappedObject {
 		return $fieldmaps;
 	}
 
-	function getName ($fieldnum) {
+	static function getName ($fieldnum) {
 		global $USER;
 		$query = "select name from fieldmap where customerid='" . $USER->customerid . "'"
 				." and fieldnum = '$fieldnum'";

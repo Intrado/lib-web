@@ -13,7 +13,7 @@ class Phone extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function format ($phone) {
+	static function format ($phone) {
 		if (strlen($phone) == 10)
 			return "(" . substr($phone,0,3) . ") " . substr($phone,3,3) . "-" . substr($phone,6,4);
 		else if (strlen($phone) == 7)
@@ -22,13 +22,13 @@ class Phone extends DBMappedObject {
 			return $phone;
 	}
 
-	function parse ($phone) {
+	static function parse ($phone) {
 		return ereg_replace("[^0-9]*","",$phone);
 	}
 
-	function validate ($phone, $iseasycall = false) {
+	static function validate ($phone, $iseasycall = false) {
 		global $IS_COMMSUITE;
-		
+
 		$phone = Phone::parse($phone);
 		if ($iseasycall) {
 			$min = getSystemSetting('easycallmin', 10);

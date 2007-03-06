@@ -18,7 +18,7 @@ class Person extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function findPerson($custid,$key) {
+	static function findPerson($custid,$key) {
 		$query = "select id from person where customerid='$custid' and pkey='" . DBSafe($key) . "'";
 		$id = QuickQuery($query);
 
