@@ -252,15 +252,12 @@ $TITLE = "Enter Contact Information: " . $name;
 include_once("nav.inc.php");
 NewForm($f);
 
-if ($ORIGINTYPE == "preview") {
-	buttons(submit($f, 'savedone', 'savedone', 'save'),
-		button('cancel',NULL,$_SESSION['previewreferer']));
-} else if (!isset($personid)) {
+if (!isset($personid)) {
 	buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'),
-		submit($f, 'savedone', 'savedone', 'save_done'),
+		submit($f, 'savedone', 'savedone', 'save'),
 		button('cancel',NULL,$redirectPage));
 } else {
-	buttons(submit($f, 'savedone', 'savedone', 'save_done'),
+	buttons(submit($f, 'savedone', 'savedone', 'save'),
 		button('cancel',NULL,$redirectPage));
 }
 
