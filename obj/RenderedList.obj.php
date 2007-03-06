@@ -305,11 +305,12 @@ class RenderedList {
 			$this->hasstats = true;
 		}
 		//now get a list of the people in the manual list entries
-		$query = "select personid from listentry where listid='$listid' and type='A' and personid in (" . implode(",",$this->pageids) . ")";
-		$this->pageaddids = QuickQueryList($query);
-		$query = "select personid from listentry where listid='$listid' and type='N' and personid in (" . implode(",",$this->pageids) . ")";
-		$this->pageremoveids = QuickQueryList($query);
-
+		if (count($this->pageids) > 0) {
+			$query = "select personid from listentry where listid='$listid' and type='A' and personid in (" . implode(",",$this->pageids) . ")";
+			$this->pageaddids = QuickQueryList($query);
+			$query = "select personid from listentry where listid='$listid' and type='N' and personid in (" . implode(",",$this->pageids) . ")";
+			$this->pageremoveids = QuickQueryList($query);
+		}
 		$this->data = $data;
 	}
 
