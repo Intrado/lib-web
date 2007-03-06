@@ -265,23 +265,26 @@ class DBMappedObject {
 
 	function getFieldList ($includeid = false, $specificfields = NULL, $alias = false) {
 		$fieldlist = ($specificfields == NULL) ? $this->_fieldlist : $specificfields;
-
-		if ($includeid) {
-			$list = array("id");
-			$list = array_merge($list,$fieldlist);
-		} else {
-			$list = $fieldlist;
-		}
-		if ($alias) {
-			return "`$alias`.`" . implode("`,`$alias`.`", $list) . "`";
-		} else {
-			return "`" . implode("`,`", $list) . "`";
-		}
+		return generateFieldList($includeid, $fieldlist, $alias);
 	}
 
 	//must override this function
 	function getLinkedChildren ($link) {
 		return array();
+	}
+}
+
+function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = false) {
+	if ($includeid) {
+		$list = array("id");
+		$list = array_merge($list,$fieldlist);
+	} else {
+		$list = $fieldlist;
+	}
+	if ($alias) {
+		return "`$alias`.`" . implode("`,`$alias`.`", $list) . "`";
+	} else {
+		return "`" . implode("`,`", $list) . "`";
 	}
 }
 
@@ -293,7 +296,7 @@ function DBFindMany ($classname, $query, $alias = false) {
 
 	$many = array();
 
-	$query = "select " . DBMappedObject::getFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
+	$query = "select " . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
 	if ($result = Query($query)) {
 		while($row = DBGetRow($result)) {
 			$newobj = new $classname();
@@ -317,7 +320,7 @@ function DBFind ($classname, $query, $alias = false) {
 	//make an object of this to get the field list
 	$newobj = new $classname();
 
-	$query = "select " . DBMappedObject::getFieldList(true,$newobj->_fieldlist,$alias) ." ". $query;
+	$query = "select " . generateFieldList(true,$newobj->_fieldlist,$alias) ." ". $query;
 	if ($result = Query($query)) {
 		if ($row = DBGetRow($result)) {
 			$newobj->id = $row[0];
