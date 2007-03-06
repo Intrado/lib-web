@@ -207,20 +207,28 @@ startWindow('Import Information ');
 	<tr>
 		<th align="right" class="windowRowHeader">Associated Jobs</th>
 		<td >
-		<table>
-			<tr>
-				<td>
-					<?
-					NewFormItem($form, $section, "trigger_checkbox", "checkbox", null, null, "id='trigger_checkbox' onclick=\"clearAllIfNotChecked(this,'associated_jobs');\"");
-					?>
-				</td>
-				<td style="vertical-align: top">
-					<?
-						NewFormItem($form, $section,"associatedjobs", "selectmultiple", "20", $repeatingjobs, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
-					?>
-				</td>
-			</tr>
-		</table>
+<?
+			if(count($repeatingjobs)==0){
+				?>No Repeating Jobs<?
+			} else {
+?>
+			<table>
+				<tr>
+					<td>
+						<?
+							NewFormItem($form, $section, "trigger_checkbox", "checkbox", null, null, "id='trigger_checkbox' onclick=\"clearAllIfNotChecked(this,'associated_jobs');\"");
+						?>
+					</td>
+					<td style="vertical-align: top">
+						<?
+							NewFormItem($form, $section,"associatedjobs", "selectmultiple", "20", $repeatingjobs, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
+						?>
+					</td>
+				</tr>
+			</table>
+<?
+			}
+?>
 		</td>
 	</tr>
 </table>
