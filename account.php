@@ -97,7 +97,7 @@ if(CheckFormSubmit($f,$s))
 			&& (!ereg("^0*$", GetFormData($f, $s, 'pincode')))){
 			error('User ID and Pin code cannot have all the same digits');
 		} elseif( isSequential(GetFormData($f, $s, 'pincode'))) {
-			error('Cannot have sequential numbers for User ID or Pin code');
+			error('Cannot have sequential numbers for Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
 		} elseif(GetFormData($f, $s, 'callearly') >= GetFormData($f, $s, 'calllate')) {
