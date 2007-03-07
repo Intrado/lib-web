@@ -36,9 +36,9 @@ if($checkpassword){
 	if($passwordlength < 6) {
 		$passwordlength = 6;
 	}
-	$securityrules = "The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 } else {
-	$securityrules = "The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 }
 
 if(CheckFormSubmit($f,$s))
@@ -71,10 +71,10 @@ if(CheckFormSubmit($f,$s))
 			error($error);
 		} elseif (($callerid != "") && (strlen($callerid)!=10)){
 			error('Caller ID must be 10 digits long', 'You do not need to include a 1 for long distance');
-		} elseif (strlen($login) < $usernamelength) {
-			error('Username must be at least ' . $usernamelength . '  characters' . $extraMsg);
-		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
-			error('Password must be at least ' . $passwordlength . ' characters long');
+		} elseif (strlen($login) < $usernamelength && !$USER->ldap) {
+			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
+		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength) && !$USER->ldap){
+			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
 		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $USER->id)) {
 			error('This username already exists, please choose another');
 		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $USER->id)) {
@@ -100,6 +100,8 @@ if(CheckFormSubmit($f,$s))
 			error('Cannot have sequential numbers for User ID or Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
+		} elseif(GetFormData($f, $s, 'callearly') >= GetFormData($f, $s, 'calllate')) {
+			error("The earlist call time must be before the latest call time");
 		} else {
 			//submit changes
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
@@ -158,8 +160,8 @@ if( $reloadform )
 	PutFormData($f,$s,"phone",Phone::format($USER->phone),"text",2, 20);
 
 	$pass = $USER->id ? '00000000' : '';
-	PutFormData($f,$s,"password",$pass,"text",4,50);
-	PutFormData($f,$s,"passwordconfirm",$pass,"text",4,50);
+	PutFormData($f,$s,"password",$pass,"text");
+	PutFormData($f,$s,"passwordconfirm",$pass,"text");
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
 
@@ -271,7 +273,7 @@ startWindow('User Information');
 						}
 	/*CSDELETEMARKER_END*/
 ?>
-						<br>Please note: username and password are case-sensitive and must be a minimum of <?=$passwordlength?> characters.
+						<br>Please note: Username and password are case-sensitive. The username must be a minimum of <?=$usernamelength?> characters long and the password <?=$passwordlength?> characters long.
 						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
 					</td>
 				</tr>
