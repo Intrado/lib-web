@@ -160,6 +160,8 @@ if( $reloadform ){
 	PutFormData($f,$s,'inboundnumber',"","text",10,10);
 	PutFormData($f,$s,'password',"","text",1,255);
 	PutFormData($f,$s,'password2',"","text",1,255);
+	PutFormData($f,$s,'managerpassword',"", "text");
+	PutFormData($f,$s,'timezone', "");
 }
 
 include_once("nav.inc.php");

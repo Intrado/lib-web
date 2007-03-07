@@ -3,9 +3,9 @@ include_once("common.inc.php");
 include_once("../inc/ftpfile.inc.php");
 include_once("../inc/formatters.inc.php");
 
-$customerID = $_GET['customer']+0;
 
 if(isset($_GET['customer'])){
+	$customerID = $_GET['customer']+0;
 	$queryextra = "AND customerID='$customerID'";
 } else {
 	$queryextra="";
