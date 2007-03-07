@@ -139,23 +139,22 @@ if( $reloadform ) {
 	PutFormData($f,$s,'inboundnumber',$custfields[2],"phone",10,10);
 	PutFormData($f,$s,'timezone', $custfields[3], "text", 1, 255);
 
-	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', $currentid)),"phone",10,10);
-	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', $currentid),"phone", 3, 3);
+	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', $currentid, false, true)),"phone",10,10);
+	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', $currentid, false, true),"phone", 3, 3);
 
-
-	$currentmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4, true);
+	$currentmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4, false, true);
 	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",4,"nomax",true);
-	$currentmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2, true);
+	$currentmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2, false, true);
 	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",2,"nomax",true);
 
-	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', $currentid),"text",1,255);
-	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', $currentid),"email",1,255);
+	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', $currentid, false, true),"text",1,255);
+	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', $currentid, false, true),"email",1,255);
 
-	PutFormData($f,$s,'renewaldate', getCustomerSystemSetting('_renewaldate', $currentid), "text", 1, 255);
-	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', $currentid), "number");
+	PutFormData($f,$s,'renewaldate', getCustomerSystemSetting('_renewaldate', $currentid, false, true), "text", 1, 255);
+	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', $currentid, false, true), "number");
 
-	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', $currentid),"number",5,240);
-	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', $currentid), "text", 0, 100);
+	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', $currentid, false, true),"number",5,240);
+	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', $currentid, false, true), "text", 0, 100);
 	if($refreshlangs){
 		$languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
 	}
@@ -166,6 +165,8 @@ if( $reloadform ) {
 		PutFormData($f, $s, $lang, $language->name, "text");
 	}
 	PutFormData($f, $s, "oldlanguages", $oldlanguages);
+	PutFormData($f, $s, "newlang", "", "text");
+	PutformData($f, $s, "managerpassword", "", "text");
 }
 
 include_once("nav.inc.php");
@@ -243,7 +244,7 @@ include_once("navbottom.inc.php");
 
 /************FUNCTIONS***********/
 function setCustomerSystemSetting($name, $value, $currid) {
-	$old = getCustomerSystemSetting($name, $currid);
+	$old = getCustomerSystemSetting($name, $currid, false, true);
 	$name = DBSafe($name);
 	$value = DBSafe($value);
 	if($old === false) {
