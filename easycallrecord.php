@@ -54,7 +54,7 @@ if (!$error) {
 	<img src="img/bug_important.gif" > You should receive a call shortly. After you save your message(s) and hangup, you will need to <b>Confirm &amp; Submit</b> your job in the next screen.
 
 </div>
-	<meta http-equiv="refresh" content="2;url=easycallrecord.php?taskid=<?= $_REQUEST['taskid'] ?>&toggle=<?= !$_REQUEST['toggle'] ?>">
+	<meta http-equiv="refresh" content="2;url=easycallrecord.php?taskid=<?= $_REQUEST['taskid'] ?>">
 
 <?
 

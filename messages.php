@@ -30,7 +30,7 @@ if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone'))) {
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-	if ($_SESSION['messageid'] == $deleteid)
+	if (isset($_SESSION['messageid']) && ($_SESSION['messageid']== $deleteid))
 		$_SESSION['messageid'] = NULL;
 	if (userOwns("message",$deleteid)) {
 		QuickUpdate("update message set deleted=1 where id='$deleteid'");

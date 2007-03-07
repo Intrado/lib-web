@@ -39,7 +39,7 @@ startWindow('Active & Pending Notification Jobs ' . help('System_ActiveJobs', NU
 
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
-
+$data = array();
 // jobworkitem columns are: id jobid type priority personid messageid status resultdata assignedto
 $result = Query(
 			"select SQL_CALC_FOUND_ROWS u.login, j.name, j.status,

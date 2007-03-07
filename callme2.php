@@ -56,7 +56,7 @@ if ($error = $specialtask->getData('error')) {
 	<h3> Message Number: <?=$currnum?></h3>
 	<img src="img/progressbar.gif?date=<?= time() ?>">
 <div>
-	<meta http-equiv="refresh" content="2;url=callme2.php?taskid=<?= $_REQUEST['taskid'] ?>&toggle=<?= !$_REQUEST['toggle'] ?>">
+	<meta http-equiv="refresh" content="2;url=callme2.php?taskid=<?= $_REQUEST['taskid'] ?>">
 <?
 }
 endWindow();

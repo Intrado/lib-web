@@ -223,13 +223,14 @@ if($reloadform == 1) {
 			$phone = Phone::format($USER->phone);
 		else
 			$phone = "";
-		if(GetFormData($f, $s, "addlangs"))
-			$checked = true;
-		$name = GetFormData($f, $s, 'name');
+		$name = "";
 	}
 	PutFormData($f,$s,"phone",$phone,"text","2","20");
 	PutFormData($f,$s,"addlangs",(bool)$checked, "bool", 0, 1);
 	PutFormData($f, $s, 'name', $name , 'text', 1, 50);
+	PutFormData($f, $s, 'newlang', "");
+	PutFormData($f, $s, 'hidden', "");
+	
 }
 
 
@@ -309,7 +310,7 @@ startWindow("EasyCall");
 		</tr>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Call&nbsp;Me&nbsp;At:&nbsp;<?= help("EasyCall_PhoneNumber", null, 'small'); ?></td>
-			<td class="bottomBorder"><? NewFormItem($f,$s,"phone","text",20, nomax,'id="phone"'); ?></td>
+			<td class="bottomBorder"><? NewFormItem($f,$s,"phone","text",20, "nomax",'id="phone"'); ?></td>
 		</tr>
 <?
 		if($USER->authorize('sendmulti')) {
@@ -321,7 +322,7 @@ startWindow("EasyCall");
 					<tr>
 						<td>
 <? 
-						$langcount = count($languagearray) ? count($languagearray) : 1;
+						$langcount = isset($languagearray) ? count($languagearray) : 1;
 							NewFormItem($f,$s,'addlangs','checkbox',NULL,NULL,"id='add'; onclick=\"new getObj('addlang').obj.disabled=!this.checked; 
 								setVisibleIfChecked(this,'shownifchecked');
 								setHiddenIfChecked(this,'hiddenifchecked');
@@ -374,9 +375,9 @@ startWindow("EasyCall");
 								<tr>
 									<td>
 <? 
-										NewFormItem($form, $section, $name, 'selectstart', NULL, NULL, 'id="hiddendropdown"');
-										NewFormItem($form, $section, $name, 'selectoption'," - Select a Language - ");
-										NewFormItem($form, $section, $name, 'selectend');
+										NewFormItem($f, $s, "hidden", 'selectstart', NULL, NULL, 'id="hiddendropdown"');
+										NewFormItem($f, $s, "hidden", 'selectoption'," - Select a Language - ");
+										NewFormItem($f, $s, "hidden", 'selectend');
 ?>
 									</td>
 								</tr>

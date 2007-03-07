@@ -87,13 +87,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 		//	those rules get lost, which is what happens when there is an error() call below.
 		if (GetFormData($f, $s, "newrulefieldnum") != "" && GetFormData($f, $s, "newrulefieldnum") != -1) {
 			$extraMsg = " - You will also need to choose your data view rules again";
+		} else {
+			$extraMsg= "";
 		}
 				// do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
-		} elseif( !GetFormData($f,$s,'ldap')&& (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
+		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
 			error('You must enter a password');
-		} elseif(!GetFormData($f,$s,'ldap') && ereg("^0*$", GetFormData($f,$s,'password')) && $usr->ldap && $IS_LDAP) {
+		} elseif($IS_LDAP && !GetFormData($f,$s,'ldap') && $usr->ldap && ereg("^0*$", GetFormData($f,$s,'password'))) {
 			error('You must enter a password');
 		} elseif( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match' . $extraMsg);
@@ -103,9 +105,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error($error);
 		} elseif (($callerid != "") && (strlen($callerid)!=10)){
 			error('Caller ID must be 10 digits long' , 'You do not need to include a 1 for long distance');
-		} elseif (strlen($login) < $usernamelength && !GetFormData($f, $s, "ldap")) {
+		} elseif ((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && strlen($login) < $usernamelength) {
 			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
-		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f, $s, 'ldap') && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
+		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && !ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
 			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
 		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
@@ -117,9 +119,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Please select a field');
 		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
 			error('Your password must contain at least one letter and one number', $securityrules);
-		} elseif(($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) && !GetFormData($f,$s,'ldap')) {
+		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')))) {
 			error($issame, $securityrules);
-		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !GetFormData($f,$s,'ldap')){
+		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && $checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password'))){
 			error($iscomplex, $securityrules);
 		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
 			error('User ID and Pin code cannot be the same');
@@ -242,8 +244,8 @@ if( $reloadform )
 
 	$checked = false;
 	$pass = $usr->id ? '00000000' : '';
-	PutFormData($f,$s,"password",$pass,"text",1,50);
-	PutFormData($f,$s,"passwordconfirm",$pass,"text",1,50);
+	PutFormData($f,$s,"password",$pass,"text");
+	PutFormData($f,$s,"passwordconfirm",$pass,"text");
 
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
@@ -252,7 +254,6 @@ if( $reloadform )
 		$types = QuickQueryList("select jobtypeid from userjobtypes where userid = $usr->id");
 	else
 		$types = array();
-
 	PutFormData($f,$s,"jobtypes",$types,"array");
 	PutFormData($f,$s,"restricttypes",(bool)count($types),"bool",0,1);
 	PutFormData($f,$s,"restrictpeople",(bool)count($RULES),"bool",0,1);

@@ -236,7 +236,7 @@ startWindow('Field Mapping');
 				</th></tr>
 <?
 			for ($ci = 0; $ci < 10; $ci++) {
-				$cel = $importdata[$x][$ci];
+				$cel = isset($importdata[$x][$ci]) ? $importdata[$x][$ci] : "";
 				echo "</tr><td>" . ($cel == "" ? "&nbsp;" : htmlentities($cel)) . "</td></tr>";
 			}
 ?>
