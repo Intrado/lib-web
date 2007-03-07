@@ -131,7 +131,7 @@ $result = Query(
 			from blockednumber b, user u
 			where b.customerid = {$USER->customerid} and b.userid = u.id
 			order by b.id desc");
-
+$data=array();
 while ($row = DBGetRow($result)) {
 	$data[] = $row;
 }
