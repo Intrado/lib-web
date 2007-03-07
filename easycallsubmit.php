@@ -45,9 +45,9 @@ if(CheckFormSubmit($f,$s)) {
 	$name = $specialtask->getData('name');
 	
 	if (!$name)
-		$name = "EasyCall - " . date("F jS, Y g:i a");
+		$name = "EasyCall - " . date("M d, Y G:i:s");
 	$job->name = $name;
-	$job->description = "EasyCall - " . date("F jS, Y g:i a");
+	$job->description = "EasyCall - " . date("M d, Y G:i:s");
 	$type = $specialtask->getData('jobtypeid');
 	$job->listid = $specialtask->getData('listid');
 	$job->jobtypeid = $type;
