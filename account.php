@@ -100,8 +100,8 @@ if(CheckFormSubmit($f,$s))
 			error('Cannot have sequential numbers for Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
-		} elseif(GetFormData($f, $s, 'callearly') >= GetFormData($f, $s, 'calllate')) {
-			error("The earlist call time must be before the latest call time");
+		} elseif(strtotime(GetFormData($f, $s, 'callearly')) >= strtotime(GetFormData($f, $s, 'calllate'))) {
+			error("The earliest call time must be before the latest call time");
 		} else {
 			//submit changes
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
