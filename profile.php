@@ -50,7 +50,7 @@ if(CheckFormSubmit($form,$section))
 		//do check
 		if( CheckFormSection($form, $section) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} elseif(strtotime(GetFormData($form, $section, 'callearly')) >= strtotime(GetFormData($form, $section, 'calllate'))) {
+		} elseif(GetFormData($form, $section, 'calllate') && GetFormData($form, $section, 'callearly') && (strtotime(GetFormData($form, $section, 'callearly')) >= strtotime(GetFormData($form, $section, 'calllate')))) {
 			error("The earliest call time must be before the latest call time");
 		} else {
 			//submit changes
