@@ -6,7 +6,7 @@
   <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
   <topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
   <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
   <key name="active &amp; pending" >
     <topic name="Reports Overview" url="reports/reports.htm" />
@@ -44,7 +44,7 @@
   <key name="multilingual" >
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
-    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   </key>
   <key name="overview" >
     <topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
@@ -53,7 +53,7 @@
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
     <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   </key>
   <key name="print" >
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
@@ -78,7 +78,7 @@
   </key>
   <key name="tutorial" >
     <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
     <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
   </key>
   <key name="view active and pending" >

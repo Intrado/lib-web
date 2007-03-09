@@ -17,10 +17,10 @@ if (navigator.appName !="Netscape")
 div.whs1 { width:100%; }
 img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
 p.whs3 { font-weight:bold; }
-img_whs4 { border:none; float:none; width:400px; height:299px; border-style:none; }
+img_whs4 { border:none; float:none; border-style:none; width:400px; height:299px; }
 ul.whs5 { list-style:decimal; }
 ol.whs6 { list-style:decimal; }
-img_whs7 { border:none; border-style:none; width:450px; height:449px; float:none; }
+img_whs7 { border:none; width:450px; height:449px; float:none; border-style:none; }
 ul.whs8 { list-style:disc; }
 p.whs9 { line-height:Normal; }
 p.whs10 { font-size:xx-small; }
@@ -164,6 +164,10 @@ else
 	<li class=kadov-p><p class="whs9">Description: Here 
  you can add an optional description for your job.</p></li>
 	
+	<li class=kadov-p><p class="whs9">Repeat this job every: 
+ Select the days which you would like your job to run and the time at which 
+ it is to start.</p></li>
+	
 	<li class=kadov-p><p class="whs9">Priority: With this 
  drop down menu you can select the priority of your job. Higher priority 
  jobs will be run first.</p></li>
@@ -181,10 +185,6 @@ else
 	<li class=kadov-p><p class="whs9">Email a report when 
  the job completes: If this box is checked, the system will email a PDF 
  file with the results of the job to the email specified in your user account.</p></li>
-	
-	<li class=kadov-p><p class="whs9">Repeat this job every: 
- Select the days which you would like your job to run and the time at which 
- it is to start.</p></li>
 </ul>
 
 <p class="whs3">Phone:</p>
@@ -227,7 +227,8 @@ else
  phone number for each person: Checking this box will cause the system 
  to attempt to reach your recipients at every available phone number in 
  the system. For example, if the database contained a home, work, and cell 
- phone number all of them would receive a call.</p></li>
+ phone number all of them would receive a call. When this option is not 
+ checked, the system will only use the first number listed for the recipient.</p></li>
 </ul>
 
 <p class="whs3">Email:</p>

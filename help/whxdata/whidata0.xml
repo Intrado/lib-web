@@ -22,7 +22,7 @@
   <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
   <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
   <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
-  <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+  <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   <key name="call jobs" >
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
@@ -51,7 +51,7 @@
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
   </key>
   <key name="reports" >
-    <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   </key>
   <key name="static lists" >
     <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />

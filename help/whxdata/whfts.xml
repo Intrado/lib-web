@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='windows-1252' ?>
 <fts>
-<chunkinfo url="whfwdata0.xml" first="0" last="community"/>
-<chunkinfo url="whfwdata1.xml" first="comparison" last="fre"/>
-<chunkinfo url="whfwdata2.xml" first="freshman" last="my"/>
-<chunkinfo url="whfwdata3.xml" first="nam" last="saf"/>
-<chunkinfo url="whfwdata4.xml" first="safety" last="voic"/>
-<chunkinfo url="whfwdata5.xml" first="volum" last="zip"/>
+<chunkinfo url="whfwdata0.xml" first="0" last="configuration"/>
+<chunkinfo url="whfwdata1.xml" first="confirm" last="get"/>
+<chunkinfo url="whfwdata2.xml" first="gift" last="nam"/>
+<chunkinfo url="whfwdata3.xml" first="natur" last="run"/>
+<chunkinfo url="whfwdata4.xml" first="s" last="variou"/>
+<chunkinfo url="whfwdata5.xml" first="ve" last="zip"/>
 
 <tchunkinfo first="0" last="48" url="whftdata0.xml" />
 

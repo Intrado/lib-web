@@ -16,13 +16,13 @@ if (navigator.appName !="Netscape")
 <!--
 p.whs1 { font-weight:bold; }
 ol.whs2 { list-style:decimal; }
-img_whs3 { border:none; border-style:none; width:400px; height:123px; float:none; }
+img_whs3 { border:none; border-style:none; width:400px; height:115px; float:none; }
 p.whs4 { margin-left:40px; }
-img_whs5 { border:none; border-style:none; width:400px; height:201px; float:none; }
+img_whs5 { border:none; border-style:none; width:400px; height:183px; float:none; }
 p.whs6 { margin-left:80px; }
-p.whs7 { margin-left:0px; }
-p.whs8 { margin-left:0px; font-weight:bold; }
-img_whs9 { border:none; border-style:none; width:400px; height:520px; float:none; }
+p.whs7 { margin-left:0px; font-weight:bold; }
+img_whs8 { border:none; border-style:none; width:400px; height:520px; float:none; }
+p.whs9 { margin-left:0px; }
 -->
 </style><script type="text/javascript" language="JavaScript">
 <!--
@@ -30,7 +30,7 @@ if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
 {
   var strNSS = "<style type='text/css'>";
   strNSS += "p.whs7 {margin-left:1pt; }";
-  strNSS += "p.whs8 {margin-left:1pt; }";
+  strNSS += "p.whs9 {margin-left:1pt; }";
   strNSS +="</style>";
   document.write(strNSS);
 }
@@ -85,7 +85,8 @@ if (window.gbWhTopic)
 {
 	if (window.addTocInfo)
 	{
-	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+	addTocInfo("The Admin Tab\nThe Import Manager");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	}
 	if (window.writeBtnStyle)
@@ -115,7 +116,7 @@ else
  the Admin tab followed by the Imports tab. </p>
 
 <p>Before you configure a new data import, you should assign fields for 
- all of the custom metadata you plan to include using the <a title="Click here to learn more about the Metadata Manager." href="the_metadata_manager.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click here to learn more about the Metadata Manager.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Metadata 
+ all of the custom metadata you plan to include using the <a title="Click to learn more about the Metadata Manager." href="the_metadata_manager.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about the Metadata Manager.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Metadata 
  Manager</a>.</p>
 
 <p class="whs1">Creating a New Data Import</p>
@@ -145,7 +146,7 @@ else
  that are currently saved in the system. It also serves as the starting 
  point for adding new data imports to the system. </span></p>
 
-<p><img src="../dataimportmanager.gif" alt="The Data Import Manager" x-maintain-ratio="TRUE" width="400px" height="123px" border="0" class="img_whs3"></p>
+<p><img src="../dataimportmanager.gif" alt="The Data Import Manager" x-maintain-ratio="TRUE" width="400px" height="115px" border="0" class="img_whs3"></p>
 
 <p>The various parts of the Import Manager screen are as follows:</p>
 
@@ -165,31 +166,32 @@ else
  - This is the type of data import that has been assigned in the Import 
  Editor. </p>
 
-<p class="whs4"><span style="font-weight: bold;"><B>Next Scheduled 
- Run</B></span> - If the import was set up to run at a regularly scheduled 
- time, the next time it is scheduled to run will display here.</p>
+<p class="whs4"><span style="font-weight: bold;"><B>Upload Key</B></span> 
+ - This is the unique import item identifier that is used with the SchoolMessenger 
+ upload utility program.</p>
 
 <p class="whs4"><span style="font-weight: bold;"><B>Status</B></span> 
  - This shows whether the import is running, idle, or if there was an error.</p>
 
-<p class="whs4"><span style="font-weight: bold;"><B>File</B></span> 
- - This shows whether or not the system is able to locate the import's 
- CSV file. It's possible values are Exists, Not Found, or Error.</p>
+<p class="whs4"><span style="font-weight: bold;"><B>Last Run 
+ - </B></span><span>The date of the last time this import was run.</span></p>
+
+<p class="whs4"><span style="font-weight: bold;"><B>File Date</B></span> 
+ - This is the date of the last file upload.</p>
+
+<p class="whs4"><span style="font-weight: bold;"><B>Upload</B></span><span> 
+ - Allows you to manually browse your computer for a CSV file to upload.</span></p>
 
 <p class="whs4"><span style="font-weight: bold;"><B>Run Now</B></span> 
- - Click Run Now if you need to run an import immediately, regardless of 
- its next scheduled run.</p>
+ - Click Run Now to import the uploaded data into the database.</p>
 
 <p class="whs4"><span style="font-weight: bold;"><B>Edit</B></span> 
  - This will take you to the Import Editor screen where you can rename 
  or reschedule the import.</p>
 
-<p class="whs4"><span style="font-weight: bold;"><B>Edit Mapping</B></span> 
- - This link will take you to the Data Import Mapping screen where you 
+<p class="whs4"><span style="font-weight: bold;"><B>Map Fields</B></span> 
+ - This link will take you to the Import Field Mapping screen where you 
  can assign fields to the data you are importing.</p>
-
-<p class="whs4"><span style="font-weight: bold;"><B>Delete</B></span> 
- - This will delete the import from the system.</p>
 
 <p class="whs4">&nbsp;</p>
 
@@ -198,7 +200,7 @@ else
 <p class="whs1"><span style="font-weight: normal;">The Import 
  Editor screen, shown in the image below, is used to configure data imports.</span></p>
 
-<p><img src="../importeditor.gif" alt="The Import Editor" x-maintain-ratio="TRUE" width="400px" height="201px" border="0" class="img_whs5"></p>
+<p><img src="../importeditor.gif" alt="The Import Editor" x-maintain-ratio="TRUE" width="400px" height="183px" border="0" class="img_whs5"></p>
 
 <p>There are a few parts to the Import Editor. The first part is the Settings 
  area which contains:</p>
@@ -209,61 +211,62 @@ else
 <p class="whs4"><span style="font-weight: bold;"><B>Description</B></span> 
  - Enter a description of the type of data being imported here.</p>
 
-<p class="whs4"><span style="font-weight: bold;"><B>File</B></span> 
- - Enter the complete path to the CSV file on your server here.</p>
-
 <p class="whs4"><span style="font-weight: bold;"><B>Update Method</B></span> 
  - There are three possible values in this menu.</p>
 
-<p class="whs6"><span style="font-weight: bold;"><B>Full</B></span> 
- - <span style="font-weight: bold; font-style: italic;"><I><B>Adds AND Deletes</B></I></span> 
- -This will completely synchronize the database with the data in your import. 
- If there are people in the system's database who are not in the import's 
- CSV file when the import is run again, they will be deleted from the database. 
- If there are new people in the most recent import they will be added to 
- the system's database.</p>
+<p class="whs6"><span style="font-weight: bold;"><B>Update only</B></span> 
+ - This will update existing information for people already in the system's 
+ database. If there are new people in the import or people missing from 
+ the import, they will not be added or removed from the system's database. 
+ Nothing new is created and only existing information is updated.</p>
 
 <p class="whs6"><span style="font-weight: bold;"><B>Update</B></span> 
- - <span style="font-weight: bold; font-style: italic;"><I><B>Adds ONLY</B></I></span> 
- - This will add any new people from your import to the system's database. 
- If people are not in your import, but exist in the system's database, 
- they will not be deleted.</p>
+ <span style="font-weight: bold;"><B>&amp; create</B></span> - This will update 
+ existing information for people already in the system's database and add 
+ any new people from your import to the system's database. If people are 
+ not in your import, but exist in the system's database, they will not 
+ be deleted.</p>
 
-<p class="whs6"><span style="font-weight: bold;"><B>Update Only</B></span> 
- -<span style="font-weight: bold; font-style: italic;"><I><B> Neither Adds NOR 
- Deletes</B></I></span> - This will update existing information for people already 
- in the system's database. If there are new people in the import or people 
- missing from the import, they will not be added or removed from the system's 
- database. Nothing new is created and only existing information is updated.</p>
+<p class="whs6"><span style="font-weight: bold;"><B>Update, 
+ create, delete</B></span> -This will completely synchronize the database with 
+ the data in your import. If there are people in the system's database 
+ who are not in the import's CSV file when the import is run, they will 
+ be deleted from the database. If there are new people in the most recent 
+ import they will be added to the system's database.</p>
 
-<p class="whs7">The next part is the Scheduling area. In this 
- area you can select which days and time you would like the import to run.</p>
+<p class="whs4"><span style="font-weight: bold;"><B>Automated 
+ Upload</B></span> - Check this box if you use the SchoolMessenger upload utility 
+ and would like the data to be automatically imported into the system's 
+ database when the latest CSV file is uploaded.</p>
 
-<p class="whs7">&nbsp;</p>
+<p class="whs4"><span style="font-weight: bold;"><B>Associated 
+ Jobs</B></span> - Select any repeating jobs that you wish to have triggered 
+ after the data has finished being imported into the system's database.</p>
 
-<p class="whs8">The Data Import Mapping 
+<p class="whs7">The Import Field Mapping 
  Screen</p>
 
-<p class="whs8"><span style="font-weight: normal;">After 
- creating and configuring your data import, you must click on the &quot;Edit 
- Mapping&quot; link on the Import Manager. On the Data Import Mapping page, 
- shown below, you will see some sample entries from your CSV file with 
- a drop down menu over each type. Select the data type from the drop down 
- menu to determine which fields the data will be found in.</span></p>
+<p class="whs7"><span style="font-weight: normal;">After 
+ uploading a CSV file, you will be directed to the Import Field Mapping 
+ page, shown below. There you will see some sample entries from your CSV 
+ file with a drop down menu over each type. Select the data type from the 
+ drop down menu to determine which fields the data will be imported into. 
+ Your settings will be saved for future imports and only need to be changed 
+ if your source file layout changes.</span></p>
 
-<p><img src="../importfieldmapping.gif" alt="Import Field Mapping" x-maintain-ratio="TRUE" width="400px" height="520px" border="0" class="img_whs9"></p>
+<p><img src="../importfieldmapping.gif" alt="Import Field Mapping" x-maintain-ratio="TRUE" width="400px" height="520px" border="0" class="img_whs8"></p>
 
-<p class="whs7">&nbsp;</p>
+<p class="whs9">&nbsp;</p>
 
-<p class="whs8">Important Considerations 
+<p class="whs7">Important Considerations 
  When Mapping Your Data</p>
 
 <p class="whs4"><span style="font-weight: bold;"><B>Unique ID</B></span> 
- - Whenever a person is associated with a Unique ID, the system will view 
- that person as a potential recipient. When importing students, use the 
- student ID as the Unique ID. If there are members of the staff that need 
- to be recipients, their staff IDs, if available, should be used as their 
- Unique IDs. </p>
+ - Each person that is imported must be associated with a unique non-changing 
+ ID number to be viewed as a potential recipient by the system. When importing 
+ students, use the student ID as the Unique ID. If there are members of 
+ the staff that need to be recipients, their staff IDs, if available, should 
+ be used as their Unique IDs. </p>
 
 <p class="whs4"><span style="font-weight: bold;"><B>Importing 
  Users</B></span> - Whenever data is labeled with the User Login data type, 
@@ -282,7 +285,9 @@ else
  above and additionally label their staff ID, if available, as their Unique 
  ID. </p>
 
-<p class="whs7">&nbsp;</p>
+<p class="whs9">&nbsp;</p>
+
+<p>&nbsp;</p>
 
 <script type="text/javascript" language="JavaScript">
 <!--

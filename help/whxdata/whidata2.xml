@@ -7,7 +7,7 @@
   <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
   <topic name="Message Overview" url="creating_a_message/messageoverview.htm" />
   <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
   <topic name="The Start Page" url="getting_started/the_start_page.htm" />
   <key name="audio file library" >
@@ -58,7 +58,7 @@
   <key name="multilingual" >
     <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
     <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
-    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   </key>
   <key name="overview" >
     <topic name="Message Overview" url="creating_a_message/messageoverview.htm" />
@@ -79,7 +79,7 @@
   <key name="TTS (text-to-speech)" >
     <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
     <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   </key>
   <key name="upload audio message" >
     <topic name="Upload Audio File" url="creating_a_message/the_audio_file_library.htm#Upload_Audio_File" />
@@ -89,7 +89,7 @@
   <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
   <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
   <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   <key name="block number" >
     <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
   </key>
@@ -102,14 +102,14 @@
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
     <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
   </key>
   <key name="phone message editor" >
     <topic name="The Phone Message Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
   </key>
   <key name="text-to-speech" >
     <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
     <topic name="The_Phone_Message_Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
   </key>
 </key>
@@ -131,38 +131,42 @@
   </key>
 </key>
 <key name="Reports" >
-  <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+  <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   <topic name="Reports Overview" url="reports/reports.htm" />
-  <topic name="Understanding Report Results" url="reports/understanding_report_results.htm" />
+  <topic name="Standard Job Reports" url="reports/standard_job_reports.htm" />
+  <topic name="Understanding Report Results" url="reports/understanding_call_logs.htm" />
   <key name="configure" >
-    <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   </key>
   <key name="create" >
-    <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   </key>
   <key name="email" >
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
   </key>
   <key name="filter options" >
-    <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   </key>
   <key name="overview" >
     <topic name="Reports Overview" url="reports/reports.htm" />
   </key>
   <key name="report builder" >
-    <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   </key>
   <key name="results" >
-    <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
-    <topic name="Understanding Report Results" url="reports/understanding_report_results.htm" />
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+    <topic name="Understanding Report Results" url="reports/understanding_call_logs.htm" />
+  </key>
+  <key name="standard" >
+    <topic name="Standard Job Reports" url="reports/standard_job_reports.htm" />
   </key>
   <key name="systemwide" >
     <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
   </key>
   <key name="view" >
-    <topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
-    <topic name="Understanding Report Results" url="reports/understanding_report_results.htm" />
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+    <topic name="Understanding Report Results" url="reports/understanding_call_logs.htm" />
   </key>
 </key>
 

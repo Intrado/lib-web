@@ -21,10 +21,11 @@
 <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
 <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
 <topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
-<topic name="Delivery Mechanism Overview" url="delivery_mechanism/delivery_mechanism_overview.htm" />
-<topic name="The Mechanism Tab" url="delivery_mechanism/the_mechanism_screen.htm" />
-<topic name="The Resources Tab" url="delivery_mechanism/the_resources_tab.htm" />
-<topic name="The Telco Tab" url="delivery_mechanism/the_telco_tab.htm" />
+<topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+<topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+<topic name="About Web Survey Template Features" url="creating_a_survey_job/more_on_web_survey_template_features.htm" />
+<topic name="Scheduling a Survey Job" url="creating_a_survey_job/scheduling_a_survey_job.htm" />
+<topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
 <topic name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
 <topic name="Getting Started" url="getting_started/getting_started.htm" />
 <topic name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
@@ -33,17 +34,16 @@
 <topic name="Remote Telephone Access Overview" url="remote_telephone_access/remote_telephone_access_overview.htm" />
 <topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
 <topic name="Remotely Create a Single Language Job" url="remote_telephone_access/remotely_create_a_single_language_job.htm" />
-<topic name="Creating Notification Reports" url="reports/creating_notification_reports.htm" />
+<topic name="Querying Report Data" url="reports/querying_report_data.htm" />
 <topic name="Reports Overview" url="reports/reports.htm" />
+<topic name="Standard Job Reports" url="reports/standard_job_reports.htm" />
+<topic name="Survey Job Reports" url="reports/survey_job_reports.htm" />
 <topic name="The Reports Tabs" url="reports/the_reports_tabs.htm" />
-<topic name="Understanding Report Results" url="reports/understanding_report_results.htm" />
+<topic name="Understanding Call Logs" url="reports/understanding_call_logs.htm" />
 <topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
 <topic name="Step-by-Step:Send a Simple Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-<topic name="Step-by-Step:Send a Multilingual Call Job" url="step-by-step_guides/step-by-step_send_a_multilingual_call_job.htm" />
+<topic name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
 <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
-<topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
-<topic name="Managing Global System Settings" url="the_admin_tab/managing_global_system_settings.htm" />
-<topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
 <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
 <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
 <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />

@@ -1,43 +1,61 @@
 <?xml version='1.0' encoding='windows-1252' ?>
 <indexdata>
-<key name="System" >
-  <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
-  <topic name="Managing Global System Settings" url="the_admin_tab/managing_global_system_settings.htm" />
-  <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
-  <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
-  <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
-  <key name="add new user" >
-    <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
+<key name="Survey" >
+  <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+  <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+  <topic name="More on Web Survey Template Features" url="creating_a_survey_job/more_on_web_survey_template_features.htm" />
+  <topic name="Survey Job Reports" url="reports/survey_job_reports.htm" />
+  <topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
+  <key name="job" >
+    <topic name="Scheduling a Survey Job" url="creating_a_survey_job/scheduling_a_survey_job.htm" />
   </key>
+  <key name="messages" >
+    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+    <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+    <topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
+  </key>
+  <key name="phone" >
+    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+    <topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
+  </key>
+  <key name="questions" >
+    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+    <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+  </key>
+  <key name="report" >
+    <topic name="Survey Job Reports" url="reports/survey_job_reports.htm" />
+  </key>
+  <key name="schedule" >
+    <topic name="Scheduling a Survey Job" url="creating_a_survey_job/scheduling_a_survey_job.htm" />
+  </key>
+  <key name="template" >
+    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+  </key>
+  <key name="tips" >
+    <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+  </key>
+  <key name="web" >
+    <topic name="More on Web Survey Template Features" url="creating_a_survey_job/more_on_web_survey_template_features.htm" />
+  </key>
+</key>
+<key name="System" >
+  <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
+  <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
+  <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
   <key name="block phone number" >
     <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
   </key>
   <key name="contact database" >
     <topic name="The Contact Database" url="the_system_tab/the_contact_database.htm" />
   </key>
-  <key name="create access profile" >
-    <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
-  </key>
-  <key name="edit access profile" >
-    <topic name="The_Edit_Access_Profile_Screen" url="the_admin_tab/managing_access_profiles.htm#The_Edit_Access_Profile_Screen" />
-  </key>
-  <key name="global system settings" >
-    <topic name="Managing Global System Settings" url="the_admin_tab/managing_global_system_settings.htm" />
+  <key name="import manager" >
+    <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
   </key>
   <key name="reports" >
     <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
   </key>
   <key name="searchable" >
     <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
-  </key>
-  <key name="security" >
-    <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
-  </key>
-  <key name="user editor" >
-    <topic name="The User Editor Screen" url="the_admin_tab/managing_user_accounts.htm#The User Editor Screen" />
-  </key>
-  <key name="view users" >
-    <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
   </key>
 </key>
 
