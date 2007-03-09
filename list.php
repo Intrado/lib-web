@@ -291,7 +291,7 @@ if ($list->id) {
 ?>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Search Database:<br><? print help('search', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader">Search Database:<br><? print help('List_SearchAndAdd', NULL, 'grey'); ?></th>
 		<td style="padding: 5px;"><?= submit($f,'search','search','search_add') ?></td>
 	</tr>
 

@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#reports/creating_notification_reports.htm
-To create a report that only shows calls to a specific individual enter the ID # of the individual.
+To create a report that only shows calls to a specific individual enter the ID or phone number of the individual.

@@ -170,7 +170,7 @@ startWindow('Import Information ');
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Settings:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Settings:<br><? print help('ImportEditor_Settings', NULL, 'grey'); ?></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -196,7 +196,7 @@ startWindow('Import Information ');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Automated upload:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Automated upload:<br><? print help('ImportEditor_AutomatedUpload', NULL, 'grey'); ?></th>
 		<td class="bottomBorder">
 			<table border="0" cellspacing="0" cellpadding="2">
 				<tr><td>Import when uploaded</td><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox'); ?> Import when remote uploads are complete <br>(uncheck this box when configuring import mapping or changing data fields)</td>
@@ -205,7 +205,7 @@ startWindow('Import Information ');
 		</td>
 	</tr>
 	<tr>
-		<th align="right" class="windowRowHeader">Associated Jobs</th>
+		<th align="right" class="windowRowHeader">Associated Jobs:<br><? print help('ImportEditor_AssociatedJobs', NULL, 'grey'); ?></th>
 		<td >
 <?
 			if(count($repeatingjobs)==0){

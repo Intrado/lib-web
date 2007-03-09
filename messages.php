@@ -196,8 +196,8 @@ if($USER->authorize('sendprint')) {
 
 if($USER->authorize('survey')) {
 
-	startWindow('My Survey Templates','padding: 3px;', true, true);
-	button_bar(button('create_new_survey', null,"surveytemplate.php?id=new") );
+	startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates', NULL, 'blue'),'padding: 3px;', true, true);
+	button_bar(button('create_new_survey', null,"surveytemplate.php?id=new") . help('Surveys_CreateNewTemplateButton') );
 
 	$questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
 

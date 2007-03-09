@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
+Enter the name you would like displayed in the dark blue area at the top of every page.

@@ -41,7 +41,7 @@ $TITLE = "Survey Builder";
 include_once("nav.inc.php");
 
 
-startWindow('My Active and Pending Surveys','padding: 3px;',true, true);
+startWindow('My Active and Pending Surveys ' . help('SurveyBuilder_MyActiveAndPending', NULL, 'blue'),'padding: 3px;',true, true);
 
 button_bar(button('schedule_survey', null,"survey.php?id=new") );
 
@@ -67,7 +67,7 @@ endWindow();
 
 echo "<br>";
 
-startWindow('My Completed Surveys','padding: 3px;',true, true);
+startWindow('My Completed Surveys '  . help('SurveyBuilder_MyCompleted', NULL, 'blue'),'padding: 3px;',true, true);
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='complete' or status='cancelled') and deleted=0 order by id desc");
 

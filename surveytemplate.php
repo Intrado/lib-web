@@ -388,7 +388,7 @@ startWindow('Survey Template Information',NULL,true, false);
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Settings:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Settings:<br><? print help('SurveysTempEditor_Settings', NULL, 'grey'); ?></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
@@ -407,7 +407,7 @@ startWindow('Survey Template Information',NULL,true, false);
 		</td>
 	</tr>
 	<tr valign="top">
-			<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
+			<th align="right" class="windowRowHeader bottomBorder">Phone:<br><? print help('SurveysTempEditor_Phone', NULL, 'grey'); ?></th>
 			<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
@@ -452,7 +452,7 @@ startWindow('Survey Template Information',NULL,true, false);
 		</td>
 	</tr>
 	<tr valign="top">
-			<th align="right" class="windowRowHeader bottomBorder">Web:</th>
+			<th align="right" class="windowRowHeader bottomBorder">Web:<br><? print help('SurveysTempEditor_Web', NULL, 'grey'); ?></th>
 			<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
@@ -485,7 +485,7 @@ endWindow();
 ?>
 <br>
 <?
-startWindow('Questions');
+startWindow('Questions ' . help('SurveysTempEditor_Questions', NULL, 'blue') );
 
 $titles = array("questionnumber" => " #",
 				"reportlabel" => "Report Label",

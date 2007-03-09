@@ -304,15 +304,15 @@ startWindow('Survey Information');
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td width="30%" >Survey Name</td>
+					<td width="30%" >Survey Name <?= help('SurveyScheduler_SurveyName',NULL,"small"); ?></td>
 					<td><? NewFormItem($f,$s,"name","text", 30,50); ?></td>
 				</tr>
 				<tr>
-					<td>Description</td>
+					<td>Description <?= help('SurveyScheduler_SurveyDesc',NULL,"small"); ?></td>
 					<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
 				</tr>
 				<tr>
-					<td>Priority <?= help('Job_SettingsType',NULL,"small"); ?></td>
+					<td>Priority <?= help('SurveyScheduler_Priority',NULL,"small"); ?></td>
 					<td>
 						<?
 
@@ -325,7 +325,7 @@ startWindow('Survey Information');
 					</td>
 				</tr>
 				<tr>
-					<td>Survey Template</td>
+					<td>Survey Template <?= help('SurveyScheduler_SurveyTemplate',NULL,"small"); ?></td>
 					<td>
 						<?
 						NewFormItem($f,$s,"questionnaireid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : 'id="questionnaireselect" onchange="checkphonesurvey(this.options[this.selectedIndex].value);"'));
@@ -338,7 +338,7 @@ startWindow('Survey Information');
 					</td>
 				</tr>
 				<tr>
-					<td>List <?= help('Job_SettingsList',NULL,"small"); ?></td>
+					<td>List <?= help('SurveyScheduler_List',NULL,"small"); ?></td>
 					<td>
 						<?
 						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
@@ -351,11 +351,11 @@ startWindow('Survey Information');
 					</td>
 				</tr>
 				<tr>
-					<td>Start Date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
+					<td>Start Date <?= help('SurveyScheduler_StartDate',NULL,"small"); ?></td>
 					<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "")); ?></td>
 				</tr>
 				<tr>
-					<td>Number of days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
+					<td>Number of days to run <?= help('SurveyScheduler_NumberOfDays', NULL, "small"); ?></td>
 					<td>
 					<?
 					NewFormItem($f, $s, 'numdays', "selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
@@ -373,15 +373,15 @@ startWindow('Survey Information');
 				<tr>
 					<td colspan="2">Survey Time Window:</td>
 				<tr>
-					<td>&nbsp;&nbsp;Earliest <?= help('Job_PhoneEarliestTime', NULL, 'small') ?></td>
+					<td>&nbsp;&nbsp;Earliest <?= help('SurveyScheduler_Earliest', NULL, 'small') ?></td>
 					<td><? time_select($f,$s,"starttime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
 				</tr>
 				<tr>
-					<td>&nbsp;&nbsp;Latest <?= help('Job_PhoneLatestTime', NULL, 'small') ?></td>
+					<td>&nbsp;&nbsp;Latest <?= help('SurveyScheduler_Latest', NULL, 'small') ?></td>
 					<td><? time_select($f,$s,"endtime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
 				</tr>
 				<tr>
-					<td>Email a report when the survey completes <?= help('Job_SendReport', NULL, 'small'); ?></td>
+					<td>Email a report when the survey completes <?= help('SurveyScheduler_EmailReport', NULL, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendreport","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Report</td>
 				</tr>
 			</table>
@@ -392,7 +392,7 @@ startWindow('Survey Information');
 		<td>
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td width="30%">Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
+					<td width="30%">Maximum attempts <?= help('SurveyScheduler_MaxAttempts', NULL, 'small')  ?></td>
 					<td>
 						<?
 						$max = first($ACCESS->getValue('callmax'), 1);
@@ -406,7 +406,7 @@ startWindow('Survey Information');
 				</tr>
 <? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
-						<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
+						<td>Caller&nbsp;ID <?= help('SurveyScheduler_CallerID',NULL,"small"); ?></td>
 						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : 'dependson="phonesurvey"')); ?></td>
 					</tr>
 <? } ?>
