@@ -54,7 +54,7 @@ if ($job->status=="repeating") {
 
 	//make a copy of this job and run it
 	$newjob = new Job($jobid);
-	$newf = NULL;
+	$newjob->id = NULL;
 	$newjob->name .= " - " . date("M j, g:i a");
 	$newjob->status = "new";
 	$newjob->assigned = NULL;
@@ -70,7 +70,7 @@ if ($job->status=="repeating") {
 	$newjob->enddate = date("Y-m-d", time() + $daydiff);
 
 	if (getSystemSetting('retry') != "")
-		$job->setOptionValue("retry",getSystemSetting('retry'));
+		$newjob->setOptionValue("retry",getSystemSetting('retry'));
 
 	$newjob->create();
 
