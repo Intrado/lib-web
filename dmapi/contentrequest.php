@@ -1,4 +1,5 @@
 <?
+require_once("../obj/Content.obj.php");
 require_once("../inc/content.inc.php");
 
 
