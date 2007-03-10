@@ -142,9 +142,9 @@ if( $reloadform ) {
 	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', $currentid, false, true)),"phone",10,10);
 	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', $currentid, false, true),"phone", 3, 3);
 
-	$currentmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4, false, true);
+	$currentmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4, true);
 	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",4,"nomax",true);
-	$currentmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2, false, true);
+	$currentmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2, true);
 	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",2,"nomax",true);
 
 	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', $currentid, false, true),"text",1,255);
