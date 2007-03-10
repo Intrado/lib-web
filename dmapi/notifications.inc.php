@@ -42,31 +42,23 @@ function assignSpecialTask ($types, $dmapidb) {
 		//when was the last time we checked the specialtasks table? We shouldn't check more than once every 5 seconds
 		$query = "select count(*) from tasksyncdata where name='specialtaskcheck_" . $specialtype ."' and value > (now() - interval 5 second)";
 		$res = DBQueryWrapper($query, $dmapidb);
-		if($res){
-			$row = DBGetRow($res);
-			if ($row[0] == 0) {
-				//check for a special task, if we dont fine one, update the table
-	
-				Query("begin")
-				$query = "select id, type from specialtask where status='queued' and type in ('$specialtype') limit 1";
-				$res = QuickQueryRow($query);
-				if($res){
-					$row = DBGetRow($res);
-					if ($row) {
-						list($id,$type) = $row;
-						$query = "update specialtask set status='assigned' where id=$id";
-						$res = QuickUpdate($query);
-						if ($res) {
-							$success = true;
-						}
-					} else {
-						$query = "insert into tasksyncdata (name,value) values 
-									('specialtaskcheck_" . $specialtype ."',now()) on duplicate key update value=now()";
-						DBQueryWrapper($query, $dmapidb);
-					}
+		$row = DBGetRow($res);
+		if ($row[0] == 0) {
+			//check for a special task, if we dont fine one, update the table
+
+			QuickUpdate("begin");
+			$res = QuickQueryRow("select id, type from specialtask where status='queued' and type in ('$specialtype') limit 1");
+			if ($res) {
+				list($id,$type) = $res;
+				if (QuickUpdate("update specialtask set status='assigned' where id=$id")) {
+					$success = true;
 				}
-				Query("commit");
+			} else {
+				$query = "insert into tasksyncdata (name,value) values
+						('specialtaskcheck_" . $specialtype ."',now()) on duplicate key update value=now()";
+				DBQueryWrapper($query, $dmapidb);
 			}
+			QuickUpdate("commit");
 		}
 		if($success)
 			break;
