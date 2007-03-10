@@ -48,4 +48,4 @@ PRIMARY KEY ( `name` )
 
 -- tweak tasksyncdata
 
-ALTER TABLE 'tasksyncdata' ENGINE = InnoDB;
+ALTER TABLE tasksyncdata ENGINE = InnoDB;
