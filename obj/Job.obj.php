@@ -135,6 +135,9 @@ class Job extends DBMappedObject {
 	}
 
 	function setOption ($option,$set) {
+		if (!$this->optionsarray) {
+			$this->parseOptions();
+		}
 		if ($set) {
 			if (!$this->isOption($option))
 				$this->optionsarray[] = $option;
@@ -160,6 +163,10 @@ class Job extends DBMappedObject {
 	}
 
 	function setOptionValue ($option,$value) {
+		if (!$this->optionsarray) {
+			$this->parseOptions();
+		}
+
 		$this->optionsarray[$option] = $value;
 		$this->buildOptions();
 	}
