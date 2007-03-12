@@ -36,6 +36,7 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 		$USER = $_SESSION['user'] = new User($id);
 		$_SESSION['access'] = new Access($USER->accessid);
 		$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
+		$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
 		redirect("start.php");
 	} else {
 		$badlogin = true;

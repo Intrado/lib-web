@@ -8,6 +8,8 @@ require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/sessiondata.inc.php");
+require_once("../inc/utils.inc.php");
+
 
 include_once("XmlToArray.obj.php");
 

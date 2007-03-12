@@ -26,7 +26,7 @@ if ($BFXML_ELEMENT['attrs']['REQUEST'] == "get") {
 	$contenttype = $dataelement['attrs']['MIME-TYPE'];
 	$data = $dataelement['txt'];
 	$tmpname = secure_tmpname("tmp","dmapicontent",".b64");
-	put_file_contents($tmpname,$data);
+	file_put_contents($tmpname,$data);
 	unset($data); // don't keep in memory
 	if ($cmid = contentPut($tmpname,$contenttype,true)) {
 ?>
