@@ -31,12 +31,12 @@ foreach($customers as $cust) {
 ?>
 	<tr><td><?= $cust->id ?></td>
 	<td><?= $cust->name ?></td>
-	<td><?= $custfields[0] ?></td>
+	<td><a href="https://asp.schoolmessenger.com/<?=$custfields[0]?>"><?=$custfields[0]?></a></td>
 	<td><?= $custfields[1] ?></td>
 	<td><?= $custfields[2] ?></td>
 	<td><?= $usercount ?></td>
 	<td><?= $jobcount ?></td>
-	<td><a href="customeredit.php?id=<?=$cust->id ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust->id ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust->id?>">Customer&nbsp;Imports</a></td>
+	<td><a href="customeredit.php?id=<?=$cust->id ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust->id ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust->id?>">Customer&nbsp;Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust->id?>">Active&nbsp;Jobs</a></td>
 	</tr>
 
 <?
