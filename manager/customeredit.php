@@ -35,8 +35,9 @@ $reloadform = 0;
 if( !QuickQuery("SELECT COUNT(*) FROM customer WHERE id = $currentid")) {
 	exit("Cannot find record of customer in database");
 }
-$refreshlangs = 0;
+$refresh = 0;
 $languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
+$custfields = QuickQueryRow("SELECT name, hostname, inboundnumber, timezone FROM customer WHERE customer.id = $currentid");
 
 if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 	if(CheckFormInvalid($f))
@@ -74,6 +75,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if (strlen($inboundnumber) > 0 && !ereg("[0-9]{10}",$inboundnumber)) {
 				error('Bad Toll Free Number Format, Try Again');
+			} else if ((strlen($custfields[1]) >= 5) && (strlen($hostname) < 5)){
+				error('Customer URL\'s cannot be shorter than 5 unless their account was already made');			
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
 			} else {
@@ -119,7 +122,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					redirect("customers.php");
 				} else {
 					$reloadform=1;
-					$refreshlangs = 1;
+					$refresh = 1;
 				}
 			}
 
@@ -132,10 +135,12 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 if( $reloadform ) {
 
 	ClearFormData($f);
-
-	$custfields = QuickQueryRow("SELECT name, hostname, inboundnumber, timezone FROM customer WHERE customer.id = $currentid");
+	if($refresh){
+		$custfields = QuickQueryRow("SELECT name, hostname, inboundnumber, timezone FROM customer WHERE customer.id = $currentid");
+		$languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
+	}
 	PutFormData($f,$s,'name',$custfields[0],"text",1,50,true);
-	PutFormData($f,$s,'hostname',$custfields[1],"text",5,255,true);
+	PutFormData($f,$s,'hostname',$custfields[1],"text",1,255,true);
 	PutFormData($f,$s,'inboundnumber',$custfields[2],"phone",10,10);
 	PutFormData($f,$s,'timezone', $custfields[3], "text", 1, 255);
 
@@ -155,9 +160,7 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', $currentid, false, true),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', $currentid, false, true), "text", 0, 100);
-	if($refreshlangs){
-		$languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
-	}
+	
 	$oldlanguages = array();
 	foreach($languages as $language){
 		$oldlanguages[] = $language->id;
@@ -172,10 +175,9 @@ if( $reloadform ) {
 include_once("nav.inc.php");
 
 NewForm($f);
-NewFormItem($f, $s,"", 'submit');
 
 ?>
-
+<br>
 <table>
 <tr><td>Customer display name: </td><td> <? NewFormItem($f, $s, 'name', 'text', 25, 50); ?></td></tr>
 <tr><td>URL path name: </td><td><? NewFormItem($f, $s, 'hostname', 'text', 25, 255); ?> (Must be 5 or more characters)</td></tr>
