@@ -9,13 +9,17 @@ $customerID = $_GET["customer"] + 0;
 
 //Finds how many users in customer.
 $users = DBFindMany("User","from user where customerid='$customerID' AND enabled=1 AND deleted=0");
-
+$customerresult = Query("select id, name, hostname from customer where id = '$customerID'");
+$customerinfo = DBGetRow($customerresult);
 include_once("nav.inc.php");
 
 ?>
 
 <table border=1>
 <tr>
+	<td>Customer ID</td>
+	<td>Customer Name</td>
+	<td>Customer URL</td>
 	<td>User ID</td>
 	<td>User Name</td>
 	<td>Last Name</td>
@@ -45,12 +49,15 @@ foreach ($users as $user) {
 
 ?>
 	<tr>
+		<td><?= $customerinfo[0] ?></td>
+		<td><?= $customerinfo[1] ?></td>
+		<td><a href="https://asp.schoolmessenger.com/<?=$customerinfo[2]?>"><?=$customerinfo[2]?></a></td>
 		<td><?= $user->id ?></td>
 		<td><?= $user->login ?></td>
 		<td><?= $user->lastname ?></td>
 		<td><?= $user->firstname ?></td>
 		<td><?= $lastlogin ?></td>
-		<td><?= $jobcount ?></td>
+		<td><a href="customeractivejobs.php?user=<?=$user->id?>"><?= $jobcount ?></a></td>
 		<td><?= $accessid->name ?></td>
 		<td><?= $user->phone ?></td>
 		<td><?= $user->email ?></td>
