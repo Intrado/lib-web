@@ -31,7 +31,7 @@ foreach($customers as $cust) {
 ?>
 	<tr><td><?= $cust->id ?></td>
 	<td><?= $cust->name ?></td>
-	<td><a href="https://asp.schoolmessenger.com/<?=$custfields[0]?>"><?=$custfields[0]?></a></td>
+	<td><a href="https://asp.schoolmessenger.com/<?=$custfields[0]?>" target="_blank"><?=$custfields[0]?></a></td>
 	<td><?= $custfields[1] ?></td>
 	<td><?= $custfields[2] ?></td>
 	<td><?= $usercount ?></td>

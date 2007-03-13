@@ -62,7 +62,7 @@ include("nav.inc.php");
 		<tr>
 			<td><?=$row[0]?></td>
 			<td><?=$row[1]?></td>
-			<td><a href="https://asp.schoolmessenger.com/<?=$row[2]?>"><?=$row[2]?></a></td>
+			<td><a href="https://asp.schoolmessenger.com/<?=$row[2]?>" target="_blank"><?=$row[2]?></a></td>
 			<td><?=$row[2]?></td>
 			<td><?=$row[3]?></td>
 			<td><?=$startdatetime?></td>
