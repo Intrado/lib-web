@@ -986,10 +986,7 @@ ALTER TABLE `user` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLA
 ALTER TABLE `jobworkitem` ADD INDEX `digest` ( `status` , `jobid` ) ;
 
 
-
-
--- Queries after this need to be applied to ASP
-
+-- Pre march 07 release (queries after this were applied to the ASP during march 07 release)
 
 
 ALTER TABLE `job` CHANGE `status` `status` ENUM( 'new', 'active', 'complete', 'cancelled', 'cancelling', 'repeating' ) NOT NULL DEFAULT 'new';
@@ -1211,9 +1208,14 @@ update person p
   where p.userid = 0;
 
 
-
-
 -- speeds up date range reports slightly because mysql query optimizer can take statistics into account (that user->customer is a many to one)
 ALTER TABLE `user` ADD INDEX ( `customerid` ) ;
+
+
+-- ASP March 07 Release (queries after this need to be applied to the ASP --
+
+
+-- field to keep track of how much a jobs workitems priority has been adjusted
+ALTER TABLE `job` ADD `priorityadjust` INT NOT NULL DEFAULT '0' AFTER `ranautoreport` ;
 
 
