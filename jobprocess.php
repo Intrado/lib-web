@@ -161,8 +161,14 @@ if ($job->type == "survey") {
 
 		$res = QuickUpdate($query);
 
-		if ($res === false)
+		if ($res === false) {
 			error_log("Problem inserting survey job $jobid: " . mysql_error() . " Query was:\n\n" . $query . "\n\n");
+		} else if ($res > 0) {
+
+			$numbuckets = min(99,$res/4);
+			$query = "update jobworkitem set priority = priority + round($numbuckets * rand()) where jobid=$jobid";
+			QuickUpdate($query);
+		}
 
 		$count += $res;
 	}
@@ -202,9 +208,14 @@ if ($job->type == "survey") {
 
 			$res = QuickUpdate($query);
 
-			if ($res === false)
+			if ($res === false) {
 				error_log("Problem inserting job $jobid: " . mysql_error() . " Query was:\n\n" . $query . "\n\n");
+			} else if ($res > 0) {
 
+				$numbuckets = min(99,$res/4);
+				$query = "update jobworkitem set priority = priority + round($numbuckets * rand()) where jobid=$jobid";
+				QuickUpdate($query);
+			}
 			$count += $res;
 		}
 	}
