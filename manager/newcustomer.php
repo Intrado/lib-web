@@ -140,6 +140,8 @@ if (CheckFormSubmit($f,$s)){
 				$query = "INSERT INTO `setting` (`customerid`, `name`, `value`) VALUES
 							($custid, 'autoreport_replyemail', '" . DBSafe($autoemail) ."'),
 							($custid, 'autoreport_replyname', '" . DBSafe($autoname) . "'),
+							($custid, 'maxphones', '3'),
+							($custid, 'maxemails', '2'),
 							($custid, 'surveyurl', '" . DBSafe($surveyurl) . "')";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 	
