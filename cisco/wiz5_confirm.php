@@ -7,6 +7,7 @@ include_once("../obj/Rule.obj.php");
 include_once("../obj/ListEntry.obj.php");
 include_once("../obj/RenderedList.obj.php");
 include_once("../obj/FieldMap.obj.php");
+include_once("../obj/Language.obj.php");
 
 if (!$USER->authorize('sendphone')) {
 	header("Location: $URL/index.php");
@@ -63,6 +64,8 @@ where le.listid='" . $list->id .  "' and $usersql and p.id=le.personid and le.ty
 $total += QuickQuery ($query);
 */
 
+$languages = DBFindMany("Language","from language where customerid= '$USER->customerid' order by name");
+
 header("Content-type: text/xml");
 ?>
 <CiscoIPPhoneText>
@@ -74,6 +77,14 @@ echo "Message:" . $messagename . "\r\n";
 echo "List:" . $list->name . "\r\n";
 echo "Total people in list:" . $renderedlist->total . "\r\n";
 echo "Priority:" . $jobtype->name . "\r\n";
+if($_SESSION['newjob']['easycall']) {
+	echo "Languages:Default - English\r\n";
+	foreach($languages as $language){
+		if(isset($_SESSION['newjob']['language'][$language->name]) && $_SESSION['newjob']['language'][$language->name] == 1)
+			echo "\t\t\t\t\t\t" . $language->name . "\r\n";
+	}
+}
+		
 
 ?>
 </Text>
@@ -96,7 +107,11 @@ echo "Priority:" . $jobtype->name . "\r\n";
 
 <SoftKeyItem>
 <Name>Back</Name>
-<URL><?= $URL . "/wiz4_priority.php" ?></URL>
+<? if ($_SESSION['newjob']['easycall']) { ?>
+	<URL><?= $URL . "/wiz4b_languages.php" ?></URL>
+<? } else { ?>
+	<URL><?= $URL . "/wiz4_priority.php" ?></URL>
+<? } ?>
 <Position>2</Position>
 </SoftKeyItem>
 
