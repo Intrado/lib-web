@@ -38,7 +38,13 @@ foreach ($VALIDJOBTYPES as $jobtype) {
 ?>
 	<MenuItem>
 	<Name><?= htmlentities($jobtype->name) ?></Name>
-	<URL><?= $URL . "/wiz5_confirm.php?jobtypeid=" . $jobtype->id ?></URL>
+<?
+		if($_SESSION['newjob']['easycall']){
+			?><URL><?= $URL . "/wiz4b_languages.php?jobtypeid=" . $jobtype->id ?></URL><?
+		} else {
+			?><URL><?= $URL . "/wiz5_confirm.php?jobtypeid=" . $jobtype->id ?></URL><?
+		}
+?>
 	</MenuItem>
 <?
 }
