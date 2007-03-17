@@ -44,9 +44,8 @@ $job->jobtypeid = $_SESSION['newjob']['jobtypeid'];
 $job->startdate = date("Y-m-d", strtotime("today"));
 $job->enddate = date("Y-m-d", strtotime("tomorrow"));
 
-$job->starttime = $USER->getCallEarly();
-
-$job->endtime = $USER->getCallLate();
+$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
+$job->endtime = date("H:i", strtotime($USER->getCallLate()));
 
 $job->maxcallattempts = min(3,$ACCESS->getValue('callmax'));
 
@@ -67,7 +66,7 @@ echo mysql_error();
 
 chdir("../");
 
-//kick of the job
+//kick off the job
 $job->runNow();
 
 unset($_SESSION['newjob']);
