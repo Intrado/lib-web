@@ -38,7 +38,7 @@ else
 $addr = $_SERVER['SERVER_NAME'] == "" ? $_SERVER['SERVER_ADDR'] : $_SERVER['SERVER_NAME'];
 $URL = "http://" . $addr . ":" . $_SERVER['SERVER_PORT'] . substr($_SERVER['PHP_SELF'],0,strrpos($_SERVER['PHP_SELF'],"/"));
 
-if (!$isindexpage) {
+if (!isset($isindexpage) || !$isindexpage) {
 	if (!isset($_SESSION['user'])) {
 		header("Location: $URL/index.php?logout=1");
 		exit();
@@ -63,7 +63,6 @@ $fp = fopen("foo.txt","w");
 ob_start();
 var_dump($GLOBALS);
 fwrite($fp,ob_get_clean());
-ob_end_clean();
 fclose($fp);
 
 
