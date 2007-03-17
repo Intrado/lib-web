@@ -1,8 +1,10 @@
 <?
 require_once("common.inc.php");
 include_once("../inc/securityhelper.inc.php");
+include_once("../inc/utils.inc.php");
 include_once("../obj/SpecialTask.obj.php");
 require_once("../obj/Phone.obj.php");
+include_once("../obj/Language.obj.php");
 
 if (!$USER->authorize('sendphone')) {
 	header("Location: $URL/index.php");
@@ -10,10 +12,10 @@ if (!$USER->authorize('sendphone')) {
 }
 
 if (isset($_GET['dn'])) {
-
+	
 	if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
-			userOwns("message",DBSafe($_SESSION['newjob']['message'])) &&
-			customerOwns("jobtype",DBSafe($_SESSION['newjob']['jobtypeid'])))) {
+			customerOwns("jobtype",DBSafe($_SESSION['newjob']['jobtypeid'])) &&
+			($_SESSION['newjob']['message'] == "callme"))) {
 		exit();
 	}
 
@@ -40,7 +42,24 @@ if (isset($_GET['dn'])) {
 
 	$task->setData('jobdays',$_SESSION['newjob']['numdays']);
 	$task->setData('jobretries',$_SESSION['newjob']['retries']);
-
+	
+	//new task info
+	$task->customerid = $USER->customerid;
+	$task->setData('progress', "Creating Call");
+	$task->setData('count', '0');
+	$task->setData('totalamount', $_SESSION['newjob']['language']['totallangcount']);
+	$task->setData('language0', 'Default');
+	$task->setData('currlang', 'Default');
+	$languages = DBFindMany("Language","from language where customerid= '$USER->customerid' order by name");
+	$i=1;
+	foreach($languages as $language){
+		if(isset($_SESSION['newjob']['language'][$language->name]) && $_SESSION['newjob']['language'][$language->name] == 1) {
+			$task->setData('language' . $i, $language->name);
+			$i++;
+		}
+	}
+	$task->status = "queued";
+	
 	$task->lastcheckin = date("Y-m-d H:i:s");
 	$task->create();
 
@@ -56,7 +75,7 @@ You should recieve a call shortly.
 
 <SoftKeyItem>
 <Name>Status</Name>
-<URL><?= $URL . "/status.php" ?></URL>
+<URL><?= $URL . "/status.php"?></URL>
 <Position>1</Position>
 </SoftKeyItem>
 
