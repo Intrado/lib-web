@@ -20,7 +20,7 @@ if($REQUEST_TYPE == "new"){
 	<?
 } else if($REQUEST_TYPE == "result"){
 
-	if($specialtask->getData('origin') == 'cisco'){
+	if(($specialtask->getData("origin") == "cisco") && ($specialtask->getData("progress") == "Done")){
 	
 		$USER = new User($specialtask->getData('userid'));
 		$ACCESS = new Access($USER->accessid);
