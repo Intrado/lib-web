@@ -41,13 +41,15 @@ function tryLogin ($userid) {
 if (isset($_GET['logout'])) {
 	$dn = $_SESSION['dn'];
 	session_destroy();
+	session_name($CUSTOMERURL . "_session");
+	session_start();
 	$_SESSION['dn'] = $dn;
 } else if (isset($_SESSION['user'])) {
 	sleep(1);
 	header("Location: $URL/main.php");
 	exit();
 } else if (isset($_GET['code'])) {
-	if (tryLogin(User::doLoginPhone($_GET['code'], $_GET['pin']),$CUSTOMERURL)) {
+	if (tryLogin(User::doLoginPhone($_GET['code'], $_GET['pin']))) {
 		sleep(1);
 		header("Location: $URL/main.php");
 		exit();
@@ -75,7 +77,7 @@ header("Content-type: text/xml");
 <URL><?= $URL . "/index.php" ?></URL>
 
 
-<? if ($_SESSION['loginalpha']) { ?>
+<? if (isset($_SESSION['loginalpha']) && $_SESSION['loginalpha']) { ?>
 
 <InputItem>
 <DisplayName>Username</DisplayName>
@@ -127,7 +129,7 @@ header("Content-type: text/xml");
 <Position>3</Position>
 </SoftKeyItem>
 
-<? if ($_SESSION['loginalpha']) { ?>
+<? if (isset($_SESSION['loginalpha']) && $_SESSION['loginalpha']) { ?>
 
 <SoftKeyItem>
 <Name>Numeric</Name>
