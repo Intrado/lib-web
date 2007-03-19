@@ -49,7 +49,8 @@ if (isset($_GET['logout'])) {
 	header("Location: $URL/main.php");
 	exit();
 } else if (isset($_GET['code'])) {
-	if (tryLogin(User::doLoginPhone($_GET['code'], $_GET['pin']))) {
+	$inbound = QuickQuery("Select inboundnumber from customer where hostname = '$CUSTOMERURL'");
+	if (tryLogin(User::doLoginPhone($_GET['code'], $_GET['pin'], $inbound))) {
 		sleep(1);
 		header("Location: $URL/main.php");
 		exit();
