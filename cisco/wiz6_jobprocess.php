@@ -2,6 +2,10 @@
 require_once("common.inc.php");
 require_once("../inc/securityhelper.inc.php");
 require_once("../obj/Job.obj.php");
+require_once("../obj/JobType.obj.php");
+require_once("../obj/Access.obj.php");
+require_once("../obj/Permission.obj.php");
+require_once("../inc/utils.inc.php");
 
 if (!$USER->authorize('sendphone')) {
 	header("Location: $URL/index.php");
@@ -29,36 +33,17 @@ if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
 	exit();
 }
 
-$job = new Job();
-
-$job->listid = $_SESSION['newjob']['list'];
-$job->phonemessageid = $_SESSION['newjob']['message'];
+$job = Job::jobWithDefaults();
 
 $defaultname = "IP Phone - " . date("F jS, Y g:i a");
 $job->name = ($_SESSION['newjob']['name'] ? $_SESSION['newjob']['name'] : $defaultname);
 $job->description = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] : $defaultname);
 
-
 $job->jobtypeid = $_SESSION['newjob']['jobtypeid'];
-
-$job->startdate = date("Y-m-d", strtotime("today"));
-$job->enddate = date("Y-m-d", strtotime("tomorrow"));
-
-$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
-$job->endtime = date("H:i", strtotime($USER->getCallLate()));
-
-$job->maxcallattempts = min(3,$ACCESS->getValue('callmax'));
+$job->listid = $_SESSION['newjob']['list'];
 
 $job->type="phone";
-$job->options = "callfirst,skipduplicates,sendreport";
-
-if (getSetting('callerid') != "")
-		$job->options .= ",callerid=" . getSetting('callerid');
-if (getSetting('retry') != "")
-		$job->options .= ",retry=" . getSetting('retry');
-$job->status = "new";
-$job->userid = $USER->id;
-$job->createdate = QuickQuery("select now()");
+$job->phonemessageid = $_SESSION['newjob']['message'];
 
 $job->create();
 
