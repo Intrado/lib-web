@@ -20,11 +20,11 @@ $query = "select customer.id, customer.name, customer.hostname, job.id, job.name
 			sum(wi.status = 'queued') as queued,
 			sum(wi.status in ('assigned', 'inprogress')) as inprogess,
 			sum(wi.status in ('success', 'fail', 'duplicate') ) as complete
-			from customer, user, job 
+			from customer
+			left join user on (user.customerid = customer.id)
+			left join job on (job.userid = user.id)
 			left join jobworkitem wi on (wi.jobid = job.id) 
-			where job.userid = user.id
-			and user.customerid = customer.id
-			and job.status = 'active'
+			where job.status = 'active'
 			and user.deleted = '0'
 			$extra
 			group by job.id
@@ -39,8 +39,8 @@ include("nav.inc.php");
 		<td>Customer ID</td>
 		<td>Customer Name</td>
 		<td>Customer URL</td>
-		<td>Job ID</td>
 		<td>Job Name</td>
+		<td>Job ID</td>
 		<td>Startdate</td>
 		<td>Enddate</td>
 		<td>Total Workitems</td>
