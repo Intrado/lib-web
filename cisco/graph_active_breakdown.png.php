@@ -40,12 +40,13 @@ select count(*) as cnt,
 		coalesce(callprogress,
 			if (wi.status not in ('fail','queued','inprogress','duplicate'), 'inprogress',wi.status))
 			as callprogress
-from jobworkitem wi, job j
+from jobworkitem wi
+left join job j on (wi.jobid = j.id)
 left join	jobtask jt on
 					(jt.jobworkitemid=wi.id)
 left join	calllog cl on
 					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
-where wi.jobid=j.id and j.userid=$USER->id and j.status='active'
+where wi.jobid=j.id and j.userid='$USER->id' and j.status='active'
 and wi.type='phone'
 group by callprogress
 order by cnt asc
