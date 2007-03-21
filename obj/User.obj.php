@@ -74,7 +74,7 @@ class User extends DBMappedObject {
 		return QuickQuery($query);
 	}
 
-	static function doLoginPhone ($accesscode, $pin, $inboundnumber = null) {
+	static function doLoginPhone ($accesscode, $pin, $inboundnumber = null, $customerurl = null) {
 		GLOBAL $SETTINGS;
 		$IS_LDAP = $SETTINGS['ldap']['is_ldap'];
 
@@ -121,6 +121,11 @@ class User extends DBMappedObject {
 		if (isset($inboundnumber)) {
 			$inboundnumber = DBSafe($inboundnumber);
 			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.inboundnumber='$inboundnumber') "
+					."where u.enabled=1 and c.enabled=1 and u.deleted=0 and "
+					."accesscode='$accesscode' and pincode=password('$pin')";
+		} else if (isset($customerurl)) {
+			$customerurl = DBSafe($customerurl);
+			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.hostname='$customerurl') "
 					."where u.enabled=1 and c.enabled=1 and u.deleted=0 and "
 					."accesscode='$accesscode' and pincode=password('$pin')";
 		} else {
