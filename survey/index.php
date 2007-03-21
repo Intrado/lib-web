@@ -133,12 +133,16 @@ if (!$exists) {
 	<br><br>Sorry, the survey link has expired or is invalid<br><br>
 <?
 } else if ($isused) {
+
 	//if already taken, show thanks page
-	if ($questionnaire->webexitmessage && isset($_GET['thanks']))
+	if ($questionnaire->webexitmessage && isset($_GET['thanks'])) {
+		echo "<br><br>";
 		if ($questionnaire->usehtml)
 			echo $questionnaire->webexitmessage;
 		else
 			echo nl2br(htmlentities($questionnaire->webexitmessage));
+		echo "<br><br>";
+	}
 	else if (isset($_GET['thanks'])) {
 ?>
 	<br><br>Your response has been recorded. Thank you for participating in this survey.<br><br>
@@ -150,7 +154,7 @@ if (!$exists) {
 	}
 } else if ($job->status != "active") {
 ?>
-	<h3>Sorry, the survey has expired.</h3>
+	<br><br><h3>Sorry, the survey has expired.</h3><br><br>
 <?
 } else {
 	//otherwise, show survey questions form
