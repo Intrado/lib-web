@@ -46,8 +46,10 @@ if($REQUEST_TYPE == "new"){
 		$type = $specialtask->getData('jobtypeid');
 		$job->listid = $specialtask->getData('listid');
 		$job->jobtypeid = $type;
-		$job->sendphone = true;
 		$job->type = "phone";
+		$numdays = $specialtask->getData('jobdays');
+		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
+		$job->setOptionValue("retry",$specialtask->getData('jobretries'));
 		
 		if($messages) {
 			
@@ -77,13 +79,18 @@ if($REQUEST_TYPE == "new"){
 
 	$SESSIONDATA = null;
 	?> <ok /> <?
-		
 
 } else {
 	?> 
 		<voice sessionid="<?= $SESSIONID ?>">
 			<message>
-				<audio cmid="file://prompts/GoodBye.wav" />
+				<?
+					if($specialtask->getData('origin') == "cisco"){
+						?><audio cmid="file://prompts/inbound/Goodbye.wav" /> <?
+					} else {
+						?><audio cmid="file://prompts/GoodBye.wav" /> <?
+					}
+				?>
 				<hangup />
 			</message>
 		</voice>
