@@ -41,6 +41,9 @@ $job->description = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] :
 
 $job->jobtypeid = $_SESSION['newjob']['jobtypeid'];
 $job->listid = $_SESSION['newjob']['list'];
+$job->setOptionValue("retry",$_SESSION['newjob']['retries']);
+
+$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($_SESSION['newjob']['numdays'] - 1) * 86400));
 
 $job->type="phone";
 $job->phonemessageid = $_SESSION['newjob']['message'];
