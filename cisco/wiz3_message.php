@@ -18,19 +18,19 @@ if(isset($_GET['info'])) {
 
 if(isset($_GET['messcount'])) {
 	$min = $_GET['messcount'] + 1;
-	$max = $_GET['messcount'] + 90;
+	$max = $_GET['messcount'] + 29;
 } else {
 	$min = 0;
-	$max = 89;
+	$max = 29;
 }
-if($_GET['messcount'] - 90 < 0){
-	$back = 0;
+if($min - 30 <= 0){
+	$back = -1;
 } else {
-	$back = $_GET['messcount'] - 90;
+	$back = $min - 30;
 }
 
-$messages = DBFindMany("Message","from message where type='phone' and userid=$USER->id and deleted=0 order by name");
-
+$messages = DBFindMany("Message","from message where type='phone' and userid=$USER->id and deleted=0 order by name
+	limit 29 offset $min");
 
 header("Content-type: text/xml");
 
@@ -48,11 +48,8 @@ header("Content-type: text/xml");
 <? } ?>
 
 <? 
-$count = 0;
+
 foreach ($messages as $message) {
-	$count++; 
-	if($count > $max) continue;
-	if($count < $min) continue;
 ?>
 	<MenuItem>
 	<Name><?= htmlentities($message->name) ?></Name>
@@ -92,5 +89,6 @@ foreach ($messages as $message) {
 <URL><?= htmlentities($URL . "/wiz3_message.php?messcount=". $back)  ?></URL>
 <Position>5</Position>
 </SoftKeyItem>
+
 
 </CiscoIPPhoneMenu>

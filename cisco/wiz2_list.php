@@ -22,18 +22,22 @@ if (isset($_GET['retries'])) {
 
 if(isset($_GET['listcount'])) {
 	$min = $_GET['listcount'] + 1;
-	$max = $_GET['listcount'] + 90;
+	$max = $_GET['listcount'] + 30;
 } else {
 	$min = 0;
-	$max = 89;
-}
-if($_GET['listcount'] - 90 < 0){
-	$back = 0;
-} else {
-	$back = $_GET['listcount'] - 90;
+	$max = 30;
 }
 
-$lists = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
+if($min - 31 <= 0){
+	$back = -1;
+} else {
+	$back = $min - 31;
+}
+
+
+$lists = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name
+	limit 30 offset $min");
+
 
 header("Content-type: text/xml");
 
@@ -43,11 +47,9 @@ header("Content-type: text/xml");
 <Prompt>Please select your list</Prompt>
 
 <?
-$count = 1;
+
 foreach ($lists as $list) {
-	$count++;
-	if($count > $max) continue;
-	if($count < $min) continue;
+
 ?>
 	<MenuItem>
 	<Name><?= htmlentities($list->name) ?></Name>
