@@ -113,10 +113,18 @@ echo htmlentities($output);
 </SoftKeyItem>
 -->
 
+<? if (doesSupport("CiscoIPPhoneImageFile") && !(isModel("7961") || isModel("7941"))) { ?>
+	<SoftKeyItem>
+	<Name>Joblist</Name>
+	<URL><?= $URL . "/joblist.php" ?></URL>
+	<Position>3</Position>
+	</SoftKeyItem>
+<? } ?>
+
 <SoftKeyItem>
 <Name>Back</Name>
 <URL><?= $URL . "/main.php" ?></URL>
-<Position>3</Position>
+<Position>4</Position>
 </SoftKeyItem>
 
 
