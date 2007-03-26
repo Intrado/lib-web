@@ -5,31 +5,6 @@ include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
 
 
-////////////////////////////
-function translatetime($datetime, $zone){
-	$offsets = array( "US/Samoa" => -3,
-					"US/Aleutian" => -2,
-					"US/Hawaii" => -2,
-					"US/Alaska" => -1,
-					"US/Pacific" => 0,
-					"US/Arizona" => 1,
-					"US/Mountain" => 1,
-					"US/Central" => 2,
-					"US/Indiana-Starke" => 2,
-					"US/East-Indiana" => 3,
-					"US/Eastern" => 3,
-					"US/Michigan" => 3
-					);
-	if(strtotime("now") > strtotime("March 11") && strtotime("now") < strtotime("November 4")){
-		$offsets["US/Arizona"] = 0;
-		$offsets["US/Hawaii"] = -3;
-	}
-	return $datetime + ($offsets[$zone] * 3600);
-}
-////////////////////////////
-
-
-
 $f = "form";
 $s = "imports";
 $reloadform = 0;
@@ -122,7 +97,8 @@ while($row = DBGetRow($list)){
 	$importfile = getImportFileURL($row[0],$row[3]);
 
 	if (is_readable($importfile) && is_file($importfile)) {
-		$row[10]=date("M j, g:i a ",translatetime(filemtime($importfile), $row[9]));
+		date_default_timezone_set($row[9]);
+		$row[10]=date("M j, g:i a ",filemtime($importfile));
 		$row[11]=filesize($importfile);
 	} else {
 		$row[10]="Not Found";
