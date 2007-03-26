@@ -14,11 +14,14 @@ if($min - 31 <= 0){
 	$back = $min - 31;
 }
 
-$activejoblist=QuickQueryList("select id from job where userid = '$USER->id' and status = 'active' order by name
+$activejoblist=QuickQueryList("select id from job where userid = '$USER->id' and status = 'active' and deleted = '0' 
+	order by id desc
 	limit 30 offset $min");
-	
-$completedjoblist=QuickQueryList("select id from job where userid = '$USER->id' and status = 'complete' order by name
+
+$completedjoblist=QuickQueryList("select id from job where userid = '$USER->id' and status = 'complete'  and deleted = '0' 
+	order by finishdate desc
 	limit 30 offset $min");
+
 
 header("Content-type: text/xml");
 ?>
