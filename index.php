@@ -72,6 +72,9 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 //try to find the customer's name
 $custname = QuickQuery("select name from customer where hostname='" . DBSafe($CUSTOMERURL) . "'");
 
+
+if ($IS_COMMSUITE) {
+
 ?>
 
 <html>
@@ -118,16 +121,6 @@ if (file_exists($logofilename) ) {
 <? if ($SETTINGS['feature']['has_ssl'] && !isset($_SERVER["HTTPS"])) { ?>
 				<tr><td colspan="2" align="right"><a href="<?= $secureurl?>"><img src="img/padlock.gif"> Switch to Secure Login</a></td></tr>
 <? } ?>
-<? /*CSDELETEMARKER_START*/ if (isset($_SERVER["HTTPS"]) && !$IS_COMMSUITE) { ?>
-				<tr><td colspan="2" align="right">
-					<table width="135" border="0" cellpadding="2" cellspacing="0">
-					<tr>
-					<td width="135" align="center" valign="top"><script src=https://seal.verisign.com/getseal?host_name=asp.schoolmessenger.com&size=S&use_flash=NO&use_transparent=NO&lang=en></script><br />
-					<a href="http://www.verisign.com/ssl-certificate/" target="_blank"  style="color:#000000; text-decoration:none; font:bold 7px verdana,sans-serif; letter-spacing:.5px; text-align:center; margin:0px; padding:0px;">About SSL Certificates</a></td>
-					</tr>
-					</table>
-				</td></tr>
-<? } /*CSDELETEMARKER_END*/ ?>
 				<tr>
 					<td colspan="2" style="font-size: x-small; font-weight: normal;">Usernames and passwords are case-sensitive.</td>
 				</tr>
@@ -143,3 +136,91 @@ new getObj('logintext').obj.focus();
 
 </script>
 <html>
+
+<?
+
+} /*CSDELETEMARKER_START*/ else {
+?>
+
+<html>
+<head>
+<title>SchoolMessenger Login</title>
+
+</head>
+<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #365F8D;'>
+<form action="index.php" method="POST">
+
+<table border=0 cellpadding=0 cellspacing=0 width="100%">
+<tr style="background-color: #365F8D;">
+	<td width="389"><img src="img/school_messenger_large.gif" /></td>
+	<td width="100%">&nbsp;</td>
+</tr>
+<tr style="background-color: #666666;">
+	<td colspan="2">&nbsp;</td>
+</tr>
+<tr>
+	<td><img src="img/classroom_girl.jpg"></td>
+	<td style="background-color: #D4DDE2; color: #365F8D;">
+
+		<table width="100%" style="color: #365F8D; text-align: right;">
+			<tr>
+				<td width="100%" style="font-size: 18px; font-weight: bold; text-align: right;"><?= htmlentities($custname) ?></div></td>
+				<td><img src="img/spacer.gif" width="25"></td>
+			</tr>
+
+			<tr>
+
+<? if ($badlogin) { ?>
+				<td style="font-size: 12px; font-weight: bold; color: red;">Incorrect username/password. Please try again.</td>
+<? } else if ($custname === false) { ?>
+				<td style="font-size: 12px; font-weight: bold; color: red;">Invalid customer URL. Please check the URL and try again.</td>
+<? } else { ?>
+				<td style="font-size: 12px;">Please enter your Username and Password and then click <span style="font-weight: bold;">Sign In</span></td>
+<? } ?>
+
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="font-size: 9px; text-align: right; font-style: italic;">Usernames and passwords are case-sensitive.</td>
+				<td>&nbsp;</td>
+			</tr>
+
+		</table>
+
+		<div><table width="100%" style="color: #365F8D;">
+			<tr>
+				<td style="font-size: 12px;"><div style="margin-left: 35px;">Login:<br><input type="text" name="login" size="35" id="logintext"></div></td>
+			</tr>
+			<tr>
+				<td style="font-size: 12px;"><div style="margin-left: 35px;">Password:<br><input type="password" name="password" size="35"></div></td>
+			</tr>
+			<tr>
+				<td><div style="margin-left: 35px;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif"></div></td>
+			</tr>
+		</table>
+
+	</td>
+</tr>
+<tr style="background-color: white;">
+	<td>&nbsp;</td>
+	<td>
+		<div style="text-align: right; margin: 5px;">
+			<script src=https://seal.verisign.com/getseal?host_name=asp.schoolmessenger.com&size=S&use_flash=NO&use_transparent=NO&lang=en></script><br />
+			<a href="http://www.verisign.com/ssl-certificate/" target="_blank"  style="color:#000000; text-decoration:none; font:bold 7px verdana,sans-serif; letter-spacing:.5px; text-align:center; margin:0px; padding:0px;">About SSL Certificates</a>
+		</div>
+	</td>
+</tr>
+
+<tr style="background-color: #365F8D; color: white;">
+	<td colspan="2"><div style="text-align:right; font-size: 12px; margin: 5px;">If you are experiencing difficulty logging or require assistance, please contact us:</div><div style="text-align:right; font-size: 12px; margin: 5px;">Email:&nbsp;<a style="color: white;" href="mailto:support@schoolmessenger.com">support@schoolmessenger.com</a>
+	<br>
+	Phone:&nbsp;888.527.5225</div></td>
+</tr>
+
+</body>
+</form>
+</html>
+
+
+<?
+} /*CSDELETEMARKER_END*/
