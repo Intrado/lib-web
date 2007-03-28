@@ -1219,3 +1219,8 @@ ALTER TABLE `user` ADD INDEX ( `customerid` ) ;
 ALTER TABLE `job` ADD `priorityadjust` INT NOT NULL DEFAULT '0' AFTER `ranautoreport` ;
 
 
+ALTER TABLE `jobtype` ADD `timeslices` SMALLINT NOT NULL DEFAULT '0' AFTER `systempriority` ;
+
+update jobtype set timeslices = 50 where systempriority=1;
+update jobtype set timeslices = 0 where systempriority=2;
+update jobtype set timeslices = 100 where systempriority=3;

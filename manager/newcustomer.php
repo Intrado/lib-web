@@ -36,19 +36,19 @@ if (CheckFormSubmit($f,$s)){
 		$reloadform = 1;
 	} else {
 		MergeSectionFormData($f,$s);
-	
+
 		// Checks to see if user left out any of the required fields
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		}else{
-	
+
 			$displayname = GetFormData($f,$s,"name");
 			$timezone = GetFormData($f, $s, "timezone");
 			$hostname = GetFormData($f, $s, "hostname");
 			$inboundnum = GetFormData($f, $s, "inboundnumber");
 			$cust_pass = GetFormData($f, $s, "password");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
-	
+
 			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."'")) {
@@ -62,7 +62,7 @@ if (CheckFormSubmit($f,$s)){
 			} else if (strlen($autoemail) > 0 && CheckFormItem($f,$s,"autoemail") != 0) {
 				error('Bad E-mail Format', 'Try Again');
 			} else {
-	
+
 				$query = "insert into customer (name,enabled,timezone,hostname,inboundnumber) VALUES
 							('" . DBSafe($displayname) . "',1,
 							'" . DBSafe($timezone) . "',
@@ -70,11 +70,11 @@ if (CheckFormSubmit($f,$s)){
 							'" . DBSafe($inboundnum) . "')";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 				$custid = mysql_insert_id();
-	
+
 				$query = "insert into access (name,customerid) values ('System Administrators', $custid)";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error());
 				$accessid = mysql_insert_id();
-	
+
 				$query = "INSERT INTO `permission` (accessid,name,value) VALUES "
 						. "($accessid, 'loginweb', '1'),"
 						. "($accessid, 'manageprofile', '1'),"
@@ -110,32 +110,32 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'managetasks', '1');"
 						;
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-	
+
 				$query = "INSERT INTO `user` (`accessid`, `login`, `password`, `customerid`,
 							`firstname`, `lastname`, `enabled`, `deleted`) VALUES
 							( '$accessid' , '$user',
 							password('" . DBSafe($cust_pass) . "') ,
 							'$custid', 'System', 'Administrator', 1 ,0)";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-	
+
 				$query = "INSERT INTO `fieldmap` (`customerid`, `fieldnum`, `name`, `options`) VALUES
 							($custid, 'f01', 'First Name', 'searchable,text'),
 							($custid, 'f02', 'Last Name', 'searchable,text'),
 							($custid, 'f03', 'Language', 'searchable,multisearch')";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-	
+
 				$query = "INSERT INTO `language` (`customerid`, `name`, `code`) VALUES
 							($custid, 'English', ''),
 							($custid, 'Spanish', '')";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-	
-	
-				$query = "INSERT INTO `jobtype` (`customerid`, `name`, `priority`, `systempriority`, `deleted`) VALUES
-							($custid, 'Emergency', 10000, 1, 0),
-							($custid, 'Attendance', 20000, 2, 0),
-							($custid, 'General', 30000, 3, 0)";
+
+
+				$query = "INSERT INTO `jobtype` (`customerid`, `name`, `priority`, `systempriority`, timeslices, `deleted`) VALUES
+							($custid, 'Emergency', 10000, 1, 50, 0),
+							($custid, 'Attendance', 20000, 2, 0, 0),
+							($custid, 'General', 30000, 3, 100, 0)";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-				
+
 				$surveyurl = "http://asp.schoolmessenger.com/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`customerid`, `name`, `value`) VALUES
 							($custid, 'autoreport_replyemail', '" . DBSafe($autoemail) ."'),
@@ -144,7 +144,7 @@ if (CheckFormSubmit($f,$s)){
 							($custid, 'maxemails', '2'),
 							($custid, 'surveyurl', '" . DBSafe($surveyurl) . "')";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-	
+
 				redirect("customers.php");
 			}
 		}

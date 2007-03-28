@@ -4,11 +4,12 @@ class JobType extends DBMappedObject {
 	var $name;
 	var $priority;
 	var $systempriority;
+	var $timeslices;
 	var $deleted;
 
 	function JobType($id = NULL) {
 		$this->_tablename = "jobtype";
-		$this->_fieldlist = array("name", "priority","systempriority","deleted");
+		$this->_fieldlist = array("name", "priority","systempriority","timeslices","deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

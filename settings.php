@@ -100,8 +100,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 	{
 		MergeSectionFormData($f, $s);
 
-
-
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
@@ -119,12 +117,19 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 					foreach($types as $id => $name) {
 						$name = DBSafe($name);
 						$id = DBSafe($id);
-						$systempriority = DBSafe((isset($_POST['systempriority'][$id]) ? $_POST['systempriority'][$id] : "3"));
-						if($id == 'new' && $name)
-							QuickUpdate("insert into jobtype (name, priority, systempriority, customerid) values ('$name', " . (QuickQuery("select max(priority) from jobtype where customerid = $USER->customerid and deleted=0") + 10000) . ", '$systempriority', $USER->customerid)");
-						else {
-							if (customerOwns("setting",$id))
-								QuickUpdate("update jobtype set name = '$name' , systempriority='$systempriority' where id = '$id'");
+						$systempriority = isset($_POST['systempriority'][$id]) ? 0 + $_POST['systempriority'][$id] : "3";
+						$timeslices = isset($_POST['timeslices'][$id]) ? 0 + $_POST['timeslices'][$id] : "100";
+						$timeslices = min(600,abs($timeslices));
+
+						if($id == 'new' && $name) {
+							$nextpri = 10000 + QuickQuery("select max(priority) from jobtype where customerid = $USER->customerid and deleted=0");
+							$query = "insert into jobtype (name, priority, systempriority, timeslices, customerid) values ('$name','$nextpri', '$systempriority','$timeslices', $USER->customerid)";
+							QuickUpdate($query);
+						} else {
+							if (customerOwns("jobtype",$id)) {
+								$query = "update jobtype set name = '$name' , systempriority='$systempriority', timeslices='$timeslices' where id = '$id'";
+								QuickUpdate($query);
+							}
 						}
 					}
 				}
@@ -155,7 +160,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
-				
+
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
 					setSetting('easycallmax', GetFormData($f, $s, 'easycallmax'));
@@ -232,6 +237,16 @@ function fmt_systempriority($obj, $name) {
 		return htmlentities($priorities[$obj->systempriority]);
 	}
 }
+
+function fmt_timeslices($obj, $name) {
+	global $f, $s;
+	if((isset($_GET['edittype']) && $_GET['edittype'] == $obj->id) || $obj->id == 'new') {
+		return '<input type="text" name="timeslices[' . $obj->id . ']" width="100%" value="' . $obj->timeslices . '">';
+	} else {
+		return $obj->timeslices;
+	}
+}
+
 function fmt_edit($obj, $name) {
 	global $f, $s;
 	if(isset($_GET['edittype']) && $_GET['edittype'] == $obj->id)
@@ -278,8 +293,10 @@ startWindow('Global System Settings');
 								$types[] = $type = new JobType();
 								$type->id = 'new';
 								$type->priority = QuickQuery("select max(priority) from jobtype where customerid = $USER->customerid and deleted=0") + 10000;
-							showObjects($types,array('priority' => 'Priority', 'name' => 'Type', 'systempriority' => "Service Level", 'edit' => '', 'move' => ''),
-								array('priority' => 'fmt_priority', 'edit' => 'fmt_edit', 'move' => 'fmt_move', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority"));
+								$type->timeslices = 100;
+								$titles = array('priority' => 'Priority', 'name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '', 'move' => '');
+								$formatters = array('priority' => 'fmt_priority', 'edit' => 'fmt_edit', 'move' => 'fmt_move', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
+								showObjects($types,$titles,$formatters);
 						?>
 
 								</td>
@@ -375,8 +392,8 @@ startWindow('Global System Settings');
 					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
 					</td>
 				</tr>
-<? 
-				if($IS_COMMSUITE){ 
+<?
+				if($IS_COMMSUITE){
 ?>
 					<tr>
 						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
@@ -421,8 +438,8 @@ startWindow('Global System Settings');
 					<? NewFormItem($f,$s,'checkpassword','checkbox') ?>
 					</td>
 				</tr>
-				
-				
+
+
 
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">

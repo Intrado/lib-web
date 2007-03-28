@@ -33,6 +33,7 @@ $jobtype = new JobType($job->jobtypeid);
 
 $priority = $jobtype->priority ? $jobtype->priority : 30000;
 $systempriority = $jobtype->systempriority ? $jobtype->systempriority : 3;
+$timeslices = $jobtype->timeslices;
 
 //check the user permissions
 $ACCESS = new Access($USER->accessid);
@@ -165,8 +166,8 @@ if ($job->type == "survey") {
 			error_log("Problem inserting survey job $jobid: " . mysql_error() . " Query was:\n\n" . $query . "\n\n");
 		} else if ($res > 0) {
 
-			$numbuckets = min(99,$res/4);
-			$query = "update jobworkitem set priority = priority + round($numbuckets * rand()) where jobid=$jobid";
+			$numbuckets = (int) max(1,min($timeslices ,$res/2));
+			$query = "update jobworkitem set priority = priority + (id % $numbuckets) where jobid=$jobid";
 			QuickUpdate($query);
 		}
 
@@ -212,8 +213,8 @@ if ($job->type == "survey") {
 				error_log("Problem inserting job $jobid: " . mysql_error() . " Query was:\n\n" . $query . "\n\n");
 			} else if ($res > 0) {
 
-				$numbuckets = min(99,$res/4);
-				$query = "update jobworkitem set priority = priority + round($numbuckets * rand()) where jobid=$jobid";
+				$numbuckets = (int) max(1,min($timeslices ,$res/2));
+				$query = "update jobworkitem set priority = priority + (id % $numbuckets) where jobid=$jobid";
 				QuickUpdate($query);
 			}
 			$count += $res;
