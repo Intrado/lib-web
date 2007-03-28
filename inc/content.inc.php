@@ -107,8 +107,10 @@ function renderTts ($text,$language,$gender) {
 	list($fp,$server) = connectToContentServer("tts");
 	list($host,$port,$path) = $server;
 	if ($fp) {
+		// tts priority 0=normal, 1=high
 		$req = "POST " . $path. "?language=" . urlencode($language)
-				. "&gender=" . urlencode($gender) . " HTTP/1.0\r\nContent-Length: " . strlen($text) . "\r\nConnection: close\r\n\r\n" . $text;
+				. "&gender=" . urlencode($gender) . "&priority=1"
+				. " HTTP/1.0\r\nContent-Length: " . strlen($text) . "\r\nConnection: close\r\n\r\n" . $text;
 		if (fwrite($fp,$req)) {
 			$data = getHttpResponseContents($fp);
 			fclose($fp);
