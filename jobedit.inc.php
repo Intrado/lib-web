@@ -172,6 +172,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			if (getSystemSetting('retry') != "")
 				$job->setOptionValue("retry",getSystemSetting('retry'));
 
+			if ($USER->authorize("leavemessage"))
+				$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
+
 			if ($JOBTYPE == "repeating") {
 				$schedule = new Schedule($job->scheduleid);
 				$schedule->time = date("H:i", strtotime(GetFormData($f,$s,"scheduletime")));
@@ -315,6 +318,7 @@ if( $reloadform )
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
 
+	PutFormData($f,$s,"leavemessage",$job->leavemessage, "bool", 0, 1);
 	if ($JOBTYPE == "repeating") {
 		$schedule = new Schedule($job->scheduleid);
 
@@ -629,6 +633,13 @@ startWindow('Job Information');
 					<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
 					<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Call all phone numbers</td>
 				</tr>
+				<? if($USER->authorize('leavemessage')) { ?>
+					<tr>
+						<td> Allow call recievers to leave messages?</td>
+						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($completedmode ? "DISABLED" : "")); ?> Leave Message </td>
+					</tr>
+				<? } ?>
+				
 			</table>
 		</td>
 	</tr>
