@@ -318,7 +318,7 @@ if( $reloadform )
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
 
-	PutFormData($f,$s,"leavemessage",$job->leavemessage, "bool", 0, 1);
+	PutFormData($f,$s,"leavemessage",$job->isOption("leavemessage"), "bool", 0, 1);
 	if ($JOBTYPE == "repeating") {
 		$schedule = new Schedule($job->scheduleid);
 
