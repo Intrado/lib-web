@@ -108,6 +108,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("viewsystemrepeating", (bool)GetFormData($form, $section, 'viewsystemrepeating'));
 			$accss->setPermission("viewsystemcompleted", (bool)GetFormData($form, $section, 'viewsystemcompleted'));
 			$accss->setPermission("survey", (bool)GetFormData($form, $section, 'survey'));
+			$accss->setPermission("leavemessage", (bool)GetFormData($form, $section, 'leavemessage'));
 
 			$_SESSION['accessid'] = $accss->id;
 
@@ -173,7 +174,8 @@ if( $reloadform )
 				array("viewsystemactive","bool",0,1),
 				array("viewsystemrepeating","bool",0,1),
 				array("viewsystemcompleted","bool",0,1),
-				array("survey","bool",0,1));
+				array("survey","bool",0,1),
+				array("leavemessage","bool",0,1));
 
 	foreach($permissions as $field) {
 		PutFormData($form, $section, $field[0], $accss->getValue($field[0]),$field[1],$field[2],$field[3]);
@@ -280,6 +282,10 @@ startWindow('Allowed Functions');
 						NewFormItem($form,$section,"callmax","selectend");
 						?>
 					</td>
+				</tr>
+				<tr>
+					<td><? NewFormItem($form, $section, "leavemessage", "checkbox"); ?></td>
+					<td>Allow phone replies</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendemail","checkbox"); ?></td>
