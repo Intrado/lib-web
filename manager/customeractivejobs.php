@@ -13,7 +13,7 @@ if(isset($_GET['customer'])){
 }
 
 $query = "select customer.id, customer.name, customer.hostname, job.id, job.name,
-			job.starttime, job.startdate, job.endtime, job.enddate,
+			customer.timezone, job.starttime, job.startdate, job.endtime, job.enddate,
 			sum(wi.status = 'new') as newcount,
 			sum(wi.status = 'scheduled') as scheduled,
 			sum(wi.status = 'waiting') as waiting,
@@ -39,8 +39,9 @@ include("nav.inc.php");
 		<td>Customer ID</td>
 		<td>Customer Name</td>
 		<td>Customer URL</td>
-		<td>Job Name</td>
 		<td>Job ID</td>
+		<td>Job Name</td>
+		<td>Timezome</td>
 		<td>Startdate</td>
 		<td>Enddate</td>
 		<td>Total Workitems</td>
@@ -55,25 +56,26 @@ include("nav.inc.php");
 	</tr>
 <?
 	while($row = DBGetRow($result)){
-		$startdatetime = date("M j, g:i a", strtotime($row[5] . " " . $row[6]));
-		$enddatetime = date("M j, g:i a", strtotime($row[7] . " " . $row[8]));
+		$startdatetime = date("M j, g:i a", strtotime($row[6] . " " . $row[7]));
+		$enddatetime = date("M j, g:i a", strtotime($row[8] . " " . $row[9]));
 		
 ?>		
 		<tr>
 			<td><?=$row[0]?></td>
 			<td><?=$row[1]?></td>
 			<td><a href="https://asp.schoolmessenger.com/<?=$row[2]?>" target="_blank"><?=$row[2]?></a></td>
-			<td><?=$row[2]?></td>
 			<td><?=$row[3]?></td>
+			<td><?=$row[4]?></td>
+			<td><?=$row[5]?></td>
 			<td><?=$startdatetime?></td>
 			<td><?=$enddatetime?></td>
-			<td><?=$row[9]+$row[10]+$row[11]+$row[12]+$row[13]+$row[14]?></td>
-			<td><?=$row[9]?></td>
+			<td><?=$row[10]+$row[11]+$row[12]+$row[13]+$row[14]+$row[15]?></td>
 			<td><?=$row[10]?></td>
 			<td><?=$row[11]?></td>
 			<td><?=$row[12]?></td>
 			<td><?=$row[13]?></td>
 			<td><?=$row[14]?></td>
+			<td><?=$row[15]?></td>
 		</tr>
 <?
 	}
