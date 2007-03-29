@@ -222,10 +222,24 @@ echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemess
 					<td class="bottomBorder" >Skip Duplicate Phone Numbers</td>
 					<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("skipduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
-				<tr>
-					<td>Call every available phone number for each person</td>
-					<td><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call all phone numbers</td>
-				</tr>
+				
+<? if($USER->authorize('leavemessage')) { ?>
+					<tr>
+						<td class="bottomBorder" >Call every available phone number for each person</td>
+						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call all phone numbers</td>
+					</tr>
+					
+					<tr>
+						<td> Allow call recievers to leave messages?</td>
+						<td><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Leave Message</td>
+					</tr>
+<? } else { ?>
+					<tr>
+						<td>Call every available phone number for each person</td>
+						<td><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call all phone numbers</td>
+					</tr>
+<? } ?>
+				
 			</table>
 		</td>
 	</tr>
