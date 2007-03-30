@@ -372,4 +372,44 @@ function fmt_numquestions ($obj,$name) {
 	return QuickQuery("select count(*) from surveyquestion where questionnaireid=$obj->id");
 }
 
+function fmt_replies_actions($obj, $name) {
+	$view = '<a href="repliesjob.php?jobid=' . $obj->id . '">View</a>';
+	$delete = '<a href="replies.php?delete=' . $obj->id . '" onclick="return confirm(\'Are you sure you want to delete all replies with this job?\');">Delete</a>';
+	$buttons = array($view, $delete);
+	return implode("&nbsp;|&nbsp;", $buttons);
+}
+
+function fmt_replies_msgname($row, $index) {
+	$job = new Job($row[$index]);
+	$message = new Message($job->phonemessageid);
+	return $message->name;
+}
+
+function fmt_replies_jobname($obj, $name) {
+	$count = QuickQuery("Select count(*) from voicereply where listened = '0' and jobid = '$obj->id'");
+	if($count > 0)
+		return "<B>" . $obj->name . "  (" . $count . ")". "</B>";
+	else
+		return $obj->name;
+}
+
+function fmt_repliesjob_actions($row, $index) {
+	$play = '<a href="" onclick="popup(\'repliespreview.php?id=' . $row[8] . '?close=1\', 400, 350); new getObj(\'reply' . $row[8] .'\').obj.style.fontWeight=\'normal\'">Play</a>';
+	$delete = '<a href="repliesjob.php?delete=' . $row[8]. '" onclick="return confirm(\'Are you sure you want to delete this reply?\');">Delete</a>';
+	$buttons = array($play, $delete);
+	return implode("&nbsp;|&nbsp;", $buttons);
+}
+
+function fmt_repliesjob_stuid($row, $index) {
+	$id = $row[$index];
+	if(!$row[9])
+		return "<div id=reply" . $row[8] ." style=\"font-weight:bold\">" . $row[$index] . "</div>";
+	else
+		return "<div id=reply" . $row[8] .">" . $row[$index] . "</div>";
+}
+	
+function fmt_repliesjob_date($row, $index){
+	return date("M j, Y g:i a", $row[$index]/1000);
+}
+	
 ?>
