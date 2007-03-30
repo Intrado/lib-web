@@ -16,6 +16,7 @@ function userOwns ($type,$id) {
 		case "audiofile":
 		case "person":
 		case "surveyquestionnaire":
+		case "voicereply":
 			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id'");
 		case "message":
 			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id' and deleted=0");
