@@ -34,8 +34,8 @@ foreach($customers as $cust) {
 	<td><a href="https://asp.schoolmessenger.com/<?=$custfields[0]?>" target="_blank"><?=$custfields[0]?></a></td>
 	<td><?= $custfields[1] ?></td>
 	<td><?= $custfields[2] ?></td>
-	<td><?= $usercount ?></td>
-	<td><?= $jobcount ?></td>
+	<td <?= $usercount == 1 ? 'style="background-color: #ffcccc;"' : "" ?>><?= $usercount ?></td>
+	<td <?= $jobcount > 0 ? 'style="background-color: #ccffcc;"' : "" ?>><?= $jobcount ?></td>
 	<td><a href="customeredit.php?id=<?=$cust->id ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust->id ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust->id?>">Customer&nbsp;Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust->id?>">Active&nbsp;Jobs</a></td>
 	</tr>
 
