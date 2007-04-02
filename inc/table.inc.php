@@ -74,8 +74,9 @@ function showTable ($data, $titles, $formatters = array()) {
 
 			//only show cels with titles
 			foreach ($titles as $index => $title) {
-				$cel = $row[$index];
-
+				if(isset($row[$index]))
+					$cel = $row[$index];
+				else $cel = "";
 				$cel = htmlentities($cel);
 
 				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
