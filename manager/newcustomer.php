@@ -142,6 +142,7 @@ if (CheckFormSubmit($f,$s)){
 							($custid, 'autoreport_replyname', '" . DBSafe($autoname) . "'),
 							($custid, 'maxphones', '3'),
 							($custid, 'maxemails', '2'),
+							($custid, 'retry', '15'),
 							($custid, 'surveyurl', '" . DBSafe($surveyurl) . "')";
 				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 
