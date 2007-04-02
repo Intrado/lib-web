@@ -5,6 +5,21 @@ include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
 
 
+
+function fmt_alert_timestamp($timestamp) {
+	if ($timestamp === false) {
+		return "<div style='background-color: #ffcccc'>- Never -</div>";
+	} else {
+		if ($timestamp < time() - 60 * 60 * 24 * 3)
+			return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
+		else
+			return date("M j, g:i a", $lastrun);
+	}
+}
+
+
+
+
 $f = "form";
 $s = "imports";
 $reloadform = 0;
@@ -36,7 +51,7 @@ if(CheckFormSubmit($f, $s)) {
 	$reloadform = 1;
 }
 if($reloadform){
-	ClearFormData($f);	
+	ClearFormData($f);
 	PutFormData($f, $s, 'importtypes', $selected, "array", array_keys($selected));
 }
 
@@ -84,7 +99,7 @@ EndForm();
 	</tr>
 <?
 
-$query = "SELECT  import.customerID, customer.name, customer.hostname, import.id, 
+$query = "SELECT  import.customerID, customer.name, customer.hostname, import.id,
 			import.name, import.status, import.type, import.updatemethod, import.lastrun, customer.timezone
 			FROM import, customer
 			WHERE import.customerID=customer.id
@@ -94,17 +109,17 @@ $query = "SELECT  import.customerID, customer.name, customer.hostname, import.id
 $list = Query($query);
 
 while($row = DBGetRow($list)){
-	$importfile = getImportFileURL($row[0],$row[3]);
+	date_default_timezone_set($row[9]);
 
+	$importfile = getImportFileURL($row[0],$row[3]);
 	if (is_readable($importfile) && is_file($importfile)) {
-		date_default_timezone_set($row[9]);
-		$row[10]=date("M j, g:i a ",filemtime($importfile));
+		$filetime = filemtime($importfile);
+		$row[10]=fmt_alert_timestamp($filetime);
 		$row[11]=filesize($importfile);
 	} else {
-		$row[10]="Not Found";
+		$row[10]="<div style='background-color: #ffcccc'>Not Found</div>";
 		$row[11]="-";
 	}
-	$row[8] = fmt_date($row, 8);
 ?>
 	<tr>
 		<td><?=$row[0]?></td>
@@ -112,13 +127,13 @@ while($row = DBGetRow($list)){
 		<td><a href="https://asp.schoolmessenger.com/<?=$row[2]?>" target="_blank"><?=$row[2]?></a></td>
 		<td><?=$row[3]?></td>
 		<td><?=$row[4]?></td>
-		<td><?=$row[5]?></td>
+		<td <?= $row[5] == "error" ? 'style="background-color: red;"' : "" ?>><?=$row[5]?></td>
 		<td><?=$row[6]?></td>
 		<td><?=$row[7]?></td>
 		<td><?=$row[9]?></td>
-		<td><?=$row[8]?></td>
+		<td><?=fmt_alert_timestamp(strtotime($row[8]))?></td>
 		<td><?=$row[10]?></td>
-		<td><?=$row[11]?></td>
+		<td <?= $row[11] < 10 ? 'style="background-color: #ffcccc;"' : "" ?>><?=$row[11]?></td>
 	</tr>
 <?
 }
