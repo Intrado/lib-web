@@ -25,6 +25,10 @@ if ($USER->authorize("loginweb") === false) {
 	redirect('unauthorized');
 }
 
+if($USER->authorize("leavemessage")){
+	$count = QuickQuery("select count(*) from voicereply where userid = '$USER->id'");
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -41,7 +45,7 @@ function fmt_surveyactions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = 'start:start';
-$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname;
+$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname . (isset($count)&&($count>0) ? "(" . $count . " unheard messages)" : "");
 
 include_once("nav.inc.php");
 
