@@ -141,22 +141,6 @@ function fmt_repliesjob_heard($row, $index){
 		return "<div id=reply" . $row[8] . ">Heard</div>";
 	}
 }
-?>
-	<script>
-	function repliesjobplay( voicereplyid ){
-	
-		popup('repliespreview.php?id=' + voicereplyid + '?close=1', 400, 500);
-		var dummy = new getObj('reply' + voicereplyid).obj;
-		dummy.style.fontWeight='normal';
-		if(document.all){
-			dummy.innerText= 'Heard';
-		} else {
-			dummy.textContent='Heard';
-		}
-	}
-	</script>
-<?
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -244,5 +228,21 @@ if(!$nojobs){
 EndForm();
 endWindow();
 buttons();
+?>
+<script>
+	function repliesjobplay( voicereplyid ){
+	
+		popup('repliespreview.php?id=' + voicereplyid + '?close=1', 400, 500);
+		var dummy = new getObj('reply' + voicereplyid).obj;
+		dummy.style.fontWeight='normal';
+		if(document.all){
+			dummy.innerText= 'Heard';
+		} else {
+			dummy.textContent='Heard';
+		}
+	}
+</script>
+
+<?
 include("navbottom.inc.php");
 ?>
