@@ -166,7 +166,6 @@ startWindow("My Replies", 'padding: 3px;');
 
 ?>
 <div> Show only unheard replies <?NewFormItem($f, $s, "unheard", "checkbox", null, null, "onclick=\"window.location='repliesjob.php?showonlyunheard=' + (this.checked ? 'true' : 'false') + '&pagestart=$pagestart';\"");?></div>
-<br>
 <?
 
 if(!$nojobs){
