@@ -315,7 +315,7 @@ if( $reloadform )
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
 
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
-	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
+	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
 
 	PutFormData($f,$s,"leavemessage",$job->isOption("leavemessage"), "bool", 0, 1);
