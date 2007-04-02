@@ -39,6 +39,26 @@ if(isset($_GET['delete'])){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Display Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function fmt_replies_actions($obj, $name) {
+	$view = '<a href="repliesjob.php?jobid=' . $obj->id . '">View Replies</a>';
+	$buttons = array($view);
+	return implode("&nbsp;|&nbsp;", $buttons);
+}
+
+function fmt_replies_unheard($obj, $name) {
+	$count = QuickQuery("Select count(*) from voicereply where listened = '0' and jobid = '$obj->id'");
+	$total = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id'");
+	if($count > 0)
+		return "<div id=" . $obj->id ." style='font-weight:bold'>". $count . "/". $total ."</div>";
+	else
+		return $count . "/". $total;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -46,32 +66,31 @@ $PAGE = "notifications:replies";
 $TITLE = "Replies";
 
 include_once("nav.inc.php");
+buttons(button("showall", "", "repliesjob.php?jobid=all"));
 
 $data = DBFindMany("Job", "from job
 						where userid = '$USER->id'
-						and id in (select distinct vr.jobid from voicereply vr left join
-										(select jobid, count(*) as count from voicereply  where listened = '0'
-										group by jobid) as foo
-										on (foo.jobid = vr.jobid)
-										where foo.count > 0)
+						and id in (select distinct jobid from voicereply)
 						group by id
-						order by finishdate desc
+						order by status asc, finishdate desc
 						");
 
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
-					"startdate" => "#Start date",
-					"enddate" => "#End Date",
+					"startdate" => "Start date",
+					"enddate" => "End Date",
 					"Status" => "#Status",
+					"Not Played" => "Not Played",
 					"Actions" => "Actions"
 					);
-$formatters = array("name" => "fmt_replies_jobname",
-					"Actions" => "fmt_replies_actions",
+$formatters = array("Actions" => "fmt_replies_actions",
 					'Status' => 'fmt_status',
 					"startdate" => "fmt_job_startdate",
-					"enddate" => "fmt_job_enddate");
+					"enddate" => "fmt_job_enddate",
+					"Not Played" => "fmt_replies_unheard");
 
 startWindow('Unread Replies to Jobs', 'padding: 3px;', true, true);
+
 $scrollThreshold = 8;
 $scroll = false;
 if (count($data) > $scrollThreshold) {
@@ -80,46 +99,9 @@ if (count($data) > $scrollThreshold) {
 
 showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
-echo "<br><br>";
-
-
-$data = DBFindMany("Job", "from job
-						where userid = '$USER->id'
-						and id in (select distinct jobid from voicereply where jobid not in (select jobid from
-										(select jobid, count(*) as count from voicereply where listened = '0'
-										group by jobid) as foo
-										where foo.count > 0))
-						group by id
-						order by finishdate desc, status asc
-						");
-
-$titles = array(	"name" => "#Name",
-					"description" => "#Description",
-					"startdate" => "#Start date",
-					"enddate" => "#End Date",
-					"Status" => "#Status",
-					"Actions" => "Actions"
-					);
-$formatters = array("name" => "fmt_replies_jobname",
-					"Actions" => "fmt_replies_actions",
-					'Status' => 'fmt_status',
-					"startdate" => "fmt_job_startdate",
-					"enddate" => "fmt_job_enddate");
-
-startWindow('Read Replies to Jobs', 'padding: 3px;', true, true);
-$scrollThreshold = 8;
-$scroll = false;
-if (count($data) > $scrollThreshold) {
-	$scroll = true;
-}
-
-showObjects($data, $titles, $formatters, $scroll, true);
-
-endWindow();
-
 echo "<br>";
-print buttons(button("showall", "", "repliesjob.php?all=1"));
 
+buttons();
 include_once("navbottom.inc.php");
 
 ?>
