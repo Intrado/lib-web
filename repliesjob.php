@@ -24,12 +24,16 @@ if (!$USER->authorize('leavemessage')) {
 	redirect('unauthorized.php');
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
 $all = 0;
+$nojobs = 1;
+$reload = 0;
+$extra = "";
+
+$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
 
 if(isset($_GET['delete'])){
 	$delete = $_GET['delete']+0;
@@ -42,78 +46,116 @@ if(isset($_GET['delete'])){
 	}
 }
 
-if(isset($_GET['all'])){
-	$_SESSION['replies']['all'] = true;
-	unset($_SESSION['replies']['jobid']);
-	redirect();
-} else if(isset($_GET['jobid'])){
-	$_SESSION['replies']['jobid'] = $_GET['jobid']+0;
-	unset($_SESSION['replies']['all']);
-	redirect();
-}
-
-if(isset($_SESSION['replies']['all'])){
-	$all = QuickQueryList("select id from job where userid = '$USER->id'
+if(isset($_GET['jobid'])){
+	if($_GET['jobid'] == 'all'){
+		$all = QuickQueryList("select id from job where userid = '$USER->id'
 			and id in (select distinct jobid from voicereply)
 			group by id
 			order by finishdate");
-	$all = "(" . implode(",", $all) . ")";
-}else if(isset($_SESSION['replies']['jobid'])){
-	$jobid = $_SESSION['replies']['jobid'];
-	if(userOwns("job", $jobid))
-		$job = new Job($jobid);
-	else
+		if(count($all) > 0){
+			$all = implode(",", $all);
+			$_SESSION['replies']['jobids'] = $all;
+		} else {
+			unset($_SESSION['replies']['jobids']); //reset the jobids
+		}
+		$_SESSION['replies']['all'] = true;
+	} else {
+		$_SESSION['replies']['jobids'] = $_GET['jobid']+0;
+		$_SESSION['replies']['all'] = false;
+	}
+	redirect();
+}
+
+if(isset($_SESSION['replies']['all']) && $_SESSION['replies']['all'])
+	$all = 1;
+
+if(isset($_SESSION['replies']['jobids'])){
+	$nojobs=0;
+	$jobids = $_SESSION['replies']['jobids'];
+	$joblist = explode(",", $jobids);
+	foreach($joblist as $jobid){
+		if(!userOwns("job", $jobids)){
+			redirect('unauthorized.php');
+		}
+	}
+	if(count($joblist) == 1){
+		$job = new Job($joblist[0]);
+	}
+}
+
+if(isset($_GET['showonlyunheard'])){
+	if($_GET['showonlyunheard'] == "true") {
+		$_SESSION['replies']['showonlyunheard'] = true;
+		$extra = "and listened = '0'";
+	} else {
+		$_SESSION['replies']['showonlyunheard'] = false;
+	}
+} else {
+	if(isset($_SESSION['replies']['showonlyunheard'])){
+		if($_SESSION['replies']['showonlyunheard'] == true)
+			$extra = "and listened = '0'";
+	}
+}
+
+if(isset($_GET['deleteall']) && $_GET['deleteall']){
+	$deleteextra = "";
+	$deleteall=true;
+} else if(isset($_GET['deleteheard']) && $_GET['deleteheard']){
+	$deleteextra = "and listened = '1'";
+}
+if(isset($_GET['deleteall']) || isset($_GET['deleteheard'])){
+	$voicereplies = DBFindMany("VoiceReply", "from voicereply where jobid in ($jobids) $deleteextra");
+	
+	foreach($voicereplies as $voicereply){
+		$content = new Content($voicereply->contentid);
+		$content->destroy();
+		$voicereply->destroy();
+	}
+	if(isset($deleteall))
 		redirect("replies.php");
 }
 
 
-
-$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
-
 $f = "replies";
 $s = "responses";
-$reloadform = 0;
 
-if(CheckFormSubmit($f, $s)){
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		print '<div class="warning">Form was edited in another window, reloading data.</div>';
-		$reloadform = 1;
+ClearFormData($f);
+PutFormData($f, $s, "unheard", isset($_SESSION['replies']['showonlyunheard']) ? $_SESSION['replies']['showonlyunheard'] : false , "bool", 0, 1);
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function fmt_repliesjob_actions($row, $index) {
+	$play = '<a href="" onclick="repliesjobplay('. $row[8] .'); return false;">Play</a>';
+	$delete = '<a href="repliesjob.php?delete=' . $row[8]. '" onclick="return confirm(\'Are you sure you want to delete this reply?\');">Delete</a>';
+	$buttons = array($play, $delete);
+	return implode("&nbsp;|&nbsp;", $buttons);
+}
+
+function fmt_repliesjob_heard($row, $index){
+	if(!$row[$index]){
+		return "<div id=reply" . $row[8] . " style='font-weight:bold'>Unheard</div>";
+	} else {
+		return "<div id=reply" . $row[8] . ">Heard</div>";
 	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-		//do check
-		if( CheckFormSection($f, $s) )
-		{
-			print '<div class="warning">There was a problem trying to save your changes. <br> Please verify that all required field information has been entered properly.</div>';
+}
+?>
+	<script>
+	function repliesjobplay( voicereplyid ){
+	
+		popup('repliespreview.php?id=' + voicereplyid + '?close=1', 400, 500);
+		var dummy = new getObj('reply' + voicereplyid).obj;
+		dummy.style.fontWeight='normal';
+		if(document.all){
+			dummy.innerText= 'Heard';
 		} else {
-			if(GetFormData($f,$s,"unheard")){
-				$extra = "and listened = '0'";
-			}else {
-				$extra = "";
-			}
+			dummy.textContent='Heard';
 		}
 	}
-} else {
-	$extra = "";
-	$reloadform = 1;
-}
-
-if($all){
-	$jobquery = "and j.id in $all";
-	$jobcount = "and jobid in $all";
-	$extra2 = "j.status asc, j.finishdate desc,";
-} else {
-	$jobquery = "and j.id = '$jobid'";
-	$jobcount = "and jobid = '$jobid'";
-	$extra2 = "";
-}
-
-if($reloadform) {
-	PutFormData($f, $s, "unheard", 0, "bool", 0, 1);
-}
+	</script>
+<?
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,38 +165,40 @@ if($reloadform) {
 $PAGE = "notifications:replies";
 if($all)
 	$TITLE = "Replies to - All Jobs";
-else
+else {
 	if($job != null)
 		$TITLE = "Replies to - " . $job->name;
 	else
 		$TITLE = "";
-		
+}
 include_once("nav.inc.php");
 
 NewForm($f);
 
-startWindow("My Replies", 'padding: 3px;', true, true);
+buttons(button('refresh',"window.location.reload()"), button('deleteheard', "return confirm('Are you sure you want to delete all heard messages?')", "repliesjob.php?deleteheard=true"),
+	button('deleteall', "return confirm('Are you sure you want to delete all messages?')", "repliesjob.php?deleteall=true"),
+	button('done',"","replies.php"));
+startWindow("My Replies", 'padding: 3px;');
 
-?><div> Show only unheard replies <?NewFormItem($f, $s, "unheard", "checkbox");?></div><br><?
-buttons(submit($f,$s,"submit", "submit"), button('done',"","replies.php"));
+?>
+<div> Show only unheard replies <?NewFormItem($f, $s, "unheard", "checkbox", null, null, "onclick=\"window.location='repliesjob.php?showonlyunheard=' + (this.checked ? 'true' : 'false') + '&pagestart=$pagestart';\"");?></div>
+<br>
+<?
 
-$count = QuickQuery("select count(*) from voicereply where 1 $jobcount");
-
-if($count){
+if(!$nojobs){
 	$firstname = FieldMap::getFirstNameField();
 	$lastname = FieldMap::getLastNameField();
-	$query = "select j.name, p.pkey, pd.$firstname, pd.$lastname, j.phonemessageid, jt.phone, vr.replytime, vr.contentid, vr.id,
+	$query = "select p.pkey, pd.$firstname, pd.$lastname, jt.phone, j.phonemessageid, j.name, vr.replytime, vr.contentid, vr.id,
 				vr.listened
 				from job j 
-				left join voicereply vr on (vr.jobid = j.id)
+				inner join voicereply vr on (vr.jobid = j.id)
 				left join jobtask jt on (jt.id = vr.jobtaskid)
 				left join persondata pd on (pd.personid = vr.personid)
 				left join person p on (p.id = vr.personid)
 				where 1 
-				$jobquery
+				and j.id in ($jobids)
 				$extra
-				
-				order by $extra2 vr.replytime desc
+				order by j.status asc, j.finishdate desc, vr.replytime desc
 				";
 	
 	$responses = Query($query);
@@ -164,24 +208,26 @@ if($count){
 		$data[] = $row;
 	}
 	
-	$titles = array(	"0" => "Job Name",
-						"1" => "ID",
-						"2" => "Firstname",
-						"3" => "Lastname",
+	$titles = array(
+						"0" => "ID",
+						"1" => "Firstname",
+						"2" => "Lastname",
+						"3" => "Phone",
 						"4" => "Message Name",
-						"5" => "Phone",
+						"5" => "Job Name",
 						"6" => "Date",
+						"9" => "Status",
 						"Actions" => "Actions"
 						);
 	$formatters = array(
-						"1" => "fmt_repliesjob_stuid",
 						"Actions" => "fmt_repliesjob_actions",
 						"6" => "fmt_repliesjob_date",
-						"4" => "fmt_replies_msgname",
-						"5" => "fmt_phone"
+						"4" => "fmt_repliesjob_msgname",
+						"3" => "fmt_phone",
+						"9" => "fmt_repliesjob_heard"
 						);
 	if(!$all)
-		unset($titles[0]);
+		unset($titles[5]);
 	
 	showPageMenu(count($data),$pagestart,500);
 	echo "\n";
@@ -191,11 +237,12 @@ if($count){
 	echo "\n</table>";
 	showPageMenu(count($data),$pagestart,500);
 } else {
-	?><div style="color: red;"> No replies for this job </div>
+	?><div style="color: red;"> No Replies Found </div>
 	<br><br><?
 }
-buttons();
-EndForm();
 
+EndForm();
+endWindow();
+buttons();
 include("navbottom.inc.php");
 ?>
