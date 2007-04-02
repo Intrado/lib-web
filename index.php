@@ -134,8 +134,9 @@ if (file_exists($logofilename) ) {
 new getObj('logintext').obj.focus();
 </script>
 
-</script>
-<html>
+</body>
+
+</html>
 
 <?
 
@@ -195,7 +196,7 @@ new getObj('logintext').obj.focus();
 				<td style="font-size: 12px;"><div style="margin-left: 35px;">Password:<br><input type="password" name="password" size="35"></div></td>
 			</tr>
 			<tr>
-				<td><div style="margin-left: 35px;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif"></div></td>
+				<td><div style="margin-left: 35px;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
 			</tr>
 		</table>
 
@@ -217,8 +218,13 @@ new getObj('logintext').obj.focus();
 	Phone:&nbsp;888.527.5225</div></td>
 </tr>
 
-</body>
 </form>
+
+<script langauge="javascript">
+document.getElementById('logintext').focus();
+</script>
+
+</body>
 </html>
 
 
