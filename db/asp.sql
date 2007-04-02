@@ -1219,8 +1219,37 @@ ALTER TABLE `user` ADD INDEX ( `customerid` ) ;
 ALTER TABLE `job` ADD `priorityadjust` INT NOT NULL DEFAULT '0' AFTER `ranautoreport` ;
 
 
+-- configurable bucket/timeslice size
 ALTER TABLE `jobtype` ADD `timeslices` SMALLINT NOT NULL DEFAULT '0' AFTER `systempriority` ;
 
 update jobtype set timeslices = 50 where systempriority=1;
 update jobtype set timeslices = 0 where systempriority=2;
 update jobtype set timeslices = 100 where systempriority=3;
+
+
+
+-- voice reply stuff
+
+CREATE TABLE voicereply (
+  id int(11) NOT NULL auto_increment,
+  jobtaskid bigint(20) NOT NULL,
+  jobworkitemid bigint(20) NOT NULL,
+  personid int(11) NOT NULL,
+  jobid int(11) NOT NULL,
+  userid int(11) NOT NULL,
+  customerid int(11) NOT NULL,
+  contentid bigint(20) NOT NULL,
+  replytime bigint(20) NOT NULL,
+  listened tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (id)
+) ENGINE=MyISAM ;
+
+
+
+
+
+
+
+
+
+
