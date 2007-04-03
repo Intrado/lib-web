@@ -1244,8 +1244,8 @@ CREATE TABLE voicereply (
   PRIMARY KEY  (id)
 ) ENGINE=MyISAM ;
 
-
-
+--added field for survey templates
+ALTER TABLE `surveyquestionnaire` ADD `leavemessage` TINYINT( 10 ) NOT NULL DEFAULT '0' AFTER `usehtml` ;
 
 
 
