@@ -89,9 +89,9 @@ $formatters = array("Actions" => "fmt_replies_actions",
 					"enddate" => "fmt_job_enddate",
 					"Not Played" => "fmt_replies_unheard");
 
-startWindow('Unread Replies to Jobs', 'padding: 3px;', true, true);
+startWindow('Replies to Jobs', 'padding: 3px;');
 
-$scrollThreshold = 8;
+$scrollThreshold = 20;
 $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
