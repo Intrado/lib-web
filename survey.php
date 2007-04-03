@@ -209,6 +209,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				$job->startdate = GetFormData($f, $s, 'startdate');
 				$numdays = GetFormData($f, $s, 'numdays');
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
+				if($questionnaire->leavemessage)
+					$job->setOption("leavemessage", true);
+				else
+					$job->setOption("leavemessage", false);
 			}
 
 			if ($questionnaire->hasphone && $USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
@@ -220,6 +224,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 
 			if (getSystemSetting('retry') != "")
 				$job->setOptionValue("retry",getSystemSetting('retry'));
+
 
 			//reformat the dates & times to DB friendly format
 			$job->startdate = date("Y-m-d", strtotime($job->startdate));
