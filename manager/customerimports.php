@@ -13,7 +13,7 @@ function fmt_alert_timestamp($timestamp) {
 		if ($timestamp < time() - 60 * 60 * 24 * 3)
 			return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
 		else
-			return date("M j, g:i a", $lastrun);
+			return date("M j, g:i a", $timestamp);
 	}
 }
 
