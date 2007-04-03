@@ -209,10 +209,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				$job->startdate = GetFormData($f, $s, 'startdate');
 				$numdays = GetFormData($f, $s, 'numdays');
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
-				if($questionnaire->leavemessage)
-					$job->setOption("leavemessage", true);
-				else
-					$job->setOption("leavemessage", false);
+				if($USER->authorize("leavemessage")){
+					if($questionnaire->leavemessage)
+						$job->setOption("leavemessage", true);
+					else
+						$job->setOption("leavemessage", false);
+				}
 			}
 
 			if ($questionnaire->hasphone && $USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {

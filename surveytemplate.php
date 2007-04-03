@@ -138,7 +138,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "leavemessage") && !GetFormData($f, $s, "hasexit")) {
+		} else if( $USER->authorize("leavemessage") && GetFormData($f, $s, "leavemessage") && !GetFormData($f, $s, "hasexit") ) {
 			error('You must have an exit message to allow replies');
 		} else {
 
@@ -171,12 +171,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 					$questionnaire->exitmessageid = null;
 				if (!$hasweb)
 					$questionnaire->emailmessageid = null;
-					
-				if(GetFormData($f,$s,"leavemessage"))
-					$questionnaire->leavemessage = 1;
-				else
-					$questionnaire->leavemessage = 0;
-					
+				if($USER->authorize("leavemessage")){
+					if(GetFormData($f,$s,"leavemessage"))
+						$questionnaire->leavemessage = 1;
+					else
+						$questionnaire->leavemessage = 0;
+				}
 				$questionnaire->userid = $USER->id;
 				$questionnaire->update();
 
@@ -455,6 +455,9 @@ startWindow('Survey Template Information',NULL,true, false);
 						</table>
 					</td>
 				</tr>
+<?
+				if($USER->authorize("leavemessage")){
+?>
 				<tr>
 					<td>Allow call recievers to leave messages?</td>
 					<td>
@@ -465,6 +468,9 @@ startWindow('Survey Template Information',NULL,true, false);
 						</table>
 					</td>
 				</tr>
+<?
+				}
+?>	
 
 			</table>
 		</td>

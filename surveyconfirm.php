@@ -176,10 +176,16 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" >Phone Survey</td>
 					<td class="bottomBorder" ><input type="checkbox" disabled <?= $questionnaire->hasphone ? "checked":"" ?>></td>
 				</tr>
-				<tr>
-					<td class="bottomBorder" >Leave Messages</td>
-					<td class="bottomBorder" ><input type="checkbox" disabled <?= $questionnaire->leavemessage ? "checked":"" ?>></td>
-				</tr>
+<?
+				if($USER->authorize("leavemessage")){
+?>
+					<tr>
+						<td class="bottomBorder" >Leave Messages</td>
+						<td class="bottomBorder" ><input type="checkbox" disabled <?= $questionnaire->leavemessage ? "checked":"" ?>></td>
+					</tr>
+<?
+				}
+?>
 				<tr>
 					<td class="bottomBorder" >Web Survey</td>
 					<td class="bottomBorder" ><input type="checkbox" disabled <?= $questionnaire->hasweb ? "checked":"" ?>></td>
