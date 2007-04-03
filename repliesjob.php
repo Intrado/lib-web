@@ -171,13 +171,15 @@ startWindow("My Replies", 'padding: 3px;');
 if(!$nojobs){
 	$firstname = FieldMap::getFirstNameField();
 	$lastname = FieldMap::getLastNameField();
-	$query = "select p.pkey, pd.$firstname, pd.$lastname, jt.phone, j.phonemessageid, j.name, vr.replytime, vr.contentid, vr.id,
-				vr.listened
+	$query = "select p.pkey, pd.$firstname, pd.$lastname, jt.phone, coalesce(m.name, s.name), j.name, vr.replytime, vr.contentid, vr.id,
+				vr.listened, j.type
 				from job j 
 				inner join voicereply vr on (vr.jobid = j.id)
 				left join jobtask jt on (jt.id = vr.jobtaskid)
 				left join persondata pd on (pd.personid = vr.personid)
 				left join person p on (p.id = vr.personid)
+				left join message m on (m.id = j.phonemessageid)
+				left join surveyquestionnaire s on (s.id = j.questionnaireid)
 				where 1 
 				and j.id in ($jobids)
 				$extra
@@ -205,7 +207,6 @@ if(!$nojobs){
 	$formatters = array(
 						"Actions" => "fmt_repliesjob_actions",
 						"6" => "fmt_repliesjob_date",
-						"4" => "fmt_repliesjob_msgname",
 						"3" => "fmt_phone",
 						"9" => "fmt_repliesjob_heard"
 						);
@@ -227,6 +228,10 @@ if(!$nojobs){
 EndForm();
 endWindow();
 buttons();
+
+////////////////////////////////////////////////////////////////////////////////
+// Scripts
+////////////////////////////////////////////////////////////////////////////////
 ?>
 <script>
 	function repliesjobplay( voicereplyid ){
