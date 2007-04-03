@@ -138,6 +138,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if(GetFormData($f, $s, "leavemessage") && !GetFormData($f, $s, "hasexit")) {
+			error('You must have an exit message to allow replies');
 		} else {
 
 			if (!$hasphone && !$hasweb) {
@@ -169,7 +171,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 					$questionnaire->exitmessageid = null;
 				if (!$hasweb)
 					$questionnaire->emailmessageid = null;
-
+					
+				if(GetFormData($f,$s,"leavemessage"))
+					$questionnaire->leavemessage = 1;
+				else
+					$questionnaire->leavemessage = 0;
+					
 				$questionnaire->userid = $USER->id;
 				$questionnaire->update();
 
@@ -260,6 +267,7 @@ if( $reloadform )
 		array("webpagetitle","text",1,50,false),
 		array("webexitmessage","text","nomin","nomax",false),
 		array("usehtml","bool",0,1),
+		array("leavemessage", "bool",0,1),
 		);
 
 	PopulateForm($f,$s,$questionnaire,$fields);
@@ -443,6 +451,16 @@ startWindow('Survey Template Information',NULL,true, false);
 						<tr>
 							<td><? NewFormItem($f,$s,"hasexit","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'exitmessage');\" dependson=\"phonesurvey\""); ?></td>
 							<td id="exitmessage" <?= ($hasexit ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"exitmessageid",'dependson="phonesurvey"'); echo button('play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
+						</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>Allow call recievers to leave messages?</td>
+					<td>
+						<table border=0 cellpadding=0 cellspacing=0>
+						<tr>
+							<td><? NewFormItem($f, $s, "leavemessage", "checkbox") ?></td>
 						</tr>
 						</table>
 					</td>
