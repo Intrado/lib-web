@@ -14,15 +14,19 @@ $vr->update();
 
 $firstname = FieldMap::getFirstNameField();
 $lastname = FieldMap::getLastNameField();
-$query = "select p.pkey, pd.$firstname, pd.$lastname, jt.phone, j.name, j.phonemessageid, vr.replytime
+$query = "select p.pkey, pd.$firstname, pd.$lastname, jt.phone, j.name, coalesce(m.name, s.name), vr.replytime, j.status
 			from job j 
-			left join voicereply vr on (vr.jobid = j.id)
+			inner join voicereply vr on (vr.jobid = j.id)
 			left join jobtask jt on (jt.id = vr.jobtaskid)
 			left join persondata pd on (pd.personid = vr.personid)
 			left join person p on (p.id = vr.personid)
+			left join message m on (m.id = j.phonemessageid)
+			left join surveyquestionnaire s on (s.id = j.questionnaireid)
 			where vr.id = '$vr->id'";
 $responses = Query($query);
 $responses = DBGetRow($responses);
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +49,8 @@ button("done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Message</td>
-		<td class="bottomBorder"><?=fmt_repliesjob_msgname($responses, 5)?></td>
+		<td class="bottomBorder"><?=$responses[5]?></td>
+
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Person ID</td>
@@ -87,4 +92,5 @@ TYPE="application/x-oleobject">
 <?
 endWindow();
 include_once('popupbottom.inc.php');
+
 ?>
