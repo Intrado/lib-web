@@ -376,9 +376,4 @@ function fmt_repliesjob_date($row, $index){
 	return date("M j, Y g:i a", $row[$index]/1000);
 }
 
-function fmt_repliesjob_msgname($row, $index) {
-	$message = new Message($row[$index]);
-	return $message->name;
-}
-
 ?>
