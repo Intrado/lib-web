@@ -70,7 +70,7 @@ button("done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Reply Date</td>
-		<td class="bottomBorder"><?=fmt_repliesjob_date($responses, 6)?></td>
+		<td class="bottomBorder"><?=fmt_unix_ms_timestamp($responses, 6)?></td>
 	</tr>
 </table>	
 

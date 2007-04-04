@@ -208,7 +208,7 @@ if(!$nojobs){
 						);
 	$formatters = array(
 						"Actions" => "fmt_repliesjob_actions",
-						"6" => "fmt_repliesjob_date",
+						"6" => "fmt_unix_ms_timestamp",
 						"3" => "fmt_phone",
 						"9" => "fmt_repliesjob_heard"
 						);
