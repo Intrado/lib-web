@@ -28,6 +28,9 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))
 		$SHORTCUTS['&nbsp;&nbsp;My Archived Jobs'] = "window.location='jobsarchived.php'";
 		$SHORTCUTS['&nbsp;&nbsp;New Job'] = "window.location='job.php?id=new'";
 	}
+	if ($USER->authorize("leavemessage")){
+		$SHORTCUTS['&nbsp;&nbsp;My Replies'] = "window.location='replies.php'";
+	}
 }
 
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
