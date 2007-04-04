@@ -159,8 +159,8 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(button('refresh',"window.location.reload()"), button('deleteheard', "return confirm('Are you sure you want to delete all heard messages?')", "repliesjob.php?deleteheard=true"),
-	button('deleteall', "return confirm('Are you sure you want to delete all messages?')", "repliesjob.php?deleteall=true"),
+buttons(button('refresh',"window.location.reload()"), button('delete_heard', "return confirm('Are you sure you want to delete all heard messages?')", "repliesjob.php?deleteheard=true"),
+	button('delete_all', "return confirm('Are you sure you want to delete all messages?')", "repliesjob.php?deleteall=true"),
 	button('done',"","replies.php"));
 startWindow("My Replies", 'padding: 3px;');
 
@@ -171,7 +171,8 @@ startWindow("My Replies", 'padding: 3px;');
 if(!$nojobs){
 	$firstname = FieldMap::getFirstNameField();
 	$lastname = FieldMap::getLastNameField();
-	$query = "select p.pkey, pd.$firstname, pd.$lastname, jt.phone, coalesce(m.name, s.name), j.name, vr.replytime, vr.contentid, vr.id,
+	$detailedquery = "select SQL_CALC_FOUND_ROWS
+				p.pkey, pd.$firstname, pd.$lastname, jt.phone, coalesce(m.name, s.name), j.name, vr.replytime, vr.contentid, vr.id,
 				vr.listened, j.type
 				from job j 
 				inner join voicereply vr on (vr.jobid = j.id)
@@ -184,9 +185,10 @@ if(!$nojobs){
 				and j.id in ($jobids)
 				$extra
 				order by j.status asc, j.finishdate desc, vr.replytime desc
+				limit $pagestart, 500
 				";
 	
-	$responses = Query($query);
+	$responses = Query($detailedquery);
 	
 	$data = array();
 	while($row = DBGetRow($responses)){
@@ -213,13 +215,16 @@ if(!$nojobs){
 	if(!$all)
 		unset($titles[5]);
 	
-	showPageMenu(count($data),$pagestart,500);
+	$query = "select found_rows()";
+	$total = QuickQuery($query);
+	
+	showPageMenu($total,$pagestart,500);
 	echo "\n";
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
 	
 	showTable($data, $titles, $formatters);
 	echo "\n</table>";
-	showPageMenu(count($data),$pagestart,500);
+	showPageMenu($total,$pagestart,500);
 } else {
 	?><div style="color: red;"> No Replies Found </div>
 	<br><br><?
