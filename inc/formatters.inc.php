@@ -12,7 +12,7 @@ function fmt_obj_date ($obj,$name) {
 function fmt_date ($row,$index) {
 	if (isset($row[$index])) {
 		$time = strtotime($row[$index]);
-		if ($time !== -1)
+		if ($time !== -1 && $time !== false)
 			return date("M j, g:i a",$time);
 	}
 	return "&nbsp;";
