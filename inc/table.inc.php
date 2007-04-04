@@ -28,18 +28,13 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 
 		//only show cels with titles
 		foreach ($titles as $index => $title) {
-			if (isset($obj->$index))
-				$cel = $obj->$index;
-			else 
-				$cel = "";
-
 			//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
 			echo "<td>";
 			if (isset($formatters[$index])) {
 				$fn = $formatters[$index];
 				$cel = $fn($obj,$index);
 			} else {
-				$cel = htmlentities($cel);
+				$cel = htmlentities($obj->$index);
 			}
 			echo $cel . "</td>";
 		}
@@ -75,18 +70,14 @@ function showTable ($data, $titles, $formatters = array()) {
 
 			//only show cels with titles
 			foreach ($titles as $index => $title) {
-				if(isset($row[$index]))
-					$cel = $row[$index];
-				else 
-					$cel = "";
-				
+
 				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
 				echo "<td>";
 				if (isset($formatters[$index])) {
 					$fn = $formatters[$index];
 					$cel = $fn($row,$index);
 				} else {
-					$cel = htmlentities($cel);
+					$cel = htmlentities($row[$index]);
 				}
 				echo $cel . "</td>";
 			}
