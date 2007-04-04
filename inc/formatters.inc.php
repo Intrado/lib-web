@@ -372,7 +372,7 @@ function fmt_numquestions ($obj,$name) {
 	return QuickQuery("select count(*) from surveyquestion where questionnaireid=$obj->id");
 }
 
-function fmt_repliesjob_date($row, $index){
+function fmt_unix_ms_timestamp($row, $index){
 	return date("M j, Y g:i a", $row[$index]/1000);
 }
 
