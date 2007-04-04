@@ -26,7 +26,7 @@ if ($USER->authorize("loginweb") === false) {
 }
 
 if($USER->authorize("leavemessage")){
-	$count = QuickQuery("select count(*) from voicereply where userid = '$USER->id'");
+	$count = QuickQuery("select count(*) from voicereply where userid = '$USER->id' and listened = '0'");
 }
 
 
