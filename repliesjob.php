@@ -179,7 +179,8 @@ if(!$nojobs){
 				left join jobtask jt on (jt.id = vr.jobtaskid)
 				left join persondata pd on (pd.personid = vr.personid)
 				left join person p on (p.id = vr.personid)
-				left join message m on (m.id = j.phonemessageid)
+				left join jobworkitem wi on (vr.jobworkitemid = wi.id)
+				left join message m on (m.id = wi.messageid)
 				left join surveyquestionnaire s on (s.id = j.questionnaireid)
 				where 1 
 				and j.id in ($jobids)
