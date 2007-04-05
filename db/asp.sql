@@ -1245,10 +1245,12 @@ CREATE TABLE voicereply (
 ) ENGINE=MyISAM ;
 
 --added field for survey templates
-ALTER TABLE `surveyquestionnaire` ADD `leavemessage` TINYINT( 10 ) NOT NULL DEFAULT '0' AFTER `usehtml` ;
+ALTER TABLE `surveyquestionnaire` ADD `leavemessage` TINYINT(4) NOT NULL DEFAULT '0' AFTER `usehtml` ;
 
 
-
+ALTER TABLE `voicereply` ADD INDEX ( `jobid` ) ;
+ALTER TABLE `voicereply` ADD INDEX ( `userid` ) ;
+ALTER TABLE `voicereply` ADD INDEX ( `replytime` ) ;
 
 
 
