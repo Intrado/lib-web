@@ -38,6 +38,11 @@ if(isset($_GET['delete'])){
 	}
 }
 
+$countunheard = array();
+$counttotal = array();
+$countunheard = QuickQueryList("select jobid, count(*) from voicereply where userid = '$USER->id' and listened = '0' group by jobid", true);
+$counttotal = QuickQueryList("select jobid, count(*) from voicereply where userid = '$USER->id' group by jobid", true);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,12 +54,12 @@ function fmt_replies_actions($obj, $name) {
 }
 
 function fmt_replies_unheard($obj, $name) {
-	$count = QuickQuery("Select count(*) from voicereply where listened = '0' and jobid = '$obj->id'");
-	$total = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id'");
-	if($count > 0)
-		return "<div id=" . $obj->id ." style='font-weight:bold'>". $count . "/". $total ."</div>";
+	GLOBAL $countunheard;
+	GLOBAL $counttotal;
+	if(isset($countunheard[$obj->id]) && $countunheard[$obj->id] > 0)
+		return "<div id=" . $obj->id ." style='font-weight:bold'>". $countunheard[$obj->id] . "/". $counttotal[$obj->id] ."</div>";
 	else
-		return $count . "/". $total;
+		return "0" . "/". $counttotal[$obj->id];
 }
 
 
@@ -70,7 +75,7 @@ buttons(button("showall", "", "repliesjob.php?jobid=all"));
 
 $data = DBFindMany("Job", "from job
 						where userid = '$USER->id'
-						and id in (select vr.jobid from voicereply vr group by vr.jobid)
+						and id in (" . implode(',',array_keys($counttotal)) . ")
 						order by status asc, finishdate desc
 						");
 
