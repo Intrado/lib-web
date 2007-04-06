@@ -70,8 +70,7 @@ buttons(button("showall", "", "repliesjob.php?jobid=all"));
 
 $data = DBFindMany("Job", "from job
 						where userid = '$USER->id'
-						and id in (select distinct jobid from voicereply)
-						group by id
+						and id in (select vr.jobid from voicereply vr group by vr.jobid)
 						order by status asc, finishdate desc
 						");
 

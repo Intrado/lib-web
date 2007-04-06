@@ -15,12 +15,12 @@ $vr->update();
 $firstname = FieldMap::getFirstNameField();
 $lastname = FieldMap::getLastNameField();
 $query = "select p.pkey, pd.$firstname, pd.$lastname, jt.phone, j.name, coalesce(m.name, s.name), vr.replytime, j.status
-			from job j 
-			inner join voicereply vr on (vr.jobid = j.id)
-			left join jobtask jt on (jt.id = vr.jobtaskid)
-			left join persondata pd on (pd.personid = vr.personid)
-			left join person p on (p.id = vr.personid)
-			left join jobworkitem wi on (vr.jobworkitemid = wi.id)
+			from voicereply vr 
+			inner join job j on (vr.jobid = j.id)
+			join jobtask jt on (jt.id = vr.jobtaskid)
+			join persondata pd on (pd.personid = vr.personid)
+			join person p on (p.id = vr.personid)
+			join jobworkitem wi on (vr.jobworkitemid = wi.id)
 			left join message m on (m.id = wi.messageid)
 			left join surveyquestionnaire s on (s.id = j.questionnaireid)
 			where vr.id = '$vr->id'";
