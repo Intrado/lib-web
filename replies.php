@@ -78,21 +78,17 @@ if(isset($_GET['showonlyunheard'])){
 	}
 }
 
-if(isset($_GET['deleteall']) && $_GET['deleteall']){
-	$deleteheard = "";
-} else if(isset($_GET['deleteheard']) && $_GET['deleteheard']){
-	$deleteheard = "and listened = '1'";
-}
-if(isset($deleteheard)){
+if(isset($_GET['deleteplayed']) && $_GET['deleteplayed']){
 	$voicereplies = DBFindMany("VoiceReply", "from voicereply vr where vr.userid = '$USER->id' 
 								$jobidquery
-								$deleteheard");
+								and listened = '1'");
 	
 	foreach($voicereplies as $voicereply){
 		$content = new Content($voicereply->contentid);
 		$content->destroy();
 		$voicereply->destroy();
 	}
+	redirect();
 }
 
 
@@ -137,7 +133,7 @@ include_once("nav.inc.php");
 NewForm($f);
 
 buttons(button('refresh',"window.location.reload()"), 
-		button('delete_played', "return confirm('Are you sure you want to delete all played messages?')", "replies.php?deleteheard=true"));
+		button('delete_played', "return confirm('Are you sure you want to delete all played messages?')", "replies.php?deleteplayed=true"));
 	
 startWindow("Response Options", "padding: 3px;");	
 ?>
