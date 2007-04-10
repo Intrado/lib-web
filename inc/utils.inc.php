@@ -216,34 +216,18 @@ function secure_tmpname($dir = "tmp", $prefix = 'tmp', $postfix = '.dat') {
    if (! (isset($prefix) && is_string($prefix))) {
        return false;
    }
+   
+   //keep searching for an unused file.  Potential risk of never finding one.  Realistically
+   //not probable.
+	$filename = $dir . "/" . $prefix . microtime(true) . mt_rand() . $postfix;
 
-   // find a temporary name
-   $tries = 1;
-   do {
-       // get a known, unique temporary file name
-       $sysFileName = tempnam($dir, $prefix);
-       if ($sysFileName === false) {
-           return false;
-       }
-
-       // tack on the extension
-       $newFileName = $sysFileName . $postfix;
-       if ($sysFileName == $newFileName) {
-           return $sysFileName;
-       }
-
-       // move or point the created temporary file to the new filename
-       // NOTE: these fail if the new file name exist
-       $newFileCreated = @rename($sysFileName, $newFileName);
-       if ($newFileCreated) {
-           return $newFileName;
-       }
-
-       unlink ($sysFileName);
-       $tries++;
-   } while ($tries <= 5);
-
+   if($filename != ""){   		
+   		$fp = fopen("$filename", "w");
+   		fclose($fp);
+		return $filename;
+   }
    return false;
+
 }
 
 
