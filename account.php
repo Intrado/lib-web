@@ -130,6 +130,9 @@ if(CheckFormSubmit($f,$s))
 			$USER->setSetting("callmax",GetFormData($f, $s, 'callmax'));
 			$USER->setSetting("maxjobdays",GetFormData($f, $s, 'maxjobdays'));
 			$USER->setSetting("callall",GetFormData($f, $s, 'callall'));
+			
+			if($USER->authorize("leavemessage"))
+				$USER->setSetting("leavemessage", GetFormData($f, $s, 'leavemessage'));
 
 			//dont save any callerid stuff if they don't have access to change it
 			if (strlen($callerid) == 0 )
@@ -197,6 +200,8 @@ if( $reloadform )
 	//default to system setting unless user has a pref
 	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
+	
+	PutFormData($f, $s, "leavemessage", (bool)$USER->getSetting("leavemessage"), "bool", 0, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,8 +335,14 @@ startWindow('User Information');
 
 							<tr>
 								<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
-								<td><? NewFormItem($f,$s,"callall","checkbox",1); ?>Call all phone numbers</td>
+								<td><? NewFormItem($f,$s,"callall","checkbox",1); ?>Call All Phone Numbers</td>
 							</tr>
+<? if ($USER->authorize('leavemessage')) { ?>
+							<tr>
+								<td>Allow call recipients to leave a voice response</td>
+								<td><? NewFormItem($f, $s, "leavemessage", "checkbox");?>Accept Voice Responses</td>
+							</td>
+<? } ?>
 						</table>
 					</td>
 				</tr>
