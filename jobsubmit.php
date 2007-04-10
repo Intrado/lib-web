@@ -14,7 +14,7 @@ Job::runNow($jobid);
 sleep(3);
 
 
-if ($_REQUEST['close']) {
+if (isset($_REQUEST['close']) && $_REQUEST['close']) {
 ?>
 
 <script language="javascript">
