@@ -172,12 +172,17 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 
 	$runrepeatbtn = '<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
 
+	$viewresponses = '<a href="replies.php?jobid=' . $id . '">Responses</a>';
 	switch ($status) {
 		case "new":
 			$buttons = array($editbtn,$cancelbtn);
 			break;
 		case "active":
-			if ($USER->authorize('createreport'))
+			if($USER->authorize('createreport') && $USER->authorize('leavemessage'))
+				$buttons = array($editbtn,$reportbtn,$monitorbtn, $viewresponses, $cancelbtn);
+			else if($USER->authorize('leavemessage'))
+				$buttons = array($editbtn, $viewresponses, $cancelbtn);
+			else if ($USER->authorize('createreport'))
 				$buttons = array($editbtn,$reportbtn,$monitorbtn,$cancelbtn);
 			else
 				$buttons = array($editbtn,$cancelbtn);
@@ -190,7 +195,11 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			else
 				$usedelbtn = $archivebtn;
 
-			if ($USER->authorize('createreport'))
+			if($USER->authorize('createreport') && $USER->authorize('leavemessage'))
+				$buttons = array($editbtn,$reportbtn,$monitorbtn, $viewresponses, $cancelbtn);
+			else if($USER->authorize('leavemessage'))
+				$buttons = array($editbtn, $viewresponses, $cancelbtn);
+			else if ($USER->authorize('createreport'))
 				$buttons = array($editbtn,$reportbtn,$graphbtn,$usedelbtn);
 			else
 				$buttons = array($editbtn,$usedelbtn);
@@ -374,6 +383,17 @@ function fmt_numquestions ($obj,$name) {
 
 function fmt_ms_timestamp($row, $index){
 	return date("M j, Y g:i a", $row[$index]/1000);
+}
+
+function fmt_response_count($obj, $name) {
+	$played = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id' and listened = '0'");
+	$total = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id'");
+	if($played > 0)
+		return "<div id=" . $obj->id ." style='font-weight:bold'>". $played . "/". $total ."</div>";
+	else if($total == 0)
+		return "- None -";
+	else
+		return "<div id=" . $obj->id . ">" . $played . "/". $total . "</div>";
 }
 
 ?>
