@@ -185,18 +185,22 @@ new getObj('logintext').obj.focus();
 
 		<div><table width="100%" style="color: #365F8D;" >
 			<tr>
+				<td width="30%">&nbsp;</td>
 				<td style="font-size: 12px;"><div style="margin-left: 50px;">Login:<br><input type="text" name="login" size="35" id="logintext"></div></td>
-				<td width="100%">&nbsp;</td>
+				<td width="70%">&nbsp;</td>
 			</tr>
 			<tr>
+				<td>&nbsp;</td>
 				<td style="font-size: 12px;"><div style="margin-left: 50px;">Password:<br><input type="password" name="password" size="35"></div></td>
-				<td width="100%">&nbsp;</td>
+				<td>&nbsp;</td>
 			</tr>
 			<tr>
+				<td>&nbsp;</td>
 				<td><div style="text-align: right;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
-				<td width="100%">&nbsp;</td>
+				<td>&nbsp;</td>
 			</tr>
 			<tr>
+				<td>&nbsp;</td>
 				<td colspan="2" style="font-size: 9px; font-style: italic;"><div style="margin-left: 50px;">Usernames and passwords are case-sensitive.</div></td>
 			</tr>
 		</table>
