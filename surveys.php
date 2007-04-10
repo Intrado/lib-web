@@ -52,12 +52,14 @@ $titles = array(	"name" => "#Name",
 					"Type" => "#Type",
 					"startdate" => "Start date",
 					"Status" => "#Status",
+					"responses" => "Responses",
 					"Actions" => "Actions"
 					);
 $actions = array("Type" => "fmt_surveytype",
 				'Status' => 'fmt_status',
 				"startdate" => "fmt_job_startdate",
 				"finishdate" => "fmt_obj_date",
+				"responses" => "fmt_response_count",
 				"Actions" => "fmt_jobs_actions"
 				);
 showObjects($data, $titles, $actions, count($data) > 8, true);
@@ -76,12 +78,14 @@ $titles = array(	"name" => "#Name",
 					"Type" => "#Type",
 					"startdate" => "Start date",
 					"Status" => "#Status",
+					"responses" => "Responses",
 					"Actions" => "Actions"
 					);
 $actions = array("Type" => "fmt_surveytype",
 				'Status' => 'fmt_status',
 				"startdate" => "fmt_job_startdate",
 				"finishdate" => "fmt_obj_date",
+				"responses" => "fmt_response_count",
 				"Actions" => "fmt_jobs_actions"
 				);
 showObjects($data, $titles, $actions, count($data) > 8, true);

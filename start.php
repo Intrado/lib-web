@@ -45,7 +45,7 @@ function fmt_surveyactions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = 'start:start';
-$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname . (isset($count)&&($count>0) ? "(" . $count . " unheard messages)" : "");
+$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname . (isset($count)&&($count>0) ? "(" . $count . " Responses Not Played)" : "");
 
 include_once("nav.inc.php");
 
@@ -89,9 +89,10 @@ if ($USER->authorize("startstats")) {
 			$titles = array(	"name" => "Name",
 								"type" => "Type",
 								"Status" => "Status",
+								"responses" => "Responses",
 								"Actions" => "Actions"
 								);
-			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
+			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', 'responses' => 'fmt_response_count');
 			showObjects($data, $titles, $formatters);
 			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
@@ -105,9 +106,10 @@ if ($USER->authorize("startstats")) {
 								"type" => "Type",
 								"Status" => "Status",
 								"enddate" => "End Date",
+								"responses" => "Responses",
 								"Actions" => "Actions"
 								);
-			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
+			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
 			showObjects($data, $titles, $formatters);
 			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
@@ -122,9 +124,10 @@ if ($USER->authorize("startstats")) {
 				$titles = array(	"name" => "Name",
 									"type" => "Type",
 									"Status" => "Status",
+									"responses" => "Responses",
 									"Actions" => "Actions"
 									);
-				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status');
+				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "responses" => "fmt_response_count");
 				showObjects($data, $titles, $formatters);
 				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
 				endWindow();
@@ -138,9 +141,10 @@ if ($USER->authorize("startstats")) {
 									"type" => "Type",
 									"Status" => "Status",
 									"enddate" => "End Date",
+									"responses" => "Responses",
 									"Actions" => "Actions"
 									);
-				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate");
+				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
 				showObjects($data, $titles, $formatters);
 				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
 				endWindow();

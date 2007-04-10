@@ -108,11 +108,13 @@ $titles = array(	"name" => "#Name",
 					"type" => "#Type",
 					"startdate" => "Start date",
 					"Status" => "#Status",
+					"responses" => "Responses",
 					"Actions" => "Actions"
 					);
 $formatters = array("Actions" => "fmt_jobs_actions",
 					'Status' => 'fmt_status',
 					"type" => "fmt_obj_csv_list",
+					"responses" => "fmt_response_count",
 					"startdate" => "fmt_job_startdate");
 
 $scrollThreshold = 8;
@@ -163,9 +165,15 @@ $titles = array(	"name" => "#Name",
 					"startdate" => "Start Date",
 					"Status" => "#Status",
 					"enddate" => "End Date",
+					"responses" => "Responses",
 					"Actions" => "Actions"
 					);
-$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "startdate" => "fmt_job_startdate", "enddate" => "fmt_job_enddate","type" => "fmt_obj_csv_list");
+$formatters = array("Actions" => "fmt_jobs_actions", 
+					'Status' => 'fmt_status', 
+					"startdate" => "fmt_job_startdate", 
+					"enddate" => "fmt_job_enddate",
+					"type" => "fmt_obj_csv_list",
+					"responses" => "fmt_response_count");
 
 $scroll = false;
 if (count($data) > $scrollThreshold) {
