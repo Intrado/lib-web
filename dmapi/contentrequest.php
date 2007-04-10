@@ -26,15 +26,22 @@ if ($BFXML_ELEMENT['attrs']['REQUEST'] == "get") {
 	$contenttype = $dataelement['attrs']['MIME-TYPE'];
 	$data = $dataelement['txt'];
 	$tmpname = secure_tmpname("tmp","dmapicontent",".b64");
-	file_put_contents($tmpname,$data);
-	unset($data); // don't keep in memory
-	if ($cmid = contentPut($tmpname,$contenttype,true)) {
+	if($tmpname != false) {
+		file_put_contents($tmpname,$data);
+		unset($data); // don't keep in memory
+		if ($cmid = contentPut($tmpname,$contenttype,true)) {
 ?>
-		<content id="<?= $cmid ?>" />
+			<content id="<?= $cmid ?>" />
 <?
+		} else {
+?>
+			<error>Unable to upload content</error>
+<?
+		}
+		unlink($tmpname);
 	} else {
 ?>
-		<error>Unable to upload content</error>
+		<error>Unable to create tmp file</error>
 <?
 	}
 }
