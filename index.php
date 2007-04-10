@@ -176,27 +176,28 @@ new getObj('logintext').obj.focus();
 <? } else if ($custname === false) { ?>
 				<td style="font-size: 12px; font-weight: bold; color: red;">Invalid customer URL. Please check the URL and try again.</td>
 <? } else { ?>
-				<td style="font-size: 12px;">Please enter your Username and Password and then click <span style="font-weight: bold;">Sign In</span></td>
+				<td>&nbsp;</td>
 <? } ?>
 
 				<td>&nbsp;</td>
 			</tr>
-			<tr>
-				<td style="font-size: 9px; text-align: right; font-style: italic;">Usernames and passwords are case-sensitive.</td>
-				<td>&nbsp;</td>
-			</tr>
-
 		</table>
 
-		<div><table width="100%" style="color: #365F8D;">
+		<div><table width="100%" style="color: #365F8D;" >
 			<tr>
-				<td style="font-size: 12px;"><div style="margin-left: 35px;">Login:<br><input type="text" name="login" size="35" id="logintext"></div></td>
+				<td style="font-size: 12px;"><div style="margin-left: 50px;">Login:<br><input type="text" name="login" size="35" id="logintext"></div></td>
+				<td width="100%">&nbsp;</td>
 			</tr>
 			<tr>
-				<td style="font-size: 12px;"><div style="margin-left: 35px;">Password:<br><input type="password" name="password" size="35"></div></td>
+				<td style="font-size: 12px;"><div style="margin-left: 50px;">Password:<br><input type="password" name="password" size="35"></div></td>
+				<td width="100%">&nbsp;</td>
 			</tr>
 			<tr>
-				<td><div style="margin-left: 35px;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
+				<td><div style="text-align: right;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
+				<td width="100%">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="font-size: 9px; font-style: italic;"><div style="margin-left: 50px;">Usernames and passwords are case-sensitive.</div></td>
 			</tr>
 		</table>
 
@@ -213,9 +214,11 @@ new getObj('logintext').obj.focus();
 </tr>
 
 <tr style="background-color: #365F8D; color: white;">
-	<td colspan="2"><div style="text-align:right; font-size: 12px; margin: 5px;">If you are experiencing difficulty logging or require assistance, please contact us:</div><div style="text-align:right; font-size: 12px; margin: 5px;">Email:&nbsp;<a style="color: white;" href="mailto:support@schoolmessenger.com">support@schoolmessenger.com</a>
-	<br>
-	Phone:&nbsp;888.527.5225</div></td>
+	<td colspan="2"><div style="text-align:right; font-size: 12px; margin: 5px;">
+		<p>If you experience difficulty logging in or require assistance, please contact us:</p>
+		<p>Email:&nbsp;<a style="color: white;" href="mailto:support@schoolmessenger.com">support@schoolmessenger.com</a></p>
+		<p>Phone:&nbsp;800.920.3897</p?
+	</div></td>
 </tr>
 
 </form>
