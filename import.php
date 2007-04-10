@@ -566,8 +566,7 @@ if ($dotrimoldrecords) {
 
 
 	//remove all deactivated people from list additions
-	QuickUpdate("update listentry le left join person p on (le.personid=p.id) set le.personid=-1 where le.type='A' and p.customerid < 0");
-	QuickUpdate("delete from listentry where personid=-1");
+	QuickUpdate("delete le from listentry le left join person p on (le.personid=p.id) where le.type='A' and p.customerid < 0");
 
 }
 
