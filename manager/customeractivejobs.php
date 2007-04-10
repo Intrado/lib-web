@@ -81,7 +81,7 @@ include("nav.inc.php");
 	}
 ?>
 </table>
-
+<div > All time stamps are in customer time. </div>
 <?
 include("navbottom.inc.php");
 ?>

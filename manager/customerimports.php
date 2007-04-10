@@ -140,8 +140,9 @@ while($row = DBGetRow($list)){
 date_default_timezone_set("US/Pacific");
 ?>
 </table>
-<br> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.
-<div style="color:FF0000"> All time stamps are in customer time. </div>
+<div> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.<div>
+<div > All time stamps are in customer time. </div>
+<div>Red cells indicate import or file dates that are more than 3 days old</div>
 
 <?
 include("navbottom.inc.php");

@@ -43,8 +43,9 @@ foreach($customers as $cust) {
 }
 ?>
 </table>
-<?
-//<a href="newcustomer.php">New Customer</a>
 
+<div>Red cells indicate that only the system user account has been created</div>
+<div>Green cells indicate customers with active jobs</div>
+<?
 include_once("navbottom.inc.php");
 ?>
