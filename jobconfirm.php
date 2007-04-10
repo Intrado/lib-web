@@ -128,7 +128,9 @@ include_once("nav.inc.php");
 
 NewForm($f, "jobsubmit.php?jobid=$jobid");
 if ($renderedlist->total > 0)
-	buttons(button('back',null, 'job.php'),button('submit_job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
+	buttons(button('saveforlater', null, 'jobs.php'),
+			button('modifyjobsetting',null, 'job.php'),
+			button('submit_job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
 else
 	buttons(button('cancel',null, 'job.php'));
 
