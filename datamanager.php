@@ -28,8 +28,10 @@ if (!$USER->authorize('metadata')) {
 
 if (isset($_GET['delete'])) {
 	$id = DBSafe($_GET['delete']);
-	if (customerOwns("fieldmap",$id))
-		QuickUpdate("delete from fieldmap where customerid = $USER->customerid and id = '$id'");
+	if (customerOwns("fieldmap",$id)) {
+		$fm = new FieldMap($id);
+		$fm->destroy();
+	}
 	redirect();
 }
 
