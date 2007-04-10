@@ -29,7 +29,7 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))
 		$SHORTCUTS['&nbsp;&nbsp;New Job'] = "window.location='job.php?id=new'";
 	}
 	if ($USER->authorize("leavemessage")){
-		$SHORTCUTS['&nbsp;&nbsp;My Replies'] = "window.location='replies.php'";
+		$SHORTCUTS['&nbsp;&nbsp;My Responses'] = "window.location='replies.php?jobid=all'";
 	}
 }
 
@@ -67,7 +67,7 @@ $NAVTREE = array (
 		array("Messages","messages.php",array('sendmessage', 'sendemail', 'sendphone'),$SUBTAB=="messages"),
 		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone'),$SUBTAB=="jobs"),
 		array("Surveys","surveys.php","survey",$SUBTAB=="survey"),
-		array("Replies","replies.php","leavemessage",$SUBTAB=="replies")
+		array("Responses","replies.php?jobid=all","leavemessage",$SUBTAB=="responses")
 		)),
 	array("Reports","reportsummary.php",array('createreport','viewsystemreports'),$MAINTAB=="reports",array(
 		array("Job Report","reportsummary.php","createreport",$SUBTAB=="jobsummary"),
