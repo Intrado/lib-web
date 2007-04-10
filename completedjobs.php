@@ -133,6 +133,7 @@ $titles = array ("Owner" => "Submitted by",
 				"Rate" => '% Contacted',
 				"startdate" => 'Start Date',
 				"enddate" => 'End Date',
+				"responses" => "Responses",
 				"Actions" => 'Actions');
 $formatters = array(
 				"type" => "fmt_jobtype",
@@ -142,6 +143,7 @@ $formatters = array(
 				"Total" => 'fmt_total',
 				"Rate" => 'fmt_rate',
 				"enddate" => 'fmt_job_enddate',
+				"responses" => 'fmt_response_count',
 				"Actions" => 'fmt_jobs_actions_customer');
 
 
