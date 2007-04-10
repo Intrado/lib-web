@@ -631,12 +631,12 @@ startWindow('Job Information');
 				</tr>
 				<tr>
 					<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
-					<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Call all phone numbers</td>
+					<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Call All Phone Numbers</td>
 				</tr>
 				<? if($USER->authorize('leavemessage')) { ?>
 					<tr>
-						<td> Allow call recievers to leave messages?</td>
-						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($completedmode ? "DISABLED" : "")); ?> Leave Message </td>
+						<td> Allow call recipients to leave messages a voice response</td>
+						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($completedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
 					</tr>
 				<? } ?>
 				

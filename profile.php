@@ -285,7 +285,7 @@ startWindow('Allowed Functions');
 				</tr>
 				<tr>
 					<td><? NewFormItem($form, $section, "leavemessage", "checkbox"); ?></td>
-					<td>Allow phone replies</td>
+					<td>Allow voice responses</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendemail","checkbox"); ?></td>
