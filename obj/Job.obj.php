@@ -83,6 +83,7 @@ class Job extends DBMappedObject {
 		$job->setOption("skipduplicates",1);
 		$job->setOption("skipemailduplicates",1);
 		$job->setOption("sendreport",1);
+		$job->setOption("leavemessage", $USER->getSetting("leavemessage"));
 
 		//date/time/numer of days
 		$job->startdate = date("Y-m-d", strtotime("today"));
