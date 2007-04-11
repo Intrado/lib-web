@@ -139,7 +139,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if( $USER->authorize("leavemessage") && GetFormData($f, $s, "leavemessage") && !GetFormData($f, $s, "hasexit") ) {
-			error('You must have an exit message to allow replies');
+			error('You must have an exit message to allow recipients to leave a message');
 		} else {
 
 			if (!$hasphone && !$hasweb) {
@@ -459,7 +459,7 @@ startWindow('Survey Template Information',NULL,true, false);
 				if($USER->authorize("leavemessage")){
 ?>
 				<tr>
-					<td>Allow call recievers to leave messages?</td>
+					<td>Allow call recipients to leave a message</td>
 					<td>
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
