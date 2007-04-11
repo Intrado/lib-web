@@ -174,26 +174,29 @@ function buildLanguageList()
 	$query = "select value from persondatavalues where fieldnum='f03' and customerid='".$user->customerid."' ".
 				"and value != '' and value is not null order by refcount desc limit 9";
 
-	$languages = array_values(QuickQueryList($query));
+	$languages = QuickQueryList($query);
 
-	// TODO its a rare case that a customer does not have any persondata (they must import something)
+	// its a rare case that a customer does not have any persondata (they must import something)
 	// but if so, take the customers languages from the language table
 	if ($languages == NULL || count($languages) == 0) {
-		$languages = array("English");
+		$languages = QuickQueryList("select name from language where customerid=$user->customerid order by name");
 	}
 
-	// "English" is always the default
+	// "English" is always the default, so remove english from the list
+	foreach ($languages as $index => $value) {
+		if (strncasecmp($value ,"english") == 0) {
+			unset($languages[$index]);
+			break;
+		}
+	}
+
+	//add default to the list as the first option (it will get removed when the user records their first/default message
+	$languages = array_unshift("default",array_values($languages));
 
 	$SESSIONDATA['languageList'] = $languages;
 
 	$SESSIONDATA['langindex'] = 0; // default
-	// search for english, langindex is used by first saveMessage, assumes english is recorded first
-	foreach ($languages as $index => $lang) {
-		if (!strcasecmp($lang, "english")) {
-			$SESSIONDATA['langindex'] = $index;
-			break;
-		}
-	}
+
 }
 
 function commitMessage($contentid)
@@ -239,7 +242,7 @@ function commitMessage($contentid)
 
 			// if default language then set session msgid, else add to map of msgid-lang to add into joblanguage
 			// ok to assume English is their default language, customer has no options for this (yet)
-			if (!strcasecmp($language, "English")) {
+			if ($language =="default") {
 				$SESSIONDATA['messageid'] = $messageid;
 			} else {
 				if (!isset($SESSIONDATA['msglangmap'])) $SESSIONDATA['msglangmap'] = array();
