@@ -180,7 +180,7 @@ startWindow("Confirmation &amp; Submit");
 				if($USER->authorize("leavemessage")){
 ?>
 					<tr>
-						<td class="bottomBorder" >Leave Messages</td>
+						<td class="bottomBorder" >Leave Message</td>
 						<td class="bottomBorder" ><input type="checkbox" disabled <?= $questionnaire->leavemessage ? "checked":"" ?>></td>
 					</tr>
 <?

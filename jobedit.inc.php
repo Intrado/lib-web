@@ -261,7 +261,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid)	{
 					redirect("jobconfirm.php?id=" . $job->id);
 				} else {
-					error("Please select at least one message for at least one type");
+					error("Please select a default message");
 				}
 			} else if (!$addlang) {
 				redirect('jobs.php');
