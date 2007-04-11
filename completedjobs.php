@@ -146,6 +146,10 @@ $formatters = array(
 				"responses" => 'fmt_response_count',
 				"Actions" => 'fmt_jobs_actions_customer');
 
+if(!$USER->authorize('leavemessage')){
+	unset($titles["responses"]);
+	unset($formatters["responses"]);
+}
 
 showPageMenu($total, $start, $limit);
 showObjects($jobs, $titles, $formatters, false, false);

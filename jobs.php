@@ -116,6 +116,11 @@ $formatters = array("Actions" => "fmt_jobs_actions",
 					"type" => "fmt_obj_csv_list",
 					"responses" => "fmt_response_count",
 					"startdate" => "fmt_job_startdate");
+					
+if(!$USER->authorize('leavemessage')){
+	unset($titles["responses"]);
+	unset($formatters["responses"]);
+}
 
 $scrollThreshold = 8;
 $scroll = false;
@@ -174,6 +179,11 @@ $formatters = array("Actions" => "fmt_jobs_actions",
 					"enddate" => "fmt_job_enddate",
 					"type" => "fmt_obj_csv_list",
 					"responses" => "fmt_response_count");
+					
+if(!$USER->authorize('leavemessage')){
+	unset($titles["responses"]);
+	unset($formatters["responses"]);
+}
 
 $scroll = false;
 if (count($data) > $scrollThreshold) {

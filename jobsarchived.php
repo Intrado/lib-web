@@ -48,7 +48,10 @@ $titles = array(	"name" => "Name",
 					"Actions" => "Actions"
 					);
 $formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
-
+if(!$USER->authorize('leavemessage')){
+	unset($titles["responses"]);
+	unset($formatters["responses"]);
+}
 startWindow('My Archived Jobs ' . help('Jobs_MyArchivedJobs', NULL, 'blue'),'padding: 3px;', false, true);
 showObjects($data, $titles, $formatters);
 endWindow();
