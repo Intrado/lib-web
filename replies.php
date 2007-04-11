@@ -135,7 +135,7 @@ NewForm($f);
 buttons(button('refresh',"window.location.reload()"), 
 		button('delete_all_played', "return confirm('Are you sure you want to delete all played messages?')", "replies.php?deleteplayed=true"));
 	
-startWindow("Response Options", "padding: 3px;");	
+startWindow("Display Options", "padding: 3px;");	
 ?>
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -166,7 +166,7 @@ startWindow("Response Options", "padding: 3px;");
 <?
 endWindow();
 echo "<br>";
-startWindow("My Responses", "padding: 3px;");
+startWindow("Responses", "padding: 3px;");
 
 ?>
 <?

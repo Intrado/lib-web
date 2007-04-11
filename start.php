@@ -50,8 +50,8 @@ $TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname;
 include_once("nav.inc.php");
 if($USER->authorize("leavemessage")){
 	if($count > 0){
-		$unplayed = "(You have unplayed responses. " . 
-				"<a href=\"replies.php?jobid=all&showonlyunheard=true\" style=\"font-size: medium;\"> Click here to view</a>)";
+		$unplayed = "(You have unplayed responses to your notifications..." . 
+				"<a href=\"replies.php?jobid=all&showonlyunheard=true\" style=\"font-size: medium;\">click to view</a>)";
 ?>	
 		<div style="font-size: medium;"><?=$unplayed?><div>
 <?
