@@ -196,9 +196,9 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 				$usedelbtn = $archivebtn;
 
 			if($USER->authorize('createreport') && $USER->authorize('leavemessage'))
-				$buttons = array($editbtn,$reportbtn,$monitorbtn, $viewresponses, $cancelbtn);
+				$buttons = array($editbtn,$reportbtn,$monitorbtn, $viewresponses, $usedelbtn);
 			else if($USER->authorize('leavemessage'))
-				$buttons = array($editbtn, $viewresponses, $cancelbtn);
+				$buttons = array($editbtn, $viewresponses, $usedelbtn);
 			else if ($USER->authorize('createreport'))
 				$buttons = array($editbtn,$reportbtn,$graphbtn,$usedelbtn);
 			else
