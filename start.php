@@ -45,10 +45,18 @@ function fmt_surveyactions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = 'start:start';
-$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname . "  (" . (isset($count)&&($count>0) ? "You have unplayed messages. Click Notifications --> Responses" : "") . ")";
+$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname;
 
 include_once("nav.inc.php");
-
+if($USER->authorize("leavemessage")){
+	if($count > 0){
+		$unplayed = "(You have unplayed responses. " . 
+				"<a href=\"replies.php?jobid=all&showonlyunheard=true\" style=\"font-size: medium;\"> Click here to view</a>)";
+?>	
+		<div style="font-size: medium;"><?=$unplayed?><div>
+<?
+	}
+}
 
 if ($USER->authorize("startstats")) {
 ?>
@@ -153,9 +161,10 @@ if ($USER->authorize("startstats")) {
 	?></td></tr></table><?
 
 } else if ($USER->authorize("starteasy")) {
-	?><table border=0 width="250"><tr><td><?
+?>
+	<table border=0 width="250"><tr><td><?
 	startWindow('EasyCall', 'padding: 3px;');
-	echo button('easycall2',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);");
+	?><div align="center"><?= button('easycall2',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);")?><div><?;
 	endWindow();
 	?></td></tr></table><?
 }
