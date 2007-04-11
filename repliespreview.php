@@ -46,24 +46,24 @@ button("done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"
 <table border="0" cellpadding="3" cellspacing="0">
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Job</td>
-		<td class="bottomBorder"><?=$responses[4]?></td>
+		<td class="bottomBorder"><?=$responses[4] ? $responses[4] : "&nbsp"?></td>
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Message</td>
-		<td class="bottomBorder"><?=$responses[5]?></td>
+		<td class="bottomBorder"><?=$responses[5] ? $responses[5] : "&nbsp"?></td>
 
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Person ID</td>
-		<td class="bottomBorder"><?=$responses[0]?></td>
+		<td class="bottomBorder"><?=$responses[0] ? $responses[0] : "&nbsp" ?></td>
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">First Name</td>
-		<td class="bottomBorder"><?=$responses[1]?></td>
+		<td class="bottomBorder"><?=$responses[1] ? $responses[1] : "&nbsp"?></td>
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Last Name</td>
-		<td class="bottomBorder"><?=$responses[2]?></td>
+		<td class="bottomBorder"><?=$responses[2] ? $responses[2] : "&nbsp"?></td>
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Phone</td>
