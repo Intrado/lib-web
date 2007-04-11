@@ -133,7 +133,7 @@ include_once("nav.inc.php");
 NewForm($f);
 
 buttons(button('refresh',"window.location.reload()"), 
-		button('delete_played', "return confirm('Are you sure you want to delete all played messages?')", "replies.php?deleteplayed=true"));
+		button('delete_all_played', "return confirm('Are you sure you want to delete all played messages?')", "replies.php?deleteplayed=true"));
 	
 startWindow("Response Options", "padding: 3px;");	
 ?>
@@ -215,8 +215,6 @@ $formatters = array(
 					"3" => "fmt_phone",
 					"9" => "fmt_replies_status"
 					);
-if(isset($_SESSION['replies']['jobid']))
-	unset($titles[5]);
 
 $query = "select found_rows()";
 $total = QuickQuery($query);
