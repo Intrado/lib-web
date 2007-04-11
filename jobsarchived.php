@@ -44,9 +44,10 @@ $titles = array(	"name" => "Name",
 					"startdate" => "Start Date",
 					"Status" => "Status",
 					"enddate" => "End Date",
+					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
-$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "enddate" => "fmt_job_enddate");
+$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
 
 startWindow('My Archived Jobs ' . help('Jobs_MyArchivedJobs', NULL, 'blue'),'padding: 3px;', false, true);
 showObjects($data, $titles, $formatters);
