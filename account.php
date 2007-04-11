@@ -339,7 +339,7 @@ startWindow('User Information');
 							</tr>
 <? if ($USER->authorize('leavemessage')) { ?>
 							<tr>
-								<td>Allow call recipients to leave a voice response</td>
+								<td>Allow call recipients to leave a message</td>
 								<td><? NewFormItem($f, $s, "leavemessage", "checkbox");?>Accept Voice Responses</td>
 							</td>
 <? } ?>

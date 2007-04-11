@@ -108,7 +108,7 @@ $titles = array(	"name" => "#Name",
 					"type" => "#Type",
 					"startdate" => "Start date",
 					"Status" => "#Status",
-					"responses" => "Responses",
+					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
 $formatters = array("Actions" => "fmt_jobs_actions",
@@ -165,7 +165,7 @@ $titles = array(	"name" => "#Name",
 					"startdate" => "Start Date",
 					"Status" => "#Status",
 					"enddate" => "End Date",
-					"responses" => "Responses",
+					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
 $formatters = array("Actions" => "fmt_jobs_actions", 

@@ -52,7 +52,7 @@ $titles = array(	"name" => "#Name",
 					"Type" => "#Type",
 					"startdate" => "Start date",
 					"Status" => "#Status",
-					"responses" => "Responses",
+					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
 $actions = array("Type" => "fmt_surveytype",
@@ -78,7 +78,7 @@ $titles = array(	"name" => "#Name",
 					"Type" => "#Type",
 					"startdate" => "Start date",
 					"Status" => "#Status",
-					"responses" => "Responses",
+					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
 $actions = array("Type" => "fmt_surveytype",

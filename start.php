@@ -45,7 +45,7 @@ function fmt_surveyactions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = 'start:start';
-$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname . (isset($count)&&($count>0) ? "(" . $count . " Responses Not Played)" : "");
+$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname . "  (" . (isset($count)&&($count>0) ? "You have unplayed messages. Click Notifications --> Responses" : "") . ")";
 
 include_once("nav.inc.php");
 
@@ -78,8 +78,6 @@ if ($USER->authorize("startstats")) {
 		<td width="100%" valign="top">
 <?
 
-
-
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
 			startWindow('My Active and Pending Notifications ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
@@ -89,7 +87,7 @@ if ($USER->authorize("startstats")) {
 			$titles = array(	"name" => "Name",
 								"type" => "Type",
 								"Status" => "Status",
-								"responses" => "Responses",
+								"responses" => "Responses (Unplayed/Total)",
 								"Actions" => "Actions"
 								);
 			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', 'responses' => 'fmt_response_count');
@@ -106,7 +104,7 @@ if ($USER->authorize("startstats")) {
 								"type" => "Type",
 								"Status" => "Status",
 								"enddate" => "End Date",
-								"responses" => "Responses",
+								"responses" => "Responses (Unplayed/Total)",
 								"Actions" => "Actions"
 								);
 			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
@@ -124,7 +122,7 @@ if ($USER->authorize("startstats")) {
 				$titles = array(	"name" => "Name",
 									"type" => "Type",
 									"Status" => "Status",
-									"responses" => "Responses",
+									"responses" => "Responses (Unplayed/Total)",
 									"Actions" => "Actions"
 									);
 				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "responses" => "fmt_response_count");
@@ -141,7 +139,7 @@ if ($USER->authorize("startstats")) {
 									"type" => "Type",
 									"Status" => "Status",
 									"enddate" => "End Date",
-									"responses" => "Responses",
+									"responses" => "Responses (Unplayed/Total)",
 									"Actions" => "Actions"
 									);
 				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");

@@ -29,7 +29,7 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))
 		$SHORTCUTS['&nbsp;&nbsp;New Job'] = "window.location='job.php?id=new'";
 	}
 	if ($USER->authorize("leavemessage")){
-		$SHORTCUTS['&nbsp;&nbsp;My Responses'] = "window.location='replies.php?jobid=all'";
+		$SHORTCUTS['&nbsp;&nbsp;View Responses'] = "window.location='replies.php?jobid=all'";
 	}
 }
 

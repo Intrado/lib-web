@@ -112,7 +112,7 @@ function fmt_replies_actions($row, $index) {
 
 function fmt_replies_status($row, $index){
 	if(!$row[$index]){
-		return "<div id=reply" . $row[8] . " style='font-weight:bold'>Not Played</div>";
+		return "<div id=reply" . $row[8] . " style='font-weight:bold'>Unplayed</div>";
 	} else {
 		return "<div id=reply" . $row[8] . ">Played</div>";
 	}
@@ -124,9 +124,9 @@ function fmt_replies_status($row, $index){
 
 $PAGE = "notifications:responses";
 if(isset($job)){
-	$TITLE = "Responses to - " . $job->name;
+	$TITLE = "Responses to: " . $job->name;
 } else {
-	$TITLE = "Responses to - All Jobs";
+	$TITLE = "Responses to: All Jobs";
 }
 include_once("nav.inc.php");
 
@@ -155,10 +155,10 @@ startWindow("Response Options", "padding: 3px;");
 	</td>
 </tr>
 <tr>
-<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Not Played:</th>
+<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Unplayed:</th>
 	<td>
 		<div><?NewFormItem($f, $s, "unheard", "checkbox", null, null, "onclick=\"window.location='replies.php?showonlyunheard=' + (this.checked ? 'true' : 'false') + '&pagestart=$pagestart';\"");?> 
-		Show only not played responses </div>
+		Show only unplayed responses </div>
 	</td>
 </tr>
 </table>

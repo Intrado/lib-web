@@ -545,7 +545,7 @@ startWindow('Job Information');
 				</tr>
 				<? if ($JOBTYPE != "repeating") { ?>
 					<tr>
-						<td>Start Date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
+						<td>Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
 						<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "")); ?></td>
 					</tr>
 				<? } ?>
@@ -570,7 +570,7 @@ startWindow('Job Information');
 					</td>
 				</tr>
 				<tr>
-					<td colspan="2">Delivery Window:</td>
+					<td colspan="2">Delivery window:</td>
 				<tr>
 					<td>&nbsp;&nbsp;Earliest <?= help('Job_PhoneEarliestTime', NULL, 'small') ?></td>
 					<td><? time_select($f,$s,"starttime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
@@ -592,11 +592,11 @@ startWindow('Job Information');
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td width="30%" >Send Phone Calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
+					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "")); ?>Phone</td>
 				</tr>
 				<tr>
-					<td>Default Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 					<td><? message_select('phone',$f,$s,"phonemessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
 				</tr>
 <? if($USER->authorize('sendmulti')) { ?>
@@ -626,7 +626,7 @@ startWindow('Job Information');
 				<? } ?>
 
 				<tr>
-					<td>Skip Duplicate Phone Numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
+					<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
 					<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 				</tr>
 				<tr>
@@ -635,7 +635,7 @@ startWindow('Job Information');
 				</tr>
 				<? if($USER->authorize('leavemessage')) { ?>
 					<tr>
-						<td> Allow call recipients to leave messages a voice response</td>
+						<td> Allow call recipients to leave a message</td>
 						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($completedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
 					</tr>
 				<? } ?>
@@ -650,11 +650,11 @@ startWindow('Job Information');
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td width="30%" >Send Emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
+					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "")); ?>Email</td>
 				</tr>
 				<tr>
-					<td>Default Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 					<td><? message_select('email',$f, $s,"emailmessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
 				</tr>
 <? if($USER->authorize('sendmulti')) { ?>
@@ -664,7 +664,7 @@ startWindow('Job Information');
 				</tr>
 <? } ?>
 				<tr>
-					<td>Skip Duplicate Email Addresses</td>
+					<td>Skip duplicate email addresses</td>
 					<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 				</tr>
 			</table>
@@ -677,11 +677,11 @@ startWindow('Job Information');
 		<td>
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td width="30%" >Send Printed Letters <? print help('Job_PrintOptions', null, 'small'); ?></td>
+					<td width="30%" >Send printed letters <? print help('Job_PrintOptions', null, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendprint","checkbox",NULL,NULL,"id='sendprint' " . ($submittedmode ? "DISABLED" : "")); ?>Print</td>
 				</tr>
 				<tr>
-					<td>Default Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 					<td><? message_select('print', $f, $s, "printmessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
 				</tr>
 <? if($USER->authorize('sendmulti')) { ?>

@@ -163,7 +163,7 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" ><?= $renderedlist->total ?></td>
 				</tr>
 				<tr>
-					<td class="bottomBorder" >Start Date</td>
+					<td class="bottomBorder" >Start date</td>
 					<td class="bottomBorder" ><?= htmlentities(date("F jS, Y", strtotime($job->startdate))); ?></td>
 				</tr>
 				<tr>
@@ -171,7 +171,7 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" ><?= 1+ (strtotime($job->enddate) - strtotime($job->startdate))/86400 ?></td>
 				</tr>
 				<tr>
-					<td colspan="2">Delivery Window:</td>
+					<td colspan="2">Delivery window:</td>
 				<tr>
 					<td class="bottomBorder" >&nbsp;&nbsp;Earliest</td>
 					<td class="bottomBorder" ><?= htmlentities(date("g:i a", strtotime($job->starttime))); ?></td>
@@ -193,7 +193,7 @@ startWindow("Confirmation &amp; Submit");
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td class="bottomBorder"  width="30%" >Default Message</td>
+					<td class="bottomBorder"  width="30%" >Default message</td>
 					<td class="bottomBorder" >
 <?
 $phonemessage = new Message($job->phonemessageid);
@@ -221,24 +221,24 @@ echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemess
 				<? } ?>
 
 				<tr>
-					<td class="bottomBorder" >Skip Duplicate Phone Numbers</td>
+					<td class="bottomBorder" >Skip duplicate phone numbers</td>
 					<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("skipduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
 				
 <? if($USER->authorize('leavemessage')) { ?>
 					<tr>
 						<td class="bottomBorder" >Call every available phone number for each person</td>
-						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call all phone numbers</td>
+						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call All Phone Numbers</td>
 					</tr>
 					
 					<tr>
-						<td> Allow call recievers to leave messages?</td>
+						<td> Allow call recipients to leave a message</td>
 						<td><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Leave Message</td>
 					</tr>
 <? } else { ?>
 					<tr>
 						<td>Call every available phone number for each person</td>
-						<td><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call all phone numbers</td>
+						<td><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call All Phone Numbers</td>
 					</tr>
 <? } ?>
 				
@@ -252,7 +252,7 @@ echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemess
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td class="bottomBorder"  width="30%" >Default Message</td>
+					<td class="bottomBorder"  width="30%" >Default message</td>
 					<td class="bottomBorder" >
 <?
 $emailmessage = new Message($job->emailmessageid);
@@ -268,7 +268,7 @@ echo htmlentities($emailmessage->name);
 				</tr>
 <? } ?>
 				<tr>
-					<td>Skip Duplicate Email Addresses</td>
+					<td>Skip duplicate email addresses</td>
 					<td><input type="checkbox" disabled <?= $job->isOption("skipemailduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
 			</table>
