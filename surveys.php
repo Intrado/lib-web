@@ -62,6 +62,11 @@ $actions = array("Type" => "fmt_surveytype",
 				"responses" => "fmt_response_count",
 				"Actions" => "fmt_jobs_actions"
 				);
+				
+if(!$USER->authorize('leavemessage')){
+	unset($titles["responses"]);
+	unset($actions["responses"]);
+}
 showObjects($data, $titles, $actions, count($data) > 8, true);
 
 
@@ -88,6 +93,11 @@ $actions = array("Type" => "fmt_surveytype",
 				"responses" => "fmt_response_count",
 				"Actions" => "fmt_jobs_actions"
 				);
+				
+if(!$USER->authorize('leavemessage')){
+	unset($titles["responses"]);
+	unset($actions["responses"]);
+}
 showObjects($data, $titles, $actions, count($data) > 8, true);
 
 
