@@ -41,21 +41,27 @@ if(isset($_GET['delete'])){
 		$content = new Content($vr->contentid);
 		$content->destroy();
 		$vr->destroy();
-		redirect();
+		$reload=1;
 	}
+}
+
+if(isset($_GET['reset']) && $_GET['reset']){
+	unset($_SESSION['replies']['jobid']);
+	unset($_SESSION['replies']['showonlyunheard']);
+	$reload=1;
 }
 
 if(isset($_GET['jobid'])){
 	if($_GET['jobid']=='all') {
 		unset($_SESSION['replies']['jobid']);
-		redirect();
+	} else {
+		$jobid = $_GET['jobid']+0;
+		if(!userOwns("job", $jobid)){
+			redirect('unauthorized.php');
+		}
+		$_SESSION['replies']['jobid'] = $jobid;
 	}
-	$jobid = $_GET['jobid']+0;
-	if(!userOwns("job", $jobid)){
-		redirect('unauthorized.php');
-	}
-	$_SESSION['replies']['jobid'] = $jobid;
-	redirect();
+	$reload=1;
 }
 
 if(isset($_SESSION['replies']['jobid'])){
@@ -88,9 +94,11 @@ if(isset($_GET['deleteplayed']) && $_GET['deleteplayed']){
 		$content->destroy();
 		$voicereply->destroy();
 	}
-	redirect();
+	$reload=1;
 }
 
+if($reload)
+	redirect();
 
 $f = "replies";
 $s = "responses";
@@ -239,12 +247,12 @@ EndForm();
 	function repliesplay( voicereplyid ){
 	
 		popup('repliespreview.php?id=' + voicereplyid + '?close=1', 400, 500);
-		var dummy = new getObj('reply' + voicereplyid).obj;
-		dummy.style.fontWeight='normal';
+		var status = new getObj('reply' + voicereplyid).obj;
+		status.style.fontWeight='normal';
 		if(document.all){
-			dummy.innerText= 'Played';
+			status.innerText= 'Played';
 		} else {
-			dummy.textContent='Played';
+			status.textContent='Played';
 		}
 	}
 </script>
