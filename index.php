@@ -185,9 +185,9 @@ new getObj('logintext').obj.focus();
 
 		<div><table width="100%" style="color: #365F8D;" >
 			<tr>
-				<td width="30%">&nbsp;</td>
+				<td width="20%">&nbsp;</td>
 				<td style="font-size: 12px;"><div style="margin-left: 50px;">Login:<br><input type="text" name="login" size="35" id="logintext"></div></td>
-				<td width="70%">&nbsp;</td>
+				<td width="80%">&nbsp;</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
