@@ -94,6 +94,12 @@ if(isset($_GET['deleteplayed']) && $_GET['deleteplayed']){
 		$content->destroy();
 		$voicereply->destroy();
 	}
+	if($jobidquery){
+		$count = QuickQuery("select count(*) from voicereply vr where vr.userid = '$USER->id'
+							$jobidquery");
+		if($count ==0)
+			unset($_SESSION['replies']['jobid']);
+	}
 	$reload=1;
 }
 
