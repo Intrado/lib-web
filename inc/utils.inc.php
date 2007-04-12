@@ -210,24 +210,22 @@ function checkemails($emaillist) {
 //from php.net comments
 function secure_tmpname($dir = "tmp", $prefix = 'tmp', $postfix = '.dat') {
    // validate arguments
-   if (! (isset($postfix) && is_string($postfix))) {
-       return false;
-   }
-   if (! (isset($prefix) && is_string($prefix))) {
-       return false;
-   }
+	if (! (isset($postfix) && is_string($postfix))) {
+		return false;
+	}
+	if (! (isset($prefix) && is_string($prefix))) {
+		return false;
+	}
    
-   //keep searching for an unused file.  Potential risk of never finding one.  Realistically
-   //not probable.
 	$filename = $dir . "/" . $prefix . microtime(true) . mt_rand() . $postfix;
 
-   if($filename != ""){   		
-   		$fp = fopen("$filename", "w");
-   		fclose($fp);
+	$fp = fopen($filename, "w");
+	if(file_exists($filename)){
+		fclose($fp);
 		return $filename;
-   }
-   return false;
-
+	} else {
+	   return false;
+	}
 }
 
 
