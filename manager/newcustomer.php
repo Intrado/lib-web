@@ -59,8 +59,6 @@ if (CheckFormSubmit($f,$s)){
 				error('Password and Confirmation Password do not match', 'Try Again');
 			} else if (strlen($inboundnum) > 0 && !ereg("[0-9]{10}",$inboundnum)) {
 				error('Bad 800 Number Format', 'Try Again');
-			} else if (strlen($autoemail) > 0 && CheckFormItem($f,$s,"autoemail") != 0) {
-				error('Bad E-mail Format', 'Try Again');
 			} else {
 
 				$query = "insert into customer (name,enabled,timezone,hostname,inboundnumber) VALUES
@@ -138,8 +136,6 @@ if (CheckFormSubmit($f,$s)){
 
 				$surveyurl = "http://asp.schoolmessenger.com/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`customerid`, `name`, `value`) VALUES
-							($custid, 'autoreport_replyemail', '" . DBSafe($autoemail) ."'),
-							($custid, 'autoreport_replyname', '" . DBSafe($autoname) . "'),
 							($custid, 'maxphones', '3'),
 							($custid, 'maxemails', '2'),
 							($custid, 'retry', '15'),
