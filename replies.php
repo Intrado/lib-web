@@ -133,15 +133,17 @@ function fmt_replies_status($row, $index){
 $PAGE = "notifications:responses";
 if(isset($job)){
 	$TITLE = "Responses to: " . $job->name;
+	$warning = "Are you sure you want to delete all played messages for: " . $job->name . "?";
 } else {
 	$TITLE = "Responses to: All Jobs";
+	$warning = "Are you sure you want to delete all played messages for all jobs?";
 }
 include_once("nav.inc.php");
 
 NewForm($f);
-
+	
 buttons(button('refresh',"window.location.reload()"), 
-		button('delete_all_played', "return confirm('Are you sure you want to delete all played messages?')", "replies.php?deleteplayed=true"));
+		button('delete_all_played', "return confirm('$warning')", "replies.php?deleteplayed=true"));
 	
 startWindow("Display Options", "padding: 3px;");	
 ?>
