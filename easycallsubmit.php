@@ -20,8 +20,8 @@ include_once('obj/JobLanguage.obj.php');
 if (!$USER->authorize("starteasy")) {
 	redirect("unauthorized.php");
 }
-$id = $_REQUEST['taskid']+0;
-$specialtask = new SpecialTask($id);
+
+$specialtask = new SpecialTask($_REQUEST['taskid']);
 $messages = array();
 $languages = array();
 $count = $specialtask->getData("count");
@@ -49,7 +49,6 @@ if (!$specialtask->getData('jobid')) {
 	$job->type = "phone";
 	
 	if($messages) {
-		
 		foreach($messages as $index => $message){
 			if($languages[$index] == "Default"){
 				$job->phonemessageid = $message;
