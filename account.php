@@ -201,7 +201,7 @@ if( $reloadform )
 	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
 	
-	PutFormData($f, $s, "leavemessage", (bool)$USER->getSetting("leavemessage"), "bool", 0, 1);
+	PutFormData($f, $s, "leavemessage", (bool)$USER->getSetting("leavemessage", 0), "bool", 0, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
