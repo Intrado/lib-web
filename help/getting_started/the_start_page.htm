@@ -16,7 +16,7 @@ if (navigator.appName !="Netscape")
 <!--
 div.whs1 { width:100%; }
 img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
-img_whs3 { border:none; float:none; border-style:none; width:400px; height:154px; }
+img_whs3 { border:none; border-style:none; width:400px; height:246px; float:none; }
 h1.whs4 { font-size:10pt; }
 p.whs5 { font-weight:bold; }
 p.whs6 { font-size:xx-small; }
@@ -115,7 +115,7 @@ else
  access to will display. For access to additional features contact your 
  system administrator.</I></span></p>
 
-<p><img src="../startpage2.gif" alt="The Start Page" x-maintain-ratio="TRUE" width="400px" height="154px" border="0" class="img_whs3"></p>
+<p><img src="../startpage.gif" alt="The Start Page" x-maintain-ratio="TRUE" width="400px" height="246px" border="0" class="img_whs3"></p>
 
 <h1 class="whs4"><span style="font-size: 10pt;"><font size=2 style="font-size:10pt;">EasyCall</font></span></h1>
 
@@ -126,33 +126,63 @@ else
  can be reached in order to record the message, and with a few simple clicks 
  a call will be sent to tens, hundreds, or even thousands of recipients.</p>
 
-<p class="whs5">My Active and Pending Jobs</p>
-
-<p>The My Active and Pending Jobs section of the Start page displays a 
- list of the jobs which are currently running or waiting to be run in your 
- account. Active and pending jobs may be <a title="Click to learn more about editing an existing job." href="../creating_a_notification_job/editing_an_existing_job.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about editing an existing job.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">viewed 
- and edited</a>, and the jobs themselves may be <a title="Click to learn more about canceling an active job." href="../creating_a_notification_job/editing_an_existing_job.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about canceling an active job.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">canceled</a> 
- from this area if desired. Simply clicking the Report link next to the 
- name of a job that is currently running allows you to access the current 
- report results for that job. The Monitor link will open a small window 
- that displays the current results of the job as a graph.</p>
-
-<p class="whs5">My Active Calls</p>
+<p class="whs5"><span style="font-weight: bold;"><B>My Active 
+ Calls</B></span></p>
 
 <p>The graph displayed in this area shows the current results of all active 
  jobs on your account. To view a graph for a specific job that is running, 
  click the Monitor link next to the job in the My Active and Pending Jobs 
  section.</p>
 
-<h1 class="whs4">My Completed Jobs</h1>
+<p class="whs5">My Active and Pending Notifications</p>
 
-<p>This section displays some of the most recently completed jobs from 
- your account. To the right of each job you will find four links. The Edit 
- link allows you to edit the name and description of the job. The Report 
- link takes you to the report results for the job. Graph shows the delivery 
- results in a graph. Lastly, Archive will archive the results so they are 
- no longer visible in any completed jobs lists. The job's results can still 
- be accessed by <a title="Click to learn more about creating a custom report." href="../reports/querying_report_data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating a custom report.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">creating 
+<p>The My Active and Pending Jobs section of the Start page displays a 
+ list of the <a href="../creating_a_notification_job/creating_a_new_job.htm" title="Click to learn more about creating a notification job." onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating a notification job.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">notification 
+ jobs</a> which are currently running or waiting to be run in your account. 
+ Active and pending jobs may be <a title="Click to learn more about editing an existing job." href="../creating_a_notification_job/editing_an_existing_job.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about editing an existing job.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">viewed 
+ and edited</a>, and the jobs themselves may be <a title="Click to learn more about canceling an active job." href="../creating_a_notification_job/editing_an_existing_job.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about canceling an active job.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">canceled</a> 
+ from this area if desired. Simply clicking the Report link next to the 
+ name of a job that is currently running allows you to access the current 
+ report results for that job. The Monitor link will open a small window 
+ that displays the current results of the job as a graph.</p>
+
+<h1 class="whs4">My Completed Notifications</h1>
+
+<p>This section displays information about some of the most recently completed 
+ notification jobs from your account. To the right of each job you will 
+ find five links. The Edit link allows you to edit the name and description 
+ of the job. The Report link takes you to the report results for the job. 
+ Graph shows the delivery results in a graph. The Responses link takes 
+ you to the Responses Tab for the job where, if you allowed recipients 
+ to leave responses, you can listen to the recordings. Lastly, Archive 
+ will archive the results so they are no longer visible in any completed 
+ jobs lists. The job's results can still be accessed by <a title="Click to learn more about creating a custom report." href="../reports/querying_report_data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating a custom report.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">creating 
+ a custom report</a>.</p>
+
+<p class="whs5"><span style="font-weight: bold;"><B>My Active 
+ and Pending Surveys</B></span></p>
+
+<p>The My Active and Pending Surveys section of the Start page displays 
+ a list of the <a href="../creating_a_survey_job/survey_overview.htm" title="Click to learn more about creating surveys." onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating surveys.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">survey 
+ jobs</a> which are currently running or waiting to be run in your account. 
+ Active and pending surveys may be viewed and edited, and the jobs themselves 
+ may be canceled from this area if desired. Simply clicking the Report 
+ link next to the name of a job that is currently running allows you to 
+ access the current report results for that job. The Monitor link will 
+ open a small window that displays the current results of the job as a 
+ graph.</p>
+
+<h1 class="whs4">My Completed Surveys</h1>
+
+<p>This section displays information about some of the most recently completed 
+ survey jobs from your account. To the right of each job you will find 
+ five links. The Edit link allows you to edit the name and description 
+ of the job. The Report link takes you to the report results for the job. 
+ Graph shows the delivery results in a graph. The Responses link takes 
+ you to the Responses Tab for the job where, if you allowed recipients 
+ to leave responses, you can listen to the recordings. Lastly, Archive 
+ will archive the results so they are no longer visible in any completed 
+ jobs lists. The job's results can still be accessed by <a title="Click to learn more about creating a custom report." href="../reports/querying_report_data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating a custom report.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">creating 
  a custom report</a>.</p>
 
 <div placeholder id="footer" class="whs1">

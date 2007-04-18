@@ -1,5 +1,17 @@
 <?xml version='1.0' encoding='windows-1252' ?>
 <indexdata>
+<key name="Responses" >
+  <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+  <key name="notification" >
+    <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+  </key>
+  <key name="playing" >
+    <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+  </key>
+  <key name="survey" >
+    <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+  </key>
+</key>
 <key name="Survey" >
   <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
   <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />

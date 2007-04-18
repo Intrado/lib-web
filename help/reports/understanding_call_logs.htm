@@ -14,14 +14,27 @@ if (navigator.appName !="Netscape")
 </script>
 <style type="text/css">
 <!--
-img_whs1 { border:none; border-style:none; width:500px; height:153px; float:none; }
+img_whs1 { border:none; width:500px; height:153px; float:none; border-style:none; }
 p.whs2 { font-weight:bold; }
 ul.whs3 { list-style:disc; }
 p.whs4 { line-height:Normal; }
 p.whs5 { line-height:Normal; font-weight:bold; }
 p.whs6 { line-height:Normal; margin-left:80px; }
+div.whs7 { width:100%; }
+p.whs8 { font-size:xx-small; }
 -->
-</style><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+</style><script type="text/javascript" language="JavaScript">
+<!--
+if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
+{
+  var strNSS = "<style type='text/css'>";
+  strNSS += "p.whs8 {font-size:x-small; }";
+  strNSS +="</style>";
+  document.write(strNSS);
+}
+//-->
+</script>
+<script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
 <!--
 function reDo() {
   if (innerWidth != origWidth || innerHeight != origHeight)
@@ -181,6 +194,10 @@ else
 
 <p>&nbsp;</p>
 
+<div placeholder id="footer" class="whs7">
+ <p class="whs8"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©2007 
+ Reliance Communications, Inc.</font></span></p>
+</div>
 <script type="text/javascript" language="javascript1.2">
 <!--
 if (window.writeIntopicBar)

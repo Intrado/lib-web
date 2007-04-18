@@ -52,6 +52,9 @@
   <item name="Querying Report Data" url="reports/querying_report_data.htm" />
   <item name="Understanding Call Logs" url="reports/understanding_call_logs.htm" />
 </book>
+<book name="Receiving Reponses" >
+  <item name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+</book>
 <book name="Step-by-Step Guides" >
   <item name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
   <item name="Step-by-Step:Send a Simple Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
