@@ -50,9 +50,9 @@ $TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname;
 include_once("nav.inc.php");
 if($USER->authorize("leavemessage")){
 	if($count > 0){
-		$unplayed = "<img src=\"img/bug_important.gif\"> You have unplayed responses to your notifications..." . 
+		$unplayed = "<img src=\"img/bug_important.gif\"> You have unplayed responses to your notifications..." .
 				"<a href=\"replies.php?jobid=all&showonlyunheard=true\" style=\"font-size: medium;\">click to view</a>";
-?>	
+?>
 		<div style="font-size: medium;"><?=$unplayed?><div>
 <?
 	}
@@ -88,7 +88,7 @@ if ($USER->authorize("startstats")) {
 
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
-			startWindow('My Active and Pending Notifications ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
+			startWindow('My Active and Pending Notifications ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;',true);
 			button_bar(button('refresh', 'window.location.reload()'));
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling') and type != 'survey' and deleted = 0 order by id desc limit $limit");
@@ -109,7 +109,7 @@ if ($USER->authorize("startstats")) {
 
 
 
-			startWindow('My Completed Notifications ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;');
+			startWindow('My Completed Notifications ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;',true);
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Name",
@@ -131,7 +131,7 @@ if ($USER->authorize("startstats")) {
 
 			if ($USER->authorize("survey")) {
 
-				startWindow('My Active and Pending Surveys ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;');
+				startWindow('My Active and Pending Surveys ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;',true);
 				button_bar(button('refresh', 'window.location.reload()'));
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling') and type='survey' and deleted = 0 order by id desc limit $limit");
@@ -152,7 +152,7 @@ if ($USER->authorize("startstats")) {
 
 
 
-				startWindow('My Completed Surveys ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;');
+				startWindow('My Completed Surveys ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;',true);
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type='survey' and deleted = 0 order by finishdate desc limit $limit");
 				$titles = array(	"name" => "Name",
