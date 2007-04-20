@@ -99,11 +99,18 @@ copytable($customerid,"audiofile",array("id", "userid", "name", "description", "
 //BLOCKEDNUMBER
 copytable($customerid,"blockednumber",array("id","userid","description","pattern"),$db,$custdb,1000,false);
 
-//CONTENT
+//CONTENT (audio files)
 $join = "
 inner join audiofile on (contentid=content.id)
 inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"content",array("id","contenttype","data"),$db,$custdb,1,$join);
+
+//CONTENT (voice reply)
+$join = "
+inner join voicereply on (contentid=content.id)
+inner join user u on (userid=u.id and u.customerid=$customerid)";
+copytable($customerid,"content",array("id","contenttype","data"),$db,$custdb,1,$join);
+
 
 //EMAIL
 $join = "inner join person p on (personid = p.id and p.customerid=$customerid)";
@@ -251,6 +258,12 @@ copytable($customerid,"usersetting",array("id", "userid", "name", "value"),$db,$
 //VOICEREPLY
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"voicereply",array("id", "jobtaskid", "jobworkitemid", "personid", "jobid", "userid", "contentid", "replytime", "listened"),$db,$custdb,1000,$join);
+
+//TODO put customer fields as settings records
+
+
+
+
 
 
 ?>
