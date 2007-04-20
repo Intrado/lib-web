@@ -182,7 +182,8 @@ getting_started\getting_started.htm
 getting_started\message_tips_and_ideas.htm
 getting_started\shortcuts.htm
 getting_started\the_start_page.htm
-receiving_responses\recipient_responses.htm
+receiving_responses\enabling_the_voice_response_option.htm
+receiving_responses\reviewing_your_response_messages.htm
 remote_telephone_access\remote_telephone_access_overview.htm
 remote_telephone_access\remotely_create_a_multilingual_job.htm
 remote_telephone_access\remotely_create_a_single_language_job.htm
@@ -224,6 +225,8 @@ reportresults2.gif
 listeditormanualadd.gif
 listmanualadd.gif
 listsearch1.gif
+responsereplywindow.gif
+jobacceptresponses.gif
 surveyscheduler.gif
 importeditor.gif
 listeditorupload.gif

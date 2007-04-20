@@ -1,15 +1,19 @@
 <?xml version='1.0' encoding='windows-1252' ?>
 <indexdata>
 <key name="Responses" >
-  <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+  <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
+  <topic name="Recipient Responses" url="receiving_responses/reviewing_your_response_messages.htm" />
+  <key name="enabling" >
+    <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
+  </key>
   <key name="notification" >
-    <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+    <topic name="Recipient Responses" url="receiving_responses/reviewing_your_response_messages.htm" />
   </key>
   <key name="playing" >
-    <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+    <topic name="Recipient Responses" url="receiving_responses/reviewing_your_response_messages.htm" />
   </key>
   <key name="survey" >
-    <topic name="Recipient Responses" url="receiving_responses/recipient_responses.htm" />
+    <topic name="Recipient Responses" url="receiving_responses/reviewing_your_response_messages.htm" />
   </key>
 </key>
 <key name="Survey" >
