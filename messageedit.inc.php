@@ -236,7 +236,7 @@ switch($MESSAGETYPE)
 					<th align="right" class="windowRowHeader">Text-to-Speech:<br><? print help('MessagePhone_TextToSpeech', NULL, 'grey'); ?></th>
 					<td>
 <?
-		$fields = DBFindMany("Voice","from ttsvoice order by language, name");
+		$fields = DBFindMany("Voice","from ttsvoice order by language, name, gender desc");
 		NewFormItem($form,$section, 'voiceid', 'selectstart');
 		foreach($fields as $file)
 		{
