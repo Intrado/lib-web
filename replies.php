@@ -151,7 +151,7 @@ NewForm($f);
 buttons(button('refresh',"window.location.reload()"), 
 		button('delete_all_played', "return confirm('$warning')", "replies.php?deleteplayed=true"));
 	
-startWindow("Display Options", "padding: 3px;");	
+startWindow("Display Options" . help('Replies_DisplayOptions', NULL, 'blue'), "padding: 3px;");	
 ?>
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -182,7 +182,7 @@ startWindow("Display Options", "padding: 3px;");
 <?
 endWindow();
 echo "<br>";
-startWindow("Responses", "padding: 3px;");
+startWindow("Responses"  . help('Replies_Responses', NULL, 'blue'), "padding: 3px;");
 
 ?>
 <?
