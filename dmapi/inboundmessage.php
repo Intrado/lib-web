@@ -184,14 +184,16 @@ function buildLanguageList()
 
 	// "English" is always the default, so remove english from the list
 	foreach ($languages as $index => $value) {
-		if (strncasecmp($value ,"english") == 0) {
+		if (strcasecmp($value ,"english") == 0) {
 			unset($languages[$index]);
 			break;
 		}
 	}
 
 	//add default to the list as the first option (it will get removed when the user records their first/default message
-	$languages = array_unshift("default",array_values($languages));
+	$languages = array_values($languages);
+	array_unshift($languages,"default");
+
 
 	$SESSIONDATA['languageList'] = $languages;
 
