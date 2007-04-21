@@ -161,10 +161,13 @@ startWindow("Display Options" . help('Replies_DisplayOptions', NULL, 'blue'), "p
 <?
 	NewFormItem($f, $s, 'jobselect', 'selectstart', NULL, NULL, "onchange=\"location.href='?jobid=' + this.value\"");
 	NewFormItem($f, $s, 'jobselect', 'selectoption', ' - All - ', "all");
-	$jobs = QuickQueryList("select j.id, j.name from job j where j.id in 
-						(select jobid from voicereply where userid = '$USER->id' group by jobid)", true);
-	foreach ($jobs as $id => $name) {
-		NewFormItem($f, $s, 'jobselect', 'selectoption', $name, $id);
+	$jobids = QuickQueryList("select vr.jobid from voicereply vr where vr.userid = '$USER->id' group by vr.jobid");
+	if(count($jobids) > 0) {
+		$jobids = "(" . implode(",",$jobids) . ")";
+		$jobs = QuickQueryList("select j.id, j.name from job j where j.id in $jobids", true);
+		foreach ($jobs as $id => $name) {
+			NewFormItem($f, $s, 'jobselect', 'selectoption', $name, $id);
+		}
 	}
 ?>
 	NewFormItem($f, $s, 'jobselect', 'selectend');
