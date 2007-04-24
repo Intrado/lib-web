@@ -6,18 +6,17 @@
 function assignTask ($type, $resourceid, $dmapidb) {
 
 	//because we might use persistent connections, ensure that we unlock the tables no matter what
-	function ensure_unlock_tables($dmapidb) {
-		mysql_query("unlock tables", $dmapidb);
+	function ensure_rollback_tables($dmapidb) {
+		mysql_query("rollback", $dmapidb);
 	}
-	register_shutdown_function("ensure_unlock_tables",$dmapidb);
+	register_shutdown_function("ensure_rollback_tables",$dmapidb);
 
-
-	mysql_query("lock tables jobtaskactive write", $dmapidb);
+	mysql_query("begin", $dmapidb);
 
 	//get the id of next available task
 	//update the task to assign it to us
 	$query = "select id from jobtaskactive where status='new' and type='$type' and tasktime > date_sub(now(), interval 60 second) "
-			. " and assignmentgroup = " . $resourceid % 2 . " order by tasktime limit 1";
+			. " and assignmentgroup = " . $resourceid % 2 . " order by tasktime limit 1 for update";
 
 	$res = mysql_query($query,$dmapidb);
 	$row = mysql_fetch_row($res);
@@ -30,8 +29,8 @@ function assignTask ($type, $resourceid, $dmapidb) {
 		$gotatask = false;
 	}
 
-	mysql_query("unlock tables", $dmapidb);
-
+	mysql_query("commit", $dmapidb);
+	
 	return $gotatask ? $foundid : false;
 }
 
