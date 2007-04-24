@@ -5,11 +5,11 @@
 //so that we don't assign any tasks that might have already been assigned from the failed node that are waiting in our mysql log.
 function assignTask ($type, $resourceid, $dmapidb) {
 
-	//because we might use persistent connections, ensure that we unlock the tables no matter what
-	function ensure_rollback_tables($dmapidb) {
+	//because we might use persistent connections, ensure that we rollback no matter what
+	function ensure_rollback($dmapidb) {
 		mysql_query("rollback", $dmapidb);
 	}
-	register_shutdown_function("ensure_rollback_tables",$dmapidb);
+	register_shutdown_function("ensure_rollback",$dmapidb);
 
 	mysql_query("begin", $dmapidb);
 
