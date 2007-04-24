@@ -51,4 +51,4 @@ PRIMARY KEY ( `name` )
 ALTER TABLE tasksyncdata ENGINE = InnoDB;
 
 -- changing jobtaskactive to innodb for transactions
-ALTER TABLE `jobtaskactive`  ENGINE = innodb
+ALTER TABLE `jobtaskactive`  ENGINE = innodb;
