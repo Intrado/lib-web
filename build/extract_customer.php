@@ -71,6 +71,20 @@ function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = 
 	} while ($row);
 }
 
+function customerinfo($custid, $source, $dest){
+	$query = "select inboundnumber, hostname, timezone from customer where id = '$custid'";
+	$sourceres = mysql_query($query, $source)
+				or die ("Failed to query customer: " . mysql_error($source));
+	
+	$row = mysql_fetch_row($sourceres);
+	
+	$destres = mysql_query("insert into setting (name, value) values
+								('inboundnumber', '$row[0]'),
+								('hostname', '$row[1]'),
+								('timezone', '$row[2]')", $dest)
+							or die ("Failed to insert into setting: " . mysql_error($dest));
+}
+
 //-------------------------------------------------------------------
 
 $newdbname = "c_$customerid";
@@ -259,8 +273,8 @@ copytable($customerid,"usersetting",array("id", "userid", "name", "value"),$db,$
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"voicereply",array("id", "jobtaskid", "jobworkitemid", "personid", "jobid", "userid", "contentid", "replytime", "listened"),$db,$custdb,1000,$join);
 
-//TODO put customer fields as settings records
-
+//Customer fields
+customerinfo($customerid, $db, $custdb);
 
 
 
