@@ -3,14 +3,14 @@
 if ($argc < 2)
 	exit ("Please specify customerid");
 
-$dbhost = "10.25.25.120";
+$dbhost = "127.0.0.1";
 $dbuser = "root";
 $dbpass = "";
 
 $customerid = $argv[1];
 
 $db = mysql_connect($dbhost,$dbuser,$dbpass,true);
-mysql_select_db("asptest2",$db);
+mysql_select_db("dialerasp",$db);
 
 $custdb = mysql_connect($dbhost,$dbuser,$dbpass,true);
 
@@ -56,7 +56,7 @@ function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = 
 	do {
 		$count = 0;
 		$outrows = array();
-		while (($row = mysql_fetch_row($sourceres)) && $count < $batch) {
+		while ($count < $batch && ($row = mysql_fetch_row($sourceres))) {
 			$outrows[] = "(". escrow($row,$dest) . ")";
 			$count++;
 		}
