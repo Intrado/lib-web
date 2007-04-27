@@ -6,13 +6,13 @@ include_once("inc/common.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_POST['add' . $MESSAGETYPE . '_x'])) {
-	$_SESSION['messageid'] = NULL;
-}
-
 //get the message to edit from the request params or session
 if (isset($_GET['id'])) {
-	setCurrentMessage($_GET['id']);
+	if($_GET['id'] == "new")
+		$_SESSION['messageid'] = NULL;
+	else
+		setCurrentMessage($_GET['id']);
+		
 	redirect("message" . $MESSAGETYPE . ".php");
 }
 
@@ -51,7 +51,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 			$message = new Message($_SESSION['messageid']);
 			$errors = array();
 			$parts = $message->parse(GetFormData($form,$section,"body"),$errors);
-
+	
 			if (count($errors) > 0) {
 				error('There was an error parsing the message', implode("",$errors));
 			} else {
@@ -112,25 +112,18 @@ if( $reloadform )
 
 	//check for new message name/desc from messages.php
 	$newmsg = false;
-	if (isset($_POST['add' . $MESSAGETYPE . '_x'])) {
+
+	if(!isset($_SESSION['messageid']))
 		$newmsg = true;
-	}
-
-
-	if ($newmsg) {
-		$message = new Message();
-		$_SESSION['messageid'] = NULL;
-		$message->type = $MESSAGETYPE;
-		$message->name = get_magic_quotes_gpc() ? stripslashes($_POST['addname' . $MESSAGETYPE]) : $_POST['addname' . $MESSAGETYPE];
-		$message->description = get_magic_quotes_gpc() ? stripslashes($_POST['adddesc' . $MESSAGETYPE]) : $_POST['adddesc' . $MESSAGETYPE];
-		$existsid = QuickQuery("select id from message where name='$name' and type='$MESSAGETYPE' and userid='$USER->id' and deleted=0");
-		if($existsid && $existsid != $_SESSION['messageid'])
-			error("A message named '$message->name' already exists");
-	} else {
+	$body = "";
+	if(!$newmsg){
 		$message = new Message($_SESSION['messageid']);
 		$message->readHeaders();
+		$parts = DBFindMany("MessagePart","from messagepart where messageid=$message->id order by sequence");
+		$body = $message->format($parts);
+	} else {
+		$message = new Message();
 	}
-
 	$fields = array(
 			array("name","text",0,50,true),
 			array("description","text",0,50)
@@ -153,12 +146,10 @@ if( $reloadform )
 			$fields[] = array("fromaddress", "text", 0, 65536);
 			break;
 	}
-	$parts = DBFindMany("MessagePart","from messagepart where messageid=$message->id order by sequence");
-	$body = $message->format($parts);
-
+	
 	PutFormData($form,$section,"body",$body,'text');
 
-	PutFormData($form,$section,"voiceid",$message->firstVoiceID(),"nomin","nomax",true);
+	PutFormData($form,$section,"voiceid",$newmsg ? 0 : $message->firstVoiceID(),"nomin","nomax",true);
 
 	PopulateForm($form,$section,$message,$fields);
 
@@ -236,7 +227,7 @@ switch($MESSAGETYPE)
 					<th align="right" class="windowRowHeader">Text-to-Speech:<br><? print help('MessagePhone_TextToSpeech', NULL, 'grey'); ?></th>
 					<td>
 <?
-		$fields = DBFindMany("Voice","from ttsvoice order by language, name, gender desc");
+		$fields = DBFindMany("Voice","from ttsvoice order by language, gender desc");
 		NewFormItem($form,$section, 'voiceid', 'selectstart');
 		foreach($fields as $file)
 		{
