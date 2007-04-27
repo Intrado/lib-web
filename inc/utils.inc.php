@@ -42,25 +42,25 @@ function first() {
 	Function to find the next seuential access code in a phone system
 	@param currentCode The current access code for which we are trying to find a replacement
 	@param userid The id of the user for whom we are trying to find a unique value
-	@param customerid The customer ID under which we are trying to find and access code
 */
-function getNextAvailableAccessCode($currentCode, $userid, $customerid) {
+function getNextAvailableAccessCode($currentCode, $userid) {
 	$result=1;
 	while($result !=0) {
 		$nextCode = rand(1000,999999);
-		$result = QuickQuery("select count(*) from user where accesscode = '$nextCode' and id != '$userid' and customerid = '$customerid'
+		$result = QuickQuery("select count(*) from user where accesscode = '$nextCode' and id != '$userid'
 								AND enabled = '1'");
 	}
 	return $nextCode;
 }
 
-function getCustomerSystemSetting($name, $customerid, $defaultvalue=false, $refresh=false) {
+function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false) {
 	static $settings = array();
 
 	if (isset($settings[$name]) && !$refresh)
 		return $settings[$name];
 
-	$value = QuickQuery("select value from setting where customerid = $customerid and name = '" . DBSafe($name) . "'");
+	$value = QuickQuery("select value from setting where name = '" . DBSafe($name) . "'");
+	
 	if($value === false) {
 		$value = $defaultvalue;
 	}
@@ -69,7 +69,7 @@ function getCustomerSystemSetting($name, $customerid, $defaultvalue=false, $refr
 
 function getSystemSetting($name, $defaultvalue=false) {
 	global $USER;
-	return getCustomerSystemSetting($name, $USER->customerid, $defaultvalue);
+	return getCustomerSystemSetting($name, $defaultvalue);
 }
 
 function isvalidtimestamp ($time) {

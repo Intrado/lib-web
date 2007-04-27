@@ -24,7 +24,7 @@ function userOwns ($type,$id) {
 			return false;
 	}
 }
-
+//jjl
 function customerOwns($type, $id) {
 	global $USER;
 	switch ($type) {
@@ -35,14 +35,14 @@ function customerOwns($type, $id) {
 		case "jobtype":
 		case "language":
 		case "persondatavalues":
-		case "setting":
-			return QuickQuery("select count(*) from `$type` where id = '$id' and customerid=$USER->customerid");
+		case "setting":	
 		case "access":
+			return QuickQuery("select count(*) from `$type` where id = '$id'");
 		case "person":
 		case "user":
-			return QuickQuery("select count(*) from `$type` where id = '$id' and customerid=$USER->customerid and deleted=0");
+			return QuickQuery("select count(*) from `$type` where id = '$id' and deleted=0");
 		case "job":
-			return QuickQuery("select count(*) from job, user where job.id = '$id' and user.customerid = $USER->customerid and user.id = job.userid");
+			return QuickQuery("select count(*) from job, user where job.id = '$id' and user.id = job.userid");
 		default:
 			return false;
 	}
@@ -53,7 +53,7 @@ function customerOwns($type, $id) {
 */
 function customerOwnsJob($jobid) {
 	global $USER;
-	return QuickQuery("select count(*) from job, user where job.id = $jobid and user.customerid = $USER->customerid and user.id = job.userid");
+	return QuickQuery("select count(*) from job, user where job.id = $jobid and user.id = job.userid");
 }
 
 function setIfOwnsOrNew ($id,$name, $type, $checkcustomer = false) {
