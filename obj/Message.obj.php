@@ -4,9 +4,10 @@ class Message extends DBMappedObject {
 	var $userid;
 	var $name;
 	var $description;
-	var $options;
 	var $data; //for headers
 	var $type;
+	var $lastused;
+	var $deleted;
 
 	//generated members
 	var $header1;
@@ -15,11 +16,12 @@ class Message extends DBMappedObject {
 	var $subject;
 	var $fromname;
 	var $fromaddress;
+	var $fromemail;
 
 
 	function Message ($id = NULL) {
 		$this->_tablename = "message";
-		$this->_fieldlist = array("userid", "name", "description", "type", "options", "data");
+		$this->_fieldlist = array("userid", "name", "description", "type", "data", "deleted", "lastused");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -131,7 +133,7 @@ class Message extends DBMappedObject {
 							$defvalue = "";
 						}
 						$fieldname = DBSafe($fieldname);
-						$query = "select fieldnum from fieldmap where customerid=$USER->customerid and name='$fieldname'";
+						$query = "select fieldnum from fieldmap where name='$fieldname'";
 
 						$fieldnum = QuickQuery($query);
 

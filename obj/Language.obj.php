@@ -2,13 +2,11 @@
 
 class Language extends DBMappedObject {
 
-	var $customerid;
 	var $name;
-	var $code;
 	
 	function Language ($id = NULL) {
 		$this->_tablename = "language";
-		$this->_fieldlist = array("customerid","name","code");
+		$this->_fieldlist = array("name");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

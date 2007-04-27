@@ -10,7 +10,6 @@ p1-4 = phone sequence 1-5
 
 class FieldMap extends DBMappedObject {
 
-	var $customerid;
 	var $fieldnum;
 	var $name;
 	var $options;
@@ -19,7 +18,7 @@ class FieldMap extends DBMappedObject {
 
 	function FieldMap ($id = NULL) {
 		$this->_tablename = "fieldmap";
-		$this->_fieldlist = array("customerid", "fieldnum", "name","options");
+		$this->_fieldlist = array("fieldnum", "name","options");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -39,7 +38,7 @@ class FieldMap extends DBMappedObject {
 	static function getMapNames () {
 		global $USER;
 		$map = array();
-		$query = "select name,fieldnum from fieldmap where customerid='" . $USER->customerid . "'"
+		$query = "select name,fieldnum from fieldmap"
 				." order by fieldnum";
 		if ($result = Query($query)) {
 			while ($row = DBGetRow($result)) {
@@ -52,7 +51,7 @@ class FieldMap extends DBMappedObject {
 	static function getAuthorizedMapNames () {
 		global $USER;
 		$map = array();
-		$query = "select name,fieldnum from fieldmap where customerid='" . $USER->customerid . "'"
+		$query = "select name,fieldnum from fieldmap"
 				." order by fieldnum";
 		if ($result = Query($query)) {
 			while ($row = DBGetRow($result)) {
@@ -65,7 +64,7 @@ class FieldMap extends DBMappedObject {
 
 	static function getAuthorizedFieldMaps () {
 		global $USER;
-		$fieldmaps = DBFindMany("FieldMap", "from fieldmap where customerid='" . $USER->customerid . "'");
+		$fieldmaps = DBFindMany("FieldMap", "from fieldmap");
 		foreach($fieldmaps as $key => $fieldmap)
 			if(!$USER->authorizeField($fieldmap->fieldnum))
 				unset($fieldmaps[$key]);
@@ -74,7 +73,7 @@ class FieldMap extends DBMappedObject {
 
 	static function getName ($fieldnum) {
 		global $USER;
-		$query = "select name from fieldmap where customerid='" . $USER->customerid . "'"
+		$query = "select name from fieldmap"
 				." and fieldnum = '$fieldnum'";
 		return QuickQuery($query);
 	}

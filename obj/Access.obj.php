@@ -2,19 +2,16 @@
 
 class Access extends DBMappedObject {
 
-	var $customerid;
-	var $moduserid;
 	var $name;
 	var $description;
-	var $created;
-	var $modified;
+
 	var $permissions;
 
 	function Access ($id = NULL) {
 		$this->permissions = array();
 		$this->_allownulls = true;
 		$this->_tablename = "access";
-		$this->_fieldlist = array("customerid","moduserid","name","description","created","modified");
+		$this->_fieldlist = array("name","description");
 		$this->_relations['permission'] = new DBRelationMap('Permission', $this->permissions, 'accessid', $this->id);
 		
 		//call super's constructor
