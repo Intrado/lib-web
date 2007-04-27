@@ -48,8 +48,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 		$USER->optionsarray = false; /* will be reconstructed if needed */
 
 		$ACCESS = &$_SESSION['access'];
-		if($USER->accessid != $ACCESS->id || $ACCESS->modified < QuickQuery("select modified from access where id = $ACCESS->id"))
-			$ACCESS->refresh(NULL, true);
+		$ACCESS->refresh(NULL, true);
 
 		if (!$USER->enabled || $USER->deleted || !$USER->authorize('loginweb')) {
 			redirect("./?logout=1");
