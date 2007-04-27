@@ -47,10 +47,6 @@ function fmt_actions ($obj,$name) {
 		. '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 }
 
-function fmt_creator ($obj, $name) {
-	return QuickQuery("select login from user where id = $obj->moduserid");
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,18 +58,15 @@ include_once("nav.inc.php");
 
 $titles = array(	"name" => "Name",
 					"description" => "Description",
-					"created" => "Created On",
-					"modified" => "Modified On",
-					"moduserid" => "Last Modified By",
 					"Actions" => "Actions"
 					);
 
-$data = DBFindMany("Access","from access where customerid=$USER->customerid order by name");
+$data = DBFindMany("Access","from access order by name");
 startWindow('Profile List ' . help('Security_ProfileList', NULL, 'blue'), 'padding: 3px;');
 
 button_bar(button('createaccesspro', NULL,"profile.php?id=new") . help('Security_ProfileAdd'));
 
-showObjects($data, $titles, array("Actions" => "fmt_actions", "moduserid" => "fmt_creator"), count($data) > 10);
+showObjects($data, $titles, array("Actions" => "fmt_actions" /*, "moduserid" => "fmt_creator"*/), count($data) > 10);
 endWindow();
 
 include_once("navbottom.inc.php");
