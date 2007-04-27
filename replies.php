@@ -193,15 +193,14 @@ startWindow("Responses"  . help('Replies_Responses', NULL, 'blue'), "padding: 3p
 $firstname = FieldMap::getFirstNameField();
 $lastname = FieldMap::getLastNameField();
 $detailedquery = "select SQL_CALC_FOUND_ROWS
-			p.pkey, pd.$firstname, pd.$lastname, jt.phone, coalesce(m.name, s.name), j.name, vr.replytime, vr.contentid, vr.id,
+			p.pkey, p.$firstname, p.$lastname, rc.phone, coalesce(m.name, s.name), j.name, vr.replytime, vr.contentid, vr.id,
 			vr.listened, j.type
 			from voicereply vr 
 			inner join job j on (vr.jobid = j.id)
-			join jobtask jt on (jt.id = vr.jobtaskid)
-			join persondata pd on (pd.personid = vr.personid)
-			join person p on (p.id = vr.personid)
-			join jobworkitem wi on (vr.jobworkitemid = wi.id)
-			left join message m on (m.id = wi.messageid)
+			inner join reportperson rp on(vr.personid = rp.personid and vr.jobid = rp.jobid and rp.type ='phone')
+			inner join person p on (vr.personid = p.id) 
+			left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
+			left join message m on (m.id = rp.messageid)
 			left join surveyquestionnaire s on (s.id = j.questionnaireid)
 			where vr.userid = '$USER->id'
 			$unheard
