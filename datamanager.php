@@ -38,7 +38,7 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['clear'])) {
 	$fieldnum = DBSafe($_GET['clear']);
 	if (ereg("^f[0-9]{2}$",$fieldnum)) {
-		QuickUpdate("update persondata pd inner join person p use index (ownership) on (pd.personid = p.id and p.customerid=$USER->customerid and p.userid is NULL) set `$fieldnum`=NULL ");
+		QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
 	}
 
 	redirect();
@@ -46,7 +46,7 @@ if (isset($_GET['clear'])) {
 
 
 $VALID_TYPES = array('text', 'reldate', 'multisearch');
-$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where customerid = $USER->customerid order by fieldnum");
+$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 $availablefields = array();
 for ($x = 1; $x <= 20; $x++)
 	$availablefields[] = sprintf("%02d",$x);
@@ -79,7 +79,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 			PutFormData($form, $section, 'newfield_name', $cleanedname);
 			if (!preg_match("/[a-zA-Z0-9]/", $cleanedname)) { // Find at least one alphanumeric character
 				error("Please choose a field name that is at least one alphanumeric character long");
-			} else if (QuickQuery("select * from fieldmap where name = '$cleanedname' and customerid = '$USER->customerid'")) {
+			} else if (QuickQuery("select * from fieldmap where name = '$cleanedname'")) {
 				error("Please choose a unique field name. This one is already in use.");
 			} else if (!in_array($type, $VALID_TYPES)) {
 				error("The field type, $type, is not valid");
@@ -88,13 +88,12 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				// Submit new item
 
 				$newfield->name = $cleanedname;
-				$newfield->customerid = $USER->customerid;
 				$newfield->fieldnum = "f" . GetFormData($form,$section,"newfield_fieldnum");
 				$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
 										DBSafe(GetFormData($form, $section, "newfield_type"));
 				if ($newfield->update()) {
 					// Requery to get the newly inserted row
-					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where customerid = $USER->customerid order by fieldnum");
+					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 				} else {
 					error("Uknown database error: unable to add new field data");
 				}
@@ -117,12 +116,12 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 					} else if (!in_array($type, $VALID_TYPES)) {
 						error("The field type, $type, is not valid");
 					} else if ($name !== null || $type !== null || $searchable !== null) {
-						$updatefield = DBFind("FieldMap", "from fieldmap where customerid = $USER->customerid and fieldnum = '$fieldnum'");
+						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
 						$updatefield->name = $cleanedname;
 						$updatefield->options = ($searchable ? 'searchable,' : '') . $type;
 						$updatefield->update();
 						// Requery to get the newly inserted row
-						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where customerid = $USER->customerid order by fieldnum");
+						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 					}
 				}
 			}
@@ -135,7 +134,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 }
 
 //load this after possibly saving a new field
-$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap where customerid = $USER->customerid"));
+$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap"));
 
 if( $reloadform )
 {
