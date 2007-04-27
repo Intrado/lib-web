@@ -6,7 +6,6 @@ class User extends DBMappedObject {
 	//Do not store password
 	var $accesscode;
 	//Do not store pincode
-	var $customerid;
 	var $firstname = "";
 	var $lastname = "";
 	var $phone = "";
@@ -20,7 +19,7 @@ class User extends DBMappedObject {
 	function User ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "user";
-		$this->_fieldlist = array("accessid", "login", "accesscode", "customerid", "firstname",
+		$this->_fieldlist = array("accessid", "login", "accesscode", "firstname",
 								"lastname", "email", "phone", "enabled","lastlogin","deleted", "ldap");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
@@ -37,14 +36,15 @@ class User extends DBMappedObject {
 		$password = dbsafe($password);
 
 		$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
-		$LDAP_EXTENSION = $SETTINGS['ldap']['ldapextension'];
+		$LDAP_EXTENSION = "@" . $SETTINGS['ldap']['ldapaddr'] . $SETTINGS['ldap']['ldapcom'];
 		if($IS_COMMSUITE && $IS_LDAP){
-			$userldap = QuickQuery("select user.ldap from user, customer where user.login='$username'
-				and user.customerid = customer.id and customer.hostname = '" . dbsafe($url) . "'");
+			$userldap = QuickQuery("select user.ldap from user where user.login='$username'");
 
 			if($userldap){
-				if(strpos('@',$username)!== false){
+				if(strpos('@',$username)== false){
 					$ldapusername = $username.$LDAP_EXTENSION;
+				} else {
+					$ldapusername = $username;
 				}
 				if($ds=ldap_connect($LDAP_CONNECT)) {
 					if(@ldap_bind($ds,$ldapusername,$password) && $password) {
@@ -64,13 +64,14 @@ class User extends DBMappedObject {
 		}
 		if (isset($url)) {
 			$url = DBSafe($url);
-			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.hostname='$url') "
-					."where u.enabled=1 and c.enabled=1 and u.deleted=0 and "
+			$query = "select u.id from user u " //jjl
+					."where u.enabled=1 and u.deleted=0 and "
 					."login='$username' and password=password('$password')";
 		} else {
 			$query = "select id from user where enabled=1 and deleted=0 and "
 					."login='$username' and password=password('$password')";
 		}
+
 		return QuickQuery($query);
 	}
 
@@ -85,6 +86,9 @@ class User extends DBMappedObject {
 			$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
 			$ldapusername = $SETTINGS['ldap']['ldapusername'];
 			$ldappassword = $SETTINGS['ldap']['ldappassword'];
+			$com = $SETTINGS['ldap']['ldapcom'];
+			$ad = $SETTINGS['ldap']['ldapaddr'];
+			$cn = $SETTINGS['ldap']['ldapcn'];
 
 			$query = "select login, id, ldap from user where enabled=1 and deleted=0 and "
 					."accesscode='$accesscode' and pincode=password('$pin')";
@@ -93,9 +97,7 @@ class User extends DBMappedObject {
 			if($user[2]){
 				if($ds=ldap_connect($LDAP_CONNECT)) {
 					if(@ldap_bind($ds,$ldapusername,$ldappassword)) {
-						$ad = "adtest";
-						$com = "net";
-						$cn = "users";
+						
 						$sr=ldap_search($ds, "cn=$cn, dc=$ad, dc=$com", "sAMAccountName=".$user[0]);
 						$info = ldap_get_entries($ds, $sr);
 						if(!($info[0]["useraccountcontrol"][0] & 2)){
@@ -120,7 +122,7 @@ class User extends DBMappedObject {
 		}
 		if (isset($inboundnumber)) {
 			$inboundnumber = DBSafe($inboundnumber);
-			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.inboundnumber='$inboundnumber') "
+			$query = "select u.id from user u inner join customer c on (u.customerid=c.id and c.inboundnumber='$inboundnumber') " //jjl
 					."where u.enabled=1 and c.enabled=1 and u.deleted=0 and "
 					."accesscode='$accesscode' and pincode=password('$pin')";
 		} else if (isset($customerurl)) {
@@ -196,14 +198,15 @@ class User extends DBMappedObject {
 
 	function rules()
 	{
-		return DBFindMany("Rule","from rule inner join userrule on rule.id = userrule.ruleid where userid = $this->id order by sequence");
+		return DBFindMany("Rule","from rule inner join userrule on rule.id = userrule.ruleid where userid = $this->id");
 	}
 
-	function userSQL ($alias = NULL, $pdalias =  NULL) {
-		if (!$alias){
-			return "customerid=$this->customerid " . Rule::makeQuery($this->rules(), $pdalias);}
-		else{
-			return "$alias.customerid=$this->customerid " . Rule::makeQuery($this->rules(), $pdalias);}
+	function userSQL ($alias = NULL) {
+		if ($alias)
+			$string = Rule::makeQuery($this->rules(), $alias);
+			if($string)
+				return " and " . $string;
+		return "";
 	}
 
 	function getCustomer () {
@@ -216,18 +219,18 @@ class User extends DBMappedObject {
 
 
 	//see if the login is used
-	function checkDuplicateLogin ($newlogin, $customerid, $id) {
+	function checkDuplicateLogin ($newlogin, $id) {
 		$newlogin = DBSafe($newlogin);
 
-		if (QuickQuery("select count(*) from user where customerid=$customerid and id!=" . (0+ $id) . " and login='$newlogin' and deleted=0") > 0 )
+		if (QuickQuery("select count(*) from user where id!=" . (0+ $id) . " and login='$newlogin' and deleted=0") > 0 )
 			return true;
 		else
 			return false;
 	}
 	//see if the accesscode is used
-	function checkDuplicateAccesscode ($newaccesscode, $customerid, $id = 0) {
+	function checkDuplicateAccesscode ($newaccesscode, $id = 0) {
 		$newaccesscode = DBSafe($newaccesscode);
-		if (QuickQuery("select count(*) from user where customerid=$customerid and id!=$id and accesscode='$newaccesscode'") > 0)
+		if (QuickQuery("select count(*) from user where id!=$id and accesscode='$newaccesscode'") > 0)
 			return true;
 		else
 			return false;
