@@ -19,7 +19,7 @@ class JobType extends DBMappedObject {
 		$jobtypes = DBFindMany("JobType","from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=$USER->id and jt.deleted=0 order by priority","jt");
 
 		if (count($jobtypes) == 0) {
-			$jobtypes = DBFindMany("JobType","from jobtype where customerid=$USER->customerid and deleted=0 order by priority");
+			$jobtypes = DBFindMany("JobType","from jobtype where deleted=0 order by priority");
 		}
 
 		return $jobtypes;
