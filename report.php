@@ -82,8 +82,8 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 			$range1 = date("Y-m-d",$range1);
 			$range2 = date("Y-m-d",$range2);
 
-			$_SESSION['reportsql'] = "and ( (jt.lastattempt >= unix_timestamp('$range1') * 1000 and jt.lastattempt <= unix_timestamp(date_add('$range2',interval 1 day)) * 1000 )
-									or jt.lastattempt = null) and ifnull(j.finishdate, j.enddate) >= '$range1' and j.startdate <= date_add('$range2',interval 1 day)" ;
+			$_SESSION['reportsql'] = "and ( (rc.starttime >= unix_timestamp('$range1') * 1000 and rc.starttime <= unix_timestamp(date_add('$range2',interval 1 day)) * 1000 )
+									or rc.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$range1' and j.startdate <= date_add('$range2',interval 1 day)" ;
 			$_SESSION['reportrange'] = "Range $range1 to $range2";
 			break;
 		case "relative":
@@ -118,8 +118,8 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 					$_SESSION['reportrange'] = "Last Week Day ($targetdate)";
 					break;
 			}
-			$_SESSION['reportsql'] = "and ( (jt.lastattempt >= unix_timestamp('$targetdate') * 1000 and jt.lastattempt < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000 )
-												or jt.lastattempt = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";	
+			$_SESSION['reportsql'] = "and ( (rc.starttime >= unix_timestamp('$targetdate') * 1000 and rc.starttime < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000 )
+												or rc.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";	
 			break;
 	}
 
@@ -142,7 +142,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 			$jobtypes[$index] = DBSafe($val);
 		}
 		//make a big OR group of the possible values
-		$_SESSION['reportsql'] .= " and (wi.type='" . implode($jobtypes, "' or wi.type='") . "')";
+		$_SESSION['reportsql'] .= " and (rp.type='" . implode($jobtypes, "' or rp.type='") . "')";
 	}
 
 
@@ -153,13 +153,13 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 		$statuses = array();
 
 		if (in_array("success",$results))
-			$statuses[] = "wi.status = 'success'";
+			$statuses[] = "rp.status = 'success'";
 
 		if (in_array("fail",$results))
-			$statuses[] = "wi.status = 'fail'";
+			$statuses[] = "rp.status = 'fail'";
 
 		if (in_array("inprogress",$results))
-			$statuses[] = "wi.status not in ('success','fail','duplicate')";
+			$statuses[] = "rp.status not in ('success','fail','duplicate')";
 
 		//make a big OR group of the possible values
 		$_SESSION['reportsql'] .= " and (" . implode($statuses, " or ") . ")";
@@ -173,7 +173,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 			$callprogresses[$index] = DBSafe($val);
 		}
 		//make a big OR group of the possible values
-		$_SESSION['reportsql'] .= " and (cl.callprogress='" . implode($callprogresses, "' or cl.callprogress='") . "')";
+		$_SESSION['reportsql'] .= " and (rc.result='" . implode($callprogresses, "' or rc.result='") . "')";
 	}
 
 	if (isset($_GET['filter_pkey']) && $_GET['filter_pkey'] &&
@@ -186,14 +186,14 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 		isset($_GET['filter_phone_data'])) {
 		$phone = DBSafe(Phone::parse($_GET['filter_phone_data']));
 
-		$_SESSION['reportsql'] .= " and cl.phonenumber like '%$phone%'";
+		$_SESSION['reportsql'] .= " and rc.phone like '%$phone%'";
 	}
 
-	$orderfields = array(	"fname" => "pd.f01,pd.f02",
-							"lname" => "pd.f02,pd.f01",
-							"type" => "wi.type,pd.f02,pd.f01",
-							"attempt" => "jt.lastattempt",
-							"result" => "wi.status,cl.callprogress,pd.f02,pd.f01"
+	$orderfields = array(	"fname" => "p.f01,p.f02",
+							"lname" => "p.f02,p.f01",
+							"type" => "rp.type,p.f02,p.f01",
+							"attempt" => "rc.starttime",
+							"result" => "rp.status,rc.starttime,p.f02,p.f01"
 						);
 
 
@@ -257,7 +257,6 @@ function fmt_message ($row,$index) {
 }
 
 $starttime = microtime_float();
-$usersql = "p.customerid=" . $USER->customerid;
 
 ////////// paging ///////////
 
@@ -274,10 +273,10 @@ $ordersql = $_SESSION['reportordersql'];
 
 //if this user can see systemwide reports, then lock them to the customerid
 //otherwise lock them to jobs that they own
-if ($USER->authorize('viewsystemreports')) {
-	$userJoin = " and u.customerid = $USER->customerid ";
-} else {
+if (!$USER->authorize('viewsystemreports')) {
 	$userJoin = " and j.userid = $USER->id ";
+} else {
+	$userJoin = "";
 }
 
 
@@ -289,13 +288,13 @@ if ($USER->authorize('viewsystemreports')) {
 
 $summaryquery = "
 select
-	wi.type,
-	count(wi.personid) as people,
-	sum(wi.status='success' or wi.status='fail') / (count(wi.personid) + 0.00 - sum(wi.status = 'duplicate')) as completed_percent,
-	sum(wi.status='success') as success,
-	sum(wi.status='fail') as fail,
-	sum(wi.status not in ('success','fail','duplicate')) as in_progress,
-	sum(wi.status = 'duplicate') as duplicate,
+	rp.type,
+	count(rp.personid) as people,
+	sum(rp.status='success' or rp.status='fail') / (count(rp.personid) + 0.00 - sum(rp.status = 'duplicate')) as completed_percent,
+	sum(rp.status='success') as success,
+	sum(rp.status='fail') as fail,
+	sum(rp.status not in ('success','fail','duplicate')) as in_progress,
+	sum(rp.status = 'duplicate') as duplicate,
 	0 as success_rate,
 
 	0 as total_attempts,
@@ -303,19 +302,16 @@ select
 	j.userid, j.name, u.firstname, u.lastname, u.login
 
 	from 		job j
-	inner join jobworkitem wi on (wi.jobid=j.id)
+	inner join reportperson rp on (rp.jobid=j.id)
 	inner join user u on (u.id = j.userid)
-	left join	jobtask jt on
-					(jt.id=wi.currentjobtaskid)
+	left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 	left join	person p on
-					(p.id=wi.personid)
-	left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1) and cl.customerid = $USER->customerid)
+					(p.id=rp.personid)
 	where  1
 	$userJoin
 	$reportsql
 
-	group by wi.type
+	group by rp.type
 ";
 
 /*
@@ -341,51 +337,38 @@ select
 $detailquery="
 select SQL_CALC_FOUND_ROWS
 	p.pkey,
-	pd.f01,
-	pd.f02,
-	wi.type,
+	p.f01,
+	p.f02,
+	rp.type,
 	m.name,
-	coalesce(jt.phone,
-				ph.phone,
-				jt.email,
-				e.email,
+	coalesce(rc.phone,
+				rc.email,
 				concat(
-					coalesce(a.addr1,''), ' ',
-					coalesce(a.addr2,''), ' ',
-					coalesce(a.city,''), ' ',
-					coalesce(a.state,''), ' ',
-					coalesce(a.zip,''))
+					coalesce(rc.addr1,''), ' ',
+					coalesce(rc.addr2,''), ' ',
+					coalesce(rc.city,''), ' ',
+					coalesce(rc.state,''), ' ',
+					coalesce(rc.zip,''))
 			) as destination,
-	jt.numattempts,
-	from_unixtime(jt.lastattempt/1000),
-	coalesce(cl.callprogress,
-			wi.status) as result,
-	wi.status,
+	rc.numattempts,
+	from_unixtime(rc.starttime/1000),
+	coalesce(rc.result,
+			rp.status) as result,
+	rp.status,
 	j.maxcallattempts,
 	u.login,
 	j.name,
-	cl.resultdata,
+	rc.resultdata,
 	sec.resultdata
 
 	from 		person p
-	inner join jobworkitem wi on (p.id = wi.personid)
-	inner join job j on (wi.jobid = j.id)
+	inner join reportperson rp on (p.id = rp.personid)
+	inner join job j on (rp.jobid = j.id)
 	inner join user u on (u.id = j.userid)
-	left join	persondata pd on
-					(pd.personid=p.id)
-	left join	jobtask jt on
-					(jt.jobworkitemid=wi.id)
-	left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1) and cl.customerid = $USER->customerid)
-	left join	phone ph on
-					(ph.id=jt.phoneid and wi.type='phone')
-	left join	email e on
-					(e.id=jt.emailid and wi.type='email')
-	left join	address a on
-					(a.id=jt.addressid and wi.type='print')
+	left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 	left join	message m on
-					(m.id = wi.messageid)
-	left join	surveyemailcode sec on (sec.jobworkitemid = wi.id and j.type='survey' and wi.type='email')
+					(m.id = rp.messageid)
+	left join	surveyemailcode sec on (sec.jobworkitemid = wi.id and j.type='survey' and rp.type='email')
 
 	where 1
 		$userJoin
