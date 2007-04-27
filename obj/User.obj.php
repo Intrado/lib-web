@@ -202,10 +202,11 @@ class User extends DBMappedObject {
 	}
 
 	function userSQL ($alias = NULL) {
-		if ($alias)
+		if ($alias){
 			$string = Rule::makeQuery($this->rules(), $alias);
 			if($string)
 				return " and " . $string;
+		}
 		return "";
 	}
 
