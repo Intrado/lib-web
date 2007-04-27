@@ -75,10 +75,10 @@ if(CheckFormSubmit($f,$s))
 			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
 		} elseif(!ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength) && !$USER->ldap){
 			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
-		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $USER->id)) {
+		} elseif (User::checkDuplicateLogin($login, $USER->id)) {
 			error('This username already exists, please choose another');
-		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $USER->id)) {
-			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $USER->id,  $USER->customerid);
+		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->id)) {
+			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $USER->id);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
@@ -270,8 +270,7 @@ startWindow('User Information');
 						
 <? /*CSDELETEMARKER_START*/
 						if($USER->authorize('loginphone') && !$IS_COMMSUITE) {
-							$query = "Select inboundnumber from customer where customer.id='$USER->customerid'";
-							$tollfree = Phone::format(QuickQuery($query));
+							$tollfree = Phone::format(getSystemSetting("inboundnumber"));
 ?>
 							<br>Your toll free number is: <?=$tollfree?>
 <?
