@@ -38,16 +38,13 @@ $cpcodes = array(
 $query = "
 select count(*) as cnt,
 		coalesce(callprogress,
-			if (wi.status not in ('fail','queued','inprogress','duplicate'), 'inprogress',wi.status))
+			if (rp.status not in ('fail','queued','inprogress','duplicate'), 'inprogress',rp.status))
 			as callprogress
-from jobworkitem wi
-left join job j on (wi.jobid = j.id)
-left join	jobtask jt on
-					(jt.jobworkitemid=wi.id)
-left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
-where wi.jobid=j.id and j.userid='$USER->id' and j.status='active'
-and wi.type='phone'
+from job j
+	inner join reportperson rp on (rp.jobid = j.id)
+	left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
+where j.userid='$USER->id' and j.status='active'
+and rp.type='phone'
 group by callprogress
 order by cnt asc
 ";

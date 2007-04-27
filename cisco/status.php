@@ -15,24 +15,18 @@ $jobs = DBFindMany("Job", "from job where userid=$USER->id and deleted=0 and sta
 foreach ($jobs as $job) {
 	$query = "
 	select
-		count(wi.personid) as people,
-		sum(wi.status='success' or wi.status='fail') / (count(wi.personid) + 0.00 - sum(wi.status = 'duplicate')) as completed_percent,
-		sum(wi.status='success') as success,
-		sum(wi.status='fail') as fail,
-		sum(wi.status not in ('success','fail','duplicate')) as in_progress,
-		sum(wi.status = 'duplicate') as duplicate,
-		sum(wi.status='success') / (sum(wi.status='success' or wi.status='fail' or (jt.numattempts>0 and wi.status = 'queued' or wi.status='scheduled')) +0.00) as success_rate
+		count(rp.personid) as people,
+		sum(rp.status='success' or rp.status='fail') / (count(rp.personid) + 0.00 - sum(rp.status = 'duplicate')) as completed_percent,
+		sum(rp.status='success') as success,
+		sum(rp.status='fail') as fail,
+		sum(rp.status not in ('success','fail','duplicate')) as in_progress,
+		sum(rp.status = 'duplicate') as duplicate,
+		sum(rp.status='success') / (sum(rp.status='success' or rp.status='fail' or (rc.numattempts>0 and rp.status = 'queued' or rp.status='scheduled')) +0.00) as success_rate
 
-		from 		job j, jobworkitem wi
-		left join	jobtask jt on
-						(jt.jobworkitemid=wi.id)
-		left join	person p on
-						(p.id=wi.personid)
-		left join	calllog cl on
-						(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
-		where wi.jobid=j.id
-		and j.id = $job->id
-		and wi.type='phone'
+		from reportperson rp
+		left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
+		where rp.jobid = $job->id
+		and rp.type='phone'
 	";
 
 
