@@ -1,8 +1,6 @@
 <?
 
 function getCustomerName($url) {
-	error_log("getCustomerName");
-
 	$params = array($url);
 	$method = "AuthServer.getCustomerName";
 	$request = xmlrpc_encode_request($method,$params);
@@ -27,9 +25,6 @@ function getCustomerName($url) {
 }
 
 function doLogin($loginname, $password, $url) {
-
-	error_log("doLogin BEGIN");
-
 	$params = array($loginname, $password, $url);
 	$method = "AuthServer.login";
 	$request = xmlrpc_encode_request($method,$params);
@@ -48,20 +43,13 @@ function doLogin($loginname, $password, $url) {
 	    error_log("doLogin failed " . $response[result]);
 	} else {
 		// login success
-		error_log("doLogin success new session id ".$response[sessionID]);
-
 		session_id($response[sessionID]); // set the session id
-
 		doStartSession();
-
 		return $response[userID];
 	}
-
 }
 
 function forceLogin($loginname, $url) {
-	error_log("forceLogin ".$loginname);
-
 	$params = array($loginname, $url, session_id());
 	$method = "AuthServer.forceLogin";
 	$request = xmlrpc_encode_request($method,$params);
@@ -80,15 +68,11 @@ function forceLogin($loginname, $url) {
 	    error_log("forceLogin failed " . $response[result]);
 	} else {
 		// login success
-		error_log("forceLogin success");
-
 		return $response[userID];
 	}
 }
 
 function getSessionData($id) {
-	error_log("getSessionData with id=".$id);
-
 	$params = array($id);
 	$method = "AuthServer.getSessionData";
 	$request = xmlrpc_encode_request($method,$params);
@@ -130,8 +114,6 @@ function getSessionData($id) {
 }
 
 function putSessionData($id, $sess_data) {
-	error_log("putSessionData id=".$id."  data=".$sess_data);
-
 	$params = array($id, $sess_data);
 	$method = "AuthServer.putSessionData";
 	$request = xmlrpc_encode_request($method,$params);
