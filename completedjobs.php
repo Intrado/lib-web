@@ -41,7 +41,7 @@ startWindow('Completed Notification Jobs ' . help('System_CompletedJobs', NULL, 
 
 //get this page's worth of jobs
 $query = "select SQL_CALC_FOUND_ROWS j.id from job j, user u
-where j.userid=u.id and u.customerid = $USER->customerid and j.deleted = 0 and
+where j.userid=u.id and j.deleted = 0 and
             	(j.status = 'complete' or j.status = 'cancelled')
 order by finishdate desc limit $start, $limit
 ";
@@ -57,13 +57,13 @@ if ($total == 0) {
 	$jobidlist = implode(",",$jobids);
 
 	//just get the stats data for this page
-	$query = "select wi.jobid,
-					wi.type,
+	$query = "select rp.jobid,
+					rp.type,
 					count(*) as total,
-					100 * sum(wi.status='success') / (sum(wi.status != 'duplicate') +0.00) as success_rate
-	from jobworkitem wi
-	where wi.jobid in ($jobidlist)
-	group by wi.jobid, wi.type
+					100 * sum(rp.status='success') / (sum(rp.status != 'duplicate') +0.00) as success_rate
+	from reportperson rp
+	where rp.jobid in ($jobidlist)
+	group by rp.jobid, rp.type
 	";
 
 	$jobstats = array();
