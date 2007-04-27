@@ -8,14 +8,13 @@ if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid']
 	if ($_GET['type'] == "add") {
 		if ($_GET['toggle'] == "true") {
 			//insert into db
-			$usersql = $USER->userSQL("p", "pd");
+			$usersql = $USER->userSQL("p");
 			$query = "select p.id
 					from 		person p
-								left join	persondata pd on
-										(p.id=pd.personid)
-					where p.id='$id' and (($usersql) or
-											(p.userid = 0 and p.customerid=$USER->customerid) or
-											p.userid = $USER->id)
+								
+					where p.id='$id' and (p.userid = 0 or
+										p.userid = $USER->id or
+										(1 $usersql))
 				";
 			if ($personid = QuickQuery($query)) {
 				QuickUpdate("insert into listentry (listid,type,personid)"
