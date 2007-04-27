@@ -12,7 +12,6 @@ include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Person.obj.php");
-include_once("obj/PersonData.obj.php");
 include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
@@ -30,14 +29,11 @@ if (isset($_GET['id'])) {
 	}
 
 	// validate user has rights to view this contact
-	$usersql = $USER->userSQL("p", "pd");
-
+	$usersql = $USER->userSQL("p");
 	$query = "
 		select p.id
 		from 		person p
-					left join	persondata pd on
-							(p.id=pd.personid)
-		where p.id='$personid' and $usersql
+		where p.id='$personid' $usersql
 	";
 
 	if (!($personid = QuickQuery($query))) {
@@ -59,7 +55,7 @@ if (!$maxemails = getSystemSetting("maxemails"))
 
 if (isset($personid)) {
 	// editing existing person
-	$data = DBFind("PersonData", "from persondata where personid = " . $personid);
+	$data = DBFind("Person", "from person where id = " . $personid);
 	$address = DBFind("Address", "from address where personid = " . $personid);
 	if ($address === false) $address = new Address(); // contact was imported/uploaded without any address data, create one now
 
