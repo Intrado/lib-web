@@ -42,7 +42,7 @@ if (!$USER->enabled) {
 	exit(-4);
 }
 
-$timezone = QuickQuery("select timezone from customer where id=$USER->customerid");
+$timezone = getSystemSetting("timezone");
 date_default_timezone_set($timezone);
 QuickUpdate("set time_zone='" . $timezone . "'");
 
@@ -94,12 +94,12 @@ QuickUpdate($query);
 if (!QuickQuery("select count(*) from job where assigned='$code' and id=$jobid"))
 	exit(-2); //not me!
 
-$usersql = $USER->userSQL("p","pd");
+$usersql = $USER->userSQL("p");
 //get and compose list rules
 $listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
 		and le.ruleid=r.id and le.listid='" . $job->listid .  "' order by le.sequence", "r");
 if (count($listrules) > 0)
-	$listsql = "1" . Rule::makeQuery($listrules, "pd");
+	$listsql = "1" . Rule::makeQuery($listrules, "p");
 else
 	$listsql = "0";//dont assume anyone is in the list if there are no rules
 
@@ -138,25 +138,24 @@ if ($job->type == "survey") {
 			continue;
 
 		//insert the workitems with no messageid, messagedigester will pick up that this is a survey and go from there
+		//TODO: fix jobworkitem related code
 		echo "$type\n";
 		$query = "
-			insert into jobworkitem (jobid, customerid, type, personid, priority, systempriority, status)
-			(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+			insert into jobworkitem (jobid, type, personid, priority, systempriority, status)
+			(select $jobid as jobid, '$type' as type, p.id as personid,
 				$priority as priority, $systempriority as systempriority, 'new' as status
-			from person p left join persondata pd on (p.id=pd.personid)
+			from person p
 			left join listentry le on (p.id=le.personid and le.listid=$job->listid)
 			where $usersql and $listsql and le.type is null and p.userid is null order by p.id)
 
 			union all
 
-			(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+			(select $jobid as jobid, '$type' as type, p.id as personid,
 				$priority as priority, $systempriority as systempriority, 'new' as status
 			from listentry le
 			straight_join person p on (p.id=le.personid)
-			left join persondata pd on (le.personid=pd.personid)
-			left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
-			where p.customerid = $USER->customerid
-			and le.listid=$job->listid and le.type='A'
+			left join joblanguage jl on (p.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
+			where le.listid=$job->listid and le.type='A'
 			order by le.id)
 		";
 
@@ -183,27 +182,25 @@ if ($job->type == "survey") {
 
 		if ($defmsgid != NULL) {
 			$query = "
-				insert into jobworkitem (jobid, customerid, type,personid, messageid, priority, systempriority, status)
-				(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+				insert into jobworkitem (jobid, type,personid, messageid, priority, systempriority, status)
+				(select $jobid as jobid, '$type' as type, p.id as personid,
 					coalesce(jl.messageid,$defmsgid) as messageid, $priority as priority, $systempriority as systempriority,
 					'new' as status
-				from person p left join persondata pd on (p.id=pd.personid)
+				from person p
 				left join listentry le on (p.id=le.personid and le.listid=$job->listid)
-				left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
+				left join joblanguage jl on (p.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
 				where $usersql and $listsql and le.type is null and p.userid is null
 				order by p.id)
 
 				union all
 
-				(select $jobid as jobid, $USER->customerid as customerid, '$type' as type, p.id as personid,
+				(select $jobid as jobid, '$type' as type, p.id as personid,
 					coalesce(jl.messageid,$defmsgid) as messageid, $priority as priority, $systempriority as systempriority,
 					'new' as status
 				from listentry le
 				straight_join person p on (p.id=le.personid)
-				left join persondata pd on (le.personid=pd.personid)
-				left join joblanguage jl on (pd.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
-				where p.customerid = $USER->customerid
-				and le.listid=$job->listid and le.type='A'
+				left join joblanguage jl on (p.$langfield=jl.language and jl.jobid=$jobid and jl.type='$type')
+				where le.listid=$job->listid and le.type='A'
 				order by le.id)
 			";
 
