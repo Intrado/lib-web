@@ -33,9 +33,10 @@ include_once("../obj/SurveyQuestionnaire.obj.php");
 include_once("../obj/SurveyQuestion.obj.php");
 
 
-$custname = QuickQuery("select name from customer where hostname='" . DBSafe($CUSTOMERURL) . "'");
+$custname = getSystemSetting("customername");
 
 //see if this code exists and has not already been used
+//TODO: fix jobworkitem related code
 $query = "select jobworkitemid, isused from surveyemailcode where code='" . DBSafe($code) . "'";
 if (strlen($code) > 0 && $row = QuickQueryRow($query)) {
 	$exists = true;
@@ -93,6 +94,7 @@ if (isset($_POST['submit']) && $exists && !$isused && $job->status == "active") 
 		QuickUpdate($query);
 
 		//we should also try to cancel the phone call in case it has not already been sent. Just fail it out if it is queued.
+		//TODO: fix jobworkitem related code
 		QuickUpdate("update jobworkitem wi_phone "
 					. "inner join jobworkitem wi_email on (wi_phone.personid=wi_email.personid "
 											."and wi_phone.jobid=wi_email.jobid and wi_email.type='email') "
