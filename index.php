@@ -35,8 +35,8 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 	if ($id) {
 		$USER = $_SESSION['user'] = new User($id);
 		$_SESSION['access'] = new Access($USER->accessid);
-		$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
-		$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
+		$_SESSION['custname'] = getSystemSetting("hostname");
+		$_SESSION['timezone'] = getSystemSetting("timezone");
 		redirect("start.php");
 	} else {
 		$badlogin = true;
@@ -55,8 +55,8 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 		if($newuser->enabled && $newaccess->getValue('loginweb')) {
 			$USER = $_SESSION['user'] = $newuser;
 			$ACCESS = $_SESSION['access'] = $newaccess;
-			$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
-			$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
+			$_SESSION['custname'] = getSystemSetting("hostname");
+			$_SESSION['timezone'] = getSystemSetting("timezone");
 			QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 			$USER->lastlogin = QuickQuery("select now()");
 			$USER->update(array("lastlogin"));
@@ -70,8 +70,8 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 }
 
 //try to find the customer's name
-$custname = QuickQuery("select name from customer where hostname='" . DBSafe($CUSTOMERURL) . "'");
-
+//$custname = QuickQuery("select name from customer where hostname='" . DBSafe($CUSTOMERURL) . "'");
+$custname = getSystemSetting("hostname");
 
 if ($IS_COMMSUITE) {
 
