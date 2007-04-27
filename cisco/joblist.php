@@ -14,14 +14,17 @@ if($min - 31 <= 0){
 	$back = $min - 31;
 }
 
-$activejoblist=QuickQueryList("select id from job where userid = '$USER->id' and status = 'active' and deleted = '0' 
+$activejoblist=QuickQueryList("select SQL_CALC_FOUND_ROWS
+	id from job where userid = '$USER->id' and status = 'active' and deleted = '0' 
 	order by id desc
 	limit 30 offset $min");
+$activecount = QuickQuery("select found_rows()");	
 
-$completedjoblist=QuickQueryList("select id from job where userid = '$USER->id' and status = 'complete'  and deleted = '0' 
+$completedjoblist=QuickQueryList("select SQL_CALC_FOUND_ROWS
+	id from job where userid = '$USER->id' and status = 'complete'  and deleted = '0' 
 	order by finishdate desc
 	limit 30 offset $min");
-
+$completedcount = QuickQuery("select found_rows()");
 
 header("Content-type: text/xml");
 ?>
@@ -59,20 +62,29 @@ foreach($completedjoblist as $job){
 
 <SoftKeyItem>
 <Name>Back</Name>
-<URL><?= htmlentities($URL . "/main.php") ?></URL>
+<URL><?= htmlentities($URL . "/status.php") ?></URL>
 <Position>2</Position>
 </SoftKeyItem>
 
-<SoftKeyItem>
-<Name>Mor Job</Name>
-<URL><?= htmlentities($URL . "/joblist.php?max=". $max)  ?></URL>
-<Position>3</Position>
-</SoftKeyItem>
-
-<SoftKeyItem>
-<Name>Bck Job</Name>
-<URL><?= htmlentities($URL . "/joblist.php?max=". $back)  ?></URL>
-<Position>4</Position>
-</SoftKeyItem>
+<?
+	if($min) {
+?>
+		<SoftKeyItem>
+		<Name>Bck Job</Name>
+		<URL><?= htmlentities($URL . "/joblist.php?max=". $back)  ?></URL>
+		<Position>3</Position>
+		</SoftKeyItem>
+<?
+	}
+	if($activecount > $max || $completedcount > $max) {
+?>
+		<SoftKeyItem>
+		<Name>Mor Job</Name>
+		<URL><?= htmlentities($URL . "/joblist.php?max=". $max)  ?></URL>
+		<Position>4</Position>
+		</SoftKeyItem>
+<?
+	}
+?>
 
 </CiscoIPPhoneMenu>
