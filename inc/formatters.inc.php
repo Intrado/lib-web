@@ -196,7 +196,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 				$usedelbtn = $archivebtn;
 
 			if($USER->authorize('createreport') && $USER->authorize('leavemessage'))
-				$buttons = array($editbtn,$reportbtn,$monitorbtn, $viewresponses, $usedelbtn);
+				$buttons = array($editbtn,$reportbtn,$graphbtn, $viewresponses, $usedelbtn);
 			else if($USER->authorize('leavemessage'))
 				$buttons = array($editbtn, $viewresponses, $usedelbtn);
 			else if ($USER->authorize('createreport'))
@@ -231,8 +231,11 @@ function fmt_job_startdate ($obj,$name) {
 function fmt_status($obj, $name) {
 	global $USER;
 	if ($obj->status == 'new') {
-		$assigned = QuickQuery("select assigned from job where id='$obj->id'");
-		if (!$assigned)
+		if($obj->id)
+			$assigned = QuickQuery("select status from job where id='$obj->id'");
+		else 
+			$assigned = false;
+		if ($assigned=="new")
 			return 'Not Submitted';
 		else
 			return "Processing";
