@@ -23,9 +23,12 @@ if ($SETTINGS['feature']['has_ssl']) {
 
 
 $badlogin = false;
+if (isset($_GET['login'])) {
+	doStartSession();
+}
 if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
 
-	$id = forceLogin($login, $CUSTOMERURL);
+	$id = forceLogin(get_magic_quotes_gpc() ? stripslashes($_GET['login']) : $_GET['login'], $CUSTOMERURL);
 
 	if ($id) {
 		$USER = $_SESSION['user'] = new User($id);
