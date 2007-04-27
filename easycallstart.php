@@ -28,7 +28,7 @@ if(isset($_REQUEST['id'])) {
 	$_SESSION['easycallid'] = null;
 	redirect();
 }
-$languages = DBFindMany("Language","from language where customerid= '$USER->customerid' order by name");
+$languages = DBFindMany("Language","from language order by name");
 
 
 // FORM HANDLING
@@ -75,7 +75,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				$task = new SpecialTask();
 				$task->data = $oldtask->data;
 				$task->type = $oldtask->type;
-				$task->customerid = $oldtask->customerid;
 				$task->setData('phonenumber', $phone);
 				$task->setData('progress', 'Creating Call');
 				$task->setData('error', "0");
@@ -107,7 +106,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 					$task->status = "new";
 				else			
 					$task->status = "queued";
-				$task->customerid=$USER->customerid;
 				if($USER->authorize('sendmulti') && GetFormData($f, $s,'addlangs')) {
 					$languagearray = array();
 					$langcount = $task->getData("totalamount");

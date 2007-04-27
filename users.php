@@ -28,8 +28,8 @@ if (isset($_GET['delete'])) {
 	if ($_SESSION['userid'] == $deleteid)
 		$_SESSION['userid'] = NULL;
 	if (customerOwns("user",$deleteid)) {
-		QuickUpdate("update user set enabled=0, deleted=1 where id='$deleteid' and customerid=$USER->customerid");
-		QuickUpdate("delete from job where status='repeating' and userid='$deleteid' and customerid=$USER->customerid");
+		QuickUpdate("update user set enabled=0, deleted=1 where id='$deleteid'");
+		QuickUpdate("delete from job where status='repeating' and userid='$deleteid'");
 	}
 	redirect();
 }
@@ -37,14 +37,14 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['disable'])) {
 	$id = DBSafe($_GET['disable']);
 	if (customerOwns("user",$id))
-		QuickUpdate("update user set enabled = 0 where id = '$id' and customerid=$USER->customerid");
+		QuickUpdate("update user set enabled = 0 where id = '$id'");
 	redirect();
 }
 
 if (isset($_GET['enable'])) {
 	$id = DBSafe($_GET['enable']);
 	if (customerOwns("user",$id))
-		QuickUpdate("update user set enabled = 1 where id = '$id' and customerid=$USER->customerid");
+		QuickUpdate("update user set enabled = 1 where id = '$id'");
 	redirect();
 }
 
@@ -93,14 +93,14 @@ startWindow('Active Users ' . help('Users_ActiveUsersList', NULL, "blue"), 'padd
 
 button_bar(button('adduser', NULL,"user.php?id=new") . help('Users_UserAdd'));
 
-$data = DBFindMany("User","from user where customerid=$USER->customerid and enabled and deleted=0 order by lastname, firstname");
+$data = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
 showObjects($data, $titles, array("Actions" => "fmt_actions_en", 'AccessProfile' => 'fmt_acc_profile', "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
 endWindow();
 
 print '<br>';
 
 startWindow('Inactive Users ' . help('Users_InactiveUsersList', NULL, "blue"), 'padding: 3px;');
-$data = DBFindMany("User","from user where customerid=$USER->customerid and not enabled and deleted=0 order by lastname, firstname");
+$data = DBFindMany("User","from user where not enabled and deleted=0 order by lastname, firstname");
 showObjects($data, $titles, array('AccessProfile' => 'fmt_acc_profile', "Actions" => "fmt_actions_dis", "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
 endWindow();
 

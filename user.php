@@ -109,10 +109,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
 		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && !ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
 			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
-		} elseif (User::checkDuplicateLogin($login, $USER->customerid, $_SESSION['userid'])) {
+		} elseif (User::checkDuplicateLogin($login, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
-		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->customerid, $_SESSION['userid'])) {
-			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid'],  $USER->customerid);
+		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $_SESSION['userid'])) {
+			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid']);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
@@ -146,7 +146,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be
 			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname"));
 			$usr->email = $emaillist;
 			$usr->login = $login;
-			$usr->customerid = $USER->customerid;
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
 			if($IS_LDAP){
 				if(GetFormData($f, $s, "ldap")) {
@@ -367,7 +366,7 @@ startWindow('User Information');
 								<td>
 								<?
 								NewFormItem($f,$s,'accessid','selectstart');
-								$accss = DBFindMany('Access', "from access where customerid = $USER->customerid");
+								$accss = DBFindMany('Access', "from access");
 								if(count($accss))
 									foreach($accss as $acc)
 										NewFormItem($f,$s,'accessid','selectoption',$acc->name,$acc->id);
@@ -396,7 +395,7 @@ startWindow('User Information');
 								<td>
 								<?
 									// changed query from name, id to id, name; jjl
-									$options = QuickQueryList("select id, name from jobtype where customerid=$USER->customerid and deleted=0 order by priority asc", true);
+									$options = QuickQueryList("select id, name from jobtype where deleted=0 order by priority asc", true);
 									if(!count($options))
 										$options['No Job Types Defined'] = 0;
 									NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,'id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');

@@ -37,7 +37,7 @@ $messageid = $_SESSION['previewmessageid'];
 
 //find all unique fields used in this message
 
-$messagefields = DBFindMany("FieldMap", "from fieldmap where customerid = $USER->customerid and fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
+$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
 
 $dopreview = 0;
 $fields = array();
@@ -145,7 +145,7 @@ startWindow('Preview Options', 'padding: 3px;');
 			//FIXME whats wrong with the SQL generating code in Rule.obj?
 			$limitsql = $limit ? "and value in ('" . implode("','", explode('|', $limit->val)) . "')" : NULL;
 			$query = "select value from persondatavalues
-						where fieldnum='$fieldnum' and customerid='" . $USER->customerid . "' $limitsql order by value";
+						where fieldnum='$fieldnum' $limitsql order by value";
 			$values = QuickQueryList($query);
 			if (count($values) > 1) {
 				//if (!GetFormData($f,$s,$fieldnum))

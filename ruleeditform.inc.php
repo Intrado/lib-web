@@ -195,7 +195,7 @@ foreach ($fieldmaps as $fieldmap) {
 			$limit = DBFind('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $USER->id and fieldnum = '$fieldnum'");
 			$limitsql = $limit ? $limit->toSQL(false,"value") : "";
 			$query = "select value from persondatavalues
-						where fieldnum='$fieldnum' and customerid='" . $USER->customerid . "' $limitsql order by value";
+						where fieldnum='$fieldnum' $limitsql order by value";
 
 			$values = QuickQueryList($query);
 			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","array",$values);

@@ -148,7 +148,7 @@ foreach ($jobs as $job) {
 		<td style="vertical-align: top">
 		<select id="option_jobpriority_select" name="option_jobpriority_data[]" multiple onmousedown="setChecked('option_jobpriority');">
 		<?
-		$jobpriorities = DBFindMany("JobType","from jobtype where customerid=$USER->customerid");
+		$jobpriorities = DBFindMany("JobType","from jobtype");
 		foreach ($jobpriorities as $jobpriority) {
 			if(!$jobpriority->deleted)
 				echo '<option value="' . $jobpriority->id . '">' . htmlentities($jobpriority->name) . '</option>';

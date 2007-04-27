@@ -359,7 +359,7 @@ if ($job->id) {
 	$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
 }
 
-$languages = DBFindMany("Language","from language where customerid=" . $USER->customerid);
+$languages = DBFindMany("Language","from language");
 
 $peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
 

@@ -40,7 +40,7 @@ $f = "search";
 $s = "main";
 $reloadform = 0;
 
-$fieldmaps = DBFindMany("FieldMap", "from fieldmap where customerid='" . $USER->customerid . "'");
+$fieldmaps = DBFindMany("FieldMap", "from fieldmap");
 
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'refresh'))
 {

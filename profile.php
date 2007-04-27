@@ -56,7 +56,6 @@ if(CheckFormSubmit($form,$section))
 			//submit changes
 
 			$accss = new Access($_SESSION['accessid']);
-			$accss->customerid = $USER->customerid;
 			$accss->moduserid = $USER->id;
 			$accss->modified = date("Y-m-d H:i:s");
 			if(!$accss->id)
