@@ -63,7 +63,7 @@ class RenderedList {
 	function renderList($getdata = true) {
 		global $USER;
 
-		$usersql = $USER->userSQL("p", "pd");
+		$usersql = $USER->userSQL("p");
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -80,11 +80,10 @@ class RenderedList {
 		//if (strlen($pdfields) > 0)
 		//	$pdfields = "," . $pdfields;
 		$pfields = "p.id";
-		$pdfields = "";
 		$contactfields = "";
 		if ($getdata) {
 			$pfields .= ", p.pkey";
-			$pdfields = ", pd.$this->firstname, pd.$this->lastname, pd.$this->language";
+			$pfields .= ", p.$this->firstname, p.$this->lastname, p.$this->language";
 			$contactfields = ",ph.phone,
 								e.email,
 								concat(
@@ -118,11 +117,8 @@ class RenderedList {
 		$query = "
 			(select ifnull(le.type,'R') as entrytype,
 			$pfields
-			$pdfields
 			$contactfields
 			from 		person p
-			left join	persondata pd on
-								(p.id=pd.personid)
 			left join	listentry le on
 								(p.id=le.personid and le.listid = $listid)
 			";
@@ -137,17 +133,14 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where $usersql and p.userid is null $modesql1 and $listsql)
+			where p.userid is null $modesql1 and $listsql $usersql)
 
 			union all
 
 			(select (le.type) as entrytype,
 			$pfields
-			$pdfields
 			$contactfields
 			from 		person p
-			left join	persondata pd on
-								(p.id=pd.personid)
 			left join	listentry le on
 								(le.listid = $listid and p.id=le.personid)
 			";
@@ -162,7 +155,7 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where p.customerid = $USER->customerid $modesql2 and le.type='A')
+			where le.type='A' $modesql2 )
 
 			$orderby
 			$pagesql
@@ -197,7 +190,7 @@ class RenderedList {
 	function renderSearch ($getdata = true) {
 		global $USER;
 
-		$usersql = $USER->userSQL("p", "pd");
+		$usersql = $USER->userSQL("p");
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -212,7 +205,7 @@ class RenderedList {
 		if($this->searchrules === false)
 			$searchsql = "and 0";
 		elseif (count($this->searchrules) > 0)
-			$searchsql = Rule::makeQuery($this->searchrules, "pd");
+			$searchsql = Rule::makeQuery($this->searchrules, "p");
 		else
 			$searchsql = "";
 
@@ -223,11 +216,10 @@ class RenderedList {
 			$statssql = "";
 
 		$pfields = "p.id";
-		$pdfields = "";
 		$contactfields = "";
 		if ($getdata) {
 			$pfields .= ", p.pkey";
-			$pdfields = ", pd.$this->firstname,pd.$this->lastname, pd.$this->language";
+			$pfields .= ", p.$this->firstname,p.$this->lastname, p.$this->language";
 
 			$contactfields = ",ph.phone,
 								e.email,
@@ -249,7 +241,7 @@ class RenderedList {
 						continue;
 					}
 
-					$contactfields .= ", pd.$key ";
+					$contactfields .= ", p.$key ";
 				}
 			}
 		}
@@ -257,9 +249,8 @@ class RenderedList {
 		$query = "
 			select $statssql ($listsql) as isinlist,
 			$pfields
-			$pdfields
 			$contactfields
-			from person p left join persondata pd on (p.id=pd.personid)
+			from person p
 		";
 		if ($getdata) {
 			$query .="
@@ -272,8 +263,8 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where $usersql
-			and p.userid is null
+			where p.userid is null
+			$usersql
 			$searchsql
 			$orderby
 			$pagesql
@@ -335,16 +326,16 @@ class RenderedList {
 			$modesql2 = ""; // also calc the added items (not in rules)
 		}
 
-		$usersql = $USER->userSQL("p", "pd");
+		$usersql = $USER->userSQL("p");
 
 		$listid = $this->list->id;
 
 		$listsql = $this->list->getListRuleSQL();
 
 		$query = "select sum(le.type is null), sum(le.type='N')
-		from person p left join persondata pd on (p.id=pd.personid)
+		from person p
 		left join listentry le on (le.personid=p.id and le.listid = $listid)
-		where $usersql and p.userid is null and $listsql $modesql1
+		where p.userid is null and $listsql $usersql  $modesql1
 		";
 
 		$stats = QuickQueryRow($query);
@@ -353,7 +344,7 @@ class RenderedList {
 
 		$query = "select count(*)
 		from person p , listentry le
-		where p.customerid = $USER->customerid and le.listid = $listid and p.id=le.personid and le.type='A' $modesql2
+		where le.listid = $listid and p.id=le.personid and le.type='A' $modesql2
 		";
 		$this->totaladded = QuickQuery($query);
 
