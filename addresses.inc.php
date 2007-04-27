@@ -110,7 +110,6 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 						left join phone on (person.id = phone.personid and phone.sequence=0)
 						left join email on (person.id = email.personid and email.sequence=0)
 						left join address on person.id = address.personid
-						left join persondata on person.id = persondata.personid
 					where userid = $USER->id and type = 'addressbook' and not deleted
 					order by $last, $first
 					");

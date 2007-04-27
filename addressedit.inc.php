@@ -12,7 +12,6 @@ include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Person.obj.php");
-include_once("obj/PersonData.obj.php");
 include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
@@ -66,7 +65,7 @@ if (!$maxemails = getSystemSetting("maxemails"))
 
 if ($personid == NULL) {
 	// create a new person with empty data
-	$data = new PersonData();
+	$data = new Person();
 	$f = FieldMap::getLanguageField();
 	$data->$f = "English"; // default language, so that first in alphabet is not selected (example, Chinese)
 	$address = new Address();
@@ -75,7 +74,7 @@ if ($personid == NULL) {
 	$emails = array();
 } else {
 	// editing existing person
-	$data = DBFind("PersonData", "from persondata where personid = " . $personid);
+	$data = DBFind("Person", "from person where id = " . $personid);
 	$address = DBFind("Address", "from address where personid = " . $personid);
 	if ($address === false) $address = new Address(); // contact was imported/uploaded without any address data, create one now
 
@@ -122,7 +121,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			//submit changes
 			$person = new Person($personid);
 			$person->userid = $USER->id;
-			$person->customerid = $USER->customerid;
 			if (!isset($personid)) {
 				switch ($ORIGINTYPE) {
 					case "nav":
@@ -276,7 +274,7 @@ startWindow("Contact");
 		<td  class="bottomBorder">
 			<?
 			NewFormItem($f,$s,FieldMap::getLanguageField(),"selectstart");
-			$data = DBFindMany('Language', "from language where customerid='$USER->customerid' order by name");
+			$data = DBFindMany('Language', "from language order by name");
 			foreach($data as $language)
 				NewFormItem($f,$s,FieldMap::getLanguageField(),"selectoption",$language->name,$language->name);
 			NewFormItem($f,$s,FieldMap::getLanguageField(),"selectend");
