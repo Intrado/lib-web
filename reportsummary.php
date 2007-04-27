@@ -37,7 +37,7 @@ if ($jobid) {
 
 
 	//TODO check if there are new workitems, then display a pie chart with % queued
-	if (QuickQuery("select id from jobworkitem where status='new' and jobid='$jobid' limit 1")) {
+	if (QuickQuery("select personid from reportperson where status='new' and jobid='$jobid' limit 1")) {
 		$isprocessing = true;
 	} else {
 		$isprocessing = false;
@@ -61,15 +61,12 @@ if ($jobid) {
 
 			//% people participated (subset of contacted)
 			$query = "select count(*) as cnt
-						from jobworkitem wi inner join jobtask jt on
-								(jt.jobworkitemid = wi.id)
-						inner join	calllog cl on
-								(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
-						where wi.jobid='$jobid'
-						and wi.status='success' and cl.callprogress='A' and cl.participated=1";
+						from reportperson rp 
+						left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+						and rp.status='success' and rc.result='A' and rc.participated=1";
 			$phoneparticipants = QuickQuery($query);
 
-
+			//TODO: fix jobworkitem related code
 			$query = "select count(*) from surveyemailcode sec
 					inner join jobworkitem wi on (sec.jobworkitemid = wi.id)
 					where sec.isused=1 and wi.jobid=$jobid";
@@ -98,9 +95,9 @@ if ($jobid) {
 		if(in_array("phone",$jobtypes) !== false) {
 			//people, dupes, contacted, notcontacted, %complete (actually from phone)
 
-			$query = "select count(*) as cnt, status
-						from jobworkitem wi
-						where wi.jobid='$jobid' and wi.type='phone' group by status";
+			$query = "select count(*) as cnt, rp.status
+						from reportperson rp
+						where rp.jobid='$jobid' and rp.type='phone' group by rp.status";
 			//then need to stitch the results back together by summing them.
 
 			$totalpeople = 0;
@@ -120,14 +117,12 @@ if ($jobid) {
 			}
 
 			//phones by cp
-			$query = "select count(*) as cnt, cl.callprogress, sum(wi.status not in ('success','fail') and jt.numattempts < $job->maxcallattempts) as remaining
-						from jobworkitem wi inner join jobtask jt on
-								(jt.jobworkitemid = wi.id)
-						left join	calllog cl on
-								(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
-			where wi.jobid = '$jobid'
-			and wi.status != 'duplicate' and wi.type='phone'
-			group by cl.callprogress";
+			$query = "select count(*) as cnt, rc.result, sum(rp.status not in ('success','fail') and rc.numattempts < $job->maxcallattempts) as remaining
+						from reportperson rp 
+						left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+			where rp.jobid = '$jobid'
+			and rp.status != 'duplicate' and rp.type='phone'
+			group by rc.result";
 			//may need to clean up, null means not called yet
 			//do math for the % completed
 			$cpstats = array (
@@ -170,15 +165,15 @@ if ($jobid) {
 		if(in_array("email",$jobtypes) !== false) {
 			//email people, emails, % sent
 			$query = "select count(*)
-						from jobworkitem wi
-						where wi.jobid='$jobid' and wi.type='email'";
+						from reportperson rp
+						where rp.jobid='$jobid' and rp.type='email'";
 
 			$emailpeople = QuickQuery($query);
 
-			$query = "select count(*) totalemails, sum(jt.numattempts>0) as sent
-						from jobworkitem wi inner join jobtask jt on
-								(jt.jobworkitemid = wi.id)
-						where wi.jobid='$jobid' and wi.type='email'";
+			$query = "select count(*) totalemails, sum(rc.numattempts>0) as sent
+						from reportperson rp 
+						left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+						where rp.jobid='$jobid' and rp.type='email'";
 			list($totalemails, $sentemails) = QuickQueryRow($query);
 
 			$jobstats["email"] = array();
@@ -194,9 +189,9 @@ if ($jobid) {
 		//--------------- PRINT ---------------
 		if(in_array("print",$jobtypes) !== false) {
 			//print people %sent
-			$query = "select count(*) as totoal, sum(wi.status='success') as printed
-						from jobworkitem wi
-						where wi.jobid='$jobid' and wi.type='print'";
+			$query = "select count(*) as totoal, sum(rp.status='success') as printed
+						from reportperson rp
+						where rp.jobid='$jobid' and rp.type='print'";
 			list($totalprint, $printed) = QuickQueryRow($query);
 
 			$jobstats["print"] = array();
