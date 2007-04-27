@@ -40,25 +40,26 @@ startWindow('Active & Pending Notification Jobs ' . help('System_ActiveJobs', NU
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 $data = array();
-// jobworkitem columns are: id jobid type priority personid messageid status resultdata assignedto
+// reportperson columns are: jobid type userid personid messageid status  
+// reportcontact columns are : resultdata
 $result = Query(
-			"select SQL_CALC_FOUND_ROWS u.login, j.name, j.status,
-				sum(wi.type='phone') as total_phone,
-            	sum(wi.type='email') as total_email,
-            	sum(wi.type='print') as total_print,
+			"select SQL_CALC_FOUND_ROWS jobowner.login, j.name, j.status,
+				sum(rp.type='phone') as total_phone,
+            	sum(rp.type='email') as total_email,
+            	sum(rp.type='print') as total_print,
             	j.type LIKE '%phone%' AS has_phone,
 				j.type LIKE '%email%' AS has_email,
 				j.type LIKE '%print%' AS has_print,
-            	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='phone') as remaining_phone,
-            	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='email') as remaining_email,
-            	sum((wi.status!='success' and wi.status!='fail' and wi.status!='duplicate') and wi.type='print') as remaining_print,
+            	sum((rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='phone') as remaining_phone,
+            	sum((rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='email') as remaining_email,
+            	sum((rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='print') as remaining_print,
             ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
-            from user u, job j
-            left join jobworkitem wi
-            	on j.id = wi.jobid
+            from job j
+            left join reportperson rp
+            	on j.id = rp.jobid
             left join user jobowner
             	on j.userid = jobowner.id
-            where u.customerid = $USER->customerid and j.userid = u.id and (j.status = 'active' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
+            where (j.status = 'active' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
             group by j.id order by j.id desc limit $start, $limit");
 
 while ($row = DBGetRow($result)) {
