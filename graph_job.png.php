@@ -22,15 +22,12 @@ if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && custom
 
 $query = "
 select count(*) as cnt,
-		coalesce(if (wi.status='waiting', 'retry', cl.callprogress),
-			if (wi.status not in ('fail','duplicate','scheduled'), 'inprogress',wi.status))
+		coalesce(if (rp.status='waiting', 'retry', rc.result),
+			if (rp.status not in ('fail','duplicate','scheduled'), 'inprogress',rp.status))
 			as callprogress2
-from jobworkitem wi
-left join	jobtask jt on
-					(jt.jobworkitemid=wi.id)
-left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
-where wi.jobid='$jobid' and wi.type='phone'
+from reportperson rp
+left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+where rp.jobid='$jobid' and rp.type='phone'
 group by callprogress2
 
 ";

@@ -15,19 +15,15 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 
 $query = "
 select count(*) as cnt,
-		coalesce(if (wi.status='waiting', 'retry', cl.callprogress),
-			if (wi.status not in ('fail','duplicate','scheduled'), 'inprogress',wi.status))
+		coalesce(if (rp.status='waiting', 'retry', rc.result),
+			if (rp.status not in ('fail','duplicate','scheduled'), 'inprogress', rp.status))
 			as callprogress2
 
-
-from jobworkitem wi
-inner join job j on (wi.jobid=j.id)
-left join	jobtask jt on
-					(jt.jobworkitemid=wi.id)
-left join	calllog cl on
-					(cl.jobtaskid=jt.id and (cl.callattempt=jt.numattempts-1))
+from job j
+inner join reportperson rp on (rp.jobid=j.id)
+left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 where j.userid=$USER->id and j.status='active'
-and wi.type='phone'
+and rp.type='phone'
 group by callprogress2
 ";
 

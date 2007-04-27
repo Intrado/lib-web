@@ -17,7 +17,7 @@ if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && custom
 	redirect('unauthorized.php');
 }
 
-$data = QuickQueryRow("select sum(status!='new'), sum(status='new') from jobworkitem where jobid='$jobid'");
+$data = QuickQueryRow("select sum(status!='new'), sum(status='new') from reportperson where jobid='$jobid'");
 
 $legend = array("Queued: %d", "Processing: %d");
 $colors = array("blue", "yellow");

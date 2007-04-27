@@ -24,9 +24,9 @@ function limit_str ($txt, $max = 25) {
 
 $query = "
 select count(*) as cnt, j.name, u.login
- from jobworkitem wi, job j, user u
-where wi.jobid = j.id and u.id = j.userid and u.customerid=$USER->customerid
-and wi.status='success'
+ from reportperson rp, job j, user u
+where rp.jobid = j.id and u.id = j.userid
+and rp.status='success'
 and j.finishdate >= date_sub(now(), interval 30 day)
 group by j.id
 order by cnt desc

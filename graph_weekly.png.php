@@ -28,21 +28,20 @@ $cpcolors = array(
 if ($IS_COMMSUITE) {
 	$query = "
 	select count(*)/4 as cnt,
-		dayofweek(from_unixtime(cl.starttime/1000)) as dayofweek, cl.callprogress
-	from calllog cl
-	where cl.callprogress in ('A','M','B','N')
-	and cl.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
-	group by dayofweek, cl.callprogress
+		dayofweek(from_unixtime(rc.starttime/1000)) as dayofweek, rc.result
+	from reportcontact rc
+	where rc.result in ('A','M','B','N')
+	and rc.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
+	group by dayofweek, rc.result
 	";
 } /*CSDELETEMARKER_START*/ else {
 	$query = "
 	select count(*)/4 as cnt,
-		dayofweek(from_unixtime(cl.starttime/1000)) as dayofweek, cl.callprogress
-	from calllog cl
-	where cl.customerid = $USER->customerid
-	and cl.callprogress in ('A','M','B','N')
-	and cl.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
-	group by dayofweek, cl.callprogress
+		dayofweek(from_unixtime(rc.starttime/1000)) as dayofweek, rc.result
+	from reportcontact rc
+	where rc.result in ('A','M','B','N')
+	and rc.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
+	group by dayofweek, rc.result
 	";
 } /*CSDELETEMARKER_END*/
 
