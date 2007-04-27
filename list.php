@@ -86,7 +86,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 			PopulateObject($f,$s,$list,array("name","description"));
 
 			$list->userid = $USER->id;
-
+			$list->deleted = '0';
 			$list->update();
 
 			$fieldaddsubmit = false;
