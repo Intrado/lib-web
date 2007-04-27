@@ -42,7 +42,7 @@ $reloadform = 0;
 //should we check for an upload?
 if(isset($_FILES['listcontents']) && $_FILES['listcontents']['tmp_name'])
 {
-	$newname = secure_tmpname($SETTINGS['import']['filedir'],"listupload","csv");
+	$newname = secure_tmpname($SETTINGS['import']['filedir'],"listupload",".csv");
 
 	if(!move_uploaded_file($_FILES['listcontents']['tmp_name'],$newname)) {
 		error('Unable to complete file upload. Please try again.');
