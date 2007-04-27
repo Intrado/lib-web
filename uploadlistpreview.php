@@ -14,7 +14,6 @@ require_once("obj/Import.obj.php");
 require_once("obj/ImportField.obj.php");
 require_once("obj/Schedule.obj.php");
 include_once("obj/PeopleList.obj.php");
-include_once("obj/PersonData.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 require_once("inc/ftpfile.inc.php");
@@ -52,7 +51,7 @@ $notfound = 0;
 $notfounddata = array();
 $errormsg = false;
 $defaultareacode = getSystemSetting("defaultareacode");
-$usersql = $USER->userSQL("p", "pd");
+$usersql = $USER->userSQL("p");
 if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 
 
@@ -92,9 +91,7 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 				$query = "
 					select p.id
 					from 		person p
-								left join	persondata pd on
-										(p.id=pd.personid)
-					where p.pkey='$pkey' and $usersql
+					where p.pkey='$pkey' $usersql
 				";
 
 				$personid = QuickQuery($query);
@@ -103,11 +100,11 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 				if ($personid) {
 
 					if ($count > 0) {
-						$pd = DBFind("PersonData","from persondata where personid='$personid'");
+						$p = DBFind("Person","from person where id='$personid'");
 						$phone = DBFind("Phone","from phone where personid='$personid'");
 						$email = DBFind("Email","from email where personid='$personid'");
 
-						$listpreviewdata[] = array($pkey,$pd->f01,$pd->f02,Phone::format($phone->phone),$email->email);
+						$listpreviewdata[] = array($pkey,$p->f01,$p->f02,Phone::format($phone->phone),$email->email);
 					}
 				} else {
 					$notfound++;
@@ -140,7 +137,6 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		if (!$importid) {
 
 			$import = new Import();
-			$import->customerid = $USER->customerid;
 			$import->userid = $USER->id;
 			$import->listid = $list->id;
 			$import->name = "User list import (" . $USER->login . ")";
@@ -187,9 +183,9 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 
 		//upload or copy the file to the main import location
 		if ($SETTINGS['import']['type'] == "ftp") {
-			$res = uploadImportFile($curfilename,$import->customerid,$import->id);
+			$res = uploadImportFile($curfilename,$import->customerid,$import->id); //jjl
 		} else if ($SETTINGS['import']['type'] == "file"){
-			$destfile = $SETTINGS['import']['filedir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv";
+			$destfile = $SETTINGS['import']['filedir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv"; //jjl
 			makeparentdirectories($destfile);
 			$res = copy($curfilename,$destfile);
 		} else {
@@ -197,7 +193,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		}
 
 		if ($res) {
-			$import->path = $import->customerid . "/" . $import->id . "/data.csv";
+			$import->path = $import->customerid . "/" . $import->id . "/data.csv"; //jjl
 			$import->update();
 			$import->runNow();
 			sleep(3);
@@ -215,8 +211,6 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 				$query = "
 					select p.id
 					from 		person p
-								left join	persondata pd on
-										(p.id=pd.personid)
 					where p.pkey='$pkey' and $usersql
 				";
 
