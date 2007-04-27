@@ -57,8 +57,8 @@ if(CheckFormSubmit($form, $section))
 			if (strlen($phone) != 10) {
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			} else {
-				$result = QuickUpdate("insert into blockednumber(userid, customerid, description, pattern)
-								values ($USER->id, $USER->customerid, '" .
+				$result = QuickUpdate("insert into blockednumber(userid, description, pattern)
+								values ($USER->id, '" .
 								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone')");
 				if ($result) {
 					ClearFormData($form);
@@ -129,7 +129,7 @@ $result = Query(
 		"select b.pattern, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
 			$ACCESS->getValue('callblockingperms') . "' as permission
 			from blockednumber b, user u
-			where b.customerid = {$USER->customerid} and b.userid = u.id
+			where b.userid = u.id
 			order by b.id desc");
 $data=array();
 while ($row = DBGetRow($result)) {

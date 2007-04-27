@@ -62,7 +62,6 @@ if(CheckFormSubmit($f,$s))
 			$task->setData('count', 1);
 			$task->lastcheckin = date("Y-m-d H:i:s");
 			$task->status = "queued";
-			$task->customerid=$USER->customerid;
 			
 			$task->create();
 			redirect('callme2.php?taskid=' . $task->id);
