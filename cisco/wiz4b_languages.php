@@ -67,8 +67,8 @@ foreach ($languages as $language) {
 <Prompt>Please select your languages</Prompt>
 
 <SoftKeyItem>
-<Name>Select</Name>
-<URL>SoftKey:Select</URL>
+<Name>Continue</Name>
+<URL><?= htmlentities($URL . "/wiz5_confirm.php") ?></URL>
 <Position>1</Position>
 </SoftKeyItem>
 
@@ -85,11 +85,10 @@ foreach ($languages as $language) {
 </SoftKeyItem>
 
 <SoftKeyItem>
-<Name>Continue</Name>
-<URL><?= htmlentities($URL . "/wiz5_confirm.php") ?></URL>
+<Name>Select</Name>
+<URL>SoftKey:Select</URL>
 <Position>4</Position>
 </SoftKeyItem>
-
 
 
 
