@@ -2,7 +2,6 @@
 
 class SpecialTask extends DBMappedObject {
 
-	var $customerid;
 	var $status;
 	var $type;
 	var $data = "";
@@ -11,7 +10,7 @@ class SpecialTask extends DBMappedObject {
 	function SpecialTask ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "specialtask";
-		$this->_fieldlist = array("customerid","status","type", "data","lastcheckin");
+		$this->_fieldlist = array("status","type", "data","lastcheckin");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
