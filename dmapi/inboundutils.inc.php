@@ -2,6 +2,7 @@
 // phone inbound helper routines (aka utilities)
 include_once("../obj/User.obj.php");
 include_once("../obj/Access.obj.php");
+include_once("../inc/utils.inc.php");
 
 
 function glog($s)
@@ -29,7 +30,7 @@ function loadTimezone()
 
 	if (!isset($SESSIONDATA['timezone'])) {
 		$USER = new User($SESSIONDATA['userid']);
-		$SESSIONDATA['timezone'] = QuickQuery("select timezone from customer where id=".$USER->customerid);
+		$SESSIONDATA['timezone'] = getSystemSetting("timezone");
 		glog("setting timezone: ".$SESSIONDATA['timezone']);
 	}
 

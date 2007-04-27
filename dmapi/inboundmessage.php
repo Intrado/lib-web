@@ -171,7 +171,7 @@ function buildLanguageList()
 
 	$user = new User($SESSIONDATA['userid']);
 
-	$query = "select value from persondatavalues where fieldnum='f03' and customerid='".$user->customerid."' ".
+	$query = "select value from persondatavalues where fieldnum='f03' ".
 				"and value != '' and value is not null order by refcount desc limit 9";
 
 	$languages = QuickQueryList($query);
@@ -179,7 +179,7 @@ function buildLanguageList()
 	// its a rare case that a customer does not have any persondata (they must import something)
 	// but if so, take the customers languages from the language table
 	if ($languages == NULL || count($languages) == 0) {
-		$languages = QuickQueryList("select name from language where customerid=$user->customerid order by name");
+		$languages = QuickQueryList("select name from language order by name");
 	}
 
 	// "English" is always the default, so remove english from the list
