@@ -1,29 +1,6 @@
 <?
 
-$dbs = array($SETTINGS['db']);
-if (isset($SETTINGS['db2']))
-	$dbs[] = $SETTINGS['db2'];
-
-
-foreach ($dbs as $db) {
-
-	if ($db['persistent'])
-		$_dbcon = mysql_pconnect($db['host'], $db['user'], $db['pass']);
-	else
-		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
-	if (!$_dbcon) {
-		error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
-		continue;
-	}
-
-	if (mysql_select_db($db['db'])) {
-		break; //got one!
-	} else {
-		error_log("Problem selecting databse for " . $db['host'] . " error:" . mysql_error());
-	}
-}
-
-unset($dbs);
+// global $_dbcon is set by auth.inc.php during login
 
 
 function DBDebug($query) {

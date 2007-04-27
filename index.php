@@ -24,13 +24,8 @@ if ($SETTINGS['feature']['has_ssl']) {
 
 $badlogin = false;
 if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
-	$olduser = $_SESSION['user'];
-	$_SESSION = array();
-//	@session_destroy();
-//	@session_name($CUSTOMERURL . "_session");
-//	@session_start();
-	$login = DBSafe($_GET['login']);
-	$id = User::forceLogin($login,$CUSTOMERURL,$olduser->customerid);
+
+	$id = forceLogin($login, $CUSTOMERURL);
 
 	if ($id) {
 		$USER = $_SESSION['user'] = new User($id);
@@ -47,7 +42,7 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 	redirect($redirpage);
 } elseif (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 
-	$id = User::doLogin(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'], get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'],$CUSTOMERURL);
+	$id = doLogin(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'], get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'],$CUSTOMERURL);
 
 	if ($id) {
 		$newuser = new User($id);
@@ -69,9 +64,8 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 	}
 }
 
-//try to find the customer's name
-//$custname = QuickQuery("select name from customer where hostname='" . DBSafe($CUSTOMERURL) . "'");
-$custname = getSystemSetting("hostname");
+$custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("hostname") but we may not be logged in yet
+
 
 if ($IS_COMMSUITE) {
 
