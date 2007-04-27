@@ -33,7 +33,7 @@ if (isset($_GET['deletetype'])) {
 	while($next = movePriority($priority))
 		$priority = $next;
 
-	QuickUpdate("update jobtype set deleted=1 where customerid = $USER->customerid and priority = '$priority' and deleted=0");
+	QuickUpdate("update jobtype set deleted=1 where priority = '$priority' and deleted=0");
 	redirect();
 }
 
@@ -51,9 +51,9 @@ function movePriority($priority, $down = true) {
 	global $USER;
 	$priority = 0 + $priority;
 	$op = $down ? array('>','') : array('<','desc');
-	$swap = QuickQueryRow("select id, priority from jobtype where customerid = $USER->customerid and priority $op[0] '$priority' and deleted =0 order by priority $op[1] limit 1");
+	$swap = QuickQueryRow("select id, priority from jobtype where priority $op[0] '$priority' and deleted =0 order by priority $op[1] limit 1");
 	if ($swap) {
-		QuickUpdate("update jobtype set priority = $swap[1] where customerid = $USER->customerid and priority = '$priority'");
+		QuickUpdate("update jobtype set priority = $swap[1] where priority = '$priority'");
 		QuickUpdate("update jobtype set priority = '$priority' where id = $swap[0]");
 		return $swap[1];
 	}
@@ -63,7 +63,7 @@ function movePriority($priority, $down = true) {
 function getSetting($name) {
 	global $USER;
 	$name = DBSafe($name);
-	return QuickQuery("select value from setting where customerid = $USER->customerid and name = '$name'");
+	return QuickQuery("select value from setting where name = '$name'");
 }
 
 function setSetting($name, $value) {
@@ -72,12 +72,12 @@ function setSetting($name, $value) {
 	$name = DBSafe($name);
 	$value = DBSafe($value);
 	if($old === false && $value !== '' && $value !==NULL) {
-		QuickUpdate("insert into setting (name, value, customerid) values ('$name', '$value', $USER->customerid)");
+		QuickUpdate("insert into setting (name, value) values ('$name', '$value')");
 	} else {
 		if($value === '' || $value === NULL)
-			QuickUpdate("delete from setting where customerid = $USER->customerid and name = '$name'");
+			QuickUpdate("delete from setting where name = '$name'");
 		elseif($value != $old)
-			QuickUpdate("update setting set value = '$value' where customerid = $USER->customerid and name = '$name'");
+			QuickUpdate("update setting set value = '$value' where and name = '$name'");
 	}
 }
 
@@ -122,8 +122,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 						$timeslices = min(600,abs($timeslices));
 
 						if($id == 'new' && $name) {
-							$nextpri = 10000 + QuickQuery("select max(priority) from jobtype where customerid = $USER->customerid and deleted=0");
-							$query = "insert into jobtype (name, priority, systempriority, timeslices, customerid) values ('$name','$nextpri', '$systempriority','$timeslices', $USER->customerid)";
+							$nextpri = 10000 + QuickQuery("select max(priority) from jobtype where deleted=0");
+							$query = "insert into jobtype (name, priority, systempriority, timeslices) values ('$name','$nextpri', '$systempriority','$timeslices')";
 							QuickUpdate($query);
 						} else {
 							if (customerOwns("jobtype",$id)) {
@@ -135,9 +135,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				}
 				$custname= GetFormData($f, $s, 'custdisplayname');
 				if($custname != "" || $custname != $_SESSION['custname']){
-					$query="UPDATE customer SET name='" . DBSafe($custname) . "'
-							WHERE id='$USER->customerid'";
-					QuickUpdate($query);
+					setSetting("hostname", $custname);
 					$_SESSION['custname']=$custname;
 				}
 				if($IS_COMMSUITE){
@@ -181,7 +179,7 @@ if( $reloadform )
 
 	//check for new setting name/desc from settings.php
 
-	$custname= QuickQuery("Select name from customer where id = '" . DBSafe($USER->customerid) . "'");
+	$custname = getSystemSetting("customername");
 	PutFormData($f, $s,"custdisplayname", $custname, 'text', 0, 50);
 	if($IS_COMMSUITE)
 		PutFormData($f, $s, "surveyurl", getSetting('surveyurl'), 'text', 0, 100);
@@ -233,7 +231,7 @@ function fmt_systempriority($obj, $name) {
 			$result .= '<option ' . ($obj->systempriority == $index ? "selected" : "") . ' value="' . $index . '">' . htmlentities($name) . '</option>';
 		return $result;
 	} else {
-		$priorities = $USER->getCustomer()->getSystemPriorities();
+		$priorities = $USER->getCustomer()->getSystemPriorities(); //jjl
 		return htmlentities($priorities[$obj->systempriority]);
 	}
 }
@@ -282,6 +280,9 @@ buttons(submit($f, $s, 'save', 'save'));
 startWindow('Global System Settings');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
+<?				
+				if($IS_COMMSUITE) {
+?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job Type/<br>Priorities:<br><? print help('Settings_JobTypes', NULL, 'grey'); ?></th>
 					<td class="bottomBorder">
@@ -289,14 +290,14 @@ startWindow('Global System Settings');
 							<tr>
 								<td>
 						<?
-							$types = DBFindMany('JobType', "from jobtype where customerid = $USER->customerid and deleted=0 order by priority");
-								$types[] = $type = new JobType();
-								$type->id = 'new';
-								$type->priority = QuickQuery("select max(priority) from jobtype where customerid = $USER->customerid and deleted=0") + 10000;
-								$type->timeslices = 100;
-								$titles = array('priority' => 'Priority', 'name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '', 'move' => '');
-								$formatters = array('priority' => 'fmt_priority', 'edit' => 'fmt_edit', 'move' => 'fmt_move', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
-								showObjects($types,$titles,$formatters);
+							$types = DBFindMany('JobType', "from jobtype where deleted=0 order by priority");
+							$types[] = $type = new JobType();
+							$type->id = 'new';
+							$type->priority = QuickQuery("select max(priority) from jobtype where deleted=0") + 10000;
+							$type->timeslices = 100;
+							$titles = array('priority' => 'Priority', 'name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '', 'move' => '');
+							$formatters = array('priority' => 'fmt_priority', 'edit' => 'fmt_edit', 'move' => 'fmt_move', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
+							showObjects($types,$titles,$formatters);
 						?>
 
 								</td>
@@ -304,6 +305,9 @@ startWindow('Global System Settings');
 						</table>
 					</td>
 				</tr>
+<?				
+				}
+?>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
 						Customer Display Name:<br><? print help('Settings_CustDisplayName', NULL, 'grey'); ?>
