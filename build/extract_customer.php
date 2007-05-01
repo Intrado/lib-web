@@ -72,7 +72,7 @@ function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = 
 }
 
 function customerinfo($custid, $source, $dest){
-	$query = "select inboundnumber, hostname, timezone from customer where id = '$custid'";
+	$query = "select inboundnumber, timezone, name from customer where id = '$custid'";
 	$sourceres = mysql_query($query, $source)
 				or die ("Failed to query customer: " . mysql_error($source));
 	
@@ -80,8 +80,8 @@ function customerinfo($custid, $source, $dest){
 	
 	$destres = mysql_query("insert into setting (name, value) values
 								('inboundnumber', '$row[0]'),
-								('hostname', '$row[1]'),
-								('timezone', '$row[2]')", $dest)
+								('timezone', '$row[1]')
+								('displayname', '$row[2]')", $dest)
 							or die ("Failed to insert into setting: " . mysql_error($dest));
 }
 
