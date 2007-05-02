@@ -10,7 +10,8 @@ function getCustomerName($url) {
     	'header' => "Content-Type: text/xml",
     	'content' => $request
 	)));
-	$file = file_get_contents("http://localhost:8088/xmlrpc", false, $context);
+	global $SETTINGS;
+	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
@@ -34,7 +35,8 @@ function doLogin($loginname, $password, $url) {
     	'header' => "Content-Type: text/xml",
     	'content' => $request
 	)));
-	$file = file_get_contents("http://localhost:8088/xmlrpc", false, $context);
+	global $SETTINGS;
+	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
@@ -59,7 +61,8 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
     	'header' => "Content-Type: text/xml",
     	'content' => $request
 	)));
-	$file = file_get_contents("http://localhost:8088/xmlrpc", false, $context);
+	global $SETTINGS;
+	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
@@ -86,7 +89,8 @@ function forceLogin($loginname, $url) {
     	'header' => "Content-Type: text/xml",
     	'content' => $request
 	)));
-	$file = file_get_contents("http://localhost:8088/xmlrpc", false, $context);
+	global $SETTINGS;
+	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
@@ -109,7 +113,8 @@ function getSessionData($id) {
     	'header' => "Content-Type: text/xml",
     	'content' => $request
 	)));
-	$file = file_get_contents("http://localhost:8088/xmlrpc", false, $context);
+	global $SETTINGS;
+	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
@@ -150,7 +155,8 @@ function putSessionData($id, $sess_data) {
     	'header' => "Content-Type: text/xml",
     	'content' => $request
 	)));
-	$file = file_get_contents("http://localhost:8088/xmlrpc", false, $context);
+	global $SETTINGS;
+	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
