@@ -1,11 +1,9 @@
 ;<?/* this prevents browsers from seeing anything
 
-[db]
-persistent=true
-host="localhost:3306"
-user="root"
-pass=""
-db="dialerasp"
+;authentication server connection information
+[authserver]
+url="http://localhost:8088/xmlrpc"
+
 
 ;optional seperate server for outbound notifications
 [dmapidb]
