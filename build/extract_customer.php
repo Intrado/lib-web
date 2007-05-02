@@ -3,7 +3,7 @@
 if ($argc < 2)
 	exit ("Please specify customerid");
 
-$dbhost = "127.0.0.1";
+$dbhost = "localhost:3306";
 $dbuser = "root";
 $dbpass = "";
 
@@ -40,47 +40,47 @@ function fieldlist ($table,$fields) {
 
 function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = false) {
 
-	$fieldlist = fieldlist($table,$fields);
+ $fieldlist = fieldlist($table,$fields);
 
-	$query = "select $fieldlist from `$table` ";
+ $query = "select $fieldlist from `$table` ";
 
-	if ($joincustomer)
-		$query .= $joincustomer;
-	else
-		$query .= " where customerid=$custid";
+ if ($joincustomer)
+  $query .= $joincustomer;
+ else
+  $query .= " where customerid=$custid";
 
-//	echo "$table: $query\n\n";
-	$sourceres = mysql_query($query,$source)
-				or die ("Failed to query $table :" . mysql_error($source));
+// echo "$table: $query\n\n";
+ $sourceres = mysql_query($query,$source)
+    or die ("Failed to query $table :" . mysql_error($source));
 
-	do {
-		$count = 0;
-		$outrows = array();
-		while ($count < $batch && ($row = mysql_fetch_row($sourceres))) {
-			$outrows[] = "(". escrow($row,$dest) . ")";
-			$count++;
-		}
+ do {
+  $count = 0;
+  $outrows = array();
+  while ($count < $batch && ($row = mysql_fetch_row($sourceres))) {
+   $outrows[] = "(". escrow($row,$dest) . ")";
+   $count++;
+  }
 
-		//ins to dest
-		if ($count) {
-			$ins = "insert into `$table` ($fieldlist) values "
-				. implode(",",$outrows);
-			mysql_query($ins,$dest)
-				or die ("Failed to insert into $table :" . mysql_error($dest));
-		}
-	} while ($row);
+  //ins to dest
+  if ($count) {
+   $ins = "insert into `$table` ($fieldlist) values "
+    . implode(",",$outrows);
+   mysql_query($ins,$dest)
+    or die ("Failed to insert into $table :" . mysql_error($dest));
+  }
+ } while ($row);
 }
 
 function customerinfo($custid, $source, $dest){
 	$query = "select inboundnumber, timezone, name from customer where id = '$custid'";
 	$sourceres = mysql_query($query, $source)
 				or die ("Failed to query customer: " . mysql_error($source));
-	
+
 	$row = mysql_fetch_row($sourceres);
-	
+
 	$destres = mysql_query("insert into setting (name, value) values
 								('inboundnumber', '$row[0]'),
-								('timezone', '$row[1]')
+								('timezone', '$row[1]'),
 								('displayname', '$row[2]')", $dest)
 							or die ("Failed to insert into setting: " . mysql_error($dest));
 }
@@ -275,6 +275,7 @@ copytable($customerid,"voicereply",array("id", "jobtaskid", "jobworkitemid", "pe
 
 //Customer fields
 customerinfo($customerid, $db, $custdb);
+
 
 
 
