@@ -5,6 +5,7 @@ include_once("inboundutils.inc.php");
 include_once("../obj/User.obj.php");
 include_once("../obj/Access.obj.php");
 include_once("../obj/Permission.obj.php");
+require_once("../inc/auth.inc.php");
 
 global $SESSIONDATA, $BFXML_VARS;
 
@@ -86,10 +87,12 @@ function welcome()
 		$inboundNumber = $SESSIONDATA['inboundNumber'];
 
 		// find user and authenticate them against database
-		$userid = User::doLoginPhone($code, $pin, $inboundNumber);
+		$userid = doLoginPhone($code, $pin, $inboundNumber);
 		glog("userid: ".$userid);
 
 		if ($userid) {
+			getSessionData($SESSIONID); // loads the db connection
+
 			$user = new User($userid);
 			$access = new Access($user->accessid);
 
