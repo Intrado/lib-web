@@ -15,12 +15,12 @@ function getCustomerName($url) {
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
-	} else if ($response[result] != "") {
+	} else if ($response['result'] != "") {
 	    // failure
-	    error_log("getCustomerName failed " . $response[result]);
+	    error_log("getCustomerName failed " . $response['result']);
 	} else {
 		// success
-		return $response[customerName];
+		return $response['customerName'];
 	}
 	return false;
 }
@@ -40,14 +40,14 @@ function doLogin($loginname, $password, $url) {
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
-	} else if ($response[result] != "") {
+	} else if ($response['result'] != "") {
 	    // login failure
-	    error_log("doLogin failed " . $response[result]);
+	    error_log("doLogin failed " . $response['result']);
 	} else {
 		// login success
-		session_id($response[sessionID]); // set the session id
+		session_id($response['sessionID']); // set the session id
 		doStartSession();
-		return $response[userID];
+		return $response['userID'];
 	}
 }
 
@@ -66,15 +66,15 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
-	} else if ($response[result] != "") {
+	} else if ($response['result'] != "") {
 	    // login failure
-	    error_log("doLoginPhone failed " . $response[result]);
+	    error_log("doLoginPhone failed " . $response['result']);
 	} else {
 		// login success
 		global $SESSIONDATA;
-		$SESSIONDATA[authSessionID] = $response[sessionID];
-		getSessionData($response[sessionID]); // load customer db connection
-		return $response[userID];
+		$SESSIONDATA['authSessionID'] = $response['sessionID'];
+		getSessionData($response['sessionID']); // load customer db connection
+		return $response['userID'];
 	}
 }
 
@@ -94,9 +94,9 @@ function forceLogin($loginname, $url) {
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
-	} else if ($response[result] != "") {
+	} else if ($response['result'] != "") {
 	    // login failure
-	    error_log("forceLogin failed " . $response[result]);
+	    error_log("forceLogin failed " . $response['result']);
 	} else {
 		// login success
 		return $response[userID];
@@ -118,15 +118,15 @@ function getSessionData($id) {
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
-	} else if ($response[result] != "") {
+	} else if ($response['result'] != "") {
 	    // login failure
-	    error_log("getSessionData failed " . $response[result]);
+	    error_log("getSessionData failed " . $response['result']);
 	} else {
 		// success
-		$db['host'] = $response[dbhost];
-		$db['user'] = $response[dbuser];
-		$db['pass'] = $response[dbpass];
-		$db['db'] = $response[dbname];
+		$db['host'] = $response['dbhost'];
+		$db['user'] = $response['dbuser'];
+		$db['pass'] = $response['dbpass'];
+		$db['db'] = $response['dbname'];
 
 		// now connect to the customer database
 		global $_dbcon;
@@ -136,7 +136,7 @@ function getSessionData($id) {
 			error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
 		} else if (mysql_select_db($db['db'])) {
 			// successful connection to customer database, return session data
-			return $response[sessionData];
+			return $response['sessionData'];
 		} else {
 			error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
 		}
@@ -160,9 +160,9 @@ function putSessionData($id, $sess_data) {
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
-	} else if ($response[result] != "") {
+	} else if ($response['result'] != "") {
 	    // login failure
-	    error_log("putSessionData failed " . $response[result]);
+	    error_log("putSessionData failed " . $response['result']);
 	} else {
 		// success
 		return true;
