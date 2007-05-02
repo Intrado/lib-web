@@ -77,7 +77,7 @@ function setSetting($name, $value) {
 		if($value === '' || $value === NULL)
 			QuickUpdate("delete from setting where name = '$name'");
 		elseif($value != $old)
-			QuickUpdate("update setting set value = '$value' where and name = '$name'");
+			QuickUpdate("update setting set value = '$value' where name = '$name'");
 	}
 }
 
@@ -135,7 +135,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				}
 				$custname= GetFormData($f, $s, 'custdisplayname');
 				if($custname != "" || $custname != $_SESSION['custname']){
-					setSetting("hostname", $custname);
+					setSetting('displayname', $custname);
 					$_SESSION['custname']=$custname;
 				}
 				if($IS_COMMSUITE){
@@ -179,7 +179,7 @@ if( $reloadform )
 
 	//check for new setting name/desc from settings.php
 
-	$custname = getSystemSetting("customername");
+	$custname = getSetting('displayname');
 	PutFormData($f, $s,"custdisplayname", $custname, 'text', 0, 50);
 	if($IS_COMMSUITE)
 		PutFormData($f, $s, "surveyurl", getSetting('surveyurl'), 'text', 0, 100);
@@ -280,7 +280,7 @@ buttons(submit($f, $s, 'save', 'save'));
 startWindow('Global System Settings');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-<?				
+<?
 				if($IS_COMMSUITE) {
 ?>
 				<tr>
@@ -305,7 +305,7 @@ startWindow('Global System Settings');
 						</table>
 					</td>
 				</tr>
-<?				
+<?
 				}
 ?>
 				<tr>
