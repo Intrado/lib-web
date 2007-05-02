@@ -33,7 +33,7 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 	if ($id) {
 		$USER = $_SESSION['user'] = new User($id);
 		$_SESSION['access'] = new Access($USER->accessid);
-		$_SESSION['custname'] = getSystemSetting("hostname");
+		$_SESSION['custname'] = getSystemSetting("displayname");
 		$_SESSION['timezone'] = getSystemSetting("timezone");
 		redirect("start.php");
 	} else {
@@ -53,7 +53,7 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 		if($newuser->enabled && $newaccess->getValue('loginweb')) {
 			$USER = $_SESSION['user'] = $newuser;
 			$ACCESS = $_SESSION['access'] = $newaccess;
-			$_SESSION['custname'] = getSystemSetting("hostname");
+			$_SESSION['custname'] = getSystemSetting("displayname");
 			$_SESSION['timezone'] = getSystemSetting("timezone");
 			QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 			$USER->lastlogin = QuickQuery("select now()");
@@ -67,7 +67,7 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 	}
 }
 
-$custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("hostname") but we may not be logged in yet
+$custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
 
 
 if ($IS_COMMSUITE) {
