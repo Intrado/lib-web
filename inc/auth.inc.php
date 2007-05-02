@@ -49,6 +49,35 @@ function doLogin($loginname, $password, $url) {
 	}
 }
 
+function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null) {
+	echo("doLoginPhone");
+
+	$params = array($loginname, $password, $inboundnumber, $url);
+	$method = "AuthServer.loginPhone";
+	$request = xmlrpc_encode_request($method,$params);
+
+	$context = stream_context_create(array('http' => array(
+    	'method' => "POST",
+    	'header' => "Content-Type: text/xml",
+    	'content' => $request
+	)));
+	$file = file_get_contents("http://localhost:8088/xmlrpc", false, $context);
+	$response = xmlrpc_decode($file);
+	if (xmlrpc_is_fault($response)) {
+	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
+	} else if ($response[result] != "") {
+	    // login failure
+	    error_log("doLoginPhone failed " . $response[result]);
+	} else {
+		// login success
+		global $SESSIONDATA;
+		$SESSIONDATA[authSessionID] = $response[sessionID];
+		getSessionData($response[sessionID]); // load customer db connection
+		return $response[userID];
+	}
+}
+
+
 function forceLogin($loginname, $url) {
 	$params = array($loginname, $url, session_id());
 	$method = "AuthServer.forceLogin";
