@@ -91,8 +91,6 @@ function welcome()
 		glog("userid: ".$userid);
 
 		if ($userid) {
-			getSessionData($SESSIONID); // loads the db connection
-
 			$user = new User($userid);
 			$access = new Access($user->accessid);
 

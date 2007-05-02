@@ -50,8 +50,6 @@ function doLogin($loginname, $password, $url) {
 }
 
 function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null) {
-	echo("doLoginPhone");
-
 	$params = array($loginname, $password, $inboundnumber, $url);
 	$method = "AuthServer.loginPhone";
 	$request = xmlrpc_encode_request($method,$params);

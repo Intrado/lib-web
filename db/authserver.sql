@@ -15,7 +15,6 @@ CREATE TABLE `customer` (
   `jdbcdriver` varchar(50) NOT NULL default '',
   `jdbcurl` varchar(50) NOT NULL default '',
   `dbhost` varchar(50) NOT NULL default '',
-  `dbname` varchar(50) NOT NULL default '',
   `dbusername` varchar(50) NOT NULL default '',
   `dbpassword` varchar(50) NOT NULL default '',
   `inboundnumber` varchar(20) NOT NULL default '',
