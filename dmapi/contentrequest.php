@@ -1,6 +1,7 @@
 <?
 require_once("../obj/Content.obj.php");
 require_once("../inc/content.inc.php");
+require_once("../inc/sessiondata.inc.php");
 
 
 
@@ -22,6 +23,8 @@ if ($BFXML_ELEMENT['attrs']['REQUEST'] == "get") {
 	}
 } else if ($BFXML_ELEMENT['attrs']['REQUEST'] == "put") {
 	$content = findChild($BFXML_ELEMENT,"CONTENT");
+	loadSessionData($content['attrs']['SESSIONID']);
+
 	$dataelement = findChild($content,"DATA");
 	$contenttype = $dataelement['attrs']['MIME-TYPE'];
 	$data = $dataelement['txt'];
