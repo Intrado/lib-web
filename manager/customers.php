@@ -2,7 +2,12 @@
 include_once("common.inc.php");
 include_once("../obj/Customer.obj.php");
 
-$customers = DBFindMany("Customer", "FROM customer");
+$customerquery = Query("select id, dbhost, dbusername, dbpassword, hostname from customer order by id");
+$customers = array();
+while($row = mysql_fetch_row($customerquery)){
+	$customers[] = $row;
+}
+
 
 include_once("nav.inc.php");
 ?>
@@ -22,24 +27,28 @@ include_once("nav.inc.php");
 //Finds the necessary fields for each customer account
 foreach($customers as $cust) {
 
-	$custfields = QuickQueryRow("SELECT hostname, inboundnumber, timezone FROM customer WHERE customer.id = $cust->id");
-	$usercount = QuickQuery("SELECT COUNT(*) FROM user WHERE user.customerid = $cust->id
-	                         AND user.enabled = '1'");
-	$jobcount = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
-							WHERE user.customerid = $cust->id
-							AND job.status = 'active'");
-?>
-	<tr><td><?= $cust->id ?></td>
-	<td><?= $cust->name ?></td>
-	<td><a href="https://asp.schoolmessenger.com/<?=$custfields[0]?>" target="_blank"><?=$custfields[0]?></a></td>
-	<td><?= $custfields[1] ?></td>
-	<td><?= $custfields[2] ?></td>
-	<td <?= $usercount == 1 ? 'style="background-color: #ffcccc;"' : "" ?>><?= $usercount ?></td>
-	<td <?= $jobcount > 0 ? 'style="background-color: #ccffcc;"' : "" ?>><?= $jobcount ?></td>
-	<td><a href="customeredit.php?id=<?=$cust->id ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust->id ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust->id?>">Customer&nbsp;Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust->id?>">Active&nbsp;Jobs</a></td>
-	</tr>
-
-<?
+	if($custdb = DBConnect($cust[1], $cust[2], $cust[3], "c_" . $cust[0])){
+	
+		$custname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
+		$hostname = $cust[4];
+		$inboundnumber = QuickQuery("select value from setting where name = 'inboundnumber'", $custdb);
+		$timezone = QuickQuery("select value from setting where name = 'timezone'", $custdb);
+		$usercount = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1'", $custdb);
+		$jobcount = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
+								WHERE job.status = 'active'", $custdb);
+	?>
+		<td><?= $cust[0] ?></td>
+		<td><?= $custname ?></td>
+		<td><a href="https://asp.schoolmessenger.com/<?=$hostname?>" target="_blank"><?=$hostname?></a></td>
+		<td><?= $inboundnumber ?></td>
+		<td><?= $timezone ?></td>
+		<td <?= $usercount == 1 ? 'style="background-color: #ffcccc;"' : "" ?>><?= $usercount ?></td>
+		<td <?= $jobcount > 0 ? 'style="background-color: #ccffcc;"' : "" ?>><?= $jobcount ?></td>
+		<td><a href="customeredit.php?id=<?=$cust[0] ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust[0] ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust[0]?>">Customer&nbsp;Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust[0]?>">Active&nbsp;Jobs</a></td>
+		</tr>
+	
+	<?
+	}
 }
 ?>
 </table>
