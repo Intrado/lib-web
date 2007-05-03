@@ -12,11 +12,19 @@ if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
 	redirect();
 }
+$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
+if(isset($_SESSION['currentid'])) {
+	$currentid = $_SESSION['currentid'];
+	$custquery = Query("select dbhost, dbusername, dbpassword, hostname from customer where id = '$currentid'");
+	$custinfo = mysql_fetch_row($custquery);
+	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
+	if(!$custdb) {
+		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
+	}
+}
 
 $f = "customer";
 $s = "edit";
-$currentid = $_SESSION['currentid'];
-$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",
@@ -31,13 +39,9 @@ $timezones = array(	"US/Alaska",
 					"US/Pacific",
 					"US/Samoa"	);
 $reloadform = 0;
-// Checking to see if customer id is in the database
-if( !QuickQuery("SELECT COUNT(*) FROM customer WHERE id = $currentid")) {
-	exit("Cannot find record of customer in database");
-}
+
 $refresh = 0;
-$languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
-$custfields = QuickQueryRow("SELECT name, hostname, inboundnumber, timezone FROM customer WHERE customer.id = $currentid");
+$languages = QuickQueryList("select id, name from language order by name", true, $custdb);
 
 if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 	if(CheckFormInvalid($f))
@@ -69,54 +73,50 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managerpassword = GetFormData($f, $s, 'managerpassword');
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
 
-			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnumber) . " AND id != $currentid")) {
+			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."' AND id != $currentid")) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if (strlen($inboundnumber) > 0 && !ereg("[0-9]{10}",$inboundnumber)) {
 				error('Bad Toll Free Number Format, Try Again');
-			} else if ((strlen($custfields[1]) >= 5) && (strlen($hostname) < 5)){
+			} else if ((strlen($custinfo[3]) >= 5) && (strlen($hostname) < 5)){
 				error('Customer URL\'s cannot be shorter than 5 unless their account was already made');			
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
 			} else {
-				$query="UPDATE customer SET name='" . DBSafe($displayname) . "',
-						hostname='" . DBSafe($hostname) . "',
-						inboundnumber='" . DBSafe($inboundnumber) . "',
-						timezone='" . DBSafe($timezone) . "' WHERE id = $currentid";
-				Query($query) or die("ERROR: " . mysql_query() . " SQL:" . $query);
 
-				setCustomerSystemSetting("maxphones", $maxphones, $currentid);
-				setCustomerSystemSetting("maxemails", $maxemails, $currentid);
-				setCustomerSystemSetting('retry', $retry, $currentid);
-				setCustomerSystemSetting('callerid', Phone::parse($callerid), $currentid);
-				setCustomerSystemSetting('defaultareacode', $areacode, $currentid);
-				setCustomerSystemSetting('autoreport_replyname', $autoname, $currentid);
-				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $currentid);
-				setCustomerSystemSetting('surveyurl', $surveyurl, $currentid);
+				QuickQuery("update customer set hostname = '" . DBSafe($hostname) ."' where id = '$currentid'");
+				QuickQuery("update customer set inboundnumber = '" . DBSafe($inboundnumber) ."' where id = '$currentid'");
+				setCustomerSystemSetting("displayname", $displayname, $custdb);
+				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
+				setCustomerSystemSetting("timezone", $timezone, $custdb);
+				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
+				setCustomerSystemSetting("maxemails", $maxemails, $custdb);
+				setCustomerSystemSetting('retry', $retry, $custdb);
+				setCustomerSystemSetting('callerid', Phone::parse($callerid), $custdb);
+				setCustomerSystemSetting('defaultareacode', $areacode, $custdb);
+				setCustomerSystemSetting('autoreport_replyname', $autoname, $custdb);
+				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $custdb);
+				setCustomerSystemSetting('surveyurl', $surveyurl, $custdb);
 
 				if($renewaldate != "" || $renewaldate != NULL){
 					if($renewaldate = strtotime($renewaldate)) {
 						$renewaldate = date("Y-m-d", $renewaldate);
 					}
 				}
-				setCustomerSystemSetting('_renewaldate', $renewaldate, $currentid);
-				setCustomerSystemSetting('_callspurchased', $callspurchased, $currentid);
+				setCustomerSystemSetting('_renewaldate', $renewaldate, $custdb);
+				setCustomerSystemSetting('_callspurchased', $callspurchased, $custdb);
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
 					if(GetFormData($f, $s, $lang) === "") {
-						$languages[$oldlanguage]->destroy();
+						QuickUpdate("delete from language where id = $oldlanguage", $custdb);
 					} else {
-						$languages[$oldlanguage]->name= GetFormData($f, $s, $lang);
-						$languages[$oldlanguage]->update();
+						QuickUpdate("update language set name='" . GetFormData($f, $s, $lang) . "' where id = '" . $oldlanguage . "'", $custdb);
 					}
 				}
 				if(GetFormData($f,$s, "newlang")!=""){
-					$newlang = new Language();
-					$newlang->name = GetFormData($f, $s, "newlang");
-					$newlang->customerid = $currentid;
-					$newlang->create();
+					QuickUpdate("insert into language(name) values ('" . GetFormData($f, $s, "newlang") . "')", $custdb);
 				}
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
@@ -125,7 +125,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					$refresh = 1;
 				}
 			}
-
 		}
 	}
 } else {
@@ -136,36 +135,35 @@ if( $reloadform ) {
 
 	ClearFormData($f);
 	if($refresh){
-		$custfields = QuickQueryRow("SELECT name, hostname, inboundnumber, timezone FROM customer WHERE customer.id = $currentid");
-		$languages = DBFindMany("Language", "from language where customerid = '$currentid' order by name");
+		$languages = QuickQueryList("select id, name from language order by name", true, $custdb);
 	}
-	PutFormData($f,$s,'name',$custfields[0],"text",1,50,true);
-	PutFormData($f,$s,'hostname',$custfields[1],"text",1,255,true);
-	PutFormData($f,$s,'inboundnumber',$custfields[2],"phone",10,10);
-	PutFormData($f,$s,'timezone', $custfields[3], "text", 1, 255);
+	PutFormData($f,$s,'name',getCustomerSystemSetting('displayname', "", true, $custdb),"text",1,50,true);
+	PutFormData($f,$s,'hostname',$custinfo[3],"text",1,255,true);
+	PutFormData($f,$s,'inboundnumber',getCustomerSystemSetting('inboundnumber', 4, true, $custdb),"phone",10,10);
+	PutFormData($f,$s,'timezone', getCustomerSystemSetting('timezone', 4, true, $custdb), "text", 1, 255);
 
-	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', $currentid, false, true)),"phone",10,10);
-	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', $currentid, false, true),"phone", 3, 3);
+	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', false, true, $custdb)),"phone",10,10);
+	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', false, true, $custdb),"phone", 3, 3);
 
-	$currentmaxphone = getCustomerSystemSetting('maxphones', $currentid, 4, true);
+	$currentmaxphone = getCustomerSystemSetting('maxphones', 4, true, $custdb);
 	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",3,"nomax",true);
-	$currentmaxemail = getCustomerSystemSetting('maxemails', $currentid, 2, true);
+	$currentmaxemail = getCustomerSystemSetting('maxemails', 2, true, $custdb);
 	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",2,"nomax",true);
 
-	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', $currentid, false, true),"text",1,255);
-	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', $currentid, false, true),"email",1,255);
+	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', false, true, $custdb),"text",1,255);
+	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb),"email",1,255);
 
-	PutFormData($f,$s,'renewaldate', getCustomerSystemSetting('_renewaldate', $currentid, false, true), "text", 1, 255);
-	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', $currentid, false, true), "number");
+	PutFormData($f,$s,'renewaldate', getCustomerSystemSetting('_renewaldate', false, true, $custdb), "text", 1, 255);
+	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', false, true, $custdb), "number");
 
-	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', $currentid, false, true),"number",5,240);
-	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', $currentid, false, true), "text", 0, 100);
+	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
+	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
 	
 	$oldlanguages = array();
-	foreach($languages as $language){
-		$oldlanguages[] = $language->id;
-		$lang = "Language" . $language->id;
-		PutFormData($f, $s, $lang, $language->name, "text");
+	foreach($languages as $index => $language){
+		$oldlanguages[] = $index;
+		$lang = "Language" . $index;
+		PutFormData($f, $s, $lang, $language, "text");
 	}
 	PutFormData($f, $s, "oldlanguages", $oldlanguages);
 	PutFormData($f, $s, "newlang", "", "text");
@@ -203,8 +201,8 @@ NewForm($f);
 
 <?
 	
-	foreach($languages as $language){
-		$lang = "Language" . $language->id;
+	foreach($languages as $index => $language){
+		$lang = "Language" . $index;
 		?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50) ?></td></tr><?
 	}
 ?>
@@ -245,14 +243,14 @@ if(isset($ERRORS) && is_array($ERRORS)) {
 include_once("navbottom.inc.php");
 
 /************FUNCTIONS***********/
-function setCustomerSystemSetting($name, $value, $currid) {
-	$old = getCustomerSystemSetting($name, $currid, false, true);
+function setCustomerSystemSetting($name, $value, $custdb) {
+	$old = getCustomerSystemSetting($name, false, false, $custdb);
 	$name = DBSafe($name);
 	$value = DBSafe($value);
 	if($old === false) {
-		QuickUpdate("insert into setting (customerid, name, value) values ('$currid', '$name', '$value')");
+		QuickUpdate("insert into setting (name, value) values ('$name', '$value')", $custdb);
 	} else {
-		QuickUpdate("update setting set value = '$value' where customerid = '$currid' and name = '$name'");
+		QuickUpdate("update setting set value = '$value' where name = '$name'", $custdb);
 
 	}
 }
