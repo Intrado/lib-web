@@ -1,6 +1,8 @@
 <?
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
+$_dbcon = mysql_connect($SETTINGS['db']['host'], $SETTINGS['db']['user'], $SETTINGS['db']['pass']);
+mysql_select_db($SETTINGS['db']['db'], $_dbcon);
+
 
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
