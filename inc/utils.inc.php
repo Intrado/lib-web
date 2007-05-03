@@ -53,13 +53,13 @@ function getNextAvailableAccessCode($currentCode, $userid) {
 	return $nextCode;
 }
 
-function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false) {
+function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false, $custdb = false) {
 	static $settings = array();
 
 	if (isset($settings[$name]) && !$refresh)
 		return $settings[$name];
 
-	$value = QuickQuery("select value from setting where name = '" . DBSafe($name) . "'");
+	$value = QuickQuery("select value from setting where name = '" . DBSafe($name) . "'", $custdb);
 	
 	if($value === false) {
 		$value = $defaultvalue;
@@ -68,7 +68,6 @@ function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false) {
 }
 
 function getSystemSetting($name, $defaultvalue=false) {
-	global $USER;
 	return getCustomerSystemSetting($name, $defaultvalue);
 }
 
