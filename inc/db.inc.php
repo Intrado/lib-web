@@ -50,17 +50,24 @@ function DBSafe ($string) {
 	return mysql_real_escape_string($string,$_dbcon);
 }
 
-function Query ($query) {
+function Query ($query, $dbconnect = false) {
 	DBDebug($query);
 	global $_dbcon;
-	return DBQueryWrapper($query,$_dbcon);
+	if($dbconnect)
+		return DBQueryWrapper($query,$dbconnect);
+	else
+		return DBQueryWrapper($query,$_dbcon);
 }
 
-function QuickQuery ($query) {
+function QuickQuery ($query, $dbconnect = false) {
 	DBDebug($query);
 	global $_dbcon;
 	$val = false;
-	if ($result = DBQueryWrapper($query,$_dbcon)) {
+	if($dbconnect)
+		$connection = $dbconnect;
+	else
+		$connection = $_dbcon;
+	if ($result = DBQueryWrapper($query,$connection)) {
 		if ($row = mysql_fetch_row($result)) {
 			$val = $row[0];
 		}
@@ -70,20 +77,28 @@ function QuickQuery ($query) {
 	return $val;
 }
 
-function QuickUpdate ($query) {
+function QuickUpdate ($query, $dbconnect = false) {
 	DBDebug($query);
 	global $_dbcon;
-	if (DBQueryWrapper($query,$_dbcon)) {
+	if($dbconnect)
+		$connection = $dbconnect;
+	else
+		$connection = $_dbcon;
+	if (DBQueryWrapper($query,$connection)) {
 		return mysql_affected_rows();
 	}
 	return false;
 }
 
-function QuickQueryRow ($query, $assoc = false) {
+function QuickQueryRow ($query, $assoc = false, $dbconnect = false) {
 	DBDebug($query);
 	global $_dbcon;
+	if($dbconnect)
+		$connection = $dbconnect;
+	else
+		$connection = $_dbcon;
 	$row = false;
-	if ($result = DBQueryWrapper($query,$_dbcon)) {
+	if ($result = DBQueryWrapper($query,$connection)) {
 		if ($assoc)
 			$row = mysql_fetch_assoc($result);
 		else
@@ -95,12 +110,16 @@ function QuickQueryRow ($query, $assoc = false) {
 	return $row;
 }
 
-function QuickQueryList ($query, $pair = false) {
+function QuickQueryList ($query, $pair = false, $dbconnect = false) {
 	DBDebug($query);
 	global $_dbcon;
 	$list = array();
-
-	if ($result = DBQueryWrapper($query,$_dbcon)) {
+	
+	if($dbconnect)
+		$connection = $dbconnect;
+	else
+		$connection = $_dbcon;
+	if ($result = DBQueryWrapper($query,$connection)) {
 		while ($row = mysql_fetch_row($result)) {
 			if($pair)
 				$list[$row[0]] = $row[1];
@@ -119,6 +138,21 @@ function DBGetRow ($query, $assoc = false) {
 		$result = mysql_fetch_row($query);
 	return $result;
 }
+
+function DBConnect($host, $user, $pass, $database){
+	$custdb = mysql_connect($host, $user, $pass);
+	if(!$custdb){
+		error_log("Problem connecting to MySQL server at " . $host . " error:" . mysql_error());
+		return false;
+	}
+	if(mysql_select_db($database, $custdb)){
+		return $custdb;
+	} else {
+		error_log("Problem connecting to MySQL database: " . $database . " error:" . mysql_error());
+		return false;
+	}
+}
+
 
 
 ?>
