@@ -125,10 +125,11 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'sendemail', '1'),"
 						. "($accessid, 'sendphone', '1'),"
 						. "($accessid, 'sendmulti', '1'),"
+						. "($accessid, 'leavemessage', '1'),"
+						. "($accessid, 'survey', '1'),"
 						. "($accessid, 'createlist', '1'),"
 						. "($accessid, 'createrepeat', '1'),"
 						. "($accessid, 'createreport', '1'),"
-						. "($accessid, 'datafields', 'f01|f02|f03'),"
 						. "($accessid, 'maxjobdays', '7'),"
 						. "($accessid, 'viewsystemreports', '1'),"
 						. "($accessid, 'managesystemjobs', '1'),"
@@ -143,7 +144,6 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'blocknumbers', '1'),"
 						. "($accessid, 'callblockingperms', 'editall'),"
 						. "($accessid, 'metadata', '1'),"
-						. "($accessid, 'leavemessage', '1'),"
 						. "($accessid, 'managetasks', '1');"
 						;
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
