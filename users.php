@@ -93,7 +93,14 @@ startWindow('Active Users ' . help('Users_ActiveUsersList', NULL, "blue"), 'padd
 
 button_bar(button('adduser', NULL,"user.php?id=new") . help('Users_UserAdd'));
 
-$data = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
+
+if($IS_COMMSUITE)
+	$data = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
+/*CSDELETEMARKER_START*/
+else
+	$data = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");	
+/*CSDELETEMARKER_END*/
+
 showObjects($data, $titles, array("Actions" => "fmt_actions_en", 'AccessProfile' => 'fmt_acc_profile', "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
 endWindow();
 
