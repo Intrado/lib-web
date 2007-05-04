@@ -61,7 +61,13 @@ $titles = array(	"name" => "Name",
 					"Actions" => "Actions"
 					);
 
-$data = DBFindMany("Access","from access order by name");
+if($IS_COMMSUITE)
+	$data = DBFindMany("Access","from access order by name");
+/*CSDELETEMARKER_START*/
+else
+	$data = DBFindMany("Access","from access where name != 'SchoolMessenger Admin' order by name");	
+/*CSDELETEMARKER_END*/
+
 startWindow('Profile List ' . help('Security_ProfileList', NULL, 'blue'), 'padding: 3px;');
 
 button_bar(button('createaccesspro', NULL,"profile.php?id=new") . help('Security_ProfileAdd'));
