@@ -1,8 +1,4 @@
 <?
-require_once("../inc/auth.inc.php");
-require_once("dmapidb.inc.php");
-global $dmapidb;
-
 
 function DmapiQuickQuery ($query) {
 	global $dmapidb;

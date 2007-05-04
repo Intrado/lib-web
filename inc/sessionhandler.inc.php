@@ -1,5 +1,4 @@
 <?
-require_once("auth.inc.php");
 
 function open($save_path, $session_name)
 {

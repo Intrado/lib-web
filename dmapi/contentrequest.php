@@ -1,6 +1,8 @@
 <?
 require_once("../obj/Content.obj.php");
 require_once("../inc/content.inc.php");
+require_once("../inc/auth.inc.php");
+require_once("dmapidb.inc.php");
 require_once("../inc/sessiondata.inc.php");
 
 
