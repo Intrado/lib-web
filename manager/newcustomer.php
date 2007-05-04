@@ -18,6 +18,22 @@ $timezones = array(	"US/Alaska",
 					"US/Pacific",
 					"US/Samoa"	);
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function genpassword() {
+	$digits = 15;
+	$passwd = "";
+	$chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	while ($digits--) {
+		$passwd .= $chars[mt_rand(0,strlen($chars)-1)];
+	}
+	return $passwd;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +42,6 @@ $f = "customer";
 $s = "main";
 
 $reloadform = 0;
-$user = "schoolmessenger";
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 // If user submitted the form
@@ -46,31 +61,54 @@ if (CheckFormSubmit($f,$s)){
 			$timezone = GetFormData($f, $s, "timezone");
 			$hostname = GetFormData($f, $s, "hostname");
 			$inboundnum = GetFormData($f, $s, "inboundnumber");
-			$cust_pass = GetFormData($f, $s, "password");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
+			$shard = GetFormData($f,$s,'shard');
 
-			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
+			if (($inboundnum != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."'")) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
-			} else if ($cust_pass != GetFormData($f,$s,"password2")) {
-				error('Password and Confirmation Password do not match', 'Try Again');
 			} else if (strlen($inboundnum) > 0 && !ereg("[0-9]{10}",$inboundnum)) {
 				error('Bad 800 Number Format', 'Try Again');
+			} else if (!$shard){
+				error('A shard needs to be chosen');
 			} else {
+			
+				//choose shard info based on selection
+				$shardinfo = QuickQueryRow("select * from shardinfo where id = '$shard'", true);
+				$shardhost = $shardinfo['shardhost'];
+				$sharduser = $shardinfo['sharduser'];
+				$shardpass = $shardinfo['shardpass'];
+				
+				$dbpassword = genpassword();
+				QuickUpdate("insert into customer (hostname, dbhost,dbpassword,inboundnumber,enabled) values
+												('" . DBSafe($hostname) . "','$shardhost', '$dbpassword', '" . DBSafe($inboundnum) . "', '1')" );
+				$customerid = mysql_insert_id();
+				
+				$newdbname = "c_$customerid";
+				QuickUpdate("update customer set dbusername = '" . $newdbname . "' where id = '" . $customerid . "'");
+				
+				$newdb = mysql_connect($shardhost, $sharduser, $shardpass)
+					or die("Failed to connect to DBHost $shardhost : " . mysql_error($newdb));
+				QuickUpdate("create database $newdbname",$newdb)
+					or die ("Failed to create new DB $newdbname : " . mysql_error($newdb));
+				mysql_select_db($newdbname,$newdb)
+					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
+					
+				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
+				QuickUpdate("grant all privileges on $newdbname . * to '$newdbname'", $newdb);
+				
+				$tablequeries = explode(";",file_get_contents("new_customer_schema.sql"));
+				foreach ($tablequeries as $tablequery) {
+					if (trim($tablequery))
+						Query($tablequery,$newdb)
+							or die ("Failed to create tables \n$tablequery\n\nfor $newdbname : " . mysql_error($custdb));
+				}
 
-				$query = "insert into customer (name,enabled,timezone,hostname,inboundnumber) VALUES
-							('" . DBSafe($displayname) . "',1,
-							'" . DBSafe($timezone) . "',
-							'" . DBSafe($hostname) . "',
-							'" . DBSafe($inboundnum) . "')";
-				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
-				$custid = mysql_insert_id();
-
-				$query = "insert into access (name,customerid) values ('System Administrators', $custid)";
-				QuickUpdate($query) or die( "ERROR:" . mysql_error());
+				$query = "insert into access (name) values ('SchoolMessenger Admin')";
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error());
 				$accessid = mysql_insert_id();
 
 				$query = "INSERT INTO `permission` (accessid,name,value) VALUES "
@@ -105,44 +143,56 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'blocknumbers', '1'),"
 						. "($accessid, 'callblockingperms', 'editall'),"
 						. "($accessid, 'metadata', '1'),"
+						. "($accessid, 'leavemessage', '1'),"
 						. "($accessid, 'managetasks', '1');"
 						;
-				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
-				$query = "INSERT INTO `user` (`accessid`, `login`, `password`, `customerid`,
+				$query = "INSERT INTO `user` (`accessid`, `login`,
 							`firstname`, `lastname`, `enabled`, `deleted`) VALUES
-							( '$accessid' , '$user',
-							password('" . DBSafe($cust_pass) . "') ,
-							'$custid', 'System', 'Administrator', 1 ,0)";
-				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+							( '$accessid' , 'schoolmessenger',
+							'School', 'Messenger', 1 ,0)";
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
-				$query = "INSERT INTO `fieldmap` (`customerid`, `fieldnum`, `name`, `options`) VALUES
-							($custid, 'f01', 'First Name', 'searchable,text'),
-							($custid, 'f02', 'Last Name', 'searchable,text'),
-							($custid, 'f03', 'Language', 'searchable,multisearch')";
-				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
+							('f01', 'First Name', 'searchable,text'),
+							('f02', 'Last Name', 'searchable,text'),
+							('f03', 'Language', 'searchable,multisearch')";
+				QuickUpdate($query, $newdb) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 
-				$query = "INSERT INTO `language` (`customerid`, `name`, `code`) VALUES
-							($custid, 'English', ''),
-							($custid, 'Spanish', '')";
-				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+				$query = "INSERT INTO `language` (`name`) VALUES
+							('English'),
+							('Spanish')";
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 
-				$query = "INSERT INTO `jobtype` (`customerid`, `name`, `priority`, `systempriority`, timeslices, `deleted`) VALUES
-							($custid, 'Emergency', 10000, 1, 50, 0),
-							($custid, 'Attendance', 20000, 2, 0, 0),
-							($custid, 'General', 30000, 3, 100, 0)";
-				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+				$query = "INSERT INTO `jobtype` (`name`, `priority`, `systempriority`, timeslices, `deleted`) VALUES
+							('Emergency', 10000, 1, 50, 0),
+							('Attendance', 20000, 2, 0, 0),
+							('General', 30000, 3, 100, 0)";
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$surveyurl = "http://asp.schoolmessenger.com/" . $hostname . "/survey/";
-				$query = "INSERT INTO `setting` (`customerid`, `name`, `value`) VALUES
-							($custid, 'maxphones', '3'),
-							($custid, 'maxemails', '2'),
-							($custid, 'retry', '15'),
-							($custid, 'surveyurl', '" . DBSafe($surveyurl) . "')";
-				QuickUpdate($query) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+							('maxphones', '3'),
+							('maxemails', '2'),
+							('retry', '15'),
+							('surveyurl', '" . DBSafe($surveyurl) . "'),
+							('displayname', '" . DBSafe($displayname) . "'),
+							('timezone', '" . DBSafe($timezone) . "'),
+							('inboundnumber', '" . DBSafe($inboundnum) . "')";
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
+				
+				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
+							('english', 'male'),
+							('english', 'female'),
+							('spanish', 'male'),
+							('spanish', 'female')";
+							
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_erryr() . " SQL: " . $query);
 
 				redirect("customers.php");
+				
 			}
 		}
 	}
@@ -157,10 +207,9 @@ if( $reloadform ){
 	PutFormData($f,$s,'name',"","text",1,50);
 	PutFormData($f,$s,'hostname',"","text",5,255);
 	PutFormData($f,$s,'inboundnumber',"","text",10,10);
-	PutFormData($f,$s,'password',"","text",1,255);
-	PutFormData($f,$s,'password2',"","text",1,255);
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
+	PutFormData($f,$s,'shard', "");
 }
 
 include_once("nav.inc.php");
@@ -176,8 +225,6 @@ NewFormItem($f, $s,"", 'submit');
 <tr><td>URL path name: </td><td><? NewFormItem($f, $s, 'hostname', 'text', 25, 255); ?> (Must be 5 or more characters)</td></tr>
 <tr><td>Toll Free Inbound Number: </td><td><? NewFormItem($f, $s, 'inboundnumber', 'text', 10, 10); ?> Make Sure Not Taken</td></tr>
 <tr><td>Admin username: </td><td>schoolmessenger</td></tr>
-<tr><td>Admin password: </td><td><? NewFormItem($f, $s, 'password', 'text', 25,255); ?></td></tr>
-<tr><td>Password verify:</td><td><? NewFormItem($f, $s, 'password2', 'text', 25,255); ?> </td></tr>
 
 
 <tr><td>Timezone: </td><td>
@@ -190,6 +237,20 @@ NewFormItem($f, $s,"", 'submit');
 ?>
 </td></tr>
 
+<tr><td>Shard: </td><td>
+<?
+	$shardquery = Query("select * from shardinfo");
+	$shards = array();
+	while($row = DBGetRow($shardquery, true)){
+		$shards[] = $row;
+	}
+	NewFormItem($f, $s, 'shard', "selectstart");
+	foreach($shards as $shard) {
+		NewFormItem($f, $s, 'shard', "selectoption", "shard". $shard['id'], $shard['id'] );
+	}
+	NewFormItem($f, $s, 'shard', "selectend");
+?>
+</td></tr>
 </table>
 
 <?
