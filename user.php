@@ -24,10 +24,19 @@ if (!$USER->authorize('manageaccount')) {
 	redirect('unauthorized.php');
 }
 
+/*CSDELETEMARKER_START*/
+if(isset($_GET['id'])){
+	$id = $_GET['id']+0;
+	if(QuickQuery("select count(*) from user where login = 'schoolmessenger' and id = '$id'")){
+		redirect('unauthorized.php');
+	}
+}
+/*CSDELETEMARKER_END*/
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-//get the message to edit from the request params or session
+
 if (isset($_GET['id'])) {
 	setCurrentUser($_GET['id']);
 	redirect();
@@ -366,7 +375,14 @@ startWindow('User Information');
 								<td>
 								<?
 								NewFormItem($f,$s,'accessid','selectstart');
-								$accss = DBFindMany('Access', "from access");
+								
+								if($IS_COMMSUITE)
+									$accss = DBFindMany('Access', "from access");
+								/*CSDELETEMARKER_START*/
+								else
+									$accss = DBFindMany('Access', "from access where name != 'SchoolMessenger Admin'");
+								/*CSDELETEMARKER_END*/
+								
 								if(count($accss))
 									foreach($accss as $acc)
 										NewFormItem($f,$s,'accessid','selectoption',$acc->name,$acc->id);
