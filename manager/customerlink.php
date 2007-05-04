@@ -14,7 +14,8 @@ if($_REQUEST['submit']){
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	if($manager->runCheck($password)){
 		$string = md5(microtime());
-		QuickQuery("update customer set asptoken = '$string', aspexpiration = now() where id = '$custid'");
+		// TODO we may want to set the expiration interval in the properties file
+		QuickQuery("update customer set asptoken = '$string', aspexpiration = now() + interval 10 minute where id = '$custid'");
 		$customerurl = QuickQuery("select hostname from customer where id = '$custid'");
 	} else {
 		error("That was an invalid password");
@@ -24,13 +25,13 @@ if($_REQUEST['submit']){
 include_once("nav.inc.php");
 ?>
 <br>
-Link: 
+Link:
 <?
 	if(isset($string)){
 ?>
 		<a href="http://asp.schoolmessenger.com/<?=$customerurl?>/?asptoken=<?=$string?>" target="_blank"><?=$customerurl?></a>
-<? 
-	} 
+<?
+	}
 ?>
 <br>
 <br>
