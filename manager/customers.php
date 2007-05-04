@@ -39,7 +39,7 @@ foreach($customers as $cust) {
 	?>
 		<td><?= $cust[0] ?></td>
 		<td><?= $custname ?></td>
-		<td><a href="https://asp.schoolmessenger.com/<?=$hostname?>" target="_blank"><?=$hostname?></a></td>
+		<td><a href="customerlink.php?id=<?=$cust[0] ?>"><?=$hostname?></a></td>
 		<td><?= $inboundnumber ?></td>
 		<td><?= $timezone ?></td>
 		<td <?= $usercount == 1 ? 'style="background-color: #ffcccc;"' : "" ?>><?= $usercount ?></td>
