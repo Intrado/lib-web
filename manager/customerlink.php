@@ -28,13 +28,13 @@ Link:
 <?
 	if(isset($string)){
 ?>
-		<a href="http://localhost/<?=$customerurl?>/?asptoken=<?=$string?>" target="_blank"><?=$customerurl?></a>
+		<a href="http://asp.schoolmessenger.com/<?=$customerurl?>/?asptoken=<?=$string?>" target="_blank"><?=$customerurl?></a>
 <? 
 	} 
 ?>
 <br>
 <br>
-<form method="POST" action="customerlogin.php?id=<?=$custid?>">
+<form method="POST" action="customerlink.php?id=<?=$custid?>">
 Enter Manager Password: <input type="password" name="password" />
 <input type="submit" name="submit" />
 </form>
