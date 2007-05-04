@@ -27,7 +27,11 @@ if (isset($_GET['login'])) {
 	doStartSession();
 }
 if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
-
+	/*CSDELETEMARKER_START*/
+	if($_GET['login'] == 'schoolmessenger'){
+		redirect("unauthorized.php");
+	}
+	/*CSDELETEMARKER_END*/
 	$id = forceLogin(get_magic_quotes_gpc() ? stripslashes($_GET['login']) : $_GET['login'], $CUSTOMERURL);
 
 	if ($id) {
