@@ -47,9 +47,14 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 	$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
 	unset($_SESSION['lasturi']);
 	redirect($redirpage);
-} elseif (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
+} elseif ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ||
+		  (isset($_GET['asptoken']))) {
 
-	$id = doLogin(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'], get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'],$CUSTOMERURL);
+	if (isset($_GET['asptoken'])) {
+		$id = asptokenLogin($_GET['asptoken'], $CUSTOMERURL);
+	} else {
+		$id = doLogin(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'], get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'],$CUSTOMERURL);
+	}
 
 	if ($id) {
 		$newuser = new User($id);

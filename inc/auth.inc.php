@@ -78,7 +78,6 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 	}
 }
 
-
 function forceLogin($loginname, $url) {
 	$params = array($loginname, $url, session_id());
 	$method = "AuthServer.forceLogin";
@@ -100,6 +99,32 @@ function forceLogin($loginname, $url) {
 	} else {
 		// login success
 		return $response[userID];
+	}
+}
+
+function asptokenLogin($asptoken, $url) {
+	$params = array($asptoken, $url);
+	$method = "AuthServer.asptokenLogin";
+	$request = xmlrpc_encode_request($method,$params);
+
+	$context = stream_context_create(array('http' => array(
+    	'method' => "POST",
+    	'header' => "Content-Type: text/xml",
+    	'content' => $request
+	)));
+	global $SETTINGS;
+	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
+	$response = xmlrpc_decode($file);
+	if (xmlrpc_is_fault($response)) {
+	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
+	} else if ($response['result'] != "") {
+	    // login failure
+	    error_log("asptokenLogin failed " . $response['result']);
+	} else {
+		// login success
+		session_id($response['sessionID']); // set the session id
+		doStartSession();
+		return $response['userID'];
 	}
 }
 
