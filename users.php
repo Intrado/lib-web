@@ -23,6 +23,11 @@ if (!$USER->authorize('manageaccount')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+/*CSDELETEMARKER_START*/
+$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
+$maxusers = getSystemSetting("_maxusers",1);
+/*CSDELETEMARKER_END*/
+
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
 	if ($_SESSION['userid'] == $deleteid)
@@ -42,10 +47,21 @@ if (isset($_GET['disable'])) {
 }
 
 if (isset($_GET['enable'])) {
-	$id = DBSafe($_GET['enable']);
-	if (customerOwns("user",$id))
-		QuickUpdate("update user set enabled = 1 where id = '$id'");
-	redirect();
+	$maxreached = false;
+	
+	/*CSDELETEMARKER_START*/
+	if($maxusers <= $usercount){
+		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';	
+		$maxreached = true;
+	}
+	/*CSDELETEMARKER_END*/
+	
+	if(!$maxreached){
+		$id = DBSafe($_GET['enable']);
+		if (customerOwns("user",$id))
+			QuickUpdate("update user set enabled = 1 where id = '$id'");
+		redirect();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +104,12 @@ $titles = array(	"firstname" => "#First Name",
 					"lastlogin" => "Last Login",
 					"Actions" => "Actions"
 					);
+					
+/*CSDELETEMARKER_START*/
+?>
+	<div align="right">Total Users: <?=$usercount?>. Max: <?=$maxusers?></div>
+<?
+/*CSDELETEMARKER_END*/
 
 startWindow('Active Users ' . help('Users_ActiveUsersList', NULL, "blue"), 'padding: 3px;');
 

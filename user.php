@@ -41,6 +41,17 @@ if (isset($_GET['id'])) {
 	setCurrentUser($_GET['id']);
 	redirect();
 }
+$maxreached = false;
+/*CSDELETEMARKER_START*/
+if($_SESSION['userid']=== NULL){
+	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
+	$maxusers = getSystemSetting("_maxusers",1);
+	if($maxusers <= $usercount){
+		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
+		$maxreached=true;
+	}
+}
+/*CSDELETEMARKER_END*/
 
 if(isset($_GET['deleterule'])) {
 	$deleterule = DBSafe($_GET['deleterule']);
@@ -73,7 +84,7 @@ if($checkpassword){
 	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
 }
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) // A hack to be able to differentiate between a submit and an add button click
+if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreached) // A hack to be able to differentiate between a submit and an add button click
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
