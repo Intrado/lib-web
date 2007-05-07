@@ -23,7 +23,7 @@ set_time_limit(0);
 function getSetting($name) {
 	global $USER;
 	$name = DBSafe($name);
-	return QuickQuery("select value from setting where customerid = $USER->customerid and name = '$name'");
+	return QuickQuery("select value from setting where name = '$name'");
 }
 
 

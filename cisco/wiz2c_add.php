@@ -41,7 +41,6 @@ if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone
 
 		$person = new Person();
 		$person->userid = $USER->id;
-		$person->customerid = $USER->customerid;
 		$person->deleted = 0;
 		$person->create();
 

@@ -44,13 +44,12 @@ if (isset($_GET['dn'])) {
 	$task->setData('jobretries',$_SESSION['newjob']['retries']);
 	
 	//new task info
-	$task->customerid = $USER->customerid;
 	$task->setData('progress', "Creating Call");
 	$task->setData('count', '0');
 	$task->setData('totalamount', $_SESSION['newjob']['language']['totallangcount']);
 	$task->setData('language0', 'Default');
 	$task->setData('currlang', 'Default');
-	$languages = DBFindMany("Language","from language where customerid= '$USER->customerid' order by name");
+	$languages = DBFindMany("Language","from language order by name");
 	$i=1;
 	foreach($languages as $language){
 		if(isset($_SESSION['newjob']['language'][$language->name]) && $_SESSION['newjob']['language'][$language->name] == 1) {

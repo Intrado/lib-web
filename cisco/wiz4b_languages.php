@@ -31,7 +31,7 @@ if(isset($_GET['language'])){
 
 
 
-$languages = DBFindMany("Language","from language where customerid= '$USER->customerid' order by name");
+$languages = DBFindMany("Language","from language order by name");
 
 header("Content-type: text/xml");
 
