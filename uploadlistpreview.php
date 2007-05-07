@@ -185,7 +185,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		if ($SETTINGS['import']['type'] == "ftp") {
 			$res = uploadImportFile($curfilename,$import->customerid,$import->id); //jjl
 		} else if ($SETTINGS['import']['type'] == "file"){
-			$destfile = $SETTINGS['import']['filedir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv"; //jjl
+			$destfile = $SETTINGS['feature']['tmp_dir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv"; //jjl
 			makeparentdirectories($destfile);
 			$res = copy($curfilename,$destfile);
 		} else {
