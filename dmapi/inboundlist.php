@@ -114,7 +114,7 @@ function playLists($incr)
 				{
 ?>
 					<audio cmid="file://prompts/inbound/Press<?= $listindex ?>For.wav" />
-					<tts gender="female"><?= htmlentities($list->name) ?></tts>
+					<tts gender="female"><?= htmlentities($list->name, ENT_COMPAT, "UTF-8") ?></tts>
 <?
 					$listindex++;
 				}
@@ -171,7 +171,7 @@ function confirmList($listname)
 		<field name="uselist" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
 				<audio cmid="file://prompts/inbound/ListChoice.wav" />
-				<tts gender="female"><?= htmlentities($listname) ?></tts>
+				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/ValidateList.wav" />
 			</prompt>
 

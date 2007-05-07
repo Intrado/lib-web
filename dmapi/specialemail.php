@@ -23,25 +23,25 @@ if ($REQUEST_TYPE == "new") {
 				$toemail = $specialtask->getData("toemail$x");
 				$toname = $specialtask->getData("toname$x");
 ?>
-				<emailaddress name="<?= htmlentities($toname) ?>" address="<?= htmlentities($toemail) ?>" />
+				<emailaddress name="<?= htmlentities($toname, ENT_COMPAT, "UTF-8") ?>" address="<?= htmlentities($toemail, ENT_COMPAT, "UTF-8") ?>" />
 <?
 				$x++;
 			}
 ?>
 		</to>
 		<from>
-			<emailaddress name="<?= htmlentities($specialtask->getData("fromname")) ?>"
-						address="<?= htmlentities($specialtask->getData("fromemail")) ?>" />
+			<emailaddress name="<?= htmlentities($specialtask->getData("fromname"), ENT_COMPAT, "UTF-8") ?>"
+						address="<?= htmlentities($specialtask->getData("fromemail"), ENT_COMPAT, "UTF-8") ?>" />
 		</from>
-		<subject><?= htmlentities($specialtask->getData("subject")) ?></subject>
-		<body><?= htmlentities($specialtask->getData("body")) ?></body>
+		<subject><?= htmlentities($specialtask->getData("subject"), ENT_COMPAT, "UTF-8") ?></subject>
+		<body><?= htmlentities($specialtask->getData("body"), ENT_COMPAT, "UTF-8") ?></body>
 <?
 		$x = 1;
 		while ($specialtask->getData("attachmentcmid$x")) {
 			$attachmentname = $specialtask->getData("attachmentname$x");
 			$attachmentcmid = $specialtask->getData("attachmentcmid$x");
 ?>
-			<attachment name="<?= htmlentities($attachmentname)?>" cmid="<?= htmlentities($attachmentcmid)?>" />
+			<attachment name="<?= htmlentities($attachmentname, ENT_COMPAT, "UTF-8")?>" cmid="<?= htmlentities($attachmentcmid, ENT_COMPAT, "UTF-8")?>" />
 <?
 			$x++;
 		}

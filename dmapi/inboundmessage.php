@@ -125,7 +125,7 @@ function promptMultiLang()
 			{
 ?>
 				<audio cmid="file://prompts/inbound/Press<?= $listindex ?>For.wav" />
-				<tts gender="female"><?= htmlentities($lang) ?></tts>
+				<tts gender="female"><?= htmlentities($lang, ENT_COMPAT, "UTF-8") ?></tts>
 <?
 				$listindex++;
 			}
