@@ -15,11 +15,7 @@ class Customer extends DBMappedObject {
 	}
 
 
-	function getSystemPriorities () {
-		return array("1" => "Emergency",
-					"2" => "Attendance",
-					"3" => "General");
-	}
+
 
 }
 
