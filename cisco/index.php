@@ -27,8 +27,8 @@ function tryLogin ($userid) {
 	if($newuser->enabled && $newaccess->getValue('loginphone')) {
 		$USER = $_SESSION['user'] = $newuser;
 		$ACCESS = $_SESSION['access'] = $newaccess;
-		$_SESSION['custname'] = QuickQuery("select name from customer where id = $USER->customerid");
-		$_SESSION['timezone'] = QuickQuery("select timezone from customer where id=$USER->customerid");
+		$_SESSION['custname'] = getSystemSetting('displayname');
+		$_SESSION['timezone'] = getSystemSetting('timezone');
 		$USER->lastlogin = QuickQuery("select now()");
 		$USER->update(array("lastlogin"));
 
