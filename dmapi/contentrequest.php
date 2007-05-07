@@ -30,7 +30,7 @@ if ($BFXML_ELEMENT['attrs']['REQUEST'] == "get") {
 	$dataelement = findChild($content,"DATA");
 	$contenttype = $dataelement['attrs']['MIME-TYPE'];
 	$data = $dataelement['txt'];
-	$tmpname = secure_tmpname("tmp","dmapicontent",".b64");
+	$tmpname = secure_tmpname($SETTINGS['feature']['tmp_dir'],"dmapicontent",".b64");
 	if($tmpname != false) {
 		file_put_contents($tmpname,$data);
 		unset($data); // don't keep in memory
