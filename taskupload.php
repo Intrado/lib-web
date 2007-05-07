@@ -45,16 +45,18 @@ $reloadform = 0;
 //should we check for an upload?
 if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name']) {
 
-	$newname = secure_tmpname("tmp","taskupload",".csv");
+	$newname = secure_tmpname($_SETTINGS['feature']['tmp_dir'],"taskupload",".csv");
 	if(!move_uploaded_file($_FILES['taskcontents']['tmp_name'],$newname)) {
 		error('Unable to complete file upload. Please try again.');
 	} else if (!is_file($newname) || !is_readable($newname)) {
 		error('Unable to complete file upload. Please try again.');
 	} else {
 		if ($SETTINGS['import']['type'] == "ftp") {
+			//TODO figure out file import directory structure
 			$res = uploadImportFile($newname,$import->customerid,$import->id);
 			unlink($newname);
 		} else if ($SETTINGS['import']['type'] == "file"){
+			//TODO figure out file import directory structure
 			$destfile = $SETTINGS['import']['filedir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv";
 			makeparentdirectories($destfile);
 			$res = copy($newname,$destfile);
@@ -64,6 +66,7 @@ if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name']) {
 		}
 
 		if ($res) {
+			//TODO figure out file import directory structure
 			$import->path = $import->customerid . "/" . $import->id . "/data.csv";
 			$import->update();
 			redirect("taskmap.php?id=$import->id");
