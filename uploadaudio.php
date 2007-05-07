@@ -81,8 +81,8 @@ if(CheckFormSubmit($f,$s))
 
 				$audio->recorddate = date("Y-m-d H:i:s");
 
-				$source = getcwd() . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . 'orig.' . $ext;
-				$dest = getcwd() . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
+				$source = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . 'orig.' . $ext;
+				$dest = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
 				if(!move_uploaded_file($_FILES['audio']['tmp_name'],$source)) {
 					error('There was an error reading your audio file','Please try another file');
 					@unlink($source);

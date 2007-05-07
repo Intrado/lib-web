@@ -73,6 +73,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 	}
 
 	function rcp_requestupload ($method_name, $params, $app_data) {
+		global $SETTINGS;
 		$sessionid = $params[0];
 		$length = $params[1];
 		$md5checksum = $params[2];
@@ -85,7 +86,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 			$sess['uploadsuccess'] = false;
 			$sess['length'] = $sess['remaining'] = $length;
 			$sess['md5'] = $md5checksum;
-			$sess['filename'] = secure_tmpname("/tmp","autoupload",".csv");
+			$sess['filename'] = secure_tmpname($SETTINGS['feature']['tmp_dir'],"autoupload",".csv");
 			storeSessionData($sessionid,$sess['customerid'],$sess);
 
 			return array ("authCode" => $newauthcode,

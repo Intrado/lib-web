@@ -13,7 +13,8 @@ include_once("obj/FieldMap.obj.php");
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 function writeWav ($data) {
-	$name = secure_tmpname("tmp","preview_parts",".wav");
+	global $SETTINGS;
+	$name = secure_tmpname($SETTINGS['feature']['tmp_dir'],"preview_parts",".wav");
 	if (file_put_contents($name,$data))
 		return $name;
 }
@@ -79,7 +80,7 @@ if(isset($_GET['id'])) {
 		}
 
 		//finally, merge the wav files
-		$outname = secure_tmpname("tmp","preview",".wav");
+		$outname = secure_tmpname($SETTINGS['feature']['tmp_dir'],"preview",".wav");
 		$cmd = 'sox "' . implode('" "',$wavfiles) . '" "' . $outname . '"';
 
 		$result = exec($cmd, $res1,$res2);
