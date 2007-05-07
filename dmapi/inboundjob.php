@@ -110,9 +110,9 @@ function jobConfirm($listname, $priority, $numdays=1)
 		<field name="sendjob" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
 				<audio cmid="file://prompts/inbound/Confirmation1.wav" />
-				<tts gender="female"><?= htmlentities($listname) ?></tts>
+				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation2.wav" />
-				<tts gender="female"><?= htmlentities($priority) ?></tts>
+				<tts gender="female"><?= htmlentities($priority, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation3.wav" />
 
 <?				if ($numdays > 1) { ?>
