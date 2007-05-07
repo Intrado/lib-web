@@ -62,7 +62,7 @@ if (CheckFormSubmit($f,$s)){
 			$hostname = GetFormData($f, $s, "hostname");
 			$inboundnum = GetFormData($f, $s, "inboundnumber");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
-			$shard = GetFormData($f,$s,'shard');
+			$shard = GetFormData($f,$s,'shard')+0;
 
 			if (($inboundnum != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -77,7 +77,7 @@ if (CheckFormSubmit($f,$s)){
 			} else {
 			
 				//choose shard info based on selection
-				$shardinfo = QuickQueryRow("select * from shardinfo where id = '$shard'", true);
+				$shardinfo = QuickQueryRow("select id, shardhost, sharduser, shardpass from shardinfo where id = '$shard'", true);
 				$shardhost = $shardinfo['shardhost'];
 				$sharduser = $shardinfo['sharduser'];
 				$shardpass = $shardinfo['shardpass'];
@@ -98,7 +98,7 @@ if (CheckFormSubmit($f,$s)){
 					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
 					
 				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
-				QuickUpdate("grant all privileges on $newdbname . * to '$newdbname'", $newdb);
+				QuickUpdate("grant select, insert, update, delete, create temporary tables on $newdbname . * to '$newdbname'", $newdb);
 				
 				$tablequeries = explode(";",file_get_contents("new_customer_schema.sql"));
 				foreach ($tablequeries as $tablequery) {
@@ -239,7 +239,7 @@ NewFormItem($f, $s,"", 'submit');
 
 <tr><td>Shard: </td><td>
 <?
-	$shardquery = Query("select * from shardinfo");
+	$shardquery = Query("select id, shardhost, sharduser, shardpass from shardinfo");
 	$shards = array();
 	while($row = DBGetRow($shardquery, true)){
 		$shards[] = $row;
