@@ -12,7 +12,6 @@ include_once("inc/text.inc.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
-include_once("obj/Customer.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,6 +209,14 @@ if( $reloadform )
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+
+function getSystemPriorities () {
+	return array("1" => "Emergency",
+				"2" => "Attendance",
+				"3" => "General");
+}
+
+
 function fmt_priority($obj, $name) {
 	return '<div align="center">' . round($obj->priority / 10000) . '</div>';
 }
@@ -227,11 +234,11 @@ function fmt_systempriority($obj, $name) {
 	global $f, $s, $USER;
 	if((isset($_GET['edittype']) && $_GET['edittype'] == $obj->id) || $obj->id == 'new') {
 		$result =  '<select name="systempriority[' . $obj->id . ']">';
-		foreach ($USER->getCustomer()->getSystemPriorities() as $index => $name)
+		foreach (getSystemPriorities() as $index => $name)
 			$result .= '<option ' . ($obj->systempriority == $index ? "selected" : "") . ' value="' . $index . '">' . htmlentities($name) . '</option>';
 		return $result;
 	} else {
-		$priorities = $USER->getCustomer()->getSystemPriorities(); //jjl
+		$priorities = getSystemPriorities();
 		return htmlentities($priorities[$obj->systempriority]);
 	}
 }
