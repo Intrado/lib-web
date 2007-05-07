@@ -95,7 +95,7 @@ if($REQUEST_TYPE == "new") {
 							if($currlang != "Default"){
 								?>
 									<audio cmid="file://prompts/NowRecordInLanguage.wav" />
-									<tts gender="female" language="english"><?=$currlang?></tts>
+									<tts gender="female" language="english"><?=htmlentities($currlang, ENT_COMPAT, "UTF-8")?></tts>
 								<?
 							}
 						?>
