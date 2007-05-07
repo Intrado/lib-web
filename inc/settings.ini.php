@@ -4,6 +4,12 @@
 [authserver]
 url="http://localhost:8088/xmlrpc"
 
+[db]
+persistent=true
+host="localhost:3306"
+user="root"
+pass=""
+db="authserver"
 
 ;optional seperate server for outbound notifications
 [dmapidb]
@@ -26,6 +32,7 @@ log_db_errors=true
 log_db_queries=true
 log_dmapi=true
 has_print=true
+tmp_dir="/tmp"
 
 ;if not set, warn_earliest is set to "7:00 am"
 ;and warn_latest is set to "9:00 pm"
@@ -43,7 +50,7 @@ put="localhost,80,/foobar/xxx-put.php"
 
 [import]
 ;type=file|ftp
-type=ftp
+type=file
 
 ;used for file type imports
 filedir=/usr/commsuite/imports/
