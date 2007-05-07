@@ -132,15 +132,25 @@ function getSessionData($id) {
 	$params = array($id);
 	$method = "AuthServer.getSessionData";
 	$request = xmlrpc_encode_request($method,$params);
-
 	$context = stream_context_create(array('http' => array(
     	'method' => "POST",
     	'header' => "Content-Type: text/xml",
     	'content' => $request
 	)));
 	global $SETTINGS;
-	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
-	$response = xmlrpc_decode($file);
+
+	for ($i=1; $i<5; $i++) {
+		$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
+		if (!isset($file) || $file=="")  {
+			error_log("GGGGGGGGGGGGGGGGGGGGET bad file, now retry");
+		} else {
+			$response = xmlrpc_decode($file);
+			if (!isset($response) || $response=="")  {
+				error_log("GGGGGGGGGGGGGGGGGGGGET bad response, now retry");
+			} else break; // success
+		}
+	}
+
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
 	} else if ($response['result'] != "") {
@@ -152,10 +162,8 @@ function getSessionData($id) {
 		$db['user'] = $response['dbuser'];
 		$db['pass'] = $response['dbpass'];
 		$db['db'] = $response['dbname'];
-
 		// now connect to the customer database
 		global $_dbcon;
-
 		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
 		if (!$_dbcon) {
 			error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
@@ -166,7 +174,6 @@ function getSessionData($id) {
 			error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
 		}
 	}
-
 	return "";
 }
 
@@ -181,7 +188,14 @@ function putSessionData($id, $sess_data) {
     	'content' => $request
 	)));
 	global $SETTINGS;
-	$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
+
+	for ($i=1; $i<5; $i++) {
+		$file = file_get_contents($SETTINGS['authserver']['url'], false, $context);
+		if (!isset($file) || $file=="")  {
+			error_log("PUTTTTTTTTTTTTTTTTTTTTTTTTTT now retry");
+		} else break;
+	}
+
 	$response = xmlrpc_decode($file);
 	if (xmlrpc_is_fault($response)) {
 	    trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
