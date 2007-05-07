@@ -33,7 +33,7 @@ include_once("../obj/SurveyQuestionnaire.obj.php");
 include_once("../obj/SurveyQuestion.obj.php");
 
 
-$custname = getSystemSetting("customername");
+$custname = getSystemSetting("displayname");
 
 //see if this code exists and has not already been used
 //TODO: fix jobworkitem related code
