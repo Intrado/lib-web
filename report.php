@@ -358,8 +358,7 @@ select SQL_CALC_FOUND_ROWS
 	j.maxcallattempts,
 	u.login,
 	j.name,
-	rc.resultdata,
-	sec.resultdata
+	rc.resultdata
 
 	from 		person p
 	inner join reportperson rp on (p.id = rp.personid)
@@ -368,7 +367,6 @@ select SQL_CALC_FOUND_ROWS
 	left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 	left join	message m on
 					(m.id = rp.messageid)
-	left join	surveyemailcode sec on (sec.jobworkitemid = wi.id and j.type='survey' and rp.type='email')
 
 	where 1
 		$userJoin
