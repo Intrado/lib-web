@@ -28,7 +28,7 @@ if (!$USER->authorize('managetasks')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$IMPORTS = DBFindMany("Import", "from import where customerid = $USER->customerid and ownertype != 'user' order by id");
+$IMPORTS = DBFindMany("Import", "from import where ownertype != 'user' order by id");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -54,9 +54,10 @@ function fmt_updatemethod ($import,$field) {
 
 function fmt_fileexists ($import,$dummy) {
 	global $SETTINGS;
-	if ($SETTINGS['import']['type'] == "ftp")
+	if ($SETTINGS['import']['type'] == "ftp"){
+		//TODO figure out file import directory structure
 		$importfile = getImportFileURL($import->customerid,$import->id);
-	else if ($SETTINGS['import']['type'] == "file")
+	} else if ($SETTINGS['import']['type'] == "file")
 		$importfile = $SETTINGS['import']['filedir'] . "/" . $import->path;
 
 

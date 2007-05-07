@@ -107,7 +107,7 @@ else
 
 //make a menu of all available fields
 
-$fieldmaps = DBFindMany("FieldMap","from fieldmap where customerid='$USER->customerid' order by fieldnum");
+$fieldmaps = DBFindMany("FieldMap","from fieldmap order by fieldnum");
 
 $maptofields = array();
 

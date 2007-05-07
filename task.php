@@ -46,8 +46,7 @@ $id = $_SESSION['importid'];
 $IMPORT = new Import($id);
 
 $query= "select job.id, concat(job.name, ' (', user.login, ')' ) from job, user
-				where user.customerid = '$USER->customerid'
-				and job.userid = user.id
+				where job.userid = user.id
 				and job.status = 'repeating'";
 $repeatingjobs = QuickQueryList($query, true);
 
@@ -80,11 +79,10 @@ if(CheckFormSubmit($form, $section))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if (CheckFormSubmit($form, $section)) {
 			if (QuickQuery("select count(*) from import where name = '" . DBSafe(GetFormData($form, $section, 'name')) .
-							"' and customerid = '$USER->customerid' and id != '$IMPORT->id'")) {
+							"' and id != '$IMPORT->id'")) {
 				error("Please choose a unique import task name. This one is already in use.");
 			} else {
 				$IMPORT->userid = $USER->id;
-				$IMPORT->customerid = $USER->customerid;
 				$IMPORT->name = GetFormData($form, $section, 'name');
 				$IMPORT->description = GetFormData($form, $section, 'description');
 
