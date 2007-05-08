@@ -4,8 +4,6 @@ include_once("../inc/ftpfile.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
 
-
-
 function fmt_alert_timestamp($timestamp) {
 	if ($timestamp === false) {
 		return "<div style='background-color: #ffcccc'>- Never -</div>";
@@ -17,7 +15,12 @@ function fmt_alert_timestamp($timestamp) {
 	}
 }
 
-
+if(isset($_GET['customer'])){
+	$customerID = $_GET['customer']+0;
+	$queryextra = "AND ID='$customerID'";
+} else {
+	$queryextra="";
+}
 
 
 $f = "form";
@@ -25,12 +28,6 @@ $s = "imports";
 $reloadform = 0;
 $types = array("automatic" => "automatic", "manual" => "manual", "list" => "list", "addressbook" => "addressbook");
 $selected = array("automatic", "manual");
-if(isset($_GET['customer'])){
-	$customerID = $_GET['customer']+0;
-	$queryextra = "AND customerID='$customerID'";
-} else {
-	$queryextra="";
-}
 $querytypes = "";
 
 
@@ -61,7 +58,7 @@ if($selected){
 	foreach($selected as $select){
 		if($count > 0)
 			$many = "OR";
-		$querytypes = $querytypes . " $many import.type = '$select'";
+		$querytypes = $querytypes . " $many import.type = '" . DBSafe($select) ."'";
 		$count++;
 	}
 	$querytypes = "and (" . $querytypes . ")";
@@ -80,6 +77,14 @@ NewForm($f);
 </table>
 <?
 EndForm();
+
+
+$custquery = Query("select id, dbhost, dbusername, dbpassword, hostname from customer where 1 $queryextra");
+$customers = array();
+while($row= mysql_fetch_row($custquery)){
+	$customers[] = $row;
+}
+
 ?>
 
 <table border = 1>
@@ -98,44 +103,51 @@ EndForm();
 		<td>File Size in Bytes</td>
 	</tr>
 <?
-
-$query = "SELECT  import.customerID, customer.name, customer.hostname, import.id,
-			import.name, import.status, import.type, import.updatemethod, import.lastrun, customer.timezone
-			FROM import, customer
-			WHERE import.customerID=customer.id
-			$queryextra
-			$querytypes
-			order by import.customerID";
-$list = Query($query);
-
-while($row = DBGetRow($list)){
-	date_default_timezone_set($row[9]);
-
-	$importfile = getImportFileURL($row[0],$row[3]);
-	if (is_readable($importfile) && is_file($importfile)) {
-		$filetime = filemtime($importfile);
-		$row[10]=fmt_alert_timestamp($filetime);
-		$row[11]=filesize($importfile);
-	} else {
-		$row[10]="<div style='background-color: #ffcccc'>Not Found</div>";
-		$row[11]="-";
+foreach($customers as $cust){
+	
+	$custdb = DBConnect($cust[1], $cust[2], $cust[3], "c_$cust[0]");
+	if(!$custdb) {
+		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
 	}
-?>
-	<tr>
-		<td><?=$row[0]?></td>
-		<td><?=$row[1]?></td>
-		<td><a href="https://asp.schoolmessenger.com/<?=$row[2]?>" target="_blank"><?=$row[2]?></a></td>
-		<td><?=$row[3]?></td>
-		<td><?=$row[4]?></td>
-		<td <?= $row[5] == "error" ? 'style="background-color: red;"' : "" ?>><?=$row[5]?></td>
-		<td><?=$row[6]?></td>
-		<td><?=$row[7]?></td>
-		<td><?=$row[9]?></td>
-		<td><?=fmt_alert_timestamp(strtotime($row[8]))?></td>
-		<td><?=$row[10]?></td>
-		<td <?= $row[11] < 10 ? 'style="background-color: #ffcccc;"' : "" ?>><?=$row[11]?></td>
-	</tr>
-<?
+	
+	$query = "SELECT id, name, status, type, updatemethod, lastrun
+				FROM import
+				where 1
+				$querytypes
+				order by id";
+	$list = Query($query, $custdb);
+	$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
+	$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
+	while($row = DBGetRow($list)){
+		date_default_timezone_set($timezone);
+		
+		//TODO fix getImportFileUrl due to customer id
+		$importfile = getImportFileURL($cust[0],$row[0]);
+		if (is_readable($importfile) && is_file($importfile)) {
+			$filetime = filemtime($importfile);
+			$row[6]=fmt_alert_timestamp($filetime);
+			$row[7]=filesize($importfile);
+		} else {
+			$row[6]="<div style='background-color: #ffcccc'>Not Found</div>";
+			$row[7]="-";
+		}
+	?>
+		<tr>
+			<td><?=$cust[0]?></td>
+			<td><?=$displayname?></td>
+			<td><a href="customerlink.php?id=<?=$cust[0]?>" target="_blank"><?=$cust[4]?></a></td>
+			<td><?=$row[0]?></td>
+			<td><?=$row[1]?></td>
+			<td <?= $row[2] == "error" ? 'style="background-color: red;"' : "" ?>><?=$row[2]?></td>
+			<td><?=$row[3]?></td>
+			<td><?=$row[4]?></td>
+			<td><?=$timezone?></td>
+			<td><?=fmt_alert_timestamp(strtotime($row[5]))?></td>
+			<td><?=$row[6]?></td>
+			<td <?= $row[7] < 10 ? 'style="background-color: #ffcccc;"' : "" ?>><?=$row[7]?></td>
+		</tr>
+	<?
+	}
 }
 date_default_timezone_set("US/Pacific");
 ?>
