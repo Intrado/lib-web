@@ -1,12 +1,10 @@
 <?
 include_once("common.inc.php");
-include_once("../obj/Customer.obj.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
 include_once("../obj/Phone.obj.php");
 include_once("AspAdminUser.obj.php");
-include_once("../obj/Language.obj.php");
 
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
@@ -72,6 +70,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$callspurchased = GetFormData($f, $s, 'callspurchased');
 			$managerpassword = GetFormData($f, $s, 'managerpassword');
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
+			$maxusers = GetFormData($f, $s, 'maxusers');
 
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -98,6 +97,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('autoreport_replyname', $autoname, $custdb);
 				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $custdb);
 				setCustomerSystemSetting('surveyurl', $surveyurl, $custdb);
+				
 
 				if($renewaldate != "" || $renewaldate != NULL){
 					if($renewaldate = strtotime($renewaldate)) {
@@ -106,6 +106,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				}
 				setCustomerSystemSetting('_renewaldate', $renewaldate, $custdb);
 				setCustomerSystemSetting('_callspurchased', $callspurchased, $custdb);
+				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
@@ -158,6 +159,7 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
+	PutFormData($f,$s,"maxusers", getCustomerSystemSetting('_maxusers', false, true, $custdb), "text", 0, 100);
 	
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
@@ -198,6 +200,7 @@ NewForm($f);
 <tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 25, 255) ?></td></tr>
 <tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
+<tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
 
 <?
 	
@@ -223,6 +226,7 @@ NewForm($f);
 
 
 ?>
+<td></tr>
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
 	<td><? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
@@ -230,21 +234,14 @@ NewForm($f);
 
 </table>
 
-<p>Manager Password: </td><td><? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?><p><?
+<p>Manager Password: <? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?></p><?
 EndForm();
-
-if(isset($ERRORS) && is_array($ERRORS)) {
-	foreach($ERRORS as $key => $value) {
-		$ERRORS[$key] = addslashes($value);
-	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-}
 
 include_once("navbottom.inc.php");
 
 /************FUNCTIONS***********/
 function setCustomerSystemSetting($name, $value, $custdb) {
-	$old = getCustomerSystemSetting($name, false, false, $custdb);
+	$old = getCustomerSystemSetting($name, false, true, $custdb);
 	$name = DBSafe($name);
 	$value = DBSafe($value);
 	if($old === false) {
