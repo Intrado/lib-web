@@ -21,10 +21,46 @@ if(isset($_SESSION['currentid'])) {
 }
 
 if(isset($_REQUEST['delete'])){
-	$id = $_REQUEST['delete']+0;
-	QuickUpdate("update jobtype set deleted = 1 where id = '$id'", $custdb);
+	$priority = $_REQUEST['delete']+0;
+	while($next = movePriority($priority)){
+		$priority = $next;
+	}
+	QuickUpdate("update jobtype set deleted = 1 where priority = '$priority'", $custdb);
 	redirect();
 }
+
+if(isset($_REQUEST['moveup'])){
+	$priority = $_REQUEST['moveup']+0;
+	movepriority($priority, false);
+	redirect();
+}
+
+if(isset($_REQUEST['movedown'])){
+	$priority = $_REQUEST['movedown']+0;
+	movepriority($priority);
+	redirect();
+}
+
+//////////////////////////////////////////
+// Data Functions
+//////////////////////////////////////////
+
+function movePriority($priority, $down = true) {
+	global $custdb;
+	$priority = 0 + $priority;
+	$op = $down ? array('>','') : array('<','desc');
+	$swap = QuickQueryRow("select id, priority from jobtype where priority $op[0] '$priority' and deleted =0 order by priority $op[1] limit 1", false, $custdb);
+	if ($swap) {
+		QuickUpdate("update jobtype set priority = $swap[1] where priority = '$priority'", $custdb);
+		QuickUpdate("update jobtype set priority = '$priority' where id = $swap[0]", $custdb);
+		return $swap[1];
+	}
+	return false;
+}
+
+//////////////////////////////////////////
+// Data Handling
+//////////////////////////////////////////
 
 $reload = 0;
 $refresh = 0;
@@ -66,7 +102,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 				$id = $jobtype['id'];
 				$name = DBSafe(GetFormData($f, $s, 'name'.$jobtype['id']));
 				$timeslice = GetFormData($f, $s, 'timeslice'.$jobtype['id']) + 0;
-				$priority = GetFormData($f, $s, 'priority'.$jobtype['id']) + 0;
 				$systempriority = GetFormData($f, $s, 'systempriority'.$jobtype['id']) + 0;
 				$query = "update jobtype set name = '$name', timeslices = '$timeslice', priority = '$priority' where id = '$id'";
 				QuickUpdate($query, $custdb);	
@@ -94,7 +129,6 @@ if($reload){
 	PutFormData($f, $s, 'newsystempriority', "");
 	foreach($jobtypes as $jobtype){
 		PutFormData($f, $s, 'name'.$jobtype['id'], $jobtype['name'], 'text');
-		PutFormData($f, $s, 'priority'.$jobtype['id'], $jobtype['priority'],'number');
 		PutFormData($f, $s, 'timeslice'.$jobtype['id'], $jobtype['timeslices'],'number');
 		PutFormData($f, $s, 'systempriority'.$jobtype['id'], $jobtype['systempriority']);
 	}
@@ -142,11 +176,11 @@ NewForm($f);
 	$systempriorities = getSystemPriorities();
 	foreach($jobtypes as $jobtype){
 		?><tr>
-			<td><? NewFormItem($f, $s, 'priority'.$jobtype['id'], 'text', 5)?></td>
+			<td><?=$jobtype['priority']?></td>
 			<td><? NewFormItem($f, $s, 'name'.$jobtype['id'], 'text', 20)?></td>
 			<td><?=$systempriorities[$jobtype['systempriority']]?></td>
 			<td><? NewFormItem($f, $s, 'timeslice'.$jobtype['id'], 'text', 20)?></td>
-			<td><a href="customerpriorities.php?delete=<?=$jobtype['id']?>">Delete</a></td>
+			<td><a href="customerpriorities.php?delete=<?=$jobtype['priority']?>">Delete</a>&nbsp;|&nbsp<a href="customerpriorities.php?moveup=<?=$jobtype['priority']?>">Move&nbsp;Up</a>&nbsp;|&nbsp<a href="customerpriorities.php?movedown=<?=$jobtype['priority']?>">Move&nbsp;Down</a></td>
 		</tr><?
 	}
 ?>
