@@ -44,7 +44,7 @@ foreach($customers as $cust) {
 		<td><?= $timezone ?></td>
 		<td <?= $usercount == 1 ? 'style="background-color: #ffcccc;"' : "" ?>><?= $usercount ?></td>
 		<td <?= $jobcount > 0 ? 'style="background-color: #ccffcc;"' : "" ?>><?= $jobcount ?></td>
-		<td><a href="customeredit.php?id=<?=$cust[0] ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust[0] ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust[0]?>">Customer&nbsp;Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust[0]?>">Active&nbsp;Jobs</a></td>
+		<td><a href="customeredit.php?id=<?=$cust[0] ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust[0] ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust[0]?>">Customer&nbsp;Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust[0]?>">Active&nbsp;Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=<?=$cust[0]?>">Customer&nbsp;Priorities</a></td>
 		</tr>
 	
 	<?
