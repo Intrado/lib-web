@@ -63,9 +63,9 @@ if (CheckFormSubmit($f,$s)){
 			$inboundnum = GetFormData($f, $s, "inboundnumber");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
 			$shard = GetFormData($f,$s,'shard')+0;
-			$maxusers = GetFormData($f,$s, 'maxusers')+0;
+			$maxusers = GetFormData($f,$s, 'maxusers');
 			$renewaldate = strtotime(GetFormData($f,$s, 'renewaldate'));
-			$callspurchased = GetFormData($f, $s, 'callspurchased')+0;
+			$callspurchased = GetFormData($f, $s, 'callspurchased');
 
 			if (($inboundnum != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -77,12 +77,13 @@ if (CheckFormSubmit($f,$s)){
 				error('Bad 800 Number Format', 'Try Again');
 			} else if (!$shard){
 				error('A shard needs to be chosen');
-			} else if(!$renewaldate){
+			} else if(!$renewaldate && GetFormData($f, $s, 'renewaldate')!= ""){
 				error('The renewal date is in a non-valid format');
-			} else if($renewaldate < strtotime("now")){
+			} else if($renewaldate && ($renewaldate < strtotime("now"))){
 				error('The renewal date has already passed');
 			} else {
-				$renewaldate = date("Y-m-d", $renewaldate);
+			
+				$renewaldate = $renewaldate ? date("Y-m-d", $renewaldate) : "";
 				
 				//choose shard info based on selection
 				$shardinfo = QuickQueryRow("select id, shardhost, sharduser, shardpass from shardinfo where id = '$shard'", true);
@@ -189,9 +190,9 @@ if (CheckFormSubmit($f,$s)){
 							('displayname', '" . DBSafe($displayname) . "'),
 							('timezone', '" . DBSafe($timezone) . "'),
 							('inboundnumber', '" . DBSafe($inboundnum) . "'),
-							('_maxusers', '$maxusers'),
+							('_maxusers', '" . DBSafe($maxusers) . "'),
 							('_renewaldate', '" . DBSafe($renewaldate) . "'),
-							('_callspurchased', '$callspurchased')";
+							('_callspurchased', '" . DBSafe($callspurchased) . "')";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 				
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
