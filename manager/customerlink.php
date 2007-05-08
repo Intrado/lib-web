@@ -35,7 +35,7 @@ if($_REQUEST['submit']){
 		$customerurl = QuickQuery("select hostname from customer where id = '$custid'");
 		$string = md5(genpassword() . $manager->login . microtime() . $customerurl);
 		// TODO we may want to set the expiration interval in the properties file
-		QuickQuery("update customer set asptoken = '$string', aspexpiration = now() + interval 10 minute where id = '$custid'");
+		QuickUpdate("update customer set asptoken = '$string', aspexpiration = now() + interval 10 minute where id = '$custid'");
 	} else {
 		error("That was an invalid password");
 	}
