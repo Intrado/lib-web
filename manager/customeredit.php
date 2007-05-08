@@ -84,8 +84,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error('Bad Manager Password');
 			} else {
 
-				QuickQuery("update customer set hostname = '" . DBSafe($hostname) ."' where id = '$currentid'");
-				QuickQuery("update customer set inboundnumber = '" . DBSafe($inboundnumber) ."' where id = '$currentid'");
+				QuickUpdate("update customer set hostname = '" . DBSafe($hostname) ."' where id = '$currentid'");
+				QuickUpdate("update customer set inboundnumber = '" . DBSafe($inboundnumber) ."' where id = '$currentid'");
 				setCustomerSystemSetting("displayname", $displayname, $custdb);
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
@@ -248,7 +248,6 @@ function setCustomerSystemSetting($name, $value, $custdb) {
 		QuickUpdate("insert into setting (name, value) values ('$name', '$value')", $custdb);
 	} else {
 		QuickUpdate("update setting set value = '$value' where name = '$name'", $custdb);
-
 	}
 }
 	
