@@ -63,6 +63,9 @@ if (CheckFormSubmit($f,$s)){
 			$inboundnum = GetFormData($f, $s, "inboundnumber");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
 			$shard = GetFormData($f,$s,'shard')+0;
+			$maxusers = GetFormData($f,$s, 'maxusers')+0;
+			$renewaldate = strtotime(GetFormData($f,$s, 'renewaldate'));
+			$callspurchased = GetFormData($f, $s, 'callspurchased')+0;
 
 			if (($inboundnum != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -74,8 +77,13 @@ if (CheckFormSubmit($f,$s)){
 				error('Bad 800 Number Format', 'Try Again');
 			} else if (!$shard){
 				error('A shard needs to be chosen');
+			} else if(!$renewaldate){
+				error('The renewal date is in a non-valid format');
+			} else if($renewaldate < strtotime("now")){
+				error('The renewal date has already passed');
 			} else {
-			
+				$renewaldate = date("Y-m-d", $renewaldate);
+				
 				//choose shard info based on selection
 				$shardinfo = QuickQueryRow("select id, shardhost, sharduser, shardpass from shardinfo where id = '$shard'", true);
 				$shardhost = $shardinfo['shardhost'];
@@ -180,7 +188,10 @@ if (CheckFormSubmit($f,$s)){
 							('surveyurl', '" . DBSafe($surveyurl) . "'),
 							('displayname', '" . DBSafe($displayname) . "'),
 							('timezone', '" . DBSafe($timezone) . "'),
-							('inboundnumber', '" . DBSafe($inboundnum) . "')";
+							('inboundnumber', '" . DBSafe($inboundnum) . "'),
+							('_maxusers', '$maxusers'),
+							('_renewaldate', '" . DBSafe($renewaldate) . "'),
+							('_callspurchased', '$callspurchased')";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 				
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
@@ -210,6 +221,9 @@ if( $reloadform ){
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "");
+	PutFormData($f,$s,'maxusers', "", "number");
+	PutFormData($f,$s,'callspurchased', "", "number");
+	PutFormData($f,$s,'renewaldate', "", "text");
 }
 
 include_once("nav.inc.php");
@@ -225,7 +239,9 @@ NewFormItem($f, $s,"", 'submit');
 <tr><td>URL path name: </td><td><? NewFormItem($f, $s, 'hostname', 'text', 25, 255); ?> (Must be 5 or more characters)</td></tr>
 <tr><td>Toll Free Inbound Number: </td><td><? NewFormItem($f, $s, 'inboundnumber', 'text', 10, 10); ?> Make Sure Not Taken</td></tr>
 <tr><td>Admin username: </td><td>schoolmessenger</td></tr>
-
+<tr><td>Max Users: </td><td><? NewFormItem($f,$s,'maxusers','text',10)?></td></tr>
+<tr><td>Calls Purchased: </td><td><? NewFormItem($f,$s,'callspurchased','text',10)?></td></tr>
+<tr><td>Renewal Date: </td><td><? NewFormItem($f,$s,'renewaldate','text',10)?></td></tr>
 
 <tr><td>Timezone: </td><td>
 <?
@@ -258,13 +274,6 @@ NewFormItem($f, $s,"", 'submit');
 NewFormItem($f, $s,"", 'submit');
 ?><p>Manager Password: </td><td><? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?><p><?
 EndForm();
-
-if(isset($ERRORS) && is_array($ERRORS)) {
-	foreach($ERRORS as $key => $value) {
-		$ERRORS[$key] = addslashes($value);
-	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-}
 
 include_once("navbottom.inc.php");
 ?>
