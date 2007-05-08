@@ -1,5 +1,7 @@
 <?
-
+//
+// WARNING: Customers must be added sequentially due to auth db
+//
 if ($argc < 2)
 	exit ("Please specify customerid");
 
@@ -7,12 +9,18 @@ $dbhost = "localhost:3306";
 $dbuser = "root";
 $dbpass = "";
 
+$authhost = "localhost:3306";
+$authuser = "root";
+$authpass = "";
+
 $customerid = $argv[1];
 
 $db = mysql_connect($dbhost,$dbuser,$dbpass,true);
 mysql_select_db("dialerasp",$db);
 
 $custdb = mysql_connect($dbhost,$dbuser,$dbpass,true);
+$authdb = mysql_connect($authhost, $authuser, $authpass, true);
+mysql_select_db("authserver", $authdb);
 
 
 function esc ($str,$db) {
@@ -85,9 +93,37 @@ function customerinfo($custid, $source, $dest){
 							or die ("Failed to insert into setting: " . mysql_error($dest));
 }
 
+function genpassword() {
+	$digits = 15;
+	$passwd = "";
+	$chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	while ($digits--) {
+		$passwd .= $chars[mt_rand(0,strlen($chars)-1)];
+	}
+	return $passwd;
+}
+	
+
 //-------------------------------------------------------------------
 
 $newdbname = "c_$customerid";
+
+$result = mysql_query("select hostname, inboundnumber from customer where id = '$customerid'", $db)
+			or die ("Failed to query customer: " . mysql_error($db));
+			
+$row = mysql_fetch_row($result);
+$custpass = genpassword();
+$destres = mysql_query("insert into customer(hostname, inboundnumber, dbhost, dbusername, dbpassword, enabled) values
+						('$row[0]', '$row[1]', '$dbhost', '$newdbname', '$custpass', '1')", $authdb)
+						or die("Failed to insert new customer into auth server: " . mysql_error($custdb));
+if($customerid != mysql_insert_id()){
+	die("Customerid and row inserted in auth db does not match.");
+}
+mysql_query("create user '$newdbname' identified by '$custpass'", $custdb)
+			or die("Failed to create new user: " . mysql_error($custdb));
+mysql_query("grant select, insert, update, delete, create temporary tables on $newdbname . * to '$newdbname'", $custdb)
+			or die("Failed to grant privileges to new user: " . mysql_error($custdb));
+							
 mysql_query("create database $newdbname",$custdb)
 	or die ("Failed to create new DB $newdbname : " . mysql_error($custdb));
 mysql_select_db($newdbname,$custdb);
