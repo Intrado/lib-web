@@ -29,7 +29,7 @@ if(isset($_GET['id'])){
 
 $manager = new AspAdminUser($_SESSION['aspadminuserid']);
 
-if($_REQUEST['submit']){
+if(isset($_REQUEST['submit']) && $_REQUEST['submit']){
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	if($manager->runCheck($password)){
 		$customerurl = QuickQuery("select hostname from customer where id = '$custid'");
@@ -48,7 +48,7 @@ Link:
 <?
 	if(isset($string)){
 ?>
-		<a href="https://localhost/<?=$customerurl?>/?asptoken=<?=$string?>" target="_blank"><?=$customerurl?></a>
+		<a href="https://asp.schoolmessenger.com/<?=$customerurl?>/?asptoken=<?=$string?>" target="_blank"><?=$customerurl?></a>
 <?
 	}
 ?>
