@@ -56,7 +56,7 @@ if($custdb = DBConnect($cust[0], $cust[1], $cust[2], "c_$customerid")){
 		<tr>
 			<td><?= $customerid ?></td>
 			<td><?= $displayname ?></td>
-			<td><a href="https://asp.schoolmessenger.com/<?=$cust[3]?>" target="_blank"><?=$cust[3]?></a></td>
+			<td><a href="customerlink.php?id=<?=$customerid?>" target="_blank"><?=$cust[3]?></a></td>
 			<td><?= $user['id'] ?></td>
 			<td><?= $user['login'] ?></td>
 			<td><?= $user['lastname'] ?></td>
