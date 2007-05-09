@@ -82,33 +82,33 @@ if (CheckFormSubmit($f,$s)){
 			} else if($renewaldate && ($renewaldate < strtotime("now"))){
 				error('The renewal date has already passed');
 			} else {
-			
+
 				$renewaldate = $renewaldate ? date("Y-m-d", $renewaldate) : "";
-				
+
 				//choose shard info based on selection
 				$shardinfo = QuickQueryRow("select id, shardhost, sharduser, shardpass from shardinfo where id = '$shard'", true);
 				$shardhost = $shardinfo['shardhost'];
 				$sharduser = $shardinfo['sharduser'];
 				$shardpass = $shardinfo['shardpass'];
-				
+
 				$dbpassword = genpassword();
 				QuickUpdate("insert into customer (hostname, dbhost,dbpassword,inboundnumber,enabled) values
 												('" . DBSafe($hostname) . "','$shardhost', '$dbpassword', '" . DBSafe($inboundnum) . "', '1')" );
 				$customerid = mysql_insert_id();
-				
+
 				$newdbname = "c_$customerid";
 				QuickUpdate("update customer set dbusername = '" . $newdbname . "' where id = '" . $customerid . "'");
-				
+
 				$newdb = mysql_connect($shardhost, $sharduser, $shardpass)
 					or die("Failed to connect to DBHost $shardhost : " . mysql_error($newdb));
 				QuickUpdate("create database $newdbname",$newdb)
 					or die ("Failed to create new DB $newdbname : " . mysql_error($newdb));
 				mysql_select_db($newdbname,$newdb)
 					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
-					
+
 				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
 				QuickUpdate("grant select, insert, update, delete, create temporary tables on $newdbname . * to '$newdbname'", $newdb);
-				
+
 				$tablequeries = explode(";",file_get_contents("new_customer_schema.sql"));
 				foreach ($tablequeries as $tablequery) {
 					if (trim($tablequery))
@@ -176,9 +176,9 @@ if (CheckFormSubmit($f,$s)){
 
 
 				$query = "INSERT INTO `jobtype` (`name`, `priority`, `systempriority`, timeslices, `deleted`) VALUES
-							('Emergency', 10000, 1, 50, 0),
+							('Emergency', 10000, 1, 450, 0),
 							('Attendance', 20000, 2, 0, 0),
-							('General', 30000, 3, 100, 0)";
+							('General', 30000, 3, 450, 0)";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$surveyurl = "http://asp.schoolmessenger.com/" . $hostname . "/survey/";
@@ -194,17 +194,17 @@ if (CheckFormSubmit($f,$s)){
 							('_renewaldate', '" . DBSafe($renewaldate) . "'),
 							('_callspurchased', '" . DBSafe($callspurchased) . "')";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
-				
+
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
 							('english', 'male'),
 							('english', 'female'),
 							('spanish', 'male'),
 							('spanish', 'female')";
-							
+
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_erryr() . " SQL: " . $query);
 
 				redirect("customers.php");
-				
+
 			}
 		}
 	}
