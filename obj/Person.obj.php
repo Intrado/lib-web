@@ -9,26 +9,26 @@ class Person extends DBMappedObject {
 	var $type = "system"; // enum (system, addressbook, manualadd, upload)
 	var $deleted = 0;
 	
-	var $f01;
-	var $f02;
-	var $f03;
-	var $f04;
-	var $f05;
-	var $f06;
-	var $f07;
-	var $f08;
-	var $f09;
-	var $f10;
-	var $f11;
-	var $f12;
-	var $f13;
-	var $f14;
-	var $f15;
-	var $f16;
-	var $f17;
-	var $f18;
-	var $f19;
-	var $f20;
+	var $f01 = "";
+	var $f02 = "";
+	var $f03 = "";
+	var $f04 = "";
+	var $f05 = "";
+	var $f06 = "";
+	var $f07 = "";
+	var $f08 = "";
+	var $f09 = "";
+	var $f10 = "";
+	var $f11 = "";
+	var $f12 = "";
+	var $f13 = "";
+	var $f14 = "";
+	var $f15 = "";
+	var $f16 = "";
+	var $f17 = "";
+	var $f18 = "";
+	var $f19 = "";
+	var $f20 = "";
 
 	function Person ($id = NULL) {
 		$this->_allownulls = true;
