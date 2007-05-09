@@ -26,11 +26,11 @@ class Phone extends DBMappedObject {
 		return ereg_replace("[^0-9]*","",$phone);
 	}
 
-	static function validate ($phone, $iseasycall = false) {
+	static function validate ($phone) {
 		global $IS_COMMSUITE;
 
 		$phone = Phone::parse($phone);
-		if ($iseasycall) {
+		if ($IS_COMMSUITE) {
 			$min = getSystemSetting('easycallmin', 10);
 			$max = getSystemSetting('easycallmax', 10);
 		} else {
