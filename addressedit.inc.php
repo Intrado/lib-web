@@ -65,16 +65,16 @@ if (!$maxemails = getSystemSetting("maxemails"))
 
 if ($personid == NULL) {
 	// create a new person with empty data
-	$data = new Person();
+	$person = new Person();
 	$f = FieldMap::getLanguageField();
-	$data->$f = "English"; // default language, so that first in alphabet is not selected (example, Chinese)
+	$person->$f = "English"; // default language, so that first in alphabet is not selected (example, Chinese)
 	$address = new Address();
 
 	$phones = array();
 	$emails = array();
 } else {
 	// editing existing person
-	$data = DBFind("Person", "from person where id = " . $personid);
+	$person = DBFind("Person", "from person where id = " . $personid);
 	$address = DBFind("Address", "from address where personid = " . $personid);
 	if ($address === false) $address = new Address(); // contact was imported/uploaded without any address data, create one now
 
@@ -119,7 +119,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 		} else {
 
 			//submit changes
-			$person = new Person($personid);
 			$person->userid = $USER->id;
 			if (!isset($personid)) {
 				switch ($ORIGINTYPE) {
@@ -137,14 +136,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				}
 			}
 			$person->deleted = 0;
-			$person->update();
+			
 
-			PopulateObject($f,$s,$data,array(FieldMap::getFirstNameField(),
+			PopulateObject($f,$s,$person,array(FieldMap::getFirstNameField(),
 											 FieldMap::getLastNameField(),
 											 FieldMap::getLanguageField()
 											 ));
-			$data->personid = $person->id;
-			$data->update();
+			$person->update();
 
 			PopulateObject($f,$s,$address,array('addr1','addr2','city','state','zip'));
 			$address->personid = $person->id;
