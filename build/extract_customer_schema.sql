@@ -511,3 +511,6 @@ CREATE TABLE voicereply (
   KEY userid (userid),
   KEY replytime (replytime)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `import` ADD `data` LONGBLOB NOT NULL ;
+
