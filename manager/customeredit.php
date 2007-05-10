@@ -71,6 +71,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managerpassword = GetFormData($f, $s, 'managerpassword');
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
 			$maxusers = GetFormData($f, $s, 'maxusers');
+			$managernote = GetFormData($f, $s, 'managernote');
 
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -98,15 +99,17 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $custdb);
 				setCustomerSystemSetting('surveyurl', $surveyurl, $custdb);
 				
-
 				if($renewaldate != "" || $renewaldate != NULL){
 					if($renewaldate = strtotime($renewaldate)) {
 						$renewaldate = date("Y-m-d", $renewaldate);
 					}
 				}
+				
 				setCustomerSystemSetting('_renewaldate', $renewaldate, $custdb);
 				setCustomerSystemSetting('_callspurchased', $callspurchased, $custdb);
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
+				setCustomerSystemSetting('_managernote', $managernote, $custdb);
+				
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
@@ -160,6 +163,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
 	PutFormData($f,$s,"maxusers", getCustomerSystemSetting('_maxusers', false, true, $custdb), "text", 0, 100);
+	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
@@ -227,6 +231,8 @@ NewForm($f);
 
 ?>
 <td></tr>
+<tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'text', 25, 255) ?></td></tr>
+
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
 	<td><? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
