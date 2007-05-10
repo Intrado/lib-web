@@ -231,7 +231,7 @@ NewForm($f);
 
 ?>
 <td></tr>
-<tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'text', 25, 255) ?></td></tr>
+<tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
 
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
