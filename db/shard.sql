@@ -1,3 +1,8 @@
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job`
+--
 
 CREATE TABLE `job` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -6,12 +11,14 @@ CREATE TABLE `job` (
   `hasphone` tinyint(4) NOT NULL default '0',
   `hasemail` tinyint(4) NOT NULL default '0',
   `hasprint` tinyint(4) NOT NULL default '0',
+  `hasquestionaire` tinyint(4) NOT NULL default '0',
   `status` enum('new','processing','active','cancelling','repeating') NOT NULL default 'new',
   `timezone` varchar(50) NOT NULL,
   `startdate` date NOT NULL,
   `enddate` date NOT NULL,
   `starttime` time NOT NULL,
   `endtime` time NOT NULL,
+  `sql` text,
   `priorityadjust` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
@@ -29,7 +36,11 @@ CREATE TABLE `jobsetting` (
   PRIMARY KEY  (`jobid`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
 
+--
+-- Table structure for table `jobtask`
+--
 
 CREATE TABLE `jobtask` (
   `jobid` bigint(20) NOT NULL,
@@ -45,5 +56,9 @@ CREATE TABLE `jobtask` (
   `lastattempttime` bigint(20) default NULL,
   `nextattempttime` bigint(20) default NULL,
   `phone` varchar(10) default NULL,
+  `emailcode` char(22) character set ascii collate ascii_bin default NULL
   PRIMARY KEY  (`jobid`,`type`,`personid`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
