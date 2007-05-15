@@ -18,7 +18,7 @@ CREATE TABLE `job` (
   `enddate` date NOT NULL,
   `starttime` time NOT NULL,
   `endtime` time NOT NULL,
-  `sql` text,
+  `thesql` text,
   `priorityadjust` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
