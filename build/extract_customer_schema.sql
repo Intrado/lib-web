@@ -119,13 +119,12 @@ CREATE TABLE job (
   starttime time NOT NULL default '00:00:00',
   endtime time NOT NULL default '00:00:00',
   finishdate datetime default NULL,
-  maxcallattempts tinyint(4) NOT NULL default '2',
-  options text NOT NULL,
   `status` enum('new','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
   deleted tinyint(4) NOT NULL default '0',
   ranautoreport tinyint(4) NOT NULL default '0',
   priorityadjust int(11) NOT NULL default '0',
   cancelleduserid int(11) default NULL,
+  `thesql` text,
   PRIMARY KEY  (id),
   KEY `status` (`status`,id),
   KEY startdate (startdate),
@@ -146,6 +145,13 @@ CREATE TABLE joblanguage (
   PRIMARY KEY  (id),
   KEY jobid (jobid,`language`(50))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `jobsetting` (
+  `jobid` bigint(20) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `value` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`jobid`,`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE jobtype (
   id int(11) NOT NULL auto_increment,

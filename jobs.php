@@ -116,7 +116,7 @@ $formatters = array("Actions" => "fmt_jobs_actions",
 					"type" => "fmt_obj_csv_list",
 					"responses" => "fmt_response_count",
 					"startdate" => "fmt_job_startdate");
-					
+
 if(!$USER->authorize('leavemessage')){
 	unset($titles["responses"]);
 	unset($formatters["responses"]);
@@ -173,13 +173,13 @@ $titles = array(	"name" => "#Name",
 					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
-$formatters = array("Actions" => "fmt_jobs_actions", 
-					'Status' => 'fmt_status', 
-					"startdate" => "fmt_job_startdate", 
+$formatters = array("Actions" => "fmt_jobs_actions",
+					'Status' => 'fmt_status',
+					"startdate" => "fmt_job_startdate",
 					"enddate" => "fmt_job_enddate",
 					"type" => "fmt_obj_csv_list",
 					"responses" => "fmt_response_count");
-					
+
 if(!$USER->authorize('leavemessage')){
 	unset($titles["responses"]);
 	unset($formatters["responses"]);

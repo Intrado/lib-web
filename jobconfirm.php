@@ -211,7 +211,7 @@ echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemess
 <? } ?>
 				<tr>
 					<td class="bottomBorder" >Maximum attempts</td>
-					<td class="bottomBorder" ><?= htmlentities($job->maxcallattempts); ?></td>
+					<td class="bottomBorder" ><?= htmlentities($job->getOptionValue('maxcallattempts')); ?></td>
 				</tr>
 				<? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
@@ -224,13 +224,13 @@ echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemess
 					<td class="bottomBorder" >Skip duplicate phone numbers</td>
 					<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("skipduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
-				
+
 <? if($USER->authorize('leavemessage')) { ?>
 					<tr>
 						<td class="bottomBorder" >Call every available phone number for each person</td>
 						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call All Phone Numbers</td>
 					</tr>
-					
+
 					<tr>
 						<td> Allow call recipients to leave a message</td>
 						<td><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Leave Message</td>
@@ -241,7 +241,7 @@ echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemess
 						<td><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call All Phone Numbers</td>
 					</tr>
 <? } ?>
-				
+
 			</table>
 		</td>
 	</tr>
@@ -274,7 +274,7 @@ echo htmlentities($emailmessage->name);
 			</table>
 		</td>
 	</tr>
-	
+
 <? } ?>
 <? if(strpos($job->type,"print") !== false) { ?>
 	<tr valign="top">

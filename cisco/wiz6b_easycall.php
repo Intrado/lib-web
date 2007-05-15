@@ -12,7 +12,7 @@ if (!$USER->authorize('sendphone')) {
 }
 
 if (isset($_GET['dn'])) {
-	
+
 	if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
 			customerOwns("jobtype",DBSafe($_SESSION['newjob']['jobtypeid'])) &&
 			($_SESSION['newjob']['message'] == "callme"))) {
@@ -24,7 +24,7 @@ if (isset($_GET['dn'])) {
 	$defaultname = "IP Phone - " . date("F jS, Y g:i a");
 	$_SESSION['newjob']['name'] = ($_SESSION['newjob']['name'] ? $_SESSION['newjob']['name'] : $defaultname);
 	$_SESSION['newjob']['desc'] = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] : $defaultname);
-	$_SESSION['newjob']['retries'] = $job->maxcallattempts = max($_SESSION['newjob']['retries'],$ACCESS->getValue('callmax'));
+	$_SESSION['newjob']['retries'] = $job->setOptionValue('maxcallattempts', max($_SESSION['newjob']['retries'],$ACCESS->getValue('callmax')));
 
 	//put in the special task
 
@@ -42,7 +42,7 @@ if (isset($_GET['dn'])) {
 
 	$task->setData('jobdays',$_SESSION['newjob']['numdays']);
 	$task->setData('jobretries',$_SESSION['newjob']['retries']);
-	
+
 	//new task info
 	$task->setData('progress', "Creating Call");
 	$task->setData('count', '0');
@@ -58,7 +58,7 @@ if (isset($_GET['dn'])) {
 		}
 	}
 	$task->status = "queued";
-	
+
 	$task->lastcheckin = date("Y-m-d H:i:s");
 	$task->create();
 

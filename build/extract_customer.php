@@ -79,6 +79,71 @@ function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = 
  } while ($row);
 }
 
+
+function parseOptions ($options) {
+  $temparray = explode(",",$options);
+  $optionsarray = array();
+  foreach ($temparray as $index => $option) {
+    if (strpos($option,"=") !== false) {
+	  list($name,$val) = explode("=",$option);
+	  $optionsarray[$name] = $val;
+    } else {
+	  $optionsarray[] = $option;
+	}
+  }
+  return $optionsarray;
+}
+
+function restructureJobOptions($custid, $source, $dest, $batch, $joincustomer = false) {
+	$query = "select job.id, job.maxcallattempts, job.options from job ";
+
+    if ($joincustomer)
+      $query .= $joincustomer;
+    else
+      $query .= " where customerid=$custid";
+
+	$sourceres = mysql_query($query, $source)
+		or die ("Failed to query job :" . mysql_error($source));
+
+	do {
+	  $count = 0;
+  	  $outrows = array();
+  	  while ($count < $batch && ($row = mysql_fetch_row($sourceres))) {
+  	  	$jobid = $row[0];
+  	  	$maxcallattempts = $row[1];
+  	  	$options = $row[2];
+  	  	$optionsarray = parseOptions($options);
+  	  	$newrow = array();
+
+  	  	$newrow[0] = $jobid;
+  	  	$newrow[1] = "maxcallattempts";
+  	  	$newrow[2] = $maxcallattempts;
+  	  	$outrows[] = "(". escrow($newrow,$dest) . ")";
+
+  	  	foreach ($optionsarray as $index => $option) {
+  	  		$newrow[0] = $jobid;
+			if (is_int($index)) {
+				$newrow[1] = $option;
+				$newrow[2] = 1;
+			} else {
+				$newrow[1] = $index;
+				$newrow[2] = $option;
+  	  		}
+  	  		$outrows[] = "(". escrow($newrow,$dest) . ")";
+  	  	}
+        $count++;
+  	  }
+
+      //ins to dest
+      if ($count) {
+       $ins = "insert into `jobsetting` (jobid, name, value) values "
+        . implode(",",$outrows);
+       mysql_query($ins,$dest)
+        or die ("Failed to insert into jobsetting :" . mysql_error($dest));
+      }
+  	} while ($row);
+}
+
 function customerinfo($custid, $source, $dest){
 	$query = "select inboundnumber, timezone, name from customer where id = '$custid'";
 	$sourceres = mysql_query($query, $source)
@@ -102,7 +167,7 @@ function genpassword() {
 	}
 	return $passwd;
 }
-	
+
 
 //-------------------------------------------------------------------
 
@@ -110,7 +175,7 @@ $newdbname = "c_$customerid";
 
 $result = mysql_query("select hostname, inboundnumber from customer where id = '$customerid'", $db)
 			or die ("Failed to query customer: " . mysql_error($db));
-			
+
 $row = mysql_fetch_row($result);
 $custpass = genpassword();
 $destres = mysql_query("insert into customer(hostname, inboundnumber, dbhost, dbusername, dbpassword, enabled) values
@@ -123,7 +188,7 @@ mysql_query("create user '$newdbname' identified by '$custpass'", $custdb)
 			or die("Failed to create new user: " . mysql_error($custdb));
 mysql_query("grant select, insert, update, delete, create temporary tables on $newdbname . * to '$newdbname'", $custdb)
 			or die("Failed to grant privileges to new user: " . mysql_error($custdb));
-							
+
 mysql_query("create database $newdbname",$custdb)
 	or die ("Failed to create new DB $newdbname : " . mysql_error($custdb));
 mysql_select_db($newdbname,$custdb);
@@ -161,7 +226,6 @@ inner join voicereply on (contentid=content.id)
 inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"content",array("id","contenttype","data"),$db,$custdb,1,$join);
 
-
 //EMAIL
 $join = "inner join person p on (personid = p.id and p.customerid=$customerid)";
 copytable($customerid,"email",array("id", "personid", "email", "sequence", "editlock"),$db,$custdb,1000,$join);
@@ -182,7 +246,10 @@ copytable($customerid,"importjob",array("id", "importid", "jobid"),$db,$custdb,1
 
 //JOB
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
-copytable($customerid,"job",array("id", "userid", "scheduleid", "jobtypeid", "name", "description", "listid", "phonemessageid", "emailmessageid", "printmessageid", "questionnaireid", "type", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate", "maxcallattempts", "options", "status", "deleted", "ranautoreport", "priorityadjust", "cancelleduserid"),$db,$custdb,1000,$join);
+copytable($customerid,"job",array("id", "userid", "scheduleid", "jobtypeid", "name", "description", "listid", "phonemessageid", "emailmessageid", "printmessageid", "questionnaireid", "type", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate", "status", "deleted", "ranautoreport", "priorityadjust", "cancelleduserid"),$db,$custdb,1000,$join);
+
+// JOBSETTINGS
+restructureJobOptions($customerid,$db,$custdb,1000,$join);
 
 //JOBLANGUAGE
 $join = "inner join job j on (jobid=j.id)

@@ -143,7 +143,7 @@ startWindow("Confirmation &amp; Submit");
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
 					<td width="30%" class="bottomBorder" >Maximum attempts</td>
-					<td class="bottomBorder" ><?= htmlentities($job->maxcallattempts); ?></td>
+					<td class="bottomBorder" ><?= htmlentities($job->getOptionValue("maxcallattempts")); ?></td>
 				</tr>
 <? if ($USER->authorize('setcallerid')) { ?>
 					<tr>

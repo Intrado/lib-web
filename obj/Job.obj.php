@@ -21,10 +21,9 @@ class Job extends DBMappedObject {
 	var $starttime;
 	var $endtime;
 	var $finishdate;
-	var $maxcallattempts;
-	var $options = "";
 	var $status;
 	var $deleted = 0;
+	var $thesql = "";
 
 	var $cancelleduserid;
 
@@ -32,31 +31,17 @@ class Job extends DBMappedObject {
 	var $sendemail;
 	var $sendprint;
 
-	var $optionsarray = false;
-
 	function Job ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
 		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description", "listid",
 				"phonemessageid", "emailmessageid", "printmessageid", "questionnaireid",
 				"type", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
-				"maxcallattempts", "options", "status", "deleted","cancelleduserid");
+				"status", "deleted", "cancelleduserid", "thesql");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function runNow($jobid = null) {
-		if (!isset($jobid))
-			$jobid = $this->id;
-
-		if (isset($_SERVER['WINDIR'])) {
-			$cmd = "start php jobprocess.php $jobid";
-			pclose(popen($cmd,"r"));
-		} else {
-			$cmd = "php jobprocess.php $jobid > /dev/null &";
-			exec($cmd);
-		}
-	}
 
 	//creates a new job object prepopulated with all of the user/system defaults
 	//date/time values are in DB format and should be beautified for forms
@@ -73,7 +58,7 @@ class Job extends DBMappedObject {
 		$job->jobtypeid = end($VALIDJOBTYPES)->id;
 
 		//call settings
-		$job->maxcallattempts = min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4"));
+		$job->setOptionValue("maxcallattempts", min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4")));
 		if (getSystemSetting('retry') != "")
 			$job->setOptionValue("retry",getSystemSetting('retry'));
 
@@ -129,73 +114,55 @@ class Job extends DBMappedObject {
 		parent::create($specificfields, $createchildren);
 	}
 
-	function isOption ($option) {
-		if (!$this->optionsarray) {
-			$this->parseOptions();
+
+	function getSetting ($name, $defaultvalue = false, $refresh = false) {
+		static $settings = null;
+
+		if ($settings === null || $refresh) {
+			$settings = array();
+			if ($res = Query("select name,value from jobsetting where jobid='$this->id'")) {
+				while ($row = DBGetRow($res)) {
+					$settings[$row[0]] = $row[1];
+				}
+			}
 		}
-		return (in_array($option, $this->optionsarray));
+
+		if (isset($settings[$name]))
+			return $settings[$name];
+		else
+			return $defaultvalue;
+	}
+
+	function setSetting ($name, $value) {
+		$old = $this->getSetting($name,false,true);
+
+		if ($old === false) {
+			$settings[$name] = $value;
+			if ($value)
+				QuickUpdate("insert into jobsetting (jobid,name,value) values ($this->id,'" . DBSafe($name) . "','" . DBSafe($value) . "')");
+		} else {
+			if ($value !== false && $value !== '' && $value !== null) {
+				QuickUpdate("update jobsetting set value='" . DBSafe($value) . "' where jobid=$this->id and name='" . DBSafe($name) . "'");
+			} else {
+				QuickUpdate("delete from jobsetting where jobid=$this->id and name='" . DBSafe($name) . "'");
+
+			}
+		}
+	}
+
+	function isOption ($option) {
+		return ($this->getOptionValue($option) == 1);
 	}
 
 	function setOption ($option,$set) {
-		if (!$this->optionsarray) {
-			$this->parseOptions();
-		}
-		if ($set) {
-			if (!$this->isOption($option))
-				$this->optionsarray[] = $option;
-		} else {
-			if ($this->isOption($option)) {
-				$key = array_search($option,$this->optionsarray);
-				unset($this->optionsarray[$key]);
-			}
-		}
-		$this->buildOptions();
+		$this->setOptionValue($option,$set);
 	}
-
 
 	function getOptionValue ($searchoption) {
-		if (!$this->optionsarray) {
-			$this->parseOptions();
-		}
-
-		if (isset($this->optionsarray[$searchoption]))
-			return $this->optionsarray[$searchoption];
-		else
-			return false;
+		return $this->getSetting($searchoption);
 	}
-
 	function setOptionValue ($option,$value) {
-		if (!$this->optionsarray) {
-			$this->parseOptions();
-		}
-
-		$this->optionsarray[$option] = $value;
-		$this->buildOptions();
-	}
-
-	function parseOptions () {
-        $temparray = explode(",",$this->options);
-        $this->optionsarray = array();
-        foreach ($temparray as $index => $option) {
-			if (strpos($option,"=") !== false) {
-			    list($name,$val) = explode("=",$option);
-			    $this->optionsarray[$name] = $val;
-			} else {
-		    	$this->optionsarray[] = $option;
-			}
-        }
-	}
-
-	function buildOptions () {
-		$this->options = "";
-		foreach ($this->optionsarray as $index => $option) {
-			if (is_int($index))
-				$this->options .= $option . ",";
-			else
-				$this->options .= $index . "=" . $option . ",";
-		}
-
-		$this->options = substr($this->options,0,strlen($this->options) -1);
+		$this->setSetting($option, $value);
 	}
 
 }

@@ -104,12 +104,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				PopulateObject($f,$s,$job,array("name", "description"));
 			}
 			else if ($submittedmode) {
-				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime",
-				"maxcallattempts"));
+				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
 			} else {
 				$fieldsarray = array("name", "jobtypeid", "description", "listid", "phonemessageid",
 				"emailmessageid","printmessageid", "starttime", "endtime",
-				"maxcallattempts", "sendphone", "sendemail", "sendprint",
+				"sendphone", "sendemail", "sendprint", "maxcallattempts",
 				"skipduplicates", "printall", "printunnotified");
 				PopulateObject($f,$s,$job,$fieldsarray);
 
@@ -160,8 +159,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->setOption("callfirst",!GetFormData($f,$s,"callall"));
 			$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 			$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
-
 			$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
+
+			$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));
+
 			if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
 			} else {
@@ -302,7 +303,6 @@ if( $reloadform )
 	array("printmessageid","number","nomin","nomax"),
 	array("starttime","text",1,50,true),
 	array("endtime","text",1,50,true),
-	array("maxcallattempts","number",1,$ACCESS->getValue('callmax'),true),
 	array("sendphone","bool",0,1),
 	array("sendemail","bool",0,1),
 	array("sendprint","bool",0,1)
@@ -310,6 +310,7 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
+	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
 	PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
@@ -639,7 +640,7 @@ startWindow('Job Information');
 						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($completedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
 					</tr>
 				<? } ?>
-				
+
 			</table>
 		</td>
 	</tr>
