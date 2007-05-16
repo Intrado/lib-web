@@ -175,6 +175,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	$viewresponses = '<a href="replies.php?jobid=' . $id . '">Responses</a>';
 	switch ($status) {
 		case "new":
+		case "processing":
 			$buttons = array($editbtn,$cancelbtn);
 			break;
 		case "active":
@@ -233,7 +234,7 @@ function fmt_status($obj, $name) {
 	if ($obj->status == 'new') {
 		if($obj->id)
 			$assigned = QuickQuery("select status from job where id='$obj->id'");
-		else 
+		else
 			$assigned = false;
 		if ($assigned=="new")
 			return 'Not Submitted';

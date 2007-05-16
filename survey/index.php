@@ -154,7 +154,7 @@ if (!$exists) {
 	<br><br>Your responses to this survey were previously noted. Thank you for your participation.<br><br>
 <?
 	}
-} else if ($job->status != "active") {
+} else if ($job->status != "active" && $job->status != "processing") {
 ?>
 	<br><br><h3>Sorry, the survey has expired.</h3><br><br>
 <?
