@@ -31,6 +31,9 @@ class Job extends DBMappedObject {
 	var $sendemail;
 	var $sendprint;
 
+	var $optionsarray = array(); //options to update
+
+
 	function Job ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
@@ -48,6 +51,7 @@ class Job extends DBMappedObject {
 	function jobWithDefaults () {
 		global $USER, $ACCESS;
 		$job = new Job();
+
 		//basic job info -- not used/visible on forms, these need to set this again after post data
 		$job->status = "new";
 		$job->userid = $USER->id;
@@ -88,7 +92,7 @@ class Job extends DBMappedObject {
 
 	function refresh($specificfields = NULL, $refreshchildren = false) {
 		parent::refresh($specificfields, $refreshchildren);
-		$this->optionsarray = false;
+		$this->optionsarray = array();
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
@@ -102,6 +106,11 @@ class Job extends DBMappedObject {
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
 		parent::update($specificfields,$updatechildren);
+
+//		var_dump($this->optionsarray);
+		foreach ($this->optionsarray as $name => $value) {
+			QuickUpdate("update jobsetting set value='" . DBSafe($value) . "' where jobid=$this->id and name='" . DBSafe($name) . "'");
+		}
 	}
 
 	function create($specificfields = NULL, $createchildren = false) {
@@ -112,42 +121,32 @@ class Job extends DBMappedObject {
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
 		parent::create($specificfields, $createchildren);
+
+		// now we have a jobid to create the jobsettings with
+		foreach ($this->optionsarray as $name => $value) {
+			QuickUpdate("insert into jobsetting (jobid,name,value) values ($this->id,'" . DBSafe($name) . "','" . DBSafe($value) . "')");
+		}
 	}
 
-
 	function getSetting ($name, $defaultvalue = false, $refresh = false) {
-		static $settings = null;
-
-		if ($settings === null || $refresh) {
-			$settings = array();
+		if (sizeof($this->optionsarray) == 0 || $refresh) {
+			$this->optionsarray = array();
 			if ($res = Query("select name,value from jobsetting where jobid='$this->id'")) {
 				while ($row = DBGetRow($res)) {
-					$settings[$row[0]] = $row[1];
+					$this->optionsarray[$row[0]] = $row[1];
+					error_log($row[0] .":". $row[1]);
 				}
 			}
 		}
 
-		if (isset($settings[$name]))
-			return $settings[$name];
+		if (isset($this->optionsarray[$name]))
+			return $this->optionsarray[$name];
 		else
 			return $defaultvalue;
 	}
 
 	function setSetting ($name, $value) {
-		$old = $this->getSetting($name,false,true);
-
-		if ($old === false) {
-			$settings[$name] = $value;
-			if ($value)
-				QuickUpdate("insert into jobsetting (jobid,name,value) values ($this->id,'" . DBSafe($name) . "','" . DBSafe($value) . "')");
-		} else {
-			if ($value !== false && $value !== '' && $value !== null) {
-				QuickUpdate("update jobsetting set value='" . DBSafe($value) . "' where jobid=$this->id and name='" . DBSafe($name) . "'");
-			} else {
-				QuickUpdate("delete from jobsetting where jobid=$this->id and name='" . DBSafe($name) . "'");
-
-			}
-		}
+		$this->optionsarray[$name] = $value;
 	}
 
 	function isOption ($option) {
