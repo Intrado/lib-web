@@ -11,7 +11,7 @@ CREATE TABLE `job` (
   `hasphone` tinyint(4) NOT NULL default '0',
   `hasemail` tinyint(4) NOT NULL default '0',
   `hasprint` tinyint(4) NOT NULL default '0',
-  `hasquestionaire` tinyint(4) NOT NULL default '0',
+  `hasquestionnaire` tinyint(4) NOT NULL default '0',
   `status` enum('new','processing','active','cancelling','repeating') NOT NULL default 'new',
   `timezone` varchar(50) NOT NULL,
   `startdate` date NOT NULL,
@@ -55,10 +55,22 @@ CREATE TABLE `jobtask` (
   `lastduration` float default NULL,
   `lastattempttime` bigint(20) default NULL,
   `nextattempttime` bigint(20) default NULL,
-  `phone` varchar(10) default NULL,
-  `emailcode` char(22) character set ascii collate ascii_bin default NULL
+  `phone` varchar(20) default NULL,
   PRIMARY KEY  (`jobid`,`type`,`personid`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+-- triggers
+
+DELIMITER $$
+
+DROP TRIGGER delete_job$$
+
+CREATE TRIGGER delete_job
+AFTER DELETE ON job FOR EACH ROW
+BEGIN
+DELETE FROM jobsetting WHERE jobid=OLD.id;
+END$$
+
+DELIMITER ;
 
