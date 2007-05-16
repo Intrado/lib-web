@@ -119,7 +119,7 @@ CREATE TABLE job (
   starttime time NOT NULL default '00:00:00',
   endtime time NOT NULL default '00:00:00',
   finishdate datetime default NULL,
-  `status` enum('new','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
+  `status` enum('new','processing','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
   deleted tinyint(4) NOT NULL default '0',
   ranautoreport tinyint(4) NOT NULL default '0',
   priorityadjust int(11) NOT NULL default '0',
@@ -519,4 +519,115 @@ CREATE TABLE voicereply (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE `import` ADD `data` LONGBLOB NOT NULL ;
+
+
+
+-- triggers from customer database to shard database
+
+DELIMITER $$
+
+DROP TRIGGER update_job$$
+
+CREATE TRIGGER update_job
+AFTER UPDATE ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE hasph TINYINT DEFAULT 0;
+DECLARE hasem TINYINT DEFAULT 0;
+DECLARE haspr TINYINT DEFAULT 0;
+DECLARE hasqu TINYINT DEFAULT 0;
+DECLARE custid INTEGER;
+DECLARE shardjobid BIGINT;
+
+SELECT COUNT(*) INTO cc FROM aspshard.job WHERE localjobid=NEW.id;
+SELECT value INTO tz FROM setting WHERE name='timezone';
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+IF NEW.phonemessageid IS NOT NULL THEN
+  SET hasph := 1;
+END IF;
+IF NEW.emailmessageid IS NOT NULL THEN
+  SET hasem := 1;
+END IF;
+IF NEW.printmessageid IS NOT NULL THEN
+  SET haspr := 1;
+END IF;
+IF NEW.questionnaireid IS NOT NULL THEN
+  SET hasqu := 1;
+END IF;
+
+IF cc = 0 THEN
+-- we expect the status to be 'processing' when we insert the shard job
+-- status 'new' is for jobs that are not yet submitted
+  IF NEW.status IN ('new','processing') THEN
+    INSERT INTO aspshard.job (customerid, localjobid, hasphone, hasemail, hasprint, hasquestionnaire, timezone, startdate, enddate, starttime, endtime, thesql)
+           VALUES(custid, NEW.id, hasph, hasem, haspr, hasqu, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.thesql);
+    -- copy the jobsettings
+    INSERT INTO aspshard.jobsetting (jobid, name, value) SELECT LAST_INSERT_ID(), name, value FROM jobsetting WHERE jobid=NEW.id;
+  END IF;
+ELSE
+-- we only need to update the job call window, or cancelling status - all other fields remain fixed
+  IF OLD.starttime <> NEW.starttime ||
+     OLD.endtime <> NEW.endtime ||
+     OLD.startdate <> NEW.startdate ||
+     OLD.enddate <> NEW.enddate THEN
+     UPDATE aspshard.job SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND localjobid=NEW.id;
+  END IF;
+  IF NEW.status IN ('cancelling') THEN
+    UPDATE aspshard.job SET status=NEW.status WHERE customerid=custid AND localjobid=NEW.id;
+  END IF;
+END IF;
+END$$
+
+DROP TRIGGER insert_jobsetting$$
+
+CREATE TRIGGER insert_jobsetting
+AFTER INSERT ON jobsetting FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+DECLARE shardjobid BIGINT;
+
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND localjobid=NEW.jobid;
+
+IF shardjobid <> 0 THEN
+    INSERT INTO aspshard.jobsetting (jobid, name, value) VALUES (shardjobid, NEW.name, NEW.value);
+END IF;
+END$$
+
+DROP TRIGGER update_jobsetting$$
+
+CREATE TRIGGER update_jobsetting
+AFTER UPDATE ON jobsetting FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+DECLARE shardjobid BIGINT;
+
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND localjobid=NEW.jobid;
+
+IF shardjobid <> 0 THEN
+    UPDATE aspshard.jobsetting SET value=NEW.value WHERE jobid=shardjobid AND name=NEW.name;
+END IF;
+END$$
+
+DROP TRIGGER delete_jobsetting$$
+
+CREATE TRIGGER delete_jobsetting
+AFTER DELETE ON jobsetting FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+DECLARE shardjobid BIGINT;
+
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND localjobid=OLD.jobid;
+
+IF shardjobid <> 0 THEN
+    DELETE FROM aspshard.jobsetting WHERE jobid=shardjobid AND name=OLD.name;
+END IF;
+END$$
+
+
+DELIMITER ;
 
