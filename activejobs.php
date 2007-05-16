@@ -59,7 +59,7 @@ $result = Query(
             	on j.id = rp.jobid
             left join user jobowner
             	on j.userid = jobowner.id
-            where (j.status = 'active' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
+            where (j.status = 'active' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
             group by j.id order by j.id desc limit $start, $limit");
 
 while ($row = DBGetRow($result)) {

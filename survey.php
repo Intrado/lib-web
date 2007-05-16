@@ -106,7 +106,7 @@ if (getCurrentSurvey() != NULL) {
 		$completedmode = true;
 	}
 
-	if ($job->status == 'active' || $completedmode) {
+	if ($job->status == 'active' || $job->status == 'processing' || $completedmode) {
 		$submittedmode = true;
 	}
 }
@@ -150,7 +150,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			error('The end date has already passed. Please correct this problem before proceeding');
 		} else if ( (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (QuickQuery("select count(*) from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','active','repeating') and id!= " . (0 + getCurrentSurvey()))) {
+		} else if (QuickQuery("select count(*) from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','processing','active','repeating') and id!= " . (0 + getCurrentSurvey()))) {
 			error('A job or survey named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
@@ -277,9 +277,9 @@ if( $reloadform )
 		array("starttime","text",1,50,true),
 		array("endtime","text",1,50,true),
 		array('startdate','text', 1, 50, true),
-		array("maxcallattempts","number",1,$ACCESS->getValue('callmax'),true)
 	);
 
+	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
 
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "phone", 10, 10, false);
 

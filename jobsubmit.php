@@ -8,7 +8,8 @@ $jobid = $_GET['jobid'] + 0;
 if (!userOwns("job",$jobid))
 	redirect('unauthorized.php');
 
-// new gjb code
+// gather job list rules to store with job.thesql for the trigger to shard db
+// job.thesql is used by the jobprocessor
 $job = new Job($jobid);
 
 $usersql = $USER->userSQL("p");
@@ -20,11 +21,14 @@ if (count($listrules) > 0)
 else
 	$listsql = "0";//dont assume anyone is in the list if there are no rules
 
+if ($usersql == "")
+    $job->thesql = $listsql;
+else
+    $job->thesql = $usersql ." and ". $listsql;
 
-$job->thesql = $usersql ." and ". $listsql;
+$job->status = "processing"; // set state, jobprocessor will set it to 'active'
 $job->update();
 
-//Job::runNow($jobid);
 sleep(3);
 
 

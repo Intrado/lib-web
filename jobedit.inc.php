@@ -35,7 +35,7 @@ if ($jobid != NULL) {
 		$completedmode = true;
 	}
 
-	if ($job->status == 'active' || $completedmode) {
+	if ($job->status == 'active' || $job->status == 'processing' || $completedmode) {
 		$submittedmode = true;
 	}
 }
@@ -86,7 +86,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('The end date has already passed. Please correct this problem before proceeding');
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
+		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','processing','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
@@ -217,6 +217,30 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->endtime = date("H:i", strtotime($job->endtime));
 			$job->userid = $USER->id;
 
+			// now that the job is created, we can save the jobsettings
+			$job->setOption("callall",GetFormData($f,$s,"callall"));
+			$job->setOption("callfirst",!GetFormData($f,$s,"callall"));
+			$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
+			$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
+			$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
+
+			$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));
+
+			if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
+				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
+			} else {
+				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
+				$job->setOptionValue("callerid", $callerid);
+			}
+
+			if (getSystemSetting('retry') != "")
+				$job->setOptionValue("retry",getSystemSetting('retry'));
+
+			if ($USER->authorize("leavemessage"))
+				$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
+
+
+
 			if ($job->id) {
 				$job->update();
 				status('Updated Job information successfully');
@@ -232,7 +256,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			}
 
 			$_SESSION['jobid'] = $job->id;
-
 			//echo $job->_lastsql;
 			//echo mysql_error();
 

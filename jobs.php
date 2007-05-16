@@ -31,7 +31,7 @@ if (isset($_GET['cancel'])) {
 		$job = new Job($cancelid);
 		$job->cancelleduserid = $USER->id;
 
-		if ($job->status == "active") {
+		if ($job->status == "active" || $job->status == "processing") {
 			$job->status = "cancelling";
 		} else if ($job->status == "new") {
 			$job->status = "cancelled";
@@ -102,7 +102,7 @@ $TITLE = "Notification Jobs";
 
 include_once("nav.inc.php");
 
-$data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by id desc");
+$data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by id desc");
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
 					"type" => "#Type",
