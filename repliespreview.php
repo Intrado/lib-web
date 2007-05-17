@@ -6,11 +6,30 @@ include_once("inc/formatters.inc.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/VoiceReply.obj.php");
 include_once("obj/Message.obj.php");
+include_once("inc/securityhelper.inc.php");
 
-$id = $_GET['id']+0;
+if(isset($_GET['delete'])){
+	$delete = $_GET['delete'];
+	if(!userOwns("voicereply", $delete)){
+		redirect('unauthorized.php');
+	}
+	$vr = new VoiceReply($delete);
+	$vr->destroy();
+	?><script>window.close();</script><?
+}
+
+$id = 0;
+if(isset($_GET['id'])){
+	$id = $_GET['id']+0;
+	if(!userOwns("voicereply", $id)){
+		redirect('unauthorized.php');
+	}
+}
 $vr = new VoiceReply($id);
 $vr->listened = 1;
 $vr->update();
+
+
 
 $firstname = FieldMap::getFirstNameField();
 $lastname = FieldMap::getLastNameField();
@@ -36,10 +55,9 @@ $responses = DBGetRow($responses);
 $TITLE = "Reply";
 
 include_once('popup.inc.php');
-
 startWindow('Reply Info', 'padding: 3px;');
 
-button("done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"); 
+buttons(button("done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"));
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0">
@@ -88,6 +106,7 @@ TYPE="application/x-oleobject">
 
 
 <br><a href="repliesplay.wav.php/download_preview.wav?id=<? print $_GET['id']; ?>&download=true">Click here to download</a>
+<br><a href="repliespreview.php?delete=<?=$vr->id?>" onclick="return confirm('Are you sure you want to delete this reply?');">Click here to delete</a>
 </div>
 <?
 endWindow();
