@@ -193,7 +193,7 @@ mysql_query("create database $newdbname",$custdb)
 	or die ("Failed to create new DB $newdbname : " . mysql_error($custdb));
 mysql_select_db($newdbname,$custdb);
 
-$tablequeries = explode(";",file_get_contents("extract_customer_schema.sql"));
+$tablequeries = explode("$$$",file_get_contents("extract_customer_schema.sql"));
 foreach ($tablequeries as $tablequery) {
 	if (trim($tablequery))
 		mysql_query($tablequery,$custdb)
@@ -378,9 +378,6 @@ copytable($customerid,"voicereply",array("id", "jobtaskid", "jobworkitemid", "pe
 
 //Customer fields
 customerinfo($customerid, $db, $custdb);
-
-
-
 
 
 
