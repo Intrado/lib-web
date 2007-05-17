@@ -134,7 +134,6 @@ class Job extends DBMappedObject {
 			if ($res = Query("select name,value from jobsetting where jobid='$this->id'")) {
 				while ($row = DBGetRow($res)) {
 					$this->optionsarray[$row[0]] = $row[1];
-					error_log($row[0] .":". $row[1]);
 				}
 			}
 		}
