@@ -25,7 +25,7 @@ $cpcolors = array(
 	"inprogress" => "blue"
 );
 
-if ($IS_COMMSUITE) {
+
 $query = "
 select count(*)/30 as cnt,
 	hour( from_unixtime(starttime/1000)) as hour,
@@ -35,17 +35,7 @@ where result in ('A','M','B','N')
 and starttime > 1000 * unix_timestamp(date_sub(now(),interval 30 day))
 group by hour, result
 ";
-} /*CSDELETEMARKER_START*/ else {
-$query = "
-select count(*)/30 as cnt,
-	hour( from_unixtime(rc.starttime/1000)) as hour,
-	rc.result
-from reportcontact rc
-where rc.result in ('A','M','B','N')
-and rc.starttime > 1000 * unix_timestamp(date_sub(now(),interval 30 day))
-group by hour, rc.result
-";
-} /*CSDELETEMARKER_END*/
+
 
 $result = Query($query);
 
