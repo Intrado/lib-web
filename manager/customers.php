@@ -16,7 +16,7 @@ include_once("nav.inc.php");
 <tr>
 <td>Customer ID</td>
 <td>Customer Name</td>
-<td>Customer URL</td>
+<td>Customer URL (link)</td>
 <td>Toll Free Number</td>
 <td>Timezone</td>
 <td>Status</td>
@@ -31,7 +31,7 @@ include_once("nav.inc.php");
 foreach($customers as $cust) {
 
 	if($custdb = DBConnect($cust[1], $cust[2], $cust[3], "c_" . $cust[0])){
-	
+
 		$custname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
 		$hostname = $cust[4];
 		$inboundnumber = QuickQuery("select value from setting where name = 'inboundnumber'", $custdb);
@@ -56,13 +56,13 @@ foreach($customers as $cust) {
 		<td><a href="customerlink.php?id=<?=$cust[0] ?>"><?=$hostname?></a></td>
 		<td><?= $inboundnumber ? $inboundnumber : "&nbsp;" ?></td>
 		<td><?= $timezone ?></td>
-		<td><?= $status ? "Repeating Jobs Disabled" : "Repeating Jobs Enabled" ?></td>
+		<td><?= $status ? "Repeating Jobs Disabled" : "OK" ?></td>
 		<td <?=$userstyle?>><?= $usercount ?></td>
 		<td <?= $jobcount > 0 ? 'style="background-color: #ccffcc;"' : "" ?>><?= $jobcount ?></td>
-		<td><a href="customeredit.php?id=<?=$cust[0] ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust[0] ?>">Show&nbsp;Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust[0]?>">Customer&nbsp;Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust[0]?>">Active&nbsp;Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=<?=$cust[0]?>">Customer&nbsp;Priorities</a></td>
+		<td><a href="customeredit.php?id=<?=$cust[0] ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust[0] ?>">Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust[0]?>">Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust[0]?>">Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=<?=$cust[0]?>">Priorities</a></td>
 		<td><?=$notes ? $notes : "&nbsp" ?></td>
 		</tr>
-	
+
 	<?
 	}
 }
