@@ -2,7 +2,8 @@
 
 ;authentication server connection information
 [authserver]
-url="http://localhost:8088/xmlrpc"
+host="localhost:8088"
+path="/xmlrpc"
 
 [db]
 persistent=true
