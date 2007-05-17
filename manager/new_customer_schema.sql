@@ -80,6 +80,8 @@ CREATE TABLE `import` (
   ownertype enum('system','user') NOT NULL default 'system',
   updatemethod enum('updateonly','update','full') NOT NULL default 'full',
   lastrun datetime default NULL,
+  data LONGBLOB default NULL,
+  datamodifiedtime datetime  DEFAULT NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY uploadkey (uploadkey),
   KEY scheduleid (scheduleid)
@@ -331,6 +333,7 @@ CREATE TABLE reportperson (
   numcontacts tinyint(4) NOT NULL,
   numduperemoved tinyint(4) NOT NULL,
   numblocked tinyint(4) NOT NULL,
+  pkey varchar(255) default NULL,
   f01 varchar(50) NOT NULL default '',
   f02 varchar(50) NOT NULL default '',
   f03 varchar(50) NOT NULL default '',
@@ -512,5 +515,17 @@ CREATE TABLE voicereply (
   KEY replytime (replytime)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-ALTER TABLE `import` ADD `data` LONGBLOB NOT NULL ;
+CREATE TABLE `systemstats` (
+`datetime` BIGINT(20) NOT NULL ,
+`answered` INT NOT NULL ,
+`machine` INT NOT NULL ,
+`busy` INT NOT NULL ,
+`noanswer` INT NOT NULL ,
+PRIMARY KEY ( `datetime` )
+) ENGINE = innodb;
 
+CREATE TABLE `jobstats` (
+`jobid` INT NOT NULL ,
+`count` INT NOT NULL ,
+PRIMARY KEY ( `jobid` )
+) ENGINE = innodb;
