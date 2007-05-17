@@ -60,7 +60,7 @@ function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false, $c
 		return $settings[$name];
 
 	$value = QuickQuery("select value from setting where name = '" . DBSafe($name) . "'", $custdb);
-	
+
 	if($value === false) {
 		$value = $defaultvalue;
 	}
@@ -207,7 +207,10 @@ function checkemails($emaillist) {
 }
 
 //from php.net comments
-function secure_tmpname($dir = "tmp", $prefix = 'tmp', $postfix = '.dat') {
+function secure_tmpname($prefix = 'tmp', $postfix = '.dat') {
+	global $SETTINGS;
+	$dir = $SETTINGS['feature']['tmp_dir'];
+
    // validate arguments
 	if (! (isset($postfix) && is_string($postfix))) {
 		return false;
@@ -215,7 +218,7 @@ function secure_tmpname($dir = "tmp", $prefix = 'tmp', $postfix = '.dat') {
 	if (! (isset($prefix) && is_string($prefix))) {
 		return false;
 	}
-   
+
 	$filename = $dir . "/" . $prefix . microtime(true) . mt_rand() . $postfix;
 
 	$fp = fopen($filename, "w");

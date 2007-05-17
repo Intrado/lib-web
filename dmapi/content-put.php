@@ -8,7 +8,7 @@ include_once("../inc/content.inc.php");
 require_once("../inc/DBMappedObject.php");
 include_once("../obj/Content.obj.php");
 
-$tmpname = secure_tmpname($SETTINGS['feature']['tmp_dir'],"dmapicontent",".dat");
+$tmpname = secure_tmpname("dmapicontent",".dat");
 file_put_contents($tmpname,$HTTP_RAW_POST_DATA);
 
 echo contentPut($tmpname,$_SERVER['CONTENT_TYPE'],false);
