@@ -1,6 +1,5 @@
 <?
 include_once("common.inc.php");
-include_once("../inc/ftpfile.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
 
@@ -104,13 +103,13 @@ while($row= mysql_fetch_row($custquery)){
 	</tr>
 <?
 foreach($customers as $cust){
-	
+
 	$custdb = DBConnect($cust[1], $cust[2], $cust[3], "c_$cust[0]");
 	if(!$custdb) {
 		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
 	}
-	
-	$query = "SELECT id, name, status, type, updatemethod, lastrun
+
+	$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data)
 				FROM import
 				where 1
 				$querytypes
@@ -120,17 +119,7 @@ foreach($customers as $cust){
 	$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
 	while($row = DBGetRow($list)){
 		date_default_timezone_set($timezone);
-		
-		//TODO fix getImportFileUrl due to customer id
-		$importfile = getImportFileURL($cust[0],$row[0]);
-		if (is_readable($importfile) && is_file($importfile)) {
-			$filetime = filemtime($importfile);
-			$row[6]=fmt_alert_timestamp($filetime);
-			$row[7]=filesize($importfile);
-		} else {
-			$row[6]="<div style='background-color: #ffcccc'>Not Found</div>";
-			$row[7]="-";
-		}
+
 	?>
 		<tr>
 			<td><?=$cust[0]?></td>
@@ -144,7 +133,7 @@ foreach($customers as $cust){
 			<td><?=$timezone?></td>
 			<td><?=fmt_alert_timestamp(strtotime($row[5]))?></td>
 			<td><?=$row[6]?></td>
-			<td <?= $row[7] < 10 ? 'style="background-color: #ffcccc;"' : "" ?>><?=$row[7]?></td>
+			<td <?= $row[7] < 10 ? 'style="background-color: #ffcccc;"' : "" ?>><?= number_format($row[7])?></td>
 		</tr>
 	<?
 	}
