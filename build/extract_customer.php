@@ -154,6 +154,7 @@ function customerinfo($custid, $source, $dest){
 	$destres = mysql_query("insert into setting (name, value) values
 								('inboundnumber', '$row[0]'),
 								('timezone', '$row[1]'),
+								('_customerid', '$custid'),
 								('displayname', '$row[2]')", $dest)
 							or die ("Failed to insert into setting: " . mysql_error($dest));
 }
@@ -234,7 +235,7 @@ copytable($customerid,"email",array("id", "personid", "email", "sequence", "edit
 copytable($customerid,"fieldmap",array("id", "fieldnum", "name", "options"),$db,$custdb,1000,false);
 
 //IMPORT
-copytable($customerid,"import",array("id", "uploadkey", "userid", "listid", "name", "description", "status", "type", "path", "scheduleid", "ownertype", "updatemethod", "lastrun"),$db,$custdb,1000,false);
+copytable($customerid,"import",array("id", "uploadkey", "userid", "listid", "name", "description", "status", "type", "path", "scheduleid", "ownertype", "updatemethod", "lastrun", "data"),$db,$custdb,1000,false);
 
 //IMPORTFIELD
 $join = "inner join import i on (importid = i.id and i.customerid=$customerid)";
@@ -305,7 +306,7 @@ copytable($customerid,"phone",array("id", "personid", "phone", "sequence", "edit
 copytable($customerid,"reportcontact",array("jobid", "personid", "type", "sequence", "numattempts", "userid", "starttime", "result", "participated", "duration", "resultdata", "attemptdata", "phone", "email", "addressee", "addr1", "addr2", "city", "state", "zip"),$db,$custdb,1000,false);
 
 //REPORTPERSON
-copytable($customerid,"reportperson",array("jobid", "personid", "type", "userid", "messageid", "status", "numcontacts", "numduperemoved", "numblocked", "f01", "f02", "f03", "f04", "f05", "f06", "f07", "f08", "f09", "f10", "f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20"),$db,$custdb,1000,false);
+copytable($customerid,"reportperson",array("jobid", "personid", "type", "userid", "messageid", "status", "numcontacts", "numduperemoved", "numblocked", "pkey", "f01", "f02", "f03", "f04", "f05", "f06", "f07", "f08", "f09", "f10", "f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20"),$db,$custdb,1000,false);
 
 //RULE (list)
 $join = "inner join listentry le on (le.ruleid = rule.id)
