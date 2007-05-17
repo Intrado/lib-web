@@ -256,7 +256,7 @@ EndForm();
 <script>
 	function repliesplay( voicereplyid ){
 	
-		popup('repliespreview.php?id=' + voicereplyid + '?close=1', 400, 500);
+		popup('repliespreview.php?id=' + voicereplyid + '&close=1', 450, 600);
 		var status = new getObj('reply' + voicereplyid).obj;
 		status.style.fontWeight='normal';
 		if(document.all){
