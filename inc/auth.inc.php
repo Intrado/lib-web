@@ -76,7 +76,6 @@ function getSessionData($id) {
 			error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
 		} else if (mysql_select_db($db['db'])) {
 			// successful connection to customer database, return session data
-			error_log("getdata SUCCESS ".$result[1]['sessionData']);
 			return $result['sessionData'];
 		} else {
 			error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
