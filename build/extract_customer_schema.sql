@@ -80,8 +80,8 @@ CREATE TABLE `import` (
   ownertype enum('system','user') NOT NULL default 'system',
   updatemethod enum('updateonly','update','full') NOT NULL default 'full',
   lastrun datetime default NULL,
-  `data` LONGBLOB default NULL,
-  `datamodifiedtime` datetime  DEFAULT NULL,
+  data LONGBLOB default NULL,
+  datamodifiedtime datetime  DEFAULT NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY uploadkey (uploadkey),
   KEY scheduleid (scheduleid)
@@ -527,13 +527,13 @@ CREATE TABLE `systemstats` (
 `busy` INT NOT NULL ,
 `noanswer` INT NOT NULL ,
 PRIMARY KEY ( `datetime` )
-) ENGINE = innodb;
+) ENGINE = innodb$$$
 
 CREATE TABLE `jobstats` (
 `jobid` INT NOT NULL ,
 `count` INT NOT NULL ,
 PRIMARY KEY ( `jobid` )
-) ENGINE = innodb;
+) ENGINE = innodb$$$
 
 
 -- triggers from customer database to shard database
