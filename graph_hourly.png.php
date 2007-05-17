@@ -31,7 +31,7 @@ select count(*)/30 as cnt,
 	hour( from_unixtime(starttime/1000)) as hour,
 	result
 from reportcontact
-where callprogress in ('A','M','B','N')
+where result in ('A','M','B','N')
 and starttime > 1000 * unix_timestamp(date_sub(now(),interval 30 day))
 group by hour, result
 ";
