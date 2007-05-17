@@ -22,9 +22,11 @@ function doStartSession() {
 		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 	}
 }
+
 require_once("db.inc.php");
 require_once("DBMappedObject.php");
 require_once("DBRelationMap.php");
+require_once("XML/RPC.php");
 require_once("auth.inc.php");
 require_once("sessionhandler.inc.php");
 
