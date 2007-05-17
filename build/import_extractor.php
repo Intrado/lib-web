@@ -33,8 +33,6 @@ $query = "select id, dbhost, dbusername, dbpassword, hostname from customer wher
 $res = mysql_query($query, $auth);
 $customer = mysql_fetch_row($res);
 
-
-//fetch report data per customer
 $custdb = mysql_connect($customer[1], $customer[2], $customer[3])
 			or die("Could not connect to customer: " . mysql_error($custdb));
 mysql_select_db("c_$customer[0]", $custdb)
@@ -57,11 +55,7 @@ foreach($imports as $import){
 	
 	if (is_readable($file) && is_file($file)) {
 		echo "Extracting: " . $file . "\n";
-		$fp = fopen($file, "r");
-		$stream = "";
-		while($data = fread($fp, filesize($file))){
-			$stream .= $data;
-		}
+		$stream = file_get_contents($file);
 		$query = "update import set data = '" . mysql_real_escape_string($stream,$custdb) . "' where id = '$import[0]'";
 		mysql_query($query, $custdb)
 			or die("Failed to insert data into import:" . mysql_error($custdb));
