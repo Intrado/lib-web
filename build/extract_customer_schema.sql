@@ -334,7 +334,7 @@ CREATE TABLE reportperson (
   personid int(11) NOT NULL,
   `type` enum('phone','email','print') NOT NULL,
   userid int(11) NOT NULL,
-  messageid int(11) NOT NULL,
+  messageid int(11),
   `status` enum('new','queued','assigned','fail','success','duplicate','blocked') NOT NULL,
   numcontacts tinyint(4) NOT NULL,
   numduperemoved tinyint(4) NOT NULL,
