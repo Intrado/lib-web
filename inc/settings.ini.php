@@ -7,7 +7,7 @@ path="/xmlrpc"
 
 [db]
 persistent=true
-host="localhost:3306"
+host="localhost"
 user="root"
 pass=""
 db="authserver"
@@ -15,7 +15,7 @@ db="authserver"
 ;optional seperate server for outbound notifications
 [dmapidb]
 persistent=true
-host="localhost:3306"
+host="localhost"
 user="root"
 pass=""
 db="dialerasp"
@@ -41,7 +41,8 @@ warn_earliest=
 warn_latest=
 
 [content]
-tts="devbox4,8080,/phone/Tts"
+;tts="devbox4,8080,/phone/Tts"
+tts="10.25.25.15,8080,/tts/ttsloquendo"
 
 externalcontent=false
 ; format is "host,port,path;host2,port2,path2;..." reserved chars= ';' and ','
@@ -49,25 +50,12 @@ get="localhost,80,/foobar/xxx-get.php"
 put="localhost,80,/foobar/xxx-put.php"
 
 
-[import]
-;type=file|ftp
-type=file
-
-;used for file type imports
-filedir=/usr/commsuite/imports/
-
-;below only used for ftp
-ftphost=127.0.0.1
-ftpport=21
-ftpuser=anonymous
-ftppass=anonymous
-
 [ldap]
 is_ldap=false
 ldapconnect="192.168.174.2"
-ldapextension="@adtest.net"
-ldapusername="testbed"
-ldappassword="testbed"
+ldapextension="@domain.com"
+ldapusername="user"
+ldappassword="pass"
 
 
 ;*/?>
