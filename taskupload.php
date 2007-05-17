@@ -14,9 +14,6 @@ require_once("obj/Import.obj.php");
 require_once("obj/ImportField.obj.php");
 require_once("obj/Schedule.obj.php");
 include_once("obj/PeopleList.obj.php");
-require_once("inc/ftpfile.inc.php");
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,33 +42,18 @@ $reloadform = 0;
 //should we check for an upload?
 if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name']) {
 
-	$newname = secure_tmpname($_SETTINGS['feature']['tmp_dir'],"taskupload",".csv");
+	$newname = secure_tmpname("taskupload",".csv");
 	if(!move_uploaded_file($_FILES['taskcontents']['tmp_name'],$newname)) {
-		error('Unable to complete file upload. Please try again.');
+		error('Unable to complete file upload. Please try again');
 	} else if (!is_file($newname) || !is_readable($newname)) {
-		error('Unable to complete file upload. Please try again.');
+		error('Unable to complete file upload. Please try again');
 	} else {
-		if ($SETTINGS['import']['type'] == "ftp") {
-			//TODO figure out file import directory structure
-			$res = uploadImportFile($newname,$import->customerid,$import->id);
-			unlink($newname);
-		} else if ($SETTINGS['import']['type'] == "file"){
-			//TODO figure out file import directory structure
-			$destfile = $SETTINGS['import']['filedir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv";
-			makeparentdirectories($destfile);
-			$res = copy($newname,$destfile);
-			unlink($newname);
-		} else {
-			$res = false;
-		}
-
-		if ($res) {
-			//TODO figure out file import directory structure
-			$import->path = $import->customerid . "/" . $import->id . "/data.csv";
-			$import->update();
+		$data = file_get_contents($newname);
+		if ($import->upload($data)) {
 			redirect("taskmap.php?id=$import->id");
 		} else {
-			error('Unable to complete file upload. Please try again.');
+			error_log("Unable to upload import data, either the file was empty or there is a DB problem.");
+			error('Unable to complete file upload. Please try again');
 		}
 	}
 } else if (CheckFormSubmit($f,'upload')) {

@@ -13,7 +13,6 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
-require_once("inc/ftpfile.inc.php");
 
 
 
@@ -52,17 +51,9 @@ function fmt_updatemethod ($import,$field) {
 }
 
 
-function fmt_fileexists ($import,$dummy) {
-	global $SETTINGS;
-	if ($SETTINGS['import']['type'] == "ftp"){
-		//TODO figure out file import directory structure
-		$importfile = getImportFileURL($import->customerid,$import->id);
-	} else if ($SETTINGS['import']['type'] == "file")
-		$importfile = $SETTINGS['import']['filedir'] . "/" . $import->path;
-
-
-	if (is_readable($importfile) && is_file($importfile)) {
-		return date("M j, g:i a",filemtime($importfile));
+function fmt_datamodifiedtime ($import,$field) {
+	if ($import->datamodifiedtime != null) {
+		return date("M j, g:i a",strtotime($import->datamodifiedtime));
 	} else {
 		return "Not Found";
 	}
@@ -89,7 +80,7 @@ $titles = array("name" => "#Name",
 				"uploadkey" => "Upload Key",
 				"status" => "#Status",
 				"lastrun" => "Last Run",
-				"file" => "File Date");
+				"datamodifiedtime" => "File Date");
 
 $titles['Actions'] = "Actions";
 
@@ -98,7 +89,7 @@ $formatters = array("updatemethod" => "fmt_updatemethod",
 					"status" => "fmt_ucfirst",
 					"lastrun" => "fmt_obj_date",
 					"updatemethod" => "fmt_updatemethod",
-					"file" => "fmt_fileexists",
+					"datamodifiedtime" => "fmt_datamodifiedtime",
 					"Actions" => "fmt_actions");
 
 

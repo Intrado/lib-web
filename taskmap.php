@@ -15,7 +15,6 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
-require_once("inc/ftpfile.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,19 +157,13 @@ foreach ($fieldmaps as $fieldmap) {
 
 //scan the file
 
+$importfile = secure_tmpname("taskmap",".csv");
+file_put_contents($importfile,$IMPORT->download());
 
-if ($SETTINGS['import']['type'] == "ftp")
-	$importfile = getImportFileURL($IMPORT->customerid,$IMPORT->id);
-else if ($SETTINGS['import']['type'] == "file")
-	$importfile = $SETTINGS['import']['filedir'] . "/" . $IMPORT->path;
-
-if (is_file($importfile ))
-	$fp = @fopen($importfile , "r");
-else
-	$fp = null;
-if ($fp) {
+$fp = @fopen($importfile , "r");
+$colcount = 0;
+if ($fp && filesize($importfile) > 0 ) {
 	$count = 10;
-	$colcount = 0;
 	$importdata = array();
 	while (($row = fgetcsv($fp,4096)) !== FALSE && $count--) {
 		for ($x = 0; $x < count($row); $x++)
@@ -184,6 +177,8 @@ if ($fp) {
 	$_SESSION['importcols'] = 0;
 	$noimportdata = true;
 }
+
+@unlink($importfile);
 
 
 if( $reloadform )
@@ -216,7 +211,7 @@ startWindow('Field Mapping');
 ?>
 <br>
 <? if ($noimportdata) { ?>
-			<br><h3>The import file could not be found. Please make sure that the file exists.</h3><br>
+			<br><h3>No import data could be found. Please check that a non empty file has been uploaded.</h3><br>
 <? } else { ?>
 
 <?

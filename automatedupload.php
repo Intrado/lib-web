@@ -7,7 +7,6 @@ require_once("inc/DBMappedObject.php");
 require_once("inc/DBRelationMap.php");
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
-require_once("inc/ftpfile.inc.php");
 require_once("inc/sessiondata.inc.php");
 require_once("obj/User.obj.php");
 require_once("obj/Customer.obj.php");
@@ -86,7 +85,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 			$sess['uploadsuccess'] = false;
 			$sess['length'] = $sess['remaining'] = $length;
 			$sess['md5'] = $md5checksum;
-			$sess['filename'] = secure_tmpname($SETTINGS['feature']['tmp_dir'],"autoupload",".csv");
+			$sess['filename'] = secure_tmpname("autoupload",".csv");
 			storeSessionData($sessionid,$sess['customerid'],$sess);
 
 			return array ("authCode" => $newauthcode,
@@ -147,17 +146,9 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 						"errorCode" => "CHECHSUM_FAILURE");
 
 		//do the upload
-		if ($SETTINGS['import']['type'] == "ftp") {
-			$res = uploadImportFile($sess['filename'],$sess['customerid'],$sess['importid']);
-		} else if ($SETTINGS['import']['type'] == "file"){
-			$destfile = $SETTINGS['import']['filedir'] . "/" . $sess['customerid'] . "/" . $sess['importid'] . "/data.csv";
-			makeparentdirectories($destfile);
-			$res = copy($sess['filename'],$destfile);
-		} else {
-			$res = false;
-		}
-
-		if (!$res)
+		$import = new Import($sess['importid']);
+		$data = file_get_contents($sess['filename']);
+		if (!$data  || !$import->upload($data))
 			return array ("resumeLength" => "0",
 						"errorMsg" => "There was an error uploading the file",
 						"errorCode" => "UPLOAD_ERROR");
@@ -165,10 +156,6 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		@unlink($sess['filename']);
 
 		//should we kick off the import?
-		$import = new Import($sess['importid']);
-		$import->path = $sess['customerid'] . "/" . $sess['importid'] . "/data.csv";
-		$import->update();
-
 		if ($import->type == "automatic") {
 			$import->runNow();
 		}

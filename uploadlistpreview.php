@@ -14,6 +14,7 @@ require_once("obj/Import.obj.php");
 require_once("obj/ImportField.obj.php");
 require_once("obj/Schedule.obj.php");
 include_once("obj/PeopleList.obj.php");
+include_once("obj/Person.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 require_once("inc/ftpfile.inc.php");
@@ -62,6 +63,8 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 			while (($row = fgetcsv($fp,4096)) !== FALSE && $count--) {
 				if (count($row) == 1 && $row[0] == "")
 					continue;
+				for ($x = 0; $x < 4; $x++)
+					$row[$x] = (isset($row[$x]) ? $row[$x] : null);
 				$phone = Phone::parse($row[2]);
 				if ($defaultareacode && strlen($phone) == 7)
 					$phone = Phone::parse($defaultareacode . $phone);
@@ -182,19 +185,8 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		}
 
 		//upload or copy the file to the main import location
-		if ($SETTINGS['import']['type'] == "ftp") {
-			$res = uploadImportFile($curfilename,$import->customerid,$import->id); //jjl
-		} else if ($SETTINGS['import']['type'] == "file"){
-			$destfile = $SETTINGS['feature']['tmp_dir'] . "/" . $import->customerid . "/" . $import->id . "/data.csv"; //jjl
-			makeparentdirectories($destfile);
-			$res = copy($curfilename,$destfile);
-		} else {
-			$res = false;
-		}
-
-		if ($res) {
-			$import->path = $import->customerid . "/" . $import->id . "/data.csv"; //jjl
-			$import->update();
+		$data = file_get_contents($curfilename);
+		if ($import->upload($data)) {
 			$import->runNow();
 			sleep(3);
 		} else {

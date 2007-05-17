@@ -9,16 +9,15 @@ class Import extends DBMappedObject {
 	var $description;
 	var $status;
 	var $type;
-	var $path;
-	var $scheduleid;
 	var $ownertype;
 	var $updatemethod;
 	var $lastrun;
+	var $datamodifiedtime;
 
 	function Import ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "import";
-		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "status", "type", "path", "scheduleid", "ownertype", "updatemethod", "lastrun");
+		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "status", "type","ownertype", "updatemethod", "lastrun","datamodifiedtime");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -34,6 +33,15 @@ class Import extends DBMappedObject {
 			$cmd = "php import.php -import=$importid > /dev/null &";
 			exec($cmd);
 		}
+	}
+
+
+	function upload ($data) {
+		return QuickUpdate("update import set data='" . DBSafe($data) . "', datamodifiedtime=now() where id=" . $this->id);
+	}
+
+	function download () {
+		return QuickQuery("select data from import where id=" . $this->id);
 	}
 
 }
