@@ -80,7 +80,8 @@ CREATE TABLE `import` (
   ownertype enum('system','user') NOT NULL default 'system',
   updatemethod enum('updateonly','update','full') NOT NULL default 'full',
   lastrun datetime default NULL,
-  `data` LONGBLOB NOT NULL,
+  `data` LONGBLOB default NULL,
+  `datamodifiedtime` datetime  DEFAULT NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY uploadkey (uploadkey),
   KEY scheduleid (scheduleid)
@@ -518,6 +519,21 @@ CREATE TABLE voicereply (
   KEY userid (userid),
   KEY replytime (replytime)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1$$$
+
+CREATE TABLE `systemstats` (
+`datetime` BIGINT(20) NOT NULL ,
+`answered` INT NOT NULL ,
+`machine` INT NOT NULL ,
+`busy` INT NOT NULL ,
+`noanswer` INT NOT NULL ,
+PRIMARY KEY ( `datetime` )
+) ENGINE = innodb;
+
+CREATE TABLE `jobstats` (
+`jobid` INT NOT NULL ,
+`count` INT NOT NULL ,
+PRIMARY KEY ( `jobid` )
+) ENGINE = innodb;
 
 
 -- triggers from customer database to shard database
