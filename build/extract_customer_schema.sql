@@ -339,6 +339,7 @@ CREATE TABLE reportperson (
   numcontacts tinyint(4) NOT NULL,
   numduperemoved tinyint(4) NOT NULL,
   numblocked tinyint(4) NOT NULL,
+  pkey varchar(255) default NULL,
   f01 varchar(50) NOT NULL default '',
   f02 varchar(50) NOT NULL default '',
   f03 varchar(50) NOT NULL default '',
