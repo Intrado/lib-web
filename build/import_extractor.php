@@ -1,20 +1,15 @@
 <?
 
-if ($argc < 2)
-	exit ("Please specify customerid");
-	
-$customerid = $argv[1];
-
 $SETTINGS = parse_ini_file("../inc/settings.ini.php", true);
 
-$authhost="localhost:3306";
-$authuser="root";
-$authpass="";
-$authdb="authserver";
+$dbhost="localhost:3306";
+$dbuser="root";
+$dbpass="";
+$db="dialerasp";
 
-$auth = mysql_connect($authhost, $authuser, $authpass)
-			or die("Could not connect to auth: " . mysql_error($authdb));
-mysql_select_db($authdb, $auth);
+$custdb = mysql_connect($dbhost, $dbuser, $dbpass)
+			or die("Could not connect to db: " . mysql_error($authdb));
+mysql_select_db($db, $custdb);
 
 
 
@@ -28,19 +23,9 @@ function getImportFileURL ($customerid, $uploadpath, $destfilename = "data.csv")
 	return $url;
 }
 
-
-$query = "select id, dbhost, dbusername, dbpassword, hostname from customer where id = '$customerid'";
-$res = mysql_query($query, $auth);
-$customer = mysql_fetch_row($res);
-
-$custdb = mysql_connect($customer[1], $customer[2], $customer[3])
-			or die("Could not connect to customer: " . mysql_error($custdb));
-mysql_select_db("c_$customer[0]", $custdb)
-			or die("Could not select customer db: " . mysql_error($custdb));
-
 //find import file, pull data out, and populate data field in import
 
-$query = "select id, path from import";
+$query = "select id, path, customerid from import";
 $result = mysql_query($query, $custdb);
 $imports = array();
 while($row = mysql_fetch_row($result)){
@@ -50,7 +35,7 @@ foreach($imports as $import){
 	if($SETTINGS['import']['type'] == 'file'){
 		$file = $SETTINGS['import']['filedir'] . $import[1];
 	} else if($SETTINGS['import']['type'] == 'ftp'){
-		$file = getImportFileUrl($customer[0], $import[0]);
+		$file = getImportFileUrl($import[2], $import[0]);
 	}
 	
 	if (is_readable($file) && is_file($file)) {
