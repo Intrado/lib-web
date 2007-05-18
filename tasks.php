@@ -67,10 +67,13 @@ function fmt_actions ($import,$dummy) {
 		$extra = 'W A R N I N G:\nThis import has ' . "$associatedjobcount" .' repeating job(s) linked to it that will automatically run if you click OK.\n';
 		$confirm = $extra. $confirm;
 	}
-	return "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>";
-
-	//disabled delete
-	//&nbsp;|&nbsp;<a href=\"task.php?delete=$import->id\" onclick=\"return confirmDelete();\">Delete</a>
+	$res = "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;";
+	if ($import->datamodifiedtime != null)
+		$res .= "<a href=\"taskdownload.php?id=$import->id\">Download</a>&nbsp;|&nbsp;";
+	$res .= "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;"
+			."<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
+			."<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>";
+	return $res;
 }
 
 
