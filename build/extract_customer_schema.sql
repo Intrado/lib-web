@@ -4,7 +4,8 @@ CREATE TABLE access (
   description varchar(50) NOT NULL default '',
   PRIMARY KEY  (id),
   KEY id (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE address (
   id int(11) NOT NULL auto_increment,
@@ -18,7 +19,8 @@ CREATE TABLE address (
   editlock tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY personid (personid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE audiofile (
   id int(11) NOT NULL auto_increment,
@@ -30,7 +32,8 @@ CREATE TABLE audiofile (
   deleted tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY list (userid,deleted)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE blockednumber (
   id int(11) NOT NULL auto_increment,
@@ -38,14 +41,16 @@ CREATE TABLE blockednumber (
   description varchar(100) NOT NULL,
   pattern varchar(10) NOT NULL default '',
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE content (
   id bigint(20) NOT NULL auto_increment,
   contenttype varchar(255) NOT NULL default '',
   `data` mediumtext NOT NULL,
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE email (
   id int(11) NOT NULL auto_increment,
@@ -55,7 +60,8 @@ CREATE TABLE email (
   editlock tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY personid (personid,sequence)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE fieldmap (
   id int(11) NOT NULL auto_increment,
@@ -64,12 +70,14 @@ CREATE TABLE fieldmap (
   options text NOT NULL,
   PRIMARY KEY  (id),
   KEY getfieldname (fieldnum)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 
 CREATE TABLE `import` (
   `id` int(11) NOT NULL auto_increment,
   `uploadkey` varchar(255) default NULL,
+  `scheduleid` int(11) default NULL,
   `userid` int(11) NOT NULL default '0',
   `listid` int(11) default NULL,
   `name` varchar(50) NOT NULL default '',
@@ -84,7 +92,8 @@ CREATE TABLE `import` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uploadkey` (`uploadkey`),
   KEY `scheduleid` (`scheduleid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 $$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE importfield (
   id int(11) NOT NULL auto_increment,
@@ -92,14 +101,16 @@ CREATE TABLE importfield (
   mapto varchar(4) NOT NULL default '',
   mapfrom tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE importjob (
   id int(11) NOT NULL auto_increment,
   importid int(11) NOT NULL,
   jobid int(11) NOT NULL,
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE job (
   id int(11) NOT NULL auto_increment,
@@ -135,7 +146,8 @@ CREATE TABLE job (
   KEY startdate_2 (startdate,enddate,starttime,endtime,id),
   KEY scheduleid (scheduleid),
   KEY ranautoreport (ranautoreport,`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE joblanguage (
   id int(11) NOT NULL auto_increment,
@@ -145,14 +157,16 @@ CREATE TABLE joblanguage (
   `language` varchar(255) NOT NULL default '',
   PRIMARY KEY  (id),
   KEY jobid (jobid,`language`(50))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE `jobsetting` (
   `jobid` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL,
   `value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`jobid`,`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1$$$
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+$$$
 
 CREATE TABLE jobtype (
   id int(11) NOT NULL auto_increment,
@@ -163,13 +177,15 @@ CREATE TABLE jobtype (
   deleted tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY customerid (priority)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE `language` (
   id int(11) NOT NULL auto_increment,
   `name` varchar(50) NOT NULL default '',
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE list (
   id int(11) NOT NULL auto_increment,
@@ -180,7 +196,8 @@ CREATE TABLE list (
   deleted tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY userid (userid,`name`,deleted)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE listentry (
   id int(11) NOT NULL auto_increment,
@@ -190,7 +207,8 @@ CREATE TABLE listentry (
   personid int(11) default NULL,
   PRIMARY KEY  (id),
   KEY `type` (personid,listid,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE message (
   id int(11) NOT NULL auto_increment,
@@ -203,7 +221,8 @@ CREATE TABLE message (
   deleted tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY userid (userid,`type`,deleted)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE messagepart (
   id int(11) NOT NULL auto_increment,
@@ -217,7 +236,8 @@ CREATE TABLE messagepart (
   sequence tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY messageid (messageid,sequence)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE permission (
   id int(11) NOT NULL auto_increment,
@@ -225,7 +245,8 @@ CREATE TABLE permission (
   `name` varchar(50) NOT NULL default '',
   `value` text NOT NULL,
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE person (
   id int(11) NOT NULL auto_increment,
@@ -281,7 +302,8 @@ CREATE TABLE person (
   KEY f18 (f18(20)),
   KEY f19 (f19(20)),
   KEY f20 (f20(20))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE persondatavalues (
   id int(11) NOT NULL auto_increment,
@@ -291,7 +313,8 @@ CREATE TABLE persondatavalues (
   PRIMARY KEY  (id),
   KEY valuelookup (`value`(50)),
   KEY `name` (fieldnum)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE phone (
   id int(11) NOT NULL auto_increment,
@@ -302,7 +325,8 @@ CREATE TABLE phone (
   PRIMARY KEY  (id),
   KEY personid (personid,sequence),
   KEY dedupe (phone,sequence)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE reportcontact (
   jobid int(11) NOT NULL,
@@ -326,7 +350,8 @@ CREATE TABLE reportcontact (
   state char(2) default NULL,
   zip varchar(10) default NULL,
   PRIMARY KEY  (jobid,`type`,personid,sequence)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE reportperson (
   jobid int(11) NOT NULL,
@@ -361,7 +386,8 @@ CREATE TABLE reportperson (
   f20 varchar(255) NOT NULL default '',
   PRIMARY KEY  (jobid,`type`,personid),
   KEY `status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE rule (
   id int(11) NOT NULL auto_increment,
@@ -370,7 +396,8 @@ CREATE TABLE rule (
   op enum('eq','ne','gt','ge','lt','le','lk','sw','ew','cn','in','reldate') NOT NULL default 'eq',
   val text NOT NULL,
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE schedule (
   id int(11) NOT NULL auto_increment,
@@ -380,7 +407,8 @@ CREATE TABLE schedule (
   `time` time NOT NULL default '00:00:00',
   nextrun datetime default NULL,
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE scheduleday (
   id int(11) NOT NULL auto_increment,
@@ -388,7 +416,8 @@ CREATE TABLE scheduleday (
   dow tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY scheduleid (scheduleid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE setting (
   id int(11) NOT NULL auto_increment,
@@ -406,7 +435,8 @@ CREATE TABLE specialtask (
   lastcheckin datetime default NULL,
   PRIMARY KEY  (id),
   KEY `status` (`status`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE surveyemailcode (
   `code` char(22) character set ascii collate ascii_bin NOT NULL,
@@ -417,7 +447,8 @@ CREATE TABLE surveyemailcode (
   resultdata text collate utf8_bin NOT NULL,
   PRIMARY KEY  (`code`),
   UNIQUE KEY jobworkitemid (jobworkitemid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
+$$$
 
 CREATE TABLE surveyquestion (
   id int(11) NOT NULL auto_increment,
@@ -428,7 +459,8 @@ CREATE TABLE surveyquestion (
   reportlabel varchar(30) default NULL,
   validresponse tinyint(4) NOT NULL,
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE surveyquestionnaire (
   id int(11) NOT NULL auto_increment,
@@ -448,7 +480,8 @@ CREATE TABLE surveyquestionnaire (
   leavemessage tinyint(4) NOT NULL default '0',
   deleted tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE surveyresponse (
   jobid int(11) NOT NULL,
@@ -456,14 +489,16 @@ CREATE TABLE surveyresponse (
   answer tinyint(4) NOT NULL,
   tally int(11) NOT NULL default '0',
   PRIMARY KEY  (jobid,questionnumber,answer)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE ttsvoice (
   id int(11) NOT NULL auto_increment,
   `language` varchar(20) NOT NULL default '',
   gender enum('male','female') NOT NULL default 'male',
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE `user` (
   id int(11) NOT NULL auto_increment,
@@ -482,18 +517,21 @@ CREATE TABLE `user` (
   ldap tinyint(10) NOT NULL default '0',
   PRIMARY KEY  (id),
   KEY login (login,`password`,enabled,deleted)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE userjobtypes (
   userid int(11) NOT NULL default '0',
   jobtypeid int(11) NOT NULL default '0',
   PRIMARY KEY  (userid,jobtypeid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE userrule (
   userid int(11) NOT NULL default '0',
   ruleid int(11) NOT NULL default '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE usersetting (
   id int(11) NOT NULL auto_increment,
@@ -502,7 +540,8 @@ CREATE TABLE usersetting (
   `value` varchar(255) NOT NULL,
   PRIMARY KEY  (id),
   KEY usersetting (userid,`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 CREATE TABLE voicereply (
   id int(11) NOT NULL auto_increment,
@@ -518,7 +557,8 @@ CREATE TABLE voicereply (
   KEY jobid (jobid),
   KEY userid (userid),
   KEY replytime (replytime)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1$$$
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+$$$
 
 CREATE TABLE `systemstats` (
 `datetime` BIGINT(20) NOT NULL ,
@@ -527,13 +567,15 @@ CREATE TABLE `systemstats` (
 `busy` INT NOT NULL ,
 `noanswer` INT NOT NULL ,
 PRIMARY KEY ( `datetime` )
-) ENGINE = innodb$$$
+) ENGINE = innodb
+$$$
 
 CREATE TABLE `jobstats` (
 `jobid` INT NOT NULL ,
 `count` INT NOT NULL ,
 PRIMARY KEY ( `jobid` )
-) ENGINE = innodb$$$
+) ENGINE = innodb
+$$$
 
 
 -- triggers from customer database to shard database
@@ -550,29 +592,16 @@ DECLARE hasqu TINYINT DEFAULT 0;
 DECLARE custid INTEGER;
 DECLARE shardjobid BIGINT;
 
-SELECT COUNT(*) INTO cc FROM aspshard.job WHERE localjobid=NEW.id;
+SELECT COUNT(*) INTO cc FROM aspshard.job WHERE id=NEW.id;
 SELECT value INTO tz FROM setting WHERE name='timezone';
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-
-IF NEW.phonemessageid IS NOT NULL THEN
-  SET hasph := 1;
-END IF;
-IF NEW.emailmessageid IS NOT NULL THEN
-  SET hasem := 1;
-END IF;
-IF NEW.printmessageid IS NOT NULL THEN
-  SET haspr := 1;
-END IF;
-IF NEW.questionnaireid IS NOT NULL THEN
-  SET hasqu := 1;
-END IF;
 
 IF cc = 0 THEN
 -- we expect the status to be 'processing' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
   IF NEW.status IN ('new','processing') THEN
-    INSERT INTO aspshard.job (customerid, localjobid, hasphone, hasemail, hasprint, hasquestionnaire, timezone, startdate, enddate, starttime, endtime, thesql)
-           VALUES(custid, NEW.id, hasph, hasem, haspr, hasqu, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.thesql);
+    INSERT INTO aspshard.job (id, customerid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, thesql)
+           VALUES(NEW.id, custid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.thesql);
     -- copy the jobsettings
     INSERT INTO aspshard.jobsetting (jobid, name, value) SELECT LAST_INSERT_ID(), name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
@@ -582,13 +611,14 @@ ELSE
      OLD.endtime <> NEW.endtime ||
      OLD.startdate <> NEW.startdate ||
      OLD.enddate <> NEW.enddate THEN
-     UPDATE aspshard.job SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND localjobid=NEW.id;
+     UPDATE aspshard.job SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND id=NEW.id;
   END IF;
   IF NEW.status IN ('cancelling') THEN
-    UPDATE aspshard.job SET status=NEW.status WHERE customerid=custid AND localjobid=NEW.id;
+    UPDATE aspshard.job SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
 END IF;
-END$$$
+END
+$$$
 
 
 CREATE TRIGGER insert_jobsetting
@@ -598,13 +628,13 @@ DECLARE custid INTEGER;
 DECLARE shardjobid BIGINT;
 
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND localjobid=NEW.jobid;
+SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND id=NEW.jobid;
 
 IF shardjobid <> 0 THEN
     INSERT INTO aspshard.jobsetting (jobid, name, value) VALUES (shardjobid, NEW.name, NEW.value);
 END IF;
-END$$$
-
+END
+$$$
 
 CREATE TRIGGER update_jobsetting
 AFTER UPDATE ON jobsetting FOR EACH ROW
@@ -613,12 +643,13 @@ DECLARE custid INTEGER;
 DECLARE shardjobid BIGINT;
 
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND localjobid=NEW.jobid;
+SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND id=NEW.jobid;
 
 IF shardjobid <> 0 THEN
     UPDATE aspshard.jobsetting SET value=NEW.value WHERE jobid=shardjobid AND name=NEW.name;
 END IF;
-END$$$
+END
+$$$
 
 CREATE TRIGGER delete_jobsetting
 AFTER DELETE ON jobsetting FOR EACH ROW
@@ -627,18 +658,20 @@ DECLARE custid INTEGER;
 DECLARE shardjobid BIGINT;
 
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND localjobid=OLD.jobid;
+SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND id=OLD.jobid;
 
 IF shardjobid <> 0 THEN
     DELETE FROM aspshard.jobsetting WHERE jobid=shardjobid AND name=OLD.name;
 END IF;
-END$$$
+END
+$$$
 
-
-drop procedure if exists start_import$$$
 create procedure start_import( in_importid int)
 begin
 declare l_custid int;
 select value+0 from setting where name='_customerid' into l_custid;
 insert ignore into aspshard.importqueue (customerid,localimportid) values (l_custid,in_importid);
-end$$$
+end
+$$$
+
+
