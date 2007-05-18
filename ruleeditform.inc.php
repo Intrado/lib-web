@@ -86,7 +86,7 @@ $extrahtml = "onchange=\"hide(ruleselected);
 PutFormData($f,$s,"newrulefieldnum", "-1");
 NewFormItem($f,$s,"newrulefieldnum","selectstart",NULL,NULL,$extrahtml);
 
-NewFormItem($f,$s,"newrulefieldnum","selectoption","-Select a Field-","-1");
+NewFormItem($f,$s,"newrulefieldnum","selectoption"," -- Select a Field -- ","-1");
 
 $typemap = array();
 

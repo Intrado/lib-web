@@ -395,7 +395,7 @@ function message_select($type, $form, $section, $name) {
 	global $messages, $submittedmode;
 
 	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' " . ($submittedmode ? "DISABLED" : ""));
-	NewFormItem($form,$section,$name, "selectoption", '- Select a Message -', "0");
+	NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
 	foreach ($messages[$type] as $message) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
 	}
@@ -409,7 +409,7 @@ function language_select($form, $section, $name, $skipusedtype) {
 	global $languages, $joblangs, $submittedmode;
 
 	NewFormItem($form, $section, $name, 'selectstart', NULL, NULL, ($submittedmode ? "DISABLED" : ""));
-	NewFormItem($form, $section, $name, 'selectoption',"- Select a Language -","");
+	NewFormItem($form, $section, $name, 'selectoption'," -- Select a Language -- ","");
 	foreach ($languages as $language) {
 		$used = false;
 		foreach ($joblangs[$skipusedtype] as $joblang) {

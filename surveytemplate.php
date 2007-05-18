@@ -315,7 +315,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 	global $MESSAGES;
 
 	NewFormItem($form,$section,$name, "selectstart",NULL,NULL,'id="' . $name . '" ' . $extrahtml);
-	NewFormItem($form,$section,$name, "selectoption", '- Select a Message -', "");
+	NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
 	foreach ($MESSAGES[$type] as $message) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
 	}

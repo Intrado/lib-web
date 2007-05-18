@@ -142,7 +142,7 @@ function audio($name) {
 	$files = DBFindMany('AudioFile', "from audiofile where userid = $USER->id and deleted != 1 order by name");
 	?>
 	<select id="audio" name="<? print $name; ?>" >
-		<option value="0">- Select an Audio File -</option>
+		<option value="0"> -- Select an Audio File -- </option>
 	<?
 	foreach($files as $audio)
 		print "<option value=\"$audio->id\">$audio->name</option>";

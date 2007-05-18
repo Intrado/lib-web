@@ -244,7 +244,7 @@ function language_select($form, $section, $name, $type) {
 		$languagenamearray[] = $language->name;
 
 	if($type == "add"){
-		NewFormItem($form, $section, $name, 'selectoption'," - Select a Language - ", "");
+		NewFormItem($form, $section, $name, 'selectoption'," -- Select a Language -- ", "");
 	}
 	foreach ($languagenamearray as $language) {
 		$used = ($type == "add") ? false : true;
@@ -374,7 +374,7 @@ startWindow("EasyCall");
 									<td>
 <? 
 										NewFormItem($f, $s, "hidden", 'selectstart', NULL, NULL, 'id="hiddendropdown"');
-										NewFormItem($f, $s, "hidden", 'selectoption'," - Select a Language - ");
+										NewFormItem($f, $s, "hidden", 'selectoption'," -- Select a Language -- ");
 										NewFormItem($f, $s, "hidden", 'selectend');
 ?>
 									</td>

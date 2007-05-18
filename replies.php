@@ -160,7 +160,7 @@ startWindow("Display Options" . help('Replies_DisplayOptions', NULL, 'blue'), "p
 	<td>
 <?
 	NewFormItem($f, $s, 'jobselect', 'selectstart', NULL, NULL, "onchange=\"location.href='?jobid=' + this.value\"");
-	NewFormItem($f, $s, 'jobselect', 'selectoption', ' - All - ', "all");
+	NewFormItem($f, $s, 'jobselect', 'selectoption', ' -- All -- ', "all");
 	$jobids = QuickQueryList("select vr.jobid from voicereply vr where vr.userid = '$USER->id' group by vr.jobid");
 	if(count($jobids) > 0) {
 		$jobids = "(" . implode(",",$jobids) . ")";
