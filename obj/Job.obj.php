@@ -45,6 +45,27 @@ class Job extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	function runNow($user, $jobid = null) {
+		if (!isset($jobid))
+			$jobid = $this->id;
+
+		$usersql = $user->userSQL("p");
+		//get and compose list rules
+		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
+				and le.ruleid=r.id and le.listid='" . $this->listid .  "' order by le.sequence", "r");
+		if (count($listrules) > 0)
+			$listsql = "1" . Rule::makeQuery($listrules, "p");
+		else
+			$listsql = "0";//dont assume anyone is in the list if there are no rules
+
+		if ($usersql == "")
+    		$this->thesql = $listsql;
+		else
+    		$this->thesql = $usersql ." and ". $listsql;
+
+		$this->status = "processing"; // set state, jobprocessor will set it to 'active'
+		$this->update();
+	}
 
 	//creates a new job object prepopulated with all of the user/system defaults
 	//date/time values are in DB format and should be beautified for forms

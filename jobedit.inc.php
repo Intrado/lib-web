@@ -645,22 +645,22 @@ startWindow('Job Information');
 				<? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
 							<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
-							<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : "")); ?></td>
+							<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
 					</tr>
 				<? } ?>
 
 				<tr>
 					<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
-					<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
+					<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 				</tr>
 				<tr>
 					<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
-					<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Call All Phone Numbers</td>
+					<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Call All Phone Numbers</td>
 				</tr>
 				<? if($USER->authorize('leavemessage')) { ?>
 					<tr>
 						<td> Allow call recipients to leave a message <?= help('Jobs_VoiceResponse', NULL, 'small') ?> </td>
-						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($completedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
+						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
 					</tr>
 				<? } ?>
 
@@ -689,7 +689,7 @@ startWindow('Job Information');
 <? } ?>
 				<tr>
 					<td>Skip duplicate email addresses</td>
-					<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
+					<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 				</tr>
 			</table>
 		</td>

@@ -12,25 +12,8 @@ if (!userOwns("job",$jobid))
 // job.thesql is used by the jobprocessor
 $job = new Job($jobid);
 
-$usersql = $USER->userSQL("p");
-//get and compose list rules
-$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
-		and le.ruleid=r.id and le.listid='" . $job->listid .  "' order by le.sequence", "r");
-if (count($listrules) > 0)
-	$listsql = "1" . Rule::makeQuery($listrules, "p");
-else
-	$listsql = "0";//dont assume anyone is in the list if there are no rules
-
-if ($usersql == "")
-    $job->thesql = $listsql;
-else
-    $job->thesql = $usersql ." and ". $listsql;
-
-$job->status = "processing"; // set state, jobprocessor will set it to 'active'
-$job->update();
-
+$job->runNow($USER);
 sleep(3);
-
 
 if (isset($_REQUEST['close']) && $_REQUEST['close']) {
 ?>
