@@ -66,26 +66,25 @@ CREATE TABLE fieldmap (
   KEY getfieldname (fieldnum)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
 
+
 CREATE TABLE `import` (
-  id int(11) NOT NULL auto_increment,
-  uploadkey varchar(255) default NULL,
-  userid int(11) NOT NULL default '0',
-  listid int(11) default NULL,
+  `id` int(11) NOT NULL auto_increment,
+  `uploadkey` varchar(255) default NULL,
+  `userid` int(11) NOT NULL default '0',
+  `listid` int(11) default NULL,
   `name` varchar(50) NOT NULL default '',
-  description varchar(50) NOT NULL default '',
-  `status` enum('idle','running','error') NOT NULL default 'idle',
+  `description` varchar(50) NOT NULL default '',
+  `status` enum('idle','queued','running','error') NOT NULL default 'idle',
   `type` enum('manual','automatic','list','addressbook') NOT NULL default 'manual',
-  path text,
-  scheduleid int(11) default NULL,
-  ownertype enum('system','user') NOT NULL default 'system',
-  updatemethod enum('updateonly','update','full') NOT NULL default 'full',
-  lastrun datetime default NULL,
-  data LONGBLOB default NULL,
-  datamodifiedtime datetime  DEFAULT NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY uploadkey (uploadkey),
-  KEY scheduleid (scheduleid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8$$$
+  `ownertype` enum('system','user') NOT NULL default 'system',
+  `updatemethod` enum('updateonly','update','full') NOT NULL default 'full',
+  `lastrun` datetime default NULL,
+  `data` longblob NOT NULL,
+  `datamodifiedtime` datetime default NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `uploadkey` (`uploadkey`),
+  KEY `scheduleid` (`scheduleid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 $$$
 
 CREATE TABLE importfield (
   id int(11) NOT NULL auto_increment,
@@ -635,3 +634,11 @@ IF shardjobid <> 0 THEN
 END IF;
 END$$$
 
+
+drop procedure if exists start_import$$$
+create procedure start_import( in_importid int)
+begin
+declare l_custid int;
+select value+0 from setting where name='_customerid' into l_custid;
+insert ignore into aspshard.importqueue (customerid,localimportid) values (l_custid,in_importid);
+end$$$
