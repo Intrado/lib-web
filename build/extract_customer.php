@@ -235,7 +235,7 @@ copytable($customerid,"email",array("id", "personid", "email", "sequence", "edit
 copytable($customerid,"fieldmap",array("id", "fieldnum", "name", "options"),$db,$custdb,1000,false);
 
 //IMPORT
-copytable($customerid,"import",array("id", "uploadkey", "userid", "listid", "name", "description", "status", "type", "path", "scheduleid", "ownertype", "updatemethod", "lastrun"),$db,$custdb,1000,false);
+copytable($customerid,"import",array("id", "uploadkey", "userid", "listid", "name", "description", "status", "type", "path", "scheduleid", "ownertype", "updatemethod", "lastrun", "data"),$db,$custdb,1000,false);
 
 //IMPORTFIELD
 $join = "inner join import i on (importid = i.id and i.customerid=$customerid)";
