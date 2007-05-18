@@ -336,7 +336,7 @@ CREATE TABLE reportcontact (
   numattempts tinyint(4) NOT NULL,
   userid int(11) NOT NULL,
   starttime bigint(20) NOT NULL default '0',
-  result enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted') NOT NULL,
+  result enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted') NOT NULL,
   participated tinyint(4) NOT NULL default '0',
   duration float default NULL,
   resultdata text,
@@ -600,8 +600,8 @@ IF cc = 0 THEN
 -- we expect the status to be 'processing' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
   IF NEW.status IN ('new','processing') THEN
-    INSERT INTO aspshard.job (id, customerid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, thesql)
-           VALUES(NEW.id, custid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.thesql);
+    INSERT INTO aspshard.job (id, customerid, userid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, thesql)
+           VALUES(NEW.id, custid, NEW.userid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.thesql);
     -- copy the jobsettings
     INSERT INTO aspshard.jobsetting (jobid, name, value) SELECT LAST_INSERT_ID(), name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
