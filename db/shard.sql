@@ -60,17 +60,14 @@ CREATE TABLE `jobtask` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
--- triggers
+-- --------------------------------------------------------
 
-DELIMITER $$
+CREATE TABLE `importqueue` (
+  `id` int(11) NOT NULL auto_increment,
+  `customerid` int(11) NOT NULL,
+  `localimportid` int(11) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `import` (`customerid`,`localimportid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-DROP TRIGGER delete_job$$
-
-CREATE TRIGGER delete_job
-AFTER DELETE ON job FOR EACH ROW
-BEGIN
-DELETE FROM jobsetting WHERE jobid=OLD.id;
-END$$
-
-DELIMITER ;
 
