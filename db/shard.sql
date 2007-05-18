@@ -3,25 +3,43 @@
 --
 -- Table structure for table `job`
 --
+-- KEEP SCHEMA FOR JOB TABLE IDENTICAL TO THE CUSTOMER DB
 
-CREATE TABLE `job` (
-  `id` bigint(20) NOT NULL auto_increment,
-  `customerid` int(11) NOT NULL,
-  `localjobid` int(11) NOT NULL,
-  `hasphone` tinyint(4) NOT NULL default '0',
-  `hasemail` tinyint(4) NOT NULL default '0',
-  `hasprint` tinyint(4) NOT NULL default '0',
-  `hasquestionnaire` tinyint(4) NOT NULL default '0',
-  `status` enum('new','processing','active','cancelling','repeating') NOT NULL default 'new',
-  `timezone` varchar(50) NOT NULL,
-  `startdate` date NOT NULL,
-  `enddate` date NOT NULL,
-  `starttime` time NOT NULL,
-  `endtime` time NOT NULL,
+CREATE TABLE job (
+  id int(11) NOT NULL auto_increment,
+  userid int(11) NOT NULL default '0',
+  scheduleid int(11) default NULL,
+  jobtypeid int(11) default '0',
+  `name` varchar(50) NOT NULL default '',
+  description varchar(50) NOT NULL default '',
+  listid int(11) NOT NULL default '0',
+  phonemessageid int(11) default NULL,
+  emailmessageid int(11) default NULL,
+  printmessageid int(11) default NULL,
+  questionnaireid int(11) default NULL,
+  `type` set('phone','email','print','survey') NOT NULL default 'phone',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  startdate date NOT NULL default '0000-00-00',
+  enddate date NOT NULL default '2006-07-04',
+  starttime time NOT NULL default '00:00:00',
+  endtime time NOT NULL default '00:00:00',
+  finishdate datetime default NULL,
+  `status` enum('new','processing','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
+  deleted tinyint(4) NOT NULL default '0',
+  ranautoreport tinyint(4) NOT NULL default '0',
+  priorityadjust int(11) NOT NULL default '0',
+  cancelleduserid int(11) default NULL,
   `thesql` text,
-  `priorityadjust` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  PRIMARY KEY  (id),
+  KEY `status` (`status`,id),
+  KEY startdate (startdate),
+  KEY enddate (enddate),
+  KEY starttime (starttime),
+  KEY endtime (endtime),
+  KEY startdate_2 (startdate,enddate,starttime,endtime,id),
+  KEY scheduleid (scheduleid),
+  KEY ranautoreport (ranautoreport,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
