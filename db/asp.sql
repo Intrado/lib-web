@@ -1258,6 +1258,51 @@ ALTER TABLE `voicereply` ADD INDEX ( `replytime` ) ;
 drop table reportcompleted;
 
 
+ALTER TABLE `person`
+ADD `f01` VARCHAR( 50 ) NOT NULL ,
+ADD `f02` VARCHAR( 50 ) NOT NULL ,
+ADD `f03` VARCHAR( 50 ) NOT NULL ,
+ADD `f04` VARCHAR( 255 ) NOT NULL ,
+ADD `f05` VARCHAR( 255 ) NOT NULL ,
+ADD `f06` VARCHAR( 255 ) NOT NULL ,
+ADD `f07` VARCHAR( 255 ) NOT NULL ,
+ADD `f08` VARCHAR( 255 ) NOT NULL ,
+ADD `f09` VARCHAR( 255 ) NOT NULL ,
+ADD `f10` VARCHAR( 255 ) NOT NULL ,
+ADD `f11` VARCHAR( 255 ) NOT NULL ,
+ADD `f12` VARCHAR( 255 ) NOT NULL ,
+ADD `f13` VARCHAR( 255 ) NOT NULL ,
+ADD `f14` VARCHAR( 255 ) NOT NULL ,
+ADD `f15` VARCHAR( 255 ) NOT NULL ,
+ADD `f16` VARCHAR( 255 ) NOT NULL ,
+ADD `f17` VARCHAR( 255 ) NOT NULL ,
+ADD `f18` VARCHAR( 255 ) NOT NULL ,
+ADD `f19` VARCHAR( 255 ) NOT NULL ,
+ADD `f20` VARCHAR( 255 ) NOT NULL ;
+
+
+update person p inner join persondata pd on (pd.personid=p.id) set
+p.f01 = pd.f01,
+p.f02 = pd.f02,
+p.f03 = pd.f03,
+p.f04 = pd.f04,
+p.f05 = pd.f05,
+p.f06 = pd.f06,
+p.f07 = pd.f07,
+p.f08 = pd.f08,
+p.f09 = pd.f09,
+p.f10 = pd.f10,
+p.f11 = pd.f11,
+p.f12 = pd.f12,
+p.f13 = pd.f13,
+p.f14 = pd.f14,
+p.f15 = pd.f15,
+p.f16 = pd.f16,
+p.f17 = pd.f17,
+p.f18 = pd.f18,
+p.f19 = pd.f19,
+p.f20 = pd.f20;
+
 CREATE TABLE `reportperson` (
   `jobid` int(11) NOT NULL,
   `personid` int(11) NOT NULL,
@@ -1373,7 +1418,7 @@ inner join job j
 inner join user u
 	on (u.id = j.userid)
 left join message m on
-	(m.id = wi.messageid)
+	(m.id = wi.messageid);
 
 
 
@@ -1385,7 +1430,7 @@ delete jt2 from
 jobtask jt1 left join jobtask jt2 on (jt2.id > jt1.id and jt2.jobworkitemid = jt1.jobworkitemid and jt2.sequence = jt1.sequence)
 where jt2.id is not null;
 
-
+-- insert phones
 insert into reportcontact
 
 select
@@ -1401,16 +1446,16 @@ u.customerid as customerid,
 ifnull(cl.starttime,jt.lastattempt) as starttime,
 
 case wi.type
-	when 'phone' then cl.callprogress
-	when 'email' then if (wi.status='success','sent','unsent')
-	when 'print' then if (wi.status='success','printed','notprinted')
-	end as result,
+ when 'phone' then cl.callprogress
+ when 'email' then if (wi.status='success','sent','unsent')
+ when 'print' then if (wi.status='success','printed','notprinted')
+ end as result,
 ifnull(cl.participated,0) as participated,
 cl.duration as duration,
-cl.resultdata as resultdata,
+coalesce(cl.resultdata, sec.resultdata) as resultdata,
 
 (select group_concat(cl2.starttime,':',cl2.callprogress order by cl2.callattempt)
-	from calllog cl2 where cl2.jobtaskid = jt.id) as attemptdata,
+ from calllog cl2 where cl2.jobtaskid = jt.id) as attemptdata,
 
 jt.phone as phone,
 jt.email as email,
@@ -1431,57 +1476,114 @@ inner join calllog cl on
 (cl.jobtaskid=jt.id and cl.callattempt = jt.numattempts-1)
 left join address a on
 (a.id=jt.addressid and wi.type='print')
+left join surveyemailcode sec on
+(sec.jobworkitemid = wi.id and j.type='survey' and wi.type='email')
+where wi.type = 'phone';
+
+-- insert emails
+insert into reportcontact
+
+select
+
+j.id as jobid,
+wi.personid as personid,
+wi.type as type,
+jt.sequence as sequence,
+jt.numattempts as numattempts,
+j.userid as userid,
+u.customerid as customerid,
+
+ifnull(cl.starttime,jt.lastattempt) as starttime,
+
+case wi.type
+ when 'phone' then cl.callprogress
+ when 'email' then if (wi.status='success','sent','unsent')
+ when 'print' then if (wi.status='success','printed','notprinted')
+ end as result,
+ifnull(cl.participated,0) as participated,
+cl.duration as duration,
+coalesce(cl.resultdata, sec.resultdata) as resultdata,
+
+(select group_concat(cl2.starttime,':',cl2.callprogress order by cl2.callattempt)
+ from calllog cl2 where cl2.jobtaskid = jt.id) as attemptdata,
+
+jt.phone as phone,
+jt.email as email,
+a.addressee as addressee,
+a.addr1 as addr1,
+a.addr2 as addr2,
+a.city as city,
+a.state as state,
+a.zip as zip
 
 
+from jobworkitem wi
+inner join job j on (wi.jobid = j.id)
+inner join user u on (u.id = j.userid)
+inner join jobtask jt on
+(jt.jobworkitemid=wi.id)
+left join calllog cl on
+(cl.jobtaskid=jt.id and cl.callattempt = jt.numattempts-1)
+left join address a on
+(a.id=jt.addressid and wi.type='print')
+left join surveyemailcode sec on
+(sec.jobworkitemid = wi.id and j.type='survey' and wi.type='email')
+where wi.type = 'email';
 
-ALTER TABLE `person`
-ADD `f01` VARCHAR( 50 ) NOT NULL ,
-ADD `f02` VARCHAR( 50 ) NOT NULL ,
-ADD `f03` VARCHAR( 50 ) NOT NULL ,
-ADD `f04` VARCHAR( 255 ) NOT NULL ,
-ADD `f05` VARCHAR( 255 ) NOT NULL ,
-ADD `f06` VARCHAR( 255 ) NOT NULL ,
-ADD `f07` VARCHAR( 255 ) NOT NULL ,
-ADD `f08` VARCHAR( 255 ) NOT NULL ,
-ADD `f09` VARCHAR( 255 ) NOT NULL ,
-ADD `f10` VARCHAR( 255 ) NOT NULL ,
-ADD `f11` VARCHAR( 255 ) NOT NULL ,
-ADD `f12` VARCHAR( 255 ) NOT NULL ,
-ADD `f13` VARCHAR( 255 ) NOT NULL ,
-ADD `f14` VARCHAR( 255 ) NOT NULL ,
-ADD `f15` VARCHAR( 255 ) NOT NULL ,
-ADD `f16` VARCHAR( 255 ) NOT NULL ,
-ADD `f17` VARCHAR( 255 ) NOT NULL ,
-ADD `f18` VARCHAR( 255 ) NOT NULL ,
-ADD `f19` VARCHAR( 255 ) NOT NULL ,
-ADD `f20` VARCHAR( 255 ) NOT NULL ;
+-- insert prints
+insert into reportcontact
+
+select
+
+j.id as jobid,
+wi.personid as personid,
+wi.type as type,
+jt.sequence as sequence,
+jt.numattempts as numattempts,
+j.userid as userid,
+u.customerid as customerid,
+
+ifnull(cl.starttime,jt.lastattempt) as starttime,
+
+case wi.type
+ when 'phone' then cl.callprogress
+ when 'email' then if (wi.status='success','sent','unsent')
+ when 'print' then if (wi.status='success','printed','notprinted')
+ end as result,
+ifnull(cl.participated,0) as participated,
+cl.duration as duration,
+coalesce(cl.resultdata, sec.resultdata) as resultdata,
+
+(select group_concat(cl2.starttime,':',cl2.callprogress order by cl2.callattempt)
+ from calllog cl2 where cl2.jobtaskid = jt.id) as attemptdata,
+
+jt.phone as phone,
+jt.email as email,
+a.addressee as addressee,
+a.addr1 as addr1,
+a.addr2 as addr2,
+a.city as city,
+a.state as state,
+a.zip as zip
 
 
-update person p inner join persondata pd on (pd.personid=p.id) set
-p.f01 = pd.f01,
-p.f02 = pd.f02,
-p.f03 = pd.f03,
-p.f04 = pd.f04,
-p.f05 = pd.f05,
-p.f06 = pd.f06,
-p.f07 = pd.f07,
-p.f08 = pd.f08,
-p.f09 = pd.f09,
-p.f10 = pd.f10,
-p.f11 = pd.f11,
-p.f12 = pd.f12,
-p.f13 = pd.f13,
-p.f14 = pd.f14,
-p.f15 = pd.f15,
-p.f16 = pd.f16,
-p.f17 = pd.f17,
-p.f18 = pd.f18,
-p.f19 = pd.f19,
-p.f20 = pd.f20;
+from jobworkitem wi
+inner join job j on (wi.jobid = j.id)
+inner join user u on (u.id = j.userid)
+inner join jobtask jt on
+(jt.jobworkitemid=wi.id)
+left join calllog cl on
+(cl.jobtaskid=jt.id and cl.callattempt = jt.numattempts-1)
+left join address a on
+(a.id=jt.addressid and wi.type='print')
+left join surveyemailcode sec on
+(sec.jobworkitemid = wi.id and j.type='survey' and wi.type='email')
+where wi.type = 'print';
+
 
 drop table persondata;
 
-
+ALTER TABLE `import` ADD `data` LONGBLOB default NULL ;
 
 
 
