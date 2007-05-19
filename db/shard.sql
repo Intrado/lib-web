@@ -4,9 +4,13 @@
 -- Table structure for table `job`
 --
 -- KEEP SCHEMA FOR JOB TABLE IDENTICAL TO THE CUSTOMER DB
+-- EXCEPT you need to add the customerid field and include it onto the primary key!!!
+-- AND you need to add the timezone field
 
 CREATE TABLE job (
   id int(11) NOT NULL auto_increment,
+  `customerid` int(11) NOT NULL,
+  `timezone` varchar(50) NOT NULL,
   userid int(11) NOT NULL default '0',
   scheduleid int(11) default NULL,
   jobtypeid int(11) default '0',
@@ -30,7 +34,7 @@ CREATE TABLE job (
   priorityadjust int(11) NOT NULL default '0',
   cancelleduserid int(11) default NULL,
   `thesql` text,
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id,customerid),
   KEY `status` (`status`,id),
   KEY startdate (startdate),
   KEY enddate (enddate),
