@@ -1,71 +1,120 @@
 <?
 include_once("common.inc.php");
 include_once("../obj/Customer.obj.php");
+include_once("../inc/Table.inc.php");
 
-$customerquery = Query("select id, dbhost, dbusername, dbpassword, hostname from customer order by id");
-$customers = array();
-while($row = mysql_fetch_row($customerquery)){
-	$customers[] = $row;
+////////////////////////////////////////////////////////////////////////////////
+// formatters
+////////////////////////////////////////////////////////////////////////////////
+
+function fmt_custurl($row, $index){
+	
+	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[1] . "</a>";
+	return $url;
 }
 
+function fmt_status($row, $index){
+	if($row[$index])
+		return "Repeating Jobs Disabled";
+	else
+		return "OK";
+}
+
+function fmt_users($row, $index){
+	if($row[$index] > $row[7]){
+		return "<div style='background-color: #ff0000;'>" . $row[$index] . "</div>";
+	} else if($row[$index] == 0){
+		return "<div style='background-color: #ffcccc;'>" . $row[$index] . "</div>";
+	} else {
+		return $row[$index];
+	}
+}
+
+function fmt_actions($row, $index){
+	$actions = '<a href="customeredit.php?id=' . $row[0] .'">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=' . $row[0] . '">Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=' . $row[0] . '">Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=' . $row[0] . '">Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=' . $row[0] . '">Priorities</a>';
+	return $actions;
+}
+
+function fmt_jobcount($row, $index){
+	if($row[$index] > 0){
+		return "<div style='background-color: #ccffcc;'>" . $row[$index] . "<div>";
+	} else {
+		return $row[$index];
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// data handling
+////////////////////////////////////////////////////////////////////////////////
+
+$res = Query("select shardhost, sharduser, shardpass from shardinfo order by shardhost");
+$shardinfo = array();
+while($row = DBGetRow($res)){
+	$shardinfo[$row[0]] = array($row[1], $row[2]);
+}
+
+
+$customerquery = Query("select id, dbhost, hostname from customer order by dbhost, id");
+$customers = array();
+while($row = DBGetRow($customerquery)){
+	$customers[] = $row;
+}
+$currhost = "";
+$custdb;
+$data = array();
+foreach($customers as $cust) {
+
+	if($currhost != $cust[1]){
+		$custdb = mysql_connect($cust[1],$shardinfo[$cust[1]][0], $shardinfo[$cust[1]][1])
+			or die("Could not connect to customer database: " . mysql_error());
+		$currhost = $cust[1];
+	}
+	mysql_select_db("c_" . $cust[0]);
+	if($custdb){
+		$row = array();
+		$row[] = $cust[0];
+		$row[] = $cust[2];
+		$row[] = QuickQuery("select value from setting where name = 'displayname'", $custdb);
+		$row[] = QuickQuery("select value from setting where name = 'inboundnumber'", $custdb);
+		$row[] = QuickQuery("select value from setting where name = 'timezone'", $custdb);
+		$row[] = QuickQuery("select value from setting where name = '_managernote'", $custdb);
+		$row[] = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
+		
+		$maxusers = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
+		$row[] = $maxusers ? $maxusers : 1;
+		
+		$row[] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
+		$row[] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
+								WHERE job.status = 'active'", $custdb);
+		
+		
+		$data[] = $row;
+	}
+}
+
+$titles = array("0" => "Customer ID", 
+				"2" => "Customer Name",
+				"url" => "Customer URL (link)",
+				"3" => "Toll Free Number",
+				"4" => "Timezone",
+				"6" => "Status",
+				"8" => "Active Users",
+				"9" => "Active Jobs",
+				"Actions" => "Actions",
+				"5" => "NOTES: ");
+				
+$formatters = array("url" => "fmt_custurl",
+					"6" => "fmt_status",
+					"8" => "fmt_users",
+					"9" => "fmt_jobcount",
+					"Actions" => "fmt_actions");
 
 include_once("nav.inc.php");
 ?>
 
 <table border=1>
-<tr>
-<td>Customer ID</td>
-<td>Customer Name</td>
-<td>Customer URL (link)</td>
-<td>Toll Free Number</td>
-<td>Timezone</td>
-<td>Status</td>
-<td>Active Users</td>
-<td>Active Jobs</td>
-<td>Actions</td>
-<td>NOTES:&nbsp;</td>
-</tr>
-
 <?
-//Finds the necessary fields for each customer account
-foreach($customers as $cust) {
-
-	if($custdb = DBConnect($cust[1], $cust[2], $cust[3], "c_" . $cust[0])){
-
-		$custname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
-		$hostname = $cust[4];
-		$inboundnumber = QuickQuery("select value from setting where name = 'inboundnumber'", $custdb);
-		$timezone = QuickQuery("select value from setting where name = 'timezone'", $custdb);
-		$maxusers = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
-		$notes = QuickQuery("select value from setting where name = '_managernote'", $custdb);
-		$status = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
-
-		$maxusers = $maxusers ? $maxusers : 1;
-		$usercount = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
-		$jobcount = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
-								WHERE job.status = 'active'", $custdb);
-		$userstyle = "";
-		if($usercount > $maxusers){
-			$userstyle = 'style="background-color: #ff0000;"';
-		} else if($usercount == 0){
-			$userstyle = 'style="background-color: #ffcccc;"';
-		}
-	?>
-		<td><?= $cust[0] ?></td>
-		<td><?= $custname ?></td>
-		<td><a href="customerlink.php?id=<?=$cust[0] ?>"><?=$hostname?></a></td>
-		<td><?= $inboundnumber ? $inboundnumber : "&nbsp;" ?></td>
-		<td><?= $timezone ?></td>
-		<td><?= $status ? "Repeating Jobs Disabled" : "OK" ?></td>
-		<td <?=$userstyle?>><?= $usercount ?></td>
-		<td <?= $jobcount > 0 ? 'style="background-color: #ccffcc;"' : "" ?>><?= $jobcount ?></td>
-		<td><a href="customeredit.php?id=<?=$cust[0] ?>">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=<?= $cust[0] ?>">Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=<?=$cust[0]?>">Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=<?=$cust[0]?>">Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=<?=$cust[0]?>">Priorities</a></td>
-		<td><?=$notes ? $notes : "&nbsp" ?></td>
-		</tr>
-
-	<?
-	}
-}
+showTable($data, $titles, $formatters);
 ?>
 </table>
 
@@ -74,4 +123,6 @@ foreach($customers as $cust) {
 <div>Green cells indicate customers with active jobs</div>
 <?
 include_once("navbottom.inc.php");
+
+
 ?>
