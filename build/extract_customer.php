@@ -150,12 +150,17 @@ function customerinfo($custid, $source, $dest){
 				or die ("Failed to query customer: " . mysql_error($source));
 
 	$row = mysql_fetch_row($sourceres);
+	$query = "select count(*) from user where customerid = '$custid' and enabled='1' and login != 'schoolmessenger'";
+	$sourceres2 = mysql_query($query, $source)
+				or die ("Failed to query customer: " . mysql_error($source));
+	$row2 = mysql_fetch_row($sourceres2);
 
 	$destres = mysql_query("insert into setting (name, value) values
 								('inboundnumber', '$row[0]'),
 								('timezone', '$row[1]'),
 								('_customerid', '$custid'),
-								('displayname', '$row[2]')", $dest)
+								('displayname', '$row[2]'),
+								('_maxusers' , '$row2[0]')", $dest)
 							or die ("Failed to insert into setting: " . mysql_error($dest));
 }
 
@@ -235,7 +240,7 @@ copytable($customerid,"email",array("id", "personid", "email", "sequence", "edit
 copytable($customerid,"fieldmap",array("id", "fieldnum", "name", "options"),$db,$custdb,1000,false);
 
 //IMPORT
-copytable($customerid,"import",array("id", "uploadkey", "userid", "listid", "name", "description", "status", "type", "path", "scheduleid", "ownertype", "updatemethod", "lastrun", "data"),$db,$custdb,1000,false);
+copytable($customerid,"import",array("id", "uploadkey", "userid", "listid", "name", "description", "status", "type", "scheduleid", "ownertype", "updatemethod", "lastrun", "data"),$db,$custdb,1000,false);
 
 //IMPORTFIELD
 $join = "inner join import i on (importid = i.id and i.customerid=$customerid)";
