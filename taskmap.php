@@ -165,10 +165,13 @@ $colcount = 0;
 if ($fp && filesize($importfile) > 0 ) {
 	$count = 10;
 	$importdata = array();
-	while (($row = fgetcsv($fp,4096)) !== FALSE && $count--) {
+	while (($row = fgetcsv($fp,4096)) !== FALSE && $count) {
+		if (count($row) == 1 && trim($row[0]) === "")
+			continue;
 		for ($x = 0; $x < count($row); $x++)
 			$importdata[$x][] = $row[$x] ;
 		$colcount = max($colcount,count($row));
+		$count--;
 	}
 	$_SESSION['importcols'] = $colcount;
 	fclose($fp);
