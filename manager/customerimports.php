@@ -2,8 +2,16 @@
 include_once("common.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
+include_once("../inc/table.inc.php");
 
-function fmt_alert_timestamp($timestamp) {
+
+////////////////////////////////////////////////////////////////////////////////
+// formatters
+////////////////////////////////////////////////////////////////////////////////
+
+function fmt_alert_timestamp($row, $index) {
+	date_default_timezone_set($row[2]);
+	$timestamp = strtotime($row[$index]);
 	if ($timestamp === false) {
 		return "<div style='background-color: #ffcccc'>- Never -</div>";
 	} else {
@@ -13,6 +21,33 @@ function fmt_alert_timestamp($timestamp) {
 			return date("M j, g:i a", $timestamp);
 	}
 }
+
+function fmt_custurl($row, $index){
+	$url = "<a href=\"customerlink.php?id=". $row[0] . "\" target=\"_blank\">" . $row[1] . "</a>";
+	return $url;
+}
+
+function fmt_import_status($row, $index){
+
+	if($row[$index] == 'error')
+		return "<div style=\"background-color: red;\">" . $row[$index] . "</div>";
+	else
+		return $row[$index];
+}
+
+function fmt_filesize($row, $index){
+
+	 if($row[$index] < 10)
+	 	return "<div style=\"background-color: #ffcccc;\">" . number_format($row[$index]) . "</div>";
+	 else
+	 	return number_format($row[$index]);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
 
 if(isset($_GET['customer'])){
 	$customerID = $_GET['customer']+0;
@@ -77,68 +112,61 @@ NewForm($f);
 <?
 EndForm();
 
-
-$custquery = Query("select id, dbhost, dbusername, dbpassword, hostname from customer where 1 $queryextra");
+$res = Query("select shardhost, sharduser, shardpass from shardinfo order by shardhost");
+$shardinfo = array();
+while($row = DBGetRow($res)){
+	$shardinfo[$row[0]] = array($row[1], $row[2]);
+}
+$custquery = Query("select id, dbhost, dbusername, dbpassword, hostname from customer where 1 $queryextra order by dbhost, id");
 $customers = array();
-while($row= mysql_fetch_row($custquery)){
+while($row= DBGetRow($custquery)){
 	$customers[] = $row;
 }
 
-?>
+$currhost="";
+$data = array();
+foreach($customers as $cust) {
 
-<table border = 1>
-	<tr>
-		<td>Customer ID</td>
-		<td>Customer Name</td>
-		<td>Customer URL</td>
-		<td>Import ID </td>
-		<td>Import Name</td>
-		<td>Status</td>
-		<td>Type </td>
-		<td>Upd. Method</td>
-		<td>TimeZone</td>
-		<td>Last Run</td>
-		<td>File Date</td>
-		<td>File Size in Bytes</td>
-	</tr>
-<?
-foreach($customers as $cust){
-
-	$custdb = DBConnect($cust[1], $cust[2], $cust[3], "c_$cust[0]");
-	if(!$custdb) {
-		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
+	if($currhost != $cust[1]){
+		$custdb = mysql_connect($cust[1],$shardinfo[$cust[1]][0], $shardinfo[$cust[1]][1])
+			or die("Could not connect to customer database: " . mysql_error());
+		$currhost = $cust[1];
 	}
-
-	$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data)
-				FROM import
-				where 1
-				$querytypes
-				order by id";
-	$list = Query($query, $custdb);
-	$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
-	$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
-	while($row = DBGetRow($list)){
-		date_default_timezone_set($timezone);
-
-	?>
-		<tr>
-			<td><?=$cust[0]?></td>
-			<td><?=$displayname?></td>
-			<td><a href="customerlink.php?id=<?=$cust[0]?>" target="_blank"><?=$cust[4]?></a></td>
-			<td><?=$row[0]?></td>
-			<td><?=$row[1]?></td>
-			<td <?= $row[2] == "error" ? 'style="background-color: red;"' : "" ?>><?=$row[2]?></td>
-			<td><?=$row[3]?></td>
-			<td><?=$row[4]?></td>
-			<td><?=$timezone?></td>
-			<td><?=fmt_alert_timestamp(strtotime($row[5]))?></td>
-			<td><?=$row[6]?></td>
-			<td <?= $row[7] < 10 ? 'style="background-color: #ffcccc;"' : "" ?>><?= number_format($row[7])?></td>
-		</tr>
-	<?
+	mysql_select_db("c_" . $cust[0]);
+	if($custdb){
+		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data)
+					FROM import
+					where 1
+					$querytypes
+					order by id";
+		$list = Query($query, $custdb);
+		$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
+		$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
+		while($row = DBGetRow($list)){
+			$data[] = array_merge(array($cust[0], $displayname, $timezone), $row);
+		}
 	}
 }
-date_default_timezone_set("US/Pacific");
+$titles = array("0" => "Customer ID",
+		"1" => "Customer Name",
+		"url" => "Customer URL",
+		"3" => "Import ID ",
+		"4" => "Import Name",
+		"5" =>  "Status",
+		"6" => "Type ",
+		"7" => "Upd. Method",
+		"2" => "TimeZone",
+		"8" => "Last Run",
+		"9" => "Last Modified",
+		"10" => "File Size in Bytes");
+$formatters = array("url" => "fmt_custurl",
+					"10" => "fmt_filesize",
+					"8" => "fmt_alert_timestamp",
+					"5" => "fmt_import_status");		
+?>
+<table border=1>
+<?
+showTable($data, $titles, $formatters);
 ?>
 </table>
 <div> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.<div>
@@ -146,5 +174,6 @@ date_default_timezone_set("US/Pacific");
 <div>Red cells indicate import or file dates that are more than 3 days old</div>
 
 <?
+date_default_timezone_set("US/Pacific");
 include("navbottom.inc.php");
 ?>
