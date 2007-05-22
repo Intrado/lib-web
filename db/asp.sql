@@ -1583,7 +1583,7 @@ where wi.type = 'print';
 
 drop table persondata;
 
-ALTER TABLE `import` ADD `data` LONGBLOB default NULL ;
+ALTER TABLE `import` ADD `data` LONGBLOB NOT NULL ;
 
 
 
