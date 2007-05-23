@@ -144,6 +144,51 @@ function restructureJobOptions($custid, $source, $dest, $batch, $joincustomer = 
   	} while ($row);
 }
 
+function restructureScheduleDay($custid, $source, $dest) {
+
+	/*
+	$join = "inner join schedule s on (s.id = scheduleid)
+		inner join user u on (userid=u.id and u.customerid=$customerid)";
+
+	copytable($customerid,"scheduleday",array("id", "scheduleid", "dow"),$db,$custdb,1000,$join);
+	*/
+
+	$join = " inner join schedule s on (s.id = scheduleid)
+		inner join user u on (userid=u.id and u.customerid=$custid)";
+
+// TODO orderby scheduleid
+	$query = "select scheduleday.scheduleid, scheduleday.dow from scheduleday " . $join;
+
+	$sourceres = mysql_query($query, $source)
+		or die ("Failed to query job :" . mysql_error($source));
+
+    $scheduleid = 0;
+    $dow = array();
+    $i = 0;
+
+	while ($row = mysql_fetch_row($sourceres)) {
+ 	  if ($scheduleid != 0 && $scheduleid != $row[0]) {
+	  	// we have all the dow fields, now update the schedule record
+	  	$ins = "update schedule set dow='" . implode(",", $dow) . "' where id=".$scheduleid;
+	  	mysql_query($ins,$dest)
+	  	  or die ("Failed to update schedule dow : " . mysql_error($dest));
+	  	// reset dow list
+	  	$dow = array();
+	  	$i = 0;
+ 	  }
+	  $scheduleid = $row[0];
+	  $dow[$i] = $row[1];
+      $i++;
+  	}
+  	if ($scheduleid != 0) {
+	  	// we have all the dow fields, now update the schedule record
+	  	$ins = "update schedule set dow='" . implode(",", $dow) . "' where id=".$scheduleid;
+	  	mysql_query($ins,$dest)
+	  	  or die ("Failed to update schedule dow : " . mysql_error($dest));
+ 	}
+
+}
+
 function customerinfo($custid, $source, $dest){
 	$query = "select inboundnumber, timezone, name from customer where id = '$custid'";
 	$sourceres = mysql_query($query, $source)
@@ -205,6 +250,13 @@ foreach ($tablequeries as $tablequery) {
 		mysql_query($tablequery,$custdb)
 			or die ("Failed to create tables \n$tablequery\n\nfor $newdbname : " . mysql_error($custdb));
 }
+
+
+//SETTING
+copytable($customerid,"setting",array("id", "name", "value"),$db,$custdb,1000,false);
+
+//Customer fields
+customerinfo($customerid, $db, $custdb);
 
 //ACCESS
 copytable($customerid,"access",array("id","name","description"),$db,$custdb,1000,false);
@@ -328,13 +380,8 @@ copytable($customerid,"rule",array("id", "logical", "fieldnum", "op", "val"),$db
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"schedule",array("id", "userid", "triggertype", "type", "time", "nextrun"),$db,$custdb,1000,$join);
 
-//SCHEDULEDAY
-$join = "inner join schedule s on (s.id = scheduleid)
-inner join user u on (userid=u.id and u.customerid=$customerid)";
-copytable($customerid,"scheduleday",array("id", "scheduleid", "dow"),$db,$custdb,1000,$join);
-
-//SETTING
-copytable($customerid,"setting",array("id", "name", "value"),$db,$custdb,1000,false);
+//SCHEDULEDAY table removed, dow field added to schedule table
+restructureScheduleDay($customerid, $db, $custdb);
 
 //SPECIALTASK
 //dont copy
@@ -381,10 +428,6 @@ copytable($customerid,"usersetting",array("id", "userid", "name", "value"),$db,$
 //VOICEREPLY
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"voicereply",array("id", "jobtaskid", "jobworkitemid", "personid", "jobid", "userid", "contentid", "replytime", "listened"),$db,$custdb,1000,$join);
-
-//Customer fields
-customerinfo($customerid, $db, $custdb);
-
 
 
 ?>

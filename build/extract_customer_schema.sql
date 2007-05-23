@@ -161,7 +161,7 @@ CREATE TABLE joblanguage (
 $$$
 
 CREATE TABLE `jobsetting` (
-  `jobid` bigint(20) NOT NULL,
+  `jobid` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`jobid`,`name`)
@@ -404,18 +404,10 @@ CREATE TABLE schedule (
   userid int(11) default NULL,
   triggertype enum('import','job') NOT NULL default 'import',
   `type` enum('R','O') NOT NULL default 'R',
+  `dow` varchar(20) NOT NULL default '',
   `time` time NOT NULL default '00:00:00',
   nextrun datetime default NULL,
   PRIMARY KEY  (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-$$$
-
-CREATE TABLE scheduleday (
-  id int(11) NOT NULL auto_increment,
-  scheduleid int(11) NOT NULL default '0',
-  dow tinyint(4) NOT NULL default '0',
-  PRIMARY KEY  (id),
-  KEY scheduleid (scheduleid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
@@ -580,41 +572,62 @@ $$$
 
 -- triggers from customer database to shard database
 
+CREATE TRIGGER insert_repeating_job
+AFTER INSERT ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER;
+
+IF NEW.status IN ('repeating') THEN
+  SELECT value INTO tz FROM setting WHERE name='timezone';
+  SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, thesql)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.thesql);
+
+  -- copy the jobsettings
+  INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
+
+  -- copy schedule
+  INSERT INTO aspshard.qschedule (id, customerid, dow, time, nextrun) SELECT id, custid, dow, time, nextrun FROM schedule WHERE id=NEW.scheduleid;
+
+END IF;
+END
+$$$
+
+
 CREATE TRIGGER update_job
 AFTER UPDATE ON job FOR EACH ROW
 BEGIN
 DECLARE cc INTEGER;
 DECLARE tz VARCHAR(50);
-DECLARE hasph TINYINT DEFAULT 0;
-DECLARE hasem TINYINT DEFAULT 0;
-DECLARE haspr TINYINT DEFAULT 0;
-DECLARE hasqu TINYINT DEFAULT 0;
 DECLARE custid INTEGER;
-DECLARE shardjobid BIGINT;
 
-SELECT COUNT(*) INTO cc FROM aspshard.job WHERE id=NEW.id;
-SELECT value INTO tz FROM setting WHERE name='timezone';
 SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT value INTO tz FROM setting WHERE name='timezone';
 
+SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
 IF cc = 0 THEN
 -- we expect the status to be 'processing' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
-  IF NEW.status IN ('new','processing') THEN
-    INSERT INTO aspshard.job (id, customerid, userid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, thesql)
-           VALUES(NEW.id, custid, NEW.userid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.thesql);
+  IF NEW.status IN ('processing') THEN
+    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, thesql)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'new', NEW.thesql);
     -- copy the jobsettings
-    INSERT INTO aspshard.jobsetting (jobid, name, value) SELECT LAST_INSERT_ID(), name, value FROM jobsetting WHERE jobid=NEW.id;
+    INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
 ELSE
--- we only need to update the job call window, or cancelling status - all other fields remain fixed
+-- we only need to update the job call window, thesql, or cancelling status - all other fields remain fixed
   IF OLD.starttime <> NEW.starttime ||
      OLD.endtime <> NEW.endtime ||
      OLD.startdate <> NEW.startdate ||
-     OLD.enddate <> NEW.enddate THEN
-     UPDATE aspshard.job SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND id=NEW.id;
+     OLD.enddate <> NEW.enddate ||
+     OLD.thesql <> NEW.thesql THEN
+     UPDATE aspshard.qjob SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
   END IF;
   IF NEW.status IN ('cancelling') THEN
-    UPDATE aspshard.job SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
+    UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
 END IF;
 END
@@ -625,13 +638,14 @@ CREATE TRIGGER insert_jobsetting
 AFTER INSERT ON jobsetting FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
-DECLARE shardjobid BIGINT;
+DECLARE cc INTEGER;
 
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND id=NEW.jobid;
 
-IF shardjobid <> 0 THEN
-    INSERT INTO aspshard.jobsetting (jobid, name, value) VALUES (shardjobid, NEW.name, NEW.value);
+-- the job must be inserted before the settings
+SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.jobid;
+IF cc = 1 THEN
+    INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) VALUES (custid, NEW.jobid, NEW.name, NEW.value);
 END IF;
 END
 $$$
@@ -640,14 +654,9 @@ CREATE TRIGGER update_jobsetting
 AFTER UPDATE ON jobsetting FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
-DECLARE shardjobid BIGINT;
-
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND id=NEW.jobid;
 
-IF shardjobid <> 0 THEN
-    UPDATE aspshard.jobsetting SET value=NEW.value WHERE jobid=shardjobid AND name=NEW.name;
-END IF;
+    UPDATE aspshard.qjobsetting SET value=NEW.value WHERE customerid=custid AND jobid=NEW.jobid AND name=NEW.name;
 END
 $$$
 
@@ -655,14 +664,48 @@ CREATE TRIGGER delete_jobsetting
 AFTER DELETE ON jobsetting FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
-DECLARE shardjobid BIGINT;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+    DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.jobid AND name=OLD.name;
+END
+$$$
+
+CREATE TRIGGER insert_schedule
+AFTER INSERT ON schedule FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+DECLARE cc INTEGER;
 
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-SELECT id INTO shardjobid FROM aspshard.job WHERE customerid=custid AND id=OLD.jobid;
 
-IF shardjobid <> 0 THEN
-    DELETE FROM aspshard.jobsetting WHERE jobid=shardjobid AND name=OLD.name;
+-- the job must be inserted before the schedule
+SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND scheduleid=NEW.id;
+IF cc = 1 THEN
+    INSERT INTO aspshard.qschedule (id, customerid, dow, time, nextrun) VALUES (NEW.id, custid, NEW.dow, NEW.time, NEW.nextrun);
 END IF;
+END
+$$$
+
+CREATE TRIGGER update_schedule
+AFTER UPDATE ON schedule FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+IF (OLD.dow <> NEW.dow ||
+    OLD.time <> NEw.time) THEN
+    UPDATE aspshard.qschedule SET dow=NEW.dow, time=NEW.time WHERE id=NEW.id AND customerid=custid;
+END IF;
+END
+$$$
+
+CREATE TRIGGER delete_schedule
+AFTER DELETE ON schedule FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+    DELETE FROM aspshard.qschedule WHERE id=OLD.id AND customerid=custid;
 END
 $$$
 
