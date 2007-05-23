@@ -5,6 +5,7 @@
 host="localhost:8088"
 path="/xmlrpc"
 
+;authdb for manager use
 [db]
 persistent=true
 host="localhost"
@@ -20,6 +21,12 @@ user="root"
 pass=""
 db="dialerasp"
 
+;shard/customer db for redialer to execute generatejobsql.php
+[redialer]
+host="localhost:3306"
+user="root"
+pass=""
+
 
 [feature]
 is_commsuite=false
@@ -28,7 +35,7 @@ is_commsuite=false
 disable_inbound_number_verification=false
 has_ssl=true
 force_ssl=false
-log_dir="/commsuite/logs/"
+log_dir="/usr/commsuite/logs/"
 log_db_errors=true
 log_db_queries=true
 log_dmapi=true
