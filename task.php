@@ -14,7 +14,6 @@ require_once("obj/Import.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("obj/Job.obj.php");
 require_once("obj/ImportJob.obj.php");
-require_once("obj/ScheduleDay.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -111,8 +110,6 @@ if(CheckFormSubmit($form, $section))
 
 					foreach($newjobids as $jobid) {
 						$newjob = new Job($jobid);
-
-						QuickUpdate("delete from scheduleday where scheduleid= $newjob->scheduleid");
 
 						$schedule = new Schedule($newjob->scheduleid);
 						$schedule->nextrun = null;

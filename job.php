@@ -18,7 +18,6 @@ include_once("obj/AudioFile.obj.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/Schedule.obj.php");
-include_once("obj/ScheduleDay.obj.php");
 include_once("inc/formatters.inc.php");
 include_once("obj/Phone.obj.php");
 

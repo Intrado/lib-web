@@ -45,11 +45,13 @@ class Job extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function runNow($user, $jobid = null) {
-		if (!isset($jobid))
-			$jobid = $this->id;
+	// generate sql to store into 'thesql' field (used by jobprocessor to select person list)
+	function generateSql() {
 
+		// user rules
+		$user = new User($this->userid);
 		$usersql = $user->userSQL("p");
+
 		//get and compose list rules
 		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
 				and le.ruleid=r.id and le.listid='" . $this->listid .  "' order by le.sequence", "r");
@@ -62,6 +64,11 @@ class Job extends DBMappedObject {
     		$this->thesql = $listsql;
 		else
     		$this->thesql = $usersql ." and ". $listsql;
+	}
+
+	// assumes this job was already created in the database
+	function runNow() {
+		$this->generateSql();
 
 		$this->status = "processing"; // set state, jobprocessor will set it to 'active'
 		$this->update();

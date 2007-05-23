@@ -12,7 +12,7 @@ if (isset($_GET['id'])) {
 		$_SESSION['messageid'] = NULL;
 	else
 		setCurrentMessage($_GET['id']);
-		
+
 	redirect("message" . $MESSAGETYPE . ".php");
 }
 
@@ -51,12 +51,11 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 			$message = new Message($_SESSION['messageid']);
 			$errors = array();
 			$parts = $message->parse(GetFormData($form,$section,"body"),$errors);
-	
+
 			if (count($errors) > 0) {
 				error('There was an error parsing the message', implode("",$errors));
 			} else {
 				//submit changes
-
 				$message->type = $MESSAGETYPE;
 
 				//TODO check that the message->userid == user->id so that there is no chance of hijacking
@@ -146,7 +145,7 @@ if( $reloadform )
 			$fields[] = array("fromaddress", "text", 0, 65536);
 			break;
 	}
-	
+
 	PutFormData($form,$section,"body",$body,'text');
 
 	PutFormData($form,$section,"voiceid",$newmsg ? 0 : $message->firstVoiceID(),"nomin","nomax",true);

@@ -182,22 +182,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$schedule->triggertype = "job";
 				$schedule->type = "R";
 				$schedule->userid = $USER->id;
-				$schedule->update();
-				$job->scheduleid = $schedule->id;
 
-				$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
+				$dow = array();
 				for ($x = 1; $x < 8; $x++) {
 					if(GetFormData($f,$s,"dow$x")) {
-						if (!in_array($x,$data))
-						QuickUpdate("insert into scheduleday (scheduleid, dow) values ($schedule->id,$x)");
-					} else {
-						if (in_array($x,$data))
-						QuickUpdate("delete from scheduleday where scheduleid=$schedule->id and dow=$x");
+						$dow[$x-1] = $x;
 					}
 				}
-
+				$schedule->dow = implode(",",$dow);
 				$schedule->nextrun = $schedule->calcNextRun();
-				$schedule->update(array("nextrun"));
+
+				$schedule->update();
+				$job->scheduleid = $schedule->id;
 
 				$numdays = GetFormData($f, $s, 'numdays');
 
@@ -350,9 +346,9 @@ if( $reloadform )
 		if ($schedule->id == NULL) {
 			$schedule->time = $USER->getCallEarly();
 		} else {
-			$data = QuickQueryList("select dow from scheduleday where scheduleid=$schedule->id");
+			$data = explode(",", $schedule->dow);
 			for ($x = 1; $x < 8; $x++)
-			$scheduledows[$x] = in_array($x,$data);
+			    $scheduledows[$x] = in_array($x,$data);
 		}
 		for ($x = 1; $x < 8; $x++) {
 			PutFormData($f,$s,"dow$x",(isset($scheduledows[$x]) ? $scheduledows[$x] : 0),"bool",0,1);

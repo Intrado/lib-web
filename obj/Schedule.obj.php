@@ -5,19 +5,20 @@ class Schedule extends DBMappedObject {
 	var $userid;
 	var $triggertype;
 	var $type;
+	var $dow;
 	var $time;
 	var	$nextrun;
 
 	function Schedule ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "schedule";
-		$this->_fieldlist = array("userid", "triggertype", "type", "time", "nextrun");
+		$this->_fieldlist = array("userid", "triggertype", "type", "dow", "time", "nextrun");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
 
 	function calcNextRun () {
-		$enableddows = QuickQueryList("select dow from scheduleday where scheduleid=$this->id");
+		$enableddows = explode(",", $this->dow);
 
 		$nextrun = Date("Y-m-d") ." " . $this->time;
 

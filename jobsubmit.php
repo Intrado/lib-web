@@ -12,7 +12,7 @@ if (!userOwns("job",$jobid))
 // job.thesql is used by the jobprocessor
 $job = new Job($jobid);
 
-$job->runNow($USER);
+$job->runNow();
 sleep(3);
 
 if (isset($_REQUEST['close']) && $_REQUEST['close']) {

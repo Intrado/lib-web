@@ -54,7 +54,6 @@ if (isset($_GET['delete'])) {
 		} else if ($job->status == "repeating") {
 			if ($job->scheduleid) {
 				$schedule = new Schedule($job->scheduleid);
-				QuickUpdate("delete from scheduleday where scheduleid=$schedule->id");
 				$schedule->destroy();
 			}
 			$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$deleteid'");
@@ -124,7 +123,7 @@ if (isset($_GET['runrepeating'])) {
 			"select $newjob->id, name, value " .
 			"from jobsetting where jobid=$job->id");
 
-			$newjob->runNow($USER);
+			$newjob->runNow();
 			sleep(3);
 			}
 		}
