@@ -618,15 +618,9 @@ IF cc = 0 THEN
     INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
 ELSE
--- we only need to update the job call window, thesql, or cancelling status - all other fields remain fixed
-  IF OLD.starttime <> NEW.starttime ||
-     OLD.endtime <> NEW.endtime ||
-     OLD.startdate <> NEW.startdate ||
-     OLD.enddate <> NEW.enddate ||
-     OLD.thesql <> NEW.thesql THEN
-     UPDATE aspshard.qjob SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
-  END IF;
-  IF NEW.status IN ('cancelling') THEN
+-- we only need to update the job call window, thesql, or status - all other fields remain fixed
+  UPDATE aspshard.qjob SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
+  IF NEW.status IN ('active', 'complete', 'cancelled', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
 END IF;
@@ -693,8 +687,9 @@ DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
 
 IF (OLD.dow <> NEW.dow ||
-    OLD.time <> NEw.time) THEN
-    UPDATE aspshard.qschedule SET dow=NEW.dow, time=NEW.time WHERE id=NEW.id AND customerid=custid;
+    OLD.time <> NEw.time ||
+    OLD.nextrun <> NEW.nextrun) THEN
+    UPDATE aspshard.qschedule SET dow=NEW.dow, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
 END IF;
 END
 $$$
