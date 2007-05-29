@@ -60,6 +60,7 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 		$newuser = new User($id);
 		$newaccess = new Access($newuser->accessid);
 		if($newuser->enabled && $newaccess->getValue('loginweb')) {
+			doStartSession();
 			$USER = $_SESSION['user'] = $newuser;
 			$ACCESS = $_SESSION['access'] = $newaccess;
 			$_SESSION['custname'] = getSystemSetting("displayname");
@@ -77,7 +78,6 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 }
 
 $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
-
 
 if ($IS_COMMSUITE) {
 

@@ -2,7 +2,7 @@
 // redialer.schedulemanager executes this to populate job.thesql field
 
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
-//$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
+$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("inc/db.inc.php");
 require_once("inc/DBMappedObject.php");
@@ -37,7 +37,14 @@ echo "generatejobsql for customerid=".$custid." jobid=".$jobid."\n";
 $db['host'] = $SETTINGS['redialer']['host'];
 $db['user'] = $SETTINGS['redialer']['user'];
 $db['pass'] = $SETTINGS['redialer']['pass'];
-$db['db'] = "c_".$custid;
+if ($IS_COMMSUITE) {
+	$db['db'] = $SETTINGS['redialer']['db'];
+	/*CSDELETEMARKER_START*/
+} else {
+	$db['db'] = "c_".$custid;
+	/*CSDELETEMARKER_END*/
+}
+
 
 // 	now connect to the customer database
 global $_dbcon;

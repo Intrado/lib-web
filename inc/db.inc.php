@@ -1,6 +1,33 @@
 <?
 
-// global $_dbcon is set by auth.inc.php during login
+// if ASP, global $_dbcon is set by auth.inc.php during login
+// else if CommSuite, set it here
+if ($IS_COMMSUITE) {
+
+$dbs = array($SETTINGS['commdb']);
+if (isset($SETTINGS['commdb2']))
+	$dbs[] = $SETTINGS['commdb2'];
+
+foreach ($dbs as $db) {
+
+	if ($db['persistent'])
+		$_dbcon = mysql_pconnect($db['host'], $db['user'], $db['pass']);
+	else
+		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
+	if (!$_dbcon) {
+		error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
+		continue;
+	}
+
+	if (mysql_select_db($db['db'])) {
+		break; //got one!
+	} else {
+		error_log("Problem selecting databse for " . $db['host'] . " error:" . mysql_error());
+	}
+}
+
+unset($dbs);
+}
 
 
 function DBDebug($query) {
@@ -114,7 +141,7 @@ function QuickQueryList ($query, $pair = false, $dbconnect = false) {
 	DBDebug($query);
 	global $_dbcon;
 	$list = array();
-	
+
 	if($dbconnect)
 		$connection = $dbconnect;
 	else

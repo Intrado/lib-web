@@ -13,6 +13,7 @@ if ($IS_COMMSUITE) {
 } /*CSDELETEMARKER_END*/
 
 function doStartSession() {
+	if (session_id() != "") return; // session was already started
 	global $CUSTOMERURL;
 	session_name($CUSTOMERURL . "_session");
 	session_start();
@@ -38,9 +39,7 @@ require_once("obj/Rule.obj.php"); //for search and sec profile rules
 
 
 if (!isset($isindexpage) || !$isindexpage) {
-
 	doStartSession();
-
 	//force ssl?
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		redirect("index.php?logout=1"); //the index page will redirect to https
