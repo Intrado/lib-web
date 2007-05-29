@@ -1585,8 +1585,25 @@ drop table persondata;
 
 ALTER TABLE `import` ADD `data` LONGBLOB NOT NULL ;
 
+CREATE TABLE `surveyweb` (
+`code` CHAR( 22 ) CHARACTER SET ascii COLLATE ascii_bin NOT NULL ,
+`jobid` INT( 11 ) NOT NULL ,
+`personid` INT( 11 ) NOT NULL ,
+`customerid` INT( 11 ) NOT NULL ,
+`status` ENUM( 'noresponse', 'web', 'phone' ) NOT NULL ,
+`dateused` DATETIME NULL ,
+`loggedip` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NULL ,
+`resultdata` TEXT CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET=utf8 ;
 
 
+insert into surveyweb
+select sec.code, wi.jobid, 
+wi.personid, wi.customerid,
+sec.isused+1, sec.dateused, 
+sec.loggedip, sec.resultdata
+from surveyemailcode sec
+inner join jobworkitem wi on (wi.id = sec.jobworkitemid)
 
 
 
