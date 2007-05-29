@@ -620,10 +620,30 @@ IF cc = 0 THEN
 ELSE
 -- we only need to update the job call window, thesql, or status - all other fields remain fixed
   UPDATE aspshard.qjob SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
-  IF NEW.status IN ('active', 'complete', 'cancelled', 'cancelling') THEN
+  IF NEW.status IN ('active', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
+  IF NEW.status IN ('cancelling') THEN
+    -- remove jobtasks that have not begun
+    DELETE FROM aspshard.qjobtask WHERE customerid=custid AND jobid=NEW.id AND status='active';
+  END IF;
+  IF NEW.status IN ('complete', 'cancelled') THEN
+    DELETE FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
+    DELETE FROM aspshard.qjobtask WHERE customerid=custid AND jobid=NEW.id;
+    DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=NEW.id;
+  END IF;
 END IF;
+END
+$$$
+
+CREATE TRIGGER delete_job
+AFTER DELETE ON job FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+-- only repeating jobs ever get deleted
+    DELETE FROM aspshard.qjob WHERE customerid=custid AND id=OLD.id;
+    DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.id;
 END
 $$$
 
