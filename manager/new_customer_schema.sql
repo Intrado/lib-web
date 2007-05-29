@@ -403,16 +403,15 @@ CREATE TABLE specialtask (
   KEY `status` (`status`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE surveyemailcode (
-  `code` char(22) character set ascii collate ascii_bin NOT NULL,
-  jobworkitemid bigint(20) NOT NULL,
-  isused tinyint(4) NOT NULL default '0',
-  dateused datetime default NULL,
-  loggedip varchar(15) collate utf8_bin default NULL,
-  resultdata text collate utf8_bin NOT NULL,
-  PRIMARY KEY  (`code`),
-  UNIQUE KEY jobworkitemid (jobworkitemid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+CREATE TABLE `surveyweb` (
+`code` CHAR( 22 ) CHARACTER SET ascii COLLATE ascii_bin NOT NULL ,
+`jobid` INT( 11 ) NOT NULL ,
+`personid` INT( 11 ) NOT NULL ,
+`status` ENUM( 'noresponse', 'web', 'phone' ) NOT NULL ,
+`dateused` DATETIME NULL ,
+`loggedip` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NULL ,
+`resultdata` TEXT CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE surveyquestion (
   id int(11) NOT NULL auto_increment,
