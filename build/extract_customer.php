@@ -386,11 +386,8 @@ restructureScheduleDay($customerid, $db, $custdb);
 //SPECIALTASK
 //dont copy
 
-//SURVEYEMAILCODE
-$join = "inner join jobworkitem wi on (wi.id = jobworkitemid)
-inner join job j on (j.id = jobid)
-inner join user u on (userid=u.id and u.customerid=$customerid)";
-copytable($customerid,"surveyemailcode",array("code", "jobworkitemid", "isused", "dateused", "loggedip", "resultdata"),$db,$custdb,1000,$join);
+//SURVEYWEB
+copytable($customerid,"surveyweb",array("code", "jobid", "personid", "status", "dateused", "loggedip", "resultdata"),$db,$custdb,1000,false);
 
 //SURVEYQUESTION
 $join = "inner join surveyquestionnaire sq on (sq.id = questionnaireid)
