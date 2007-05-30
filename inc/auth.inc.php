@@ -91,7 +91,6 @@ function doLogin($loginname, $password, $url = null) {
 		if ($result !== false) {
 			// login success
 			session_id($result['sessionID']); // set the session id
-			doStartSession();
 			return $result['userID'];
 		}
 	/*CSDELETEMARKER_END*/
@@ -190,7 +189,6 @@ function asptokenLogin($asptoken, $url) {
 	if ($result !== false) {
 		// login success
 		session_id($result['sessionID']); // set the session id
-		doStartSession();
 		return $result['userID'];
 	}
 }

@@ -21,10 +21,9 @@ if ($SETTINGS['feature']['has_ssl']) {
 	}
 }
 
-
 $badlogin = false;
 if (isset($_GET['login'])) {
-	doStartSession();
+	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
 }
 if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
 	/*CSDELETEMARKER_START*/
@@ -57,10 +56,10 @@ if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->
 	}
 
 	if ($id) {
+		doStartSession();
 		$newuser = new User($id);
 		$newaccess = new Access($newuser->accessid);
 		if($newuser->enabled && $newaccess->getValue('loginweb')) {
-			doStartSession();
 			$USER = $_SESSION['user'] = $newuser;
 			$ACCESS = $_SESSION['access'] = $newaccess;
 			$_SESSION['custname'] = getSystemSetting("displayname");

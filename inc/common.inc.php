@@ -13,7 +13,7 @@ if ($IS_COMMSUITE) {
 } /*CSDELETEMARKER_END*/
 
 function doStartSession() {
-	if (session_id() != "") return; // session was already started
+//	if (session_id() != "") return; // session was already started
 	global $CUSTOMERURL;
 	session_name($CUSTOMERURL . "_session");
 	session_start();
