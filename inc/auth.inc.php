@@ -175,7 +175,7 @@ function forceLogin($loginname, $url = null) {
 		$result = pearxmlrpc($method, $params);
 		if ($result !== false) {
 			// login success
-			return $result[userID];
+			return $result['userID'];
 		}
 	/*CSDELETEMARKER_END*/
 	}
