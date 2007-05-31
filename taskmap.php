@@ -121,10 +121,17 @@ if (!$maxphones = getSystemSetting("maxphones"))
 	$maxphones = 4;
 
 for ($x = 0; $x < $maxphones; $x++) {
-	if ($x == 0)
+	if ($x == 0) {
 		$maptofields["p0"] = "Phone";
-	else
+		if ($SETTINGS['feature']['has_sms']) {
+			$maptofields["s0"] = "Phone (SMS)";
+		}
+	} else {
 		$maptofields["p$x"] = "Phone " . ($x + 1);
+		if ($SETTINGS['feature']['has_sms']) {
+			$maptofields["s$x"] = "Phone " . ($x + 1) . " (SMS)";
+		}
+	}
 }
 
 if (!$maxemails = getSystemSetting("maxemails"))

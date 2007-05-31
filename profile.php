@@ -87,6 +87,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("calllate", GetFormData($form, $section, 'calllate'));
 			$accss->setPermission("callmax", GetFormData($form, $section, 'callmax'));
 			$accss->setPermission("sendemail", (bool)GetFormData($form, $section, 'sendemail'));
+			$accss->setPermission("sendsms", (bool)GetFormData($form, $section, 'sendsms'));
 			$accss->setPermission("sendmulti", (bool)GetFormData($form, $section, 'sendmulti'));
 			$accss->setPermission("createlist", (bool)GetFormData($form, $section, 'createlist'));
 			$accss->setPermission("listuploadids", (bool)GetFormData($form, $section, 'listuploadids'));
@@ -158,6 +159,7 @@ if( $reloadform )
 				array("calllate","text",1,50),
 				array("callmax","text",1,50),
 				array("sendemail","bool",0,1),
+				array("sendsms","bool",0,1),
 				array("sendprint","bool",0,1),
 				array("sendmulti","bool",0,1),
 				array("createlist","bool",0,1),
@@ -297,6 +299,15 @@ startWindow('Allowed Functions');
 					<td><? NewFormItem($form,$section,"sendemail","checkbox"); ?></td>
 					<td>Send emails</td>
 				</tr>
+
+<? if ($SETTINGS['feature']['has_sms']) { ?>
+				<tr>
+					<td><? NewFormItem($form,$section,"sendsms","checkbox"); ?></td>
+					<td>Send SMS messages</td>
+				</tr>
+<? } ?>
+
+
 <? if ($SETTINGS['feature']['has_print']) { ?>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendprint","checkbox"); ?></td>

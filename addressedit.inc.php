@@ -154,6 +154,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				$phone->personid = $person->id;
 				$phone->sequence = $x;
 				$phone->phone = Phone::parse(GetFormData($f,$s,$itemname));
+				$phone->smsenabled = GetFormData($f,$s,"sms" . ($x +1));
 				$phone->update();
 				$x++;
 			}
@@ -224,6 +225,7 @@ if( $reloadform )
 	foreach ($phones as $phone) {
 		$itemname = "phone".($x+1);
 		PutFormData($f,$s,$itemname,Phone::format($phone->phone),"phone",10,10);
+		PutFormData($f,$s,"sms" . ($x+1),$phone->smsenabled,"bool");
 		$x++;
 	}
 
@@ -289,7 +291,10 @@ startWindow("Contact");
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?></td>
+		<td class="bottomBorder">
+			<? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?>
+			SMS: <? NewFormItem($f, $s, "sms" . ($x+1), 'checkbox'); ?>
+		</td>
 	</tr>
 <?
 		$x++;

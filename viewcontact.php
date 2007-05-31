@@ -129,7 +129,7 @@ startWindow('Contact', 'padding: 3px;');
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? displayValue(Phone::format($phone->phone)); ?></td>
+		<td class="bottomBorder"><? displayValue(Phone::format($phone->phone)); ?> <?= $phone->smsenabled ? "<b>[SMS]</b>" : "" ?></td>
 	</tr>
 <?
 		$x++;

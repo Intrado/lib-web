@@ -57,11 +57,12 @@ if(CheckFormSubmit($form, $section))
 			if (strlen($phone) != 10) {
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			} else {
-				$result = QuickUpdate("insert into blockednumber(userid, description, pattern)
+				$result = QuickUpdate("insert into blockednumber(userid, description, pattern, type)
 								values ($USER->id, '" .
-								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone')");
+								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone','" .
+								DBSafe(GetFormData($form, $section, 'type')) . "')");
 				if ($result) {
-					ClearFormData($form);
+					$reloadform = true;
 				} else {
 					error("An error occurred when saving the phone number");
 				}
@@ -79,6 +80,33 @@ if( $reloadform )
 	ClearFormData($form);
 	PutFormData($form, $section,"number", "", "text", 1, 20, true);
 	PutFormData($form, $section,"reason", "", "text", 1, 100, true);
+	PutFormData($form, $section,"type", "both", "text");
+}
+
+
+function fmt_blocking_actions($row, $index) {
+	global $USER;
+	$id = $row[$index];
+	$ownerid = $row[$index + 1];
+	$perm = $row[$index + 2];
+
+	// Only show the delete link in 'addonly' mode for blocked calls created by this user
+	if ($perm == 'editall' ||
+		($perm == 'addonly' && $USER->id == $ownerid)) {
+		return "<a href=\"blocked.php?delete=$id\" onclick=\"return confirmDelete();\">Delete</a>";
+	} else {
+		return '';
+	}
+}
+
+function fmt_bntype ($row, $index) {
+	if ($row[$index] == "both")
+		return "Calls and SMS";
+	else if ($row[$index] == "sms")
+		return "SMS only";
+	else
+		return "Calls only";
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +125,18 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>Number: <? NewFormItem($form, $section, 'number', 'text',20,20); ?>&nbsp;&nbsp;</td>
-			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text'); ?>&nbsp;&nbsp;</td>
+			<td>
+<?
+				NewFormItem($form, $section,"type","selectstart");
+				NewFormItem($form, $section,"type","selectoption","Block Calls and SMS","both");
+				NewFormItem($form, $section,"type","selectoption","Block SMS only","sms");
+				NewFormItem($form, $section,"type","selectoption","Block Calls only","call");
+				NewFormItem($form, $section,"type","selectend");
+
+?>
+			&nbsp;
+			</td>
+			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text',30,100); ?>&nbsp;&nbsp;</td>
 			<td><?= submit($form, $section, 'add', 'add'); ?></td>
 			<td><? print help('Blocked_Add', 'style="margin-left: 5px;"'); ?></td>
 		</tr>
@@ -111,23 +150,26 @@ EndForm();
 if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
 	$titles = array(
 				"0" => '#Phone Number',
+				"6" => "#Type",
 				"1" => '#Reason for Blocking',
 				"2" => '#Blocked by',
 				"3" => 'Actions');
 } else {
 	$titles = array(
 				"0" => '#Phone Number',
+				"6" => "#Type",
 				"1" => '#Reason for Blocking',
 				"2" => '#Blocked by');
 }
 
 $formatters = array(
+				"6" => "fmt_bntype",
 				"0" => 'fmt_phone',
 				"3" => 'fmt_blocking_actions');
 
 $result = Query(
 		"select b.pattern, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type
 			from blockednumber b, user u
 			where b.userid = u.id
 			order by b.id desc");
@@ -142,19 +184,6 @@ echo "\n</table>";
 
 include_once("navbottom.inc.php");
 
-function fmt_blocking_actions($row, $index) {
-	global $USER;
-	$id = $row[$index];
-	$ownerid = $row[$index + 1];
-	$perm = $row[$index + 2];
 
-	// Only show the delete link in 'addonly' mode for blocked calls created by this user
-	if ($perm == 'editall' ||
-		($perm == 'addonly' && $USER->id == $ownerid)) {
-		return "<a href=\"blocked.php?delete=$id\" onclick=\"return confirmDelete();\">Delete</a>";
-	} else {
-		return '';
-	}
-}
 
 ?>
