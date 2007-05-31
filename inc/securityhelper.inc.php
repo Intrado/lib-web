@@ -13,6 +13,7 @@ function userOwns ($type,$id) {
 	switch($type) {
 		case "list":
 		case "job":
+		case "smsjob":
 		case "audiofile":
 		case "person":
 		case "surveyquestionnaire":
@@ -43,6 +44,8 @@ function customerOwns($type, $id) {
 			return QuickQuery("select count(*) from `$type` where id = '$id' and deleted=0");
 		case "job":
 			return QuickQuery("select count(*) from job, user where job.id = '$id' and user.id = job.userid");
+		case "smsjob":
+			return QuickQuery("select count(*) from smsjob, user where smsjob.id = '$id' and user.customerid = $USER->customerid and user.id = smsjob.userid");
 		default:
 			return false;
 	}
