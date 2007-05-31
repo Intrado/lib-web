@@ -74,6 +74,7 @@ if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->en
 $PAGE = "notifications:survey";
 $TITLE = "Review and Confirm Selections";
 $DESCRIPTION = "After verifying survey settings click Submit Survey";
+$f = "survey";
 
 include_once("nav.inc.php");
 NewForm($f);
