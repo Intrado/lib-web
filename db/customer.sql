@@ -661,7 +661,7 @@ ELSE
   END IF;
   IF NEW.status IN ('cancelling') THEN
     -- remove jobtasks that have not begun
-    DELETE FROM aspshard.qjobtask WHERE customerid=custid AND jobid=NEW.id AND status='active';
+    DELETE FROM aspshard.qjobtask WHERE customerid=custid AND jobid=NEW.id AND status IN ('active','pending','waiting');
 END IF;
   IF NEW.status IN ('complete', 'cancelled') THEN
     DELETE FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
