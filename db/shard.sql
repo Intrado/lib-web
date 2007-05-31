@@ -48,7 +48,7 @@ CREATE TABLE `qjobtask` (
   `type` enum('phone','email','print','sms') NOT NULL,
   `personid` int(11) NOT NULL,
   `sequence` tinyint(4) NOT NULL,
-  `status` enum('active','pending','assigned','progress','waiting','thottled') NOT NULL,
+  `status` enum('active','pending','assigned','progress','waiting','throttled') NOT NULL,
   `attempts` tinyint(4) NOT NULL default '0',
   `renderedmessage` text,
   `lastresult` enum('A','M','N','B','X','F','sent','unsent','printed','notprinted') default NULL,
