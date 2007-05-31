@@ -109,7 +109,7 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
 				QuickUpdate("grant select, insert, update, delete, create temporary tables on $newdbname . * to '$newdbname'", $newdb);
 
-				$tablequeries = explode(";",file_get_contents("new_customer_schema.sql"));
+				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
 				foreach ($tablequeries as $tablequery) {
 					if (trim($tablequery))
 						Query($tablequery,$newdb)
@@ -223,7 +223,7 @@ if( $reloadform ){
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "");
-	PutFormData($f,$s,'maxusers', "", "number");
+	PutFormData($f,$s,'maxusers', "1", "number");
 	PutFormData($f,$s,'callspurchased', "", "number");
 	PutFormData($f,$s,'renewaldate', "", "text");
 }
