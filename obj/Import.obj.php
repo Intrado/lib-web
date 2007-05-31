@@ -27,7 +27,7 @@ class Import extends DBMappedObject {
 			$importid = $this->id;
 
 		QuickUpdate("call start_import($importid)");
-		QuickUpdate("update import set status='queued' where id=$importid and status='idle'");
+		QuickUpdate("update import set status='queued' where id=$importid and status != 'running'");
 	}
 
 
