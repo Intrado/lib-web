@@ -31,10 +31,15 @@ foreach($customers as $customer) {
 	mysql_select_db("c_$customer[0]", $custdb)
 				or die("Could not select customer db: " . mysql_error($custdb));
 				
-				
-	$query = "insert systemstats(datetime, answered, machine, busy, noanswer) 
-				select 
-				floor(rc.starttime/(1000*3600))*3600 as datetime,
+	$res = mysql_query("select value from setting where name='timezone'", $custdb);
+	$row = mysql_fetch_row($res);
+	$timezone = $row[0];
+
+	mysql_query("set time_zone='$timezone'", $custdb);			
+	$query = "insert systemstats(date, hour, answered, machine, busy, noanswer) 
+				select
+				date(from_unixtime(rc.starttime/1000)) as date,
+				hour(from_unixtime(rc.starttime/1000)) as hour,
 				sum(rc.result = 'A') as answered,
 				sum(rc.result = 'M') as machine,
 				sum(rc.result = 'B') as busy,
@@ -42,7 +47,7 @@ foreach($customers as $customer) {
 				from reportcontact rc
 				where rc.starttime/1000 > unix_timestamp('$yesterday')
 				and rc.starttime/1000 <= unix_timestamp(now())
-				group by datetime 
+				group by date, hour 
 				on duplicate key update 
 				answered = values(answered),
 				machine = values(machine),
