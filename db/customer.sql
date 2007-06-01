@@ -605,6 +605,15 @@ $$$
 ALTER TABLE `smsjob` ADD `deleted` TINYINT NOT NULL DEFAULT '0';
 $$$
 
+ALTER TABLE `systemstats` DROP `datetime`;
+$$$
+
+ALTER TABLE `systemstats` ADD `date` DATE NOT NULL FIRST ,
+ADD `hour` INT( 11 ) NOT NULL AFTER `date` ;
+$$$
+ALTER TABLE `systemstats` ADD PRIMARY KEY ( `date` , `hour` ) ;
+$$$
+
 
 -- triggers from customer database to shard database
 
