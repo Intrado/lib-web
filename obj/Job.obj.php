@@ -54,7 +54,7 @@ class Job extends DBMappedObject {
 
 		//get and compose list rules
 		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
-				and le.ruleid=r.id and le.listid='" . $this->listid .  "' order by le.sequence", "r");
+				and le.ruleid=r.id and le.listid='" . $this->listid .  "'", "r");
 		if (count($listrules) > 0)
 			$listsql = "1" . Rule::makeQuery($listrules, "p");
 		else
