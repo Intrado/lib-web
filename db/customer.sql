@@ -437,7 +437,8 @@ CREATE TABLE `surveyweb` (
 `status` ENUM( 'noresponse', 'web', 'phone' ) NOT NULL ,
 `dateused` DATETIME NULL ,
 `loggedip` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NULL ,
-`resultdata` TEXT CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
+`resultdata` TEXT CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+PRIMARY KEY (jobid, personid)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 $$$
 
@@ -536,8 +537,6 @@ $$$
 
 CREATE TABLE voicereply (
   id int(11) NOT NULL auto_increment,
-  jobtaskid bigint(20) NOT NULL,
-  jobworkitemid bigint(20) NOT NULL,
   personid int(11) NOT NULL,
   jobid int(11) NOT NULL,
   userid int(11) NOT NULL,
@@ -663,15 +662,15 @@ IF cc = 0 THEN
     INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
 ELSE
--- we only need to update the job call window, thesql, or status - all other fields remain fixed
-  UPDATE aspshard.qjob SET starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
+-- update job fields
+  UPDATE aspshard.qjob SET phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
   IF NEW.status IN ('active', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
   IF NEW.status IN ('cancelling') THEN
     -- remove jobtasks that have not begun
     DELETE FROM aspshard.qjobtask WHERE customerid=custid AND jobid=NEW.id AND status IN ('active','pending','waiting');
-END IF;
+  END IF;
   IF NEW.status IN ('complete', 'cancelled') THEN
     DELETE FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
     DELETE FROM aspshard.qjobtask WHERE customerid=custid AND jobid=NEW.id;
