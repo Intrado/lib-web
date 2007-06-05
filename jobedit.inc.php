@@ -109,7 +109,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$fieldsarray = array("name", "jobtypeid", "description", "listid", "phonemessageid",
 				"emailmessageid","printmessageid", "starttime", "endtime",
 				"sendphone", "sendemail", "sendprint", "maxcallattempts",
-				"skipduplicates", "printall", "printunnotified");
+				"skipduplicates");
 				PopulateObject($f,$s,$job,$fieldsarray);
 
 				if ($JOBTYPE != 'repeating') {
@@ -368,9 +368,18 @@ if( $reloadform )
 }
 
 $messages = array();
-$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
-$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
-$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
+// if submitted or completed, gather all messages not just the deleted=0 ones
+// because the schedulemanager copies all messages setting deleted=1 when job is due to start
+if ($submittedmode || $completedmode) {
+	// TODO will this array be too large?
+	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and type='phone' order by name");
+	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and type='email' order by name");
+	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and type='print' order by name");
+} else {
+	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
+	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
+	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
+}
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array());
 if ($job->id) {
