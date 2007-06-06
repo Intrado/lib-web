@@ -94,8 +94,12 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
 				$IMPORT->update();
 
-				$associated = GetFormData($form, $section, 'associatedjobs');
-
+				$checked = GetFormData($form, $section, 'trigger_checkbox');
+				if ($checked) {
+					$associated = GetFormData($form, $section, 'associatedjobs');
+				} else {
+					$associated = array();
+				}
 				if(count($associated)==0) {
 					$query = "Delete from importjob where importid = '$IMPORT->id'";
 					QuickUpdate($query);
@@ -122,6 +126,7 @@ if(CheckFormSubmit($form, $section))
 					}
 				}
 
+
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
 				redirect("tasks.php");
 			}
@@ -139,7 +144,7 @@ if( $reloadform )
 	PutFormData($form, $section, 'updatemethod', ($IMPORT->updatemethod != null ? $IMPORT->updatemethod : 'updateonly'), 'text');
 
 	PutFormData($form, $section, 'automaticimport', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
-	PutFormData($form, $section, 'associatedjobs', $associatedjobids, "array", array_keys($repeatingjobs));
+	PutFormData($form, $section, 'associatedjobs', $associatedjobids, 'array', array_keys($repeatingjobs));
 	$checked = false;
 	if(count($associatedjobids))
 		$checked = true;

@@ -112,7 +112,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				error('There was an error parsing the setting', implode("",$errors));
 			} else {
 				//submit changes
-				if($types = $_POST['jobtype']) {
+				if(isset($_POST['jobtype']) && $types = $_POST['jobtype']) {
 					foreach($types as $id => $name) {
 						$name = DBSafe($name);
 						$id = DBSafe($id);

@@ -368,13 +368,12 @@ if( $reloadform )
 }
 
 $messages = array();
-// if submitted or completed, gather all messages not just the deleted=0 ones
+// if submitted or completed, gather only the selected messageids used by this job
 // because the schedulemanager copies all messages setting deleted=1 when job is due to start
 if ($submittedmode || $completedmode) {
-	// TODO will this array be too large?
-	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and type='phone' order by name");
-	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and type='email' order by name");
-	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and type='print' order by name");
+	$messages['phone'] = DBFindMany("Message","from message where id=$job->phonemessageid or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
+	$messages['email'] = DBFindMany("Message","from message where id=$job->emailmessageid or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
+	$messages['print'] = DBFindMany("Message","from message where id=$job->printmessageid or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
 } else {
 	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");

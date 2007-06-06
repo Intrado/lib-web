@@ -113,8 +113,14 @@ if (getCurrentSurvey() != NULL) {
 
 $VALIDJOBTYPES = JobType::getUserJobTypes();
 $PEOPLELISTS = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
-$QUESTIONNAIRES = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
-
+$QUESTIONNAIRES = array();
+// if submitted or completed, gather only the selected questionnaireid
+// because the schedulemanager copies the questionnaire setting deleted=1 when job is due to start
+if ($submittedmode || $completedmode) {
+	$QUESTIONNAIRES = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where id=$job->questionnaireid");
+} else {
+	$QUESTIONNAIRES = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
+}
 
 /****************** main message section ******************/
 
@@ -193,19 +199,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				PopulateObject($f,$s,$job,array("name", "description"));
 			} else if ($submittedmode) {
 				$fieldsarray = array("name", "description","startdate", "starttime", "endtime");
-				if ($questionnaire->hasphone)
-					$fieldsarray[] = "maxcallattempts";
 				PopulateObject($f,$s,$job,$fieldsarray);
+				if ($questionnaire->hasphone)
+					$job->setOption("maxcallattempts", GetFormData($f, $s, 'maxcallattempts'));
 				$job->startdate = GetFormData($f, $s, 'startdate');
 								$numdays = GetFormData($f, $s, 'numdays');
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			} else {
 				$fieldsarray = array("name", "jobtypeid", "description", "listid",
 							"starttime", "endtime","startdate");
-				if ($questionnaire->hasphone)
-					$fieldsarray[] = "maxcallattempts";
 				PopulateObject($f,$s,$job,$fieldsarray);
-
+				if ($questionnaire->hasphone)
+					$job->setOption("maxcallattempts", GetFormData($f, $s, 'maxcallattempts'));
 				$job->startdate = GetFormData($f, $s, 'startdate');
 				$numdays = GetFormData($f, $s, 'numdays');
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
@@ -349,7 +354,7 @@ startWindow('Survey Information');
 					<td>
 						<?
 						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
-						NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
+						NewFormItem($f,$s,"listid", "selectoption", "-- Select a List --", NULL);
 						foreach ($PEOPLELISTS as $plist) {
 							NewFormItem($f,$s,"listid", "selectoption", $plist->name, $plist->id);
 						}

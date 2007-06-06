@@ -28,11 +28,13 @@ if (!$USER->authorize('metadata')) {
 
 function newfield($f, $s, $name){
 
-	$fieldlist = array("First Name" => FieldMap::getFirstNameField(), 
-					"Last Name" => FieldMap::getLastNameField(), 
-					"Language" => FieldMap::getLanguageField(), 
-					"School" => FieldMap::getSchoolField(), 
+	$fieldlist = array("First Name" => FieldMap::getFirstNameField(),
+					"Last Name" => FieldMap::getLastNameField(),
+					"Language" => FieldMap::getLanguageField(),
+					"School" => FieldMap::getSchoolField(),
 					"Grade" => FieldMap::getGradeField());
+
+	$count = 0;
 	foreach($fieldlist as $index => $value){
 		if($value) $count++;
 	}
@@ -233,20 +235,20 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 <?
 	$alt = 0;
 	if (count($FIELDMAPS) > 0) {
-	
+
 		$types = array("Text" => 'text',
 					"Date" => 'reldate',
 					"List" => 'multisearch');
-					
+
 		foreach ($FIELDMAPS as $field) {
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-?>			
+?>
 			<td>
 <?
 				$fieldnum = $field->fieldnum;
 				$num = substr($fieldnum, 1) + 0;
 				echo $num;
-?>			
+?>
 			</td>
 <?
 			// These 3 items are read-only so display them in the else block
@@ -271,7 +273,7 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 			} else {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20');?></td>
-<?	
+<?
 				$type = GetFormData($form, $section, "type_$fieldnum");
 				switch ($type) {
 					case 'multisearch':
@@ -291,15 +293,15 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 				<td><a href='datamanager.php?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='datamanager.php?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
 <?
 			}
-?>			
+?>
 		</tr>
 <?
 		}
 	}
-	
+
 	// Print extra row for adding new items
 ?>
-	
+
 	<tr>
 		<td>
 <?
@@ -313,15 +315,15 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 <?
 		newfield($form, $section, 'newfield_name');
 		NewFormItem($form, $section, 'newfield_name', 'text',20, '', 'id=newfield');
-?> 
+?>
 		</td>
 		<td>
-<?		
+<?
 		NewFormItem($form, $section, 'newfield_type', 'selectstart', '', '', 'id=newfield_type');
 		foreach($types as $text => $type)
 			NewFormItem($form, $section, 'newfield_type', 'selectoption', $text, $type);
 		NewFormItem($form, $section, 'newfield_type', 'selectend');
-		NewFormItem($form, $section, 'newfield_specialtype', 'text', '20', '', 'id=specialtype'); 
+		NewFormItem($form, $section, 'newfield_specialtype', 'text', '20', '', 'id=specialtype');
 ?>
 		</td>
 		<td><? NewFormItem($form, $section, 'newfield_searchable', 'checkbox', '', '', 'id=newfield_searchable'); ?> </td>
@@ -339,9 +341,9 @@ include_once("navbottom.inc.php");
 // Scripts
 ////////////////////////////////////////////////////////////////////////////////
 ?>
-	<script>	
+	<script>
 		hide('specialtype');
-		
+
 		function predef_name(name){
 			specialtype = new getObj('specialtype').obj;
 			type = new getObj('newfield_type').obj;
@@ -362,28 +364,28 @@ include_once("navbottom.inc.php");
 					break;
 				case 'School':
 					new getObj('newfield').obj.value = 'School';
-					specialtype.value = 'school';	
+					specialtype.value = 'school';
 					type.value='multisearch';
 					break;
 				case 'Last Name':
 					new getObj('newfield').obj.value = 'Last Name';
-					specialtype.value = 'lastname';	
+					specialtype.value = 'lastname';
 					type.value='text';
 					break;
 				case 'First Name':
 					new getObj('newfield').obj.value = 'First Name';
-					specialtype.value = 'firstname';	
+					specialtype.value = 'firstname';
 					type.value='text';
 					break;
 				default:
-					new getObj('newfield').obj.value = '';		
+					new getObj('newfield').obj.value = '';
 					type.value = 'text';
 					type.style.display="block";
 					specialtype.value = '';
 					show('newfield_searchable');
 					break;
-			}	
-		
+			}
+
 		}
 
 
