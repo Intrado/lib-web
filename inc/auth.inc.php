@@ -53,7 +53,9 @@ function doLogin($loginname, $password, $url = null) {
 		$password = dbsafe($password);
 
 		$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
-		$LDAP_EXTENSION = "@" . $SETTINGS['ldap']['ldapaddr'] . $SETTINGS['ldap']['ldapcom'];
+		$ad = $SETTINGS['ldap']['ldap_ad'];
+		$com = $SETTINGS['ldap']['ldap_com'];
+		$LDAP_EXTENSION = "@" . $ad . "." . $com;
 		if($IS_LDAP){
 			$userldap = QuickQuery("select user.ldap from user where user.login='$loginname'");
 
@@ -63,6 +65,8 @@ function doLogin($loginname, $password, $url = null) {
 				} else {
 					$ldapusername = $loginname;
 				}
+				if($ldapusername == "")
+					return false;
 				if($ds=ldap_connect($LDAP_CONNECT)) {
 					if(@ldap_bind($ds,$ldapusername,$password) && $password) {
 						$query = "select id from user where user.login='$loginname'";
@@ -110,9 +114,9 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 			$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
 			$ldapusername = $SETTINGS['ldap']['ldapusername'];
 			$ldappassword = $SETTINGS['ldap']['ldappassword'];
-			$com = $SETTINGS['ldap']['ldapcom'];
-			$ad = $SETTINGS['ldap']['ldapaddr'];
-			$cn = $SETTINGS['ldap']['ldapcn'];
+			$ad = $SETTINGS['ldap']['ldap_ad'];
+			$com = $SETTINGS['ldap']['ldap_com'];
+			$cn = $SETTINGS['ldap']['ldap_cn'];
 
 			$query = "select login, id, ldap from user where enabled=1 and deleted=0 and "
 					."accesscode='$loginname' and pincode=password('$password')";
