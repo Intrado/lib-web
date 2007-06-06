@@ -232,7 +232,9 @@ function NewFormSelect ($f,$s,$item,$map) {
 */
 
 function GetFormData ($form, $section, $item) {
-	return $_SESSION['formdata'][$form][$section][$item]['value'];
+	if (isset($_SESSION['formdata'][$form][$section][$item]['value']))
+		return $_SESSION['formdata'][$form][$section][$item]['value'];
+	return null;
 }
 
 /***************** PutFormData *****************
