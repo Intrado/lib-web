@@ -35,7 +35,7 @@ persistent=true
 host="localhost:3306"
 user="root"
 pass=""
-db="commsuite"
+db="c_1"
 
 
 [feature]
@@ -45,12 +45,13 @@ is_commsuite=false
 disable_inbound_number_verification=false
 has_ssl=true
 force_ssl=false
-log_dir="/usr/commsuite/logs/"
+log_dir="/commsuite/logs/"
 log_db_errors=true
 log_db_queries=true
 log_dmapi=true
 has_print=true
 tmp_dir="/tmp"
+has_sms=true
 
 ;if not set, warn_earliest is set to "7:00 am"
 ;and warn_latest is set to "9:00 pm"
@@ -66,13 +67,18 @@ externalcontent=false
 get="localhost,80,/foobar/xxx-get.php"
 put="localhost,80,/foobar/xxx-put.php"
 
-
 [ldap]
 is_ldap=false
 ldapconnect="192.168.174.2"
-ldapextension="@domain.com"
 ldapusername="user"
 ldappassword="pass"
 
+; cn is the directory where ldap users live ex. "users" or "teachers"
+; ad and com make up the domain
+; ex. if their domain/ldap extension is @adtest.net then
+; ldap_ad = "adtest" and ldap_com="net"
+ldap_cn="users"
+ldap_ad="adtest"
+ldap_com="net"
 
 ;*/?>
