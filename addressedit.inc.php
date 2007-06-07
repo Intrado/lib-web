@@ -136,7 +136,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				}
 			}
 			$person->deleted = 0;
-			
+
 
 			PopulateObject($f,$s,$person,array(FieldMap::getFirstNameField(),
 											 FieldMap::getLastNameField(),
@@ -210,7 +210,7 @@ if( $reloadform )
 		PutFormData($f,$s,"manualsave",1,"bool",0,1,false);
 	}
 
-	PopulateForm($f,$s,$data,array(array(FieldMap::getFirstNameField(),"text",1,255),
+	PopulateForm($f,$s,$person,array(array(FieldMap::getFirstNameField(),"text",1,255),
 								   array(FieldMap::getLastNameField(),"text",1,255),
 								   array(FieldMap::getLanguageField(),"text",1,255))
 								   );
