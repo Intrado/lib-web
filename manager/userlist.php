@@ -39,8 +39,8 @@ function fmt_accssname($row, $index){
 }
 
 function fmt_custurl($row, $index){
-	
-	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[1] . "</a>";
+
+	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[2] . "</a>";
 	return $url;
 }
 
@@ -53,7 +53,7 @@ include_once("nav.inc.php");
 
 if($custdb = DBConnect($cust[0], $cust[1], $cust[2], "c_$customerid")){
 	$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
-	$custinfo = array($customerid, $displayname);
+	$custinfo = array($customerid, $displayname, $cust[3]);
 	$result = Query("select id, login, firstname, lastname, lastlogin, phone, email, accessid from user where enabled=1 AND deleted=0", $custdb);
 	$users = array();
 	while($row = DBGetRow($result)){
@@ -65,18 +65,18 @@ if($custdb = DBConnect($cust[0], $cust[1], $cust[2], "c_$customerid")){
 $titles = array("0" => "Customer ID",
 				"1" => "Customer Name",
 				"url" => "Customer URl",
-				"2" => "User ID",
-				"3" => "User Name",
-				"4" => "Last Name",
-				"5" => "First Name",
-				"6" => "Last Login",
+				"3" => "User ID",
+				"4" => "User Name",
+				"5" => "Last Name",
+				"6" => "First Name",
+				"7" => "Last Login",
 				"activejobs" => "Active Jobs",
 				"access" => "Access Profile",
-				"7" => "Phone",
-				"8" => "Email");
+				"8" => "Phone",
+				"9" => "Email");
 
 $formatters = array("url" => "fmt_custurl",
-					"6" => "fmt_lastlogin",
+					"7" => "fmt_lastlogin",
 					"activejobs" => "fmt_jobcount",
 					"access" => "fmt_accssname");
 
