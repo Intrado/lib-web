@@ -164,9 +164,9 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
-							('f01', 'First Name', 'searchable,text'),
-							('f02', 'Last Name', 'searchable,text'),
-							('f03', 'Language', 'searchable,multisearch')";
+							('f01', 'First Name', 'searchable,text,firstname'),
+							('f02', 'Last Name', 'searchable,text,lastname'),
+							('f03', 'Language', 'searchable,multisearch,language')";
 				QuickUpdate($query, $newdb) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `language` (`name`) VALUES
