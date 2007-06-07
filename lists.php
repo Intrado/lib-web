@@ -58,7 +58,7 @@ include_once("nav.inc.php");
 $data = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
 $titles = array(	"name" => "#List Name",
 					"description" => "#Description",
-					"modified" => "Last Used",
+					"lastused" => "Last Used",
 					"Actions" => "Actions"
 					);
 
@@ -69,7 +69,7 @@ button_bar(button('createlist', NULL,"list.php?id=new") . help('Lists_AddList'))
 
 
 
-showObjects($data, $titles,array("Actions" => "fmt_actions", "modified" => "fmt_obj_date"), count($data) > 10,  true);
+showObjects($data, $titles,array("Actions" => "fmt_actions", "lastused" => "fmt_obj_date"), count($data) > 10,  true);
 endWindow();
 
 
