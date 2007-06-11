@@ -656,8 +656,8 @@ IF cc = 0 THEN
 -- we expect the status to be 'processing' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
   IF NEW.status IN ('processing') THEN
-    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, thesql)
-           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'new', NEW.thesql);
+    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, jobtypeid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, thesql)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.jobtypeid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'new', NEW.thesql);
     -- copy the jobsettings
     INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
