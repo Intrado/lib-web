@@ -1,11 +1,13 @@
 <?
 class VoiceReply extends DBMappedObject{
 
+	var $personid;
 	var $jobid;
 	var $userid;
 	var $contentid;
 	var $replytime;
 	var $listened = 0;
+	
 
 
 	function VoiceReply($id = NULL){
