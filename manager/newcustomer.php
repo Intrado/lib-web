@@ -107,7 +107,7 @@ if (CheckFormSubmit($f,$s)){
 					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
 
 				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
-				QuickUpdate("grant select, insert, update, delete, create temporary tables on $newdbname . * to '$newdbname'", $newdb);
+				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
 
 				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
 				foreach ($tablequeries as $tablequery) {
