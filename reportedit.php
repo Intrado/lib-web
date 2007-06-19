@@ -102,19 +102,20 @@ if($reload){
 		$dows = $reportsubscription->dow;
 		$dowarray = explode(",", $dows);
 		$dom = $reportsubscription->dom;
-		$rundate = date("M d, Y", strtotime($reportsubscription->date));
+		if($reportsubscription->date && $reportsubscription->date != "0000-00-00")
+			$rundate = date("M d, Y", strtotime($reportsubscription->date));
 	}
 	for($i=1; $i<8;$i++){
 		PutFormData($f, $s, "dow$i", in_array($i, $dowarray) ? "1" : "0", "bool", "0", "1");
 	}
 	PutFormData($f, $s, "dom", $dom ? $dom : "1" );
 	PutFormData($f, $s, "reportsubscription", isset($reportsubscription) ? $reportsubscription->id : "");
-	PutFormData($f, $s, "date", $rundate != "0000-00-00" ? $rundate : "", "text");
-	PutFormData($f, $s, "name", isset($reportsubscription) ? $reportsubscription->name : "", "text");
-	PutFormData($f, $s, "reporttype", isset($options['reporttype']) ? $options['reporttype'] : "" );
+	PutFormData($f, $s, "date", $rundate, "text");
+	PutFormData($f, $s, "name", isset($reportsubscription) ? $reportsubscription->name : "", "text", null, null, true);
+	PutFormData($f, $s, "reporttype", isset($options['reporttype']) ? $options['reporttype'] : "", null, null, null, true );
 	
-	$radio = 1;
-	if($rundate && $rundate != "0000-00-00"){
+	$radio = 0;
+	if($rundate){
 		$radio= 1;
 	} else if($dows){
 		$radio= 2;
