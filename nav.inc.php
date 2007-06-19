@@ -36,8 +36,8 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['-- Reports & Status --'] = "false;";
 	if ($USER->authorize('createreport')) {
-		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "window.location='report_edit.php'";
-		$SHORTCUTS['&nbsp;&nbsp;View Job Summary'] = "window.location='report_job.php'";
+		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "window.location='reportedit.php'";
+		$SHORTCUTS['&nbsp;&nbsp;View Job Summary'] = "window.location='reportjob.php'";
 	}
 	if ($USER->authorize('viewsystemreports')) {
 		$SHORTCUTS['&nbsp;&nbsp;Usage Stats'] = "window.location='reportsystem.php'";
