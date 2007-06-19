@@ -1,103 +1,22 @@
 <?
-
-
-/*
-
-
-#
-# Table structure for table `reportinstance`
-#
-
-CREATE TABLE reportinstance (
-  ID int(11) NOT NULL auto_increment,
-  ReportID smallint(6) NOT NULL default '0',
-  LastRun datetime NOT NULL default '0000-00-00 00:00:00',
-  RefreshInterval int(11) NOT NULL default '5',
-  InProgress tinyint(4) NOT N[ULL default '0',
-  MetaReport tinyint(4) NOT NULL default '0',
-  Parameters text NOT NULL,
-  InstanceHash varchar(32) NOT NULL default '',
-  PRIMARY KEY  (ID),
-  KEY refresh (LastRun,RefreshInterval),
-  KEY InstanceHash (InstanceHash)
-) TYPE=MyISAM;
-
-
-
-*/
-
-
-
-
-//this goes through and deletes all the old files from reportcache
-function CleanReportCache () {
-	//get a list of main files for each reportinstance that has expired
-	$count = 0;
-
-	
-	$query= "
-	select  ri.id, a.filename
-	from 		reportinstance ri, reportinstancefile a
-	where 		a.id=ri.id 
-	and			a.fileorder=0
-	and 		(date_add(ri.lastrun, interval ri.refreshinterval minute) < now()
-	or			ri.lastrun = '0000-00-00 00:00:00')
-	";
-	
-	if ($result = mysql_query($query)) {
-		while ($row = mysql_fetch_row($result)) {
-			//echo SM_ENTERPRISE_REPORT_CACHE . "/" . $row[1] . "\n";
-			@unlink(SM_ENTERPRISE_REPORT_CACHE . "/" . $row[1]);
-			$query = "delete from reportinstancefile where id='$row[0]'";
-			QuickUpdate($query);
-			$count++;
-		}
-	}
-	
-	return $count;
-}
-
-
-
 class ReportInstance extends DBMappedObject {
 	//table vars
-	var $id;
-	var $reportid;
-	var $lastrun;
-	var $refreshinterval;
-	var $inprogress;
-	var $metareport;
+	
 	var $parameters;
+	var $fields;
+	var $activefields;
 	var $instancehash;
 
 	//related parent object
 	var $report;
 
 	function ReportInstance ($id = NULL) {
+		$this->_allownulls = false;
 		$this->_tablename = "reportinstance";
-		$this->_fieldlist = array("reportid", "lastrun","refreshinterval",
-					"inprogress","metareport","parameters","instancehash");
-		$this->id = $id;
-		$this->refresh();
+		$this->_fieldlist = array("parameters","fields", "activefields", "instancehash" );
+		DBMappedObject::DBMappedObject($id);
 	}
-	
-	//override the refresh function
-	//add a part to refresh the report object based on reportid
-	function refresh ($loadparams = false) {
-		$isrefreshed = false;
 		
-		//call parent class' refresh
-		//(get_parent_class(get_class($this)))
-		if ( DBMappedObject::refresh()) {
-			$this->report = new Report($this->reportid);
-			//TODO get filelist
-			$isreisrefreshed = true;
-		}
-		
-		return $isrefreshed;
-	}
-	
-	
 	function  findInstance () {
 		if ($this->reportid == NULL)
 			return false;
@@ -125,7 +44,7 @@ class ReportInstance extends DBMappedObject {
 		$params = explode("&", $paramstring);
 		sort($params);
 		$this->parameters = implode("&", $params);
-		$this->rehash();
+		//$this->rehash();
 	}
 	
 	//takes an input string formatted like http get query
@@ -135,14 +54,43 @@ class ReportInstance extends DBMappedObject {
 		//it will break into "name=value2" "abc=123" "name=value1" 
 		//then sort to "abc=123" "name[]=1" "name[]=2"
 		//this way we can reorder randomly ordered parameters so that
-		//the hash will check out ok.
-		$paramstring = my_http_build_query($paramarray, $keepnumericindex);
+		//the hash will check out ok.	
+		$paramstring = http_build_query($paramarray, false, "&");
 		$this->setParameterString($paramstring);			
 	}
 	
+	function setString ($paramstring) {
+		$params = explode("&", $paramstring);
+		sort($params);
+		return implode("&", $params);
+		//$this->rehash();
+	}
+	
+	//takes an input string formatted like http get query
+	function setFields ($fieldlist) {
+		$fieldliststring = http_build_query($fieldlist, false, "&");
+		$this->fields = $this->setString($fieldliststring);			
+	}
+	function setActivefields ($activefields) {
+		$activefieldsstring = http_build_query($activefields, false, "&");
+		$this->activefields = $this->setString($activefieldsstring);			
+	}
+	
+	function getFields(){
+		$fieldlist = array();
+		$fieldlist=sane_parsestr($this->fields);
+		return $fieldlist;
+	}
+	
+	function getActiveFields(){
+		$activefields = array();
+		$activefields=sane_parsestr($this->activefields);
+		return $activefields;
+	}
+		
 	function getParameters () {
 		$paramarray = array();
-		parse_str($this->parameters, $paramarray);
+		$paramarray=sane_parsestr($this->parameters);
 		return $paramarray;
 	}
 	
