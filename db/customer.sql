@@ -613,6 +613,28 @@ $$$
 ALTER TABLE `systemstats` ADD PRIMARY KEY ( `date` , `hour` ) ;
 $$$
 
+CREATE TABLE reportinstance (
+  ID int(11) NOT NULL auto_increment,
+  Parameters text NOT NULL,
+  Fields text NULL,
+  Activefields text NULL,
+  PRIMARY KEY  (ID)
+) TYPE=InnoDB;
+$$$
+
+CREATE TABLE `reportsubscription` (
+  `ID` int(11) NOT NULL auto_increment,
+  `UserID` int(11) NOT NULL default '0',
+  `Name` varchar(20) NOT NULL default '',
+  `ReportInstanceID` int(11) NOT NULL default '0',
+  `Dow` varchar(255) NOT NULL default '',
+  `Dom` tinyint(4) NOT NULL default '0',
+  `Date` date NOT NULL default '0000-00-00',
+  `NextRun` datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (`ID`),
+  KEY `subscription` (`UserID`,`ReportInstanceID`)
+) TYPE=InnoDB;
+$$$
 
 -- triggers from customer database to shard database
 
