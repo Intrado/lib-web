@@ -160,6 +160,8 @@ function isNotComplexPass($pass) {
 function isSequential($number){
 	$isseq = 0;
 	$neg=0;
+	if($number == "")
+		return $isseq;
 	if($number[0]-$number[1] == -1){
 		$isseq=1;
 		$neg = 0;
@@ -270,5 +272,76 @@ function sane_parsestr($url) {
 	return $data;
 }
 
+function generateFields($tablealias){
+	$fieldstring = "";
+	$first = FieldMap::GetFirstNameField();
+	$last = FieldMap::GetLastNameField();
+	for($i=1; $i<=20; $i++){
+		
+		if($i<10){
+			$num = "f0".$i;
+		}else{
+			$num = "f".$i;
+		}
+		if($num == $first || $num == $last){
+			continue;
+		} else{
+			$fieldstring .= "," . $tablealias . "." . $num;
+		}
+	}
+	return $fieldstring;
+}
+
+function select_metadata($tablename=null, $start=null, $fields){
+	global $USER;
+?>
+	<table border="0" cellpadding="2" cellspacing="1" class="list">
+		<tr class="listHeader" align="left" valign="bottom">
+<?
+			foreach($fields as $field){
+				?><td><?=$field->name;?></td><?
+			}
+?>
+		</tr>
+		<tr>
+<?
+			$count = 1;
+			foreach($fields as $field){
+				$fieldnum = $field->fieldnum;
+				if(!isset($_SESSION['saved_report']) || !$_SESSION['saved_report']){
+					$usersetting = DBFind("UserSetting", "from usersetting where name = '" . DBSafe($field->fieldnum) . "' and userid = '$USER->id'");
+					if($usersetting!= null){
+						if($usersetting->value == "true"){
+							$_SESSION['fields'][$fieldnum] = true;
+						} else if($usersetting->value == "false"){
+							$_SESSION['fields'][$fieldnum] = false;
+						}
+					}
+				}
+				?><td><div align="center">
+				<? 
+					if(!isset($_SESSION['fields'][$fieldnum]) || $_SESSION['fields'][$fieldnum]){
+						$result = "<img src=\"img/checkbox-check.png\" onclick=\"dofieldbox(this,true,'$fieldnum');";
+						$checked = "checked>";
+					} else {
+						$result = "<img src=\"img/checkbox-clear.png\" onclick=\"dofieldbox(this,false,'$fieldnum');";
+						$checked = ">";
+					}
+					if($tablename == null && $start ==null){
+						$result .= "\">";
+					} else {
+						$result .= "toggleHiddenField('$fieldnum'); setColVisability($tablename, $start+$count, new getObj('hiddenfield$fieldnum').obj.checked); \">";
+					}				
+					echo $result;
+					echo "<input style='display: none' type='checkbox' id='hiddenfield$fieldnum' " . $checked;
+				?>
+				</div></td><?
+				$count++;
+			}
+?>
+		</tr>
+	</table>
+<?
+}
 
 ?>
