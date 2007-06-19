@@ -36,8 +36,8 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['-- Reports & Status --'] = "false;";
 	if ($USER->authorize('createreport')) {
-		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "window.location='reportoptions.php'";
-		$SHORTCUTS['&nbsp;&nbsp;View Job Summary'] = "window.location='reportsummary.php'";
+		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "window.location='report_edit.php'";
+		$SHORTCUTS['&nbsp;&nbsp;View Job Summary'] = "window.location='report_job.php'";
 	}
 	if ($USER->authorize('viewsystemreports')) {
 		$SHORTCUTS['&nbsp;&nbsp;Usage Stats'] = "window.location='reportsystem.php'";
@@ -71,14 +71,11 @@ $NAVTREE = array (
 		array("SMS","smsjobs.php","sendsms",$SUBTAB=="sms")
 		)),
 	array("Reports","reportsummary.php",array('createreport','viewsystemreports'),$MAINTAB=="reports",array(
-		array("Job Report","reportsummary.php","createreport",$SUBTAB=="jobsummary"),
-		array("Report Builder","reportoptions.php","createreport",$SUBTAB=="builder"),
-		//give the report viewer the default of a "today" report if there was no previous report
-		array("View Report","report.php" . (isset($_SESSION['reportsql']) ? "" : "?reporttype=relative&jobtype_relative_data=today"),"createreport",$SUBTAB=="view"),
-		array("Usage Stats","reportsystem.php","viewsystemreports",$SUBTAB=="system"),
-		array("Call Distribution","reportsystemdistribution.php","viewsystemreports",$SUBTAB=="distribution"),
+		array("Reports", "reports.php", "createreport", $SUBTAB=="reports"),
 		array("SMS Report","reportsms.php?smsjobid=","createreport",$SUBTAB=="sms"),
-
+		//give the report viewer the default of a "today" report if there was no previous report
+		array("Usage Stats","reportsystem.php","viewsystemreports",$SUBTAB=="system"),
+		array("Call Distribution","reportsystemdistribution.php","viewsystemreports",$SUBTAB=="distribution")
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
 						'viewsystemrepeating','viewcontacts','blocknumbers'),$MAINTAB=="system",array(
@@ -88,6 +85,7 @@ $NAVTREE = array (
 
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
 		array("Contacts","contacts.php","viewcontacts",$SUBTAB=="contacts"),
+		array("Contact Search","contact_search.php","viewcontacts",$SUBTAB=="contact search"),
 		array("Blocked Numbers","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
