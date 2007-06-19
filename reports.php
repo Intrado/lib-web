@@ -70,7 +70,7 @@ $scroll = false;
 
 
 startWindow("Saved Reports");
-button_bar(button("newreport", null, "report_edit.php"));
+button_bar(button("newreport", null, "reportedit.php"));
 showObjects($data, $titles, $formatters, $scroll, true);
 EndWindow();
 include("navbottom.inc.php");
