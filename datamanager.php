@@ -76,8 +76,8 @@ if (isset($_GET['clear'])) {
 }
 
 
-$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,language', 'multisearch,grade',
-						'multisearch,school', 'text,firstname',  'text,lastname');
+$VALID_TYPES = array('text', 'reldate', 'multisearch', 'language', 'grade',
+						'school', 'firstname',  'lastname');
 $FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 $availablefields = array();
 for ($x = 1; $x <= 20; $x++)
@@ -124,6 +124,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
 										DBSafe(GetFormData($form, $section, "newfield_type") .
 										($specialtype ? ',' . DBSafe($specialtype) : ''));
+				
 				if ($newfield->update()) {
 					// Requery to get the newly inserted row
 					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
@@ -136,13 +137,16 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				$fieldnum = $field->fieldnum;
 				if ($fieldnum != FieldMap::getFirstNameField() &&
 					$fieldnum != FieldMap::getLastNameField() &&
-					$fieldnum != FieldMap::getLanguageField()) {
+					$fieldnum != FieldMap::getLanguageField() &&
+					$fieldnum != FieldMap::getSchoolField() &&
+					$fieldnum != FieldMap::getGradeField() )
+					{
 					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
 					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
 					$searchable = GetFormData($form, $section, "searchable_$fieldnum");
 
 					// Check that new name contains only alphanumerics, underscores, and spaces
-					$cleanedname = preg_replace('/[^\w ]/', '#', DBSafe(GetFormData($form, $section, "name_$fieldnum")));
+					$cleanedname = preg_replace('/[^\w ]/', '#', $name);
 					PutFormData($form, $section, 'newfield_name', $cleanedname);
 					if (!preg_match("/\w/", $cleanedname)) { // Find at least one alphanumeric or underscore character
 						error("Please choose a field name that is at least one alphanumeric character long");
@@ -152,6 +156,22 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
 						$updatefield->name = $cleanedname;
 						$updatefield->options = ($searchable ? 'searchable,' : '') . $type;
+						$updatefield->update();
+						// Requery to get the newly inserted row
+						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
+					}
+				} else {
+					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
+					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
+					$cleanedname = preg_replace('/[^\w ]/', '#', DBSafe(GetFormData($form, $section, "name_$fieldnum")));
+					PutFormData($form, $section, 'newfield_name', $cleanedname);
+					if (!preg_match("/\w/", $cleanedname)) { // Find at least one alphanumeric or underscore character
+						error("Please choose a field name that is at least one alphanumeric character long");
+					} else if (!in_array($type, $VALID_TYPES)) {
+						error("The field type, $type, is not valid");
+					} else if ($name !== null || $type !== null || $searchable !== null) {
+						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
+						$updatefield->name = $cleanedname;
 						$updatefield->update();
 						// Requery to get the newly inserted row
 						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
