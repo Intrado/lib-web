@@ -636,6 +636,11 @@ CREATE TABLE `reportsubscription` (
 ) TYPE=InnoDB;
 $$$
 
+ALTER TABLE `reportinstance` ADD InstanceHash varchar(32) NOT NULL default '';
+$$$
+
+ALTER TABLE `reportsubscription` ADD `time` TIME NOT NULL default '00:00:00';
+
 -- triggers from customer database to shard database
 
 CREATE TRIGGER insert_repeating_job
