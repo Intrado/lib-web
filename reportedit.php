@@ -56,8 +56,8 @@ if(CheckFormSubmit($f, $s))
 		} else if(GetFormData($f, $s, "radio") == 1 && !strtotime(GetFormData($f, $s, "date"))){
 			error('That date was invalid');
 		} else {
-			
-			
+
+
 			$options['reporttype'] = GetFormData($f, $s, "reporttype");
 			$radio = GetFormData($f, $s, "radio");
 			switch($radio){
@@ -79,10 +79,10 @@ if(CheckFormSubmit($f, $s))
 			$reportsubscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
 			$reportinstance->setParameters($options);
 			$reportinstance->update();
-			
+
 			$reportsubscription->name = GetFormData($f, $s, "name");
 			$reportsubscription->reportinstanceid = $reportinstance->id;
-			
+
 			$reportsubscription->update();
 			redirect("reportsavedoptions.php?reportid=$reportsubscription->id");
 		}
@@ -93,7 +93,7 @@ if(CheckFormSubmit($f, $s))
 
 if($reload){
 	ClearFormData($f);
-	
+
 	$dom = "0";
 	$rundate = "";
 	$dowarray = array();
@@ -111,9 +111,9 @@ if($reload){
 	PutFormData($f, $s, "dom", $dom ? $dom : "1" );
 	PutFormData($f, $s, "reportsubscription", isset($reportsubscription) ? $reportsubscription->id : "");
 	PutFormData($f, $s, "date", $rundate, "text");
-	PutFormData($f, $s, "name", isset($reportsubscription) ? $reportsubscription->name : "", "text", null, null, true);
+	PutFormData($f, $s, "name", isset($reportsubscription) ? $reportsubscription->name : "", "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "reporttype", isset($options['reporttype']) ? $options['reporttype'] : "", null, null, null, true );
-	
+
 	$radio = 0;
 	if($rundate){
 		$radio= 1;
@@ -123,7 +123,7 @@ if($reload){
 		$radio= 3;
 	}
 	PutFormData($f, $s, "radio", $radio);
-	
+
 	if(isset($reportsubscription->time)){
 		$settime = date("g:i a", strtotime($reportsubscription->time));
 	}
@@ -151,16 +151,16 @@ startWindow("Schedule Report");
 				<tr><td>Report Type:</td>
 					<td>
 						<?
-							NewFormItem($f, $s, 'reporttype', 'selectstart'); 
+							NewFormItem($f, $s, 'reporttype', 'selectstart');
 							NewFormItem($f, $s, 'reporttype', 'selectoption', " -- Select a Type -- ", "");
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Job Report", "jobreport");
-							NewFormItem($f, $s, 'reporttype', 'selectoption', "Survey Report", "surveyreport"); 
-							NewFormItem($f, $s, 'reporttype', 'selectoption', "Calls Report", "callsreport"); 
+							NewFormItem($f, $s, 'reporttype', 'selectoption', "Survey Report", "surveyreport");
+							NewFormItem($f, $s, 'reporttype', 'selectoption', "Calls Report", "callsreport");
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Undelivered Calls", "undelivered");
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Attendance Calls", "attendance");
-							NewFormItem($f, $s, 'reporttype', 'selectoption', "Emergency Calls", "emergency"); 
+							NewFormItem($f, $s, 'reporttype', 'selectoption', "Emergency Calls", "emergency");
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Contacts Report", "contacts");
-							NewFormItem($f, $s, 'reporttype', 'selectend'); 
+							NewFormItem($f, $s, 'reporttype', 'selectend');
 						?>
 					</td>
 				</tr>
