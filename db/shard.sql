@@ -5,7 +5,6 @@ CREATE TABLE qjob (
   id int(11) NOT NULL,
   userid int(11) NOT NULL default '0',
   scheduleid int(11) default NULL,
-  jobtypeid int(11) default '0',
   listid int(11) NOT NULL default '0',
   phonemessageid int(11) default NULL,
   emailmessageid int(11) default NULL,
@@ -16,9 +15,13 @@ CREATE TABLE qjob (
   enddate date NOT NULL default '0000-00-00',
   starttime time NOT NULL default '00:00:00',
   endtime time NOT NULL default '00:00:00',
-  `status` enum('new','processing','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
+  `status` enum('new','processing','active','cancelling','repeating') NOT NULL default 'new',
   `attempts` tinyint(4) NOT NULL default '0',
   `sequence` tinyint(4) NOT NULL default '0',
+  `maxsequence` tinyint(4) NOT NULL default '0',
+  `phonetaskcount` int(11) NOT NULL default '0',
+  systempriority tinyint(4) NOT NULL default '3',
+  timeslices smallint(6) NOT NULL default '0',
   `thesql` text,
   PRIMARY KEY  (customerid,id),
   KEY `status` (`status`,id),
@@ -57,6 +60,7 @@ CREATE TABLE `qjobtask` (
   `lastattempttime` bigint(20) default NULL,
   `nextattempttime` bigint(20) default NULL,
   `phone` varchar(20) default NULL,
+  `uuid` varchar(255) NOT NULL,
   PRIMARY KEY  (`customerid`,`jobid`,`type`,`personid`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
