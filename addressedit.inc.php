@@ -274,6 +274,7 @@ startWindow("Contact");
 		<td  class="bottomBorder">
 			<?
 			NewFormItem($f,$s,FieldMap::getLanguageField(),"selectstart");
+			NewFormItem($f,$s,FieldMap::getLanguageField(),"selectoption"," - ","");
 			$data = DBFindMany('Language', "from language order by name");
 			foreach($data as $language)
 				NewFormItem($f,$s,FieldMap::getLanguageField(),"selectoption",$language->name,$language->name);
