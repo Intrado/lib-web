@@ -188,7 +188,13 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		$data = file_get_contents($curfilename);
 		if ($import->upload($data)) {
 			$import->runNow();
-			sleep(3);
+
+			$import->refresh();
+			while ($import->status == "queued" || $import->status == "running") {
+				sleep(1);
+				$import->refresh();
+			}
+
 		} else {
 			$errormsg = 'Unable to complete file upload. Please try again.';
 		}
