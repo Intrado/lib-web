@@ -14,15 +14,15 @@ CREATE TABLE `aspadminuser` (
 CREATE TABLE `customer` (
   `id` int(11) NOT NULL auto_increment,
   `shardid` tinyint(4) NOT NULL,
-  `hostname` varchar(255) NOT NULL default '',
+  `urlcomponent` varchar(255) NOT NULL default '',
   `inboundnumber` varchar(20) NOT NULL default '',
   `dbusername` varchar(50) NOT NULL default '',
   `dbpassword` varchar(50) NOT NULL default '',
-  `token` varchar(255) NOT NULL default '',
-  `expiration` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `logintoken` varchar(255) NOT NULL default '',
+  `logintokenexpiretime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `enabled` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `hostname` (`hostname`),
+  KEY `urlcomponent` (`urlcomponent`),
   KEY `inboundnumber` (`inboundnumber`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS  `sessiondata` (
 
 CREATE TABLE `shard` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-  `dbhost` VARCHAR( 50 ) NOT NULL default '',
+  `name` VARCHAR(255) NOT NULL default '',
+  `description` VARCHAR(255) NOT NULL default '',
+  `dbhost` VARCHAR( 255 ) NOT NULL default '',
   `dbusername` VARCHAR( 50 ) NOT NULL default '',
   `dbpassword` VARCHAR( 50 ) NOT NULL default ''
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
