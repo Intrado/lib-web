@@ -47,14 +47,14 @@ function fmt_jobcount($row, $index){
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$res = Query("select shardhost, sharduser, shardpass from shardinfo order by shardhost");
+$res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 $shardinfo = array();
 while($row = DBGetRow($res)){
-	$shardinfo[$row[0]] = array($row[1], $row[2]);
+	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
 }
 
 
-$customerquery = Query("select id, dbhost, hostname from customer order by dbhost, id");
+$customerquery = Query("select id, shardid, urlcomponent from customer order by shardid, id");
 $customers = array();
 while($row = DBGetRow($customerquery)){
 	$customers[] = $row;
@@ -65,7 +65,7 @@ $data = array();
 foreach($customers as $cust) {
 
 	if($currhost != $cust[1]){
-		$custdb = mysql_connect($cust[1],$shardinfo[$cust[1]][0], $shardinfo[$cust[1]][1])
+		$custdb = mysql_connect($shardinfo[$cust[1]][0],$shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2])
 			or die("Could not connect to customer database: " . mysql_error());
 		$currhost = $cust[1];
 	}
