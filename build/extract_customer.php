@@ -229,8 +229,8 @@ $result = mysql_query("select hostname, inboundnumber from customer where id = '
 
 $row = mysql_fetch_row($result);
 $custpass = genpassword();
-$destres = mysql_query("insert into customer(hostname, inboundnumber, dbhost, dbusername, dbpassword, enabled) values
-						('$row[0]', '$row[1]', '$dbhost', '$newdbname', '$custpass', '1')", $authdb)
+$destres = mysql_query("insert into customer(urlcomponent, inboundnumber, shardid, dbusername, dbpassword, enabled) values
+						('$row[0]', '$row[1]', '1', '$newdbname', '$custpass', '1')", $authdb)
 						or die("Failed to insert new customer into auth server: " . mysql_error($custdb));
 if($customerid != mysql_insert_id()){
 	die("Customerid and row inserted in auth db does not match.");
@@ -424,7 +424,7 @@ copytable($customerid,"usersetting",array("id", "userid", "name", "value"),$db,$
 
 //VOICEREPLY
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
-copytable($customerid,"voicereply",array("id", "jobtaskid", "jobworkitemid", "personid", "jobid", "userid", "contentid", "replytime", "listened"),$db,$custdb,1000,$join);
+copytable($customerid,"voicereply",array("id", "personid", "jobid", "userid", "contentid", "replytime", "listened"),$db,$custdb,1000,$join);
 
 
 ?>
