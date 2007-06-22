@@ -13,7 +13,7 @@ if (isset($_GET['id'])) {
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 if(isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
-	$custquery = Query("select dbhost, dbusername, dbpassword, hostname from customer where id = '$currentid'");
+	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custinfo = mysql_fetch_row($custquery);
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
 	if(!$custdb) {

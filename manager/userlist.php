@@ -7,7 +7,7 @@ include_once("../inc/table.inc.php");
 
 $customerid = $_GET["customer"] + 0;
 
-$custquery = Query("select dbhost, dbusername, dbpassword, hostname from customer where id = '$customerid'");
+$custquery = Query("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
 $cust = mysql_fetch_row($custquery);
 
 ////////////////////////////////////////////////////////////////////////////////
