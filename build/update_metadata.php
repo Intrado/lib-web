@@ -13,7 +13,7 @@ $auth = mysql_connect($authhost, $authuser, $authpass)
 			or die("Could not connect to auth: " . mysql_error($authdb));
 mysql_select_db($authdb, $auth);
 
-$query = "select id, dbhost, dbusername, dbpassword, hostname from customer where id = '$customerid'";
+$query = "select c.id, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = '$customerid'";
 $res = mysql_query($query, $auth);
 $customer = mysql_fetch_row($res);
 

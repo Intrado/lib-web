@@ -12,13 +12,13 @@ $auth = mysql_connect($authhost, $authuser, $authpass)
 			or die("Could not connect to auth: " . mysql_error($authdb));
 mysql_select_db($authdb, $auth);
 		
-$res = mysql_query("select shardhost, sharduser, shardpass from shardinfo order by shardhost", $auth);
+$res = mysql_query("select id, dbhost, dbusername, dbpassword from shard order by id", $auth);
 $shardinfo = array();
 while($row = mysql_fetch_row($res)){
 	$shardinfo[$row[0]] = array($row[1], $row[2]);
 }
 
-$customerquery = mysql_query("select id, dbhost, hostname from customer", $auth);
+$customerquery = mysql_query("select id, shardid from customer", $auth);
 $customers = array();
 while($row = mysql_fetch_row($customerquery)){
 	$customers[] = $row;
@@ -26,7 +26,7 @@ while($row = mysql_fetch_row($customerquery)){
 
 foreach($customers as $customer) {
 	//connect to customer
-	$custdb = mysql_connect($customer[1], $shardinfo[$customer[1]][0], $shardinfo[$customer[1]][1])
+	$custdb = mysql_connect($shardinfo[$customer[1]][0], $shardinfo[$customer[1]][1], $shardinfo[$customer[1]][2])
 				or die("Could not connect to customer: " . mysql_error($custdb));
 	mysql_select_db("c_$customer[0]", $custdb)
 				or die("Could not select customer db: " . mysql_error($custdb));
