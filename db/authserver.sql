@@ -13,13 +13,13 @@ CREATE TABLE `aspadminuser` (
 
 CREATE TABLE `customer` (
   `id` int(11) NOT NULL auto_increment,
+  `shardid` tinyint(4) NOT NULL,
   `hostname` varchar(255) NOT NULL default '',
   `inboundnumber` varchar(20) NOT NULL default '',
-  `dbhost` varchar(50) NOT NULL default '',
   `dbusername` varchar(50) NOT NULL default '',
   `dbpassword` varchar(50) NOT NULL default '',
-  `asptoken` varchar(255) NOT NULL default '',
-  `aspexpiration` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `token` varchar(255) NOT NULL default '',
+  `expiration` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `enabled` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `hostname` (`hostname`),
@@ -36,10 +36,9 @@ CREATE TABLE IF NOT EXISTS  `sessiondata` (
   KEY `lastused` (`lastused`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `shardinfo` (
+CREATE TABLE `shard` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-  `shardhost` VARCHAR( 255 ) NOT NULL default '',
-  `sharduser` VARCHAR( 255 ) NOT NULL default '',
-  `shardpass` VARCHAR( 255 ) NOT NULL default ''
+  `dbhost` VARCHAR( 50 ) NOT NULL default '',
+  `dbusername` VARCHAR( 50 ) NOT NULL default '',
+  `dbpassword` VARCHAR( 50 ) NOT NULL default ''
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
-
