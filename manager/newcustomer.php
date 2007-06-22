@@ -86,14 +86,16 @@ if (CheckFormSubmit($f,$s)){
 				$renewaldate = $renewaldate ? date("Y-m-d", $renewaldate) : "";
 
 				//choose shard info based on selection
-				$shardinfo = QuickQueryRow("select id, shardhost, sharduser, shardpass from shardinfo where id = '$shard'", true);
-				$shardhost = $shardinfo['shardhost'];
-				$sharduser = $shardinfo['sharduser'];
-				$shardpass = $shardinfo['shardpass'];
+				$shardinfo = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard where id = '$shard'", true);
+				$shardid = $shardinfo['id'];
+				$shardhost = $shardinfo['dbhost'];
+				$sharduser = $shardinfo['dbusername'];
+				$shardpass = $shardinfo['dbpassword'];
 
 				$dbpassword = genpassword();
-				QuickUpdate("insert into customer (hostname, dbhost,dbpassword,inboundnumber,enabled) values
-												('" . DBSafe($hostname) . "','$shardhost', '$dbpassword', '" . DBSafe($inboundnum) . "', '1')" );
+				QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword,inboundnumber,enabled) values
+												('" . DBSafe($hostname) . "','$shardid', '$dbpassword', '" . DBSafe($inboundnum) . "', '1')" )
+						or die("failed to insert customer into auth server");
 				$customerid = mysql_insert_id();
 
 				$newdbname = "c_$customerid";
@@ -176,8 +178,8 @@ if (CheckFormSubmit($f,$s)){
 
 
 				$query = "INSERT INTO `jobtype` (`name`, `priority`, `systempriority`, timeslices, `deleted`) VALUES
-							('Emergency', 10000, 1, 450, 0),
-							('Attendance', 20000, 2, 0, 0),
+							('Emergency', 10000, 3, 225, 0),
+							('Attendance', 20000, 3, 0, 0),
 							('General', 30000, 3, 450, 0)";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
@@ -257,14 +259,14 @@ NewFormItem($f, $s,"", 'submit');
 
 <tr><td>Shard: </td><td>
 <?
-	$shardquery = Query("select id, shardhost, sharduser, shardpass from shardinfo");
+	$shardquery = Query("select id, name from shard order by id");
 	$shards = array();
 	while($row = DBGetRow($shardquery, true)){
 		$shards[] = $row;
 	}
 	NewFormItem($f, $s, 'shard', "selectstart");
 	foreach($shards as $shard) {
-		NewFormItem($f, $s, 'shard', "selectoption", "shard". $shard['id'], $shard['id'] );
+		NewFormItem($f, $s, 'shard', "selectoption", $shard['name'], $shard['id'] );
 	}
 	NewFormItem($f, $s, 'shard', "selectend");
 ?>
