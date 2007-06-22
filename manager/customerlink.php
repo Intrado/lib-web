@@ -32,10 +32,10 @@ $manager = new AspAdminUser($_SESSION['aspadminuserid']);
 if(isset($_REQUEST['submit']) && $_REQUEST['submit']){
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	if($manager->runCheck($password)){
-		$customerurl = QuickQuery("select hostname from customer where id = '$custid'");
+		$customerurl = QuickQuery("select urlcomponent from customer where id = '$custid'");
 		$string = md5(genpassword() . $manager->login . microtime() . $customerurl);
 		// TODO we may want to set the expiration interval in the properties file
-		QuickUpdate("update customer set asptoken = '$string', aspexpiration = now() + interval 10 minute where id = '$custid'");
+		QuickUpdate("update customer set logintoken = '$string', logintokenexpiretime = now() + interval 10 minute where id = '$custid'");
 	} else {
 		error("That was an invalid password");
 	}
