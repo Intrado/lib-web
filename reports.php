@@ -25,12 +25,36 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_report_actions($obj){
-	return "<a href='reportedit.php?reportid=$obj->id' />Edit</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id&runreport=true' />Run Report</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id' />Options</a>";
+	return "<a href='reportedit.php?reportid=$obj->id' >Edit</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id&runreport=true' >Run Report</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id' >Options</a>&nbsp;|&nbsp;<a href='reports.php?delete=$obj->id' onclick='return confirm(\"Are you sure you want to delete this?\")';>Delete</a>";
 }
 
 function fmt_next_run($obj){
 	return $obj->nextrun;
 }
+
+function fmt_last_run($obj){
+	return $obj->lastrun;
+}
+
+function fmt_report_type($obj){
+	$instance = new ReportInstance($obj->reportinstanceid);
+	$options = $instance->getParameters();
+	return fmt_report_name($options['reporttype']);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+if(isset($_REQUEST['delete'])){
+	if(userOwns("reportsubscription", $_REQUEST['delete']+0)){
+		$subscription = new ReportSubscription($_REQUEST['delete']+0);
+		$instance = new ReportInstance($subscription->instanceid);
+		$instance->destroy();
+		$subscription->destroy();
+	}
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -42,16 +66,16 @@ include("nav.inc.php");
 
 startWindow("Custom Reports");
 ?>
-	<table width="100%" cellpadding="3" cellspacing="1" class="list" >
+	<table width="100%" cellpadding="3" cellspacing="2" class="list" >
 		<tr>
-			<td><a href='report_job.php'/>Jobs</a></td>
-			<td><a href='report_notified.php'/>Notification Search</a></td>
-			<td><a href='report_notified.php?attendance=1'/>Attendance</a></td>
+			<td><a href='reportjob.php?clear=1'/>Jobs</a></td>
+			<td><a href='reportcallssearch.php?clear=1&callsreport=1'/>Individual Calls Report</a></td>
+			<td><a href='reportcallssearch.php?clear=1&attendance=1'/>Attendance Calls</a></td>
 		</tr>
 		<tr>
-			<td><a href='report_survey.php'/>Surveys</a></td>
-			<td><a href='report_unnotified.php'/>Undelivered Calls</a></td>
-			<td><a href='report_notified.php?emergency=1'/>Emergencies</a></td>
+			<td><a href='reportsurvey.php?clear=1'/>Surveys</a></td>
+			<td><a href='reportcallssearch.php?clear=1&undelivered=1'/>Undelivered Calls</a></td>
+			<td><a href='reportcallssearch.php?clear=1&emergency=1'/>Emergency Calls</a></td>
 		</tr>
 	</table>
 <?
@@ -62,10 +86,15 @@ endWindow();
 $data = DBFindMany("ReportSubscription", "from reportsubscription where userid = '$USER->id'");
 
 $titles = array("name" => "Name",
+				"description" => "Description",
+				"Type"	=> "Type",
 				"Next Run" => "Next Run",
+				"Last Run" => "Last Run",
 				"Actions" => "Actions");
 $formatters = array("Actions" => "fmt_report_actions",
-					"Next Run" => "fmt_next_run");
+					"Next Run" => "fmt_next_run",
+					"Type" => "fmt_report_type",
+					"Last Run" => "fmt_last_run");
 $scroll = false;
 
 
