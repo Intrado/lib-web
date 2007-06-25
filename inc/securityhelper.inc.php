@@ -11,6 +11,7 @@ function exists($table, $name) {
 function userOwns ($type,$id) {
 	global $USER;
 	switch($type) {
+		case "reportsubscription":
 		case "list":
 		case "job":
 		case "smsjob":
