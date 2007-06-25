@@ -1,14 +1,15 @@
 <?
 
 if ($argc < 6)
-	exit("Usage: reportsubscription id, filename, dbhost, db, user, dbpass,");
+	exit("Usage: reportsubscription id, type, filename, dbhost, db, user, dbpass,");
 
 $id = $argv[1];
-$filename = $argv[2];
-$host = $argv[3];
-$db = $argv[4];
-$user = $argv[5];
-$pass = $argv[6];
+$type = $argv[2];
+$filename = $argv[3];
+$host = $argv[4];
+$db = $argv[5];
+$user = $argv[6];
+$pass = $argv[7];
 
 $params = array("host" => "jdbc:mysql://" . $host . "/" . $db,
 				"user" => $user,
@@ -32,31 +33,49 @@ require_once("../obj/ContactsReport.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
+require_once("../obj/Job.obj.php");
 require_once("XML/RPC.php");
 
-
-$reportfile = "";
-$subscription = new ReportSubscription($id);
-$instance = new ReportInstance($subscription->reportinstanceid);
-$options = $instance->getParameters();
-switch($options['reporttype']){
-
-	case 'attendance':
-	case 'emergency':
-	case 'undelivered':
-	case 'callsreport':
-		$generator = new CallsReport();
-		break;
-	case 'surveyreport':
-		$generator = new SurveyReport();
-		break;
-	case 'jobreport':
+if($type == "subscription"){
+	$subscription = new ReportSubscription($id);
+	$instance = new ReportInstance($subscription->reportinstanceid);
+	$options = $instance->getParameters();
+	switch($options['reporttype']){
+	
+		case 'attendance':
+		case 'emergency':
+		case 'undelivered':
+		case 'callsreport':
+			$generator = new CallsReport();
+			break;
+		case 'surveyreport':
+			$generator = new SurveyReport();
+			break;
+		case 'jobreport':
+			$generator = new JobReport();
+			break;
+		case 'contactsreport':
+			$generator = new ContactsReport();
+			break;
+	}
+	$generator->userid = $subscription->userid;
+} else if($type == "job"){
+	$instance = new ReportInstance();
+	$job = new Job($id);
+	$options = array();
+	if($job->questionnaireid == null){
 		$generator = new JobReport();
-		break;
-	case 'contactsreport':
-		$generator = new ContactsReport();
-		break;
+		$options['reporttype'] = 'jobreport';
+	} else {
+		$generator = new SurveyReport();
+		$options['reporttype'] = 'surveyreport';
+	}
+	$options['jobid'] = $id;
+	$instance->setParameters($options);
+	$generator->userid = $job->userid;
 }
+	
+
 
 if(!isset($generator)){
 	exit("Bad report type, corresponding generator not found\n");
@@ -64,7 +83,6 @@ if(!isset($generator)){
 
 $generator->format = "pdf";
 $generator->reportinstance = $instance;
-$generator->userid = $subscription->userid;
 echo "finished configuring generator\n";
 $generator->generateQuery();
 echo "finished generating query\n";
