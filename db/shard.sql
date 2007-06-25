@@ -85,3 +85,16 @@ CREATE TABLE `importqueue` (
   UNIQUE KEY `import` (`customerid`,`localimportid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+
+-- --------------------------------------------------------
+
+CREATE TABLE `jobstatdata` (
+  `jobid` int(11) NOT NULL,
+  `customerid` int(11) NOT NULL,
+  `attempt` tinyint(4) NOT NULL,
+  `priority` tinyint(4) NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `priority_fraction` float NOT NULL,
+  `customer_fraction` float NOT NULL,
+  `job_fraction` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
