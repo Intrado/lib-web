@@ -63,6 +63,8 @@ if(CheckFormSubmit($f, $s))
 			switch($radio){
 				case '1':
 					$reportsubscription->date = date("Y-m-d", strtotime(GetFormData($f, $s, "date")));
+					$reportsubscription->dow = null;
+					$reportsubscription->dom = null;
 					break;
 				case '2':
 					$dow = array();
@@ -71,12 +73,17 @@ if(CheckFormSubmit($f, $s))
 							$dow[] = $i;
 					}
 					$reportsubscription->dow = implode(",", $dow);
+					$reportsubscription->date = null;
+					$reportsubscription->dom = null;
 					break;
 				case '3':
 					$reportsubscription->dom = GetFormData($f, $s, "dom");
+					$reportsubscription->date = null;
+					$reportsubscription->dow = null;
 					break;
 			}
 			$reportsubscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
+			$reportsubscription->nextrun = $reportsubscription->calcNextRun();
 			$reportinstance->setParameters($options);
 			$reportinstance->update();
 
