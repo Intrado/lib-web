@@ -28,7 +28,7 @@ $data = array();
 $legend = array();
 $colors = array();
 
-if ($jobstats['phone']) {
+if (isset($jobstats['phone'])) {
 
 	if ($numnoresponse = $jobstats['phone']['contacted'] - $jobstats['survey']['phoneparticipants']) {
 		$data[] = $numnoresponse;
@@ -43,7 +43,7 @@ if ($jobstats['phone']) {
 }
 
 
-if ($jobstats['email']) {
+if (isset($jobstats['email'])) {
 
 	if ($numnoresponse = $jobstats['email']['sentemails'] - $jobstats['survey']['emailparticipants']) {
 		$data[] = $numnoresponse;
