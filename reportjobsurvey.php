@@ -94,7 +94,7 @@ if(isset($_REQUEST['reportid'])){
 			unset($_SESSION['jobstats'][$jobid]);
 			$job = new Job($jobid);	
 			
-			$options["reporttype"] = $_SESSION['reporttype'];
+			$options["reporttype"] = isset($_SESSION['reporttype']) ? $_SESSION['reporttype'] : "jobreport";
 
 		}
 		$_SESSION['saved_report'] = false;
