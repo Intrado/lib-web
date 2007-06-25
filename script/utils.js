@@ -259,3 +259,17 @@ function modifyMarkedNodes (parent,attribute,marker,callback) {
 		}
 	}
 }
+
+function dofieldbox (img, init, field) {
+	if (!img.toggleset) {
+		img.toggleset = true;
+		img.toggle = init;
+	}
+	img.toggle = !img.toggle;
+	img.src = "checkboxfield.png.php?toggle=" + img.toggle + "&field=" + field + "&foo=" + new Date();
+}
+
+function toggleHiddenField(i){
+	var checkbox = new getObj("hiddenfield".concat(i)).obj;
+	checkbox.checked = !checkbox.checked;
+}
