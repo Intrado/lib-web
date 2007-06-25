@@ -8,8 +8,10 @@ class ReportSubscription extends DBMappedObject {
 	var $dow;
 	var $dom;
 	var $date;
+	var $lastrun;
 	var $nextrun;
 	var $time;
+
 
 	//var $reportinstance; // doesnt make sence in this context, subscriptions are children of reportinstance
 	var $reportschedule;
@@ -18,7 +20,7 @@ class ReportSubscription extends DBMappedObject {
 	function ReportSubscription ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "reportsubscription";
-		$this->_fieldlist = array("userid", "name", "description", "reportinstanceid","dow", "dom", "date", "nextrun", "time");
+		$this->_fieldlist = array("userid", "name", "description", "reportinstanceid","dow", "dom", "date", "lastrun", "nextrun", "time");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
