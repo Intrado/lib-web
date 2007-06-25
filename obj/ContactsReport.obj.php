@@ -1,0 +1,249 @@
+<?
+
+class ContactsReport extends ReportGenerator {
+
+	function generateQuery(){
+		global $USER;
+		
+		$instance = $this->reportinstance;
+		$params = $this->params = $instance->getParameters();
+		$this->reporttype = $params['reporttype'];
+		$orders = array("order1", "order2", "order3");
+		$orderquery = "";
+		foreach($orders as $order){
+			if(!isset($params[$order]))
+				continue;
+			$orderby = $params[$order];
+			if($orderby == "") continue;
+			if($orderquery == ""){
+				$orderquery = " order by ";
+			} else {
+				$orderquery .= ", ";
+			}
+			$orderquery .= $orderby;
+		}
+		$rulesql = "";
+		if(isset($params['rules']) && $params['rules']){
+			$rules = explode("||", $params['rules']);
+			foreach($rules as $rule){
+				if($rule) {
+					$rule = explode(";", $rule);
+					$newrule = new Rule();
+					$newrule->logical = $rule[0];
+					$newrule->op = $rule[1];
+					$newrule->fieldnum = $rule[2];
+					$newrule->val = $rule[3];
+					$rulesql .= " " . $newrule->toSql("p");
+				}
+			}
+		}
+		$usersql = $USER->userSQL("p");
+		$phonequery="";
+		$emailquery="";
+		if(isset($params['phone'])){
+			$phonequery = $params['phone'] ? " and ph.phone like '%" . DBSafe($params['phone']) . "%'" : "";
+		} 
+		if(isset($params['email'])){
+			$emailquery = $params['email'] ? " and e.email like '%" . DBSafe($params['email']) . "%'" : "";
+		}
+		if(isset($params['personid'])){
+			$emailquery = $params['personid'] ? " and p.pkey like '%" . DBSafe($params['personid']) . "%'" : "";
+		}
+		if($orderquery == "")
+			$orderquery = "order by p.id";		
+		$this->query = "select SQL_CALC_FOUND_ROWS
+					p.id
+					from person p
+					left join phone ph on (ph.personid = p.id)
+					left join email e on (e.personid = p.id)
+					where 1
+					$phonequery
+					$emailquery
+					$usersql
+					$rulesql
+					group by p.id
+					$orderquery
+					";
+	}
+
+	function runHtml($params = null){
+
+		$fieldlist = $this->reportinstance->getFields();
+		$activefields = $this->reportinstance->getActiveFields();
+		$fieldcount = count($fieldlist);
+		$options = $this->params;
+		$query = $this->query;
+		$pagestart = isset($options['pagestart']) ? $options['pagestart'] : 0;
+		$query .= "limit $pagestart, 500";
+		$idlist = QuickQueryList($query);
+		$total = QuickQuery("select found_rows()");
+		$personlist = array();
+		$phonelist = array();
+		$emaillist = array();
+		$fieldquery = generateFields("p");
+		foreach($idlist as $id){
+			$personquery = "select
+							p.pkey as pkey, 
+							p." . FieldMap::GetFirstNameField() . " as firstname, 
+							p." . FieldMap::GetLastNameField() . " as lastname 
+							$fieldquery
+							 from person p
+							where p.id = '$id'";
+							
+			$personrow = QuickQueryRow($personquery);
+			$personlist[$id] = $personrow;
+			$phonelist[$id] = DBFindMany("Phone", "from phone where personid = '$id'");
+			$emaillist[$id] = DBFindMany("Email", "from email where personid = '$id'");
+		}
+		
+		startWindow("Search Information", "padding: 3px;"); 
+		?>
+			<table>
+<?
+				if(isset($options['personid']) && $options['personid'] != "") {
+?>
+				<tr><td>Person ID: <?=isset($options['personid']) ? $options['personid'] : ""?></td></tr>
+<?
+				}
+				if(isset($options['phone']) && $options['phone'] != "") {
+?>
+				<tr><td>Phone: <?=isset($options['phone']) ? $options['phone'] : ""?></td></tr>
+<?
+				}
+				if(isset($options['email']) && $options['email'] != "") {
+?>			
+				<tr><td>Email: <?=isset($options['email']) ? $options['email'] : ""?></td></tr>
+<?
+				}
+?>
+			</table>
+		<? 
+		endWindow();
+		?>
+		<br>
+		<?
+		startWindow("Search Results", "padding: 3px;");
+		showPageMenu($total,$pagestart,500);
+		?>
+			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
+			<tr class="listHeader">
+				<td>ID#</td>
+				<td>First Name</td>
+				<td>Last Name</td>
+				<td>Sequence</td>
+				<td>Destination</td>
+			<?
+			for($i=0;$i<20; $i++){
+				if($i<10){
+					$num = "f0" . $i;
+				} else {
+					$num = "f" . $i;
+				}
+				if(in_array($num, array_keys($fieldlist))){
+					?><td><?=$fieldlist[$num]?></td><?
+				}
+			}
+			
+		?>
+			</tr>
+		<?
+			$alt = 0;
+			foreach($idlist as $id){
+				echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+				
+				$person = $personlist[$id];
+				?>
+					<td><?=$person[0]?></td>
+					<td><?=$person[1]?></td>
+					<td><?=$person[2]?></td>
+					
+					<?
+						$first=true;
+						foreach($phonelist[$id] as $phone){
+							if(!$first) {
+								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
+								?><td></td><td></td><td></td><?
+							}
+							?>
+							<td><?=$phone->sequence +1?></td><td><?=fmt_phone_contact($phone->phone)?></td>
+							<?
+							if($first){
+								$first = false;
+								$count=0;
+								for($i=0;$i<20; $i++){
+									if($i<10){
+										$num = "f0" . $i;
+									} else {
+										$num = "f" . $i;
+									}
+									if(in_array($num, array_keys($fieldlist))){
+										?><td><?=$person[3+$count]?></td><?
+										$count++;
+									}
+								}
+							} else {
+								for($i=1; $i<$fieldcount+1; $i++){
+									?><td>&nbsp;</td><?
+								}
+							}
+							?>
+							</tr><?
+						}
+						foreach($emaillist[$id] as $email){
+							if(!$first) {
+								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
+								?><td></td><td></td><td></td><?
+							}
+							?><td><?=$email->sequence +1?></td><td><?=$email->email?></td>
+							<? 
+							if($first){
+								$first = false;
+								$count=0;
+								for($i=0;$i<20; $i++){
+									if($i<10){
+										$num = "f0" . $i;
+									} else {
+										$num = "f" . $i;
+									}
+									if(in_array($num, array_keys($fieldlist))){
+										?><td><?=$person[3+$count]?></td><?
+										$count++;
+									}
+								}
+							} else {
+								for($i=1; $i<$fieldcount+1; $i++){
+									?><td>&nbsp;</td><?
+								}
+							}
+							?>
+							</tr><?
+						}
+					?>
+				<?
+			}
+		?>
+			</table>
+			<script langauge="javascript">
+			var searchresultstable = new getObj("searchresults").obj;
+			
+		<?
+			$count=1;
+			foreach($fieldlist as $index => $field){
+				?>
+				setColVisability(searchresultstable, 4+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				<?
+				$count++;
+			}
+		?>
+			</script>
+		<?
+		showPageMenu($total,$pagestart,500);
+		endWindow();	
+	}
+	
+	function setReportFile(){
+		$this->reportfile = "contactsreport.jasper";
+	}
+}
+
+?>
