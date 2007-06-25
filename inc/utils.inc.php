@@ -320,7 +320,7 @@ function select_metadata($tablename=null, $start=null, $fields){
 				}
 				?><td><div align="center">
 				<? 
-					if(!isset($_SESSION['fields'][$fieldnum]) || $_SESSION['fields'][$fieldnum]){
+					if(isset($_SESSION['fields'][$fieldnum]) && $_SESSION['fields'][$fieldnum]){
 						$result = "<img src=\"img/checkbox-check.png\" onclick=\"dofieldbox(this,true,'$fieldnum');";
 						$checked = "checked>";
 					} else {
