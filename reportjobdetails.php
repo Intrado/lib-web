@@ -18,6 +18,9 @@ require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
+require_once("inc/date.inc.php");
+require_once("obj/JobReport.obj.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +99,7 @@ if(isset($_GET['pagestart'])){
 }
 
 $fields = DBFindMany("FieldMap", "from fieldmap where options not like '%firstname%' and options not like '%lastname%'");
+$fieldmap = DBFindMany("FieldMap", "from fieldmap");
 foreach($fields as $key => $fieldmap){
 	if(!$USER->authorizeField($fieldmap->fieldnum))
 		unset($fields[$key]);
@@ -105,50 +109,44 @@ $lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
 
 $orders = array("order1", "order2", "order3");
 
-$jobid = false;
-if (isset($_GET['jobid'])) {
-	$jobid = $_GET['jobid'] + 0;
-	//check userowns or customerowns and viewsystemreports
-	$_SESSION['report']['jobid'] = $jobid;
-} else if(isset($_SESSION['report']['jobid'])){
-	$jobid = $_SESSION['report']['jobid'];
-}
-
-
-if ($jobid) {
+$options = $_SESSION['report']['options'];
+if(isset($options['jobid'])){
+	$jobid = $options['jobid'];
 	if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid)))
 		redirect('unauthorized.php');
-	$options = array("jobid" => $jobid);
-	
-	$activefields = array();
-	$fieldlist = array();
-	foreach($fields as $field){
-		// used in html
-		$fieldlist[$field->fieldnum] = $field->name;
-		
-		// used in pdf
-		if(!isset($_SESSION['fields']['$field->fieldnum']) || $_SESSION['fields']['$field->fieldnum']){
-			$activefields[] = $field->fieldnum; 
-		}
-	}
-
-	foreach($orders as $order){
-		$options[$order] = isset($_SESSION[$order]) ? $_SESSION[$order] : "";
-	}
-	
-	unset($_SESSION['jobstats'][$jobid]);
-	$job = new Job($jobid);	
-	
-	$options["reporttype"] = "jobreport";
-	$options["detailed"] = true;
-	$options["pagestart"] = $pagestart;
-	$reportinstance = new ReportInstance();
-	$reportinstance->setParameters($options);
-	$reportinstance->setFields($fieldlist);
-	$reportinstance->setActiveFields($activefields);
-	$reportgenerator = new ReportGenerator();
-	$reportgenerator->reportinstance = $reportinstance;
 }
+$activefields = array();
+$fieldlist = array();
+foreach($fields as $field){
+	// used in html
+	$fieldlist[$field->fieldnum] = $field->name;
+	
+	// used in pdf
+	if(!isset($_SESSION['fields']['$field->fieldnum']) || $_SESSION['fields']['$field->fieldnum']){
+		$activefields[] = $field->fieldnum; 
+	}
+}
+
+foreach($orders as $order){
+	$options[$order] = isset($_SESSION[$order]) ? $_SESSION[$order] : "";
+}
+
+unset($_SESSION['jobstats']);
+if(isset($jobid)){
+	$job = new Job($jobid);	
+}
+$options["reporttype"] = "jobreport";
+$options["detailed"] = true;
+$options["pagestart"] = $pagestart;
+
+$reportinstance = new ReportInstance();
+$reportinstance->setParameters($options);
+$reportinstance->setFields($fieldlist);
+$reportinstance->setActiveFields($activefields);
+$reportgenerator = new JobReport();
+$reportgenerator->reportinstance = $reportinstance;
+$reportgenerator->userid = $USER->id;
+
 if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	$reportgenerator->format = "csv";
 } else {
@@ -177,8 +175,9 @@ if(CheckFormSubmit($f,$s))
 				$options[$order] = GetFormData($f, $s, $order);
 				$_SESSION[$order] = GetFormData($f, $s, $order);
 			}
-			$reportinstance->setParameters($options);
-			$reportgenerator->reportinstance=$reportinstance;
+
+			$_SESSION['report']['options']= $options;
+			redirect();
 		}
 	}
 } else {
@@ -190,6 +189,7 @@ if($reload){
 	foreach($orders as $order){
 		PutFormData($f, $s, $order, isset($_SESSION[$order]) ? $_SESSION[$order] : "");
 	}
+
 }
 
 
@@ -209,14 +209,7 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 		$TITLE = "Standard Job Report" . ($jobid ? " - " . $job->name : "");
 	}
 	include_once("nav.inc.php");
-	NewForm($f);
-	
-	//TODO buttons for notification log: download csv, view call details
-	if ($jobid)
-		echo buttons(button('refresh', 'window.location.reload()'), button('done', 'window.history.go(-1)'));
-	else
-		buttons();
-	
+	NewForm($f);	
 	
 	startWindow("Display Options", "padding: 3px;");
 	?>
@@ -250,11 +243,12 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	<?
 				}
 	?>
-				<td><? echo submit($f, $s, "filter", "refresh");?></td>
+				
 					</tr>
 				</table>
 			</td>
 		</tr>
+		<tr><td><? echo submit($f, $s, "filter", "search");?></td></tr>
 	</table>
 	<?
 	endWindow();
@@ -263,10 +257,9 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	<?
 	
 	if(isset($reportgenerator)){
-		$reportgenerator->generate();
+		$reportgenerator->generate("detailed");
 	}
 	
-	echo buttons();
 	endForm();
 	include_once("navbottom.inc.php");
 }
