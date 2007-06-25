@@ -56,8 +56,8 @@ if(CheckFormSubmit($f, $s))
 		} else if(GetFormData($f, $s, "radio") == 1 && !strtotime(GetFormData($f, $s, "date"))){
 			error('That date was invalid');
 		} else {
-
-
+			
+			
 			$options['reporttype'] = GetFormData($f, $s, "reporttype");
 			$radio = GetFormData($f, $s, "radio");
 			switch($radio){
@@ -86,10 +86,12 @@ if(CheckFormSubmit($f, $s))
 			$reportsubscription->nextrun = $reportsubscription->calcNextRun();
 			$reportinstance->setParameters($options);
 			$reportinstance->update();
-
+			
+			$reportsubscription->userid = $USER->id;
 			$reportsubscription->name = GetFormData($f, $s, "name");
+			$reportsubscription->description = GetFormData($f, $s, "description");
 			$reportsubscription->reportinstanceid = $reportinstance->id;
-
+			
 			$reportsubscription->update();
 			redirect("reportsavedoptions.php?reportid=$reportsubscription->id");
 		}
@@ -100,7 +102,7 @@ if(CheckFormSubmit($f, $s))
 
 if($reload){
 	ClearFormData($f);
-
+	
 	$dom = "0";
 	$rundate = "";
 	$dowarray = array();
@@ -118,9 +120,10 @@ if($reload){
 	PutFormData($f, $s, "dom", $dom ? $dom : "1" );
 	PutFormData($f, $s, "reportsubscription", isset($reportsubscription) ? $reportsubscription->id : "");
 	PutFormData($f, $s, "date", $rundate, "text");
+	PutFormData($f, $s, "description", isset($reportsubscription) ? $reportsubscription->name : "", "text", "nomin", "nomax");
 	PutFormData($f, $s, "name", isset($reportsubscription) ? $reportsubscription->name : "", "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "reporttype", isset($options['reporttype']) ? $options['reporttype'] : "", null, null, null, true );
-
+	
 	$radio = 0;
 	if($rundate){
 		$radio= 1;
@@ -130,7 +133,7 @@ if($reload){
 		$radio= 3;
 	}
 	PutFormData($f, $s, "radio", $radio);
-
+	
 	if(isset($reportsubscription->time)){
 		$settime = date("g:i a", strtotime($reportsubscription->time));
 	}
@@ -154,20 +157,21 @@ startWindow("Schedule Report");
 		<th align="right" class="windowRowHeader bottomBorder">Report:</th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="3" cellspacing="0">
-				<tr><td>Report Name:</td><td><? NewFormItem($f, $s, 'name', 'text', '20')?></td></tr>
+				<tr><td>Report Name:</td><td><? NewFormItem($f, $s, 'name', 'text', '50')?></td></tr>
+				<tr><td>Report Description:</td><td><? NewFormItem($f, $s, 'description', 'text', '50')?></td></tr>
 				<tr><td>Report Type:</td>
 					<td>
 						<?
-							NewFormItem($f, $s, 'reporttype', 'selectstart');
+							NewFormItem($f, $s, 'reporttype', 'selectstart'); 
 							NewFormItem($f, $s, 'reporttype', 'selectoption', " -- Select a Type -- ", "");
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Job Report", "jobreport");
-							NewFormItem($f, $s, 'reporttype', 'selectoption', "Survey Report", "surveyreport");
-							NewFormItem($f, $s, 'reporttype', 'selectoption', "Calls Report", "callsreport");
+							NewFormItem($f, $s, 'reporttype', 'selectoption', "Survey Report", "surveyreport"); 
+							NewFormItem($f, $s, 'reporttype', 'selectoption', "Calls Report", "callsreport"); 
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Undelivered Calls", "undelivered");
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Attendance Calls", "attendance");
-							NewFormItem($f, $s, 'reporttype', 'selectoption', "Emergency Calls", "emergency");
+							NewFormItem($f, $s, 'reporttype', 'selectoption', "Emergency Calls", "emergency"); 
 							NewFormItem($f, $s, 'reporttype', 'selectoption', "Contacts Report", "contacts");
-							NewFormItem($f, $s, 'reporttype', 'selectend');
+							NewFormItem($f, $s, 'reporttype', 'selectend'); 
 						?>
 					</td>
 				</tr>
@@ -177,9 +181,9 @@ startWindow("Schedule Report");
 	<tr valign="top"><th align="right" class="windowRowHeader">Schedule:</th>
 		<td>
 			<table  border="0" cellpadding="3" cellspacing="0">
-				<tr onclick="new getObj('radio_date').obj.checked=true;"><td><? NewFormItem($f, $s, "radio", "radio", NULL, "1", "id='radio_date'")?></td><td>Date: </td><td><? NewFormItem($f, $s, 'date', 'text', '25')?></td></tr>
-				<tr onclick="new getObj('radio_dow').obj.checked=true;"><td><? NewFormItem($f, $s, "radio", "radio", NULL, "2", "id='radio_dow'")?></td><td>Day of the Week: </td>
-					<td>
+				<tr ><td><? NewFormItem($f, $s, "radio", "radio", NULL, "1", "id='radio_date'")?></td><td>Date: </td><td onclick="new getObj('radio_date').obj.checked=true;"><? NewFormItem($f, $s, 'date', 'text', '25')?></td></tr>
+				<tr ><td><? NewFormItem($f, $s, "radio", "radio", NULL, "2", "id='radio_dow'")?></td><td>Day of the Week: </td>
+					<td onclick="new getObj('radio_dow').obj.checked=true;">
 						<table border="0" cellpadding="2" cellspacing="1" class="list">
 							<tr class="listHeader" align="left" valign="bottom">
 								<td>Su</td>
@@ -202,14 +206,15 @@ startWindow("Schedule Report");
 						</table>
 					</td>
 				</tr>
-				<tr onclick="new getObj('radio_dom').obj.checked=true;"><td><? NewFormItem($f, $s, "radio", "radio", NULL, "3", "id='radio_dom'")?></td>
+				<tr><td><? NewFormItem($f, $s, "radio", "radio", NULL, "3", "id='radio_dom'")?></td>
 					<td>Day of the Month: </td>
-					<td><?
+					<td onclick="new getObj('radio_dom').obj.checked=true;"><?
 						NewFormItem($f, $s, 'dom', 'selectstart');
 						NewFormItem($f, $s, 'dom', 'selectoption', " -- Day of Month -- ", "");
-						for($i=1; $i<=31;$i++){
+						for($i=1; $i<=28;$i++){
 							NewFormItem($f, $s, 'dom', 'selectoption', "$i", "$i");
 						}
+						NewFormItem($f,$s, 'dom', 'selectoption', "Last Day of the Month", "31");
 						NewFormItem($f, $s, 'dom', 'selectend');
 					?></td>
 				</tr>
@@ -226,5 +231,6 @@ startWindow("Schedule Report");
 <?
 EndWindow();
 buttons();
+EndForm();
 include("navbottom.inc.php");
 ?>
