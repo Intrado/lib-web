@@ -163,7 +163,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 
 	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
-	$reportbtn = '<a href="reportsummary.php?jobid=' . $id . '">Report</a>';
+	$reportbtn = '<a href="reportjobsurvey.php?jobid=' . $id . '">Report</a>';
 	$monitorbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '\', 500, 450);" >Monitor</a>';
 	$graphbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '&noupdate\', 500, 450);" >Graph</a>';
 
@@ -386,6 +386,9 @@ function fmt_numquestions ($obj,$name) {
 }
 
 function fmt_ms_timestamp($row, $index){
+	if($row[$index] == "" || $row[$index] == null){
+		return "";
+	}
 	return date("M j, Y g:i a", $row[$index]/1000);
 }
 
@@ -398,6 +401,25 @@ function fmt_response_count($obj, $name) {
 		return "- None -";
 	else
 		return "<div id=" . $obj->id . ">" . $played . "/". $total . "</div>";
+}
+
+function fmt_report_name($string){
+	switch($string){
+		case 'jobreport':
+			return "Job Report";
+		case 'undelivered':
+			return "Undelivered Calls";
+		case 'emergency':
+			return "Emergency";
+		case 'attendance':
+			return "Attendance";
+		case 'surveyreport':
+			return "Survey Report";
+		case 'callsreport':
+			return "Individual Calls Report";
+		default:
+			return $string;
+	}
 }
 
 ?>
