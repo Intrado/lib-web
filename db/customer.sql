@@ -629,16 +629,17 @@ CREATE TABLE `reportsubscription` (
   `name` varchar(50) NOT NULL default '',
   `description` varchar(50) NOT NULL default '',
   `reportinstanceid` int(11) NOT NULL default '0',
-  `dow` varchar(20) NOT NULL default '',
-  `dom` tinyint(4) NOT NULL default '0',
-  `date` date NOT NULL default '0000-00-00',
-  `lastrun` datetime NOT NULL default '0000-00-00 00:00:00',
-  `nextrun` datetime NOT NULL default '0000-00-00 00:00:00',
+  `dow` varchar(20) default NULL,
+  `dom` tinyint(4) default NULL,
+  `date` date default NULL,
+  `lastrun` datetime default NULL,
+  `nextrun` datetime default NULL,
   `time` TIME NOT NULL default '00:00:00',
   PRIMARY KEY  (`id`),
   KEY `subscription` (`userid`,`reportinstanceid`)
 ) TYPE=InnoDB
 $$$
+
 
 -- triggers from customer database to shard database
 
@@ -792,6 +793,46 @@ SELECT value INTO custid FROM setting WHERE name='_customerid';
     DELETE FROM aspshard.qschedule WHERE id=OLD.id AND customerid=custid;
 END
 $$$
+
+CREATE TRIGGER insert_reportsubscription
+AFTER INSERT ON reportsubscription FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+DECLARE tz VARCHAR(50);
+
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT value INTO tz FROM setting WHERE name='timezone';
+
+	INSERT INTO aspshard.qreportsubscription (id, customerid, userid, dow, dom, timezone, date, time, nextrun) VALUES (NEW.id, custid, NEW.userid, NEW.dow, NEW.dom, tz, NEW.date, NEW.time, NEW.nextrun);
+END
+$$$
+
+CREATE TRIGGER update_reportsubscription
+AFTER UPDATE ON reportsubscription FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+IF (OLD.dow <> NEW.dow ||
+	OLD.dom <> NEW.dom ||
+	OLD.date <> NEW.date ||
+    OLD.time <> NEw.time ||
+    OLD.nextrun <> NEW.nextrun) THEN
+    UPDATE aspshard.qreportsubscription SET dow=NEW.dow, dom=NEW.dom, date=NEW.date, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
+END IF;
+END
+$$$
+
+CREATE TRIGGER delete_reportsubscription
+AFTER DELETE ON reportsubscription FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+    DELETE FROM aspshard.qreportsubscription WHERE id=OLD.id AND customerid=custid;
+END
+$$$
+
 
 create procedure start_import( in_importid int)
 begin

@@ -85,7 +85,6 @@ CREATE TABLE `importqueue` (
   UNIQUE KEY `import` (`customerid`,`localimportid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-
 -- --------------------------------------------------------
 
 CREATE TABLE `jobstatdata` (
@@ -98,3 +97,19 @@ CREATE TABLE `jobstatdata` (
   `customer_fraction` float NOT NULL,
   `job_fraction` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+CREATE TABLE `qreportsubscription` (
+  customerid int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `userid` int(11) NOT NULL default '0',
+  `dow` varchar(20) default NULL,
+  `dom` tinyint(4) default NULL,
+  `date` date default NULL,
+  `timezone` varchar(50) NOT NULL,
+  `nextrun` datetime default NULL,
+  `time` TIME NOT NULL default '00:00:00',
+  PRIMARY KEY  (customerid, `id`)
+) TYPE=InnoDB;
+
