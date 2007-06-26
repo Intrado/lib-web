@@ -45,6 +45,7 @@ class CallsReport extends ReportGenerator{
 		$reldatequery = "";
 		$resultquery="";
 		$jobidquery = "";
+		$systemquery = "";
 		
 		if(isset($params['personid'])){
 			$personquery = ($params['personid'] != "" || $params['personid'] != null) ? " and rp.pkey like '%" . DBSafe($params['personid']) . "%'" : "";
@@ -172,7 +173,7 @@ class CallsReport extends ReportGenerator{
 					from_unixtime(rc.starttime/1000) as date,
 					rp.status as status 
 					$fieldquery
-					, j.id
+					, rp.type, j.id
 					from reportperson rp
 					left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 					inner join job j on (rp.jobid= j.id)
@@ -346,7 +347,7 @@ class CallsReport extends ReportGenerator{
 					from_unixtime(rc.starttime/1000) as date, 
 					rp.status as status
 					$fieldquery
-					, j.id
+					,j.id
 					from reportperson rp
 					left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 					inner join job j on (rp.jobid= j.id)
