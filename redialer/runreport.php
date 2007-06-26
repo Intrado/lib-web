@@ -1,7 +1,7 @@
 <?
 
-if ($argc < 6)
-	exit("Usage: reportsubscription id, type, filename, dbhost, db, user, dbpass,");
+if ($argc < 7)
+	exit("Usage: reportsubscriptionid | jobid, type 'subscription' | 'job', filename, dbhost, dbname, dbuser, dbpass");
 
 $id = $argv[1];
 $type = $argv[2];
@@ -41,7 +41,7 @@ if($type == "subscription"){
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 	switch($options['reporttype']){
-	
+
 		case 'attendance':
 		case 'emergency':
 		case 'undelivered':
@@ -74,7 +74,7 @@ if($type == "subscription"){
 	$instance->setParameters($options);
 	$generator->userid = $job->userid;
 }
-	
+
 
 
 if(!isset($generator)){
