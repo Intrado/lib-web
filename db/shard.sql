@@ -16,8 +16,6 @@ CREATE TABLE qjob (
   starttime time NOT NULL default '00:00:00',
   endtime time NOT NULL default '00:00:00',
   `status` enum('new','processing','active','cancelling','repeating') NOT NULL default 'new',
-  `attempts` tinyint(4) NOT NULL default '0',
-  `sequence` tinyint(4) NOT NULL default '0',
   `maxsequence` tinyint(4) NOT NULL default '0',
   `phonetaskcount` int(11) NOT NULL default '0',
   systempriority tinyint(4) NOT NULL default '3',
@@ -59,6 +57,7 @@ CREATE TABLE `qjobtask` (
   `lastduration` float default NULL,
   `lastattempttime` bigint(20) default NULL,
   `nextattempttime` bigint(20) default NULL,
+  `leasetime` bigint(20) default NULL,
   `phone` varchar(20) default NULL,
   `uuid` varchar(255) NOT NULL,
   PRIMARY KEY  (`customerid`,`jobid`,`type`,`personid`,`sequence`)
