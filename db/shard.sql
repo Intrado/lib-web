@@ -71,7 +71,8 @@ CREATE TABLE qschedule (
   `dow` varchar(20) NOT NULL default '',
   `time` time NOT NULL default '00:00:00',
   nextrun datetime default NULL,
-  PRIMARY KEY  (customerid,id)
+  PRIMARY KEY  (customerid,id),
+  KEY nextrun (nextrun)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -108,7 +109,8 @@ CREATE TABLE `qreportsubscription` (
   `date` date default NULL,
   `timezone` varchar(50) NOT NULL,
   `nextrun` datetime default NULL,
-  `time` TIME NOT NULL default '00:00:00',
-  PRIMARY KEY  (customerid, `id`)
+  `time` TIME default NULL,
+  PRIMARY KEY  (customerid, `id`),
+  KEY nextrun (nextrun)
 ) TYPE=InnoDB;
 
