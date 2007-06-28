@@ -89,7 +89,11 @@ echo "finished generating query\n";
 $generator->setReportFile();
 echo "finished setting report file to use\n";
 $result = $generator->runPDF($params);
-
 echo $result;
+
+// if success, and subscription, then update the lastrun field
+if("success" == $result && $type == "subscription") {
+	QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id)); // TODO handle timezone
+}
 
 ?>
