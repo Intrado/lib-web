@@ -37,7 +37,12 @@ class ReportSubscription extends DBMappedObject {
 			return $nextrun;
 
 		} else if ($this->dom != null) {
-			// TODO
+
+			$nextrun = Date("Y-m-d");
+			// TODO if day is later than today, take from first of current month, otherwise last_day into next month
+			$nextrun = QuickQuery("select last_day('$nextrun')");
+			$nextrun = QuickQuery("select date_add('$nextrun', interval ".$this->dom." day)") ." " . $this->time;
+			return $nextrun;
 
 		} else if ($this->dow != null) {
 			$enableddows = explode(",", $this->dow);
