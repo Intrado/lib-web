@@ -43,25 +43,27 @@ CREATE TABLE `qjobsetting` (
 
 -- --------------------------------------------------------
 
-CREATE TABLE `qjobtask` (
-  `customerid` int(11) NOT NULL default '0',
-  `jobid` int(11) NOT NULL default '0',
+CREATE TABLE qjobtask (
+  customerid int(11) NOT NULL default '0',
+  jobid int(11) NOT NULL default '0',
   `type` enum('phone','email','print','sms') NOT NULL,
-  `personid` int(11) NOT NULL default '0',
-  `sequence` tinyint(4) NOT NULL default '0',
+  personid int(11) NOT NULL default '0',
+  sequence tinyint(4) NOT NULL default '0',
   `status` enum('active','pending','assigned','progress','waiting','throttled') NOT NULL,
-  `attempts` tinyint(4) NOT NULL default '0',
-  `renderedmessage` text,
-  `lastresult` enum('A','M','N','B','X','F','sent','unsent','printed','notprinted') default NULL,
-  `lastresultdata` text,
-  `lastduration` float default NULL,
-  `lastattempttime` bigint(20) default NULL,
-  `nextattempttime` bigint(20) default NULL,
-  `leasetime` bigint(20) default NULL,
-  `phone` varchar(20) default NULL,
-  `uuid` varchar(255) NOT NULL,
-  PRIMARY KEY  (`customerid`,`jobid`,`type`,`personid`,`sequence`)
+  attempts tinyint(4) NOT NULL default '0',
+  renderedmessage text,
+  lastresult enum('A','M','N','B','X','F','sent','unsent','printed','notprinted') default NULL,
+  lastresultdata text,
+  lastduration float default NULL,
+  lastattempttime bigint(20) default NULL,
+  nextattempttime bigint(20) default NULL,
+  leasetime bigint(20) default NULL,
+  phone varchar(20) default NULL,
+  uuid varchar(255) NOT NULL,
+  PRIMARY KEY  (customerid,jobid,`type`,personid,sequence),
+  KEY dispatch (jobid,`status`,attempts,sequence)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 -- --------------------------------------------------------
 
@@ -114,4 +116,5 @@ CREATE TABLE `qreportsubscription` (
   PRIMARY KEY  (customerid, `id`),
   KEY nextrun (nextrun)
 ) TYPE=InnoDB;
+
 
