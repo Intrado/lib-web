@@ -108,9 +108,6 @@ if (isset($_GET['runrepeating'])) {
 	$newjob->startdate = date("Y-m-d", time());
 	$newjob->enddate = date("Y-m-d", time() + $daydiff);
 
-	if (getSystemSetting('retry') != "")
-		$newjob->setOptionValue("retry",getSystemSetting('retry'));
-
 	$newjob->create();
 
 	//copy all the job language settings
@@ -128,6 +125,11 @@ if (isset($_GET['runrepeating'])) {
 			}
 		}
 	}
+
+	// update the retry setting - it may have changed since the repeater was created
+	if (getSystemSetting('retry') != "")
+		$newjob->setOptionValue("retry",getSystemSetting('retry'));
+
 	redirectToReferrer();
 }
 
