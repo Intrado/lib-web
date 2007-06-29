@@ -16,7 +16,6 @@ CREATE TABLE qjob (
   starttime time NOT NULL default '00:00:00',
   endtime time NOT NULL default '00:00:00',
   `status` enum('new','processing','active','cancelling','repeating') NOT NULL default 'new',
-  `maxsequence` tinyint(4) NOT NULL default '0',
   `phonetaskcount` int(11) NOT NULL default '0',
   systempriority tinyint(4) NOT NULL default '3',
   timeslices smallint(6) NOT NULL default '0',

@@ -333,10 +333,10 @@ CREATE TABLE reportcontact (
   personid int(11) NOT NULL,
   `type` enum('phone','email','print') NOT NULL,
   sequence tinyint(4) NOT NULL,
-  numattempts tinyint(4) NOT NULL,
+  numattempts tinyint(4) NOT NULL default '0',
   userid int(11) NOT NULL,
-  starttime bigint(20) NOT NULL default '0',
-  result enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted') NOT NULL,
+  starttime bigint(20) default NULL,
+  result enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted') NOT NULL default 'notattempted',
   participated tinyint(4) NOT NULL default '0',
   duration float default NULL,
   resultdata text,
@@ -641,6 +641,7 @@ CREATE TABLE `reportsubscription` (
 $$$
 
 
+
 -- triggers from customer database to shard database
 
 CREATE TRIGGER insert_repeating_job
@@ -666,7 +667,6 @@ IF NEW.status IN ('repeating') THEN
 END IF;
 END
 $$$
-
 
 CREATE TRIGGER update_job
 AFTER UPDATE ON job FOR EACH ROW
@@ -713,8 +713,8 @@ BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
 -- only repeating jobs ever get deleted
-    DELETE FROM aspshard.qjob WHERE customerid=custid AND id=OLD.id;
-    DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.id;
+DELETE FROM aspshard.qjob WHERE customerid=custid AND id=OLD.id;
+DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.id;
 END
 $$$
 
@@ -739,8 +739,7 @@ AFTER UPDATE ON jobsetting FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-
-    UPDATE aspshard.qjobsetting SET value=NEW.value WHERE customerid=custid AND jobid=NEW.jobid AND name=NEW.name;
+UPDATE aspshard.qjobsetting SET value=NEW.value WHERE customerid=custid AND jobid=NEW.jobid AND name=NEW.name;
 END
 $$$
 
@@ -749,8 +748,7 @@ AFTER DELETE ON jobsetting FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-
-    DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.jobid AND name=OLD.name;
+DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.jobid AND name=OLD.name;
 END
 $$$
 
@@ -775,12 +773,7 @@ AFTER UPDATE ON schedule FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-
-IF OLD.dow <> NEW.dow ||
-   OLD.time <> NEw.time ||
-   OLD.nextrun <> NEW.nextrun THEN
-   UPDATE aspshard.qschedule SET dow=NEW.dow, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
-END IF;
+UPDATE aspshard.qschedule SET dow=NEW.dow, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
 END
 $$$
 
@@ -789,8 +782,7 @@ AFTER DELETE ON schedule FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-
-    DELETE FROM aspshard.qschedule WHERE id=OLD.id AND customerid=custid;
+DELETE FROM aspshard.qschedule WHERE id=OLD.id AND customerid=custid;
 END
 $$$
 
@@ -799,15 +791,9 @@ AFTER INSERT ON reportsubscription FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 DECLARE tz VARCHAR(50);
-
--- only insert if there is a schedule to run
-IF NEW.nextrun IS NOT NULL THEN
-
-	SELECT value INTO custid FROM setting WHERE name='_customerid';
-	SELECT value INTO tz FROM setting WHERE name='timezone';
-
-	INSERT INTO aspshard.qreportsubscription (id, customerid, userid, dow, dom, timezone, date, time, nextrun) VALUES (NEW.id, custid, NEW.userid, NEW.dow, NEW.dom, tz, NEW.date, NEW.time, NEW.nextrun);
-END IF;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT value INTO tz FROM setting WHERE name='timezone';
+INSERT INTO aspshard.qreportsubscription (id, customerid, userid, dow, dom, timezone, date, time, nextrun) VALUES (NEW.id, custid, NEW.userid, NEW.dow, NEW.dom, tz, NEW.date, NEW.time, NEW.nextrun);
 END
 $$$
 
@@ -815,16 +801,8 @@ CREATE TRIGGER update_reportsubscription
 AFTER UPDATE ON reportsubscription FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
-
-IF  OLD.nextrun <> NEW.nextrun ||
-	OLD.dow <> NEW.dow ||
-	OLD.dom <> NEW.dom ||
-	OLD.date <> NEW.date ||
-    OLD.time <> NEW.time THEN
-
-	SELECT value INTO custid FROM setting WHERE name='_customerid';
-	UPDATE aspshard.qreportsubscription SET dow=NEW.dow, dom=NEW.dom, date=NEW.date, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
-END IF;
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+UPDATE aspshard.qreportsubscription SET dow=NEW.dow, dom=NEW.dom, date=NEW.date, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
 END
 $$$
 
@@ -833,8 +811,7 @@ AFTER DELETE ON reportsubscription FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-
-    DELETE FROM aspshard.qreportsubscription WHERE id=OLD.id AND customerid=custid;
+DELETE FROM aspshard.qreportsubscription WHERE id=OLD.id AND customerid=custid;
 END
 $$$
 
