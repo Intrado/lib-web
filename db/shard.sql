@@ -44,11 +44,11 @@ CREATE TABLE `qjobsetting` (
 -- --------------------------------------------------------
 
 CREATE TABLE `qjobtask` (
-  `customerid` int(11) NOT NULL,
-  `jobid` int(11) NOT NULL,
+  `customerid` int(11) NOT NULL default '0',
+  `jobid` int(11) NOT NULL default '0',
   `type` enum('phone','email','print','sms') NOT NULL,
-  `personid` int(11) NOT NULL,
-  `sequence` tinyint(4) NOT NULL,
+  `personid` int(11) NOT NULL default '0',
+  `sequence` tinyint(4) NOT NULL default '0',
   `status` enum('active','pending','assigned','progress','waiting','throttled') NOT NULL,
   `attempts` tinyint(4) NOT NULL default '0',
   `renderedmessage` text,
@@ -84,6 +84,7 @@ CREATE TABLE `importqueue` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `import` (`customerid`,`localimportid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 
 -- --------------------------------------------------------
 
