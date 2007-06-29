@@ -23,7 +23,7 @@ function fmt_alert_timestamp($row, $index) {
 }
 
 function fmt_custurl($row, $index){
-	$url = "<a href=\"customerlink.php?id=". $row[0] . "\" target=\"_blank\">" . $row[1] . "</a>";
+	$url = "<a href=\"customerlink.php?id=". $row[0] . "\" >" . $row[1] . "</a>";
 	return $url;
 }
 
@@ -162,7 +162,7 @@ $titles = array("0" => "Customer ID",
 $formatters = array("url" => "fmt_custurl",
 					"10" => "fmt_filesize",
 					"8" => "fmt_alert_timestamp",
-					"5" => "fmt_import_status");		
+					"5" => "fmt_import_status");
 ?>
 <table border=1>
 <?

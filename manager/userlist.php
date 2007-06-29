@@ -40,7 +40,7 @@ function fmt_accssname($row, $index){
 
 function fmt_custurl($row, $index){
 
-	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[2] . "</a>";
+	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[2] . "</a>";
 	return $url;
 }
 

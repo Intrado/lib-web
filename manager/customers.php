@@ -8,8 +8,8 @@ include_once("../inc/Table.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_custurl($row, $index){
-	
-	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[1] . "</a>";
+
+	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[1] . "</a>";
 	return $url;
 }
 
@@ -79,20 +79,20 @@ foreach($customers as $cust) {
 		$row[] = QuickQuery("select value from setting where name = 'timezone'", $custdb);
 		$row[] = QuickQuery("select value from setting where name = '_managernote'", $custdb);
 		$row[] = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
-		
+
 		$maxusers = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
 		$row[] = $maxusers ? $maxusers : 1;
-		
+
 		$row[] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
 		$row[] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
 								WHERE job.status = 'active'", $custdb);
-		
-		
+
+
 		$data[] = $row;
 	}
 }
 
-$titles = array("0" => "Customer ID", 
+$titles = array("0" => "Customer ID",
 				"2" => "Customer Name",
 				"url" => "Customer URL (link)",
 				"3" => "Toll Free Number",
@@ -102,7 +102,7 @@ $titles = array("0" => "Customer ID",
 				"9" => "Active Jobs",
 				"Actions" => "Actions",
 				"5" => "NOTES: ");
-				
+
 $formatters = array("url" => "fmt_custurl",
 					"6" => "fmt_status",
 					"8" => "fmt_users",
