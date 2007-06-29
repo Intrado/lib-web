@@ -1,7 +1,9 @@
 <?
 
-if ($argc < 7)
-	exit("Usage: reportsubscriptionid | jobid, type 'subscription' | 'job', filename, dbhost, dbname, dbuser, dbpass");
+if ($argc < 7) {
+	echo "Usage: reportsubscriptionid | jobid, type 'subscription' | 'job', filename, dbhost, dbname, dbuser, dbpass";
+	exit(-1);
+}
 
 $id = $argv[1];
 $type = $argv[2];
@@ -94,6 +96,8 @@ echo $result;
 // if success, and subscription, then update the lastrun field
 if("success" == $result && $type == "subscription") {
 	QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id)); // TODO handle timezone
+} else {
+	exit(-1);
 }
 
 ?>
