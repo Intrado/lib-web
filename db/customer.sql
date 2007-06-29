@@ -402,9 +402,7 @@ $$$
 CREATE TABLE schedule (
   id int(11) NOT NULL auto_increment,
   userid int(11) default NULL,
-  triggertype enum('import','job') NOT NULL default 'import',
-  `type` enum('R','O') NOT NULL default 'R',
-  `dow` varchar(20) NOT NULL default '',
+  `daysofweek` varchar(20) NOT NULL,
   `time` time NOT NULL default '00:00:00',
   nextrun datetime default NULL,
   PRIMARY KEY  (id)
@@ -623,23 +621,24 @@ CREATE TABLE reportinstance (
 ) TYPE=InnoDB
 $$$
 
-CREATE TABLE `reportsubscription` (
-  `id` int(11) NOT NULL auto_increment,
-  `userid` int(11) NOT NULL default '0',
+CREATE TABLE reportsubscription (
+  id int(11) NOT NULL auto_increment,
+  userid int(11) NOT NULL default '0',
   `name` varchar(50) NOT NULL default '',
-  `description` varchar(50) NOT NULL default '',
-  `reportinstanceid` int(11) NOT NULL default '0',
-  `dow` varchar(20) default NULL,
-  `dom` tinyint(4) default NULL,
-  `date` date default NULL,
-  `lastrun` datetime default NULL,
-  `nextrun` datetime default NULL,
-  `time` TIME default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `subscription` (`userid`,`reportinstanceid`)
-) TYPE=InnoDB
+  description varchar(50) NOT NULL default '',
+  reportinstanceid int(11) NOT NULL default '0',
+  `type` enum('notscheduled','once','weekly','monthly') NOT NULL default 'notscheduled',
+  daysofweek varchar(20) default NULL,
+  dayofmonth tinyint(4) default NULL,
+  lastrun datetime default NULL,
+  nextrun datetime default NULL,
+  `time` time default NULL,
+  email text NOT NULL,
+  PRIMARY KEY  (id),
+  KEY subscription (userid,reportinstanceid),
+  KEY nextrun (nextrun)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
 $$$
-
 
 
 -- triggers from customer database to shard database
@@ -662,7 +661,7 @@ IF NEW.status IN ('repeating') THEN
   INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
 
   -- copy schedule
-  INSERT INTO aspshard.qschedule (id, customerid, dow, time, nextrun) SELECT id, custid, dow, time, nextrun FROM schedule WHERE id=NEW.scheduleid;
+  INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun) SELECT id, custid, daysofweek, time, nextrun FROM schedule WHERE id=NEW.scheduleid;
 
 END IF;
 END
@@ -763,7 +762,7 @@ SELECT value INTO custid FROM setting WHERE name='_customerid';
 -- the job must be inserted before the schedule
 SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND scheduleid=NEW.id;
 IF cc = 1 THEN
-    INSERT INTO aspshard.qschedule (id, customerid, dow, time, nextrun) VALUES (NEW.id, custid, NEW.dow, NEW.time, NEW.nextrun);
+    INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun) VALUES (NEW.id, custid, NEW.daysofweek, NEW.time, NEW.nextrun);
 END IF;
 END
 $$$
@@ -773,7 +772,7 @@ AFTER UPDATE ON schedule FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-UPDATE aspshard.qschedule SET dow=NEW.dow, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
+UPDATE aspshard.qschedule SET daysofweek=NEW.daysofweek, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
 END
 $$$
 
@@ -793,7 +792,7 @@ DECLARE custid INTEGER;
 DECLARE tz VARCHAR(50);
 SELECT value INTO custid FROM setting WHERE name='_customerid';
 SELECT value INTO tz FROM setting WHERE name='timezone';
-INSERT INTO aspshard.qreportsubscription (id, customerid, userid, dow, dom, timezone, date, time, nextrun) VALUES (NEW.id, custid, NEW.userid, NEW.dow, NEW.dom, tz, NEW.date, NEW.time, NEW.nextrun);
+INSERT INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) VALUES (NEW.id, custid, NEW.userid, NEW.type, NEW.daysofweek, NEW.dayofmonth, NEW.time, tz, NEW.nextrun, NEW.email);
 END
 $$$
 
@@ -802,7 +801,7 @@ AFTER UPDATE ON reportsubscription FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 SELECT value INTO custid FROM setting WHERE name='_customerid';
-UPDATE aspshard.qreportsubscription SET dow=NEW.dow, dom=NEW.dom, date=NEW.date, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
+UPDATE aspshard.qreportsubscription SET type=NEW.type, daysofweek=NEW.daysofweek, dayofmonth=NEW.dayofmonth, time=NEW.time, nextrun=NEW.nextrun, email=NEW.email WHERE id=NEW.id AND customerid=custid;
 END
 $$$
 

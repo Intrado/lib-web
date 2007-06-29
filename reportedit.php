@@ -50,21 +50,29 @@ if(CheckFormSubmit($f, $s))
 	else
 	{
 		MergeSectionFormData($f, $s);
+		$emaillist = GetFormData($f, $s, "email");
+		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(GetFormData($f, $s, "radio") == 1 && !strtotime(GetFormData($f, $s, "date"))){
 			error('That date was invalid');
+		} elseif($bademaillist = checkemails($emaillist)) {
+			error("These emails are invalid", $bademaillist);
 		} else {
-
-
 			$options['reporttype'] = GetFormData($f, $s, "reporttype");
+
+			$reportsubscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
+			$reportsubscription->type = 'notscheduled';
+			$reportsubscription->email = $emaillist;
+
 			$radio = GetFormData($f, $s, "radio");
 			switch($radio){
 				case '1':
-					$reportsubscription->date = date("Y-m-d", strtotime(GetFormData($f, $s, "date")));
-					$reportsubscription->dow = null;
-					$reportsubscription->dom = null;
+					$reportsubscription->nextrun = date("Y-m-d", strtotime(GetFormData($f, $s, "date"))) ." " . $reportsubscription->time;
+					$reportsubscription->daysofweek = null;
+					$reportsubscription->dayofmonth = null;
+					$reportsubscription->type = 'once';
 					break;
 				case '2':
 					$dow = array();
@@ -72,25 +80,18 @@ if(CheckFormSubmit($f, $s))
 						if(GetFormData($f, $s, "dow$i"))
 							$dow[] = $i;
 					}
-					$reportsubscription->dow = implode(",", $dow);
-					$reportsubscription->date = null;
-					$reportsubscription->dom = null;
+					$reportsubscription->daysofweek = implode(",", $dow);
+					$reportsubscription->dayofmonth = null;
+					$reportsubscription->type = 'weekly';
 					break;
 				case '3':
-					$reportsubscription->dom = GetFormData($f, $s, "dom");
-					$reportsubscription->date = null;
-					$reportsubscription->dow = null;
+					$reportsubscription->dayofmonth = GetFormData($f, $s, "dom");
+					$reportsubscription->daysofweek = null;
+					$reportsubscription->type = 'monthly';
 					break;
 			}
-			if ($reportsubscription->date == null &&
-				$reportsubscription->dow == null &&
-				$reportsubscription->dom == null) {
-					$reportsubscription->time = null;
-					$reportsubscription->nextrun = null;
-			} else {
-				$reportsubscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
-				$reportsubscription->nextrun = $reportsubscription->calcNextRun();
-			}
+			$reportsubscription->nextrun = $reportsubscription->calcNextRun();
+
 			$reportinstance->setParameters($options);
 			$reportinstance->update();
 
@@ -115,11 +116,11 @@ if($reload){
 	$dowarray = array();
 	$dows = "";
 	if(isset($reportsubscription)){
-		$dows = $reportsubscription->dow;
+		$dows = $reportsubscription->daysofweek;
 		$dowarray = explode(",", $dows);
-		$dom = $reportsubscription->dom;
-		if($reportsubscription->date && $reportsubscription->date != "0000-00-00")
-			$rundate = date("M d, Y", strtotime($reportsubscription->date));
+		$dom = $reportsubscription->dayofmonth;
+		if($reportsubscription->type == 'once')
+			$rundate = date("M d, Y", strtotime($reportsubscription->nextrun));
 	}
 	for($i=1; $i<8;$i++){
 		PutFormData($f, $s, "dow$i", in_array($i, $dowarray) ? "1" : "0", "bool", "0", "1");
@@ -127,8 +128,9 @@ if($reload){
 	PutFormData($f, $s, "dom", $dom ? $dom : "1" );
 	PutFormData($f, $s, "reportsubscription", isset($reportsubscription) ? $reportsubscription->id : "");
 	PutFormData($f, $s, "date", $rundate, "text");
-	PutFormData($f, $s, "description", isset($reportsubscription) ? $reportsubscription->name : "", "text", "nomin", "nomax");
+	PutFormData($f, $s, "description", isset($reportsubscription) ? $reportsubscription->description : "", "text", "nomin", "nomax");
 	PutFormData($f, $s, "name", isset($reportsubscription) ? $reportsubscription->name : "", "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "email", isset($reportsubscription) ? $reportsubscription->email : "", "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "reporttype", isset($options['reporttype']) ? $options['reporttype'] : "", null, null, null, true );
 
 	$radio = 0;
@@ -164,9 +166,10 @@ startWindow("Schedule Report");
 		<th align="right" class="windowRowHeader bottomBorder">Report:</th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="3" cellspacing="0">
-				<tr><td>Report Name:</td><td><? NewFormItem($f, $s, 'name', 'text', '50')?></td></tr>
-				<tr><td>Report Description:</td><td><? NewFormItem($f, $s, 'description', 'text', '50')?></td></tr>
-				<tr><td>Report Type:</td>
+				<tr><td>Name:</td><td><? NewFormItem($f, $s, 'name', 'text', '50')?></td></tr>
+				<tr><td>Description:</td><td><? NewFormItem($f, $s, 'description', 'text', '50')?></td></tr>
+				<tr><td>Email(s):</td><td><? NewFormItem($f, $s, 'email', 'text', 72, 10000)?></td></tr>
+				<tr><td>Type:</td>
 					<td>
 						<?
 							NewFormItem($f, $s, 'reporttype', 'selectstart');

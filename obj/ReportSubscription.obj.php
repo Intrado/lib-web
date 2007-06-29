@@ -5,12 +5,13 @@ class ReportSubscription extends DBMappedObject {
 	var $name = "";
 	var $description;
 	var $reportinstanceid;
-	var $dow;
-	var $dom;
-	var $date;
+	var $type;
+	var $daysofweek;
+	var $dayofmonth;
 	var $lastrun;
 	var $nextrun;
 	var $time;
+	var $email;
 
 
 	//var $reportinstance; // doesnt make sence in this context, subscriptions are children of reportinstance
@@ -20,7 +21,7 @@ class ReportSubscription extends DBMappedObject {
 	function ReportSubscription ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "reportsubscription";
-		$this->_fieldlist = array("userid", "name", "description", "reportinstanceid","dow", "dom", "date", "lastrun", "nextrun", "time");
+		$this->_fieldlist = array("userid", "name", "description", "reportinstanceid","type","daysofweek","dayofmonth", "lastrun", "nextrun", "time", "email");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
@@ -32,20 +33,21 @@ class ReportSubscription extends DBMappedObject {
 	}
 
 	function calcNextRun () {
-		if ($this->date != null) {
-			$nextrun = $this->date ." " . $this->time;
-			return $nextrun;
+		if ($this->type == 'once') {
+			return $this->nextrun; // once time should be calculated by the GUI
 
-		} else if ($this->dom != null) {
+		} else if ($this->type == 'monthly') {
 
 			$nextrun = Date("Y-m-d");
+			// TODO if -1 treat as 'end of month'
 			// TODO if day is later than today, take from first of current month, otherwise last_day into next month
 			$nextrun = QuickQuery("select last_day('$nextrun')");
-			$nextrun = QuickQuery("select date_add('$nextrun', interval ".$this->dom." day)") ." " . $this->time;
+			$nextrun = QuickQuery("select date_add('$nextrun', interval ".$this->dayofmonth." day)") ." " . $this->time;
 			return $nextrun;
 
-		} else if ($this->dow != null) {
-			$enableddows = explode(",", $this->dow);
+		} else if ($this->type == 'weekly') {
+
+			$enableddows = explode(",", $this->daysofweek);
 			$nextrun = Date("Y-m-d") ." " . $this->time;
 
 			for ($x = 0; $x < 8 ; $x++) {
@@ -58,7 +60,7 @@ class ReportSubscription extends DBMappedObject {
 				$nextrun = QuickQuery("select date_add('$nextrun',interval 1 day)");
 			}
 		}
-		return NULL;
+		return NULL; // null means notscheduled
 	}
 
 }

@@ -69,7 +69,7 @@ CREATE TABLE qjobtask (
 CREATE TABLE qschedule (
   `customerid` int(11) NOT NULL,
   `id` int(11) NOT NULL,
-  `dow` varchar(20) NOT NULL default '',
+  `daysofweek` varchar(20) NOT NULL,
   `time` time NOT NULL default '00:00:00',
   nextrun datetime default NULL,
   PRIMARY KEY  (customerid,id),
@@ -106,12 +106,13 @@ CREATE TABLE `qreportsubscription` (
   customerid int(11) NOT NULL,
   `id` int(11) NOT NULL,
   `userid` int(11) NOT NULL default '0',
-  `dow` varchar(20) default NULL,
-  `dom` tinyint(4) default NULL,
-  `date` date default NULL,
+  `type` enum('notscheduled','once','weekly','monthly') NOT NULL default 'notscheduled',
+  daysofweek varchar(20) default NULL,
+  dayofmonth tinyint(4) default NULL,
   `timezone` varchar(50) NOT NULL,
   `nextrun` datetime default NULL,
   `time` TIME default NULL,
+  email text NOT NULL,
   PRIMARY KEY  (customerid, `id`),
   KEY nextrun (nextrun)
 ) TYPE=InnoDB;

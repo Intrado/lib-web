@@ -189,7 +189,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$dow[$x-1] = $x;
 					}
 				}
-				$schedule->dow = implode(",",$dow);
+				$schedule->daysofweek = implode(",",$dow);
+		error_log("daysofweek ".$schedule->daysofweek);
 				$schedule->nextrun = $schedule->calcNextRun();
 
 				$schedule->update();
@@ -346,7 +347,7 @@ if( $reloadform )
 		if ($schedule->id == NULL) {
 			$schedule->time = $USER->getCallEarly();
 		} else {
-			$data = explode(",", $schedule->dow);
+			$data = explode(",", $schedule->daysofweek);
 			for ($x = 1; $x < 8; $x++)
 			    $scheduledows[$x] = in_array($x,$data);
 		}
