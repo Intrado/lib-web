@@ -188,6 +188,7 @@ if (CheckFormSubmit($f,$s)){
 							('maxphones', '3'),
 							('maxemails', '2'),
 							('retry', '15'),
+							('disablerepeat', '0'),
 							('surveyurl', '" . DBSafe($surveyurl) . "'),
 							('displayname', '" . DBSafe($displayname) . "'),
 							('timezone', '" . DBSafe($timezone) . "'),
