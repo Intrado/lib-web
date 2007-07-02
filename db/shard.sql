@@ -60,7 +60,8 @@ CREATE TABLE qjobtask (
   phone varchar(20) default NULL,
   uuid varchar(255) NOT NULL,
   PRIMARY KEY  (customerid,jobid,`type`,personid,sequence),
-  KEY dispatch (jobid,`status`,attempts,sequence)
+  KEY dispatch (jobid,`status`,attempts,sequence),
+  UNIQUE uuid (uuid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
