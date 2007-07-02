@@ -63,4 +63,6 @@ $job->generateSql();
 echo "new sql is: " . $job->thesql . "\n";
 
 $job->update();
+
+exit(0); // success
 ?>

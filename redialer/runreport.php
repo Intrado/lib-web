@@ -94,10 +94,11 @@ $result = $generator->runPDF($params);
 echo $result;
 
 // if success, and subscription, then update the lastrun field
-if("success" == $result && $type == "subscription") {
-	QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id)); // TODO handle timezone
-} else {
-	exit(-1);
+if("success" == $result) {
+	if ("subscription" == $type) {
+		QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id)); // TODO handle timezone
+	}
+	exit(0);
 }
-
+exit(-1);
 ?>
