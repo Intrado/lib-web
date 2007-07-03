@@ -1,7 +1,7 @@
 <?
 include_once("common.inc.php");
 include_once("../obj/Customer.obj.php");
-include_once("../inc/Table.inc.php");
+include_once("../inc/table.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
