@@ -164,6 +164,27 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 	}
 }
 
+function doLoginUploadImport($uploadkey, $url = null) {
+	global $IS_COMMSUITE;
+	if ($IS_COMMSUITE) {
+		// TODO
+		return 0;
+
+	/*CSDELETEMARKER_START*/
+	} else {
+		$params = array(new XML_RPC_Value($uploadkey, 'string'), new XML_RPC_Value($url, 'string'));
+		$method = "AuthServer.loginUploadImport";
+		$result = pearxmlrpc($method, $params);
+		if ($result !== false) {
+			// login success
+			session_id($result['sessionID']); // set the session id
+			return $result['importID'];
+		}
+	/*CSDELETEMARKER_END*/
+	}
+}
+
+
 function forceLogin($loginname, $url = null) {
 	global $IS_COMMSUITE;
 	if ($IS_COMMSUITE) {
