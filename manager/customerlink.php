@@ -48,7 +48,7 @@ Link:
 <?
 	if(isset($string)){
 ?>
-		<a href="https://asp.schoolmessenger.com/<?=$customerurl?>/?asptoken=<?=$string?>" target="_blank"><?=$customerurl?></a>
+		<a href="<?=$SETTINGS['feature']['customer_url_prefix'] ."/". $customerurl?>/?asptoken=<?=$string?>" target="_blank"><?=$customerurl?></a>
 <?
 	}
 ?>
