@@ -2,9 +2,12 @@
 /*CSDELETEMARKER_START*/
 
 function pearxmlrpc($method, $params) {
+	global $SETTINGS;
+	$authhost = $SETTINGS['authserver']['host'];
+
 	$msg = new XML_RPC_Message($method, $params);
 
-	$cli = new XML_RPC_Client('/xmlrpc', 'localhost:8088');
+	$cli = new XML_RPC_Client('/xmlrpc', $authhost);
 
 	$resp = $cli->send($msg);
 
