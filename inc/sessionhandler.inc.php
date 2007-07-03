@@ -1,39 +1,34 @@
 <?
-/*CSDELETEMARKER_START*/
-if (!$IS_COMMSUITE) {
 
-function open($save_path, $session_name)
+function sess_open($save_path, $session_name)
 {
   return(true);
 }
 
-function close()
+function sess_close()
 {
   return(true);
 }
 
-function read($id)
+function sess_read($id)
 {
   return (string) getSessionData($id);
 }
 
-function write($id, $sess_data)
+function sess_write($id, $sess_data)
 {
   return putSessionData($id, $sess_data);
 }
 
-function destroy($id)
+function sess_destroy($id)
 {
   return(true);
 }
 
-function gc($maxlifetime)
+function sess_gc($maxlifetime)
 {
   return true;
 }
 
-session_set_save_handler("open", "close", "read", "write", "destroy", "gc");
-}
-
-/*CSDELETEMARKER_END*/
+session_set_save_handler("sess_open", "sess_close", "sess_read", "sess_write", "sess_destroy", "sess_gc");
 ?>

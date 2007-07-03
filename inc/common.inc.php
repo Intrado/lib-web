@@ -12,18 +12,6 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
-function doStartSession() {
-//	if (session_id() != "") return; // session was already started
-	global $CUSTOMERURL;
-	session_name($CUSTOMERURL . "_session");
-	session_start();
-
-	if (isset($_SESSION['timezone'])) {
-		@date_default_timezone_set($_SESSION['timezone']);
-		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-	}
-}
-
 require_once("db.inc.php");
 require_once("DBMappedObject.php");
 require_once("DBRelationMap.php");
@@ -61,7 +49,6 @@ if (!isset($isindexpage) || !$isindexpage) {
 		}
 	}
 }
-
 
 
 ?>

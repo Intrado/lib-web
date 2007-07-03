@@ -21,58 +21,67 @@ if ($SETTINGS['feature']['has_ssl']) {
 	}
 }
 
+
+//check various ways to log in
 $badlogin = false;
+$userid = false;
+$updatelogin = false;
+$sessionstarted = false;
 if (isset($_GET['login'])) {
-	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
-}
-if (isset($_GET['login']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
+	$login = get_magic_quotes_gpc() ? stripslashes($_GET['login']) : $_GET['login'];
 	/*CSDELETEMARKER_START*/
-	if($_GET['login'] == 'schoolmessenger'){
-		redirect("unauthorized.php");
+	if(!$IS_COMMSUITE && $_GET['login'] == 'schoolmessenger'){
+		@session_destroy();
+		$badlogin = true;
+	} else {
+	/*CSDELETEMARKER_END*/
+		doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
+		$sessionstarted = true;
+		if (isset($_SESSION['user']) && is_object($_SESSION['user']) && $_SESSION['user']->authorize('manageaccount')) {
+			$userid = forceLogin($login, $CUSTOMERURL);
+		} else {
+			$badlogin = true;
+			error_log("FORCE login failed");
+		}
+
+	/*CSDELETEMARKER_START*/
 	}
 	/*CSDELETEMARKER_END*/
-	$id = forceLogin(get_magic_quotes_gpc() ? stripslashes($_GET['login']) : $_GET['login'], $CUSTOMERURL);
 
-	if ($id) {
-		$USER = $_SESSION['user'] = new User($id);
-		$_SESSION['access'] = new Access($USER->accessid);
-		$_SESSION['custname'] = getSystemSetting("displayname");
-		$_SESSION['timezone'] = getSystemSetting("timezone");
-		redirect("start.php");
-	} else {
+} else if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
+	$f_login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
+	$f_pass = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
+	if (!$userid = doLogin($f_login, $f_pass, $CUSTOMERURL)) {
 		$badlogin = true;
+		error_log("User trying to log in but has bad user/pass/url");
 	}
-} elseif (isset($_SESSION['user'])) {
+	$updatelogin = true;
+} else if (isset($_GET['asptoken'])) {
+	if (!$userid = asptokenLogin($_GET['asptoken'], $CUSTOMERURL)) {
+		$badlogin = true;
+		error_log("ASPTOKEN login failure");
+	}
+} else if (isset($_SESSION['user'])) {
 	$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
 	unset($_SESSION['lasturi']);
 	redirect($redirpage);
-} elseif ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ||
-		  (isset($_GET['asptoken']))) {
+}
 
-	if (isset($_GET['asptoken'])) {
-		$id = asptokenLogin($_GET['asptoken'], $CUSTOMERURL);
-	} else {
-		$id = doLogin(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'], get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'],$CUSTOMERURL);
-	}
-
-	if ($id) {
+//if we got a valid userid from above, log in for that user.
+if ($userid) {
+	if (!$sessionstarted)
 		doStartSession();
-		$newuser = new User($id);
-		$newaccess = new Access($newuser->accessid);
-		if($newuser->enabled && $newaccess->getValue('loginweb')) {
-			$USER = $_SESSION['user'] = $newuser;
-			$ACCESS = $_SESSION['access'] = $newaccess;
-			$_SESSION['custname'] = getSystemSetting("displayname");
-			$_SESSION['timezone'] = getSystemSetting("timezone");
-			QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
+	loadCredentials($userid);
+	if (!$USER->enabled || $USER->deleted | !$ACCESS->getValue('loginweb')) {
+		@session_destroy();
+		$badlogin = true;
+		error_log("User trying to log in but is disabled or doesnt have access");
+	} else {
+		if ($updatelogin) {
 			$USER->lastlogin = QuickQuery("select now()");
 			$USER->update(array("lastlogin"));
-			redirect("start.php");
-		} else {
-			$badlogin = true;
 		}
-	} else {
-		$badlogin = true;
+		redirect("start.php");
 	}
 }
 
