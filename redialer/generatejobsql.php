@@ -20,23 +20,23 @@ require_once("../obj/SurveyQuestionnaire.obj.php");
 
 $custid = $argv[1] +0;
 if ($custid == 0) {
-	echo "missing customer id, Usage: generatejobsql customerid jobid dbhost:port dbuser dbpass dbname \n";
+	echo "missing customer id, Usage: generatejobsql customerid jobid dbhost:port dbname dbuser dbpass \n";
 	exit(-1);
 }
 
 $jobid = $argv[2] +0;
 if ($jobid == 0) {
-	echo "missing job id, Usage: generatejobsql customerid jobid dbhost:port dbuser dbpass dbname \n";
+	echo "missing job id, Usage: generatejobsql customerid jobid dbhost:port dbname dbuser dbpass \n";
 	exit(-1);
 }
 
 echo "generatejobsql for customerid=".$custid." jobid=".$jobid."\n";
 
 // gather database connection info
-$db['host'] = $argv[3]; //"localhost:3306";
-$db['db'] = $argv[4]; //"c_7";
-$db['user'] = $argv[5]; //"root";
-$db['pass'] = $argv[6]; //""; // password is last argument in case it is blank
+$db['host'] = $argv[3];
+$db['db'] = $argv[4];
+$db['user'] = $argv[5];
+$db['pass'] = $argv[6]; // password is last argument in case it is blank
 
 
 
