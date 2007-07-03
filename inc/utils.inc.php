@@ -190,6 +190,16 @@ function base64url_encode($data)
 	return rtrim(strtr(base64_encode($data), '+/', '-_'),"=");
 }
 
+//modified from php.net
+function base64url_decode($string) {
+    $data = strtr($string, '-_','+/');
+    $mod4 = strlen($data) % 4;
+    if ($mod4) {
+        $data .= substr('====', $mod4);
+    }
+    return base64_decode($data);
+}
+
 //checks emails seperated by ";" in a single string
 function checkemails($emaillist) {
 	if($emaillist=="")
@@ -277,7 +287,7 @@ function generateFields($tablealias){
 	$first = FieldMap::GetFirstNameField();
 	$last = FieldMap::GetLastNameField();
 	for($i=1; $i<=20; $i++){
-		
+
 		if($i<10){
 			$num = "f0".$i;
 		}else{
@@ -319,7 +329,7 @@ function select_metadata($tablename=null, $start=null, $fields){
 					}
 				}
 				?><td><div align="center">
-				<? 
+				<?
 					if(isset($_SESSION['fields'][$fieldnum]) && $_SESSION['fields'][$fieldnum]){
 						$result = "<img src=\"img/checkbox-check.png\" onclick=\"dofieldbox(this,true,'$fieldnum');";
 						$checked = "checked>";
@@ -331,7 +341,7 @@ function select_metadata($tablename=null, $start=null, $fields){
 						$result .= "\">";
 					} else {
 						$result .= "toggleHiddenField('$fieldnum'); setColVisability($tablename, $start+$count, new getObj('hiddenfield$fieldnum').obj.checked); \">";
-					}				
+					}
 					echo $result;
 					echo "<input style='display: none' type='checkbox' id='hiddenfield$fieldnum' " . $checked;
 				?>
