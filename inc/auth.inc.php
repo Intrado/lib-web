@@ -55,10 +55,9 @@ function doLogin($loginname, $password, $url = null) {
 		$loginname = dbsafe(trim($loginname));
 		$password = dbsafe($password);
 
-		$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
-		$ad = $SETTINGS['ldap']['ldap_ad'];
-		$com = $SETTINGS['ldap']['ldap_com'];
-		$LDAP_EXTENSION = "@" . $ad . "." . $com;
+		$LDAP_CONNECT = $SETTINGS['ldap']['ldap_connect'];
+		$LDAP_EXTENSION = $SETTINGS['ldap']['ldap_extension'];
+		
 		if($IS_LDAP){
 			$userldap = QuickQuery("select user.ldap from user where user.login='$loginname'");
 
@@ -117,20 +116,34 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 			$LDAP_CONNECT = $SETTINGS['ldap']['ldapconnect'];
 			$ldapusername = $SETTINGS['ldap']['ldapusername'];
 			$ldappassword = $SETTINGS['ldap']['ldappassword'];
-			$ad = $SETTINGS['ldap']['ldap_ad'];
-			$com = $SETTINGS['ldap']['ldap_com'];
-			$cn = $SETTINGS['ldap']['ldap_cn'];
+			$LDAP_EXTENSION = $SETTINGS['ldap']['ldap_extension'];
+			$LDAP_WINDOWS = $SETTINGS['ldap']['ldap_windows'];
 
 			$query = "select login, id, ldap from user where enabled=1 and deleted=0 and "
 					."accesscode='$loginname' and pincode=password('$password')";
 			$user = Query($query);
 			$user = DBGetRow($user);
 			if($user[2]){
+				$ldap_query = "";
+				$extensions = explode(".", substr($LDAP_EXTENSION ,1, strlen($LDAP_EXTENSION )-1));
+				foreach($extensions as $extension){
+					if($ldap_query !=""){
+						$ldap_query .= ",";
+					}
+					$ldap_query .= "dc=$extension";
+				}
 				if($ds=ldap_connect($LDAP_CONNECT)) {
-					if(@ldap_bind($ds,$ldapusername,$ldappassword)) {
-
-						$sr=ldap_search($ds, "cn=$cn, dc=$ad, dc=$com", "sAMAccountName=".$user[0]);
+					if(ldap_bind($ds, $ldap_username . $LDAP_EXTENSION, $ldap_password)) {
+						if($LDAP_WINDOWS){
+							$sr=ldap_search($ds, $ldap_query, "sAMAccountName=".$user[0]);
+						} else {
+							$sr=ldap_search($ds, $ldap_query, "uid=".$user[0]);
+						}
 						$info = ldap_get_entries($ds, $sr);
+						if(!$info || $info['count'] == 0 || $info['count'] > 1){
+							ldap_close($ds);
+							return false;
+						}
 						if(!($info[0]["useraccountcontrol"][0] & 2)){
 							ldap_close($ds);
 							return $user[1];
