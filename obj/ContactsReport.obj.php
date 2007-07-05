@@ -84,10 +84,20 @@ class ContactsReport extends ReportGenerator {
 		foreach($idlist as $id){
 			$personquery = "select
 							p.pkey as pkey, 
+							p.id as pid,
 							p." . FieldMap::GetFirstNameField() . " as firstname, 
-							p." . FieldMap::GetLastNameField() . " as lastname 
+							p." . FieldMap::GetLastNameField() . " as lastname, 
+							concat(
+									coalesce(a.addr1,''), ' ',
+									coalesce(a.addr2,''), ' ',
+									coalesce(a.city,''), ' ',
+									coalesce(a.state,''), ' ',
+									coalesce(a.zip,'')
+								) as address
+							
 							$fieldquery
 							 from person p
+							 left join address a on (a.personid = p.id)
 							where p.id = '$id'";
 							
 			$personrow = QuickQueryRow($personquery);
@@ -102,17 +112,17 @@ class ContactsReport extends ReportGenerator {
 <?
 				if(isset($options['personid']) && $options['personid'] != "") {
 ?>
-				<tr><td>Person ID: <?=isset($options['personid']) ? $options['personid'] : ""?></td></tr>
+				<tr><td>Person ID: <?=$options['personid']?></td></tr>
 <?
 				}
 				if(isset($options['phone']) && $options['phone'] != "") {
 ?>
-				<tr><td>Phone: <?=isset($options['phone']) ? $options['phone'] : ""?></td></tr>
+				<tr><td>Phone: <?=$options['phone']?></td></tr>
 <?
 				}
 				if(isset($options['email']) && $options['email'] != "") {
 ?>			
-				<tr><td>Email: <?=isset($options['email']) ? $options['email'] : ""?></td></tr>
+				<tr><td>Email: <?=$options['email']?></td></tr>
 <?
 				}
 ?>
@@ -130,6 +140,7 @@ class ContactsReport extends ReportGenerator {
 				<td>ID#</td>
 				<td>First Name</td>
 				<td>Last Name</td>
+				<td>Address</td>
 				<td>Sequence</td>
 				<td>Destination</td>
 			<?
@@ -153,16 +164,17 @@ class ContactsReport extends ReportGenerator {
 				
 				$person = $personlist[$id];
 				?>
-					<td><?=$person[0]?></td>
-					<td><?=$person[1]?></td>
+					<td><?=fmt_idmagnify($person,0)?></td>
 					<td><?=$person[2]?></td>
+					<td><?=$person[3]?></td>
+					<td><?=$person[4]?></td>
 					
 					<?
 						$first=true;
 						foreach($phonelist[$id] as $phone){
 							if(!$first) {
 								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-								?><td></td><td></td><td></td><?
+								?><td></td><td></td><td></td><td></td><?
 							}
 							?>
 							<td><?=$phone->sequence +1?></td><td><?=fmt_phone_contact($phone->phone)?></td>
@@ -177,12 +189,12 @@ class ContactsReport extends ReportGenerator {
 										$num = "f" . $i;
 									}
 									if(in_array($num, array_keys($fieldlist))){
-										?><td><?=$person[3+$count]?></td><?
+										?><td><?=$person[5+$count]?></td><?
 										$count++;
 									}
 								}
 							} else {
-								for($i=1; $i<$fieldcount+1; $i++){
+								for($i=0; $i<$fieldcount; $i++){
 									?><td>&nbsp;</td><?
 								}
 							}
@@ -192,7 +204,7 @@ class ContactsReport extends ReportGenerator {
 						foreach($emaillist[$id] as $email){
 							if(!$first) {
 								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-								?><td></td><td></td><td></td><?
+								?><td></td><td></td><td></td><td></td><?
 							}
 							?><td><?=$email->sequence +1?></td><td><?=$email->email?></td>
 							<? 
@@ -206,12 +218,12 @@ class ContactsReport extends ReportGenerator {
 										$num = "f" . $i;
 									}
 									if(in_array($num, array_keys($fieldlist))){
-										?><td><?=$person[3+$count]?></td><?
+										?><td><?=$person[5+$count]?></td><?
 										$count++;
 									}
 								}
 							} else {
-								for($i=1; $i<$fieldcount+1; $i++){
+								for($i=0; $i<$fieldcount; $i++){
 									?><td>&nbsp;</td><?
 								}
 							}
@@ -230,7 +242,7 @@ class ContactsReport extends ReportGenerator {
 			$count=1;
 			foreach($fieldlist as $index => $field){
 				?>
-				setColVisability(searchresultstable, 4+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				setColVisability(searchresultstable, 5+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
 				$count++;
 			}
