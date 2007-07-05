@@ -75,7 +75,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
-			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."' AND id != $currentid")) {
+			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' AND id != $currentid")) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if (strlen($inboundnumber) > 0 && !ereg("[0-9]{10}",$inboundnumber)) {
 				error('Bad Toll Free Number Format, Try Again');
@@ -85,7 +85,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error('Bad Manager Password');
 			} else {
 
-				QuickUpdate("update customer set hostname = '" . DBSafe($hostname) ."' where id = '$currentid'");
+				QuickUpdate("update customer set urlcomponent = '" . DBSafe($hostname) ."' where id = '$currentid'");
 				QuickUpdate("update customer set inboundnumber = '" . DBSafe($inboundnumber) ."' where id = '$currentid'");
 				setCustomerSystemSetting("displayname", $displayname, $custdb);
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
