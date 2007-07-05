@@ -302,7 +302,7 @@ function generateFields($tablealias){
 	return $fieldstring;
 }
 
-function select_metadata($tablename=null, $start=null, $fields){
+function select_metadata($tablename=null, $start=null, $fields, $saved = "false"){
 	global $USER;
 ?>
 	<table border="0" cellpadding="2" cellspacing="1" class="list">
@@ -331,10 +331,10 @@ function select_metadata($tablename=null, $start=null, $fields){
 				?><td><div align="center">
 				<?
 					if(isset($_SESSION['fields'][$fieldnum]) && $_SESSION['fields'][$fieldnum]){
-						$result = "<img src=\"img/checkbox-check.png\" onclick=\"dofieldbox(this,true,'$fieldnum');";
+						$result = "<img src=\"img/checkbox-check.png\" onclick=\"dofieldbox(this,true,'$fieldnum', $saved);";
 						$checked = "checked>";
 					} else {
-						$result = "<img src=\"img/checkbox-clear.png\" onclick=\"dofieldbox(this,false,'$fieldnum');";
+						$result = "<img src=\"img/checkbox-clear.png\" onclick=\"dofieldbox(this,false,'$fieldnum', $saved);";
 						$checked = ">";
 					}
 					if($tablename == null && $start ==null){
