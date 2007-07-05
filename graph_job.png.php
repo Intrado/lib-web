@@ -22,7 +22,7 @@ if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && custom
 
 $query = "
 select count(*) as cnt,
-		coalesce(if (rp.status='waiting', 'retry', rc.result),
+		coalesce(if (rp.status='waiting', 'retry', if(rc.result='notattempted', null, rc.result)),
 			if (rp.status not in ('fail','duplicate','scheduled'), 'inprogress',rp.status))
 			as callprogress2
 from reportperson rp

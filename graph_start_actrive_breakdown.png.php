@@ -15,7 +15,7 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 
 $query = "
 select count(*) as cnt,
-		coalesce(if (rp.status='waiting', 'retry', rc.result),
+		coalesce(if (rp.status='waiting', 'retry', if(rc.result='notattempted', null, rc.result)),
 			if (rp.status not in ('fail','duplicate','scheduled'), 'inprogress', rp.status))
 			as callprogress2
 
