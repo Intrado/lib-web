@@ -203,7 +203,7 @@ class JobReport extends ReportGenerator{
 							$result = Query($query);
 							while ($row = DBGetRow($result)) {
 								$totalcalls += $row[0];
-								$index = $row[1] !== NULL ? $row[1] : "nullcp";
+								$index = ( ($row[1] !== NULL) && ($row[1] !== 'notattempted') ) ? $row[1] : "nullcp";
 								$jobstats["phone"][$index] += $row[0];
 								if ($row[1] != "A" && $row[1] != "M") {
 									$remainingcalls += $row[2];
@@ -335,9 +335,6 @@ class JobReport extends ReportGenerator{
 						<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Phone:</th>
 						<td class="bottomBorder">
 							<table>
-							<tr><td>
-								<div class="floatingreportdata"><u>Phone #s</u></td><td><?= number_format($jobstats["phone"]["totalcalls"]) ?></div>
-							</td></tr>
 							<tr><td>
 								<div class="floatingreportdata"><u>Answered</u></td><td><?= number_format($jobstats["phone"]["A"]) ?></div>
 							</td></tr>
