@@ -82,7 +82,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 	else
 	{
 		MergeSectionFormData($f, $s);
-
+		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(!$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
@@ -103,7 +103,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 				$name = DBSafe(GetFormData($f, $s, 'name'.$jobtype['id']));
 				$timeslice = GetFormData($f, $s, 'timeslice'.$jobtype['id']) + 0;
 				$systempriority = GetFormData($f, $s, 'systempriority'.$jobtype['id']) + 0;
-				$query = "update jobtype set name = '$name', timeslices = '$timeslice', where id = '$id'";
+				$query = "update jobtype set name = '$name', timeslices = '$timeslice' where id = '$id'";
 				QuickUpdate($query, $custdb);	
 			}
 			$refresh = 1;
