@@ -29,7 +29,7 @@ if ($REQUEST_TYPE == "new") {
 	} else if ($foundtask = assignTask("phone",$RESOURCEID, $dmapidb)) {
 
 
-		$sessid = base64url_encode(implode(":",array($foundtask->id,$foundtask->customerid,$foundtask->shardid,$foundtask->tasktime)));
+		$sessid = base64url_encode(implode(":",array($foundtask->id,$foundtask->customerid,$foundtask->shardid,ceil(microtime(true)*1000))));
 
 		//add the sessionid to the voice tag
 		echo str_replace("<voice>","<voice sessionid=\"outbound_$sessid\">",$foundtask->renderedmessage);
