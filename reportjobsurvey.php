@@ -98,7 +98,6 @@ if(isset($_REQUEST['reportid'])){
 
 		}
 		$_SESSION['saved_report'] = false;
-		$options=array("jobid" => $jobid);
 		$_SESSION['report']['options'] = $options;
 	} else {
 		$options = $_SESSION['report']['options'];
