@@ -253,7 +253,7 @@ if($reportgenerator->format != "html"){
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
 			<td class="bottomBorder">
 	<? 		
-				select_metadata('searchresultstable', 4, $fields);
+				select_metadata('searchresultstable', 5, $fields);
 	?>
 			</td>
 		</tr>
