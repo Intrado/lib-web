@@ -18,6 +18,7 @@ require_once("obj/UserSetting.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/ContactsReport.obj.php");
+require_once("obj/Person.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,9 +77,9 @@ if(isset($_REQUEST['reportid'])){
 	$options = $reportinstance->getParameters();
 	
 	$_SESSION['saved_report'] = true;
-	$_SESSION['report']['options'] = $options;
+	$_SESSION['contacts']['options'] = $options;
 } else {
-	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
 	$activefields = array();
 	$fieldlist = array();
 	foreach($fields as $field){
@@ -126,10 +127,10 @@ if(CheckFormSubmit($f,$s))
 			$orders = array("order1", "order2", "order3");
 			foreach($orders as $order){
 				$options[$order] = GetFormData($f, $s, $order);
-				$_SESSION['report']['options'] = $options;
+				$_SESSION['contacts']['options'] = $options;
 			}
 
-			$_SESSION['report']['options'] = $options;
+			$_SESSION['contacts']['options'] = $options;
 			redirect();
 		}
 	}
@@ -138,7 +139,7 @@ if(CheckFormSubmit($f,$s))
 }
 if($reload){
 	ClearFormData($f);
-	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
 	foreach($orders as $order){
 		PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
 	}
@@ -167,12 +168,12 @@ startWindow("Display Options", "padding: 3px;");
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
 		<td class="bottomBorder">
 <? 		
-		select_metadata('searchresultstable', 4, $fields); 
+		select_metadata('searchresultstable', 5, $fields); 
 ?>
 		</td>
 	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort by:</th>
-		<td class="bottomBorder">
+	<tr valign="top"><th align="right" class="windowRowHeader">Sort by:</th>
+		<td>
 			<table>
 				<tr>
 <?
@@ -195,11 +196,12 @@ startWindow("Display Options", "padding: 3px;");
 <?
 			}
 ?>
+				<td><? echo submit($f, $s, "refresh", "refresh");?></td>
 				</tr>
+				
 			</table>
 		</td>
 	</tr>
-	<tr><td><? echo submit($f, $s, "search", "search");?></td></tr>
 </table>
 <?
 endWindow();
