@@ -121,11 +121,11 @@ $reportgenerator->userid = $USER->id;
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:reports";
-$TITLE = "Drilldown";
+$TITLE = "Individual Report Data";
 
 include_once("nav.inc.php");
-
+buttons(button('back', 'window.history.go(-1)'));
 $reportgenerator->generate();
-
+buttons();
 include_once("navbottom.inc.php");
 ?>
