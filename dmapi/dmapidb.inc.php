@@ -3,6 +3,7 @@
 //establish a DB connection to the dmapi db
 //remember we can't mix DB functions like DBSafe,Query, etc and need to specify the connection handler
 //is there an alternate DB to use for the dmapi?
+global $_dbcon, $dmapidb;
 if (isset($SETTINGS['dmapidb']['host'])) {
 	$db = $SETTINGS['dmapidb'];
 
@@ -26,7 +27,6 @@ if (isset($SETTINGS['dmapidb']['host'])) {
 		return;
 	}
 } else {
-	global $_dbcon;
 	$dmapidb = $_dbcon; //just set it to the same as the default DB connection
 }
 ?>

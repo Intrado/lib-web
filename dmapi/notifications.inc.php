@@ -1,5 +1,13 @@
 <?
 
+class Task {
+	var $id;
+	var $customerid;
+	var $shardid;
+	var $tasktime;
+	var $renderedmessage;
+}
+
 //attempt to assign a task by setting the status to calling.
 //TODO, check to see if this request is a failover request, and possible delay it until the DBs are syned up
 //so that we don't assign any tasks that might have already been assigned from the failed node that are waiting in our mysql log.
@@ -15,27 +23,33 @@ function assignTask ($type, $resourceid, $dmapidb) {
 
 	//get the id of next available task
 	//update the task to assign it to us
-	$query = "select id from jobtaskactive where status='new' and type='$type' and tasktime > date_sub(now(), interval 60 second) "
-			. " and assignmentgroup = " . $resourceid % 2 . " order by tasktime limit 1 for update";
+	$query = "select id,customerid,shardid,tasktime,renderedmessage from jobtaskactive order by tasktime limit 1 for update";
 
 	$res = mysql_query($query,$dmapidb);
-	$row = mysql_fetch_row($res);
-	if ($row && $row[0]) {
-		$foundid = $row[0];
-		$query = "update jobtaskactive set status='calling', starttime=unix_timestamp()*1000 where id='" . mysql_real_escape_string($foundid,$dmapidb) . "'";
-		$res = mysql_query($query, $dmapidb);
-		$gotatask = true;
+	if ($row = mysql_fetch_row($res)) {
+		$task = new Task();
+
+		$task->id = $row[0];
+		$task->customerid = $row[1];
+		$task->shardid = $row[2];
+		$task->tasktime = $row[3];
+		$task->renderedmessage = $row[4];
+
+		$query = "delete from jobtaskactive where id='" . mysql_real_escape_string($task->id,$dmapidb) . "'";
+		mysql_query($query, $dmapidb);
 	} else {
-		$gotatask = false;
+		$task = false;
 	}
 
 	mysql_query("commit", $dmapidb);
-	
-	return $gotatask ? $foundid : false;
+
+	return $task;
 }
 
 
 function assignSpecialTask ($types, $dmapidb) {
+	return false;
+	/*
 	$success = false;
 	foreach($types as $specialtype) {
 		//when was the last time we checked the specialtasks table? We shouldn't check more than once every 5 seconds
@@ -66,6 +80,7 @@ function assignSpecialTask ($types, $dmapidb) {
 		return false;
 	else
 		return array($id,$type);
+*/
 }
 
 

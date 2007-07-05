@@ -56,7 +56,6 @@ if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 
 	if ($SETTINGS['feature']['log_dmapi']) {
 		$rawoutput = ob_get_flush();
-		ob_end_flush();
 
 		$logfilename = $SETTINGS['feature']['log_dir'] . "output.txt";
 
