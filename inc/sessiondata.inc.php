@@ -1,66 +1,38 @@
 <?
 
-function DmapiQuickQuery ($query) {
-	global $dmapidb;
-	$val = false;
-	if ($result = mysql_query($query,$dmapidb)) {
-		if ($row = mysql_fetch_row($result)) {
-			$val = $row[0];
-		}
-		mysql_free_result($result);
-	}
-	return $val;
-}
-
-function DmapiQuickUpdate ($query) {
-	global $dmapidb;
-	if (mysql_query($query,$dmapidb)) {
-		return mysql_affected_rows();
-	}
-	return false;
-}
-
-
 //load session data
 function loadSessionData ($sessionid) {
-	global $dmapidb;
-
 	//escape the sessionid!
-	$query = "select data from sessiondata where id='" . mysql_real_escape_string($sessionid, $dmapidb) . "'";
-	$data = DmapiQuickQuery($query);
+	$query = "select data from sessiondata where id='" . DBSafe($sessionid) . "'";
+	$data = QuickQuery($query);
 
-	if ($data !== false) {
-		$retdata = unserialize($data);
-		getSessionData($retdata[authSessionID]); // load customer db connection from auth server
-		return $retdata;
-	} else
+	if ($data !== false)
+		return unserialize($data);
+	else
 		return false;
 }
 
 //store session data
 function storeSessionData ($sessionid, $customerid, $data) {
-	global $dmapidb;
-
-	if (DmapiQuickQuery("select count(*) from sessiondata where id='" . mysql_real_escape_string($sessionid, $dmapidb) . "'") > 0) {
+	if (QuickQuery("select count(*) from sessiondata where id='" . DBSafe($sessionid) . "'") > 0) {
 		$query = "update sessiondata set data='"
-					. mysql_real_escape_string(serialize($data), $dmapidb) . "' where id='"
-					. mysql_real_escape_string($sessionid, $dmapidb) . "'";
-		DmapiQuickUpdate($query);
+					. DBSafe(serialize($data)) . "' where id='"
+					. DBSafe($sessionid) . "'";
+		QuickUpdate($query);
 	} else {
 		$query = "insert into sessiondata (id,customerid,data) values ('"
-				. mysql_real_escape_string($sessionid, $dmapidb) . "', '"
-				 . mysql_real_escape_string($customerid, $dmapidb) . "', '"
-				 . mysql_real_escape_string(serialize($data), $dmapidb) . "')";
+				. DBSafe($sessionid) . "', '"
+				 . DBSafe($customerid) . "', '"
+				 . DBSafe(serialize($data)) . "')";
 
-		DmapiQuickUpdate($query);
+		QuickUpdate($query);
+
 	}
 }
 
 //erase session data
 function eraseSessionData ($sessionid) {
-	global $dmapidb;
-
-	DmapiQuickUpdate("delete from sessiondata where id='" . mysql_real_escape_string($sessionid, $dmapidb) . "'");
+	QuickUpdate("delete from sessiondata where id='" . DBSafe($sessionid) . "'");
 }
 
 ?>
