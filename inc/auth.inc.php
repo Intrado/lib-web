@@ -171,8 +171,12 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 		$result = pearxmlrpc($method, $params);
 		if ($result !== false) {
 			// login success
+
+			//if this is in the DMAPI code, we need to set the auth session id in teh dmapi session data
+			//so that it can load the db connection info on next page hit
 			global $SESSIONDATA;
-			$SESSIONDATA['authSessionID'] = $result['sessionID'];
+			if (isset($SESSIONDATA))
+				$SESSIONDATA['authSessionID'] = $result['sessionID'];
 			getSessionData($result['sessionID']); // load customer db connection
 			return $result['userID'];
 		}
