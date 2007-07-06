@@ -9,7 +9,7 @@ require_once("dmapidb.inc.php");
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
-require_once("../inc/sessiondata.inc.php");
+require_once("dmapisessiondata.inc.php");
 require_once("../inc/utils.inc.php");
 
 

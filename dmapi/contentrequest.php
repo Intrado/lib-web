@@ -5,50 +5,80 @@ require_once("../inc/auth.inc.php");
 require_once("dmapidb.inc.php");
 require_once("../inc/sessiondata.inc.php");
 
+if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
+	$SESSIONID = $BFXML_ELEMENT['attrs']['SESSIONID'];
 
+	$success = false;
+	if (strpos($SESSIONID,"outbound_") !== false) {
 
-if ($BFXML_ELEMENT['attrs']['REQUEST'] == "get") {
-	$content = findChild($BFXML_ELEMENT,"CONTENT");
-	$cmid = $content['attrs']['ID'] + 0;
+		//parse out the sessionid
+		//trim off the "outbound_" marker from the sessionid
+		$sessid = substr($SESSIONID,9); //trim off "outbound_" from the sessionid
+		//parse out the bits:
+		list($taskid,$customerid,$shardid,$tasktime) = explode(":",base64url_decode($sessid));
 
-	if ($c = contentGet($cmid, true)) {
-		list($contenttype,$data) = $c;
-?>
-	<content id="<?= $cmid ?>">
-		<data mime-type="<?= $contenttype ?>"><?= $data ?></data>
-	</content>
-<?
+		$success = authorizeTaskRequest($taskid); //get DB connection info
+
 	} else {
-?>
-		<error>Unable to retrieve the content for cmid:<?= $cmid ?></error>
-<?
-	}
-} else if ($BFXML_ELEMENT['attrs']['REQUEST'] == "put") {
-	$content = findChild($BFXML_ELEMENT,"CONTENT");
-	loadSessionData($content['attrs']['SESSIONID']);
 
-	$dataelement = findChild($content,"DATA");
-	$contenttype = $dataelement['attrs']['MIME-TYPE'];
-	$data = $dataelement['txt'];
-	$tmpname = secure_tmpname("dmapicontent",".b64");
-	if($tmpname != false) {
-		file_put_contents($tmpname,$data);
-		unset($data); // don't keep in memory
-		if ($cmid = contentPut($tmpname,$contenttype,true)) {
-?>
-			<content id="<?= $cmid ?>" />
-<?
-		} else {
-?>
-			<error>Unable to upload content</error>
-<?
+		$SESSIONDATA = loadSessionData($SESSIONID);
+		if (isset($SESSIONDATA['authSessionID'])) {
+			$ret = getSessionData($SESSIONDATA['authSessionID']); //actually just load the DB connection for the customer
+			$success = $ret !== false;
 		}
-		unlink($tmpname);
+	}
+
+	if ($success) {
+		if ($BFXML_ELEMENT['attrs']['REQUEST'] == "get") {
+			$content = findChild($BFXML_ELEMENT,"CONTENT");
+			$cmid = $content['attrs']['ID'] + 0;
+
+			if ($c = contentGet($cmid, true)) {
+				list($contenttype,$data) = $c;
+?>
+			<content id="<?= $cmid ?>">
+				<data mime-type="<?= $contenttype ?>"><?= $data ?></data>
+			</content>
+<?
+			} else {
+?>
+				<error>Unable to retrieve the content for cmid:<?= $cmid ?></error>
+<?
+			}
+		} else if ($BFXML_ELEMENT['attrs']['REQUEST'] == "put") {
+			$content = findChild($BFXML_ELEMENT,"CONTENT");
+			$dataelement = findChild($content,"DATA");
+			$contenttype = $dataelement['attrs']['MIME-TYPE'];
+			$data = $dataelement['txt'];
+			$tmpname = secure_tmpname("dmapicontent",".b64");
+			if($tmpname != false) {
+				file_put_contents($tmpname,$data);
+				unset($data); // don't keep in memory
+				if ($cmid = contentPut($tmpname,$contenttype,true)) {
+?>
+					<content id="<?= $cmid ?>" />
+<?
+				} else {
+?>
+					<error>Unable to upload content</error>
+<?
+				}
+				unlink($tmpname);
+			} else {
+?>
+				<error>Unable to create tmp file</error>
+<?
+			}
+		}
 	} else {
 ?>
-		<error>Unable to create tmp file</error>
+		<error>Not Authorized.</error>
 <?
 	}
+} else {
+?>
+	<error>No sessionid</error>
+<?
 }
 
 

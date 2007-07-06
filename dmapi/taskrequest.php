@@ -34,8 +34,11 @@ if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
 	$SESSIONID = $BFXML_ELEMENT['attrs']['SESSIONID'];
 
 	//only load sessiondata if the sessionid doesn't have the "outbound_" marker
-	if (strpos($SESSIONID,"outbound_") === false)
+	if (strpos($SESSIONID,"outbound_") === false) {
 		$SESSIONDATA = loadSessionData($SESSIONID);
+		if (isset($SESSIONDATA['authSessionID']))
+			getSessionData($SESSIONDATA['authSessionID']); //actually just load the DB connection for the customer
+	}
 } else {
 	$SESSIONID = uniqid(mt_rand(), true);
 }
@@ -55,21 +58,12 @@ if ($REQUEST_TYPE == "new") {
 		case "voiceinbound":
 			forwardToPage("phoneinbound.php");
 			break;
-		case "email":
-			forwardToPage("email.php");
-			break;
-		case "print":
-			forwardToPage("print.php");
-			break;
 	}
 //check for outbound, it doesnt have any sessiondata so we need to check and forward directly to it
 } else if (strpos($SESSIONID,"outbound_") === 0) {
 	switch($BFXML_ELEMENT['attrs']['TYPE']) {
 		case "voice":
 			forwardToPage("phoneoutbound.php");
-			break;
-		case "email":
-			forwardToPage("email.php");
 			break;
 	}
 } else {
