@@ -118,4 +118,15 @@ CREATE TABLE `qreportsubscription` (
   KEY nextrun (nextrun)
 ) TYPE=InnoDB;
 
+-- --------------------------------------------------------
 
+CREATE TABLE specialtaskqueue (
+  id int(11) NOT NULL auto_increment,
+  customerid int(11) NOT NULL,
+  localspecialtaskid int(11) NOT NULL,
+  uuid varchar(255) default NULL,
+  `status` enum('new','assigned') NOT NULL default 'new',
+  PRIMARY KEY  (id),
+  UNIQUE KEY specialtask (customerid,localspecialtaskid),
+  UNIQUE KEY uuid (uuid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

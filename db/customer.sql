@@ -814,4 +814,12 @@ insert ignore into aspshard.importqueue (customerid,localimportid) values (l_cus
 end
 $$$
 
+create procedure start_specialtask( in_specialtaskid int)
+begin
+declare l_custid int;
+select value+0 from setting where name='_customerid' into l_custid;
+insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid) values (l_custid,in_specialtaskid);
+end
+$$$
+
 
