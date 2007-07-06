@@ -9,11 +9,13 @@ include_once("notifications.inc.php");
 if ($REQUEST_TYPE == "new") {
 
 	//check for specialtasks
-	if ($specialtask = assignSpecialTask(array("EasyCall", "CallMe"),$dmapidb)) {
-		list($id,$type) = $specialtask;
-		$SESSIONDATA['specialtaskid'] = $id;
+	if ($specialtask = assignSpecialTask($dmapidb)) {
 
-		switch ($type) {
+		$SESSIONDATA['specialtaskid'] = $task->specialtaskid;
+
+		//TODO authenticateSpecialTask to get DB connection info and set authSessionID
+
+		switch ($specialtask->type) {
 			case "EasyCall":
 				forwardToPage("easycall.php");
 				return;
@@ -26,7 +28,7 @@ if ($REQUEST_TYPE == "new") {
 <?
 		}
 	//check for normal tasks
-	} else if ($foundtask = assignTask("phone",$RESOURCEID, $dmapidb)) {
+	} else if ($foundtask = assignTask($dmapidb)) {
 
 
 		$sessid = base64url_encode(implode(":",array($foundtask->id,$foundtask->customerid,$foundtask->shardid,ceil(microtime(true)*1000))));
