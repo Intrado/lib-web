@@ -78,7 +78,7 @@ function authorizeUploadImport($uploadkey, $url = null) {
 }
 
 function authorizeTaskRequest($shardid, $taskuuid) {
-	$params = array(new XML_RPC_Value($shardid, 'string'), new XML_RPC_Value($taskuuid, 'string'));
+	$params = array(new XML_RPC_Value($shardid, 'int'), new XML_RPC_Value($taskuuid, 'string'));
 	$method = "AuthServer.authorizeTaskRequest";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
