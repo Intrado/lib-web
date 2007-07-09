@@ -2,6 +2,7 @@
 
 $SETTINGS = parse_ini_file("settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
+$IS_LDAP = $SETTINGS['feature']['is_ldap'];
 
 //get the customer URL
 if ($IS_COMMSUITE) {
