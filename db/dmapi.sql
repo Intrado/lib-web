@@ -50,3 +50,14 @@ CREATE TABLE `tasksyncdata` (
 PRIMARY KEY ( `name` )
 ) ENGINE = InnoDB ;
 
+
+
+
+CREATE TABLE specialtaskactive (
+  id varchar(50) collate utf8_bin NOT NULL,
+  customerid int(11) NOT NULL,
+  specialtaskid int(11) NOT NULL,
+  shardid tinyint(4) NOT NULL,
+  `type` varchar(50) collate utf8_bin NOT NULL,
+  PRIMARY KEY  (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
