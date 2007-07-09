@@ -66,6 +66,16 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 	}
 }
 
+function forceLogin($loginname, $url = null) {
+	$params = array(new XML_RPC_Value($loginname, 'string'), new XML_RPC_Value($url, 'string'), new XML_RPC_Value(session_id(), 'string'));
+	$method = "AuthServer.forceLogin";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// login success
+		return $result['userID'];
+	}
+}
+
 function authorizeUploadImport($uploadkey, $url = null) {
 	$params = array(new XML_RPC_Value($uploadkey, 'string'), new XML_RPC_Value($url, 'string'));
 	$method = "AuthServer.authorizeUploadImport";
@@ -102,14 +112,43 @@ function authorizeTaskRequest($shardid, $taskuuid) {
 	return false;
 }
 
-function forceLogin($loginname, $url = null) {
-	$params = array(new XML_RPC_Value($loginname, 'string'), new XML_RPC_Value($url, 'string'), new XML_RPC_Value(session_id(), 'string'));
-	$method = "AuthServer.forceLogin";
+function authorizeSpecialTask($shardid, $taskuuid) {
+	$params = array(new XML_RPC_Value($shardid, 'int'), new XML_RPC_Value($taskuuid, 'string'));
+	$method = "AuthServer.authorizeSpecialTask";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
-		// login success
-		return $result['userID'];
+		// success
+		return $result['sessionID'];
+
+		// customer database connection is set via connectDatabase(sessionID)
 	}
+}
+
+// used by dmapi to pass an authserver sessionID to get the customer database connection, spanning life of specialtask
+function connectDatabase($sessionID) {
+	$params = array(new XML_RPC_Value($sessionID, 'string'));
+	$method = "AuthServer.getCustomerDatabaseInfo";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+
+		// success
+		$db['host'] = $result['dbhost'];
+		$db['user'] = $result['dbuser'];
+		$db['pass'] = $result['dbpass'];
+		$db['db'] = $result['dbname'];
+		// 	now connect to the customer database
+		global $_dbcon;
+		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
+		if (!$_dbcon) {
+			error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
+		} else if (mysql_select_db($db['db'])) {
+			// successful connection to customer database, return session data
+			return true;
+		} else {
+			error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
+		}
+	}
+	return false;
 }
 
 function getSessionData($id) {
