@@ -386,14 +386,14 @@ startWindow('User Information');
 								<td>
 								<?
 								NewFormItem($f,$s,'accessid','selectstart');
-								
+
 								if($IS_COMMSUITE)
 									$accss = DBFindMany('Access', "from access");
 								/*CSDELETEMARKER_START*/
 								else
 									$accss = DBFindMany('Access', "from access where name != 'SchoolMessenger Admin'");
 								/*CSDELETEMARKER_END*/
-								
+
 								if(count($accss))
 									foreach($accss as $acc)
 										NewFormItem($f,$s,'accessid','selectoption',$acc->name,$acc->id);

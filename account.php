@@ -111,7 +111,7 @@ if(CheckFormSubmit($f,$s))
 			$USER->update();
 
 			// If the password is all 0 characters then it was a default form value, so ignore it
-			if((!$USER->ldap && $IS_LDAP )|| !$IS_LDAP) {
+			if(!$USER->ldap) {
 				$newpassword = GetFormData($f, $s, 'password');
 				if (!ereg("^0*$", $newpassword))
 					$USER->setPassword($newpassword);
@@ -130,7 +130,7 @@ if(CheckFormSubmit($f,$s))
 			$USER->setSetting("callmax",GetFormData($f, $s, 'callmax'));
 			$USER->setSetting("maxjobdays",GetFormData($f, $s, 'maxjobdays'));
 			$USER->setSetting("callall",GetFormData($f, $s, 'callall'));
-			
+
 			if($USER->authorize("leavemessage"))
 				$USER->setSetting("leavemessage", GetFormData($f, $s, 'leavemessage'));
 
@@ -200,7 +200,7 @@ if( $reloadform )
 	//default to system setting unless user has a pref
 	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
-	
+
 	PutFormData($f, $s, "leavemessage", (bool)$USER->getSetting("leavemessage", 0), "bool", 0, 1);
 }
 
@@ -234,7 +234,7 @@ startWindow('User Information');
 								<td colspan="4"><? NewFormItem($f,$s, 'login', 'text', 20); ?></td>
 							</tr>
 							<?
-								if((!$USER->ldap && $IS_LDAP) || !$IS_LDAP) {
+								if(!$USER->ldap) {
 							?>
 								<tr>
 									<td align="right">Password:</td>
@@ -267,7 +267,7 @@ startWindow('User Information');
 							</tr>
 
 						</table>
-						
+
 <? /*CSDELETEMARKER_START*/
 						if($USER->authorize('loginphone') && !$IS_COMMSUITE) {
 							$tollfree = Phone::format(getSystemSetting("inboundnumber"));
