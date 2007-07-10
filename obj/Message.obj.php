@@ -94,10 +94,10 @@ class Message extends DBMappedObject {
 				$parts[] = $part;
 			}
 
-			$pos += 2;
+			$pos += 2; // pass over the begintoken
 
 			$endtoken = ($type == "A") ? "}}" : ">>";
-			$length = @strpos($data,$endtoken,$pos+2);
+			$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
 
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
