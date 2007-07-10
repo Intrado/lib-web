@@ -181,8 +181,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 					$task->create();
 				}		
 				$_SESSION['easycallid'] = $task->id;
-				if(!CheckFormSubmit($f, 'add') && !$removedlang)
+				if(!CheckFormSubmit($f, 'add') && !$removedlang){
+					QuickUpdate("call start_specialtask(" . $task->id . ")");
 					redirect('easycallrecord.php?taskid=' . $task->id);
+				}
 			}
 		}
 	}
