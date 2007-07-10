@@ -16,16 +16,14 @@ class SpecialTask {
 	var $type;
 }
 
-//attempt to assign a task by setting the status to calling.
-//TODO, check to see if this request is a failover request, and possible delay it until the DBs are syned up
-//so that we don't assign any tasks that might have already been assigned from the failed node that are waiting in our mysql log.
+// read one task from table then delete the row
 function assignTask ($dmapidb) {
 
 	//because we might use persistent connections, ensure that we rollback no matter what
-	function ensure_rollback($dmapidb) {
+	function ensure_rollback_task($dmapidb) {
 		mysql_query("rollback", $dmapidb);
 	}
-	register_shutdown_function("ensure_rollback",$dmapidb);
+	register_shutdown_function("ensure_rollback_task",$dmapidb);
 
 	mysql_query("begin", $dmapidb);
 
@@ -54,7 +52,7 @@ function assignTask ($dmapidb) {
 	return $task;
 }
 
-
+// read one specialtask from table then delete the row
 function assignSpecialTask ($dmapidb) {
 	//because we might use persistent connections, ensure that we rollback no matter what
 	function ensure_rollback($dmapidb) {
@@ -66,7 +64,7 @@ function assignSpecialTask ($dmapidb) {
 
 	//get the id of next available task
 	//update the task to assign it to us
-	$query = "select id,customerid,specialtaskid,shardid,type specialtaskactive limit 1 for update";
+	$query = "select id,customerid,specialtaskid,shardid,type from specialtaskactive limit 1 for update";
 
 	$res = mysql_query($query,$dmapidb);
 	if ($row = mysql_fetch_row($res)) {
@@ -87,7 +85,6 @@ function assignSpecialTask ($dmapidb) {
 	mysql_query("commit", $dmapidb);
 
 	return $task;
-
 }
 
 
