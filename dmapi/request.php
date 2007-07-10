@@ -1,7 +1,7 @@
 <?
 $time = microtime(true);
 
-$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+$SETTINGS = parse_ini_file("dmapisettings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("../inc/auth.inc.php");

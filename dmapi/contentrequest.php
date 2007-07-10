@@ -17,7 +17,7 @@ if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
 		//parse out the bits:
 		list($taskid,$customerid,$shardid,$tasktime) = explode(":",base64url_decode($sessid));
 
-		$success = authorizeTaskRequest($taskid); //get DB connection info
+		$success = authorizeTaskRequest($shardid, $taskid); //get DB connection info
 
 	} else {
 
