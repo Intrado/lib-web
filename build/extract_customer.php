@@ -16,7 +16,7 @@ $authpass = "";
 $customerid = $argv[1];
 
 $db = mysql_connect($dbhost,$dbuser,$dbpass,true);
-mysql_select_db("dialerasp",$db);
+mysql_select_db("testdata",$db);
 
 $custdb = mysql_connect($dbhost,$dbuser,$dbpass,true);
 $authdb = mysql_connect($authhost, $authuser, $authpass, true);
@@ -169,9 +169,9 @@ function restructureScheduleDay($custid, $source, $dest) {
 	while ($row = mysql_fetch_row($sourceres)) {
  	  if ($scheduleid != 0 && $scheduleid != $row[0]) {
 	  	// we have all the dow fields, now update the schedule record
-	  	$ins = "update schedule set dow='" . implode(",", $dow) . "' where id=".$scheduleid;
+	  	$ins = "update schedule set daysofweek='" . implode(",", $dow) . "' where id=".$scheduleid;
 	  	mysql_query($ins,$dest)
-	  	  or die ("Failed to update schedule dow : " . mysql_error($dest));
+	  	  or die ("Failed to update schedule daysofweek : " . mysql_error($dest));
 	  	// reset dow list
 	  	$dow = array();
 	  	$i = 0;
@@ -182,9 +182,9 @@ function restructureScheduleDay($custid, $source, $dest) {
   	}
   	if ($scheduleid != 0) {
 	  	// we have all the dow fields, now update the schedule record
-	  	$ins = "update schedule set dow='" . implode(",", $dow) . "' where id=".$scheduleid;
+	  	$ins = "update schedule set daysofweek='" . implode(",", $dow) . "' where id=".$scheduleid;
 	  	mysql_query($ins,$dest)
-	  	  or die ("Failed to update schedule dow : " . mysql_error($dest));
+	  	  or die ("Failed to update schedule daysofweek : " . mysql_error($dest));
  	}
 
 }
@@ -237,7 +237,7 @@ if($customerid != mysql_insert_id()){
 }
 mysql_query("create user '$newdbname' identified by '$custpass'", $custdb)
 			or die("Failed to create new user: " . mysql_error($custdb));
-mysql_query("grant select, insert, update, delete, create temporary tables on $newdbname . * to '$newdbname'", $custdb)
+mysql_query("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $custdb)
 			or die("Failed to grant privileges to new user: " . mysql_error($custdb));
 
 mysql_query("create database $newdbname",$custdb)
@@ -378,7 +378,7 @@ copytable($customerid,"rule",array("id", "logical", "fieldnum", "op", "val"),$db
 
 //SCHEDULE
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
-copytable($customerid,"schedule",array("id", "userid", "triggertype", "type", "time", "nextrun"),$db,$custdb,1000,$join);
+copytable($customerid,"schedule",array("id", "userid", "time", "nextrun"),$db,$custdb,1000,$join);
 
 //SCHEDULEDAY table removed, dow field added to schedule table
 restructureScheduleDay($customerid, $db, $custdb);
