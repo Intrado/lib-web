@@ -13,12 +13,8 @@ if ($REQUEST_TYPE == "new") {
 
 		$SESSIONDATA['specialtaskid'] = $task->specialtaskid;
 
-// TODO if this is the only place connectDatabase is used, let's just roll this into the authorizeSpecialTask routine
 		$authsessid = authorizeSpecialTask($task->shardid, $task->id);
-// TODO do we set authsessid someplace for future?
-
-		if (connectDatabase($authsessid)) {
-
+		if ($authsessid) {
 			switch ($specialtask->type) {
 				case "EasyCall":
 					forwardToPage("easycall.php");
@@ -33,7 +29,7 @@ if ($REQUEST_TYPE == "new") {
 			}
 		} else {
 ?>
-			<error>No database connection for specialtask</error>
+			<error>specialtask not authorized</error>
 <?
 		}
 	//check for normal tasks

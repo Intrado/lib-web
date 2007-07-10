@@ -61,8 +61,8 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 		global $SESSIONDATA;
 		if (isset($SESSIONDATA))
 			$SESSIONDATA['authSessionID'] = $result['sessionID'];
-		getSessionData($result['sessionID']); // load customer db connection
-		return $result['userID'];
+
+		if (doDBConnect($result)) return $result['userID'];
 	}
 }
 
@@ -93,21 +93,7 @@ function authorizeTaskRequest($shardid, $taskuuid) {
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
-		$db['host'] = $result['dbhost'];
-		$db['user'] = $result['dbuser'];
-		$db['pass'] = $result['dbpass'];
-		$db['db'] = $result['dbname'];
-		// 	now connect to the customer database
-		global $_dbcon;
-		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
-		if (!$_dbcon) {
-			error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
-		} else if (mysql_select_db($db['db'])) {
-			// successful connection to customer database
-			return true;
-		} else {
-			error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
-		}
+		if (doDBConnect($result)) return true;
 	}
 	return false;
 }
@@ -118,9 +104,14 @@ function authorizeSpecialTask($shardid, $taskuuid) {
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
-		return $result['sessionID'];
 
-		// customer database connection is set via connectDatabase(sessionID)
+		//this is in the DMAPI code, we need to set the auth session id in the dmapi session data
+		//so that it can load the db connection info on next page hit
+		global $SESSIONDATA;
+		if (isset($SESSIONDATA))
+			$SESSIONDATA['authSessionID'] = $result['sessionID'];
+
+		if (doDBConnect($result)) return $result['sessionID'];
 	}
 }
 
@@ -132,21 +123,7 @@ function connectDatabase($sessionID) {
 	if ($result !== false) {
 
 		// success
-		$db['host'] = $result['dbhost'];
-		$db['user'] = $result['dbuser'];
-		$db['pass'] = $result['dbpass'];
-		$db['db'] = $result['dbname'];
-		// 	now connect to the customer database
-		global $_dbcon;
-		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
-		if (!$_dbcon) {
-			error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
-		} else if (mysql_select_db($db['db'])) {
-			// successful connection to customer database, return session data
-			return true;
-		} else {
-			error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
-		}
+		if (doDBConnect($result)) return true;
 	}
 	return false;
 }
@@ -156,23 +133,8 @@ function getSessionData($id) {
 	$method = "AuthServer.getSessionData";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
-
 		// success
-		$db['host'] = $result['dbhost'];
-		$db['user'] = $result['dbuser'];
-		$db['pass'] = $result['dbpass'];
-		$db['db'] = $result['dbname'];
-		// 	now connect to the customer database
-		global $_dbcon;
-		$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
-		if (!$_dbcon) {
-			error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
-		} else if (mysql_select_db($db['db'])) {
-			// successful connection to customer database, return session data
-			return $result['sessionData'];
-		} else {
-			error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
-		}
+		if (doDBConnect($result)) return $result['sessionData'];
 	}
 	return "";
 }
@@ -204,6 +166,25 @@ function loadCredentials ($userid) {
 	$ACCESS = $_SESSION['access'] = new Access($USER->accessid);
 	$_SESSION['custname'] = getSystemSetting("displayname");
 	$_SESSION['timezone'] = getSystemSetting("timezone");
+}
+
+function doDBConnect($result) {
+	$db['host'] = $result['dbhost'];
+	$db['user'] = $result['dbuser'];
+	$db['pass'] = $result['dbpass'];
+	$db['db'] = $result['dbname'];
+	// 	now connect to the customer database
+	global $_dbcon;
+	$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
+	if (!$_dbcon) {
+		error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
+	} else if (mysql_select_db($db['db'])) {
+		// successful connection to customer database
+		return true;
+	} else {
+		error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
+	}
+	return false;
 }
 
 /*CSDELETEMARKER_START*/
