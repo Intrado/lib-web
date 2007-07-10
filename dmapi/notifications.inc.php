@@ -31,7 +31,7 @@ function assignTask ($dmapidb) {
 	//update the task to assign it to us
 	$query = "select id,customerid,shardid,tasktime,renderedmessage from jobtaskactive order by tasktime limit 1 for update";
 
-	$res = mysql_query($query,$dmapidb);
+	$res = mysql_query($query,$dmapidb) or error_log("mysql had a problem: " . mysql_error());
 	if ($row = mysql_fetch_row($res)) {
 		$task = new Task();
 
@@ -66,7 +66,7 @@ function assignSpecialTask ($dmapidb) {
 	//update the task to assign it to us
 	$query = "select id,customerid,specialtaskid,shardid,type from specialtaskactive limit 1 for update";
 
-	$res = mysql_query($query,$dmapidb);
+	$res = mysql_query($query,$dmapidb) or error_log("mysql had a problem: " . mysql_error());
 	if ($row = mysql_fetch_row($res)) {
 		$task = new SpecialTask();
 
