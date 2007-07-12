@@ -190,7 +190,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					}
 				}
 				$schedule->daysofweek = implode(",",$dow);
-		error_log("daysofweek ".$schedule->daysofweek);
 				$schedule->nextrun = $schedule->calcNextRun();
 
 				$schedule->update();
