@@ -36,12 +36,15 @@ function contentGet ($cmid, $base64 = false) {
 	global $SETTINGS;
 	if (!$SETTINGS['content']['externalcontent']) {
 		$c = new Content($cmid);
-		$contenttype = $c->contenttype;
-		if (!$base64)
-			$data = base64_decode($c->data);
-		else
-			$data = $c->data;
-		return array($contenttype,$data);
+		if (strlen($c->data) > 0) {
+			$contenttype = $c->contenttype;
+			if (!$base64)
+				$data = base64_decode($c->data);
+			else
+				$data = $c->data;
+			return array($contenttype,$data);
+		}
+
 	} else {
 		list($fp,$server) = connectToContentServer("get");
 		list($host,$port,$path) = $server;
