@@ -1,9 +1,6 @@
 <?
 require_once("../obj/Content.obj.php");
 require_once("../inc/content.inc.php");
-require_once("../inc/auth.inc.php");
-require_once("dmapidb.inc.php");
-require_once("../inc/sessiondata.inc.php");
 
 if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
 	$SESSIONID = $BFXML_ELEMENT['attrs']['SESSIONID'];
