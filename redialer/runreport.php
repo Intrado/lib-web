@@ -18,8 +18,8 @@ $params = array("host" => "jdbc:mysql://" . $host . "/" . $db,
 				"pass" => $pass,
 				"filename" => $filename);
 
-$_dbcon = mysql_connect($host, $user, $pass);
-mysql_select_db($db, $_dbcon);
+$_dbcon = mysql_connect($host, $user, $pass) or die("Could not connect to: ". $host);
+mysql_select_db($db, $_dbcon) or die("Could not select db: " . $db);
 
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
@@ -36,19 +36,22 @@ require_once("../obj/User.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Job.obj.php");
+require_once("../inc/reportutils.inc.php");
 require_once("XML/RPC.php");
 
 if($type == "subscription"){
 	$subscription = new ReportSubscription($id);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
-	switch($options['reporttype']){
 
+	switch($options['reporttype']){
+		
 		case 'attendance':
 		case 'emergency':
 		case 'undelivered':
 		case 'callsreport':
 			$generator = new CallsReport();
+			
 			break;
 		case 'surveyreport':
 			$generator = new SurveyReport();
