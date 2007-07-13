@@ -10,6 +10,7 @@ require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/form.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/reportutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/ReportInstance.obj.php");
@@ -92,6 +93,7 @@ if(isset($_SESSION['drilldown']['id'])){
 }
 if(isset($_SESSION['drilldown']['jobid'])){
 	$options['jobid'] = $_SESSION['drilldown']['jobid'];
+	$job = new Job($options['jobid']+0);
 }
 $options['reporttype']="drilldown";
 
@@ -121,7 +123,7 @@ $reportgenerator->userid = $USER->id;
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:reports";
-$TITLE = "Individual Report Data";
+$TITLE = "Individual Report Data  - $job->name";
 
 include_once("nav.inc.php");
 buttons(button('back', 'window.history.go(-1)'));
