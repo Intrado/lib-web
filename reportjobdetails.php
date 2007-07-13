@@ -109,40 +109,60 @@ if(isset($_SESSION['reportid'])){
 	$subscription = new ReportSubscription($_SESSION['reportid']+0);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
+	
+	$activefields = $instance->getActiveFields();
+	foreach($fields as $field){
+		if(in_array($field->fieldnum, $activefields)){
+			$_SESSION['fields'][$field->fieldnum] = true;
+		} else {
+			$_SESSION['fields'][$field->fieldnum] = false;
+		}
+	}
+	foreach($orders as $order){
+		$_SESSION[$order] = isset($options[$order]) ? $options[$order] : "";
+	}
 } else {
 	$options = $_SESSION['report']['options'];
+	
+	if(isset($_REQUEST['result'])){
+
+		$options['result'] = $_REQUEST['result'];
+		$_SESSION['report']['options'] = $options;
+		redirect();
+	}
+	$options["detailed"] = true;
+	$options["pagestart"] = $pagestart;
+	
+	$activefields = array();
+	$fieldlist = array();
+	foreach($fields as $field){
+		// used in html
+		$fieldlist[$field->fieldnum] = $field->name;
+		
+		// used in pdf,csv
+		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
+			$activefields[] = $field->fieldnum; 
+		}
+	}
+	$instance = new ReportInstance();
+	$instance->setParameters($options);
+	$instance->setFields($fieldlist);
+	$instance->setActiveFields($activefields);
+	$subscription = new ReportSubscription();
+	$subscription->createDefaults();
 }
 if(isset($options['jobid'])){
 	$jobid = $options['jobid'];
 	if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid)))
 		redirect('unauthorized.php');
 }
-$activefields = array();
-$fieldlist = array();
-foreach($fields as $field){
-	// used in html
-	$fieldlist[$field->fieldnum] = $field->name;
-	
-	// used in pdf,csv
-	if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-		$activefields[] = $field->fieldnum; 
-	}
-}
 
-unset($_SESSION['jobstats']);
 if(isset($jobid)){
 	$job = new Job($jobid);	
 }
-$options["reporttype"] = "jobreport";
-$options["detailed"] = true;
-$options["pagestart"] = $pagestart;
 
-$reportinstance = new ReportInstance();
-$reportinstance->setParameters($options);
-$reportinstance->setFields($fieldlist);
-$reportinstance->setActiveFields($activefields);
 $reportgenerator = new JobReport();
-$reportgenerator->reportinstance = $reportinstance;
+$reportgenerator->reportinstance = $instance;
 $reportgenerator->userid = $USER->id;
 
 if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
