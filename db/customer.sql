@@ -822,4 +822,18 @@ insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid) val
 end
 $$$
 
+-- -------------------------------------------------------------------------------------------------------------
+-- ---- July 13, 2007
+-- -------------------------------------------------------------------------------------------------------------
+
+alter table systemstats
+add `jobid` int(11) not null first,
+add `failed` int(11) not null,
+add `disconnect` int(11) not null,
+drop primary key,
+add primary key (jobid,date,hour)
+$$$
+
+
+
 
