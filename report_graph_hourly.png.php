@@ -43,13 +43,14 @@ $cpcolors = array(
 
 
 $query = "
-select count(*) as cnt,
-	hour( from_unixtime(starttime/1000)) as hour,
-	result
-from reportcontact
-where result in ('A','M','B','N')
+select hour,
+	answered as A,
+	machine as M,
+	busy as B,
+	noanswer as N
+from systemstats
+where 1
 $jobidquery
-group by hour, result
 ";
 
 
@@ -59,7 +60,10 @@ $data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
 
 $x_titles = array();
 while ($row = DBGetRow($result)) {
-	$data[$row[2]][$row[1]] = $row[0];
+	$data["A"][$row[0]] = $row[1];
+	$data["M"][$row[0]] = $row[2];
+	$data["B"][$row[0]] = $row[3];
+	$data["N"][$row[0]] = $row[4];
 }
 
 //var_dump($data);
