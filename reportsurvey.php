@@ -57,6 +57,10 @@ if(isset($_SESSION['reportid'])){
 	$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 	$options['reporttype'] = "surveyreport";
 	$_SESSION['saved_report'] = false;
+	
+	$subscription = new ReportSubscription();
+	$subscription->createDefaults(fmt_report_name($options['reporttype']));
+	$instance = new ReportInstance();
 }
 
 $_SESSION['report']['options'] = $options;
@@ -66,7 +70,7 @@ $reload=0;
 $f="reports";
 $s="jobs";
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run"))
+if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview"))
 {
 	if(CheckFormInvalid($f))
 	{
@@ -99,13 +103,17 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			$_SESSION['report']['options'] = $options;
 			if(!$error && CheckFormSubmit($f, "run"))
 				redirect("reportjobsurvey.php");
-			if(!$error && CheckFormSubmit($f, "save")){
-				if(isset($subscription)){
+			if(!$error && (CheckFormSubmit($f, "save") || CheckFormSubmit($f, "saveview"))){
+				$instance->setParameters($options);
+				$instance->update();
+				$subscription->reportinstanceid = $instance->id;
+				$subscription->update();
+				$_SESSION['reportid'] = $subscription->id;
+				if(CheckFormSubmit($f, "save"))
 					redirect("reportedit.php?reportid=" . $subscription->id);
-				} else {
-					redirect("reportedit.php?new=true");
-				}
 			}
+			if(!$error && (CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview")))
+				redirect("reportjobsurvey.php");
 		}
 	}
 } else {
@@ -137,7 +145,8 @@ $TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "")
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons( button('done', "location.href='reports.php'"), submit($f, "save", "save", "save"), submit($f, "run", "View Report", "View Report"));
+buttons( button('done', "location.href='reports.php'"), submit($f, "save", "save", "save"),
+			isset($_SESSION['reportid']) ? submit($f, "saveview", "saveview", "Save and View") : submit($f, "run", "View Report", "View Report"));
 
 
 //--------------- Select window ---------------
