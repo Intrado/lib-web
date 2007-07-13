@@ -21,6 +21,9 @@ class JobReport extends ReportGenerator{
 			}
 			$orderquery .= $orderby;
 		}
+		if($orderquery == ""){
+			$orderquery = " order by rp.pkey ";
+		}
 		$rulesql = "";
 		
 		if(isset($params['rules']) && $params['rules']){
@@ -342,9 +345,6 @@ class JobReport extends ReportGenerator{
 								<div class="floatingreportdata"><u>Machine</u></td><td><?= number_format($jobstats["phone"]["M"]) ?></div>
 							</td></tr>
 							<tr><td>
-								<div class="floatingreportdata"><u>Calling</u></td><td><?= number_format($jobstats["phone"]["C"]) ?></div>
-							</td></tr>
-							<tr><td>
 								<div class="floatingreportdata"><u>No Answer</u></td><td><?= number_format($jobstats["phone"]["N"]) ?></div>
 							</td></tr>
 							<tr><td>
@@ -393,7 +393,7 @@ class JobReport extends ReportGenerator{
 						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Contact Log:</th>
 						<td >
 							<? if(!isset($this->params['detailed']) || !$this->params['detailed']){ ?>
-								&nbsp;<a href="reportjobdetails.php">View</a>&nbsp;|&nbsp;
+								<a href="reportjobdetails.php">View</a>&nbsp;|&nbsp;
 							<? } ?>
 							<a href="reportjobdetails.php?csv=true">Download CSV File</a>
 						</td>
@@ -428,7 +428,7 @@ class JobReport extends ReportGenerator{
 	
 		showPageMenu($total,$pagestart,500);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
-		$titles = array(0 => "ID",
+		$titles = array(0 => "ID#",
 						1 => "First Name",
 						2 => "Last Name",
 						3 => "Message",
@@ -526,7 +526,7 @@ class JobReport extends ReportGenerator{
 			$row[8] = fmt_result($row,8);
 	
 	
-			$reportarray = array($row[11],$row[10],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[7],$row[8]);
+			$reportarray = array($row[12],$row[10],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[7],$row[8]);
 	
 			if ($issurvey) {
 				//fill in survey result data, be sure to fill in an array element for all questions, even if blank
@@ -546,7 +546,7 @@ class JobReport extends ReportGenerator{
 			$count=0;
 			foreach($fieldlist as $index => $field){
 				if(in_array($index, $activefields)){
-					$reportarray[] = $row[14+$count];
+					$reportarray[] = $row[16+$count];
 				}
 				$count++;
 			}
@@ -559,7 +559,28 @@ class JobReport extends ReportGenerator{
 		$this->reportfile = "jobreport.jasper";
 	}
 
-
+	static function getOrdering(){
+		global $USER;
+		$fields = getFieldMaps();
+		$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
+		$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+	
+		$ordering = array();
+		$ordering["ID#"] = "rp.pkey";
+		$ordering[$firstname->name]="rp." . $firstname->fieldnum;
+		$ordering[$lastname->name]="rp." . $lastname->fieldnum;
+		$ordering["Message"]="m.name";
+		$ordering["Destination"]="destination";
+		$ordering["Attempts"] = "attempts";
+		$ordering["Last Attempt"]="date";
+		$ordering["Last Result"]="result";
+		
+		
+		foreach($fields as $field){
+			$ordering[$field->name]= "rp." . $field->fieldnum;
+		}
+		return $ordering;
+	}
 }
 
 ?>
