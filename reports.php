@@ -78,7 +78,7 @@ startWindow("Standard Reports");
 		</tr>
 		<tr>
 			<td><a href='reportsurvey.php?clear=1'/>Surveys</a></td>
-			<td><a href='reportcallssearch.php?clear=1&type=undelivered'/>Undelivered</a></td>
+			<td><a href='reportundeliveredsearch.php?clear=1'/>Undelivered</a></td>
 			<td><a href='reportcallssearch.php?clear=1&type=emergency'/>Emergency</a></td>
 		</tr>
 	</table>
