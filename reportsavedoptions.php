@@ -38,13 +38,11 @@ function runReport($subscription){
 			redirect("reportjobsurvey.php?reportid=$subscription->id");
 			break;
 		case "undelivered":
+			redirect("reportundeliveredresult.php?reportid=$subscription->id");
 		case "emergency":
 		case "attendance":
 		case "callsreport":
 			redirect("reportcallsresult.php?reportid=$subscription->id");
-			break;
-		case "contacts":
-			redirect("contactresult.php?reportid=$subscription->id");
 			break;
 	}
 }
@@ -58,6 +56,7 @@ function editReport($subscription){
 		case "jobreport":
 			redirect("reportjob.php?reportid=$subscription->id");
 		case "undelivered":
+			redirect("reportundeliveredsearch.php?reportid=$subscription->id");
 		case "emergency":
 		case "attendance":
 		case "callsreport":
@@ -71,7 +70,6 @@ function editReport($subscription){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$options = array();
 if(isset($_REQUEST['reportid'])){
 	$reportid = $_REQUEST['reportid'] +0;
 }
