@@ -163,8 +163,9 @@ if(isset($_REQUEST['reportid'])){
 	$_SESSION['report']['options'] = $options;
 	redirect();
 } else {
-	
+
 	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+	
 	$activefields = array();
 	$fieldlist = array();
 
@@ -236,7 +237,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 			$_SESSION['report']['options']= $options;
 			if(CheckFormSubmit($f, "save")){
 				$instance->setParameters($options);
-				var_dump($activefields);
 				$instance->update();
 				$subscription->reportinstanceid = $instance->id;
 				$subscription->update();
