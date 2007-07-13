@@ -24,9 +24,9 @@ if ($_GET['valid'] != $jobstats['validstamp'])
 
 $phonestats = $jobstats['phone'];
 
-$data = array($phonestats['contacted'], $phonestats['notcontacted'], $phonestats['duplicates']);
-$legend = array("Contacted: %d", "Not Contacted: %d", "Duplicates: %d");
-$colors = array("lightgreen", "red", "lightgray");
+$data = array($phonestats['contacted'], $phonestats['notcontacted'], $phonestats['duplicates'], $phonestats['nocontacts']);
+$legend = array("Contacted: %d", "Not Contacted: %d", "Duplicates: %d", "No Contact Info: %d");
+$colors = array("lightgreen", "red", "lightgray", "yellow");
 
 
 //echo mysql_error();
