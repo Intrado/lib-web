@@ -186,6 +186,7 @@ class JobReport extends ReportGenerator{
 							$duplicates = 0;
 							$contacted = 0;
 							$notcontacted = 0;
+							$nocontacts = 0;
 							$result = Query($query);
 							while ($row = DBGetRow($result)) {
 								$totalpeople += $row[0];
@@ -194,17 +195,18 @@ class JobReport extends ReportGenerator{
 									$contacted += $row[0];
 								else if ($row[1] == "duplicate")
 									$duplicates += $row[0];
+								else if ($row[1] == "nocontacts")
+									$nocontacts +=$row[0];
 								else
 									$notcontacted += $row[0];
 							}
 				
 							//phones by cp
 							$maxcallattempts = QuickQuery("select value from jobsetting where name='maxcallattempts' and jobid = '$jobid'");
-							$query = "select count(*) as cnt, rc.result, sum(rp.status not in ('success','fail') and rc.numattempts < $maxcallattempts) as remaining
-										from reportperson rp 
-										left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-							where rp.jobid = '$jobid'
-							and rp.status != 'duplicate' and rp.type='phone'
+							$query = "select count(*) as cnt, rc.result, sum(rc.result not in ('A','M') and rc.numattempts < $maxcallattempts) as remaining
+										from reportcontact rc
+							where rc.jobid = '$jobid'
+							and rc.type='phone'
 							group by rc.result";
 							//may need to clean up, null means not called yet
 							//do math for the % completed
@@ -227,7 +229,8 @@ class JobReport extends ReportGenerator{
 							$jobstats["phone"]["duplicates"] = (isset($jobstats["phone"]["duplicates"]) ? $jobstats["phone"]["duplicates"] : 0) + $duplicates;
 							$jobstats["phone"]["contacted"] = (isset($jobstats["phone"]["contacted"]) ? $jobstats["phone"]["contacted"] : 0) + $contacted;
 							$jobstats["phone"]["notcontacted"] = (isset($jobstats["phone"]["notcontacted"]) ? $jobstats["phone"]["notcontacted"] : 0) + $notcontacted;
-				
+							$jobstats["phone"]["nocontacts"] = (isset($jobstats["phone"]["nocontacts"]) ? $jobstats["phone"]["nocontacts"] : 0) + $nocontacts;
+							
 							$jobstats["phone"]["remainingcalls"] = (isset($jobstats["phone"]["remainingcalls"]) ? $jobstats["phone"]["remainingcalls"] : 0) + $remainingcalls;
 							$jobstats["phone"]["totalcalls"] = (isset($jobstats["phone"]["totalcalls"]) ? $jobstats["phone"]["totalcalls"] : 0) + $totalcalls;
 							$jobstats["phone"]["percentcomplete"] = $jobstats["phone"]["totalcalls"] ? ($jobstats["phone"]["totalcalls"] - $jobstats["phone"]["remainingcalls"])/$jobstats["phone"]["totalcalls"] : 0;
