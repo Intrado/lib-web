@@ -26,14 +26,14 @@ $cpcolors = array(
 );
 
 
-$query = "
-select count(*)/30 as cnt,
-	hour( from_unixtime(starttime/1000)) as hour,
-	result
-from reportcontact
-where result in ('A','M','B','N')
-and starttime > 1000 * unix_timestamp(date_sub(now(),interval 30 day))
-group by hour, result
+$query = "select 	hour,
+				sum(answered)/30 as answered,
+				sum(machine)/30 as machine,
+				sum(busy)/30 as busy,
+				sum(noanswer)/30 as noanswer
+			from systemstats
+			where date > date_sub(now(),interval 30 day)
+			group by hour
 ";
 
 
@@ -43,7 +43,10 @@ $data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
 
 $x_titles = array();
 while ($row = DBGetRow($result)) {
-	$data[$row[2]][$row[1]] = $row[0];
+	$data["A"][$row[0]] = $row[1];
+	$data["M"][$row[0]] = $row[2];
+	$data["B"][$row[0]] = $row[3];
+	$data["N"][$row[0]] = $row[4];
 }
 
 //var_dump($data);
@@ -99,7 +102,7 @@ $gbplot->SetWidth(0.7);
 // ...and add it to the graPH
 $graph->Add($gbplot);
 
-$graph->title->Set("By Time of Day (last 30 days)");
+$graph->title->Set("By Time of Day (last 30 Days)");
 $graph->xaxis->SetTickLabels($x_titles);
 $graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos("min");
