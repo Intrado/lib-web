@@ -62,6 +62,15 @@ class ReportSubscription extends DBMappedObject {
 		}
 		return NULL; // null means notscheduled
 	}
+	
+	function createDefaults($name){
+		global $USER;
+		$this->name = $name . " " . date("M d, g:i:s A", strtotime("now"));;
+		$this->type = "notscheduled";
+		$this->userid = $USER->id;
+		$this->description = "";
+		$this->email = "";
+	}
 
 }
 
