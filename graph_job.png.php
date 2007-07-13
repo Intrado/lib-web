@@ -66,18 +66,18 @@ $cpcodes = array(
 
 //preset array positions
 $data = array(
-	"scheduled" => false,
-	"inprogress" => false,
-	"retry" => false,
-	"C" => false,
 	"A" => false,
 	"M" => false,
 	"B" => false,
 	"N" => false,
 	"X" => false,
+	"F" => false,
+	"C" => false,
 	"duplicate" => false,
 	"fail" => false,
-	"F" => false
+	"inprogress" => false,
+	"retry" => false,
+	"scheduled" => false
 );
 $legend = $data;
 $colors = $data;
