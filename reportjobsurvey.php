@@ -9,12 +9,14 @@ require_once("obj/Phone.obj.php");
 require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/reportutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/SurveyQuestionnaire.obj.php");
 require_once("obj/SurveyQuestion.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
+require_once("obj/ReportSubscription.obj.php");
 require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("obj/SurveyReport.obj.php");
@@ -58,20 +60,16 @@ $orders = array("order1", "order2", "order3");
 
 
 if(isset($_REQUEST['reportid'])){
-	$reportinstance = new ReportInstance($_REQUEST['reportid']);
-	$options = $reportinstance->getParameters();
-	if($options['reporttype'] == "surveyreport"){
-		$reportgenerator = new SurveyReport();
-	} else {
-		$reportgenerator = new JobReport();
+	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
+		redirect('unauthorized.php');
 	}
-	$reportgenerator->reportinstance = $reportinstance;
-	$reportgenerator->format = "html";
-	$reportgenerator->userid = $USER->id;
+	$subscription = new ReportSubscription($_REQUEST['reportid']+0);
+	$instance = new ReportInstance($subscription->reportinstanceid);
+	$options = $instance->getParameters();
 
-	$jobid = $options['jobid'];
+	$jobid = isset($options['jobid']) ? $options['jobid'] : 0;
 	
-	$activefields = $reportinstance->getActiveFields();
+	$activefields = $instance->getActiveFields();
 	foreach($fields as $field){
 		if(in_array($field->fieldnum, $activefields)){
 			$_SESSION['fields'][$field->fieldnum] = true;
@@ -79,65 +77,128 @@ if(isset($_REQUEST['reportid'])){
 			$_SESSION['fields'][$field->fieldnum] = false;
 		}
 	}
-	$job = new Job($jobid);
-	$_SESSION['saved_report'] = true;
+	if($jobid)
+		$job = new Job($jobid);
+	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
 } else {
+	$jobid = 0;
+	$options = array();
 	if (isset($_GET['jobid'])) {
 		$jobid = $_GET['jobid'] + 0;
+		$options["reporttype"] = "jobreport";
+	} else if(isset($_GET['surveyid'])){
+		$jobid = $_GET['surveyid']+0;
+		$options["reporttype"] = "surveyreport";
+	} else {
+		$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+		$jobid = isset($options['jobid']) ? $options['jobid'] : 0;
+	}
+	
+	if(!in_array($options["reporttype"], array("jobreport", "surveyreport"))){
+		redirect('unauthorized.php');
+	}
+	if($jobid){
+		
 		//check userowns or customerowns and viewsystemreports
 		if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
 			redirect('unauthorized.php');
 		}
-		if ($jobid) {
 		
-			$options = array("jobid" => $jobid);
-			unset($_SESSION['jobstats'][$jobid]);
-			$job = new Job($jobid);	
-			
-			$options["reporttype"] = isset($_SESSION['reporttype']) ? $_SESSION['reporttype'] : "jobreport";
+		unset($_SESSION['jobstats'][$jobid]);
+		$job = new Job($jobid);
+		$options['jobid'] = $jobid;
 
-		}
-		$_SESSION['saved_report'] = false;
 		$_SESSION['report']['options'] = $options;
-	} else {
-		$options = $_SESSION['report']['options'];
 	}
-	$reportinstance = new ReportInstance();
-	$reportinstance->setParameters($options);
-	if($options['reporttype'] == "surveyreport"){
-		$reportgenerator = new SurveyReport();
-	} else {
-		$reportgenerator = new JobReport();
+	
+	$activefields = array();
+	$fieldlist = array();
+	foreach($fields as $field){
+		// used in html
+		$fieldlist[$field->fieldnum] = $field->name;
+		
+		// used in pdf
+		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
+			$activefields[] = $field->fieldnum; 
+		}
 	}
-	$reportgenerator->reportinstance = $reportinstance;
-	$reportgenerator->format = "html";
-	$reportgenerator->userid = $USER->id;
+	
+	$instance = new ReportInstance();
+	$instance->setParameters($options);
+	$subscription = new ReportSubscription();
+	$subscription->createDefaults(fmt_report_name($options['reporttype']));
 }
-$_SESSION['reporttype'] = $options['reporttype'];
 
+if($options['reporttype'] == "surveyreport"){
+	$generator = new SurveyReport();
+} else {
+	$generator = new JobReport();
+}
+$generator->reportinstance = $instance;
+$generator->userid = $USER->id;
+
+if(isset($_SESSION['reportid'])){
+	$_SESSION['saved_report'] = true;
+} else {
+	$_SESSION['saved_report'] = false;
+}
+
+$_SESSION['report']['options'] = $options;
+$generator->format = "html";
+
+$reload=0;
+$f="jobsurvey";
+$s="save";
+
+if(CheckFormSubmit($f,$s)){
+	//check to see if formdata is valid
+	if(CheckFormInvalid($f))
+	{
+		error('Form was edited in another window, reloading data');
+		$reloadform = 1;
+	}
+	else
+	{
+		MergeSectionFormData($f, $s);
+		if( CheckFormSection($f, $s) ) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else {
+			$instance->setFields($fieldlist);
+			$instance->setActiveFields($activefields);
+			$instance->setParameters($options);
+			$instance->update();
+			$subscription->reportinstanceid = $instance->id;
+			$subscription->update();
+			$_SESSION['reportid'] = $subscription->id;
+			redirect("reportedit.php?reportid=" . $subscription->id);
+		}
+	}
+} else {
+	$reload=1;
+}
+
+if($reload)
+	ClearFormData($f);
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:reports";
-if($_SESSION['reporttype'] == "surveyreport"){
-	$TITLE = "Standard Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+if($options['reporttype'] == "surveyreport"){
+	$TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
 } else {
-	$TITLE = "Standard Job Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+	$TITLE = "Job Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
 }
 include_once("nav.inc.php");
-
+NewForm($f);
 //TODO buttons for notification log: download csv, view call details
-if (isset($jobid) && $jobid)
-	echo buttons(button('refresh', 'window.location.reload()'), button('done', 'location.href=\'reports.php\''));
-else
-	buttons();
+buttons(button('back', 'window.history.go(-1)'),button('done', null, 'reports.php'), submit($f, $s, "save", "save"),button('refresh', 'window.location.reload()'));
 
-if(isset($reportgenerator)){
-	$reportgenerator->generate();
+if(isset($generator)){
+	$generator->generate();
 }
 
-echo buttons();
+buttons();
 endForm();
 include_once("navbottom.inc.php");
 ?>
