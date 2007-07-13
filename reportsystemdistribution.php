@@ -42,6 +42,14 @@ include_once("nav.inc.php");
 <img src="graph_hourly.png.php" onclick="popup('graph_hourly.png.php?big',790,500);" />
 </div>
 
+<div>
+<img src="graph_daily.png.php" onclick="popup('graph_daily.png.php?big',790,500);" />
+</div>
+
+<div>
+<img src="graph_monthly.png.php" onclick="popup('graph_monthly.png.php?big',790,500);" />
+</div>
+
 <img src="img/bug_lightbulb.gif" > Click a graph to enlarge.
 
 <? endWindow();
