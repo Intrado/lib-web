@@ -234,27 +234,58 @@ class SurveyReport extends ReportGenerator{
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Participation</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Summary</th>
 					<td class="bottomBorder">
-		<? if ($jobstats['survey']['phoneparticipants'] || $jobstats['survey']['emailparticipants']) { ?>
-						<img src="graph_survey_participation.png.php?<?= $urloptions ?>">
-		<? } else { ?>
-						No one has yet participated in this survey.
-		<? } ?>
+						<table border="0" cellpadding="3" cellspacing="0" width="100%">
+							<tr>
+								<td>
+					<? if ($jobstats['survey']['phoneparticipants'] || $jobstats['survey']['emailparticipants']) { ?>
+									<img src="graph_survey_participation.png.php?<?= $urloptions ?>">
+					<? } else { ?>
+									No one has yet participated in this survey.
+					<? } ?>
+								</td>
+								<td>
+									<table width="100%" cellpadding="3" cellspacing="1" class="list">
+<?
+										$titles = array("No.", "Question");
+										for ($x = 1; $x <= 9; $x++)
+											$titles[$x+2] = " #$x";
+										$titles[] = "Total";
+										
+										$data = array();
+										foreach ($jobstats['survey']['questions'] as $index => $question) {
+											$line = array_fill(1,11,"");
+											foreach ($question['answers'] as $answer => $tally) {
+												$line[$answer+2] = $tally;
+											}
+											$line[12] = array_sum($line);
+											foreach($question['answers'] as $answer => $tally) {
+												$line[$answer+14] = (round(($tally / $line[12]), 3) * 100) . "%";
+											}
+											$line[0] = $index+1;
+											$line[1] = $question['label'];
+											$line[2] = $questiontext[$index];
+											$line[14] = $validstamp;
+											$data[] = $line;
+										}
+										
+										$formatters = array();
+							
+										showtable($data,$titles,$formatters);
+?>						
+									</table>
+								</td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Responses</th>
 					<td class="bottomBorder">
-						<table width="100%" cellpadding="3" cellspacing="1" class="list">
+						<table width="100%" cellpadding="3" cellspacing="1">
 			<?
-						$titles = array("No.", "Question");
-						for ($x = 1; $x <= 9; $x++)
-							$titles[$x+2] = " #$x";
-						$titles[] = "Total";
-						$titles[] = "Graph";
 						
-						$data = array();
 						foreach ($jobstats['survey']['questions'] as $index => $question) {
 							$line = array_fill(1,11,"");
 							foreach ($question['answers'] as $answer => $tally) {
@@ -270,41 +301,53 @@ class SurveyReport extends ReportGenerator{
 							$line[14] = $validstamp;
 							$data[] = $line;
 						}
-						
-						$formatters = array("13" => "fmt_survey_graph",
-											"1" => "fmt_question");
 
 
 						$alt=0;
 						foreach($data as $line){
 						
-							echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+							
 							?>
-								<td rowspan="2"><?=$line[0]?></td>
-								<td rowspan="2"><?=fmt_question($line,1)?></td>
-								<th align="left" class="listheader nosort">1</th>
-								<th align="left" class="listheader nosort">2</th>
-								<th align="left" class="listheader nosort">3</th>
-								<th align="left" class="listheader nosort">4</th>
-								<th align="left" class="listheader nosort">5</th>
-								<th align="left" class="listheader nosort">6</th>
-								<th align="left" class="listheader nosort">7</th>
-								<th align="left" class="listheader nosort">8</th>
-								<th align="left" class="listheader nosort">9</th>
-								<th align="left" class="listheader nosort">Total</th>
-								<th align="left" class="listheader nosort">Graph</th>
-							</tr>
-<?
-							echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-								for($i = 3; $i<12; $i++){
-									?><td><?=fmt_answer($line, $i)?></td><?
-								}
-?>
-								<td><?=$line[12]?></td>
+							<tr>
+								
+								<td>
+									<table>
+										<tr><td valign="top"><div style='font-weight:bold; text-decoration: underline'>Question <?=$line[0]?>:</div></td></tr>
+										<tr>
+											<td><?=fmt_question($line,1)?></td>
+										</tr>
+										<tr>
+												<td>
+													<table width="100%" cellpadding="3" cellspacing="1" class="list">
+														<tr>
+															<th align="left" class="listheader nosort">1</th>
+															<th align="left" class="listheader nosort">2</th>
+															<th align="left" class="listheader nosort">3</th>
+															<th align="left" class="listheader nosort">4</th>
+															<th align="left" class="listheader nosort">5</th>
+															<th align="left" class="listheader nosort">6</th>
+															<th align="left" class="listheader nosort">7</th>
+															<th align="left" class="listheader nosort">8</th>
+															<th align="left" class="listheader nosort">9</th>
+															<th align="left" class="listheader nosort">Total</th>
+														</tr>
+														<tr>
+							<?
+														
+															for($i = 3; $i<12; $i++){
+																?><td><?=fmt_answer($line, $i)?></td><?
+															}
+							?>
+															<td><?=$line[12]?></td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+									</table>
+								</td>
 								<td><?=fmt_survey_graph($line, 13)?></td>
 							</tr>
 <?
-						//showtable($data,$titles,$formatters);
 						}			
 ?>
 						</table>
