@@ -26,13 +26,17 @@ $cpcolors = array(
 );
 
 
+
+
 $query = "
-select count(*)/4 as cnt,
-	dayofweek(from_unixtime(rc.starttime/1000)) as dayofweek, rc.result
-from reportcontact rc
-where rc.result in ('A','M','B','N')
-and rc.starttime >= unix_timestamp(date_sub(now(), interval 28 day)) * 1000
-group by dayofweek, rc.result
+select 	dayofweek(date) as dayofweek, 
+				sum(answered)/4 as answered,
+				sum(machine)/4 as machine,
+				sum(busy)/4 as busy,
+				sum(noanswer)/4 as noanswer
+			from systemstats
+			where date >= date_sub(now(), interval 28 day)
+			group by dayofweek
 ";
 
 
@@ -47,7 +51,10 @@ $data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
 
 $x_titles = array();
 while ($row = DBGetRow($result)) {
-	$data[$row[2]][$row[1]-1] = $row[0];
+	$data["A"][$row[0]-1] = $row[1];
+	$data["M"][$row[0]-1] = $row[2];
+	$data["B"][$row[0]-1] = $row[3];
+	$data["N"][$row[0]-1] = $row[4];
 }
 
 //var_dump($data);
