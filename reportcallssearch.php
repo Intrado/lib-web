@@ -148,12 +148,6 @@ if(isset($_GET['deleterule'])) {
 
 if(isset($options['reporttype'])){
 	switch($options['reporttype']){
-		case 'undelivered':
-			$chosenresults = array("N","B","F","X");
-			unset($results["A"]);
-			unset($results["M"]);
-			$options['result'] = implode("','", $chosenresults);
-			break;
 		case 'emergency':
 			$options['systempriority'] = "1";
 			break;
@@ -414,7 +408,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 				<td>
 					<table>
 		<?
-			if($options['reporttype'] == 'callsreport' || $options['reporttype'] == 'undelivered'){
+			if($options['reporttype'] == 'callsreport'){
 		?>
 			
 						<tr valign="top">
