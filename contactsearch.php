@@ -8,6 +8,7 @@ require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/form.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/reportutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("inc/date.inc.php");
@@ -37,6 +38,7 @@ $lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
 
 if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
 	unset($_SESSION['contacts']['options']);
+	$_SESSION['saved_report'] = false;
 	redirect();
 }
 $options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
@@ -130,7 +132,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'submit')){
 				}
 			}
 			$options['rules'] = implode("||", $options['rules']);
-			$_SESSION['saved_report'] = false;
 			$_SESSION['contacts']['options'] = $options;
 			if(CheckFormSubmit($f, 'submit')){
 				redirect("contactresult.php");
@@ -148,7 +149,11 @@ if($reload){
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
 	foreach($orders as $order){
-		PutFormData($f, $s, $order, isset($_SESSION[$order]) ? $_SESSION[$order] : "");
+		if($order == "order1"){
+			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "pkey");
+		} else {
+			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
+		}
 	}
 
 	PutFormData($f,$s,"newrulefieldnum","");
