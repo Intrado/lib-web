@@ -140,7 +140,7 @@ class JobReport extends ReportGenerator{
 								"F" => 0,
 								"nullcp" => 0
 							);
-			$jobstats["phone"] = $cpstats; //start with the cp codes
+			
 			
 			foreach($joblist as $jobid) {
 				if ($jobid) {
@@ -167,6 +167,9 @@ class JobReport extends ReportGenerator{
 						
 						//--------------- PHONE ---------------
 						if(in_array("phone",$jobtypes) !== false) {
+						
+							if(!isset($jobstats["phone"]))
+								$jobstats["phone"] = $cpstats; //start with the cp codes
 							//people, dupes, contacted, notcontacted, %complete (actually from phone)
 				
 							$query = "select count(*) as cnt, rp.status
