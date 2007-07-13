@@ -817,8 +817,10 @@ $$$
 create procedure start_specialtask( in_specialtaskid int)
 begin
 declare l_custid int;
+declare l_type varchar(50);
 select value+0 from setting where name='_customerid' into l_custid;
-insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid) values (l_custid,in_specialtaskid);
+select type from specialtask where id=in_specialtaskid into l_type;
+insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid,type) values (l_custid,in_specialtaskid,l_type);
 end
 $$$
 
