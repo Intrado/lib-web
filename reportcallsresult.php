@@ -10,10 +10,12 @@ require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/form.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/reportutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/ReportInstance.obj.php");
+require_once("obj/ReportSubscription.obj.php");
 require_once("obj/UserSetting.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/CallsReport.obj.php");
@@ -64,11 +66,23 @@ function job_status($resulttype){
 
 
 
-function fmt_jobdrilldown($personid, $jobid, $jobname){
+function fmt_drilldown($personid, $jobid){
 	if($personid == "" || $jobid == "")
 		return null;
-	$url = "<a href=\"reportdrilldown.php?id=" . $personid . "&jobid=" . $jobid . "\">" . $jobname . "</a>";
+	$url = "<a href=\"reportdrilldown.php?id=" . $personid . "&jobid=" . $jobid . "\"><img src=\"img/magnify.gif\"></a>";
 	return $url;
+}
+
+function fmt_type($jobname, $phone, $email){
+	$phoneimg = "";
+	$emailimg = "";
+	if($phone){
+		$phoneimg = "<img src=\"img/icon_phone_12.gif\" align=\"bottom\" />";
+	}
+	if($email){
+		$emailimg = "<img src=\"img/icon_email_12.gif\" align=\"bottom\" />";
+	}
+	return $phoneimg . $emailimg . $jobname;
 }
 
 function fmt_calls_result($row, $index){
@@ -82,9 +96,32 @@ function fmt_calls_result($row, $index){
 				return "No";
 			case 'duplicate':
 				return "Duplicate";
+			default:
+				return "No";
 		}
 	}
 	return "";
+}
+
+function fmt_rel_date($string, $arg1="", $arg2=""){
+	switch($string){
+		case 'today':
+			return "Today";
+		case 'yesterday':
+			return "Yesterday";
+		case 'lastweekday':
+			return "Last Week Day";
+		case 'weektodate':
+			return "Week to Date";
+		case 'monthtodate':
+			return "Month to Date";
+		case 'xdays':
+			return "Last $arg1 days";
+		case 'daterange':
+			return date("M d, Y", strtotime($arg1)) . " To: " . date("M d, Y", strtotime($arg2));
+		default:
+			return $string;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,22 +139,17 @@ if(isset($_REQUEST['pagestart'])){
 
 $orders = array("order1", "order2", "order3");
 
-$fields = DBFindMany("FieldMap", "from fieldmap where options not like '%firstname%' and options not like '%lastname%'");
-foreach($fields as $key => $fieldmap){
-	if(!$USER->authorizeField($fieldmap->fieldnum))
-		unset($fields[$key]);
-}
-$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
-$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+$fields = getFieldMaps();
+$ordering = CallsReport::getOrdering();
 
 
 if(isset($_REQUEST['reportid'])){
-	$reportid = $_REQUEST['reportid']+0;
-	$reportinstance = new ReportInstance($reportid);
-	$options = $reportinstance->getParameters();
-	
-	$_SESSION['saved_report'] = true;
-	$activefields = $reportinstance->getActiveFields();
+	$_SESSION['reportid'] = $_REQUEST['reportid'];
+	$reportid = $_SESSION['reportid']+0;
+	$subscription = new ReportSubscription($reportid);
+	$instance = new ReportInstance($subscription->reportinstanceid);
+	$options = $instance->getParameters();
+	$activefields = $instance->getActiveFields();
 	foreach($fields as $field){
 		if(in_array($field->fieldnum, $activefields)){
 			$_SESSION['fields'][$field->fieldnum] = true;
@@ -128,40 +160,20 @@ if(isset($_REQUEST['reportid'])){
 	foreach($orders as $order){
 		$_SESSION[$order] = isset($options[$order]) ? $options[$order] : "";
 	}
-	
-	unset($_SESSION['contactrules']);
-	if(isset($options['rules']) && $options['rules'] != ""){
-		$rules = explode("||", $options['rules']);
-		foreach($rules as $rule){
-			if($rule != ""){
-				$rule = explode(";", $rule);
-				$newrule = new Rule();
-				$newrule->logical = $rule[0];
-				$newrule->op = $rule[1];
-				$newrule->fieldnum = $rule[2];
-				$newrule->val = $rule[3];
-				if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
-					$_SESSION['contactrules'][] = $newrule;
-				else 
-					$_SESSION['contactrules'] = array($newrule);
-				$newrule->id = array_search($newrule, $_SESSION['contactrules']);
-				$_SESSION['contactrules'][$newrule->id] = $newrule;
-			}
-		}
-	}
-	
 	$_SESSION['report']['options'] = $options;
+	redirect();
 } else {
 	
 	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 	$activefields = array();
 	$fieldlist = array();
+
 	foreach($fields as $field){
 		// used in html
 		$fieldlist[$field->fieldnum] = $field->name;
 		
 		// used in pdf
-		if(isset($_SESSION['fields']['$field->fieldnum']) && $_SESSION['fields']['$field->fieldnum']){
+		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
 			$activefields[] = $field->fieldnum; 
 		}
 	}
@@ -169,26 +181,39 @@ if(isset($_REQUEST['reportid'])){
 	foreach($orders as $order){
 		$_SESSION[$order] = isset($options[$order]) ? $options[$order] : "" ;
 	}
-	$reportinstance = new ReportInstance();
-	$reportinstance->setFields($fieldlist);
-	$reportinstance->setActiveFields($activefields);
+	if(isset($_SESSION['reportid'])){
+		$subscription = new ReportSubscription($_SESSION['reportid']);
+		$instance = new ReportInstance($subscription->reportinstanceid);
+	} else {
+		$instance = new ReportInstance();
+		$subscription = new ReportSubscription();
+		$subscription->createDefaults(fmt_report_name($options['reporttype']));
+	}
+
+	$instance->setFields($fieldlist);
+	$instance->setActiveFields($activefields);
+}
+
+if(isset($_SESSION['reportid'])){
+	$_SESSION['saved_report'] = true;
+} else {
+	$_SESSION['saved_report'] = false;
 }
 
 $options['pagestart'] = $pagestart;
 
-$reportinstance->setParameters($options);
-
-$reportgenerator = new CallsReport();
-$reportgenerator->reportinstance = $reportinstance;
-$reportgenerator->userid = $USER->id;
+$instance->setParameters($options);
+$generator = new CallsReport();
+$generator->reportinstance = $instance;
+$generator->userid = $USER->id;
 
 if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
-	$reportgenerator->format = "csv";
+	$generator->format = "csv";
 } else {
-	$reportgenerator->format = "html";
+	$generator->format = "html";
 }
 
-if(CheckFormSubmit($f,$s))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -203,12 +228,21 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			$orderquery = "";
-			$options = $reportinstance->getParameters();
+			$options = $instance->getParameters();
 			foreach($orders as $order){
 				$options[$order] = GetFormData($f, $s, $order);
 				$_SESSION[$order] = GetFormData($f, $s, $order);
 			}		
 			$_SESSION['report']['options']= $options;
+			if(CheckFormSubmit($f, "save")){
+				$instance->setParameters($options);
+				var_dump($activefields);
+				$instance->update();
+				$subscription->reportinstanceid = $instance->id;
+				$subscription->update();
+				$_SESSION['reportid'] = $subscription->id;
+				redirect("reportedit.php?reportid=" . $subscription->id);
+			}
 			redirect();
 		}
 	}
@@ -218,35 +252,39 @@ if(CheckFormSubmit($f,$s))
 
 if($reload){
 	ClearFormData($f);
-	foreach($orders as $order){
-		PutFormData($f, $s, $order, isset($_SESSION[$order]) ? $_SESSION[$order] : "");
-	}
+	PutFormData($f, $s, "order1", isset($options["order1"]) ? $options["order1"] : "");
+	PutFormData($f, $s, "order2", isset($options["order2"]) ? $options["order2"] : "");
+	PutFormData($f, $s, "order3", isset($options["order3"]) ? $options["order3"] : "");
+
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-if($reportgenerator->format != "html"){
-	$reportgenerator->generate();
+if($generator->format != "html"){
+	$generator->generate();
 } else {
 	$PAGE = "reports:reports";
 	switch($options['reporttype']){
 		case 'undelivered':
-			$TITLE = "UnDelivered Calls";
+			$TITLE = "UnDelivered";
 			break;
 		case 'attendance':
-			$TITLE = "Attendance Calls";
+			$TITLE = "Attendance";
 			break;
 		case 'emergency':
-			$TITLE = "Emergency Calls";
+			$TITLE = "Emergency";
 			break;
 		default:
-			$TITLE = "Calls Report";
+			$TITLE = "Individual's Report";
+	}
+	if(isset($subscription)){
+		$TITLE .= ": " . $subscription->name;
 	}
 	
 	include_once("nav.inc.php");
 	NewForm($f);
-	buttons(button('back', 'window.history.go(-1)'));
+	buttons(button('back', 'window.history.go(-1)'), submit($f, "save", "save", "save"), submit($f, $s, "search", "refresh"));
 	startWindow("Display Options", "padding: 3px;");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -268,11 +306,8 @@ if($reportgenerator->format != "html"){
 	<?
 						NewFormItem($f, $s, $order, 'selectstart');
 						NewFormItem($f, $s, $order, 'selectoption', " -- Not Selected --", "");
-						NewFormItem($f, $s, $order, 'selectoption', "Person ID", "pkey");
-						NewFormItem($f, $s, $order, 'selectoption', $firstname->name, $firstname->fieldnum);
-						NewFormItem($f, $s, $order, 'selectoption', $lastname->name, $lastname->fieldnum);
-						foreach($fields as $field){
-							NewFormItem($f, $s, $order, 'selectoption', $field->name, $field->fieldnum);
+						foreach($ordering as $index => $item){
+							NewFormItem($f, $s, $order, 'selectoption', $index, $item);
 						}
 						NewFormItem($f, $s, $order, 'selectend');
 	?>
@@ -287,7 +322,6 @@ if($reportgenerator->format != "html"){
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
 			<td class="bottomBorder"><a href="reportcallsresult.php?csv=1">CSV</a></td>
 		</tr>
-		<tr><td><? echo submit($f, $s, "search", "search");?></td></tr>
 	</table>
 	<?
 	endWindow();
@@ -295,9 +329,9 @@ if($reportgenerator->format != "html"){
 	<br>
 	<?
 			
-	$reportgenerator->generate();
-	EndForm();
+	$generator->generate();
 	buttons();
+	EndForm();
 	include_once("navbottom.inc.php");
 }
 ?>
