@@ -7,7 +7,7 @@ header ("Content-type: image/png");
 $toggle = $_REQUEST['toggle'];
 $field = $_REQUEST['field'];
 
-if(!$_REQUEST['saved']){
+if($_REQUEST['saved']== "false"){
 	$usersetting = DBFind("UserSetting", "from usersetting where name ='" . DBSafe($field) . "' and userid = '$USER->id'");
 	if($usersetting == null){
 		$usersetting = new UserSetting();
