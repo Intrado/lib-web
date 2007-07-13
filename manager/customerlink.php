@@ -29,7 +29,7 @@ if(isset($_GET['id'])){
 
 $manager = new AspAdminUser($_SESSION['aspadminuserid']);
 
-if(isset($_REQUEST['submit']) && $_REQUEST['submit']){
+if(isset($_POST["password"])){
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	if($manager->runCheck($password)){
 		$customerurl = QuickQuery("select urlcomponent from customer where id = '$custid'");
@@ -55,8 +55,8 @@ Link:
 <br>
 <br>
 <form method="POST" action="customerlink.php?id=<?=$custid?>">
-Enter Manager Password: <input type="password" name="password" />
-<input type="submit" name="submit" />
+	Enter Manager Password: <input type="password" name="password" />
+	<input type="submit" name="submit" />
 </form>
 
 <?
