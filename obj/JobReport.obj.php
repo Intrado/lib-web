@@ -53,8 +53,13 @@ class JobReport extends ReportGenerator{
 				$dateend = date("Y-m-d", strtotime("now"));
 			$joblist = QuickQueryList("select j.id from job j where j.startdate < '$dateend' and (j.finishdate > '$datestart' or j.enddate > '$datestart')");
 		}
+		$resultquery = "";
+		if(isset($params['result']) && $params['result']){
+			$resultquery = " and rc.result = '" . $params['result'] . "' ";
+		}
 		
 		$searchquery = isset($jobid) ? " and rp.jobid='$jobid'" : " and rp.jobid in ('" . implode("','", $joblist) ."')";
+		$searchquery .= $resultquery;
 		$usersql = $USER->userSQL("rp");
 		$fields = $instance->getFields();
 		$fieldquery = generateFields("rp");
@@ -342,25 +347,25 @@ class JobReport extends ReportGenerator{
 						<td class="bottomBorder">
 							<table>
 							<tr><td>
-								<div class="floatingreportdata"><u>Answered</u></td><td><?= number_format($jobstats["phone"]["A"]) ?></div>
+								<div class="floatingreportdata"><u><a href="reportjobdetails.php?result=A">Answered</a></u></td><td><?= number_format($jobstats["phone"]["A"]) ?></div>
 							</td></tr>
 							<tr><td>
-								<div class="floatingreportdata"><u>Machine</u></td><td><?= number_format($jobstats["phone"]["M"]) ?></div>
+								<div class="floatingreportdata"><u><a href="reportjobdetails.php?result=M">Machine</a></u></td><td><?= number_format($jobstats["phone"]["M"]) ?></div>
 							</td></tr>
 							<tr><td>
-								<div class="floatingreportdata"><u>No Answer</u></td><td><?= number_format($jobstats["phone"]["N"]) ?></div>
+								<div class="floatingreportdata"><u><a href="reportjobdetails.php?result=N">No Answer</a></u></td><td><?= number_format($jobstats["phone"]["N"]) ?></div>
 							</td></tr>
 							<tr><td>
-								<div class="floatingreportdata"><u>Busy</u></td><td><?= number_format($jobstats["phone"]["B"]) ?></div>
+								<div class="floatingreportdata"><u><a href="reportjobdetails.php?result=B">Busy</a></u></td><td><?= number_format($jobstats["phone"]["B"]) ?></div>
 							</td></tr>
 							<tr><td>
-								<div class="floatingreportdata"><u>Disconnect</u></td><td><?= number_format($jobstats["phone"]["X"]) ?></div>
+								<div class="floatingreportdata"><u><a href="reportjobdetails.php?result=X">Disconnect</a></u></td><td><?= number_format($jobstats["phone"]["X"]) ?></div>
 							</td></tr>
 							<tr><td>
-								<div class="floatingreportdata"><u>Fail</u></td><td><?= number_format($jobstats["phone"]["F"]) ?></div>
+								<div class="floatingreportdata"><u><a href="reportjobdetails.php?result=F">Fail</a></u></td><td><?= number_format($jobstats["phone"]["F"]) ?></div>
 							</td></tr>
 							<tr><td>
-								<div class="floatingreportdata"><u>Not Attempted</u></td><td><?= number_format($jobstats["phone"]["nullcp"]) ?></div>
+								<div class="floatingreportdata"><u><a href="reportjobdetails.php?result=notattempted">Not Attempted</a></u></td><td><?= number_format($jobstats["phone"]["nullcp"]) ?></div>
 							</td></tr>
 							</table>
 						</td>
@@ -393,12 +398,20 @@ class JobReport extends ReportGenerator{
 					</tr>
 			<? } ?>
 					<tr>
-						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Contact Log:</th>
+						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">View Options</th>
 						<td >
 							<? if(!isset($this->params['detailed']) || !$this->params['detailed']){ ?>
-								<a href="reportjobdetails.php">View</a>&nbsp;|&nbsp;
+								<a href="reportjobdetails.php">Call Details</a>&nbsp;|&nbsp;
 							<? } ?>
 							<a href="reportjobdetails.php?csv=true">Download CSV File</a>
+							<?
+								if(isset($options['jobid'])){
+									$job = new Job($options['jobid']);
+									if($job->questionnaireid){
+										?>&nbsp;|&nbsp;<a href="reportjobsurvey.php?surveyid=<?=$options['jobid']?>">Survey Results</a><?
+									}
+								}
+							?>
 						</td>
 					</tr>
 			
