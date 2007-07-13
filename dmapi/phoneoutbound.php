@@ -11,9 +11,9 @@ if ($REQUEST_TYPE == "new") {
 	//check for specialtasks
 	if ($specialtask = assignSpecialTask($dmapidb)) {
 
-		$SESSIONDATA['specialtaskid'] = $task->specialtaskid;
+		$SESSIONDATA['specialtaskid'] = $specialtask->specialtaskid;
 
-		$authsessid = authorizeSpecialTask($task->shardid, $task->id);
+		$authsessid = authorizeSpecialTask($specialtask->shardid, $specialtask->id);
 		if ($authsessid) {
 			switch ($specialtask->type) {
 				case "EasyCall":
