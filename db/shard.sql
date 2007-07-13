@@ -126,7 +126,7 @@ CREATE TABLE specialtaskqueue (
   localspecialtaskid int(11) NOT NULL,
   uuid varchar(255) default NULL,
   `status` enum('new','assigned') NOT NULL default 'new',
-  'type' varchar(50) default NULL,
+  `type` varchar(50) default NULL,
   leasetime bigint(20) default NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY specialtask (customerid,localspecialtaskid),
