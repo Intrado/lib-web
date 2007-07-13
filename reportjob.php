@@ -85,7 +85,7 @@ if(isset($_SESSION['reportid'])){
 
 $_SESSION['report']['options'] = $options;
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run"))
+if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview"))
 {
 	if(CheckFormInvalid($f))
 	{
@@ -140,11 +140,9 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			
 			$options['reporttype'] = "jobreport";
 			$_SESSION['report']['options'] = $options;
-			if(!$error && CheckFormSubmit($f, "run"))
-				redirect("reportjobsurvey.php");
-			if(CheckFormSubmit($f, "save")){
+			
+			if(!$error && (CheckFormSubmit($f, "save") || CheckFormSubmit($f, "saveview"))){
 				$activefields = array();
-				$fieldlist = array();
 				foreach($fieldlist as $field){
 					$fields[$field->fieldnum] = $field->name;
 					if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
@@ -159,8 +157,11 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$subscription->reportinstanceid = $instance->id;
 				$subscription->update();
 				$_SESSION['reportid'] = $subscription->id;
-				redirect("reportedit.php?reportid=" . $subscription->id);
+				if(CheckFormSubmit($f, "save"))
+					redirect("reportedit.php?reportid=" . $subscription->id);
 			}
+			if(!$error && (CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview")))
+				redirect("reportjobsurvey.php");
 		}
 	}
 } else {
@@ -201,7 +202,8 @@ $PAGE = "reports:reports";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons( button('done', "location.href='reports.php'"), submit($f, "save", "save", "save"), submit($f, "run", "View Report", "View Report"));
+buttons( button('done', "location.href='reports.php'"), submit($f, "save", "save", "save"),
+			isset($_SESSION['reportid']) ? submit($f, "saveview", "saveview", "Save and View") : submit($f, "run", "View Report", "View Report"));
 
 //--------------- Select window ---------------
 startWindow("Select", NULL, false);
