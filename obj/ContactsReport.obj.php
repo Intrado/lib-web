@@ -50,12 +50,26 @@ class ContactsReport extends ReportGenerator {
 			$emailquery = $params['personid'] ? " and p.pkey like '%" . DBSafe($params['personid']) . "%'" : "";
 		}
 		if($orderquery == "")
-			$orderquery = "order by p.id";		
+			$orderquery = "order by p.id";
+		$fieldquery = generateFields("p");	
 		$this->query = "select SQL_CALC_FOUND_ROWS
-					p.id
+					p.pkey as pkey, 
+					p.id as pid,
+					p." . FieldMap::GetFirstNameField() . " as firstname, 
+					p." . FieldMap::GetLastNameField() . " as lastname, 
+					concat(
+							coalesce(a.addr1,''), ' ',
+							coalesce(a.addr2,''), ' ',
+							coalesce(a.city,''), ' ',
+							coalesce(a.state,''), ' ',
+							coalesce(a.zip,'')
+						) as address
+					$fieldquery	
 					from person p
+					left join address a on (a.personid = p.id)
 					left join phone ph on (ph.personid = p.id)
 					left join email e on (e.personid = p.id)
+					
 					where 1
 					$phonequery
 					$emailquery
@@ -75,35 +89,27 @@ class ContactsReport extends ReportGenerator {
 		$query = $this->query;
 		$pagestart = isset($options['pagestart']) ? $options['pagestart'] : 0;
 		$query .= "limit $pagestart, 500";
-		$idlist = QuickQueryList($query);
+		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
-		$personlist = array();
 		$phonelist = array();
 		$emaillist = array();
-		$fieldquery = generateFields("p");
-		foreach($idlist as $id){
-			$personquery = "select
-							p.pkey as pkey, 
-							p.id as pid,
-							p." . FieldMap::GetFirstNameField() . " as firstname, 
-							p." . FieldMap::GetLastNameField() . " as lastname, 
-							concat(
-									coalesce(a.addr1,''), ' ',
-									coalesce(a.addr2,''), ' ',
-									coalesce(a.city,''), ' ',
-									coalesce(a.state,''), ' ',
-									coalesce(a.zip,'')
-								) as address
-							
-							$fieldquery
-							 from person p
-							 left join address a on (a.personid = p.id)
-							where p.id = '$id'";
-							
-			$personrow = QuickQueryRow($personquery);
-			$personlist[$id] = $personrow;
-			$phonelist[$id] = DBFindMany("Phone", "from phone where personid = '$id'");
-			$emaillist[$id] = DBFindMany("Email", "from email where personid = '$id'");
+		$phonelist = array();
+		while($row = DBGetRow($result)){
+			$personlist[$row[1]] = $row;
+			$phoneresult = Query("Select sequence, phone from phone where personid = '$row[1]' order by sequence");
+			while($phonerow = DBGetRow($phoneresult)){
+				if(!isset($phonelist[$row[1]]) || !is_array($phonelist[$row[1]])){
+					$phonelist[$row[1]] = array();
+				}
+				$phonelist[$row[1]][] = $phonerow;
+			}
+			$emailresult = Query("Select sequence, email from email where personid = '$row[1]' order by sequence");
+			while($emailrow = DBGetRow($emailresult)){
+				if(!isset($emaillist[$row[1]]) || !is_array($emaillist[$row[1]])){
+					$emaillist[$row[1]] = array();
+				}
+				$emaillist[$row[1]][] = $emailrow;
+			}
 		}
 		
 		startWindow("Search Information", "padding: 3px;"); 
@@ -159,79 +165,84 @@ class ContactsReport extends ReportGenerator {
 			</tr>
 		<?
 			$alt = 0;
-			foreach($idlist as $id){
+			foreach($personlist as $person){
 				echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 				
-				$person = $personlist[$id];
+				$id = $person[1];
 				?>
 					<td><?=fmt_idmagnify($person,0)?></td>
 					<td><?=$person[2]?></td>
 					<td><?=$person[3]?></td>
 					<td><?=$person[4]?></td>
 					
-					<?
+					<? 
 						$first=true;
-						foreach($phonelist[$id] as $phone){
-							if(!$first) {
-								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-								?><td></td><td></td><td></td><td></td><?
-							}
-							?>
-							<td><?=$phone->sequence +1?></td><td><?=fmt_phone_contact($phone->phone)?></td>
-							<?
-							if($first){
-								$first = false;
-								$count=0;
-								for($i=0;$i<20; $i++){
-									if($i<10){
-										$num = "f0" . $i;
-									} else {
-										$num = "f" . $i;
+						if(isset($phonelist)){
+							foreach($phonelist[$id] as $phone){
+								if(!$first) {
+									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
+									?><td></td><td></td><td></td><td></td><?
+								}
+								?>
+								<td><?=$phone[0]+1?></td><td><?=fmt_phone_contact($phone[1])?></td>
+								<?
+								if($first){
+									$first = false;
+									$count=0;
+									for($i=0;$i<20; $i++){
+										if($i<10){
+											$num = "f0" . $i;
+										} else {
+											$num = "f" . $i;
+										}
+										if(in_array($num, array_keys($fieldlist))){
+											?><td><?=$person[5+$count]?></td><?
+											$count++;
+										}
 									}
-									if(in_array($num, array_keys($fieldlist))){
-										?><td><?=$person[5+$count]?></td><?
-										$count++;
+								} else {
+									for($i=0; $i<$fieldcount; $i++){
+										?><td>&nbsp;</td><?
 									}
 								}
-							} else {
-								for($i=0; $i<$fieldcount; $i++){
-									?><td>&nbsp;</td><?
-								}
+								?>
+								</tr><?
 							}
-							?>
-							</tr><?
 						}
-						foreach($emaillist[$id] as $email){
-							if(!$first) {
-								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-								?><td></td><td></td><td></td><td></td><?
-							}
-							?><td><?=$email->sequence +1?></td><td><?=$email->email?></td>
-							<? 
-							if($first){
-								$first = false;
-								$count=0;
-								for($i=0;$i<20; $i++){
-									if($i<10){
-										$num = "f0" . $i;
-									} else {
-										$num = "f" . $i;
+						if(isset($emaillist[$id])){
+							foreach($emaillist[$id] as $email){
+								
+								if(!$first) {
+									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
+									?><td></td><td></td><td></td><td></td><?
+								}
+								?><td><?=$email[0] +1?></td><td><?=$email[1]?></td>
+								<? 
+								if($first){
+									$first = false;
+									$count=0;
+									for($i=0;$i<20; $i++){
+										if($i<10){
+											$num = "f0" . $i;
+										} else {
+											$num = "f" . $i;
+										}
+										if(in_array($num, array_keys($fieldlist))){
+											?><td><?=$person[5+$count]?></td><?
+											$count++;
+										}
 									}
-									if(in_array($num, array_keys($fieldlist))){
-										?><td><?=$person[5+$count]?></td><?
-										$count++;
+								} else {
+									for($i=0; $i<$fieldcount; $i++){
+										?><td>&nbsp;</td><?
 									}
 								}
-							} else {
-								for($i=0; $i<$fieldcount; $i++){
-									?><td>&nbsp;</td><?
-								}
+								
+								?>
+								</tr><?
 							}
-							?>
-							</tr><?
 						}
-					?>
-				<?
+						
 			}
 		?>
 			</table>
