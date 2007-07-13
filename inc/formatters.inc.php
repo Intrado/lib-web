@@ -406,17 +406,19 @@ function fmt_response_count($obj, $name) {
 function fmt_report_name($string){
 	switch($string){
 		case 'jobreport':
-			return "Job Report";
+			return "Jobs";
 		case 'undelivered':
-			return "Undelivered Calls";
+			return "Undelivered";
 		case 'emergency':
 			return "Emergency";
 		case 'attendance':
 			return "Attendance";
 		case 'surveyreport':
-			return "Survey Report";
+			return "Surveys";
 		case 'callsreport':
-			return "Individual Calls Report";
+			return "Individual's Report";
+		case 'contacts':
+			return "Contact Report";
 		default:
 			return $string;
 	}
