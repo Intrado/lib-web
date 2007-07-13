@@ -10,12 +10,14 @@ require_once("obj/Phone.obj.php");
 require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/reportutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/SurveyQuestionnaire.obj.php");
 require_once("obj/SurveyQuestion.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
+require_once("obj/ReportSubscription.obj.php");
 require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("inc/date.inc.php");
@@ -98,18 +100,18 @@ if(isset($_GET['pagestart'])){
 	$pagestart = $_GET['pagestart'];
 }
 
-$fields = DBFindMany("FieldMap", "from fieldmap where options not like '%firstname%' and options not like '%lastname%'");
-$fieldmap = DBFindMany("FieldMap", "from fieldmap");
-foreach($fields as $key => $fieldmap){
-	if(!$USER->authorizeField($fieldmap->fieldnum))
-		unset($fields[$key]);
-}
-$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
-$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+$fields = getFieldMaps();
+$ordering = JobReport::getOrdering();
 
 $orders = array("order1", "order2", "order3");
 
-$options = $_SESSION['report']['options'];
+if(isset($_SESSION['reportid'])){
+	$subscription = new ReportSubscription($_SESSION['reportid']+0);
+	$instance = new ReportInstance($subscription->reportinstanceid);
+	$options = $instance->getParameters();
+} else {
+	$options = $_SESSION['report']['options'];
+}
 if(isset($options['jobid'])){
 	$jobid = $options['jobid'];
 	if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid)))
@@ -121,14 +123,10 @@ foreach($fields as $field){
 	// used in html
 	$fieldlist[$field->fieldnum] = $field->name;
 	
-	// used in pdf
-	if(!isset($_SESSION['fields']['$field->fieldnum']) || $_SESSION['fields']['$field->fieldnum']){
+	// used in pdf,csv
+	if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
 		$activefields[] = $field->fieldnum; 
 	}
-}
-
-foreach($orders as $order){
-	$options[$order] = isset($_SESSION[$order]) ? $_SESSION[$order] : "";
 }
 
 unset($_SESSION['jobstats']);
@@ -173,7 +171,6 @@ if(CheckFormSubmit($f,$s))
 			$options = $reportinstance->getParameters();
 			foreach($orders as $order){
 				$options[$order] = GetFormData($f, $s, $order);
-				$_SESSION[$order] = GetFormData($f, $s, $order);
 			}
 
 			$_SESSION['report']['options']= $options;
@@ -187,7 +184,11 @@ if(CheckFormSubmit($f,$s))
 if($reload){
 	ClearFormData($f);
 	foreach($orders as $order){
-		PutFormData($f, $s, $order, isset($_SESSION[$order]) ? $_SESSION[$order] : "");
+		if($order == "order1"){
+			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "rp.pkey");
+		} else {
+			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
+		}
 	}
 
 }
@@ -201,16 +202,13 @@ if($reload){
 if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	$reportgenerator->generate();
 } else {
-	if($_SESSION['reporttype'] == "surveyreport"){
-		$PAGE = "reports:reports";
-		$TITLE = "Standard Survey Report" . ($jobid ? " - " . $job->name : "");
-	} else {
-		$PAGE = "reports:reports";
-		$TITLE = "Standard Job Report" . ($jobid ? " - " . $job->name : "");
-	}
+	
+	$PAGE = "reports:reports";
+	$TITLE = "Standard Job Report" . (isset($jobid) ? " - " . $job->name : "");
+	
 	include_once("nav.inc.php");
 	NewForm($f);	
-	
+	buttons(button("back", "window.history.go(-1)"), submit($f, $s, "filter", "refresh"));
 	startWindow("Display Options", "padding: 3px;");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -232,11 +230,9 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	<?
 						NewFormItem($f, $s, $order, 'selectstart');
 						NewFormItem($f, $s, $order, 'selectoption', " -- Not Selected --", "");
-						NewFormItem($f, $s, $order, 'selectoption', $firstname->name, $firstname->fieldnum);
-						NewFormItem($f, $s, $order, 'selectoption', $lastname->name, $lastname->fieldnum);
-						foreach($fields as $field){
-							NewFormItem($f, $s, $order, 'selectoption', $field->name, $field->fieldnum);
-						}
+						foreach($ordering as $index => $item){
+							NewFormItem($f, $s, $order, 'selectoption', $index, $item);
+						}						
 						NewFormItem($f, $s, $order, 'selectend');
 	?>
 					</td>
@@ -247,8 +243,9 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 					</tr>
 				</table>
 			</td>
+		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
+			<td class="bottomBorder"><a href="reportjobdetails.php?csv=true">CSV</a></td>
 		</tr>
-		<tr><td><? echo submit($f, $s, "filter", "search");?></td></tr>
 	</table>
 	<?
 	endWindow();
@@ -259,7 +256,7 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	if(isset($reportgenerator)){
 		$reportgenerator->generate("detailed");
 	}
-	
+	buttons();
 	endForm();
 	include_once("navbottom.inc.php");
 }
