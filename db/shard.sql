@@ -132,3 +132,7 @@ CREATE TABLE specialtaskqueue (
   UNIQUE KEY specialtask (customerid,localspecialtaskid),
   UNIQUE KEY uuid (uuid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+ALTER TABLE `qjobtask` ADD INDEX `waiting` ( `status` , `nextattempttime` ) ;
+ALTER TABLE `qjobtask` ADD INDEX `progresshandler` ( `status` , `lastattempttime` ) ;
