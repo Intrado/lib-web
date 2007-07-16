@@ -169,20 +169,26 @@ function loadCredentials ($userid) {
 }
 
 function doDBConnect($result) {
-	$db['host'] = $result['dbhost'];
-	$db['user'] = $result['dbuser'];
-	$db['pass'] = $result['dbpass'];
-	$db['db'] = $result['dbname'];
+	global $_DBHOST;
+	global $_DBNAME;
+	global $_DBUSER;
+	global $_DBPASS;
+
+	$_DBHOST = $result['dbhost'];
+	$_DBUSER = $result['dbuser'];
+	$_DBPASS = $result['dbpass'];
+	$_DBNAME = $result['dbname'];
+
 	// 	now connect to the customer database
 	global $_dbcon;
-	$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
+	$_dbcon = mysql_connect($_DBHOST, $_DBUSER, $_DBPASS);
 	if (!$_dbcon) {
-		error_log("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error());
-	} else if (mysql_select_db($db['db'])) {
+		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . mysql_error());
+	} else if (mysql_select_db($_DBNAME)) {
 		// successful connection to customer database
 		return true;
 	} else {
-		error_log("Problem selecting database for " . $db['host'] . " error:" . mysql_error());
+		error_log("Problem selecting database for " . $_DBHOST . " error:" . mysql_error());
 	}
 	return false;
 }
