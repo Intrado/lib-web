@@ -134,5 +134,13 @@ CREATE TABLE specialtaskqueue (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+-- -------------------------------------------------------------------------------------------------------------
+-- ---- July 13, 2007
+-- -------------------------------------------------------------------------------------------------------------
+
 ALTER TABLE `qjobtask` ADD INDEX `waiting` ( `status` , `nextattempttime` ) ;
 ALTER TABLE `qjobtask` ADD INDEX `progresshandler` ( `status` , `lastattempttime` ) ;
+ALTER TABLE `qjobtask` ADD INDEX `emailer` ( `type` , `nextattempttime` ) ;
+ALTER TABLE `qjobtask` ADD INDEX `expired` ( `status` , `leasetime` ) ;
+
+
