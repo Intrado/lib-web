@@ -259,7 +259,12 @@ class SurveyReport extends ReportGenerator{
 	}
 
 	function setReportFile(){
-		$this->reportfile = "surveyreport.jasper";
+		$this->reportfile = "Survey.jasper";
+	}
+
+	function getReportSpecificParams($params){
+		$params['jobid'] = new XML_RPC_VALUE($this->params['jobid'], "string");
+		return $params;
 	}
 
 }
