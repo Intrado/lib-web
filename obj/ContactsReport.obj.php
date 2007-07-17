@@ -211,7 +211,9 @@ class ContactsReport extends ReportGenerator {
 						}
 						if(isset($emaillist[$id])){
 							foreach($emaillist[$id] as $email){
-								
+								if($email[1] == ""){
+									continue;
+								}
 								if(!$first) {
 									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
 									?><td></td><td></td><td></td><td></td><?
