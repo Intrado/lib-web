@@ -424,4 +424,38 @@ function fmt_report_name($string){
 	}
 }
 
+function fmt_result ($row,$index) {
+	if ($row[3] == "phone") {
+		if ($row[9] == "duplicate")
+			return "Duplicate";
+		switch($row[$index]) {
+			case "A":
+				return "Answered";
+			case "M":
+				return "Machine";
+			case "B":
+				return "Busy";
+			case "N":
+				return "No Answer";
+			case "X":
+				return "Disconnect";
+			case "F":
+				return "Failed";
+			case "C":
+				return "In Progress";
+			default:
+				return "";
+		}
+	} else {
+		if ($row[9] == "success")
+			return "Success";
+		else if ($row[9] == "fail")
+			return "Failed";
+		else if ($row[9] == "duplicate")
+			return "Duplicate";
+		else
+			return "In Progress";
+	}
+}
+
 ?>
