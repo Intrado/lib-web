@@ -69,7 +69,7 @@ class JobReport extends ReportGenerator{
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
 			rp.type,
-			coalesce(m.name, sq.name),
+			coalesce(m.name, sq.name) as messagename,
 			coalesce(rc.phone,
 						rc.email,
 						concat(
@@ -80,7 +80,7 @@ class JobReport extends ReportGenerator{
 							coalesce(rc.zip,''))
 					) as destination,
 			rc.numattempts,
-			from_unixtime(rc.starttime/1000) as date,
+			from_unixtime(rc.starttime/1000) as lastattempt,
 			coalesce(rc.result,
 					rp.status) as result,
 			rp.status,
@@ -576,6 +576,11 @@ class JobReport extends ReportGenerator{
 	
 	function setReportFile(){
 		$this->reportfile = "jobreport.jasper";
+	}
+	
+	function getReportSpecificParams($params){
+		$params['jobId'] = new XML_RPC_VALUE($this->params['jobid'], "string");
+		return $params;
 	}
 
 	static function getOrdering(){
