@@ -266,8 +266,12 @@ class ContactsReport extends ReportGenerator {
 		endWindow();	
 	}
 	
+	function getReportSpecificParams($params){
+		return $params;
+	}
+	
 	function setReportFile(){
-		$this->reportfile = "contactsreport.jasper";
+		$this->reportfile = "Contactsreport.jasper";
 	}
 }
 
