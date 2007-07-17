@@ -41,12 +41,15 @@ class ReportGenerator {
 		$xmlparams[] = new XML_RPC_Value($timeoffsetquery, 'string');
 		
 		$fieldlist = $instance->getFields();
-		$fieldarray = array();
+		$params = array();
 		foreach($fieldlist as $index => $title){
 			$newindex = preg_replace("{f}", "flex_title_", $index);
-			$fieldarray[$newindex] = new XML_RPC_VALUE($title, 'string');
+			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
 		}
-		$xmlparams[] = new XML_RPC_Value($fieldarray, 'struct');
+		$params = $this->getReportSpecificParams($params);
+		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
+		$params["iconLocation"] = new XML_RPC_VALUE("images\\", 'string');
+		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 		
 		$activefields = $instance->getActiveFields();
 		$active = array();
@@ -60,6 +63,7 @@ class ReportGenerator {
 		$method = "Resizer.render";
 		$result = $this->reportxmlrpc($method, $xmlparams);
 		return $result;
+
 	}
 	
 	function reportxmlrpc($method, $xmlparams){
