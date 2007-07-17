@@ -166,6 +166,12 @@ class DrillDownReport extends ReportGenerator{
 	function setReportFile(){
 		$this->reportfile = "drilldownreport.jasper";
 	}
+	
+	function getReportSpecificParams($params){
+		$params['Job_Id'] = new XML_RPC_VALUE($this->params['jobid'], "string");
+		$params['Person_Id'] = new XML_RPC_VALUE($this->params['personid'], "string");
+		return $params;
+	}
 }
 
 ?>
