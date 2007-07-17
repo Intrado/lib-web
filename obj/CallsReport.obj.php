@@ -165,8 +165,8 @@ class CallsReport extends ReportGenerator{
 					max(from_unixtime(rc.starttime/1000)) as date,
 					rp.status as status,
 					j.id,
-					sum(rp.type = 'phone'),
-					sum(rp.type = 'email')
+					sum(rp.type = 'phone') as phonecount,
+					sum(rp.type = 'email') as emailcount
 					$fieldquery
 					from reportperson rp
 					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
@@ -309,7 +309,7 @@ class CallsReport extends ReportGenerator{
 							
 		startWindow("Search Results", "padding: 3px;");
 			
-			showPageMenu($total,$pagestart,10);
+			showPageMenu($total,$pagestart,50);
 			?>
 				<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 					<tr class="listHeader">
@@ -348,7 +348,7 @@ class CallsReport extends ReportGenerator{
 ?>
 				</table>
 <?
-			showPageMenu($total,$pagestart,10);
+			showPageMenu($total,$pagestart,50);
 		
 		endWindow();
 		?>
@@ -456,7 +456,11 @@ class CallsReport extends ReportGenerator{
 	}
 	
 	function setReportFile(){
-		$this->reportfile = "CallsUndeliveredCalls.jrxml";
+		$this->reportfile = "CallsReport.jasper";
+	}
+	
+	function getReportSpecificParams($params){
+		return $params;
 	}
 	
 	/**static functions**/
