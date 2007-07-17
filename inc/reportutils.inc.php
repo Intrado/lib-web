@@ -85,4 +85,22 @@ function getFieldMaps(){
 	}
 	return $fields;
 }
+
+function createPdfParams($filename){
+	//	global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
+	$host = "jdbc:mysql://localhost:3306/c_1"; // "jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME;
+	$user = "root"; //$_DBUSER;
+	$pass = ""; //$_DBPASS;
+	$params = array("host" => $host,
+					"user" => $user,
+					"pass" => $pass,
+					"filename" => $filename);
+	return $params;
+}
+
+function secure_reportname(){
+	global $SETTINGS;
+	$name = $SETTINGS['feature']['tmp_dir'] . "/report-" . strtotime("now") . ".pdf";
+	return $name;
+}
 ?>
