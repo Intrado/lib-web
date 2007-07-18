@@ -29,7 +29,6 @@ class SurveyReport extends ReportGenerator{
 						sr.answer as answer, 
 						sr.tally as tally, 
 						sq.reportlabel as questionname,
-						coalesce(mp.txt, sq.webmessage) as questiontext,
 						sr.jobid as jobid
 						from surveyresponse sr
 						inner join job j on (sr.jobid = j.id)
@@ -61,7 +60,7 @@ class SurveyReport extends ReportGenerator{
 		$query = "select sum(rp.status='success' and rc.result='A' and rc.participated=1), count(*) as cnt
 			from reportperson rp 
 			left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-			where rp.jobid='$jobid'";
+			where rp.jobid='$jobid' and rp.type ='phone'";
 			
 		$result = QuickQueryRow($query);
 		$phoneparticipants = 0;
@@ -75,9 +74,9 @@ class SurveyReport extends ReportGenerator{
 		
 		$urloptions = "jobid=$jobid&valid=$validstamp";
 
-		$query = "select count(*) from surveyweb sw
+		$query = "select sum(sw.status = 'web'), count(*) from surveyweb sw
 				inner join reportperson rp on (rp.personid = sw.personid and rp.jobid = sw.jobid)
-				where sw.status='web' and sw.jobid=$jobid";
+				where sw.jobid=$jobid";
 	
 		$result = QuickQueryRow($query);
 		$sentemails=0;
@@ -98,7 +97,6 @@ class SurveyReport extends ReportGenerator{
 		while ($row = DBGetRow($res)) {
 			$questions[$row[0]]['answers'][$row[1]] = $row[2];
 			$questions[$row[0]]['label'] = $row[3] != NULL ? $row[3] : ("Question " . ($row[0] + 1));
-			$questiontext[$row[0]] = $row[4] != NULL ? $row[4] : "";
 		}
 	
 		
@@ -146,9 +144,10 @@ class SurveyReport extends ReportGenerator{
 					
 								</td>
 								<td>
+									<div style="float; left">
 									<table width="100%" cellpadding="3" cellspacing="1" class="list">
 <?
-										$titles = array("No.", "Question");
+										$titles = array(' #', "Question");
 										for ($x = 1; $x <= 9; $x++)
 											$titles[$x+2] = " #$x";
 										$titles[] = "Total";
@@ -165,7 +164,6 @@ class SurveyReport extends ReportGenerator{
 											}
 											$line[0] = $index+1;
 											$line[1] = $question['label'];
-											$line[2] = $questiontext[$index];
 											$line[14] = $validstamp;
 											$data[] = $line;
 										}
@@ -175,6 +173,7 @@ class SurveyReport extends ReportGenerator{
 										showtable($data,$titles,$formatters);
 ?>						
 									</table>
+									</div>
 								</td>
 							</tr>
 						</table>
@@ -197,7 +196,6 @@ class SurveyReport extends ReportGenerator{
 							}
 							$line[0] = $index+1;
 							$line[1] = $question['label'];
-							$line[2] = $questiontext[$index];
 							$line[14] = $validstamp;
 							$data[] = $line;
 						}
@@ -212,7 +210,7 @@ class SurveyReport extends ReportGenerator{
 								
 								<td>
 									<table>
-										<tr><td valign="top"><div style='font-weight:bold; text-decoration: underline'>Question <?=$line[0]?>:</div></td></tr>
+										<tr><td valign="top"><div style='font-weight:bold;'>Question <?=$line[0]?>:</div></td></tr>
 										<tr>
 											<td><?=fmt_question($line,1)?></td>
 										</tr>
@@ -257,10 +255,137 @@ class SurveyReport extends ReportGenerator{
 		<?
 		endWindow();	
 	}
+	
+	function runCSV(){
+	
+		$fieldquery = generateFields("rp");
+		$options = $this->params;
+		$jobid = $options['jobid'];
+		$query = "select SQL_CALC_FOUND_ROWS
+			rp.pkey,
+			rp." . FieldMap::GetFirstNameField() . " as firstname,
+			rp." . FieldMap::GetLastNameField() . " as lastname,
+			rp.type,
+			coalesce(m.name, sq.name) as messagename,
+			coalesce(rc.phone,
+						rc.email,
+						concat(
+							coalesce(rc.addr1,''), ' ',
+							coalesce(rc.addr2,''), ' ',
+							coalesce(rc.city,''), ' ',
+							coalesce(rc.state,''), ' ',
+							coalesce(rc.zip,''))
+					) as destination,
+			rc.numattempts,
+			from_unixtime(rc.starttime/1000) as lastattempt,
+			coalesce(rc.result,
+					rp.status) as result,
+			rp.status,
+			u.login,
+			rp.type as jobtype,
+			j.name as jobname,
+			rc.numattempts as attempts,
+			rc.resultdata,
+			sw.resultdata
+			$fieldquery
+			from reportperson rp
+			inner join job j on (rp.jobid = j.id)
+			inner join user u on (u.id = j.userid)
+			left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+			left join	message m on
+							(m.id = rp.messageid)
+			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
+			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
+		
+			where rp.jobid = '$jobid'";
+			
+		$fieldlist = $this->reportinstance->getFields();
+		$activefields = $this->reportinstance->getActiveFields();
+		
+		
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=report.csv");
+		header("Content-type: application/vnd.ms-excel");
+	
+		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+	
+	
+		$issurvey = false;
+		if (isset($_SESSION['reportjobid']) && $_SESSION['reportjobid']) {
+			$job = new Job($_SESSION['reportjobid']);
+			if ($job->questionnaireid) {
+				$issurvey = true;
+				$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
+			}
+		}
+	
+		//generate the CSV header
+		$header = '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Last Attempt","Last Result"';
+		
+		
+		if (isset($options['issurvey']) && $options['issurvey']) {
+			for ($x = 1; $x <= $numquestions; $x++) {
+				$header .= ",Question $x";
+			}
+		}
+		foreach($activefields as $active){
+			$header .= ',"' . $fieldlist[$active] . '"';
+		}
+		echo $header;
+		echo "\r\n";
+	
+		$result = Query($query);
+	
+		while ($row = DBGetRow($result)) {
+			$row[5] = html_entity_decode(fmt_destination($row,5));
+			$row[6] = (isset($row[6]) ? $row[6] : "");
+			
+	
+			if (isset($row[7])) {
+				$time = strtotime($row[7]);
+				if ($time !== -1 && $time !== false)
+					$row[7] = date("m/d/Y H:i",$time);
+			} else {
+				$row[7] = "";
+			}
+			$row[8] = fmt_result($row,8);
+	
+	
+			$reportarray = array($row[12],$row[10],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[7],$row[8]);
+	
+			if ($issurvey) {
+				//fill in survey result data, be sure to fill in an array element for all questions, even if blank
+				$startindex = count($reportarray);
+	
+				$questiondata = array();
+				if ($row[3] == "phone")
+					parse_str($row[12],$questiondata);
+				else if ($row[3] == "email")
+					parse_str($row[13],$questiondata);
+	
+				//add data to the report for each question
+				for ($x = 0; $x < $numquestions; $x++) {
+					$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
+				}
+			}
+			$count=0;
+			foreach($fieldlist as $index => $field){
+				if(in_array($index, $activefields)){
+					$reportarray[] = $row[16+$count];
+				}
+				$count++;
+			}
+			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
+			
+		}
+	}
 
 	function setReportFile(){
 		$this->reportfile = "Survey.jasper";
 	}
+	
+	
 
 	function getReportSpecificParams($params){
 		$params['jobid'] = new XML_RPC_VALUE($this->params['jobid'], "string");
