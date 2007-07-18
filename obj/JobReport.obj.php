@@ -505,8 +505,8 @@ class JobReport extends ReportGenerator{
 	
 	
 		$issurvey = false;
-		if (isset($_SESSION['reportjobid']) && $_SESSION['reportjobid']) {
-			$job = new Job($_SESSION['reportjobid']);
+		if (isset($options['jobid']) && $options['jobid']) {
+			$job = new Job($options['jobid']);
 			if ($job->questionnaireid) {
 				$issurvey = true;
 				$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
@@ -517,7 +517,7 @@ class JobReport extends ReportGenerator{
 		$header = '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Last Attempt","Last Result"';
 		
 		
-		if (isset($options['issurvey']) && $options['issurvey']) {
+		if (isset($issurvey) && $issurvey) {
 			for ($x = 1; $x <= $numquestions; $x++) {
 				$header .= ",Question $x";
 			}
@@ -553,9 +553,9 @@ class JobReport extends ReportGenerator{
 	
 				$questiondata = array();
 				if ($row[3] == "phone")
-					parse_str($row[12],$questiondata);
+					parse_str($row[14],$questiondata);
 				else if ($row[3] == "email")
-					parse_str($row[13],$questiondata);
+					parse_str($row[15],$questiondata);
 	
 				//add data to the report for each question
 				for ($x = 0; $x < $numquestions; $x++) {
