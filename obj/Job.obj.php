@@ -47,7 +47,6 @@ class Job extends DBMappedObject {
 
 	// generate sql to store into 'thesql' field (used by jobprocessor to select person list)
 	function generateSql() {
-
 		// user rules
 		$user = new User($this->userid);
 		$usersql = $user->userSQL("p");
@@ -68,10 +67,54 @@ class Job extends DBMappedObject {
 
 	// assumes this job was already created in the database
 	function runNow() {
-		$this->generateSql();
+		if ($this->status=="repeating") {
+			// copy this repeater job to a normal job then run it
+			if (!getSystemSetting("disablerepeat")) {
 
-		$this->status = "processing"; // set state, jobprocessor will set it to 'active'
-		$this->update();
+				//update the finishdate (reused as last run for repeating jobs)
+				QuickUpdate("update job set finishdate=now() where id='$this->id'");
+
+				//make a copy of this job and run it
+				$newjob = new Job($this->id);
+				$newjob->id = NULL;
+				$newjob->name .= " - " . date("M j, g:i a");
+				$newjob->status = "new";
+				$newjob->assigned = NULL;
+				$newjob->scheduleid = NULL;
+				$newjob->finishdate = NULL;
+
+				$newjob->createdate = QuickQuery("select now()");
+
+				//refresh the dates to present
+				$daydiff = strtotime($newjob->enddate) - strtotime($newjob->startdate);
+
+				$newjob->startdate = date("Y-m-d", time());
+				$newjob->enddate = date("Y-m-d", time() + $daydiff);
+
+				$newjob->create();
+
+				//copy all the job language settings
+				QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
+							select $newjob->id, messageid, type,language
+							from joblanguage where jobid=$this->id");
+
+				//copy all the jobsetting
+				QuickUpdate("insert into jobsetting (jobid,name,value) " .
+						"select $newjob->id, name, value " .
+						"from jobsetting where jobid=$this->id");
+
+				// update the retry setting - it may have changed since the repeater was created
+				if (getSystemSetting('retry') != "")
+					$newjob->setOptionValue("retry",getSystemSetting('retry'));
+
+				$newjob->runNow();
+				sleep(3);
+			}
+		} else {
+			$this->generateSql();
+			$this->status = "processing"; // set state, jobprocessor will set it to 'active'
+			$this->update();
+		}
 	}
 
 	//creates a new job object prepopulated with all of the user/system defaults
