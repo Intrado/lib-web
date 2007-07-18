@@ -225,7 +225,7 @@ startWindow("Select", NULL, false);
 				</tr>
 				<tr>
 					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="daterange">
+						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="daterange" >
 							<tr>
 								<td>Date From: <? NewFormItem($f, $s, "datestart", "text", "20")?> To: <? NewFormItem($f, $s, "dateend", "text", "20") ?></td>
 							</tr>
@@ -245,12 +245,14 @@ startWindow("Select", NULL, false);
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
 									}
+									NewFormItem($f, $s, "jobid", "selectend");
 									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
 									$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 and status!='repeating' order by id desc");
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 									}
+									NewFormItem($f, $s, "jobid_archived", "selectend");
 								?>
 								</td>
 								<td aligh="left"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
@@ -294,13 +296,13 @@ startWindow("Select", NULL, false);
 	</tr>
 </table>
 <script>
-	setHiddenIfChecked(check_archived, 'jobid');
-	setVisibleIfChecked(check_archived, 'jobid_archived')
+	setHiddenIfChecked('check_archived', 'jobid');
+	setVisibleIfChecked('check_archived', 'jobid_archived');
 	<?
 		if(!isset($options['datestart'])){
-			?>hide("daterange");<?
+			?>hide('daterange');<?
 		} else {
-			?>hide("jobs");<?
+			?>hide('jobs');<?
 		}
 	?>
 </script>
