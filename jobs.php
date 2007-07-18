@@ -83,53 +83,8 @@ if (isset($_GET['runrepeating'])) {
 	$runnow = $_GET['runrepeating'] + 0;
 	if (userOwns("job",$runnow) || (customerOwnsJob($runnow) && $USER->authorize('managesystemjobs'))) {
 		$job = new Job($runnow);
-		$jobid = $job->id;
-		if ($job->status=="repeating") {
-			// copy this repeater job to a normal job then run it
-			if (!getSystemSetting("disablerepeat")) {
-
-	//update the finishdate (reused as last run for repeating jobs)
-	QuickUpdate("update job set finishdate=now() where id='$jobid'");
-
-	//make a copy of this job and run it
-	$newjob = new Job($jobid);
-	$newjob->id = NULL;
-	$newjob->name .= " - " . date("M j, g:i a");
-	$newjob->status = "new";
-	$newjob->assigned = NULL;
-	$newjob->scheduleid = NULL;
-	$newjob->finishdate = NULL;
-
-	$newjob->createdate = QuickQuery("select now()");
-
-	//refresh the dates to present
-	$daydiff = strtotime($newjob->enddate) - strtotime($newjob->startdate);
-
-	$newjob->startdate = date("Y-m-d", time());
-	$newjob->enddate = date("Y-m-d", time() + $daydiff);
-
-	$newjob->create();
-
-	//copy all the job language settings
-	QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
-				select $newjob->id, messageid, type,language
-				from joblanguage where jobid=$job->id");
-
-	//copy all the jobsetting
-	QuickUpdate("insert into jobsetting (jobid,name,value) " .
-			"select $newjob->id, name, value " .
-			"from jobsetting where jobid=$job->id");
-
-			$newjob->runNow();
-			sleep(3);
-			}
-		}
+		$job->runNow();
 	}
-
-	// update the retry setting - it may have changed since the repeater was created
-	if (getSystemSetting('retry') != "")
-		$newjob->setOptionValue("retry",getSystemSetting('retry'));
-
 	redirectToReferrer();
 }
 
