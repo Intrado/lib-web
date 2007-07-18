@@ -134,12 +134,15 @@ function getSessionData($id) {
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
-		if (doDBConnect($result)) return $result['sessionData'];
+		$sess_data = base64url_decode($result['sessionData']);
+		if (doDBConnect($result)) return $sess_data;
 	}
 	return "";
 }
 
 function putSessionData($id, $sess_data) {
+	$sess_data = base64url_encode($sess_data);
+
 	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value($sess_data, 'string'));
 	$method = "AuthServer.putSessionData";
 	$result = pearxmlrpc($method, $params);
