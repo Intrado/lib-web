@@ -39,7 +39,7 @@ function fmt_survey_graph($row, $index){
 }
 
 function fmt_question($row, $index){
-	return "<div style='font-weight:bold; text-decoration: underline'>$row[$index]</div><br><div>$row[2]</div>";	
+	return "<div style='text-decoration: underline'>$row[$index]</div>";	
 }
 
 function fmt_answer($row, $index){
@@ -144,7 +144,14 @@ if(isset($_SESSION['reportid'])){
 }
 
 $_SESSION['report']['options'] = $options;
-$generator->format = "html";
+
+if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
+	$generator->format = "csv";
+} else if(isset($_REQUEST['pdf']) && $_REQUEST['pdf']){
+	$generator->format = "pdf";
+} else {
+	$generator->format = "html";
+}
 
 $reload=0;
 $f="jobsurvey";
@@ -183,22 +190,54 @@ if($reload)
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "reports:reports";
-if($options['reporttype'] == "surveyreport"){
-	$TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+if($generator->format != "html"){
+	if($generator->format == "pdf"){
+		$name = secure_reportname();
+		$params = createPdfParams($name);
+		$result = $generator->generate($params);
+		
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=$name");
+		header("Content-type: application/pdf");	
+		session_write_close();
+		$fp = fopen($name, "r");
+		while($line = fgets($fp)){
+			echo $line;
+		}
+		unlink($name);
+	} else {
+		$generator->generate();
+	}
 } else {
-	$TITLE = "Job Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
-}
-include_once("nav.inc.php");
-NewForm($f);
-//TODO buttons for notification log: download csv, view call details
-buttons(button('back', 'window.history.go(-1)'),button('done', null, 'reports.php'), submit($f, $s, "save", "save"),button('refresh', 'window.location.reload()'));
+	
+	$PAGE = "reports:reports";
+	if($options['reporttype'] == "surveyreport"){
+		$TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+	} else {
+		$TITLE = "Job Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+	}
+	include_once("nav.inc.php");
+	NewForm($f);
+	//TODO buttons for notification log: download csv, view call details
+	buttons(button('back', 'window.history.go(-1)'),button('done', null, 'reports.php'), submit($f, $s, "save", "save"),button('refresh', 'window.location.reload()'));
+	
+		startWindow("Display Options", "padding: 3px;");
+		?>
+		<table border="0" cellpadding="3" cellspacing="0" width="100%">
+			<tr><th align="right" class="windowRowHeader">Output Format:</th>
+				<td>
+					<a href="reportjobsurvey.php?csv=1">CSV</a>&nbsp;|&nbsp;<a href="reportjobsurvey.php?pdf=1">PDF</a>
+				</td>
+			</tr>
+		</table>
+		<?
+	endWindow();
 
-if(isset($generator)){
 	$generator->generate();
-}
 
-buttons();
-endForm();
-include_once("navbottom.inc.php");
+	buttons();
+	endForm();
+	include_once("navbottom.inc.php");
+}
 ?>
