@@ -33,39 +33,6 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
-function fmt_result ($row,$index) {
-	if ($row[3] == "phone") {
-		if ($row[9] == "duplicate")
-			return "Duplicate";
-		switch($row[$index]) {
-			case "A":
-				return "Answered";
-			case "M":
-				return "Machine";
-			case "B":
-				return "Busy";
-			case "N":
-				return "No Answer";
-			case "X":
-				return "Disconnect";
-			case "F":
-				return "Failed";
-			case "C":
-				return "In Progress";
-			default:
-				return "";
-		}
-	} else {
-		if ($row[9] == "success")
-			return "Success";
-		else if ($row[9] == "fail")
-			return "Failed";
-		else if ($row[9] == "duplicate")
-			return "Duplicate";
-		else
-			return "In Progress";
-	}
-}
 
 function fmt_attempts ($row,$index) {
 
@@ -149,7 +116,7 @@ if(isset($_SESSION['reportid'])){
 	$instance->setFields($fieldlist);
 	$instance->setActiveFields($activefields);
 	$subscription = new ReportSubscription();
-	$subscription->createDefaults();
+	$subscription->createDefaults("Job Report");
 }
 if(isset($options['jobid'])){
 	$jobid = $options['jobid'];
@@ -167,6 +134,8 @@ $reportgenerator->userid = $USER->id;
 
 if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	$reportgenerator->format = "csv";
+} else if(isset($_REQUEST['pdf']) && $_REQUEST['pdf']){
+	$reportgenerator->format = "pdf";
 } else {
 	$reportgenerator->format = "html";
 }
@@ -219,8 +188,26 @@ if($reload){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
-	$reportgenerator->generate();
+if($reportgenerator->format != "html"){
+
+	if($reportgenerator->format == "pdf"){
+		$name = secure_tmpname("report", ".pdf");
+		$params = createPdfParams($name);
+		$reportgenerator->generate($params);
+	
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=$name");
+		header("Content-type: application/pdf");	
+		session_write_close();
+		$fp = fopen($name, "r");
+		while($line = fgets($fp)){
+			echo $line;
+		}
+		unlink($name);
+	} else {
+		$reportgenerator->generate();
+	}
 } else {
 	
 	$PAGE = "reports:reports";
@@ -264,7 +251,7 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 				</table>
 			</td>
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder"><a href="reportjobdetails.php?csv=true">CSV</a></td>
+			<td class="bottomBorder"><a href="reportjobdetails.php?csv=true">CSV</a>&nbsp;|&nbsp;<a href="reportjobdetails.php?pdf=true">PDF</a></td>
 		</tr>
 	</table>
 	<?
