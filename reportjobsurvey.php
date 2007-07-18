@@ -222,7 +222,7 @@ if($generator->format != "html"){
 	//TODO buttons for notification log: download csv, view call details
 	buttons(button('back', 'window.history.go(-1)'),button('done', null, 'reports.php'), submit($f, $s, "save", "save"),button('refresh', 'window.location.reload()'));
 	
-		startWindow("Display Options", "padding: 3px;");
+		startWindow("Related Links", "padding: 3px;");
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr><th align="right" class="windowRowHeader">Output Format:</th>
