@@ -91,9 +91,15 @@ $options['pagestart'] = $pagestart;
 $reportinstance->setParameters($options);
 $reportgenerator = new ContactsReport();
 $reportgenerator->reportinstance = $reportinstance;
-$reportgenerator->format="html";
 $reportgenerator->userid = $USER->id;
 
+if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
+	$reportgenerator->format = "csv";
+} else if(isset($_REQUEST['pdf']) && $_REQUEST['pdf']){
+	$reportgenerator->format = "pdf";
+} else {
+	$reportgenerator->format = "html";
+}
 if(CheckFormSubmit($f,$s))
 {
 	//check to see if formdata is valid
@@ -140,62 +146,90 @@ if($reload){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "system:contact search";
-$TITLE = "Contact Search";
 
-include_once("nav.inc.php");
-NewForm($f);
+if($reportgenerator->format != "html"){
+	if($reportgenerator->format == "pdf"){
+		$name = secure_reportname();
+		$params = createPdfParams($name);
+		$reportgenerator->generate($params);
 
-buttons(button("back", "location.href='contactsearch.php'"),submit($f, $s, "refresh", "refresh"));
-startWindow("Display Options", "padding: 3px;");
-?>
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
-		<td class="bottomBorder">
-<? 		
-		select_metadata('searchresultstable', 5, $fields); 
-?>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader">Sort by:</th>
-		<td>
-			<table>
-				<tr>
-<?
-
-				foreach($orders as $order){
-?>
-				<td>
-<?
-					NewFormItem($f, $s, $order, 'selectstart');
-					NewFormItem($f, $s, $order, 'selectoption', " -- Order --", "");
-					NewFormItem($f, $s, $order, 'selectoption', "Person ID", "pkey");
-					NewFormItem($f, $s, $order, 'selectoption', $firstname->name, $firstname->fieldnum);
-					NewFormItem($f, $s, $order, 'selectoption', $lastname->name, $lastname->fieldnum);
-					foreach($fields as $field){
-						NewFormItem($f, $s, $order, 'selectoption', $field->name, $field->fieldnum);
-					}
-					NewFormItem($f, $s, $order, 'selectend');
-?>
-				</td>
-<?
-			}
-?>
-				</tr>
-				
-			</table>
-		</td>
-	</tr>
-</table>
-<?
-endWindow();
-
-?>
-<br>
-<?
-
-$reportgenerator->generate();
-buttons();
-EndForm();
-include("navbottom.inc.php");
+	
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=$name");
+		header("Content-type: application/pdf");	
+		session_write_close();
+		$fp = fopen($name, "r");
+		while($line = fgets($fp)){
+			echo $line;
+		}
+		unlink($name);
+	} else {
+		$reportgenerator->generate();
+	}
+} else {
+	$PAGE = "system:contact search";
+	$TITLE = "Contact Search";
+	
+	include_once("nav.inc.php");
+	NewForm($f);
+	
+	buttons(button("back", "location.href='contactsearch.php'"),submit($f, $s, "refresh", "refresh"));
+	startWindow("Display Options", "padding: 3px;");
+	?>
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
+			<td class="bottomBorder">
+	<? 		
+			select_metadata('searchresultstable', 5, $fields); 
+	?>
+			</td>
+		</tr>
+		<tr valign="top"><th align="right" class="windowRowHeader">Sort by:</th>
+			<td>
+				<table>
+					<tr>
+	<?
+	
+					foreach($orders as $order){
+	?>
+					<td>
+	<?
+						NewFormItem($f, $s, $order, 'selectstart');
+						NewFormItem($f, $s, $order, 'selectoption', " -- Order --", "");
+						NewFormItem($f, $s, $order, 'selectoption', "Person ID", "pkey");
+						NewFormItem($f, $s, $order, 'selectoption', $firstname->name, $firstname->fieldnum);
+						NewFormItem($f, $s, $order, 'selectoption', $lastname->name, $lastname->fieldnum);
+						foreach($fields as $field){
+							NewFormItem($f, $s, $order, 'selectoption', $field->name, $field->fieldnum);
+						}
+						NewFormItem($f, $s, $order, 'selectend');
+	?>
+					</td>
+	<?
+				}
+	?>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+		<tr><th align="right" class="windowRowHeader">Output Format:</th>
+			<td>
+				<a href="contactresult.php?csv=1">CSV</a>&nbsp;|&nbsp;<a href="contactresult.php?pdf=1">PDF</a>
+			</td>
+		</tr>
+	</table>
+	<?
+	endWindow();
+	
+	?>
+	<br>
+	<?
+	
+	$reportgenerator->generate();
+	buttons();
+	EndForm();
+	include("navbottom.inc.php");
+}
 ?>

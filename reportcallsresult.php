@@ -210,6 +210,8 @@ $generator->userid = $USER->id;
 
 if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	$generator->format = "csv";
+} else if(isset($_REQUEST['pdf']) && $_REQUEST['pdf']){
+	$generator->format = "pdf";
 } else {
 	$generator->format = "html";
 }
@@ -262,7 +264,26 @@ if($reload){
 ////////////////////////////////////////////////////////////////////////////////
 
 if($generator->format != "html"){
-	$generator->generate();
+	if($generator->format == "pdf"){
+		$name = secure_tmpname("report", ".pdf");
+		$params = createPdfParams($name);
+		$generator->generate($params);
+
+	
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=$name");
+		header("Content-type: application/pdf");	
+		session_write_close();
+		$fp = fopen($name, "r");
+		while($line = fgets($fp)){
+			echo $line;
+		}
+		unlink($name);
+	} else {
+		$generator->generate();
+	}
+
 } else {
 	$PAGE = "reports:reports";
 	switch($options['reporttype']){
@@ -319,8 +340,10 @@ if($generator->format != "html"){
 				</table>
 			</td>
 		</tr>
-		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder"><a href="reportcallsresult.php?csv=1">CSV</a></td>
+		<tr><th align="right" class="windowRowHeader">Output Format:</th>
+			<td>
+				<a href="reportcallsresult.php?csv=1">CSV</a>&nbsp;|&nbsp;<a href="reportcallsresult.php?pdf=1">PDF</a>
+			</td>
 		</tr>
 	</table>
 	<?
