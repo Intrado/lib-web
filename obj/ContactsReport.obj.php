@@ -266,6 +266,10 @@ class ContactsReport extends ReportGenerator {
 		endWindow();	
 	}
 	
+	function runCSV($options){
+		echo "Not ready yet";
+	}
+	
 	function getReportSpecificParams($params){
 		return $params;
 	}
