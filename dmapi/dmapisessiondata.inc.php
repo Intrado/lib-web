@@ -34,6 +34,7 @@ function storeSessionData ($sessionid, $customerid, $data) {
 
 //erase session data
 function eraseSessionData ($sessionid) {
+	global $dmapidb;
 	QuickUpdate("delete from sessiondata where id='" . DBSafe($sessionid,$dmapidb) . "'",$dmapidb);
 }
 
