@@ -26,6 +26,7 @@ if (isset($SETTINGS['dmapidb']['host'])) {
 <?
 		return;
 	}
+	$_dbcon = $dmapidb;
 } else {
 	$dmapidb = $_dbcon; //just set it to the same as the default DB connection
 }
