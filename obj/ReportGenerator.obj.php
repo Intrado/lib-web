@@ -1,15 +1,15 @@
 <?
 
-//abstract superclass for specific reports 
+//abstract superclass for specific reports
 class ReportGenerator {
-	
+
 	var $userid;
 	var $reportinstance;
 	var $format;
 	var $query="";
 	var $params;
 	var $reporttype;
-	
+
 	function generate($options = null){
 		$this->generateQuery();
 		switch($this->format){
@@ -25,9 +25,9 @@ class ReportGenerator {
 				break;
 		}
 	}
-	
+
 	function runPDF($options){
-		
+
 		$instance = $this->reportinstance;
 		$xmlparams = array();
 		$xmlparams[] = new XML_RPC_Value($this->reportfile, 'string');
@@ -35,11 +35,11 @@ class ReportGenerator {
 		$xmlparams[] = new XML_RPC_Value($options['user'], 'string');
 		$xmlparams[] = new XML_RPC_Value($options['pass'], 'string');
 		$xmlparams[] = new XML_RPC_Value($this->query, 'string');
-		
+
 		$timeoffset = QuickQuery("select value from setting where name = 'timezone'");
 		$timeoffsetquery = "set time_zone = '$timeoffset'";
 		$xmlparams[] = new XML_RPC_Value($timeoffsetquery, 'string');
-		
+
 		$fieldlist = $instance->getFields();
 		$params = array();
 		foreach($fieldlist as $index => $title){
@@ -48,9 +48,9 @@ class ReportGenerator {
 		}
 		$params = $this->getReportSpecificParams($params);
 		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
-		$params["iconLocation"] = new XML_RPC_VALUE("images\\", 'string');
+		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
-		
+
 		$activefields = $instance->getActiveFields();
 		$active = array();
 		foreach($activefields as $index){
@@ -58,21 +58,21 @@ class ReportGenerator {
 			$active[$newindex] = new XML_RPC_VALUE("true", 'string');
 		}
 		$xmlparams[] = new XML_RPC_Value($active, 'struct');
-		
+
 		$xmlparams[] = new XML_RPC_Value($options['filename'], 'string');
 		$method = "Resizer.render";
 		$result = $this->reportxmlrpc($method, $xmlparams);
 		return $result;
 
 	}
-	
+
 	function reportxmlrpc($method, $xmlparams){
 		$msg = new XML_RPC_Message($method, $xmlparams);
 
 		$cli = new XML_RPC_Client('/xmlrpc', 'localhost:8089');
-	
+
 		$resp = $cli->send($msg);
-	
+
 		if (!$resp) {
 	    	error_log($method . ' communication error: ' . $cli->errstr);
 		} else if ($resp->faultCode()) {
@@ -94,13 +94,13 @@ class ReportGenerator {
 	//array of options
 	function setOptions ($options) {
 		$this->options = $options;
-		
-		
+
+
 		//get format
 		if (isset($this->options['format'])) {
 			$this->format = $this->options['format'];
-		} 
-		
+		}
+
 		//get output
 		if (isset($this->options['output'])) {
 			$this->output = $this->options['output'];
@@ -108,7 +108,7 @@ class ReportGenerator {
 			$this->output = "file";
 		}
 	}
-	
+
 	//converts a string of options
 	//ie from a reportinstance parameter string
 	//or a GET query string
@@ -118,7 +118,7 @@ class ReportGenerator {
 		parse_str($paramstring, $newoptions);
 		$this->setOptions($newoptions);
 	}
-	
+
 	//setOptionsCLI
 	//get options from command line params
 	//parses basic params ie "-school=1 -school=2 -someflag -format=csv"
@@ -133,7 +133,7 @@ class ReportGenerator {
 					$name = $arg;
 					$value = 1;
 				}
-				
+
 				//see if we have something set for this already
 				if (isset($options[$name])) {
 					//if it is an array
@@ -151,7 +151,7 @@ class ReportGenerator {
 				}
 			}
 		}
-		
+
 		$this->setOptions($options);
 	}
 }
