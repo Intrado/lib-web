@@ -4,6 +4,7 @@
 include_once("inboundutils.inc.php");
 include_once("../inc/utils.inc.php"); // for jobdefaults getSystemSetting()
 include_once("../obj/User.obj.php");
+include_once("../obj/Rule.obj.php");
 include_once("../obj/Access.obj.php");
 include_once("../obj/Job.obj.php");
 include_once("../obj/JobLanguage.obj.php");
@@ -365,17 +366,10 @@ function commitJob()
 
 		// now we submit this job
 		glog("now submit the job to process ".$jobid);
-		if (isset($_SERVER['WINDIR'])) {
-			$cmd = "start php ..\jobprocess.php $jobid";
-			pclose(popen($cmd,"r"));
-		} else {
-			$cmd = "php ../jobprocess.php $jobid > /dev/null &";
-			exec($cmd);
-		}
+		$job->runNow();
 
 		return true;
 	}
-
 	return false;
 }
 
