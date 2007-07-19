@@ -143,4 +143,5 @@ ALTER TABLE `qjobtask` ADD INDEX `progresshandler` ( `status` , `lastattempttime
 ALTER TABLE `qjobtask` ADD INDEX `emailer` ( `type` , `nextattempttime` ) ;
 ALTER TABLE `qjobtask` ADD INDEX `expired` ( `status` , `leasetime` ) ;
 
+ALTER TABLE `qjobtask` ADD `contactsequence` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `sequence` ;
 

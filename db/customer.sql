@@ -836,6 +836,10 @@ drop primary key,
 add primary key (jobid,date,hour)
 $$$
 
+ALTER TABLE `reportcontact`
+CHANGE `result` `result` ENUM( 'C', 'A', 'M', 'N', 'B', 'X', 'F', 'sent', 'unsent', 'printed', 'notprinted', 'notattempted', 'duplicate', 'blocked' ) NOT NULL default 'notattempted'
+$$$
+
 
 
 
