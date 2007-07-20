@@ -55,7 +55,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 	{
 		MergeSectionFormData($f, $s);
 
-		
+
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		//do check
 		if( CheckFormSection($f, $s) ) {
@@ -63,12 +63,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 		} else if ($phoneerror = Phone::validate($phone)){
 			error($phoneerror);
 		} else if (GetFormData($f,$s,"listid") <=0 ) {
-			error('Please choose a list');	
-		} else if(QuickQuery("select count(*) from job where userid = '$USER->id' and deleted = 0 
+			error('Please choose a list');
+		} else if(QuickQuery("select count(*) from job where userid = '$USER->id' and deleted = 0
 					and name = '" . DBSafe(GetFormData($f, $s, 'name')) ."'
 					and status!='cancelling' and status !='complete' and status != 'cancelled'")) {
 			error('This job name is already in use, please make another');
-		
+
 		} else {
 			if (isset($_GET['retry'])) {
 				$oldtask = new SpecialTask($_GET['retry']);
@@ -80,31 +80,32 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				$task->setData('error', "0");
 				$task->status = "queued";
 				$task->create();
+				QuickUpdate("call start_specialtask(" . $task->id . ")");
 				redirect('easycallrecord.php?taskid=' . $task->id);
 			} else {
-				
+
 				if($_SESSION['easycallid'] == null){
 					$task = new SpecialTask();
 				} else {
 					$task = new SpecialTask($_SESSION['easycallid']);
 				}
 				$task->type = 'EasyCall';
-				$task->setData('phonenumber', $phone);	
+				$task->setData('phonenumber', $phone);
 				$task->setData('callerid', getSystemSetting('callerid'));
 				$name = GetFormData($f, $s, 'name');
 				if($name == "")
-					$name = "EasyCall - " . date("M d, Y G:i:s");				
-				$task->setData('name', $name);	
-				$task->setData('origin', "start");			
-				$task->setData('userid', $USER->id);				
-				$task->setData('listid', GetFormData($f,$s,"listid"));			
+					$name = "EasyCall - " . date("M d, Y G:i:s");
+				$task->setData('name', $name);
+				$task->setData('origin', "start");
+				$task->setData('userid', $USER->id);
+				$task->setData('listid', GetFormData($f,$s,"listid"));
 				$task->setData('jobtypeid', GetFormData($f,$s,"jobtypeid"));
-				$task->setData('progress', "Creating Call");	
-				$task->setData('count', 0);	
+				$task->setData('progress', "Creating Call");
+				$task->setData('count', 0);
 				$task->lastcheckin = date("Y-m-d H:i:s");
-				if(CheckFormSubmit($f, 'add') || $removedlang)				
+				if(CheckFormSubmit($f, 'add') || $removedlang)
 					$task->status = "new";
-				else			
+				else
 					$task->status = "queued";
 				if($USER->authorize('sendmulti') && GetFormData($f, $s,'addlangs')) {
 					$languagearray = array();
@@ -120,7 +121,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 							$languagearray[$i] = $task->getData($langnum);
 						}
 					}
-					
+
 					$selectedlangs = getFormData($f, $s, "newlang");
 					if($selectedlangs && CheckFormSubmit($f, 'add') || $selectedlangs && CheckFormSubmit($f, $s)){
 						$used = false;
@@ -164,7 +165,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 							break;
 						}
 					}
-					
+
 				} else {
 					$languagearray = array();
 					$langcount = 1;
@@ -174,12 +175,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				}
 				$task->setData('currlang', $task->getdata('language0'));
 				$task->setData('langchkbox', GetFormData($f, $s, 'addlangs'));
-				
+
 				if($task->id){
 					$task->update();
 				} else {
 					$task->create();
-				}		
+				}
 				$_SESSION['easycallid'] = $task->id;
 				if(!CheckFormSubmit($f, 'add') && !$removedlang){
 					QuickUpdate("call start_specialtask(" . $task->id . ")");
@@ -193,7 +194,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 }
 
 if($reloadform == 1) {
-	
+
 	ClearFormData($f);
 
 	if (isset($_GET['retry'])){
@@ -201,7 +202,7 @@ if($reloadform == 1) {
 	}else{
 		if($_SESSION['easycallid'] != null)
 			$specialtask = new SpecialTask($_SESSION['easycallid']);
-		else 
+		else
 			$specialtask = false;
 	}
 	PutFormData($f,$s,"listid",$specialtask ? $specialtask->getData('listid') : 0);
@@ -230,7 +231,7 @@ if($reloadform == 1) {
 	PutFormData($f, $s, 'name', $name , 'text', 1, 50);
 	PutFormData($f, $s, 'newlang', "");
 	PutFormData($f, $s, 'hidden', "");
-	
+
 }
 
 
@@ -321,12 +322,12 @@ startWindow("EasyCall");
 				<table>
 					<tr>
 						<td>
-<? 
+<?
 						$langcount = isset($languagearray) ? count($languagearray) : 1;
-							NewFormItem($f,$s,'addlangs','checkbox',NULL,NULL,"id='add'; onclick=\"new getObj('addlang').obj.disabled=!this.checked; 
+							NewFormItem($f,$s,'addlangs','checkbox',NULL,NULL,"id='add'; onclick=\"new getObj('addlang').obj.disabled=!this.checked;
 								setVisibleIfChecked(this,'shownifchecked');
 								setHiddenIfChecked(this,'hiddenifchecked');
-								new getObj('hiddendropdown').obj.disabled=!this.checked;\"" ); 
+								new getObj('hiddendropdown').obj.disabled=!this.checked;\"" );
 ?>
 						</td>
 					</tr>
@@ -338,7 +339,7 @@ startWindow("EasyCall");
 									<td class="bottomBorder">Default - English</td>
 									<td class="bottomBorder">&nbsp;</td>
 								</tr>
-<?	
+<?
 								if(isset($languagearray)) {
 									foreach($languagearray as $lang){
 										if($lang == "Default") continue;
@@ -366,15 +367,15 @@ startWindow("EasyCall");
 											echo submit($f, 'add', 'Add', 'add');
 ?>
 									</td>
-								</tr>	
-								
+								</tr>
+
 							</table>
 							</div>
 							<div id="hiddenifchecked">
 							<table>
 								<tr>
 									<td>
-<? 
+<?
 										NewFormItem($f, $s, "hidden", 'selectstart', NULL, NULL, 'id="hiddendropdown"');
 										NewFormItem($f, $s, "hidden", 'selectoption'," -- Select a Language -- ");
 										NewFormItem($f, $s, "hidden", 'selectend');
@@ -386,7 +387,7 @@ startWindow("EasyCall");
 							<script>
 								var box = new getObj('add').obj;
 								setVisibleIfChecked(box,'shownifchecked');
-								setHiddenIfChecked(box,'hiddenifchecked');		
+								setHiddenIfChecked(box,'hiddenifchecked');
 								new getObj('addlang').obj.disabled=!box.checked;
 								new getObj('hiddendropdown').obj.disabled=!box.checked;
 <?

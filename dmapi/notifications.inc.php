@@ -8,7 +8,7 @@ class Task {
 	var $renderedmessage;
 }
 
-class SpecialTask {
+class SpecialTaskDmapi {
 	var $id;
 	var $customerid;
 	var $specialtaskid;
@@ -68,7 +68,7 @@ function assignSpecialTask ($dmapidb) {
 
 	$res = mysql_query($query,$dmapidb) or error_log("mysql had a problem: " . mysql_error());
 	if ($row = mysql_fetch_row($res)) {
-		$task = new SpecialTask();
+		$task = new SpecialTaskDmapi();
 
 		$task->id = $row[0];
 		$task->customerid = $row[1];

@@ -62,8 +62,9 @@ if(CheckFormSubmit($f,$s))
 			$task->setData('count', 1);
 			$task->lastcheckin = date("Y-m-d H:i:s");
 			$task->status = "queued";
-			
+
 			$task->create();
+			QuickUpdate("call start_specialtask(" . $task->id . ")");
 			redirect('callme2.php?taskid=' . $task->id);
 		}
 	}
@@ -111,8 +112,8 @@ startWindow("Call Me to Record");
 			<th align="right" class="windowRowHeader bottomBorder">Phone&nbsp;Number:</td>
 			<td class="bottomBorder"><? NewFormItem($f,$s,"phone","text",20); ?></td>
 		</tr>
-		
-<? 
+
+<?
 		if($IS_COMMSUITE){
 			?> <tr><td colspan=3 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr> <?
 		} else {
@@ -120,7 +121,7 @@ startWindow("Call Me to Record");
 		}
 ?>
 		</table>
-		
+
 <?
 endWindow();
 buttons();
