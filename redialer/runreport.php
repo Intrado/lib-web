@@ -29,9 +29,11 @@ require_once("../obj/ReportInstance.obj.php");
 require_once("../obj/ReportSubscription.obj.php");
 require_once("../obj/ReportGenerator.obj.php");
 require_once("../obj/CallsReport.obj.php");
-require_once("../obj/JobReport.obj.php");
+require_once("../obj/JobAutoReport.obj.php");
 require_once("../obj/SurveyReport.obj.php");
 require_once("../obj/ContactsReport.obj.php");
+require_once("../obj/JobSummaryReport.obj.php");
+require_once("../obj/JobDetailReport.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
@@ -51,13 +53,15 @@ if($type == "subscription"){
 		case 'undelivered':
 		case 'callsreport':
 			$generator = new CallsReport();
-			
 			break;
 		case 'surveyreport':
 			$generator = new SurveyReport();
 			break;
-		case 'jobreport':
-			$generator = new JobReport();
+		case 'jobsummaryreport':
+			$generator = new JobSummaryReport();
+			break;
+		case 'jobdetailreport':
+			$generator = new JobDetailReport();
 			break;
 		case 'contactsreport':
 			$generator = new ContactsReport();
@@ -69,8 +73,8 @@ if($type == "subscription"){
 	$job = new Job($id);
 	$options = array();
 	if($job->questionnaireid == null){
-		$generator = new JobReport();
-		$options['reporttype'] = 'jobreport';
+		$generator = new JobAutoReport();
+		$options['reporttype'] = 'jobautoreport';
 	} else {
 		$generator = new SurveyReport();
 		$options['reporttype'] = 'surveyreport';
