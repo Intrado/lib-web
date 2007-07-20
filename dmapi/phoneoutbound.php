@@ -82,7 +82,9 @@ if ($REQUEST_TYPE == "new") {
 	$callduration = (isset($BFXML_VARS['callduration']) ? $BFXML_VARS['callduration'] + 0 : 0);
 	$resultdata = mysql_real_escape_string(http_build_query($BFXML_VARS,'','&'),$dmapidb);
 
-
+if ($tasktime == 1) {
+	error_log("WARNING jobtaskcomplete uuid=".$taskid." with tasktime=1");
+}
 	//insert into jobtaskcomplete
 	$query = "insert into jobtaskcomplete (id,customerid,shardid,starttime,duration,result,resultdata) values "
 			."('" . mysql_real_escape_string($taskid,$dmapidb) . "',"
