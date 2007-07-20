@@ -11,6 +11,7 @@ class ReportGenerator {
 	var $reporttype;
 
 	function generate($options = null){
+		$result = "";
 		$this->generateQuery();
 		switch($this->format){
 			case 'html':
@@ -21,9 +22,10 @@ class ReportGenerator {
 				break;
 			case 'pdf':
 				$this->setReportFile();
-				$this->runPDF($options);
+				$result = $this->runPDF($options);
 				break;
 		}
+		return $result;
 	}
 
 	function runPDF($options){
@@ -62,6 +64,7 @@ class ReportGenerator {
 		$xmlparams[] = new XML_RPC_Value($options['filename'], 'string');
 		$method = "Resizer.render";
 		$result = $this->reportxmlrpc($method, $xmlparams);
+		
 		return $result;
 
 	}
@@ -71,7 +74,7 @@ class ReportGenerator {
 
 		$cli = new XML_RPC_Client('/xmlrpc', 'localhost:8089');
 
-		$resp = $cli->send($msg);
+		$resp = $cli->send($msg, 600);
 
 		if (!$resp) {
 	    	error_log($method . ' communication error: ' . $cli->errstr);
