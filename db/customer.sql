@@ -840,6 +840,7 @@ ALTER TABLE `reportcontact`
 CHANGE `result` `result` ENUM( 'C', 'A', 'M', 'N', 'B', 'X', 'F', 'sent', 'unsent', 'printed', 'notprinted', 'notattempted', 'duplicate', 'blocked' ) NOT NULL default 'notattempted'
 $$$
 
-
+ALTER TABLE `surveyquestion` CHANGE `reportlabel` `reportlabel` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+$$$
 
 

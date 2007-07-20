@@ -284,7 +284,7 @@ if( $reloadform )
 		PutFormData($f,$s,"webmessage_$qn",$question->webmessage,"text");
 		PutFormData($f,$s,"phonemessageid_$qn",$question->phonemessageid,"number");
 		PutFormData($f,$s,"validresponse_$qn",$question->validresponse,"number",2,9,true);
-		PutFormData($f,$s,"reportlabel_$qn",$question->reportlabel,"text",1,30,false);
+		PutFormData($f,$s,"reportlabel_$qn",$question->reportlabel,"text");
 	}
 
 	PutFormData($f,$s,"numquestions",count($questions)); //will always be the number of questions +1 because of the new question that is always added to the array
@@ -350,7 +350,7 @@ function fmt_qnum($obj,$name) {
 
 function fmt_reportlabel($obj,$name) {
 	global $f,$s;
-	NewFormItem($f, $s,"reportlabel_" . $obj->questionnumber,"text",20,30);
+	NewFormItem($f, $s,"reportlabel_" . $obj->questionnumber,"textarea",30);
 }
 
 function fmt_qphone($obj,$name) {
