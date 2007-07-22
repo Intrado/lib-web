@@ -11,8 +11,15 @@ require_once("inc/utils.inc.php");
 require_once("inc/reportutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
-require_once("inc/date.inc.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/ReportGenerator.obj.php");
+require_once("obj/ReportInstance.obj.php");
 require_once("obj/UserSetting.obj.php");
+require_once("obj/Rule.obj.php");
+require_once("inc/date.inc.php");
+require_once("obj/ContactsReport.obj.php");
+require_once("obj/Person.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,24 +29,42 @@ if (!$USER->authorize('createreport')) {
 	redirect('unauthorized.php');
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function fmt_phone_contact ($phone) {
+	if (strlen($phone) == 10)
+		return "(" . substr($phone,0,3) . ")&nbsp;" . substr($phone,3,3) . "-" . substr($phone,6,4);
+	else if (strlen($phone) == 7)
+		return  substr($phone,0,3) . "-" . substr($phone,3,4);
+	else
+		return $phone;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
 
+$f = "person";
+$s = "all";
+$reload = 0;
+$orders = array("order1", "order2", "order3");
+$ordering = ContactsReport::getOrdering();
+
 $fields = DBFindMany("FieldMap", "from fieldmap where options not like '%firstname%' and options not like '%lastname%'");
 foreach($fields as $key => $fieldmap){
 	if(!$USER->authorizeField($fieldmap->fieldnum))
 		unset($fields[$key]);
 }
+
 $firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
 $lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
 
 if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
 	unset($_SESSION['contacts']['options']);
 	$_SESSION['saved_report'] = false;
-	redirect();
 }
 $options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
 
@@ -75,12 +100,35 @@ if(isset($_GET['deleterule'])) {
 	redirect();
 }
 
-$f = "person";
-$s = "search";
-$reload = 0;
-$orders = array("order1", "order2", "order3");
+$activefields = array();
+$fieldlist = array();
+foreach($fields as $field){
+	// used in html
+	$fieldlist[$field->fieldnum] = $field->name;
+	
+	// used in pdf
+	if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
+		$activefields[] = $field->fieldnum; 
+	}
+}
+$reportinstance = new ReportInstance();
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'submit')){
+$reportinstance->setFields($fieldlist);
+$reportinstance->setActiveFields($activefields);
+
+$pagestart = 0;
+if(isset($_REQUEST['pagestart'])){
+	$pagestart = $_REQUEST['pagestart'];
+}
+$options['pagestart'] = $pagestart;
+
+$reportinstance->setParameters($options);
+$reportgenerator = new ContactsReport();
+$reportgenerator->reportinstance = $reportinstance;
+$reportgenerator->userid = $USER->id;
+$reportgenerator->format = "html";
+
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
@@ -93,49 +141,56 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'submit')){
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			$options['reporttype']="contacts";
-			$options['personid'] = GetFormData($f, $s, 'personid');
-			$options['phone']= GetFormData($f, $s, 'phone');
-			$options['email'] = GetFormData($f, $s, 'email');
-			foreach($orders as $order){
-				$options[$order] = GetFormData($f, $s, $order);
-			}
-			$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
-			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-			if ($fieldnum != "") {
-				$type = GetFormData($f,$s,"newruletype");
-
-				if ($type == "text")
-					$logic = "and";
-				else
-					$logic = GetFormData($f,$s,"newrulelogical_$type");
-
-				if ($type == "multisearch")
-					$op = "in";
-				else
-					$op = GetFormData($f,$s,"newruleoperator_$type");
-
-				$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-				if (count($value) > 0) {
-					$rule = new Rule();
-					$rule->logical = $logic;
-					$rule->op = $op;
-					$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-					$rule->fieldnum = $fieldnum;
-					if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
-						$_SESSION['contactrules'][] = $rule;
-					else
-						$_SESSION['contactrules'] = array($rule);
-					$rule->id = array_search($rule, $_SESSION['contactrules']);
-					
-					$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
+			if(CheckFormSubmit($f, "showall")){
+				$options = array('reporttype' => "contacts");
+				foreach($orders as $order){
+					$options[$order] = GetFormData($f, $s, $order);
 				}
+				$_SESSION['contacts']['options'] = $options;
+				redirect();
+			} else {
+				$options['reporttype']="contacts";
+				$options['personid'] = GetFormData($f, $s, 'personid');
+				$options['phone']= GetFormData($f, $s, 'phone');
+				$options['email'] = GetFormData($f, $s, 'email');
+				foreach($orders as $order){
+					$options[$order] = GetFormData($f, $s, $order);
+				}
+				$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
+				$fieldnum = GetFormData($f,$s,"newrulefieldnum");
+				if ($fieldnum != "") {
+					$type = GetFormData($f,$s,"newruletype");
+	
+					if ($type == "text")
+						$logic = "and";
+					else
+						$logic = GetFormData($f,$s,"newrulelogical_$type");
+	
+					if ($type == "multisearch")
+						$op = "in";
+					else
+						$op = GetFormData($f,$s,"newruleoperator_$type");
+	
+					$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
+					if (count($value) > 0) {
+						$rule = new Rule();
+						$rule->logical = $logic;
+						$rule->op = $op;
+						$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
+						$rule->fieldnum = $fieldnum;
+						if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
+							$_SESSION['contactrules'][] = $rule;
+						else
+							$_SESSION['contactrules'] = array($rule);
+						$rule->id = array_search($rule, $_SESSION['contactrules']);
+						
+						$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
+					}
+				}
+				$options['rules'] = implode("||", $options['rules']);
 			}
-			$options['rules'] = implode("||", $options['rules']);
 			$_SESSION['contacts']['options'] = $options;
-			if(CheckFormSubmit($f, 'submit')){
-				redirect("contactresult.php");
-			}
+			redirect();
 		}
 	}
 } else {
@@ -176,7 +231,7 @@ $TITLE = "Contact Search";
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(submit($f, 'submit', 'search', 'search'));
+buttons(submit($f, $s, 'search', 'search'), submit($f, 'showall','showallcontacts','showallcontacts'));
 startWindow("Contact Search", "padding: 3px;"); 
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -210,9 +265,9 @@ startWindow("Contact Search", "padding: 3px;");
 	</tr>
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
 		<td class="bottomBorder">
-<? 		
-			select_metadata('searchresultstable', 4, $fields);
-?>
+	<? 		
+			select_metadata('searchresultstable', 5, $fields); 
+	?>
 		</td>
 	</tr>	
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort by:</th>
@@ -226,12 +281,9 @@ startWindow("Contact Search", "padding: 3px;");
 <?
 					NewFormItem($f, $s, $order, 'selectstart');
 					NewFormItem($f, $s, $order, 'selectoption', " -- Not Selected --", "");
-					NewFormItem($f, $s, $order, 'selectoption', "Person ID", "pkey");
-					NewFormItem($f, $s, $order, 'selectoption', $firstname->name, $firstname->fieldnum);
-					NewFormItem($f, $s, $order, 'selectoption', $lastname->name, $lastname->fieldnum);
-					foreach($fields as $field){
-						NewFormItem($f, $s, $order, 'selectoption', $field->name, $field->fieldnum);
-					}
+					foreach($ordering as $index => $item){
+						NewFormItem($f, $s, $order, 'selectoption', $index, $item);
+					}	
 					NewFormItem($f, $s, $order, 'selectend');
 ?>
 				</td>
@@ -243,8 +295,12 @@ startWindow("Contact Search", "padding: 3px;");
 		</td>
 	</tr>
 </table>
-
-<?
+	
+	<br>
+	<?
+if(!isset($_REQUEST['clear'])){
+	$reportgenerator->generate();
+}
 buttons();
 endWindow();
 EndForm();
