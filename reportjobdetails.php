@@ -21,7 +21,7 @@ require_once("obj/ReportSubscription.obj.php");
 require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("inc/date.inc.php");
-require_once("obj/JobReport.obj.php");
+require_once("obj/JobDetailReport.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -68,14 +68,24 @@ if(isset($_GET['pagestart'])){
 }
 
 $fields = getFieldMaps();
-$ordering = JobReport::getOrdering();
+$ordering = JobDetailReport::getOrdering();
 
 $orders = array("order1", "order2", "order3");
 
-if(isset($_SESSION['reportid'])){
+if(isset($_REQUEST['reportid'])){
+	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
+		redirect("unauthorized.php");
+	}
+	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
+	
 	$subscription = new ReportSubscription($_SESSION['reportid']+0);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
+	if(isset($options['type'])){
+		$_SESSION['report']['type'] = $options['type'];
+	} else {
+		unset($_SESSION['report']['type']);
+	}
 	
 	$activefields = $instance->getActiveFields();
 	foreach($fields as $field){
@@ -97,7 +107,6 @@ if(isset($_SESSION['reportid'])){
 		$_SESSION['report']['options'] = $options;
 		redirect();
 	}
-	$options["detailed"] = true;
 	$options["pagestart"] = $pagestart;
 	
 	$activefields = array();
@@ -111,13 +120,26 @@ if(isset($_SESSION['reportid'])){
 			$activefields[] = $field->fieldnum; 
 		}
 	}
-	$instance = new ReportInstance();
-	$instance->setParameters($options);
+	if(isset($_SESSION['reportid'])){
+		$subscription = new ReportSubscription($_SESSION['reportid']);
+		$instance = new ReportInstance($subscription->reportinstanceid);
+	} else {
+		$instance = new ReportInstance();
+		$subscription = new ReportSubscription();
+		$subscription->createDefaults(fmt_report_name($options['reporttype']));
+	}
+
 	$instance->setFields($fieldlist);
 	$instance->setActiveFields($activefields);
-	$subscription = new ReportSubscription();
-	$subscription->createDefaults("Job Report");
+	
 }
+
+if(isset($_SESSION['reportid'])){
+	$_SESSION['saved_report'] = true;
+} else {
+	$_SESSION['saved_report'] = false;
+}
+
 if(isset($options['jobid'])){
 	$jobid = $options['jobid'];
 	if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid)))
@@ -128,7 +150,12 @@ if(isset($jobid)){
 	$job = new Job($jobid);	
 }
 
-$reportgenerator = new JobReport();
+$_SESSION['report']['options'] = $options;
+
+$options['pagestart'] = $pagestart;
+
+$instance->setParameters($options);
+$reportgenerator = new JobDetailReport();
 $reportgenerator->reportinstance = $instance;
 $reportgenerator->userid = $USER->id;
 
@@ -142,7 +169,7 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 
 
 
-if(CheckFormSubmit($f,$s))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -157,12 +184,21 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			$orderquery = "";
-			$options = $reportinstance->getParameters();
+			$options = $instance->getParameters();
 			foreach($orders as $order){
 				$options[$order] = GetFormData($f, $s, $order);
-			}
-
+				$_SESSION[$order] = GetFormData($f, $s, $order);
+			}		
 			$_SESSION['report']['options']= $options;
+			
+			if(CheckFormSubmit($f, "save")){
+				$instance->setParameters($options);
+				$instance->update();
+				$subscription->reportinstanceid = $instance->id;
+				$subscription->update();
+				$_SESSION['reportid'] = $subscription->id;
+				redirect("reportedit.php?reportid=" . $subscription->id);
+			}
 			redirect();
 		}
 	}
@@ -211,18 +247,29 @@ if($reportgenerator->format != "html"){
 } else {
 	
 	$PAGE = "reports:reports";
-	$TITLE = "Standard Job Report" . (isset($jobid) ? " - " . $job->name : "");
-	
+	$TITLE = "Job Details";
+	if(isset($_SESSION['report']['type'])){
+		if($_SESSION['report']['type'] == "phone"){
+			$TITLE = "Call Detail";
+		} else if($_SESSION['report']['type'] == "email"){
+			$TITLE = "Email Detail";
+		}
+	}
+	if(isset($_SESSION['reportid'])){
+		$TITLE .= " - " . $subscription->name;
+	} else if(isset($jobid)){
+		$TITLE .= " - " . $job->name;
+	}
 	include_once("nav.inc.php");
 	NewForm($f);	
-	buttons(button("back", "window.history.go(-1)"), submit($f, $s, "filter", "refresh"));
+	buttons(button("back", "window.history.go(-1)"), submit($f, "save", "save", "save"), submit($f, $s, "filter", "refresh"));
 	startWindow("Display Options", "padding: 3px;");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
 			<td class="bottomBorder">
 	<? 		
-				select_metadata('reportdetailstable', 7, $fields);
+				select_metadata('reportdetailstable', 9, $fields);
 	?>
 			</td>
 		</tr>
