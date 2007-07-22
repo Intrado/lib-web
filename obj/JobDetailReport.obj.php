@@ -1,6 +1,6 @@
 <?
 
-class JobReport extends ReportGenerator{
+class JobDetailReport extends ReportGenerator{
 	
 	function generateQuery(){
 		$USER = new User($this->userid);
@@ -24,8 +24,8 @@ class JobReport extends ReportGenerator{
 		if($orderquery == ""){
 			$orderquery = " order by rp.pkey ";
 		}
-		$rulesql = "";
 		
+		$rulesql = "";
 		if(isset($params['rules']) && $params['rules']){
 			$rules = explode("||", $params['rules']);
 			foreach($rules as $rule){
@@ -40,31 +40,98 @@ class JobReport extends ReportGenerator{
 				}
 			}
 		}
+		
 		if(isset($params['jobid'])){
 			$jobid = DBSafe($params['jobid']);
 		} else {
-			if(isset($params['datestart']))
-				$datestart = date("Y-m-d", strtotime($params['datestart']));
-			else
-				$datestart = date("Y-m-d", strtotime("today"));
-			if(isset($params['dateend']))
-				$dateend = date("Y-m-d", strtotime($params['dateend']));
-			else
-				$dateend = date("Y-m-d", strtotime("now"));
-			$joblist = QuickQueryList("select j.id from job j where j.startdate < '$dateend' and (j.finishdate > '$datestart' or j.enddate > '$datestart')");
+			$reldate = $params['reldate'];
+			if($reldate != ""){
+				switch($reldate){
+					case 'today':
+						$targetdate = QuickQuery("select curdate()");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
+						
+						break;
+					
+					case 'week':
+						//1 = Sunday, 2 = Monday, ..., 7 = Saturday
+						$dow = QuickQuery("select dayofweek(curdate())");
+	
+						//normally go back 1 day
+						$daydiff = 1;
+						//if it is sunday, go back 2 days
+						if ($dow == 1)
+							$daydiff = 2;
+						//if it is monday, go back 3 days
+						if ($dow == 2)
+							$daydiff = 3;
+	
+						$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
+						
+						break;
+					case 'yesterday':
+						$targetdate = QuickQuery("select date_sub(curdate(),interval 1 day)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
+						
+						break;
+					case 'xdays':
+						$lastxdays = $params['lastxdays'];
+						if($lastxdays == "")
+							$lastxdays = 1;
+						$today = QuickQuery("select curdate()");
+						$targetdate = QuickQuery("select date_sub(curdate(),interval $lastxdays day)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
+						
+						break;
+					case 'daterange':
+						
+						$datestart = strtotime($params['startdate']);
+						$dateend = strtotime($params['enddate']);
+						$reldatequery = "and ( (j.startdate >= from_unixtime('$datestart') and j.startdate < date_add(from_unixtime('$dateend'),interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= from_unixtime('$datestart') and j.startdate <= date_add(from_unixtime('$dateend'),interval 1 day) ";
+						break;
+					case 'weektodate':
+						$today = QuickQuery("select curdate()");
+						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 week)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
+						break;
+					case 'monthtodate':
+						$today = QuickQuery("select curdate()");
+						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 month)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
+						break;
+				}
+			}
+		
+			$joblist = QuickQueryList("select j.id from job j where 1 $reldatequery");
 		}
+		
 		$resultquery = "";
 		if(isset($params['result']) && $params['result']){
-			$resultquery = " and rc.result = '" . $params['result'] . "' ";
+			$resultquery = " and rc.result in ('" . $params['result'] . "')";
+		}
+		
+		$typequery = "";
+		if(isset($params['type']) && $params['type']){
+			$typequery = " and rp.type = '" . $params['type'] . "'";
 		}
 		
 		$searchquery = isset($jobid) ? " and rp.jobid='$jobid'" : " and rp.jobid in ('" . implode("','", $joblist) ."')";
-		$searchquery .= $resultquery;
+		$searchquery .= $resultquery . $typequery;
 		$usersql = $USER->userSQL("rp");
 		$fields = $instance->getFields();
 		$fieldquery = generateFields("rp");
 		$this->query = 
 			"select SQL_CALC_FOUND_ROWS
+			j.name as jobname,
+			u.login,
 			rp.pkey,
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
@@ -84,9 +151,7 @@ class JobReport extends ReportGenerator{
 			coalesce(rc.result,
 					rp.status) as result,
 			rp.status,
-			u.login,
 			rp.type as jobtype,
-			j.name as jobname,
 			rc.numattempts as attempts,
 			rc.resultdata,
 			sw.resultdata
@@ -102,7 +167,7 @@ class JobReport extends ReportGenerator{
 		
 			where 1 
 			$searchquery
-			
+
 			$usersql
 			$rulesql
 			$orderquery
@@ -130,26 +195,28 @@ class JobReport extends ReportGenerator{
 	
 		showPageMenu($total,$pagestart,500);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
-		$titles = array(0 => "ID#",
-						1 => "First Name",
-						2 => "Last Name",
-						3 => "Message",
-						5 => "Destination",
-						6 => "Attempts",
-						7 => "Last Attempt",
-						8 => "Last Result");
+		$titles = array(0 => "Job Name",
+						1 => "User Login",
+						2 => "ID#",
+						3 => "First Name",
+						4 => "Last Name",
+						5 => "Message",
+						7 => "Destination",
+						8 => "Attempts",
+						9 => "Last Attempt",
+						10 => "Last Result");
 		$count=16;
 		foreach($fields as $index => $field){
 			$titles[$count] = $field;
 			$count++;
 		}
 			
-		$formatters = array(3 => "fmt_message",
-							4 => "fmt_limit_25",
-							5 => "fmt_destination",
-							6 => "fmt_attempts",
-							7 => "fmt_date",
-							8 => "fmt_result");
+		$formatters = array(5 => "fmt_message",
+							6 => "fmt_limit_25",
+							7 => "fmt_destination",
+							8 => "fmt_attempts",
+							9 => "fmt_date",
+							10 => "fmt_result");
 		showTable($data,$titles,$formatters);
 		echo "</table>";
 		showPageMenu($total,$pagestart,500);
@@ -162,7 +229,7 @@ class JobReport extends ReportGenerator{
 			$count=1;
 			foreach($fields as $index => $field){
 				?>
-				setColVisability(reportdetailstable, 7+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				setColVisability(reportdetailstable, 9+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
 				$count++;
 			}
@@ -273,13 +340,15 @@ class JobReport extends ReportGenerator{
 		$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
 	
 		$ordering = array();
+		$ordering["Job Name"] = "j.name";
+		$ordering["User Login"] = "u.login";
 		$ordering["ID#"] = "rp.pkey";
 		$ordering[$firstname->name]="rp." . $firstname->fieldnum;
 		$ordering[$lastname->name]="rp." . $lastname->fieldnum;
 		$ordering["Message"]="m.name";
 		$ordering["Destination"]="destination";
 		$ordering["Attempts"] = "attempts";
-		$ordering["Last Attempt"]="date";
+		$ordering["Last Attempt"]="lastattempt";
 		$ordering["Last Result"]="result";
 		
 		
