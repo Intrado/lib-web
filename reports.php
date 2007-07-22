@@ -64,22 +64,33 @@ if(isset($_REQUEST['delete'])){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE= "reports:reports";
-$TITLE= "Reports";
+$TITLE= "Report Builder";
 
 include("nav.inc.php");
 
-startWindow("Standard Reports");
+startWindow("Select a Template");
 ?>
 	<table width="100%" cellpadding="3" cellspacing="2" class="list" >
-		<tr>
-			<td><a href='reportjob.php?clear=1'/>Jobs</a></td>
-			<td><a href='reportcallssearch.php?clear=1&type=callsreport'/>Individual's Report</a></td>
-			<td><a href='reportcallssearch.php?clear=1&type=attendance'/>Attendance</a></td>
+		<tr class="listHeader" align="left" valign="bottom">
+			<th>Summary</th>
+			<th>Individual</th>
+			<th>Detailed</th>
 		</tr>
 		<tr>
-			<td><a href='reportsurvey.php?clear=1'/>Surveys</a></td>
-			<td><a href='reportundeliveredsearch.php?clear=1'/>Undelivered</a></td>
-			<td><a href='reportcallssearch.php?clear=1&type=emergency'/>Emergency</a></td>
+			<td><a href='reportjobsearch.php?clear=1'/>Job Summary</a></td>
+			<td><a href='reportcallssearch.php?clear=1&type=callsreport'/>Contact History</a></td>
+			<td><a href='reportjobdetailsearch.php?clear=1'/>Job Detail</a></td>
+
+		</tr>
+		<tr>
+			<td><a href='reportsurvey.php?clear=1'/>Survey</a></td>
+			<td>&nbsp;</td>
+			<td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Call Detail</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Detail</a></td>			
 		</tr>
 	</table>
 <?
