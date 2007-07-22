@@ -18,7 +18,7 @@ if($_REQUEST['saved']== "false"){
 		$_SESSION['fields'][$field] = true;
 		$usersetting->value = "true";
 		$usersetting->update();
-		readfile("img/checkbox-check.png");
+		readfile("img/checkbox-rule.png");
 	} else if ($toggle == "false"){
 		$_SESSION['fields'][$field] = false;
 		$usersetting->value="false";
@@ -28,7 +28,7 @@ if($_REQUEST['saved']== "false"){
 } else {
 	if($toggle == "true"){
 		$_SESSION['fields'][$field] = true;
-		readfile("img/checkbox-check.png");
+		readfile("img/checkbox-rule.png");
 	} else if ($toggle == "false"){
 		$_SESSION['fields'][$field] = false;
 		readfile("img/checkbox-clear.png");
