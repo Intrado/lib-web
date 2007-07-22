@@ -221,7 +221,7 @@ if($generator->format != "html"){
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr><th align="right" class="windowRowHeader">Output Format:</th>
 				<td>
-					<a href="reportjobsurvey.php?pdf=1">PDF</a>
+					<a href="reportsurveysummary.php?pdf=1">PDF</a>
 				</td>
 			</tr>
 		</table>
