@@ -102,7 +102,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			$options['archived'] = $check;		
 			$_SESSION['report']['options'] = $options;
 			if(!$error && CheckFormSubmit($f, "run"))
-				redirect("reportjobsurvey.php");
+				redirect("reportsurveysummary.php");
 			if(!$error && (CheckFormSubmit($f, "save") || CheckFormSubmit($f, "saveview"))){
 				$instance->setParameters($options);
 				$instance->update();
@@ -113,7 +113,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					redirect("reportedit.php?reportid=" . $subscription->id);
 			}
 			if(!$error && (CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview")))
-				redirect("reportjobsurvey.php");
+				redirect("reportsurveysummary.php");
 		}
 	}
 } else {
