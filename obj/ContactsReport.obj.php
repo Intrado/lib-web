@@ -66,11 +66,13 @@ class ContactsReport extends ReportGenerator {
 						) as address
 					$fieldquery	
 					from person p
-					left join address a on (a.personid = p.id)
-					left join phone ph on (ph.personid = p.id)
-					left join email e on (e.personid = p.id)
+					left join address a on (a.personid = p.id) " .
 					
-					where 1
+					(($phonequery !="") ? " left join phone ph on (ph.personid = p.id) " : "") .
+					
+					(($emailquery != "") ? " left join email e on (e.personid = p.id) " : "") .
+					
+					" where 1
 					$phonequery
 					$emailquery
 					$usersql
@@ -112,32 +114,6 @@ class ContactsReport extends ReportGenerator {
 			}
 		}
 		
-		startWindow("Search Information", "padding: 3px;"); 
-		?>
-			<table>
-<?
-				if(isset($options['personid']) && $options['personid'] != "") {
-?>
-				<tr><td>Person ID: <?=$options['personid']?></td></tr>
-<?
-				}
-				if(isset($options['phone']) && $options['phone'] != "") {
-?>
-				<tr><td>Phone: <?=$options['phone']?></td></tr>
-<?
-				}
-				if(isset($options['email']) && $options['email'] != "") {
-?>			
-				<tr><td>Email: <?=$options['email']?></td></tr>
-<?
-				}
-?>
-			</table>
-		<? 
-		endWindow();
-		?>
-		<br>
-		<?
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,500);
 		?>
@@ -179,6 +155,9 @@ class ContactsReport extends ReportGenerator {
 						$first=true;
 						if(isset($phonelist)){
 							foreach($phonelist[$id] as $phone){
+								if($phone[1] == ""){
+									continue;
+								}
 								if(!$first) {
 									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
 									?><td></td><td></td><td></td><td></td><?
@@ -276,6 +255,24 @@ class ContactsReport extends ReportGenerator {
 	
 	function setReportFile(){
 		$this->reportfile = "Contactsreport.jasper";
+	}
+	
+	static function getOrdering(){
+		global $USER;
+		$fields = getFieldMaps();
+		$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
+		$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+	
+		$ordering = array();
+		$ordering["ID#"] = "pkey";
+		$ordering[$firstname->name] = "p." . $firstname->fieldnum;
+		$ordering[$lastname->name]="p." . $lastname->fieldnum;
+		$ordering["Address"] = "address";
+		
+		foreach($fields as $field){
+			$ordering[$field->name]= "p." . $field->fieldnum;
+		}
+		return $ordering;
 	}
 }
 
