@@ -17,7 +17,7 @@ require_once("inc/form.inc.php");
 require_once("inc/reportutils.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("obj/ReportGenerator.obj.php");
-require_once("obj/JobReport.obj.php");
+require_once("obj/JobSummaryReport.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ $reload=0;
 
 $orders = array("order1", "order2", "order3");
 $fieldlist = getFieldMaps();
-$ordering = JobReport::getOrdering();
+$ordering = JobSummaryReport::getOrdering();
 
 if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
 	unset($_SESSION['report']['options']);
@@ -161,7 +161,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					redirect("reportedit.php?reportid=" . $subscription->id);
 			}
 			if(!$error && (CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview")))
-				redirect("reportjobsurvey.php");
+				redirect("reportjobsummary.php");
 		}
 	}
 } else {
