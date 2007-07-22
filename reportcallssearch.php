@@ -193,7 +193,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"v
 			if($priorities)
 				$options['priority'] = implode("','", $priorities);
 
-			$result = GetFormData($f, $s, "result");
+			$result = GetFormData($f, $s, "results");
 			if($result)
 				$options['result'] = implode("','", $result);
 			
