@@ -42,7 +42,7 @@ class JobSummaryReport extends ReportGenerator{
 								left join surveyquestionnaire sq on (j.questionnaireid = sq.id)
 								inner join user u on (rp.userid = u.id)
 								where rp.jobid in ('$joblist')
-								group by m.id";
+								group by m.id, sq.id";
 		$jobinforesult = Query($jobinfoquery);
 		$jobinfo = array();
 		while($row = DBGetRow($jobinforesult)){
@@ -61,9 +61,9 @@ class JobSummaryReport extends ReportGenerator{
 								and rp.type='phone'";
 		$phonecontactinfo = QuickQueryRow($phonecontactquery);
 								
-		$phonenumberquery = "select sum(rc.jobid in ('$joblist')) as total,
-									sum(rc.result in ('A','M')) as completed,
-									sum(rc.result not in ('A','M') and rc.numattempts < js.value) as remaining
+		$phonenumberquery = "select sum(rc.jobid in ('$joblist') and rc.result not in ('duplicate', 'blocked')) as total,
+									sum(rc.result in ('A','M', 'duplicate', 'blocked')) as completed,
+									sum(rc.result not in ('A','M', 'duplicate', 'blocked') and rc.numattempts < js.value) as remaining
 									from reportcontact rc
 									left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
 									where rc.jobid in ('$joblist')
@@ -80,7 +80,7 @@ class JobSummaryReport extends ReportGenerator{
 								and rp.type='email'";
 		$emailcontactinfo = QuickQueryRow($emailcontactquery);
 								
-		$emailquery = "select sum(rc.jobid in ('$joblist')) as total,
+		$emailquery = "select sum(rc.jobid in ('$joblist') and rc.result not in ('duplicate')) as total,
 									sum(rc.result = 'sent') as completed,
 									sum(rc.result  = 'unsent') as remaining
 									from reportcontact rc
@@ -255,7 +255,7 @@ class JobSummaryReport extends ReportGenerator{
 				if($phonecontactinfo[0] > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Details:</th>
+					<th align="right" class="windowRowHeader bottomBorder">Phone Details:</th>
 					<td class="bottomBorder"><img src="graph_detail_callprogress.png.php?<?= $urloptions ?>"></td>
 				</tr>			
 <?
