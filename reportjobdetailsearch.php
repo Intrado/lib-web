@@ -179,15 +179,17 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				if($option == "")
 					unset($options[$index]);
 			}
+			
+			$options['reporttype'] = "jobdetailreport";
 			if(isset($_SESSION['report']['type'])){
 				$options['type'] = $_SESSION['report']['type'];
-			}
-			$options['reporttype'] = "jobdetailreport";
-			if($options['type'] == "phone"){
+				if($options['type'] == "phone"){
 				$options['reporttype'] = "calldetail";
-			} else if($options['type'] == "email"){
-				$options['reporttype'] = "emaildetail";
+				} else if($options['type'] == "email"){
+					$options['reporttype'] = "emaildetail";
+				}
 			}
+			
 			$_SESSION['report']['options'] = $options;
 			
 			if(!$error && (CheckFormSubmit($f, "save") || CheckFormSubmit($f, "saveview"))){
