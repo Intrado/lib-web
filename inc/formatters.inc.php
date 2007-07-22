@@ -163,7 +163,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 
 	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
-	$reportbtn = '<a href="reportjobsurvey.php?jobid=' . $id . '">Report</a>';
+	$reportbtn = '<a href="reportjobsummary.php?jobid=' . $id . '">Report</a>';
 	$monitorbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '\', 500, 450);" >Monitor</a>';
 	$graphbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '&noupdate\', 500, 450);" >Graph</a>';
 
@@ -405,8 +405,14 @@ function fmt_response_count($obj, $name) {
 
 function fmt_report_name($string){
 	switch($string){
-		case 'jobreport':
-			return "Jobs";
+		case 'jobsummaryreport':
+			return "Job Summary";
+		case 'jobdetailreport':
+			return "Job Details";
+		case 'calldetail':
+			return "Call Detail";
+		case 'emaildetail':
+			return "Email Detail";
 		case 'undelivered':
 			return "Undelivered";
 		case 'emergency':
@@ -414,20 +420,16 @@ function fmt_report_name($string){
 		case 'attendance':
 			return "Attendance";
 		case 'surveyreport':
-			return "Surveys";
-		case 'callsreport':
-			return "Individual's Report";
-		case 'contacts':
-			return "Contact Report";
+			return "Survey";
+		case 'contacthistory':
+			return "Contact history";
 		default:
 			return $string;
 	}
 }
 
 function fmt_result ($row,$index) {
-	if ($row[3] == "phone") {
-		if ($row[9] == "duplicate")
-			return "Duplicate";
+	if ($row[5] == "phone") {
 		switch($row[$index]) {
 			case "A":
 				return "Answered";
@@ -443,18 +445,32 @@ function fmt_result ($row,$index) {
 				return "Failed";
 			case "C":
 				return "In Progress";
+			case "blocked":
+				return "Blocked";
+			case "duplicate":
+				return "Duplicate";
+			case "nocontacts":
+				return "No Contact";
 			default:
 				return "";
 		}
 	} else {
-		if ($row[9] == "success")
+		if ($row[10] == "success")
 			return "Success";
-		else if ($row[9] == "fail")
+		else if ($row[10] == "fail")
 			return "Failed";
-		else if ($row[9] == "duplicate")
+		else if ($row[10] == "duplicate")
 			return "Duplicate";
+		else if($row[10] == "blocked")
+			return "Blocked";
+		else if($row[10] == "nocontacts")
+			return "No Contact";
+		else if($row[10] == "sent")
+			return "Sent";
+		else if($row[10] == "unsent")
+			return "Unsent";
 		else
-			return "In Progress";
+			return $row[10];
 	}
 }
 
