@@ -3,29 +3,19 @@ include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("obj/Job.obj.php");
 
-
 include ("jpgraph/jpgraph.php");
-include ("jpgraph/jpgraph_pie.php");
-include ("jpgraph/jpgraph_pie3d.php");
-include ("jpgraph/jpgraph_canvas.php");
+include ("jpgraph/jpgraph_bar.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 $jobid = $_GET['jobid'] + 0;
-//check userowns or customerowns and viewsystemreports
-if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
-	redirect('unauthorized.php');
-}
 
 $jobstats = $_SESSION['jobstats'][$jobid];
-if ($_GET['valid'] != $jobstats['validstamp'])
-	redirect('unauthorized.php');
+if ($_GET['valid'] != $jobstats['validstamp']){
+	redirect('unauthorized.php');	
+}
 
 $phonestats = $jobstats['phone'];
-
-$data = array($phonestats['A'] - $phonestats['M'], $phonestats['remainingcalls']);
-$legend = array("Completed: %d","Remaining: %d");
-$colors = array("lightgreen", "blue");
 
 $cpcolors = array(
 	"A" => "lightgreen",
@@ -52,50 +42,51 @@ $cpcodes = array(
 $data = array();
 $legend = array();
 $colors = array();
-foreach ($cpcodes as $code => $title) {
-	$color = $cpcolors[$code];
-
-	if ($phonestats[$code] == 0)
-		continue;
-
-	$data[] = $phonestats[$code];
-	$legend[] = $title . ": %d";
-	$colors[] = $color;
+$labels = array();
+$count=0;
+foreach($cpcodes as $index => $code){
+	$data = array_fill(0, 8, 0);
+	$count++;
+	$color = $cpcolors[$index];
+	$data[$count-1] = $phonestats[$index];
+	$legend = $code;
+	$labels[] = $code;
+	
+	$barname = "bar" . $count;
+	$$barname = new BarPlot($data);
+	$$barname->setLegend(($legend));
+	$$barname->SetFillColor($color);
+	$$barname->SetAlign('center');
+	$$barname->value->Show();
 }
 
-
-//var_dump($data);
-//var_dump($legend);
-//var_dump($colors);
-//exit();
-
-if (array_sum($data) == 0) {
-	redirect("img/spacer.gif");
-}
-
-$graph = new PieGraph(250,160,"auto");
+// New graph with a drop shadow
+$graph = new Graph(700,250,'auto');
 //$graph->SetShadow();
-$graph->SetFrame(false);
-$graph->SetAntiAliasing();
+$graph->img->SetMargin(40,90,20,50);
 
-$graph->title->Set("Numbers to Call: " . number_format($phonestats['totalcalls']));
+for($i=1;$i<=$count;$i++){
+	$barname = "bar" . $i;
+	$graph->Add($$barname);
+}
+
+// Use a "text" X-scale
+$graph->SetScale("textlin");
+$graph->xaxis->SetTickLabels($labels);
+$graph->xaxis->SetPos("min");
+$graph->yaxis->SetTextLabelInterval(2);
+$graph->yaxis->HideFirstTickLabel();
+$graph->SetFrame(false);
+
+// Use built in font
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 $graph->legend->Pos(0.00,0.55,"right","center");
 
+$graph->title->SetFont(FF_FONT1,FS_BOLD);
+$graph->yaxis->title->SetFont(FF_FONT1,FS_BOLD);
+$graph->xaxis->title->SetFont(FF_FONT1,FS_BOLD);
 
-$p1 = new PiePlot3D($data);
-
-$p1->SetLabelType(PIE_VALUE_ABS);
-$p1->value->SetFormat('');
-$p1->value->Show();
-$size = 0.26;
-$p1->SetSize($size);
-$p1->SetCenter(0.27);
-$p1->SetLegends(($legend));
-$p1->SetSliceColors(array_reverse($colors));
-
-$graph->Add($p1);
+// Finally output the  image
 $graph->Stroke();
-
 ?>
