@@ -7,9 +7,7 @@ include_once("obj/Job.obj.php");
 
 
 include ("jpgraph/jpgraph.php");
-include ("jpgraph/jpgraph_pie.php");
-include ("jpgraph/jpgraph_pie3d.php");
-include ("jpgraph/jpgraph_canvas.php");
+include ("jpgraph/jpgraph_bar.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
@@ -25,98 +23,45 @@ if ($_GET['valid'] != $jobstats['validstamp'])
 
 $question = $_REQUEST['question']+0;
 
-//figure out how much space for the pie charts
-$piesperrow	= 2;
-$piesize 	= 50;
-$xoffset 	= 120;
 
 
-$yoffset	= 100;
-
-
-$startwidth	= 140;
-$widthdelta	= 95;
-
-$startheight= 120;
-$heightdelta= 95;
-
-$cols = min($piesperrow,count($jobstats['survey']['questions']));
-$rows = ceil(count($jobstats['survey']['questions'])/(float)$piesperrow);
-
-
-$width = $startwidth + $widthdelta;
-$height = $startheight + $heightdelta;
-
-
-//echo "c:$cols r:$rows w:$width h:$height<br>";
-//exit();
-
-
-$legend = range(1,9);
 $colorset = array("blue","red","green","yellow","orange","purple","cyan","lightslateblue","forestgreen");
 
 
-$graph = new PieGraph($width,$height,"auto");
+$graph = new Graph(500,250,"auto");
 //$graph->SetShadow();
 $graph->SetFrame(false);
-$graph->SetAntiAliasing();
-
-//$graph->title->Set("Participants of People Contacted");
-//$graph->title->SetFont(FF_FONT1,FS_BOLD);
-
-//$graph->legend->Pos(0.0,0.05,"right","top");
 
 $i = 0;
 $question=$jobstats['survey']['questions'][$question];
 
 	$questiondata = $question['answers'];
-//	$questiondata = array (1=> 1,2,3,4,5,6,7,8,9);
 
-	$labels = array();
-	$data = array();
-	$colors = array();
-	foreach ($questiondata as $index => $value) {
-		if ($value) {
-			$data[] = $value;
-			$labels[] = "#" . ($index) . ": %.1f%%";
-			$colors[] = $colorset[$index-1];
-		}
-	}
-
-//var_dump(($data));
-//exit();
-
-	$p1 = new PiePlot(($data));
-
-//	$p1->SetLabelType(PIE_VALUE_ABS);
-
-	$p1->SetLabelType(PIE_VALUE_PER);
-
-	$p1->SetLabels($labels);
-	$p1->SetLabelPos(1);
-
-
-
-	$p1->title->Set($question['label']);
-	$p1->title->SetBox(array(255,255,255,0.6),false,false,0,1);
-	$p1->title->SetMargin(5);
-
-	$p1->SetSize($piesize);
-	$p1->SetCenter($xoffset, $yoffset);
-	$p1->SetGuideLines(true,true,false);
-	$p1->SetGuideLinesAdjust(1.2);
-
-//	$p1->value->SetFormat('');
-	$p1->value->Show();
-	$p1->value->SetFont(FF_FONT0);
-
-//	if ($i+1 == $cols)//only set on top right pie chart
-//		$p1->SetLegends(($legend));
-	$p1->SetSliceColors(array_reverse($colors));
-
-
-	$graph->Add($p1);
-
+$count=0;
+foreach ($questiondata as $index => $value) {
+	$data = array_fill(0, 9, 0);
+	$count++;
+	$data[$index-1] = $value;
+	
+	$barname = "bar" . $count;
+	$$barname = new BarPlot($data);
+	$$barname->SetFillColor($colorset[$index-1]);
+	$$barname->SetAlign('center');
+	$$barname->value->Show();
+}
+	
+for($i=1;$i<=$count;$i++){
+	$barname = "bar" . $i;
+	$graph->Add($$barname);
+}
+$labels = array("#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9");
+// Use a "text" X-scale
+$graph->SetScale("textlin");
+$graph->xaxis->SetTickLabels($labels);
+$graph->xaxis->SetPos("min");
+$graph->yaxis->SetTextLabelInterval(2);
+$graph->yaxis->HideFirstTickLabel();
+$graph->SetFrame(false);
 $graph->Stroke();
 
 ?>
