@@ -105,6 +105,29 @@ class SurveyReport extends ReportGenerator{
 		$jobstats['survey']['questions'] = $questions;
 		$_SESSION['jobstats'][$jobid] = $jobstats;
 		
+		$titles = array(' #', "Question");
+		for ($x = 1; $x <= 9; $x++)
+			$titles[$x+2] = " #$x";
+		$titles[] = "Total";
+		
+		$data = array();
+		foreach ($jobstats['survey']['questions'] as $index => $question) {
+			$line = array_fill(1,11,"");
+			foreach ($question['answers'] as $answer => $tally) {
+				$line[$answer+2] = $tally;
+			}
+			$line[12] = array_sum($line);
+			foreach($question['answers'] as $answer => $tally) {
+				$line[$answer+14] = (round(($tally / $line[12]), 3) * 100) . "%";
+			}
+			$line[0] = $index+1;
+			$line[1] = nl2br($question['label']);
+			$line[14] = $validstamp;
+			$data[] = $line;
+		}
+		
+		$formatters = array();
+		
 
 		//////////////////////////////////////
 		// DISPLAY
@@ -146,30 +169,7 @@ class SurveyReport extends ReportGenerator{
 								<td>
 									<div style="float; left">
 									<table width="100%" cellpadding="3" cellspacing="1" class="list">
-<?
-										$titles = array(' #', "Question");
-										for ($x = 1; $x <= 9; $x++)
-											$titles[$x+2] = " #$x";
-										$titles[] = "Total";
-										
-										$data = array();
-										foreach ($jobstats['survey']['questions'] as $index => $question) {
-											$line = array_fill(1,11,"");
-											foreach ($question['answers'] as $answer => $tally) {
-												$line[$answer+2] = $tally;
-											}
-											$line[12] = array_sum($line);
-											foreach($question['answers'] as $answer => $tally) {
-												$line[$answer+14] = (round(($tally / $line[12]), 3) * 100) . "%";
-											}
-											$line[0] = $index+1;
-											$line[1] = $question['label'];
-											$line[14] = $validstamp;
-											$data[] = $line;
-										}
-										
-										$formatters = array();
-							
+<?										
 										showtable($data,$titles,$formatters);
 ?>						
 									</table>
@@ -184,23 +184,6 @@ class SurveyReport extends ReportGenerator{
 					<td class="bottomBorder">
 						<table width="100%" cellpadding="3" cellspacing="1">
 			<?
-						
-						foreach ($jobstats['survey']['questions'] as $index => $question) {
-							$line = array_fill(1,11,"");
-							foreach ($question['answers'] as $answer => $tally) {
-								$line[$answer+2] = $tally;
-							}
-							$line[12] = array_sum($line);
-							foreach($question['answers'] as $answer => $tally) {
-								$line[$answer+14] = (round(($tally / $line[12]), 3) * 100) . "%";
-							}
-							$line[0] = $index+1;
-							$line[1] = $question['label'];
-							$line[14] = $validstamp;
-							$data[] = $line;
-						}
-
-
 						$alt=0;
 						foreach($data as $line){
 						
