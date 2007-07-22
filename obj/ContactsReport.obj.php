@@ -93,7 +93,7 @@ class ContactsReport extends ReportGenerator {
 		$query .= "limit $pagestart, 500";
 		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
-		$phonelist = array();
+		$personlist = array();
 		$emaillist = array();
 		$phonelist = array();
 		while($row = DBGetRow($result)){
