@@ -156,6 +156,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 				foreach($orders as $order){
 					$options[$order] = GetFormData($f, $s, $order);
 				}
+				foreach($options as $index => $option){
+					if($option == "")
+						unset($options[$index]);
+				}
 				$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
 				$fieldnum = GetFormData($f,$s,"newrulefieldnum");
 				if ($fieldnum != "") {
@@ -200,6 +204,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 if($reload){
 	ClearFormData($f);
 	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
+	
+	if(isset($options['personid']) || isset($options['phone']) || isset($options['email']))
+		$radio = 2;
+	else
+		$radio = 1;
+	PutFormData($f, $s, "radioselect", $radio);
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
@@ -241,24 +251,40 @@ startWindow("Contact Search", "padding: 3px;");
 				<tr>
 					<td>
 						<table>
+							<tr>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "1", "onclick='hide(\"singleperson\"); show(\"searchcriteria\")'");?> Search Criteria</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "2", "onclick='hide(\"searchcriteria\"); show(\"singleperson\")'");?> Person Search</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
+							<tr>
+								<td>
+								<? 
+									if(!isset($_SESSION['contactrules']) || is_null($_SESSION['contactrules']))
+										$_SESSION['contactrules'] = false;
+									
+									$RULES = &$_SESSION['contactrules'];
+									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
+									
+									include("ruleeditform.inc.php");
+								?>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table id="singleperson">
 							<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'personid', 'text', '15'); ?></td></tr>
 							<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '12'); ?></td></tr>
 							<tr><td>Email Address: </td><td><? NewFormItem($f, $s, 'email', 'text', '100'); ?></td></tr>
 						</table>
 					</td>
-				</tr>
-				<tr>
-					<td><br>
-						<? 
-							if(!isset($_SESSION['contactrules']) || is_null($_SESSION['contactrules']))
-								$_SESSION['contactrules'] = false;
-							
-							$RULES = &$_SESSION['contactrules'];
-							$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-							
-							include("ruleeditform.inc.php");
-						?>
-					<br></td>
 				</tr>
 			</table>
 		</td>
@@ -295,6 +321,15 @@ startWindow("Contact Search", "padding: 3px;");
 		</td>
 	</tr>
 </table>
+<script>
+	<?
+		if(isset($options['personid'])|| isset($options['phone']) || isset($options['email'])){
+			?>hide("searchcriteria");<?
+		} else {
+			?>hide("singleperson");<?
+		}
+	?>
+</script>
 	
 	<br>
 	<?
