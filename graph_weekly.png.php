@@ -110,7 +110,7 @@ $gbplot = new AccBarPlot(array($b4plot,$b3plot,$b2plot,$b1plot));
 // ...and add it to the graph
 $graph->Add($gbplot);
 
-$graph->title->Set("By Day of Week (last 30 days)" );
+$graph->title->Set("By Day of Week (last 28 days)" );
 $graph->xaxis->SetTickLabels($x_titles);
 $graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos("min");
