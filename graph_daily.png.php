@@ -33,7 +33,7 @@ select 	dayofmonth(date) as dayofmonth,
 				sum(busy)/12 as busy,
 				sum(noanswer)/12 as noanswer
 			from systemstats
-			where date > date_sub(now(), interval 1 year)
+			where date > date_sub(now(), interval 28 day)
 			group by dayofmonth
 ";
 
@@ -54,7 +54,7 @@ while ($row = DBGetRow($result)) {
 //exit();
 
 $max = 0;
-for ($x = 0; $x < 31; $x++) {
+for ($x = 0; $x < 28; $x++) {
 
 	foreach (array("A","M","B","N") as $type) {
 		if (!isset($data[$type][$x]))
@@ -103,7 +103,8 @@ $gbplot->SetWidth(0.7);
 // ...and add it to the graPH
 $graph->Add($gbplot);
 
-$graph->title->Set("By Day of Month");
+$graph->title->Set("By Day of Month (last 28 days)");
+$graph->xaxis->SetTextTickInterval(6,0);
 $graph->xaxis->SetTickLabels($x_titles);
 $graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos("min");
