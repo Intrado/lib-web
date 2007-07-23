@@ -98,15 +98,23 @@ if(isset($_REQUEST['reportid'])){
 	foreach($orders as $order){
 		$_SESSION[$order] = isset($options[$order]) ? $options[$order] : "";
 	}
-} else {
-	$options = $_SESSION['report']['options'];
-	
-	if(isset($_REQUEST['result'])){
+} else if(isset($_REQUEST['type'])){
 
-		$options['result'] = $_REQUEST['result'];
-		$_SESSION['report']['options'] = $options;
-		redirect();
+	$options = $_SESSION['report']['options'];
+	$_SESSION['report']['type'] = $_REQUEST['type'];
+	$options['type'] =  $_REQUEST['type'];
+	if($options['type'] == "phone"){
+		$options['reporttype'] = "calldetail";
+	} else if($options['type'] == "email"){
+		$options['reporttype'] = "emaildetail";
 	}
+
+	$_SESSION['report']['options'] = $options;
+	redirect();
+
+} else {
+
+	$options = $_SESSION['report']['options'];
 	$options["pagestart"] = $pagestart;
 	
 	$activefields = array();
@@ -263,7 +271,7 @@ if($reportgenerator->format != "html"){
 	include_once("nav.inc.php");
 	NewForm($f);	
 	buttons(button("back", "window.history.go(-1)"), submit($f, "save", "save", "save"), submit($f, $s, "filter", "refresh"));
-	startWindow("Display Options", "padding: 3px;");
+	startWindow("Display Options", "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
