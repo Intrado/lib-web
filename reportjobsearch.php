@@ -83,20 +83,26 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		MergeSectionFormData($f, $s);
 		//do check
 		
-		$datestart = GetformData($f, $s, "datestart");
-		$dateend = GetFormData($f, $s, "dateend");
+		$startdate = GetformData($f, $s, "startdate");
+		$enddate = GetFormData($f, $s, "enddate");
 		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "radioselect") != "1" && !strtotime($datestart)){
+		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
 			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if(GetFormData($f, $s, "radioselect") != "1" && !strtotime($dateend)){
+		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
+		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
+			error('You must enter a number');
 		} else {
 			$error=false;
 			$radio = GetFormData($f, $s, "radioselect");
 			switch($radio){
 				case "1":
+					unset($options['reldate']);
+					unset($options['startdate']);
+					unset($options['enddate']);
+					unset($options['lastxdays']);
 					$check = GetFormData($f, $s, "check_archived");
 					if($check)
 						$options['jobid'] = GetFormData($f, $s, "jobid_archived");
@@ -111,8 +117,14 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				case "2":
 					unset($options['archived']);
 					unset($options['jobid']);
-					$options['datestart'] = $datestart;
-					$options['dateend'] = $dateend;
+					$options['reldate'] = GetFormData($f, $s, "relativedate");
+					
+					if($options['reldate'] == "xdays"){
+						$options['lastxdays'] = GetFormData($f, $s, "xdays");
+					} else if($options['reldate'] == "daterange"){
+						$options['startdate'] = $startdate;
+						$options['enddate'] = $enddate;
+					}
 					break;
 			}
 			
@@ -145,13 +157,15 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 
 if($reload){
 	ClearFormData($f, $s);
-	if(!isset($options['datestart']))
+	if(!isset($options['reldate']))
 		$radio = 1;
 	else
 		$radio = 2;
 	PutFormData($f, $s, "radioselect", $radio);
-	PutFormData($f, $s, "datestart", isset($options['datestart']) ? $options['datestart'] : "", "text");
-	PutFormData($f, $s, "dateend", isset($options['dateend']) ? $options['dateend'] : "", "text");
+	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "today");
+	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
+	PutFormData($f, $s, "startdate", isset($options['startdate']) ? $options['startdate'] : "", "text");
+	PutFormData($f, $s, "enddate", isset($options['enddate']) ? $options['enddate'] : "", "text");
 	if(isset($options['archived']) && $options['archived']){
 		PutFormData($f, $s, "jobid", "");
 		PutFormData($f, $s, "jobid_archived", isset($options['jobid']) ? $options['jobid'] : "");
@@ -187,18 +201,41 @@ startWindow("Select", NULL, false);
 					<td>
 						<table>
 							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "1", "onclick='hide(\"daterange\"); show(\"jobs\")'");?> Job</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "2", "onclick='hide(\"jobs\"); show(\"daterange\")'");?> DateRange</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "1", "id=\"job\" onclick='hide(\"daterange\"); show(\"jobs\")'");?> Job</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "2", "onclick='hide(\"jobs\"); show(\"daterange\")'");?> Date</td>
 							</tr>
 						</table>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="daterange" >
-							<tr>
-								<td>Date From: <? NewFormItem($f, $s, "datestart", "text", "20")?> To: <? NewFormItem($f, $s, "dateend", "text", "20") ?></td>
+						<table  border="0" cellpadding="3" cellspacing="0" width="100%" id="daterange">
+							<tr><td>Relative Date: </td>
+								<td><?
+									NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
+									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Today', 'today');
+									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Yesterday', 'yesterday');
+									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last Week Day', 'weekday');
+									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Week to date', 'weektodate');
+									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Month to date', 'monthtodate');
+									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last X Days', 'xdays');
+									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Date Range(inclusive)', 'daterange');
+									NewFormItem($f, $s, 'relativedate', 'selectend');
+									
+									?>
+								</td>
+								<td><? NewFormItem($f, $s, 'xdays', 'text', '3', null, "id='xdays'"); ?></td>
+								<td><div id="date"><? NewFormItem($f, $s, "startdate", "text", "20") ?> To: <? NewFormItem($f, $s, "enddate", "text", "20")?></div></td>
 							</tr>
+							<script>
+								if(new getObj("reldate").obj.value!="xdays"){
+									hide("xdays");
+								}
+								if(new getObj("reldate").obj.value!="daterange"){
+									hide("date");
+								
+								}
+							</script>
 						</table>
 					</td>
 				</tr>
@@ -239,13 +276,11 @@ startWindow("Select", NULL, false);
 <script>
 	setHiddenIfChecked('check_archived', 'jobid');
 	setVisibleIfChecked('check_archived', 'jobid_archived');
-	<?
-		if(!isset($options['datestart'])){
-			?>hide('daterange');<?
-		} else {
-			?>hide('jobs');<?
-		}
-	?>
+	if(new getObj("job").obj.checked){
+		hide("daterange");
+	} else {
+		hide("jobs");
+	}
 </script>
 <?
 endWindow();
