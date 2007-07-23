@@ -79,18 +79,12 @@ startWindow("Select a Template");
 		<tr>
 			<td><a href='reportjobsearch.php?clear=1'/>Job Summary</a></td>
 			<td><a href='reportcallssearch.php?clear=1&type=callsreport'/>Contact History</a></td>
-			<td><a href='reportjobdetailsearch.php?clear=1'/>Job Detail</a></td>
-
+			<td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Call Detail</td>
 		</tr>
 		<tr>
 			<td><a href='reportsurvey.php?clear=1'/>Survey</a></td>
 			<td>&nbsp;</td>
-			<td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Call Detail</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Detail</a></td>			
+			<td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Detail</a></td>	
 		</tr>
 	</table>
 <?
