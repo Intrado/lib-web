@@ -52,7 +52,7 @@ if ($USER->authorize("createlist")) {
 }
 $SHORTCUTS['&nbsp;&nbsp;My Address Book'] = "window.location='addresses.php'";
 if ($USER->authorize("viewcontacts"))
-	$SHORTCUTS['&nbsp;&nbsp;System Contacts'] = "window.location='contacts.php'";
+	$SHORTCUTS['&nbsp;&nbsp;System Contacts'] = "window.location='contactsearch.php?clear=1'";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
 $SHORTCUTS['&nbsp;&nbsp;Message Tips & Ideas'] = "window.open('help/schoolmessenger_help.htm#getting_started/message_tips_and_ideas.htm', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
 $SHORTCUTS['&nbsp;&nbsp;Help'] = "window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
@@ -84,7 +84,6 @@ $NAVTREE = array (
 		array("SMS Jobs","systemsmsjobs.php","sendsms",$SUBTAB=="smsjobs"),
 
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
-		array("Contacts","contacts.php","viewcontacts",$SUBTAB=="contacts"),
 		array("Contact Search","contactsearch.php?clear=1","viewcontacts",$SUBTAB=="contact search"),
 		array("Blocked Numbers","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
 		)),
