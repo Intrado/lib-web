@@ -138,6 +138,8 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
 		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
+		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
+			error('You must enter a number');
 		} else {
 			$error=false;
 			$radio = GetFormData($f, $s, "radioselect");
@@ -180,7 +182,6 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					unset($options[$index]);
 			}
 			
-			$options['reporttype'] = "jobdetailreport";
 			if(isset($_SESSION['report']['type'])){
 				$options['type'] = $_SESSION['report']['type'];
 				if($options['type'] == "phone"){
@@ -291,7 +292,7 @@ startWindow("Select", NULL, false);
 					<td>
 						<table>
 							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "1", "onclick='hide(\"daterange\"); show(\"jobs\")'");?> Job</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "1", "id=\"job\" onclick='hide(\"daterange\"); show(\"jobs\")'");?> Job</td>
 								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "2", "onclick='hide(\"jobs\"); show(\"daterange\")'");?> Date</td>
 							</tr>
 						</table>
@@ -319,7 +320,7 @@ startWindow("Select", NULL, false);
 							</tr>
 							<script>
 								if(new getObj("reldate").obj.value!="xdays"){
-									hide("xdays")
+									hide("xdays");
 								}
 								if(new getObj("reldate").obj.value!="daterange"){
 									hide("date");
@@ -421,13 +422,11 @@ startWindow("Select", NULL, false);
 <script>
 	setHiddenIfChecked(check_archived, 'jobid');
 	setVisibleIfChecked(check_archived, 'jobid_archived')
-	<?
-		if(!isset($options['reldate'])){
-			?>hide("daterange");<?
-		} else {
-			?>hide("jobs");<?
-		}
-	?>
+	if(new getObj("job").obj.checked){
+		hide("daterange");
+	} else {
+		hide("jobs");
+	}
 </script>
 <?
 endWindow();
