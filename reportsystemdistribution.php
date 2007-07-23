@@ -31,8 +31,9 @@ include_once("nav.inc.php");
 
 ?>
 
-<? startWindow("Average Systemwide Daily and Hourly Call Distribution", "padding: 3px;"); ?>
-
+<? 
+startWindow("Average Systemwide Daily and Hourly Call Distribution", "padding: 3px;"); 
+?>
 
 <div style="float: left;">
 <img src="graph_weekly.png.php" onclick="popup('graph_weekly.png.php?big',790,500);" />
@@ -41,18 +42,27 @@ include_once("nav.inc.php");
 <div>
 <img src="graph_hourly.png.php" onclick="popup('graph_hourly.png.php?big',790,500);" />
 </div>
-
+<?
+endWindow();
+startWindow("Average Systemwide Call Distribution For Past Month", "padding: 3px;");
+?>
 <div>
 <img src="graph_daily.png.php" onclick="popup('graph_daily.png.php?big',790,500);" />
 </div>
-
+<?
+endWindow();
+startWindow("Average Systemwide Call Distribution For Past Year", "padding: 3px;");
+?>
 <div>
 <img src="graph_monthly.png.php" onclick="popup('graph_monthly.png.php?big',790,500);" />
 </div>
 
+
+
+<? 
+	endWindow();
+?>
 <img src="img/bug_lightbulb.gif" > Click a graph to enlarge.
-
-<? endWindow();
-
+<?
 include_once("navbottom.inc.php");
 ?>
