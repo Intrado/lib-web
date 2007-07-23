@@ -212,9 +212,12 @@ if($generator->format != "html"){
 		startWindow("Related Links", "padding: 3px;");
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
-			<tr><th align="right" class="windowRowHeader">Output Format:</th>
+			<tr>
 				<td>
 					<a href="reportjobsummary.php?pdf=1">PDF</a>
+				</td>
+				<td>
+					<a href="" onclick="popup('report_graph_hourly.png.php',500,500)"/>Time Distribution</a>
 				</td>
 			</tr>
 		</table>
