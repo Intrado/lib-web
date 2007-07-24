@@ -300,7 +300,7 @@ startWindow('Allowed Functions');
 					<td>Send emails</td>
 				</tr>
 
-<? if ($SETTINGS['feature']['has_sms']) { ?>
+<? if ($SETTINGS['feature']['has_sms'] && getSystemSetting('_hassms', false)) { ?>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendsms","checkbox"); ?></td>
 					<td>Send SMS messages</td>

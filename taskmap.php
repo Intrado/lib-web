@@ -123,12 +123,12 @@ if (!$maxphones = getSystemSetting("maxphones"))
 for ($x = 0; $x < $maxphones; $x++) {
 	if ($x == 0) {
 		$maptofields["p0"] = "Phone";
-		if ($SETTINGS['feature']['has_sms']) {
+		if ($SETTINGS['feature']['has_sms'] && getSystemSetting('_hassms', false)) {
 			$maptofields["s0"] = "Phone (SMS)";
 		}
 	} else {
 		$maptofields["p$x"] = "Phone " . ($x + 1);
-		if ($SETTINGS['feature']['has_sms']) {
+		if ($SETTINGS['feature']['has_sms']&& getSystemSetting('_hassms', false)) {
 			$maptofields["s$x"] = "Phone " . ($x + 1) . " (SMS)";
 		}
 	}
