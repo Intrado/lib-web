@@ -42,7 +42,7 @@ class JobDetailReport extends ReportGenerator{
 		}
 		
 		if(isset($params['jobid'])){
-			$jobid = DBSafe($params['jobid']);
+			$joblist = array(DBSafe($params['jobid']));
 		} else {
 			$reldate = $params['reldate'];
 			if($reldate != ""){
@@ -54,7 +54,7 @@ class JobDetailReport extends ReportGenerator{
 						
 						break;
 					
-					case 'week':
+					case 'weekday':
 						//1 = Sunday, 2 = Monday, ..., 7 = Saturday
 						$dow = QuickQuery("select dayofweek(curdate())");
 	
@@ -112,7 +112,7 @@ class JobDetailReport extends ReportGenerator{
 		
 			$joblist = QuickQueryList("select j.id from job j where 1 $reldatequery");
 		}
-		
+		$this->params['joblist'] = $joblist;
 		$resultquery = "";
 		if(isset($params['result']) && $params['result']){
 			$resultquery = " and rc.result in ('" . $params['result'] . "')";
@@ -123,7 +123,7 @@ class JobDetailReport extends ReportGenerator{
 			$typequery = " and rp.type = '" . $params['type'] . "'";
 		}
 		
-		$searchquery = isset($jobid) ? " and rp.jobid='$jobid'" : " and rp.jobid in ('" . implode("','", $joblist) ."')";
+		$searchquery = " and rp.jobid in ('" . implode("','", $joblist) ."')";
 		$searchquery .= $resultquery . $typequery;
 		$usersql = $USER->userSQL("rp");
 		$fields = $instance->getFields();
@@ -176,21 +176,84 @@ class JobDetailReport extends ReportGenerator{
 	
 	function runHtml(){
 		
+		$typequery = "";
+		if(isset($this->params['type'])){
+			$typequery = " and rp.type = '" . $this->params['type'] . "'";
+		}
+		
+		$joblist = implode("','", $this->params['joblist']);
+		
+		$jobinfoquery = "Select u.login, 
+								j.name, 
+								j.description,
+								coalesce(m.name, sq.name),
+								count(distinct rp.personid),
+								count(*)
+								from reportperson rp
+								left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
+								inner join job j on (rp.jobid = j.id)
+								left join message m on (rp.messageid = m.id)
+								left join surveyquestionnaire sq on (j.questionnaireid = sq.id)
+								inner join user u on (rp.userid = u.id)
+								where rp.jobid in ('$joblist')
+								$typequery
+								group by m.id, sq.id";
+		$jobinforesult = Query($jobinfoquery);
+		$jobinfo = array();
+		while($row = DBGetRow($jobinforesult)){
+			$jobinfo[] = $row;
+		}
+		
 		$fields = $this->reportinstance->getFields();
 		$pagestart = $this->params['pagestart'];
 		print '<br>';
 		$query = $this->query;
 		$query .= " limit $pagestart, 500";
-		//load page to memory
 		$data = array();
+		
 		$result = Query($query);
 		while ($row = DBGetRow($result)) {
 			$data[] = $row;
 		}
-		
 		$query = "select found_rows()";
 		$total = QuickQuery($query);
-	
+		
+		startWindow("Report Information", 'padding: 3px;');
+		?>
+			<table border="0" cellpadding="3" cellspacing="0" width="100%">
+					<tr valign="top">
+						<th align="right" class="windowRowHeader">Job Info:</th>
+						<td >
+							<table border="1" cellpadding="2" cellspacing="1" class="list">
+								<tr class="listHeader" align="left" valign="bottom">
+									<th>User</th>
+									<th>Job</th>
+									<th>Description</th>
+									<th>Message</th>
+									<th>People to Contact</th>
+									<th>Total Destinations</th>
+								</tr>
+								<?
+								foreach($jobinfo as $job){
+									//if there is no message, then it is a no contact
+									if($job[3]){
+										?><tr><?
+											foreach($job as $jdata){
+												if($jdata == null)
+													$jdata = "&nbsp";
+												?><td><?=$jdata?></td><?
+											}
+										?></tr><?
+									}
+								}
+								?>
+							</table>
+						</td>
+					</tr>
+			</table>
+		<?
+		endWindow();
+		?><br><?
 		startWindow("Report Details", 'padding: 3px;', false);
 	
 		showPageMenu($total,$pagestart,500);
@@ -325,11 +388,10 @@ class JobDetailReport extends ReportGenerator{
 	}
 	
 	function setReportFile(){
-		$this->reportfile = "jobreport.jasper";
+		$this->reportfile = "jobdetailreport.jasper";
 	}
 	
 	function getReportSpecificParams($params){
-		$params['jobId'] = new XML_RPC_VALUE($this->params['jobid'], "string");
 		return $params;
 	}
 
