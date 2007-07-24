@@ -509,7 +509,7 @@ startWindow('Job Information');
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td width="30%" >Name</td>
+					<td width="30%" >Job Name</td>
 					<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
 				</tr>
 				<tr>
