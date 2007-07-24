@@ -93,7 +93,8 @@ if(CheckFormSubmit($f,$s))
 					$result = exec($cmd, $res1,$res2);
 
 					if($res2 || !file_exists($dest)) {
-						error('There was an error reading your audio file','Please try another file');
+						error('There was an error reading your audio file','Please try another file', 
+						'Supported formats include: .wav, .aiff, and .au');
 						@unlink($source);
 						@unlink($dest);
 					} else {
@@ -110,7 +111,8 @@ if(CheckFormSubmit($f,$s))
 							ClearFormData($f);
 							redirect('audio.php');
 						} else {
-							error('There was an error uploading your audio file','Please try again');
+							error('There was an error uploading your audio file','Please try again', 
+							'Supported formats include: .wav, .aiff, and .au');
 						}
 					}
 				}
