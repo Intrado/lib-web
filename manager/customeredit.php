@@ -72,6 +72,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
 			$maxusers = GetFormData($f, $s, 'maxusers');
 			$managernote = GetFormData($f, $s, 'managernote');
+			$hassms = GetFormData($f, $s, 'hassms');
 
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -109,6 +110,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_callspurchased', $callspurchased, $custdb);
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				setCustomerSystemSetting('_managernote', $managernote, $custdb);
+				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
@@ -163,7 +165,8 @@ if( $reloadform ) {
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
 	PutFormData($f,$s,"maxusers", getCustomerSystemSetting('_maxusers', false, true, $custdb), "text", 0, 100);
-	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
+	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text");
+	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
@@ -214,7 +217,7 @@ NewForm($f);
 	}
 ?>
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
-
+<tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
 <tr><td>Retry:
 
 <?
