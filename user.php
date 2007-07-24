@@ -123,8 +123,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error('Telephone Pin Code confirmation does not match' . $extraMsg);
 		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
 			error($error);
-		} elseif (($callerid != "") && (strlen($callerid)!=10)){
-			error('Caller ID must be 10 digits long' , 'You do not need to include a 1 for long distance');
+		} elseif(GetFormData($f, $s, "callerid") && strlen($callerid) != 10){
+			error('Caller ID must be 10 digits long', 'You do not need to include a 1 for long distance');
 		} elseif ((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && strlen($login) < $usernamelength) {
 			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
 		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && !ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
