@@ -136,6 +136,7 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'callmax', '10'),"
 						. "($accessid, 'sendemail', '1'),"
 						. "($accessid, 'sendphone', '1'),"
+						. "($accessid, 'sendsms', '1'),"
 						. "($accessid, 'sendmulti', '1'),"
 						. "($accessid, 'leavemessage', '1'),"
 						. "($accessid, 'survey', '1'),"
