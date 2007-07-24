@@ -139,7 +139,7 @@ class SurveyReport extends ReportGenerator{
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Summary</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Participation</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
@@ -166,21 +166,25 @@ class SurveyReport extends ReportGenerator{
 					
 					
 								</td>
-								<td>
-									<div style="float; left">
-									<table width="100%" cellpadding="3" cellspacing="1" class="list">
-<?										
-										showtable($data,$titles,$formatters);
-?>						
-									</table>
-									</div>
-								</td>
 							</tr>
 						</table>
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Responses</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Response Summary</th>
+					<td class="bottomBorder">
+						<div style="float; left">
+						<table width="100%" cellpadding="3" cellspacing="1" class="list">
+<?										
+							showtable($data,$titles,$formatters);
+?>						
+						</table>
+						</div>
+					</td>
+				
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Response Details</th>
 					<td class="bottomBorder">
 						<table width="100%" cellpadding="3" cellspacing="1">
 			<?
