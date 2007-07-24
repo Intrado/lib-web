@@ -10,31 +10,91 @@ class JobSummaryReport extends ReportGenerator{
 	
 		$validstamp = time();
 		$jobstats = array ("validstamp" => $validstamp);
-		$options = $this->params;
+		$params = $this->params;
 		
 		// Gather Job information
 		$datestart = "";
 		$dateend = "";
-		if(isset($options['jobid'])){
-			$joblist = array($options['jobid']);
+		$reldatequery = "";
+		if(isset($params['jobid'])){
+			$joblist = array($params['jobid']);
 		} else {
-			if(isset($options['datestart']))
-				$datestart = date("Y-m-d", strtotime($options['datestart']));
-			else
-				$datestart = date("Y-m-d", strtotime("today"));
-			if(isset($options['dateend']))
-				$dateend = date("Y-m-d", strtotime($options['dateend']));
-			else
-				$dateend = date("Y-m-d", strtotime("now"));
-			$joblist = QuickQueryList("select j.id from job j where j.startdate < '$dateend' and (j.finishdate > '$datestart' or j.enddate > '$datestart')");
+			$reldate = $params['reldate'];
+			if($reldate != ""){
+				switch($reldate){
+					case 'today':
+						$targetdate = QuickQuery("select curdate()");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
+						
+						break;
+					
+					case 'weekday':
+						//1 = Sunday, 2 = Monday, ..., 7 = Saturday
+						$dow = QuickQuery("select dayofweek(curdate())");
+	
+						//normally go back 1 day
+						$daydiff = 1;
+						//if it is sunday, go back 2 days
+						if ($dow == 1)
+							$daydiff = 2;
+						//if it is monday, go back 3 days
+						if ($dow == 2)
+							$daydiff = 3;
+	
+						$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
+						
+						break;
+					case 'yesterday':
+						$targetdate = QuickQuery("select date_sub(curdate(),interval 1 day)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
+						
+						break;
+					case 'xdays':
+						$lastxdays = $params['lastxdays'];
+						if($lastxdays == "")
+							$lastxdays = 1;
+						$today = QuickQuery("select curdate()");
+						$targetdate = QuickQuery("select date_sub(curdate(),interval $lastxdays day)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
+						
+						break;
+					case 'daterange':
+						
+						$datestart = strtotime($params['startdate']);
+						$dateend = strtotime($params['enddate']);
+						$reldatequery = "and ( (j.startdate >= from_unixtime('$datestart') and j.startdate < date_add(from_unixtime('$dateend'),interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= from_unixtime('$datestart') and j.startdate <= date_add(from_unixtime('$dateend'),interval 1 day) ";
+						break;
+					case 'weektodate':
+						$today = QuickQuery("select curdate()");
+						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 week)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
+						break;
+					case 'monthtodate':
+						$today = QuickQuery("select curdate()");
+						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 month)");
+						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
+											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
+						break;
+				}
+			}
+		
+			$joblist = QuickQueryList("select j.id from job j where 1 $reldatequery");
 		}
 		$joblist = implode("','", $joblist);
 		
 		$jobinfoquery = "Select u.login, 
 								j.name, 
 								j.description,
-								coalesce(m.name, sq.name), 
-								count(*)
+								coalesce(m.name, sq.name),
+								count(distinct rp.personid),
+								count(rc.personid)
 								from reportperson rp
 								left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
 								inner join job j on (rp.jobid = j.id)
@@ -50,7 +110,7 @@ class JobSummaryReport extends ReportGenerator{
 		}
 		
 		//Gather Phone Information
-		$phonecontactquery = "select sum(rp.jobid in ('$joblist')),
+		$phonecontactquery = "select count(rp.personid),
 								sum(rp.status = 'success'),
 								sum(rp.status not in ('success', 'duplicate', 'nocontacts', 'blocked')),
 								sum(rp.status = 'duplicate'),
@@ -70,7 +130,7 @@ class JobSummaryReport extends ReportGenerator{
 									and rc.type='phone'";
 		$phonenumberinfo = QuickQueryRow($phonenumberquery);
 		
-		$emailcontactquery = "select sum(rp.jobid in ('$joblist')),
+		$emailcontactquery = "select count(rp.personid),
 								sum(rp.status = 'success'),
 								sum(rp.status not in ('success', 'duplicate', 'nocontacts')),
 								sum(rp.status = 'duplicate'),
@@ -87,13 +147,15 @@ class JobSummaryReport extends ReportGenerator{
 									where rc.jobid in ('$joblist')
 									and rc.type='email'";
 		$emailinfo = QuickQueryRow($emailquery);
-		
+
 		$query = "select count(*) as cnt, rc.result, sum(rc.result not in ('A','M') and rc.numattempts < js.value) as remaining
 					from reportcontact rc
 					left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
 					where rc.jobid in ('$joblist')
 					and rc.type='phone'
 					group by rc.result";
+			
+					
 		//may need to clean up, null means not called yet
 		//do math for the % completed
 		
@@ -128,7 +190,7 @@ class JobSummaryReport extends ReportGenerator{
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr valign="top">
-					<th align="right" class="windowRowHeader bottomBorder">Summary:</th>
+					<th align="right" class="windowRowHeader bottomBorder">Job Info:</th>
 					<td class ="bottomBorder">
 						<table border="1" cellpadding="2" cellspacing="1" class="list">
 							<tr class="listHeader" align="left" valign="bottom">
@@ -136,6 +198,7 @@ class JobSummaryReport extends ReportGenerator{
 								<th>Job</th>
 								<th>Description</th>
 								<th>Message</th>
+								<th>People to Contact</th>
 								<th>Total Destinations</th>
 							</tr>
 							<?
@@ -159,7 +222,7 @@ class JobSummaryReport extends ReportGenerator{
 				if($phonecontactinfo[0] > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Phone</th>
+					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=phone"/a>Phone Details:</a></th>
 					<td class ="bottomBorder">	
 						<table>
 							<tr>
@@ -208,7 +271,7 @@ class JobSummaryReport extends ReportGenerator{
 				if($emailcontactinfo[0] > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Email</th>
+					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email"/a>Email</a></th>
 					<td class="bottomBorder">	
 						<table>
 							<tr>
