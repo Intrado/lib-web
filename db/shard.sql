@@ -145,3 +145,4 @@ ALTER TABLE `qjobtask` ADD INDEX `expired` ( `status` , `leasetime` ) ;
 
 ALTER TABLE `qjobtask` ADD `contactsequence` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `sequence` ;
 
+ALTER TABLE `qjobtask` ADD INDEX `dispatch` ( `status`, `customerid`, `jobid`, `type`, `attempts`, `sequence`);
