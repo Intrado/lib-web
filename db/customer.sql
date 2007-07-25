@@ -843,4 +843,6 @@ $$$
 ALTER TABLE `surveyquestion` CHANGE `reportlabel` `reportlabel` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
 $$$
 
+ALTER TABLE `reportperson` ADD `duplicateid` int( 11 ) NULL AFTER `numblocked`
+$$$
 
