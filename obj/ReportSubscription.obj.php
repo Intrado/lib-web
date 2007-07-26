@@ -39,11 +39,28 @@ class ReportSubscription extends DBMappedObject {
 		} else if ($this->type == 'monthly') {
 
 			$nextrun = Date("Y-m-d");
-			// TODO if -1 treat as 'end of month'
-			// TODO if day is later than today, take from first of current month, otherwise last_day into next month
-			$nextrun = QuickQuery("select last_day('$nextrun')");
-			$nextrun = QuickQuery("select date_add('$nextrun', interval ".$this->dayofmonth." day)") ." " . $this->time;
-			return $nextrun;
+
+			// if -1 treat as 'end of month'
+			if ($this->dayofmonth == -1) {
+				$today = $nextrun;
+				$nextrun = QuickQuery("select last_day('$nextrun')");
+				// if today is the end of month, set for next month
+				if ($nextrun == $today) {
+					$nextrun = QuickQuery("select date_add('$nextrun', interval 1 day)");
+					$nextrun = QuickQuery("select last_day('$nextrun')");
+				}
+			} else {
+				// if day is later than today, take from first of current month, otherwise last_day into next month
+				$currentdayofmonth = QuickQuery("select dayofmonth('$nextrun')");
+				if ($currentdayofmonth < $this->dayofmonth) {
+					$diff = $this->dayofmonth - $currentdayofmonth;
+					$nextrun = QuickQuery("select date_add('$nextrun', interval ".$diff." day)");
+				} else {
+					$nextrun = QuickQuery("select last_day('$nextrun')");
+					$nextrun = QuickQuery("select date_add('$nextrun', interval ".$this->dayofmonth." day)");
+				}
+			}
+			return $nextrun ." " . $this->time;
 
 		} else if ($this->type == 'weekly') {
 
@@ -62,7 +79,7 @@ class ReportSubscription extends DBMappedObject {
 		}
 		return NULL; // null means notscheduled
 	}
-	
+
 	function createDefaults($name){
 		global $USER;
 		$this->name = $name . " " . date("M d, g:i A", strtotime("now"));;
