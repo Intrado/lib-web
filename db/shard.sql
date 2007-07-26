@@ -151,3 +151,10 @@ ADD INDEX `dispatch` ( `status`, `customerid`, `jobid`, `type`, `attempts`, `seq
 ALTER TABLE `qjobtask` DROP INDEX `emailer` ,
 ADD INDEX `emailer` ( `type` , `status` , `nextattempttime` );
 
+CREATE TABLE `leasetask` (
+  `taskuuid` varchar(255) NOT NULL,
+  `leasetime` bigint(20) NOT NULL,
+  PRIMARY KEY (`taskuuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
