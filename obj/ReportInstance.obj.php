@@ -3,8 +3,6 @@ class ReportInstance extends DBMappedObject {
 	//table vars
 	
 	var $parameters;
-	var $fields;
-	var $activefields;
 	var $instancehash;
 
 	//related parent object
@@ -13,7 +11,7 @@ class ReportInstance extends DBMappedObject {
 	function ReportInstance ($id = NULL) {
 		$this->_allownulls = false;
 		$this->_tablename = "reportinstance";
-		$this->_fieldlist = array("parameters","fields", "activefields", "instancehash" );
+		$this->_fieldlist = array("parameters", "instancehash" );
 		DBMappedObject::DBMappedObject($id);
 	}
 		
@@ -65,32 +63,10 @@ class ReportInstance extends DBMappedObject {
 		return implode("&", $params);
 		//$this->rehash();
 	}
-	
-	//takes an input string formatted like http get query
-	function setFields ($fieldlist) {
-		$fieldliststring = http_build_query($fieldlist, false, "&");
-		$this->fields = $this->setString($fieldliststring);			
-	}
-	function setActivefields ($activefields) {
-		$activefieldsstring = http_build_query($activefields, false, "&");
-		$this->activefields = $this->setString($activefieldsstring);			
-	}
-	
-	function getFields(){
-		$fieldlist = array();
-		$fieldlist=sane_parsestr($this->fields);
-		return $fieldlist;
-	}
-	
-	function getActiveFields(){
-		$activefields = array();
-		$activefields=sane_parsestr($this->activefields);
-		return $activefields;
-	}
 		
 	function getParameters () {
 		$paramarray = array();
-		$paramarray=sane_parsestr($this->parameters);
+		$paramarray = sane_parsestr($this->parameters);
 		return $paramarray;
 	}
 	
