@@ -522,7 +522,7 @@ startWindow('Job Information');
 					<td>Repeat this job every:</td>
 					<td>
 						<table border="0" cellpadding="2" cellspacing="1" class="list">
-							<tr class="listHeader" align="left" valign="bottom"><td>Su</td>
+							<tr class="listHeader" align="left" valign="bottom"><th>Su</th>
 								<th>M</th>
 								<th>Tu</th>
 								<th>W</th>
