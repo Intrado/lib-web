@@ -8,18 +8,16 @@ if ($argc < 7) {
 $id = $argv[1];
 $type = $argv[2];
 $filename = $argv[3];
-$host = $argv[4];
-$db = $argv[5];
-$user = $argv[6];
-$pass = $argv[7];
+$_DBHOST = $argv[4];
+$_DBNAME = $argv[5];
+$_DBUSER = $argv[6];
+$_DBPASS = $argv[7];
 
-$params = array("host" => "jdbc:mysql://" . $host . "/" . $db,
-				"user" => $user,
-				"pass" => $pass,
-				"filename" => $filename);
 
-$_dbcon = mysql_connect($host, $user, $pass) or die("Could not connect to: ". $host);
-mysql_select_db($db, $_dbcon) or die("Could not select db: " . $db);
+$params = array("filename" => $filename);
+
+$_dbcon = mysql_connect($_DBHOST, $_DBUSER, $_DBPASS) or die("Could not connect to: ". $_DBHOST);
+mysql_select_db($_DBNAME, $_dbcon) or die("Could not select db: " . $_DBNAME);
 
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
@@ -28,10 +26,8 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/ReportInstance.obj.php");
 require_once("../obj/ReportSubscription.obj.php");
 require_once("../obj/ReportGenerator.obj.php");
-require_once("../obj/CallsReport.obj.php");
 require_once("../obj/JobAutoReport.obj.php");
 require_once("../obj/SurveyReport.obj.php");
-require_once("../obj/ContactsReport.obj.php");
 require_once("../obj/JobSummaryReport.obj.php");
 require_once("../obj/JobDetailReport.obj.php");
 require_once("../obj/User.obj.php");
@@ -62,9 +58,6 @@ if($type == "subscription"){
 			break;
 		case 'jobdetailreport':
 			$generator = new JobDetailReport();
-			break;
-		case 'contactsreport':
-			$generator = new ContactsReport();
 			break;
 	}
 	$generator->userid = $subscription->userid;
