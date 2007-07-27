@@ -43,7 +43,7 @@ function fmt_last_run($obj){
 function fmt_report_type($obj){
 	$instance = new ReportInstance($obj->reportinstanceid);
 	$options = $instance->getParameters();
-	return fmt_report_name($options['reporttype']);
+	return report_name($options['reporttype']);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,23 +68,36 @@ $TITLE= "Report Builder";
 
 include("nav.inc.php");
 
-startWindow("Select a Template");
+startWindow("Select a Template", 'padding: 3px;');
 ?>
-	<table width="100%" cellpadding="3" cellspacing="2" class="list" >
-		<tr class="listHeader" align="left" valign="bottom">
-			<th>Summary</th>
-			<th>Individual</th>
-			<th>Detailed</th>
+	<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
+		<tr class="listHeader">
+			<th align="left" class="nosort">Job and Date Range</th>
+			<th align="left" class="nosort">Individual</th>
+			<th align="left" class="nosort">Survey</th>
 		</tr>
-		<tr>
-			<td><a href='reportjobsearch.php?clear=1'/>Job Summary</a></td>
-			<td><a href='reportcallssearch.php?clear=1&type=callsreport'/>Contact History</a></td>
-			<td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Call Detail</td>
-		</tr>
-		<tr>
-			<td><a href='reportsurvey.php?clear=1'/>Survey</a></td>
-			<td>&nbsp;</td>
-			<td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Detail</a></td>	
+		<tr align="left" valign="bottom">
+			<td>
+				<table>
+					<tr><td><a href='reportjobsearch.php?clear=1'/>Notification Summary</a></td></tr>
+					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Phone Log</a></td></tr>
+					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Log</a></td></tr>
+				</table>
+			</td>
+			<td>
+				<table>
+					<tr><td><a href='reportcallssearch.php?clear=1&type=callsreport'/>Contact History</a></td></tr>
+					<tr><td>&nbsp;</td></tr>
+					<tr><td>&nbsp;</td></tr>
+				</table>
+			</td>
+			<td>
+				<table>
+					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
+					<tr><td>&nbsp;</td></tr>
+					<tr><td>&nbsp;</td></tr>
+				</table>
+			</td>
 		</tr>
 	</table>
 <?
@@ -106,8 +119,7 @@ $formatters = array("Actions" => "fmt_report_actions",
 					"Last Run" => "fmt_last_run");
 $scroll = false;
 
-
-startWindow("My Reports");
+startWindow("My Saved Reports", 'padding: 3px;');
 showObjects($data, $titles, $formatters, $scroll, true);
 EndWindow();
 include("navbottom.inc.php");
