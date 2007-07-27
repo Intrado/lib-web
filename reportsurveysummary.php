@@ -68,34 +68,24 @@ if(isset($_REQUEST['reportid'])){
 
 	$jobid = isset($options['jobid']) ? $options['jobid'] : 0;
 	
-	$activefields = $instance->getActiveFields();
 	foreach($fields as $field){
-		if(in_array($field->fieldnum, $activefields)){
-			$_SESSION['fields'][$field->fieldnum] = true;
-		} else {
-			$_SESSION['fields'][$field->fieldnum] = false;
-		}
+		$_SESSION['fields'][$field->fieldnum] = false;
 	}
+
 	if($jobid)
 		$job = new Job($jobid);
 	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
+	$_SESSION['report']['options'] = $options;
 } else {
 	$jobid = 0;
-	$options = array();
+	
 	if (isset($_GET['jobid'])) {
 		$jobid = $_GET['jobid'] + 0;
-		$options["reporttype"] = "jobreport";
-	} else if(isset($_GET['surveyid'])){
-		$jobid = $_GET['surveyid']+0;
-		$options["reporttype"] = "surveyreport";
 	} else {
 		$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 		$jobid = isset($options['jobid']) ? $options['jobid'] : 0;
 	}
-	
-	if(!in_array($options["reporttype"], array("jobreport", "surveyreport"))){
-		redirect('unauthorized.php');
-	}
+	$options['reporttype'] = "surveyreport";
 	if($jobid){
 		
 		//check userowns or customerowns and viewsystemreports
@@ -106,31 +96,13 @@ if(isset($_REQUEST['reportid'])){
 		unset($_SESSION['jobstats'][$jobid]);
 		$job = new Job($jobid);
 		$options['jobid'] = $jobid;
-
-		$_SESSION['report']['options'] = $options;
 	}
-	
-	$activefields = array();
-	$fieldlist = array();
-	foreach($fields as $field){
-		// used in html
-		$fieldlist[$field->fieldnum] = $field->name;
-		
-		// used in pdf
-		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-			$activefields[] = $field->fieldnum; 
-		}
-	}
-	
-	$instance = new ReportInstance();
-	$instance->setParameters($options);
-	$subscription = new ReportSubscription();
-	$subscription->createDefaults(fmt_report_name($options['reporttype']));
+	$_SESSION['report']['options'] = $options;
 }
 
-
+$instance = new ReportInstance();
+$instance->setParameters($options);
 $generator = new SurveyReport();
-
 $generator->reportinstance = $instance;
 $generator->userid = $USER->id;
 
@@ -167,14 +139,7 @@ if(CheckFormSubmit($f,$s)){
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			$instance->setFields($fieldlist);
-			$instance->setActiveFields($activefields);
-			$instance->setParameters($options);
-			$instance->update();
-			$subscription->reportinstanceid = $instance->id;
-			$subscription->update();
-			$_SESSION['reportid'] = $subscription->id;
-			redirect("reportedit.php?reportid=" . $subscription->id);
+			redirect("reportedit.php");
 		}
 	}
 } else {
@@ -189,7 +154,7 @@ if($reload)
 
 if($generator->format != "html"){
 	if($generator->format == "pdf"){
-		$name = secure_reportname();
+		$name = secure_tmpname("report", ".pdf");
 		$params = createPdfParams($name);
 		$result = $generator->generate($params);
 		
@@ -209,19 +174,18 @@ if($generator->format != "html"){
 } else {
 	
 	$PAGE = "reports:reports";
-	$TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+	$TITLE = "Survey Results" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
 
 	include_once("nav.inc.php");
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
-	buttons(button('back', 'window.history.go(-1)'), submit($f, $s, "save", "save"),button('refresh', 'window.location.reload()'));
+	buttons(button('back', 'window.history.go(-1)'), submit($f, $s, "save/schedule", "save/schedule"),button('refresh', 'window.location.reload()'));
 	
 		startWindow("Related Links", "padding: 3px;");
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
-			<tr><th align="right" class="windowRowHeader">Output Format:</th>
 				<td>
-					<a href="reportsurveysummary.php?pdf=1">PDF</a>
+					<a href="reportsurveysummary.php?pdf=1">PDF</a>&nbsp;|&nbsp;<a href="reportjobsummary.php?jobid=<?=$job->id?>&survey=true"/>Contact&nbsp;Summary</a>&nbsp;|&nbsp<a href="reportsurveysummary.php?csv=1"/>CSV</a>
 				</td>
 			</tr>
 		</table>
