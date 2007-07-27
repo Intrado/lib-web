@@ -27,13 +27,9 @@ $s="scheduler";
 
 $options = array();
 
-if(isset($_REQUEST['reportid'])){
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
-	redirect();
-}
 
-if(isset($_SESSION['reportid'])){
-	$reportid = $_SESSION['reportid'];
+if(isset($_REQUEST['reportid'])){
+	$reportid = $_REQUEST['reportid']+0;
 	if(!userOwns("reportsubscription",$reportid)){
 		redirect('unauthorized.php');
 	}
@@ -45,10 +41,21 @@ if(isset($_SESSION['reportid'])){
 		error_log("Subscription exists without instance; ID=" . $subscription->id);
 		$instance = new ReportInstance();
 	}
-	$_SESSION['report']['options'] = $instance->getParameters();
+	$options = $instance->getParameters();
+	$_SESSION['report']['options'] = $options;
+	$_SESSION['reportid'] = $reportid;
+	redirect();
+} else {
+	$options = $_SESSION['report']['options'];
+	if(isset($_SESSION['reportid'])){
+		$subscription = new ReportSubscription($_SESSION['reportid']);
+		$instance = new ReportInstance($subscription->reportinstanceid);
+	} else {
+		$subscription = new ReportSubscription();
+		$subscription->createDefaults(report_name($options['reporttype']));
+		$instance = new ReportInstance();
+	}
 }
-
-$options = $_SESSION['report']['options'];
 
 if(CheckFormSubmit($f, $s))
 {
@@ -62,27 +69,29 @@ if(CheckFormSubmit($f, $s))
 		MergeSectionFormData($f, $s);
 		$emaillist = GetFormData($f, $s, "email");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
+		$radio = GetFormData($f, $s, "radio");
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "radio") == 2 && !strtotime(GetFormData($f, $s, "date"))){
+		} else if($radio == "runonce" && !strtotime(GetFormData($f, $s, "date"))){
 			error('That date was invalid');
-		} elseif($bademaillist = checkemails($emaillist)) {
+		} else if($radio != "none" && !$emaillist){
+			error('An email address is required');
+		} else if($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
 		} else {
 			$subscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
 			$subscription->type = 'notscheduled';
 			$subscription->email = $emaillist;
 
-			$radio = GetFormData($f, $s, "radio");
 			switch($radio){
-				case '2':
+				case 'runonce':
 					$subscription->nextrun = date("Y-m-d", strtotime(GetFormData($f, $s, "date"))) ." " . $subscription->time;
 					$subscription->daysofweek = null;
 					$subscription->dayofmonth = null;
 					$subscription->type = 'once';
 					break;
-				case '3':
+				case 'dow':
 					$dow = array();
 					for($i=1; $i<8; $i++){
 						if(GetFormData($f, $s, "dow$i"))
@@ -92,7 +101,7 @@ if(CheckFormSubmit($f, $s))
 					$subscription->dayofmonth = null;
 					$subscription->type = 'weekly';
 					break;
-				case '4':
+				case 'dom':
 					$subscription->dayofmonth = GetFormData($f, $s, "dom");
 					$subscription->daysofweek = null;
 					$subscription->type = 'monthly';
@@ -103,12 +112,10 @@ if(CheckFormSubmit($f, $s))
 			$subscription->userid = $USER->id;
 			$subscription->name = GetFormData($f, $s, "name");
 			$subscription->description = GetFormData($f, $s, "description");
-			
-			if(!isset($_SESSION['reportid'])){
-				$instance->setParameters($options);
-				$instance->update();
-				$subscription->reportinstanceid=$instance->id;
-			}	
+
+			$instance->setParameters($options);
+			$instance->update();
+			$subscription->reportinstanceid=$instance->id;
 			$subscription->update();
 			redirect("reports.php");
 		}
@@ -139,15 +146,15 @@ if($reload){
 	PutFormData($f, $s, "date", $rundate, "text");
 	PutFormData($f, $s, "description", isset($subscription) ? $subscription->description : "", "text", "nomin", "nomax");
 	PutFormData($f, $s, "name", isset($subscription) ? $subscription->name : "", "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "email", isset($subscription) ? $subscription->email : "", "text");
+	PutFormData($f, $s, "email", isset($subscription) ? $subscription->email : $USER->email, "text");
 
-	$radio = 1;
+	$radio = "none";
 	if($rundate){
-		$radio= 2;
+		$radio= "runonce";
 	} else if($dows){
-		$radio= 3;
+		$radio= "dow";
 	} else if($dom){
-		$radio= 4;
+		$radio= "dom";
 	}
 	PutFormData($f, $s, "radio", $radio);
 
@@ -162,22 +169,22 @@ if($reload){
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:reports";
-$TITLE = "Saved Report";
+$TITLE = "Saved/Scheduled Report";
 
 include("nav.inc.php");
 NewForm($f);
 buttons(button("back", 'window.history.go(-1)'), submit($f, $s, "save", "save"));
-startWindow("Schedule Report");
+startWindow("Report Details");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Report:</th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="3" cellspacing="0">
-				<tr><td>Name:</td><td><? NewFormItem($f, $s, 'name', 'text', '50')?></td></tr>
+				<tr><td>Type:</td><td><?=report_name($options['reporttype'])?></td></tr>
+				<tr><td>Report Name:</td><td><? NewFormItem($f, $s, 'name', 'text', '50')?></td></tr>
 				<tr><td>Description:</td><td><? NewFormItem($f, $s, 'description', 'text', '50')?></td></tr>
-				<tr><td>Email(s):</td><td><? NewFormItem($f, $s, 'email', 'text', 72, 10000)?></td></tr>
-				<tr><td>Type:</td><td><?=fmt_report_name($options['reporttype'])?></td></tr>
+				
 			</table>
 		</td>
 	</tr>
@@ -185,10 +192,10 @@ startWindow("Schedule Report");
 		<td>
 			<table  border="0" cellpadding="3" cellspacing="0">
 				<tr>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "1", "id=radio_none' onclick='hide(\"schedule\")'")?> None</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "2", "id='radio_date' onclick='show(\"schedule\");show(\"date\");show(\"date2\");hide(\"weekly\");hide(\"monthly\");hide(\"weekly2\");hide(\"monthly2\")'")?>Date(Once Only)</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "3", "id='radio_dow' onclick='show(\"schedule\");show(\"weekly\");show(\"weekly2\");hide(\"date\");hide(\"monthly\");hide(\"date2\");hide(\"monthly2\")'")?>Weekly</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "4", "id='radio_dom' onclick='show(\"schedule\");show(\"monthly\");show(\"monthly2\");hide(\"weekly\");hide(\"date\");hide(\"weekly2\");hide(\"date2\")'")?>Monthly</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "none", "id=radio_none' onclick='hide(\"schedule\")'")?> None</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "runonce", "id='radio_date' onclick='show(\"schedule\");show(\"date\");show(\"date2\");hide(\"weekly\");hide(\"monthly\");hide(\"weekly2\");hide(\"monthly2\")'")?>Run Once</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dow", "id='radio_dow' onclick='show(\"schedule\");show(\"weekly\");show(\"weekly2\");hide(\"date\");hide(\"monthly\");hide(\"date2\");hide(\"monthly2\")'")?>Daily/Weekly</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dom", "id='radio_dom' onclick='show(\"schedule\");show(\"monthly\");show(\"monthly2\");hide(\"weekly\");hide(\"date\");hide(\"weekly2\");hide(\"date2\")'")?>Monthly</td>
 				</tr>
 			</table>
 			<table>
@@ -202,7 +209,7 @@ startWindow("Schedule Report");
 							<tr>
 								<td>
 									<div id='date'>Date:</div>
-									<div id='weekly'>Weekly:</div>
+									<div id='weekly'>Day(s):</div>
 									<div id='monthly'>Day of Month</div>
 								</td>
 								<td>
@@ -210,7 +217,7 @@ startWindow("Schedule Report");
 									<div id='weekly2'>
 										<table border="0" cellpadding="2" cellspacing="1" class="list">
 											<tr class="listHeader" align="left" valign="bottom">
-												<td>Su</td>
+												<th>Su</th>
 												<th>M</th>
 												<th>Tu</th>
 												<th>W</th>
@@ -242,6 +249,10 @@ startWindow("Schedule Report");
 									</div>
 								</td>
 							</tr>
+							<tr>
+								<td>Email(s):</td>
+								<td><? NewFormItem($f, $s, 'email', 'text', 72, 10000)?></td>
+							</tr>
 						</table>
 					</td>
 				</tr>
@@ -252,16 +263,16 @@ startWindow("Schedule Report");
 <script>
 <?
 switch($radio){
-	case '1':
+	case 'none':
 		?>hide("schedule");<?
 		break;
-	case '2':
+	case 'runonce':
 		?>show("schedule");show("date");show("date2");hide("weekly");hide("monthly");hide("weekly2");hide("monthly2");<?
 		break;
-	case '3':
+	case 'dow':
 		?>show("schedule");show("weekly");show("weekly2");hide("date");hide("monthly");hide("date2");hide("monthly2");<?
 		break;
-	case '4':
+	case 'dom':
 		?>show("schedule");show("monthly");show("monthly2");hide("weekly");hide("date");hide("weekly2");hide("date2");<?
 		break;
 }
