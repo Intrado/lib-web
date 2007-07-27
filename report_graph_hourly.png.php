@@ -2,6 +2,9 @@
 include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("obj/Job.obj.php");
+include_once("inc/reportutils.inc.php");
+include_once("inc/reportgeneratorutils.inc.php");
+include_once("inc/date.inc.php");
 
 
 include ("jpgraph/jpgraph.php");
@@ -10,81 +13,32 @@ include ("jpgraph/jpgraph_bar.php");
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 $options = $_SESSION['report']['options'];
-$reldatequery = "";
 
-if(isset($options['jobid'])){
-	$jobid = $options['jobid'];
-	$jobidquery = "and jobid = '$jobid'";
-} else if(isset($options['reldate'])){
-	$reldate = $options['reldate'];
-	switch($reldate){
-		case 'today':
-			$targetdate = QuickQuery("select curdate()");
-			$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-								or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-			
-			break;
-		
-		case 'week':
-			//1 = Sunday, 2 = Monday, ..., 7 = Saturday
-			$dow = QuickQuery("select dayofweek(curdate())");
-
-			//normally go back 1 day
-			$daydiff = 1;
-			//if it is sunday, go back 2 days
-			if ($dow == 1)
-				$daydiff = 2;
-			//if it is monday, go back 3 days
-			if ($dow == 2)
-				$daydiff = 3;
-
-			$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
-			$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-								or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-			
-			break;
-		case 'yesterday':
-			$targetdate = QuickQuery("select date_sub(curdate(),interval 1 day)");
-			$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-								or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-			
-			break;
-		case 'weektodate':
-			$today = QuickQuery("select curdate()");
-			$targetdate = QuickQuery("select date_sub(curdate(), interval 1 week)");
-			$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-								or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-			break;
-		case 'monthtodate':
-			$today = QuickQuery("select curdate()");
-			$targetdate = QuickQuery("select date_sub(curdate(), interval 1 month)");
-			$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-								or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-			break;
-		case 'xdays':
-			$lastxdays = $params['lastxdays'];
-			if($lastxdays == "")
-				$lastxdays = 1;
-			$today = QuickQuery("select curdate()");
-			$targetdate = QuickQuery("select date_sub(curdate(),interval $lastxdays day)");
-			$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-								or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-			
-			break;
-		case 'daterange':
-			
-			$datestart = strtotime($params['startdate']);
-			$dateend = strtotime($params['enddate']);
-			$reldatequery = "and ( (j.startdate >= from_unixtime('$datestart') and j.startdate < date_add(from_unixtime('$dateend'),interval 1 day) )
-								or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= from_unixtime('$datestart') and j.startdate <= date_add(from_unixtime('$dateend'),interval 1 day) ";
-			break;
-	}
-	$joblist = QuickQueryList("select j.id from job j where 1 $reldatequery");
-	$jobidquery = " and jobid in ('" . implode("','", $joblist) . "')";
-} else {
-	exit(0);
+$jobtypes = "";
+if(isset($options['jobtypes'])){
+	$jobtypes = $options['jobtypes'];
+}
+$surveyonly = "false";
+if(isset($options['survey']) && $options['survey']=="true"){
+	$surveyonly = "true";
 }
 
+if(isset($options['jobid'])){
+	$joblist = "";
+	$job = new Job($options['jobid']);
+	$jobtypesarray = explode("','", $jobtypes);
+	if($jobtypes == "" || in_array($job->jobtypeid, $jobtypesarray)){
+		$joblist = $options['jobid'];
+	}
+} else {
+	$reldate = "today";
+	if(isset($options['reldate']))
+		$reldate = $options['reldate'];
+	list($startdate, $enddate) = getStartEndDate($reldate, $options);
+	$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes));
+}
+error_log($joblist);
+$jobidquery = " and jobid in ('" . $joblist . "')";
 $big = isset($_GET['big']) ? true : false;
 
 $cpcolors = array(
