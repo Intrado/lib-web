@@ -18,6 +18,7 @@ require_once("obj/SurveyQuestion.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/ReportSubscription.obj.php");
+require_once("inc/reportgeneratorutils.inc.php");
 require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("inc/date.inc.php");
@@ -51,7 +52,7 @@ function fmt_attempts ($row,$index) {
 }
 
 function fmt_message ($row,$index) {
-	return '<img src="img/icon_' . $row[$index] . '_12.gif" align="bottom" />&nbsp;' . htmlentities($row[$index+1]);
+	return '<img src="img/' . $row[$index] . '_2.png" align="bottom" />&nbsp;' . htmlentities($row[$index+1]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,10 +68,10 @@ if(isset($_GET['pagestart'])){
 	$pagestart = $_GET['pagestart'];
 }
 
-$fields = getFieldMaps();
+$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 $ordering = JobDetailReport::getOrdering();
+$ordercount=3;
 
-$orders = array("order1", "order2", "order3");
 
 if(isset($_REQUEST['reportid'])){
 	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
@@ -81,13 +82,14 @@ if(isset($_REQUEST['reportid'])){
 	$subscription = new ReportSubscription($_SESSION['reportid']+0);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
-	if(isset($options['type'])){
-		$_SESSION['report']['type'] = $options['type'];
+	if($options['reporttype'] == "phonedetail"){
+		$_SESSION['report']['type'] = "phone";
+	} else if($options['reporttype'] == "emaildetail"){
+		$_SESSION['report']['type'] = "email";
 	} else {
-		unset($_SESSION['report']['type']);
+		error_log("Wrong report type recieved: " . $options['reporttype'] . " Check links on other page.");
 	}
-	
-	$activefields = $instance->getActiveFields();
+	$activefields = isset($options['activefields']) ? explode(",",$options['activefields']) : array();
 	foreach($fields as $field){
 		if(in_array($field->fieldnum, $activefields)){
 			$_SESSION['fields'][$field->fieldnum] = true;
@@ -95,51 +97,43 @@ if(isset($_REQUEST['reportid'])){
 			$_SESSION['fields'][$field->fieldnum] = false;
 		}
 	}
-	foreach($orders as $order){
-		$_SESSION[$order] = isset($options[$order]) ? $options[$order] : "";
-	}
+	redirect();
 } else if(isset($_REQUEST['type'])){
 
 	$options = $_SESSION['report']['options'];
 	$_SESSION['report']['type'] = $_REQUEST['type'];
-	$options['type'] =  $_REQUEST['type'];
-	if($options['type'] == "phone"){
-		$options['reporttype'] = "calldetail";
-	} else if($options['type'] == "email"){
+	if($_REQUEST['type'] == "phone"){
+		$options['reporttype'] = "phonedetail";
+	} else if($_REQUEST['type'] == "email"){
 		$options['reporttype'] = "emaildetail";
 	}
 
 	$_SESSION['report']['options'] = $options;
 	redirect();
+} else if(isset($_REQUEST['result'])){
+	unset($_SESSION['reportid']);
+	unset($_SESSION['report']['type']);
+	$options = $_SESSION['report']['options'];
+	$options['result'] = $_REQUEST['result'];
 
+	if($_REQUEST['result'] == "sent" || $_REQUEST['result'] == "unsent"){
+		$options['reporttype']="emaildetail";
+	} else if($_REQUEST['result'] == "undelivered"){
+		$options['reporttype'] = "notcontacted";
+	} else {
+		$options['reporttype']="phonedetail";
+	}
+	$_SESSION['report']['options'] = $options;
+	redirect();
 } else {
 
 	$options = $_SESSION['report']['options'];
 	$options["pagestart"] = $pagestart;
-	
-	$activefields = array();
-	$fieldlist = array();
-	foreach($fields as $field){
-		// used in html
-		$fieldlist[$field->fieldnum] = $field->name;
-		
-		// used in pdf,csv
-		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-			$activefields[] = $field->fieldnum; 
-		}
-	}
-	if(isset($_SESSION['reportid'])){
-		$subscription = new ReportSubscription($_SESSION['reportid']);
-		$instance = new ReportInstance($subscription->reportinstanceid);
-	} else {
-		$instance = new ReportInstance();
-		$subscription = new ReportSubscription();
-		$subscription->createDefaults(fmt_report_name($options['reporttype']));
-	}
 
-	$instance->setFields($fieldlist);
-	$instance->setActiveFields($activefields);
+	if(!isset($_SESSION['reportid']))
+		$_SESSION['saved_report'] = false;
 	
+	$instance = new ReportInstance();
 }
 
 if(isset($_SESSION['reportid'])){
@@ -150,7 +144,7 @@ if(isset($_SESSION['reportid'])){
 
 if(isset($options['jobid'])){
 	$jobid = $options['jobid'];
-	if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid)))
+	if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports')) && customerOwns("job",$jobid))
 		redirect('unauthorized.php');
 }
 
@@ -193,19 +187,23 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 		} else {
 			$orderquery = "";
 			$options = $instance->getParameters();
-			foreach($orders as $order){
-				$options[$order] = GetFormData($f, $s, $order);
-				$_SESSION[$order] = GetFormData($f, $s, $order);
+			for($i=1; $i<=$ordercount; $i++){
+				$options["order$i"] = GetFormData($f, $s, "order$i");
 			}		
 			$_SESSION['report']['options']= $options;
 			
 			if(CheckFormSubmit($f, "save")){
-				$instance->setParameters($options);
-				$instance->update();
-				$subscription->reportinstanceid = $instance->id;
-				$subscription->update();
-				$_SESSION['reportid'] = $subscription->id;
-				redirect("reportedit.php?reportid=" . $subscription->id);
+				
+				$activefields = array();
+				foreach($fields as $field){
+					// used in pdf,csv
+					if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
+						$activefields[] = $field->fieldnum; 
+					}
+				}
+				$options['activefields'] = implode(",",$activefields);
+				$_SESSION['report']['options'] = $options;
+				redirect("reportedit.php");
 			}
 			redirect();
 		}
@@ -216,17 +214,23 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 
 if($reload){
 	ClearFormData($f);
-	foreach($orders as $order){
-		if($order == "order1"){
-			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "rp.pkey");
+	for($i=1;$i<=$ordercount;$i++){
+		$order="order$i";
+		if($i==1){
+			if(!isset($options[$order])){
+				if(isset($_SESSION['reportid']))
+					$orderquery = "";
+				else
+					$orderquery = "rp.pkey";
+			} else
+				$orderquery = $options[$order];
+			PutFormData($f, $s, $order, $orderquery);
 		} else {
 			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
 		}
 	}
 
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -237,17 +241,14 @@ if($reportgenerator->format != "html"){
 	if($reportgenerator->format == "pdf"){
 		$name = secure_tmpname("report", ".pdf");
 		$params = createPdfParams($name);
-		$reportgenerator->generate($params);
-	
+
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=$name");
 		header("Content-type: application/pdf");	
 		session_write_close();
-		$fp = fopen($name, "r");
-		while($line = fgets($fp)){
-			echo $line;
-		}
+		$reportgenerator->generate($params);
+		@readfile($name);
 		unlink($name);
 	} else {
 		$reportgenerator->generate();
@@ -255,55 +256,45 @@ if($reportgenerator->format != "html"){
 } else {
 	
 	$PAGE = "reports:reports";
-	$TITLE = "Job Details";
+	$TITLE = "Phone Log";
 	if(isset($_SESSION['report']['type'])){
 		if($_SESSION['report']['type'] == "phone"){
-			$TITLE = "Call Detail";
+			$TITLE = "Phone Log";
 		} else if($_SESSION['report']['type'] == "email"){
-			$TITLE = "Email Detail";
+			$TITLE = "Email Log";
 		}
+	} else if(isset($options['reporttype']) && $options['reporttype'] == "notcontacted"){
+		$TITLE = "Not Contacted";
 	}
 	if(isset($_SESSION['reportid'])){
+		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$TITLE .= " - " . $subscription->name;
 	} else if(isset($jobid)){
 		$TITLE .= " - " . $job->name;
 	}
+	if(isset($options['reldate'])){
+		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
+		$DESCRIPTION = "From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
+	}
+	
 	include_once("nav.inc.php");
 	NewForm($f);	
-	buttons(button("back", "window.history.go(-1)"), submit($f, "save", "save", "save"), submit($f, $s, "filter", "refresh"));
+	buttons(button("back", "window.history.go(-1)"), submit($f, "save", "save/schedule", "save/schedule"), submit($f, $s, "filter", "refresh"));
 	startWindow("Display Options", "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
+		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 			<td class="bottomBorder">
 	<? 		
 				select_metadata('reportdetailstable', 9, $fields);
 	?>
 			</td>
 		</tr>
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort by:</th>
-			<td class="bottomBorder">
-				<table>
-					<tr>
-	<?
-					foreach($orders as $order){
-	?>
-					<td>
-	<?
-						NewFormItem($f, $s, $order, 'selectstart');
-						NewFormItem($f, $s, $order, 'selectoption', " -- Not Selected --", "");
-						foreach($ordering as $index => $item){
-							NewFormItem($f, $s, $order, 'selectoption', $index, $item);
-						}						
-						NewFormItem($f, $s, $order, 'selectend');
-	?>
-					</td>
-	<?
-				}
-	?>
-				
-					</tr>
-				</table>
+		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort By:</th>
+			<td class="bottomBorder" >
+<?
+				selectOrderBy($f, $s, $ordercount, $ordering);
+?>
 			</td>
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
 			<td class="bottomBorder"><a href="reportjobdetails.php?csv=true">CSV</a>&nbsp;|&nbsp;<a href="reportjobdetails.php?pdf=true">PDF</a></td>

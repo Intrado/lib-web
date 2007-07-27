@@ -18,11 +18,20 @@ require_once("inc/reportutils.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/JobDetailReport.obj.php");
+require_once("obj/JobType.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports')) {
 	redirect('unauthorized.php');
+}
+
+//if this user can see systemwide reports, then lock them to the customerid
+//otherwise lock them to jobs that they own
+if (!$USER->authorize('viewsystemreports')) {
+	$userJoin = " and userid = $USER->id ";
+} else {
+	$userJoin = "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,6 +44,7 @@ $s="jobs";
 $reload=0;
 $clear = 0;
 
+
 if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
 	unset($_SESSION['report']);
 	unset($_SESSION['reportid']);
@@ -46,78 +56,120 @@ if(isset($_REQUEST['type'])){
 	$clear = 1;
 }
 
-if(isset($_REQUEST['reportid'])){
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
-	$clear = 1;
-}
-
 if($clear)
 	redirect();
 
-$orders = array("order1", "order2", "order3");
-$fieldlist = getFieldMaps();
+$jobtypeobjs = DBFindMany("JobType", "from jobtype");
+$jobtypes = array();
+foreach($jobtypeobjs as $jobtype){
+	$jobtypes[$jobtype->id] = $jobtype->name;
+}
+$fieldlist = FieldMap::getOptionalAuthorizedFieldMaps();
+$ordercount = 3;
 $ordering = JobDetailReport::getOrdering();
 
-$results = array("A" => "Answered",
-					"M" => "Machine",
-					"N" => "No Answer",
-					"B" => "Busy",
-					"F" => "Failed",
-					"X" => "Disconnected",
-					"unsent" => "Unsent",
-					"sent" => "Sent");
-
-if(isset($_SESSION['reportid'])){
-	if(!userOwns("reportsubscription", $_SESSION['reportid']+0)){
+if(isset($_REQUEST['reportid'])){
+	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
 		redirect('unauthorized.php');
 	}
+	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
+	
 	$subscription = new ReportSubscription($_SESSION['reportid']+0);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 	
-	if(isset($options['type'])){
-		$_SESSION['report']['type'] = $options['type'];
-	} else {
-		unset($_SESSION['report']['type']);
+	$_SESSION['report']['type']="phone";
+	if(isset($options['reporttype'])){
+		if($options['reporttype']=="emaildetail")
+			$_SESSION['report']['type']="email";
 	}
-	$activefields = $instance->getActiveFields();
-	if(!(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save'))){
-		foreach($fieldlist as $field){
-			if(in_array($field->fieldnum, $activefields)){
-				$_SESSION['fields'][$field->fieldnum] = true;
-			} else {
-				$_SESSION['fields'][$field->fieldnum] = false;
-			}
+	$activefields = explode(",", $options['activefields']);
+	foreach($fieldlist as $field){
+		if(in_array($field->fieldnum, $activefields)){
+			$_SESSION['fields'][$field->fieldnum] = true;
+		} else {
+			$_SESSION['fields'][$field->fieldnum] = false;
 		}
 	}
 	$_SESSION['saved_report'] = true;
-	
-	if($options['reporttype']!="jobdetailreport"){
-		error_log("Expected job detail report, got something else");
-	}
+	$_SESSION['report']['options'] = $options;
+	redirect();
 } else {
 	$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 	
-	$options['reporttype'] = "jobdetailreport";
+	$options['reporttype'] = "phonedetail";
 	if(isset($_SESSION['report']['type'])){
-		if($_SESSION['report']['type'] == "phone"){
-			$options['reporttype'] = "calldetail";
-		} else if ($_SESSION['report']['type'] == "email"){
+		if ($_SESSION['report']['type'] == "email"){
 			$options['reporttype'] = "emaildetail";
 		}
 	}
-	
-	$_SESSION['saved_report'] = false;
-
-	$subscription = new ReportSubscription();
-	$subscription->createDefaults(fmt_report_name($options['reporttype']));
-	$instance = new ReportInstance();
-
+	if(isset($_SESSION['reportid'])){
+		$subscription = new ReportSubscription($_SESSION['reportid']);
+		$_SESSION['saved_report'] = true;
+	} else {
+		$_SESSION['saved_report'] = false;
+	}
+	$_SESSION['report']['options'] = $options;
 }
 
-$_SESSION['report']['options'] = $options;
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview"))
+unset($_SESSION['reportrules']);
+if(isset($options['rules']) && $options['rules'] != ""){
+	$rules = explode("||", $options['rules']);
+	foreach($rules as $rule){
+		if($rule != ""){
+			$rule = explode(";", $rule);
+			$newrule = new Rule();
+			$newrule->logical = $rule[0];
+			$newrule->op = $rule[1];
+			$newrule->fieldnum = $rule[2];
+			$newrule->val = $rule[3];
+			if(isset($_SESSION['reportrules']) && is_array($_SESSION['reportrules']))
+				$_SESSION['reportrules'][] = $newrule;
+			else 
+				$_SESSION['reportrules'] = array($newrule);
+			$newrule->id = array_search($newrule, $_SESSION['reportrules']);
+			$_SESSION['reportrules'][$newrule->id] = $newrule;
+		}
+	}
+}
+
+
+if(isset($_GET['deleterule'])) {
+	unset($_SESSION['reportrules'][(int)$_GET['deleterule']]);
+	if(!isset($options['rules'])){
+		if(count($_SESSION['contactrules']) > 0){
+			$_SESSION['contactrules'] = false;
+		}
+		redirect();
+	}
+	$options['rules'] = explode("||", $options['rules']);
+	unset($options['rules'][(int)$_GET['deleterule']]);
+	if(count($options['rules']) == 0){
+		unset($options['rules']);
+	} else {
+		$options['rules'] = implode("||", $options['rules']);
+	}
+	$_SESSION['report']['options'] = $options;
+	if(!count($_SESSION['reportrules']))
+		$_SESSION['reportrules'] = false;
+	redirect();
+}
+
+
+if($_SESSION['report']['type'] == "phone"){
+	$results = array("A" => "Answered",
+					"M" => "Machine",
+					"N" => "No Answer",
+					"B" => "Busy",
+					"F" => "Failed",
+					"X" => "Disconnected");
+} else {
+	$results = array("sent" => "Sent",
+					"unsent" => "Unsent");
+}
+
+if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view") || CheckFormSubmit($f, "saveview"))
 {
 	if(CheckFormInvalid($f))
 	{
@@ -138,27 +190,34 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
 		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
+		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
 			error('You must enter a number');
+		} else if(GetFormData($f, $s, "radioselect") == "job" && !GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
+			error("You must pick a job");
 		} else {
-			$error=false;
+			if($_SESSION['report']['type'] == "phone"){
+				$options['reporttype'] = "phonedetail";
+			} else {
+				$options['reporttype'] = "emaildetail";
+			}
+				
 			$radio = GetFormData($f, $s, "radioselect");
 			switch($radio){
-				case "1":
+				case "job":
+					unset($options['reldate']);
+					unset($options['startdate']);
+					unset($options['enddate']);
+					unset($options['lastxdays']);
 					$check = GetFormData($f, $s, "check_archived");
 					if($check)
 						$options['jobid'] = GetFormData($f, $s, "jobid_archived");
 					else
 						$options['jobid'] = GetFormData($f, $s, "jobid");
-					if(!$options['jobid']){
-						error("You Must Pick A job");
-						$error = true;
-					}
 					$options['archived'] = $check;
 					break;
-				case "2":
-					unset($options['archived']);
+				case "date":
 					unset($options['jobid']);
+					unset($options['archived']);
 					$options['reldate'] = GetFormData($f, $s, "relativedate");
 			
 					if($options['reldate'] == "xdays"){
@@ -171,50 +230,73 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			}
 			
 			$result = GetFormData($f, $s, "results");
+			
 			if($result)
 				$options['result'] = implode("','", $result);
 			
-			foreach($orders as $order){
-				$options[$order] = GetFormData($f, $s, $order);
+			$savedjobtype = GetFormData($f, $s, "jobtypes");
+			if($savedjobtype)
+				$options['jobtypes'] = implode("','", $savedjobtype);
+			
+			for($i=1; $i<=$ordercount; $i++){
+				$options["order$i"] = GetFormData($f, $s, "order$i");
 			}
+			
+			$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
+			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
+			if ($fieldnum != "") {
+				$type = GetFormData($f,$s,"newruletype");
+
+				if ($type == "text")
+					$logic = "and";
+				else
+					$logic = GetFormData($f,$s,"newrulelogical_$type");
+
+				if ($type == "multisearch")
+					$op = "in";
+				else
+					$op = GetFormData($f,$s,"newruleoperator_$type");
+
+				$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
+				if (count($value) > 0) {
+					$rule = new Rule();
+					$rule->logical = $logic;
+					$rule->op = $op;
+					$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
+					$rule->fieldnum = $fieldnum;
+					if(isset($_SESSION['reportrules']) && is_array($_SESSION['reportrules']))
+						$_SESSION['reportrules'][] = $rule;
+					else
+						$_SESSION['reportrules'] = array($rule);
+					$rule->id = array_search($rule, $_SESSION['reportrules']);
+					
+					$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
+				}
+			}
+			$options['rules'] = implode("||", $options['rules']);
 			foreach($options as $index => $option){
 				if($option == "")
 					unset($options[$index]);
 			}
 			
-			if(isset($_SESSION['report']['type'])){
-				$options['type'] = $_SESSION['report']['type'];
-				if($options['type'] == "phone"){
-				$options['reporttype'] = "calldetail";
-				} else if($options['type'] == "email"){
-					$options['reporttype'] = "emaildetail";
-				}
-			}
-			
 			$_SESSION['report']['options'] = $options;
 			
-			if(!$error && (CheckFormSubmit($f, "save") || CheckFormSubmit($f, "saveview"))){
+			if(CheckFormSubmit($f, "save")){
 				$activefields = array();
-				$fields = array();
 				foreach($fieldlist as $field){
-					$fields[$field->fieldnum] = $field->name;
 					if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
 						$activefields[] = $field->fieldnum;
 					}
 				}
 			
-				$instance->setFields($fields);
-				$instance->setActiveFields($activefields);
-				$instance->setParameters($options);
-				$instance->update();
-				$subscription->reportinstanceid = $instance->id;
-				$subscription->update();
-				$_SESSION['reportid'] = $subscription->id;
-				if(CheckFormSubmit($f, "save"))
-					redirect("reportedit.php?reportid=" . $subscription->id);
+				$options['activefields'] = implode(",",$activefields);
+				$_SESSION['report']['options'] = $options;
+				redirect("reportedit.php");
 			}
-			if(!$error && (CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview") ))
+			if(CheckFormSubmit($f, "view"))
 				redirect("reportjobdetails.php");
+			
+			redirect();
 		}
 	}
 } else {
@@ -225,9 +307,9 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 if($reload){
 	ClearFormData($f, $s);
 	if(!isset($options['reldate']))
-		$radio = 1;
+		$radio = "job";
 	else
-		$radio = 2;
+		$radio = "date";
 	PutFormData($f, $s, "radioselect", $radio);
 	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "today");
 	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
@@ -244,41 +326,68 @@ if($reload){
 	$result = array();
 	$checkbox=0;
 	if(isset($options['result'])){
-		$result = explode("','", $options['result']);
+		if($options['result'] == "undelivered"){
+			$result = array("F", "B", "N", "X");
+		} else {
+			$result = explode("','", $options['result']);
+		}
 		if($result != "")
 			$checkbox = 1;
 	}
 	PutFormData($f, $s, 'result', $checkbox, "bool", 0, 1);
 	PutFormData($f, $s, 'results', $result , "array", array_keys($results));
+	$savedjobtypes = array();
+	if(isset($options['jobtypes'])){
+		$savedjobtypes = explode("','", $options['jobtypes']);
+	}
+	PutFormData($f, $s, 'jobtype', isset($options['jobtypes']) && $options['jobtypes'] !="" ? 1 : 0, "bool", 0, 1);
+	PutFormData($f, $s, 'jobtypes', $savedjobtypes, "array", array_keys($jobtypes));
 	
+	for($i=1;$i<=$ordercount;$i++){
+		$order="order$i";
+		if($i==1){
+			if(!isset($options[$order])){
+				if(isset($_SESSION['reportid']))
+					$orderquery = "";
+				else
+					$orderquery = "rp.pkey";
+			} else
+				$orderquery = $options[$order];
+			PutFormData($f, $s, $order, $orderquery);
+		} else {
+			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
+		}
+	}
 	
-	PutFormData($f, $s, "order1", isset($options['order1']) ? $options['order1'] : "rp.pkey");
-	PutFormData($f, $s, "order2", isset($options['order2']) ? $options['order2'] : "");
-	PutFormData($f, $s, "order3", isset($options['order3']) ? $options['order3'] : "");
-
+	PutFormData($f,$s,"newrulefieldnum","");
+	PutFormData($f,$s,"newruletype","text","text",1,50);
+	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
+	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
+	PutFormData($f,$s,"newruleoperator_text","sw","text",1,50);
+	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:reports";
-$TITLE = "Job Details";
+$TITLE = "Phone Log";
 
 if(isset($_SESSION['report']['type'])){
 	if($_SESSION['report']['type'] == 'email'){
-		$TITLE = "Email Detail";
+		$TITLE = "Email Log";
 	} else if($_SESSION['report']['type'] == 'phone'){
-		$TITLE = "Call Detail";
+		$TITLE = "Phone Log";
 	}
 }
 
 if(isset($_SESSION['reportid']))
-	$TITLE .= " " . $subscription->name;
+	$TITLE .= " - " . $subscription->name;
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons( button('done', "location.href='reports.php'"), submit($f, "save", "save", "save"),
-			isset($_SESSION['reportid']) ? submit($f, "saveview", "saveview", "Save and View") : submit($f, "run", "View Report", "View Report"));
+buttons( button('back', 'window.history.go(-1)'), submit($f, "save", "save/schedule", "save/schedule"),
+			submit($f, "view", "View Report", "View Report"));
 
 //--------------- Select window ---------------
 startWindow("Select", NULL, false);
@@ -292,42 +401,17 @@ startWindow("Select", NULL, false);
 					<td>
 						<table>
 							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "1", "id=\"job\" onclick='hide(\"daterange\"); show(\"jobs\")'");?> Job</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "2", "onclick='hide(\"jobs\"); show(\"daterange\")'");?> Date</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='hide(\"daterange\"); show(\"jobs\")'");?> Job</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='hide(\"jobs\"); show(\"daterange\")'");?> Date</td>
 							</tr>
 						</table>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<table  border="0" cellpadding="3" cellspacing="0" width="100%" id="daterange">
-							<tr><td>Relative Date: </td>
-								<td><?
-									NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
-									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Today', 'today');
-									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Yesterday', 'yesterday');
-									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last Week Day', 'weekday');
-									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Week to date', 'weektodate');
-									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Month to date', 'monthtodate');
-									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last X Days', 'xdays');
-									NewFormItem($f, $s, 'relativedate', 'selectoption', 'Date Range(inclusive)', 'daterange');
-									NewFormItem($f, $s, 'relativedate', 'selectend');
-									
-									?>
-								</td>
-								<td><? NewFormItem($f, $s, 'xdays', 'text', '3', null, "id='xdays'"); ?></td>
-								<td><div id="date"><? NewFormItem($f, $s, "startdate", "text", "20") ?> To: <? NewFormItem($f, $s, "enddate", "text", "20")?></div></td>
-							</tr>
-							<script>
-								if(new getObj("reldate").obj.value!="xdays"){
-									hide("xdays");
-								}
-								if(new getObj("reldate").obj.value!="daterange"){
-									hide("date");
-								
-								}
-							</script>
-						</table>
+<?
+					dateOptions($f, $s, "daterange");
+?>	
 					</td>
 				</tr>
 				<tr>
@@ -338,14 +422,14 @@ startWindow("Select", NULL, false);
 								<?
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 									NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status in ('active','complete','cancelled','cancelling') order by id desc");
+									$jobs = DBFindMany("Job","from job where deleted = 0 and status in ('active','complete','cancelled','cancelling') $userJoin order by id desc");
 							
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
 									}
 									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 and status!='repeating' order by id desc");
+									$jobs = DBFindMany("Job","from job where deleted = 2 and status!='repeating' $userJoin order by id desc");
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 									}
@@ -362,18 +446,56 @@ startWindow("Select", NULL, false);
 			</table>
 		</td>
 	</tr>
-<?
-	if(!isset($_SESSION['report']['type']) || $_SESSION['report']['type'] != 'email'){		
-?>
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter by:</th>
 		<td class="bottomBorder">
-			<table>
+			<table width="100%">
+				<tr>
+					<td>
+						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
+							<tr>
+								<td>
+								<? 
+									if(!isset($_SESSION['reportrules']) || is_null($_SESSION['reportrules']))
+										$_SESSION['reportrules'] = false;
+									
+									$RULES = &$_SESSION['reportrules'];
+									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
+									
+									include("ruleeditform.inc.php");
+								?>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table>
+							<tr valign="top">
+								<td><? NewFormItem($f,$s,"jobtype","checkbox",NULL,NULL,'id="jobtype" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?></td>
+								<td>Job Type: </td>
+								<td>
+									<?
+									NewFormItem($f, $s, 'jobtypes', 'selectmultiple', count($jobtypes), $jobtypes, 'id="jobtypeselect" onmousedown="setChecked(\'jobtype\');"');
+									?>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
 				<tr>
 					<td>
 						<table>
 							<tr valign="top">
 								<td><? NewFormItem($f,$s,"result","checkbox",NULL,NULL,'id="result" onclick="clearAllIfNotChecked(this,\'resultselect\');"'); ?></td>
-								<td>Call Result:</td>
+								<td>
+								<?
+									if((isset($options['reporttype']) && $options['reporttype'] == "emaildetails") || $_SESSION['report']['type']=="email")
+										echo "Status:";
+									else
+										echo "Call Result:"
+								?>
+								</td>
 								<td>
 									<?
 									NewFormItem($f, $s, 'results', 'selectmultiple',  "6", $results, 'id="resultselect" onmousedown="setChecked(\'result\');"');
@@ -383,39 +505,20 @@ startWindow("Select", NULL, false);
 						</table>
 					</td>
 				</tr>
+				
 			</table>
 		</td>
 	</tr>
-<?
-	}
-?>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields</th>
+	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 		<td class="bottomBorder">
 			<? select_metadata(null, null, $fieldlist);?>
 		</td>
 	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader">Sort Order</th>
+	<tr valign="top"><th align="right" class="windowRowHeader">Sort By:</th>
 		<td >
-			<table>
-			<tr>
-		<?
-				foreach($orders as $order){
-?>
-				<td>
 <?
-					NewFormItem($f, $s, $order, 'selectstart');
-					NewFormItem($f, $s, $order, 'selectoption', " -- Not Selected --", "");
-					foreach($ordering as $index => $item){
-						NewFormItem($f, $s, $order, 'selectoption', $index, $item);
-					}	
-					NewFormItem($f, $s, $order, 'selectend');
+			selectOrderBy($f, $s, $ordercount, $ordering);
 ?>
-				</td>
-<?
-			}
-	?>
-				</tr>
-			</table>
 		</td>
 	</tr>
 </table>
