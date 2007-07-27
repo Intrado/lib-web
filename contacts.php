@@ -55,14 +55,7 @@ $reload = 0;
 $ordercount = 3;
 $ordering = ContactsReport::getOrdering();
 
-$fields = DBFindMany("FieldMap", "from fieldmap where options not like '%firstname%' and options not like '%lastname%'");
-foreach($fields as $key => $fieldmap){
-	if(!$USER->authorizeField($fieldmap->fieldnum))
-		unset($fields[$key]);
-}
-
-$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
-$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
 if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
 	unset($_SESSION['contacts']['options']);
