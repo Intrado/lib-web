@@ -43,11 +43,15 @@ $result = Query($query);
 $data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
 
 $x_titles = array();
+$thismonth = date("m", strtotime("now"));
+$x=$thismonth-11;
+if($x < 0)
+	$x=-$x;
 while ($row = DBGetRow($result)) {
-	$data["A"][$row[0]-1] = $row[1];
-	$data["M"][$row[0]-1] = $row[2];
-	$data["B"][$row[0]-1] = $row[3];
-	$data["N"][$row[0]-1] = $row[4];
+	$data["A"][$row[0]+$x] = $row[1];
+	$data["M"][$row[0]+$x] = $row[2];
+	$data["B"][$row[0]+$x] = $row[3];
+	$data["N"][$row[0]+$x] = $row[4];
 }
 
 //var_dump($data);
@@ -57,7 +61,7 @@ $months=array("January", "February", "March", "April", "May", "June", "July", "A
 
 
 $max = 0;
-for ($x = 0; $x < 12; $x++) {
+for ($x = 0; $x <= 11; $x++) {
 
 	foreach (array("A","M","B","N") as $type) {
 		if (!isset($data[$type][$x]))
@@ -68,8 +72,8 @@ for ($x = 0; $x < 12; $x++) {
 	}
 
 	$max = max($max, $data["A"][$x] + $data["M"][$x]);
-
-	$x_titles[$x] = $months[$x];
+	$offset = 11-$x;
+	$x_titles[$x] = date("F", strtotime("-$offset month"));
 }
 
 
@@ -79,7 +83,7 @@ $graph->SetScale("textlin");
 $graph->SetFrame(false);
 
 //$graph->SetShadow();
-$graph->img->SetMargin(40,75,20,70);
+$graph->img->SetMargin(40,80,20,70);
 
 // Create the bar plots
 $b1plot = new BarPlot($data["A"]);
