@@ -26,32 +26,6 @@ if (!$USER->authorize('metadata')) {
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function newfield($f, $s, $name){
-
-	$fieldlist = array("First Name" => FieldMap::getFirstNameField(),
-					"Last Name" => FieldMap::getLastNameField(),
-					"Language" => FieldMap::getLanguageField(),
-					"School" => FieldMap::getSchoolField(),
-					"Grade" => FieldMap::getGradeField());
-
-	$count = 0;
-	foreach($fieldlist as $index => $value){
-		if($value) $count++;
-	}
-	if($count == count($fieldlist)) return true;
-
-	NewFormItem($f, $s, 'predef_name', 'selectstart', NULL, NULL, "onchange=\"predef_name(this.value)\"");
-	NewFormItem($f, $s, 'predef_name', 'selectoption'," -- Select a Category -- ", "");
-	$count = count($fieldlist);
-	foreach($fieldlist as $index => $value){
-		if(!$value){
-			NewFormItem($f, $s, 'predef_name', 'selectoption', $index, $index);
-		}
-	}
-	NewFormItem($f, $s, 'predef_name', 'selectend');
-}
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -76,8 +50,8 @@ if (isset($_GET['clear'])) {
 }
 
 
-$VALID_TYPES = array('text', 'reldate', 'multisearch', 'language', 'grade',
-						'school', 'firstname',  'lastname');
+$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,language', 'multisearch,grade',
+						'multisearch,school', 'text,firstname',  'text,lastname', 'grade', 'school', 'firstname', 'lastname', 'language');
 $FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 $availablefields = array();
 for ($x = 1; $x <= 20; $x++)
@@ -226,8 +200,6 @@ if( $reloadform )
 	PutFormData($form, $section, 'newfield_name', '', 'text', 1, 20, false); // This item is only required on an add operation
 	PutFormData($form, $section, 'newfield_type', 'text', 'text');
 	PutFormData($form, $section, 'newfield_searchable', '1', 'bool');
-	PutFormData($form, $section, 'predef_name', "");
-	PutFormData($form, $section, 'newfield_specialtype', '', 'text');
 
 	PutFormData($form,$section,"newfield_fieldnum","array",$availablefields);
 }
@@ -248,17 +220,29 @@ buttons(submit($form, $section));
 startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;');
 ?>
 
-<table width="50%" cellpadding="3" cellspacing="1" class="list">
+<table cellpadding="3" cellspacing="1" class="list">
 	<tr class="listHeader">
 		<th></th><th>Name</th><th>Type</th><th>Searchable</th><th></th>
 	</tr>
 <?
 	$alt = 0;
-	if (count($FIELDMAPS) > 0) {
-
-		$types = array("Text" => 'text',
+	
+	$types = array("Text" => 'text',
 					"Date" => 'reldate',
 					"List" => 'multisearch');
+
+		if(!FieldMap::getFirstNameField())
+			$types["First Name"] = 'text,firstname';
+		if(!FieldMap::getLastNameField())
+			$types["Last Name"] = 'text,lastname';
+		if(!FieldMap::getLanguageField())
+			$types["Language"] = 'multisearch,language';
+		if(!FieldMap::getSchoolField())
+			$types["School"] = 'multisearch,school';
+		if(!FieldMap::getGradeField())
+			$types["Grade"] = 'multisearch,grade';
+
+	if (count($FIELDMAPS) > 0) {
 
 		foreach ($FIELDMAPS as $field) {
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
@@ -271,7 +255,7 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 ?>
 			</td>
 <?
-			// These 3 items are read-only so display them in the else block
+			// These 5 items are special cases
 			if ($fieldnum != $field->getFirstNameField() &&
 				$fieldnum != $field->getLastNameField() &&
 				$fieldnum != $field->getLanguageField() &&
@@ -293,22 +277,7 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 			} else {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20');?></td>
-<?
-				$type = GetFormData($form, $section, "type_$fieldnum");
-				switch ($type) {
-					case 'multisearch':
-						$type = 'List';
-						break;
-					case 'reldate':
-						$type = 'Date';
-						break;
-					case 'text':
-						$type = 'Text';
-					default:
-						$type = ucfirst($type);
-				}
-?>
-				<td><?=$type ?></td>
+				<td><?=ucfirst(GetFormData($form, $section, "type_$fieldnum")); ?></td>
 				<td><? NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, 'DISABLED');?></td>
 				<td><a href='datamanager.php?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='datamanager.php?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
 <?
@@ -333,7 +302,6 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 		</td>
 		<td>
 <?
-		newfield($form, $section, 'newfield_name');
 		NewFormItem($form, $section, 'newfield_name', 'text',20, '', 'id=newfield');
 ?>
 		</td>
@@ -343,7 +311,6 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 		foreach($types as $text => $type)
 			NewFormItem($form, $section, 'newfield_type', 'selectoption', $text, $type);
 		NewFormItem($form, $section, 'newfield_type', 'selectend');
-		NewFormItem($form, $section, 'newfield_specialtype', 'text', '20', '', 'id=specialtype');
 ?>
 		</td>
 		<td><? NewFormItem($form, $section, 'newfield_searchable', 'checkbox', '', '', 'id=newfield_searchable'); ?> </td>
@@ -356,57 +323,3 @@ buttons();
 EndForm();
 
 include_once("navbottom.inc.php");
-
-////////////////////////////////////////////////////////////////////////////////
-// Scripts
-////////////////////////////////////////////////////////////////////////////////
-?>
-	<script>
-		hide('specialtype');
-
-		function predef_name(name){
-			specialtype = new getObj('specialtype').obj;
-			type = new getObj('newfield_type').obj;
-			type.style.display="none";
-			searchable = new getObj('newfield_searchable').obj;
-			searchable.checked=true;
-			searchable.style.display="none";
-			switch(name){
-				case 'Language':
-					new getObj('newfield').obj.value = 'Language';
-					specialtype.value = 'language';
-					type.value='multisearch';
-					break;
-				case 'Grade':
-					new getObj('newfield').obj.value = 'Grade';
-					specialtype.value = 'grade';
-					type.value='multisearch';
-					break;
-				case 'School':
-					new getObj('newfield').obj.value = 'School';
-					specialtype.value = 'school';
-					type.value='multisearch';
-					break;
-				case 'Last Name':
-					new getObj('newfield').obj.value = 'Last Name';
-					specialtype.value = 'lastname';
-					type.value='text';
-					break;
-				case 'First Name':
-					new getObj('newfield').obj.value = 'First Name';
-					specialtype.value = 'firstname';
-					type.value='text';
-					break;
-				default:
-					new getObj('newfield').obj.value = '';
-					type.value = 'text';
-					type.style.display="block";
-					specialtype.value = '';
-					show('newfield_searchable');
-					break;
-			}
-
-		}
-
-
-	</script>
