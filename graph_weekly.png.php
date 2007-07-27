@@ -25,9 +25,6 @@ $cpcolors = array(
 	"inprogress" => "blue"
 );
 
-
-
-
 $query = "
 select 	dayofweek(date) as dayofweek, 
 				sum(answered)/4 as answered,
@@ -35,13 +32,9 @@ select 	dayofweek(date) as dayofweek,
 				sum(busy)/4 as busy,
 				sum(noanswer)/4 as noanswer
 			from systemstats
-			where date >= date_sub(now(), interval 28 day)
+			where date >= date_sub(now(), interval 4 week)
 			group by dayofweek
 ";
-
-
-
-
 
 $daysofweek = array( 1 => "Sunday", 2 => "Monday", 3 => "Tuesday", 4 => "Wednesday", 5 => "Thursday", 6 => "Friday", 7 => "Saturday");
 
@@ -110,7 +103,7 @@ $gbplot = new AccBarPlot(array($b4plot,$b3plot,$b2plot,$b1plot));
 // ...and add it to the graph
 $graph->Add($gbplot);
 
-$graph->title->Set("By Day of Week (last 28 days)" );
+$graph->title->Set("By Day of Week" );
 $graph->xaxis->SetTickLabels($x_titles);
 $graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos("min");
