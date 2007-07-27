@@ -10,17 +10,17 @@ require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/reportutils.inc.php");
+require_once("inc/reportgeneratorutils.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("inc/date.inc.php");
 require_once("obj/FieldMap.obj.php");
-require_once("obj/SurveyQuestionnaire.obj.php");
-require_once("obj/SurveyQuestion.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/ReportSubscription.obj.php");
 require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
-require_once("obj/SurveyReport.obj.php");
 require_once("obj/JobSummaryReport.obj.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,12 +31,6 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 // Formatters
 ////////////////////////////////////////////////////////////////////////////////
-
-function fmt_survey_graph($row, $index){
-	global $jobid;
-	echo "<div><img src=\"graph_survey_result.png.php?jobid=" . $jobid . "&question=" . ($row[0] -1) . "&valid=".$row[14] ."\"></div>";
-	
-}
 
 function fmt_question($row, $index){
 	return "<div style='text-decoration: underline'>$row[$index]</div>";	
@@ -51,6 +45,24 @@ function fmt_answer($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
+$clear = 0;
+if(isset($_REQUEST['jobid'])){
+	unset($_SESSION['report']);
+	unset($_SESSION['reportid']);
+	$options= array("jobid" => $_REQUEST['jobid']+0,
+					"reporttype" => "jobsummaryreport");
+	$_SESSION['report']['options'] = $options;
+	$clear = 1;
+}
+
+if(isset($_REQUEST['survey'])){
+	$options['survey'] = true;
+	$clear=1;
+}
+
+if($clear)
+	redirect();
 
 $fields = DBFindMany("FieldMap", "from fieldmap where options not like '%firstname%' and options not like '%lastname%'");
 $firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
@@ -67,63 +79,32 @@ if(isset($_REQUEST['reportid'])){
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 
-	$jobid = isset($options['jobid']) ? $options['jobid'] : 0;
-	
-	$activefields = $instance->getActiveFields();
 	foreach($fields as $field){
-		if(in_array($field->fieldnum, $activefields)){
-			$_SESSION['fields'][$field->fieldnum] = true;
-		} else {
-			$_SESSION['fields'][$field->fieldnum] = false;
-		}
+		$_SESSION['fields'][$field->fieldnum] = false;
 	}
-	if($jobid)
-		$job = new Job($jobid);
 	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
+	$_SESSION['report']['options'] = $options;
+	redirect();
 } else {
-	$jobid = 0;
-	$options = array();
-	if (isset($_GET['jobid'])) {
-		$jobid = $_GET['jobid'] + 0;
-		$options["reporttype"] = "jobsummaryreport";
-	} else {
-		$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-		$jobid = isset($options['jobid']) ? $options['jobid'] : 0;
+	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+	$options['reporttype']="jobsummaryreport";
+	if(isset($options['jobid'])){
+		$jobid= $options['jobid'];
 	}
-	
-	if($jobid){
+	if(isset($jobid)){
 		
 		//check userowns or customerowns and viewsystemreports
-		if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
+		if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports')) && customerOwns("job",$jobid)) {
 			redirect('unauthorized.php');
 		}
-		
 		unset($_SESSION['jobstats'][$jobid]);
 		$job = new Job($jobid);
 		$options['jobid'] = $jobid;
-
-		$_SESSION['report']['options'] = $options;
 	}
-	
-	$activefields = array();
-	$fieldlist = array();
-	foreach($fields as $field){
-		// used in html
-		$fieldlist[$field->fieldnum] = $field->name;
-		
-		// used in pdf
-		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-			$activefields[] = $field->fieldnum; 
-		}
-	}
-	
-	$instance = new ReportInstance();
-	$instance->setParameters($options);
-	$subscription = new ReportSubscription();
-	$subscription->createDefaults(fmt_report_name($options['reporttype']));
 }
 
-
+$instance = new ReportInstance();
+$instance->setParameters($options);
 $generator = new JobSummaryReport();
 $generator->reportinstance = $instance;
 $generator->userid = $USER->id;
@@ -145,7 +126,7 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 }
 
 $reload=0;
-$f="jobsurvey";
+$f="job";
 $s="save";
 
 if(CheckFormSubmit($f,$s)){
@@ -161,14 +142,7 @@ if(CheckFormSubmit($f,$s)){
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			$instance->setFields($fieldlist);
-			$instance->setActiveFields($activefields);
-			$instance->setParameters($options);
-			$instance->update();
-			$subscription->reportinstanceid = $instance->id;
-			$subscription->update();
-			$_SESSION['reportid'] = $subscription->id;
-			redirect("reportedit.php?reportid=" . $subscription->id);
+			redirect("reportedit.php");
 		}
 	}
 } else {
@@ -183,19 +157,16 @@ if($reload)
 
 if($generator->format != "html"){
 	if($generator->format == "pdf"){
-		$name = secure_reportname();
+		$name = secure_tmpname("report", ".pdf");
 		$params = createPdfParams($name);
-		$result = $generator->generate($params);
+		session_write_close();
 		
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=$name");
-		header("Content-type: application/pdf");	
-		session_write_close();
-		$fp = fopen($name, "r");
-		while($line = fgets($fp)){
-			echo $line;
-		}
+		header("Content-type: application/pdf");
+		$result = $generator->generate($params);	
+		@readfile($name, "r");
 		unlink($name);
 	} else {
 		$generator->generate();
@@ -203,22 +174,30 @@ if($generator->format != "html"){
 } else {
 	
 	$PAGE = "reports:reports";
-	$TITLE = "Job Summary Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+	$TITLE = "Notification Summary";
+	if(isset($_SESSION['reportid'])){
+		$subscription = new ReportSubscription($_SESSION['reportid']);
+		$TITLE .= " - " . $subscription->name;
+	} else if((isset($jobid) && $jobid)){
+		$TITLE .= " - " . $job->name;
+	}
+	if(isset($options['reldate'])){
+		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
+		$DESCRIPTION = " From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
+	}
 	include_once("nav.inc.php");
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
-	buttons(button('back', 'window.history.go(-1)'),button('done', null, 'reports.php'), submit($f, $s, "save", "save"),button('refresh', 'window.location.reload()'));
+	buttons(button('back', 'window.history.go(-1)'), submit($f, $s, "save/schedule", "save/schedule"),button('refresh', 'window.location.reload()'));
 	
 		startWindow("Related Links", "padding: 3px;");
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr>
 				<td>
-					<a href="reportjobsummary.php?pdf=1">PDF</a>
+					<a href="reportjobsummary.php?pdf=1">PDF</a>&nbsp;|&nbsp;<a href="" onclick="popup('report_graph_hourly.png.php',500,500)"/>Time Distribution</a>&nbsp;|&nbsp;<a href="reportjobdetails.php?result=undelivered"/>Not&nbsp;Contacted</a>
 				</td>
-				<td>
-					<a href="" onclick="popup('report_graph_hourly.png.php',500,500)"/>Time Distribution</a>
-				</td>
+				
 			</tr>
 		</table>
 		<?
