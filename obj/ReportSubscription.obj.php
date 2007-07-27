@@ -86,7 +86,7 @@ class ReportSubscription extends DBMappedObject {
 		$this->type = "notscheduled";
 		$this->userid = $USER->id;
 		$this->description = "";
-		$this->email = "";
+		$this->email = $USER->email;
 	}
 
 }
