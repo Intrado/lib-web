@@ -2,13 +2,21 @@
 include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("obj/Job.obj.php");
+include_once("inc/reportutils.inc.php");
 
 include ("jpgraph/jpgraph.php");
 include ("jpgraph/jpgraph_bar.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-$jobid = $_GET['jobid'] + 0;
+if(isset($_GET['jobid'])){
+	$jobid = $_GET['jobid'] + 0;
+	if(!(userOwns("job", $jobid) || $USER->authorize('viewsystemreports'))){
+		redirect("unauthorized.php");
+	}
+} else if(isset($_GET['startdate']) && isset($_GET['enddate']) && isset($_GET['jobtypes'])){
+	$jobid = implode("", getJobList($_GET['startdate'], $_GET['enddate'], $_GET['jobtypes'], $_GET['surveyonly']));
+}
 
 $jobstats = $_SESSION['jobstats'][$jobid];
 if ($_GET['valid'] != $jobstats['validstamp']){
@@ -24,8 +32,7 @@ $cpcolors = array(
 	"N" => "tan",
 	"X" => "black",
 	"F" => "red",
-	"C" => "yellow",
-	"nullcp" => "blue"
+	"notattempted" => "blue"
 );
 
 $cpcodes = array(
@@ -35,8 +42,7 @@ $cpcodes = array(
 	"N" => "No Answer",
 	"X" => "Disconnect",
 	"F" => "Failed",
-	"C" => "Calling",
-	"nullcp" => "Not Attmp."
+	"notattempted" => "Not Attempted",
 );
 
 $data = array();
@@ -45,7 +51,7 @@ $colors = array();
 $labels = array();
 $count=0;
 foreach($cpcodes as $index => $code){
-	$data = array_fill(0, 8, 0);
+	$data = array_fill(0, 7, 0);
 	$count++;
 	$color = $cpcolors[$index];
 	$data[$count-1] = $phonestats[$index];
@@ -54,16 +60,15 @@ foreach($cpcodes as $index => $code){
 	
 	$barname = "bar" . $count;
 	$$barname = new BarPlot($data);
-	$$barname->setLegend(($legend));
 	$$barname->SetFillColor($color);
 	$$barname->SetAlign('center');
 	$$barname->value->Show();
 }
 
 // New graph with a drop shadow
-$graph = new Graph(700,250,'auto');
+$graph = new Graph(800,250,'auto');
 //$graph->SetShadow();
-$graph->img->SetMargin(40,90,20,50);
+$graph->img->SetMargin(90,90,20,50);
 
 for($i=1;$i<=$count;$i++){
 	$barname = "bar" . $i;
@@ -80,8 +85,6 @@ $graph->SetFrame(false);
 
 // Use built in font
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
-
-$graph->legend->Pos(0.00,0.55,"right","center");
 
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 $graph->yaxis->title->SetFont(FF_FONT1,FS_BOLD);
