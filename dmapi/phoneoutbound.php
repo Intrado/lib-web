@@ -69,6 +69,7 @@ if ($REQUEST_TYPE == "new") {
 					"machine" => "M",
 					"failed" => "F",
 					"busy" => "B",
+					"badnumber" => "X",
 					"noanswer" => "N",
 					"trunkbusy" => "F",
 					);
