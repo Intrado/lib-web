@@ -1,7 +1,7 @@
 <?
 
 
-function reldate ($reldate) {
+function reldate ($reldate, $timestamp = false) {
 	switch($reldate) {
 		default:
 		case "today":
@@ -25,9 +25,47 @@ function reldate ($reldate) {
 
 			$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
 			break;
+		case "weektodate":
+			$targetdate = QuickQuery("select date_sub(curdate(),interval 1 week)");
+			break;
+		case "monthtodate":
+			$targetdate = QuickQuery("select date_sub(curdate(),interval 1 month)");
+			break;
 	}
-	return date("m/d/Y", strtotime($targetdate));
+	if($timestamp)
+		return strtotime($targetdate);
+	else
+		return date("m/d/Y", strtotime($targetdate));
 }
 
 $RELDATE_OPTIONS = array('today' => 'Today', 'yesterday' => 'Yesterday', 'lastweekday' => 'Last Weekday');
+
+function getStartEndDate($type, $arguments = array()){
+	switch($type){
+		case 'today':			
+		case 'lastweekday':					
+		case 'yesterday':
+			$enddate = $startdate = date("Y-m-d", reldate($type, true));
+		case 'weektodate':
+		case 'monthtodate':
+			$startdate = reldate($type, true);
+			$enddate = reldate("today", true);
+			break;					
+		case 'xdays':
+			$lastxdays = $arguments['lastxdays'];
+			$startdate = QuickQuery("select date_sub(curdate(),interval $lastxdays day)");
+			$startdate = strtotime($startdate);
+			$enddate = reldate("today", true);
+			break;
+		case 'daterange':
+			$startdate = strtotime($arguments['startdate']);
+			$enddate = strtotime($arguments['enddate']);
+			break;
+		default:
+			$enddate = $startdate = reldate("today", true);
+			break;
+	}
+	return array($startdate, $enddate);
+
+}
 ?>
