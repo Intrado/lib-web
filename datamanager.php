@@ -220,7 +220,7 @@ buttons(submit($form, $section));
 startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;');
 ?>
 
-<table cellpadding="3" cellspacing="1" class="list">
+<table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">
 		<th></th><th>Name</th><th>Type</th><th>Searchable</th><th></th>
 	</tr>
