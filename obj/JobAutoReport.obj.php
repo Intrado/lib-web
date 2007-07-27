@@ -61,7 +61,6 @@ class JobAutoReport extends ReportGenerator{
 		$searchquery = isset($jobid) ? " and rp.jobid='$jobid'" : " and rp.jobid in ('" . implode("','", $joblist) ."')";
 		$searchquery .= $resultquery;
 		$usersql = $USER->userSQL("rp");
-		$fields = $instance->getFields();
 		$fieldquery = generateFields("rp");
 
 		$this->query = 
