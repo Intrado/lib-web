@@ -4,129 +4,55 @@ class JobDetailReport extends ReportGenerator{
 	
 	function generateQuery(){
 		$USER = new User($this->userid);
-		$instance = $this->reportinstance;
-		$params = $this->params = $instance->getParameters();
-		$this->reporttype = $params['reporttype'];
-		$orders = array("order1", "order2", "order3");
-		$orderquery = "";
-		foreach($orders as $order){
-			if(!isset($params[$order]))
-				continue;
-			$orderby = $params[$order];
-			if($orderby == "") continue;
-			if($orderquery == ""){
-				$orderquery = " order by ";
-			} else {
-				$orderquery .= ", ";
-			}
-			$orderquery .= $orderby;
-		}
-		if($orderquery == ""){
-			$orderquery = " order by rp.pkey ";
-		}
+		$this->params = $this->reportinstance->getParameters();
+		$this->reporttype = $this->params['reporttype'];
 		
-		$rulesql = "";
-		if(isset($params['rules']) && $params['rules']){
-			$rules = explode("||", $params['rules']);
-			foreach($rules as $rule){
-				if($rule) {
-					$rule = explode(";", $rule);
-					$newrule = new Rule();
-					$newrule->logical = $rule[0];
-					$newrule->op = $rule[1];
-					$newrule->fieldnum = $rule[2];
-					$newrule->val = $rule[3];
-					$rulesql .= " " . $newrule->toSql("rp");
-				}
-			}
-		}
+		$orderquery = getOrderSql($this->params);
+		$rulesql = getRuleSql($this->params, "rp");
 		
-		if(isset($params['jobid'])){
-			$joblist = array(DBSafe($params['jobid']));
-		} else {
-			$reldate = $params['reldate'];
-			if($reldate != ""){
-				switch($reldate){
-					case 'today':
-						$targetdate = QuickQuery("select curdate()");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-						
-						break;
-					
-					case 'weekday':
-						//1 = Sunday, 2 = Monday, ..., 7 = Saturday
-						$dow = QuickQuery("select dayofweek(curdate())");
-	
-						//normally go back 1 day
-						$daydiff = 1;
-						//if it is sunday, go back 2 days
-						if ($dow == 1)
-							$daydiff = 2;
-						//if it is monday, go back 3 days
-						if ($dow == 2)
-							$daydiff = 3;
-	
-						$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-						
-						break;
-					case 'yesterday':
-						$targetdate = QuickQuery("select date_sub(curdate(),interval 1 day)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-						
-						break;
-					case 'xdays':
-						$lastxdays = $params['lastxdays'];
-						if($lastxdays == "")
-							$lastxdays = 1;
-						$today = QuickQuery("select curdate()");
-						$targetdate = QuickQuery("select date_sub(curdate(),interval $lastxdays day)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-						
-						break;
-					case 'daterange':
-						
-						$datestart = strtotime($params['startdate']);
-						$dateend = strtotime($params['enddate']);
-						$reldatequery = "and ( (j.startdate >= from_unixtime('$datestart') and j.startdate < date_add(from_unixtime('$dateend'),interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= from_unixtime('$datestart') and j.startdate <= date_add(from_unixtime('$dateend'),interval 1 day) ";
-						break;
-					case 'weektodate':
-						$today = QuickQuery("select curdate()");
-						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 week)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-						break;
-					case 'monthtodate':
-						$today = QuickQuery("select curdate()");
-						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 month)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-						break;
-				}
-			}
-		
-			$joblist = QuickQueryList("select j.id from job j where 1 $reldatequery");
-		}
-		$this->params['joblist'] = $joblist;
-		$resultquery = "";
-		if(isset($params['result']) && $params['result']){
-			$resultquery = " and rc.result in ('" . $params['result'] . "')";
+		$jobtypes = "";
+		if(isset($this->params['jobtypes'])){
+			$jobtypes = $this->params['jobtypes'];
 		}
 		
 		$typequery = "";
-		if(isset($params['type']) && $params['type']){
-			$typequery = " and rp.type = '" . $params['type'] . "'";
+		if($this->params['reporttype'] == "phonedetail"){
+			$typequery = " and rp.type = 'phone'";
+			$this->params['type'] = "phone";
+		} else if($this->params['reporttype'] == "emaildetail"){
+			$typequery = " and rp.type = 'email'";
+			$this->params['type'] = "email";
 		}
 		
-		$searchquery = " and rp.jobid in ('" . implode("','", $joblist) ."')";
+		if(isset($this->params['jobid'])){
+			$joblist = "";
+			$job = new Job($this->params['jobid']);
+			$jobtypesarray = explode("','", $jobtypes);
+			if($jobtypes == "" || in_array($job->jobtypeid, $jobtypesarray)){
+				$joblist = $this->params['jobid'];
+			}
+		} else {
+			$reldate = "today";
+			if(isset($this->params['reldate']))
+				$reldate = $this->params['reldate'];
+			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
+			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, null, isset($this->params['type']) ? array($this->params['type']) : array()));
+		}
+		$this->params['joblist'] = $joblist;
+		
+		$resultquery = "";
+		if(isset($this->params['result']) && $this->params['result']){
+			if($this->params['result'] == "undelivered"){
+				$resultquery = " and rp.status = 'fail' ";
+			} else {
+				$resultquery = " and rc.result in ('" . $this->params['result'] . "')";
+			}
+		}		
+		
+		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
 		$usersql = $USER->userSQL("rp");
-		$fields = $instance->getFields();
+		
 		$fieldquery = generateFields("rp");
 		$this->query = 
 			"select SQL_CALC_FOUND_ROWS
@@ -177,34 +103,14 @@ class JobDetailReport extends ReportGenerator{
 	function runHtml(){
 		
 		$typequery = "";
-		if(isset($this->params['type'])){
+		if(isset($this->params['type']))
 			$typequery = " and rp.type = '" . $this->params['type'] . "'";
+	
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
 		}
-		
-		$joblist = implode("','", $this->params['joblist']);
-		
-		$jobinfoquery = "Select u.login, 
-								j.name, 
-								j.description,
-								coalesce(m.name, sq.name),
-								count(distinct rp.personid),
-								count(*)
-								from reportperson rp
-								left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
-								inner join job j on (rp.jobid = j.id)
-								left join message m on (rp.messageid = m.id)
-								left join surveyquestionnaire sq on (j.questionnaireid = sq.id)
-								inner join user u on (rp.userid = u.id)
-								where rp.jobid in ('$joblist')
-								$typequery
-								group by m.id, sq.id";
-		$jobinforesult = Query($jobinfoquery);
-		$jobinfo = array();
-		while($row = DBGetRow($jobinforesult)){
-			$jobinfo[] = $row;
-		}
-		
-		$fields = $this->reportinstance->getFields();
 		$pagestart = $this->params['pagestart'];
 		print '<br>';
 		$query = $this->query;
@@ -218,41 +124,11 @@ class JobDetailReport extends ReportGenerator{
 		$query = "select found_rows()";
 		$total = QuickQuery($query);
 		
-		startWindow("Report Information", 'padding: 3px;');
-		?>
-			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-					<tr valign="top">
-						<th align="right" class="windowRowHeader">Job Info:</th>
-						<td >
-							<table border="1" cellpadding="2" cellspacing="1" class="list">
-								<tr class="listHeader" align="left" valign="bottom">
-									<th>User</th>
-									<th>Job</th>
-									<th>Description</th>
-									<th>Message</th>
-									<th>People to Contact</th>
-									<th>Total Destinations</th>
-								</tr>
-								<?
-								foreach($jobinfo as $job){
-									//if there is no message, then it is a no contact
-									if($job[3]){
-										?><tr><?
-											foreach($job as $jdata){
-												if($jdata == null)
-													$jdata = "&nbsp";
-												?><td><?=$jdata?></td><?
-											}
-										?></tr><?
-									}
-								}
-								?>
-							</table>
-						</td>
-					</tr>
-			</table>
-		<?
-		endWindow();
+		
+		// DISPLAY
+		
+		displayJobSummary($this->params['joblist']);	
+
 		?><br><?
 		startWindow("Report Details", 'padding: 3px;', false);
 	
@@ -269,7 +145,7 @@ class JobDetailReport extends ReportGenerator{
 						9 => "Last Attempt",
 						10 => "Last Result");
 		$count=16;
-		foreach($fields as $index => $field){
+		foreach($fieldlist as $index => $field){
 			$titles[$count] = $field;
 			$count++;
 		}
@@ -290,7 +166,7 @@ class JobDetailReport extends ReportGenerator{
 			var reportdetailstable = new getObj("reportdetails").obj;
 		<?
 			$count=1;
-			foreach($fields as $index => $field){
+			foreach($fieldlist as $index => $field){
 				?>
 				setColVisability(reportdetailstable, 9+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
@@ -305,9 +181,14 @@ class JobDetailReport extends ReportGenerator{
 	function runCSV(){
 		
 		$query = $this->query;
-		$fieldlist = $this->reportinstance->getFields();
-		$activefields = $this->reportinstance->getActiveFields();
 		$options = $this->params;
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
+		$activefields = $options['activefields'];
+		
 		
 		header("Pragma: private");
 		header("Cache-Control: private");
@@ -392,21 +273,17 @@ class JobDetailReport extends ReportGenerator{
 	}
 	
 	function getReportSpecificParams($params){
-		return $params;
+		$params = array("jobId", $this->params['joblist']);
 	}
 
 	static function getOrdering(){
 		global $USER;
-		$fields = getFieldMaps();
-		$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
-		$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+		$fields = FieldMap::getAuthorizedFieldMaps();
 	
 		$ordering = array();
-		$ordering["Job Name"] = "j.name";
-		$ordering["User Login"] = "u.login";
+		$ordering["Job"] = "j.name";
+		$ordering["Submitted By"] = "u.login";
 		$ordering["ID#"] = "rp.pkey";
-		$ordering[$firstname->name]="rp." . $firstname->fieldnum;
-		$ordering[$lastname->name]="rp." . $lastname->fieldnum;
 		$ordering["Message"]="m.name";
 		$ordering["Destination"]="destination";
 		$ordering["Attempts"] = "attempts";
