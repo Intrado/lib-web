@@ -249,7 +249,7 @@ class JobSummaryReport extends ReportGenerator{
 		$this->reportfile = "jobreport.jasper";
 	}
 	
-	function getReportSpecificParams($params){
+	function getReportSpecificParams(){
 		
 		$params = array("jobId", $this->params['joblist']);
 		return $params;

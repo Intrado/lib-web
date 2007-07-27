@@ -63,6 +63,7 @@ class JobAutoReport extends ReportGenerator{
 		$usersql = $USER->userSQL("rp");
 		$fields = $instance->getFields();
 		$fieldquery = generateFields("rp");
+
 		$this->query = 
 			"select SQL_CALC_FOUND_ROWS
 			rp.pkey,
@@ -107,6 +108,8 @@ class JobAutoReport extends ReportGenerator{
 			$rulesql
 			$orderquery
 			";
+
+			
 	}
 
 	
@@ -114,8 +117,8 @@ class JobAutoReport extends ReportGenerator{
 		$this->reportfile = "jobautoreport.jasper";
 	}
 	
-	function getReportSpecificParams($params){
-		$params['jobId'] = new XML_RPC_VALUE($this->params['jobid'], "string");
+	function getReportSpecificParams(){
+		$params = array("jobId", $this->params['jobid']);
 		return $params;
 	}
 }
