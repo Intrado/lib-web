@@ -149,6 +149,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
+			
 			if(CheckFormSubmit($f, "showall")){
 				$options = array('reporttype' => "contacts");
 				for($i=1; $i<=$ordercount; $i++){
@@ -158,47 +159,53 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 				$_SESSION['contacts']['options'] = $options;
 				redirect();
 			} else {
-				unset($options['showall']);
 				$options['reporttype']="contacts";
-				$options['personid'] = GetFormData($f, $s, 'personid');
-				$options['phone']= GetFormData($f, $s, 'phone');
-				$options['email'] = GetFormData($f, $s, 'email');
+				unset($options['showall']);
+				if(GetFormData($f, $s, "radioselect") == "person"){
+					unset($options['rules']);
+					$options['personid'] = GetFormData($f, $s, 'personid');
+					$options['phone']= GetFormData($f, $s, 'phone');
+					$options['email'] = GetFormData($f, $s, 'email');
+				} else {
+					unset($options['personid']);
+					unset($options['phone']);
+					unset($options['email']);
+					$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
+					$fieldnum = GetFormData($f,$s,"newrulefieldnum");
+					if ($fieldnum != "") {
+						$type = GetFormData($f,$s,"newruletype");
+		
+						if ($type == "text")
+							$logic = "and";
+						else
+							$logic = GetFormData($f,$s,"newrulelogical_$type");
+		
+						if ($type == "multisearch")
+							$op = "in";
+						else
+							$op = GetFormData($f,$s,"newruleoperator_$type");
+		
+						$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
+						if (count($value) > 0) {
+							$rule = new Rule();
+							$rule->logical = $logic;
+							$rule->op = $op;
+							$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
+							$rule->fieldnum = $fieldnum;
+							if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
+								$_SESSION['contactrules'][] = $rule;
+							else
+								$_SESSION['contactrules'] = array($rule);
+							$rule->id = array_search($rule, $_SESSION['contactrules']);
+							
+							$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
+						}
+					}
+					$options['rules'] = implode("||", $options['rules']);
+				}
 				for($i=1; $i<=$ordercount; $i++){
 					$options["order$i"] = GetFormData($f, $s, "order$i");
 				}
-				
-				$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
-				$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-				if ($fieldnum != "") {
-					$type = GetFormData($f,$s,"newruletype");
-	
-					if ($type == "text")
-						$logic = "and";
-					else
-						$logic = GetFormData($f,$s,"newrulelogical_$type");
-	
-					if ($type == "multisearch")
-						$op = "in";
-					else
-						$op = GetFormData($f,$s,"newruleoperator_$type");
-	
-					$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-					if (count($value) > 0) {
-						$rule = new Rule();
-						$rule->logical = $logic;
-						$rule->op = $op;
-						$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-						$rule->fieldnum = $fieldnum;
-						if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
-							$_SESSION['contactrules'][] = $rule;
-						else
-							$_SESSION['contactrules'] = array($rule);
-						$rule->id = array_search($rule, $_SESSION['contactrules']);
-						
-						$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
-					}
-				}
-				$options['rules'] = implode("||", $options['rules']);
 				foreach($options as $index => $option){
 					if($option == "")
 						unset($options[$index]);
@@ -217,9 +224,9 @@ if($reload){
 	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
 	
 	if(isset($options['personid']) || isset($options['phone']) || isset($options['email']))
-		$radio = 2;
+		$radio = "person";
 	else
-		$radio = 1;
+		$radio = "criteria";
 	PutFormData($f, $s, "radioselect", $radio);
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
@@ -264,8 +271,8 @@ startWindow("Contact Search", "padding: 3px;");
 					<td>
 						<table>
 							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "1", "onclick='hide(\"singleperson\"); show(\"searchcriteria\")'");?> By Criteria</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "2", "onclick='hide(\"searchcriteria\"); show(\"singleperson\")'");?> By Person</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "criteria", "onclick='hide(\"singleperson\"); show(\"searchcriteria\")'");?> By Criteria</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "person", "onclick='hide(\"searchcriteria\"); show(\"singleperson\")'");?> By Person</td>
 							</tr>
 						</table>
 					</td>
