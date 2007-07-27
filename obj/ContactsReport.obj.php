@@ -5,53 +5,27 @@ class ContactsReport extends ReportGenerator {
 	function generateQuery(){
 		global $USER;
 		
-		$instance = $this->reportinstance;
-		$params = $this->params = $instance->getParameters();
-		$this->reporttype = $params['reporttype'];
-		$orders = array("order1", "order2", "order3");
-		$orderquery = "";
-		foreach($orders as $order){
-			if(!isset($params[$order]))
-				continue;
-			$orderby = $params[$order];
-			if($orderby == "") continue;
-			if($orderquery == ""){
-				$orderquery = " order by ";
-			} else {
-				$orderquery .= ", ";
-			}
-			$orderquery .= $orderby;
-		}
-		$rulesql = "";
-		if(isset($params['rules']) && $params['rules']){
-			$rules = explode("||", $params['rules']);
-			foreach($rules as $rule){
-				if($rule) {
-					$rule = explode(";", $rule);
-					$newrule = new Rule();
-					$newrule->logical = $rule[0];
-					$newrule->op = $rule[1];
-					$newrule->fieldnum = $rule[2];
-					$newrule->val = $rule[3];
-					$rulesql .= " " . $newrule->toSql("p");
-				}
-			}
-		}
+		$this->params = $this->reportinstance->getParameters();
+		$this->reporttype = $this->params['reporttype'];
+		
+		$orderquery = getOrderSql($this->params);
+		$rulesql = getRuleSql($this->params, "p");
+		
 		$usersql = $USER->userSQL("p");
 		$phonequery="";
 		$emailquery="";
+		$personquery="";
 		if(isset($params['phone'])){
-			$phonequery = $params['phone'] ? " and ph.phone like '%" . DBSafe($params['phone']) . "%'" : "";
+			$phonequery = $this->params['phone'] ? " and ph.phone like '%" . DBSafe($this->params['phone']) . "%'" : "";
 		} 
 		if(isset($params['email'])){
-			$emailquery = $params['email'] ? " and e.email like '%" . DBSafe($params['email']) . "%'" : "";
+			$emailquery = $this->params['email'] ? " and e.email like '%" . DBSafe($this->params['email']) . "%'" : "";
 		}
 		if(isset($params['personid'])){
-			$emailquery = $params['personid'] ? " and p.pkey like '%" . DBSafe($params['personid']) . "%'" : "";
+			$personquery = $this->params['personid'] ? " and p.pkey like '%" . DBSafe($this->params['personid']) . "%'" : "";
 		}
-		if($orderquery == "")
-			$orderquery = "order by p.id";
-		$fieldquery = generateFields("p");	
+		$fieldquery = generateFields("p");
+		
 		$this->query = "select SQL_CALC_FOUND_ROWS
 					p.pkey as pkey, 
 					p.id as pid,
@@ -66,15 +40,13 @@ class ContactsReport extends ReportGenerator {
 						) as address
 					$fieldquery	
 					from person p
-					left join address a on (a.personid = p.id) " .
-					
-					(($phonequery !="") ? " left join phone ph on (ph.personid = p.id) " : "") .
-					
-					(($emailquery != "") ? " left join email e on (e.personid = p.id) " : "") .
-					
-					" where 1
+					left join address a on (a.personid = p.id)
+					left join phone ph on (ph.personid = p.id)
+					left join email e on (e.personid = p.id)
+					where 1
 					$phonequery
 					$emailquery
+					$personquery
 					$usersql
 					$rulesql
 					group by p.id
@@ -82,36 +54,28 @@ class ContactsReport extends ReportGenerator {
 					";
 	}
 
-	function runHtml($params = null){
+	function runHtml(){
 
-		$fieldlist = $this->reportinstance->getFields();
-		$activefields = $this->reportinstance->getActiveFields();
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
 		$fieldcount = count($fieldlist);
-		$options = $this->params;
 		$query = $this->query;
-		$pagestart = isset($options['pagestart']) ? $options['pagestart'] : 0;
+	
+		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
 		$query .= "limit $pagestart, 500";
 		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
 		$personlist = array();
 		$emaillist = array();
 		$phonelist = array();
+		//fetch data with main query and populate arrays using personid as the key
 		while($row = DBGetRow($result)){
 			$personlist[$row[1]] = $row;
-			$phoneresult = Query("Select sequence, phone from phone where personid = '$row[1]' order by sequence");
-			while($phonerow = DBGetRow($phoneresult)){
-				if(!isset($phonelist[$row[1]]) || !is_array($phonelist[$row[1]])){
-					$phonelist[$row[1]] = array();
-				}
-				$phonelist[$row[1]][] = $phonerow;
-			}
-			$emailresult = Query("Select sequence, email from email where personid = '$row[1]' order by sequence");
-			while($emailrow = DBGetRow($emailresult)){
-				if(!isset($emaillist[$row[1]]) || !is_array($emaillist[$row[1]])){
-					$emaillist[$row[1]] = array();
-				}
-				$emaillist[$row[1]][] = $emailrow;
-			}
+			$phonelist[$row[1]] = DBFindMany("Phone", "from phone where personid = '$row[1]'");
+			$emaillist[$row[1]] = DBFindMany("Email", "from email where personid = '$row[1]'");
 		}
 		
 		startWindow("Search Results", "padding: 3px;");
@@ -155,15 +119,21 @@ class ContactsReport extends ReportGenerator {
 						$first=true;
 						if(isset($phonelist)){
 							foreach($phonelist[$id] as $phone){
-								if($phone[1] == ""){
+								if($phone->phone == ""){
 									continue;
 								}
 								if(!$first) {
 									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-									?><td></td><td></td><td></td><td></td><?
+									?>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									<?
 								}
 								?>
-								<td><?=$phone[0]+1?></td><td><?=fmt_phone_contact($phone[1])?></td>
+									<td><?=$phone->sequence+1?></td>
+									<td><?=Phone::format($phone->phone)?></td>
 								<?
 								if($first){
 									$first = false;
@@ -190,14 +160,21 @@ class ContactsReport extends ReportGenerator {
 						}
 						if(isset($emaillist[$id])){
 							foreach($emaillist[$id] as $email){
-								if($email[1] == ""){
+								if($email->email == ""){
 									continue;
 								}
 								if(!$first) {
 									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-									?><td></td><td></td><td></td><td></td><?
+									?>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									<?
 								}
-								?><td><?=$email[0] +1?></td><td><?=$email[1]?></td>
+								?>
+									<td><?=$email->sequence+1?></td>
+									<td><?=$email->email?></td>
 								<? 
 								if($first){
 									$first = false;
@@ -242,10 +219,10 @@ class ContactsReport extends ReportGenerator {
 			</script>
 		<?
 		showPageMenu($total,$pagestart,500);
-		endWindow();	
+		endWindow();
 	}
 	
-	function runCSV($options){
+	function runCSV(){
 		echo "Not ready yet";
 	}
 	
@@ -259,19 +236,15 @@ class ContactsReport extends ReportGenerator {
 	
 	static function getOrdering(){
 		global $USER;
-		$fields = getFieldMaps();
-		$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
-		$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+		$fields = FieldMap::getAuthorizedFieldMaps();
 	
 		$ordering = array();
-		$ordering["ID#"] = "pkey";
-		$ordering[$firstname->name] = "p." . $firstname->fieldnum;
-		$ordering[$lastname->name]="p." . $lastname->fieldnum;
-		$ordering["Address"] = "address";
-		
+		$ordering["ID#"] = "p.pkey";
+
 		foreach($fields as $field){
 			$ordering[$field->name]= "p." . $field->fieldnum;
 		}
+		$ordering["Address"] = "address";
 		return $ordering;
 	}
 }
