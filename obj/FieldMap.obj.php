@@ -77,11 +77,21 @@ class FieldMap extends DBMappedObject {
 				unset($fieldmaps[$key]);
 		return $fieldmaps;
 	}
+	
+	static function getOptionalAuthorizedFieldMaps(){
+		$fieldmaps = FieldMap::getAuthorizedFieldMaps();
+		foreach($fieldmaps as $index => $fieldmap){
+			if($fieldmap->isOptionEnabled("firstname") || $fieldmap->isOptionEnabled("lastname")){
+				unset($fieldmaps[$index]);
+			}
+		}
+		return $fieldmaps;
+	}
 
 	static function getName ($fieldnum) {
 		global $USER;
-		$query = "select name from fieldmap"
-				." and fieldnum = '$fieldnum'";
+		$query = "select name from fieldmap where "
+				." fieldnum = '$fieldnum'";
 		return QuickQuery($query);
 	}
 
