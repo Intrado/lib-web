@@ -43,6 +43,10 @@ if(CheckFormSubmit($f, $s)){
 					$mess = new Message($message);
 					$mess->name = GetFormData($f,$s,"message ".$key);
 					$mess->update();
+					$messagepart = DBFind("MessagePart", "from messagepart where messageid = '$mess->id'");
+					$audio = new AudioFile($messagepart->audiofileid);
+					$audio->name = GetformData($f, $s, "message ".$key);
+					$audio->update();
 				}
 			}
 		} else if($specialtask->getData("origin") == "audio") {
