@@ -15,10 +15,10 @@ class ReportGenerator {
 		$this->generateQuery();
 		switch($this->format){
 			case 'html':
-				$this->runHtml($options);
+				$this->runHtml();
 				break;
 			case 'csv':
-				$this->runCSV($options);
+				$this->runCSV();
 				break;
 			case 'pdf':
 				$this->setReportFile();
@@ -29,31 +29,38 @@ class ReportGenerator {
 	}
 
 	function runPDF($options){
-
+		global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
 		$instance = $this->reportinstance;
 		$xmlparams = array();
 		$xmlparams[] = new XML_RPC_Value($this->reportfile, 'string');
-		$xmlparams[] = new XML_RPC_Value($options['host'], 'string');
-		$xmlparams[] = new XML_RPC_Value($options['user'], 'string');
-		$xmlparams[] = new XML_RPC_Value($options['pass'], 'string');
+		$xmlparams[] = new XML_RPC_Value("jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME, 'string');
+		$xmlparams[] = new XML_RPC_Value($_DBUSER, 'string');
+		$xmlparams[] = new XML_RPC_Value($_DBPASS, 'string');
 		$xmlparams[] = new XML_RPC_Value($this->query, 'string');
 
 		$timeoffset = QuickQuery("select value from setting where name = 'timezone'");
 		$timeoffsetquery = "set time_zone = '$timeoffset'";
 		$xmlparams[] = new XML_RPC_Value($timeoffsetquery, 'string');
 
-		$fieldlist = $instance->getFields();
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
 		$params = array();
 		foreach($fieldlist as $index => $title){
 			$newindex = preg_replace("{f}", "flex_title_", $index);
 			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
 		}
-		$params = $this->getReportSpecificParams($params);
+		$specificparams = $this->getReportSpecificParams();
+		foreach($specificparams as $index => $value){
+			$params[$index] = new XML_RPC_VALUE($value, 'string');
+		}
 		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
 		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 
-		$activefields = $instance->getActiveFields();
+		$activefields = $this->params['activefields'];
 		$active = array();
 		foreach($activefields as $index){
 			$newindex = preg_replace("{f}", "", $index);
