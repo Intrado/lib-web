@@ -143,7 +143,7 @@ startWindow("Confirmation &amp; Submit");
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td class="bottomBorder" width="30%" >Name</td>
+					<td class="bottomBorder" width="30%" >Job Name</td>
 					<td class="bottomBorder" ><?= htmlentities($job->name); ?></td>
 				</tr>
 				<tr>
