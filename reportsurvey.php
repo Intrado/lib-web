@@ -57,10 +57,6 @@ if(isset($_SESSION['reportid'])){
 	$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 	$options['reporttype'] = "surveyreport";
 	$_SESSION['saved_report'] = false;
-	
-	$subscription = new ReportSubscription();
-	$subscription->createDefaults(fmt_report_name($options['reporttype']));
-	$instance = new ReportInstance();
 }
 
 $_SESSION['report']['options'] = $options;
@@ -70,7 +66,7 @@ $reload=0;
 $f="reports";
 $s="jobs";
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview"))
+if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run"))
 {
 	if(CheckFormInvalid($f))
 	{
@@ -82,38 +78,23 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		MergeSectionFormData($f, $s);
 		//do check
 		
-		$datestart = GetformData($f, $s, "datestart");
-		$dateend = GetFormData($f, $s, "dateend");
-		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if(!GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
+			error('You must pick a survey');
 		} else {
-			$error=false;
 
 			$check = GetFormData($f, $s, "check_archived");
 			if($check)
 				$options['jobid'] = GetFormData($f, $s, "jobid_archived");
 			else
 				$options['jobid'] = GetFormData($f, $s, "jobid");
-			if(!$options['jobid']){
-				error("You Must Pick A job");
-				$error = true;
-			}
 			$options['archived'] = $check;		
 			$_SESSION['report']['options'] = $options;
-			if(!$error && CheckFormSubmit($f, "run"))
+			if(CheckFormSubmit($f, "run"))
 				redirect("reportsurveysummary.php");
-			if(!$error && (CheckFormSubmit($f, "save") || CheckFormSubmit($f, "saveview"))){
-				$instance->setParameters($options);
-				$instance->update();
-				$subscription->reportinstanceid = $instance->id;
-				$subscription->update();
-				$_SESSION['reportid'] = $subscription->id;
-				if(CheckFormSubmit($f, "save"))
-					redirect("reportedit.php?reportid=" . $subscription->id);
-			}
-			if(!$error && (CheckFormSubmit($f, "run") || CheckFormSubmit($f, "saveview")))
-				redirect("reportsurveysummary.php");
+			if((CheckFormSubmit($f, "save")))
+				redirect("reportedit.php");
 		}
 	}
 } else {
@@ -131,8 +112,6 @@ if($reload){
 		PutFormData($f, $s, "jobid_archived", "");
 	}
 	PutFormData($f, $s, "check_archived", isset($options['archived']) ? $options['archived'] : 0, "bool", "0", "1");
-	
-
 }
 
 
@@ -145,8 +124,8 @@ $TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "")
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons( button('done', "location.href='reports.php'"), submit($f, "save", "save", "save"),
-			isset($_SESSION['reportid']) ? submit($f, "saveview", "saveview", "Save and View") : submit($f, "run", "View Report", "View Report"));
+buttons(button('back', 'window.history.go(-1)'), submit($f, "save", "save/schedule", "save/schedule"),
+		submit($f, "run", "View Report", "View Report"));
 
 
 //--------------- Select window ---------------
@@ -164,14 +143,14 @@ startWindow("Select", NULL, false);
 						<td width="1%">
 						<?
 							NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
-							NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
+							NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Survey --", "");
 							$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null order by id desc");
 					
 							foreach ($jobs as $job) {
 								NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
 							}
 							NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
-							NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
+							NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Survey --", "");
 							$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null order by id desc");
 							foreach ($jobs as $job) {
 								NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
