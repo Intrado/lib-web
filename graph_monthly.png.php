@@ -106,13 +106,14 @@ $gbplot->SetWidth(0.7);
 // ...and add it to the graPH
 $graph->Add($gbplot);
 
-$graph->title->Set("By Month");
+$graph->title->Set("Monthly");
 $graph->xaxis->SetTickLabels($x_titles);
 $graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos("min");
 $graph->yaxis->title->Set("");
 $graph->yaxis->HideFirstTickLabel();
 $graph->yaxis->SetTextLabelInterval($big ? 3 : 2);
+$graph->legend->Pos(0.00,0.25,"right","center");
 
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 $graph->yaxis->title->SetFont(FF_FONT1,FS_BOLD);
