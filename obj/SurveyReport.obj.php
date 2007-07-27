@@ -39,7 +39,7 @@ class SurveyReport extends ReportGenerator{
 		}
 	}
 	
-	function runHtml($params=null){
+	function runHtml(){
 		//////////////////////////////////////
 		// Processing
 		//////////////////////////////////////
@@ -286,8 +286,12 @@ class SurveyReport extends ReportGenerator{
 		
 			where rp.jobid = '$jobid'";
 			
-		$fieldlist = $this->reportinstance->getFields();
-		$activefields = $this->reportinstance->getActiveFields();
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
+		$activefields = $options['activefields'];
 		
 		
 		header("Pragma: private");
@@ -374,8 +378,8 @@ class SurveyReport extends ReportGenerator{
 	
 	
 
-	function getReportSpecificParams($params){
-		$params['jobid'] = new XML_RPC_VALUE($this->params['jobid'], "string");
+	function getReportSpecificParams(){
+		$params = array("jobId", $this->params['jobid']);
 		return $params;
 	}
 
