@@ -197,17 +197,15 @@ startWindow('Import Information ');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Automated upload:<br><? print help('ImportEditor_AutomatedUpload', NULL, 'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">*Automated upload:<br><? print help('ImportEditor_AutomatedUpload', NULL, 'grey'); ?></th>
 		<td class="bottomBorder">
 			<table border="0" cellspacing="0" cellpadding="2">
-				<tr><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox'); ?>Import when uploaded</td></tr>
-				<tr><td> Automatically run data import when upload completes. <br>[Uncheck this box when configuring import mapping or changing data fields.]</td>
-				</tr>
+				<tr><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox'); ?> Automatically run data import when upload completes. <br>[Uncheck this box when configuring import mapping or changing data fields.]</td></tr>
 			</table>
 		</td>
 	</tr>
 	<tr>
-		<th align="right" class="windowRowHeader">Associated Jobs:<br><? print help('ImportEditor_AssociatedJobs', NULL, 'grey'); ?></th>
+		<th align="right" class="windowRowHeader">*Associated Jobs:<br><? print help('ImportEditor_AssociatedJobs', NULL, 'grey'); ?></th>
 		<td >
 <?
 			if(count($repeatingjobs)==0){
@@ -236,7 +234,7 @@ startWindow('Import Information ');
 </table>
 <?
 endWindow();
-?><br><div style="margin-left: 10px;"><img src="img/bug_important.gif">[Note: This option does not apply to data files that are manually uploaded using the Browse option.]</div><?
+?><br><div style="margin-left: 10px;">[*Note: This option does not apply to data files that are manually uploaded using the Browse option.]</div><?
 buttons();
 EndForm();
 
