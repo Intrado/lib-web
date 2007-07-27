@@ -54,6 +54,7 @@ if(CheckFormSubmit($f,$s))
 			$name = GetFormData($f,$s,"name");
 			if($name == "")
 				$name = "Call Me - " . date("M d, Y G:i:s");
+			$name = trim($name);
 			$task->setData('name', $name);
 			$task->setData('origin', GetFormData($f,$s,"origin"));
 			$task->setData('userid', $USER->id);
