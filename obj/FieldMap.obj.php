@@ -71,7 +71,7 @@ class FieldMap extends DBMappedObject {
 
 	static function getAuthorizedFieldMaps () {
 		global $USER;
-		$fieldmaps = DBFindMany("FieldMap", "from fieldmap");
+		$fieldmaps = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 		foreach($fieldmaps as $key => $fieldmap)
 			if(!$USER->authorizeField($fieldmap->fieldnum))
 				unset($fieldmaps[$key]);
