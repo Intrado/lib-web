@@ -60,7 +60,7 @@ class ReportGenerator {
 		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 
-		$activefields = $this->params['activefields'];
+		$activefields = isset($this->params['activefields']) ? $this->params['activefields'] : array();
 		$active = array();
 		foreach($activefields as $index){
 			$newindex = preg_replace("{f}", "", $index);
