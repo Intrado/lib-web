@@ -32,7 +32,7 @@ $query = "select 	hour,
 				sum(busy)/30 as busy,
 				sum(noanswer)/30 as noanswer
 			from systemstats
-			where date > date_sub(now(),interval 28 day)
+			where date > date_sub(now(),interval 4 week)
 			group by hour
 ";
 
@@ -102,13 +102,15 @@ $gbplot->SetWidth(0.7);
 // ...and add it to the graPH
 $graph->Add($gbplot);
 
-$graph->title->Set("By Time of Day (last 28 Days)");
+$graph->title->Set("By Time of Day");
 $graph->xaxis->SetTickLabels($x_titles);
 $graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos("min");
 $graph->yaxis->title->Set("");
 $graph->yaxis->HideFirstTickLabel();
 $graph->yaxis->SetTextLabelInterval($big ? 3 : 2);
+$graph->legend->Pos(0.00,0.25,"right","center");
+
 
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 $graph->yaxis->title->SetFont(FF_FONT1,FS_BOLD);
