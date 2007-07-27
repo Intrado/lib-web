@@ -3,8 +3,7 @@
 class ContactsReport extends ReportGenerator {
 
 	function generateQuery(){
-		global $USER;
-		
+		global $USER;;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
 		
@@ -15,13 +14,13 @@ class ContactsReport extends ReportGenerator {
 		$phonequery="";
 		$emailquery="";
 		$personquery="";
-		if(isset($params['phone'])){
+		if(isset($this->params['phone'])){
 			$phonequery = $this->params['phone'] ? " and ph.phone like '%" . DBSafe($this->params['phone']) . "%'" : "";
 		} 
-		if(isset($params['email'])){
+		if(isset($this->params['email'])){
 			$emailquery = $this->params['email'] ? " and e.email like '%" . DBSafe($this->params['email']) . "%'" : "";
 		}
-		if(isset($params['personid'])){
+		if(isset($this->params['personid'])){
 			$personquery = $this->params['personid'] ? " and p.pkey like '%" . DBSafe($this->params['personid']) . "%'" : "";
 		}
 		$fieldquery = generateFields("p");
@@ -226,7 +225,7 @@ class ContactsReport extends ReportGenerator {
 		echo "Not ready yet";
 	}
 	
-	function getReportSpecificParams($params){
+	function getReportSpecificParams(){
 		return $params;
 	}
 	
