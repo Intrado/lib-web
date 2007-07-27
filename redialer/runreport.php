@@ -35,6 +35,8 @@ require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../inc/reportutils.inc.php");
+require_once("../obj/Access.obj.php");
+require_once("../obj/Permission.obj.php");
 require_once("XML/RPC.php");
 
 if($type == "subscription"){
@@ -60,6 +62,7 @@ if($type == "subscription"){
 			$generator = new JobDetailReport();
 			break;
 	}
+	$USER = new User($subscription->userid);
 	$generator->userid = $subscription->userid;
 } else if($type == "job"){
 	$instance = new ReportInstance();
@@ -74,10 +77,11 @@ if($type == "subscription"){
 	}
 	$options['jobid'] = $id;
 	$instance->setParameters($options);
+	$USER = new User($job->userid);
 	$generator->userid = $job->userid;
 }
 
-
+$_SESSION['access'] = new Access($USER->accessid);
 
 if(!isset($generator)){
 	exit("Bad report type, corresponding generator not found\n");
