@@ -403,16 +403,18 @@ function fmt_response_count($obj, $name) {
 		return "<div id=" . $obj->id . ">" . $played . "/". $total . "</div>";
 }
 
-function fmt_report_name($string){
+function report_name($string){
 	switch($string){
 		case 'jobsummaryreport':
-			return "Job Summary";
+			return "Notification Summary";
+		case 'surveynotification':
+			return "Survey Notification Summary";
 		case 'jobdetailreport':
 			return "Job Details";
-		case 'calldetail':
-			return "Call Detail";
+		case 'phonedetail':
+			return "Phone Log";
 		case 'emaildetail':
-			return "Email Detail";
+			return "Email Log";
 		case 'undelivered':
 			return "Undelivered";
 		case 'emergency':
@@ -420,58 +422,67 @@ function fmt_report_name($string){
 		case 'attendance':
 			return "Attendance";
 		case 'surveyreport':
-			return "Survey";
+			return "Survey Results";
 		case 'contacthistory':
 			return "Contact history";
+		case 'notcontacted':
+			return "Not Contacted";
 		default:
 			return $string;
 	}
 }
 
 function fmt_result ($row,$index) {
-	if ($row[5] == "phone") {
-		switch($row[$index]) {
-			case "A":
-				return "Answered";
-			case "M":
-				return "Machine";
-			case "B":
-				return "Busy";
-			case "N":
-				return "No Answer";
-			case "X":
-				return "Disconnect";
-			case "F":
-				return "Failed";
-			case "C":
-				return "In Progress";
-			case "blocked":
-				return "Blocked";
-			case "duplicate":
-				return "Duplicate";
-			case "nocontacts":
-				return "No Contact";
-			default:
-				return "";
-		}
-	} else {
-		if ($row[10] == "success")
-			return "Success";
-		else if ($row[10] == "fail")
+	switch($row[$index]) {
+		case "A":
+			return "Answered";
+		case "M":
+			return "Machine";
+		case "B":
+			return "Busy";
+		case "N":
+			return "No Answer";
+		case "X":
+			return "Disconnect";
+		case "F":
 			return "Failed";
-		else if ($row[10] == "duplicate")
-			return "Duplicate";
-		else if($row[10] == "blocked")
+		case "C":
+			return "In Progress";
+		case "blocked":
 			return "Blocked";
-		else if($row[10] == "nocontacts")
+		case "duplicate":
+			return "Duplicate";
+		case "nocontacts":
 			return "No Contact";
-		else if($row[10] == "sent")
+		case "Sent":
 			return "Sent";
-		else if($row[10] == "unsent")
+		case "unent":
 			return "Unsent";
-		else
-			return $row[10];
+		default:
+			return ucfirst($row[$index]);
 	}
 }
+
+function display_rel_date($string, $arg1="", $arg2=""){
+	switch($string){
+		case 'today':
+			return "Today";
+		case 'yesterday':
+			return "Yesterday";
+		case 'lastweekday':
+			return "Last Week Day";
+		case 'weektodate':
+			return "Week to Date";
+		case 'monthtodate':
+			return "Month to Date";
+		case 'xdays':
+			return "Last $arg1 days";
+		case 'daterange':
+			return date("M d, Y", strtotime($arg1)) . " To: " . date("M d, Y", strtotime($arg2));
+		default:
+			return $string;
+	}
+}
+
 
 ?>
