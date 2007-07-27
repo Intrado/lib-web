@@ -35,16 +35,13 @@ function runReport($subscription){
 	switch($options['reporttype']){
 		case "surveyreport":
 			redirect("reportsurveysummary.php?reportid=$subscription->id");
+		case "surveynotification":
 		case "jobsummaryreport":
 			redirect("reportjobsummary.php?reportid=$subscription->id");
-		case "calldetail":
+		case "phonedetail":
 		case "emaildetail":
-		case "jobdetailreport":
+		case "notcontacted":
 			redirect("reportjobdetails.php?reportid=$subscription->id");
-		case "emergency":
-		case "attendance":
-		case "callsreport":
-			redirect("reportcallsresult.php?reportid=$subscription->id");
 	}
 }
 
@@ -54,11 +51,12 @@ function editReport($subscription){
 	switch($options['reporttype']){
 		case "surveyreport":
 			redirect("reportsurvey.php?reportid=$subscription->id");
+		case "surveynotification":
 		case "jobsummaryreport":
-			redirect("reportjob.php?reportid=$subscription->id");
-		case "calldetail":
+			redirect("reportjobsearch.php?reportid=$subscription->id");
+		case "phonedetail":
 		case "emaildetail":
-		case "jobdetailreport":
+		case "notcontacted":
 			redirect("reportjobdetailsearch.php?reportid=$subscription->id");
 		case "emergency":
 		case "attendance":
