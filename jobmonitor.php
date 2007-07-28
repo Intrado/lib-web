@@ -47,8 +47,8 @@ $TITLE = htmlentities($job->name);
 
 include_once("popup.inc.php");
 
-button_bar(button('done', 'window.close()'),
-		button("refresh","new getObj('realtime').obj.src = 'graph_job.png.php?jobid=$jobid&foo=' + new Date();"));
+button_bar(button('Done', 'window.close()'),
+		button("Refresh","new getObj('realtime').obj.src = 'graph_job.png.php?jobid=$jobid&foo=' + new Date();"));
 
 //startWindow('Job Status', 'padding: 3px;');
 

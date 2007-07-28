@@ -73,7 +73,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'upload','upload','upload'), button('cancel',NULL,'tasks.php'));
+buttons(submit($f, 'upload','Upload'), button('Cancel',NULL,'tasks.php'));
 
 
 startWindow('Upload Import File');

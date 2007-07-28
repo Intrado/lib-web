@@ -101,9 +101,9 @@ $TITLE = "View Contact Information: " . $contactFullName;
 
 include_once("nav.inc.php");
 
-button_bar(button('done', NULL,$_SERVER['HTTP_REFERER']));
+button_bar(button('Done', NULL,$_SERVER['HTTP_REFERER']));
 
-startWindow('Contact', 'padding: 3px;');
+startWindow('Contact');
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">

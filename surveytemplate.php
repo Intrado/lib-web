@@ -357,7 +357,7 @@ function fmt_qphone($obj,$name) {
 	global $f,$s;
 	message_select("phone",$f,$s,"phonemessageid_" . $obj->questionnumber);
 
-	echo button('play', "var audio = new getObj('phonemessageid_" . $obj->questionnumber . "').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
+	echo button('Play', "var audio = new getObj('phonemessageid_" . $obj->questionnumber . "').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
 
 }
 
@@ -375,7 +375,7 @@ function fmt_actions($obj,$name) {
 	global $f,$s;
 
 	if (!$obj->id)
-		return submit($f, 'add', 'add', 'add');
+		return submit($f, 'add', 'Add');
 	else
 		return '<a href="?delete=' . $obj->questionnumber . '">Delete</a>';
 }
@@ -390,7 +390,7 @@ $TITLE = "Survey Template Editor";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'saveforlater','saveforlater'),submit($f, 'schedule', 'schedule_survey','schedule_survey'));
+buttons(submit($f, $s, 'Save For Later'),submit($f, 'schedule', 'Schedule Survey'));
 
 startWindow('Survey Template Information',NULL,true, false);
 ?>
@@ -428,7 +428,7 @@ startWindow('Survey Template Information',NULL,true, false);
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
 							<td><? NewFormItem($f,$s,"hasmachine","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'machinemessage');\" dependson=\"phonesurvey\""); ?></td>
-							<td id="machinemessage" <?= ($hasmachine ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"machinemessageid",'dependson="phonesurvey"'); echo button('play', "var audio = new getObj('machinemessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
+							<td id="machinemessage" <?= ($hasmachine ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"machinemessageid",'dependson="phonesurvey"'); echo button('Play', "var audio = new getObj('machinemessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
 						</tr>
 						</table>
 					</td>
@@ -439,7 +439,7 @@ startWindow('Survey Template Information',NULL,true, false);
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
 							<td><? NewFormItem($f,$s,"hasintro","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'intromessage');\" dependson=\"phonesurvey\""); ?></td>
-							<td id="intromessage" <?= ($hasintro ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"intromessageid",'dependson="phonesurvey"'); echo button('play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
+							<td id="intromessage" <?= ($hasintro ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"intromessageid",'dependson="phonesurvey"'); echo button('Play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
 						</tr>
 						</table>
 					</td>
@@ -450,7 +450,7 @@ startWindow('Survey Template Information',NULL,true, false);
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
 							<td><? NewFormItem($f,$s,"hasexit","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'exitmessage');\" dependson=\"phonesurvey\""); ?></td>
-							<td id="exitmessage" <?= ($hasexit ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"exitmessageid",'dependson="phonesurvey"'); echo button('play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
+							<td id="exitmessage" <?= ($hasexit ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"exitmessageid",'dependson="phonesurvey"'); echo button('Play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
 						</tr>
 						</table>
 					</td>
@@ -470,7 +470,7 @@ startWindow('Survey Template Information',NULL,true, false);
 				</tr>
 <?
 				}
-?>	
+?>
 
 			</table>
 		</td>
@@ -509,7 +509,7 @@ endWindow();
 ?>
 <br>
 <?
-startWindow('Questions ' . help('SurveysTempEditor_Questions', NULL, 'blue') );
+startWindow('Questions ' . help('SurveysTempEditor_Questions') );
 
 $titles = array("questionnumber" => " #",
 				"reportlabel" => "Report Label",

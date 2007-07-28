@@ -76,19 +76,19 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding-bottom: 5px;">
 		<tr>
-			<td align="left"><? buttons(button('done', NULL, ($ORIGINTYPE == "nav") ? 'start.php' : 'list.php')); ?></td>
+			<td align="left"><? buttons(button('Done', NULL, ($ORIGINTYPE == "nav") ? 'start.php' : 'list.php')); ?></td>
 			<td align="right" valign="bottom">
 				<?= ($ORIGINTYPE == "nav") ? '' : 'Select the individuals you want to add to your list.'?>
 			</td>
 		</tr>
 	</table>
 	<?
-	$help = (($ORIGINTYPE == "nav") ? '' : help('AddressBook_MyAddressBook', NULL, 'blue'));
-	startWindow('Addresses ' . $help,'padding: 3px;');
+	$help = (($ORIGINTYPE == "nav") ? '' : help('AddressBook_MyAddressBook'));
+	startWindow('Addresses ' . $help);
 	?>
 	<table border="0" cellpadding="0" cellspacing="0" style="margin-top: 3px;">
 		<tr>
-			<td><? button_bar(button('addcontact', NULL,"$addressPagename?id=new")); ?></td>
+			<td><? button_bar(button('Add Contact', NULL,"$addressPagename?id=new")); ?></td>
 		</tr>
 	</table>
 

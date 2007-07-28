@@ -25,11 +25,11 @@ if($specialtask->getData("progress") == "Done") {
 } else {
 	$currlang = $specialtask->getData("currlang");
 	$progress = $specialtask->getData("progress");
-	
+
 	if($progress == "Hung up") {
 		$specialtask->setData('error', "Hung up early");
 	}
-	
+
 	$specialtask->lastcheckin = date("Y-m-d H:i:s");
 	$specialtask->update();
 }
@@ -44,7 +44,7 @@ include_once('popup.inc.php');
 startWindow("Recording session in progress");
 if (!$error) {
 ?>
-<div style="text-align: center; width: 400px; padding: 3px;">
+<div style="text-align: center; width: 100%; padding: 3px;">
 
 	<h3>Recording session with <?= Phone::format($specialtask->getData("phonenumber")) ?></h3>
 	<h3> Progress: <?=$progress?></h3>
@@ -60,7 +60,7 @@ if (!$error) {
 
 } else {
 ?>
-	<div style="text-align: center; width: 400px; padding: 3px;">
+	<div style="text-align: center; width: 100%; padding: 3px;">
 		<span style="color: red;">There was an error during the call: <?=$error?>.</span><br>
 		Please check the phone number and <a href="easycallstart.php?retry=<?= $specialtask->id ?>">try again</a>
 	</div>

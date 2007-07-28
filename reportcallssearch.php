@@ -51,7 +51,7 @@ $results = array("A" => "Answered",
 					"N" => "No Answer",
 					"B" => "Busy",
 					"F" => "Failed",
-					"X" => "Disconnected");	
+					"X" => "Disconnected");
 $clear = false;
 
 if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
@@ -69,7 +69,7 @@ if(isset($_REQUEST['reportid'])){
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 	$_SESSION['saved_report'] = true;
-	
+
 	if($options['reporttype']!="jobreport"){
 		error_log("Expected calls report, got something else");
 	}
@@ -85,7 +85,7 @@ if(isset($_REQUEST['reportid'])){
 	}
 	$clear = true;
 } else {
-	
+
 	if(!isset($_SESSION['report']['options'])){
 		$_SESSION['report']['options'] = array();
 	}
@@ -94,9 +94,9 @@ if(isset($_REQUEST['reportid'])){
 		$clear=true;
 		$_SESSION['report']['options']['reporttype'] = $_REQUEST['type'];
 	}
-	
+
 	$options = $_SESSION['report']['options'];
-	
+
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$instance = new ReportInstance($subscription->reportinstanceid);
@@ -105,7 +105,7 @@ if(isset($_REQUEST['reportid'])){
 		$subscription->createDefaults(fmt_report_name($options['reporttype']));
 		$instance = new ReportInstance();
 	}
-	
+
 }
 
 if(isset($_SESSION['reportid'])){
@@ -113,7 +113,7 @@ if(isset($_SESSION['reportid'])){
 } else {
 	$_SESSION['saved_report'] = false;
 }
-	
+
 unset($_SESSION['reportrules']);
 if(isset($options['rules']) && $options['rules'] != ""){
 	$rules = explode("||", $options['rules']);
@@ -127,7 +127,7 @@ if(isset($options['rules']) && $options['rules'] != ""){
 			$newrule->val = $rule[3];
 			if(isset($_SESSION['reportrules']) && is_array($_SESSION['reportrules']))
 				$_SESSION['reportrules'][] = $newrule;
-			else 
+			else
 				$_SESSION['reportrules'] = array($newrule);
 			$newrule->id = array_search($newrule, $_SESSION['reportrules']);
 			$_SESSION['reportrules'][$newrule->id] = $newrule;
@@ -161,7 +161,7 @@ $_SESSION['report']['options'] = $options;
 
 if($clear)
 	redirect();
-	
+
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"view")|| CheckFormSubmit($f, "saveview")){
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -188,7 +188,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"v
 			$options['email'] = GetFormData($f, $s, 'email');
 			$options['datestart'] = GetFormData($f, $s, 'datestart');
 			$options['dateend'] = GetFormData($f, $s, 'dateend');
-			
+
 			$priorities = GetFormData($f, $s, 'priorities');
 			if($priorities)
 				$options['priority'] = implode("','", $priorities);
@@ -196,12 +196,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"v
 			$result = GetFormData($f, $s, "results");
 			if($result)
 				$options['result'] = implode("','", $result);
-			
+
 			foreach($orders as $order)
 				$options[$order] = GetFormData($f, $s, $order);
 
 			$options['reldate'] = GetFormData($f, $s, "relativedate");
-			
+
 			if($options['reldate'] == "xdays"){
 				$options['lastxdays'] = GetFormData($f, $s, "xdays");
 			} else if($options['reldate'] == "daterange"){
@@ -235,14 +235,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"v
 					else
 						$_SESSION['reportrules'] = array($rule);
 					$rule->id = array_search($rule, $_SESSION['reportrules']);
-					
+
 					$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
 				}
 			}
 			$options['rules'] = implode("||", $options['rules']);
 
 			$_SESSION['report']['options'] = $options;
-			
+
 			if(CheckFormSubmit($f, "save") ||CheckFormSubmit($f,"saveview") ){
 				$activefields = array();
 				$fieldlist = array();
@@ -252,7 +252,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"v
 						$activefields[] = $field->fieldnum;
 					}
 				}
-			
+
 				$instance->setFields($fieldlist);
 				$instance->setActiveFields($activefields);
 				$instance->setParameters($options);
@@ -282,7 +282,7 @@ if($reload){
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
-	
+
 	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : "");
 	PutFormData($f, $s, 'enddate', isset($options['enddate']) ? $options['enddate'] : "");
 	$priority = array();
@@ -295,14 +295,14 @@ if($reload){
 	if(isset($options['result'])){
 		$result = explode("','", $options['result']);
 	}
-	
+
 	PutFormData($f, $s, 'result', isset($options['result']) && $options['result'] !="" ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, 'results', $result , "array", array_keys($results));
-	
+
 	PutFormData($f, $s, "order1", isset($options["order1"]) ? $options["order1"] : "rp.pkey");
 	PutFormData($f, $s, "order2", isset($options["order2"]) ? $options["order2"] : "date");
 	PutFormData($f, $s, "order3", isset($options["order3"]) ? $options["order3"] : "");
-	
+
 	PutFormData($f,$s,"newrulefieldnum","");
 	PutFormData($f,$s,"newruletype","text","text",1,50);
 	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
@@ -310,7 +310,7 @@ if($reload){
 	PutFormData($f,$s,"newruleoperator_text","sw","text",1,50);
 	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
 }
-	
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -340,7 +340,7 @@ if(isset($_SESSION['reportid'])){
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(button('done', null, "reports.php"), submit($f, "save", "save", "save"), 
+buttons(button('Done', null, "reports.php"), submit($f, "save", "Save"),
 			isset($_SESSION['reportid']) ? submit($f, "saveview", "saveview", "save and view") : submit($f, "view", "view", "view report"));
 startWindow("Person Notification Search", "padding: 3px;");
 
@@ -356,13 +356,13 @@ startWindow("Person Notification Search", "padding: 3px;");
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr>
 				<td><br>
-					<? 
+					<?
 						if(!isset($_SESSION['reportrules']) || is_null($_SESSION['reportrules']))
 							$_SESSION['reportrules'] = false;
-						
+
 						$RULES = &$_SESSION['reportrules'];
 						$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-						
+
 						include("ruleeditform.inc.php");
 					?>
 				<br></td>
@@ -386,7 +386,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last X Days', 'xdays');
 								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Date Range(inclusive)', 'daterange');
 								NewFormItem($f, $s, 'relativedate', 'selectend');
-								
+
 								?>
 							</td>
 							<td><? NewFormItem($f, $s, 'xdays', 'text', '3', null, "id='xdays'"); ?></td>
@@ -398,7 +398,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 							}
 							if(new getObj("reldate").obj.value!="daterange"){
 								hide("date");
-							
+
 							}
 						</script>
 					</table>
@@ -410,7 +410,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 		<?
 			if($options['reporttype'] == 'callsreport'){
 		?>
-			
+
 						<tr valign="top">
 							<td><? NewFormItem($f,$s,"priority","checkbox",NULL,NULL,'id="priority" onclick="clearAllIfNotChecked(this,\'priorityselect\');"'); ?></td>
 							<td>Job Type: </td>
@@ -439,7 +439,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 	</td>
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 		<td class="bottomBorder">
-<? 		
+<?
 			select_metadata(null, null, $fields);
 ?>
 		</td>

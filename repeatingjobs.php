@@ -35,7 +35,7 @@ $TITLE = "Repeating Jobs";
 
 include_once("nav.inc.php");
 
-startWindow('Repeating Notification Jobs ' . help('System_RepeatingJobs', NULL, 'blue'), 'padding: 3px;');
+startWindow('Repeating Notification Jobs ' . help('System_RepeatingJobs'), 'padding: 3px;');
 
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;

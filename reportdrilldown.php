@@ -126,7 +126,7 @@ $PAGE = "reports:reports";
 $TITLE = "Individual Report Data  - $job->name";
 
 include_once("nav.inc.php");
-buttons(button('back', 'window.history.go(-1)'));
+buttons(button('Back', 'window.history.go(-1)'));
 $reportgenerator->generate();
 buttons();
 include_once("navbottom.inc.php");

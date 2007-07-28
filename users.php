@@ -48,14 +48,14 @@ if (isset($_GET['disable'])) {
 
 if (isset($_GET['enable'])) {
 	$maxreached = false;
-	
+
 	/*CSDELETEMARKER_START*/
 	if($maxusers <= $usercount){
-		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';	
+		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
 		$maxreached = true;
 	}
 	/*CSDELETEMARKER_END*/
-	
+
 	if(!$maxreached){
 		$id = DBSafe($_GET['enable']);
 		if (customerOwns("user",$id))
@@ -104,23 +104,23 @@ $titles = array(	"firstname" => "#First Name",
 					"lastlogin" => "Last Login",
 					"Actions" => "Actions"
 					);
-					
+
 /*CSDELETEMARKER_START*/
 ?>
 	<div align="right">Total Users: <?=$usercount?>. Max: <?=$maxusers?></div>
 <?
 /*CSDELETEMARKER_END*/
 
-startWindow('Active Users ' . help('Users_ActiveUsersList', NULL, "blue"), 'padding: 3px;');
+startWindow('Active Users ' . help('Users_ActiveUsersList'));
 
-button_bar(button('adduser', NULL,"user.php?id=new") . help('Users_UserAdd'));
+button_bar(button('Add New User', NULL,"user.php?id=new") . help('Users_UserAdd'));
 
 
 if($IS_COMMSUITE)
 	$data = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
 /*CSDELETEMARKER_START*/
 else
-	$data = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");	
+	$data = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");
 /*CSDELETEMARKER_END*/
 
 showObjects($data, $titles, array("Actions" => "fmt_actions_en", 'AccessProfile' => 'fmt_acc_profile', "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
@@ -128,7 +128,7 @@ endWindow();
 
 print '<br>';
 
-startWindow('Inactive Users ' . help('Users_InactiveUsersList', NULL, "blue"), 'padding: 3px;');
+startWindow('Inactive Users ' . help('Users_InactiveUsersList'));
 $data = DBFindMany("User","from user where not enabled and deleted=0 order by lastname, firstname");
 showObjects($data, $titles, array('AccessProfile' => 'fmt_acc_profile', "Actions" => "fmt_actions_dis", "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
 endWindow();

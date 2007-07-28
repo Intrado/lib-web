@@ -98,7 +98,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
 										DBSafe(GetFormData($form, $section, "newfield_type") .
 										($specialtype ? ',' . DBSafe($specialtype) : ''));
-				
+
 				if ($newfield->update()) {
 					// Requery to get the newly inserted row
 					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
@@ -217,7 +217,7 @@ include_once("nav.inc.php");
 
 NewForm($form);
 buttons(submit($form, $section));
-startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;');
+startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 ?>
 
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
@@ -314,7 +314,7 @@ startWindow('Fields ' . help('DataManager_Fields', NULL, 'blue'), 'padding: 3px;
 ?>
 		</td>
 		<td><? NewFormItem($form, $section, 'newfield_searchable', 'checkbox', '', '', 'id=newfield_searchable'); ?> </td>
-		<td><? echo submit($form, 'add', 'add', 'add'); ?></td>
+		<td><? echo submit($form, 'add', 'Add'); ?></td>
 	</tr>
 </table>
 <?

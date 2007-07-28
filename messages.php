@@ -66,8 +66,8 @@ function fmt_actions ($obj,$name) {
 	}
 
 
-	$simpleplaybtn = button("play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 350);");
-	$advancedplaybtn = button("play", "popup('previewmessage.php?close=1&id=$obj->id', 400, 500);");
+	$simpleplaybtn = button("Play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 350);");
+	$advancedplaybtn = button("Play", "popup('previewmessage.php?close=1&id=$obj->id', 400, 500);");
 	$editbtn = '<a href="message' . $obj->type . '.php?id=' . $obj->id . '">Edit</a>';
 	$deletebtn = '<a href="messages.php?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 	$renamebtn = '<a href="messagerename.php?id=' . $obj->id . '">Rename</a>';
@@ -133,15 +133,15 @@ if($USER->authorize('sendphone')) {
 	if (count($data) > $scrollThreshold) {
 		$scroll = true;
 	}
-	startWindow('My Phone Messages ' . help('Messages_MyPhoneMessages', NULL, 'blue'), 'padding: 3px;', true, true);
+	startWindow('My Phone Messages ' . help('Messages_MyPhoneMessages'), 'padding: 3px;', true, true);
 
 	if ($USER->authorize('starteasy')) {
-		button_bar(button('callmetorecord', "popup('callme.php?origin=message',500,450);") . help('AudioFileEditor_CallMeToRecord'),
-			button('createadphmess', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
-			button('openaudiolib', "popup('audio.php',500,450);") . help('Messages_AudioFileEditor'));
+		button_bar(button('Call Me To Record', "popup('callme.php?origin=message',500,450);") . help('AudioFileEditor_CallMeToRecord'),
+			button('Create Advanced Message', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
+			button('Audio Library', "popup('audio.php',500,450);") . help('Messages_AudioFileEditor'));
 	} else {
-		button_bar(button('createadphmess', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
-			button('openaudiolib', "popup('audio.php',500,450);") . help('Messages_AudioFileEditor'));
+		button_bar(button('Create Advanced Message', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
+			button('Audio Library', "popup('audio.php',500,450);") . help('Messages_AudioFileEditor'));
 	}
 
 
@@ -170,9 +170,9 @@ if($USER->authorize('sendemail')) {
 	if (count($data) > $scrollThreshold) {
 		$scroll = true;
 	}
-	startWindow('My Email Messages ' . help('Messages_MyEmailMessages', NULL, 'blue'), 'padding: 3px;', true, true);
+	startWindow('My Email Messages ' . help('Messages_MyEmailMessages'), 'padding: 3px;', true, true);
 
-	button_bar(button('createemail', NULL,'messageemail.php?id=new') . help('Messages_AddEmailMessage'));
+	button_bar(button('Create Email Message', NULL,'messageemail.php?id=new') . help('Messages_AddEmailMessage'));
 
 	showObjects($data, $titles, array("Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
 	endWindow();
@@ -186,8 +186,8 @@ if($USER->authorize('sendprint')) {
 	if (count($data) > $scrollThreshold) {
 		$scroll = true;
 	}
-	startWindow('My Print Messages ' . help('Messages_MyPrintMessages', NULL, 'blue'), 'padding: 3px;', true, true);
-	button_bar(button('createprint', NULL,'messageprint.php?id=new') . help('Messages_AddprintMessage'));
+	startWindow('My Print Messages ' . help('Messages_MyPrintMessages'), 'padding: 3px;', true, true);
+	button_bar(button('Create Print Message', NULL,'messageprint.php?id=new') . help('Messages_AddprintMessage'));
 	showObjects($data, $titles, array("Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
 	endWindow();
 	echo '<br>';
@@ -196,8 +196,8 @@ if($USER->authorize('sendprint')) {
 
 if($USER->authorize('survey')) {
 
-	startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates', NULL, 'blue'),'padding: 3px;', true, true);
-	button_bar(button('create_new_survey', null,"surveytemplate.php?id=new") . help('Surveys_CreateNewTemplateButton') );
+	startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates'),'padding: 3px;', true, true);
+	button_bar(button('Create New Survey Template', null,"surveytemplate.php?id=new") . help('Surveys_CreateNewTemplateButton') );
 
 	$questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
 

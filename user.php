@@ -299,7 +299,7 @@ $PAGE = "admin:users";
 $TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : GetFormData($f,$s,"firstname") . ' ' . GetFormData($f,$s,"lastname"));
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, 'submitbutton', 'save', 'save'));
+buttons(submit($f, 'submitbutton', 'Save'));
 
 startWindow('User Information');
 ?>

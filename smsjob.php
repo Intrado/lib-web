@@ -155,7 +155,7 @@ include_once("nav.inc.php");
 NewForm($f);
 
 
-buttons(button('cancel',null,"smsjobs.php"), submit($f, 'send','submit_job', 'submit_job'));
+buttons(button('Cancel',null,"smsjobs.php"), submit($f, 'send','Submit Job'));
 
 startWindow('Survey Information');
 ?>

@@ -168,7 +168,7 @@ $ICON = $MESSAGETYPE . ".gif";
 include_once("nav.inc.php");
 
 NewForm($form);
-buttons(  submit($form, $section, 'save', 'save') /*, submit($form, 'preview', 'play', 'play')*/);
+buttons( submit($form, $section, 'Save'));
 startWindow('Message Information', 'padding: 3px;');
 print 'Name: ';
 NewFormItem($form,$section,"name","text", 30,50);
@@ -178,7 +178,7 @@ print '&nbsp;';
 endWindow();
 
 print '<br>';
-startWindow('Message Content ' . help('MessagePhone_Message', NULL, 'blue') );
+startWindow('Message Content ' . help('MessagePhone_Message') );
 
 switch($MESSAGETYPE)
 {
@@ -196,8 +196,8 @@ switch($MESSAGETYPE)
 								<td>
 									<? audio('audio'); ?>
 								</td>
-								<td><? print button('insert', "sel = new getObj('audio').obj; if (sel.options[sel.selectedIndex].value > 0) {  insert('{{' + sel.options[sel.selectedIndex].text + '}}', new getObj('bodytext').obj);}"); ?></td>
-								<td><? print button('play', "var audio = new getObj('audio').obj; if(audio.selectedIndex >= 1) popup('previewaudio.php?close=1&id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
+								<td><? print button('Insert', "sel = new getObj('audio').obj; if (sel.options[sel.selectedIndex].value > 0) {  insert('{{' + sel.options[sel.selectedIndex].text + '}}', new getObj('bodytext').obj);}"); ?></td>
+								<td><? print button('Play', "var audio = new getObj('audio').obj; if(audio.selectedIndex >= 1) popup('previewaudio.php?close=1&id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
 							</tr>
 						</table>
 					</td>
@@ -218,7 +218,7 @@ switch($MESSAGETYPE)
 							<tr>
 								<td>Default&nbsp;Value:</td>
 								<td><input type="text" size="10" id="default"></td>
-								<td><? print button('insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value; insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', new getObj('bodytext').obj);"); ?></td>
+								<td><? print button('Insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value; insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', new getObj('bodytext').obj);"); ?></td>
 							</tr>
 						</table></td>
 				</tr>
@@ -285,7 +285,7 @@ switch($MESSAGETYPE)
 							<tr>
 								<td>Default&nbsp;Value:</td>
 								<td><input type="text" size="10" id="default"></td>
-								<td><? print button('insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value;insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', new getObj('bodytext').obj);"); ?></td>
+								<td><? print button('Insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value;insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', new getObj('bodytext').obj);"); ?></td>
 							</tr>
 						</table>
 					</td>
@@ -333,7 +333,7 @@ switch($MESSAGETYPE)
 							<tr>
 								<td>Default&nbsp;Value:</td>
 								<td><input type="text" size="10" id="default"></td>
-								<td><? print button('insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value; insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', new getObj('bodytext').obj);"); ?></td>
+								<td><? print button('Insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value; insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', new getObj('bodytext').obj);"); ?></td>
 							</tr>
 						</table>
 					</td>

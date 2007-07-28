@@ -34,10 +34,10 @@ $vr->update();
 $firstname = FieldMap::getFirstNameField();
 $lastname = FieldMap::getLastNameField();
 $query = "select p.pkey, p.$firstname, p.$lastname, rc.phone, j.name, coalesce(m.name, s.name), vr.replytime, j.status
-			from voicereply vr 
+			from voicereply vr
 			inner join job j on (vr.jobid = j.id)
 			inner join reportperson rp on(vr.personid = rp.personid and vr.jobid = rp.jobid and rp.type ='phone')
-			inner join person p on (vr.personid = p.id) 
+			inner join person p on (vr.personid = p.id)
 			left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
 			left join message m on (m.id = rp.messageid)
 			left join surveyquestionnaire s on (s.id = j.questionnaireid)
@@ -57,7 +57,7 @@ $TITLE = "Reply";
 include_once('popup.inc.php');
 startWindow('Reply Info', 'padding: 3px;');
 
-buttons(button("done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"));
+buttons(button("Done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"));
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0">
@@ -90,7 +90,7 @@ buttons(button("done",isset($_GET['close']) ? "window.close()" : "window.history
 		<th align="right" class="windowRowHeader bottomBorder">Reply Date</td>
 		<td class="bottomBorder"><?=fmt_ms_timestamp($responses, 6)?></td>
 	</tr>
-</table>	
+</table>
 
 <div align="center">
 

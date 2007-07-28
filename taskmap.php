@@ -216,7 +216,7 @@ $TITLE = "Import Field Mapping: " . ($IMPORT != null ? $IMPORT->name : 'New Task
 include_once("nav.inc.php");
 
 NewForm($form);
-buttons(($noimportdata ? button('done',NULL,'tasks.php') : submit($form, $section)));
+buttons(($noimportdata ? button('Done',NULL,'tasks.php') : submit($form, $section)));
 startWindow('Field Mapping');
 ?>
 <br>

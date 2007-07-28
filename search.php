@@ -136,9 +136,9 @@ $TITLE = 'List Search: ' . QuickQuery("select name from list where id = $_SESSIO
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(submit($f,'refresh','refresh','refresh'), submit($f, 'showall','showallcontacts','showallcontacts'),button("done","","list.php"));
+buttons(submit($f,'refresh','Refresh'), submit($f, 'showall','Show All Contacts'),button("Done","","list.php"));
 
-startWindow('Search for ' . help('SearchList_SearchFor', NULL, 'blue'));
+startWindow('Search for ' . help('SearchList_SearchFor'));
 
 //ruleeditform expects $RULES to be set
 if(CheckFormSubmit($f, 'showall'))
@@ -159,7 +159,7 @@ $renderedlist->setSearch($RULES);
 $renderedlist->pagelimit=500;
 $showpagemenu = true;
 
-startWindow('Search Results ' . help('SearchList_SearchResults', NULL, 'blue'), 'padding: 3px;');
+startWindow('Search Results ' . help('SearchList_SearchResults'), 'padding: 3px;');
 
 //list.inc.php expects renderedlist, showpagemenu to be set
 include("list.inc.php");

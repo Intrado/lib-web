@@ -69,7 +69,7 @@ $TITLE = "template";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'save'));
+buttons(submit($f, $s, 'Save'));
 
 
 startWindow('template');

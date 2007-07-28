@@ -85,10 +85,10 @@ if(isset($_GET['showonlyunheard'])){
 }
 
 if(isset($_GET['deleteplayed']) && $_GET['deleteplayed']){
-	$voicereplies = DBFindMany("VoiceReply", "from voicereply vr where vr.userid = '$USER->id' 
+	$voicereplies = DBFindMany("VoiceReply", "from voicereply vr where vr.userid = '$USER->id'
 								$jobidquery
 								and listened = '1'");
-	
+
 	foreach($voicereplies as $voicereply){
 		$content = new Content($voicereply->contentid);
 		$content->destroy();
@@ -147,11 +147,11 @@ if(isset($job)){
 include_once("nav.inc.php");
 
 NewForm($f);
-	
-buttons(button('refresh',"window.location.reload()"), 
-		button('delete_all_played', "return confirm('$warning')", "replies.php?deleteplayed=true"));
-	
-startWindow("Display Options" . help('Replies_DisplayOptions', NULL, 'blue'), "padding: 3px;");	
+
+buttons(button('Refresh',"window.location.reload()"),
+		button('Delete All Played Replies', "return confirm('$warning')", "replies.php?deleteplayed=true"));
+
+startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;");
 ?>
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -176,7 +176,7 @@ startWindow("Display Options" . help('Replies_DisplayOptions', NULL, 'blue'), "p
 <tr>
 <th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Unplayed:</th>
 	<td>
-		<div><?NewFormItem($f, $s, "unheard", "checkbox", null, null, "onclick=\"window.location='replies.php?showonlyunheard=' + (this.checked ? 'true' : 'false') + '&pagestart=$pagestart';\"");?> 
+		<div><?NewFormItem($f, $s, "unheard", "checkbox", null, null, "onclick=\"window.location='replies.php?showonlyunheard=' + (this.checked ? 'true' : 'false') + '&pagestart=$pagestart';\"");?>
 		Show only unplayed responses </div>
 	</td>
 </tr>
@@ -185,7 +185,7 @@ startWindow("Display Options" . help('Replies_DisplayOptions', NULL, 'blue'), "p
 <?
 endWindow();
 echo "<br>";
-startWindow("Responses"  . help('Replies_Responses', NULL, 'blue'), "padding: 3px;");
+startWindow("Responses"  . help('Replies_Responses'), "padding: 3px;");
 
 ?>
 <?
@@ -195,10 +195,10 @@ $lastname = FieldMap::getLastNameField();
 $detailedquery = "select SQL_CALC_FOUND_ROWS
 			p.pkey, p.$firstname, p.$lastname, rc.phone, coalesce(m.name, s.name), j.name, vr.replytime, vr.contentid, vr.id,
 			vr.listened, j.type
-			from voicereply vr 
+			from voicereply vr
 			inner join job j on (vr.jobid = j.id)
 			inner join reportperson rp on(vr.personid = rp.personid and vr.jobid = rp.jobid and rp.type ='phone')
-			inner join person p on (vr.personid = p.id) 
+			inner join person p on (vr.personid = p.id)
 			left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
 			left join message m on (m.id = rp.messageid)
 			left join surveyquestionnaire s on (s.id = j.questionnaireid)
@@ -255,7 +255,7 @@ EndForm();
 ?>
 <script>
 	function repliesplay( voicereplyid ){
-	
+
 		popup('repliespreview.php?id=' + voicereplyid + '&close=1', 450, 600);
 		var status = new getObj('reply' + voicereplyid).obj;
 		status.style.fontWeight='normal';

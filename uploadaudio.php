@@ -93,7 +93,7 @@ if(CheckFormSubmit($f,$s))
 					$result = exec($cmd, $res1,$res2);
 
 					if($res2 || !file_exists($dest)) {
-						error('There was an error reading your audio file','Please try another file', 
+						error('There was an error reading your audio file','Please try another file',
 						'Supported formats include: .wav, .aiff, and .au');
 						@unlink($source);
 						@unlink($dest);
@@ -111,7 +111,7 @@ if(CheckFormSubmit($f,$s))
 							ClearFormData($f);
 							redirect('audio.php');
 						} else {
-							error('There was an error uploading your audio file','Please try again', 
+							error('There was an error uploading your audio file','Please try again',
 							'Supported formats include: .wav, .aiff, and .au');
 						}
 					}
@@ -146,8 +146,8 @@ $TITLE = "Upload Audio File";
 
 include_once("popup.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'save', $audio->contentid ? 'save' : 'upload'), button('cancel', "window.location = 'audio.php';"));
-startWindow("Audio Information " . help('UploadAudioFile', null, 'blue'));
+buttons(submit($f, $s, $audio->contentid ? 'Save' : 'Upload'), button('Cancel', "window.location = 'audio.php';"));
+startWindow("Audio Information " . help('UploadAudioFile'));
 
 if (false) {
 ?>
@@ -187,7 +187,7 @@ if(sel && <? print ($audio->id && $audio->name) ? 'true' : 'false'; ?>) {
 <? if($audio->contentid) { ?>
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Preview:</th>
-		<td><?= button("play", NULL,"previewaudio.php?id=" .$audio->id);?></td>
+		<td><?= button("Play", NULL,"previewaudio.php?id=" .$audio->id);?></td>
 	</tr>
 <? } else { ?>
 	<tr>

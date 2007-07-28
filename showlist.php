@@ -42,7 +42,7 @@ $TITLE = 'List Preview: ' . QuickQuery("select name from list where id = $_SESSI
 
 include_once("nav.inc.php");
 
-buttons(button('refresh', '', $_SERVER["REQUEST_URI"] ), button("done","",$_SESSION['listreferer']));
+buttons(button('Refresh', '', $_SERVER["REQUEST_URI"] ), button("Done","",$_SESSION['listreferer']));
 
 
 $starttime = microtime_float();
@@ -58,14 +58,14 @@ $renderedlist->mode = "preview";
 $renderedlist->pagelimit = 500;
 $showpagemenu = true;
 
-startWindow("Preview " . help('ShowList_Preview', NULL, 'blue'));
+startWindow("Preview " . help('ShowList_Preview'));
 
 //list.inc.php expects renderedlist, showpagemenu to be set
 include("list.inc.php"); //expects $renderedlist to be set
 endWindow();
 
 $endtime = microtime_float();
-buttons(button('refresh', '', $_SERVER["REQUEST_URI"] ), button("done","","list.php"));
+buttons(button('Refresh', '', $_SERVER["REQUEST_URI"] ), button("Done","","list.php"));
 
 include_once("navbottom.inc.php");
 ?>

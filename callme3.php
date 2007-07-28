@@ -107,34 +107,34 @@ $TITLE = 'Call Me';
 include_once('popup.inc.php');
 
 NewForm($f);
-buttons(submit($f, $s, 'submit','save'));
+buttons(submit($f, $s, 'Save'));
 startWindow("Rename Files");
 
 ?>
 
-	<table border="0" cellpadding="3" cellspacing="0" width="400">
-		
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+
 			<th align="left" class="windowRowHeader bottomBorder">Name</td>
 			<?
 			if($messages){
 				foreach($messages as $key => $message){
 					?>
 					<tr><td>
-						<? 
+						<?
 							NewFormItem($f, $s, "message ".$key, "text");
 							if($specialtask->getData("origin") == "message")
-								echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $message . "', 400, 400);");
+								echo "&nbsp;" . button('Play', "popup('previewmessage.php?id=" . $message . "', 400, 400);");
 							else
-								echo "&nbsp;" . button('play', "popup('previewaudio.php?id=" . $message . "&close=1', 400, 400);");
+								echo "&nbsp;" . button('Play', "popup('previewaudio.php?id=" . $message . "&close=1', 400, 400);");
 						?>
 					</td></tr>
 					<?
 				}
 			}
 		?>
-		
+
 	</table>
-		
+
 <?
 endWindow();
 buttons();

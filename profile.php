@@ -218,7 +218,7 @@ $DESCRIPTION = GetFormData($form, $section, 'description');
 include_once("nav.inc.php");
 NewForm($form);
 
-buttons(submit($form, $section, 'submit', 'save'));
+buttons(submit($form, $section, 'Save'));
 
 startWindow('Profile Information', 'padding: 3px;');
 print 'Name: ';

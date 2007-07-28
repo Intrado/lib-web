@@ -381,7 +381,7 @@ if ($submittedmode || $completedmode) {
 }
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array());
-if ($job->id) {
+if (isset($job->id)) {
 	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
 	$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 	$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
@@ -398,7 +398,7 @@ $peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where useri
 function message_select($type, $form, $section, $name) {
 	global $messages, $submittedmode;
 
-	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' " . ($submittedmode ? "DISABLED" : ""));
+	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : ""));
 	NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
 	foreach ($messages[$type] as $message) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
@@ -406,7 +406,7 @@ function message_select($type, $form, $section, $name) {
 	NewFormItem($form,$section,$name, "selectend");
 
 	if ($type == "phone")
-		echo button('play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
+		echo button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
 }
 
 function language_select($form, $section, $name, $skipusedtype) {
@@ -451,7 +451,7 @@ foreach($joblangs[$type] as $joblang) {
 				</td>
 				<td>
 <? if ($type == "phone") { ?>
-					<div style="float: right;"><?= button('play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
+					<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
 <? } ?>
 					<?= $messages[$type][$joblang->messageid]->name ?>
 				</td>
@@ -469,7 +469,7 @@ foreach($joblangs[$type] as $joblang) {
 			</td>
 			<td><? message_select($type, $f, $type, 'newmess' . $type); ?></td>
 			<td><? 	if (!$submittedmode)
-						echo submit($f, $type, 'Add', 'add'); ?></td>
+						echo submit($f, $type, 'Add'); ?></td>
 		</tr>
 	</table>
 
@@ -485,7 +485,8 @@ foreach($joblangs[$type] as $joblang) {
 
 $PAGE = "notifications:jobs";
 $TITLE = ($JOBTYPE == 'repeating' ? 'Repeating Job Editor: ' : 'Job Editor: ') . ($jobid == NULL ? "New Job" : $job->name);
-$DESCRIPTION = "Job status: " . fmt_status($job, NULL);
+if (isset($job))
+	$DESCRIPTION = "Job status: " . fmt_status($job, NULL);
 
 include_once("nav.inc.php");
 
@@ -493,11 +494,11 @@ NewForm($f);
 
 if ($JOBTYPE == "normal") {
 	if ($submittedmode)
-	buttons(submit($f, $s, 'save', 'save'));
+	buttons(submit($f, $s, 'Save'));
 	else
-	buttons(submit($f, $s, 'saveforlater', 'saveforlater'),submit($f, 'send','confirmation', 'confirmation'));
+	buttons(submit($f, $s, 'Save For Later'),submit($f, 'send','Proceed To Confirmation'));
 } else {
-	buttons(submit($f, $s, 'save', 'save'));
+	buttons(submit($f, $s, 'Save'));
 }
 
 

@@ -80,9 +80,9 @@ include_once("nav.inc.php");
 NewForm($f);
 
 if ($renderedlist->total > 0 && count($questions) > 0)
-	buttons(button('back',null, 'survey.php'), button('submitsurvey',null, 'jobsubmit.php?jobid=' . $jobid));
+	buttons(button('Back',null, 'survey.php'), button('Submit Survey',null, 'jobsubmit.php?jobid=' . $jobid));
 else
-	buttons(button('cancel',null, 'survey.php'));
+	buttons(button('Cancel',null, 'survey.php'));
 
 startWindow("Confirmation &amp; Submit");
 ?>

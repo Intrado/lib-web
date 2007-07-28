@@ -69,7 +69,7 @@ $TITLE = "SMS Job Report" . ($smsjobid ? " - " . $smsjob->name : "");
 include_once("nav.inc.php");
 //TODO buttons for notification log: download csv, view call details
 if ($smsjobid)
-	echo buttons(button('refresh', 'window.location.reload()'), button('done', 'window.history.go(-1)'));
+	echo buttons(button('Refresh', 'window.location.reload()'), button('Done', 'window.history.go(-1)'));
 else
 	buttons();
 

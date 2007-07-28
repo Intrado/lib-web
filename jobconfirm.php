@@ -100,7 +100,7 @@ foreach($joblangs[$type] as $joblang) {
 				</td>
 				<td>
 <? if ($type == "phone") { ?>
-					<div style="float: right;"><?= button('play', "popup('previewmessage.php?id=" . $message->id . "', 400, 400);"); ?></div>
+					<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $message->id . "', 400, 400);"); ?></div>
 <? } ?>
 					<?= htmlentities($message->name) ?>
 				</td>
@@ -128,11 +128,11 @@ include_once("nav.inc.php");
 
 NewForm($f, "jobsubmit.php?jobid=$jobid");
 if ($renderedlist->total > 0)
-	buttons(button('saveforlater', null, 'jobs.php'),
-			button('modifyjobsetting',null, 'job.php'),
-			button('submit_job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
+	buttons(button('Save For Later', null, 'jobs.php'),
+			button('Modify Job Settings',null, 'job.php'),
+			button('Submit Job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
 else
-	buttons(button('cancel',null, 'job.php'));
+	buttons(button('Cancel',null, 'job.php'));
 
 
 startWindow("Confirmation &amp; Submit");
@@ -198,7 +198,7 @@ startWindow("Confirmation &amp; Submit");
 <?
 $phonemessage = new Message($job->phonemessageid);
 echo htmlentities($phonemessage->name);
-echo "&nbsp;" . button('play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);");
+echo "&nbsp;" . button('Play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);");
 ?>
 					</td>
 				</tr>

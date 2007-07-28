@@ -11,16 +11,19 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 	<link href='css/style.css' type='text/css' rel='stylesheet' media='screen'>
 </head>
 <body onload="try {UpdateTimer();} catch (e) {}" style="margin: 0px; background-color: white;">
-	<IFRAME id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" src="javascript:false;" frameBorder="0" scrolling="no"></IFRAME>
-	<div id="popupcontainer">
-		<div id="mainscreen">
-			<img id="brand" src="img/school_messenger.gif"/>
-		</div>
-		<div id="contentbody">
-			<div>
-				<div id="navtitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
-				<div id="navdesc"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
-			</div>
-			<div id="shadowblock">
-				<table border="0" cellpadding="0" cellspacing="0">
-					<tr><td id="shadowcontent">
+	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
+
+
+
+<div>
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif">
+	<tr>
+	<td><img src="img/logo.gif"></td>
+	</tr>
+	</table>
+</div>
+
+<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
+
+<div class="content">

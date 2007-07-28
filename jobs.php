@@ -123,9 +123,9 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Active and Pending Notification Jobs ' . help('Jobs_MyActiveJobs', NULL, 'blue'), 'padding: 3px;', true, true);
+startWindow('My Active and Pending Notification Jobs ' . help('Jobs_MyActiveJobs'), 'padding: 3px;', true, true);
 
-button_bar(button('createjob', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('easycall',"var namefield = new getObj('easycallname');popup('easycallstart.php?id=new',500,450);") . help('Start_EasyCall') : ''));
+button_bar(button('Create Job', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('EasyCall',"var namefield = new getObj('easycallname');popup('easycallstart.php?id=new',500,450);") . help('Start_EasyCall') : ''));
 
 showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
@@ -147,10 +147,10 @@ if ($USER->authorize('createrepeat')) {
 	if (count($data) > $scrollThreshold) {
 		$scroll = true;
 	}
-	startWindow('My Repeating Notification Jobs ' . help('Jobs_MyRepeatingJobs', NULL, 'blue'), 'padding: 3px;', true, true);
+	startWindow('My Repeating Notification Jobs ' . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
 
 
-	button_bar(button('createrepeatjob', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
+	button_bar(button('Create Repeating Job', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
 
 
 	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "type" => "fmt_obj_csv_list","finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
@@ -185,7 +185,7 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Completed Notification Jobs ' . help('Jobs_MyCompletedJobs', NULL, 'blue'),'padding: 3px;', true, true);
+startWindow('My Completed Notification Jobs ' . help('Jobs_MyCompletedJobs'),'padding: 3px;', true, true);
 showObjects($data, $titles, $formatters, $scroll, true);
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">

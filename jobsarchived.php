@@ -52,7 +52,7 @@ if(!$USER->authorize('leavemessage')){
 	unset($titles["responses"]);
 	unset($formatters["responses"]);
 }
-startWindow('My Archived Jobs ' . help('Jobs_MyArchivedJobs', NULL, 'blue'),'padding: 3px;', false, true);
+startWindow('My Archived Jobs ' . help('Jobs_MyArchivedJobs'),'padding: 3px;', false, true);
 showObjects($data, $titles, $formatters);
 endWindow();
 

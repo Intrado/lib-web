@@ -63,9 +63,9 @@ $titles = array(	"name" => "#List Name",
 					);
 
 
-startWindow('My Lists&nbsp;' . help('Lists_MyLists', NULL, 'blue'), 'padding: 3px;');
+startWindow('My Lists&nbsp;' . help('Lists_MyLists'), 'padding: 3px;');
 
-button_bar(button('createlist', NULL,"list.php?id=new") . help('Lists_AddList'));
+button_bar(button('Create New List', NULL,"list.php?id=new") . help('Lists_AddList'));
 
 
 

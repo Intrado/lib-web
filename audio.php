@@ -42,7 +42,7 @@ function fmt_actions($obj, $name) {
 }
 
 function fmt_preview($obj, $name) {
-	return button("play", NULL,"previewaudio.php?id=" .$obj->id);
+	return button("Play", NULL,"previewaudio.php?id=" .$obj->id);
 
 
 	//"<a href=\"previewaudio.php?id=$obj->id\"><img border=\"0\" src=\"audio.gif\"></a>";
@@ -56,7 +56,7 @@ $TITLE = "Audio File Library";
 
 include_once("popup.inc.php");
 
-button_bar(button('done', 'window.close()'), ($USER->authorize("starteasy") ? button('callmetorecord', NULL,"callme.php?origin=audio") . help('AudioFileEditor_CallMeToRecord') : ''), button('uploadaudio', NULL,"uploadaudio.php?id=new") . help('AudioFileEditor_UploadAudioFile'));
+buttons(button('Done', 'window.close()'));
 
 $data = DBFindMany("AudioFile",", name + 0 as dummy from audiofile where userid=$USER->id and not deleted order by dummy,name");
 $titles = array(	"preview" => "Preview",
@@ -67,9 +67,11 @@ $titles = array(	"preview" => "Preview",
 					);
 
 startWindow('Audio Files', 'padding: 3px;');
+
+button_bar(($USER->authorize("starteasy") ? button('Call Me To Record', NULL,"callme.php?origin=audio") . help('AudioFileEditor_CallMeToRecord') : ''), button('Upload Audio', NULL,"uploadaudio.php?id=new") . help('AudioFileEditor_UploadAudioFile'));
+
 showObjects($data, $titles, array("preview" => "fmt_preview", "created" => "fmt_date", "Actions" => "fmt_actions", 'method' => 'fmt_ucfirst'));
 endWindow();
-print('<br>');
-print button('done', 'window.close();');
+buttons();
 
 include_once("popupbottom.inc.php");

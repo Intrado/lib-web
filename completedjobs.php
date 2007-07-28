@@ -36,7 +36,7 @@ $TITLE = "Completed Jobs";
 
 include_once("nav.inc.php");
 
-startWindow('Completed Notification Jobs ' . help('System_CompletedJobs', NULL, 'blue'), 'padding: 3px;');
+startWindow('Completed Notification Jobs ' . help('System_CompletedJobs'), 'padding: 3px;');
 
 
 //get this page's worth of jobs

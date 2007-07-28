@@ -61,7 +61,7 @@ if ($jobid) {
 
 			//% people participated (subset of contacted)
 			$query = "select count(*) as cnt
-						from reportperson rp 
+						from reportperson rp
 						left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 						and rp.status='success' and rc.result='A' and rc.participated=1";
 			$phoneparticipants = QuickQuery($query);
@@ -118,7 +118,7 @@ if ($jobid) {
 
 			//phones by cp
 			$query = "select count(*) as cnt, rc.result, sum(rp.status not in ('success','fail') and rc.numattempts < $job->maxcallattempts) as remaining
-						from reportperson rp 
+						from reportperson rp
 						left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 			where rp.jobid = '$jobid'
 			and rp.status != 'duplicate' and rp.type='phone'
@@ -171,7 +171,7 @@ if ($jobid) {
 			$emailpeople = QuickQuery($query);
 
 			$query = "select count(*) totalemails, sum(rc.numattempts>0) as sent
-						from reportperson rp 
+						from reportperson rp
 						left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 						where rp.jobid='$jobid' and rp.type='email'";
 			list($totalemails, $sentemails) = QuickQueryRow($query);
@@ -216,7 +216,7 @@ $TITLE = "Standard Job Report" . ($jobid ? " - " . $job->name : "");
 include_once("nav.inc.php");
 //TODO buttons for notification log: download csv, view call details
 if ($jobid)
-	echo buttons(button('refresh', 'window.location.reload()'), button('done', 'window.history.go(-1)'));
+	echo buttons(button('Refresh', 'window.location.reload()'), button('Done', 'window.history.go(-1)'));
 else
 	buttons();
 

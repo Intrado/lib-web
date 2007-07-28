@@ -67,15 +67,18 @@ if ($USER->authorize("startstats")) {
 <?
 			if ($USER->authorize("starteasy")) {
 			?><tr><td><?
-				startWindow('EasyCall ' . help('Start_EasyCall', NULL, 'blue'), 'padding: 3px;');
-				?><div align="center"><?= button('easycall2',"var namefield = new getObj('easycallname');popup('easycallstart.php?id=new',550,550);"); ?></div><?
+				startWindow('EasyCall ' . help('Start_EasyCall'),NULL);
+				?><div align="center" style="margin: 5px;"><img src="img/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);");"
+					onmouseover="this.src='img/b2_easycall2.gif'"
+					onmouseout="this.src='img/b1_easycall2.gif'">
+					</div><?
 				endWindow();
 			?><br></td></tr><?
 			}
 ?>
 			<tr><td><?
-				startWindow('My Active Calls', 'padding: 3px;');
-				button_bar(button('refresh', 'window.location.reload()'));
+				startWindow('My Active Calls',NULL);
+				button_bar(button('Refresh', 'window.location.reload()'));
 				?><div align="center"><img src="graph_start_actrive_breakdown.png.php?junk=<?= rand() ?>" /></div><?
 				endWindow();
 ?>
@@ -88,8 +91,8 @@ if ($USER->authorize("startstats")) {
 
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
-			startWindow('My Active and Pending Notifications ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;',true);
-			button_bar(button('refresh', 'window.location.reload()'));
+			startWindow('My Active and Pending Notifications ' . help('Start_MyActiveJobs'),NULL,true);
+			button_bar(button('Refresh', 'window.location.reload()'));
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Name",
@@ -109,7 +112,7 @@ if ($USER->authorize("startstats")) {
 
 
 
-			startWindow('My Completed Notifications ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;',true);
+			startWindow('My Completed Notifications ' . help('Start_MyCompletedJobs'),NULL,true);
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Name",
@@ -131,8 +134,8 @@ if ($USER->authorize("startstats")) {
 
 			if ($USER->authorize("survey")) {
 
-				startWindow('My Active and Pending Surveys ' . help('Start_MyActiveJobs', NULL, 'blue'), 'padding: 3px;',true);
-				button_bar(button('refresh', 'window.location.reload()'));
+				startWindow('My Active and Pending Surveys ' . help('Start_MyActiveJobs'),NULL,true);
+				button_bar(button('Refresh', 'window.location.reload()'));
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='processing') and type='survey' and deleted = 0 order by id desc limit $limit");
 				$titles = array(	"name" => "Name",
@@ -152,7 +155,7 @@ if ($USER->authorize("startstats")) {
 
 
 
-				startWindow('My Completed Surveys ' . help('Start_MyCompletedJobs', NULL, 'blue'), 'padding: 3px;',true);
+				startWindow('My Completed Surveys ' . help('Start_MyCompletedJobs'),NULL,true);
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type='survey' and deleted = 0 order by finishdate desc limit $limit");
 				$titles = array(	"name" => "Name",
@@ -179,8 +182,11 @@ if ($USER->authorize("startstats")) {
 } else if ($USER->authorize("starteasy")) {
 ?>
 	<table border=0 width="250"><tr><td><?
-	startWindow('EasyCall', 'padding: 3px;');
-	?><div align="center"><?= button('easycall2',"var namefield = new getObj('easycallname');popup('easycallstart.php',500,450);")?><div><?;
+	startWindow('EasyCall',NULL);
+	?><div align="center" style="margin: 5px;"><img src="img/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);");"
+					onmouseover="this.src='img/b2_easycall2.gif'"
+					onmouseout="this.src='img/b1_easycall2.gif'">
+					</div><?;
 	endWindow();
 	?></td></tr></table><?
 }

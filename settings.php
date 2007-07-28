@@ -255,9 +255,9 @@ function fmt_timeslices($obj, $name) {
 function fmt_edit($obj, $name) {
 	global $f, $s;
 	if(isset($_GET['edittype']) && $_GET['edittype'] == $obj->id)
-		return '<div align="center">' . submit($f, $s, 'save', 'save') . '</div>';
+		return '<div align="center">' . submit($f, $s, 'Save') . '</div>';
 	if($obj->id == 'new')
-		return '<div align="center">' . submit($f, $s, 'add', 'add') . '</div>';
+		return '<div align="center">' . submit($f, $s, 'Add') . '</div>';
 	else
 		return '<div align="center"><a href="' . $_SERVER['SCRIPT_NAME'] . '?edittype=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
 			. '<a href="' . $_SERVER['SCRIPT_NAME'] . '?deletetype=' . $obj->priority . '" onclick="return confirmDelete();">Delete</a></div>';
@@ -283,7 +283,7 @@ $TITLE = 'Systemwide Settings';
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'save', 'save'));
+buttons(submit($f, $s, 'Save'));
 startWindow('Global System Settings');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">

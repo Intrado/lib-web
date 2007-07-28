@@ -60,7 +60,7 @@ foreach ($fieldmaps as $fieldmap) {
 			}
 
 			echo '<td>';
-			echo button('delete', NULL, '?deleterule=' . $rule->id);
+			echo button('Delete', NULL, '?deleterule=' . $rule->id);
 			echo "</td></tr>\n";
 		}
 	}
@@ -210,7 +210,10 @@ foreach ($fieldmaps as $fieldmap) {
 	}
 }
 echo '</td><td>';
-NewFormItem($f,$s,"Add","image", 'add');
+
+echo submit($f,$s,"Add");
+
+//NewFormItem($f,$s,"Add","image", 'add');
 echo "</tr>";
 
 ?>

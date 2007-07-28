@@ -119,7 +119,7 @@ $TITLE = "Blocked Numbers List";
 include_once("nav.inc.php");
 
 NewForm($form);
-startWindow('Systemwide Blocked Phone Numbers ' . help('Blocked_SystemwideBlocked', NULL, 'blue'), 'padding: 3px;', false, true);
+startWindow('Systemwide Blocked Phone Numbers ' . help('Blocked_SystemwideBlocked'), 'padding: 3px;', false, true);
 if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall') {
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
@@ -137,15 +137,12 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 			&nbsp;
 			</td>
 			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text',30,100); ?>&nbsp;&nbsp;</td>
-			<td><?= submit($form, $section, 'add', 'add'); ?></td>
+			<td><?= submit($form, $section, 'Add'); ?></td>
 			<td><? print help('Blocked_Add', 'style="margin-left: 5px;"'); ?></td>
 		</tr>
 	</table>
 <?
 } // End if
-
-endWindow();
-EndForm();
 
 if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
 	$titles = array(
@@ -181,6 +178,9 @@ while ($row = DBGetRow($result)) {
 echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
 showTable($data, $titles, $formatters);
 echo "\n</table>";
+
+endWindow();
+EndForm();
 
 include_once("navbottom.inc.php");
 

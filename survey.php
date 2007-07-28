@@ -304,9 +304,9 @@ include_once("nav.inc.php");
 NewForm($f);
 
 if ($submittedmode)
-	buttons(submit($f, $s, 'save', 'save'));
+	buttons(submit($f, $s, 'Save'));
 else
-	buttons(submit($f, $s, 'saveforlater', 'saveforlater'),submit($f, 'send','confirmation', 'confirmation'));
+	buttons(submit($f, $s, 'Save For Later'),submit($f, 'send','Proceed To Confirmation'));
 
 startWindow('Survey Information');
 ?>

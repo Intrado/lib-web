@@ -72,7 +72,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'upload','preview','preview'), button('cancel',NULL,'list.php'));
+buttons(submit($f, 'upload','Preview'), button('Cancel',NULL,'list.php'));
 
 
 startWindow('Upload Call List File');

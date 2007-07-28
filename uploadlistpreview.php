@@ -266,7 +266,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'save','save','save'), button("selectdiffile",NULL,"uploadlist.php"), button('cancel',NULL,'list.php'));
+buttons(submit($f, 'save','Save'), button("Select Different File",NULL,"uploadlist.php"), button('Cancel',NULL,'list.php'));
 
 
 if ($notfound > 0) {

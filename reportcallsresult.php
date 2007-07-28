@@ -165,20 +165,20 @@ if(isset($_REQUEST['reportid'])){
 } else {
 
 	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-	
+
 	$activefields = array();
 	$fieldlist = array();
 
 	foreach($fields as $field){
 		// used in html
 		$fieldlist[$field->fieldnum] = $field->name;
-		
+
 		// used in pdf
 		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-			$activefields[] = $field->fieldnum; 
+			$activefields[] = $field->fieldnum;
 		}
 	}
-	
+
 	foreach($orders as $order){
 		$_SESSION[$order] = isset($options[$order]) ? $options[$order] : "" ;
 	}
@@ -235,7 +235,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 			foreach($orders as $order){
 				$options[$order] = GetFormData($f, $s, $order);
 				$_SESSION[$order] = GetFormData($f, $s, $order);
-			}		
+			}
 			$_SESSION['report']['options']= $options;
 			if(CheckFormSubmit($f, "save")){
 				$instance->setParameters($options);
@@ -269,11 +269,11 @@ if($generator->format != "html"){
 		$params = createPdfParams($name);
 		$generator->generate($params);
 
-	
+
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=$name");
-		header("Content-type: application/pdf");	
+		header("Content-type: application/pdf");
 		session_write_close();
 		$fp = fopen($name, "r");
 		while($line = fgets($fp)){
@@ -302,16 +302,16 @@ if($generator->format != "html"){
 	if(isset($subscription)){
 		$TITLE .= ": " . $subscription->name;
 	}
-	
+
 	include_once("nav.inc.php");
 	NewForm($f);
-	buttons(button('back', 'window.history.go(-1)'), submit($f, "save", "save", "save"), submit($f, $s, "search", "refresh"));
+	buttons(button('Back', 'window.history.go(-1)'), submit($f, "save", "Save"), submit($f, $s, "Refresh"));
 	startWindow("Display Options", "padding: 3px;");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Fields:</th>
 			<td class="bottomBorder">
-	<? 		
+	<?
 				select_metadata('searchresultstable', 5, $fields);
 	?>
 			</td>
@@ -351,7 +351,7 @@ if($generator->format != "html"){
 	?>
 	<br>
 	<?
-			
+
 	$generator->generate();
 	buttons();
 	EndForm();

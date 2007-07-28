@@ -1,13 +1,4 @@
-						</td>
-						<td id='shadowright' valign="top" align="left"><img src="img/shadow_top_right.gif"></td>
-					</tr>
-					<tr>
-						<td id='shadowbottom' valign="top" align="left"><img src="img/shadow_bottom_left.gif"></td>
-						<td valign="top" align="left"><img src="img/shadow_bottom_right.gif"></td>
-					</tr>
-			</table></div>
-		</div>
-	</div>
+
 </div>
 <?
 if(isset($ERRORS) && is_array($ERRORS)) {

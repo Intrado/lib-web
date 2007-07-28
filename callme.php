@@ -99,11 +99,11 @@ if (GetFormData($f,$s,"origin") == 'audio') {
 } else {
 	$onclick = 'window.close()';
 }
-buttons(submit($f, $s, 'submit','callmetorecord'), button('cancel', $onclick));
+buttons(submit($f, $s, 'Call Me To Record'), button('Cancel', $onclick));
 startWindow("Call Me to Record");
 
 ?>
-	<table border="0" cellpadding="3" cellspacing="0" width="400">
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder"><?= (GetFormData($f,$s,"origin") == "message" ? "Message&nbsp;Name:" : "Audio&nbsp;File&nbsp;Name:") ?></td>

@@ -212,7 +212,7 @@ $TITLE = "Account Information: $USER->firstname $USER->lastname";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'save'));
+buttons(submit($f, $s, 'Save'));
 
 startWindow('User Information');
 ?>

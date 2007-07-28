@@ -251,12 +251,12 @@ include_once("nav.inc.php");
 NewForm($f);
 
 if (!isset($personid)) {
-	buttons(submit($f, 'saveanother', 'saveanother', 'save_add_another'),
-		submit($f, 'savedone', 'savedone', 'save'),
-		button('cancel',NULL,$redirectPage));
+	buttons(submit($f, 'saveanother', 'Save &amp Add Another'),
+		submit($f, 'savedone', 'Save'),
+		button('Cancel',NULL,$redirectPage));
 } else {
-	buttons(submit($f, 'savedone', 'savedone', 'save'),
-		button('cancel',NULL,$redirectPage));
+	buttons(submit($f, 'savedone', 'Save'),
+		button('Cancel',NULL,$redirectPage));
 }
 
 startWindow("Contact");

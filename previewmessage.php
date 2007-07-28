@@ -113,7 +113,7 @@ include_once("popup.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, $s, 'submit',$dopreview ? 'refresh' : 'play'), button('done', 'window.close()'));
+buttons(submit($f, $s, $dopreview ? 'Refresh' : 'Play'), button('Done', 'window.close()'));
 
 startWindow('Preview Options', 'padding: 3px;');
 

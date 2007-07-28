@@ -61,9 +61,9 @@ $TITLE = "SMS Jobs";
 include_once("nav.inc.php");
 
 
-startWindow('My SMS Jobs&nbsp;' . help('SMS_jobs', NULL, 'blue'), 'padding: 3px;');
+startWindow('My SMS Jobs&nbsp;' . help('SMS_jobs'), 'padding: 3px;');
 
-button_bar(button('createjob', NULL,"smsjob.php?id=new"));
+button_bar(button('Create New SMS Job', NULL,"smsjob.php?id=new"));
 
 $data = DBFindMany("SmsJob","from smsjob where userid=$USER->id and deleted = 0 order by sentdate desc");
 $titles = array(	"name" => "#Name",

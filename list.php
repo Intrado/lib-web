@@ -191,10 +191,10 @@ $titles = array(	"id" => "ID",
 
 NewForm($f);
 if (!$list->id)
-	buttons(submit($f,'refresh','save','save'));
+	buttons(submit($f,'refresh','Save'));
 else
-	buttons(submit($f,'refresh','refresh','refresh'),
-		submit($f,'search','search','search') , submit($f, 'preview','preview','preview'),submit($f,'save','done','done'));
+	buttons(submit($f,'refresh','Refresh'),
+		submit($f,'search','Search &amp; Add') , submit($f, 'preview','Preview'),submit($f,'save','Done'));
 
 startWindow('List Information', 'padding: 3px;');
 print 'Name: ';
@@ -218,10 +218,10 @@ if (!$list->id) {
 
 StartWindow("List Content");
 ?>
-<table border="0" cellpadding="3" cellspacing="1" width=100%>
+<table border="0" cellpadding="3" cellspacing="0" width=100%>
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Rules:<br><? print help('List_Rules', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;" valign="bottom">
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Rules:<br><? print help('List_Rules', NULL, 'grey'); ?></th>
+		<td class="bottomBorder" style="padding: 5px;" valign="bottom">
 <?
 //ruleeditform expects $RULES to be set
 $RULEMODE = array('multisearch' => true, 'text' => false, 'reldate' => true);
@@ -249,8 +249,8 @@ if ($numAdd > 0) {
 ?>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Additions:<br><? print help('List_Additions', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;">
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Additions:<br><? print help('List_Additions', NULL, 'grey'); ?></th>
+		<td class="bottomBorder" style="padding: 5px;">
 <?
 if ($list->id) {
 	$renderedlist->mode = "add";
@@ -272,8 +272,8 @@ if ($numSkip > 0) {
 ?>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Skip:<br><? print help('List_Skip', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;">
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Skip:<br><? print help('List_Skip', NULL, 'grey'); ?></th>
+		<td class="bottomBorder" style="padding: 5px;">
 <?
 if ($list->id) {
 	$renderedlist->mode = "remove";
@@ -292,23 +292,23 @@ if ($list->id) {
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Search Database:<br><? print help('List_SearchAndAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= submit($f,'search','search','search_add') ?></td>
+		<td style="padding: 5px;"><?= submit($f,'search','Search &amp; Add') ?></td>
 	</tr>
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("enter_contacts",NULL,"addressmanualadd.php?id=new")?></td>
+		<td style="padding: 5px;"><?= button("Enter Contacts",NULL,"addressmanualadd.php?id=new")?></td>
 	</tr>
 
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Address Book<br><? print help('List_AddressBookAdd', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("openaddbook",NULL,"addressesmanualadd.php"); ?></td>
+		<td style="padding: 5px;"><?= button("Open Addressbook",NULL,"addressesmanualadd.php"); ?></td>
 	</tr>
 
 <? if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) { ?>
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader">Upload List<br><? print help('List_UploadList', NULL, 'grey'); ?></th>
-		<td style="padding: 5px;"><?= button("upload",NULL,"uploadlist.php"); ?></td>
+		<td style="padding: 5px;"><?= button("Upload List",NULL,"uploadlist.php"); ?></td>
 	</tr>
 <? } ?>
 </table>

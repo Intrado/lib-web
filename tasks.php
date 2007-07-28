@@ -38,8 +38,8 @@ $TITLE = "Data Import Manager";
 
 include_once("nav.inc.php");
 
-startWindow('System Imports ' . help('Tasks_SystemTasks', NULL, 'blue'), 'padding: 3px;');
-button_bar(button('addnewimport', null, "task.php?id=new"),button('refresh', 'window.location.reload()'));
+startWindow('System Imports ' . help('Tasks_SystemTasks'), 'padding: 3px;');
+button_bar(button('Add New Import', null, "task.php?id=new"),button('Refresh', 'window.location.reload()'));
 
 function fmt_updatemethod ($import,$field) {
 	if ($import->$field == "full")

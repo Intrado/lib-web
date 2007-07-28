@@ -3,7 +3,7 @@ include_once('inc/common.inc.php');
 include_once('inc/html.inc.php');
 include_once('popup.inc.php');
 ?>
-<?= button("done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"); ?>
+<?= button("Done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"); ?>
 <div align="center">
 
 <OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42

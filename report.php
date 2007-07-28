@@ -119,7 +119,7 @@ if (isset($_GET['reporttype']) || isset($_GET['jobid']) || isset($_GET['jobid_ar
 					break;
 			}
 			$_SESSION['reportsql'] = "and ( (rc.starttime >= unix_timestamp('$targetdate') * 1000 and rc.starttime < unix_timestamp(date_add('$targetdate',interval 1 day)) * 1000 )
-												or rc.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";	
+												or rc.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
 			break;
 	}
 
@@ -477,7 +477,7 @@ if (isset($_GET['csv'])) {
 		$DESCRIPTION .= "<br>Created by {$data[0][11]} {$data[0][12]} ({$data[0][13]})";
 	}
 	include_once("nav.inc.php");
-	print buttons(button('refresh', 'window.location.reload()'), button('done', 'window.history.go(-1)'));
+	print buttons(button('Refresh', 'window.location.reload()'), button('Done', 'window.history.go(-1)'));
 
 	startWindow("Report Summary", NULL, false);
 
@@ -565,7 +565,7 @@ if (isset($_GET['csv'])) {
 <?
 
 
-	print buttons(button('refresh', 'window.location.reload()'), button('done', NULL, 'reportoptions.php'));
+	print buttons(button('Refresh', 'window.location.reload()'), button('Done', NULL, 'reportoptions.php'));
 
 	include_once("navbottom.inc.php");
 } //else if csv

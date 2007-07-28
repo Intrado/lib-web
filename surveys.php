@@ -41,9 +41,9 @@ $TITLE = "Survey Builder";
 include_once("nav.inc.php");
 
 
-startWindow('My Active and Pending Surveys ' . help('SurveyBuilder_MyActiveAndPending', NULL, 'blue'),'padding: 3px;',true, true);
+startWindow('My Active and Pending Surveys ' . help('SurveyBuilder_MyActiveAndPending'),'padding: 3px;',true, true);
 
-button_bar(button('schedule_survey', null,"survey.php?id=new") );
+button_bar(button('Schedule Survey', null,"survey.php?id=new") );
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='new' or status='processing' or status='active' or status='cancelling') and deleted=0 order by id desc");
 
@@ -62,7 +62,7 @@ $actions = array("Type" => "fmt_surveytype",
 				"responses" => "fmt_response_count",
 				"Actions" => "fmt_jobs_actions"
 				);
-				
+
 if(!$USER->authorize('leavemessage')){
 	unset($titles["responses"]);
 	unset($actions["responses"]);
@@ -74,7 +74,7 @@ endWindow();
 
 echo "<br>";
 
-startWindow('My Completed Surveys '  . help('SurveyBuilder_MyCompleted', NULL, 'blue'),'padding: 3px;',true, true);
+startWindow('My Completed Surveys '  . help('SurveyBuilder_MyCompleted'),'padding: 3px;',true, true);
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='complete' or status='cancelled') and deleted=0 order by id desc");
 
@@ -93,7 +93,7 @@ $actions = array("Type" => "fmt_surveytype",
 				"responses" => "fmt_response_count",
 				"Actions" => "fmt_jobs_actions"
 				);
-				
+
 if(!$USER->authorize('leavemessage')){
 	unset($titles["responses"]);
 	unset($actions["responses"]);

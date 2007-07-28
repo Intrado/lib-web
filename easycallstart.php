@@ -274,17 +274,17 @@ include_once('popup.inc.php');
 
 NewForm($f);
 
-buttons(submit($f, $s, 'submit','callmetorecord'), button('cancel', 'window.close()'));
+buttons(submit($f, $s, 'Call Me To Record'), button('Cancel', 'window.close()'));
 startWindow("EasyCall");
 
 ?>
-	<table border="0" cellpadding="3" cellspacing="0" width="400">
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Job&nbsp;Name:&nbsp;<?= help("EasyCall_Name", null, 'small'); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Job&nbsp;Name:&nbsp;<?= help("EasyCall_Name", null, 'small'); ?></th>
 			<td class="bottomBorder"><? NewFormItem($f,$s,"name","text",30,30,'id="name"'); ?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Priority:&nbsp;<?= help('EasyCall_Priority', NULL, "small"); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Priority:&nbsp;<?= help('EasyCall_Priority', NULL, "small"); ?></th>
 			<td class="bottomBorder">
 <?
 				NewFormItem($f,$s,"jobtypeid", "selectstart", null, null, 'id="jobtype"');
@@ -296,7 +296,7 @@ startWindow("EasyCall");
 			</td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">List: <?= help('EasyCall_List', NULL, "small"); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">List: <?= help('EasyCall_List', NULL, "small"); ?></th>
 			<td class="bottomBorder">
 <?
 				$peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
@@ -310,14 +310,14 @@ startWindow("EasyCall");
 			</td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Call&nbsp;Me&nbsp;At:&nbsp;<?= help("EasyCall_PhoneNumber", null, 'small'); ?></td>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Call&nbsp;Me&nbsp;At:&nbsp;<?= help("EasyCall_PhoneNumber", null, 'small'); ?></th>
 			<td class="bottomBorder"><? NewFormItem($f,$s,"phone","text",20, "nomax",'id="phone"'); ?></td>
 		</tr>
 <?
 		if($USER->authorize('sendmulti')) {
 ?>
 			<tr>
-				<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Record in Additional Languages:</td>
+				<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Record in Additional Languages:</th>
 				<td class="bottomBorder">
 				<table>
 					<tr>
@@ -349,7 +349,7 @@ startWindow("EasyCall");
 											<td class="bottomBorder">
 <?
 												if(!isset($_GET['retry']))
-													echo submit($f, 'remove_'.$lang, 'delete', 'delete', 'id="delbutton"');
+													echo submit($f, 'remove_'.$lang, 'Delete');
 												else
 													echo "&nbsp;";
 ?>
@@ -364,7 +364,7 @@ startWindow("EasyCall");
 									<td>
 <?
 										if(!isset($_GET['retry']))
-											echo submit($f, 'add', 'Add', 'add');
+											echo submit($f, 'add', 'Add');
 ?>
 									</td>
 								</tr>
@@ -411,9 +411,9 @@ startWindow("EasyCall");
 		}
 
 		if($IS_COMMSUITE){
-			?> <tr><td colspan=3 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr> <?
+			?> <tr><td colspan=2 style="padding: 10px;"><img src="img/bug_important.gif" > If dialing an outside line, please include the area code.</td><tr> <?
 		} else {
-			?> <tr><td colspan=3 style="padding: 10px;">Enter the 10-digit direct-dial phone number where you are currently located.</td><tr> <?
+			?> <tr><td colspan=2 style="padding: 10px;"><img src="img/bug_important.gif" > Enter the 10-digit direct-dial phone number where you are currently located.</td></tr> <?
 		}
 ?>
 		</table>
