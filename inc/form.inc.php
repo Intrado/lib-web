@@ -21,7 +21,7 @@ array
 
 function NewForm($formname) {
 
-	echo "<form method=\"post\" action=\"" . $_SERVER["REQUEST_URI"] . "\" enctype=\"multipart/form-data\">";
+	echo "<form name=\"$formname\" method=\"post\" action=\"" . $_SERVER["REQUEST_URI"] . "\" enctype=\"multipart/form-data\">";
 	echo "<input type=\"hidden\" name=\"frm[" . $formname . "][timestamp]\" value=\""
 			. $_SESSION['formdata'][$formname]['timestamp'] . "\">";
 }

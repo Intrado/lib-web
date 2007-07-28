@@ -89,50 +89,40 @@ function showTable ($data, $titles, $formatters = array()) {
 
 function startWindow($title, $style = NULL, $minimize = false, $usestate = true)
 {
-	static $id;
+	static $id = 0;
 	$id++;
-	if($usestate && state('window_' . $id))
-		$display = state('window_' . $id) == 'closed' ? false : true;
-	else
-		$display = true;
-	if($minimize) {
-?><div  id="_window_off_<? print $id;?>" <? if($display) print 'style="display: none;"' ?> >
-	<table width="100%" cellpadding="0" cellspacing="1" class="window noprint">
-		<tr class="windowHeader">
-			<td colspan="2" style="padding: 0px;"><table border="0" cellpadding="0" cellspacing="0" class="windowHeader" width="100%">
-					<tr>
-						<th align="left" style="padding: 1px 3px 1px 3px;"><div class="windowTitle"><? print $title; ?></div></th>
-						<th align="right" height="21"><img class="noprint clickable" src="img/collapse_down.gif"
-								onClick="hide('_window_off_<? print $id;?>'); show('_window_on_<? print $id; ?>'); setState('window_<? print $id; ?>', 'open');"
-								></th>
-					</tr>
-			</table></td>
-		</tr>
-	</table>
-	</div><?
-	}
-	?><div  id="_window_on_<? print $id;?>" <? if(!$display) print 'style="display: none;"' ?> >
-	<table width="100%" cellpadding="0" cellspacing="1" class="window">
-		<tr class="windowHeader" >
-			<td style="padding: 0px;"><table border="0" cellpadding="0" cellspacing="0" class="windowHeader" width="100%">
-				<tr>
-						<th align="left" style="padding: 1px 3px 1px 3px;"><div class="windowTitle"><? print $title; ?></div></th>
-						<th align="right" height="21"><? if($minimize) { ?><img class="noprint clickable" src="img/collapse_up.gif"
-								onClick="hide('_window_on_<? print $id; ?>'); show('_window_off_<? print $id; ?>'); setState('window_<? print $id; ?>', 'closed');"
-								><? } ?></th>
-				</tr>
-			</table></td>
-		</tr>
-		<tr>
-			<td class="windowCell" style="<? print $style; ?>"> <?
+
+?>
+<div class="window">
+<table width="100%" border=0 cellpadding=0 cellspacing=0>
+<tr>
+	<td width="100%">
+		<div class="windowborder">
+			<div class="windowbar">
+<?	if ($minimize) { ?>
+				<div class="menucollapse" onclick="windowHide(<?=$id?>);" ><img id="window_colapseimg_<?= $id ?>" src="img/arrow_down.gif"></div>
+<? } ?>
+				<div class="windowtitle"><?= $title ?></div>
+			</div>
+			<div id="window_<?= $id ?>" class="windowbody" style="<?=$style?>"><div style="width: 100%;">
+<?
 }
 
 function endWindow()
 {
-		?></div></td>
-		</tr>
+?>
+				</div></div>
+			</div>
+		</td>
+		<td width="6" valign="top" background="img/window_shadow_right.gif"><img src="img/window_shadow_topright.gif"></td>
+	</tr>
+	<tr>
+		<td background="img/window_shadow_bot.gif"><img src="img/window_shadow_botleft.gif"></td>
+		<td><img src="img/window_shadow_botright.gif"></td>
 	</table>
-	</div><?
+</div>
+<?
+
 }
 
 function showPageMenu ($total,$start, $perpage, $link = NULL) {

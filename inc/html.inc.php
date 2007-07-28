@@ -19,7 +19,7 @@ function help($title, $extrahtml = NULL, $color = NULL) {
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	if ($link != "")
 		$hover .= " onclick=\"window.open('$link', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');\"";
-	$hover .= '><div class="hoverhelp" >' . $contents . '</div></span>';
+	$hover .= '><div class="hoverhelp">' . $contents . '</div></span>';
 
 	return $hover;
 }
@@ -70,41 +70,56 @@ function error() {
 	}
 }
 
+function buttons() {
+	static $buttons;
+	if(!$buttons) {
+		$buttons = func_get_args();
+	}
+?>
+		<table border=0 cellspacing=3 cellpadding=0><tr><td>
+<?
+		echo implode('</td><td>', $buttons);
+?>
+		</td></tr></table>
+<?
+}
+
 function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
-	$btn = "";
 
-	if ($href !== NULL) {
-		$btn .= '<a href="' . htmlentities($href) . '">';
-	}
+	$btn = '<div class="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 
-	$btn .= '<img class="button" alt="' . $name . '" src="img/b1_' . $name . '.gif" ' . $extrahtml . ' border="0" align="absmiddle" onMouseOver="this.src=\'img/b2_' . $name . '.gif\';" onMouseOut="this.src=\'img/b1_' . $name . '.gif\';" ' . (isset($onclick) ? 'onClick="' . $onclick . '"' : "") . '>';
 
-	if ($href !== NULL) {
-		$btn .= '</a>';
-	}
+	if ($onclick && !$href)
+		$btn .= ' onclick="' . $onclick . '; return false;" ';
+	else if ($onclick)
+		$btn .= ' onclick="' . $onclick . '" ';
+
+	if ($extrahtml)
+		$btn .= $extrahtml;
+
+	$btn .= '><a href="';
+
+	if ($href)
+		$btn .= htmlentities($href);
+	else
+		$btn .= "#";
+
+	$btn.= '">
+		<table><tr><td><img buttonrollover="left" src="img/button_left.gif"></td><td buttonrollover="middle" class="middle">' . $name . '</td><td><img buttonrollover="right" src="img/button_right.gif"></td></tr></table>
+	</a></div>';
+
 	return $btn;
 }
 
-function submit($form, $section, $name = 'submit', $image = 'submit') {
-	ob_start();
-	NewFormItem($form, $section, $name, 'image', $image);
-	$html = ob_get_contents();
-	ob_end_clean();
-	return $html;
+function submit($form, $section, $name = 'Submit') {
+	return button($name,"submitForm('$form','$section');");
 }
 
 function add($name, $file = 'add') {
 	return '<input type="image" name="' . $name . '" value="' . $name . '" src="img/b1_' . $file . '.gif" onMouseOver="this.src=\'img/b2_' . $file . '.gif\';" onMouseOut="this.src=\'img/b1_' . $file . '.gif\';">';
 }
 
-function buttons() {
-	static $buttons;
-	if(!$buttons) {
-		$buttons = func_get_args();
-		print '<table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 5px;" class="noprint"><tr><td>' .  implode('</td><td>', $buttons) . '</td></tr></table>';
-	} else
-		print '<table border="0" cellspacing="0" cellpadding="0" style="margin-top: 5px;" class="noprint"><tr><td>' .  implode('</td><td>', $buttons) . '</td></tr></table>';
-}
+
 
 /*
 	Function to create a bar of buttons and UI elements from the list of input parameters,
@@ -112,7 +127,14 @@ function buttons() {
 */
 function button_bar() {
 	$buttons = func_get_args();
-	print '<div class="buttonbar" style="margin-bottom: 5px;"><table border="0" cellspacing="0" cellpadding="0" class="noprint"><tr><td class="buttonbaritem">' .  implode('</td><td class="buttonbaritem">', $buttons) . '</td><tr></table></div>';
+?>
+		<table border=0 cellspacing=3 cellpadding=0><tr><td>
+<?
+		echo implode('</td><td>', $buttons);
+?>
+		</td></tr></table>
+<?
+
 }
 
 function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL) {

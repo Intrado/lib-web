@@ -19,8 +19,10 @@ function getObj(name)
 function toggleVisible(name)
 {
 	var x = new getObj(name);
-	if (x.style)
+	if (x.style) {
 		x.style.display = (x.style.display == "block") ? "none" : "block";
+		return x.style.display == "block";
+	}
 }
 
 function setState(field, set)
@@ -272,4 +274,45 @@ function dofieldbox (img, init, field, saved) {
 function toggleHiddenField(i){
 	var checkbox = new getObj("hiddenfield".concat(i)).obj;
 	checkbox.checked = !checkbox.checked;
+}
+
+function btn_rollover(obj) {
+	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/button_left_over.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/button_right_over.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/button_mid_over.gif') repeat-x";});
+}
+
+function btn_rollout(obj) {
+	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/button_left.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/button_right.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/button_mid.gif') repeat-x";});
+}
+
+function windowHide(windowid) {
+	var windowbody = new getObj('window_' + windowid);
+	var collapseicon = new getObj('window_colapseimg_' + windowid);
+	
+
+
+	var vis = windowbody.style.display != "none";
+	
+	if (vis) {
+		windowbody.style.display =  "none" ;
+		collapseicon.obj.src = "img/arrow_right.gif";
+	} else {
+		windowbody.style.display =  "block" ;
+		collapseicon.obj.src = "img/arrow_down.gif";
+	}
+}
+
+function submitForm (formname,section) {
+	var theform = document.forms[formname];
+	//make a new hidden element to emulate the data that would normally be passed back from a submit button
+	var submit = document.createElement('input');
+	submit.setAttribute('name','submit[' + formname  + '][' + section + ']');
+	submit.value='Submit';
+	submit.setAttribute('type','hidden');
+	theform.appendChild(submit);
+
+	theform.submit();
 }
