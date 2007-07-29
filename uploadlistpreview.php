@@ -94,7 +94,7 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 				$query = "
 					select p.id
 					from 		person p
-					where p.pkey='$pkey' $usersql
+					where p.pkey='$pkey' and not p.deleted $usersql
 				";
 
 				$personid = QuickQuery($query);
