@@ -263,7 +263,7 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where p.userid is null
+			where p.userid is null and not p.deleted
 			$usersql
 			$searchsql
 			$orderby
@@ -335,7 +335,7 @@ class RenderedList {
 		$query = "select sum(le.type is null), sum(le.type='N')
 		from person p
 		left join listentry le on (le.personid=p.id and le.listid = $listid)
-		where p.userid is null and $listsql $usersql  $modesql1
+		where p.userid is null and not p.deleted and $listsql $usersql  $modesql1
 		";
 
 		$stats = QuickQueryRow($query);
@@ -344,7 +344,7 @@ class RenderedList {
 
 		$query = "select count(*)
 		from person p , listentry le
-		where le.listid = $listid and p.id=le.personid and le.type='A' $modesql2
+		where not p.deleted and le.listid = $listid and p.id=le.personid and le.type='A' $modesql2
 		";
 		$this->totaladded = QuickQuery($query);
 
