@@ -19,43 +19,43 @@ if (isset($_GET['timer']))
 if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))) {
 	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
 	if ($USER->authorize("starteasy")) {
-		$SHORTCUTS['&nbsp;&nbsp;Start EasyCall'] = "javascript: popup('easycallstart.php',500,450);";
-		$SHORTCUTS['&nbsp;&nbsp;Call Me to Record'] = "javascript: popup('callme.php?origin=message',500,450);";
+		$SHORTCUTS['Start EasyCall'] = "javascript: popup('easycallstart.php',500,450);";
+		$SHORTCUTS['Call Me to Record'] = "javascript: popup('callme.php?origin=message',500,450);";
 	}
 	if ($USER->authorize(array('sendmessage', 'sendemail', 'sendphone'))) {
-		$SHORTCUTS['&nbsp;&nbsp;My Messages'] = "messages.php";
-		$SHORTCUTS['&nbsp;&nbsp;My Jobs'] = "jobs.php";
-		$SHORTCUTS['&nbsp;&nbsp;My Archived Jobs'] = "jobsarchived.php";
-		$SHORTCUTS['&nbsp;&nbsp;New Job'] = "job.php?id=new";
+		$SHORTCUTS['My Messages'] = "messages.php";
+		$SHORTCUTS['My Jobs'] = "jobs.php";
+		$SHORTCUTS['My Archived Jobs'] = "jobsarchived.php";
+		$SHORTCUTS['New Job'] = "job.php?id=new";
 	}
 	if ($USER->authorize("leavemessage")){
-		$SHORTCUTS['&nbsp;&nbsp;View Responses'] = "replies.php?reset=1";
+		$SHORTCUTS['View Responses'] = "replies.php?reset=1";
 	}
 }
 
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['-- Reports & Status --'] = "false;";
 	if ($USER->authorize('createreport')) {
-		$SHORTCUTS['&nbsp;&nbsp;Create a Report'] = "reportedit.php";
-		$SHORTCUTS['&nbsp;&nbsp;View Job Summary'] = "reportjob.php";
+		$SHORTCUTS['Create a Report'] = "reportedit.php";
+		$SHORTCUTS['View Job Summary'] = "reportjob.php";
 	}
 	if ($USER->authorize('viewsystemreports')) {
-		$SHORTCUTS['&nbsp;&nbsp;Usage Stats'] = "reportsystem.php";
-		$SHORTCUTS['&nbsp;&nbsp;Call Distribution'] = "reportsystemdistribution.php";
+		$SHORTCUTS['Usage Stats'] = "reportsystem.php";
+		$SHORTCUTS['Call Distribution'] = "reportsystemdistribution.php";
 	}
 }
 
 $SHORTCUTS['-- Lists & Contacts --'] = "false;";
 if ($USER->authorize("createlist")) {
-	$SHORTCUTS['&nbsp;&nbsp;New List'] = "list.php?id=new";
-	$SHORTCUTS['&nbsp;&nbsp;My Lists'] = "lists.php";
+	$SHORTCUTS['New List'] = "list.php?id=new";
+	$SHORTCUTS['My Lists'] = "lists.php";
 }
-$SHORTCUTS['&nbsp;&nbsp;My Address Book'] = "addresses.php";
+$SHORTCUTS['My Address Book'] = "addresses.php";
 if ($USER->authorize("viewcontacts"))
-	$SHORTCUTS['&nbsp;&nbsp;System Contacts'] = "window.location='contacts.php?clear=1'";
+	$SHORTCUTS['System Contacts'] = "contactsearch.php?clear=1";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
-$SHORTCUTS['&nbsp;&nbsp;Message Tips & Ideas'] = "javascript: window.open('help/schoolmessenger_help.htm#getting_started/message_tips_and_ideas.htm', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
-$SHORTCUTS['&nbsp;&nbsp;Help'] = "javascript: window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
+$SHORTCUTS['Message Tips & Ideas'] = "javascript: window.open('help/schoolmessenger_help.htm#getting_started/message_tips_and_ideas.htm', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
+$SHORTCUTS['Help'] = "javascript: window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
 
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
@@ -152,7 +152,7 @@ function doShortcuts ($shortcuts) {
 	if ($USER->authorize("startshort")) {
 		foreach ($shortcuts as $name => $value) {
 			if (strpos($name,"--") === 0) {
-				?><div><?= $name ?></div><?
+				?><div class="shortcuttitle"><?= $name ?></div><?
 			} else {
 				?><a href="<?= htmlentities($value) ?>"><?= $name ?></a><?
 			}
