@@ -23,7 +23,7 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 	</table>
 </div>
 
-<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= (isset($TITLE) ? $TITLE : "") ?></div>
 <div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
 <div class="content">

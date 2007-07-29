@@ -29,7 +29,7 @@ if (isset($_GET['id'])) {
 		redirect('unauthorized.php');
 	}
 
-	$_SESSION['previewreferer'] = $_SERVER['HTTP_REFERER'];
+	$_SESSION['previewreferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 	redirect();
 }
 
