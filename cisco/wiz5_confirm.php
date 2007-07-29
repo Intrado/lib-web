@@ -31,39 +31,6 @@ $jobtype = new JobType($_SESSION['newjob']['jobtypeid']);
 $renderedlist = new RenderedList($list);
 $renderedlist->calcStats();
 
-/*
-$usersql = "p.customerid=" . $USER->customerid;
-
-//get and compose list rules
-$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
-		and le.ruleid=r.id and le.listid='" . $list->id .  "' order by le.sequence", "r");
-if (count($listrules) > 0)
-	$listsql = "1" . Rule::makeQuery($listrules, "pd");
-else
-	$listsql = "0";//dont assume anyone is in the list if there are no rules
-
-//get all the rules based people that dont have remove records
-//then union with all the manual add people
-$query = "
-select count(*)
-from person p left join persondata pd on (p.id=pd.personid)
-left join listentry le on (p.id=le.personid and le.listid='" . $list->id .  "')
-where $usersql and $listsql and le.type is null
-";
-
-$total = QuickQuery ($query);
-
-$query = "
-select count(*)
-from person p left join persondata pd on (p.id=pd.personid)
-, listentry le
-where le.listid='" . $list->id .  "' and $usersql and p.id=le.personid and le.type='A'
-";
-
-
-$total += QuickQuery ($query);
-*/
-
 $languages = DBFindMany("Language","from language order by name");
 
 header("Content-type: text/xml");
@@ -84,7 +51,7 @@ if($_SESSION['newjob']['easycall']) {
 			echo "\t\t\t\t\t\t" . $language->name . "\r\n";
 	}
 }
-		
+
 
 ?>
 </Text>
