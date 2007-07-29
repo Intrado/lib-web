@@ -151,16 +151,6 @@ $maptofields["a3"] = "City";
 $maptofields["a4"] = "State";
 $maptofields["a5"] = "Zip";
 
-$maptofields["user"] = "User Login";
-$maptofields["pass"] = "User Password";
-$maptofields["acc"] = "User Profile";
-$maptofields["code"] = "Access code";
-$maptofields["pin"] = "PIN";
-
-foreach ($fieldmaps as $fieldmap) {
-	if ($fieldmap->isOptionEnabled("multisearch") && $fieldmap->isOptionEnabled("searchable"))
-		$maptofields["v" . $fieldmap->fieldnum] = "Rule (" . $fieldmap->name . ")";
-}
 
 //scan the file
 
