@@ -89,10 +89,10 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$btn = '<div class="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 
 
-	if ($onclick && !$href)
+	if ($onclick)
 		$btn .= ' onclick="' . $onclick . '; return false;" ';
-	else if ($onclick)
-		$btn .= ' onclick="' . $onclick . '" ';
+	else if ($href)
+		$btn .= ' onclick="window.location=\'' . $href . '\'" ';
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
@@ -112,7 +112,10 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 }
 
 function submit($form, $section, $name = 'Submit') {
-	return button($name,"submitForm('$form','$section');");
+	//ugly hack. in order for enter key to submit form, either we need to add JS to each text field, or there must be an actual submit button
+	//so we make a submit button and hide it off screen.
+	return '<input type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" style="position: absolute; left: -1000px; top: -1000px;">'
+	. button($name,"submitForm('$form','$section');");
 }
 
 function add($name, $file = 'add') {
