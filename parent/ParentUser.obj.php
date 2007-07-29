@@ -39,7 +39,7 @@ class ParentUser extends DBMappedObject{
 	function findChildren(){
 		$parentid = $this->id;
 		$query = "Select person.id from person, personparent
-					where personparent.parentuserid = '$parentid'
+					where not person.deleted and personparent.parentuserid = '$parentid'
 					AND personparent.personid = person.id
 					GROUP BY person.id";
 		$childlist = Query($query);

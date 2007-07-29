@@ -8,7 +8,7 @@ class Person extends DBMappedObject {
 	var $lastimport;
 	var $type = "system"; // enum (system, addressbook, manualadd, upload)
 	var $deleted = 0;
-	
+
 	var $f01 = "";
 	var $f02 = "";
 	var $f03 = "";
@@ -41,7 +41,7 @@ class Person extends DBMappedObject {
 	}
 
 	static function findPerson($custid,$key) {
-		$query = "select id from person where pkey='" . DBSafe($key) . "'";
+		$query = "select id from person where pkey='" . DBSafe($key) . "'  and not deleted";
 		$id = QuickQuery($query);
 
 		if ($id)
