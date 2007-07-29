@@ -92,7 +92,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			insert into smsmsg (smsjobid, personid, sequence, phone)
 			(select $smsjobid as smsjobid, p.id as personid, ph.sequence as sequence, ph.phone as phone
 			from person p
-			left join persondata pd on (pd.personid = p.id)
+			left join persondata pd on (pd.personid = p.id and not p.deleted)
 			inner join phone ph on (ph.personid = p.id and ph.smsenabled=1 and ph.phone != '')
 			left join listentry le on (p.id=le.personid and le.listid=$listid)
 			where $usersql and $listsql and le.type is null and p.userid is null order by p.id,ph.sequence)
@@ -101,7 +101,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 
 			(select $smsjobid as smsjobid, p.id as personid, ph.sequence as sequence, ph.phone as phone
 			from listentry le
-			straight_join person p on (p.id=le.personid)
+			straight_join person p on (p.id=le.personid and not p.deleted)
 			inner join phone ph on (ph.personid = p.id and ph.smsenabled=1 and ph.phone != '')
 			where p.customerid = $USER->customerid
 			and le.listid=$listid and le.type='A'
