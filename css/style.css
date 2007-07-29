@@ -17,7 +17,7 @@ img {
 }
 
 
-a, a:active, a:visited {
+a, a:link, a:active, a:visited {
 	color: #346799;
 }
 
@@ -76,7 +76,10 @@ a:hover {
 
 	overflow:hidden;
 	display: block;
+}
 
+.navtab a:link, .navtab a:active, .navtab a:visited {
+	color: black;
 }
 
 .navtab img {
@@ -131,6 +134,10 @@ a:hover {
 	float: left;
 }
 
+.subnavmenu a:link, .subnavmenu a:active, .subnavmenu a:visited {
+	color: black;
+}
+
 
 .subnavmenu a div {
 	padding-top: 4px;
@@ -171,7 +178,7 @@ a:hover {
 }
 
 .shortcutmenu img {
-	margin-right: 5px;
+	margin-right: 10px;
 	float: right;
 }
 
@@ -182,8 +189,14 @@ a:hover {
 	display: none;
 }
 
-.shortcuts a {
+.shortcuts a , .shortcuts a:link, .shortcuts a:active, .shortcuts a:visited {
+	margin-left: 5px;
 	display: block;
+	color: #346799;
+}
+
+.shortcuttitle {
+	background: #E5E5E5;
 }
 
 
@@ -289,6 +302,7 @@ a:hover {
 	color:#346799;
 	font-size: 9px;
 	font-weight: bold;
+	cursor: pointer;
 }
 
 .button .middle {
