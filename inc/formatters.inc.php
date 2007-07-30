@@ -452,6 +452,8 @@ function fmt_result ($row,$index) {
 			return "Sent";
 		case "unent":
 			return "Unsent";
+		case "notattempted":
+			return "Not Attempted";
 		default:
 			return ucfirst($row[$index]);
 	}
