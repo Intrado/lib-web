@@ -30,6 +30,7 @@ if (!$USER->authorize('viewsystemreports')) {
 
 $groupby = FieldMap::getSchoolField(); //defaults to school f-field
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
+$type = "phone";
 $reldate = "monthtodate";
 $f = "system";
 $s = "report";
@@ -58,6 +59,7 @@ if(CheckFormSubmit($f,$s))
 		} else {
 			$groupby = GetFormData($f, $s, "groupby");
 			$reldate = GetFormData($f, $s, "relativedate");
+			$type = GetFormData($f, $s, "type");
 		}
 	}
 } else {
@@ -74,6 +76,7 @@ if($reload){
 	PutFormData($f, $s, 'xdays', isset($lastxdays) ? $lastxdays : "0", "number");
 	PutFormData($f, $s, "startdate", isset($startdate) ? $startdate : "", "text");
 	PutFormData($f, $s, "enddate", isset($enddate) ? $enddate : "", "text");
+	PutFormData($f, $s, "type", isset($type) ? $type : "");
 }
 
 
@@ -93,7 +96,7 @@ if($reload){
 		$enddate = strtotime($enddate);
 	}
 
-	$joblist = getJobList($startdate, $enddate);
+	$joblist = getJobList($startdate, $enddate, "", "", $type);
 	$joblistquery = " and j.id in ('" . implode("','", $joblist) . "') ";
 
 	$groupbyquery = "";
@@ -117,7 +120,6 @@ if($reload){
 				inner join job j on (rp.jobid = j.id)
 				inner join jobtype jt on (jt.id = j.jobtypeid)
 				where rp.status in ('fail', 'success')
-				and rp.type = 'phone'
 				$joblistquery
 				group by $groupbyquery rp.userid
 				order by $groupbyquery rp.userid";
@@ -170,6 +172,17 @@ buttons(submit($f, $s, "refresh", "refresh"));
 startWindow("Display Options", "padding: 3px;");
 ?>
 	<table border="0" cellpadding="2" cellspacing="1" width="100%">
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Delivery Method</th>
+			<td class="bottomBorder">
+				<?
+					NewFormItem($f, $s, "type", "selectstart");
+					NewFormItem($f, $s, "type", "selectoption", "Phone", "phone");
+					NewFormItem($f, $s, "type", "selectoption", "Email", "email");
+					NewFormItem($f, $s, "type", "selectend");
+				?>
+			</td>
+		</tr>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder">Date</th>
 			<td class="bottomBorder">
