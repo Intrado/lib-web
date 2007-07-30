@@ -47,8 +47,7 @@ $data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
 $x_titles = array();
 $today = date("d", strtotime("now"));
 $x=$today-28;
-if($x < 0)
-	$x=-$x;
+$x = -$x;
 while ($row = DBGetRow($result)) {
 	$data["dates"][$row[0]-1+$x] = $row[1];
 	$data["A"][$row[0]+$x] = $row[2];
@@ -81,7 +80,7 @@ for ($x=0; $x <= 28; $x++) {
 //var_dump($x_titles);
 
 // Create the graph. These two calls are always required
-$graph = new Graph($big ? 750 : 650, $big ? 450 : 400,"auto");
+$graph = new Graph($big ? 750 : 650, $big ? 450 : 300,"auto");
 $graph->SetScale("textlin");
 $graph->SetFrame(false);
 
