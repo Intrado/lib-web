@@ -50,37 +50,8 @@ class ContactsReport extends ReportGenerator {
 					$emailquery
 					$personquery
 					$usersql
-					$rulesql
-					
+					$rulesql		
 					group by p.id
-					
-					union all
-					(select p.pkey as pkey, 
-						p.id as pid,
-						p." . FieldMap::GetFirstNameField() . " as firstname, 
-						p." . FieldMap::GetLastNameField() . " as lastname, 
-						concat(
-								coalesce(a.addr1,''), ' ',
-								coalesce(a.addr2,''), ' ',
-								coalesce(a.city,''), ' ',
-								coalesce(a.state,''), ' ',
-								coalesce(a.zip,'')
-							) as address
-						$fieldquery	
-						from person p
-						left join address a on (a.personid = p.id)
-						left join phone ph on (ph.personid = p.id)
-						left join email e on (e.personid = p.id)
-						where not p.deleted
-						and p.type='addressbook'
-						and p.userid= '$USER->id'
-						$phonequery
-						$emailquery
-						$personquery
-						$usersql
-						$rulesql
-						group by p.id)
-
 					$orderquery
 					";
 	}
