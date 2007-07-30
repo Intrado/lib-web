@@ -747,13 +747,15 @@ AFTER INSERT ON schedule FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
 DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
 
 SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT value INTO tz FROM setting WHERE name='timezone';
 
 -- the job must be inserted before the schedule
 SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND scheduleid=NEW.id;
 IF cc = 1 THEN
-    INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun) VALUES (NEW.id, custid, NEW.daysofweek, NEW.time, NEW.nextrun);
+    INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) VALUES (NEW.id, custid, NEW.daysofweek, NEW.time, NEW.nextrun, tz);
 END IF;
 END
 $$$
@@ -845,6 +847,7 @@ $$$
 
 DROP TABLE `jobstats`
 $$$
+
 ALTER TABLE `reportperson` ADD `duplicateid` int( 11 ) NULL AFTER `numblocked`
 $$$
 
@@ -852,3 +855,5 @@ ALTER TABLE `reportinstance`
   DROP `fields`,
   DROP `activefields`
 $$$
+
+-- not sure how to do this but you need to drop and recreate trigger create_schedule - Gretel

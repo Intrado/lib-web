@@ -157,4 +157,6 @@ CREATE TABLE `leasetask` (
   PRIMARY KEY (`taskuuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+ALTER TABLE `qschedule` ADD `timezone` VARCHAR( 50 ) NOT NULL ;
+
 
