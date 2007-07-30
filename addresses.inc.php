@@ -84,7 +84,7 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 	</table>
 	<?
 	$help = (($ORIGINTYPE == "nav") ? '' : help('AddressBook_MyAddressBook'));
-	startWindow('Addresses ' . $help);
+	startWindow('Contacts ' . $help);
 	?>
 	<table border="0" cellpadding="0" cellspacing="0" style="margin-top: 3px;">
 		<tr>
