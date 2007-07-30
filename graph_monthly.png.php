@@ -78,7 +78,7 @@ for ($x = 0; $x <= 11; $x++) {
 
 
 // Create the graph. These two calls are always required
-$graph = new Graph($big ? 750 : 550, $big ? 450 : 400,"auto");
+$graph = new Graph($big ? 750 : 550, $big ? 450 : 300,"auto");
 $graph->SetScale("textlin");
 $graph->SetFrame(false);
 
