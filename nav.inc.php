@@ -54,8 +54,8 @@ $SHORTCUTS['My Address Book'] = "addresses.php";
 if ($USER->authorize("viewcontacts"))
 	$SHORTCUTS['System Contacts'] = "contacts.php?clear=1";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
-$SHORTCUTS['Message Tips & Ideas'] = "javascript: window.open('help/schoolmessenger_help.htm#getting_started/message_tips_and_ideas.htm', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
-$SHORTCUTS['Help'] = "javascript: window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
+$SHORTCUTS['Message Tips & Ideas'] = "javascript: popup('help/schoolmessenger_help.htm#getting_started/message_tips_and_ideas.htm',750,500);";
+$SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
@@ -212,7 +212,7 @@ doNavTabs($NAVTREE);
 	<?= $MAINTABS ?>
 
 	<div class="applinks hoverlinks">
-		<a href="addresses.php">Addressbook</a> |
+		<a href="addresses.php">Address Book</a> |
 		<a href="account.php">Account</a> |
 		<a href="#" onclick="window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
 		<a href="index.php?logout=1">Logout</a>
