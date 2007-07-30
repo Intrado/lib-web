@@ -131,7 +131,8 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			$savedjobtype = GetFormData($f, $s, "jobtypes");
 			if($savedjobtype)
 				$options['jobtypes'] = implode("','", $savedjobtype);
-			
+			else
+				$options['jobtypes'] = "";
 			
 			foreach($options as $index => $option){
 				if($option == "")
