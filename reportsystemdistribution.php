@@ -25,7 +25,7 @@ if (!$USER->authorize('viewsystemreports')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:distribution";
-$TITLE = "Call Distribution";
+$TITLE = "Call Distribution for " . getSystemSetting("displayname");
 
 include_once("nav.inc.php");
 
