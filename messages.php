@@ -66,7 +66,7 @@ function fmt_actions ($obj,$name) {
 	}
 
 
-	$simpleplaybtn = button("Play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 350);");
+	$simpleplaybtn = button("Play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 400);");
 	$advancedplaybtn = button("Play", "popup('previewmessage.php?close=1&id=$obj->id', 400, 500);");
 	$editbtn = '<a href="message' . $obj->type . '.php?id=' . $obj->id . '">Edit</a>';
 	$deletebtn = '<a href="messages.php?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
@@ -138,10 +138,10 @@ if($USER->authorize('sendphone')) {
 	if ($USER->authorize('starteasy')) {
 		button_bar(button('Call Me To Record', "popup('callme.php?origin=message',500,450);") . help('AudioFileEditor_CallMeToRecord'),
 			button('Create Advanced Message', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
-			button('Audio Library', "popup('audio.php',500,450);") . help('Messages_AudioFileEditor'));
+			button('Audio Library', "popup('audio.php',500,400);") . help('Messages_AudioFileEditor'));
 	} else {
 		button_bar(button('Create Advanced Message', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
-			button('Audio Library', "popup('audio.php',500,450);") . help('Messages_AudioFileEditor'));
+			button('Audio Library', "popup('audio.php',500,400);") . help('Messages_AudioFileEditor'));
 	}
 
 

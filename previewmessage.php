@@ -115,7 +115,9 @@ NewForm($f);
 
 buttons(submit($f, $s, $dopreview ? 'Refresh' : 'Play'), button('Done', 'window.close()'));
 
-startWindow('Preview Options', 'padding: 3px;');
+
+if (count($fields) > 0) {
+	startWindow('Preview Options', 'padding: 3px;');
 
 
 ?>
@@ -164,7 +166,13 @@ startWindow('Preview Options', 'padding: 3px;');
 	}
 ?>
 	</table>
-<? if ($dopreview) { ?>
+<?
+	endWindow();
+}
+
+if ($dopreview) {
+	startWindow('Message Preview', 'padding: 3px;');
+?>
 
 	<div align="center">
 
@@ -181,10 +189,11 @@ startWindow('Preview Options', 'padding: 3px;');
 
 	<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>">Click here to download</a>
 	</div>
-<? } ?>
-
 <?
-endWindow();
+	endWindow();
+}
+
+
 
 EndForm($f);
 
