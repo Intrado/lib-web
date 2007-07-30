@@ -75,7 +75,7 @@ class JobSummaryReport extends ReportGenerator{
 		//Gather Phone Information		
 		$phonenumberquery = "select sum(rc.result not in ('duplicate', 'blocked')) as total,
 									sum(rc.result in ('A','M', 'duplicate', 'blocked')) as completed,
-									sum(rc.result not in ('A','M', 'duplicate', 'blocked') and rc.numattempts < js.value) as remaining,
+									sum(rc.result not in ('A','M', 'duplicate', 'blocked') and rc.numattempts < js.value and j.status in ('processing', 'active')) as remaining,
 									sum(rc.numattempts) as totalattempts,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rc.result = 'blocked') as blocked,
@@ -83,6 +83,7 @@ class JobSummaryReport extends ReportGenerator{
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
+									inner join job j on (j.id = rp.jobid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
 									$usersql
 									and rp.type='phone'";
@@ -140,7 +141,7 @@ class JobSummaryReport extends ReportGenerator{
 		// DISPLAY
 		displayJobSummary($this->params['joblist']);	
 		?><br><?
-		startWindow("Totals:");
+		startWindow("Totals", "padding: 3px;");
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 <?
@@ -152,7 +153,7 @@ class JobSummaryReport extends ReportGenerator{
 						<table width="100%">
 							<tr>
 								<td>
-									<table  border="1" cellpadding="2" cellspacing="1" class="list" width="100%">
+									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th># of Emails</th>
 											<th>Completed</th>
@@ -183,7 +184,7 @@ class JobSummaryReport extends ReportGenerator{
 						<table width="100%">
 							<tr>
 								<td>
-									<table  border="1" cellpadding="2" cellspacing="1" class="list" width="100%">
+									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th># of Phones</th>
 											<th>Completed</th>
