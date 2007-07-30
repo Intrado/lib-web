@@ -70,17 +70,24 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		$customer = $params[0];
 		$identity = $params[1];
 
-		//authorize the upload key
-		if ($importid = authorizeUploadImport($identity, $CUSTOMERURL)) {
-			doStartSession();
-			$_SESSION['importid'] = $importid;
+		if ($customer == $CUSTOMERURL) {
 
-			return array ("sessionId" => session_id(),
-							"errorMsg" => "",
-							"errorCode" => "NO_ERROR");
+			//authorize the upload key
+			if ($importid = authorizeUploadImport($identity, $CUSTOMERURL)) {
+				doStartSession();
+				$_SESSION['importid'] = $importid;
+
+				return array ("sessionId" => session_id(),
+								"errorMsg" => "",
+								"errorCode" => "NO_ERROR");
+			} else {
+				return array ("sessionId" => "",
+							"errorMsg" => "Unknown identity",
+							"errorCode" => "UNAUTHORIZED");
+			}
 		} else {
 			return array ("sessionId" => "",
-						"errorMsg" => "Unknown identity",
+						"errorMsg" => "Unknown customer",
 						"errorCode" => "UNAUTHORIZED");
 		}
 	}
