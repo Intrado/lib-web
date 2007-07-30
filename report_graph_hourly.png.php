@@ -58,13 +58,14 @@ $cpcolors = array(
 
 $query = "
 select hour,
-	answered as A,
-	machine as M,
-	busy as B,
-	noanswer as N
+        sum(answered) as A,
+        sum(machine) as M,
+        sum(busy) as B,
+        sum(noanswer) as N
 from systemstats
 where 1
 $jobidquery
+group by hour
 ";
 
 
