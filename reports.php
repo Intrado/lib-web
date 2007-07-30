@@ -86,7 +86,7 @@ startWindow("Select a Template", 'padding: 3px;');
 			</td>
 			<td>
 				<table>
-					<tr><td><a href='reportcallssearch.php?clear=1&type=callsreport'/>Contact History</a></td></tr>
+					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>
 				</table>
