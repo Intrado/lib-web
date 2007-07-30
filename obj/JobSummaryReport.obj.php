@@ -3,7 +3,9 @@
 class JobSummaryReport extends ReportGenerator{
 	
 	function generateQuery(){
+		global $USER;
 		$this->params = $this->reportinstance->getParameters();
+		$usersql = $USER->userSQL("rp");
 		$jobtypes = "";
 		if(isset($this->params['jobtypes'])){
 			$jobtypes = $this->params['jobtypes'];
@@ -28,6 +30,14 @@ class JobSummaryReport extends ReportGenerator{
 			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
 		}
 		$this->params['joblist'] = $joblist;
+		$this->query = "select count(*) as cnt, rc.result, sum(rc.result not in ('A','M') and rc.numattempts < js.value) as remaining
+				from reportperson rp
+				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
+				where rc.jobid in ('" . $joblist . "')
+				and rc.type='phone'
+				$usersql
+				group by rc.result";
 
 	}
 	
@@ -89,20 +99,11 @@ class JobSummaryReport extends ReportGenerator{
 									$usersql
 									and rc.type='email'";
 		$emailinfo = QuickQueryRow($emailquery);
-
-		$query = "select count(*) as cnt, rc.result, sum(rc.result not in ('A','M') and rc.numattempts < js.value) as remaining
-					from reportcontact rc
-					left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
-					where rc.jobid in ('" . $this->params['joblist'] . "')
-					and rc.type='phone'
-					$usersql
-					group by rc.result";
 			
-					
 		//may need to clean up, null means not called yet
 		//do math for the % completed
 		
-		$result = Query($query);
+		$result = Query($this->query);
 		$cpstats = array (
 							"A" => 0,
 							"M" => 0,
@@ -137,7 +138,6 @@ class JobSummaryReport extends ReportGenerator{
 		$urloptions = $url . "&valid=$validstamp";	
 
 		// DISPLAY
-		
 		displayJobSummary($this->params['joblist']);	
 		?><br><?
 		startWindow("Totals:");
@@ -246,12 +246,12 @@ class JobSummaryReport extends ReportGenerator{
 	}
 	
 	function setReportFile(){
-		$this->reportfile = "jobreport.jasper";
+		$this->reportfile = "jobsummaryreport.jasper";
 	}
 	
 	function getReportSpecificParams(){
 		
-		$params = array("jobId", $this->params['joblist']);
+		$params = array("jobId" => $this->params['joblist']);
 		return $params;
 	}
 
