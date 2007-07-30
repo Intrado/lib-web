@@ -6,7 +6,6 @@ class JobDetailReport extends ReportGenerator{
 		$USER = new User($this->userid);
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
-		
 		$orderquery = getOrderSql($this->params);
 		$rulesql = getRuleSql($this->params, "rp");
 		
@@ -36,7 +35,7 @@ class JobDetailReport extends ReportGenerator{
 			if(isset($this->params['reldate']))
 				$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
-			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, null, isset($this->params['type']) ? array($this->params['type']) : array()));
+			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, null, isset($this->params['type']) ? $this->params['type'] : ""));
 		}
 		$this->params['joblist'] = $joblist;
 		
@@ -52,7 +51,7 @@ class JobDetailReport extends ReportGenerator{
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
 		$usersql = $USER->userSQL("rp");
-		
+		$this->params['usersql'] = $usersql;
 		$fieldquery = generateFields("rp");
 		$this->query = 
 			"select SQL_CALC_FOUND_ROWS
@@ -273,7 +272,8 @@ class JobDetailReport extends ReportGenerator{
 	}
 	
 	function getReportSpecificParams(){
-		$params = array("jobId", $this->params['joblist']);
+		$params = array("jobId" => $this->params['joblist'],
+						"usersql" => $this->params['usersql'] );
 		return $params;
 	}
 
