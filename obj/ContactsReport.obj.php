@@ -3,20 +3,22 @@
 class ContactsReport extends ReportGenerator {
 
 	function generateQuery(){
-		global $USER;;
+		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
-
+		
 		$orderquery = getOrderSql($this->params);
 		$rulesql = getRuleSql($this->params, "p");
-
+		
+		$userJoin = " and p.userid = '$USER->id' ";
+		
 		$usersql = $USER->userSQL("p");
 		$phonequery="";
 		$emailquery="";
 		$personquery="";
 		if(isset($this->params['phone'])){
 			$phonequery = $this->params['phone'] ? " and ph.phone like '%" . DBSafe($this->params['phone']) . "%'" : "";
-		}
+		} 
 		if(isset($this->params['email'])){
 			$emailquery = $this->params['email'] ? " and e.email like '%" . DBSafe($this->params['email']) . "%'" : "";
 		}
@@ -24,12 +26,12 @@ class ContactsReport extends ReportGenerator {
 			$personquery = $this->params['personid'] ? " and p.pkey like '%" . DBSafe($this->params['personid']) . "%'" : "";
 		}
 		$fieldquery = generateFields("p");
-
+		
 		$this->query = "select SQL_CALC_FOUND_ROWS
-					p.pkey as pkey,
+					p.pkey as pkey, 
 					p.id as pid,
-					p." . FieldMap::GetFirstNameField() . " as firstname,
-					p." . FieldMap::GetLastNameField() . " as lastname,
+					p." . FieldMap::GetFirstNameField() . " as firstname, 
+					p." . FieldMap::GetLastNameField() . " as lastname, 
 					concat(
 							coalesce(a.addr1,''), ' ',
 							coalesce(a.addr2,''), ' ',
@@ -37,18 +39,48 @@ class ContactsReport extends ReportGenerator {
 							coalesce(a.state,''), ' ',
 							coalesce(a.zip,'')
 						) as address
-					$fieldquery
+					$fieldquery	
 					from person p
 					left join address a on (a.personid = p.id)
 					left join phone ph on (ph.personid = p.id)
 					left join email e on (e.personid = p.id)
 					where not p.deleted
+					and p.type='system'
 					$phonequery
 					$emailquery
 					$personquery
 					$usersql
 					$rulesql
+					
 					group by p.id
+					
+					union all
+					(select p.pkey as pkey, 
+						p.id as pid,
+						p." . FieldMap::GetFirstNameField() . " as firstname, 
+						p." . FieldMap::GetLastNameField() . " as lastname, 
+						concat(
+								coalesce(a.addr1,''), ' ',
+								coalesce(a.addr2,''), ' ',
+								coalesce(a.city,''), ' ',
+								coalesce(a.state,''), ' ',
+								coalesce(a.zip,'')
+							) as address
+						$fieldquery	
+						from person p
+						left join address a on (a.personid = p.id)
+						left join phone ph on (ph.personid = p.id)
+						left join email e on (e.personid = p.id)
+						where not p.deleted
+						and p.type='addressbook'
+						and p.userid= '$USER->id'
+						$phonequery
+						$emailquery
+						$personquery
+						$usersql
+						$rulesql
+						group by p.id)
+
 					$orderquery
 					";
 	}
@@ -62,7 +94,7 @@ class ContactsReport extends ReportGenerator {
 		}
 		$fieldcount = count($fieldlist);
 		$query = $this->query;
-
+	
 		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
 		$query .= "limit $pagestart, 500";
 		$result = Query($query);
@@ -76,7 +108,7 @@ class ContactsReport extends ReportGenerator {
 			$phonelist[$row[1]] = DBFindMany("Phone", "from phone where personid = '$row[1]'");
 			$emaillist[$row[1]] = DBFindMany("Email", "from email where personid = '$row[1]'");
 		}
-
+		
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,500);
 		?>
@@ -99,22 +131,22 @@ class ContactsReport extends ReportGenerator {
 					?><td><?=$fieldlist[$num]?></td><?
 				}
 			}
-
+			
 		?>
 			</tr>
 		<?
 			$alt = 0;
 			foreach($personlist as $person){
 				echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-
+				
 				$id = $person[1];
 				?>
 					<td><?=fmt_idmagnify($person,0)?></td>
 					<td><?=$person[2]?></td>
 					<td><?=$person[3]?></td>
 					<td><?=$person[4]?></td>
-
-					<?
+					
+					<? 
 						$first=true;
 						if(isset($phonelist)){
 							foreach($phonelist[$id] as $phone){
@@ -174,7 +206,7 @@ class ContactsReport extends ReportGenerator {
 								?>
 									<td><?=$email->sequence+1?></td>
 									<td><?=$email->email?></td>
-								<?
+								<? 
 								if($first){
 									$first = false;
 									$count=0;
@@ -194,18 +226,18 @@ class ContactsReport extends ReportGenerator {
 										?><td>&nbsp;</td><?
 									}
 								}
-
+								
 								?>
 								</tr><?
 							}
 						}
-
+						
 			}
 		?>
 			</table>
 			<script langauge="javascript">
 			var searchresultstable = new getObj("searchresults").obj;
-
+			
 		<?
 			$count=1;
 			foreach($fieldlist as $index => $field){
@@ -220,23 +252,23 @@ class ContactsReport extends ReportGenerator {
 		showPageMenu($total,$pagestart,500);
 		endWindow();
 	}
-
+	
 	function runCSV(){
 		echo "Not ready yet";
 	}
-
+	
 	function getReportSpecificParams(){
 		return $params;
 	}
-
+	
 	function setReportFile(){
 		$this->reportfile = "Contactsreport.jasper";
 	}
-
+	
 	static function getOrdering(){
 		global $USER;
 		$fields = FieldMap::getAuthorizedFieldMaps();
-
+	
 		$ordering = array();
 		$ordering["ID#"] = "p.pkey";
 
