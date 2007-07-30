@@ -53,7 +53,7 @@ startWindow("Total Systemwide Call Distribution (Last 4 Weeks)", "padding: 3px;"
 endWindow();
 ?><br><?
 
-startWindow("Total Systemwide Call Distribution (Last 12 Months", "padding: 3px;");
+startWindow("Total Systemwide Call Distribution (Last 12 Months)", "padding: 3px;");
 ?>
 	<div>
 	<img src="graph_monthly.png.php" onclick="popup('graph_monthly.png.php?big',790,500);" />
