@@ -58,14 +58,20 @@ class ReportGenerator {
 		}
 		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
 		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
+		if(isset($this->params['title']) && $this->params['title'] != ""){
+			$params["title"] = new XML_RPC_VALUE($this->params['title'], 'string');
+		}
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 
-		$activefields = isset($this->params['activefields']) ? $this->params['activefields'] : array();
+		$activefields = (isset($this->params['activefields']) && ($this->params['activefields'] != "")) ? explode("','", $this->params['activefields']) : array();
 		$active = array();
 		foreach($activefields as $index){
 			$newindex = preg_replace("{f}", "", $index);
 			$active[$newindex] = new XML_RPC_VALUE("true", 'string');
 		}
+		if(count($active) == 0)
+			$active["empty"] = new XML_RPC_VALUE("", 'string');
+			
 		$xmlparams[] = new XML_RPC_Value($active, 'struct');
 
 		$xmlparams[] = new XML_RPC_Value($options['filename'], 'string');
