@@ -355,10 +355,18 @@ function fmt_reportlabel($obj,$name) {
 
 function fmt_qphone($obj,$name) {
 	global $f,$s;
+?>
+	<table border=0 cellpadding=3 cellspacing=0><tr><td>
+<?
 	message_select("phone",$f,$s,"phonemessageid_" . $obj->questionnumber);
-
+?>
+	</td><td>
+<?
 	echo button('Play', "var audio = new getObj('phonemessageid_" . $obj->questionnumber . "').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
+?>
 
+	</tr></td></table>
+<?
 }
 
 function fmt_qweb($obj,$name) {
@@ -428,7 +436,13 @@ startWindow('Survey Template Information',NULL,true, false);
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
 							<td><? NewFormItem($f,$s,"hasmachine","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'machinemessage');\" dependson=\"phonesurvey\""); ?></td>
-							<td id="machinemessage" <?= ($hasmachine ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"machinemessageid",'dependson="phonesurvey"'); echo button('Play', "var audio = new getObj('machinemessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
+							<td id="machinemessage" <?= ($hasmachine ? "" : 'style="display:none;"')?>>&nbsp;
+								<table border=0 cellpadding=3 cellspacing=0><tr><td>
+									<? message_select("phone",$f,$s,"machinemessageid",'dependson="phonesurvey"'); ?>
+								</td><td>
+									<? echo button('Play', "var audio = new getObj('machinemessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?>
+								</td></tr></table>
+							</td>
 						</tr>
 						</table>
 					</td>
@@ -439,7 +453,13 @@ startWindow('Survey Template Information',NULL,true, false);
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
 							<td><? NewFormItem($f,$s,"hasintro","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'intromessage');\" dependson=\"phonesurvey\""); ?></td>
-							<td id="intromessage" <?= ($hasintro ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"intromessageid",'dependson="phonesurvey"'); echo button('Play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?></td>
+							<td id="intromessage" <?= ($hasintro ? "" : 'style="display:none;"')?>>&nbsp;
+								<table border=0 cellpadding=3 cellspacing=0><tr><td>
+									<? message_select("phone",$f,$s,"intromessageid",'dependson="phonesurvey"'); ?>
+								</td><td>
+									<? echo button('Play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?>
+								</td></tr></table>
+							</td>
 						</tr>
 						</table>
 					</td>
@@ -450,7 +470,14 @@ startWindow('Survey Template Information',NULL,true, false);
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
 							<td><? NewFormItem($f,$s,"hasexit","checkbox",NULL,NULL,"onclick=\"setVisibleIfChecked(this, 'exitmessage');\" dependson=\"phonesurvey\""); ?></td>
-							<td id="exitmessage" <?= ($hasexit ? "" : 'style="display:none;"')?>>&nbsp;<? message_select("phone",$f,$s,"exitmessageid",'dependson="phonesurvey"'); echo button('Play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?></td>
+							<td id="exitmessage" <?= ($hasexit ? "" : 'style="display:none;"')?>>&nbsp;
+
+								<table border=0 cellpadding=3 cellspacing=0><tr><td>
+									<? message_select("phone",$f,$s,"exitmessageid",'dependson="phonesurvey"'); ?>
+								</td><td>
+									<? echo button('Play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?>
+								</td></tr></table>
+							</td>
 						</tr>
 						</table>
 					</td>
