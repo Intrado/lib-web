@@ -39,8 +39,10 @@ if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 		$SHORTCUTS['Create a Report'] = "reports.php";
 		$SHORTCUTS['View Job Summary'] = "reportjobsearch.php";
 	}
-	if ($USER->authorize('viewsystemreports')) {
+	if ($USER->authorize('viewusagestats')) {
 		$SHORTCUTS['Usage Stats'] = "reportsystem.php";
+	}
+	if ($USER->authorize('viewcalldistribution')) {
 		$SHORTCUTS['Call Distribution'] = "reportsystemdistribution.php";
 	}
 }
@@ -74,8 +76,8 @@ $NAVTREE = array (
 		array("Reports", "reports.php", "createreport", $SUBTAB=="reports"),
 		array("SMS Report","reportsms.php?smsjobid=","sendsms",$SUBTAB=="sms"),
 		//give the report viewer the default of a "today" report if there was no previous report
-		array("Usage Stats","reportsystem.php","viewsystemreports",$SUBTAB=="system"),
-		array("Call Distribution","reportsystemdistribution.php","viewsystemreports",$SUBTAB=="distribution")
+		array("Usage Stats","reportsystem.php","viewusagestats",$SUBTAB=="system"),
+		array("Call Distribution","reportsystemdistribution.php","viewcalldistribution",$SUBTAB=="distribution")
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
 						'viewsystemrepeating','viewcontacts','blocknumbers','sendsms'),$MAINTAB=="system",array(

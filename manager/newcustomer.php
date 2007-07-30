@@ -145,6 +145,8 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'createreport', '1'),"
 						. "($accessid, 'maxjobdays', '7'),"
 						. "($accessid, 'viewsystemreports', '1'),"
+						. "($accessid, 'viewusagestats', '1'),"
+						. "($accessid, 'viewcalldistribution', '1'),"
 						. "($accessid, 'managesystemjobs', '1'),"
 						. "($accessid, 'managemyaccount', '1'),"
 						. "($accessid, 'viewcontacts', '1'),"
@@ -180,8 +182,8 @@ if (CheckFormSubmit($f,$s)){
 
 
 				$query = "INSERT INTO `jobtype` (`name`, `priority`, `systempriority`, timeslices, `deleted`) VALUES
-							('Emergency', 10000, 3, 225, 0),
-							('Attendance', 20000, 3, 0, 0),
+							('Emergency', 10000, 1, 225, 0),
+							('Attendance', 20000, 2, 0, 0),
 							('General', 30000, 3, 450, 0)";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 

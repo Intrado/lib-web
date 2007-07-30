@@ -100,6 +100,8 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("callblockingperms", GetFormData($form, $section, 'callblockingperms'));
 			$accss->setPermission("createreport", (bool)GetFormData($form, $section, 'createreport'));
 			$accss->setPermission("viewsystemreports", (bool)GetFormData($form, $section, 'viewsystemreports'));
+			$accss->setPermission("viewusagestats", (bool)GetFormData($form, $section, 'viewusagestats'));
+			$accss->setPermission("viewcalldistribution", (bool)GetFormData($form, $section, 'viewcalldistribution'));
 			$accss->setPermission("managesystemjobs", (bool)GetFormData($form, $section, 'managesystemjobs'));
 			$accss->setPermission("managemyaccount", (bool)GetFormData($form, $section, 'managemyaccount'));
 			$accss->setPermission("manageaccount", (bool)GetFormData($form, $section, 'manageaccount'));
@@ -169,6 +171,8 @@ if( $reloadform )
 				array("blocknumbers","bool",0,1),
 				array("createreport","bool",0,1),
 				array("viewsystemreports","bool",0,1),
+				array("viewusagestats","bool",0,1),
+				array("viewcalldistribution","bool",0,1),
 				array("managesystemjobs","bool",0,1),
 				array("managemyaccount","bool",0,1),
 				array("manageaccount","bool",0,1),
@@ -442,6 +446,14 @@ startWindow('Allowed Functions');
 				<tr>
 					<td><? NewFormItem($form, $section, "viewsystemreports", "checkbox", 40, 'nopotion', 'id="viewsystemreports"' ); ?></td>
 					<td>View systemwide reports</td>
+				</tr>
+				<tr>
+					<td><? NewFormItem($form,$section,"viewusagestats","checkbox", 40, 'nooption', "id='viewusagestats'"); ?></td>
+					<td>View systemwide usage stats</td>
+				</tr>
+				<tr>
+					<td><? NewFormItem($form,$section,"viewcalldistribution","checkbox", 40, 'nooption', "id='viewcalldistribution'"); ?></td>
+					<td>View systemwide call distribution</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form, $section, "viewsystemactive", "checkbox", 40, 'nooption', "id='viewsystemactive'"); ?></td>
