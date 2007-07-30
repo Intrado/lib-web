@@ -145,6 +145,9 @@ a:hover {
 
 .subnavmenu .active {
 	background: url('../img/chrome_light.png');
+	border-left: 1px solid #cccccc;
+	border-right: 1px solid #cccccc;
+	
 }
 
 
