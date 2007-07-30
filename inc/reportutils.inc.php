@@ -115,7 +115,7 @@ function createPdfParams($filename){
 	return $params;
 }
 
-function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $deliverymethod = array()){
+function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $deliverymethod = ""){
 	global $USER;
 	//expects unix time stamps as input
 	//returns any jobs between the date range.
@@ -123,14 +123,14 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $d
 	//if this user can see systemwide reports, then lock them to the customerid
 	//otherwise lock them to jobs that they own
 	if (!$USER->authorize('viewsystemreports')) {
-		$userJoin = " and j.userid = $USER->id ";
+		$userJoin = " and j.userid = '$USER->id' ";
 	} else {
 		$userJoin = "";
 	}
 	$deliveryquery = " ";
-	if(in_array("phone", $deliverymethod))
+	if("phone" == $deliverymethod)
 		$deliveryquery .= " and j.phonemessageid is not null ";
-	if(in_array("email", $deliverymethod))
+	else if("email" == $deliverymethod)
 		$deliveryquery .= " and j.emailmessageid is not null ";	
 		
 	$surveyfilter = "";
