@@ -42,6 +42,8 @@ function runReport($subscription){
 		case "emaildetail":
 		case "notcontacted":
 			redirect("reportjobdetails.php?reportid=$subscription->id");
+		case "contacthistory":
+			redirect("reportcallsperson.php?reportid=$subscription->id");
 	}
 }
 
@@ -58,9 +60,7 @@ function editReport($subscription){
 		case "emaildetail":
 		case "notcontacted":
 			redirect("reportjobdetailsearch.php?reportid=$subscription->id");
-		case "emergency":
-		case "attendance":
-		case "callsreport":
+		case "contacthistory":
 			redirect("reportcallssearch.php?reportid=$subscription->id");
 	}
 }
