@@ -554,7 +554,7 @@ startWindow('Job Information');
 				</tr>
 <? } ?>
 				<tr>
-					<td>Priority <?= help('Job_SettingsType',NULL,"small"); ?></td>
+					<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
 					<td>
 						<?
 
