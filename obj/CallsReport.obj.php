@@ -4,221 +4,168 @@ class CallsReport extends ReportGenerator{
 
 	function generateQuery(){
 		$USER = new User($this->userid);
-		$params = $this->params = $this->reportinstance->getParameters();
-		$this->reporttype = $params['reporttype'];
-		$orders = array("order1", "order2", "order3");
-		$orderquery = "";
-		foreach($orders as $order){
-			if(!isset($params[$order]))
-				continue;
-			$orderby = $params[$order];
-			if($orderby == "") continue;
-			if($orderquery == ""){
-				$orderquery = " order by ";
-			} else {
-				$orderquery .= ", ";
-			}
-			$orderquery .= $orderby;
-		}
-		$rulesql = "";
-		if(isset($params['rules']) && $params['rules']){
-			$rules = explode("||", $params['rules']);
-			foreach($rules as $rule){
-				if($rule) {
-					$rule = explode(";", $rule);
-					$newrule = new Rule();
-					$newrule->logical = $rule[0];
-					$newrule->op = $rule[1];
-					$newrule->fieldnum = $rule[2];
-					$newrule->val = $rule[3];
-					$rulesql .= " " . $newrule->toSql("rp");
-				}
-			}
-		}
+		$this->params = $this->reportinstance->getParameters();
+		$this->reporttype = $this->params['reporttype'];
+		
+		$rulesql = getRuleSql($this->params, "rp");
+		
 		$usersql = $USER->userSQL("rp");
 		$personquery="";
 		$phonequery="";
 		$emailquery="";
-		$priorityquery=""; 
+		$priorityquery="";
 		$reldatequery = "";
 		$resultquery="";
 		$jobidquery = "";
-		$systemquery = "";
 		
-		if(isset($params['personid'])){
-			$personquery = ($params['personid'] != "" || $params['personid'] != null) ? " and rp.pkey like '%" . DBSafe($params['personid']) . "%'" : "";
+		if(isset($this->params['pid'])){
+			$personquery = " and rp.personid like '" . DBSafe($this->params['pid']) . "'";
 		}
-		if(isset($params['phone'])){
-			$phonequery = $params['phone'] ? " and rc.phone like '%" . DBSafe($params['phone']) . "%'" : "";
+		if(isset($this->params['phone'])){
+			$phonequery = $this->params['phone'] ? " and rc.phone like '%" . DBSafe($this->params['phone']) . "%'" : "";
 		}
-		if(isset($params['email'])){
-			$emailquery = $params['email'] ? " and rc.email like '%" . DBSafe($params['email']) . "%'" : "";
+		if(isset($this->params['email'])){
+			$emailquery = $this->params['email'] ? " and rc.email like '%" . DBSafe($this->params['email']) . "%'" : "";
 		}
 
-		
-		if(isset($params['priority'])){
-			$priorityquery = $params['priority'] ? " and j.jobtypeid in ('" . $params['priority'] . "')" : "";
+		if(isset($this->params['priority'])){
+			$priorityquery = $this->params['priority'] ? " and j.jobtypeid in ('" . $this->params['priority'] . "')" : "";
 		}
-		if(isset($params['reldate'])){
-			$reldate = $params['reldate'];
-			if($reldate != ""){
-				switch($reldate){
-					case 'today':
-						$targetdate = QuickQuery("select curdate()");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-						
-						break;
-					
-					case 'week':
-						//1 = Sunday, 2 = Monday, ..., 7 = Saturday
-						$dow = QuickQuery("select dayofweek(curdate())");
 	
-						//normally go back 1 day
-						$daydiff = 1;
-						//if it is sunday, go back 2 days
-						if ($dow == 1)
-							$daydiff = 2;
-						//if it is monday, go back 3 days
-						if ($dow == 2)
-							$daydiff = 3;
-	
-						$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-						
-						break;
-					case 'yesterday':
-						$targetdate = QuickQuery("select date_sub(curdate(),interval 1 day)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$targetdate',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$targetdate',interval 1 day) ";
-						
-						break;
-					case 'xdays':
-						$lastxdays = $params['lastxdays'];
-						if($lastxdays == "")
-							$lastxdays = 1;
-						$today = QuickQuery("select curdate()");
-						$targetdate = QuickQuery("select date_sub(curdate(),interval $lastxdays day)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-						
-						break;
-					case 'daterange':
-
-						$datestart = strtotime($params['startdate']);
-						$dateend = strtotime($params['enddate']);
-						$reldatequery = "and ( (j.startdate >= from_unixtime('$datestart') and j.startdate < date_add(from_unixtime('$dateend'),interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= from_unixtime('$datestart') and j.startdate <= date_add(from_unixtime('$dateend'),interval 1 day) ";
-						break;
-					case 'weektodate':
-						$today = QuickQuery("select curdate()");
-						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 week)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-						break;
-					case 'monthtodate':
-						$today = QuickQuery("select curdate()");
-						$targetdate = QuickQuery("select date_sub(curdate(), interval 1 month)");
-						$reldatequery = "and ( (j.startdate >= '$targetdate' and j.startdate < date_add('$today',interval 1 day) )
-											or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$targetdate' and j.startdate <= date_add('$today',interval 1 day) ";
-						break;
-				}
-			}
-		}
-		/*
-		$jobids = "";
-		if($datestartquery != "" || $dateendquery != ""){
-			$jobids = QuickQueryList("select j.id from job j where 1 $datestartquery $dateendquery");
-		} else if ($reldatequery != ""){
-			$jobids = QuickQueryList("select j.id from job j where 1 $reldatequery");
+		if(isset($this->params['reldate'])){
+			$reldate = $this->params['reldate'];
+			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
+			$this->params['joblist'] = implode("','", getJobList($startdate, $enddate));
+			$jobquery = " and rp.jobid in ('" . $this->params['joblist'] . "')";
 		}
 		
-		if($jobids != ""){
-			$jobids = implode("','", $jobids);
-			$jobidquery = "and j.id in ('" . implode("','", $jobids) . "')";
-		*/
-		if(isset($params['result'])){
-			$results = $params['result'];
-			if($results != ""){
-				$resultquery = " and rc.result in ('" . $results . "') ";
-			}
-		}
-		if(isset($params['systempriority'])){
-			$systemquery = "and jt.systempriority = '" . DBSafe($params['systempriority']) . "'";
+		if(isset($this->params['result']) && $this->params['result'] != ""){
+			$resultquery = " and rc.result in ('" . $this->params['result'] . "') ";
 		}
 			
-		$search = $personquery . $phonequery . $emailquery . $priorityquery . $resultquery . $reldatequery . $systemquery;
-		if($orderquery == ""){
-			$orderquery .= " order by rp.pkey, date";
-		}
+		$search = $personquery . $phonequery . $emailquery . $priorityquery . $resultquery  . $jobquery;
 		
 		$fieldquery = generateFields("rp");
 		
 		$this->query = 
-				"Select SQL_CALC_FOUND_ROWS
-					rp.pkey as pkey, 
-					rp." . FieldMap::GetFirstNameField() . " as firstname, 
-					rp." . FieldMap::GetLastNameField() . " as lastname,
-					rp.personid,
+				"Select
 					j.name as jobname,
-					max(from_unixtime(rc.starttime/1000)) as date,
-					rp.status as status,
-					j.id,
-					sum(rp.type = 'phone') as phonecount,
-					sum(rp.type = 'email') as emailcount
+					rp.type as type,
+					coalesce(m.name, sq.name) as message,
+					coalesce(rc.phone,
+						rc.email,
+						concat(
+							coalesce(rc.addr1,''), ' ',
+							coalesce(rc.addr2,''), ' ',
+							coalesce(rc.city,''), ' ',
+							coalesce(rc.state,''), ' ',
+							coalesce(rc.zip,''))
+							) as destination,
+					rc.attemptdata as attemptdata,
+					rp.status as status
 					$fieldquery
 					from reportperson rp
 					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
 					inner join job j on (rp.jobid= j.id)
 					inner join jobtype jt on (j.jobtypeid = jt.id)
+					left join message m on (m.id = rp.messageid)
+					left join surveyquestionnaire sq on (sq.id = rp.messageid)
 					where 1
 					$search
 					$usersql
 					$rulesql
-					group by rp.personid, j.id
-					$orderquery
 					";
 	}
 
-	function runHtml($params=null){
-		$options = $this->params;
-		$results = isset($options['result']) ? $options['result'] : "";
-		$resulttypes = "";
-		if($results){
-			$resulttypes = array();
-			$restypes = explode(",", $results);
-			foreach($restypes as $res){
-				$resulttypes[] = job_status(preg_replace("{'}", "",$res));
-			}
-			$resulttypes = implode(", ", $resulttypes);
+	function runHtml(){
+		
+		$columnindex = array("jobname" => 0,
+								"message" => 2,
+								"destination" => 3,
+								"date" => 4,
+								"result" => 5);
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		$count=5;
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+			$columnindex[$field->name] = $count;
+			$count++;
 		}
-		$pagestart = $options['pagestart'];
-		$fields = $this->reportinstance->getFields();
-		$query = $this->query;
-		$query .= " limit $pagestart, 50";
-		$result = Query($query);
-		$persondata = array();
+		
+		
+		
+		$result = Query($this->query);
+		$data = array();
+		// parse through data and seperate attempts.
+		// if no attempt made, look at rp.status for reason(index 5)
 		while($row = DBGetRow($result)){
-			$persondata[] = $row;
-		}
-		$total = QuickQuery("select found_rows()");
-
-
-		$priority = "";
-		if(isset($options['priority'])){
-			$priorities = explode("','", $options['priority']);
-			$first = true;
-			$displaypriority = "";
-			foreach($priorities as $priority){
-				$jobtype= new JobType($priority);
-				$displaypriority .= ($first ? "" : ", ") . $jobtype->name;
-				$first = false;
+			$tmp = explode(",",$row[4]);
+			
+			foreach($tmp as $attempt){
+				$line = array();
+				if($attempt == ""){
+					$time = "";
+					$res = $row[5];
+				} else {
+					list($time, $res) = explode(":", $attempt);
+				}
+				$line[] = $row[0];
+				$line[] = $row[1];
+				$line[] = $row[2];
+				$line[] = $row[3];
+				$line[] = $time;
+				$line[] = $res;
+				for($i=0; $i<count($fields); $i++){
+					$line[] = $row[6+$i];
+				}
+				$data[] = $line;
 			}
 		}
+		// Ordering done in php due to attempt data
+		for($i=3; $i>0; $i--){
+			if(isset($this->params["order".$i]) && $this->params["order".$i] !=""){
+				$rowindex = $columnindex[$this->params["order".$i]];
+				if(in_array($this->params["order".$i], array("date"))){
+					$sort = SORT_NUMERIC;
+				} else {
+					$sort = SORT_STRING;
+				}
+				
+				$temparray = array();
+				foreach($data as $index => $row){
+					$temparray[$index] = $row[$rowindex];
+				}
+				$tempdata=array();
+				if(asort($temparray, $sort)){
+					$count=0;
+					foreach($temparray as $taindex => $value){					
+						$tempdata[$count] = $data[$taindex];
+						$count++;
+					}
+					$data = $tempdata;
+				}
+			}
+		}
+
+		
+		
+		$titles = array("0" => "Job Name",
+						"1" => "Message",
+						"3" => "Destination",
+						"4" => "Date/Time",
+						"5" => "Result");
+		foreach($fieldlist as $index => $field){
+			$titles[] = $field;
+		}
+		$formatters = array("1" => "fmt_message",
+							"3" => "fmt_destination",
+							"4" => "fmt_ms_timestamp",
+							"5" => "fmt_result");
+		
 		$searchrules = array();
-		if(isset($options['rules']) && $options['rules']){
-			$rules = explode("||", $options['rules']);
+		if(isset($this->params['rules']) && $this->params['rules']){
+			$rules = explode("||", $this->params['rules']);
 			foreach($rules as $rule){
 				if($rule) {
 					$rule = explode(";", $rule);
@@ -233,139 +180,109 @@ class CallsReport extends ReportGenerator{
 			}
 		}
 	
-		startWindow("Search Information", "padding: 3px;"); 
-		?>
-			<table>
-<? 
-			if(isset($options['personid']) && $options['personid'] !="") { 
+		startWindow("Search Parameters");
 ?>
-				<tr><td>Person ID: <?=$options['personid']?></td></tr>
-<? 
+		<table>
+<?
+			if(isset($this->params['personid']) && $this->params['personid'] != ""){
+?>
+				<tr><td>ID#: <?=$this->params['personid']?></td></tr>
+<?	
 			}
-			if(isset($options['phone']) && $options['phone'] !="") {
+			if(isset($this->params['phone']) && $this->params['phone'] != ""){
 ?>
-				<tr><td>Phone: <?=$options['phone']?></td></tr>
+				<tr><td>Phone: <?=$this->params['phone']?></td></tr>
 <?
 			}
-			if(isset($options['email']) && $options['email'] !="") {
+			if(isset($this->params['email']) && $this->params['email'] != ""){
 ?>
-				<tr><td>Email: <?=$options['email']?></td></tr>
+				<tr><td>Email: <?=$this->params['email']?></td></tr>
 <?
 			}
-			if(isset($options['date_start']) && $options['date_start'] !=""){
+			if(isset($this->params['reldate'])){
+				list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
 ?>
-				<tr><td>Date From: <?=$options['date_start']?></td></tr>
-<?
-			}	
-			if(isset($options['date_end']) && $options['date_end'] !=""){
-?>
-				<tr><td>Date To: <?=$options['date_end']?></td></tr>
+				<tr><td>From: <?=date("m/d/Y", $startdate)?> To: <?=date("m/d/Y", $enddate)?></td></tr>
 <?
 			}
-			if(isset($options['reldate']) && $options['reldate'] != ""){
-				$datedisplay = "Relative Date: ";
-				if($options['reldate'] == "xdays"){
-					$date = fmt_rel_date($options['reldate'], $options['lastxdays']);
-				} else if($options['reldate'] == "daterange"){
-					$datedisplay = "Date Range: ";
-					$date = fmt_rel_date($options['reldate'], $options['startdate'], $options['enddate']);
-				} else {
-					$date = fmt_rel_date($options['reldate']);
+			if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
+				$jobtypes = explode("','", $this->params['jobtypes']);
+				$jobtypenames = array();
+				foreach($jobtypes as $jobtype){
+					$jobtypeobj = new JobType($jobtype);
+					$jobtypenames[] = $jobtypeobj->name;
 				}
+				$jobtypenames = implode(", ",$jobtypenames);
 ?>
-				<tr><td><?=$datedisplay?><?=$date?></td></tr>
+				<tr><td>Job Type: <?=$jobtypenames?></td></tr>
 <?
 			}
-			if(isset($options['priority']) && $displaypriority !="") {
+			if(isset($this->params['results']) && $this->params['results'] != ""){
+				$results = explode("','",$this->params['results']);
+				$resultnames = array();
+				foreach($results as $result)
+					$resultnames[] = fmt_result(array($result), 0);
+				$resultnames = implode(", ", $resultnames);
 ?>
-				<tr><td>Priority: <?=$displaypriority?></td></tr>
+				<tr><td>Results: <?=$resultnames?></td></tr>
 <?
 			}
-			if(isset($options['result']) && $resulttypes !=""){
-?>
-				<tr><td>Result Type: <?=$resulttypes?></td></tr>
-<?
-			}
+
 			foreach($searchrules as $rule){
 				?><tr><td><?=$rule?></td></tr><?
 			}
 ?>
 			</table>
 		<? 
-		endWindow(); 
+		endWindow();
 		?>
 		<br>
 		<?
-		
-		$titles = array("ID#",
-						"First Name",
-						"Last Name",
-						"Job Name",
-						"Last Attempt",
-						"Notified");
-		foreach($fields as $index => $field){
-			$titles[] = $field;
-		}
-							
 		startWindow("Search Results", "padding: 3px;");
-			
-			showPageMenu($total,$pagestart,50);
-			?>
-				<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
-					<tr class="listHeader">
-<?
-						foreach($titles as $title){
-							?><th align="left" class="nosort"><?=$title?></td><?
-						}
+			$query = "select rp.pkey, " .
+						" rp." . FieldMap::getFirstNameField() . ", " .
+						" rp." . FieldMap::getLastNameField() .
+						" from reportperson rp
+						where rp.personid = '" . DBSafe($this->params['pid']) . "'
+						group by rp.personid";
+			list($pkey,$firstname, $lastname) = QuickQueryRow($query);
 ?>
-					</tr>
+			<table  width="100%" cellpadding="3" cellspacing="1" class="list" >
+				<tr><td>ID# <?=$pkey?></td></tr>
+				<tr><td>First Name <?=$firstname?></td></tr>
+				<tr><td>Last Name <?=$lastname?></td></tr>
+			</table>
 <?
-				$alt = 1;
-				$currid = "";
-				foreach($persondata as $row){
-					if($row[3] != $currid){
-						$alt++;
-						$currid = $row[3];
-					}
-					echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-					?>
-						<td><?=fmt_drilldown($row[3], $row[7])?><?=$row[0]?></td>
-						<td><?=$row[1]?></td>
-						<td><?=$row[2]?></td>
-
-						<td><?=fmt_type($row[4], $row[8], $row[9])?></td>
-						<td><?=fmt_date($row,5)?></td>
-						<td><?=fmt_calls_result($row,6)?></td>
-<?
-					
-						for($i=10;$i<count($fields)+10;$i++){
-							?><td><?=$row[$i]?></td><?
-						}
-?>
-						</tr>
-<?
-				}
-?>
-				</table>
-<?
-			showPageMenu($total,$pagestart,50);
-		
 		endWindow();
+?>
+<br>
+<?		
+
+		startWindow("Contact History", "padding: 3px;");
+?>
+		<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
+<?
+		showTable($data, $titles, $formatters);
+?>
+		</table>
+<?
+		endWindow();
+		
 		?>
 		<script langauge="javascript">
 			var searchresultstable = new getObj("searchresults").obj;	
 		<?
 			$count=1;
-			foreach($fields as $index => $field){
+			foreach($fieldlist as $index => $field){
 				?>
-				setColVisability(searchresultstable, 5+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				setColVisability(searchresultstable, 4+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
 				$count++;
 			}
 		?>
 		</script>
 		<?
-	
+		
 	}
 
 	function runCSV(){
@@ -381,8 +298,12 @@ class CallsReport extends ReportGenerator{
 			}
 			$resulttypes = implode(", ", $resulttypes);
 		}
-		$fields = $this->reportinstance->getFields();
-		$activefields = $this->reportinstance->getActiveFields();
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
+		$activefields = $this->params['activefields'];
 		$query = $this->query;
 		$result = Query($query);
 		$persondata = array();
@@ -426,7 +347,7 @@ class CallsReport extends ReportGenerator{
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	
 		$titles = "Person ID, First Name,Last Name,Job Name,Date";
-		foreach($fields as $index => $field){
+		foreach($fieldlist as $index => $field){
 			if(in_array($index, $activefields)){
 				$titles .= "," . $field;
 			}
@@ -444,7 +365,7 @@ class CallsReport extends ReportGenerator{
 				$line2[] = date("m/d/Y H:i", strtotime($callinfo[1]));
 				$line2[] = $callinfo[2];
 				$i = 4;
-				foreach($fields as $index => $field){
+				foreach($fieldlist as $index => $field){
 					if(in_array($index, $activefields)){
 						$line2[] = $callinfo[$i];
 					}
@@ -467,18 +388,14 @@ class CallsReport extends ReportGenerator{
 
 	static function getOrdering(){
 		global $USER;
-		$fields = getFieldMaps();
-		$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
-		$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 	
 		$ordering = array();
-		$ordering["ID#"] = "rp.pkey";
-		$ordering[$firstname->name]="rp." . $firstname->fieldnum;
-		$ordering[$lastname->name]="rp." . $lastname->fieldnum;
 		$ordering["Job Name"]="jobname";
-		$ordering["Last Attempt"]="date";
-		
-		$ordering["Notified"]="status";
+		$ordering["Message"] = "message";
+		$ordering["Destination"] = "destination";
+		$ordering["Date/Time"] = "date";
+		$ordering["result"] = "result";
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;
 		}
