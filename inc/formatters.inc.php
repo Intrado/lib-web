@@ -232,14 +232,7 @@ function fmt_job_startdate ($obj,$name) {
 function fmt_status($obj, $name) {
 	global $USER;
 	if ($obj->status == 'new') {
-		if($obj->id)
-			$assigned = QuickQuery("select status from job where id='$obj->id'");
-		else
-			$assigned = false;
-		if ($assigned=="new")
-			return 'Not Submitted';
-		else
-			return "Processing";
+		return "Not Submitted";
 	} else {
 		if ($obj->cancelleduserid && $obj->cancelleduserid != $USER->id) {
 			$usr = new User($obj->cancelleduserid);
