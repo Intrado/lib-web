@@ -48,8 +48,6 @@ $fields = FieldMap::getOptionalAuthorizedFieldMaps();
 $f="contacthistory";
 $s="displayoptions";
 $reload = 0;
-$ordercount = 3;
-$ordering = CallsReport::getOrdering();
 
 if(isset($_REQUEST['reportid'])){
 	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0))
@@ -111,14 +109,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save"))
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			for($i=1; $i<$ordercount; $i++){
-				$order = "order" . $i;
-				$options[$order] = GetFormData($f, $s, $order);
-			}
-			foreach($options as $index => $item){
-				if($item == "")
-					unset($options[$index]);
-			}
+
 			$_SESSION['report']['options'] = $options;
 			if(CheckFormSubmit($f,"save")){
 				redirect("reportedit.php");
@@ -133,10 +124,6 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save"))
 
 if($reload){
 	ClearFormData($f);
-	for($i=1;$i<=$ordercount;$i++){
-		$order="order$i";
-		PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
-	}
 }
 
 
@@ -165,12 +152,6 @@ startWindow("Display Options", "padding: 3px;", "true");
 ?>
 			</td>
 		</tr>
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort By:</th>
-			<td class="bottomBorder" >
-<?
-				selectOrderBy($f, $s, $ordercount, $ordering);
-?>
-			</td>
 	</table>
 <?
 endWindow();

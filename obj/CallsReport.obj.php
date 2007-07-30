@@ -85,22 +85,12 @@ class CallsReport extends ReportGenerator{
 
 	function runHtml(){
 		
-		$columnindex = array("jobname" => 0,
-								"message" => 2,
-								"destination" => 3,
-								"date" => 4,
-								"result" => 5);
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
-		$count=5;
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
-			$columnindex[$field->name] = $count;
-			$count++;
 		}
-		
-		
-		
+
 		$result = Query($this->query);
 		$data = array();
 		// parse through data and seperate attempts.
@@ -129,29 +119,19 @@ class CallsReport extends ReportGenerator{
 			}
 		}
 		// Ordering done in php due to attempt data
-		for($i=3; $i>0; $i--){
-			if(isset($this->params["order".$i]) && $this->params["order".$i] !=""){
-				$rowindex = $columnindex[$this->params["order".$i]];
-				if(in_array($this->params["order".$i], array("date"))){
-					$sort = SORT_NUMERIC;
-				} else {
-					$sort = SORT_STRING;
-				}
-				
-				$temparray = array();
-				foreach($data as $index => $row){
-					$temparray[$index] = $row[$rowindex];
-				}
-				$tempdata=array();
-				if(asort($temparray, $sort)){
-					$count=0;
-					foreach($temparray as $taindex => $value){					
-						$tempdata[$count] = $data[$taindex];
-						$count++;
-					}
-					$data = $tempdata;
-				}
+		// index 4 is date/time column
+		$temparray = $data;
+		foreach($data as $index => $row){
+			$temparray[$index] = $row[4];
+		}
+		$tempdata=array();
+		if(asort($temparray, SORT_NUMERIC)){
+			$count=0;
+			foreach($temparray as $taindex => $value){					
+				$tempdata[$count] = $data[$taindex];
+				$count++;
 			}
+			$data = $tempdata;
 		}
 
 		

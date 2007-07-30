@@ -36,7 +36,6 @@ if (!$USER->authorize('createreport')) {
 $f = "report";
 $s = "personnotify";
 $reload = 0;
-$ordercount = 3;
 
 
 $jobtypeobjs = DBFindMany("JobType", "from jobtype");
@@ -45,9 +44,7 @@ foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
 }
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
-$ordering = CallsReport::getOrdering();
 
-$orders = array("order1", "order2", "order3");
 $results = array("A" => "Answered",
 					"M" => "Machine",
 					"N" => "No Answer",
@@ -192,10 +189,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"v
 			else
 				$options['results'] = "";
 			
-			for($i=1; $i<=$ordercount; $i++){
-				$options["order$i"] = GetFormData($f, $s, "order$i");
-			}
-			
 			$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
 			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
 			if ($fieldnum != "") {
@@ -269,22 +262,6 @@ if($reload){
 	
 	PutFormData($f, $s, 'result', isset($options['result']) && $options['result'] !="" ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, 'results', $result , "array", array_keys($results));
-	
-	for($i=1;$i<=$ordercount;$i++){
-		$order="order$i";
-		if($i==1){
-			if(!isset($options[$order])){
-				if(isset($_SESSION['reportid']))
-					$orderquery = "";
-				else
-					$orderquery = "date";
-			} else
-				$orderquery = $options[$order];
-			PutFormData($f, $s, $order, $orderquery);
-		} else {
-			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
-		}
-	}
 	
 	PutFormData($f,$s,"newrulefieldnum","");
 	PutFormData($f,$s,"newruletype","text","text",1,50);
@@ -407,30 +384,6 @@ startWindow("Person Notification Search", "padding: 3px;");
 <? 		
 			select_metadata(null, null, $fields);
 ?>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort by:</th>
-		<td class="bottomBorder">
-			<table>
-				<tr>
-<?
-				foreach($orders as $order){
-?>
-				<td>
-<?
-					NewFormItem($f, $s, $order, 'selectstart');
-					NewFormItem($f, $s, $order, 'selectoption', " -- Not Selected --", "");
-					foreach($ordering as $index => $item){
-						NewFormItem($f, $s, $order, 'selectoption', $index, $item);
-					}
-					NewFormItem($f, $s, $order, 'selectend');
-?>
-				</td>
-<?
-				}
-?>
-				</tr>
-			</table>
 		</td>
 	</tr>
 </table>
