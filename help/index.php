@@ -12,8 +12,18 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
-session_name($CUSTOMERURL . "_session");
-session_start();
+
+require_once("../inc/db.inc.php");
+require_once("../inc/DBMappedObject.php");
+require_once("../inc/DBRelationMap.php");
+require_once("XML/RPC.php");
+require_once("../inc/auth.inc.php");
+require_once("../inc/sessionhandler.inc.php");
+require_once("../inc/utils.inc.php");
+
+
+// we just want to confirm that someone is logged in to this customer
+doStartSession();
 
 if (!isset($_SESSION['user']))
 	header("Location: ..");
