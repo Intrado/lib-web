@@ -69,9 +69,10 @@ if (isset($_GET['enable'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_actions_en ($obj,$name) {
+	global $USER;
 	return '<a href="user.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
-		. ($obj->enabled ? '<a href="./?login=' . $obj->login . '">Login&nbsp;as&nbsp;this&nbsp;user</a>&nbsp;|&nbsp;' : NULL)
-		. '<a href="?disable=' . $obj->id . '">Disable</a>&nbsp;';
+		. ($obj->enabled ? '<a href="./?login=' . $obj->login . '">Login&nbsp;as&nbsp;this&nbsp;user</a>' : NULL)
+		. ($obj->id == $USER->id ? "" : '&nbsp;|&nbsp;<a href="?disable=' . $obj->id . '">Disable</a>&nbsp;');
 }
 
 function fmt_actions_dis ($obj,$name) {
