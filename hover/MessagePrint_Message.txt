@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_print_message.htm
+Fill out the required fields to create your print message.
