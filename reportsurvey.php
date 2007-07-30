@@ -22,11 +22,15 @@ require_once("obj/UserSetting.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports')) {
+if (!$USER->authorize('createreport')) {
 	redirect('unauthorized.php');
 }
 
-
+if (!$USER->authorize('viewsystemreports')) {
+	$userjoin = " and j.userid = $USER->id ";
+} else {
+	$userjoin = "";
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -144,14 +148,14 @@ startWindow("Select", NULL, false);
 						<?
 							NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 							NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Survey --", "");
-							$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null order by id desc");
+							$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 0 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null $userjoin order by id desc");
 					
 							foreach ($jobs as $job) {
 								NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
 							}
 							NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 							NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Survey --", "");
-							$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null order by id desc");
+							$jobs = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null $userjoin order by id desc");
 							foreach ($jobs as $job) {
 								NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 							}
