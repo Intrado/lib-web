@@ -8,6 +8,7 @@ class User extends DBMappedObject {
 	//Do not store pincode
 	var $firstname = "";
 	var $lastname = "";
+	var $description = "";
 	var $phone = "";
 	var $email = "";
 	var $enabled = 0;
@@ -20,7 +21,7 @@ class User extends DBMappedObject {
 		$this->_allownulls = true;
 		$this->_tablename = "user";
 		$this->_fieldlist = array("accessid", "login", "accesscode", "firstname",
-								"lastname", "email", "phone", "enabled","lastlogin","deleted", "ldap");
+								"lastname", "description", "email", "phone", "enabled","lastlogin","deleted", "ldap");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

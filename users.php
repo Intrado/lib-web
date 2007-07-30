@@ -96,21 +96,22 @@ function fmt_acc_profile ($obj,$name) {
 $PAGE = "admin:users";
 $TITLE = "User List";
 
+/*CSDELETEMARKER_START*/
+$DESCRIPTION = "Active Users: $usercount, Maximum Allowed: $maxusers";
+/*CSDELETEMARKER_END*/
+
 include_once("nav.inc.php");
 
 $titles = array(	"firstname" => "#First Name",
 					"lastname" => "#Last Name",
 					"login" => "#Username",
+					"description" => "#Description",
 					"AccessProfile" => "#Security Profile",
 					"lastlogin" => "Last Login",
 					"Actions" => "Actions"
 					);
 
-/*CSDELETEMARKER_START*/
-?>
-	<div align="right">Total Users: <?=$usercount?>. Max: <?=$maxusers?></div>
-<?
-/*CSDELETEMARKER_END*/
+
 
 startWindow('Active Users ' . help('Users_ActiveUsersList'));
 

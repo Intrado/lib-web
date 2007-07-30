@@ -163,7 +163,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 				$usr->enabled = 1;
 			}
 
-			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname"));
+			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname","description"));
 			$usr->email = $emaillist;
 			$usr->login = $login;
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
@@ -239,15 +239,8 @@ if( $reloadform )
 {
 	ClearFormData($f);
 
-	if (isset($_POST['adduser_x'])) {
-		$_SESSION['userid'] = NULL;
-		$usr = new User();
-		$usr->firstname = get_magic_quotes_gpc() ? stripslashes($_POST['adduserfirst']) : $_POST['adduserfirst'];
-		$usr->lastname = get_magic_quotes_gpc() ? stripslashes($_POST['adduserlast']) : $_POST['adduserlast'];
-		$usr->enabled = 1;
-	} else {
-		$usr = new User($_SESSION['userid']);
-	}
+
+	$usr = new User($_SESSION['userid']);
 
 	$fields = array(
 			array("accessid","number","nomin","nomax"),
@@ -255,6 +248,7 @@ if( $reloadform )
 			array("accesscode","number","nomin","nomax"),
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
+			array("description","text",0,50),
 			array("email","text"),
 			);
 
@@ -317,6 +311,9 @@ startWindow('User Information');
 								<td colspan="4"><? NewFormItem($f,$s, 'lastname', 'text', 20, 50); ?></td>
 							</tr>
 							<tr>
+								<td align="right">Description:</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'description', 'text', 20, 50); ?></td>
+							</tr>							<tr>
 								<td align="right">Username:</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'login', 'text', 20); ?></td>
 							</tr>
