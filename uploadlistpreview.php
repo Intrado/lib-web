@@ -206,10 +206,12 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		if ($fp = fopen($curfilename, "r")) {
 			while ($row = fgetcsv($fp,4096)) {
 				$pkey = DBSafe(trim($row[0]));
+				if ($pkey == "")
+					continue;
 				$query = "
 					select p.id
 					from 		person p
-					where p.pkey='$pkey' and $usersql
+					where p.pkey='$pkey' and not p.deleted $usersql
 				";
 
 				if ($personid = QuickQuery($query))
@@ -217,21 +219,17 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			}
 			fclose($fp);
 
+
 			$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='A' and p.userid is null and le.listid=$list->id");
 			$deleteids = array_diff($oldids, $personids);
 			$addids = array_diff($personids, $oldids);
 
 			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "')";
-			//echo $query. "<hr>";
 			QuickUpdate($query);
-			//echo mysql_error();
 			if (count($addids) > 0) {
 				$query = "insert into listentry (listid, type, personid) values ($list->id,'A','" . implode("'),($list->id,'A','",$addids) . "')";
-				//echo $query. "<hr>";
 				QuickUpdate($query);
-				//echo mysql_error();
 			}
-			//exit();
 		} else {
 			$errormsg = "Unable to open the file";
 		}
