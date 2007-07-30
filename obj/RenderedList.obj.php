@@ -133,7 +133,7 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where p.userid is null $modesql1 and $listsql $usersql)
+			where not p.deleted and p.userid is null $modesql1 and $listsql $usersql)
 
 			union all
 
@@ -155,7 +155,7 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where le.type='A' $modesql2 )
+			where not p.deleted and le.type='A' $modesql2 )
 
 			$orderby
 			$pagesql
