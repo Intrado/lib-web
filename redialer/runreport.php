@@ -35,6 +35,7 @@ require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../inc/reportutils.inc.php");
+require_once("../inc/reportgeneratorutils.inc.php");
 require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
 require_once("XML/RPC.php");
