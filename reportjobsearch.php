@@ -195,8 +195,8 @@ if(isset($_SESSION['reportid'])){
 }
 include_once("nav.inc.php");
 NewForm($f);
-buttons( button('back', "location.href='reports.php'"), submit($f, "save", "save/schedule", "save/schedule"),
-			 submit($f, "view", "View Report", "View Report"));
+buttons( button('Back', "location.href='reports.php'"), submit($f, "save", "Save/Schedule"),
+			 submit($f, "view", "View Report"));
 
 //--------------- Select window ---------------
 startWindow("Select", NULL, false);

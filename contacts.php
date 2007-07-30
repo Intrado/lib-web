@@ -253,7 +253,7 @@ $TITLE = "Contact Database";
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(submit($f, $s, 'search', 'search'), submit($f, 'showall','showallcontacts','showallcontacts'));
+buttons(submit($f, $s, 'Search'), submit($f, 'showall','Show All Contacts'));
 startWindow("Contact Search", "padding: 3px;"); 
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
