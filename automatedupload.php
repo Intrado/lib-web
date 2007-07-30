@@ -2,36 +2,63 @@
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
+//get the customer URL
+if ($IS_COMMSUITE) {
+	$CUSTOMERURL = "default";
+} /*CSDELETEMARKER_START*/ else {
+	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+} /*CSDELETEMARKER_END*/
+
 require_once("inc/db.inc.php");
 require_once("inc/DBMappedObject.php");
 require_once("inc/DBRelationMap.php");
+require_once("XML/RPC.php");
+require_once("inc/auth.inc.php");
+require_once("inc/sessionhandler.inc.php");
+
+
+
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
-require_once("inc/sessiondata.inc.php");
+require_once("obj/User.obj.php");
+require_once("obj/Access.obj.php");
+require_once("obj/Permission.obj.php");
+
+require_once("inc/utils.inc.php");
+require_once("inc/date.inc.php");
 require_once("obj/User.obj.php");
 require_once("obj/Customer.obj.php");
 require_once("obj/Import.obj.php");
 
 
 
+
+
+//call 	doStartSession(); manually
+
 //1st, see if this is a POST with some raw post data, if so we should check the sessionid and make sure it is valid, then append/create the file
 if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 	$authcode = $_GET['authCode'];
 	$sessionid = $_GET['sessionId'];
 
-	if (!$sess = loadSessionData($sessionid))
+	//fire up the session
+	session_id($sessionid);
+	doStartSession();
+	if (!isset($_SESSION['importid']))
 		exit("error Bad session");
 
-	if ($sess['authcode'] != $_GET['authCode'])
+
+	if ($_SESSION['authcode'] != $_GET['authCode'])
 		exit("error Bad authcode");
 
-	if ($sess['uploadsuccess'])
+	if ($_SESSION['uploadsuccess'])
 		exit("already uploaded");
 
-	if (!$fp = fopen($sess['filename'],"ab"))
-		exit("error Can't write file");
+	if (!$fp = fopen($_SESSION['filename'],"ab"))
+		exit("error can't write file");
 
-//	error_log("writing to file " . $sess['filename']);
+//	error_log("writing to file " . $_SESSION['filename']);
 
 	if (false !== ($numbytes = fwrite($fp,$HTTP_RAW_POST_DATA)))
 		exit("ok $numbytes written");
@@ -39,34 +66,21 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 } else {
 
 	function rcp_authorize ($method_name, $params, $app_data) {
+		global $CUSTOMERURL;
 		$customer = $params[0];
 		$identity = $params[1];
 
-		$newsessid = md5(mt_rand() . microtime() . $_SERVER['REMOTE_ADDR']);
+		//authorize the upload key
+		if ($importid = authorizeUploadImport($identity, $CUSTOMERURL)) {
+			doStartSession();
+			$_SESSION['importid'] = $importid;
 
-		//check for the customer
-		$customerid = QuickQuery("select id from customer where hostname='" . DBSafe($customer) . "' and enabled=1");
-		if ($customerid) {
-			$importid = QuickQuery("select id from import where customerid='$customerid' and uploadkey='" . DBSafe($identity) . "'");
-			if ($importid) {
-
-				$sess = array();
-				$sess['importid'] = $importid;
-				$sess['customerid'] = $customerid;
-				storeSessionData($newsessid,$customerid, $sess);
-
-				return array ("sessionId" => $newsessid,
+			return array ("sessionId" => session_id(),
 							"errorMsg" => "",
 							"errorCode" => "NO_ERROR");
-
-			} else {
-				return array ("sessionId" => "",
-							"errorMsg" => "Unknown identity",
-							"errorCode" => "UNAUTHORIZED");
-			}
 		} else {
 			return array ("sessionId" => "",
-						"errorMsg" => "Unknown customer",
+						"errorMsg" => "Unknown identity",
 						"errorCode" => "UNAUTHORIZED");
 		}
 	}
@@ -77,17 +91,16 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		$length = $params[1];
 		$md5checksum = $params[2];
 
-		if ($sess = loadSessionData($sessionid)) {
-
-
+		//fire up the session and make an authcode
+		session_id($sessionid);
+		doStartSession();
+		if (isset($_SESSION['importid'])) {
 			$newauthcode = md5(mt_rand() . microtime() . $_SERVER['REMOTE_ADDR']);
-			$sess['authcode'] = $newauthcode;
-			$sess['uploadsuccess'] = false;
-			$sess['length'] = $sess['remaining'] = $length;
-			$sess['md5'] = $md5checksum;
-			$sess['filename'] = secure_tmpname("autoupload",".csv");
-			storeSessionData($sessionid,$sess['customerid'],$sess);
-
+			$_SESSION['authcode'] = $newauthcode;
+			$_SESSION['uploadsuccess'] = false;
+			$_SESSION['length'] = $sess['remaining'] = $length;
+			$_SESSION['md5'] = $md5checksum;
+			$_SESSION['filename'] = secure_tmpname("autoupload",".csv");
 			return array ("authCode" => $newauthcode,
 						"errorMsg" => "",
 						"errorCode" => "NO_ERROR");
@@ -103,57 +116,61 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		$sessionid = $params[0];
 		$authcode = $params[1];
 
-		if (!$sess = loadSessionData($sessionid))
+
+		//fire up the session
+		session_id($sessionid);
+		doStartSession();
+		if (!isset($_SESSION['importid']))
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Unknown session",
 						"errorCode" => "INVALID_SESSION");
 
 		//find the authcode
-		if (!(isset($sess['authcode']) && $sess['authcode'] == $authcode))
+		if (! (isset($_SESSION['authcode']) && $_SESSION['authcode'] == $authcode) )
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Unknown authcode",
 						"errorCode" => "UNAUTHORIZED");
 
 		//have we already uploaded? (handle duplicate confirmation requests)
-		if ($sess['uploadsuccess']) {
+		if ($_SESSION['uploadsuccess']) {
 			return array ("resumeLength" => "0",
 						"errorMsg" => "",
 						"errorCode" => "NO_ERROR");
 		}
 
 		//check for the file
-		if (!(isset($sess['filename']) && file_exists($sess['filename'])))
-			return array ("resumeLength" => $sess['length'],
+		if (!(isset($_SESSION['filename']) && file_exists($_SESSION['filename'])))
+			return array ("resumeLength" => $_SESSION['length'],
 						"errorMsg" => "No HTTP POST recieved",
 						"errorCode" => "PARTIAL_FILE");
 
 		//see if its all there
-		if (filesize($sess['filename']) < $sess['length'])
-			return array ("resumeLength" => ($sess['length'] - filesize($sess['filename'])),
+		if (filesize($_SESSION['filename']) < $_SESSION['length'])
+			return array ("resumeLength" => ($_SESSION['length'] - filesize($_SESSION['filename'])),
 						"errorMsg" => "Partial file recieved",
 						"errorCode" => "PARTIAL_FILE");
 		//got too much?
-		if (filesize($sess['filename']) < $sess['length'])
+		if (filesize($_SESSION['filename']) < $_SESSION['length'])
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Too much data for original file size",
 						"errorCode" => "CHECHSUM_FAILURE");
 
 		//check teh md5
-		$currentmd5 = md5_file($sess['filename']);
-		if ($currentmd5 != $sess['md5'])
+		$currentmd5 = md5_file($_SESSION['filename']);
+		if ($currentmd5 != $_SESSION['md5'])
 			return array ("resumeLength" => "0",
-						"errorMsg" => "Md5 is different. Request mdd5 = " . $sess['md5'] . " Md5 of file on server: $currentmd5",
+						"errorMsg" => "Md5 is different. Request mdd5 = " . $_SESSION['md5'] . " Md5 of file on server: $currentmd5",
 						"errorCode" => "CHECHSUM_FAILURE");
 
 		//do the upload
-		$import = new Import($sess['importid']);
-		$data = file_get_contents($sess['filename']);
+		$import = new Import($_SESSION['importid']);
+		$data = file_get_contents($_SESSION['filename']);
 		if (!$data  || !$import->upload($data))
 			return array ("resumeLength" => "0",
 						"errorMsg" => "There was an error uploading the file",
 						"errorCode" => "UPLOAD_ERROR");
 
-		@unlink($sess['filename']);
+		@unlink($_SESSION['filename']);
 
 		//should we kick off the import?
 		if ($import->type == "automatic") {
@@ -162,26 +179,33 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 
 		//save the session data
 		//set uploadsuccess in case the client misses our reply
-		$sess['uploadsuccess'] = true;
-
-		storeSessionData($sessionid,$sess['customerid'],$sess);
+		$_SESSION['uploadsuccess'] = true;
 
 		return array ("resumeLength" => "0",
 						"errorMsg" => "",
 						"errorCode" => "NO_ERROR");
+
 	}
 
 	function rcp_closesession ($method_name, $params, $app_data) {
 		$sessionid = $params[0];
-		if (!$sess = loadSessionData($sessionid))
-			return array ("resumeLength" => "0",
-						"errorMsg" => "Unknown session",
+
+		//fire up the session
+				session_id($sessionid);
+				doStartSession();
+		if (!isset($_SESSION['importid'])) {
+			return array ("errorMsg" => "Unknown session",
 						"errorCode" => "INVALID_SESSION");
+		}
+
 		//delete any remaining files still hanging around
 		if (isset($sess['filename']))
 			@unlink($sess['filename']);
 		//delete the session
-		eraseSessionData($sessionid);
+		$_SESSION = array();
+
+		return array ("errorMsg" => "",
+					"errorCode" => "NO_ERROR");
 	}
 
 	//do the xmlrpc stuff
