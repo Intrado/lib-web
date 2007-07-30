@@ -66,14 +66,13 @@ function fmt_actions ($obj,$name) {
 	}
 
 
-	$simpleplaybtn = button("Play", "popup('previewaudio.php?close=1&id=$audiofileid', 400, 400);");
 	$advancedplaybtn = button("Play", "popup('previewmessage.php?close=1&id=$obj->id', 400, 500);");
 	$editbtn = '<a href="message' . $obj->type . '.php?id=' . $obj->id . '">Edit</a>';
 	$deletebtn = '<a href="messages.php?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 	$renamebtn = '<a href="messagerename.php?id=' . $obj->id . '">Rename</a>';
 
 	if ($audiofileid) {
-		return  "$simpleplaybtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
+		return  "$advancedplaybtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
 	} else {
 		if ($obj->type == "phone") {
 			return "$advancedplaybtn&nbsp;|&nbsp;$editbtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
