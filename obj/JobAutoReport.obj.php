@@ -3,7 +3,7 @@
 class JobAutoReport extends ReportGenerator{
 	
 	function generateQuery(){
-		$USER = new User($this->userid);
+		global $USER;
 		$instance = $this->reportinstance;
 		$params = $this->params = $instance->getParameters();
 		$this->reporttype = $params['reporttype'];

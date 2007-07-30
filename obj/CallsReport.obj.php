@@ -3,9 +3,14 @@
 class CallsReport extends ReportGenerator{
 
 	function generateQuery(){
-		$USER = new User($this->userid);
+		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
+		if (!$USER->authorize('viewsystemreports')) {
+			$userjoin = " and rp.userid = $USER->id ";
+		} else {
+			$userjoin = "";
+		}
 		
 		$rulesql = getRuleSql($this->params, "rp");
 		
@@ -74,6 +79,7 @@ class CallsReport extends ReportGenerator{
 					$search
 					$usersql
 					$rulesql
+					$userjoin
 					";
 	}
 

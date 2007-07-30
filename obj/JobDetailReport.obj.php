@@ -3,7 +3,7 @@
 class JobDetailReport extends ReportGenerator{
 	
 	function generateQuery(){
-		$USER = new User($this->userid);
+		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
 		$orderquery = getOrderSql($this->params);
