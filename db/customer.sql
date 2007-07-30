@@ -578,7 +578,7 @@ CREATE TABLE `smsjob` (
   `status` enum('new','queued','sent','error') NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `status` (`status`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=innodb  DEFAULT CHARSET=latin1;
 $$$
 
 
@@ -590,7 +590,7 @@ CREATE TABLE `smsmsg` (
   `sequence` tinyint(4) NOT NULL,
   `phone` varchar(10) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=innodb DEFAULT CHARSET=latin1;
 $$$
 
 ALTER TABLE `phone` ADD `smsenabled` TINYINT NOT NULL DEFAULT '0';
@@ -847,7 +847,6 @@ $$$
 
 DROP TABLE `jobstats`
 $$$
-
 ALTER TABLE `reportperson` ADD `duplicateid` int( 11 ) NULL AFTER `numblocked`
 $$$
 
@@ -856,4 +855,5 @@ ALTER TABLE `reportinstance`
   DROP `activefields`
 $$$
 
--- not sure how to do this but you need to drop and recreate trigger create_schedule - Gretel
+ALTER TABLE `user` ADD `description` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `lastname` ;
+$$$
