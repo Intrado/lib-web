@@ -85,6 +85,7 @@ function authorizeUploadImport($uploadkey, $url = null) {
 		session_id($result['sessionID']); // set the session id
 		return $result['importID'];
 	}
+	return false;
 }
 
 function authorizeTaskRequest($shardid, $taskuuid) {
