@@ -139,6 +139,7 @@ if($reload){
 		}
 		$userlistarray[$userid] = $jobtypearray;
 	}
+	$groupbyarray = array();
 	while($row = DBGetRow($result)){
 		if(!isset($groupbyarray[$row[0]]))
 			$groupbyarray[$row[0]] = $userlistarray;
