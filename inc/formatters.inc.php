@@ -415,12 +415,6 @@ function report_name($string){
 			return "Phone Log";
 		case 'emaildetail':
 			return "Email Log";
-		case 'undelivered':
-			return "Undelivered";
-		case 'emergency':
-			return "Emergency";
-		case 'attendance':
-			return "Attendance";
 		case 'surveyreport':
 			return "Survey Results";
 		case 'contacthistory':
@@ -484,5 +478,9 @@ function display_rel_date($string, $arg1="", $arg2=""){
 	}
 }
 
+function fmt_message ($row,$index) {
+	//index is message type and index+1 is message name
+	return '<img src="img/' . $row[$index] . '_2.png" align="bottom" />&nbsp;' . htmlentities($row[$index+1]);
+}
 
 ?>
