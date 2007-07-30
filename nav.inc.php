@@ -36,8 +36,8 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['-- Reports & Status --'] = "false;";
 	if ($USER->authorize('createreport')) {
-		$SHORTCUTS['Create a Report'] = "reportedit.php";
-		$SHORTCUTS['View Job Summary'] = "reportjob.php";
+		$SHORTCUTS['Create a Report'] = "reports.php";
+		$SHORTCUTS['View Job Summary'] = "reportjobsearch.php";
 	}
 	if ($USER->authorize('viewsystemreports')) {
 		$SHORTCUTS['Usage Stats'] = "reportsystem.php";
@@ -52,7 +52,7 @@ if ($USER->authorize("createlist")) {
 }
 $SHORTCUTS['My Address Book'] = "addresses.php";
 if ($USER->authorize("viewcontacts"))
-	$SHORTCUTS['System Contacts'] = "contactsearch.php?clear=1";
+	$SHORTCUTS['System Contacts'] = "contacts.php?clear=1";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
 $SHORTCUTS['Message Tips & Ideas'] = "javascript: window.open('help/schoolmessenger_help.htm#getting_started/message_tips_and_ideas.htm', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
 $SHORTCUTS['Help'] = "javascript: window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');";
@@ -84,7 +84,7 @@ $NAVTREE = array (
 		array("SMS Jobs","systemsmsjobs.php","sendsms",$SUBTAB=="smsjobs"),
 
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
-		array("Contact Search","contactsearch.php?clear=1","viewcontacts",$SUBTAB=="contact search"),
+		array("Contacts","contacts.php?clear=1","viewcontacts",$SUBTAB=="contacts"),
 		array("Blocked Numbers","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
