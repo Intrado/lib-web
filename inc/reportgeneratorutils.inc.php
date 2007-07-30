@@ -1,13 +1,14 @@
 <?
 
-function getOrderSql($params){
+function getOrderSql($params, $exceptions = array()){
 
 	$orderquery = "";
 	$orderfields = array();
 	//only 3 order by's allowed. if more is specified, must change on web also
 	for($i=1; $i<=3; $i++){
 		if(isset($params["order$i"]) && $params["order$i"]!=""){
-			$orderfields[] = $params["order$i"];
+			if(count($exceptions) > 0 && !in_array($params["order$i"], $exceptions))
+				$orderfields[] = $params["order$i"];
 		}
 	}
 	if(count($orderfields) > 0){
@@ -50,12 +51,12 @@ function getJobSummary($joblist){
 							j.status,
 							sum(rc.type='phone'),
 							sum(rc.type='email')
-							from reportperson rp
-							left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
-							inner join job j on (rp.jobid = j.id)
-							inner join user u on (rp.userid = u.id)
+							from job j
+							left join reportperson rp on (j.id = rp.jobid)
+							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
+							inner join user u on (j.userid = u.id)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
-							where rp.jobid in ('" . $joblist . "')
+							where j.id in ('" . $joblist . "')
 							$usersql
 							group by j.id";
 	$jobinforesult = Query($jobinfoquery);
