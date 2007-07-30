@@ -189,9 +189,9 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "radioselect") != "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
+		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
 			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if(GetFormData($f, $s, "radioselect") != "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
+		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
 		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
 			error('You must enter a number');
