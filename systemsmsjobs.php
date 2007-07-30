@@ -40,10 +40,10 @@ startWindow('Completed SMS Jobs', 'padding: 3px;');
 
 
 
-$total = QuickQuery("select count(*) from smsjob s inner join user u on (u.id = s.userid and u.customerid=$USER->customerid) where s.deleted = 0");
+$total = QuickQuery("select count(*) from smsjob s inner join user u on (u.id = s.userid) where s.deleted = 0");
 
 
-$smsjobs = DBFindMany("SmsJob","from smsjob s inner join user u on (u.id = s.userid and u.customerid=$USER->customerid) where s.deleted = 0 order by sentdate desc","s");
+$smsjobs = DBFindMany("SmsJob","from smsjob s inner join user u on (u.id = s.userid) where s.deleted = 0 order by sentdate desc","s");
 
 
 function fmt_actions ($obj,$field) {
