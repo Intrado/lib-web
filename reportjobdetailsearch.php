@@ -236,11 +236,14 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			
 			if($result)
 				$options['result'] = implode("','", $result);
+			else
+				$options['result'] = "";
 			
 			$savedjobtype = GetFormData($f, $s, "jobtypes");
 			if($savedjobtype)
 				$options['jobtypes'] = implode("','", $savedjobtype);
-			
+			else
+				$options['jobtypes'] = "";
 			for($i=1; $i<=$ordercount; $i++){
 				$options["order$i"] = GetFormData($f, $s, "order$i");
 			}
