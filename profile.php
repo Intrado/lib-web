@@ -157,7 +157,6 @@ if( $reloadform )
 				array("sendphone","bool",0,1),
 				array("callearly","text",1,50),
 				array("calllate","text",1,50),
-				array("callmax","text",1,50),
 				array("sendemail","bool",0,1),
 				array("sendsms","bool",0,1),
 				array("sendprint","bool",0,1),
@@ -167,7 +166,6 @@ if( $reloadform )
 				array("listuploadcontacts","bool",0,1),
 				array("createrepeat","bool",0,1),
 				array("setcallerid","bool",0,1),
-				array("maxjobdays","number",1,7),
 				array("blocknumbers","bool",0,1),
 				array("createreport","bool",0,1),
 				array("viewsystemreports","bool",0,1),
@@ -189,6 +187,17 @@ if( $reloadform )
 		PutFormData($form, $section, $field[0], $accss->getValue($field[0]),$field[1],$field[2],$field[3]);
 	}
 
+	$callmax = $accss->getValue("callmax");
+	$callmax = $callmax === false ? 5 : $callmax ;
+	PutFormData($form, $section, "callmax", $callmax,"text",1,50);
+
+	$maxjobdays = $accss->getValue("maxjobdays");
+	$maxjobdays = $maxjobdays === false ? 2 : $maxjobdays ;
+
+	PutFormData($form, $section, "maxjobdays", $maxjobdays,"number",1,7);
+
+
+
 	// Only set the radio button values mapped to 'callblockingperms' if the master permission is enabled.
 	if ($accss->getValue('blocknumbers')) {
 		PutFormData($form, $section, 'callblockingperms', $accss->getValue('callblockingperms'));
@@ -196,9 +205,6 @@ if( $reloadform )
 		PutFormData($form, $section, 'callblockingperms', 'none');
 	}
 
-	if ($accss->getValue('maxjobdays') == null) {
-		PutFormData($form, $section, 'maxjobdays', 7);
-	}
 }
 
 
