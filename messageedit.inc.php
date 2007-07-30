@@ -178,11 +178,11 @@ print '&nbsp;';
 endWindow();
 
 print '<br>';
-startWindow('Message Content ' . help('MessagePhone_Message') );
 
 switch($MESSAGETYPE)
 {
 	case 'phone':
+		startWindow('Message Content ' . help('MessagePhone_Message') );
 		?>
 			<table border="0" cellpadding="3" cellspacing="0">
 				<tr>
@@ -245,6 +245,7 @@ switch($MESSAGETYPE)
 		<?
 		break;
 	case 'email':
+		startWindow('Message Content ' . help('MessageEmail_Message') );
 		?>
 			<table border="0" cellpadding="3" cellspacing="0">
 				<tr>
@@ -294,6 +295,7 @@ switch($MESSAGETYPE)
 		<?
 		break;
 	case 'print':
+		startWindow('Message Content ' . help('MessagePhone_Message') );
 		?>
 			<table border="0" cellpadding="3" cellspacing="0">
 				<tr>
