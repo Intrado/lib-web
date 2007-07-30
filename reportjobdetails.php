@@ -51,10 +51,6 @@ function fmt_attempts ($row,$index) {
 	*/
 }
 
-function fmt_message ($row,$index) {
-	return '<img src="img/' . $row[$index] . '_2.png" align="bottom" />&nbsp;' . htmlentities($row[$index+1]);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +85,10 @@ if(isset($_REQUEST['reportid'])){
 	} else {
 		error_log("Wrong report type recieved: " . $options['reporttype'] . " Check links on other page.");
 	}
-	$activefields = isset($options['activefields']) ? explode(",",$options['activefields']) : array();
+	$activefields = array();
+	if(isset($options['activefields'])){
+		$activefields = explode(",", $options['activefields']) ;
+	}
 	foreach($fields as $field){
 		if(in_array($field->fieldnum, $activefields)){
 			$_SESSION['fields'][$field->fieldnum] = true;
@@ -133,6 +132,15 @@ if(isset($_REQUEST['reportid'])){
 	if(!isset($_SESSION['reportid']))
 		$_SESSION['saved_report'] = false;
 	
+
+	$activefields = array();
+	foreach($fields as $field){
+		// used in pdf,csv
+		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
+			$activefields[] = $field->fieldnum; 
+		}
+	}
+	$options['activefields'] = implode(",",$activefields);
 	$instance = new ReportInstance();
 }
 
@@ -141,7 +149,6 @@ if(isset($_SESSION['reportid'])){
 } else {
 	$_SESSION['saved_report'] = false;
 }
-
 if(isset($options['jobid'])){
 	$jobid = $options['jobid'];
 	if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports')) && customerOwns("job",$jobid))
@@ -169,8 +176,6 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	$reportgenerator->format = "html";
 }
 
-
-
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 {
 	//check to see if formdata is valid
@@ -185,7 +190,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			$orderquery = "";
 			$options = $instance->getParameters();
 			for($i=1; $i<=$ordercount; $i++){
 				$options["order$i"] = GetFormData($f, $s, "order$i");
@@ -193,16 +197,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 			$_SESSION['report']['options']= $options;
 			
 			if(CheckFormSubmit($f, "save")){
-				
-				$activefields = array();
-				foreach($fields as $field){
-					// used in pdf,csv
-					if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-						$activefields[] = $field->fieldnum; 
-					}
-				}
-				$options['activefields'] = implode(",",$activefields);
-				$_SESSION['report']['options'] = $options;
 				redirect("reportedit.php");
 			}
 			redirect();
@@ -279,7 +273,7 @@ if($reportgenerator->format != "html"){
 	
 	include_once("nav.inc.php");
 	NewForm($f);	
-	buttons(button("back", "window.history.go(-1)"), submit($f, "save", "save/schedule", "save/schedule"), submit($f, $s, "filter", "refresh"));
+	buttons(button("Back", "window.history.go(-1)"), submit($f, "save", "Save/Schedule"), submit($f, $s, "Refresh"));
 	startWindow("Display Options", "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
