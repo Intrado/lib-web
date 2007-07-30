@@ -26,7 +26,7 @@ require_once("obj/Person.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createreport')) {
+if (!$USER->authorize('viewcontacts')) {
 	redirect('unauthorized.php');
 }
 
@@ -76,7 +76,7 @@ if(isset($options['rules']) && $options['rules'] != ""){
 			$newrule->val = $rule[3];
 			if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
 				$_SESSION['contactrules'][] = $newrule;
-			else 
+			else
 				$_SESSION['contactrules'] = array($newrule);
 			$newrule->id = array_search($newrule, $_SESSION['contactrules']);
 			$_SESSION['contactrules'][$newrule->id] = $newrule;
@@ -111,7 +111,7 @@ $fieldlist = array();
 foreach($fields as $field){
 	// used in pdf
 	if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-		$activefields[] = $field->fieldnum; 
+		$activefields[] = $field->fieldnum;
 	}
 }
 $options['activefields'] = $activefields;
@@ -142,7 +142,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-			
+
 			if(CheckFormSubmit($f, "showall")){
 				$options = array('reporttype' => "contacts");
 				for($i=1; $i<=$ordercount; $i++){
@@ -167,17 +167,17 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 					$fieldnum = GetFormData($f,$s,"newrulefieldnum");
 					if ($fieldnum != "") {
 						$type = GetFormData($f,$s,"newruletype");
-		
+
 						if ($type == "text")
 							$logic = "and";
 						else
 							$logic = GetFormData($f,$s,"newrulelogical_$type");
-		
+
 						if ($type == "multisearch")
 							$op = "in";
 						else
 							$op = GetFormData($f,$s,"newruleoperator_$type");
-		
+
 						$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
 						if (count($value) > 0) {
 							$rule = new Rule();
@@ -190,7 +190,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 							else
 								$_SESSION['contactrules'] = array($rule);
 							$rule->id = array_search($rule, $_SESSION['contactrules']);
-							
+
 							$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
 						}
 					}
@@ -215,7 +215,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 if($reload){
 	ClearFormData($f);
 	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
-	
+
 	if(isset($options['personid']) || isset($options['phone']) || isset($options['email']))
 		$radio = "person";
 	else
@@ -240,7 +240,7 @@ if($reload){
 	PutFormData($f,$s,"newruleoperator_text","sw","text",1,50);
 	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
 }
-	
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,7 +254,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 buttons(submit($f, $s, 'Search'), submit($f, 'showall','Show All Contacts'));
-startWindow("Contact Search", "padding: 3px;"); 
+startWindow("Contact Search", "padding: 3px;");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search:</th>
@@ -275,13 +275,13 @@ startWindow("Contact Search", "padding: 3px;");
 						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
 							<tr>
 								<td>
-								<? 
+								<?
 									if(!isset($_SESSION['contactrules']) || is_null($_SESSION['contactrules']))
 										$_SESSION['contactrules'] = false;
-									
+
 									$RULES = &$_SESSION['contactrules'];
 									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-									
+
 									include("ruleeditform.inc.php");
 								?>
 								</td>
@@ -303,11 +303,11 @@ startWindow("Contact Search", "padding: 3px;");
 	</tr>
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 		<td class="bottomBorder">
-	<? 		
-			select_metadata('searchresultstable', 5, $fields); 
+	<?
+			select_metadata('searchresultstable', 5, $fields);
 	?>
 		</td>
-	</tr>	
+	</tr>
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort By:</th>
 		<td class="bottomBorder">
 <?
@@ -325,7 +325,7 @@ startWindow("Contact Search", "padding: 3px;");
 		}
 	?>
 </script>
-	
+
 	<br>
 	<?
 

@@ -445,7 +445,7 @@ startWindow('Allowed Functions');
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
 					<td><? NewFormItem($form, $section, "viewsystemreports", "checkbox", 40, 'nopotion', 'id="viewsystemreports"' ); ?></td>
-					<td>View systemwide reports</td>
+					<td>View systemwide report data (controls access to report details on individual reports)</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form,$section,"viewusagestats","checkbox", 40, 'nooption', "id='viewusagestats'"); ?></td>
