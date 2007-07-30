@@ -79,7 +79,7 @@ function displayJobSummary($joblist){
 				<tr valign="top">
 					<th align="right" class="windowRowHeader">Job Summary:</th>
 					<td>
-						<table border="1" cellpadding="2" cellspacing="1" class="list" width="100%">
+						<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 							<tr class="listHeader" align="left" valign="bottom">
 								<th>Job Name</th>
 								<th>Description</th>
@@ -92,9 +92,11 @@ function displayJobSummary($joblist){
 								<th># of Emails</th>
 							</tr>
 <?
+							$alt=0;
 							foreach($jobinfo as $job){
+								echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-								<tr>
+								
 									<td><?=$job[0]?></td>
 									<td><?= ($job[1] == "" ) ? "&nbsp;" : $job[1]?></td>
 									<td><?=$job[2]?></td>
