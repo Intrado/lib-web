@@ -296,7 +296,11 @@ function fmt_jobs_actions_customer($row, $index) {
 		$deleteLink = '';
 	}
 
-	$runrepeatLink = '&nbsp;|&nbsp;<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
+	if ($USER->authorize('managesystemjobs') || $USER->id == $jobownerid) {
+		$runrepeatLink = '&nbsp;|&nbsp;<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
+	} else {
+		$runrepeatLink = "";
+	}
 
 	switch ($status) {
 		case "new":
