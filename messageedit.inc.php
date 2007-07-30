@@ -58,8 +58,8 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 				//submit changes
 				$message->type = $MESSAGETYPE;
 
-				//TODO check that the message->userid == user->id so that there is no chance of hijacking
-				if ($message->id && !userOwns("message",$message->id)) {
+				//check that the message->userid == user->id so that there is no chance of hijacking
+				if ($message->id && !userOwns("message",$message->id) || $message->deleted ) {
 					exit("nope!"); //TODO
 				}
 				$fields = array("name","description","body");

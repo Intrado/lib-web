@@ -19,9 +19,8 @@ function userOwns ($type,$id) {
 		case "person":
 		case "surveyquestionnaire":
 		case "voicereply":
-			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id'");
 		case "message":
-			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id' and deleted=0");
+			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id'");
 		default:
 			return false;
 	}
@@ -37,7 +36,7 @@ function customerOwns($type, $id) {
 		case "jobtype":
 		case "language":
 		case "persondatavalues":
-		case "setting":	
+		case "setting":
 		case "access":
 			return QuickQuery("select count(*) from `$type` where id = '$id'");
 		case "person":
