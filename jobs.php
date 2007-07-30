@@ -134,7 +134,7 @@ endWindow();
 print '<br>';
 if ($USER->authorize('createrepeat')) {
 
-	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type != 'survey' order by foo,name desc");
+	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type != 'survey' order by foo,name ");
 	$titles = array(	"name" => "#Name",
 						"description" => "#Description",
 						"type" => "#Type",
