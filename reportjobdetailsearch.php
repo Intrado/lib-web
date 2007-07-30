@@ -83,7 +83,10 @@ if(isset($_REQUEST['reportid'])){
 		if($options['reporttype']=="emaildetail")
 			$_SESSION['report']['type']="email";
 	}
-	$activefields = explode(",", $options['activefields']);
+	$activefields = array();
+	if(isset($options['activefields'])){
+		$activefields = explode(",", $options['activefields']) ;
+	}
 	foreach($fieldlist as $field){
 		if(in_array($field->fieldnum, $activefields)){
 			$_SESSION['fields'][$field->fieldnum] = true;
@@ -186,9 +189,9 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
+		} else if(GetFormData($f, $s, "radioselect") != "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
 			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if(GetFormData($f, $s, "radioselect") != "1" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
+		} else if(GetFormData($f, $s, "radioselect") != "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
 		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
 			error('You must enter a number');
@@ -386,7 +389,7 @@ if(isset($_SESSION['reportid']))
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons( button('back', 'window.history.go(-1)'), submit($f, "save", "save/schedule", "save/schedule"),
+buttons( button('Back', 'window.history.go(-1)'), submit($f, "save", "Save/Schedule"),
 			submit($f, "view", "View Report", "View Report"));
 
 //--------------- Select window ---------------
