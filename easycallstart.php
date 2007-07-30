@@ -284,7 +284,7 @@ startWindow("EasyCall");
 			<td class="bottomBorder"><? NewFormItem($f,$s,"name","text",30,30,'id="name"'); ?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Priority:&nbsp;<?= help('EasyCall_Priority', NULL, "small"); ?></th>
+			<th align="right" class="windowRowHeader bottomBorder" style="width: 100px;">Job Type:&nbsp;<?= help('EasyCall_Priority', NULL, "small"); ?></th>
 			<td class="bottomBorder">
 <?
 				NewFormItem($f,$s,"jobtypeid", "selectstart", null, null, 'id="jobtype"');
