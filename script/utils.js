@@ -292,8 +292,6 @@ function windowHide(windowid) {
 	var windowbody = new getObj('window_' + windowid);
 	var collapseicon = new getObj('window_colapseimg_' + windowid);
 	
-
-
 	var vis = windowbody.style.display != "none";
 	
 	if (vis) {
@@ -303,6 +301,8 @@ function windowHide(windowid) {
 		windowbody.style.display =  "block" ;
 		collapseicon.obj.src = "img/arrow_down.gif";
 	}
+	
+	setState('window_' + windowid, vis ? "closed" : "open");
 }
 
 function submitForm (formname,section) {

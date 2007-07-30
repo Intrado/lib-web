@@ -87,10 +87,15 @@ function showTable ($data, $titles, $formatters = array()) {
 	}
 }
 
-function startWindow($title, $style = NULL, $minimize = false, $usestate = true)
+function startWindow($title, $style = "", $minimize = false, $usestate = true)
 {
 	static $id = 0;
 	$id++;
+
+	$visible = !$usestate || state("window_$id") != "closed";
+
+	if (!$visible)
+		$style .= "; display: none";
 
 ?>
 <div class="window">
@@ -100,7 +105,7 @@ function startWindow($title, $style = NULL, $minimize = false, $usestate = true)
 		<div class="windowborder">
 			<div class="windowbar">
 <?	if ($minimize) { ?>
-				<div class="menucollapse" onclick="windowHide(<?=$id?>);" ><img id="window_colapseimg_<?= $id ?>" src="img/arrow_down.gif"></div>
+				<div class="menucollapse" onclick="windowHide(<?=$id?>);" ><img id="window_colapseimg_<?= $id ?>" src="img/arrow_<?=  $visible ? "down" : "right" ?>.gif"></div>
 <? } ?>
 				<div class="windowtitle"><?= $title ?></div>
 			</div>

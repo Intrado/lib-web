@@ -79,7 +79,7 @@ if ($USER->authorize("startstats")) {
 			<tr><td><?
 				startWindow('My Active Calls',NULL);
 				button_bar(button('Refresh', 'window.location.reload()'));
-				?><div align="center"><img src="graph_start_actrive_breakdown.png.php?junk=<?= rand() ?>" /></div><?
+				?><div align="center"><img width="300" height="200" src="graph_start_actrive_breakdown.png.php?junk=<?= rand() ?>" /></div><?
 				endWindow();
 ?>
 				</td>
