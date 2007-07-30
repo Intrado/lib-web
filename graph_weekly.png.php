@@ -59,6 +59,8 @@ for ($x =0; $x < 7; $x++) {
 	foreach (array("A","M","B","N") as $type) {
 		if (!isset($data[$type][$x]))
 			$data[$type][$x] = 0;
+		if ($type == "B" || $type == "N")
+			$data[$type][$x] = -$data[$type][$x];
 	}
 
 	$max = max($max, $data["A"][$x] + $data["M"][$x]);
