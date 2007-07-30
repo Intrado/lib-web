@@ -118,6 +118,9 @@ if($reload){
 		$jobtypelist[$row[1]] = $row[0];
 	}
 	
+	$groupbylist = array();
+	$groupbylist = QuickQueryList("select $groupby from reportperson group by $groupby");
+	
 	$query = "SELECT $groupbyquery
 					, rp.userid,
 					j.jobtypeid,
@@ -140,9 +143,11 @@ if($reload){
 		$userlistarray[$userid] = $jobtypearray;
 	}
 	$groupbyarray = array();
+	foreach($groupbylist as $item){
+		$groupbyarray[$item] = $userlistarray;
+	}
+	
 	while($row = DBGetRow($result)){
-		if(!isset($groupbyarray[$row[0]]))
-			$groupbyarray[$row[0]] = $userlistarray;
 		$groupbyarray[$row[0]][$row[1]][$row[2]] = $row[3];
 	}
 	$schooltotals = array();
@@ -158,7 +163,11 @@ if($reload){
 			}
 		}
 		foreach($users as $userid => $jobtypes){
-			$groupbyarray[$school][$userid]["total"] = array_sum($groupbyarray[$school][$userid])/(array_sum($schooltotals[$school])) * 100;
+			$schoolsum = array_sum($schooltotals[$school]);
+			if($schoolsum == 0)
+				$groupbyarray[$school][$userid]["total"] = 0;
+			else
+				$groupbyarray[$school][$userid]["total"] = (array_sum($groupbyarray[$school][$userid])/$schoolsum) * 100;
 		}
 		
 	}
