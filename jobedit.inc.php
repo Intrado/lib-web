@@ -503,6 +503,13 @@ if ($JOBTYPE == "normal") {
 
 
 startWindow('Job Information');
+
+	if (getSystemSetting("disablerepeat") ) {
+?>
+		<div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div>
+<?
+	}
+
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">

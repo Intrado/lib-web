@@ -148,7 +148,11 @@ if ($USER->authorize('createrepeat')) {
 		$scroll = true;
 	}
 	startWindow('My Repeating Notification Jobs ' . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
-
+	if (count($data) > 0 && getSystemSetting("disablerepeat") ) {
+?>
+		<div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div>
+<?
+	}
 
 	button_bar(button('Create Repeating Job', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
 

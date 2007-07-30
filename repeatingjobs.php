@@ -37,6 +37,13 @@ include_once("nav.inc.php");
 
 startWindow('Repeating Notification Jobs ' . help('System_RepeatingJobs'), 'padding: 3px;');
 
+	if (getSystemSetting("disablerepeat") ) {
+?>
+		<div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div>
+<?
+	}
+
+
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
