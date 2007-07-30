@@ -109,7 +109,7 @@ $colors = array_values($colors);
 //check for no data
 if (count($data) == 0 || array_sum($data) == 0) {
 	header("Content-type: image/png");
-	readfile("img/start_graph_placeholder.png");
+	readfile("img/spacer.gif");
 	exit();
 }
 
