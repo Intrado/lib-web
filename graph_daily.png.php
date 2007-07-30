@@ -29,13 +29,13 @@ $cpcolors = array(
 $query = "
 select 	dayofmonth(date) as dayofmonth,
 		date as date,
-				sum(answered)/12 as answered,
-				sum(machine)/12 as machine,
-				sum(busy)/12 as busy,
-				sum(noanswer)/12 as noanswer
+				sum(answered) as answered,
+				sum(machine) as machine,
+				sum(busy) as busy,
+				sum(noanswer) as noanswer
 			from systemstats
 			where date > date_sub(now(), interval 4 week)
-			group by dayofmonth
+			group by date
 			order by date
 ";
 
