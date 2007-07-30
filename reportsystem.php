@@ -29,6 +29,8 @@ if (!$USER->authorize('viewsystemreports')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $groupby = FieldMap::getSchoolField(); //defaults to school f-field
+if(!$groupby)
+	$groupby = FieldMap::getLanguageField(); //but if school is not used, default to language
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
 $type = "phone";
 $reldate = "monthtodate";
@@ -101,61 +103,63 @@ if($reload){
 
 	$groupbyquery = "";
 	if($groupby){
-		$groupbyquery = "rp." . $groupby . ", ";
+		$groupbyquery = "rp." . $groupby;
 	}
 	
 	$userlist = array();
-	$userquery = "Select login, id from user";
-	$userresult = Query($userquery);
+	$userresult = Query("Select login, id from user");
 	while($row = DBGetRow($userresult)){
 		$userlist[$row[1]] = $row[0];
 	}
 	
+	$jobtypelist = array();
+	$jobtyperesult = Query("select name, id from jobtype");
+	while($row = DBGetRow($jobtyperesult)){
+		$jobtypelist[$row[1]] = $row[0];
+	}
+	
 	$query = "SELECT $groupbyquery
-					rp.userid, 
-					sum(jt.systempriority = '1'),
-					sum(jt.systempriority = '2'),
-					sum(jt.systempriority = '3')
+					, rp.userid,
+					j.jobtypeid,
+					count(*)
 				from reportperson rp 
 				inner join job j on (rp.jobid = j.id)
-				inner join jobtype jt on (jt.id = j.jobtypeid)
 				where rp.status in ('fail', 'success')
 				$joblistquery
-				group by $groupbyquery rp.userid
-				order by $groupbyquery rp.userid";
+				group by $groupbyquery, j.jobtypeid, rp.userid
+				order by $groupbyquery, rp.userid";
 	
 	$result = Query($query);
 	$data = array();
+	$userlistarray = array();
+	foreach($userlist as $userid => $name){
+		$jobtypearray = array();
+		foreach($jobtypelist as $jobtypeid => $jobtypename){
+			$jobtypearray[$jobtypeid] = 0;
+		}
+		$userlistarray[$userid] = $jobtypearray;
+	}
 	while($row = DBGetRow($result)){
-		$data[] = $row;
+		if(!isset($groupbyarray[$row[0]]))
+			$groupbyarray[$row[0]] = $userlistarray;
+		$groupbyarray[$row[0]][$row[1]][$row[2]] = $row[3];
 	}
-	$schools = array();
-	$schooltotals = array("emergency" => array(),
-						"attendance" => array(),
-						"general" => array(),
-						"totalpercent" => array());
-	$total = 0;
-	$userlist=array();
-	foreach($data as $row){
-		if(!isset($userlist[$row[1]])){
-			$user = new User($row[1]);
-			$userlist[$row[1]] = $user->login;
+	$schooltotals = array();
+	$systemtotal = 0;
+	foreach($groupbyarray as $school => $users){
+		$schooltotals[$school] = array();
+		foreach($users as $userid => $jobtypes){
+			foreach($jobtypes as $jobtypeid => $count){
+				if(!isset($schooltotals[$school][$jobtypeid]))
+					$schooltotals[$school][$jobtypeid] = 0;
+				$schooltotals[$school][$jobtypeid]+=$count;
+				$systemtotal +=$count;
+			}
 		}
-		$row[1] = $userlist[$row[1]];
-		$schools[$row[0]][] = $row;
-		$schooltotals["emergency"][$row[0]] = (isset($schooltotals["emergency"][$row[0]]) ? $schooltotals["emergency"][$row[0]] : 0) + $row[2];
-		$schooltotals["attendance"][$row[0]] = (isset($schooltotals["attendance"][$row[0]]) ? $schooltotals["attendance"][$row[0]] : 0) + $row[3];
-		$schooltotals["general"][$row[0]] = (isset($schooltotals["general"][$row[0]]) ? $schooltotals["general"][$row[0]] : 0) + $row[4];
-		$schooltotals["totalpercent"][$row[0]] = "100%";
-	}
-	foreach($schools as $index => $users){
-		$schooltotal = $schooltotals["emergency"][$index] + $schooltotals["attendance"][$index] + $schooltotals["general"][$index];
-		foreach($users as $uindex => $row){
-			$sum = $row[2] + $row[3] + $row[4];
-			$row[] = ($sum/$schooltotal) * 100;
-			$users[$uindex] = $row;
-			$schools[$index] = $users;
+		foreach($users as $userid => $jobtypes){
+			$groupbyarray[$school][$userid]["total"] = array_sum($groupbyarray[$school][$userid])/(array_sum($schooltotals[$school])) * 100;
 		}
+		
 	}
 
 
@@ -238,43 +242,52 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 ?>
 	<table border="0" cellpadding="2" cellspacing="1" class="list">
 		<tr class="listHeader" >
-			<td colspan="4">System Total</td>
-			<td><?=$total?></td>
+			<td colspan="<?=count($jobtypelist)+1?>">System Total</td>
+			<td><?=$systemtotal?></td>
 		</tr>
 		<tr class="listHeader" align="left" valign="bottom">
 			<td>&nbsp;</td>
-			<td>Emergency</td>
-			<td>Attendance</td>
-			<td>General</td>
+<?
+			foreach($jobtypelist as $id => $name){
+?>
+			<td><?=$name?></td>
+<?
+			}
+?>
 			<td>%</td>
 		</tr>
 <?
 		$alt=0;
-		foreach($schools as $index => $schools){
-		
+		foreach($groupbyarray as $index => $groupbyfield){
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-
-				<td><div style='font-weight:bold;'><?=FieldMap::getName($groupby)?>:&nbsp;<?=$index?></div></td>
-				<td><?=$schooltotals["emergency"][$index]?></td>
-				<td><?=$schooltotals["attendance"][$index]?></td>
-				<td><?=$schooltotals["general"][$index]?></td>
-				<td><?=$schooltotals["totalpercent"][$index]?></td>
+			<td><u><?=FieldMap::getName($groupby)?>: <?=$index?><u></td>
+<?
+			foreach($schooltotals[$index] as $jobtype => $total){
+?>
+				<td><?=$total?></td>
+<?
+			}
+?>
+				<td>100%</td>
 			</tr>
 <?
-			foreach($schools as $users){
+			foreach($groupbyfield as $uindex => $user){
 				echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-					<td>&nbsp;&nbsp;&nbsp;User:&nbsp;<?=$users[1]?></td>
-					<td><?=$users[2]?></td>
-					<td><?=$users[3]?></td>
-					<td><?=$users[4]?></td>
-					<td><?=number_format($users[5], 2)?>%</td>
+					<td>&nbsp;&nbsp;&nbsp;User: <?=$userlist[$uindex]?></td>
+<?
+				foreach($jobtypelist as $jobtypeid => $jobtypename){
+?>
+					<td><?=$user[$jobtypeid]?></td>
+<?
+				}
+?>
+					<td><?=number_format($user["total"],2)?>%</td>
 				</tr>
 <?
 			}
 		}
-
 ?>
 	</table>
 <?
