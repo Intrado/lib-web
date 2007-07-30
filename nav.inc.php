@@ -78,7 +78,7 @@ $NAVTREE = array (
 		array("Call Distribution","reportsystemdistribution.php","viewsystemreports",$SUBTAB=="distribution")
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
-						'viewsystemrepeating','viewcontacts','blocknumbers'),$MAINTAB=="system",array(
+						'viewsystemrepeating','viewcontacts','blocknumbers','sendsms'),$MAINTAB=="system",array(
 		array("Active Jobs","activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
 		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
 		array("SMS Jobs","systemsmsjobs.php","sendsms",$SUBTAB=="smsjobs"),
