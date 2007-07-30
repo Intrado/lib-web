@@ -112,7 +112,7 @@ if(CheckFormSubmit($f, $s))
 			$subscription->userid = $USER->id;
 			$subscription->name = GetFormData($f, $s, "name");
 			$subscription->description = GetFormData($f, $s, "description");
-
+			$options['title'] = $subscription->name;
 			$instance->setParameters($options);
 			$instance->update();
 			$subscription->reportinstanceid=$instance->id;
@@ -173,7 +173,7 @@ $TITLE = "Saved/Scheduled Report";
 
 include("nav.inc.php");
 NewForm($f);
-buttons(button("back", 'window.history.go(-1)'), submit($f, $s, "save", "save"));
+buttons(button("Back", 'window.history.go(-1)'), submit($f, $s, "Save"));
 startWindow("Report Details");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
