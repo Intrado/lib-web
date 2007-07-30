@@ -7,39 +7,10 @@ class JobAutoReport extends ReportGenerator{
 		$instance = $this->reportinstance;
 		$params = $this->params = $instance->getParameters();
 		$this->reporttype = $params['reporttype'];
-		$orders = array("order1", "order2", "order3");
-		$orderquery = "";
-		foreach($orders as $order){
-			if(!isset($params[$order]))
-				continue;
-			$orderby = $params[$order];
-			if($orderby == "") continue;
-			if($orderquery == ""){
-				$orderquery = " order by ";
-			} else {
-				$orderquery .= ", ";
-			}
-			$orderquery .= $orderby;
-		}
-		if($orderquery == ""){
-			$orderquery = " order by rp.pkey ";
-		}
-		$rulesql = "";
 		
-		if(isset($params['rules']) && $params['rules']){
-			$rules = explode("||", $params['rules']);
-			foreach($rules as $rule){
-				if($rule) {
-					$rule = explode(";", $rule);
-					$newrule = new Rule();
-					$newrule->logical = $rule[0];
-					$newrule->op = $rule[1];
-					$newrule->fieldnum = $rule[2];
-					$newrule->val = $rule[3];
-					$rulesql .= " " . $newrule->toSql("rp");
-				}
-			}
-		}
+		$orderquery = getOrderSql($this->params);
+		$rulesql = getRuleSql($this->params, "rp");
+		
 		if(isset($params['jobid'])){
 			$jobid = DBSafe($params['jobid']);
 		} else {
@@ -117,7 +88,7 @@ class JobAutoReport extends ReportGenerator{
 	}
 	
 	function getReportSpecificParams(){
-		$params = array("jobId", $this->params['jobid']);
+		$params = array("jobId" => $this->params['jobid']);
 		return $params;
 	}
 }
