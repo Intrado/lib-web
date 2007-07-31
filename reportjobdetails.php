@@ -23,6 +23,7 @@ require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/JobDetailReport.obj.php");
+require_once("obj/JobType.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -106,6 +107,7 @@ if(isset($_REQUEST['reportid'])){
 	} else if($_REQUEST['type'] == "email"){
 		$options['reporttype'] = "emaildetail";
 	}
+	unset($options['result']);
 
 	$_SESSION['report']['options'] = $options;
 	redirect();
@@ -251,10 +253,10 @@ if($reportgenerator->format != "html"){
 	
 	$PAGE = "reports:reports";
 	$TITLE = "Phone Log";
-	if(isset($_SESSION['report']['type'])){
-		if($_SESSION['report']['type'] == "phone"){
+	if(isset($_SESSION['report']['options']['reporttype'])){
+		if($_SESSION['report']['options']['reporttype'] == "phonedetail"){
 			$TITLE = "Phone Log";
-		} else if($_SESSION['report']['type'] == "email"){
+		} else if($_SESSION['report']['options']['reporttype'] == "emaildetail"){
 			$TITLE = "Email Log";
 		}
 	} else if(isset($options['reporttype']) && $options['reporttype'] == "notcontacted"){
