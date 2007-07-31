@@ -301,13 +301,13 @@ if ($list->id) {
 	</tr>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Address Book<br><? print help('List_AddressBookAdd', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader">Address Book:<br><? print help('List_AddressBookAdd', NULL, 'grey'); ?></th>
 		<td style="padding: 5px;"><?= button("Open Address Book",NULL,"addressesmanualadd.php"); ?></td>
 	</tr>
 
 <? if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) { ?>
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Upload List<br><? print help('List_UploadList', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader">Upload List:<br><? print help('List_UploadList', NULL, 'grey'); ?></th>
 		<td style="padding: 5px;"><?= button("Upload List",NULL,"uploadlist.php"); ?></td>
 	</tr>
 <? } ?>
