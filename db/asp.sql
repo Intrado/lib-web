@@ -1624,6 +1624,8 @@ drop table persondata;
 
 ALTER TABLE `import` ADD `data` LONGBLOB Default NULL ;
 
+ALTER TABLE `import` ADD `datamodifiedtime` DATETIME NULL ;
+
 CREATE TABLE `surveyweb` (
 `code` CHAR( 22 ) CHARACTER SET ascii COLLATE ascii_bin NOT NULL ,
 `jobid` INT( 11 ) NOT NULL ,
@@ -1637,9 +1639,9 @@ CREATE TABLE `surveyweb` (
 
 
 insert into surveyweb
-select sec.code, wi.jobid, 
+select sec.code, wi.jobid,
 wi.personid, wi.customerid,
-sec.isused+1, sec.dateused, 
+sec.isused+1, sec.dateused,
 sec.loggedip, sec.resultdata
 from surveyemailcode sec
 inner join jobworkitem wi on (wi.id = sec.jobworkitemid);
