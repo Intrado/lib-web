@@ -235,6 +235,8 @@ $destres = mysql_query("insert into customer(urlcomponent, inboundnumber, shardi
 if($customerid != mysql_insert_id()){
 	die("Customerid and row inserted in auth db does not match.");
 }
+
+mysql_query("drop user '$newdbname'");
 mysql_query("create user '$newdbname' identified by '$custpass'", $custdb)
 			or die("Failed to create new user: " . mysql_error($custdb));
 mysql_query("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $custdb)
