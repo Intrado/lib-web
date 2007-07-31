@@ -401,29 +401,18 @@ $peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where useri
 
 function message_select($type, $form, $section, $name) {
 	global $messages, $submittedmode;
-?>
-	<table>
-		<tr>
-			<td>
-<?
-				NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : ""));
-				NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
-				foreach ($messages[$type] as $message) {
-					NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
-				}
-				NewFormItem($form,$section,$name, "selectend");
-?>
-			</td>
-			<td>
-<?
-				if ($type == "phone"){
-					echo button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
-				}
-?>
-			</td>
-		</tr>
-	</table>
-<?
+
+	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : ""));
+	NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
+	foreach ($messages[$type] as $message) {
+		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
+	}
+	NewFormItem($form,$section,$name, "selectend");
+
+	if ($type == "phone"){
+		echo button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
+	}
+
 }
 
 function language_select($form, $section, $name, $skipusedtype) {
