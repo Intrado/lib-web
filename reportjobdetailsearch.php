@@ -527,16 +527,17 @@ startWindow("Select", NULL, false);
 ?>
 		</td>
 	</tr>
+	<script>
+		setHiddenIfChecked(check_archived, 'jobid');
+		setVisibleIfChecked(check_archived, 'jobid_archived')
+		if(new getObj("job").obj.checked){
+			hide("daterange");
+		} else {
+			hide("jobs");
+		}
+	</script>
 </table>
-<script>
-	setHiddenIfChecked(check_archived, 'jobid');
-	setVisibleIfChecked(check_archived, 'jobid_archived')
-	if(new getObj("job").obj.checked){
-		hide("daterange");
-	} else {
-		hide("jobs");
-	}
-</script>
+
 <?
 endWindow();
 buttons();
