@@ -97,6 +97,7 @@ if(isset($_REQUEST['reportid'])){
 			$_SESSION['fields'][$field->fieldnum] = false;
 		}
 	}
+	$_SESSION['report']['options'] = $options;
 	redirect();
 } else if(isset($_REQUEST['type'])){
 
