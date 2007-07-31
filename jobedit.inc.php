@@ -284,7 +284,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					error("Please select a default message");
 				}
 			} else if (!$addlang) {
-				redirect('jobs.php');
+				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid)	{
+					redirect('jobs.php');
+				} else {
+					error("Please select a default message");
+				}
 			} else {
 				$reloadform = 1;
 			}
