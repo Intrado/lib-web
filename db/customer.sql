@@ -661,7 +661,7 @@ IF NEW.status IN ('repeating') THEN
   INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
 
   -- copy schedule
-  INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun) SELECT id, custid, daysofweek, time, nextrun FROM schedule WHERE id=NEW.scheduleid;
+  INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) SELECT id, custid, daysofweek, time, nextrun, tz FROM schedule WHERE id=NEW.scheduleid;
 
 END IF;
 END
@@ -847,6 +847,7 @@ $$$
 
 DROP TABLE `jobstats`
 $$$
+
 ALTER TABLE `reportperson` ADD `duplicateid` int( 11 ) NULL AFTER `numblocked`
 $$$
 
@@ -857,3 +858,49 @@ $$$
 
 ALTER TABLE `user` ADD `description` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `lastname` ;
 $$$
+
+drop trigger insert_schedule$$$
+CREATE TRIGGER insert_schedule
+AFTER INSERT ON schedule FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER;
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+
+SELECT value INTO custid FROM setting WHERE name='_customerid';
+SELECT value INTO tz FROM setting WHERE name='timezone';
+
+-- the job must be inserted before the schedule
+SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND scheduleid=NEW.id;
+IF cc = 1 THEN
+    INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) VALUES (NEW.id, custid, NEW.daysofweek, NEW.time, NEW.nextrun, tz);
+END IF;
+END
+$$$
+
+drop trigger insert_repeating_job
+$$
+CREATE TRIGGER insert_repeating_job
+AFTER INSERT ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER;
+
+IF NEW.status IN ('repeating') THEN
+  SELECT value INTO tz FROM setting WHERE name='timezone';
+  SELECT value INTO custid FROM setting WHERE name='_customerid';
+
+  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, thesql)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.thesql);
+
+  -- copy the jobsettings
+  INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
+
+  -- copy schedule
+  INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) SELECT id, custid, daysofweek, time, nextrun, tz FROM schedule WHERE id=NEW.scheduleid;
+
+END IF;
+END
+$$$
+
