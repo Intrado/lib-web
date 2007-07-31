@@ -123,8 +123,61 @@ class JobDetailReport extends ReportGenerator{
 		$query = "select found_rows()";
 		$total = QuickQuery($query);
 		
+		$searchrules = array();
+		if(isset($this->params['rules']) && $this->params['rules']){
+			$rules = explode("||", $this->params['rules']);
+			foreach($rules as $rule){
+				if($rule) {
+					$rule = explode(";", $rule);
+					$newrule = new Rule();
+					$newrule->logical = $rule[0];
+					$newrule->op = $rule[1];
+					$newrule->fieldnum = $rule[2];
+					$newrule->val = $rule[3];
+					$fieldname = QuickQuery("select name from fieldmap where fieldnum = '$newrule->fieldnum'");
+					$searchrules[] = $fieldname . " : " . preg_replace("{\|}", ", ", $newrule->val);
+				}
+			}
+		}
 		
 		// DISPLAY
+		
+			startWindow("Search Parameters");
+?>
+		<table>
+<?
+			if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
+				$jobtypes = explode("','", $this->params['jobtypes']);
+				$jobtypenames = array();
+				foreach($jobtypes as $jobtype){
+					$jobtypeobj = new JobType($jobtype);
+					$jobtypenames[] = $jobtypeobj->name;
+				}
+				$jobtypenames = implode(", ",$jobtypenames);
+?>
+				<tr><td>Job Type: <?=$jobtypenames?></td></tr>
+<?
+			}
+			if(isset($this->params['result']) && $this->params['result'] != ""){
+				$results = explode("','",$this->params['result']);
+				$resultnames = array();
+				foreach($results as $result)
+					$resultnames[] = fmt_result(array($result), 0);
+				$resultnames = implode(", ", $resultnames);
+?>
+				<tr><td>Results: <?=$resultnames?></td></tr>
+<?
+			}
+
+			foreach($searchrules as $rule){
+				?><tr><td><?=$rule?></td></tr><?
+			}
+?>
+			</table>
+		<? 
+		endWindow();
+		
+		?><br><?
 		
 		displayJobSummary($this->params['joblist']);	
 
