@@ -879,7 +879,8 @@ END
 $$$
 
 drop trigger insert_repeating_job
-$$
+$$$
+
 CREATE TRIGGER insert_repeating_job
 AFTER INSERT ON job FOR EACH ROW
 BEGIN

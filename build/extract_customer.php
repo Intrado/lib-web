@@ -16,7 +16,7 @@ $authpass = "";
 $customerid = $argv[1];
 
 $db = mysql_connect($dbhost,$dbuser,$dbpass,true);
-mysql_select_db("testdata",$db);
+mysql_select_db("dialerasp",$db);
 
 $custdb = mysql_connect($dbhost,$dbuser,$dbpass,true);
 $authdb = mysql_connect($authhost, $authuser, $authpass, true);
