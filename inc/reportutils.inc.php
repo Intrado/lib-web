@@ -148,6 +148,7 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $d
 	}
 	$joblist = QuickQueryList("select j.id from job j where ( (j.startdate >= '$startdate' and j.startdate < date_add('$enddate',interval 1 day) )
 							or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$startdate' and j.startdate <= date_add('$enddate',interval 1 day)
+							and j.status in ('active', 'complete', 'cancelled')
 							$userJoin 
 							$surveyfilter
 							$deliveryquery
