@@ -285,8 +285,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				}
 			} else if (!$addlang) {
 				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid)	{
-					redirect('jobs.php');
-				} else {
+				redirect('jobs.php');
+			} else {
 					error("Please select a default message");
 				}
 			} else {
@@ -401,18 +401,23 @@ $peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where useri
 
 function message_select($type, $form, $section, $name) {
 	global $messages, $submittedmode;
-
+?>
+	<table border=0 cellpadding=3 cellspacing=0><tr><td>
+<?
 	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : ""));
 	NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
 	foreach ($messages[$type] as $message) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
 	}
 	NewFormItem($form,$section,$name, "selectend");
-
-	if ($type == "phone"){
-		echo button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
-	}
-
+?>
+	</td>
+<?	if ($type == "phone") { ?>
+		<td><?= button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);") ?>
+		</td>
+<?	} ?>
+	</tr></table>
+<?
 }
 
 function language_select($form, $section, $name, $skipusedtype) {

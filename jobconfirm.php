@@ -195,12 +195,15 @@ startWindow("Confirmation &amp; Submit");
 				<tr>
 					<td class="bottomBorder"  width="30%" >Default message</td>
 					<td class="bottomBorder" >
+						<table border=0 cellpadding=3 cellspacing=0><tr>
+							<td>
 <?
-$phonemessage = new Message($job->phonemessageid);
-echo htmlentities($phonemessage->name);
-echo "&nbsp;" . button('Play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);");
+						$phonemessage = new Message($job->phonemessageid);
+						echo htmlentities($phonemessage->name);
 ?>
-					</td>
+							</td><td><?= button('Play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);") ?>
+								</td></tr></table>
+					</div></td>
 				</tr>
 <? if($USER->authorize('sendmulti')) { ?>
 
