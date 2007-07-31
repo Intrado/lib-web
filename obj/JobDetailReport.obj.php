@@ -142,7 +142,7 @@ class JobDetailReport extends ReportGenerator{
 		
 		// DISPLAY
 		
-			startWindow("Search Parameters");
+			startWindow("Filter By");
 ?>
 		<table>
 <?
