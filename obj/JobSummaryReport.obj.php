@@ -139,6 +139,29 @@ class JobSummaryReport extends ReportGenerator{
 		$urloptions = $url . "&valid=$validstamp";	
 
 		// DISPLAY
+		startWindow("Filter by");
+?>
+		<table>
+<?
+			if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
+				$jobtypes = explode("','", $this->params['jobtypes']);
+				$jobtypenames = array();
+				foreach($jobtypes as $jobtype){
+					$jobtypeobj = new JobType($jobtype);
+					$jobtypenames[] = $jobtypeobj->name;
+				}
+				$jobtypenames = implode(", ",$jobtypenames);
+?>
+				<tr><td>Job Type: <?=$jobtypenames?></td></tr>
+<?
+			}
+?>
+			</table>
+		<? 
+		endWindow();
+		
+		?><br><?
+		
 		displayJobSummary($this->params['joblist']);	
 		?><br><?
 		startWindow("Totals", "padding: 3px;");
