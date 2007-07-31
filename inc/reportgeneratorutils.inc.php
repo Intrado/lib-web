@@ -1,14 +1,13 @@
 <?
 
-function getOrderSql($params, $exceptions = array()){
+function getOrderSql($params){
 
 	$orderquery = "";
 	$orderfields = array();
 	//only 3 order by's allowed. if more is specified, must change on web also
 	for($i=1; $i<=3; $i++){
 		if(isset($params["order$i"]) && $params["order$i"]!=""){
-			if(count($exceptions) > 0 && !in_array($params["order$i"], $exceptions))
-				$orderfields[] = $params["order$i"];
+			$orderfields[] = $params["order$i"];
 		}
 	}
 	if(count($orderfields) > 0){
