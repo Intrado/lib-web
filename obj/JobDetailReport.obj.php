@@ -38,7 +38,6 @@ class JobDetailReport extends ReportGenerator{
 			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, null, isset($this->params['type']) ? $this->params['type'] : ""));
 		}
 		$this->params['joblist'] = $joblist;
-		
 		$resultquery = "";
 		if(isset($this->params['result']) && $this->params['result']){
 			if($this->params['result'] == "undelivered"){
@@ -97,6 +96,7 @@ class JobDetailReport extends ReportGenerator{
 			$rulesql
 			$orderquery
 			";
+		
 	}
 	
 	function runHtml(){
@@ -325,8 +325,18 @@ class JobDetailReport extends ReportGenerator{
 	}
 	
 	function getReportSpecificParams(){
+		$daterange = "";
+		if(isset($this->params['reldate'])){
+			list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
+			$daterange = "From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
+		}
+		$joblist = array();
+		if($this->params['joblist'] != "")
+			$joblist=explode("','", $this->params['joblist']);
 		$params = array("jobId" => $this->params['joblist'],
-						"usersql" => $this->params['usersql'] );
+						"usersql" => $this->params['usersql'],
+						"jobcount" => count($joblist),
+						"daterange" => $daterange);
 		return $params;
 	}
 
