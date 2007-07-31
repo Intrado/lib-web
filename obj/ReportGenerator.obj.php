@@ -53,14 +53,18 @@ class ReportGenerator {
 			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
 		}
 		$specificparams = $this->getReportSpecificParams();
-		foreach($specificparams as $index => $value){
-			$params[$index] = new XML_RPC_VALUE($value, 'string');
+		if(count($specificparams)){
+			foreach($specificparams as $index => $value){
+				$params[$index] = new XML_RPC_VALUE($value, 'string');
+			}
 		}
 		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
 		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
+		$title = report_name($this->params['reporttype']);
 		if(isset($this->params['title']) && $this->params['title'] != ""){
-			$params["title"] = new XML_RPC_VALUE($this->params['title'], 'string');
+			$title .= " - " . $this->params['title'];
 		}
+		$params["title"] = new XML_RPC_VALUE($title, 'string');
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 
 		$activefields = (isset($this->params['activefields']) && ($this->params['activefields'] != "")) ? explode("','", $this->params['activefields']) : array();
