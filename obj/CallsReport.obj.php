@@ -366,8 +366,8 @@ class CallsReport extends ReportGenerator{
 		$this->reportfile = "CallsReport.jasper";
 	}
 	
-	function getReportSpecificParams($params){
-		return $params;
+	function getReportSpecificParams(){
+		return array();
 	}
 	
 	/**static functions**/
