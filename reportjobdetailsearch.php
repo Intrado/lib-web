@@ -141,8 +141,8 @@ if(isset($options['rules']) && $options['rules'] != ""){
 if(isset($_GET['deleterule'])) {
 	unset($_SESSION['reportrules'][(int)$_GET['deleterule']]);
 	if(!isset($options['rules'])){
-		if(count($_SESSION['contactrules']) > 0){
-			$_SESSION['contactrules'] = false;
+		if(count($_SESSION['reportrules']) > 0){
+			$_SESSION['reportrules'] = false;
 		}
 		redirect();
 	}
