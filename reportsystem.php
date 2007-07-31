@@ -182,7 +182,7 @@ $PAGE = "reports:system";
 $TITLE = "Usage Statistics";
 NewForm($f);
 include_once("nav.inc.php");
-buttons(submit($f, $s, "refresh", "refresh"));
+buttons(submit($f, $s, "Refresh"));
 startWindow("Display Options", "padding: 3px;");
 ?>
 	<table border="0" cellpadding="2" cellspacing="1" width="100%">
