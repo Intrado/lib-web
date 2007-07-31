@@ -482,7 +482,7 @@ function display_rel_date($string, $arg1="", $arg2=""){
 
 function fmt_message ($row,$index) {
 	//index is message type and index+1 is message name
-	return '<img src="img/' . $row[$index] . '_2.png" align="bottom" />&nbsp;' . htmlentities($row[$index+1]);
+	return '<img src="img/' . $row[$index] . '.png" align="bottom" />&nbsp;' . htmlentities($row[$index+1]);
 }
 
 ?>
