@@ -30,6 +30,7 @@ require_once("../obj/JobAutoReport.obj.php");
 require_once("../obj/SurveyReport.obj.php");
 require_once("../obj/JobSummaryReport.obj.php");
 require_once("../obj/JobDetailReport.obj.php");
+require_once("../obj/CallsReport.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
@@ -38,7 +39,16 @@ require_once("../inc/reportutils.inc.php");
 require_once("../inc/reportgeneratorutils.inc.php");
 require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
+require_once("../inc/date.inc.php");
+require_once("../inc/formatters.inc.php");
 require_once("XML/RPC.php");
+
+$timezone = QuickQuery("select value from setting where name='timezone'");
+if($timezone){
+	@date_default_timezone_set($timezone);
+	QuickUpdate("set time_zone='" . $timezone . "'");
+}
+
 
 if($type == "subscription"){
 	$subscription = new ReportSubscription($id);
@@ -47,10 +57,7 @@ if($type == "subscription"){
 
 	switch($options['reporttype']){
 		
-		case 'attendance':
-		case 'emergency':
-		case 'undelivered':
-		case 'callsreport':
+		case 'contacthistory':
 			$generator = new CallsReport();
 			break;
 		case 'surveyreport':
@@ -59,7 +66,8 @@ if($type == "subscription"){
 		case 'jobsummaryreport':
 			$generator = new JobSummaryReport();
 			break;
-		case 'jobdetailreport':
+		case 'emaildetail':
+		case 'phonedetail':
 			$generator = new JobDetailReport();
 			break;
 	}
@@ -87,7 +95,6 @@ $_SESSION['access'] = new Access($USER->accessid);
 if(!isset($generator)){
 	exit("Bad report type, corresponding generator not found\n");
 }
-
 $generator->format = "pdf";
 $generator->reportinstance = $instance;
 echo "finished configuring generator\n";
