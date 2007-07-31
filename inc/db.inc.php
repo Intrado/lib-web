@@ -141,7 +141,7 @@ function DBGetRow ($query, $assoc = false) {
 }
 
 function DBConnect($host, $user, $pass, $database){
-	$custdb = mysql_connect($host, $user, $pass);
+	$custdb = mysql_connect($host, $user, $pass, true);
 	if(!$custdb){
 		error_log("Problem connecting to MySQL server at " . $host . " error:" . mysql_error());
 		return false;
