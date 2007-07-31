@@ -103,15 +103,15 @@ class RenderedList {
 
 		if ($this->mode == "preview") {
 			$modesql1 = "and le.type is null"; //don't include removed items
-			$modesql2 = "";
+			$modesql2 = "and le.type='A'";
 		}
 		if ($this->mode == "add") {
 			$modesql1 = "and 0"; //don't include any rule or removed items
-			$modesql2 = "";
+			$modesql2 = "and le.type='A'";
 		}
 		if ($this->mode == "remove") {
-			$modesql1 = "and le.type = 'N'"; //only get the removed items
-			$modesql2 = "and 0"; //and ignore adds
+			$modesql1 = "and 0"; //only get the removed items
+			$modesql2 = "and le.type = 'N'"; //and ignore adds
 		}
 
 		$query = "
@@ -155,7 +155,7 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where not p.deleted and le.type='A' $modesql2 )
+			where not p.deleted $modesql2 )
 
 			$orderby
 			$pagesql
@@ -309,48 +309,47 @@ class RenderedList {
 	function calcStats () {
 		global $USER;
 
-		if ($this->mode == "preview") {
-			$modesql1 = "and le.type is null"; //don't include removed items
-			$modesql2 = "";
-		}
-		if ($this->mode == "add") {
-			$modesql1 = "and 0"; //don't include any rule or removed items
-			$modesql2 = "";
-		}
-		if ($this->mode == "remove") {
-			$modesql1 = "and le.type = 'N'"; //only get the removed items
-			$modesql2 = "and 0"; //and ignore adds
-		}
-		if ($this->mode == "totals") {
-			$modesql1 = "and le.type = 'N'"; //only get the removed items
-			$modesql2 = ""; // also calc the added items (not in rules)
-		}
-
 		$usersql = $USER->userSQL("p");
-
-		$listid = $this->list->id;
-
 		$listsql = $this->list->getListRuleSQL();
 
-		$query = "select sum(le.type is null), sum(le.type='N')
-		from person p
-		left join listentry le on (le.personid=p.id and le.listid = $listid)
-		where p.userid is null and not p.deleted and $listsql $usersql  $modesql1
-		";
+		//$this->totalrule = $this->countByRule($usersql, $listsql); //not useful
+		$this->totalremoved = $this->countRemoved();
+		$this->totaladded = $this->countAdded();
+		$this->total = $this->countEffectiveRule($usersql, $listsql) + $this->totaladded;
 
-		$stats = QuickQueryRow($query);
-		$this->totalrule = $stats[0];
-		$this->totalremoved = 0+$stats[1];
-
-		$query = "select count(*)
-		from person p , listentry le
-		where not p.deleted and le.listid = $listid and p.id=le.personid and le.type='A' $modesql2
-		";
-		$this->totaladded = QuickQuery($query);
-
-		$this->total = $this->totalrule + $this->totaladded;
 		$this->hasstats = true;
 	}
+
+	function countEffectiveRule ($usersql, $listsql) {
+		$query = "select count(*)
+				from person p
+				left join listentry le on (le.personid=p.id and le.listid = " . $this->list->id . ")
+				where le.type is null and p.userid is null and not p.deleted and $listsql $usersql
+		";
+		return QuickQuery($query);
+	}
+
+	function countByRule ($usersql, $listsql) {
+		$query = "select count(*)
+				from person p
+				where p.userid is null and not p.deleted and $listsql $usersql
+		";
+		return QuickQuery($query);
+	}
+
+	function countRemoved () {
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where le.type='N' and le.listid = " . $this->list->id;
+		return QuickQuery($query);
+	}
+
+	function countAdded () {
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where  le.type='A' and le.listid = " . $this->list->id;
+		return QuickQuery($query);
+	}
+
+
+
+
 }
 
 ?>
