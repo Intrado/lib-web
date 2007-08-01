@@ -222,6 +222,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 			}
 			$options['rules'] = implode("||", $options['rules']);
 
+			foreach($options as $index => $option){
+				if($option == "")
+					unset($options[$index]);
+			}
 			$_SESSION['report']['options'] = $options;
 			
 			if(CheckFormSubmit($f, "save")){
@@ -241,14 +245,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 if($reload){
 	ClearFormData($f);
 	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "daterange");
+	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "");
 	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
 	
-	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : date("m/d/y", strtotime("-1 year")));
-	PutFormData($f, $s, 'enddate', isset($options['enddate']) ? $options['enddate'] : date("m/d/y", strtotime("now")));
+	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : "");
+	PutFormData($f, $s, 'enddate', isset($options['enddate']) ? $options['enddate'] : "");
 	$savedjobtypes = array();
 	if(isset($options['jobtype'])){
 		$savedjobtypes = explode("','", $options['jobtype']);
@@ -323,34 +327,9 @@ startWindow("Person Notification Search", "padding: 3px;");
 		<table>
 			<tr>
 				<td>
-					<table>
-						<tr><td>Relative Date: </td>
-							<td><?
-								NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
-								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Today', 'today');
-								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Yesterday', 'yesterday');
-								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last Week Day', 'lastweekday');
-								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Week to date', 'weektodate');
-								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Month to date', 'monthtodate');
-								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last X Days', 'xdays');
-								NewFormItem($f, $s, 'relativedate', 'selectoption', 'Date Range(inclusive)', 'daterange');
-								NewFormItem($f, $s, 'relativedate', 'selectend');
-								
-								?>
-							</td>
-							<td><? NewFormItem($f, $s, 'xdays', 'text', '3', null, "id='xdays'"); ?></td>
-							<td><div id="date"><? NewFormItem($f, $s, 'startdate', 'text', '10'); ?> To: <? NewFormItem($f, $s, 'enddate', 'text', '10'); ?></div></td>
-						</tr>
-						<script>
-							if(new getObj("reldate").obj.value!="xdays"){
-								hide("xdays")
-							}
-							if(new getObj("reldate").obj.value!="daterange"){
-								hide("date");
-							
-							}
-						</script>
-					</table>
+<?
+					dateOptions($f, $s, "", true);
+?>
 				</td>
 			</tr>
 			<tr>
