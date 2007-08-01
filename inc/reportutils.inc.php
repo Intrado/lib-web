@@ -156,7 +156,7 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $d
 	return $joblist;
 }
 
-function dateOptions($f, $s, $tablename){
+function dateOptions($f, $s, $tablename = "", $infinite = false){
 //function to generate table for date options.
 //Note that the form data names are pre-set.
 ?>
@@ -164,6 +164,8 @@ function dateOptions($f, $s, $tablename){
 		<tr>
 			<td><?
 				NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
+				if($infinite)
+					NewFormItem($f, $s, 'relativedate', 'selectoption', '-- Select A Date Options --', "");
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Today', 'today');
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Yesterday', 'yesterday');
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last Week Day', 'lastweekday');
