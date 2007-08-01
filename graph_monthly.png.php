@@ -33,8 +33,9 @@ select 	month(date) as month,
 				sum(busy) as busy,
 				sum(noanswer) as noanswer
 			from systemstats
-			where date > date_sub(now(), interval 1 year)
+			where unix_timestamp(date) > unix_timestamp(date_sub(now(), interval 12 month))
 			group by month
+			order by date
 ";
 
 
@@ -43,15 +44,16 @@ $result = Query($query);
 $data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
 
 $x_titles = array();
-$thismonth = date("m", strtotime("now"));
-$x=$thismonth-11;
-if($x < 0)
-	$x=-$x;
+$thismonth = date("n", strtotime("today"));
 while ($row = DBGetRow($result)) {
-	$data["A"][$row[0]+$x] = $row[1];
-	$data["M"][$row[0]+$x] = $row[2];
-	$data["B"][$row[0]+$x] = $row[3];
-	$data["N"][$row[0]+$x] = $row[4];
+	$offsetmonth = $row[0] - $thismonth-1;
+	if($offsetmonth < 0)
+		$offsetmonth = $offsetmonth + 12;
+
+	$data["A"][$offsetmonth] = $row[1];
+	$data["M"][$offsetmonth] = $row[2];
+	$data["B"][$offsetmonth] = $row[3];
+	$data["N"][$offsetmonth] = $row[4];
 }
 
 //var_dump($data);
@@ -61,7 +63,7 @@ $months=array("January", "February", "March", "April", "May", "June", "July", "A
 
 
 $max = 0;
-for ($x = 0; $x <= 11; $x++) {
+for ($x = 0; $x < 12; $x++) {
 
 	foreach (array("A","M","B","N") as $type) {
 		if (!isset($data[$type][$x]))
