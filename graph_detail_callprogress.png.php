@@ -32,6 +32,9 @@ $cpcolors = array(
 	"N" => "tan",
 	"X" => "black",
 	"F" => "red",
+	"duplicate" => "lightgray",
+	"blocked" => "#CC00CC",
+	"nocontacts" => "#aaaaaa",
 	"notattempted" => "blue"
 );
 
@@ -42,6 +45,9 @@ $cpcodes = array(
 	"N" => "No Answer",
 	"X" => "Disconnect",
 	"F" => "Failed",
+	"duplicate" => "Duplicate",
+	"blocked" => "Blocked",
+	"nocontacts" => "No Contact Info",
 	"notattempted" => "Not Attempted",
 );
 
@@ -51,7 +57,7 @@ $colors = array();
 $labels = array();
 $count=0;
 foreach($cpcodes as $index => $code){
-	$data = array_fill(0, 7, 0);
+	$data = array_fill(0, 9, 0);
 	$count++;
 	$color = $cpcolors[$index];
 	$data[$count-1] = $phonestats[$index];
