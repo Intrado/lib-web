@@ -283,6 +283,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 			</tr>
 <?
 			foreach($groupbyfield as $uindex => $user){
+				if($user["total"] == 0) continue;
 				echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
 					<td>&nbsp;&nbsp;&nbsp;User: <?=$userlist[$uindex]?></td>
