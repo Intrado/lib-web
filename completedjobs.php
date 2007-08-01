@@ -127,7 +127,7 @@ function fmt_jobtype ($obj,$name) {
 
 $titles = array ("Owner" => "Submitted by",
 				"name" => 'Job Name',
-				"type" => "Type",
+				"type" => "Mode",
 				"status" => 'Status',
 				"Total" => 'Total',
 				"Rate" => '% Contacted',

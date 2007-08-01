@@ -105,7 +105,7 @@ function fmt_remaining ($row, $index) {
 $titles = array(
 				"0" => 'Submitted by',
 				"1" => 'Job Name',
-				"18" => "Type",
+				"18" => "Mode",
 				"2" => 'Status',
 				"3" => 'Total',
 				"9" => 'Remaining',

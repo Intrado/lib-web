@@ -49,7 +49,7 @@ $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and 
 
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
-					"Type" => "#Type",
+					"Type" => "#Deliver by",
 					"startdate" => "Start date",
 					"Status" => "#Status",
 					"responses" => "Responses (Unplayed/Total)",
@@ -80,7 +80,7 @@ $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and 
 
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",
-					"Type" => "#Type",
+					"Type" => "#Deliver by",
 					"startdate" => "Start date",
 					"Status" => "#Status",
 					"responses" => "Responses (Unplayed/Total)",

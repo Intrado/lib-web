@@ -96,7 +96,7 @@ if ($USER->authorize("startstats")) {
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Name",
-								"type" => "Type",
+								"type" => "Deliver by",
 								"Status" => "Status",
 								"responses" => "Responses (Unplayed/Total)",
 								"Actions" => "Actions"
@@ -116,7 +116,7 @@ if ($USER->authorize("startstats")) {
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Name",
-								"type" => "Type",
+								"type" => "Deliver by",
 								"Status" => "Status",
 								"enddate" => "End Date",
 								"responses" => "Responses (Unplayed/Total)",
@@ -139,7 +139,7 @@ if ($USER->authorize("startstats")) {
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='processing') and type='survey' and deleted = 0 order by id desc limit $limit");
 				$titles = array(	"name" => "Name",
-									"type" => "Type",
+									"type" => "Deliver by",
 									"Status" => "Status",
 									"responses" => "Responses (Unplayed/Total)",
 									"Actions" => "Actions"
@@ -159,7 +159,7 @@ if ($USER->authorize("startstats")) {
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type='survey' and deleted = 0 order by finishdate desc limit $limit");
 				$titles = array(	"name" => "Name",
-									"type" => "Type",
+									"type" => "Deliver by",
 									"Status" => "Status",
 									"enddate" => "End Date",
 									"responses" => "Responses (Unplayed/Total)",
