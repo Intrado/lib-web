@@ -5,7 +5,7 @@ class JobSummaryReport extends ReportGenerator{
 	function generateQuery(){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
-		$usersql = $USER->userSQL("rp");
+		$this->params['usersql'] = $USER->userSQL("rp");
 		$jobtypes = "";
 		if(isset($this->params['jobtypes'])){
 			$jobtypes = $this->params['jobtypes'];
@@ -37,14 +37,14 @@ class JobSummaryReport extends ReportGenerator{
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
 				where rc.jobid in ('" . $joblist . "')
 				and rc.type='phone'
-				$usersql
+				" . $this->params['usersql'] . "
 				group by rc.result";
 
 	}
 	
 	function runHtml(){
 		global $USER;
-		$usersql = $USER->userSQL("rp");
+		$usersql = $this->params['usersql'];
 		$validstamp = time();
 		$jobstats = array ("validstamp" => $validstamp);
 		
@@ -132,6 +132,7 @@ class JobSummaryReport extends ReportGenerator{
 						);
 		$jobstats["phone"] = $cpstats;
 		$remainingcalls=0;
+
 		while ($row = DBGetRow($result)) {
 			$jobstats["phone"][$row[1]] += $row[0];
 			if ($row[1] != "A" && $row[1] != "M" && $row[1] != "blocked" && $row[1] != "duplicate") {
@@ -281,7 +282,18 @@ class JobSummaryReport extends ReportGenerator{
 	
 	function getReportSpecificParams(){
 		
-		$params = array("jobId" => $this->params['joblist']);
+		$daterange = "";
+		if(isset($this->params['reldate'])){
+			list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
+			$daterange = "From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
+		}
+		$joblist = array();
+		if($this->params['joblist'] != "")
+			$joblist=explode("','", $this->params['joblist']);
+		$params = array("jobId" => $this->params['joblist'],
+						"usersql" => $this->params['usersql'],
+						"jobcount" => count($joblist),
+						"daterange" => $daterange);
 		return $params;
 	}
 
