@@ -51,11 +51,7 @@ function fmt_answer($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$fields = DBFindMany("FieldMap", "from fieldmap where options not like '%firstname%' and options not like '%lastname%'");
-$firstname = DBFind("FieldMap", "from fieldmap where options like '%firstname%'");
-$lastname = DBFind("FieldMap", "from fieldmap where options like '%lastname%'");
-
-$orders = array("order1", "order2", "order3");
+$fields = FieldMaps::getOptionalAuthorizedFieldMaps()
 
 
 if(isset($_REQUEST['reportid'])){
