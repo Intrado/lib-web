@@ -241,14 +241,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 if($reload){
 	ClearFormData($f);
 	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "monthtodate");
+	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "daterange");
 	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
 	
-	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : "");
-	PutFormData($f, $s, 'enddate', isset($options['enddate']) ? $options['enddate'] : "");
+	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : date("m/d/y", strtotime("-1 year")));
+	PutFormData($f, $s, 'enddate', isset($options['enddate']) ? $options['enddate'] : date("m/d/y", strtotime("now")));
 	$savedjobtypes = array();
 	if(isset($options['jobtype'])){
 		$savedjobtypes = explode("','", $options['jobtype']);
