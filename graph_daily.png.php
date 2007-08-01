@@ -45,15 +45,23 @@ $result = Query($query);
 $data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
 
 $x_titles = array();
-$today = date("d", strtotime("now"));
-$x=$today-28;
-$x = -$x;
+$unix_today = strtotime("today");
+$today = date("d", $unix_today);
+
+$month = date("n", strtotime("-1 month"));
+$numdays = cal_days_in_month(CAL_GREGORIAN, $month, date("Y", $unix_today));
+$offset = $today - 28;
+
+if($offset < 0)
+	$offset = -$offset;
 while ($row = DBGetRow($result)) {
-	$data["dates"][$row[0]-1+$x] = $row[1];
-	$data["A"][$row[0]+$x] = $row[2];
-	$data["M"][$row[0]+$x] = $row[3];
-	$data["B"][$row[0]+$x] = $row[4];
-	$data["N"][$row[0]+$x] = $row[5];
+	$newday = $row[0] + $offset-1;
+	if($newday > $today)
+		$newday = $newday % $numdays;
+	$data["A"][$newday] = $row[2];
+	$data["M"][$newday] = $row[3];
+	$data["B"][$newday] = $row[4];
+	$data["N"][$newday] = $row[5];
 }
 
 //var_dump($data);
@@ -61,7 +69,7 @@ while ($row = DBGetRow($result)) {
 
 $max = 0;
 
-for ($x=0; $x <= 28; $x++) {
+for ($x=0; $x < 28; $x++) {
 
 	foreach (array("A","M","B","N") as $type) {
 		if (!isset($data[$type][$x]))
@@ -72,7 +80,7 @@ for ($x=0; $x <= 28; $x++) {
 	}
 
 	$max = max($max, $data["A"][$x] + $data["M"][$x]);
-	$offset = 28-$x;
+	$offset = 27-$x;
 	$x_titles[$x] = date("m/d/y", strtotime("-$offset day"));
 	
 }
