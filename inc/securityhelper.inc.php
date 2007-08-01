@@ -27,28 +27,7 @@ function userOwns ($type,$id) {
 }
 //jjl
 function customerOwns($type, $id) {
-	global $USER;
-	switch ($type) {
-
-		case "blockednumber":
-		case "fieldmap":
-		case "import":
-		case "jobtype":
-		case "language":
-		case "persondatavalues":
-		case "setting":
-		case "access":
-			return QuickQuery("select count(*) from `$type` where id = '$id'");
-		case "person":
-		case "user":
-			return QuickQuery("select count(*) from `$type` where id = '$id' and deleted=0");
-		case "job":
-			return QuickQuery("select count(*) from job, user where job.id = '$id' and user.id = job.userid");
-		case "smsjob":
-			return QuickQuery("select count(*) from smsjob, user where smsjob.id = '$id' and user.customerid = $USER->customerid and user.id = smsjob.userid");
-		default:
-			return false;
-	}
+	return true; //TODO remove references
 }
 
 /*
