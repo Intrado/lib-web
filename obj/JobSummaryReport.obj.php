@@ -30,6 +30,7 @@ class JobSummaryReport extends ReportGenerator{
 			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
 		}
 		$this->params['joblist'] = $joblist;
+		// Query for graph in pdf
 		$this->query = "select count(*) as cnt, rc.result, sum(rc.result not in ('A','M') and rc.numattempts < js.value) as remaining
 				from reportperson rp
 				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
@@ -112,6 +113,9 @@ class JobSummaryReport extends ReportGenerator{
 							"B" => 0,
 							"X" => 0,
 							"F" => 0,
+							"duplicate" => 0,
+							"blocked" => 0,
+							"nocontacts" => 0,
 							"notattempted" => 0
 						);
 		$cpcodes = array(
@@ -121,12 +125,14 @@ class JobSummaryReport extends ReportGenerator{
 							"N" => "No Answer",
 							"X" => "Disconnect",
 							"F" => "Failed",
+							"duplicate" => "Duplicate",
+							"blocked" => "Blocked",
+							"nocontacts" => "No Contact Info",
 							"notattempted" => "Not Attempted"
 						);
 		$jobstats["phone"] = $cpstats;
 		$remainingcalls=0;
 		while ($row = DBGetRow($result)) {
-			if($row[1] == "blocked" || $row[1] == "duplicate") continue;
 			$jobstats["phone"][$row[1]] += $row[0];
 			if ($row[1] != "A" && $row[1] != "M" && $row[1] != "blocked" && $row[1] != "duplicate") {
 				$remainingcalls += $row[2];
