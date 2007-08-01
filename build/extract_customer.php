@@ -229,19 +229,17 @@ $result = mysql_query("select hostname, inboundnumber from customer where id = '
 
 $row = mysql_fetch_row($result);
 $custpass = genpassword();
-$destres = mysql_query("insert into customer(urlcomponent, inboundnumber, shardid, dbusername, dbpassword, enabled) values
-						('$row[0]', '$row[1]', '1', '$newdbname', '$custpass', '1')", $authdb)
+$destres = mysql_query("replace into customer(id,urlcomponent, inboundnumber, shardid, dbusername, dbpassword, enabled) values
+						($customerid,'$row[0]', '$row[1]', '1', '$newdbname', '$custpass', '1')", $authdb)
 						or die("Failed to insert new customer into auth server: " . mysql_error($custdb));
-if($customerid != mysql_insert_id()){
-	die("Customerid and row inserted in auth db does not match.");
-}
 
-mysql_query("drop user '$newdbname'");
+mysql_query("drop user '$newdbname'", $custdb);
 mysql_query("create user '$newdbname' identified by '$custpass'", $custdb)
 			or die("Failed to create new user: " . mysql_error($custdb));
 mysql_query("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $custdb)
 			or die("Failed to grant privileges to new user: " . mysql_error($custdb));
 
+mysql_query("drop database if exists $newdbname",$custdb);
 mysql_query("create database $newdbname",$custdb)
 	or die ("Failed to create new DB $newdbname : " . mysql_error($custdb));
 mysql_select_db($newdbname,$custdb);
