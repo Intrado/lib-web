@@ -172,7 +172,7 @@ if($_SESSION['report']['type'] == "phone"){
 					"unsent" => "Unsent");
 }
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view") || CheckFormSubmit($f, "saveview"))
+if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view"))
 {
 	if(CheckFormInvalid($f))
 	{
@@ -393,7 +393,7 @@ if(isset($_SESSION['reportid']))
 include_once("nav.inc.php");
 NewForm($f);
 buttons( button('Back', 'window.history.go(-1)'), submit($f, "save", "Save/Schedule"),
-			submit($f, "view", "View Report", "View Report"));
+			submit($f, "view", "View Report"));
 
 //--------------- Select window ---------------
 startWindow("Select", NULL, false);

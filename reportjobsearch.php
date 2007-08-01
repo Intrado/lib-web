@@ -80,7 +80,7 @@ if(isset($_REQUEST['reportid'])){
 	}
 }
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view") || CheckFormSubmit($f, "saveview"))
+if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view"))
 {
 	if(CheckFormInvalid($f))
 	{
