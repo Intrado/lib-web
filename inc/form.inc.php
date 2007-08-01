@@ -147,8 +147,9 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 	case "selectmultiple":
 		//option is the size of the select box
 		//optionvalue is the map of name => value pairs
-
-		$usevalue = $_SESSION['formdata'][$form][$section][$item]['value'];
+		$usevalue = null;
+		if(isset($_SESSION['formdata'][$form][$section][$item]['value']))
+			$usevalue = $_SESSION['formdata'][$form][$section][$item]['value'];
 		//this is a hack for multiselects. we must unset the value in formdata
 		//because if nothing is selected the old data will not be overwritten.
 		unset($_SESSION['formdata'][$form][$section][$item]['value']);
