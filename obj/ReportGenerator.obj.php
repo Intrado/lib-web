@@ -42,29 +42,8 @@ class ReportGenerator {
 		$timeoffsetquery = "set time_zone = '$timeoffset'";
 		$xmlparams[] = new XML_RPC_Value($timeoffsetquery, 'string');
 
-		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
-		$fieldlist = array();
-		foreach($fields as $field){
-			$fieldlist[$field->fieldnum] = $field->name;
-		}
-		$params = array();
-		foreach($fieldlist as $index => $title){
-			$newindex = preg_replace("{f}", "flex_title_", $index);
-			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
-		}
-		$specificparams = $this->getReportSpecificParams();
-		if(count($specificparams)){
-			foreach($specificparams as $index => $value){
-				$params[$index] = new XML_RPC_VALUE($value, 'string');
-			}
-		}
-		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
-		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
-		$title = report_name($this->params['reporttype']);
-		if(isset($this->params['title']) && $this->params['title'] != ""){
-			$title .= " - " . $this->params['title'];
-		}
-		$params["title"] = new XML_RPC_VALUE($title, 'string');
+		
+		$params = $this->generateXmlParams();
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 
 		$activefields = (isset($this->params['activefields']) && ($this->params['activefields'] != "")) ? explode("','", $this->params['activefields']) : array();
@@ -84,6 +63,47 @@ class ReportGenerator {
 		
 		return $result;
 
+	}
+	function generateXmlParams(){
+		global $USER;
+		$params = array();
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
+		foreach($fieldlist as $index => $title){
+			$newindex = preg_replace("{f}", "flex_title_", $index);
+			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
+		}
+		$specificparams = $this->getReportSpecificParams();
+		if(count($specificparams)){
+			foreach($specificparams as $index => $value){
+				$params[$index] = new XML_RPC_VALUE($value, 'string');
+			}
+		}
+		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
+		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
+		$reportname = report_name($this->params['reporttype']);
+		
+		$subname = isset($this->params['subname']) ? $this->params['subname'] : "";
+		$description = isset($this->params['description']) ? $this->params['description'] : "";
+		
+		$params["reportname"] = new XML_RPC_VALUE($reportname, 'string');
+		$params["subname"] = new XML_RPC_VALUE($subname, 'string');
+		$params["username"] = new XML_RPC_VALUE($USER->login, 'string');
+		$customer = QuickQuery("select value from setting where name = 'displayname'");
+		if(!$customer)
+			$customer = "";
+		$params["accountname"] = new XML_RPC_VALUE($customer, 'string'); 
+		$params["firstname"] = new XML_RPC_VALUE($USER->firstname, 'string'); 
+		$params["lastname"] = new XML_RPC_VALUE($USER->lastname, 'string');
+		$params["description"] = new XML_RPC_VALUE($description, 'string');
+		$params["createdate"] = new XML_RPC_VALUE(date("M d, Y", strtotime("now")), 'string');
+		if(isset($this->params['sorrymessage']))
+			$params["sorrymessage"] = new XML_RPC_VALUE($this->params['sorrymessage'], 'string');
+		return $params;
+	
 	}
 
 	function reportxmlrpc($method, $xmlparams){
