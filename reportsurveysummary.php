@@ -51,7 +51,7 @@ function fmt_answer($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$fields = FieldMaps::getOptionalAuthorizedFieldMaps();
+$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
 
 if(isset($_REQUEST['reportid'])){
@@ -85,7 +85,7 @@ if(isset($_REQUEST['reportid'])){
 	if($jobid){
 		
 		//check userowns or customerowns and viewsystemreports
-		if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
+		if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports'))) {
 			redirect('unauthorized.php');
 		}
 		
