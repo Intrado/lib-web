@@ -22,14 +22,18 @@ if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && custom
 
 $query = "
 select count(*) as cnt,
-		coalesce(if (rp.status='waiting', 'retry', if(rc.result='notattempted', null, rc.result)),
-			if (rp.status not in ('fail','duplicate','scheduled'), 'inprogress',rp.status))
+		coalesce(if(rp.status = 'nocontacts','fail', null),
+			if(rc.result not in ('A', 'M', 'blocked', 'duplicate') and rc.numattempts > 0 and rc.numattempts < js.value, 'retry', if(rc.result='notattempted', null, rc.result)),
+			if (rp.status not in ('fail','duplicate','scheduled', 'blocked'), 'inprogress', rp.status))
 			as callprogress2
-from reportperson rp
-left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-where rp.jobid='$jobid' and rp.type='phone'
-group by callprogress2
 
+from job j
+inner join reportperson rp on (rp.jobid=j.id)
+left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+inner join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
+where rp.type='phone'
+and rp.jobid='$jobid'
+group by callprogress2
 ";
 
 
@@ -45,7 +49,8 @@ $cpcolors = array(
 	"fail" => "#aaaaaa",
 	"inprogress" => "blue",
 	"retry" => "cyan",
-	"scheduled" => "darkblue"
+	"scheduled" => "darkblue",
+	"blocked" => "#CC00CC"
 
 );
 
@@ -61,7 +66,8 @@ $cpcodes = array(
 	"fail" => "No Phone #",
 	"inprogress" => "Queued",
 	"retry" => "Retrying",
-	"scheduled" => "Scheduled"
+	"scheduled" => "Scheduled",
+	"blocked" => "Blocked"
 );
 
 //preset array positions
