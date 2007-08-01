@@ -343,7 +343,7 @@ class RenderedList {
 	}
 
 	function countAdded () {
-		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where  le.type='A' and le.listid = " . $this->list->id;
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid and not p.deleted) where  le.type='A' and le.listid = " . $this->list->id;
 		return QuickQuery($query);
 	}
 
