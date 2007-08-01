@@ -75,15 +75,24 @@ if($type == "subscription"){
 	$generator->userid = $subscription->userid;
 } else if($type == "job"){
 	$instance = new ReportInstance();
-	$job = new Job($id);
+	$job = new Job($id+0);
 	$options = array();
+	$count = QuickQuery("select sum(numcontacts) from reportperson where jobid = '" . DBSafe($id) . "'");
 	if($job->questionnaireid == null){
-		$generator = new JobAutoReport();
-		$options['reporttype'] = 'jobautoreport';
+		if($count > 1200){
+			$generator = new JobSummaryReport();
+			$options['reporttype'] = 'jobsummaryreport';
+			$options['sorrymessage'] = "Sorry, this job was too long for a standard auto report.  A Notification Summary as been created instead.  If you'd like to see the details, please use the Phone Log or Email Log report on the web.";
+		} else {
+			$generator = new JobAutoReport();
+			$options['reporttype'] = 'jobautoreport';
+		}
 	} else {
 		$generator = new SurveyReport();
 		$options['reporttype'] = 'surveyreport';
 	}
+
+	
 	$options['jobid'] = $id;
 	$instance->setParameters($options);
 	$USER = new User($job->userid);
