@@ -421,6 +421,8 @@ function report_name($string){
 			return "Contact history";
 		case 'notcontacted':
 			return "Not Contacted";
+		case 'jobautoreport':
+			return "Auto Report";
 		default:
 			return $string;
 	}
