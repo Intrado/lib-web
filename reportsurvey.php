@@ -128,8 +128,7 @@ $TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "")
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(button('Back', 'window.history.go(-1)'), submit($f, "save", "Save/Schedule"),
-		submit($f, "run", "View Report"));
+buttons(button('Back', 'window.history.go(-1)'), submit($f, "run", "View Report"), submit($f, "save", "Save/Schedule"));
 
 
 //--------------- Select window ---------------

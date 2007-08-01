@@ -184,7 +184,7 @@ if($generator->format != "html"){
 	include_once("nav.inc.php");
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
-	buttons(button('Back', 'window.history.go(-1)'), submit($f, $s, "Save/Schedule"),button('Refresh', 'window.location.reload()'));
+	buttons(button('Back', 'window.history.go(-1)'), button('Refresh', 'window.location.reload()'), submit($f, $s, "Save/Schedule"));
 	
 		startWindow("Related Links", "padding: 3px;");
 		?>

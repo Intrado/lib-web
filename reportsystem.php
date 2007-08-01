@@ -30,7 +30,7 @@ if (!$USER->authorize('viewusagestats')) {
 
 $groupby = FieldMap::getSchoolField(); //defaults to school f-field
 if(!$groupby)
-	$groupby = FieldMap::getLanguageField(); //but if school is not used, default to language
+	$groupby = ""; //but if school is not used, default to blank
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
 $type = "phone";
 $reldate = "monthtodate";
@@ -121,7 +121,7 @@ if($reload){
 	$groupbylist = array();
 	$groupbylist = QuickQueryList("select $groupby from reportperson group by $groupby");
 	
-	$query = "SELECT $groupbyquery
+	$query = "SELECT $groupbyquery as field
 					, rp.userid,
 					j.jobtypeid,
 					count(*)
