@@ -88,7 +88,8 @@ class JobAutoReport extends ReportGenerator{
 	}
 	
 	function getReportSpecificParams(){
-		$params = array("jobId" => $this->params['jobid']);
+		$params = array("jobId" => $this->params['jobid'],
+						"jobcount" => "1");
 		return $params;
 	}
 }
