@@ -21,7 +21,7 @@ class CallsReport extends ReportGenerator{
 		$priorityquery="";
 		$reldatequery = "";
 		$resultquery="";
-		$jobidquery = "";
+		$jobquery = "";
 		
 		if(isset($this->params['pid'])){
 			$personquery = " and rp.personid like '" . DBSafe($this->params['pid']) . "'";
@@ -37,7 +37,7 @@ class CallsReport extends ReportGenerator{
 			$priorityquery = $this->params['priority'] ? " and j.jobtypeid in ('" . $this->params['priority'] . "')" : "";
 		}
 	
-		if(isset($this->params['reldate'])){
+		if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
 			$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 			$this->params['joblist'] = implode("','", getJobList($startdate, $enddate));
@@ -185,7 +185,7 @@ class CallsReport extends ReportGenerator{
 				<tr><td>Email: <?=$this->params['email']?></td></tr>
 <?
 			}
-			if(isset($this->params['reldate'])){
+			if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
 				list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
 ?>
 				<tr><td>From: <?=date("m/d/Y", $startdate)?> To: <?=date("m/d/Y", $enddate)?></td></tr>
