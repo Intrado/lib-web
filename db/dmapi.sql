@@ -1,10 +1,10 @@
 
--- 
+--
 -- Table structure for table `jobtaskactive`
--- 
+--
 
 CREATE TABLE `jobtaskactive` (
-  `id` varchar(50) collate utf8_bin NOT NULL,
+  `id` bigint NOT NULL,
   `customerid` int(11) NOT NULL,
   `shardid` tinyint(4) NOT NULL,
   `tasktime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
@@ -15,12 +15,12 @@ CREATE TABLE `jobtaskactive` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtaskcomplete`
--- 
+--
 
 CREATE TABLE `jobtaskcomplete` (
-  `id` varchar(50) collate utf8_bin NOT NULL,
+  `id` bigint NOT NULL,
   `customerid` int(11) NOT NULL,
   `shardid` tinyint(4) NOT NULL,
   `starttime` bigint(20) NOT NULL default '0',

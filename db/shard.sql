@@ -40,7 +40,7 @@ CREATE TABLE `jobstatdata` (
 --
 
 CREATE TABLE `leasetask` (
-  `taskuuid` varchar(255) NOT NULL,
+  `taskuuid` bigint NOT NULL,
   `leasetime` bigint(20) NOT NULL,
   PRIMARY KEY  (`taskuuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -118,7 +118,7 @@ CREATE TABLE `qjobtask` (
   `nextattempttime` bigint(20) default NULL,
   `leasetime` bigint(20) default NULL,
   `phone` varchar(20) default NULL,
-  `uuid` varchar(255) NOT NULL,
+  `uuid` bigint NOT NULL,
   PRIMARY KEY  (`customerid`,`jobid`,`type`,`personid`,`sequence`),
   UNIQUE KEY `uuid` (`uuid`),
   KEY `waiting` (`status`,`nextattempttime`),
