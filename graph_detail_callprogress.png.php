@@ -69,10 +69,11 @@ foreach($cpcodes as $index => $code){
 	$$barname->SetFillColor($color);
 	$$barname->SetAlign('center');
 	$$barname->value->Show();
+	$$barname->value->SetFormat('%d');
 }
 
 // New graph with a drop shadow
-$graph = new Graph(800,250,'auto');
+$graph = new Graph(1100,250,'auto');
 //$graph->SetShadow();
 $graph->img->SetMargin(90,90,20,50);
 
@@ -85,6 +86,7 @@ for($i=1;$i<=$count;$i++){
 $graph->SetScale("textlin");
 $graph->xaxis->SetTickLabels($labels);
 $graph->xaxis->SetPos("min");
+
 $graph->yaxis->SetTextLabelInterval(2);
 $graph->yaxis->HideFirstTickLabel();
 $graph->SetFrame(false);
