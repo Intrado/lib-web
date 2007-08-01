@@ -79,12 +79,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 
 			//run the list query and make the smsmsg records
 
-			$usersql = $USER->userSQL("p","pd");
+			$usersql = $USER->userSQL("p");
 			//get and compose list rules
 			$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
-					and le.ruleid=r.id and le.listid='$listid' order by le.sequence", "r");
+					and le.ruleid=r.id and le.listid='$listid'", "r");
 			if (count($listrules) > 0)
-				$listsql = "1" . Rule::makeQuery($listrules, "pd");
+				$listsql = "1" . Rule::makeQuery($listrules, "p");
 			else
 				$listsql = "0";//dont assume anyone is in the list if there are no rules
 
@@ -92,10 +92,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			insert into smsmsg (smsjobid, personid, sequence, phone)
 			(select $smsjobid as smsjobid, p.id as personid, ph.sequence as sequence, ph.phone as phone
 			from person p
-			left join persondata pd on (pd.personid = p.id and not p.deleted)
 			inner join phone ph on (ph.personid = p.id and ph.smsenabled=1 and ph.phone != '')
 			left join listentry le on (p.id=le.personid and le.listid=$listid)
-			where $usersql and $listsql and le.type is null and p.userid is null order by p.id,ph.sequence)
+			where not p.deleted $usersql and $listsql and le.type is null and p.userid is null order by p.id,ph.sequence)
 
 			union all
 
@@ -103,10 +102,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			from listentry le
 			straight_join person p on (p.id=le.personid and not p.deleted)
 			inner join phone ph on (ph.personid = p.id and ph.smsenabled=1 and ph.phone != '')
-			where p.customerid = $USER->customerid
-			and le.listid=$listid and le.type='A'
+			where le.listid=$listid and le.type='A'
 			order by le.id,ph.sequence)
 			";
+
+			echo $query;
 
 			QuickUpdate($query);
 
@@ -114,7 +114,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			//delete blocked numbers from the list
 
 			$query = "delete s from smsmsg s inner join blockednumber b on
-									(s.phone=b.pattern and b.customerid = $USER->customerid
+									(s.phone=b.pattern
 									and b.type in ('both','sms'))
 					where s.smsjobid=$smsjobid";
 			QuickUpdate($query);

@@ -19,20 +19,56 @@ require_once("inc/instaconnect.php");
 
 set_time_limit(0);
 
+
+//auth server connection info
+$authdbhost = "10.25.25.56";
+$authdbuser = "root";
+$authdbpass = "";
+$authdbdb = "authserver";
+
+$authdb = mysql_connect($authdbhost, $authdbuser, $authdbpass, true);
+mysql_select_db($authdbdb, $authdb);
+
+//get a list of all shards
+//and get a connection to each shard
+$query = "select id, name, description, dbhost, dbusername, dbpassword from shard";
+$shards = array();
+$res = Query($query,$authdb);
+while ($row = DBGetRow($res)) {
+	echo "connecting to " . $row[1] . "\n";
+	$shards[$row[0]] = mysql_connect($row[3], $row[4], $row[5], true);
+}
+
+
 $starttime = time();
 
 //while (time() - $starttime < 60) {
 while (true) {
-	if ($smsjobid = QuickQuery("select id from smsjob where status='queued' order by id desc limit 1")) {
-		echo date("r") . "sending job $smsjobid\n";
-		sendSmsJob($smsjobid);
-	} else {
+
+	$somejobs = false;
+	foreach ($shards as $shardid => $sharddb) {
+		//get a list of customer dbs
+		$customers = QuickQueryList("select id,shardid from customer",true,$authdb);
+
+		//go through each customer and change the global DB to the shard and check for sms jobs
+		foreach ($customers as $customerid => $shardid) {
+			$_dbcon = $shards[$shardid];
+			mysql_select_db("c_" . $customerid, $_dbcon);
+
+			if ($smsjobid = QuickQuery("select id from smsjob where status='queued' order by id desc limit 1")) {
+				echo date("r") . "sending smsjob. shard: $shardid, customer: $customerid, smsjobid: $smsjobid\n";
+				sendSmsJob($smsjobid);
+				sleep(5);
+				$somejobs = true;
+			}
+		}
+	}
+
+	if (!$somejobs) {
 		echo date("r") . " sleeping\n";
-		sleep(1);
+		sleep(5);
 	}
 }
-
-
 
 function sendSmsJob($smsjobid) {
 
