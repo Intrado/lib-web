@@ -40,16 +40,16 @@ function getJobSummary($joblist){
 	global $USER;
 	$usersql = $USER->userSQL("rp");
 	$jobinfoquery = "Select 
-							j.name, 
-							j.description,
+							j.name,
 							jt.name,
 							u.login,
 							j.startdate,
 							j.starttime,
 							coalesce(j.finishdate, j.enddate),
 							j.status,
-							sum(rc.type='phone'),
-							sum(rc.type='email')
+							count(distinct rp.personid) as pcount,
+							coalesce(sum(rc.type='phone'), 0),
+							coalesce(sum(rc.type='email'), 0)
 							from job j
 							left join reportperson rp on (j.id = rp.jobid)
 							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
@@ -81,12 +81,12 @@ function displayJobSummary($joblist){
 						<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 							<tr class="listHeader" align="left" valign="bottom">
 								<th>Job Name</th>
-								<th>Description</th>
 								<th>Type</th>
 								<th>Submitted By</th>
 								<th>Start Date</th>
 								<th>End Date</th>
 								<th>Status</th>
+								<td>Ind's on List</td>
 								<th># of Phones</th>
 								<th># of Emails</th>
 							</tr>
@@ -97,12 +97,12 @@ function displayJobSummary($joblist){
 ?>
 								
 									<td><?=$job[0]?></td>
-									<td><?= ($job[1] == "" ) ? "&nbsp;" : $job[1]?></td>
+									<td><?=$job[1]?></td>
 									<td><?=$job[2]?></td>
-									<td><?=$job[3]?></td>
-									<td><?=fmt_date($job,4)?></td>
-									<td><?=fmt_date($job,6)?></td>
-									<td><?=ucfirst($job[7])?></td>
+									<td><?=fmt_date($job,3)?></td>
+									<td><?=fmt_date($job,5)?></td>
+									<td><?=ucfirst($job[6])?></td>
+									<td><?=$job[7]?></td>
 									<td><?=$job[8]?></td>
 									<td><?=$job[9]?></td>
 								</tr>
