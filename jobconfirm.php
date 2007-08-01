@@ -67,6 +67,12 @@ if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->en
 		error("WARNING: The call window for this job is set for: ". date("g:i a", strtotime($job->starttime)) . " - " . date("g:i a", strtotime($job->endtime)));
 		error("These times fall outside the range of typical calling hours");
 	}
+
+
+if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) <= strtotime("now"))) {
+	error('The end time has already passed. Please correct this problem before proceeding');
+}
+	
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 
@@ -151,7 +157,7 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" ><?= htmlentities($job->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
-					<td class="bottomBorder" >Priority</td>
+					<td class="bottomBorder" >Job Type</td>
 					<td class="bottomBorder" ><?= htmlentities($jobtype->name); ?></td>
 				</tr>
 				<tr>
