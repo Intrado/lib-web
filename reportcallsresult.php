@@ -66,10 +66,10 @@ if(isset($options['personid']) && $options['personid'] != "")
 	$personsql = " and rp.pkey like '%" . DBSafe($options['personid']) . "%'";
 	
 if(isset($options['phone']) && $options['phone'] != "")
-	$phonesql = " and rp.pkey like '%" . DBSafe($options['phone']) . "%'";
+	$phonesql = " and rc.phone like '%" . DBSafe($options['phone']) . "%'";
 
 if(isset($options['email']) && $options['email'] != "")
-	$emailsql = " and rp.pkey like '%" . DBSafe($options['email']) . "%'";
+	$emailsql = " and rc.email like '%" . DBSafe($options['email']) . "%'";
 
 if(isset($options['rules']) && $options['rules'] != "")
 	$rulesql = getRuleSql($options, "rp");
@@ -110,6 +110,13 @@ while($row = DBGetRow($result)){
 	$data[] = $row;
 }
 
+// if only one person(one row in data), redirect to person with person id.
+if(count($data) == 1){
+	redirect("reportcallsperson.php?pid=" . $data[0][3]);
+}
+	
+	
+	
 $titles = array("0" => "ID#",
 				"1" => "First Name",
 				"2" => "Last Name");
@@ -142,7 +149,7 @@ if(isset($options['rules']) && $options['rules']){
 
 	
 	include_once("nav.inc.php");
-	buttons(button('back', 'window.history.go(-1)'));
+	buttons(button('Back', 'window.history.go(-1)'));
 	
 	startWindow("Search Parameters");
 ?>
@@ -201,8 +208,16 @@ if(isset($options['rules']) && $options['rules']){
 	<br>
 <?
 	startWindow("Search Results");
+		if(count($data) > 0){
 ?>
 	<div>Your search returned multiple persons.  Please choose one<div>
+<?
+		} else {
+?>
+			<div>Your search returned 0 results<div>
+<?
+		}
+?>		
 	<table>
 		
 <?
