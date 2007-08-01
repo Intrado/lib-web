@@ -25,7 +25,7 @@ if (!isset($_GET['jobid'])) {
 } else {
 	$jobid = $_GET['jobid'] + 0;
 	//check userowns or customerowns and viewsystemreports
-	if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
+	if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports'))) {
 		redirect('unauthorized.php');
 	}
 }

@@ -154,7 +154,7 @@ if(isset($_SESSION['reportid'])){
 }
 if(isset($options['jobid'])){
 	$jobid = $options['jobid'];
-	if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports')) && customerOwns("job",$jobid))
+	if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports')))
 		redirect('unauthorized.php');
 }
 

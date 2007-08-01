@@ -90,7 +90,7 @@ if(isset($_REQUEST['reportid'])){
 	if(isset($jobid)){
 		
 		//check userowns or customerowns and viewsystemreports
-		if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports')) && customerOwns("job",$jobid)) {
+		if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports'))) {
 			redirect('unauthorized.php');
 		}
 		unset($_SESSION['jobstats'][$jobid]);
