@@ -47,7 +47,6 @@ function doLogin($loginname, $password, $url = null) {
 		session_id($result['sessionID']); // set the session id
 		return $result['userID'];
 	}
-	return false;
 }
 
 function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null) {
@@ -65,7 +64,6 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 
 		if (doDBConnect($result)) return $result['userID'];
 	}
-	return false;
 }
 
 function forceLogin($loginname, $url = null) {
@@ -76,7 +74,6 @@ function forceLogin($loginname, $url = null) {
 		// login success
 		return $result['userID'];
 	}
-	return false;
 }
 
 function authorizeUploadImport($uploadkey, $url = null) {
@@ -117,7 +114,6 @@ function authorizeSpecialTask($shardid, $taskuuid) {
 
 		if (doDBConnect($result)) return $result['sessionID'];
 	}
-	return false;
 }
 
 // used by dmapi to pass an authserver sessionID to get the customer database connection, spanning life of specialtask
@@ -211,7 +207,6 @@ function asptokenLogin($asptoken, $url) {
 		session_id($result['sessionID']); // set the session id
 		return $result['userID'];
 	}
-	return false;
 }
 /*CSDELETEMARKER_END*/
 
