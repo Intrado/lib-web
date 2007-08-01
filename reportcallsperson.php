@@ -95,7 +95,7 @@ $generator->reportinstance = $instance;
 $generator->format = "html";
 $generator->userid = $USER->id;
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save"))
+if(CheckFormSubmit($f, $s))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -141,7 +141,7 @@ if(isset($_SESSION['reportid'])){
 include_once("nav.inc.php");
 NewForm($f);
 
-buttons(button("Back", "window.history.go(-1)"), submit($f, "save", "Save/Schedule"), submit($f, $s, "Refresh"));
+buttons(button("Back", "window.history.go(-1)"), submit($f, $s, "Refresh"));
 startWindow("Display Options", "padding: 3px;", "true");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">

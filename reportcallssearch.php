@@ -142,7 +142,7 @@ if(isset($_GET['deleterule'])) {
 
 $_SESSION['report']['options'] = $options;
 	
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save")|| CheckFormSubmit($f,"view")){
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
@@ -289,7 +289,7 @@ if(isset($_SESSION['reportid'])){
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(button('Back', 'window.history.go(-1)'), submit($f, "save", "Save"), submit($f, "view", "View Report"));
+buttons(button('Back', 'window.history.go(-1)'), submit($f, "view", "View Report"));
 startWindow("Person Notification Search", "padding: 3px;");
 
 ?>
