@@ -25,21 +25,21 @@ class FieldMap extends DBMappedObject {
 
 	static function getFirstNameField() {
 		$field = QuickQuery("select fieldnum from fieldmap where options like '%firstname%'");
-		if($field == "" || $field == null)
+		if(!$field)
 			$field = "f01";
 		return $field;
 	}
 
 	static function getLastNameField() {
 		$field = QuickQuery("select fieldnum from fieldmap where options like '%lastname%'");
-		if($field == "" || $field == null)
+		if(!$field)
 			$field = "f02";
 		return $field;
 	}
 
 	static function getLanguageField() {
 		$field = QuickQuery("select fieldnum from fieldmap where options like '%language%'");
-		if($field == "" || $field == null)
+		if(!$field)
 			$field = "f03";
 		return $field;
 	}
