@@ -74,13 +74,13 @@ class JobSummaryReport extends ReportGenerator{
 		}
 		
 		//Gather Phone Information		
-		$phonenumberquery = "select sum(rc.result not in ('duplicate', 'blocked')) as total,
-									sum(rc.result in ('A','M', 'duplicate', 'blocked')) as completed,
-									sum(rc.result not in ('A','M', 'duplicate', 'blocked') and rc.numattempts < js.value and j.status in ('processing', 'active')) as remaining,
-									sum(rc.numattempts) as totalattempts,
+		$phonenumberquery = "select sum(rc.type='phone') as total,
+									sum(rc.result in ('A','M', 'duplicate', 'blocked') or rc.numattempts > js.value or rp.status in ('fail') ) as completed,
+									sum(rc.result not in ('A','M', 'duplicate', 'blocked') and rc.numattempts < js.value and rp.status not in ('success', 'fail')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rc.result = 'blocked') as blocked,
-									sum(rp.status = 'nocontacts') as nocontacts
+									sum(rp.status = 'nocontacts') as nocontacts,
+									sum(rc.numattempts) as totalattempts
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
@@ -219,10 +219,10 @@ class JobSummaryReport extends ReportGenerator{
 											<th># of Phones</th>
 											<th>Completed</th>
 											<th>Remaining</th>
-											<th>Total Attempts</th>
 											<th>Duplicates Removed</th>
 											<th>Blocked</th>
 											<th>No Contact Info</th>
+											<th>Total Attempts</th>
 										</tr>
 										<tr>
 											<td><?=$phonenumberinfo[0]?></td>
