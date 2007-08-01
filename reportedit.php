@@ -112,7 +112,8 @@ if(CheckFormSubmit($f, $s))
 			$subscription->userid = $USER->id;
 			$subscription->name = GetFormData($f, $s, "name");
 			$subscription->description = GetFormData($f, $s, "description");
-			$options['title'] = $subscription->name;
+			$options['subname'] = $subscription->name;
+			$options['description'] = $subscription->description;
 			$instance->setParameters($options);
 			$instance->update();
 			$subscription->reportinstanceid=$instance->id;
