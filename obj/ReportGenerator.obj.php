@@ -99,7 +99,7 @@ class ReportGenerator {
 		$params["firstname"] = new XML_RPC_VALUE($USER->firstname, 'string'); 
 		$params["lastname"] = new XML_RPC_VALUE($USER->lastname, 'string');
 		$params["description"] = new XML_RPC_VALUE($description, 'string');
-		$params["createdate"] = new XML_RPC_VALUE(date("M d, Y", strtotime("now")), 'string');
+		$params["createdate"] = new XML_RPC_VALUE(date("M d, Y h:i a", strtotime("now")), 'string');
 		if(isset($this->params['sorrymessage']))
 			$params["sorrymessage"] = new XML_RPC_VALUE($this->params['sorrymessage'], 'string');
 		return $params;
