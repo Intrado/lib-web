@@ -241,7 +241,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 if($reload){
 	ClearFormData($f);
 	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "today");
+	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "monthtodate");
 	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
