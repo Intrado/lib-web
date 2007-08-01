@@ -134,7 +134,7 @@ foreach($customers as $cust) {
 	}
 	mysql_select_db("c_" . $cust[0]);
 	if($custdb){
-		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data)
+		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description
 					FROM import
 					where 1
 					$querytypes
@@ -152,6 +152,7 @@ $titles = array("0" => "Customer ID",
 		"url" => "Customer URL",
 		"3" => "Import ID ",
 		"4" => "Import Name",
+		"11" => "Description",
 		"5" =>  "Status",
 		"6" => "Type ",
 		"7" => "Upd. Method",
