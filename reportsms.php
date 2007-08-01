@@ -133,7 +133,7 @@ if ($smsjobid) {
 	$langf = FieldMap::getLanguageField();
 
 
-	$query = "select SQL_CALC_FOUND_ROWS p.pkey, pd.$fnf, pd.$lnf, pd.$langf, s.phone from smsmsg s left join person p on (p.id = s.personid) left join persondata pd on (pd.personid = s.personid) where s.smsjobid='$smsjobid' order by pd.f02, pd.f01 limit $start, $limit";
+	$query = "select SQL_CALC_FOUND_ROWS p.pkey, p.$fnf, p.$lnf, p.$langf, s.phone from smsmsg s left join person p on (p.id = s.personid) where s.smsjobid='$smsjobid' order by p.$lnf, p.$fnf limit $start, $limit";
 	$data = array();
 	$res = Query($query);
 	while ($row = DBGetRow($res)) {
