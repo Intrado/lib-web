@@ -51,7 +51,7 @@ function fmt_answer($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$fields = FieldMaps::getOptionalAuthorizedFieldMaps()
+$fields = FieldMaps::getOptionalAuthorizedFieldMaps();
 
 
 if(isset($_REQUEST['reportid'])){
