@@ -1647,4 +1647,10 @@ from surveyemailcode sec
 inner join jobworkitem wi on (wi.id = sec.jobworkitemid);
 
 
+-- set fieldmap options from hardcoded
+
+update fieldmap fm set fm.options=concat(fm.options, ',firstname') where fm.fieldnum = 'f01';
+update fieldmap fm set fm.options=concat(fm.options, ',lastname') where fm.fieldnum = 'f02';
+update fieldmap fm set fm.options=concat(fm.options, ',language') where fm.fieldnum = 'f03';
+
 
