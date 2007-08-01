@@ -82,7 +82,8 @@ if($type == "subscription"){
 		if($count > 1200){
 			$generator = new JobSummaryReport();
 			$options['reporttype'] = 'jobsummaryreport';
-			$options['sorrymessage'] = "Sorry, this job was too long for a standard auto report.  A Notification Summary as been created instead.  If you'd like to see the details, please use the Phone Log or Email Log report on the web.";
+			$options['sorrymessage'] = 
+				"Notice: The contact details for this job exceeds the page limit for an emailed autoreport.  See notification summary information above.  To view contact details, log into your web account and access the Phone Log or Email Log report.";
 		} else {
 			$generator = new JobAutoReport();
 			$options['reporttype'] = 'jobautoreport';
