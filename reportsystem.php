@@ -72,7 +72,7 @@ if($reload){
 	ClearFormData($f);
 	PutFormData($f, $s, "phone", "1", "bool", 0, 1);
 	PutFormData($f, $s, "email", "1", "bool", 0, 1);
-	PutFormData($f, $s, "groupby", FieldMap::getSchoolField());
+	PutFormData($f, $s, "groupby", $groupby);
 	
 	PutFormData($f, $s, "relativedate", $reldate);
 	PutFormData($f, $s, 'xdays', isset($lastxdays) ? $lastxdays : "0", "number");
@@ -102,8 +102,12 @@ if($reload){
 	$joblistquery = " and j.id in ('" . implode("','", $joblist) . "') ";
 
 	$groupbyquery = "";
-	if($groupby){
+	if($groupby != ""){
 		$groupbyquery = "rp." . $groupby;
+		$groupbyorder = $groupbyquery . ", ";
+	} else {
+		$groupbyquery = "''";
+		$groupbyorder = "";
 	}
 	
 	$userlist = array();
@@ -119,7 +123,8 @@ if($reload){
 	}
 	
 	$groupbylist = array();
-	$groupbylist = QuickQueryList("select $groupby from reportperson group by $groupby");
+	if($groupby != "")
+		$groupbylist = QuickQueryList("select $groupby from reportperson group by $groupby");
 	
 	$query = "SELECT $groupbyquery as field
 					, rp.userid,
@@ -129,8 +134,8 @@ if($reload){
 				inner join job j on (rp.jobid = j.id)
 				where rp.status in ('fail', 'success')
 				$joblistquery
-				group by $groupbyquery, j.jobtypeid, rp.userid
-				order by $groupbyquery, rp.userid";
+				group by $groupbyorder j.jobtypeid, rp.userid
+				order by $groupbyorder rp.userid";
 	
 	$result = Query($query);
 	$data = array();
@@ -155,19 +160,23 @@ if($reload){
 	foreach($groupbyarray as $school => $users){
 		$schooltotals[$school] = array();
 		foreach($users as $userid => $jobtypes){
-			foreach($jobtypes as $jobtypeid => $count){
+			foreach($jobtypelist as $jobtypeid => $jobtypename){
+				if(!isset($groupbyarray[$school][$userid][$jobtypeid]))
+					$groupbyarray[$school][$userid][$jobtypeid]=0;
 				if(!isset($schooltotals[$school][$jobtypeid]))
 					$schooltotals[$school][$jobtypeid] = 0;
-				$schooltotals[$school][$jobtypeid]+=$count;
-				$systemtotal +=$count;
+				if(!isset($schooltotals[$school]["total"]))
+					$schooltotals[$school]["total"] = 0;
+				$schooltotals[$school][$jobtypeid]+=$groupbyarray[$school][$userid][$jobtypeid];
+				$schooltotals[$school]["total"] +=$groupbyarray[$school][$userid][$jobtypeid];
+				$systemtotal +=$groupbyarray[$school][$userid][$jobtypeid];
 			}
 		}
 		foreach($users as $userid => $jobtypes){
-			$schoolsum = array_sum($schooltotals[$school]);
-			if($schoolsum == 0)
+			if($schooltotals[$school]["total"] == 0)
 				$groupbyarray[$school][$userid]["total"] = 0;
 			else
-				$groupbyarray[$school][$userid]["total"] = (array_sum($groupbyarray[$school][$userid])/$schoolsum) * 100;
+				$groupbyarray[$school][$userid]["total"] = (array_sum($groupbyarray[$school][$userid])/$schooltotals[$school]["total"]) * 100;
 		}
 		
 	}
@@ -200,34 +209,9 @@ startWindow("Display Options", "padding: 3px;");
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder">Date</th>
 			<td class="bottomBorder">
-				<table  border="0" cellpadding="3" cellspacing="0">
-					<tr>
-						<td><?
-							NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
-							NewFormItem($f, $s, 'relativedate', 'selectoption', 'Today', 'today');
-							NewFormItem($f, $s, 'relativedate', 'selectoption', 'Yesterday', 'yesterday');
-							NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last Week Day', 'weekday');
-							NewFormItem($f, $s, 'relativedate', 'selectoption', 'Week to date', 'weektodate');
-							NewFormItem($f, $s, 'relativedate', 'selectoption', 'Month to date', 'monthtodate');
-							NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last X Days', 'xdays');
-							NewFormItem($f, $s, 'relativedate', 'selectoption', 'Date Range(inclusive)', 'daterange');
-							NewFormItem($f, $s, 'relativedate', 'selectend');
-							
-							?>
-						</td>
-						<td><? NewFormItem($f, $s, 'xdays', 'text', '3', null, "id='xdays'"); ?></td>
-						<td><div id="date"><? NewFormItem($f, $s, "startdate", "text", "20") ?> To: <? NewFormItem($f, $s, "enddate", "text", "20")?></div></td>
-					</tr>
-					<script>
-						if(new getObj("reldate").obj.value!="xdays"){
-							hide("xdays");
-						}
-						if(new getObj("reldate").obj.value!="daterange"){
-							hide("date");
-						
-						}
-					</script>
-				</table>
+<?
+				dateOptions($f, $s, "", true);
+?>
 			</td>
 		</tr>
 
@@ -236,6 +220,7 @@ startWindow("Display Options", "padding: 3px;");
 			<td>
 				<? 
 					NewFormItem($f, $s, "groupby", "selectstart");
+					NewFormItem($f, $s, "groupby", "selectoption", "User", "");
 					foreach($fields as $field){
 						NewFormItem($f, $s, "groupby", "selectoption", $field->name, $field->fieldnum);
 					}
@@ -252,7 +237,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 ?>
 	<table border="0" cellpadding="2" cellspacing="1" class="list">
 		<tr class="listHeader" >
-			<td colspan="<?=count($jobtypelist)+1?>">System Total</td>
+			<td colspan="<?=count($jobtypelist)+2?>">System Total</td>
 			<td><?=$systemtotal?></td>
 		</tr>
 		<tr class="listHeader" align="left" valign="bottom">
@@ -264,21 +249,31 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 <?
 			}
 ?>
-			<td>%</td>
+			<td>Total</td>
+			<td>Group %</td>
 		</tr>
 <?
 		$alt=0;
+
 		foreach($groupbyarray as $index => $groupbyfield){
+			
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+			$name = FieldMap::getName($groupby);
+			if(!$name)
+				$name = "System";
+			else
+				$name .= " : " . $index;
 ?>
-			<td><u><?=FieldMap::getName($groupby)?>: <?=$index?><u></td>
+			<td><u><?=$name?><u></td>
 <?
-			foreach($schooltotals[$index] as $jobtype => $total){
+			$schooltotal = 0;
+			foreach($jobtypelist as $jobtypeid => $jobtypename){
 ?>
-				<td><?=$total?></td>
+				<td><?=$schooltotals[$index][$jobtypeid]?></td>
 <?
 			}
 ?>
+				<td><?=$schooltotals[$index]["total"]?></td>
 				<td>100%</td>
 			</tr>
 <?
@@ -288,12 +283,15 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 ?>
 					<td>&nbsp;&nbsp;&nbsp;User: <?=$userlist[$uindex]?></td>
 <?
+				$usertotal = 0;
 				foreach($jobtypelist as $jobtypeid => $jobtypename){
+					$usertotal += $user[$jobtypeid];
 ?>
 					<td><?=$user[$jobtypeid]?></td>
 <?
 				}
 ?>
+					<td><?=$usertotal?></td>
 					<td><?=number_format($user["total"],2)?>%</td>
 				</tr>
 <?
