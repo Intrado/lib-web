@@ -73,9 +73,9 @@ foreach($cpcodes as $index => $code){
 }
 
 // New graph with a drop shadow
-$graph = new Graph(1100,250,'auto');
+$graph = new Graph(500,250,'auto');
 //$graph->SetShadow();
-$graph->img->SetMargin(90,90,20,50);
+$graph->img->SetMargin(100,40,20,100);
 
 for($i=1;$i<=$count;$i++){
 	$barname = "bar" . $i;
@@ -86,7 +86,7 @@ for($i=1;$i<=$count;$i++){
 $graph->SetScale("textlin");
 $graph->xaxis->SetTickLabels($labels);
 $graph->xaxis->SetPos("min");
-
+$graph->xaxis->SetLabelAngle(90);
 $graph->yaxis->SetTextLabelInterval(2);
 $graph->yaxis->HideFirstTickLabel();
 $graph->SetFrame(false);
