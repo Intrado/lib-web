@@ -207,18 +207,18 @@ class SurveyReport extends ReportGenerator{
 										</tr>
 										<tr>
 												<td>
-													<table width="100%" cellpadding="3" cellspacing="1" class="list">
+													<table width=400px" cellpadding="3" cellspacing="1" class="list">
 														<tr>
-															<th align="left" class="listheader nosort">1</th>
-															<th align="left" class="listheader nosort">2</th>
-															<th align="left" class="listheader nosort">3</th>
-															<th align="left" class="listheader nosort">4</th>
-															<th align="left" class="listheader nosort">5</th>
-															<th align="left" class="listheader nosort">6</th>
-															<th align="left" class="listheader nosort">7</th>
-															<th align="left" class="listheader nosort">8</th>
-															<th align="left" class="listheader nosort">9</th>
-															<th align="left" class="listheader nosort">Total</th>
+															<th align="left" class="listheader nosort" width='10%'>1</th>
+															<th align="left" class="listheader nosort" width='10%'>2</th>
+															<th align="left" class="listheader nosort" width='10%'>3</th>
+															<th align="left" class="listheader nosort" width='10%'>4</th>
+															<th align="left" class="listheader nosort" width='10%'>5</th>
+															<th align="left" class="listheader nosort" width='10%'>6</th>
+															<th align="left" class="listheader nosort" width='10%'>7</th>
+															<th align="left" class="listheader nosort" width='10%'>8</th>
+															<th align="left" class="listheader nosort" width='10%'>9</th>
+															<th align="left" class="listheader nosort" width='10%'>Total</th>
 														</tr>
 														<tr>
 							<?
