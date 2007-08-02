@@ -42,6 +42,7 @@ if(CheckFormSubmit($f, $s)){
 				foreach($messages as $key => $message) {
 					$mess = new Message($message);
 					$mess->name = GetFormData($f,$s,"message ".$key);
+					$mess->description = "Call Me - " . $mess->name;
 					$mess->update();
 					$messagepart = DBFind("MessagePart", "from messagepart where messageid = '$mess->id'");
 					$audio = new AudioFile($messagepart->audiofileid);
