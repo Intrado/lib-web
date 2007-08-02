@@ -41,13 +41,14 @@ print '<br>';
 $data = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 order by id desc");
 $titles = array(	"name" => "Name",
 					"description" => "Description",
+					"type" => "#Deliver by",
 					"startdate" => "Start Date",
 					"Status" => "Status",
 					"enddate" => "End Date",
 					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
-$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
+$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "type" => "fmt_obj_csv_list", "enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
 if(!$USER->authorize('leavemessage')){
 	unset($titles["responses"]);
 	unset($formatters["responses"]);
