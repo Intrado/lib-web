@@ -236,6 +236,10 @@ function fmt_status($obj, $name) {
 	global $USER;
 	if ($obj->status == 'new') {
 		return "Not Submitted";
+	} else if ($obj->status == 'processing') {
+		if ($obj->percentprocessed != '0') {
+			return ucfirst($obj->status) . " (" . $obj->percentprocessed . "%)";
+		} else return ucfirst($obj->status);
 	} else {
 		if ($obj->cancelleduserid && $obj->cancelleduserid != $USER->id) {
 			$usr = new User($obj->cancelleduserid);

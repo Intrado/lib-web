@@ -202,6 +202,7 @@ CREATE TABLE `job` (
   `endtime` time NOT NULL default '00:00:00',
   `finishdate` datetime default NULL,
   `status` enum('new','processing','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
+  `percentprocessed` tinyint(4) NOT NULL default '0',
   `deleted` tinyint(4) NOT NULL default '0',
   `ranautoreport` tinyint(4) NOT NULL default '0',
   `priorityadjust` int(11) NOT NULL default '0',
