@@ -119,15 +119,21 @@ startWindow("Rename Files");
 			if($messages){
 				foreach($messages as $key => $message){
 					?>
-					<tr><td>
-						<?
-							NewFormItem($f, $s, "message ".$key, "text");
+					<tr>
+						<td>
+<? 
+								NewFormItem($f, $s, "message ".$key, "text"); 
+?>
+						</td>
+						<td>
+<?
 							if($specialtask->getData("origin") == "message")
-								echo "&nbsp;" . button('Play', "popup('previewmessage.php?id=" . $message . "', 400, 400);");
+								echo button('Play', "popup('previewmessage.php?id=" . $message . "', 400, 400);");
 							else
-								echo "&nbsp;" . button('Play', "popup('previewaudio.php?id=" . $message . "&close=1', 400, 400);");
-						?>
-					</td></tr>
+								echo button('Play', "popup('previewaudio.php?id=" . $message . "&close=1', 400, 400);");
+?>
+						</td>
+					</tr>
 					<?
 				}
 			}
