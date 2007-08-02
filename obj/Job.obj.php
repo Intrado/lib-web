@@ -22,7 +22,7 @@ class Job extends DBMappedObject {
 	var $endtime;
 	var $finishdate;
 	var $status;
-	var $percentprocessed;
+	var $percentprocessed = 0;
 	var $deleted = 0;
 	var $thesql = "";
 
