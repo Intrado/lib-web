@@ -57,7 +57,8 @@ class SurveyReport extends ReportGenerator{
 		$jobstats['phone'] = array();
 		$jobstats['email'] = array();
 		
-		$query = "select sum(rp.status='success' and rc.result='A' and rc.participated=1), count(*) as cnt
+		$query = "select sum(rp.status='success' and rc.result='A' and rc.participated=1), 
+			sum(rp.status not in ('duplicate', 'blocked', 'nocontacts'))
 			from reportperson rp 
 			left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 			where rp.jobid='$jobid' and rp.type ='phone'";
@@ -74,7 +75,9 @@ class SurveyReport extends ReportGenerator{
 		
 		$urloptions = "jobid=$jobid&valid=$validstamp";
 
-		$query = "select sum(sw.status = 'web'), count(*) from surveyweb sw
+		$query = "select sum(sw.status = 'web' and rp.status != 'nocontacts'),
+				sum(rp.status not in ('duplicate', 'blocked', 'nocontacts')
+				from surveyweb sw
 				inner join reportperson rp on (rp.personid = sw.personid and rp.jobid = sw.jobid)
 				where sw.jobid=$jobid";
 	
@@ -196,6 +199,7 @@ class SurveyReport extends ReportGenerator{
 							<tr>
 								
 								<td>
+								<div style="float:left">
 									<table>
 										<tr><td valign="top"><div style='font-weight:bold;'>Question <?=$line[0]?>:</div></td></tr>
 										<tr>
@@ -229,8 +233,9 @@ class SurveyReport extends ReportGenerator{
 												</td>
 											</tr>
 									</table>
+								</div>
+								<div style="float: left"><?=fmt_survey_graph($line, 13)?></div>
 								</td>
-								<td><?=fmt_survey_graph($line, 13)?></td>
 							</tr>
 <?
 						}			
@@ -373,13 +378,14 @@ class SurveyReport extends ReportGenerator{
 	}
 
 	function setReportFile(){
-		$this->reportfile = "Survey.jasper";
+		$this->reportfile = "survey.jasper";
 	}
 	
 	
 
 	function getReportSpecificParams(){
-		$params = array("jobId", $this->params['jobid']);
+		$params = array("jobId" => $this->params['jobid'],
+						"jobcount" => 1);
 		return $params;
 	}
 
