@@ -76,7 +76,7 @@ class SurveyReport extends ReportGenerator{
 		$urloptions = "jobid=$jobid&valid=$validstamp";
 
 		$query = "select sum(sw.status = 'web' and rp.status != 'nocontacts'),
-				sum(rp.status not in ('duplicate', 'blocked', 'nocontacts')
+				sum(rp.status not in ('duplicate', 'blocked', 'nocontacts'))
 				from surveyweb sw
 				inner join reportperson rp on (rp.personid = sw.personid and rp.jobid = sw.jobid)
 				where sw.jobid=$jobid";
