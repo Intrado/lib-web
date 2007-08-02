@@ -27,9 +27,9 @@ $query = "update fieldmap fm set fm.options=concat(fm.options, ',firstname') whe
 mysql_query($query, $custdb);
 $query = "update fieldmap fm set fm.options=concat(fm.options, ',lastname') where fm.name = 'Last Name'";
 mysql_query($query, $custdb);
-$query = "update fieldmap fm set fm.options=concat(fm.options, ',grade') where fm.name = 'Grade'";
+$query = "update fieldmap fm set fm.options=concat(fm.options, ',grade') where fm.name = 'Grade' OR fm.name='Grade Level'";
 mysql_query($query, $custdb);
-$query = "update fieldmap fm set fm.options=concat(fm.options, ',school') where fm.name = 'School'";
+$query = "update fieldmap fm set fm.options=concat(fm.options, ',school') where fm.name = 'School' or fm.name='school'";
 mysql_query($query, $custdb);
 $query = "update fieldmap fm set fm.options=concat(fm.options, ',language') where fm.name = 'Language'";
 mysql_query($query, $custdb);
