@@ -891,6 +891,7 @@ $$$
 CREATE TABLE `voicereply` (
   `id` int(11) NOT NULL auto_increment,
   `personid` int(11) NOT NULL,
+  `sequence` tinyint(4) NOT NULL default '0',
   `jobid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `contentid` bigint(20) NOT NULL,
