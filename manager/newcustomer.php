@@ -69,7 +69,7 @@ if (CheckFormSubmit($f,$s)){
 
 			if (($inboundnum != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
-			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE hostname='" . DBSafe($hostname) ."'")) {
+			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."'")) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
