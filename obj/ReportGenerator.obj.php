@@ -7,12 +7,27 @@ class ReportGenerator {
 	var $reportinstance;
 	var $format;
 	var $query="";
+	var $testquery = "";
 	var $params;
 	var $reporttype;
 
+
+	function testSize(){
+		$result = "";
+		$this->generateQuery();
+		if($this->testquery != ""){
+			$count = QuickQuery($this->testquery);
+		}
+		if($count > 1300){
+			$result = "Report exceeds max page limit";
+		}
+		return $result;
+	}
+	
 	function generate($options = null){
 		$result = "";
 		$this->generateQuery();
+		
 		switch($this->format){
 			case 'html':
 				$this->runHtml();
