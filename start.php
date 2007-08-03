@@ -49,7 +49,7 @@ $TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname;
 
 if($USER->authorize("leavemessage")){
 	if($count > 0){
-		$$DESCRIPTION = "<img src=\"img/bug_important.gif\"> You have unplayed responses to your notifications..." .
+		$DESCRIPTION = "<img src=\"img/bug_important.gif\"> You have unplayed responses to your notifications..." .
 				"<a href=\"replies.php?jobid=all&showonlyunheard=true\">click to view</a>";
 	}
 }
