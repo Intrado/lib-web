@@ -26,9 +26,9 @@ function fmt_lastlogin($row, $index){
 
 function fmt_jobcount($row, $index){
 	global $custdb;
-	$jobcount = QuickQuery("SELECT COUNT(*) FROM job WHERE job.userid = '" . $row[2] . "'
+	$jobcount = QuickQuery("SELECT COUNT(*) FROM job WHERE job.userid = '" . $row[3] . "'
 							AND job.status = 'active'", $custdb);
-	$link = "<a href=\"customeractivejobs.php?user=" . $row['2'] . "\">" . $jobcount . "</a>";
+	$link = "<a href=\"customeractivejobs.php?user=" . $row['3'] . "&customer=" . $row[0] . "\">" . $jobcount . "</a>";
 	return $link;
 }
 
