@@ -1,84 +1,91 @@
 <?
 include_once("common.inc.php");
+include_once("../inc/table.inc.php");
 
-
+$customer = "";
+$user="";
+$authcustomer = "";
+$shardcustomer = "";
+$userid = "";
 if(isset($_GET['customer'])){
-	$customerid = $_GET['customer'];
-	$extra = "and customer.id = '$customerid'";
-} else if(isset($_GET['user'])){
-	$userid = $_GET['user'];
-	$extra = "and user.id = '$userid'";
-} else {
-	$extra = "";
+	$customerid = $_GET['customer']+0;
+	$authcustomer = "and c.id = '$customerid'";
+	$shardcustomer = "and qj.customerid = '$customerid'";
+} 
+if(isset($_GET['user'])){
+	$userid = $_GET['user']+0;
+	$user = "and qj.userid = '$userid'";
 }
 
-$query = "select customer.id, customer.name, customer.hostname, job.id, job.name,
-			customer.timezone, job.starttime, job.startdate, job.endtime, job.enddate,
-			sum(wi.status = 'new') as newcount,
-			sum(wi.status = 'scheduled') as scheduled,
-			sum(wi.status = 'waiting') as waiting,
-			sum(wi.status = 'queued') as queued,
-			sum(wi.status in ('assigned', 'inprogress')) as inprogess,
-			sum(wi.status in ('success', 'fail', 'duplicate') ) as complete
-			from customer
-			left join user on (user.customerid = customer.id)
-			left join job on (job.userid = user.id)
-			left join jobworkitem wi on (wi.jobid = job.id) 
-			where job.status = 'active'
-			and user.deleted = '0'
-			$extra
-			group by job.id
-			order by customer.id, job.id";
-			
-$result = Query($query);
-include("nav.inc.php");
-?>
+function fmt_date($row, $index){
+	$date = date("M j, g:i a", strtotime($row[$index] . " " . $row[$index+1]));
+	return $date;
+}
 
-<table border=.2>
-	<tr>
-		<td>Customer ID</td>
-		<td>Customer Name</td>
-		<td>Customer URL</td>
-		<td>Job ID</td>
-		<td>Job Name</td>
-		<td>Timezome</td>
-		<td>Startdate</td>
-		<td>Enddate</td>
-		<td>Total Workitems</td>
-		<td>New</td>
-		<td>Sch</td>
-		<td>Wait</td>
-		<td>Queued</td>
-		<td>Inprog</td>
-		<td>Done</td>
+function calc_done($row, $index){
+
+	return $row[$index-2] - $row[$index-1];
+}
+
+$titles = array("0" => "Shard Name",
+				"1" => "Customer ID",
+				"2" => "User ID",
+				"3" => "Job ID",
+				"4" => "Status",
+				"5" => "System Priority",
+				"6" => "Time Slices",
+				"7" => "TimeZone",
+				"8" => "Start Date/Time",
+				"10" => "End Date/Time",
+				"12" => "Total Tasks",
+				"13" => "Inprog",
+				"14" => "Done");
+
+
+
+
+$result = Query("select s.name, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where 1 $authcustomer ");
+$conninfo = array();
+while($row = DBGetRow($result)){
+	$conninfo[] = $row;
+}
+
+foreach($conninfo as $conn){
+	if($custdb = DBConnect($conn[1], $conn[2], $conn[3], "aspshard")){
+		$query = "select qj.customerid,
+					qj.userid, 
+					qj.id,
+					qj.status,
+					qj.systempriority,
+					qj.timeslices,
+					qj.timezone,
+					qj.startdate,
+					qj.starttime,
+					qj.enddate,
+					qj.endtime,
+					qj.phonetaskcount,
+					sum(qjt.jobid = qj.id and qjt.customerid = qj.customerid)
+					from qjob qj
+					left join qjobtask qjt on (qjt.jobid = qj.id)
+					where qj.status = 'active'
+					$shardcustomer
+					$user
+					group by qj.id
+					order by qj.id";
+			
+		$result = Query($query, $custdb);
+		$data = array();
+		while($row = DBGetRow($result)){
+			$data[] = array_merge(array($conn[0]), $row);
+		}
 		
-		
-	</tr>
-<?
-	while($row = DBGetRow($result)){
-		$startdatetime = date("M j, g:i a", strtotime($row[6] . " " . $row[7]));
-		$enddatetime = date("M j, g:i a", strtotime($row[8] . " " . $row[9]));
-		
-?>		
-		<tr>
-			<td><?=$row[0]?></td>
-			<td><?=$row[1]?></td>
-			<td><a href="https://asp.schoolmessenger.com/<?=$row[2]?>" target="_blank"><?=$row[2]?></a></td>
-			<td><?=$row[3]?></td>
-			<td><?=$row[4]?></td>
-			<td><?=$row[5]?></td>
-			<td><?=$startdatetime?></td>
-			<td><?=$enddatetime?></td>
-			<td><?=$row[10]+$row[11]+$row[12]+$row[13]+$row[14]+$row[15]?></td>
-			<td><?=$row[10]?></td>
-			<td><?=$row[11]?></td>
-			<td><?=$row[12]?></td>
-			<td><?=$row[13]?></td>
-			<td><?=$row[14]?></td>
-			<td><?=$row[15]?></td>
-		</tr>
-<?
 	}
+}
+include("nav.inc.php");	
+?>
+<table border=.2>
+<?
+	showtable($data, $titles, array("8"=>"fmt_date", "10" => "fmt_date", "14" => "calc_done"));
 ?>
 </table>
 <div > All time stamps are in customer time. </div>
