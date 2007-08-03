@@ -108,11 +108,18 @@ if(!isset($generator)){
 $generator->format = "pdf";
 $generator->reportinstance = $instance;
 echo "finished configuring generator\n";
-$generator->generateQuery();
-echo "finished generating query\n";
-$generator->setReportFile();
-echo "finished setting report file to use\n";
-$result = $generator->runPDF($params);
+$result = "";
+if($options['reporttype'] == 'phonedetail' || $options['reporttype'] == 'emaildetail'){
+	$result = $generator->testSize();
+	
+}
+if($result == ""){
+	$generator->generateQuery();
+	echo "finished generating query\n";
+	$generator->setReportFile();
+	echo "finished setting report file to use\n";
+	$result = $generator->runPDF($params);
+}
 echo $result;
 
 // if success, and subscription, then update the lastrun field
@@ -121,6 +128,9 @@ if("success" == $result) {
 		QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id)); // TODO handle timezone
 	}
 	exit(0);
+}
+if($result != "success" || $result != "failure"){
+	exit(-2);
 }
 exit(-1);
 ?>
