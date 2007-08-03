@@ -103,7 +103,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 				$name = DBSafe(GetFormData($f, $s, 'name'.$jobtype['id']));
 				$timeslice = GetFormData($f, $s, 'timeslice'.$jobtype['id']) + 0;
 				$systempriority = GetFormData($f, $s, 'systempriority'.$jobtype['id']) + 0;
-				$query = "update jobtype set name = '$name', timeslices = '$timeslice' where id = '$id'";
+				$query = "update jobtype set name = '$name', timeslices = '$timeslice', systempriority = '$systempriority' where id = '$id'";
 				QuickUpdate($query, $custdb);	
 			}
 			$refresh = 1;
@@ -178,7 +178,7 @@ NewForm($f);
 		?><tr>
 			<td><?=$jobtype['priority']?></td>
 			<td><? NewFormItem($f, $s, 'name'.$jobtype['id'], 'text', 20)?></td>
-			<td><?=$systempriorities[$jobtype['systempriority']]?></td>
+			<td><? setSystemPriority($f, $s, 'systempriority'.$jobtype['id'])?></td>
 			<td><? NewFormItem($f, $s, 'timeslice'.$jobtype['id'], 'text', 20)?></td>
 			<td><a href="customerpriorities.php?delete=<?=$jobtype['priority']?>">Delete</a>&nbsp;|&nbsp<a href="customerpriorities.php?moveup=<?=$jobtype['priority']?>">Move&nbsp;Up</a>&nbsp;|&nbsp<a href="customerpriorities.php?movedown=<?=$jobtype['priority']?>">Move&nbsp;Down</a></td>
 		</tr><?
