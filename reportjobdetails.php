@@ -233,25 +233,33 @@ if($reload){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
+$error = false;
 if($reportgenerator->format != "html"){
 
 	if($reportgenerator->format == "pdf"){
-		$name = secure_tmpname("report", ".pdf");
-		$params = createPdfParams($name);
-
-		header("Pragma: private");
-		header("Cache-Control: private");
-		header("Content-disposition: attachment; filename=$name");
-		header("Content-type: application/pdf");	
-		session_write_close();
-		$reportgenerator->generate($params);
-		@readfile($name);
-		unlink($name);
+		if($result = $reportgenerator->testSize()){
+			error($result);
+			$error = true;
+		} else {
+			$name = secure_tmpname("report", ".pdf");
+			$params = createPdfParams($name);
+	
+			header("Pragma: private");
+			header("Cache-Control: private");
+			header("Content-disposition: attachment; filename=$name");
+			header("Content-type: application/pdf");	
+			session_write_close();
+			$reportgenerator->generate($params);
+			@readfile($name);
+			unlink($name);
+		}
 	} else {
 		$reportgenerator->generate();
 	}
-} else {
-	
+}
+
+if($error || $reportgenerator->format == "html"){
+	$reportgenerator->format = "html";
 	$PAGE = "reports:reports";
 	$TITLE = "Phone Log";
 	if(isset($_SESSION['report']['options']['reporttype'])){
