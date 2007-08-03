@@ -96,6 +96,25 @@ class JobDetailReport extends ReportGenerator{
 			$rulesql
 			$orderquery
 			";
+		//query to test resulting dataset
+		$this->testquery = 
+			"select count(*)
+				from reportperson rp
+				inner join job j on (rp.jobid = j.id)
+				inner join user u on (u.id = j.userid)
+				left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+				left join	message m on
+								(m.id = rp.messageid)
+				left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
+				left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
+			
+				where 1 
+				$searchquery
+	
+				$usersql
+				$rulesql
+				$orderquery
+				";
 		
 	}
 	
