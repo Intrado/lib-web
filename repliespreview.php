@@ -33,12 +33,11 @@ $vr->update();
 
 $firstname = FieldMap::getFirstNameField();
 $lastname = FieldMap::getLastNameField();
-$query = "select p.pkey, p.$firstname, p.$lastname, rc.phone, j.name, coalesce(m.name, s.name), vr.replytime, j.status
+$query = "select rp.pkey, rp.$firstname, rp.$lastname, rc.phone, j.name, coalesce(m.name, s.name), vr.replytime, j.status
 			from voicereply vr
 			inner join job j on (vr.jobid = j.id)
 			inner join reportperson rp on(vr.personid = rp.personid and vr.jobid = rp.jobid and rp.type ='phone')
-			inner join person p on (vr.personid = p.id)
-			left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
+			left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type and vr.sequence = rc.sequence)
 			left join message m on (m.id = rp.messageid)
 			left join surveyquestionnaire s on (s.id = j.questionnaireid)
 			where vr.id = '$vr->id'";
