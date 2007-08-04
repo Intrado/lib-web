@@ -27,41 +27,46 @@ $cpcolors = array(
 
 
 $query = "
-select 	dayofmonth(date) as dayofmonth,
-		date as date,
-				sum(answered) as answered,
-				sum(machine) as machine,
-				sum(busy) as busy,
-				sum(noanswer) as noanswer
-			from systemstats
-			where date > date_sub(now(), interval 4 week)
-			group by date
-			order by date
+select 	date as date,
+		sum(answered) as answered,
+		sum(machine) as machine,
+		sum(busy) as busy,
+		sum(noanswer) as noanswer,
+		sum(failed) as failed,
+		sum(disconnect) as disconnect
+		from systemstats
+		where date > date_sub(now(), interval 4 week)
+		group by date
 ";
 
 
 $result = Query($query);
 
-$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
+$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array(), "X" => array(), "F" => array());
 
 $x_titles = array();
-$unix_today = strtotime("today");
-$today = date("d", $unix_today);
 
-$month = date("n", strtotime("-1 month"));
-$numdays = cal_days_in_month(CAL_GREGORIAN, $month, date("Y", $unix_today));
-$offset = $today - 28;
+for($x=0; $x < 28; $x++){
+	$data["A"][$x] = 0;
+	$data["M"][$x] = 0;
+	$data["B"][$x] = 0;
+	$data["N"][$x] = 0;
+	$data["F"][$x] = 0;
+	$data["X"][$x] = 0;
+}
 
-if($offset < 0)
-	$offset = -$offset;
+
+
 while ($row = DBGetRow($result)) {
-	$newday = $row[0] + $offset-1;
-	if($newday > $today)
-		$newday = $newday % $numdays;
-	$data["A"][$newday] = $row[2];
-	$data["M"][$newday] = $row[3];
-	$data["B"][$newday] = $row[4];
-	$data["N"][$newday] = $row[5];
+	$daysoffset = (strtotime("midnight") - strtotime($row[0])) / (60*60*24);
+	$newday = 28-$daysoffset-1;
+	
+	$data["A"][$newday] = $row[1];
+	$data["M"][$newday] = $row[2];
+	$data["B"][$newday] = $row[3];
+	$data["N"][$newday] = $row[4];
+	$data["F"][$newday] = $row[4];
+	$data["X"][$newday] = $row[4];
 }
 
 //var_dump($data);
@@ -71,11 +76,11 @@ $max = 0;
 
 for ($x=0; $x < 28; $x++) {
 
-	foreach (array("A","M","B","N") as $type) {
+	foreach (array("A","M","B","N","X","F") as $type) {
 		if (!isset($data[$type][$x]))
 			$data[$type][$x] = 0;
 		//show non a/m as negative
-		if ($type == "B" || $type == "N")
+		if ($type == "B" || $type == "N" || $type == "X" || $type == "F")
 			$data[$type][$x] = -$data[$type][$x];
 	}
 
@@ -104,16 +109,25 @@ $b2plot = new BarPlot($data["M"]);
 $b2plot->SetFillColor($cpcolors["M"]);
 $b2plot->SetLegend("Machine");
 
-$b3plot = new BarPlot($data["B"]);
-$b3plot->SetFillColor($cpcolors["B"]);
-$b3plot->SetLegend("Busy");
+$b3plot = new BarPlot($data["X"]);
+$b3plot->SetFillColor($cpcolors["X"]);
+$b3plot->SetLegend("Disconnect");
 
-$b4plot = new BarPlot($data["N"]);
-$b4plot->SetFillColor($cpcolors["N"]);
-$b4plot->SetLegend("No Answer");
+$b4plot = new BarPlot($data["F"]);
+$b4plot->SetFillColor($cpcolors["F"]);
+$b4plot->SetLegend("Fail");
+
+$b5plot = new BarPlot($data["B"]);
+$b5plot->SetFillColor($cpcolors["B"]);
+$b5plot->SetLegend("Busy");
+
+$b6plot = new BarPlot($data["N"]);
+$b6plot->SetFillColor($cpcolors["N"]);
+$b6plot->SetLegend("No Answer");
+
 
 // Create the grouped bar plot
-$gbplot = new AccBarPlot(array($b4plot,$b3plot,$b2plot,$b1plot));
+$gbplot = new AccBarPlot(array($b6plot,$b5plot,$b4plot,$b3plot,$b2plot,$b1plot));
 $gbplot->SetWidth(0.7);
 
 
