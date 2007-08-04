@@ -28,24 +28,37 @@ $cpcolors = array(
 
 $query = "
 select 	month(date) as month,
-				sum(answered) as answered,
-				sum(machine) as machine,
-				sum(busy) as busy,
-				sum(noanswer) as noanswer
-			from systemstats
-			where unix_timestamp(date) > unix_timestamp(date_sub(now(), interval 12 month))
-			group by month
-			order by date
+		sum(answered) as answered,
+		sum(machine) as machine,
+		sum(busy) as busy,
+		sum(noanswer) as noanswer,
+		sum(failed) as failed,
+		sum(disconnect) as disconnect
+		from systemstats
+		where unix_timestamp(date) > unix_timestamp(date_sub(now(), interval 12 month))
+		group by month
 ";
 
 
 $result = Query($query);
 
-$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
+$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array(), "F" => array(), "X" => array());
 
 $x_titles = array();
+
+for($x=0; $x <= 11; $x++){
+	$data["A"][$x] = 0;
+	$data["M"][$x] = 0;
+	$data["B"][$x] = 0;
+	$data["N"][$x] = 0;
+	$data["F"][$x] = 0;
+	$data["X"][$x] = 0;
+}
+
+
 $thismonth = date("n", strtotime("today"));
 while ($row = DBGetRow($result)) {
+	
 	$offsetmonth = $row[0] - $thismonth-1;
 	if($offsetmonth < 0)
 		$offsetmonth = $offsetmonth + 12;
@@ -54,6 +67,8 @@ while ($row = DBGetRow($result)) {
 	$data["M"][$offsetmonth] = $row[2];
 	$data["B"][$offsetmonth] = $row[3];
 	$data["N"][$offsetmonth] = $row[4];
+	$data["F"][$offsetmonth] = $row[5];
+	$data["X"][$offsetmonth] = $row[6];
 }
 
 //var_dump($data);
@@ -65,11 +80,11 @@ $months=array("January", "February", "March", "April", "May", "June", "July", "A
 $max = 0;
 for ($x = 0; $x < 12; $x++) {
 
-	foreach (array("A","M","B","N") as $type) {
+	foreach (array("A","M","B","N","F","X") as $type) {
 		if (!isset($data[$type][$x]))
 			$data[$type][$x] = 0;
 		//show non a/m as negative
-		if ($type == "B" || $type == "N")
+		if ($type == "B" || $type == "N" || $type == "F" || $type == "X")
 			$data[$type][$x] = -$data[$type][$x];
 	}
 
@@ -96,16 +111,30 @@ $b2plot = new BarPlot($data["M"]);
 $b2plot->SetFillColor($cpcolors["M"]);
 $b2plot->SetLegend("Machine");
 
-$b3plot = new BarPlot($data["B"]);
-$b3plot->SetFillColor($cpcolors["B"]);
-$b3plot->SetLegend("Busy");
+$b3plot = new BarPlot($data["X"]);
+$b3plot->SetFillColor($cpcolors["X"]);
+$b3plot->SetLegend("Disconnect");
 
-$b4plot = new BarPlot($data["N"]);
-$b4plot->SetFillColor($cpcolors["N"]);
-$b4plot->SetLegend("No Answer");
+$b4plot = new BarPlot($data["F"]);
+$b4plot->SetFillColor($cpcolors["F"]);
+$b4plot->SetLegend("Fail");
+
+$b5plot = new BarPlot($data["N"]);
+$b5plot->SetFillColor($cpcolors["N"]);
+$b5plot->SetLegend("No Answer");
+
+$b6plot = new BarPlot($data["B"]);
+$b6plot->SetFillColor($cpcolors["B"]);
+$b6plot->SetLegend("Busy");
+
+
+
+
+
+
 
 // Create the grouped bar plot
-$gbplot = new AccBarPlot(array($b4plot,$b3plot,$b2plot,$b1plot));
+$gbplot = new AccBarPlot(array($b6plot, $b5plot, $b4plot,$b3plot,$b2plot,$b1plot));
 $gbplot->SetWidth(0.7);
 
 

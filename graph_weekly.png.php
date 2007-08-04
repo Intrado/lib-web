@@ -27,20 +27,22 @@ $cpcolors = array(
 
 $query = "
 select 	dayofweek(date) as dayofweek, 
-				sum(answered)/4 as answered,
-				sum(machine)/4 as machine,
-				sum(busy)/4 as busy,
-				sum(noanswer)/4 as noanswer
-			from systemstats
-			where date >= date_sub(now(), interval 4 week)
-			group by dayofweek
+		sum(answered)/4 as answered,
+		sum(machine)/4 as machine,
+		sum(busy)/4 as busy,
+		sum(noanswer)/4 as noanswer,
+		sum(failed)/4 as failed,
+		sum(disconnect)/4 as disconnect
+		from systemstats
+		where date >= date_sub(now(), interval 4 week)
+		group by dayofweek
 ";
 
 $daysofweek = array( 1 => "Sunday", 2 => "Monday", 3 => "Tuesday", 4 => "Wednesday", 5 => "Thursday", 6 => "Friday", 7 => "Saturday");
 
 $result = Query($query);
 
-$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
+$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array(), "F" => array(), "X" => array());
 
 $x_titles = array();
 while ($row = DBGetRow($result)) {
@@ -48,6 +50,8 @@ while ($row = DBGetRow($result)) {
 	$data["M"][$row[0]-1] = $row[2];
 	$data["B"][$row[0]-1] = $row[3];
 	$data["N"][$row[0]-1] = $row[4];
+	$data["F"][$row[0]-1] = $row[5];
+	$data["X"][$row[0]-1] = $row[6];
 }
 
 //var_dump($data);
@@ -56,10 +60,10 @@ while ($row = DBGetRow($result)) {
 $max = 0;
 for ($x =0; $x < 7; $x++) {
 
-	foreach (array("A","M","B","N") as $type) {
+	foreach (array("A","M","B","N","F","X") as $type) {
 		if (!isset($data[$type][$x]))
 			$data[$type][$x] = 0;
-		if ($type == "B" || $type == "N")
+		if ($type == "B" || $type == "N" || $type == "F" || $type == "X")
 			$data[$type][$x] = -$data[$type][$x];
 	}
 
@@ -90,17 +94,25 @@ $b2plot = new BarPlot($data["M"]);
 $b2plot->SetFillColor($cpcolors["M"]);
 $b2plot->SetLegend("Machine");
 
-$b3plot = new BarPlot($data["B"]);
-$b3plot->SetFillColor($cpcolors["B"]);
-$b3plot->SetLegend("Busy");
+$b3plot = new BarPlot($data["X"]);
+$b3plot->SetFillColor($cpcolors["X"]);
+$b3plot->SetLegend("Disconnect");
 
-$b4plot = new BarPlot($data["N"]);
-$b4plot->SetFillColor($cpcolors["N"]);
-$b4plot->SetLegend("No Answer");
+$b4plot = new BarPlot($data["F"]);
+$b4plot->SetFillColor($cpcolors["F"]);
+$b4plot->SetLegend("Fail");
+
+$b5plot = new BarPlot($data["B"]);
+$b5plot->SetFillColor($cpcolors["B"]);
+$b5plot->SetLegend("Busy");
+
+$b6plot = new BarPlot($data["N"]);
+$b6plot->SetFillColor($cpcolors["N"]);
+$b6plot->SetLegend("No Answer");
 
 
 // Create the grouped bar plot
-$gbplot = new AccBarPlot(array($b4plot,$b3plot,$b2plot,$b1plot));
+$gbplot = new AccBarPlot(array($b6plot, $b5plot, $b4plot,$b3plot,$b2plot,$b1plot));
 
 // ...and add it to the graph
 $graph->Add($gbplot);
