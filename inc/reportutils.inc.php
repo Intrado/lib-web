@@ -115,7 +115,7 @@ function createPdfParams($filename){
 	return $params;
 }
 
-function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $deliverymethod = ""){
+function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $deliverymethod = ""){
 	global $USER;
 	//expects unix time stamps as input
 	//returns any jobs between the date range.
@@ -128,11 +128,14 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $d
 		$userJoin = "";
 	}
 	$deliveryquery = " ";
-	if("phone" == $deliverymethod)
-		$deliveryquery .= " and j.phonemessageid is not null ";
-	else if("email" == $deliverymethod)
-		$deliveryquery .= " and j.emailmessageid is not null ";	
-		
+	$surveydeliveryquery = "";
+	if("phone" == $deliverymethod){
+		$deliveryquery = " and j.phonemessageid is not null ";
+		$surveydeliveryquery = " OR sq.hasphone != '0' ";
+	} else if("email" == $deliverymethod) {
+		$deliveryquery = " and j.emailmessageid is not null ";	
+		$surveydeliveryquery = " OR sq.hasemail != '0'";
+	}	
 	$surveyfilter = "";
 	if($surveyonly == "true"){
 		$surveyfilter = " and j.questionnaireid is not null ";
@@ -146,12 +149,15 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = null, $d
 	if($jobtypes != ""){
 		$jobtypequery = " and j.jobtypeid in ('" . $jobtypes . "') ";
 	}
-	$joblist = QuickQueryList("select j.id from job j where ( (j.startdate >= '$startdate' and j.startdate < date_add('$enddate',interval 1 day) )
+	$joblist = QuickQueryList("select j.id from job j 
+							left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
+							where ( (j.startdate >= '$startdate' and j.startdate < date_add('$enddate',interval 1 day) )
 							or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$startdate' and j.startdate <= date_add('$enddate',interval 1 day)
 							and j.status in ('active', 'complete', 'cancelled')
 							$userJoin 
 							$surveyfilter
 							$deliveryquery
+							$surveydeliveryquery
 							$jobtypequery");
 	return $joblist;
 }
