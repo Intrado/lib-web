@@ -83,7 +83,7 @@ $graph->SetScale("textlin");
 $graph->SetFrame(false);
 
 //$graph->SetShadow();
-$graph->img->SetMargin(40,90,20,70);
+$graph->img->SetMargin(60,90,20,70);
 
 // Create the bar plots
 $b1plot = new BarPlot($data["A"]);
