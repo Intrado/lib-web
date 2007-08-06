@@ -61,7 +61,7 @@ if(CheckFormSubmit($form,$section))
 			error("The earliest call time must be before the latest call time");
 		} elseif(GetFormData($form, $section, "name") == ""){
 			error("Profile names cannot be blank");
-		} elseif(QuickQuery("select count(*) from access where name = '"  . DBSafe(GetFormData($form,$section,"name")) . "'")){
+		} elseif(QuickQuery("select count(*) from access where name = '"  . DBSafe(GetFormData($form,$section,"name")) . "' and id != '" . $_SESSION['accessid'] . "'")){
 			error("This profile name already exists, please choose another");
 		} else {
 			//submit changes
