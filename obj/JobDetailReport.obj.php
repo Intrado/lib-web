@@ -59,7 +59,7 @@ class JobDetailReport extends ReportGenerator{
 			rp.pkey,
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
-			rp.type,
+			rp.type as jobtype,
 			coalesce(m.name, sq.name) as messagename,
 			coalesce(rc.phone,
 						rc.email,
@@ -70,12 +70,10 @@ class JobDetailReport extends ReportGenerator{
 							coalesce(rc.state,''), ' ',
 							coalesce(rc.zip,''))
 					) as destination,
-			rc.numattempts,
 			from_unixtime(rc.starttime/1000) as lastattempt,
 			coalesce(rc.result,
 					rp.status) as result,
 			rp.status,
-			rp.type as jobtype,
 			rc.numattempts as attempts,
 			rc.resultdata,
 			sw.resultdata
@@ -212,21 +210,20 @@ class JobDetailReport extends ReportGenerator{
 						4 => "Last Name",
 						5 => "Message",
 						7 => "Destination",
-						8 => "Attempts",
-						9 => "Last Attempt",
-						10 => "Last Result");
-		$count=16;
+						11 => "Attempts",
+						8 => "Last Attempt",
+						9 => "Last Result");
+		$count=14;
 		foreach($fieldlist as $index => $field){
 			$titles[$count] = $field;
 			$count++;
 		}
 			
 		$formatters = array(5 => "fmt_message",
-							6 => "fmt_limit_25",
 							7 => "fmt_destination",
-							8 => "fmt_attempts",
-							9 => "fmt_date",
-							10 => "fmt_result");
+							11 => "fmt_attempts",
+							8 => "fmt_date",
+							9 => "fmt_result");
 		showTable($data,$titles,$formatters);
 		echo "</table>";
 		showPageMenu($total,$pagestart,500);
@@ -258,7 +255,7 @@ class JobDetailReport extends ReportGenerator{
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
-		$activefields = $options['activefields'];
+		$activefields = explode(",", $options['activefields']);
 		
 		
 		header("Pragma: private");
@@ -270,11 +267,17 @@ class JobDetailReport extends ReportGenerator{
 	
 	
 		$issurvey = false;
-		if (isset($options['jobid']) && $options['jobid']) {
-			$job = new Job($options['jobid']);
-			if ($job->questionnaireid) {
-				$issurvey = true;
-				$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
+		$maxquestions = 0;
+		if(isset($this->params['joblist']) && $this->params['joblist']!= ""){
+			$joblist = explode("','", $this->params['joblist']);
+			foreach($joblist as $jobid){
+				$job = new Job($jobid);
+				if($job->questionnaireid != null){
+					$issurvey = true;
+					$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
+					if($numquestions > $maxquestions)
+						$maxquestions = $numquestions;
+				}
 			}
 		}
 	
@@ -283,7 +286,7 @@ class JobDetailReport extends ReportGenerator{
 		
 		
 		if (isset($issurvey) && $issurvey) {
-			for ($x = 1; $x <= $numquestions; $x++) {
+			for ($x = 1; $x <= $maxquestions; $x++) {
 				$header .= ",Question $x";
 			}
 		}
@@ -296,41 +299,41 @@ class JobDetailReport extends ReportGenerator{
 		$result = Query($query);
 	
 		while ($row = DBGetRow($result)) {
-			$row[5] = html_entity_decode(fmt_destination($row,5));
-			$row[6] = (isset($row[6]) ? $row[6] : "");
+			$row[7] = html_entity_decode(fmt_destination($row,7));
+			$row[11] = (isset($row[11]) ? $row[11] : "");
 			
 	
-			if (isset($row[7])) {
-				$time = strtotime($row[7]);
+			if (isset($row[8])) {
+				$time = strtotime($row[8]);
 				if ($time !== -1 && $time !== false)
-					$row[7] = date("m/d/Y H:i",$time);
+					$row[8] = date("m/d/Y H:i",$time);
 			} else {
-				$row[7] = "";
+				$row[8] = "";
 			}
-			$row[8] = fmt_result($row,8);
+			$row[9] = fmt_result($row,9);
 	
 	
-			$reportarray = array($row[12],$row[10],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[7],$row[8]);
+			$reportarray = array($row[0], $row[1], $row[5],$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
 	
 			if ($issurvey) {
 				//fill in survey result data, be sure to fill in an array element for all questions, even if blank
 				$startindex = count($reportarray);
 	
 				$questiondata = array();
-				if ($row[3] == "phone")
-					parse_str($row[14],$questiondata);
-				else if ($row[3] == "email")
-					parse_str($row[15],$questiondata);
+				if ($row[5] == "phone")
+					parse_str($row[12],$questiondata);
+				else if ($row[5] == "email")
+					parse_str($row[13],$questiondata);
 	
 				//add data to the report for each question
-				for ($x = 0; $x < $numquestions; $x++) {
+				for ($x = 0; $x < $maxquestions; $x++) {
 					$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
 				}
 			}
 			$count=0;
 			foreach($fieldlist as $index => $field){
 				if(in_array($index, $activefields)){
-					$reportarray[] = $row[16+$count];
+					$reportarray[] = $row[14+$count];
 				}
 				$count++;
 			}
