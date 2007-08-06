@@ -220,7 +220,7 @@ StartWindow("List Content");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width=100%>
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader bottomBorder">Rules:<br><? print help('List_Rules', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Rules:<br><? print help('List_Rules'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;" valign="bottom">
 <?
 //ruleeditform expects $RULES to be set
@@ -249,7 +249,7 @@ if ($numAdd > 0) {
 ?>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader bottomBorder">Additions:<br><? print help('List_Additions', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Additions:<br><? print help('List_Additions'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;">
 <?
 if ($list->id) {
@@ -272,7 +272,7 @@ if ($numSkip > 0) {
 ?>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader bottomBorder">Skip:<br><? print help('List_Skip', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Skip:<br><? print help('List_Skip'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;">
 <?
 if ($list->id) {
@@ -291,23 +291,23 @@ if ($list->id) {
 ?>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Search Database:<br><? print help('List_SearchAndAdd', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader">Search Database:<br><? print help('List_SearchAndAdd'); ?></th>
 		<td style="padding: 5px;"><?= submit($f,'search','Search &amp; Add') ?></td>
 	</tr>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd'); ?></th>
 		<td style="padding: 5px;"><?= button("Enter Contacts",NULL,"addressmanualadd.php?id=new")?></td>
 	</tr>
 
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Address Book:<br><? print help('List_AddressBookAdd', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader">Address Book:<br><? print help('List_AddressBookAdd'); ?></th>
 		<td style="padding: 5px;"><?= button("Open Address Book",NULL,"addressesmanualadd.php"); ?></td>
 	</tr>
 
 <? if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) { ?>
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Upload List:<br><? print help('List_UploadList', NULL, 'grey'); ?></th>
+		<th align="right" valign="top" class="windowRowHeader">Upload List:<br><? print help('List_UploadList'); ?></th>
 		<td style="padding: 5px;"><?= button("Upload List",NULL,"uploadlist.php"); ?></td>
 	</tr>
 <? } ?>

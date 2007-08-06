@@ -189,7 +189,7 @@ switch($MESSAGETYPE)
 					<td rowspan="4">
 						<? NewFormItem($form, $section,"body","textarea",60,NULL,'id="bodytext"'); ?>
 					</td>
-					<th align="right" class="windowRowHeader bottomBorder" width="70">Audio Recording:<br><? print help('MessagePhone_AudioRecording', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader bottomBorder" width="70">Audio Recording:<br><? print help('MessagePhone_AudioRecording'); ?></th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="1" cellspacing="0">
 							<tr>
@@ -203,7 +203,7 @@ switch($MESSAGETYPE)
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Data Field:<br><? print help('MessagePhone_DataField', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader bottomBorder">Data Field:<br><? print help('MessagePhone_DataField'); ?></th>
 					<td class="bottomBorder"><select id="data" name="data">
 <?
 
@@ -223,7 +223,7 @@ switch($MESSAGETYPE)
 						</table></td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader">Text-to-Speech:<br><? print help('MessagePhone_TextToSpeech', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader">Text-to-Speech:<br><? print help('MessagePhone_TextToSpeech'); ?></th>
 					<td>
 <?
 		$fields = DBFindMany("Voice","from ttsvoice order by language, gender desc");
@@ -249,7 +249,7 @@ switch($MESSAGETYPE)
 		?>
 			<table border="0" cellpadding="3" cellspacing="0">
 				<tr>
-					<th width="70" class="windowRowHeader" align="right">Subject:<br><? print help('MessageEmail_Subject', NULL, 'grey'); ?></th>
+					<th width="70" class="windowRowHeader" align="right">Subject:<br><? print help('MessageEmail_Subject'); ?></th>
 					<td colspan="3">
 						<? NewFormItem($form, $section, 'subject', 'text', 30, 50,'id="subject"'); ?>
 					</td>
@@ -267,11 +267,11 @@ switch($MESSAGETYPE)
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessageEmail_Body', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessageEmail_Body'); ?></th>
 					<td>
 						<? NewFormItem($form, $section,"body","textarea",60,NULL,'id="bodytext"'); ?>
 					</td>
-					<th align="right" class="windowRowHeader" valign="top">Data Field:<br><? print help('MessageEmail_DataField', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader" valign="top">Data Field:<br><? print help('MessageEmail_DataField'); ?></th>
 					<td valign="top">
 						<select id="data" name="data">
 <?
@@ -299,7 +299,7 @@ switch($MESSAGETYPE)
 		?>
 			<table border="0" cellpadding="3" cellspacing="0">
 				<tr>
-					<th width="70" align="right" class="windowRowHeader bottomBorder" valign="top">Header:<br><? print help('MessagePrint_Header', NULL, 'grey'); ?></th>
+					<th width="70" align="right" class="windowRowHeader bottomBorder" valign="top">Header:<br><? print help('MessagePrint_Header'); ?></th>
 					<td colspan="3" class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0">
 							<tr><td>Line 1:</td><td><? NewFormItem($form, $section, 'header1', 'text', 30, NULL,'id="header1"'); ?></td></tr>
@@ -309,18 +309,18 @@ switch($MESSAGETYPE)
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">From Address:<br><? print help('MessagePrint_FromAddress', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader bottomBorder">From Address:<br><? print help('MessagePrint_FromAddress'); ?></th>
 					<td colspan="3" class="bottomBorder">
 						<? NewFormItem($form, $section, 'fromaddress', 'textarea', 35); ?>
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessagePrint_Body', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessagePrint_Body'); ?></th>
 					<td>
 						<? NewFormItem($form, $section,"body","textarea",60,NULL,'id="bodytext"'); ?>
 						<!--<textarea cols="75" rows="20" id="body" name="body" onChange="if(document.selection) this.sel = document.selection.createRange();"><? print $message->body; ?></textarea>-->
 					</td>
-					<th align="right" valign="top" class="windowRowHeader" width="70" style="padding-top: 6px;">Data Field:<br><? print help('MessagePrint_DataField', NULL, 'grey'); ?></th>
+					<th align="right" valign="top" class="windowRowHeader" width="70" style="padding-top: 6px;">Data Field:<br><? print help('MessagePrint_DataField'); ?></th>
 					<td align="left" valign="top">
 						<select id="data" name="data">
 <?

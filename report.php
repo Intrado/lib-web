@@ -495,7 +495,7 @@ if (isset($_GET['csv'])) {
 				case 'phone':
 	?>
 					<tr>
-						<th class="windowRowHeader bottomBorder" align="right">Phone:<br><? print help('ReportResults_Phone', NULL, 'grey'); ?></th>
+						<th class="windowRowHeader bottomBorder" align="right">Phone:<br><? print help('ReportResults_Phone'); ?></th>
 						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "People", 6 => "Duplicates Removed", 2 => "% Complete", 3 => "Delivered", 4 => "Undelivered", 5 => "Remaining"),array(2=>"fmt_percent", 7=>"fmt_percent")); ?></table></td>
 					</tr>
 	<?
@@ -503,7 +503,7 @@ if (isset($_GET['csv'])) {
 				case 'email':
 	?>
 					<tr>
-						<th class="windowRowHeader bottomBorder" align="right">Email:<br><? print help('ReportResults_Email', NULL, 'grey'); ?></th>
+						<th class="windowRowHeader bottomBorder" align="right">Email:<br><? print help('ReportResults_Email'); ?></th>
 						<td class="bottomBorder"><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "Total", 2 => "% Completed", 5 => "Remaining"),array(2=>"fmt_percent")); ?></table></td>
 					</tr>
 	<?
@@ -511,7 +511,7 @@ if (isset($_GET['csv'])) {
 				case 'print':
 	?>
 					<tr>
-						<th class="windowRowHeader" align="right">Print:<br><? print help('ReportResults_Print', NULL, 'grey'); ?></th>
+						<th class="windowRowHeader" align="right">Print:<br><? print help('ReportResults_Print'); ?></th>
 						<td ><table border="0" cellpadding="3" cellspacing="1" class="border"><? showTable(array($item),array(1 => "Total", 2 => "% Completed", 5 => "Remaining"),array(2=>"fmt_percent")); ?></table></td>
 					</tr>
 	<?

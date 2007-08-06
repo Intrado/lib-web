@@ -54,7 +54,7 @@ Name: <input type="text" name="name" size="30"> &nbsp;&nbsp; Description: <input
 <? startWindow("Report Settings"); ?>
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
-<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Report Type:<br><? print help('ReportOptions_ReportType', NULL, 'grey'); ?></th>
+<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Report Type:<br><? print help('ReportOptions_ReportType'); ?></th>
 <td class="bottomBorder">
 	<table>
 		<tr>
@@ -131,7 +131,7 @@ foreach ($jobs as $job) {
 </td>
 </tr>
 
-<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Report Options:<br><? print help('ReportOptions_ReportOptions', NULL, 'grey'); ?></th>
+<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Report Options:<br><? print help('ReportOptions_ReportOptions'); ?></th>
 <td class="bottomBorder">
 	<table>
 
@@ -206,7 +206,7 @@ foreach ($jobs as $job) {
 </td>
 </tr>
 
-<tr valign="top"><th align="right" class="windowRowHeader">Filter Options:<br><? print help('ReportOptions_FilterOptions', NULL, 'grey'); ?></th>
+<tr valign="top"><th align="right" class="windowRowHeader">Filter Options:<br><? print help('ReportOptions_FilterOptions'); ?></th>
 <td>
 
 

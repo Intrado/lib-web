@@ -171,7 +171,7 @@ startWindow('Import Information ');
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Settings:<br><? print help('ImportEditor_Settings', NULL, 'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Settings:<br><? print help('ImportEditor_Settings'); ?></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -197,7 +197,7 @@ startWindow('Import Information ');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">*Automated upload:<br><? print help('ImportEditor_AutomatedUpload', NULL, 'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">*Automated upload:<br><? print help('ImportEditor_AutomatedUpload'); ?></th>
 		<td class="bottomBorder">
 			<table border="0" cellspacing="0" cellpadding="2">
 				<tr><td><? NewFormItem($form, $section, 'automaticimport', 'checkbox'); ?> Automatically run data import when upload completes. <br>[Uncheck this box when configuring import mapping or changing data fields.]</td></tr>
@@ -205,7 +205,7 @@ startWindow('Import Information ');
 		</td>
 	</tr>
 	<tr>
-		<th align="right" class="windowRowHeader">*Associated Jobs:<br><? print help('ImportEditor_AssociatedJobs', NULL, 'grey'); ?></th>
+		<th align="right" class="windowRowHeader">*Associated Jobs:<br><? print help('ImportEditor_AssociatedJobs'); ?></th>
 		<td >
 <?
 			if(count($repeatingjobs)==0){

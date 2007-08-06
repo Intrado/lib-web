@@ -291,7 +291,7 @@ startWindow('Global System Settings');
 				if($IS_COMMSUITE) {
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job Type/<br>Priorities:<br><? print help('Settings_JobTypes', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job Type/<br>Priorities:<br><? print help('Settings_JobTypes'); ?></th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="0" cellspacing="0" width="60%">
 							<tr>
@@ -317,7 +317,7 @@ startWindow('Global System Settings');
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Customer Display Name:<br><? print help('Settings_CustDisplayName', NULL, 'grey'); ?>
+						Customer Display Name:<br><? print help('Settings_CustDisplayName'); ?>
 					</th>
 					<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 255);  ?></td>
 				<tr>
@@ -326,7 +326,7 @@ startWindow('Global System Settings');
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Survey URL:<br><? print help('Settings_SurveyURL', NULL, 'grey'); ?>
+						Survey URL:<br><? print help('Settings_SurveyURL'); ?>
 					</th>
 					<td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100);  ?></td>
 				<tr>
@@ -334,7 +334,7 @@ startWindow('Global System Settings');
 				}
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Retry Setting:<br><? print help('Settings_RetrySetting', NULL, 'grey'); ?></th>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Retry Setting:<br><? print help('Settings_RetrySetting'); ?></th>
 					<td>
 						<table border="0" cellpadding="2" cellspacing="0">
 							<tr>
@@ -360,7 +360,7 @@ startWindow('Global System Settings');
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Disable Repeating Jobs:<br><? print help('Settings_DisableRepeat', NULL, 'grey'); ?>
+						Disable Repeating Jobs:<br><? print help('Settings_DisableRepeat'); ?>
 					</th>
 					<td>
 						<table border="0" cellpadding="2" cellspacing="0">
@@ -372,7 +372,7 @@ startWindow('Global System Settings');
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Default Caller ID Number:<br><? print help('Settings_CallerID', NULL, 'grey'); ?>
+						Default Caller ID Number:<br><? print help('Settings_CallerID'); ?>
 					</th>
 					<td>
 					<? NewFormItem($f, $s, 'callerid', 'text', 20);  ?>
@@ -381,7 +381,7 @@ startWindow('Global System Settings');
 
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Default Local Area Code:<br><? print help('Settings_DefaultLocalAreaCode', NULL, 'grey'); ?>
+						Default Local Area Code:<br><? print help('Settings_DefaultLocalAreaCode'); ?>
 					</th>
 					<td>
 					<? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?>
@@ -389,7 +389,7 @@ startWindow('Global System Settings');
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Autoreport Email address:<br><? print help('Settings_AutoreportEmailAddress', NULL, 'grey'); ?>
+						Autoreport Email address:<br><? print help('Settings_AutoreportEmailAddress'); ?>
 					</th>
 					<td>
 					<? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 30,100);  ?>
@@ -397,7 +397,7 @@ startWindow('Global System Settings');
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Autoreport Email Name:<br><? print help('Settings_AutoreportEmailName', NULL, 'grey'); ?>
+						Autoreport Email Name:<br><? print help('Settings_AutoreportEmailName'); ?>
 					</th>
 					<td>
 					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
@@ -408,7 +408,7 @@ startWindow('Global System Settings');
 ?>
 					<tr>
 						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-							Minimum Extensions Length:<br><? print help('Settings_MinimumExtensions', NULL, 'grey'); ?>
+							Minimum Extensions Length:<br><? print help('Settings_MinimumExtensions'); ?>
 						</th>
 						<td>
 						<? NewFormItem($f, $s, 'easycallmin', 'text', 3,3);  ?>
@@ -416,7 +416,7 @@ startWindow('Global System Settings');
 					</tr>
 					<tr>
 						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-							Maximum Extensions Length:<br><? print help('Settings_MaximumExtensions', NULL, 'grey'); ?>
+							Maximum Extensions Length:<br><? print help('Settings_MaximumExtensions'); ?>
 						</th>
 						<td>
 						<? NewFormItem($f, $s, 'easycallmax', 'text', 3,3);  ?>
@@ -427,7 +427,7 @@ startWindow('Global System Settings');
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Minimum Username Length:<br><? print help('Settings_MinimumUsername', NULL, 'grey'); ?>
+						Minimum Username Length:<br><? print help('Settings_MinimumUsername'); ?>
 					</th>
 					<td>
 					<? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?>
@@ -435,7 +435,7 @@ startWindow('Global System Settings');
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Minimum Password Length:<br><? print help('Settings_MinimumPassword', NULL, 'grey'); ?>
+						Minimum Password Length:<br><? print help('Settings_MinimumPassword'); ?>
 					</th>
 					<td>
 					<? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?>
@@ -443,7 +443,7 @@ startWindow('Global System Settings');
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Very Secure Passwords:<br><? print help('Settings_VerySecurePasswords', NULL, 'grey'); ?>
+						Very Secure Passwords:<br><? print help('Settings_VerySecurePasswords'); ?>
 					</th>
 					<td>
 					<? NewFormItem($f,$s,'checkpassword','checkbox') ?>
@@ -454,7 +454,7 @@ startWindow('Global System Settings');
 
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Systemwide Alert Message:<br><? print help('Settings_SystemwideAlert', NULL, 'grey'); ?>
+						Systemwide Alert Message:<br><? print help('Settings_SystemwideAlert'); ?>
 					</th>
 					<td>
 						<? NewFormItem($f, $s, 'alertmessage', 'textarea',50);  ?>

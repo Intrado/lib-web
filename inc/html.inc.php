@@ -1,6 +1,6 @@
 <?
 
-function help($title, $extrahtml = NULL, $color = NULL) {
+function help($title, $extrahtml = NULL, $style = NULL) {
 	$contents = @file_get_contents('hover' . DIRECTORY_SEPARATOR . $title . '.txt');
 	//$contents = nl2br(preg_replace('/($|\\r\\n\\r\\n)[^\\r\\n:]+?:/', '<span class="hovertitle">\\0</span>', $contents ));
 
@@ -14,7 +14,7 @@ function help($title, $extrahtml = NULL, $color = NULL) {
 	$contents = nl2br($contents);
 
 	$hover = '<span class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
-	$hover .= '<img align="absmiddle" src="img/helpcenter' . ($color ? '_' . $color : "") . '.gif"';
+	$hover .= '<img align="absmiddle" src="img/helpcenter' . ($style ? '_' . $style : "") . '.gif"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	if ($link != "")

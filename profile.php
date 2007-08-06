@@ -246,7 +246,7 @@ startWindow('Allowed Functions');
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Login:<br><? print help('Profile_Login',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Login:<br><? print help('Profile_Login'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -265,7 +265,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Start Page:<br><? print help('Profile_StartPage',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Start Page:<br><? print help('Profile_StartPage'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -284,7 +284,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Messages:<br><? print help('Profile_Messages',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Messages:<br><? print help('Profile_Messages'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -336,7 +336,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Lists:<br><? print help('Profile_Lists',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Lists:<br><? print help('Profile_Lists'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -355,7 +355,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Data:<br><? print help('Profile_Data',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Data:<br><? print help('Profile_Data'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr valign="top">
@@ -372,7 +372,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Jobs:<br><? print help('Profile_Jobs',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Jobs:<br><? print help('Profile_Jobs'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -403,7 +403,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Reports:<br><? print help('Profile_Reports',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Reports:<br><? print help('Profile_Reports'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -414,7 +414,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Security:<br><? print help('Profile_Security',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Security:<br><? print help('Profile_Security'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -433,7 +433,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Contacts:<br><? print help('Profile_Contacts',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Contacts:<br><? print help('Profile_Contacts'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
@@ -444,7 +444,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Systemwide View:<br><? print help('Profile_SystemwideView',NULL,'grey'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Systemwide View:<br><? print help('Profile_SystemwideView'); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>

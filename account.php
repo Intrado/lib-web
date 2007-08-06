@@ -218,7 +218,7 @@ startWindow('User Information');
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-					<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('Account_AccessCredentials', NULL, 'grey'); ?></th>
+					<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('Account_AccessCredentials'); ?></th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="1" cellspacing="0">
 							<tr>
