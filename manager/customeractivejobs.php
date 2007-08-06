@@ -2,94 +2,229 @@
 include_once("common.inc.php");
 include_once("../inc/table.inc.php");
 
-$customer = "";
-$user="";
-$authcustomer = "";
-$shardcustomer = "";
-$userid = "";
+
 if(isset($_GET['customer'])){
-	$customerid = $_GET['customer']+0;
-	$authcustomer = "and c.id = '$customerid'";
-	$shardcustomer = "and qj.customerid = '$customerid'";
-} 
-if(isset($_GET['user'])){
-	$userid = $_GET['user']+0;
-	$user = "and qj.userid = '$userid'";
+	$customerid = $_GET['customer'] + 0;
+} else if(isset($_GET['user'])){
+	$userid = $_GET['user'];
+	$extra = "and user.id = '$userid'";
+} else {
+	$extra = "";
 }
 
-function fmt_date($row, $index){
-	$date = date("M j, g:i a", strtotime($row[$index] . " " . $row[$index+1]));
-	return $date;
+
+
+
+/*
+
+//TODO filter for a customer
+
+
+foreach shard:
+
+select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
+		jt.status, j.phonetaskcount, j.timeslices, count(*)
+from qjobtask jt
+straight_join qjob j on (j.id = jt.jobid and j.customerid = jt.customerid)
+group by jt.status, jt.customerid, jt.jobid, jt.type, jt.attempts, jt.sequence
+
+order by j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence, jt.status
+
+
+
+show by
+syspri
+	customer
+		job (totalphone, timeslices)
+			type
+				attempt
+					sequence
+
+*/
+
+function fmt_html ($row,$index) {
+	return $row[$index];
 }
 
-function calc_done($row, $index){
-
-	return $row[$index-2] - $row[$index-1];
+function fmt_number ($row,$index) {
+	if ($row[$index])
+		return number_format($row[$index]);
+	else
+		return "";
 }
 
-$titles = array("0" => "Shard Name",
-				"1" => "Customer ID",
-				"2" => "User ID",
-				"3" => "Job ID",
-				"4" => "Status",
-				"5" => "System Priority",
-				"6" => "Time Slices",
-				"7" => "TimeZone",
-				"8" => "Start Date/Time",
-				"10" => "End Date/Time",
-				"12" => "Total Tasks",
-				"13" => "Inprog",
-				"14" => "Done");
-
-
-
-
-$result = Query("select s.name, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where 1 $authcustomer ");
-$conninfo = array();
-while($row = DBGetRow($result)){
-	$conninfo[] = $row;
+$res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
+$shards = array();
+while($row = DBGetRow($res)){
+	$shards[$row[0]] = $db = mysql_connect($row[1], $row[2], $row[3]);
+	mysql_select_db("aspshard",$db);
 }
 
-foreach($conninfo as $conn){
-	if($custdb = DBConnect($conn[1], $conn[2], $conn[3], "aspshard")){
-		$query = "select qj.customerid,
-					qj.userid, 
-					qj.id,
-					qj.status,
-					qj.systempriority,
-					qj.timeslices,
-					qj.timezone,
-					qj.startdate,
-					qj.starttime,
-					qj.enddate,
-					qj.endtime,
-					qj.phonetaskcount,
-					sum(qjt.jobid = qj.id and qjt.customerid = qj.customerid)
-					from qjob qj
-					left join qjobtask qjt on (qjt.jobid = qj.id)
-					where qj.status = 'active'
-					$shardcustomer
-					$user
-					group by qj.id
-					order by qj.id";
-			
-		$result = Query($query, $custdb);
-		$data = array();
-		while($row = DBGetRow($result)){
-			$data[] = array_merge(array($conn[0]), $row);
-		}
-		
+
+$customers = QuickQueryList("select id, urlcomponent from customer",true);
+
+
+$calldata = array();
+$jobs = array();
+foreach ($shards as $shardid => $sharddb) {
+	$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
+					jt.status, j.phonetaskcount, j.timeslices, count(*)
+			from qjobtask jt
+			straight_join qjob j on (j.id = jt.jobid and j.customerid = jt.customerid)
+			group by jt.status, jt.customerid, jt.jobid, jt.type, jt.attempts, jt.sequence
+			order by j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence
+			";
+	$res = Query($query,$sharddb);
+	while ($row = DBGetRow($res)) {
+
+		$calldata[$row[0]][$row[1]][$row[2]][$row[3]][$row[4]][$row[5]][$row[6]] = $row[9];
+
+		$jobs[$row[1]][$row[2]]["phonetaskcount"] = $row[7];
+		@$jobs[$row[1]][$row[2]]["phonetaskremaining"] += $row[9];
+
+
+		$jobs[$row[1]][$row[2]]["timeslices"] = $row[8];
 	}
+
 }
-include("nav.inc.php");	
+
+
+include("nav.inc.php");
+
+
+$prinames = array (1 => "Emergency", 2 => "Attendance", 3 => "General");
+$pricolors = array (1 => "#ff0000", 2 => "#ffff00", 3 => "#0000ff");
+
+
+
+
+foreach ($calldata as $pri => $pricalldata) {
+
+
+	$data = array();
+	$pritotals = array();
+	foreach ($pricalldata as $customerid => $custcalldata) {
+		$showcust = true;
+		foreach ($custcalldata as $jobid => $jobcalldata) {
+			$showjob = true;
+
+			@$pritotals["phonetaskremaining"] += $jobs[$customerid][$jobid]["phonetaskremaining"];
+			@$pritotals["phonetaskcount"] += $jobs[$customerid][$jobid]["phonetaskcount"];
+
+			$slicesize = $jobs[$customerid][$jobid]["timeslices"];
+			if ($slicesize) {
+				$slicesize = (int) ($jobs[$customerid][$jobid]["phonetaskcount"] / $slicesize);
+				@$pritotals["slicesize"] += $slicesize;
+			} else {
+				$slicesize = "&#8734;";
+			}
+
+			foreach ($jobcalldata as $type => $typecalldata) {
+				$showtype = true;
+				foreach ($typecalldata as $attempt => $attemptcalldata) {
+					$showattempt = true;
+					foreach ($attemptcalldata as $sequence => $sequencecalldata) {
+
+
+
+
+						$row = @array(
+								$showcust ? $customerid : "",
+								$showcust ? $customers[$customerid] : "",
+								$showjob ? $jobid : "",
+								$showjob ? $jobs[$customerid][$jobid]["phonetaskremaining"] : "",
+								$showjob ? $jobs[$customerid][$jobid]["phonetaskcount"] : "",
+								$showjob ? $slicesize : "",
+								$showtype ? $type : "",
+								$showattempt ? $attempt : "",
+								$sequence,
+								$sequencecalldata['active'],
+								$sequencecalldata['assigned'],
+								$sequencecalldata['progress'],
+								$sequencecalldata['pending'],
+								$sequencecalldata['waiting']
+							);
+						$data[] = $row;
+
+
+						@$pritotals["active"] += $sequencecalldata['active'];
+						@$pritotals["assigned"] += $sequencecalldata['assigned'];
+						@$pritotals["progress"] += $sequencecalldata['progress'];
+						@$pritotals["pending"] += $sequencecalldata['pending'];
+						@$pritotals["waiting"] += $sequencecalldata['waiting'];
+
+						$showcust = $showjob = $showtype = $showattempt = false;
+					}
+				}
+			}
+		}
+	}
+
+
+	$totalsrow = array ("<b>Total</b>",
+						"",
+						"",
+						$pritotals["phonetaskremaining"],
+						$pritotals["phonetaskcount"],
+						$pritotals["slicesize"] ? $pritotals["slicesize"] : "&#8734;",
+						"",
+						"",
+						"",
+						$pritotals["active"],
+						$pritotals["assigned"],
+						$pritotals["progress"],
+						$pritotals["pending"],
+						$pritotals["waiting"]
+					);
+	$data[] = $totalsrow;
+
+
+
 ?>
-<table border=.2>
+	<h2 style="border: 3px solid <?= $pricolors[$pri] ?>;">Priority: <?=$prinames[$pri]?>
+	<table border=1>
 <?
-	showtable($data, $titles, array("8"=>"fmt_date", "10" => "fmt_date", "14" => "calc_done"));
+
+	$titles = array("Customer id",
+					"Customer url",
+					"Job id",
+					"job ph remain",
+					"job ph total",
+					"job throttle",
+					"Type",
+					"attempt",
+					"sequence",
+					"Active",
+					"Assigned",
+					"Progress",
+					"Pending",
+					"Waiting"
+				);
+	$formatters = array (0 => "fmt_html",
+						3 => "fmt_number",
+						4 => "fmt_number",
+						5 => "fmt_html",
+						9 => "fmt_number",
+						10 => "fmt_number",
+						11 => "fmt_number",
+						12 => "fmt_number",
+						13 => "fmt_number"
+
+		);
+
+	showTable($data, $titles, $formatters);
+
 ?>
-</table>
+	</table>
+	</h2>
+<?
+
+}
+
+?>
+
+
 <div > All time stamps are in customer time. </div>
 <?
 include("navbottom.inc.php");
 ?>
-			
