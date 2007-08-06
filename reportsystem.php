@@ -31,7 +31,8 @@ if (!$USER->authorize('viewusagestats')) {
 $groupby = FieldMap::getSchoolField(); //defaults to school f-field
 if(!$groupby)
 	$groupby = ""; //but if school is not used, default to blank
-$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+$fields = DBFindMany("FieldMap", "from fieldmap where options like '%multisearch%'");
+$hideusers = 0;
 $type = "phone";
 $reldate = "monthtodate";
 $f = "system";
@@ -59,9 +60,10 @@ if(CheckFormSubmit($f,$s))
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
 		} else {
-			$groupby = GetFormData($f, $s, "groupby");
+			$groupby = DBSafe(GetFormData($f, $s, "groupby"));
 			$reldate = GetFormData($f, $s, "relativedate");
-			$type = GetFormData($f, $s, "type");
+			$type = DBSafe(GetFormData($f, $s, "type"));
+			$hideusers = GetFormData($f, $s, "hideusers");
 		}
 	}
 } else {
@@ -73,6 +75,7 @@ if($reload){
 	PutFormData($f, $s, "phone", "1", "bool", 0, 1);
 	PutFormData($f, $s, "email", "1", "bool", 0, 1);
 	PutFormData($f, $s, "groupby", $groupby);
+	PutFormData($f, $s, "hideusers", $hideusers, "bool", 0, 1);
 	
 	PutFormData($f, $s, "relativedate", $reldate);
 	PutFormData($f, $s, 'xdays', isset($lastxdays) ? $lastxdays : "0", "number");
@@ -97,10 +100,10 @@ if($reload){
 		$startdate = strtotime($startdate);
 		$enddate = strtotime($enddate);
 	}
-
+	
 	$joblist = getJobList($startdate, $enddate, "", "", $type);
-	$joblistquery = " and j.id in ('" . implode("','", $joblist) . "') ";
-
+	$joblistquery = " and rp.jobid in ('" . implode("','", $joblist) . "') ";
+	$jobidtypelist = QuickQueryList("select id, jobtypeid from job j where j.id in ('" . implode("','",$joblist) ."') ", true);
 	$groupbyquery = "";
 	if($groupby != ""){
 		$groupbyquery = "rp." . $groupby;
@@ -122,21 +125,15 @@ if($reload){
 		$jobtypelist[$row[1]] = $row[0];
 	}
 	
-	$groupbylist = array();
-	if($groupby != "")
-		$groupbylist = QuickQueryList("select $groupby from reportperson group by $groupby");
-	
-	$query = "SELECT $groupbyquery as field
-					, rp.userid,
-					j.jobtypeid,
-					count(*)
+	$query = "SELECT $groupbyquery as field,
+				rp.userid,
+				rp.jobid,
+				count(*)
 				from reportperson rp 
-				inner join job j on (rp.jobid = j.id)
 				where rp.status in ('fail', 'success')
 				$joblistquery
-				group by $groupbyorder j.jobtypeid, rp.userid
-				order by $groupbyorder rp.userid";
-	
+				group by $groupbyorder rp.jobid, rp.userid";
+
 	$result = Query($query);
 	$data = array();
 	$userlistarray = array();
@@ -148,12 +145,10 @@ if($reload){
 		$userlistarray[$userid] = $jobtypearray;
 	}
 	$groupbyarray = array();
-	foreach($groupbylist as $item){
-		$groupbyarray[$item] = $userlistarray;
-	}
-	
 	while($row = DBGetRow($result)){
-		$groupbyarray[$row[0]][$row[1]][$row[2]] = $row[3];
+		if(!isset($groupbyarray[$row[0]]))
+			$groupbyarray[$row[0]]= $userlistarray;
+		$groupbyarray[$row[0]][$row[1]][$jobidtypelist[$row[2]]] += $row[3];
 	}
 	$schooltotals = array();
 	$systemtotal = 0;
@@ -220,12 +215,21 @@ startWindow("Display Options", "padding: 3px;");
 			<td>
 				<? 
 					NewFormItem($f, $s, "groupby", "selectstart");
-					NewFormItem($f, $s, "groupby", "selectoption", "User", "");
+					NewFormItem($f, $s, "groupby", "selectoption", "System", "");
 					foreach($fields as $field){
 						NewFormItem($f, $s, "groupby", "selectoption", $field->name, $field->fieldnum);
 					}
 					NewFormItem($f, $s, "groupby", "selectend");
 				?>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th align="right" class="windowRowHeader">Hide Users:</th>
+			<td>
+				<? 
+					NewFormItem($f, $s, "hideusers", "checkbox");
+				?>
+				Hide Users
 			</td>
 		</tr>
 	</table>
@@ -274,27 +278,30 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 			}
 ?>
 				<td><?=$schooltotals[$index]["total"]?></td>
-				<td>100%</td>
+				<td>100.00%</td>
 			</tr>
 <?
-			foreach($groupbyfield as $uindex => $user){
-				if($user["total"] == 0) continue;
-				echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
+			if(!$hideusers){
+				foreach($groupbyfield as $uindex => $user){
+					if($user["total"] == 0) continue;
+					echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-					<td>&nbsp;&nbsp;&nbsp;User: <?=$userlist[$uindex]?></td>
+						<td>&nbsp;&nbsp;&nbsp;User: <?=$userlist[$uindex]?></td>
 <?
-				$usertotal = 0;
-				foreach($jobtypelist as $jobtypeid => $jobtypename){
-					$usertotal += $user[$jobtypeid];
+					$usertotal = 0;
+					foreach($jobtypelist as $jobtypeid => $jobtypename){
+						$usertotal += $user[$jobtypeid];
 ?>
-					<td><?=$user[$jobtypeid]?></td>
+						<td><?=$user[$jobtypeid]?></td>
 <?
+					}
+?>
+						<td><?=$usertotal?></td>
+						<td><?=number_format($user["total"],2)?>%</td>
+					</tr>
+<?
+
 				}
-?>
-					<td><?=$usertotal?></td>
-					<td><?=number_format($user["total"],2)?>%</td>
-				</tr>
-<?
 			}
 		}
 ?>
