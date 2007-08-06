@@ -95,12 +95,12 @@ for ($x = 0; $x < 12; $x++) {
 
 
 // Create the graph. These two calls are always required
-$graph = new Graph($big ? 750 : 550, $big ? 450 : 300,"auto");
+$graph = new Graph($big ? 750 : 570, $big ? 450 : 300,"auto");
 $graph->SetScale("textlin");
 $graph->SetFrame(false);
 
 //$graph->SetShadow();
-$graph->img->SetMargin(40,80,20,70);
+$graph->img->SetMargin(60,90,20,70);
 
 // Create the bar plots
 $b1plot = new BarPlot($data["A"]);
