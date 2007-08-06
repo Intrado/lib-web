@@ -78,12 +78,8 @@ class User extends DBMappedObject {
 		return DBFindMany("Rule","from rule inner join userrule on rule.id = userrule.ruleid where userid = $this->id");
 	}
 
-	function userSQL ($alias = NULL) {
-		$string = "";
-		if ($alias){
-			$string = Rule::makeQuery($this->rules(), $alias);
-		}
-		return $string;
+	function userSQL ($alias = false) {
+		return Rule::makeQuery($this->rules(), $alias);
 	}
 
 	function getCustomer () {
