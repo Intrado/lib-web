@@ -87,7 +87,7 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->description = GetFormData($form, $section, 'description');
 
 				if (!$IMPORT->id)
-					$IMPORT->uploadkey = substr(md5($CUSTOMERURL . microtime()),5,12);
+					$IMPORT->uploadkey = md5($CUSTOMERURL . microtime());
 
 				$IMPORT->updatemethod = GetFormData($form, $section, 'updatemethod');
 				$IMPORT->status = 'idle';
