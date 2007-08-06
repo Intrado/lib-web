@@ -95,6 +95,7 @@ if($type == "subscription"){
 
 	
 	$options['jobid'] = $id;
+	$options['subname'] = $job->name;
 	$instance->setParameters($options);
 	$USER = new User($job->userid);
 	$generator->userid = $job->userid;
