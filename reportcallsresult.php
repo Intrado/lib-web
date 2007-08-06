@@ -210,11 +210,11 @@ if(isset($options['rules']) && $options['rules']){
 	startWindow("Search Results");
 		if(count($data) > 0){
 ?>
-	<div>Your search returned multiple persons.  Please choose one<div>
+			<div>Your search returned multiple persons.  Please choose one:<div>
 <?
 		} else {
 ?>
-			<div>Your search returned 0 results<div>
+			<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
 <?
 		}
 ?>		
