@@ -72,7 +72,7 @@ $NAVTREE = array (
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses"),
 		array("SMS","smsjobs.php","sendsms",$SUBTAB=="sms")
 		)),
-	array("Reports","reportsummary.php",array('createreport',"sendsms","viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
+	array("Reports","reports.php",array('createreport',"sendsms","viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
 		array("Reports", "reports.php", "createreport", $SUBTAB=="reports"),
 		array("SMS Report","reportsms.php?smsjobid=","sendsms",$SUBTAB=="sms"),
 		//give the report viewer the default of a "today" report if there was no previous report
