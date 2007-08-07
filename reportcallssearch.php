@@ -178,13 +178,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 			
 			$savedjobtypes = GetFormData($f, $s, 'jobtypes');
 			if($savedjobtypes)
-				$options['jobtypes'] = implode("','", DBSafe($savedjobtypes));
+				$options['jobtypes'] = DBSafe(implode("','", $savedjobtypes));
 			else
 				$options['jobtypes'] = "";
 			
 			$results = GetFormData($f, $s, "results");
 			if($results)
-				$options['results'] = implode("','", DBSafe($results));
+				$options['results'] = DBSafe(implode("','", $results));
 			else
 				$options['results'] = "";
 			
