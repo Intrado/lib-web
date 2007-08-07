@@ -925,8 +925,7 @@ IF NEW.status IN ('repeating') THEN
   -- copy the jobsettings
   INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
 
-  -- copy schedule
-  INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) SELECT id, custid, daysofweek, time, nextrun, tz FROM schedule WHERE id=NEW.scheduleid;
+  -- do not copy schedule because it was inserted via the insert_schedule trigger
 
 END IF;
 END
