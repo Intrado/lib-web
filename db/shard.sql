@@ -68,7 +68,6 @@ CREATE TABLE `qjob` (
   `endtime` time NOT NULL default '00:00:00',
   `status` enum('new','processing','procactive','active','cancelling','repeating') NOT NULL default 'new',
   `phonetaskcount` int(11) NOT NULL default '0',
-  `personcount` int(11) NOT NULL default '0',
   `processedcount` int (11) NOT NULL default '0',
   `systempriority` tinyint(4) NOT NULL default '3',
   `timeslices` smallint(6) NOT NULL default '0',
@@ -188,4 +187,12 @@ CREATE TABLE `specialtaskqueue` (
   UNIQUE KEY `uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- -------------------------
+
+CREATE TABLE `qjobperson` (
+`customerid` INT( 11 ) NOT NULL DEFAULT '0',
+`jobid` INT( 11 ) NOT NULL DEFAULT '0',
+`personid` INT( 11 ) NOT NULL DEFAULT '0',
+PRIMARY KEY (`customerid~,`jobid`,`personid`)
+) ENGINE = innodb;
 
