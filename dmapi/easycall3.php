@@ -21,7 +21,7 @@ if($REQUEST_TYPE == "new"){
 } else if($REQUEST_TYPE == "result"){
 
 	if(($specialtask->getData("origin") == "cisco") && ($specialtask->getData("progress") == "Done")){
-	
+
 		$USER = new User($specialtask->getData('userid'));
 		$ACCESS = new Access($USER->accessid);
 		$messages = array();
@@ -33,12 +33,12 @@ if($REQUEST_TYPE == "new"){
 			$langnum = "language" . $i;
 			$languages[$i] = $specialtask->getData($langnum);
 		}
-	
+
 		$job = Job::jobWithDefaults();
 		//get the job name, type, and messageid
-	
+
 		$name = $specialtask->getData('name');
-		
+
 		if (!$name)
 			$name = "EasyCall - " . date("M d, Y G:i:s");
 		$job->name = $name;
@@ -50,9 +50,9 @@ if($REQUEST_TYPE == "new"){
 		$numdays = $specialtask->getData('jobdays');
 		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 		$job->setOptionValue("retry",$specialtask->getData('jobretries'));
-		
+
 		if($messages) {
-			
+
 			foreach($messages as $index => $message){
 				if($languages[$index] == "Default"){
 					$job->phonemessageid = $message;
@@ -81,7 +81,7 @@ if($REQUEST_TYPE == "new"){
 	?> <ok /> <?
 
 } else {
-	?> 
+	?>
 		<voice sessionid="<?= $SESSIONID ?>">
 			<message>
 				<?
@@ -95,5 +95,6 @@ if($REQUEST_TYPE == "new"){
 			</message>
 		</voice>
 	<?
+	$SESSIONDATA = null;
 }
 ?>

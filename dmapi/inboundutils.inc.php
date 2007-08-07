@@ -7,7 +7,7 @@ include_once("../inc/utils.inc.php");
 
 function glog($s)
 {
-	//echo "GJB ".$s."\n";
+//	error_log("GJB ".$s);
 }
 
 function loadUser()

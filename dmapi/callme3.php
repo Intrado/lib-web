@@ -14,13 +14,15 @@ if($REQUEST_TYPE == "new"){
 	?>
 	<error>Easycall3: wanted result, got new </error>
 	<?
+	$SESSIONDATA=null;
+
 } else if($REQUEST_TYPE == "result"){
-	
+
 	$SESSIONDATA = null;
 	?> <ok /> <?
 
 } else {
-	?> 
+	?>
 		<voice sessionid="<?= $SESSIONID ?>">
 			<message>
 				<audio cmid="file://prompts/GoodBye.wav" />
@@ -28,5 +30,6 @@ if($REQUEST_TYPE == "new"){
 			</message>
 		</voice>
 	<?
+	$SESSIONDATA = null;
 }
 ?>

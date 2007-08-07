@@ -16,6 +16,7 @@ if($REQUEST_TYPE == "new") {
 	?>
 	<error> Got new when wanted continue </error>
 	<?
+	$SESSIONDATA=null;
 } else {
 	if(isset($BFXML_VARS['saveaudio']) &&  $BFXML_VARS['saveaudio']== 1){
 		$user = new user($specialtask->getData('userid'));

@@ -198,6 +198,10 @@ function confirmList($listname)
 
 /////////////////
 
+error_log("gjb list ".$REQUEST_TYPE);
+
+if($REQUEST_TYPE == "continue") {
+
 	// if they selected a list
 	if (isset($BFXML_VARS['listnumber'])) {
 
@@ -240,4 +244,9 @@ function confirmList($listname)
 	} else {
 		confirmContinue();
 	}
+
+} else {
+	$SESSIONDATA=null;
+}
+
 ?>

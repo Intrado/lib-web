@@ -403,6 +403,10 @@ function checkExpirationThenConfirm()
 
 //////////////////////////////
 
+error_log("gjb job ".$REQUEST_TYPE);
+
+if($REQUEST_TYPE == "continue") {
+
 	// if they entered the job options
 	if (isset($BFXML_VARS['numdays'])) {
 
@@ -550,6 +554,10 @@ function checkExpirationThenConfirm()
 	} else {
 		jobOptions();
 	}
+
+} else {
+	$SESSIONDATA=null;
+}
 
 
 ?>

@@ -16,6 +16,7 @@ if($REQUEST_TYPE == "new") {
 	?>
 	<error> Got new when wanted continue </error>
 	<?
+	$SESSIONDATA=null;
 } else{
 
 	if($BFXML_VARS['saveaudio'] == 1){

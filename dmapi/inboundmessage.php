@@ -260,6 +260,9 @@ function commitMessage($contentid)
 
 
 ///////////////////////////////
+error_log("gjb msg ".$REQUEST_TYPE);
+
+if($REQUEST_TYPE == "continue") {
 
 	// if they recorded a message, and asked to save
 	if (isset($BFXML_VARS['saveaudio'])) {
@@ -311,4 +314,9 @@ function commitMessage($contentid)
 	} else {
 		promptRecordMessage();
 	}
+
+} else {
+	$SESSIONDATA=null;
+}
+
 ?>

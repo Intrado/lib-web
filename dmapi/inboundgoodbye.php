@@ -25,4 +25,5 @@ function goodbye($jobSubmit=false)
 	} else {
 		goodbye();
 	}
+	$SESSIONDATA = null;
 ?>
