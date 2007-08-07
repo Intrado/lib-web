@@ -281,7 +281,7 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->authorize('viewsystemreports')) {
-		$reportLink = '&nbsp;|&nbsp;<a href="reportsummary.php?jobid=' . $id . '">Report</a>';
+		$reportLink = '&nbsp;|&nbsp;<a href="reportjobsummary.php?jobid=' . $id . '">Report</a>';
 	} else {
 		$reportLink = '';
 	}
