@@ -203,7 +203,6 @@ function customerinfo($custid, $source, $dest){
 	$destres = mysql_query("insert into setting (name, value) values
 								('inboundnumber', '$row[0]'),
 								('timezone', '$row[1]'),
-								('_customerid', '$custid'),
 								('displayname', '$row[2]'),
 								('_maxusers' , '$row2[0]')", $dest)
 							or die ("Failed to insert into setting: " . mysql_error($dest));

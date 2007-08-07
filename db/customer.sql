@@ -913,11 +913,10 @@ AFTER INSERT ON job FOR EACH ROW
 BEGIN
 DECLARE cc INTEGER;
 DECLARE tz VARCHAR(50);
-DECLARE custid INTEGER;
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 
 IF NEW.status IN ('repeating') THEN
   SELECT value INTO tz FROM setting WHERE name='timezone';
-  SELECT value INTO custid FROM setting WHERE name='_customerid';
 
   INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, thesql)
          VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.thesql);
@@ -936,9 +935,8 @@ AFTER UPDATE ON job FOR EACH ROW
 BEGIN
 DECLARE cc INTEGER;
 DECLARE tz VARCHAR(50);
-DECLARE custid INTEGER;
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 
-SELECT value INTO custid FROM setting WHERE name='_customerid';
 SELECT value INTO tz FROM setting WHERE name='timezone';
 
 SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
@@ -964,8 +962,7 @@ $$$
 CREATE TRIGGER delete_job
 AFTER DELETE ON job FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
-SELECT value INTO custid FROM setting WHERE name='_customerid';
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 -- only repeating jobs ever get deleted
 DELETE FROM aspshard.qjob WHERE customerid=custid AND id=OLD.id;
 DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.id;
@@ -975,10 +972,8 @@ $$$
 CREATE TRIGGER insert_jobsetting
 AFTER INSERT ON jobsetting FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 DECLARE cc INTEGER;
-
-SELECT value INTO custid FROM setting WHERE name='_customerid';
 
 -- the job must be inserted before the settings
 SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.jobid;
@@ -991,8 +986,7 @@ $$$
 CREATE TRIGGER update_jobsetting
 AFTER UPDATE ON jobsetting FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
-SELECT value INTO custid FROM setting WHERE name='_customerid';
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 UPDATE aspshard.qjobsetting SET value=NEW.value WHERE customerid=custid AND jobid=NEW.jobid AND name=NEW.name;
 END
 $$$
@@ -1000,8 +994,7 @@ $$$
 CREATE TRIGGER delete_jobsetting
 AFTER DELETE ON jobsetting FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
-SELECT value INTO custid FROM setting WHERE name='_customerid';
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.jobid AND name=OLD.name;
 END
 $$$
@@ -1009,10 +1002,9 @@ $$$
 CREATE TRIGGER insert_schedule
 AFTER INSERT ON schedule FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 DECLARE tz VARCHAR(50);
 
-SELECT value INTO custid FROM setting WHERE name='_customerid';
 SELECT value INTO tz FROM setting WHERE name='timezone';
 
 INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) VALUES (NEW.id, custid, NEW.daysofweek, NEW.time, NEW.nextrun, tz);
@@ -1022,8 +1014,7 @@ $$$
 CREATE TRIGGER update_schedule
 AFTER UPDATE ON schedule FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
-SELECT value INTO custid FROM setting WHERE name='_customerid';
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 UPDATE aspshard.qschedule SET daysofweek=NEW.daysofweek, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
 END
 $$$
@@ -1031,8 +1022,7 @@ $$$
 CREATE TRIGGER delete_schedule
 AFTER DELETE ON schedule FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
-SELECT value INTO custid FROM setting WHERE name='_customerid';
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 DELETE FROM aspshard.qschedule WHERE id=OLD.id AND customerid=custid;
 END
 $$$
@@ -1040,9 +1030,8 @@ $$$
 CREATE TRIGGER insert_reportsubscription
 AFTER INSERT ON reportsubscription FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 DECLARE tz VARCHAR(50);
-SELECT value INTO custid FROM setting WHERE name='_customerid';
 SELECT value INTO tz FROM setting WHERE name='timezone';
 INSERT INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) VALUES (NEW.id, custid, NEW.userid, NEW.type, NEW.daysofweek, NEW.dayofmonth, NEW.time, tz, NEW.nextrun, NEW.email);
 END
@@ -1051,8 +1040,7 @@ $$$
 CREATE TRIGGER update_reportsubscription
 AFTER UPDATE ON reportsubscription FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
-SELECT value INTO custid FROM setting WHERE name='_customerid';
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 UPDATE aspshard.qreportsubscription SET type=NEW.type, daysofweek=NEW.daysofweek, dayofmonth=NEW.dayofmonth, time=NEW.time, nextrun=NEW.nextrun, email=NEW.email WHERE id=NEW.id AND customerid=custid;
 END
 $$$
@@ -1060,26 +1048,22 @@ $$$
 CREATE TRIGGER delete_reportsubscription
 AFTER DELETE ON reportsubscription FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER;
-SELECT value INTO custid FROM setting WHERE name='_customerid';
+DECLARE custid INTEGER DEFAULT _CCXXZZY_;
 DELETE FROM aspshard.qreportsubscription WHERE id=OLD.id AND customerid=custid;
 END
 $$$
 
-
 create procedure start_import( in_importid int)
 begin
-declare l_custid int;
-select value+0 from setting where name='_customerid' into l_custid;
+declare l_custid int DEFAULT _CCXXZZY_;
 insert ignore into aspshard.importqueue (customerid,localimportid) values (l_custid,in_importid);
 end
 $$$
 
 create procedure start_specialtask( in_specialtaskid int)
 begin
-declare l_custid int;
+declare l_custid int DEFAULT _CCXXZZY_;
 declare l_type varchar(50);
-select value+0 from setting where name='_customerid' into l_custid;
 select type from specialtask where id=in_specialtaskid into l_type;
 insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid,type) values (l_custid,in_specialtaskid,l_type);
 end

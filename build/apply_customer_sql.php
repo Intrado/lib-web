@@ -28,6 +28,7 @@ foreach($data as $customer){
 
 	foreach ($sqlqueries as $sqlquery) {
 		if (trim($sqlquery)){
+			$sqlquery = str_replace('_CCXXZZY_', $customer[0], $sqlquery);
 			mysql_query($sqlquery,$custdb)
 				or die ("Failed to execute sql: " . mysql_error($custdb));
 		}

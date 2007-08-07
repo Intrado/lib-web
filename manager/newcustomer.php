@@ -199,7 +199,6 @@ if (CheckFormSubmit($f,$s)){
 							('inboundnumber', '" . DBSafe($inboundnum) . "'),
 							('_maxusers', '" . DBSafe($maxusers) . "'),
 							('_renewaldate', '" . DBSafe($renewaldate) . "'),
-							('_customerid', '" . $customerid . "'),
 							('_callspurchased', '" . DBSafe($callspurchased) . "')";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
