@@ -59,7 +59,7 @@ class JobDetailReport extends ReportGenerator{
 			rp.pkey,
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
-			rp.type as jobtype,
+			rp.type as type,
 			coalesce(m.name, sq.name) as messagename,
 			coalesce(rc.phone,
 						rc.email,
@@ -221,9 +221,8 @@ class JobDetailReport extends ReportGenerator{
 			
 		$formatters = array(5 => "fmt_message",
 							7 => "fmt_destination",
-							11 => "fmt_attempts",
 							8 => "fmt_date",
-							9 => "fmt_result");
+							9 => "fmt_jobdetail_result");
 		showTable($data,$titles,$formatters);
 		echo "</table>";
 		showPageMenu($total,$pagestart,500);
