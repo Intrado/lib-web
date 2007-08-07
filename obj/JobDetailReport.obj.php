@@ -74,7 +74,7 @@ class JobDetailReport extends ReportGenerator{
 			coalesce(rc.result,
 					rp.status) as result,
 			rp.status,
-			rc.numattempts as attempts,
+			rc.numattempts as numattempts,
 			rc.resultdata,
 			sw.resultdata
 			$fieldquery
