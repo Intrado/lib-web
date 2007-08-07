@@ -954,7 +954,7 @@ IF cc = 0 THEN
   END IF;
 ELSE
 -- update job fields
-  UPDATE aspshard.qjob SET phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
+  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
   IF NEW.status IN ('active', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
@@ -1011,17 +1011,12 @@ CREATE TRIGGER insert_schedule
 AFTER INSERT ON schedule FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER;
-DECLARE cc INTEGER;
 DECLARE tz VARCHAR(50);
 
 SELECT value INTO custid FROM setting WHERE name='_customerid';
 SELECT value INTO tz FROM setting WHERE name='timezone';
 
--- the job must be inserted before the schedule
-SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND scheduleid=NEW.id;
-IF cc = 1 THEN
-    INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) VALUES (NEW.id, custid, NEW.daysofweek, NEW.time, NEW.nextrun, tz);
-END IF;
+INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) VALUES (NEW.id, custid, NEW.daysofweek, NEW.time, NEW.nextrun, tz);
 END
 $$$
 
