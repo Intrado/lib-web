@@ -47,7 +47,7 @@ $cpcodes = array(
 	"F" => "Failed",
 	"duplicate" => "Duplicate",
 	"blocked" => "Blocked",
-	"nocontacts" => "No Contact Info",
+	"nocontacts" => "No Phone #",
 	"notattempted" => "Not Attempted",
 );
 
