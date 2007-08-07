@@ -59,6 +59,7 @@ $rulesql = "";
 $jobtypes = "";
 $resultsql = "";
 $jobquery = "";
+$jobtypequery = "";
 
 $usersql = $USER->userSQL("rp");
 
@@ -74,9 +75,10 @@ if(isset($options['email']) && $options['email'] != "")
 if(isset($options['rules']) && $options['rules'] != "")
 	$rulesql = getRuleSql($options, "rp");
 
-if(isset($options['jobtypes']) && $options['jobtypes'] != "")
+if(isset($options['jobtypes']) && $options['jobtypes'] != ""){
 	$jobtypes = $options['jobtypes'];
-
+	$jobtypequery = " and j.jobtypeid in ('". $jobtypes ."') ";
+}
 if(isset($options['results']) && $options['results'] != "")
 	$resultsql = " and rc.result in ('" . $options['results'] . "')";	
 
@@ -93,6 +95,7 @@ $query = "select rp.pkey,
 			max(rc.starttime)
 			from reportperson rp
 			left join reportcontact rc on (rc.personid = rp.personid and rc.type = rp.type and rc.jobid = rp.jobid)
+			left join job j on (j.id = rp.jobid)
 			where 1
 			$userjoin
 			$usersql
@@ -101,6 +104,7 @@ $query = "select rp.pkey,
 			$emailsql
 			$resultsql
 			$jobquery
+			$jobtypequery 
 			$rulesql
 			group by rp.personid";
 
