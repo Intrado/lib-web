@@ -45,7 +45,8 @@ function getStartEndDate($type, $arguments = array()){
 		case 'today':			
 		case 'lastweekday':					
 		case 'yesterday':
-			$enddate = $startdate = date("Y-m-d", reldate($type, true));
+			$enddate = $startdate = reldate($type, true);
+			break;
 		case 'weektodate':
 		case 'monthtodate':
 			$startdate = reldate($type, true);
