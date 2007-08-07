@@ -122,15 +122,15 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 }
 
 $reload=0;
-$f="job";
-$s="save";
+$f="reports";
+$s="jobs";
 
 if(CheckFormSubmit($f,$s)){
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
 		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
+		$reload = 1;
 	}
 	else
 	{

@@ -21,9 +21,7 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 	redirect('unauthorized.php');
 }
 
-$reload=0;
-$f="reports";
-$s="scheduler";
+
 
 $options = array();
 
@@ -57,12 +55,16 @@ if(isset($_REQUEST['reportid'])){
 	}
 }
 
+$reload=0;
+$f="reports";
+$s="scheduler";
+
 if(CheckFormSubmit($f, $s))
 {
 	if(CheckFormInvalid($f))
 	{
 		print '<div class="warning">Form was edited in another window, reloading data.</div>';
-		$reloadform = 1;
+		$reload = 1;
 	}
 	else
 	{
