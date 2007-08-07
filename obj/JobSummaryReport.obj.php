@@ -75,8 +75,8 @@ class JobSummaryReport extends ReportGenerator{
 		
 		//Gather Phone Information		
 		$phonenumberquery = "select sum(rc.type='phone') as total,
-									sum(rc.result in ('A','M', 'duplicate', 'blocked') or rc.numattempts > js.value or rp.status in ('fail') ) as completed,
-									sum(rc.result not in ('A','M', 'duplicate', 'blocked') and rc.numattempts < js.value and rp.status not in ('success', 'fail')) as remaining,
+									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as completed,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rc.result = 'blocked') as blocked,
 									sum(rp.status = 'nocontacts') as nocontacts,
@@ -90,8 +90,8 @@ class JobSummaryReport extends ReportGenerator{
 									and rp.type='phone'";
 		$phonenumberinfo = QuickQueryRow($phonenumberquery);
 						
-		$emailquery = "select sum(rc.result != 'duplicate') as total,
-									sum(rc.result = 'sent') as Sent,
+		$emailquery = "select sum(rc.type = 'email') as total,
+									sum(rc.result in ('sent', 'duplicate')) as Sent,
 									sum(rc.result = 'unsent') as Unsent,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts') as nocontacts
