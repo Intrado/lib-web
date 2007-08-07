@@ -119,24 +119,24 @@ class ContactsReport extends ReportGenerator {
 					
 					<? 
 						$first=true;
-						if(isset($phonelist)){
+						if(isset($phonelist[$id])){
 							foreach($phonelist[$id] as $phone){
 								if($phone->phone == ""){
 									continue;
 								}
 								if(!$first) {
 									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-									?>
+?>
 										<td></td>
 										<td></td>
 										<td></td>
 										<td></td>
-									<?
+<?
 								}
-								?>
-									<td><?=$phone->sequence+1?></td>
-									<td><?=Phone::format($phone->phone)?></td>
-								<?
+?>
+								<td><?=$phone->sequence+1?></td>
+								<td><?=Phone::format($phone->phone)?></td>
+<?
 								if($first){
 									$first = false;
 									$count=0;
@@ -159,43 +159,43 @@ class ContactsReport extends ReportGenerator {
 								?>
 								</tr><?
 							}
+							if($first){
+								?>
+									<td>&nbsp;</td>
+									<td>No Phone Numbers</td>
+								<?
+								$count=0;
+								for($i=0;$i<20; $i++){
+									if($i<10){
+										$num = "f0" . $i;
+									} else {
+										$num = "f" . $i;
+									}
+									if(in_array($num, array_keys($fieldlist))){
+										?><td><?=htmlentities($person[5+$count])?></td><?
+										$count++;
+									}
+								}
+							}
 						}
 						if(isset($emaillist[$id])){
 							foreach($emaillist[$id] as $email){
 								if($email->email == ""){
 									continue;
 								}
-								if(!$first) {
-									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-									?>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-									<?
-								}
+								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
 								?>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								
 									<td><?=$email->sequence+1?></td>
 									<td><?=$email->email?></td>
 								<? 
-								if($first){
-									$first = false;
-									$count=0;
-									for($i=0;$i<20; $i++){
-										if($i<10){
-											$num = "f0" . $i;
-										} else {
-											$num = "f" . $i;
-										}
-										if(in_array($num, array_keys($fieldlist))){
-											?><td><?=$person[5+$count]?></td><?
-											$count++;
-										}
-									}
-								} else {
-									for($i=0; $i<$fieldcount; $i++){
-										?><td>&nbsp;</td><?
-									}
+								
+								for($i=0; $i<$fieldcount; $i++){
+									?><td>&nbsp;</td><?
 								}
 								
 								?>
