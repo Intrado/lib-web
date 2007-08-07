@@ -20,7 +20,7 @@ if (isset($BFXML_ELEMENT['attrs']['SESSIONID'])) {
 
 		$SESSIONDATA = loadSessionData($SESSIONID);
 		if (isset($SESSIONDATA['authSessionID'])) {
-			$ret = getSessionData($SESSIONDATA['authSessionID']); //actually just load the DB connection for the customer
+			$ret = connectDatabase($SESSIONDATA['authSessionID']); //actually just load the DB connection for the customer
 			$success = $ret !== false;
 		}
 	}
