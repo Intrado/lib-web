@@ -32,7 +32,20 @@ if (!$USER->authorize('createreport')) {
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-
+//result formatter for job details.
+//index 2 is the delivery type
+function fmt_contacthistory_result($row, $index){
+	if($row[$index] == "nocontacts"){
+		if($row[2] == 'phone')
+			return "No Phone #";
+		else if($row[2] == 'email')
+			return "No Email";
+		else 
+			return "No Contacts";
+	} else {
+		return fmt_result($row, $index);
+	}
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +161,7 @@ startWindow("Display Options", "padding: 3px;", "true");
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 			<td class="bottomBorder">
 <? 		
-				select_metadata('searchresultstable', 4, $fields);
+				select_metadata('searchresultstable', 5, $fields);
 ?>
 			</td>
 		</tr>
