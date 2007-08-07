@@ -68,14 +68,14 @@ $_SESSION['report']['options'] = $options;
 $reload=0;
 
 $f="reports";
-$s="jobs";
+$s="survey";
 
 if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "run"))
 {
 	if(CheckFormInvalid($f))
 	{
 		print '<div class="warning">Form was edited in another window, reloading data.</div>';
-		$reloadform = 1;
+		$reload = 1;
 	}
 	else
 	{
