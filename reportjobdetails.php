@@ -36,21 +36,21 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_attempts ($row,$index) {
-
-	return $row[$index];
-	/*
-	if ($row[$index] !== NULL && $row[$index] !== "") {
-		if ($row[3] == "phone") {
-			return $row[$index] . "/" . $row[];
-		} else {
-			return $row[$index] . "/1";
-		}
+//result formatter for job details.
+//index 5 is the delivery type
+function fmt_jobdetail_result($row, $index){
+	if($row[$index] == "nocontacts"){
+		if($row[5] == 'phone')
+			return "No Phone #";
+		else if($row[5] == 'email')
+			return "No Email";
+		else 
+			return "No Contacts";
 	} else {
-		return "";
+		return fmt_result($row, $index);
 	}
-	*/
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
