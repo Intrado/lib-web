@@ -249,15 +249,18 @@ class SurveyReport extends ReportGenerator{
 	}
 	
 	function runCSV(){
-	
+	//For csv data, give them call details
 		$fieldquery = generateFields("rp");
 		$options = $this->params;
 		$jobid = $options['jobid'];
+		$job = new Job($jobid);
 		$query = "select SQL_CALC_FOUND_ROWS
+			j.name as jobname,
+			u.login,
 			rp.pkey,
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
-			rp.type,
+			rp.type as jobtype,
 			coalesce(m.name, sq.name) as messagename,
 			coalesce(rc.phone,
 						rc.email,
@@ -268,14 +271,10 @@ class SurveyReport extends ReportGenerator{
 							coalesce(rc.state,''), ' ',
 							coalesce(rc.zip,''))
 					) as destination,
-			rc.numattempts,
 			from_unixtime(rc.starttime/1000) as lastattempt,
 			coalesce(rc.result,
 					rp.status) as result,
 			rp.status,
-			u.login,
-			rp.type as jobtype,
-			j.name as jobname,
 			rc.numattempts as attempts,
 			rc.resultdata,
 			sw.resultdata
@@ -288,7 +287,6 @@ class SurveyReport extends ReportGenerator{
 							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-		
 			where rp.jobid = '$jobid'";
 			
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
@@ -296,8 +294,10 @@ class SurveyReport extends ReportGenerator{
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
-		$activefields = $options['activefields'];
-		
+		if(isset($options['activefields']))
+			$activefields = explode(",", $options['activefields']);
+		else
+			$activefields = array();	
 		
 		header("Pragma: private");
 		header("Cache-Control: private");
@@ -305,26 +305,17 @@ class SurveyReport extends ReportGenerator{
 		header("Content-type: application/vnd.ms-excel");
 	
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-	
-	
-		$issurvey = false;
-		if (isset($jobid) && $jobid) {
-			$job = new Job($jobid);
-			if ($job->questionnaireid) {
-				$issurvey = true;
-				$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
-			}
-		}
-	
+
+		$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
+
 		//generate the CSV header
 		$header = '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Last Attempt","Last Result"';
 		
-		
-		if (isset($issurvey) && $issurvey) {
-			for ($x = 1; $x <= $numquestions; $x++) {
-				$header .= ",Question $x";
-			}
+
+		for ($x = 1; $x <= $numquestions; $x++) {
+			$header .= ",Question $x";
 		}
+
 		foreach($activefields as $active){
 			$header .= ',"' . $fieldlist[$active] . '"';
 		}
@@ -334,41 +325,41 @@ class SurveyReport extends ReportGenerator{
 		$result = Query($query);
 	
 		while ($row = DBGetRow($result)) {
-			$row[5] = html_entity_decode(fmt_destination($row,5));
-			$row[6] = (isset($row[6]) ? $row[6] : "");
+			$row[7] = html_entity_decode(fmt_destination($row,7));
+			$row[11] = (isset($row[11]) ? $row[11] : "");
 			
 	
-			if (isset($row[7])) {
-				$time = strtotime($row[7]);
+			if (isset($row[8])) {
+				$time = strtotime($row[8]);
 				if ($time !== -1 && $time !== false)
-					$row[7] = date("m/d/Y H:i",$time);
+					$row[8] = date("m/d/Y H:i",$time);
 			} else {
-				$row[7] = "";
+				$row[8] = "";
 			}
-			$row[8] = fmt_result($row,8);
+			$row[9] = fmt_result($row,9);
 	
 	
-			$reportarray = array($row[12],$row[10],ucfirst($row[3]),$row[4],$row[0],$row[1],$row[2],$row[5],$row[6],$row[7],$row[8]);
+			$reportarray = array($row[0], $row[1], $row[5],$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
 	
-			if ($issurvey) {
-				//fill in survey result data, be sure to fill in an array element for all questions, even if blank
-				$startindex = count($reportarray);
-	
-				$questiondata = array();
-				if ($row[3] == "phone")
-					parse_str($row[14],$questiondata);
-				else if ($row[3] == "email")
-					parse_str($row[15],$questiondata);
-	
-				//add data to the report for each question
-				for ($x = 0; $x < $numquestions; $x++) {
-					$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
-				}
+
+			//fill in survey result data, be sure to fill in an array element for all questions, even if blank
+			$startindex = count($reportarray);
+
+			$questiondata = array();
+			if ($row[5] == "phone")
+				parse_str($row[12],$questiondata);
+			else if ($row[5] == "email")
+				parse_str($row[13],$questiondata);
+
+			//add data to the report for each question
+			for ($x = 0; $x < $numquestions; $x++) {
+				$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
 			}
+			
 			$count=0;
 			foreach($fieldlist as $index => $field){
 				if(in_array($index, $activefields)){
-					$reportarray[] = $row[16+$count];
+					$reportarray[] = $row[14+$count];
 				}
 				$count++;
 			}
