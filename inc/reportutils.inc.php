@@ -130,11 +130,9 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	$deliveryquery = " ";
 	$surveydeliveryquery = "";
 	if("phone" == $deliverymethod){
-		$deliveryquery = " and j.phonemessageid is not null ";
-		$surveydeliveryquery = " OR sq.hasphone != '0' ";
+		$deliveryquery = " and (j.phonemessageid is not null OR sq.hasphone != '0' )";
 	} else if("email" == $deliverymethod) {
-		$deliveryquery = " and j.emailmessageid is not null ";	
-		$surveydeliveryquery = " OR sq.hasemail != '0'";
+		$deliveryquery = " and (j.emailmessageid is not null OR sq.hasemail != '0' )";	
 	}	
 	$surveyfilter = "";
 	if($surveyonly == "true"){
@@ -142,7 +140,6 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	} else if($surveyonly == "false") {
 		$surveyfilter = " and j.questionnaireid is null ";
 	}
-	
 	$startdate = date("Y-m-d", $startdate);
 	$enddate = date("Y-m-d", $enddate);
 	$jobtypequery = "";
