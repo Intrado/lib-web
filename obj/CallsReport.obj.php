@@ -18,7 +18,7 @@ class CallsReport extends ReportGenerator{
 		$personquery="";
 		$phonequery="";
 		$emailquery="";
-		$priorityquery="";
+		$jobtypesquery="";
 		$reldatequery = "";
 		$resultquery="";
 		$jobquery = "";
@@ -33,8 +33,8 @@ class CallsReport extends ReportGenerator{
 			$emailquery = $this->params['email'] ? " and rc.email like '%" . DBSafe($this->params['email']) . "%'" : "";
 		}
 
-		if(isset($this->params['priority'])){
-			$priorityquery = $this->params['priority'] ? " and j.jobtypeid in ('" . $this->params['priority'] . "')" : "";
+		if(isset($this->params['jobtypes'])){
+			$jobtypesquery = $this->params['jobtypes'] ? " and j.jobtypeid in ('" . $this->params['jobtypes'] . "')" : "";
 		}
 	
 		if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
@@ -48,13 +48,14 @@ class CallsReport extends ReportGenerator{
 			$resultquery = " and rc.result in ('" . $this->params['result'] . "') ";
 		}
 			
-		$search = $personquery . $phonequery . $emailquery . $priorityquery . $resultquery  . $jobquery;
+		$search = $personquery . $phonequery . $emailquery . $jobtypesquery . $resultquery  . $jobquery;
 		
 		$fieldquery = generateFields("rp");
 		
 		$this->query = 
 				"Select
 					j.name as jobname,
+					jt.name as jobtype,
 					rp.type as type,
 					coalesce(m.name, sq.name) as message,
 					coalesce(rc.phone,
@@ -67,7 +68,7 @@ class CallsReport extends ReportGenerator{
 							coalesce(rc.zip,''))
 							) as destination,
 					rc.attemptdata as attemptdata,
-					rp.status as status
+					coalesce(rc.result, rp.status) as status
 					$fieldquery
 					from reportperson rp
 					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
@@ -96,13 +97,13 @@ class CallsReport extends ReportGenerator{
 		// parse through data and seperate attempts.
 		// if no attempt made, look at rp.status for reason(index 5)
 		while($row = DBGetRow($result)){
-			$tmp = explode(",",$row[4]);
+			$tmp = explode(",",$row[5]);
 			
 			foreach($tmp as $attempt){
 				$line = array();
 				if($attempt == ""){
 					$time = "";
-					$res = $row[5];
+					$res = $row[6];
 				} else {
 					list($time, $res) = explode(":", $attempt);
 				}
@@ -110,10 +111,11 @@ class CallsReport extends ReportGenerator{
 				$line[] = $row[1];
 				$line[] = $row[2];
 				$line[] = $row[3];
+				$line[] = $row[4];
 				$line[] = $time;
 				$line[] = $res;
 				for($i=0; $i<count($fields); $i++){
-					$line[] = $row[6+$i];
+					$line[] = $row[7+$i];
 				}
 				$data[] = $line;
 			}
@@ -137,17 +139,18 @@ class CallsReport extends ReportGenerator{
 		
 		
 		$titles = array("0" => "Job Name",
-						"1" => "Message",
-						"3" => "Destination",
-						"4" => "Date/Time",
-						"5" => "Result");
+						"1" => "Job Type",
+						"2" => "Message",
+						"4" => "Destination",
+						"5" => "Date/Time",
+						"6" => "Result");
 		foreach($fieldlist as $index => $field){
 			$titles[] = $field;
 		}
-		$formatters = array("1" => "fmt_message",
-							"3" => "fmt_destination",
-							"4" => "fmt_ms_timestamp",
-							"5" => "fmt_result");
+		$formatters = array("2" => "fmt_message",
+							"4" => "fmt_destination",
+							"5" => "fmt_ms_timestamp",
+							"6" => "fmt_contacthistory_result");
 		
 		$searchrules = array();
 		if(isset($this->params['rules']) && $this->params['rules']){
@@ -261,7 +264,7 @@ class CallsReport extends ReportGenerator{
 			$count=1;
 			foreach($fieldlist as $index => $field){
 				?>
-				setColVisability(searchresultstable, 4+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				setColVisability(searchresultstable, 5+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
 				$count++;
 			}
