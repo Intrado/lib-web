@@ -147,7 +147,7 @@ class ContactsReport extends ReportGenerator {
 											$num = "f" . $i;
 										}
 										if(in_array($num, array_keys($fieldlist))){
-											?><td><?=$person[5+$count]?></td><?
+											?><td><?=htmlentities($person[5+$count])?></td><?
 											$count++;
 										}
 									}
