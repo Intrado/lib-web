@@ -19,6 +19,7 @@ require_once("obj/UserSetting.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/JobDetailReport.obj.php");
 require_once("obj/JobType.obj.php");
+require_once("inc/date.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
