@@ -56,10 +56,7 @@ function fmt_attempts ($row,$index) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$f="report";
-$s="order";
 
-$reload = 0;
 $pagestart=0;
 if(isset($_GET['pagestart'])){
 	$pagestart = $_GET['pagestart'];
@@ -179,12 +176,18 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 	$reportgenerator->format = "html";
 }
 
+
+$f="reports";
+$s="jobs";
+$reload = 0;
+
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
 		print '<div class="warning">Form was edited in another window, reloading data.</div>';
+		$reload = 1;
 	}
 	else
 	{
@@ -195,7 +198,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 		} else {
 			$options = $instance->getParameters();
 			for($i=1; $i<=$ordercount; $i++){
-				$options["order$i"] = GetFormData($f, $s, "order$i");
+				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
 			}		
 			$_SESSION['report']['options']= $options;
 			
