@@ -92,7 +92,7 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	if ($onclick)
 		$btn .= ' onclick="' . $onclick . '; return false;" ';
 	else if ($href)
-		$btn .= ' onclick="window.location=\'' . $href . '\'" ';
+		$btn .= ' onclick="window.location=\'' . $href . '\'; return false;" ';
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
