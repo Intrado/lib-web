@@ -232,18 +232,23 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					break;
 			}
 			
-			$result = GetFormData($f, $s, "results");
-			
-			if($result)
-				$options['result'] = implode("','", DBSafe($result));
-			else
-				$options['result'] = "";
-			
-			$savedjobtype = GetFormData($f, $s, "jobtypes");
-			if($savedjobtype)
-				$options['jobtypes'] = implode("','", DBSafe($savedjobtype));
-			else
+			$savedjobtypes = GetFormData($f, $s, 'jobtypes');
+			if($savedjobtypes){
+				$temp = array();
+				foreach($savedjobtypes as $savedjobtype)
+					$temp[] = DBSafe($savedjobtype);
+				$options['jobtypes'] = implode("','", $temp);
+			}else
 				$options['jobtypes'] = "";
+			
+			$savedresults = GetFormData($f, $s, "results");
+			if($savedresults){
+				$temp = array();
+				foreach($savedresults as $savedresult)
+					$temp[] = DBSafe($savedresult);
+				$options['result'] = implode("','", $temp);
+			}else
+				$options['result'] = "";
 			for($i=1; $i<=$ordercount; $i++){
 				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
 			}

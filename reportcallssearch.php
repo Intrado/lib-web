@@ -177,15 +177,21 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 			}
 			
 			$savedjobtypes = GetFormData($f, $s, 'jobtypes');
-			if($savedjobtypes)
-				$options['jobtypes'] = DBSafe(implode("','", $savedjobtypes));
-			else
+			if($savedjobtypes){
+				$temp = array();
+				foreach($savedjobtypes as $savedjobtype)
+					$temp[] = DBSafe($savedjobtype);
+				$options['jobtypes'] = implode("','", $temp);
+			}else
 				$options['jobtypes'] = "";
 			
-			$results = GetFormData($f, $s, "results");
-			if($results)
-				$options['results'] = DBSafe(implode("','", $results));
-			else
+			$savedresults = GetFormData($f, $s, "results");
+			if($savedresults){
+				$temp = array();
+				foreach($savedresults as $savedresult)
+					$temp[] = DBSafe($savedresult);
+				$options['results'] = implode("','", $temp);
+			}else
 				$options['results'] = "";
 			
 			$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();

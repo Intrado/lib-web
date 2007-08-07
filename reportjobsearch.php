@@ -128,10 +128,13 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					}
 					break;
 			}
-			$savedjobtype = GetFormData($f, $s, "jobtypes");
-			if($savedjobtype)
-				$options['jobtypes'] = implode("','", DBSafe($savedjobtype));
-			else
+			$savedjobtypes = GetFormData($f, $s, "jobtypes");
+			if($savedjobtypes){
+				$temp = array();
+				foreach($savedjobtypes as $savedjobtype)
+					$temp[] = DBSafe($savedjobtype);
+				$options['jobtypes'] = implode("','", $temp);
+			} else
 				$options['jobtypes'] = "";
 			
 			foreach($options as $index => $option){
