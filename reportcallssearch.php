@@ -33,12 +33,7 @@ if (!$USER->authorize('createreport')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$f = "report";
-$s = "personnotify";
-$reload = 0;
-
-
-$jobtypeobjs = DBFindMany("JobType", "from jobtype");
+$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
 $jobtypes = array();
 foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
@@ -141,13 +136,17 @@ if(isset($_GET['deleterule'])) {
 }
 
 $_SESSION['report']['options'] = $options;
-	
+
+$f = "report";
+$s = "personnotify";
+$reload = 0;
+
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
 		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
+		$reload = 1;
 	}
 	else
 	{
@@ -179,13 +178,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 			
 			$savedjobtypes = GetFormData($f, $s, 'jobtypes');
 			if($savedjobtypes)
-				$options['jobtypes'] = implode("','", $savedjobtypes);
+				$options['jobtypes'] = implode("','", DBSafe($savedjobtypes));
 			else
 				$options['jobtypes'] = "";
 			
 			$results = GetFormData($f, $s, "results");
 			if($results)
-				$options['results'] = implode("','", $results);
+				$options['results'] = implode("','", DBSafe($results));
 			else
 				$options['results'] = "";
 			
