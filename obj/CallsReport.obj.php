@@ -74,7 +74,7 @@ class CallsReport extends ReportGenerator{
 					inner join job j on (rp.jobid= j.id)
 					inner join jobtype jt on (j.jobtypeid = jt.id)
 					left join message m on (m.id = rp.messageid)
-					left join surveyquestionnaire sq on (sq.id = rp.messageid)
+					left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 					where 1
 					$search
 					$usersql
