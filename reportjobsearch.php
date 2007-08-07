@@ -38,10 +38,6 @@ if (!$USER->authorize('viewsystemreports')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
-$f="reports";
-$s="jobs";
-$reload=0;
 $clear = 0;
 
 if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
@@ -53,7 +49,7 @@ if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
 if($clear)
 	redirect();
 
-$jobtypeobjs = DBFindMany("JobType", "from jobtype");
+$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
 $jobtypes = array();
 foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
@@ -80,12 +76,16 @@ if(isset($_REQUEST['reportid'])){
 	}
 }
 
+$f="reports";
+$s="jobs";
+$reload=0;
+
 if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view"))
 {
 	if(CheckFormInvalid($f))
 	{
 		print '<div class="warning">Form was edited in another window, reloading data.</div>';
-		$reloadform = 1;
+		$reload = 1;
 	}
 	else
 	{
@@ -130,7 +130,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			}
 			$savedjobtype = GetFormData($f, $s, "jobtypes");
 			if($savedjobtype)
-				$options['jobtypes'] = implode("','", $savedjobtype);
+				$options['jobtypes'] = implode("','", DBSafe($savedjobtype));
 			else
 				$options['jobtypes'] = "";
 			
