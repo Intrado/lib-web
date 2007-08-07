@@ -127,7 +127,7 @@ class JobSummaryReport extends ReportGenerator{
 							"F" => "Failed",
 							"duplicate" => "Duplicate",
 							"blocked" => "Blocked",
-							"nocontacts" => "No Contact Info",
+							"nocontacts" => "No Phone #",
 							"notattempted" => "Not Attempted"
 						);
 		$jobstats["phone"] = $cpstats;
@@ -189,7 +189,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Completed</th>
 											<th>Remaining</th>
 											<th>Duplicates Removed</th>
-											<th>No Contact Info</th>
+											<th>No Email</th>
 										</tr>
 										<tr>
 											<td><?=$emailinfo[0]?></td>
@@ -221,7 +221,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Remaining</th>
 											<th>Duplicates Removed</th>
 											<th>Blocked</th>
-											<th>No Contact Info</th>
+											<th>No Phone #</th>
 											<th>Total Attempts</th>
 										</tr>
 										<tr>
