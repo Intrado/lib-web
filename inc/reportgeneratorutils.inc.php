@@ -86,7 +86,7 @@ function displayJobSummary($joblist){
 								<th>Start Date</th>
 								<th>End Date</th>
 								<th>Status</th>
-								<td>Ind's on List</td>
+								<th>Ind's on List</th>
 								<th># of Phones</th>
 								<th># of Emails</th>
 							</tr>
