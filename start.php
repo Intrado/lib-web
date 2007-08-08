@@ -93,7 +93,7 @@ if ($USER->authorize("startstats")) {
 			startWindow('My Active and Pending Notifications ' . help('Start_MyActiveJobs'),NULL,true);
 			button_bar(button('Refresh', 'window.location.reload()'));
 
-			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
+			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='scheduled' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Name",
 								"type" => "Deliver by",
 								"Status" => "Status",
@@ -136,7 +136,7 @@ if ($USER->authorize("startstats")) {
 				startWindow('My Active and Pending Surveys ' . help('Start_MyActiveJobs'),NULL,true);
 				button_bar(button('Refresh', 'window.location.reload()'));
 
-				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='processing') and type='survey' and deleted = 0 order by id desc limit $limit");
+				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='processing' or status='scheduled') and type='survey' and deleted = 0 order by id desc limit $limit");
 				$titles = array(	"name" => "Name",
 									"type" => "Deliver by",
 									"Status" => "Status",

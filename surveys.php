@@ -45,7 +45,7 @@ startWindow('My Active and Pending Surveys ' . help('SurveyBuilder_MyActiveAndPe
 
 button_bar(button('Schedule Survey', null,"survey.php?id=new") );
 
-$data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='new' or status='processing' or status='active' or status='cancelling') and deleted=0 order by id desc");
+$data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='new' or status='scheduled' or status='processing' or status='active' or status='cancelling') and deleted=0 order by id desc");
 
 $titles = array(	"name" => "#Name",
 					"description" => "#Description",

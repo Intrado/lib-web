@@ -110,7 +110,7 @@ class Job extends DBMappedObject {
 			}
 		} else {
 			$this->generateSql();
-			$this->status = "processing"; // set state, jobprocessor will set it to 'active'
+			$this->status = "scheduled"; // set state, schedulemanager will set it to 'processing' then jobprocessor will set it to 'active'
 			$this->update();
 		}
 	}

@@ -201,7 +201,7 @@ CREATE TABLE `job` (
   `starttime` time NOT NULL default '00:00:00',
   `endtime` time NOT NULL default '00:00:00',
   `finishdate` datetime default NULL,
-  `status` enum('new','processing','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
+  `status` enum('new','scheduled','processing','active','complete','cancelled','cancelling','repeating') NOT NULL default 'new',
   `percentprocessed` tinyint(4) NOT NULL default '0',
   `deleted` tinyint(4) NOT NULL default '0',
   `ranautoreport` tinyint(4) NOT NULL default '0',
@@ -941,18 +941,18 @@ SELECT value INTO tz FROM setting WHERE name='timezone';
 
 SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
 IF cc = 0 THEN
--- we expect the status to be 'processing' when we insert the shard job
+-- we expect the status to be 'scheduled' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
-  IF NEW.status IN ('processing') THEN
+  IF NEW.status IN ('scheduled') THEN
     INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, thesql)
-           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'new', NEW.thesql);
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.thesql);
     -- copy the jobsettings
     INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
 ELSE
 -- update job fields
   UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
-  IF NEW.status IN ('active', 'cancelling') THEN
+  IF NEW.status IN ('processing', 'active', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
 END IF;

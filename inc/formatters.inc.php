@@ -178,6 +178,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	$viewresponses = '<a href="replies.php?jobid=' . $id . '">Responses</a>';
 	switch ($status) {
 		case "new":
+		case "scheduled":
 		case "processing":
 			$buttons = array($editbtn,$cancelbtn);
 			break;

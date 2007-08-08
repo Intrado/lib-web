@@ -66,7 +66,7 @@ CREATE TABLE `qjob` (
   `enddate` date NOT NULL default '0000-00-00',
   `starttime` time NOT NULL default '00:00:00',
   `endtime` time NOT NULL default '00:00:00',
-  `status` enum('new','processing','procactive','active','cancelling','repeating') NOT NULL default 'new',
+  `status` enum('scheduled','processing','procactive','active','cancelling','repeating') NOT NULL default 'scheduled',
   `phonetaskcount` int(11) NOT NULL default '0',
   `processedcount` int (11) NOT NULL default '0',
   `systempriority` tinyint(4) NOT NULL default '3',

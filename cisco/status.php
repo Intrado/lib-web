@@ -11,7 +11,7 @@ if (!$USER->authorize('createreport')) {
 
 //get the top 5 jobs
 
-$jobs = DBFindMany("Job", "from job where userid=$USER->id and deleted=0 and status in ('processing','active','complete','cancelled','cancelling') order by id desc limit 5");
+$jobs = DBFindMany("Job", "from job where userid=$USER->id and deleted=0 and status in ('scheduled','processing','active','complete','cancelled','cancelling') order by id desc limit 5");
 foreach ($jobs as $job) {
 	$query = "
 	select
