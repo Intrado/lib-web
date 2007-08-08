@@ -181,7 +181,7 @@ if($generator->format != "html"){
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<td>
-					<a href="reportsurveysummary.php?pdf=1">PDF</a>&nbsp;|&nbsp;<a href="reportjobsummary.php?jobid=<?=$job->id?>&survey=true"/>Contact&nbsp;Summary</a>&nbsp;|&nbsp<a href="reportsurveysummary.php?csv=1"/>CSV</a>
+					<a href="reportsurveysummary.php?pdf=1">PDF</a>&nbsp;|&nbsp;<a href="reportjobsummary.php?jobid=<?=$job->id?>&survey=true"/>Notification&nbsp;Summary</a>&nbsp;|&nbsp<a href="reportsurveysummary.php?csv=1"/>CSV</a>
 				</td>
 			</tr>
 		</table>
