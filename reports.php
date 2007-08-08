@@ -68,7 +68,7 @@ $TITLE= "Report Builder";
 
 include("nav.inc.php");
 
-startWindow("Select a Template", 'padding: 3px;');
+startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3px;');
 ?>
 	<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
 		<tr class="listHeader">
@@ -119,7 +119,7 @@ $formatters = array("Actions" => "fmt_report_actions",
 					"Last Run" => "fmt_last_run");
 $scroll = false;
 
-startWindow("My Saved Reports", 'padding: 3px;');
+startWindow("My Saved Reports" . help('Reports_MySavedReports'), 'padding: 3px;');
 showObjects($data, $titles, $formatters, $scroll, true);
 EndWindow();
 include("navbottom.inc.php");
