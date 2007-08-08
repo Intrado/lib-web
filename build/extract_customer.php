@@ -246,7 +246,7 @@ mysql_select_db($newdbname,$custdb);
 $tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
 foreach ($tablequeries as $tablequery) {
 	if (trim($tablequery)) {
-		$tablequery = str_replace('_CCXXZZY_', $customerid, $tablequery);
+		$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
 		mysql_query($tablequery,$custdb)
 			or die ("Failed to create tables \n$tablequery\n\nfor $newdbname : " . mysql_error($custdb));
 	}
