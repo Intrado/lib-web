@@ -193,6 +193,6 @@ CREATE TABLE `qjobperson` (
 `customerid` INT( 11 ) NOT NULL DEFAULT '0',
 `jobid` INT( 11 ) NOT NULL DEFAULT '0',
 `personid` INT( 11 ) NOT NULL DEFAULT '0',
-PRIMARY KEY (`customerid~,`jobid`,`personid`)
+PRIMARY KEY (`customerid`,`jobid`,`personid`)
 ) ENGINE = innodb;
 
