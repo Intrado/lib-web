@@ -28,11 +28,16 @@ if (!$USER->authorize('viewusagestats')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$showusers = 0;
+if(isset($_REQUEST['showusers']) && $_REQUEST['showusers'] == 1){
+	$showusers = 1;
+}
+
 $groupby = FieldMap::getSchoolField(); //defaults to school f-field
 if(!$groupby)
 	$groupby = ""; //but if school is not used, default to blank
 $fields = DBFindMany("FieldMap", "from fieldmap where options like '%multisearch%'");
-$hideusers = 0;
+
 $type = "phone";
 $reldate = "monthtodate";
 $f = "system";
@@ -45,6 +50,7 @@ if(CheckFormSubmit($f,$s))
 	if(CheckFormInvalid($f))
 	{
 		print '<div class="warning">Form was edited in another window, reloading data.</div>';
+		$reload = 1;
 	}
 	else
 	{
@@ -63,7 +69,6 @@ if(CheckFormSubmit($f,$s))
 			$groupby = DBSafe(GetFormData($f, $s, "groupby"));
 			$reldate = GetFormData($f, $s, "relativedate");
 			$type = DBSafe(GetFormData($f, $s, "type"));
-			$hideusers = GetFormData($f, $s, "hideusers");
 		}
 	}
 } else {
@@ -75,7 +80,7 @@ if($reload){
 	PutFormData($f, $s, "phone", "1", "bool", 0, 1);
 	PutFormData($f, $s, "email", "1", "bool", 0, 1);
 	PutFormData($f, $s, "groupby", $groupby);
-	PutFormData($f, $s, "hideusers", $hideusers, "bool", 0, 1);
+	PutFormData($f, $s, "showusers", $showusers, "bool", 0, 1);
 	
 	PutFormData($f, $s, "relativedate", $reldate);
 	PutFormData($f, $s, 'xdays', isset($lastxdays) ? $lastxdays : "0", "number");
@@ -224,12 +229,12 @@ startWindow("Display Options", "padding: 3px;");
 			</td>
 		</tr>
 		<tr valign="top">
-			<th align="right" class="windowRowHeader">Hide Users:</th>
+			<th align="right" class="windowRowHeader">Show Users:</th>
 			<td>
 				<? 
-					NewFormItem($f, $s, "hideusers", "checkbox");
+					NewFormItem($f, $s, "showusers", "checkbox", null, null, "onclick=\"window.location='?showusers='+ (this.checked ? '1' : '0') \"");
 				?>
-				Hide Users
+				Show Users
 			</td>
 		</tr>
 	</table>
@@ -281,7 +286,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 				<td>100.00%</td>
 			</tr>
 <?
-			if(!$hideusers){
+			if($showusers){
 				foreach($groupbyfield as $uindex => $user){
 					if($user["total"] == 0) continue;
 					echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
