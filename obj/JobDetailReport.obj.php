@@ -371,7 +371,7 @@ class JobDetailReport extends ReportGenerator{
 		$ordering["ID#"] = "rp.pkey";
 		$ordering["Message"]="m.name";
 		$ordering["Destination"]="destination";
-		$ordering["Attempts"] = "attempts";
+		$ordering["Attempts"] = "numattempts";
 		$ordering["Last Attempt"]="lastattempt";
 		$ordering["Last Result"]="result";
 		
