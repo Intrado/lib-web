@@ -176,7 +176,13 @@ $TITLE = "Saved/Scheduled Report";
 
 include("nav.inc.php");
 NewForm($f);
-buttons(button("Back", 'window.history.go(-1)'), submit($f, $s, "Save"));
+if(isset($_SESSION['report']['edit']))
+	$back = button("Back", "window.history.go(-1)");
+else {
+	$fallbackUrl = "reports.php";
+	$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+}
+buttons($back, submit($f, $s, "Save"));
 startWindow("Report Details");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">

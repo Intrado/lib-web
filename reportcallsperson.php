@@ -154,7 +154,12 @@ if(isset($_SESSION['reportid'])){
 include_once("nav.inc.php");
 NewForm($f);
 
-buttons(button("Back", "window.history.go(-1)"), submit($f, $s, "Refresh"));
+$fallbackUrl = "reportcallssearch.php";
+if(isset($_SESSION['report']['singleperson']))
+	$back = button("Back", null, "reportcallssearch.php");
+else
+	$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+buttons($back, submit($f, $s, "Refresh"));
 startWindow("Display Options", "padding: 3px;", "true");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">

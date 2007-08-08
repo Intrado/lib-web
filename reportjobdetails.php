@@ -65,7 +65,7 @@ if(isset($_GET['pagestart'])){
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
 $ordering = JobDetailReport::getOrdering();
 $ordercount=3;
-
+unset($_SESSION['report']['edit']);
 
 if(isset($_REQUEST['reportid'])){
 	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
@@ -110,6 +110,7 @@ if(isset($_REQUEST['reportid'])){
 	$_SESSION['report']['options'] = $options;
 	redirect();
 } else if(isset($_REQUEST['result'])){
+	$_SESSION['report']['jobdetail']=1;
 	unset($_SESSION['reportid']);
 	unset($_SESSION['report']['type']);
 	$options = $_SESSION['report']['options'];
@@ -203,6 +204,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 			$_SESSION['report']['options']= $options;
 			
 			if(CheckFormSubmit($f, "save")){
+				$_SESSION['report']['edit'] = 1;
 				redirect("reportedit.php");
 			}
 			redirect();
@@ -286,8 +288,16 @@ if($error || $reportgenerator->format == "html"){
 	}
 	
 	include_once("nav.inc.php");
-	NewForm($f);	
-	buttons(button("Back", "window.history.go(-1)"), submit($f, $s, "Refresh"), submit($f, "save", "Save/Schedule"));
+	NewForm($f);
+	
+	//check to see if referer came from summary page.  if so, go to history instead of referer
+	if(isset($_SESSION['report']['jobdetail']))
+		$back = button("Back", "window.history.go(-1)");
+	else {
+		$fallbackUrl = "reports.php";
+		$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+	}
+	buttons($back, submit($f, $s, "Refresh"), submit($f, "save", "Save/Schedule"));
 	startWindow("Display Options", "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">

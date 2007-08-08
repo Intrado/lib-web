@@ -46,7 +46,7 @@ function fmt_answer($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
+unset($_SESSION['report']['edit']);
 $clear = 0;
 if(isset($_REQUEST['jobid'])){
 	unset($_SESSION['report']);
@@ -54,6 +54,7 @@ if(isset($_REQUEST['jobid'])){
 	$options= array("jobid" => $_REQUEST['jobid']+0,
 					"reporttype" => "jobsummaryreport");
 	$_SESSION['report']['options'] = $options;
+	$_SESSION['report']['jobsummary'] = 1;
 	$clear = 1;
 }
 
@@ -138,6 +139,7 @@ if(CheckFormSubmit($f,$s)){
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
+			$_SESSION['report']['edit'] = 1;
 			redirect("reportedit.php");
 		}
 	}
@@ -184,7 +186,13 @@ if($generator->format != "html"){
 	include_once("nav.inc.php");
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
-	buttons(button('Back', 'window.history.go(-1)'), button('Refresh', 'window.location.reload()'), submit($f, $s, "Save/Schedule"));
+	if(isset($_SESSION['report']['jobsummary']))
+		$back = button("Back", "window.history.go(-1)");
+	else {
+		$fallbackUrl = "reports.php";
+		$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+	}
+	buttons($back, button('Refresh', 'window.location.reload()'), submit($f, $s, "Save/Schedule"));
 	
 		startWindow("Related Links", "padding: 3px;");
 		?>

@@ -116,9 +116,10 @@ while($row = DBGetRow($result)){
 
 // if only one person(one row in data), redirect to person with person id.
 if(count($data) == 1){
+	$_SESSION['report']['singleperson'] = 1;
 	redirect("reportcallsperson.php?pid=" . $data[0][3]);
 }
-	
+unset($_SESSION['report']['singleperson']);
 	
 	
 $titles = array("0" => "ID#",
@@ -153,7 +154,7 @@ if(isset($options['rules']) && $options['rules']){
 
 	
 	include_once("nav.inc.php");
-	buttons(button('Back', 'window.history.go(-1)'));
+	buttons(button('Back', null, 'reportcallssearch.php'));
 	
 	startWindow("Search Parameters");
 ?>

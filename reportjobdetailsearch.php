@@ -397,7 +397,7 @@ if(isset($_SESSION['reportid']))
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons( button('Back', 'window.history.go(-1)'), submit($f, "view", "View Report"),
+buttons( button('Back',null, "reports.php"), submit($f, "view", "View Report"),
 			submit($f, "save", "Save/Schedule"));
 
 //--------------- Select window ---------------
@@ -535,8 +535,8 @@ startWindow("Select", NULL, false);
 		</td>
 	</tr>
 	<script>
-		setHiddenIfChecked(check_archived, 'jobid');
-		setVisibleIfChecked(check_archived, 'jobid_archived')
+		setHiddenIfChecked('check_archived', 'jobid');
+		setVisibleIfChecked('check_archived', 'jobid_archived')
 		if(new getObj("job").obj.checked){
 			hide("daterange");
 		} else {

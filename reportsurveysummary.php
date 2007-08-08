@@ -52,7 +52,7 @@ function fmt_answer($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
-
+unset($_SESSION['report']['edit']);
 
 if(isset($_REQUEST['reportid'])){
 	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
@@ -72,11 +72,13 @@ if(isset($_REQUEST['reportid'])){
 		$job = new Job($jobid);
 	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
 	$_SESSION['report']['options'] = $options;
+	$_SESSION['report']['surveysummary'] = 1;
 } else {
 	$jobid = 0;
 	
 	if (isset($_GET['jobid'])) {
 		$jobid = $_GET['jobid'] + 0;
+		$_SESSION['report']['surveysummary'] = 1;
 	} else {
 		$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 		$jobid = isset($options['jobid']) ? $options['jobid'] : 0;
@@ -135,6 +137,7 @@ if(CheckFormSubmit($f,$s)){
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
+			$_SESSION['report']['edit'] = 1;
 			redirect("reportedit.php");
 		}
 	}
@@ -175,7 +178,13 @@ if($generator->format != "html"){
 	include_once("nav.inc.php");
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
-	buttons(button('Back', 'window.history.go(-1)'), submit($f, $s, "Save/Schedule"),button('Refresh', 'window.location.reload()'));
+	if(isset($_SESSION['report']['surveysummary']))
+		$back = button("Back", "window.history.go(-1)");
+	else {
+		$fallbackUrl = "reports.php";
+		$back = button("Back", "location.href=' " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+	}
+	buttons($back, submit($f, $s, "Save/Schedule"),button('Refresh', 'window.location.reload()'));
 	
 		startWindow("Related Links", "padding: 3px;");
 		?>

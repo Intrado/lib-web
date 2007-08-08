@@ -298,7 +298,7 @@ if(isset($_SESSION['reportid'])){
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(button('Back', 'window.history.go(-1)'), submit($f, "view", "View Report"));
+buttons(button('Back', null, 'reports.php'), submit($f, "view", "View Report"));
 startWindow("Person Notification Search", "padding: 3px;");
 
 ?>
