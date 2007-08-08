@@ -180,6 +180,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 		case "new":
 		case "scheduled":
 		case "processing":
+		case "procactive":
 			$buttons = array($editbtn,$cancelbtn);
 			break;
 		case "active":

@@ -35,7 +35,7 @@ if ($jobid != NULL) {
 		$completedmode = true;
 	}
 
-	if ($job->status == 'active' || $job->status == 'processing' || $job->status == 'scheduled' || $completedmode) {
+	if ($job->status == 'active' || $job->status == 'procactive' || $job->status == 'processing' || $job->status == 'scheduled' || $completedmode) {
 		$submittedmode = true;
 	}
 }
@@ -86,7 +86,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('The end date has already passed. Please correct this problem before proceeding');
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','scheduled','processing','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
+		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
