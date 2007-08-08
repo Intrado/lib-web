@@ -65,7 +65,7 @@ function select_metadata($tablename=null, $start=null, $fields){
 						$result .= "toggleHiddenField('$fieldnum'); setColVisability($tablename, $start+$count, new getObj('hiddenfield$fieldnum').obj.checked); \">";
 					}
 					echo $result;
-					echo "<input style='display: none' type='checkbox' id='hiddenfield$fieldnum' " . $checked;
+					echo "<input style='display: none;' type='checkbox' id='hiddenfield$fieldnum' " . $checked;
 				?>
 				</div></td><?
 				$count++;
