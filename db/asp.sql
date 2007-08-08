@@ -1653,4 +1653,23 @@ update fieldmap fm set fm.options=concat(fm.options, ',firstname') where fm.fiel
 update fieldmap fm set fm.options=concat(fm.options, ',lastname') where fm.fieldnum = 'f02';
 update fieldmap fm set fm.options=concat(fm.options, ',language') where fm.fieldnum = 'f03';
 
+-- fix jobtype priorities
+
+update jobtype set systempriority=priority/10000;
+update jobtype set systempriority=3 where name like '%General%';
+update jobtype set systempriority=3 where systempriority > 3;
+
+select count(*), name, systempriority, priority from jobtype where not deleted group by name, systempriority, priority;
+
+
+-- fix names on SM access profiles
+
+select * from customer c left join user u on (u.customerid = c.id and u.login!='schoolmessenger') left join access a on (a.id = u.accessid)
+where a.name='System Administrators';
+
+update customer c left join user u on (u.customerid = c.id and u.login='schoolmessenger') left join access a on (a.id = u.accessid)
+set u.password='', a.name='SchoolMessenger Admin';
+
+select * from customer c left join user u on (u.customerid = c.id and u.login!='schoolmessenger') left join access a on (a.id = u.accessid)
+where a.name='SchoolMessenger Admin';
 
