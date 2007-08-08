@@ -56,7 +56,7 @@ $TITLE = "Reply";
 include_once('popup.inc.php');
 startWindow('Reply Info', 'padding: 3px;');
 
-buttons(button("Done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"));
+buttons(button("Done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"), button("Delete", "return confirm('Are you sure you want to delete this reply?');", "repliespreview.php?delete=$vr->id") );
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0">
@@ -105,7 +105,6 @@ TYPE="application/x-oleobject">
 
 
 <br><a href="repliesplay.wav.php/download_preview.wav?id=<? print $_GET['id']; ?>&download=true">Click here to download</a>
-<br><a href="repliespreview.php?delete=<?=$vr->id?>" onclick="return confirm('Are you sure you want to delete this reply?');">Click here to delete</a>
 </div>
 <?
 endWindow();
