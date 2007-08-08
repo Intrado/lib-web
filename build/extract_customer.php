@@ -228,7 +228,7 @@ $result = mysql_query("select hostname, inboundnumber from customer where id = '
 
 $row = mysql_fetch_row($result);
 $custpass = genpassword();
-$destres = mysql_query("replace into customer(id,urlcomponent, inboundnumber, shardid, dbusername, dbpassword, enabled) values
+$destres = mysql_query("insert into customer(id,urlcomponent, inboundnumber, shardid, dbusername, dbpassword, enabled) values
 						($customerid,'$row[0]', '$row[1]', '1', '$newdbname', '$custpass', '1')", $authdb)
 						or die("Failed to insert new customer into auth server: " . mysql_error($custdb));
 
