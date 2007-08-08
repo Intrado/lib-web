@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#reports/reports.htm
+Certain reports can be customized and saved for quick access. You can also schedule your saved reports to automatically email the current results on a regular basis.
