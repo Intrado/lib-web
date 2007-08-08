@@ -164,7 +164,7 @@ class CallsReport extends ReportGenerator{
 					$newrule->fieldnum = $rule[2];
 					$newrule->val = $rule[3];
 					$fieldname = QuickQuery("select name from fieldmap where fieldnum = '$newrule->fieldnum'");
-					$searchrules[] = $fieldname . " : " . preg_replace("{\|}", ", ", $newrule->val);
+					$searchrules[] = $fieldname . ": " . preg_replace("{\|}", ", ", $newrule->val);
 				}
 			}
 		}
@@ -237,9 +237,9 @@ class CallsReport extends ReportGenerator{
 			list($pkey,$firstname, $lastname) = QuickQueryRow($query);
 ?>
 			<table  width="100%" cellpadding="3" cellspacing="1" class="list" >
-				<tr><td>ID# <?=$pkey?></td></tr>
-				<tr><td>First Name <?=$firstname?></td></tr>
-				<tr><td>Last Name <?=$lastname?></td></tr>
+				<tr><td>ID#: <?=$pkey?></td></tr>
+				<tr><td>First Name: <?=$firstname?></td></tr>
+				<tr><td>Last Name: <?=$lastname?></td></tr>
 			</table>
 <?
 		endWindow();
