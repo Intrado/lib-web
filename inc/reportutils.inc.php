@@ -168,7 +168,7 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 			<td><?
 				NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
 				if($infinite)
-					NewFormItem($f, $s, 'relativedate', 'selectoption', '-- Select A Date Options --', "");
+					NewFormItem($f, $s, 'relativedate', 'selectoption', '-- Date --', "");
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Today', 'today');
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Yesterday', 'yesterday');
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last Week Day', 'lastweekday');
