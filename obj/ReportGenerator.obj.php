@@ -61,7 +61,8 @@ class ReportGenerator {
 		$params = $this->generateXmlParams();
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 
-		$activefields = (isset($this->params['activefields']) && ($this->params['activefields'] != "")) ? explode("','", $this->params['activefields']) : array();
+		$activefields = (isset($this->params['activefields']) && ($this->params['activefields'] != "")) ? explode(",", $this->params['activefields']) : array();
+
 		$active = array();
 		foreach($activefields as $index){
 			$newindex = preg_replace("{f}", "", $index);
@@ -69,7 +70,7 @@ class ReportGenerator {
 		}
 		if(count($active) == 0)
 			$active["empty"] = new XML_RPC_VALUE("", 'string');
-			
+
 		$xmlparams[] = new XML_RPC_Value($active, 'struct');
 
 		$xmlparams[] = new XML_RPC_Value($options['filename'], 'string');
