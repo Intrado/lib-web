@@ -159,7 +159,7 @@ class SurveyReport extends ReportGenerator{
 						if ($jobstats['survey']['emailparticipants'] ){ 
 							$noparticipants=false;
 					?>
-									<div style="float; left"><img src="graph_survey_email_participation.png.php?<?= $urloptions ?>"></div>
+									<div style="float: left"><img src="graph_survey_email_participation.png.php?<?= $urloptions ?>"></div>
 					<? 
 						}
 						if($noparticipants){
@@ -176,7 +176,7 @@ class SurveyReport extends ReportGenerator{
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Response Summary</th>
 					<td class="bottomBorder">
-						<div style="float; left">
+						<div style="float: left">
 						<table width="100%" cellpadding="3" cellspacing="1" class="list">
 <?										
 							showtable($data,$titles,$formatters);
@@ -203,11 +203,11 @@ class SurveyReport extends ReportGenerator{
 									<table>
 										<tr><td valign="top"><div style='font-weight:bold;'>Question <?=$line[0]?>:</div></td></tr>
 										<tr>
-											<td><?=fmt_question($line,1)?></td>
+											<td width="400px"><?=fmt_question($line,1)?></td>
 										</tr>
 										<tr>
 												<td>
-													<table width=400px" cellpadding="3" cellspacing="1" class="list">
+													<table width="400px" cellpadding="3" cellspacing="1" class="list">
 														<tr>
 															<th align="left" class="listheader nosort" width='10%'>1</th>
 															<th align="left" class="listheader nosort" width='10%'>2</th>
