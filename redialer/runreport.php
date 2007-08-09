@@ -11,7 +11,7 @@ $filename = $argv[3];
 $_DBHOST = $argv[4];
 $_DBNAME = $argv[5];
 $_DBUSER = $argv[6];
-$_DBPASS = $argv[7];
+@ $_DBPASS = $argv[7];
 
 
 $params = array("filename" => $filename);
@@ -56,7 +56,7 @@ if($type == "subscription"){
 	$options = $instance->getParameters();
 
 	switch($options['reporttype']){
-		
+
 		case 'contacthistory':
 			$generator = new CallsReport();
 			break;
@@ -82,7 +82,7 @@ if($type == "subscription"){
 		if($count > 1200){
 			$generator = new JobSummaryReport();
 			$options['reporttype'] = 'jobsummaryreport';
-			$options['sorrymessage'] = 
+			$options['sorrymessage'] =
 				"Notice: The contact details for this job exceeds the page limit for an emailed autoreport.  See notification summary information above.  To view contact details, log into your web account and access the Phone Log or Email Log report.";
 		} else {
 			$generator = new JobAutoReport();
@@ -93,7 +93,7 @@ if($type == "subscription"){
 		$options['reporttype'] = 'surveyreport';
 	}
 
-	
+
 	$options['jobid'] = $id;
 	$options['subname'] = $job->name;
 	$instance->setParameters($options);
@@ -112,7 +112,7 @@ echo "finished configuring generator\n";
 $result = "";
 if($options['reporttype'] == 'phonedetail' || $options['reporttype'] == 'emaildetail'){
 	$result = $generator->testSize();
-	
+
 }
 if($result == ""){
 	$generator->generateQuery();
