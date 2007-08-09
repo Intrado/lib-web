@@ -97,7 +97,7 @@ if(isset($_REQUEST['reportid'])){
 	$_SESSION['report']['options'] = $options;
 	redirect();
 } else if(isset($_REQUEST['type'])){
-
+	$_SESSION['report']['jobdetail']=1;
 	$options = $_SESSION['report']['options'];
 	$_SESSION['report']['type'] = $_REQUEST['type'];
 	if($_REQUEST['type'] == "phone"){
@@ -181,6 +181,7 @@ if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
 $f="reports";
 $s="jobs";
 $reload = 0;
+$submit=0;
 
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 {
@@ -197,6 +198,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
+			$submit=1;
 			$options = $instance->getParameters();
 			for($i=1; $i<=$ordercount; $i++){
 				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
@@ -289,7 +291,7 @@ if($error || $reportgenerator->format == "html"){
 	NewForm($f);
 	
 	//check to see if referer came from summary page.  if so, go to history instead of referer
-	if(isset($_SESSION['report']['jobdetail']) || $error)
+	if(isset($_SESSION['report']['jobdetail']) || $error || $submit)
 		$back = button("Back", "window.history.go(-1)");
 	else {
 		$fallbackUrl = "reports.php";
