@@ -27,6 +27,16 @@ class ContactsReport extends ReportGenerator {
 		}
 		$fieldquery = generateFields("p");
 		
+		$peoplephonelist = QuickQueryList("select personid from phone ph where 1 $phonequery group by personid");
+		$peopleemaillist = QuickQueryList("select personid from email e where 1 $emailquery group by personid");
+		$intersect = array_intersect($peoplephonelist, $peopleemaillist);
+		if($emailquery == "" && !count($peopleemaillist))
+			$intersect = $peoplephonelist;
+		else if($phonequery == "" && !count($peoplephonelist))
+			$intersect = $peopleemaillist;
+
+		$peoplelist = implode("','", $intersect);
+		
 		$this->query = "select SQL_CALC_FOUND_ROWS
 					p.pkey as pkey, 
 					p.id as pid,
@@ -42,12 +52,9 @@ class ContactsReport extends ReportGenerator {
 					$fieldquery	
 					from person p
 					left join address a on (a.personid = p.id)
-					left join phone ph on (ph.personid = p.id)
-					left join email e on (e.personid = p.id)
 					where not p.deleted
+					and p.id in ('" . $peoplelist ."')
 					and p.type='system'
-					$phonequery
-					$emailquery
 					$personquery
 					$usersql
 					$rulesql		
@@ -225,7 +232,55 @@ class ContactsReport extends ReportGenerator {
 	}
 	
 	function runCSV(){
-		echo "Not ready yet";
+			
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
+		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
+		
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=report.csv");
+		header("Content-type: application/vnd.ms-excel");
+	
+		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+	
+		//generate the CSV header
+		$header = '"ID#", "First Name", "Last Name", "Address"';
+
+		foreach($activefields as $active){
+			if(!$active) continue;
+			$header .= ',"' . $fieldlist[$active] . '"';
+		}
+		echo $header;
+		echo "\r\n";
+	
+		$result = Query($this->query);
+	
+		while ($row = DBGetRow($result)) {
+			
+			$reportarray = array($row[0], $row[2], $row[3], $row[4]);
+
+			$count=0;
+			foreach($fieldlist as $index => $field){
+				if(in_array($index, $activefields)){
+					$reportarray[] = $row[5+$count];
+				}
+				$count++;
+			}
+			$phonelist = DBFindMany("Phone", "from phone where personid = '$row[1]'");
+			foreach($phonelist as $phone){
+				$reportarray[] = $phone->phone;
+			}
+			$emaillist = DBFindMany("Email", "from email where personid = '$row[1]'");
+			foreach($emaillist as $email){
+				$reportarray[] = $email->email;
+			}
+			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
+		
+		}
 	}
 	
 	function getReportSpecificParams(){
