@@ -267,14 +267,12 @@ if($error || $reportgenerator->format == "html"){
 	$reportgenerator->format = "html";
 	$PAGE = "reports:reports";
 	$TITLE = "Phone Log";
-	if(isset($_SESSION['report']['options']['reporttype'])){
-		if($_SESSION['report']['options']['reporttype'] == "phonedetail"){
-			$TITLE = "Phone Log";
-		} else if($_SESSION['report']['options']['reporttype'] == "emaildetail"){
-			$TITLE = "Email Log";
-		}
-	} else if(isset($options['reporttype']) && $options['reporttype'] == "notcontacted"){
-		$TITLE = "Not Contacted";
+	if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "phonedetail"){
+		$TITLE = "Phone Log";
+	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "emaildetail"){
+		$TITLE = "Email Log";
+	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
+		$TITLE = "Individuals Not Contacted";
 	}
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
