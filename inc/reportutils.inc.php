@@ -163,7 +163,7 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 //function to generate table for date options.
 //Note that the form data names are pre-set.
 ?>
-	<table  border="0" cellpadding="3" cellspacing="0" width="100%" id="<?=$tablename?>">
+	<table  border="0" cellpadding="3" cellspacing="0" id="<?=$tablename?>">
 		<tr>
 			<td><?
 				NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
