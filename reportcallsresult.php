@@ -215,7 +215,7 @@ if(isset($options['rules']) && $options['rules']){
 	startWindow("Search Results");
 		if(count($data) > 0){
 ?>
-			<div>Your search returned multiple persons.  Please choose one:<div>
+			<div>Your search returned more than one result. Please choose one:<div>
 <?
 		} else {
 ?>

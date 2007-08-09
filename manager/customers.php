@@ -17,7 +17,7 @@ function fmt_status($row, $index){
 	if($row[$index])
 		return "Repeating Jobs Disabled";
 	else
-		return "OK";
+		return "&nbsp;";
 }
 
 function fmt_users($row, $index){
