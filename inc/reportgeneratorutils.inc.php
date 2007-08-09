@@ -45,7 +45,7 @@ function getJobSummary($joblist){
 							u.login,
 							j.startdate,
 							j.starttime,
-							coalesce(j.finishdate, j.enddate),
+							coalesce(j.finishdate, concat(j.enddate, ' ' , j.endtime)),
 							j.status,
 							count(distinct rp.personid) as pcount,
 							coalesce(sum(rc.type='phone'), 0),
