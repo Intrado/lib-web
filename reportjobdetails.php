@@ -291,7 +291,7 @@ if($error || $reportgenerator->format == "html"){
 	NewForm($f);
 	
 	//check to see if referer came from summary page.  if so, go to history instead of referer
-	if(isset($_SESSION['report']['jobdetail']))
+	if(isset($_SESSION['report']['jobdetail']) || $error)
 		$back = button("Back", "window.history.go(-1)");
 	else {
 		$fallbackUrl = "reports.php";
