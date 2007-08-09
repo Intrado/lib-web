@@ -317,6 +317,7 @@ class SurveyReport extends ReportGenerator{
 		}
 
 		foreach($activefields as $active){
+			if(!$active) continue;
 			$header .= ',"' . $fieldlist[$active] . '"';
 		}
 		echo $header;

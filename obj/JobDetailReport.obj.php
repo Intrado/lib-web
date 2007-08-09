@@ -254,7 +254,7 @@ class JobDetailReport extends ReportGenerator{
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
-		$activefields = explode(",", $options['activefields']);
+		$activefields = explode(",", isset($options['activefields']) ? $options['activefields'] : "");
 		
 		
 		header("Pragma: private");
@@ -289,9 +289,12 @@ class JobDetailReport extends ReportGenerator{
 				$header .= ",Question $x";
 			}
 		}
+	
 		foreach($activefields as $active){
+			if(!$active) continue;
 			$header .= ',"' . $fieldlist[$active] . '"';
 		}
+
 		echo $header;
 		echo "\r\n";
 	
