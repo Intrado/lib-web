@@ -30,14 +30,13 @@ if ($jobid == 0) {
 	exit(-1);
 }
 
-echo "generatejobsql for customerid=".$custid." jobid=".$jobid."\n";
+//echo "generatejobsql for customerid=".$custid." jobid=".$jobid."\n";
 
 // gather database connection info
 $db['host'] = $argv[3];
 $db['db'] = $argv[4];
 $db['user'] = $argv[5];
-$db['pass'] = $argv[6]; // password is last argument in case it is blank
-
+@ $db['pass'] = $argv[6]; // password is last argument in case it is blank
 
 
 // 	now connect to the customer database
@@ -63,6 +62,8 @@ $job->generateSql();
 echo "new sql is: " . $job->thesql . "\n";
 
 $job->update();
+
+echo "job updated, assume success \n";
 
 exit(0); // success
 ?>
