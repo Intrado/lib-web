@@ -126,7 +126,9 @@ $titles = array("0" => "ID#",
 				"1" => "First Name",
 				"2" => "Last Name");
 				
-$formatters = array("0" => "drilldownOnId");
+$formatters = array("0" => "drilldownOnId",
+					"1" => "drilldownOnId",
+					"2" => "drilldownOnId");
 
 $searchrules = array();
 if(isset($options['rules']) && $options['rules']){
