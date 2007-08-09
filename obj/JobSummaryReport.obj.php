@@ -209,7 +209,7 @@ class JobSummaryReport extends ReportGenerator{
 				if($phonenumberinfo[0] > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=phone"/a>Phone:</a></th>
+					<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 					<td class ="bottomBorder">	
 						<table width="100%">
 							<tr>
@@ -247,16 +247,20 @@ class JobSummaryReport extends ReportGenerator{
 							<tr>
 								<td>
 									<table>
-			<?
+<?
 										foreach($cpcodes as $index => $value){
-			?>
+?>
 										<tr>
 											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=<?=$index?>"/><?=$value?></a><u></div></td>
 											<td><?=$jobstats["phone"][$index]?></td>
 										</tr>
-			<?
+<?
 										}
-			?>
+?>
+										<tr>
+											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php?type=phone"/a>Total:</a><u></div></td>
+											<td><?=$jobstats["phone"]['totalcalls']?></td>
+										</tr>
 									</table>
 								</td>
 								<td>
