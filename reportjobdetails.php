@@ -56,10 +56,11 @@ function fmt_jobdetail_result($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
+$pagestartflag=0;
 $pagestart=0;
 if(isset($_GET['pagestart'])){
 	$pagestart = $_GET['pagestart'];
+	$pagestartflag=1;
 }
 
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
@@ -291,7 +292,7 @@ if($error || $reportgenerator->format == "html"){
 	NewForm($f);
 	
 	//check to see if referer came from summary page.  if so, go to history instead of referer
-	if(isset($_SESSION['report']['jobdetail']) || $error || $submit)
+	if(isset($_SESSION['report']['jobdetail']) || $error || $submit || $pagestartflag)
 		$back = button("Back", "window.history.go(-1)");
 	else {
 		$fallbackUrl = "reports.php";
