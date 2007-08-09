@@ -53,6 +53,10 @@ function fmt_number ($row,$index) {
 		return "";
 }
 
+
+$customers = QuickQueryList("select id, urlcomponent from customer",true);
+
+
 $res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 $shards = array();
 while($row = DBGetRow($res)){
@@ -61,7 +65,6 @@ while($row = DBGetRow($res)){
 }
 
 
-$customers = QuickQueryList("select id, urlcomponent from customer",true);
 
 
 $calldata = array();
