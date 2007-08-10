@@ -9,13 +9,16 @@ include_once("obj/Message.obj.php");
 include_once("inc/securityhelper.inc.php");
 
 if(isset($_GET['delete'])){
-	$delete = $_GET['delete'];
+	$delete = $_GET['delete']+0;
 	if(!userOwns("voicereply", $delete)){
 		redirect('unauthorized.php');
 	}
 	$vr = new VoiceReply($delete);
 	$vr->destroy();
-	?><script>window.close();</script><?
+	?><script>
+			window.opener.document.location.reload();
+			window.close();
+	</script><?
 }
 
 $id = 0;
