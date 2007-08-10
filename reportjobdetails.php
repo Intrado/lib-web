@@ -119,6 +119,8 @@ if(isset($_REQUEST['reportid'])){
 
 	if($_REQUEST['result'] == "sent" || $_REQUEST['result'] == "unsent"){
 		$options['reporttype']="emaildetail";
+		if($_REQUEST['result'] == "sent")
+			$options['result'] .= "','duplicate";
 	} else if($_REQUEST['result'] == "undelivered"){
 		$options['reporttype'] = "notcontacted";
 	} else {
