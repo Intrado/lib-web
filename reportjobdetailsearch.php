@@ -535,8 +535,8 @@ startWindow("Select", NULL, false);
 		</td>
 	</tr>
 	<script>
-		setHiddenIfChecked('check_archived', 'jobid');
-		setVisibleIfChecked('check_archived', 'jobid_archived')
+		setHiddenIfChecked(new getObj('check_archived').obj, 'jobid');
+		setVisibleIfChecked(new getObj('check_archived').obj, 'jobid_archived')
 		if(new getObj("job").obj.checked){
 			hide("daterange");
 		} else {
