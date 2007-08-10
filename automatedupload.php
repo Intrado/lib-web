@@ -169,7 +169,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 						"errorMsg" => "Md5 is different. Request mdd5 = " . $_SESSION['md5'] . " Md5 of file on server: $currentmd5",
 						"errorCode" => "CHECHSUM_FAILURE");
 
-		$timezone = QuickQuery("select timezone from setting");
+		$timezone = getSystemSetting("timezone");
 		@date_default_timezone_set($timezone);
 		QuickUpdate("set time_zone='$timezone'");
 
