@@ -77,8 +77,8 @@ class JobSummaryReport extends ReportGenerator{
 		$phonenumberquery = "select sum(rc.type='phone') as total,
 									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts')) as remaining,
-									sum(rp.numduperemoved) as duplicate,
-									sum(rp.numblocked) as blocked,
+									sum(rc.result = 'duplicate') as duplicate,
+									sum(rc.result = 'blocked') as blocked,
 									sum(rp.status = 'nocontacts') as nocontacts,
 									sum(rc.numattempts) as totalattempts
 									from reportperson rp
@@ -92,7 +92,7 @@ class JobSummaryReport extends ReportGenerator{
 		$emailquery = "select sum(rc.type = 'email') as total,
 									sum(rp.status in ('success', 'duplicate')) as sent,
 									sum(rp.status not in ('success', 'duplicate')) as unsent,
-									sum(rp.numduperemoved) as duplicate,
+									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts') as nocontacts
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
