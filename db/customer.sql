@@ -666,7 +666,7 @@ CREATE TABLE `smsjob` (
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `status` (`status`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1
+) ENGINE=innodb DEFAULT CHARSET=latin1
 $$$
 
 -- --------------------------------------------------------
@@ -682,7 +682,7 @@ CREATE TABLE `smsmsg` (
   `sequence` tinyint(4) NOT NULL,
   `phone` varchar(10) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1
+) ENGINE=innodb DEFAULT CHARSET=latin1
 $$$
 
 -- --------------------------------------------------------
