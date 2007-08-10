@@ -126,7 +126,7 @@ echo $result;
 // if success, and subscription, then update the lastrun field
 if("success" == $result) {
 	if ("subscription" == $type) {
-		QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id)); // TODO handle timezone
+		QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id));
 	}
 	exit(0);
 }
