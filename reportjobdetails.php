@@ -107,7 +107,7 @@ if(isset($_REQUEST['reportid'])){
 		$options['reporttype'] = "emaildetail";
 	}
 	unset($options['result']);
-
+	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
 	redirect();
 } else if(isset($_REQUEST['result'])){
@@ -126,6 +126,7 @@ if(isset($_REQUEST['reportid'])){
 	} else {
 		$options['reporttype']="phonedetail";
 	}
+	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
 	redirect();
 } else {
