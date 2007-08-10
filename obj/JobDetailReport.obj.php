@@ -42,6 +42,8 @@ class JobDetailReport extends ReportGenerator{
 		if(isset($this->params['result']) && $this->params['result']){
 			if($this->params['result'] == "undelivered"){
 				$resultquery = " and rp.status = 'fail' ";
+			} else if($this->params['result'] == "nocontacts"){
+				$resultquery = " and rp.status = 'nocontacts' ";
 			} else {
 				$resultquery = " and rc.result in ('" . $this->params['result'] . "')";
 			}
