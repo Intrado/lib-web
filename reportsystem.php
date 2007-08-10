@@ -290,7 +290,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 			if(!$name)
 				$name = "System";
 			else
-				$name .= " : " . $index;
+				$name .= ": " . $index;
 ?>
 			<td><u><?=$name?><u></td>
 <?
