@@ -433,7 +433,7 @@ startWindow("Select", NULL, false);
 								<?
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 									NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job where deleted = 0 and status in ('active','complete','cancelled','cancelling') $userJoin order by id desc");
+									$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and j.questionnaireid is null $userJoin order by id desc");
 							
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
@@ -441,7 +441,7 @@ startWindow("Select", NULL, false);
 									NewFormItem($f, $s, "jobid", "selectend");
 									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job where deleted = 2 and status!='repeating' $userJoin order by id desc");
+									$jobs = DBFindMany("Job","from job j where deleted = 2 and status!='repeating' and j.questionnaireid is null $userJoin order by id desc");
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 									}
