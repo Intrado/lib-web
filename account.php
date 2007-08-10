@@ -69,7 +69,7 @@ if(CheckFormSubmit($f,$s))
 			error('Telephone Pin Code confirmation does not match');
 		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
 			error($error);
-		} elseif (($callerid != "") && (strlen($callerid)!=10)){
+		} elseif ((GetFormData($f, $s, 'callerid') != "") && (strlen($callerid)!=10)){
 			error('Caller ID must be 10 digits long', 'You do not need to include a 1 for long distance');
 		} elseif (strlen($login) < $usernamelength && !$USER->ldap) {
 			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
