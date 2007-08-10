@@ -15,6 +15,8 @@ $authpass = "";
 
 $customerid = $argv[1];
 
+$starttime = microtime(true);
+
 $db = mysql_connect($dbhost,$dbuser,$dbpass,true);
 mysql_select_db("dialerasp",$db);
 
@@ -203,7 +205,7 @@ function customerinfo($custid, $source, $dest){
 	$destres = mysql_query("insert into setting (name, value) values
 								('inboundnumber', '$row[0]'),
 								('timezone', '$row[1]'),
-								('displayname', '$row[2]'),
+								('displayname', '" . esc($row[2],$dest) . "'),
 								('_maxusers' , '$row2[0]')", $dest)
 							or die ("Failed to insert into setting: " . mysql_error($dest));
 }
@@ -226,7 +228,10 @@ $newdbname = "c_$customerid";
 $result = mysql_query("select hostname, inboundnumber from customer where id = '$customerid'", $db)
 			or die ("Failed to query customer: " . mysql_error($db));
 
-$row = mysql_fetch_row($result);
+$row = mysql_fetch_row($result) or die ("Failed to query customer: $customerid");
+
+echo "Doing $customerid\n";
+
 $custpass = genpassword();
 $destres = mysql_query("insert into customer(id,urlcomponent, inboundnumber, shardid, dbusername, dbpassword, enabled) values
 						($customerid,'$row[0]', '$row[1]', '1', '$newdbname', '$custpass', '1')", $authdb)
@@ -427,5 +432,6 @@ copytable($customerid,"usersetting",array("id", "userid", "name", "value"),$db,$
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"voicereply",array("id", "personid", "jobid", "userid", "contentid", "replytime", "listened"),$db,$custdb,1000,$join);
 
+echo "Did $customerid in " . sprintf("%0.2f",microtime(true) - $starttime) . "\n";
 
 ?>
