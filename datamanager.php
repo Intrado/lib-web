@@ -231,11 +231,11 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 					"Date" => 'reldate',
 					"List" => 'multisearch');
 
-		if(!FieldMap::getFirstNameField())
+		if(!FieldMap::getName(FieldMap::getFirstNameField()))
 			$types["First Name"] = 'text,firstname';
-		if(!FieldMap::getLastNameField())
+		if(!FieldMap::getName(FieldMap::getLastNameField()))
 			$types["Last Name"] = 'text,lastname';
-		if(!FieldMap::getLanguageField())
+		if(!FieldMap::getName(FieldMap::getLanguageField()))
 			$types["Language"] = 'multisearch,language';
 		if(!FieldMap::getSchoolField())
 			$types["School"] = 'multisearch,school';
