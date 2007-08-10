@@ -424,7 +424,7 @@ function report_name($string){
 		case 'contacthistory':
 			return "Contact history";
 		case 'notcontacted':
-			return "Individuals Not Contacted";
+			return "Recipients Not Contacted";
 		case 'jobautoreport':
 			return "Auto Report";
 		default:
@@ -460,6 +460,8 @@ function fmt_result ($row,$index) {
 			return "Unsent";
 		case "notattempted":
 			return "Not Attempted";
+		case "undelivered":
+			return "Not Contacted";
 		default:
 			return ucfirst($row[$index]);
 	}
@@ -489,6 +491,20 @@ function display_rel_date($string, $arg1="", $arg2=""){
 function fmt_message ($row,$index) {
 	//index is message type and index+1 is message name
 	return '<img src="img/' . $row[$index] . '.png" align="bottom" />&nbsp;' . fmt_limit_25($row, $index+1);
+}
+
+function fmt_scheduled_date($row, $index){
+	//expects the start date and end date to be sequential in the row
+	$start = date("M j, Y", strtotime($row[$index]));
+	$end = date("M j, Y", strtotime($row[$index+1]));
+	return $start . " - " . $end;
+}
+
+function fmt_scheduled_time($row, $index){
+	//expects the start time and end time to be sequential in the row
+	$start = date("g:i a", strtotime($row[$index]));
+	$end = date("g:i a", strtotime($row[$index+1]));
+	return $start . " - " . $end;
 }
 
 ?>
