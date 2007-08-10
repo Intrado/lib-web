@@ -28,18 +28,35 @@ if (!$USER->authorize('viewusagestats')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$showusers = 0;
-if(isset($_REQUEST['showusers']) && $_REQUEST['showusers'] == 1){
-	$showusers = 1;
+if(isset($_REQUEST['clear'])){
+	unset($_SESSION['usagestats']);	
+	redirect();
 }
 
-$groupby = FieldMap::getSchoolField(); //defaults to school f-field
+$clear=0;
+if(isset($_REQUEST['showusers'])){
+	$_SESSION['usagestats']['showusers'] = $_REQUEST['showusers'];
+	$clear = 1;
+}
+if(isset($_REQUEST['type']) && $_REQUEST['type'] != ""){
+	$_SESSION['usagestats']['type'] = DBSafe($_REQUEST['type']);
+	$clear = 1;
+}
+
+if($clear)
+	redirect();
+
+$groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : FieldMap::getSchoolField(); //defaults to school f-field
 if(!$groupby)
 	$groupby = ""; //but if school is not used, default to blank
 $fields = DBFindMany("FieldMap", "from fieldmap where options like '%multisearch%'");
 
-$type = "phone";
-$reldate = "monthtodate";
+$showusers = isset($_SESSION['usagestats']['showusers']) ? $_SESSION['usagestats']['showusers'] : "0";
+$type = isset($_SESSION['usagestats']['type']) ? $_SESSION['usagestats']['type'] : "phone";
+$reldate = isset($_SESSION['usagestats']['reldate']) ? $_SESSION['usagestats']['reldate'] : "monthtodate";
+$lastxdays = isset($_SESSION['usagestats']['lastxdays']) ? $_SESSION['usagestats']['lastxdays'] : "0";
+$startdate = isset($_SESSION['usagestats']['startdate']) ? $_SESSION['usagestats']['startdate'] : "";
+$enddate = isset($_SESSION['usagestats']['enddate']) ? $_SESSION['usagestats']['enddate'] : "";
 $f = "system";
 $s = "report";
 $reload = 0;
@@ -66,9 +83,13 @@ if(CheckFormSubmit($f,$s))
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
 		} else {
-			$groupby = DBSafe(GetFormData($f, $s, "groupby"));
-			$reldate = GetFormData($f, $s, "relativedate");
-			$type = DBSafe(GetFormData($f, $s, "type"));
+			$_SESSION['usagestats']['groupby'] = DBSafe(GetFormData($f, $s, "groupby"));
+			$_SESSION['usagestats']['reldate'] = GetFormData($f, $s, "relativedate");
+			$_SESSION['usagestats']['type'] = DBSafe(GetFormData($f, $s, "type"));
+			$_SESSION['usagestats']['lastxdays'] = GetFormData($f, $s, "xdays");
+			$_SESSION['usagestats']['startdate'] = $startdate;
+			$_SESSION['usagestats']['enddate'] = $enddate;
+			redirect();
 		}
 	}
 } else {
@@ -77,16 +98,14 @@ if(CheckFormSubmit($f,$s))
 
 if($reload){
 	ClearFormData($f);
-	PutFormData($f, $s, "phone", "1", "bool", 0, 1);
-	PutFormData($f, $s, "email", "1", "bool", 0, 1);
 	PutFormData($f, $s, "groupby", $groupby);
 	PutFormData($f, $s, "showusers", $showusers, "bool", 0, 1);
 	
 	PutFormData($f, $s, "relativedate", $reldate);
-	PutFormData($f, $s, 'xdays', isset($lastxdays) ? $lastxdays : "0", "number");
-	PutFormData($f, $s, "startdate", isset($startdate) ? $startdate : "", "text");
-	PutFormData($f, $s, "enddate", isset($enddate) ? $enddate : "", "text");
-	PutFormData($f, $s, "type", isset($type) ? $type : "");
+	PutFormData($f, $s, 'xdays', $lastxdays, "number");
+	PutFormData($f, $s, "startdate", $startdate, "text");
+	PutFormData($f, $s, "enddate", $enddate, "text");
+	PutFormData($f, $s, "type", $type);
 }
 
 
@@ -232,7 +251,7 @@ startWindow("Display Options", "padding: 3px;");
 			<th align="right" class="windowRowHeader">Show Users:</th>
 			<td>
 				<? 
-					NewFormItem($f, $s, "showusers", "checkbox", null, null, "onclick=\"window.location='?showusers='+ (this.checked ? '1' : '0') \"");
+					NewFormItem($f, $s, "showusers", "checkbox", null, null, "onclick=\"window.location='?showusers='+ (this.checked ? '1' : '0') + '&type=$type'\"");
 				?>
 				Show Users
 			</td>
