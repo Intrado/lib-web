@@ -389,6 +389,16 @@ copytable($customerid,"schedule",array("id", "userid", "time", "nextrun"),$db,$c
 //SCHEDULEDAY table removed, dow field added to schedule table
 restructureScheduleDay($customerid, $db, $custdb);
 
+//SMSJOB
+$join = "
+inner join user u on (smsjob.userid=u.id and u.customerid=$customerid)";
+copytable($customerid,"smsjob", array("id","userid","listid","name","description","txt","sendoptout","sentdate","status","deleted"),$db,$custdb,1000, $join);
+
+//SMSMESSAGE
+$join = "inner join smsjob on (smsjob.id = smsmsg.smsjobid)
+inner join user u on (smsjob.userid = u.id and u.customerid=$customerid)";
+copytable($customerid, "smsmsg", array("id","smsjobid","personid","sequence","phone"),$db,$custdb,1000,$join);
+
 //SPECIALTASK
 //dont copy
 
@@ -432,6 +442,5 @@ copytable($customerid,"usersetting",array("id", "userid", "name", "value"),$db,$
 $join = "inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"voicereply",array("id", "personid", "jobid", "userid", "contentid", "replytime", "listened"),$db,$custdb,1000,$join);
 
-echo "Did $customerid in " . sprintf("%0.2f",microtime(true) - $starttime) . "\n";
 
 ?>
