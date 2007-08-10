@@ -46,6 +46,10 @@ function fmt_answer($row, $index){
 	return "<div style='font-weight:bold; text-decoration: underline'>" . (isset($row[$offset]) ? $row[$offset] : "") . "</div><br><div>$row[$index]</div>";	
 }
 
+function fmt_questionnumber($row, $index){
+	return "Question #" . ($row[$index]);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
