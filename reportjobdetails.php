@@ -275,7 +275,7 @@ if($error || $reportgenerator->format == "html"){
 	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "emaildetail"){
 		$TITLE = "Email Log";
 	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
-		$TITLE = "Individuals Not Contacted";
+		$TITLE = "Recipients Not Contacted";
 	}
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
