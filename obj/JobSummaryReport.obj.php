@@ -193,8 +193,8 @@ class JobSummaryReport extends ReportGenerator{
 										<tr>
 											<td><?=$emailinfo[0]?></td>
 											<td><a href="reportjobdetails.php?result=sent"/><?=$emailinfo[1]?></a></td>
-											<td><a href="reportjobdetails.php?result=unsent"/><?=$emailinfo[2]?><a></td>
-											<td><?=$emailinfo[3]?></td>
+											<td><a href="reportjobdetails.php?result=unsent"/><?=$emailinfo[2]?></a></td>
+											<td><a href="reportjobdetails.php?result=duplicate"/><?=$emailinfo[3]?></a></td>
 											<td><?=$emailinfo[4]?></td>
 										</tr>
 									</table>
