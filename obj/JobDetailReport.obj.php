@@ -35,7 +35,7 @@ class JobDetailReport extends ReportGenerator{
 			if(isset($this->params['reldate']))
 				$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
-			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, null, isset($this->params['type']) ? $this->params['type'] : ""));
+			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, "false", isset($this->params['type']) ? $this->params['type'] : ""));
 		}
 		$this->params['joblist'] = $joblist;
 		$resultquery = "";
