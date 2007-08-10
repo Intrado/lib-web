@@ -108,14 +108,14 @@ class SurveyReport extends ReportGenerator{
 		$jobstats['survey']['questions'] = $questions;
 		$_SESSION['jobstats'][$jobid] = $jobstats;
 		
-		$titles = array(' #', "Question");
+		$titles = array(0 => "");
 		for ($x = 1; $x <= 9; $x++)
 			$titles[$x+2] = " #$x";
 		$titles[] = "Total";
 		
 		$data = array();
 		foreach ($jobstats['survey']['questions'] as $index => $question) {
-			$line = array_fill(1,11,"");
+			$line = array_fill(0,12,"");
 			foreach ($question['answers'] as $answer => $tally) {
 				$line[$answer+2] = $tally;
 			}
@@ -128,8 +128,6 @@ class SurveyReport extends ReportGenerator{
 			$line[14] = $validstamp;
 			$data[] = $line;
 		}
-		
-		$formatters = array();
 		
 
 		//////////////////////////////////////
@@ -179,7 +177,7 @@ class SurveyReport extends ReportGenerator{
 						<div style="float: left">
 						<table width="100%" cellpadding="3" cellspacing="1" class="list">
 <?										
-							showtable($data,$titles,$formatters);
+							showtable($data,$titles,array(0 => "fmt_questionnumber"));
 ?>						
 						</table>
 						</div>
@@ -201,7 +199,7 @@ class SurveyReport extends ReportGenerator{
 								<td>
 								<div style="float:left">
 									<table>
-										<tr><td valign="top"><div style='font-weight:bold;'>Question <?=$line[0]?>:</div></td></tr>
+										<tr><td valign="top"><div style='font-weight:bold;'><?=fmt_questionnumber($line,0)?>:</div></td></tr>
 										<tr>
 											<td width="400px"><?=fmt_question($line,1)?></td>
 										</tr>
