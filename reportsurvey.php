@@ -171,6 +171,10 @@ startWindow("Select", NULL, false);
 		</table>
 		</td>
 	</tr>
+	<script>
+		setHiddenIfChecked(new getObj('check_archived').obj, 'jobid');
+		setVisibleIfChecked(new getObj('check_archived').obj, 'jobid_archived');
+	</script>
 </table>
 
 <?
