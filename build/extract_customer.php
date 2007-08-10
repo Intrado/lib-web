@@ -363,7 +363,7 @@ copytable($customerid,"persondatavalues",array("id", "fieldnum", "value", "refco
 
 //PHONE
 $join = "inner join person p on (personid = p.id and p.customerid=$customerid)";
-copytable($customerid,"phone",array("id", "personid", "phone", "sequence", "editlock"),$db,$custdb,1000,$join);
+copytable($customerid,"phone",array("id", "personid", "phone", "sequence", "editlock", "smsenabled"),$db,$custdb,1000,$join);
 
 //REPORTCONTACT
 copytable($customerid,"reportcontact",array("jobid", "personid", "type", "sequence", "numattempts", "userid", "starttime", "result", "participated", "duration", "resultdata", "attemptdata", "phone", "email", "addressee", "addr1", "addr2", "city", "state", "zip"),$db,$custdb,1000,false);
