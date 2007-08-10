@@ -121,10 +121,10 @@ class CallsReport extends ReportGenerator{
 			}
 		}
 		// Ordering done in php due to attempt data
-		// index 4 is date/time column
+		// index 5 is date/time column
 		$temparray = $data;
 		foreach($data as $index => $row){
-			$temparray[$index] = $row[4];
+			$temparray[$index] = $row[5];
 		}
 		$tempdata=array();
 		if(asort($temparray, SORT_NUMERIC)){
