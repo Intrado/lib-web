@@ -44,8 +44,9 @@ function getJobSummary($joblist){
 							jt.name,
 							u.login,
 							j.startdate,
+							j.enddate,
 							j.starttime,
-							coalesce(j.finishdate, concat(j.enddate, ' ' , j.endtime)),
+							j.endtime,
 							j.status,
 							count(distinct rp.personid) as pcount,
 							coalesce(sum(rc.type='phone'), 0),
@@ -83,10 +84,10 @@ function displayJobSummary($joblist){
 								<th>Job Name</th>
 								<th>Type</th>
 								<th>Submitted By</th>
-								<th>Start Date</th>
-								<th>End Date</th>
+								<th>Scheduled Date</th>
+								<th>Scheduled Time</th>
 								<th>Status</th>
-								<th>Individuals</th>
+								<th>Recipients</th>
 								<th># of Phones</th>
 								<th># of Emails</th>
 							</tr>
@@ -99,12 +100,12 @@ function displayJobSummary($joblist){
 									<td><?=$job[0]?></td>
 									<td><?=$job[1]?></td>
 									<td><?=$job[2]?></td>
-									<td><?=fmt_date($job,3)?></td>
-									<td><?=fmt_date($job,5)?></td>
-									<td><?=ucfirst($job[6])?></td>
-									<td><?=$job[7]?></td>
+									<td><?=fmt_scheduled_date($job,3)?></td>
+									<td><?=fmt_scheduled_time($job,5)?></td>
+									<td><?=ucfirst($job[7])?></td>
 									<td><?=$job[8]?></td>
 									<td><?=$job[9]?></td>
+									<td><?=$job[10]?></td>
 								</tr>
 <?
 							}
