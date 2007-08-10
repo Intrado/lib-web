@@ -129,7 +129,7 @@ $reportgenerator->reportinstance = $reportinstance;
 $reportgenerator->userid = $USER->id;
 $reportgenerator->format = "html";
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($f, 'search') || CheckFormSubmit($f, 'refresh')){
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
@@ -153,7 +153,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall')){
 				redirect();
 			} else {
 				$options['reporttype']="contacts";
-				unset($options['showall']);
+				if(CheckFormSubmit($f, 'search') || CheckFormSubmit($f, $s))
+					unset($options['showall']);
 				if(GetFormData($f, $s, "radioselect") == "person"){
 					unset($options['rules']);
 					$options['personid'] = GetFormData($f, $s, 'personid');
@@ -253,7 +254,7 @@ $TITLE = "Contact Database";
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(submit($f, $s, 'Search'), submit($f, 'showall','Show All Contacts'));
+buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
 startWindow("Contact Search", "padding: 3px;");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -295,6 +296,7 @@ startWindow("Contact Search", "padding: 3px;");
 							<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'personid', 'text', '15'); ?></td></tr>
 							<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '12'); ?></td></tr>
 							<tr><td>Email Address: </td><td><? NewFormItem($f, $s, 'email', 'text', '100'); ?></td></tr>
+							<tr><td><?=submit($f,'search', 'Search')?></td></tr>
 						</table>
 					</td>
 				</tr>
