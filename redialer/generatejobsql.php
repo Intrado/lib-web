@@ -56,6 +56,13 @@ if (!QuickQuery("select count(*) from job where id=".$jobid)) {
 	exit(-1);
 }
 
+$timezone = QuickQuery("select value from setting where name='timezone'");
+if($timezone){
+	@date_default_timezone_set($timezone);
+	QuickUpdate("set time_zone='" . $timezone . "'");
+}
+
+
 $job = new Job($jobid);
 $job->generateSql();
 
