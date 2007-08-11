@@ -16,26 +16,27 @@ class ContactsReport extends ReportGenerator {
 		$phonequery="";
 		$emailquery="";
 		$personquery="";
-		if(isset($this->params['phone'])){
-			$phonequery = $this->params['phone'] ? " and ph.phone like '%" . DBSafe($this->params['phone']) . "%'" : "";
+		$peoplequery = "";
+		if(isset($this->params['phone']) && $this->params['phone'] != ""){
+			$peoplephonelist = QuickQueryList("select personid from phone ph where 1 and ph.phone like '%" . DBSafe($this->params['phone']) . "%' group by personid");
 		} 
-		if(isset($this->params['email'])){
-			$emailquery = $this->params['email'] ? " and e.email like '%" . DBSafe($this->params['email']) . "%'" : "";
+		if(isset($this->params['email']) && $this->params['email'] != ""){
+			$peopleemaillist = QuickQueryList("select personid from email e where 1 and e.email like '%" . DBSafe($this->params['email']) . "%'  group by personid");
 		}
 		if(isset($this->params['personid'])){
 			$personquery = $this->params['personid'] ? " and p.pkey like '%" . DBSafe($this->params['personid']) . "%'" : "";
 		}
 		$fieldquery = generateFields("p");
-		
-		$peoplephonelist = QuickQueryList("select personid from phone ph where 1 $phonequery group by personid");
-		$peopleemaillist = QuickQueryList("select personid from email e where 1 $emailquery group by personid");
-		$intersect = array_intersect($peoplephonelist, $peopleemaillist);
-		if($emailquery == "" && !count($peopleemaillist))
-			$intersect = $peoplephonelist;
-		else if($phonequery == "" && !count($peoplephonelist))
-			$intersect = $peopleemaillist;
 
-		$peoplelist = implode("','", $intersect);
+		if(isset($peoplephonelist) && isset($peopleemaillist))
+			$peoplelist = implode("','", array_intersect($peoplephonelist, $peopleemaillist));
+		else if(isset($peoplephonelist))	
+			$peoplelist = implode("','", $peoplephonelist);
+		else if(isset($peopleemaillist))
+			$peoplelist = implode("','", $peopleemaillist);
+		
+		if(isset($peoplelist))
+			$peoplequery = " and p.id in ('" . $peoplelist . "') ";
 		
 		$this->query = "select SQL_CALC_FOUND_ROWS
 					p.pkey as pkey, 
@@ -53,8 +54,8 @@ class ContactsReport extends ReportGenerator {
 					from person p
 					left join address a on (a.personid = p.id)
 					where not p.deleted
-					and p.id in ('" . $peoplelist ."')
 					and p.type='system'
+					$peoplequery
 					$personquery
 					$usersql
 					$rulesql		
