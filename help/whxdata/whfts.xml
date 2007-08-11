@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='windows-1252' ?>
 <fts>
-<chunkinfo url="whfwdata0.xml" first="0" last="comment"/>
-<chunkinfo url="whfwdata1.xml" first="common" last="figur"/>
-<chunkinfo url="whfwdata2.xml" first="fil" last="manual"/>
-<chunkinfo url="whfwdata3.xml" first="map" last="red"/>
-<chunkinfo url="whfwdata4.xml" first="ref" last="thank"/>
-<chunkinfo url="whfwdata5.xml" first="them" last="zip"/>
+<chunkinfo url="whfwdata0.xml" first="0" last="clear"/>
+<chunkinfo url="whfwdata1.xml" first="click" last="experienc"/>
+<chunkinfo url="whfwdata2.xml" first="explain" last="link"/>
+<chunkinfo url="whfwdata3.xml" first="list" last="prompt"/>
+<chunkinfo url="whfwdata4.xml" first="proper" last="structur"/>
+<chunkinfo url="whfwdata5.xml" first="student" last="zip"/>
 
-<tchunkinfo first="0" last="54" url="whftdata0.xml" />
+<tchunkinfo first="0" last="57" url="whftdata0.xml" />
 
 </fts>

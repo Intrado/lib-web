@@ -201,6 +201,9 @@ step-by-step_guides\step-by-step_create_a_list.htm
 step-by-step_guides\step-by-step_send_a_call_job.htm
 step-by-step_guides\step-by-step_send_a_phone_and_email_job.htm
 step-by-step_guides\step-by-step_send_an_email_job.htm
+the_admin_tab\managing_access_profiles.htm
+the_admin_tab\managing_systemwide_settings.htm
+the_admin_tab\managing_user_accounts.htm
 the_admin_tab\the_import_manager.htm
 the_admin_tab\the_metadata_manager.htm
 the_system_tab\blocking_phone_numbers.htm
@@ -212,6 +215,7 @@ ehelp.xml
 remoteaccesspocketguide.pdf
 robohhre.lng
 schoolmessenger_new_user_training_guide.pdf
+new_user_training_guide.pdf
 schoolmessenger_help.glo
 help.css
 smsjobeditor.gif
@@ -220,6 +224,7 @@ messagebuilder.gif
 exampledisconnectednumbers.gif
 reportemaillog.gif
 phonelog.gif
+userlist.gif
 startpage.gif
 listeditorsearchdatabase.gif
 metadatamanager.gif
@@ -233,6 +238,7 @@ importfieldmapping.gif
 surveyconfirmation.gif
 listeditormanualadd.gif
 reportstimedistribution.gif
+usereditor.gif
 listmanualadd.gif
 listsearch1.gif
 reportsaveschedule.gif
@@ -250,6 +256,7 @@ reportnotificationsummary.gif
 listeditormanualaddbutton.gif
 jobeditor.gif
 surveyreportwithdatachart.gif
+accessprofileconfigure.gif
 phonemessageeditor.gif
 uploadaudiofile.gif
 notificationjobs.gif
@@ -271,6 +278,7 @@ emailmessageeditor.gif
 reportcontacthistory.gif
 surveytemplateeditorwebopti.gif
 callmenamemessages.gif
+globalsystemsettings.gif
 dataimportmanager.gif
 listeditoradditions.gif
 listeditorbuttons.gif
@@ -282,6 +290,7 @@ surveyreportdetails.gif
 surveytemplateeditor.gif
 listeditor.gif
 jobeditoremail.gif
+accessprofiles.gif
 surveysamplewebpage.gif
 reportbuilder.gif
 completedjobs.gif
@@ -377,6 +386,8 @@ whgdata\whlstf12.htm
 whgdata\whlstf13.htm
 whgdata\whlstf14.htm
 whgdata\whlstf15.htm
+whgdata\whlstf16.htm
+whgdata\whlstf17.htm
 whgdata\whlstg0.htm
 schoolmessenger_help.htm
 schoolmessenger_help_csh.htm

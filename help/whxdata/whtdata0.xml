@@ -75,6 +75,9 @@
   <item name="The Contact Database" url="the_system_tab/the_contact_database.htm" />
 </book>
 <book name="The Admin Tab" >
+  <item name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
+  <item name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
+  <item name="Managing Systemwide Settings" url="the_admin_tab/managing_systemwide_settings.htm" />
   <item name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
   <item name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
 </book>
