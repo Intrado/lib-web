@@ -3,6 +3,7 @@
 
 include_once("inboundutils.inc.php");
 include_once("../inc/utils.inc.php"); // for jobdefaults getSystemSetting()
+require_once("../inc/date.inc.php");
 include_once("../obj/User.obj.php");
 include_once("../obj/Rule.obj.php");
 include_once("../obj/Access.obj.php");

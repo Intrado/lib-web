@@ -9,6 +9,7 @@ include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 include_once("obj/ImportJob.obj.php");

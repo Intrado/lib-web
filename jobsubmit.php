@@ -1,5 +1,6 @@
 <?
 include_once("inc/common.inc.php");
+require_once("inc/date.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("obj/Job.obj.php");
 
