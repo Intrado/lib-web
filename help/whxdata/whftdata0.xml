@@ -21,6 +21,7 @@
 <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
 <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
 <topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
+<topic name="Sending an SMS Job" url="creating_a_notification_job/sending_an_sms_job.htm" />
 <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
 <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
 <topic name="About Web Survey Template Features" url="creating_a_survey_job/more_on_web_survey_template_features.htm" />
@@ -29,19 +30,22 @@
 <topic name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
 <topic name="Getting Started" url="getting_started/getting_started.htm" />
 <topic name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
-<topic name="Shortcuts" url="getting_started/shortcuts.htm" />
 <topic name="The Start Page" url="getting_started/the_start_page.htm" />
 <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
 <topic name="Reviewing Your Response Messages" url="receiving_responses/reviewing_your_response_messages.htm" />
 <topic name="Remote Telephone Access Overview" url="remote_telephone_access/remote_telephone_access_overview.htm" />
 <topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
 <topic name="Remotely Create a Single Language Job" url="remote_telephone_access/remotely_create_a_single_language_job.htm" />
-<topic name="Querying Report Data" url="reports/querying_report_data.htm" />
+<topic name="Call Distribution Report" url="reports/call_distribution_report.htm" />
+<topic name="Contact History Report" url="reports/contact_history_report.htm" />
+<topic name="Using the Report Builder" url="reports/querying_report_data.htm" />
 <topic name="Reports Overview" url="reports/reports.htm" />
-<topic name="Standard Job Reports" url="reports/standard_job_reports.htm" />
-<topic name="Survey Job Reports" url="reports/survey_job_reports.htm" />
-<topic name="The Reports Tabs" url="reports/the_reports_tabs.htm" />
-<topic name="Understanding Call Logs" url="reports/understanding_call_logs.htm" />
+<topic name="Saving and Scheduling Reports" url="reports/saving_and_scheduling_reports.htm" />
+<topic name="SMS Reports" url="reports/sms_reports.htm" />
+<topic name="Notification Summaries" url="reports/standard_job_reports.htm" />
+<topic name="Survey Reports" url="reports/survey_job_reports.htm" />
+<topic name="Phone and Email Log Reports" url="reports/understanding_call_logs.htm" />
+<topic name="Usage Stats Report" url="reports/usage_stats_report.htm" />
 <topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
 <topic name="Step-by-Step:Send a Simple Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
 <topic name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />

@@ -31,6 +31,7 @@
   <item name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
   <item name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
   <item name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  <item name="Sending an SMS Job" url="creating_a_notification_job/sending_an_sms_job.htm" />
   <item name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
 </book>
 <book name="Creating a Survey Job" >
@@ -47,12 +48,18 @@
 </book>
 <book name="Reports" >
   <item name="Reports Overview" url="reports/reports.htm" />
-  <item name="Standard Job Reports" url="reports/standard_job_reports.htm" />
+  <item name="Notification Summaries" url="reports/standard_job_reports.htm" />
   <item name="Survey Job Reports" url="reports/survey_job_reports.htm" />
-  <item name="Querying Report Data" url="reports/querying_report_data.htm" />
-  <item name="Understanding Call Logs" url="reports/understanding_call_logs.htm" />
+  <item name="Phone and Email Log Reports" url="reports/understanding_call_logs.htm" />
+  <item name="Contact History Report" url="reports/contact_history_report.htm" />
+  <item name="SMS Reports" url="reports/sms_reports.htm" />
+  <item name="Using the Report Builder" url="reports/querying_report_data.htm" />
+  <item name="Saving and Scheduling Reports" url="reports/saving_and_scheduling_reports.htm" />
+  <item name="Usage Stats Report" url="reports/usage_stats_report.htm" />
+  <item name="Call Distribution Report" url="reports/call_distribution_report.htm" />
 </book>
 <book name="Receiving Responses" >
+  <item name="Notification Summaries" url="reports/standard_job_reports.htm" />
   <item name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
   <item name="Reviewing Your Response Messages" url="receiving_responses/reviewing_your_response_messages.htm" />
 </book>
