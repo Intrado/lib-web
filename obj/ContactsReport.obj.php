@@ -58,8 +58,7 @@ class ContactsReport extends ReportGenerator {
 					$peoplequery
 					$personquery
 					$usersql
-					$rulesql		
-					group by p.id
+					$rulesql
 					$orderquery
 					";
 	}
