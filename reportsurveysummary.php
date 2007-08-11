@@ -163,7 +163,7 @@ if($generator->format != "html"){
 		
 		header("Pragma: private");
 		header("Cache-Control: private");
-		header("Content-disposition: attachment; filename=$name");
+		header("Content-disposition: attachment; filename=report.pdf");
 		header("Content-type: application/pdf");	
 		session_write_close();
 		$fp = fopen($name, "r");

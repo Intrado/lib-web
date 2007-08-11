@@ -161,7 +161,7 @@ if($generator->format != "html"){
 		
 		header("Pragma: private");
 		header("Cache-Control: private");
-		header("Content-disposition: attachment; filename=$name");
+		header("Content-disposition: attachment; filename=report.pdf");
 		header("Content-type: application/pdf");
 		$result = $generator->generate($params);	
 		@readfile($name, "r");
