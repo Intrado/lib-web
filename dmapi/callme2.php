@@ -16,7 +16,6 @@ if($REQUEST_TYPE == "new") {
 	?>
 	<error> Got new when wanted continue </error>
 	<?
-	$SESSIONDATA=null;
 } else{
 
 	if($BFXML_VARS['saveaudio'] == 1){
@@ -44,7 +43,7 @@ if($REQUEST_TYPE == "new") {
 			$message = new Message();
 			$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('count');
 			if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0'
-							and name = '$messagename'"))
+							and name = '" . DBSafe($messagename) . "'"))
 				$messagename = $messagename . " - " . date("M d, Y G:i:s");
 			$message->name = $messagename;
 			$message->description = "Call Me - " . $messagename;
