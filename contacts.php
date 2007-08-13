@@ -51,7 +51,7 @@ function fmt_phone_contact ($phone) {
 $f = "person";
 $s = "all";
 
-$reload = 0;
+$reloadform = 0;
 $ordercount = 3;
 $ordering = ContactsReport::getOrdering();
 
@@ -210,10 +210,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 		}
 	}
 } else {
-	$reload = 1;
+	$reloadform = 1;
 }
 
-if($reload){
+if($reloadform){
 	ClearFormData($f);
 	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
 
