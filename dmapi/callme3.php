@@ -14,7 +14,6 @@ if($REQUEST_TYPE == "new"){
 	?>
 	<error>Easycall3: wanted result, got new </error>
 	<?
-	$SESSIONDATA=null;
 
 } else if($REQUEST_TYPE == "result"){
 
@@ -30,6 +29,5 @@ if($REQUEST_TYPE == "new"){
 			</message>
 		</voice>
 	<?
-	$SESSIONDATA = null;
 }
 ?>

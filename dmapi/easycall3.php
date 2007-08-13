@@ -96,6 +96,5 @@ if($REQUEST_TYPE == "new"){
 			</message>
 		</voice>
 	<?
-	$SESSIONDATA = null;
 }
 ?>
