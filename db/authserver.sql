@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS  `sessiondata` (
   `customerid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `lastused` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `data` text NOT NULL,
+  `data` mediumtext NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `lastused` (`lastused`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
