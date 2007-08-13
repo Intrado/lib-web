@@ -66,47 +66,75 @@ class Job extends DBMappedObject {
 	// assumes this job was already created in the database
 	function runNow() {
 		if ($this->status=="repeating") {
-			// copy this repeater job to a normal job then run it
+			// check for system disablerepeat
 			if (!getSystemSetting("disablerepeat")) {
+				// check for empty message
+				if ($this->phonemessageid != null || $this->emailmessageid != null || $this->printmessageid || $this->questionnaireid != null) {
+					// check for empty list
+					$this->generateSql(); // update thesql
 
-				//update the finishdate (reused as last run for repeating jobs)
-				QuickUpdate("update job set finishdate=now() where id='$this->id'");
+					$hasPeople = false;
+					// with latest list, be sure at least one person (otherwise, why bother copying this job that does nothing)
+					// find all person ids from list rules
+					$query = "select p.id from person p " .
+						"left join listentry le on (p.id=le.personid and le.listid=".$this->listid.") " .
+						"where ".$this->thesql." and not p.deleted and le.type is null and p.userid is null " .
+						"limit 1";
+					$p = QuickQuery($query);
+					if ($p) $hasPeople = true;
 
-				//make a copy of this job and run it
-				$newjob = new Job($this->id);
-				$newjob->id = NULL;
-				$newjob->name .= " - " . date("M j, g:i a");
-				$newjob->status = "new";
-				$newjob->assigned = NULL;
-				$newjob->scheduleid = NULL;
-				$newjob->finishdate = NULL;
+					$query = "select p.id " .
+						"from listentry le " .
+						"straight_join person p on (p.id=le.personid and not p.deleted) " .
+						"where le.listid=".$this->listid." and le.type='A' " .
+						"limit 1";
+					$p = QuickQuery($query);
+					if ($p) $hasPeople = true;
 
-				$newjob->createdate = QuickQuery("select now()");
+					if ($hasPeople == true) {
+						// copy this repeater job to a normal job then run it
 
-				//refresh the dates to present
-				$daydiff = strtotime($newjob->enddate) - strtotime($newjob->startdate);
+						//update the finishdate (reused as last run for repeating jobs)
+						QuickUpdate("update job set finishdate=now() where id='$this->id'");
 
-				$newjob->startdate = date("Y-m-d", time());
-				$newjob->enddate = date("Y-m-d", time() + $daydiff);
+						//make a copy of this job and run it
+						$newjob = new Job($this->id);
+						$newjob->id = NULL;
+						$newjob->name .= " - " . date("M j, g:i a");
+						$newjob->status = "new";
+						$newjob->assigned = NULL;
+						$newjob->scheduleid = NULL;
+						$newjob->finishdate = NULL;
 
-				$newjob->create();
+						$newjob->createdate = QuickQuery("select now()");
 
-				//copy all the job language settings
-				QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
+						//refresh the dates to present
+						$daydiff = strtotime($newjob->enddate) - strtotime($newjob->startdate);
+
+						$newjob->startdate = date("Y-m-d", time());
+						$newjob->enddate = date("Y-m-d", time() + $daydiff);
+
+						$newjob->create();
+
+						//copy all the job language settings
+						QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
 							select $newjob->id, messageid, type,language
 							from joblanguage where jobid=$this->id");
 
-				//copy all the jobsetting
-				QuickUpdate("insert into jobsetting (jobid,name,value) " .
-						"select $newjob->id, name, value " .
-						"from jobsetting where jobid=$this->id");
+						//copy all the jobsetting
+						QuickUpdate("insert into jobsetting (jobid,name,value) " .
+							"select $newjob->id, name, value " .
+							"from jobsetting where jobid=$this->id");
 
-				// update the retry setting - it may have changed since the repeater was created
-				if (getSystemSetting('retry') != "")
-					$newjob->setOptionValue("retry",getSystemSetting('retry'));
+						// update the retry setting - it may have changed since the repeater was created
+						if (getSystemSetting('retry') != "")
+							$newjob->setOptionValue("retry",getSystemSetting('retry'));
 
-				$newjob->runNow();
-				sleep(3);
+						$newjob->runNow();
+						sleep(3);
+
+					}
+				}
 			}
 		} else {
 			$this->generateSql();
