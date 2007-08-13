@@ -65,8 +65,8 @@ while ($row = DBGetRow($result)) {
 	$data["M"][$newday] = $row[2];
 	$data["B"][$newday] = $row[3];
 	$data["N"][$newday] = $row[4];
-	$data["F"][$newday] = $row[4];
-	$data["X"][$newday] = $row[4];
+	$data["F"][$newday] = $row[5];
+	$data["X"][$newday] = $row[6];
 }
 
 //var_dump($data);
