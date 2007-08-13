@@ -490,7 +490,7 @@ function display_rel_date($string, $arg1="", $arg2=""){
 
 function fmt_message ($row,$index) {
 	//index is message type and index+1 is message name
-	return '<img src="img/' . $row[$index] . '.png" align="bottom" />&nbsp;' . fmt_limit_25($row, $index+1);
+	return '<img src="img/' . $row[$index] . '.png" align="bottom" />&nbsp;' . $row[$index+1];
 }
 
 function fmt_scheduled_date($row, $index){
