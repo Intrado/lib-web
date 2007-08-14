@@ -239,7 +239,7 @@ startWindow("Display Options", "padding: 3px;");
 			<td>
 				<? 
 					NewFormItem($f, $s, "groupby", "selectstart");
-					NewFormItem($f, $s, "groupby", "selectoption", "System", "");
+					NewFormItem($f, $s, "groupby", "selectoption", " -- System -- ", "");
 					foreach($fields as $field){
 						NewFormItem($f, $s, "groupby", "selectoption", $field->name, $field->fieldnum);
 					}
