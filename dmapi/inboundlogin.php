@@ -122,11 +122,11 @@ if($REQUEST_TYPE == "new" ||
 	// play the prompt
 	login($SESSIONDATA['authcount'] > 0);
 } else {
-	$SESSIONDATA=null;
+	//huh, they must have hung up
+	$SESSIONDATA = null;
 	?>
-	<hangup/>
+	<ok />
 	<?
-
 }
 
 ?>

@@ -25,9 +25,10 @@ if($REQUEST_TYPE == "new"){
 	<error>inboundgoodbye: wanted result or continue, got new </error>
 	<?
 } else if($REQUEST_TYPE == "result"){
+	//huh, they must have hung up
 	$SESSIONDATA = null;
 	?>
-	<ok/>
+	<ok />
 	<?
 } else {
 	if (isset($SESSIONDATA['jobSubmit'])) {

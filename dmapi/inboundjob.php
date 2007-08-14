@@ -559,9 +559,10 @@ if($REQUEST_TYPE == "new"){
 	}
 
 } else {
-	$SESSIONDATA=null;
+	//huh, they must have hung up
+	$SESSIONDATA = null;
 	?>
-	<hangup/>
+	<ok />
 	<?
 }
 
