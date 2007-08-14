@@ -85,10 +85,12 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 			PutFormData($form, $section, 'newfield_name', $cleanedname);
 			if (!preg_match("/[a-zA-Z0-9]/", $cleanedname)) { // Find at least one alphanumeric character
 				error("Please choose a field name that is at least one alphanumeric character long");
-			} else if (QuickQuery("select * from fieldmap where name = '$cleanedname'")) {
+			} else if (QuickQuery("select count(*) from fieldmap where name = '$cleanedname'")) {
 				error("Please choose a unique field name. This one is already in use.");
 			} else if (!in_array($type, $VALID_TYPES)) {
 				error("The field type, $type, is not valid");
+			} else if (count($FIELDMAPS) >= 20){
+				error("You can only have 20 Metadata Fields");
 			} else {
 				$newfield = new FieldMap();
 				// Submit new item
@@ -166,7 +168,7 @@ $availablefields = array_diff($availablefields, QuickQueryList("select right(fie
 if( $reloadform )
 {
 	ClearFormData($form);
-	PutFormData($form, $section, 'newfield_type', 'text', 'text');
+
 
 	foreach($FIELDMAPS as $field) {
 		$fieldnum = $field->fieldnum;
@@ -196,12 +198,14 @@ if( $reloadform )
 		PutFormData($form, $section, 'type_' . $fieldnum, $type, 'text');
 		PutFormData($form, $section, 'searchable_' . $fieldnum, $searchable, 'bool');
 	}
-
-	PutFormData($form, $section, 'newfield_name', '', 'text', 1, 20, false); // This item is only required on an add operation
-	PutFormData($form, $section, 'newfield_type', 'text', 'text');
-	PutFormData($form, $section, 'newfield_searchable', '1', 'bool');
-
-	PutFormData($form,$section,"newfield_fieldnum","array",$availablefields);
+	if(count($FIELDMAPS) < 20){
+		PutFormData($form, $section, 'newfield_type', 'text', 'text');
+		PutFormData($form, $section, 'newfield_name', '', 'text', 1, 20, false); // This item is only required on an add operation
+		PutFormData($form, $section, 'newfield_type', 'text', 'text');
+		PutFormData($form, $section, 'newfield_searchable', '1', 'bool');
+	
+		PutFormData($form,$section,"newfield_fieldnum","array",$availablefields);
+	}
 }
 
 
@@ -289,6 +293,8 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 	}
 
 	// Print extra row for adding new items
+	// only if they have more f-fields to use
+	if(count($FIELDMAPS) < 20){
 ?>
 
 	<tr>
@@ -316,6 +322,9 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 		<td><? NewFormItem($form, $section, 'newfield_searchable', 'checkbox', '', '', 'id=newfield_searchable'); ?> </td>
 		<td><? echo submit($form, 'add', 'Add'); ?></td>
 	</tr>
+<?
+	}
+?>
 </table>
 <?
 endWindow();
