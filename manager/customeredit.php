@@ -145,8 +145,8 @@ if( $reloadform ) {
 	}
 	PutFormData($f,$s,'name',getCustomerSystemSetting('displayname', "", true, $custdb),"text",1,50,true);
 	PutFormData($f,$s,'hostname',$custinfo[3],"text",1,255,true);
-	PutFormData($f,$s,'inboundnumber',getCustomerSystemSetting('inboundnumber', 4, true, $custdb),"phone",10,10);
-	PutFormData($f,$s,'timezone', getCustomerSystemSetting('timezone', 4, true, $custdb), "text", 1, 255);
+	PutFormData($f,$s,'inboundnumber',getCustomerSystemSetting('inboundnumber', false, true, $custdb),"phone",10,10);
+	PutFormData($f,$s,'timezone', getCustomerSystemSetting('timezone', false, true, $custdb), "text", 1, 255);
 
 	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', false, true, $custdb)),"phone",10,10);
 	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', false, true, $custdb),"phone", 3, 3);
