@@ -115,7 +115,7 @@ if(isset($_REQUEST['reportid'])){
 	unset($_SESSION['reportid']);
 	unset($_SESSION['report']['type']);
 	$options = $_SESSION['report']['options'];
-	$options['result'] = $_REQUEST['result'];
+	$options['result'] = DBSafe($_REQUEST['result']);
 
 	if($_REQUEST['result'] == "sent" || $_REQUEST['result'] == "unsent"){
 		$options['reporttype']="emaildetail";
