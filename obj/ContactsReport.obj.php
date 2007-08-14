@@ -99,7 +99,7 @@ class ContactsReport extends ReportGenerator {
 				<td>Sequence</td>
 				<td>Destination</td>
 			<?
-			for($i=0;$i<20; $i++){
+			for($i=0;$i<=20; $i++){
 				if($i<10){
 					$num = "f0" . $i;
 				} else {
@@ -147,7 +147,7 @@ class ContactsReport extends ReportGenerator {
 								if($first){
 									$first = false;
 									$count=0;
-									for($i=0;$i<20; $i++){
+									for($i=0;$i<=20; $i++){
 										if($i<10){
 											$num = "f0" . $i;
 										} else {
@@ -172,7 +172,7 @@ class ContactsReport extends ReportGenerator {
 									<td>No Phone Numbers</td>
 								<?
 								$count=0;
-								for($i=0;$i<20; $i++){
+								for($i=0;$i<=20; $i++){
 									if($i<10){
 										$num = "f0" . $i;
 									} else {
