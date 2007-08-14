@@ -260,9 +260,12 @@ function commitMessage($contentid)
 
 
 ///////////////////////////////
-error_log("gjb msg ".$REQUEST_TYPE);
 
-if($REQUEST_TYPE == "continue") {
+if($REQUEST_TYPE == "new"){
+	?>
+	<error>inboundmessage: wanted continue, got new </error>
+	<?
+} else if($REQUEST_TYPE == "continue") {
 
 	// if they recorded a message, and asked to save
 	if (isset($BFXML_VARS['saveaudio'])) {
@@ -317,6 +320,10 @@ if($REQUEST_TYPE == "continue") {
 
 } else {
 	$SESSIONDATA=null;
+	?>
+	<hangup/>
+	<?
+
 }
 
 ?>

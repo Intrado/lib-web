@@ -198,9 +198,11 @@ function confirmList($listname)
 
 /////////////////
 
-error_log("gjb list ".$REQUEST_TYPE);
-
-if($REQUEST_TYPE == "continue") {
+if($REQUEST_TYPE == "new"){
+	?>
+	<error>inboundlist: wanted continue, got new </error>
+	<?
+} else if($REQUEST_TYPE == "continue") {
 
 	// if they selected a list
 	if (isset($BFXML_VARS['listnumber'])) {
@@ -247,6 +249,10 @@ if($REQUEST_TYPE == "continue") {
 
 } else {
 	$SESSIONDATA=null;
+	?>
+	<hangup/>
+	<?
+
 }
 
 ?>

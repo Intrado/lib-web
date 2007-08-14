@@ -20,10 +20,21 @@ function goodbye($jobSubmit=false)
 
 
 ////////////////////////////////////////
+if($REQUEST_TYPE == "new"){
+	?>
+	<error>inboundgoodbye: wanted result or continue, got new </error>
+	<?
+} else if($REQUEST_TYPE == "result"){
+	$SESSIONDATA = null;
+	?>
+	<ok/>
+	<?
+} else {
 	if (isset($SESSIONDATA['jobSubmit'])) {
 		goodbye(true);
 	} else {
 		goodbye();
 	}
-	$SESSIONDATA = null;
+}
+
 ?>

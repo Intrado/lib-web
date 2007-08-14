@@ -404,9 +404,11 @@ function checkExpirationThenConfirm()
 
 //////////////////////////////
 
-error_log("gjb job ".$REQUEST_TYPE);
-
-if($REQUEST_TYPE == "continue") {
+if($REQUEST_TYPE == "new"){
+	?>
+	<error>inboundjob: wanted continue, got new </error>
+	<?
+} else if($REQUEST_TYPE == "continue") {
 
 	// if they entered the job options
 	if (isset($BFXML_VARS['numdays'])) {
@@ -558,7 +560,9 @@ if($REQUEST_TYPE == "continue") {
 
 } else {
 	$SESSIONDATA=null;
+	?>
+	<hangup/>
+	<?
 }
-
 
 ?>

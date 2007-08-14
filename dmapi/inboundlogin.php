@@ -79,7 +79,6 @@ function welcome()
 }
 
 ///////////////////////////////////
-error_log("gjb login ".$REQUEST_TYPE);
 
 if($REQUEST_TYPE == "new" ||
    $REQUEST_TYPE == "continue") {
@@ -124,6 +123,10 @@ if($REQUEST_TYPE == "new" ||
 	login($SESSIONDATA['authcount'] > 0);
 } else {
 	$SESSIONDATA=null;
+	?>
+	<hangup/>
+	<?
+
 }
 
 ?>
