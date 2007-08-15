@@ -60,12 +60,6 @@ Link:
 </form>
 
 <?
-if(isset($ERRORS) && is_array($ERRORS)) {
-	foreach($ERRORS as $key => $value) {
-		$ERRORS[$key] = addslashes($value);
-	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-}
 
 include_once("navbottom.inc.php");
 ?>
