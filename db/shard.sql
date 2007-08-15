@@ -128,7 +128,7 @@ CREATE TABLE `qjobtask` (
   KEY `emailer` (`type`,`status`,`nextattempttime`),
   KEY `personid` (`personid`),
   KEY `expired` (`status`,`leasetime`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
