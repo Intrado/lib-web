@@ -2,15 +2,6 @@
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
-require_once("../inc/db.inc.php");
-require_once("../inc/DBMappedObject.php");
-require_once("../inc/DBRelationMap.php");
-
-require_once("../obj/User.obj.php");
-require_once("../obj/Access.obj.php");
-require_once("../obj/Permission.obj.php");
-require_once("../obj/Rule.obj.php"); //for search and sec profile rules
-
 //get the customer URL
 if ($IS_COMMSUITE) {
 	$CUSTOMERURL = "default";
@@ -19,14 +10,21 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
+require_once("../inc/db.inc.php");
+require_once("../inc/DBMappedObject.php");
+require_once("../inc/DBRelationMap.php");
+require_once("XML/RPC.php");
+require_once("../inc/auth.inc.php");
+require_once("../inc/sessionhandler.inc.php");
 
-session_name($CUSTOMERURL . "_session");
-session_start();
+require_once("../inc/utils.inc.php");
+require_once("../obj/User.obj.php");
+require_once("../obj/Access.obj.php");
+require_once("../obj/Permission.obj.php");
+require_once("../obj/Rule.obj.php"); //for search and sec profile rules
 
-if (isset($_SESSION['timezone'])) {
-	@date_default_timezone_set($_SESSION['timezone']);
-	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-}
+
+
 
 if (isset($_SERVER['HTTP_X_CISCOIPPHONEMODELNAME']))
 	$_SESSION['HTTP_X_CISCOIPPHONEMODELNAME'] = $_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'];
@@ -39,6 +37,7 @@ $addr = $_SERVER['SERVER_NAME'] == "" ? $_SERVER['SERVER_ADDR'] : $_SERVER['SERV
 $URL = "http://" . $addr . ":" . $_SERVER['SERVER_PORT'] . substr($_SERVER['PHP_SELF'],0,strrpos($_SERVER['PHP_SELF'],"/"));
 
 if (!isset($isindexpage) || !$isindexpage) {
+	doStartSession();
 	if (!isset($_SESSION['user'])) {
 		header("Location: $URL/index.php?logout=1");
 		exit();
@@ -48,8 +47,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 		$USER->optionsarray = false; /* will be reconstructed if needed */
 
 		$ACCESS = &$_SESSION['access'];
-		if($ACCESS->modified < QuickQuery("select modified from access where id = $ACCESS->id"))
-			$ACCESS->refresh(NULL, true);
+		$ACCESS->refresh(NULL, true);
 
 		if (!$USER->enabled || !$USER->authorize('loginphone')) {
 			header("Location: $URL/index.php?logout=1");
@@ -58,13 +56,13 @@ if (!isset($isindexpage) || !$isindexpage) {
 	}
 }
 
-
+/*
 $fp = fopen("foo.txt","w");
 ob_start();
 var_dump($GLOBALS);
 fwrite($fp,ob_get_clean());
 fclose($fp);
-
+*/
 
 $PHONE_FEATURES = array(
 "CiscoIPPhoneText" 				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
