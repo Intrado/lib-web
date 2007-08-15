@@ -26,10 +26,6 @@ require_once("../obj/Rule.obj.php"); //for search and sec profile rules
 
 
 
-if (isset($_SERVER['HTTP_X_CISCOIPPHONEMODELNAME']))
-	$_SESSION['HTTP_X_CISCOIPPHONEMODELNAME'] = $_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'];
-else
-	$_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'] = $_SESSION['HTTP_X_CISCOIPPHONEMODELNAME'];
 
 //reconstruct the full URL. IP phones don't handle relative links.
 
@@ -56,27 +52,32 @@ if (!isset($isindexpage) || !$isindexpage) {
 	}
 }
 
-/*
+if (isset($_SERVER['HTTP_X_CISCOIPPHONEMODELNAME']))
+	$_SESSION['HTTP_X_CISCOIPPHONEMODELNAME'] = $_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'];
+else
+	$_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'] = isset($_SESSION['HTTP_X_CISCOIPPHONEMODELNAME']) ? $_SESSION['HTTP_X_CISCOIPPHONEMODELNAME'] : null;
+
+
 $fp = fopen("foo.txt","w");
 ob_start();
 var_dump($GLOBALS);
 fwrite($fp,ob_get_clean());
 fclose($fp);
-*/
+
 
 $PHONE_FEATURES = array(
-"CiscoIPPhoneText" 				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneMenu" 				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneIconMenu" 			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneDirectory"			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneInput" 			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneImage" 			=> array("7905" => false,	"7912" => false,	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneImageFile" 		=> array("7905" => false,	"7912" => false,	"7920" => false,	"7940" => false,	"7960" => false,	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneGraphicMenu"		=> array("7905" => false,	"7912" => false,	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneGraphicFileMenu"	=> array("7905" => false,	"7912" => false,	"7920" => false,	"7940" => false,	"7960" => false,	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneExecute"			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneError"				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
-"CiscoIPPhoneResponse"			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true)
+"CiscoIPPhoneText" 				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true,		"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneMenu" 				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true,		"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneIconMenu" 			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneDirectory"			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneInput" 			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneImage" 			=> array("7905" => false,	"7912" => false,	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneImageFile" 		=> array("7905" => false,	"7912" => false,	"7920" => false, 	"7940" => false,	"7941" => false,	"7960" => false,	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneGraphicMenu"		=> array("7905" => false,	"7912" => false,	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneGraphicFileMenu"	=> array("7905" => false,	"7912" => false,	"7920" => false, 	"7940" => false,	"7941" => false,	"7960" => false,	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneExecute"			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneError"				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
+"CiscoIPPhoneResponse"			=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true, 	"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true)
 );
 
 function doesSupport ($feature) {
