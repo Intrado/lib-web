@@ -22,6 +22,7 @@ $badlogin = false;
 function tryLogin ($userid) {
 	if (!$userid)
 		return false;
+	doStartSession();
 	$newuser = new User($userid);
 	$newaccess = new Access($newuser->accessid);
 	if($newuser->enabled && $newaccess->getValue('loginphone')) {
@@ -34,22 +35,22 @@ function tryLogin ($userid) {
 
 		return true;
 	} else {
+		@session_destroy();
 		return false;
 	}
 }
 
 if (isset($_GET['logout'])) {
 	$dn = $_SESSION['dn'];
-	session_destroy();
-	session_name($CUSTOMERURL . "_session");
-	session_start();
+	@session_destroy();
 	$_SESSION['dn'] = $dn;
 } else if (isset($_SESSION['user'])) {
 	sleep(1);
 	header("Location: $URL/main.php");
 	exit();
 } else if (isset($_GET['code'])) {
-	if (tryLogin(User::doLoginPhone($_GET['code'], $_GET['pin'], null, $CUSTOMERURL))) {
+	if (tryLogin(doLoginPhone($_GET['code'], $_GET['pin'],null, $CUSTOMERURL))) {
+
 		sleep(1);
 		header("Location: $URL/main.php");
 		exit();
@@ -57,7 +58,7 @@ if (isset($_GET['logout'])) {
 		$badlogin = true;
 	}
 } else if (isset($_GET['login'])) {
-	if (tryLogin(User::doLogin($_GET['login'], $_GET['password'],$CUSTOMERURL))) {
+	if (tryLogin(doLogin($_GET['login'], $_GET['password'],$CUSTOMERURL))) {
 		sleep(1);
 		header("Location: $URL/main.php");
 		exit();
