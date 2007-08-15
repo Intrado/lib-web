@@ -1,19 +1,19 @@
 <?
 
 class JobDetailReport extends ReportGenerator{
-	
+
 	function generateQuery(){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
 		$orderquery = getOrderSql($this->params);
 		$rulesql = getRuleSql($this->params, "rp");
-		
+
 		$jobtypes = "";
 		if(isset($this->params['jobtypes'])){
 			$jobtypes = $this->params['jobtypes'];
 		}
-		
+
 		$typequery = "";
 		if($this->params['reporttype'] == "phonedetail"){
 			$typequery = " and rp.type = 'phone'";
@@ -22,7 +22,7 @@ class JobDetailReport extends ReportGenerator{
 			$typequery = " and rp.type = 'email'";
 			$this->params['type'] = "email";
 		}
-		
+
 		if(isset($this->params['jobid'])){
 			$joblist = "";
 			$job = new Job($this->params['jobid']);
@@ -41,20 +41,20 @@ class JobDetailReport extends ReportGenerator{
 		$resultquery = "";
 		if(isset($this->params['result']) && $this->params['result']){
 			if($this->params['result'] == "undelivered"){
-				$resultquery = " and rp.status = 'fail' ";
+				$resultquery = " and rp.status not in ('success', 'duplicate')";
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery = " and rp.status = 'nocontacts' ";
 			} else {
 				$resultquery = " and rc.result in ('" . $this->params['result'] . "')";
 			}
-		}		
-		
+		}
+
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
 		$usersql = $USER->userSQL("rp");
 		$this->params['usersql'] = $usersql;
 		$fieldquery = generateFields("rp");
-		$this->query = 
+		$this->query =
 			"select SQL_CALC_FOUND_ROWS
 			j.name as jobname,
 			u.login,
@@ -88,8 +88,8 @@ class JobDetailReport extends ReportGenerator{
 							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-		
-			where 1 
+
+			where 1
 			$searchquery
 
 			$usersql
@@ -97,7 +97,7 @@ class JobDetailReport extends ReportGenerator{
 			$orderquery
 			";
 		//query to test resulting dataset
-		$this->testquery = 
+		$this->testquery =
 			"select count(*)
 				from reportperson rp
 				inner join job j on (rp.jobid = j.id)
@@ -107,23 +107,23 @@ class JobDetailReport extends ReportGenerator{
 								(m.id = rp.messageid)
 				left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 				left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-			
-				where 1 
+
+				where 1
 				$searchquery
-	
+
 				$usersql
 				$rulesql
 				$orderquery
 				";
-		
+
 	}
-	
+
 	function runHtml(){
-		
+
 		$typequery = "";
 		if(isset($this->params['type']))
 			$typequery = " and rp.type = '" . $this->params['type'] . "'";
-	
+
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
 		foreach($fields as $field){
@@ -134,14 +134,14 @@ class JobDetailReport extends ReportGenerator{
 		$query = $this->query;
 		$query .= " limit $pagestart, 500";
 		$data = array();
-		
+
 		$result = Query($query);
 		while ($row = DBGetRow($result)) {
 			$data[] = $row;
 		}
 		$query = "select found_rows()";
 		$total = QuickQuery($query);
-		
+
 		$searchrules = array();
 		if(isset($this->params['rules']) && $this->params['rules']){
 			$rules = explode("||", $this->params['rules']);
@@ -158,9 +158,9 @@ class JobDetailReport extends ReportGenerator{
 				}
 			}
 		}
-		
+
 		// DISPLAY
-		
+
 			startWindow("Filter By");
 ?>
 		<table>
@@ -193,16 +193,16 @@ class JobDetailReport extends ReportGenerator{
 			}
 ?>
 			</table>
-		<? 
+		<?
 		endWindow();
-		
+
 		?><br><?
-		
-		displayJobSummary($this->params['joblist']);	
+
+		displayJobSummary($this->params['joblist']);
 
 		?><br><?
 		startWindow("Report Details", 'padding: 3px;', false);
-	
+
 		showPageMenu($total,$pagestart,500);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
 		$titles = array(0 => "Job",
@@ -220,7 +220,7 @@ class JobDetailReport extends ReportGenerator{
 			$titles[$count] = $field;
 			$count++;
 		}
-			
+
 		$formatters = array(5 => "fmt_message",
 							7 => "fmt_destination",
 							8 => "fmt_date",
@@ -228,7 +228,7 @@ class JobDetailReport extends ReportGenerator{
 		showTable($data,$titles,$formatters);
 		echo "</table>";
 		showPageMenu($total,$pagestart,500);
-	
+
 		endWindow();
 		?>
 		<script langauge="javascript">
@@ -244,11 +244,11 @@ class JobDetailReport extends ReportGenerator{
 		?>
 			</script>
 		<?
-	
+
 	}
 
 	function runCSV(){
-		
+
 		$query = $this->query;
 		$options = $this->params;
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
@@ -257,16 +257,16 @@ class JobDetailReport extends ReportGenerator{
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
 		$activefields = explode(",", isset($options['activefields']) ? $options['activefields'] : "");
-		
-		
+
+
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=report.csv");
 		header("Content-type: application/vnd.ms-excel");
-	
+
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-	
-	
+
+
 		$issurvey = false;
 		$maxquestions = 0;
 		if(isset($this->params['joblist']) && $this->params['joblist']!= ""){
@@ -281,17 +281,17 @@ class JobDetailReport extends ReportGenerator{
 				}
 			}
 		}
-	
+
 		//generate the CSV header
 		$header = '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Last Attempt","Last Result"';
-		
-		
+
+
 		if (isset($issurvey) && $issurvey) {
 			for ($x = 1; $x <= $maxquestions; $x++) {
 				$header .= ",Question $x";
 			}
 		}
-	
+
 		foreach($activefields as $active){
 			if(!$active) continue;
 			$header .= ',"' . $fieldlist[$active] . '"';
@@ -299,14 +299,14 @@ class JobDetailReport extends ReportGenerator{
 
 		echo $header;
 		echo "\r\n";
-	
+
 		$result = Query($query);
-	
+
 		while ($row = DBGetRow($result)) {
 			$row[7] = html_entity_decode(fmt_destination($row,7));
 			$row[11] = (isset($row[11]) ? $row[11] : "");
-			
-	
+
+
 			if (isset($row[8])) {
 				$time = strtotime($row[8]);
 				if ($time !== -1 && $time !== false)
@@ -315,20 +315,20 @@ class JobDetailReport extends ReportGenerator{
 				$row[8] = "";
 			}
 			$row[9] = fmt_result($row,9);
-	
-	
+
+
 			$reportarray = array($row[0], $row[1], $row[5],$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
-	
+
 			if ($issurvey) {
 				//fill in survey result data, be sure to fill in an array element for all questions, even if blank
 				$startindex = count($reportarray);
-	
+
 				$questiondata = array();
 				if ($row[5] == "phone")
 					parse_str($row[12],$questiondata);
 				else if ($row[5] == "email")
 					parse_str($row[13],$questiondata);
-	
+
 				//add data to the report for each question
 				for ($x = 0; $x < $maxquestions; $x++) {
 					$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
@@ -342,14 +342,14 @@ class JobDetailReport extends ReportGenerator{
 				$count++;
 			}
 			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
-			
+
 		}
 	}
-	
+
 	function setReportFile(){
 		$this->reportfile = "jobdetailreport.jasper";
 	}
-	
+
 	function getReportSpecificParams(){
 		$daterange = "";
 		if(isset($this->params['reldate'])){
@@ -369,7 +369,7 @@ class JobDetailReport extends ReportGenerator{
 	static function getOrdering(){
 		global $USER;
 		$fields = FieldMap::getAuthorizedFieldMaps();
-	
+
 		$ordering = array();
 		$ordering["Job"] = "j.name";
 		$ordering["Submitted By"] = "u.login";
@@ -379,8 +379,8 @@ class JobDetailReport extends ReportGenerator{
 		$ordering["Attempts"] = "numattempts";
 		$ordering["Last Attempt"]="lastattempt";
 		$ordering["Last Result"]="result";
-		
-		
+
+
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;
 		}
