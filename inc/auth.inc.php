@@ -61,6 +61,8 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 		global $SESSIONDATA;
 		if (isset($SESSIONDATA))
 			$SESSIONDATA['authSessionID'] = $result['sessionID'];
+		else if($url != null || $url != "")
+			session_id($result['sessionID']);
 
 		if (doDBConnect($result)) return $result['userID'];
 	}
