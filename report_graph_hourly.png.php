@@ -61,7 +61,9 @@ select hour,
         sum(answered) as A,
         sum(machine) as M,
         sum(busy) as B,
-        sum(noanswer) as N
+        sum(noanswer) as N,
+        sum(failed) as F,
+        sum(disconnect) as X
 from systemstats
 where 1
 $jobidquery
@@ -71,7 +73,7 @@ group by hour
 
 $result = Query($query);
 
-$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array());
+$data = array("A" => array(), "M" => array(), "B" => array(), "N" => array(), "F" => array(), "X" => array());
 
 $x_titles = array();
 while ($row = DBGetRow($result)) {
@@ -79,6 +81,8 @@ while ($row = DBGetRow($result)) {
 	$data["M"][$row[0]] = $row[2];
 	$data["B"][$row[0]] = $row[3];
 	$data["N"][$row[0]] = $row[4];
+	$data["F"][$row[0]] = $row[5];
+	$data["X"][$row[0]] = $row[6];
 }
 
 //var_dump($data);
@@ -87,11 +91,11 @@ while ($row = DBGetRow($result)) {
 $max = 0;
 for ($x = 0; $x < 24; $x++) {
 
-	foreach (array("A","M","B","N") as $type) {
+	foreach (array("A","M","B","N","F","X") as $type) {
 		if (!isset($data[$type][$x]))
 			$data[$type][$x] = 0;
 		//show non a/m as negative
-		if ($type == "B" || $type == "N")
+		if ($type == "B" || $type == "N" || $type == "F" || $type == "X")
 			$data[$type][$x] = -$data[$type][$x];
 	}
 
@@ -112,22 +116,30 @@ $graph->img->SetMargin(40,75,20,70);
 // Create the bar plots
 $b1plot = new BarPlot($data["A"]);
 $b1plot->SetFillColor($cpcolors["A"]);
-
 $b1plot->SetLegend("Answered");
+
 $b2plot = new BarPlot($data["M"]);
 $b2plot->SetFillColor($cpcolors["M"]);
 $b2plot->SetLegend("Machine");
 
-$b3plot = new BarPlot($data["B"]);
-$b3plot->SetFillColor($cpcolors["B"]);
-$b3plot->SetLegend("Busy");
+$b3plot = new BarPlot($data["X"]);
+$b3plot->SetFillColor($cpcolors["X"]);
+$b3plot->SetLegend("Disconnect");
 
-$b4plot = new BarPlot($data["N"]);
-$b4plot->SetFillColor($cpcolors["N"]);
-$b4plot->SetLegend("No Answer");
+$b4plot = new BarPlot($data["F"]);
+$b4plot->SetFillColor($cpcolors["F"]);
+$b4plot->SetLegend("Failed");
+
+$b5plot = new BarPlot($data["N"]);
+$b5plot->SetFillColor($cpcolors["N"]);
+$b5plot->SetLegend("No Answer");
+
+$b6plot = new BarPlot($data["B"]);
+$b6plot->SetFillColor($cpcolors["B"]);
+$b6plot->SetLegend("Busy");
 
 // Create the grouped bar plot
-$gbplot = new AccBarPlot(array($b4plot,$b3plot,$b2plot,$b1plot));
+$gbplot = new AccBarPlot(array($b6plot,$b5plot,$b4plot,$b3plot,$b2plot,$b1plot));
 $gbplot->SetWidth(0.7);
 
 
