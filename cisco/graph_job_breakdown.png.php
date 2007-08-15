@@ -9,23 +9,28 @@ include ("../jpgraph/jpgraph_pie3d.php");
 include ("../jpgraph/jpgraph_canvas.php");
 
 
-$jobid = DBSafe($_GET['jobid']);
+$jobid = $_GET['jobid'];
 
 if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
 	header("Content-type: image/gif");
 	readfile("img/icon_logout.gif");
 	exit();
 }
-
+$job = new Job($jobid);
 
 $query = "
 select count(*) as cnt,
-		coalesce(if (rp.status='waiting', 'retry', rc.result),
-			if (rp.status not in ('fail','duplicate','scheduled'), 'inprogress',rp.status))
+		coalesce(if(rp.status = 'nocontacts','fail', null),
+			if(rc.result not in ('A', 'M', 'blocked', 'duplicate') and rc.numattempts > 0 and rc.numattempts < js.value, 'retry', if(rc.result='notattempted', null, rc.result)),
+			if (rp.status not in ('fail','duplicate','scheduled', 'blocked'), 'inprogress', rp.status))
 			as callprogress2
-from from reportperson rp
-left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
-where rp.jobid='$jobid' and rp.type='phone'
+
+from job j
+inner join reportperson rp on (rp.jobid=j.id)
+left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+inner join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
+where j.id = '" . DBSafe($jobid) . "'
+and rp.type='phone'
 group by callprogress2
 
 ";
@@ -127,21 +132,22 @@ $graph = new PieGraph(298,168,"auto");
 $graph->SetFrame(false);
 $graph->SetAntiAliasing();
 
-$graph->title->Set("Call results - " . date("g:i:s a"));
+$graph->title->Set($job->name);
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 $p1 = new PiePlot3D($data);
 
 if (($aindex = array_search("Answered",$legend)) !== false)
 	$p1->ExplodeSlice($aindex);
-
+	
+$graph->legend->Pos(0.01,0.1,"right","top");
 $p1->SetLabelType(PIE_VALUE_ABS);
 $p1->value->Show(false);
 $size = 0.5;
 $p1->SetSize($size);
 $p1->SetCenter(0.35);
 $p1->SetLegends(($legend));
-$p1->SetSliceColors($colors);
+$p1->SetSliceColors(array_reverse($colors));
 
 $graph->Add($p1);
 $graph->Stroke();

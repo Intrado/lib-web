@@ -15,9 +15,11 @@ $cpcolors = array(
 	"F" => "red",
 	"C" => "yellow",
 	"duplicate" => "lightgray",
-	"fail" => "red",
-	"queued" => "blue",
-	"inprogress" => "blue"
+	"fail" => "#aaaaaa",
+	"inprogress" => "blue",
+	"retry" => "cyan",
+	"scheduled" => "darkblue",
+	"blocked" => "#CC00CC"
 );
 
 $cpcodes = array(
@@ -29,24 +31,27 @@ $cpcodes = array(
 	"F" => "Failed",
 	"C" => "Calling",
 	"duplicate" => "Duplicate",
-	"fail" => "Failed",
-	"queued" => "In Progress",
-	"inprogress" => "In Progress"
+	"fail" => "No Phone #",
+	"inprogress" => "In Progress",
+	"retry" => "Retry",
+	"scheduled" => "Scheduled",
+	"blocked" => "Blocked"
 );
 
 
 $query = "
 select count(*) as cnt,
-		coalesce(callprogress,
-			if (rp.status not in ('fail','queued','inprogress','duplicate'), 'inprogress',rp.status))
-			as callprogress
+		coalesce(if(rp.status = 'nocontacts','fail', null),
+			if(rc.result not in ('A', 'M', 'blocked', 'duplicate') and rc.numattempts > 0 and rc.numattempts < js.value, 'retry', if(rc.result='notattempted', null, rc.result)),
+			if (rp.status not in ('fail','duplicate','scheduled', 'blocked'), 'inprogress', rp.status))
+			as callprogress2
 from job j
-	inner join reportperson rp on (rp.jobid = j.id)
-	left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
-where j.userid='$USER->id' and j.status='active'
+inner join reportperson rp on (rp.jobid=j.id)
+left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+inner join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
+where j.userid=$USER->id and j.status='active'
 and rp.type='phone'
-group by callprogress
-order by cnt asc
+group by callprogress2
 ";
 
 
@@ -80,14 +85,15 @@ $graph = new PieGraph(298,168,"auto");
 $graph->SetFrame(false);
 $graph->SetAntiAliasing();
 
-$graph->title->Set("Active jobs by Call Progress");
+//$graph->title->Set("Active jobs by Call Progress");
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 $p1 = new PiePlot3D($data);
 
 if (($aindex = array_search("Answered",$legend)) !== false)
 	$p1->ExplodeSlice($aindex);
-
+	
+$graph->legend->Pos(0.01,0.01,"right","top");
 $p1->SetLabelType(PIE_VALUE_ABS);
 //$p1->value->SetFormat('%d');
 $p1->value->Show(false);
@@ -95,7 +101,7 @@ $size = 0.5;
 $p1->SetSize($size);
 $p1->SetCenter(0.35);
 $p1->SetLegends(($legend));
-$p1->SetSliceColors($colors);
+$p1->SetSliceColors(array_reverse($colors));
 
 $graph->Add($p1);
 $graph->Stroke();
