@@ -81,6 +81,8 @@ if(isset($_REQUEST['reportid'])){
 		$_SESSION['report']['type'] = "phone";
 	} else if($options['reporttype'] == "emaildetail"){
 		$_SESSION['report']['type'] = "email";
+	} else if($options['reporttype'] == "notcontacted"){
+		$_SESSION['report']['type'] = "notcontacted";
 	} else {
 		error_log("Wrong report type recieved: " . $options['reporttype'] . " Check links on other page.");
 	}
