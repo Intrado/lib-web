@@ -31,7 +31,6 @@ class JobAutoReport extends ReportGenerator{
 		
 		$searchquery = isset($jobid) ? " and rp.jobid='$jobid'" : " and rp.jobid in ('" . implode("','", $joblist) ."')";
 		$searchquery .= $resultquery;
-		$usersql = $USER->userSQL("rp");
 		$fieldquery = generateFields("rp");
 
 		$this->query = 
@@ -73,8 +72,6 @@ class JobAutoReport extends ReportGenerator{
 		
 			where 1 
 			$searchquery
-			
-			$usersql
 			$rulesql
 			$orderquery
 			";
