@@ -27,6 +27,9 @@ if (!$BFXML_DOC = $xmlparser->parse($HTTP_RAW_POST_DATA)) {
 	</bfxml>
 <?
 } else {
+
+	 echo "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
+
 ?>
 	<bfxml>
 <?
