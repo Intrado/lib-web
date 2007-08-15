@@ -24,7 +24,7 @@ if (isset($_GET['dn'])) {
 	$defaultname = "IP Phone - " . date("F jS, Y g:i a");
 	$_SESSION['newjob']['name'] = ($_SESSION['newjob']['name'] ? $_SESSION['newjob']['name'] : $defaultname);
 	$_SESSION['newjob']['desc'] = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] : $defaultname);
-	$_SESSION['newjob']['retries'] = $job->setOptionValue('maxcallattempts', max($_SESSION['newjob']['retries'],$ACCESS->getValue('callmax')));
+	$_SESSION['newjob']['retries'] = max($_SESSION['newjob']['retries'],$ACCESS->getValue('callmax'));
 
 	//put in the special task
 
