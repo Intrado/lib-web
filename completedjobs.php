@@ -24,8 +24,12 @@ if (!$USER->authorize('viewsystemcompleted')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -59,8 +63,8 @@ if ($total == 0) {
 	//just get the stats data for this page
 	$query = "select rp.jobid,
 					rp.type,
-					count(*) as total,
-					100 * sum(rp.status='success') / (sum(rp.status != 'duplicate') +0.00) as success_rate
+					sum(rp.numcontacts) as total,
+					100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
 	from reportperson rp
 	where rp.jobid in ($jobidlist)
 	group by rp.jobid, rp.type
