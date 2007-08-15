@@ -321,7 +321,7 @@ if($error || $reportgenerator->format == "html"){
 ?>
 			</td>
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder"><a href="reportjobdetails.php?csv=true">CSV</a>&nbsp;|&nbsp;<a href="reportjobdetails.php?pdf=true">PDF</a></td>
+			<td class="bottomBorder"><a href="reportjobdetails.php/report.csv?csv=true">CSV</a>&nbsp;|&nbsp;<a href="reportjobdetails.php/report.pdf?pdf=true">PDF</a></td>
 		</tr>
 	</table>
 	<?

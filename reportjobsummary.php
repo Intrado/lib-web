@@ -199,7 +199,7 @@ if($generator->format != "html"){
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr>
 				<td>
-					<a href="reportjobsummary.php?pdf=1">PDF</a>&nbsp;|&nbsp;<a href="#" onclick="popup('report_graph_hourly.png.php',500,500); return false;"/>Time Distribution</a>&nbsp;|&nbsp;<a href="reportjobdetails.php?result=undelivered"/>Recipients&nbsp;Not&nbsp;Contacted</a>
+					<a href="reportjobsummary.php/report.pdf?pdf=1">PDF</a>&nbsp;|&nbsp;<a href="#" onclick="popup('report_graph_hourly.png.php',500,500); return false;"/>Time Distribution</a>&nbsp;|&nbsp;<a href="reportjobdetails.php?result=undelivered"/>Recipients&nbsp;Not&nbsp;Contacted</a>
 				</td>
 				
 			</tr>
