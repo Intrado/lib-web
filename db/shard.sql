@@ -196,3 +196,9 @@ CREATE TABLE `qjobperson` (
 PRIMARY KEY (`customerid`,`jobid`,`personid`)
 ) ENGINE = innodb;
 
+-- RELEASE ASP_2007-08_10 ----------------------------------------
+
+ALTER TABLE `qjobtask` CHANGE `renderedmessage` `renderedmessage` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+
+
