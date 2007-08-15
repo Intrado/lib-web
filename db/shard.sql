@@ -198,6 +198,10 @@ PRIMARY KEY (`customerid`,`jobid`,`personid`)
 
 -- RELEASE ASP_2007-08_10 ----------------------------------------
 
+
+
+ALTER TABLE `qjobtask` CHANGE `uuid` `uuid` BIGINT( 20 ) UNSIGNED NOT NULL;
+ 
 ALTER TABLE `qjobtask` CHANGE `renderedmessage` `renderedmessage` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 
 
