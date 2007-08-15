@@ -44,3 +44,9 @@ CREATE TABLE `shard` (
   `dbusername` VARCHAR( 50 ) NOT NULL default '',
   `dbpassword` VARCHAR( 50 ) NOT NULL default ''
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+
+-- RELEASE ASP_2007-08_10 ----------------------------------------
+
+ALTER TABLE `sessiondata` CHANGE `data` `data` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
