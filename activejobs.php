@@ -24,7 +24,7 @@ if (!$USER->authorize('viewsystemactive')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -50,9 +50,9 @@ $result = Query(
             	j.type LIKE '%phone%' AS has_phone,
 				j.type LIKE '%email%' AS has_email,
 				j.type LIKE '%print%' AS has_print,
-            	sum((rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='phone') as remaining_phone,
-            	sum((rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='email') as remaining_email,
-            	sum((rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='print') as remaining_print,
+            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='phone') as remaining_phone,
+            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='email') as remaining_email,
+            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='print') as remaining_print,
             ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
             from job j
             left join reportperson rp
