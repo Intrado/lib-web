@@ -78,6 +78,8 @@ if(isset($_REQUEST['reportid'])){
 	if(isset($options['reporttype'])){
 		if($options['reporttype']=="emaildetail")
 			$_SESSION['report']['type']="email";
+		else if($options['reporttype'] == "notcontacted")
+			$_SESSION['report']['type']="notcontacted";
 	}
 	$activefields = array();
 	if(isset($options['activefields'])){
@@ -162,7 +164,18 @@ if($_SESSION['report']['type'] == "phone"){
 					"N" => "No Answer",
 					"B" => "Busy",
 					"F" => "Failed",
-					"X" => "Disconnected");
+					"X" => "Disconnected",
+					"duplicate" => "Duplicate",
+					"blocked" => "Blocked",
+					"notattempted" => "Not Attempted");
+} else if($_SESSION['report']['type'] == "notcontacted"){
+	$results = array("N" => "No Answer",
+					"B" => "Busy",
+					"F" => "Failed",
+					"X" => "Disconnected",
+					"blocked" => "Blocked",
+					"notattempted" => "Not Attempted",
+					"unsent" => "Unsent");
 } else {
 	$results = array("sent" => "Sent",
 					"unsent" => "Unsent");
@@ -198,10 +211,11 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		} else if(GetFormData($f, $s, "radioselect") == "job" && !GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
 			error("You must pick a job");
 		} else {
-			if($_SESSION['report']['type'] == "phone"){
-				$options['reporttype'] = "phonedetail";
-			} else {
+			$options['reporttype'] = "phonedetail";	
+			if($_SESSION['report']['type'] == "email"){
 				$options['reporttype'] = "emaildetail";
+			}else if($_SESSION['report']['type'] == "notcontacted"){
+				$options['reporttype'] = "notcontacted";
 			}
 				
 			$radio = GetFormData($f, $s, "radioselect");
@@ -338,7 +352,7 @@ if($reload){
 	$checkbox=0;
 	if(isset($options['result'])){
 		if($options['result'] == "undelivered"){
-			$result = array("F", "B", "N", "X");
+			$result = array("F", "B", "N", "X", "notattempted", "nocontacts", "blocked", "unsent");
 		} else {
 			$result = explode("','", $options['result']);
 		}
@@ -389,6 +403,8 @@ if(isset($_SESSION['report']['type'])){
 		$TITLE = "Email Log";
 	} else if($_SESSION['report']['type'] == 'phone'){
 		$TITLE = "Phone Log";
+	} else if($_SESSION['report']['type'] == 'notcontacted'){
+		$TITLE = "Recipients Not Contacted";
 	}
 }
 
