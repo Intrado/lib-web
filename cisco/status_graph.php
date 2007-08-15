@@ -2,7 +2,6 @@
 require_once("common.inc.php");
 
 
-//TODO refresh header
 header("Refresh: 10; url=" . $URL . "/status_graph.php");
 header("Content-type: text/xml");
 
