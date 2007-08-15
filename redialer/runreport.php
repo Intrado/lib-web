@@ -79,7 +79,7 @@ if($type == "subscription"){
 	$options = array();
 	$count = QuickQuery("select sum(numcontacts) from reportperson where jobid = '" . DBSafe($id) . "'");
 	if($job->questionnaireid == null){
-		if($count > 2000){
+		if($count > 33000){
 			$generator = new JobSummaryReport();
 			$options['reporttype'] = 'jobsummaryreport';
 			$options['sorrymessage'] =
