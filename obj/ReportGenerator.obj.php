@@ -18,7 +18,7 @@ class ReportGenerator {
 		if($this->testquery != ""){
 			$count = QuickQuery($this->testquery);
 		}
-		if($count > 2000){
+		if($count > 33000){
 			$result = "Report exceeds max page limit";
 		}
 		return $result;
