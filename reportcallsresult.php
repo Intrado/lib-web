@@ -61,8 +61,6 @@ $resultsql = "";
 $jobquery = "";
 $jobtypequery = "";
 
-$usersql = $USER->userSQL("rp");
-
 if(isset($options['personid']) && $options['personid'] != "")
 	$personsql = " and rp.pkey like '%" . DBSafe($options['personid']) . "%'";
 	
@@ -98,7 +96,6 @@ $query = "select rp.pkey,
 			left join job j on (j.id = rp.jobid)
 			where 1
 			$userjoin
-			$usersql
 			$personsql
 			$phonesql
 			$emailsql

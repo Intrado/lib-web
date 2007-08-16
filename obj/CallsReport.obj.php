@@ -13,8 +13,6 @@ class CallsReport extends ReportGenerator{
 		}
 		
 		$rulesql = getRuleSql($this->params, "rp");
-		
-		$usersql = $USER->userSQL("rp");
 		$personquery="";
 		$phonequery="";
 		$emailquery="";
@@ -78,7 +76,6 @@ class CallsReport extends ReportGenerator{
 					left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 					where 1
 					$search
-					$usersql
 					$rulesql
 					$userjoin
 					";

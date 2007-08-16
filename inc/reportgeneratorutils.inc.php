@@ -38,7 +38,7 @@ function getRuleSql($params, $alias){
 
 function getJobSummary($joblist){
 	global $USER;
-	$usersql = $USER->userSQL("rp");
+
 	$jobinfoquery = "Select 
 							j.name,
 							jt.name,
@@ -57,7 +57,6 @@ function getJobSummary($joblist){
 							inner join user u on (j.userid = u.id)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							where j.id in ('" . $joblist . "')
-							$usersql
 							group by j.id";
 	$jobinforesult = Query($jobinfoquery);
 	$jobinfo = array();

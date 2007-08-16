@@ -5,7 +5,6 @@ class JobSummaryReport extends ReportGenerator{
 	function generateQuery(){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
-		$this->params['usersql'] = $USER->userSQL("rp");
 		$jobtypes = "";
 		if(isset($this->params['jobtypes'])){
 			$jobtypes = $this->params['jobtypes'];
@@ -37,14 +36,12 @@ class JobSummaryReport extends ReportGenerator{
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
 				where rp.jobid in ('" . $joblist . "')
 				and rp.type='phone'
-				" . $this->params['usersql'] . "
 				group by result";
 
 	}
 	
 	function runHtml(){
 		global $USER;
-		$usersql = $this->params['usersql'];
 		$validstamp = time();
 		$jobstats = array ("validstamp" => $validstamp);
 		
@@ -85,7 +82,6 @@ class JobSummaryReport extends ReportGenerator{
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									inner join job j on (j.id = rp.jobid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
-									$usersql
 									and rp.type='phone'";
 		$phonenumberinfo = QuickQueryRow($phonenumberquery);
 						
@@ -97,7 +93,6 @@ class JobSummaryReport extends ReportGenerator{
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
-									$usersql
 									and rc.type='email'";
 		$emailinfo = QuickQueryRow($emailquery);
 			
@@ -294,7 +289,6 @@ class JobSummaryReport extends ReportGenerator{
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
 		$params = array("jobId" => $this->params['joblist'],
-						"usersql" => $this->params['usersql'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange);
 		return $params;
