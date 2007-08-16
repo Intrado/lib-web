@@ -51,8 +51,6 @@ class JobDetailReport extends ReportGenerator{
 
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
-		$usersql = $USER->userSQL("rp");
-		$this->params['usersql'] = $usersql;
 		$fieldquery = generateFields("rp");
 		$this->query =
 			"select SQL_CALC_FOUND_ROWS
@@ -91,8 +89,6 @@ class JobDetailReport extends ReportGenerator{
 
 			where 1
 			$searchquery
-
-			$usersql
 			$rulesql
 			$orderquery
 			";
@@ -110,8 +106,6 @@ class JobDetailReport extends ReportGenerator{
 
 				where 1
 				$searchquery
-
-				$usersql
 				$rulesql
 				$orderquery
 				";
@@ -360,7 +354,6 @@ class JobDetailReport extends ReportGenerator{
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
 		$params = array("jobId" => $this->params['joblist'],
-						"usersql" => $this->params['usersql'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange);
 		return $params;
