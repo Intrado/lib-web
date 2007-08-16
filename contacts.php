@@ -158,7 +158,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 				if(GetFormData($f, $s, "radioselect") == "person"){
 					unset($options['rules']);
 					$options['personid'] = GetFormData($f, $s, 'personid');
-					$options['phone']= GetFormData($f, $s, 'phone');
+					$options['phone']= Phone::parse(GetFormData($f, $s, 'phone'));
 					$options['email'] = GetFormData($f, $s, 'email');
 				} else {
 					unset($options['personid']);
@@ -223,7 +223,7 @@ if($reloadform){
 		$radio = "criteria";
 	PutFormData($f, $s, "radioselect", $radio);
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
-	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
+	PutFormData($f, $s, 'phone', isset($options['phone']) ? Phone::format($options['phone']) : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
 	for($i=1;$i<=$ordercount;$i++){
 		$order="order$i";
@@ -294,7 +294,7 @@ startWindow("Contact Search", "padding: 3px;");
 					<td>
 						<table id="singleperson">
 							<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'personid', 'text', '15'); ?></td></tr>
-							<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '12'); ?></td></tr>
+							<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '15'); ?></td></tr>
 							<tr><td>Email Address: </td><td><? NewFormItem($f, $s, 'email', 'text', '100'); ?></td></tr>
 							<tr><td><?=submit($f,'search', 'Search')?></td></tr>
 						</table>

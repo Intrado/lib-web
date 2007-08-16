@@ -151,6 +151,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 	else
 	{
 		MergeSectionFormData($f, $s);
+		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime(GetFormData($f, $s, 'startdate'))){
@@ -164,7 +165,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 		} else {
 			$options['reporttype'] = "contacthistory";
 			$options['personid'] = GetFormData($f, $s, 'personid');
-			$options['phone'] = GetFormData($f, $s, 'phone');
+			$options['phone'] = Phone::parse(GetFormData($f, $s, 'phone'));
 			$options['email'] = GetFormData($f, $s, 'email');
 			
 			$options['reldate'] = GetFormData($f, $s, "relativedate");
@@ -253,7 +254,7 @@ if($reload){
 	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "");
 	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
-	PutFormData($f, $s, 'phone', isset($options['phone']) ? $options['phone'] : "", 'phone', "7", "10");
+	PutFormData($f, $s, 'phone', isset($options['phone']) ? Phone::format($options['phone']) : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
 	
 	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : "");
@@ -307,7 +308,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 	<td class="bottomBorder">
 		<table>
 			<tr><td>ID#: </td><td><? NewFormItem($f, $s, 'personid', 'text', '20'); ?></td></tr>
-			<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '12'); ?></td></tr>
+			<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '15'); ?></td></tr>
 			<tr><td>Email Address: </td><td><? NewFormItem($f, $s, 'email', 'text', '20', '100'); ?></td></tr>
 		</table>
 		
