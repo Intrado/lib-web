@@ -90,9 +90,9 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 
 			$check = GetFormData($f, $s, "check_archived");
 			if($check)
-				$options['jobid'] = GetFormData($f, $s, "jobid_archived");
+				$options['jobid'] = GetFormData($f, $s, "jobid_archived")+0;
 			else
-				$options['jobid'] = GetFormData($f, $s, "jobid");
+				$options['jobid'] = GetFormData($f, $s, "jobid")+0;
 			$options['archived'] = $check;		
 			$_SESSION['report']['options'] = $options;
 			if(CheckFormSubmit($f, "run"))

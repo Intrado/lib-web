@@ -112,16 +112,16 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				case "job":
 					$check = GetFormData($f, $s, "check_archived");
 					if($check)
-						$options['jobid'] = GetFormData($f, $s, "jobid_archived");
+						$options['jobid'] = GetFormData($f, $s, "jobid_archived")+0;
 					else
-						$options['jobid'] = GetFormData($f, $s, "jobid");
+						$options['jobid'] = GetFormData($f, $s, "jobid")+0;
 					$options['archived'] = $check;
 					break;
 				case "date":
 					$options['reldate'] = GetFormData($f, $s, "relativedate");
 					
 					if($options['reldate'] == "xdays"){
-						$options['lastxdays'] = GetFormData($f, $s, "xdays");
+						$options['lastxdays'] = GetFormData($f, $s, "xdays")+0;
 					} else if($options['reldate'] == "daterange"){
 						$options['startdate'] = $startdate;
 						$options['enddate'] = $enddate;
