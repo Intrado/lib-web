@@ -20,6 +20,7 @@ require_once("obj/UserSetting.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/CallsReport.obj.php");
 require_once("inc/reportgeneratorutils.inc.php");
+require_once("obj/Phone.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -166,7 +167,7 @@ if(isset($options['rules']) && $options['rules']){
 		}
 		if(isset($options['phone']) && $options['phone'] != ""){
 ?>
-			<tr><td>Phone: <?=$options['phone']?></td></tr>
+			<tr><td>Phone: <?=Phone::format($options['phone'])?></td></tr>
 <?
 		}
 		if(isset($options['email']) && $options['email'] != ""){

@@ -19,6 +19,7 @@ require_once("obj/ReportSubscription.obj.php");
 require_once("obj/CallsReport.obj.php");
 require_once("obj/UserSetting.obj.php");
 require_once("obj/JobType.obj.php");
+require_once("obj/Phone.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization

@@ -177,7 +177,7 @@ class CallsReport extends ReportGenerator{
 			}
 			if(isset($this->params['phone']) && $this->params['phone'] != ""){
 ?>
-				<tr><td>Phone: <?=$this->params['phone']?></td></tr>
+				<tr><td>Phone: <?=Phone::format($this->params['phone'])?></td></tr>
 <?
 			}
 			if(isset($this->params['email']) && $this->params['email'] != ""){
