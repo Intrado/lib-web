@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_notification_job/sending_an_sms_job.htm
+To send a text message click the Create New SMS Job button and complete the required information. To review the results of a previous SMS job click the Report link.
