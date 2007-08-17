@@ -907,6 +907,7 @@ $$$
 
 
 -- triggers from customer database to shard database
+-- NOTE for CommSuite we must remove all "aspshard." and replace all "_$CUSTOMERID_" with "1"
 
 CREATE TRIGGER insert_repeating_job
 AFTER INSERT ON job FOR EACH ROW

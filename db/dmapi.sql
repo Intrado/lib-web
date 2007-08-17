@@ -32,6 +32,7 @@ CREATE TABLE `jobtaskcomplete` (
 
 
 
+-- NOTE if CommSuite we must create sessiondata from authserver schema
 
 CREATE TABLE IF NOT EXISTS  `sessiondata` (
   `id` char(255) NOT NULL,
