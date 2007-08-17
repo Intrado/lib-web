@@ -157,7 +157,7 @@ NewForm($f);
 
 buttons(button('Cancel',null,"smsjobs.php"), submit($f, 'send','Submit Job'));
 
-startWindow('Survey Information');
+startWindow('SMS Information');
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
