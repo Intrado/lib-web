@@ -74,7 +74,7 @@ class ContactsReport extends ReportGenerator {
 		$query = $this->query;
 	
 		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
-		$query .= "limit $pagestart, 500";
+		$query .= "limit $pagestart, 100";
 		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
 		$personlist = array();
@@ -86,27 +86,27 @@ class ContactsReport extends ReportGenerator {
 			$phonelist[$row[1]] = DBFindMany("Phone", "from phone where personid = '$row[1]'");
 			$emaillist[$row[1]] = DBFindMany("Email", "from email where personid = '$row[1]'");
 		}
-		
+
 		startWindow("Search Results", "padding: 3px;");
-		showPageMenu($total,$pagestart,500);
+		showPageMenu($total,$pagestart,100);
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 			<tr class="listHeader">
-				<td>ID#</td>
-				<td>First Name</td>
-				<td>Last Name</td>
-				<td>Address</td>
-				<td>Sequence</td>
-				<td>Destination</td>
+				<th>ID#</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Address</th>
+				<th>Sequence</th>
+				<th>Destination</th>
 			<?
 			for($i=0;$i<=20; $i++){
-				if($i<10){
-					$num = "f0" . $i;
-				} else {
-					$num = "f" . $i;
-				}
-				if(in_array($num, array_keys($fieldlist))){
-					?><td><?=$fieldlist[$num]?></td><?
+				$num = sprintf("f%02d", $i);
+				if(isset($fieldlist[$num])){
+					$style = "";
+					if(!$_SESSION['fields'][$num]){
+						$style = ' style="display:none;" ';
+					}
+					?><th <?=$style?>><?=$fieldlist[$num]?></th><?
 				}
 			}
 			
@@ -148,19 +148,26 @@ class ContactsReport extends ReportGenerator {
 									$first = false;
 									$count=0;
 									for($i=0;$i<=20; $i++){
-										if($i<10){
-											$num = "f0" . $i;
-										} else {
-											$num = "f" . $i;
-										}
-										if(in_array($num, array_keys($fieldlist))){
-											?><td><?=htmlentities($person[5+$count])?></td><?
+										$num = sprintf("f%02d", $i);
+										if(isset($fieldlist[$num])){
+											$style = "";
+											if(!$_SESSION['fields'][$num]){
+												$style = ' style="display:none;" ';
+											}
+											?><td <?=$style?>><?=htmlentities($person[5+$count])?></td><?
 											$count++;
 										}
 									}
 								} else {
-									for($i=0; $i<$fieldcount; $i++){
-										?><td>&nbsp;</td><?
+									for($i=0;$i<=20; $i++){
+										$num = sprintf("f%02d", $i);
+										if(isset($fieldlist[$num])){
+											$style = "";
+											if(!$_SESSION['fields'][$num]){
+												$style = ' style="display:none;" ';
+											}
+											?><td <?=$style?>>&nbsp;</td><?
+										}
 									}
 								}
 								?>
@@ -173,13 +180,13 @@ class ContactsReport extends ReportGenerator {
 								<?
 								$count=0;
 								for($i=0;$i<=20; $i++){
-									if($i<10){
-										$num = "f0" . $i;
-									} else {
-										$num = "f" . $i;
-									}
-									if(in_array($num, array_keys($fieldlist))){
-										?><td><?=htmlentities($person[5+$count])?></td><?
+									$num = sprintf("f%02d", $i);
+									if(isset($fieldlist[$num])){
+										$style = "";
+										if(!$_SESSION['fields'][$num]){
+											$style = ' style="display:none;" ';
+										}
+										?><td <?=$style?>><?=htmlentities($person[5+$count])?></td><?
 										$count++;
 									}
 								}
@@ -201,8 +208,15 @@ class ContactsReport extends ReportGenerator {
 									<td><?=$email->email?></td>
 								<? 
 								
-								for($i=0; $i<$fieldcount; $i++){
-									?><td>&nbsp;</td><?
+								for($i=0;$i<=20; $i++){
+									$num = sprintf("f%02d", $i);
+									if(isset($fieldlist[$num])){
+										$style = "";
+										if(!$_SESSION['fields'][$num]){
+											$style = ' style="display:none;" ';
+										}
+										?><td <?=$style?>>&nbsp;</td><?
+									}
 								}
 								
 								?>
@@ -215,16 +229,6 @@ class ContactsReport extends ReportGenerator {
 			</table>
 			<script langauge="javascript">
 			var searchresultstable = new getObj("searchresults").obj;
-			
-		<?
-			$count=1;
-			foreach($fieldlist as $index => $field){
-				?>
-				setColVisability(searchresultstable, 5+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
-				<?
-				$count++;
-			}
-		?>
 			</script>
 		<?
 		showPageMenu($total,$pagestart,500);
