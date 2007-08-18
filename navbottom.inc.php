@@ -1,21 +1,6 @@
 
 </div>
 
-<!-- ***********************************
-						</td>
-						<td id='shadowright' valign="top" align="left"><img class="noprint" src="img/shadow_top_right.gif"></td>
-					</tr>
-					<tr>
-						<td id='shadowbottom' valign="top" align="left"><img class="noprint" src="img/shadow_bottom_left.gif"></td>
-						<td valign="top" align="left"><img class="noprint" src="img/shadow_bottom_right.gif"></td>
-					</tr>
-			</table></div>
-		</div>
-	</div>
-</div>
-
--->
-
 <div id="termsinfo">
 <? /*CSDELETEMARKER_START*/ if (!$IS_COMMSUITE) { ?>
 Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
