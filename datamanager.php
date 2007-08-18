@@ -89,8 +89,6 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				error("Please choose a unique field name. This one is already in use.");
 			} else if (!in_array($type, $VALID_TYPES)) {
 				error("The field type, $type, is not valid");
-			} else if (count($FIELDMAPS) >= 20){
-				error("You can only have 20 Metadata Fields");
 			} else {
 				$newfield = new FieldMap();
 				// Submit new item
@@ -136,7 +134,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 						// Requery to get the newly inserted row
 						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 					}
-				} else {
+				} else if (count($FIELDMAPS) < 20){
 					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
 					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
 					$cleanedname = preg_replace('/[^\w ]/', '#', DBSafe(GetFormData($form, $section, "name_$fieldnum")));
