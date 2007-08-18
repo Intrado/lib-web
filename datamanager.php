@@ -89,7 +89,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				error("Please choose a unique field name. This one is already in use.");
 			} else if (!in_array($type, $VALID_TYPES)) {
 				error("The field type, $type, is not valid");
-			} else {
+			} else if(count($FIELDMAPS) < 20){
 				$newfield = new FieldMap();
 				// Submit new item
 				$specialtype = GetFormData($form, $section, "newfield_specialtype");
@@ -134,7 +134,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 						// Requery to get the newly inserted row
 						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
 					}
-				} else if (count($FIELDMAPS) < 20){
+				} else {
 					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
 					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
 					$cleanedname = preg_replace('/[^\w ]/', '#', DBSafe(GetFormData($form, $section, "name_$fieldnum")));
