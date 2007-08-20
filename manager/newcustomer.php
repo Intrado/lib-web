@@ -189,7 +189,7 @@ if (CheckFormSubmit($f,$s)){
 							('General', 30000, 3, 450, 0)";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
-				$surveyurl = "http://asp.schoolmessenger.com/" . $hostname . "/survey/";
+				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 							('maxphones', '3'),
 							('maxemails', '2'),
