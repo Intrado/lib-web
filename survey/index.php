@@ -66,7 +66,7 @@ if ($reason == 'ok') {
 }
 
 $exitmsg = false;
-if (isset($_POST['submit']) && $reason == 'ok') {
+if (isset($_POST['Submit']) && $reason == 'ok') {
 
 	$resultsql = array();
 	$results = array();
@@ -211,7 +211,7 @@ function validate_survey () {
 ?>
 	</table>
 
-	<input style="margin: 5px;" alt="Submit" type="image" name="submit[]" src="../img/b1_easycall2.gif" onMouseOver="this.src='../img/b2_easycall2.gif';" onMouseOut="this.src='../img/b1_easycall2.gif';">
+	<input type="submit" name="Submit" value="Submit" style="margin: 5px;" alt="Submit" >
 	</form>
 
 <!-- copy from endWindow() to set image location "../img" -->
