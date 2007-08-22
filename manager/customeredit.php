@@ -13,7 +13,7 @@ if (isset($_GET['id'])) {
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 if(isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
-	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
+	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custinfo = mysql_fetch_row($custquery);
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
 	if(!$custdb) {
@@ -81,13 +81,20 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			} else if (strlen($inboundnumber) > 0 && !ereg("[0-9]{10}",$inboundnumber)) {
 				error('Bad Toll Free Number Format, Try Again');
 			} else if ((strlen($custinfo[3]) >= 5) && (strlen($hostname) < 5)){
-				error('Customer URL\'s cannot be shorter than 5 unless their account was already made');			
+				error('Customer URL\'s cannot be shorter than 5 unless their account was already made');
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
 			} else {
 
-				QuickUpdate("update customer set urlcomponent = '" . DBSafe($hostname) ."' where id = '$currentid'");
-				QuickUpdate("update customer set inboundnumber = '" . DBSafe($inboundnumber) ."' where id = '$currentid'");
+				QuickUpdate("update customer set
+						urlcomponent = '" . DBSafe($hostname) ."',
+						inboundnumber = '" . DBSafe($inboundnumber) ."',
+						enabled=" . (GetFormData($f,$s,"enabled") + 0) ."
+						where id = '$currentid'");
+
+				if (!GetFormData($f,$s,"enabled"))
+					setCustomerSystemSetting("disablerepeat", "1", $custdb);
+
 				setCustomerSystemSetting("displayname", $displayname, $custdb);
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
@@ -99,19 +106,19 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('autoreport_replyname', $autoname, $custdb);
 				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $custdb);
 				setCustomerSystemSetting('surveyurl', $surveyurl, $custdb);
-				
+
 				if($renewaldate != "" || $renewaldate != NULL){
 					if($renewaldate = strtotime($renewaldate)) {
 						$renewaldate = date("Y-m-d", $renewaldate);
 					}
 				}
-				
+
 				setCustomerSystemSetting('_renewaldate', $renewaldate, $custdb);
 				setCustomerSystemSetting('_callspurchased', $callspurchased, $custdb);
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				setCustomerSystemSetting('_managernote', $managernote, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
-				
+
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
@@ -127,8 +134,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
-					$reloadform=1;
-					$refresh = 1;
+					redirect(); //the annoying custinfo above needs to be reloaded
 				}
 			}
 		}
@@ -167,7 +173,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"maxusers", getCustomerSystemSetting('_maxusers', false, true, $custdb), "text", 0, 100);
 	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
-	
+
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
 		$oldlanguages[] = $index;
@@ -177,6 +183,8 @@ if( $reloadform ) {
 	PutFormData($f, $s, "oldlanguages", $oldlanguages);
 	PutFormData($f, $s, "newlang", "", "text");
 	PutformData($f, $s, "managerpassword", "", "text");
+
+	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
 }
 
 include_once("nav.inc.php");
@@ -210,7 +218,7 @@ NewForm($f);
 <tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
 
 <?
-	
+
 	foreach($languages as $index => $language){
 		$lang = "Language" . $index;
 		?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50) ?></td></tr><?
@@ -218,6 +226,8 @@ NewForm($f);
 ?>
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
+<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!</b></td></tr>
+
 <tr><td>Retry:
 
 <?
@@ -259,6 +269,6 @@ function setCustomerSystemSetting($name, $value, $custdb) {
 		QuickUpdate("update setting set value = '$value' where name = '$name'", $custdb);
 	}
 }
-	
+
 
 ?>

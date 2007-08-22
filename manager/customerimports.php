@@ -4,7 +4,6 @@ include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +52,7 @@ if(isset($_GET['customer'])){
 	$customerID = $_GET['customer']+0;
 	$queryextra = "AND ID='$customerID'";
 } else {
-	$queryextra="";
+	$queryextra=" and enabled";
 }
 
 

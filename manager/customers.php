@@ -3,13 +3,23 @@ include_once("common.inc.php");
 include_once("../obj/Customer.obj.php");
 include_once("../inc/table.inc.php");
 
+
+if (isset($_GET['showdisabled']))
+	$customersql = "where not enabled";
+else
+	$customersql = "where enabled";
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_custurl($row, $index){
 
-	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[1] . "</a>";
+	if (!isset($_GET['showdisabled']))
+		$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[1] . "</a>";
+	else
+		$url = '<span style="color: gray;">' . $row[1] . '</span>';
 	return $url;
 }
 
@@ -53,8 +63,7 @@ while($row = DBGetRow($res)){
 	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
 }
 
-
-$customerquery = Query("select id, shardid, urlcomponent from customer order by shardid, id");
+$customerquery = Query("select id, shardid, urlcomponent from customer $customersql order by shardid, id");
 $customers = array();
 while($row = DBGetRow($customerquery)){
 	$customers[] = $row;
@@ -112,6 +121,8 @@ $formatters = array("url" => "fmt_custurl",
 
 include_once("nav.inc.php");
 ?>
+
+Show disabled: <input type="checkbox" onclick="window.location='customers.php?' + (this.checked ? 'showdisabled' : '');" <?= isset($_GET['showdisabled']) ? "checked" : ""?>>
 
 <table border=1>
 <?
