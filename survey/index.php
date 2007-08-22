@@ -22,35 +22,34 @@ header("Cache-Control: post-check=0,pre-check=0");
 header("Cache-Control: max-age=0");
 header("Pragma: no-cache");
 
-
+require_once("XML/RPC.php");
+require_once("../inc/auth.inc.php");
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 include_once("../inc/utils.inc.php");
+include_once("../inc/html.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../obj/Job.obj.php");
 include_once("../obj/SurveyQuestionnaire.obj.php");
 include_once("../obj/SurveyQuestion.obj.php");
 
 
-$custname = getSystemSetting("displayname");
+$custname = getCustomerName($CUSTOMERURL);
 
-//see if this code exists and has not already been used
-//TODO: fix jobworkitem related code
-$query = "select jobworkitemid, isused from surveyemailcode where code='" . DBSafe($code) . "'";
-if (strlen($code) > 0 && $row = QuickQueryRow($query)) {
-	$exists = true;
-	list($workitemid, $isused) = $row;
+$reason = authorizeSurveyWeb($code, $CUSTOMERURL);
+
+if ($reason == 'ok') {
+	// find the jobid
+	$query = "select jobid from surveyweb where code='" . DBSafe($code) . "'";
+	list($jobid) = QuickQueryRow($query);
 
 	//find and load the questionnaire
-	$query = "select j.questionnaireid, j.id from job j
-				inner join jobworkitem wi on (wi.jobid=j.id)
-				where wi.id = $workitemid";
-	list($questionnaireid,$jobid) = QuickQueryRow($query);
+	$query = "select questionnaireid from job where id = $jobid";
+	list($questionnaireid) = QuickQueryRow($query);
 	$job = new Job($jobid);
 	$questionnaire = new SurveyQuestionnaire($questionnaireid);
 
-	if (!$isused) {
 		$questions = array_values(DBFindMany("SurveyQuestion","from surveyquestion where questionnaireid=$questionnaire->id order by questionnumber"));
 
 		//if we need to randomize question order, we should do it in a determinable way based on the workitemid or something so that if the user returns to the form multiple times or reloads the page the questions dont move around.
@@ -64,12 +63,10 @@ if (strlen($code) > 0 && $row = QuickQueryRow($query)) {
 				$questions[$x] = $tmp;
 			}
 		}
-	}
-} else {
-	$exists = false;
 }
 
-if (isset($_POST['submit']) && $exists && !$isused && $job->status == "active") {
+$exitmsg = false;
+if (isset($_POST['submit']) && $reason == 'ok') {
 
 	$resultsql = array();
 	$results = array();
@@ -88,23 +85,16 @@ if (isset($_POST['submit']) && $exists && !$isused && $job->status == "active") 
 		$query = "insert into surveyresponse (jobid,questionnumber,answer,tally) values "
 				. implode(",",$resultsql) . " on duplicate key update tally=tally + values(tally)";
 		QuickUpdate($query);
-		$query = "update surveyemailcode set isused=1, dateused=now(), loggedip='" . DBSafe($_SERVER["REMOTE_ADDR"]) . "'"
+		$query = "update surveyweb set status='web', dateused=now(), loggedip='" . DBSafe($_SERVER["REMOTE_ADDR"]) . "'"
 				. ", resultdata='" . DBSafe(http_build_query($results,'','&')) . "'"
 				. " where code='" . DBSafe($code) . "'";
 		QuickUpdate($query);
 
-		//we should also try to cancel the phone call in case it has not already been sent. Just fail it out if it is queued.
-		//TODO: fix jobworkitem related code
-		QuickUpdate("update jobworkitem wi_phone "
-					. "inner join jobworkitem wi_email on (wi_phone.personid=wi_email.personid "
-											."and wi_phone.jobid=wi_email.jobid and wi_email.type='email') "
-					."inner join surveyemailcode sec on (sec.jobworkitemid = wi_email.id) "
-					."set wi_phone.status='fail' "
-					."where sec.code='" . DBSafe($code) . "' and wi_phone.type='phone' and "
-					."wi_phone.status in ('queued','scheduled','waiting')");
+		//TODO  we should also try to cancel the phone call in case it has not already been sent. Just fail it out if it is queued.
 	}
 
-	header("Location: " . $_SERVER["REQUEST_URI"] . "&thanks");
+	$reason = 'prevresponse';
+	$exitmsg = true; // display the exit message
 }
 
 
@@ -116,13 +106,15 @@ if (isset($_POST['submit']) && $exists && !$isused && $job->status == "active") 
 	<link href='../css/style.css' type='text/css' rel='stylesheet' media='screen'>
 </head>
 <body>
-<div id='container'>
-<div id='mainscreen'>
-<div id='orgtitle'><?= htmlentities($custname) ?></div>
-			<img id='brand' src='../img/school_messenger.gif' /><img src='img/spacer.gif' width="1" height="40" />
 
-<div id="contentbody">
-<div id="navtitle"><?= htmlentities(isset($questionnaire->webpagetitle) ? $questionnaire->webpagetitle : "") ?></div>
+<div>
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="../img/header_bg.gif">
+	<tr>
+	<td><img src="../img/logo.gif"></td>
+	<td><div class="custname"><?= htmlentities(isset($questionnaire->webpagetitle) ? $questionnaire->webpagetitle : "") ?></div></td>
+	</tr>
+	</table>
+</div>
 
 <div id='shadowblock'>
 	<table width='100%' border='0' cellpadding='0' cellspacing='0'>
@@ -130,14 +122,14 @@ if (isset($_POST['submit']) && $exists && !$isused && $job->status == "active") 
 <? /* ----------------------------------------------------- */ ?>
 <?
 //if no survey found, display error page
-if (!$exists) {
+if ($reason != 'ok' && $reason != 'prevresponse' && $reason != 'expired') {
 ?>
 	<br><br>Sorry, the survey link has expired or is invalid<br><br>
 <?
-} else if ($isused) {
+} else if ($reason == 'prevresponse') {
 
 	//if already taken, show thanks page
-	if ($questionnaire->webexitmessage && isset($_GET['thanks'])) {
+	if ($exitmsg && $questionnaire->webexitmessage) {
 		echo "<br><br>";
 		if ($questionnaire->usehtml)
 			echo $questionnaire->webexitmessage;
@@ -145,7 +137,7 @@ if (!$exists) {
 			echo nl2br(htmlentities($questionnaire->webexitmessage));
 		echo "<br><br>";
 	}
-	else if (isset($_GET['thanks'])) {
+	else if ($exitmsg) {
 ?>
 	<br><br>Your response has been recorded. Thank you for participating in this survey.<br><br>
 <?
@@ -154,7 +146,7 @@ if (!$exists) {
 	<br><br>Your responses to this survey were previously noted. Thank you for your participation.<br><br>
 <?
 	}
-} else if ($job->status != "active" && $job->status != "procactive" && $job->status != "processing" && $job->status != "scheduled") {
+} else if ($reason == 'expired') {
 ?>
 	<br><br><h3>Sorry, the survey has expired.</h3><br><br>
 <?
@@ -218,26 +210,30 @@ function validate_survey () {
 	}
 ?>
 	</table>
-	<input style="margin: 5px;" alt="Submit" type="image" name="submit[]" src="../img/b1_submit.gif" onMouseOver="this.src='../img/b2_submit.gif';" onMouseOut="this.src='../img/b1_submit.gif';">
+
+	<input style="margin: 5px;" alt="Submit" type="image" name="submit[]" src="../img/b1_easycall2.gif" onMouseOver="this.src='../img/b2_easycall2.gif';" onMouseOut="this.src='../img/b1_easycall2.gif';">
 	</form>
+
+<!-- copy from endWindow() to set image location "../img" -->
+				</div></div>
+			</div>
+		</td>
+		<td width="6" valign="top" background="../img/window_shadow_right.gif"><img src="../img/window_shadow_topright.gif"></td>
+	</tr>
+	<tr>
+		<td background="../img/window_shadow_bot.gif"><img src="../img/window_shadow_botleft.gif"></td>
+		<td><img src="../img/window_shadow_botright.gif"></td>
+	</table>
+</div>
+<!-- end of copy -->
+
 <?
-	endWindow();
 }
 ?>
 <? /* ----------------------------------------------------- */ ?>
 		</td>
-			<td id='shadowright' valign="top" align="left"><img class="noprint" src="../img/shadow_top_right.gif"></td>
-		</tr>
-		<tr>
-			<td id='shadowbottom' valign="top" align="left"><img class="noprint" src="../img/shadow_bottom_left.gif"></td>
-			<td valign="top" align="left"><img class="noprint" src="../img/shadow_bottom_right.gif"></td>
 		</tr>
 	</table>
-</div>
-
-</div>
-
-</div>
 </div>
 </body>
 </html>
