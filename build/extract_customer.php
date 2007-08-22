@@ -5,11 +5,16 @@
 if ($argc < 2)
 	exit ("Please specify customerid");
 
-$dbhost = "localhost:3306";
+$dialerdbname = "dialerasp";
+$authdbname = "authserver";
+$commsuitedbname = ""; // use/set only if commsuite extract (NOTE: assumes commsuite database and tables already created)
+
+
+$dbhost = "localhost";
 $dbuser = "root";
 $dbpass = "";
 
-$authhost = "localhost:3306";
+$authhost = "localhost";
 $authuser = "root";
 $authpass = "";
 
@@ -18,11 +23,11 @@ $customerid = $argv[1];
 $starttime = microtime(true);
 
 $db = mysql_connect($dbhost,$dbuser,$dbpass,true);
-mysql_select_db("dialerasp",$db);
+mysql_select_db($dialerdbname,$db);
 
 $custdb = mysql_connect($dbhost,$dbuser,$dbpass,true);
 $authdb = mysql_connect($authhost, $authuser, $authpass, true);
-mysql_select_db("authserver", $authdb);
+mysql_select_db($authdbname, $authdb);
 
 
 function esc ($str,$db) {
@@ -224,6 +229,7 @@ function genpassword() {
 //-------------------------------------------------------------------
 
 $newdbname = "c_$customerid";
+if (isset($commsuitedbname) && $commsuitedbname != "") $newdbname = $commsuitedbname;
 
 $result = mysql_query("select hostname, inboundnumber from customer where id = '$customerid'", $db)
 			or die ("Failed to query customer: " . mysql_error($db));
@@ -236,6 +242,11 @@ $custpass = genpassword();
 $destres = mysql_query("insert into customer(id,urlcomponent, inboundnumber, shardid, dbusername, dbpassword, enabled) values
 						($customerid,'$row[0]', '$row[1]', '1', '$newdbname', '$custpass', '1')", $authdb)
 						or die("Failed to insert new customer into auth server: " . mysql_error($custdb));
+
+if (isset($commsuitedbname) && $commsuitedbname != "") {
+	mysql_select_db($commsuitedbname,$custdb);
+
+} else {
 
 mysql_query("drop user '$newdbname'", $custdb);
 mysql_query("create user '$newdbname' identified by '$custpass'", $custdb)
@@ -255,6 +266,8 @@ foreach ($tablequeries as $tablequery) {
 		mysql_query($tablequery,$custdb)
 			or die ("Failed to create tables \n$tablequery\n\nfor $newdbname : " . mysql_error($custdb));
 	}
+}
+
 }
 
 
@@ -363,7 +376,11 @@ copytable($customerid,"persondatavalues",array("id", "fieldnum", "value", "refco
 
 //PHONE
 $join = "inner join person p on (personid = p.id and p.customerid=$customerid)";
-copytable($customerid,"phone",array("id", "personid", "phone", "sequence", "editlock", "smsenabled"),$db,$custdb,1000,$join);
+$phonefields = array("id", "personid", "phone", "sequence", "editlock", "smsenabled");
+if (isset($commsuitedbname) && $commsuitedbname != "") {
+	$phonefields = array("id", "personid", "phone", "sequence", "editlock");
+}
+copytable($customerid,"phone",$phonefields,$db,$custdb,1000,$join);
 
 //REPORTCONTACT
 copytable($customerid,"reportcontact",array("jobid", "personid", "type", "sequence", "numattempts", "userid", "starttime", "result", "participated", "duration", "resultdata", "attemptdata", "phone", "email", "addressee", "addr1", "addr2", "city", "state", "zip"),$db,$custdb,1000,false);
@@ -389,6 +406,9 @@ copytable($customerid,"schedule",array("id", "userid", "time", "nextrun"),$db,$c
 //SCHEDULEDAY table removed, dow field added to schedule table
 restructureScheduleDay($customerid, $db, $custdb);
 
+if (isset($commsuitedbname) && $commsuitedbname != "") {
+	// commsuite does not have sms
+} else {
 //SMSJOB
 $join = "
 inner join user u on (smsjob.userid=u.id and u.customerid=$customerid)";
@@ -398,6 +418,7 @@ copytable($customerid,"smsjob", array("id","userid","listid","name","description
 $join = "inner join smsjob on (smsjob.id = smsmsg.smsjobid)
 inner join user u on (smsjob.userid = u.id and u.customerid=$customerid)";
 copytable($customerid, "smsmsg", array("id","smsjobid","personid","sequence","phone"),$db,$custdb,1000,$join);
+}
 
 //SPECIALTASK
 //dont copy
