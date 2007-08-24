@@ -20,6 +20,7 @@ if(isset($_POST["submit"])) {
 
 	$id = AspAdminUser::doLogin($login, $password);
 	if($id){
+		error_log("Manager login by $login");
 		$_SESSION['aspadminuserid'] = $id;
 		redirect("customers.php");
 	} else {
