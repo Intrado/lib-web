@@ -37,6 +37,8 @@ include_once("../obj/SurveyQuestion.obj.php");
 
 $custname = getCustomerName($CUSTOMERURL);
 
+$custdisplayname = getCustomerName($CUSTOMERURL);
+
 $reason = authorizeSurveyWeb($code, $CUSTOMERURL);
 
 if ($reason == 'ok') {
@@ -111,7 +113,7 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="../img/header_bg.gif">
 	<tr>
 	<td><img src="../img/logo.gif"></td>
-	<td><div class="custname"><?= htmlentities(isset($questionnaire->webpagetitle) ? $questionnaire->webpagetitle : "") ?></div></td>
+	<td><div class="custname"><?= htmlentities($custdisplayname) ?></div></td>
 	</tr>
 	</table>
 </div>
@@ -152,6 +154,11 @@ if ($reason != 'ok' && $reason != 'prevresponse' && $reason != 'expired') {
 <?
 } else {
 	//otherwise, show survey questions form
+	$TITLE= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "";
+
+?>
+	<div class="pagetitle"> <?= $TITLE ?></div>
+<?
 	startWindow('Survey',null,false,false);
 ?>
 	<form name="surveyform" method="POST" action="<?= $_SERVER["REQUEST_URI"] ?>" onsubmit="return validate_survey();">
