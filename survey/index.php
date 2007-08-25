@@ -99,6 +99,8 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 	$exitmsg = true; // display the exit message
 }
 
+$TITLE= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "";
+
 
 ?>
 <html>
@@ -118,48 +120,58 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 	</table>
 </div>
 
-<div id='shadowblock'>
-	<table width='100%' border='0' cellpadding='0' cellspacing='0'>
-		<tr><td id='shadowcontent'>
-<? /* ----------------------------------------------------- */ ?>
+<div class="content">
+
+
+	<div class="pagetitle"> <?= $TITLE ?></div>
+<!-- startWindow() -->
+	<div class="window">
+	<table width="100%" border=0 cellpadding=0 cellspacing=0>
+	<tr>
+		<td width="100%">
+			<div class="windowborder">
+				<div class="windowbar">
+					<div class="windowtitle">Survey</div>
+				</div>
+				<div id="window_1" class="windowbody" style=""><div style="width: 100%;">
+<!-- startWindow() -->
+
 <?
 //if no survey found, display error page
 if ($reason != 'ok' && $reason != 'prevresponse' && $reason != 'expired') {
 ?>
-	<br><br>Sorry, the survey link has expired or is invalid<br><br>
+	<br><br><h3 style="margin-left: 15px;">Sorry, the survey link has expired or is invalid</h3><br><br>
 <?
 } else if ($reason == 'prevresponse') {
 
 	//if already taken, show thanks page
 	if ($exitmsg && $questionnaire->webexitmessage) {
-		echo "<br><br>";
-		if ($questionnaire->usehtml)
+		if ($questionnaire->usehtml) {
+			echo "<br><br>";
 			echo $questionnaire->webexitmessage;
-		else
+			echo "<br><br>";
+		} else {
+			echo '<br><br><h3 style="margin-left: 15px;">';
 			echo nl2br(htmlentities($questionnaire->webexitmessage));
-		echo "<br><br>";
+			echo "</h3<<br><br>";
+		}
+
 	}
 	else if ($exitmsg) {
 ?>
-	<br><br>Your response has been recorded. Thank you for participating in this survey.<br><br>
+	<br><br><h3 style="margin-left: 15px;">Your response has been recorded. Thank you for participating in this survey.</h3><br><br>
 <?
 	} else {
 ?>
-	<br><br>Your responses to this survey were previously noted. Thank you for your participation.<br><br>
+	<br><br><h3 style="margin-left: 15px;">Your responses to this survey were previously noted. Thank you for your participation.</h3><br><br>
 <?
 	}
 } else if ($reason == 'expired') {
 ?>
-	<br><br><h3>Sorry, the survey has expired.</h3><br><br>
+	<br><br><h3 style="margin-left: 15px;">Sorry, the survey has expired.</h3><br><br>
 <?
 } else {
 	//otherwise, show survey questions form
-	$TITLE= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "";
-
-?>
-	<div class="pagetitle"> <?= $TITLE ?></div>
-<?
-	startWindow('Survey',null,false,false);
 ?>
 	<form name="surveyform" method="POST" action="<?= $_SERVER["REQUEST_URI"] ?>" onsubmit="return validate_survey();">
 
@@ -221,7 +233,13 @@ function validate_survey () {
 	<input type="submit" name="Submit" value="Submit" style="margin: 5px;" alt="Submit" >
 	</form>
 
-<!-- copy from endWindow() to set image location "../img" -->
+
+
+<?
+}
+?>
+
+<!-- endWindow() -->
 				</div></div>
 			</div>
 		</td>
@@ -232,15 +250,9 @@ function validate_survey () {
 		<td><img src="../img/window_shadow_botright.gif"></td>
 	</table>
 </div>
-<!-- end of copy -->
+<!-- endWindow() -->
 
-<?
-}
-?>
-<? /* ----------------------------------------------------- */ ?>
-		</td>
-		</tr>
-	</table>
+</div>
 </div>
 </body>
 </html>
