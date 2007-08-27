@@ -41,7 +41,7 @@ function tryLogin ($userid) {
 }
 
 if (isset($_GET['logout'])) {
-	$dn = $_SESSION['dn'];
+	$dn = isset($_SESSION['dn']) ? $_SESSION['dn'] : "";
 	@session_destroy();
 	$_SESSION['dn'] = $dn;
 } else if (isset($_SESSION['user'])) {
