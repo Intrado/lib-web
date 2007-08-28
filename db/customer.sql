@@ -1070,3 +1070,11 @@ insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid,type
 end
 $$$
 
+-- ASP_RELEASE_2007_08_10
+
+alter table reportperson add iscontacted tinyint(4) not null default 0 after status
+$$$
+
+update reportperson set iscontacted=1 where status='success'
+$$$
+
