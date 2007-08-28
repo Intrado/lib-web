@@ -201,8 +201,11 @@ PRIMARY KEY (`customerid`,`jobid`,`personid`)
 
 
 ALTER TABLE `qjobtask` CHANGE `uuid` `uuid` BIGINT( 20 ) UNSIGNED NOT NULL;
- 
+
 ALTER TABLE `qjobtask` CHANGE `renderedmessage` `renderedmessage` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 
 
+-- RELEASE ASP_2007-08-24 ------------------------------------------
+
+ALTER TABLE `qjobtask` CHANGE `lastresult` `lastresult` ENUM( 'A', 'M', 'N', 'B', 'X', 'F', 'sent', 'unsent', 'printed', 'notprinted', 'cancelling', 'endoflife' ) NULL DEFAULT NULL;
 
