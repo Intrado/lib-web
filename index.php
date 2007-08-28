@@ -4,8 +4,12 @@ require_once("inc/common.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/form.inc.php");
 
-if (isset($_GET['logout']))
+if (isset($_GET['logout'])) {
+	doStartSession(); // start the session to get the id
+	putSessionData(session_id(), ""); // write empty data to flush the user
+
 	@session_destroy();
+}
 
 if ($SETTINGS['feature']['has_ssl']) {
 	if ($IS_COMMSUITE)
@@ -61,10 +65,15 @@ if (isset($_GET['login'])) {
 		$badlogin = true;
 		error_log("ASPTOKEN login failure");
 	}
-} else if (isset($_SESSION['user'])) {
-	$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
-	unset($_SESSION['lasturi']);
-	redirect($redirpage);
+} else if (!isset($_GET['logout'])){
+	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
+	$sessionstarted = true;
+
+	if (isset($_SESSION['user'])) {
+		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
+		unset($_SESSION['lasturi']);
+		redirect($redirpage);
+	}
 }
 
 //if we got a valid userid from above, log in for that user.
