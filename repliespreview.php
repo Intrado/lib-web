@@ -1,5 +1,7 @@
 <?
+
 include_once("inc/common.inc.php");
+include_once("obj/Phone.obj.php");
 include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/formatters.inc.php");
@@ -86,7 +88,7 @@ buttons(button("Done",isset($_GET['close']) ? "window.close()" : "window.history
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Phone</td>
-		<td class="bottomBorder"><?=fmt_phone($responses, 3)?></td>
+		<td class="bottomBorder"><?=Phone::format($responses[3])?></td>
 	</tr>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Reply Date</td>
