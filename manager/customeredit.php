@@ -170,7 +170,7 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
-	PutFormData($f,$s,"maxusers", getCustomerSystemSetting('_maxusers', false, true, $custdb), "text", 0, 100);
+	PutFormData($f,$s,"maxusers", getCustomerSystemSetting('_maxusers', false, true, $custdb), "number", 0, 100);
 	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 
