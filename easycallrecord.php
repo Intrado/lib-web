@@ -27,7 +27,7 @@ if($specialtask->getData("progress") == "Done") {
 	$progress = $specialtask->getData("progress");
 
 	if($progress == "Hung up") {
-		$specialtask->setData('error', "Hung up early");
+		$specialtask->setData('error', "Phone call hung up early");
 	}
 
 	$specialtask->lastcheckin = date("Y-m-d H:i:s");
