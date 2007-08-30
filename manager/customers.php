@@ -30,8 +30,9 @@ function fmt_status($row, $index){
 		return "&nbsp;";
 }
 
+//Row[7] is the max users value
 function fmt_users($row, $index){
-	if($row[$index] > $row[7]){
+	if($row[7] != "unlimited" && $row[$index] > $row[7]){
 		return "<div style='background-color: #ff0000;'>" . $row[$index] . "</div>";
 	} else if($row[$index] == 0){
 		return "<div style='background-color: #ffcccc;'>" . $row[$index] . "</div>";
@@ -90,7 +91,7 @@ foreach($customers as $cust) {
 		$row[] = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
 
 		$maxusers = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
-		$row[] = $maxusers ? $maxusers : 1;
+		$row[] = $maxusers ? $maxusers : "unlimited";
 
 		$row[] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
 		$row[] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
