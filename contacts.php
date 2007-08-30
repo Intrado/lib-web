@@ -31,19 +31,6 @@ if (!$USER->authorize('viewcontacts')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Functions
-////////////////////////////////////////////////////////////////////////////////
-
-function fmt_phone_contact ($phone) {
-	if (strlen($phone) == 10)
-		return "(" . substr($phone,0,3) . ")&nbsp;" . substr($phone,3,3) . "-" . substr($phone,6,4);
-	else if (strlen($phone) == 7)
-		return  substr($phone,0,3) . "-" . substr($phone,3,4);
-	else
-		return $phone;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -165,37 +152,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 					unset($options['phone']);
 					unset($options['email']);
 					$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
-					$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-					if ($fieldnum != "") {
-						$type = GetFormData($f,$s,"newruletype");
-
-						if ($type == "text")
-							$logic = "and";
-						else
-							$logic = GetFormData($f,$s,"newrulelogical_$type");
-
-						if ($type == "multisearch")
-							$op = "in";
-						else
-							$op = GetFormData($f,$s,"newruleoperator_$type");
-
-						$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-						if (count($value) > 0) {
-							$rule = new Rule();
-							$rule->logical = $logic;
-							$rule->op = $op;
-							$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-							$rule->fieldnum = $fieldnum;
-							if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
-								$_SESSION['contactrules'][] = $rule;
-							else
-								$_SESSION['contactrules'] = array($rule);
-							$rule->id = array_search($rule, $_SESSION['contactrules']);
-
-							$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
-						}
-					}
+					if($rule = Rule::getRule($f, $s, "contactrules"))
+						$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
 					$options['rules'] = implode("||", $options['rules']);
+					
 				}
 				for($i=1; $i<=$ordercount; $i++){
 					$options["order$i"] = GetFormData($f, $s, "order$i");
