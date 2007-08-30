@@ -28,7 +28,7 @@ class CallsReport extends ReportGenerator{
 			$phonequery = $this->params['phone'] ? " and rc.phone like '%" . DBSafe($this->params['phone']) . "%'" : "";
 		}
 		if(isset($this->params['email'])){
-			$emailquery = $this->params['email'] ? " and rc.email like '%" . DBSafe($this->params['email']) . "%'" : "";
+			$emailquery = $this->params['email'] ? " and rc.email = '" . DBSafe($this->params['email']) . "'" : "";
 		}
 
 		if(isset($this->params['jobtypes'])){
