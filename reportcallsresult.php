@@ -63,13 +63,13 @@ $jobquery = "";
 $jobtypequery = "";
 
 if(isset($options['personid']) && $options['personid'] != "")
-	$personsql = " and rp.pkey like '%" . DBSafe($options['personid']) . "%'";
+	$personsql = " and rp.pkey = '" . DBSafe($options['personid']) . "'";
 	
 if(isset($options['phone']) && $options['phone'] != "")
 	$phonesql = " and rc.phone like '%" . DBSafe($options['phone']) . "%'";
 
 if(isset($options['email']) && $options['email'] != "")
-	$emailsql = " and rc.email like '%" . DBSafe($options['email']) . "%'";
+	$emailsql = " and rc.email = '" . DBSafe($options['email']) . "'";
 
 if(isset($options['rules']) && $options['rules'] != "")
 	$rulesql = getRuleSql($options, "rp");

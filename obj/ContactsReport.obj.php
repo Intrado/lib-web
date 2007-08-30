@@ -21,10 +21,10 @@ class ContactsReport extends ReportGenerator {
 			$peoplephonelist = QuickQueryList("select personid from phone ph where 1 and ph.phone like '%" . DBSafe($this->params['phone']) . "%' group by personid");
 		} 
 		if(isset($this->params['email']) && $this->params['email'] != ""){
-			$peopleemaillist = QuickQueryList("select personid from email e where 1 and e.email like '%" . DBSafe($this->params['email']) . "%'  group by personid");
+			$peopleemaillist = QuickQueryList("select personid from email e where 1 and e.email = '" . DBSafe($this->params['email']) . "'  group by personid");
 		}
 		if(isset($this->params['personid'])){
-			$personquery = $this->params['personid'] ? " and p.pkey like '%" . DBSafe($this->params['personid']) . "%'" : "";
+			$personquery = $this->params['personid'] ? " and p.pkey = '" . DBSafe($this->params['personid']) . "'" : "";
 		}
 		$fieldquery = generateFields("p");
 
