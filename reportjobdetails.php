@@ -206,6 +206,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 		} else {
 			$submit=1;
 			$options = $instance->getParameters();
+			$hideinprogress = GetFormData($f, $s, "hideinprogress");
+			if($hideinprogress)
+				$options['hideinprogress'] = "true";
+			else
+				$options['hideinprogress'] = "false";
 			for($i=1; $i<=$ordercount; $i++){
 				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
 			}		
@@ -239,6 +244,11 @@ if($reload){
 			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
 		}
 	}
+	$hideinprog = 0;
+	if(isset($options['hideinprogress']) && $options['hideinprogress'] == 'true')
+		$hideinprog = 1;
+	
+	PutFormData($f, $s, "hideinprogress", $hideinprog, "bool", "0", "1");
 
 }
 
@@ -323,6 +333,15 @@ if($error || $reportgenerator->format == "html"){
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
 			<td class="bottomBorder"><a href="reportjobdetails.php/report.csv?csv=true">CSV</a>&nbsp;|&nbsp;<a href="reportjobdetails.php/report.pdf?pdf=true">PDF</a></td>
 		</tr>
+<?
+		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
+?>
+			<tr><th align="right" class="windowRowHeader">Finalized Calls:</th>
+				<td class="bottomBorder"><?=NewFormItem($f, $s, "hideinprogress", "checkbox");?>Only Show Finalized Calls</td>
+			</tr>
+<?
+		}
+?>
 	</table>
 	<?
 	endWindow();
