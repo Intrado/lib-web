@@ -25,24 +25,23 @@ if (!$USER->authorize('manageaccount')) {
 
 /*CSDELETEMARKER_START*/
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
-$maxusers = getSystemSetting("_maxusers",1);
+$maxusers = getSystemSetting("_maxusers",null);
 /*CSDELETEMARKER_END*/
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
 	if ($_SESSION['userid'] == $deleteid)
 		$_SESSION['userid'] = NULL;
-	if (customerOwns("user",$deleteid)) {
-		QuickUpdate("update user set enabled=0, deleted=1 where id='$deleteid'");
-		QuickUpdate("delete from job where status='repeating' and userid='$deleteid'");
-	}
+
+	QuickUpdate("update user set enabled=0, deleted=1 where id='$deleteid'");
+	QuickUpdate("delete from job where status='repeating' and userid='$deleteid'");
+
 	redirect();
 }
 
 if (isset($_GET['disable'])) {
 	$id = DBSafe($_GET['disable']);
-	if (customerOwns("user",$id))
-		QuickUpdate("update user set enabled = 0 where id = '$id'");
+	QuickUpdate("update user set enabled = 0 where id = '$id'");
 	redirect();
 }
 
@@ -50,7 +49,7 @@ if (isset($_GET['enable'])) {
 	$maxreached = false;
 
 	/*CSDELETEMARKER_START*/
-	if($maxusers <= $usercount){
+	if(($maxusers != null) && $maxusers <= $usercount){
 		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
 		$maxreached = true;
 	}
@@ -58,8 +57,7 @@ if (isset($_GET['enable'])) {
 
 	if(!$maxreached){
 		$id = DBSafe($_GET['enable']);
-		if (customerOwns("user",$id))
-			QuickUpdate("update user set enabled = 1 where id = '$id'");
+		QuickUpdate("update user set enabled = 1 where id = '$id'");
 		redirect();
 	}
 }
@@ -97,7 +95,9 @@ $PAGE = "admin:users";
 $TITLE = "User List";
 
 /*CSDELETEMARKER_START*/
-$DESCRIPTION = "Active Users: $usercount, Maximum Allowed: $maxusers";
+$DESCRIPTION = "Active Users: $usercount";
+if($maxusers != null)
+	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
 /*CSDELETEMARKER_END*/
 
 include_once("nav.inc.php");
