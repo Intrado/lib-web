@@ -268,37 +268,10 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			}
 			
 			$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
-			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-			if ($fieldnum != "") {
-				$type = GetFormData($f,$s,"newruletype");
-
-				if ($type == "text")
-					$logic = "and";
-				else
-					$logic = GetFormData($f,$s,"newrulelogical_$type");
-
-				if ($type == "multisearch")
-					$op = "in";
-				else
-					$op = GetFormData($f,$s,"newruleoperator_$type");
-
-				$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-				if (count($value) > 0) {
-					$rule = new Rule();
-					$rule->logical = $logic;
-					$rule->op = $op;
-					$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-					$rule->fieldnum = $fieldnum;
-					if(isset($_SESSION['reportrules']) && is_array($_SESSION['reportrules']))
-						$_SESSION['reportrules'][] = $rule;
-					else
-						$_SESSION['reportrules'] = array($rule);
-					$rule->id = array_search($rule, $_SESSION['reportrules']);
-					
-					$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
-				}
-			}
+			if($rule = Rule::getRule($f, $s, "reportrules"))
+				$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
 			$options['rules'] = implode("||", $options['rules']);
+			
 			foreach($options as $index => $option){
 				if($option == "")
 					unset($options[$index]);
