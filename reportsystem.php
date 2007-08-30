@@ -115,7 +115,8 @@ if($reload){
 // Data Calculation
 ////////////////////////////////////////////////////////////////////////////////
 	$joblistquery = "";
-	
+	$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted", true);
+		
 	if($reldate == "xdays"){
 		list($startdate, $enddate) = getStartEndDate($reldate, array("lastxdays" =>  GetFormData($f, $s, "xdays")));
 	} else if(GetFormData($f, $s, "relativedate") != "daterange"){
@@ -125,7 +126,7 @@ if($reload){
 		$enddate = strtotime($enddate);
 	}
 	
-	$joblist = getJobList($startdate, $enddate, "", "", $type);
+	$joblist = getJobList($startdate, $enddate, implode("','", array_keys($jobtypelist)), "", $type);
 	$joblistquery = " and rp.jobid in ('" . implode("','", $joblist) . "') ";
 	$jobidtypelist = QuickQueryList("select id, jobtypeid from job j where j.id in ('" . implode("','",$joblist) ."') ", true);
 	$groupbyquery = "";
@@ -142,13 +143,7 @@ if($reload){
 	while($row = DBGetRow($userresult)){
 		$userlist[$row[1]] = $row[0];
 	}
-	
-	$jobtypelist = array();
-	$jobtyperesult = Query("select name, id from jobtype");
-	while($row = DBGetRow($jobtyperesult)){
-		$jobtypelist[$row[1]] = $row[0];
-	}
-	
+
 	$query = "SELECT $groupbyquery as field,
 				rp.userid,
 				rp.jobid,
@@ -287,10 +282,13 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 			
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 			$name = FieldMap::getName($groupby);
+			$display = $index;
+			if($display == "")
+				$display = htmlentities("<Not Assigned>");
 			if(!$name)
 				$name = "System";
 			else
-				$name .= ": " . $index;
+				$name .= ": " . $display;
 ?>
 			<td><u><?=$name?><u></td>
 <?
