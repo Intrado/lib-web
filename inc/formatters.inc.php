@@ -19,12 +19,7 @@ function fmt_date ($row,$index) {
 }
 
 function fmt_phone ($row,$index) {
-	if (strlen($row[$index]) == 10)
-		return "(" . substr($row[$index],0,3) . ")&nbsp;" . substr($row[$index],3,3) . "-" . substr($row[$index],6,4);
-	else if (strlen($row[$index]) == 7)
-		return  substr($row[$index],0,3) . "-" . substr($row[$index],3,4);
-	else
-		return $row[$index];
+	return Phone::format($row[$index]);
 }
 
 function fmt_email ($row,$index) {
