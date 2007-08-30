@@ -41,7 +41,11 @@ class JobDetailReport extends ReportGenerator{
 		$resultquery = "";
 		if(isset($this->params['result']) && $this->params['result']){
 			if($this->params['result'] == "undelivered"){
-				$resultquery = " and rp.status not in ('success', 'duplicate')";
+				//TODO: rename newflag
+				$resultquery = " and rp.iscontacted = '0' and rp.status != 'duplicate'";
+				if(isset($this->params['hideinprogress']) && $this->params['hideinprogress'] == "true"){
+					$resultquery .= " and rp.status in ('fail', 'nocontacts', 'blocked') ";
+				}
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery = " and rp.status = 'nocontacts' ";
 			} else {
