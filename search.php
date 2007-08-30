@@ -14,6 +14,7 @@ include_once("obj/ListEntry.obj.php");
 include_once("obj/RenderedList.obj.php");
 include_once("obj/Rule.obj.php");
 include_once("obj/FieldMap.obj.php");
+include_once("obj/Phone.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,7 @@ include_once("obj/VoiceReply.obj.php");
 include_once("obj/Message.obj.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Content.obj.php");
+require_once("obj/Phone.obj.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
