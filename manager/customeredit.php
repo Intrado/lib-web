@@ -92,6 +92,20 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 						enabled=" . (GetFormData($f,$s,"enabled") + 0) ."
 						where id = '$currentid'");
 
+				// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
+				if ($timezone != getCustomerSystemSetting('timezone', false, true, $custdb)) {
+					$currentid = $_SESSION['currentid'];
+					$shardquery = Query("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = '$currentid'");
+					$shardinfo = mysql_fetch_row($shardquery);
+					$sharddb = DBConnect($shardinfo[0], $shardinfo[1], $shardinfo[2], "aspshard");
+					if(!$sharddb) {
+						exit("Connection failed for customer: $currentid, shardhost: $shardinfo[0]");
+					}
+					QuickUpdate("update qjob set timezone='".$timezone."' where customerid=".$currentid, $sharddb);
+					QuickUpdate("update qschedule set timezone='".$timezone."' where customerid=".$currentid, $sharddb);
+					QuickUpdate("update qreportsubscription set timezone='".$timezone."' where customerid=".$currentid, $sharddb);
+				}
+
 				if (!GetFormData($f,$s,"enabled"))
 					setCustomerSystemSetting("disablerepeat", "1", $custdb);
 
