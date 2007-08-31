@@ -48,7 +48,8 @@ $cpcolors = array(
 	"fail" => "#aaaaaa",
 	"inprogress" => "blue",
 	"retry" => "cyan",
-	"scheduled" => "darkblue"
+	"scheduled" => "darkblue",
+	"blocked" => "#CC00CC"
 
 );
 
@@ -64,7 +65,8 @@ $cpcodes = array(
 	"fail" => "No Phone #",
 	"inprogress" => "Queued",
 	"retry" => "Retrying",
-	"scheduled" => "Scheduled"
+	"scheduled" => "Scheduled",
+	"blocked" => "Blocked"
 );
 
 //preset array positions
