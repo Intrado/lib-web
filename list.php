@@ -35,10 +35,6 @@ if (!$USER->authorize('createlist')) {
 
 $list = NULL;
 
-if (isset($_POST['addlist_x'])) {
-	$_SESSION['listid'] = NULL;
-}
-
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
 	redirect();
@@ -140,17 +136,7 @@ if( $reloadform )
 {
 	ClearFormData($f);
 
-	//check to see if the name & desc is prepopulated from another form
-	if (isset($_POST['addlist_x'])) {
-		$_SESSION['listid'] = NULL;
-		$list = new PeopleList();
-		$list->name = get_magic_quotes_gpc() ? stripslashes($_POST['addlistname']) : $_POST['addlistname'];
-		$list->description = get_magic_quotes_gpc() ? stripslashes($_POST['addlistdesc']) : $_POST['addlistdesc'];
-		if(QuickQuery("select id from list where name = '" . DBSafe($list->name) . "' and userid = $USER->id and deleted=0"))
-			error("A list named '$list->name' already exists");
-	} else {
-		$list = new PeopleList($_SESSION['listid']);
-	}
+	$list = new PeopleList($_SESSION['listid']);
 
 
 	$fields = array(
