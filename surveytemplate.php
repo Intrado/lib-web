@@ -49,38 +49,6 @@ if (isset($_GET['delete'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-/*
-
-
-Questionnaire builder:
-
-	hasphone checkbox: if not checked, hides all phone related items
-	hasweb checkbox: if not checked, hides all web/email related items
-	generic message editor: disables audio whenever focus is in an email/web field
-
-	questions:
-		up/down controls
-		add new question, just inserts more form stuff
-		up to 2 message boxes for each of web/phone
-
-
-validation:
-	make sure at least one of phone or email is checked
-	if web is checked, make sure all webmessages are not empty
-	if phone is checked, make sure all phone messages are selected
-
-	for each phone message, make sure the user owns that message
-
-	for each checkbox of leaveonmachine, playintro, playexit check that there is a message selected
-
-
-	when unchecking web, disable form components in that section
-	same for phone
-
-*/
-
-
-
 /****************** main message section ******************/
 
 $f = "questionnaire";
