@@ -4,10 +4,6 @@
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_POST['addjob_x'])) {
-	$_SESSION['jobid'] = NULL;
-}
-
 if (isset($_GET['id'])) {
 	setCurrentJob($_GET['id']);
 	redirect();
@@ -517,7 +513,7 @@ startWindow('Job Information');
 
 	if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
-		<div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td align=center><div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div></td></tr></table>
 <?
 	}
 
