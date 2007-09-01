@@ -87,8 +87,9 @@ class ContactsReport extends ReportGenerator {
 			$emaillist[$row[1]] = DBFindMany("Email", "from email where personid = '$row[1]'");
 		}
 
+		$max = 100;
 		startWindow("Search Results", "padding: 3px;");
-		showPageMenu($total,$pagestart,100);
+		showPageMenu($total,$pagestart,$max);
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 			<tr class="listHeader">
@@ -103,7 +104,7 @@ class ContactsReport extends ReportGenerator {
 				$num = sprintf("f%02d", $i);
 				if(isset($fieldlist[$num])){
 					$style = "";
-					if(!$_SESSION['fields'][$num]){
+					if(!$_SESSION['report']['fields'][$num]){
 						$style = ' style="display:none;" ';
 					}
 					?><th <?=$style?>><?=$fieldlist[$num]?></th><?
@@ -151,7 +152,7 @@ class ContactsReport extends ReportGenerator {
 										$num = sprintf("f%02d", $i);
 										if(isset($fieldlist[$num])){
 											$style = "";
-											if(!$_SESSION['fields'][$num]){
+											if(!$_SESSION['report']['fields'][$num]){
 												$style = ' style="display:none;" ';
 											}
 											?><td <?=$style?>><?=htmlentities($person[5+$count])?></td><?
@@ -163,7 +164,7 @@ class ContactsReport extends ReportGenerator {
 										$num = sprintf("f%02d", $i);
 										if(isset($fieldlist[$num])){
 											$style = "";
-											if(!$_SESSION['fields'][$num]){
+											if(!$_SESSION['report']['fields'][$num]){
 												$style = ' style="display:none;" ';
 											}
 											?><td <?=$style?>>&nbsp;</td><?
@@ -183,7 +184,7 @@ class ContactsReport extends ReportGenerator {
 									$num = sprintf("f%02d", $i);
 									if(isset($fieldlist[$num])){
 										$style = "";
-										if(!$_SESSION['fields'][$num]){
+										if(!$_SESSION['report']['fields'][$num]){
 											$style = ' style="display:none;" ';
 										}
 										?><td <?=$style?>><?=htmlentities($person[5+$count])?></td><?
@@ -212,7 +213,7 @@ class ContactsReport extends ReportGenerator {
 									$num = sprintf("f%02d", $i);
 									if(isset($fieldlist[$num])){
 										$style = "";
-										if(!$_SESSION['fields'][$num]){
+										if(!$_SESSION['report']['fields'][$num]){
 											$style = ' style="display:none;" ';
 										}
 										?><td <?=$style?>>&nbsp;</td><?
@@ -231,7 +232,7 @@ class ContactsReport extends ReportGenerator {
 			var searchresultstable = new getObj("searchresults").obj;
 			</script>
 		<?
-		showPageMenu($total,$pagestart,500);
+		showPageMenu($total,$pagestart,$max);
 		endWindow();
 	}
 	
