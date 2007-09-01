@@ -90,8 +90,7 @@ foreach($customers as $cust) {
 		$row[] = QuickQuery("select value from setting where name = '_managernote'", $custdb);
 		$row[] = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
 
-		$maxusers = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
-		$row[] = $maxusers ? $maxusers : "unlimited";
+		$row[] = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
 
 		$row[] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
 		$row[] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
