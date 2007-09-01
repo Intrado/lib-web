@@ -21,6 +21,7 @@ require_once("obj/Rule.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/ContactsReport.obj.php");
 require_once("obj/Person.obj.php");
+require_once("inc/rulesutils.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,70 +35,37 @@ if (!$USER->authorize('viewcontacts')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
-$f = "person";
-$s = "all";
-
-$reloadform = 0;
-$ordercount = 3;
-$ordering = ContactsReport::getOrdering();
-
-$fields = FieldMap::getOptionalAuthorizedFieldMaps();
-
-if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
+if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['contacts']['options']);
 	$_SESSION['saved_report'] = false;
 }
 $options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array("reporttype" => "contacts");
 
-unset($_SESSION['contactrules']);
-if(isset($options['rules']) && $options['rules'] != ""){
-	$rules = explode("||", $options['rules']);
-	foreach($rules as $rule){
-		if($rule != ""){
-			$rule = explode(";", $rule);
-			$newrule = new Rule();
-			$newrule->logical = $rule[0];
-			$newrule->op = $rule[1];
-			$newrule->fieldnum = $rule[2];
-			$newrule->val = $rule[3];
-			if(isset($_SESSION['contactrules']) && is_array($_SESSION['contactrules']))
-				$_SESSION['contactrules'][] = $newrule;
-			else
-				$_SESSION['contactrules'] = array($newrule);
-			$newrule->id = array_search($newrule, $_SESSION['contactrules']);
-			$_SESSION['contactrules'][$newrule->id] = $newrule;
-		}
-	}
-}
-
-
 if(isset($_GET['deleterule'])) {
-	unset($_SESSION['contactrules'][(int)$_GET['deleterule']]);
-	if(!isset($options['rules'])){
-		if(count($_SESSION['contactrules']) > 0){
-			$_SESSION['contactrules'] = false;
-		}
-		redirect();
-	}
-	$options['rules'] = explode("||", $options['rules']);
-	unset($options['rules'][(int)$_GET['deleterule']]);
-	if(count($options['rules']) == 0){
-		unset($options['rules']);
-	} else {
-		$options['rules'] = implode("||", $options['rules']);
+	if(isset($options['rules'])){
+		unset($options['rules'][$_GET['deleterule']]);
+		if(!count($options['rules']))
+			unset($options['rules']);
 	}
 	$_SESSION['contacts']['options'] = $options;
-	if(!count($_SESSION['contactrules']))
-		$_SESSION['contactrules'] = false;
 	redirect();
 }
+
+$RULES = false;
+if(isset($options['rules']) && $options['rules']){
+	$RULES = $options['rules'];
+}
+
+$ordercount = 3;
+$ordering = ContactsReport::getOrdering();
+
+$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
 $activefields = array();
 $fieldlist = array();
 foreach($fields as $field){
 	// used in pdf
-	if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
+	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
 		$activefields[] = $field->fieldnum;
 	}
 }
@@ -105,8 +73,8 @@ $options['activefields'] = $activefields;
 $reportinstance = new ReportInstance();
 
 $pagestart = 0;
-if(isset($_REQUEST['pagestart'])){
-	$pagestart = $_REQUEST['pagestart'];
+if(isset($_GET['pagestart'])){
+	$pagestart = $_GET['pagestart'];
 }
 $options['pagestart'] = $pagestart;
 
@@ -115,6 +83,10 @@ $reportgenerator = new ContactsReport();
 $reportgenerator->reportinstance = $reportinstance;
 $reportgenerator->userid = $USER->id;
 $reportgenerator->format = "html";
+
+$f = "person";
+$s = "all";
+$reloadform = 0;
 
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($f, 'search') || CheckFormSubmit($f, 'refresh')){
 	//check to see if formdata is valid
@@ -151,11 +123,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 					unset($options['personid']);
 					unset($options['phone']);
 					unset($options['email']);
-					$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
-					if($rule = Rule::getRule($f, $s, "contactrules"))
-						$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
-					$options['rules'] = implode("||", $options['rules']);
 					
+					if($rule = getRuleFromForm($f, $s)){
+						if(!isset($options['rules']))
+							$options['rules'] = array();
+						$options['rules'][] = $rule;
+						$rule->id = array_search($rule, $options['rules']);
+						$options['rules'][$rule->id] = $rule;
+					}
 				}
 				for($i=1; $i<=$ordercount; $i++){
 					$options["order$i"] = GetFormData($f, $s, "order$i");
@@ -172,7 +147,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 } else {
 	$reloadform = 1;
 }
-
 if($reloadform){
 	ClearFormData($f);
 	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
@@ -194,12 +168,7 @@ if($reloadform){
 		}
 	}
 
-	PutFormData($f,$s,"newrulefieldnum","");
-	PutFormData($f,$s,"newruletype","text","text",1,50);
-	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
-	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
-	PutFormData($f,$s,"newruleoperator_text","sw","text",1,50);
-	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
+	putRuleFormData($f, $s);
 }
 
 
@@ -237,10 +206,7 @@ startWindow("Contact Search", "padding: 3px;");
 							<tr>
 								<td>
 								<?
-									if(!isset($_SESSION['contactrules']) || is_null($_SESSION['contactrules']))
-										$_SESSION['contactrules'] = false;
-
-									$RULES = &$_SESSION['contactrules'];
+									//$RULES is declared above
 									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 
 									include("ruleeditform.inc.php");
