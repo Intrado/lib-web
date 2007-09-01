@@ -21,6 +21,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/CallsReport.obj.php");
+require_once("inc/rulesutils.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -33,12 +34,48 @@ if (!$USER->authorize('createreport')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+
+$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+					
+if(isset($_GET['clear']) && $_GET['clear']){
+	unset($_SESSION['reportid']);
+	unset($_SESSION['report']['options']);
+	redirect();
+}
+
+$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+
+if(isset($_GET['deleterule'])) {
+	if(isset($options['rules'])){
+		unset($options['rules'][$_GET['deleterule']]);
+		if(!count($options['rules']))
+			unset($options['rules']);
+	}
+	$_SESSION['report']['options'] = $options;
+	redirect();
+}
+
+$RULES = false;
+if(isset($options['rules']) && $options['rules']){
+	$RULES = $options['rules'];
+}
+
+$activefields = array();
+foreach($fields as $field){
+	// used in pdf,csv
+	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
+		$activefields[] = $field->fieldnum; 
+	}
+}
+$options['activefields'] = implode(",",$activefields);
+
+$_SESSION['report']['options'] = $options;
+
 $jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
 $jobtypes = array();
 foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
 }
-$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
 $results = array("A" => "Answered",
 					"M" => "Machine",
@@ -46,96 +83,11 @@ $results = array("A" => "Answered",
 					"B" => "Busy",
 					"F" => "Failed",
 					"X" => "Disconnected",
+					"duplicate" => "Duplicate",
+					"blocked" => "Blocked",
+					"notattempted" => "Not Attempted",
 					"sent" => "Sent",
-					"unset" => "Unsent");	
-					
-if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
-	unset($_SESSION['reportid']);
-	unset($_SESSION['report']['options']);
-	redirect();
-}
-
-
-
-if(isset($_REQUEST['reportid'])){
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
-	if(!userOwns("reportsubscription", $_SESSION['reportid'])){
-		redirect('unauthorized.php');
-	}
-	$subscription = new ReportSubscription($_REQUEST['reportid']);
-	$instance = new ReportInstance($subscription->reportinstanceid);
-	$options = $instance->getParameters();
-	
-	$activefields = array();
-	if(isset($options['activefields'])){
-		$activefields = explode(",", $options['activefields']) ;
-	}
-	foreach($fields as $field){
-		if(in_array($field->fieldnum, $activefields)){
-			$_SESSION['fields'][$field->fieldnum] = true;
-		} else {
-			$_SESSION['fields'][$field->fieldnum] = false;
-		}
-	}
-
-	redirect();
-} else {
-
-	$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-	$activefields = array();
-	foreach($fields as $field){
-		// used in pdf,csv
-		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-			$activefields[] = $field->fieldnum; 
-		}
-	}
-	$options['activefields'] = implode(",",$activefields);
-}
-
-if(isset($_SESSION['reportid'])){
-	$_SESSION['saved_report'] = true;
-} else {
-	$_SESSION['saved_report'] = false;
-}
-	
-unset($_SESSION['reportrules']);
-if(isset($options['rules']) && $options['rules'] != ""){
-	$rules = explode("||", $options['rules']);
-	foreach($rules as $rule){
-		if($rule != ""){
-			$rule = explode(";", $rule);
-			$newrule = new Rule();
-			$newrule->logical = $rule[0];
-			$newrule->op = $rule[1];
-			$newrule->fieldnum = $rule[2];
-			$newrule->val = $rule[3];
-			if(isset($_SESSION['reportrules']) && is_array($_SESSION['reportrules']))
-				$_SESSION['reportrules'][] = $newrule;
-			else 
-				$_SESSION['reportrules'] = array($newrule);
-			$newrule->id = array_search($newrule, $_SESSION['reportrules']);
-			$_SESSION['reportrules'][$newrule->id] = $newrule;
-		}
-	}
-}
-
-if(isset($_GET['deleterule'])) {
-	unset($_SESSION['reportrules'][(int)$_GET['deleterule']]);
-	$options['rules'] = explode("||", $options['rules']);
-	unset($options['rules'][(int)$_GET['deleterule']]);
-	if(count($options['rules']) == 0){
-		unset($options['rules']);
-	} else {
-		$options['rules'] = implode("||", $options['rules']);
-	}
-	$options['rules'] = implode("||", $options['rules']);
-	$_SESSION['report']['options'] = $options;
-	if(!count($_SESSION['reportrules']) || !isset($_SESSION['reportrules']))
-		$_SESSION['reportrules'] = false;
-	redirect();
-}
-
-$_SESSION['report']['options'] = $options;
+					"unset" => "Unsent");
 
 $f = "report";
 $s = "personnotify";
@@ -195,10 +147,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 			}else
 				$options['results'] = "";
 			
-			$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
-			if($rule = Rule::getRule($f, $s, "reportrules"))
-				$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
-			$options['rules'] = implode("||", $options['rules']);
+			if($rule = getRuleFromForm($f, $s)){
+				if(!isset($options['rules']))
+					$options['rules'] = array();
+				$options['rules'][] = $rule;
+				$rule->id = array_search($rule, $options['rules']);
+				$options['rules'][$rule->id] = $rule;
+			}
 			
 			foreach($options as $index => $option){
 				if($option == "")
@@ -294,7 +249,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 						if(!isset($_SESSION['reportrules']) || is_null($_SESSION['reportrules']))
 							$_SESSION['reportrules'] = false;
 						
-						$RULES = &$_SESSION['reportrules'];
+						//$RULES declared above
 						$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 						
 						include("ruleeditform.inc.php");

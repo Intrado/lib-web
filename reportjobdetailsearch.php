@@ -20,6 +20,8 @@ require_once("obj/ReportGenerator.obj.php");
 require_once("obj/JobDetailReport.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/date.inc.php");
+require_once("inc/rulesutils.inc.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,35 +42,27 @@ if (!$USER->authorize('viewsystemreports')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $clear = 0;
+$fieldlist = FieldMap::getOptionalAuthorizedFieldMaps();
 
-if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
+if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['report']);
 	unset($_SESSION['reportid']);
 	$clear = 1;
 }
 
-if(isset($_REQUEST['type'])){
-	$_SESSION['report']['type'] = $_REQUEST['type'];
+if(isset($_GET['type'])){
+	$_SESSION['report']['type'] = $_GET['type'];
 	$clear = 1;
 }
 
 if($clear)
 	redirect();
 
-$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
-$jobtypes = array();
-foreach($jobtypeobjs as $jobtype){
-	$jobtypes[$jobtype->id] = $jobtype->name;
-}
-$fieldlist = FieldMap::getOptionalAuthorizedFieldMaps();
-$ordercount = 3;
-$ordering = JobDetailReport::getOrdering();
-
-if(isset($_REQUEST['reportid'])){
-	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
+if(isset($_GET['reportid'])){
+	if(!userOwns("reportsubscription", $_GET['reportid']+0)){
 		redirect('unauthorized.php');
 	}
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
+	$_SESSION['reportid'] = $_GET['reportid']+0;
 	
 	$subscription = new ReportSubscription($_SESSION['reportid']+0);
 	$instance = new ReportInstance($subscription->reportinstanceid);
@@ -87,76 +81,55 @@ if(isset($_REQUEST['reportid'])){
 	}
 	foreach($fieldlist as $field){
 		if(in_array($field->fieldnum, $activefields)){
-			$_SESSION['fields'][$field->fieldnum] = true;
+			$_SESSION['report']['fields'][$field->fieldnum] = true;
 		} else {
-			$_SESSION['fields'][$field->fieldnum] = false;
+			$_SESSION['report']['fields'][$field->fieldnum] = false;
 		}
 	}
 	$_SESSION['saved_report'] = true;
 	$_SESSION['report']['options'] = $options;
 	redirect();
-} else {
-	$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-	
-	$options['reporttype'] = "phonedetail";
-	if(isset($_SESSION['report']['type'])){
-		if ($_SESSION['report']['type'] == "email"){
-			$options['reporttype'] = "emaildetail";
-		}
-	}
-	if(isset($_SESSION['reportid'])){
-		$subscription = new ReportSubscription($_SESSION['reportid']);
-		$_SESSION['saved_report'] = true;
-	} else {
-		$_SESSION['saved_report'] = false;
-	}
-	$_SESSION['report']['options'] = $options;
-}
+} 
 
-
-unset($_SESSION['reportrules']);
-if(isset($options['rules']) && $options['rules'] != ""){
-	$rules = explode("||", $options['rules']);
-	foreach($rules as $rule){
-		if($rule != ""){
-			$rule = explode(";", $rule);
-			$newrule = new Rule();
-			$newrule->logical = $rule[0];
-			$newrule->op = $rule[1];
-			$newrule->fieldnum = $rule[2];
-			$newrule->val = $rule[3];
-			if(isset($_SESSION['reportrules']) && is_array($_SESSION['reportrules']))
-				$_SESSION['reportrules'][] = $newrule;
-			else 
-				$_SESSION['reportrules'] = array($newrule);
-			$newrule->id = array_search($newrule, $_SESSION['reportrules']);
-			$_SESSION['reportrules'][$newrule->id] = $newrule;
-		}
-	}
-}
-
+$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 
 if(isset($_GET['deleterule'])) {
-	unset($_SESSION['reportrules'][(int)$_GET['deleterule']]);
-	if(!isset($options['rules'])){
-		if(count($_SESSION['reportrules']) > 0){
-			$_SESSION['reportrules'] = false;
-		}
-		redirect();
-	}
-	$options['rules'] = explode("||", $options['rules']);
-	unset($options['rules'][(int)$_GET['deleterule']]);
-	if(count($options['rules']) == 0){
-		unset($options['rules']);
-	} else {
-		$options['rules'] = implode("||", $options['rules']);
+	if(isset($options['rules'])){
+		unset($options['rules'][$_GET['deleterule']]);
+		if(!count($options['rules']))
+			unset($options['rules']);
 	}
 	$_SESSION['report']['options'] = $options;
-	if(!count($_SESSION['reportrules']))
-		$_SESSION['reportrules'] = false;
 	redirect();
 }
 
+$RULES = false;
+if(isset($options['rules']) && $options['rules']){
+	$RULES = $options['rules'];
+}
+
+$options['reporttype'] = "phonedetail";
+if(isset($_SESSION['report']['type'])){
+	if ($_SESSION['report']['type'] == "email"){
+		$options['reporttype'] = "emaildetail";
+	}
+}
+if(isset($_SESSION['reportid'])){
+	$subscription = new ReportSubscription($_SESSION['reportid']);
+	$_SESSION['saved_report'] = true;
+} else {
+	$_SESSION['saved_report'] = false;
+}
+$_SESSION['report']['options'] = $options;
+
+$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
+$jobtypes = array();
+foreach($jobtypeobjs as $jobtype){
+	$jobtypes[$jobtype->id] = $jobtype->name;
+}
+
+$ordercount = 3;
+$ordering = JobDetailReport::getOrdering();
 
 if($_SESSION['report']['type'] == "phone"){
 	$results = array("A" => "Answered",
@@ -267,10 +240,13 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
 			}
 			
-			$options['rules'] = isset($options['rules']) ? explode("||", $options['rules']) : array();
-			if($rule = Rule::getRule($f, $s, "reportrules"))
-				$options['rules'][$rule->id] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
-			$options['rules'] = implode("||", $options['rules']);
+			if($rule = getRuleFromForm($f, $s)){
+				if(!isset($options['rules']))
+					$options['rules'] = array();
+				$options['rules'][] = $rule;
+				$rule->id = array_search($rule, $options['rules']);
+				$options['rules'][$rule->id] = $rule;
+			}
 			
 			foreach($options as $index => $option){
 				if($option == "")
@@ -282,7 +258,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			if(CheckFormSubmit($f, "save")){
 				$activefields = array();
 				foreach($fieldlist as $field){
-					if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
+					if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
 						$activefields[] = $field->fieldnum;
 					}
 				}
@@ -457,10 +433,7 @@ startWindow("Select", NULL, false);
 							<tr>
 								<td>
 								<? 
-									if(!isset($_SESSION['reportrules']) || is_null($_SESSION['reportrules']))
-										$_SESSION['reportrules'] = false;
-									
-									$RULES = &$_SESSION['reportrules'];
+									//$RULES declared above
 									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 									
 									include("ruleeditform.inc.php");
