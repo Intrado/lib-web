@@ -190,6 +190,8 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
+				if($maxusers == "")
+					$maxusers = "unlimited";
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 							('maxphones', '3'),
 							('maxemails', '2'),
