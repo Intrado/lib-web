@@ -24,7 +24,7 @@ if (!$USER->authorize("starteasy")) {
 // DATA SECTION
 $VALIDJOBTYPES = JobType::getUserJobTypes();
 
-if(isset($_REQUEST['id'])) {
+if(isset($_GET['id'])) {
 	$_SESSION['easycallid'] = null;
 	redirect();
 }

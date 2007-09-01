@@ -21,7 +21,7 @@ if (!$USER->authorize("starteasy")) {
 	redirect("unauthorized.php");
 }
 
-$specialtask = new SpecialTask($_REQUEST['taskid']);
+$specialtask = new SpecialTask($_GET['taskid']);
 $messages = array();
 $languages = array();
 $count = $specialtask->getData("count");

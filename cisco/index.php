@@ -3,8 +3,8 @@
 $isindexpage = true;
 require_once("common.inc.php");
 
-if (isset($_REQUEST['dn'])) {
-	$_SESSION['dn'] = $_REQUEST['dn'];
+if (isset($_GET['dn'])) {
+	$_SESSION['dn'] = $_GET['dn'];
 }
 
 if (isset($_GET['loginalpha'])) {

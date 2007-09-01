@@ -19,7 +19,7 @@ if (!$USER->authorize("starteasy")) {
 $f = "callme";
 $s = "main";
 
-$specialtask = new SpecialTask($_REQUEST['taskid']);
+$specialtask = new SpecialTask($_GET['taskid']);
 $messages = array();
 for($i = 1; $i < $specialtask->getData('count'); $i++){
 	$messnum = "message".$i;

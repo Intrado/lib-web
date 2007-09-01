@@ -14,7 +14,7 @@ include_once("inc/form.inc.php");
 include_once('inc/table.inc.php');
 
 // AUTHORIZATION //////////////////////////////////////////////////
-$origin = $_REQUEST['origin'];
+$origin = $_GET['origin'];
 if (!$USER->authorize("starteasy")) {
 	redirect("unauthorized.php");
 }
@@ -85,7 +85,7 @@ if( $reloadform )
 	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
 	PutFormData($f,$s,"name","","text","1","50");
 	PutFormData($f,$s,"size","","text");
-	PutFormData($f,$s,"origin",$_REQUEST['origin']);
+	PutFormData($f,$s,"origin",$_GET['origin']);
 }
 
 

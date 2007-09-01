@@ -17,7 +17,7 @@ if (!$USER->authorize("starteasy")) {
 	redirect("unauthorized.php");
 }
 
-$specialtask = new SpecialTask($_REQUEST['taskid']);
+$specialtask = new SpecialTask($_GET['taskid']);
 
 if($specialtask->getData('progress')=="Done") {
 
@@ -56,7 +56,7 @@ if ($error = $specialtask->getData('error')) {
 	<h3> Message Number: <?=$currnum?></h3>
 	<img src="img/progressbar.gif?date=<?= time() ?>">
 <div>
-	<meta http-equiv="refresh" content="2;url=callme2.php?taskid=<?= $_REQUEST['taskid'] ?>">
+	<meta http-equiv="refresh" content="2;url=callme2.php?taskid=<?= $_GET['taskid'] ?>">
 <?
 }
 endWindow();

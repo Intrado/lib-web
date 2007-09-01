@@ -21,7 +21,7 @@ $jobstats = $_SESSION['jobstats'][$jobid];
 if ($_GET['valid'] != $jobstats['validstamp'])
 	redirect('unauthorized.php');
 
-$question = $_REQUEST['question']+0;
+$question = $_GET['question']+0;
 
 
 
