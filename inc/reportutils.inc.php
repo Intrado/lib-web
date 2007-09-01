@@ -43,16 +43,16 @@ function select_metadata($tablename=null, $start=null, $fields){
 				$fieldnum = $field->fieldnum;
 				if($saved == "false"){
 					$usersetting = DBFind("UserSetting", "from usersetting where name = '" . DBSafe($field->fieldnum) . "' and userid = '$USER->id'");
-					$_SESSION['fields'][$fieldnum] = false;
+					$_SESSION['report']['fields'][$fieldnum] = false;
 					if($usersetting!= null){
 						if($usersetting->value == "true"){
-							$_SESSION['fields'][$fieldnum] = true;
+							$_SESSION['report']['fields'][$fieldnum] = true;
 						}
 					}
 				}
 				?><td><div align="center">
 				<?
-					if(isset($_SESSION['fields'][$fieldnum]) && $_SESSION['fields'][$fieldnum]){
+					if(isset($_SESSION['report']['fields'][$fieldnum]) && $_SESSION['report']['fields'][$fieldnum]){
 						$result = "<img src=\"img/checkbox-rule.png\" onclick=\"dofieldbox(this,true,'$fieldnum', $saved);";
 						$checked = "checked>";
 					} else {
@@ -196,5 +196,4 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 <?
 
 }
-
 ?>
