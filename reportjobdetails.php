@@ -24,6 +24,7 @@ require_once("obj/UserSetting.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/JobDetailReport.obj.php");
 require_once("obj/JobType.obj.php");
+require_once("inc/rulesutils.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -68,62 +69,50 @@ $ordering = JobDetailReport::getOrdering();
 $ordercount=3;
 unset($_SESSION['report']['edit']);
 
-if(isset($_REQUEST['reportid'])){
-	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
+if(isset($_GET['reportid'])){
+	$_SESSION['reportid'] = $_GET['reportid']+0;
+	if(!userOwns("reportsubscription", $_SESSION['reportid'])){
 		redirect("unauthorized.php");
 	}
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
-	
-	$subscription = new ReportSubscription($_SESSION['reportid']+0);
+	$subscription = new ReportSubscription($_SESSION['reportid']);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
-	if($options['reporttype'] == "phonedetail"){
-		$_SESSION['report']['type'] = "phone";
-	} else if($options['reporttype'] == "emaildetail"){
-		$_SESSION['report']['type'] = "email";
-	} else if($options['reporttype'] == "notcontacted"){
-		$_SESSION['report']['type'] = "notcontacted";
-	} else {
-		error_log("Wrong report type recieved: " . $options['reporttype'] . " Check links on other page.");
-	}
 	$activefields = array();
 	if(isset($options['activefields'])){
 		$activefields = explode(",", $options['activefields']) ;
 	}
 	foreach($fields as $field){
 		if(in_array($field->fieldnum, $activefields)){
-			$_SESSION['fields'][$field->fieldnum] = true;
+			$_SESSION['report']['fields'][$field->fieldnum] = true;
 		} else {
-			$_SESSION['fields'][$field->fieldnum] = false;
+			$_SESSION['report']['fields'][$field->fieldnum] = false;
 		}
 	}
 	$_SESSION['report']['options'] = $options;
 	redirect();
-} else if(isset($_REQUEST['type'])){
+} else if(isset($_GET['type'])){
 	$_SESSION['report']['jobdetail']=1;
 	$options = $_SESSION['report']['options'];
-	$_SESSION['report']['type'] = $_REQUEST['type'];
-	if($_REQUEST['type'] == "phone"){
+	if($_GET['type'] == "phone"){
 		$options['reporttype'] = "phonedetail";
-	} else if($_REQUEST['type'] == "email"){
+	} else if($_GET['type'] == "email"){
 		$options['reporttype'] = "emaildetail";
 	}
 	unset($options['result']);
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
 	redirect();
-} else if(isset($_REQUEST['result'])){
+} else if(isset($_GET['result'])){
 	$_SESSION['report']['jobdetail']=1;
 	unset($_SESSION['reportid']);
-	unset($_SESSION['report']['type']);
 	$options = $_SESSION['report']['options'];
-	$options['result'] = DBSafe($_REQUEST['result']);
+	$options['result'] = DBSafe($_GET['result']);
 
-	if($_REQUEST['result'] == "sent" || $_REQUEST['result'] == "unsent"){
+	if($_GET['result'] == "sent" || $_GET['result'] == "unsent"){
 		$options['reporttype']="emaildetail";
-		if($_REQUEST['result'] == "sent")
+		if($_GET['result'] == "sent")
 			$options['result'] .= "','duplicate";
-	} else if($_REQUEST['result'] == "undelivered"){
+	} else if($_GET['result'] == "undelivered"){
 		$options['reporttype'] = "notcontacted";
 	} else {
 		$options['reporttype']="phonedetail";
@@ -131,25 +120,24 @@ if(isset($_REQUEST['reportid'])){
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
 	redirect();
-} else {
-
-	$options = $_SESSION['report']['options'];
-	$options["pagestart"] = $pagestart;
-
-	if(!isset($_SESSION['reportid']))
-		$_SESSION['saved_report'] = false;
 	
+} 
+$options = $_SESSION['report']['options'];
+$options["pagestart"] = $pagestart;
 
-	$activefields = array();
-	foreach($fields as $field){
-		// used in pdf,csv
-		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-			$activefields[] = $field->fieldnum; 
-		}
+if(!isset($_SESSION['reportid']))
+	$_SESSION['saved_report'] = false;
+
+$activefields = array();
+foreach($fields as $field){
+	// used in pdf,csv
+	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
+		$activefields[] = $field->fieldnum; 
 	}
-	$options['activefields'] = implode(",",$activefields);
-	$instance = new ReportInstance();
 }
+$options['activefields'] = implode(",",$activefields);
+$instance = new ReportInstance();
+
 
 if(isset($_SESSION['reportid'])){
 	$_SESSION['saved_report'] = true;
@@ -175,9 +163,9 @@ $reportgenerator = new JobDetailReport();
 $reportgenerator->reportinstance = $instance;
 $reportgenerator->userid = $USER->id;
 
-if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
+if(isset($_GET['csv']) && $_GET['csv']){
 	$reportgenerator->format = "csv";
-} else if(isset($_REQUEST['pdf']) && $_REQUEST['pdf']){
+} else if(isset($_GET['pdf']) && $_GET['pdf']){
 	$reportgenerator->format = "pdf";
 } else {
 	$reportgenerator->format = "html";
