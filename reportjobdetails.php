@@ -57,16 +57,8 @@ function fmt_jobdetail_result($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$pagestartflag=0;
-$pagestart=0;
-if(isset($_GET['pagestart'])){
-	$pagestart = $_GET['pagestart'];
-	$pagestartflag=1;
-}
-
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
-$ordering = JobDetailReport::getOrdering();
-$ordercount=3;
+
 unset($_SESSION['report']['edit']);
 
 if(isset($_GET['reportid'])){
@@ -90,7 +82,9 @@ if(isset($_GET['reportid'])){
 	}
 	$_SESSION['report']['options'] = $options;
 	redirect();
-} else if(isset($_GET['type'])){
+}
+
+if(isset($_GET['type'])){
 	$_SESSION['report']['jobdetail']=1;
 	$options = $_SESSION['report']['options'];
 	if($_GET['type'] == "phone"){
@@ -102,7 +96,9 @@ if(isset($_GET['reportid'])){
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
 	redirect();
-} else if(isset($_GET['result'])){
+}
+
+if(isset($_GET['result'])){
 	$_SESSION['report']['jobdetail']=1;
 	unset($_SESSION['reportid']);
 	$options = $_SESSION['report']['options'];
@@ -120,8 +116,18 @@ if(isset($_GET['reportid'])){
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
 	redirect();
-	
-} 
+}
+
+$ordering = JobDetailReport::getOrdering();
+$ordercount=3;
+
+$pagestartflag=0;
+$pagestart=0;
+if(isset($_GET['pagestart'])){
+	$pagestart = $_GET['pagestart']+0;
+	$pagestartflag=1;
+}
+
 $options = $_SESSION['report']['options'];
 $options["pagestart"] = $pagestart;
 
