@@ -19,18 +19,9 @@ function getOrderSql($params){
 
 function getRuleSql($params, $alias){
 	$rulesql = "";
-	if(isset($params['rules']) && $params['rules']){
-		$rules = explode("||", $params['rules']);
-		foreach($rules as $rule){
-			if($rule) {
-				$rule = explode(";", $rule);
-				$newrule = new Rule();
-				$newrule->logical = $rule[0];
-				$newrule->op = $rule[1];
-				$newrule->fieldnum = $rule[2];
-				$newrule->val = $rule[3];
-				$rulesql .= " " . $newrule->toSql($alias);
-			}
+	if(isset($params['rules'])){
+		foreach($params['rules'] as $rule){
+			$rulesql .= " " . $rule->toSql($alias);
 		}
 	}
 	return $rulesql;
