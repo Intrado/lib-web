@@ -25,7 +25,7 @@ if (!$USER->authorize('manageaccount')) {
 
 /*CSDELETEMARKER_START*/
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
-$maxusers = getSystemSetting("_maxusers",null);
+$maxusers = getSystemSetting("_maxusers","unlimited");
 /*CSDELETEMARKER_END*/
 
 if (isset($_GET['delete'])) {
@@ -49,7 +49,7 @@ if (isset($_GET['enable'])) {
 	$maxreached = false;
 
 	/*CSDELETEMARKER_START*/
-	if(($maxusers != null) && $maxusers <= $usercount){
+	if(($maxusers != "unlimited") && $maxusers <= $usercount){
 		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
 		$maxreached = true;
 	}
@@ -96,7 +96,7 @@ $TITLE = "User List";
 
 /*CSDELETEMARKER_START*/
 $DESCRIPTION = "Active Users: $usercount";
-if($maxusers != null)
+if($maxusers != "unlimited")
 	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
 /*CSDELETEMARKER_END*/
 
