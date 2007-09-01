@@ -119,40 +119,6 @@ class Rule extends DBMappedObject {
 				$query .= $rule->toSql($alias, $fieldoverride);
 		return $query;
 	}
-	static function getRule($f, $s, $sessionvariable){
-	
-		$rule = null;
-		$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-		if ($fieldnum != "") {
-			$type = GetFormData($f,$s,"newruletype");
-
-			if ($type == "text")
-				$logic = "and";
-			else
-				$logic = GetFormData($f,$s,"newrulelogical_$type");
-
-			if ($type == "multisearch")
-				$op = "in";
-			else
-				$op = GetFormData($f,$s,"newruleoperator_$type");
-
-			$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-			if (count($value) > 0) {
-				$rule = new Rule();
-				$rule->logical = $logic;
-				$rule->op = $op;
-				$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-				$rule->fieldnum = $fieldnum;
-				if(isset($_SESSION['contactrules']) && is_array($_SESSION[$sessionvariable]))
-					$_SESSION[$sessionvariable][] = $rule;
-				else
-					$_SESSION[$sessionvariable] = array($rule);
-				$rule->id = array_search($rule, $_SESSION[$sessionvariable]);
-				$_SESSION[$sessionvariable][$rule->id] = $rule;
-			}
-		}
-		return $rule;
-	}
 }
 
 
