@@ -232,7 +232,7 @@ $DESCRIPTION = GetFormData($form, $section, 'description');
 include_once("nav.inc.php");
 NewForm($form);
 
-buttons(submit($form, $section, 'Save'));
+buttons(submit($form, $section, 'Save'), button("Check All", "checkAllCheckboxes()"));
 
 startWindow('Profile Information', 'padding: 3px;');
 print 'Name: ';
@@ -509,3 +509,13 @@ buttons();
 EndForm();
 include_once("navbottom.inc.php");
 ?>
+<script>
+	function checkAllCheckboxes(){
+		var form = document.forms[0].elements;
+		for(var i = 0; i < form.length; i++){
+			if(form[i].type == "checkbox"){
+				form[i].checked = true;
+			}
+		}
+	}
+</script>
