@@ -52,7 +52,10 @@ class ReportInstance extends DBMappedObject {
 		//it will break into "name=value2" "abc=123" "name=value1" 
 		//then sort to "abc=123" "name[]=1" "name[]=2"
 		//this way we can reorder randomly ordered parameters so that
-		//the hash will check out ok.	
+		//the hash will check out ok.
+		if(isset($paramarray['rules'])){
+			$paramarray['rules'] = $this->ruleArraytoString($paramarray['rules']);	
+		}
 		$paramstring = http_build_query($paramarray, false, "&");
 		$this->setParameterString($paramstring);			
 	}
@@ -67,6 +70,8 @@ class ReportInstance extends DBMappedObject {
 	function getParameters () {
 		$paramarray = array();
 		$paramarray = sane_parsestr($this->parameters);
+		if(isset($paramarray['rules']))
+			$paramarray['rules'] = $this->ruleStringtoArray($paramarray['rules']);
 		return $paramarray;
 	}
 	
@@ -192,6 +197,37 @@ class ReportInstance extends DBMappedObject {
 		}
 	}
 	
+	// takes the rules string and converts it to an array of rules
+	function ruleStringtoArray($rules = ""){
+		$finalarray = array();
+		if($rules != ""){
+			$rulearray = explode("||", $rules);
+			foreach($rulearray as $rule){
+				if($rule != ""){
+					$rule = explode(";", $rule);
+					$newrule = new Rule();
+					$newrule->logical = $rule[0];
+					$newrule->op = $rule[1];
+					$newrule->fieldnum = $rule[2];
+					$newrule->val = $rule[3];
+					$finalarray[] = $newrule;
+					$newrule->id = array_search($newrule, $finalarray);
+					$finalarray[$newrule->id] = $newrule;
+				}
+			}
+		}
+		return $finalarray;
+	}
+	
+	//converts an array of rule objects to a big string
+	function ruleArraytoString($rules = array()){
+		$rulestringarray = array();
+		foreach($rules as $rule){
+			$rulestringarray[] = implode(";", array($rule->logical, $rule->op, $rule->fieldnum, $rule->val));
+		}
+		return implode("||", $rulestringarray);
+	
+	}
 	
 }
 
