@@ -20,6 +20,7 @@ require_once("obj/CallsReport.obj.php");
 require_once("obj/UserSetting.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("obj/Phone.obj.php");
+require_once("inc/rulesutils.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -53,54 +54,23 @@ function fmt_contacthistory_result($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_REQUEST['pid'])){
-	$_SESSION['report']['options']['pid'] = $_REQUEST['pid'];
+if(isset($_GET['pid'])){
+	$_SESSION['report']['options']['pid'] = $_GET['pid'];
 	redirect();
 }
 
+$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
-$f="contacthistory";
-$s="displayoptions";
-$reload = 0;
-
-if(isset($_REQUEST['reportid'])){
-	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0))
-		redirect("unauthorized.php");
-	$_SESSION['reportid'] = $_REQUEST['reportid'];
-	$subscription = new ReportSubscription($_REQUEST['reportid']);
-	$instance = new ReportInstance($subscription->reportinstanceid);
-	$_SESSION['report']['options'] = $instance->getParameters();
-	
-	$activefields = array();
-	if(isset($_SESSION['report']['options']['activefields'])){
-		$activefields = explode(",", $_SESSION['report']['options']['activefields']) ;
+$activefields = array();
+foreach($fields as $field){
+	// used in pdf,csv
+	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
+		$activefields[] = $field->fieldnum; 
 	}
-	foreach($fields as $field){
-		if(in_array($field->fieldnum, $activefields)){
-			$_SESSION['fields'][$field->fieldnum] = true;
-		} else {
-			$_SESSION['fields'][$field->fieldnum] = false;
-		}
-	}
-	redirect();
-} else {
-	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-	$activefields = array();
-	foreach($fields as $field){
-		// used in pdf,csv
-		if(isset($_SESSION['fields'][$field->fieldnum]) && $_SESSION['fields'][$field->fieldnum]){
-			$activefields[] = $field->fieldnum; 
-		}
-	}
-	$options['activefields'] = implode(",",$activefields);
-	$_SESSION['report']['options'] = $options;
 }
+$options['activefields'] = implode(",",$activefields);
 
-if(isset($_SESSION['reportid'])){
-	$_SESSION['savedreport'] = true;
-} else {
-	$_SESSION['savedreport'] = false;
-}
+$_SESSION['report']['options'] = $options;
 
 $instance = new ReportInstance();
 $instance->setParameters($options);
@@ -108,6 +78,10 @@ $generator = new CallsReport();
 $generator->reportinstance = $instance;
 $generator->format = "html";
 $generator->userid = $USER->id;
+
+$f="contacthistory";
+$s="displayoptions";
+$reload = 0;
 
 if(CheckFormSubmit($f, $s))
 {
