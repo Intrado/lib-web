@@ -129,6 +129,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 				setCustomerSystemSetting('_renewaldate', $renewaldate, $custdb);
 				setCustomerSystemSetting('_callspurchased', $callspurchased, $custdb);
+				if($maxusers == "")
+					$maxusers = "unlimited";
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				setCustomerSystemSetting('_managernote', $managernote, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
@@ -184,7 +186,10 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
-	PutFormData($f,$s,"maxusers", getCustomerSystemSetting('_maxusers', false, true, $custdb), "number", 0, 100);
+	$maxusers = getCustomerSystemSetting('_maxusers', false, true, $custdb);
+	if($maxusers == "unlimited")
+		$maxusers = "";
+	PutFormData($f,$s,"maxusers", $maxusers, "number", 0, 100);
 	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 
