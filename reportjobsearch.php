@@ -40,7 +40,7 @@ if (!$USER->authorize('viewsystemreports')) {
 
 $clear = 0;
 
-if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
+if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['report']['options']);
 	unset($_SESSION['reportid']);
 	$clear = 1;
@@ -55,12 +55,13 @@ foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
 }
 
-if(isset($_REQUEST['reportid'])){
-	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
+if(isset($_GET['reportid'])){
+	$reportid = $_GET['reportid'] +0;
+	if(!userOwns("reportsubscription", $reportid)){
 		redirect('unauthorized.php');
 	}
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
-	$subscription = new ReportSubscription($_SESSION['reportid']+0);
+	$_SESSION['reportid'] = $reportid;
+	$subscription = new ReportSubscription($reportid);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 	
