@@ -68,7 +68,7 @@ if($REQUEST_TYPE == "new") {
 		$totalamount = $specialtask->getData("totalamount");
 		if($count < $totalamount) {
 			$specialtask->status = "done";
-			$specialtask->setData("progress", "Hung up");
+			$specialtask->setData("progress", "Messages Remain");
 			$specialtask->update();
 			forwardToPage("easycall3.php");
 		} else {
