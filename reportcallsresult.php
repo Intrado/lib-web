@@ -21,6 +21,7 @@ require_once("inc/date.inc.php");
 require_once("obj/CallsReport.obj.php");
 require_once("inc/reportgeneratorutils.inc.php");
 require_once("obj/Phone.obj.php");
+require_once("inc/rulesutils.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -130,19 +131,7 @@ $formatters = array("0" => "drilldownOnId",
 
 $searchrules = array();
 if(isset($options['rules']) && $options['rules']){
-	$rules = explode("||", $options['rules']);
-	foreach($rules as $rule){
-		if($rule) {
-			$rule = explode(";", $rule);
-			$newrule = new Rule();
-			$newrule->logical = $rule[0];
-			$newrule->op = $rule[1];
-			$newrule->fieldnum = $rule[2];
-			$newrule->val = $rule[3];
-			$fieldname = QuickQuery("select name from fieldmap where fieldnum = '$newrule->fieldnum'");
-			$searchrules[] = $fieldname . " : " . preg_replace("{\|}", ", ", $newrule->val);
-		}
-	}
+	$searchrules = displayRules($options['rules']);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
