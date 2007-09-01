@@ -48,17 +48,17 @@ function fmt_answer($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 unset($_SESSION['report']['edit']);
 $clear = 0;
-if(isset($_REQUEST['jobid'])){
+if(isset($_GET['jobid'])){
 	unset($_SESSION['report']);
 	unset($_SESSION['reportid']);
-	$options= array("jobid" => $_REQUEST['jobid']+0,
+	$options= array("jobid" => $_GET['jobid']+0,
 					"reporttype" => "jobsummaryreport");
 	$_SESSION['report']['options'] = $options;
 	$_SESSION['report']['jobsummary'] = 1;
 	$clear = 1;
 }
 
-if(isset($_REQUEST['survey'])){
+if(isset($_GET['survey'])){
 	$options['survey'] = true;
 	$clear=1;
 }
@@ -68,18 +68,16 @@ if($clear)
 
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
-if(isset($_REQUEST['reportid'])){
-	if(!userOwns("reportsubscription", $_REQUEST['reportid']+0)){
+if(isset($_GET['reportid'])){
+	$reportid = $_GET['reportid']+0;
+	if(!userOwns("reportsubscription", $reportid)){
 		redirect('unauthorized.php');
 	}
-	$subscription = new ReportSubscription($_REQUEST['reportid']+0);
+	$subscription = new ReportSubscription($reportid);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
-
-	foreach($fields as $field){
-		$_SESSION['fields'][$field->fieldnum] = false;
-	}
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
+	
+	$_SESSION['reportid'] = $reportid;
 	$_SESSION['report']['options'] = $options;
 	redirect();
 } else {
@@ -114,9 +112,9 @@ if(isset($_SESSION['reportid'])){
 
 $_SESSION['report']['options'] = $options;
 
-if(isset($_REQUEST['csv']) && $_REQUEST['csv']){
+if(isset($_GET['csv']) && $_GET['csv']){
 	$generator->format = "csv";
-} else if(isset($_REQUEST['pdf']) && $_REQUEST['pdf']){
+} else if(isset($_GET['pdf']) && $_GET['pdf']){
 	$generator->format = "pdf";
 } else {
 	$generator->format = "html";

@@ -50,9 +50,10 @@ function fmt_report_type($obj){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_REQUEST['delete'])){
-	if(userOwns("reportsubscription", $_REQUEST['delete']+0)){
-		$subscription = new ReportSubscription($_REQUEST['delete']+0);
+if(isset($_GET['delete'])){
+	$delete = $_GET['delete'] +0;
+	if(userOwns("reportsubscription", $delete)){
+		$subscription = new ReportSubscription($delete);
 		$instance = new ReportInstance($subscription->reportinstanceid);
 		$instance->destroy();
 		$subscription->destroy();
