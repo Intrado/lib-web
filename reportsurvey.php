@@ -36,13 +36,13 @@ if (!$USER->authorize('viewsystemreports')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_REQUEST['clear']) && $_REQUEST['clear']){
+if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['reportid']);
 	unset($_SESSION['report']['options']);
 	redirect();
 }
-if(isset($_REQUEST['reportid'])){
-	$_SESSION['reportid'] = $_REQUEST['reportid']+0;
+if(isset($_GET['reportid'])){
+	$_SESSION['reportid'] = $_GET['reportid']+0;
 	redirect();
 }
 

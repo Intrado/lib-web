@@ -71,8 +71,8 @@ function editReport($subscription){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_REQUEST['reportid'])){
-	$reportid = $_REQUEST['reportid'] +0;
+if(isset($_GET['reportid'])){
+	$reportid = $_GET['reportid'] +0;
 }
 
 if(isset($reportid)){
@@ -84,7 +84,7 @@ if(isset($reportid)){
 	redirect("reports.php");
 }
 
-if(isset($_REQUEST['runreport'])){
+if(isset($_GET['runreport'])){
 	runReport($reportsubscription);	
 } else {
 	editReport($reportsubscription);

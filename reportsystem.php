@@ -28,18 +28,18 @@ if (!$USER->authorize('viewusagestats')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_REQUEST['clear'])){
+if(isset($_GET['clear'])){
 	unset($_SESSION['usagestats']);	
 	redirect();
 }
 
 $clear=0;
-if(isset($_REQUEST['showusers'])){
-	$_SESSION['usagestats']['showusers'] = $_REQUEST['showusers'];
+if(isset($_GET['showusers'])){
+	$_SESSION['usagestats']['showusers'] = $_GET['showusers'];
 	$clear = 1;
 }
-if(isset($_REQUEST['type']) && $_REQUEST['type'] != ""){
-	$_SESSION['usagestats']['type'] = DBSafe($_REQUEST['type']);
+if(isset($_GET['type']) && $_GET['type'] != ""){
+	$_SESSION['usagestats']['type'] = DBSafe($_GET['type']);
 	$clear = 1;
 }
 

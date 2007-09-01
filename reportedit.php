@@ -26,8 +26,8 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 $options = array();
 
 
-if(isset($_REQUEST['reportid'])){
-	$reportid = $_REQUEST['reportid']+0;
+if(isset($_GET['reportid'])){
+	$reportid = $_GET['reportid']+0;
 	if(!userOwns("reportsubscription",$reportid)){
 		redirect('unauthorized.php');
 	}
