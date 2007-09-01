@@ -18,16 +18,18 @@ if (!$USER->authorize("starteasy")) {
 }
 
 
-$specialtask = new SpecialTask($_REQUEST['taskid']);
+$specialtask = new SpecialTask($_GET['taskid']);
 
 if($specialtask->getData("progress") == "Done") {
-	redirect("easycallsubmit.php?taskid=" . $_REQUEST['taskid']);
+	redirect("easycallsubmit.php?taskid=" . $_GET['taskid']);
 } else {
 	$currlang = $specialtask->getData("currlang");
 	$progress = $specialtask->getData("progress");
 
 	if($progress == "Hung up") {
-		$specialtask->setData('error', "Phone call hung up early");
+		$specialtask->setData('error', "The phone call ended earlier than expected. Please check your phone connectivity");
+	} else if ($progress == "Messages Remain"){
+		$specialtask->setData('error', "The phone call ended earlier than expected. There are still more messages to be recorded");
 	}
 
 	$specialtask->lastcheckin = date("Y-m-d H:i:s");
@@ -54,7 +56,7 @@ if (!$error) {
 	<img src="img/bug_important.gif" > You should receive a call shortly. After you save your message(s) and hangup, you will need to <b>Confirm &amp; Submit</b> your job in the next screen.
 
 </div>
-	<meta http-equiv="refresh" content="2;url=easycallrecord.php?taskid=<?= $_REQUEST['taskid'] ?>">
+	<meta http-equiv="refresh" content="2;url=easycallrecord.php?taskid=<?= $_GET['taskid'] ?>">
 
 <?
 
