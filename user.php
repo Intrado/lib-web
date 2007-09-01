@@ -45,8 +45,8 @@ $maxreached = false;
 /*CSDELETEMARKER_START*/
 if($_SESSION['userid']=== NULL){
 	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
-	$maxusers = getSystemSetting("_maxusers",null);
-	if(($maxusers != null) && $maxusers <= $usercount){
+	$maxusers = getSystemSetting("_maxusers", "unlimited");
+	if(($maxusers != "unlimited") && $maxusers <= $usercount){
 		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
 		$maxreached=true;
 	}
