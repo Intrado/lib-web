@@ -316,142 +316,144 @@ startWindow('Global System Settings');
 				}
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Customer Display Name:<br><? print help('Settings_CustDisplayName'); ?>
-					</th>
-					<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 255);  ?></td>
-				<tr>
-<?
-				if($IS_COMMSUITE){
-?>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Survey URL:<br><? print help('Settings_SurveyURL'); ?>
-					</th>
-					<td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100);  ?></td>
-				<tr>
-<?
-				}
-?>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Retry Setting:<br><? print help('Settings_RetrySetting'); ?></th>
-					<td>
-						<table border="0" cellpadding="2" cellspacing="0">
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+							<tr>
+								<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName'); ?></td>
+								<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 255);  ?></td>
+							<tr>
+			<?
+							if($IS_COMMSUITE){
+			?>
 							<tr>
 								<td>
-					<?
-						NewFormItem($f,$s,'retry','selectstart');
-						NewFormItem($f,$s,'retry','selectoption',5,5);
-						NewFormItem($f,$s,'retry','selectoption',10,10);
-						NewFormItem($f,$s,'retry','selectoption',15,15);
-						NewFormItem($f,$s,'retry','selectoption',30,30);
-						NewFormItem($f,$s,'retry','selectoption',60,60);
-						NewFormItem($f,$s,'retry','selectoption',90,90);
-						NewFormItem($f,$s,'retry','selectoption',120,120);
-						NewFormItem($f,$s,'retry','selectend');
-					?>
+									Survey URL<? print help('Settings_SurveyURL'); ?>
+								</td>
+								<td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100);  ?></td>
+							<tr>
+			<?
+							}
+			?>
+							<tr>
+								<td>Retry Setting<? print help('Settings_RetrySetting'); ?></td>
+								<td>
+									<table border="0" cellpadding="2" cellspacing="0">
+										<tr>
+											<td>
+								<?
+									NewFormItem($f,$s,'retry','selectstart');
+									NewFormItem($f,$s,'retry','selectoption',5,5);
+									NewFormItem($f,$s,'retry','selectoption',10,10);
+									NewFormItem($f,$s,'retry','selectoption',15,15);
+									NewFormItem($f,$s,'retry','selectoption',30,30);
+									NewFormItem($f,$s,'retry','selectoption',60,60);
+									NewFormItem($f,$s,'retry','selectoption',90,90);
+									NewFormItem($f,$s,'retry','selectoption',120,120);
+									NewFormItem($f,$s,'retry','selectend');
+								?>
+											</td>
+											<td>
+												minutes to retry busy and unanswered phone numbers
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Disable Repeating Jobs<? print help('Settings_DisableRepeat'); ?>
 								</td>
 								<td>
-									minutes to retry busy and unanswered phone numbers
+									<table border="0" cellpadding="2" cellspacing="0">
+										<tr>
+											<td><? NewFormItem($f, $s, 'disablerepeat', 'checkbox'); ?></td>
+											<td>This setting will prevent all scheduled repeating jobs from running.</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Default Caller ID Number<? print help('Settings_CallerID'); ?>
+								</td>
+								<td>
+								<? NewFormItem($f, $s, 'callerid', 'text', 20);  ?>
 								</td>
 							</tr>
 						</table>
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Disable Repeating Jobs:<br><? print help('Settings_DisableRepeat'); ?>
-					</th>
-					<td>
-						<table border="0" cellpadding="2" cellspacing="0">
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Import:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
-								<td><? NewFormItem($f, $s, 'disablerepeat', 'checkbox'); ?></td>
-								<td>This setting will prevent all scheduled repeating jobs from running.</td>
+								<td width="30%">Default Local Area Code<? print help('Settings_DefaultLocalAreaCode'); ?></td>
+								<td><? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?></td>
 							</tr>
 						</table>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Default Caller ID Number:<br><? print help('Settings_CallerID'); ?>
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'callerid', 'text', 20);  ?>
-					</td>
-				</tr>
-
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Default Local Area Code:<br><? print help('Settings_DefaultLocalAreaCode'); ?>
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?>
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Autoreport Email address:<br><? print help('Settings_AutoreportEmailAddress'); ?>
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 30,100);  ?>
-					</td>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Autoreport Email Name:<br><? print help('Settings_AutoreportEmailName'); ?>
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Auto Report:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+							<tr>
+								<td  width="30%">Autoreport Email address<? print help('Settings_AutoreportEmailAddress'); ?></td>
+								<td><? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 30,100);  ?></td>
+							</tr>
+							<tr>
+								<td>
+									Autoreport Email Name<? print help('Settings_AutoreportEmailName'); ?>
+								</td>
+								<td>
+								<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
+								</td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 <?
 				if($IS_COMMSUITE){
 ?>
-					<tr>
-						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-							Minimum Extensions Length:<br><? print help('Settings_MinimumExtensions'); ?>
-						</th>
-						<td>
-						<? NewFormItem($f, $s, 'easycallmin', 'text', 3,3);  ?>
-						</td>
-					</tr>
-					<tr>
-						<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-							Maximum Extensions Length:<br><? print help('Settings_MaximumExtensions'); ?>
-						</th>
-						<td>
-						<? NewFormItem($f, $s, 'easycallmax', 'text', 3,3);  ?>
-						</td>
-					</tr>
+				<tr>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Extension:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+							<tr>
+								<td width="30%">Minimum Extensions Length<? print help('Settings_MinimumExtensions'); ?></td>
+								<td><? NewFormItem($f, $s, 'easycallmin', 'text', 3,3);  ?></td>
+							</tr>
+							<tr>
+								<td>Maximum Extensions Length<? print help('Settings_MaximumExtensions'); ?></td>
+								<td><? NewFormItem($f, $s, 'easycallmax', 'text', 3,3);  ?></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
 <?
 				}
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Minimum Username Length:<br><? print help('Settings_MinimumUsername'); ?>
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Security:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+							<tr>
+								<td width="30%">Minimum Username Length<? print help('Settings_MinimumUsername'); ?></td>
+								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?></td>
+							</tr>
+							<tr>
+								<td>Minimum Password Length:<? print help('Settings_MinimumPassword'); ?></td>
+								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?></td>
+							</tr>
+							<tr>
+								<td>Very Secure Passwords<? print help('Settings_VerySecurePasswords'); ?></td>
+								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
+							</tr>
+						</table>
 					</td>
 				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Minimum Password Length:<br><? print help('Settings_MinimumPassword'); ?>
-					</th>
-					<td>
-					<? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?>
-					</td>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Very Secure Passwords:<br><? print help('Settings_VerySecurePasswords'); ?>
-					</th>
-					<td>
-					<? NewFormItem($f,$s,'checkpassword','checkbox') ?>
-					</td>
-				</tr>
-
-
-
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
 						Systemwide Alert Message:<br><? print help('Settings_SystemwideAlert'); ?>
