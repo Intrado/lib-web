@@ -34,6 +34,31 @@ if(isset($_GET['id'])){
 /*CSDELETEMARKER_END*/
 
 ////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+//Checks the password for required chars
+//returns false if fails the test
+function passwordcheck($f, $s){
+	$tally = 0;
+	$password = GetFormData($f,$s,'password');
+	if(ereg("^0*$", $password)){
+		return true;
+	}
+	if(ereg("[0-9]", $password))
+		$tally++;
+	if(ereg("[a-zA-Z]", $password))
+		$tally++;
+	if(ereg("[\!\@\#\$\%\^\&\*]", $password))
+		$tally++;
+	
+	if($tally >= 2)
+		return true;
+		
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -79,9 +104,9 @@ if($checkpassword){
 	if($passwordlength < 6) {
 		$passwordlength = 6;
 	}
-	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least 2 of the following: a letter, a number or a symbol";
 } else {
-	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least 2 of the following: a letter, a number or a symbol";
 }
 
 if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreached) // A hack to be able to differentiate between a submit and an add button click
@@ -137,8 +162,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
-		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9\!\@\#\$\%\^\&\*]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
-			error('Your password must contain at least one letter and one number or symbol', $securityrules);
+		} elseif(!passwordcheck($f, $s)){
+			error('Your password must contain at least 2 of the following: a letter, a number or a symbol', $securityrules);
 		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')))) {
 			error($issame, $securityrules);
 		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && $checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password'))){
