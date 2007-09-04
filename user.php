@@ -137,8 +137,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
-		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
-			error('Your password must contain at least one letter and one number', $securityrules);
+		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9\!\@\#\$\%\^\&\*]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
+			error('Your password must contain at least one letter and one number or symbol', $securityrules);
 		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($issame=isSameUserPass($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')))) {
 			error($issame, $securityrules);
 		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && $checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password'))){
