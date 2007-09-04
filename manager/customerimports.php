@@ -68,7 +68,7 @@ if(CheckFormSubmit($f, $s)) {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f)) {
 		error('Form was edited in another window, reloading data');
-		$reloadform = true;
+		$reloadform = 1;
 	} else {
 		MergeSectionFormData($f, $s);
 		if( CheckFormSection($f, $s) ){
@@ -85,31 +85,8 @@ if($reloadform){
 	PutFormData($f, $s, 'importtypes', $selected, "array", array_keys($selected));
 }
 
-if($selected){
-	$count = 0;
-	$many = "";
-	foreach($selected as $select){
-		if($count > 0)
-			$many = "OR";
-		$querytypes = $querytypes . " $many import.type = '" . DBSafe($select) ."'";
-		$count++;
-	}
-	$querytypes = "and (" . $querytypes . ")";
-}
 
-include("nav.inc.php");
-NewForm($f);
-?>
-<table>
-	<tr><td>
-		<?
-			NewFormItem($f, $s, 'importtypes', 'selectmultiple', "4", $types);
-		?>
-	</td></tr>
-	<tr><td><? NewFormItem($f, $s, 'submit', 'submit'); ?></td><tr>
-</table>
-<?
-EndForm();
+
 
 $res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 $shardinfo = array();
@@ -120,6 +97,10 @@ $custquery = Query("select id, shardid, urlcomponent from customer where 1 $quer
 $customers = array();
 while($row= DBGetRow($custquery)){
 	$customers[] = $row;
+}
+
+if($selected){
+	$querytypes = "and import.type in ('" . implode("','", $selected) . "')";
 }
 
 $currhost="";
@@ -163,6 +144,25 @@ $formatters = array("url" => "fmt_custurl",
 					"10" => "fmt_filesize",
 					"8" => "fmt_alert_timestamp",
 					"5" => "fmt_import_status");
+
+/////////////////////////////
+// Display
+/////////////////////////////
+
+include("nav.inc.php");
+NewForm($f);
+?>
+<table>
+	<tr><td>
+		<?
+			NewFormItem($f, $s, 'importtypes', 'selectmultiple', "4", $types);
+		?>
+	</td></tr>
+	<tr><td><? NewFormItem($f, $s, 'submit', 'submit'); ?></td><tr>
+</table>
+<?
+EndForm();
+
 ?>
 <table border=1>
 <?
