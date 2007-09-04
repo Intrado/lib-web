@@ -191,6 +191,10 @@ function loadCredentials ($userid) {
 	$ACCESS = $_SESSION['access'] = new Access($USER->accessid);
 	$_SESSION['custname'] = getSystemSetting("displayname");
 	$_SESSION['timezone'] = getSystemSetting("timezone");
+	if (isset($_SESSION['timezone'])) {
+		@date_default_timezone_set($_SESSION['timezone']);
+		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
+	}
 }
 
 function doDBConnect($result) {
