@@ -287,54 +287,71 @@ buttons(submit($f, $s, 'Save'));
 startWindow('Global System Settings');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
+
 <?
 				if($IS_COMMSUITE) {
 ?>
-				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job Type/<br>Priorities:<br><? print help('Settings_JobTypes'); ?></th>
-					<td class="bottomBorder">
-						<table border="0" cellpadding="0" cellspacing="0" width="60%">
-							<tr>
-								<td>
-						<?
-							$types = DBFindMany('JobType', "from jobtype where deleted=0 order by priority");
-							$types[] = $type = new JobType();
-							$type->id = 'new';
-							$type->priority = QuickQuery("select max(priority) from jobtype where deleted=0") + 10000;
-							$type->timeslices = 100;
-							$titles = array('priority' => 'Priority', 'name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '', 'move' => '');
-							$formatters = array('priority' => 'fmt_priority', 'edit' => 'fmt_edit', 'move' => 'fmt_move', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
-							showObjects($types,$titles,$formatters);
-						?>
-
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
+					<tr>
+						<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job Type/Priorities:<br><? print help('Settings_JobTypes'); ?></th>
+						<td class="bottomBorder">
+							<table border="0" cellpadding="0" cellspacing="0" width="60%">
+								<tr>
+									<td>
+							<?
+								$types = DBFindMany('JobType', "from jobtype where deleted=0 order by priority");
+								$types[] = $type = new JobType();
+								$type->id = 'new';
+								$type->priority = QuickQuery("select max(priority) from jobtype where deleted=0") + 10000;
+								$type->timeslices = 100;
+								$titles = array('priority' => 'Priority', 'name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '', 'move' => '');
+								$formatters = array('priority' => 'fmt_priority', 'edit' => 'fmt_edit', 'move' => 'fmt_move', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
+								showObjects($types,$titles,$formatters);
+							?>
+	
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
 <?
 				}
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Customer Info:</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
-							<tr>
-								<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName'); ?></td>
-								<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 255);  ?></td>
-							<tr>
-			<?
-							if($IS_COMMSUITE){
-			?>
+				
+						<tr>
+							<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName'); ?></td>
+							<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 60, 255);  ?></td>
+						<tr>
+<?
+						if($IS_COMMSUITE){
+?>
 							<tr>
 								<td>
 									Survey URL<? print help('Settings_SurveyURL'); ?>
 								</td>
-								<td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100);  ?></td>
+								<td><? NewFormItem($f, $s, 'surveyurl', 'text', 60, 100);  ?></td>
 							<tr>
-			<?
-							}
-			?>
+<?
+						}
+?>
+							<tr>
+								<td width="30%">Default Local Area Code<? print help('Settings_DefaultLocalAreaCode'); ?></td>
+								<td><? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?></td>
+							</tr>
+							<tr>
+								<td>Systemwide Alert Message:<? print help('Settings_SystemwideAlert'); ?></td>
+								<td><? NewFormItem($f, $s, 'alertmessage', 'textarea',44,4);  ?></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
 								<td>Retry Setting<? print help('Settings_RetrySetting'); ?></td>
 								<td>
@@ -381,34 +398,16 @@ startWindow('Global System Settings');
 								<? NewFormItem($f, $s, 'callerid', 'text', 20);  ?>
 								</td>
 							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Import:</th>
-					<td class="bottomBorder">
-						<table border="0" cellpadding="2" cellspacing="0" width=100%>
-							<tr>
-								<td width="30%">Default Local Area Code<? print help('Settings_DefaultLocalAreaCode'); ?></td>
-								<td><? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?></td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Auto Report:</th>
-					<td class="bottomBorder">
-						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
 								<td  width="30%">Autoreport Email address<? print help('Settings_AutoreportEmailAddress'); ?></td>
-								<td><? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 30,100);  ?></td>
+								<td><? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 60,100);  ?></td>
 							</tr>
 							<tr>
 								<td>
 									Autoreport Email Name<? print help('Settings_AutoreportEmailName'); ?>
 								</td>
 								<td>
-								<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 30,100);  ?>
+								<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 60,100);  ?>
 								</td>
 							</tr>
 						</table>
@@ -418,7 +417,7 @@ startWindow('Global System Settings');
 				if($IS_COMMSUITE){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Extension:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">EasyCall/<br>Call Me:</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
@@ -444,7 +443,7 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Minimum Password Length:<? print help('Settings_MinimumPassword'); ?></td>
+								<td>Minimum Password Length<? print help('Settings_MinimumPassword'); ?></td>
 								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
@@ -452,14 +451,6 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
 							</tr>
 						</table>
-					</td>
-				</tr>
-				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">
-						Systemwide Alert Message:<br><? print help('Settings_SystemwideAlert'); ?>
-					</th>
-					<td>
-						<? NewFormItem($f, $s, 'alertmessage', 'textarea',50);  ?>
 					</td>
 				</tr>
 			</table>
