@@ -1,5 +1,6 @@
 <html>
 <body>
+<image src="manager.png">
 <table border = 1>
 	<tr>
 		<td><a href="customers.php">Customer&nbsp;List</a></td>
