@@ -66,6 +66,7 @@ if(CheckFormSubmit($f,$s))
 
 			$task->create();
 			QuickUpdate("call start_specialtask(" . $task->id . ")");
+			ClearFormData($f);
 			redirect('callme2.php?taskid=' . $task->id);
 		}
 	}

@@ -96,6 +96,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 					$reloadform = 1;
 					$dopreview = 1;
 				} else {
+					ClearFormData($form);
 					redirect('messages.php');
 				}
 			}

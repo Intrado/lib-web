@@ -275,14 +275,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//TODO check for send button
 			if ($JOBTYPE == "normal" && CheckFormSubmit($f,'send')) {
 				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid)	{
+					ClearFormData($f);
 					redirect("jobconfirm.php?id=" . $job->id);
 				} else {
 					error("Please select a default message");
 				}
 			} else if (!$addlang) {
 				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid)	{
-				redirect('jobs.php');
-			} else {
+					ClearFormData($f);
+					redirect('jobs.php');
+				} else {
 					error("Please select a default message");
 				}
 			} else {

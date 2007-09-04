@@ -195,7 +195,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$job->update();
 
 			setCurrentSurvey($job->id);
-
+			
+			ClearFormData($f);
 			if (CheckFormSubmit($f,'send')) {
 				redirect("surveyconfirm.php?id=" . $job->id);
 			} else {

@@ -212,6 +212,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 			
 			if(CheckFormSubmit($f, "save")){
 				$_SESSION['report']['edit'] = 1;
+				ClearFormData($f);
 				redirect("reportedit.php");
 			}
 			redirect();

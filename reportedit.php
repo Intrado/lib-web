@@ -120,6 +120,7 @@ if(CheckFormSubmit($f, $s))
 			$instance->update();
 			$subscription->reportinstanceid=$instance->id;
 			$subscription->update();
+			ClearFormData($f);
 			redirect("reports.php");
 		}
 	}

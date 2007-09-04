@@ -145,7 +145,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			
 			$options['reporttype'] = "jobsummaryreport";
 			$_SESSION['report']['options'] = $options;
-			
+			ClearFormData($f);
 			if(CheckFormSubmit($f, "save"))
 				redirect("reportedit.php");
 			if(CheckFormSubmit($f, "view"))

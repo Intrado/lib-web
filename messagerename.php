@@ -66,7 +66,7 @@ if(CheckFormSubmit($form,$section))
 
 			PopulateObject($form,$section,$message,array("name", "description"));
 			$message->update();
-
+			ClearFormData($form);
 			redirect('messages.php');
 		}
 	}

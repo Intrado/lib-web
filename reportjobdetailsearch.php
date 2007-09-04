@@ -265,11 +265,13 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			
 				$options['activefields'] = implode(",",$activefields);
 				$_SESSION['report']['options'] = $options;
+				ClearFormData($f);
 				redirect("reportedit.php");
 			}
-			if(CheckFormSubmit($f, "view"))
+			if(CheckFormSubmit($f, "view")){
+				ClearFormData($f);
 				redirect("reportjobdetails.php");
-			
+			}
 			redirect();
 		}
 	}

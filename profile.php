@@ -124,7 +124,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("leavemessage", (bool)GetFormData($form, $section, 'leavemessage'));
 
 			$_SESSION['accessid'] = $accss->id;
-
+			ClearFormData($form);
 			redirect('profiles.php');
 
 			$reloadform = 1;

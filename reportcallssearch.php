@@ -162,9 +162,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 			$_SESSION['report']['options'] = $options;
 			
 			if(CheckFormSubmit($f, "save")){
+				ClearFormData($f);
 				redirect("reportedit.php");
 			}
 			if(CheckFormSubmit($f,"view")){
+				ClearFormData($f);
 				redirect("reportcallsresult.php");
 			}
 			redirect();

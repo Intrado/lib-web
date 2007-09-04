@@ -81,6 +81,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				$task->status = "queued";
 				$task->create();
 				QuickUpdate("call start_specialtask(" . $task->id . ")");
+				ClearFormData($f);
 				redirect('easycallrecord.php?taskid=' . $task->id);
 			} else {
 
@@ -184,6 +185,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				$_SESSION['easycallid'] = $task->id;
 				if(!CheckFormSubmit($f, 'add') && !$removedlang){
 					QuickUpdate("call start_specialtask(" . $task->id . ")");
+					ClearFormData($f);
 					redirect('easycallrecord.php?taskid=' . $task->id);
 				}
 			}

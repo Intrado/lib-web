@@ -95,6 +95,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$options['jobid'] = GetFormData($f, $s, "jobid")+0;
 			$options['archived'] = $check;		
 			$_SESSION['report']['options'] = $options;
+			ClearFormData($f);
 			if(CheckFormSubmit($f, "run"))
 				redirect("reportsurveysummary.php");
 			if((CheckFormSubmit($f, "save")))
