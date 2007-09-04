@@ -37,43 +37,49 @@ if(CheckFormSubmit($f, $s)){
 	else
 	{
 		MergeSectionFormData($f, $s);
-		if($specialtask->getData("origin") == "message"){
-			if($messages){
-				foreach($messages as $key => $message) {
-					$mess = new Message($message);
-					$mess->name = GetFormData($f,$s,"message ".$key);
-					$mess->description = "Call Me - " . $mess->name;
-					$mess->update();
-					$messagepart = DBFind("MessagePart", "from messagepart where messageid = '$mess->id'");
-					$audio = new AudioFile($messagepart->audiofileid);
-					$audio->name = GetformData($f, $s, "message ".$key);
-					$audio->update();
-				}
-			}
-		} else if($specialtask->getData("origin") == "audio") {
-			if($messages){
-				foreach($messages as $key => $message) {
-					$mess = new AudioFile($message);
-					$mess->name = GetFormData($f,$s,"message ".$key);
-					$mess->update();
-				}
-			}
-		}
-		if ($specialtask->getData('origin') == "audio") {
-			redirect("audio.php");
+				//do check
+		if( CheckFormSection($f, $s) ) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
-		?>
-			<script language="javascript">
-				alert("Your message has been saved.");
-				<?
-					if ($specialtask->getData('origin') == 'message') {
-						print 'window.opener.document.location.reload(); window.close()';
-					} else {
-						print 'window.close()';
+			if($specialtask->getData("origin") == "message"){
+				if($messages){
+					foreach($messages as $key => $message) {
+						$mess = new Message($message);
+						$mess->name = GetFormData($f,$s,"message ".$key);
+						$mess->description = "Call Me - " . $mess->name;
+						$mess->update();
+						$messagepart = DBFind("MessagePart", "from messagepart where messageid = '$mess->id'");
+						$audio = new AudioFile($messagepart->audiofileid);
+						$audio->name = GetformData($f, $s, "message ".$key);
+						$audio->update();
 					}
-				?>
-			</script>
-		<?
+				}
+			} else if($specialtask->getData("origin") == "audio") {
+				if($messages){
+					foreach($messages as $key => $message) {
+						$mess = new AudioFile($message);
+						$mess->name = GetFormData($f,$s,"message ".$key);
+						$mess->update();
+					}
+				}
+			}
+			ClearFormData($f);
+			if ($specialtask->getData('origin') == "audio") {
+				redirect("audio.php");
+			} else {
+			?>
+				<script language="javascript">
+					alert("Your message has been saved.");
+					<?
+						if ($specialtask->getData('origin') == 'message') {
+							print 'window.opener.document.location.reload(); window.close()';
+						} else {
+							print 'window.close()';
+						}
+					?>
+				</script>
+			<?
+			}
 		}
 	}
 } else {
