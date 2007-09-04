@@ -67,7 +67,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$autoname = GetFormData($f, $s, 'autoname');
 			$autoemail = GetFormData($f, $s, 'autoemail');
 			$renewaldate = GetFormData($f, $s, 'renewaldate');
-			$callspurchased = GetFormData($f, $s, 'callspurchased');
+			$callspurchased = ereg_replace("[^0-9]*","",GetFormData($f, $s, 'callspurchased'));
 			$managerpassword = GetFormData($f, $s, 'managerpassword');
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
 			$maxusers = GetFormData($f, $s, 'maxusers');
@@ -182,7 +182,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb),"email",1,255);
 
 	PutFormData($f,$s,'renewaldate', getCustomerSystemSetting('_renewaldate', false, true, $custdb), "text", 1, 255);
-	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', false, true, $custdb), "number");
+	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', false, true, $custdb), "text");
 
 	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
