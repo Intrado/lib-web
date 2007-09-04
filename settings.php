@@ -323,7 +323,7 @@ startWindow('Global System Settings');
 				
 						<tr>
 							<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName'); ?></td>
-							<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 60, 255);  ?></td>
+							<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 50);  ?></td>
 						<tr>
 <?
 						if($IS_COMMSUITE){
