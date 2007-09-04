@@ -82,18 +82,18 @@ foreach($customers as $cust) {
 	mysql_select_db("c_" . $cust[0]);
 	if($custdb){
 		$row = array();
-		$row[] = $cust[0];
-		$row[] = $cust[2];
-		$row[] = QuickQuery("select value from setting where name = 'displayname'", $custdb);
-		$row[] = QuickQuery("select value from setting where name = 'inboundnumber'", $custdb);
-		$row[] = QuickQuery("select value from setting where name = 'timezone'", $custdb);
-		$row[] = QuickQuery("select value from setting where name = '_managernote'", $custdb);
-		$row[] = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
+		$row[0] = $cust[0];
+		$row[1] = $cust[2];
+		$row[2] = QuickQuery("select value from setting where name = 'displayname'", $custdb);
+		$row[3] = QuickQuery("select value from setting where name = 'inboundnumber'", $custdb);
+		$row[4] = QuickQuery("select value from setting where name = 'timezone'", $custdb);
+		$row[5] = QuickQuery("select value from setting where name = '_managernote'", $custdb);
+		$row[6] = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
 
-		$row[] = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
+		$row[7] = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
 
-		$row[] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
-		$row[] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
+		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
+		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
 								WHERE job.status = 'active'", $custdb);
 
 
