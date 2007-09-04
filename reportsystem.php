@@ -151,6 +151,7 @@ if($reload){
 				from reportperson rp 
 				where rp.status in ('fail', 'success')
 				$joblistquery
+				and type = '" . DBSafe($type) . "'
 				group by $groupbyorder rp.jobid, rp.userid";
 
 	$result = Query($query);
