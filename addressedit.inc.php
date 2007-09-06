@@ -294,7 +294,11 @@ startWindow("Contact");
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
 		<td class="bottomBorder">
 			<? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?>
-			SMS: <? NewFormItem($f, $s, "sms" . ($x+1), 'checkbox'); ?>
+			<? if ($USER->authorize('sendsms')) {
+				echo "SMS:";
+				NewFormItem($f, $s, "sms" . ($x+1), 'checkbox');
+			}
+			?>
 		</td>
 	</tr>
 <?
