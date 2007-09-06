@@ -86,8 +86,8 @@ class JobSummaryReport extends ReportGenerator{
 		$phonenumberinfo = QuickQueryRow($phonenumberquery);
 						
 		$emailquery = "select sum(rc.type = 'email') as total,
-									sum(rp.status in ('success', 'duplicate')) as sent,
-									sum(rp.status not in ('success', 'duplicate')) as unsent,
+									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
+									sum(rp.status not in ('success', 'duplicate', 'nocontacts', 'fail')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts') as nocontacts
 									from reportperson rp
@@ -187,8 +187,8 @@ class JobSummaryReport extends ReportGenerator{
 										</tr>
 										<tr>
 											<td><?=$emailinfo[0]?></td>
-											<td><a href="reportjobdetails.php?result=sent"/><?=$emailinfo[1]?></a></td>
-											<td><a href="reportjobdetails.php?result=unsent"/><?=$emailinfo[2]?></a></td>
+											<td><a href="reportjobdetails.php?status=completed"/><?=$emailinfo[1]?></a></td>
+											<td><a href="reportjobdetails.php?status=remaining"/><?=$emailinfo[2]?></a></td>
 											<td><?=$emailinfo[3]?></td>
 											<td><?=$emailinfo[4]?></td>
 										</tr>
