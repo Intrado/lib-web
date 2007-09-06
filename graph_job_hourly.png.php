@@ -130,13 +130,13 @@ $b4plot = new BarPlot($data["F"]);
 $b4plot->SetFillColor($cpcolors["F"]);
 $b4plot->SetLegend("Failed");
 
-$b5plot = new BarPlot($data["N"]);
-$b5plot->SetFillColor($cpcolors["N"]);
-$b5plot->SetLegend("No Answer");
+$b5plot = new BarPlot($data["B"]);
+$b5plot->SetFillColor($cpcolors["B"]);
+$b5plot->SetLegend("Busy");
 
-$b6plot = new BarPlot($data["B"]);
-$b6plot->SetFillColor($cpcolors["B"]);
-$b6plot->SetLegend("Busy");
+$b6plot = new BarPlot($data["N"]);
+$b6plot->SetFillColor($cpcolors["N"]);
+$b6plot->SetLegend("No Answer");
 
 // Create the grouped bar plot
 $gbplot = new AccBarPlot(array($b6plot,$b5plot,$b4plot,$b3plot,$b2plot,$b1plot));
