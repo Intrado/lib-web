@@ -52,6 +52,13 @@ class JobDetailReport extends ReportGenerator{
 				$resultquery = " and rc.result in ('" . $this->params['result'] . "')";
 			}
 		}
+		
+		if(isset($this->params['status']) && $this->params['status']){
+			if($this->params['status'] == "completed")
+				$resultquery .= " and rp.status in ('success', 'fail', 'duplicate')";
+			else if($this->params['status'] == "remaining")
+				$resultquery .= " and rp.status not in ('success', 'fail', 'duplicate')";
+		}
 
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
