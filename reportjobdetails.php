@@ -98,17 +98,24 @@ if(isset($_GET['type'])){
 	redirect();
 }
 
+if(isset($_GET['status'])){
+	$_SESSION['report']['jobdetail']=1;
+	unset($_SESSION['reportid']);
+	$options = $_SESSION['report']['options'];
+	$options['reporttype']="emaildetail";
+	$options['status'] = DBSafe($_GET['status']);
+	$options['order1'] = 'rp.pkey';
+	$_SESSION['report']['options'] = $options;
+	redirect();
+}
+
 if(isset($_GET['result'])){
 	$_SESSION['report']['jobdetail']=1;
 	unset($_SESSION['reportid']);
 	$options = $_SESSION['report']['options'];
 	$options['result'] = DBSafe($_GET['result']);
 
-	if($_GET['result'] == "sent" || $_GET['result'] == "unsent"){
-		$options['reporttype']="emaildetail";
-		if($_GET['result'] == "sent")
-			$options['result'] .= "','duplicate";
-	} else if($_GET['result'] == "undelivered"){
+	if($_GET['result'] == "undelivered"){
 		$options['reporttype'] = "notcontacted";
 	} else {
 		$options['reporttype']="phonedetail";
