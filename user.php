@@ -181,6 +181,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error('Cannot have sequential numbers for Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
+		} elseif(!GetFormData($f,$s,"accessid")){
+			error("No access profile was chosen");
 		} else {
 			// Submit changes
 
