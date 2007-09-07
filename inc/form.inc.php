@@ -40,6 +40,12 @@ calls CheckFormItem, puts red * for bad/missing values
 */
 
 function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="nooption", $extrahtml = "") {
+
+
+	if (!isset($_SESSION['formdata'][$form][$section][$item]))
+		error_log("Attempt to call NewFormItem with non initialized object $form,$section,$item");
+
+
 	switch($type) {
 	case "text":
 		echo "<input $extrahtml type=\"text\" name=\"frm[" . $form . "][" . $section
@@ -233,9 +239,12 @@ function NewFormSelect ($f,$s,$item,$map) {
 */
 
 function GetFormData ($form, $section, $item) {
-	if (isset($_SESSION['formdata'][$form][$section][$item]['value']))
+	if (isset($_SESSION['formdata'][$form][$section][$item]['value'])) {
 		return $_SESSION['formdata'][$form][$section][$item]['value'];
-	return null;
+	} else {
+		error_log("Attempt to access nonexistant form data $form,$section,$item");
+		return null;
+	}
 }
 
 /***************** PutFormData *****************
