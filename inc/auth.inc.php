@@ -17,11 +17,14 @@ function pearxmlrpc($method, $params) {
 	} else {
 		$val = $resp->value();
     	$data = XML_RPC_decode($val);
-		if ($data['result'] != "") {
-			error_log($method . " " .$data['result']);
-		} else {
-			// success;
+		if ($data['result'] == "") {
+			// success
 			return $data;
+		} else if ($data['result'] == "warning") {
+			// warning we do not log, but handle like failure
+		} else {
+			// error
+			error_log($method . " " .$data['result']);
 		}
 	}
 	return false;
