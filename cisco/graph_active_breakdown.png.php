@@ -15,7 +15,7 @@ $cpcolors = array(
 	"F" => "red",
 	"C" => "yellow",
 	"duplicate" => "lightgray",
-	"fail" => "#aaaaaa",
+	"nocontacts" => "#aaaaaa",
 	"inprogress" => "blue",
 	"retry" => "cyan",
 	"scheduled" => "darkblue",
@@ -31,7 +31,7 @@ $cpcodes = array(
 	"F" => "Failed",
 	"C" => "Calling",
 	"duplicate" => "Duplicate",
-	"fail" => "No Phone #",
+	"nocontacts" => "No Phone #",
 	"inprogress" => "Queued",
 	"retry" => "Retry",
 	"scheduled" => "Scheduled",
@@ -41,7 +41,7 @@ $cpcodes = array(
 
 $query = "
 select count(*) as cnt,
-		coalesce(if(rp.status = 'nocontacts','fail', null),
+		coalesce(if(rp.status = 'nocontacts','nocontacts', null),
 			if(rc.result not in ('A', 'M', 'blocked', 'duplicate') and rc.numattempts > 0 and rc.numattempts < js.value, 'retry', if(rc.result='notattempted', null, rc.result)),
 			if (rp.status not in ('fail','duplicate','scheduled', 'blocked'), 'inprogress', rp.status))
 			as callprogress2
@@ -55,13 +55,30 @@ group by callprogress2
 ";
 
 
-$data = array();
+$data = array(
+	"A" => false,
+	"M" => false,
+	"B" => false,
+	"N" => false,
+	"X" => false,
+	"F" => false,
+	"C" => false,
+	"duplicate" => false,
+	"nocontacts" => false,
+	"inprogress" => false,
+	"retry" => false,
+	"scheduled" => false
+);
 $legend = array();
 $colors = array();
 
 if ($result = Query($query)) {
 	while ($row = DBGetRow($result)) {
-		$data[] = $row[0];
+		if($row[1] == "fail"){
+			$row[1] = "F";
+			$data[$row[1]] += $row[0];
+		}else
+			$data[$row[1]] = $row[0];
 
 		$legend[] = $cpcodes[$row[1]] . ": %d";
 		$colors[] = $cpcolors[$row[1]];
