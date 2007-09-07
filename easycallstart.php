@@ -95,7 +95,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				$task->setData('callerid', getSystemSetting('callerid'));
 				$name = GetFormData($f, $s, 'name');
 				if($name == "")
-					$name = "EasyCall - " . date("M d, Y G:i:s");
+					$name = "EasyCall - " . date("M d, Y g:i a");
 				$task->setData('name', $name);
 				$task->setData('origin', "start");
 				$task->setData('userid', $USER->id);

@@ -31,23 +31,23 @@ for($i = 0; $i < $count; $i++){
 	$langnum = "language" . $i;
 	$languages[$i] = $specialtask->getData($langnum);
 }
-	
+
 if (!$specialtask->getData('jobid')) {
 	$job = Job::jobWithDefaults();
 	//get the job name, type, and messageid
 
 	$name = $specialtask->getData('name');
-	
+
 	if (!$name)
-		$name = "EasyCall - " . date("M d, Y G:i:s");
+		$name = "EasyCall - " . date("M d, Y g:i a");
 	$job->name = $name;
-	$job->description = "EasyCall - " . date("M d, Y G:i:s");
+	$job->description = "EasyCall - " . date("M d, Y g:i a");
 	$type = $specialtask->getData('jobtypeid');
 	$job->listid = $specialtask->getData('listid');
 	$job->jobtypeid = $type;
 	$job->sendphone = true;
 	$job->type = "phone";
-	
+
 	if($messages) {
 		foreach($messages as $index => $message){
 			if($languages[$index] == "Default"){
