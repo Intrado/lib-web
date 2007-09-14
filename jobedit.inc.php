@@ -202,31 +202,29 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->endtime = date("H:i", strtotime($job->endtime));
 			$job->userid = $USER->id;
 
-			// now that the job is created, we can save the jobsettings
 			// make sure we don't resave these options on an already submitted or completed job
 			if(!$submittedmode && !$completedmode) {
 				$job->setOption("callall",GetFormData($f,$s,"callall"));
 				$job->setOption("callfirst",!GetFormData($f,$s,"callall"));
 				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
+				
+				if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
+					$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
+				} else {
+					$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
+					$job->setOptionValue("callerid", $callerid);
+				}
+	
+				if (getSystemSetting('retry') != "")
+					$job->setOptionValue("retry",getSystemSetting('retry'));
+	
+				if ($USER->authorize("leavemessage"))
+					$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
+				
 			}
 			$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 			$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));
-
-			if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
-				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
-			} else {
-				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-				$job->setOptionValue("callerid", $callerid);
-			}
-
-			if (getSystemSetting('retry') != "")
-				$job->setOptionValue("retry",getSystemSetting('retry'));
-
-			if ($USER->authorize("leavemessage"))
-				$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
-
-
 
 			if ($job->id) {
 				$job->update();
