@@ -189,7 +189,7 @@ if( $reloadform ) {
 	$maxusers = getCustomerSystemSetting('_maxusers', false, true, $custdb);
 	if($maxusers == "unlimited")
 		$maxusers = "";
-	PutFormData($f,$s,"maxusers", $maxusers, "number", 0, 100);
+	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
 	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 
