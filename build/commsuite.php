@@ -1,19 +1,15 @@
 <?
 $commsuitedbname = "commsuite";  //new db name
 $olddbname = "dialer"; //old db name
-$initpath = "/commsuite/init/";  //path where all init files exist, for linux only
+$initpath = "/usr/commsuite/init/";  //path where all init files exist, for linux only
 
-if($argc < 2)
-	exit("Usage: dbuser, dbpassword");
-	
+$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+$dbuser = $SETTINGS['db']['user'];
+$dbpass = $SETTINGS['db']['pass'];
+
 $type = installtype();
-$type = trim($type);
-if(!in_array($type, array("upgrade", "new"))){
-	exit("That was not an option");
-}
+$answer = confirmmangle();
 
-$dbuser = $argv[1];
-$dbpass = $argv[2];
 echo "Connecting to mysql\n";
 $custdb = mysql_connect("127.0.0.1", $dbuser, $dbpass);
 
@@ -29,15 +25,7 @@ if($type == "upgrade"){
 	echo "No active jobs found.\n";
 }
 
-$system = systemtype();
-$system = trim($system);
-
-if($system == "linux"){
-	echo "Shutting down services\n";
-	foreach(array("httpd", "dialer", "tasksync", "tomcat", "jtapi") as $service){
-		exec($initpath . $service . " stop");
-	}
-} elseif($system == "windows"){
+if(isset($WINDIR)){
 	echo "Shutting down services\n";
 	$output = array();
 	foreach(array("Apache2", "csDialer", "csTasksync", "csTomcat", "csjtapi") as $service){
@@ -46,8 +34,15 @@ if($system == "linux"){
 		echoarray($output);
 	}
 } else {
-	exit("That was not an option\n");
+	echo "Shutting down services\n";
+	foreach(array("httpd", "dialer", "tasksync", "tomcat", "jtapi") as $service){
+		$output = array();
+		echo "Stopping $service\n";
+		exec($initpath . $service . " stop", $output);
+		echoarray($output);
+	}
 }
+
 
 echo "Creating database\n";
 mysql_query("create database $commsuitedbname",$custdb) 
@@ -67,8 +62,6 @@ if($type == "new"){
 	executeSqlFile("commsuitedefaults.sql");
 	echo "Defaults loaded.\n";
 } else if($type == "upgrade"){
-	$answer = confirmmangle();
-	$answer = trim($answer);
 	if($answer == "y"){
 		mysql_select_db($olddbname);
 		echo "Mangling\n";
@@ -101,24 +94,33 @@ function executeSqlFile($sqlfile, $replace = false){
 }
 
 function confirmmangle(){
-	echo "Mangling old db to convert data and then extracting to new db.\n";
-	echo "If you did not back-up the database, hit n\n";
-	echo "Are you sure you want to continue? y or n\n";
-	return fread(STDIN, 1024);
-}
-
-function systemtype(){
-	echo "Is this a 'windows' or 'linux'?\n";
-	return fread(STDIN, 1024);
+	$questions = array();
+	$questions[] = "Mangling old db to convert data and then extracting to new db.";
+	$questions[] = "If you did not back-up the database, hit n";
+	$questions[] = "Are you sure you want to continue? y or n";
+	return generalmenu($questions, array("y", "n"));
 }
 
 function installtype(){
-	echo "Is this 'new' or 'upgrade'?\n";
-	return fread(STDIN, 1024);
+	$questions = array();
+	$questions[] = "Is this 'new' or 'upgrade'?";
+	return generalmenu($questions, array("new", "upgrade"));
 }
 function echoarray($somearray){
 	foreach($somearray as $line){
 		echo $line . "\n";
 	}
+}
+
+function generalmenu($questions = array(), $validresponses = array()){
+	echoarray($questions);
+	$response = fread(STDIN, 1024);
+	$response = trim($response);
+	while(!in_array($response, $validresponses)){
+		echo "That was not an option\n";
+		$response = fread(STDIN, 1024);
+		$response = trim($response);
+	}
+	return $response;
 }
 ?>
