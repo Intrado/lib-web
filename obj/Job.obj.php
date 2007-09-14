@@ -32,7 +32,7 @@ class Job extends DBMappedObject {
 	var $sendemail;
 	var $sendprint;
 
-	var $optionsarray = array(); //options to update
+	var $optionsarray = null; //options to update
 
 
 	function Job ($id = NULL) {
@@ -202,12 +202,14 @@ class Job extends DBMappedObject {
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
-		parent::update($specificfields,$updatechildren);
+		$success = parent::update($specificfields,$updatechildren);
 
-//		var_dump($this->optionsarray);
-		foreach ($this->optionsarray as $name => $value) {
-			QuickUpdate("update jobsetting set value='" . DBSafe($value) . "' where jobid=$this->id and name='" . DBSafe($name) . "'");
+		if($success){
+			foreach ($this->optionsarray as $name => $value) {
+				QuickUpdate("update jobsetting set value='" . DBSafe($value) . "' where jobid=$this->id and name='" . DBSafe($name) . "'");
+			}
 		}
+		return $success;
 	}
 
 	function create($specificfields = NULL, $createchildren = false) {
@@ -217,22 +219,25 @@ class Job extends DBMappedObject {
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
-		parent::create($specificfields, $createchildren);
-
-		// now we have a jobid to create the jobsettings with
-		foreach ($this->optionsarray as $name => $value) {
-			QuickUpdate("insert into jobsetting (jobid,name,value) values ($this->id,'" . DBSafe($name) . "','" . DBSafe($value) . "')");
+		$id = parent::create($specificfields, $createchildren);
+		
+		if($id){
+			// now we have a jobid to create the jobsettings with
+			foreach ($this->optionsarray as $name => $value) {
+				QuickUpdate("insert into jobsetting (jobid,name,value) values ($this->id,'" . DBSafe($name) . "','" . DBSafe($value) . "')");
+			}
 		}
+		return $id;
+	}
+
+	function loadSettings(){
+	
+		$this->$optionsarray = QuickQueryList("select name,value from jobsetting where jobid='$this->id'", true);
 	}
 
 	function getSetting ($name, $defaultvalue = false, $refresh = false) {
-		if (sizeof($this->optionsarray) == 0 || $refresh) {
-			$this->optionsarray = array();
-			if ($res = Query("select name,value from jobsetting where jobid='$this->id'")) {
-				while ($row = DBGetRow($res)) {
-					$this->optionsarray[$row[0]] = $row[1];
-				}
-			}
+		if ($this->optionsarray == null || $refresh) {
+			loadSettings();
 		}
 
 		if (isset($this->optionsarray[$name]))
