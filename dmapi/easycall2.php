@@ -11,58 +11,71 @@ include_once("../obj/AudioFile.obj.php");
 $specialtask = new specialtask($SESSIONDATA['specialtaskid']);
 $phone = $specialtask->getData('phonenumber');
 //$callerid = $specialtask->getData('callerid');
-
+$error = 0;
 if($REQUEST_TYPE == "new") {
 	?>
 	<error> Got new when wanted continue </error>
 	<?
 } else {
 	if(isset($BFXML_VARS['saveaudio']) &&  $BFXML_VARS['saveaudio']== 1){
-		$user = new user($specialtask->getData('userid'));
-		$audio = new AudioFile();
-		$audio->userid =$specialtask->getData('userid');
-		$name = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
-		if(QuickQuery("select count(*) from audiofile where userid = '$user->id' and deleted = 0
-					and name = '" . DBSafe($name) ."'"))
-			$name = $name ."-". date("M d, Y G:i:s");
-
-		$audio->name = $name;
-		$audio->contentid = $BFXML_VARS['recordaudio'];
-		$audio->recorddate = date("Y-m-d G:i:s");
-		$audio->update();
-
-		$BFXML_VARS['audiofileid'] = $audio->id;
-		$BFXML_VARS['saveaudio']=NULL;
-		$BFXML_VARS['recordaudio']=NULL;
-
-		$message = new Message();
-		$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
-		if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0'
-						and name = '" . DBSafe($messagename) . "'"))
-			$messagename = $messagename . " - " . date("M d, Y G:i:s");
-		$message->name = $messagename;
-		$message->description = "Easy Call - " . $messagename;
-		$message->type = "phone";
-		$message->userid = $user->id;
-		$message->create();
-
-		$part = new MessagePart();
-		$part->messageid = $message->id;
-		$part->type = "A";
-		$part->audiofileid = $audio->id;
-		$part->sequence = 0;
-		$part->create();
-
-		$count = $specialtask->getData('count');
-		$messnum = "message" . $count;
-		$messageid = $message->id;
-		$specialtask->setData($messnum, $messageid);
-		$count++;
-		$specialtask->setData("count", $count);
-		$specialtask->update();
+		$contentid = $BFXML_VARS['recordaudio']+0;
+		if($contentid <= 0){
+?>
+			<voice sessionid="<?= $SESSIONID ?>">
+				<message>
+					<hangup />
+				</message>
+			</voice>
+<?
+			$error = 1;
+		} else {
+	
+			$user = new user($specialtask->getData('userid'));
+			$audio = new AudioFile();
+			$audio->userid =$specialtask->getData('userid');
+			$name = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
+			if(QuickQuery("select count(*) from audiofile where userid = '$user->id' and deleted = 0
+						and name = '" . DBSafe($name) ."'"))
+				$name = $name ."-". date("M d, Y G:i:s");
+	
+			$audio->name = $name;
+			$audio->contentid = $contentid;
+			$audio->recorddate = date("Y-m-d G:i:s");
+			$audio->update();
+	
+			$BFXML_VARS['audiofileid'] = $audio->id;
+			$BFXML_VARS['saveaudio']=NULL;
+			$BFXML_VARS['recordaudio']=NULL;
+	
+			$message = new Message();
+			$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
+			if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0'
+							and name = '" . DBSafe($messagename) . "'"))
+				$messagename = $messagename . " - " . date("M d, Y G:i:s");
+			$message->name = $messagename;
+			$message->description = "Easy Call - " . $messagename;
+			$message->type = "phone";
+			$message->userid = $user->id;
+			$message->create();
+	
+			$part = new MessagePart();
+			$part->messageid = $message->id;
+			$part->type = "A";
+			$part->audiofileid = $audio->id;
+			$part->sequence = 0;
+			$part->create();
+	
+			$count = $specialtask->getData('count');
+			$messnum = "message" . $count;
+			$messageid = $message->id;
+			$specialtask->setData($messnum, $messageid);
+			$count++;
+			$specialtask->setData("count", $count);
+			$specialtask->update();
+		}
 
 	}
-	if($REQUEST_TYPE == "result") {
+	if($REQUEST_TYPE == "result" || $error) {
 
 		$count = $specialtask->getData("count");
 		$totalamount = $specialtask->getData("totalamount");
