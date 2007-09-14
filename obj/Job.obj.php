@@ -189,7 +189,7 @@ class Job extends DBMappedObject {
 
 	function refresh($specificfields = NULL, $refreshchildren = false) {
 		parent::refresh($specificfields, $refreshchildren);
-		$this->optionsarray = array();
+		$this->loadSettings();
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
@@ -202,14 +202,18 @@ class Job extends DBMappedObject {
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
-		$success = parent::update($specificfields,$updatechildren);
-
-		if($success){
+		parent::update($specificfields,$updatechildren);
+		
+		if($this->id){
+			QuickUpdate("delete from jobsetting where jobid='$this->id'");
 			foreach ($this->optionsarray as $name => $value) {
-				QuickUpdate("update jobsetting set value='" . DBSafe($value) . "' where jobid=$this->id and name='" . DBSafe($name) . "'");
+				QuickUpdate("insert into jobsetting (jobid,name,value) values ('$this->id','" . DBSafe($name) . "','" . DBSafe($value) . "')");
 			}
 		}
-		return $success;
+		if($this->id){
+			return true;
+		}
+		return false;
 	}
 
 	function create($specificfields = NULL, $createchildren = false) {
@@ -231,13 +235,14 @@ class Job extends DBMappedObject {
 	}
 
 	function loadSettings(){
-	
-		$this->$optionsarray = QuickQueryList("select name,value from jobsetting where jobid='$this->id'", true);
+		if($this->id){
+			$this->optionsarray = QuickQueryList("select name,value from jobsetting where jobid='$this->id'", true);
+		}
 	}
 
 	function getSetting ($name, $defaultvalue = false, $refresh = false) {
 		if ($this->optionsarray == null || $refresh) {
-			loadSettings();
+			$this->loadSettings();
 		}
 
 		if (isset($this->optionsarray[$name]))
@@ -247,6 +252,11 @@ class Job extends DBMappedObject {
 	}
 
 	function setSetting ($name, $value) {
+		
+		if($this->optionsarray == null)
+			$this->loadSettings();
+		if($this->optionsarray == null)
+			$this->optionsarray = array();
 		$this->optionsarray[$name] = $value;
 	}
 
