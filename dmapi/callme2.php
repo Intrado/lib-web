@@ -20,16 +20,7 @@ if($REQUEST_TYPE == "new") {
 
 	if(isset($BFXML_VARS['saveaudio']) && $BFXML_VARS['saveaudio'] == 1){
 		$contentid = $BFXML_VARS['recordaudio']+0;
-		if($contentid <= 0){
-?>
-			<voice sessionid="<?= $SESSIONID ?>">
-				<message>
-					<hangup />
-				</message>
-			</voice>
-<?
-			$error = 1;
-		} else {
+		if($contentid > 0){
 			$user = new user($specialtask->getData('userid'));
 			$audio = new AudioFile();
 			$audio->userid =$specialtask->getData('userid');
@@ -86,6 +77,8 @@ if($REQUEST_TYPE == "new") {
 				$specialtask->setData($messnum, $message);
 				$specialtask->update();
 			}
+		} else {
+			$error = 1;
 		}
 	}
 
