@@ -7,11 +7,10 @@ include_once("../obj/SpecialTask.obj.php");
 include_once("../obj/Message.obj.php");
 include_once("../obj/MessagePart.obj.php");
 include_once("../obj/AudioFile.obj.php");
-
+$error = 0;
 $specialtask = new specialtask($SESSIONDATA['specialtaskid']);
 $phone = $specialtask->getData('phonenumber');
 //$callerid = $specialtask->getData('callerid');
-$error = 0;
 if($REQUEST_TYPE == "new") {
 	?>
 	<error> Got new when wanted continue </error>
@@ -19,16 +18,7 @@ if($REQUEST_TYPE == "new") {
 } else {
 	if(isset($BFXML_VARS['saveaudio']) &&  $BFXML_VARS['saveaudio']== 1){
 		$contentid = $BFXML_VARS['recordaudio']+0;
-		if($contentid <= 0){
-?>
-			<voice sessionid="<?= $SESSIONID ?>">
-				<message>
-					<hangup />
-				</message>
-			</voice>
-<?
-			$error = 1;
-		} else {
+		if($contentid > 0{
 	
 			$user = new user($specialtask->getData('userid'));
 			$audio = new AudioFile();
@@ -72,16 +62,24 @@ if($REQUEST_TYPE == "new") {
 			$count++;
 			$specialtask->setData("count", $count);
 			$specialtask->update();
+		} else {
+			$error = 1;
 		}
-
 	}
-	if($REQUEST_TYPE == "result" || $error) {
+	if($REQUEST_TYPE == "result") {
 
 		$count = $specialtask->getData("count");
 		$totalamount = $specialtask->getData("totalamount");
-		if($count < $totalamount) {
+		if($error){
 			$specialtask->status = "done";
-			$specialtask->setData("progress", "Messages Remain");
+			$specialtask->setData("progress", "Call Ended");
+			$specialtask->setData("error",  "saveerror");
+			$specialtask->update();
+			forwardToPage("easycall3.php");
+		}else if($count < $totalamount) {
+			$specialtask->status = "done";
+			$specialtask->setData("progress", "Call Ended");
+			$specialtask->setData("error", "messagesremain");
 			$specialtask->update();
 			forwardToPage("easycall3.php");
 		} else {
