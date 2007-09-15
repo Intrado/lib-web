@@ -34,7 +34,8 @@ if($REQUEST_TYPE == "new") {
 	<?
 } else if($REQUEST_TYPE == "result") {
 	$specialtask->status = "done";
-	$specialtask->setData("progress", "Hung up");
+	$specialtask->setData("progress", "Call Ended");
+	$specialtask->setData("error", "callended");
 	$specialtask->update();
 	?>
 		<ok />
