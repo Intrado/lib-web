@@ -19,25 +19,21 @@ if (!$USER->authorize("starteasy")) {
 
 
 $specialtask = new SpecialTask($_GET['taskid']);
-
-if($specialtask->getData("progress") == "Done") {
+$progress = $specialtask->getData("progress");
+$error = $specialtask->getData("error");
+if($progress == "Done") {
 	redirect("easycallsubmit.php?taskid=" . $_GET['taskid']);
 } else {
 	$currlang = $specialtask->getData("currlang");
-	$progress = $specialtask->getData("progress");
 
-	if($progress == "Hung up") {
-		$specialtask->setData('error', "The phone call ended earlier than expected. Please check your phone connectivity");
-	} else if ($progress == "Messages Remain"){
-		$specialtask->setData('error', "The phone call ended earlier than expected. There are still more messages to be recorded");
+	if($error == "callended") {
+		$errormsg = "The phone call ended earlier than expected. Please check your phone connectivity";
+	} else if ($error == "messagesremain"){
+		$errormsg = "The phone call ended earlier than expected. There are still more messages to be recorded";
+	} else if($error == "saveerror"){
+		$errormsg = "There was an error saving the message.";
 	}
-
-	$specialtask->lastcheckin = date("Y-m-d H:i:s");
-	$specialtask->update();
 }
-
-$error = $specialtask->getData('error');
-
 
 $TITLE = 'EasyCall';
 
@@ -63,7 +59,7 @@ if (!$error) {
 } else {
 ?>
 	<div style="text-align: center; width: 100%; padding: 3px;">
-		<span style="color: red;">There was an error during the call: <?=$error?>.</span><br>
+		<span style="color: red;">There was an error during the call: <?=$errormsg?>.</span><br>
 		Please check the phone number and <a href="easycallstart.php?retry=<?= $specialtask->id ?>">try again</a>
 	</div>
 <?
