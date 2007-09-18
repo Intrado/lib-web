@@ -22,7 +22,12 @@ if(stat("../inc/settings.ini.php")){
 }
 
 $type = installtype();
-$answer = confirmmangle();
+if($type == "upgrade"){
+	$answer = confirmmangle();
+	if($answer != "y"){
+		exit("Exiting");
+	}
+}
 
 echo "Connecting to mysql\n";
 $custdb = mysql_connect("127.0.0.1", $dbuser, $dbpass);
@@ -79,18 +84,14 @@ if($type == "new"){
 	executeSqlFile("commsuitedefaults.sql");
 	echo "Defaults loaded.\n";
 } else if($type == "upgrade"){
-	if($answer == "y"){
-		mysql_select_db($olddbname);
-		echo "Mangling\n";
-		executeSqlFile("commsuitemangle.sql");
-		echo "Extracting old database to new database\n";
-		$output = array();
-		exec("php extract_customer.php", $output);
-		echoarray($output);
-		echo "Old database extracted\n";
-	} else {
-		exit("Exiting.\n");
-	}
+	mysql_select_db($olddbname);
+	echo "Mangling\n";
+	executeSqlFile("commsuitemangle.sql");
+	echo "Extracting old database to new database\n";
+	$output = array();
+	exec("php extract_customer.php", $output);
+	echoarray($output);
+	echo "Old database extracted\n";
 }
 
 echo "Done.\n";
@@ -112,7 +113,7 @@ function executeSqlFile($sqlfile, $replace = false){
 
 function confirmmangle(){
 	$questions = array();
-	$questions[] = "Mangling old db to convert data and then extracting to new db.";
+	$questions[] = "The old db will be mangled to convert data and then extracted to the new db.";
 	$questions[] = "If you did not back-up the database, hit n";
 	$questions[] = "Are you sure you want to continue? y or n";
 	return generalmenu($questions, array("y", "n"));
