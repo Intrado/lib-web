@@ -216,7 +216,7 @@ function genpassword() {
 
 //-------------------------------------------------------------------
 
-$result = mysql_query("select hostname, inboundnumber from customer where id = '$customerid'", $db)
+$result = mysql_query("select inboundnumber from customer where id = '$customerid'", $db)
 			or die ("Failed to query customer: " . mysql_error($db));
 
 $row = mysql_fetch_row($result) or die ("Failed to query customer: $customerid");
@@ -224,8 +224,8 @@ $row = mysql_fetch_row($result) or die ("Failed to query customer: $customerid")
 echo "Doing $customerid\n";
 
 $custpass = genpassword();
-$destres = mysql_query("insert into customer(urlcomponent, inboundnumber) values ('$row[0]', '$row[1]')", $custdb)
-						or die("Failed to insert new customer into auth server: " . mysql_error($custdb));
+$destres = mysql_query("update customer set inboundnumber = '$row[0]' where id = '$customerid'", $custdb)
+						or die("Failed to update customer inboundnumber: " . mysql_error($custdb));
 
 //SETTING
 copytable($customerid,"setting",array("id", "name", "value"),$db,$custdb,1000,false);
