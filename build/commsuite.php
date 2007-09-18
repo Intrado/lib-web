@@ -92,6 +92,10 @@ if($type == "new"){
 	exec("php extract_customer.php", $output);
 	echoarray($output);
 	echo "Old database extracted\n";
+	echo "Updating Settings File\n";
+	$output = array();
+	exec("php create_new_settings.php", $output);
+	echoarray($output);
 }
 
 echo "Done.\n";
