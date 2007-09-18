@@ -152,19 +152,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			PopulateForm($f,$s,$job,$fields);
 
-			if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
-				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
-			} else {
-				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-				$job->setOptionValue("callerid", $callerid);
-			}
-
-			if (getSystemSetting('retry') != "")
-				$job->setOptionValue("retry",getSystemSetting('retry'));
-
-			if ($USER->authorize("leavemessage"))
-				$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
-
 			if ($JOBTYPE == "repeating") {
 				$schedule = new Schedule($job->scheduleid);
 				$schedule->time = date("H:i", strtotime(GetFormData($f,$s,"scheduletime")));
