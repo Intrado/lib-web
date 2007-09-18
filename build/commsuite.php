@@ -3,9 +3,23 @@ $commsuitedbname = "commsuite";  //new db name
 $olddbname = "dialer"; //old db name
 $initpath = "/usr/commsuite/init/";  //path where all init files exist, for linux only
 
-$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-$dbuser = $SETTINGS['db']['user'];
-$dbpass = $SETTINGS['db']['pass'];
+if(stat("../inc/settings.ini.php")){
+	$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+	$dbuser = $SETTINGS['db']['user'];
+	$dbpass = $SETTINGS['db']['pass'];
+} else {
+	//if file cant be found, prompt user for db connection info
+	$confirm = "n";
+	while($confirm != "y"){
+		echo "\nEnter DB User:\n";
+		$dbuser = trim(fread(STDIN, 1024));
+		echo "\nEnter DB Pass:\n";
+		$dbpass = trim(fread(STDIN, 1024));
+		echo "DBUSER: " . $dbuser . "\n";
+		echo "DBPASS: " . $dbpass . "\n";
+		$confirm = generalMenu(array("Is this information correct?", "y or n"), array("y", "n"));
+	}
+}
 
 $type = installtype();
 $answer = confirmmangle();
@@ -25,15 +39,18 @@ if($type == "upgrade"){
 	echo "No active jobs found.\n";
 }
 
-if(isset($WINDIR)){
+if(isset($_ENV['WINDIR'])){
+	echo "Windows Machine\n";
 	echo "Shutting down services\n";
 	$output = array();
 	foreach(array("Apache2", "csDialer", "csTasksync", "csTomcat", "csjtapi") as $service){
+		$output = array();
 		echo "Stopping $service\n";
 		exec("net stop $service", $output);
 		echoarray($output);
 	}
 } else {
+	echo "Linux Machine\n";
 	echo "Shutting down services\n";
 	foreach(array("httpd", "dialer", "tasksync", "tomcat", "jtapi") as $service){
 		$output = array();
@@ -117,7 +134,7 @@ function generalmenu($questions = array(), $validresponses = array()){
 	$response = fread(STDIN, 1024);
 	$response = trim($response);
 	while(!in_array($response, $validresponses)){
-		echo "That was not an option\n";
+		echo "\nThat was not an option\n";
 		$response = fread(STDIN, 1024);
 		$response = trim($response);
 	}
