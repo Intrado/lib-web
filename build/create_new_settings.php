@@ -30,7 +30,7 @@ function deleteSection($fileLines, $sectionName){
 	echo "Deleting this section: " . $sectionName . "\n\n";
 	$commentmarker = array();
 	$start = null;
-	$end = 0;
+	$end = null;
 	foreach($fileLines as $index => $line){
 		$line = trim($line);
 		if(ereg("^\[$sectionName\]", $line)){
@@ -43,6 +43,9 @@ function deleteSection($fileLines, $sectionName){
 			// find the next section and set limit one line before it
 			$end = $index-1;
 			break;
+		}
+		if($index == (count($fileLines)-1) && $end == null && $start != null){
+			$end = $index;
 		}
 	}
 
