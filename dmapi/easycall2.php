@@ -18,7 +18,7 @@ if($REQUEST_TYPE == "new") {
 } else {
 	if(isset($BFXML_VARS['saveaudio']) &&  $BFXML_VARS['saveaudio']== 1){
 		$contentid = $BFXML_VARS['recordaudio']+0;
-		if($contentid > 0{
+		if($contentid > 0){
 	
 			$user = new user($specialtask->getData('userid'));
 			$audio = new AudioFile();
