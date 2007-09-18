@@ -177,7 +177,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				//	like dates before 1970, and using 0 makes windows think it's 12/31/69
 				$job->startdate = date("Y-m-d", 86400);
 				$job->enddate = date("Y-m-d", ($numdays * 86400));
-			} else if ($JOBTYPE == 'normal') {
+			} else if ($JOBTYPE == 'normal' && !$completedmode) {
 				$numdays = GetFormData($f, $s, 'numdays');
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			}
@@ -203,16 +203,17 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$job->setOptionValue("callerid", $callerid);
 				}
 	
-				if (getSystemSetting('retry') != "")
-					$job->setOptionValue("retry",getSystemSetting('retry'));
-	
 				if ($USER->authorize("leavemessage"))
 					$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
 				
 			}
-			$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
-			$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));
-
+			if(!$completedmode){
+				if (getSystemSetting('retry') != "")
+					$job->setOptionValue("retry",getSystemSetting('retry'));
+					
+				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
+				$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));
+			}
 			if ($job->id) {
 				$job->update();
 				status('Updated Job information successfully');
