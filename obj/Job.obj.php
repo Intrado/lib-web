@@ -121,11 +121,6 @@ class Job extends DBMappedObject {
 							select $newjob->id, messageid, type,language
 							from joblanguage where jobid=$this->id");
 
-						//copy all the jobsetting
-						QuickUpdate("insert into jobsetting (jobid,name,value) " .
-							"select $newjob->id, name, value " .
-							"from jobsetting where jobid=$this->id");
-
 						// update the retry setting - it may have changed since the repeater was created
 						if (getSystemSetting('retry') != "")
 							$newjob->setOptionValue("retry",getSystemSetting('retry'));
