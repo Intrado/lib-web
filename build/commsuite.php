@@ -30,7 +30,8 @@ if($type == "upgrade"){
 }
 
 echo "Connecting to mysql\n";
-$custdb = mysql_connect("127.0.0.1", $dbuser, $dbpass);
+$custdb = mysql_connect("127.0.0.1", $dbuser, $dbpass)
+	or die("Failed to connect to database");
 
 if($type == "upgrade"){
 	mysql_select_db($olddbname);
@@ -48,7 +49,11 @@ if(isset($_ENV['WINDIR'])){
 	echo "Windows Machine\n";
 	echo "Shutting down services\n";
 	$output = array();
-	foreach(array("Apache2", "csDialer", "csTasksync", "csTomcat", "csjtapi") as $service){
+	if($type == "upgrade")
+		$services = array("Apache2", "csDialer", "csTasksync", "csTomcat", "csjtapi");
+	else
+		$services = array("Apache2", "csRedialer", "csReportServer", "csTomcat", "csjtapi");
+	foreach( $services as $service){
 		$output = array();
 		echo "Stopping $service\n";
 		exec("net stop $service", $output);
@@ -57,7 +62,11 @@ if(isset($_ENV['WINDIR'])){
 } else {
 	echo "Linux Machine\n";
 	echo "Shutting down services\n";
-	foreach(array("httpd", "dialer", "tasksync", "tomcat", "jtapi") as $service){
+	if($type == "upgrade")
+		$services = array("httpd", "dialer", "tasksync", "tomcat", "jtapi")
+	else
+		$services = array("httpd", "redialer", "reportserver", "tomcat", "jtapi")
+	foreach($services as $service){
 		$output = array();
 		echo "Stopping $service\n";
 		exec($initpath . $service . " stop", $output);
