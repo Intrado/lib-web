@@ -1,6 +1,11 @@
 <?
 $settingsiniphp = "../inc/settings.ini.php";
+$oldsettings = "../inc/settings.ini.php.backup";
 $outfile = "test.ini.php";
+if(rename($settingsiniphp, $oldsettings)){
+	$outfile = $settingsiniphp;
+	$settingsiniphp = $oldsettings;
+}
 
 $outfilefp = fopen($outfile, "w");
 
@@ -80,7 +85,7 @@ function addLines($fileLines, $linesToAdd, $start){
 //return line number of section start
 function findSection($fileLines, $sectionName){
 	echo "Finding Section: " . $sectionName . "\n\n";
-	$linenumber;
+	$linenumber = null;
 	foreach($fileLines as $index => $line){
 		if(ereg("^\[$sectionName\]", $line)){
 			$linenumber = $index;
@@ -96,6 +101,8 @@ function replaceSection($fileLines, $sectionName, $linesToAdd){
 	echo "\n";
 	
 	$lineToReplace = findSection($fileLines, $sectionName);
+	if($lineToReplace == null)
+		return $fileLines;
 	$fileLines = deleteSection($fileLines, $sectionName);
 	$fileLines = addLines($fileLines, $linesToAdd, $lineToReplace);
 	return $fileLines;
