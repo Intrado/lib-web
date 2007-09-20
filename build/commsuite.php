@@ -3,11 +3,16 @@ $commsuitedbname = "commsuite";  //new db name
 $olddbname = "dialer"; //old db name
 $initpath = "/usr/commsuite/init/";  //path where all init files exist, for linux only
 
+$error = 1;
 if(stat("../inc/settings.ini.php")){
 	$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-	$dbuser = $SETTINGS['db']['user'];
-	$dbpass = $SETTINGS['db']['pass'];
-} else {
+	if(isset($SETTINGS['db']['user'])){
+		$dbuser = $SETTINGS['db']['user'];
+		$dbpass = $SETTINGS['db']['pass'];
+		$error = 0;
+	}
+}
+if($error)
 	//if file cant be found, prompt user for db connection info
 	$confirm = "n";
 	while($confirm != "y"){
