@@ -12,7 +12,7 @@ if(stat("../inc/settings.ini.php")){
 		$error = 0;
 	}
 }
-if($error)
+if($error){
 	//if file cant be found, prompt user for db connection info
 	$confirm = "n";
 	while($confirm != "y"){
