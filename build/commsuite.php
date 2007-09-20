@@ -68,9 +68,9 @@ if(isset($_ENV['WINDIR'])){
 	echo "Linux Machine\n";
 	echo "Shutting down services\n";
 	if($type == "upgrade")
-		$services = array("httpd", "dialer", "tasksync", "tomcat", "jtapi")
+		$services = array("httpd", "dialer", "tasksync", "tomcat", "jtapi");
 	else
-		$services = array("httpd", "redialer", "reportserver", "tomcat", "jtapi")
+		$services = array("httpd", "redialer", "reportserver", "tomcat", "jtapi");
 	foreach($services as $service){
 		$output = array();
 		echo "Stopping $service\n";
