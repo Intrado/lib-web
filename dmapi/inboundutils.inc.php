@@ -17,8 +17,8 @@ function loadUser()
 	if (isset($SESSIONDATA['userid'])) {
 		global $USER, $ACCESS;
 
-		$USER = new User($SESSIONDATA['userid']);
-		$ACCESS = new Access($USER->accessid);
+		$USER = $_SESSION['user'] = new User($SESSIONDATA['userid']);
+		$ACCESS = $_SESSION['access'] = new Access($USER->accessid);
 	} else {
 		glog("ERROR: inboundutils->loadUser() called before SESSIONDATA[userid] was set");
 	}
