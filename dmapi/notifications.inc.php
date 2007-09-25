@@ -56,15 +56,15 @@ function assignTask ($dmapidb) {
 function assignSpecialTask ($dmapidb) {
 	//because we might use persistent connections, ensure that we rollback no matter what
 	function ensure_rollback($dmapidb) {
-		mysql_query("rollback", $dmapidb);
+		mysql_query("unlock tables", $dmapidb);
 	}
 	register_shutdown_function("ensure_rollback",$dmapidb);
 
-	mysql_query("begin", $dmapidb);
+	mysql_query("lock table specialtaskactive write", $dmapidb);
 
 	//get the id of next available task
 	//update the task to assign it to us
-	$query = "select id,customerid,specialtaskid,shardid,type from specialtaskactive limit 1 for update";
+	$query = "select id,customerid,specialtaskid,shardid,type from specialtaskactive limit 1";
 
 	$res = mysql_query($query,$dmapidb) or error_log("mysql had a problem: " . mysql_error());
 	if ($row = mysql_fetch_row($res)) {
@@ -82,7 +82,7 @@ function assignSpecialTask ($dmapidb) {
 		$task = false;
 	}
 
-	mysql_query("commit", $dmapidb);
+	mysql_query("unlock tables", $dmapidb);
 
 	return $task;
 }
