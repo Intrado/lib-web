@@ -21,15 +21,15 @@ function assignTask ($dmapidb) {
 
 	//because we might use persistent connections, ensure that we rollback no matter what
 	function ensure_rollback_task($dmapidb) {
-		mysql_query("rollback", $dmapidb);
+		mysql_query("unlock tables", $dmapidb);
 	}
 	register_shutdown_function("ensure_rollback_task",$dmapidb);
 
-	mysql_query("begin", $dmapidb);
+	mysql_query("lock table jobtaskactive write", $dmapidb);
 
 	//get the id of next available task
 	//update the task to assign it to us
-	$query = "select id,customerid,shardid,tasktime,renderedmessage from jobtaskactive order by tasktime limit 1 for update";
+	$query = "select id,customerid,shardid,tasktime,renderedmessage from jobtaskactive order by tasktime limit 1";
 
 	$res = mysql_query($query,$dmapidb) or error_log("mysql had a problem: " . mysql_error());
 	if ($row = mysql_fetch_row($res)) {
@@ -47,7 +47,7 @@ function assignTask ($dmapidb) {
 		$task = false;
 	}
 
-	mysql_query("commit", $dmapidb);
+	mysql_query("unlock tables", $dmapidb);
 
 	return $task;
 }
