@@ -50,3 +50,25 @@ CREATE TABLE `shard` (
 
 ALTER TABLE `sessiondata` CHANGE `data` `data` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 
+-- RELEASE ASP_2007_09_27 ----------------------------------------
+-- new schema for parent portal ---
+
+CREATE TABLE `portaluser` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`username` VARCHAR( 255 ) NOT NULL ,
+`password` VARCHAR( 50 ) NOT NULL ,
+`firstname` VARCHAR( 100 ) NOT NULL ,
+`lastname` VARCHAR( 100 ) NOT NULL ,
+`zipcode` VARCHAR( 10 ) NOT NULL ,
+`enabled` TINYINT NOT NULL DEFAULT '0',
+UNIQUE (
+`username`
+)
+) ENGINE = innodb;
+
+CREATE TABLE `portalactivation` (
+`activationtoken` VARCHAR( 255 ) NOT NULL ,
+`creation` timestamp NOT NULL default CURRENT_TIMESTAMP ,
+`portaluserid` INT NOT NULL DEFAULT '0'
+) ENGINE = innodb;
+
