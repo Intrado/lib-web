@@ -1,7 +1,6 @@
 <?
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
-require_once("PortalUser.obj.php");
 
 
 if(isset($_GET["logout"])) {
@@ -12,11 +11,9 @@ if (!isset($_SERVER["HTTPS"])){
 	redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/parentportal/index.php");
 }
 $badlogin=false;
-$id = 0;
+$id = false;
 
-if(isset($_SESSION["portaluserid"]))
-	redirect("parentportal.php");
-
+$sessionstarted = false;
 if(isset($_POST["submit"])) {
 
 	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
@@ -26,8 +23,19 @@ if(isset($_POST["submit"])) {
 	if(!$id){
 		$badlogin = true;
 	}
+} else if (!isset($_GET['logout'])){
+	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
+	$sessionstarted = true;
+
+	if (isset($_SESSION['portaluserid'])) {
+		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
+		unset($_SESSION['lasturi']);
+		redirect($redirpage);
+	}
 }
 if($id){
+	if (!$sessionstarted)
+		doStartSession();
 	$_SESSION['portaluserid'] = $id;
 	redirect("choosecustomer.php");
 }
