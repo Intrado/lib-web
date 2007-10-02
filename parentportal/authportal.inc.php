@@ -70,6 +70,96 @@ function portalLogin($username, $password) {
 }
 
 
+function portalGetCustomerAssociations($sessionid) {
+	$params = array(new XML_RPC_Value($sessionid, 'string'));
+	$method = "PortalServer.portal_getCustomerAssociations";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['customeridlist'];
+	}
+	return false;
+}
+
+
+function portalAccessCustomer($sessionid, $customerid) {
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'));
+	$method = "PortalServer.portal_accessCustomer";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		if (doDBConnect($result)) return true;
+	}
+	return false;
+}
+
+
+function portalGetSessionData($id) {
+	$params = array(new XML_RPC_Value($id, 'string'));
+	$method = "PortalServer.portal_getSessionData";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		$sess_data = base64url_decode($result['sessionData']);
+		if ($result['dbhost']) {
+			doDBConnect($result);
+		}
+		return $sess_data;
+	}
+	return "";
+}
+
+
+function portalPutSessionData($id, $sess_data) {
+	$sess_data = base64url_encode($sess_data);
+
+	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value($sess_data, 'string'));
+	$method = "PortalServer.portal_putSessionData";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) return true;
+	return false;
+}
+
+
+function doDBConnect($result) {
+	global $_DBHOST;
+	global $_DBNAME;
+	global $_DBUSER;
+	global $_DBPASS;
+
+	$_DBHOST = $result['dbhost'];
+	$_DBUSER = $result['dbuser'];
+	$_DBPASS = $result['dbpass'];
+	$_DBNAME = $result['dbname'];
+
+	// 	now connect to the customer database
+	global $_dbcon;
+	$_dbcon = mysql_connect($_DBHOST, $_DBUSER, $_DBPASS);
+	if (!$_dbcon) {
+		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . mysql_error());
+	} else if (mysql_select_db($_DBNAME)) {
+		// successful connection to customer database
+		return true;
+	} else {
+		error_log("Problem selecting database for " . $_DBHOST . " error:" . mysql_error());
+	}
+	return false;
+}
+
+
+function doStartSession() {
+	$todo = "todo"; // TODO unique name, maybe use the portaluser name
+	session_name($todo . "_session");
+	session_start();
+
+// TODO will we use a timezone for the user?
+/*
+	if (isset($_SESSION['timezone'])) {
+		@date_default_timezone_set($_SESSION['timezone']);
+		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
+	}
+*/
+}
 
 
 ?>
