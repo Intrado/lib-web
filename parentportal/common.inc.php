@@ -2,8 +2,6 @@
 
 $SETTINGS = parse_ini_file("parentportalsettings.ini.php",true);
 $IS_COMMSUITE = false;
-$_dbcon = mysql_connect("localhost", "root", "");
-mysql_select_db("authserver");
 
 require_once("XML/RPC.php");
 require_once("authportal.inc.php");
@@ -22,11 +20,9 @@ if(!isset($ppNotLoggedIn)){
 	}
 */
 	doStartSession();
-	if(!isset($_SESSION["portaluser"]))
+	if(!isset($_SESSION["portaluserid"])){
+		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
 		redirect("./?logout=1");
-	else {
-		$PORTALUSER = &$_SESSION['portaluser'];
-		$PORTALUSER->refresh();
 	}
 
 }
