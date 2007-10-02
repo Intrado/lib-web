@@ -9,7 +9,7 @@ if(isset($_GET["logout"])) {
 }
 
 if (!isset($_SERVER["HTTPS"])){
-	redirect($secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/junk/manager/index.php");
+	redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/manager/index.php");
 }
 
 $badlogin=false;
