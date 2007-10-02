@@ -72,3 +72,8 @@ CREATE TABLE `portalactivation` (
 `portaluserid` INT NOT NULL DEFAULT '0'
 ) ENGINE = innodb;
 
+CREATE TABLE `portalcustomer` (
+`portaluserid` INT NOT NULL ,
+`customerid` INT NOT NULL
+) ENGINE = innodb;
+
