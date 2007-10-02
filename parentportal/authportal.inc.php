@@ -101,7 +101,7 @@ function portalGetSessionData($id) {
 	if ($result !== false) {
 		// success
 		$sess_data = base64url_decode($result['sessionData']);
-		if ($result['dbhost']) {
+		if (isset($result['dbhost'])) {
 			doDBConnect($result);
 		}
 		return $sess_data;

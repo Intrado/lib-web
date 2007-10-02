@@ -3,7 +3,10 @@ $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 
 
-if(isset($_GET["logout"])) {
+if (isset($_GET['logout'])) {
+	doStartSession(); // start the session to get the id
+	putSessionData(session_id(), ""); // write empty data to flush the user
+
 	@session_destroy();
 }
 
@@ -31,7 +34,7 @@ if(isset($_POST["submit"])) {
 		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
 		unset($_SESSION['lasturi']);
 		redirect($redirpage);
-	}
+    }
 }
 if($id){
 	if (!$sessionstarted)
