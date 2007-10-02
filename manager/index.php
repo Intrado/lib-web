@@ -8,6 +8,10 @@ if(isset($_GET["logout"])) {
 	@session_destroy();
 }
 
+if (!isset($_SERVER["HTTPS"])){
+	redirect($secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/junk/manager/index.php");
+}
+
 $badlogin=false;
 
 if(isset($_SESSION["aspadminuserid"]))
