@@ -5,7 +5,7 @@ require_once("common.inc.php");
 
 if (isset($_GET['logout'])) {
 	doStartSession(); // start the session to get the id
-	putSessionData(session_id(), ""); // write empty data to flush the user
+	portalputSessionData(session_id(), ""); // write empty data to flush the user
 
 	@session_destroy();
 }
