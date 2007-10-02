@@ -21,7 +21,13 @@ if(!isset($ppNotLoggedIn)){
 		redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/parentportal/index.php?logout=1");
 	}
 */
-	if(!isset($_SESSION["portaluserid"]))
+	doStartSession();
+	if(!isset($_SESSION["portaluser"]))
 		redirect("./?logout=1");
+	else {
+		$PORTALUSER = &$_SESSION['portaluser'];
+		$PORTALUSER->refresh();
+	}
+
 }
 ?>
