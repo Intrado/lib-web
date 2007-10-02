@@ -76,7 +76,7 @@ function portalGetCustomerAssociations($sessionid) {
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
-		return $result['customeridlist'];
+		return $result['custmap'];
 	}
 	return false;
 }
