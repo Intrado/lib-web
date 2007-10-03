@@ -210,7 +210,7 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
 	PutFormData($f,"Save","Save", "");
-	PutFormData($f,"Return","Return", "");
+	PutFormData($f,"Return","Save and Return", "");
 }
 
 include_once("nav.inc.php");
