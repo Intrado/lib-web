@@ -134,6 +134,10 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				setCustomerSystemSetting('_managernote', $managernote, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
+				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
+
+				QuickUpdate("update customer set enableportal = '" . DBSafe(GetFormData($f, $s, 'hasportal')) 
+							. "' where id = '" . $currentid . "'");
 
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
@@ -192,6 +196,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
 	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
@@ -204,6 +209,8 @@ if( $reloadform ) {
 	PutformData($f, $s, "managerpassword", "", "text");
 
 	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
+	PutFormData($f,"Save","Save", "");
+	PutFormData($f,"Return","Return", "");
 }
 
 include_once("nav.inc.php");
@@ -245,6 +252,7 @@ NewForm($f);
 ?>
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
+<tr><td> Has Portal </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?></td></tr>
 <tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!</b></td></tr>
 
 <tr><td>Retry:
