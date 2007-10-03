@@ -12,14 +12,14 @@ if(isset($_GET['token'])){
 	}
 	if($id && isset($_GET['forgot'])) {
 		?>
-		<br>Thank you, you will be redirected in 3 seconds to reset your password.
-		<meta http-equiv="refresh" content="3;url=account.php">
+		<br>Thank you, you will be redirected in 5 seconds to reset your password.
+		<meta http-equiv="refresh" content="5;url=account.php">
 		<?
 	} else if($id) {
 		?>
 		<br>Thank you, your account has been activated.
-		<br>You will be redirected to the welcome page in 10 seconds.
-		<meta http-equiv="refresh" content="10;url=index.php">
+		<br>You will be redirected to the welcome page in 5 seconds.
+		<meta http-equiv="refresh" content="5;url=index.php">
 		<?
 	} else {
 		?>
