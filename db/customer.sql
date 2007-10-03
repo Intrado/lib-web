@@ -1077,4 +1077,13 @@ $$$
 
 update reportperson set iscontacted=1 where status='success'
 $$$
+-- Parent Portal
 
+CREATE TABLE `personportal` (
+`portaluserid` INT NOT NULL ,
+`personid` INT NOT NULL ,
+UNIQUE (
+`portaluserid` ,
+`personid`
+)
+) ENGINE = INNODB;
