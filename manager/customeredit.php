@@ -136,9 +136,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
 
-				QuickUpdate("update customer set enableportal = '" . DBSafe(GetFormData($f, $s, 'hasportal')) 
-							. "' where id = '" . $currentid . "'");
-
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
