@@ -9,14 +9,18 @@ if (isset($_GET['logout'])) {
 
 	@session_destroy();
 }
-
-if (!isset($_SERVER["HTTPS"])){
-	redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/parentportal/index.php");
+/*
+	TODO:unsure if needed
+if ($SETTINGS['feature']['has_ssl']) {
+	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
+		redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/parentportal/index.php");
+	}
 }
+*/
 $badlogin=false;
 $id = false;
-
 $sessionstarted = false;
+
 if(isset($_POST["submit"])) {
 
 	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
