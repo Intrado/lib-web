@@ -25,15 +25,11 @@ if(!isset($ppNotLoggedIn)){
 	if(!isset($_SESSION["portaluserid"])){
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
 		redirect("./?logout=1");
+    } else {
+    	$_SESSION['portaluser'] = portalGetPortalUser($_SESSION['portaluserid']);
     }
 } else {
 	// we are not logged in
 }
-//TODO:Remove once api for portal user fields is complete
-$_SESSION['portaluser']= array();
-$_SESSION['portaluser']['firstname'] = "test";
-$_SESSION['portaluser']['lastname'] = "test2";
-$_SESSION['portaluser']['username'] = "test3";
-$_SESSION['portaluser']['zipcode'] = "99999";
 
 ?>
