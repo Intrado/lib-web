@@ -94,6 +94,40 @@ function portalAccessCustomer($sessionid, $customerid) {
 }
 
 
+function portalForgotPassword($username) {
+	$params = array(new XML_RPC_Value($username, 'string'));
+	$method = "PortalServer.portal_forgotPassword";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// activation email sent
+		return true;
+	}
+	return false;
+}
+
+function portalGetPortalUser($portaluserid) {
+	$params = array(new XML_RPC_Value($portaluserid, 'int'));
+	$method = "PortalServer.portal_getPortalUser";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['portaluser'];
+	}
+	return false;
+}
+
+function portalUpdatePortalUser($portaluserid, $firstname, $lastname, $zipcode) {
+	$params = array(new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($firstname, 'string'), new XML_RPC_Value($lastname, 'string'), new XML_RPC_Value($zipcode, 'string'));
+	$method = "PortalServer.portal_updatePortalUser";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return true;
+	}
+	return false;
+}
+
+
 function portalGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));
 	$method = "PortalServer.portal_getSessionData";
