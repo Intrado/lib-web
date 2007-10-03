@@ -18,7 +18,7 @@ if(!isset($ppNotLoggedIn)){
 
 /*
 	TODO:unsure if needed
-	if (!isset($_SERVER["HTTPS"])){
+	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
 		redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/parentportal/index.php?logout=1");
 	}
 */
@@ -30,6 +30,11 @@ if(!isset($ppNotLoggedIn)){
 } else {
 	// we are not logged in
 }
-
+//TODO:Remove once api for portal user fields is complete
+$_SESSION['portaluser']= array();
+$_SESSION['portaluser']['firstname'] = "test";
+$_SESSION['portaluser']['lastname'] = "test2";
+$_SESSION['portaluser']['username'] = "test3";
+$_SESSION['portaluser']['zipcode'] = "99999";
 
 ?>
