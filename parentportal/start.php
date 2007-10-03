@@ -41,7 +41,7 @@ if($_SESSION['customerid']){
 
 function message_action($row, $index){
 	//index 0 is job id and index 7 is person id
-	return button("Play", NULL, '../../previewmessage.php?jobid=' . $row[0] . '&personid=' . $row[7]);
+	return button("Play", "popup('previewmessage.php?jobid=" . $row[0] . "&personid=" . $row[7] . "', 400, 500);",null);
 }
 
 function sender($row, $index){
@@ -52,7 +52,7 @@ function sender($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$TITLE="Welcome - " . $_SESSION['portaluser']['firstname'] . " " . $_SESSION['portaluser']['lastname'];
+$TITLE="Welcome - " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
 $PAGE = 'welcome:welcome';
 include_once("nav.inc.php");
 startWindow("My messages from the last 30 days");
