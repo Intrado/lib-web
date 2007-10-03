@@ -23,7 +23,7 @@ if($_SESSION['customerid']){
 			inner join user u on (u.id = j.userid)
 			where j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
 			and rp.personid = '" . $personid . "'
-			and j.status not in ('cancelled', 'cancelling')
+			and j.status in ('active', 'complete')
 			order by j.startdate");
 		$data = array();
 		while($row = DBGetRow($result)){
