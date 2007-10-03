@@ -51,36 +51,15 @@ class Person extends DBMappedObject {
 	}
 
 	function getAddress () {
-		$query = "select id from address a where a.personid='" . $this->id . "'";
-		$id = QuickQuery($query);
-		if ($id)
-			return new Address($id);
-		else
-			return false;
+		return DBFind("Address", "from address where personid = '" . $this->id . "'");
 	}
 
 	function getPhones () {
-		$query = "select id,sequence from phone p where p.personid='" . $this->id . "'";
-		$result = Query($query);
-
-		$phones = array();
-		while ($row = DBGetRow($result)) {
-			$phones[$row[1]] = new Phone($row[0]);
-		}
-
-		return $phones;
+		return DBFindMany("Phone", "from phone where personid = '" . $this->id . "'");
 	}
 
 	function getEmails () {
-		$query = "select id,sequence from email e where e.personid='" . $this->id . "'";
-		$result = Query($query);
-
-		$emails = array();
-		while ($row = DBGetRow($result)) {
-			$emails[$row[1]] = new Email($row[0]);
-		}
-
-		return $emails;
+		return DBFindMany("Email", "from email where personid = '" . $this->id . "'");
 	}
 
 }
