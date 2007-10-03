@@ -1,10 +1,29 @@
 <?
 $ppNotLoggedIn = 1;
+require_once("common.inc.php");
+require_once("../inc/html.inc.php");
 
-if(isset($_POST['submit'])){
-	sendNewPassword($_POST['email']);
+$success = false;
+if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
+	$email = get_magic_quotes_gpc() ? stripslashes($_POST['email']) : $_POST['email'];
+	if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email)){
+		error("That is not a valid email address");
+	}
+	if(portalForgotPassword($email)){
+		$success = true;
+		?>
+			<br>A link has been sent to your email address to log in.
+			<br>Please remember to change your password.
+			<br>You will be redirected to the login page in 5 seconds.
+			<meta http-equiv="refresh" content="5;url=index.php">
+		<?
+	} else {
+		?>
+			<br>That email is not in our system.
+		<?
+	}
 }
-
+if(!$success){
 ?>
 
 <form method="POST" action="forgotpassword.php">
@@ -18,3 +37,13 @@ if(isset($_POST['submit'])){
 </form>
 
 <br><a href="index.php">Return to Parent Portal Login</a>
+<?
+}
+
+if(isset($ERRORS) && is_array($ERRORS)) {
+	foreach($ERRORS as $key => $value) {
+		$ERRORS[$key] = addslashes($value);
+	}
+	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
+}
+?>
