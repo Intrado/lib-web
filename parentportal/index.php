@@ -21,7 +21,7 @@ $badlogin=false;
 $id = false;
 $sessionstarted = false;
 
-if(isset($_POST["submit"])) {
+if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
 	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
