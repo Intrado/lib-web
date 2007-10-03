@@ -46,7 +46,7 @@ $PAGE="contacts:contacts";
 $TITLE="Your Contacts";
 include_once("nav.inc.php");
 
-startWindow("Contacts");
+startWindow("Contacts",'padding: 3px;');
 button_bar(button("Add A Contact", null, "addcontact.php"));
 if($data){
 	showObjects($data, $titles, $formatters);

@@ -100,7 +100,7 @@ if($personid){
 	$TITLE .= " - " . $person->$firstnamefield . " " . $person->$lastnamefield;
 }
 include_once("nav.inc.php");
-startWindow("Preferences");
+startWindow("Preferences", 'padding: 3px;');
 ?>
 <table border="1" width="100%" cellpadding="3" cellspacing="1" >
 <?
