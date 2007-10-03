@@ -143,8 +143,9 @@ doNavTabs($NAVTREE);
 	<?= $MAINTABS ?>
 
 	<div class="applinks hoverlinks">
-		<a href="account.php">My Account</a> |
-		<a href="index.php?logout=1">Logout</a>
+		<a href="account.php"/>My Account</a> |
+		<a href="choosecustomer.php?logoutcustomer=1"/>Change Customer</a> |
+		<a href="index.php?logout=1"/>Logout</a>
 	</div>
 
 </div>
