@@ -10,6 +10,9 @@ if(isset($customeridlist) && !(count($customeridlist) > 1)){
 		$_SESSION['customerid'] = $customeridlist[0];
 		$_SESSION['custname'] = $customerlist[$customeridlist[0]];
 		portalAccessCustomer(session_id(), $customeridlist[0]);
+	} else {
+		$_SESSION['customerid'] = 0;
+		$_SESSION['custname'] = "";
 	}
 	redirect("start.php");
 }
