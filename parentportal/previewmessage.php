@@ -82,7 +82,7 @@ buttons(button('Done', 'window.close()'));
 if (count($fields) > 0) {
 	startWindow('Preview Options', 'padding: 3px;');
 ?>
-	<table border="0" cellpadding="3" cellspacing="0">
+	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 <?
 	foreach ($fields as $fieldmap) {
 		$fieldnum = $fieldmap->fieldnum;
