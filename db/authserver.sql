@@ -53,8 +53,6 @@ ALTER TABLE `sessiondata` CHANGE `data` `data` MEDIUMTEXT CHARACTER SET utf8 COL
 -- RELEASE ASP_2007_09_27 ----------------------------------------
 -- new schema for parent portal ---
 
-ALTER TABLE `customer` ADD `enableportal` TINYINT( 4 ) NOT NULL DEFAULT '0';
-
 CREATE TABLE `portaluser` (
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `username` VARCHAR( 255 ) NOT NULL ,
@@ -78,3 +76,8 @@ CREATE TABLE `portalcustomer` (
 `portaluserid` INT NOT NULL ,
 `customerid` INT NOT NULL
 ) ENGINE = innodb;
+
+ALTER TABLE `customer`
+ADD `portaldbuser` VARCHAR( 50 ) NOT NULL default '' AFTER `dbpassword` ,
+ADD `portaldbpass` VARCHAR( 50 ) NOT NULL default '' AFTER `portaldbuser` ;
+
