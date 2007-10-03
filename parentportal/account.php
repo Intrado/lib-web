@@ -29,7 +29,11 @@ if(CheckFormSubmit($f,$s))
 			error('Password confirmation does not match');
 		} else {
 			//submit changes
-			redirect();
+			if(portalUpdatePortalUser($_SESSION['portaluserid'], GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"))){
+				redirect();
+			} else {
+				error("An error occurred while updating your information");
+			}
 		}
 	}
 } else {
@@ -39,18 +43,18 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
-	PutFormData($f, $s, "firstname", $_SESSION['portaluser']['firstname'], "text", "1", "100");
-	PutFormData($f, $s, "lastname", $_SESSION['portaluser']['lastname'], "text", "1", "100");
+	PutFormData($f, $s, "firstname", $_SESSION['portaluser']['portaluser.firstname'], "text", "1", "100");
+	PutFormData($f, $s, "lastname", $_SESSION['portaluser']['portaluser.lastname'], "text", "1", "100");
 	PutFormData($f, $s, "password1", "00000000");
 	PutFormData($f, $s, "password2", "00000000");
-	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['zipcode'], "number", "10000", "99999");
+	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999");
 }
 
 $PAGE = "welcome:account";
-$TITLE = "Account Information: " . $_SESSION['portaluser']['firstname'] . " " . $_SESSION['portaluser']['lastname'];
+$TITLE = "Account Information: " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'Save'));
+buttons(submit($f, $s, 'Save'), button("Change Email",NULL, "changeemail.php"));
 
 startWindow('User Information');
 ?>			
