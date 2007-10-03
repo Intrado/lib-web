@@ -11,7 +11,6 @@ require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
-require_once("PortalUser.obj.php");
 
 if(!isset($ppNotLoggedIn)){
 	// we are logged in
