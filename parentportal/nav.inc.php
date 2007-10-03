@@ -157,11 +157,6 @@ doNavTabs($NAVTREE);
 	<?= $SUBTABS ?>
 </div>
 
-
-<div class="crumbs hoverlinks">
-	<?= doCrumb($FIRSTACTIVETABLINK, $ACTIVEMAINTABTITLE, $TITLE) ?>
-</div>
-
 <div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 <div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
