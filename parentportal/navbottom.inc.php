@@ -10,7 +10,7 @@ Use of this system is subject to the <a href="privacy.html" target="_blank">Priv
 
 </div>
 <?
-print "<div id='logininfo' class='noprint' >Logged in as " . $_SESSION['portaluser']['firstname'] . " " .$_SESSION['portaluser']['lastname'] . " (" . $_SESSION['portaluser']['username'] . ") <br> Current system time is " . date("F jS, Y h:i a") . "</div>";
+print "<div id='logininfo' class='noprint' >Logged in as " . $_SESSION['portaluser']['portaluser.firstname'] . " " .$_SESSION['portaluser']['portaluser.lastname'] . " (" . $_SESSION['portaluser']['portaluser.username'] . ") <br> Current system time is " . date("F jS, Y h:i a") . "</div>";
 
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {
