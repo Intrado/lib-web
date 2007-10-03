@@ -4,24 +4,32 @@ require_once("../inc/securityhelper.inc.php");
 require_once("../inc/html.inc.php");
 require_once("parentportalutils.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../obj/FieldMap.obj.php");
+require_once("../obj/Person.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-$data = false;
+$allData = array();
 if($_SESSION['customerid']){
+	$firstnameField = FieldMap::getFirstNameField();
+	$lastnameField = FieldMap::getLastNameField();
 	$contactList = getContactIDs($_SESSION['portaluserid']);
 	
-	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.messageid, rp.personid
-		from job j 
-		left join reportperson rp on (rp.jobid = j.id)
-		inner join user u on (u.id = j.userid)
-		where j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
-		and rp.personid in ('" . implode("','", $contactList) . "') "
-		. "order by j.startdate");
-	$data = array();
-	while($row = DBGetRow($result)){
-		$data[] = $row;
+	foreach($contactList as $personid){
+		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.messageid, rp.personid
+			from job j 
+			left join reportperson rp on (rp.jobid = j.id)
+			inner join user u on (u.id = j.userid)
+			where j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
+			and rp.personid = '" . $personid . "'
+			and j.status not in ('cancelled', 'cancelling')
+			order by j.startdate");
+		$data = array();
+		while($row = DBGetRow($result)){
+			$data[] = $row;
+		}
+		$allData[$personid] = $data;
 	}
 	
 	$titles = array("1" => "Date",
@@ -31,7 +39,9 @@ if($_SESSION['customerid']){
 					"Actions" => "Actions"
 				);
 	
-	$formatters = array("SentBy" => "sender",
+	$formatters = array("1" => "format_date",
+						"SentBy" => "sender",
+						"3" => "format_type",
 						"Actions" => "message_action"
 					);
 }
@@ -41,7 +51,20 @@ if($_SESSION['customerid']){
 
 function message_action($row, $index){
 	//index 0 is job id and index 7 is person id
-	return button("Play", "popup('previewmessage.php?jobid=" . $row[0] . "&personid=" . $row[7] . "', 400, 500);",null);
+	//index 3 is type
+	if($row[3] == "phone"){
+		return button("Play", "popup('previewmessage.php?jobid=" . $row[0] . "&personid=" . $row[7] . "', 400, 500);",null);
+	} else {
+		return "";
+	}
+}
+
+function format_type($row, $index){
+	return ucfirst($row[$index]);
+}
+
+function format_date($row, $index){
+	return date("M d, Y", strtotime($row[$index]));
 }
 
 function sender($row, $index){
@@ -55,20 +78,30 @@ function sender($row, $index){
 $TITLE="Welcome - " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
 $PAGE = 'welcome:welcome';
 include_once("nav.inc.php");
-startWindow("My messages from the last 30 days");
+if($_SESSION['customerid']){
+	foreach($contactList as $personid){
+		$data = $allData[$personid];
+		$person = new Person($personid);
+		startWindow("Messages for " . $person->$firstnameField . " " . $person->$lastnameField . " from the last 30 days",'padding: 3px;');
+		$scroll="";
+		if(count($data) > 6)
+			$scroll = 'class="scrollTableContainer"';
 ?>
-<table width="100%" cellpadding="3" cellspacing="1" class="list">
+		<div <?=$scroll?>>
+			<table width="100%" cellpadding="3" cellspacing="1" class="list">
 <?
-if($data){
-	showTable($data, $titles, $formatters);
+				showTable($data, $titles, $formatters);
+?>
+			</table>
+		</div>
+<?
+		endWindow();
+?>
+		<br>
+<?
+	}
 } else {
-?>
-	<tr><td>You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact.php"/>Click Here</a></td></tr>
-<?
+	?><img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact.php"/>Click Here</a><?
 }
-?>
-</table>
-<?
-endWindow();
 include_once("navbottom.inc.php");
 ?>
