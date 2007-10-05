@@ -87,7 +87,8 @@ $data = array(
 	"X" => false,
 	"duplicate" => false,
 	"nocontacts" => false,
-	"F" => false
+	"F" => false,
+	"blocked" => false
 );
 $legend = $data;
 $colors = $data;
