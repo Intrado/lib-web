@@ -67,10 +67,11 @@ $data = array(
 	"nocontacts" => false,
 	"inprogress" => false,
 	"retry" => false,
-	"scheduled" => false
+	"scheduled" => false,
+	"blocked" => false
 );
-$legend = array();
-$colors = array();
+$legend = $data;
+$colors = $data;
 
 if ($result = Query($query)) {
 	while ($row = DBGetRow($result)) {
@@ -80,10 +81,21 @@ if ($result = Query($query)) {
 		}else
 			$data[$row[1]] = $row[0];
 
-		$legend[] = $cpcodes[$row[1]] . ": %d";
-		$colors[] = $cpcolors[$row[1]];
+		$legend[$row[1]] = $cpcodes[$row[1]] . ": %d";
+		$colors[$row[1]] = $cpcolors[$row[1]];
 	}
 }
+foreach ($data as $k => $v) {
+	if ($v === false) {
+		unset($data[$k]);
+		unset($legend[$k]);
+		unset($colors[$k]);
+	}
+}
+
+$data = array_values($data);
+$legend = array_values($legend);
+$colors = array_values($colors);
 
 //var_dump($data);
 //var_dump($legend);
