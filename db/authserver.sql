@@ -66,6 +66,9 @@ UNIQUE (
 )
 ) ENGINE = innodb;
 
+ALTER TABLE `portaluser` ADD `lastlogin` DATETIME NULL ;
+
+
 CREATE TABLE `portalactivation` (
 `activationtoken` VARCHAR( 255 ) NOT NULL ,
 `creation` timestamp NOT NULL default CURRENT_TIMESTAMP ,

@@ -1079,7 +1079,7 @@ update reportperson set iscontacted=1 where status='success'
 $$$
 -- Parent Portal
 
-CREATE TABLE `personportal` (
+CREATE TABLE `portalperson` (
 `portaluserid` INT NOT NULL ,
 `personid` INT NOT NULL ,
 UNIQUE (
