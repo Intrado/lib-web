@@ -61,6 +61,7 @@ if (isset($_GET['dn'])) {
 
 	$task->lastcheckin = date("Y-m-d H:i:s");
 	$task->create();
+	QuickUpdate("call start_specialtask(" . $task->id . ")");
 
 header("Content-type: text/xml");
 ?>
