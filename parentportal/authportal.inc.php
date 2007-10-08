@@ -105,9 +105,11 @@ function portalForgotPassword($username) {
 	return false;
 }
 
-function portalGetPortalUser($portaluserid) {
-	$params = array(new XML_RPC_Value($portaluserid, 'int'));
-	$method = "PortalServer.portal_getPortalUser";
+
+function portalGetPortalUser() {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'));
+	$method = "PortalServer.portal_getMyPortalUser";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
@@ -116,9 +118,37 @@ function portalGetPortalUser($portaluserid) {
 	return false;
 }
 
-function portalUpdatePortalUser($portaluserid, $firstname, $lastname, $zipcode) {
-	$params = array(new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($firstname, 'string'), new XML_RPC_Value($lastname, 'string'), new XML_RPC_Value($zipcode, 'string'));
-	$method = "PortalServer.portal_updatePortalUser";
+
+function portalUpdatePortalUser($firstname, $lastname, $zipcode) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($firstname, 'string'), new XML_RPC_Value($lastname, 'string'), new XML_RPC_Value($zipcode, 'string'));
+	$method = "PortalServer.portal_updateMyPortalUser";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return true;
+	}
+	return false;
+}
+
+
+function portalUpdatePortalUserPassword($password) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'));
+	$method = "PortalServer.portal_updateMyPortalUserPassword";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return true;
+	}
+	return false;
+}
+
+
+function portalUpdatePortalUsername($username, $password) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($username, 'string'));
+	$method = "PortalServer.portal_updateMyPortalUsername";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
