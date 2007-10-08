@@ -12,6 +12,7 @@ include_once("../obj/JobType.obj.php");
 include_once("../obj/Access.obj.php");
 include_once("../obj/Permission.obj.php");
 include_once("../obj/JobLanguage.obj.php");
+include_once("../obj/Rule.obj.php");
 
 $specialtask = new specialtask($SESSIONDATA['specialtaskid']);
 
