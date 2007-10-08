@@ -25,7 +25,7 @@ if($REQUEST_TYPE == "new"){
 	if(($specialtask->getData("origin") == "cisco") && ($specialtask->getData("progress") == "Done")){
 
 		$USER = new User($specialtask->getData('userid'));
-		$ACCESS = new Access($USER->accessid);
+		$ACCESS = $_SESSION['access'] = new Access($USER->accessid);
 		$messages = array();
 		$languages = array();
 		$count = $specialtask->getData("count");
