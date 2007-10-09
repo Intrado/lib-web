@@ -94,6 +94,19 @@ function portalAccessCustomer($sessionid, $customerid) {
 }
 
 
+function portalAssociatePerson($token, $validationdata) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($token, 'string'), new XML_RPC_Value($validationdata, 'string'));
+	$method = "PortalServer.portal_associatePerson";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return true;
+	}
+	return false;
+}
+
+
 function portalForgotPassword($username) {
 	$params = array(new XML_RPC_Value($username, 'string'));
 	$method = "PortalServer.portal_forgotPassword";
