@@ -1087,3 +1087,12 @@ UNIQUE (
 `personid`
 )
 ) ENGINE = INNODB;
+
+CREATE TABLE `portalpersontoken` (
+`token` VARCHAR( 255 ) NOT NULL ,
+`expirationdate` DATETIME NOT NULL ,
+`personid` INT NOT NULL ,
+`creationuserid` INT NOT NULL
+) ENGINE = innodb;
+
+

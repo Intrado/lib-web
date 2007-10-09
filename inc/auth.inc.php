@@ -238,4 +238,65 @@ function asptokenLogin($asptoken, $url) {
 }
 /*CSDELETEMARKER_END*/
 
+
+////////// parent portal methods
+
+function getPortalUsers($portaluserids) {
+	$portaluseridstruct = array();
+	$i = 0;
+	foreach($portaluserids as $id){
+		$portaluseridstruct[$i] = new XML_RPC_VALUE($id, 'int');
+		$i++;
+	}
+
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($portaluseridstruct, 'struct'));
+	$method = "PortalAdminServer.portal_getPortalUsers";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['usermap'];
+	}
+	return false;
+}
+
+function generatePersonTokens($personids) {
+	$personidstruct = array();
+	$i = 0;
+	foreach($personids as $id){
+		$personidstruct[$i] = new XML_RPC_VALUE($id, 'int');
+		$i++;
+	}
+
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personidstruct, 'struct'));
+	$method = "PortalAdminServer.portal_generatePersonTokens";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['tokencount'];
+	}
+	return false;
+}
+
+function revokePersonTokens($personids) {
+	$personidstruct = array();
+	$i = 0;
+	foreach($personids as $id){
+		$personidstruct[$i] = new XML_RPC_VALUE($id, 'int');
+		$i++;
+	}
+
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personidstruct, 'struct'));
+	$method = "PortalAdminServer.portal_revokePersonTokens";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['tokencount'];
+	}
+	return false;
+}
+
+
 ?>

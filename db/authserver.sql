@@ -84,3 +84,11 @@ ALTER TABLE `customer`
 ADD `portaldbuser` VARCHAR( 50 ) NOT NULL default '' AFTER `dbpassword` ,
 ADD `portaldbpass` VARCHAR( 50 ) NOT NULL default '' AFTER `portaldbuser` ;
 
+CREATE TABLE `persontoken` (
+`customerid` INT ,
+`token` VARCHAR( 255 ) NOT NULL ,
+`validationdata` VARCHAR( 50 ) NOT NULL,
+`expirationdate` DATETIME,
+`personid` INT,
+) ENGINE = innodb;
+
