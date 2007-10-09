@@ -53,42 +53,42 @@ ALTER TABLE `sessiondata` CHANGE `data` `data` MEDIUMTEXT CHARACTER SET utf8 COL
 -- RELEASE ASP_2007_09_27 ----------------------------------------
 -- new schema for parent portal ---
 
-CREATE TABLE `portaluser` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`username` VARCHAR( 255 ) NOT NULL ,
-`password` VARCHAR( 50 ) NOT NULL ,
-`firstname` VARCHAR( 100 ) NOT NULL ,
-`lastname` VARCHAR( 100 ) NOT NULL ,
-`zipcode` VARCHAR( 10 ) NOT NULL ,
-`enabled` TINYINT NOT NULL DEFAULT '0',
-UNIQUE (
-`username`
-)
-) ENGINE = innodb;
-
-ALTER TABLE `portaluser` ADD `lastlogin` DATETIME NULL ;
-
-
-CREATE TABLE `portalactivation` (
-`activationtoken` VARCHAR( 255 ) NOT NULL ,
-`creation` timestamp NOT NULL default CURRENT_TIMESTAMP ,
-`portaluserid` INT NOT NULL DEFAULT '0'
-) ENGINE = innodb;
-
-CREATE TABLE `portalcustomer` (
-`portaluserid` INT NOT NULL ,
-`customerid` INT NOT NULL
-) ENGINE = innodb;
-
 ALTER TABLE `customer`
 ADD `portaldbuser` VARCHAR( 50 ) NOT NULL default '' AFTER `dbpassword` ,
 ADD `portaldbpass` VARCHAR( 50 ) NOT NULL default '' AFTER `portaldbuser` ;
 
 CREATE TABLE `persontoken` (
-`customerid` INT ,
-`token` VARCHAR( 255 ) NOT NULL ,
-`validationdata` VARCHAR( 50 ) NOT NULL,
-`expirationdate` DATETIME,
-`personid` INT,
-) ENGINE = innodb;
+  `customerid` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `validationdata` varchar(50) NOT NULL,
+  `expirationdate` datetime NOT NULL,
+  `personid` int(11) NOT NULL,
+  PRIMARY KEY  (`customerid`,`token`,`validationdata`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `portalactivation` (
+  `activationtoken` varchar(255) NOT NULL,
+  `creation` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `portaluserid` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`activationtoken`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `portalcustomer` (
+  `portaluserid` int(11) NOT NULL,
+  `customerid` int(11) NOT NULL,
+  PRIMARY KEY  (`portaluserid`,`customerid`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `portaluser` (
+  `id` int(11) NOT NULL auto_increment,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(50) NOT NULL default ' ',
+  `firstname` varchar(100) NOT NULL,
+  `lastname` varchar(100) NOT NULL,
+  `zipcode` varchar(10) NOT NULL,
+  `enabled` tinyint(4) NOT NULL default '0',
+  `lastlogin` datetime default NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB;
 
