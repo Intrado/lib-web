@@ -1077,22 +1077,23 @@ $$$
 
 update reportperson set iscontacted=1 where status='success'
 $$$
+
 -- Parent Portal
 
 CREATE TABLE `portalperson` (
-`portaluserid` INT NOT NULL ,
-`personid` INT NOT NULL ,
-UNIQUE (
-`portaluserid` ,
-`personid`
-)
-) ENGINE = INNODB;
+  `portaluserid` int(11) NOT NULL,
+  `personid` int(11) NOT NULL,
+  PRIMARY KEY  (`portaluserid`,`personid`)
+) ENGINE=InnoDB
+$$$
 
 CREATE TABLE `portalpersontoken` (
-`token` VARCHAR( 255 ) NOT NULL ,
-`expirationdate` DATETIME NOT NULL ,
-`personid` INT NOT NULL ,
-`creationuserid` INT NOT NULL
-) ENGINE = innodb;
-
+  `token` varchar(255) NOT NULL,
+  `expirationdate` datetime NOT NULL,
+  `personid` int(11) NOT NULL,
+  `creationuserid` int(11) NOT NULL,
+  PRIMARY KEY  (`token`),
+  UNIQUE KEY `personid` (`personid`)
+) ENGINE=InnoDB
+$$$
 
