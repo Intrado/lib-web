@@ -145,9 +145,9 @@ function portalUpdatePortalUser($firstname, $lastname, $zipcode) {
 }
 
 
-function portalUpdatePortalUserPassword($password) {
+function portalUpdatePortalUserPassword($newpassword, $oldpassword) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newpassword, 'string'), new XML_RPC_Value($oldpassword, 'string'));
 	$method = "PortalServer.portal_updateMyPortalUserPassword";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
