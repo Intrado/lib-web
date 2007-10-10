@@ -293,6 +293,7 @@ function playAudio($id){
 
 	$message = new Message($id);
 	$parts = DBFindMany("MessagePart", "from messagepart where messageid=$message->id order by sequence");
+
 	$voices = DBFindMany("Voice","from ttsvoice");
 
 	// -- digest the message --
@@ -300,6 +301,7 @@ function playAudio($id){
 	$curpart = 0;
 
 	$lastVoice = null;
+
 	foreach ($parts as $part) {
 		switch ($part->type) {
 		case "A":
@@ -337,6 +339,7 @@ function playAudio($id){
 
 	// -- get the wav files --
 	$wavfiles = array();
+
 	foreach ($renderedparts as $part) {
 		if ($part[0] == "a") {
 			list($contenttype,$data) = contentGet($part[1]);
@@ -383,4 +386,23 @@ function playAudio($id){
 
 	@unlink($outname);
 }
+
+//array is the initial array
+//insertitems is an array of items you want inserted
+//startindex is the position before you want items inserted
+function array_insert($array, $insertitems = array(), $startindex){
+	$newarray = array();
+	foreach($array as $index => $item){
+		if($index == $startindex){
+			$newarray[] = $item;
+			foreach($insertitems as $insertitem){
+				$newarray[] = $insertitem;
+			}
+		} else {
+			$newarray[] = $item;
+		}
+	}
+	return $newarray;
+}
+
 ?>
