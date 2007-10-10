@@ -27,16 +27,20 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error("You must enter a password");
 	} else if($password1 != $password2){
 		error("Your passwords don't match");
-	} else if(portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode)){
-		$success = true;
-		?>
-		<br>Thank you, Your account has been created.
-		<br>Please check your email to activate your account.
-		<br>You will be redirected to the login page in 5 seconds.
-		<meta http-equiv="refresh" content="5;url=index.php">
-		<?
 	} else {
-		error("Your account was not created, please check your information");
+		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode);
+		if($result['result'] != ""){
+			$errordetails = $result['resultdetail'];
+			error("Your account was not created: " . $errordetails);
+		} else {
+			$success = true;
+			?>
+			<br>Thank you, Your account has been created.
+			<br>Please check your email to activate your account.
+			<br>You will be redirected to the login page in 5 seconds.
+			<meta http-equiv="refresh" content="5;url=index.php">
+			<?
+		}
 	}
 }
 
@@ -51,6 +55,8 @@ if(!$success){
 			<tr>
 				<td>Password: </td>
 				<td><input type="password" name="password1" /> </td>
+			</tr>
+			<tr>
 				<td>Confirm Password: </td>
 				<td><input type="password" name="password2" /> </td>
 			</tr>

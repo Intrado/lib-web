@@ -3,8 +3,13 @@ require_once("common.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 
-$customerlist = portalGetCustomerAssociations(session_id());
-$customeridlist = array_keys($customerlist);
+$result = portalGetCustomerAssociations(session_id());
+if($result['result'] == ""){
+	$customerlist = $result['custmap'];
+	$customeridlist = array_keys($customerlist);
+} else {
+	$customeridlist = array();
+}
 if(isset($customeridlist) && !(count($customeridlist) > 1)){
 	if(count($customeridlist) == 1){
 		$_SESSION['customerid'] = $customeridlist[0];
