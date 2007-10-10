@@ -149,4 +149,58 @@ function showPageMenu ($total,$start, $perpage, $link = NULL) {
 </div>
 <?
 }
+
+// similiar to show table but allows for hidden columns
+// groupby is the index to check to see if a new group has occured
+function showTableWithHidden($data, $titles, $formatters = array(), $hiddenColumns = array(), $groupby = 0) {
+	echo '<tr class="listHeader">';
+	foreach ($titles as $index => $title) {
+
+		//make column sortable?
+		echo '<th align="left" ';
+		if(in_array($index, $hiddenColumns))
+			echo ' style="display:none" ';
+		if (strpos($title,"#") === false) {
+			echo 'class="nosort">' ;
+		} else {
+			echo '>';
+		}
+
+		if (strpos($title,"#") === 0)
+			$title = substr($title,1);
+		echo htmlentities($title) . "</th>";
+	}
+	echo "</tr>\n";
+
+	$alt = 0;
+	if (count($data) > 0) {
+		foreach ($data as $row) {
+			if($row[$groupby]){
+				$alt++;
+			}
+			echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
+
+			//only show cels with titles
+			foreach ($titles as $index => $title) {
+
+				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
+				echo "<td";
+				if(in_array($index, $hiddenColumns))
+					echo ' style="display:none">';
+				else
+					echo ">";
+				if (isset($formatters[$index])) {
+					$fn = $formatters[$index];
+					$cel = $fn($row,$index);
+				} else {
+					$cel = htmlentities($row[$index]);
+				}
+				echo $cel . "</td>";
+			}
+
+			echo "</tr>\n";
+		}
+	}
+}
+
 ?>
