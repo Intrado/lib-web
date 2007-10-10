@@ -1,6 +1,5 @@
 <?
 
-// TODO dup function with auth.inc.php should move to common code?
 function pearxmlrpc($method, $params) {
 	global $SETTINGS;
 	$authhost = $SETTINGS['authserver']['host'];
@@ -20,15 +19,19 @@ function pearxmlrpc($method, $params) {
     	$data = XML_RPC_decode($val);
 		if ($data['result'] == "") {
 			// success
-			return $data;
 		} else if ($data['result'] == "warning") {
 			// warning we do not log, but handle like failure
 		} else {
 			// error
 			error_log($method . " " .$data['result']);
 		}
+		return $data;
 	}
-	return false;
+	$data = array();
+	$data['result'] = "unknown error";
+	$data['resultdetail'] = "unexpected failure condition";
+
+	return $data;
 }
 
 
@@ -36,11 +39,7 @@ function portalCreateAccount($username, $password, $firstname, $lastname, $zipco
 	$params = array(new XML_RPC_Value($username, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($firstname, 'string'), new XML_RPC_Value($lastname, 'string'), new XML_RPC_Value($zipcode, 'string'));
 	$method = "PortalServer.portal_createAccount";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// account created
-		return true;
-	}
-	return false;
+	return $result; // we do nothing for success/fail
 }
 
 
@@ -48,12 +47,11 @@ function portalActivateAccount($activationtoken) {
 	$params = array(new XML_RPC_Value($activationtoken, 'string'));
 	$method = "PortalServer.portal_activateAccount";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
+	if ($result['result'] == "") {
 		// account activated
 		session_id($result['sessionID']); // set the session id
-		return $result['userID'];
 	}
-	return false;
+	return $result;
 }
 
 
@@ -61,12 +59,11 @@ function portalLogin($username, $password) {
 	$params = array(new XML_RPC_Value($username, 'string'), new XML_RPC_Value($password, 'string'));
 	$method = "PortalServer.portal_login";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
+	if ($result['result'] == "") {
 		// login success
 		session_id($result['sessionID']); // set the session id
-		return $result['userID'];
 	}
-	return false;
+	return $result;
 }
 
 
@@ -74,11 +71,7 @@ function portalGetCustomerAssociations($sessionid) {
 	$params = array(new XML_RPC_Value($sessionid, 'string'));
 	$method = "PortalServer.portal_getCustomerAssociations";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// success
-		return $result['custmap'];
-	}
-	return false;
+	return $result;
 }
 
 
@@ -86,11 +79,14 @@ function portalAccessCustomer($sessionid, $customerid) {
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'));
 	$method = "PortalServer.portal_accessCustomer";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
+	if ($result['result'] == "") {
 		// success
-		if (doDBConnect($result)) return true;
+		if (!doDBConnect($result)) {
+			$result['result'] = "unknown error";
+			$result['resultdetail'] = "unexpected failure condition";
+		}
 	}
-	return false;
+	return $result;
 }
 
 
@@ -99,11 +95,7 @@ function portalAssociatePerson($token, $validationdata) {
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($token, 'string'), new XML_RPC_Value($validationdata, 'string'));
 	$method = "PortalServer.portal_associatePerson";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// success
-		return true;
-	}
-	return false;
+	return $result;
 }
 
 
@@ -111,11 +103,7 @@ function portalForgotPassword($username) {
 	$params = array(new XML_RPC_Value($username, 'string'));
 	$method = "PortalServer.portal_forgotPassword";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// activation email sent
-		return true;
-	}
-	return false;
+	return $result;
 }
 
 
@@ -124,11 +112,7 @@ function portalGetPortalUser() {
 	$params = array(new XML_RPC_Value($sessionid, 'string'));
 	$method = "PortalServer.portal_getMyPortalUser";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// success
-		return $result['portaluser'];
-	}
-	return false;
+	return $result;
 }
 
 
@@ -137,11 +121,7 @@ function portalUpdatePortalUser($firstname, $lastname, $zipcode) {
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($firstname, 'string'), new XML_RPC_Value($lastname, 'string'), new XML_RPC_Value($zipcode, 'string'));
 	$method = "PortalServer.portal_updateMyPortalUser";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// success
-		return true;
-	}
-	return false;
+	return $result;
 }
 
 
@@ -150,11 +130,7 @@ function portalUpdatePortalUserPassword($newpassword, $oldpassword) {
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newpassword, 'string'), new XML_RPC_Value($oldpassword, 'string'));
 	$method = "PortalServer.portal_updateMyPortalUserPassword";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// success
-		return true;
-	}
-	return false;
+	return $result;
 }
 
 
@@ -163,11 +139,7 @@ function portalUpdatePortalUsername($username, $password) {
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($username, 'string'));
 	$method = "PortalServer.portal_updateMyPortalUsername";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-		// success
-		return true;
-	}
-	return false;
+	return $result;
 }
 
 
