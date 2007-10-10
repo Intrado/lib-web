@@ -73,6 +73,8 @@ CREATE TABLE `portalactivation` (
   PRIMARY KEY  (`activationtoken`)
 ) ENGINE=InnoDB;
 
+ALTER TABLE `portalactivation` ADD `newusername` VARCHAR( 255 ) NULL ;
+
 CREATE TABLE `portalcustomer` (
   `portaluserid` int(11) NOT NULL,
   `customerid` int(11) NOT NULL,
