@@ -69,7 +69,7 @@ foreach($fields as $field){
 		$activefields[] = $field->fieldnum;
 	}
 }
-$options['activefields'] = $activefields;
+$options['activefields'] = implode(",",$activefields);
 $reportinstance = new ReportInstance();
 
 $pagestart = 0;
