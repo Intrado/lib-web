@@ -1097,3 +1097,96 @@ CREATE TABLE `portalpersontoken` (
 ) ENGINE=InnoDB
 $$$
 
+ALTER TABLE `jobtype`
+ADD `infoforparents` VARCHAR( 255 ) NOT NULL DEFAULT ''  AFTER `timeslices` ,
+ADD `issurvey` TINYINT NOT NULL DEFAULT '0' AFTER `infoforparents`
+$$$
+
+CREATE TABLE `jobtypepref` (
+`jobtypeid` INT NOT NULL ,
+`type` ENUM( 'phone', 'email', 'print', 'sms' ) NOT NULL ,
+`sequence` TINYINT NOT NULL ,
+`enabled` TINYINT NOT NULL DEFAULT '0',
+PRIMARY KEY ( `jobtypeid` , `type` , `sequence` )
+) ENGINE = innodb
+$$$
+
+CREATE TABLE `contactpref` (
+`personid` INT NOT NULL,
+`jobtypeid` INT NOT NULL,
+`type` ENUM( 'phone', 'email', 'print', 'sms' ) NOT NULL ,
+`sequence` TINYINT NOT NULL,
+`enabled` TINYINT NOT NULL DEFAULT '0',
+PRIMARY KEY ( `personid` , `jobtypeid` , `type` , `sequence` )
+) ENGINE = innodb
+$$$
+
+ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL default 'notattempted'
+$$$
+
+ALTER TABLE `reportperson` CHANGE `status` `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts','declined') NOT NULL,
+$$$
+
+ALTER TABLE `reportperson`
+ADD `numdeclined` tinyint(4) NOT NULL default '0' AFTER `numduperemoved'
+$$$
+
+
+drop trigger insert_repeating_job
+$$$
+
+CREATE TRIGGER insert_repeating_job
+AFTER INSERT ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+
+IF NEW.status IN ('repeating') THEN
+  SELECT value INTO tz FROM setting WHERE name='timezone';
+
+  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.jobtypeid, NEW.thesql);
+
+  -- copy the jobsettings
+  INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
+
+  -- do not copy schedule because it was inserted via the insert_schedule trigger
+
+END IF;
+END
+$$$
+
+drop trigger update_job
+$$$
+
+CREATE TRIGGER update_job
+AFTER UPDATE ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+
+SELECT value INTO tz FROM setting WHERE name='timezone';
+
+SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
+IF cc = 0 THEN
+-- we expect the status to be 'scheduled' when we insert the shard job
+-- status 'new' is for jobs that are not yet submitted
+  IF NEW.status='scheduled' THEN
+    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid, NEW.thesql);
+    -- copy the jobsettings
+    INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
+  END IF;
+ELSE
+-- update job fields
+  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
+  IF NEW.status IN ('processing', 'procactive', 'active', 'cancelling') THEN
+    UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
+  END IF;
+END IF;
+END
+$$$
+
+

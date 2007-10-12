@@ -198,14 +198,16 @@ PRIMARY KEY (`customerid`,`jobid`,`personid`)
 
 -- RELEASE ASP_2007-08_10 ----------------------------------------
 
-
-
 ALTER TABLE `qjobtask` CHANGE `uuid` `uuid` BIGINT( 20 ) UNSIGNED NOT NULL;
 
 ALTER TABLE `qjobtask` CHANGE `renderedmessage` `renderedmessage` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 
-
 -- RELEASE ASP_2007-08-24 ------------------------------------------
 
 ALTER TABLE `qjobtask` CHANGE `lastresult` `lastresult` ENUM( 'A', 'M', 'N', 'B', 'X', 'F', 'sent', 'unsent', 'printed', 'notprinted', 'cancelling', 'endoflife' ) NULL DEFAULT NULL;
+
+-- begin parent portal September 2007
+
+ALTER TABLE `qjob` ADD `jobtypeid` INT NOT NULL AFTER `timeslices` ;
+
 
