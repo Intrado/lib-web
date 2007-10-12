@@ -1124,11 +1124,11 @@ $$$
 ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL default 'notattempted'
 $$$
 
-ALTER TABLE `reportperson` CHANGE `status` `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts','declined') NOT NULL,
+ALTER TABLE `reportperson` CHANGE `status` `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts','declined') NOT NULL
 $$$
 
 ALTER TABLE `reportperson`
-ADD `numdeclined` tinyint(4) NOT NULL default '0' AFTER `numduperemoved'
+ADD `numdeclined` tinyint(4) NOT NULL default '0' AFTER `numduperemoved`
 $$$
 
 
