@@ -26,10 +26,12 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 
-	$id = portalLogin($login, $password);
-	if(!$id){
+	$result = portalLogin($login, $password);
+	if($result['result'] == "")
+		$id = $result['userID'];
+	else
 		$badlogin = true;
-	}
+		
 } else if (!isset($_GET['logout'])){
 	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
 	$sessionstarted = true;

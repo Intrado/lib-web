@@ -26,7 +26,12 @@ if(!isset($ppNotLoggedIn)){
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
 		redirect("./?logout=1");
     } else {
-    	$_SESSION['portaluser'] = portalGetPortalUser($_SESSION['portaluserid']);
+    	$result = portalGetPortalUser();
+    	if($result['result'] == ""){
+	    	$_SESSION['portaluser'] = $result['portaluser'];
+    	} else {
+    		redirect("./?logout=1");
+    	}
     }
 } else {
 	// we are not logged in
