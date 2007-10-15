@@ -3,7 +3,12 @@ $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 
 if(isset($_GET['token'])){
-	$id = portalActivateAccount($_GET['token']);
+	$result = portalActivateAccount($_GET['token']);
+	if($result['result'] == ""){
+		$id = $result['userID'];
+	} else {
+		$id = 0;
+	}
 	if($id){
 		doStartSession();
 		$_SESSION['portaluserid'] = $id;
