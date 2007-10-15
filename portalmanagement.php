@@ -49,6 +49,27 @@ if(isset($_GET['deleterule'])) {
 	redirect();
 }
 
+if(isset($_GET['hideactivetokens'])){
+	if($_GET['hideactivetokens'] == "true"){
+		$options['hideactivetokens'] = 1;
+	} else {
+		$options['hideactivetokens'] = 0;
+	}
+	$_SESSION['portal']['options'] = $options;
+	redirect();
+}
+
+if(isset($_GET['hideassociated'])){
+	if($_GET['hideassociated'] == "true"){
+		$options['hideassociated'] = 1;
+	} else {
+		$options['hideassociated'] = 0;
+	}
+	$_SESSION['portal']['options'] = $options;
+	redirect();
+}
+
+
 $RULES = false;
 if(isset($options['rules']) && $options['rules']){
 	$RULES = $options['rules'];
@@ -125,6 +146,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 					if($option == "")
 						unset($options[$index]);
 				}
+				$options['hideactivetokens'] = GetFormData($f, $s, "hideactivetokens");
+				$options['hideassociated'] = GetFormData($f, $s, "hideassociated");
 				$_SESSION['portal']['options'] = $options;
 				if(CheckFormSubmit($f, 'generate')){
 					$reportinstance->setParameters($options);
@@ -156,12 +179,14 @@ if($reloadform){
 	PutFormData($f, $s, 'pkey', isset($options['pkey']) ? $options['pkey'] : "", 'text');
 
 	putRuleFormData($f, $s);
+	PutFormData($f, $s, "hideactivetokens", isset($options['hideactivetokens']) ? $options['hideactivetokens'] : 0, "bool", 0, 1);
+	PutFormData($f, $s, "hideassociated", isset($options['hideassociated']) ? $options['hideassociated'] : 0, "bool", 0, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "admin:portalmanagement";
+$PAGE = "admin:portal";
 $TITLE = "Portal Management";
 
 include_once("nav.inc.php");
@@ -223,6 +248,14 @@ if(isset($options['pkey'])){
 	<?
 			select_metadata('portalresultstable', 5, $fields);
 	?>
+		</td>
+	</tr>
+	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter:</th>
+		<td class="bottomBorder">
+			<table>
+				<tr><td><? NewFormItem($f, $s, "hideactivetokens", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideactivetokens=\' + this.checked"') ?>Hide People with Active Tokens</td></tr>
+				<tr><td><? NewFormItem($f, $s, "hideassociated", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideassociated=\' + this.checked"') ?>Hide People with Portal Users</td></tr>
+			</table>
 		</td>
 	</tr>
 </table>

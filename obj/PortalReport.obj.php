@@ -6,8 +6,16 @@ class PortalReport extends ReportGenerator{
 		$this->params = $this->reportinstance->getParameters();
 		$rulesql = getRuleSql($this->params, "p");
 		$pkeysql = "";
+		$hideactivetokens = "";
+		$hideassociated = "";
 		if(isset($this->params['pkey'])){
 			$pkeysql = " and p.pkey = '" . DBSafe($this->params['pkey']) . "' ";
+		}
+		if(isset($this->params['hideactivetokens']) && $this->params['hideactivetokens']){
+			$hideactivetokens = " and (ppt.token is null or ppt.expirationdate < now()) ";
+		}
+		if(isset($this->params['hideassociated']) && $this->params['hideassociated']){
+			$hideassociated = " and not exists (select count(*) from portalperson pp where pp.personid = p.id group by pp.personid) ";
 		}
 		$this->query = "select SQL_CALC_FOUND_ROWS
 					p.pkey as pkey, 
@@ -22,6 +30,8 @@ class PortalReport extends ReportGenerator{
 					where 1 "
 					. $pkeysql
 					. $rulesql
+					. $hideactivetokens
+					. $hideassociated
 					. " order by p.id";
 	}
 
