@@ -30,8 +30,12 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	} else {
 		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode);
 		if($result['result'] != ""){
-			$errordetails = $result['resultdetail'];
-			error("Your account was not created: " . $errordetails);
+			if($result['result'] == "duplicate"){
+				$errordetails = "The username is already in use";
+			} else {
+				$errordetails = "An unknown error occured";
+			}
+			error("Your account was not created", $errordetails);
 		} else {
 			$success = true;
 			?>
