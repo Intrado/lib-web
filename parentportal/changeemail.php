@@ -8,13 +8,15 @@ require_once("../inc/table.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+
+$error_badpass = "That password is incorrect";
+$error_generalproblem = "There was a problem changing your username";
 /****************** main message section ******************/
 
 $f = "changeemail";
 $s = "main";
 $reloadform = 0;
 
-$email = "";
 
 if(CheckFormSubmit($f,$s))
 {
@@ -29,14 +31,21 @@ if(CheckFormSubmit($f,$s))
 		MergeSectionFormData($f, $s);
 
 		//do check
-		$email = GetFormData($f, $s, "email");
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			//submit changes
-
-
-			redirect("changeemail.php");
+			$result = portalUpdatePortalUsername(GetFormData($f, $s, "newemail"), GetFormData($f, $s, "password"));
+			if($result['result'] == ""){
+				redirect("start.php");
+			} else {
+				$resultcode = $result['result'];
+				if($resultcode == "invalid data"){
+					error($error_badpass);
+				} else {
+					error($error_generalproblem);
+				}
+			}
 		}
 	}
 } else {
@@ -46,7 +55,8 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
-	PutFormData($f, $s, "email", $email, "email", "0", "100", true);
+	PutFormData($f, $s, "newemail", "", "email", "0", "100", true);
+	PutFormData($f, $s, "password", "", "text", "0", "100", true);
 
 }
 
@@ -66,10 +76,13 @@ startWindow('Change Email');
 <table>
 	<tr>
 		<td>New Email Address:</td>
-		<td><? NewFormItem($f, $s, "email", "text", "100") ?> </td>
+		<td><? NewFormItem($f, $s, "newemail", "text", "100") ?> </td>
+	</tr>
+	<tr>
+		<td>Password:</td>
+		<td><? NewFormItem($f, $s, "password", "password", "100") ?> </td>
 	</tr>
 </table>
-<img src="img/bug_important.gif" >Changing your email will log you out and disable your account until you reactivate it.
 <br>
 <?
 endWindow();
