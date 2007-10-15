@@ -147,7 +147,7 @@ function portalGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));
 	$method = "PortalServer.portal_getSessionData";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
+	if ($result['result'] == "") {
 		// success
 		$sess_data = base64url_decode($result['sessionData']);
 		if (isset($result['dbhost'])) {
@@ -165,7 +165,7 @@ function portalPutSessionData($id, $sess_data) {
 	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value($sess_data, 'string'));
 	$method = "PortalServer.portal_putSessionData";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) return true;
+	if ($result['result'] == "") return true;
 	return false;
 }
 
