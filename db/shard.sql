@@ -210,4 +210,6 @@ ALTER TABLE `qjobtask` CHANGE `lastresult` `lastresult` ENUM( 'A', 'M', 'N', 'B'
 
 ALTER TABLE `qjob` ADD `jobtypeid` INT NOT NULL AFTER `timeslices` ;
 
+ALTER TABLE `qjob` ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid` ;
+
 

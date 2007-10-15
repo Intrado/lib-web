@@ -1145,8 +1145,8 @@ DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
 IF NEW.status IN ('repeating') THEN
   SELECT value INTO tz FROM setting WHERE name='timezone';
 
-  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
-         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.jobtypeid, NEW.thesql);
+  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.jobtypeid, NEW.thesql);
 
   -- copy the jobsettings
   INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
@@ -1174,19 +1174,64 @@ IF cc = 0 THEN
 -- we expect the status to be 'scheduled' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
   IF NEW.status='scheduled' THEN
-    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
-           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid, NEW.thesql);
+    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid, NEW.thesql);
     -- copy the jobsettings
     INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
   END IF;
 ELSE
 -- update job fields
-  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
+  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, smsmessageid=NEW.smsmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
   IF NEW.status IN ('processing', 'procactive', 'active', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
 END IF;
 END
+$$$
+
+-- alter sms
+
+ALTER TABLE `job`
+ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid`
+$$$
+
+ALTER TABLE `job`
+CHANGE `type` `type` set('phone','email','print','sms','survey') NOT NULL default 'phone'
+$$$
+
+ALTER TABLE `joblanguage`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL default 'phone'
+$$$
+
+ALTER TABLE `message`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL default 'phone'
+$$$
+
+ALTER TABLE `reportcontact`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL
+$$$
+
+ALTER TABLE `reportperson`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL
+$$$
+
+ALTER TABLE `messagepart` ADD `maxlen` SMALLINT NULL
+$$$
+
+CREATE TABLE `sms` (
+  `id` int(11) NOT NULL auto_increment,
+  `personid` int(11) NOT NULL default '0',
+  `sms` varchar(20) NOT NULL default '',
+  `sequence` tinyint(4) NOT NULL default '0',
+  `editlock` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `personid` (`personid`,`sequence`),
+  KEY `dedupe` (`sms`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `reportcontact`
+ADD `sms` varchar(20) default NULL AFTER `email`
 $$$
 
 
