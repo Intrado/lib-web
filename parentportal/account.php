@@ -4,9 +4,13 @@ require_once("../inc/html.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 
+
+$error_failedupdate = "There was an error updating your information";
+$error_failedupdatepassword = "There was an error updating your password";
 $f="portaluser";
 $s="main";
 $reloadform = 0;
+$error = 0;
 
 
 if(CheckFormSubmit($f,$s))
@@ -25,14 +29,26 @@ if(CheckFormSubmit($f,$s))
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "password1") != GetFormData($f, $s, "password2")){
+		} else if(GetFormData($f, $s, "newpassword1") != GetFormData($f, $s, "newpassword2")){
 			error('Password confirmation does not match');
 		} else {
 			//submit changes
-			if(portalUpdatePortalUser($_SESSION['portaluserid'], GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"))){
+			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"));
+			if($result['result'] != ""){
+				$updateuser = false;
+				error($error_failedupdate);
+				$error = 1;
+			}
+			if(GetFormData($f, $s, "newpassword1")){
+				$result = portalUpdatePortalUserPassword(GetFormData($f, $s, "newpassword1"), GetFormData($f, $s, "oldpassword"));
+				if($result['result'] != ""){
+					$updateuser = false;
+					error($error_failedupdatepassword);
+					$error = 1;
+				}
+			}
+			if(!$error){
 				redirect();
-			} else {
-				error("An error occurred while updating your information");
 			}
 		}
 	}
@@ -45,8 +61,9 @@ if( $reloadform )
 	ClearFormData($f);
 	PutFormData($f, $s, "firstname", $_SESSION['portaluser']['portaluser.firstname'], "text", "1", "100");
 	PutFormData($f, $s, "lastname", $_SESSION['portaluser']['portaluser.lastname'], "text", "1", "100");
-	PutFormData($f, $s, "password1", "00000000");
-	PutFormData($f, $s, "password2", "00000000");
+	PutFormData($f, $s, "newpassword1", "", "text");
+	PutFormData($f, $s, "newpassword2", "", "text");
+	PutFormData($f, $s, "oldpassword", "", "text");
 	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999");
 }
 
@@ -72,20 +89,27 @@ startWindow('User Information');
 						<td colspan="4"><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
 					</tr>
 					<tr>
-						<td align="right">Password:</td>
-						<td colspan="4"><? NewFormItem($f,$s, 'password1', 'password', 20,50); ?></td>
-						<td>&nbsp;</td>
-						<td align="right">Confirm Password:</td>
-						<td colspan="4"><? NewFormItem($f,$s, 'password2', 'password', 20,50); ?></td>
-					</tr>
-					<tr>
 						<td align="right">Zipcode:</td>
 						<td colspan="4"><? NewFormItem($f, $s, 'zipcode', 'text', '5'); ?></td>
 					</tr>
+					<tr>
+						<td align="right">Old Password*:</td>
+						<td colspan="4"><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
+					</tr>
+					<tr>
+						<td align="right">New Password:</td>
+						<td colspan="4"><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
+						<td>&nbsp;</td>
+						<td align="right">Confirm New Password:</td>
+						<td colspan="4"><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
+					</tr>
+					
 				</table>
+				<div>*Only required for changing your password</div>
 			</td>
 		</tr>
 	</table>
+	
 <?
 endWindow();
 buttons();
