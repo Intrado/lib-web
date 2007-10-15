@@ -8,8 +8,14 @@ if(isset($_GET["logout"])) {
 	@session_destroy();
 }
 
-if (!isset($_SERVER["HTTPS"])){
-	redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/manager/index.php");
+if ($SETTINGS['feature']['has_ssl']) {
+	$location = substr($_SERVER["SCRIPT_NAME"],1);
+	$location = strtolower(substr($location,0,strrpos($location,"/")));
+	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/" . $location . "/index.php";
+	
+	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
+		redirect($secureurl);
+	}
 }
 
 $badlogin=false;
