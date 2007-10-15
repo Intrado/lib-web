@@ -69,6 +69,9 @@ if (isset($personid)) {
 	for ($i=count($emails); $i<$maxemails; $i++) {
 		$emails[$i] = new Email();
 	}
+	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
+	$associates = getPortalUsers($associateids);
+	
 } else {
 	// error, person should always be set, this is a viewing page!
 	redirect('unauthorized.php');
@@ -90,6 +93,7 @@ function displayValue($s) {
 // where did we come from, list preview or contact tab
 $PAGE = "notifications:lists";
 if (strpos($_SERVER['HTTP_REFERER'],"contacts.php") !== false) $PAGE = "system:contacts";
+if (strpos($_SERVER['HTTP_REFERER'],"portalmanagement.php") !== false) $PAGE = "admin:portal";
 
 $contactFullName = "";
 $f = FieldMap::getFirstNameField();
@@ -119,8 +123,58 @@ startWindow('Contact');
 			<? $f=FieldMap::getLanguageField(); displayValue($data->$f); ?>
 		</td>
 	</tr>
-
 <?
+
+
+$fieldmaps = FieldMap::getAuthorizedFieldMaps();
+foreach ($fieldmaps as $map) {
+	$fname = $map->fieldnum;
+	$header = $map->name;
+	$fval = $data->$fname;
+
+	if (!strcmp($fname, FieldMap::getFirstNameField()) ||
+		!strcmp($fname, FieldMap::getLastNameField()) ||
+		!strcmp($fname, FieldMap::getLanguageField())) {
+			continue; // skip field, it was in layout above
+	}
+
+?>
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
+		<td class="bottomBorder"><? displayValue($fval); ?></td>
+	</tr>
+<?
+}
+?>
+	<tr>
+		<th align="right" valign="top" class="windowRowHeader bottomBorder" style="padding-top: 10px;">Address:</th>
+		<td class="bottomBorder">
+			<table border="0">
+				<tr>
+					<td><? displayValue($address->addr1); ?></td>
+				</tr>
+				<tr>
+					<td><? displayValue($address->addr2); ?></td>
+				</tr>
+				<tr>
+					<td>
+						<?
+							if (strlen(trim($address->city)) == 0 &&
+								strlen(trim($address->state)) == 0) {
+									displayValue($address->zip);
+								} else {
+						 			displayValue($address->city.",");
+						 			displayValue($address->state." ");
+						 			displayValue($address->zip);
+								}
+						 ?>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<?
+
 	$x = 0;
 	foreach ($phones as $phone) {
 		$header = "Phone " . ($x+1) . ":";
@@ -149,58 +203,23 @@ startWindow('Contact');
 		$x++;
 	}
 ?>
-
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader bottomBorder" style="padding-top: 10px;">Address:</th>
-		<td class="bottomBorder">
-			<table border="0">
-				<tr>
-					<td><? displayValue($address->addr1); ?></td>
-				</tr>
-				<tr>
-					<td><? displayValue($address->addr2); ?></td>
-				</tr>
-				<tr>
-					<td>
-						<?
-							if (strlen(trim($address->city)) == 0 &&
-								strlen(trim($address->state)) == 0) {
-									displayValue($address->zip);
-								} else {
-						 			displayValue($address->city.",");
-						 			displayValue($address->state." ");
-						 			displayValue($address->zip);
-								}
-						 ?>
-					</td>
-				</tr>
+		<th align="right" class="windowRowHeader">Associations</th>
+		<td>
+			<table>
+<?
+			if($associates){
+				foreach($associates as $associate){
+					$name = $associate['portaluser.firstname'] . " " . $associate['portaluser.lastname'] . " (" . $associate['portaluser.username'] . ")";
+					?><tr><td><?=$name?></td></tr><?
+				}
+			} else {
+				?><tr><td>&nbsp</td></tr><?
+			}
+?>
 			</table>
 		</td>
 	</tr>
-
-<?
-
-
-$fieldmaps = FieldMap::getAuthorizedFieldMaps();
-foreach ($fieldmaps as $map) {
-	$fname = $map->fieldnum;
-	$header = $map->name;
-	$fval = $data->$fname;
-
-	if (!strcmp($fname, FieldMap::getFirstNameField()) ||
-		!strcmp($fname, FieldMap::getLastNameField()) ||
-		!strcmp($fname, FieldMap::getLanguageField())) {
-			continue; // skip field, it was in layout above
-	}
-
-?>
-	<tr>
-		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? displayValue($fval); ?></td>
-	</tr>
-<?
-}
-?>
 </table>
 <?
 
