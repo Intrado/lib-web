@@ -37,7 +37,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$sessionstarted = true;
 
 	if (isset($_SESSION['portaluserid'])) {
-		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
+		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php';
 		unset($_SESSION['lasturi']);
 		redirect($redirpage);
     }
