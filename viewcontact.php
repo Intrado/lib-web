@@ -16,10 +16,15 @@ include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
+include_once("obj/JobType.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
+
+if(isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'],"viewcontact.php") === false){
+	$_SESSION['viewcontact_referer'] = $_SERVER['HTTP_REFERER'];
+}
 
 if (isset($_GET['id'])) {
 	$personid = DBSafe($_GET['id']);
@@ -39,6 +44,39 @@ if (isset($_GET['id'])) {
 	if (!($personid = QuickQuery($query))) {
 		// bad
 		redirect('unauthorized.php');
+	}
+	$_SESSION['currentpid'] = $personid;
+	redirect();
+} else if(isset($_SESSION['currentpid'])){
+	$personid = $_SESSION['currentpid'];
+} else {
+	redirect('unauthorized.php');
+}
+
+if(isset($_GET['create'])){
+	$createpersonid = $_GET['create']+0;
+	if(generatePersonTokens(array($createpersonid))){
+		redirect("?id=$personid");
+	} else {
+		error("There was an error generating a new token");
+	}
+}
+
+if(isset($_GET['revoke'])){
+	$revokeid = $_GET['revoke'] + 0;
+	$count = revokePersonTokens(array($revokeid));
+	if($count){
+		redirect("?id=$personid");
+	} else {
+		error("There was an error revoking this person's token");
+	}
+}
+
+if(isset($_GET['disassociate'])){
+	$portaluserid = $_GET['disassociate'] + 0;
+	$count = revokePersonTokens(array($portaluserid));
+	if($count){
+		redirect("?id=$personid");
 	}
 }
 
@@ -64,14 +102,29 @@ if (isset($personid)) {
 	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
 	for ($i=count($phones); $i<$maxphones; $i++) {
 		$phones[$i] = new Phone();
+		$phones[$i]->sequence = $i;
 	}
 	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
 	for ($i=count($emails); $i<$maxemails; $i++) {
 		$emails[$i] = new Email();
+		$emails[$i]->sequence = $i;
 	}
 	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
 	$associates = getPortalUsers($associateids);
-	
+	$tokendata = QuickQueryRow("select token, expirationdate, creationuserid from portalpersontoken where personid = '" . $personid . "'", true);
+	$creationusername = "";
+	if($tokendata){
+		$creationuser = new User($tokendata['creationuserid']);
+		$tokendata['creationusername'] = $creationuser->firstname . " " . $creationuser->lastname;
+		$tokendata['expirationdate'] = ($tokendata['expirationdate'] != "") ? date("M d, Y", strtotime($tokendata['expirationdate'])) : "";
+	} else {
+		$tokendata = array("token" => "",
+							"creationusername" => "",
+							"expirationdate" => "");
+	}
+	$jobtypes = DBFindMany("JobType", "from jobtype where not deleted order by systempriority, name");
+	$contactprefs = getContactPrefs($personid);
+	$defaultcontactprefs = getDefaultContactPrefs();
 } else {
 	// error, person should always be set, this is a viewing page!
 	redirect('unauthorized.php');
@@ -79,8 +132,130 @@ if (isset($personid)) {
 
 /****************** main message section ******************/
 
-$f = "person";
+$f = "viewcontact";
 $s = "main";
+$reloadform = 0;
+
+
+if(CheckFormSubmit($f,$s))
+{
+	//check to see if formdata is valid
+	if(CheckFormInvalid($f))
+	{
+		error('Form was edited in another window, reloading data');
+		$reloadform = 1;
+	}
+	else
+	{
+		MergeSectionFormData($f, $s);
+
+		//do check
+
+		if( CheckFormSection($f, $s) ) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else {
+			//submit changes
+			foreach($phones as $phone){
+				$phone->phone = Phone::parse(GetFormData($f,$s, "phone" . $phone->sequence));
+				$phone->editlock = GetFormData($f, $s, "editlock_phone" . $phone->sequence);
+				$phone->update();
+				foreach($jobtypes as $jobtype){
+					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+								values ('" . $personid . "','" . $jobtype->id . "','phone','" . $phone->sequence . "','" 
+								. DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "') 
+								on duplicate key update
+								personid = '" . $personid . "',
+								jobtypeid = '" . $jobtype->id . "',
+								type = 'phone',
+								sequence = '" . $phone->sequence . "',
+								enabled = '" . DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "'");
+				}
+			}
+			foreach($emails as $email){
+				$email->email = GetFormData($f,$s, "email" . $email->sequence);
+				$email->editlock = GetFormData($f, $s, "editlock_email" . $email->sequence);
+				$email->update();
+				foreach($jobtypes as $jobtype){
+					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+								values ('" . $personid . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
+								. DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "') 
+								on duplicate key update
+								personid = '" . $personid . "',
+								jobtypeid = '" . $jobtype->id . "',
+								type = 'email',
+								sequence = '" . $email->sequence . "',
+								enabled = '" . DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "'");
+				}
+			}
+			/*
+			foreach($smses as $sms){
+				$sms->sms = Phone::parse(GetFormData($f,$s, "sms" . $sms->sequence));
+				$sms->editlock = GetFormData($f, $s, "editlock_sms" . $sms->sequence);
+				$sms->update();
+				foreach($jobtypes as $jobtype){
+					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+								values ('" . $personid . "','" . $jobtype->id . "','sms','" . $sms->sequence . "','" 
+								. DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "') 
+								on duplicate key update
+								personid = '" . $personid . "',
+								jobtypeid = '" . $jobtype->id . "',
+								type = 'sms',
+								sequence = '" . $sms->sequence . "',
+								enabled = '" . DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "'");
+				}
+			}
+			*/
+
+			redirect();
+		}
+	}
+} else {
+	$reloadform = 1;
+}
+
+if( $reloadform )
+{
+	ClearFormData($f);
+	foreach($phones as $phone){
+		PutFormData($f, $s, "phone" . $phone->sequence, Phone::format($phone->phone), "phone", 10);
+		PutFormData($f, $s, "editlock_phone" . $phone->sequence, $phone->editlock, "bool", 0, 1);
+		foreach($jobtypes as $jobtype){
+			$contactpref = 0;
+			if(isset($contactprefs["phone"][$phone->sequence][$jobtype->id]))
+				$contactpref = $contactprefs["phone"][$phone->sequence][$jobtype->id];
+			else if(isset($defaultcontactprefs["phone"][$phone->sequence][$jobtype->id]))
+				$contactpref = $defaultcontactprefs["phone"][$phone->sequence][$jobtype->id];
+			PutFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
+		}
+	}
+	foreach($emails as $email){
+		PutFormData($f, $s, "email" . $email->sequence, $email->email, "email", 0, 100);
+		PutFormData($f, $s, "editlock_email" . $email->sequence, $email->editlock, "bool", 0, 1);
+		foreach($jobtypes as $jobtype){
+			$contactpref = 0;
+			if(isset($contactprefs["email"][$email->sequence][$jobtype->id]))
+				$contactpref = $contactprefs["email"][$email->sequence][$jobtype->id];
+			else if(isset($defaultcontactprefs["email"][$email->sequence][$jobtype->id]))
+				$contactpref = $defaultcontactprefs["email"][$email->sequence][$jobtype->id];
+			PutFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
+		}
+	}
+	/*
+	foreach($smses as $sms){
+		PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->sms), "phone", 10);
+		PutFormData($f, $s, "editlock_sms" . $sms->sequence, $sms->editlock, "bool", 0, 1);
+		foreach($jobtypes as $jobtype){
+			$contactpref = 0;
+			if(isset($contactprefs["sms"][$sms->sequence][$jobtype->id]))
+				$contactpref = $contactprefs["sms"][$sms->sequence][$jobtype->id];
+			else if(isset($defaultcontactprefs["sms"][$sms->sequence][$jobtype->id]))
+				$contactpref = $defaultcontactprefs["sms"][$sms->sequence][$jobtype->id];
+			PutFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
+		}
+	}
+	*/
+}
+
 
 function displayValue($s) {
 	echo($s."&nbsp;");
@@ -92,20 +267,20 @@ function displayValue($s) {
 
 // where did we come from, list preview or contact tab
 $PAGE = "notifications:lists";
-if (strpos($_SERVER['HTTP_REFERER'],"contacts.php") !== false) $PAGE = "system:contacts";
-if (strpos($_SERVER['HTTP_REFERER'],"portalmanagement.php") !== false) $PAGE = "admin:portal";
+if (strpos($_SESSION['viewcontact_referer'],"contacts.php") !== false) $PAGE = "system:contacts";
+if (strpos($_SESSION['viewcontact_referer'],"portalmanagement.php") !== false) $PAGE = "admin:portal";
 
 $contactFullName = "";
-$f = FieldMap::getFirstNameField();
-$contactFullName .= $data->$f;
-$f = FieldMap::getLastNameField();
-$contactFullName .= " ".$data->$f;
+$firstnamefield = FieldMap::getFirstNameField();
+$contactFullName .= $data->$firstnamefield;
+$lastnamefield = FieldMap::getLastNameField();
+$contactFullName .= " ".$data->$lastnamefield;
 
 $TITLE = "View Contact Information: " . $contactFullName;
 
 include_once("nav.inc.php");
-
-button_bar(button('Done', NULL,$_SERVER['HTTP_REFERER']));
+NewForm($f);
+buttons(button('Done', NULL,$_SESSION['viewcontact_referer']), submit($f, $s, "Save"));
 
 startWindow('Contact');
 
@@ -120,7 +295,7 @@ startWindow('Contact');
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Language Preference:</th>
 		<td  class="bottomBorder">
-			<? $f=FieldMap::getLanguageField(); displayValue($data->$f); ?>
+			<? $languagefield=FieldMap::getLanguageField(); displayValue($data->$languagefield); ?>
 		</td>
 	</tr>
 <?
@@ -173,17 +348,36 @@ foreach ($fieldmaps as $map) {
 			</table>
 		</td>
 	</tr>
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder">Contact Details: </th>
+		<td class="bottomBorder">
+			<table padding="3px">
+				<tr>
+					<th>Contact Type</th>
+					<th>Destination</th>
+					<th>Edit Lock</th>
+<?
+					foreach($jobtypes as $jobtype){
+						?><th><?=htmlentities($jobtype->name)?></th><?	
+					}
+?>
+				</tr>
 <?
 
 	$x = 0;
 	foreach ($phones as $phone) {
 		$header = "Phone " . ($x+1) . ":";
-		if ($x == 0) $header = "Primary Phone:";
 		$itemname = "phone".($x+1);
 ?>
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? displayValue(Phone::format($phone->phone)); ?> <?= $phone->smsenabled ? "<b>[SMS]</b>" : "" ?></td>
+		<td><?= $header ?></td>
+		<td><? NewFormItem($f, $s, "phone" . $phone->sequence, "text", 15); ?> <?= $phone->smsenabled ? "<b>[SMS]</b>" : "" ?></td>
+		<td align="middle"><? NewFormItem($f, $s, "editlock_phone" . $phone->sequence, "checkbox", 0, 1); ?></td>
+<?
+		foreach($jobtypes as $jobtype){
+			?><td align="middle"><? NewFormItem($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+		}
+?>
 	</tr>
 <?
 		$x++;
@@ -192,26 +386,39 @@ foreach ($fieldmaps as $map) {
 	$x = 0;
 	foreach ($emails as $email) {
 		$header = "Email " . ($x+1) . ":";
-		if ($x == 0) $header = "Primary Email:";
 		$itemname = "email".($x+1);
 ?>
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? displayValue($email->email); ?></td>
+		<td><?= $header ?></td>
+		<td><? NewFormItem($f, $s, "email" . $email->sequence, "text", 50, 100) ?></td>
+		<td align="middle"><? NewFormItem($f, $s, "editlock_email" . $email->sequence, "checkbox", 0,1);?></td>
+<?
+		foreach($jobtypes as $jobtype){
+			?><td align="middle"><? NewFormItem($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+		}
+?>
 	</tr>
 <?
 		$x++;
 	}
 ?>
-	<tr>
-		<th align="right" class="windowRowHeader">Associations</th>
+			</table>
 		<td>
+	</tr>
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder">Associations</th>
+		<td class="bottomBorder">
 			<table>
 <?
 			if($associates){
-				foreach($associates as $associate){
+				foreach($associates as $portaluserid => $associate){
 					$name = $associate['portaluser.firstname'] . " " . $associate['portaluser.lastname'] . " (" . $associate['portaluser.username'] . ")";
-					?><tr><td><?=$name?></td></tr><?
+?>
+					<tr>
+						<td><?=$name?></td>
+						<td><?=button("Disassociate", "if(confirmDisassociate()) window.location='?id=" . $personid . "&disassociate=" . $portaluserid . "'")?></td>
+					</tr>
+<?
 				}
 			} else {
 				?><tr><td>&nbsp</td></tr><?
@@ -220,11 +427,41 @@ foreach ($fieldmaps as $map) {
 			</table>
 		</td>
 	</tr>
+	<tr>
+		<th align="right" class="windowRowHeader">Token Information</th>
+		<td>
+			<table>
+				<tr><td>Token: <?=$tokendata['token'] ?></td></tr>
+				<tr><td>Expiration Date: <?=$tokendata['expirationdate'] ?></td></tr>
+				<tr><td>Creation User: <?=$tokendata['creationusername'] ?></td></tr>
+				<tr>
+					<td>
+<?
+					if($tokendata['token']){
+						echo button("Revoke Token", "if(confirmRevoke()) window.location='?id=" . $personid . "&revoke=" . $personid . "'");
+					} else {
+						echo button("Generate Token", "window.location='?id=" . $personid . "&create=" . $personid . "'");;
+					}
+?>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
 </table>
+<script>
+	function confirmDisassociate(){
+		return confirm('Are you sure you want to disassociate this Portal User?');
+	}
+	function confirmRevoke(){
+		return confirm('Are you sure you want to revoke this contact\'s token?');
+	}
+</script>
 <?
 
 
 endWindow();
-
+buttons();
+EndForm();
 include_once("navbottom.inc.php");
 
