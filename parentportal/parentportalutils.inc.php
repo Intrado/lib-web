@@ -23,7 +23,7 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 		}
 	}
 	foreach($phones as $phone){
-		PutFormData($f, $s, "phone" . $phone->sequence, Phone::format($phone->phone), "phone", 0, 100);
+		PutFormData($f, $s, "phone" . $phone->sequence, Phone::format($phone->phone), "phone", 10);
 		foreach($jobtypes as $jobtype){
 			$contactpref = 0;
 			if(isset($contactprefs["phone"][$phone->sequence][$jobtype->id]))
@@ -35,7 +35,7 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 	}
 	/*
 	foreach($smses as $sms){
-		PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->phone), "phone", 0, 100);
+		PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->phone), "phone", 0, 10);
 		foreach($jobtypes as $jobtype){
 			$contactpref = 0;
 			if(isset($contactprefs["sms"][$sms->sequence][$jobtype->id]))
@@ -46,17 +46,6 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 		}
 	}
 	*/
-}
-
-//checks a list of corresponding form field phone numbers for validation
-function checkPhones($f, $s, $phones){
-	foreach($phones as $phone){
-		$phone = Phone::parse(GetFormData($f, $s, "phone" . $phone->sequence));
-		if($error = Phone::validate($phone)){
-			return true;
-		}
-	}
-	return false;
 }
 
 //displays checkbox for each jobtype 
@@ -81,40 +70,6 @@ function displayEnabledJobtypes($contactprefs, $defaultcontactprefs, $type, $seq
 		}
 	}
 	return implode(",",$enabled);
-}
-
-// fetches jobtype preferences and builds multidimensional array
-function getDefaultContactPrefs(){
-	$query = "Select type, sequence, jobtypeid, enabled from jobtypepref";
-	$res = Query($query);
-	$contactprefs = array();
-	while($row = DBGetRow($res)){
-		if(!isset($contactprefs[$row[0]]))
-			$contactprefs[$row[0]] = array();
-		if(!isset($contactprefs[$row[0]][$row[1]]))
-			$contactprefs[$row[0]][$row[1]] = array();
-		if(!isset($contactprefs[$row[0]][$row[1]][$row[2]]))
-			$contactprefs[$row[0]][$row[1]][$row[2]] = array();
-		$contactprefs[$row[0]][$row[1]][$row[2]] = $row[3];
-	}
-	return $contactprefs;
-}
-
-//fetches contact preferences and builds multidimesional array
-function getContactPrefs($personid){
-	$query = "Select type, sequence, jobtypeid, enabled from contactpref where personid = '" . $personid . "'";
-	$res = Query($query);
-	$contactprefs = array();
-	while($row = DBGetRow($res)){
-		if(!isset($contactprefs[$row[0]]))
-			$contactprefs[$row[0]] = array();
-		if(!isset($contactprefs[$row[0]][$row[1]]))
-			$contactprefs[$row[0]][$row[1]] = array();
-		if(!isset($contactprefs[$row[0]][$row[1]][$row[2]]))
-			$contactprefs[$row[0]][$row[1]][$row[2]] = array();
-		$contactprefs[$row[0]][$row[1]][$row[2]] = $row[3];
-	}
-	return $contactprefs;
 }
 
 //copies contact details and preferences of main person to all persons in otherpids
