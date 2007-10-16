@@ -99,15 +99,18 @@ if (isset($personid)) {
 
 	// get existing phones from db, then create any additional based on the max allowed
 	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
+	// use array_values to reset starting index to 0
 	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
 	for ($i=count($phones); $i<$maxphones; $i++) {
 		$phones[$i] = new Phone();
 		$phones[$i]->sequence = $i;
+		$phones[$i]->personid = $personid;
 	}
 	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
 	for ($i=count($emails); $i<$maxemails; $i++) {
 		$emails[$i] = new Email();
 		$emails[$i]->sequence = $i;
+		$emails[$i]->personid = $personid;
 	}
 	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
 	$associates = getPortalUsers($associateids);
@@ -175,6 +178,7 @@ if(CheckFormSubmit($f,$s))
 				$email->email = GetFormData($f,$s, "email" . $email->sequence);
 				$email->editlock = GetFormData($f, $s, "editlock_email" . $email->sequence);
 				$email->update();
+				var_dump($email);
 				foreach($jobtypes as $jobtype){
 					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
 								values ('" . $personid . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
