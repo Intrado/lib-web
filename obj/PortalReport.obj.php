@@ -25,10 +25,12 @@ class PortalReport extends ReportGenerator{
 					p." . FieldMap::GetFirstNameField() . " as firstname, 
 					p." . FieldMap::GetLastNameField() . " as lastname, 
 					ppt.token,
-					ppt.expirationdate "
+					ppt.expirationdate,
+					pp.portaluserid "
 					. generateFields("p")
-					. " from person p 
+					. "	from person p 
 					left join portalpersontoken ppt on (ppt.personid = p.id)
+					left join portalperson pp on (pp.personid = p.id)
 					where not p.deleted
 					and p.type='system' "
 					. $pkeysql
@@ -54,26 +56,21 @@ class PortalReport extends ReportGenerator{
 		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
 		$data = array();
-
+		$portaluserids = array();
 		while($row = DBGetRow($result)){
-			//$phones = QuickQueryList("select phone from phone where personid = '$row[1]'");
-			//$emails = QuickQueryList("select phone from phone where personid = '$row[1]' and phone like '9993%'");
-			//$row = array_insert($row, array($phones, $emails), 3);
-			$associateids = QuickQueryList("select portaluserid from portalperson where personid = '$row[1]'");
-			$associates = getPortalUsers($associateids);
-			if($associates){
-				$associatenames = array();
-				foreach($associates as $associate){
-					$associatenames[] = $associate["portaluser.firstname"] . " " . $associate["portaluser.lastname"] . " (" . $associate["portaluser.username"] . ")";
-				}
-			} else
-				$associatenames = array("");
-			$row = array_insert($row, array($associatenames), 5);
-
+			if($row[6])
+				$portaluserids[] = $row[6];
 			$data[] = $row;
 		}
-		$data = flattenData($data);
-
+		$portalusers = getPortalUsers($portaluserids);
+		foreach($data as $index => $row){
+			if(isset($portalusers[$row[6]])){
+				$portaluser = $portalusers[$row[6]];
+				$row[6] = $portaluser['portaluser.firstname'] . " " . $portaluser['portaluser.lastname'];
+				$data[$index] = $row;
+			}
+		}
+		
 		$titles = array(0 => "ID#", 
 						2 => "First Name", 
 						3 => "Last Name",
@@ -94,7 +91,9 @@ class PortalReport extends ReportGenerator{
 			}
 			$end++;
 		}
-
+		
+		$repeatedColumns = array(6);
+		
 		$formatters = array(0 => "fmt_idmagnify",
 							5 => "fmt_date");
 		
@@ -103,7 +102,7 @@ class PortalReport extends ReportGenerator{
 ?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="portalresults">
 <?
-				showTableWithHidden($data, $titles, $formatters, $hiddenColumns, 0);
+				showTable($data, $titles, $formatters, $repeatedColumns, $hiddenColumns, 0);
 ?>
 			</table>
 			<script langauge="javascript">
