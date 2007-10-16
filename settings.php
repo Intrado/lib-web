@@ -80,6 +80,7 @@ function setSetting($name, $value) {
 	}
 }
 
+$maxphones = getSystemSetting("maxphones", 3);
 
 /****************** main message section ******************/
 
@@ -157,6 +158,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
+				
+				for($i = 0; $i < $maxphones; $i++){
+					setSetting('accessiblePhone' . $i, GetFormData($f, $s, 'accessiblePhone' . $i));
+				}
 
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
@@ -202,7 +207,10 @@ if( $reloadform )
 		PutFormData($f, $s, "easycallmin", getSetting('easycallmin'), "number", 0, 10);
 		PutFormData($f, $s, "easycallmax", getSetting('easycallmax'), "number", 0, 10);
 	}
-	//do some custom stuff for the options
+	
+	for($i=0; $i < $maxphones; $i++){
+		PutFormData($f, $s, "accessiblePhone" . $i, getSystemSetting('accessiblePhone' . $i, 0), "bool", 0, 1);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -452,6 +460,18 @@ startWindow('Global System Settings');
 							</tr>
 						</table>
 					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Portal:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+<?
+								for($i=0; $i<$maxphones; $i++){
+									?><tr><td><? NewFormItem($f, $s, "accessiblePhone" . $i, "checkbox");?> Phone <?=$i+1?></td></tr><?
+								}
+?>
+						</table>
+					</td>								
 				</tr>
 			</table>
 			<?
