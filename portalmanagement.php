@@ -315,4 +315,15 @@ function flattenData($data){
 	}
 	return $newdata;
 }
+
+function display_associated_portal_user($row, $index){
+	$portaluserid = $row[$index];
+	if($portaluserid){
+		$result = getPortalUsers(array($portaluserid));
+		if(isset($result[$portaluserid])){
+			return $result[$portaluserid]['portaluser.firstname'] . " " . $result[$portaluserid]['portaluser.lastname'];
+		}
+	}
+	return "";
+}
 ?>
