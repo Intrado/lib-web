@@ -37,12 +37,23 @@ if(isset($_SESSION['customerid'])){
 
 if($PERSONID){
 	
-	$phones = $person->getPhones();
-	$emails = $person->getEmails();
+	$maxphones = getSystemSetting("maxphones");
+	$maxemails = getSystemSetting("maxemails");
+	$phones = array_values($person->getPhones());
+	for ($i=count($phones); $i<$maxphones; $i++) {
+		$phones[$i] = new Phone();
+		$phones[$i]->sequence = $i;
+		$phones[$i]->personid = $personid;
+	}
+	$emails = array_values($person->getEmails();
+	for ($i=count($emails); $i<$maxemails; $i++) {
+		$emails[$i] = new Email();
+		$emails[$i]->sequence = $i;
+		$emails[$i]->personid = $personid;
+	}
 	$smses = null;
 	//TODO: uncomment and delete null
-	//$smses = $person->getSmses();
-	$maxphones = getSystemSetting("maxphones");
+	//$smses = array_values($person->getSmses());
 	$accessiblePhones= array();
 	for($i=0; $i < $maxphones; $i++){
 		$accessiblePhones[$i] = getSystemSetting("accessiblePhone" . $i);
