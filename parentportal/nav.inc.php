@@ -22,7 +22,7 @@ if (isset($_GET['timer']))
 $NAVTREE = array (
 	array("Welcome","start.php",NULL,$MAINTAB=="welcome",array()),
 	array("Contacts", NULL, NULL, $MAINTAB=="contacts", array(
-		array("Contact Preferences", "contactpreferences.php", NULL, $SUBTAB=="contactpreferences"),
+		array("Contact Preferences", "contactpreferences.php?clear=1", NULL, $SUBTAB=="contactpreferences"),
 		))
 );
 
