@@ -3,8 +3,10 @@
 class PortalReport extends ReportGenerator{
 
 	function generateQuery(){
+		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$rulesql = getRuleSql($this->params, "p");
+		$usersql = $USER->userSQL("p");
 		$pkeysql = "";
 		$hideactivetokens = "";
 		$hideassociated = "";
@@ -27,11 +29,13 @@ class PortalReport extends ReportGenerator{
 					. generateFields("p")
 					. " from person p 
 					left join portalpersontoken ppt on (ppt.personid = p.id)
-					where 1 "
+					where not p.deleted
+					and p.type='system' "
 					. $pkeysql
 					. $rulesql
 					. $hideactivetokens
 					. $hideassociated
+					. $usersql
 					. " order by p.id";
 	}
 
