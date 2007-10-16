@@ -17,7 +17,7 @@ if($_SESSION['customerid']){
 	$contactList = getContactIDs($_SESSION['portaluserid']);
 	
 	foreach($contactList as $personid){
-		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.messageid, rp.personid
+		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.messageid, rp.personid , u.email
 			from job j 
 			left join reportperson rp on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
@@ -70,7 +70,13 @@ function format_date($row, $index){
 function sender($row, $index){
 	//index 4 is first name
 	//index 5 is last name
-	return $row[4] . " " . $row[5];
+	//index 3 is type
+	//index 8 is email
+	if($row[3] == 'email'){
+		return "<a href='mailto:" . $row[8] . "'>" . $row[4] . " " . $row[5] . "</a>";
+	} else {
+		return $row[4] . " " . $row[5];
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -79,10 +85,11 @@ $TITLE="Welcome - " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_
 $PAGE = 'welcome:welcome';
 include_once("nav.inc.php");
 if($_SESSION['customerid']){
+	?><div><b>Messages from the last 30 days</b></div><br><?
 	foreach($contactList as $personid){
 		$data = $allData[$personid];
 		$person = new Person($personid);
-		startWindow("Messages for " . $person->$firstnameField . " " . $person->$lastnameField . " from the last 30 days",'padding: 3px;');
+		startWindow($person->$firstnameField . " " . $person->$lastnameField,'padding: 3px;', true);
 		$scroll="";
 		if(count($data) > 6)
 			$scroll = 'class="scrollTableContainer"';
