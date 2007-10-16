@@ -405,4 +405,38 @@ function array_insert($array, $insertitems = array(), $startindex){
 	return $newarray;
 }
 
+// fetches jobtype preferences and builds multidimensional array
+function getDefaultContactPrefs(){
+	$query = "Select type, sequence, jobtypeid, enabled from jobtypepref";
+	$res = Query($query);
+	$contactprefs = array();
+	while($row = DBGetRow($res)){
+		if(!isset($contactprefs[$row[0]]))
+			$contactprefs[$row[0]] = array();
+		if(!isset($contactprefs[$row[0]][$row[1]]))
+			$contactprefs[$row[0]][$row[1]] = array();
+		if(!isset($contactprefs[$row[0]][$row[1]][$row[2]]))
+			$contactprefs[$row[0]][$row[1]][$row[2]] = array();
+		$contactprefs[$row[0]][$row[1]][$row[2]] = $row[3];
+	}
+	return $contactprefs;
+}
+
+//fetches contact preferences and builds multidimesional array
+function getContactPrefs($personid){
+	$query = "Select type, sequence, jobtypeid, enabled from contactpref where personid = '" . $personid . "'";
+	$res = Query($query);
+	$contactprefs = array();
+	while($row = DBGetRow($res)){
+		if(!isset($contactprefs[$row[0]]))
+			$contactprefs[$row[0]] = array();
+		if(!isset($contactprefs[$row[0]][$row[1]]))
+			$contactprefs[$row[0]][$row[1]] = array();
+		if(!isset($contactprefs[$row[0]][$row[1]][$row[2]]))
+			$contactprefs[$row[0]][$row[1]][$row[2]] = array();
+		$contactprefs[$row[0]][$row[1]][$row[2]] = $row[3];
+	}
+	return $contactprefs;
+}
+
 ?>
