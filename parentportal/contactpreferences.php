@@ -15,26 +15,97 @@ require_once("parentportalutils.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 $PERSONID = 0;
 
+if(isset($_GET['clear'])){
+	unset($_SESSION['currentpersonid']);
+	redirect();
+}
 
-if($_SESSION['customerid']){
-	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted");
+if(isset($_SESSION['customerid'])){
+	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, name");
 	$contactList = getContacts($_SESSION['portaluserid']);
 	$firstnamefield = FieldMap::getFirstNameField();
 	$lastnamefield = FieldMap::getLastNameField();
 	if(isset($_GET['id'])){
 		$PERSONID = $_GET['id'] + 0;
+		$_SESSION['currentpersonid'] = $PERSONID;
+		$person = new Person($PERSONID);
+	} else if(isset($_SESSION['currentpersonid'])){
+		$PERSONID = $_SESSION['currentpersonid'];
 		$person = new Person($PERSONID);
 	}
 }
+
+if($PERSONID){
 	
+	$phones = $person->getPhones();
+	$emails = $person->getEmails();
+	$smses = null;
+	//TODO: uncomment and delete null
+	//$smses = $person->getSmses();
+	$maxphones = getSystemSetting("maxphones");
+	$accessiblePhones= array();
+	for($i=0; $i < $maxphones; $i++){
+		$accessiblePhones[$i] = getSystemSetting("accessiblePhone" . $i);
+	}
+
+	$contactprefs = getContactPrefs($PERSONID);
+	$defaultcontactprefs = getDefaultContactPrefs();
+
+	/****************** main message section ******************/
+
+	$f = "contactpreferences";
+	$s = "main";
+	$reloadform = 0;
+
+
+	if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "all"))
+	{
+		//check to see if formdata is valid
+		if(CheckFormInvalid($f))
+		{
+			error('Form was edited in another window, reloading data');
+			$reloadform = 1;
+		}
+		else
+		{
+			MergeSectionFormData($f, $s);
+
+			//do check
+			if( CheckFormSection($f, $s) ) {
+				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+			} else if(checkPhones($f, $s, $phones)){
+				error('There is a problem with one of your phone numbers.  Please validate that it has 10 digits');
+			} else {
+				
+				getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
+				
+				if(GetFormData($f, $s, "savetoall")){
+					//Fetch all person id's associated with this user on this customer
+					//then remove the current person id from the list
+					$otherContacts = getContactIDs($_SESSION['portaluserid']);
+					unset($otherContacts[array_search($PERSONID, $otherContacts)]);
+					copyContactData($PERSONID, $otherContacts, $accessiblePhones);
+				}
+				redirect();
+			}
+		}
+	} else {
+		$reloadform = 1;
+	}
+
+	if( $reloadform )
+	{
+		ClearFormData($f);
+		PutFormData($f, $s, "savetoall", "1", "bool", 0, 1);
+		putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes);
+	}
+}
 
 
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
 // Functions
-////////////////////////////////////////////////////////////////////////////////
-
-
+///////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -65,7 +136,7 @@ startWindow("Preferences", 'padding: 3px;');
 ?>
 				</table>
 <?
-			buttons(button("Add A Contact", null, "addcontact.php"));
+			buttons(button("Add A Contact", null, "addcontact1.php"));
 ?>
 			</td>
 
