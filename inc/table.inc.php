@@ -46,16 +46,21 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	return $tableid;
 }
 
-function showTable ($data, $titles, $formatters = array()) {
+function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $hiddenColumns = array(), $groupby = null) {
 	echo '<tr class="listHeader">';
-	foreach ($titles as $title) {
+	foreach ($titles as $index => $title) {
 
+		
+		echo '<th align="left" ';
+		if(in_array($index, $hiddenColumns))
+			echo ' style="display:none" ';
 		//make column sortable?
 		if (strpos($title,"#") === false) {
-			echo '<th align="left" class="nosort">' ;
+			echo 'class="nosort">' ;
 		} else {
-			echo '<th align="left">';
+			echo '>';
 		}
+
 
 		if (strpos($title,"#") === 0)
 			$title = substr($title,1);
@@ -65,23 +70,41 @@ function showTable ($data, $titles, $formatters = array()) {
 
 	$alt = 0;
 	if (count($data) > 0) {
+		$curr = null;
 		foreach ($data as $row) {
-			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+			if($groupby !== null){
+				if($row[$groupby] !== $curr){
+					$alt++;
+				}
+			} else {
+				$alt++;
+			}
+			echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
 
 			//only show cels with titles
 			foreach ($titles as $index => $title) {
 
 				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
-				echo "<td>";
-				if (isset($formatters[$index])) {
-					$fn = $formatters[$index];
-					$cel = $fn($row,$index);
+				echo "<td";
+				if(in_array($index, $hiddenColumns))
+					echo ' style="display:none">';
+				else
+					echo ">";
+				if( $groupby === null || (($groupby !== null) && (($row[$groupby] != $curr) || ($row[$groupby] == $curr && in_array($index, $repeatedColumns))))){
+					if (isset($formatters[$index])) {
+						$fn = $formatters[$index];
+						$cel = $fn($row,$index);
+					} else {
+						$cel = htmlentities($row[$index]);
+					}
 				} else {
-					$cel = htmlentities($row[$index]);
+					$cel = "&nbsp;";
 				}
 				echo $cel . "</td>";
 			}
-
+			if($groupby !== null){
+				$curr = $row[$groupby];
+			}
 			echo "</tr>\n";
 		}
 	}
@@ -148,59 +171,6 @@ function showPageMenu ($total,$start, $perpage, $link = NULL) {
 </select>
 </div>
 <?
-}
-
-// similiar to show table but allows for hidden columns
-// groupby is the index to check to see if a new group has occured
-function showTableWithHidden($data, $titles, $formatters = array(), $hiddenColumns = array(), $groupby = 0) {
-	echo '<tr class="listHeader">';
-	foreach ($titles as $index => $title) {
-
-		//make column sortable?
-		echo '<th align="left" ';
-		if(in_array($index, $hiddenColumns))
-			echo ' style="display:none" ';
-		if (strpos($title,"#") === false) {
-			echo 'class="nosort">' ;
-		} else {
-			echo '>';
-		}
-
-		if (strpos($title,"#") === 0)
-			$title = substr($title,1);
-		echo htmlentities($title) . "</th>";
-	}
-	echo "</tr>\n";
-
-	$alt = 0;
-	if (count($data) > 0) {
-		foreach ($data as $row) {
-			if($row[$groupby]){
-				$alt++;
-			}
-			echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-
-			//only show cels with titles
-			foreach ($titles as $index => $title) {
-
-				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
-				echo "<td";
-				if(in_array($index, $hiddenColumns))
-					echo ' style="display:none">';
-				else
-					echo ">";
-				if (isset($formatters[$index])) {
-					$fn = $formatters[$index];
-					$cel = $fn($row,$index);
-				} else {
-					$cel = htmlentities($row[$index]);
-				}
-				echo $cel . "</td>";
-			}
-
-			echo "</tr>\n";
-		}
-	}
 }
 
 ?>
