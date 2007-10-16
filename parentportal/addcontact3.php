@@ -73,8 +73,6 @@ if($PERSONID){
 			//do check
 			if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-			} else if(checkPhones($f, $s, $phones)){
-				error('There is a problem with one of your phone numbers.  Please validate that it has 10 digits');
 			} else {
 				
 				getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
