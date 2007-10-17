@@ -1,5 +1,4 @@
 <?
-
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +28,7 @@ if (!$USER->authorize('managetasks')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
-	$id = DBSafe($_GET['id']);
+	$id = $_GET['id'] + 0;
 	if (customerOwns("import",$id)) {
 		$_SESSION['importid'] = $id;
 		$_SESSION['importcols'] = NULL;
@@ -38,112 +37,54 @@ if (isset($_GET['id'])) {
 }
 
 
-/****************** main message section ******************/
-$form = "taskmap";
-$section = "main";
-$reloadform = false;
+$previewrows = 10;
 
-if(CheckFormSubmit($form, $section))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($form))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = true;
+$import = new Import($_SESSION['importid']);
+$importfields = DBFindMany("importfield","from importfield where importid=" . $_SESSION['importid'] . " order by id");
+
+$newimportfield = new ImportField();
+$newimportfield->importid = $import->id;
+$newimportfield->mapto="";
+$newimportfield->mapfrom="";
+
+$importfields[] = $newimportfield;
+
+
+$importfieldmap = array();
+$usedcols = array();
+foreach ($importfields as $importfield) {
+	if ($importfield->mapfrom == null)
+		$importfield->mapfrom = "";
+	if ($importfield->mapfrom != "") {
+		$importfieldmap[] = $importfield->mapfrom;
+		$usedcols[$importfield->mapfrom] = true;
 	}
-	else
-	{
-		MergeSectionFormData($form, $section);
-		if( CheckFormSection($form, $section) )
-		{
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (CheckFormSubmit($form, $section)) {
-
-			for ($x = 0; $x < $_SESSION['importcols']; $x++) {
-				$mapto = GetFormData($form,$section,'mapto_' . $x);
-
-
-				$importfield = DBFind("ImportField","from importfield where mapfrom=$x and importid=" . $_SESSION['importid']);
-				if ($importfield && $mapto == "") {
-					$importfield->destroy();
-				} else if ($importfield && $mapto != "") {
-					$importfield->mapto = $mapto;
-					$importfield->update();
-				} else if ($mapto != "") {
-					$importfield = new ImportField();
-					$importfield->importid = $_SESSION['importid'];
-					$importfield->mapto = $mapto;
-					$importfield->mapfrom = $x;
-					$importfield->create();
-				}
-			}
-
-			//get rid of any mappings that are beyond the scope of the current file
-			QuickUpdate("delete from importfield where importid='" . $_SESSION['importid'] . "' and mapfrom >= $x");
-
-			//$reloadform = true;
-			redirect("tasks.php");
-		}
-	}
-} else {
-	$reloadform = true;
 }
-
-
-$id = $_SESSION['importid'];
-if (!$id || $id == 'new') {
-	$IMPORT = new Import();
-} else {
-	$IMPORT = new Import($id);
-}
-if ($IMPORT->id)
-	$IMPORTFIELDS = DBFindMany("importfield","from importfield where importid=" . $_SESSION['importid']);
-else
-	$IMPORTFIELDS = array();
-
-
-
 
 //make a menu of all available fields
 
 $fieldmaps = DBFindMany("FieldMap","from fieldmap order by fieldnum");
 
 $maptofields = array();
-
 $maptofields[""] = "- Unmapped -";
-
 $maptofields["key"] = "Unique ID";
+//F fields
 foreach ($fieldmaps as $fieldmap)
 	$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 
-
-if (!$maxphones = getSystemSetting("maxphones"))
-	$maxphones = 4;
-
-for ($x = 0; $x < $maxphones; $x++) {
-	if ($x == 0) {
-		$maptofields["p0"] = "Phone";
-		if ($SETTINGS['feature']['has_sms'] && getSystemSetting('_hassms', false)) {
-			$maptofields["s0"] = "Phone (SMS)";
-		}
-	} else {
-		$maptofields["p$x"] = "Phone " . ($x + 1);
-		if ($SETTINGS['feature']['has_sms']&& getSystemSetting('_hassms', false)) {
-			$maptofields["s$x"] = "Phone " . ($x + 1) . " (SMS)";
-		}
-	}
+//phones, emails, SMS
+$maxphones = getSystemSetting("maxphones",4);
+for ($x = 0; $x < $maxphones; $x++)
+	$maptofields["p$x"] = "Phone " . ($x + 1);
+if ($SETTINGS['feature']['has_sms'] && getSystemSetting('_hassms', false)) {
+	$maxsms = getSystemSetting("maxphones",2);
+	for ($x = 0; $x < $maxsms; $x++)
+		$maptofields["s$x"] = "SMS " . ($x + 1);
 }
-
-if (!$maxemails = getSystemSetting("maxemails"))
-	$maxemails = 2;
-
-for ($x = 0; $x < $maxemails; $x++) {
-	if ($x == 0)
-		$maptofields["e0"] = "Email";
-	else
-		$maptofields["e$x"] = "Email " . ($x + 1);
-}
-
+$maxemails = getSystemSetting("maxemails",4);
+for ($x = 0; $x < $maxemails; $x++)
+	$maptofields["e$x"] = "Email " . ($x + 1);
+//address fields
 $maptofields["a6"] = "Address ATTN";
 $maptofields["a1"] = "Address 1";
 $maptofields["a2"] = "Address 2";
@@ -152,15 +93,19 @@ $maptofields["a4"] = "State";
 $maptofields["a5"] = "Zip";
 
 
+$actions = array('copy' => "Copy",
+				'staticvalue' => "Static Value",
+				'currency' => "Currency",
+				'date' => "Date",
+				'lookup' => "Data Lookup");
 //scan the file
-
 $importfile = secure_tmpname("taskmap",".csv");
-file_put_contents($importfile,$IMPORT->download());
+file_put_contents($importfile,$import->download());
 
 $fp = @fopen($importfile , "r");
 $colcount = 0;
 if ($fp && filesize($importfile) > 0 ) {
-	$count = 10;
+	$count = $previewrows;
 	$importdata = array();
 	while (($row = fgetcsv($fp,4096)) !== FALSE && $count) {
 		if (count($row) == 1 && trim($row[0]) === "")
@@ -181,17 +126,135 @@ if ($fp && filesize($importfile) > 0 ) {
 @unlink($importfile);
 
 
-if( $reloadform )
-{
-	ClearFormData($form);
+$mapfromcols = range(0,$colcount-1);
+array_unshift($mapfromcols,"");
 
-	//set defaults to unmapped
-	for ($x = 0; $x < $colcount; $x++) {
-		PutFormData($form,$section, "mapto_" . $x, "");
+
+/****************** main message section ******************/
+$f = "taskmap";
+$s = "main";
+$reloadform = false;
+
+if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'add') || CheckFormSubmit($f, 'delete') !== false) {
+	//check to see if formdata is valid
+	if (CheckFormInvalid($f)) {
+		error('Form was edited in another window, reloading data');
+		$reloadform = true;
+	} else {
+		MergeSectionFormData($f, $s);
+
+
+		//update required flags on each
+		$count = 0;
+		foreach ($importfields as $importfield) {
+
+			if (GetFormData($f,$s,"mapto_$count") != "") {
+
+				$action = GetFormData($f,$s,"action_$count");
+
+				if ($action == "date")
+					SetRequired($f,$s,"date_$count",true);
+				else
+					SetRequired($f,$s,"date_$count",false);
+
+				if ($action == "staticvalue")
+					SetRequired($f,$s,"mapfrom_$count",false);
+				else
+					SetRequired($f,$s,"mapfrom_$count",true);
+
+			}
+			$count++;
+		}
+
+		if (CheckFormSection($f, $s)) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else {
+
+			$count = 0;
+			foreach ($importfields as $importfield) {
+				//check each map. if not static value, needs to have a col mapping
+
+				$importfield->mapto = $mapto = GetFormData($f,$s,"mapto_$count");
+
+				//if the user submitted the form via delete button, check and delete the item as if it where unmapped
+				if (CheckFormSubmit($f, 'delete') !== false &&
+					CheckFormSubmit($f, 'delete') == $count) {
+					$mapto = "";
+				}
+
+
+				if ($mapto == "") {
+					if ($importfield->id)
+						$importfield->destroy();
+				} else {
+					$importfield->action = $action = GetFormData($f,$s,"action_$count");
+
+					//set the val
+					switch ($action) {
+					case "staticvalue":
+					case "lookup":
+					case "date":
+						$importfield->val = GetFormData($f,$s,$action . "_" . $count);
+						break;
+					default:
+						$importfield->val = null;
+						break;
+					}
+
+					//set the mapfrom
+					if ($action == "staticvalue")
+						$importfield->mapfrom = null;
+					else
+						$importfield->mapfrom = GetFormData($f,$s,"mapfrom_$count");
+
+					if ($importfield->mapfrom == "")
+						$importfield->mapfrom = null;
+
+					$importfield->update();
+				}
+
+				$count++;
+			}
+
+			if (CheckFormSubmit($f, $s))
+				redirect("tasks.php");
+			else
+				redirect();
+		}
 	}
+} else {
+	$reloadform = true;
+}
 
-	foreach ($IMPORTFIELDS as $importfield) {
-		PutFormData($form,$section, "mapto_" . $importfield->mapfrom, $importfield->mapto);
+
+if ($reloadform) {
+	ClearFormData($f);
+
+	//add every existing importfield
+	$count = 0;
+	foreach ($importfields as $importfield) {
+		//mapto
+		PutFormData($f,$s,"mapto_$count",$importfield->mapto, "array",array_keys($maptofields));
+
+		//action
+		PutFormData($f,$s,"action_$count",$importfield->action, "array",array_keys($actions));
+
+		//lookupdata|value|format
+		//put defaults, then overwrite appropriate one with importfield->val
+		PutFormData($f,$s,"lookup_$count","", "text");
+		PutFormData($f,$s,"staticvalue_$count","", "text",0,255);
+		PutFormData($f,$s,"date_$count","MM/dd/yy", "text",4,50);
+
+		if ($importfield->action == "lookup")
+			PutFormData($f,$s,"lookup_$count",$importfield->val, "text");
+		else if ($importfield->action == "staticvalue")
+			PutFormData($f,$s,"staticvalue_$count",$importfield->val, "text",0,255);
+		else if ($importfield->action == "date")
+			PutFormData($f,$s,"date_$count",$importfield->val, "text",4,50);
+
+		//mapfrom
+		PutFormData($f,$s,"mapfrom_$count",$importfield->mapfrom, "array",$mapfromcols);
+		$count++;
 	}
 }
 
@@ -201,44 +264,190 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:taskmanager";
-$TITLE = "Import Field Mapping: " . ($IMPORT != null ? $IMPORT->name : 'New Task');
+$TITLE = "Import Field Mapping: " . htmlentities($import->name);
+$DESCRIPTION = count($usedcols) . " of $colcount input columns mapped";
 
 include_once("nav.inc.php");
 
-NewForm($form);
-buttons(($noimportdata ? button('Done',NULL,'tasks.php') : submit($form, $section)));
+NewForm($f);
+buttons(($noimportdata ? button('Done',NULL,'tasks.php') : submit($f, $s)));
 startWindow('Field Mapping');
-?>
-<br>
-<? if ($noimportdata) { ?>
+if ($noimportdata) { ?>
 			<br><h3>No import data could be found. Please check that a non empty file has been uploaded.</h3><br>
 <? } else { ?>
 
-<?
-		//spit out a column and mapto menu for each col in the input file
-		for ($x = 0; $x < $colcount; $x++) {
-?>
-			<div style="float: left; border: 1px dotted black; margin-left: 10px; margin-bottom: 10px; padding: 3px; "><table border="0" cellpadding="2" cellspacing="0" border="2">
-				<tr><th>Col <?= $x ?><br>
-<?
-			NewFormItem($form, $section, 'mapto_' . $x, 'selectstart');
 
-			foreach ($maptofields as $mapto => $name) {
-				NewFormItem($form, $section, 'mapto_' . $x, 'selectoption', $name, $mapto);
-			}
-			NewFormItem($form, $section, 'mapto_' . $x, 'selectend');
-?>
-				</th></tr>
+<table width="100%" cellpadding="3" cellspacing="1" class="list">
+	<tr class="listHeader">
+		<th align="left">Field</th><th align="left">Translator</th><th align="left" width="30%">Translator&nbsp;Options</th><th align="left" width="70%">File Data</th><th align="left">Actions</th>
+	</tr>
 <?
-			for ($ci = 0; $ci < 10; $ci++) {
-				$cel = isset($importdata[$x][$ci]) ? $importdata[$x][$ci] : "";
-				echo "</tr><td>" . ($cel == "" ? "&nbsp;" : htmlentities($cel)) . "</td></tr>";
-			}
+	$alt = 0;
+	$count = 0;
+	foreach ($importfields as $importfield) {
+
+		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-			</table></div>
+		<td>
+<?
+			NewFormItem($f,$s,"mapto_$count","selectstart");
+			foreach ($maptofields as $mapto => $name)
+				NewFormItem($f,$s,"mapto_$count","selectoption",$name,$mapto);
+			NewFormItem($f,$s,"mapto_$count","selectend");
+?>
+		</td>
+		<td>
+<?
+			//TODO add some JS to show/hide actions, and if staticvalue hide mapfrom
+			NewFormItem($f,$s,"action_$count","selectstart",null,null,'onchange="switchactiondata(' . $count . ',this.value);"');
+			foreach ($actions as $action => $name)
+				NewFormItem($f,$s,"action_$count","selectoption",$name,$action);
+			NewFormItem($f,$s,"action_$count","selectend");
+?>
+		</td>
+		<td>
+<?
+			//TODO action datas, show/hide these based on action menu
+
+			$show = GetFormData($f,$s,"action_$count");
+
+?>
+			<div id="actiondata_<?=$count?>_lookup" style="<?= $show == 'lookup' ? '' : 'display:none'?>">
+
+				<? NewFormItem($f,$s,"lookup_$count","textarea",25,10); ?>
+
+			</div>
+			<div id="actiondata_<?=$count?>_staticvalue" style="<?= $show == 'staticvalue' ? '' : 'display:none'?>">
+
+				<? NewFormItem($f,$s,"staticvalue_$count","text",20,255); ?>
+
+			</div>
+			<div id="actiondata_<?=$count?>_date" style="<?= $show == 'date' ? '' : 'display:none'?>">
+
+				<? NewFormItem($f,$s,"date_$count","text",20,20); ?>
+
+			</div>
+
+		</td>
+		<td>
+			<div id="filedata_<?=$count?>" style="<?= $show == "staticvalue" ? "display: none;" : "" ?>">
+				<table border="0" cellpadding="3" cellspacing="0"><tr><td>
+<?
+				//file data map
+
+				NewFormItem($f,$s,"mapfrom_$count","selectstart",null,null,'id="select_' . $count . '" onchange="setdata(' . $count . ');"');
+
+				foreach ($mapfromcols as $col) {
+					if ($col === "") {
+						NewFormItem($f,$s,"mapfrom_$count","selectoption","- None -","");
+					} else {
+						NewFormItem($f,$s,"mapfrom_$count","selectoption","Column " . ($col + 1),$col);
+					}
+				}
+				NewFormItem($f,$s,"mapfrom_$count","selectend");
+?>
+				</td><td>
+					<?= button('Previous',"prevselect($count)") ?>
+				</td><td>
+					<?= button('Next',"nextselect($count)") ?>
+				</td></tr></table>
+				<div id="selectordata<?=$count?>">
+				</div>
+				</div>
+
+		</td>
+		<td>
+			<?= $count == count($importfields) -1 ? submit($f,'add',"Add") : submit($f,'delete',"Delete",$count); ?>
+		</td>
+<?
+		$count++;
+	}
+
+?>
+</table>
+<?
+
+//load a bunch of hidden, named divs with the data from the import file, then this data can be read later and copied to show values
+	for ($x = 0; $x < $colcount; $x++) {
+	?>
+		<div id="data<?= $x?>" style="display: none;">
+		<table cellpadding="0" cellspacing="0" width="100%" style="font-size: 8pt; border: 1px solid gray;">
+<?
+		for ($ci = 0; $ci < $previewrows; $ci++) {
+			$cel = isset($importdata[$x][$ci]) ? $importdata[$x][$ci] : "";
+?>
+			<tr ><td style="border-bottom: 1px dotted black; padding-left: 3px;"><?= $cel == "" ? "&nbsp;" : htmlentities($cel) ?></td></tr>
 <?
 		}
 ?>
+		</table>
+		</div>
+<?
+	}
+?>
+
+<script>
+
+
+
+function switchactiondata (num,newaction) {
+	hide("actiondata_" + num + "_lookup");
+	hide("actiondata_" + num + "_staticvalue");
+	hide("actiondata_" + num + "_date");
+
+	show("actiondata_" + num + "_" + newaction);
+
+	var select = new getObj("select_" + num).obj;
+
+	if (newaction == 'staticvalue') {
+		hide("filedata_" + num);
+	} else {
+		show("filedata_" + num);
+		setdata(num);
+	}
+}
+
+function nextselect (num) {
+	var select = new getObj("select_" + num).obj;
+	var next = select.selectedIndex + 1;
+	if (next >= select.options.length)
+		next = 0;
+	select.selectedIndex = next;
+	setdata(num);
+}
+
+function prevselect (num) {
+	var select = new getObj("select_" + num).obj;
+	var prev = select.selectedIndex - 1;
+	if (prev < 0 )
+		prev = select.options.length > 0 ? (select.options.length - 1) : 0;
+	select.selectedIndex = prev;
+	setdata(num);
+}
+
+
+function setdata(num) {
+
+	var select = new getObj("select_" + num).obj;
+	var sourcenum = select.value;
+
+	var dest = new getObj("selectordata" + num);
+	var source = new getObj("data" + sourcenum);
+	if (source.obj && source.obj.innerHTML)
+		dest.obj.innerHTML = source.obj.innerHTML;
+	else
+		dest.obj.innerHTML = '';
+}
+
+//set the import file data for each mapping
+var importfieldcount = <?= count($importfieldmap) ?>;
+
+for (var x = 0; x < importfieldcount; x++) {
+	setdata(x);
+}
+
+</script>
+
 
 <?
 }
