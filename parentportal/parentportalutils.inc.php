@@ -52,7 +52,7 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 //displays checkbox for each jobtype 
 function displayJobtypeForm($f, $s, $type, $sequence, $jobtypes){
 	foreach($jobtypes as $jobtype){
-		?><div style="float:left"><? NewFormItem($f, $s, $type . $sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1); ?><?=$jobtype->name?></div><?
+		?><div style="float:left"><?=jobtype_info($jobtype)?><? NewFormItem($f, $s, $type . $sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1); ?></div><?
 	}
 }
 
@@ -180,6 +180,22 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 			}
 		}
 	}
-	
+}
+
+
+//displays jobtype name and on hover, displays infoforparents
+function jobtype_info($jobtype, $extrahtml = NULL, $style = NULL) {
+	$contents = nl2br($jobtype->infoforparents);
+	if($contents == ""){
+		$contents = "<br/>";
+	}
+
+	$hover = '<span ' . $extrahtml . '>';
+	$hover .= '<div';
+	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	$hover .= '>&nbsp;' . $jobtype->name . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
+
+	return $hover;
 }
 ?>
