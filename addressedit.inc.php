@@ -17,6 +17,7 @@ include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/ListEntry.obj.php");
+include_once("obj/Sms.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -63,6 +64,9 @@ if (!$maxphones = getSystemSetting("maxphones"))
 if (!$maxemails = getSystemSetting("maxemails"))
 	$maxemails = 2;
 
+if (!$maxsms = getSystemSetting("maxsms"))
+	$maxsms = 2;
+
 if ($personid == NULL) {
 	// create a new person with empty data
 	$person = new Person();
@@ -82,6 +86,7 @@ if ($personid == NULL) {
 	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
 	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
 	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
+	$smses = array_values(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
 }
 
 for ($i=count($phones); $i<$maxphones; $i++) {
@@ -90,7 +95,9 @@ for ($i=count($phones); $i<$maxphones; $i++) {
 for ($i=count($emails); $i<$maxemails; $i++) {
 	$emails[$i] = new Email();
 }
-
+for ($i=count($smses); $i<$maxsms; $i++) {
+	$smses[$i] = new Sms();
+}
 
 /****************** main message section ******************/
 
@@ -154,7 +161,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				$phone->personid = $person->id;
 				$phone->sequence = $x;
 				$phone->phone = Phone::parse(GetFormData($f,$s,$itemname));
-				$phone->smsenabled = GetFormData($f,$s,"sms" . ($x +1));
 				$phone->update();
 				$x++;
 			}
@@ -168,7 +174,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				$email->update();
 				$x++;
 			}
-
+			
+			if ($USER->authorize('sendsms')){
+				$x = 0;
+				foreach ($smses as $sms) {
+					$itemname = "sms".($x+1);
+					$sms->personid = $person->id;
+					$sms->sequence = $x;
+					$sms->sms = GetFormData($f,$s,$itemname);
+					$sms->update();
+					$x++;
+				}
+			}
 			// if manual add to a list, and entry not found, then create one
 			// (otherwise they edit existing contact on the list)
 
@@ -225,7 +242,6 @@ if( $reloadform )
 	foreach ($phones as $phone) {
 		$itemname = "phone".($x+1);
 		PutFormData($f,$s,$itemname,Phone::format($phone->phone),"phone",10,10);
-		PutFormData($f,$s,"sms" . ($x+1),$phone->smsenabled,"bool");
 		$x++;
 	}
 
@@ -234,6 +250,14 @@ if( $reloadform )
 		$itemname = "email".($x+1);
 		PutFormData($f,$s,$itemname,$email->email,"email",5,100);
 		$x++;
+	}
+	if ($USER->authorize('sendsms')){
+		$x = 0;
+		foreach ($smses as $sms) {
+			$itemname = "sms".($x+1);
+			PutFormData($f,$s,$itemname,$sms->sms,"phone",10,10);
+			$x++;
+		}
 	}
 }
 
@@ -294,11 +318,6 @@ startWindow("Contact");
 		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
 		<td class="bottomBorder">
 			<? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?>
-			<? if ($USER->authorize('sendsms')) {
-				echo "SMS:";
-				NewFormItem($f, $s, "sms" . ($x+1), 'checkbox');
-			}
-			?>
 		</td>
 	</tr>
 <?
@@ -317,6 +336,21 @@ startWindow("Contact");
 	</tr>
 <?
 		$x++;
+	}
+	if ($USER->authorize('sendsms')){
+		$x = 0;
+		foreach ($smses as $sms) {
+			$header = "Sms " . ($x+1) . ":";
+			if ($x == 0) $header = "Primary Sms:";
+			$itemname = "sms".($x+1);
+?>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
+			<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 50, 100); ?></td>
+		</tr>
+<?
+			$x++;
+		}
 	}
 ?>
 
