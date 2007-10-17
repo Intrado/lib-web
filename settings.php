@@ -158,7 +158,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
-				if($USER->authorize('portalaccess')){
+				if(getSystemSetting("_hasportal") && $USER->authorize('portalaccess')){
 					for($i = 0; $i < $maxphones; $i++){
 						setSetting('accessiblePhone' . $i, GetFormData($f, $s, 'accessiblePhone' . $i));
 					}
@@ -463,7 +463,7 @@ startWindow('Global System Settings');
 					</td>
 				</tr>
 <?
-				if($USER->authorize('portalaccess')){
+				if(getSystemSetting("_hasportal") && $USER->authorize('portalaccess')){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Portal:</th>

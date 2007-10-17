@@ -122,7 +122,10 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("viewsystemcompleted", (bool)GetFormData($form, $section, 'viewsystemcompleted'));
 			$accss->setPermission("survey", (bool)GetFormData($form, $section, 'survey'));
 			$accss->setPermission("leavemessage", (bool)GetFormData($form, $section, 'leavemessage'));
-
+			if(getSystemSetting("_hasportal")){
+				$accss->setPermission("portalaccess", (bool)GetFormData($form, $section, 'portalaccess'));
+				$accss->setPermission("generatebulktokens", (bool)GetFormData($form, $section, 'generatebulktokens'));
+			}
 			$_SESSION['accessid'] = $accss->id;
 			ClearFormData($form);
 			redirect('profiles.php');
@@ -189,7 +192,9 @@ if( $reloadform )
 				array("viewsystemrepeating","bool",0,1),
 				array("viewsystemcompleted","bool",0,1),
 				array("survey","bool",0,1),
-				array("leavemessage","bool",0,1));
+				array("leavemessage","bool",0,1),
+				array("portalaccess","bool",0,1),
+				array("generatebulktokens","bool",0,1));
 
 	foreach($permissions as $field) {
 		PutFormData($form, $section, $field[0], $accss->getValue($field[0]),$field[1],$field[2],$field[3]);
@@ -443,6 +448,27 @@ startWindow('Allowed Functions');
 			</table>
 		</td>
 	</tr>
+<?
+	if(getSystemSetting("_hasportal")){
+?>
+	<tr valign="top">
+		<th align="right" class="windowRowHeader bottomBorder">Portal:<br><? print (''); ?></th>
+		<td class="bottomBorder" width="100%">
+			<table border="0" cellpadding="2" cellspacing="0">
+				<tr>
+					<td><? NewFormItem($form,$section,"portalaccess","checkbox"); ?></td>
+					<td>Portal Access</td>
+				</tr>
+				<tr>
+					<td><? NewFormItem($form,$section,"generatebulktokens","checkbox"); ?></td>
+					<td>Generate Bulk Tokens</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<?
+	}
+?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Systemwide View:<br><? print help('Profile_SystemwideView'); ?></th>
 		<td class="bottomBorder" width="100%">
