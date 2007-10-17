@@ -201,7 +201,7 @@ if( $reloadform )
 		PutFormData($form, $section, 'newfield_name', '', 'text', 1, 20, false); // This item is only required on an add operation
 		PutFormData($form, $section, 'newfield_type', 'text', 'text');
 		PutFormData($form, $section, 'newfield_searchable', '1', 'bool');
-	
+
 		PutFormData($form,$section,"newfield_fieldnum","array",$availablefields);
 	}
 }
@@ -224,11 +224,11 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">
-		<th></th><th>Name</th><th>Type</th><th>Searchable</th><th></th>
+		<th align="left">Field</th><th align="left">Name</th><th align="left">Type</th><th align="left">Searchable</th><th align="left"></th>
 	</tr>
 <?
 	$alt = 0;
-	
+
 	$types = array("Text" => 'text',
 					"Date" => 'reldate',
 					"List" => 'multisearch');
