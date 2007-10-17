@@ -61,6 +61,10 @@ class Person extends DBMappedObject {
 	function getEmails () {
 		return DBFindMany("Email", "from email where personid = '" . $this->id . "'");
 	}
+	
+	function getSmses () {
+		return DBFindMany("Sms", "from sms where personid = '" . $this->id . "'");
+	}
 
 }
 
