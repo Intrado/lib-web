@@ -97,7 +97,7 @@ $NAVTREE = array (
 		array("Metadata","datamanager.php","metadata",$SUBTAB=="datamanager"),
 		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager"),
 		array("Portal", "portalmanagement.php?clear=1", "portalaccess", $SUBTAB=="portal"),
-		array("Jobtype", "jobtypemanagement.php", NULL, $SUBTAB=="jobtype")
+		array("Jobtype", "jobtypemanagement.php?clear=1", NULL, $SUBTAB=="jobtype")
 		))
 );
 
