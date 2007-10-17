@@ -19,26 +19,30 @@ class PortalReport extends ReportGenerator{
 		if(isset($this->params['hideassociated']) && $this->params['hideassociated']){
 			$hideassociated = " and not exists (select count(*) from portalperson pp where pp.personid = p.id group by pp.personid) ";
 		}
-		$this->query = "select SQL_CALC_FOUND_ROWS
-					p.pkey as pkey, 
-					p.id as pid,
-					p." . FieldMap::GetFirstNameField() . " as firstname, 
-					p." . FieldMap::GetLastNameField() . " as lastname, 
-					ppt.token,
-					ppt.expirationdate,
-					pp.portaluserid "
-					. generateFields("p")
-					. "	from person p 
-					left join portalpersontoken ppt on (ppt.personid = p.id)
-					left join portalperson pp on (pp.personid = p.id)
-					where not p.deleted
-					and p.type='system' "
-					. $pkeysql
-					. $rulesql
-					. $hideactivetokens
-					. $hideassociated
-					. $usersql
-					. " order by p.id";
+		if($rulesql || $pkeysql){
+			$this->query = "select SQL_CALC_FOUND_ROWS
+						p.pkey as pkey, 
+						p.id as pid,
+						p." . FieldMap::GetFirstNameField() . " as firstname, 
+						p." . FieldMap::GetLastNameField() . " as lastname, 
+						ppt.token,
+						ppt.expirationdate,
+						pp.portaluserid "
+						. generateFields("p")
+						. "	from person p 
+						left join portalpersontoken ppt on (ppt.personid = p.id)
+						left join portalperson pp on (pp.personid = p.id)
+						where not p.deleted
+						and p.type='system' "
+						. $pkeysql
+						. $rulesql
+						. $hideactivetokens
+						. $hideassociated
+						. $usersql
+						. " order by p.id";
+		} else {
+			$this->query = "";
+		}
 	}
 
 
@@ -114,8 +118,38 @@ class PortalReport extends ReportGenerator{
 	}
 	
 	function runCSV(){
-	
 		
+		
+		$titles = array("ID#", "First Name", "Last Name", "Token", "Expiration Date");
+		$titles = '"' . implode('","',$titles) . '"';
+		
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=report.csv");
+		header("Content-type: application/vnd.ms-excel");
+		
+		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+		
+		echo $titles;
+		echo "\r\n";
+		$curr = null;
+		if($this->query){
+			$result = Query($this->query);
+			while($row = DBGetRow($result)){
+				if($curr == $row[0])
+					continue;
+				$curr = $row[0];
+			
+				$date = "";
+				if($row[5])
+					$date = date("M d Y", strtotime($row[5]));
+		
+				$data = array($row[0], $row[2], $row[3], $row[4], $date);
+				$output = '"' . implode('","', $data) . '"';
+				echo $output;
+				echo "\r\n";
+			}
+		}
 	}
 
 }
