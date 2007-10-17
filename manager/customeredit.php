@@ -73,6 +73,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$maxusers = GetFormData($f, $s, 'maxusers');
 			$managernote = GetFormData($f, $s, 'managernote');
 			$hassms = GetFormData($f, $s, 'hassms');
+			$maxsms = GetFormData($f, $s, 'maxsms');
 
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -114,6 +115,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
 				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
 				setCustomerSystemSetting("maxemails", $maxemails, $custdb);
+				setCustomerSystemSetting('maxsms', $maxsms, $custdb);
 				setCustomerSystemSetting('retry', $retry, $custdb);
 				setCustomerSystemSetting('callerid', Phone::parse($callerid), $custdb);
 				setCustomerSystemSetting('defaultareacode', $areacode, $custdb);
@@ -135,6 +137,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_managernote', $managernote, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
+				
 
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
@@ -178,6 +181,8 @@ if( $reloadform ) {
 	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",3,"nomax",true);
 	$currentmaxemail = getCustomerSystemSetting('maxemails', 2, true, $custdb);
 	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",2,"nomax",true);
+	$currentmaxsms = getCustomerSystemSetting('maxsms', 2, true, $custdb);
+	PutFormData($f,$s,'maxsms',$currentmaxsms,"number",2,"nomax",true);
 
 	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', false, true, $custdb),"text",1,255);
 	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb),"email",1,255);
@@ -236,6 +241,7 @@ NewForm($f);
 <tr><td>Survey URL: </td><td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100); ?></td></tr>
 <tr><td>Max Phones: </td><td> <? NewFormItem($f, $s, 'maxphones', 'text', 25, 255) ?></td></tr>
 <tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 25, 255) ?></td></tr>
+<tr><td>Max Smses: </td><td> <? NewFormItem($f, $s, 'maxsms', 'text', 25, 255) ?></td></tr>
 <tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
 <tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
