@@ -99,8 +99,11 @@ $reportinstance->setParameters($options);
 $reportgenerator = new PortalReport();
 $reportgenerator->reportinstance = $reportinstance;
 $reportgenerator->userid = $USER->id;
-$reportgenerator->format = "html";
-
+if(isset($_GET['csv']) && $_GET['csv']){
+	$reportgenerator->format = "csv";
+} else {
+	$reportgenerator->format = "html";
+}
 $f = "person";
 $s = "all";
 $reloadform = 0;
@@ -185,98 +188,106 @@ if($reloadform){
 	PutFormData($f, $s, "hideassociated", isset($options['hideassociated']) ? $options['hideassociated'] : 0, "bool", 0, 1);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Display
-////////////////////////////////////////////////////////////////////////////////
-$PAGE = "admin:portal";
-$TITLE = "Portal Management";
-
-include_once("nav.inc.php");
-
-NewForm($f);
-if($USER->authorize('generatebulktokens')){
-	buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), submit($f, "generate", "Generate Tokens"));
-} else {
-	buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
-}
-startWindow("Contact Search", "padding: 3px;");
-
-if(isset($options['pkey'])){
-	$singlepersondisplay = '';
-	$searchbardisplay = 'style="display:none"';
-} else {
-	$singlepersondisplay = 'style="display:none"';
-	$searchbardisplay = '';
-}
-?>
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search:</th>
-		<td class="bottomBorder">
-			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-				<tr>
-					<td>
-						<table>
-							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "criteria", "onclick='hide(\"singleperson\"); show(\"searchcriteria\")'");?> By Criteria</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "person", "onclick='hide(\"searchcriteria\"); show(\"singleperson\")'");?> By Person</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria" <?=$searchbardisplay?> >
-							<tr>
-								<td>
-								<?
-									//$RULES is declared above
-									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-
-									include("ruleeditform.inc.php");
-								?>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<table id="singleperson" <?=$singlepersondisplay?> >
-							<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'pkey', 'text', '15'); ?></td><td><?=submit($f,'search', 'Search')?></td></tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
-		<td class="bottomBorder">
-	<?
-			select_metadata('portalresultstable', 5, $fields);
-	?>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter:</th>
-		<td class="bottomBorder">
-			<table>
-				<tr><td><? NewFormItem($f, $s, "hideactivetokens", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideactivetokens=\' + this.checked"') ?>Hide People with Active Tokens</td></tr>
-				<tr><td><? NewFormItem($f, $s, "hideassociated", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideassociated=\' + this.checked"') ?>Hide People with Portal Users</td></tr>
-			</table>
-		</td>
-	</tr>
-</table>
-	<br>
-	<?
-
-if(isset($options['pkey']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
+if($reportgenerator->format == "csv"){
 	$reportgenerator->generate();
+} else {
+	
+	////////////////////////////////////////////////////////////////////////////////
+	// Display
+	////////////////////////////////////////////////////////////////////////////////
+	$PAGE = "admin:portal";
+	$TITLE = "Portal Management";
+	
+	include_once("nav.inc.php");
+	
+	NewForm($f);
+	if($USER->authorize('generatebulktokens')){
+		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), submit($f, "generate", "Generate Tokens"));
+	} else {
+		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
+	}
+	startWindow("Contact Search", "padding: 3px;");
+	
+	if(isset($options['pkey'])){
+		$singlepersondisplay = '';
+		$searchbardisplay = 'style="display:none"';
+	} else {
+		$singlepersondisplay = 'style="display:none"';
+		$searchbardisplay = '';
+	}
+	?>
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search:</th>
+			<td class="bottomBorder">
+				<table border="0" cellpadding="3" cellspacing="0" width="100%">
+					<tr>
+						<td>
+							<table>
+								<tr>
+									<td><? NewFormItem($f, $s, "radioselect", "radio", null, "criteria", "onclick='hide(\"singleperson\"); show(\"searchcriteria\")'");?> By Criteria</td>
+									<td><? NewFormItem($f, $s, "radioselect", "radio", null, "person", "onclick='hide(\"searchcriteria\"); show(\"singleperson\")'");?> By Person</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria" <?=$searchbardisplay?> >
+								<tr>
+									<td>
+									<?
+										//$RULES is declared above
+										$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
+	
+										include("ruleeditform.inc.php");
+									?>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<table id="singleperson" <?=$singlepersondisplay?> >
+								<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'pkey', 'text', '15'); ?></td><td><?=submit($f,'search', 'Search')?></td></tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
+			<td class="bottomBorder">
+		<?
+				select_metadata('portalresultstable', 5, $fields);
+		?>
+			</td>
+		</tr>
+		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter:</th>
+			<td class="bottomBorder">
+				<table>
+					<tr><td><? NewFormItem($f, $s, "hideactivetokens", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideactivetokens=\' + this.checked"') ?>Hide People with Active Tokens</td></tr>
+					<tr><td><? NewFormItem($f, $s, "hideassociated", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideassociated=\' + this.checked"') ?>Hide People with Portal Users</td></tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
+			<td class="bottomBorder"><a href="portalmanagement.php/report.csv?csv=true">CSV</a></td>
+		</tr>
+	</table>
+		<br>
+		<?
+	
+	if(isset($options['pkey']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
+		$reportgenerator->generate();
+	}
+	buttons();
+	endWindow();
+	EndForm();
+	
+	include_once("navbottom.inc.php");
 }
-buttons();
-endWindow();
-EndForm();
-
-include_once("navbottom.inc.php");
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
