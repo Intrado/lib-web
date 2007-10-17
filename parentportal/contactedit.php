@@ -78,6 +78,34 @@ if($PERSONID){
 				</tr>
 <?
 			}
+			$type= "sms";
+			foreach($smses as $sms){
+?>
+				<tr>
+					<td>Sms <?=$sms->sequence+1?>: <? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 40, 100); ?></td>
+					<td>
+						<table id="smstable<?=$sms->sequence?>" style="display:none">
+							<tr>
+								<td>
+<?
+									displayJobtypeForm($f, $s, "sms", $sms->sequence, $jobtypes);
+?>									
+								</td>
+							</tr>
+						</table>
+						<div id="<?=$type?><?=$sms->sequence?>enabledjobtypes" ><?=displayEnabledJobtypes($contactprefs, $defaultcontactprefs, $type, $sms->sequence, $jobtypes)?></div>
+						<div style="float:right">
+<?
+							echo button("Change", "show('" . $type . "table" . $sms->sequence . "'); 
+													hide('" . $type . "edit" . $sms->sequence ."');
+													hide('" . $type . $sms->sequence . "enabledjobtypes');",
+										null, "id='" . $type . "edit" . $sms->sequence . "'");
+?>
+						</div>
+					</td>
+				</tr>
+<?
+			}
 ?>
 	</table>
 	<div><? NewFormItem($f, $s, "savetoall", "checkbox"); ?> Save To All Contacts</div>

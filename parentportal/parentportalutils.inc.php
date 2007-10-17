@@ -33,9 +33,9 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 			PutFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
 		}
 	}
-	/*
+	
 	foreach($smses as $sms){
-		PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->phone), "phone", 0, 10);
+		PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->sms), "phone", 0, 10);
 		foreach($jobtypes as $jobtype){
 			$contactpref = 0;
 			if(isset($contactprefs["sms"][$sms->sequence][$jobtype->id]))
@@ -45,7 +45,7 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 			PutFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
 		}
 	}
-	*/
+	
 }
 
 //displays checkbox for each jobtype 
@@ -76,7 +76,7 @@ function displayEnabledJobtypes($contactprefs, $defaultcontactprefs, $type, $seq
 function copyContactData($mainpid, $otherpids = array(), $accessiblePhones){
 	$mainphones = QuickQueryList("select sequence, phone from phone where personid = '" . $mainpid . "'", true);
 	$mainemails = QuickQueryList("select sequence, email from email where personid = '" . $mainpid . "'", true);
-	//$mainsmses = QuickQueryList("select sequence, sms from sms where personid = '" . $mainpid . "'", true);
+	$mainsmses = QuickQueryList("select sequence, sms from sms where personid = '" . $mainpid . "'", true);
 	$mainContactPrefs = getContactPrefs($mainpid);
 	
 	foreach($otherpids as $pid){
@@ -95,13 +95,13 @@ function copyContactData($mainpid, $otherpids = array(), $accessiblePhones){
 			$email->editlock = 1;
 			$email->update();
 		}
-		/*
+		
 		foreach($smses as $sms){
 			$sms->sms = $mainseses[$sms->sequence];
 			$sms->editlock = 1;
 			$sms->update();
 		}
-		*/
+		
 		foreach($mainContactPrefs as $type => $sequencePrefs){
 			foreach($sequencePrefs as $sequence => $jobtypePrefs){
 				foreach($jobtypePrefs as $jobtypeid => $enabled){
@@ -157,11 +157,11 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 						enabled = '" . DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "'");
 		}
 	}
-	/*
+	
 	foreach($smses as $sms){
 		$sms->sms = Phone::parse(GetFormData($f, $s, "sms" . $sms->sequence));
 		$sms->editlock = 1;
-		$phone->update();
+		$sms->update();
 		foreach($jobtypes as $jobtype){
 			QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
 						values ('" . $PERSONID . "','" . $jobtype->id . "','sms','" . $sms->sequence . "','" 
@@ -174,6 +174,6 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 						enabled = '" . DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "'");
 		}
 	}
-	*/
+	
 }
 ?>

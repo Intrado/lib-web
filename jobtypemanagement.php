@@ -37,7 +37,7 @@ foreach($systemprioritynames as $index => $name){
 $maxhighpriorities = getSystemSetting("maxhighpriorities", 1);
 $maxphones = getSystemSetting("maxphones", 4);
 $maxemails = getSystemSetting("maxemails", 2);
-$maxsms = getSystemSetting("maxsms", $maxphones);
+$maxsms = getSystemSetting("maxsms", 2);
 $maxcolumns = max($maxphones, $maxemails, $maxsms);
 $jobtypeprefs = getJobTypePrefs();
 

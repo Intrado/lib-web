@@ -6,6 +6,7 @@ require_once("../inc/table.inc.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
+require_once("../obj/Sms.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("parentportalutils.inc.php");
@@ -37,12 +38,27 @@ if(isset($_SESSION['currentpid'])){
 }
 if($PERSONID){
 	
-	$phones = $person->getPhones();
-	$emails = $person->getEmails();
-	$smses = null;
-	//TODO: uncomment and delete null
-	//$smses = $person->getSmses();
 	$maxphones = getSystemSetting("maxphones");
+	$maxemails = getSystemSetting("maxemails");
+	$maxsms = getSystemSetting("maxsms");
+	$phones = array_values($person->getPhones());
+	for ($i=count($phones); $i<$maxphones; $i++) {
+		$phones[$i] = new Phone();
+		$phones[$i]->sequence = $i;
+		$phones[$i]->personid = $PERSONID;
+	}
+	$emails = array_values($person->getEmails());
+	for ($i=count($emails); $i<$maxemails; $i++) {
+		$emails[$i] = new Email();
+		$emails[$i]->sequence = $i;
+		$emails[$i]->personid = $PERSONID;
+	}
+	$smses = array_values($person->getSmses());
+	for ($i=count($smses); $i<$maxsms; $i++) {
+		$smses[$i] = new Sms();
+		$smses[$i]->sequence = $i;
+		$smses[$i]->personid = $PERSONID;
+	}
 	$accessiblePhones= array();
 	for($i=0; $i < $maxphones; $i++){
 		$accessiblePhones[$i] = getSystemSetting("accessiblePhone" . $i);

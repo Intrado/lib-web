@@ -17,6 +17,7 @@ include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/JobType.obj.php");
+include_once("obj/Sms.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -52,7 +53,7 @@ if (isset($_GET['id'])) {
 } else {
 	redirect('unauthorized.php');
 }
-if(getSystemSetting("_hasportal") && $USER->authorized("portalaccess")){
+if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess")){
 	if(isset($_GET['create']) && $_GET['create']){
 		if(generatePersonTokens(array($personid))){
 			redirect();
@@ -92,6 +93,9 @@ if (!$maxphones = getSystemSetting("maxphones"))
 
 if (!$maxemails = getSystemSetting("maxemails"))
 	$maxemails = 2;
+	
+if (!$maxsms = getSystemSetting("maxsms"))
+	$maxsms = 2;
 
 if (isset($personid)) {
 	// editing existing person
@@ -113,6 +117,12 @@ if (isset($personid)) {
 		$emails[$i] = new Email();
 		$emails[$i]->sequence = $i;
 		$emails[$i]->personid = $personid;
+	}
+	$smses = array_values(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
+	for ($i=count($smses); $i<$maxsms; $i++) {
+		$smses[$i] = new Sms();
+		$smses[$i]->sequence = $i;
+		$smses[$i]->personid = $personid;
 	}
 	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
 	$associates = getPortalUsers($associateids);
@@ -193,7 +203,7 @@ if(CheckFormSubmit($f,$s))
 								enabled = '" . DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "'");
 				}
 			}
-			/*
+			
 			foreach($smses as $sms){
 				$sms->sms = Phone::parse(GetFormData($f,$s, "sms" . $sms->sequence));
 				$sms->editlock = GetFormData($f, $s, "editlock_sms" . $sms->sequence);
@@ -210,7 +220,7 @@ if(CheckFormSubmit($f,$s))
 								enabled = '" . DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "'");
 				}
 			}
-			*/
+			
 
 			redirect();
 		}
@@ -246,7 +256,7 @@ if( $reloadform )
 			PutFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
 		}
 	}
-	/*
+	
 	foreach($smses as $sms){
 		PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->sms), "phone", 10);
 		PutFormData($f, $s, "editlock_sms" . $sms->sequence, $sms->editlock, "bool", 0, 1);
@@ -259,7 +269,7 @@ if( $reloadform )
 			PutFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
 		}
 	}
-	*/
+	
 }
 
 
@@ -377,7 +387,7 @@ foreach ($fieldmaps as $map) {
 ?>
 	<tr>
 		<td><?= $header ?></td>
-		<td><? NewFormItem($f, $s, "phone" . $phone->sequence, "text", 15); ?> <?= $phone->smsenabled ? "<b>[SMS]</b>" : "" ?></td>
+		<td><? NewFormItem($f, $s, "phone" . $phone->sequence, "text", 15); ?></td>
 		<td align="middle"><? NewFormItem($f, $s, "editlock_phone" . $phone->sequence, "checkbox", 0, 1); ?></td>
 <?
 		foreach($jobtypes as $jobtype){
@@ -407,12 +417,31 @@ foreach ($fieldmaps as $map) {
 <?
 		$x++;
 	}
+
+	$x = 0;
+	foreach ($smses as $sms) {
+		$header = "Sms " . ($x+1) . ":";
+		$itemname = "sms".($x+1);
+?>
+	<tr>
+		<td><?= $header ?></td>
+		<td><? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 50, 100) ?></td>
+		<td align="middle"><? NewFormItem($f, $s, "editlock_sms" . $sms->sequence, "checkbox", 0,1);?></td>
+<?
+		foreach($jobtypes as $jobtype){
+			?><td align="middle"><? NewFormItem($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+		}
+?>
+	</tr>
+<?
+		$x++;
+	}
 ?>
 			</table>
 		<td>
 	</tr>
 <?
-	if(getSystemSetting("_hasportal") && $USER->authorized("portalaccess")){
+	if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess")){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Associations</th>
