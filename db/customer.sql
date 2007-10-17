@@ -1132,6 +1132,13 @@ ADD `numdeclined` tinyint(4) NOT NULL default '0' AFTER `numduperemoved`
 $$$
 
 
+-- alter sms
+
+ALTER TABLE `job`
+ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid`
+$$$
+
+
 drop trigger insert_repeating_job
 $$$
 
@@ -1189,11 +1196,6 @@ END IF;
 END
 $$$
 
--- alter sms
-
-ALTER TABLE `job`
-ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid`
-$$$
 
 ALTER TABLE `job`
 CHANGE `type` `type` set('phone','email','print','sms','survey') NOT NULL default 'phone'
