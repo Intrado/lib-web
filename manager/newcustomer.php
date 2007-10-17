@@ -195,6 +195,7 @@ if (CheckFormSubmit($f,$s)){
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 							('maxphones', '3'),
 							('maxemails', '2'),
+							('maxsms', '2'),
 							('retry', '15'),
 							('disablerepeat', '0'),
 							('surveyurl', '" . DBSafe($surveyurl) . "'),
