@@ -52,31 +52,33 @@ if (isset($_GET['id'])) {
 } else {
 	redirect('unauthorized.php');
 }
-
-if(isset($_GET['create'])){
-	$createpersonid = $_GET['create']+0;
-	if(generatePersonTokens(array($createpersonid))){
-		redirect("?id=$personid");
-	} else {
-		error("There was an error generating a new token");
+if($ACCESS->getValue("portalaccess")){
+	if(isset($_GET['create']) && $_GET['create']){
+		if(generatePersonTokens(array($personid))){
+			redirect();
+		} else {
+			error("There was an error generating a new token");
+		}
 	}
-}
-
-if(isset($_GET['revoke'])){
-	$revokeid = $_GET['revoke'] + 0;
-	$count = revokePersonTokens(array($revokeid));
-	if($count){
-		redirect("?id=$personid");
-	} else {
-		error("There was an error revoking this person's token");
+	
+	if(isset($_GET['revoke'])){
+		$revokeid = $_GET['revoke'] + 0;
+		$count = revokePersonTokens(array($revokeid));
+		if($count){
+			redirect();
+		} else {
+			error("There was an error revoking this person's token");
+		}
 	}
-}
-
-if(isset($_GET['disassociate'])){
-	$portaluserid = $_GET['disassociate'] + 0;
-	$count = revokePersonTokens(array($portaluserid));
-	if($count){
-		redirect("?id=$personid");
+	
+	if(isset($_GET['disassociate'])){
+		$portaluserid = $_GET['disassociate'] + 0;
+		$count = QuickUpdate("delete from portalperson where personid = '" . $personid . "' and portaluserid = '" . $portaluserid . "'");
+		if($count){
+			redirect();
+		} else {
+			error("An error occurred while disassociating the Portal User to this person");
+		}
 	}
 }
 
@@ -409,6 +411,9 @@ foreach ($fieldmaps as $map) {
 			</table>
 		<td>
 	</tr>
+<?
+	if($ACCESS->getValue("portalaccess")){
+?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Associations</th>
 		<td class="bottomBorder">
@@ -420,7 +425,7 @@ foreach ($fieldmaps as $map) {
 ?>
 					<tr>
 						<td><?=$name?></td>
-						<td><?=button("Disassociate", "if(confirmDisassociate()) window.location='?id=" . $personid . "&disassociate=" . $portaluserid . "'")?></td>
+						<td><?=button("Disassociate", "if(confirmDisassociate()) window.location='?disassociate=" . $portaluserid . "'")?></td>
 					</tr>
 <?
 				}
@@ -441,10 +446,9 @@ foreach ($fieldmaps as $map) {
 				<tr>
 					<td>
 <?
+					echo button("Generate Token", "window.location='?create=1'");
 					if($tokendata['token']){
-						echo button("Revoke Token", "if(confirmRevoke()) window.location='?id=" . $personid . "&revoke=" . $personid . "'");
-					} else {
-						echo button("Generate Token", "window.location='?id=" . $personid . "&create=" . $personid . "'");;
+						echo button("Revoke Token", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
 					}
 ?>
 					</td>
@@ -452,6 +456,9 @@ foreach ($fieldmaps as $map) {
 			</table>
 		</td>
 	</tr>
+<?
+	}
+?>
 </table>
 <script>
 	function confirmDisassociate(){

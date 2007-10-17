@@ -25,11 +25,11 @@ require_once("obj/PortalReport.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-/*
-if (!$USER->authorize('PortalManagement')) {
+
+if (!$USER->authorize('portalaccess')) {
 	redirect('unauthorized.php');
 }
-*/
+
 
 if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['portal']['options']);
@@ -149,16 +149,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 				$options['hideactivetokens'] = GetFormData($f, $s, "hideactivetokens");
 				$options['hideassociated'] = GetFormData($f, $s, "hideassociated");
 				$_SESSION['portal']['options'] = $options;
-				if(CheckFormSubmit($f, 'generate')){
-					$reportinstance->setParameters($options);
-					$reportgenerator->reportinstance = $reportinstance;
-					$reportgenerator->generateQuery();
-					$result = Query($reportgenerator->query);
-					$data = array();
-					while($row = DBGetRow($result)){
-						$data[] = $row[1];
+				if($USER->authorize('generatebulktokens')){
+					if(CheckFormSubmit($f, 'generate')){
+						$reportinstance->setParameters($options);
+						$reportgenerator->reportinstance = $reportinstance;
+						$reportgenerator->generateQuery();
+						$result = Query($reportgenerator->query);
+						$data = array();
+						while($row = DBGetRow($result)){
+							$data[] = $row[1];
+						}
+						generatePersonTokens($data);
 					}
-					generatePersonTokens($data);
 				}
 				redirect();
 			}
@@ -192,7 +194,11 @@ $TITLE = "Portal Management";
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), submit($f, "generate", "Generate Tokens"));
+if($USER->authorize('generatebulktokens')){
+	buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), submit($f, "generate", "Generate Tokens"));
+} else {
+	buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
+}
 startWindow("Contact Search", "padding: 3px;");
 
 if(isset($options['pkey'])){

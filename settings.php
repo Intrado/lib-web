@@ -158,9 +158,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
-				
-				for($i = 0; $i < $maxphones; $i++){
-					setSetting('accessiblePhone' . $i, GetFormData($f, $s, 'accessiblePhone' . $i));
+				if($USER->authorize('portalaccess')){
+					for($i = 0; $i < $maxphones; $i++){
+						setSetting('accessiblePhone' . $i, GetFormData($f, $s, 'accessiblePhone' . $i));
+					}
 				}
 
 				if($IS_COMMSUITE){
@@ -461,6 +462,9 @@ startWindow('Global System Settings');
 						</table>
 					</td>
 				</tr>
+<?
+				if($USER->authorize('portalaccess')){
+?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Portal:</th>
 					<td class="bottomBorder">
@@ -473,6 +477,9 @@ startWindow('Global System Settings');
 						</table>
 					</td>								
 				</tr>
+<?
+				}
+?>
 			</table>
 			<?
 endWindow();
