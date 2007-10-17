@@ -19,23 +19,31 @@ if(isset($_GET['clear'])){
 	redirect();
 }
 
+$systemprioritynames = array("1" => "Emergency",
+							"2" => "High Priority",
+							"3" => "General");
 //check params
 if (isset($_GET['deletetype'])) {
-	$priority = DBSafe($_GET['deletetype']);
-	$type = new Jobtype($priority);
-	$count = QuickQuery("select count(*) from jobtype where systempriority = '" . $type->systempriority . "'");
+	$jobtypeid = DBSafe($_GET['deletetype']);
+	$type = new Jobtype($jobtypeid);
+	$surveysql = " and not issurvey ";
+	if($type->issurvey)
+		$surveysql = " and issurvey ";
+	$count = QuickQuery("select count(*) from jobtype where systempriority = '" . $type->systempriority . "' and not deleted $surveysql");
 	if($count > 1){
-		QuickUpdate("update jobtype set deleted=1 where id = '$priority' and deleted=0");
+		QuickUpdate("update jobtype set deleted=1 where id = '$jobtypeid' and deleted=0");
 		redirect();
 	} else {
-		error("You cannot delete that jobtype", "You must have at least one jobtype for each system priority");
+		if($type->issurvey)
+			$displayname = "Survey";
+		else
+			$displayname = $systemprioritynames[$type->systempriority];
+		error("You cannot delete that jobtype", "You must have at least one " . $displayname);
 	}
 }
 
 
-$systemprioritynames = array("1" => "Emergency",
-							"2" => "High Priority",
-							"3" => "General");
+
 foreach($systemprioritynames as $index => $name){
 	$types[$index] = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '" . $index . "' and not issurvey order by name");
 }
