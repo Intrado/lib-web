@@ -6,11 +6,10 @@ class Phone extends DBMappedObject {
 	var $phone;
 	var $sequence;
 	var $editlock;
-	var $smsenabled = 0;
 
 	function Phone ($id = NULL) {
 		$this->_tablename = "phone";
-		$this->_fieldlist = array("personid", "phone", "sequence","editlock","smsenabled");
+		$this->_fieldlist = array("personid", "phone", "sequence","editlock");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
