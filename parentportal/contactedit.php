@@ -78,8 +78,9 @@ if($PERSONID){
 				</tr>
 <?
 			}
-			$type= "sms";
-			foreach($smses as $sms){
+			if(getSystemSetting("_hassms")){
+				$type= "sms";
+				foreach($smses as $sms){
 ?>
 				<tr>
 					<td>Sms <?=$sms->sequence+1?>: <? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 40, 100); ?></td>
@@ -105,6 +106,7 @@ if($PERSONID){
 					</td>
 				</tr>
 <?
+				}
 			}
 ?>
 	</table>
