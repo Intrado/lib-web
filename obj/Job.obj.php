@@ -13,6 +13,7 @@ class Job extends DBMappedObject {
 	var $phonemessageid;
 	var $emailmessageid;
 	var $printmessageid;
+	var $smsmessageid;
 	var $questionnaireid;
 	var $type;
 	var $createdate;
@@ -31,7 +32,8 @@ class Job extends DBMappedObject {
 	var $sendphone;
 	var $sendemail;
 	var $sendprint;
-
+	var $sendsms;
+	
 	var $optionsarray = null; //options to update
 
 
@@ -39,7 +41,7 @@ class Job extends DBMappedObject {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
 		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description", "listid",
-				"phonemessageid", "emailmessageid", "printmessageid", "questionnaireid",
+				"phonemessageid", "emailmessageid", "printmessageid", "smsmessageid", "questionnaireid",
 				"type", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
 				"status", "percentprocessed", "deleted", "cancelleduserid", "thesql");
 		//call super's constructor
@@ -166,6 +168,7 @@ class Job extends DBMappedObject {
 		$job->setOption("callfirst",!$USER->getSetting("callall") + 0);
 		$job->setOption("skipduplicates",1);
 		$job->setOption("skipemailduplicates",1);
+		$job->setOption("skipsmsduplicates",1);
 		$job->setOption("sendreport",1);
 		if($USER->authorize("leavemessage"))
 			$job->setOption("leavemessage", $USER->getSetting("leavemessage", 0));
@@ -191,15 +194,18 @@ class Job extends DBMappedObject {
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
+		$this->sendsms = (bool)$this->smsmessageid;
 	}
 
 	function update($specificfields = NULL, $updatechildren = false) {
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
+		$this->sendsms = (bool)$this->smsmessageid;
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
+		if(!$this->sendsms) $this->smsmessageid = NULL;
 		parent::update($specificfields,$updatechildren);
 		
 		if($this->id){
@@ -218,9 +224,11 @@ class Job extends DBMappedObject {
 		$this->sendphone = (bool)$this->phonemessageid;
 		$this->sendemail = (bool)$this->emailmessageid;
 		$this->sendprint = (bool)$this->printmessageid;
+		$this->sendsms = (bool)$this->smsmessageid;
 		if(!$this->sendphone) $this->phonemessageid = NULL;
 		if(!$this->sendemail) $this->emailmessageid = NULL;
 		if(!$this->sendprint) $this->printmessageid = NULL;
+		if(!$this->sendsms) $this->smsmessageid = NULL;
 		$id = parent::create($specificfields, $createchildren);
 		
 		if($id){
