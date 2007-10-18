@@ -10,6 +10,10 @@ class PortalReport extends ReportGenerator{
 		$pkeysql = "";
 		$hideactivetokens = "";
 		$hideassociated = "";
+		$showall = false;
+		
+		if(isset($this->params['showall']))
+			$showall = true;
 		if(isset($this->params['pkey'])){
 			$pkeysql = " and p.pkey = '" . DBSafe($this->params['pkey']) . "' ";
 		}
@@ -19,7 +23,7 @@ class PortalReport extends ReportGenerator{
 		if(isset($this->params['hideassociated']) && $this->params['hideassociated']){
 			$hideassociated = " and not exists (select count(*) from portalperson pp where pp.personid = p.id group by pp.personid) ";
 		}
-		if($rulesql || $pkeysql){
+		if($rulesql || $pkeysql || $showall){
 			$this->query = "select SQL_CALC_FOUND_ROWS
 						p.pkey as pkey, 
 						p.id as pid,
@@ -61,10 +65,16 @@ class PortalReport extends ReportGenerator{
 		$total = QuickQuery("select found_rows()");
 		$data = array();
 		$portaluserids = array();
+		$count = 0;
+		$curr = null;
 		while($row = DBGetRow($result)){
 			if($row[6])
 				$portaluserids[] = $row[6];
 			$data[] = $row;
+			if($curr != $row[1]){
+				$count++;
+				$curr = $row[1];
+			}
 		}
 		$portalusers = getPortalUsers($portaluserids);
 		foreach($data as $index => $row){
@@ -89,31 +99,32 @@ class PortalReport extends ReportGenerator{
 		$hiddenColumns = array();
 
 		foreach($fieldlist as $index => $field){
-			$titles[$end] = $field;
 			if(!in_array($index, $activefields)){
-				$hiddenColumns[] = $end;
+				$titles[$end] = "@" .$field;
+			} else {
+				$titles[$end] = $field;
 			}
 			$end++;
 		}
-		
+
 		$repeatedColumns = array(6);
 		
 		$formatters = array(0 => "fmt_idmagnify",
 							5 => "fmt_date");
 		
 		startWindow("Search Results");
-		showPageMenu($total,$pagestart,$max);
+		showPageMenu($total,$pagestart,$count);
 ?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="portalresults">
 <?
-				showTable($data, $titles, $formatters, $repeatedColumns, $hiddenColumns, 0);
+				showTable($data, $titles, $formatters, $repeatedColumns, 0);
 ?>
 			</table>
 			<script langauge="javascript">
 				var portalresultstable = new getObj("portalresults").obj;
 			</script>
 <?
-		showPageMenu($total,$pagestart,$max);
+		showPageMenu($total,$pagestart,$count);
 		endWindow();
 	}
 	
