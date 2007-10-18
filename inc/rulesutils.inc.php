@@ -6,7 +6,8 @@ function getRuleFromForm($f, $s){
 	
 	$rule = null;
 	$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-	if ($fieldnum != "") {
+	
+	if ($fieldnum != "" && $fieldnum != -1) {
 		$type = GetFormData($f,$s,"newruletype");
 
 		if ($type == "text")
