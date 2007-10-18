@@ -10,13 +10,14 @@ class MessagePart extends DBMappedObject {
 	var $defaultvalue;
 	var $voiceid;
 	var $sequence;
+	var $maxlen;
 
 	var $audiofile;
 
 	function MessagePart ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "messagepart";
-		$this->_fieldlist = array("messageid", "type", "audiofileid", "txt", "fieldnum", "defaultvalue", "voiceid", "sequence");
+		$this->_fieldlist = array("messageid", "type", "audiofileid", "txt", "fieldnum", "defaultvalue", "voiceid", "sequence", "maxlen");
 		$this->_childobjects = array("audiofile");
 		$this->_childclasses = array("AudioFile");
 
