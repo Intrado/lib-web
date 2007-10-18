@@ -60,6 +60,12 @@ function fmt_custurl($row, $index){
 	return $url;
 }
 
+function fmt_play_link($row, $index){
+	$url = "";
+	if($row[1])
+		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[0] . "&jobid=" . $row[2] . "\", 400, 500)' href=\"#\">Play Message</a>";
+	return $url;
+}
 
 
 $customers = QuickQueryList("select id, urlcomponent from customer",true);
@@ -233,7 +239,8 @@ for ($pri = 1; $pri <=3 ; $pri++) {
 					"Assigned",
 					"Progress",
 					"Pending",
-					"Waiting"
+					"Waiting",
+					"Play Message"
 				);
 	$formatters = array (0 => "fmt_html",
 						1 => "fmt_custurl",
@@ -244,7 +251,8 @@ for ($pri = 1; $pri <=3 ; $pri++) {
 						10 => "fmt_number",
 						11 => "fmt_number",
 						12 => "fmt_number",
-						13 => "fmt_number"
+						13 => "fmt_number",
+						14 => "fmt_play_link"
 
 		);
 
