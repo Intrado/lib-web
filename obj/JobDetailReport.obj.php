@@ -129,6 +129,7 @@ class JobDetailReport extends ReportGenerator{
 		if(isset($this->params['type']))
 			$typequery = " and rp.type = '" . $this->params['type'] . "'";
 
+		$activefields = explode(",", $this->params['activefields']);
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
 		foreach($fields as $field){
@@ -208,11 +209,7 @@ class JobDetailReport extends ReportGenerator{
 						11 => "Attempts",
 						8 => "Last Attempt",
 						9 => "Last Result");
-		$count=14;
-		foreach($fieldlist as $index => $field){
-			$titles[$count] = $field;
-			$count++;
-		}
+		$titles = appendFieldTitles($titles, 13, $fieldlist, $activefields);
 
 		$formatters = array(5 => "fmt_message",
 							7 => "fmt_destination",
