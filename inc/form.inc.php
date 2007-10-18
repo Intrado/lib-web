@@ -51,7 +51,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 		echo "<input $extrahtml type=\"text\" name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" value=\""
 				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
-				. "maxlength=\"" . ($optionvalue == 'nooption' ? $option : $optionvalue) . "\">";
+				. "maxlength=\"" . ($optionvalue === 'nooption' ? $option : $optionvalue) . "\">";
 		break;
 	case "hidden":
 		echo "<input $extrahtml type=\"hidden\" name=\"frm[" . $form . "][" . $section
@@ -59,7 +59,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\">";
 		break;
 	case "textarea":
-		$rows = ($optionvalue == "nooption" || $optionvalue == NULL) ? $option/6 : $optionvalue;
+		$rows = ($optionvalue === "nooption" || $optionvalue == NULL) ? $option/6 : $optionvalue;
 		echo "<textarea $extrahtml name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" "
 				. "cols=\"" . $option . "\" rows=\"" . $rows . "\">";
@@ -70,7 +70,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 		echo "<input $extrahtml type=\"password\" name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" value=\""
 				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
-				. "maxlength=\"" . ($optionvalue == 'nooption' ? $option : $optionvalue) . "\">";
+				. "maxlength=\"" . ($optionvalue === 'nooption' ? $option : $optionvalue) . "\">";
 		break;
 	case "checkbox":
 		echo "<input $extrahtml type=\"checkbox\" name=\"frm[" . $form . "][" . $section
@@ -95,7 +95,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 	case "radio":
 
 		//allow override on items formdata value. this is almost always the case for radio inputs
-		if($optionvalue=="nooption") {
+		if($optionvalue==="nooption") {
 			$usevalue = $_SESSION['formdata'][$form][$section][$item]['value'];
 		} else {
 			$usevalue = $optionvalue;
@@ -119,7 +119,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 		break;
 	case "selectoption":
 		//allow override on items formdata value. this is almost always the case for select inputs
-		if($optionvalue=="nooption") {
+		if($optionvalue==="nooption") {
 			$usevalue = $_SESSION['formdata'][$form][$section][$item]['value'];
 		}
 		else {
@@ -137,7 +137,10 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 
 		echo "<option value=\"" . htmlentities($usevalue) . "\" ";
 
-		if(	$usevalue == $_SESSION['formdata'][$form][$section][$item]['value'] ) {
+		//when checking if this should be selected, check against the difference of "0" and ""
+		//but allow "5" and 5 to be equivalent.
+		if(	$usevalue == $_SESSION['formdata'][$form][$section][$item]['value'] &&
+			strlen($usevalue) == strlen($_SESSION['formdata'][$form][$section][$item]['value'])) {
 			echo "selected";
 		}
 
@@ -287,7 +290,7 @@ function SetRequired ($form, $section, $item, $req) {
 */
 
 function CheckFormSubmit ($form, $section) {
-	return isset($_POST['submit'][$form][$section]);
+	return isset($_POST['submit'][$form][$section]) ? $_POST['submit'][$form][$section] : false;
 }
 
 /***************** CheckFormInvalid *****************
