@@ -46,13 +46,14 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	return $tableid;
 }
 
-function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $hiddenColumns = array(), $groupby = null) {
+function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $groupby = null) {
 	echo '<tr class="listHeader">';
 	foreach ($titles as $index => $title) {
 
 		
 		echo '<th align="left" ';
-		if(in_array($index, $hiddenColumns))
+		// make column hidden
+		if(strpos($title,"@") !== false)
 			echo ' style="display:none" ';
 		//make column sortable?
 		if (strpos($title,"#") === false) {
@@ -61,10 +62,14 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 			echo '>';
 		}
 
-
-		if (strpos($title,"#") === 0)
-			$title = substr($title,1);
-		echo htmlentities($title) . "</th>";
+		if (strpos($title,"@") === 0){
+			$displaytitle = substr($title,1);
+		} else if (strpos($title,"#") === 0){
+			$displaytitle = substr($title,1);
+		} else {
+			$displaytitle = $title;
+		}
+		echo htmlentities($displaytitle) . "</th>";
 	}
 	echo "</tr>\n";
 
@@ -86,7 +91,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 
 				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
 				echo "<td";
-				if(in_array($index, $hiddenColumns))
+				if(strpos($title,"@") !== false)
 					echo ' style="display:none">';
 				else
 					echo ">";
