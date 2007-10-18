@@ -64,7 +64,7 @@ if (getCurrentSurvey() != NULL) {
 	}
 }
 
-$VALIDJOBTYPES = JobType::getUserJobTypes();
+$VALIDJOBTYPES = JobType::getUserJobTypes(true);
 $PEOPLELISTS = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
 $QUESTIONNAIRES = array();
 // if submitted or completed, gather only the selected questionnaireid
