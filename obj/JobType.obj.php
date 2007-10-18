@@ -16,12 +16,15 @@ class JobType extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	static function getUserJobTypes() {
+	static function getUserJobTypes($issurvey = false) {
 		global $USER;
-		$jobtypes = DBFindMany("JobType","from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=$USER->id and jt.deleted=0 order by priority","jt");
+		$surveysql = "and not issurvey ";
+		if($issurvey)
+			$surveysql = " and issurvey ";
+		$jobtypes = DBFindMany("JobType","from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=$USER->id and jt.deleted=0 $surveysql order by name","jt");
 
 		if (count($jobtypes) == 0) {
-			$jobtypes = DBFindMany("JobType","from jobtype where deleted=0 order by priority");
+			$jobtypes = DBFindMany("JobType","from jobtype where deleted=0 $surveysql order by priority");
 		}
 
 		return $jobtypes;
