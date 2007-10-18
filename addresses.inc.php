@@ -97,7 +97,7 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 	$first = FieldMap::getFirstNameField();
 	$last = FieldMap::getLastNameField();
 	$lang = FieldMap::getLanguageField();
-	$table = Query("select person.id, pkey, $first, $last, $lang, phone, email,
+	$table = Query("select person.id, pkey, $first, $last, $lang, phone, email, sms,
 									concat(
 										coalesce(addr1,''), ' ',
 										coalesce(addr2,''), ' ',
@@ -109,6 +109,7 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 					from person
 						left join phone on (person.id = phone.personid and phone.sequence=0)
 						left join email on (person.id = email.personid and email.sequence=0)
+						left join sms on (person.id = sms.personid and sms.sequence=0)
 						left join address on person.id = address.personid
 					where userid = $USER->id and type = 'addressbook' and not deleted
 					order by $last, $first
@@ -145,23 +146,27 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 						4 => "Language",
 						5 => "Phone",
 						6 => "Email",
-						7 => "Address",
-						8 => "Actions");
+						7 => "SMS",
+						8 => "Address",
+						9 => "Actions");
 		$formatters = array(1 => "fmt_checkbox_addrbook",
 							5 => "fmt_phone",
 							6 => "fmt_email",
-							8 => "fmt_actions");
+							7 => "fmt_phone",
+							9 => "fmt_actions");
 	} else {
 		$titles = array(2 => "First Name",
 						3 => "Last Name",
 						4 => "Language",
 						5 => "Phone",
 						6 => "Email",
-						7 => "Address",
-						8 => "Actions");
+						7 => "SMS",
+						8 => "Address",
+						9 => "Actions");
 		$formatters = array(5 => "fmt_phone",
 							6 => "fmt_email",
-							8 => "fmt_actions");
+							7 => "fmt_phone",
+							9 => "fmt_actions");
 	}
 
 	showTable($data, $titles,$formatters);
