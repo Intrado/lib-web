@@ -223,16 +223,7 @@ class JobDetailReport extends ReportGenerator{
 		?>
 		<script langauge="javascript">
 			var reportdetailstable = new getObj("reportdetails").obj;
-		<?
-			$count=1;
-			foreach($fieldlist as $index => $field){
-				?>
-				setColVisability(reportdetailstable, 9+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
-				<?
-				$count++;
-			}
-		?>
-			</script>
+		</script>
 		<?
 
 	}
