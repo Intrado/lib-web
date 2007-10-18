@@ -53,7 +53,7 @@ $f = "notification";
 $s = "main" . $JOBTYPE;
 $reloadform = 0;
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'email') || CheckFormSubmit($f,'print') || CheckFormSubmit($f,'send'))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'email') || CheckFormSubmit($f,'print') || CheckFormSubmit($f,'sms') || CheckFormSubmit($f,'send'))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -64,7 +64,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 	else
 	{
 		MergeSectionFormData($f, $s);
-		foreach (array("phone","email","print") as $type)
+		foreach (array("phone","email","print","sms") as $type)
 			MergeSectionFormData($f, $type);
 
 		//do check
@@ -105,9 +105,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
 			} else {
 				$fieldsarray = array("name", "jobtypeid", "description", "listid", "phonemessageid",
-				"emailmessageid","printmessageid", "starttime", "endtime",
-				"sendphone", "sendemail", "sendprint", "maxcallattempts",
-				"skipduplicates");
+				"emailmessageid","printmessageid", "smsmessageid", "starttime", "endtime",
+				"sendphone", "sendemail", "sendprint", "sendsms", "maxcallattempts");
 				PopulateObject($f,$s,$job,$fieldsarray);
 
 				if ($JOBTYPE != 'repeating') {
@@ -120,6 +119,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$job->sendemail = false;
 				if(!$USER->authorize('sendprint'))
 					$job->sendprint = false;
+				if(!$USER->authorize('sendsms'))
+					$job->sendsms = false;
 			}
 
 			$jobtypes = array();
@@ -141,13 +142,20 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->printmessageid = NULL;
 				$job->sendprint = false;
 			}
+			if ($job->sendsms && $job->smsmessageid != 0) {
+				$jobtypes[] = "sms";
+			} else {
+				$job->smsmessageid = NULL;
+				$job->sendsms = false;
+			}
 			$job->type=implode(",",$jobtypes);
 
 			//repopulate the form with these linked values in case of a validation error.
 			$fields = array(
 				array("sendphone","bool",0,1),
 				array("sendemail","bool",0,1),
-				array("sendprint","bool",0,1)
+				array("sendprint","bool",0,1),
+				array("sendsms","bool",0,1)
 			);
 
 			PopulateForm($f,$s,$job,$fields);
@@ -195,6 +203,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->setOption("callfirst",!GetFormData($f,$s,"callall"));
 				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
+				$job->setOption("skipsmsduplicates",GetFormData($f,$s,"skipsmsduplicates"));
 				
 				if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 					$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
@@ -236,7 +245,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//now add any language options
 			$addlang = false;
 			if($USER->authorize('sendmulti')) {
-				foreach (array("phone","email","print") as $type) {
+				foreach (array("phone","email","print","sms") as $type) {
 					if (CheckFormSubmit($f,$type))
 						$addlang = true;
 
@@ -255,14 +264,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			//TODO check for send button
 			if ($JOBTYPE == "normal" && CheckFormSubmit($f,'send')) {
-				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid)	{
+				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid || $job->smsmessageid)	{
 					ClearFormData($f);
 					redirect("jobconfirm.php?id=" . $job->id);
 				} else {
 					error("Please select a default message");
 				}
 			} else if (!$addlang) {
-				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid)	{
+				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid || $job->smsmessageid)	{
 					ClearFormData($f);
 					redirect('jobs.php');
 				} else {
@@ -303,11 +312,13 @@ if( $reloadform )
 	array("phonemessageid","number","nomin","nomax"),
 	array("emailmessageid","number","nomin","nomax"),
 	array("printmessageid","number","nomin","nomax"),
+	array("smsmessageid","number","nomin","nomax"),
 	array("starttime","text",1,50,true),
 	array("endtime","text",1,50,true),
 	array("sendphone","bool",0,1),
 	array("sendemail","bool",0,1),
-	array("sendprint","bool",0,1)
+	array("sendprint","bool",0,1),
+	array("sendsms","bool",0,1)
 	);
 
 	PopulateForm($f,$s,$job,$fields);
@@ -316,6 +327,7 @@ if( $reloadform )
 	PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
+	PutFormData($f,$s,"skipsmsduplicates",$job->isOption("skipsmsduplicates"), "bool",0,1);
 
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
@@ -347,7 +359,9 @@ if( $reloadform )
 	PutFormData($f,"email","newmessemail","");
 	PutFormData($f,"print","newlangprint","");
 	PutFormData($f,"print","newmessprint","");
-
+	PutFormData($f,"sms", "newlangsms","");
+	PutFormData($f,"sms","newmesssms","");
+	
 }
 
 $messages = array();
@@ -357,17 +371,20 @@ if ($submittedmode || $completedmode) {
 	$messages['phone'] = DBFindMany("Message","from message where id=$job->phonemessageid or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
 	$messages['email'] = DBFindMany("Message","from message where id=$job->emailmessageid or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
 	$messages['print'] = DBFindMany("Message","from message where id=$job->printmessageid or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
+	$messages['sms'] = DBFindMany("Message","from message where id=$job->smsmessageid or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
 } else {
 	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
+	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
 }
 
-$joblangs = array("phone" => array(), "email" => array(), "print" => array());
+$joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
 if (isset($job->id)) {
 	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
 	$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 	$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
+	$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $job->id);
 }
 
 $languages = DBFindMany("Language","from language");
@@ -728,6 +745,33 @@ startWindow('Job Information');
 		</td>
 	</tr>
 <? } ?>
+<? if($USER->authorize('sendsms')) { ?>
+	<tr valign="top">
+		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
+		<td class="bottomBorder">
+			<table border="0" cellpadding="2" cellspacing="0" width=100%>
+				<tr>
+					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
+					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "")); ?>SMS</td>
+				</tr>
+				<tr>
+					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+					<td><? message_select('sms',$f, $s,"smsmessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
+				</tr>
+<? if($USER->authorize('sendmulti')) { ?>
+				<tr>
+					<td>Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
+					<td><? alternate('sms'); ?></td>
+				</tr>
+<? } ?>
+				<tr>
+					<td>Skip duplicate sms numbers</td>
+					<td><? NewFormItem($f,$s,"skipsmsduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<? } ?>
 </table>
 <?
 endWindow();
@@ -738,7 +782,7 @@ include_once("navbottom.inc.php");
 
 ?>
 <script language="javascript">
-sections = Array('phone', 'email', 'print');
+sections = Array('phone', 'email', 'print', 'sms');
 for(section in sections) {
 	var chk = new getObj('send' + sections[section]).obj;
 	if (chk) {

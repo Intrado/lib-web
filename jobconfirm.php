@@ -25,6 +25,7 @@ include_once("obj/ListEntry.obj.php");
 include_once("obj/RenderedList.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Phone.obj.php");
+include_once("obj/Sms.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +81,7 @@ $joblangs = array();
 $joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
 $joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 $joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
+$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $job->id);
 
 
 function alternate($type) {
@@ -309,6 +311,36 @@ echo htmlentities($printmessage->name);
 			</table>
 		</td>
 	</tr>
+<? } ?>
+<? if(strpos($job->type,"sms") !== false) { ?>
+	<tr valign="top">
+		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
+		<td class="bottomBorder">
+			<table border="0" cellpadding="2" cellspacing="0" width=100%>
+				<tr>
+					<td class="bottomBorder"  width="30%" >Default message</td>
+					<td class="bottomBorder" >
+<?
+$smsmessage = new Message($job->smsmessageid);
+echo htmlentities($smsmessage->name);
+?>
+					</td>
+				</tr>
+<? if($USER->authorize('sendmulti')) { ?>
+
+				<tr>
+					<td class="bottomBorder" >Multilingual message options</td>
+					<td class="bottomBorder" ><? alternate('sms'); ?></td>
+				</tr>
+<? } ?>
+				<tr>
+					<td>Skip duplicate sms addresses</td>
+					<td><input type="checkbox" disabled <?= $job->isOption("skipsmsduplicates") ? "checked":"" ?>>Skip Duplicates</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
 <? } ?>
 </table>
 
