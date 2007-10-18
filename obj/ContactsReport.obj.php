@@ -64,174 +64,129 @@ class ContactsReport extends ReportGenerator {
 	}
 
 	function runHtml(){
-
+		$max = 500;
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
-		$fieldcount = count($fieldlist);
+		// get field list same way query did
+		// leave first item even though it is a blank, this will allow the count offset to begin at 1
+		// find field alias if it exists and strip string starting from 1 after that position
+		// flip the array so the field number is now the index and the index is a count offset
+		$fieldindex = explode(",",generateFields("p"));
+		foreach($fieldindex as $index => $fieldnumber){
+			$aliaspos = strpos($fieldnumber, ".");
+			if($aliaspos !== false){
+				$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
+			}
+		}
+		$fieldindex = array_flip($fieldindex);
+		
+		$activefields = explode(",", $this->params['activefields']);
 		$query = $this->query;
-	
+		
 		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
-		$query .= "limit $pagestart, 100";
+		$query .= "limit $pagestart, $max";
 		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
-		$personlist = array();
-		$emaillist = array();
-		$phonelist = array();
+		
 		//fetch data with main query and populate arrays using personid as the key
+		$personlist = array();
+		$personidlist = array();
 		while($row = DBGetRow($result)){
 			$personlist[$row[1]] = $row;
-			$phonelist[$row[1]] = DBFindMany("Phone", "from phone where personid = '$row[1]'");
-			$emaillist[$row[1]] = DBFindMany("Email", "from email where personid = '$row[1]'");
+			$personidlist[] = $row[1];
 		}
-
-		$max = 100;
+		
+		// select static value "ordering" in order to order results as phone, email, sms
+		$phoneemailsmsquery = 
+			"(select personid as pid,
+				phone as destination,
+				sequence as sequence,
+				'1' as ordering
+				from phone ph
+				where
+				personid in ('" . implode("','",$personidlist) . "')
+				)
+			union
+			(select personid as pid2,
+				email as destination,
+				sequence as sequence,
+				'2' as ordering
+				from email
+				where
+				personid in ('" . implode("','",$personidlist) . "')
+				)
+			union
+			(select personid as pid3,
+				sms as destination,
+				sequence as sequence,
+				'3' as ordering
+				from sms
+				where
+				personid in ('" . implode("','",$personidlist) . "')
+				)
+			order by pid, ordering, sequence";
+			
+		$result = Query($phoneemailsmsquery);
+		$phoneemailsmsdata = array();
+		while($row = DBGetRow($result)){
+			if(!isset($phoneemailsmsdata[$row[0]])){
+				$phoneemailsmsdata[$row[0]] = array();
+			}
+			$phoneemailsmsdata[$row[0]][] = $row;
+		}
+	
+		
+		// personrow index 4 is address
+		// personrow index 5 is the start of f-fields
+		// personrow insert all destinations before f-fields
+		// array_insert inserts data after 3rd argument's array index
+		// destination index 1 is phone/email/sms
+		// destination index 2 is sequence
+		$data = array();
+		foreach($personlist as $personrow){
+			foreach($phoneemailsmsdata[$personrow[1]] as $destination){
+				$data[] = array_insert($personrow, array($destination[2],$destination[1]), 4);
+			}
+		}
+		
+		$titles = array("0" => "ID#",
+						"2" => "First Name",
+						"3" => "Last Name", 
+						"4" => "Address",
+						"5" => "Sequence",
+						"6" => "Destination");
+		// set the last title index
+		$end = 6;
+		foreach($fieldlist as $fieldnum => $fieldname){
+			$num = $fieldindex[$fieldnum];
+			if(!in_array($fieldnum, $activefields)){
+				$titles[$end + $num] = "@" . $fieldname;
+			} else {
+				$titles[$end + $num] = $fieldname;
+			}
+		}
+		
+		$formatters = array("0" => "fmt_idmagnify",
+							"5" => "add_one_to_sequence",
+							"6" => "fmt_destination");
+		
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
+		
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
-			<tr class="listHeader">
-				<th>ID#</th>
-				<th>First Name</th>
-				<th>Last Name</th>
-				<th>Address</th>
-				<th>Sequence</th>
-				<th>Destination</th>
-			<?
-			for($i=0;$i<=20; $i++){
-				$num = sprintf("f%02d", $i);
-				if(isset($fieldlist[$num])){
-					$style = "";
-					if(!$_SESSION['report']['fields'][$num]){
-						$style = ' style="display:none;" ';
-					}
-					?><th <?=$style?>><?=$fieldlist[$num]?></th><?
-				}
-			}
-			
-		?>
-			</tr>
 		<?
-			$alt = 0;
-			foreach($personlist as $person){
-				echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-				
-				$id = $person[1];
-				?>
-					<td><?=fmt_idmagnify($person,0)?></td>
-					<td><?=$person[2]?></td>
-					<td><?=$person[3]?></td>
-					<td><?=$person[4]?></td>
-					
-					<? 
-						$first=true;
-						if(isset($phonelist[$id])){
-							foreach($phonelist[$id] as $phone){
-								if($phone->phone == ""){
-									continue;
-								}
-								if(!$first) {
-									echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-?>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-<?
-								}
-?>
-								<td><?=$phone->sequence+1?></td>
-								<td><?=Phone::format($phone->phone)?></td>
-<?
-								if($first){
-									$first = false;
-									$count=0;
-									for($i=0;$i<=20; $i++){
-										$num = sprintf("f%02d", $i);
-										if(isset($fieldlist[$num])){
-											$style = "";
-											if(!$_SESSION['report']['fields'][$num]){
-												$style = ' style="display:none;" ';
-											}
-											?><td <?=$style?>><?=htmlentities($person[5+$count])?></td><?
-											$count++;
-										}
-									}
-								} else {
-									for($i=0;$i<=20; $i++){
-										$num = sprintf("f%02d", $i);
-										if(isset($fieldlist[$num])){
-											$style = "";
-											if(!$_SESSION['report']['fields'][$num]){
-												$style = ' style="display:none;" ';
-											}
-											?><td <?=$style?>>&nbsp;</td><?
-										}
-									}
-								}
-								?>
-								</tr><?
-							}
-							if($first){
-								?>
-									<td>&nbsp;</td>
-									<td>No Phone Numbers</td>
-								<?
-								$count=0;
-								for($i=0;$i<=20; $i++){
-									$num = sprintf("f%02d", $i);
-									if(isset($fieldlist[$num])){
-										$style = "";
-										if(!$_SESSION['report']['fields'][$num]){
-											$style = ' style="display:none;" ';
-										}
-										?><td <?=$style?>><?=htmlentities($person[5+$count])?></td><?
-										$count++;
-									}
-								}
-							}
-						}
-						if(isset($emaillist[$id])){
-							foreach($emaillist[$id] as $email){
-								if($email->email == ""){
-									continue;
-								}
-								echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-								?>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								
-									<td><?=$email->sequence+1?></td>
-									<td><?=$email->email?></td>
-								<? 
-								
-								for($i=0;$i<=20; $i++){
-									$num = sprintf("f%02d", $i);
-									if(isset($fieldlist[$num])){
-										$style = "";
-										if(!$_SESSION['report']['fields'][$num]){
-											$style = ' style="display:none;" ';
-										}
-										?><td <?=$style?>>&nbsp;</td><?
-									}
-								}
-								
-								?>
-								</tr><?
-							}
-						}
-						
-			}
+			showTable($data, $titles, $formatters, array("5", "6"), 0);
 		?>
 			</table>
 			<script langauge="javascript">
 			var searchresultstable = new getObj("searchresults").obj;
 			</script>
 		<?
+		
 		showPageMenu($total,$pagestart,$max);
 		endWindow();
 	}
