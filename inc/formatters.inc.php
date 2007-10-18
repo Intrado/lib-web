@@ -458,6 +458,8 @@ function fmt_result ($row,$index) {
 			return "Not Attempted";
 		case "undelivered":
 			return "Not Contacted";
+		case "declined":
+			return "Declined";
 		default:
 			return ucfirst($row[$index]);
 	}
