@@ -1237,3 +1237,15 @@ ADD `sms` varchar(20) default NULL AFTER `email`
 $$$
 
 
+-- import enhancements
+
+ALTER TABLE `importfield` add `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy' after mapto
+$$$
+
+ALTER TABLE `importfield` add `val` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+$$$
+
+ALTER TABLE `importfield` CHANGE `mapfrom` `mapfrom` TINYINT( 4 ) NULL
+$$$
+
+
