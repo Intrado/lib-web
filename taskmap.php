@@ -32,12 +32,21 @@ if (isset($_GET['id'])) {
 	if (customerOwns("import",$id)) {
 		$_SESSION['importid'] = $id;
 		$_SESSION['importcols'] = NULL;
+		$_SESSION['importviewrows'] = 10;
 	}
 	redirect();
 }
 
+if (!$_SESSION['importid'])
+	redirect("tasks.php");
 
-$previewrows = 10;
+if (isset($_GET['previewrows'])) {
+	$_SESSION['importviewrows'] = $_GET['previewrows'] + 0;
+	$_SESSION['importviewrows'] = max(5,$_SESSION['importviewrows']);
+	$_SESSION['importviewrows'] = min(50,$_SESSION['importviewrows']);
+}
+
+$previewrows = $_SESSION['importviewrows'];
 
 $import = new Import($_SESSION['importid']);
 $importfields = DBFindMany("importfield","from importfield where importid=" . $_SESSION['importid'] . " order by id");
@@ -276,10 +285,26 @@ if ($noimportdata) { ?>
 			<br><h3>No import data could be found. Please check that a non empty file has been uploaded.</h3><br>
 <? } else { ?>
 
+<div class="hoverlinks" style="margin: 5px;">
+Preview rows:
+<select onchange="if(confirm('Warning: changing the number of preview rows will undo any changes made on the page.\nClick cancel if you need to save your changes.')) {location.href='?previewrows=' + this.value;}"
+<?
+	for ($x = 5; $x <= 50; $x += 5) {
+?>
+		<option value="<?=$x?>" <?= $x == $_SESSION['importviewrows'] ? "selected" : "" ?>><?=$x?></option>
+<?
+	}
+?>
+</select>
+<br>
+<a href="#" onclick="hide('viewdata'); show('datamapping'); return undefined;">Edit Mapping</a> |
+<a href="#" onclick="hide('datamapping'); show('viewdata'); return undefined;">View Data</a>
+</div>
 
+<div id="datamapping">
 <table width="100%" cellpadding="3" cellspacing="1" class="list">
 	<tr class="listHeader">
-		<th align="left">Field</th><th align="left">Translator</th><th align="left" width="30%">Translator&nbsp;Options</th><th align="left" width="70%">File Data</th><th align="left">Actions</th>
+		<th align="left">Field</th><th align="left">Translator</th><th align="left" >Translator&nbsp;Options</th><th align="left">File Data</th><th align="left">Actions</th>
 	</tr>
 <?
 	$alt = 0;
@@ -341,7 +366,8 @@ if ($noimportdata) { ?>
 					if ($col === "") {
 						NewFormItem($f,$s,"mapfrom_$count","selectoption","- None -","");
 					} else {
-						NewFormItem($f,$s,"mapfrom_$count","selectoption","Column " . ($col + 1),$col);
+						$unused = !isset($usedcols[$col]) ? " *" : "";
+						NewFormItem($f,$s,"mapfrom_$count","selectoption","Column " . ($col + 1) . $unused,$col);
 					}
 				}
 				NewFormItem($f,$s,"mapfrom_$count","selectend");
@@ -365,13 +391,21 @@ if ($noimportdata) { ?>
 
 ?>
 </table>
+<div style="margin: 5px;">
+<img src="img/bug_lightbulb.gif" > Columns with an * indicate that they have not yet been mapped.
+</div>
+</div>
+<div id="viewdata" style="display: none;">
+<table border=0><tr><td>
 <?
 
 //load a bunch of hidden, named divs with the data from the import file, then this data can be read later and copied to show values
 	for ($x = 0; $x < $colcount; $x++) {
 	?>
-		<div id="data<?= $x?>" style="display: none;">
-		<table cellpadding="0" cellspacing="0" width="100%" style="font-size: 8pt; border: 1px solid gray;">
+		<div style="float: left; margin-left: 10px; margin-bottom: 10px; padding: 3px; ">
+		<b>Column <?= $x +1?></b>
+		<div id="data<?= $x?>" >
+		<table cellpadding="0" cellspacing="0" width="250" style="font-size: 8pt; border: 1px solid gray;">
 <?
 		for ($ci = 0; $ci < $previewrows; $ci++) {
 			$cel = isset($importdata[$x][$ci]) ? $importdata[$x][$ci] : "";
@@ -382,13 +416,14 @@ if ($noimportdata) { ?>
 ?>
 		</table>
 		</div>
+		</div>
 <?
 	}
 ?>
+</td></tr></table>
+<div>
 
 <script>
-
-
 
 function switchactiondata (num,newaction) {
 	hide("actiondata_" + num + "_lookup");
@@ -440,14 +475,13 @@ function setdata(num) {
 }
 
 //set the import file data for each mapping
-var importfieldcount = <?= count($importfieldmap) ?>;
+var importfieldcount = <?= count($importfields) ?>;
 
 for (var x = 0; x < importfieldcount; x++) {
 	setdata(x);
 }
 
 </script>
-
 
 <?
 }

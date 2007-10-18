@@ -111,11 +111,17 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	return $btn;
 }
 
-function submit($form, $section, $name = 'Submit') {
+function submit($form, $section, $name = 'Submit',$val = null) {
 	//ugly hack. in order for enter key to submit form, either we need to add JS to each text field, or there must be an actual submit button
 	//so we make a submit button and hide it off screen.
-	return '<input type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" style="position: absolute; left: -1000px; top: -1000px;">'
-	. button($name,"submitForm('$form','$section');");
+	$ret = '<input type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" style="position: absolute; left: -1000px; top: -1000px;">';
+
+	if ($val !== null) {
+		$ret .= button($name,"submitForm('$form','$section','$val');");
+	} else {
+		$ret .= button($name,"submitForm('$form','$section');");
+	}
+	return $ret;
 }
 
 function add($name, $file = 'add') {
