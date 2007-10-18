@@ -194,6 +194,32 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 		</script>
 	</table>
 <?
+}
+
+
+function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
+	// get field list same way query did
+	// leave first item even though it is a blank, this will allow the count offset to begin at 1
+	// find field alias if it exists and strip string starting from 1 after that position
+	// flip the array so the field number is now the index and the index is a count offset
+	$fieldindex = explode(",",generateFields("p"));
+	foreach($fieldindex as $index => $fieldnumber){
+		$aliaspos = strpos($fieldnumber, ".");
+		if($aliaspos !== false){
+			$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
+		}
+	}
+	$fieldindex = array_flip($fieldindex);
+
+	foreach($fieldlist as $fieldnum => $fieldname){
+		$num = $fieldindex[$fieldnum];
+		if(!in_array($fieldnum, $activefields)){
+			$titles[$startindex + $num] = "@" . $fieldname;
+		} else {
+			$titles[$startindex + $num] = $fieldname;
+		}
+	}
+	return $titles;
 
 }
 ?>
