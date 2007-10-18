@@ -64,24 +64,12 @@ class ContactsReport extends ReportGenerator {
 	}
 
 	function runHtml(){
-		$max = 500;
+		$max = 100;
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
-		// get field list same way query did
-		// leave first item even though it is a blank, this will allow the count offset to begin at 1
-		// find field alias if it exists and strip string starting from 1 after that position
-		// flip the array so the field number is now the index and the index is a count offset
-		$fieldindex = explode(",",generateFields("p"));
-		foreach($fieldindex as $index => $fieldnumber){
-			$aliaspos = strpos($fieldnumber, ".");
-			if($aliaspos !== false){
-				$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
-			}
-		}
-		$fieldindex = array_flip($fieldindex);
 		
 		$activefields = explode(",", $this->params['activefields']);
 		$query = $this->query;
@@ -159,16 +147,8 @@ class ContactsReport extends ReportGenerator {
 						"5" => "Sequence",
 						"6" => "Destination");
 		// set the last title index
-		$end = 6;
-		foreach($fieldlist as $fieldnum => $fieldname){
-			$num = $fieldindex[$fieldnum];
-			if(!in_array($fieldnum, $activefields)){
-				$titles[$end + $num] = "@" . $fieldname;
-			} else {
-				$titles[$end + $num] = $fieldname;
-			}
-		}
-		
+		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
+
 		$formatters = array("0" => "fmt_idmagnify",
 							"5" => "add_one_to_sequence",
 							"6" => "fmt_destination");
