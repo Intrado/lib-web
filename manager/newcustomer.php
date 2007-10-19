@@ -161,6 +161,8 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'blocknumbers', '1'),"
 						. "($accessid, 'callblockingperms', 'editall'),"
 						. "($accessid, 'metadata', '1'),"
+						. "($accessid, 'portalaccess', '1'),"
+						. "($accessid, 'generatebulktokens', '1'),"
 						. "($accessid, 'managetasks', '1');"
 						;
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
@@ -183,10 +185,10 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 
-				$query = "INSERT INTO `jobtype` (`name`, `priority`, `systempriority`, timeslices, `deleted`) VALUES
-							('Emergency', 10000, 1, 225, 0),
-							('Attendance', 20000, 2, 0, 0),
-							('General', 30000, 3, 450, 0)";
+				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, timeslices, `deleted`) VALUES
+							('Emergency', 1, 225, 0),
+							('Attendance', 2, 0, 0),
+							('General', 3, 450, 0)";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
