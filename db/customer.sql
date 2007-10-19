@@ -1249,13 +1249,13 @@ $$$
 
 -- data migration
 
-INSERT INTO SETTING (name,value) select 'maxsms', value from setting where name='maxphones'
+INSERT INTO `setting` (name,value) select 'maxsms', value from setting where name='maxphones'
 $$$
 
-INSERT INTO SMS (personid, sequence) select personid, sequence from phone
+INSERT INTO `sms` (personid, sequence) select personid, sequence from phone
 $$$
 
-INSERT INTO SMS (personid, sms, sequence) select personid, `phone`, sequence from phone where smsenabled=1 on duplicate key update sms.sms = phone.phone
+INSERT INTO `sms` (personid, sms, sequence) select personid, `phone`, sequence from phone where smsenabled=1 on duplicate key update sms.sms = phone.phone
 $$$
 
 ALTER TABLE phone DROP smsenabled
