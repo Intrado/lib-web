@@ -117,7 +117,7 @@ if (CheckFormSubmit($f,$s)){
 					if (trim($tablequery)) {
 						$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
 						Query($tablequery,$newdb)
-							or die ("Failed to create tables \n$tablequery\n\nfor $newdbname : " . mysql_error($custdb));
+							or die ("Failed to execute statement \n$tablequery\n\nfor $newdbname : " . mysql_error($newdb));
 					}
 				}
 
