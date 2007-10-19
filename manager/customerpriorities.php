@@ -21,41 +21,9 @@ if(isset($_SESSION['currentid'])) {
 }
 
 if(isset($_REQUEST['delete'])){
-	$priority = $_REQUEST['delete']+0;
-	while($next = movePriority($priority)){
-		$priority = $next;
-	}
-	QuickUpdate("update jobtype set deleted = 1 where priority = '$priority'", $custdb);
+	$jobtypeid = $_REQUEST['delete']+0;
+	QuickUpdate("update jobtype set deleted = 1 where id = '$jobtypeid'", $custdb);
 	redirect();
-}
-
-if(isset($_REQUEST['moveup'])){
-	$priority = $_REQUEST['moveup']+0;
-	movepriority($priority, false);
-	redirect();
-}
-
-if(isset($_REQUEST['movedown'])){
-	$priority = $_REQUEST['movedown']+0;
-	movepriority($priority);
-	redirect();
-}
-
-//////////////////////////////////////////
-// Data Functions
-//////////////////////////////////////////
-
-function movePriority($priority, $down = true) {
-	global $custdb;
-	$priority = 0 + $priority;
-	$op = $down ? array('>','') : array('<','desc');
-	$swap = QuickQueryRow("select id, priority from jobtype where priority $op[0] '$priority' and deleted =0 order by priority $op[1] limit 1", false, $custdb);
-	if ($swap) {
-		QuickUpdate("update jobtype set priority = $swap[1] where priority = '$priority'", $custdb);
-		QuickUpdate("update jobtype set priority = '$priority' where id = $swap[0]", $custdb);
-		return $swap[1];
-	}
-	return false;
 }
 
 //////////////////////////////////////////
@@ -64,7 +32,7 @@ function movePriority($priority, $down = true) {
 
 $reload = 0;
 $refresh = 0;
-$result = Query("select id, priority, name, systempriority, timeslices from jobtype where deleted = 0 order by priority", $custdb);
+$result = Query("select id, name, systempriority, timeslices from jobtype where deleted = 0 order by systempriority, name", $custdb);
 $jobtypes = array();
 while($row = DBGetRow($result, true)){
 	$jobtypes[] = $row;
@@ -91,11 +59,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 		
 			if(CheckFormSubmit($f, 'new')){
 				$name = DBSafe(GetFormData($f, $s, 'newname'));
-				$nextpriority = 10000 + QuickQuery("select max(priority) from jobtype where deleted=0", $custdb);
 				$timeslice = GetFormData($f, $s, 'newtimeslice') +0;
 				$systempriority = GetFormData($f, $s, 'newsystempriority')+0;
-				QuickUpdate("insert into jobtype(name, priority, systempriority, timeslices) values
-							('$name', '$nextpriority','$systempriority', '$timeslice')", $custdb);
+				QuickUpdate("insert into jobtype(name, systempriority, timeslices) values
+							('$name', '$systempriority', '$timeslice')", $custdb);
 			}
 				
 			foreach($jobtypes as $jobtype){
@@ -118,7 +85,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 if($reload){
 	ClearFormData($f);
 	if($refresh){
-		$result = Query("select id, priority, name, systempriority, timeslices from jobtype where deleted = 0 order by priority", $custdb);
+		$result = Query("select id, name, systempriority, timeslices from jobtype where deleted = 0 order by systempriority, name", $custdb);
 		$jobtypes = array();
 		while($row = DBGetRow($result, true)){
 			$jobtypes[] = $row;
@@ -142,7 +109,7 @@ if($reload){
 
 function getSystemPriorities () {
 	return array("1" => "Emergency",
-				"2" => "Attendance",
+				"2" => "High Priority",
 				"3" => "General");
 }
 
@@ -166,7 +133,6 @@ NewForm($f);
 
 <table border=1>
 	<tr>
-		<td>Priority</td>
 		<td>Name</td>
 		<td>System Priority</td>
 		<td>Throttle Level/Timeslice</td>
@@ -176,16 +142,14 @@ NewForm($f);
 	$systempriorities = getSystemPriorities();
 	foreach($jobtypes as $jobtype){
 		?><tr>
-			<td><?=$jobtype['priority']?></td>
 			<td><? NewFormItem($f, $s, 'name'.$jobtype['id'], 'text', 20)?></td>
 			<td><? setSystemPriority($f, $s, 'systempriority'.$jobtype['id'])?></td>
 			<td><? NewFormItem($f, $s, 'timeslice'.$jobtype['id'], 'text', 20)?></td>
-			<td><a href="customerpriorities.php?delete=<?=$jobtype['priority']?>">Delete</a>&nbsp;|&nbsp<a href="customerpriorities.php?moveup=<?=$jobtype['priority']?>">Move&nbsp;Up</a>&nbsp;|&nbsp<a href="customerpriorities.php?movedown=<?=$jobtype['priority']?>">Move&nbsp;Down</a></td>
+			<td><a href="customerpriorities.php?delete=<?=$jobtype['id']?>">Delete</a>
 		</tr><?
 	}
 ?>
 	<tr>
-		<td><?=10000 + QuickQuery("select max(priority) from jobtype where deleted=0", $custdb);?></td>
 		<td><? NewFormItem($f, $s, 'newname', 'text', 20)?></td>
 		<td><? setSystemPriority($f, $s, 'newsystempriority')?></td>
 		<td><? NewFormItem($f, $s, 'newtimeslice', 'text', 20)?></td>
