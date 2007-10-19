@@ -39,6 +39,8 @@ INSERT INTO `permission` (accessid,name,value) VALUES
 						 (@smaccessid, 'blocknumbers', '1'),
 						 (@smaccessid, 'callblockingperms', 'editall'),
 						 (@smaccessid, 'metadata', '1'),
+						 (@smaccessid, 'portalaccess', '1'),
+						 (@smaccessid, 'generatebulktokens', '1'),
 						 (@smaccessid, 'managetasks', '1');
 $$$
 						
