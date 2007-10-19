@@ -76,6 +76,7 @@ if ($personid == NULL) {
 
 	$phones = array();
 	$emails = array();
+	$smses = array();
 } else {
 	// editing existing person
 	$person = DBFind("Person", "from person where id = " . $personid);
@@ -174,7 +175,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				$email->update();
 				$x++;
 			}
-			
+
 			if ($USER->authorize('sendsms')){
 				$x = 0;
 				foreach ($smses as $sms) {

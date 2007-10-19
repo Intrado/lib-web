@@ -51,10 +51,10 @@ function passwordcheck($f, $s){
 		$tally++;
 	if(ereg("[\!\@\#\$\%\^\&\*]", $password))
 		$tally++;
-	
+
 	if($tally >= 2)
 		return true;
-		
+
 	return false;
 }
 
@@ -447,7 +447,7 @@ startWindow('User Information');
 								<td>
 								<?
 									// changed query from name, id to id, name; jjl
-									$options = QuickQueryList("select id, name from jobtype where deleted=0 order by priority asc", true);
+									$options = QuickQueryList("select id, name from jobtype where deleted=0 order by systempriority, name asc", true);
 									if(!count($options))
 										$options['No Job Types Defined'] = 0;
 									NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,'id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');

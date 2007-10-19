@@ -28,35 +28,11 @@ if (!$USER->authorize('managesystem')) {
 
 //check params
 if (isset($_GET['deletetype'])) {
+	// TODO jobtype priority is gone, use id instead
 	$priority = DBSafe($_GET['deletetype']);
-	while($next = movePriority($priority))
-		$priority = $next;
 
 	QuickUpdate("update jobtype set deleted=1 where priority = '$priority' and deleted=0");
 	redirect();
-}
-
-
-if (isset($_GET['moveup'])) {
-	movePriority($_GET['moveup'], false);
-	redirect();
-}
-if (isset($_GET['movedn'])) {
-	movePriority($_GET['movedn'], true);
-	redirect();
-}
-
-function movePriority($priority, $down = true) {
-	global $USER;
-	$priority = 0 + $priority;
-	$op = $down ? array('>','') : array('<','desc');
-	$swap = QuickQueryRow("select id, priority from jobtype where priority $op[0] '$priority' and deleted =0 order by priority $op[1] limit 1");
-	if ($swap) {
-		QuickUpdate("update jobtype set priority = $swap[1] where priority = '$priority'");
-		QuickUpdate("update jobtype set priority = '$priority' where id = $swap[0]");
-		return $swap[1];
-	}
-	return false;
 }
 
 function getSetting($name) {
@@ -122,8 +98,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 						$timeslices = min(600,abs($timeslices));
 
 						if($id == 'new' && $name) {
-							$nextpri = 10000 + QuickQuery("select max(priority) from jobtype where deleted=0");
-							$query = "insert into jobtype (name, priority, systempriority, timeslices) values ('$name','$nextpri', '$systempriority','$timeslices')";
+							$query = "insert into jobtype (name, systempriority, timeslices) values ('$name','$systempriority','$timeslices')";
 							QuickUpdate($query);
 						} else {
 							if (customerOwns("jobtype",$id)) {
@@ -208,7 +183,7 @@ if( $reloadform )
 		PutFormData($f, $s, "easycallmin", getSetting('easycallmin'), "number", 0, 10);
 		PutFormData($f, $s, "easycallmax", getSetting('easycallmax'), "number", 0, 10);
 	}
-	
+
 	for($i=0; $i < $maxphones; $i++){
 		PutFormData($f, $s, "accessiblePhone" . $i, getSystemSetting('accessiblePhone' . $i, 0), "bool", 0, 1);
 	}
@@ -223,11 +198,6 @@ function getSystemPriorities () {
 	return array("1" => "Emergency",
 				"2" => "Attendance",
 				"3" => "General");
-}
-
-
-function fmt_priority($obj, $name) {
-	return '<div align="center">' . round($obj->priority / 10000) . '</div>';
 }
 
 function fmt_name($obj, $name) {
@@ -272,17 +242,6 @@ function fmt_edit($obj, $name) {
 			. '<a href="' . $_SERVER['SCRIPT_NAME'] . '?deletetype=' . $obj->priority . '" onclick="return confirmDelete();">Delete</a></div>';
 }
 
-function fmt_move($obj, $name) {
-	static $alt;
-	$alt = !$alt;
-	if($obj->id != 'new')
-	return '<div align="center">' .
-	'<a href="' . $_SERVER['SCRIPT_NAME'] . '?moveup=' . $obj->priority . '">' .
-			'<img src="img/arrow_up_' . ($alt ? 'w' : 'g') . '.gif" border="0"></a>' .
-	'<a href="' . $_SERVER['SCRIPT_NAME'] . '?movedn=' . $obj->priority . '">' .
-			'<img src="img/arrow_down_' . ($alt ? 'w' : 'g') . '.gif" border="0"></a></div>';
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,16 +266,15 @@ startWindow('Global System Settings');
 								<tr>
 									<td>
 							<?
-								$types = DBFindMany('JobType', "from jobtype where deleted=0 order by priority");
+								$types = DBFindMany('JobType', "from jobtype where deleted=0 order by systempriority, name");
 								$types[] = $type = new JobType();
 								$type->id = 'new';
-								$type->priority = QuickQuery("select max(priority) from jobtype where deleted=0") + 10000;
 								$type->timeslices = 100;
-								$titles = array('priority' => 'Priority', 'name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '', 'move' => '');
-								$formatters = array('priority' => 'fmt_priority', 'edit' => 'fmt_edit', 'move' => 'fmt_move', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
+								$titles = array('name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '');
+								$formatters = array('edit' => 'fmt_edit', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
 								showObjects($types,$titles,$formatters);
 							?>
-	
+
 									</td>
 								</tr>
 							</table>
@@ -329,7 +287,7 @@ startWindow('Global System Settings');
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Customer Info:</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				
+
 						<tr>
 							<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName'); ?></td>
 							<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 50);  ?></td>
@@ -475,7 +433,7 @@ startWindow('Global System Settings');
 								}
 ?>
 						</table>
-					</td>								
+					</td>
 				</tr>
 <?
 				}

@@ -99,7 +99,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f
 					if(CheckFormSubmit($f, "newsurvey")){
 						getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3, true);
 					}
-					
+
 				}
 				$_SESSION['jobtypemanagement']['radio'] = GetFormData($f, $s, "joborsurvey");
 				redirect();
@@ -111,7 +111,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f
 }
 
 if($reloadform){
-	ClearFormData($f);	
+	ClearFormData($f);
 	foreach($systemprioritynames as $index => $name){
 		foreach($types[$index] as $type){
 			putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtypeprefs);
@@ -266,13 +266,12 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 		$type->name = GetFormData($f, $s, "jobtypename" . $jobtypeid);
 		$type->infoforparents = GetformData($f, $s, "jobtypedesc" . $jobtypeid);
 		$type->systempriority = $systempriority;
-		$type->priority = 10000 + QuickQuery("select max(priority) from jobtype where deleted=0");
 		$type->timeslices = 450;
 		if($issurvey == true){
 			$type->issurvey = 1;
 		}
 		$type->create();
-		
+
 	} else {
 		if($type->name != "Emergency"){
 			$type->name = GetFormData($f, $s, "jobtypename" . $type->id);
@@ -286,8 +285,8 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 	}
 	for($i=0; $i<$maxphones; $i++){
 		QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-					values ('" . $type->id . "','phone','" . $i . "','" 
-					. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "phone" . $i)) . "') 
+					values ('" . $type->id . "','phone','" . $i . "','"
+					. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "phone" . $i)) . "')
 					on duplicate key update
 					jobtypeid = '" . $type->id . "',
 					type = 'phone',
@@ -296,8 +295,8 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 	}
 	for($i=0; $i<$maxemails; $i++){
 		QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-					values ('" . $type->id . "','email','" . $i . "','" 
-					. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "email" . $i)) . "') 
+					values ('" . $type->id . "','email','" . $i . "','"
+					. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "email" . $i)) . "')
 					on duplicate key update
 					jobtypeid = '" . $type->id . "',
 					type = 'email',
@@ -307,8 +306,8 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 	if(getSystemSetting("_hassms")){
 		for($i=0; $i<$maxsms; $i++){
 			QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-						values ('" . $type->id . "','sms','" . $i . "','" 
-						. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "sms" . $i)) . "') 
+						values ('" . $type->id . "','sms','" . $i . "','"
+						. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "sms" . $i)) . "')
 						on duplicate key update
 						jobtypeid = '" . $type->id . "',
 						type = 'sms',
@@ -324,7 +323,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms,
 ?>
 	<tr>
 		<td width="10%" class="bottomBorder" >
-			<? 
+			<?
 				if($jobtypeid+0){
 					$type = new JobType($jobtypeid);
 				}
