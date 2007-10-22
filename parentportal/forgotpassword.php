@@ -11,18 +11,17 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 	if(portalForgotPassword($email)){
 		$success = true;
-		?>
-			<br>A link has been sent to your email address to log in.
-			<br>Please remember to change your password.
-			<br>You will be redirected to the login page in 5 seconds.
-			<meta http-equiv="refresh" content="5;url=index.php">
-		<?
 	} else {
 		?>
 			<br>That email is not in our system.
 		<?
 	}
 }
+
+$PAGE = ":";
+$TITLE = "Parent Portal Login";
+$hidenav = 1;
+include_once("nav.inc.php");
 if(!$success){
 ?>
 
@@ -38,12 +37,13 @@ if(!$success){
 
 <br><a href="index.php">Return to Parent Portal Login</a>
 <?
+} else {
+?>
+			<br>A link has been sent to your email address to log in.
+			<br>Please remember to change your password.
+			<br>You will be redirected to the login page in 5 seconds.
+			<meta http-equiv="refresh" content="5;url=index.php">
+<?
 }
-
-if(isset($ERRORS) && is_array($ERRORS)) {
-	foreach($ERRORS as $key => $value) {
-		$ERRORS[$key] = addslashes($value);
-	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-}
+include_once("navbottom.inc.php");
 ?>

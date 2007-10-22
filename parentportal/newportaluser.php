@@ -38,23 +38,21 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			error("Your account was not created", $errordetails);
 		} else {
 			$success = true;
-			?>
-			<br>Thank you, Your account has been created.
-			<br>Please check your email to activate your account.
-			<br>You will be redirected to the login page in 5 seconds.
-			<meta http-equiv="refresh" content="5;url=index.php">
-			<?
 		}
 	}
 }
 
+$hidenav = 1;
+$TITLE = "Create a New User";
+$PAGE = ":";
+include_once("nav.inc.php");
 if(!$success){
 ?>
 	<form method="POST" action="newportaluser.php">
 		<table>
 			<tr>
 				<td>Email(this will be your login name):</td>
-				<td><input type="text" name="login" value="<?=$login?>" /> </td>
+				<td><input type="text" name="login" value="<?=$login?>" size="50" maxlength="100"/> </td>
 			</tr>
 			<tr>
 				<td>Password: </td>
@@ -81,13 +79,14 @@ if(!$success){
 	</form>
 	<br><a href="index.php">Return to Parent Portal Login</a>
 <?
+} else {
+?>
+	<br>Thank you, Your account has been created.
+	<br>Please check your email to activate your account.
+	<br>You will be redirected to the login page in 5 seconds.
+	<meta http-equiv="refresh" content="5;url=index.php">
+<?
 }
 
-
-if(isset($ERRORS) && is_array($ERRORS)) {
-	foreach($ERRORS as $key => $value) {
-		$ERRORS[$key] = addslashes($value);
-	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
-}
+include_once("navbottom.inc.php");
 ?>

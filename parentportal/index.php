@@ -53,12 +53,19 @@ if ($badlogin) {
 	<div style="color: red;">Incorrect username/password. Please try again.</div>
 <?
 }
+$PAGE = ":";
+$TITLE = "Parent Portal Login";
+$hidenav = 1;
+include_once("nav.inc.php");
 ?>
 
 	<form method="POST" action="index.php">
 		<p>Email: <input type="text" name="login" /> </p>
 		<p>Password: <input type="password" name="password" /> </p>
-		<p><input type="submit" name="submit" /></p>
+		<p><input type="submit" name="submit" value="Login"/></p>
 	</form>
 	<p><a href="newportaluser.php"> Create a new account</a></p>
 	<p><a href="forgotpassword.php">I forgot my password</a></p>
+<?
+include_once("navbottom.inc.php");
+?>
