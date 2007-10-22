@@ -26,7 +26,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 			and rp.personid = '" . $personid . "'
 			and j.status in ('active', 'complete')
 			and j.questionnaireid is null
-			order by j.startdate");
+			order by j.startdate desc");
 		$data = array();
 		$number = 1;
 		while($row = DBGetRow($result)){
