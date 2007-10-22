@@ -132,12 +132,15 @@ if (isset($personid)) {
 		$creationuser = new User($tokendata['creationuserid']);
 		$tokendata['creationusername'] = $creationuser->firstname . " " . $creationuser->lastname;
 		$tokendata['expirationdate'] = ($tokendata['expirationdate'] != "") ? date("M d, Y", strtotime($tokendata['expirationdate'])) : "";
+		if(strtotime($tokendata['expirationdate']) < strtotime("now")){
+			$tokendata['token'] = "Expired";
+		}
 	} else {
 		$tokendata = array("token" => "",
 							"creationusername" => "",
 							"expirationdate" => "");
 	}
-	$jobtypes = DBFindMany("JobType", "from jobtype where not deleted order by systempriority, name");
+	$jobtypes = DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 	$contactprefs = getContactPrefs($personid);
 	$defaultcontactprefs = getDefaultContactPrefs();
 } else {
@@ -190,7 +193,6 @@ if(CheckFormSubmit($f,$s))
 				$email->email = GetFormData($f,$s, "email" . $email->sequence);
 				$email->editlock = GetFormData($f, $s, "editlock_email" . $email->sequence);
 				$email->update();
-				var_dump($email);
 				foreach($jobtypes as $jobtype){
 					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
 								values ('" . $personid . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
@@ -305,6 +307,12 @@ startWindow('Contact');
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
+		<th align="right" class="windowRowHeader bottomBorder">ID#:</th>
+		<td class="bottomBorder">
+			<? displayValue($data->pkey); ?>
+		</td>
+	</tr>
+	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Name:</th>
 		<td class="bottomBorder">
 			<? displayValue($contactFullName); ?>
@@ -376,7 +384,7 @@ foreach ($fieldmaps as $map) {
 					<th>Edit Lock</th>
 <?
 					foreach($jobtypes as $jobtype){
-						?><th><?=htmlentities($jobtype->name)?></th><?	
+						?><th><?=jobtype_info($jobtype)?></th><?
 					}
 ?>
 				</tr>
@@ -393,7 +401,14 @@ foreach ($fieldmaps as $map) {
 		<td align="middle"><? NewFormItem($f, $s, "editlock_phone" . $phone->sequence, "checkbox", 0, 1); ?></td>
 <?
 		foreach($jobtypes as $jobtype){
-			?><td align="middle"><? NewFormItem($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+			if(!$jobtype->issurvey){
+				?><td align="middle"><? NewFormItem($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+			}
+		}
+		foreach($jobtypes as $jobtype){
+			if($jobtype->issurvey){
+				?><td align="middle"><? NewFormItem($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+			}
 		}
 ?>
 	</tr>
@@ -412,7 +427,14 @@ foreach ($fieldmaps as $map) {
 		<td align="middle"><? NewFormItem($f, $s, "editlock_email" . $email->sequence, "checkbox", 0,1);?></td>
 <?
 		foreach($jobtypes as $jobtype){
-			?><td align="middle"><? NewFormItem($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+			if(!$jobtype->issurvey){
+				?><td align="middle"><? NewFormItem($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+			}
+		}
+		foreach($jobtypes as $jobtype){
+			if($jobtype->issurvey){
+				?><td align="middle"><? NewFormItem($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+			}
 		}
 ?>
 	</tr>
@@ -431,7 +453,14 @@ foreach ($fieldmaps as $map) {
 			<td align="middle"><? NewFormItem($f, $s, "editlock_sms" . $sms->sequence, "checkbox", 0,1);?></td>
 <?
 			foreach($jobtypes as $jobtype){
-				?><td align="middle"><? NewFormItem($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+				if(!$jobtype->issurvey){
+					?><td align="middle"><? NewFormItem($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+				}
+			}
+			foreach($jobtypes as $jobtype){
+				if($jobtype->issurvey){
+					?><td align="middle"><? NewFormItem($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+				}
 			}
 ?>
 		</tr>
@@ -472,15 +501,15 @@ foreach ($fieldmaps as $map) {
 		<th align="right" class="windowRowHeader">Token Information</th>
 		<td>
 			<table>
-				<tr><td>Token: <?=$tokendata['token'] ?></td></tr>
+				<tr><td>Activation Code: <?=$tokendata['token'] ?></td></tr>
 				<tr><td>Expiration Date: <?=$tokendata['expirationdate'] ?></td></tr>
 				<tr><td>Creation User: <?=$tokendata['creationusername'] ?></td></tr>
 				<tr>
 					<td>
 <?
-					echo button("Generate Token", "window.location='?create=1'");
+					echo button("Generate Activation Code", "window.location='?create=1'");
 					if($tokendata['token']){
-						echo button("Revoke Token", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
+						echo button("Revoke ACtivation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
 					}
 ?>
 					</td>
