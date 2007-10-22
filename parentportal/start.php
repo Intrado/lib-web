@@ -11,7 +11,7 @@ require_once("../obj/Person.obj.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 $allData = array();
-if($_SESSION['customerid']){
+if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$firstnameField = FieldMap::getFirstNameField();
 	$lastnameField = FieldMap::getLastNameField();
 	$contactList = getContactIDs($_SESSION['portaluserid']);
@@ -21,27 +21,32 @@ if($_SESSION['customerid']){
 			from job j 
 			left join reportperson rp on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
-			where j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
+			where 
+			j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
 			and rp.personid = '" . $personid . "'
 			and j.status in ('active', 'complete')
+			and j.questionnaireid is null
 			order by j.startdate");
 		$data = array();
+		$number = 1;
 		while($row = DBGetRow($result)){
-			$data[] = $row;
+			$data[] = array_merge(array($number), $row);
+			$number++;
 		}
 		$allData[$personid] = $data;
 	}
 	
-	$titles = array("1" => "Date",
-					"2" => "Subject",
-					"SentBy" => "Sent By",
-					"3" => "Type",
+	$titles = array("0" => "##",
+					"2" => "Date",
+					"3" => "#Job Name",
+					"SentBy" => "#Sent By",
+					"4" => "#Delivery Type",
 					"Actions" => "Actions"
 				);
 	
-	$formatters = array("1" => "format_date",
+	$formatters = array("2" => "format_date",
 						"SentBy" => "sender",
-						"3" => "format_type",
+						"4" => "format_type",
 						"Actions" => "message_action"
 					);
 }
@@ -50,10 +55,13 @@ if($_SESSION['customerid']){
 ////////////////////////////////////////////////////////////////////////////////
 
 function message_action($row, $index){
-	//index 0 is job id and index 7 is person id
-	//index 3 is type
-	if($row[3] == "phone"){
-		return button("Play", "popup('previewmessage.php?jobid=" . $row[0] . "&personid=" . $row[7] . "', 400, 500);",null);
+	//index 1 is job id
+	//index 8 is person id
+	//index 4 is type
+	if($row[4] == "phone"){
+		return button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "', 400, 500);",null);
+	} if($row[4] == "email"){
+		return button("Read", "popup('previewemail.php?jobid=" . $row[1] . "&personid=" . $row[8] . "', 400, 500);",null);
 	} else {
 		return "";
 	}
@@ -68,14 +76,14 @@ function format_date($row, $index){
 }
 
 function sender($row, $index){
-	//index 4 is first name
-	//index 5 is last name
-	//index 3 is type
-	//index 8 is email
-	if($row[3] == 'email'){
-		return "<a href='mailto:" . $row[8] . "'>" . $row[4] . " " . $row[5] . "</a>";
+	//index 5 is first name
+	//index 6 is last name
+	//index 4 is type
+	//index 9 is email
+	if($row[4] == 'email'){
+		return "<a href='mailto:" . $row[9] . "'>" . $row[5] . " " . $row[6] . "</a>";
 	} else {
-		return $row[4] . " " . $row[5];
+		return $row[5] . " " . $row[6];
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,9 +92,11 @@ function sender($row, $index){
 $TITLE="Welcome - " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
 $PAGE = 'welcome:welcome';
 include_once("nav.inc.php");
-if($_SESSION['customerid']){
+if(isset($_SESSION['customerid'])){
 	?><div><b>Messages from the last 30 days</b></div><br><?
+	$counter = 1000;
 	foreach($contactList as $personid){
+		$counter++;
 		$data = $allData[$personid];
 		$person = new Person($personid);
 		startWindow($person->$firstnameField . " " . $person->$lastnameField,'padding: 3px;', true);
@@ -95,7 +105,7 @@ if($_SESSION['customerid']){
 			$scroll = 'class="scrollTableContainer"';
 ?>
 		<div <?=$scroll?>>
-			<table width="100%" cellpadding="3" cellspacing="1" class="list">
+			<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="tableid<?=$counter?>">
 <?
 				showTable($data, $titles, $formatters);
 ?>
@@ -108,7 +118,16 @@ if($_SESSION['customerid']){
 <?
 	}
 } else {
-	?><img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact.php"/>Click Here</a><?
+	startWindow("No Associations");
+	
+	?>
+	<br>
+		<img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a>
+	<br>
+	<br>
+	<?
+	
+	endWindow();
 }
 include_once("navbottom.inc.php");
 ?>
