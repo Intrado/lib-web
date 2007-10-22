@@ -81,6 +81,10 @@ startWindow('User Information');
 			<td class="bottomBorder">
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>
+						<td align="right">Email:</td>
+						<td colspan="4"><?=$_SESSION['portaluser']['portaluser.username']?></td>
+					</tr>
+					<tr>
 						<td align="right">First Name:</td>
 						<td colspan="4"><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
 					</tr>
@@ -93,13 +97,14 @@ startWindow('User Information');
 						<td colspan="4"><? NewFormItem($f, $s, 'zipcode', 'text', '5'); ?></td>
 					</tr>
 					<tr>
-						<td align="right">Old Password*:</td>
+						<td align="right">*Old Password:</td>
 						<td colspan="4"><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
 					</tr>
 					<tr>
 						<td align="right">New Password:</td>
 						<td colspan="4"><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
-						<td>&nbsp;</td>
+					</tr>
+					<tr>
 						<td align="right">Confirm New Password:</td>
 						<td colspan="4"><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
 					</tr>
