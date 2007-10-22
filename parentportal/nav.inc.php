@@ -127,38 +127,60 @@ doNavTabs($NAVTREE);
 
 <!-- ********************************************************************* -->
 
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif">
-	<tr>
-	<td><img src="img/logo.gif"></td>
-	<td><div class="custname"><?= htmlentities($_SESSION['custname']); ?></div></td>
-	</tr>
-	</table>
-</div>
-
-<div class="navmenuspacer">
-<div class="navmenu">
-
-	<?= $MAINTABS ?>
-
-	<div class="applinks hoverlinks">
-		<a href="account.php"/>My Account</a> |
-		<a href="choosecustomer.php?logoutcustomer=1"/>Change Customer</a> |
-		<a href="index.php?logout=1"/>Logout</a>
+	<div>
+		<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif">
+		<tr>
+		<td><img src="img/logo.gif"></td>
+<?
+		if(!isset($hidenav) || !$hidenav){
+?>
+		<td><div class="custname"><?= isset($_SESSION['custname']) ? htmlentities($_SESSION['custname']) : ""; ?></div></td>
+<?
+		}
+?>
+		</tr>
+		</table>
 	</div>
-
-</div>
-</div>
-
-
-<div class="subnavmenu hoverlinks">
-
-	<?= $SUBTABS ?>
-</div>
-
-<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
-<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
-
-<div class="content">
-
-	<?= $SYSTEMALERT ?>
+<?
+if(!isset($hidenav) || !$hidenav){
+?>	
+	<div class="navmenuspacer">
+	<div class="navmenu">
+	
+		<?= $MAINTABS ?>
+	
+		<div class="applinks hoverlinks">
+			<a href="account.php"/>My Account</a> |
+	<?
+			$result = portalGetCustomerAssociations(session_id());
+			if($result['result'] == ""){
+				$customerlist = $result['custmap'];
+				$customeridlist = array_keys($customerlist);
+			} else {
+				$customeridlist = array();
+			}
+			
+			if(count($customeridlist) > 1){
+				?><a href="choosecustomer.php?logoutcustomer=1"/>Change Customer</a> |<?
+			}
+	?>
+			<a href="index.php?logout=1"/>Logout</a>
+		</div>
+	
+	</div>
+	</div>
+	
+	
+	<div class="subnavmenu hoverlinks">
+	
+		<?= $SUBTABS ?>
+	</div>
+<?
+}
+?>	
+	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
+	
+	<div class="content">
+	
+		<?= $SYSTEMALERT ?>
