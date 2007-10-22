@@ -17,7 +17,7 @@ require_once("parentportalutils.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 $ADDWIZARD = true;
-$jobtypes=DBFindMany("JobType", "from jobtype where not deleted");
+$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 $PERSONID = 0;
 $firstnamefield = FieldMap::getFirstNameField();
 $lastnamefield = FieldMap::getLastNameField();
@@ -59,9 +59,9 @@ if($PERSONID){
 		$smses[$i]->sequence = $i;
 		$smses[$i]->personid = $PERSONID;
 	}
-	$accessiblePhones= array();
+	$lockedphones= array();
 	for($i=0; $i < $maxphones; $i++){
-		$accessiblePhones[$i] = getSystemSetting("accessiblePhone" . $i);
+		$lockedphones[$i] = getSystemSetting("lockphone" . $i);
 	}
 
 	$contactprefs = getContactPrefs($PERSONID);
@@ -98,7 +98,7 @@ if($PERSONID){
 					//then remove the current person id from the list
 					$otherContacts = getContactIDs($_SESSION['portaluserid']);
 					unset($otherContacts[array_search($PERSONID, $otherContacts)]);
-					copyContactData($PERSONID, $otherContacts, $accessiblePhones);
+					copyContactData($PERSONID, $otherContacts, $lockedphones);
 					unset($_SESSION['pidlist'][$customerid]);
 				}
 				unset($_SESSION['currentpid']);
