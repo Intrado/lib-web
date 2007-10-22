@@ -51,7 +51,7 @@ if($jobid != 0 && $personid != 0){
 			rp." . FieldMap::GetLastNameField()
 			. generateFields("rp")
 			. ",
-			rc.phone as destination, 
+			rc.email as destination, 
 			j.name as jobname, 
 			j.startdate as startdate,
 			m.name as messagename
@@ -165,8 +165,8 @@ startWindow('Preview Options', 'padding: 3px;');
 			<td class="bottomBorder"><?=$historicdata['messagename']?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Phone:</td>
-			<td class="bottomBorder"><?=Phone::format($historicdata['destination'])?></td>
+			<th align="right" class="windowRowHeader bottomBorder">Email:</td>
+			<td class="bottomBorder"><?=$historicdata['destination']?></td>
 		</tr>
 	</table>
 <?
