@@ -439,4 +439,19 @@ function getContactPrefs($personid){
 	return $contactprefs;
 }
 
+//displays jobtype name and on hover, displays infoforparents
+function jobtype_info($jobtype, $extrahtml = NULL, $style = NULL) {
+	$contents = nl2br($jobtype->infoforparents);
+	if($contents == ""){
+		$contents = "<br/>";
+	}
+
+	$hover = '<span ' . $extrahtml . '>';
+	$hover .= '<div';
+	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	$hover .= '>&nbsp;' . $jobtype->name . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
+
+	return $hover;
+}
 ?>
