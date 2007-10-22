@@ -52,7 +52,7 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 //displays checkbox for each jobtype 
 function displayJobtypeForm($f, $s, $type, $sequence, $jobtypes){
 	foreach($jobtypes as $jobtype){
-		?><div style="float:left"><?=jobtype_info($jobtype)?><? NewFormItem($f, $s, $type . $sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1); ?></div><?
+		?><td><?=jobtype_info($jobtype)?><? NewFormItem($f, $s, $type . $sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1); ?></td><?
 	}
 }
 
@@ -70,11 +70,11 @@ function displayEnabledJobtypes($contactprefs, $defaultcontactprefs, $type, $seq
 			}
 		}
 	}
-	return implode(",",$enabled);
+	return implode(", ",$enabled);
 }
 
 //copies contact details and preferences of main person to all persons in otherpids
-function copyContactData($mainpid, $otherpids = array(), $accessiblePhones){
+function copyContactData($mainpid, $otherpids = array(), $lockedphones){
 	$mainphones = QuickQueryList("select sequence, phone from phone where personid = '" . $mainpid . "'", true);
 	$mainemails = QuickQueryList("select sequence, email from email where personid = '" . $mainpid . "'", true);
 	if(getSystemSetting("_hassms")){
@@ -89,7 +89,7 @@ function copyContactData($mainpid, $otherpids = array(), $accessiblePhones){
 			$smses = DBFindMany("Sms", "from sms where personid = '" . $pid . "'");
 		}
 		foreach($phones as $phone){
-			if($accessiblePhones[$phone->sequence]){
+			if(!$lockedphones[$phone->sequence]){
 				$phone->phone = $mainphones[$phone->sequence];
 				$phone->editlock = 1;
 				$phone->update();
@@ -127,23 +127,23 @@ function copyContactData($mainpid, $otherpids = array(), $accessiblePhones){
 
 //Gets form data and updates contact details
 function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes){
-	global $accessiblePhones;
+	global $lockedphones;
 	foreach($phones as $phone){
-		if($accessiblePhones[$phone->sequence]){
+		if(!$lockedphones[$phone->sequence]){
 			$phone->phone = Phone::parse(GetFormData($f, $s, "phone" . $phone->sequence));
 			$phone->editlock = 1;
 			$phone->update();
-			foreach($jobtypes as $jobtype){
-				QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-							values ('" . $PERSONID . "','" . $jobtype->id . "','phone','" . $phone->sequence . "','" 
-							. DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "') 
-							on duplicate key update
-							personid = '" . $PERSONID . "',
-							jobtypeid = '" . $jobtype->id . "',
-							type = 'phone',
-							sequence = '" . $phone->sequence . "',
-							enabled = '" . DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "'");
-			}
+		}
+		foreach($jobtypes as $jobtype){
+			QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+						values ('" . $PERSONID . "','" . $jobtype->id . "','phone','" . $phone->sequence . "','" 
+						. DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "') 
+						on duplicate key update
+						personid = '" . $PERSONID . "',
+						jobtypeid = '" . $jobtype->id . "',
+						type = 'phone',
+						sequence = '" . $phone->sequence . "',
+						enabled = '" . DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "'");
 		}
 	}
 	foreach($emails as $email){
@@ -180,22 +180,5 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 			}
 		}
 	}
-}
-
-
-//displays jobtype name and on hover, displays infoforparents
-function jobtype_info($jobtype, $extrahtml = NULL, $style = NULL) {
-	$contents = nl2br($jobtype->infoforparents);
-	if($contents == ""){
-		$contents = "<br/>";
-	}
-
-	$hover = '<span ' . $extrahtml . '>';
-	$hover .= '<div';
-	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	$hover .= '>&nbsp;' . $jobtype->name . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
-
-	return $hover;
 }
 ?>
