@@ -21,8 +21,8 @@ if(isset($_GET['clear'])){
 	redirect();
 }
 
-if(isset($_SESSION['customerid'])){
-	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, name");
+if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
+	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 	$contactList = getContacts($_SESSION['portaluserid']);
 	$firstnamefield = FieldMap::getFirstNameField();
 	$lastnamefield = FieldMap::getLastNameField();
@@ -59,9 +59,9 @@ if($PERSONID){
 		$smses[$i]->sequence = $i;
 		$smses[$i]->personid = $PERSONID;
 	}
-	$accessiblePhones= array();
+	$lockedphones= array();
 	for($i=0; $i < $maxphones; $i++){
-		$accessiblePhones[$i] = getSystemSetting("accessiblePhone" . $i);
+		$lockedphones[$i] = getSystemSetting("lockedphone" . $i);
 	}
 
 	$contactprefs = getContactPrefs($PERSONID);
@@ -98,7 +98,7 @@ if($PERSONID){
 					//then remove the current person id from the list
 					$otherContacts = getContactIDs($_SESSION['portaluserid']);
 					unset($otherContacts[array_search($PERSONID, $otherContacts)]);
-					copyContactData($PERSONID, $otherContacts, $accessiblePhones);
+					copyContactData($PERSONID, $otherContacts, $lockedphones);
 				}
 				redirect();
 			}
