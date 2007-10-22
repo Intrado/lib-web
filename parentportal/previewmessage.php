@@ -15,6 +15,7 @@ require_once("../inc/date.inc.php");
 require_once("../inc/securityhelper.inc.php");
 require_once("../inc/formatters.inc.php");
 require_once("../inc/reportutils.inc.php");
+require_once("../obj/Phone.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,12 +43,21 @@ $fields = array();
 
 // if historic data should be used, fetch it now
 if($jobid != 0 && $personid != 0){
-	$query = "select rp." . FieldMap::GetFirstNameField() . ", "
-			. "rp." . FieldMap::GetLastNameField() . " "
+	$query = "select
+			rp." . FieldMap::GetFirstNameField() . ",
+			rp." . FieldMap::GetLastNameField()
 			. generateFields("rp")
-			. " from reportperson rp
-			where jobid = '$jobid'
-			and personid = '$personid'";
+			. ",
+			rc.phone as destination, 
+			j.name as jobname, 
+			j.startdate as startdate,
+			m.name as messagename
+			from reportperson rp
+			left join reportcontact rc on (rc.jobid = rp.jobid and rc.personid = rp.personid and rc.type = rp.type)
+			left join job j on (j.id = rp.jobid)
+			left join message m on (m.id = rp.messageid)
+			where j.id = '$jobid'
+			and rp.personid = '$personid'";
 	$historicdata = QuickQueryRow($query, true);
 }
 
@@ -83,24 +93,26 @@ if (count($fields) > 0) {
 	startWindow('Preview Options', 'padding: 3px;');
 ?>
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
-<?
-	foreach ($fields as $fieldmap) {
-		$fieldnum = $fieldmap->fieldnum;
-?>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?= $fieldmap->name ?></td>
-			<td class="bottomBorder">
-<?
-		if(isset($historicdata)){
-?>
-			<div><?=$historicdata[$fieldnum]?></div>
-<?
-		}
-?>
-		</td></tr>
-<?
-	}
-?>
+			<th align="right" class="windowRowHeader bottomBorder">Message For:</td>
+			<td class="bottomBorder"><?=$historicdata['f01'] . " " . $historicdata['f02']?></td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Job Name:</td>
+			<td class="bottomBorder"><?=$historicdata['jobname']?></td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Date:</td>
+			<td class="bottomBorder"><?=date("M d, Y", strtotime($historicdata['startdate']))?></td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Message Name:</td>
+			<td class="bottomBorder"><?=$historicdata['messagename']?></td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Phone:</td>
+			<td class="bottomBorder"><?=Phone::format($historicdata['destination'])?></td>
+		</tr>
 	</table>
 <?
 	endWindow();
