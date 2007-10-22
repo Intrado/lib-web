@@ -22,27 +22,6 @@ if(isset($_GET['clear'])){
 $systemprioritynames = array("1" => "Emergency",
 							"2" => "High Priority",
 							"3" => "General");
-//check params
-if (isset($_GET['deletetype'])) {
-	$jobtypeid = DBSafe($_GET['deletetype']);
-	$type = new Jobtype($jobtypeid);
-	$surveysql = " and not issurvey ";
-	if($type->issurvey)
-		$surveysql = " and issurvey ";
-	$count = QuickQuery("select count(*) from jobtype where systempriority = '" . $type->systempriority . "' and not deleted $surveysql");
-	if($count > 1){
-		QuickUpdate("update jobtype set deleted=1 where id = '$jobtypeid' and deleted=0");
-		redirect();
-	} else {
-		if($type->issurvey)
-			$displayname = "Survey";
-		else
-			$displayname = $systemprioritynames[$type->systempriority];
-		error("You cannot delete that jobtype", "You must have at least one " . $displayname);
-	}
-}
-
-
 
 foreach($systemprioritynames as $index => $name){
 	$types[$index] = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '" . $index . "' and not issurvey order by name");
@@ -62,7 +41,9 @@ $s = "main";
 $reloadform = 0;
 
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f, "new") || CheckFormSubmit($f, "new_high") || CheckFormSubmit($f, "newsurvey"))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f, "new") 
+	|| CheckFormSubmit($f, "new_high") || CheckFormSubmit($f, "newsurvey") 
+	|| CheckFormSubmit($f, "delete") !== false )
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -80,29 +61,40 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 
-				if(GetFormData($f, $s, "joborsurvey") == "job"){
-					foreach($systemprioritynames as $index => $name){
-						foreach($types[$index] as $type){
+			if(GetFormData($f, $s, "joborsurvey") == "job"){
+				foreach($systemprioritynames as $index => $name){
+					foreach($types[$index] as $type){
+						if(CheckFormSubmit($f, 'delete') !== false &&
+							CheckFormSubmit($f, 'delete') == $type->id){
+							$type->deleted = 1;
+							$type->update();
+						} else {
 							getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms);
 						}
 					}
-					if(CheckFormSubmit($f, "new_high")){
-						getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 2);
-					}
-					if(CheckFormSubmit($f, "new")){
-						getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3);
-					}
-				} else if(GetFormData($f, $s, "joborsurvey") == "survey"){
-					foreach($surveytypes as $surveytype){
+				}
+				// new jobtype for high priority
+				getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 2);
+				
+				// new jobtype for general priority
+				getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3);
+
+			} else if(GetFormData($f, $s, "joborsurvey") == "survey"){
+				foreach($surveytypes as $surveytype){
+					if(CheckFormSubmit($f, 'delete') !== false &&
+						CheckFormSubmit($f, 'delete') == $surveytype->id){
+						$surveytype->deleted = 1;
+						$surveytype->update();
+					} else {
 						getJobtypeForm($f, $s, $surveytype, $maxphones, $maxemails, $maxsms);
 					}
-					if(CheckFormSubmit($f, "newsurvey")){
-						getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3, true);
-					}
-
 				}
-				$_SESSION['jobtypemanagement']['radio'] = GetFormData($f, $s, "joborsurvey");
-				redirect();
+				
+				getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3, true);
+
+			}
+			$_SESSION['jobtypemanagement']['radio'] = GetFormData($f, $s, "joborsurvey");
+			redirect();
 
 		}
 	}
@@ -263,7 +255,10 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 			$jobtypeid = "_newhigh_";
 		}
 		$type = new Jobtype();
-		$type->name = GetFormData($f, $s, "jobtypename" . $jobtypeid);
+		$name = GetFormData($f, $s, "jobtypename" . $jobtypeid);
+		if($name == "")
+			return;
+		$type->name = $name;
 		$type->infoforparents = GetformData($f, $s, "jobtypedesc" . $jobtypeid);
 		$type->systempriority = $systempriority;
 		$type->timeslices = 450;
@@ -333,7 +328,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms,
 					NewFormItem($f, $s, "jobtypename" . $jobtypeid, "text", 20, 50);
 			?>
 		</td>
-		<td class="bottomBorder" ><? NewFormItem($f, $s, "jobtypedesc" . $jobtypeid, "textarea", 40, 3);?></td>
+		<td class="bottomBorder" ><? NewFormItem($f, $s, "jobtypedesc" . $jobtypeid, "textarea", 30, 3);?></td>
 		<td class="bottomBorder" >
 			<table border="1">
 				<tr>
@@ -392,7 +387,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms,
 		if($add){
 			?><td class="bottomBorder" ><?=submit($f,$add, "Add");?></td><?
 		} else if($type->systempriority != 1) {
-			?><td class="bottomBorder" ><?=button("Delete","if(confirmDelete()) window.location='?deletetype=$jobtypeid'");?></td><?
+			?><td class="bottomBorder" ><?=submit($f, "delete","Delete", $jobtypeid) ?></td><?
 		} else {
 			?><td class="bottomBorder" >&nbsp;</td><?
 		}
