@@ -4,19 +4,20 @@ if($PERSONID){
 
 	NewForm($f);
 ?>
-	<table border="1" cellpadding="3" cellspacing="1">
+	<table border="1px" cellpadding="3" cellspacing="1">
 		<tr>
-			<th>Contact Detail</th>
-			<th>Contact Settings</th>
+			<th colspan="2">Contact Detail</th>
+			<th width="50%">Contact Settings</th>
 		<tr>
 <?
 			$type = "phone";
 			foreach($phones as $phone){
 ?>
 				<tr>
-					<td>Phone <?=$phone->sequence+1?>: 
+					<td>Phone <?=$phone->sequence+1?>:</td>
+					<td>
 					<? 
-						if($accessiblePhones[$phone->sequence]){ 
+						if(!$lockedphones[$phone->sequence]){ 
 							NewFormItem($f, $s, "phone" . $phone->sequence, "text", 14, null);
 						} else {
 							echo Phone::format($phone->phone);
@@ -36,14 +37,10 @@ if($PERSONID){
 						<div id="<?=$type?><?=$phone->sequence?>enabledjobtypes" ><?=displayEnabledJobtypes($contactprefs, $defaultcontactprefs, $type, $phone->sequence, $jobtypes)?></div>
 						<div style="float:right">
 <?
-						if($accessiblePhones[$phone->sequence]){
 							echo button("Change", "show('" . $type . "table" . $phone->sequence . "');
 													hide('" . $type . "edit" . $phone->sequence ."');
 													hide('" . $type . $phone->sequence . "enabledjobtypes');", 
 										null, "id='" . $type . "edit" . $phone->sequence . "'");
-						} else {
-							echo "&nbsp;";
-						}
 ?>
 						</div>
 					</td>
@@ -54,7 +51,9 @@ if($PERSONID){
 			foreach($emails as $email){
 ?>
 				<tr>
-					<td>Email <?=$email->sequence+1?>: <? NewFormItem($f, $s, "email" . $email->sequence, "text", 40, 100); ?></td>
+					<td>Email <?=$email->sequence+1?>: </td>
+					<td><? NewFormItem($f, $s, "email" . $email->sequence, "text", 40, 100, 'id="email' . $email->sequence . '"'); ?>
+						<?=button("Copy Email", "var email=new getObj('email" . $email->sequence . "').obj; email.value='" . $_SESSION['portaluser']['portaluser.username'] . "'") ?></td>
 					<td>
 						<table id="emailtable<?=$email->sequence?>" style="display:none">
 							<tr>
@@ -83,7 +82,8 @@ if($PERSONID){
 				foreach($smses as $sms){
 ?>
 				<tr>
-					<td>Sms <?=$sms->sequence+1?>: <? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 40, 100); ?></td>
+					<td>SMS <?=$sms->sequence+1?>:</td>
+					<td><? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 40, 100); ?></td>
 					<td>
 						<table id="smstable<?=$sms->sequence?>" style="display:none">
 							<tr>
