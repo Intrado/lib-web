@@ -292,45 +292,14 @@ if($reportgenerator->format == "csv"){
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
-//data is an array of arrays 
-//if there is an array inside a subarray of data ex array[][][], extract it and place
-//into own row.
-//basically try to an array of array of arrays into an array of arrays that has
-//holes
-function flattenData($data){
-	$newdata = array();
-	$count = 0;
-	$colcount=0;
-	$rowcount=0;
-	$maxrowcount = 0;
-	$newline = false;
-	foreach($data as $row){
-		$newdata[$count] = array_fill(0, count($row), "");
-		foreach($row as $item){
-			if(is_array($item)){
-				$newline = true;
-				foreach($item as $subitem){
-					if(!isset($newdata[$count+$rowcount]) || !is_array($newdata[$count+$rowcount]))
-						$newdata[$count+$rowcount] = array_fill(0, count($row), "");
-					$newdata[$count+$rowcount][$colcount] = $subitem;
-					$rowcount++;
-				}
-			} else {
-				$newdata[$count][$colcount] = $item;
-			}
-			$colcount++;
-			if($maxrowcount < $rowcount)
-				$maxrowcount = $rowcount;
-			$rowcount=0;
-		}
-		$colcount=0;
-		if($newline)
-			$count += $maxrowcount;
-		else
-			$count++;
-		$maxrowcount = 0;
-	}
-	return $newdata;
-}
 
+//index 4 is token
+//index 5 is expiration date
+function fmt_activation_code($row, $index){
+	if(strtotime($row[5]) < strtotime("now")){
+		return "Expired";
+	} else {
+		return $row[$index];
+	}
+}
 ?>
