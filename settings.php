@@ -135,8 +135,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
 				if(getSystemSetting("_hasportal") && $USER->authorize('portalaccess')){
 					for($i = 0; $i < $maxphones; $i++){
-						setSetting('accessiblePhone' . $i, GetFormData($f, $s, 'accessiblePhone' . $i));
+						setSetting('lockedPhone' . $i, GetFormData($f, $s, 'lockedPhone' . $i));
 					}
+					setSetting('tokenlife', GetFormData($f, $s, 'tokenlife'));
 				}
 
 				if($IS_COMMSUITE){
@@ -185,8 +186,9 @@ if( $reloadform )
 	}
 
 	for($i=0; $i < $maxphones; $i++){
-		PutFormData($f, $s, "accessiblePhone" . $i, getSystemSetting('accessiblePhone' . $i, 0), "bool", 0, 1);
+		PutFormData($f, $s, "lockedPhone" . $i, getSystemSetting('lockedPhone' . $i, 0), "bool", 0, 1);
 	}
+	PutFormData($f, $s, "tokenlife", getSetting('tokenlife'), 'number', 0, 365);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,7 +394,7 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f, $s, 'easycallmin', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Maximum Extensions Length<? print help('Settings_MaximumExtensions'); ?></td>
+								<td width="30%">Maximum Extensions Length<? print help('Settings_MaximumExtensions'); ?></td>
 								<td><? NewFormItem($f, $s, 'easycallmax', 'text', 3,3);  ?></td>
 							</tr>
 						</table>
@@ -410,11 +412,11 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Minimum Password Length<? print help('Settings_MinimumPassword'); ?></td>
+								<td width="30%">Minimum Password Length<? print help('Settings_MinimumPassword'); ?></td>
 								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Very Secure Passwords<? print help('Settings_VerySecurePasswords'); ?></td>
+								<td width="30%">Very Secure Passwords<? print help('Settings_VerySecurePasswords'); ?></td>
 								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
 							</tr>
 						</table>
@@ -427,9 +429,18 @@ startWindow('Global System Settings');
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Portal:</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+								<tr>
+									<td width="30%">Activation Code lifetime in days</td>
+									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?></td>
+								</tr>
 <?
 								for($i=0; $i<$maxphones; $i++){
-									?><tr><td><? NewFormItem($f, $s, "accessiblePhone" . $i, "checkbox");?> Phone <?=$i+1?></td></tr><?
+									?>
+									<tr>
+										<td width="30%">Phone <?=$i+1?> locked from portal access </td>
+										<td><? NewFormItem($f, $s, "lockedPhone" . $i, "checkbox");?></td>
+									</tr>
+									<?
 								}
 ?>
 						</table>
