@@ -145,7 +145,7 @@ include_once("popup.inc.php");
 buttons(button('Done', 'window.close()'));
 
 
-startWindow('Preview Options', 'padding: 3px;');
+startWindow('Message Information', 'padding: 3px;');
 ?>
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>

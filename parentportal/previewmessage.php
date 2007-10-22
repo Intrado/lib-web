@@ -90,7 +90,7 @@ buttons(button('Done', 'window.close()'));
 
 
 if (count($fields) > 0) {
-	startWindow('Preview Options', 'padding: 3px;');
+	startWindow('Message Information', 'padding: 3px;');
 ?>
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>
