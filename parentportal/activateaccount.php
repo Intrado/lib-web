@@ -11,8 +11,8 @@ if(isset($_GET['token'])){
 
 if(isset($_GET['forgot'])) {
 	$form = false;
-	$result = portalActivateAccount($_GET['token']);
-	
+	$result = portalActivateAccount($_GET['token'], ''); // pass empty password, not used in validation but cannot be null
+
 	if($result['result'] == ""){
 		$id = $result['userID'];
 	} else {
@@ -33,7 +33,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	$token = get_magic_quotes_gpc() ? stripslashes($_POST['token']) : $_POST['token'];
 	$result = portalActivateAccount($token, $password);
-	
+
 	if($result['result'] == ""){
 		$id = $result['userID'];
 	} else {

@@ -43,8 +43,8 @@ function portalCreateAccount($username, $password, $firstname, $lastname, $zipco
 }
 
 
-function portalActivateAccount($activationtoken) {
-	$params = array(new XML_RPC_Value($activationtoken, 'string'));
+function portalActivateAccount($activationtoken, $password) {
+	$params = array(new XML_RPC_Value($activationtoken, 'string'), new XML_RPC_Value($password, 'string'));
 	$method = "PortalServer.portal_activateAccount";
 	$result = pearxmlrpc($method, $params);
 	if ($result['result'] == "") {
@@ -67,7 +67,8 @@ function portalLogin($username, $password) {
 }
 
 
-function portalGetCustomerAssociations($sessionid) {
+function portalGetCustomerAssociations() {
+	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'));
 	$method = "PortalServer.portal_getCustomerAssociations";
 	$result = pearxmlrpc($method, $params);
@@ -75,7 +76,8 @@ function portalGetCustomerAssociations($sessionid) {
 }
 
 
-function portalAccessCustomer($sessionid, $customerid) {
+function portalAccessCustomer($customerid) {
+	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'));
 	$method = "PortalServer.portal_accessCustomer";
 	$result = pearxmlrpc($method, $params);

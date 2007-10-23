@@ -29,21 +29,24 @@ if(CheckFormSubmit($f,$s))
 		} else {
 			//submit changes
 			$result = portalAssociatePerson(GetFormData($f, $s, "code"), GetFormData($f, $s, "pkey"));
-			if($result){
+			if($result['result'] == ""){
 				if(!isset($_SESSION['pidlist'][$result['customerid']])){
 					$_SESSION['pidlist'][$result['customerid']] = array();
 				}
-				
+
 				if(!isset($_SESSION['customerid'])){
 					$_SESSION['customerid'] = $result['customerid'];
-					$_SESSION['custname'] = $customerlist[$customeridlist[0]];
-					portalAccessCustomer(session_id(), $customeridlist[0]);
+					//TODO
+					//$_SESSION['custname'] = $customerlist[$customeridlist[0]];
+					//portalAccessCustomer($customeridlist[0]);
+					$_SESSION['custname'] = 'todo';
+					portalAccessCustomer($result['customerid']);
 				}
-				
+
 				$_SESSION['pidlist'][$result['customerid']][] = $result['personid'];
 				$_SESSION['currentpid'] = $result['personid'];
 				$_SESSION['currentcid'] = $result['customerid'];
-				redirect("addcontact2.php");	
+				redirect("addcontact2.php");
 			} else {
 				error("That is not a valid Activation Code and Person ID combination");
 			}

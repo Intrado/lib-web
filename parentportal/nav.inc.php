@@ -143,44 +143,44 @@ doNavTabs($NAVTREE);
 	</div>
 <?
 if(!isset($hidenav) || !$hidenav){
-?>	
+?>
 	<div class="navmenuspacer">
 	<div class="navmenu">
-	
+
 		<?= $MAINTABS ?>
-	
+
 		<div class="applinks hoverlinks">
 			<a href="account.php"/>My Account</a> |
 	<?
-			$result = portalGetCustomerAssociations(session_id());
+			$result = portalGetCustomerAssociations();
 			if($result['result'] == ""){
 				$customerlist = $result['custmap'];
 				$customeridlist = array_keys($customerlist);
 			} else {
 				$customeridlist = array();
 			}
-			
+
 			if(count($customeridlist) > 1){
 				?><a href="choosecustomer.php?logoutcustomer=1"/>Change Customer</a> |<?
 			}
 	?>
 			<a href="index.php?logout=1"/>Logout</a>
 		</div>
-	
+
 	</div>
 	</div>
-	
-	
+
+
 	<div class="subnavmenu hoverlinks">
-	
+
 		<?= $SUBTABS ?>
 	</div>
 <?
 }
-?>	
+?>
 	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
-	
+
 	<div class="content">
-	
+
 		<?= $SYSTEMALERT ?>

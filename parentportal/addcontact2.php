@@ -16,7 +16,7 @@ if(!isset($_SESSION['currentpid'])){
 }
 
 if($_SESSION['customerid'] != $_SESSION['currentcid']){
-	portalAccessCustomer(session_id(), $_SESSION['currentcid']);
+	portalAccessCustomer($_SESSION['currentcid']);
 }
 
 $person = new Person($_SESSION['currentpid']);
