@@ -1295,3 +1295,7 @@ ALTER TABLE jobtype DROP `priority`
 $$$
 
 
+ALTER TABLE `portalpersontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL
+$$$
+
+

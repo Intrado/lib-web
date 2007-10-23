@@ -94,3 +94,11 @@ CREATE TABLE `portaluser` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB;
 
+
+ALTER TABLE `portalactivation` ADD `forgotpassword` TINYINT NOT NULL DEFAULT '0';
+
+
+ALTER TABLE `persontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL;
+
+
+
