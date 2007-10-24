@@ -498,7 +498,7 @@ foreach ($fieldmaps as $map) {
 		</td>
 	</tr>
 	<tr>
-		<th align="right" class="windowRowHeader">Token Information</th>
+		<th align="right" class="windowRowHeader">Activation Code Information</th>
 		<td>
 			<table>
 				<tr><td>Activation Code: <?=$tokendata['token'] ?></td></tr>
