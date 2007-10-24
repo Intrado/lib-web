@@ -52,8 +52,6 @@ $job->phonemessageid = $_SESSION['newjob']['message'];
 
 $job->create();
 
-echo mysql_error();
-
 chdir("../");
 
 //kick off the job
