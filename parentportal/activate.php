@@ -42,7 +42,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		$result = portalActivateAccount($token, $password);
 		if($result['result'] == ""){
 			$form = false;
-			$sucess = true;
+			$success = true;
 			doStartSession();
 			$_SESSION['portaluserid'] = $result['userID'];
 		} else {
@@ -83,7 +83,7 @@ if($form){
 		<table>
 			<tr>
 				<td>Activation Code: </td>
-				<td><input type="text" name="token" value="<?=$token?>" size="30" /></td>
+				<td><input type="text" name="token" value="<?=$token?>" size="50" /></td>
 			</tr>
 <?
 		if($forgot){
