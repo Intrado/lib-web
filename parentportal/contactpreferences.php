@@ -53,11 +53,15 @@ if($PERSONID){
 		$emails[$i]->sequence = $i;
 		$emails[$i]->personid = $PERSONID;
 	}
-	$smses = array_values($person->getSmses());
-	for ($i=count($smses); $i<$maxsms; $i++) {
-		$smses[$i] = new Sms();
-		$smses[$i]->sequence = $i;
-		$smses[$i]->personid = $PERSONID;
+	if(getSystemSetting("_hassms")){
+		$smses = array_values($person->getSmses());
+		for ($i=count($smses); $i<$maxsms; $i++) {
+			$smses[$i] = new Sms();
+			$smses[$i]->sequence = $i;
+			$smses[$i]->personid = $PERSONID;
+		}
+	} else {
+		$smses = array();
 	}
 	$lockedphones= array();
 	for($i=0; $i < $maxphones; $i++){
@@ -133,17 +137,17 @@ include_once("nav.inc.php");
 startWindow("Preferences", 'padding: 3px;');
 
 ?>
-<table border="1" width="100%" cellpadding="3" cellspacing="1" >
+<table width="100%" cellpadding="3" cellspacing="1" >
 <?
 	if(isset($contactList)){
 ?>
 		<tr>
-			<td width="25%">
+			<td valign="top">
 				<table>
 <?
 				foreach($contactList as $person){
 ?>
-					<tr><td><a href="contactpreferences.php?id=<?=$person->id?>"/><?=$person->pkey?> <?=$person->$firstnamefield?> <?=$person->$lastnamefield?></a></td></tr>
+					<tr><td><a href="contactpreferences.php?id=<?=$person->id?>"><?=$person->pkey . "&nbsp;" . $person->$firstnamefield . "&nbsp;" . $person->$lastnamefield?></a></td></tr>
 <?
 				}
 
