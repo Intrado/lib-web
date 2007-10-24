@@ -51,9 +51,20 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 			$message = new Message($_SESSION['messageid']);
 			$errors = array();
 			$parts = $message->parse(GetFormData($form,$section,"body"),$errors);
-
+			$charcount = 0;
+			if($MESSAGETYPE == "sms"){
+				foreach($parts as $part){
+					if($part->maxlen)
+						$charcount += $part->maxlen;
+					else
+						$charcount += strlen($part->txt);
+				}
+			}
+			
 			if (count($errors) > 0) {
 				error('There was an error parsing the message', implode("",$errors));
+			} else if($MESSAGETYPE == "sms" && $charcount > 160){
+				error("There are too many characters for an SMS message: " . $charcount, "You can only have 160 characters");
 			} else {
 				//submit changes
 				$message->type = $MESSAGETYPE;
@@ -342,6 +353,65 @@ switch($MESSAGETYPE)
 					</td>
 				</tr>
 			</table>
+		<?
+		break;
+	case 'sms':
+		startWindow('Message Content ' . help('MessageSms_Message') );
+		?>
+			<table>
+				<tr>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessageEmail_Body'); ?></th>
+					<td>
+						<? NewFormItem($form, $section,"body","textarea",60,NULL,'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"'); ?>
+					</td>
+					<?
+					/* TODO: Add message inserts later when supported, jjl
+					<th align="right" class="windowRowHeader" valign="top">Data Field:<br><? print help('MessageEmail_DataField'); ?></th>
+					<td valign="top">
+						<select id="data" name="data">
+<?
+							foreach($fieldmap as $name)
+							{
+								print "<option value=\"$name\">$name</option>\n";
+							}
+?>
+						</select>
+						<br>
+						
+						<table border="0" cellpadding="1" cellspacing="0" style="font-size: 9px; margin-top: 5px;">
+							<tr>
+								<td>Default&nbsp;Value:</td>
+								<td><input type="text" size="10" id="default"></td>
+							</tr>
+							<tr>
+								<td>Max&nbsp;Length:</td>
+								<td><input type="text" size="10" id="maxlength" value="6"></td>
+							<tr>
+								<td><? print button('Insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value; maxlen = new getObj('maxlength').obj.value;insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '#' + (maxlen ? maxlen : '6') + '>>', new getObj('bodytext').obj);"); ?></td>
+								<td>&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					*/
+					?>
+				</tr>
+			</table>
+			<script>
+
+				function limit_chars(field) {
+					if (field.value.length > 160)
+						field.value = field.value.substring(0,160);
+					var status = new getObj('charsleft');
+					var remaining = 160 - field.value.length;
+					if (remaining <= 0)
+						status.obj.innerHTML="<b style='color:red;'>0</b>";
+					else if (remaining <= 20)
+						status.obj.innerHTML="<b style='color:orange;'>" + remaining + "</b>";
+					else
+						status.obj.innerHTML=remaining;
+				}
+			</script>
+			<span id="charsleft"><?= 160 - strlen(GetFormData($form,$section,"body")) ?></span> characters remaining.
 		<?
 		break;
 }
