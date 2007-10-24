@@ -178,6 +178,20 @@ if($USER->authorize('sendemail')) {
 	echo '<br>';
 }
 
+if($USER->authorize('sendsms')) {
+	$data = DBFindMany("Message",", (name + 0) as foo from message where type='sms' and userid=$USER->id and deleted=0 order by foo, name");
+	$scroll = false;
+	if (count($data) > $scrollThreshold) {
+		$scroll = true;
+	}
+	startWindow('My SMS Messages ' . help('Messages_MySmsMessages'), 'padding: 3px;', true, true);
+
+	button_bar(button('Create SMS Message', NULL,'messagesms.php?id=new') . help('Messages_AddSmsMessage'));
+
+	showObjects($data, $titles, array("Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
+	endWindow();
+	echo '<br>';
+}
 
 if($USER->authorize('sendprint')) {
 	$data = DBFindMany("Message",", (name + 0) as foo from message where type='print' and userid=$USER->id and deleted=0 order by foo, name");
