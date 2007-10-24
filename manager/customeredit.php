@@ -137,6 +137,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_managernote', $managernote, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
+				setCustomerSystemSetting('_emergencyonly', GetFormData($f, $s, 'emergencyonly'), $custdb);
 				
 
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
@@ -199,6 +200,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"emergencyonly", getCustomerSystemSetting('_emergencyonly', false, true, $custdb), "bool", 0, 1);
 
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
@@ -246,6 +248,7 @@ NewForm($f);
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
 <tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
 
+
 <?
 
 	foreach($languages as $index => $language){
@@ -256,6 +259,7 @@ NewForm($f);
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
 <tr><td> Has Portal </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?></td></tr>
+<tr><td> Emergency Only: </td><td><? NewFormItem($f, $s, 'emergencyonly', 'checkbox') ?></td></tr>
 <tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!</b></td></tr>
 
 <tr><td>Retry:

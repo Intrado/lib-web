@@ -184,11 +184,15 @@ if (CheckFormSubmit($f,$s)){
 							('Spanish')";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
-
-				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, timeslices, `deleted`) VALUES
-							('Emergency', 1, 225, 0),
-							('Attendance', 2, 0, 0),
-							('General', 3, 450, 0)";
+				if(GetFormData($f, $s, "emergencyonly")){
+					$query = "INSERT INTO `jobtype` (`name`, `systempriority`, timeslices, `deleted`) VALUES
+								('Emergency', 1, 225, 0)";
+				} else {
+					$query = "INSERT INTO `jobtype` (`name`, `systempriority`, timeslices, `deleted`) VALUES
+								('Emergency', 1, 225, 0),
+								('Attendance', 2, 0, 0),
+								('General', 3, 450, 0)";
+				}
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
@@ -206,7 +210,9 @@ if (CheckFormSubmit($f,$s)){
 							('inboundnumber', '" . DBSafe($inboundnum) . "'),
 							('_maxusers', '" . DBSafe($maxusers) . "'),
 							('_renewaldate', '" . DBSafe($renewaldate) . "'),
-							('_callspurchased', '" . DBSafe($callspurchased) . "')";
+							('_callspurchased', '" . DBSafe($callspurchased) . "'),
+							('_emergencyonly', '" . DBSafe(GetFormData($f, $s, "emergencyonly")) . "')";
+							
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
@@ -239,6 +245,7 @@ if( $reloadform ){
 	PutFormData($f,$s,'maxusers', "1", "number");
 	PutFormData($f,$s,'callspurchased', "", "number");
 	PutFormData($f,$s,'renewaldate', "", "text");
+	PutFormData($f,$s,'emergencyonly', 0, "bool", 0, 1);
 }
 
 include_once("nav.inc.php");
@@ -257,6 +264,7 @@ NewFormItem($f, $s,"", 'submit');
 <tr><td>Max Users: </td><td><? NewFormItem($f,$s,'maxusers','text',10)?></td></tr>
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f,$s,'callspurchased','text',10)?></td></tr>
 <tr><td>Renewal Date: </td><td><? NewFormItem($f,$s,'renewaldate','text',10)?></td></tr>
+<tr><td>Emergency Only: </td><td><? NewFormItem($f, $s, 'emergencyonly', 'checkbox') ?></td></tr>
 
 <tr><td>Timezone: </td><td>
 <?
