@@ -52,7 +52,7 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 //displays checkbox for each jobtype 
 function displayJobtypeForm($f, $s, $type, $sequence, $jobtypes){
 	foreach($jobtypes as $jobtype){
-		?><td><?=jobtype_info($jobtype)?><? NewFormItem($f, $s, $type . $sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1); ?></td><?
+		?><td class="bottomBorder" align="middle"><? NewFormItem($f, $s, $type . $sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1); ?></td><?
 	}
 }
 
