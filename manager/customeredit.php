@@ -178,11 +178,11 @@ if( $reloadform ) {
 	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', false, true, $custdb),"phone", 3, 3);
 
 	$currentmaxphone = getCustomerSystemSetting('maxphones', 4, true, $custdb);
-	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",3,"nomax",true);
+	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",$currentmaxphone,"nomax",true);
 	$currentmaxemail = getCustomerSystemSetting('maxemails', 2, true, $custdb);
-	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",2,"nomax",true);
+	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",$currentmaxemail,"nomax",true);
 	$currentmaxsms = getCustomerSystemSetting('maxsms', 2, true, $custdb);
-	PutFormData($f,$s,'maxsms',$currentmaxsms,"number",2,"nomax",true);
+	PutFormData($f,$s,'maxsms',$currentmaxsms,"number",$currentmaxsms,"nomax",true);
 
 	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', false, true, $custdb),"text",1,255);
 	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb),"email",1,255);
