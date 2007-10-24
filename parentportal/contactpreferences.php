@@ -94,17 +94,28 @@ if($PERSONID){
 			if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
-				
-				getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
-				
-				if(GetFormData($f, $s, "savetoall")){
-					//Fetch all person id's associated with this user on this customer
-					//then remove the current person id from the list
-					$otherContacts = getContactIDs($_SESSION['portaluserid']);
-					unset($otherContacts[array_search($PERSONID, $otherContacts)]);
-					copyContactData($PERSONID, $otherContacts, $lockedphones);
+				$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = '1'");
+				$hasemergency = false;
+				for($i=0; $i < $maxphones; $i++){
+					if(GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid)){
+						$hasemergency=true;
+						break;
+					}
 				}
-				redirect();
+				if(!$hasemergency){
+					error("You must have at least one phone number that can receive emergency calls");
+				} else {
+					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
+					
+					if(GetFormData($f, $s, "savetoall")){
+						//Fetch all person id's associated with this user on this customer
+						//then remove the current person id from the list
+						$otherContacts = getContactIDs($_SESSION['portaluserid']);
+						unset($otherContacts[array_search($PERSONID, $otherContacts)]);
+						copyContactData($PERSONID, $otherContacts, $lockedphones);
+					}
+					redirect();
+				}
 			}
 		}
 	} else {
