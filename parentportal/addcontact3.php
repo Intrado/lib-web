@@ -77,15 +77,19 @@ if($PERSONID){
 		$emails[$i]->sequence = $i;
 		$emails[$i]->personid = $PERSONID;
 	}
-	$smses = array_values($person->getSmses());
-	for ($i=count($smses); $i<$maxsms; $i++) {
-		$smses[$i] = new Sms();
-		$smses[$i]->sequence = $i;
-		$smses[$i]->personid = $PERSONID;
+	if(getSystemSetting("_hassms")){
+		$smses = array_values($person->getSmses());
+		for ($i=count($smses); $i<$maxsms; $i++) {
+			$smses[$i] = new Sms();
+			$smses[$i]->sequence = $i;
+			$smses[$i]->personid = $PERSONID;
+		}
+	} else {
+		$smses = array();
 	}
 	$lockedphones= array();
 	for($i=0; $i < $maxphones; $i++){
-		$lockedphones[$i] = getSystemSetting("lockphone" . $i);
+		$lockedphones[$i] = getSystemSetting("lockedPhone" . $i);
 	}
 
 	$contactprefs = getContactPrefs($PERSONID);
