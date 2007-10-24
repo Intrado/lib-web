@@ -152,8 +152,19 @@ $PAGE = "contacts:contactpreferences";
 $TITLE = "Edit Contact Details - " . $person->$firstnamefield . " " . $person->$lastnamefield;
 
 include("nav.inc.php");
-
-include("contactedit.php");
+startWindow("Preferences");
+?>
+<table>
+	<tr>
+		<td>
+<?
+			include("contactedit.php");
+?>
+		</td>
+	</tr>
+</table>
+<?
+endWindow();
 include("navbottom.inc.php");
 } else {
 	redirect("contactpreferences.php");
