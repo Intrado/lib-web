@@ -33,14 +33,22 @@ if(CheckFormSubmit($f,$s))
 				if(!isset($_SESSION['pidlist'][$result['customerid']])){
 					$_SESSION['pidlist'][$result['customerid']] = array();
 				}
-
+				
 				if(!isset($_SESSION['customerid'])){
+					$associationresult = portalGetCustomerAssociations();
+					if($associationresult['result'] == ""){
+						$customerlist = $associationresult['custmap'];
+						$customeridlist = array_keys($customerlist);
+					} else {
+						$customeridlist = array();
+					}
 					$_SESSION['customerid'] = $result['customerid'];
-					//TODO
-					//$_SESSION['custname'] = $customerlist[$customeridlist[0]];
-					//portalAccessCustomer($customeridlist[0]);
-					$_SESSION['custname'] = 'todo';
-					portalAccessCustomer($result['customerid']);
+					
+					$_SESSION['custname'] = $customerlist[$customeridlist[0]];
+					$accessresult = portalAccessCustomer($customeridlist[0]);
+					if($accessresult['result'] != ""){
+						error("There was an unknown problem connecting to that customer");
+					}
 				}
 
 				$_SESSION['pidlist'][$result['customerid']][] = $result['personid'];
