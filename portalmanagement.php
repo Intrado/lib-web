@@ -296,10 +296,12 @@ if($reportgenerator->format == "csv"){
 //index 4 is token
 //index 5 is expiration date
 function fmt_activation_code($row, $index){
-	if(strtotime($row[5]) < strtotime("now")){
-		return "Expired";
-	} else {
-		return $row[$index];
+	if($row[$index]){
+		if(strtotime($row[5]) < strtotime("now")){
+			return "Expired";
+		}
 	}
+	return $row[$index];
+
 }
 ?>
