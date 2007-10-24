@@ -166,7 +166,7 @@ startWindow("Preferences", 'padding: 3px;');
 		</tr>
 <?
 } else {
-	?><tr><td>You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a></td></tr><?
+	?><tr><td><img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a></td></tr><?
 }
 ?>
 </table>
