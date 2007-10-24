@@ -76,11 +76,11 @@ startWindow('Change Email');
 <table>
 	<tr>
 		<td>New Email Address:</td>
-		<td><? NewFormItem($f, $s, "newemail", "text", "100") ?> </td>
+		<td><? NewFormItem($f, $s, "newemail", "text", "50", "100") ?> </td>
 	</tr>
 	<tr>
 		<td>Password:</td>
-		<td><? NewFormItem($f, $s, "password", "password", "100") ?> </td>
+		<td><? NewFormItem($f, $s, "password", "password", "50", "100") ?> </td>
 	</tr>
 </table>
 <br>
