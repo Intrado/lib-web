@@ -440,7 +440,7 @@ function getContactPrefs($personid){
 }
 
 //displays jobtype name and on hover, displays infoforparents
-function jobtype_info($jobtype, $extrahtml = NULL, $style = NULL) {
+function jobtype_info($jobtype, $extrahtml = NULL) {
 	$contents = nl2br($jobtype->infoforparents);
 	if($contents == ""){
 		$contents = "<br/>";
