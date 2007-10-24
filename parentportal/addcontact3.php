@@ -16,28 +16,52 @@ require_once("parentportalutils.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$result = portalGetCustomerAssociations();
+if($result['result'] == ""){
+	$customerlist = $result['custmap'];
+	$customeridlist = array_keys($customerlist);
+} else {
+	$customeridlist = array();
+}
+
+
 $ADDWIZARD = true;
-$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 $PERSONID = 0;
-$firstnamefield = FieldMap::getFirstNameField();
-$lastnamefield = FieldMap::getLastNameField();
 if(isset($_SESSION['currentpid'])){
 	$PERSONID = $_SESSION['currentpid'];
-	$customerid = $_SESSION['currentcid'];
-	$customerpidlist = $_SESSION['pidlist'][$customerid];
+	$_SESSION['customerid'] = $_SESSION['currentcid'];
+	$_SESSION['custname'] = $customerlist[$_SESSION['customerid']];
+	$result = portalAccessCustomer($_SESSION['customerid']);
+	if($result['result'] != ""){
+		error("An error occurred, please try again");
+		$error = 1;
+	}
+	$customerpidlist = $_SESSION['pidlist'][$_SESSION['customerid']];
 	$personindex = array_search($PERSONID, $customerpidlist);
 	$person = new Person($PERSONID);
 } else if(isset($_SESSION['pidlist']) && count($_SESSION['pidlist'])){
 	$customerpidlist = end($_SESSION['pidlist']);
-	$customerid = key($_SESSION['pidlist']);
+	$_SESSION['customerid'] = key($_SESSION['pidlist']);
+	
 	$PERSONID = end($customerpidlist);
 	$personindex = key($customerpidlist);
+	
+	$_SESSION['custname'] = $customerlist[$_SESSION['customerid']];
+	$result = portalAccessCustomer($_SESSION['customerid']);
+	
+	if($result['result'] != ""){
+		error("An error occurred, please try again");
+		$error = 1;
+	}
+	
 	$person = new Person($PERSONID);
 } else {
 	redirect("contactpreferences.php");
 }
 if($PERSONID){
-	
+	$firstnamefield = FieldMap::getFirstNameField();
+	$lastnamefield = FieldMap::getLastNameField();
+	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 	$maxphones = getSystemSetting("maxphones");
 	$maxemails = getSystemSetting("maxemails");
 	$maxsms = getSystemSetting("maxsms");
@@ -92,14 +116,14 @@ if($PERSONID){
 			} else {
 				
 				getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
-				unset($_SESSION['pidlist'][$customerid][$personindex]);
+				unset($_SESSION['pidlist'][$_SESSION['customerid']][$personindex]);
 				if(GetFormData($f, $s, "savetoall")){
 					//Fetch all person id's associated with this user on this customer
 					//then remove the current person id from the list
 					$otherContacts = getContactIDs($_SESSION['portaluserid']);
 					unset($otherContacts[array_search($PERSONID, $otherContacts)]);
 					copyContactData($PERSONID, $otherContacts, $lockedphones);
-					unset($_SESSION['pidlist'][$customerid]);
+					unset($_SESSION['pidlist'][$_SESSION['customerid']]);
 				}
 				unset($_SESSION['currentpid']);
 				redirect();
