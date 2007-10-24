@@ -75,6 +75,7 @@ function displayEnabledJobtypes($contactprefs, $defaultcontactprefs, $type, $seq
 
 //copies contact details and preferences of main person to all persons in otherpids
 function copyContactData($mainpid, $otherpids = array(), $lockedphones){
+	
 	$mainphones = QuickQueryList("select sequence, phone from phone where personid = '" . $mainpid . "'", true);
 	$mainemails = QuickQueryList("select sequence, email from email where personid = '" . $mainpid . "'", true);
 	if(getSystemSetting("_hassms")){
@@ -102,7 +103,7 @@ function copyContactData($mainpid, $otherpids = array(), $lockedphones){
 		}
 		if(getSystemSetting("_hassms")){
 			foreach($smses as $sms){
-				$sms->sms = $mainseses[$sms->sequence];
+				$sms->sms = $mainsmses[$sms->sequence];
 				$sms->editlock = 1;
 				$sms->update();
 			}
@@ -152,7 +153,7 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 		$email->update();
 		foreach($jobtypes as $jobtype){
 			QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-						values ('" . $PERSONID . "','" . $jobtype->id . "','email','" . $phone->sequence . "','" 
+						values ('" . $PERSONID . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
 						. DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "') 
 						on duplicate key update
 						personid = '" . $PERSONID . "',
