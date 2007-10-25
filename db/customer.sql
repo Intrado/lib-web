@@ -1236,6 +1236,7 @@ ALTER TABLE `reportcontact`
 ADD `sms` varchar(20) default NULL AFTER `email`
 $$$
 
+
 -- import enhancements
 
 ALTER TABLE `importfield` add `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy' after mapto
@@ -1298,4 +1299,12 @@ $$$
 ALTER TABLE `portalpersontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL
 $$$
 
+-- add curdate and skipheaders to imports
+
+
+ALTER TABLE `import` ADD `skipheaderlines` TINYINT NOT NULL DEFAULT '0' AFTER `datamodifiedtime`
+$$$
+
+ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy'
+$$$
 
