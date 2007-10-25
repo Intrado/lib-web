@@ -326,13 +326,6 @@ echo htmlentities($smsmessage->name);
 ?>
 					</td>
 				</tr>
-<? if($USER->authorize('sendmulti')) { ?>
-
-				<tr>
-					<td class="bottomBorder" >Multilingual message options</td>
-					<td class="bottomBorder" ><? alternate('sms'); ?></td>
-				</tr>
-<? } ?>
 				<tr>
 					<td>Skip duplicate sms addresses</td>
 					<td><input type="checkbox" disabled <?= $job->isOption("skipsmsduplicates") ? "checked":"" ?>>Skip Duplicates</td>
