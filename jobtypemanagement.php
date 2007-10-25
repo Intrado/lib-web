@@ -262,8 +262,10 @@ function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtype
 		PutFormData($f, $s, "jobtype" . $type->id . "email" . $i, isset($jobtypeprefs[$type->id]["email"][$i]) ? $jobtypeprefs[$type->id]["email"][$i] : 0, "bool", 0, 1);
 	}
 	if(getSystemSetting("_hassms")){
-		for($i=0; $i<$maxsms; $i++){
-			PutFormData($f, $s, "jobtype" . $type->id . "sms" . $i, isset($jobtypeprefs[$type->id]["sms"][$i]) ? $jobtypeprefs[$type->id]["sms"][$i] :0 , "bool", 0, 1);
+		if(!$type->issurvey){
+			for($i=0; $i<$maxsms; $i++){
+				PutFormData($f, $s, "jobtype" . $type->id . "sms" . $i, isset($jobtypeprefs[$type->id]["sms"][$i]) ? $jobtypeprefs[$type->id]["sms"][$i] :0 , "bool", 0, 1);
+			}
 		}
 	}
 
@@ -327,15 +329,17 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 					enabled = '" . DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "email" . $i)) . "'");
 	}
 	if(getSystemSetting("_hassms")){
-		for($i=0; $i<$maxsms; $i++){
-			QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-						values ('" . $type->id . "','sms','" . $i . "','"
-						. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "sms" . $i)) . "')
-						on duplicate key update
-						jobtypeid = '" . $type->id . "',
-						type = 'sms',
-						sequence = '" . $i . "',
-						enabled = '" . DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "sms" . $i)) . "'");
+		if(!$type->issurvey){
+			for($i=0; $i<$maxsms; $i++){
+				QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
+							values ('" . $type->id . "','sms','" . $i . "','"
+							. DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "sms" . $i)) . "')
+							on duplicate key update
+							jobtypeid = '" . $type->id . "',
+							type = 'sms',
+							sequence = '" . $i . "',
+							enabled = '" . DBSafe(GetFormData($f, $s, "jobtype" . $jobtypeid . "sms" . $i)) . "'");
+			}
 		}
 	}
 
@@ -393,6 +397,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms,
 				</tr>
 <?
 				if(getSystemSetting("_hassms")){
+					if(!((isset($type) && $type->issurvey) || $jobtypeid == "_newsurvey_")){
 ?>
 					<tr>
 						<td width="10%" >SMS:</td>
@@ -407,6 +412,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms,
 ?>
 					</tr>
 <?
+					}
 				}
 ?>
 			</table>
