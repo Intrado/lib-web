@@ -80,7 +80,7 @@ class PortalReport extends ReportGenerator{
 		foreach($data as $index => $row){
 			if(isset($portalusers[$row[6]])){
 				$portaluser = $portalusers[$row[6]];
-				$row[6] = $portaluser['portaluser.firstname'] . " " . $portaluser['portaluser.lastname'];
+				$row[6] = $portaluser['portaluser.firstname'] . " " . $portaluser['portaluser.lastname'] . " (" . $portaluser['portaluser.username'] . ")";
 				$data[$index] = $row;
 			}
 		}
