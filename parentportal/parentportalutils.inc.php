@@ -182,4 +182,18 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 		}
 	}
 }
+
+function checkEmergencyPhone($f, $s){
+	$hasemergency = false;
+	$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = '1'");
+	$maxphones = getSystemSetting("maxphones");
+	
+	for($i=0; $i < $maxphones; $i++){
+		if(GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid) && GetFormData($f, $s, "phone" . $i) !== "" ){
+			$hasemergency=true;
+			break;
+		}
+	}
+	return $hasemergency;
+}
 ?>

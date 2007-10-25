@@ -118,15 +118,7 @@ if($PERSONID){
 			if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
-				$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = '1'");
-				$hasemergency = false;
-				for($i=0; $i < $maxphones; $i++){
-					if(GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid)){
-						$hasemergency=true;
-						break;
-					}
-				}
-				if(!$hasemergency){
+				if(!checkEmergencyPhone($f, $s)){
 					error("You must have at least one phone number that can receive emergency calls");
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
