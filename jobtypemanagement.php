@@ -283,7 +283,11 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 		$type->name = $name;
 		$type->infoforparents = GetformData($f, $s, "jobtypedesc" . $jobtypeid);
 		$type->systempriority = $systempriority;
-		$type->timeslices = 450;
+		if($systempriority == 2){
+			$type->timeslices = 0;
+		} else {
+			$type->timeslices = 450;
+		}
 		if($issurvey == true){
 			$type->issurvey = 1;
 		}
