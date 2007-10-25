@@ -207,6 +207,9 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			if(GetFormData($f,$s,"restricttypes") && count(GetFormData($f,$s,'jobtypes')) > 0)
 			foreach(GetFormData($f,$s,'jobtypes') as $type)
 				QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($type) . "')");
+				if(GetFormData($f,$s,"restrictsurveytypes") && count(GetFormData($f,$s,'surveyjobtypes')) > 0)
+			foreach(GetFormData($f,$s,'surveyjobtypes') as $surveytype)
+				QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($surveytype) . "')");
 
 			$_SESSION['userid'] = $usr->id;
 
@@ -291,12 +294,24 @@ if( $reloadform )
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
 
-	if ($usr->id)
-		$types = QuickQueryList("select jobtypeid from userjobtypes where userid = $usr->id");
-	else
+	if ($usr->id){
+		$surveytypes = array();
+		$types = QuickQueryList("select ujt.jobtypeid, issurvey from userjobtypes ujt inner join jobtype jt on (jt.id = ujt.jobtypeid) where userid = $usr->id", true);
+		foreach($types as $jtid => $issurvey){
+			if($issurvey){
+				$surveytypes[] = $jtid;
+				unset($types[$jtid]);
+			}
+		}
+		$types = array_keys($types);
+	}else {
 		$types = array();
+		$surveytypes = array();
+	}
 	PutFormData($f,$s,"jobtypes",$types,"array");
 	PutFormData($f,$s,"restricttypes",(bool)count($types),"bool",0,1);
+	PutFormData($f,$s,"surveyjobtypes",$surveytypes,"array");
+	PutFormData($f,$s,"restrictsurveytypes",(bool)count($surveytypes),"bool",0,1);
 	PutFormData($f,$s,"restrictpeople",(bool)count($RULES),"bool",0,1);
 
 	if($IS_LDAP) {
@@ -433,7 +448,7 @@ startWindow('User Information');
 									<table>
 										<tr>
 											<td>
-												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,'id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?>
+												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,'id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');clearAllIfNotChecked(this,\'surveyjobtypeselect\'); "'); ?>
 											</td>
 											<td>
 												Restrict this user to the following types of jobs
@@ -447,10 +462,36 @@ startWindow('User Information');
 								<td>
 								<?
 									// changed query from name, id to id, name; jjl
-									$options = QuickQueryList("select id, name from jobtype where deleted=0 order by systempriority, name asc", true);
+									$options = QuickQueryList("select id, name from jobtype where deleted=0 and not issurvey order by systempriority, name asc", true);
 									if(!count($options))
 										$options['No Job Types Defined'] = 0;
 									NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,'id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');
+								?>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<table>
+										<tr>
+											<td>
+												<? NewFormItem($f,$s,'restrictsurveytypes','checkbox',NULL,NULL,'id="restrictsurveytypes" onclick="clearAllIfNotChecked(this,\'surveyjobtypeselect\'); "'); ?>
+											</td>
+											<td>
+												Restrict this user to the following types of survey jobs
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td align="right" valign="top" style="padding-top: 4px;">Survey Job Types:</td>
+								<td>
+								<?
+									// changed query from name, id to id, name; jjl
+									$surveyoptions = QuickQueryList("select id, name from jobtype where deleted=0 and issurvey=1 order by systempriority, name asc", true);
+									if(!count($surveyoptions))
+										$surveyoptions['No Job Types Defined'] = 0;
+									NewFormItem($f,$s,'surveyjobtypes','selectmultiple',3,$surveyoptions,'id="surveyjobtypeselect" onmousedown="setChecked(\'restrictsurveytypes\')"');
 								?>
 								</td>
 							</tr>
