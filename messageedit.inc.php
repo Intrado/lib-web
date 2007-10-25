@@ -365,34 +365,7 @@ switch($MESSAGETYPE)
 						<? NewFormItem($form, $section,"body","textarea",60,NULL,'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"'); ?>
 					</td>
 					<?
-					/* TODO: Add message inserts later when supported, jjl
-					<th align="right" class="windowRowHeader" valign="top">Data Field:<br><? print help('MessageEmail_DataField'); ?></th>
-					<td valign="top">
-						<select id="data" name="data">
-<?
-							foreach($fieldmap as $name)
-							{
-								print "<option value=\"$name\">$name</option>\n";
-							}
-?>
-						</select>
-						<br>
-						
-						<table border="0" cellpadding="1" cellspacing="0" style="font-size: 9px; margin-top: 5px;">
-							<tr>
-								<td>Default&nbsp;Value:</td>
-								<td><input type="text" size="10" id="default"></td>
-							</tr>
-							<tr>
-								<td>Max&nbsp;Length:</td>
-								<td><input type="text" size="10" id="maxlength" value="6"></td>
-							<tr>
-								<td><? print button('Insert', "sel = new getObj('data').obj; def = new getObj('default').obj.value; maxlen = new getObj('maxlength').obj.value;insert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '#' + (maxlen ? maxlen : '6') + '>>', new getObj('bodytext').obj);"); ?></td>
-								<td>&nbsp;</td>
-							</tr>
-						</table>
-					</td>
-					*/
+					/* TODO: Add message inserts later when supported, jjl */
 					?>
 				</tr>
 			</table>
