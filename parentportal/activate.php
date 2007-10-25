@@ -29,7 +29,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			$result = portalActivateAccount($token, $password1);
 			if($result['result'] == ""){
 				$form = false;
-				$forgotsucess = true;
+				$forgotsuccess = true;
 				doStartSession();
 				$_SESSION['portaluserid'] = $result['userID'];
 			} else {
