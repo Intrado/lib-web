@@ -88,6 +88,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
+		} else if (GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) > 160){
+			error('There is a maximum of 160 characters for SMS messages');
+		} else if (GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) < 1){
+			error('The SMS message body cannot be empty');
 		} else {
 			//submit changes
 
@@ -100,10 +104,28 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//only allow editing some fields
 			if ($completedmode) {
 				PopulateObject($f,$s,$job,array("name", "description"));
-			}
-			else if ($submittedmode) {
+			} else if ($submittedmode) {
 				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
 			} else {
+				if(GetFormData($f, $s, 'smsmessageid') == "0"){
+					$newsmsmessage = new Message();
+					$parts = $newsmsmessage->parse(GetFormData($f, $s, 'smsmessagetxt'));
+					$newsmsmessage->userid = $USER->id;
+					$newsmsmessage->type = 'sms';
+					$newsmsmessage->name = GetFormData($f, $s,'name');
+					$newsmsmessage->description = "SMS Message " . date("M d, Y h:i:s", strtotime("now"));
+					$newsmsmessage->create();
+					
+					QuickUpdate("delete from messagepart where messageid='" . $newsmsmessage->id ."'");
+					foreach($parts as $part){
+						$part->messageid = $newsmsmessage->id;
+						$part->create();
+					}
+					
+					//Do a putform on message select so if there is an error later on, another message does not get created
+					PutFormData($f, $s, 'smsmessageid', $newsmsmessage->id, 'number', 'nomin', 'nomax');
+				}
+			
 				$fieldsarray = array("name", "jobtypeid", "description", "listid", "phonemessageid",
 				"emailmessageid","printmessageid", "smsmessageid", "starttime", "endtime",
 				"sendphone", "sendemail", "sendprint", "sendsms", "maxcallattempts");
@@ -358,10 +380,7 @@ if( $reloadform )
 	PutFormData($f,"email","newlangemail","");
 	PutFormData($f,"email","newmessemail","");
 	PutFormData($f,"print","newlangprint","");
-	PutFormData($f,"print","newmessprint","");
-	PutFormData($f,"sms", "newlangsms","");
-	PutFormData($f,"sms","newmesssms","");
-	
+	PutFormData($f,"print","newmessprint","");	
 }
 
 $messages = array();
@@ -372,11 +391,19 @@ if ($submittedmode || $completedmode) {
 	$messages['email'] = DBFindMany("Message","from message where id=$job->emailmessageid or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
 	$messages['print'] = DBFindMany("Message","from message where id=$job->printmessageid or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
 	$messages['sms'] = DBFindMany("Message","from message where id=$job->smsmessageid or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
+	$smsmessageparses = array();
+	foreach($messages['sms'] as $smsmessage){
+		$messageparts = DBFindMany("MessagePart", "from messagepart where messageid='" . $smsmessage->id . "' order by sequence");
+		$smsmessageparses[$smsmessage->id] = Message::format($messageparts);
+	}
+	$smsmessageid = GetFormData($f, $s, "smsmessageid");
+	PutFormData($f,$s,"smsmessagetxt", $smsmessageid ? $smsmessageparses[$smsmessageid] : "", "text");
 } else {
 	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
 	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
+	PutFormData($f,$s,"smsmessagetxt", "", "text");
 }
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
@@ -395,13 +422,18 @@ $peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where useri
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function message_select($type, $form, $section, $name) {
+function message_select($type, $form, $section, $name, $extrahtml = "") {
 	global $messages, $submittedmode;
 ?>
 	<table border=0 cellpadding=3 cellspacing=0><tr><td>
 <?
-	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : ""));
-	NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
+	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : "") . $extrahtml);
+	
+	if($type == "sms") {
+		NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "0");
+	} else {
+		NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
+	}
 	foreach ($messages[$type] as $message) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
 	}
@@ -520,6 +552,26 @@ startWindow('Job Information');
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
+		<th align="right" class="windowRowHeader bottomBorder">Delivery Type:<br></th>
+		<td class="bottomBorder">
+			<table border="0" cellpadding="2" cellspacing="0" >
+				<tr>
+					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
+					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('phoneoptions'); else hide('phoneoptions');\""); ?>Phone</td>
+				</tr>
+				<tr>
+					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
+					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?>Email</td>
+				</tr>
+				<tr>
+					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
+					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('smsoptions'); else hide('smsoptions');\""); ?>SMS</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
+	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Settings:<br></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
@@ -630,149 +682,184 @@ startWindow('Job Information');
 		</td>
 	</tr>
 <? if($USER->authorize('sendphone')) { ?>
+<div id="sendphonerow">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
-			<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				<tr>
-					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "")); ?>Phone</td>
-				</tr>
-				<tr>
-					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-					<td><? message_select('phone',$f,$s,"phonemessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
-				</tr>
+			&nbsp;
+			<div id='phoneoptions' style="display:none">
+				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+					<tr>
+						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+						<td><? message_select('phone',$f,$s,"phonemessageid"); ?></td>
+					</tr>
 <? if($USER->authorize('sendmulti')) { ?>
-
-				<tr>
-					<td>Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
-					<td><? alternate('phone'); ?></td>
-				</tr>
+	
+					<tr>
+						<td>Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
+						<td><? alternate('phone'); ?></td>
+					</tr>
 <? } ?>
-				<tr>
-					<td>Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
-					<td>
-						<?
-						$max = first($ACCESS->getValue('callmax'), 1);
-						NewFormItem($f,$s,"maxcallattempts","selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
-						for($i = 1; $i <= $max; $i++)
-						NewFormItem($f,$s,"maxcallattempts","selectoption",$i,$i);
-						NewFormItem($f,$s,"maxcallattempts","selectend");
-						?>
-					</td>
-				</tr>
-				<? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
-							<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
-							<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
+						<td>Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
+						<td>
+							<?
+							$max = first($ACCESS->getValue('callmax'), 1);
+							NewFormItem($f,$s,"maxcallattempts","selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
+							for($i = 1; $i <= $max; $i++)
+							NewFormItem($f,$s,"maxcallattempts","selectoption",$i,$i);
+							NewFormItem($f,$s,"maxcallattempts","selectend");
+							?>
+						</td>
 					</tr>
-				<? } ?>
-
-				<tr>
-					<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
-					<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
-				</tr>
-				<tr>
-					<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
-					<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Call All Phone Numbers</td>
-				</tr>
-				<? if($USER->authorize('leavemessage')) { ?>
+					<? if ($USER->authorize('setcallerid')) { ?>
+						<tr>
+								<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
+								<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
+						</tr>
+					<? } ?>
+	
 					<tr>
-						<td> Allow call recipients to leave a message <?= help('Jobs_VoiceResponse', NULL, 'small') ?> </td>
-						<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
+						<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
+						<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 					</tr>
-				<? } ?>
-
-			</table>
+					<tr>
+						<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
+						<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Call All Phone Numbers</td>
+					</tr>
+					<? if($USER->authorize('leavemessage')) { ?>
+						<tr>
+							<td> Allow call recipients to leave a message <?= help('Jobs_VoiceResponse', NULL, 'small') ?> </td>
+							<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
+						</tr>
+					<? } ?>
+	
+				</table>
+			</div>
 		</td>
 	</tr>
+</div>
 <? } ?>
 <? if($USER->authorize('sendemail')) { ?>
+<div id="sendemailrow">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 		<td class="bottomBorder">
-			<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				<tr>
-					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "")); ?>Email</td>
-				</tr>
-				<tr>
-					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-					<td><? message_select('email',$f, $s,"emailmessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
-				</tr>
+			&nbsp;
+			<div id='emailoptions' style="display:none">
+				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+					<tr>
+						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+						<td><? message_select('email',$f, $s,"emailmessageid"); ?></td>
+					</tr>
 <? if($USER->authorize('sendmulti')) { ?>
-				<tr>
-					<td>Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
-					<td><? alternate('email'); ?></td>
-				</tr>
+					<tr>
+						<td>Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
+						<td><? alternate('email'); ?></td>
+					</tr>
 <? } ?>
-				<tr>
-					<td>Skip duplicate email addresses</td>
-					<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
-				</tr>
-			</table>
+					<tr>
+						<td>Skip duplicate email addresses</td>
+						<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
+					</tr>
+				</table>
+			<div>
 		</td>
 	</tr>
+</div>
 <? } ?>
 <? if($USER->authorize('sendprint')) { ?>
+<div id="sendprintrow">
 	<tr valign="top">
 		<th align="right" valign="top" class="windowRowHeader">Print</th>
 		<td>
-			<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				<tr>
-					<td width="30%" >Send printed letters <? print help('Job_PrintOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendprint","checkbox",NULL,NULL,"id='sendprint' " . ($submittedmode ? "DISABLED" : "")); ?>Print</td>
-				</tr>
-				<tr>
-					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-					<td><? message_select('print', $f, $s, "printmessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
-				</tr>
+			&nbsp;
+			<div id='printoptions' style="display:none">
+				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+					<tr>
+						<td width="30%" >Send printed letters <? print help('Job_PrintOptions', null, 'small'); ?></td>
+						<td><? NewFormItem($f,$s,"sendprint","checkbox",NULL,NULL,"id='sendprint' " . ($submittedmode ? "DISABLED" : "")); ?>Print</td>
+					</tr>
+					<tr>
+						<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+						<td><? message_select('print', $f, $s, "printmessageid"); ?></td>
+					</tr>
 <? if($USER->authorize('sendmulti')) { ?>
-				<tr>
-					<td>Multilingual message options <?= help('Job_MultilingualPrintOption',NULL,"small"); ?></td>
-					<td><? alternate('print'); ?></td>
-				</tr>
+					<tr>
+						<td>Multilingual message options <?= help('Job_MultilingualPrintOption',NULL,"small"); ?></td>
+						<td><? alternate('print'); ?></td>
+					</tr>
 <? } ?>
 <? if (0) { ?>
-				<tr>
-					<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"1"); ?> Send to all valid addresses in this list</td>
-				</tr>
-				<tr>
-					<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"0"); ?> After job completes, print letters for anyone who was not contacted</td>
-				</tr>
+					<tr>
+						<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"1"); ?> Send to all valid addresses in this list</td>
+					</tr>
+					<tr>
+						<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"0"); ?> After job completes, print letters for anyone who was not contacted</td>
+					</tr>
 <? } ?>
-			</table>
+				</table>
+			</div>
 		</td>
 	</tr>
+</div>
 <? } ?>
 <? if($USER->authorize('sendsms')) { ?>
+<div id="sendsmsrow">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
-			<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				<tr>
-					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "")); ?>SMS</td>
-				</tr>
-				<tr>
-					<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-					<td><? message_select('sms',$f, $s,"smsmessageid", NULL, NULL, ($submittedmode ? "DISABLED" : "")); ?></td>
-				</tr>
-<? if($USER->authorize('sendmulti')) { ?>
-				<tr>
-					<td>Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
-					<td><? alternate('sms'); ?></td>
-				</tr>
-<? } ?>
-				<tr>
-					<td>Skip duplicate sms numbers</td>
-					<td><? NewFormItem($f,$s,"skipsmsduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
-				</tr>
-			</table>
+			&nbsp;
+			<div id='smsoptions' style="display:none">
+				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+					<tr>
+						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+						<td>
+							<? message_select('sms',$f, $s,"smsmessageid", "onclick='if(this.value == 0){ show(\"newsmstext\") }else{ hide(\"newsmstext\") }'"); ?>
+							<div id='newsmstext'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
+							<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span> characters remaining.</div>
+							<script>
+								var smsmessagedropdown = new getObj('smsmessageid').obj;
+								if(smsmessagedropdown.value != 0){
+									hide('newsmstext');
+								}
+							</script>
+						</td>
+					</tr>
+					<tr>
+						<td>Skip duplicate sms numbers</td>
+						<td><? NewFormItem($f,$s,"skipsmsduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
+					</tr>
+				</table>
+			</div>
 		</td>
 	</tr>
+</div>
 <? } ?>
 </table>
+<script>
+	if(new getObj('sendphone').obj.checked){
+		show('phoneoptions');
+	}
+	if(new getObj('sendemail').obj.checked){
+		show('emailoptions');
+	}
+	if(new getObj('sendsms').obj.checked){
+		show('smsoptions');
+	}
+	function limit_chars(field) {
+		if (field.value.length > 160)
+			field.value = field.value.substring(0,160);
+		var status = new getObj('charsleft');
+		var remaining = 160 - field.value.length;
+		if (remaining <= 0)
+			status.obj.innerHTML="<b style='color:red;'>0</b>";
+		else if (remaining <= 20)
+			status.obj.innerHTML="<b style='color:orange;'>" + remaining + "</b>";
+		else
+			status.obj.innerHTML=remaining;
+	}
+</script>
 <?
 endWindow();
 
