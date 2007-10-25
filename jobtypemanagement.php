@@ -64,6 +64,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(QuickQuery("select count(*) from jobtype where id != '" . DBSafe(CheckFormSubmit($f, "delete")) . "' and issurvey and not deleted") < 1){
 			error("You must have at least one survey job type");
+		} else if(QuickQuery("select count(*) from userjobtypes where jobtypeid = '" . DBSafe(CheckFormSubmit($f, 'delete')) . "'")){
+			error("A user is still restricted to that job type", "Please remove the restriction if you would like to delete that job type");
 		} else {
 
 			if(GetFormData($f, $s, "joborsurvey") == "job"){
