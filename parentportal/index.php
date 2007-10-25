@@ -48,17 +48,18 @@ if($id){
 	$_SESSION['portaluserid'] = $id;
 	redirect("choosecustomer.php");
 }
+
+$PAGE = ":";
+$TITLE = "Parent Portal Login";
+$hidenav = 1;
+include_once("nav.inc.php");
+
 if ($badlogin) {
 ?>
 	<div style="color: red;">Incorrect username/password. Please try again.</div>
 <?
 }
-$PAGE = ":";
-$TITLE = "Parent Portal Login";
-$hidenav = 1;
-include_once("nav.inc.php");
 ?>
-
 	<form method="POST" action="index.php">
 		<p>Email: <input type="text" name="login" /> </p>
 		<p>Password: <input type="password" name="password" /> </p>
