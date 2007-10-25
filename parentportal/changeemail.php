@@ -40,7 +40,7 @@ if(CheckFormSubmit($f,$s))
 				redirect("start.php");
 			} else {
 				$resultcode = $result['result'];
-				if($resultcode == "invalid data"){
+				if($resultcode == "invalid argument"){
 					error($error_badpass);
 				} else {
 					error($error_generalproblem);
