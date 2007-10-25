@@ -104,6 +104,7 @@ $maptofields["a5"] = "Zip";
 
 $actions = array('copy' => "Copy",
 				'staticvalue' => "Static Value",
+				'curdate' => "Current Date",
 				'currency' => "Currency",
 				'date' => "Date",
 				'lookup' => "Data Lookup");
@@ -166,7 +167,7 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'add') || CheckFormSubmit($f,
 				else
 					SetRequired($f,$s,"date_$count",false);
 
-				if ($action == "staticvalue")
+				if ($action == "staticvalue" || $action == "curdate")
 					SetRequired($f,$s,"mapfrom_$count",false);
 				else
 					SetRequired($f,$s,"mapfrom_$count",true);
@@ -205,13 +206,15 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'add') || CheckFormSubmit($f,
 					case "date":
 						$importfield->val = GetFormData($f,$s,$action . "_" . $count);
 						break;
+					case "copy":
+					case "curdate":
 					default:
 						$importfield->val = null;
 						break;
 					}
 
 					//set the mapfrom
-					if ($action == "staticvalue")
+					if ($action == "staticvalue" || $action == "curdate")
 						$importfield->mapfrom = null;
 					else
 						$importfield->mapfrom = GetFormData($f,$s,"mapfrom_$count");
@@ -323,7 +326,7 @@ Preview rows:
 		</td>
 		<td>
 <?
-			//TODO add some JS to show/hide actions, and if staticvalue hide mapfrom
+			//show/hide actions, and if staticvalue hide mapfrom
 			NewFormItem($f,$s,"action_$count","selectstart",null,null,'onchange="switchactiondata(' . $count . ',this.value);"');
 			foreach ($actions as $action => $name)
 				NewFormItem($f,$s,"action_$count","selectoption",$name,$action);
@@ -355,7 +358,7 @@ Preview rows:
 
 		</td>
 		<td>
-			<div id="filedata_<?=$count?>" style="<?= $show == "staticvalue" ? "display: none;" : "" ?>">
+			<div id="filedata_<?=$count?>" style="<?= $show == "staticvalue" || $show == "curdate" ? "display: none;" : "" ?>">
 				<table border="0" cellpadding="3" cellspacing="0"><tr><td>
 <?
 				//file data map
@@ -410,7 +413,7 @@ Preview rows:
 		for ($ci = 0; $ci < $previewrows; $ci++) {
 			$cel = isset($importdata[$x][$ci]) ? $importdata[$x][$ci] : "";
 ?>
-			<tr ><td style="border-bottom: 1px dotted black; padding-left: 3px;"><?= $cel == "" ? "&nbsp;" : htmlentities($cel) ?></td></tr>
+			<tr ><td style="border-bottom: 1px dotted black; padding-left: 3px; <?= $import->skipheaderlines > $ci ? ' background: #cccccc;' : ' background: white;'?>"><?= $cel == "" ? "&nbsp;" : htmlentities($cel) ?></td></tr>
 <?
 		}
 ?>
@@ -434,7 +437,7 @@ function switchactiondata (num,newaction) {
 
 	var select = new getObj("select_" + num).obj;
 
-	if (newaction == 'staticvalue') {
+	if (newaction == 'staticvalue' || newaction == 'curdate') {
 		hide("filedata_" + num);
 	} else {
 		show("filedata_" + num);

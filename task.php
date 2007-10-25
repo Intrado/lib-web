@@ -85,6 +85,7 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->userid = $USER->id;
 				$IMPORT->name = GetFormData($form, $section, 'name');
 				$IMPORT->description = GetFormData($form, $section, 'description');
+				$IMPORT->skipheaderlines = GetFormData($form, $section, 'skipheaderlines');
 
 				if (!$IMPORT->id)
 					$IMPORT->uploadkey = md5($CUSTOMERURL . microtime());
@@ -145,6 +146,8 @@ if( $reloadform )
 	PutFormData($form, $section, 'description', $IMPORT->description, 'text', 1, 50);
 	PutFormData($form, $section, 'updatemethod', ($IMPORT->updatemethod != null ? $IMPORT->updatemethod : 'updateonly'), 'text');
 
+	PutFormData($form, $section, "skipheaderlines", $IMPORT->skipheaderlines, 1,10);
+
 	PutFormData($form, $section, 'automaticimport', ($IMPORT->type == 'automatic'), 'bool', 0, 1);
 	PutFormData($form, $section, 'associatedjobs', $associatedjobids, 'array', array_keys($repeatingjobs));
 	$checked = false;
@@ -192,6 +195,10 @@ startWindow('Import Information ');
 							NewFormItem($form, $section, 'updatemethod', 'selectend');
 						?>
 					</td>
+				</tr>
+				<tr>
+					<td>Skip Header Lines:</td>
+					<td><? NewFormItem($form, $section,"skipheaderlines","text", 10); ?></td>
 				</tr>
 			</table>
 		</td>
