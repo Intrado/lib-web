@@ -188,7 +188,7 @@ if( $reloadform )
 	for($i=0; $i < $maxphones; $i++){
 		PutFormData($f, $s, "lockedPhone" . $i, getSystemSetting('lockedPhone' . $i, 0), "bool", 0, 1);
 	}
-	PutFormData($f, $s, "tokenlife", getSetting('tokenlife'), 'number', 0, 365);
+	PutFormData($f, $s, "tokenlife", getSetting('tokenlife', 30), 'number', 0, 365);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
