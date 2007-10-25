@@ -211,15 +211,17 @@ if(CheckFormSubmit($f,$s))
 					$sms->editlock = GetFormData($f, $s, "editlock_sms" . $sms->sequence);
 					$sms->update();
 					foreach($jobtypes as $jobtype){
-						QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-									values ('" . $personid . "','" . $jobtype->id . "','sms','" . $sms->sequence . "','" 
-									. DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "') 
-									on duplicate key update
-									personid = '" . $personid . "',
-									jobtypeid = '" . $jobtype->id . "',
-									type = 'sms',
-									sequence = '" . $sms->sequence . "',
-									enabled = '" . DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "'");
+						if(!$jobtype->issurvey){
+							QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+										values ('" . $personid . "','" . $jobtype->id . "','sms','" . $sms->sequence . "','" 
+										. DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "') 
+										on duplicate key update
+										personid = '" . $personid . "',
+										jobtypeid = '" . $jobtype->id . "',
+										type = 'sms',
+										sequence = '" . $sms->sequence . "',
+										enabled = '" . DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "'");
+						}
 					}
 				}
 			}
@@ -264,12 +266,14 @@ if( $reloadform )
 			PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->sms), "phone", 10);
 			PutFormData($f, $s, "editlock_sms" . $sms->sequence, $sms->editlock, "bool", 0, 1);
 			foreach($jobtypes as $jobtype){
-				$contactpref = 0;
-				if(isset($contactprefs["sms"][$sms->sequence][$jobtype->id]))
-					$contactpref = $contactprefs["sms"][$sms->sequence][$jobtype->id];
-				else if(isset($defaultcontactprefs["sms"][$sms->sequence][$jobtype->id]))
-					$contactpref = $defaultcontactprefs["sms"][$sms->sequence][$jobtype->id];
-				PutFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
+				if(!$jobtype->issurvey){
+					$contactpref = 0;
+					if(isset($contactprefs["sms"][$sms->sequence][$jobtype->id]))
+						$contactpref = $contactprefs["sms"][$sms->sequence][$jobtype->id];
+					else if(isset($defaultcontactprefs["sms"][$sms->sequence][$jobtype->id]))
+						$contactpref = $defaultcontactprefs["sms"][$sms->sequence][$jobtype->id];
+					PutFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
+				}
 			}
 		}
 	}
@@ -454,11 +458,6 @@ foreach ($fieldmaps as $map) {
 <?
 			foreach($jobtypes as $jobtype){
 				if(!$jobtype->issurvey){
-					?><td align="middle"><? NewFormItem($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
-				}
-			}
-			foreach($jobtypes as $jobtype){
-				if($jobtype->issurvey){
 					?><td align="middle"><? NewFormItem($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
 				}
 			}
