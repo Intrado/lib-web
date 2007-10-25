@@ -107,7 +107,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			} else if ($submittedmode) {
 				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
 			} else {
-				if(GetFormData($f, $s, 'smsmessageid') == "0"){
+				if($USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") &&GetFormData($f, $s, 'smsmessageid') == "0" ){
 					$newsmsmessage = new Message();
 					$parts = $newsmsmessage->parse(GetFormData($f, $s, 'smsmessagetxt'));
 					$newsmsmessage->userid = $USER->id;
@@ -119,6 +119,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					QuickUpdate("delete from messagepart where messageid='" . $newsmsmessage->id ."'");
 					foreach($parts as $part){
 						$part->messageid = $newsmsmessage->id;
+						$part->voiceid = 0;
 						$part->create();
 					}
 					
@@ -391,20 +392,15 @@ if ($submittedmode || $completedmode) {
 	$messages['email'] = DBFindMany("Message","from message where id=$job->emailmessageid or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
 	$messages['print'] = DBFindMany("Message","from message where id=$job->printmessageid or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
 	$messages['sms'] = DBFindMany("Message","from message where id=$job->smsmessageid or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
-	$smsmessageparses = array();
-	foreach($messages['sms'] as $smsmessage){
-		$messageparts = DBFindMany("MessagePart", "from messagepart where messageid='" . $smsmessage->id . "' order by sequence");
-		$smsmessageparses[$smsmessage->id] = Message::format($messageparts);
-	}
-	$smsmessageid = GetFormData($f, $s, "smsmessageid");
-	PutFormData($f,$s,"smsmessagetxt", $smsmessageid ? $smsmessageparses[$smsmessageid] : "", "text");
+
 } else {
 	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
 	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
-	PutFormData($f,$s,"smsmessagetxt", "", "text");
 }
+
+PutFormData($f,$s,"smsmessagetxt", "", "text");
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
 if (isset($job->id)) {
@@ -682,7 +678,6 @@ startWindow('Job Information');
 		</td>
 	</tr>
 <? if($USER->authorize('sendphone')) { ?>
-<div id="sendphonerow">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
@@ -738,10 +733,8 @@ startWindow('Job Information');
 			</div>
 		</td>
 	</tr>
-</div>
 <? } ?>
 <? if($USER->authorize('sendemail')) { ?>
-<div id="sendemailrow">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 		<td class="bottomBorder">
@@ -766,10 +759,8 @@ startWindow('Job Information');
 			<div>
 		</td>
 	</tr>
-</div>
 <? } ?>
 <? if($USER->authorize('sendprint')) { ?>
-<div id="sendprintrow">
 	<tr valign="top">
 		<th align="right" valign="top" class="windowRowHeader">Print</th>
 		<td>
@@ -802,10 +793,8 @@ startWindow('Job Information');
 			</div>
 		</td>
 	</tr>
-</div>
 <? } ?>
 <? if($USER->authorize('sendsms')) { ?>
-<div id="sendsmsrow">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
@@ -818,12 +807,6 @@ startWindow('Job Information');
 							<? message_select('sms',$f, $s,"smsmessageid", "onclick='if(this.value == 0){ show(\"newsmstext\") }else{ hide(\"newsmstext\") }'"); ?>
 							<div id='newsmstext'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
 							<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span> characters remaining.</div>
-							<script>
-								var smsmessagedropdown = new getObj('smsmessageid').obj;
-								if(smsmessagedropdown.value != 0){
-									hide('newsmstext');
-								}
-							</script>
 						</td>
 					</tr>
 					<tr>
@@ -834,10 +817,21 @@ startWindow('Job Information');
 			</div>
 		</td>
 	</tr>
-</div>
 <? } ?>
 </table>
-<script>
+<?
+endWindow();
+
+buttons();
+EndForm();
+include_once("navbottom.inc.php");
+
+?>
+<script language="javascript">
+	var smsmessagedropdown = new getObj('smsmessageid').obj;
+	if(smsmessagedropdown.value != 0){
+		hide('newsmstext');
+	}
 	if(new getObj('sendphone').obj.checked){
 		show('phoneoptions');
 	}
@@ -858,30 +852,7 @@ startWindow('Job Information');
 			status.obj.innerHTML="<b style='color:orange;'>" + remaining + "</b>";
 		else
 			status.obj.innerHTML=remaining;
-	}
-</script>
-<?
-endWindow();
-
-buttons();
-EndForm();
-include_once("navbottom.inc.php");
-
-?>
-<script language="javascript">
-sections = Array('phone', 'email', 'print', 'sms');
-for(section in sections) {
-	var chk = new getObj('send' + sections[section]).obj;
-	if (chk) {
-		chk.sel = new getObj(sections[section] + 'messageid').obj;
-		chk.sel.chk = chk;
-		chk.onchange = fchk;
-		chk.sel.onchange = fsel;
-	}
-}
-function fchk() { if(this.sel.options.length < 2) this.checked = false; }
-function fsel() { this.chk.checked = this.selectedIndex; }
-
+	}	
 /*
 	Function to show the date in page text
 */
