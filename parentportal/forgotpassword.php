@@ -4,17 +4,18 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 
 $success = false;
+$emailnotfound = false;
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$email = get_magic_quotes_gpc() ? stripslashes($_POST['email']) : $_POST['email'];
 	if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email)){
 		error("That is not a valid email address");
-	}
-	if(portalForgotPassword($email)){
-		$success = true;
 	} else {
-		?>
-			<br>That email is not in our system.
-		<?
+		$result = portalForgotPassword($email);
+		if($result == ""){
+			$success = true;
+		} else {
+			$emailnotfound = true;
+		}
 	}
 }
 
@@ -22,6 +23,12 @@ $PAGE = ":";
 $TITLE = "Parent Portal Login";
 $hidenav = 1;
 include_once("nav.inc.php");
+if($emailnotfound){
+	?>
+		<div style="color: red;">That email is not in our system.</div>
+	<?
+}
+
 if(!$success){
 ?>
 
