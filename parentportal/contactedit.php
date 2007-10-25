@@ -24,7 +24,10 @@ if($PERSONID){
 						if(!$lockedphones[$phone->sequence]){ 
 							NewFormItem($f, $s, "phone" . $phone->sequence, "text", 14, null);
 						} else {
-							echo Phone::format($phone->phone);
+							if($phone->phone)
+								echo Phone::format($phone->phone);
+							else
+								echo "&nbsp;";
 						}
 					?>
 <?
