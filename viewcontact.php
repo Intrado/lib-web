@@ -508,7 +508,7 @@ foreach ($fieldmaps as $map) {
 <?
 					echo button("Generate Activation Code", "window.location='?create=1'");
 					if($tokendata['token']){
-						echo button("Revoke ACtivation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
+						echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
 					}
 ?>
 					</td>
