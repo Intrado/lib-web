@@ -69,13 +69,10 @@ $NAVTREE = array (
 		array("Messages","messages.php",array('sendmessage', 'sendemail', 'sendphone'),$SUBTAB=="messages"),
 		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone'),$SUBTAB=="jobs"),
 		array("Surveys","surveys.php","survey",$SUBTAB=="survey"),
-		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses"),
-		array("SMS","smsjobs.php","sendsms",$SUBTAB=="sms")
+		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
 	array("Reports","reports.php",array('createreport',"sendsms","viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
 		array("Reports", "reports.php", "createreport", $SUBTAB=="reports"),
-		array("SMS Report","reportsms.php?smsjobid=","sendsms",$SUBTAB=="sms"),
-		//give the report viewer the default of a "today" report if there was no previous report
 		array("Usage Stats","reportsystem.php?clear=1","viewusagestats",$SUBTAB=="system"),
 		array("Call Distribution","reportsystemdistribution.php","viewcalldistribution",$SUBTAB=="distribution")
 		)),
@@ -83,8 +80,6 @@ $NAVTREE = array (
 						'viewsystemrepeating','viewcontacts','blocknumbers','sendsms'),$MAINTAB=="system",array(
 		array("Active Jobs","activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
 		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
-		array("SMS Jobs","systemsmsjobs.php","sendsms",$SUBTAB=="smsjobs"),
-
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
 		array("Contacts","contacts.php?clear=1","viewcontacts",$SUBTAB=="contacts"),
 		array("Blocked Numbers","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
