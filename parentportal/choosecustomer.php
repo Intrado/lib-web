@@ -13,11 +13,6 @@ if($result['result'] == ""){
 	$customeridlist = array();
 }
 
-$forgot = false;
-if(isset($_GET['forgot'])){
-	$forgot = true;
-}
-
 if(isset($customeridlist) && !(count($customeridlist) > 1)){
 	if(count($customeridlist) == 1){
 		$_SESSION['customerid'] = $customeridlist[0];
@@ -30,17 +25,8 @@ if(isset($customeridlist) && !(count($customeridlist) > 1)){
 	} else {
 		$_SESSION['custname'] = "";
 	}
-	if(!$error){
-		if($forgot)
-			redirect("account.php");
-		else
-			redirect("start.php");
-	}
+	redirect("start.php");
 }
-
-//redirect to "my account" if user forgot password.  Have them choose the customer after they've fixed their password.
-if($forgot)
-	redirect("account.php");
 
 if(isset($_GET['customerid']) && $_GET['customerid']){
 	$_SESSION['customerid'] = $_GET['customerid']+0;
