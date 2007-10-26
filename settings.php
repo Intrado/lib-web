@@ -135,7 +135,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
 				if(getSystemSetting("_hasportal") && $USER->authorize('portalaccess')){
 					for($i = 0; $i < $maxphones; $i++){
-						setSetting('lockedPhone' . $i, GetFormData($f, $s, 'lockedPhone' . $i));
+						setSetting('lockedphone' . $i, GetFormData($f, $s, 'lockedphone' . $i));
 					}
 					setSetting('tokenlife', GetFormData($f, $s, 'tokenlife'));
 				}
@@ -186,7 +186,7 @@ if( $reloadform )
 	}
 
 	for($i=0; $i < $maxphones; $i++){
-		PutFormData($f, $s, "lockedPhone" . $i, getSystemSetting('lockedPhone' . $i, 0), "bool", 0, 1);
+		PutFormData($f, $s, "lockedphone" . $i, getSystemSetting('lockedphone' . $i, 0), "bool", 0, 1);
 	}
 	PutFormData($f, $s, "tokenlife", getSetting('tokenlife', 30), 'number', 0, 365);
 }
@@ -438,7 +438,7 @@ startWindow('Global System Settings');
 									?>
 									<tr>
 										<td width="30%">Phone <?=$i+1?> locked from portal access </td>
-										<td><? NewFormItem($f, $s, "lockedPhone" . $i, "checkbox");?></td>
+										<td><? NewFormItem($f, $s, "lockedphone" . $i, "checkbox");?></td>
 									</tr>
 									<?
 								}
