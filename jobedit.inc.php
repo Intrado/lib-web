@@ -222,8 +222,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			// make sure we don't resave these options on an already submitted or completed job
 			if(!$submittedmode && !$completedmode) {
-				$job->setOption("callall",GetFormData($f,$s,"callall"));
-				$job->setOption("callfirst",!GetFormData($f,$s,"callall"));
 				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
 				$job->setOption("skipsmsduplicates",GetFormData($f,$s,"skipsmsduplicates"));
@@ -347,7 +345,6 @@ if( $reloadform )
 	PopulateForm($f,$s,$job,$fields);
 
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
-	PutFormData($f,$s,"callall",$job->isOption("callall"), "bool",0,1);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipsmsduplicates",$job->isOption("skipsmsduplicates"), "bool",0,1);
@@ -717,10 +714,6 @@ startWindow('Job Information');
 					<tr>
 						<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
 						<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
-					</tr>
-					<tr>
-						<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
-						<td><? NewFormItem($f,$s,"callall","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Call All Phone Numbers</td>
 					</tr>
 					<? if($USER->authorize('leavemessage')) { ?>
 						<tr>
