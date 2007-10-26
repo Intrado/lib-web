@@ -119,17 +119,15 @@ function copyContactData($mainpid, $otherpids = array(), $lockedphones){
 		foreach($mainContactPrefs as $type => $sequencePrefs){
 			foreach($sequencePrefs as $sequence => $jobtypePrefs){
 				foreach($jobtypePrefs as $jobtypeid => $enabled){
-					if(!$jobtype->issurvey){
-						QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-										values ('" . $pid . "','" . $jobtypeid . "','" . $type . "','" . $sequence . "','" 
-										. $enabled . "') 
-										on duplicate key update
-										personid = '" . $pid . "',
-										jobtypeid = '" . $jobtypeid . "',
-										type = '" . $type . "',
-										sequence = '" . $sequence . "',
-										enabled = '" . $enabled . "'");
-					}
+					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+									values ('" . $pid . "','" . $jobtypeid . "','" . $type . "','" . $sequence . "','" 
+									. $enabled . "') 
+									on duplicate key update
+									personid = '" . $pid . "',
+									jobtypeid = '" . $jobtypeid . "',
+									type = '" . $type . "',
+									sequence = '" . $sequence . "',
+									enabled = '" . $enabled . "'");
 				}
 			}
 		}
@@ -195,13 +193,19 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 	}
 }
 
-function checkEmergencyPhone($f, $s){
+function checkEmergencyPhone($f, $s, $phones){
 	$hasemergency = false;
 	$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = '1'");
 	$maxphones = getSystemSetting("maxphones");
-	
+	$lockedphones = array();
 	for($i=0; $i < $maxphones; $i++){
-		if(GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid) && GetFormData($f, $s, "phone" . $i) !== "" ){
+		$lockedphones[$i] = getSystemSetting("lockedphone" . $i, 0);
+	}
+	for($i=0; $i < $maxphones; $i++){
+		if(!$lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid) && GetFormData($f, $s, "phone" . $i) !== "") {
+			$hasemergency=true;
+			break;
+		} else if ($lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid) && $phones[$i]->phone){
 			$hasemergency=true;
 			break;
 		}
