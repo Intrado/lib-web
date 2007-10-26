@@ -85,6 +85,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error('Customer URL\'s cannot be shorter than 5 unless their account was already made');
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
+			} else if(GetFormData($f, $s, "timeslice") == ""){
+				error("Timeslice cannot be blank");
 			} else {
 
 				QuickUpdate("update customer set
@@ -137,7 +139,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_managernote', $managernote, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
-				setCustomerSystemSetting('_emergencyonly', GetFormData($f, $s, 'emergencyonly'), $custdb);
+				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
 				
 
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
@@ -200,7 +202,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"emergencyonly", getCustomerSystemSetting('_emergencyonly', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 150, 900);
 
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
@@ -241,9 +243,10 @@ NewForm($f);
 <tr><td>AutoReport Name: </td><td><? NewFormItem($f,$s,'autoname','text',25,50); ?></td></tr>
 <tr><td>AutoReport Email: </td><td><? NewFormItem($f,$s,'autoemail','text',25,255); ?></td></tr>
 <tr><td>Survey URL: </td><td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100); ?></td></tr>
-<tr><td>Max Phones: </td><td> <? NewFormItem($f, $s, 'maxphones', 'text', 25, 255) ?></td></tr>
-<tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 25, 255) ?></td></tr>
-<tr><td>Max Smses: </td><td> <? NewFormItem($f, $s, 'maxsms', 'text', 25, 255) ?></td></tr>
+<tr><td>Max Phones: </td><td> <? NewFormItem($f, $s, 'maxphones', 'text', 3) ?></td></tr>
+<tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 3) ?></td></tr>
+<tr><td>Max SMS: </td><td> <? NewFormItem($f, $s, 'maxsms', 'text', 3) ?></td></tr>
+<tr><td>Timeslice(Min 150): </td><td> <? NewFormItem($f, $s, 'timeslice', 'text', 3) ?></td></tr>
 <tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
 <tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
@@ -259,7 +262,6 @@ NewForm($f);
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
 <tr><td> Has Portal </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?></td></tr>
-<tr><td> Emergency Only: </td><td><? NewFormItem($f, $s, 'emergencyonly', 'checkbox') ?></td></tr>
 <tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!</b></td></tr>
 
 <tr><td>Retry:
