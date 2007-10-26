@@ -89,8 +89,7 @@ include_once("popup.inc.php");
 buttons(button('Done', 'window.close()'));
 
 
-if (count($fields) > 0) {
-	startWindow('Message Information', 'padding: 3px;');
+startWindow('Message Information', 'padding: 3px;');
 ?>
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>
@@ -115,8 +114,7 @@ if (count($fields) > 0) {
 		</tr>
 	</table>
 <?
-	endWindow();
-}
+endWindow();
 
 
 startWindow('Message Preview', 'padding: 3px;');
