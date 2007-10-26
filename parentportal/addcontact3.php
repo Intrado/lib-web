@@ -89,7 +89,7 @@ if($PERSONID){
 	}
 	$lockedphones= array();
 	for($i=0; $i < $maxphones; $i++){
-		$lockedphones[$i] = getSystemSetting("lockedPhone" . $i);
+		$lockedphones[$i] = getSystemSetting("lockedphone" . $i);
 	}
 
 	$contactprefs = getContactPrefs($PERSONID);
@@ -118,7 +118,7 @@ if($PERSONID){
 			if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
-				if(!checkEmergencyPhone($f, $s)){
+				if(!checkEmergencyPhone($f, $s, $phones)){
 					error("You must have at least one phone number that can receive emergency calls");
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
