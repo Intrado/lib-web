@@ -11,7 +11,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error("That is not a valid email address");
 	} else {
 		$result = portalForgotPassword($email);
-		if($result == ""){
+		if($result['result'] == ""){
 			$success = true;
 		} else {
 			$emailnotfound = true;
