@@ -21,6 +21,10 @@ if(isset($customeridlist) && !(count($customeridlist) > 1)){
 		if($result['result'] != ""){
 			error("An error occurred, please try again");
 			$error = 1;
+		} else {
+			$_SESSION['timezone'] = getSystemSetting("timezone");
+			@date_default_timezone_set($_SESSION['timezone']);
+			QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 		}
 	} else {
 		$_SESSION['custname'] = "";
@@ -36,8 +40,11 @@ if(isset($_GET['customerid']) && $_GET['customerid']){
 		error("An error occurred, please try again");
 		$error = 1;
 	}
-	if(!$error)
+	if(!$error){
+		$_SESSION['timezone'] = getSystemSetting("timezone");
+		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 		redirect("start.php");
+	}
 }
 
 if(isset($_GET['logoutcustomer'])){
@@ -47,10 +54,10 @@ if(isset($_GET['logoutcustomer'])){
 
 
 $PAGE = ":";
-$TITLE = "Parent Portal Login";
+$TITLE = "Choose A District/School";
 $hidenav = 1;
 include_once("nav.inc.php");
-startWindow("Choose District/School");
+startWindow("Districts/Schools");
 ?>
 <br>You have students in multiple districts/schools
 <br>Please choose one of the districts/schools you are associated with:
