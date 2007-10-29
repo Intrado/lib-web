@@ -58,13 +58,17 @@ function message_action($row, $index){
 	//index 1 is job id
 	//index 8 is person id
 	//index 4 is type
-	if($row[4] == "phone"){
-		return button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "', 400, 500);",null);
-	} if($row[4] == "email"){
-		return button("Read", "popup('previewemail.php?jobid=" . $row[1] . "&personid=" . $row[8] . "', 400, 500);",null);
-	} else {
-		return "";
+	$types = explode(",",$row[4]);
+	if(in_array("phone", $types) && in_array("email", $types)){
+		return button_bar(button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=phone', 400, 500);",null), button("Read", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=email', 400, 500);",null));
 	}
+	if(in_array("phone", $types)){
+		return button_bar(button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=phone', 400, 500);",null));
+	}
+	if(in_array("email", $types)){
+		return button_bar(button("Read", "popup('previewemail.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=email', 400, 500);",null));
+	}
+	return "&nbsp;";
 }
 
 function format_type($row, $index){
@@ -80,7 +84,8 @@ function sender($row, $index){
 	//index 6 is last name
 	//index 4 is type
 	//index 9 is email
-	if($row[4] == 'email'){
+	$types = explode(",",$row[4]);
+	if(in_array("email", $types)){
 		return "<a href='mailto:" . $row[9] . "'>" . $row[5] . " " . $row[6] . "</a>";
 	} else {
 		return $row[5] . " " . $row[6];
