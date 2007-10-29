@@ -19,13 +19,10 @@ if(isset($_GET['clear'])){
 	redirect();
 }
 
-if(getSystemSetting('_emergencyonly')){
-	$systemprioritynames = array("1" => "Emergency");
-} else {
-	$systemprioritynames = array("1" => "Emergency",
-								"2" => "High Priority",
-								"3" => "General");
-}
+$systemprioritynames = array("1" => "Emergency",
+							"2" => "High Priority",
+							"3" => "General");
+
 foreach($systemprioritynames as $index => $name){
 	$types[$index] = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '" . $index . "' and not issurvey order by name");
 }
@@ -80,15 +77,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f
 						}
 					}
 				}
-				if(!getSystemSetting('_emergencyonly')){
-					// new jobtype for high priority
-					getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 2);
-					
-					// new jobtype for general priority
-					getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3);
-				}
+				// new jobtype for high priority
+				getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 2);
+				
+				// new jobtype for general priority
+				getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3);
 
-			} else if(GetFormData($f, $s, "joborsurvey") == "survey" && !getSystemSetting('_emergencyonly')){
+			} else if(GetFormData($f, $s, "joborsurvey") == "survey"){
 				foreach($surveytypes as $surveytype){
 					if(CheckFormSubmit($f, 'delete') !== false &&
 						CheckFormSubmit($f, 'delete') == $surveytype->id){
@@ -102,9 +97,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f
 				getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3, true);
 
 			}
-			if(!getSystemSetting('_emergencyonly')){
-				$_SESSION['jobtypemanagement']['radio'] = GetFormData($f, $s, "joborsurvey");
-			}
+			$_SESSION['jobtypemanagement']['radio'] = GetFormData($f, $s, "joborsurvey");
 			redirect();
 
 		}
@@ -120,18 +113,16 @@ if($reloadform){
 			putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtypeprefs);
 		}
 	}
-	if(!getSystemSetting('_emergencyonly')){
-		PutFormData($f, $s, "joborsurvey", isset($_SESSION['jobtypemanagement']['radio']) ? $_SESSION['jobtypemanagement']['radio'] : "job");
-	
-		foreach($surveytypes as $surveytype){
-			putJobtypeForm($f, $s, $surveytype, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 3);
-		}
-		putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 3, true);
-		if(count($types[2]) < $maxhighpriorities){
-			putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 2);
-		}
-		putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 3);
+	PutFormData($f, $s, "joborsurvey", isset($_SESSION['jobtypemanagement']['radio']) ? $_SESSION['jobtypemanagement']['radio'] : "job");
+
+	foreach($surveytypes as $surveytype){
+		putJobtypeForm($f, $s, $surveytype, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 3);
 	}
+	putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 3, true);
+	if(count($types[2]) < $maxhighpriorities){
+		putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 2);
+	}
+	putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 3);
 	
 }
 
@@ -142,10 +133,8 @@ include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, "Save"));
 startWindow("Jobtypes");
-if(!getSystemSetting('_emergencyonly')){
-	?><div><? NewFormItem($f, $s, "joborsurvey", "radio", null, "job", "id=\"jobtype\" onclick=' hide(\"surveyjobtypes\"); show(\"normaljobtypes\")'")?>Normal Jobtypes<div><?
-	?><div><? NewFormItem($f, $s, "joborsurvey", "radio", null, "survey", "onclick='hide(\"normaljobtypes\"); show(\"surveyjobtypes\")'")?>Survey Jobtypes<div><?
-}
+?><div><? NewFormItem($f, $s, "joborsurvey", "radio", null, "job", "id=\"jobtype\" onclick=' hide(\"surveyjobtypes\"); show(\"normaljobtypes\")'")?>Normal Jobtypes<div><?
+?><div><? NewFormItem($f, $s, "joborsurvey", "radio", null, "survey", "onclick='hide(\"normaljobtypes\"); show(\"surveyjobtypes\")'")?>Survey Jobtypes<div><?
 ?><div id="normaljobtypes"><?
 foreach($systemprioritynames as $index => $name){
 ?>
@@ -165,12 +154,10 @@ foreach($systemprioritynames as $index => $name){
 						continue;
 					displayJobtypeForm($f, $s, $type->id, $maxphones, $maxemails, $maxsms, false);
 				}
-				if(!getSystemSetting('_emergencyonly')){
-					if($index == 2 && count($types[2]) < $maxhighpriorities)
-						displayJobtypeForm($f, $s, "_newhigh_", $maxphones, $maxemails, $maxsms,"new_high");
-					if($index == 3){
-						displayJobtypeForm($f, $s, "_new_", $maxphones, $maxemails, $maxsms, "new");
-					}
+				if($index == 2 && count($types[2]) < $maxhighpriorities)
+					displayJobtypeForm($f, $s, "_newhigh_", $maxphones, $maxemails, $maxsms,"new_high");
+				if($index == 3){
+					displayJobtypeForm($f, $s, "_new_", $maxphones, $maxemails, $maxsms, "new");
 				}
 ?>
 			</tr>
@@ -181,7 +168,6 @@ foreach($systemprioritynames as $index => $name){
 </div>
 <?
 
-if(!getSystemSetting('_emergencyonly')){
 ?>
 	<div id="surveyjobtypes" style="display:none">
 		<br>
@@ -212,7 +198,6 @@ if(!getSystemSetting('_emergencyonly')){
 		}
 	</script>
 <?
-}
 endWindow();
 buttons();
 endForm();
