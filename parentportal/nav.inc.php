@@ -115,10 +115,10 @@ doNavTabs($NAVTREE);
 ?>
 <html>
 <head>
-	<title>SchoolMessenger Parent Portal: <?= $PAGETITLE ?></title>
-	<script src='../script/utils.js'></script>
-	<script src='../script/nav.js'></script>
-	<script src='../script/sorttable.js'></script>
+	<title>SchoolMessenger Contact Manager: <?= $PAGETITLE ?></title>
+	<script src='script/utils.js'></script>
+	<script src='script/nav.js'></script>
+	<script src='script/sorttable.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 	<link href='css/style.css' type='text/css' rel='stylesheet' media='screen'>
 </head>
