@@ -30,6 +30,7 @@ if($PERSONID){
 								echo "&nbsp;";
 						}
 					?>
+					</td>
 <?
 						displayJobtypeForm($f, $s, "phone", $phone->sequence, $jobtypes);
 ?>									
@@ -43,9 +44,16 @@ if($PERSONID){
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Email <?=$email->sequence+1?>: </th>
 					<td class="bottomBorder" >
-						<div style="float:left"><? NewFormItem($f, $s, "email" . $email->sequence, "text", 40, 100, 'id="email' . $email->sequence . '"'); ?></div>
-						<?=button("Copy Email", "var email=new getObj('email" . $email->sequence . "').obj; email.value='" . $_SESSION['portaluser']['portaluser.username'] . "'") ?>
-						
+						<? 
+							if(!$lockedemails[$email->sequence]){ 
+								NewFormItem($f, $s, "email" . $email->sequence, "text", 40, 100, 'id="email' . $email->sequence . '"');
+							} else {
+								if($email->email)
+									echo $email->email;
+								else
+									echo "&nbsp;";
+							}
+						?>
 					</td>
 <?
 					displayJobtypeForm($f, $s, "email", $email->sequence, $jobtypes);
@@ -60,7 +68,18 @@ if($PERSONID){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">SMS <?=$sms->sequence+1?>:</th>
-					<td class="bottomBorder" ><? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 14); ?></td>
+					<td class="bottomBorder" >
+						<? 
+							if(!$lockedsms[$sms->sequence]){
+								NewFormItem($f, $s, "sms" . $sms->sequence, "text", 14);
+							} else {
+								if($sms->sms)
+									echo Phone::format($sms->sms);
+								else
+									echo "&nbsp;";
+							}
+						?>
+					</td>
 <?
 					displayJobtypeForm($f, $s, "sms", $sms->sequence, $jobtypes);
 ?>									
@@ -71,6 +90,7 @@ if($PERSONID){
 ?>
 	</table>
 	<div><? NewFormItem($f, $s, "savetoall", "checkbox"); ?> Save To All Contacts</div>
+	<br>
 <?
 	
 	echo submit($f, $s, "Save");

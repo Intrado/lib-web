@@ -10,9 +10,14 @@ function getContacts($portaluserid) {
 }
 
 //put form data for contact details
-function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes){
+function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked){
+	$lockedphones = $locked['phones'];
+	$lockedemails = $locked['emails'];
+	$lockedsms = $locked['sms'];
 	foreach($emails as $email){
-		PutFormData($f, $s, "email" . $email->sequence, $email->email, "email", 0, 100);
+		if(!$lockedemails[$email->sequence]){
+			PutFormData($f, $s, "email" . $email->sequence, $email->email, "email", 0, 100);
+		}
 		foreach($jobtypes as $jobtype){
 			$contactpref = 0;
 			if(isset($contactprefs["email"][$email->sequence][$jobtype->id]))
@@ -23,7 +28,9 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 		}
 	}
 	foreach($phones as $phone){
-		PutFormData($f, $s, "phone" . $phone->sequence, Phone::format($phone->phone), "phone", 10);
+		if(!$lockedphones[$phone->sequence]){
+			PutFormData($f, $s, "phone" . $phone->sequence, Phone::format($phone->phone), "phone", 10);
+		}
 		foreach($jobtypes as $jobtype){
 			$contactpref = 0;
 			if(isset($contactprefs["phone"][$phone->sequence][$jobtype->id]))
@@ -35,7 +42,9 @@ function putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $ph
 	}
 	if(getSystemSetting("_hassms")){
 		foreach($smses as $sms){
-			PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->sms), "phone", 0, 10);
+			if(!$lockedsms[$sms->sequence]){
+				PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->sms), "phone", 0, 10);
+			}
 			foreach($jobtypes as $jobtype){
 				if(!$jobtype->issurvey){
 					$contactpref = 0;
@@ -82,8 +91,11 @@ function displayEnabledJobtypes($contactprefs, $defaultcontactprefs, $type, $seq
 }
 
 //copies contact details and preferences of main person to all persons in otherpids
-function copyContactData($mainpid, $otherpids = array(), $lockedphones){
-	
+function copyContactData($mainpid, $otherpids = array(), $locked){
+
+	$lockedphones = $locked['phones'];
+	$lockedemails = $locked['emails'];
+	$lockedsms = $locked['sms'];
 	$mainphones = QuickQueryList("select sequence, phone from phone where personid = '" . $mainpid . "'", true);
 	$mainemails = QuickQueryList("select sequence, email from email where personid = '" . $mainpid . "'", true);
 	if(getSystemSetting("_hassms")){
@@ -105,15 +117,19 @@ function copyContactData($mainpid, $otherpids = array(), $lockedphones){
 			}
 		}
 		foreach($emails as $email){
-			$email->email = $mainemails[$email->sequence];
-			$email->editlock = 1;
-			$email->update();
+			if(!$lockedemails[$email->sequence]){
+				$email->email = $mainemails[$email->sequence];
+				$email->editlock = 1;
+				$email->update();
+			}
 		}
 		if(getSystemSetting("_hassms")){
 			foreach($smses as $sms){
-				$sms->sms = $mainsmses[$sms->sequence];
-				$sms->editlock = 1;
-				$sms->update();
+				if(!$lockedsms[$sms->sequence]){
+					$sms->sms = $mainsmses[$sms->sequence];
+					$sms->editlock = 1;
+					$sms->update();
+				}
 			}
 		}
 		foreach($mainContactPrefs as $type => $sequencePrefs){
@@ -135,8 +151,10 @@ function copyContactData($mainpid, $otherpids = array(), $lockedphones){
 }
 
 //Gets form data and updates contact details
-function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes){
-	global $lockedphones;
+function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked){
+	$lockedphones = $locked['phones'];
+	$lockedemails = $locked['emails'];
+	$lockedsms = $locked['sms'];
 	foreach($phones as $phone){
 		if(!$lockedphones[$phone->sequence]){
 			$phone->phone = Phone::parse(GetFormData($f, $s, "phone" . $phone->sequence));
@@ -156,9 +174,11 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 		}
 	}
 	foreach($emails as $email){
-		$email->email = GetFormData($f, $s, "email" . $email->sequence);
-		$email->editlock = 1;
-		$email->update();
+		if(!$lockedemails[$email->sequence]){
+			$email->email = GetFormData($f, $s, "email" . $email->sequence);
+			$email->editlock = 1;
+			$email->update();
+		}
 		foreach($jobtypes as $jobtype){
 			QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
 						values ('" . $PERSONID . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
@@ -173,9 +193,11 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 	}
 	if(getSystemSetting("_hassms")){
 		foreach($smses as $sms){
-			$sms->sms = Phone::parse(GetFormData($f, $s, "sms" . $sms->sequence));
-			$sms->editlock = 1;
-			$sms->update();
+			if(!$lockedsms[$sms->sequence]){
+				$sms->sms = Phone::parse(GetFormData($f, $s, "sms" . $sms->sequence));
+				$sms->editlock = 1;
+				$sms->update();
+			}
 			foreach($jobtypes as $jobtype){
 				if(!$jobtype->issurvey){
 					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
@@ -211,5 +233,23 @@ function checkEmergencyPhone($f, $s, $phones){
 		}
 	}
 	return $hasemergency;
+}
+
+function getLockedDestinations($maxphones, $maxemails, $maxsms){
+	$lockedphones= array();	
+	for($i=0; $i < $maxphones; $i++){
+		$lockedphones[$i] = getSystemSetting("lockedphone" . $i, 0);
+	}
+	$lockedemails= array();
+	for($i=0; $i < $maxemails; $i++){
+		$lockedemails[$i] = getSystemSetting("lockedemail" . $i, 0);
+	}
+	$lockedsmses= array();
+	for($i=0; $i < $maxsms; $i++){
+		$lockedsmses[$i] = getSystemSetting("lockedsms" . $i, 0);
+	}
+	return array("phones" => $lockedphones, 
+				"emails" => $lockedemails,
+				"sms" => $lockedsmses);
 }
 ?>

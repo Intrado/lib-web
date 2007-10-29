@@ -63,10 +63,10 @@ if($PERSONID){
 	} else {
 		$smses = array();
 	}
-	$lockedphones= array();
-	for($i=0; $i < $maxphones; $i++){
-		$lockedphones[$i] = getSystemSetting("lockedphone" . $i);
-	}
+	$locked = getLockedDestinations($maxphones, $maxemails, $maxsms);
+	$lockedphones = $locked['phones'];
+	$lockedemails = $locked['emails'];
+	$lockedsms = $locked['sms'];
 
 	$contactprefs = getContactPrefs($PERSONID);
 	$defaultcontactprefs = getDefaultContactPrefs();
@@ -97,14 +97,14 @@ if($PERSONID){
 				if(!checkEmergencyPhone($f, $s, $phones)){
 					error("You must have at least one valid phone number that can receive emergency calls");
 				} else {
-					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes);
+					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
 					
 					if(GetFormData($f, $s, "savetoall")){
 						//Fetch all person id's associated with this user on this customer
 						//then remove the current person id from the list
 						$otherContacts = getContactIDs($_SESSION['portaluserid']);
 						unset($otherContacts[array_search($PERSONID, $otherContacts)]);
-						copyContactData($PERSONID, $otherContacts, $lockedphones);
+						copyContactData($PERSONID, $otherContacts, $locked);
 					}
 					redirect();
 				}
@@ -118,7 +118,7 @@ if($PERSONID){
 	{
 		ClearFormData($f);
 		PutFormData($f, $s, "savetoall", "1", "bool", 0, 1);
-		putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes);
+		putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked);
 	}
 }
 
