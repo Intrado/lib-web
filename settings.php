@@ -57,6 +57,8 @@ function setSetting($name, $value) {
 }
 
 $maxphones = getSystemSetting("maxphones", 3);
+$maxemails = getSystemSetting("maxemails", 2);
+$maxsms = getSystemSetting("maxsms", 2);
 
 /****************** main message section ******************/
 
@@ -137,6 +139,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 					for($i = 0; $i < $maxphones; $i++){
 						setSetting('lockedphone' . $i, GetFormData($f, $s, 'lockedphone' . $i));
 					}
+					for($i = 0; $i < $maxemails; $i++){
+						setSetting('lockedemail' . $i, GetFormData($f, $s, 'lockedemail' . $i));
+					}
+					for($i = 0; $i < $maxsms; $i++){
+						setSetting('lockedsms' . $i, GetFormData($f, $s, 'lockedsms' . $i));
+					}
 					setSetting('tokenlife', GetFormData($f, $s, 'tokenlife'));
 				}
 
@@ -187,6 +195,12 @@ if( $reloadform )
 
 	for($i=0; $i < $maxphones; $i++){
 		PutFormData($f, $s, "lockedphone" . $i, getSystemSetting('lockedphone' . $i, 0), "bool", 0, 1);
+	}
+	for($i=0; $i < $maxemails; $i++){
+		PutFormData($f, $s, "lockedemail" . $i, getSystemSetting('lockedemail' . $i, 0), "bool", 0, 1);
+	}
+	for($i=0; $i < $maxsms; $i++){
+		PutFormData($f, $s, "lockedsms" . $i, getSystemSetting('lockedsms' . $i, 0), "bool", 0, 1);
 	}
 	PutFormData($f, $s, "tokenlife", getSetting('tokenlife', 30), 'number', 0, 365);
 }
@@ -439,6 +453,22 @@ startWindow('Global System Settings');
 									<tr>
 										<td width="30%">Phone <?=$i+1?> locked from portal access </td>
 										<td><? NewFormItem($f, $s, "lockedphone" . $i, "checkbox");?></td>
+									</tr>
+									<?
+								}
+								for($i=0; $i<$maxemails; $i++){
+									?>
+									<tr>
+										<td width="30%">Email <?=$i+1?> locked from portal access </td>
+										<td><? NewFormItem($f, $s, "lockedemail" . $i, "checkbox");?></td>
+									</tr>
+									<?
+								}
+								for($i=0; $i<$maxsms; $i++){
+									?>
+									<tr>
+										<td width="30%">SMS <?=$i+1?> locked from portal access </td>
+										<td><? NewFormItem($f, $s, "lockedsms" . $i, "checkbox");?></td>
 									</tr>
 									<?
 								}
