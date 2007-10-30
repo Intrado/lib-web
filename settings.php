@@ -91,23 +91,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				error('There was an error parsing the setting', implode("",$errors));
 			} else {
 				//submit changes
-				if(isset($_POST['jobtype']) && $types = $_POST['jobtype']) {
-					foreach($types as $id => $name) {
-						$name = DBSafe($name);
-						$id = DBSafe($id);
-						$systempriority = isset($_POST['systempriority'][$id]) ? 0 + $_POST['systempriority'][$id] : "3";
-
-						if($id == 'new' && $name) {
-							$query = "insert into jobtype (name, systempriority) values ('$name','$systempriority')";
-							QuickUpdate($query);
-						} else {
-							if (customerOwns("jobtype",$id)) {
-								$query = "update jobtype set name = '$name' , systempriority='$systempriority' where id = '$id'";
-								QuickUpdate($query);
-							}
-						}
-					}
-				}
 				$custname= GetFormData($f, $s, 'custdisplayname');
 				if($custname != "" || $custname != $_SESSION['custname']){
 					setSetting('displayname', $custname);
