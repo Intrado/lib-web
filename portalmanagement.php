@@ -304,4 +304,11 @@ function fmt_activation_code($row, $index){
 	return $row[$index];
 
 }
+
+function fmt_activation_date($row, $index){
+	if($row[$index]){
+		return date("M d, Y", strtotime($row[$index]));
+	}
+	return "";
+}
 ?>
