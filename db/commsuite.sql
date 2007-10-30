@@ -1,20 +1,20 @@
 -- phpMyAdmin SQL Dump
 -- version 2.9.1.1
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Sep 10, 2007 at 04:33 PM
 -- Server version: 5.0.27
 -- PHP Version: 5.2.0
--- 
+--
 -- Database: `commsuite`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `access`
--- 
+--
 
 CREATE TABLE `access` (
   `id` int(11) NOT NULL auto_increment,
@@ -22,14 +22,14 @@ CREATE TABLE `access` (
   `description` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `id` (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `address`
--- 
+--
 
 CREATE TABLE `address` (
   `id` int(11) NOT NULL auto_increment,
@@ -43,14 +43,14 @@ CREATE TABLE `address` (
   `editlock` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `personid` (`personid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `audiofile`
--- 
+--
 
 CREATE TABLE `audiofile` (
   `id` int(11) NOT NULL auto_increment,
@@ -62,14 +62,14 @@ CREATE TABLE `audiofile` (
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `list` (`userid`,`deleted`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `blockednumber`
--- 
+--
 
 CREATE TABLE `blockednumber` (
   `id` int(11) NOT NULL auto_increment,
@@ -78,14 +78,14 @@ CREATE TABLE `blockednumber` (
   `pattern` varchar(10) NOT NULL default '',
   `type` enum('call','sms','both') NOT NULL default 'both',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `content`
--- 
+--
 
 CREATE TABLE `content` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -97,9 +97,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `customer`
--- 
+--
 
 CREATE TABLE `customer` (
   `id` int(11) NOT NULL auto_increment,
@@ -114,14 +114,14 @@ CREATE TABLE `customer` (
   PRIMARY KEY  (`id`),
   KEY `urlcomponent` (`urlcomponent`),
   KEY `inboundnumber` (`inboundnumber`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `email`
--- 
+--
 
 CREATE TABLE `email` (
   `id` int(11) NOT NULL auto_increment,
@@ -131,14 +131,14 @@ CREATE TABLE `email` (
   `editlock` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `personid` (`personid`,`sequence`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20003 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20003
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `fieldmap`
--- 
+--
 
 CREATE TABLE `fieldmap` (
   `id` int(11) NOT NULL auto_increment,
@@ -147,14 +147,14 @@ CREATE TABLE `fieldmap` (
   `options` text NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `getfieldname` (`fieldnum`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `import`
--- 
+--
 
 CREATE TABLE `import` (
   `id` int(11) NOT NULL auto_increment,
@@ -174,14 +174,14 @@ CREATE TABLE `import` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uploadkey` (`uploadkey`),
   KEY `scheduleid` (`scheduleid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `importfield`
--- 
+--
 
 CREATE TABLE `importfield` (
   `id` int(11) NOT NULL auto_increment,
@@ -189,28 +189,28 @@ CREATE TABLE `importfield` (
   `mapto` varchar(4) NOT NULL default '',
   `mapfrom` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `importjob`
--- 
+--
 
 CREATE TABLE `importjob` (
   `id` int(11) NOT NULL auto_increment,
   `importid` int(11) NOT NULL,
   `jobid` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `importqueue`
--- 
+--
 
 CREATE TABLE `importqueue` (
   `id` int(11) NOT NULL auto_increment,
@@ -218,14 +218,14 @@ CREATE TABLE `importqueue` (
   `localimportid` int(11) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `import` (`customerid`,`localimportid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `job`
--- 
+--
 
 CREATE TABLE `job` (
   `id` int(11) NOT NULL auto_increment,
@@ -262,14 +262,14 @@ CREATE TABLE `job` (
   KEY `startdate_2` (`startdate`,`enddate`,`starttime`,`endtime`,`id`),
   KEY `scheduleid` (`scheduleid`),
   KEY `ranautoreport` (`ranautoreport`,`status`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=21 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=21
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `joblanguage`
--- 
+--
 
 CREATE TABLE `joblanguage` (
   `id` int(11) NOT NULL auto_increment,
@@ -279,14 +279,14 @@ CREATE TABLE `joblanguage` (
   `language` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `jobid` (`jobid`,`language`(50))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobsetting`
--- 
+--
 
 CREATE TABLE `jobsetting` (
   `jobid` int(11) NOT NULL,
@@ -298,9 +298,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobstatdata`
--- 
+--
 
 CREATE TABLE `jobstatdata` (
   `jobid` int(11) NOT NULL,
@@ -316,9 +316,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobstats`
--- 
+--
 
 CREATE TABLE `jobstats` (
   `jobid` int(11) NOT NULL,
@@ -329,9 +329,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtaskactive`
--- 
+--
 
 CREATE TABLE `jobtaskactive` (
   `id` bigint(20) NOT NULL,
@@ -346,9 +346,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtaskcomplete`
--- 
+--
 
 CREATE TABLE `jobtaskcomplete` (
   `id` bigint(20) NOT NULL,
@@ -364,9 +364,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtype`
--- 
+--
 
 CREATE TABLE `jobtype` (
   `id` int(11) NOT NULL auto_increment,
@@ -377,27 +377,27 @@ CREATE TABLE `jobtype` (
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `customerid` (`priority`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `language`
--- 
+--
 
 CREATE TABLE `language` (
   `id` int(11) NOT NULL auto_increment,
   `name` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `leasetask`
--- 
+--
 
 CREATE TABLE `leasetask` (
   `taskuuid` bigint(20) NOT NULL,
@@ -408,9 +408,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `list`
--- 
+--
 
 CREATE TABLE `list` (
   `id` int(11) NOT NULL auto_increment,
@@ -421,14 +421,14 @@ CREATE TABLE `list` (
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`,`name`,`deleted`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `listentry`
--- 
+--
 
 CREATE TABLE `listentry` (
   `id` int(11) NOT NULL auto_increment,
@@ -438,14 +438,14 @@ CREATE TABLE `listentry` (
   `personid` int(11) default NULL,
   PRIMARY KEY  (`id`),
   KEY `type` (`personid`,`listid`,`type`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `message`
--- 
+--
 
 CREATE TABLE `message` (
   `id` int(11) NOT NULL auto_increment,
@@ -458,14 +458,14 @@ CREATE TABLE `message` (
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`,`type`,`deleted`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=24 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=24
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `messagepart`
--- 
+--
 
 CREATE TABLE `messagepart` (
   `id` int(11) NOT NULL auto_increment,
@@ -484,9 +484,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `permission`
--- 
+--
 
 CREATE TABLE `permission` (
   `id` int(11) NOT NULL auto_increment,
@@ -494,14 +494,14 @@ CREATE TABLE `permission` (
   `name` varchar(50) NOT NULL default '',
   `value` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=72 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=72
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `person`
--- 
+--
 
 CREATE TABLE `person` (
   `id` int(11) NOT NULL auto_increment,
@@ -557,14 +557,14 @@ CREATE TABLE `person` (
   KEY `f18` (`f18`(20)),
   KEY `f19` (`f19`(20)),
   KEY `f20` (`f20`(20))
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10002 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10002
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `persondatavalues`
--- 
+--
 
 CREATE TABLE `persondatavalues` (
   `id` int(11) NOT NULL auto_increment,
@@ -574,14 +574,14 @@ CREATE TABLE `persondatavalues` (
   PRIMARY KEY  (`id`),
   KEY `valuelookup` (`value`(50)),
   KEY `name` (`fieldnum`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=81 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=81
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `phone`
--- 
+--
 
 CREATE TABLE `phone` (
   `id` int(11) NOT NULL auto_increment,
@@ -593,14 +593,14 @@ CREATE TABLE `phone` (
   PRIMARY KEY  (`id`),
   KEY `personid` (`personid`,`sequence`),
   KEY `dedupe` (`phone`,`sequence`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30004 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30004
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjob`
--- 
+--
 
 CREATE TABLE `qjob` (
   `customerid` int(11) NOT NULL,
@@ -636,9 +636,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjobperson`
--- 
+--
 
 CREATE TABLE `qjobperson` (
   `customerid` int(11) NOT NULL default '0',
@@ -650,9 +650,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjobsetting`
--- 
+--
 
 CREATE TABLE `qjobsetting` (
   `customerid` int(11) NOT NULL,
@@ -665,9 +665,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjobtask`
--- 
+--
 
 CREATE TABLE `qjobtask` (
   `customerid` int(11) NOT NULL default '0',
@@ -700,9 +700,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qreportsubscription`
--- 
+--
 
 CREATE TABLE `qreportsubscription` (
   `customerid` int(11) NOT NULL,
@@ -722,9 +722,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qschedule`
--- 
+--
 
 CREATE TABLE `qschedule` (
   `customerid` int(11) NOT NULL,
@@ -740,9 +740,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportcontact`
--- 
+--
 
 CREATE TABLE `reportcontact` (
   `jobid` int(11) NOT NULL,
@@ -771,9 +771,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportinstance`
--- 
+--
 
 CREATE TABLE `reportinstance` (
   `id` int(11) NOT NULL auto_increment,
@@ -782,14 +782,14 @@ CREATE TABLE `reportinstance` (
   `activefields` text,
   `instancehash` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportperson`
--- 
+--
 
 CREATE TABLE `reportperson` (
   `jobid` int(11) NOT NULL,
@@ -831,9 +831,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportsubscription`
--- 
+--
 
 CREATE TABLE `reportsubscription` (
   `id` int(11) NOT NULL auto_increment,
@@ -851,14 +851,14 @@ CREATE TABLE `reportsubscription` (
   PRIMARY KEY  (`id`),
   KEY `subscription` (`userid`,`reportinstanceid`),
   KEY `nextrun` (`nextrun`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rule`
--- 
+--
 
 CREATE TABLE `rule` (
   `id` int(11) NOT NULL auto_increment,
@@ -867,14 +867,14 @@ CREATE TABLE `rule` (
   `op` enum('eq','ne','gt','ge','lt','le','lk','sw','ew','cn','in','reldate') NOT NULL default 'eq',
   `val` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `schedule`
--- 
+--
 
 CREATE TABLE `schedule` (
   `id` int(11) NOT NULL auto_increment,
@@ -883,14 +883,14 @@ CREATE TABLE `schedule` (
   `time` time NOT NULL default '00:00:00',
   `nextrun` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `sessiondata`
--- 
+--
 
 CREATE TABLE `sessiondata` (
   `id` char(255) NOT NULL,
@@ -905,9 +905,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `setting`
--- 
+--
 
 CREATE TABLE `setting` (
   `id` int(11) NOT NULL auto_increment,
@@ -915,14 +915,14 @@ CREATE TABLE `setting` (
   `value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `lookup` (`name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `shard`
--- 
+--
 
 CREATE TABLE `shard` (
   `id` int(11) NOT NULL auto_increment,
@@ -932,14 +932,14 @@ CREATE TABLE `shard` (
   `dbusername` varchar(50) NOT NULL default '',
   `dbpassword` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `specialtask`
--- 
+--
 
 CREATE TABLE `specialtask` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -949,14 +949,14 @@ CREATE TABLE `specialtask` (
   `lastcheckin` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `status` (`status`,`type`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `specialtaskactive`
--- 
+--
 
 CREATE TABLE `specialtaskactive` (
   `id` varchar(50) collate utf8_bin NOT NULL,
@@ -970,9 +970,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `specialtaskqueue`
--- 
+--
 
 CREATE TABLE `specialtaskqueue` (
   `id` int(11) NOT NULL auto_increment,
@@ -985,14 +985,14 @@ CREATE TABLE `specialtaskqueue` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `specialtask` (`customerid`,`localspecialtaskid`),
   UNIQUE KEY `uuid` (`uuid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyquestion`
--- 
+--
 
 CREATE TABLE `surveyquestion` (
   `id` int(11) NOT NULL auto_increment,
@@ -1003,14 +1003,14 @@ CREATE TABLE `surveyquestion` (
   `reportlabel` text,
   `validresponse` tinyint(4) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyquestionnaire`
--- 
+--
 
 CREATE TABLE `surveyquestionnaire` (
   `id` int(11) NOT NULL auto_increment,
@@ -1030,14 +1030,14 @@ CREATE TABLE `surveyquestionnaire` (
   `leavemessage` tinyint(4) NOT NULL default '0',
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyresponse`
--- 
+--
 
 CREATE TABLE `surveyresponse` (
   `jobid` int(11) NOT NULL,
@@ -1050,9 +1050,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyweb`
--- 
+--
 
 CREATE TABLE `surveyweb` (
   `code` char(22) character set ascii collate ascii_bin NOT NULL,
@@ -1068,9 +1068,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `systemstats`
--- 
+--
 
 CREATE TABLE `systemstats` (
   `jobid` int(11) NOT NULL,
@@ -1088,9 +1088,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `tasksyncdata`
--- 
+--
 
 CREATE TABLE `tasksyncdata` (
   `name` varchar(50) NOT NULL,
@@ -1101,23 +1101,23 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `ttsvoice`
--- 
+--
 
 CREATE TABLE `ttsvoice` (
   `id` int(11) NOT NULL auto_increment,
   `language` varchar(20) NOT NULL default '',
   `gender` enum('male','female') NOT NULL default 'male',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `user`
--- 
+--
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL auto_increment,
@@ -1137,14 +1137,14 @@ CREATE TABLE `user` (
   `ldap` tinyint(10) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `login` (`login`,`password`,`enabled`,`deleted`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `userjobtypes`
--- 
+--
 
 CREATE TABLE `userjobtypes` (
   `userid` int(11) NOT NULL default '0',
@@ -1155,9 +1155,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `userrule`
--- 
+--
 
 CREATE TABLE `userrule` (
   `userid` int(11) NOT NULL default '0',
@@ -1167,9 +1167,9 @@ $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `usersetting`
--- 
+--
 
 CREATE TABLE `usersetting` (
   `id` int(11) NOT NULL auto_increment,
@@ -1178,14 +1178,14 @@ CREATE TABLE `usersetting` (
   `value` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `usersetting` (`userid`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
 $$$
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `voicereply`
--- 
+--
 
 CREATE TABLE `voicereply` (
   `id` int(11) NOT NULL auto_increment,
@@ -1200,7 +1200,7 @@ CREATE TABLE `voicereply` (
   KEY `jobid` (`jobid`),
   KEY `userid` (`userid`),
   KEY `replytime` (`replytime`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1
 $$$
 
 
@@ -1213,7 +1213,7 @@ AFTER INSERT ON job FOR EACH ROW
 BEGIN
 DECLARE cc INTEGER;
 DECLARE tz VARCHAR(50);
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 
 IF NEW.status IN ('repeating') THEN
   SELECT value INTO tz FROM setting WHERE name='timezone';
@@ -1235,7 +1235,7 @@ AFTER UPDATE ON job FOR EACH ROW
 BEGIN
 DECLARE cc INTEGER;
 DECLARE tz VARCHAR(50);
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 
 SELECT value INTO tz FROM setting WHERE name='timezone';
 
@@ -1262,7 +1262,7 @@ $$$
 CREATE TRIGGER delete_job
 AFTER DELETE ON job FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 -- only repeating jobs ever get deleted
 DELETE FROM qjob WHERE customerid=custid AND id=OLD.id;
 DELETE FROM qjobsetting WHERE customerid=custid AND jobid=OLD.id;
@@ -1272,7 +1272,7 @@ $$$
 CREATE TRIGGER insert_jobsetting
 AFTER INSERT ON jobsetting FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 DECLARE cc INTEGER;
 
 -- the job must be inserted before the settings
@@ -1286,7 +1286,7 @@ $$$
 CREATE TRIGGER update_jobsetting
 AFTER UPDATE ON jobsetting FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 UPDATE qjobsetting SET value=NEW.value WHERE customerid=custid AND jobid=NEW.jobid AND name=NEW.name;
 END
 $$$
@@ -1294,7 +1294,7 @@ $$$
 CREATE TRIGGER delete_jobsetting
 AFTER DELETE ON jobsetting FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 DELETE FROM qjobsetting WHERE customerid=custid AND jobid=OLD.jobid AND name=OLD.name;
 END
 $$$
@@ -1302,7 +1302,7 @@ $$$
 CREATE TRIGGER insert_schedule
 AFTER INSERT ON schedule FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 DECLARE tz VARCHAR(50);
 
 SELECT value INTO tz FROM setting WHERE name='timezone';
@@ -1314,7 +1314,7 @@ $$$
 CREATE TRIGGER update_schedule
 AFTER UPDATE ON schedule FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 UPDATE qschedule SET daysofweek=NEW.daysofweek, time=NEW.time, nextrun=NEW.nextrun WHERE id=NEW.id AND customerid=custid;
 END
 $$$
@@ -1322,7 +1322,7 @@ $$$
 CREATE TRIGGER delete_schedule
 AFTER DELETE ON schedule FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 DELETE FROM qschedule WHERE id=OLD.id AND customerid=custid;
 END
 $$$
@@ -1330,7 +1330,7 @@ $$$
 CREATE TRIGGER insert_reportsubscription
 AFTER INSERT ON reportsubscription FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 DECLARE tz VARCHAR(50);
 SELECT value INTO tz FROM setting WHERE name='timezone';
 INSERT INTO qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) VALUES (NEW.id, custid, NEW.userid, NEW.type, NEW.daysofweek, NEW.dayofmonth, NEW.time, tz, NEW.nextrun, NEW.email);
@@ -1340,7 +1340,7 @@ $$$
 CREATE TRIGGER update_reportsubscription
 AFTER UPDATE ON reportsubscription FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 UPDATE qreportsubscription SET type=NEW.type, daysofweek=NEW.daysofweek, dayofmonth=NEW.dayofmonth, time=NEW.time, nextrun=NEW.nextrun, email=NEW.email WHERE id=NEW.id AND customerid=custid;
 END
 $$$
@@ -1348,25 +1348,271 @@ $$$
 CREATE TRIGGER delete_reportsubscription
 AFTER DELETE ON reportsubscription FOR EACH ROW
 BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE custid INTEGER DEFAULT 1;
 DELETE FROM qreportsubscription WHERE id=OLD.id AND customerid=custid;
 END
 $$$
 
 create procedure start_import( in_importid int)
 begin
-declare l_custid int DEFAULT _$CUSTOMERID_;
+declare l_custid int DEFAULT 1;
 insert ignore into importqueue (customerid,localimportid) values (l_custid,in_importid);
 end
 $$$
 
 create procedure start_specialtask( in_specialtaskid int)
 begin
-declare l_custid int DEFAULT _$CUSTOMERID_;
+declare l_custid int DEFAULT 1;
 declare l_type varchar(50);
 select type from specialtask where id=in_specialtaskid into l_type;
 insert ignore into specialtaskqueue (customerid,localspecialtaskid,type) values (l_custid,in_specialtaskid,l_type);
 end
 $$$
 
+
+-- PARENT PORTAL ---------------------------------------------------------
+
+-- authserver stuff
+ALTER TABLE `customer`
+ADD `portaldbuser` VARCHAR( 50 ) NOT NULL default '' AFTER `dbpassword` ,
+ADD `portaldbpass` VARCHAR( 50 ) NOT NULL default '' AFTER `portaldbuser` $$$
+
+CREATE TABLE `persontoken` (
+  `customerid` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `validationdata` varchar(50) NOT NULL,
+  `expirationdate` datetime NOT NULL,
+  `personid` int(11) NOT NULL,
+  PRIMARY KEY  (`customerid`,`token`,`validationdata`)
+) ENGINE=InnoDB$$$
+
+CREATE TABLE `portalactivation` (
+  `activationtoken` varchar(255) NOT NULL,
+  `creation` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `portaluserid` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`activationtoken`)
+) ENGINE=InnoDB$$$
+
+ALTER TABLE `portalactivation` ADD `newusername` VARCHAR( 255 ) NULL $$$
+
+CREATE TABLE `portalcustomer` (
+  `portaluserid` int(11) NOT NULL,
+  `customerid` int(11) NOT NULL,
+  PRIMARY KEY  (`portaluserid`,`customerid`)
+) ENGINE=InnoDB$$$
+
+CREATE TABLE `portaluser` (
+  `id` int(11) NOT NULL auto_increment,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(50) NOT NULL default ' ',
+  `firstname` varchar(100) NOT NULL,
+  `lastname` varchar(100) NOT NULL,
+  `zipcode` varchar(10) NOT NULL,
+  `enabled` tinyint(4) NOT NULL default '0',
+  `lastlogin` datetime default NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB$$$
+
+ALTER TABLE `portalactivation` ADD `forgotpassword` TINYINT NOT NULL DEFAULT '0'$$$
+
+ALTER TABLE `persontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL$$$
+
+
+-- shard stuff
+ALTER TABLE `qjob` ADD `jobtypeid` INT NOT NULL AFTER `timeslices` $$$
+
+ALTER TABLE `qjob` ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid` $$$
+
+-- customer stuff
+CREATE TABLE `portalperson` (
+  `portaluserid` int(11) NOT NULL,
+  `personid` int(11) NOT NULL,
+  PRIMARY KEY  (`portaluserid`,`personid`)
+) ENGINE=InnoDB
+$$$
+
+CREATE TABLE `portalpersontoken` (
+  `token` varchar(255) NOT NULL,
+  `expirationdate` datetime NOT NULL,
+  `personid` int(11) NOT NULL,
+  `creationuserid` int(11) NOT NULL,
+  PRIMARY KEY  (`token`),
+  UNIQUE KEY `personid` (`personid`)
+) ENGINE=InnoDB
+$$$
+
+ALTER TABLE `jobtype`
+ADD `infoforparents` VARCHAR( 255 ) NOT NULL DEFAULT ''  AFTER `timeslices` ,
+ADD `issurvey` TINYINT NOT NULL DEFAULT '0' AFTER `infoforparents`
+$$$
+
+CREATE TABLE `jobtypepref` (
+`jobtypeid` INT NOT NULL ,
+`type` ENUM( 'phone', 'email', 'print', 'sms' ) NOT NULL ,
+`sequence` TINYINT NOT NULL ,
+`enabled` TINYINT NOT NULL DEFAULT '0',
+PRIMARY KEY ( `jobtypeid` , `type` , `sequence` )
+) ENGINE = innodb
+$$$
+
+CREATE TABLE `contactpref` (
+`personid` INT NOT NULL,
+`jobtypeid` INT NOT NULL,
+`type` ENUM( 'phone', 'email', 'print', 'sms' ) NOT NULL ,
+`sequence` TINYINT NOT NULL,
+`enabled` TINYINT NOT NULL DEFAULT '0',
+PRIMARY KEY ( `personid` , `jobtypeid` , `type` , `sequence` )
+) ENGINE = innodb
+$$$
+
+ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL default 'notattempted'
+$$$
+
+ALTER TABLE `reportperson` CHANGE `status` `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts','declined') NOT NULL
+$$$
+
+ALTER TABLE `reportperson`
+ADD `numdeclined` tinyint(4) NOT NULL default '0' AFTER `numduperemoved`
+$$$
+
+
+-- alter sms
+
+ALTER TABLE `job`
+ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid`
+$$$
+
+
+drop trigger insert_repeating_job
+$$$
+
+CREATE TRIGGER insert_repeating_job
+AFTER INSERT ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER DEFAULT 1;
+
+IF NEW.status IN ('repeating') THEN
+  SELECT value INTO tz FROM setting WHERE name='timezone';
+
+  INSERT INTO qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.jobtypeid, NEW.thesql);
+
+  -- copy the jobsettings
+  INSERT INTO qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
+
+  -- do not copy schedule because it was inserted via the insert_schedule trigger
+
+END IF;
+END
+$$$
+
+drop trigger update_job
+$$$
+
+CREATE TRIGGER update_job
+AFTER UPDATE ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER DEFAULT 1;
+
+SELECT value INTO tz FROM setting WHERE name='timezone';
+
+SELECT COUNT(*) INTO cc FROM qjob WHERE customerid=custid AND id=NEW.id;
+IF cc = 0 THEN
+-- we expect the status to be 'scheduled' when we insert the shard job
+-- status 'new' is for jobs that are not yet submitted
+  IF NEW.status='scheduled' THEN
+    INSERT INTO qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid, NEW.thesql);
+    -- copy the jobsettings
+    INSERT INTO qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
+  END IF;
+ELSE
+-- update job fields
+  UPDATE qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, smsmessageid=NEW.smsmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
+  IF NEW.status IN ('processing', 'procactive', 'active', 'cancelling') THEN
+    UPDATE qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
+  END IF;
+END IF;
+END
+$$$
+
+
+ALTER TABLE `job`
+CHANGE `type` `type` set('phone','email','print','sms','survey') NOT NULL default 'phone'
+$$$
+
+ALTER TABLE `joblanguage`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL default 'phone'
+$$$
+
+ALTER TABLE `message`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL default 'phone'
+$$$
+
+ALTER TABLE `reportcontact`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL
+$$$
+
+ALTER TABLE `reportperson`
+CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL
+$$$
+
+ALTER TABLE `messagepart` ADD `maxlen` SMALLINT NULL
+$$$
+
+CREATE TABLE `sms` (
+  `id` int(11) NOT NULL auto_increment,
+  `personid` int(11) NOT NULL default '0',
+  `sms` varchar(20) NOT NULL default '',
+  `sequence` tinyint(4) NOT NULL default '0',
+  `editlock` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `personid` (`personid`,`sequence`),
+  KEY `dedupe` (`sms`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `reportcontact`
+ADD `sms` varchar(20) default NULL AFTER `email`
+$$$
+
+
+-- import enhancements
+
+ALTER TABLE `importfield` add `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy' after mapto
+$$$
+
+ALTER TABLE `importfield` add `val` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+$$$
+
+ALTER TABLE `importfield` CHANGE `mapfrom` `mapfrom` TINYINT( 4 ) NULL
+$$$
+
+-- more changes
+
+ALTER TABLE phone DROP smsenabled
+$$$
+
+ALTER TABLE jobtype DROP `priority`
+$$$
+
+ALTER TABLE `portalpersontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL
+$$$
+
+-- add curdate and skipheaders to imports
+
+ALTER TABLE `import` ADD `skipheaderlines` TINYINT NOT NULL DEFAULT '0' AFTER `datamodifiedtime`
+$$$
+
+ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy'
+$$$
+
+-- timeslices moved to system setting
+ALTER TABLE jobtype DROP `timeslices`
+$$$
 
