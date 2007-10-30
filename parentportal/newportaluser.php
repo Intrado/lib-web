@@ -50,7 +50,7 @@ include_once("nav.inc.php");
 startWindow("Enter Your Information");
 if(!$success){
 ?>
-	<form method="POST" action="newportaluser.php">
+	<form method="POST" action="newportaluser.php" name="newaccount">
 		<table>
 			<tr>
 				<td>Email&nbsp;(this will be your login name):</td>
