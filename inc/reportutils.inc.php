@@ -222,4 +222,36 @@ function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
 	return $titles;
 
 }
+
+function createCSV($data, $titles, $formatters, $groupby = 0){
+
+	echo '"' . implode('","', $titles) . '"';
+	echo "\r\n";
+
+	if (count($data) > 0) {
+		$curr = null;
+		foreach ($data as $row) {
+			$csvrow = array();
+			if($row[$groupby] == $curr){
+				continue;
+			} else {
+				$curr = $row[$groupby];
+			}
+			//only show output data with titles
+			foreach ($titles as $index => $title) {
+
+				if (isset($formatters[$index])) {
+					$fn = $formatters[$index];
+					$cel = $fn($row,$index);
+				} else {
+					$cel = htmlentities($row[$index]);
+				}
+				$csvrow[] = $cel;
+			}
+			echo '"' . implode('","', $csvrow) . '"';
+			echo "\r\n";
+		}
+	}
+	
+}
 ?>
