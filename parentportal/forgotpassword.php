@@ -59,7 +59,7 @@ if(!$success){
 			<br>A link has been sent to your email address to log in.
 			<br>Please remember to change your password.
 			<br>You will be redirected to the activate page in 5 seconds.
-			<meta http-equiv="refresh" content="5;url=activate.php">
+			<meta http-equiv="refresh" content="5;url=activate.php?forgot=1">
 <?
 }
 endWindow();
