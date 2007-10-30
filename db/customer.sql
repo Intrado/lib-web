@@ -1248,63 +1248,26 @@ $$$
 ALTER TABLE `importfield` CHANGE `mapfrom` `mapfrom` TINYINT( 4 ) NULL
 $$$
 
--- data migration
-
-INSERT INTO `setting` (name,value) select 'maxsms', value from setting where name='maxphones'
-$$$
-
-INSERT INTO `sms` (personid, sequence) select personid, sequence from phone
-$$$
-
-INSERT INTO `sms` (personid, sms, sequence) select personid, `phone`, sequence from phone where smsenabled=1 on duplicate key update sms.sms = phone.phone
-$$$
+-- more changes
 
 ALTER TABLE phone DROP smsenabled
 $$$
 
-UPDATE aspshard.qjob qj, job j set qj.jobtypeid=j.jobtypeid where qj.customerid=_$CUSTOMERID_ and qj.id=j.id
-$$$
-
-INSERT INTO jobtype (name, systempriority, timeslices, issurvey) values ('Survey', 3, 450, 1)
-$$$
-
-CREATE PROCEDURE test(seq INT, maxval INT, t VARCHAR(10))
-BEGIN
-  declare enab int default 0;
-  label1: LOOP
-    SET enab = 0;
-    IF seq = 0 THEN SET enab = 1; END IF;
-    INSERT INTO jobtypepref (jobtypeid, type, sequence, enabled) select id, t, seq, enab from jobtype;
-    INSERT INTO jobtypepref (jobtypeid, type, sequence, enabled) select id, t, seq, enab from jobtype where systempriority=1 on duplicate key update enabled=1;
-
-    SET seq = seq + 1;
-    IF seq < maxval THEN ITERATE label1; END IF;
-    LEAVE label1;
-  END LOOP label1;
-END
-$$$
-call test(0, (select value from setting where name='maxphones'), 'phone');
-$$$
-call test(0, (select value from setting where name='maxemails'), 'email');
-$$$
-call test(0, (select value from setting where name='maxsms'), 'sms');
-$$$
-drop procedure test
-$$$
-
 ALTER TABLE jobtype DROP `priority`
 $$$
-
 
 ALTER TABLE `portalpersontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL
 $$$
 
 -- add curdate and skipheaders to imports
 
-
 ALTER TABLE `import` ADD `skipheaderlines` TINYINT NOT NULL DEFAULT '0' AFTER `datamodifiedtime`
 $$$
 
 ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy'
+$$$
+
+-- timeslices moved to system setting
+ALTER TABLE jobtype DROP `timeslices`
 $$$
 

@@ -290,7 +290,7 @@ inner join user u on (userid=u.id and u.customerid=$customerid)";
 copytable($customerid,"joblanguage",array("id", "jobid", "messageid", "type", "language"),$db,$custdb,1000,$join);
 
 //JOBTYPE
-copytable($customerid,"jobtype",array("id", "name", "priority", "systempriority", "timeslices", "deleted"),$db,$custdb,1000,false);
+copytable($customerid,"jobtype",array("id", "name", "systempriority", "deleted"),$db,$custdb,1000,false);
 
 //LANGUAGE
 copytable($customerid,"language",array("id", "name"),$db,$custdb,1000,false);

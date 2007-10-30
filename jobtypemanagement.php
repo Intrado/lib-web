@@ -40,8 +40,8 @@ $s = "main";
 $reloadform = 0;
 
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f, "new") 
-	|| CheckFormSubmit($f, "new_high") || CheckFormSubmit($f, "newsurvey") 
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f, "new")
+	|| CheckFormSubmit($f, "new_high") || CheckFormSubmit($f, "newsurvey")
 	|| CheckFormSubmit($f, "delete") !== false )
 {
 	//check to see if formdata is valid
@@ -91,7 +91,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype') || CheckFormSubmit($f
 						getJobtypeForm($f, $s, $surveytype, $maxphones, $maxemails, $maxsms);
 					}
 				}
-				
+
 				getJobtypeForm($f, $s, NULL, $maxphones, $maxemails, $maxsms, 3, true);
 
 			$_SESSION['jobtypemanagement']['radio'] = GetFormData($f, $s, "joborsurvey");
@@ -120,7 +120,7 @@ if($reloadform){
 		putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 2);
 	}
 	putJobtypeForm($f, $s, null, $maxphones, $maxemails, $maxsms, $jobtypeprefs, 3);
-	
+
 }
 
 
@@ -145,7 +145,7 @@ foreach($systemprioritynames as $index => $name){
 	<tr>
 		<th align="left"><?=$name?><th>
 	</tr>
-	
+
 <?
 		foreach($types[$index] as $type) {
 			if($type->systempriority != $index)
@@ -246,11 +246,6 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $systemp
 		$type->name = $name;
 		$type->infoforparents = GetformData($f, $s, "jobtypedesc" . $jobtypeid);
 		$type->systempriority = $systempriority;
-		if($systempriority == 2){
-			$type->timeslices = 0;
-		} else {
-			$type->timeslices = 450;
-		}
 		if($issurvey == true){
 			$type->issurvey = 1;
 		}

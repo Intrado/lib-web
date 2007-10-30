@@ -96,15 +96,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 						$name = DBSafe($name);
 						$id = DBSafe($id);
 						$systempriority = isset($_POST['systempriority'][$id]) ? 0 + $_POST['systempriority'][$id] : "3";
-						$timeslices = isset($_POST['timeslices'][$id]) ? 0 + $_POST['timeslices'][$id] : "100";
-						$timeslices = min(600,abs($timeslices));
 
 						if($id == 'new' && $name) {
-							$query = "insert into jobtype (name, systempriority, timeslices) values ('$name','$systempriority','$timeslices')";
+							$query = "insert into jobtype (name, systempriority) values ('$name','$systempriority')";
 							QuickUpdate($query);
 						} else {
 							if (customerOwns("jobtype",$id)) {
-								$query = "update jobtype set name = '$name' , systempriority='$systempriority', timeslices='$timeslices' where id = '$id'";
+								$query = "update jobtype set name = '$name' , systempriority='$systempriority' where id = '$id'";
 								QuickUpdate($query);
 							}
 						}
@@ -238,15 +236,6 @@ function fmt_systempriority($obj, $name) {
 	}
 }
 
-function fmt_timeslices($obj, $name) {
-	global $f, $s;
-	if((isset($_GET['edittype']) && $_GET['edittype'] == $obj->id) || $obj->id == 'new') {
-		return '<input type="text" name="timeslices[' . $obj->id . ']" width="100%" value="' . $obj->timeslices . '">';
-	} else {
-		return $obj->timeslices;
-	}
-}
-
 function fmt_edit($obj, $name) {
 	global $f, $s;
 	if(isset($_GET['edittype']) && $_GET['edittype'] == $obj->id)
@@ -285,9 +274,8 @@ startWindow('Global System Settings');
 								$types = DBFindMany('JobType', "from jobtype where deleted=0 order by systempriority, name");
 								$types[] = $type = new JobType();
 								$type->id = 'new';
-								$type->timeslices = 100;
-								$titles = array('name' => 'Type', 'systempriority' => "Service Level", 'timeslices' => "Throttle Level", 'edit' => '');
-								$formatters = array('edit' => 'fmt_edit', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority",'timeslices' => "fmt_timeslices");
+								$titles = array('name' => 'Type', 'systempriority' => "Service Level", 'edit' => '');
+								$formatters = array('edit' => 'fmt_edit', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority");
 								showObjects($types,$titles,$formatters);
 							?>
 
@@ -458,7 +446,7 @@ startWindow('Global System Settings');
 												}
 												?>
 											</tr>
-											
+
 											<tr>
 												<td align="left">Locked&nbsp;Phones</td>
 <?
