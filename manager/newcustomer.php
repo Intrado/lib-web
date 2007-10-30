@@ -188,7 +188,7 @@ if (CheckFormSubmit($f,$s)){
 								('Emergency', 1, 225, 0),
 								('Attendance', 2, 0, 0),
 								('General', 3, 450, 0)";
-				}
+
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
@@ -206,8 +206,8 @@ if (CheckFormSubmit($f,$s)){
 							('inboundnumber', '" . DBSafe($inboundnum) . "'),
 							('_maxusers', '" . DBSafe($maxusers) . "'),
 							('_renewaldate', '" . DBSafe($renewaldate) . "'),
-							('_callspurchased', '" . DBSafe($callspurchased) . "')
-							
+							('_callspurchased', '" . DBSafe($callspurchased) . "')";
+
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
