@@ -293,9 +293,8 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 	// Print extra row for adding new items
 	// only if they have more f-fields to use
 	if(count($FIELDMAPS) < 20){
+		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-
-	<tr>
 		<td>
 <?
 		NewFormItem($form, $section, 'newfield_fieldnum', 'selectstart');
