@@ -164,6 +164,7 @@ if(!isset($hidenav) || !$hidenav){
 				?><a href="choosecustomer.php?logoutcustomer=1"/>Change Customer</a> |<?
 			}
 	?>
+			<a href="#" onclick="window.open('help/index.html', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
 			<a href="index.php?logout=1"/>Logout</a>
 		</div>
 
