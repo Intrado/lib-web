@@ -137,7 +137,7 @@ if($PERSONID){
 	$TITLE .= " - " . $person->$firstnamefield . " " . $person->$lastnamefield;
 }
 include_once("nav.inc.php");
-startWindow("Preferences", 'padding: 3px;');
+startWindow("Preferences" . help("Contactpreferences"), 'padding: 3px;');
 
 ?>
 <table width="100%" cellpadding="3" cellspacing="1" >
