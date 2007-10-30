@@ -63,6 +63,14 @@ $PAGE = ":";
 $TITLE = "Activate Account";
 $hidenav = 1;
 include_once("nav.inc.php");
+
+if($forgot){
+	startWindow("Activate" . help("Activateforgotpassword"));
+	$action = "?forgot=1";
+} else {
+	startWindow("Activate" . help("Activateaccount"));
+	$action = "";
+}
 if($forgotsuccess){
 	?>
 	<br>Thank you, your password has been updated.
@@ -75,19 +83,18 @@ if($forgotsuccess){
 	<br>You will be redirected to the welcome page in 5 seconds.
 	<meta http-equiv="refresh" content="5;url=index.php">
 	<?
+} else if ($error && $forgot){
+?>
+	<div style="color: red;">That token is invalid or has expired.</div>
+<?
 } else if ($error){
 ?>
-	<br>That token is invalid or has expired or that is an incorrect password.
+	<div style="color: red;">That token is invalid or has expired or that is an incorrect password.</div>
 <?
 }
-if($forgot)
-	startWindow("Activate" . help("Activateforgotpassword"));
-else
-	startWindow("Activate" . help("Activateaccount"));
-
 if($form){
 ?>
-	<form method="POST" action="activate.php" name="activate">
+	<form method="POST" action="activate.php<?=$action?>" name="activate">
 		<table>
 			<tr>
 				<td>Activation Code: </td>
