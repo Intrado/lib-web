@@ -16,7 +16,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	} else if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email1)){
 		error("That is not a valid email address");
 	} else {
-		$result = portalForgotPassword($email);
+		$result = portalForgotPassword($email1);
 		if($result['result'] == ""){
 			$success = true;
 		} else {
