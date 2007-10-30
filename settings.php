@@ -325,7 +325,7 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Systemwide Alert Message:<? print help('Settings_SystemwideAlert'); ?></td>
+								<td>Systemwide Alert Message<? print help('Settings_SystemwideAlert'); ?></td>
 								<td><? NewFormItem($f, $s, 'alertmessage', 'textarea',44,4);  ?></td>
 							</tr>
 						</table>
@@ -442,37 +442,56 @@ startWindow('Global System Settings');
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Portal:</th>
 					<td class="bottomBorder">
-						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 								<tr>
 									<td width="30%">Activation Code lifetime in days</td>
 									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?></td>
 								</tr>
+								<tr>
+									<td colspan="2">
+										<table border="0" cellpadding="3" cellspacing="1" width="30%">
+											<tr>
+												<th>&nbsp;</th>
+												<?
+												for($i=1; $i<= max($maxphones, $maxemails, $maxsms);$i++){
+													?><th><?=$i?></th><?
+												}
+												?>
+											</tr>
+											
+											<tr>
+												<td align="left">Locked&nbsp;Phones</td>
 <?
-								for($i=0; $i<$maxphones; $i++){
-									?>
-									<tr>
-										<td width="30%">Phone <?=$i+1?> locked from portal access </td>
-										<td><? NewFormItem($f, $s, "lockedphone" . $i, "checkbox");?></td>
-									</tr>
-									<?
-								}
-								for($i=0; $i<$maxemails; $i++){
-									?>
-									<tr>
-										<td width="30%">Email <?=$i+1?> locked from portal access </td>
-										<td><? NewFormItem($f, $s, "lockedemail" . $i, "checkbox");?></td>
-									</tr>
-									<?
-								}
-								for($i=0; $i<$maxsms; $i++){
-									?>
-									<tr>
-										<td width="30%">SMS <?=$i+1?> locked from portal access </td>
-										<td><? NewFormItem($f, $s, "lockedsms" . $i, "checkbox");?></td>
-									</tr>
-									<?
-								}
+												for($i=0; $i<$maxphones; $i++){
+													?>
+														<td align="center"><? NewFormItem($f, $s, "lockedphone" . $i, "checkbox");?></td>
+													<?
+												}
 ?>
+											</tr>
+											<tr>
+												<td align="left">Locked&nbsp;Emails</td>
+<?
+												for($i=0; $i<$maxemails; $i++){
+													?>
+														<td align="center"><? NewFormItem($f, $s, "lockedemail" . $i, "checkbox");?></td>
+													<?
+												}
+?>
+											</tr>
+											<tr>
+												<td align="left">Locked&nbsp;SMS</td>
+<?
+												for($i=0; $i<$maxsms; $i++){
+													?>
+														<td align="center"><? NewFormItem($f, $s, "lockedsms" . $i, "checkbox");?></td>
+													<?
+												}
+?>
+											</tr>
+										</table>
+									</td>
+								</tr>
 						</table>
 					</td>
 				</tr>
