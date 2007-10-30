@@ -30,12 +30,10 @@ class PortalReport extends ReportGenerator{
 						p." . FieldMap::GetFirstNameField() . " as firstname, 
 						p." . FieldMap::GetLastNameField() . " as lastname, 
 						ppt.token,
-						ppt.expirationdate,
-						pp.portaluserid "
+						ppt.expirationdate"
 						. generateFields("p")
 						. "	from person p 
 						left join portalpersontoken ppt on (ppt.personid = p.id)
-						left join portalperson pp on (pp.personid = p.id)
 						where not p.deleted
 						and p.type='system' "
 						. $pkeysql
@@ -64,27 +62,38 @@ class PortalReport extends ReportGenerator{
 		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
 		$data = array();
-		$portaluserids = array();
+		$personids = array();
 		$count = 0;
 		$curr = null;
 		while($row = DBGetRow($result)){
-			if($row[6])
-				$portaluserids[] = $row[6];
+			$personids[] = $row[1];
 			$data[] = $row;
-			if($curr != $row[1]){
-				$count++;
-				$curr = $row[1];
-			}
+		}
+		$result = Query("select personid, portaluserid from portalperson where personid in ('" . implode("','",$personids) . "') order by personid, portaluserid");	
+		$portaluserids = array();
+		$personportalusers = array();
+		while($row = DBGetRow($result)){
+			$portaluserids[] = $row[1];
+			if(!isset($personportalusers[$row[0]]))
+				$personportalusers[$row[0]] = array();
+			$personportalusers[$row[0]][] = $row[1];
 		}
 		$portalusers = getPortalUsers($portaluserids);
+		$newdata = array();
 		foreach($data as $index => $row){
-			if(isset($portalusers[$row[6]])){
-				$portaluser = $portalusers[$row[6]];
-				$row[6] = $portaluser['portaluser.firstname'] . " " . $portaluser['portaluser.lastname'] . " (" . $portaluser['portaluser.username'] . ")";
-				$data[$index] = $row;
+			if(!isset($personportalusers[$row[1]])){
+				$newdata[] = array_insert($row, array(""), 5);
+			} else {
+				foreach($personportalusers[$row[1]] as $portaluserid){
+					if(isset($portalusers[$portaluserid])){
+						$portaluser = $portalusers[$portaluserid];
+						$portaluserinfo = $portaluser['portaluser.firstname'] . " " . $portaluser['portaluser.lastname'] . " (" . $portaluser['portaluser.username'] . ")";
+						$newdata[] = array_insert($row, array($portaluserinfo), 5);
+					}
+				}
 			}
 		}
-		
+		$data = $newdata;
 		$titles = array(0 => "ID#", 
 						2 => "First Name", 
 						3 => "Last Name",
@@ -92,20 +101,7 @@ class PortalReport extends ReportGenerator{
 						5 => "Expiration Date",
 						6 => "Associated Portal Users");
 						
-		//set the initial column index for fields
-		//by end of loop, end should be the last column index for a field
-		$start = 7;
-		$end = $start;
-		$hiddenColumns = array();
-
-		foreach($fieldlist as $index => $field){
-			if(!in_array($index, $activefields)){
-				$titles[$end] = "@" .$field;
-			} else {
-				$titles[$end] = $field;
-			}
-			$end++;
-		}
+		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
 
 		$repeatedColumns = array(6);
 		
@@ -114,7 +110,7 @@ class PortalReport extends ReportGenerator{
 							4 => "fmt_activation_code");
 		
 		startWindow("Search Results");
-		showPageMenu($total,$pagestart,$count);
+		showPageMenu($total,$pagestart,$max);
 ?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="portalresults">
 <?
@@ -125,15 +121,33 @@ class PortalReport extends ReportGenerator{
 				var portalresultstable = new getObj("portalresults").obj;
 			</script>
 <?
-		showPageMenu($total,$pagestart,$count);
+		showPageMenu($total,$pagestart,$max);
 		endWindow();
 	}
 	
 	function runCSV(){
 		
+		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
+		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
+		$titles = array(0 => "ID#", 
+						2 => "First Name", 
+						3 => "Last Name", 
+						4 => "Token", 
+						5 => "Expiration Date");
+		$titles = appendFieldTitles($titles, 5, $fieldlist, $activefields);
 		
-		$titles = array("ID#", "First Name", "Last Name", "Token", "Expiration Date");
-		$titles = '"' . implode('","',$titles) . '"';
+		$formatters = array(4 => "fmt_activation_code",
+							5 => "fmt_activation_date");
+		
+		$data = array();
+		$result = Query($this->query);
+		while($row = DBGetRow($result)){
+			$data[] = $row;
+		}
 		
 		header("Pragma: private");
 		header("Cache-Control: private");
@@ -142,26 +156,7 @@ class PortalReport extends ReportGenerator{
 		
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 		
-		echo $titles;
-		echo "\r\n";
-		$curr = null;
-		if($this->query){
-			$result = Query($this->query);
-			while($row = DBGetRow($result)){
-				if($curr == $row[0])
-					continue;
-				$curr = $row[0];
-			
-				$date = "";
-				if($row[5])
-					$date = date("M d Y", strtotime($row[5]));
-		
-				$data = array($row[0], $row[2], $row[3], $row[4], $date);
-				$output = '"' . implode('","', $data) . '"';
-				echo $output;
-				echo "\r\n";
-			}
-		}
+		createCSV($data, $titles, $formatters, 0);
 	}
 
 }
