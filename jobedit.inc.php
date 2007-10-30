@@ -92,6 +92,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('There is a maximum of 160 characters for SMS messages');
 		} else if (GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) < 1){
 			error('The SMS message body cannot be empty');
+		} else if (GetFormData($f, $s, 'sendphone') && GetFormData($f, $s, 'phonemessageid') == '0'){
+			error('Please select a default phone message');
+		} else if (GetFormData($f, $s, 'sendemail') && GetFormData($f, $s, 'emailmessageid') == '0'){
+			error('Please select a default email message');
 		} else {
 			//submit changes
 
@@ -224,7 +228,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			if(!$submittedmode && !$completedmode) {
 				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
-				$job->setOption("skipsmsduplicates",GetFormData($f,$s,"skipsmsduplicates"));
 				
 				if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 					$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
@@ -347,7 +350,6 @@ if( $reloadform )
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
-	PutFormData($f,$s,"skipsmsduplicates",$job->isOption("skipsmsduplicates"), "bool",0,1);
 
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
@@ -550,15 +552,15 @@ startWindow('Job Information');
 			<table border="0" cellpadding="2" cellspacing="0" >
 				<tr>
 					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('phoneoptions'); else hide('phoneoptions');\""); ?>Phone</td>
+					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('phoneoptions'); else hide('phoneoptions');\""); ?></td>
 				</tr>
 				<tr>
 					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?>Email</td>
+					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?></td>
 				</tr>
 				<tr>
 					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('smsoptions'); else hide('smsoptions');\""); ?>SMS</td>
+					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('smsoptions'); else hide('smsoptions');\""); ?></td>
 				</tr>
 			</table>
 		</td>
@@ -745,7 +747,7 @@ startWindow('Job Information');
 					</tr>
 <? } ?>
 					<tr>
-						<td>Skip duplicate email addresses</td>
+						<td>Skip duplicate email addresses <?=  help('Job_EmailSkipDuplicates', NULL, 'small') ?></td>
 						<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 					</tr>
 				</table>
@@ -795,16 +797,12 @@ startWindow('Job Information');
 			<div id='smsoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
-						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+						<td width="30%" >Default message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
 						<td>
 							<? message_select('sms',$f, $s,"smsmessageid", "onclick='if(this.value == 0){ show(\"newsmstext\") }else{ hide(\"newsmstext\") }'"); ?>
 							<div id='newsmstext'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
 							<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span> characters remaining.</div>
 						</td>
-					</tr>
-					<tr>
-						<td>Skip duplicate sms numbers</td>
-						<td><? NewFormItem($f,$s,"skipsmsduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 					</tr>
 				</table>
 			</div>
