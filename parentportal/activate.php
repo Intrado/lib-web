@@ -7,16 +7,22 @@ require_once("../inc/table.inc.php");
 
 $form = true;
 $forgotsuccess = false;
+$newusersuccess = false;
 $token = "";
 $forgot = false;
+$changeuser = false;
 $success = false;
 $error = false;
+$result = null;
 if(isset($_GET['token'])){
 	$token = $_GET['token'];
 }
 
 if(isset($_GET['forgot'])){
 	$forgot = true;
+}
+if(isset($_GET['changeuser'])){
+	$changeuser = true;
 }
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
@@ -31,10 +37,15 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		} else {
 			$result = portalActivateAccount($token, $password1);
 			if($result['result'] == ""){
-				$form = false;
-				$forgotsuccess = true;
-				doStartSession();
-				$_SESSION['portaluserid'] = $result['userID'];
+				if(!$forgot && $result['functionCode'] != '3'){
+					error("An unknown error occurred");
+					$error = true;
+				} else {
+					$form = false;
+					$forgotsuccess = true;
+					doStartSession();
+					$_SESSION['portaluserid'] = $result['userID'];
+				}
 			} else {
 				$error = true;
 			}
@@ -45,9 +56,18 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		$result = portalActivateAccount($token, $password);
 		if($result['result'] == ""){
 			$form = false;
-			$success = true;
-			doStartSession();
-			$_SESSION['portaluserid'] = $result['userID'];
+			if($result['functionCode'] == '1'){
+				$success = true;
+			} else if ($result['functionCode'] == '2' && $changeuser){
+				$newusersuccess = true;
+			} else {
+				error("An unknown error occurred");
+				$error = true;
+			}
+			if(!$error){
+				doStartSession();
+				$_SESSION['portaluserid'] = $result['userID'];
+			}
 		} else {
 			$error = true;
 		}
@@ -67,6 +87,9 @@ include_once("nav.inc.php");
 if($forgot){
 	startWindow("Activate" . help("Activateforgotpassword"));
 	$action = "?forgot=1";
+} else if($changeuser){
+	startWindow("Activate" . help("Activatenewemail"));
+	$action = "?changeuser=1";
 } else {
 	startWindow("Activate" . help("Activateaccount"));
 	$action = "";
@@ -80,6 +103,12 @@ if($forgotsuccess){
 } else if($success){
 	?>
 	<br>Thank you, your account has been activated.
+	<br>You will be redirected to the welcome page in 5 seconds.
+	<meta http-equiv="refresh" content="5;url=index.php">
+	<?
+} else if($newusersuccess){
+	?>
+	<br>Thank you, your email address has been changed.
 	<br>You will be redirected to the welcome page in 5 seconds.
 	<meta http-equiv="refresh" content="5;url=index.php">
 	<?
