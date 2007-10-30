@@ -117,6 +117,8 @@ if($reload){
 		PutFormData($f, $s, 'issurvey' . $jobtype['id'], (bool)$jobtype['issurvey'], 'bool', 0, 1);
 	}
 	PutFormData($f, $s, 'managerpassword', "", "text");
+	PutFormData($f, 'new', 'add', '');
+	PutFormData($f, $s, 'save', '');
 }
 
 
