@@ -383,8 +383,8 @@ foreach ($fieldmaps as $map) {
 		<td class="bottomBorder">
 			<table padding="3px">
 				<tr>
-					<th>Contact Type</th>
-					<th>Destination</th>
+					<th align="left">Contact&nbsp;Type</th>
+					<th align="left">Destination</th>
 					<th>Edit Lock</th>
 <?
 					foreach($jobtypes as $jobtype){
@@ -396,12 +396,12 @@ foreach ($fieldmaps as $map) {
 
 	$x = 0;
 	foreach ($phones as $phone) {
-		$header = "Phone " . ($x+1) . ":";
+		$header = "Phone&nbsp;" . ($x+1) . ":";
 		$itemname = "phone".($x+1);
 ?>
 	<tr>
 		<td><?= $header ?></td>
-		<td><? NewFormItem($f, $s, "phone" . $phone->sequence, "text", 15); ?></td>
+		<td><? NewFormItem($f, $s, "phone" . $phone->sequence, "text", 14); ?></td>
 		<td align="middle"><? NewFormItem($f, $s, "editlock_phone" . $phone->sequence, "checkbox", 0, 1); ?></td>
 <?
 		foreach($jobtypes as $jobtype){
@@ -422,12 +422,12 @@ foreach ($fieldmaps as $map) {
 
 	$x = 0;
 	foreach ($emails as $email) {
-		$header = "Email " . ($x+1) . ":";
+		$header = "Email&nbsp;" . ($x+1) . ":";
 		$itemname = "email".($x+1);
 ?>
 	<tr>
 		<td><?= $header ?></td>
-		<td><? NewFormItem($f, $s, "email" . $email->sequence, "text", 50, 100) ?></td>
+		<td><? NewFormItem($f, $s, "email" . $email->sequence, "text", 30, 100) ?></td>
 		<td align="middle"><? NewFormItem($f, $s, "editlock_email" . $email->sequence, "checkbox", 0,1);?></td>
 <?
 		foreach($jobtypes as $jobtype){
@@ -448,12 +448,12 @@ foreach ($fieldmaps as $map) {
 	if(getSystemSetting("_hassms")){
 		$x = 0;
 		foreach ($smses as $sms) {
-			$header = "Sms " . ($x+1) . ":";
+			$header = "Sms&nbsp;" . ($x+1) . ":";
 			$itemname = "sms".($x+1);
 ?>
 		<tr>
 			<td><?= $header ?></td>
-			<td><? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 50, 100) ?></td>
+			<td><? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 14) ?></td>
 			<td align="middle"><? NewFormItem($f, $s, "editlock_sms" . $sms->sequence, "checkbox", 0,1);?></td>
 <?
 			foreach($jobtypes as $jobtype){
@@ -475,43 +475,81 @@ foreach ($fieldmaps as $map) {
 	if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess")){
 ?>
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Associations</th>
+		<th align="right" class="windowRowHeader bottomBorder">Associations:</th>
 		<td class="bottomBorder">
-			<table>
+			<table >
+				<tr>
+					<th align="left"><b>First Name<b></th>
+					<th align="left"><b>Last Name<b></th>
+					<th align="left"><b>User Name<b></th>
+					<th align="left"><b>Last Login<b></th>
+					<th align="left"><b>&nbsp;<b></th>
+				</tr>
 <?
 			if($associates){
 				foreach($associates as $portaluserid => $associate){
-					$name = $associate['portaluser.firstname'] . " " . $associate['portaluser.lastname'] . " (" . $associate['portaluser.username'] . ")";
+					if($associate['portaluser.lastlogin']){
+						$lastlogin = date("M d, Y h:i:s a", strtotime($associate['portaluser.lastlogin']));
+					} else {
+						$lastlogin = "Never";
+					}
 ?>
 					<tr>
-						<td><?=$name?></td>
+						<td><?=$associate['portaluser.firstname']?></td>
+						<td><?=$associate['portaluser.lastname']?></td>
+						<td><?=$associate['portaluser.username']?></td>
+						<td><?=htmlentities($lastlogin)?></td>
 						<td><?=button("Disassociate", "if(confirmDisassociate()) window.location='?disassociate=" . $portaluserid . "'")?></td>
 					</tr>
 <?
 				}
 			} else {
-				?><tr><td>&nbsp</td></tr><?
+?>
+				<tr>
+					<td>&nbsp</td>
+					<td>&nbsp</td>
+					<td>&nbsp</td>
+					<td>&nbsp</td>
+				</tr>
+<?
 			}
 ?>
 			</table>
 		</td>
 	</tr>
 	<tr>
-		<th align="right" class="windowRowHeader">Activation Code Information</th>
+		<th align="right" class="windowRowHeader">Activation Code Information:</th>
 		<td>
 			<table>
-				<tr><td>Activation Code: <?=$tokendata['token'] ?></td></tr>
-				<tr><td>Expiration Date: <?=$tokendata['expirationdate'] ?></td></tr>
-				<tr><td>Creation User: <?=$tokendata['creationusername'] ?></td></tr>
+				<tr>
+					<td>Activation Code:</td>
+					<td><?=$tokendata['token'] ?></td>
+				</tr>
+				<tr>
+					<td>Expiration Date:</td>
+					<td><?=$tokendata['expirationdate'] ?></td>
+				</tr>
+				<tr>
+					<td>Creation User:</td>
+					<td><?=$tokendata['creationusername'] ?></td>
+				</tr>
 				<tr>
 					<td>
 <?
 					echo button("Generate Activation Code", "window.location='?create=1'");
+?>					
+					</td>
+<?	
 					if($tokendata['token']){
-						echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
+?>
+						<td>
+<?
+							echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
+?>
+						</td>
+<?
 					}
 ?>
-					</td>
 				</tr>
 			</table>
 		</td>
