@@ -1,6 +1,9 @@
 <?
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/table.inc.php");
+
 
 $form = true;
 $forgotsuccess = false;
@@ -57,12 +60,13 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
 
 $PAGE = ":";
-$TITLE = "Parent Portal Login";
+$TITLE = "Activate Account";
 $hidenav = 1;
 include_once("nav.inc.php");
 if($forgotsuccess){
 	?>
 	<br>Thank you, your password has been updated.
+	<br>You will be redirected to the welcome page in 5 seconds.
 	<meta http-equiv="refresh" content="5;url=choosecustomer.php">
 	<?
 } else if($success){
@@ -76,10 +80,14 @@ if($forgotsuccess){
 	<br>That token is invalid or has expired or that is an incorrect password.
 <?
 }
+if($forgot)
+	startWindow("Activate" . help("Activateforgotpassword"));
+else
+	startWindow("Activate" . help("Activateaccount"));
 
 if($form){
 ?>
-	<form method="POST" action="activate.php">
+	<form method="POST" action="activate.php" name="activate">
 		<table>
 			<tr>
 				<td>Activation Code: </td>
@@ -107,10 +115,17 @@ if($form){
 		}
 ?>
 		<tr>
-			<td><input type="submit" name="submit" value="Submit" /></td>
+			<td>&nbsp;</td>
+			<td><?=submit("activate", "main", "Submit")?></td>
 		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><a href="index.php">Return to Contact Manager Login</a></td>
+		</tr>
+		</table>
 	</form>
 <?
 }
+endWindow();
 include_once("navbottom.inc.php");
 ?>
