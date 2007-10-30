@@ -10,6 +10,7 @@ $firstname = "";
 $lastname = "";
 $zipcode = "";
 $success = false;
+$tos = file_get_contents("terms.html");
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
@@ -18,6 +19,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$zipcode = get_magic_quotes_gpc() ? stripslashes($_POST['zipcode']) : $_POST['zipcode'];
 	$password1 = get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1'];
 	$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
+	$acceptterms = isset($_POST['acceptterms']);
 	if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $login)){
 		error("That is not a valid email format");
 	} else if(!ereg("^[0-9]*$",$zipcode)){
@@ -28,6 +30,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error("You must enter a password");
 	} else if($password1 != $password2){
 		error("Your passwords don't match");
+	} else if(!$acceptterms){
+		error("You must accept the Terms of Service");
 	} else {
 		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode);
 		if($result['result'] != ""){
@@ -76,6 +80,12 @@ if(!$success){
 				<td>Zip Code:</td>
 				<td><input type="text" name="zipcode" value="<?=$zipcode?>" /></td>
 			</tr>
+			<tr>
+				<td colspan="2"><div style="overflow:scroll; height:500px;"><?=$tos ?></div></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="acceptterms"/> Accept Terms of Service</td>
+				<td>&nbsp;</td>
 			<tr>
 				<td>&nbsp;</td>
 				<td><?=submit("newaccount", "main", "Create Account")?></td>
