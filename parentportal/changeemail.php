@@ -16,7 +16,7 @@ $error_generalproblem = "There was a problem changing your username";
 $f = "changeemail";
 $s = "main";
 $reloadform = 0;
-
+$success = false;
 
 if(CheckFormSubmit($f,$s))
 {
@@ -37,7 +37,7 @@ if(CheckFormSubmit($f,$s))
 			//submit changes
 			$result = portalUpdatePortalUsername(GetFormData($f, $s, "newemail"), GetFormData($f, $s, "password"));
 			if($result['result'] == ""){
-				redirect("start.php");
+				$success = true;
 			} else {
 				$resultcode = $result['result'];
 				if($resultcode == "invalid argument"){
@@ -68,10 +68,14 @@ $TITLE = "Change Email";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'Submit'));
+if(!$success)
+	buttons(submit($f, $s, 'Submit'));
 
 
-startWindow('Change Email');
+startWindow('Change Email' . help("Changeemail"));
+if($success){
+	?><br><div>You should receive an email shortly at the new address with an activation code.</div><br><?
+} else {
 ?>
 <table>
 	<tr>
@@ -85,6 +89,7 @@ startWindow('Change Email');
 </table>
 <br>
 <?
+}
 endWindow();
 buttons();
 EndForm();
