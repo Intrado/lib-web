@@ -387,10 +387,10 @@ $messages = array();
 // if submitted or completed, gather only the selected messageids used by this job
 // because the schedulemanager copies all messages setting deleted=1 when job is due to start
 if ($submittedmode || $completedmode) {
-	$messages['phone'] = DBFindMany("Message","from message where id=$job->phonemessageid or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
-	$messages['email'] = DBFindMany("Message","from message where id=$job->emailmessageid or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
-	$messages['print'] = DBFindMany("Message","from message where id=$job->printmessageid or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
-	$messages['sms'] = DBFindMany("Message","from message where id=$job->smsmessageid or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
+	$messages['phone'] = DBFindMany("Message","from message where id='$job->phonemessageid' or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
+	$messages['email'] = DBFindMany("Message","from message where id='$job->emailmessageid' or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
+	$messages['print'] = DBFindMany("Message","from message where id='$job->printmessageid' or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
+	$messages['sms'] = DBFindMany("Message","from message where id='$job->smsmessageid' or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
 
 } else {
 	$messages['phone'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
