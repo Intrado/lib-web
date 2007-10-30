@@ -19,6 +19,7 @@ if ($SETTINGS['feature']['has_ssl']) {
 	}
 }
 */
+$login="";
 $badlogin=false;
 $id = false;
 $sessionstarted = false;
@@ -64,7 +65,7 @@ if ($badlogin) {
 ?>
 <table>
 	<form method="POST" action="index.php" name="login">
-		<tr><td>Email: </td><td><input type="text" name="login" size="30"/> </td></tr>
+		<tr><td>Email: </td><td><input type="text" name="login" size="30" value="<?=$login?>"/> </td></tr>
 		<tr><td>Password: </td><td><input type="password" name="password" /> </td></tr>
 		<tr><td>&nbsp;</td><td><?=submit("login", "main", "Login") ?></td></tr>
 	</form>
