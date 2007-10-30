@@ -1,7 +1,9 @@
 <?
+
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
-
+require_once("../inc/html.inc.php");
+require_once("../inc/table.inc.php");
 
 if (isset($_GET['logout'])) {
 	doStartSession(); // start the session to get the id
@@ -13,7 +15,7 @@ if (isset($_GET['logout'])) {
 	TODO:unsure if needed
 if ($SETTINGS['feature']['has_ssl']) {
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
-		redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/parentportal/index.php");
+		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php");
 	}
 }
 */
@@ -50,23 +52,27 @@ if($id){
 }
 
 $PAGE = ":";
-$TITLE = "Parent Portal Login";
+$TITLE = "Contact Manager Login";
 $hidenav = 1;
 include_once("nav.inc.php");
-
+startWindow("Login");
 if ($badlogin) {
 ?>
 	<div style="color: red;">Incorrect username/password. Please try again.</div>
 <?
 }
 ?>
-	<form method="POST" action="index.php">
-		<p>Email: <input type="text" name="login" /> </p>
-		<p>Password: <input type="password" name="password" /> </p>
-		<p><input type="submit" name="submit" value="Login"/></p>
+<table>
+	<form method="POST" action="index.php" name="login">
+		<tr><td>Email: </td><td><input type="text" name="login" size="30"/> </td></tr>
+		<tr><td>Password: </td><td><input type="password" name="password" /> </td></tr>
+		<tr><td>&nbsp;</td><td><?=submit("login", "main", "Login") ?></td></tr>
 	</form>
-	<p><a href="newportaluser.php"> Create a new account</a></p>
-	<p><a href="forgotpassword.php">I forgot my password</a></p>
+
+<tr><td>&nbsp;</td><td><a href="newportaluser.php"> Create a new account</a></td></tr>
+<tr><td>&nbsp;</td><td><a href="forgotpassword.php">I forgot my password</a></td></tr>
+</table>
 <?
+endWindow();
 include_once("navbottom.inc.php");
 ?>
