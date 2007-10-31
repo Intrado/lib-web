@@ -552,15 +552,15 @@ startWindow('Job Information');
 			<table border="0" cellpadding="2" cellspacing="0" >
 				<tr>
 					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('phoneoptions'); else hide('phoneoptions');\""); ?></td>
+					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('phoneoptions'); else hide('phoneoptions');\""); ?></td>
 				</tr>
 				<tr>
 					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?></td>
+					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?></td>
 				</tr>
 				<tr>
 					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . "onclick=\"if(this.checked) show('smsoptions'); else hide('smsoptions');\""); ?></td>
+					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('smsoptions'); else hide('smsoptions');\""); ?></td>
 				</tr>
 			</table>
 		</td>
