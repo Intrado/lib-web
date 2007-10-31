@@ -483,7 +483,7 @@ foreach ($fieldmaps as $map) {
 					<th align="left"><b>Last Name<b></th>
 					<th align="left"><b>User Name<b></th>
 					<th align="left"><b>Last Login<b></th>
-					<th align="left"><b>&nbsp;<b></th>
+					<th align="left"><b>Actions<b></th>
 				</tr>
 <?
 			if($associates){
@@ -499,7 +499,7 @@ foreach ($fieldmaps as $map) {
 						<td><?=$associate['portaluser.lastname']?></td>
 						<td><?=$associate['portaluser.username']?></td>
 						<td><?=htmlentities($lastlogin)?></td>
-						<td><?=button("Disassociate", "if(confirmDisassociate()) window.location='?disassociate=" . $portaluserid . "'")?></td>
+						<td><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid?>'" />Disassociate</a></td>
 					</tr>
 <?
 				}
