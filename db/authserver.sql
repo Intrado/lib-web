@@ -100,5 +100,7 @@ ALTER TABLE `portalactivation` ADD `forgotpassword` TINYINT NOT NULL DEFAULT '0'
 
 ALTER TABLE `persontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL;
 
-
+ALTER TABLE `customer`
+DROP `portaldbuser` ,
+DROP `portaldbpass` ;
 
