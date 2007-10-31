@@ -86,11 +86,11 @@ $maxphones = getSystemSetting("maxphones",4);
 for ($x = 0; $x < $maxphones; $x++)
 	$maptofields["p$x"] = "Phone " . ($x + 1);
 if ($SETTINGS['feature']['has_sms'] && getSystemSetting('_hassms', false)) {
-	$maxsms = getSystemSetting("maxphones",2);
+	$maxsms = getSystemSetting("maxsms",2);
 	for ($x = 0; $x < $maxsms; $x++)
 		$maptofields["s$x"] = "SMS " . ($x + 1);
 }
-$maxemails = getSystemSetting("maxemails",4);
+$maxemails = getSystemSetting("maxemails",2);
 for ($x = 0; $x < $maxemails; $x++)
 	$maptofields["e$x"] = "Email " . ($x + 1);
 //address fields
