@@ -17,7 +17,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$contactList = getContactIDs($_SESSION['portaluserid']);
 	
 	foreach($contactList as $personid){
-		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.messageid, rp.personid , u.email
+		$result = Query("select j.id, j.startdate, j.name, rp.type, u.firstname, u.lastname, rp.messageid, rp.personid , u.email
 			from job j 
 			left join reportperson rp on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
@@ -66,7 +66,7 @@ function message_action($row, $index){
 		return button_bar(button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=phone', 400, 500);",null));
 	}
 	if(in_array("email", $types)){
-		return button_bar(button("Read", "popup('previewemail.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=email', 400, 500);",null));
+		return button_bar(button("Read", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=email', 400, 500);",null));
 	}
 	return "&nbsp;";
 }
