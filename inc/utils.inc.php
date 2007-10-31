@@ -454,4 +454,12 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 
 	return $hover;
 }
+
+function ucfirst_withexceptions($string){
+	if($string == "sms"){
+		return "SMS";
+	} else {
+		return ucfirst($string);
+	}
+}
 ?>
