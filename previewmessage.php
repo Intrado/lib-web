@@ -40,7 +40,8 @@ if(isset($_GET['jobid']) && isset($_GET['personid'])){
 	$_SESSION['previewmessage_jobid'] = $_GET['jobid']+0;
 	$_SESSION['previewmessage_personid'] = $_GET['personid']+0;
 	$_SESSION['previewmessageid'] = QuickQuery("select messageid from reportperson where jobid = '" . $_SESSION['previewmessage_jobid'] . "'
-												 and personid = '" . $_SESSION['previewmessage_personid'] . "'");
+												 and personid = '" . $_SESSION['previewmessage_personid'] . "'
+												 and rp.type='phone'");
 	redirect();
 }
 
