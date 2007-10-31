@@ -106,7 +106,7 @@ class PortalReport extends ReportGenerator{
 		$repeatedColumns = array(6);
 		
 		$formatters = array(0 => "fmt_idmagnify",
-							5 => "fmt_date",
+							5 => "fmt_activation_date",
 							4 => "fmt_activation_code");
 		
 		startWindow("Search Results");
