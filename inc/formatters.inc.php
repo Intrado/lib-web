@@ -330,13 +330,13 @@ function fmt_status_index($row, $index) {
 
 function fmt_csv_list ($row,$index) {
 	$data = explode(",", $row[$index]);
-	$data = array_map("ucfirst",$data);
+	$data = array_map("ucfirst_withexceptions",$data);
 	return implode(", ", $data);
 }
 
 function fmt_obj_csv_list ($obj, $name) {
 	$data = explode(",", $obj->$name);
-	$data = array_map("ucfirst",$data);
+	$data = array_map("ucfirst_withexceptions",$data);
 	return implode(", ", $data);
 }
 
@@ -423,6 +423,8 @@ function report_name($string){
 			return "Recipients Not Contacted";
 		case 'jobautoreport':
 			return "Auto Report";
+		case 'smsdetail':
+			return "SMS Log";
 		default:
 			return $string;
 	}
