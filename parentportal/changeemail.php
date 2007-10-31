@@ -11,6 +11,7 @@ require_once("../inc/table.inc.php");
 
 $error_badpass = "That password is incorrect";
 $error_generalproblem = "There was a problem changing your username";
+$error_badusername = "That username is already in use";
 /****************** main message section ******************/
 
 $f = "changeemail";
@@ -41,7 +42,11 @@ if(CheckFormSubmit($f,$s))
 			} else {
 				$resultcode = $result['result'];
 				if($resultcode == "invalid argument"){
-					error($error_badpass);
+					if(strpos($result['resultdetail'], "username") !== false){
+						error($error_badusername);
+					} else {
+						error($error_badpass);
+					}
 				} else {
 					error($error_generalproblem);
 				}
