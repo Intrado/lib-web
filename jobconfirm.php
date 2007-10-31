@@ -237,19 +237,10 @@ startWindow("Confirmation &amp; Submit");
 				</tr>
 
 <? if($USER->authorize('leavemessage')) { ?>
-					<tr>
-						<td class="bottomBorder" >Call every available phone number for each person</td>
-						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call All Phone Numbers</td>
-					</tr>
 
 					<tr>
 						<td> Allow call recipients to leave a message</td>
 						<td><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Leave Message</td>
-					</tr>
-<? } else { ?>
-					<tr>
-						<td>Call every available phone number for each person</td>
-						<td><input type="checkbox" disabled <?= $job->isOption("callall") ? "checked":"" ?>>Call All Phone Numbers</td>
 					</tr>
 <? } ?>
 
@@ -318,17 +309,13 @@ echo htmlentities($printmessage->name);
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td class="bottomBorder"  width="30%" >Default message</td>
-					<td class="bottomBorder" >
+					<td width="30%" >Default message</td>
+					<td>
 <?
 $smsmessage = new Message($job->smsmessageid);
 echo htmlentities($smsmessage->name);
 ?>
 					</td>
-				</tr>
-				<tr>
-					<td>Skip duplicate sms addresses</td>
-					<td><input type="checkbox" disabled <?= $job->isOption("skipsmsduplicates") ? "checked":"" ?>>Skip Duplicates</td>
 				</tr>
 			</table>
 		</td>
