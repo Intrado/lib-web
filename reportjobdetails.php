@@ -45,6 +45,8 @@ function fmt_jobdetail_result($row, $index){
 			return "No Phone #";
 		else if($row[5] == 'email')
 			return "No Email";
+		else if($row[5] == 'sms')
+			return "No SMS";
 		else 
 			return "No Contacts";
 	} else {
@@ -91,22 +93,24 @@ if(isset($_GET['type'])){
 		$options['reporttype'] = "phonedetail";
 	} else if($_GET['type'] == "email"){
 		$options['reporttype'] = "emaildetail";
+	} else if($_GET['type'] == "sms"){
+		$options['reporttype'] = "smsdetail";
 	}
 	unset($options['result']);
+	unset($options['status']);
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
-	redirect();
+	$redirect = 1;
 }
 
 if(isset($_GET['status'])){
 	$_SESSION['report']['jobdetail']=1;
 	unset($_SESSION['reportid']);
 	$options = $_SESSION['report']['options'];
-	$options['reporttype']="emaildetail";
 	$options['status'] = DBSafe($_GET['status']);
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
-	redirect();
+	$redirect = 1;
 }
 
 if(isset($_GET['result'])){
@@ -122,8 +126,11 @@ if(isset($_GET['result'])){
 	}
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
-	redirect();
+	$redirect = 1;
 }
+
+if($redirect)
+	redirect();
 
 $ordering = JobDetailReport::getOrdering();
 $ordercount=3;
@@ -291,6 +298,8 @@ if($error || $reportgenerator->format == "html"){
 		$TITLE = "Phone Log";
 	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "emaildetail"){
 		$TITLE = "Email Log";
+	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "smsdetail"){
+		$TITLE = "SMS Log";
 	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
 		$TITLE = "Recipients Not Contacted";
 	}
