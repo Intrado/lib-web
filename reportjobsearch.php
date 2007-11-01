@@ -49,7 +49,7 @@ if(isset($_GET['clear']) && $_GET['clear']){
 if($clear)
 	redirect();
 
-$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
+$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0' order by systempriority, issurvey, name");
 $jobtypes = array();
 foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
