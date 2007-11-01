@@ -74,6 +74,8 @@ if(isset($_GET['reportid'])){
 			$_SESSION['report']['type']="email";
 		else if($options['reporttype'] == "notcontacted")
 			$_SESSION['report']['type']="notcontacted";
+		else if($options['reporttype'] == "smsdetail")
+			$_SESSION['report']['type']="sms";
 	}
 	$activefields = array();
 	if(isset($options['activefields'])){
@@ -112,6 +114,8 @@ $options['reporttype'] = "phonedetail";
 if(isset($_SESSION['report']['type'])){
 	if ($_SESSION['report']['type'] == "email"){
 		$options['reporttype'] = "emaildetail";
+	} else if ($_SESSION['report']['type'] == "sms"){
+		$options['reporttype'] = "smsdetail";
 	}
 }
 if(isset($_SESSION['reportid'])){
@@ -122,7 +126,7 @@ if(isset($_SESSION['reportid'])){
 }
 $_SESSION['report']['options'] = $options;
 
-$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
+$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0' order by systempriority, issurvey, name");
 $jobtypes = array();
 foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
@@ -140,7 +144,8 @@ if($_SESSION['report']['type'] == "phone"){
 					"X" => "Disconnected",
 					"duplicate" => "Duplicate",
 					"blocked" => "Blocked",
-					"notattempted" => "Not Attempted");
+					"notattempted" => "Not Attempted",
+					"declined" => "Declined");
 } else if($_SESSION['report']['type'] == "notcontacted"){
 	$results = array("N" => "No Answer",
 					"B" => "Busy",
@@ -148,10 +153,12 @@ if($_SESSION['report']['type'] == "phone"){
 					"X" => "Disconnected",
 					"blocked" => "Blocked",
 					"notattempted" => "Not Attempted",
-					"unsent" => "Unsent");
+					"unsent" => "Unsent",
+					"declined" => "Declined");
 } else {
 	$results = array("sent" => "Sent",
-					"unsent" => "Unsent");
+					"unsent" => "Unsent",
+					"declined" => "Declined");
 }
 
 $f="reports";
@@ -189,6 +196,8 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$options['reporttype'] = "emaildetail";
 			}else if($_SESSION['report']['type'] == "notcontacted"){
 				$options['reporttype'] = "notcontacted";
+			}else if($_SESSION['report']['type'] == "sms"){
+				$options['reporttype'] = "smsdetail";
 			}
 				
 			$radio = GetFormData($f, $s, "radioselect");
@@ -354,6 +363,8 @@ if(isset($_SESSION['report']['type'])){
 		$TITLE = "Email Log";
 	} else if($_SESSION['report']['type'] == 'phone'){
 		$TITLE = "Phone Log";
+	} else if($_SESSION['report']['type'] == 'sms'){
+		$TITLE = "SMS Log";
 	} else if($_SESSION['report']['type'] == 'notcontacted'){
 		$TITLE = "Recipients Not Contacted";
 	}
