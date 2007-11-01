@@ -34,10 +34,8 @@ if(isset($_GET['jobid']) && isset($_GET['personid'])){
 	$_SESSION['previewmessage_personid'] = $_GET['personid']+0;
 	$query = "select messageid from reportperson where jobid = '" . $_SESSION['previewmessage_jobid'] . "'
 												 and personid = '" . $_SESSION['previewmessage_personid'] . "'";
-	if(isset($_SESSION['type']) && $_SESSION['type'] == "phone"){
-		$query .= " and type = 'phone'";
-	} else if(isset($_SESSION['type']) && $_SESSION['type'] == "email"){
-		$query .= " and type = 'email'";
+	if(isset($_SESSION['type'])){
+		$query .= " and type = '" . DBSafe($_SESSION['type']) . "'";
 	}
 	$_SESSION['previewmessageid'] = QuickQuery($query);
 	redirect();
@@ -48,6 +46,7 @@ $personid = isset($_SESSION['previewmessage_personid']) ? $_SESSION['previewmess
 $messageid = isset($_SESSION['previewmessageid']) ? $_SESSION['previewmessageid'] : 0;
 $phone = isset($_SESSION['type']) && $_SESSION['type'] == "phone" ? true : false;
 $email = isset($_SESSION['type']) && $_SESSION['type'] == "email" ? true : false;
+$sms = isset($_SESSION['type']) && $_SESSION['type'] == "sms" ? true : false;
 
 //find all unique fields used in this message
 
@@ -70,10 +69,8 @@ if($jobid != 0 && $personid != 0){
 			left join job j on (j.id = rp.jobid)
 			where j.id = '$jobid'
 			and rp.personid = '$personid'";
-	if(isset($_SESSION['type']) && $_SESSION['type'] == "phone"){
-		$query .= " and rp.type = 'phone'";
-	} else if(isset($_SESSION['type']) && $_SESSION['type'] == "email"){
-		$query .= " and rp.type = 'email'";
+	if(isset($_SESSION['type'])){
+		$query .= " and rp.type = '" . DBSafe($_SESSION['type']) . "'";
 	}
 	$historicdata = QuickQueryRow($query, true);
 }
@@ -87,8 +84,8 @@ if($phone){
 	} else {
 		$previewdata = "&qt=";
 	}
-} else if($email){
-	$message = formatEmail($messageid, $historicdata);
+} else if($email || $sms){
+	$message = formatText($messageid, $historicdata);
 }
 
 
@@ -97,7 +94,7 @@ if($phone){
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function formatEmail($messageid, $historicdata) {
+function formatText($messageid, $historicdata) {
 	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = '" . $messageid . "' order by sequence");
 	$data = Message::format($messageparts);
 	$message = "";
@@ -162,6 +159,11 @@ function formatEmail($messageid, $historicdata) {
 	
 		$data = substr($data,$skip );
 	}
+	//get trailling text if exists.
+	if (strlen($data) > 0) {
+		$message .= $data;
+	}
+	
 	if(count($errors)){
 		return $errors;
 	} else {
@@ -220,7 +222,7 @@ if($phone){
 		</div>
 	<?
 	endWindow();
-} else if ($email){
+} else if ($email || $sms){
 	startWindow('Read', 'padding: 3px;');
 	if(is_array($message)){
 		error($message);
