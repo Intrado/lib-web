@@ -187,6 +187,10 @@ $$$
 UPDATE aspshard.qjob qj, job j set qj.jobtypeid=j.jobtypeid where qj.customerid=_$CUSTOMERID_ and qj.id=j.id
 $$$
 
+-- if they have 'survey' in the name, convert it to a general survey jobtype
+UPDATE jobtype set systempriority=3, issurvey=1 where name like '%survey%'
+$$$
+
 -- create new survey jobtype
 INSERT INTO jobtype (name, systempriority, issurvey) values ('Survey', 3, 1)
 $$$
