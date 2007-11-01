@@ -28,7 +28,7 @@ select count(*) as cnt,
 			if(rp.status = 'blocked','blocked', null),
 			if(rc.result not in ('A', 'M') and rc.numattempts > '0' and rc.numattempts < js.value and j.status not in ('complete','cancelled'), 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
-			if(rc.result not in ('A', 'M') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
+			if(rc.result not in ('A', 'M', 'declined') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
 			rc.result)
 			as callprogress2
 
@@ -55,7 +55,8 @@ $cpcolors = array(
 	"inprogress" => "blue",
 	"retry" => "cyan",
 	"scheduled" => "darkblue",
-	"blocked" => "#CC00CC"
+	"blocked" => "#CC00CC",
+	"declined" => "pink"
 
 );
 
@@ -72,7 +73,8 @@ $cpcodes = array(
 	"inprogress" => "Queued",
 	"retry" => "Retrying",
 	"scheduled" => "Scheduled",
-	"blocked" => "Blocked"
+	"blocked" => "Blocked",
+	"declined" => "Declined"
 );
 
 //preset array positions
@@ -88,7 +90,8 @@ $data = array(
 	"nocontacts" => false,
 	"inprogress" => false,
 	"retry" => false,
-	"scheduled" => false
+	"scheduled" => false,
+	"declined" => false
 );
 $legend = $data;
 $colors = $data;
