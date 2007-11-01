@@ -21,6 +21,9 @@ class JobDetailReport extends ReportGenerator{
 		} else if($this->params['reporttype'] == "emaildetail"){
 			$typequery = " and rp.type = 'email'";
 			$this->params['type'] = "email";
+		} else if($this->params['reporttype'] == "smsdetail"){
+			$typequery = " and rp.type = 'sms'";
+			$this->params['type'] = "sms";
 		}
 
 		if(isset($this->params['jobid'])){
@@ -74,6 +77,7 @@ class JobDetailReport extends ReportGenerator{
 			coalesce(m.name, sq.name) as messagename,
 			coalesce(rc.phone,
 						rc.email,
+						rc.sms,
 						concat(
 							coalesce(rc.addr1,''), ' ',
 							coalesce(rc.addr2,''), ' ',

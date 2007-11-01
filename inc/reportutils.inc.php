@@ -133,6 +133,8 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 		$deliveryquery = " and (j.phonemessageid is not null OR sq.hasphone != '0' )";
 	} else if("email" == $deliverymethod) {
 		$deliveryquery = " and (j.emailmessageid is not null OR sq.hasweb != '0' )";	
+	} else if("sms" == $deliverymethod) {
+		$deliveryquery = " and (j.smsmessageid is not null)";	
 	}	
 	$surveyfilter = "";
 	if($surveyonly == "true"){
