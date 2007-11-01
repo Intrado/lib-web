@@ -41,7 +41,8 @@ function getJobSummary($joblist){
 							j.status,
 							count(distinct rp.personid) as pcount,
 							coalesce(sum(rc.type='phone'), 0),
-							coalesce(sum(rc.type='email'), 0)
+							coalesce(sum(rc.type='email'), 0),
+							coalesce(sum(rc.type='sms'), 0)
 							from job j
 							left join reportperson rp on (j.id = rp.jobid)
 							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
@@ -80,6 +81,7 @@ function displayJobSummary($joblist){
 								<th>Recipients</th>
 								<th># of Phones</th>
 								<th># of Emails</th>
+								<th># of SMS</th>
 							</tr>
 <?
 							$alt=0;
@@ -96,6 +98,7 @@ function displayJobSummary($joblist){
 									<td><?=$job[8]?></td>
 									<td><?=$job[9]?></td>
 									<td><?=$job[10]?></td>
+									<td><?=$job[11]?></td>
 								</tr>
 <?
 							}
