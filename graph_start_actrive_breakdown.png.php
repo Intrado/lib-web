@@ -13,9 +13,14 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 
 $query = "
 select count(*) as cnt,
-		coalesce(if(rp.status = 'nocontacts','nocontacts', null),
-			if(rc.result not in ('A', 'M', 'blocked', 'duplicate') and rc.numattempts > 0 and rc.numattempts < js.value, 'retry', if(rc.result='notattempted', null, rc.result)),
-			if (rp.status not in ('fail','duplicate','scheduled', 'blocked'), 'inprogress', rp.status))
+		coalesce(
+			if(rp.status = 'nocontacts','nocontacts', null),
+			if(rp.status = 'duplicate','duplicate', null),
+			if(rp.status = 'blocked','blocked', null),
+			if(rc.result = 'declined', 'declined', null),
+			if(rp.status not in ('success', 'fail', 'blocked', 'duplicate', 'declined'), 'retry', null),
+			if(rc.result!='notattempted', rc.result, null),
+			if(rp.status not in ('fail','duplicate','scheduled', 'blocked', 'declined'), 'inprogress', rp.status))
 			as callprogress2
 
 from job j
@@ -42,7 +47,8 @@ $cpcolors = array(
 	"inprogress" => "blue",
 	"retry" => "cyan",
 	"scheduled" => "darkblue",
-	"blocked" => "#CC00CC"
+	"blocked" => "#CC00CC",
+	"declined" => "pink"
 
 );
 
@@ -59,7 +65,8 @@ $cpcodes = array(
 	"inprogress" => "Queued",
 	"retry" => "Retrying",
 	"scheduled" => "Scheduled",
-	"blocked" => "Blocked"
+	"blocked" => "Blocked",
+	"declined" => "Declined"
 );
 
 //preset array positions
@@ -75,7 +82,8 @@ $data = array(
 	"fail" => false,
 	"inprogress" => false,
 	"retry" => false,
-	"scheduled" => false
+	"scheduled" => false,
+	"declined" => false
 );
 $legend = $data;
 $colors = $data;
