@@ -6,6 +6,7 @@ require_once("parentportalutils.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Person.obj.php");
+require_once("../inc/formatters.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -17,7 +18,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$contactList = getContactIDs($_SESSION['portaluserid']);
 	
 	foreach($contactList as $personid){
-		$result = Query("select j.id, j.startdate, j.name, rp.type, u.firstname, u.lastname, rp.messageid, rp.personid , u.email
+		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, u.email
 			from job j 
 			left join reportperson rp on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
@@ -26,7 +27,8 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 			and rp.personid = '" . $personid . "'
 			and j.status in ('active', 'complete')
 			and j.questionnaireid is null
-			order by j.startdate desc");
+			group by j.id
+			order by j.startdate desc, j.starttime, j.id desc");
 		$data = array();
 		$number = 1;
 		while($row = DBGetRow($result)){
@@ -46,7 +48,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	
 	$formatters = array("2" => "format_date",
 						"SentBy" => "sender",
-						"4" => "format_type",
+						"4" => "fmt_csv_list",
 						"Actions" => "message_action"
 					);
 }
@@ -56,23 +58,19 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 
 function message_action($row, $index){
 	//index 1 is job id
-	//index 8 is person id
+	//index 7 is person id
 	//index 4 is type
 	$types = explode(",",$row[4]);
-	if(in_array("phone", $types) && in_array("email", $types)){
-		return button_bar(button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=phone', 400, 500);",null), button("Read", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=email', 400, 500);",null));
-	}
 	if(in_array("phone", $types)){
-		return button_bar(button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=phone', 400, 500);",null));
+		$buttons[] = button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500);",null);
 	}
 	if(in_array("email", $types)){
-		return button_bar(button("Read", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[8] . "&type=email', 400, 500);",null));
+		$buttons[] = button("Read Email", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500);",null);
 	}
-	return "&nbsp;";
-}
-
-function format_type($row, $index){
-	return ucfirst($row[$index]);
+	if(in_array("sms", $types)){
+		$buttons[] = button("Read SMS", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500);",null);
+	}
+	return "<table><tr><td>" . implode("</td><td>", $buttons) . "</td></tr></table>";
 }
 
 function format_date($row, $index){
@@ -83,10 +81,10 @@ function sender($row, $index){
 	//index 5 is first name
 	//index 6 is last name
 	//index 4 is type
-	//index 9 is email
+	//index 8 is email
 	$types = explode(",",$row[4]);
 	if(in_array("email", $types)){
-		return "<a href='mailto:" . $row[9] . "'>" . $row[5] . " " . $row[6] . "</a>";
+		return "<a href='mailto:" . $row[8] . "'>" . $row[5] . " " . $row[6] . "</a>";
 	} else {
 		return $row[5] . " " . $row[6];
 	}
