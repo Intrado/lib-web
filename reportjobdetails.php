@@ -62,7 +62,7 @@ function fmt_jobdetail_result($row, $index){
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
 unset($_SESSION['report']['edit']);
-
+$redirect = 0;
 if(isset($_GET['reportid'])){
 	$_SESSION['reportid'] = $_GET['reportid']+0;
 	if(!userOwns("reportsubscription", $_SESSION['reportid'])){
@@ -347,7 +347,7 @@ if($error || $reportgenerator->format == "html"){
 <?
 		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
 ?>
-			<tr><th align="right" class="windowRowHeader">Finalized Calls:</th>
+			<tr><th align="right" class="windowRowHeader">Finalized Notifications:</th>
 				<td class="bottomBorder"><?=NewFormItem($f, $s, "hideinprogress", "checkbox");?>Only Show Finalized Calls</td>
 			</tr>
 <?
