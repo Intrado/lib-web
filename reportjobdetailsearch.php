@@ -126,7 +126,7 @@ if(isset($_SESSION['reportid'])){
 }
 $_SESSION['report']['options'] = $options;
 
-$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0' order by systempriority, issurvey, name");
+$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0' and not issurvey order by systempriority, name");
 $jobtypes = array();
 foreach($jobtypeobjs as $jobtype){
 	$jobtypes[$jobtype->id] = $jobtype->name;
