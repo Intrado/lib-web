@@ -20,15 +20,6 @@ if(isset($_SESSION['currentid'])) {
 	}
 }
 
-if(isset($_REQUEST['delete'])){
-	$jobtypeid = $_REQUEST['delete']+0;
-	if(QuickQuery("select count(*) from userjobtypes where jobtypeid = '" . $jobtypeid . "'")){
-		error("There are still users with that jobtype as a restriction.  You cannot delete it.");
-	} else {
-		QuickUpdate("update jobtype set deleted = 1 where id = '$jobtypeid'", $custdb);
-		redirect();
-	}
-}
 
 //////////////////////////////////////////
 // Data Handling
@@ -46,7 +37,7 @@ $error = 0;
 $f = "form";
 $s = "priorities";
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
+if(CheckFormSubmit($f, 'new')) {
 	if(CheckFormInvalid($f))
 	{
 		error('Form was edited in another window, reloading data');
@@ -62,35 +53,29 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 				error('Bad Manager Password');
 		} else {
 		
-			if(CheckFormSubmit($f, 'new') && GetFormData($f, $s, 'newname') != ""){
+			if(GetFormData($f, $s, 'newname') != ""){
 				$name = DBSafe(GetFormData($f, $s, 'newname'));
-				$systempriority = GetFormData($f, $s, 'newsystempriority')+0;
-				$issurvey = DBSafe(GetFormData($f, $s, 'newissurvey'));
-				if($issurvey && $systempriority != '3'){
-					error("Surveys can only be general system priority");
-					$error = 1;
-				}
 				QuickUpdate("insert into jobtype(name, systempriority, issurvey) values
-							('$name', '$systempriority', '$issurvey')", $custdb);
-			}
-				
-			foreach($jobtypes as $jobtype){
-				$id = $jobtype['id'];
-				$name = DBSafe(GetFormData($f, $s, 'name'.$jobtype['id']));
-				$systempriority = GetFormData($f, $s, 'systempriority'.$jobtype['id']) + 0;
-				$issurvey = DBSafe(GetFormData($f, $s, 'issurvey' . $jobtype['id']));
-				
-				if($issurvey && $systempriority !='3'){
-					error("Surveys can only be general system priority");
-					$error = 1;
-				} else {
-					$query = "update jobtype set name = '$name', issurvey = '$issurvey', systempriority = '$systempriority' where id = '$id'";
-					QuickUpdate($query, $custdb);	
+							('$name', '2', '0')", $custdb);
+				$jobtypeid = mysql_insert_id();
+				$maxphones = getCustomerSystemSetting("maxphones", 4, true, $custdb);
+				$maxemails = getCustomerSystemSetting("maxemails", 2, true, $custdb);
+				$maxsms = getCustomerSystemSetting("maxsms", 2, true, $custdb);
+				for($i=0; $i < $maxphones; $i++){
+					QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
+									values ('$jobtypeid', 'phone', '$i', '0')",$custdb);
 				}
-			}
-			if(!$error){
-				$refresh = 1;
-				$reload = 1;
+				for($i=0; $i < $maxemails; $i++){
+					QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
+									values ('$jobtypeid', 'email', '$i', '0')",$custdb);
+				}
+				for($i=0; $i < $maxsms; $i++){
+					QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
+									values ('$jobtypeid', 'sms', '$i', '0')",$custdb);
+				}
+				redirect();
+			} else {
+				error("You cannot add a job type that has a blank name");
 			}
 		}
 	}
@@ -101,46 +86,23 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'new')) {
 
 if($reload){
 	ClearFormData($f);
-	if($refresh){
-		$result = Query("select id, name, systempriority, issurvey from jobtype where deleted = 0 order by systempriority, issurvey, name", $custdb);
-		$jobtypes = array();
-		while($row = DBGetRow($result, true)){
-			$jobtypes[] = $row;
-		}
-	}
 	PutFormData($f, $s, 'newname', "", 'text');
-	PutFormData($f, $s, 'newsystempriority', "3");
-	PutFormData($f, $s, 'newissurvey', 0, "bool", 0, 1);
-	foreach($jobtypes as $jobtype){
-		PutFormData($f, $s, 'name'.$jobtype['id'], $jobtype['name'], 'text');
-		PutFormData($f, $s, 'systempriority'.$jobtype['id'], $jobtype['systempriority']);
-		PutFormData($f, $s, 'issurvey' . $jobtype['id'], (bool)$jobtype['issurvey'], 'bool', 0, 1);
-	}
 	PutFormData($f, $s, 'managerpassword', "", "text");
 	PutFormData($f, 'new', 'add', '');
-	PutFormData($f, $s, 'save', '');
 }
-
 
 //////////////////////////////////////////
-// Display Functions
+// Display functions
 //////////////////////////////////////////
 
-function getSystemPriorities () {
-	return array("1" => "Emergency",
-				"2" => "High Priority",
-				"3" => "General");
+function getPriorityName($systempriority){
+	$systemprioritynames = array(1 => "Emergency",
+								2 => "High Priority",
+								3 => "General");
+	
+	return $systemprioritynames[$systempriority];
 }
 
-function setSystemPriority($f, $s, $name) {
-	$systempriorities = getSystemPriorities();
-	NewFormItem($f, $s, $name, 'selectstart', NULL, NULL, 'id="addlang"');
-
-	foreach ($systempriorities as $index => $priority) {
-		NewFormItem($f, $s, $name, 'selectoption', $priority, $index);
-	}
-	NewFormItem($f, $s, $name, 'selectend');
-}
 //////////////////////////////////////////
 // Display
 //////////////////////////////////////////
@@ -158,26 +120,30 @@ NewForm($f);
 		<td>Actions</td>
 	</tr>
 <?
-	$systempriorities = getSystemPriorities();
 	foreach($jobtypes as $jobtype){
 		?><tr>
-			<td><? NewFormItem($f, $s, 'name'.$jobtype['id'], 'text', 20)?></td>
-			<td><? setSystemPriority($f, $s, 'systempriority'.$jobtype['id'])?></td>
-			<td><? NewFormItem($f, $s, 'issurvey' . $jobtype['id'], "checkbox");?></td>
-			<td><a href="customerpriorities.php?delete=<?=$jobtype['id']?>">Delete</a>
+			<td><?=$jobtype["name"]?></td>
+			<td><?=getPriorityName($jobtype["systempriority"])?></td>
+			<td><?= $jobtype["issurvey"] ? "Yes" : "No" ?></td>
+			<td>&nbsp</td>
 		</tr><?
 	}
 ?>
 	<tr>
 		<td><? NewFormItem($f, $s, 'newname', 'text', 20)?></td>
-		<td><? setSystemPriority($f, $s, 'newsystempriority')?></td>
-		<td><? NewFormItem($f, $s, 'newissurvey', "checkbox");?></td>
+		<td>High Priority</td>
+		<td>No</td>
 		<td><? NewFormItem($f, 'new', 'add', 'submit')?></td>
 		
 	</tr>
 
 </table>
-<p> <? NewFormItem($f, $s, "Save", 'submit');?>
+<div style="color:green">
+<p>If you want to add more general or survey types, please log into the customer and use the Job Type Management page.
+<p>If you are adding a High Priority Job Type, make sure it qualifies as a High Priority.  This would include things like "Attendance" or "Food Services".
+<p>If it does not fall into that category, please make the Job Type a General.
+<p>Do not forget to configure the job type call preferences for any added job types on this page.
+</div>
 <br> Manager Password: <? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?></p>
 
 <?
