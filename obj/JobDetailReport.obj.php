@@ -299,10 +299,10 @@ class JobDetailReport extends ReportGenerator{
 			} else {
 				$row[8] = "";
 			}
-			$row[9] = fmt_result($row,9);
+			$row[9] = fmt_jobdetail_result($row,9);
 
 
-			$reportarray = array($row[0], $row[1], $row[5],$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
+			$reportarray = array($row[0], $row[1], ucfirst_withexceptions($row[5]),$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
 
 			if ($issurvey) {
 				//fill in survey result data, be sure to fill in an array element for all questions, even if blank
