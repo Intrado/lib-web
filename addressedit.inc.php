@@ -176,7 +176,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 				$x++;
 			}
 
-			if ($USER->authorize('sendsms')){
+			if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 				$x = 0;
 				foreach ($smses as $sms) {
 					$itemname = "sms".($x+1);
@@ -252,7 +252,7 @@ if( $reloadform )
 		PutFormData($f,$s,$itemname,$email->email,"email",5,100);
 		$x++;
 	}
-	if ($USER->authorize('sendsms')){
+	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 		$x = 0;
 		foreach ($smses as $sms) {
 			$itemname = "sms".($x+1);
@@ -338,7 +338,7 @@ startWindow("Contact");
 <?
 		$x++;
 	}
-	if ($USER->authorize('sendsms')){
+	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 		$x = 0;
 		foreach ($smses as $sms) {
 			$header = "Sms " . ($x+1) . ":";
