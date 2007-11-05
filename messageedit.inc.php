@@ -174,7 +174,7 @@ $fieldmap = FieldMap::getAuthorizedMapNames();
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = ucfirst($MESSAGETYPE) . ' Message Editor: ' . (GetFormData($form,$section,"name") ? GetFormData($form,$section,"name") : "New Message" );
+$TITLE = ucfirst_withexceptions($MESSAGETYPE) . ' Message Editor: ' . (GetFormData($form,$section,"name") ? GetFormData($form,$section,"name") : "New Message" );
 $ICON = $MESSAGETYPE . ".gif";
 
 include_once("nav.inc.php");
