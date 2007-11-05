@@ -102,7 +102,7 @@ if (isset($personid)) {
 	$data = DBFind("Person", "from person where id = " . $personid);
 	$address = DBFind("Address", "from address where personid = " . $personid);
 	if ($address === false) $address = new Address(); // contact was imported/uploaded without any address data, create one now
-
+	$types = array();
 	// get existing phones from db, then create any additional based on the max allowed
 	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
 	// use array_values to reset starting index to 0
@@ -112,18 +112,28 @@ if (isset($personid)) {
 		$phones[$i]->sequence = $i;
 		$phones[$i]->personid = $personid;
 	}
+	$types["phone"] = $phones;
+	
 	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
 	for ($i=count($emails); $i<$maxemails; $i++) {
 		$emails[$i] = new Email();
 		$emails[$i]->sequence = $i;
 		$emails[$i]->personid = $personid;
 	}
-	$smses = array_values(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
-	for ($i=count($smses); $i<$maxsms; $i++) {
-		$smses[$i] = new Sms();
-		$smses[$i]->sequence = $i;
-		$smses[$i]->personid = $personid;
+	$types["email"] = $emails;
+	
+	if(getSystemSetting("_hassms")){
+		$smses = array_values(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
+		for ($i=count($smses); $i<$maxsms; $i++) {
+			$smses[$i] = new Sms();
+			$smses[$i]->sequence = $i;
+			$smses[$i]->personid = $personid;
+		}
+		$types["sms"] = $smses;
 	}
+	$contacttypes = array("phone", "email");
+	if(getSystemSetting("_hassms", false))
+		$contactypes[] = "sms";
 	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
 	$associates = getPortalUsers($associateids);
 	$tokendata = QuickQueryRow("select token, expirationdate, creationuserid from portalpersontoken where personid = '" . $personid . "'", true);
@@ -173,61 +183,38 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			//submit changes
-			foreach($phones as $phone){
-				$phone->phone = Phone::parse(GetFormData($f,$s, "phone" . $phone->sequence));
-				$phone->editlock = GetFormData($f, $s, "editlock_phone" . $phone->sequence);
-				$phone->update();
-				foreach($jobtypes as $jobtype){
-					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-								values ('" . $personid . "','" . $jobtype->id . "','phone','" . $phone->sequence . "','" 
-								. DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "') 
-								on duplicate key update
-								personid = '" . $personid . "',
-								jobtypeid = '" . $jobtype->id . "',
-								type = 'phone',
-								sequence = '" . $phone->sequence . "',
-								enabled = '" . DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "'");
-				}
-			}
-			foreach($emails as $email){
-				$email->email = GetFormData($f,$s, "email" . $email->sequence);
-				$email->editlock = GetFormData($f, $s, "editlock_email" . $email->sequence);
-				$email->update();
-				foreach($jobtypes as $jobtype){
-					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-								values ('" . $personid . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
-								. DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "') 
-								on duplicate key update
-								personid = '" . $personid . "',
-								jobtypeid = '" . $jobtype->id . "',
-								type = 'email',
-								sequence = '" . $email->sequence . "',
-								enabled = '" . DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "'");
-				}
-			}
-			if(getSystemSetting("_hassms")){
-				foreach($smses as $sms){
-					$sms->sms = Phone::parse(GetFormData($f,$s, "sms" . $sms->sequence));
-					$sms->editlock = GetFormData($f, $s, "editlock_sms" . $sms->sequence);
-					$sms->update();
+			foreach($contacttypes as $type){
+				if(!isset($types[$type])) continue;
+				foreach($types[$type] as $item){
+					$item->editlock = GetFormData($f, $s, "editlock_" . $type . $item->sequence);
+					if($item->editlock){
+						if($type == "email")
+							$item->$type = GetFormData($f, $s, $type . $item->sequence);
+						else
+							$item->$type = Phone::parse(GetFormData($f,$s, $type . $item->sequence));
+						$item->update();
+					}
 					foreach($jobtypes as $jobtype){
-						if(!$jobtype->issurvey){
-							QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-										values ('" . $personid . "','" . $jobtype->id . "','sms','" . $sms->sequence . "','" 
-										. DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "') 
-										on duplicate key update
-										personid = '" . $personid . "',
-										jobtypeid = '" . $jobtype->id . "',
-										type = 'sms',
-										sequence = '" . $sms->sequence . "',
-										enabled = '" . DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "'");
+						if((!isset($contactpref[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+							GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) ||
+							(!isset($contactpref[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+							GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id]) ||
+							(isset($contactprefs[$type][$item->sequence][$jobtype->id]) && 
+								GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id])){
+								QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+											values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','" 
+											. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "') 
+											on duplicate key update
+											personid = '" . $personid . "',
+											jobtypeid = '" . $jobtype->id . "',
+											type = '$type',
+											sequence = '" . $item->sequence . "',
+											enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'");
 						}
 					}
 				}
 			}
-			
-
-			redirect();
+			redirect($_SESSION['viewcontact_referer']);
 		}
 	}
 } else {
@@ -237,47 +224,24 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
-	foreach($phones as $phone){
-		PutFormData($f, $s, "phone" . $phone->sequence, Phone::format($phone->phone), "phone", 10);
-		PutFormData($f, $s, "editlock_phone" . $phone->sequence, $phone->editlock, "bool", 0, 1);
-		foreach($jobtypes as $jobtype){
-			$contactpref = 0;
-			if(isset($contactprefs["phone"][$phone->sequence][$jobtype->id]))
-				$contactpref = $contactprefs["phone"][$phone->sequence][$jobtype->id];
-			else if(isset($defaultcontactprefs["phone"][$phone->sequence][$jobtype->id]))
-				$contactpref = $defaultcontactprefs["phone"][$phone->sequence][$jobtype->id];
-			PutFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
-		}
-	}
-	foreach($emails as $email){
-		PutFormData($f, $s, "email" . $email->sequence, $email->email, "email", 0, 100);
-		PutFormData($f, $s, "editlock_email" . $email->sequence, $email->editlock, "bool", 0, 1);
-		foreach($jobtypes as $jobtype){
-			$contactpref = 0;
-			if(isset($contactprefs["email"][$email->sequence][$jobtype->id]))
-				$contactpref = $contactprefs["email"][$email->sequence][$jobtype->id];
-			else if(isset($defaultcontactprefs["email"][$email->sequence][$jobtype->id]))
-				$contactpref = $defaultcontactprefs["email"][$email->sequence][$jobtype->id];
-			PutFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
-		}
-	}
-	if(getSystemSetting("_hassms")){
-		foreach($smses as $sms){
-			PutFormData($f, $s, "sms" . $sms->sequence, Phone::format($sms->sms), "phone", 10);
-			PutFormData($f, $s, "editlock_sms" . $sms->sequence, $sms->editlock, "bool", 0, 1);
+	foreach($contacttypes as $type){
+		if(!isset($types[$type])) continue;
+		foreach($types[$type] as $item){
+			if($type == "email")
+				PutFormData($f, $s, $type . $item->sequence, $item->$type, $type, 0, 100);
+			else
+				PutFormData($f, $s, $type . $item->sequence, Phone::format($item->$type), "phone", 10);
+			PutFormData($f, $s, "editlock_" . $type . $item->sequence, $item->editlock, "bool", 0, 1);
 			foreach($jobtypes as $jobtype){
-				if(!$jobtype->issurvey){
-					$contactpref = 0;
-					if(isset($contactprefs["sms"][$sms->sequence][$jobtype->id]))
-						$contactpref = $contactprefs["sms"][$sms->sequence][$jobtype->id];
-					else if(isset($defaultcontactprefs["sms"][$sms->sequence][$jobtype->id]))
-						$contactpref = $defaultcontactprefs["sms"][$sms->sequence][$jobtype->id];
-					PutFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
-				}
+				$contactpref = 0;
+				if(isset($contactprefs[$type][$item->sequence][$jobtype->id]))
+					$contactpref = $contactprefs[$type][$item->sequence][$jobtype->id];
+				else if(isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]))
+					$contactpref = $defaultcontactprefs[$type][$item->sequence][$jobtype->id];
+				PutFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
 			}
 		}
-	}
-	
+	}	
 }
 
 
@@ -304,7 +268,7 @@ $TITLE = "View Contact Information: " . $contactFullName;
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(button('Done', NULL,$_SESSION['viewcontact_referer']), submit($f, $s, "Save"));
+buttons(submit($f, $s, "Save"));
 
 startWindow('Contact');
 
@@ -381,11 +345,11 @@ foreach ($fieldmaps as $map) {
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Contact Details: </th>
 		<td class="bottomBorder">
-			<table padding="3px">
-				<tr>
+			<table  cellpadding="2" cellspacing="1">
+				<tr class="listheader">
 					<th align="left">Contact&nbsp;Type</th>
+					<th>Override</th>
 					<th align="left">Destination</th>
-					<th>Edit Lock</th>
 <?
 					foreach($jobtypes as $jobtype){
 						?><th><?=jobtype_info($jobtype)?></th><?
@@ -394,77 +358,30 @@ foreach ($fieldmaps as $map) {
 				</tr>
 <?
 
-	$x = 0;
-	foreach ($phones as $phone) {
-		$header = "Phone&nbsp;" . ($x+1) . ":";
-		$itemname = "phone".($x+1);
-?>
-	<tr>
-		<td><?= $header ?></td>
-		<td><? NewFormItem($f, $s, "phone" . $phone->sequence, "text", 14); ?></td>
-		<td align="middle"><? NewFormItem($f, $s, "editlock_phone" . $phone->sequence, "checkbox", 0, 1); ?></td>
-<?
-		foreach($jobtypes as $jobtype){
-			if(!$jobtype->issurvey){
-				?><td align="middle"><? NewFormItem($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
-			}
-		}
-		foreach($jobtypes as $jobtype){
-			if($jobtype->issurvey){
-				?><td align="middle"><? NewFormItem($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
-			}
-		}
-?>
-	</tr>
-<?
-		$x++;
-	}
 
-	$x = 0;
-	foreach ($emails as $email) {
-		$header = "Email&nbsp;" . ($x+1) . ":";
-		$itemname = "email".($x+1);
+	foreach($contacttypes as $type){
+		if(!isset($types[$type])) continue;
+		foreach($types[$type] as $item){
+			$header = ucfirst_withexceptions($type) . "&nbsp;" . ($item->sequence +1);
 ?>
-	<tr>
-		<td><?= $header ?></td>
-		<td><? NewFormItem($f, $s, "email" . $email->sequence, "text", 30, 100) ?></td>
-		<td align="middle"><? NewFormItem($f, $s, "editlock_email" . $email->sequence, "checkbox", 0,1);?></td>
+			<tr>
+				<td><?= $header ?></td>
+				<td align="middle"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, 'onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
 <?
-		foreach($jobtypes as $jobtype){
-			if(!$jobtype->issurvey){
-				?><td align="middle"><? NewFormItem($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
-			}
-		}
-		foreach($jobtypes as $jobtype){
-			if($jobtype->issurvey){
-				?><td align="middle"><? NewFormItem($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
-			}
-		}
-?>
-	</tr>
-<?
-		$x++;
-	}
-	if(getSystemSetting("_hassms")){
-		$x = 0;
-		foreach ($smses as $sms) {
-			$header = "Sms&nbsp;" . ($x+1) . ":";
-			$itemname = "sms".($x+1);
-?>
-		<tr>
-			<td><?= $header ?></td>
-			<td><? NewFormItem($f, $s, "sms" . $sms->sequence, "text", 14) ?></td>
-			<td align="middle"><? NewFormItem($f, $s, "editlock_sms" . $sms->sequence, "checkbox", 0,1);?></td>
-<?
-			foreach($jobtypes as $jobtype){
-				if(!$jobtype->issurvey){
-					?><td align="middle"><? NewFormItem($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+				$disabled = "";
+				if(!$item->editlock)
+					$disabled = " Disabled ";
+				if($type == "email"){
+					?><td><? NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id=" . $type . $item->sequence . $disabled); ?></td><?
+				} else {
+					?><td><? NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id=" . $type . $item->sequence . $disabled); ?></td><?
 				}
-			}
+				foreach($jobtypes as $jobtype){
+					?><td align="middle"><? NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+				}
 ?>
-		</tr>
+			</tr>
 <?
-			$x++;
 		}
 	}
 ?>
@@ -472,13 +389,13 @@ foreach ($fieldmaps as $map) {
 		<td>
 	</tr>
 <?
-	if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess")){
+	if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess") && $associates){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Associations:</th>
 		<td class="bottomBorder">
-			<table >
-				<tr>
+			<table  cellpadding="2" cellspacing="1" >
+				<tr class="listheader">
 					<th align="left"><b>First Name<b></th>
 					<th align="left"><b>Last Name<b></th>
 					<th align="left"><b>User Name<b></th>
@@ -486,7 +403,6 @@ foreach ($fieldmaps as $map) {
 					<th align="left"><b>Actions<b></th>
 				</tr>
 <?
-			if($associates){
 				foreach($associates as $portaluserid => $associate){
 					if($associate['portaluser.lastlogin']){
 						$lastlogin = date("M d, Y h:i:s a", strtotime($associate['portaluser.lastlogin']));
@@ -503,20 +419,14 @@ foreach ($fieldmaps as $map) {
 					</tr>
 <?
 				}
-			} else {
-?>
-				<tr>
-					<td>&nbsp</td>
-					<td>&nbsp</td>
-					<td>&nbsp</td>
-					<td>&nbsp</td>
-				</tr>
-<?
-			}
 ?>
 			</table>
 		</td>
 	</tr>
+<?
+	}
+	if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess")){
+?>
 	<tr>
 		<th align="right" class="windowRowHeader">Activation Code Information:</th>
 		<td>
@@ -536,7 +446,10 @@ foreach ($fieldmaps as $map) {
 				<tr>
 					<td>
 <?
-					echo button("Generate Activation Code", "window.location='?create=1'");
+					if($tokendata['token'])
+						echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1'");
+					else
+						echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1'");
 ?>					
 					</td>
 <?	
@@ -563,7 +476,13 @@ foreach ($fieldmaps as $map) {
 		return confirm('Are you sure you want to disassociate this Portal User?');
 	}
 	function confirmRevoke(){
-		return confirm('Are you sure you want to revoke this contact\'s token?');
+		return confirm('Are you sure you want to revoke this contact\'s activation code?');
+	}
+	function confirmGenerate(){
+		return confirm('Are you sure you want to generate an activation code for this person?');
+	}
+	function confirmGenerateActive(){
+		return confirm('Are you sure you want to overwrite the current activation code?');
 	}
 </script>
 <?
