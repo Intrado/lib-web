@@ -10,7 +10,7 @@ if (isset($_GET['id'])) {
 }
 
 $jobid = $_SESSION['jobid'];
-
+$hassms = getSystemSetting('_hassms', false);
 
 // Set up variables that determine later editability of the form
 /*
@@ -88,9 +88,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
-		} else if (GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) > 160){
+		} else if ($hassms && GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) > 160){
 			error('There is a maximum of 160 characters for SMS messages');
-		} else if (GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) < 1){
+		} else if ($hassms && GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) < 1){
 			error('The SMS message body cannot be empty');
 		} else if (GetFormData($f, $s, 'sendphone') && GetFormData($f, $s, 'phonemessageid') == '0'){
 			error('Please select a default phone message');
@@ -111,7 +111,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			} else if ($submittedmode) {
 				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
 			} else {
-				if($USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") &&GetFormData($f, $s, 'smsmessageid') == "0" ){
+				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") &&GetFormData($f, $s, 'smsmessageid') == "0" ){
 					$newsmsmessage = new Message();
 					$parts = $newsmsmessage->parse(GetFormData($f, $s, 'smsmessagetxt'));
 					$newsmsmessage->userid = $USER->id;
@@ -146,7 +146,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$job->sendemail = false;
 				if(!$USER->authorize('sendprint'))
 					$job->sendprint = false;
-				if(!$USER->authorize('sendsms'))
+				if(!$hassms || !$USER->authorize('sendsms'))
 					$job->sendsms = false;
 			}
 
@@ -169,7 +169,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->printmessageid = NULL;
 				$job->sendprint = false;
 			}
-			if ($job->sendsms && $job->smsmessageid != 0) {
+			if ($hassms && $job->sendsms && $job->smsmessageid != 0) {
 				$jobtypes[] = "sms";
 			} else {
 				$job->smsmessageid = NULL;
@@ -558,10 +558,16 @@ startWindow('Job Information');
 					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?></td>
 				</tr>
+<?
+				if($hassms && $USER->authorize('sendsms')){
+?>
 				<tr>
 					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('smsoptions'); else hide('smsoptions');\""); ?></td>
 				</tr>
+<?
+				}
+?>
 			</table>
 		</td>
 	</tr>
@@ -789,7 +795,7 @@ startWindow('Job Information');
 		</td>
 	</tr>
 <? } ?>
-<? if($USER->authorize('sendsms')) { ?>
+<? if($hassms && $USER->authorize('sendsms')) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
@@ -819,19 +825,26 @@ include_once("navbottom.inc.php");
 
 ?>
 <script language="javascript">
-	var smsmessagedropdown = new getObj('smsmessageid').obj;
-	if(smsmessagedropdown.value != 0){
-		hide('newsmstext');
+<?
+	if($hassms && $USER->authorize('sendsms')) {
+?>
+		var smsmessagedropdown = new getObj('smsmessageid').obj;
+		if(smsmessagedropdown.value != 0){
+			hide('newsmstext');
+		}
+		if(new getObj('sendsms').obj.checked){
+			show('smsoptions');
+		}
+<?
 	}
+?>
 	if(new getObj('sendphone').obj.checked){
 		show('phoneoptions');
 	}
 	if(new getObj('sendemail').obj.checked){
 		show('emailoptions');
 	}
-	if(new getObj('sendsms').obj.checked){
-		show('smsoptions');
-	}
+
 	function limit_chars(field) {
 		if (field.value.length > 160)
 			field.value = field.value.substring(0,160);
