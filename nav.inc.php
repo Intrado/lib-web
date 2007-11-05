@@ -71,7 +71,7 @@ $NAVTREE = array (
 		array("Surveys","surveys.php","survey",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
-	array("Reports","reports.php",array('createreport',"sendsms","viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
+	array("Reports","reports.php",array('createreport',"viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
 		array("Reports", "reports.php", "createreport", $SUBTAB=="reports"),
 		array("Usage Stats","reportsystem.php?clear=1","viewusagestats",$SUBTAB=="system"),
 		array("Call Distribution","reportsystemdistribution.php","viewcalldistribution",$SUBTAB=="distribution")
@@ -89,10 +89,10 @@ $NAVTREE = array (
 		array("Users","users.php","manageaccount",$SUBTAB=="users"),
 		array("Security","profiles.php","manageprofile",$SUBTAB=="security"),
 		array("Settings","settings.php","managesystem",$SUBTAB=="settings"),
-		array("Jobtype", "jobtypemanagement.php?clear=1", NULL, $SUBTAB=="jobtype"),
+		array("Job Types", "jobtypemanagement.php?clear=1", NULL, $SUBTAB=="jobtype"),
 		array("Metadata","datamanager.php","metadata",$SUBTAB=="datamanager"),
 		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager"),
-		array("Portal", "portalmanagement.php?clear=1", "portalaccess", $SUBTAB=="portal")
+		array("Portal", "portalmanagement.php?clear=1", getSystemSetting("_hasportal") ? "portalaccess" : "dummy", $SUBTAB=="portal")
 		))
 );
 
