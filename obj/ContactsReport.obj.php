@@ -136,7 +136,8 @@ class ContactsReport extends ReportGenerator {
 		$data = array();
 		foreach($personlist as $personrow){
 			foreach($phoneemailsmsdata[$personrow[1]] as $destination){
-				$data[] = array_insert($personrow, array($destination[2],$destination[1]), 4);
+				
+				$data[] = array_insert($personrow, array($destination[2],$destination[1], $destination[3]), 4);
 			}
 		}
 		
@@ -146,11 +147,13 @@ class ContactsReport extends ReportGenerator {
 						"4" => "Address",
 						"5" => "Sequence",
 						"6" => "Destination");
-		// set the last title index
-		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
+		// index 7 is a flag to tell what type of destination
+		// so set the title of starting f-field at appropriate place
+		// append begins after index specified
+		$titles = appendFieldTitles($titles, 7, $fieldlist, $activefields);
 
 		$formatters = array("0" => "fmt_idmagnify",
-							"5" => "add_one_to_sequence",
+							"5" => "fmt_destination_sequence",
 							"6" => "fmt_destination");
 		
 		startWindow("Search Results", "padding: 3px;");
