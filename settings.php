@@ -183,7 +183,7 @@ if( $reloadform )
 	for($i=0; $i < $maxsms; $i++){
 		PutFormData($f, $s, "lockedsms" . $i, getSystemSetting('lockedsms' . $i, 0), "bool", 0, 1);
 	}
-	PutFormData($f, $s, "tokenlife", getSetting('tokenlife', 30), 'number', 0, 365);
+	PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 0, 365);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,7 +353,7 @@ startWindow('Global System Settings');
 								</td>
 							</tr>
 							<tr>
-								<td  width="30%">Autoreport Email address<? print help('Settings_AutoreportEmailAddress'); ?></td>
+								<td  width="30%">Autoreport Email Address<? print help('Settings_AutoreportEmailAddress'); ?></td>
 								<td><? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 60,100);  ?></td>
 							</tr>
 							<tr>
@@ -415,14 +415,15 @@ startWindow('Global System Settings');
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 								<tr>
-									<td width="30%">Activation Code lifetime in days</td>
-									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?></td>
+									<td width="30%">Activation Code Lifetime</td>
+									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?>days</td>
 								</tr>
 								<tr>
-									<td colspan="2">
-										<table border="0" cellpadding="3" cellspacing="1" width="30%">
-											<tr>
-												<th>&nbsp;</th>
+									<td width="30%">Restricted Destination Fields</td>
+									<td>
+										<table border="0" cellpadding="3" cellspacing="1">
+											<tr class="listheader">
+												<th>Contact Type</th>
 												<?
 												for($i=1; $i<= max($maxphones, $maxemails, $maxsms);$i++){
 													?><th><?=$i?></th><?
@@ -431,7 +432,7 @@ startWindow('Global System Settings');
 											</tr>
 
 											<tr>
-												<td align="left">Locked&nbsp;Phones</td>
+												<td align="left">Phones</td>
 <?
 												for($i=0; $i<$maxphones; $i++){
 													?>
@@ -441,7 +442,7 @@ startWindow('Global System Settings');
 ?>
 											</tr>
 											<tr>
-												<td align="left">Locked&nbsp;Emails</td>
+												<td align="left">Emails</td>
 <?
 												for($i=0; $i<$maxemails; $i++){
 													?>
@@ -451,7 +452,7 @@ startWindow('Global System Settings');
 ?>
 											</tr>
 											<tr>
-												<td align="left">Locked&nbsp;SMS</td>
+												<td align="left">SMS</td>
 <?
 												for($i=0; $i<$maxsms; $i++){
 													?>
