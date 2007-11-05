@@ -32,11 +32,11 @@ $cpcolors = array(
 	"N" => "tan",
 	"X" => "black",
 	"F" => "red",
-	"duplicate" => "lightgray",
-	"blocked" => "#CC00CC",
-	"nocontacts" => "#aaaaaa",
 	"notattempted" => "blue",
-	"declined" => "pink"
+	"blocked" => "#CC00CC",
+	"duplicate" => "lightgray",
+	"nocontacts" => "#aaaaaa",
+	"declined" => "yellow"
 );
 
 $cpcodes = array(
@@ -46,10 +46,10 @@ $cpcodes = array(
 	"N" => "No Answer",
 	"X" => "Disconnect",
 	"F" => "Failed",
-	"duplicate" => "Duplicate",
-	"blocked" => "Blocked",
-	"nocontacts" => "No Phone #",
 	"notattempted" => "Not Attempted",
+	"blocked" => "Blocked",
+	"duplicate" => "Duplicate",
+	"nocontacts" => "No Phone #",
 	"declined" => "Declined"
 );
 
