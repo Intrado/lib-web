@@ -20,6 +20,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$password1 = get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1'];
 	$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
 	$acceptterms = isset($_POST['acceptterms']);
+	
 	if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $login)){
 		error("That is not a valid email format");
 	} else if(!ereg("^[0-9]*$",$zipcode)){
@@ -30,6 +31,10 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error("You must enter a password");
 	} else if($password1 != $password2){
 		error("Your passwords don't match");
+	} else if(strlen($password1) < 5){
+		error("Passwords must be at least 5 characters long");
+	} else if($passworderror = isSameUserPass($login, $password1, $firstname, $lastname)){
+		error($passworderror);
 	} else if(!$acceptterms){
 		error("You must accept the Terms of Service");
 	} else {
@@ -58,27 +63,27 @@ if(!$success){
 		<table>
 			<tr>
 				<td>Email&nbsp;(this will be your login name):</td>
-				<td><input type="text" name="login" value="<?=$login?>" size="50" maxlength="100"/> </td>
+				<td><input type="text" name="login" value="<?=$login?>" size="50" maxlength="255"/> </td>
 			</tr>
 			<tr>
 				<td>Password: </td>
-				<td><input type="password" name="password1" /> </td>
+				<td><input type="password" name="password1"  maxlength="50"/> </td>
 			</tr>
 			<tr>
 				<td>Confirm Password: </td>
-				<td><input type="password" name="password2" /> </td>
+				<td><input type="password" name="password2"  maxlength="50"/> </td>
 			</tr>
 			<tr>
 				<td>First Name:</td>
-				<td><input type="text" name="firstname" value="<?=$firstname?>" /></td>
+				<td><input type="text" name="firstname" value="<?=$firstname?>" maxlength="100"/></td>
 			</tr>
 			<tr>
 				<td>Last Name:</td>
-				<td><input type="text" name="lastname" value="<?=$lastname?>" /></td>
+				<td><input type="text" name="lastname" value="<?=$lastname?>" maxlength="100"/></td>
 			</tr>
 			<tr>
 				<td>Zip Code:</td>
-				<td><input type="text" name="zipcode" value="<?=$zipcode?>" /></td>
+				<td><input type="text" name="zipcode" value="<?=$zipcode?>" size="5" maxlength="5"/></td>
 			</tr>
 			<tr>
 				<td colspan="2"><div style="overflow:scroll; height:500px;"><?=$tos ?></div></td>
