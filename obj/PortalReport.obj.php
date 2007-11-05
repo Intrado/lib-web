@@ -10,18 +10,23 @@ class PortalReport extends ReportGenerator{
 		$pkeysql = "";
 		$hideactivetokens = "";
 		$hideassociated = "";
+		$hideassociatedtable = "";
 		$showall = false;
-		
 		if(isset($this->params['showall']))
 			$showall = true;
 		if(isset($this->params['pkey'])){
 			$pkeysql = " and p.pkey = '" . DBSafe($this->params['pkey']) . "' ";
 		}
 		if(isset($this->params['hideactivetokens']) && $this->params['hideactivetokens']){
-			$hideactivetokens = " and (ppt.token is null or ppt.expirationdate < now()) ";
+			$hideactivetokens = " and (ppt.token is null or ppt.expirationdate < curdate()) ";
 		}
 		if(isset($this->params['hideassociated']) && $this->params['hideassociated']){
-			$hideassociated = " and not exists (select count(*) from portalperson pp where pp.personid = p.id group by pp.personid) ";
+			$hideassociated = " and ppcount.count is null ";
+			$hideassociatedtable = " left join 
+									(select count(*) as count, pp.personid as ppcountpersonid 
+									from portalperson pp 
+									group by pp.personid) 
+									as ppcount on (ppcount.ppcountpersonid = p.id) ";
 		}
 		if($rulesql || $pkeysql || $showall){
 			$this->query = "select SQL_CALC_FOUND_ROWS
@@ -33,8 +38,9 @@ class PortalReport extends ReportGenerator{
 						ppt.expirationdate"
 						. generateFields("p")
 						. "	from person p 
-						left join portalpersontoken ppt on (ppt.personid = p.id)
-						where not p.deleted
+						left join portalpersontoken ppt on (ppt.personid = p.id) "
+						. $hideassociatedtable . 	
+						"where not p.deleted
 						and p.type='system' "
 						. $pkeysql
 						. $rulesql
@@ -42,6 +48,19 @@ class PortalReport extends ReportGenerator{
 						. $hideassociated
 						. $usersql
 						. " order by p.id";
+			//test query used to confirm no active codes are in the list
+			$this->testquery = "select count(ppt.token)
+						from person p 
+						left join portalpersontoken ppt on (ppt.personid = p.id) "
+						. $hideassociatedtable .
+						" where not p.deleted
+						and p.type='system'
+						and ppt.expirationdate > curdate() "
+						. $pkeysql
+						. $rulesql
+						. $hideactivetokens
+						. $hideassociated
+						. $usersql;
 		} else {
 			$this->query = "";
 		}
