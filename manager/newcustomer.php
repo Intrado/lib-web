@@ -60,30 +60,16 @@ if (CheckFormSubmit($f,$s)){
 			$displayname = GetFormData($f,$s,"name");
 			$timezone = GetFormData($f, $s, "timezone");
 			$hostname = GetFormData($f, $s, "hostname");
-			$inboundnum = GetFormData($f, $s, "inboundnumber");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
 			$shard = GetFormData($f,$s,'shard')+0;
-			$maxusers = GetFormData($f,$s, 'maxusers');
-			$renewaldate = strtotime(GetFormData($f,$s, 'renewaldate'));
-			$callspurchased = GetFormData($f, $s, 'callspurchased');
 
-			if (($inboundnum != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber=" . DBSafe($inboundnum) . "")) {
-				error('Entered 800 Number Already being used', 'Please Enter Another');
-			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."'")) {
+			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."'")) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
-			} else if (strlen($inboundnum) > 0 && !ereg("[0-9]{10}",$inboundnum)) {
-				error('Bad 800 Number Format', 'Try Again');
 			} else if (!$shard){
 				error('A shard needs to be chosen');
-			} else if(!$renewaldate && GetFormData($f, $s, 'renewaldate')!= ""){
-				error('The renewal date is in a non-valid format');
-			} else if($renewaldate && ($renewaldate < strtotime("now"))){
-				error('The renewal date has already passed');
 			} else {
-
-				$renewaldate = $renewaldate ? date("Y-m-d", $renewaldate) : "";
 
 				//choose shard info based on selection
 				$shardinfo = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard where id = '$shard'", true);
@@ -93,8 +79,8 @@ if (CheckFormSubmit($f,$s)){
 				$shardpass = $shardinfo['dbpassword'];
 
 				$dbpassword = genpassword();
-				QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword,inboundnumber,enabled) values
-												('" . DBSafe($hostname) . "','$shardid', '$dbpassword', '" . DBSafe($inboundnum) . "', '1')" )
+				QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword,enabled) values
+												('" . DBSafe($hostname) . "','$shardid', '$dbpassword', '1')" )
 						or die("failed to insert customer into auth server");
 				$customerid = mysql_insert_id();
 
@@ -225,8 +211,6 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
-				if($maxusers == "")
-					$maxusers = "unlimited";
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 							('maxphones', '3'),
 							('maxemails', '2'),
@@ -235,11 +219,7 @@ if (CheckFormSubmit($f,$s)){
 							('disablerepeat', '0'),
 							('surveyurl', '" . DBSafe($surveyurl) . "'),
 							('displayname', '" . DBSafe($displayname) . "'),
-							('timezone', '" . DBSafe($timezone) . "'),
-							('inboundnumber', '" . DBSafe($inboundnum) . "'),
-							('_maxusers', '" . DBSafe($maxusers) . "'),
-							('_renewaldate', '" . DBSafe($renewaldate) . "'),
-							('_callspurchased', '" . DBSafe($callspurchased) . "')";
+							('timezone', '" . DBSafe($timezone) . "')";
 
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
@@ -251,7 +231,7 @@ if (CheckFormSubmit($f,$s)){
 
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_erryr() . " SQL: " . $query);
 
-				redirect("customers.php");
+				redirect("customeredit.php?id=" . $customerid);
 
 			}
 		}
@@ -266,19 +246,17 @@ if( $reloadform ){
 
 	PutFormData($f,$s,'name',"","text",1,50);
 	PutFormData($f,$s,'hostname',"","text",5,255);
-	PutFormData($f,$s,'inboundnumber',"","text",10,10);
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "");
-	PutFormData($f,$s,'maxusers', "1", "number");
-	PutFormData($f,$s,'callspurchased', "", "number");
-	PutFormData($f,$s,'renewaldate', "", "text");
 }
 
 include_once("nav.inc.php");
 
-
 NewForm($f);
+
+?><br><?
+
 NewFormItem($f, $s,"", 'submit');
 
 ?>
@@ -286,11 +264,6 @@ NewFormItem($f, $s,"", 'submit');
 <table>
 <tr><td>Customer display name: </td><td> <? NewFormItem($f, $s, 'name', 'text', 25, 50); ?></td></tr>
 <tr><td>URL path name: </td><td><? NewFormItem($f, $s, 'hostname', 'text', 25, 255); ?> (Must be 5 or more characters)</td></tr>
-<tr><td>Toll Free Inbound Number: </td><td><? NewFormItem($f, $s, 'inboundnumber', 'text', 10, 10); ?> Make Sure Not Taken</td></tr>
-<tr><td>Admin username: </td><td>schoolmessenger</td></tr>
-<tr><td>Max Users: </td><td><? NewFormItem($f,$s,'maxusers','text',10)?></td></tr>
-<tr><td>Calls Purchased: </td><td><? NewFormItem($f,$s,'callspurchased','text',10)?></td></tr>
-<tr><td>Renewal Date: </td><td><? NewFormItem($f,$s,'renewaldate','text',10)?></td></tr>
 
 <tr><td>Timezone: </td><td>
 <?
@@ -317,7 +290,11 @@ NewFormItem($f, $s,"", 'submit');
 ?>
 </td></tr>
 </table>
-
+<br>
+<div style="color:green" >
+	Please remember to double check the customer settings on the following edit page.
+</div>
+<br>
 <?
 
 NewFormItem($f, $s,"", 'submit');
