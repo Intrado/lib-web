@@ -69,6 +69,24 @@ if(isset($_GET['hideassociated'])){
 	redirect();
 }
 
+if($USER->authorize('generatebulktokens')){
+	if(isset($_GET['generate'])){
+		$reportinstance = new ReportInstance();
+		$reportgenerator = new PortalReport();
+		$reportinstance->setParameters($options);
+		$reportgenerator->reportinstance = $reportinstance;
+		$reportgenerator->generateQuery();
+		if($reportgenerator->query){
+			$result = Query($reportgenerator->query);
+			$data = array();
+			while($row = DBGetRow($result)){
+				$data[] = $row[1];
+			}
+			generatePersonTokens($data);
+		}
+		redirect();
+	}
+}
 
 $RULES = false;
 if(isset($options['rules']) && $options['rules']){
@@ -108,7 +126,7 @@ $f = "person";
 $s = "all";
 $reloadform = 0;
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($f, 'search') || CheckFormSubmit($f, 'refresh') || CheckFormSubmit($f, 'generate')){
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($f, 'search') || CheckFormSubmit($f, 'refresh')){
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
@@ -152,19 +170,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 				$options['hideactivetokens'] = GetFormData($f, $s, "hideactivetokens");
 				$options['hideassociated'] = GetFormData($f, $s, "hideassociated");
 				$_SESSION['portal']['options'] = $options;
-				if($USER->authorize('generatebulktokens')){
-					if(CheckFormSubmit($f, 'generate')){
-						$reportinstance->setParameters($options);
-						$reportgenerator->reportinstance = $reportinstance;
-						$reportgenerator->generateQuery();
-						$result = Query($reportgenerator->query);
-						$data = array();
-						while($row = DBGetRow($result)){
-							$data[] = $row[1];
-						}
-						generatePersonTokens($data);
-					}
-				}
 				redirect();
 			}
 		}
@@ -172,6 +177,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 } else {
 	$reloadform = 1;
 }
+
 if($reloadform){
 	ClearFormData($f);
 	$options = isset($_SESSION['portal']['options']) ? $_SESSION['portal']['options'] : array();
@@ -202,7 +208,15 @@ if($reportgenerator->format == "csv"){
 	
 	NewForm($f);
 	if($USER->authorize('generatebulktokens')){
-		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), submit($f, "generate", "Generate Tokens"));
+		$reportgenerator->generateQuery();
+		$query = $reportgenerator->testquery;
+		$result = QuickQuery($query);
+		if($result){
+			$extrajs = "if(confirmGenerateActive())";
+		} else {
+			$extrajs = "if(confirmGenerate())";
+		}
+		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), button("Generate Activation Codes", $extrajs . " window.location='?generate=1'"));
 	} else {
 		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
 	}
@@ -266,7 +280,7 @@ if($reportgenerator->format == "csv"){
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter:</th>
 			<td class="bottomBorder">
 				<table>
-					<tr><td><? NewFormItem($f, $s, "hideactivetokens", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideactivetokens=\' + this.checked"') ?>Hide People with Active Tokens</td></tr>
+					<tr><td><? NewFormItem($f, $s, "hideactivetokens", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideactivetokens=\' + this.checked"') ?>Hide People with Active Codes</td></tr>
 					<tr><td><? NewFormItem($f, $s, "hideassociated", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideassociated=\' + this.checked"') ?>Hide People with Portal Users</td></tr>
 				</table>
 			</td>
@@ -312,3 +326,11 @@ function fmt_activation_date($row, $index){
 	return "";
 }
 ?>
+<script>
+	function confirmGenerate(){
+		return confirm(" Are you sure you want to generate activation codes for these people?");
+	}
+	function confirmGenerateActive(){
+		return confirm("Some activation codes exist in this list.  Are you sure you want to overwrite them?");
+	}
+</script>
