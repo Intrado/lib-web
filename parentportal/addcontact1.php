@@ -49,6 +49,9 @@ if(CheckFormSubmit($f,$s))
 					if($accessresult['result'] != ""){
 						error("There was an unknown problem connecting to that customer");
 					}
+					//make sure timezone gets updated to the current customer's tz
+					$timezone = getSystemSetting("timezone");
+					$_SESSION['timezone'] = $timezone;
 				}
 
 				$_SESSION['pidlist'][$result['customerid']][] = $result['personid'];
