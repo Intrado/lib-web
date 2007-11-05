@@ -98,20 +98,21 @@ function isAllSameDigit($number){
 
 /**
 	Function to test if the user, pass, firstname, and last name are
-	the same thing.
+	the same thing or similiar.
+	The password cannot be a substring or superstring of first, last or user.
 */
 function isSameUserPass($user, $pass, $firstname, $lastname) {
 	$user = strtolower($user);
 	$pass = strtolower($pass);
 	$firstname = strtolower($firstname);
 	$lastname = strtolower($lastname);
-	if(strlen($user)>=3 && strpos($pass, $user)!==FALSE) {
+	if(strlen($user)>=3 && strpos($user, $pass)!==FALSE && strpos($pass,$user)!==FALSE) {
 		return("Username and password are too similiar");
 	}
-	if(strlen($firstname)>=3 && strpos($pass, $firstname)!==FALSE) {
+	if(strlen($firstname)>=3 && strpos($firstname,$pass)!==FALSE && strpos($pass,$firstname)!==FALSE) {
 		return("Firstname and password are too similiar");
 	}
-	if(strlen($lastname) >=3 && strpos($pass, $lastname)!==FALSE) {
+	if(strlen($lastname) >=3 && strpos($lastname,$pass)!==FALSE && strpos($pass,$lastname)!==FALSE) {
 		return("Lastname and password are too similiar");
 	}
 	return false;
@@ -406,6 +407,7 @@ function array_insert($array, $insertitems = array(), $startindex){
 }
 
 // fetches jobtype preferences and builds multidimensional array
+// builds by type, sequence, jobtypeid
 function getDefaultContactPrefs(){
 	$query = "Select type, sequence, jobtypeid, enabled from jobtypepref";
 	$res = Query($query);
@@ -423,6 +425,7 @@ function getDefaultContactPrefs(){
 }
 
 //fetches contact preferences and builds multidimesional array
+// builds by type, sequence, jobtypeid
 function getContactPrefs($personid){
 	$query = "Select type, sequence, jobtypeid, enabled from contactpref where personid = '" . $personid . "'";
 	$res = Query($query);
@@ -447,7 +450,7 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 	}
 
 	$hover = '<span ' . $extrahtml . '>';
-	$hover .= '<div';
+	$hover .= '<div style="color:blue"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	$hover .= '>&nbsp;' . $jobtype->name . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
@@ -456,10 +459,11 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 }
 
 function ucfirst_withexceptions($string){
-	if($string == "sms"){
-		return "SMS";
-	} else {
-		return ucfirst($string);
+	switch($string){
+		case 'sms':
+			return strtoupper($string);
+		default:
+			return ucfirst($string);
 	}
 }
 ?>
