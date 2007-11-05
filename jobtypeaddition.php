@@ -13,7 +13,7 @@ include_once("obj/JobType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
-$IS_COMMSUITE=true;
+
 if(isset($_GET['clear'])){
 	unset($_SESSION['jobtypemanagement']['radio']);
 	redirect();
