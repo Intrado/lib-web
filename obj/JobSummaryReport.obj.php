@@ -30,7 +30,9 @@ class JobSummaryReport extends ReportGenerator{
 		}
 		$this->params['joblist'] = $joblist;
 		// Query for graph in pdf
-		$this->query = "select count(*) as cnt, coalesce(rc.result, rp.status) as result, sum(rc.result not in ('A','M', 'blocked', 'duplicate', 'declined') and rc.numattempts < js.value) as remaining
+		$this->query = "select count(*) as cnt, 
+				coalesce(rc.result, rp.status) as result, 
+				sum(rc.result not in ('A','M', 'blocked', 'duplicate') and rc.numattempts < js.value) as remaining
 				from reportperson rp
 				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
@@ -76,9 +78,9 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rc.result = 'blocked') as blocked,
-									sum(rp.status = 'nocontacts') as nocontacts,
+									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rc.numattempts) as totalattempts,
-									sum(rp.status = 'declined') as declined
+									sum(rp.status = 'declined' and rc.result is null) as declined
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									inner join job j on (j.id = rp.jobid)
@@ -90,8 +92,8 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
-									sum(rp.status = 'nocontacts') as nocontacts,
-									sum(rp.status = 'declined') as declined
+									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
+									sum(rp.status = 'declined' and rc.result is null) as declined
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
@@ -102,8 +104,8 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
-									sum(rp.status = 'nocontacts') as nocontacts,
-									sum(rp.status = 'declined') as declined
+									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
+									sum(rp.status = 'declined' and rc.result is null) as declined
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
@@ -153,6 +155,7 @@ class JobSummaryReport extends ReportGenerator{
 		$jobstats["phone"]['totalcalls'] = $phonenumberinfo[0]+0;
 		$jobnumberlist = implode("", explode("','", $this->params['joblist']));
 		$_SESSION['jobstats'][$jobnumberlist] = $jobstats;
+
 		$urloptions = $url . "&valid=$validstamp";	
 		
 		// DISPLAY
