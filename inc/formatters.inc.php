@@ -451,7 +451,7 @@ function fmt_result ($row,$index) {
 		case "duplicate":
 			return "Duplicate";
 		case "nocontacts":
-			return "No Contact";
+			return "No Contacts";
 		case "Sent":
 			return "Sent";
 		case "unent":
