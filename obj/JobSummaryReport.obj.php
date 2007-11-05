@@ -72,7 +72,7 @@ class JobSummaryReport extends ReportGenerator{
 		
 		//Gather Phone Information		
 		$phonenumberquery = "select sum(rc.type='phone') as total,
-									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked', 'declined')) as done,
+									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rc.result = 'blocked') as blocked,
@@ -87,7 +87,7 @@ class JobSummaryReport extends ReportGenerator{
 		$phonenumberinfo = QuickQueryRow($phonenumberquery);
 						
 		$emailquery = "select sum(rc.type = 'email') as total,
-									sum(rp.status in ('success', 'duplicate', 'fail', 'declined')) as done,
+									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts') as nocontacts,
@@ -99,7 +99,7 @@ class JobSummaryReport extends ReportGenerator{
 		$emailinfo = QuickQueryRow($emailquery);
 		
 		$smsquery = "select sum(rc.type = 'sms') as total,
-									sum(rp.status in ('success', 'duplicate', 'fail', 'declined')) as done,
+									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts') as nocontacts,
@@ -185,7 +185,7 @@ class JobSummaryReport extends ReportGenerator{
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 <?
-				if($emailinfo[1] > 0){
+				if(array_sum($emailinfo) > 0){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email">Email:</a></th>
@@ -218,7 +218,7 @@ class JobSummaryReport extends ReportGenerator{
 				</tr>
 <?
 				}
-				if($smsinfo[1] > 0){
+				if(array_sum($smsinfo) > 0){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=sms">SMS:</a></th>
@@ -251,7 +251,7 @@ class JobSummaryReport extends ReportGenerator{
 				</tr>
 <?
 				}
-				if($phonenumberinfo[1] > 0){
+				if(array_sum($phonenumberinfo) > 0){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=phone">Phone:</a></th>
