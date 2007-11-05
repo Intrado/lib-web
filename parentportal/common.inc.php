@@ -18,7 +18,7 @@ if(!isset($ppNotLoggedIn)){
 /*
 	TODO:unsure if needed
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
-		redirect("https://" . $_SERVER["SERVER_NAME"] . "/junk/parentportal/index.php?logout=1");
+		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php?logout=1");
 	}
 */
 	doStartSession();
