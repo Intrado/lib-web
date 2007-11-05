@@ -72,8 +72,8 @@ class JobSummaryReport extends ReportGenerator{
 		
 		//Gather Phone Information		
 		$phonenumberquery = "select sum(rc.type='phone') as total,
-									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked', 'declined') or rc.result = 'declined') as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result != 'declined') as remaining,
+									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked', 'declined')) as done,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rc.result = 'blocked') as blocked,
 									sum(rp.status = 'nocontacts') as nocontacts,
@@ -87,27 +87,27 @@ class JobSummaryReport extends ReportGenerator{
 		$phonenumberinfo = QuickQueryRow($phonenumberquery);
 						
 		$emailquery = "select sum(rc.type = 'email') as total,
-									sum(rp.status in ('success', 'duplicate', 'fail', 'declined') or rc.result = 'declined') as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result != 'declined') as remaining,
+									sum(rp.status in ('success', 'duplicate', 'fail', 'declined')) as done,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts') as nocontacts,
-									sum(rc.result = 'declined') as declined
+									sum(rp.status = 'declined') as declined
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
-									and rc.type='email'";
+									and rp.type='email'";
 		$emailinfo = QuickQueryRow($emailquery);
 		
 		$smsquery = "select sum(rc.type = 'sms') as total,
-									sum(rp.status in ('success', 'duplicate', 'fail', 'declined') or rc.result = 'declined') as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result != 'declined') as remaining,
+									sum(rp.status in ('success', 'duplicate', 'fail', 'declined')) as done,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts') as nocontacts,
-									sum(rc.result = 'declined') as declined
+									sum(rp.status = 'declined') as declined
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
-									and rc.type='sms'";
+									and rp.type='sms'";
 		$smsinfo = QuickQueryRow($smsquery);
 			
 		//may need to clean up, null means not called yet
@@ -121,10 +121,10 @@ class JobSummaryReport extends ReportGenerator{
 							"B" => 0,
 							"X" => 0,
 							"F" => 0,
-							"duplicate" => 0,
-							"blocked" => 0,
-							"nocontacts" => 0,
 							"notattempted" => 0,
+							"blocked" => 0,
+							"duplicate" => 0,
+							"nocontacts" => 0,
 							"declined" => 0
 						);
 		$cpcodes = array(
@@ -134,10 +134,10 @@ class JobSummaryReport extends ReportGenerator{
 							"N" => "No Answer",
 							"X" => "Disconnect",
 							"F" => "Failed",
-							"duplicate" => "Duplicate",
-							"blocked" => "Blocked",
-							"nocontacts" => "No Phone #",
 							"notattempted" => "Not Attempted",
+							"blocked" => "Blocked",
+							"duplicate" => "Duplicate",
+							"nocontacts" => "No Phone #",
 							"declined" => "Declined"
 						);
 		$jobstats["phone"] = $cpstats;
@@ -150,11 +150,11 @@ class JobSummaryReport extends ReportGenerator{
 			}
 		}
 		$jobstats["phone"]['remainingcalls'] = $remainingcalls;
-		$jobstats["phone"]['totalcalls'] = $phonenumberinfo[0];
+		$jobstats["phone"]['totalcalls'] = $phonenumberinfo[0]+0;
 		$jobnumberlist = implode("", explode("','", $this->params['joblist']));
 		$_SESSION['jobstats'][$jobnumberlist] = $jobstats;
 		$urloptions = $url . "&valid=$validstamp";	
-
+		
 		// DISPLAY
 		startWindow("Filter by");
 ?>
@@ -185,10 +185,10 @@ class JobSummaryReport extends ReportGenerator{
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 <?
-				if($emailinfo[0] > 0){
+				if($emailinfo[1] > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email"/a>Email:</a></th>
+					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email">Email:</a></th>
 					<td class="bottomBorder">	
 						<table width="100%">
 							<tr>
@@ -200,13 +200,15 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Remaining</th>
 											<th>Duplicates Removed</th>
 											<th>No Email</th>
+											<th>Declined</th>
 										</tr>
 										<tr>
-											<td><?=$emailinfo[0]?></td>
-											<td><a href="reportjobdetails.php?status=completed&type=email"/><?=$emailinfo[1]?></a></td>
-											<td><a href="reportjobdetails.php?status=remaining&type=email"/><?=$emailinfo[2]?></a></td>
-											<td><?=$emailinfo[3]?></td>
-											<td><?=$emailinfo[4]?></td>
+											<td><?=$emailinfo[0]+0?></td>
+											<td><?=$emailinfo[1]+0?></td>
+											<td><?=$emailinfo[2]+0?></td>
+											<td><?=$emailinfo[3]+0?></td>
+											<td><?=$emailinfo[4]+0?></td>
+											<td><?=$emailinfo[5]+0?></td>
 										</tr>
 									</table>
 								</td>
@@ -216,10 +218,10 @@ class JobSummaryReport extends ReportGenerator{
 				</tr>
 <?
 				}
-				if($smsinfo[0] > 0){
+				if($smsinfo[1] > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=sms"/a>SMS:</a></th>
+					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=sms">SMS:</a></th>
 					<td class="bottomBorder">	
 						<table width="100%">
 							<tr>
@@ -231,13 +233,15 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Remaining</th>
 											<th>Duplicates Removed</th>
 											<th>No SMS</th>
+											<th>Declined</th>
 										</tr>
 										<tr>
-											<td><?=$smsinfo[0]?></td>
-											<td><a href="reportjobdetails.php?status=completed&type=sms"/><?=$smsinfo[1]?></a></td>
-											<td><a href="reportjobdetails.php?status=remaining&type=sms"/><?=$smsinfo[2]?></a></td>
-											<td><?=$smsinfo[3]?></td>
-											<td><?=$smsinfo[4]?></td>
+											<td><?=$smsinfo[0]+0?></td>
+											<td><?=$smsinfo[1]+0?></td>
+											<td><?=$smsinfo[2]+0?></td>
+											<td><?=$smsinfo[3]+0?></td>
+											<td><?=$smsinfo[4]+0?></td>
+											<td><?=$smsinfo[5]+0?></td>
 										</tr>
 									</table>
 								</td>
@@ -247,10 +251,10 @@ class JobSummaryReport extends ReportGenerator{
 				</tr>
 <?
 				}
-				if($phonenumberinfo[0] > 0){
+				if($phonenumberinfo[1] > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
+					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=phone">Phone:</a></th>
 					<td class ="bottomBorder">	
 						<table width="100%">
 							<tr>
@@ -263,16 +267,18 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Duplicates Removed</th>
 											<th>Blocked</th>
 											<th>No Phone #</th>
+											<th>Declined</th>
 											<th>Total Attempts</th>
 										</tr>
 										<tr>
-											<td><?=$phonenumberinfo[0]?></td>
-											<td><?=$phonenumberinfo[1]?></td>
-											<td><?=$phonenumberinfo[2]?></td>
-											<td><?=$phonenumberinfo[3]?></td>
-											<td><?=$phonenumberinfo[4]?></td>
-											<td><?=$phonenumberinfo[5]?></td>
-											<td><?=$phonenumberinfo[6]?></td>
+											<td><?=$phonenumberinfo[0]+0?></td>
+											<td><?=$phonenumberinfo[1]+0?></td>
+											<td><?=$phonenumberinfo[2]+0?></td>
+											<td><?=$phonenumberinfo[3]+0?></td>
+											<td><?=$phonenumberinfo[4]+0?></td>
+											<td><?=$phonenumberinfo[5]+0?></td>
+											<td><?=$phonenumberinfo[7]+0?></td>
+											<td><?=$phonenumberinfo[6]+0?></td>
 											
 										</tr>
 									</table>
@@ -311,6 +317,11 @@ class JobSummaryReport extends ReportGenerator{
 						</table>
 					</td>
 				</tr>			
+<?
+				}
+				if($phonenumberinfo[0] < 1 && $smsinfo[0] < 1 && $emailinfo[0] < 1){
+?>
+				<tr><td>No Jobs Ran</td></tr>
 <?
 				}
 ?>
