@@ -39,13 +39,21 @@ $titles = array("0" => "In List",
 				"4" => "Last Name",
 				"5" => "Language",
 				"6" => "Primary Phone",
-				"7" => "Primary Email",
-				"8" => "Address");
+				"7" => "Primary Email");
 $formatters = array("0" => "fmt_checkbox",
 					"2" => "fmt_idmagnify",
 					"6" => "fmt_phone",
-					"7" => "fmt_email",
-					"8" => "fmt_null");
+					"7" => "fmt_email");
+
+if(getSystemSetting("_hassms")){
+	$titles["8"] = "Primary SMS";
+	$formatters["8"] = "fmt_phone";
+	$titles["9"] = "Address";
+	$formatters["9"] = "fmt_null";
+} else {
+	$titles["8"] = "Address";
+	$formatters["8"] = "fmt_null";
+}
 
 showTable($data, $titles,$formatters);
 
