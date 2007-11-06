@@ -217,7 +217,9 @@ startWindow("Display Options", "padding: 3px;");
 					NewFormItem($f, $s, "type", "selectstart");
 					NewFormItem($f, $s, "type", "selectoption", "Phone", "phone");
 					NewFormItem($f, $s, "type", "selectoption", "Email", "email");
+if(getSystemSetting('_hassms', false)){
 					NewFormItem($f, $s, "type", "selectoption", "SMS", "sms");
+}
 					NewFormItem($f, $s, "type", "selectend");
 				?>
 			</td>
