@@ -122,7 +122,7 @@ if (isset($personid)) {
 	}
 	$types["email"] = $emails;
 	
-	if(getSystemSetting("_hassms")){
+	if(getSystemSetting("_hassms", false)){
 		$smses = array_values(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
 		for ($i=count($smses); $i<$maxsms; $i++) {
 			$smses[$i] = new Sms();
@@ -133,7 +133,7 @@ if (isset($personid)) {
 	}
 	$contacttypes = array("phone", "email");
 	if(getSystemSetting("_hassms", false))
-		$contactypes[] = "sms";
+		$contacttypes[] = "sms";
 	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
 	$associates = getPortalUsers($associateids);
 	$tokendata = QuickQueryRow("select token, expirationdate, creationuserid from portalpersontoken where personid = '" . $personid . "'", true);
@@ -365,19 +365,29 @@ foreach ($fieldmaps as $map) {
 			$header = ucfirst_withexceptions($type) . "&nbsp;" . ($item->sequence +1);
 ?>
 			<tr>
-				<td><?= $header ?></td>
-				<td align="middle"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, 'onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
+				<td class="bottomBorder"><?= $header ?></td>
+				<td align="middle"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, 'onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
 <?
 				$disabled = "";
 				if(!$item->editlock)
 					$disabled = " Disabled ";
 				if($type == "email"){
-					?><td><? NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id=" . $type . $item->sequence . $disabled); ?></td><?
+					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id=" . $type . $item->sequence . $disabled); ?></td><?
 				} else {
-					?><td><? NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id=" . $type . $item->sequence . $disabled); ?></td><?
+					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id=" . $type . $item->sequence . $disabled); ?></td><?
 				}
 				foreach($jobtypes as $jobtype){
-					?><td align="middle"><? NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1) ?></td><?
+?>
+					<td align="middle"  class="bottomBorder">
+<?
+						if($type != "sms" || ($type == "sms" && !$jobtype->issurvey)){
+							echo NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1);
+						} else {
+							echo "&nbsp;";
+						}
+?>
+					</td>
+<?
 				}
 ?>
 			</tr>
@@ -411,11 +421,11 @@ foreach ($fieldmaps as $map) {
 					}
 ?>
 					<tr>
-						<td><?=$associate['portaluser.firstname']?></td>
-						<td><?=$associate['portaluser.lastname']?></td>
-						<td><?=$associate['portaluser.username']?></td>
-						<td><?=htmlentities($lastlogin)?></td>
-						<td><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid?>'" />Disassociate</a></td>
+						<td class="bottomBorder"><?=$associate['portaluser.firstname']?></td>
+						<td class="bottomBorder"><?=$associate['portaluser.lastname']?></td>
+						<td class="bottomBorder"><?=$associate['portaluser.username']?></td>
+						<td class="bottomBorder"><?=htmlentities($lastlogin)?></td>
+						<td class="bottomBorder"><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid?>'" />Disassociate</a></td>
 					</tr>
 <?
 				}
@@ -446,7 +456,7 @@ foreach ($fieldmaps as $map) {
 				<tr>
 					<td>
 <?
-					if($tokendata['token'])
+					if($tokendata['token'] && strtotime($tokendata['expirationdate']) > strtotime("now"))
 						echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1'");
 					else
 						echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1'");
@@ -479,7 +489,7 @@ foreach ($fieldmaps as $map) {
 		return confirm('Are you sure you want to revoke this contact\'s activation code?');
 	}
 	function confirmGenerate(){
-		return confirm('Are you sure you want to generate an activation code for this person?');
+		return confirm('Are you sure you want to generate a new activation code for this person?');
 	}
 	function confirmGenerateActive(){
 		return confirm('Are you sure you want to overwrite the current activation code?');
