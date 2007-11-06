@@ -52,7 +52,7 @@ class JobDetailReport extends ReportGenerator{
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery = " and rp.status = 'nocontacts' ";
 			} else {
-				$resultquery = " and rc.result in ('" . $this->params['result'] . "')";
+				$resultquery = " and rc.result in ('" . DBSafe($this->params['result']) . "')";
 			}
 		}
 		
@@ -61,6 +61,8 @@ class JobDetailReport extends ReportGenerator{
 				$resultquery .= " and rp.status in ('success', 'fail', 'duplicate')";
 			else if($this->params['status'] == "remaining")
 				$resultquery .= " and rp.status not in ('success', 'fail', 'duplicate')";
+			else
+				$resultquery .= " and rp.status = '" . DBSafe($this->params['status']) . "'";
 		}
 
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
