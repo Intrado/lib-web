@@ -30,12 +30,13 @@ $PAGE = "contacts:contactpreferences";
 $TITLE = "Add A Contact";
 
 include("nav.inc.php");
+startWindow("Add Successful");
 ?>
 <div> You have successfully added <?=$person->$firstnamefield?> <?=$person->$lastnamefield?>.
 <div> Would you like to add another contact?
 <?
 buttons(button("Yes", NULL, "addcontact1.php"), button("No", NULL, "addcontact3.php"));
-
+endWindow();
 
 include("navbottom.inc.php");
 ?>
