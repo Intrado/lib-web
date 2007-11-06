@@ -144,8 +144,7 @@ if($_SESSION['report']['type'] == "phone"){
 					"X" => "Disconnected",
 					"duplicate" => "Duplicate",
 					"blocked" => "Blocked",
-					"notattempted" => "Not Attempted",
-					"declined" => "Declined");
+					"notattempted" => "Not Attempted");
 } else if($_SESSION['report']['type'] == "notcontacted"){
 	$results = array("N" => "No Answer",
 					"B" => "Busy",
@@ -153,12 +152,10 @@ if($_SESSION['report']['type'] == "phone"){
 					"X" => "Disconnected",
 					"blocked" => "Blocked",
 					"notattempted" => "Not Attempted",
-					"unsent" => "Unsent",
-					"declined" => "Declined");
+					"unsent" => "Unsent");
 } else {
 	$results = array("sent" => "Sent",
-					"unsent" => "Unsent",
-					"declined" => "Declined");
+					"unsent" => "Unsent");
 }
 
 $f="reports";
