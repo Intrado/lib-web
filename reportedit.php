@@ -269,24 +269,6 @@ startWindow("Report Details");
 			</table>
 		</td>
 	</tr>
-	<script>
-<?
-		switch($radio){
-			case 'none':
-				?>hide("schedule");<?
-				break;
-			case 'runonce':
-				?>show("schedule");show("date");show("date2");hide("weekly");hide("monthly");hide("weekly2");hide("monthly2");<?
-				break;
-			case 'dow':
-				?>show("schedule");show("weekly");show("weekly2");hide("date");hide("monthly");hide("date2");hide("monthly2");<?
-				break;
-			case 'dom':
-				?>show("schedule");show("monthly");show("monthly2");hide("weekly");hide("date");hide("weekly2");hide("date2");<?
-				break;
-		}
-?>
-	</script>
 </table>
 <?
 EndWindow();
@@ -294,3 +276,21 @@ buttons();
 EndForm();
 include("navbottom.inc.php");
 ?>
+<script>
+<?
+	switch($radio){
+		case 'none':
+			?>hide("schedule");<?
+			break;
+		case 'runonce':
+			?>show("schedule");show("date");show("date2");hide("weekly");hide("monthly");hide("weekly2");hide("monthly2");<?
+			break;
+		case 'dow':
+			?>show("schedule");show("weekly");show("weekly2");hide("date");hide("monthly");hide("date2");hide("monthly2");<?
+			break;
+		case 'dom':
+			?>show("schedule");show("monthly");show("monthly2");hide("weekly");hide("date");hide("weekly2");hide("date2");<?
+			break;
+	}
+?>
+</script>
