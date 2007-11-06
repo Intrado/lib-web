@@ -40,7 +40,7 @@ $s = "main";
 $reloadform = 0;
 
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "delete") !== false )
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "delete") !== false )
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -82,6 +82,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "delete") !== false )
 					getJobtypeForm($f, $s, $surveytype, $maxphones, $maxemails, $maxsms);
 				}
 			}
+			if(CheckFormSubmit($f, "add"))
+				redirect("jobtypeaddition.php");
 			redirect();
 		}
 	}
@@ -107,7 +109,7 @@ $PAGE = "admin:jobtype";
 $TITLE = "Job Type Manager";
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Save"), button("Add a Job Type", null, "jobtypeaddition.php"));
+buttons(submit($f, $s, "Save"), submit($f, "add", "Add a Job Type"));
 startWindow("Job Types");
 ?>
 
