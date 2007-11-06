@@ -81,11 +81,18 @@ class RenderedList {
 		//	$pdfields = "," . $pdfields;
 		$pfields = "p.id";
 		$contactfields = "";
+		$sms = "";
+		$smsquery = "";
+		if(getSystemSetting("_hassms", false)){
+			$sms = "s.sms,";
+			$smsquery = " left join sms s on (s.personid = p.id and s.sequence=0) ";
+		}
 		if ($getdata) {
 			$pfields .= ", p.pkey";
 			$pfields .= ", p.$this->firstname, p.$this->lastname, p.$this->language";
 			$contactfields = ",ph.phone,
 								e.email,
+								$sms
 								concat(
 									coalesce(a.addr1,''), ' ',
 									coalesce(a.addr2,''), ' ',
@@ -128,6 +135,7 @@ class RenderedList {
 								(ph.personid=p.id and ph.sequence=0)
 			left join	email e on
 								(e.personid=p.id  and e.sequence=0)
+			$smsquery
 			left join	address a on
 								(a.personid=p.id)
 			";
@@ -150,6 +158,7 @@ class RenderedList {
 								(ph.personid=p.id and ph.sequence=0)
 			left join	email e on
 								(e.personid=p.id  and e.sequence=0)
+			$smsquery
 			left join	address a on
 								(a.personid=p.id)
 			";
