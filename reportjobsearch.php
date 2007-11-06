@@ -283,15 +283,6 @@ startWindow("Select", NULL, false);
 			</table>
 		</td>
 	</tr>
-	<script>
-		setHiddenIfChecked(new getObj('check_archived').obj, 'jobid');
-		setVisibleIfChecked(new getObj('check_archived').obj, 'jobid_archived');
-		if(new getObj("job").obj.checked){
-			hide("daterange");
-		} else {
-			hide("jobs");
-		}
-	</script>
 </table>
 
 <?
@@ -300,3 +291,12 @@ buttons();
 EndForm();
 include_once("navbottom.inc.php");
 ?>
+<script>
+	setHiddenIfChecked(new getObj('check_archived').obj, 'jobid');
+	setVisibleIfChecked(new getObj('check_archived').obj, 'jobid_archived');
+	if(new getObj("job").obj.checked){
+		hide("daterange");
+	} else {
+		hide("jobs");
+	}
+</script>
