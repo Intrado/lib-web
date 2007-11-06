@@ -6,6 +6,7 @@ require_once("../inc/table.inc.php");
 
 $success = false;
 $emailnotfound = false;
+$generalerror = false;
 $email1 = "";
 $email2 = "";
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
@@ -20,7 +21,11 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		if($result['result'] == ""){
 			$success = true;
 		} else {
-			$emailnotfound = true;
+			if($result['result'] == "invalid argument"){
+				$emailnotfound = true;
+			} else {
+				$generalerror = true;	
+			}
 		}
 	}
 }
@@ -29,12 +34,14 @@ $PAGE = ":";
 $TITLE = "Forgot Password";
 $hidenav = 1;
 include_once("nav.inc.php");
+startWindow("Send Reset Password" . help('Forgotpassword'));
 if($emailnotfound){
 	?>
 		<div style="color: red;">That email is not in our system.</div>
 	<?
+} else if($generalerror){
+	error("There was a problem with your request.  Please try again later");
 }
-startWindow("Send Reset Password" . help('Forgotpassword'));
 if(!$success){
 ?>
 <table>
