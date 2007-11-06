@@ -83,7 +83,10 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 					<tr><td><a href='reportjobsearch.php?clear=1'/>Notification Summary</a></td></tr>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Phone Log</a></td></tr>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Log</a></td></tr>
+					
+<? if(getSystemSetting('_hassms', false)){ ?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms'/>SMS Log</a></td></tr>
+<? } ?>
 				</table>
 			</td>
 			<td>
@@ -91,7 +94,10 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>
+					
+<? if(getSystemSetting('_hassms', false)){ ?>
 					<tr><td>&nbsp;</td></tr>
+<? } ?>
 				</table>
 			</td>
 			<td>
@@ -99,7 +105,10 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>
+					
+<? if(getSystemSetting('_hassms', false)){ ?>
 					<tr><td>&nbsp;</td></tr>
+<? } ?>
 				</table>
 			</td>
 		</tr>
