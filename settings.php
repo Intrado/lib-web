@@ -59,6 +59,7 @@ function setSetting($name, $value) {
 $maxphones = getSystemSetting("maxphones", 3);
 $maxemails = getSystemSetting("maxemails", 2);
 $maxsms = getSystemSetting("maxsms", 2);
+$maxcolumns = max($maxphones, $maxemails, $maxsms);
 
 /****************** main message section ******************/
 
@@ -425,42 +426,72 @@ startWindow('Global System Settings');
 											<tr class="listheader">
 												<th>Contact Type</th>
 												<?
-												for($i=1; $i<= max($maxphones, $maxemails, $maxsms);$i++){
+												for($i=1; $i<= $maxcolumns;$i++){
 													?><th><?=$i?></th><?
 												}
 												?>
 											</tr>
 
 											<tr>
-												<td align="left">Phones</td>
+												<td align="left" class="bottomBorder">Phones</td>
 <?
-												for($i=0; $i<$maxphones; $i++){
-													?>
-														<td align="center"><? NewFormItem($f, $s, "lockedphone" . $i, "checkbox");?></td>
-													<?
+												for($i=0; $i< $maxcolumns; $i++){
+?>
+													<td align="center" class="bottomBorder">
+<?
+													if($i< $maxphones){
+														echo NewFormItem($f, $s, "lockedphone" . $i, "checkbox");
+													} else {
+														echo "&nbsp;";	
+													}
+?>
+													</td>
+<?
 												}
 ?>
 											</tr>
 											<tr>
-												<td align="left">Emails</td>
+												<td align="left" class="bottomBorder">Emails</td>
 <?
-												for($i=0; $i<$maxemails; $i++){
-													?>
-														<td align="center"><? NewFormItem($f, $s, "lockedemail" . $i, "checkbox");?></td>
-													<?
+												for($i=0; $i< $maxcolumns; $i++){
+?>
+													<td align="center" class="bottomBorder">
+<?
+													if($i< $maxemails){
+														echo NewFormItem($f, $s, "lockedemail" . $i, "checkbox");
+													} else {
+														echo "&nbsp;";	
+													}
+?>
+													</td>
+<?
 												}
 ?>
 											</tr>
+<?											
+											if(getSystemSetting("_hassms", false)){
+?>											
 											<tr>
-												<td align="left">SMS</td>
+												<td align="left" class="bottomBorder">SMS</td>
 <?
-												for($i=0; $i<$maxsms; $i++){
-													?>
-														<td align="center"><? NewFormItem($f, $s, "lockedsms" . $i, "checkbox");?></td>
-													<?
+												for($i=0; $i< $maxcolumns; $i++){
+?>
+													<td align="center" class="bottomBorder">
+<?
+													if($i< $maxsms){
+														echo NewFormItem($f, $s, "lockedsms" . $i, "checkbox");
+													} else {
+														echo "&nbsp;";	
+													}
+?>
+													</td>
+<?
 												}
 ?>
 											</tr>
+<?
+											}
+?>
 										</table>
 									</td>
 								</tr>
