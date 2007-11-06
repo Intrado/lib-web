@@ -129,7 +129,6 @@ if(CheckFormSubmit($f,$s))
 			$USER->setSetting("calllate",GetFormData($f, $s, 'calllate'));
 			$USER->setSetting("callmax",GetFormData($f, $s, 'callmax'));
 			$USER->setSetting("maxjobdays",GetFormData($f, $s, 'maxjobdays'));
-			$USER->setSetting("callall",GetFormData($f, $s, 'callall'));
 
 			if($USER->authorize("leavemessage"))
 				$USER->setSetting("leavemessage", GetFormData($f, $s, 'leavemessage'));
@@ -192,9 +191,6 @@ if( $reloadform )
 	}
 
 	PutFormData($f, $s, 'maxjobdays', $maxjobdays, 'number', 1, 7, true);
-
-	//Call every available phone number for each person
-	PutFormData($f,$s,"callall",$USER->getDefaultAccessPref("callall","0"), "bool",0,1);
 
 	//Default caller ID
 	//default to system setting unless user has a pref
@@ -331,11 +327,6 @@ startWindow('User Information');
 									<td><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
 							</tr>
 <? } ?>
-
-							<tr>
-								<td>Call every available phone number for each person <?= help('Job_PhoneCallAll', NULL, 'small') ?></td>
-								<td><? NewFormItem($f,$s,"callall","checkbox",1); ?>Call All Phone Numbers</td>
-							</tr>
 <? if ($USER->authorize('leavemessage')) { ?>
 							<tr>
 								<td>Allow call recipients to leave a message <?= help('Account_VoiceResponse', NULL, 'small') ?></td>
