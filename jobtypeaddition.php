@@ -116,7 +116,7 @@ $PAGE = "admin:jobtype";
 $TITLE = "Job Type Addition";
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Add"));
+buttons(button("Back", null, "jobtypemanagement.php"), submit($f, $s, "Add"));
 startWindow("Add a Job Type");
 ?>
 
