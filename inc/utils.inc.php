@@ -106,13 +106,13 @@ function isSameUserPass($user, $pass, $firstname, $lastname) {
 	$pass = strtolower($pass);
 	$firstname = strtolower($firstname);
 	$lastname = strtolower($lastname);
-	if(strlen($user)>=3 && strpos($user, $pass)!==FALSE && strpos($pass,$user)!==FALSE) {
+	if(strlen($user)>=3 && (strpos($user, $pass)!==FALSE || strpos($pass,$user)!==FALSE)) {
 		return("Username and password are too similiar");
 	}
-	if(strlen($firstname)>=3 && strpos($firstname,$pass)!==FALSE && strpos($pass,$firstname)!==FALSE) {
+	if(strlen($firstname)>=3 && (strpos($firstname,$pass)!==FALSE || strpos($pass,$firstname)!==FALSE)) {
 		return("Firstname and password are too similiar");
 	}
-	if(strlen($lastname) >=3 && strpos($lastname,$pass)!==FALSE && strpos($pass,$lastname)!==FALSE) {
+	if(strlen($lastname) >=3 && (strpos($lastname,$pass)!==FALSE || strpos($pass,$lastname)!==FALSE)) {
 		return("Lastname and password are too similiar");
 	}
 	return false;
