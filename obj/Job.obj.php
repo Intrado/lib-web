@@ -164,8 +164,6 @@ class Job extends DBMappedObject {
 			$job->setOptionValue("retry",getSystemSetting('retry'));
 
 		//options
-		$job->setOption("callall",$USER->getSetting("callall"));
-		$job->setOption("callfirst",!$USER->getSetting("callall") + 0);
 		$job->setOption("skipduplicates",1);
 		$job->setOption("skipemailduplicates",1);
 		$job->setOption("skipsmsduplicates",1);
