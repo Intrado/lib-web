@@ -7,6 +7,7 @@ require_once("../inc/table.inc.php");
 
 $error_failedupdate = "There was an error updating your information";
 $error_failedupdatepassword = "There was an error updating your password";
+$error_badpassword = "The old password provided is invalid";
 $f="portaluser";
 $s="main";
 $reloadform = 0;
@@ -29,6 +30,10 @@ if(CheckFormSubmit($f,$s))
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if(strlen(GetFormData($f, $s, "newpassword1")) && strlen(GetFormData($f, $s, "newpassword1")) < 5){
+			error("Passwords must be at least 5 characters long");
+		} else if($passworderror = isSameUserPass($_SESSION['portaluser']['portaluser.username'], GetFormData($f, $s, "newpassword1"), GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"))){
+			error($passworderror);
 		} else if(GetFormData($f, $s, "newpassword1") != GetFormData($f, $s, "newpassword2")){
 			error('Password confirmation does not match');
 		} else {
@@ -43,12 +48,16 @@ if(CheckFormSubmit($f,$s))
 				$result = portalUpdatePortalUserPassword(GetFormData($f, $s, "newpassword1"), GetFormData($f, $s, "oldpassword"));
 				if($result['result'] != ""){
 					$updateuser = false;
-					error($error_failedupdatepassword);
 					$error = 1;
+					if(strpos($result['resultdetail'], "oldpassword") !== false){
+						error($error_badpassword);
+					} else {
+						error($error_failedupdatepassword);
+					}
 				}
 			}
 			if(!$error){
-				redirect();
+				redirect("start.php");
 			}
 		}
 	}
