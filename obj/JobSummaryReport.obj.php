@@ -299,9 +299,18 @@ class JobSummaryReport extends ReportGenerator{
 									<table>
 <?
 										foreach($cpcodes as $index => $value){
+											switch($index){
+												case 'nocontacts':
+												case 'declined':
+													$urltext = "?status=$index";
+													break;
+												default:
+													$urltext = "?result=$index";
+													break;
+											}
 ?>
 										<tr>
-											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=<?=$index?>"/><?=$value?></a><u></div></td>
+											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php<?=$urltext?>&type=phone"/><?=$value?></a><u></div></td>
 											<td><?=$jobstats["phone"][$index]?></td>
 										</tr>
 <?
@@ -322,9 +331,9 @@ class JobSummaryReport extends ReportGenerator{
 				</tr>			
 <?
 				}
-				if($phonenumberinfo[0] < 1 && $smsinfo[0] < 1 && $emailinfo[0] < 1){
+				if(array_sum($phonenumberinfo) < 1 && array_sum($smsinfo) < 1 && array_sum($emailinfo) < 1){
 ?>
-				<tr><td>No Jobs Ran</td></tr>
+				<tr><td>No Job Data</td></tr>
 <?
 				}
 ?>
