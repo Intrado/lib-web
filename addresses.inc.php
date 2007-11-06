@@ -97,7 +97,13 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 	$first = FieldMap::getFirstNameField();
 	$last = FieldMap::getLastNameField();
 	$lang = FieldMap::getLanguageField();
-	$table = Query("select person.id, pkey, $first, $last, $lang, phone, email, sms,
+	$sms = "";
+	$smsquery = "";
+	if(getSystemSetting("_hassms", false)){
+		$sms = "sms,";
+		$smsquery = " left join sms on (sms.personid = person.id and sms.sequence=0) ";
+	}
+	$table = Query("select person.id, pkey, $first, $last, $lang, phone, email, $sms
 									concat(
 										coalesce(addr1,''), ' ',
 										coalesce(addr2,''), ' ',
@@ -109,7 +115,7 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 					from person
 						left join phone on (person.id = phone.personid and phone.sequence=0)
 						left join email on (person.id = email.personid and email.sequence=0)
-						left join sms on (person.id = sms.personid and sms.sequence=0)
+						$smsquery
 						left join address on person.id = address.personid
 					where userid = $USER->id and type = 'addressbook' and not deleted
 					order by $last, $first
@@ -145,28 +151,44 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 						3 => "Last Name",
 						4 => "Language",
 						5 => "Phone",
-						6 => "Email",
-						7 => "SMS",
-						8 => "Address",
-						9 => "Actions");
+						6 => "Email");
 		$formatters = array(1 => "fmt_checkbox_addrbook",
 							5 => "fmt_phone",
-							6 => "fmt_email",
-							7 => "fmt_phone",
-							9 => "fmt_actions");
+							6 => "fmt_email");
+		if(getSystemSetting("_hassms")){
+			$titles["7"] = "SMS";
+			$formatters["7"] = "fmt_phone";
+			$titles["8"] = "Address";
+			$formatters["8"] = "fmt_null";
+			$titles["9"] = "Actions";
+			$formatters["9"] = "fmt_actions";
+		} else {
+			$titles["7"] = "Address";
+			$formatters["7"] = "fmt_null";
+			$titles["8"] = "Actions";
+			$formatters["8"] = "fmt_actions";
+		}
 	} else {
 		$titles = array(2 => "First Name",
 						3 => "Last Name",
 						4 => "Language",
 						5 => "Phone",
-						6 => "Email",
-						7 => "SMS",
-						8 => "Address",
-						9 => "Actions");
+						6 => "Email");
 		$formatters = array(5 => "fmt_phone",
-							6 => "fmt_email",
-							7 => "fmt_phone",
-							9 => "fmt_actions");
+							6 => "fmt_email");
+		if(getSystemSetting("_hassms")){
+			$titles["7"] = "SMS";
+			$formatters["7"] = "fmt_phone";
+			$titles["8"] = "Address";
+			$formatters["8"] = "fmt_null";
+			$titles["9"] = "Actions";
+			$formatters["9"] = "fmt_actions";
+		} else {
+			$titles["7"] = "Address";
+			$formatters["7"] = "fmt_null";
+			$titles["8"] = "Actions";
+			$formatters["8"] = "fmt_actions";
+		}
 	}
 
 	showTable($data, $titles,$formatters);
