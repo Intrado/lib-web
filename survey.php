@@ -140,10 +140,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$job->sendprint = false;
 			$job->printmessageid = NULL;
 
-			//turn off callall
-			$job->setOption("callall",false);
-			$job->setOption("callfirst",true);
-
 			//always skip dupes
 			$job->setOption("skipduplicates",true);
 
