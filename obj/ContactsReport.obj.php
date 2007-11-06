@@ -88,7 +88,7 @@ class ContactsReport extends ReportGenerator {
 		}
 		
 		// select static value "ordering" in order to order results as phone, email, sms
-		$phoneemailsmsquery = 
+		$phoneemailquery = 
 			"(select personid as pid,
 				phone as destination,
 				sequence as sequence,
@@ -105,8 +105,8 @@ class ContactsReport extends ReportGenerator {
 				from email
 				where
 				personid in ('" . implode("','",$personidlist) . "')
-				)
-			union
+				)";
+		$smsquery = " union
 			(select personid as pid3,
 				sms as destination,
 				sequence as sequence,
@@ -114,9 +114,15 @@ class ContactsReport extends ReportGenerator {
 				from sms
 				where
 				personid in ('" . implode("','",$personidlist) . "')
-				)
-			order by pid, ordering, sequence";
-			
+				) ";
+		$extraquery ="order by pid, ordering, sequence";
+		
+		//Don't display SMS if no sms in system
+		if(getSystemSetting("_hassms", false)){
+			$phoneemailsmsquery = $phoneemailquery . $smsquery . $extraquery;
+		} else {
+			$phoneemailsmsquery = $phoneemailquery . $extraquery;
+		}
 		$result = Query($phoneemailsmsquery);
 		$phoneemailsmsdata = array();
 		while($row = DBGetRow($result)){
