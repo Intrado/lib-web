@@ -95,40 +95,91 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 
 	$lockedphones = $locked['phones'];
 	$lockedemails = $locked['emails'];
-	$lockedsms = $locked['sms'];
 	$mainphones = QuickQueryList("select sequence, phone from phone where personid = '" . $mainpid . "'", true);
 	$mainemails = QuickQueryList("select sequence, email from email where personid = '" . $mainpid . "'", true);
-	if(getSystemSetting("_hassms")){
+	if(getSystemSetting("_hassms", false)){
 		$mainsmses = QuickQueryList("select sequence, sms from sms where personid = '" . $mainpid . "'", true);
+		$lockedsms = $locked['sms'];
 	}
 	$mainContactPrefs = getContactPrefs($mainpid);
 	
 	foreach($otherpids as $pid){
 		$phones = DBFindMany("Phone", "from phone where personid = '" . $pid . "'");
-		$emails = DBFindMany("Email", "from email where personid = '" . $pid . "'");
-		if(getSystemSetting("_hassms")){
-			$smses = DBFindMany("Sms", "from sms where personid = '" . $pid . "'");
-		}
+		$temp = array();
 		foreach($phones as $phone){
-			if(!$lockedphones[$phone->sequence]){
-				$phone->phone = $mainphones[$phone->sequence];
-				$phone->editlock = 1;
-				$phone->update();
-			}
+			$temp[$phone->sequence] = $phone;
 		}
+		$phones = $temp;
+		$phonecount = count($phones);
+		$temp = array();
+		$emails = DBFindMany("Email", "from email where personid = '" . $pid . "'");
 		foreach($emails as $email){
-			if(!$lockedemails[$email->sequence]){
-				$email->email = $mainemails[$email->sequence];
-				$email->editlock = 1;
-				$email->update();
+			$temp[$email->sequence] = $email;
+		}
+		$emails = $temp;
+		$emailcount = count($emails);
+		
+		if(getSystemSetting("_hassms", false)){
+			$temp = array();
+			$smses = DBFindMany("Sms", "from sms where personid = '" . $pid . "'");
+			foreach($smses as $sms){
+				$temp[$sms->sequence] = $sms;
+			}
+			$smses = $temp;
+			$smscount = count($smses);
+		}
+		
+		
+		foreach($mainphones as $sequence => $mainphone){
+			if(!$lockedphones[$sequence]){
+				if(!isset($phones[$sequence])){
+					$phone = new Phone();
+					$phone->phone = $mainphone;
+					$phone->editlock = 1;
+					$phone->personid = $pid;
+					$phone->sequence=$phonecount;
+					$phone->create();
+					$phonecount++;
+				} else {
+					$phones[$sequence]->phone = $mainphone;
+					$phones[$sequence]->editlock = 1;
+					$phones[$sequence]->update();
+				}
 			}
 		}
-		if(getSystemSetting("_hassms")){
-			foreach($smses as $sms){
-				if(!$lockedsms[$sms->sequence]){
-					$sms->sms = $mainsmses[$sms->sequence];
-					$sms->editlock = 1;
-					$sms->update();
+		foreach($mainemails as $sequence => $mainemail){
+			if(!$lockedemails[$sequence]){
+				if(!isset($emails[$sequence])){
+					$email = new Email();
+					$email->email = $mainemail;
+					$email->editlock = 1;
+					$email->personid = $pid;
+					$email->sequence=$emailcount;
+					$email->create();
+					$emailcount++;
+				} else {
+					$emails[$sequence]->email = $mainemail;
+					$emails[$sequence]->editlock = 1;
+					$emails[$sequence]->update();
+				}
+			}
+		}
+		if(getSystemSetting("_hassms", false)){
+			foreach($mainsmses as $sequence => $mainsms){
+				if(!$lockedsms[$sequence]){
+					if(!isset($smses[$sequence])){
+						$sms = new Sms();
+						$sms->sms = $mainsms;
+						$sms->editlock = 1;
+						$sms->personid = $pid;
+						$sms->sequence=$smscount;
+						$sms->create();
+						$smscount++;
+					} else {
+						$smses[$sequence]->sms = $mainsms;
+						$smses[$sequence]->editlock = 1;
+						$smses[$sequence]->update();
+					}
 				}
 			}
 		}
