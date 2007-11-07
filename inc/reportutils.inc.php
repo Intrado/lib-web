@@ -225,7 +225,38 @@ function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
 
 }
 
-function createCSV($data, $titles, $formatters, $groupby = 0){
+//custom formatter for csv output of survey data
+//only used in job detail report and survey report as of 11/7
+//index 5 is delivery type
+function parse_survey_data($row, $index){
+	
+	$x = substr($index, strlen("question"));
+	$questiondata = array();
+	if ($row[5] == "phone")
+		parse_str($row[12],$questiondata);
+	else if ($row[5] == "email")
+		parse_str($row[13],$questiondata);
+	return isset($questiondata["q" . ($x-1)]) ? $questiondata["q" . ($x-1)] : "";
+	
+}
+
+function csv_destination($row, $index){
+	$result = fmt_destination($row, $index);
+	if($result == "&nbsp;")
+		return "";
+	else
+		return $result;
+}
+
+function csv_date($row, $index){
+	$result = fmt_date($row, $index);
+	if($result == "&nbsp;")
+		return "";
+	else
+		return $result;
+}
+
+function createCSV($data, $titles, $formatters, $groupby = null){
 
 	echo '"' . implode('","', $titles) . '"';
 	echo "\r\n";
@@ -234,10 +265,12 @@ function createCSV($data, $titles, $formatters, $groupby = 0){
 		$curr = null;
 		foreach ($data as $row) {
 			$csvrow = array();
-			if($row[$groupby] == $curr){
-				continue;
-			} else {
-				$curr = $row[$groupby];
+			if($groupby != null){
+				if($row[$groupby] == $curr){
+					continue;
+				} else {
+					$curr = $row[$groupby];
+				}
 			}
 			//only show output data with titles
 			foreach ($titles as $index => $title) {
@@ -254,6 +287,5 @@ function createCSV($data, $titles, $formatters, $groupby = 0){
 			echo "\r\n";
 		}
 	}
-	
 }
 ?>
