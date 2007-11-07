@@ -184,7 +184,7 @@ if( $reloadform )
 	for($i=0; $i < $maxsms; $i++){
 		PutFormData($f, $s, "lockedsms" . $i, getSystemSetting('lockedsms' . $i, 0), "bool", 0, 1);
 	}
-	PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 0, 365);
+	PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 1, 365);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
