@@ -34,6 +34,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
 		if($password1 !== $password2){
 			error("The passwords do not match");
+		} else if(strlen($password1) < 5){
+			error("Passwords must be at least 5 characters long");
 		} else {
 			$result = portalActivateAccount($token, $password1);
 			if($result['result'] == ""){
