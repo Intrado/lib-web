@@ -507,4 +507,24 @@ function fmt_scheduled_time($row, $index){
 	return $start . " - " . $end;
 }
 
+function fmt_delivery_type($row, $index) {
+	return ucfirst_withexceptions($row[$index]);
+}
+
+//result formatter for job details.
+//index 5 is the delivery type
+function fmt_jobdetail_result($row, $index){
+	if($row[$index] == "nocontacts"){
+		if($row[5] == 'phone')
+			return "No Phone #";
+		else if($row[5] == 'email')
+			return "No Email";
+		else if($row[5] == 'sms')
+			return "No SMS";
+		else 
+			return "No Contacts";
+	} else {
+		return fmt_result($row, $index);
+	}
+}
 ?>
