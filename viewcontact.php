@@ -181,6 +181,8 @@ if(CheckFormSubmit($f,$s))
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if($manualerror = manualCheckFormSection($f, $s, $contacttypes, $types)){
+			error($manualerror);
 		} else {
 			//submit changes
 			foreach($contacttypes as $type){
@@ -192,8 +194,8 @@ if(CheckFormSubmit($f,$s))
 							$item->$type = GetFormData($f, $s, $type . $item->sequence);
 						else
 							$item->$type = Phone::parse(GetFormData($f,$s, $type . $item->sequence));
-						$item->update();
 					}
+					$item->update();
 					foreach($jobtypes as $jobtype){
 						if((!isset($contactpref[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
 							GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) ||
@@ -228,9 +230,9 @@ if( $reloadform )
 		if(!isset($types[$type])) continue;
 		foreach($types[$type] as $item){
 			if($type == "email")
-				PutFormData($f, $s, $type . $item->sequence, $item->$type, $type, 0, 100);
+				PutFormData($f, $s, $type . $item->sequence, $item->$type, "text");
 			else
-				PutFormData($f, $s, $type . $item->sequence, Phone::format($item->$type), "phone", 10);
+				PutFormData($f, $s, $type . $item->sequence, Phone::format($item->$type), "text");
 			PutFormData($f, $s, "editlock_" . $type . $item->sequence, $item->editlock, "bool", 0, 1);
 			foreach($jobtypes as $jobtype){
 				$contactpref = 0;
@@ -244,10 +246,43 @@ if( $reloadform )
 	}	
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
 function displayValue($s) {
 	echo($s."&nbsp;");
 }
+
+//Because form fields are being disabled, if a user inputs improper data, it gets stored into the form session.
+//However, when submitting a form, a form field that is disabled will not resubmit the form data.
+//This caused the improper data to be stuck thus causing a manual check on every form post.
+//This function will iterate over all contact data fields to do a manual check on the values.
+//inputs:
+// contacttypes = array of contact types
+// types =  types' index is a contact type, value is an array of objects of that type
+function manualCheckFormSection($f, $s, $contacttypes, $types){
+	$errors = array();
+	foreach($contacttypes as $type){
+		if(!isset($types[$type])) continue;
+		foreach($types[$type] as $item){
+			$error = false;
+			if($type == "email" && GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
+				if (GetFormData($f, $s, $type . $item->sequence) && !preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", GetFormData($f, $s, $type . $item->sequence))) {
+					$error = true;
+				}
+			} else if(GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
+				if (GetFormData($f, $s, $type . $item->sequence) && Phone::parse(GetFormData($f, $s, $type . $item->sequence)) < 10) {
+					$error = true;
+				}
+			}
+			if($error){
+				$errors[] = ucfirst_withexceptions($type) . " " . ($item->sequence+1) . " is not valid";
+			}
+		}
+	}
+	return $errors;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -366,15 +401,15 @@ foreach ($fieldmaps as $map) {
 ?>
 			<tr>
 				<td class="bottomBorder"><?= $header ?></td>
-				<td align="middle"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, 'onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
+				<td align="middle"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, 'id="editlock_' . $type . $item->sequence . '" onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
 <?
 				$disabled = "";
 				if(!$item->editlock)
 					$disabled = " Disabled ";
 				if($type == "email"){
-					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id=" . $type . $item->sequence . $disabled); ?></td><?
+					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id='" . $type . $item->sequence . "'". $disabled); ?></td><?
 				} else {
-					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id=" . $type . $item->sequence . $disabled); ?></td><?
+					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled); ?></td><?
 				}
 				foreach($jobtypes as $jobtype){
 ?>
@@ -494,6 +529,23 @@ foreach ($fieldmaps as $map) {
 	function confirmGenerateActive(){
 		return confirm('Are you sure you want to overwrite the current activation code?');
 	}
+<?
+	//update disabled flags for error case
+	foreach($contacttypes as $type){
+		if(!isset($types[$type])) continue;
+		foreach($types[$type] as $item){
+?>
+			var contactdetail<?=$type?><?=$item->sequence?> = new getObj("<?=$type?><?=$item->sequence?>").obj;
+			var contactcheckbox<?=$type?><?=$item->sequence?> = new getObj("editlock_<?=$type?><?=$item->sequence?>").obj;
+			if(contactcheckbox<?=$type?><?=$item->sequence?>.checked){
+				contactdetail<?=$type?><?=$item->sequence?>.disabled = false;
+			} else {
+				contactdetail<?=$type?><?=$item->sequence?>.disabled = true;
+			}
+<?
+		}
+	}
+?>
 </script>
 <?
 
