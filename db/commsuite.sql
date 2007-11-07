@@ -1,20 +1,20 @@
 -- phpMyAdmin SQL Dump
 -- version 2.9.1.1
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Nov 05, 2007 at 03:39 PM
 -- Server version: 5.0.27
 -- PHP Version: 5.2.0
--- 
+--
 -- Database: `c_X`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `access`
--- 
+--
 
 CREATE TABLE `access` (
   `id` int(11) NOT NULL auto_increment,
@@ -26,9 +26,9 @@ CREATE TABLE `access` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `address`
--- 
+--
 
 CREATE TABLE `address` (
   `id` int(11) NOT NULL auto_increment,
@@ -46,9 +46,9 @@ CREATE TABLE `address` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `audiofile`
--- 
+--
 
 CREATE TABLE `audiofile` (
   `id` int(11) NOT NULL auto_increment,
@@ -64,9 +64,9 @@ CREATE TABLE `audiofile` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `blockednumber`
--- 
+--
 
 CREATE TABLE `blockednumber` (
   `id` int(11) NOT NULL auto_increment,
@@ -79,9 +79,9 @@ CREATE TABLE `blockednumber` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `contactpref`
--- 
+--
 
 CREATE TABLE `contactpref` (
   `personid` int(11) NOT NULL,
@@ -94,9 +94,9 @@ CREATE TABLE `contactpref` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `content`
--- 
+--
 
 CREATE TABLE `content` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -107,9 +107,9 @@ CREATE TABLE `content` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `email`
--- 
+--
 
 CREATE TABLE `email` (
   `id` int(11) NOT NULL auto_increment,
@@ -123,9 +123,9 @@ CREATE TABLE `email` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `fieldmap`
--- 
+--
 
 CREATE TABLE `fieldmap` (
   `id` int(11) NOT NULL auto_increment,
@@ -138,9 +138,9 @@ CREATE TABLE `fieldmap` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `import`
--- 
+--
 
 CREATE TABLE `import` (
   `id` int(11) NOT NULL auto_increment,
@@ -165,9 +165,9 @@ CREATE TABLE `import` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `importfield`
--- 
+--
 
 CREATE TABLE `importfield` (
   `id` int(11) NOT NULL auto_increment,
@@ -181,9 +181,9 @@ CREATE TABLE `importfield` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `importjob`
--- 
+--
 
 CREATE TABLE `importjob` (
   `id` int(11) NOT NULL auto_increment,
@@ -194,9 +194,9 @@ CREATE TABLE `importjob` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `job`
--- 
+--
 
 CREATE TABLE `job` (
   `id` int(11) NOT NULL auto_increment,
@@ -238,9 +238,9 @@ CREATE TABLE `job` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `joblanguage`
--- 
+--
 
 CREATE TABLE `joblanguage` (
   `id` int(11) NOT NULL auto_increment,
@@ -254,9 +254,9 @@ CREATE TABLE `joblanguage` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobsetting`
--- 
+--
 
 CREATE TABLE `jobsetting` (
   `jobid` int(11) NOT NULL,
@@ -267,9 +267,9 @@ CREATE TABLE `jobsetting` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobstats`
--- 
+--
 
 CREATE TABLE `jobstats` (
   `jobid` int(11) NOT NULL,
@@ -279,9 +279,9 @@ CREATE TABLE `jobstats` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtype`
--- 
+--
 
 CREATE TABLE `jobtype` (
   `id` int(11) NOT NULL auto_increment,
@@ -295,9 +295,9 @@ CREATE TABLE `jobtype` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtypepref`
--- 
+--
 
 CREATE TABLE `jobtypepref` (
   `jobtypeid` int(11) NOT NULL,
@@ -309,9 +309,9 @@ CREATE TABLE `jobtypepref` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `language`
--- 
+--
 
 CREATE TABLE `language` (
   `id` int(11) NOT NULL auto_increment,
@@ -321,9 +321,9 @@ CREATE TABLE `language` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `list`
--- 
+--
 
 CREATE TABLE `list` (
   `id` int(11) NOT NULL auto_increment,
@@ -338,9 +338,9 @@ CREATE TABLE `list` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `listentry`
--- 
+--
 
 CREATE TABLE `listentry` (
   `id` int(11) NOT NULL auto_increment,
@@ -354,9 +354,9 @@ CREATE TABLE `listentry` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `message`
--- 
+--
 
 CREATE TABLE `message` (
   `id` int(11) NOT NULL auto_increment,
@@ -373,9 +373,9 @@ CREATE TABLE `message` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `messagepart`
--- 
+--
 
 CREATE TABLE `messagepart` (
   `id` int(11) NOT NULL auto_increment,
@@ -394,9 +394,9 @@ CREATE TABLE `messagepart` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `permission`
--- 
+--
 
 CREATE TABLE `permission` (
   `id` int(11) NOT NULL auto_increment,
@@ -408,9 +408,9 @@ CREATE TABLE `permission` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `person`
--- 
+--
 
 CREATE TABLE `person` (
   `id` int(11) NOT NULL auto_increment,
@@ -470,9 +470,9 @@ CREATE TABLE `person` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `persondatavalues`
--- 
+--
 
 CREATE TABLE `persondatavalues` (
   `id` int(11) NOT NULL auto_increment,
@@ -486,9 +486,9 @@ CREATE TABLE `persondatavalues` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `phone`
--- 
+--
 
 CREATE TABLE `phone` (
   `id` int(11) NOT NULL auto_increment,
@@ -503,9 +503,9 @@ CREATE TABLE `phone` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `portalperson`
--- 
+--
 
 CREATE TABLE `portalperson` (
   `portaluserid` int(11) NOT NULL,
@@ -515,9 +515,9 @@ CREATE TABLE `portalperson` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `portalpersontoken`
--- 
+--
 
 CREATE TABLE `portalpersontoken` (
   `token` varchar(255) NOT NULL,
@@ -530,9 +530,9 @@ CREATE TABLE `portalpersontoken` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportcontact`
--- 
+--
 
 CREATE TABLE `reportcontact` (
   `jobid` int(11) NOT NULL,
@@ -561,9 +561,9 @@ CREATE TABLE `reportcontact` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportinstance`
--- 
+--
 
 CREATE TABLE `reportinstance` (
   `id` int(11) NOT NULL auto_increment,
@@ -576,9 +576,9 @@ CREATE TABLE `reportinstance` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportperson`
--- 
+--
 
 CREATE TABLE `reportperson` (
   `jobid` int(11) NOT NULL,
@@ -620,9 +620,9 @@ CREATE TABLE `reportperson` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `reportsubscription`
--- 
+--
 
 CREATE TABLE `reportsubscription` (
   `id` int(11) NOT NULL auto_increment,
@@ -644,9 +644,9 @@ CREATE TABLE `reportsubscription` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rule`
--- 
+--
 
 CREATE TABLE `rule` (
   `id` int(11) NOT NULL auto_increment,
@@ -659,9 +659,9 @@ CREATE TABLE `rule` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `schedule`
--- 
+--
 
 CREATE TABLE `schedule` (
   `id` int(11) NOT NULL auto_increment,
@@ -674,9 +674,9 @@ CREATE TABLE `schedule` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `setting`
--- 
+--
 
 CREATE TABLE `setting` (
   `id` int(11) NOT NULL auto_increment,
@@ -688,9 +688,9 @@ CREATE TABLE `setting` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `sms`
--- 
+--
 
 CREATE TABLE `sms` (
   `id` int(11) NOT NULL auto_increment,
@@ -705,9 +705,9 @@ CREATE TABLE `sms` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `specialtask`
--- 
+--
 
 CREATE TABLE `specialtask` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -721,9 +721,9 @@ CREATE TABLE `specialtask` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyquestion`
--- 
+--
 
 CREATE TABLE `surveyquestion` (
   `id` int(11) NOT NULL auto_increment,
@@ -738,9 +738,9 @@ CREATE TABLE `surveyquestion` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyquestionnaire`
--- 
+--
 
 CREATE TABLE `surveyquestionnaire` (
   `id` int(11) NOT NULL auto_increment,
@@ -764,9 +764,9 @@ CREATE TABLE `surveyquestionnaire` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyresponse`
--- 
+--
 
 CREATE TABLE `surveyresponse` (
   `jobid` int(11) NOT NULL,
@@ -778,9 +778,9 @@ CREATE TABLE `surveyresponse` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveyweb`
--- 
+--
 
 CREATE TABLE `surveyweb` (
   `code` char(22) character set ascii collate ascii_bin NOT NULL,
@@ -795,9 +795,9 @@ CREATE TABLE `surveyweb` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `systemstats`
--- 
+--
 
 CREATE TABLE `systemstats` (
   `jobid` int(11) NOT NULL,
@@ -814,9 +814,9 @@ CREATE TABLE `systemstats` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `ttsvoice`
--- 
+--
 
 CREATE TABLE `ttsvoice` (
   `id` int(11) NOT NULL auto_increment,
@@ -827,9 +827,9 @@ CREATE TABLE `ttsvoice` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `user`
--- 
+--
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL auto_increment,
@@ -853,9 +853,9 @@ CREATE TABLE `user` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `userjobtypes`
--- 
+--
 
 CREATE TABLE `userjobtypes` (
   `userid` int(11) NOT NULL default '0',
@@ -865,9 +865,9 @@ CREATE TABLE `userjobtypes` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `userrule`
--- 
+--
 
 CREATE TABLE `userrule` (
   `userid` int(11) NOT NULL default '0',
@@ -876,9 +876,9 @@ CREATE TABLE `userrule` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `usersetting`
--- 
+--
 
 CREATE TABLE `usersetting` (
   `id` int(11) NOT NULL auto_increment,
@@ -891,9 +891,9 @@ CREATE TABLE `usersetting` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `voicereply`
--- 
+--
 
 CREATE TABLE `voicereply` (
   `id` int(11) NOT NULL auto_increment,
@@ -1083,20 +1083,20 @@ $$$
 -- phpMyAdmin SQL Dump
 -- version 2.9.1.1
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Nov 05, 2007 at 04:07 PM
 -- Server version: 5.0.27
 -- PHP Version: 5.2.0
--- 
+--
 -- Database: `authserver`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `aspadminuser`
--- 
+--
 
 CREATE TABLE `aspadminuser` (
   `id` int(11) NOT NULL auto_increment,
@@ -1112,9 +1112,9 @@ CREATE TABLE `aspadminuser` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `customer`
--- 
+--
 
 CREATE TABLE `customer` (
   `id` int(11) NOT NULL auto_increment,
@@ -1133,9 +1133,9 @@ CREATE TABLE `customer` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `persontoken`
--- 
+--
 
 CREATE TABLE `persontoken` (
   `customerid` int(11) NOT NULL,
@@ -1148,9 +1148,9 @@ CREATE TABLE `persontoken` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `portalactivation`
--- 
+--
 
 CREATE TABLE `portalactivation` (
   `activationtoken` varchar(255) NOT NULL,
@@ -1163,9 +1163,9 @@ CREATE TABLE `portalactivation` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `portalcustomer`
--- 
+--
 
 CREATE TABLE `portalcustomer` (
   `portaluserid` int(11) NOT NULL,
@@ -1175,9 +1175,9 @@ CREATE TABLE `portalcustomer` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `portaluser`
--- 
+--
 
 CREATE TABLE `portaluser` (
   `id` int(11) NOT NULL auto_increment,
@@ -1194,9 +1194,9 @@ CREATE TABLE `portaluser` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `sessiondata`
--- 
+--
 
 CREATE TABLE `sessiondata` (
   `id` char(255) NOT NULL,
@@ -1210,9 +1210,9 @@ CREATE TABLE `sessiondata` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `shard`
--- 
+--
 
 CREATE TABLE `shard` (
   `id` int(11) NOT NULL auto_increment,
@@ -1232,20 +1232,20 @@ CREATE TABLE `shard` (
 -- phpMyAdmin SQL Dump
 -- version 2.9.1.1
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Nov 05, 2007 at 04:10 PM
 -- Server version: 5.0.27
 -- PHP Version: 5.2.0
--- 
+--
 -- Database: `aspshard`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `importqueue`
--- 
+--
 
 CREATE TABLE `importqueue` (
   `id` int(11) NOT NULL auto_increment,
@@ -1257,9 +1257,9 @@ CREATE TABLE `importqueue` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobstatdata`
--- 
+--
 
 CREATE TABLE `jobstatdata` (
   `jobid` int(11) NOT NULL,
@@ -1274,9 +1274,9 @@ CREATE TABLE `jobstatdata` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `leasetask`
--- 
+--
 
 CREATE TABLE `leasetask` (
   `taskuuid` bigint(20) NOT NULL,
@@ -1286,9 +1286,9 @@ CREATE TABLE `leasetask` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjob`
--- 
+--
 
 CREATE TABLE `qjob` (
   `customerid` int(11) NOT NULL,
@@ -1325,9 +1325,9 @@ CREATE TABLE `qjob` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjobperson`
--- 
+--
 
 CREATE TABLE `qjobperson` (
   `customerid` int(11) NOT NULL default '0',
@@ -1338,9 +1338,9 @@ CREATE TABLE `qjobperson` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjobsetting`
--- 
+--
 
 CREATE TABLE `qjobsetting` (
   `customerid` int(11) NOT NULL,
@@ -1352,9 +1352,9 @@ CREATE TABLE `qjobsetting` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qjobtask`
--- 
+--
 
 CREATE TABLE `qjobtask` (
   `customerid` int(11) NOT NULL default '0',
@@ -1386,9 +1386,9 @@ CREATE TABLE `qjobtask` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qreportsubscription`
--- 
+--
 
 CREATE TABLE `qreportsubscription` (
   `customerid` int(11) NOT NULL,
@@ -1407,9 +1407,9 @@ CREATE TABLE `qreportsubscription` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `qschedule`
--- 
+--
 
 CREATE TABLE `qschedule` (
   `customerid` int(11) NOT NULL,
@@ -1424,9 +1424,9 @@ CREATE TABLE `qschedule` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `specialtaskqueue`
--- 
+--
 
 CREATE TABLE `specialtaskqueue` (
   `id` int(11) NOT NULL auto_increment,
@@ -1449,20 +1449,20 @@ CREATE TABLE `specialtaskqueue` (
 -- phpMyAdmin SQL Dump
 -- version 2.9.1.1
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Nov 05, 2007 at 05:03 PM
 -- Server version: 5.0.27
 -- PHP Version: 5.2.0
--- 
+--
 -- Database: `dmapi`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtaskactive`
--- 
+--
 
 CREATE TABLE `jobtaskactive` (
   `id` bigint(20) NOT NULL,
@@ -1476,9 +1476,9 @@ CREATE TABLE `jobtaskactive` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `jobtaskcomplete`
--- 
+--
 
 CREATE TABLE `jobtaskcomplete` (
   `id` bigint(20) NOT NULL,
@@ -1493,24 +1493,10 @@ CREATE TABLE `jobtaskcomplete` (
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `sessiondata`
--- 
 
-CREATE TABLE `sessiondata` (
-  `id` char(255) NOT NULL,
-  `customerid` int(11) NOT NULL,
-  `lastused` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `data` text NOT NULL,
-  PRIMARY KEY  (`id`),
-  KEY `lastused` (`lastused`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8   $$$
-
--- --------------------------------------------------------
-
--- 
+--
 -- Table structure for table `specialtaskactive`
--- 
+--
 
 CREATE TABLE `specialtaskactive` (
   `id` varchar(50) collate utf8_bin NOT NULL,
@@ -1523,9 +1509,9 @@ CREATE TABLE `specialtaskactive` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `tasksyncdata`
--- 
+--
 
 CREATE TABLE `tasksyncdata` (
   `name` varchar(50) NOT NULL,
