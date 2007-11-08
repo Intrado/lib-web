@@ -466,4 +466,14 @@ function ucfirst_withexceptions($string){
 			return ucfirst($string);
 	}
 }
+
+//Function to index an array of objects by their sequence
+//should be used only with objs that have a sequence.
+function resequence($objectarray){
+	$temparray = array();
+	foreach($objectarray as $obj){
+		$temparray[$obj->sequence] = $obj;
+	}
+	return $temparray;
+}
 ?>
