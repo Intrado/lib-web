@@ -122,7 +122,7 @@ if (isset($personid)) {
 	$tempemails = resequence(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
 	$emails = array();
 	for ($i=count($emails); $i<$maxemails; $i++) {
-		if(!isset($tempphones[$i])){
+		if(!isset($tempemails[$i])){
 			$emails[$i] = new Email();
 			$emails[$i]->sequence = $i;
 			$emails[$i]->personid = $personid;
