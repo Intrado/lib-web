@@ -19,7 +19,7 @@ class JobType extends DBMappedObject {
 		$surveysql = "and not issurvey ";
 		if($issurvey)
 			$surveysql = " and issurvey ";
-		$jobtypes = DBFindMany("JobType","from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=$USER->id and jt.deleted=0 $surveysql order by name","jt");
+		$jobtypes = DBFindMany("JobType","from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=$USER->id and jt.deleted=0 $surveysql order by systempriority, name","jt");
 
 		if (count($jobtypes) == 0) {
 			$jobtypes = DBFindMany("JobType","from jobtype where deleted=0 $surveysql order by systempriority, name");
