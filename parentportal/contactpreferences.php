@@ -41,24 +41,39 @@ if($PERSONID){
 	$maxphones = getSystemSetting("maxphones");
 	$maxemails = getSystemSetting("maxemails");
 	$maxsms = getSystemSetting("maxsms");
-	$phones = array_values($person->getPhones());
-	for ($i=count($phones); $i<$maxphones; $i++) {
-		$phones[$i] = new Phone();
-		$phones[$i]->sequence = $i;
-		$phones[$i]->personid = $PERSONID;
+	$tempphones = resequence($person->getPhones());
+	$phones = array();
+	for ($i=0; $i<$maxphones; $i++) {
+		if(!isset($tempphones[$i])){
+			$phones[$i] = new Phone();
+			$phones[$i]->sequence = $i;
+			$phones[$i]->personid = $PERSONID;
+		} else {
+			$phones[$i] = $tempphones[$i];
+		}
 	}
-	$emails = array_values($person->getEmails());
-	for ($i=count($emails); $i<$maxemails; $i++) {
-		$emails[$i] = new Email();
-		$emails[$i]->sequence = $i;
-		$emails[$i]->personid = $PERSONID;
+	$tempemails = resequence($person->getEmails());
+	$emails = array();
+	for ($i=0; $i<$maxemails; $i++) {
+		if(!isset($tempemails[$i])){
+			$emails[$i] = new Email();
+			$emails[$i]->sequence = $i;
+			$emails[$i]->personid = $PERSONID;
+		} else {
+			$emails[$i] = $tempemails[$i];
+		}
 	}
 	if(getSystemSetting("_hassms")){
-		$smses = array_values($person->getSmses());
-		for ($i=count($smses); $i<$maxsms; $i++) {
-			$smses[$i] = new Sms();
-			$smses[$i]->sequence = $i;
-			$smses[$i]->personid = $PERSONID;
+		$tempsmses = resequence($person->getSmses());
+		$smses = array();
+		for ($i=0; $i<$maxsms; $i++) {
+			if(!isset($tempsmses[$i])){
+				$smses[$i] = new Sms();
+				$smses[$i]->sequence = $i;
+				$smses[$i]->personid = $PERSONID;
+			} else {
+				$smses[$i] = $tempsmses[$i];
+			}
 		}
 	} else {
 		$smses = array();
