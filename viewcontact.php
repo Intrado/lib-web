@@ -188,14 +188,16 @@ if(CheckFormSubmit($f,$s))
 			foreach($contacttypes as $type){
 				if(!isset($types[$type])) continue;
 				foreach($types[$type] as $item){
-					$item->editlock = GetFormData($f, $s, "editlock_" . $type . $item->sequence);
-					if($item->editlock){
-						if($type == "email")
-							$item->$type = GetFormData($f, $s, $type . $item->sequence);
-						else
-							$item->$type = Phone::parse(GetFormData($f,$s, $type . $item->sequence));
+					if(GetFormData($f, $s, "editlock_" . $type . $item->sequence) || $item->editlock != GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
+						$item->editlock = GetFormData($f, $s, "editlock_" . $type . $item->sequence);
+						if($item->editlock){
+							if($type == "email")
+								$item->$type = GetFormData($f, $s, $type . $item->sequence);
+							else
+								$item->$type = Phone::parse(GetFormData($f,$s, $type . $item->sequence));
+						}
+						$item->update();
 					}
-					$item->update();
 					foreach($jobtypes as $jobtype){
 						if((!isset($contactpref[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
 							GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) ||
