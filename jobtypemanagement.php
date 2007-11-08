@@ -109,7 +109,7 @@ $PAGE = "admin:jobtype";
 $TITLE = "Job Type Manager";
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Save"), submit($f, "add", "Add a Job Type"));
+buttons(submit($f, $s, "Save"), submit($f, "add", "Create new Job Type"));
 startWindow("Job Types");
 ?>
 
