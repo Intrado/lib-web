@@ -106,28 +106,42 @@ if (isset($personid)) {
 	// get existing phones from db, then create any additional based on the max allowed
 	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
 	// use array_values to reset starting index to 0
-	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
-	for ($i=count($phones); $i<$maxphones; $i++) {
-		$phones[$i] = new Phone();
-		$phones[$i]->sequence = $i;
-		$phones[$i]->personid = $personid;
+	$tempphones = resequence(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
+	$phones = array();
+	for ($i=0; $i<$maxphones; $i++) {
+		if(!isset($tempphones[$i])){
+			$phones[$i] = new Phone();
+			$phones[$i]->sequence = $i;
+			$phones[$i]->personid = $personid;
+		} else {
+			$phones[$i] = $tempphones[$i];
+		}
 	}
 	$types["phone"] = $phones;
 	
-	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
+	$tempemails = resequence(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
+	$emails = array();
 	for ($i=count($emails); $i<$maxemails; $i++) {
-		$emails[$i] = new Email();
-		$emails[$i]->sequence = $i;
-		$emails[$i]->personid = $personid;
+		if(!isset($tempphones[$i])){
+			$emails[$i] = new Email();
+			$emails[$i]->sequence = $i;
+			$emails[$i]->personid = $personid;
+		} else {
+			$emails[$i] = $tempemails[$i];
+		}
 	}
 	$types["email"] = $emails;
 	
 	if(getSystemSetting("_hassms", false)){
-		$smses = array_values(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
+		$tempsmses = resequence(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
 		for ($i=count($smses); $i<$maxsms; $i++) {
-			$smses[$i] = new Sms();
-			$smses[$i]->sequence = $i;
-			$smses[$i]->personid = $personid;
+			if(!isset($tempsmses[$i])){
+				$smses[$i] = new Sms();
+				$smses[$i]->sequence = $i;
+				$smses[$i]->personid = $personid;
+			} else {
+				$smses[$i] = $tempsmses[$i];
+			}
 		}
 		$types["sms"] = $smses;
 	}
