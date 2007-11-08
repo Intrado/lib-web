@@ -54,6 +54,13 @@ function fmt_jobcount($row, $index){
 	}
 }
 
+function fmt_hasportal($row, $index){
+	if($row[$index])
+		return "Yes";
+	else
+		return "No";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,18 +91,18 @@ foreach($customers as $cust) {
 		$row = array();
 		$row[0] = $cust[0];
 		$row[1] = $cust[2];
-		$row[2] = QuickQuery("select value from setting where name = 'displayname'", $custdb);
-		$row[3] = QuickQuery("select value from setting where name = 'inboundnumber'", $custdb);
-		$row[4] = QuickQuery("select value from setting where name = 'timezone'", $custdb);
-		$row[5] = QuickQuery("select value from setting where name = '_managernote'", $custdb);
-		$row[6] = QuickQuery("select value from setting where name = 'disablerepeat'", $custdb);
+		$row[2] = getCustomerSystemSetting('displayname', false, true, $custdb);
+		$row[3] = getCustomerSystemSetting('inboundnumber', false, true, $custdb);
+		$row[4] = getCustomerSystemSetting('timezone', false, true, $custdb);
+		$row[5] = getCustomerSystemSetting('_managernote', false, true, $custdb);
+		$row[6] = getCustomerSystemSetting('disablerepeat', false, true, $custdb);
 
-		$row[7] = QuickQuery("select value from setting where name = '_maxusers'", $custdb);
+		$row[7] = getCustomerSystemSetting('_maxusers', false, true, $custdb);
 
 		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
 		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
 								WHERE job.status = 'active'", $custdb);
-
+		$row[10] = getCustomerSystemSetting('_hasportal', false, true, $custdb);
 
 		$data[] = $row;
 	}
@@ -107,6 +114,7 @@ $titles = array("0" => "Customer ID",
 				"3" => "Toll Free Number",
 				"4" => "Timezone",
 				"6" => "Status",
+				"10" => "Portal",
 				"7" => "Max Users",
 				"8" => "Active Users",
 				"9" => "Active Jobs",
@@ -117,6 +125,7 @@ $formatters = array("url" => "fmt_custurl",
 					"6" => "fmt_status",
 					"8" => "fmt_users",
 					"9" => "fmt_jobcount",
+					"10" => "fmt_hasportal",
 					"Actions" => "fmt_actions");
 
 include_once("nav.inc.php");
