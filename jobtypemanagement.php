@@ -60,6 +60,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 			error("You must have at least one survey job type");
 		} else if(QuickQuery("select count(*) from userjobtypes where jobtypeid = '" . DBSafe(CheckFormSubmit($f, 'delete')) . "'")){
 			error("A user is still restricted to that job type", "Please remove the restriction if you would like to delete that job type");
+		} else if($error = checkNames($f, $s, $systemprioritynames, $types, $surveytypes)){
+			error("There are duplicate job type names", $error);
 		} else {
 
 			foreach($systemprioritynames as $index => $name){
@@ -163,6 +165,36 @@ include("navbottom.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Funcitons
 ////////////////////////////////////////////////////////////////////////////////
+
+//Check names of job types to make sure unique
+function checkNames($f, $s, $systemprioritynames, $types, $surveytypes){
+	$errors = array();
+	$namecount = array();
+	$names = array();
+	foreach($systemprioritynames as $index => $name){
+		foreach($types[$index] as $type){
+			$name = GetFormData($f, $s, "jobtypename" . $type->id);
+			$lcname = strtolower($name);
+			if(!isset($namecount[$lcname]))
+				$namecount[$lcname] = 0;
+			$namecount[$lcname]++;
+			$names[] = $name;
+		}
+	}
+	foreach($surveytypes as $surveytype){
+		$name = GetFormData($f, $s, "jobtypename" . $surveytype->id);
+		$lcname = strtolower($name);
+		if(!isset($namecount[$lcname]))
+			$namecount[$lcname] = 0;
+		$namecount[$lcname]++;
+		$names[] = $name;
+	}
+	foreach($names as $name){
+		if($namecount[strtolower($name)] > 1 && !isset($errors[strtolower($name)]))
+			$errors[strtolower($name)] = $name;
+	}
+	return $errors;
+}
 
 //fetches all jobtypeprefs and returns 3 dimensional array
 //builds by jobtypeid, type, sequence
