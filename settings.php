@@ -244,33 +244,6 @@ buttons(submit($f, $s, 'Save'));
 startWindow('Global System Settings');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-
-<?
-				if($IS_COMMSUITE) {
-?>
-					<tr>
-						<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job Type/Priorities:<br><? print help('Settings_JobTypes'); ?></th>
-						<td class="bottomBorder">
-							<table border="0" cellpadding="0" cellspacing="0" width="60%">
-								<tr>
-									<td>
-							<?
-								$types = DBFindMany('JobType', "from jobtype where deleted=0 order by systempriority, name");
-								$types[] = $type = new JobType();
-								$type->id = 'new';
-								$titles = array('name' => 'Type', 'systempriority' => "Service Level", 'edit' => '');
-								$formatters = array('edit' => 'fmt_edit', 'name' => 'fmt_name', 'systempriority' => "fmt_systempriority");
-								showObjects($types,$titles,$formatters);
-							?>
-
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-<?
-				}
-?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Customer Info:</th>
 					<td class="bottomBorder">
