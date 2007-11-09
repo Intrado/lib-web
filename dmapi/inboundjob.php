@@ -25,21 +25,6 @@ function jobOptions()
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="joboptions">
-		<field name="priority" type="menu" timeout="5000" sticky="true">
-			<prompt repeat="2">
-				<audio cmid="file://prompts/inbound/SelectPriority.wav" />
-			</prompt>
-
-			<choice digits="1" />
-			<choice digits="2" />
-
-			<default>
-				<audio cmid="file://prompts/ImSorry.wav" />
-			</default>
-			<timeout>
-				<goto message="error" />
-			</timeout>
-		</field>
 
 <?		if ($maxdays > 1) { ?>
 			<sub message="numdays" />
@@ -128,8 +113,7 @@ function jobConfirm($listname, $priority, $numdays=1)
 				<audio cmid="file://prompts/inbound/And.wav" />
 				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
 
-				<audio cmid="file://prompts/inbound/Confirmation4.wav" />
-				<audio cmid="file://prompts/inbound/ConfirmationTimeSetting.wav" />
+				<tts gender="female">If this is correct press one to submit your job and exist the system.  To select a different list, press two.  To select a different priority, press three.  To change the number of days this job is to run, press four. To change the call time settings, press five.</tts>
 
 			</prompt>
 
@@ -137,6 +121,7 @@ function jobConfirm($listname, $priority, $numdays=1)
 			<choice digits="2" />
 			<choice digits="3" />
 			<choice digits="4" />
+			<choice digits="5" />
 
 			<default>
 				<audio cmid="file://prompts/ImSorry.wav" />
@@ -419,15 +404,6 @@ if($REQUEST_TYPE == "new"){
 			$USER = new User($SESSIONDATA['userid']);
 			$VALIDJOBTYPES = array_values(JobType::getUserJobTypes());
 
-			// if user selected "1" then use highest priority, else use default (aka lowest)
-			if ($BFXML_VARS['priority'] == 1) {
-				$priority = $VALIDJOBTYPES[0]->name;
-			} else {
-				$priority = $VALIDJOBTYPES[count($VALIDJOBTYPES)-1]->name;
-			}
-
-			$SESSIONDATA['priority'] = $priority; // this is a string, not an int
-
 			// if they are reentering job options, jump ahead to job confirm
 			if (isset($SESSIONDATA['starttime']) &&
 				isset($SESSIONDATA['stoptime'])) {
@@ -530,21 +506,27 @@ if($REQUEST_TYPE == "new"){
 			// replay list selection
 			else if ($BFXML_VARS['sendjob'] == "2")
 			{
+				$SESSIONDATA['currentListPage'] = 0; // reset paging
 				forwardToPage("inboundlist.php");
 			}
-			// replay job options
+			// replay job type selection
 			else if ($BFXML_VARS['sendjob'] == "3")
+			{
+				forwardToPage("inboundjobtype.php");
+			}
+			// replay numdays option
+			else if ($BFXML_VARS['sendjob'] == "4")
 			{
 				jobOptions();
 			}
 			// replay call window
-			else if ($BFXML_VARS['sendjob'] == "4")
+			else if ($BFXML_VARS['sendjob'] == "5")
 			{
 				promptStartTime();
 			}
 
 	// they already entered job options, but returned to select a different list
-	// so keep their options and reply the confirm
+	// so keep their options and replay the confirm
 	} else if ( isset($SESSIONDATA['listname']) &&
 				isset($SESSIONDATA['priority']) &&
 				isset($SESSIONDATA['numdays']) &&

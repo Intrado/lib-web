@@ -233,15 +233,27 @@ if($REQUEST_TYPE == "new"){
 	} else if (isset($BFXML_VARS['uselist'])) {
 
 		if ($BFXML_VARS['uselist'] == "1") {
+			// they already entered job options, but returned to select a different list
+			// so keep their options and replay the confirm
+			if ( isset($SESSIONDATA['listname']) &&
+				isset($SESSIONDATA['priority']) &&
+				isset($SESSIONDATA['numdays']) &&
+				isset($SESSIONDATA['starttime']) &&
+				isset($SESSIONDATA['stoptime'])) {
+
+				forwardToPage("inboundjob.php");
+			}
+
 			// user confirmed they wish to use the selected list, go to job options
-			forwardToPage("inboundjob.php");
+			forwardToPage("inboundjobtype.php");
 		} else {
 			// user does not want selected list
 			playLists(false); // do not increment the page
 		}
 	// play the current page of lists
-	} else if (isset($BFXML_VARS['confirmContinue'])) {
+	} else if (isset($BFXML_VARS['confirmContinue']) || isset($SESSIONDATA['currentListPage'])) {
 		playLists(true);
+
 	// confirm that they wish to continue setting up their job, or they exit after recording messages
 	} else {
 		confirmContinue();
