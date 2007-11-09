@@ -141,9 +141,12 @@ class ContactsReport extends ReportGenerator {
 		// destination index 2 is sequence
 		$data = array();
 		foreach($personlist as $personrow){
-			foreach($phoneemailsmsdata[$personrow[1]] as $destination){
-				
-				$data[] = array_insert($personrow, array($destination[2],$destination[1], $destination[3]), 4);
+			if(!isset($phoneemailsmsdata[$personrow[1]])){
+				$data[] = array_insert($personrow, array("","", ""), 4);
+			} else {
+				foreach($phoneemailsmsdata[$personrow[1]] as $destination){
+					$data[] = array_insert($personrow, array($destination[2],$destination[1], $destination[3]), 4);
+				}
 			}
 		}
 		
