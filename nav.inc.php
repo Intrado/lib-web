@@ -16,13 +16,13 @@ $SHORTCUTS = array();
 if (isset($_GET['timer']))
 	$PAGETIME = microtime(true);
 
-if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone'))) {
+if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
 	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
 	if ($USER->authorize("starteasy")) {
 		$SHORTCUTS['Start EasyCall'] = "javascript: popup('easycallstart.php',500,450);";
 		$SHORTCUTS['Call Me to Record'] = "javascript: popup('callme.php?origin=message',500,450);";
 	}
-	if ($USER->authorize(array('sendmessage', 'sendemail', 'sendphone'))) {
+	if ($USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
 		$SHORTCUTS['My Messages'] = "messages.php";
 		$SHORTCUTS['My Jobs'] = "jobs.php";
 		$SHORTCUTS['My Archived Jobs'] = "jobsarchived.php";

@@ -18,7 +18,7 @@ include_once("obj/ImportJob.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendprint')  && !$USER->authorize('managesystemjobs')) {
+if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendprint')  && !$USER->authorize('sendsms') && !$USER->authorize('managesystemjobs')) {
 	redirect('unauthorized.php');
 }
 

@@ -19,7 +19,7 @@ include_once("obj/FieldMap.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (! ($USER->authorize("sendemail") || $USER->authorize("sendphone") || $USER->authorize("sendprint"))) {
+if (! ($USER->authorize("sendemail") || $USER->authorize("sendphone") || $USER->authorize("sendprint") || $USER->authorize('sendsms'))) {
 	redirect('unauthorized.php');
 }
 
