@@ -216,7 +216,7 @@ function getJobTypePrefs(){
 }
 
 function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtypeprefs){
-	PutFormData($f, $s, "jobtypename" . $type->id, $type->name, "text", 0, 50);
+	PutFormData($f, $s, "jobtypename" . $type->id, $type->name, "text", 0, 50, true);
 	PutFormData($f, $s, "jobtypedesc" . $type->id, $type->infoforparents, "text", 0, 255);
 	for($i=0; $i<$maxphones; $i++){
 		PutFormData($f, $s, "jobtype" . $type->id . "phone" . $i, isset($jobtypeprefs[$type->id]["phone"][$i]) ? $jobtypeprefs[$type->id]["phone"][$i] : 0, "bool", 0, 1);
