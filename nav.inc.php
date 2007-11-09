@@ -64,10 +64,10 @@ $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 
 $NAVTREE = array (
 	array("Start","start.php",NULL,$MAINTAB=="start",array()),
-	array("Notifications",NULL,array("createlist","sendphone","sendprint","sendemail"),$MAINTAB=="notifications",array(
+	array("Notifications",NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms"),$MAINTAB=="notifications",array(
 		array("Lists","lists.php","createlist",$SUBTAB=="lists"),
-		array("Messages","messages.php",array('sendmessage', 'sendemail', 'sendphone'),$SUBTAB=="messages"),
-		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone'),$SUBTAB=="jobs"),
+		array("Messages","messages.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="messages"),
+		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
 		array("Surveys","surveys.php","survey",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
@@ -77,7 +77,7 @@ $NAVTREE = array (
 		array("Call Distribution","reportsystemdistribution.php","viewcalldistribution",$SUBTAB=="distribution")
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
-						'viewsystemrepeating','viewcontacts','blocknumbers','sendsms'),$MAINTAB=="system",array(
+						'viewsystemrepeating','viewcontacts','blocknumbers'),$MAINTAB=="system",array(
 		array("Active Jobs","activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
 		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
