@@ -550,15 +550,24 @@ startWindow('Job Information');
 		<th align="right" class="windowRowHeader bottomBorder">Delivery Type:<br></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" >
+
+<?
+				if($USER->authorize('sendphone')){
+?>
 				<tr>
 					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('phoneoptions'); else hide('phoneoptions');\""); ?></td>
 				</tr>
+<?
+				}
+				if($USER->authorize('sendemail')){
+?>
 				<tr>
 					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
 					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?></td>
 				</tr>
 <?
+				}
 				if($hassms && $USER->authorize('sendsms')){
 ?>
 				<tr>
