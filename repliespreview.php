@@ -59,10 +59,8 @@ $responses = DBGetRow($responses);
 $TITLE = "Reply";
 
 include_once('popup.inc.php');
-startWindow('Reply Info', 'padding: 3px;');
-
 buttons(button("Done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"), button("Delete", "if(confirmDelete()) window.location='repliespreview.php?delete=$vr->id'") );
-
+startWindow('Reply Info', 'padding: 3px;');
 ?>
 <table border="0" cellpadding="3" cellspacing="0">
 	<tr>
