@@ -6,13 +6,12 @@ host="localhost:8088"
 path="/xmlrpc"
 
 ;optional seperate server for outbound notifications
-[dmapidb]
-persistent=true
-host="localhost"
-user="root"
-pass=""
-db="commsuite"
-
+;[dmapidb]
+;persistent=true
+;host="localhost"
+;user="root"
+;pass=""
+;db="commsuite"
 
 [feature]
 is_commsuite=true
@@ -25,7 +24,6 @@ log_db_queries=true
 log_dmapi=true
 has_print=true
 tmp_dir="/tmp"
-has_sms=false
 
 ;if not set, warn_earliest is set to "7:00 am"
 ;and warn_latest is set to "9:00 pm"
