@@ -358,9 +358,13 @@ class JobSummaryReport extends ReportGenerator{
 		$joblist = array();
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
+		
+		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
-						"daterange" => $daterange);
+						"daterange" => $daterange,
+						"hassms" => $sms);
 		return $params;
 	}
 
