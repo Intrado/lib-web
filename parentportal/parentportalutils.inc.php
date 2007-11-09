@@ -110,14 +110,13 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 			$temp[$phone->sequence] = $phone;
 		}
 		$phones = $temp;
-		$phonecount = count($phones);
+
 		$temp = array();
 		$emails = DBFindMany("Email", "from email where personid = '" . $pid . "'");
 		foreach($emails as $email){
 			$temp[$email->sequence] = $email;
 		}
 		$emails = $temp;
-		$emailcount = count($emails);
 		
 		if(getSystemSetting("_hassms", false)){
 			$temp = array();
@@ -126,7 +125,6 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 				$temp[$sms->sequence] = $sms;
 			}
 			$smses = $temp;
-			$smscount = count($smses);
 		}
 		
 		
@@ -137,9 +135,8 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 					$phone->phone = $mainphone;
 					$phone->editlock = 1;
 					$phone->personid = $pid;
-					$phone->sequence=$phonecount;
+					$phone->sequence=$sequence;
 					$phone->create();
-					$phonecount++;
 				} else {
 					$phones[$sequence]->phone = $mainphone;
 					$phones[$sequence]->editlock = 1;
@@ -154,9 +151,8 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 					$email->email = $mainemail;
 					$email->editlock = 1;
 					$email->personid = $pid;
-					$email->sequence=$emailcount;
+					$email->sequence=$sequence;
 					$email->create();
-					$emailcount++;
 				} else {
 					$emails[$sequence]->email = $mainemail;
 					$emails[$sequence]->editlock = 1;
@@ -172,9 +168,8 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 						$sms->sms = $mainsms;
 						$sms->editlock = 1;
 						$sms->personid = $pid;
-						$sms->sequence=$smscount;
+						$sms->sequence=$sequence;
 						$sms->create();
-						$smscount++;
 					} else {
 						$smses[$sequence]->sms = $mainsms;
 						$smses[$sequence]->editlock = 1;
