@@ -13,7 +13,6 @@ include_once("obj/JobType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
-
 if(isset($_GET['clear'])){
 	unset($_SESSION['jobtypemanagement']['radio']);
 	redirect();
@@ -50,7 +49,7 @@ if(CheckFormSubmit($f,$s))
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(QuickQuery("select count(*) from jobtype where name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
+		} else if(QuickQuery("select count(*) from jobtype where not deleted name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
 			error("That name is already in use");
 		} else {
 	
@@ -90,10 +89,10 @@ if(CheckFormSubmit($f,$s))
 
 if($reloadform){
 	ClearFormData($f);
-	PutFormData($f, $s, "jobtypename", "", "text", 0, 50);
+	PutFormData($f, $s, "jobtypename", "", "text", 0, 50, true);
 	PutFormData($f, $s, "jobtypedesc", "", "text", 0, 255);
 	if($IS_COMMSUITE){
-		PutFormData($f, $s, "systempriority", "number", "3");
+		PutFormData($f, $s, "systempriority", "3", "number");
 	}
 	PutFormData($f, $s, "issurvey", (bool)0, "bool", 0, 1);
 	foreach($max as $index => $maxvalue){
@@ -111,10 +110,10 @@ if($reloadform){
 
 
 $PAGE = "admin:jobtype";
-$TITLE = "Job Type Addition";
+$TITLE = "Job Type Editor: New Job Type";
 include_once("nav.inc.php");
 NewForm($f);
-buttons(button("Back", null, "jobtypemanagement.php"), submit($f, $s, "Add"));
+buttons(submit($f, $s, "Add"));
 startWindow("Add a Job Type");
 ?>
 
@@ -141,7 +140,6 @@ startWindow("Add a Job Type");
 			<td class="bottomBorder" >
 <?
 				NewFormItem($f, $s, "systempriority", "selectstart");
-				NewFormItem($f, $s, "systempriority", "selectoption", " -- Select a System Priority -- ", "");
 				NewFormItem($f, $s, "systempriority", "selectoption", "High Priority", "2");
 				NewFormItem($f, $s, "systempriority", "selectoption", "General", "3");
 				NewFormItem($f, $s, "systempriority", "selectend");
