@@ -174,17 +174,18 @@ if( $reloadform )
 		PutFormData($f, $s, "easycallmin", getSetting('easycallmin'), "number", 0, 10);
 		PutFormData($f, $s, "easycallmax", getSetting('easycallmax'), "number", 0, 10);
 	}
-
-	for($i=0; $i < $maxphones; $i++){
-		PutFormData($f, $s, "lockedphone" . $i, getSystemSetting('lockedphone' . $i, 0), "bool", 0, 1);
+	if(getSystemSetting("_hasportal", false)){
+		for($i=0; $i < $maxphones; $i++){
+			PutFormData($f, $s, "lockedphone" . $i, getSystemSetting('lockedphone' . $i, 0), "bool", 0, 1);
+		}
+		for($i=0; $i < $maxemails; $i++){
+			PutFormData($f, $s, "lockedemail" . $i, getSystemSetting('lockedemail' . $i, 0), "bool", 0, 1);
+		}
+		for($i=0; $i < $maxsms; $i++){
+			PutFormData($f, $s, "lockedsms" . $i, getSystemSetting('lockedsms' . $i, 0), "bool", 0, 1);
+		}
+		PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 1, 365, true);
 	}
-	for($i=0; $i < $maxemails; $i++){
-		PutFormData($f, $s, "lockedemail" . $i, getSystemSetting('lockedemail' . $i, 0), "bool", 0, 1);
-	}
-	for($i=0; $i < $maxsms; $i++){
-		PutFormData($f, $s, "lockedsms" . $i, getSystemSetting('lockedsms' . $i, 0), "bool", 0, 1);
-	}
-	PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 1, 365);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
