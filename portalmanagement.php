@@ -26,7 +26,7 @@ require_once("obj/PortalReport.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if (!getSystemSetting("_hasportal") || !$USER->authorize('portalaccess')) {
+if (!getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess')) {
 	redirect('unauthorized.php');
 }
 

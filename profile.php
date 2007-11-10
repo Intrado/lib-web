@@ -122,7 +122,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("viewsystemcompleted", (bool)GetFormData($form, $section, 'viewsystemcompleted'));
 			$accss->setPermission("survey", (bool)GetFormData($form, $section, 'survey'));
 			$accss->setPermission("leavemessage", (bool)GetFormData($form, $section, 'leavemessage'));
-			if(getSystemSetting("_hasportal")){
+			if(getSystemSetting("_hasportal", false)){
 				$accss->setPermission("portalaccess", (bool)GetFormData($form, $section, 'portalaccess'));
 				$accss->setPermission("generatebulktokens", (bool)GetFormData($form, $section, 'generatebulktokens'));
 			}
@@ -449,7 +449,7 @@ startWindow('Allowed Functions');
 		</td>
 	</tr>
 <?
-	if(getSystemSetting("_hasportal")){
+	if(getSystemSetting("_hasportal", false)){
 ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Portal:<br><? print (''); ?></th>

@@ -53,7 +53,7 @@ if (isset($_GET['id'])) {
 } else {
 	redirect('unauthorized.php');
 }
-if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess")){
+if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 	if(isset($_GET['create']) && $_GET['create']){
 		if(generatePersonTokens(array($personid))){
 			redirect();
@@ -450,7 +450,7 @@ foreach ($fieldmaps as $map) {
 		<td>
 	</tr>
 <?
-	if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess") && $associates){
+	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && $associates){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Associations:</th>
@@ -486,7 +486,7 @@ foreach ($fieldmaps as $map) {
 	</tr>
 <?
 	}
-	if(getSystemSetting("_hasportal") && $USER->authorize("portalaccess")){
+	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader">Activation Code Information:</th>
