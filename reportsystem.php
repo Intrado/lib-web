@@ -209,7 +209,7 @@ include_once("nav.inc.php");
 buttons(submit($f, $s, "Refresh"));
 startWindow("Display Options", "padding: 3px;");
 ?>
-	<table border="0" cellpadding="2" cellspacing="1" width="100%">
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder">Delivery Method</th>
 			<td class="bottomBorder">
@@ -234,8 +234,8 @@ if(getSystemSetting('_hassms', false)){
 		</tr>
 
 		<tr valign="top">
-			<th align="right" class="windowRowHeader">Group By:</th>
-			<td>
+			<th align="right" class="bottomBorder windowRowHeader">Group By:</th>
+			<td class="bottomBorder">
 				<? 
 					NewFormItem($f, $s, "groupby", "selectstart");
 					NewFormItem($f, $s, "groupby", "selectoption", " -- System -- ", "");
@@ -247,8 +247,8 @@ if(getSystemSetting('_hassms', false)){
 			</td>
 		</tr>
 		<tr valign="top">
-			<th align="right" class="windowRowHeader">Show Users:</th>
-			<td>
+			<th align="right" class="bottomBorder windowRowHeader">Show Users:</th>
+			<td class="bottomBorder">
 				<? 
 					NewFormItem($f, $s, "showusers", "checkbox", null, null, "onclick=\"window.location='?showusers='+ (this.checked ? '1' : '0') + '&type=$type'\"");
 				?>
