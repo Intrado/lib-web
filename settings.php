@@ -117,7 +117,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
-				if(getSystemSetting("_hasportal") && $USER->authorize('portalaccess')){
+				if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
 					for($i = 0; $i < $maxphones; $i++){
 						setSetting('lockedphone' . $i, GetFormData($f, $s, 'lockedphone' . $i));
 					}
@@ -174,7 +174,7 @@ if( $reloadform )
 		PutFormData($f, $s, "easycallmin", getSetting('easycallmin'), "number", 0, 10);
 		PutFormData($f, $s, "easycallmax", getSetting('easycallmax'), "number", 0, 10);
 	}
-	if(getSystemSetting("_hasportal", false)){
+	if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
 		for($i=0; $i < $maxphones; $i++){
 			PutFormData($f, $s, "lockedphone" . $i, getSystemSetting('lockedphone' . $i, 0), "bool", 0, 1);
 		}
@@ -383,7 +383,7 @@ startWindow('Global System Settings');
 					</td>
 				</tr>
 <?
-				if(getSystemSetting("_hasportal") && $USER->authorize('portalaccess')){
+				if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Portal:</th>
