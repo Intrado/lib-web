@@ -39,7 +39,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 				error("The passwords do not match");
 			} else if(strlen($password1) < 5){
 				error("Passwords must be at least 5 characters long");
-			} else if($password1 && $passworderror = isSameUserPass($user['portaluser.username'], $password1, $user['portal.firstname'], $user['portal.lastname'])){
+			} else if($password1 && $passworderror = isSameUserPass($user['portaluser.username'], $password1, $user['portaluser.firstname'], $user['portaluser.lastname'])){
 				error($passworderror);
 			} else {
 				$result = portalActivateAccount($token, $password1);
