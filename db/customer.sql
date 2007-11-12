@@ -1271,3 +1271,19 @@ $$$
 ALTER TABLE jobtype DROP `timeslices`
 $$$
 
+-- TODO remove the first alter when we added 'declined' we would not want to alter a huge table twice!
+ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked') NOT NULL default 'notattempted'
+$$$
+
+DROP TABLE smsjob
+$$$
+
+DROP TABLE smsmsg
+$$$
+
+ALTER TABLE `systemstats` ADD `attempt` TINYINT NOT NULL DEFAULT '0' AFTER `jobid`
+$$$
+
+ALTER TABLE `systemstats` DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `jobid` , `attempt` , `date` , `hour` )
+$$$
