@@ -210,7 +210,7 @@ startWindow("List Content");
 		<td class="bottomBorder" style="padding: 5px;" valign="bottom">
 <?
 //ruleeditform expects $RULES to be set
-$RULEMODE = array('multisearch' => true, 'text' => false, 'reldate' => true);
+$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 $RULES = DBFindMany("Rule", "from rule r,listentry le
 			where le.ruleid=r.id and le.listid='" . $_SESSION['listid'] . "'" ,"r");
 include("ruleeditform.inc.php");
