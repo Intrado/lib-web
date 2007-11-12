@@ -49,7 +49,7 @@ function portalActivateAccount($activationtoken, $password) {
 	$result = pearxmlrpc($method, $params);
 	if ($result['result'] == "") {
 		// account activated
-		session_id($result['sessionID']); // set the session id
+		if (isset($result['sessionID'])) session_id($result['sessionID']); // set the session id
 	}
 	return $result;
 }
