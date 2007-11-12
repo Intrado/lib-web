@@ -260,7 +260,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 	$reloadform = 1;
 }
 
-$RULEMODE = array('multisearch' => true, 'text' => false, 'reldate' => false);
+$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => false);
 if ($_SESSION['userid'])
 	$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
 else
