@@ -49,8 +49,16 @@ function portalActivateAccount($activationtoken, $password) {
 	$result = pearxmlrpc($method, $params);
 	if ($result['result'] == "") {
 		// account activated
-		if (isset($result['sessionID'])) session_id($result['sessionID']); // set the session id
+		session_id($result['sessionID']); // set the session id
 	}
+	return $result;
+}
+
+
+function portalPreactivateForgottenPassword($activationtoken) {
+	$params = array(new XML_RPC_Value($activationtoken, 'string'));
+	$method = "PortalServer.portal_preactivateForgottenPassword";
+	$result = pearxmlrpc($method, $params);
 	return $result;
 }
 
