@@ -17,8 +17,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$firstname = get_magic_quotes_gpc() ? stripslashes($_POST['firstname']) : $_POST['firstname'];
 	$lastname = get_magic_quotes_gpc() ? stripslashes($_POST['lastname']) : $_POST['lastname'];
 	$zipcode = get_magic_quotes_gpc() ? stripslashes($_POST['zipcode']) : $_POST['zipcode'];
-	$password1 = get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1'];
-	$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
+	$password1 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password1'])) : trim($_POST['password1']);
+	$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
 	$acceptterms = isset($_POST['acceptterms']);
 	
 	if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $login)){
@@ -82,11 +82,11 @@ if(!$success){
 				<td><input type="text" name="lastname" value="<?=$lastname?>" maxlength="100"/></td>
 			</tr>
 			<tr>
-				<td>Zip Code:</td>
+				<td>ZIP Code:</td>
 				<td><input type="text" name="zipcode" value="<?=$zipcode?>" size="5" maxlength="5"/></td>
 			</tr>
 			<tr>
-				<td colspan="2"><div style="overflow:scroll; height:500px;"><?=$tos ?></div></td>
+				<td colspan="2"><div style="overflow:scroll; height:250px;"><?=$tos ?></div></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" name="acceptterms"/> Accept Terms of Service</td>
@@ -103,9 +103,11 @@ if(!$success){
 <?
 } else {
 ?>
-	<br>Thank you, Your account has been created.
-	<br>Please check your email to activate your account.
-	<br>You will be redirected to the activate page in 5 seconds.
+	<div style="margin:5px">
+		Thank you, Your account has been created.
+		<br>Please check your email to activate your account.
+		<br>You will be redirected to the activate page in 5 seconds.
+	</div>
 	<meta http-equiv="refresh" content="5;url=activate.php">
 <?
 }
