@@ -179,7 +179,7 @@ if($reloadform){
 //1 is phone, 2 is email, 3 is sms
 //flag at index 7
 function fmt_destination_sequence($row, $index){
-	if($row[$index]){
+	if($row[$index] != "" || $row[$index] != false){
 		$types = array(1 => "Phone",
 						2 => "Email",
 						3 => "SMS");
