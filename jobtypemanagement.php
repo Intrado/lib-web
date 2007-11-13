@@ -13,10 +13,10 @@ include_once("obj/JobType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
-if(isset($_GET['clear'])){
-	unset($_SESSION['jobtypemanagement']['radio']);
-	redirect();
+if (!$USER->authorize('managesystem')) {
+	redirect('unauthorized.php');
 }
+
 
 $systemprioritynames = array("1" => "Emergency",
 							"2" => "High Priority",
@@ -106,7 +106,7 @@ if($reloadform){
 }
 
 
-$PAGE = "admin:jobtype";
+$PAGE = "admin:contactsettings";
 $TITLE = "Job Type Manager";
 include_once("nav.inc.php");
 NewForm($f);
