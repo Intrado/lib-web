@@ -450,7 +450,7 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 	}
 
 	$hover = '<span ' . $extrahtml . '>';
-	$hover .= '<div style="color:blue"';
+	$hover .= '<div style="color:#346799"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	$hover .= '>&nbsp;' . $jobtype->name . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
