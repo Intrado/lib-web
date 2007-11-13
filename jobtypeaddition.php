@@ -109,7 +109,7 @@ if($reloadform){
 }
 
 
-$PAGE = "admin:jobtype";
+$PAGE = "admin:contactsettings";
 $TITLE = "Job Type Editor: New Job Type";
 include_once("nav.inc.php");
 NewForm($f);
