@@ -89,7 +89,7 @@ $NAVTREE = array (
 		array("Users","users.php","manageaccount",$SUBTAB=="users"),
 		array("Security","profiles.php","manageprofile",$SUBTAB=="security"),
 		array("Settings","settings.php","managesystem",$SUBTAB=="settings"),
-		array("Job Types", "jobtypemanagement.php?clear=1", NULL, $SUBTAB=="jobtype"),
+		array("Contact Settings", "contactsettings.php", "managesystem", $SUBTAB=="contactsettings"),
 		array("Metadata","datamanager.php","metadata",$SUBTAB=="datamanager"),
 		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager"),
 		array("Portal", "portalmanagement.php?clear=1", getSystemSetting("_hasportal", false) ? "portalaccess" : "dummy", $SUBTAB=="portal")
