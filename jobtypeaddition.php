@@ -113,109 +113,116 @@ $PAGE = "admin:jobtype";
 $TITLE = "Job Type Editor: New Job Type";
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Add"));
+buttons(submit($f, $s, "Done"));
 startWindow("Add a Job Type");
 ?>
 
-<table cellpadding="0" cellspacing="0" width="100%">
-<?
-?>
+<table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 3px;">Name</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 3px;">System Priority</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 3px;">Is Survey?</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 3px;">Info For Parents</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 3px;">Contact Preferences</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 3px;">&nbsp;</th>
-	</tr>
-	<tr>
-		<td class="bottomBorder" >
-<?
-			NewFormItem($f, $s, "jobtypename", "text", 20, 50);
-?>
-		</td>
-<?
-		if($IS_COMMSUITE){
-?>
-			<td class="bottomBorder" >
-<?
-				NewFormItem($f, $s, "systempriority", "selectstart");
-				NewFormItem($f, $s, "systempriority", "selectoption", "High Priority", "2");
-				NewFormItem($f, $s, "systempriority", "selectoption", "General", "3");
-				NewFormItem($f, $s, "systempriority", "selectend");
-?>
-			</td>
-<?
-		} else {
-?>
-			<td class="bottomBorder" >General</td>
-<?
-		}
-?>
-		<td class="bottomBorder" ><? NewFormItem($f, $s, "issurvey", "checkbox", 0, 1, "onclick='if(this.checked) displaysurveytable(); else hidesurveytable();'");?></td>
-		<td class="bottomBorder" ><? NewFormItem($f, $s, "jobtypedesc", "textarea", 20, 3);?></td>
-		<td class="bottomBorder" >
-			<table  cellpadding="0" cellspacing="0" id="nonsurvey">
-				<tr class="listheader">
-					<th align="left">Contact Type</th>
-<?
-					for($i=0; $i < $maxcolumns; $i++){
-						?><th><?=$i+1?></th><?
-					}
-?>
-				</tr>
-<?
-				foreach($max as $index => $maxvalue){
-?>
+		<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">New Job Type:</th>
+		<td class="bottomBorder">
+			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td class="bottomBorder"><?=ucfirst_withexceptions($index)?></td>
+					<td width="30%">Name</td>
+					<td>
+					<?
+								NewFormItem($f, $s, "jobtypename", "text", 20, 50);
+					?>
+					</td>
+				</tr>
+				<tr>
+					<td width="30%">System Priority</td>
+					<td>
 <?
-						for($i=0; $i < $maxcolumns; $i++){
-							?><td class="bottomBorder" align="center"><?
-							if($i < $maxvalue){
-								echo NewFormItem($f, $s, $index . $i, "checkbox", 0, 1);
-							} else {
-								echo "&nbsp;";
-							}
-							?></td><?
+						if($IS_COMMSUITE){
+								NewFormItem($f, $s, "systempriority", "selectstart");
+								NewFormItem($f, $s, "systempriority", "selectoption", "High Priority", "2");
+								NewFormItem($f, $s, "systempriority", "selectoption", "General", "3");
+								NewFormItem($f, $s, "systempriority", "selectend");
+						} else {
+							echo "General";
 						}
 ?>
+					</td>
 				</tr>
-<?
-				}
-?>
-			</table>
-			<table  cellpadding="0" cellspacing="0" id="survey" style="display:none">
-				<tr class="listheader">
-					<th align="left">Contact Type</th>
-<?
-					for($i=0; $i < $maxcolumns; $i++){
-						?><th><?=$i+1?></th><?
-					}
-?>
-				</tr>
-<?
-				foreach($max as $index => $maxvalue){
-					if($index =="sms")
-						continue;
-?>
 				<tr>
-					<td class="bottomBorder"><?=ucfirst_withexceptions($index)?></td>
-<?
-						for($i=0; $i < $maxcolumns; $i++){
-							?><td class="bottomBorder" align="center"><?
-							if($i < $maxvalue){
-								echo NewFormItem($f, $s, $index . $i . "survey", "checkbox", 0, 1);
-							} else {
-								echo "&nbsp;";
-							}
-							?></td><?
-						}
-?>
+					<td width="30%">Is Survey?</td>
+					<td>
+						<? NewFormItem($f, $s, "issurvey", "checkbox", 0, 1, "onclick='if(this.checked) displaysurveytable(); else hidesurveytable();'");?>
+					</td>
 				</tr>
+				<tr>
+					<td width="30%">Info For Parents</td>
+					<td ><? NewFormItem($f, $s, "jobtypedesc", "textarea", 20, 3);?></td>
+				</tr>
+				<tr>
+					<td width="30%">Contact Preferences</td>
+					<td>
+						<table  cellpadding="0" cellspacing="0" id="nonsurvey">
+							<tr class="listheader">
+								<th align="left">Contact Type</th>
 <?
-				}
+									for($i=0; $i < $maxcolumns; $i++){
+										?><th><?=$i+1?></th><?
+									}
 ?>
+							</tr>
+<?
+							foreach($max as $index => $maxvalue){
+								if($IS_COMMSUITE && $index == 'sms') continue;
+?>
+								<tr>
+									<td class="bottomBorder"><?=ucfirst_withexceptions($index)?></td>
+<?
+										for($i=0; $i < $maxcolumns; $i++){
+											?><td class="bottomBorder" align="center"><?
+											if($i < $maxvalue){
+												echo NewFormItem($f, $s, $index . $i, "checkbox", 0, 1);
+											} else {
+												echo "&nbsp;";
+											}
+											?></td><?
+										}
+?>
+								</tr>
+<?
+							}
+?>
+						</table>
+						<table  cellpadding="0" cellspacing="0" id="survey" style="display:none">
+							<tr class="listheader">
+								<th align="left">Contact Type</th>
+<?
+								for($i=0; $i < $maxcolumns; $i++){
+									?><th><?=$i+1?></th><?
+								}
+?>
+							</tr>
+<?
+							foreach($max as $index => $maxvalue){
+								if($index =="sms")
+									continue;
+?>
+								<tr>
+									<td class="bottomBorder"><?=ucfirst_withexceptions($index)?></td>
+<?
+									for($i=0; $i < $maxcolumns; $i++){
+										?><td class="bottomBorder" align="center"><?
+										if($i < $maxvalue){
+											echo NewFormItem($f, $s, $index . $i . "survey", "checkbox", 0, 1);
+										} else {
+											echo "&nbsp;";
+										}
+										?></td><?
+									}
+?>
+								</tr>
+<?
+							}
+?>
+						</table>
+					</td>
+				</tr>
 			</table>
 		</td>
 	</tr>
