@@ -81,7 +81,7 @@ class PortalReport extends ReportGenerator{
 		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
 		$query = $this->query . " limit $pagestart, $max";
 		$result = Query($query);
-		$reporttotal = QuickQuery("select found_rows()");
+		$this->reporttotal = QuickQuery("select found_rows()");
 		$data = array();
 		$personids = array();
 		$count = 0;
@@ -131,7 +131,7 @@ class PortalReport extends ReportGenerator{
 							4 => "fmt_activation_code");
 		
 		startWindow("Search Results");
-		showPageMenu($reporttotal,$pagestart,$max);
+		showPageMenu($this->reporttotal,$pagestart,$max);
 ?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="portalresults">
 <?
@@ -139,7 +139,7 @@ class PortalReport extends ReportGenerator{
 ?>
 			</table>
 <?
-		showPageMenu($reporttotal,$pagestart,$max);
+		showPageMenu($this->reporttotal,$pagestart,$max);
 		endWindow();
 ?>
 		<script langauge="javascript">
