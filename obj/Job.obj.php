@@ -33,7 +33,7 @@ class Job extends DBMappedObject {
 	var $sendemail;
 	var $sendprint;
 	var $sendsms;
-	
+
 	var $optionsarray = null; //options to update
 
 
@@ -71,7 +71,7 @@ class Job extends DBMappedObject {
 			// check for system disablerepeat
 			if (!getSystemSetting("disablerepeat")) {
 				// check for empty message
-				if ($this->phonemessageid != null || $this->emailmessageid != null || $this->printmessageid || $this->questionnaireid != null) {
+				if ($this->phonemessageid != null || $this->emailmessageid != null || $this->smsmessageid != null || $this->printmessageid || $this->questionnaireid != null) {
 					// check for empty list
 					$this->generateSql(); // update thesql
 
@@ -205,7 +205,7 @@ class Job extends DBMappedObject {
 		if(!$this->sendprint) $this->printmessageid = NULL;
 		if(!$this->sendsms) $this->smsmessageid = NULL;
 		parent::update($specificfields,$updatechildren);
-		
+
 		if($this->id){
 			QuickUpdate("delete from jobsetting where jobid='$this->id'");
 			foreach ($this->optionsarray as $name => $value) {
@@ -228,7 +228,7 @@ class Job extends DBMappedObject {
 		if(!$this->sendprint) $this->printmessageid = NULL;
 		if(!$this->sendsms) $this->smsmessageid = NULL;
 		$id = parent::create($specificfields, $createchildren);
-		
+
 		if($id){
 			// now we have a jobid to create the jobsettings with
 			foreach ($this->optionsarray as $name => $value) {
@@ -256,7 +256,7 @@ class Job extends DBMappedObject {
 	}
 
 	function setSetting ($name, $value) {
-		
+
 		if($this->optionsarray == null)
 			$this->loadSettings();
 		if($this->optionsarray == null)
