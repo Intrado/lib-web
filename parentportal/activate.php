@@ -92,7 +92,7 @@ $PAGE = ":";
 if($forgot){
 	$TITLE = "Forgot Password";
 } else if($changeuser){
-	$TITLE = "Change User Name";
+	$TITLE = "Change Email";
 } else {
 	$TITLE = "Activate Account";
 }
@@ -103,7 +103,7 @@ if($forgot){
 	startWindow("Forgot Password" . help("Activateforgotpassword"));
 	$action = "?forgot=1";
 } else if($changeuser){
-	startWindow("Change User Name" . help("Activatenewemail"));
+	startWindow("Change Email" . help("Activatenewemail"));
 	$action = "?changeuser=1";
 } else {
 	startWindow("Activate" . help("Activateaccount"));
