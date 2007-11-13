@@ -4,7 +4,7 @@ if($PERSONID){
 
 	NewForm($f);
 ?>
-	<table cellpadding="3" cellspacing="1">
+	<table cellpadding="3" cellspacing="1" width="100%">
 		<tr class="listheader" >
 			<th colspan="2">Contact Details</th>
 <?
