@@ -290,16 +290,14 @@ if($reportgenerator->format == "csv"){
 			<td class="bottomBorder"><a href="portalmanagement.php/report.csv?csv=true">CSV</a></td>
 		</tr>
 	</table>
-		<br>
 		<?
+	endWindow();
 	
 	if(isset($options['pkey']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
 		$reportgenerator->generate();
 	}
 	buttons();
-	endWindow();
 	EndForm();
-	
 	include_once("navbottom.inc.php");
 }
 
