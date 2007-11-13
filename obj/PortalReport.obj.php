@@ -2,6 +2,8 @@
 
 class PortalReport extends ReportGenerator{
 
+	var $reporttotal = 0;
+
 	function generateQuery(){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
@@ -79,7 +81,7 @@ class PortalReport extends ReportGenerator{
 		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
 		$query = $this->query . " limit $pagestart, $max";
 		$result = Query($query);
-		$total = QuickQuery("select found_rows()");
+		$reporttotal = QuickQuery("select found_rows()");
 		$data = array();
 		$personids = array();
 		$count = 0;
@@ -129,19 +131,21 @@ class PortalReport extends ReportGenerator{
 							4 => "fmt_activation_code");
 		
 		startWindow("Search Results");
-		showPageMenu($total,$pagestart,$max);
+		showPageMenu($reporttotal,$pagestart,$max);
 ?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="portalresults">
 <?
 				showTable($data, $titles, $formatters, $repeatedColumns, 0);
 ?>
 			</table>
-			<script langauge="javascript">
-				var portalresultstable = new getObj("portalresults").obj;
-			</script>
 <?
-		showPageMenu($total,$pagestart,$max);
+		showPageMenu($reporttotal,$pagestart,$max);
 		endWindow();
+?>
+		<script langauge="javascript">
+			var portalresultstable = new getObj("portalresults").obj;
+		</script>
+<?
 	}
 	
 	function runCSV(){
