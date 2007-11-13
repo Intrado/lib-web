@@ -158,7 +158,7 @@ startWindow("Add a Job Type");
 				<tr>
 					<td width="30%">Contact Preferences</td>
 					<td>
-						<table  cellpadding="0" cellspacing="0" id="nonsurvey">
+						<table border="0" cellpadding="3" cellspacing="1" id="nonsurvey">
 							<tr class="listheader">
 								<th align="left">Contact Type</th>
 <?
@@ -189,7 +189,7 @@ startWindow("Add a Job Type");
 							}
 ?>
 						</table>
-						<table  cellpadding="0" cellspacing="0" id="survey" style="display:none">
+						<table  border="0" cellpadding="3" cellspacing="1" id="survey" style="display:none">
 							<tr class="listheader">
 								<th align="left">Contact Type</th>
 <?
