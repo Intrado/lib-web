@@ -333,6 +333,7 @@ function fmt_activation_date($row, $index){
 				return false;
 			}
 <? } ?>
+	}
 	function confirmGenerateActive(){
 		return confirm("Some activation codes exist in this list.  Are you sure you want to overwrite them?");
 	}
