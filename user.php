@@ -125,6 +125,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 		$usr = new User($_SESSION['userid']);
 		$emaillist = GetFormData($f, $s, "email");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
+		$password = trim(GetFormData($f, $s, "password"));
+		$passwordconfirm = trim(GetFormData($f, $s, "passwordconfirm"));
 
 		$login = trim(GetFormData($f, $s, 'login'));
 
@@ -138,11 +140,11 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 				// do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
-		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && (GetFormData($f, $s, 'password')=="") && (GetFormData($f, $s, 'passwordconfirm')=="")) {
+		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($password=="") && ($passwordconfirm=="")) {
 			error('You must enter a password');
 		} elseif($IS_LDAP && !GetFormData($f,$s,'ldap') && $usr->ldap && ereg("^0*$", GetFormData($f,$s,'password'))) {
 			error('You must enter a password');
-		} elseif( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
+		} elseif( $password != $passwordconfirm ) {
 			error('Password confirmation does not match' . $extraMsg);
 		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
 			error('Telephone Pin Code confirmation does not match' . $extraMsg);
@@ -152,7 +154,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error('Caller ID must be 10 digits long', 'You do not need to include a 1 for long distance');
 		} elseif ((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && strlen($login) < $usernamelength) {
 			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
-		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && !ereg("^0*$", GetFormData($f,$s,'password')) && (strlen(GetFormData($f, $s, 'password')) < $passwordlength)){
+		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && !ereg("^0*$", GetFormData($f,$s,'password')) && (strlen($password) < $passwordlength)){
 			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
 		} elseif (User::checkDuplicateLogin($login, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
@@ -215,7 +217,6 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 
 			if((!$usr->ldap && $IS_LDAP) || !$IS_LDAP){
 				// If the password is all 0 characters then it was a default form value, so ignore it
-				$password = GetFormData($f, $s, 'password');
 				if (!ereg("^0*$", $password)) {
 					$usr->setPassword($password);
 				}
