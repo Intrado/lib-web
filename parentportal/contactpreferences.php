@@ -154,11 +154,9 @@ if($PERSONID){
 include_once("nav.inc.php");
 startWindow("Preferences" . help("Contactpreferences"), 'padding: 3px;');
 
+if(isset($contactList)){
 ?>
-<table width="100%" cellpadding="3" cellspacing="1" >
-<?
-	if(isset($contactList)){
-?>
+	<table width="100%" cellpadding="3" cellspacing="1" >
 		<tr>
 			<td valign="top">
 				<table>
@@ -168,27 +166,39 @@ startWindow("Preferences" . help("Contactpreferences"), 'padding: 3px;');
 					<tr><td><a href="contactpreferences.php?id=<?=$person->id?>"><?=$person->pkey . "&nbsp;" . $person->$firstnamefield . "&nbsp;" . $person->$lastnamefield?></a></td></tr>
 <?
 				}
-
 ?>
 				</table>
 <?
 			buttons(button("Add A Contact", null, "addcontact1.php"));
 ?>
 			</td>
-
-			<td>
-<?
-				include("contactedit.php");
-?>				
-			</td>
 		</tr>
+	</table>
 <?
 } else {
-	?><tr><td><img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a></td></tr><?
-}
 ?>
-</table>
+	<div style="margin:5px">
+		<img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a>
+	</div>
 <?
+}
 endWindow();
+
+if($PERSONID){
+	?><br><?
+	startWindow("Edit Preferences");
+?>
+	<table>
+		<tr>
+			<td>
+<?
+	include_once("contactedit.php");
+?>
+			</td>
+		</tr>
+	</table>
+<?
+	endWindow();
+}
 include_once("navbottom.inc.php");
 ?>
