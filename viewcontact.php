@@ -319,7 +319,7 @@ $TITLE = "View Contact Information: " . $contactFullName;
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Save"));
+buttons(submit($f, $s, "Done"));
 
 startWindow('Contact');
 
@@ -417,7 +417,7 @@ foreach ($fieldmaps as $map) {
 ?>
 			<tr>
 				<td class="bottomBorder"><?= $header ?></td>
-				<td align="middle"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, 'id="editlock_' . $type . $item->sequence . '" onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
+				<td align="center"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, 'id="editlock_' . $type . $item->sequence . '" onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
 <?
 				$disabled = "";
 				if(!$item->editlock)
@@ -429,7 +429,7 @@ foreach ($fieldmaps as $map) {
 				}
 				foreach($jobtypes as $jobtype){
 ?>
-					<td align="middle"  class="bottomBorder">
+					<td align="center"  class="bottomBorder">
 <?
 						if($type != "sms" || ($type == "sms" && !$jobtype->issurvey)){
 							echo NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1);
