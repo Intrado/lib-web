@@ -27,14 +27,15 @@ if(CheckFormSubmit($f,$s))
 		MergeSectionFormData($f, $s);
 
 		//do check
-
+		$newpassword1 = trim(GetFormData($f, $s, "newpassword1"));
+		$newpassword2 = trim(GetFormData($f, $s, "newpassword2"));
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(strlen(GetFormData($f, $s, "newpassword1")) && strlen(GetFormData($f, $s, "newpassword1")) < 5){
+		} else if(strlen($newpassword1) && strlen($newpassword1) < 5){
 			error("Passwords must be at least 5 characters long");
-		} else if(GetFormData($f, $s, "newpassword1") && $passworderror = isSameUserPass($_SESSION['portaluser']['portaluser.username'], GetFormData($f, $s, "newpassword1"), GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"))){
+		} else if($newpassword1 && $passworderror = isSameUserPass($_SESSION['portaluser']['portaluser.username'], $newpassword1, GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"))){
 			error($passworderror);
-		} else if(GetFormData($f, $s, "newpassword1") != GetFormData($f, $s, "newpassword2")){
+		} else if($newpassword1 != $newpassword2){
 			error('Password confirmation does not match');
 		} else {
 			//submit changes
@@ -44,8 +45,8 @@ if(CheckFormSubmit($f,$s))
 				error($error_failedupdate);
 				$error = 1;
 			}
-			if(GetFormData($f, $s, "newpassword1")){
-				$result = portalUpdatePortalUserPassword(GetFormData($f, $s, "newpassword1"), GetFormData($f, $s, "oldpassword"));
+			if($newpassword1){
+				$result = portalUpdatePortalUserPassword($newpassword1, GetFormData($f, $s, "oldpassword"));
 				if($result['result'] != ""){
 					$updateuser = false;
 					$error = 1;
@@ -76,7 +77,7 @@ if( $reloadform )
 	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999");
 }
 
-$PAGE = "welcome:account";
+$PAGE = "messages:account";
 $TITLE = "Account Information: " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
 include_once("nav.inc.php");
 NewForm($f);
@@ -102,7 +103,7 @@ startWindow('User Information');
 						<td colspan="4"><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
 					</tr>
 					<tr>
-						<td align="right">Zipcode:</td>
+						<td align="right">ZIP Code:</td>
 						<td colspan="4"><? NewFormItem($f, $s, 'zipcode', 'text', '5'); ?></td>
 					</tr>
 					<tr>
@@ -110,11 +111,11 @@ startWindow('User Information');
 						<td colspan="4"><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
 					</tr>
 					<tr>
-						<td align="right">New Password:</td>
+						<td align="right">*New Password:</td>
 						<td colspan="4"><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
 					</tr>
 					<tr>
-						<td align="right">Confirm New Password:</td>
+						<td align="right">*Confirm New Password:</td>
 						<td colspan="4"><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
 					</tr>
 					
