@@ -7,6 +7,7 @@ require_once("../inc/table.inc.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Person.obj.php");
 require_once("../inc/formatters.inc.php");
+require_once("../obj/Message.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -18,7 +19,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$contactList = getContactIDs($_SESSION['portaluserid']);
 	
 	foreach($contactList as $personid){
-		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, u.email
+		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.emailmessageid
 			from job j 
 			left join reportperson rp on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
@@ -81,10 +82,14 @@ function sender($row, $index){
 	//index 5 is first name
 	//index 6 is last name
 	//index 4 is type
-	//index 8 is email
+	//index 8 is email message id
+	//fetch associated email message if it exists and find email return address
+	
 	$types = explode(",",$row[4]);
 	if(in_array("email", $types)){
-		return "<a href='mailto:" . $row[8] . "'>" . $row[5] . " " . $row[6] . "</a>";
+		$message = DBFind("Message", "from message m where m.id = '" . DBSafe($row[8]) . "'");
+		$messagedata = sane_parsestr($message->data);
+		return "<a href='mailto:" . $messagedata['fromemail'] . "'>" . $messagedata['fromname'] . "</a>";
 	} else {
 		return $row[5] . " " . $row[6];
 	}
@@ -93,7 +98,7 @@ function sender($row, $index){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE="Welcome - " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
-$PAGE = 'welcome:welcome';
+$PAGE = 'messages:messages';
 include_once("nav.inc.php");
 if(isset($_SESSION['customerid'])){
 	?><div><b>Messages from the last 30 days</b></div><br><?
@@ -122,14 +127,11 @@ if(isset($_SESSION['customerid'])){
 	}
 } else {
 	startWindow("No Associations");
-	
-	?>
-	<br>
+?>
+	<div style="margin:5px">
 		<img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a>
-	<br>
-	<br>
-	<?
-	
+	</div>
+<?
 	endWindow();
 }
 include_once("navbottom.inc.php");
