@@ -180,10 +180,10 @@ if($reloadform){
 //flag at index 7
 function fmt_destination_sequence($row, $index){
 	if($row[$index] != "" || $row[$index] != false){
-		$types = array(1 => "Phone",
-						2 => "Email",
-						3 => "SMS");
-		return $types[$row[7]] . " " . ($row[$index] + 1);
+		$types = array(1 => "phone",
+						2 => "email",
+						3 => "sms");
+		return destination_label($types[$row[7]], $row[$index]);
 	} else {
 		return "";
 	}
