@@ -121,7 +121,7 @@ if (isset($personid)) {
 	
 	$tempemails = resequence(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
 	$emails = array();
-	for ($i=count($emails); $i<$maxemails; $i++) {
+	for ($i=0; $i<$maxemails; $i++) {
 		if(!isset($tempemails[$i])){
 			$emails[$i] = new Email();
 			$emails[$i]->sequence = $i;
@@ -134,7 +134,7 @@ if (isset($personid)) {
 	
 	if(getSystemSetting("_hassms", false)){
 		$tempsmses = resequence(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
-		for ($i=count($smses); $i<$maxsms; $i++) {
+		for ($i=0; $i<$maxsms; $i++) {
 			if(!isset($tempsmses[$i])){
 				$smses[$i] = new Sms();
 				$smses[$i]->sequence = $i;
