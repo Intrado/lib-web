@@ -59,8 +59,9 @@ $hidenav = 1;
 include_once("nav.inc.php");
 startWindow("Districts/Schools");
 ?>
-<br>You have students in multiple districts/schools
-<br>Please choose one of the districts/schools you are associated with:
+<div style="margin:5px">
+	You have students in multiple districts/schools
+	<br>Please choose one of the districts/schools you are associated with:
 	<table cellpadding="3" cellspacing="1">
 <?
 		foreach($customerlist as $index => $customername){
@@ -68,6 +69,7 @@ startWindow("Districts/Schools");
 		}
 ?>
 	</table>
+</div>
 <?
 endWindow();
 include_once("navbottom.inc.php");

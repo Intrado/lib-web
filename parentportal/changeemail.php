@@ -79,7 +79,7 @@ if(!$success)
 
 startWindow('Change Email' . help("Changeemail"));
 if($success){
-	?><br><div>You should receive an email shortly at the new address with an activation code.</div><br><?
+	?><div style="margin:5px">You should receive an email shortly at the new address with an activation code.</div><?
 } else {
 ?>
 <table>

@@ -32,8 +32,11 @@ $TITLE = "Add A Contact";
 include("nav.inc.php");
 startWindow("Add Successful");
 ?>
-<div> You have successfully added <?=$person->$firstnamefield?> <?=$person->$lastnamefield?>.
-<div> Would you like to add another contact?
+	<div style="margin:5px">
+		You have successfully added <?=$person->$firstnamefield?> <?=$person->$lastnamefield?>.
+	<br>
+		Would you like to add another contact?
+	</div>
 <?
 buttons(button("Yes", NULL, "addcontact1.php"), button("No", NULL, "addcontact3.php"));
 endWindow();
