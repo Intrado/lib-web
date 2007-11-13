@@ -38,15 +38,15 @@ $titles = array("0" => "In List",
 				"3" => "First Name",
 				"4" => "Last Name",
 				"5" => "Language",
-				"6" => "Primary Phone",
-				"7" => "Primary Email");
+				"6" => destination_label_primary("phone"),
+				"7" => destination_label_primary("email"));
 $formatters = array("0" => "fmt_checkbox",
 					"2" => "fmt_idmagnify",
 					"6" => "fmt_phone",
 					"7" => "fmt_email");
 
 if(getSystemSetting("_hassms")){
-	$titles["8"] = "Primary SMS";
+	$titles["8"] = destination_label_primary("sms");
 	$formatters["8"] = "fmt_phone";
 	$titles["9"] = "Address";
 	$formatters["9"] = "fmt_null";

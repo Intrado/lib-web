@@ -311,8 +311,7 @@ startWindow("Contact");
 <?
 	$x = 0;
 	foreach ($phones as $phone) {
-		$header = "Phone " . ($x+1) . ":";
-		if ($x == 0) $header = "Primary Phone:";
+		$header = destination_label("phone", $x) .":";
 		$itemname = "phone".($x+1);
 ?>
 	<tr>
@@ -327,8 +326,7 @@ startWindow("Contact");
 
 	$x = 0;
 	foreach ($emails as $email) {
-		$header = "Email " . ($x+1) . ":";
-		if ($x == 0) $header = "Primary Email:";
+		$header = destination_label("email", $x) .":";
 		$itemname = "email".($x+1);
 ?>
 	<tr>
@@ -341,8 +339,7 @@ startWindow("Contact");
 	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 		$x = 0;
 		foreach ($smses as $sms) {
-			$header = "Sms " . ($x+1) . ":";
-			if ($x == 0) $header = "Primary Sms:";
+			$header = destination_label("sms", $x) .":";
 			$itemname = "sms".($x+1);
 ?>
 		<tr>
