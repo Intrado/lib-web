@@ -413,7 +413,7 @@ foreach ($fieldmaps as $map) {
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
 		foreach($types[$type] as $item){
-			$header = ucfirst_withexceptions($type) . "&nbsp;" . ($item->sequence +1);
+			$header = destination_label($type, $item->sequence);
 ?>
 			<tr>
 				<td class="bottomBorder"><?= $header ?></td>
