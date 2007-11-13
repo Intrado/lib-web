@@ -18,7 +18,7 @@ if($PERSONID){
 			foreach($phones as $phone){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Phone&nbsp;<?=$phone->sequence+1?>:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("phone",$phone->sequence)?>:</th>
 					<td class="bottomBorder" >
 					<? 
 						if(!$lockedphones[$phone->sequence]){ 
@@ -41,7 +41,7 @@ if($PERSONID){
 			foreach($emails as $email){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Email&nbsp;<?=$email->sequence+1?>:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("email",$email->sequence)?>:</th>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedemails[$email->sequence]){ 
@@ -65,7 +65,7 @@ if($PERSONID){
 				foreach($smses as $sms){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">SMS&nbsp;<?=$sms->sequence+1?>:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("sms",$sms->sequence)?>:</th>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedsms[$sms->sequence]){
