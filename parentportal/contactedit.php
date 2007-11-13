@@ -12,13 +12,13 @@ if($PERSONID){
 				?><th><?=jobtype_info($jobtype)?></th><?
 			}
 ?>
-		<tr>
+		</tr>
 <?
 			$type = "phone";
 			foreach($phones as $phone){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Phone <?=$phone->sequence+1?>:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Phone&nbsp;<?=$phone->sequence+1?>:</th>
 					<td class="bottomBorder" >
 					<? 
 						if(!$lockedphones[$phone->sequence]){ 
@@ -33,8 +33,7 @@ if($PERSONID){
 					</td>
 <?
 						displayJobtypeForm($f, $s, "phone", $phone->sequence, $jobtypes);
-?>									
-
+?>
 				</tr>
 <?
 			}
@@ -42,7 +41,7 @@ if($PERSONID){
 			foreach($emails as $email){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Email <?=$email->sequence+1?>: </th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Email&nbsp;<?=$email->sequence+1?>:</th>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedemails[$email->sequence]){ 
@@ -58,7 +57,6 @@ if($PERSONID){
 <?
 					displayJobtypeForm($f, $s, "email", $email->sequence, $jobtypes);
 ?>									
-					</td>
 				</tr>
 <?
 			}
@@ -67,7 +65,7 @@ if($PERSONID){
 				foreach($smses as $sms){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">SMS <?=$sms->sequence+1?>:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">SMS&nbsp;<?=$sms->sequence+1?>:</th>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedsms[$sms->sequence]){
@@ -82,7 +80,7 @@ if($PERSONID){
 					</td>
 <?
 					displayJobtypeForm($f, $s, "sms", $sms->sequence, $jobtypes);
-?>									
+?>
 				</tr>
 <?
 				}
@@ -92,7 +90,6 @@ if($PERSONID){
 	<div><? NewFormItem($f, $s, "savetoall", "checkbox"); ?> Save To All Contacts</div>
 	<br>
 <?
-	
 	echo submit($f, $s, "Save");
 	EndForm();
 }
