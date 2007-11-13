@@ -476,4 +476,23 @@ function resequence($objectarray){
 	}
 	return $temparray;
 }
+
+//fetch destination labels and store them into a static array
+function fetch_labels($type, $refresh=false){
+	static $labels = array();
+	if(isset($labels[$type]) && !$refresh)
+		return $labels[$type];
+
+	$labels[$type] = QuickQueryList("select sequence, label from destlabel where type = '" . DBSafe($type) . "'", true);
+	return $labels[$type];
+}
+
+function destination_label($type, $sequence){
+	$labels = fetch_labels($type);
+	$label = isset($labels[$sequence]) ? $labels[$sequence] : "";
+	$text = ucfirst_withexceptions($type) . "&nbsp;" . ($sequence+1);
+	if($label != "")
+		$text .= "&nbsp;($label)";
+	return $text;
+}
 ?>
