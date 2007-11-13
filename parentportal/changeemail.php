@@ -72,31 +72,51 @@ $PAGE = "account:account";
 $TITLE = "Change Email";
 
 include_once("nav.inc.php");
-NewForm($f);
-if(!$success)
-	buttons(submit($f, $s, 'Submit'));
 
-
-startWindow('Change Email' . help("Changeemail"));
 if($success){
-	?><div style="margin:5px">You should receive an email shortly at the new address with an activation code.</div><?
+	startWindow('Change Email' . help("Changeemail"));
+	?>
+	<div style="margin:5px">You should receive an email shortly at the new address with an activation code.</div>
+	<form method='POST' action="activate.php?changeuser=1" name="activate" id="activate">
+		<table>
+			<tr>
+				<td>Activation Code: </td>
+				<td><input type="text" name="token" size="50" /></td>
+			</tr>
+			<tr>
+				<td>Password:</td>
+				<td><input type="password" name="password" /></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td><?=submit("activate", "main", "Submit")?></td>
+			</tr>
+		</table>
+	</form>
+	<?
+	endWindow();
 } else {
+	NewForm($f);
+	if(!$success)
+		buttons(submit($f, $s, 'Submit'));
+	startWindow('Change Email' . help("Changeemail"));
 ?>
-<table>
-	<tr>
-		<td>New Email Address:</td>
-		<td><? NewFormItem($f, $s, "newemail", "text", "50", "100") ?> </td>
-	</tr>
-	<tr>
-		<td>Password:</td>
-		<td><? NewFormItem($f, $s, "password", "password", "20", "100") ?> </td>
-	</tr>
-</table>
-<br>
+	<table>
+		<tr>
+			<td>New Email Address:</td>
+			<td><? NewFormItem($f, $s, "newemail", "text", "50", "100") ?> </td>
+		</tr>
+		<tr>
+			<td>Password:</td>
+			<td><? NewFormItem($f, $s, "password", "password", "20", "100") ?> </td>
+		</tr>
+	</table>
+	<br>
 <?
+	endWindow();
+	buttons();
+	EndForm();
 }
-endWindow();
-buttons();
-EndForm();
+
 include_once("navbottom.inc.php");
 ?>
