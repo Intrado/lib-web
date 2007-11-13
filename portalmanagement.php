@@ -328,8 +328,13 @@ function fmt_activation_date($row, $index){
 ?>
 <script>
 	function confirmGenerate(){
-		return confirm(" Are you sure you want to generate activation codes for these people?");
-	}
+<? if($reportgenerator->reporttotal > 0){ ?>
+				return confirm(" Are you sure you want to generate activation codes for these people?");
+<? } else { ?>
+				window.alert("There are no persons in this list.");
+				return false;
+			}
+<? } ?>
 	function confirmGenerateActive(){
 		return confirm("Some activation codes exist in this list.  Are you sure you want to overwrite them?");
 	}
