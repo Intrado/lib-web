@@ -126,7 +126,7 @@ if(isset($_SESSION['customerid'])){
 <?
 	}
 } else {
-	startWindow("No Associations");
+	startWindow("No Associations", 'padding: 3px;');
 ?>
 	<div style="margin:5px">
 		<img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a>
