@@ -76,8 +76,8 @@ class JobSummaryReport extends ReportGenerator{
 		$phonenumberquery = "select sum(rc.type='phone') as total,
 									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined')) as remaining,
-									sum(rc.result = 'duplicate') as duplicate,
 									sum(rc.result = 'blocked') as blocked,
+									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rc.numattempts) as totalattempts,
 									sum(rp.status = 'declined' and rc.result is null) as declined
