@@ -267,8 +267,8 @@ class JobSummaryReport extends ReportGenerator{
 											<th># of Phones</th>
 											<th>Done</th>
 											<th>Remaining</th>
-											<th>Duplicates Removed</th>
 											<th>Blocked</th>
+											<th>Duplicates Removed</th>
 											<th>No Phone #</th>
 											<th>Declined</th>
 											<th>Total Attempts</th>
@@ -310,7 +310,7 @@ class JobSummaryReport extends ReportGenerator{
 											}
 ?>
 										<tr>
-											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php<?=$urltext?>&type=phone"/><?=$value?></a><u></div></td>
+											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php<?=$urltext?>&type=phone"/><?=$value?>:</a><u></div></td>
 											<td><?=$jobstats["phone"][$index]?></td>
 										</tr>
 <?
