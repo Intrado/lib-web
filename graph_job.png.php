@@ -46,8 +46,8 @@ $cpcolors = array(
 	"N" => "tan",
 	"X" => "black",
 	"F" => "red",
-	"retry" => "cyan",
-	"inprogress" => "blue"
+	"inprogress" => "blue",
+	"retry" => "cyan"
 );
 
 $cpcodes = array(
@@ -57,8 +57,8 @@ $cpcodes = array(
 	"N" => "No Answer",
 	"X" => "Disconnect",
 	"F" => "Failed",
-	"retry" => "Retrying",
-	"inprogress" => "Queued"
+	"inprogress" => "Queued",
+	"retry" => "Retrying"
 );
 
 //preset array positions
@@ -69,8 +69,8 @@ $data = array(
 	"N" => false,
 	"X" => false,
 	"F" => false,
-	"retry" => false,
-	"inprogress" => false
+	"inprogress" => false,
+	"retry" => false
 );
 $legend = $data;
 $colors = $data;
