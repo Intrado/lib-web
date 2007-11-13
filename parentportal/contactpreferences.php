@@ -143,6 +143,10 @@ if($PERSONID){
 // Functions
 ///////////////////////////////////////////////////////////////////
 
+function id_url($obj, $index){
+	return "<a href='contactpreferences.php?id=" . $obj->$index . "'>" . $obj->pkey . "</a>";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,26 +159,13 @@ include_once("nav.inc.php");
 startWindow("Preferences" . help("Contactpreferences"), 'padding: 3px;');
 
 if(isset($contactList)){
-?>
-	<table width="100%" cellpadding="3" cellspacing="1" >
-		<tr>
-			<td valign="top">
-				<table>
-<?
-				foreach($contactList as $person){
-?>
-					<tr><td><a href="contactpreferences.php?id=<?=$person->id?>"><?=$person->pkey . "&nbsp;" . $person->$firstnamefield . "&nbsp;" . $person->$lastnamefield?></a></td></tr>
-<?
-				}
-?>
-				</table>
-<?
-			buttons(button("Add A Contact", null, "addcontact1.php"));
-?>
-			</td>
-		</tr>
-	</table>
-<?
+	buttons(button("Add A Contact", null, "addcontact1.php"));
+
+	$titles = array("id" => "ID#",
+					$firstnamefield => "First Name",
+					$lastnamefield => "Last Name");
+	$formatters = array("id" => "id_url");
+	showObjects($contactList, $titles, $formatters);	
 } else {
 ?>
 	<div style="margin:5px">
@@ -185,10 +176,9 @@ if(isset($contactList)){
 endWindow();
 
 if($PERSONID){
-	?><br><?
-	startWindow("Edit Preferences");
+	startWindow("Edit Preferences", 'padding: 3px;');
 ?>
-	<table>
+	<table width="100%">
 		<tr>
 			<td>
 <?
