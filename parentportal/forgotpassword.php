@@ -22,7 +22,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			$success = true;
 		} else {
 			if($result['result'] == "invalid argument"){
-				$emailnotfound = true;
+				$success = true;
 			} else {
 				$generalerror = true;	
 			}
@@ -35,11 +35,7 @@ $TITLE = "Forgot Password";
 $hidenav = 1;
 include_once("nav.inc.php");
 startWindow("Send Reset Password" . help('Forgotpassword'));
-if($emailnotfound){
-	?>
-		<div style="color: red;">That email is not in our system.</div>
-	<?
-} else if($generalerror){
+if($generalerror){
 	error("There was a problem with your request.  Please try again later");
 }
 if(!$success){
@@ -63,10 +59,12 @@ if(!$success){
 <?
 } else {
 ?>
-			<br>A link has been sent to your email address to log in.
-			<br>Please remember to change your password.
-			<br>You will be redirected to the activate page in 5 seconds.
-			<meta http-equiv="refresh" content="5;url=activate.php?forgot=1">
+	<div style="margin:5px">
+		A link has been sent to your email address to log in.
+		<br>Please remember to change your password.
+		<br>You will be redirected to the activate page in 5 seconds.
+	</div>
+	<meta http-equiv="refresh" content="5;url=activate.php?forgot=1">
 <?
 }
 endWindow();
