@@ -268,15 +268,13 @@ startWindow("Contact Search", "padding: 3px;");
 		}
 	?>
 </script>
-
-	<br>
-	<?
+<?
+endWindow();
 
 if(isset($options['personid']) || isset($options['phone']) || isset($options['email']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
 	$reportgenerator->generate();
 }
 buttons();
-endWindow();
 EndForm();
 
 include_once("navbottom.inc.php");
