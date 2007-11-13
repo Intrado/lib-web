@@ -75,7 +75,7 @@ foreach($cpcodes as $index => $code){
 }
 
 // New graph with a drop shadow
-$graph = new Graph(500,250,'auto');
+$graph = new Graph(500,325,'auto');
 //$graph->SetShadow();
 $graph->img->SetMargin(100,40,20,100);
 
