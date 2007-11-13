@@ -20,7 +20,7 @@ if (isset($_GET['timer']))
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
 
 $NAVTREE = array (
-	array("Welcome","start.php",NULL,$MAINTAB=="welcome",array()),
+	array("Messages","start.php",NULL,$MAINTAB=="messages",array()),
 	array("Contacts", "contactpreferences.php?clear=1", NULL, $MAINTAB=="contacts", array()
 	)
 );
@@ -149,7 +149,7 @@ if(!isset($hidenav) || !$hidenav){
 		<?= $MAINTABS ?>
 
 		<div class="applinks hoverlinks">
-			<a href="account.php"/>My Account</a> |
+			<a href="account.php">My Account</a> |
 	<?
 			$result = portalGetCustomerAssociations();
 			if($result['result'] == ""){
@@ -160,11 +160,11 @@ if(!isset($hidenav) || !$hidenav){
 			}
 
 			if(count($customeridlist) > 1){
-				?><a href="choosecustomer.php?logoutcustomer=1"/>Change Customer</a> |<?
+				?><a href="choosecustomer.php?logoutcustomer=1">Change Customer</a> |<?
 			}
 	?>
 			<a href="#" onclick="window.open('help/index.html', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
-			<a href="index.php?logout=1"/>Logout</a>
+			<a href="index.php?logout=1">Logout</a>
 		</div>
 
 	</div>
