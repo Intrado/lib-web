@@ -43,9 +43,6 @@ PRIMARY KEY ( `personid` , `jobtypeid` , `type` , `sequence` )
 ) ENGINE = innodb
 $$$
 
-ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL default 'notattempted'
-$$$
-
 ALTER TABLE `reportperson` CHANGE `status` `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts','declined') NOT NULL
 $$$
 
@@ -238,4 +235,16 @@ $$$
 -- system setting timeslice (from old jobtype)
 INSERT INTO `setting` (name,value) values ('_timeslice', 450)
 $$$
+
+-- timeslices moved to system setting
+ALTER TABLE jobtype DROP `timeslices`
+$$$
+
+ALTER TABLE `systemstats` ADD `attempt` TINYINT NOT NULL DEFAULT '0' AFTER `jobid`
+$$$
+
+ALTER TABLE `systemstats` DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `jobid` , `attempt` , `date` , `hour` )
+$$$
+
 

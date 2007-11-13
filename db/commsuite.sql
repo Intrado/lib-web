@@ -801,6 +801,7 @@ CREATE TABLE `surveyweb` (
 
 CREATE TABLE `systemstats` (
   `jobid` int(11) NOT NULL,
+  `attempt` tinyint(4) NOT NULL,
   `date` date NOT NULL,
   `hour` int(11) NOT NULL,
   `answered` int(11) NOT NULL,
@@ -809,7 +810,7 @@ CREATE TABLE `systemstats` (
   `noanswer` int(11) NOT NULL,
   `failed` int(11) NOT NULL,
   `disconnect` int(11) NOT NULL,
-  PRIMARY KEY  (`jobid`,`date`,`hour`)
+  PRIMARY KEY  (`jobid`,`attempt`,`date`,`hour`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8   $$$
 
 -- --------------------------------------------------------
