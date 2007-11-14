@@ -37,9 +37,9 @@ function fmt_import_status($row, $index){
 function fmt_filesize($row, $index){
 
 	 if($row[$index] < 10)
-	 	return "<div style=\"background-color: #ffcccc;\">" . number_format($row[$index]) . "</div>";
+	 	return "<div style=\"background-color: #ffcccc; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 	 else
-	 	return number_format($row[$index]);
+	 	return "<div style=\"width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 }
 
 
