@@ -495,4 +495,15 @@ function destination_label($type, $sequence){
 		$text .= "&nbsp;($label)";
 	return $text;
 }
+
+//Fetches label of sequence 0 and outputs for title format
+//no nbsp
+function destination_label_primary($type){
+	$labels = fetch_labels($type);
+	$label = isset($labels[0]) ? $labels[0] : "";
+	$text = ucfirst_withexceptions($type);
+	if($label != "")
+		$text .= " ($label)";
+	return $text;
+}
 ?>
