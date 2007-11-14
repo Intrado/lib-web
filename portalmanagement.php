@@ -327,11 +327,10 @@ function fmt_activation_date($row, $index){
 <script>
 	function confirmGenerate(){
 <? if($reportgenerator->reporttotal > 0){ ?>
-				return confirm(" Are you sure you want to generate activation codes for these people?");
+		return confirm(" Are you sure you want to generate activation codes for these people?");
 <? } else { ?>
-				window.alert("There are no persons in this list.");
-				return false;
-			}
+		window.alert("There are no persons in this list.");
+		return false;
 <? } ?>
 	}
 	function confirmGenerateActive(){
