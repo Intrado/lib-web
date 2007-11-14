@@ -67,6 +67,7 @@ select hour,
 from systemstats
 where 1
 $jobidquery
+and attempt = '0'
 group by hour
 ";
 

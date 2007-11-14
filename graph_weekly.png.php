@@ -35,6 +35,7 @@ select 	dayofweek(date) as dayofweek,
 		sum(disconnect)/4 as disconnect
 		from systemstats
 		where date >= date_sub(now(), interval 4 week)
+		and attempt = '0'
 		group by dayofweek
 ";
 
