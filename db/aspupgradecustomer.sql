@@ -167,14 +167,7 @@ ALTER TABLE `importfield` CHANGE `mapfrom` `mapfrom` TINYINT( 4 ) NULL
 $$$
 
 -- system setting maxsms
-INSERT INTO `setting` (name,value) select 'maxsms', value from setting where name='maxphones'
-$$$
-
--- copy phone fields enabled with sms into new sms records
-INSERT INTO `sms` (personid, sequence) select personid, sequence from phone
-$$$
-
-INSERT INTO `sms` (personid, sms, sequence) select personid, `phone`, sequence from phone where smsenabled=1 on duplicate key update sms.sms = phone.phone
+INSERT INTO `setting` ( `name` , `value` ) VALUES ('maxsms', '2')
 $$$
 
 ALTER TABLE phone DROP smsenabled
