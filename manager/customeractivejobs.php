@@ -60,10 +60,11 @@ function fmt_custurl($row, $index){
 	return $url;
 }
 
+//index 2 is jobid
 function fmt_play_link($row, $index){
 	$url = "";
-	if($row[1])
-		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[0] . "&jobid=" . $row[2] . "\", 400, 500)' href=\"#\">Play Message</a>";
+	if($row[2])
+		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[14] . "&jobid=" . $row[2] . "\", 400, 500)' href=\"#\">Play Message</a>";
 	return $url;
 }
 
@@ -183,7 +184,8 @@ for ($pri = 1; $pri <=3 ; $pri++) {
 								$sequencecalldata['assigned'],
 								$sequencecalldata['progress'],
 								$sequencecalldata['pending'],
-								$sequencecalldata['waiting']
+								$sequencecalldata['waiting'],
+								$customerid
 							);
 						$data[] = $row;
 
