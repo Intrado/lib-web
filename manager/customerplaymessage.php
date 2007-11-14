@@ -67,7 +67,7 @@ if (count($messagefields) > 0) {
 if (count($fields) > 0) {
 ?>
 	<div>Fields inserted into message</div>
-	<table border="0" cellpadding="3" cellspacing="0">
+	<table border="1">
 <?
 	foreach ($fields as $fieldmap) {
 		$fieldnum = $fieldmap->fieldnum;
