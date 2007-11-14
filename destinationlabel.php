@@ -24,8 +24,13 @@ $type = isset($_SESSION['destinationtype']) ? $_SESSION['destinationtype'] : "ph
 $default = 4;
 if($type == "email" || $type == "sms")
 	$default = 2;
+$name = $type;
+if($name == "email" || $name == "phone"){
+	$name .= "s";
+}	
 
-$max = getSystemSetting("max".$type, $default);
+$max = getSystemSetting("max".$name, $default);
+
 
 $reloadform = 0;
 $f="destinationlabels";
