@@ -10,7 +10,14 @@ $$$
 INSERT INTO `jobtype` VALUES (1,'Emergency',1,'',0,0),(2,'Attendance',2,'',0,0),(3,'General',3,'',0,0),(4,'Survey',3,'',1,0)
 $$$
 
--- TODO jobtypepref
+INSERT INTO `jobtypepref` VALUES (1,'phone',0,1),(1,'phone',1,1),(1,'phone',2,1),(1,'email',0,1),(1,'email',1,1),(1,'sms',0,1),(1,'sms',1,1)
+$$$
+INSERT INTO `jobtypepref` VALUES (2,'phone',0,1),(2,'phone',1,0),(2,'phone',2,0),(2,'email',0,1),(2,'email',1,0),(2,'sms',0,1),(2,'sms',1,0)
+$$$
+INSERT INTO `jobtypepref` VALUES (3,'phone',0,1),(3,'phone',1,0),(3,'phone',2,0),(3,'email',0,1),(3,'email',1,0),(3,'sms',0,1),(3,'sms',1,0)
+$$$
+INSERT INTO `jobtypepref` VALUES (4,'phone',0,1),(4,'phone',1,0),(4,'phone',2,0),(4,'email',0,1),(4,'email',1,0),(4,'sms',0,0),(4,'sms',1,0)
+$$$
 
 INSERT INTO `language` VALUES (1,'English'),(2,'Spanish')
 $$$
