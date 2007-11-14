@@ -217,7 +217,7 @@ function getJobTypePrefs(){
 function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtypeprefs){
 	global $IS_COMMSUITE;
 	PutFormData($f, $s, "jobtypename" . $type->id, $type->name, "text", 0, 50, true);
-	PutFormData($f, $s, "jobtypedesc" . $type->id, $type->infoforparents, "text", 0, 255);
+	PutFormData($f, $s, "jobtypedesc" . $type->id, $type->info, "text", 0, 255);
 	for($i=0; $i<$maxphones; $i++){
 		PutFormData($f, $s, "jobtype" . $type->id . "phone" . $i, isset($jobtypeprefs[$type->id]["phone"][$i]) ? $jobtypeprefs[$type->id]["phone"][$i] : 0, "bool", 0, 1);
 	}
@@ -239,7 +239,7 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms){
 	if($type->name != "Emergency"){
 		$type->name = GetFormData($f, $s, "jobtypename" . $type->id);
 	}
-	$type->infoforparents = GetFormData($f, $s, "jobtypedesc" . $type->id);
+	$type->info = GetFormData($f, $s, "jobtypedesc" . $type->id);
 	$type->update();
 
 	for($i=0; $i<$maxphones; $i++){

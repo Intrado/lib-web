@@ -287,7 +287,7 @@ CREATE TABLE `jobtype` (
   `id` int(11) NOT NULL auto_increment,
   `name` varchar(50) NOT NULL default '',
   `systempriority` tinyint(4) NOT NULL default '3',
-  `infoforparents` varchar(255) NOT NULL default '',
+  `info` varchar(255) NOT NULL default '',
   `issurvey` tinyint(4) NOT NULL default '0',
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`)

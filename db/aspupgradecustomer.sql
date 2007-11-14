@@ -255,3 +255,7 @@ CREATE TABLE `destlabel` (
 PRIMARY KEY ( `type` , `sequence` )
 ) ENGINE = innodb
 $$$
+
+
+ALTER TABLE `jobtype` CHANGE `infoforparents` `info` VARCHAR( 255 ) NOT NULL
+$$$

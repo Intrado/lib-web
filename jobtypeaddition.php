@@ -52,10 +52,10 @@ if(CheckFormSubmit($f,$s))
 		} else if(QuickQuery("select count(*) from jobtype where not deleted name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
 			error("That name is already in use");
 		} else {
-	
+
 			$type = new JobType();
 			$type->name = GetFormData($f, $s, "jobtypename");
-			$type->infoforparents = GetFormData($f, $s, "jobtypedesc");
+			$type->info = GetFormData($f, $s, "jobtypedesc");
 			$type->systempriority = 3;
 			if($IS_COMMSUITE){
 				$type->systempriority = GetFormData($f, $s, "systempriority");
@@ -65,7 +65,7 @@ if(CheckFormSubmit($f,$s))
 				error("Survey job types can only have a system priority of General");
 			} else {
 				$type->create();
-			
+
 				$survey = "";
 				if($type->issurvey)
 					$survey = "survey";
@@ -239,7 +239,7 @@ include("navbottom.inc.php");
 		hide("survey");
 		show("nonsurvey");
 	}
-	
+
 	function displaysurveytable(){
 		hide("nonsurvey");
 		show("survey");
