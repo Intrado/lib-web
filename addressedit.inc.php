@@ -344,7 +344,7 @@ startWindow("Contact");
 ?>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-			<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 50, 100); ?></td>
+			<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?></td>
 		</tr>
 <?
 			$x++;
