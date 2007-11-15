@@ -25,7 +25,7 @@ select count(*) as cnt,
 		coalesce(
 			if(rc.result not in ('A', 'M') and rc.numattempts > '0' and rc.numattempts < js.value and j.status not in ('complete','cancelled'), 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
-			if(rc.result not in ('A', 'M', 'declined') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
+			if(rc.result not in ('A', 'M', 'duplicate') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
 			rc.result)
 			as callprogress2
 
@@ -77,7 +77,7 @@ $colors = $data;
 
 if ($result = Query($query)) {
 	while ($row = DBGetRow($result)) {
-		if($row[1] == null){
+		if(!isset($data[$row[1]])){
 			continue;
 		} else if($row[1] == "fail"){
 			$row[1] = "F";

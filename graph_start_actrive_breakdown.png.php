@@ -14,9 +14,9 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 $query = "
 select count(*) as cnt,
 		coalesce(
-			if(rc.result not in ('A', 'M') and rc.numattempts > '0' and rc.numattempts < js.value, 'retry', null),
+			if(rc.result not in ('A', 'M', 'duplicate') and rc.numattempts > '0' and rc.numattempts < js.value, 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
-			if(rc.result not in ('A', 'M') and rc.numattempts = '0', 'inprogress', null),
+			if(rc.result not in ('A', 'M', 'duplicate') and rc.numattempts = '0', 'inprogress', null),
 			rc.result)
 			as callprogress2
 
@@ -39,7 +39,6 @@ $cpcolors = array(
 	"X" => "black",
 	"F" => "red",
 	"C" => "yellow",
-	"duplicate" => "lightgray",
 	"inprogress" => "blue",
 	"retry" => "cyan"
 );
@@ -52,7 +51,6 @@ $cpcodes = array(
 	"X" => "Disconnect",
 	"F" => "Failed",
 	"C" => "Calling",
-	"duplicate" => "Duplicate",
 	"inprogress" => "Queued",
 	"retry" => "Retrying"
 );
@@ -66,7 +64,6 @@ $data = array(
 	"X" => false,
 	"F" => false,
 	"C" => false,
-	"duplicate" => false,
 	"inprogress" => false,
 	"retry" => false
 );
@@ -75,7 +72,7 @@ $colors = $data;
 
 if ($result = Query($query)) {
 	while ($row = DBGetRow($result)) {
-		if($row[1] == null){
+		if(!isset($data[$row[1]])){
 			continue;
 		} else if($row[1] == "fail"){
 			$row[1] = "F";
