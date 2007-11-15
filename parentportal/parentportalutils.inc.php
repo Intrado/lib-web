@@ -261,24 +261,28 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 	}
 }
 
-function checkEmergencyPhone($f, $s, $phones){
+function checkPriorityPhone($f, $s, $phones){
 	$hasemergency = false;
-	$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = '1'");
-	$maxphones = getSystemSetting("maxphones");
+	$jobtypenames = QuickQueryList("select id, name from jobtype where systempriority in ('1', '2') and not deleted", true);
+	$jobtypelist = $jobtypenames;
+	$maxphones = getSystemSetting("maxphones", 4);
 	$lockedphones = array();
 	for($i=0; $i < $maxphones; $i++){
 		$lockedphones[$i] = getSystemSetting("lockedphone" . $i, 0);
 	}
-	for($i=0; $i < $maxphones; $i++){
-		if(!$lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid) && GetFormData($f, $s, "phone" . $i) !== "") {
-			$hasemergency=true;
-			break;
-		} else if ($lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $emergencyjobtypeid) && $phones[$i]->phone){
-			$hasemergency=true;
-			break;
+	foreach($jobtypenames as $jobtypeid => $jobtypename){
+		for($i=0; $i < $maxphones; $i++){
+			if(!$lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $jobtypeid) && GetFormData($f, $s, "phone" . $i) !== "") {
+				unset($jobtypelist[$jobtypeid]);
+				break;
+			} else if ($lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $jobtypeid) && $phones[$i]->phone){
+				unset($jobtypelist[$jobtypeid]);
+				break;
+			}
 		}
 	}
-	return $hasemergency;
+	
+	return $jobtypelist;
 }
 
 function getLockedDestinations($maxphones, $maxemails, $maxsms){
