@@ -267,44 +267,80 @@ class JobDetailReport extends ReportGenerator{
 				}
 			}
 		}
-
+		
+		// find the f-fields the same way as the query did
+		// strip off the f, use the field number as the index and
+		// it's position as the offset
+		$fieldindex = explode(",",generateFields("p"));
+		foreach($fieldindex as $index => $fieldnumber){
+			$aliaspos = strpos($fieldnumber, ".");
+			if($aliaspos !== false){
+				$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
+			}
+		}
+		$fieldindex = array_flip($fieldindex);
+		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$titles = array("0" => "Job Name",
-						"1" => "User",
-						"5" => "Type",
-						"6" => "Message",
-						"2" => "ID",
-						"3" => "First Name",
-						"4" => "Last Name",
-						"7" => "Destination",
-						"11" => "Attempts",
-						"8" => "Last Attempt",
-						"9" => "Last Result");
-
+		$header = '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Last Attempt","Last Result"';
+		foreach($fieldlist as $fieldnum => $fieldname){
+			if(isset($activefields[$fieldnum])){
+				$header .= ',"' . $fieldname . '"';
+			}
+		}
 
 		if (isset($issurvey) && $issurvey) {
 			for ($x = 1; $x <= $maxquestions; $x++) {
-				$titles["question$x"] = "Question $x";
+				$header .= ',"Question '. $x . '"';
 			}
 		}
 
-		$titles = appendFieldTitles($titles, 13, $fieldlist, $activefields);
+		echo $header;
+		echo "\r\n";
 
-		$formatters = array("5" => "fmt_delivery_type",
-							"7" => "csv_destination",
-							"8" => "csv_date",
-							"9" => "fmt_jobdetail_result");
-		if ($issurvey) {
-			for ($x = 1; $x <= $maxquestions; $x++) {
-				$formatters["question$x"] = "parse_survey_data";
-			}
-		}
 		$result = Query($this->query);
-		$data = array();
+
 		while ($row = DBGetRow($result)) {
-			$data[] = $row;
+			$row[7] = html_entity_decode(fmt_destination($row,7));
+			$row[11] = (isset($row[11]) ? $row[11] : "");
+
+
+			if (isset($row[8])) {
+				$time = strtotime($row[8]);
+				if ($time !== -1 && $time !== false)
+					$row[8] = date("m/d/Y h:i A",$time);
+			} else {
+				$row[8] = "";
+			}
+			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
+
+
+			$reportarray = array($row[0], $row[1], ucfirst_withexceptions($row[5]),$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
+		
+			//index 13 is the last position of a non-ffield
+			foreach($fieldlist as $fieldnum => $fieldname){
+				if(isset($activefields[$fieldnum])){
+					$num = $fieldindex[$fieldnum];
+					$reportarray[] = $row[13+$num];
+				}
+			}
+			if ($issurvey) {
+				//fill in survey result data, be sure to fill in an array element for all questions, even if blank
+				$startindex = count($reportarray);
+
+				$questiondata = array();
+				if ($row[5] == "phone")
+					parse_str($row[12],$questiondata);
+				else if ($row[5] == "email")
+					parse_str($row[13],$questiondata);
+
+				//add data to the report for each question
+				for ($x = 0; $x < $maxquestions; $x++) {
+					$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
+				}
+			}
+			
+			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
 		}
-		createCSV($data, $titles, $formatters, null);
 	}
 
 	function setReportFile(){
