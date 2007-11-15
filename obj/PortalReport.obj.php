@@ -103,13 +103,15 @@ class PortalReport extends ReportGenerator{
 		$newdata = array();
 		foreach($data as $index => $row){
 			if(!isset($personportalusers[$row[1]])){
-				$newdata[] = array_insert($row, array(""), 5);
+				array_splice($row, 6, 0, array(""));
+				$newdata[] = $row;
 			} else {
 				foreach($personportalusers[$row[1]] as $portaluserid){
 					if(isset($portalusers[$portaluserid])){
 						$portaluser = $portalusers[$portaluserid];
 						$portaluserinfo = $portaluser['portaluser.firstname'] . " " . $portaluser['portaluser.lastname'] . " (" . $portaluser['portaluser.username'] . ")";
-						$newdata[] = array_insert($row, array($portaluserinfo), 5);
+						array_splice($row, 6, 0, array($portaluserinfo));
+						$newdata[] = $row;
 					}
 				}
 			}
@@ -161,15 +163,23 @@ class PortalReport extends ReportGenerator{
 						3 => "Last Name", 
 						4 => "Token", 
 						5 => "Expiration Date");
-		$titles = appendFieldTitles($titles, 5, $fieldlist, $activefields);
 		
-		$formatters = array(4 => "fmt_activation_code",
-							5 => "fmt_activation_date");
-		
-		$data = array();
-		$result = Query($this->query);
-		while($row = DBGetRow($result)){
-			$data[] = $row;
+		// find the f-fields the same way as the query did
+		// strip off the f, use the field number as the index and
+		// it's position as the offset
+		$fieldindex = explode(",",generateFields("p"));
+		foreach($fieldindex as $index => $fieldnumber){
+			$aliaspos = strpos($fieldnumber, ".");
+			if($aliaspos !== false){
+				$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
+			}
+		}
+		$fieldindex = array_flip($fieldindex);
+		$activefields = array_flip($activefields);
+		foreach($fieldlist as $fieldnum => $fieldname){
+			if(isset($activefields[$fieldnum])){
+				$titles[] = $fieldname;
+			}
 		}
 		
 		header("Pragma: private");
@@ -178,8 +188,28 @@ class PortalReport extends ReportGenerator{
 		header("Content-type: application/vnd.ms-excel");
 		
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
+		echo '"' . implode('","', $titles) . '"';
+		echo "\r\n";
 		
-		createCSV($data, $titles, $formatters, 0);
+		$data = array();
+		$result = Query($this->query);
+		$count = 0;
+		while($row = DBGetRow($result)){
+			$array = array($row[0], $row[2], $row[3], html_entity_decode(fmt_activation_code($row,4)),html_entity_decode(fmt_activation_date($row,5)));
+			
+			//index 13 is the last position of a non-ffield
+			foreach($fieldlist as $fieldnum => $fieldname){
+				if(isset($activefields[$fieldnum])){
+					$num = $fieldindex[$fieldnum];
+					$array[] = $row[5+$num];
+				}
+			}
+			
+			echo '"' . implode('","', $array) . '"';
+			echo "\r\n";
+		}
+		
 	}
 
 }

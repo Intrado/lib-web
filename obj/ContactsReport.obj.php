@@ -136,20 +136,21 @@ class ContactsReport extends ReportGenerator {
 		// personrow index 4 is address
 		// personrow index 5 is the start of f-fields
 		// personrow insert all destinations before f-fields
-		// array_insert inserts data after 3rd argument's array index
+		// array_splice inserts data after 2nd argument's array index
 		// destination index 1 is phone/email/sms
 		// destination index 2 is sequence
 		$data = array();
 		foreach($personlist as $personrow){
 			if(!isset($phoneemailsmsdata[$personrow[1]])){
-				$data[] = array_insert($personrow, array("","", ""), 4);
+				array_splice($personrow, 5, 0, array("","", ""));
+				$data[] = $personrow;
 			} else {
 				foreach($phoneemailsmsdata[$personrow[1]] as $destination){
-					$data[] = array_insert($personrow, array($destination[2],$destination[1], $destination[3]), 4);
+					array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[3]));
+					$data[] = $personrow;
 				}
 			}
 		}
-		
 		$titles = array("0" => "ID#",
 						"2" => "First Name",
 						"3" => "Last Name", 
