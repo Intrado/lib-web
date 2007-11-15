@@ -47,14 +47,17 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 }
 
 function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $groupby = null) {
+	//use sparse array to use isset later
+	$hiddencolumns = array();
 	echo '<tr class="listHeader">';
 	foreach ($titles as $index => $title) {
-
 		
 		echo '<th align="left" ';
 		// make column hidden
-		if(strpos($title,"@") !== false)
+		if(strpos($title,"@") !== false){
 			echo ' style="display:none" ';
+			$hiddencolumns[$index] = true;
+		}
 		//make column sortable?
 		if (strpos($title,"#") === false) {
 			echo 'class="nosort">' ;
@@ -76,6 +79,8 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 	$alt = 0;
 	if (count($data) > 0) {
 		$curr = null;
+		//flip the array to use isset later
+		$repeatedColumns = array_flip($repeatedColumns);
 		foreach ($data as $row) {
 			if($groupby !== null){
 				if($row[$groupby] !== $curr){
@@ -91,11 +96,11 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 
 				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
 				echo "<td";
-				if(strpos($title,"@") !== false)
+				if(isset($hiddencolumns[$index]))
 					echo ' style="display:none">';
 				else
 					echo ">";
-				if( $groupby === null || (($groupby !== null) && (($row[$groupby] != $curr) || ($row[$groupby] == $curr && in_array($index, $repeatedColumns))))){
+				if( $groupby === null || (($row[$groupby] != $curr) || ($row[$groupby] == $curr && isset($repeatedColumns[$index])))){
 					if (isset($formatters[$index])) {
 						$fn = $formatters[$index];
 						$cel = $fn($row,$index);
