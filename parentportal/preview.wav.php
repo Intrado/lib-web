@@ -10,11 +10,25 @@ include_once("../obj/MessagePart.obj.php");
 include_once("../obj/AudioFile.obj.php");
 include_once("../obj/Voice.obj.php");
 include_once("../obj/FieldMap.obj.php");
+require_once("../inc/reportutils.inc.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-if(isset($_GET['id'])) {
-	$id = DBSafe($_GET['id']);
-	playAudio($id);
+if(isset($_GET['jid']) && isset($_GET['pid'])) {
+	$jid = DBSafe($_GET['jid']);
+	$pid = DBSafe($_GET['pid']);
+	$query = "select
+			rp." . FieldMap::GetFirstNameField() . ",
+			rp." . FieldMap::GetLastNameField()
+			. generateFields("rp")
+			. "
+			,rp.messageid as messageid
+			from reportperson rp
+			where rp.jobid = '$jid'
+			and rp.personid = '$pid'
+			and rp.type = 'phone'";
+
+	$historicdata = QuickQueryRow($query, true);
+	Message::playAudio($historicdata['messageid'], $historicdata);
 }
 ?>
