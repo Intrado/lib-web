@@ -31,14 +31,14 @@ class JobSummaryReport extends ReportGenerator{
 		$this->params['joblist'] = $joblist;
 		// Query for graph in pdf
 		$this->query = "select count(*) as cnt, 
-				coalesce(rc.result, rp.status) as result, 
+				coalesce(rc.result, rp.status) as currentstatus, 
 				sum(rc.result not in ('A','M', 'blocked', 'duplicate') and rc.numattempts < js.value) as remaining
 				from reportperson rp
 				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
 				where rp.jobid in ('" . $joblist . "')
 				and rp.type='phone'
-				group by result";
+				group by currentstatus";
 
 	}
 	
