@@ -62,9 +62,9 @@ if($PERSONID){
 	$firstnamefield = FieldMap::getFirstNameField();
 	$lastnamefield = FieldMap::getLastNameField();
 	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
-	$maxphones = getSystemSetting("maxphones");
-	$maxemails = getSystemSetting("maxemails");
-	$maxsms = getSystemSetting("maxsms");
+	$maxphones = getSystemSetting("maxphones", 4);
+	$maxemails = getSystemSetting("maxemails", 2);
+	$maxsms = getSystemSetting("maxsms", 2);
 	$tempphones = resequence($person->getPhones());
 	$phones = array();
 	for ($i=0; $i<$maxphones; $i++) {
@@ -133,8 +133,8 @@ if($PERSONID){
 			if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
-				if(!checkEmergencyPhone($f, $s, $phones)){
-					error("You must have at least one phone number that can receive emergency calls");
+				if(getSystemSetting('priorityenforcement') && $error = checkPriorityPhone($f, $s, $phones)){
+					error("You must have at least one phone number that can receive calls for these job types", $error);
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
 					unset($_SESSION['pidlist'][$_SESSION['customerid']][$personindex]);
