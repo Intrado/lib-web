@@ -269,7 +269,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//now add any language options
 			$addlang = false;
 			if($USER->authorize('sendmulti')) {
-				foreach (array("phone","email","print","sms") as $type) {
+				foreach (array("phone","email","print") as $type) {
 					if (CheckFormSubmit($f,$type))
 						$addlang = true;
 
