@@ -128,7 +128,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 						setSetting('lockedsms' . $i, GetFormData($f, $s, 'lockedsms' . $i));
 					}
 					setSetting('tokenlife', GetFormData($f, $s, 'tokenlife'));
+					setSetting('priorityenforcement', GetFormData($f, $s, 'priorityenforcement'));
 				}
+
+				
 
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
@@ -175,6 +178,7 @@ if( $reloadform )
 		PutFormData($f, $s, "easycallmax", getSetting('easycallmax'), "number", 0, 10);
 	}
 	if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
+		
 		for($i=0; $i < $maxphones; $i++){
 			PutFormData($f, $s, "lockedphone" . $i, getSystemSetting('lockedphone' . $i, 0), "bool", 0, 1);
 		}
@@ -185,6 +189,7 @@ if( $reloadform )
 			PutFormData($f, $s, "lockedsms" . $i, getSystemSetting('lockedsms' . $i, 0), "bool", 0, 1);
 		}
 		PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 1, 365, true);
+		PutFormData($f, $s, 'priorityenforcement', getSystemSetting('priorityenforcement', 0), "bool", 0, 1);
 	}
 }
 
@@ -392,6 +397,10 @@ startWindow('Global System Settings');
 								<tr>
 									<td width="30%">Activation Code Lifetime</td>
 									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?>days</td>
+								</tr>
+								<tr>
+									<td width="30%">Require destinations for Emergency and High Priority Job Types</td>
+									<td><? NewFormItem($f, $s, "priorityenforcement", "checkbox"); ?></td>
 								</tr>
 								<tr>
 									<td width="30%">Restricted Destination Fields</td>
