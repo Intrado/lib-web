@@ -265,7 +265,7 @@ function checkPriorityPhone($f, $s, $phones){
 	$hasemergency = false;
 	$jobtypenames = QuickQueryList("select id, name from jobtype where systempriority in ('1', '2') and not deleted", true);
 	$jobtypelist = $jobtypenames;
-	$maxphones = getSystemSetting("maxphones", 4);
+	$maxphones = getSystemSetting("maxphones", 3);
 	$lockedphones = array();
 	for($i=0; $i < $maxphones; $i++){
 		$lockedphones[$i] = getSystemSetting("lockedphone" . $i, 0);

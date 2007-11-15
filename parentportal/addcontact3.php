@@ -62,7 +62,7 @@ if($PERSONID){
 	$firstnamefield = FieldMap::getFirstNameField();
 	$lastnamefield = FieldMap::getLastNameField();
 	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
-	$maxphones = getSystemSetting("maxphones", 4);
+	$maxphones = getSystemSetting("maxphones", 3);
 	$maxemails = getSystemSetting("maxemails", 2);
 	$maxsms = getSystemSetting("maxsms", 2);
 	$tempphones = resequence($person->getPhones());

@@ -58,7 +58,7 @@ if(CheckFormSubmit($f, 'new')) {
 				QuickUpdate("insert into jobtype(name, systempriority, issurvey) values
 							('$name', '2', '0')", $custdb);
 				$jobtypeid = mysql_insert_id();
-				$maxphones = getCustomerSystemSetting("maxphones", 4, true, $custdb);
+				$maxphones = getCustomerSystemSetting("maxphones", 3, true, $custdb);
 				$maxemails = getCustomerSystemSetting("maxemails", 2, true, $custdb);
 				$maxsms = getCustomerSystemSetting("maxsms", 2, true, $custdb);
 				for($i=0; $i < $maxphones; $i++){

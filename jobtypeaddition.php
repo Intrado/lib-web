@@ -17,7 +17,7 @@ if(isset($_GET['clear'])){
 	unset($_SESSION['jobtypemanagement']['radio']);
 	redirect();
 }
-$maxphones = getSystemSetting("maxphones", 4);
+$maxphones = getSystemSetting("maxphones", 3);
 $maxemails = getSystemSetting("maxemails", 2);
 $maxsms = getSystemSetting("maxsms", 2);
 $max = array("phone" => $maxphones,

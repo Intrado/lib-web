@@ -82,7 +82,7 @@ foreach ($fieldmaps as $fieldmap)
 	$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 
 //phones, emails, SMS
-$maxphones = getSystemSetting("maxphones",4);
+$maxphones = getSystemSetting("maxphones",3);
 for ($x = 0; $x < $maxphones; $x++)
 	$maptofields["p$x"] = "Phone " . ($x + 1);
 if (getSystemSetting('_hassms', false)) {

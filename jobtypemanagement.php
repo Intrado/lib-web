@@ -26,7 +26,7 @@ foreach($systemprioritynames as $index => $name){
 	$types[$index] = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '" . $index . "' and not issurvey order by name");
 }
 $surveytypes = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '3' and issurvey order by name");
-$maxphones = getSystemSetting("maxphones", 4);
+$maxphones = getSystemSetting("maxphones", 3);
 $maxemails = getSystemSetting("maxemails", 2);
 $maxsms = getSystemSetting("maxsms", 2);
 $maxcolumns = max($maxphones, $maxemails, $maxsms);

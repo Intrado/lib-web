@@ -180,7 +180,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', false, true, $custdb)),"phone",10,10);
 	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', false, true, $custdb),"phone", 3, 3);
 
-	$currentmaxphone = getCustomerSystemSetting('maxphones', 4, true, $custdb);
+	$currentmaxphone = getCustomerSystemSetting('maxphones', 3, true, $custdb);
 	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",$currentmaxphone,"nomax",true);
 	$currentmaxemail = getCustomerSystemSetting('maxemails', 2, true, $custdb);
 	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",$currentmaxemail,"nomax",true);

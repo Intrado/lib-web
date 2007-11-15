@@ -59,7 +59,7 @@ default:
 
 // prepopulate person phone and email lists
 if (!$maxphones = getSystemSetting("maxphones"))
-	$maxphones = 4;
+	$maxphones = 3;
 
 if (!$maxemails = getSystemSetting("maxemails"))
 	$maxemails = 2;
