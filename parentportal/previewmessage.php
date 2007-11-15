@@ -48,10 +48,6 @@ $phone = isset($_SESSION['type']) && $_SESSION['type'] == "phone" ? true : false
 $email = isset($_SESSION['type']) && $_SESSION['type'] == "email" ? true : false;
 $sms = isset($_SESSION['type']) && $_SESSION['type'] == "sms" ? true : false;
 
-//find all unique fields used in this message
-
-$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
-
 $dopreview = 0;
 $fields = array();
 
@@ -65,7 +61,6 @@ if($jobid != 0 && $personid != 0){
 			j.name as jobname, 
 			j.startdate as startdate
 			from reportperson rp
-			left join reportcontact rc on (rc.jobid = rp.jobid and rc.personid = rp.personid and rc.type = rp.type)
 			left join job j on (j.id = rp.jobid)
 			where j.id = '$jobid'
 			and rp.personid = '$personid'";
@@ -74,17 +69,7 @@ if($jobid != 0 && $personid != 0){
 	}
 	$historicdata = QuickQueryRow($query, true);
 }
-if($phone){
-	if (count($messagefields) > 0) {
-		$previewdata = "";
-		foreach ($messagefields as $fieldmap) {
-			$fields[$fieldmap->fieldnum] = $fieldmap;
-			$previewdata .= "&$fieldmap->fieldnum=" . urlencode($historicdata[$fieldmap->fieldnum]);
-		}
-	} else {
-		$previewdata = "&qt=";
-	}
-} else if($email || $sms){
+if($email || $sms){
 	$message = formatText($messageid, $historicdata);
 }
 
@@ -212,13 +197,13 @@ if($phone){
 		STANDBY="Loading Windows Media Player components..."
 		TYPE="application/x-oleobject">
 	
-		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id=<?= $messageid ?><?= $previewdata ?>">
+		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>">
 		<param name="controller" value="true">
-		<EMBED SRC="preview.wav.php/embed_preview.wav?id=<?= $messageid ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>
+		<EMBED SRC="preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>" AUTOSTART="TRUE"></EMBED>
 		</OBJECT>
 	
 	
-		<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>">Click here to download</a>
+		<br><a href="preview.wav.php/download_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true">Click here to download</a>
 		</div>
 	<?
 	endWindow();
