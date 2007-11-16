@@ -56,13 +56,13 @@ function playJobtypes($incr)
 <voice sessionid="<?= $SESSIONID ?>">
 	<message name="jobtypedirectory">
 <?	if (count($jobtypes) == 0) { ?>
-		<tts gender="female">I'm sorry but you have no priority levels available</tts>
+		<audio cmid="file://prompts/inbound/NoJobTypes.wav" />
 		<hangup />
 <?	} ?>
 
 		<field name="jobtypenumber" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
-				<tts gender="female">Please select a priority level from one of the following</tts>
+				<audio cmid="file://prompts/inbound/SpecifyJobType.wav" />
 <?
 				$jobtypeindex = 1;
 				foreach ($jobtypes as $jobtype)
@@ -76,7 +76,7 @@ function playJobtypes($incr)
 				// if jobtypes are on pages, provide * option
 				if ($SESSIONDATA['hasPaging']) {
 ?>
-					<tts gender="female">Press the star key to hear more priority levels</tts>
+					<tts gender="female">Press the star key to hear more job types</tts>
 <?
 				}
 ?>
@@ -125,9 +125,9 @@ function confirmJobtype($jobtypename)
 
 		<field name="usejobtype" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
-				<tts gender="female">You have chosen to use the priority level</tts>
+				<audio cmid="file://prompts/inbound/ChosenJobType.wav" />
 				<tts gender="female"><?= htmlentities($jobtypename, ENT_COMPAT, "UTF-8") ?></tts>
-				<tts gender="female">If this is correct, press one.  To choose a different priority level, press two.</tts>
+				<audio cmid="file://prompts/inbound/ConfirmJobType.wav" />
 			</prompt>
 
 			<choice digits="1" />

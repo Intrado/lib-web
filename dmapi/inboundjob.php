@@ -89,7 +89,7 @@ function jobConfirm($listname, $priority, $numdays=1)
 
 <?	if (!$isValid) { ?>
 		<message name="jobexpired">
-		<tts gender="female"> Warning, the call window for this job has expired </tts>
+		<audio cmid="file://prompts/inbound/ExpiredCallWindowWarning.wav" />
 		</message>
 <?	} ?>
 
@@ -113,7 +113,7 @@ function jobConfirm($listname, $priority, $numdays=1)
 				<audio cmid="file://prompts/inbound/And.wav" />
 				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
 
-				<tts gender="female">If this is correct press one to submit your job and exist the system.  To select a different list, press two.  To select a different priority, press three.  To change the number of days this job is to run, press four. To change the call time settings, press five.</tts>
+				<audio cmid="file://prompts/inbound/ConfirmJob.wav" />
 
 			</prompt>
 
