@@ -148,7 +148,7 @@ if( $reloadform )
 		case 'email':
 			$fields[] = array("subject", "text", 1, 50, true);
 			$fields[] = array("fromname", "text", 1, 50, true);
-			$fields[] = array("fromemail", "text", 1, 100, true);
+			$fields[] = array("fromemail", "email", 1, 100, true);
 			break;
 		case 'print':
 			$fields[] = array("header1", "text", 1, 50);
@@ -174,7 +174,7 @@ $fieldmap = FieldMap::getAuthorizedMapNames();
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = ucfirst_withexceptions($MESSAGETYPE) . ' Message Editor: ' . (GetFormData($form,$section,"name") ? GetFormData($form,$section,"name") : "New Message" );
+$TITLE = format_delivery_type($MESSAGETYPE) . ' Message Editor: ' . (GetFormData($form,$section,"name") ? GetFormData($form,$section,"name") : "New Message" );
 $ICON = $MESSAGETYPE . ".gif";
 
 include_once("nav.inc.php");
