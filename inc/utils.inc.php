@@ -342,7 +342,7 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 	return $hover;
 }
 
-function ucfirst_withexceptions($string){
+function format_delivery_type($string){
 	switch($string){
 		case 'sms':
 			return strtoupper($string);
@@ -351,43 +351,32 @@ function ucfirst_withexceptions($string){
 	}
 }
 
-//Function to index an array of objects by their sequence
-//should be used only with objs that have a sequence.
-function resequence($objectarray){
+//Function to index an array of objects by 
+function resequence($objectarray, $field){
 	$temparray = array();
 	foreach($objectarray as $obj){
-		$temparray[$obj->sequence] = $obj;
+		$temparray[$obj->$field] = $obj;
 	}
 	return $temparray;
 }
 
 //fetch destination labels and store them into a static array
-function fetch_labels($type, $refresh=false){
+function fetch_labels($type, $sequence, $refresh=false){
 	static $labels = array();
-	if(isset($labels[$type]) && !$refresh)
-		return $labels[$type];
+	if(isset($labels[$type][$sequence]) && !$refresh)
+		return $labels[$type][$sequence];
 
-	$labels[$type] = QuickQueryList("select sequence, label from destlabel where type = '" . DBSafe($type) . "'", true);
-	return $labels[$type];
+	$labels[$type][$sequence] = QuickQuery("select label from destlabel where type = '" . DBSafe($type) . "' and sequence = '" . DBSafe($sequence) . "'");
+	return $labels[$type][$sequence];
 }
 
 function destination_label($type, $sequence){
-	$labels = fetch_labels($type);
-	$label = isset($labels[$sequence]) ? $labels[$sequence] : "";
-	$text = ucfirst_withexceptions($type) . "&nbsp;" . ($sequence+1);
-	if($label != "")
-		$text .= "&nbsp;($label)";
-	return $text;
-}
-
-//Fetches label of sequence 0 and outputs for title format
-//no nbsp
-function destination_label_primary($type){
-	$labels = fetch_labels($type);
-	$label = isset($labels[0]) ? $labels[0] : "";
-	$text = ucfirst_withexceptions($type);
-	if($label != "")
-		$text .= " ($label)";
-	return $text;
+	$label = fetch_labels($type, $sequence);
+	if($label){
+		$text = format_delivery_type($type). " ". ($sequence+1) . " (" . $label . ")";
+		return $text;
+	} else {
+		return format_delivery_type($type). " ". ($sequence+1);
+	}
 }
 ?>
