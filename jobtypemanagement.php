@@ -123,8 +123,8 @@ foreach($systemprioritynames as $index => $name){
 	</tr>
 	<tr>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Name</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Info For Parents</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Contact Preferences</th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Display Information</th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Default Notification Setting</th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 
@@ -143,8 +143,8 @@ foreach($systemprioritynames as $index => $name){
 	<tr>
 	<tr>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Name</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Info For Parents</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Contact Preferences</th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Display Information</th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Default Notification Setting</th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 <?
@@ -217,7 +217,7 @@ function getJobTypePrefs(){
 function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtypeprefs){
 	global $IS_COMMSUITE;
 	PutFormData($f, $s, "jobtypename" . $type->id, $type->name, "text", 0, 50, true);
-	PutFormData($f, $s, "jobtypedesc" . $type->id, $type->info, "text", 0, 255);
+	PutFormData($f, $s, "jobtypedesc" . $type->id, $type->info, "text", 0, 255, true);
 	for($i=0; $i<$maxphones; $i++){
 		PutFormData($f, $s, "jobtype" . $type->id . "phone" . $i, isset($jobtypeprefs[$type->id]["phone"][$i]) ? $jobtypeprefs[$type->id]["phone"][$i] : 0, "bool", 0, 1);
 	}
@@ -241,42 +241,28 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms){
 	}
 	$type->info = GetFormData($f, $s, "jobtypedesc" . $type->id);
 	$type->update();
-
+	QuickUpdate("Begin");
+	QuickUpdate("delete from jobtypepref where jobtypeid = '" . $type->id . "'");
+	$values = array();
 	for($i=0; $i<$maxphones; $i++){
-		QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-					values ('" . $type->id . "','phone','" . $i . "','"
-					. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "phone" . $i)) . "')
-					on duplicate key update
-					jobtypeid = '" . $type->id . "',
-					type = 'phone',
-					sequence = '" . $i . "',
-					enabled = '" . DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "phone" . $i)) . "'");
+		$values[] = "('" . $type->id . "','phone','" . $i . "','"
+					. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "phone" . $i)) . "')";
 	}
 	for($i=0; $i<$maxemails; $i++){
-		QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-					values ('" . $type->id . "','email','" . $i . "','"
-					. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "email" . $i)) . "')
-					on duplicate key update
-					jobtypeid = '" . $type->id . "',
-					type = 'email',
-					sequence = '" . $i . "',
-					enabled = '" . DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "email" . $i)) . "'");
+		$values[] = "('" . $type->id . "','email','" . $i . "','"
+					. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "email" . $i)) . "')";
 	}
 	if(!$IS_COMMSUITE && getSystemSetting("_hassms")){
 		if(!$type->issurvey){
 			for($i=0; $i<$maxsms; $i++){
-				QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-							values ('" . $type->id . "','sms','" . $i . "','"
-							. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "sms" . $i)) . "')
-							on duplicate key update
-							jobtypeid = '" . $type->id . "',
-							type = 'sms',
-							sequence = '" . $i . "',
-							enabled = '" . DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "sms" . $i)) . "'");
+				$values[] = "('" . $type->id . "','sms','" . $i . "','"
+							. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "sms" . $i)) . "')";
 			}
 		}
 	}
-
+	QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
+					values " . implode(",", $values));
+	QuickUpdate("Commit");
 }
 
 function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms){
@@ -303,7 +289,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 		<td class="bottomBorder" >
 			<table  cellpadding="0" cellspacing="0" width="100%">
 				<tr class="listheader">
-					<th align="left">Contact Type</th>
+					<th align="left">&nbsp;</th>
 <?
 					for($i=0; $i < $maxcolumns; $i++){
 						?><th><?=$i+1?></th><?
@@ -311,12 +297,12 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 ?>
 				</tr>
 				<tr>
-					<td class="bottomBorder">Phone</td>
+					<td class="bottomBorder"><?=destination_label_popup_paragraph("phone")?></td>
 <?
 						for($i=0; $i < $maxcolumns; $i++){
 							?><td class="bottomBorder" align="center"><?
 							if($i < $maxphones){
-								echo NewFormItem($f, $s, "jobtype" . $jobtypeid . "phone" . $i, "checkbox", 0, 1);
+								destination_label_popup("phone", $i, $f, $s, "jobtype" . $jobtypeid . "phone" . $i);
 							} else {
 								echo "&nbsp;";
 							}
@@ -325,12 +311,12 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 ?>
 				</tr>
 				<tr>
-					<td class="bottomBorder">Email</td>
+					<td class="bottomBorder"><?=destination_label_popup_paragraph("email")?></td>
 <?
 						for($i=0; $i < $maxcolumns; $i++){
 							?><td class="bottomBorder" align="center"><?
 							if($i < $maxemails){
-								echo NewFormItem($f, $s, "jobtype" . $jobtypeid . "email" . $i, "checkbox", 0, 1);
+								destination_label_popup("phone", $i, $f, $s, "jobtype" . $jobtypeid . "email" . $i);
 							} else {
 								echo "&nbsp;";
 							}
@@ -343,12 +329,12 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 					if(!((isset($type) && $type->issurvey) || $jobtypeid == "_newsurvey_")){
 ?>
 					<tr>
-						<td class="bottomBorder">SMS</td>
+						<td class="bottomBorder"><?=destination_label_popup_paragraph("sms")?></td>
 <?
 							for($i=0; $i < $maxcolumns; $i++){
 								?><td class="bottomBorder" align="center"><?
 								if($i < $maxsms){
-									echo NewFormItem($f, $s, "jobtype" . $jobtypeid . "sms" . $i, "checkbox", 0, 1);
+									destination_label_popup("phone", $i, $f, $s, "jobtype" . $jobtypeid . "sms" . $i);
 								} else {
 									echo "&nbsp;";
 								}
@@ -371,5 +357,40 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 ?>
 	</tr>
 <?
+}
+function destination_label_popup($type, $sequence, $f, $s, $itemname){
+	$label = fetch_labels($type, $sequence);
+	if(!$label)
+		$label = "&nbsp";
+
+	$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	?><div <?=$hover?>><?
+	NewFormItem($f, $s, $itemname, "checkbox", 0, 1);
+	?></div><?
+	echo '<div class="hoverhelp">' . $label . '</div>';
+}
+
+function destination_label_popup_paragraph($type){
+	$maxphones = getSystemSetting("maxphones");
+	$maxemails = getSystemSetting("maxemails");
+	$maxsms = getSystemSetting("maxsms");
+	
+	$labels = array();
+	$max = "max" . $type;
+	if($type != "sms")
+		$max .= "s";
+	for($i = 0; $i < $$max; $i++){
+		$labels[] = destination_label($type, $i);
+	}
+	$labels = implode(",<br>", $labels);
+	
+	$hover = '<span ' . $extrahtml . '>';
+	$hover .= '<div style="color:#346799"';
+	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	$hover .= '>&nbsp;' . format_delivery_type($type) . '&nbsp;</div><div class="hoverhelp">' . $labels . '</div></span>';
+	return $hover;
+	
 }
 ?>

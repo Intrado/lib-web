@@ -90,7 +90,7 @@ if(CheckFormSubmit($f,$s))
 if($reloadform){
 	ClearFormData($f);
 	PutFormData($f, $s, "jobtypename", "", "text", 0, 50, true);
-	PutFormData($f, $s, "jobtypedesc", "", "text", 0, 255);
+	PutFormData($f, $s, "jobtypedesc", "", "text", 0, 255, true);
 	if($IS_COMMSUITE){
 		PutFormData($f, $s, "systempriority", "3", "number");
 	}
@@ -108,6 +108,45 @@ if($reloadform){
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Funcitons
+////////////////////////////////////////////////////////////////////////////////
+
+function destination_label_popup($type, $sequence, $f, $s, $itemname){
+	$label = fetch_labels($type, $sequence);
+	if(!$label)
+		$label = "&nbsp";
+
+	$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	?><div <?=$hover?>><?
+	NewFormItem($f, $s, $itemname, "checkbox", 0, 1);
+	?></div><?
+	echo '<div class="hoverhelp">' . $label . '</div>';
+}
+
+function destination_label_popup_paragraph($type){
+	$maxphones = getSystemSetting("maxphones");
+	$maxemails = getSystemSetting("maxemails");
+	$maxsms = getSystemSetting("maxsms");
+	
+	$labels = array();
+	$max = "max" . $type;
+	if($type != "sms")
+		$max .= "s";
+	for($i = 0; $i < $$max; $i++){
+		$labels[] = destination_label($type, $i);
+	}
+	$labels = implode(",<br>", $labels);
+	
+	$hover = '<span ' . $extrahtml . '>';
+	$hover .= '<div style="color:#346799"';
+	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	$hover .= '>&nbsp;' . format_delivery_type($type) . '&nbsp;</div><div class="hoverhelp">' . $labels . '</div></span>';
+	return $hover;
+	
+}
 
 $PAGE = "admin:contactsettings";
 $TITLE = "Job Type Editor: New Job Type";
@@ -160,7 +199,7 @@ startWindow("Add a Job Type");
 					<td>
 						<table border="0" cellpadding="3" cellspacing="1" id="nonsurvey">
 							<tr class="listheader">
-								<th align="left">Contact Type</th>
+								<th align="left">&nbsp;</th>
 <?
 									for($i=0; $i < $maxcolumns; $i++){
 										?><th><?=$i+1?></th><?
@@ -172,12 +211,12 @@ startWindow("Add a Job Type");
 								if($IS_COMMSUITE && $index == 'sms') continue;
 ?>
 								<tr>
-									<td class="bottomBorder"><?=ucfirst_withexceptions($index)?></td>
+									<td class="bottomBorder"><?=destination_label_popup_paragraph($index)?></td>
 <?
 										for($i=0; $i < $maxcolumns; $i++){
 											?><td class="bottomBorder" align="center"><?
 											if($i < $maxvalue){
-												echo NewFormItem($f, $s, $index . $i, "checkbox", 0, 1);
+												echo destination_label_popup($index, $i, $f, $s, $index . $i . "survey");
 											} else {
 												echo "&nbsp;";
 											}
@@ -191,7 +230,7 @@ startWindow("Add a Job Type");
 						</table>
 						<table  border="0" cellpadding="3" cellspacing="1" id="survey" style="display:none">
 							<tr class="listheader">
-								<th align="left">Contact Type</th>
+								<th align="left">&nbsp;</th>
 <?
 								for($i=0; $i < $maxcolumns; $i++){
 									?><th><?=$i+1?></th><?
@@ -204,12 +243,12 @@ startWindow("Add a Job Type");
 									continue;
 ?>
 								<tr>
-									<td class="bottomBorder"><?=ucfirst_withexceptions($index)?></td>
+									<td class="bottomBorder"><?=destination_label_popup_paragraph($index)?></td>
 <?
 									for($i=0; $i < $maxcolumns; $i++){
 										?><td class="bottomBorder" align="center"><?
 										if($i < $maxvalue){
-											echo NewFormItem($f, $s, $index . $i . "survey", "checkbox", 0, 1);
+											echo destination_label_popup($index, $i, $f, $s, $index . $i . "survey");
 										} else {
 											echo "&nbsp;";
 										}
