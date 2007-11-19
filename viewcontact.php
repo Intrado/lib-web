@@ -106,7 +106,7 @@ if (isset($personid)) {
 	// get existing phones from db, then create any additional based on the max allowed
 	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
 	// use array_values to reset starting index to 0
-	$tempphones = resequence(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
+	$tempphones = resequence(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"), "sequence");
 	$phones = array();
 	for ($i=0; $i<$maxphones; $i++) {
 		if(!isset($tempphones[$i])){
@@ -119,7 +119,7 @@ if (isset($personid)) {
 	}
 	$types["phone"] = $phones;
 	
-	$tempemails = resequence(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
+	$tempemails = resequence(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"), "sequence");
 	$emails = array();
 	for ($i=0; $i<$maxemails; $i++) {
 		if(!isset($tempemails[$i])){
@@ -133,7 +133,7 @@ if (isset($personid)) {
 	$types["email"] = $emails;
 	
 	if(getSystemSetting("_hassms", false)){
-		$tempsmses = resequence(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
+		$tempsmses = resequence(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"), "sequence");
 		for ($i=0; $i<$maxsms; $i++) {
 			if(!isset($tempsmses[$i])){
 				$smses[$i] = new Sms();
@@ -213,21 +213,18 @@ if(CheckFormSubmit($f,$s))
 						$item->update();
 					}
 					foreach($jobtypes as $jobtype){
-						if((!isset($contactpref[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
-							GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) ||
-							(!isset($contactpref[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
-							GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id]) ||
-							(isset($contactprefs[$type][$item->sequence][$jobtype->id]) && 
-								GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id])){
+						if((!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id))
+							||
+							(!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id])){
 								QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
 											values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','" 
-											. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "') 
-											on duplicate key update
-											personid = '" . $personid . "',
-											jobtypeid = '" . $jobtype->id . "',
-											type = '$type',
-											sequence = '" . $item->sequence . "',
-											enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'");
+											. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "')");
+							} else if(isset($contactprefs[$type][$item->sequence][$jobtype->id]) && 
+										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id]){
+								QuickUpdate("update contactpref set enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'
+												where personid = '" . $personid . "' and jobtypeid = '" . $jobtype->id . "' and sequence = '" . $item->sequence . "'");
 						}
 					}
 				}
@@ -292,7 +289,7 @@ function manualCheckFormSection($f, $s, $contacttypes, $types){
 				}
 			}
 			if($error){
-				$errors[] = ucfirst_withexceptions($type) . " " . ($item->sequence+1) . " is not valid";
+				$errors[] = format_delivery_type($type) . " " . ($item->sequence+1) . " is not valid";
 			}
 		}
 	}
@@ -397,21 +394,27 @@ foreach ($fieldmaps as $map) {
 		<th align="right" class="windowRowHeader bottomBorder">Contact Details: </th>
 		<td class="bottomBorder">
 			<table  cellpadding="2" cellspacing="1">
-				<tr class="listheader">
-					<th align="left">Contact&nbsp;Type</th>
-					<th>Override</th>
-					<th align="left">Destination</th>
-<?
-					foreach($jobtypes as $jobtype){
-						?><th><?=jobtype_info($jobtype)?></th><?
-					}
-?>
-				</tr>
+				
 <?
 
 
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
+?>
+		<tr class="listHeader">
+			<td colspan="<?=count($jobtypes)+3; ?>"><?=format_delivery_type($type); ?></td>
+		</tr>
+		<tr class="windowRowHeader">
+			<th align="left">Contact&nbsp;Type</th>
+			<th>Override</th>
+			<th align="left">Destination</th>
+<?
+			foreach($jobtypes as $jobtype){
+				?><th><?=jobtype_info($jobtype)?></th><?
+			}
+?>
+		</tr>
+<?
 		foreach($types[$type] as $item){
 			$header = destination_label($type, $item->sequence);
 ?>
