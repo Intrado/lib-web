@@ -57,22 +57,6 @@ if(CheckFormSubmit($f, 'new')) {
 				$name = DBSafe(GetFormData($f, $s, 'newname'));
 				QuickUpdate("insert into jobtype(name, systempriority, issurvey) values
 							('$name', '2', '0')", $custdb);
-				$jobtypeid = mysql_insert_id();
-				$maxphones = getCustomerSystemSetting("maxphones", 3, true, $custdb);
-				$maxemails = getCustomerSystemSetting("maxemails", 2, true, $custdb);
-				$maxsms = getCustomerSystemSetting("maxsms", 2, true, $custdb);
-				for($i=0; $i < $maxphones; $i++){
-					QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-									values ('$jobtypeid', 'phone', '$i', '0')",$custdb);
-				}
-				for($i=0; $i < $maxemails; $i++){
-					QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-									values ('$jobtypeid', 'email', '$i', '0')",$custdb);
-				}
-				for($i=0; $i < $maxsms; $i++){
-					QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)
-									values ('$jobtypeid', 'sms', '$i', '0')",$custdb);
-				}
 				redirect();
 			} else {
 				error("You cannot add a job type that has a blank name");
