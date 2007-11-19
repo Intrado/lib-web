@@ -69,9 +69,8 @@ if(CheckFormSubmit($f,$s))
 
 if($reloadform){
 	ClearFormData($f);
-	$labels = fetch_labels($type, true);
 	for($i=0; $i<$max; $i++){
-		PutFormData($f, $s, $type . $i, isset($labels[$i]) ? $labels[$i] : "", "text");
+		PutFormData($f, $s, $type . $i, fetch_labels($type, $i, true), "text");
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +84,7 @@ if($reloadform){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$TITLE="Destination Labels - " . ucfirst_withexceptions($type);
+$TITLE="Destination Labels - " . format_delivery_type($type);
 $PAGE = "admin:contactsettings";
 include_once("nav.inc.php");
 NewForm($f);
@@ -101,7 +100,7 @@ startWindow("Labels");
 	for($i=0; $i< $max; $i++){
 ?>
 		<tr>
-			<td><?=ucfirst_withexceptions($type)?>&nbsp;<?=$i+1?></td>
+			<td><?=format_delivery_type($type)?>&nbsp;<?=$i+1?></td>
 			<td><? NewFormItem($f, $s, $type . $i, "text", 10, 20);?></td>
 		</tr>
 <?
