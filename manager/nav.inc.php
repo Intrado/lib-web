@@ -1,7 +1,6 @@
 <html>
 <body>
 <image src="manager.png">
-<script src='../script/utils.js'></script>
 <table border = 1>
 	<tr>
 		<td><a href="customers.php">Customer&nbsp;List</a></td>
