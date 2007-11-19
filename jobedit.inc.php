@@ -64,12 +64,20 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 	else
 	{
 		MergeSectionFormData($f, $s);
-		foreach (array("phone","email","print","sms") as $type)
+		foreach (array("phone","email","print","sms") as $type){
 			MergeSectionFormData($f, $type);
-
+			SetRequired($f, $s, $type . "messageid", (bool)GetFormData($f, $s, 'send' . $type));
+		}
+		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
 		//do check
+		
+		$sendphone = GetFormData($f, $s, "sendphone");
+		$sendemail = GetFormData($f, $s, "sendemail");
+		$sendsms = getSystemSetting("_hassms", false) ? GetFormData($f, $s, "sendsms") : 0;
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if(!$sendphone && !$sendemail && !$sendsms){
+			error("Plese select a delivery type");
 		} else if ($JOBTYPE == 'normal' && (strtotime(GetFormData($f,$s,"startdate")) === -1 || strtotime(GetFormData($f,$s,"startdate")) === false)) {
 			error('The start date is invalid');
 		} else if ($JOBTYPE=='normal' && (strtotime(GetFormData($f,$s,"starttime")) === -1 || strtotime(GetFormData($f,$s,"starttime")) === false)) {
@@ -88,14 +96,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
-		} else if ($hassms && GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) > 160){
-			error('There is a maximum of 160 characters for SMS messages');
-		} else if ($hassms && GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == '0' && strlen(GetFormData($f, $s, 'smsmessagetxt')) < 1){
-			error('The SMS message body cannot be empty');
-		} else if (GetFormData($f, $s, 'sendphone') && GetFormData($f, $s, 'phonemessageid') == '0'){
-			error('Please select a default phone message');
-		} else if (GetFormData($f, $s, 'sendemail') && GetFormData($f, $s, 'emailmessageid') == '0'){
-			error('Please select a default email message');
 		} else {
 			//submit changes
 
@@ -291,15 +291,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid || $job->smsmessageid)	{
 					ClearFormData($f);
 					redirect("jobconfirm.php?id=" . $job->id);
-				} else {
-					error("Please select a default message");
 				}
 			} else if (!$addlang) {
 				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid || $job->smsmessageid)	{
 					ClearFormData($f);
 					redirect('jobs.php');
-				} else {
-					error("Please select a default message");
 				}
 			} else {
 				$reloadform = 1;
@@ -380,7 +376,9 @@ if( $reloadform )
 	PutFormData($f,"email","newlangemail","");
 	PutFormData($f,"email","newmessemail","");
 	PutFormData($f,"print","newlangprint","");
-	PutFormData($f,"print","newmessprint","");	
+	PutFormData($f,"print","newmessprint","");
+	
+	PutFormData($f,$s,"smsmessagetxt", "", "text", 0, 160);
 }
 
 $messages = array();
@@ -398,8 +396,6 @@ if ($submittedmode || $completedmode) {
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
 	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
 }
-
-PutFormData($f,$s,"smsmessagetxt", "", "text");
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
 if (isset($job->id)) {
@@ -425,9 +421,9 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : "") . $extrahtml);
 	
 	if($type == "sms") {
-		NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "0");
+		NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
 	} else {
-		NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "0");
+		NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
 	}
 	foreach ($messages[$type] as $message) {
 		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
@@ -838,7 +834,7 @@ include_once("navbottom.inc.php");
 	if($hassms && $USER->authorize('sendsms')) {
 ?>
 		var smsmessagedropdown = new getObj('smsmessageid').obj;
-		if(smsmessagedropdown.value != 0){
+		if(smsmessagedropdown.value != ""){
 			hide('newsmstext');
 		}
 		if(new getObj('sendsms').obj.checked){
