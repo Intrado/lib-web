@@ -335,7 +335,8 @@ class SurveyReport extends ReportGenerator{
 		$result = Query($query);
 
 		while ($row = DBGetRow($result)) {
-			$row[7] = html_entity_decode(fmt_destination($row,7));
+			if($row[5] == "phone")
+				$row[7] = Phone::format($row[7]);
 			$row[11] = (isset($row[11]) ? $row[11] : "");
 
 
@@ -349,7 +350,7 @@ class SurveyReport extends ReportGenerator{
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
 
-			$reportarray = array($row[0], $row[1], ucfirst_withexceptions($row[5]),$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
+			$reportarray = array($row[0], $row[1], format_delivery_type($row[5]),$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
 		
 			//index 13 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
