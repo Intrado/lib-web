@@ -376,6 +376,11 @@ div.scrollTableContainer {
 	background-color: #E5E5E5;
 }
 
+.listSelected {
+	color: white;
+	background-color: red;
+}
+
 .bottomBorder {
 	border-bottom: 1px solid #cccccc;
 }
