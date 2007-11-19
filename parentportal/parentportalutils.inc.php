@@ -6,7 +6,7 @@ function getContactIDs($portaluserid){
 
 function getContacts($portaluserid) {
 	$contactList = getContactIDs($portaluserid);
-	return DBFindMany("Person", "from person where id in ('" . implode("','", $contactList) . "') and not deleted order by id");
+	return resequence(DBFindMany("Person", "from person where id in ('" . implode("','", $contactList) . "') and not deleted order by id"), "pkey");
 }
 
 //put form data for contact details
@@ -178,21 +178,20 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 				}
 			}
 		}
+		QuickUpdate("Begin");
+		QuickUpdate("delete from contactpref where personid = '" . $pid . "'");
+		$values = array();
 		foreach($mainContactPrefs as $type => $sequencePrefs){
 			foreach($sequencePrefs as $sequence => $jobtypePrefs){
 				foreach($jobtypePrefs as $jobtypeid => $enabled){
-					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-									values ('" . $pid . "','" . $jobtypeid . "','" . $type . "','" . $sequence . "','" 
-									. $enabled . "') 
-									on duplicate key update
-									personid = '" . $pid . "',
-									jobtypeid = '" . $jobtypeid . "',
-									type = '" . $type . "',
-									sequence = '" . $sequence . "',
-									enabled = '" . $enabled . "'");
+					$values[] = "('" . $pid . "','" . $jobtypeid . "','" . $type . "','" . $sequence . "','" 
+									. $enabled . "')";
 				}
 			}
 		}
+		QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+									values " . implode(",",$values));
+		QuickUpdate("Commit");
 	}
 }
 
@@ -201,6 +200,9 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 	$lockedphones = $locked['phones'];
 	$lockedemails = $locked['emails'];
 	$lockedsms = $locked['sms'];
+	QuickUpdate("Begin");
+	QuickUpdate("delete from contactpref where personid = '" . $PERSONID . "'");
+	$values = array();
 	foreach($phones as $phone){
 		if(!$lockedphones[$phone->sequence]){
 			$phone->phone = Phone::parse(GetFormData($f, $s, "phone" . $phone->sequence));
@@ -208,15 +210,8 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 			$phone->update();
 		}
 		foreach($jobtypes as $jobtype){
-			QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-						values ('" . $PERSONID . "','" . $jobtype->id . "','phone','" . $phone->sequence . "','" 
-						. DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "') 
-						on duplicate key update
-						personid = '" . $PERSONID . "',
-						jobtypeid = '" . $jobtype->id . "',
-						type = 'phone',
-						sequence = '" . $phone->sequence . "',
-						enabled = '" . DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "'");
+			$values[] = "('" . $PERSONID . "','" . $jobtype->id . "','phone','" . $phone->sequence . "','" 
+						. DBSafe(GetFormData($f, $s, "phone" . $phone->sequence . "jobtype" . $jobtype->id)) . "')";
 		}
 	}
 	foreach($emails as $email){
@@ -226,15 +221,8 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 			$email->update();
 		}
 		foreach($jobtypes as $jobtype){
-			QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-						values ('" . $PERSONID . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
-						. DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "') 
-						on duplicate key update
-						personid = '" . $PERSONID . "',
-						jobtypeid = '" . $jobtype->id . "',
-						type = 'email',
-						sequence = '" . $email->sequence . "',
-						enabled = '" . DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "'");
+			$values[] = "('" . $PERSONID . "','" . $jobtype->id . "','email','" . $email->sequence . "','" 
+						. DBSafe(GetFormData($f, $s, "email" . $email->sequence . "jobtype" . $jobtype->id)) . "')";
 		}
 	}
 	if(getSystemSetting("_hassms")){
@@ -246,19 +234,16 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 			}
 			foreach($jobtypes as $jobtype){
 				if(!$jobtype->issurvey){
-					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-								values ('" . $PERSONID . "','" . $jobtype->id . "','sms','" . $sms->sequence . "','" 
-								. DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "') 
-								on duplicate key update
-								personid = '" . $PERSONID . "',
-								jobtypeid = '" . $jobtype->id . "',
-								type = 'sms',
-								sequence = '" . $sms->sequence . "',
-								enabled = '" . DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "'");
+					$values[] = "('" . $PERSONID . "','" . $jobtype->id . "','sms','" . $sms->sequence . "','" 
+								. DBSafe(GetFormData($f, $s, "sms" . $sms->sequence . "jobtype" . $jobtype->id)) . "')";
 				}
 			}
+			
 		}
 	}
+	QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+							values " . implode(",",$values));
+	QuickUpdate("Commit");
 }
 
 function checkPriorityPhone($f, $s, $phones){
