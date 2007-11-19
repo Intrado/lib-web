@@ -116,40 +116,6 @@ function playJobtypes($incr)
 <?
 }
 
-function confirmJobtype($jobtypename)
-{
-	global $SESSIONID;
-?>
-<voice sessionid="<?= $SESSIONID ?>">
-	<message name="jobtypeconfirm">
-
-		<field name="usejobtype" type="menu" timeout="5000" sticky="true">
-			<prompt repeat="2">
-				<audio cmid="file://prompts/inbound/ChosenJobType.wav" />
-				<tts gender="female"><?= htmlentities($jobtypename, ENT_COMPAT, "UTF-8") ?></tts>
-				<audio cmid="file://prompts/inbound/ConfirmJobType.wav" />
-			</prompt>
-
-			<choice digits="1" />
-			<choice digits="2" />
-
-			<default>
-				<audio cmid="file://prompts/ImSorry.wav" />
-			</default>
-			<timeout>
-				<goto message="error" />
-			</timeout>
-		</field>
-	</message>
-
-	<message name="error">
-		<audio cmid="file://prompts/inbound/Error.wav" />
-		<hangup />
-	</message>
-</voice>
-<?
-}
-
 
 /////////////////
 
@@ -168,7 +134,7 @@ if($REQUEST_TYPE == "new"){
 		// if they want to hear the next page of jobtypes
 		if ($jobtypenumber == "*") {
 			playJobtypes(true);
-		// else confirm the jobtypeid is correct
+		// else save jobtype selection and move to job options
 		} else {
 
 			$jobtypeindex = ($SESSIONDATA['currentJobtypePage']*$PAGESIZE)+($jobtypenumber-1);
@@ -178,19 +144,11 @@ if($REQUEST_TYPE == "new"){
 			//var_dump($jobtypes);
 			$jobtype = $jobtypes[$jobtypeindex];
 			glog("jobtype name: ".$jobtype->name);
-			confirmJobtype($jobtype->name);
 
 			$SESSIONDATA['priority'] = $jobtype->name;
-		}
-	// if they confirmed the jobtype selection
-	} else if (isset($BFXML_VARS['usejobtype'])) {
 
-		if ($BFXML_VARS['usejobtype'] == "1") {
-			// user confirmed they wish to use the selected jobtype, go to job options
 			forwardToPage("inboundjob.php");
-		} else {
-			// user does not want selected jobtype
-			playJobtypes(false); // do not increment the page
+
 		}
 	// play the current page of jobtypes
 	} else {

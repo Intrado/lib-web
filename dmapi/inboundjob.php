@@ -11,6 +11,10 @@ include_once("../obj/Job.obj.php");
 include_once("../obj/JobLanguage.obj.php");
 include_once("../obj/JobType.obj.php");
 include_once("../obj/Permission.obj.php");
+include_once("../obj/PeopleList.obj.php");
+include_once("../obj/RenderedList.obj.php");
+include_once("../obj/FieldMap.obj.php");
+
 
 global $SESSIONDATA, $BFXML_VARS;
 
@@ -84,6 +88,14 @@ function jobConfirm($listname, $priority, $numdays=1)
 		$isValid = ((strtotime($nowtime) - strtotime($SESSIONDATA['stoptime'])) < 0);
 	}
 
+	$list = new PeopleList($SESSIONDATA['listid']);
+	$renderedlist = new RenderedList($list);
+	$renderedlist->mode = "preview";
+	$renderedlist->renderList();
+	$listsize = $renderedlist->total;
+	glog("number of people in list: ".$listsize);
+
+
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
 
@@ -93,10 +105,9 @@ function jobConfirm($listname, $priority, $numdays=1)
 		</message>
 <?	} ?>
 
-	<message name="jobconfirm">
-		<field name="sendjob" type="menu" timeout="5000" sticky="true">
-			<prompt repeat="1">
-				<audio cmid="file://prompts/inbound/Confirmation1.wav" />
+	<message name="jobplayback">
+				<tts gender="female">You are about to submit a job to <?= $listsize ?>  people.  Using the list </tts>
+
 				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation2.wav" />
 				<tts gender="female"><?= htmlentities($priority, ENT_COMPAT, "UTF-8") ?></tts>
@@ -112,6 +123,14 @@ function jobConfirm($listname, $priority, $numdays=1)
 				<tts gender="female"><?= $SESSIONDATA['starttime'] ?></tts>
 				<audio cmid="file://prompts/inbound/And.wav" />
 				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
+
+				<goto message="jobconfirm" />
+
+	</message>
+
+	<message name="jobconfirm">
+		<field name="sendjob" type="menu" timeout="5000" sticky="true">
+			<prompt repeat="1">
 
 				<audio cmid="file://prompts/inbound/ConfirmJob.wav" />
 
