@@ -48,8 +48,7 @@ class PortalReport extends ReportGenerator{
 						. $rulesql
 						. $hideactivetokens
 						. $hideassociated
-						. $usersql
-						. " order by p.id";
+						. $usersql;
 			//test query used to confirm no active codes are in the list
 			$this->testquery = "select count(ppt.token)
 						from person p 
@@ -65,6 +64,7 @@ class PortalReport extends ReportGenerator{
 						. $usersql;
 		} else {
 			$this->query = "";
+			$this->testquery = "";
 		}
 	}
 
@@ -79,7 +79,7 @@ class PortalReport extends ReportGenerator{
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
 		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
-		$query = $this->query . " limit $pagestart, $max";
+		$query = $this->query . " order by p.id" . " limit $pagestart, $max";
 		$result = Query($query);
 		$this->reporttotal = QuickQuery("select found_rows()");
 		$data = array();
@@ -193,10 +193,19 @@ class PortalReport extends ReportGenerator{
 		echo "\r\n";
 		
 		$data = array();
-		$result = Query($this->query);
+		$query = $this->query . " order by p.id";
+		$result = Query($query);
 		$count = 0;
 		while($row = DBGetRow($result)){
-			$array = array($row[0], $row[2], $row[3], html_entity_decode(fmt_activation_code($row,4)),html_entity_decode(fmt_activation_date($row,5)));
+			if($row[4]){
+				if(strtotime($row[5]) < strtotime("now")){
+					$row[4] = "Expired";
+				}
+			}
+			if($row[5]){
+				$row[5] = date("m/d/Y", strtotime($row[5]));
+			}
+			$array = array($row[0], $row[2], $row[3], $row[4],$row[5]);
 			
 			//index 13 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
