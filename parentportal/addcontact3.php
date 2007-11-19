@@ -39,10 +39,14 @@ if(isset($_SESSION['currentpid'])){
 	$customerpidlist = $_SESSION['pidlist'][$_SESSION['customerid']];
 	$personindex = array_search($PERSONID, $customerpidlist);
 	$person = new Person($PERSONID);
+	$_SESSION['savetoall'] = true;
 } else if(isset($_SESSION['pidlist']) && count($_SESSION['pidlist'])){
+	$_SESSION['savetoall'] = false;
 	$customerpidlist = end($_SESSION['pidlist']);
-	$_SESSION['customerid'] = key($_SESSION['pidlist']);
-	
+	if(key($_SESSION['pidlist']) != $_SESSION['customerid']){
+		$_SESSION['savetoall'] = true;
+		$_SESSION['customerid'] = key($_SESSION['pidlist']);
+	}
 	$PERSONID = end($customerpidlist);
 	$personindex = key($customerpidlist);
 	
@@ -56,7 +60,7 @@ if(isset($_SESSION['currentpid'])){
 	
 	$person = new Person($PERSONID);
 } else {
-	redirect("contactpreferences.php");
+	redirect("contactpreferences.php?clear=1");
 }
 if($PERSONID){
 	$firstnamefield = FieldMap::getFirstNameField();
@@ -65,7 +69,7 @@ if($PERSONID){
 	$maxphones = getSystemSetting("maxphones", 3);
 	$maxemails = getSystemSetting("maxemails", 2);
 	$maxsms = getSystemSetting("maxsms", 2);
-	$tempphones = resequence($person->getPhones());
+	$tempphones = resequence($person->getPhones(), "sequence");
 	$phones = array();
 	for ($i=0; $i<$maxphones; $i++) {
 		if(!isset($tempphones[$i])){
@@ -76,7 +80,7 @@ if($PERSONID){
 			$phones[$i] = $tempphones[$i];
 		}
 	}
-	$tempemails = resequence($person->getEmails());
+	$tempemails = resequence($person->getEmails(), "sequence");
 	$emails = array();
 	for ($i=0; $i<$maxemails; $i++) {
 		if(!isset($tempemails[$i])){
@@ -88,7 +92,7 @@ if($PERSONID){
 		}
 	}
 	if(getSystemSetting("_hassms")){
-		$tempsmses = resequence($person->getSmses());
+		$tempsmses = resequence($person->getSmses(), "sequence");
 		$smses = array();
 		for ($i=0; $i<$maxsms; $i++) {
 			if(!isset($tempsmses[$i])){
@@ -147,6 +151,7 @@ if($PERSONID){
 						unset($_SESSION['pidlist'][$_SESSION['customerid']]);
 					}
 					unset($_SESSION['currentpid']);
+					$_SESSION['savetoall'] = false;
 					redirect();
 				}
 			}
@@ -158,7 +163,10 @@ if($PERSONID){
 	if( $reloadform )
 	{
 		ClearFormData($f);
-		PutFormData($f, $s, "savetoall", "1", "bool", 0, 1);
+		$savetoall = 0;
+		if(isset($_SESSION['savetoall']) && $_SESSION['savetoall'] )
+			$savetoall = 1;
+		PutFormData($f, $s, "savetoall", $savetoall, "bool", 0, 1);
 		putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked);
 	}
 
