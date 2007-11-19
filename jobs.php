@@ -110,7 +110,7 @@ $titles = array(	"name" => "#Name",
 					);
 $formatters = array("Actions" => "fmt_jobs_actions",
 					'Status' => 'fmt_status',
-					"type" => "fmt_obj_csv_list",
+					"type" => "fmt_obj_delivery_type_list",
 					"responses" => "fmt_response_count",
 					"startdate" => "fmt_job_startdate");
 
@@ -158,7 +158,7 @@ if ($USER->authorize('createrepeat')) {
 	button_bar(button('Create Repeating Job', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
 
 
-	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "type" => "fmt_obj_csv_list","finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
+	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "type" => "fmt_obj_delivery_type_list","finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
 	endWindow();
 	print '<br>';
 }
@@ -178,7 +178,7 @@ $formatters = array("Actions" => "fmt_jobs_actions",
 					'Status' => 'fmt_status',
 					"startdate" => "fmt_job_startdate",
 					"enddate" => "fmt_job_enddate",
-					"type" => "fmt_obj_csv_list",
+					"type" => "fmt_obj_delivery_type_list",
 					"responses" => "fmt_response_count");
 
 if(!$USER->authorize('leavemessage')){

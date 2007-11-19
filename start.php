@@ -100,7 +100,7 @@ if ($USER->authorize("startstats")) {
 								"responses" => "Responses (Unplayed/Total)",
 								"Actions" => "Actions"
 								);
-			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', 'responses' => 'fmt_response_count');
+			$formatters = array("type" => "fmt_obj_delivery_type_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', 'responses' => 'fmt_response_count');
 			if(!$USER->authorize('leavemessage')){
 				unset($titles["responses"]);
 				unset($formatters["responses"]);
@@ -121,7 +121,7 @@ if ($USER->authorize("startstats")) {
 								"responses" => "Responses (Unplayed/Total)",
 								"Actions" => "Actions"
 								);
-			$formatters = array("type" => "fmt_obj_csv_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
+			$formatters = array("type" => "fmt_obj_delivery_type_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
 			if(!$USER->authorize('leavemessage')){
 				unset($titles["responses"]);
 				unset($formatters["responses"]);
