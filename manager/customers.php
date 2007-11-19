@@ -102,7 +102,12 @@ foreach($customers as $cust) {
 		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
 		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
 								WHERE job.status = 'active'", $custdb);
-		$row[10] = getCustomerSystemSetting('_hasportal', false, true, $custdb);
+		$row[10] = array();
+		if(getCustomerSystemSetting('_hasportal', false, true, $custdb))
+			$row[10][] = "Portal";
+		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
+			$row[10][] = "SMS";
+		$row[10] = implode(", ", $row[10]);
 
 		$data[] = $row;
 	}
@@ -114,7 +119,7 @@ $titles = array("0" => "Customer ID",
 				"3" => "Toll Free Number",
 				"4" => "Timezone",
 				"6" => "Status",
-				"10" => "Portal",
+				"10" => "Features",
 				"7" => "Max Users",
 				"8" => "Active Users",
 				"9" => "Active Jobs",
@@ -125,7 +130,6 @@ $formatters = array("url" => "fmt_custurl",
 					"6" => "fmt_status",
 					"8" => "fmt_users",
 					"9" => "fmt_jobcount",
-					"10" => "fmt_hasportal",
 					"Actions" => "fmt_actions");
 
 include_once("nav.inc.php");
