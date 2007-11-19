@@ -330,13 +330,13 @@ function fmt_status_index($row, $index) {
 
 function fmt_csv_list ($row,$index) {
 	$data = explode(",", $row[$index]);
-	$data = array_map("ucfirst_withexceptions",$data);
+	$data = array_map("ucfirst",$data);
 	return implode(", ", $data);
 }
 
 function fmt_obj_csv_list ($obj, $name) {
 	$data = explode(",", $obj->$name);
-	$data = array_map("ucfirst_withexceptions",$data);
+	$data = array_map("ucfirst",$data);
 	return implode(", ", $data);
 }
 
@@ -507,8 +507,16 @@ function fmt_scheduled_time($row, $index){
 	return $start . " - " . $end;
 }
 
-function fmt_delivery_type($row, $index) {
-	return ucfirst_withexceptions($row[$index]);
+function fmt_delivery_type_list($row, $index) {
+	$types = explode(",", $row[$index]);
+	$types = array_map("format_delivery_type", $types);
+	return implode(", ", $types);
+}
+
+function fmt_obj_delivery_type_list($obj, $index) {
+	$types = explode(",", $obj->$index);
+	$types = array_map("format_delivery_type", $types);
+	return implode(", ", $types);
 }
 
 //result formatter for job details.
