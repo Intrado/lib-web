@@ -150,13 +150,13 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 						2 => "First Name",
 						3 => "Last Name",
 						4 => "Language",
-						5 => destination_label_primary("phone"),
-						6 => destination_label_primary("email"));
+						5 => destination_label("phone", 0),
+						6 => destination_label("email", 0));
 		$formatters = array(1 => "fmt_checkbox_addrbook",
 							5 => "fmt_phone",
 							6 => "fmt_email");
 		if(getSystemSetting("_hassms")){
-			$titles["7"] = destination_label_primary("sms");
+			$titles["7"] = destination_label("sms", 0);
 			$formatters["7"] = "fmt_phone";
 			$titles["8"] = "Address";
 			$formatters["8"] = "fmt_null";
@@ -172,12 +172,12 @@ if (($ORIGINTYPE == "manualadd") && $_SESSION['listid'] == null) {
 		$titles = array(2 => "First Name",
 						3 => "Last Name",
 						4 => "Language",
-						5 => destination_label_primary("phone"),
-						6 => destination_label_primary("email"));
+						5 => destination_label("phone", 0),
+						6 => destination_label("email", 0));
 		$formatters = array(5 => "fmt_phone",
 							6 => "fmt_email");
 		if(getSystemSetting("_hassms")){
-			$titles["7"] = destination_label_primary("sms");
+			$titles["7"] = destination_label("sms", 0);
 			$formatters["7"] = "fmt_phone";
 			$titles["8"] = "Address";
 			$formatters["8"] = "fmt_null";
