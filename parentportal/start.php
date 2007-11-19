@@ -12,33 +12,36 @@ require_once("../obj/Message.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-$allData = array();
+
 if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$firstnameField = FieldMap::getFirstNameField();
 	$lastnameField = FieldMap::getLastNameField();
 	$contactList = getContactIDs($_SESSION['portaluserid']);
 	
+	$contactListString = implode("','", $contactList);
+	$contactCount=array();
+	$allData = array();
 	foreach($contactList as $personid){
-		$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.emailmessageid
-			from job j 
-			left join reportperson rp on (rp.jobid = j.id)
-			inner join user u on (u.id = j.userid)
-			where 
-			j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
-			and rp.personid = '" . $personid . "'
-			and j.status in ('active', 'complete')
-			and j.questionnaireid is null
-			group by j.id
-			order by j.startdate desc, j.starttime, j.id desc");
-		$data = array();
-		$number = 1;
-		while($row = DBGetRow($result)){
-			$data[] = array_merge(array($number), $row);
-			$number++;
-		}
-		$allData[$personid] = $data;
+		$contactCount[$personid] = 1;
+		$allData[$personid] = array();
 	}
-	
+
+	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.emailmessageid
+		from job j 
+		left join reportperson rp on (rp.jobid = j.id)
+		inner join user u on (u.id = j.userid)
+		where 
+		j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
+		and rp.personid in ('" . $contactListString . "')
+		and j.status in ('active', 'complete')
+		and j.questionnaireid is null
+		group by j.id, rp.personid
+		order by j.startdate desc, j.starttime, j.id desc");
+	while($row = DBGetRow($result)){
+		array_splice($row, 0, 0, $contactCount[$row[6]]);
+		$allData[$row[7]][] = $row;
+		$countactCount[$row[7]]++;
+	}
 	$titles = array("0" => "##",
 					"2" => "Date",
 					"3" => "#Job Name",
@@ -49,7 +52,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	
 	$formatters = array("2" => "format_date",
 						"SentBy" => "sender",
-						"4" => "fmt_csv_list",
+						"4" => "fmt_delivery_type_list",
 						"Actions" => "message_action"
 					);
 }
@@ -100,7 +103,7 @@ function sender($row, $index){
 $TITLE="Welcome - " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
 $PAGE = 'messages:messages';
 include_once("nav.inc.php");
-if(isset($_SESSION['customerid'])){
+if(isset($contactList) && $contactList){
 	?><div><b>Messages from the last 30 days</b></div><br><?
 	$counter = 1000;
 	foreach($contactList as $personid){
