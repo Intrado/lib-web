@@ -17,7 +17,7 @@ require_once("parentportalutils.inc.php");
 $PERSONID = 0;
 
 if(isset($_GET['clear'])){
-	unset($_SESSION['currentpersonid']);
+	unset($_SESSION['currentpersonpkey']);
 	redirect();
 }
 
@@ -27,12 +27,19 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$firstnamefield = FieldMap::getFirstNameField();
 	$lastnamefield = FieldMap::getLastNameField();
 	if(isset($_GET['id'])){
-		$PERSONID = $_GET['id'] + 0;
-		$_SESSION['currentpersonid'] = $PERSONID;
-		$person = new Person($PERSONID);
-	} else if(isset($_SESSION['currentpersonid'])){
-		$PERSONID = $_SESSION['currentpersonid'];
-		$person = new Person($PERSONID);
+		$personpkey = DBSafe($_GET['id']);
+		if(!isset($contactList[$personpkey])){
+			redirect("unauthorized.php");
+		}
+		$_SESSION['currentpersonpkey'] = $personpkey;
+		redirect();
+	}
+	if(isset($_SESSION['currentpersonpkey'])){
+		$personpkey = $_SESSION['currentpersonpkey'];
+	}
+	if(isset($contactList[$personpkey])){
+		$person = $contactList[$personpkey];
+		$PERSONID = $person->id;
 	}
 }
 
@@ -41,7 +48,7 @@ if($PERSONID){
 	$maxphones = getSystemSetting("maxphones", 3);
 	$maxemails = getSystemSetting("maxemails", 2);
 	$maxsms = getSystemSetting("maxsms", 2);
-	$tempphones = resequence($person->getPhones());
+	$tempphones = resequence($person->getPhones(), "sequence");
 	$phones = array();
 	for ($i=0; $i<$maxphones; $i++) {
 		if(!isset($tempphones[$i])){
@@ -52,7 +59,7 @@ if($PERSONID){
 			$phones[$i] = $tempphones[$i];
 		}
 	}
-	$tempemails = resequence($person->getEmails());
+	$tempemails = resequence($person->getEmails(), "sequence");
 	$emails = array();
 	for ($i=0; $i<$maxemails; $i++) {
 		if(!isset($tempemails[$i])){
@@ -64,7 +71,7 @@ if($PERSONID){
 		}
 	}
 	if(getSystemSetting("_hassms")){
-		$tempsmses = resequence($person->getSmses());
+		$tempsmses = resequence($person->getSmses(), "sequence");
 		$smses = array();
 		for ($i=0; $i<$maxsms; $i++) {
 			if(!isset($tempsmses[$i])){
@@ -143,8 +150,8 @@ if($PERSONID){
 // Functions
 ///////////////////////////////////////////////////////////////////
 
-function id_url($obj, $index){
-	return "<a href='contactpreferences.php?id=" . $obj->$index . "'>" . $obj->pkey . "</a>";
+function contact_actions($obj, $index){
+	return "<a href='contactpreferences.php?id=" . $obj->pkey . "#edit'>Edit</a>";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,14 +165,15 @@ if($PERSONID){
 include_once("nav.inc.php");
 startWindow("Preferences" . help("Contactpreferences"), 'padding: 3px;');
 
-if(isset($contactList)){
+if(isset($contactList) && $contactList){
 	buttons(button("Add A Contact", null, "addcontact1.php"));
 
-	$titles = array("id" => "ID#",
+	$titles = array("pkey" => "ID#",
 					$firstnamefield => "First Name",
-					$lastnamefield => "Last Name");
-	$formatters = array("id" => "id_url");
-	showObjects($contactList, $titles, $formatters);	
+					$lastnamefield => "Last Name",
+					"Actions" => "Actions");
+	$formatters = array("Actions" => "contact_actions");
+	showObjects($contactList, $titles, $formatters, false, false, "id", array($PERSONID));	
 } else {
 ?>
 	<div style="margin:5px">
@@ -176,7 +184,8 @@ if(isset($contactList)){
 endWindow();
 
 if($PERSONID){
-	startWindow("Edit Preferences", 'padding: 3px;');
+?><a name="edit"></a><?
+	startWindow($person->$firstnamefield . " " . $person->$lastnamefield, 'padding: 3px;');
 ?>
 	<table width="100%">
 		<tr>
