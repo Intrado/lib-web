@@ -210,7 +210,11 @@ if($reportgenerator->format == "csv"){
 	if($USER->authorize('generatebulktokens')){
 		$reportgenerator->generateQuery();
 		$query = $reportgenerator->testquery;
-		$result = QuickQuery($query);
+		if($query != ""){
+			$result = QuickQuery($query);
+		} else {
+			$result = false;
+		}
 		if($result){
 			$extrajs = "if(confirmGenerateActive())";
 		} else {
@@ -299,6 +303,21 @@ if($reportgenerator->format == "csv"){
 	buttons();
 	EndForm();
 	include_once("navbottom.inc.php");
+?>
+	<script>
+	function confirmGenerate(){
+<? if($reportgenerator->reporttotal > 0){ ?>
+		return confirm(" Are you sure you want to generate activation codes for these people?");
+<? } else { ?>
+		window.alert("There are no persons in this list.");
+		return false;
+<? } ?>
+	}
+	function confirmGenerateActive(){
+		return confirm("Some activation codes exist in this list.  Are you sure you want to overwrite them?");
+	}
+</script>
+<?
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -314,7 +333,6 @@ function fmt_activation_code($row, $index){
 		}
 	}
 	return $row[$index];
-
 }
 
 function fmt_activation_date($row, $index){
@@ -324,16 +342,3 @@ function fmt_activation_date($row, $index){
 	return "";
 }
 ?>
-<script>
-	function confirmGenerate(){
-<? if($reportgenerator->reporttotal > 0){ ?>
-		return confirm(" Are you sure you want to generate activation codes for these people?");
-<? } else { ?>
-		window.alert("There are no persons in this list.");
-		return false;
-<? } ?>
-	}
-	function confirmGenerateActive(){
-		return confirm("Some activation codes exist in this list.  Are you sure you want to overwrite them?");
-	}
-</script>
