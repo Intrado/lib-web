@@ -261,15 +261,9 @@ function getPortalUsers($portaluserids) {
 }
 
 function generatePersonTokens($personids) {
-	$personidstruct = array();
-	$i = 0;
-	foreach($personids as $id){
-		$personidstruct[$i] = new XML_RPC_VALUE($id, 'int');
-		$i++;
-	}
-
+	$personids = implode($personids, ','); // send the CSV format
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personidstruct, 'struct'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personids, 'string'));
 	$method = "PortalAdminServer.portal_generatePersonTokens";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
@@ -280,15 +274,9 @@ function generatePersonTokens($personids) {
 }
 
 function revokePersonTokens($personids) {
-	$personidstruct = array();
-	$i = 0;
-	foreach($personids as $id){
-		$personidstruct[$i] = new XML_RPC_VALUE($id, 'int');
-		$i++;
-	}
-
+	$personids = implode($personids, ','); // send the CSV format
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personidstruct, 'struct'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personids, 'string'));
 	$method = "PortalAdminServer.portal_revokePersonTokens";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
