@@ -524,7 +524,7 @@ CREATE TABLE `portalpersontoken` (
   `expirationdate` date NOT NULL,
   `personid` int(11) NOT NULL,
   `creationuserid` int(11) NOT NULL,
-  PRIMARY KEY  (`token`),
+  PRIMARY KEY  (`token`, `personid`),
   UNIQUE KEY `personid` (`personid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8   $$$
 

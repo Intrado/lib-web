@@ -252,3 +252,8 @@ $$$
 
 ALTER TABLE `jobtype` CHANGE `infoforparents` `info` VARCHAR( 255 ) NOT NULL
 $$$
+
+
+ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `token` , `personid` )
+$$$
