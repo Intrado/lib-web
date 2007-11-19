@@ -5,8 +5,15 @@ if($PERSONID){
 	NewForm($f);
 ?>
 	<table cellpadding="3" cellspacing="1" width="100%">
-		<tr class="listheader" >
-			<th colspan="2">Contact Details</th>
+<?
+		$type = "phone";
+?>
+		<tr class="listHeader">
+			<th align="left" colspan="<?=count($jobtypes)+2; ?>"><?=format_delivery_type($type); ?></th>
+		</tr>
+		<tr class="windowRowHeader" >
+			<th align="left">Contact&nbsp;Type</th>
+			<th align="left">Destination</th>
 <?
 			foreach($jobtypes as $jobtype){
 				?><th><?=jobtype_info($jobtype)?></th><?
@@ -14,11 +21,10 @@ if($PERSONID){
 ?>
 		</tr>
 <?
-			$type = "phone";
 			foreach($phones as $phone){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("phone",$phone->sequence)?>:</th>
+					<th align="left" class="bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("phone",$phone->sequence)?></th>
 					<td class="bottomBorder" >
 					<? 
 						if(!$lockedphones[$phone->sequence]){ 
@@ -37,11 +43,25 @@ if($PERSONID){
 				</tr>
 <?
 			}
-			$type= "email";
+		$type = "email";
+?>
+			<tr class="listHeader">
+				<th align="left"  colspan="<?=count($jobtypes)+3; ?>"><?=format_delivery_type($type); ?></th>
+			</tr>
+			<tr class="windowRowHeader" >
+				<th align="left">Contact&nbsp;Type</th>
+				<th align="left">Destination</th>
+<?
+				foreach($jobtypes as $jobtype){
+					?><th><?=jobtype_info($jobtype)?></th><?
+				}
+?>
+			</tr>
+<?
 			foreach($emails as $email){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("email",$email->sequence)?>:</th>
+					<th align="left" class="bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("email",$email->sequence)?>:</th>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedemails[$email->sequence]){ 
@@ -61,11 +81,25 @@ if($PERSONID){
 <?
 			}
 			if(getSystemSetting("_hassms")){
-				$type= "sms";
+				$type = "sms";
+?>
+				<tr class="listHeader">
+					<th align="left" colspan="<?=count($jobtypes)+3; ?>"><?=format_delivery_type($type); ?></th>
+				</tr>
+				<tr class="windowRowHeader" >
+					<th align="left">Contact&nbsp;Type</th>
+					<th align="left">Destination</th>
+<?
+					foreach($jobtypes as $jobtype){
+						?><th><?=jobtype_info($jobtype)?></th><?
+					}
+?>
+				</tr>
+<?
 				foreach($smses as $sms){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("sms",$sms->sequence)?>:</th>
+					<th align="left" class="bottomBorder" valign="top" style="padding-top: 6px;"><?=destination_label("sms",$sms->sequence)?>:</th>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedsms[$sms->sequence]){
