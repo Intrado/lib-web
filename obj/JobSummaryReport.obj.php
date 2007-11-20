@@ -102,7 +102,8 @@ class JobSummaryReport extends ReportGenerator{
 		
 		$smsquery = "select sum(rc.type = 'sms') as total,
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined')) as remaining,
+									sum(rp.status not in ('success', 'fail', ,'duplicate', 'blocked', 'nocontacts', 'declined')) as remaining,
+									sum(rc.result = 'blocked') as blocked,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rp.status = 'declined' and rc.result is null) as declined
