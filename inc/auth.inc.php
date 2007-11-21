@@ -261,7 +261,7 @@ function getPortalUsers($portaluserids) {
 }
 
 function generatePersonTokens($personids) {
-	$personids = implode("','",$personids); // send the CSV format
+	$personids = "'" . implode("','",$personids) . "'"; // send the CSV format
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personids, 'string'));
 	$method = "PortalAdminServer.portal_generatePersonTokens";
@@ -274,7 +274,7 @@ function generatePersonTokens($personids) {
 }
 
 function revokePersonTokens($personids) {
-	$personids = implode("','",$personids); // send the CSV format
+	$personids = "'" . implode("','",$personids) . "'"; // send the CSV format
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($personids, 'string'));
 	$method = "PortalAdminServer.portal_revokePersonTokens";
