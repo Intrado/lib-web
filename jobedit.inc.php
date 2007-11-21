@@ -66,6 +66,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		MergeSectionFormData($f, $s);
 		foreach (array("phone","email","print","sms") as $type){
 			MergeSectionFormData($f, $type);
+			if($type == "sms")
+				continue;
 			SetRequired($f, $s, $type . "messageid", (bool)GetFormData($f, $s, 'send' . $type));
 		}
 		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
