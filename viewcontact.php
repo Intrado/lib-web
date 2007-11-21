@@ -402,7 +402,7 @@ foreach ($fieldmaps as $map) {
 		if(!isset($types[$type])) continue;
 ?>
 		<tr class="listHeader">
-			<td colspan="<?=count($jobtypes)+3; ?>"><?=format_delivery_type($type); ?></td>
+			<th align="left" colspan="<?=count($jobtypes)+3; ?>"><?=format_delivery_type($type); ?></th>
 		</tr>
 		<tr class="windowRowHeader">
 			<th align="left">Contact&nbsp;Type</th>
