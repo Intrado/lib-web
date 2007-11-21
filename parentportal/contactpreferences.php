@@ -173,7 +173,7 @@ if(isset($contactList) && $contactList){
 					$lastnamefield => "Last Name",
 					"Actions" => "Actions");
 	$formatters = array("Actions" => "contact_actions");
-	showObjects($contactList, $titles, $formatters, false, false, "id", array($PERSONID));	
+	showObjects($contactList, $titles, $formatters);	
 } else {
 ?>
 	<div style="margin:5px">
