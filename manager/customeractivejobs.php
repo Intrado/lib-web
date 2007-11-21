@@ -299,3 +299,8 @@ for ($pri = 1; $pri <=3 ; $pri++) {
 <?
 include("navbottom.inc.php");
 ?>
+<script>
+function popup(url, width, height) {
+	window.open(url, '_blank', 'width=' + width + ',height=' + height + 'location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=no');
+}
+</script>
