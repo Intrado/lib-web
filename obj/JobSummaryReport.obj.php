@@ -235,6 +235,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th># of SMS</th>
 											<th>Completed</th>
 											<th>Remaining</th>
+											<th>Blocked</th>
 											<th>Duplicates Removed</th>
 											<th>No SMS</th>
 											<th>Declined</th>
@@ -246,6 +247,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=$smsinfo[3]+0?></td>
 											<td><?=$smsinfo[4]+0?></td>
 											<td><?=$smsinfo[5]+0?></td>
+											<td><?=$smsinfo[6]+0?></td>
 										</tr>
 									</table>
 								</td>
