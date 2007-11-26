@@ -49,7 +49,7 @@ if(CheckFormSubmit($f,$s))
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(QuickQuery("select count(*) from jobtype where not deleted name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
+		} else if(QuickQuery("select count(*) from jobtype where not deleted and name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
 			error("That name is already in use");
 		} else {
 
