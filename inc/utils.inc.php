@@ -379,4 +379,42 @@ function destination_label($type, $sequence){
 		return format_delivery_type($type). " ". ($sequence+1);
 	}
 }
+
+//TODO: Create more generic functions for popup that would wrap around
+//code or text. ex startHover, endHover
+function destination_label_popup($type, $sequence, $f, $s, $itemname){
+	$label = fetch_labels($type, $sequence);
+	if(!$label)
+		$label = "&nbsp";
+
+	$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	?><div <?=$hover?>><?
+	NewFormItem($f, $s, $itemname, "checkbox", 0, 1);
+	?></div><?
+	echo '<div class="hoverhelp">' . $label . '</div>';
+}
+
+function destination_label_popup_paragraph($type){
+	$maxphones = getSystemSetting("maxphones", 3);
+	$maxemails = getSystemSetting("maxemails", 2);
+	$maxsms = getSystemSetting("maxsms", 2);
+	
+	$labels = array();
+	$max = "max" . $type;
+	if($type != "sms")
+		$max .= "s";
+	for($i = 0; $i < $$max; $i++){
+		$labels[] = destination_label($type, $i);
+	}
+	$labels = implode(",<br>", $labels);
+	
+	$hover = '<span ' . $extrahtml . '>';
+	$hover .= '<div style="color:#346799"';
+	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
+	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
+	$hover .= '>&nbsp;' . format_delivery_type($type) . '&nbsp;</div><div class="hoverhelp">' . $labels . '</div></span>';
+	return $hover;
+	
+}
 ?>
