@@ -73,6 +73,10 @@ if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->en
 if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) <= strtotime("now"))) {
 	error('The end time has already passed. Please correct this problem before proceeding');
 }
+if($jobtype->systempriority == 1){
+	error("WARNING: You are about to send a notification with a system priority of Emergency",
+			"Notifications with an Emergency system priority are reserved for cases where immediate action is required");
+}
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Display
