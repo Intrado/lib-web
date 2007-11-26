@@ -178,7 +178,7 @@ $PAGE = "contacts:contactpreferences";
 $TITLE = "Edit Contact Details - " . $person->$firstnamefield . " " . $person->$lastnamefield;
 
 include("nav.inc.php");
-startWindow("Preferences");
+startWindow($person->$firstnamefield . " " . $person->$lastnamefield);
 ?>
 <table>
 	<tr>
