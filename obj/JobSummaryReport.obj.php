@@ -152,8 +152,8 @@ class JobSummaryReport extends ReportGenerator{
 				$remainingcalls += $row[2];
 			}
 		}
+		$jobstats["phone"]['totalcalls'] = array_sum($jobstats["phone"]);
 		$jobstats["phone"]['remainingcalls'] = $remainingcalls;
-		$jobstats["phone"]['totalcalls'] = $phonenumberinfo[0]+0;
 		$jobnumberlist = implode("", explode("','", $this->params['joblist']));
 		$_SESSION['jobstats'][$jobnumberlist] = $jobstats;
 
