@@ -221,7 +221,11 @@ if( $reloadform ) {
 
 include_once("nav.inc.php");
 
-NewForm($f);
+//custom newform declaration to catch if manager password is submitted
+echo "<form name=\"$f\" method=\"post\" action=\"" . $_SERVER["REQUEST_URI"] . "\" enctype=\"multipart/form-data\"
+		onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'>";
+echo "<input type=\"hidden\" name=\"frm[" . $f . "][timestamp]\" value=\""
+		. $_SESSION['formdata'][$f]['timestamp'] . "\">";
 
 ?>
 <br>
@@ -289,7 +293,7 @@ NewForm($f);
 
 </table>
 
-<p>Manager Password: <? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?></p><?
+<p>Manager Password: <? NewFormItem($f, $s, 'managerpassword', 'password', 25, null, "id='managerpassword'"); ?></p><?
 EndForm();
 
 include_once("navbottom.inc.php");
@@ -308,3 +312,23 @@ function setCustomerSystemSetting($name, $value, $custdb) {
 
 
 ?>
+<script>
+function getObj(name)
+{
+  if (document.getElementById)
+  {
+  	this.obj = document.getElementById(name);
+  }
+  else if (document.all)
+  {
+	this.obj = document.all[name];
+  }
+  else if (document.layers)
+  {
+   	this.obj = document.layers[name];
+  }
+  if(this.obj)
+	this.style = this.obj.style;
+}
+
+</script>
