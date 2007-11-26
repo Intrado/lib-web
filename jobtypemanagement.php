@@ -286,7 +286,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 			?>
 		</td>
 		<td class="bottomBorder" ><? NewFormItem($f, $s, "jobtypedesc" . $jobtypeid, "textarea", 20, 3);?></td>
-		<td class="bottomBorder" >
+		<td class="bottomBorder">
 			<table  cellpadding="0" cellspacing="0" width="100%">
 				<tr class="listheader">
 					<th align="left">&nbsp;</th>
@@ -316,7 +316,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 						for($i=0; $i < $maxcolumns; $i++){
 							?><td class="bottomBorder" align="center"><?
 							if($i < $maxemails){
-								destination_label_popup("phone", $i, $f, $s, "jobtype" . $jobtypeid . "email" . $i);
+								destination_label_popup("email", $i, $f, $s, "jobtype" . $jobtypeid . "email" . $i);
 							} else {
 								echo "&nbsp;";
 							}
@@ -334,7 +334,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 							for($i=0; $i < $maxcolumns; $i++){
 								?><td class="bottomBorder" align="center"><?
 								if($i < $maxsms){
-									destination_label_popup("phone", $i, $f, $s, "jobtype" . $jobtypeid . "sms" . $i);
+									destination_label_popup("sms", $i, $f, $s, "jobtype" . $jobtypeid . "sms" . $i);
 								} else {
 									echo "&nbsp;";
 								}
@@ -357,40 +357,5 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 ?>
 	</tr>
 <?
-}
-function destination_label_popup($type, $sequence, $f, $s, $itemname){
-	$label = fetch_labels($type, $sequence);
-	if(!$label)
-		$label = "&nbsp";
-
-	$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	?><div <?=$hover?>><?
-	NewFormItem($f, $s, $itemname, "checkbox", 0, 1);
-	?></div><?
-	echo '<div class="hoverhelp">' . $label . '</div>';
-}
-
-function destination_label_popup_paragraph($type){
-	$maxphones = getSystemSetting("maxphones");
-	$maxemails = getSystemSetting("maxemails");
-	$maxsms = getSystemSetting("maxsms");
-	
-	$labels = array();
-	$max = "max" . $type;
-	if($type != "sms")
-		$max .= "s";
-	for($i = 0; $i < $$max; $i++){
-		$labels[] = destination_label($type, $i);
-	}
-	$labels = implode(",<br>", $labels);
-	
-	$hover = '<span ' . $extrahtml . '>';
-	$hover .= '<div style="color:#346799"';
-	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	$hover .= '>&nbsp;' . format_delivery_type($type) . '&nbsp;</div><div class="hoverhelp">' . $labels . '</div></span>';
-	return $hover;
-	
 }
 ?>
