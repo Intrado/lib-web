@@ -112,42 +112,6 @@ if($reloadform){
 // Funcitons
 ////////////////////////////////////////////////////////////////////////////////
 
-function destination_label_popup($type, $sequence, $f, $s, $itemname){
-	$label = fetch_labels($type, $sequence);
-	if(!$label)
-		$label = "&nbsp";
-
-	$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	?><div <?=$hover?>><?
-	NewFormItem($f, $s, $itemname, "checkbox", 0, 1);
-	?></div><?
-	echo '<div class="hoverhelp">' . $label . '</div>';
-}
-
-function destination_label_popup_paragraph($type){
-	$maxphones = getSystemSetting("maxphones");
-	$maxemails = getSystemSetting("maxemails");
-	$maxsms = getSystemSetting("maxsms");
-	
-	$labels = array();
-	$max = "max" . $type;
-	if($type != "sms")
-		$max .= "s";
-	for($i = 0; $i < $$max; $i++){
-		$labels[] = destination_label($type, $i);
-	}
-	$labels = implode(",<br>", $labels);
-	
-	$hover = '<span ' . $extrahtml . '>';
-	$hover .= '<div style="color:#346799"';
-	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	$hover .= '>&nbsp;' . format_delivery_type($type) . '&nbsp;</div><div class="hoverhelp">' . $labels . '</div></span>';
-	return $hover;
-	
-}
-
 $PAGE = "admin:contactsettings";
 $TITLE = "Job Type Editor: New Job Type";
 include_once("nav.inc.php");
@@ -209,6 +173,7 @@ startWindow("Add a Job Type");
 <?
 							foreach($max as $index => $maxvalue){
 								if($IS_COMMSUITE && $index == 'sms') continue;
+								if($index == 'sms' && !getSystemSetting('_hassms', false)) continue;
 ?>
 								<tr>
 									<td class="bottomBorder"><?=destination_label_popup_paragraph($index)?></td>
