@@ -416,14 +416,14 @@ startWindow('Global System Settings');
 											</tr>
 
 											<tr>
-												<td align="left" class="bottomBorder">Phones</td>
+												<td align="left" class="bottomBorder"><?=destination_label_popup_paragraph("phone")?></td>
 <?
 												for($i=0; $i< $maxcolumns; $i++){
 ?>
 													<td align="center" class="bottomBorder">
 <?
 													if($i< $maxphones){
-														echo NewFormItem($f, $s, "lockedphone" . $i, "checkbox");
+														destination_label_popup("phone", $i, $f, $s, "lockedphone" . $i);
 													} else {
 														echo "&nbsp;";	
 													}
@@ -434,14 +434,14 @@ startWindow('Global System Settings');
 ?>
 											</tr>
 											<tr>
-												<td align="left" class="bottomBorder">Emails</td>
+												<td align="left" class="bottomBorder"><?=destination_label_popup_paragraph("email")?></td>
 <?
 												for($i=0; $i< $maxcolumns; $i++){
 ?>
 													<td align="center" class="bottomBorder">
 <?
 													if($i< $maxemails){
-														echo NewFormItem($f, $s, "lockedemail" . $i, "checkbox");
+														destination_label_popup("email", $i, $f, $s, "lockedemail" . $i);
 													} else {
 														echo "&nbsp;";	
 													}
@@ -455,14 +455,14 @@ startWindow('Global System Settings');
 											if(getSystemSetting("_hassms", false)){
 ?>											
 											<tr>
-												<td align="left" class="bottomBorder">SMS</td>
+												<td align="left" class="bottomBorder"><?=destination_label_popup_paragraph("sms")?></td>
 <?
 												for($i=0; $i< $maxcolumns; $i++){
 ?>
 													<td align="center" class="bottomBorder">
 <?
 													if($i< $maxsms){
-														echo NewFormItem($f, $s, "lockedsms" . $i, "checkbox");
+														destination_label_popup("sms", $i, $f, $s, "lockedsms" . $i);
 													} else {
 														echo "&nbsp;";	
 													}
