@@ -216,7 +216,7 @@ startWindow("Add a Job Type");
 										for($i=0; $i < $maxcolumns; $i++){
 											?><td class="bottomBorder" align="center"><?
 											if($i < $maxvalue){
-												echo destination_label_popup($index, $i, $f, $s, $index . $i . "survey");
+												echo destination_label_popup($index, $i, $f, $s, $index . $i);
 											} else {
 												echo "&nbsp;";
 											}
