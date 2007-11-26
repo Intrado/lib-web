@@ -163,7 +163,7 @@ if($PERSONID){
 	$TITLE .= " - " . $person->$firstnamefield . " " . $person->$lastnamefield;
 }
 include_once("nav.inc.php");
-startWindow("Preferences" . help("Contactpreferences"), 'padding: 3px;');
+startWindow("Contacts" . help("Contactpreferences"), 'padding: 3px;');
 
 if(isset($contactList) && $contactList){
 	buttons(button("Add A Contact", null, "addcontact1.php"));
@@ -173,7 +173,45 @@ if(isset($contactList) && $contactList){
 					$lastnamefield => "Last Name",
 					"Actions" => "Actions");
 	$formatters = array("Actions" => "contact_actions");
-	showObjects($contactList, $titles, $formatters);	
+	
+	
+	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
+	echo '<tr class="listHeader">';
+	foreach ($titles as $title) {
+
+		echo '<th align="left">';
+		echo htmlentities($title) . '</th>';
+	}
+	echo "</tr>\n";
+
+	$alt = 0;;
+	foreach ($contactList as $obj) {
+		$alt++;
+		if($obj->id == $PERSONID){
+			echo '<tr style="color:white; background-color:red">';
+		} else if($alt % 2){
+			echo '<tr>';
+		} else {
+			echo '<tr class="listAlt">';
+		}
+
+		//only show cels with titles
+		foreach ($titles as $index => $title) {
+			//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
+			echo "<td>";
+			if (isset($formatters[$index])) {
+				$fn = $formatters[$index];
+				$cel = $fn($obj,$index);
+			} else {
+				$cel = htmlentities($obj->$index);
+			}
+			echo $cel . "</td>";
+		}
+
+		echo "</tr>\n";
+	}
+	echo "</table>";
+	
 } else {
 ?>
 	<div style="margin:5px">
