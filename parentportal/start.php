@@ -40,7 +40,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	while($row = DBGetRow($result)){
 		array_splice($row, 0, 0, $contactCount[$row[6]]);
 		$allData[$row[7]][] = $row;
-		$countactCount[$row[7]]++;
+		$contactCount[$row[7]]++;
 	}
 	$titles = array("0" => "##",
 					"2" => "Date",
