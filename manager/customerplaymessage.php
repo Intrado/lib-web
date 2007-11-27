@@ -34,9 +34,12 @@ if(!$_dbcon) {
 $messageid = QuickQuery("select phonemessageid from job j where id = '" . $_SESSION['previewmessage_jobid'] . "'");
 
 //find all unique fields used in this message
-
-$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
-
+$messagefields = array();
+if($messageid)
+	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
+else
+	$questionnaireid = QuickQuery("select questionnaireid from job j where id = '" . $_SESSION['previewmessage_jobid'] . "'");
+	
 $dopreview = 0;
 $previewdata = "";
 $fields = array();
@@ -50,8 +53,10 @@ if (count($messagefields) > 0) {
 	$dopreview = 1;
 	
 } else {
-	$dopreview = 1; //go ahead and preview w/o submiting form if there are no fields in the message
-	$previewdata = "&qt=";
+	if($messageid){
+		$dopreview = 1; //go ahead and preview w/o submiting form if there are no fields in the message
+		$previewdata = "&qt=";
+	}
 }
 
 
@@ -106,5 +111,7 @@ if ($dopreview) {
 	</td></tr>
 </table>
 <?
+} else if($questionnaireid){
+	echo "This is a survey job";
 }
 ?>
