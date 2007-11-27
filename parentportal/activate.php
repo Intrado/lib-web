@@ -101,10 +101,10 @@ include_once("nav.inc.php");
 
 if($forgot){
 	startWindow("Forgot Password" . help("Activateforgotpassword"));
-	$action = "?forgot=1";
+	$action = "?f=1";
 } else if($changeuser){
 	startWindow("Change Email" . help("Activatenewemail"));
-	$action = "?changeuser=1";
+	$action = "?c=1";
 } else {
 	startWindow("Activate" . help("Activateaccount"));
 	$action = "";
