@@ -14,14 +14,14 @@ $changeuser = false;
 $success = false;
 $error = false;
 $result = null;
-if(isset($_GET['token'])){
-	$token = $_GET['token'];
+if(isset($_GET['t'])){
+	$token = $_GET['t'];
 }
 
-if(isset($_GET['forgot'])){
+if(isset($_GET['f'])){
 	$forgot = true;
 }
-if(isset($_GET['changeuser'])){
+if(isset($_GET['c'])){
 	$changeuser = true;
 }
 
