@@ -38,6 +38,7 @@ if (!$USER->authorize('viewcontacts')) {
 if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['contacts']['options']);
 	$_SESSION['saved_report'] = false;
+	redirect();
 }
 $options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array("reporttype" => "contacts");
 
