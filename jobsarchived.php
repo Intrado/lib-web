@@ -48,7 +48,7 @@ $titles = array(	"name" => "Name",
 					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
-$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "type" => "fmt_obj_delivery_type_list", "enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
+$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "type" => "fmt_obj_delivery_type_list","startdate" => "fmt_job_startdate", "enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
 if(!$USER->authorize('leavemessage')){
 	unset($titles["responses"]);
 	unset($formatters["responses"]);
