@@ -78,7 +78,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		$sendsms = getSystemSetting("_hassms", false) ? GetFormData($f, $s, "sendsms") : 0;
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(!$sendphone && !$sendemail && !$sendsms){
+		} else if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
 			error("Plese select a delivery type");
 		} else if ($JOBTYPE == 'normal' && (strtotime(GetFormData($f,$s,"startdate")) === -1 || strtotime(GetFormData($f,$s,"startdate")) === false)) {
 			error('The start date is invalid');
@@ -420,7 +420,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 ?>
 	<table border=0 cellpadding=3 cellspacing=0><tr><td>
 <?
-	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? "DISABLED" : "") . $extrahtml);
+	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? " DISABLED " : "") . $extrahtml);
 	
 	if($type == "sms") {
 		NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
