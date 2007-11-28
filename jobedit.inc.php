@@ -113,7 +113,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			} else if ($submittedmode) {
 				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
 			} else {
-				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") &&GetFormData($f, $s, 'smsmessageid') == "0" ){
+				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
 					$newsmsmessage = new Message();
 					$parts = $newsmsmessage->parse(GetFormData($f, $s, 'smsmessagetxt'));
 					$newsmsmessage->userid = $USER->id;
