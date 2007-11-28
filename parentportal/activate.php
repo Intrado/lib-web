@@ -9,20 +9,11 @@ $form = true;
 $forgotsuccess = false;
 $newusersuccess = false;
 $token = "";
-$forgot = false;
-$changeuser = false;
 $success = false;
 $error = false;
 $result = null;
 if(isset($_GET['t'])){
 	$token = $_GET['t'];
-}
-
-if(isset($_GET['f'])){
-	$forgot = true;
-}
-if(isset($_GET['c'])){
-	$changeuser = true;
 }
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
