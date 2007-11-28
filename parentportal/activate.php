@@ -92,13 +92,13 @@ include_once("nav.inc.php");
 
 if($forgot){
 	startWindow("Forgot Password" . help("Activateforgotpassword"));
-	$action = "?f=1";
+	$action = "?f";
 } else if($changeuser){
 	startWindow("Change Email" . help("Activatenewemail"));
-	$action = "?c=1";
+	$action = "?c";
 } else {
 	startWindow("Activate" . help("Activateaccount"));
-	$action = "";
+	$action = "?n";
 }
 if($forgotsuccess){
 	?>
@@ -135,7 +135,7 @@ if($forgotsuccess){
 }
 if($form){
 ?>
-	<form method="POST" action="activate.php<?=$action?>" name="activate">
+	<form method="POST" action="<?=$action?>" name="activate">
 		<table>
 			<tr>
 				<td>Activation Code: </td>
