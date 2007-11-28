@@ -5,6 +5,23 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
+
+$changeuser = false;
+$forgot = false;
+if(isset($_GET['c'])){
+	$changeuser = true;
+	include("activate.php");
+	exit();
+} else if(isset($_GET['f'])){
+	$forgot = true;
+	include("activate.php");
+	exit();
+} else if(isset($_GET['n'])){
+	include("activate.php");
+	exit();
+}
+
+
 if (isset($_GET['logout'])) {
 	doStartSession(); // start the session to get the id
 	portalputSessionData(session_id(), ""); // write empty data to flush the user
