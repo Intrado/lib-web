@@ -88,7 +88,11 @@ class CallsReport extends ReportGenerator{
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
-
+		$activefields = explode(",", $this->params['activefields']);
+		
+		//fetch f-fields just like the query and explode the string into an array for an easier count
+		$queryfields = explode(",",generateFields("rp"));
+		
 		$result = Query($this->query);
 		$data = array();
 		// parse through data and seperate attempts.
@@ -111,7 +115,7 @@ class CallsReport extends ReportGenerator{
 				$line[] = $row[4];
 				$line[] = $time;
 				$line[] = $res;
-				for($i=0; $i<count($fields); $i++){
+				for($i=0; $i<count($queryfields); $i++){
 					$line[] = $row[7+$i];
 				}
 				$data[] = $line;
@@ -141,9 +145,8 @@ class CallsReport extends ReportGenerator{
 						"4" => "Destination",
 						"5" => "Date/Time",
 						"6" => "Result");
-		foreach($fieldlist as $index => $field){
-			$titles[] = $field;
-		}
+		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
+
 		$formatters = array("2" => "fmt_message",
 							"4" => "fmt_destination",
 							"5" => "fmt_ms_timestamp",
