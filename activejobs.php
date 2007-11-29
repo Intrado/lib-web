@@ -47,12 +47,15 @@ $result = Query(
 				sum(rp.type='phone') as total_phone,
             	sum(rp.type='email') as total_email,
             	sum(rp.type='print') as total_print,
+            	sum(rp.type='sms') as total_sms,
             	j.type LIKE '%phone%' AS has_phone,
 				j.type LIKE '%email%' AS has_email,
 				j.type LIKE '%print%' AS has_print,
+				j.type LIKE '%sms%' AS has_sms,
             	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='phone') as remaining_phone,
             	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='email') as remaining_email,
             	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='print') as remaining_print,
+            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='sms') as remaining_sms,
             ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
             from job j
             left join reportperson rp
@@ -68,7 +71,7 @@ while ($row = DBGetRow($result)) {
 
 
 function fmt_job_type ($row,$index) {
-	if ($row[18] == "survey")
+	if ($row[21] == "survey")
 		return "Survey";
 	else
 		return "Notification";
@@ -78,12 +81,15 @@ function fmt_job_type ($row,$index) {
 function fmt_total ($row, $index) {
 	$data = array();
 
-	if ($row[$index+3])
-		$data[] = "Phone:&nbsp;" . $row[$index];
 	if ($row[$index+4])
-		$data[] = "Email:&nbsp;" . $row[$index+1];
+		$data[] = "Phone:&nbsp;" . $row[$index];
 	if ($row[$index+5])
+		$data[] = "Email:&nbsp;" . $row[$index+1];
+	if ($row[$index+6])
 		$data[] = "Print:&nbsp;" . $row[$index+2];
+	if ($row[$index+7])
+		$data[] = "SMS:&nbsp;" . $row[$index+3];
+		
 
 	return implode("<br>",$data);
 }
@@ -91,12 +97,14 @@ function fmt_total ($row, $index) {
 function fmt_remaining ($row, $index) {
 	$data = array();
 
-	if ($row[$index-3])
+	if ($row[$index-4])
 		$data[] = "Phone:&nbsp;" . $row[$index];
-	if ($row[$index-2])
+	if ($row[$index-3])
 		$data[] = "Email:&nbsp;" . $row[$index+1];
-	if ($row[$index-1])
+	if ($row[$index-2])
 		$data[] = "Print:&nbsp;" . $row[$index+2];
+	if ($row[$index-1])
+		$data[] = "SMS:&nbsp;" . $row[$index+3];
 
 	return implode("<br>",$data);
 }
@@ -105,19 +113,19 @@ function fmt_remaining ($row, $index) {
 $titles = array(
 				"0" => 'Submitted by',
 				"1" => 'Job Name',
-				"18" => "Mode",
+				"21" => "Mode",
 				"2" => 'Status',
 				"3" => 'Total',
-				"9" => 'Remaining',
-				"12" => 'Scheduled Start',
-				"13" => 'Actions');
+				"11" => 'Remaining',
+				"15" => 'Scheduled Start',
+				"16" => 'Actions');
 $formatters = array(
-				"18" => "fmt_job_type",
+				"21" => "fmt_job_type",
 				"2" => 'fmt_status_index',
 				"3" => 'fmt_total',
-				"9" => 'fmt_remaining',
-				"12" => 'fmt_date',
-				"13" => 'fmt_jobs_actions_customer');
+				"11" => 'fmt_remaining',
+				"15" => 'fmt_date',
+				"16" => 'fmt_jobs_actions_customer');
 
 $query = "select FOUND_ROWS()";
 $total = QuickQuery($query);
