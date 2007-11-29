@@ -44,22 +44,22 @@ $data = array();
 // reportcontact columns are : resultdata
 $result = Query(
 			"select SQL_CALC_FOUND_ROWS jobowner.login, j.name, j.status,
-				sum(rp.type='phone') as total_phone,
-            	sum(rp.type='email') as total_email,
-            	sum(rp.type='print') as total_print,
-            	sum(rp.type='sms') as total_sms,
+				sum(rc.type='phone') as total_phone,
+            	sum(rc.type='email') as total_email,
+            	sum(rc.type='print') as total_print,
+            	sum(rc.type='sms') as total_sms,
             	j.type LIKE '%phone%' AS has_phone,
 				j.type LIKE '%email%' AS has_email,
 				j.type LIKE '%print%' AS has_print,
 				j.type LIKE '%sms%' AS has_sms,
-            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='phone') as remaining_phone,
-            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='email') as remaining_email,
-            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='print') as remaining_print,
-            	sum(rp.numcontacts and (rp.status!='success' and rp.status!='fail' and rp.status!='duplicate') and rp.type='sms') as remaining_sms,
+            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='phone') as remaining_phone,
+            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='email') as remaining_email,
+            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='print') as remaining_print,
+            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='sms') as remaining_sms,
             ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
             from job j
-            left join reportperson rp
-            	on j.id = rp.jobid
+            left join reportcontact rc
+            	on j.id = rc.jobid
             left join user jobowner
             	on j.userid = jobowner.id
             where (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
