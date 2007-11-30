@@ -100,9 +100,13 @@ function fmt_blocking_actions($row, $index) {
 }
 
 function fmt_bntype ($row, $index) {
-	if ($row[$index] == "both")
-		return "Calls and SMS";
-	else if ($row[$index] == "sms")
+	if ($row[$index] == "both"){
+		if(getSystemSetting("_hassms", false)){
+			return "Calls and SMS";
+		} else {
+			return "Calls";
+		}
+	} else if ($row[$index] == "sms")
 		return "SMS only";
 	else
 		return "Calls only";
@@ -128,9 +132,13 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 			<td>
 <?
 				NewFormItem($form, $section,"type","selectstart");
-				NewFormItem($form, $section,"type","selectoption","Block Calls and SMS","both");
-				NewFormItem($form, $section,"type","selectoption","Block SMS only","sms");
-				NewFormItem($form, $section,"type","selectoption","Block Calls only","call");
+				if(getSystemSetting("_hassms", false)){
+					NewFormItem($form, $section,"type","selectoption","Block Calls and SMS","both");
+					NewFormItem($form, $section,"type","selectoption","Block SMS only","sms");
+					NewFormItem($form, $section,"type","selectoption","Block Calls only","call");
+				} else {
+					NewFormItem($form, $section,"type","selectoption","Block Calls","both");
+				}
 				NewFormItem($form, $section,"type","selectend");
 
 ?>
