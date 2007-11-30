@@ -170,6 +170,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 						$job->setOption("leavemessage", false);
 				}
 			}
+			
+			if(!$completedmode){
+				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
+			}
 
 			if ($questionnaire->hasphone && $USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
