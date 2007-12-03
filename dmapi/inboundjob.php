@@ -76,18 +76,10 @@ function jobConfirm($listname, $priority, $numdays=1)
 {
 	global $SESSIONID, $SESSIONDATA;
 
-	// if job is one day, and stop time is in the past... warn them about a job that is ineffective
-	// NOTE this case should not exist, should be handled by checkExpirationThenConfirm() method
-	$isValid = true;
-	if ($numdays == 1) {
-		loadUser();
-		global $USER, $ACCESS;
-		loadTimezone();
-		$now = QuickQuery("select now()");
-		$nowtime = substr($now, 11);
-		$isValid = ((strtotime($nowtime) - strtotime($SESSIONDATA['stoptime'])) < 0);
-	}
+	loadUser(); // must load user before rendering list
+	global $USER, $ACCESS;
 
+	// find list size
 	$list = new PeopleList($SESSIONDATA['listid']);
 	$renderedlist = new RenderedList($list);
 	$renderedlist->mode = "preview";
@@ -95,6 +87,15 @@ function jobConfirm($listname, $priority, $numdays=1)
 	$listsize = $renderedlist->total;
 	glog("number of people in list: ".$listsize);
 
+	// if job is one day, and stop time is in the past... warn them about a job that is ineffective
+	// NOTE this case should not exist, should be handled by checkExpirationThenConfirm() method
+	$isValid = true;
+	if ($numdays == 1) {
+		loadTimezone();
+		$now = QuickQuery("select now()");
+		$nowtime = substr($now, 11);
+		$isValid = ((strtotime($nowtime) - strtotime($SESSIONDATA['stoptime'])) < 0);
+	}
 
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
@@ -106,8 +107,13 @@ function jobConfirm($listname, $priority, $numdays=1)
 <?	} ?>
 
 	<message name="jobplayback">
-				<tts gender="female">You are about to submit a job to <?= $listsize ?>  people.  Using the list </tts>
-
+				<tts gender="female">You are about to submit a job to <?= $listsize ?> </tts>
+<?				if ($listsize == 1) { ?>
+					<tts gender="female"> person. </tts>
+<?				} else { ?>
+					<tts gender="female"> people. </tts>
+<? 				} ?>
+				<tts gender="female">Using the list </tts>
 				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation2.wav" />
 				<tts gender="female"><?= htmlentities($priority, ENT_COMPAT, "UTF-8") ?></tts>
@@ -531,6 +537,7 @@ if($REQUEST_TYPE == "new"){
 			// replay job type selection
 			else if ($BFXML_VARS['sendjob'] == "3")
 			{
+				$SESSIONDATA['currentJobtypePage'] = 0; // reset paging
 				forwardToPage("inboundjobtype.php");
 			}
 			// replay numdays option

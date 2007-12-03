@@ -2,7 +2,17 @@
 // phone inbound, prompt to select list (page into sets of 9), then save listid
 
 include_once("inboundutils.inc.php");
+include_once("../obj/User.obj.php");
+include_once("../obj/Rule.obj.php");
+include_once("../obj/Access.obj.php");
+include_once("../obj/Job.obj.php");
+include_once("../obj/JobLanguage.obj.php");
+include_once("../obj/JobType.obj.php");
+include_once("../obj/Permission.obj.php");
 include_once("../obj/PeopleList.obj.php");
+include_once("../obj/RenderedList.obj.php");
+include_once("../obj/FieldMap.obj.php");
+
 
 global $SESSIONDATA, $BFXML_VARS;
 
@@ -91,14 +101,23 @@ function loadLists($incr)
 	return $listSubset; // the list of lists for this user, page includes no more than 9
 }
 
-function playLists($incr)
+function playLists($incr, $emptylist = false)
 {
+	glog("playlists, empty? ".$emptylist);
+
 	global $SESSIONDATA;
 
 	$lists = loadLists($incr);
 	global $SESSIONID;
 ?>
 <voice sessionid="<?= $SESSIONID ?>">
+
+<?  if ($emptylist) { ?>
+	<message name="emptylist">
+		<tts gender="female">I'm sorry, that list is currently empty.  You must select a different list.</tts>
+	</message>
+<?  } ?>
+
 	<message name="listdirectory">
 <?	if (count($lists) == 0) { ?>
 		<audio cmid="file://prompts/inbound/NoLists.wav" />
@@ -161,40 +180,6 @@ function playLists($incr)
 <?
 }
 
-function confirmList($listname)
-{
-	global $SESSIONID;
-?>
-<voice sessionid="<?= $SESSIONID ?>">
-	<message name="listconfirm">
-
-		<field name="uselist" type="menu" timeout="5000" sticky="true">
-			<prompt repeat="2">
-				<audio cmid="file://prompts/inbound/ListChoice.wav" />
-				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
-				<audio cmid="file://prompts/inbound/ValidateList.wav" />
-			</prompt>
-
-			<choice digits="1" />
-			<choice digits="2" />
-
-			<default>
-				<audio cmid="file://prompts/ImSorry.wav" />
-			</default>
-			<timeout>
-				<goto message="error" />
-			</timeout>
-		</field>
-	</message>
-
-	<message name="error">
-		<audio cmid="file://prompts/inbound/Error.wav" />
-		<hangup />
-	</message>
-</voice>
-<?
-}
-
 
 /////////////////
 
@@ -223,16 +208,24 @@ if($REQUEST_TYPE == "new"){
 			//var_dump($lists);
 			$list = $lists[$listindex];
 			glog("list name: ".$list->name);
-			confirmList($list->name);
 
 			$SESSIONDATA['listid'] = $list->id;
 			$SESSIONDATA['listname'] = $list->name;
-			$SESSIONDATA['step'] = "uselist";
-		}
-	// if they confirmed the list selection
-	} else if (isset($BFXML_VARS['uselist'])) {
 
-		if ($BFXML_VARS['uselist'] == "1") {
+			loadUser(); // must load user before rendering list
+			global $USER, $ACCESS;
+			$list = new PeopleList($SESSIONDATA['listid']);
+			$renderedlist = new RenderedList($list);
+			$renderedlist->mode = "preview";
+			$renderedlist->renderList();
+			$listsize = $renderedlist->total;
+			glog("number of people in list: ".$listsize);
+
+			if ($listsize == 0) {
+				playLists(true, true);
+			} else {
+
+
 			// they already entered job options, but returned to select a different list
 			// so keep their options and replay the confirm
 			if ( isset($SESSIONDATA['listname']) &&
@@ -244,11 +237,9 @@ if($REQUEST_TYPE == "new"){
 				forwardToPage("inboundjob.php");
 			}
 
-			// user confirmed they wish to use the selected list, go to job options
+			// user selected list, go to job options
 			forwardToPage("inboundjobtype.php");
-		} else {
-			// user does not want selected list
-			playLists(false); // do not increment the page
+			}
 		}
 	// play the current page of lists
 	} else if (isset($BFXML_VARS['confirmContinue']) || isset($SESSIONDATA['currentListPage'])) {
