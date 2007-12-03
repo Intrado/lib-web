@@ -10,7 +10,7 @@ require_once("../inc/table.inc.php");
 
 
 $error_badpass = "That password is incorrect";
-$error_generalproblem = "There was a problem changing your username";
+$error_generalproblem = "There was a problem changing your username, please try again later";
 $error_badusername = "That username is already in use";
 /****************** main message section ******************/
 
@@ -76,11 +76,11 @@ include_once("nav.inc.php");
 if($success){
 	startWindow('Change Email' . help("Changeemail"));
 	?>
-	<div style="margin:5px">You should receive an email shortly at the new address with an activation code.</div>
+	<div style="margin:5px">You should receive an email shortly at the new address with a confirmation code.</div>
 	<form method='POST' action="activate.php?changeuser=1" name="activate" id="activate">
 		<table>
 			<tr>
-				<td>Activation Code: </td>
+				<td>Confirmation Code: </td>
 				<td><input type="text" name="token" size="50" /></td>
 			</tr>
 			<tr>

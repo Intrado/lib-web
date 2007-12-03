@@ -103,7 +103,7 @@ if($forgot){
 if($forgotsuccess){
 	?>
 	<div style="margin:5px">
-		Thank you, your password has been updated.
+		Thank you, your password has been reset.
 		<br>You will be redirected to the main page in 5 seconds.
 	</div>
 	<meta http-equiv="refresh" content="5;url=choosecustomer.php">
@@ -126,11 +126,11 @@ if($forgotsuccess){
 	<?
 } else if ($error && $forgot){
 ?>
-	<div style="color: red;">That token is invalid or has expired.</div>
+	<div style="color: red;">That code is invalid or has expired.</div>
 <?
 } else if ($error){
 ?>
-	<div style="color: red;">That token is invalid or has expired or that is an incorrect password.</div>
+	<div style="color: red;">That code is invalid or has expired or that is an incorrect password.</div>
 <?
 }
 if($form){
@@ -138,7 +138,7 @@ if($form){
 	<form method="POST" action="<?=$action?>" name="activate">
 		<table>
 			<tr>
-				<td>Activation Code: </td>
+				<td>Confirmation Code: </td>
 				<td><input type="text" name="token" value="<?=$token?>" size="50" /></td>
 			</tr>
 <?
