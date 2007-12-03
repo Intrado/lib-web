@@ -45,9 +45,13 @@ class JobDetailReport extends ReportGenerator{
 		if(isset($this->params['result']) && $this->params['result']){
 			if($this->params['result'] == "undelivered"){
 				//TODO: rename newflag
-				$resultquery = " and rp.iscontacted = '0' and rp.status != 'duplicate'";
+				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt from reportperson rp
+											where rp.jobid in ('" . $joblist . "') group by jobid, personid having cnt = 0", true);
+				$undeliveredpersons = array_keys($undeliveredpersons);
+				$this->params['undeliveredcount'] = count($undeliveredpersons);
+				$resultquery = " and rp.personid in ('" . implode("','", $undeliveredpersons) . "') ";
 				if(isset($this->params['hideinprogress']) && $this->params['hideinprogress'] == "true"){
-					$resultquery .= " and rp.status in ('fail', 'nocontacts', 'blocked') ";
+					$resultquery .= " and rp.status in ('fail', 'nocontacts', 'blocked', 'declined', 'duplicate') ";
 				}
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery = " and rp.status = 'nocontacts' ";
