@@ -275,6 +275,7 @@ if($reportgenerator->format != "html"){
 
 if($error || $reportgenerator->format == "html"){
 	$reportgenerator->format = "html";
+	$reportgenerator->generateQuery();
 	$PAGE = "reports:reports";
 	$TITLE = "Phone Log";
 	if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "phonedetail"){
@@ -284,13 +285,17 @@ if($error || $reportgenerator->format == "html"){
 	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "smsdetail"){
 		$TITLE = "SMS Log";
 	} else if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
-		$TITLE = "Recipients Not Contacted";
+		$TITLE = "Recipients Not Contacted - " . $reportgenerator->params['undeliveredcount'] . " Recipients";
 	}
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$TITLE .= " - " . $subscription->name;
 	} else if(isset($jobid)){
-		$TITLE .= " - " . $job->name;
+		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
+			$DESCRIPTION = $job->name;
+		} else {
+			$TITLE .= " - " . $job->name;
+		}
 	}
 	if(isset($options['reldate'])){
 		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
@@ -331,7 +336,7 @@ if($error || $reportgenerator->format == "html"){
 		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
 ?>
 			<tr><th align="right" class="windowRowHeader">Finalized Notifications:</th>
-				<td class="bottomBorder"><?=NewFormItem($f, $s, "hideinprogress", "checkbox");?>Only Show Finalized Calls</td>
+				<td class="bottomBorder"><?=NewFormItem($f, $s, "hideinprogress", "checkbox");?>Only Display Final Results</td>
 			</tr>
 <?
 		}
@@ -344,7 +349,7 @@ if($error || $reportgenerator->format == "html"){
 	<?
 	
 	if(isset($reportgenerator)){
-		$reportgenerator->generate("detailed");
+		$reportgenerator->runHtml();
 	}
 	buttons();
 	endForm();
