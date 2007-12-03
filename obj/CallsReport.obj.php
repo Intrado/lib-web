@@ -142,7 +142,7 @@ class CallsReport extends ReportGenerator{
 		$titles = array("0" => "Job Name",
 						"1" => "Job Type",
 						"3" => "Message",
-						"2" => "Delivery by",
+						"2" => "Deliver by",
 						"4" => "Destination",
 						"5" => "Date/Time",
 						"6" => "Result");
