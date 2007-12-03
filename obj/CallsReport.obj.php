@@ -141,13 +141,14 @@ class CallsReport extends ReportGenerator{
 		
 		$titles = array("0" => "Job Name",
 						"1" => "Job Type",
-						"2" => "Message",
+						"3" => "Message",
+						"2" => "Delivery by",
 						"4" => "Destination",
 						"5" => "Date/Time",
 						"6" => "Result");
 		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
 
-		$formatters = array("2" => "fmt_message",
+		$formatters = array("2" => "fmt_delivery_type_list",
 							"4" => "fmt_destination",
 							"5" => "fmt_ms_timestamp",
 							"6" => "fmt_contacthistory_result");
