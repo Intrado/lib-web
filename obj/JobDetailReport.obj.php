@@ -214,14 +214,15 @@ class JobDetailReport extends ReportGenerator{
 						2 => "ID#",
 						3 => "First Name",
 						4 => "Last Name",
-						5 => "Message",
+						6 => "Message",
+						5 => "Delivery by",
 						7 => "Destination",
 						11 => "Attempts",
 						8 => "Last Attempt",
 						9 => "Last Result");
 		$titles = appendFieldTitles($titles, 13, $fieldlist, $activefields);
 
-		$formatters = array(5 => "fmt_message",
+		$formatters = array(5 => "fmt_delivery_type_list",
 							7 => "fmt_destination",
 							8 => "fmt_date",
 							9 => "fmt_jobdetail_result");
