@@ -77,7 +77,7 @@ if($success){
 	startWindow('Change Email' . help("Changeemail"));
 	?>
 	<div style="margin:5px">You should receive an email shortly at the new address with a confirmation code.</div>
-	<form method='POST' action="activate.php?changeuser=1" name="activate" id="activate">
+	<form method='POST' action="index.php?c" name="activate" id="activate">
 		<table>
 			<tr>
 				<td>Confirmation Code: </td>
