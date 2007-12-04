@@ -307,9 +307,9 @@ if($reportgenerator->format == "csv"){
 	<script>
 	function confirmGenerate(){
 <? if($reportgenerator->reporttotal > 0){ ?>
-		return confirm(" Are you sure you want to generate activation codes for these people?");
+		return confirm("Are you sure you want to generate activation codes for these people?");
 <? } else { ?>
-		window.alert("There are no persons in this list.");
+		window.alert("There are no people in this list.");
 		return false;
 <? } ?>
 	}
