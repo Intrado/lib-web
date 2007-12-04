@@ -48,7 +48,6 @@ class JobDetailReport extends ReportGenerator{
 				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from reportperson rp
 											left join reportperson rp2 on (rp2.personid = rp.duplicateid and rp2.jobid = rp.jobid and rp2.type = rp.type)
 											where rp.jobid in ('" . $joblist . "') group by rp.jobid, rp.personid having cnt = 0 and (cnt2 = 0 or cnt2 is null)", true);
-				exit();
 				$undeliveredpersons = array_keys($undeliveredpersons);
 				$this->params['undeliveredcount'] = count($undeliveredpersons);
 				$resultquery = " and rp.personid in ('" . implode("','", $undeliveredpersons) . "') ";
