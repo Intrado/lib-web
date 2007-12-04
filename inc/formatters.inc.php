@@ -443,7 +443,7 @@ function fmt_result ($row,$index) {
 		case "X":
 			return "Disconnect";
 		case "F":
-			return "Failed";
+			return "Unknown";
 		case "C":
 			return "In Progress";
 		case "blocked":

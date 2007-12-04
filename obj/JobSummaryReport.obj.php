@@ -136,7 +136,7 @@ class JobSummaryReport extends ReportGenerator{
 							"B" => "Busy",
 							"N" => "No Answer",
 							"X" => "Disconnect",
-							"F" => "Failed",
+							"F" => "Unknown",
 							"notattempted" => "Not Attempted",
 							"blocked" => "Blocked",
 							"duplicate" => "Duplicate",
