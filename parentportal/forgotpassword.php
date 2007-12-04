@@ -13,7 +13,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$email1 = get_magic_quotes_gpc() ? stripslashes($_POST['email1']) : $_POST['email1'];
 	$email2 = get_magic_quotes_gpc() ? stripslashes($_POST['email2']) : $_POST['email2'];
 	if ($email1 !== $email2){
-		error("Those emails don't match");
+		error("The 2 emails you have entered do not match");
 	} else if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email1)){
 		error("That is not a valid email address");
 	} else {
@@ -31,7 +31,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 }
 
 $PAGE = ":";
-$TITLE = "Forgot Password";
+$TITLE = "Password Assistance";
 $hidenav = 1;
 include_once("nav.inc.php");
 startWindow("Send Reset Password" . help('Forgotpassword'));
@@ -40,6 +40,9 @@ if($generalerror){
 }
 if(!$success){
 ?>
+<br>
+<div>We will email you a link to a page where you can reset your password</div>
+<br>
 <table>
 	<form method="POST" action="forgotpassword.php" name="forgotpassword">
 			<tr>
