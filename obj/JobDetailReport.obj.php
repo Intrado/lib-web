@@ -45,13 +45,15 @@ class JobDetailReport extends ReportGenerator{
 		if(isset($this->params['result']) && $this->params['result']){
 			if($this->params['result'] == "undelivered"){
 				//TODO: rename newflag
-				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt from reportperson rp
-											where rp.jobid in ('" . $joblist . "') group by jobid, personid having cnt = 0", true);
+				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from reportperson rp
+											left join reportperson rp2 on (rp2.personid = rp.duplicateid and rp2.jobid = rp.jobid and rp2.type = rp.type)
+											where rp.jobid in ('" . $joblist . "') group by rp.jobid, rp.personid having cnt = 0 and (cnt2 = 0 or cnt2 is null)", true);
+				exit();
 				$undeliveredpersons = array_keys($undeliveredpersons);
 				$this->params['undeliveredcount'] = count($undeliveredpersons);
 				$resultquery = " and rp.personid in ('" . implode("','", $undeliveredpersons) . "') ";
 				if(isset($this->params['hideinprogress']) && $this->params['hideinprogress'] == "true"){
-					$resultquery .= " and rp.status in ('fail', 'nocontacts', 'blocked', 'declined', 'duplicate') ";
+					$resultquery .= " and rp.status in ('fail', 'nocontacts', 'blocked', 'declined') ";
 				}
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery = " and rp.status = 'nocontacts' ";
