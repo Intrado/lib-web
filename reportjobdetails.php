@@ -319,7 +319,7 @@ if($error || $reportgenerator->format == "html"){
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 			<td class="bottomBorder">
 	<? 		
-				select_metadata('reportdetailstable', 9, $fields);
+				select_metadata('reportdetailstable', 10, $fields);
 	?>
 			</td>
 		</tr>
