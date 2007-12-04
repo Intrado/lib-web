@@ -20,10 +20,20 @@ $linesToAdd[] = "[authserver]";
 $linesToAdd[] = "host=\"localhost:8088\"";
 $linesToAdd[] = "path=\"/xmlrpc\"";
 
+$dmapiLinesToAdd = array();
+$dmapiLinesToAdd[] = "[dmapidb]";
+$dmapiLinesToAdd[] = "persistent=true";
+$dmapiLinesToAdd[] = "host=\"localhost\"";
+$dmapiLinesToAdd[] = "user=\"root\"";
+$dmapiLinesToAdd[] = "pass=\"\"";
+$dmapiLinesToAdd[] = "db=\"commsuite\"";
+
 $fileLines = replaceSection($fileLines, "db", $linesToAdd);
+$fileLines = replaceSection($fileLines, "dmapidb", $dmapiLinesToAdd);
 $ldapline = findSection($fileLines, "feature");
 $fileLines = deleteSection($fileLines, "ldap");
 $fileLines = appendToSection($fileLines, "feature", array("", "is_ldap=false"));
+
 
 writearray($fileLines, $outfilefp);
 fclose($outfilefp);
@@ -91,6 +101,8 @@ function findSection($fileLines, $sectionName){
 			$linenumber = $index;
 		}
 	}
+	if($linenumber != null)
+		echo "success\n";
 	return $linenumber;
 }
 
