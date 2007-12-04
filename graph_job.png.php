@@ -45,7 +45,7 @@ $cpcolors = array(
 	"B" => "orange",
 	"N" => "tan",
 	"X" => "black",
-	"F" => "red",
+	"F" => "#8AA6B6",
 	"inprogress" => "blue",
 	"retry" => "cyan"
 );
@@ -56,7 +56,7 @@ $cpcodes = array(
 	"B" => "Busy",
 	"N" => "No Answer",
 	"X" => "Disconnect",
-	"F" => "Failed",
+	"F" => "Unknown",
 	"inprogress" => "Queued",
 	"retry" => "Retrying"
 );

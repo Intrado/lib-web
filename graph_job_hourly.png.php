@@ -47,10 +47,10 @@ $cpcolors = array(
 	"B" => "orange",
 	"N" => "tan",
 	"X" => "black",
-	"F" => "red",
+	"F" => "#8AA6B6",
 	"C" => "yellow",
 	"duplicate" => "lightgray",
-	"fail" => "red",
+	"fail" => "#8AA6B6",
 	"queued" => "blue",
 	"inprogress" => "blue"
 );
@@ -129,7 +129,7 @@ $b3plot->SetLegend("Disconnect");
 
 $b4plot = new BarPlot($data["F"]);
 $b4plot->SetFillColor($cpcolors["F"]);
-$b4plot->SetLegend("Failed");
+$b4plot->SetLegend("Unknown");
 
 $b5plot = new BarPlot($data["B"]);
 $b5plot->SetFillColor($cpcolors["B"]);
