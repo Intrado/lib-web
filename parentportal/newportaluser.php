@@ -108,7 +108,7 @@ if(!$success){
 		<br>Please check your email to activate your account.
 		<br>You will be redirected to the activate page in 5 seconds.
 	</div>
-	<meta http-equiv="refresh" content="5;url=activate.php">
+	<meta http-equiv="refresh" content="5;url=index.php?n">
 <?
 }
 endWindow();

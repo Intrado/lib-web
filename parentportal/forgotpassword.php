@@ -64,7 +64,7 @@ if(!$success){
 		<br>Please remember to change your password.
 		<br>You will be redirected to the activate page in 5 seconds.
 	</div>
-	<meta http-equiv="refresh" content="5;url=activate.php?forgot=1">
+	<meta http-equiv="refresh" content="5;url=index.php?f">
 <?
 }
 endWindow();
