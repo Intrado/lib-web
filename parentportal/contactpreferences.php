@@ -37,7 +37,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	if(isset($_SESSION['currentpersonpkey'])){
 		$personpkey = $_SESSION['currentpersonpkey'];
 	}
-	if(isset($contactList[$personpkey])){
+	if(isset($personpkey) && isset($contactList[$personpkey])){
 		$person = $contactList[$personpkey];
 		$PERSONID = $person->id;
 	}
