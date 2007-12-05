@@ -107,13 +107,13 @@ function jobConfirm($listname, $priority, $numdays=1)
 <?	} ?>
 
 	<message name="jobplayback">
-				<tts gender="female">You are about to submit a job to <?= $listsize ?> </tts>
+				<audio cmid="file://prompts/inbound/SubmitJobTo.wav" />
+				<tts gender="female"><?= $listsize ?> </tts>
 <?				if ($listsize == 1) { ?>
-					<tts gender="female"> person. </tts>
+					<audio cmid="file://prompts/inbound/PersonUsingList.wav" />
 <?				} else { ?>
-					<tts gender="female"> people. </tts>
+					<audio cmid="file://prompts/inbound/PeopleUsingList.wav" />
 <? 				} ?>
-				<tts gender="female">Using the list </tts>
 				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation2.wav" />
 				<tts gender="female"><?= htmlentities($priority, ENT_COMPAT, "UTF-8") ?></tts>

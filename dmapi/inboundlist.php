@@ -114,7 +114,7 @@ function playLists($incr, $emptylist = false)
 
 <?  if ($emptylist) { ?>
 	<message name="emptylist">
-		<tts gender="female">I'm sorry, that list is currently empty.  You must select a different list.</tts>
+		<audio cmid="file://prompts/inbound/EmptyList.wav" />
 	</message>
 <?  } ?>
 

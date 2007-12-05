@@ -76,7 +76,7 @@ function playJobtypes($incr)
 				// if jobtypes are on pages, provide * option
 				if ($SESSIONDATA['hasPaging']) {
 ?>
-					<tts gender="female">Press the star key to hear more job types</tts>
+					<audio cmid="file://prompts/inbound/MoreJobs.wav" />
 <?
 				}
 ?>
