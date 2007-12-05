@@ -139,9 +139,7 @@ doNavTabs($NAVTREE);
 		</tr>
 		</table>
 	</div>
-<?
-if(!isset($hidenav) || !$hidenav){
-?>
+
 	<div class="navmenuspacer">
 	<div class="navmenu">
 
@@ -174,9 +172,6 @@ if(!isset($hidenav) || !$hidenav){
 
 		<?= $SUBTABS ?>
 	</div>
-<?
-}
-?>
 	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 

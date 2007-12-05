@@ -10,9 +10,9 @@ Use of this system is subject to the <a href="privacy.html" target="_blank">Priv
 
 </div>
 <?
-if(!isset($hidenav) || !$hidenav){
-	print "<div id='logininfo' class='noprint' >Logged in as " . $_SESSION['portaluser']['portaluser.firstname'] . " " .$_SESSION['portaluser']['portaluser.lastname'] . " (" . $_SESSION['portaluser']['portaluser.username'] . ") <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
-}
+
+print "<div id='logininfo' class='noprint' >Logged in as " . $_SESSION['portaluser']['portaluser.firstname'] . " " .$_SESSION['portaluser']['portaluser.lastname'] . " (" . $_SESSION['portaluser']['portaluser.username'] . ") <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
+
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {
 		$ERRORS[$key] = addslashes($value);
