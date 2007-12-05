@@ -104,3 +104,7 @@ ALTER TABLE `customer`
 DROP `portaldbuser` ,
 DROP `portaldbpass` ;
 
+ALTER TABLE `portaluser` CHANGE `lastlogin` `lastlogin` BIGINT NULL DEFAULT NULL ;
+
+
+
