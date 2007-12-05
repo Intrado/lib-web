@@ -83,7 +83,7 @@ if ($badlogin) {
 }
 ?>
 <form method="POST" action="index.php" name="login">
-	<table border=0 cellpadding=0 cellspacing=0 width="100%" style="color: #365F8D;" >
+	<table width="100%" style="color: #365F8D;" >
 		<tr>
 			<td width="20%">&nbsp;</td>
 			<td>
@@ -103,26 +103,14 @@ if ($badlogin) {
 			<td>&nbsp;</td>
 		<tr>
 			<td>&nbsp;</td>
-			<td>Email: </td>
+			<td>Email: <br><input type="text" id="logintext" name="login" size="35" value="<?=$login?>"/> </td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><input type="text" id="logintext" name="login" size="35" value="<?=$login?>"/> </td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>Password&nbsp;(case sensitive):</td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>
-				<input style="float: left" type="password" name="password" size = "35" onkeypress="checkCapsLock(event)"/>
-				<div id="capslockwarning" style="visibility:hidden; color:red;">*Caps&nbsp;Lock&nbsp;is&nbsp;on.*</div>
+			<td>Password&nbsp;(case sensitive):<br><input type="password" name="password" size = "35" onkeypress="checkCapsLock(event)"/>
 			</td>
-			<td>&nbsp;</td>
+			<td><br><div id="capslockwarning"  style="float:left; border:1px solid red; visibility:hidden; color:black; background-color:white">*Caps&nbsp;Lock&nbsp;is&nbsp;on.*</div></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
