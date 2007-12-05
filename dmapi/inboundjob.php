@@ -72,7 +72,7 @@ function jobOptions()
 <?
 }
 
-function jobConfirm($listname, $priority, $numdays=1)
+function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 {
 	global $SESSIONID, $SESSIONDATA;
 
@@ -106,6 +106,7 @@ function jobConfirm($listname, $priority, $numdays=1)
 		</message>
 <?	} ?>
 
+<?	if ($playback) { ?>
 	<message name="jobplayback">
 				<audio cmid="file://prompts/inbound/SubmitJobTo.wav" />
 				<tts gender="female"><?= $listsize ?> </tts>
@@ -131,15 +132,15 @@ function jobConfirm($listname, $priority, $numdays=1)
 				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
 
 				<goto message="jobconfirm" />
-
 	</message>
+<?	} ?>
 
 	<message name="jobconfirm">
 		<field name="sendjob" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
 
 				<audio cmid="file://prompts/inbound/ConfirmJob.wav" />
-
+				<tts gender="female">Press the star key to hear these options again.</tts>
 			</prompt>
 
 			<choice digits="1" />
@@ -147,6 +148,7 @@ function jobConfirm($listname, $priority, $numdays=1)
 			<choice digits="3" />
 			<choice digits="4" />
 			<choice digits="5" />
+			<choice digits="*" />
 
 			<default>
 				<audio cmid="file://prompts/ImSorry.wav" />
@@ -384,7 +386,7 @@ function commitJob()
 	return false;
 }
 
-function checkExpirationThenConfirm()
+function checkExpirationThenConfirm($playback=true)
 {
 	global $SESSIONDATA;
 
@@ -406,7 +408,7 @@ function checkExpirationThenConfirm()
 		$listname = $SESSIONDATA['listname'];
 		$priority = $SESSIONDATA['priority'];
 		$numdays = $SESSIONDATA['numdays'];
-		jobConfirm($listname, $priority, $numdays);
+		jobConfirm($listname, $priority, $numdays, $playback);
 	} else {
 		promptStartTime(true, $invalidreason);
 	}
@@ -547,6 +549,11 @@ if($REQUEST_TYPE == "new"){
 			else if ($BFXML_VARS['sendjob'] == "5")
 			{
 				promptStartTime();
+			}
+			// replay confirmation options
+			else if ($BFXML_VARS['sendjob'] == "*")
+			{
+				checkExpirationThenConfirm(false); // do not playback job settings, just options
 			}
 
 	// they already entered job options, but returned to select a different list
