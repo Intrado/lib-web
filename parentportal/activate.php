@@ -88,18 +88,16 @@ if($forgot){
 	$TITLE = "Activate Account";
 }
 $hidenav = 1;
-include_once("nav.inc.php");
+include("cmlogintop.inc.php");
 
 if($forgot){
-	startWindow("Forgot Password" . help("Activateforgotpassword"));
 	$action = "?f";
 } else if($changeuser){
-	startWindow("Change Email" . help("Activatenewemail"));
 	$action = "?c";
 } else {
-	startWindow("Activate" . help("Activateaccount"));
 	$action = "?n";
 }
+
 if($forgotsuccess){
 	?>
 	<div style="margin:5px">
@@ -136,7 +134,7 @@ if($forgotsuccess){
 if($form){
 ?>
 	<form method="POST" action="<?=$action?>" name="activate">
-		<table>
+		<table  style="color: #365F8D;" >
 			<tr>
 				<td>Confirmation Code: </td>
 				<td><input type="text" name="token" value="<?=$token?>" size="50" /></td>
@@ -174,6 +172,6 @@ if($form){
 	</form>
 <?
 }
-endWindow();
-include_once("navbottom.inc.php");
+
+include_once("cmloginbottom.inc.php");
 ?>
