@@ -214,8 +214,8 @@ new getObj('logintext').obj.focus();
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td style="font-size: 12px;"><div style="margin-left: 50px;">Password:<br><input type="password" name="password" size="35"></div></td>
-				<td>&nbsp;</td>
+				<td style="font-size: 12px;"><div style="margin-left: 50px;">Password:<br><input type="password" name="password" size="35" onkeypress="checkCapsLock(event)"></div></td>
+				<td style="font-size: 12px;"><br><div id="capslockwarning"  style=" float:left; border:1px solid red; visibility:hidden; color:black; background-color:white">*Caps&nbsp;Lock&nbsp;is&nbsp;on.*</div></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
@@ -252,6 +252,16 @@ new getObj('logintext').obj.focus();
 
 <script langauge="javascript">
 document.getElementById('logintext').focus();
+
+function checkCapsLock(e){
+	<? //taken from http://www.codeproject.com/KB/scripting/Detect_Caps_Lock.aspx ?>
+	keycode = e.keyCode ? e.keyCode : e.which;
+	shiftkey = e.shiftKey ? e.shiftKey : ((keycode == 16) ? true : false);
+	if(((keycode >= 65 && keycode <= 90) && !shiftkey) || ((keycode >= 97 && keycode <= 122) && shiftkey))
+		document.getElementById('capslockwarning').style.visibility = 'visible';
+	else
+		document.getElementById('capslockwarning').style.visibility = 'hidden';
+}
 </script>
 
 </body>
