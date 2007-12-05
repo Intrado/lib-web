@@ -77,7 +77,7 @@ if( $reloadform )
 	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999");
 }
 
-$PAGE = "messages:account";
+$PAGE = "account:account";
 $TITLE = "Account Information: " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
 include_once("nav.inc.php");
 NewForm($f);
