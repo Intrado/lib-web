@@ -53,7 +53,7 @@ if(!$success){
 			</tr>
 			<tr><td>&nbsp;</td><td><?=submit("forgotpassword", "main", "Submit")?></td></tr>
 	</form>
-	<tr><td>&nbsp;</td><td><a href="index.php">Return to Contact Manager Login</a></td></tr>
+	<tr><td colspan="2"><a href="index.php">Return to Contact Manager Login</a></td></tr>
 </table>
 
 
