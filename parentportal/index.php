@@ -82,33 +82,25 @@ if ($badlogin) {
 <?
 }
 ?>
-
-<table width = "100%"  style="color: #365F8D;" >
-	<tr>
-		<td width="20%">&nbsp;</td>
-		<td>
-			<div style="font-size: 20px; font-weight: bold;">Contact Manager</div>
-			<div style="font-size: 12px;">Manage your contact preferences</div>
-		</td>
-		<td width="80%">&nbsp;</td>
-	</tr>
-	<tr>
-		<td>&nbsp;</td>
-		<td><a href="newportaluser.php">Sign Up Now(this is a button)</a></td>
-		<td>&nbsp;</td>
-	</tr>
-	
-	<tr>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-	</tr>
-	<tr>
-		<th>&nbsp;</th>
-		<th>Already have an account?</th>
-		<th>&nbsp;</th>
-	</tr>
-	<form method="POST" action="index.php" name="login">
+<form method="POST" action="index.php" name="login">
+	<table border=0 cellpadding=0 cellspacing=0 width="100%" style="color: #365F8D;" >
+		<tr>
+			<td width="20%">&nbsp;</td>
+			<td>
+				<div style="font-size: 20px; font-weight: bold;">Contact Manager</div>
+				<div style="font-size: 12px;">Manage your contact preferences...</div>
+			</td>
+			<td width="80%">&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><a href="newportaluser.php">Sign Up Now(this is a button)</a></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><br><div style="font-weight: bold;">Already have an account?</div></td>
+			<td>&nbsp;</td>
 		<tr>
 			<td>&nbsp;</td>
 			<td>Email: </td>
@@ -116,7 +108,7 @@ if ($badlogin) {
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><input type="text" id="logintext" name="login" size="30" value="<?=$login?>"/> </td>
+			<td><input type="text" id="logintext" name="login" size="35" value="<?=$login?>"/> </td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
@@ -126,7 +118,10 @@ if ($badlogin) {
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><input type="password" name="password" size = "30"/> </td>
+			<td>
+				<input style="float: left" type="password" name="password" size = "35" onkeypress="checkCapsLock(event)"/>
+				<div id="capslockwarning" style="visibility:hidden; color:red;">*Caps&nbsp;Lock&nbsp;is&nbsp;on.*</div>
+			</td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
@@ -139,12 +134,22 @@ if ($badlogin) {
 			<td align="right"><div style="text-align: right;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
 			<td>&nbsp;</td>
 		</tr>
-	</form>
-
-</table>
+	</table>
+</form>
 <?
 include("cmloginbottom.inc.php");
 ?>
 <script langauge="javascript">
 document.getElementById('logintext').focus();
+
+function checkCapsLock(e){
+	<? //taken from http://www.codeproject.com/KB/scripting/Detect_Caps_Lock.aspx ?>
+	keycode = e.keyCode ? e.keyCode : e.which;
+	shiftkey = e.shiftKey ? e.shiftKey : ((keycode == 16) ? true : false);
+	if(((keycode >= 65 && keycode <= 90) && !shiftkey) || ((keycode >= 97 && keycode <= 122) && shiftkey))
+		new getObj('capslockwarning').obj.style.visibility = 'visible';
+	else
+		new getObj('capslockwarning').obj.style.visibility = 'hidden';
+}
+
 </script>
