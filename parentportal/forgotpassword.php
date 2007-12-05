@@ -33,24 +33,24 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 $PAGE = ":";
 $TITLE = "Password Assistance";
 $hidenav = 1;
-include_once("nav.inc.php");
-startWindow("Send Reset Password" . help('Forgotpassword'));
+include_once("cmlogintop.inc.php");
 if($generalerror){
 	error("There was a problem with your request.  Please try again later");
 }
+
 if(!$success){
 ?>
 <br>
 <div>We will email you a link to a page where you can reset your password</div>
 <br>
-<table>
+<table  style="color: #365F8D;" >
 	<form method="POST" action="forgotpassword.php" name="forgotpassword">
 			<tr>
-				<td>Enter Your Email:</td>
+				<td>Enter Your Email Address:</td>
 				<td><input type="text" name="email1" size="30" value="<?=$email1?>"></td>
 			</tr>
 			<tr>
-				<td>Confirm Email:</td>
+				<td>Please Confirm Your Email Address:</td>
 				<td><input type="text" name="email2" size="30" value="<?=$email2?>"></td>
 			</tr>
 			<tr><td>&nbsp;</td><td><?=submit("forgotpassword", "main", "Submit")?></td></tr>
@@ -70,6 +70,5 @@ if(!$success){
 	<meta http-equiv="refresh" content="5;url=index.php?f">
 <?
 }
-endWindow();
-include_once("navbottom.inc.php");
+include_once("cmloginbottom.inc.php");
 ?>

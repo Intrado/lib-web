@@ -55,15 +55,14 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 $hidenav = 1;
 $TITLE = "Create a New Account";
 $PAGE = ":";
-include_once("nav.inc.php");
-startWindow("Enter Your Information");
+include_once("cmlogintop.inc.php");
 if(!$success){
 ?>
 	<form method="POST" action="newportaluser.php" name="newaccount">
-		<table>
+		<table  style="color: #365F8D;" >
 			<tr>
 				<td>Email&nbsp;(this will be your login name):</td>
-				<td><input type="text" name="login" value="<?=$login?>" size="50" maxlength="255"/> </td>
+				<td><input type="text" name="login" value="<?=$login?>" size="45" maxlength="255"/> </td>
 			</tr>
 			<tr>
 				<td>Password: </td>
@@ -89,14 +88,13 @@ if(!$success){
 				<td colspan="2"><div style="overflow:scroll; height:250px;"><?=$tos ?></div></td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="acceptterms"/> Accept Terms of Service</td>
-				<td>&nbsp;</td>
+				<td colspan="2"><input type="checkbox" name="acceptterms"/> Accept Terms of Service</td>
+			</tr>
 			<tr>
-				<td>&nbsp;</td>
-				<td><?=submit("newaccount", "main", "Create Account")?></td>
+				<td colspan="2"><?=submit("newaccount", "main", "Create Account")?></td>
+			</tr>
 			<tr>
-				<td>&nbsp;</td>
-				<td><a href="index.php">Return to Contact Manager Login</a></td>
+				<td colspan="2"><a href="index.php">Return to Contact Manager Login</a></td>
 			</tr>
 		</table>
 	</form>
@@ -111,6 +109,5 @@ if(!$success){
 	<meta http-equiv="refresh" content="5;url=index.php?n">
 <?
 }
-endWindow();
-include_once("navbottom.inc.php");
+include_once("cmloginbottom.inc.php");
 ?>

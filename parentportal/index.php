@@ -69,28 +69,82 @@ if($id){
 	redirect("choosecustomer.php");
 }
 
-$PAGE = ":";
-$TITLE = "Contact Manager Login";
-$hidenav = 1;
-include_once("nav.inc.php");
-startWindow("Login");
+
+include_once("cmlogintop.inc.php");
+?>
+
+
+
+<?
 if ($badlogin) {
 ?>
 	<div style="color: red;">Incorrect username/password. Please try again.</div>
 <?
 }
 ?>
-<table>
+
+<table width = "100%"  style="color: #365F8D;" >
+	<tr>
+		<td width="20%">&nbsp;</td>
+		<td>
+			<div style="font-size: 20px; font-weight: bold;">Contact Manager</div>
+			<div style="font-size: 12px;">Manage your contact preferences</div>
+		</td>
+		<td width="80%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><a href="newportaluser.php">Sign Up Now(this is a button)</a></td>
+		<td>&nbsp;</td>
+	</tr>
+	
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<th>&nbsp;</th>
+		<th>Already have an account?</th>
+		<th>&nbsp;</th>
+	</tr>
 	<form method="POST" action="index.php" name="login">
-		<tr><td>Email: </td><td><input type="text" name="login" size="30" value="<?=$login?>"/> </td></tr>
-		<tr><td>Password: </td><td><input type="password" name="password" /> </td></tr>
-		<tr><td>&nbsp;</td><td><?=submit("login", "main", "Login") ?></td></tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>Email: </td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><input type="text" id="logintext" name="login" size="30" value="<?=$login?>"/> </td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>Password&nbsp;(case sensitive):</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><input type="password" name="password" size = "30"/> </td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><a href="forgotpassword.php">Forgot your password? Click Here!</a></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td align="right"><div style="text-align: right;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
+			<td>&nbsp;</td>
+		</tr>
 	</form>
 
-<tr><td>&nbsp;</td><td><a href="newportaluser.php"> Create a new account</a></td></tr>
-<tr><td>&nbsp;</td><td><a href="forgotpassword.php">I forgot my password</a></td></tr>
 </table>
 <?
-endWindow();
-include_once("navbottom.inc.php");
+include("cmloginbottom.inc.php");
 ?>
+<script langauge="javascript">
+document.getElementById('logintext').focus();
+</script>
