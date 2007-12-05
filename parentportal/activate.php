@@ -77,9 +77,6 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 }
 
-
-
-$PAGE = ":";
 if($forgot){
 	$TITLE = "Forgot Password";
 } else if($changeuser){
@@ -87,9 +84,7 @@ if($forgot){
 } else {
 	$TITLE = "Activate Account";
 }
-$hidenav = 1;
 include("cmlogintop.inc.php");
-
 if($forgot){
 	$action = "?f";
 } else if($changeuser){

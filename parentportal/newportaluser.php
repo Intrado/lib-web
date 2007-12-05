@@ -52,9 +52,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 }
 
-$hidenav = 1;
 $TITLE = "Create a New Account";
-$PAGE = ":";
 include_once("cmlogintop.inc.php");
 if(!$success){
 ?>

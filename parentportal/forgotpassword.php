@@ -30,9 +30,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 }
 
-$PAGE = ":";
 $TITLE = "Password Assistance";
-$hidenav = 1;
 include_once("cmlogintop.inc.php");
 if($generalerror){
 	error("There was a problem with your request.  Please try again later");
