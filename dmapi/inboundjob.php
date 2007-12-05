@@ -419,15 +419,12 @@ if($REQUEST_TYPE == "new"){
 	<error>inboundjob: wanted continue, got new </error>
 	<?
 } else if($REQUEST_TYPE == "continue") {
+	glog("job continue...");
 
 	// if they entered the job options
 	if (isset($BFXML_VARS['numdays'])) {
 
 			$SESSIONDATA['numdays'] = $BFXML_VARS['numdays'];
-
-			global $USER;
-			$USER = new User($SESSIONDATA['userid']);
-			$VALIDJOBTYPES = array_values(JobType::getUserJobTypes());
 
 			// if they are reentering job options, jump ahead to job confirm
 			if (isset($SESSIONDATA['starttime']) &&
@@ -520,6 +517,7 @@ if($REQUEST_TYPE == "new"){
 
 	// if they listened to confirmation
 	} else if (isset($BFXML_VARS['sendjob'])) {
+			glog("sendjob ".$BFXML_VARS['sendjob']);
 
 			// send the job
 			if ($BFXML_VARS['sendjob'] == "1" &&
@@ -531,13 +529,13 @@ if($REQUEST_TYPE == "new"){
 			// replay list selection
 			else if ($BFXML_VARS['sendjob'] == "2")
 			{
-				$SESSIONDATA['currentListPage'] = 0; // reset paging
+				unset($SESSIONDATA['currentListPage']); // reset paging
 				forwardToPage("inboundlist.php");
 			}
 			// replay job type selection
 			else if ($BFXML_VARS['sendjob'] == "3")
 			{
-				$SESSIONDATA['currentJobtypePage'] = 0; // reset paging
+				unset($SESSIONDATA['currentJobtypePage']); // reset paging
 				forwardToPage("inboundjobtype.php");
 			}
 			// replay numdays option

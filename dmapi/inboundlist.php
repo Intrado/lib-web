@@ -224,25 +224,23 @@ if($REQUEST_TYPE == "new"){
 			if ($listsize == 0) {
 				playLists(true, true);
 			} else {
+				// they already entered job options, but returned to select a different list
+				// so keep their options and replay the confirm
+				if ( isset($SESSIONDATA['listname']) &&
+					isset($SESSIONDATA['priority']) &&
+					isset($SESSIONDATA['numdays']) &&
+					isset($SESSIONDATA['starttime']) &&
+					isset($SESSIONDATA['stoptime'])) {
 
-
-			// they already entered job options, but returned to select a different list
-			// so keep their options and replay the confirm
-			if ( isset($SESSIONDATA['listname']) &&
-				isset($SESSIONDATA['priority']) &&
-				isset($SESSIONDATA['numdays']) &&
-				isset($SESSIONDATA['starttime']) &&
-				isset($SESSIONDATA['stoptime'])) {
-
-				forwardToPage("inboundjob.php");
-			}
-
-			// user selected list, go to job options
-			forwardToPage("inboundjobtype.php");
+					forwardToPage("inboundjob.php");
+				} else {
+					// user selected list, go to job options
+					forwardToPage("inboundjobtype.php");
+				}
 			}
 		}
 	// play the current page of lists
-	} else if (isset($BFXML_VARS['confirmContinue']) || isset($SESSIONDATA['currentListPage'])) {
+	} else if (isset($BFXML_VARS['confirmContinue']) || isset($SESSIONDATA['currentListPage']) || isset($SESSIONDATA['listid'])) {
 		playLists(true);
 
 	// confirm that they wish to continue setting up their job, or they exit after recording messages
