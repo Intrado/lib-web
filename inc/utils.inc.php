@@ -409,7 +409,7 @@ function destination_label_popup_paragraph($type){
 	}
 	$labels = implode(",<br>", $labels);
 	
-	$hover = '<span ' . $extrahtml . '>';
+	$hover = '<span>';
 	$hover .= '<div style="color:#346799"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
