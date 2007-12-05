@@ -61,7 +61,7 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 			error("There was an error generating a new token");
 		}
 	}
-	
+
 	if(isset($_GET['revoke'])){
 		$revokeid = $_GET['revoke'] + 0;
 		$count = revokePersonTokens(array($revokeid));
@@ -71,7 +71,7 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 			error("There was an error revoking this person's token");
 		}
 	}
-	
+
 	if(isset($_GET['disassociate'])){
 		$portaluserid = $_GET['disassociate'] + 0;
 		$count = QuickUpdate("delete from portalperson where personid = '" . $personid . "' and portaluserid = '" . $portaluserid . "'");
@@ -93,7 +93,7 @@ if (!$maxphones = getSystemSetting("maxphones"))
 
 if (!$maxemails = getSystemSetting("maxemails"))
 	$maxemails = 2;
-	
+
 if (!$maxsms = getSystemSetting("maxsms"))
 	$maxsms = 2;
 
@@ -118,7 +118,7 @@ if (isset($personid)) {
 		}
 	}
 	$types["phone"] = $phones;
-	
+
 	$tempemails = resequence(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"), "sequence");
 	$emails = array();
 	for ($i=0; $i<$maxemails; $i++) {
@@ -131,7 +131,7 @@ if (isset($personid)) {
 		}
 	}
 	$types["email"] = $emails;
-	
+
 	if(getSystemSetting("_hassms", false)){
 		$tempsmses = resequence(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"), "sequence");
 		for ($i=0; $i<$maxsms; $i++) {
@@ -219,9 +219,9 @@ if(CheckFormSubmit($f,$s))
 							(!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
 										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id])){
 								QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-											values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','" 
+											values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','"
 											. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "')");
-							} else if(isset($contactprefs[$type][$item->sequence][$jobtype->id]) && 
+							} else if(isset($contactprefs[$type][$item->sequence][$jobtype->id]) &&
 										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id]){
 								QuickUpdate("update contactpref set enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'
 												where personid = '" . $personid . "' and jobtypeid = '" . $jobtype->id . "' and sequence = '" . $item->sequence . "'");
@@ -256,7 +256,7 @@ if( $reloadform )
 				PutFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
 			}
 		}
-	}	
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ foreach ($fieldmaps as $map) {
 		<th align="right" class="windowRowHeader bottomBorder">Contact Details: </th>
 		<td class="bottomBorder">
 			<table  cellpadding="2" cellspacing="1">
-				
+
 <?
 
 
@@ -469,7 +469,7 @@ foreach ($fieldmaps as $map) {
 <?
 				foreach($associates as $portaluserid => $associate){
 					if($associate['portaluser.lastlogin']){
-						$lastlogin = date("M d, Y h:i:s a", strtotime($associate['portaluser.lastlogin']));
+						$lastlogin = date("M d, Y h:i a", $associate['portaluser.lastlogin'] / 1000);
 					} else {
 						$lastlogin = "Never";
 					}
@@ -514,9 +514,9 @@ foreach ($fieldmaps as $map) {
 						echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1'");
 					else
 						echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1'");
-?>					
+?>
 					</td>
-<?	
+<?
 					if($tokendata['token']){
 ?>
 						<td>
