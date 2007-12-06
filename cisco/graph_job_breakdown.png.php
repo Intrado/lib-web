@@ -21,12 +21,9 @@ $job = new Job($jobid);
 $query = "
 select count(*) as cnt,
 		coalesce(
-			if(rp.status = 'nocontacts','nocontacts', null),
-			if(rp.status = 'duplicate','duplicate', null),
-			if(rp.status = 'blocked','blocked', null),
 			if(rc.result not in ('A', 'M') and rc.numattempts > '0' and rc.numattempts < js.value and j.status not in ('complete','cancelled'), 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
-			if(rc.result not in ('A', 'M') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
+			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
 			rc.result)
 			as callprogress2
 
@@ -46,15 +43,11 @@ $cpcolors = array(
 	"B" => "orange",
 	"N" => "tan",
 	"X" => "black",
-	"F" => "red",
+	"F" => "#8AA6B6",
 	"C" => "yellow",
-	"duplicate" => "lightgray",
-	"nocontacts" => "#aaaaaa",
 	"inprogress" => "blue",
 	"retry" => "cyan",
-	"scheduled" => "darkblue",
-	"blocked" => "#CC00CC"
-
+	"scheduled" => "darkblue"
 );
 
 
@@ -64,14 +57,11 @@ $cpcodes = array(
 	"B" => "Busy",
 	"N" => "No Answer",
 	"X" => "Disconnect",
-	"F" => "Failed",
+	"F" => "Unknown",
 	"C" => "Calling",
-	"duplicate" => "Duplicate",
-	"nocontacts" => "No Phone #",
 	"inprogress" => "Queued",
 	"retry" => "Retrying",
-	"scheduled" => "Scheduled",
-	"blocked" => "Blocked"
+	"scheduled" => "Scheduled"
 );
 
 //preset array positions
@@ -85,17 +75,16 @@ $data = array(
 	"B" => false,
 	"N" => false,
 	"X" => false,
-	"duplicate" => false,
-	"nocontacts" => false,
-	"F" => false,
-	"blocked" => false
+	"F" => false
 );
 $legend = $data;
 $colors = $data;
 
 if ($result = Query($query)) {
 	while ($row = DBGetRow($result)) {
-		if($row[1] == "fail"){
+		if(!isset($data[$row[1]])){
+			continue;
+		} else if($row[1] == "fail"){
 			$row[1] = "F";
 			$data[$row[1]] += $row[0];
 		}else

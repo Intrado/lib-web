@@ -12,14 +12,11 @@ $cpcolors = array(
 	"B" => "orange",
 	"N" => "tan",
 	"X" => "black",
-	"F" => "red",
+	"F" => "#8AA6B6",
 	"C" => "yellow",
-	"duplicate" => "lightgray",
-	"nocontacts" => "#aaaaaa",
 	"inprogress" => "blue",
 	"retry" => "cyan",
-	"scheduled" => "darkblue",
-	"blocked" => "#CC00CC"
+	"scheduled" => "darkblue"
 );
 
 $cpcodes = array(
@@ -28,29 +25,29 @@ $cpcodes = array(
 	"B" => "Busy",
 	"N" => "No Answer",
 	"X" => "Disconnect",
-	"F" => "Failed",
+	"F" => "Unknown",
 	"C" => "Calling",
-	"duplicate" => "Duplicate",
-	"nocontacts" => "No Phone #",
 	"inprogress" => "Queued",
 	"retry" => "Retry",
-	"scheduled" => "Scheduled",
-	"blocked" => "Blocked"
+	"scheduled" => "Scheduled"
 );
 
 
 $query = "
 select count(*) as cnt,
-		coalesce(if(rp.status = 'nocontacts','nocontacts', null),
-			if(rc.result not in ('A', 'M', 'blocked', 'duplicate') and rc.numattempts > 0 and rc.numattempts < js.value, 'retry', if(rc.result='notattempted', null, rc.result)),
-			if (rp.status not in ('fail','duplicate','scheduled', 'blocked'), 'inprogress', rp.status))
+		coalesce(
+			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts > '0' and rc.numattempts < js.value, 'retry', null),
+			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
+			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = '0', 'inprogress', null),
+			rc.result)
 			as callprogress2
+
 from job j
 inner join reportperson rp on (rp.jobid=j.id)
 left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 inner join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-where j.userid=$USER->id and j.status='active'
-and rp.type='phone'
+where j.userid = '$USER->id' and j.status = 'active'
+and rp.type = 'phone'
 group by callprogress2
 ";
 
@@ -63,19 +60,18 @@ $data = array(
 	"X" => false,
 	"F" => false,
 	"C" => false,
-	"duplicate" => false,
-	"nocontacts" => false,
 	"inprogress" => false,
 	"retry" => false,
-	"scheduled" => false,
-	"blocked" => false
+	"scheduled" => false
 );
 $legend = $data;
 $colors = $data;
 
 if ($result = Query($query)) {
 	while ($row = DBGetRow($result)) {
-		if($row[1] == "fail"){
+		if(!isset($data[$row[1]])){
+			continue;
+		} else if($row[1] == "fail"){
 			$row[1] = "F";
 			$data[$row[1]] += $row[0];
 		}else
