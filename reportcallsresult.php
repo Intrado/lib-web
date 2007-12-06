@@ -204,15 +204,17 @@ if(isset($options['rules']) && $options['rules']){
 	startWindow("Search Results");
 		if(count($data) > 0){
 ?>
-			<div>Your search returned more than one result. Please choose one:<div>
+			<div>Your search returned more than one result. 
+			<br>Please select one of the following:<div>
 <?
 		} else {
 ?>
 			<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
 <?
 		}
-?>		
-	<table>
+?>	
+	<br>	
+	<table class="list" cellpadding="3" cellspacing="1" >
 		
 <?
 		showTable($data, $titles, $formatters);
