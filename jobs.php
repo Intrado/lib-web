@@ -100,7 +100,7 @@ $TITLE = "Notification Jobs";
 include_once("nav.inc.php");
 
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by id desc");
-$titles = array(	"name" => "#Name",
+$titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"type" => "#Deliver by",
 					"startdate" => "Start date",
@@ -136,7 +136,7 @@ print '<br>';
 if ($USER->authorize('createrepeat')) {
 
 	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type != 'survey' order by foo,name ");
-	$titles = array(	"name" => "#Name",
+	$titles = array(	"name" => "#Job Name",
 						"description" => "#Description",
 						"type" => "#Deliver by",
 						"startdate" => "Next Scheduled Run",
@@ -165,7 +165,7 @@ if ($USER->authorize('createrepeat')) {
 
 
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc");
-$titles = array(	"name" => "#Name",
+$titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"type" => "#Deliver by",
 					"startdate" => "Start Date",

@@ -94,7 +94,7 @@ if ($USER->authorize("startstats")) {
 			button_bar(button('Refresh', 'window.location.reload()'));
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='scheduled' or status='procactive' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
-			$titles = array(	"name" => "Name",
+			$titles = array(	"name" => "Job Name",
 								"type" => "Deliver by",
 								"Status" => "Status",
 								"responses" => "Responses (Unplayed/Total)",
@@ -114,7 +114,7 @@ if ($USER->authorize("startstats")) {
 			startWindow('My Completed Notifications ' . help('Start_MyCompletedJobs'),NULL,true);
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
-			$titles = array(	"name" => "Name",
+			$titles = array(	"name" => "Job Name",
 								"type" => "Deliver by",
 								"Status" => "Status",
 								"enddate" => "End Date",
@@ -137,7 +137,7 @@ if ($USER->authorize("startstats")) {
 				button_bar(button('Refresh', 'window.location.reload()'));
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='procactive' or status='processing' or status='scheduled') and type='survey' and deleted = 0 order by id desc limit $limit");
-				$titles = array(	"name" => "Name",
+				$titles = array(	"name" => "Job Name",
 									"type" => "Deliver by",
 									"Status" => "Status",
 									"responses" => "Responses (Unplayed/Total)",
@@ -157,7 +157,7 @@ if ($USER->authorize("startstats")) {
 				startWindow('My Completed Surveys ' . help('Start_MyCompletedJobs'),NULL,true);
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type='survey' and deleted = 0 order by finishdate desc limit $limit");
-				$titles = array(	"name" => "Name",
+				$titles = array(	"name" => "Job Name",
 									"type" => "Deliver by",
 									"Status" => "Status",
 									"enddate" => "End Date",
