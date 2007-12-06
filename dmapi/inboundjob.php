@@ -140,7 +140,6 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 			<prompt repeat="1">
 
 				<audio cmid="file://prompts/inbound/ConfirmJob.wav" />
-				<tts gender="female">Press the star key to hear these options again.</tts>
 			</prompt>
 
 			<choice digits="1" />
