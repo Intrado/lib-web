@@ -47,12 +47,6 @@ if(isset($_GET['customerid']) && $_GET['customerid']){
 	}
 }
 
-if(isset($_GET['logoutcustomer'])){
-	unset($_SESSION['customerid']);
-	redirect();
-}
-
-
 $PAGE = ":";
 $TITLE = "Choose A District/School";
 $hidenav = 1;
