@@ -554,7 +554,7 @@ startWindow('Job Information');
 ?>
 				<tr>
 					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('phoneoptions'); else hide('phoneoptions');\""); ?></td>
+					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('phone'); else hideSection('phone')\""); ?></td>
 				</tr>
 <?
 				}
@@ -562,7 +562,7 @@ startWindow('Job Information');
 ?>
 				<tr>
 					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('emailoptions'); else hide('emailoptions');\""); ?></td>
+					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('email'); else hideSection('email');\""); ?></td>
 				</tr>
 <?
 				}
@@ -570,7 +570,7 @@ startWindow('Job Information');
 ?>
 				<tr>
 					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) show('smsoptions'); else hide('smsoptions');\""); ?></td>
+					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('sms'); else hideSection('sms');\""); ?></td>
 				</tr>
 <?
 				}
@@ -582,6 +582,8 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Settings:<br></th>
 		<td class="bottomBorder">
+			&nbsp;
+			<div id="settings" style="display:none">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
 					<td width="30%" >Job Name</td>
@@ -687,13 +689,14 @@ startWindow('Job Information');
 					<td><? NewFormItem($f,$s,"sendreport","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Report</td>
 				</tr>
 			</table>
+			</div>
 		</td>
 	</tr>
 <? if($USER->authorize('sendphone')) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
-			&nbsp;
+			<div id='displayphoneoptions'>If you would like to send a phone message, <a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true">click here</a></div>
 			<div id='phoneoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
@@ -746,7 +749,7 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 		<td class="bottomBorder">
-			&nbsp;
+			<div id='displayemailoptions'>If you would like to send an email message, <a href="#" onclick="displaySection('email'); new getObj('sendemail').obj.checked=true">click here</a></div>
 			<div id='emailoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
@@ -772,7 +775,7 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" valign="top" class="windowRowHeader">Print</th>
 		<td>
-			&nbsp;
+			<div id='displayprintoptions'>If you would like to send a print message, <a href="#" onclick="displaySection('print'); new getObj('sendprint').obj.checked=true">click here</a></div>
 			<div id='printoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
@@ -806,7 +809,7 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
-			&nbsp;
+			<div id='displaysmsoptions'>If you would like to send an SMS message, <a href="#" onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true">click here</a></div>
 			<div id='smsoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
@@ -841,15 +844,21 @@ include_once("navbottom.inc.php");
 		}
 		if(new getObj('sendsms').obj.checked){
 			show('smsoptions');
+			hide('displaysmsoptions');
 		}
 <?
 	}
 ?>
 	if(new getObj('sendphone').obj.checked){
 		show('phoneoptions');
+		hide('displayphoneoptions');
 	}
 	if(new getObj('sendemail').obj.checked){
 		show('emailoptions');
+		hide('displayemailoptions');
+	}
+	if(new getObj('sendemail').obj.checked || new getObj('sendphone').obj.checked || new getObj('sendsms').obj.checked ){
+		show('settings');
 	}
 
 	function limit_chars(field) {
@@ -883,6 +892,44 @@ function formatDate(Ob) {
 		var month = 3 * getMonth()
     	return months.substring(month, month + 3) + " " + getDate() + ", " + getFullYear()
 	} // TODO - add on change handler to the start date text box
+}
+
+function displaySection(section){
+	switch(section){
+		case 'phone':
+			show('phoneoptions');
+			hide('displayphoneoptions');
+			break;
+		case 'email':
+			show('emailoptions');
+			hide('displayemailoptions');
+			break;
+		case 'sms':
+			show('smsoptions');
+			hide('displaysmsoptions');
+			break;
+	}
+	show('settings');
+}
+
+function hideSection(section){
+	switch(section){
+		case 'phone':
+			hide('phoneoptions');
+			show('displayphoneoptions');
+			break;
+		case 'email':
+			hide('emailoptions');
+			show('displayemailoptions');
+			break;
+		case 'sms':
+			hide('smsoptions');
+			show('displaysmsoptions');
+			break;
+	}
+	if(!(new getObj('sendemail').obj.checked) && !(new getObj('sendphone').obj.checked) && !(new getObj('sendsms').obj.checked) ){
+		hide('settings');
+	}
 }
 
 </script>
