@@ -48,16 +48,16 @@ if(isset($_GET['customerid']) && $_GET['customerid']){
 }
 
 $PAGE = ":";
-$TITLE = "Choose A District/School";
+$TITLE = "Select an Account";
 $hidenav = 1;
 include_once("nav.inc.php");
-startWindow("Districts/Schools");
+startWindow("Select Account");
 ?>
 <div style="margin:5px">
-	You have students in multiple districts/schools
-	<br>Please choose one of the districts/schools you are associated with:
+	You have contacts associated with more than one customer account.
+	<br>Please select the account you would like to access:
 	<table cellpadding="3" cellspacing="1" class="list">
-		<tr><th class="listHeader">District/School Name</th></tr>
+		<tr><th class="listHeader">Customer Accounts</th></tr>
 <?
 		$alt = 0;
 		foreach($customerlist as $index => $customername){
