@@ -210,7 +210,7 @@ class JobDetailReport extends ReportGenerator{
 
 		showPageMenu($total,$pagestart,500);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
-		$titles = array(0 => "Job",
+		$titles = array(0 => "Job Name",
 						1 => "Submitted By",
 						2 => "ID#",
 						3 => "First Name",
