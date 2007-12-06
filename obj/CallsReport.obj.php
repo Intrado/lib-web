@@ -118,7 +118,8 @@ class CallsReport extends ReportGenerator{
 				$line[] = $row[5];
 				$line[] = $time;
 				$line[] = $res;
-				for($i=0; $i<count($queryfields); $i++){
+				//generatefields returns a string beginning with a comma so the count of generatefields is 1 plus the count of f-fields
+				for($i=0; $i<count($queryfields)-1; $i++){
 					$line[] = $row[8+$i];
 				}
 				$data[] = $line;
