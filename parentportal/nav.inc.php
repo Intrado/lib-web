@@ -143,7 +143,7 @@ doNavTabs($NAVTREE);
 	<div class="navmenuspacer">
 	<div class="navmenu">
 
-		<?= $MAINTABS ?>
+		<? if(isset($_SESSION['customerid'])) echo $MAINTABS ?>
 
 		<div class="applinks hoverlinks">
 			<a href="account.php">My Account</a> |
@@ -168,10 +168,7 @@ doNavTabs($NAVTREE);
 	</div>
 
 
-	<div class="subnavmenu hoverlinks">
-
-		<?= $SUBTABS ?>
-	</div>
+	<div class="subnavmenu hoverlinks"></div>
 	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
