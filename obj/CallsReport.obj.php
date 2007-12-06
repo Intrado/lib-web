@@ -53,6 +53,7 @@ class CallsReport extends ReportGenerator{
 		$this->query = 
 				"Select
 					j.name as jobname,
+					u.login as username,
 					jt.name as jobtype,
 					rp.type as type,
 					coalesce(m.name, sq.name) as message,
@@ -74,6 +75,7 @@ class CallsReport extends ReportGenerator{
 					inner join jobtype jt on (j.jobtypeid = jt.id)
 					left join message m on (m.id = rp.messageid)
 					left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
+					inner join user u on (u.id = j.userid)
 					where 1
 					$search
 					$rulesql
@@ -98,13 +100,13 @@ class CallsReport extends ReportGenerator{
 		// parse through data and seperate attempts.
 		// if no attempt made, look at rp.status for reason(index 5)
 		while($row = DBGetRow($result)){
-			$tmp = explode(",",$row[5]);
+			$tmp = explode(",",$row[6]);
 			
 			foreach($tmp as $attempt){
 				$line = array();
 				if($attempt == ""){
 					$time = "";
-					$res = $row[6];
+					$res = $row[7];
 				} else {
 					list($time, $res) = explode(":", $attempt);
 				}
@@ -113,10 +115,11 @@ class CallsReport extends ReportGenerator{
 				$line[] = $row[2];
 				$line[] = $row[3];
 				$line[] = $row[4];
+				$line[] = $row[5];
 				$line[] = $time;
 				$line[] = $res;
 				for($i=0; $i<count($queryfields); $i++){
-					$line[] = $row[7+$i];
+					$line[] = $row[8+$i];
 				}
 				$data[] = $line;
 			}
@@ -125,7 +128,7 @@ class CallsReport extends ReportGenerator{
 		// index 5 is date/time column
 		$temparray = $data;
 		foreach($data as $index => $row){
-			$temparray[$index] = $row[5];
+			$temparray[$index] = $row[6];
 		}
 		$tempdata=array();
 		if(asort($temparray, SORT_NUMERIC)){
@@ -140,18 +143,19 @@ class CallsReport extends ReportGenerator{
 		
 		
 		$titles = array("0" => "Job Name",
-						"1" => "Job Type",
-						"3" => "Message",
-						"2" => "Deliver by",
-						"4" => "Destination",
-						"5" => "Date/Time",
-						"6" => "Result");
-		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
+						"1" => "Submitted by",
+						"2" => "Job Type",
+						"4" => "Message",
+						"3" => "Deliver by",
+						"5" => "Destination",
+						"6" => "Date/Time",
+						"7" => "Result");
+		$titles = appendFieldTitles($titles, 7, $fieldlist, $activefields);
 
-		$formatters = array("2" => "fmt_delivery_type_list",
-							"4" => "fmt_destination",
-							"5" => "fmt_ms_timestamp",
-							"6" => "fmt_contacthistory_result");
+		$formatters = array("3" => "fmt_delivery_type_list",
+							"5" => "fmt_destination",
+							"6" => "fmt_ms_timestamp",
+							"7" => "fmt_contacthistory_result");
 		
 		$searchrules = array();
 		if(isset($this->params['rules']) && $this->params['rules']){
@@ -253,7 +257,7 @@ class CallsReport extends ReportGenerator{
 			$count=1;
 			foreach($fieldlist as $index => $field){
 				?>
-				setColVisability(searchresultstable, 5+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				setColVisability(searchresultstable, 7+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
 				$count++;
 			}
