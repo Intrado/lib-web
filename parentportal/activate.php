@@ -19,7 +19,7 @@ if(isset($_GET['t'])){
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
 	$token = get_magic_quotes_gpc() ? stripslashes($_POST['token']) : $_POST['token'];
-	
+
 	if(isset($_POST['password1']) && isset($_POST['password2'])){
 		$password1 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password1'])) : trim($_POST['password1']);
 		$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
@@ -35,7 +35,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			} else {
 				$result = portalActivateAccount($token, $password1);
 				if($result['result'] == ""){
-					if(!$forgot && $result['functionCode'] != '3'){
+					if(!$forgot && $result['functionCode'] != 'forgotpassword'){
 						error("An unknown error occurred");
 						$error = true;
 					} else {
@@ -56,9 +56,9 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		$result = portalActivateAccount($token, $password);
 		if($result['result'] == ""){
 			$form = false;
-			if($result['functionCode'] == '1'){
+			if($result['functionCode'] == 'newaccount'){
 				$success = true;
-			} else if ($result['functionCode'] == '2' && $changeuser){
+			} else if ($result['functionCode'] == 'changeusername' && $changeuser){
 				$newusersuccess = true;
 			} else {
 				error("An unknown error occurred");
@@ -71,7 +71,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		} else {
 			$error = true;
 		}
-		
+
 	} else {
 		error("You are missing required fields");
 	}
@@ -85,6 +85,7 @@ if($forgot){
 	$TITLE = "Activate Account";
 }
 include("cmlogintop.inc.php");
+
 if($forgot){
 	$action = "?f";
 } else if($changeuser){
@@ -144,7 +145,7 @@ if($form){
 			<tr>
 				<td>Confirm Password:</td>
 				<td><input type="password" name="password2" /></td>
-			</tr>		
+			</tr>
 <?
 		} else {
 ?>
