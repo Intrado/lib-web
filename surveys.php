@@ -47,7 +47,7 @@ button_bar(button('Schedule Survey', null,"survey.php?id=new") );
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='new' or status='scheduled' or status='processing' or status='procactive' or status='active' or status='cancelling') and deleted=0 order by id desc");
 
-$titles = array(	"name" => "#Name",
+$titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"Type" => "#Deliver by",
 					"startdate" => "Start date",
@@ -78,7 +78,7 @@ startWindow('My Completed Surveys '  . help('SurveyBuilder_MyCompleted'),'paddin
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='complete' or status='cancelled') and deleted=0 order by id desc");
 
-$titles = array(	"name" => "#Name",
+$titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"Type" => "#Deliver by",
 					"startdate" => "Start date",
