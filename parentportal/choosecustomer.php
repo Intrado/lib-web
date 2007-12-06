@@ -56,10 +56,15 @@ startWindow("Districts/Schools");
 <div style="margin:5px">
 	You have students in multiple districts/schools
 	<br>Please choose one of the districts/schools you are associated with:
-	<table cellpadding="3" cellspacing="1">
+	<table cellpadding="3" cellspacing="1" class="list">
+		<tr><th class="listHeader">District/School Name</th></tr>
 <?
+		$alt = 0;
 		foreach($customerlist as $index => $customername){
-			?><tr><td><a href="choosecustomer.php?customerid=<?=$index?>"/><?=$customername?></a></td></tr><br><?
+			$class = "";
+			if($alt++ % 2)
+				$class="class=\"listAlt\"";
+			?><tr><td <?=$class?> ><a href="choosecustomer.php?customerid=<?=$index?>"/><?=$customername?></a></td></tr><br><?
 		}
 ?>
 	</table>
