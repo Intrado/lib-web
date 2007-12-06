@@ -157,7 +157,7 @@ doNavTabs($NAVTREE);
 			}
 
 			if(count($customeridlist) > 1){
-				?><a href="choosecustomer.php?logoutcustomer=1">Change Customer</a> |<?
+				?><a href="choosecustomer.php">Change Customer</a> |<?
 			}
 	?>
 			<a href="#" onclick="window.open('help/index.html', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
