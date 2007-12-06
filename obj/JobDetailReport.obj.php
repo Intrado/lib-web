@@ -211,12 +211,12 @@ class JobDetailReport extends ReportGenerator{
 		showPageMenu($total,$pagestart,500);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
 		$titles = array(0 => "Job Name",
-						1 => "Submitted By",
+						1 => "Submitted by",
 						2 => "ID#",
 						3 => "First Name",
 						4 => "Last Name",
 						6 => "Message",
-						5 => "Delivery by",
+						5 => "Deliver by",
 						7 => "Destination",
 						11 => "Attempts",
 						8 => "Last Attempt",

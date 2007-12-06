@@ -74,7 +74,7 @@ function displayJobSummary($joblist){
 							<tr class="listHeader" align="left" valign="bottom">
 								<th>Job Name</th>
 								<th>Type</th>
-								<th>Submitted By</th>
+								<th>Submitted by</th>
 								<th>Scheduled Date</th>
 								<th>Scheduled Time</th>
 								<th>Status</th>
