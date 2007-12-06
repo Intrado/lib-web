@@ -154,7 +154,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 					$options['pkey'] = GetFormData($f, $s, 'pkey');
 				} else {
 					unset($options['pkey']);
-					
+
 					if($rule = getRuleFromForm($f, $s)){
 						if(!isset($options['rules']))
 							$options['rules'] = array();
@@ -197,15 +197,15 @@ if($reloadform){
 if($reportgenerator->format == "csv"){
 	$reportgenerator->generate();
 } else {
-	
+
 	////////////////////////////////////////////////////////////////////////////////
 	// Display
 	////////////////////////////////////////////////////////////////////////////////
 	$PAGE = "admin:portal";
 	$TITLE = "Portal Management";
-	
+
 	include_once("nav.inc.php");
-	
+
 	NewForm($f);
 	if($USER->authorize('generatebulktokens')){
 		$reportgenerator->generateQuery();
@@ -225,7 +225,7 @@ if($reportgenerator->format == "csv"){
 		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
 	}
 	startWindow("Contact Search", "padding: 3px;");
-	
+
 	if(isset($options['pkey'])){
 		$singlepersondisplay = '';
 		$searchbardisplay = 'style="display:none"';
@@ -256,7 +256,7 @@ if($reportgenerator->format == "csv"){
 									<?
 										//$RULES is declared above
 										$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-	
+
 										include("ruleeditform.inc.php");
 									?>
 									</td>
@@ -296,7 +296,7 @@ if($reportgenerator->format == "csv"){
 	</table>
 		<?
 	endWindow();
-	
+
 	if(isset($options['pkey']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
 		$reportgenerator->generate();
 	}
@@ -328,7 +328,7 @@ if($reportgenerator->format == "csv"){
 //index 5 is expiration date
 function fmt_activation_code($row, $index){
 	if($row[$index]){
-		if(strtotime($row[5]) < strtotime("now")){
+		if(strtotime($row[5]) < strtotime("today")){
 			return "Expired";
 		}
 	}
