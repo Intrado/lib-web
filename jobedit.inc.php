@@ -696,7 +696,20 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
-			<div id='displayphoneoptions'>If you would like to send a phone message, <a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true">click here</a></div>
+			
+			<div id='displayphoneoptions'>
+<? 
+					if(!$submittedmode){
+?>
+						If you would like to send a phone message, <a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true">click here</a>
+<? 
+					} else {
+?>
+						&nbsp;
+<?
+					}
+?>
+			</div>
 			<div id='phoneoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
@@ -749,7 +762,19 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 		<td class="bottomBorder">
-			<div id='displayemailoptions'>If you would like to send an email message, <a href="#" onclick="displaySection('email'); new getObj('sendemail').obj.checked=true">click here</a></div>
+			<div id='displayemailoptions'>
+<? 
+					if(!$submittedmode){
+?>
+						If you would like to send an email message, <a href="#" onclick="displaySection('email'); new getObj('sendemail').obj.checked=true">click here</a>
+<? 
+					} else {
+?>
+						&nbsp;
+<?
+					}
+?>
+			</div>
 			<div id='emailoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
@@ -775,7 +800,19 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" valign="top" class="windowRowHeader">Print</th>
 		<td>
-			<div id='displayprintoptions'>If you would like to send a print message, <a href="#" onclick="displaySection('print'); new getObj('sendprint').obj.checked=true">click here</a></div>
+			<div id='displayprintoptions'>
+<? 
+					if(!$submittedmode){
+?>
+						If you would like to send a print message, <a href="#" onclick="displaySection('print'); new getObj('sendprint').obj.checked=true">click here</a>
+<? 
+					} else {
+?>
+						&nbsp;
+<?
+					}
+?>
+			</div>
 			<div id='printoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
@@ -809,7 +846,19 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
-			<div id='displaysmsoptions'>If you would like to send an SMS message, <a href="#" onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true">click here</a></div>
+			<div id='displaysmsoptions'>
+<? 
+					if(!$submittedmode){
+?>
+						If you would like to send an SMS message, <a href="#" onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true">click here</a>
+<? 
+					} else {
+?>
+						&nbsp;
+<?
+					}
+?>
+			</div>
 			<div id='smsoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
