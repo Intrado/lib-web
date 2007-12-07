@@ -83,7 +83,7 @@ if(!$success){
 				<td><input type="text" name="zipcode" value="<?=$zipcode?>" size="5" maxlength="5"/></td>
 			</tr>
 			<tr>
-				<td colspan="2"><div style="overflow:scroll; height:250px;"><?=$tos ?></div></td>
+				<td colspan="2"><div style="overflow:scroll; height:250px; width:375px;"><?=$tos ?></div></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="checkbox" name="acceptterms"/> Accept Terms of Service</td>
