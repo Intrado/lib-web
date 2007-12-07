@@ -60,7 +60,7 @@ if(!$success){
 		<table  style="color: #365F8D;" >
 			<tr>
 				<td>Email&nbsp;(this will be your login name):</td>
-				<td><input type="text" name="login" value="<?=$login?>" size="45" maxlength="255"/> </td>
+				<td><input type="text" name="login" value="<?=$login?>" size="50" maxlength="255"/> </td>
 			</tr>
 			<tr>
 				<td>Password: </td>
