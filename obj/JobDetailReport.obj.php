@@ -287,7 +287,7 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = array_flip($fieldindex);
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = '"Job Name","User","Type","Message","ID","First Name","Last Name","Destination","Attempts","Last Attempt","Last Result"';
+		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Deliver by","Destination","Attempts","Last Attempt","Last Result"';
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header .= ',"' . $fieldname . '"';
@@ -321,7 +321,7 @@ class JobDetailReport extends ReportGenerator{
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
 
-			$reportarray = array($row[0], $row[1], format_delivery_type($row[5]),$row[6],$row[2],$row[3],$row[4],$row[7],$row[11],$row[8],$row[9]);
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],format_delivery_type($row[5]),$row[7],$row[11],$row[8],$row[9]);
 		
 			//index 13 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
