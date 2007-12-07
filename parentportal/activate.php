@@ -78,7 +78,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 }
 
 if($forgot){
-	$TITLE = "Forgot Password";
+	$TITLE = "Password Assistance";
 } else if($changeuser){
 	$TITLE = "Change Email";
 } else {
@@ -133,7 +133,7 @@ if($form){
 		<table  style="color: #365F8D;" >
 			<tr>
 				<td>Confirmation Code: </td>
-				<td><input type="text" name="token" value="<?=$token?>" size="50" /></td>
+				<td><input type="text" name="token" value="<?=$token?>" size="30" /></td>
 			</tr>
 <?
 		if($forgot){
