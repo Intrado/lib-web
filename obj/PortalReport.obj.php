@@ -23,12 +23,7 @@ class PortalReport extends ReportGenerator{
 			$hideactivetokens = " and (ppt.token is null or ppt.expirationdate < curdate()) ";
 		}
 		if(isset($this->params['hideassociated']) && $this->params['hideassociated']){
-			$hideassociated = " and ppcount.count is null ";
-			$hideassociatedtable = " left join 
-									(select count(*) as count, pp.personid as ppcountpersonid 
-									from portalperson pp 
-									group by pp.personid) 
-									as ppcount on (ppcount.ppcountpersonid = p.id) ";
+			$hideassociated = " and not exists(select count(*) from portalperson pp2 where pp2.personid = p.id group by pp2.personid) ";
 		}
 		if($rulesql || $pkeysql || $showall){
 			$this->query = "select SQL_CALC_FOUND_ROWS
@@ -40,9 +35,8 @@ class PortalReport extends ReportGenerator{
 						ppt.expirationdate"
 						. generateFields("p")
 						. "	from person p 
-						left join portalpersontoken ppt on (ppt.personid = p.id) "
-						. $hideassociatedtable . 	
-						"where not p.deleted
+						left join portalpersontoken ppt on (ppt.personid = p.id)
+						where not p.deleted
 						and p.type='system' "
 						. $pkeysql
 						. $rulesql
@@ -52,9 +46,8 @@ class PortalReport extends ReportGenerator{
 			//test query used to confirm no active codes are in the list
 			$this->testquery = "select count(ppt.token)
 						from person p 
-						left join portalpersontoken ppt on (ppt.personid = p.id) "
-						. $hideassociatedtable .
-						" where not p.deleted
+						left join portalpersontoken ppt on (ppt.personid = p.id) 
+						where not p.deleted
 						and p.type='system'
 						and ppt.expirationdate > curdate() "
 						. $pkeysql
