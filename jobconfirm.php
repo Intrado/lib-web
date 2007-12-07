@@ -74,8 +74,7 @@ if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime
 	error('The end time has already passed. Please correct this problem before proceeding');
 }
 if($jobtype->systempriority == 1){
-	error("WARNING:",
-			"Emergency Notifications are reserved for situations that have immediate, severe, or likely threat to life, health or property, or notifications that are time-critical and require action such as school closures and temporary changes to transportation schedules.");
+	error("WARNING:  Emergency Notifications are reserved for situations that are time-critical and require action such as school closures and temporary changes to transportation schedules or that have immediate, severe or likely impact on safety");
 }
 	
 ////////////////////////////////////////////////////////////////////////////////
