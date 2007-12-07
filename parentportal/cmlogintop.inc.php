@@ -11,14 +11,13 @@
 
 <table border=0 cellpadding=0 cellspacing=0 width="100%">
 <tr style="background-color: #365F8D;">
-	<td width="389"><img src="img/school_messenger_large.gif" /></td>
-	<td width="100%">&nbsp;</td>
+	<td colspan="2"><img src="img/school_messenger_large.gif" /></td>
 </tr>
 <tr style="background-color: #666666;">
 	<td colspan="2">&nbsp;</td>
 </tr>
 <tr>
-	<td valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="img/contactmanager_splash.jpg"></td>
+	<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="img/contactmanager_splash.jpg"></td>
 	<td style="background-color: #D4DDE2; color: #365F8D;">
 	<?
 		if(isset($TITLE)){
