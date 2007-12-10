@@ -129,10 +129,10 @@ if(isset($contactList) && $contactList){
 <?
 	}
 } else {
-	startWindow("No Associations", 'padding: 3px;');
+	startWindow("Welcome", 'padding: 3px;');
 ?>
 	<div style="margin:5px">
-		<img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a>
+		Welcome to the Contact Manager.<br>Once you have added contacts, you will be able to view your old messages and set preferences on how to receive your messages.  You should have received activation codes for each contact you are elligible to add.<br>If you would like to begin adding contacts, <a href="addcontact1.php"><img src="img/bug_important.gif" >Click Here</a>
 	</div>
 <?
 	endWindow();
