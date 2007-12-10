@@ -122,10 +122,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$newsmsmessage->description = "SMS Message " . date("M d, Y h:i:s", strtotime("now"));
 					$newsmsmessage->create();
 					
-					QuickUpdate("delete from messagepart where messageid='" . $newsmsmessage->id ."'");
 					foreach($parts as $part){
 						$part->messageid = $newsmsmessage->id;
-						$part->voiceid = 0;
 						$part->create();
 					}
 					
@@ -548,33 +546,45 @@ startWindow('Job Information');
 		<th align="right" class="windowRowHeader bottomBorder">Delivery Type:<br></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" >
-
+				<tr>
 <?
 				if($USER->authorize('sendphone')){
-?>
-				<tr>
-					<td width="30%" >Send phone calls <? print help('Job_PhoneOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('phone'); else hideSection('phone')\""); ?></td>
-				</tr>
+?>	
+						<td align="center" style="padding-left:15px"><div onclick="clickIcon('phone')"><img src="img/icon_phone.gif" align="absmiddle"></div></td>
 <?
 				}
 				if($USER->authorize('sendemail')){
 ?>
-				<tr>
-					<td width="30%" >Send emails <? print help('Job_EmailOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('email'); else hideSection('email');\""); ?></td>
-				</tr>
+						<td align="center" style="padding-left:15px"><div onclick="clickIcon('email')"><img src="img/icon_email.gif" align="absmiddle"></div></td>
 <?
 				}
 				if($hassms && $USER->authorize('sendsms')){
 ?>
-				<tr>
-					<td width="30%" >Send sms <? print help('Job_SMSOptions', null, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('sms'); else hideSection('sms');\""); ?></td>
-				</tr>
+						<td align="center" style="padding-left:15px"><div onclick="clickIcon('sms')"><img src="img/icon_sms.gif" align="absmiddle"></div></td>
 <?
 				}
 ?>
+				</tr>
+				<tr>
+<?
+				if($USER->authorize('sendphone')){
+?>
+					<td style="padding-left:15px">Phone:<? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('phone'); else hideSection('phone')\""); ?></td>
+<?
+				}
+				if($USER->authorize('sendemail')){
+?>
+
+					<td style="padding-left:15px">Email:<? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('email'); else hideSection('email');\""); ?></td>
+<?
+				}
+				if($USER->authorize('sendsms')){
+?>
+					<td style="padding-left:15px">SMS:<? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('sms'); else hideSection('sms');\""); ?></td>
+<?
+				}
+?>
+				</tr>
 			</table>
 		</td>
 	</tr>
@@ -701,7 +711,7 @@ startWindow('Job Information');
 <? 
 					if(!$submittedmode){
 ?>
-						If you would like to send a phone message, <a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true">click here</a>
+						<a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true; return false;">Click here</a> or select checkbox above.
 <? 
 					} else {
 ?>
@@ -766,7 +776,7 @@ startWindow('Job Information');
 <? 
 					if(!$submittedmode){
 ?>
-						If you would like to send an email message, <a href="#" onclick="displaySection('email'); new getObj('sendemail').obj.checked=true">click here</a>
+						<a href="#" onclick="displaySection('email'); new getObj('sendemail').obj.checked=true; return false;">Click here</a> or select checkbox above.
 <? 
 					} else {
 ?>
@@ -804,7 +814,7 @@ startWindow('Job Information');
 <? 
 					if(!$submittedmode){
 ?>
-						If you would like to send a print message, <a href="#" onclick="displaySection('print'); new getObj('sendprint').obj.checked=true">click here</a>
+						<a href="#" onclick="displaySection('print'); new getObj('sendprint').obj.checked=true; return false;">Click here</a> or select checkbox above.
 <? 
 					} else {
 ?>
@@ -850,7 +860,7 @@ startWindow('Job Information');
 <? 
 					if(!$submittedmode){
 ?>
-						If you would like to send an SMS message, <a href="#" onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true">click here</a>
+						<a href="#" onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true; return false;">Click here</a> or select checkbox above.
 <? 
 					} else {
 ?>
@@ -953,6 +963,10 @@ function displaySection(section){
 			show('emailoptions');
 			hide('displayemailoptions');
 			break;
+		case 'print':
+			show('printoptions');
+			hide('displayprintoptions');
+			break;
 		case 'sms':
 			show('smsoptions');
 			hide('displaysmsoptions');
@@ -971,6 +985,10 @@ function hideSection(section){
 			hide('emailoptions');
 			show('displayemailoptions');
 			break;
+		case 'print':
+			hide('printoptions');
+			show('displayprintoptions');
+			break;
 		case 'sms':
 			hide('smsoptions');
 			show('displaysmsoptions');
@@ -978,6 +996,38 @@ function hideSection(section){
 	}
 	if(!(new getObj('sendemail').obj.checked) && !(new getObj('sendphone').obj.checked) && !(new getObj('sendsms').obj.checked) ){
 		hide('settings');
+	}
+}
+
+function clickIcon(section){
+	var checked;
+	switch(section){
+		case 'phone':
+			var sendphone = new getObj('sendphone').obj;
+			sendphone.checked = !sendphone.checked;
+			checked = sendphone.checked;
+			break;
+		case 'email':
+			var sendemail = new getObj('sendemail').obj;
+			sendemail.checked = !sendemail.checked;
+			checked = sendemail.checked;
+			break;
+		case 'print':
+			var sendprint = new getObj('sendprint').obj;
+			sendprint.checked = !sendprint.checked;
+			checked = sendprint.checked;
+			break;
+		case 'sms':
+			var sendsms = new getObj('sendsms').obj;
+			sendsms.checked = !sendsms.checked;
+			checked = sendsms.checked;
+			break;
+	}
+	
+	if(checked){
+		displaySection(section);
+	} else {
+		hideSection(section);
 	}
 }
 
