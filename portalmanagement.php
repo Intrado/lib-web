@@ -31,6 +31,11 @@ if (!getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess'))
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+
 if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['portal']['options']);
 	$_SESSION['saved_report'] = false;
@@ -194,6 +199,29 @@ if($reloadform){
 	PutFormData($f, $s, "hideassociated", isset($options['hideassociated']) ? $options['hideassociated'] : 0, "bool", 0, 1);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+//index 4 is token
+//index 5 is expiration date
+function fmt_activation_code($row, $index){
+	if($row[$index]){
+		if(strtotime($row[5]) < strtotime("today")){
+			return "Expired";
+		}
+	}
+	return $row[$index];
+}
+
+function fmt_activation_date($row, $index){
+	if($row[$index]){
+		return date("M d, Y", strtotime($row[$index]));
+	}
+	return "";
+}
+?>
+
 if($reportgenerator->format == "csv"){
 	$reportgenerator->generate();
 } else {
@@ -304,7 +332,7 @@ if($reportgenerator->format == "csv"){
 	EndForm();
 	include_once("navbottom.inc.php");
 ?>
-	<script>
+<script>
 	function confirmGenerate(){
 <? if($reportgenerator->reporttotal > 0){ ?>
 		return confirm("Are you sure you want to generate activation codes for these people?");
@@ -318,27 +346,5 @@ if($reportgenerator->format == "csv"){
 	}
 </script>
 <?
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Functions
-////////////////////////////////////////////////////////////////////////////////
-
-//index 4 is token
-//index 5 is expiration date
-function fmt_activation_code($row, $index){
-	if($row[$index]){
-		if(strtotime($row[5]) < strtotime("today")){
-			return "Expired";
-		}
-	}
-	return $row[$index];
-}
-
-function fmt_activation_date($row, $index){
-	if($row[$index]){
-		return date("M d, Y", strtotime($row[$index]));
-	}
-	return "";
 }
 ?>
