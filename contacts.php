@@ -176,19 +176,7 @@ if($reloadform){
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-//look at flag for type
-//1 is phone, 2 is email, 3 is sms
-//flag at index 7
-function fmt_destination_sequence($row, $index){
-	if($row[$index] != "" || $row[$index] != false){
-		$types = array(1 => "phone",
-						2 => "email",
-						3 => "sms");
-		return destination_label($types[$row[7]], $row[$index]);
-	} else {
-		return "";
-	}
-}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
