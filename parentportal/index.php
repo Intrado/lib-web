@@ -71,16 +71,8 @@ if($id){
 
 
 include_once("cmlogintop.inc.php");
-?>
 
 
-
-<?
-if ($badlogin) {
-?>
-	<div style="color: red;">Incorrect username/password. Please try again.</div>
-<?
-}
 ?>
 <form method="POST" action="index.php" name="login">
 	<table width="100%" style="color: #365F8D;" >
@@ -101,16 +93,25 @@ if ($badlogin) {
 			<td>&nbsp;</td>
 			<td><br><div style="font-weight: bold;">Already have an account?</div></td>
 			<td>&nbsp;</td>
+		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td>Email: <br><input type="text" id="logintext" name="login" size="35" value="<?=$login?>"/> </td>
+			<td>
+<?
+				if ($badlogin) {
+				?>
+					<div style="color: red;">Incorrect username/password. Please try again.</div><br>
+				<?
+				}
+?>
+				Email: <br><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=htmlentities($login)?>"/> </td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td>Password&nbsp;(case sensitive):<br><input type="password" name="password" size = "35" onkeypress="checkCapsLock(event)"/>
+			<td>Password&nbsp;(case sensitive):<br><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/>
 			</td>
-			<td><br><div id="capslockwarning"  style="float:left; border:1px solid red; visibility:hidden; color:black; background-color:white">*Caps&nbsp;Lock&nbsp;is&nbsp;on.*</div></td>
+			<td><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;">Warning! Your Caps Lock key is on.</div></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -130,14 +131,28 @@ include("cmloginbottom.inc.php");
 <script langauge="javascript">
 document.getElementById('logintext').focus();
 
-function checkCapsLock(e){
-	<? //taken from http://www.codeproject.com/KB/scripting/Detect_Caps_Lock.aspx ?>
-	keycode = e.keyCode ? e.keyCode : e.which;
-	shiftkey = e.shiftKey ? e.shiftKey : ((keycode == 16) ? true : false);
-	if(((keycode >= 65 && keycode <= 90) && !shiftkey) || ((keycode >= 97 && keycode <= 122) && shiftkey))
-		new getObj('capslockwarning').obj.style.visibility = 'visible';
-	else
-		new getObj('capslockwarning').obj.style.visibility = 'hidden';
-}
+function capslockCheck(e){
+		var keypressed;
+		var shiftkey;
+		
+		if(e.keyCode)
+			keypressed = e.keyCode;
+		else
+			keypressed = e.which;
+		
+		if(e.shiftKey) {
+			shiftkey = e.shiftkey;
+		} else {
+			if(keypressed == 16) {
+				shiftkey = true;
+			} else {
+				shiftkey = false;
+			}
+		}
+		if(((keypressed >= 65 && keypressed <= 90) && !shiftkey) || ((keypressed >= 97 && keypressed <= 122) && shiftkey)){
+			new getObj('capslockwarning').style.display = 'block';
+		} else
+			new getObj('capslockwarning').style.display = 'none';
+	}
 
 </script>
