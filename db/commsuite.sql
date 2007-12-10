@@ -524,8 +524,7 @@ CREATE TABLE `portalpersontoken` (
   `expirationdate` date NOT NULL,
   `personid` int(11) NOT NULL,
   `creationuserid` int(11) NOT NULL,
-  PRIMARY KEY  (`token`, `personid`),
-  UNIQUE KEY `personid` (`personid`)
+  PRIMARY KEY  (`personid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8   $$$
 
 -- --------------------------------------------------------
@@ -1144,7 +1143,8 @@ CREATE TABLE `persontoken` (
   `validationdata` varchar(50) NOT NULL,
   `expirationdate` date NOT NULL,
   `personid` int(11) NOT NULL,
-  PRIMARY KEY  (`customerid`,`token`,`validationdata`)
+  PRIMARY KEY  (`customerid`,`validationdata`,`token`),
+  INDEX `token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8   $$$
 
 -- --------------------------------------------------------

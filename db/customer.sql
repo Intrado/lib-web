@@ -1297,12 +1297,19 @@ PRIMARY KEY ( `type` , `sequence` )
 ) ENGINE = innodb
 $$$
 
-
 ALTER TABLE `jobtype` CHANGE `infoforparents` `info` VARCHAR( 255 ) NOT NULL
 $$$
 
-
 ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
 ADD PRIMARY KEY ( `token` , `personid` )
+$$$
+
+-- Dec 10
+
+ALTER TABLE `portalpersontoken` DROP INDEX `personid`
+$$$
+
+ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `personid` )
 $$$
 

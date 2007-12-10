@@ -107,4 +107,14 @@ DROP `portaldbpass` ;
 ALTER TABLE `portaluser` CHANGE `lastlogin` `lastlogin` BIGINT NULL DEFAULT NULL ;
 
 
+-- Dec 10
+
+ALTER TABLE `persontoken` DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `customerid` , `validationdata` , `token` ) ;
+
+ALTER TABLE `persontoken` ADD INDEX `token` ( `token` ) ;
+
+
+
+
 
