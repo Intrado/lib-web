@@ -101,7 +101,7 @@ function loadLists($incr)
 	return $listSubset; // the list of lists for this user, page includes no more than 9
 }
 
-function playLists($incr, $emptylist = false)
+function playLists($incr, $emptylist = false, $playprompt=true)
 {
 	glog("playlists, empty? ".$emptylist);
 
@@ -126,7 +126,10 @@ function playLists($incr, $emptylist = false)
 
 		<field name="listnumber" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
-				<audio cmid="file://prompts/inbound/PleaseSelectList.wav" />
+<?				if ($playprompt) { ?>
+					<audio cmid="file://prompts/inbound/PleaseSelectList.wav" />
+<?				} ?>
+
 <?
 				$listindex = 1;
 				foreach ($lists as $list)
@@ -197,7 +200,7 @@ if($REQUEST_TYPE == "new"){
 
 		// if they want to hear the next page of lists
 		if ($listnumber == "*") {
-			playLists(true);
+			playLists(true, false, false);
 		// else confirm the listid is correct
 		} else {
 

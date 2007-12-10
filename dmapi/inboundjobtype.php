@@ -47,7 +47,7 @@ function loadJobtypes($incr)
 	return $jobtypeSubset; // the list of jobtypes for this user, page includes no more than 9
 }
 
-function playJobtypes($incr)
+function playJobtypes($incr, $playprompt=true)
 {
 	global $SESSIONDATA;
 
@@ -63,7 +63,11 @@ function playJobtypes($incr)
 
 		<field name="jobtypenumber" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
-				<audio cmid="file://prompts/inbound/SpecifyJobType.wav" />
+
+<?				if ($playprompt) { ?>
+					<audio cmid="file://prompts/inbound/SpecifyJobType.wav" />
+<?				} ?>
+
 <?
 				$jobtypeindex = 1;
 				foreach ($jobtypes as $jobtype)
@@ -134,7 +138,7 @@ if($REQUEST_TYPE == "new"){
 
 		// if they want to hear the next page of jobtypes
 		if ($jobtypenumber == "*") {
-			playJobtypes(true);
+			playJobtypes(true, false);
 		// else save jobtype selection and move to job options
 		} else {
 
