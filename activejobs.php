@@ -52,10 +52,10 @@ $result = Query(
 				j.type LIKE '%email%' AS has_email,
 				j.type LIKE '%print%' AS has_print,
 				j.type LIKE '%sms%' AS has_sms,
-            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='phone') as remaining_phone,
-            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='email') as remaining_email,
-            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='print') as remaining_print,
-            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked', 'sent') and rc.type='sms') as remaining_sms,
+            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone') as remaining_phone,
+            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email') as remaining_email,
+            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print') as remaining_print,
+            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms') as remaining_sms,
             ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
             from job j
             left join reportcontact rc
