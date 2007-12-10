@@ -345,13 +345,13 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 function format_delivery_type($string){
 	switch($string){
 		case 'sms':
-			return strtoupper($string);
+			return "SMS";
 		default:
 			return ucfirst($string);
 	}
 }
 
-//Function to index an array of objects by 
+//Function to index an array of objects by
 function resequence($objectarray, $field){
 	$temparray = array();
 	foreach($objectarray as $obj){
@@ -399,7 +399,7 @@ function destination_label_popup_paragraph($type){
 	$maxphones = getSystemSetting("maxphones", 3);
 	$maxemails = getSystemSetting("maxemails", 2);
 	$maxsms = getSystemSetting("maxsms", 2);
-	
+
 	$labels = array();
 	$max = "max" . $type;
 	if($type != "sms")
@@ -408,13 +408,13 @@ function destination_label_popup_paragraph($type){
 		$labels[] = destination_label($type, $i);
 	}
 	$labels = implode(",<br>", $labels);
-	
+
 	$hover = '<span>';
 	$hover .= '<div style="color:#346799"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	$hover .= '>&nbsp;' . format_delivery_type($type) . '&nbsp;</div><div class="hoverhelp">' . $labels . '</div></span>';
 	return $hover;
-	
+
 }
 ?>
