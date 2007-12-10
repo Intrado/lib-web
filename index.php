@@ -214,8 +214,8 @@ new getObj('logintext').obj.focus();
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td style="font-size: 12px;"><div style="margin-left: 50px;">Password:<br><input type="password" name="password" size="35" onkeypress="checkCapsLock(event)"></div></td>
-				<td style="font-size: 12px;"><br><div id="capslockwarning"  style=" float:left; border:1px solid red; visibility:hidden; color:black; background-color:white">*Caps&nbsp;Lock&nbsp;is&nbsp;on.*</div></td>
+				<td style="font-size: 12px;"><div style="margin-left: 50px;">Password:<br><input type="password" name="password" size="35" onkeypress="capslockCheck(event)"></div></td>
+				<td style="font-size: 12px;"><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;">Warning! Your Caps Lock key is on.</div></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
@@ -253,15 +253,47 @@ new getObj('logintext').obj.focus();
 <script langauge="javascript">
 document.getElementById('logintext').focus();
 
-function checkCapsLock(e){
-	<? //taken from http://www.codeproject.com/KB/scripting/Detect_Caps_Lock.aspx ?>
-	keycode = e.keyCode ? e.keyCode : e.which;
-	shiftkey = e.shiftKey ? e.shiftKey : ((keycode == 16) ? true : false);
-	if(((keycode >= 65 && keycode <= 90) && !shiftkey) || ((keycode >= 97 && keycode <= 122) && shiftkey))
-		document.getElementById('capslockwarning').style.visibility = 'visible';
-	else
-		document.getElementById('capslockwarning').style.visibility = 'hidden';
-}
+	function capslockCheck(e){
+		var keypressed;
+		var shiftkey;
+		
+		if(e.keyCode)
+			keypressed = e.keyCode;
+		else
+			keypressed = e.which;
+		
+		if(e.shiftKey) {
+			shiftkey = e.shiftkey;
+		} else {
+			if(keypressed == 16) {
+				shiftkey = true;
+			} else {
+				shiftkey = false;
+			}
+		}
+		if(((keypressed >= 65 && keypressed <= 90) && !shiftkey) || ((keypressed >= 97 && keypressed <= 122) && shiftkey)){
+			new getObj('capslockwarning').style.display = 'block';
+		} else
+			new getObj('capslockwarning').style.display = 'none';
+	}
+
+	function getObj(name)
+	{
+	  if (document.getElementById)
+	  {
+	  	this.obj = document.getElementById(name);
+	  }
+	  else if (document.all)
+	  {
+		this.obj = document.all[name];
+	  }
+	  else if (document.layers)
+	  {
+	   	this.obj = document.layers[name];
+	  }
+	  if(this.obj)
+		this.style = this.obj.style;
+	}
 </script>
 
 </body>
