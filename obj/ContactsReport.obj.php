@@ -92,7 +92,8 @@ class ContactsReport extends ReportGenerator {
 			"(select personid as pid,
 				phone as destination,
 				sequence as sequence,
-				'1' as ordering
+				'1' as ordering,
+				'phone' as type
 				from phone ph
 				where
 				personid in ('" . implode("','",$personidlist) . "')
@@ -101,7 +102,8 @@ class ContactsReport extends ReportGenerator {
 			(select personid as pid2,
 				email as destination,
 				sequence as sequence,
-				'2' as ordering
+				'2' as ordering,
+				'email' as type
 				from email
 				where
 				personid in ('" . implode("','",$personidlist) . "')
@@ -110,7 +112,8 @@ class ContactsReport extends ReportGenerator {
 			(select personid as pid3,
 				sms as destination,
 				sequence as sequence,
-				'3' as ordering
+				'3' as ordering,
+				'sms' as type
 				from sms
 				where
 				personid in ('" . implode("','",$personidlist) . "')
@@ -146,11 +149,30 @@ class ContactsReport extends ReportGenerator {
 				$data[] = $personrow;
 			} else {
 				foreach($phoneemailsmsdata[$personrow[1]] as $destination){
-					array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[3]));
+					array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[4]));
 					$data[] = $personrow;
 				}
 			}
 		}
+		
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////////////////////////
+		
+		//type at index 7
+		function fmt_destination_sequence($row, $index){
+			if($row[$index] != "" || $row[$index] != false){
+				return destination_label($row[7], $row[$index]);
+			} else {
+				return "";
+			}
+		}
+		
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// Display
+		////////////////////////////////////////////////////////////////////////////////
 		$titles = array("0" => "ID#",
 						"2" => "First Name",
 						"3" => "Last Name", 
@@ -165,7 +187,7 @@ class ContactsReport extends ReportGenerator {
 		$formatters = array("0" => "fmt_idmagnify",
 							"5" => "fmt_destination_sequence",
 							"6" => "fmt_destination");
-		
+
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
 		
