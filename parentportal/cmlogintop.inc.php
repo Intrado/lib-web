@@ -18,10 +18,3 @@
 <tr>
 	<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="img/contactmanager_splash.jpg"></td>
 	<td style="background-color: #D4DDE2; color: #365F8D;">
-	<?
-		if(isset($TITLE)){
-	?>
-			<div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div>
-	<?
-		}
-	?>
