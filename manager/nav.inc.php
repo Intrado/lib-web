@@ -1,6 +1,25 @@
 <html>
 <body>
 <image src="manager.png">
+<script>
+	function getObj(name)
+	{
+	  if (document.getElementById)
+	  {
+	  	this.obj = document.getElementById(name);
+	  }
+	  else if (document.all)
+	  {
+		this.obj = document.all[name];
+	  }
+	  else if (document.layers)
+	  {
+	   	this.obj = document.layers[name];
+	  }
+	  if(this.obj)
+		this.style = this.obj.style;
+	}
+</script>
 <table border = 1>
 	<tr>
 		<td><a href="customers.php">Customer&nbsp;List</a></td>
