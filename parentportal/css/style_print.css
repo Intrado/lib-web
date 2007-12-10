@@ -1,9 +1,5 @@
 @import url(style.css);
 
-/* don't show navigation */
-.navbox {
-	display: none;
-}
 
 .list {
 	font-size: 9px;
@@ -19,45 +15,6 @@
 
 .button {
 	display: none;
-}
-
-#brand {
-	display: none; 
-}
-
-#accountnav {
-	display:none;
-}
-
-#topnav {
-	display: none;
-}
-
-#midnav {
-	display: none;
-}
-
-#logos {
-	color: black;
-}
-
-
-/* resize the main container to 100% */
-
-#container #popupcontainer {
-	margin: 0 auto;
-	text-align: center;
-	width: 100%;
-}
-
-#contentbody {
-	width: 100%;
-	padding: 0px;
-}
-
-#mainscreen {
-	border: 0px;
-	background-color: white;
 }
 
 body {

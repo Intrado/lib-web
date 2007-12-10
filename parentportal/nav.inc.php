@@ -25,14 +25,6 @@ $NAVTREE = array (
 	)
 );
 
-/*
-if (strlen($SYSTEMALERT = getSystemSetting("alertmessage")) > 0)
-	$SYSTEMALERT = "<div class='alertmessage noprint'>" . nl2br(htmlentities($SYSTEMALERT)) . "</div>";
-else
-*/
-	$SYSTEMALERT = "";
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,35 +66,6 @@ function doNavTabs ($navtree) {
 			$MAINTABS .= navMainTab($maintab[0],$maintablink,$maintab[3]);
 		}
 	}
-}
-
-function doShortcuts ($shortcuts) {
-	global $USER;
-	if ($USER->authorize("startshort")) {
-		foreach ($shortcuts as $name => $value) {
-			if (strpos($name,"--") === 0) {
-				?><div class="shortcuttitle"><?= $name ?></div><?
-			} else {
-				?><a href="<?= htmlentities($value) ?>"><?= $name ?></a><?
-			}
-		}
-	}
-}
-
-function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
-	$crumb = array ("Welcome" => "start.php");
-	if ($firstactivetablink)
-		$crumb["$activemaintabtitle"] = "$firstactivetablink";
-
-	$crumbhtml = "";
-	foreach($crumb as $name => $url) {
-		$crumbhtml .= '<a href="' . $url . '"><img src="img/arrow_right.gif">' . $name . '</a> ';
-	}
-	$title = explode(':',$title);
-
-	$crumbhtml .= '<img src="img/arrow_right.gif">' . $title[0];
-
-	return $crumbhtml;
 }
 
 doNavTabs($NAVTREE);
@@ -173,5 +136,3 @@ doNavTabs($NAVTREE);
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
 	<div class="content">
-
-		<?= $SYSTEMALERT ?>
