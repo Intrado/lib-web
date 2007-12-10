@@ -101,7 +101,7 @@ function isAllSameDigit($number){
 	the same thing or similiar.
 	The password cannot be a substring or superstring of first, last or user.
 */
-function isSameUserPass($user, $pass, $firstname, $lastname) {
+function validateNewPassword($user, $pass, $firstname, $lastname) {
 	$user = strtolower($user);
 	$pass = strtolower($pass);
 	$firstname = strtolower($firstname);
