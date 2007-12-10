@@ -93,7 +93,7 @@ startWindow('Add');
 		<td>ID#</td><td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
 	</tr>
 	<tr>
-		<td>Person Activation Code: </td><td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
+		<td>Activation Code: </td><td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
 	</tr>
 </table>
 <?
