@@ -41,6 +41,8 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 		$person = $contactList[$personpkey];
 		$PERSONID = $person->id;
 	}
+} else {
+	redirect("start.php");
 }
 
 if($PERSONID){
@@ -212,12 +214,6 @@ if(isset($contactList) && $contactList){
 	}
 	echo "</table>";
 	
-} else {
-?>
-	<div style="margin:5px">
-		<img src="img/bug_important.gif" >You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact1.php"/>Click Here</a>
-	</div>
-<?
 }
 endWindow();
 
