@@ -102,12 +102,12 @@ foreach($customers as $cust) {
 		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
 		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
 								WHERE job.status = 'active'", $custdb);
-		$row[10] = array();
+		$customerfeatures = array();
 		if(getCustomerSystemSetting('_hasportal', false, true, $custdb))
-			$row[10][] = "Portal";
+			$customerfeatures[] = "Portal";
 		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
-			$row[10][] = "SMS";
-		$row[10] = implode(", ", $row[10]);
+			$customerfeatures[] = "SMS";
+		$row[10] = implode(", ", $customerfeatures);
 
 		$data[] = $row;
 	}
