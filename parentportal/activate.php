@@ -30,7 +30,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 				error("The passwords do not match");
 			} else if(strlen($password1) < 5){
 				error("Passwords must be at least 5 characters long");
-			} else if($password1 && $passworderror = isSameUserPass($user['portaluser.username'], $password1, $user['portaluser.firstname'], $user['portaluser.lastname'])){
+			} else if($password1 && $passworderror = validateNewPassword($user['portaluser.username'], $password1, $user['portaluser.firstname'], $user['portaluser.lastname'])){
 				error($passworderror);
 			} else {
 				$result = portalActivateAccount($token, $password1);
@@ -79,20 +79,18 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
 if($forgot){
 	$TITLE = "Password Assistance";
+	$action = "?f";
+	$text = "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first or last name, or email address";
 } else if($changeuser){
 	$TITLE = "Change Email";
+	$action = "?c";
+	$text = "your password";
 } else {
 	$TITLE = "Activate Account";
+	$action = "?n";
+	$text = "your password";
 }
 include("cmlogintop.inc.php");
-
-if($forgot){
-	$action = "?f";
-} else if($changeuser){
-	$action = "?c";
-} else {
-	$action = "?n";
-}
 
 if($forgotsuccess){
 	?>
@@ -130,39 +128,61 @@ if($forgotsuccess){
 if($form){
 ?>
 	<form method="POST" action="<?=$action?>" name="activate">
-		<table  style="color: #365F8D;" >
+		<table  style="color: #365F8D;" width="100%">
 			<tr>
+				<td width="20%">&nbsp;</td>
+				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+				<td width="80%">&nbsp;</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td colspan="2">You should have recieved an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
+			</tr>
+			
+			<tr>
+				<td>&nbsp;</td>
 				<td>Confirmation Code: </td>
-				<td><input type="text" name="token" value="<?=$token?>" size="30" /></td>
+				<td><input type="text" name="token" value="<?=htmlentities($token)?>" size="35" /></td>
+				<td>&nbsp;</td>
 			</tr>
 <?
 		if($forgot){
 ?>
 			<tr>
+				<td>&nbsp;</td>
 				<td>New Password:</td>
-				<td><input type="password" name="password1" /></td>
+				<td><input type="password" name="password1"  size="35" maxlength="50" /></td>
+				<td>&nbsp;</td>
 			</tr>
 			<tr>
+				<td>&nbsp;</td>
 				<td>Confirm Password:</td>
-				<td><input type="password" name="password2" /></td>
+				<td><input type="password" name="password2"  size="35" maxlength="50" /></td>
+				<td>&nbsp;</td>
 			</tr>
 <?
 		} else {
 ?>
 			<tr>
+				<td>&nbsp;</td>
 				<td>Password:</td>
-				<td><input type="password" name="password" /></td>
+				<td><input type="password" name="password"  size="35" maxlength="50"/></td>
+				<td>&nbsp;</td>
 			</tr>
 <?
 		}
 ?>
 		<tr>
 			<td>&nbsp;</td>
+			<td>&nbsp;</td>
 			<td><?=submit("activate", "main", "Submit")?></td>
+			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><a href="index.php">Return to Contact Manager Login</a></td>
+			<td>&nbsp;</td>
+			<td><br><a href="index.php">Return to Sign In</a></td>
+			<td>&nbsp;</td>
 		</tr>
 		</table>
 	</form>
