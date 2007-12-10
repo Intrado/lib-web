@@ -38,34 +38,55 @@ if($generalerror){
 
 if(!$success){
 ?>
-<br>
-<div>We will email you a link to a page where you can reset your password</div>
-<br>
-<table  style="color: #365F8D;" >
-	<form method="POST" action="forgotpassword.php" name="forgotpassword">
-			<tr>
-				<td>Enter Your Email Address:</td>
-				<td><input type="text" name="email1" size="30" value="<?=$email1?>"></td>
-			</tr>
-			<tr>
-				<td>Please Confirm Your Email Address:</td>
-				<td><input type="text" name="email2" size="30" value="<?=$email2?>"></td>
-			</tr>
-			<tr><td>&nbsp;</td><td><?=submit("forgotpassword", "main", "Submit")?></td></tr>
-	</form>
-	<tr><td colspan="2"><a href="index.php">Return to Contact Manager Login</a></td></tr>
-</table>
-
+<form method="POST" action="forgotpassword.php" name="forgotpassword">
+	<table  style="color: #365F8D;" >
+		<tr>
+			<td width="20%">&nbsp;</td>
+			<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+		</tr>
+		<tr>
+			<td width="20%">&nbsp;</td>
+			<td colspan="2">We will email you a link to a page where you can reset your password.</td>
+		</tr>
+		<tr>
+			<td width="20%">&nbsp;</td>
+			<td>Email Address:</td>
+			<td><input type="text" name="email1" size="50" maxlength="255" value="<?=htmlentities($email1)?>"></td>
+		</tr>
+		<tr>
+			<td width="20%">&nbsp;</td>
+			<td>Email Confirmation:</td>
+			<td><input type="text" name="email2" size="50" maxlength="255" value="<?=htmlentities($email2)?>"></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td><?=submit("forgotpassword", "main", "Submit")?></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td><br><a href="index.php">Return to Sign In</a></td>
+		</tr>
+	</table>
+</form>
 
 <?
 } else {
 ?>
-	<div style="margin:5px">
-		A link has been sent to your email address to log in.
-		<br>Please remember to change your password.
-		<br>You will be redirected to the activate page in 5 seconds.
-	</div>
-	<meta http-equiv="refresh" content="5;url=index.php?f">
+	<table  style="color: #365F8D;" >
+		<tr>
+			<td width=20%>&nbsp;</td>
+			<td>
+				<div style="margin:5px">
+					A link has been sent to your email address to log in.
+					<br>Please remember to change your password.
+					<br>You will be redirected to the activate page in 5 seconds.
+				</div>
+				<meta http-equiv="refresh" content="5;url=index.php?f">
+			</td>
+		</tr>
+	</table>
 <?
 }
 include_once("cmloginbottom.inc.php");
