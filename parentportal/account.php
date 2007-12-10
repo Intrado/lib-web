@@ -31,9 +31,9 @@ if(CheckFormSubmit($f,$s))
 		$newpassword2 = trim(GetFormData($f, $s, "newpassword2"));
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(strlen($newpassword1) && strlen($newpassword1) < 5){
+		} else if(strlen($newpassword1) > 0 && strlen($newpassword1) < 5){
 			error("Passwords must be at least 5 characters long");
-		} else if($newpassword1 && $passworderror = isSameUserPass($_SESSION['portaluser']['portaluser.username'], $newpassword1, GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"))){
+		} else if($newpassword1 && $passworderror = validateNewPassword($_SESSION['portaluser']['portaluser.username'], $newpassword1, GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"))){
 			error($passworderror);
 		} else if($newpassword1 != $newpassword2){
 			error('Password confirmation does not match');
