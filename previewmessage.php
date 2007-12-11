@@ -11,7 +11,6 @@ require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
-require_once("inc/reportutils.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,8 +25,6 @@ if (!$USER->authorize("sendphone")) {
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
-	unset($_SESSION['previewmessage_jobid']);
-	unset($_SESSION['previewmessage_personid']);
 	$id = DBSafe($_GET['id']);
 	if (userOwns("message", $id)) {
 		$_SESSION['previewmessageid'] = $id;
@@ -36,18 +33,6 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
-if(isset($_GET['jobid']) && isset($_GET['personid'])){
-	$_SESSION['previewmessage_jobid'] = $_GET['jobid']+0;
-	$_SESSION['previewmessage_personid'] = $_GET['personid']+0;
-	$_SESSION['previewmessageid'] = QuickQuery("select messageid from reportperson where jobid = '" . $_SESSION['previewmessage_jobid'] . "'
-												 and personid = '" . $_SESSION['previewmessage_personid'] . "'
-												 and rp.type='phone'");
-	redirect();
-}
-
-
-$jobid = isset($_SESSION['previewmessage_jobid']) ? $_SESSION['previewmessage_jobid'] : 0;
-$personid = isset($_SESSION['previewmessage_personid']) ? $_SESSION['previewmessage_personid'] : 0;
 $messageid = $_SESSION['previewmessageid'];
 
 //find all unique fields used in this message
@@ -62,17 +47,6 @@ if (count($messagefields) > 0) {
 } else {
 	$dopreview = 1; //go ahead and preview w/o submiting form if there are no fields in the message
 	$previewdata = "&qt=";
-}
-
-// if historic data should be used, fetch it now
-if($jobid != 0 && $personid != 0){
-	$query = "select rp." . FieldMap::GetFirstNameField() . ", "
-			. "rp." . FieldMap::GetLastNameField() . " "
-			. generateFields("rp")
-			. " from reportperson rp
-			where jobid = '$jobid'
-			and personid = '$personid'";
-	$historicdata = QuickQueryRow($query, true);
 }
 
 /****************** main message section ******************/
@@ -109,12 +83,14 @@ if(CheckFormSubmit($f,$s)) {
 if ($reloadform) {
 	ClearFormData($f);
 
+
+
 	if (isset($fields['f01']))
-		PutFormData($f,$s,"f01",isset($historicdata) ? $historicdata["f01"] : $USER->firstname);
+		PutFormData($f,$s,"f01",$USER->firstname);
 	if (isset($fields['f02']))
-		PutFormData($f,$s,"f02",isset($historicdata) ? $historicdata["f02"] : $USER->lastname);
+		PutFormData($f,$s,"f02",$USER->lastname);
 	if (isset($fields['f03']))
-		PutFormData($f,$s,"f03",isset($historicdata) ? $historicdata["f03"] : "English");
+		PutFormData($f,$s,"f03","English");
 }
 
 
@@ -145,7 +121,7 @@ if (count($fields) > 0) {
 
 
 ?>
-	<table width="100%" border="0" cellpadding="3" cellspacing="0">
+	<table border="0" cellpadding="3" cellspacing="0">
 <?
 	foreach ($fields as $fieldmap) {
 		$fieldnum = $fieldmap->fieldnum;
@@ -154,13 +130,7 @@ if (count($fields) > 0) {
 			<th align="right" class="windowRowHeader bottomBorder"><?= $fieldmap->name ?></td>
 			<td class="bottomBorder">
 <?
-		if(isset($historicdata)){
-			PutFormData($f,$s,$fieldnum, $historicdata[$fieldnum]);
-?>
-			<div><?=$historicdata[$fieldnum]?></div>
-<?
-			
-		} else if($fieldmap->isOptionEnabled("text")) {
+		if($fieldmap->isOptionEnabled("text")) {
 
 			NewFormItem($f,$s,$fieldnum,"text",20,255);
 
@@ -181,7 +151,7 @@ if (count($fields) > 0) {
 			$values = QuickQueryList($query);
 			if (count($values) > 1) {
 				//if (!GetFormData($f,$s,$fieldnum))
-					//PutFormData($f,$s,$fieldnum,$values[0],"array");
+				//	PutFormData($f,$s,$fieldnum,$values[0],"array");
 
 
 				NewFormSelect($f,$s, $fieldnum,@array_combine($values,$values));
