@@ -268,7 +268,7 @@ function displayValue($s) {
 
 //Because form fields are being disabled, if a user inputs improper data, it gets stored into the form session.
 //However, when submitting a form, a form field that is disabled will not resubmit the form data.
-//This caused the improper data to be stuck thus causing a manual check on every form post.
+//This caused the improper data to be stuck thus requiring a manual check on every form post for current values.
 //This function will iterate over all contact data fields to do a manual check on the values.
 //inputs:
 // contacttypes = array of contact types
@@ -280,7 +280,7 @@ function manualCheckFormSection($f, $s, $contacttypes, $types){
 		foreach($types[$type] as $item){
 			$error = false;
 			if($type == "email" && GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
-				if (GetFormData($f, $s, $type . $item->sequence) && !preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", GetFormData($f, $s, $type . $item->sequence))) {
+				if (GetFormData($f, $s, $type . $item->sequence) && !validEmail(GetFormData($f, $s, $type . $item->sequence))) {
 					$error = true;
 				}
 			} else if(GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
