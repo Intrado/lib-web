@@ -399,13 +399,15 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.11 $
+	    # $Revision: 1.12 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 	
 	    ##################################################################################
-	
-	    
-		
+
+		#
+		# Email Parser Start
+		#
+			
         $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
 
         $dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';
@@ -432,10 +434,14 @@ function CheckFormItem($form, $section, $item) {
 
         $addr_spec = "$local_part\\x40$domain";
 
+		#
+        # Email Parser End
+        #
+        
         if(!preg_match("!^$addr_spec$!", $email)){
         	return 'type';
         }
-
+        
 		break;
 	//### start number types ###
 	case "number":
