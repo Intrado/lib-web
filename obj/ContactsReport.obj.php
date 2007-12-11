@@ -127,12 +127,12 @@ class ContactsReport extends ReportGenerator {
 			$phoneemailsmsquery = $phoneemailquery . $extraquery;
 		}
 		$result = Query($phoneemailsmsquery);
-		$phoneemailsmsdata = array();
+		$destinationdata = array();
 		while($row = DBGetRow($result)){
 			if(!isset($phoneemailsmsdata[$row[0]])){
 				$phoneemailsmsdata[$row[0]] = array();
 			}
-			$phoneemailsmsdata[$row[0]][] = $row;
+			$destinationdata[$row[0]][] = $row;
 		}
 	
 		
@@ -144,11 +144,11 @@ class ContactsReport extends ReportGenerator {
 		// destination index 2 is sequence
 		$data = array();
 		foreach($personlist as $personrow){
-			if(!isset($phoneemailsmsdata[$personrow[1]])){
+			if(!isset($destinationdata[$personrow[1]])){
 				array_splice($personrow, 5, 0, array("","", ""));
 				$data[] = $personrow;
 			} else {
-				foreach($phoneemailsmsdata[$personrow[1]] as $destination){
+				foreach($destinationdata[$personrow[1]] as $destination){
 					array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[4]));
 					$data[] = $personrow;
 				}
