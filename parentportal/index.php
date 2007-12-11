@@ -69,6 +69,7 @@ if($id){
 	redirect("choosecustomer.php");
 }
 
+$TITLE= "Sign In";
 
 include_once("cmlogintop.inc.php");
 
