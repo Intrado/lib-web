@@ -201,19 +201,73 @@ function base64url_decode($string) {
     return base64_decode($data);
 }
 
+// returns true if email is valid, false otherwise
+function validEmail($email){
+		#
+	    # RFC822 Email Parser
+	    #
+	    # By Cal Henderson <cal@iamcal.com>
+	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
+	    # http://creativecommons.org/licenses/by-sa/2.5/
+	    #
+	    # $Revision: 1.54 $
+	    # http://www.iamcal.com/publish/articles/php/parsing_email/
+	
+	    ##################################################################################
+	
+	    #
+		# Email Parser Start
+		#
+		
+        $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
+
+        $dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';
+
+        $atom = '[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c'.
+            '\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+';
+
+        $quoted_pair = '\\x5c[\\x00-\\x7f]';
+
+        $domain_literal = "\\x5b($dtext|$quoted_pair)*\\x5d";
+
+        $quoted_string = "\\x22($qtext|$quoted_pair)*\\x22";
+
+        $domain_ref = $atom;
+
+        $sub_domain = "($domain_ref|$domain_literal)";
+
+        $word = "($atom|$quoted_string)";
+		// original code allows a domain to only contain a single sub_domain.  Code has been
+		// changed to require 2 domain parts ex.  "example.com"  instead of just "example"
+        $domain = "$sub_domain\\x2e$sub_domain(\\x2e$sub_domain)*";
+
+        $local_part = "$word(\\x2e$word)*";
+
+        $addr_spec = "$local_part\\x40$domain";
+
+		#
+		# Email Parser Start
+		#
+		
+        if(!preg_match("!^$addr_spec$!", $email)){
+        	return false;
+        }
+        return true;
+
+}
+
 //checks emails seperated by ";" in a single string
 function checkemails($emaillist) {
+
 	if($emaillist=="")
 		return false;
 	$bademaillist=array();
 	$emails = explode(";", $emaillist);
-	$i=0;
 	foreach($emails as $email){
 		if($email=="")
 			continue;
-		if (!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", trim($email))) {
-			$bademaillist[$i] = $email;
-			$i++;
+		if (!validEmail(trim($email))) {
+			$bademaillist[] = $email;
 		}
 	}
 	return $bademaillist;
