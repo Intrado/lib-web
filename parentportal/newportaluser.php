@@ -56,7 +56,7 @@ $TITLE = "Create a New Account";
 include_once("cmlogintop.inc.php");
 if(!$success){
 ?>
-	<form method="POST" action="newportaluser.php" name="newaccount">
+	<form method="POST" action="newportaluser.php" name="newaccount" onSubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
 		<table  style="color: #365F8D;" >
 			<tr>
 				<td width="20%">&nbsp;</td>
@@ -107,7 +107,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td width="20%">&nbsp;</td>
-				<td colspan="2"><?=customsubmit("newaccount", "main", "Create Account")?></td>
+				<td colspan="2"><?=submit("newaccount", "main", "Create Account")?></td>
 			</tr>
 			<tr>
 				<td width="20%">&nbsp;</td>
@@ -127,37 +127,4 @@ if(!$success){
 <?
 }
 include_once("cmloginbottom.inc.php");
-
-function custombutton($name, $onclick = NULL, $href = NULL) {
-
-	$btn = '<div class="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
-
-
-	if ($onclick)
-		$btn .= ' onclick="' . $onclick . '; return false;" ';
-	else if ($href)
-		$btn .= ' onclick="window.location=\'' . $href . '\'; return false;" ';
-
-	$btn .= '><a href="';
-
-	if ($href)
-		$btn .= htmlentities($href);
-	else
-		$btn .= "#";
-
-	$btn.= '">
-		<table><tr><td><img buttonrollover="left" src="img/button_left.gif"></td><td buttonrollover="middle" class="middle">' . $name . '</td><td><img buttonrollover="right" src="img/button_right.gif"></td></tr></table>
-	</a></div>';
-
-	return $btn;
-}
-
-function customsubmit($form, $section, $name = 'Submit') {
-	//ugly hack. in order for enter key to submit form, either we need to add JS to each text field, or there must be an actual submit button
-	//so we make a submit button and hide it off screen.
-	$ret = '<input type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" style="position: absolute; left: -1000px; top: -1000px;">';
-	$ret .= button($name,"if(new getObj('tos').obj.checked){ submitForm('$form','$section'); } else { window.alert('You must accept the Terms of Service.');}");
-
-	return $ret;
-}
 ?>
