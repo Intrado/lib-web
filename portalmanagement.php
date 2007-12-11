@@ -220,7 +220,6 @@ function fmt_activation_date($row, $index){
 	}
 	return "";
 }
-?>
 
 if($reportgenerator->format == "csv"){
 	$reportgenerator->generate();
