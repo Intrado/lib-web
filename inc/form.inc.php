@@ -19,9 +19,9 @@ array
 
 */
 
-function NewForm($formname) {
+function NewForm($formname, $extrahtml = "") {
 
-	echo "<form name=\"$formname\" method=\"post\" action=\"" . $_SERVER["REQUEST_URI"] . "\" enctype=\"multipart/form-data\">";
+	echo "<form name=\"$formname\" method=\"post\" action=\"" . $_SERVER["REQUEST_URI"] . "\" enctype=\"multipart/form-data\" " . $extrahtml . " >";
 	echo "<input type=\"hidden\" name=\"frm[" . $formname . "][timestamp]\" value=\""
 			. $_SESSION['formdata'][$formname]['timestamp'] . "\">";
 }
@@ -399,7 +399,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.12 $
+	    # $Revision: 1.13 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 	
 	    ##################################################################################
