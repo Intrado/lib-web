@@ -24,7 +24,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	
 	if($login != $confirmlogin){
 		error("The emails you have entered do not match");
-	} else if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $login)){
+	} else if(!validEmail($login)){
 		error("That is not a valid email format");
 	} else if(!ereg("^[0-9]*$",$zipcode)){
 		error("The zipcode must be a number");

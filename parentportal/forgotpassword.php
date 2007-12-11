@@ -14,7 +14,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$email2 = get_magic_quotes_gpc() ? stripslashes($_POST['email2']) : $_POST['email2'];
 	if ($email1 !== $email2){
 		error("The 2 emails you have entered do not match");
-	} else if(!preg_match("/^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,}$/", $email1)){
+	} else if(!validEmail($email1)){
 		error("That is not a valid email address");
 	} else {
 		$result = portalForgotPassword($email1);
