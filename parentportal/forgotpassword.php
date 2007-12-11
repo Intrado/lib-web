@@ -3,7 +3,6 @@ $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
-require_once("parentportalutils.inc.php");
 
 $success = false;
 $emailnotfound = false;
