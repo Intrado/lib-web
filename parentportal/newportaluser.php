@@ -64,6 +64,10 @@ if(!$success){
 			</tr>
 			<tr>
 				<td width="20%">&nbsp;</td>
+				<td colspan="2">Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
+			</tr>
+			<tr>
+				<td width="20%">&nbsp;</td>
 				<td>Email&nbsp;(this will be your login name):</td>
 				<td><input type="text" name="login" value="<?=$login?>" size="50" maxlength="255"/> </td>
 			</tr>
