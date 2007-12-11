@@ -221,7 +221,8 @@ if( $reloadform ) {
 
 include_once("nav.inc.php");
 
-NewForm($f);
+//custom newform declaration to catch if manager password is submitted
+NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
 
 ?>
 <br>
@@ -283,8 +284,8 @@ NewForm($f);
 <tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
 
 <tr>
-	<td><? NewFormItem($f, "Save","Save", 'submit', null, null, "onclick=\"if(new getObj('managerpassword').obj.value == ''){ window.alert('Enter Your Manager Password'); return false;}\"");?> </td>
-	<td><? NewFormItem($f, "Return","Save and Return", 'submit', null, null, "onclick=\"if(new getObj('managerpassword').obj.value == ''){ window.alert('Enter Your Manager Password'); return false;}\"");?></td>
+	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
+	<td><? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
 </tr>
 
 </table>
