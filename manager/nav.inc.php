@@ -19,6 +19,9 @@
 	  if(this.obj)
 		this.style = this.obj.style;
 	}
+	function popup(url, width, height) {
+		window.open(url, '_blank', 'width=' + width + ',height=' + height + 'location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=no');
+	}
 </script>
 <table border = 1>
 	<tr>
