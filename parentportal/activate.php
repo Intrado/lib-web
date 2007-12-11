@@ -80,7 +80,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 if($forgot){
 	$TITLE = "Password Assistance";
 	$action = "?f";
-	$text = "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first or last name, or email address";
+	$text = "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address";
 } else if($changeuser){
 	$TITLE = "Change Email";
 	$action = "?c";
