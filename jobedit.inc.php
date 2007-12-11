@@ -550,17 +550,17 @@ startWindow('Job Information');
 <?
 				if($USER->authorize('sendphone')){
 ?>	
-						<td align="center" style="padding-left:15px"><div onclick="clickIcon('phone')"><img src="img/icon_phone.gif" align="absmiddle"></div></td>
+						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('phone')\"" ?> ><img src="img/icon_phone.gif" align="absmiddle"></div></td>
 <?
 				}
 				if($USER->authorize('sendemail')){
 ?>
-						<td align="center" style="padding-left:15px"><div onclick="clickIcon('email')"><img src="img/icon_email.gif" align="absmiddle"></div></td>
+						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('email')\"" ?> ><img src="img/icon_email.gif" align="absmiddle"></div></td>
 <?
 				}
 				if($hassms && $USER->authorize('sendsms')){
 ?>
-						<td align="center" style="padding-left:15px"><div onclick="clickIcon('sms')"><img src="img/icon_sms.gif" align="absmiddle"></div></td>
+						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('sms')\""?> ><img src="img/icon_sms.gif" align="absmiddle"></div></td>
 <?
 				}
 ?>
