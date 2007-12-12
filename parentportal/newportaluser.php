@@ -1,8 +1,17 @@
 <?
 $ppNotLoggedIn = 1;
+
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
 
 $login = "";
 $firstname = "";
@@ -52,11 +61,38 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+//custom submit button required to run onclick ToS check.  form.submit() does not call onsubmit event handler in browsers.
+function customSubmit($form, $section, $name) {
+	//ugly hack. in order for enter key to submit form, either we need to add JS to each text field, or there must be an actual submit button
+	//so we make a submit button and hide it off screen.
+	$btn = '<input type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" style="position: absolute; left: -1000px; top: -1000px;">';
+	$btn .= '<div class="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	$btn .= ' onclick="if(new getObj(\'tos\').obj.checked){ submitForm(\'' . $form . '\',\'' . $section . '\'); } else { window.alert(\'You must accept the Terms of Service.\');}"';
+
+	$btn .= '><a href="';
+	$btn .= "#";
+
+	$btn.= '">
+		<table><tr><td><img buttonrollover="left" src="img/button_left.gif"></td><td buttonrollover="middle" class="middle">' . $name . '</td><td><img buttonrollover="right" src="img/button_right.gif"></td></tr></table>
+	</a></div>';
+
+	return $btn;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
+
 $TITLE = "Create a New Account";
 include_once("cmlogintop.inc.php");
 if(!$success){
 ?>
-	<form method="POST" action="newportaluser.php" name="newaccount" onSubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
+	<form method="POST" action="newportaluser.php" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
 		<table  style="color: #365F8D;" >
 			<tr>
 				<td width="20%">&nbsp;</td>
@@ -111,7 +147,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td width="20%">&nbsp;</td>
-				<td colspan="2"><?=submit("newaccount", "main", "Create Account")?></td>
+				<td colspan="2"><?=customSubmit("newaccount", "main", "Create Account")?></td>
 			</tr>
 			<tr>
 				<td width="20%">&nbsp;</td>
@@ -122,12 +158,20 @@ if(!$success){
 <?
 } else {
 ?>
-	<div style="margin:5px">
-		Thank you, Your account has been created.
-		<br>Please check your email to activate your account.
-		<br>You will be redirected to the activate page in 5 seconds.
-	</div>
-	<meta http-equiv="refresh" content="5;url=index.php?n">
+	<table style="color: #365F8D;">
+		<tr>
+			<td width=20%">&nbsp;</td>
+			<td>
+				<div style="margin:5px">
+					Thank you, Your account has been created.
+					<br>Please check your email to activate your account.
+					<br>You will be redirected to the activate page in 5 seconds.
+				</div>
+				<meta http-equiv="refresh" content="5;url=index.php?n">
+			</td>
+			<td widht="80%">&nbsp;</td>
+		</tr>
+	</table>
 <?
 }
 include_once("cmloginbottom.inc.php");
