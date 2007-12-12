@@ -75,6 +75,7 @@ if( $reloadform )
 	PutFormData($f, $s, "newpassword2", "", "text");
 	PutFormData($f, $s, "oldpassword", "", "text");
 	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999");
+	PutFormData($f, $s, "notify", 0, "bool", 0, 1);
 }
 
 $PAGE = "account:account";
@@ -92,36 +93,45 @@ startWindow('User Information');
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>
 						<td align="right">Email:</td>
-						<td colspan="4"><?=$_SESSION['portaluser']['portaluser.username']?></td>
+						<td><?=$_SESSION['portaluser']['portaluser.username']?></td>
 					</tr>
 					<tr>
 						<td align="right">First Name:</td>
-						<td colspan="4"><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
+						<td><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
 					</tr>
 					<tr>
 						<td align="right">Last Name:</td>
-						<td colspan="4"><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
+						<td><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
 					</tr>
 					<tr>
 						<td align="right">ZIP Code:</td>
-						<td colspan="4"><? NewFormItem($f, $s, 'zipcode', 'text', '5'); ?></td>
+						<td><? NewFormItem($f, $s, 'zipcode', 'text', '5'); ?></td>
 					</tr>
 					<tr>
 						<td align="right">*Old Password:</td>
-						<td colspan="4"><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
+						<td><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
 					</tr>
 					<tr>
 						<td align="right">*New Password:</td>
-						<td colspan="4"><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
+						<td><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
 					</tr>
 					<tr>
 						<td align="right">*Confirm New Password:</td>
-						<td colspan="4"><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
+						<td><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
 					</tr>
-					
 				</table>
 				<div>*Only required for changing your password</div>
 			</td>
+		</tr>
+		<tr>
+			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Preferences:</th>
+			<td  class="bottomBorder">
+				<table border="0" cellpadding="1" cellspacing="0">
+					<tr>
+						<td><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Notify me when I have a new phone message.</td>
+					</tr>
+				</table>
+			<td>
 		</tr>
 	</table>
 	
