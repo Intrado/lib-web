@@ -399,7 +399,7 @@ startWindow('Global System Settings');
 									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?>days</td>
 								</tr>
 								<tr>
-									<td width="30%">Require destinations for Emergency and High Priority Job Types</td>
+									<td width="30%">Require phone numbers for Emergency and High Priority Job Types</td>
 									<td><? NewFormItem($f, $s, "priorityenforcement", "checkbox"); ?></td>
 								</tr>
 								<tr>
