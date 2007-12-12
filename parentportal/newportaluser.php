@@ -111,7 +111,7 @@ if(!$success){
 			<tr>
 				<td>&nbsp;</td>
 				<td>Email&nbsp;(this will be your login name):</td>
-				<td><input type="text" name="login" value="<?=$login?>" size="50" maxlength="255"/> </td>
+				<td><input type="text" name="login" value="<?=htmlentities($login)?>" size="50" maxlength="255"/> </td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
