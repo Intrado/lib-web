@@ -29,13 +29,13 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$password1 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password1'])) : trim($_POST['password1']);
 	$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
 	$acceptterms = isset($_POST['acceptterms']);
-	
+
 	if($login != $confirmlogin){
 		error("The emails you have entered do not match");
 	} else if(!validEmail($login)){
 		error("That is not a valid email format");
 	} else if(!ereg("^[0-9]*$",$zipcode)){
-		error("The zipcode must be a number");
+		error("Zip code must be a 5 digit number");
 	} else if(strlen($zipcode) != 5){
 		error("Zip code must be a 5 digit number");
 	} else if($_POST['password1'] == ""){
@@ -100,7 +100,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td width="20%">&nbsp;</td>
-				<td colspan="2">Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
+				<td colspan="2">Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
 			</tr>
 			<tr>
 				<td width="20%">&nbsp;</td>
@@ -165,7 +165,7 @@ if(!$success){
 				<div style="margin:5px">
 					Thank you, Your account has been created.
 					<br>Please check your email to activate your account.
-					<br>You will be redirected to the activate page in 5 seconds.
+					<br>You will be redirected to the activation page in 5 seconds.
 				</div>
 				<meta http-equiv="refresh" content="5;url=index.php?n">
 			</td>
