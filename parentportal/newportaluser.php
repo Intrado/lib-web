@@ -151,7 +151,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td colspan="2"><input type="checkbox" name="notify"/> Email me when a new phone call is made</td>
+				<td colspan="2"><input type="checkbox" name="notify"/>&nbsp;Notify me when I have a new phone message.</td>
 				<td>
 			</tr>
 			<tr>
