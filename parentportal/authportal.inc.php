@@ -36,7 +36,7 @@ function pearxmlrpc($method, $params) {
 
 
 function portalCreateAccount($username, $password, $firstname, $lastname, $zipcode) {
-	$params = array(new XML_RPC_Value($username, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($firstname, 'string'), new XML_RPC_Value($lastname, 'string'), new XML_RPC_Value($zipcode, 'string'));
+	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'));
 	$method = "PortalServer.portal_createAccount";
 	$result = pearxmlrpc($method, $params);
 	return $result; // we do nothing for success/fail
@@ -44,7 +44,7 @@ function portalCreateAccount($username, $password, $firstname, $lastname, $zipco
 
 
 function portalActivateAccount($activationtoken, $password) {
-	$params = array(new XML_RPC_Value($activationtoken, 'string'), new XML_RPC_Value($password, 'string'));
+	$params = array(new XML_RPC_Value(trim($activationtoken), 'string'), new XML_RPC_Value(trim($password), 'string'));
 	$method = "PortalServer.portal_activateAccount";
 	$result = pearxmlrpc($method, $params);
 	if ($result['result'] == "") {
@@ -56,7 +56,7 @@ function portalActivateAccount($activationtoken, $password) {
 
 
 function portalPreactivateForgottenPassword($activationtoken) {
-	$params = array(new XML_RPC_Value($activationtoken, 'string'));
+	$params = array(new XML_RPC_Value(trim($activationtoken), 'string'));
 	$method = "PortalServer.portal_preactivateForgottenPassword";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -64,7 +64,7 @@ function portalPreactivateForgottenPassword($activationtoken) {
 
 
 function portalLogin($username, $password) {
-	$params = array(new XML_RPC_Value($username, 'string'), new XML_RPC_Value($password, 'string'));
+	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'));
 	$method = "PortalServer.portal_login";
 	$result = pearxmlrpc($method, $params);
 	if ($result['result'] == "") {
@@ -102,7 +102,7 @@ function portalAccessCustomer($customerid) {
 
 function portalAssociatePerson($token, $validationdata) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($token, 'string'), new XML_RPC_Value($validationdata, 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($token), 'string'), new XML_RPC_Value(trim($validationdata), 'string'));
 	$method = "PortalServer.portal_associatePerson";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -110,7 +110,7 @@ function portalAssociatePerson($token, $validationdata) {
 
 
 function portalForgotPassword($username) {
-	$params = array(new XML_RPC_Value($username, 'string'));
+	$params = array(new XML_RPC_Value(trim($username), 'string'));
 	$method = "PortalServer.portal_forgotPassword";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -128,7 +128,7 @@ function portalGetPortalUser() {
 
 function portalUpdatePortalUser($firstname, $lastname, $zipcode) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($firstname, 'string'), new XML_RPC_Value($lastname, 'string'), new XML_RPC_Value($zipcode, 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'));
 	$method = "PortalServer.portal_updateMyPortalUser";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -137,7 +137,7 @@ function portalUpdatePortalUser($firstname, $lastname, $zipcode) {
 
 function portalUpdatePortalUserPassword($newpassword, $oldpassword) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newpassword, 'string'), new XML_RPC_Value($oldpassword, 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($newpassword), 'string'), new XML_RPC_Value(trim($oldpassword), 'string'));
 	$method = "PortalServer.portal_updateMyPortalUserPassword";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -146,7 +146,7 @@ function portalUpdatePortalUserPassword($newpassword, $oldpassword) {
 
 function portalUpdatePortalUsername($username, $password) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($username, 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($password), 'string'), new XML_RPC_Value(trim($username), 'string'));
 	$method = "PortalServer.portal_updateMyPortalUsername";
 	$result = pearxmlrpc($method, $params);
 	return $result;
