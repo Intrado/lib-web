@@ -14,6 +14,7 @@ require_once("../inc/table.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 $login = "";
+$confirmlogin="";
 $firstname = "";
 $lastname = "";
 $zipcode = "";
