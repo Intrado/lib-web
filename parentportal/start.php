@@ -131,9 +131,14 @@ if(isset($contactList) && $contactList){
 } else {
 	startWindow("Welcome", 'padding: 3px;');
 ?>
-	<div style="margin:5px">
-		Welcome to the Contact Manager.<br>Once you have added contacts, you will be able to view your old messages and set preferences on how to receive your messages.  You should have received activation codes for each contact you are elligible to add.<br>If you would like to begin adding contacts, <a href="addcontact1.php"><img src="img/bug_important.gif" >Click Here</a>
+
+	<div style="margin:5px; width:600px">
+		Welcome to the Contact Manager.  Once you have added contacts, you will be able to view your old messages and set preferences on how to receive your messages.  You should have received activation codes for each contact you are elligible to add.
+		<br>
+		<br>
+		If you would like to begin adding contacts, <a href="addcontact1.php"><img src="img/bug_important.gif" >Click Here</a>
 	</div>
+
 <?
 	endWindow();
 }
