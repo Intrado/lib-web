@@ -92,6 +92,14 @@ if($forgot){
 }
 include("cmlogintop.inc.php");
 
+if($forgotsuccess || $success || $newusersuccess){
+?>
+	<table style="color: #365F8D;">
+		<tr>
+			<td width="20%">&nbsp;</td>
+			<td>
+<?
+}
 if($forgotsuccess){
 	?>
 	<div style="margin:5px">
@@ -116,15 +124,15 @@ if($forgotsuccess){
 	</div>
 	<meta http-equiv="refresh" content="5;url=index.php">
 	<?
-} else if ($error && $forgot){
+}
+if($forgotsuccess || $success || $newusersuccess){
 ?>
-	<div style="color: red;">That code is invalid or has expired.</div>
-<?
-} else if ($error){
-?>
-	<div style="color: red;">That code is invalid or has expired or that is an incorrect password.</div>
+			</td>
+		</tr>
+	</table>
 <?
 }
+
 if($form){
 ?>
 	<form method="POST" action="<?=$action?>" name="activate">
@@ -181,7 +189,27 @@ if($form){
 		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
-			<td><br><a href="index.php">Return to Sign In</a></td>
+			<td>
+<?
+		if ($error && $forgot){
+?>
+			<div style="color: red;">That code is invalid or has expired.</div>
+<?
+		} else if ($error){
+?>
+			<div style="color: red;">That code is invalid or has expired or that is an incorrect password.</div>
+<?
+		} else {
+			echo "&nbsp;";
+		}
+?>
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td><a href="index.php">Return to Sign In</a></td>
 			<td>&nbsp;</td>
 		</tr>
 		</table>
