@@ -55,6 +55,15 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 						"4" => "fmt_delivery_type_list",
 						"Actions" => "message_action"
 					);
+} else {
+	$result = portalGetCustomerAssociations();
+	if($result['result'] == ""){
+		$customerlist = $result['custmap'];
+		$customeridlist = array_keys($customerlist);
+	}
+	if(isset($customerlist)){
+		redirect("choosecustomer.php");
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
