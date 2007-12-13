@@ -210,14 +210,14 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.54 $
+	    # $Revision: 1.55 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 	
 	    ##################################################################################
 	
-	    #
-		# Email Parser Start
-		#
+	    ##################################################################################
+		# Beginning of Creative Commons Email Parser Code
+		##################################################################################
 		
         $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
 
@@ -245,9 +245,9 @@ function validEmail($email){
 
         $addr_spec = "$local_part\\x40$domain";
 
-		#
-		# Email Parser Start
-		#
+		##################################################################################
+		# End of Creative Commons Email Parser Code
+		##################################################################################
 		
         if(!preg_match("!^$addr_spec$!", $email)){
         	return false;
