@@ -35,8 +35,8 @@ function pearxmlrpc($method, $params) {
 }
 
 
-function portalCreateAccount($username, $password, $firstname, $lastname, $zipcode) {
-	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'));
+function portalCreateAccount($username, $password, $firstname, $lastname, $zipcode, $notifyType) {
+	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'), new XML_RPC_Value(trim($notifyType), 'string'));
 	$method = "PortalServer.portal_createAccount";
 	$result = pearxmlrpc($method, $params);
 	return $result; // we do nothing for success/fail
@@ -126,9 +126,9 @@ function portalGetPortalUser() {
 }
 
 
-function portalUpdatePortalUser($firstname, $lastname, $zipcode) {
+function portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'), new XML_RPC_Value(trim($notifyType), 'string'));
 	$method = "PortalServer.portal_updateMyPortalUser";
 	$result = pearxmlrpc($method, $params);
 	return $result;

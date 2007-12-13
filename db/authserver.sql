@@ -114,6 +114,10 @@ ADD PRIMARY KEY ( `customerid` , `validationdata` , `token` ) ;
 
 ALTER TABLE `persontoken` ADD INDEX `token` ( `token` ) ;
 
+-- Dec 13
+
+ALTER TABLE `portaluser` ADD `notify` ENUM( 'none', 'message' ) NOT NULL DEFAULT 'none' ;
+
 
 
 

@@ -39,7 +39,8 @@ if(CheckFormSubmit($f,$s))
 			error('Password confirmation does not match');
 		} else {
 			//submit changes
-			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"));
+			$notifyType = "none"; // TODO set "none" or "message" based on checkbox value
+			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType);
 			if($result['result'] != ""){
 				$updateuser = false;
 				error($error_failedupdate);
@@ -85,7 +86,7 @@ NewForm($f);
 buttons(submit($f, $s, 'Save'), button("Change Email",NULL, "changeemail.php"));
 
 startWindow('User Information');
-?>			
+?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>
 			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Account Info:</th>
@@ -119,6 +120,7 @@ startWindow('User Information');
 						<td align="right">*Confirm New Password:</td>
 						<td><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
 					</tr>
+
 				</table>
 				<div>*Only required for changing your password</div>
 			</td>
@@ -130,11 +132,11 @@ startWindow('User Information');
 					<tr>
 						<td><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Notify me when I have a new phone message.</td>
 					</tr>
-				</table>
+	</table>
 			<td>
 		</tr>
 	</table>
-	
+
 <?
 endWindow();
 buttons();

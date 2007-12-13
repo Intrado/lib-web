@@ -48,7 +48,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	} else if($passworderror = validateNewPassword($login, $password1, $firstname, $lastname)){
 		error($passworderror);
 	} else {
-		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode);
+		$notifyType = "none"; // TODO set "none" or "message" based on checkbox value
+		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode, $notifyType);
 		if($result['result'] != ""){
 			if($result['result'] == "duplicate"){
 				$errordetails = "That email address is already in use";
