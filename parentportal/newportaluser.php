@@ -66,25 +66,6 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-//custom submit button required to run onclick ToS check.  form.submit() does not call onsubmit event handler in browsers.
-function customSubmit($form, $section, $name) {
-	//ugly hack. in order for enter key to submit form, either we need to add JS to each text field, or there must be an actual submit button
-	//so we make a submit button and hide it off screen.
-	$btn = '<input type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" style="position: absolute; left: -1000px; top: -1000px;">';
-	$btn .= '<div class="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
-	$btn .= ' onclick="if(new getObj(\'tos\').obj.checked){ submitForm(\'' . $form . '\',\'' . $section . '\'); } else { window.alert(\'You must accept the Terms of Service.\');}"';
-
-	$btn .= '><a href="';
-	$btn .= "#";
-
-	$btn.= '">
-		<table><tr><td><img buttonrollover="left" src="img/button_left.gif"></td><td buttonrollover="middle" class="middle">' . $name . '</td><td><img buttonrollover="right" src="img/button_right.gif"></td></tr></table>
-	</a></div>';
-
-	return $btn;
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +148,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td colspan="2"><?=customSubmit("newaccount", "main", "Create Account")?></td>
+				<td colspan="2"><?=submit("newaccount", "main", "Create Account")?></td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
