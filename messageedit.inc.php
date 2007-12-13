@@ -6,6 +6,13 @@ include_once("inc/common.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$maxattachmentsize = 2 * 1024 * 1024; //2m
+$unsafeext = array(".ade",".adp",".asx",".bas",".bat",".chm",".cmd",".com",".cpl",
+	".crt",".dbx",".exe",".hlp",".hta",".inf",".ins",".isp",".js",".jse",".lnk",
+	".mda",".mdb",".mde",".mdt",".mdw",".mdz",".mht",".msc",".msi",".msp",".mst",
+	".nch",".ops",".pcd",".pif",".prf",".reg",".scf",".scr",".sct",".shb",".shs",
+	".url",".vb",".vbe",".vbs",".wms",".wsc",".wsf",".wsh",".zip",".dmg",".app");
+
 //get the message to edit from the request params or session
 if (isset($_GET['id'])) {
 	if($_GET['id'] == "new")
@@ -13,8 +20,18 @@ if (isset($_GET['id'])) {
 	else
 		setCurrentMessage($_GET['id']);
 
+	//if we did have a temp uploaded file, delete it.
+	if (isset($_SESSION['emailattachment'])) {
+		QuickUpdate("delete from content where id=" . $_SESSION['emailattachment']['cmid']);
+		unset($_SESSION['emailattachment']);
+	}
+
 	redirect("message" . $MESSAGETYPE . ".php");
 }
+
+$attachments = array(); //id -> obj map
+if ($_SESSION['messageid'])
+	$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid=" . DBSafe($_SESSION['messageid']));
 
 /****************** main message section ******************/
 
@@ -23,8 +40,80 @@ $form = "message";
 $section = "main". $MESSAGETYPE;
 $reloadform = 0;
 
-if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
+
+if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFormSubmit($form,"delete") !== false)
 {
+	//get any uploaded file and put in session queue (use session in case there is a form error)
+	$uploaderror = false;
+	if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['error'] != UPLOAD_ERR_OK) {
+		switch($_FILES['emailattachment']['error']) {
+		case UPLOAD_ERR_INI_SIZE:
+		case UPLOAD_ERR_FORM_SIZE:
+			error('The file you uploaded exceeds the maximum email attachment limit of 2048K');
+			$uploaderror = true;
+			break;
+		case UPLOAD_ERR_PARTIAL:
+			error('The file upload did not complete','Please try again','If the problem persists, please check your network settings');
+			$uploaderror = true;
+			break;
+		case UPLOAD_ERR_NO_FILE:
+			if (CheckFormSubmit($form,"upload")) {
+				error("Please select a file to upload");
+				$uploaderror = true;
+			}
+			break;
+		case UPLOAD_ERR_NO_TMP_DIR:
+		case UPLOAD_ERR_CANT_WRITE:
+		case UPLOAD_ERR_EXTENSION:
+			error('Unable to complete file upload. Please try again');
+			$uploaderror = true;
+			break;
+		}
+	} else if(isset($_FILES['emailattachment']) && $_FILES['emailattachment']['tmp_name']) {
+
+		$newname = secure_tmpname("emailattachment",".dat");
+
+		$filename = $_FILES['emailattachment']['name'];
+		$extdotpos = strrpos($filename,".");
+		if ($extdotpos !== false)
+			$ext = substr($filename,$extdotpos);
+
+		$mimetype = $_FILES['emailattachment']['type'];
+
+		$uploaderror = true;
+		if(!move_uploaded_file($_FILES['emailattachment']['tmp_name'],$newname)) {
+			error('Unable to complete file upload. Please try again');
+		} else if (!is_file($newname) || !is_readable($newname)) {
+			error('Unable to complete file upload. Please try again');
+		} else if (array_search(strtolower($ext),$unsafeext) !== false) {
+			error('The file you uploaded may pose a security risk and is not allowed' , 'Please check the help documentation for more information on safe and unsafe file types');
+		} else if ($_FILES['emailattachment']['size'] >= $maxattachmentsize) {
+			error('The file you uploaded exceeds the maximum email attachment limit of 2048K');
+		} else if ($_FILES['emailattachment']['size'] <= 0) {
+			error('The file you uploaded apears to be empty','Please check the file and try again');
+		} else if ($extdotpos === false) {
+			error('The file you uploaded does not have a file extension','Please make sure the file has the correct extension and try again');
+		} else {
+
+			$contentid = contentPut($newname,$mimetype);
+			@unlink($dest);
+
+			if ($contentid) {
+				$_SESSION['emailattachment'] = array(
+						"cmid" => $contentid,
+						"filename" => $filename,
+						"size" => $_FILES['emailattachment']['size'],
+						"mimetype" => $_FILES['emailattachment']['type']
+					);
+				$uploaderror = false;
+			} else {
+				error_log("Unable to upload email attachment data, either the file was empty or there is a DB problem.");
+				error('Unable to complete file upload. Please try again');
+			}
+		}
+	}
+
+
 	//check to see if formdata is valid
 	if(CheckFormInvalid($form))
 	{
@@ -46,9 +135,10 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 			error('A message named \'' . GetFormData($form,$section,"name") . '\' already exists');
 		} else if (strlen(GetFormData($form,$section,"body")) == 0) {
 			error('The message body cannot be empty');
-		} else {
+		} else if (!$uploaderror) {
 			//check the parsing
 			$message = new Message($_SESSION['messageid']);
+			$message->readHeaders();
 			$errors = array();
 			$parts = $message->parse(GetFormData($form,$section,"body"),$errors);
 			$charcount = 0;
@@ -60,7 +150,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 						$charcount += strlen($part->txt);
 				}
 			}
-			
+
 			if (count($errors) > 0) {
 				error('There was an error parsing the message', implode("",$errors));
 			} else if($MESSAGETYPE == "sms" && $charcount > 160){
@@ -92,6 +182,31 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 				$message->stuffHeaders();
 				$message->update();
 
+				//check for deleted attachments
+				if (CheckFormSubmit($form,"delete") !== false) {
+					$deleteid = CheckFormSubmit($form,"delete");
+					if (isset($attachments[$deleteid])) {
+						$msgattachment = $attachments[$deleteid];
+						$msgattachment->deleted=1;
+						$msgattachment->update();
+						unset($attachments[$deleteid]);
+					} else {
+						error_log("trying to delete nonexistant messageattachment");
+					}
+				}
+				//see if there is an uploaded file and add it to this email
+				if (isset($_SESSION['emailattachment'])) {
+					$msgattachment = new MessageAttachment();
+					$msgattachment->messageid = $message->id;
+					$msgattachment->contentid = $_SESSION['emailattachment']['cmid'];
+					$msgattachment->filename = $_SESSION['emailattachment']['filename'];
+					$msgattachment->size = $_SESSION['emailattachment']['size'];
+					$msgattachment->create();
+					$attachments[$msgattachment->id] = $msgattachment;
+					unset($_SESSION['emailattachment']);
+				}
+
+
 				//update the parts
 				QuickUpdate("delete from messagepart where messageid=$message->id");
 				foreach ($parts as $part) {
@@ -103,12 +218,11 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"preview"))
 
 				$_SESSION['messageid'] = $message->id;
 
-				if (CheckFormSubmit($form,"preview")) {
-					$reloadform = 1;
-					$dopreview = 1;
-				} else {
+				if (CheckFormSubmit($form,$section)) {
 					ClearFormData($form);
 					redirect('messages.php');
+				} else {
+					$reloadform = 1;
 				}
 			}
 		}
@@ -168,6 +282,7 @@ if( $reloadform )
 }
 
 $fieldmap = FieldMap::getAuthorizedMapNames();
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -269,15 +384,59 @@ switch($MESSAGETYPE)
 				<tr>
 					<th align="right" class="windowRowHeader">From Name:</th>
 					<td colspan="3">
-						<? NewFormItem($form, $section, 'fromname', 'text', 30, 50); ?>
+						<? NewFormItem($form, $section, 'fromname', 'text', 30, 50); ?> (ex: Joe Smith)
 					</td>
 				</tr>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder">From Email:</th>
 					<td colspan="3" class="bottomBorder">
-						<? NewFormItem($form, $section, 'fromemail', 'text', 30,100); ?>
+						<? NewFormItem($form, $section, 'fromemail', 'text', 50,100); ?> (ex: joe.smith@example.com)
 					</td>
 				</tr>
+
+
+				<tr>
+					<th align="right" class="windowRowHeader bottomBorder">Attachments:</th>
+					<td colspan="3" class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="1" class="list" width="50%">
+						<tr class="listHeader" align="left" valign="bottom">
+							<th>Name</th>
+							<th>Size</th>
+							<th>Actions</th>
+						</tr>
+<?
+		foreach ($attachments as $attachment) {
+?>
+						<tr>
+							<td><a href="messageattachmentdownload.php?id=<?= $attachment->id ?>"><?= htmlentities($attachment->filename)?></a></td>
+							<td><?= max(1,round($attachment->size/1024)) ?>K</td>
+							<td><?= submit($form,'delete',"Delete",$attachment->id); ?></td>
+						</tr>
+<?
+		}
+		//if the user uploaded a file, but needs to correct form errors, don't show the upload box again
+		if (isset($_SESSION['emailattachment'])) {
+?>
+						<tr>
+							<td><?= htmlentities($_SESSION['emailattachment']['filename']) ?></td>
+							<td><?= max(1,round($_SESSION['emailattachment']['size']/1024)) ?>K</td>
+							<td>&nbsp;</td>
+						</tr>
+<?
+		} else {
+?>
+						<tr>
+							<td><input type="hidden" name="MAX_FILE_SIZE" value="<?= $maxattachmentsize ?>"><input type="file" name="emailattachment" size="30"></td>
+							<td>(Max 2048K)</td>
+							<td><?= submit($form, "upload", 'Upload') ?></td>
+						</tr>
+<?
+		}
+?>
+						</table>
+					</td>
+				</tr>
+
 				<tr>
 					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessageEmail_Body'); ?></th>
 					<td>
