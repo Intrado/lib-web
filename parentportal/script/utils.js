@@ -101,5 +101,7 @@ function submitForm (formname,section,value) {
 	submit.value= value == undefined ? 'Submit' : value;
 	submit.setAttribute('type','hidden');
 	theform.appendChild(submit);
-	theform.submit();
+	if(!(theform.onsubmit && theform.onsubmit() == false)){
+		theform.submit();
+	}
 }
