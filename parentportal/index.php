@@ -81,7 +81,7 @@ include_once("cmlogintop.inc.php");
 			<td width="20%">&nbsp;</td>
 			<td>
 				<div style="font-size: 20px; font-weight: bold;">Contact Manager</div>
-				<div style="font-size: 12px;">Manage your contact preferences...</div>
+				<div style="font-size: 12px;">Welcome to the Contact Manager.  Here you will have access to contact data and your messages as well as configure preferences on how you would like to be contacted.  Don't delay, sign up now!</div>
 			</td>
 			<td width="80%">&nbsp;</td>
 		</tr>
