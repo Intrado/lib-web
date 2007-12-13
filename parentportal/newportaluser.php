@@ -97,7 +97,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td>Email Confirmation:</td>
+				<td>Confirm Email:</td>
 				<td><input type="text" name="confirmlogin" value="<?=htmlentities($confirmlogin)?>" size="50" maxlength="255"/> </td>
 				<td>&nbsp;</td>
 			</tr>

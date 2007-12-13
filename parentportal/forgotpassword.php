@@ -50,12 +50,12 @@ if(!$success){
 		</tr>
 		<tr>
 			<td width="20%">&nbsp;</td>
-			<td>Email Address:</td>
+			<td>Email:</td>
 			<td><input type="text" name="email1" size="50" maxlength="255" value="<?=htmlentities($email1)?>"></td>
 		</tr>
 		<tr>
 			<td width="20%">&nbsp;</td>
-			<td>Email Confirmation:</td>
+			<td>Confirm Email:</td>
 			<td><input type="text" name="email2" size="50" maxlength="255" value="<?=htmlentities($email2)?>"></td>
 		</tr>
 		<tr>
