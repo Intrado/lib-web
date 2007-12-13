@@ -18,6 +18,7 @@ $confirmlogin="";
 $firstname = "";
 $lastname = "";
 $zipcode = "";
+$notify = 0;
 $success = false;
 $tos = file_get_contents("terms.html");
 
@@ -29,8 +30,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$zipcode = get_magic_quotes_gpc() ? stripslashes($_POST['zipcode']) : $_POST['zipcode'];
 	$password1 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password1'])) : trim($_POST['password1']);
 	$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
+	$notify = isset($_POST['notify']) ? $_POST['notify'] : 0;
 	$acceptterms = isset($_POST['acceptterms']);
-	
 	if($login != $confirmlogin){
 		error("The emails you have entered do not match");
 	} else if(!validEmail($login)){
@@ -48,7 +49,11 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	} else if($passworderror = validateNewPassword($login, $password1, $firstname, $lastname)){
 		error($passworderror);
 	} else {
-		$notifyType = "none"; // TODO set "none" or "message" based on checkbox value
+		if($notify){
+			$notifyType = "message";
+		} else {
+			$notifyType = "none";
+		}
 		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode, $notifyType);
 		if($result['result'] != ""){
 			if($result['result'] == "duplicate"){
@@ -134,7 +139,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td colspan="2"><input type="checkbox" name="notify"/>&nbsp;Notify me when I have a new phone message.</td>
+				<td colspan="2"><input type="checkbox" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>&nbsp;Notify me when I have a new phone message.</td>
 				<td>
 			</tr>
 			<tr>

@@ -39,7 +39,11 @@ if(CheckFormSubmit($f,$s))
 			error('Password confirmation does not match');
 		} else {
 			//submit changes
-			$notifyType = "none"; // TODO set "none" or "message" based on checkbox value
+			if(GetFormData($f, $s, "notify")){
+				$notifyType = "message";
+			} else {
+				$notifyType = "none";
+			}
 			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType);
 			if($result['result'] != ""){
 				$updateuser = false;
@@ -76,7 +80,7 @@ if( $reloadform )
 	PutFormData($f, $s, "newpassword2", "", "text");
 	PutFormData($f, $s, "oldpassword", "", "text");
 	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999");
-	PutFormData($f, $s, "notify", 0, "bool", 0, 1);
+	PutFormData($f, $s, "notify",  ($_SESSION['portaluser']['portaluser.notifytype'] == "message") ? 1 : 0, "bool", 0, 1);
 }
 
 $PAGE = "account:account";
