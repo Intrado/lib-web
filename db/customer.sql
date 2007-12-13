@@ -1313,3 +1313,15 @@ ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
 ADD PRIMARY KEY ( `personid` )
 $$$
 
+-- email attachments
+
+CREATE TABLE `messageattachment` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`messageid` INT NOT NULL ,
+`contentid` BIGINT NOT NULL ,
+`filename` VARCHAR( 255 ) NOT NULL ,
+`size` INT NOT NULL ,
+`deleted` TINYINT NOT NULL DEFAULT '0',
+INDEX ( `messageid` )
+) ENGINE = innodb;
+
