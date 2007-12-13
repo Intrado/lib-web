@@ -1000,31 +1000,10 @@ function hideSection(section){
 }
 
 function clickIcon(section){
-	var checked;
-	switch(section){
-		case 'phone':
-			var sendphone = new getObj('sendphone').obj;
-			sendphone.checked = !sendphone.checked;
-			checked = sendphone.checked;
-			break;
-		case 'email':
-			var sendemail = new getObj('sendemail').obj;
-			sendemail.checked = !sendemail.checked;
-			checked = sendemail.checked;
-			break;
-		case 'print':
-			var sendprint = new getObj('sendprint').obj;
-			sendprint.checked = !sendprint.checked;
-			checked = sendprint.checked;
-			break;
-		case 'sms':
-			var sendsms = new getObj('sendsms').obj;
-			sendsms.checked = !sendsms.checked;
-			checked = sendsms.checked;
-			break;
-	}
+	var checkbox = new getObj('send' + section).obj;
+	checkbox.checked = !checkbox.checked;
 	
-	if(checked){
+	if(checkbox.checked){
 		displaySection(section);
 	} else {
 		hideSection(section);
