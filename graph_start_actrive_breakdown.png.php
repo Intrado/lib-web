@@ -14,9 +14,9 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 $query = "
 select count(*) as cnt,
 		coalesce(
-			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts > '0' and rc.numattempts < js.value, 'retry', null),
+			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts > 0 and rc.numattempts < js.value, 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
-			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = '0', 'inprogress', null),
+			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = 0, 'inprogress', null),
 			rc.result)
 			as callprogress2
 

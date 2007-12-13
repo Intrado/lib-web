@@ -23,9 +23,9 @@ if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && custom
 $query = "
 select count(*) as cnt,
 		coalesce(
-			if(rc.result not in ('A', 'M') and rc.numattempts > '0' and rc.numattempts < js.value and j.status not in ('complete','cancelled'), 'retry', null),
+			if(rc.result not in ('A', 'M') and rc.numattempts > 0 and rc.numattempts < js.value and j.status not in ('complete','cancelled'), 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
-			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
+			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = 0 and j.status not in ('complete','cancelled'), 'inprogress', null),
 			rc.result)
 			as callprogress2
 
