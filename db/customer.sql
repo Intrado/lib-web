@@ -1323,5 +1323,6 @@ CREATE TABLE `messageattachment` (
 `size` INT NOT NULL ,
 `deleted` TINYINT NOT NULL DEFAULT '0',
 INDEX ( `messageid` )
-) ENGINE = innodb;
+) ENGINE = innodb
+$$$
 
