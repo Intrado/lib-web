@@ -1,5 +1,5 @@
 <?
-include_once("inc/common.inc.php");
+require_once("inc/common.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -396,7 +396,7 @@ switch($MESSAGETYPE)
 
 
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Attachments:</th>
+					<th align="right" class="windowRowHeader bottomBorder">Attachments:<br>(Max 3)</th>
 					<td colspan="3" class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="1" class="list" width="50%">
 						<tr class="listHeader" align="left" valign="bottom">
@@ -423,7 +423,7 @@ switch($MESSAGETYPE)
 							<td>&nbsp;</td>
 						</tr>
 <?
-		} else {
+		} else if (count($attachments) < 3) {
 ?>
 						<tr>
 							<td><input type="hidden" name="MAX_FILE_SIZE" value="<?= $maxattachmentsize ?>"><input type="file" name="emailattachment" size="30"></td>
