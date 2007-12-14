@@ -1313,6 +1313,11 @@ ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
 ADD PRIMARY KEY ( `personid` )
 $$$
 
+-- Dec 13
+
+ALTER TABLE `portalperson` ADD `notifyemail` VARCHAR( 100 ) NULL
+$$$
+
 -- email attachments
 
 CREATE TABLE `messageattachment` (
