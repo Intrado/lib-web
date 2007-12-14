@@ -17,7 +17,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$firstnameField = FieldMap::getFirstNameField();
 	$lastnameField = FieldMap::getLastNameField();
 	$contactList = getContactIDs($_SESSION['portaluserid']);
-	
+
 	$contactListString = implode("','", $contactList);
 	$contactCount=array();
 	$allData = array();
@@ -27,10 +27,10 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	}
 
 	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.emailmessageid
-		from job j 
+		from job j
 		left join reportperson rp on (rp.jobid = j.id)
 		inner join user u on (u.id = j.userid)
-		where 
+		where
 		j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
 		and rp.personid in ('" . $contactListString . "')
 		and j.status in ('active', 'complete')
@@ -49,7 +49,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 					"4" => "#Delivery Type",
 					"Actions" => "Actions"
 				);
-	
+
 	$formatters = array("2" => "format_date",
 						"SentBy" => "sender",
 						"4" => "fmt_delivery_type_list",
@@ -61,7 +61,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 		$customerlist = $result['custmap'];
 		$customeridlist = array_keys($customerlist);
 	}
-	if(isset($customerlist)){
+	if(isset($customerlist) && sizeof($customerlist) > 0){
 		redirect("choosecustomer.php");
 	}
 }
@@ -96,7 +96,7 @@ function sender($row, $index){
 	//index 4 is type
 	//index 8 is email message id
 	//fetch associated email message if it exists and find email return address
-	
+
 	$types = explode(",",$row[4]);
 	if(in_array("email", $types)){
 		$message = DBFind("Message", "from message m where m.id = '" . DBSafe($row[8]) . "'");
