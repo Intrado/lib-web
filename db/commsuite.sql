@@ -373,6 +373,18 @@ CREATE TABLE `message` (
 
 -- --------------------------------------------------------
 
+CREATE TABLE `messageattachment` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`messageid` INT NOT NULL ,
+`contentid` BIGINT NOT NULL ,
+`filename` VARCHAR( 255 ) NOT NULL ,
+`size` INT NOT NULL ,
+`deleted` TINYINT NOT NULL DEFAULT '0',
+INDEX ( `messageid` )
+) ENGINE = innodb
+$$$
+
+
 --
 -- Table structure for table `messagepart`
 --
@@ -510,7 +522,8 @@ CREATE TABLE `phone` (
 CREATE TABLE `portalperson` (
   `portaluserid` int(11) NOT NULL,
   `personid` int(11) NOT NULL,
-  PRIMARY KEY  (`portaluserid`,`personid`)
+  `notifyemail` VARCHAR( 100 ) NULL,
+  PRIMARY KEY  (`portaluserid`, `personid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8   $$$
 
 -- --------------------------------------------------------
