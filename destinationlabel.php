@@ -57,7 +57,7 @@ if(CheckFormSubmit($f,$s))
 			QuickUpdate("delete from destlabel where type = '" . DBSafe($type) . "'");
 			for($i = 0; $i < $max; $i++){
 				QuickUpdate("insert into destlabel (type, sequence, label) values
-								('" . DBSafe($type) . "', '" . $i . "', '" . GetFormData($f, $s, $type . $i) . "')");
+								('" . DBSafe($type) . "', '" . $i . "', '" . DBSafe(GetFormData($f, $s, $type . $i)) . "')");
 			}
 			QuickUpdate("commit");
 			redirect("contactsettings.php");
