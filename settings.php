@@ -131,7 +131,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 					setSetting('priorityenforcement', GetFormData($f, $s, 'priorityenforcement'));
 				}
 
-				
+				setSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'));
+				setSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'));
+				setSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'));
 
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
@@ -169,6 +171,10 @@ if( $reloadform )
 
 	PutFormData($f, $s, "autoreport_replyemail", getSetting('autoreport_replyemail'), 'email',0,100);
 	PutFormData($f, $s, "autoreport_replyname", getSetting('autoreport_replyname'), 'text',0,100);
+
+	PutFormData($f, $s, "loginlockoutattempts", getSystemSetting('loginlockoutattempts', 5), "number", 0);
+	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', 0), "number", 0);
+	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', 5), "number", 0);
 
 	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), "number", 0, 10);
 	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), "number", 0, 10);
@@ -383,6 +389,18 @@ startWindow('Global System Settings');
 							<tr>
 								<td width="30%">Very Secure Passwords<? print help('Settings_VerySecurePasswords'); ?></td>
 								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
+							</tr>
+							<tr>
+								<td width="30%">Failed login attempts to cause lockout</td>
+								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?></td>
+							</tr>
+							<tr>
+								<td>Failed login attempts before account disable</td>
+								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?></td>
+							</tr>
+							<tr>
+								<td>Number of minutes for login lockout</td>
+								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> Minutes</td>
 							</tr>
 						</table>
 					</td>

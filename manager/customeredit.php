@@ -204,6 +204,10 @@ if( $reloadform ) {
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 150, 900);
 
+	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
+	PutFormData($f, $s, "logindisableattempts", getCustomerSystemSetting('logindisableattempts', 0, true, $custdb), "number", 0);
+	PutFormData($f, $s, "loginlockouttime", getCustomerSystemSetting('loginlockouttime', 5, true, $custdb), "number", 0);
+
 	$oldlanguages = array();
 	foreach($languages as $index => $language){
 		$oldlanguages[] = $index;
@@ -251,7 +255,9 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
 <tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
-
+<tr><td width="30%">Failed login attempts to cause lockout:</td><td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?></td></tr>
+<tr><td>Failed login attempts before account disable:</td><td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?></td></tr>
+<tr><td>Number of minutes for login lockout:</td><td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> Minutes</td></tr>
 
 <?
 
