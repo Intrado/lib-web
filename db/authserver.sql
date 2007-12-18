@@ -118,7 +118,18 @@ ALTER TABLE `persontoken` ADD INDEX `token` ( `token` ) ;
 
 ALTER TABLE `portaluser` ADD `notify` ENUM( 'none', 'message' ) NOT NULL DEFAULT 'none' ;
 
+-- Dec 17
 
+ CREATE TABLE `loginattempt` (
+`customerid` INT NOT NULL ,
+`login` VARCHAR( 20 ) NOT NULL ,
+`ipaddress` VARCHAR( 15 ) NOT NULL ,
+`attempts` TINYINT NOT NULL ,
+`lastattempt` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+`status` ENUM( 'enabled', 'disabled', 'lockout' ) NOT NULL DEFAULT 'enabled' ,
+PRIMARY KEY ( `customerid` , `login` ) ,
+INDEX ( `status` )
+) ENGINE = innodb ;
 
 
 

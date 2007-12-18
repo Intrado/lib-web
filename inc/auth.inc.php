@@ -41,14 +41,21 @@ function getCustomerName($url) {
 	return false;
 }
 
-function doLogin($loginname, $password, $url = null) {
-	$params = array(new XML_RPC_Value($loginname, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($url, 'string'));
+function doLogin($loginname, $password, $url = null, $ipaddress = null) {
+	$ipaddress = "127.0.0.1"; // TODO
+	$params = array(new XML_RPC_Value($loginname, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($url, 'string'), new XML_RPC_Value($ipaddress, 'string'));
 	$method = "AuthServer.login";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
-		// login success
-		session_id($result['sessionID']); // set the session id
-		return $result['userID'];
+		if ($result['userID'] == -1) {
+			return false; // TODO replace this with -1
+			return -1; // user temporarily locked out
+			// TODO everywhere that calls doLogin need to test for -1 condition
+		} else {
+			// login success
+			session_id($result['sessionID']); // set the session id
+			return $result['userID'];
+		}
 	}
 	return false;
 }
