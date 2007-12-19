@@ -15,6 +15,7 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 if(isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
 	if (userOwns("message",$id)) {
+		$fields=array();
 		for($i=1; $i <= 20; $i++){
 			$fieldnum = sprintf("f%02d", $i);
 			if(isset($_REQUEST[$fieldnum]))
