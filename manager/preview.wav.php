@@ -22,6 +22,7 @@ if(isset($_GET['id']) && isset($_GET['customerid'])) {
 	if(!$_dbcon) {
 		exit("Connection failed for customer: $custinfo[0], db: c_" . $customerid);
 	}
+	$fields = array();
 	for($i=1; $i <= 20; $i++){
 		$fieldnum = sprintf("f%02d", $i);
 		if(isset($_REQUEST[$fieldnum]))
