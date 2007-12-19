@@ -14,7 +14,7 @@ require_once("../inc/utils.inc.php");
 session_start();
 if(!isset($isasplogin)){
 	
-	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
+	if (isset($SETTINGS['feature']['force_ssl']) && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		redirect("index.php?logout=1"); //the index page will redirect to https
 	}	
 	if(!isset($_SESSION["aspadminuserid"]))
