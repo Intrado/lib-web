@@ -5,7 +5,6 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 <head>
 <title>SchoolMessenger: <?= $pagetitle ?></title>
 	<script src='../script/utils.js'></script>
-	<script src='../script/nav.js'></script>
 	<script src='../script/sorttable.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 	<link href='css/style.css' type='text/css' rel='stylesheet' media='screen'>
