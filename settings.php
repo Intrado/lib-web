@@ -393,15 +393,15 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
 							</tr>
 							<tr>
-								<td width="30%">Failed login attempts to cause lockout</td>
+								<td width="30%">Login Lockout</td>
 								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 							<tr>
-								<td>Failed login attempts before account disable</td>
+								<td>Login Disable Account</td>
 								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 							<tr>
-								<td>Number of minutes for login lockout</td>
+								<td>Login Lockout Period</td>
 								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td>
 							</tr>
 						</table>
