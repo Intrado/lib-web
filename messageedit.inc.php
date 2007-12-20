@@ -248,6 +248,11 @@ if( $reloadform )
 		$body = $message->format($parts);
 	} else {
 		$message = new Message();
+		if($MESSAGETYPE == "email"){
+			$message->fromname = $USER->firstname . " " . $USER->lastname;
+			$useremails = explode(";", $USER->email);
+			$message->fromemail = $useremails[0];
+		}
 	}
 	$fields = array(
 			array("name","text",0,50,true),
