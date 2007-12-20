@@ -85,6 +85,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if($IS_COMMSUITE && GetFormData($f, $s, "easycallmin") > GetFormData($f, $s, "easycallmax") && (GetFormData($f, $s, "easycallmax") != "")){
 			error('The minimum extensions length has to be less than or equal to the maximum');
+		} else if(GetFormData($f, $s, "loginlockoutattempts") != 0 && GetFormData($f, $s, "logindisableattempts") !=0 && GetFormData($f, $s, "logindisableattempts") <= GetFormData($f, $s, "loginlockoutattempts")){
+			error("The login disable attempts must be greater than the login lockout attempts");
 		} else {
 			//check the parsing
 
@@ -172,9 +174,9 @@ if( $reloadform )
 	PutFormData($f, $s, "autoreport_replyemail", getSetting('autoreport_replyemail'), 'email',0,100);
 	PutFormData($f, $s, "autoreport_replyname", getSetting('autoreport_replyname'), 'text',0,100);
 
-	PutFormData($f, $s, "loginlockoutattempts", getSystemSetting('loginlockoutattempts', 5), "number", 0);
-	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', 0), "number", 0);
-	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', 5), "number", 0);
+	PutFormData($f, $s, "loginlockoutattempts", getSystemSetting('loginlockoutattempts', 5), "number", 0, 15, true);
+	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', 0), "number", 0, 15, true);
+	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', 5), "number", 1, 60, true);
 
 	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), "number", 0, 10);
 	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), "number", 0, 10);
@@ -392,15 +394,15 @@ startWindow('Global System Settings');
 							</tr>
 							<tr>
 								<td width="30%">Failed login attempts to cause lockout</td>
-								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?></td>
+								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 							<tr>
 								<td>Failed login attempts before account disable</td>
-								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?></td>
+								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 							<tr>
 								<td>Number of minutes for login lockout</td>
-								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> Minutes</td>
+								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td>
 							</tr>
 						</table>
 					</td>
@@ -414,7 +416,7 @@ startWindow('Global System Settings');
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 								<tr>
 									<td width="30%">Activation Code Lifetime</td>
-									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?>days</td>
+									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?> 1 - 365 days</td>
 								</tr>
 								<tr>
 									<td width="30%">Require phone numbers for Emergency and High Priority Job Types</td>
