@@ -14,6 +14,13 @@ require_once("../inc/reportutils.inc.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
+if(isset($_GET['pid'])){
+	$ids = getContactIDs($_SESSION['portaluserid']);
+	if(!isset($ids[$_GET['personid']])){
+		redirect("unauthorized.php");
+	}
+}
+
 if(isset($_GET['jid']) && isset($_GET['pid'])) {
 	$jid = DBSafe($_GET['jid']);
 	$pid = DBSafe($_GET['pid']);
