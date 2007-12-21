@@ -19,11 +19,20 @@ require_once("../obj/Phone.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/AudioFile.obj.php");
 require_once("../obj/MessagePart.obj.php");
+require_once("../obj/MessageAttachment.obj.php");
+require_once("parentportalutils.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
+if(isset($_GET['personid'])){
+	$ids = getContactIDs($_SESSION['portaluserid']);
+	if(!isset($ids[$_GET['personid']])){
+		redirect("unauthorized.php");
+	}
+}
 
 if(isset($_GET['type'])){
 	$_SESSION['type'] = $_GET['type'];
@@ -71,6 +80,9 @@ if($jobid != 0 && $personid != 0){
 }
 if($email || $sms){
 	$message = formatText($messageid, $historicdata);
+	if($email){
+		$attachments = DBFindMany("messageattachment","from messageattachment where messageid=" . DBSafe($messageid));
+	}
 }
 
 
@@ -80,7 +92,7 @@ if($email || $sms){
 ////////////////////////////////////////////////////////////////////////////////
 
 function formatText($messageid, $historicdata) {
-	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = '" . $messageid . "' order by sequence");
+	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = " . $messageid . " order by sequence");
 	$data = Message::format($messageparts);
 	$message = "";
 	
@@ -182,12 +194,36 @@ startWindow('Details', 'padding: 3px;');
 			<th align="right" class="windowRowHeader bottomBorder">Date:</td>
 			<td class="bottomBorder"><?=date("M d, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
+<?
+	if($email){
+?>
+			<tr>
+				<th align="right" class="windowRowHeader bottomBorder">Attachments:</th>
+				<td colspan="3" class="bottomBorder">
+					<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+					<tr class="listHeader" align="left" valign="bottom">
+						<th>Name</th>
+						<th>Size</th>
+					</tr>
+<?
+				foreach ($attachments as $attachment) {
+?>
+					<tr>
+						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&mid=<?= $attachment->id ?>"><?= htmlentities($attachment->filename)?></a></td>
+						<td><?= max(1,round($attachment->size/1024)) ?>K</td>
+					</tr>
+<?
+				}
+?>
+				</table>
+				</td>
+			</tr>
 	</table>
 <?
 endWindow();
 
 if($phone){
-	startWindow('Play', 'padding: 3px;');
+	startWindow('Message', 'padding: 3px;');
 	?>
 	
 		<div align="center">
@@ -208,7 +244,8 @@ if($phone){
 	<?
 	endWindow();
 } else if ($email || $sms){
-	startWindow('Read', 'padding: 3px;');
+	startWindow('Message', 'padding: 3px;');
+	}
 	if(is_array($message)){
 		error($message);
 	} else {
