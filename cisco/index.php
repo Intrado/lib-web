@@ -22,6 +22,8 @@ $badlogin = false;
 function tryLogin ($userid) {
 	if (!$userid)
 		return false;
+	if($userid == -1)
+		return false;
 	doStartSession();
 	$newuser = new User($userid);
 	$newaccess = new Access($newuser->accessid);
