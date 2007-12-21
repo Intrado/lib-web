@@ -97,8 +97,8 @@ $s = "main";
 $reloadform = 0;
 
 $checkpassword = (getSystemSetting("checkpassword","",true)==0) ? getSystemSetting("checkpassword") : 1;
-$usernamelength = getSystemSetting("usernamelength","",true) ? getSystemSetting("usernamelength") : 5;
-$passwordlength = getSystemSetting("passwordlength","",true) ? getSystemSetting("passwordlength") : 5;
+$usernamelength = getSystemSetting("usernamelength",5);
+$passwordlength = getSystemSetting("passwordlength",5);
 
 if($checkpassword){
 	if($passwordlength < 6) {
