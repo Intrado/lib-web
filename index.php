@@ -28,6 +28,7 @@ if ($SETTINGS['feature']['has_ssl']) {
 
 //check various ways to log in
 $badlogin = false;
+$softlock = false;
 $userid = false;
 $updatelogin = false;
 $sessionstarted = false;
@@ -55,11 +56,15 @@ if (isset($_GET['login'])) {
 } else if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$f_login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
 	$f_pass = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
-	if (!$userid = doLogin($f_login, $f_pass, $CUSTOMERURL)) {
+	$userid = doLogin($f_login, $f_pass, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
+	if ($userid == -1) {
+		$softlock = true;
+	} else if(!$userid){
 		$badlogin = true;
 		error_log("User trying to log in but has bad user/pass/url");
 	}
-	$updatelogin = true;
+	if($userid)
+		$updatelogin = true;
 } else if (isset($_GET['asptoken'])) {
 	if (!$userid = asptokenLogin($_GET['asptoken'], $CUSTOMERURL)) {
 		$badlogin = true;
@@ -77,7 +82,7 @@ if (isset($_GET['login'])) {
 }
 
 //if we got a valid userid from above, log in for that user.
-if ($userid) {
+if ($userid && $userid != -1) {
 	if (!$sessionstarted)
 		doStartSession();
 	loadCredentials($userid);
@@ -129,8 +134,10 @@ if (file_exists($logofilename) ) {
 			<table border="0" cellpadding="10" cellspacing="0" id="login" align="center">
 				<tr>
 					<td colspan="2">
-<? if ($badlogin) { ?>
+<?if ($badlogin) { ?>
 						<div style="color: red;">Incorrect username/password. Please try again.</div>
+<? } else if ($softlock) { ?>
+						<div style="color: red;">You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.</div>
 <? } else if ($custname === false) { ?>
 						<div style="color: red;">Invalid customer URL. Please check the URL and try again.</div>
 <? } else { ?>
@@ -196,6 +203,8 @@ new getObj('logintext').obj.focus();
 
 <? if ($badlogin) { ?>
 				<td style="font-size: 12px; font-weight: bold; color: red;">Incorrect username/password. Please try again.</td>
+<? } else if ($softlock) { ?>
+				<td style="font-size: 12px; font-weight: bold; color: red;">You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.</td>
 <? } else if ($custname === false) { ?>
 				<td style="font-size: 12px; font-weight: bold; color: red;">Invalid customer URL. Please check the URL and try again.</td>
 <? } else { ?>
