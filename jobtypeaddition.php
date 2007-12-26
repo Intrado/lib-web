@@ -149,17 +149,17 @@ startWindow("Add a Job Type");
 					</td>
 				</tr>
 				<tr>
-					<td width="30%">Is Survey?</td>
+					<td width="30%">Check if this is a survey</td>
 					<td>
 						<? NewFormItem($f, $s, "issurvey", "checkbox", 0, 1, "onclick='if(this.checked) displaysurveytable(); else hidesurveytable();'");?>
 					</td>
 				</tr>
 				<tr>
-					<td width="30%">Info For Parents</td>
+					<td width="30%">Display Info for Contact Manager users</td>
 					<td ><? NewFormItem($f, $s, "jobtypedesc", "textarea", 20, 3);?></td>
 				</tr>
 				<tr>
-					<td width="30%">Contact Preferences</td>
+					<td width="30%">Default Contact Preferences</td>
 					<td>
 						<table border="0" cellpadding="3" cellspacing="1" id="nonsurvey">
 							<tr class="listheader">
