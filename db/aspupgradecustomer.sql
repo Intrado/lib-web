@@ -226,7 +226,7 @@ ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 
 $$$
 
 -- system setting timeslice (from old jobtype)
-INSERT INTO `setting` (name,value) values ('_timeslice', 450)
+INSERT INTO `setting` (name,value) values ('_timeslice', ifnull(  (select max(timeslices) from jobtype) ,450))
 $$$
 
 -- timeslices moved to system setting
@@ -257,3 +257,32 @@ $$$
 ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
 ADD PRIMARY KEY ( `token` , `personid` )
 $$$
+
+
+-- Dec 10
+
+ALTER TABLE `portalpersontoken` DROP INDEX `personid`
+$$$
+
+ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `personid` )
+$$$
+
+-- Dec 13
+
+ALTER TABLE `portalperson` ADD `notifyemail` VARCHAR( 100 ) NULL
+$$$
+
+-- email attachments
+
+CREATE TABLE `messageattachment` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`messageid` INT NOT NULL ,
+`contentid` BIGINT NOT NULL ,
+`filename` VARCHAR( 255 ) NOT NULL ,
+`size` INT NOT NULL ,
+`deleted` TINYINT NOT NULL DEFAULT '0',
+INDEX ( `messageid` )
+) ENGINE = innodb
+$$$
+
