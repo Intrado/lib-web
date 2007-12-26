@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
+This setting controls the number of invalid attempts a user has before their account is disabled.  This must be greater than the Invalid Login Lockout Attempts.
