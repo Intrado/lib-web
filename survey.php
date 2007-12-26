@@ -230,7 +230,7 @@ if( $reloadform )
 	$fields = array(
 		array("name","text",1,50,true),
 		array("description","text",1,50,false),
-		array("jobtypeid","number","nomin","nomax"),
+		array("jobtypeid","number","nomin","nomax", true),
 		array("questionnaireid","number","nomin","nomax",true),
 		array("listid","number","nomin","nomax",true),
 		array("starttime","text",1,50,true),
@@ -278,11 +278,12 @@ startWindow('Survey Information');
 					<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
 				</tr>
 				<tr>
-					<td>Priority <?= help('SurveyScheduler_Priority',NULL,"small"); ?></td>
+					<td>Job Type <?= help('SurveyScheduler_Priority',NULL,"small"); ?></td>
 					<td>
 						<?
 
 						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
+						NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
 						foreach ($VALIDJOBTYPES as $item) {
 							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
 						}
