@@ -64,6 +64,21 @@ if ($USER->authorize("startstats")) {
 		<td valign="top">
 			<table border=0 cellpadding=0 cellspacing=0>
 <?
+		  	$startCustomTitle = "Tip of the Day";
+		  	$startCustomFile = "tipoftheday.php";
+
+			if (file_exists($startCustomFile)) {
+			?><tr><td><?
+				startWindow($startCustomTitle,NULL);
+				?><div align="center" style="margin: 5px;">
+<?					readfile($startCustomFile); ?>
+					</div><?
+				endWindow();
+			?><br></td></tr><?
+			}
+?>
+
+<?
 			if ($USER->authorize("starteasy")) {
 			?><tr><td><?
 				startWindow('EasyCall ' . help('Start_EasyCall'),NULL);
