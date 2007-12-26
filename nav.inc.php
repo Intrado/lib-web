@@ -91,8 +91,7 @@ $NAVTREE = array (
 		array("Settings","settings.php","managesystem",$SUBTAB=="settings"),
 		array("Contact Settings", "contactsettings.php", "managesystem", $SUBTAB=="contactsettings"),
 		array("Metadata","datamanager.php","metadata",$SUBTAB=="datamanager"),
-		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager"),
-		array("Portal", "portalmanagement.php?clear=1", getSystemSetting("_hasportal", false) ? "portalaccess" : "dummy", $SUBTAB=="portal")
+		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager")
 		))
 );
 
