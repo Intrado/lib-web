@@ -31,6 +31,13 @@ startWindow("Options", 'padding: 3px;');
 		<tr class="listHeader">
 			<th align="left" class="nosort">Job Types</th>
 			<th align="left" class="nosort">Destination Labels</th>
+<?
+			if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
+?>
+			<th align="left" class="nosort">Contact Manager Administration</th>
+<?
+			}
+?>
 		</tr>
 		<tr align="left" valign="bottom">
 			<td>
@@ -51,6 +58,19 @@ startWindow("Options", 'padding: 3px;');
 <? } ?>
 				</table>
 			</td>
+<?
+			if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
+?>
+			<td>
+				<table>
+					<tr><td><a href='activationcodemanager.php?clear=1'>Manage Activation Codes</a></td></tr>
+					<tr><td>&nbsp;</td></tr>
+					<tr><td>&nbsp;</td></tr>
+				</table>
+			</td>
+<?
+			}
+?>
 		</tr>
 	</table>
 <?
