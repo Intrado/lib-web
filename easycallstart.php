@@ -207,8 +207,8 @@ if($reloadform == 1) {
 		else
 			$specialtask = false;
 	}
-	PutFormData($f,$s,"listid",$specialtask ? $specialtask->getData('listid') : 0);
-	PutFormData($f,$s,"jobtypeid",$specialtask ? $specialtask->getData('jobtypeid') : end($VALIDJOBTYPES)->id);
+	PutFormData($f,$s,"listid",$specialtask ? $specialtask->getData('listid') : 0, "number", "nomin", "nomax", true);
+	PutFormData($f,$s,"jobtypeid",$specialtask ? $specialtask->getData('jobtypeid') : "", "number", "nomin", "nomax", true);
 	$checked=false;
 	if ($specialtask) {
 		$phone = Phone::format($specialtask->getData('phonenumber'));
@@ -228,7 +228,7 @@ if($reloadform == 1) {
 			$phone = "";
 		$name = "";
 	}
-	PutFormData($f,$s,"phone",$phone,"text","2","20");
+	PutFormData($f,$s,"phone",$phone,"text","2","20", true);
 	PutFormData($f,$s,"addlangs",(bool)$checked, "bool", 0, 1);
 	PutFormData($f, $s, 'name', $name , 'text', 1, 50);
 	PutFormData($f, $s, 'newlang', "");
@@ -290,6 +290,7 @@ startWindow("EasyCall");
 			<td class="bottomBorder">
 <?
 				NewFormItem($f,$s,"jobtypeid", "selectstart", null, null, 'id="jobtype"');
+				NewFormItem($f,$s,"jobtypeid", "selectoption"," -- Select a Job Type -- ", "");
 				foreach ($VALIDJOBTYPES as $item) {
 					NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
 				}
