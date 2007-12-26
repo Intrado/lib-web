@@ -100,7 +100,7 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" ><?= htmlentities($job->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
-					<td class="bottomBorder" >Priority</td>
+					<td class="bottomBorder" >Job Type</td>
 					<td class="bottomBorder" ><?= htmlentities($jobtype->name); ?></td>
 				</tr>
 				<tr>
