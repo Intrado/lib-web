@@ -327,7 +327,7 @@ if( $reloadform )
 	$fields = array(
 	array("name","text",1,$JOBTYPE == "repeating" ? 30: 50,true),
 	array("description","text",1,50,false),
-	array("jobtypeid","number","nomin","nomax"),
+	array("jobtypeid","number","nomin","nomax", true),
 	array("listid","number","nomin","nomax",true),
 	array("phonemessageid","number","nomin","nomax"),
 	array("emailmessageid","number","nomin","nomax"),
@@ -638,6 +638,7 @@ startWindow('Job Information');
 						<?
 
 						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
+						NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
 						foreach ($VALIDJOBTYPES as $item) {
 							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
 						}
