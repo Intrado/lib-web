@@ -112,6 +112,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("manageprofile", (bool)GetFormData($form, $section, 'manageprofile'));
 			$accss->setPermission("managesystem", (bool)GetFormData($form, $section, 'managesystem'));
 			$accss->setPermission("viewcontacts", (bool)GetFormData($form, $section, 'viewcontacts'));
+			$accss->setPermission("managecontactdetailsettings", (bool)GetFormData($form, $section, 'managecontactdetailsettings'));
 			if ($SETTINGS['feature']['has_print']) {
 				$accss->setPermission("sendprint", (bool)GetFormData($form, $section, 'sendprint'));
 			}
@@ -186,6 +187,7 @@ if( $reloadform )
 				array("manageprofile","bool",0,1),
 				array("managesystem","bool",0,1),
 				array("viewcontacts","bool",0,1),
+				array("managecontactdetailsettings","bool",0,1),
 				array("metadata","bool",0,1),
 				array("managetasks","bool",0,1),
 				array("viewsystemactive","bool",0,1),
@@ -445,6 +447,10 @@ startWindow('Allowed Functions');
 					<td><? NewFormItem($form,$section,"viewcontacts","checkbox"); ?></td>
 					<td>View Contacts</td>
 				</tr>
+				<tr>
+					<td><? NewFormItem($form,$section,"managecontactdetailsettings","checkbox"); ?></td>
+					<td>Manage Contact Detail Settings</td>
+				</tr>
 			</table>
 		</td>
 	</tr>
@@ -452,16 +458,16 @@ startWindow('Allowed Functions');
 	if(getSystemSetting("_hasportal", false)){
 ?>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Portal:<br><? print (''); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Contact Manager:<br><? print (''); ?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
 					<td><? NewFormItem($form,$section,"portalaccess","checkbox"); ?></td>
-					<td>Portal Access</td>
+					<td>Access Contact Manager Administration Options</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form,$section,"generatebulktokens","checkbox"); ?></td>
-					<td>Generate Bulk Tokens</td>
+					<td>Generate Bulk Activation Codes</td>
 				</tr>
 			</table>
 		</td>
