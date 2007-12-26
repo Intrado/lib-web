@@ -307,7 +307,7 @@ Preview rows:
 <div id="datamapping">
 <table width="100%" cellpadding="3" cellspacing="1" class="list">
 	<tr class="listHeader">
-		<th align="left">Field</th><th align="left">Translator</th><th align="left" >Translator&nbsp;Options</th><th align="left">File Data</th><th align="left">Actions</th>
+		<th align="left">Field</th><th align="left">Translator</th><th align="left" >Translator&nbsp;Options</th><th align="left">Import File Data</th><th align="left">Actions</th>
 	</tr>
 <?
 	$alt = 0;
