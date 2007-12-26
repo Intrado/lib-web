@@ -10,7 +10,7 @@ class PortalReport extends ReportGenerator{
 		$rulesql = getRuleSql($this->params, "p");
 		$usersql = $USER->userSQL("p");
 		$pkeysql = "";
-		$hideactivetokens = "";
+		$hideactivecodes = "";
 		$hideassociated = "";
 		$hideassociatedtable = "";
 		$showall = false;
@@ -19,8 +19,8 @@ class PortalReport extends ReportGenerator{
 		if(isset($this->params['pkey'])){
 			$pkeysql = " and p.pkey = '" . DBSafe($this->params['pkey']) . "' ";
 		}
-		if(isset($this->params['hideactivetokens']) && $this->params['hideactivetokens']){
-			$hideactivetokens = " and (ppt.token is null or ppt.expirationdate < curdate()) ";
+		if(isset($this->params['hideactivecodes']) && $this->params['hideactivecodes']){
+			$hideactivecodes = " and (ppt.token is null or ppt.expirationdate < curdate()) ";
 		}
 		if(isset($this->params['hideassociated']) && $this->params['hideassociated']){
 			$hideassociated = " and not exists(select count(*) from portalperson pp2 where pp2.personid = p.id group by pp2.personid) ";
@@ -40,7 +40,7 @@ class PortalReport extends ReportGenerator{
 						and p.type='system' "
 						. $pkeysql
 						. $rulesql
-						. $hideactivetokens
+						. $hideactivecodes
 						. $hideassociated
 						. $usersql;
 			//test query used to confirm no active codes are in the list
@@ -52,7 +52,7 @@ class PortalReport extends ReportGenerator{
 						and ppt.expirationdate > curdate() "
 						. $pkeysql
 						. $rulesql
-						. $hideactivetokens
+						. $hideactivecodes
 						. $hideassociated
 						. $usersql;
 		} else {
@@ -115,7 +115,7 @@ class PortalReport extends ReportGenerator{
 						3 => "Last Name",
 						4 => "Activation Code",
 						5 => "Expiration Date",
-						6 => "Associated Portal Users");
+						6 => "Contact Manager Account(s)");
 						
 		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
 
