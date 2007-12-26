@@ -174,9 +174,9 @@ if( $reloadform )
 	PutFormData($f, $s, "autoreport_replyemail", getSetting('autoreport_replyemail'), 'email',0,100);
 	PutFormData($f, $s, "autoreport_replyname", getSetting('autoreport_replyname'), 'text',0,100);
 
-	PutFormData($f, $s, "loginlockoutattempts", getSystemSetting('loginlockoutattempts', 5), "number", 0, 15, true);
-	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', 0), "number", 0, 15, true);
-	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', 5), "number", 1, 60, true);
+	PutFormData($f, $s, "loginlockoutattempts", getSystemSetting('loginlockoutattempts', "5"), "number", 0, 15, true);
+	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', "0"), "number", 0, 15, true);
+	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', "5"), "number", 1, 60, true);
 
 	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), "number", 0, 10);
 	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), "number", 0, 10);
@@ -393,16 +393,16 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
 							</tr>
 							<tr>
-								<td width="30%">Login Lockout</td>
+								<td width="30%">Invalid Login Lockout<? print help('Settings_InvalidLoginLockout'); ?></td>
 								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 							<tr>
-								<td>Login Disable Account</td>
-								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
+								<td>Login Lockout Period<? print help('Settings_LoginLockoutTime'); ?></td>
+								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td>
 							</tr>
 							<tr>
-								<td>Login Lockout Period</td>
-								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td>
+								<td>Login Disable Account<? print help('Settings_LoginDisableAccount'); ?></td>
+								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 						</table>
 					</td>
@@ -411,7 +411,7 @@ startWindow('Global System Settings');
 				if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Portal:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Contact Manager:</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 								<tr>
