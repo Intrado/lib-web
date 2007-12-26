@@ -154,10 +154,6 @@ class Job extends DBMappedObject {
 		$job->userid = $USER->id;
 		$job->createdate = QuickQuery("select now()");
 
-		//job type
-		$VALIDJOBTYPES = JobType::getUserJobTypes();
-		$job->jobtypeid = end($VALIDJOBTYPES)->id;
-
 		//call settings
 		$job->setOptionValue("maxcallattempts", min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4")));
 		if (getSystemSetting('retry') != "")
@@ -169,7 +165,7 @@ class Job extends DBMappedObject {
 		$job->setOption("skipsmsduplicates",1);
 		$job->setOption("sendreport",1);
 		if($USER->authorize("leavemessage"))
-			$job->setOption("leavemessage", $USER->getSetting("leavemessage", 0));
+			$job->setOption("leavemessage", $USER->getSetting("leavemessage", 1));
 
 		//date/time/numer of days
 		$job->startdate = date("Y-m-d", strtotime("today"));
