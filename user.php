@@ -449,7 +449,7 @@ startWindow('User Information');
 									<table>
 										<tr>
 											<td>
-												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,'id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');clearAllIfNotChecked(this,\'surveyjobtypeselect\'); "'); ?>
+												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,'id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?>
 											</td>
 											<td>
 												Restrict this user to the following types of jobs
