@@ -104,7 +104,7 @@ if($forgotsuccess){
 	?>
 	<div style="margin:5px">
 		Thank you, your password has been reset.
-		<br>You will be redirected to the main page in 5 seconds.
+		<br>You will be redirected to the main page in 5 seconds or <a href="choosecustomer.php">Click Here.</a>
 	</div>
 	<meta http-equiv="refresh" content="5;url=choosecustomer.php">
 	<?
@@ -112,7 +112,7 @@ if($forgotsuccess){
 	?>
 	<div style="margin:5px">
 		Thank you, your account has been activated.
-		<br>You will be redirected to the main page in 5 seconds.
+		<br>You will be redirected to the main page in 5 seconds or <a href="index.php">Click Here.</a>
 	</div>
 	<meta http-equiv="refresh" content="5;url=index.php">
 	<?
@@ -120,7 +120,7 @@ if($forgotsuccess){
 	?>
 	<div style="margin:5px">
 		Thank you, your email address has been changed.
-		<br>You will be redirected to the main page in 5 seconds.
+		<br>You will be redirected to the main page in 5 seconds or <a href="index.php">Click Here.</a>
 	</div>
 	<meta http-equiv="refresh" content="5;url=index.php">
 	<?
