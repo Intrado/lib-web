@@ -120,7 +120,7 @@ include_once("cmlogintop.inc.php");
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td align="right"><div style="text-align: right;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
+			<td align="right"><div style="text-align: right;"><input type="image" src="img/signin.gif" onmouseover="this.src='img/signin_over.gif';" onmouseout="this.src='img/signin.gif';"></div></td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
