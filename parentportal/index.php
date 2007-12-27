@@ -79,25 +79,16 @@ include_once("cmlogintop.inc.php");
 	<table width="100%" style="color: #365F8D;" >
 		<tr>
 			<td width="20%">&nbsp;</td>
-			<td>
-				<div style="font-size: 20px; font-weight: bold;">Contact Manager</div>
-				<div style="font-size: 12px;">Welcome to the Contact Manager.  Here you will have access to contact data and your messages as well as configure preferences on how you would like to be contacted.  Don't delay, sign up now!</div>
+			<td colspan="2">
+				<div style="font-size: 20px; font-weight: bold;">SchoolMessenger Contact Manager</div>
+				<br>
+				<br>
 			</td>
-			<td width="80%">&nbsp;</td>
+			<td width="80%"></td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
-			<td><a href="newportaluser.php">Sign Up Now(this is a button)</a></td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td><br><div style="font-weight: bold;">Already have an account?</div></td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>
+			<td></td>
+			<td colspan="3">
 <?
 				if ($badlogin) {
 				?>
@@ -105,27 +96,47 @@ include_once("cmlogintop.inc.php");
 				<?
 				}
 ?>
-				Email: <br><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=htmlentities($login)?>"/> </td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>Password&nbsp;(case sensitive):<br><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/>
 			</td>
-			<td><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;">Warning! Your Caps Lock key is on.</div></td>
+		<tr>
+			<td>&nbsp;</td>
+			<td align="right">Email:</td>
+			<td><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=htmlentities($login)?>"/></td>
+			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><a href="forgotpassword.php">Forgot your password? Click Here!</a></td>
-			<td>&nbsp;</td>
+			<td align="right">Password&nbsp;(case sensitive):</td>
+			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
+			<td align="left"><a href="forgotpassword.php">Forgot your password? Click Here!</a></td>
 		</tr>
 		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td colspan="2"><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;">Warning! Your Caps Lock key is on.</div></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td align="right"><div style="text-align: right;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
 			<td>&nbsp;</td>
 		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="2">First time accessing the SchoolMessenger Contact Manager?</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="2"><a href="newportaluser.php"><b>Sign up now</b></a></td>
+			<td>&nbsp;</td>
+		</tr>
 	</table>
 </form>
+<br>
+<br>
+<br>
+<br>
+<br>
 <?
 include("cmloginbottom.inc.php");
 ?>
