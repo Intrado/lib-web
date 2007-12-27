@@ -171,7 +171,7 @@ if($form){
 ?>
 		<tr>
 			<td>&nbsp;</td>
-			<td><?=submit("activate", "main", "Submit")?></td>
+			<td><div><input type="image" src="img/submit.gif" onmouseover="this.src='img/submit_over.gif';" onmouseout="this.src='img/submit.gif';"></div></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
