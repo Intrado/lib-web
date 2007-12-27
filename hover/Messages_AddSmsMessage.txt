@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_message/editing_or_deleting_an_existing_message.htm
+To create a new SMS message click the Create SMS Message button. This will open the SMS message editor where you can edit the content of your SMS message.
