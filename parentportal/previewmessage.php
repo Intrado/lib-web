@@ -218,6 +218,9 @@ startWindow('Details', 'padding: 3px;');
 				</table>
 				</td>
 			</tr>
+<?
+	}
+?>
 	</table>
 <?
 endWindow();
@@ -245,7 +248,7 @@ if($phone){
 	endWindow();
 } else if ($email || $sms){
 	startWindow('Message', 'padding: 3px;');
-	}
+	
 	if(is_array($message)){
 		error($message);
 	} else {
