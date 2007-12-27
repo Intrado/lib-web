@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
-This setting controls the ammount of time a user is temporarily locked out.
+This setting controls the amount of time a user is temporarily locked out.
