@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_job_with_easycall.htm
-Specify the priority of notification you are sending. The priority determines the order in which calls will be placed relative to other active jobs in the system.
+Specify the type of job you are sending. The job type determines which phone/email/sms destinations to notify based on their notification preferences.

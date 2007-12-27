@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#creating_a_survey_job/scheduling_a_survey_job.htm
-Specify the priority of your survey job. This determines the order in which calls for this job will be placed relative to other jobs on the system. 
+Specify the type of survey job you are sending. The job type determines which phone/email destinations to notify based on their notification preferences.
