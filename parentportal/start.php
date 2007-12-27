@@ -142,10 +142,10 @@ if(isset($contactList) && $contactList){
 ?>
 
 	<div style="margin:5px; width:600px">
-		Welcome to the Contact Manager.  Once you have added contacts, you will be able to view your old messages and set preferences on how to receive your messages.  You should have received activation codes for each contact you are elligible to add.
+		The Contact Manager allows you to customize your message delivery preferences and enables you to review past messages.
 		<br>
 		<br>
-		If you would like to begin adding contacts, <a href="addcontact1.php"><img src="img/bug_important.gif" >Click Here</a>
+		To begin, <a href="addcontact1.php">Click Here</a> and enter the ID number and activation code that you received for each person that will be associated with your account.
 	</div>
 
 <?
