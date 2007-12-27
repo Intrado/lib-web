@@ -81,9 +81,9 @@ include_once("cmlogintop.inc.php");
 if(!$success){
 ?>
 	<form method="POST" action="newportaluser.php" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
-		<table  style="color: #365F8D;" >
+		<table width="100%" style="color: #365F8D;" >
 			<tr>
-				<td>&nbsp;</td>
+				<td width="20%">&nbsp;</td>
 				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 				<td width="80%">&nbsp;</td>
 			</tr>
@@ -114,7 +114,7 @@ if(!$success){
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td width="20%">&nbsp;</td>
+				<td>&nbsp;</td>
 				<td>Confirm Password: </td>
 				<td><input type="password" name="password2"  size="35" maxlength="50"/> </td>
 				<td>&nbsp;</td>
