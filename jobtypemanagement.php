@@ -85,7 +85,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 			}
 			if(CheckFormSubmit($f, "add"))
 				redirect("jobtypeaddition.php");
-			redirect();
+			redirect("contactsettings.php");
 		}
 	}
 } else {
@@ -110,8 +110,8 @@ $PAGE = "admin:contactsettings";
 $TITLE = "Job Type Manager";
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Save"), submit($f, "add", "Create New Job Type"));
-startWindow("Job Types");
+buttons(submit($f, $s, "Done"), submit($f, "add", "Create New Job Type"));
+startWindow("Job Types" . help("JobType_Manager"));
 ?>
 
 <table cellpadding="0" cellspacing="0" width="100%">
