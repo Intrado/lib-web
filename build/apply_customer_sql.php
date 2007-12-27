@@ -13,7 +13,7 @@ $auth = mysql_connect($authhost, $authuser, $authpass)
 			or die("Could not connect to auth: " . mysql_error($authdb));
 mysql_select_db($authdb, $auth);
 
-$query = "select c.id, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)";
+$query = "select c.id, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) order by c.id";
 $res = mysql_query($query, $auth);
 $data = array();
 while($row = mysql_fetch_row($res)){
@@ -26,13 +26,17 @@ foreach($data as $customer){
 	mysql_select_db("c_$customer[0]", $custdb)
 				or die("Could not select customer db: " . mysql_error($custdb));
 
+	echo "doing " . $customer[0] . ": ";
 	foreach ($sqlqueries as $sqlquery) {
+
+		echo ".";
 		if (trim($sqlquery)){
 			$sqlquery = str_replace('_$CUSTOMERID_', $customer[0], $sqlquery);
 			mysql_query($sqlquery,$custdb)
 				or die ("Failed to execute sql: " . mysql_error($custdb));
 		}
 	}
+	echo "\n";
 }
 
 ?>
