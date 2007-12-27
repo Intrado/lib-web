@@ -119,7 +119,7 @@ if($PERSONID){
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
 				if(getSystemSetting('priorityenforcement') && $error = checkPriorityPhone($f, $s, $phones)){
-					error("You must have at least one phone number that can receive calls for these job types", $error);
+					error("You must have at least one phone number that can receive calls for these job types: " . implode(", ", $error));
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
 					
@@ -186,15 +186,11 @@ if(isset($contactList) && $contactList){
 	}
 	echo "</tr>\n";
 
-	$alt = 0;;
 	foreach ($contactList as $obj) {
-		$alt++;
 		if($obj->id == $PERSONID){
-			echo '<tr style="color:white; background-color:red">';
-		} else if($alt % 2){
-			echo '<tr>';
+			echo '<tr style="color:white; background-color:#D4DDE2; color:#365F8D;">';
 		} else {
-			echo '<tr class="listAlt">';
+			echo '<tr>';
 		}
 
 		//only show cels with titles
