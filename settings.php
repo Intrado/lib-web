@@ -385,23 +385,23 @@ startWindow('Global System Settings');
 								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td width="30%">Minimum Password Length<? print help('Settings_MinimumPassword'); ?></td>
+								<td>Minimum Password Length<? print help('Settings_MinimumPassword'); ?></td>
 								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td width="30%">Very Secure Passwords<? print help('Settings_VerySecurePasswords'); ?></td>
+								<td>Very Secure Passwords<? print help('Settings_VerySecurePasswords'); ?></td>
 								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
 							</tr>
 							<tr>
-								<td width="30%">Invalid Login Lockout<? print help('Settings_InvalidLoginLockout'); ?></td>
+								<td>Invalid Login Lockout<? print help('Settings_InvalidLoginLockout'); ?></td>
 								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 							<tr>
-								<td>Login Lockout Period<? print help('Settings_LoginLockoutTime'); ?></td>
+								<td>Invalid Login Lockout Period<? print help('Settings_LoginLockoutTime'); ?></td>
 								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td>
 							</tr>
 							<tr>
-								<td>Login Disable Account<? print help('Settings_LoginDisableAccount'); ?></td>
+								<td>Invalid Login Disable Account<? print help('Settings_LoginDisableAccount'); ?></td>
 								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 						</table>
