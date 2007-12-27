@@ -16,7 +16,7 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 
 if(isset($_GET['pid'])){
 	$ids = getContactIDs($_SESSION['portaluserid']);
-	if(!isset($ids[$_GET['personid']])){
+	if(!in_array($_GET['pid'], $ids)){
 		redirect("unauthorized.php");
 	}
 }

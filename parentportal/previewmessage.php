@@ -29,7 +29,7 @@ require_once("parentportalutils.inc.php");
 
 if(isset($_GET['personid'])){
 	$ids = getContactIDs($_SESSION['portaluserid']);
-	if(!isset($ids[$_GET['personid']])){
+	if(!in_array($_GET['personid'], $ids)){
 		redirect("unauthorized.php");
 	}
 }

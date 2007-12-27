@@ -21,10 +21,9 @@ require_once("parentportalutils.inc.php");
 if(isset($_GET['pid'])){
 	$personid = DBSafe($_GET['pid']);
 	$ids = getContactIDs($_SESSION['portaluserid']);
-	if(!isset($ids[$personid])){
+	if(!in_array($personid, $ids)){
 		redirect("unauthorized.php");
 	}
-
 } else {
 	exit();
 }
