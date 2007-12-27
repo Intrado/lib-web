@@ -3,18 +3,16 @@
 if(isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']=="1"){
 ?>
 		</td>
-	</tr>
-	<tr>
-		<td>
-			<table width="100%">
-				<td width="100%"><div style="background-color: #365F8D; color: #365F8D; height: 3px; padding:0px; margin:3px">&nbsp;</div></td>
-			</table>
-		</td>
+		<td width="20%">&nbsp;</td>
 	</tr>
 </table>
+<div style="background-color: #365F8D; color: #365F8D; height: 3px; margin-left:30px; margin-right:30px;">&nbsp;</div>
 <?
 } else {
 ?>
+					</td>
+				</tr>
+			</table>
 		</td>
 	</tr>
 	<tr style="background-color: white;">

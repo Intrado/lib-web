@@ -96,7 +96,7 @@ if($forgotsuccess || $success || $newusersuccess){
 ?>
 	<table style="color: #365F8D;">
 		<tr>
-			<td width="20%">&nbsp;</td>
+			<td>&nbsp;</td>
 			<td>
 <?
 }
@@ -136,59 +136,44 @@ if($forgotsuccess || $success || $newusersuccess){
 if($form){
 ?>
 	<form method="POST" action="<?=$action?>" name="activate">
-		<table  style="color: #365F8D;" width="100%">
+		<table  style="color: #365F8D;">
 			<tr>
-				<td width="20%">&nbsp;</td>
-				<td colspan="2" width="60%"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
-				<td width="20%">&nbsp;</td>
+				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 			</tr>
 			<tr>
-				<td>&nbsp;</td>
 				<td colspan="2">You should have recieved an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
-				<td>&nbsp;</td>
 			</tr>
 			
 			<tr>
-				<td>&nbsp;</td>
 				<td>Confirmation Code: </td>
 				<td><input type="text" name="token" value="<?=htmlentities($token)?>" size="35" /></td>
-				<td>&nbsp;</td>
 			</tr>
 <?
 		if($forgot){
 ?>
 			<tr>
-				<td>&nbsp;</td>
 				<td>New Password:</td>
 				<td><input type="password" name="password1"  size="35" maxlength="50" /></td>
-				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td>&nbsp;</td>
 				<td>Confirm Password:</td>
 				<td><input type="password" name="password2"  size="35" maxlength="50" /></td>
-				<td>&nbsp;</td>
 			</tr>
 <?
 		} else {
 ?>
 			<tr>
-				<td>&nbsp;</td>
 				<td>Password:</td>
 				<td><input type="password" name="password"  size="35" maxlength="50"/></td>
-				<td>&nbsp;</td>
 			</tr>
 <?
 		}
 ?>
 		<tr>
 			<td>&nbsp;</td>
-			<td>&nbsp;</td>
 			<td><?=submit("activate", "main", "Submit")?></td>
-			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td>
 <?
@@ -205,13 +190,10 @@ if($form){
 		}
 ?>
 			</td>
-			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td>&nbsp;</td>
 			<td><a href="index.php">Return to Sign In</a></td>
-			<td>&nbsp;</td>
 		</tr>
 		</table>
 	</form>

@@ -41,38 +41,26 @@ if(!$success){
 <form method="POST" action="forgotpassword.php" name="forgotpassword">
 	<table width="100%" style="color: #365F8D;" >
 		<tr>
-			<td width="20%">&nbsp;</td>
-			<td colspan="2" width="60%"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
-			<td width="20%">&nbsp;</td>
+			<td colspan="2""><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
 			<td colspan="2">We will email you a link to a page where you can reset your password.</td>
-			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
 			<td>Email:</td>
 			<td><input type="text" name="email1" size="50" maxlength="255" value="<?=htmlentities($email1)?>"></td>
-			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
 			<td>Confirm Email:</td>
 			<td><input type="text" name="email2" size="50" maxlength="255" value="<?=htmlentities($email2)?>"></td>
-			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td><?=submit("forgotpassword", "main", "Submit")?></td>
-			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td>&nbsp;</td>
 			<td><br><a href="index.php">Return to Sign In</a></td>
-			<td>&nbsp;</td>
 		</tr>
 	</table>
 </form>
@@ -82,7 +70,7 @@ if(!$success){
 ?>
 	<table  style="color: #365F8D;" >
 		<tr>
-			<td width=20%>&nbsp;</td>
+			<td>&nbsp;</td>
 			<td>
 				<div style="margin:5px">
 					A link has been sent to your email address to log in.
