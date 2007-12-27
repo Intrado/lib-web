@@ -134,7 +134,7 @@ startWindow('User Information');
 			<td  class="bottomBorder">
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>
-						<td><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Notify me when I have a new phone message.</td>
+						<td><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Email me when I have a new phone message.</td>
 					</tr>
 	</table>
 			<td>
