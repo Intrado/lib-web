@@ -195,7 +195,7 @@ startWindow('Details', 'padding: 3px;');
 			<td class="bottomBorder"><?=date("M d, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
 <?
-	if($email){
+	if($email && count($attachments)){
 ?>
 			<tr>
 				<th align="right" class="windowRowHeader bottomBorder">Attachments:</th>
