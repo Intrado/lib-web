@@ -21,6 +21,12 @@ if(isset($_GET['c'])){
 	exit();
 }
 
+if(isset($_GET['embedded'])){
+	setcookie('embeddedpage', "1");
+}
+if(isset($_GET['deleteembedded'])){
+	setcookie('embeddedpage');
+}
 
 if (isset($_GET['logout'])) {
 	doStartSession(); // start the session to get the id
@@ -76,18 +82,18 @@ include_once("cmlogintop.inc.php");
 
 ?>
 <form method="POST" action="index.php" name="login">
-	<table width="100%" style="color: #365F8D;" >
+	<table style="color: #365F8D;" >
 		<tr>
 			<td width="20%">&nbsp;</td>
-			<td colspan="2">
+			<td colspan="3" width="60%">
 				<div style="font-size: 20px; font-weight: bold;">SchoolMessenger Contact Manager</div>
 				<br>
 				<br>
 			</td>
-			<td width="80%"></td>
+			<td width="20%"></td>
 		</tr>
 		<tr>
-			<td></td>
+			<td>&nbsp;</td>
 			<td colspan="3">
 <?
 				if ($badlogin) {
@@ -97,37 +103,42 @@ include_once("cmlogintop.inc.php");
 				}
 ?>
 			</td>
+			<td>&nbsp;</td>
 		<tr>
 			<td>&nbsp;</td>
-			<td align="right">Email:</td>
+			<td>Email:</td>
 			<td><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=htmlentities($login)?>"/></td>
+			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td align="right">Password&nbsp;(case sensitive):</td>
+			<td>Password&nbsp;(case&nbsp;sensitive):</td>
 			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
 			<td align="left"><a href="forgotpassword.php">Forgot your password? Click Here!</a></td>
+			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td colspan="2"><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;">Warning! Your Caps Lock key is on.</div></td>
+			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td align="right"><div style="text-align: right;"><input type="image" src="img/b1_signin_dark.gif" onmouseover="this.src='img/b2_signin_dark.gif';" onmouseout="this.src='img/b1_signin_dark.gif';"></div></td>
 			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td colspan="2">First time accessing the SchoolMessenger Contact Manager?</td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td colspan="2"><a href="newportaluser.php"><b>Sign up now</b></a></td>
+			<td colspan="3">First time accessing the SchoolMessenger Contact Manager?</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="3"><a href="newportaluser.php"><b>Sign up now</b></a></td>
 			<td>&nbsp;</td>
 		</tr>
 	</table>
