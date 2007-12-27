@@ -129,7 +129,7 @@ if(!$success){
 				<td colspan="2"><input type="checkbox" name="acceptterms" id="tos"/> Accept Terms of Service</td>
 			</tr>
 			<tr>
-				<td colspan="2"><?=submit("newaccount", "main", "Create Account")?></td>
+				<td colspan="2"><div><input type="image" src="img/createaccount.gif" onmouseover="this.src='img/createaccount_over.gif';" onmouseout="this.src='img/createaccount.gif';"></div></td>
 			</tr>
 			<tr>
 				<td colspan="2"><br><a href="index.php">Return to Sign In</a></td>
