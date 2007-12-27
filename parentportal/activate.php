@@ -139,12 +139,13 @@ if($form){
 		<table  style="color: #365F8D;" width="100%">
 			<tr>
 				<td width="20%">&nbsp;</td>
-				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
-				<td width="80%">&nbsp;</td>
+				<td colspan="2" width="60%"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+				<td width="20%">&nbsp;</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td colspan="2">You should have recieved an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
+				<td>&nbsp;</td>
 			</tr>
 			
 			<tr>

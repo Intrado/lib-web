@@ -84,8 +84,8 @@ if(!$success){
 		<table width="100%" style="color: #365F8D;" >
 			<tr>
 				<td width="20%">&nbsp;</td>
-				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
-				<td width="80%">&nbsp;</td>
+				<td colspan="2" width="60%"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+				<td width="20%">&nbsp;</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
@@ -139,12 +139,12 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td colspan="2"><input type="checkbox" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>&nbsp;Notify me when I have a new phone message.</td>
+				<td colspan="2"><input type="checkbox" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>&nbsp;Email me when I have a new phone message.</td>
 				<td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td colspan="2"><div style="overflow:scroll; height:250px; width:375px;"><?=$tos ?></div></td>
+				<td colspan="2"><div style="overflow:scroll; height:250px; width:525px;"><?=$tos ?></div></td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
