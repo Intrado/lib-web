@@ -13,6 +13,7 @@
 <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
 <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
 <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+<topic name="Creating an SMS Message" url="creating_a_message/creating_an_sms_message.htm" />
 <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
 <topic name="Message Overview" url="creating_a_message/messageoverview.htm" />
 <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
@@ -30,7 +31,9 @@
 <topic name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
 <topic name="Getting Started" url="getting_started/getting_started.htm" />
 <topic name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
+<topic name="New Features!" url="getting_started/new_features.htm" />
 <topic name="The Start Page" url="getting_started/the_start_page.htm" />
+<topic name="Managing Your Account Settings" url="managing_your_account_settings.htm" />
 <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
 <topic name="Reviewing Your Response Messages" url="receiving_responses/reviewing_your_response_messages.htm" />
 <topic name="Remote Telephone Access Overview" url="remote_telephone_access/remote_telephone_access_overview.htm" />
@@ -50,6 +53,7 @@
 <topic name="Step-by-Step:Send a Simple Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
 <topic name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
 <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+<topic name="Contact Settings" url="the_admin_tab/contact_settings.htm" />
 <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
 <topic name="Managing Systemwide Settings" url="the_admin_tab/managing_systemwide_settings.htm" />
 <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
@@ -58,5 +62,6 @@
 <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
 <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
 <topic name="The Contact Database" url="the_system_tab/the_contact_database.htm" />
+<topic name="Viewing and Editing Contact Details" url="the_system_tab/viewing_and_editing_contact_details.htm" />
 
 </ftstdata>  

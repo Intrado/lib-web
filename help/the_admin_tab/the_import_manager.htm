@@ -17,13 +17,15 @@ if (navigator.appName !="Netscape")
 img_whs1 { border:none; width:20px; height:20px; float:none; border-style:none; }
 p.whs2 { font-weight:bold; }
 ol.whs3 { list-style:decimal; }
-img_whs4 { border:none; border-style:none; width:400px; height:114px; float:none; }
+img_whs4 { border:none; width:400px; height:114px; float:none; border-style:none; }
 p.whs5 { margin-left:40px; }
-img_whs6 { border:none; border-style:none; float:none; width:400px; height:161px; }
+img_whs6 { border:none; border-style:none; width:400px; height:178px; float:none; }
 p.whs7 { margin-left:80px; }
 p.whs8 { margin-left:0px; font-weight:bold; }
-img_whs9 { border:none; border-style:none; width:400px; height:410px; float:none; }
-p.whs10 { margin-left:0px; }
+p.whs9 { margin-left:0px; font-weight:normal; }
+img_whs10 { border:none; width:400px; height:226px; float:none; border-style:none; }
+ul.whs11 { list-style:disc; }
+p.whs12 { margin-left:0px; }
 -->
 </style><script type="text/javascript" language="JavaScript">
 <!--
@@ -31,7 +33,8 @@ if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
 {
   var strNSS = "<style type='text/css'>";
   strNSS += "p.whs8 {margin-left:1pt; }";
-  strNSS += "p.whs10 {margin-left:1pt; }";
+  strNSS += "p.whs9 {margin-left:1pt; }";
+  strNSS += "p.whs12 {margin-left:1pt; }";
   strNSS +="</style>";
   document.write(strNSS);
 }
@@ -206,7 +209,7 @@ else
 <p class="whs2"><span style="font-weight: normal;">The Import 
  Editor screen, shown in the image below, is used to configure data imports.</span></p>
 
-<p><img src="../importeditor.gif" alt="The Import Editor" x-maintain-ratio="TRUE" width="400px" height="161px" border="0" class="img_whs6"></p>
+<p><img src="../importeditor.gif" alt="The Import Editor" x-maintain-ratio="TRUE" width="400px" height="178px" border="0" class="img_whs6"></p>
 
 <p>There are a few parts to the Import Editor. The first part is the Settings 
  area which contains:</p>
@@ -240,6 +243,10 @@ else
  be deleted from the database. If there are new people in the most recent 
  import they will be added to the system's database.</p>
 
+<p class="whs5"><span style="font-weight: bold;"><B>Skip Header 
+ Lines</B></span><span> - Specify the number of records at the top of your 
+ import file to be skipped.</span></p>
+
 <p class="whs5"><span style="font-weight: bold;"><B>Automated 
  Upload</B></span> - Check this box if you use the SchoolMessenger upload utility 
  and would like the data to be automatically imported into the system's 
@@ -252,17 +259,80 @@ else
 <p class="whs8">The Import Field Mapping 
  Screen</p>
 
-<p class="whs8"><span style="font-weight: normal;">After 
- uploading a CSV file, you will be directed to the Import Field Mapping 
- page, shown below. There you will see some sample entries from your CSV 
- file with a drop down menu over each type. Select the data type from the 
- drop down menu to determine which fields the data will be imported into. 
- Your settings will be saved for future imports and only need to be changed 
- if your source file layout changes.</span></p>
+<p class="whs9">The Import Field Mapping 
+ screen allows you to map the data from your data import to the corresponding 
+ fields in the system's database. After uploading a CSV file, you will 
+ be directed to the Import Field Mapping page, shown below. </p>
 
-<p><img src="../importfieldmapping.gif" alt="Import Field Mapping" x-maintain-ratio="TRUE" width="400px" height="410px" border="0" class="img_whs9"></p>
+<p class="whs9"><img src="../importfieldmapping.gif" alt="Import Field Mapping" x-maintain-ratio="TRUE" width="400px" height="226px" border="0" class="img_whs10"></p>
 
-<p class="whs10">&nbsp;</p>
+<p class="whs9">To map the data from 
+ your data import to the fields in the system:</p>
+
+<ol type="1" class="whs3">
+	
+	<li style="font-weight: normal; /*begin!kadov{{*/ font-weight: normal; /*}}end!kadov*/ "
+		class=kadov-p><p class="whs9">Select 
+ the field to map, for example &quot;School&quot;, from the drop down menu. 
+ </p></li>
+	
+	<li style="font-weight: normal; /*begin!kadov{{*/ font-weight: normal; /*}}end!kadov*/ "
+		class=kadov-p><p class="whs9">Specify 
+ the appropriate translator for the data type that you are importing and 
+ enter the import format from the source data file in the Translator options 
+ field. For example, if your data includes the date in yyyy/mm/dd format, 
+ specify this in the options for the Date translator which can then transform 
+ the data into mm/dd/yyyy format, which is the format the system requires.</p></li>
+	
+	<li style="font-weight: normal; /*begin!kadov{{*/ font-weight: normal; /*}}end!kadov*/ "
+		class=kadov-p><p class="whs9">Select 
+ the field in the CSV corresponding to the field you selected in the first 
+ column. You will see an automatic preview of the data in that column to 
+ confirm your selection. </p></li>
+	
+	<li style="font-weight: normal; /*begin!kadov{{*/ font-weight: normal; /*}}end!kadov*/ "
+		class=kadov-p><p class="whs9">If 
+ the data looks correct, click the Add button to proceed to the next field. 
+ </p></li>
+	
+	<li style="font-weight: normal; /*begin!kadov{{*/ font-weight: normal; /*}}end!kadov*/ "
+		class=kadov-p><p class="whs9">After 
+ all of the data fields have been mapped, click the Submit button to save 
+ your changes. </p></li>
+</ol>
+
+<p class="whs9">Your settings will be 
+ saved for future imports and only need to be changed if your source file 
+ layout changes.</p>
+
+<p class="whs8">Translator Types</p>
+
+<ul type="disc" class="whs11">
+	
+	<li class=kadov-p><p class="whs9">Copy 
+ - Maps the exact value from the import file into the database without 
+ modifying the data. </p></li>
+	
+	<li class=kadov-p><p class="whs9">Static 
+ Value - Maps the specified value into the database for every contact record. 
+ For example, you may want to specify a contact type &quot;Student&quot; 
+ for all student records.</p></li>
+	
+	<li class=kadov-p><p class="whs9">Current 
+ Date - Automatically inserts the current date for every record.</p></li>
+	
+	<li class=kadov-p><p class="whs9">Currency 
+ - Automatically converts numbers into standard currency format. For example 
+ &quot;$05.27&quot; would be converted into &quot;$5.27&quot;.</p></li>
+	
+	<li class=kadov-p><p class="whs9">Date 
+ - Converts common date formats into mm/dd/yyyy format.</p></li>
+	
+	<li class=kadov-p><p class="whs9">Data 
+ Lookup - Maps specific input values to specified output values. For example, 
+ converting school numeric codes into descriptions such as &quot;027=Springfield 
+ HS&quot;.</p></li>
+</ul>
 
 <p class="whs8">Important Considerations 
  When Mapping Your Data</p>
@@ -291,7 +361,7 @@ else
  above and additionally label their staff ID, if available, as their Unique 
  ID. </p>
 
-<p class="whs10">&nbsp;</p>
+<p class="whs12">&nbsp;</p>
 
 <p>&nbsp;</p>
 
