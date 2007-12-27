@@ -26,7 +26,7 @@ foreach($data as $customer){
 	mysql_select_db("c_$customer[0]", $custdb)
 				or die("Could not select customer db: " . mysql_error($custdb));
 
-	echo "doing " . $customer[0] . ": ";
+	printf("Doing % 5d: ",$customer[0]);
 	foreach ($sqlqueries as $sqlquery) {
 
 		echo ".";
