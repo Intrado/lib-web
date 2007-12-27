@@ -504,7 +504,7 @@ foreach ($fieldmaps as $map) {
 </table>
 <script>
 	function confirmDisassociate(){
-		return confirm('Are you sure you want to disassociate this Portal User?');
+		return confirm('Are you sure you want to disassociate this Contact Manager User?');
 	}
 	function confirmRevoke(){
 		return confirm('Are you sure you want to revoke this contact\'s activation code?');
