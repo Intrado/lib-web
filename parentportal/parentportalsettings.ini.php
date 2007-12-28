@@ -18,4 +18,5 @@ tmp_dir="/tmp"
 ;tts="10.25.25.17,8080,/tts/ttsloquendo"
 tts="localhost,8080,/phone/Tts"
 
+externalcontent=false;
 ;*/?>

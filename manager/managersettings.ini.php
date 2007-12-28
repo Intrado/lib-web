@@ -23,4 +23,5 @@ customer_url_prefix=https://asp.schoolmessenger.com
 [content]
 tts="localhost,8080,/phone/Tts"
 
+externalcontent=false;
 ;*/?>
