@@ -1,6 +1,10 @@
 <?
 // phone inbound, prompt to select jobtype (page into sets of 9), then save jobtypeid
 
+include_once("../obj/User.obj.php");
+include_once("../obj/Access.obj.php");
+include_once("../obj/Permission.obj.php");
+include_once("../inc/utils.inc.php");
 include_once("inboundutils.inc.php");
 include_once("../obj/JobType.obj.php");
 
@@ -11,6 +15,7 @@ $PAGESIZE = 9;
 
 function loadJobtypesDB()
 {
+	loadUser(); // load the user to obtain the permitted job types
 	global $SESSIONDATA, $USER;
 	return JobType::getUserJobTypes();
 }

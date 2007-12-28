@@ -1,7 +1,6 @@
 <?
 // phone inbound, prompt to select list (page into sets of 9), then save listid
 
-include_once("inboundutils.inc.php");
 include_once("../obj/User.obj.php");
 include_once("../obj/Rule.obj.php");
 include_once("../obj/Access.obj.php");
@@ -12,6 +11,7 @@ include_once("../obj/Permission.obj.php");
 include_once("../obj/PeopleList.obj.php");
 include_once("../obj/RenderedList.obj.php");
 include_once("../obj/FieldMap.obj.php");
+include_once("inboundutils.inc.php");
 
 
 global $SESSIONDATA, $BFXML_VARS;

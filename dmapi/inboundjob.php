@@ -1,7 +1,6 @@
 <?
 // phone inbound, job options and confirmation to submit
 
-include_once("inboundutils.inc.php");
 include_once("../inc/utils.inc.php"); // for jobdefaults getSystemSetting()
 require_once("../inc/date.inc.php");
 include_once("../obj/User.obj.php");
@@ -14,6 +13,7 @@ include_once("../obj/Permission.obj.php");
 include_once("../obj/PeopleList.obj.php");
 include_once("../obj/RenderedList.obj.php");
 include_once("../obj/FieldMap.obj.php");
+include_once("inboundutils.inc.php");
 
 
 global $SESSIONDATA, $BFXML_VARS;
@@ -86,7 +86,7 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 	$renderedlist->renderList();
 	$listsize = $renderedlist->total;
 	$jobtype = new JobType($priority);
-	
+
 	glog("number of people in list: ".$listsize);
 
 	// if job is one day, and stop time is in the past... warn them about a job that is ineffective
@@ -349,11 +349,13 @@ function commitJob()
 
 	$job->listid = $SESSIONDATA['listid'];
 	$job->phonemessageid = $SESSIONDATA['messageid'];
-	$job->jobtypeid = $SESSIONDATA['priority'];
-	//TODO set description to jobtype name
-	$job->description = "";
 
-	glog("priority: ".$SESSIONDATA['priority']."   id: ".$job->jobtypeid);
+	$jobtype = new JobType($SESSIONDATA['priority']);
+
+	$job->jobtypeid = $jobtype->id;
+	$job->description = $jobtype->name;
+
+	glog("priority: ".$jobtype->name."   id: ".$job->jobtypeid);
 
 	glog("about to create the job!!!");
 	$job->create();

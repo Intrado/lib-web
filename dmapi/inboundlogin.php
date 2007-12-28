@@ -1,11 +1,11 @@
 <?
 // phone inbound, login prompt and authentication
 
-include_once("inboundutils.inc.php");
 include_once("../obj/User.obj.php");
 include_once("../obj/Access.obj.php");
 include_once("../obj/Permission.obj.php");
 require_once("../inc/auth.inc.php");
+include_once("inboundutils.inc.php");
 
 global $SESSIONDATA, $BFXML_VARS;
 

@@ -1,9 +1,5 @@
 <?
 // phone inbound helper routines (aka utilities)
-include_once("../obj/User.obj.php");
-include_once("../obj/Access.obj.php");
-include_once("../inc/utils.inc.php");
-
 
 function glog($s)
 {
