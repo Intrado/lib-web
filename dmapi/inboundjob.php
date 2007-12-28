@@ -350,6 +350,7 @@ function commitJob()
 	$job->listid = $SESSIONDATA['listid'];
 	$job->phonemessageid = $SESSIONDATA['messageid'];
 	$job->jobtypeid = $SESSIONDATA['priority'];
+	//TODO set description to jobtype name
 	$job->description = "";
 
 	glog("priority: ".$SESSIONDATA['priority']."   id: ".$job->jobtypeid);
