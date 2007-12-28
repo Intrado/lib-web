@@ -11,13 +11,13 @@ $PAGESIZE = 9;
 
 function loadJobtypesDB()
 {
-	global $SESSIONDATA;
+	global $SESSIONDATA, $USER;
 	return JobType::getUserJobTypes();
 }
 
 function loadJobtypes($incr)
 {
-	global $SESSIONDATA, $PAGESIZE;
+	global $SESSIONDATA, $PAGESIZE, $USER;
 	if (!isset($PAGESIZE)) $PAGESIZE = 9; // this is strange... why isnt it set the first time from above???
 	glog("pagesize: ".$PAGESIZE);
 	glog("loadjobtypes current page ".$SESSIONDATA['currentJobtypePage']);
@@ -150,7 +150,7 @@ if($REQUEST_TYPE == "new"){
 			$jobtype = $jobtypes[$jobtypeindex];
 			glog("jobtype name: ".$jobtype->name);
 
-			$SESSIONDATA['priority'] = $jobtype->name;
+			$SESSIONDATA['priority'] = $jobtype->id;
 
 			forwardToPage("inboundjob.php");
 
