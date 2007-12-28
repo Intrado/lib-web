@@ -85,6 +85,8 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 	$renderedlist->mode = "preview";
 	$renderedlist->renderList();
 	$listsize = $renderedlist->total;
+	$jobtype = new JobType($priority);
+	
 	glog("number of people in list: ".$listsize);
 
 	// if job is one day, and stop time is in the past... warn them about a job that is ineffective
@@ -117,7 +119,7 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 <? 				} ?>
 				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation2.wav" />
-				<tts gender="female"><?= htmlentities($priority, ENT_COMPAT, "UTF-8") ?></tts>
+				<tts gender="female"><?= htmlentities($jobtype->name, ENT_COMPAT, "UTF-8") ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation3.wav" />
 
 <?				if ($numdays > 1) { ?>
@@ -322,7 +324,6 @@ function commitJob()
 	global $SESSIONDATA;
 
 	$numdays = $SESSIONDATA['numdays'];
-	$priority = $SESSIONDATA['priority'];
 
 	loadUser();
 	global $USER, $ACCESS;
@@ -348,15 +349,9 @@ function commitJob()
 
 	$job->listid = $SESSIONDATA['listid'];
 	$job->phonemessageid = $SESSIONDATA['messageid'];
+	$job->jobtypeid = $SESSIONDATA['priority'];
+	$job->description = "";
 
-	$VALIDJOBTYPES = JobType::getUserJobTypes();
-	foreach ($VALIDJOBTYPES as $t) {
-		if ($t->name == $SESSIONDATA['priority']) {
-			$job->jobtypeid = $t->id;
-			$job->description = $t->name;
-			break;
-		}
-	}
 	glog("priority: ".$SESSIONDATA['priority']."   id: ".$job->jobtypeid);
 
 	glog("about to create the job!!!");
