@@ -13,12 +13,22 @@ require_once("../inc/utils.inc.php");
 
 session_start();
 if(!isset($isasplogin)){
-	
+
 	if (isset($SETTINGS['feature']['force_ssl']) && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
-		redirect("index.php?logout=1"); //the index page will redirect to https
-	}	
+		redirect("index.php"); //the index page will redirect to https
+	}
+
 	if(!isset($_SESSION["aspadminuserid"]))
 		redirect("./?logout=1");
+
+	//check to make sure the url component is the username
+	$expectedusername = substr($_SERVER["SCRIPT_NAME"],1);
+	$expectedusername = strtolower(substr($expectedusername,0,strpos($expectedusername,"/")));
+	$username = QuickQuery("select login from aspadminuser where id=" . $_SESSION["aspadminuserid"]);
+	if ($username != $expectedusername) {
+		redirect("index.php?logout=1");
+	}
+
 }
 
 ?>

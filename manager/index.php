@@ -6,13 +6,14 @@ include_once("AspAdminUser.obj.php");
 
 if(isset($_GET["logout"])) {
 	@session_destroy();
+	redirect();
 }
 
 if ($SETTINGS['feature']['has_ssl']) {
 	$location = substr($_SERVER["SCRIPT_NAME"],1);
 	$location = strtolower(substr($location,0,strrpos($location,"/")));
 	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/" . $location . "/index.php";
-	
+
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		redirect($secureurl);
 	}
@@ -32,7 +33,8 @@ if(isset($_POST["submit"])) {
 	if($id){
 		error_log("Manager login by $login");
 		$_SESSION['aspadminuserid'] = $id;
-		redirect("customers.php");
+
+		redirect("/$login/manager/customers.php");
 	} else {
 		$badlogin = true;
 	}
