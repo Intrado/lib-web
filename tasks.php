@@ -13,6 +13,7 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+include_once("obj/FieldMap.obj.php");
 
 
 
@@ -27,7 +28,37 @@ if (!$USER->authorize('managetasks')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+if (isset($_GET['delete'])) {
+	$id = $_GET['delete'] + 0;
+	$import = new Import($id);
+
+	//deactivate everyone with this importid
+	QuickUpdate("update person set deleted=1, lastimport=now() where importid=$id");
+	//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
+	QuickUpdate("delete le from listentry le
+				left join person p on (p.id = le.personid)
+				where p.id is null and le.personid is not null");
+
+	//recalc pdvalues for all fields mapped
+	$fieldnums = QuickQueryList("select distinct mapto from importfield where mapto like 'f%' and importid=$id");
+	if (count($fieldnums) > 0) {
+		$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
+		foreach ($fields as $field)
+			$field->updatePersonDataValues();
+	}
+
+	//delete mappings
+	QuickUpdate("delete from importfield where importid=$id");
+
+	//delete import
+	$import->destroy();
+	redirect();
+}
+
+
 $IMPORTS = DBFindMany("Import", "from import where ownertype != 'user' order by id");
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -72,7 +103,8 @@ function fmt_actions ($import,$dummy) {
 		$res .= "<a href=\"taskdownload.php?id=$import->id\">Download</a>&nbsp;|&nbsp;";
 	$res .= "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;"
 			."<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
-			."<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>";
+			."<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>&nbsp;|&nbsp;"
+			."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\nThis will deactivate all associated contact records!');\">Delete</a>";
 	return $res;
 }
 

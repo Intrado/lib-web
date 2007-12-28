@@ -43,7 +43,7 @@ class FieldMap extends DBMappedObject {
 			$field = "f03";
 		return $field;
 	}
-	
+
 	static function getSchoolField(){
 		return QuickQuery("select fieldnum from fieldmap where options like '%school%'");
 	}
@@ -86,7 +86,7 @@ class FieldMap extends DBMappedObject {
 				unset($fieldmaps[$key]);
 		return $fieldmaps;
 	}
-	
+
 	static function getOptionalAuthorizedFieldMaps(){
 		$fieldmaps = FieldMap::getAuthorizedFieldMaps();
 		foreach($fieldmaps as $index => $fieldmap){
@@ -103,6 +103,28 @@ class FieldMap extends DBMappedObject {
 				." fieldnum = '$fieldnum'";
 		return QuickQuery($query);
 	}
+
+	function updatePersonDataValues () {
+
+		if ($this->isOptionEnabled("searchable") &&
+			$this->isOptionEnabled("multisearch")) {
+
+			$fieldnum = $this->fieldnum;
+
+			$query = "delete from persondatavalues where fieldnum='$fieldnum '";
+			QuickUpdate($query);
+
+			$count = QuickUpdate("insert into persondatavalues (fieldnum,value,refcount) "
+							. "select '$fieldnum' as fieldnum, "
+							. "p.$fieldnum as value, "
+							. "count(*) "
+							. "from person p "
+							. "where not p.deleted and p.type = 'system' "
+							. "group by value");
+		}
+	}
+
+
 
 	function isOptionEnabled ($name) {
 		if (!$this->optionsarray) {
