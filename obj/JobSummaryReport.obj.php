@@ -6,6 +6,7 @@ class JobSummaryReport extends ReportGenerator{
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$jobtypes = "";
+		$joblistquery = "";
 		if(isset($this->params['jobtypes'])){
 			$jobtypes = $this->params['jobtypes'];
 		}
@@ -28,6 +29,12 @@ class JobSummaryReport extends ReportGenerator{
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
 		}
+
+		if($joblist){
+			$joblistquery = " and rp.jobid in ('" . $joblist . "')";
+		} else {
+			$joblistquery = " and rp.jobid =0";
+		}
 		$this->params['joblist'] = $joblist;
 		// Query for graph in pdf
 		$this->query = "select count(*) as cnt, 
@@ -36,8 +43,9 @@ class JobSummaryReport extends ReportGenerator{
 				from reportperson rp
 				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
-				where rp.jobid in ('" . $joblist . "')
-				and rp.type='phone'
+				where 1 " 
+				. $joblistquery .
+				" and rp.type='phone'
 				group by currentstatus";
 
 	}
