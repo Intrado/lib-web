@@ -1147,6 +1147,24 @@ CREATE TABLE `customer` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `loginattempt`
+--
+
+ CREATE TABLE `loginattempt` (
+`customerid` INT NOT NULL ,
+`login` VARCHAR( 20 ) NOT NULL ,
+`ipaddress` VARCHAR( 15 ) NOT NULL ,
+`attempts` TINYINT NOT NULL ,
+`lastattempt` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+`status` ENUM( 'enabled', 'disabled', 'lockout' ) NOT NULL DEFAULT 'enabled' ,
+PRIMARY KEY ( `customerid` , `login` ) ,
+INDEX ( `status` )
+) ENGINE = innodb
+$$$
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `persontoken`
 --
 
@@ -1202,6 +1220,7 @@ CREATE TABLE `portaluser` (
   `zipcode` varchar(10) NOT NULL,
   `enabled` tinyint(4) NOT NULL default '0',
   `lastlogin` datetime default NULL,
+  `notify` ENUM( 'none', 'message' ) NOT NULL DEFAULT 'none',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8   $$$
@@ -1531,7 +1550,8 @@ CREATE TABLE `tasksyncdata` (
   `name` varchar(50) NOT NULL,
   `value` varchar(50) NOT NULL,
   PRIMARY KEY  (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8   $$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 
 -- New table for destination labels
