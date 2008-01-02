@@ -149,8 +149,10 @@ class ContactsReport extends ReportGenerator {
 				$data[] = $personrow;
 			} else {
 				foreach($destinationdata[$personrow[1]] as $destination){
-					array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[4]));
-					$data[] = $personrow;
+					if($destination[1]){
+						array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[4]));
+						$data[] = $personrow;
+					}
 				}
 			}
 		}
