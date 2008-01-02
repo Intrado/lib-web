@@ -146,9 +146,9 @@ if(!$success){
 				<div style="margin:5px">
 					Thank you, Your account has been created.
 					<br>Please check your email to activate your account.
-					<br>You will be redirected to the activate page in 5 seconds or <a href="index.php?n">Click Here.</a>
+					<br>You will be redirected to the activate page in 10 seconds or <a href="index.php?n">Click Here.</a>
 				</div>
-				<meta http-equiv="refresh" content="5;url=index.php?n">
+				<meta http-equiv="refresh" content="10;url=index.php?n">
 			</td>
 			<td>&nbsp;</td>
 		</tr>

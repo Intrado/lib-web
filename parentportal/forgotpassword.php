@@ -75,9 +75,9 @@ if(!$success){
 				<div style="margin:5px">
 					A link has been sent to your email address to log in.
 					<br>Please remember to change your password.
-					<br>You will be redirected to the activate page in 5 seconds or <a href="index.php?f">Click Here.</a>
+					<br>You will be redirected to the activate page in 10 seconds or <a href="index.php?f">Click Here.</a>
 				</div>
-				<meta http-equiv="refresh" content="5;url=index.php?f">
+				<meta http-equiv="refresh" content="10;url=index.php?f">
 			</td>
 		</tr>
 	</table>
