@@ -202,7 +202,11 @@ foreach ($fieldmaps as $fieldmap) {
 			if (count($values) > 1) {
 				NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"selectmultiple",5,@array_combine($values,$values));
 			} else {
-				NewFormSelect($f,$s,"newrulevalue_" . $fieldnum,@array_combine($values,$values));
+				$arrayvalues = @array_combine($values,$values);
+				if($arrayvalues === false){
+					$arrayvalues = array(0 => "");
+				}
+				NewFormSelect($f,$s,"newrulevalue_" . $fieldnum,$arrayvalues);
 			}
 		}
 
