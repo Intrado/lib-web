@@ -33,7 +33,7 @@ class JobSummaryReport extends ReportGenerator{
 		if($joblist){
 			$joblistquery = " and rp.jobid in ('" . $joblist . "')";
 		} else {
-			$joblistquery = " and rp.jobid =0";
+			$joblistquery = " and 0 ";
 		}
 		$this->params['joblist'] = $joblist;
 		// Query for graph in pdf
