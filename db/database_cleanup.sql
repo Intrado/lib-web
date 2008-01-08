@@ -1,6 +1,6 @@
---Messages for deletion
---Remove all messages that are deleted and not associated with any job.
---Remove message parts for deleted messages also
+-- Messages for deletion
+-- Remove all messages that are deleted and not associated with any job.
+-- Remove message parts for deleted messages also
 
 DELETE	m,
 	mp
@@ -24,8 +24,8 @@ and		not exists (
 
 $$$
 
---Audiofiles for deletion
---Remove audiofiles that are not associated with any message parts and are deleted.
+-- Audiofiles for deletion
+-- Remove audiofiles that are not associated with any message parts and are deleted.
 
 DELETE	a
 FROM	audiofile a
@@ -38,8 +38,8 @@ and		not exists (
 
 $$$
 
---Email message attachments for deletion
---Deleted email attachments that are not associated with any messages
+-- Email message attachments for deletion
+-- Deleted email attachments that are not associated with any messages
 
 DELETE	ma
 FROM	messageattachment ma
@@ -51,8 +51,8 @@ WHERE	not exists (
 
 $$$
 
---Content deletion
---Remove all content that is not associated with an audiofile, message attachment or voicereply
+-- Content deletion
+-- Remove all content that is not associated with an audiofile, message attachment or voicereply
 
 DELETE	c
 FROM	content c
@@ -74,8 +74,8 @@ and		not exists (
 
 $$$
 
---List deletion
---Remove all lists that are not associated with a job and are deleted
+-- List deletion
+-- Remove all lists that are not associated with a job and are deleted
 
 DELETE	l
 FROM	list l
@@ -88,8 +88,8 @@ and		not exists (
 
 $$$
 
---List entry removal
---Remove all list entries that are not associated with a list
+-- List entry removal
+-- Remove all list entries that are not associated with a list
 
 DELETE	le
 FROM	listentry le
@@ -101,8 +101,8 @@ WHERE	not exists (
 
 $$$
 
---List import removal
---Remove list imports for deleted lists
+-- List import removal
+-- Remove list imports for deleted lists
 
 DELETE 	i
 FROM 	import i
@@ -110,28 +110,29 @@ WHERE 	i.type = 'list'
 and		not exists (
 		SELECT 	*
 		FROM 	list l
-		WHERE 	l.id = import.listid
+		WHERE 	l.id = i.listid
 	)
 
 $$$
 
---Delete persons
---Remove persons who have not been changed in more than six months and are deleted
+-- Delete persons
+-- Remove persons who have not been changed in more than six months and are deleted
 
 DELETE 	p
 FROM	person p
-WHERE	p.lastimport < (now() - interval 6 months)
+WHERE	p.lastimport < (now() - interval 6 month)
 and 	p.deleted
 
 $$$
 
---Delete import fields
---Remove import fields that are associated with imports that were removed due to deleted list removal
+-- Delete import fields
+-- Remove import fields that are associated with imports that were removed due to deleted list removal
 
-DELETE	if
-FROM	importfield if
+DELETE	imf
+FROM	importfield imf
 WHERE	not exists (
 		SELECT 	*
 		FROM 	import i
-		WHERE	i.id = if.importid
+		WHERE	i.id = imf.importid
 	)
+$$$
