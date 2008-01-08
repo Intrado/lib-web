@@ -995,7 +995,18 @@ function hideSection(section){
 			show('displaysmsoptions');
 			break;
 	}
-	if(!(new getObj('sendemail').obj.checked) && !(new getObj('sendphone').obj.checked) && !(new getObj('sendsms').obj.checked) ){
+	phonecheck = false;
+	emailcheck = false;
+	smscheck = false;
+	
+	if(new getObj('sendphone').obj)
+		phonecheck = new getObj('sendphone').obj.checked;
+	if(new getObj('sendemail').obj)
+		emailcheck = new getObj('sendemail').obj.checked;
+	if(new getObj('sendsms').obj)
+		smscheck = new getObj('sendsms').obj.checked;
+	
+	if(!phonecheck && !emailcheck && !smscheck){
 		hide('settings');
 	}
 }
