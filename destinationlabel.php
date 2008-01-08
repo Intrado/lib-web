@@ -101,7 +101,7 @@ startWindow("Labels");
 ?>
 		<tr>
 			<td><?=format_delivery_type($type)?>&nbsp;<?=$i+1?></td>
-			<td><? NewFormItem($f, $s, $type . $i, "text", 10, 20);?></td>
+			<td><? NewFormItem($f, $s, $type . $i, "text", 20, 20);?></td>
 		</tr>
 <?
 	}
