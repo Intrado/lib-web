@@ -53,7 +53,6 @@ if($type == "upgrade"){
 if(isset($_ENV['WINDIR'])){
 	echo "Windows Machine\n";
 	echo "Shutting down services\n";
-	$output = array();
 	if($type == "upgrade")
 		$services = array("Apache2", "csDialer", "csTasksync", "csTomcat", "csjtapi");
 	else
@@ -103,13 +102,21 @@ if($type == "new"){
 	executeSqlFile("commsuitemangle.sql");
 	echo "Extracting old database to new database\n";
 	$output = array();
-	exec("php extract_customer.php", $output);
+	exec("php extract_customer.php", $output, $returncode);
 	echoarray($output);
-	echo "Old database extracted\n";
+	echo "extract customer had return code: " . $returncode;
+	if($returncode != 0){
+		exit("Extract Failed, fix db and try again");
+	} else{
+		echo "Old database extracted\n";
+	}
 	echo "Updating Settings File\n";
 	$output = array();
 	exec("php create_new_settings.php", $output);
 	echoarray($output);
+	echo "Cleaning up the database\n";
+	mysql_select_db($commsuitedbname, $custdb);
+	executeSqlFile("database_cleanup.sql");
 }
 
 echo "Done.\n";
@@ -124,7 +131,7 @@ function executeSqlFile($sqlfile, $replace = false){
 				$tablequery = str_replace('_$CUSTOMERID_', 1, $tablequery);
 			}
 			mysql_query($tablequery,$custdb)
-				or die ("Failed to create tables \n$tablequery\n\nfor $newdbname : " . mysql_error($custdb));
+				or die ("Failed to create tables \n$tablequery\n\n : " . mysql_error($custdb));
 		}
 	}
 }
