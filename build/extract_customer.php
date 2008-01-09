@@ -41,7 +41,7 @@ function fieldlist ($table,$fields) {
 	return implode(",",$fieldlist);
 }
 
-function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = false) {
+function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = false, $groupby = false) {
 
  $fieldlist = fieldlist($table,$fields);
 
@@ -51,6 +51,9 @@ function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = 
   $query .= $joincustomer;
  else
   $query .= " where customerid=$custid";
+
+ if ($groupby)
+ 	$query .= $groupby;
 
 // echo "$table: $query\n\n";
  $sourceres = mysql_query($query,$source)
@@ -251,7 +254,8 @@ copytable($customerid,"blockednumber",array("id","userid","description","pattern
 $join = "
 inner join audiofile on (contentid=content.id)
 inner join user u on (userid=u.id and u.customerid=$customerid)";
-copytable($customerid,"content",array("id","contenttype","data"),$db,$custdb,1,$join);
+$groupby = " group by contentid ";
+copytable($customerid,"content",array("id","contenttype","data"),$db,$custdb,1,$join, $groupby);
 
 //CONTENT (voice reply)
 $join = "
