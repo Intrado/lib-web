@@ -4,10 +4,10 @@ if ($argc < 2)
 	
 $customerid = $argv[1];
 
-$authhost="localhost:3306";
+$authhost="localhost";
 $authuser="root";
 $authpass="";
-$authdb="authserver";
+$authdb="commsuite";
 
 $auth = mysql_connect($authhost, $authuser, $authpass)
 			or die("Could not connect to auth: " . mysql_error($authdb));
