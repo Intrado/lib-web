@@ -29,10 +29,11 @@ $dmapiLinesToAdd[] = "pass=\"\"";
 $dmapiLinesToAdd[] = "db=\"commsuite\"";
 
 $fileLines = replaceSection($fileLines, "db", $linesToAdd);
-$fileLines = replaceSection($fileLines, "dmapidb", $dmapiLinesToAdd);
+$fileLines = appendToSection($fileLines, "authserver", $dmapiLinesToAdd);
 $ldapline = findSection($fileLines, "feature");
 $fileLines = deleteSection($fileLines, "ldap");
 $fileLines = appendToSection($fileLines, "feature", array("", "is_ldap=false"));
+$fileLines = deleteSection("fileLines, "import");
 
 
 writearray($fileLines, $outfilefp);
