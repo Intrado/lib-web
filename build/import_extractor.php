@@ -2,10 +2,10 @@
 
 $SETTINGS = parse_ini_file("../inc/settings.ini.php", true);
 
-$dbhost="localhost:3306";
+$dbhost="localhost";
 $dbuser="root";
 $dbpass="";
-$db="dialerasp";
+$db="dialer";
 
 $filepath = "/usr/commsuite/imports/"; //trailing slash
 
