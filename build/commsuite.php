@@ -98,18 +98,22 @@ if($type == "new"){
 	echo "Defaults loaded.\n";
 } else if($type == "upgrade"){
 	mysql_select_db($olddbname);
+	mysql_query("delete from setting where name = 'checkpassword'");
+	echo "Running Import Updater\n";
+	exec("php import_extractor.php");
+	
 	echo "Mangling\n";
 	executeSqlFile("commsuitemangle.sql");
+	
 	echo "Extracting old database to new database\n";
 	$output = array();
 	exec("php extract_customer.php", $output, $returncode);
 	echoarray($output);
-	echo "extract customer had return code: " . $returncode;
-	if($returncode != 0){
-		exit("Extract Failed, fix db and try again");
-	} else{
-		echo "Old database extracted\n";
-	}
+	addNewDefaults();
+	
+	echo "Updating metadata fields\n";
+	exec("php update_metadata.php");
+	
 	echo "Updating Settings File\n";
 	$output = array();
 	exec("php create_new_settings.php", $output);
@@ -165,5 +169,16 @@ function generalmenu($questions = array(), $validresponses = array()){
 		$response = trim($response);
 	}
 	return $response;
+}
+
+function addNewDefaults(){
+	global $custdb;
+	
+	echo "Adding new default values\n";
+	
+	$query = "INSERT INTO `jobtype` (name, systempriority, info, issurvey,deleted) VALUES ('Survey',3,'Surveys',1,0)";
+	mysql_query($query, $custdb)
+		or die("Failed to run this query: " . $query . "\n, with this error " . mysql_error($custdb));
+
 }
 ?>
