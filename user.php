@@ -96,6 +96,8 @@ $f = "user";
 $s = "main";
 $reloadform = 0;
 
+
+//TODO: remove all "secure password" code, "checkpassword" setting
 $checkpassword = (getSystemSetting("checkpassword","",true)==0) ? getSystemSetting("checkpassword") : 1;
 $usernamelength = getSystemSetting("usernamelength",5);
 $passwordlength = getSystemSetting("passwordlength",5);
