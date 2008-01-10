@@ -1,4 +1,5 @@
 <?
+$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 $settingsiniphp = "../inc/settings.ini.php";
 $oldsettings = "../inc/settings.ini.php.backup";
 $outfile = "test.ini.php";
@@ -24,8 +25,8 @@ $dmapiLinesToAdd = array();
 $dmapiLinesToAdd[] = "[dmapidb]";
 $dmapiLinesToAdd[] = "persistent=true";
 $dmapiLinesToAdd[] = "host=\"localhost\"";
-$dmapiLinesToAdd[] = "user=\"root\"";
-$dmapiLinesToAdd[] = "pass=\"\"";
+$dmapiLinesToAdd[] = "user=\"" . $SETTINGS['db']['user'] . "\"";
+$dmapiLinesToAdd[] = "pass=\"" . $SETTINGS['db']['pass'] . "\"";
 $dmapiLinesToAdd[] = "db=\"commsuite\"";
 
 $fileLines = replaceSection($fileLines, "db", $linesToAdd);
