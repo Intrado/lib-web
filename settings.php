@@ -114,9 +114,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
 				setSetting('autoreport_replyname', GetFormData($f, $s, 'autoreport_replyname'));
 
-				$checkpassword = GetFormData($f, $s, 'checkpassword') ? 1 : 0;
-				setSetting('checkpassword', GetFormData($f, $s, 'checkpassword'));
-
 				setSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
 				setSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
 				if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
@@ -178,12 +175,11 @@ if( $reloadform )
 	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', "0"), "number", 0, 15, true);
 	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', "5"), "number", 1, 60, true);
 
-	PutFormData($f, $s,"usernamelength", getSetting('usernamelength'), "number", 0, 10);
-	PutFormData($f, $s,"passwordlength", getSetting('passwordlength'), "number", 0, 10);
-	PutFormData($f,$s,"checkpassword",(bool)getSetting('checkpassword'), "bool", 0, 1);
+	PutFormData($f, $s,"usernamelength", getSystemSetting('usernamelength', "5"), "number", 0, 10);
+	PutFormData($f, $s,"passwordlength", getSystemSetting('passwordlength', "5"), "number", 0, 10);
 	if($IS_COMMSUITE){
-		PutFormData($f, $s, "easycallmin", getSetting('easycallmin'), "number", 0, 10);
-		PutFormData($f, $s, "easycallmax", getSetting('easycallmax'), "number", 0, 10);
+		PutFormData($f, $s, "easycallmin", getSystemSetting('easycallmin', 10), "number", 0, 10);
+		PutFormData($f, $s, "easycallmax", getSystemSetting('easycallmax', 10), "number", 0, 10);
 	}
 	if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
 		
@@ -387,10 +383,6 @@ startWindow('Global System Settings');
 							<tr>
 								<td>Minimum Password Length<? print help('Settings_MinimumPassword'); ?></td>
 								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?></td>
-							</tr>
-							<tr>
-								<td>Very Secure Passwords<? print help('Settings_VerySecurePasswords'); ?></td>
-								<td><? NewFormItem($f,$s,'checkpassword','checkbox') ?></td>
 							</tr>
 							<tr>
 								<td>Invalid Login Lockout<? print help('Settings_InvalidLoginLockout'); ?></td>
