@@ -1,38 +1,23 @@
 <?
-if ($argc < 2)
-	exit ("Please specify customerid");
-	
-$customerid = $argv[1];
+$cshost="localhost";
+$csuser="_dbuser_";
+$cspass="_dbpass_";
+$csdb="commsuite";
 
-$authhost="localhost";
-$authuser="root";
-$authpass="";
-$authdb="commsuite";
-
-$auth = mysql_connect($authhost, $authuser, $authpass)
-			or die("Could not connect to auth: " . mysql_error($authdb));
-mysql_select_db($authdb, $auth);
-
-$query = "select c.id, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = '$customerid'";
-$res = mysql_query($query, $auth);
-$customer = mysql_fetch_row($res);
-
-$custdb = mysql_connect($customer[1], $customer[2], $customer[3])
-			or die("Could not connect to customer: " . mysql_error($custdb));
-mysql_select_db("c_$customer[0]", $custdb)
-			or die("Could not select customer db: " . mysql_error($custdb));
-			
-			
+$db_con = mysql_connect($cshost, $csuser, $cspass)
+			or die("Could not connect to db: " . mysql_error($db_con));
+mysql_select_db($csdb, $db_con);
+				
 $query = "update fieldmap fm set fm.options=concat(fm.options, ',firstname') where fm.name = 'First Name'";
-mysql_query($query, $custdb);
+mysql_query($query, $db_con);
 $query = "update fieldmap fm set fm.options=concat(fm.options, ',lastname') where fm.name = 'Last Name'";
-mysql_query($query, $custdb);
+mysql_query($query, $db_con);
 $query = "update fieldmap fm set fm.options=concat(fm.options, ',grade') where fm.name = 'Grade' OR fm.name='Grade Level'";
-mysql_query($query, $custdb);
+mysql_query($query, $db_con);
 $query = "update fieldmap fm set fm.options=concat(fm.options, ',school') where fm.name = 'School' or fm.name='school'";
-mysql_query($query, $custdb);
+mysql_query($query, $db_con);
 $query = "update fieldmap fm set fm.options=concat(fm.options, ',language') where fm.name = 'Language'";
-mysql_query($query, $custdb);
+mysql_query($query, $db_con);
 
 
 
