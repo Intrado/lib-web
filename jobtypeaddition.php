@@ -155,7 +155,7 @@ startWindow("Add a Job Type");
 					</td>
 				</tr>
 				<tr>
-					<td width="30%">Display Info for Contact Manager users</td>
+					<td width="30%">Display Information</td>
 					<td ><? NewFormItem($f, $s, "jobtypedesc", "textarea", 20, 3);?></td>
 				</tr>
 				<tr>
