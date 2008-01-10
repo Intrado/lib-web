@@ -7,7 +7,7 @@ $$$
 INSERT INTO `fieldmap` VALUES (1,'f01','First Name','searchable,text,firstname'),(2,'f02','Last Name','searchable,text,lastname'),(3,'f03','Language','searchable,multisearch,language')
 $$$
 
-INSERT INTO `jobtype` VALUES (1,'Emergency',1,'',0,0),(2,'Attendance',2,'',0,0),(3,'General',3,'',0,0),(4,'Survey',3,'',1,0)
+INSERT INTO `jobtype` VALUES (1,'Emergency',1,'Emergencies Only',0,0),(2,'Attendance',2,'Attendance Notifications',0,0),(3,'General',3,'General Announcements',0,0),(4,'Survey',3,'Survey Notifications',1,0)
 $$$
 
 INSERT INTO `jobtypepref` VALUES (1,'phone',0,1),(1,'phone',1,1),(1,'phone',2,1),(1,'email',0,1),(1,'email',1,1),(1,'sms',0,1),(1,'sms',1,1)
