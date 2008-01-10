@@ -109,6 +109,7 @@ if($type == "new"){
 	$output = array();
 	exec("php extract_customer.php", $output, $returncode);
 	echoarray($output);
+	mysql_select_db($commsuitedbname, $custdb);
 	addNewDefaults();
 	
 	echo "Updating metadata fields\n";
@@ -119,7 +120,7 @@ if($type == "new"){
 	exec("php create_new_settings.php", $output);
 	echoarray($output);
 	echo "Cleaning up the database\n";
-	mysql_select_db($commsuitedbname, $custdb);
+
 	executeSqlFile("database_cleanup.sql");
 }
 
