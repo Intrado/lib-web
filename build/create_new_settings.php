@@ -1,5 +1,10 @@
 <?
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+$isldap="false";
+if($SETTINGS['ldap']['is_ldap']){
+	$is_ldap="true";
+}
+
 $settingsiniphp = "../inc/settings.ini.php";
 $oldsettings = "../inc/settings.ini.php.backup";
 $outfile = "test.ini.php";
@@ -33,7 +38,7 @@ $fileLines = replaceSection($fileLines, "db", $linesToAdd);
 $fileLines = appendToSection($fileLines, "authserver", $dmapiLinesToAdd);
 $ldapline = findSection($fileLines, "feature");
 $fileLines = deleteSection($fileLines, "ldap");
-$fileLines = appendToSection($fileLines, "feature", array("", "is_ldap=false"));
+$fileLines = appendToSection($fileLines, "feature", array("", "is_ldap=" . $is_ldap));
 $fileLines = deleteSection($fileLines, "import");
 
 
