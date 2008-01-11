@@ -64,7 +64,7 @@ if ($USER->authorize("startstats")) {
 		<td valign="top">
 			<table border=0 cellpadding=0 cellspacing=0>
 <?
-		  	$startCustomTitle = "Tip of the Day";
+		  	$startCustomTitle = "What's New";
 		  	$startCustomFile = "motd.txt";
 
 			if (file_exists($startCustomFile)) {
