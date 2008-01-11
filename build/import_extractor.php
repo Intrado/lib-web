@@ -2,16 +2,16 @@
 
 $SETTINGS = parse_ini_file("../inc/settings.ini.php", true);
 
-$dbhost="localhost";
-$dbuser="root";
-$dbpass="";
+$dbhost=$SETTINGS['db']['host'];
+$dbuser=$SETTINGS['db']['user'];
+$dbpass=$SETTINGS['db']['pass'];
 $db="dialer";
 
 $filepath = "/usr/commsuite/imports/"; //trailing slash
 
 
 $custdb = mysql_connect($dbhost, $dbuser, $dbpass)
-			or die("Could not connect to db: " . mysql_error($authdb));
+			or die("Could not connect to db: " . mysql_error($custdb));
 mysql_select_db($db, $custdb);
 
 
