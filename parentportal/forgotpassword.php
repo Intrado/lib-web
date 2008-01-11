@@ -44,7 +44,7 @@ if(!$success){
 			<td colspan="2""><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 		</tr>
 		<tr>
-			<td colspan="2">We will email you a link to a page where you can reset your password.</td>
+			<td colspan="2">To begin the password reset process, enter your email address.</td>
 		</tr>
 		<tr>
 			<td>Email:</td>
@@ -73,9 +73,8 @@ if(!$success){
 			<td>&nbsp;</td>
 			<td>
 				<div style="margin:5px">
-					A link has been sent to your email address to log in.
-					<br>Please remember to change your password.
-					<br>You will be redirected to the activate page in 10 seconds or <a href="index.php?f">Click Here.</a>
+					Check your email to receive the password reset link.
+					<br>You will be redirected to the Activation page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a>
 				</div>
 				<meta http-equiv="refresh" content="10;url=index.php?f">
 			</td>
