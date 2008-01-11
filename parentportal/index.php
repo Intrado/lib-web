@@ -111,7 +111,7 @@ include_once("cmlogintop.inc.php");
 		<tr>
 			<td>Password&nbsp;(case&nbsp;sensitive):</td>
 			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
-			<td align="left"><a href="forgotpassword.php">Forgot your password? Click Here!</a></td>
+			<td align="left"><a href="forgotpassword.php">Forgot your password? Click Here</a></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
