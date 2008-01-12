@@ -111,17 +111,15 @@ if($type == "new"){
 	echoarray($output);
 	mysql_select_db($commsuitedbname, $custdb);
 	addNewDefaults();
-	
-	// TODO run metadata updater 
-	//echo "Updating metadata fields\n";
-	//exec("php update_metadata.php");
+
+	echo "Updating metadata fields\n";
+	exec("php update_metadata.php");
 	
 	echo "Updating Settings File\n";
 	$output = array();
 	exec("php create_new_settings.php", $output);
 	echoarray($output);
 	echo "Cleaning up the database\n";
-
 	executeSqlFile("database_cleanup.sql");
 }
 
