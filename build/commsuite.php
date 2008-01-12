@@ -99,11 +99,12 @@ if($type == "new"){
 } else if($type == "upgrade"){
 	mysql_select_db($olddbname);
 	mysql_query("delete from setting where name = 'checkpassword'");
-	echo "Running Import Updater\n";
-	exec("php import_extractor.php");
 	
 	echo "Mangling\n";
 	executeSqlFile("commsuitemangle.sql");
+	
+	echo "Running Import Updater\n";
+	exec("php import_extractor.php");
 	
 	echo "Extracting old database to new database\n";
 	$output = array();
