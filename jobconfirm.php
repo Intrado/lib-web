@@ -243,7 +243,7 @@ startWindow("Confirmation &amp; Submit");
 
 					<tr>
 						<td> Allow call recipients to leave a message</td>
-						<td><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Leave Message</td>
+						<td><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Accept Voice Responses</td>
 					</tr>
 <? } ?>
 
