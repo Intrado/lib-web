@@ -149,7 +149,7 @@ class JobSummaryReport extends ReportGenerator{
 							"blocked" => "Blocked",
 							"duplicate" => "Duplicate",
 							"nocontacts" => "No Phone #",
-							"declined" => "Declined"
+							"declined" => "No Phone Selected"
 						);
 		$jobstats["phone"] = $cpstats;
 		$remainingcalls=0;

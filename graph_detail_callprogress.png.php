@@ -50,7 +50,7 @@ $cpcodes = array(
 	"blocked" => "Blocked",
 	"duplicate" => "Duplicate",
 	"nocontacts" => "No Phone #",
-	"declined" => "Declined"
+	"declined" => "No Phone Selected"
 );
 
 $data = array();
@@ -75,9 +75,9 @@ foreach($cpcodes as $index => $code){
 }
 
 // New graph with a drop shadow
-$graph = new Graph(500,325,'auto');
+$graph = new Graph(500,400,'auto');
 //$graph->SetShadow();
-$graph->img->SetMargin(100,40,20,100);
+$graph->img->SetMargin(100,60,20,130);
 
 for($i=1;$i<=$count;$i++){
 	$barname = "bar" . $i;
