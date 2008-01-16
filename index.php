@@ -127,7 +127,7 @@ if (file_exists($logofilename) ) {
 <table align="center" cellpadding="8" cellspacing="0" style="border: 7px solid #9B9B9B;">
 	<tr>
 		<td bgcolor="#365F8D"><img id='brand' src='img/school_messenger.gif' /></td>
-		<td bgcolor="#365F8D" align="center"><div id='orgtitle'><?= htmlentities($custname) ?></div></td>
+		<td bgcolor="#365F8D" align="center"><div id='orgtitle' style='margin-top: 3px; margin-right: 10px; font-size: large; display: inline; float: right; color: white;'><?= htmlentities($custname) ?></div></td>
 	</tr>
 	<tr>
 		<td colspan="2">
