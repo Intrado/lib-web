@@ -198,6 +198,8 @@ foreach ($fieldmaps as $fieldmap) {
 						where fieldnum='$fieldnum' $limitsql order by value";
 
 			$values = QuickQueryList($query);
+			if(!count($values))
+				$values = array(0 => "");
 			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","array",$values);
 			if (count($values) > 1) {
 				NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"selectmultiple",5,@array_combine($values,$values));
