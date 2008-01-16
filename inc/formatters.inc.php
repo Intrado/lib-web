@@ -531,6 +531,15 @@ function fmt_jobdetail_result($row, $index){
 			return "No SMS";
 		else 
 			return "No Contacts";
+	} else if($row[$index] == "declined"){
+		if($row[5] == 'phone')
+			return "No Phone Selected";
+		else if($row[5] == 'email')
+			return "No Email Selected";
+		else if($row[5] == 'sms')
+			return "No SMS Selected";
+		else 
+			return "No Selected";
 	} else {
 		return fmt_result($row, $index);
 	}

@@ -35,15 +35,26 @@ if (!$USER->authorize('createreport')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 //result formatter for job details.
-//index 2 is the delivery type
+//index 3 is the delivery type
 function fmt_contacthistory_result($row, $index){
 	if($row[$index] == "nocontacts"){
-		if($row[2] == 'phone')
+		if($row[3] == 'phone')
 			return "No Phone #";
-		else if($row[2] == 'email')
+		else if($row[3] == 'email')
 			return "No Email";
+		else if($row[3] == 'sms')
+			return "No SMS";
 		else 
 			return "No Contacts";
+	} else if($row[$index] == "declined"){
+		if($row[3] == 'phone')
+			return "No Phone Selected";
+		else if($row[3] == 'email')
+			return "No Email Selected";
+		else if($row[3] == 'sms')
+			return "No SMS Selected";
+		else 
+			return "Declined";
 	} else {
 		return fmt_result($row, $index);
 	}
