@@ -96,6 +96,9 @@ mysql_query("INSERT INTO `customer` VALUES (1,1,'default','','" . $dbuser ."','"
 if($type == "new"){
 	executeSqlFile("commsuitedefaults.sql");
 	echo "Defaults loaded.\n";
+	echo "Updating Settings File\n";
+	$output = array();
+	exec("php create_new_settings.php", $output);
 } else if($type == "upgrade"){
 	mysql_select_db($olddbname);
 	mysql_query("delete from setting where name = 'checkpassword'");
