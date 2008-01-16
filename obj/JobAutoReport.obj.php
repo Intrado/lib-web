@@ -8,7 +8,6 @@ class JobAutoReport extends ReportGenerator{
 		$params = $this->params = $instance->getParameters();
 		$this->reporttype = $params['reporttype'];
 		
-		$orderquery = getOrderSql($this->params);
 		$rulesql = getRuleSql($this->params, "rp");
 		
 		if(isset($params['jobid'])){
@@ -70,11 +69,10 @@ class JobAutoReport extends ReportGenerator{
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
 		
-			where 1 
-			$searchquery
-			$rulesql
-			$orderquery
-			";
+			where 1 "
+			. $searchquery
+			. $rulesql
+			. " order by rp." . FieldMap::GetLastNameField() . ", rp." . FieldMap::GetFirstNameField() .", rp.pkey";
 
 			
 	}
