@@ -85,7 +85,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 				redirect('easycallrecord.php?taskid=' . $task->id);
 			} else {
 
-				if($_SESSION['easycallid'] == null){
+				if(!isset($_SESSION['easycallid'])){
 					$task = new SpecialTask();
 				} else {
 					$task = new SpecialTask($_SESSION['easycallid']);
@@ -202,7 +202,7 @@ if($reloadform == 1) {
 	if (isset($_GET['retry'])){
 		$specialtask = new SpecialTask(DBSafe($_GET['retry']));
 	}else{
-		if($_SESSION['easycallid'] != null)
+		if(isset($_SESSION['easycallid']))
 			$specialtask = new SpecialTask($_SESSION['easycallid']);
 		else
 			$specialtask = false;
