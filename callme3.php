@@ -87,6 +87,7 @@ if(CheckFormSubmit($f, $s)){
 }
 
 if ($reloadform) {
+	ClearFormData($f);
 	if($specialtask->getData("origin") == "message"){
 		if($messages){
 			foreach($messages as $key => $message){
