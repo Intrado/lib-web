@@ -106,8 +106,8 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 						$p = DBFind("Person","from person where id='$personid'");
 						$phone = DBFind("Phone","from phone where personid='$personid'");
 						$email = DBFind("Email","from email where personid='$personid'");
-
-						$listpreviewdata[] = array($pkey,$p->f01,$p->f02,Phone::format($phone->phone),$email->email);
+						//check if the object isnt false else display empty string
+						$listpreviewdata[] = array($pkey,$p->f01,$p->f02, $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
 					}
 				} else {
 					$notfound++;
