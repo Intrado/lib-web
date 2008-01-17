@@ -30,7 +30,7 @@ $maxusers = getSystemSetting("_maxusers","unlimited");
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-	if (isset($_SESSION['userid'] && $_SESSION['userid'] == $deleteid)
+	if (isset($_SESSION['userid']) && $_SESSION['userid'] == $deleteid)
 		$_SESSION['userid'] = NULL;
 
 	QuickUpdate("update user set enabled=0, deleted=1 where id='$deleteid'");
