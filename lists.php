@@ -25,7 +25,7 @@ if (!$USER->authorize('createlist')) {
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-	if ($_SESSION['listid'] == $deleteid)
+	if (isset($_SESSION['listid']) && $_SESSION['listid'] == $deleteid)
 		$_SESSION['listid'] = NULL;
 	if (userOwns("list",$deleteid)) {
 		//QuickUpdate("delete from listentry where listid='$deleteid'");
