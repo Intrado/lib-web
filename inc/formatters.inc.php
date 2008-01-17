@@ -274,6 +274,8 @@ function fmt_jobs_actions_customer($row, $index) {
 		$editLink = '<a href="job.php?id=' . $id . '">Edit</a>';
 	} elseif ($USER->authorize('manageaccount')) {
 		$editLink = '<a href="./?login=' . $jobownerlogin . '">Login&nbsp;as&nbsp;this&nbsp;user</a>';
+	} else {
+		$editLink= '';
 	}
 
 	if ($USER->authorize('viewsystemreports')) {
