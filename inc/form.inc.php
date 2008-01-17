@@ -245,7 +245,6 @@ function GetFormData ($form, $section, $item) {
 	if (isset($_SESSION['formdata'][$form][$section][$item]['value'])) {
 		return $_SESSION['formdata'][$form][$section][$item]['value'];
 	} else {
-		error_log("Attempt to access nonexistant form data $form,$section,$item");
 		return null;
 	}
 }
@@ -399,7 +398,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.14 $
+	    # $Revision: 1.15 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 	
 	    ##################################################################################
