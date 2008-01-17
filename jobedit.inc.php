@@ -681,7 +681,7 @@ startWindow('Job Information');
 					NewFormItem($f, $s, 'numdays', "selectend");
 					?>
 					<!--
-					<span id="job_end_date">You have scheduled this job to end on <?= $job->enddate ?></span>
+					<span id="job_end_date">You have scheduled this job to end on <?= isset($job) ? $job->enddate : "" ?></span>
 					-->
 					</td>
 				</tr>
@@ -895,29 +895,40 @@ include_once("navbottom.inc.php");
 
 ?>
 <script language="javascript">
+	smscheck = false;
 <?
 	if($hassms && $USER->authorize('sendsms')) {
 ?>
+		smscheck = new getObj('sendsms').obj.checked;
 		var smsmessagedropdown = new getObj('smsmessageid').obj;
 		if(smsmessagedropdown.value != ""){
 			hide('newsmstext');
 		}
-		if(new getObj('sendsms').obj.checked){
+		if(smscheck){
 			show('smsoptions');
 			hide('displaysmsoptions');
 		}
 <?
 	}
 ?>
-	if(new getObj('sendphone').obj.checked){
-		show('phoneoptions');
-		hide('displayphoneoptions');
+	phonecheck = false;
+	emailcheck = false;
+	
+	if(new getObj('sendphone').obj){
+		phonecheck = new getObj('sendphone').obj.checked;
+		if(phonecheck){
+			show('phoneoptions');
+			hide('displayphoneoptions');
+		}
 	}
-	if(new getObj('sendemail').obj.checked){
-		show('emailoptions');
-		hide('displayemailoptions');
+	if(new getObj('sendemail').obj){
+		emailcheck = new getObj('sendemail').obj.checked;
+		if(emailcheck){
+			show('emailoptions');
+			hide('displayemailoptions');
+		}
 	}
-	if(new getObj('sendemail').obj.checked || new getObj('sendphone').obj.checked || new getObj('sendsms').obj.checked ){
+	if( phonecheck || emailcheck || smscheck ){
 		show('settings');
 	}
 
