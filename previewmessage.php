@@ -150,10 +150,8 @@ if (count($fields) > 0) {
 						where fieldnum='$fieldnum' $limitsql order by value";
 			$values = QuickQueryList($query);
 			if (count($values) > 1) {
-				//if (!GetFormData($f,$s,$fieldnum))
-				//	PutFormData($f,$s,$fieldnum,$values[0],"array");
-
-
+				if (!GetFormData($f,$s,$fieldnum))
+					PutFormData($f,$s,$fieldnum,$values[0],"array");
 				NewFormSelect($f,$s, $fieldnum,@array_combine($values,$values));
 
 			} else {
