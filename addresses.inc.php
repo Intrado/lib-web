@@ -28,7 +28,7 @@ if (isset($_GET['delete'])) {
 		$person = new Person($id);
 		$person->deleted = 1;
 		$person->update();
-		QuickQuery("delete from listentry where personid='$id'");
+		QuickUpdate("delete from listentry where personid='$id'");
 	}
 	redirect();
 }
