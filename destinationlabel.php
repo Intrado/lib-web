@@ -53,14 +53,35 @@ if(CheckFormSubmit($f,$s))
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
+			$warning = false;
 			QuickUpdate("begin");
 			QuickUpdate("delete from destlabel where type = '" . DBSafe($type) . "'");
 			for($i = 0; $i < $max; $i++){
+				$label = GetFormData($f, $s, $type . $i);
+				if($label == "other"){
+					$label = GetFormData($f, $s, $type . $i . "other");
+				}
+				if(ereg("[0-9\)\(]+", $label)){
+					$warning = true;
+				}
 				QuickUpdate("insert into destlabel (type, sequence, label) values
-								('" . DBSafe($type) . "', '" . $i . "', '" . DBSafe(GetFormData($f, $s, $type . $i)) . "')");
+								('" . DBSafe($type) . "', '" . $i . "', '" . DBSafe($label) . "')");
 			}
 			QuickUpdate("commit");
-			redirect("contactsettings.php");
+			if($warning){
+				?>
+				<script language="javascript">
+					changelabel=confirm('We recommend that labels do not contain numbers or parentheses. Would you like to stay and change your labels?');
+					if(changelabel){
+						location.href="destinationlabel.php?type=<?=$type?>";
+					} else {
+						location.href="contactsettings.php";
+					}
+				</script>
+				<?
+			} else {
+				redirect("contactsettings.php");
+			}
 		}
 	}
 } else {
@@ -69,8 +90,16 @@ if(CheckFormSubmit($f,$s))
 
 if($reloadform){
 	ClearFormData($f);
+	$presetlabels = array("Home", "Cell", "Work", "Other", "");
 	for($i=0; $i<$max; $i++){
-		PutFormData($f, $s, $type . $i, fetch_labels($type, $i, true), "text");
+		$label = fetch_labels($type, $i, true);
+		if(in_array($label, $presetlabels)){
+			PutFormData($f, $s, $type . $i, $label, "text");
+			PutFormData($f, $s, $type . $i . "other", "", "text");
+		} else {
+			PutFormData($f, $s, $type . $i, "other", "text");
+			PutFormData($f, $s, $type . $i . "other", $label, "text");
+		}
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,14 +123,33 @@ startWindow("Labels");
 <table border="0" cellpadding="3" cellspacing="1">
 	<tr class="listheader">
 		<th>Destination</th>
-		<th>Label</th>
+		<th colspan="2">Label</th>
 	</tr>
 <?
 	for($i=0; $i< $max; $i++){
 ?>
 		<tr>
 			<td><?=format_delivery_type($type)?>&nbsp;<?=$i+1?></td>
-			<td><? NewFormItem($f, $s, $type . $i, "text", 20, 20);?></td>
+			<td>
+				<?
+					NewFormItem($f, $s, $type . $i, "selectstart", NULL, NULL, "onchange='if(this.value == \"other\"){ show(\"otherlabel$i\") } else { hide(\"otherlabel$i\") }'");
+					NewFormItem($f, $s, $type . $i, 'selectoption'," -- None -- ", "");
+					NewFormItem($f, $s, $type . $i, 'selectoption',"Home", "Home");
+					NewFormItem($f, $s, $type . $i, 'selectoption',"Work", "Work");
+					NewFormItem($f, $s, $type . $i, 'selectoption',"Cell", "Cell");
+					NewFormItem($f, $s, $type . $i, 'selectoption'," -- Other -- ", "other");
+					NewFormItem($f, $s, $type . $i, "selectend");
+				?>
+			</td>
+			<td>
+				<?
+					$display=" display:none; ";
+					if(GetFormData($f, $s, $type . $i) == "other"){
+						$display = " display:block; ";
+					}
+				?>
+				<div id="otherlabel<?=$i?>" style="<?=$display?>"><? NewFormItem($f, $s, $type . $i . "other", "text", 20, 20) ?></div>
+			</td>
 		</tr>
 <?
 	}
