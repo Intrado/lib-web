@@ -61,7 +61,7 @@ if(CheckFormSubmit($f,$s))
 				if($label == "other"){
 					$label = GetFormData($f, $s, $type . $i . "other");
 				}
-				if(ereg("[0-9\)\(]+", $label)){
+				if(ereg("[0-9\)\(]+", $label) || strripos($label,"phone") || strripos($label, "email") || strripos($label, "sms")){
 					$warning = true;
 				}
 				QuickUpdate("insert into destlabel (type, sequence, label) values
@@ -71,7 +71,7 @@ if(CheckFormSubmit($f,$s))
 			if($warning){
 				?>
 				<script language="javascript">
-					changelabel=confirm('We recommend that labels do not contain numbers or parentheses. Would you like to stay and change your labels?');
+					changelabel=confirm('We recommend that labels do not contain numbers, parentheses or the type it describes.\nWould you like to stay and change your labels?');
 					if(changelabel){
 						location.href="destinationlabel.php?type=<?=$type?>";
 					} else {
