@@ -401,7 +401,7 @@ switch($MESSAGETYPE)
 
 
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Attachments:<br>(Max 3)</th>
+					<th align="right" class="windowRowHeader bottomBorder">Attachments:<br>(Max 3)<br><? print help('MessageEmail_Attachments') ?></th>
 					<td colspan="3" class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="1" class="list" width="50%">
 						<tr class="listHeader" align="left" valign="bottom">
