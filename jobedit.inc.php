@@ -578,7 +578,7 @@ startWindow('Job Information');
 					<td style="padding-left:15px">Email:<? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('email'); else hideSection('email');\""); ?></td>
 <?
 				}
-				if($USER->authorize('sendsms')){
+				if($hassms && $USER->authorize('sendsms')){
 ?>
 					<td style="padding-left:15px">SMS:<? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('sms'); else hideSection('sms');\""); ?></td>
 <?
