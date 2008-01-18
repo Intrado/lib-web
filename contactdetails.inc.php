@@ -392,11 +392,22 @@ foreach ($fieldmaps as $map) {
 				$disabled = "";
 				if(!$item->editlock)
 					$disabled = " Disabled ";
+				?><td class="bottomBorder"><?
 				if($type == "email"){
-					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id='" . $type . $item->sequence . "'". $disabled . $FORMDISABLE); ?></td><?
+						if($FORMDISABLE){
+							echo $item->$type . "&nbsp;";
+						} else {
+							NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id='" . $type . $item->sequence . "'". $disabled);
+						}
 				} else {
-					?><td class="bottomBorder"><? NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled . $FORMDISABLE); ?></td><?
+						if($FORMDISABLE){
+							echo Phone::format($item->$type) . "&nbsp;";
+						} else {
+							NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled);
+						}
+					
 				}
+				?></td><?
 				foreach($jobtypes as $jobtype){
 ?>
 					<td align="center"  class="bottomBorder">
