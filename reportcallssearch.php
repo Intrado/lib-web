@@ -233,7 +233,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search on:</th>
+	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search on:<br><?=help('ContactHistory_Search')?></th>
 	<td class="bottomBorder">
 		<table>
 			<tr><td>ID#: </td><td><? NewFormItem($f, $s, 'personid', 'text', '20'); ?></td></tr>
@@ -242,7 +242,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 		</table>
 		
 	</td>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter by:</th>
+	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter by:<br><?=help("ContactHistory_Filter")?></th>
 	<td class="bottomBorder">
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr>
@@ -293,7 +293,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 			</tr>
 		</table>
 	</td>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
+	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:,<br><?=help('ContactHistory_DisplayFields')?></th>
 		<td class="bottomBorder">
 <? 		
 			select_metadata(null, null, $fields);

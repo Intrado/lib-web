@@ -136,7 +136,15 @@ $PAGE = "admin:contactsettings";
 include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, "Done"));
-startWindow("Labels");
+$hoverHelpLinkType = '';
+if ($type == 'phone') {
+	$hoverHelpLinkType = 'DestinationLabels_Phone';
+} else if ($type == 'email') {
+	$hoverHelpLinkType = 'DestinationLabels_Email';
+} else if ($type == 'sms') {
+	$hoverHelpLinkType = 'DestinationLabels_SMS';
+}
+startWindow("Labels" . help($hoverHelpLinkType));
 ?>
 <table border="0" cellpadding="3" cellspacing="1">
 	<tr class="listheader">

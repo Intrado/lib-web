@@ -207,7 +207,7 @@ $TITLE = "Usage Statistics";
 NewForm($f);
 include_once("nav.inc.php");
 buttons(submit($f, $s, "Refresh"));
-startWindow("Display Options", "padding: 3px;");
+startWindow("Display Options" . help("UsageStats_DisplayOptions"), "padding: 3px;");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>

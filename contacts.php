@@ -188,7 +188,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
-startWindow("Contact Search", "padding: 3px;");
+startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 3px;");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search:</th>

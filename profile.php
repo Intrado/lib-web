@@ -458,7 +458,7 @@ startWindow('Allowed Functions');
 	if(getSystemSetting("_hasportal", false)){
 ?>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Contact Manager:<br><? print (''); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Contact Manager:<br><?=help('Profile_ContactManager')?></th>
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
