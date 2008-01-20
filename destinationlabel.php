@@ -27,9 +27,25 @@ if($type == "email" || $type == "sms")
 $name = $type;
 if($name == "email" || $name == "phone"){
 	$name .= "s";
-}	
+}
 
 $max = getSystemSetting("max".$name, $default);
+
+
+switch ($type) {
+default:
+case "phone":
+	$presetlabels = array("Home", "Work", "Cell", "");
+	break;
+case "email":
+	$presetlabels = array("Home", "Work", "Cell", "PDA", "");
+	break;
+case "sms":
+	$presetlabels = array("Cell", "PDA", "");
+	break;
+}
+
+
 
 
 $reloadform = 0;
@@ -90,7 +106,6 @@ if(CheckFormSubmit($f,$s))
 
 if($reloadform){
 	ClearFormData($f);
-	$presetlabels = array("Home", "Cell", "Work", "Other", "");
 	for($i=0; $i<$max; $i++){
 		$label = fetch_labels($type, $i, true);
 		if(in_array($label, $presetlabels)){
@@ -134,9 +149,13 @@ startWindow("Labels");
 				<?
 					NewFormItem($f, $s, $type . $i, "selectstart", NULL, NULL, "onchange='if(this.value == \"other\"){ show(\"otherlabel$i\") } else { hide(\"otherlabel$i\") }'");
 					NewFormItem($f, $s, $type . $i, 'selectoption'," -- None -- ", "");
-					NewFormItem($f, $s, $type . $i, 'selectoption',"Home", "Home");
-					NewFormItem($f, $s, $type . $i, 'selectoption',"Work", "Work");
-					NewFormItem($f, $s, $type . $i, 'selectoption',"Cell", "Cell");
+
+
+					foreach ($presetlabels as $label) {
+						if (strlen($label))
+							NewFormItem($f, $s, $type . $i, 'selectoption',$label, $label);
+					}
+
 					NewFormItem($f, $s, $type . $i, 'selectoption'," -- Other -- ", "other");
 					NewFormItem($f, $s, $type . $i, "selectend");
 				?>
