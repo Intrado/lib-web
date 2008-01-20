@@ -260,7 +260,7 @@ startWindow('Global System Settings');
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 
 						<tr>
-							<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName'); ?></td>
+							<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName', NULL, "small"); ?></td>
 							<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 50);  ?></td>
 						<tr>
 <?
@@ -268,7 +268,7 @@ startWindow('Global System Settings');
 ?>
 							<tr>
 								<td>
-									Survey URL<? print help('Settings_SurveyURL'); ?>
+									Survey URL<? print help('Settings_SurveyURL', NULL, "small"); ?>
 								</td>
 								<td><? NewFormItem($f, $s, 'surveyurl', 'text', 60, 100);  ?></td>
 							<tr>
@@ -276,11 +276,11 @@ startWindow('Global System Settings');
 						}
 ?>
 							<tr>
-								<td width="30%">Default Local Area Code<? print help('Settings_DefaultLocalAreaCode'); ?></td>
+								<td width="30%">Default Local Area Code<? print help('Settings_DefaultLocalAreaCode', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Systemwide Alert Message<? print help('Settings_SystemwideAlert'); ?></td>
+								<td>Systemwide Alert Message<? print help('Settings_SystemwideAlert', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'alertmessage', 'textarea',44,4);  ?></td>
 							</tr>
 						</table>
@@ -291,7 +291,7 @@ startWindow('Global System Settings');
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
-								<td>Retry Setting<? print help('Settings_RetrySetting'); ?></td>
+								<td>Retry Setting<? print help('Settings_RetrySetting', NULL, "small"); ?></td>
 								<td>
 									<table border="0" cellpadding="2" cellspacing="0">
 										<tr>
@@ -317,7 +317,7 @@ startWindow('Global System Settings');
 							</tr>
 							<tr>
 								<td>
-									Disable Repeating Jobs<? print help('Settings_DisableRepeat'); ?>
+									Disable Repeating Jobs<? print help('Settings_DisableRepeat', NULL, "small"); ?>
 								</td>
 								<td>
 									<table border="0" cellpadding="2" cellspacing="0">
@@ -330,19 +330,19 @@ startWindow('Global System Settings');
 							</tr>
 							<tr>
 								<td>
-									Default Caller ID Number<? print help('Settings_CallerID'); ?>
+									Default Caller ID Number<? print help('Settings_CallerID', NULL, "small"); ?>
 								</td>
 								<td>
 								<? NewFormItem($f, $s, 'callerid', 'text', 20);  ?>
 								</td>
 							</tr>
 							<tr>
-								<td  width="30%">Autoreport Email Address<? print help('Settings_AutoreportEmailAddress'); ?></td>
+								<td  width="30%">Autoreport Email Address<? print help('Settings_AutoreportEmailAddress', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 60,100);  ?></td>
 							</tr>
 							<tr>
 								<td>
-									Autoreport Email Name<? print help('Settings_AutoreportEmailName'); ?>
+									Autoreport Email Name<? print help('Settings_AutoreportEmailName', NULL, "small"); ?>
 								</td>
 								<td>
 								<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 60,100);  ?>
@@ -359,11 +359,11 @@ startWindow('Global System Settings');
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
-								<td width="30%">Minimum Extensions Length<? print help('Settings_MinimumExtensions'); ?></td>
+								<td width="30%">Minimum Extensions Length<? print help('Settings_MinimumExtensions', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'easycallmin', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td width="30%">Maximum Extensions Length<? print help('Settings_MaximumExtensions'); ?></td>
+								<td width="30%">Maximum Extensions Length<? print help('Settings_MaximumExtensions', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'easycallmax', 'text', 3,3);  ?></td>
 							</tr>
 						</table>
@@ -377,23 +377,23 @@ startWindow('Global System Settings');
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
-								<td width="30%">Minimum Username Length<? print help('Settings_MinimumUsername'); ?></td>
+								<td width="30%">Minimum Username Length<? print help('Settings_MinimumUsername', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Minimum Password Length<? print help('Settings_MinimumPassword'); ?></td>
+								<td>Minimum Password Length<? print help('Settings_MinimumPassword', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
-								<td>Invalid Login Lockout<? print help('Settings_InvalidLoginLockout'); ?></td>
+								<td>Invalid Login Lockout<? print help('Settings_InvalidLoginLockout', NULL, "small"); ?></td>
 								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 							<tr>
-								<td>Invalid Login Lockout Period<? print help('Settings_LoginLockoutTime'); ?></td>
+								<td>Invalid Login Lockout Period<? print help('Settings_LoginLockoutTime', NULL, "small"); ?></td>
 								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td>
 							</tr>
 							<tr>
-								<td>Invalid Login Disable Account<? print help('Settings_LoginDisableAccount'); ?></td>
+								<td>Invalid Login Disable Account<? print help('Settings_LoginDisableAccount', NULL, "small"); ?></td>
 								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
 						</table>
@@ -407,15 +407,15 @@ startWindow('Global System Settings');
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 								<tr>
-									<td width="30%">Activation Code Lifetime</td>
+									<td width="30%">Activation Code Lifetime<?=help("SystemwideSettings_ActCodeLifetime", NULL, "small")?></td>
 									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?> 1 - 365 days</td>
 								</tr>
 								<tr>
-									<td width="30%">Require phone numbers for Emergency and High Priority Job Types</td>
+									<td width="30%">Require phone numbers for Emergency and High Priority Job Types<?=help("SystemwideSettings_RequirePhone", NULL, "small")?></td>
 									<td><? NewFormItem($f, $s, "priorityenforcement", "checkbox"); ?></td>
 								</tr>
 								<tr>
-									<td width="30%">Restricted Destination Fields</td>
+									<td width="30%">Restricted Destination Fields<?=help("SystemwideSettings_RestrictedDest", NULL, "small")?></td>
 									<td>
 										<table border="0" cellpadding="3" cellspacing="1">
 											<tr class="listheader">
