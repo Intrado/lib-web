@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#/the_admin_tab/contact_settings.htm#Creating%20a%20New%20Job%20Type
+Enter the appropriate information into each field to create a new Job Type. New Job Types may only be general priority. Please click for more information.

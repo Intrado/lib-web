@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#the_system_tab/systemwide_reports.htm
+Select any contact options that Contact Managers should not be allowed to edit.

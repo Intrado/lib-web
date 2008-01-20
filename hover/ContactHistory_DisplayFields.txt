@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#reports/contact_history_report.htm
+Select which fields should be displayed in the search results.
