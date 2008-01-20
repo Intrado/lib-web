@@ -84,6 +84,8 @@ if(CheckFormSubmit($f,$s))
 								('" . DBSafe($type) . "', '" . $i . "', '" . DBSafe($label) . "')");
 			}
 			QuickUpdate("commit");
+
+/* disabled per howard
 			if($warning){
 				?>
 				<script language="javascript">
@@ -96,8 +98,9 @@ if(CheckFormSubmit($f,$s))
 				</script>
 				<?
 			} else {
+*/
 				redirect("contactsettings.php");
-			}
+//			}
 		}
 	}
 } else {
