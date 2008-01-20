@@ -1,4 +1,4 @@
-//	WebHelp 5.10.002
+﻿//	WebHelp 5.10.002
 var gaChunks=new Array();
 var gaFakes=new Array();
 var gaDataCon=null;
@@ -382,6 +382,13 @@ function fakeItemsArea(nB,n,sKA,sKB,obj)
 	}
 	this.getBtm=function()
 	{
+	if(gbSafari3)
+	{
+		if(this.obj.length)
+			return findPosition(this.obj[this.obj.length-1]);
+		else
+			return findPosition(this.obj);
+	}
 		if(this.obj.length)
 			return this.obj[this.obj.length-1].offsetTop;
 		else
@@ -578,7 +585,7 @@ function checkAgain()
 		else
 		{
 			markBegin();
-			getUnitIdx(document.body.scrollTop,document.body.clientHeight);
+		    getUnitIdx(document.body.scrollTop,getClientHeight());
 		}
 	}
 	else
@@ -983,12 +990,14 @@ function writeFakeItems()
 {
 	disEvt();
 	gnUHeight=15;
+	if(gbSafari3 && !gbMac)
+	    gnUHeight=1;
 	var sHTML=getFakeItemsHTMLbyCount(0,gnItems);
 	document.body.insertAdjacentHTML("beforeEnd",sHTML);
 	var obj=getH6ById(0);
 	if (document.body != null)
 	{
-		gnVisible=Math.ceil(document.body.clientHeight/gnUHeight);
+		gnVisible=Math.ceil(getClientHeight()/gnUHeight);
 	}
 	gaFakes[0]=new fakeItemsArea(0,gnItems,"",getEndString(),obj);
 	enEvt();
@@ -1167,7 +1176,7 @@ function procScroll()
 	if(gnSE==1&&!gbProcess)
 	{
 		markBegin();
-		getUnitIdx(document.body.scrollTop,document.body.clientHeight);
+		getUnitIdx(document.body.scrollTop,getClientHeight());
 	}
 	gnSE--;
 }
@@ -1183,9 +1192,9 @@ function procResize()
 	if(gnRE==1&&!gbProcess)
 	{
 		markBegin();
-		gnVisible=Math.ceil(document.body.clientHeight/gnUHeight);
+		gnVisible=Math.ceil(getClientHeight()/gnUHeight);
 		if(gnIns==-1)
-			getUnitIdx(document.body.scrollTop,document.body.clientHeight);
+			getUnitIdx(document.body.scrollTop,getClientHeight());
 	}
 	gnRE--;
 }
@@ -1300,6 +1309,21 @@ function findCK()
 function writeLoadingDiv(nIIdx)
 {
 	return "<div id=\""+gsLoadingDivID+"\" style=\"position:absolute;top:0;left:0;z-index:600;visibility:hidden;padding-left:4px;background-color:ivory;border-width:1;border-style:solid;border-color:black;width:150px;\">"+gsLoadingMsg+"</div>";
+}
+
+function findPosition( oElement ) {
+  if( typeof( oElement.offsetParent ) != 'undefined' ) 
+  {
+    for( var posY = 0; oElement; oElement = oElement.offsetParent ) 
+    {
+      posY += oElement.offsetTop;
+    }
+    return posY ;
+  } 
+  else 
+  {
+    return oElement.y ;
+  }
 }
 
 var gbWhHost=true;

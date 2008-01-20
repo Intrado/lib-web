@@ -1,4 +1,4 @@
-//	WebHelp 5.10.001
+﻿//	WebHelp 5.10.001
 var gbInited=false;
 var gWndStubPage=null;
 function getStubPage()

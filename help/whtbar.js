@@ -1,4 +1,4 @@
-//	WebHelp 5.10.006
+﻿//	WebHelp 5.10.006
 var gaButtons=new Array();
 var	gaTypes=new Array();
 var gaBtnBgColor=new Array();
@@ -684,7 +684,7 @@ function addButton(sType,nStyle,sTitle,sHref,sOnClick,sOnMouseOver,sOnLoad,nWidt
 		sButton+="</a>";
 		bState=true;
 	}
-	else if(sType=="hide2"&&(!gbNav4)&&(!gbOpera))
+	else if(sType=="hide2")
 	{
 		var svTitle="Hide Navigation Component";
 		sButton="<a title=\""+svTitle+"\" id=\"btnhide\" class=\"btnhide\" href=\"javascript:void(0);\" onclick=\"showHidePane();return false;\">";

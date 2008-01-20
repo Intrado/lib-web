@@ -1,12 +1,10 @@
-\007d A { 
-         font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif; 
-         color:#365F8D; 
-         x-text-underline:normal; 
-         font-size:10pt; 
-         text-decoration:underline;  }
+﻿A { 
+   font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif; 
+   color:#365F8D; 
+   font-size:10pt; 
+   text-decoration:underline;  }
 a:hover { 
          font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif; 
-         x-text-underline:normal; 
          color:#4274aa; 
          font-size:10pt; 
          text-decoration:underline;  }
@@ -18,12 +16,10 @@ body {
       font-size:10pt;  }
 a:link { 
         color:#365F8D; 
-        x-text-underline:normal; 
         font-size:10pt; 
         text-decoration:underline;  }
 a:visited { 
            color:#365F8D; 
-           x-text-underline:normal; 
            font-size:10pt; 
            text-decoration:underline;  }
 #mainscreen { 
@@ -34,22 +30,19 @@ a:visited {
 td { 
     font-size:10pt; 
     font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif;  }
-LI.kadov-Imainscreen { 
-                      text-align:left;  }
-object id\003d\0022RelatedTopics\0022 { 
-                                       font-size:medium; 
-                                       font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif; 
-                                       color:#365F8D; 
-                                       x-text-underline:normal; 
-                                       text-decoration:underline;  }
+object id="RelatedTopics"   { 
+                             font-size:medium; 
+                             font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif; 
+                             color:#365F8D; 
+                             text-decoration:underline;  }
 A.popupspot {  }
 H1 { 
     font-size:18pt; 
     font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif; 
     color:#595959; 
     font-weight:bold;  }
-LI.kadov-H1 { 
-             font-size:18pt;  }
+LI.H1 { 
+       font-size:18pt;  }
 ul { 
     color:#595959;  }
 ol { 

@@ -1,5 +1,5 @@
-//	WebHelp 5.10.002
-if (! window.gbIE4 && window.gbNav6 && !document.childNodes[0].insertAdjacentHTML){
+﻿//	WebHelp 5.10.002
+if (! window.gbIE4 && (window.gbNav6 || gbSafari3) && !document.childNodes[0].insertAdjacentHTML){
 
 HTMLElement.prototype.insertAdjacentElement = function(where,parsedNode)
 {

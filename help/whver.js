@@ -1,4 +1,4 @@
-//	WebHelp 5.10.006
+﻿//	WebHelp 5.10.006
 var gbNav=false;
 var gbNav6=false;
 var gbNav61=false;
@@ -11,6 +11,7 @@ var gbIE55=false;
 var gbOpera6=false;
 var gbOpera7=false;
 var gbKonqueror3=false;
+var gbSafari3=false;
 
 var gAgent=navigator.userAgent.toLowerCase();
 var gbMac=(gAgent.indexOf("mac")!=-1);
@@ -99,5 +100,16 @@ else if (gbKonqueror)
 		}
 	}
 }
-
+if(gbSafari)
+{
+	var nPos = gAgent.indexOf("version/");
+	if(nPos!=-1)
+	{
+		var nVersion = parseFloat(gAgent.substring(nPos+8,nPos+9));
+		if (nVersion >= 3)
+		{
+			gbSafari3=true;
+		}
+	}
+}
 var gbWhVer=true;

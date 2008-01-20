@@ -1,8 +1,8 @@
-<?xml version='1.0' encoding='windows-1252' ?>
+<?xml version='1.0' encoding='utf-8' ?>
 <indexdata>
 <key name="Responses" >
-  <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
   <topic name="Recipient Responses" url="receiving_responses/reviewing_your_response_messages.htm" />
+  <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
   <key name="enabling" >
     <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
   </key>
@@ -17,26 +17,26 @@
   </key>
 </key>
 <key name="Survey" >
-  <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
-  <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
-  <topic name="More on Web Survey Template Features" url="creating_a_survey_job/more_on_web_survey_template_features.htm" />
   <topic name="Survey Job Reports" url="reports/survey_job_reports.htm" />
   <topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
+  <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+  <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+  <topic name="More on Web Survey Template Features" url="creating_a_survey_job/more_on_web_survey_template_features.htm" />
   <key name="job" >
     <topic name="Scheduling a Survey Job" url="creating_a_survey_job/scheduling_a_survey_job.htm" />
   </key>
   <key name="messages" >
-    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
     <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
     <topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
+    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
   </key>
   <key name="phone" >
     <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
     <topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
   </key>
   <key name="questions" >
-    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
     <topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+    <topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
   </key>
   <key name="report" >
     <topic name="Survey Job Reports" url="reports/survey_job_reports.htm" />
@@ -55,9 +55,9 @@
   </key>
 </key>
 <key name="System" >
+  <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
   <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
   <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
-  <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
   <key name="block phone number" >
     <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
   </key>

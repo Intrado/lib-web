@@ -1,4 +1,4 @@
-//	WebHelp 5.10.001
+﻿//	WebHelp 5.10.001
 // const strings
 var gaProj = new Array();
 var gsRoot = "";

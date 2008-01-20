@@ -1,4 +1,4 @@
-//	WebHelp 5.10.007
+﻿//	WebHelp 5.10.007
 var gaHSLoad=new Array();
 var gnMinIdx=0;
 var gnInsIdx=-1;
@@ -269,7 +269,7 @@ function writeBook(nIdx)
 		if (!isBookEmpty(nIdx))
 		{
 			sHTML+="parent><p><nobr><a id=\""+getBookId(nIdx)+"\" href=\"javascript:void(0);\" onfocus=\"markBook("+nIdx+");\" onclick=\"";
-			sHTML+="insertBookItems("+nIdx+", "+getItemContentsNum(nIdx);
+			sHTML+="markBook("+nIdx+");insertBookItems("+nIdx+", "+getItemContentsNum(nIdx);
 			sHTML+=");return false;\" title=\""+sName+"\"><img alt=\"Book\" name=\""+getBId(nIdx)+"\" src=\""+sIcon+"\" border=0 align=\"absmiddle\">";
 			sHTML+="&nbsp;"+sName+"</a></nobr></p></div>";
 			var sURL=_textToHtml_nonbsp(getItemURL(nIdx));
@@ -423,7 +423,7 @@ function writeAnItem(nIdx)
 	}
 	sIcon=_textToHtml_nonbsp(sIcon);
 	var sName=_textToHtml(getItemName(nIdx));
-	var sHTML="<p><nobr><a id=\""+getItemId(nIdx)+"\" onfocus=\"markItem("+nIdx+");\""
+	var sHTML="<p><nobr><a id=\""+getItemId(nIdx)+"\" onfocus =\"markItem("+nIdx+");\" onclick=\"markItem("+nIdx+");\""
 	var sAltString="";
 	if(nItemType&2)
 		sAltString="Page";
@@ -724,10 +724,10 @@ function ExpandIt2(nId,bForceOpen)
 	if(oC.style.display=="block"){
 		var nTop=oC.offsetTop;
 		var nBottom=nTop+oC.offsetHeight;
-		if(document.body.scrollTop+document.body.clientHeight<nBottom){
-			nNewScroll=nBottom-document.body.clientHeight;
+		if(document.body.scrollTop+getClientHeight()<nBottom){
+			nNewScroll=nBottom-getClientHeight();
 		}
-		if(nBottom-nTop>document.body.clientHeight){
+		if(nBottom-nTop>getClientHeight()){
 			nNewScroll=nTop-20;
 		}
 	}
@@ -1026,7 +1026,10 @@ function syncInit()
 				if(!gbIE55)
 					aIdList[aIdList.length-1].focus();
 				else
+				{
 					HighLightElement(aIdList[aIdList.length-1],gsABgColor,"transparent");
+					aIdList[aIdList.length-1].focus();
+				}
 			}
 			var aPaths=gaBTPs;
 			gsTP=null;

@@ -1,10 +1,11 @@
-//	WebHelp 5.10.001
+﻿//	WebHelp 5.10.001
 var gfunLookUp;
 var gbInputEnable;
 var gfunInit;
 var gstrFormName= "";
 var gbWithButton = false;
 var gsTitle="";
+var gsHiliteSearchTitle="";
 var gsOverImage = "";
 var gsOutImage = "";
 var gsClickImage = "";
@@ -13,6 +14,7 @@ var gsBgColor = "#c0c0c0";
 var gsBgImage = "";
 var gbInImage = 0;
 var gbInputEnable = 0;
+var gbHighlightSearch = false;
 
 var goTitleFont=null;
 var goInputFont=null;
@@ -98,11 +100,17 @@ function setFont(sType, sFontName, sFontSize, sFontColor, sFontStyle, sFontWeigh
 		goHoverFont = vFont;
 }
 
+function setHighlightSearch(bEnable)
+{
+	gbHighlightSearch = bEnable;
+}
+
 function writeFormStyle()
 {
 	var sStyle = "<style type='text/css'>";
 	sStyle += "p.title {" + getFontStyle(goTitleFont) + "margin-top:0;margin-bottom:0}\n";
 	sStyle += ".inputfield {" + getFontStyle(goInputFont) +"width:100%; }\n";
+	sStyle += ".hilite {" + getFontStyle(goTitleFont) + "margin-top:0;margin-bottom:0; }\n";
 	sStyle+="A:link {"+getFontStyle(goNormalFont)+"}\n";
 	sStyle+="A:visited {"+getFontStyle(goNormalFont)+"}\n";
 	sStyle +="A:hover {"+getFontStyle(goHoverFont)+"}\n";
@@ -163,7 +171,10 @@ function getFormHTML()
 	sForm += "<form name=\"" + gstrFormName + "\" method=\"POST\" action=\"javascript:inputSubmit()\" style=\"width:100%\">";
 	sForm += "<tr>";
 	sForm += "<td>";
-	sForm += "<p class=title><nobr>" + gsTitle + "</nobr><br><table width=\"100%\"><tr valign=\"middle\"><td width=\"100%\"><input class=\"inputfield\" type=\"text\" name=\"keywordField\" onfocus=\"inputEnable(1);\" onblur=\"inputEnable(0);\"></td>";
+	if(gbSafari3)
+	    sForm += "<p class=title>" + gsTitle + "<br><table width=\"100%\"><tr valign=\"middle\"><td width=\"100%\"><input class=\"inputfield\" type=\"text\" name=\"keywordField\" onfocus=\"inputEnable(1);\"\"></td>";
+	else
+	    sForm += "<p class=title>" + gsTitle + "<br><table width=\"100%\"><tr valign=\"middle\"><td width=\"100%\"><input class=\"inputfield\" type=\"text\" name=\"keywordField\" onKeyPress=\"lookupKeyDown();\" onfocus=\"inputEnable(1);\" onblur=\"inputEnable(0);\"></td>";
 	if (gbWithButton && gnType >= 0)
 	{
 		sForm += "<td><a title=\"submit button\" href=\"javascript:void(0);\" onclick=\"" + gstrFormName + ".submit(); return false;\" onfocus=\"inImage(1);\" onblur=\"inImage(0);\" onmouseup=\"onMouseUp();\" onmousedown=\"onMouseDown();\" onmouseover=\"onMouseOver();\" onmouseout=\"onMouseOut();\">"
@@ -177,6 +188,11 @@ function getFormHTML()
 			sForm += gsText ;
 		sForm += "</a></td>";
 	}
+	if(gbHighlightSearch == true)
+	{
+		sForm += "</tr><tr class=\"hilite\" valign=\"middle\"><td width=\"100%\"><input type=\"checkbox\" name=\"HiLite\" checked>" + gsHiliteSearchTitle + "<br></td>";
+	}
+
 	sForm += "</tr></table></p></td></tr></form></table>";
 	return sForm;
 }

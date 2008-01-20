@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='windows-1252' ?>
+<?xml version='1.0' encoding='utf-8' ?>
 <indexdata>
 <key name="Audio File Library" >
   <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
@@ -16,11 +16,11 @@
   </key>
 </key>
 <key name="Create" >
-  <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
-  <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
-  <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
-  <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
   <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+  <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
+  <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
   <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
   <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   <key name="call jobs" >
@@ -32,8 +32,8 @@
     <topic name="Adding People Using Rules" url="creating_a_list/adding_people_using_rules.htm" />
   </key>
   <key name="dynamic messages" >
-    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
     <topic name="Creating a New Phone Message#The_Phone_Message_Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
   </key>
   <key name="email jobs" >
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
@@ -44,8 +44,8 @@
     <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
   </key>
   <key name="messages" >
-    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
     <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
   </key>
   <key name="repeating jobs" >
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
@@ -54,8 +54,8 @@
     <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
   </key>
   <key name="static lists" >
-    <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
     <topic name="Adding People Manually" url="creating_a_list/adding_people_manually.htm" />
+    <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
   </key>
   <key name="static messages" >
     <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
@@ -112,9 +112,9 @@
     <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
   </key>
   <key name="send job" >
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
-    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
   </key>
 </key>
 <key name="Emergency" >

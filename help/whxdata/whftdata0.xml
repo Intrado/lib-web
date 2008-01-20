@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='windows-1252' ?>
+<?xml version='1.0' encoding='utf-8' ?>
 <ftstdata>
 <topic name="Adding People By Searching" url="creating_a_list/adding_people_by_searching.htm" />
 <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
@@ -18,7 +18,7 @@
 <topic name="Message Overview" url="creating_a_message/messageoverview.htm" />
 <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
 <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
-<topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+<topic name="Creating a New Job Using the Job Editor" url="creating_a_notification_job/creating_a_new_job.htm" />
 <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
 <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
 <topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
@@ -30,10 +30,10 @@
 <topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
 <topic name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
 <topic name="Getting Started" url="getting_started/getting_started.htm" />
+<topic name="Managing Your Account Settings" url="getting_started/managing_your_account_settings.htm" />
 <topic name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
-<topic name="New Features!" url="getting_started/new_features.htm" />
+<topic name="New Features" url="getting_started/new_features.htm" />
 <topic name="The Start Page" url="getting_started/the_start_page.htm" />
-<topic name="Managing Your Account Settings" url="managing_your_account_settings.htm" />
 <topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
 <topic name="Reviewing Your Response Messages" url="receiving_responses/reviewing_your_response_messages.htm" />
 <topic name="Remote Telephone Access Overview" url="remote_telephone_access/remote_telephone_access_overview.htm" />
@@ -50,7 +50,7 @@
 <topic name="Phone and Email Log Reports" url="reports/understanding_call_logs.htm" />
 <topic name="Usage Stats Report" url="reports/usage_stats_report.htm" />
 <topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
-<topic name="Step-by-Step:Send a Simple Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+<topic name="Step-by-Step:Send a Job with EasyCall" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
 <topic name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
 <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
 <topic name="Contact Settings" url="the_admin_tab/contact_settings.htm" />
@@ -59,6 +59,9 @@
 <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
 <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
 <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
+<topic name="Bulk Activation Code Management" url="the_contact_manager/bulk_activation_code_management.htm" />
+<topic name="Contact Manager Overview" url="the_contact_manager/contact_manager_overview.htm" />
+<topic name="Generate an Individual Activation Code" url="the_contact_manager/generate_an_individual_activation_code.htm" />
 <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
 <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
 <topic name="The Contact Database" url="the_system_tab/the_contact_database.htm" />

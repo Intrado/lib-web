@@ -1,4 +1,4 @@
-//	WebHelp 5.10.002
+﻿//	WebHelp 5.10.002
 window.whname="wh_stub";
 function getframehandle(frames,framename)
 {

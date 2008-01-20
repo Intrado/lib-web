@@ -1,4 +1,4 @@
-//	WebHelp 5.10.003
+﻿//	WebHelp 5.10.003
 RegisterListener2(this, WH_MSG_GETSTARTFRAME);
 RegisterListener2(this, WH_MSG_GETDEFAULTTOPIC);
 RegisterListener2(this, WH_MSG_MINIBARORDER);
@@ -13,7 +13,7 @@ RegisterListener2(this, WH_MSG_GETCMD);
 RegisterListener2(this, WH_MSG_GETPANE);
 RegisterListener2(this, WH_MSG_GETDEFPANE);
 
-if (gbNav6)
+if (gbNav4 && !gbNav6)
 {
 	var gnReload=0;
 	setTimeout("delayReload();",5000);
@@ -25,7 +25,7 @@ function delayReload()
 	{
 		if(gnReload!=2)
 		{
-			if(nViewFrameType&&nViewFrameType==1)
+			if(typeof(nViewFrameType) != "undefined" && nViewFrameType==1)
 				document.location=document.location;
 		}
 	}
@@ -61,11 +61,15 @@ if (location.hash.length > 1)
 		var nPos = sParam.indexOf(">>");
 		if (nPos>1)
 		{
-			gsTopic = sParam.substring(1, nPos);
+			if(IsInternal(sParam.substring(1, nPos)))
+				gsTopic = sParam.substring(1, nPos);
 			parseParam(sParam.substring(nPos+2));
 		}
 		else
-			gsTopic = sParam.substring(1);
+		{
+			if(IsInternal(sParam.substring(1)))
+				gsTopic = sParam.substring(1);
+		}
 	}
 	if (gnPans == 1 && gsTopic)
 	{
@@ -360,7 +364,7 @@ function onSendMessageX(oMsg)
 	}
 	else if(nMsgId==WH_MSG_RELOADNS6)
 	{
-		if(gbNav6)
+		if(gbNav4 && !gbNav6)
 			gnReload++;
 		return false;
 	}

@@ -1,4 +1,4 @@
-//	WebHelp 5.10.002
+﻿//	WebHelp 5.10.002
 var gsDefaultTarget="bsscright";
 var gsBgColor="#ffffff";
 var gsBgImage="";

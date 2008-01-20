@@ -1,4 +1,4 @@
-//	WebHelp 5.10.001
+﻿//	WebHelp 5.10.001
 var gaProj=new Array();
 
 gaProj[0]=new project("");

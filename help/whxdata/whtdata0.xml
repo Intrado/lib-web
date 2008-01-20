@@ -1,12 +1,12 @@
-<?xml version='1.0' encoding='windows-1252' ?>
+<?xml version='1.0' encoding='utf-8' ?>
 <tocdata>
 <book name="Getting Started" >
   <item name="Getting Started" url="getting_started/getting_started.htm" />
-  <item name="New Features!" url="getting_started/new_features.htm" />
+  <item name="New Features" url="getting_started/new_features.htm" />
   <item name="The Start Page" url="getting_started/the_start_page.htm" />
   <item name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
   <item name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
-  <item name="Managing Your Account Settings" url="managing_your_account_settings.htm" />
+  <item name="Managing Your Account Settings" url="getting_started/managing_your_account_settings.htm" />
 </book>
 <book name="Creating a List" >
   <item name="Lists Overview" url="creating_a_list/listsoverview.htm" />
@@ -31,9 +31,9 @@
 </book>
 <book name="Creating a Notification Job" >
   <item name="Job Overview" url="creating_a_notification_job/jobsoverview.htm" />
-  <item name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
-  <item name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
   <item name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  <item name="Creating a New Job Using the Job Editor" url="creating_a_notification_job/creating_a_new_job.htm" />
+  <item name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
   <item name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
 </book>
 <book name="Creating a Survey Job" >
@@ -52,23 +52,22 @@
   <item name="Reports Overview" url="reports/reports.htm" />
   <item name="Using the Report Builder" url="reports/querying_report_data.htm" />
   <item name="Notification Summaries" url="reports/standard_job_reports.htm" />
-  <item name="Survey Job Reports" url="reports/survey_job_reports.htm" />
   <item name="Phone, Email, and SMS Log Reports" url="reports/understanding_call_logs.htm" />
   <item name="Contact History Report" url="reports/contact_history_report.htm" />
+  <item name="Survey Job Reports" url="reports/survey_job_reports.htm" />
   <item name="Saving and Scheduling Reports" url="reports/saving_and_scheduling_reports.htm" />
-  <item name="Usage Stats Report" url="reports/usage_stats_report.htm" />
   <item name="Call Distribution Report" url="reports/call_distribution_report.htm" />
+  <item name="Usage Stats Report" url="reports/usage_stats_report.htm" />
 </book>
 <book name="Receiving Responses" >
-  <item name="Notification Summaries" url="reports/standard_job_reports.htm" />
   <item name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
   <item name="Reviewing Your Response Messages" url="receiving_responses/reviewing_your_response_messages.htm" />
 </book>
 <book name="Step-by-Step Guides" >
   <item name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
-  <item name="Step-by-Step:Send a Simple Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
-  <item name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+  <item name="Step-by-Step:Send a Job with EasyCall" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
   <item name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  <item name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
 </book>
 <book name="The System Tab" >
   <item name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
@@ -81,8 +80,13 @@
   <item name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
   <item name="Managing Systemwide Settings" url="the_admin_tab/managing_systemwide_settings.htm" />
   <item name="Contact Settings" url="the_admin_tab/contact_settings.htm" />
-  <item name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
   <item name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
+  <item name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
+</book>
+<book name="Contact Manager" >
+  <item name="Contact Manager Overview" url="the_contact_manager/contact_manager_overview.htm" />
+  <item name="Bulk Activation Code Management" url="the_contact_manager/bulk_activation_code_management.htm" />
+  <item name="Generate an Individual Activation Code" url="the_contact_manager/generate_an_individual_activation_code.htm" />
 </book>
 
 </tocdata>

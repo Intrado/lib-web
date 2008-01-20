@@ -1,4 +1,4 @@
-
+﻿
 <html>
 <head><script language="javascript">
 <!--
@@ -9,7 +9,7 @@ if (sPath.indexOf("http")!= -1)
 //-->
 </script>
  <title>SchoolMessenger ASP Plus Help</title>
- <meta name="generator" content="RoboHelp by eHelp Corporation   www.ehelp.com">
+ <meta name="generator" content="Adobe RoboHelp - www.adobe.com">
  <meta name="description" content="WebHelp 5.50">
 </head>
 <script type="text/javascript" language="javascript" src="whver.js"></script>
@@ -64,6 +64,8 @@ else
 			if (gbNav6&&gbDHTML)								nViewFrameType = 1;
 			if (gbNav6&&!gbNav61&&nWebhelpNavPaneMode == 2)		nViewFrameType = 3;
 			if (gbMac)											nViewFrameType = 3;
+			if (gbMac && gbNav6)										nViewFrameType = 1;
+			if (gbSafari3)                                       nViewFrameType = 1;
 			if (gbOpera7&&nViewFrameType == 2)					nViewFrameType = 3;
 			if ((bNoApplet)&&(nViewFrameType == 2)) 			nViewFrameType = 3;
 		}

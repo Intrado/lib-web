@@ -1,7 +1,8 @@
-//	WebHelp 5.10.005
+﻿//	WebHelp 5.10.005
 var gsPPath="";
 var gaPaths=new Array();
 var gaAvenues=new Array();
+var gaSearchTerms = new Array();
 
 var goFrame=null;
 var gsStartPage="";
@@ -9,7 +10,11 @@ var gsRelCurPagePath="";
 var gsSearchFormHref="";
 var gnTopicOnly=-1;
 var gnOutmostTopic=-1;
+var gsFtsBreakChars="\t\r\n\"\\ .,!@#$%^&*()~'`:;<>?/{}[]|+-=\x85\x92\x93\x94\x95\x96\x97\x99\xA9\xAE\xB7";
 
+var gsHiliteSearchSetting = "enable,#b2b4bf,black";
+var gsBkgndColor="";
+var gsTextColor="";
 var BTN_TEXT=1;
 var BTN_IMG=2;
 
@@ -33,6 +38,635 @@ var whtopic_foldUnload=null;
 var gbWhTopic=false;
 var gbCheckSync=false;
 var gbSyncEnabled=false;
+var gaBreadcrumbsTrail = new Array();
+var gnYPos = -1;
+
+function AddMasterBreadcrumbs(relHomePage, styleInfo, separator, strHome, strHomePath)
+{
+	delete gaBreadcrumbsTrail;
+	gaBreadcrumbsTrail = new Array();
+	var sTopicFullPath = _getPath(document.location.href);
+	var sXmlFullPath = _getFullPath(sTopicFullPath, relHomePage);
+	var sXmlFolderPath = _getPath(sXmlFullPath);
+	var sdocPath = _getFullPath(sXmlFolderPath, "MasterData.xml");
+
+	try
+	{
+		GetMasterBreadcrumbs(sdocPath, styleInfo, separator);
+	}
+	catch(err)
+	{
+		var i = gaBreadcrumbsTrail.length;
+		if(i == 0)
+		{
+			var strTrail = "<a style=\""+ styleInfo + "\"" + " href=\"" + strHomePath + "\">" + strHome + "</a> " + separator + " ";
+			document.write(strTrail);
+		}
+		else
+		{
+			while(i > 0)
+			{
+				document.write(gaBreadcrumbsTrail[i-1]);
+				i--;
+			}
+		}
+	}
+	return;
+}
+
+var xmlHttp1;
+function GetMasterBreadcrumbs(masterFullPath, styleInfo, separator)
+{	
+	if(gbIE5)
+	{
+		xmlDoc1=new ActiveXObject("Microsoft.XMLDOM");
+		xmlDoc1.async="false";
+		xmlDoc1.load(masterFullPath);
+	}
+	else if(gbNav6)
+	{
+		var req=new XMLHttpRequest();
+     		req.open("GET", masterFullPath, false);   
+		req.send(null);   
+		xmlDoc1 = req.responseXML;
+	}
+	else if(gbSafari3)
+	{
+        if(window.XMLHttpRequest && !(window.ActiveXObject)) 
+    	{
+	    	xmlHttp1 = new XMLHttpRequest();
+    		if(xmlHttp1)
+    		{
+        		xmlHttp1.onreadystatechange=onXMLResponse;
+        	    xmlHttp1.open("GET", masterFullPath, true);
+        	    xmlHttp1.send(null);
+    	    }
+    	}
+	}
+
+	if(xmlDoc1 == null) throw "error";
+
+	var root = xmlDoc1.documentElement;
+	var masterProj = xmlDoc1.getElementsByTagName("MasterProject");
+	var masterName="";
+	var masterRelPath="";
+
+	if(masterProj)
+	{
+		masterName = masterProj[0].getAttribute("name");
+		masterRelPath = masterProj[0].getAttribute("url");		
+	}
+
+	var x = xmlDoc1.getElementsByTagName("item");
+	var i = 0;
+	var strTrail = "";
+
+	for(i=0; i< x.length; i++)
+	{
+		var name= x[i].getAttribute("name");
+		var path = x[i].getAttribute("url");
+
+		name = name.replace(/\\\\/g, '\\'); 
+		
+		if(path == "")
+		{
+			strTrail += name + " " + separator + " ";
+		}
+		else
+		{
+			var sHrefRelPath = _getPath(masterFullPath) + masterRelPath;
+			var sHrefFullPath = _getFullPath(sHrefRelPath, path); 
+ 			strTrail += "<a style=\""+ styleInfo + "\"" + " href=\"" + sHrefFullPath + "\">" + name + "</a> " + separator + " ";
+		}
+
+	}	
+
+	gaBreadcrumbsTrail[gaBreadcrumbsTrail.length] = strTrail;
+
+	// call for master breadcrumbs
+	masterFullPath = _getPath(masterFullPath)
+	masterFullPath += masterRelPath;
+	masterFullPath = _getFullPath(masterFullPath, "MasterData.xml");
+
+	GetMasterBreadcrumbs(masterFullPath);
+	
+}
+
+
+/////////highlight Search Routines /////////
+function ClosedRange( a_nStart, a_nEnd )
+{
+	this.nStart = a_nStart;
+	this.nEnd = a_nEnd;
+}
+
+////////generic functions //////////
+
+var g_RunesWordBreaks=gsFtsBreakChars;
+var g_RunesWhiteSpaces="\x20\x09\x0D\x0A\xA0";
+
+function _isWordBreak( a_ch )
+{
+	return ( g_RunesWordBreaks.indexOf( a_ch ) >= 0 );
+}
+
+function _isWhiteSpace( a_ch )
+{
+	return ( g_RunesWhiteSpaces.indexOf( a_ch ) >= 0 );
+}
+
+function _getLengthOfWordBreak( a_str, a_nFrom )
+{
+	var i = a_nFrom, nLen = a_str.length;
+	while ( i < nLen && _isWordBreak( a_str.charAt( i ) ) )
+		++i;
+	return i - a_nFrom;
+}
+
+function _getLengthOfWord( a_str, a_nFrom )
+{
+	var i = a_nFrom, nLen = a_str.length;
+	while ( i < nLen &&	!_isWordBreak( a_str.charAt( i ) ) )
+		++i;
+	return i - a_nFrom;
+}
+
+function _getWord( a_str, a_nFrom )
+{
+	var nLen = _getLengthOfWord( a_str, a_nFrom );
+	return a_str.substr( a_nFrom, nLen );
+}
+
+function _getPositionInc( a_str, a_nFrom )
+{
+	var i = a_nFrom, nLen = a_str.length, nInc = 1;
+	while ( i < nLen && _isWordBreak( a_str.charAt( i ) ) )
+	{
+		if ( !_isWhiteSpace( a_str.charAt( i ) ) )
+			nInc++;
+
+		i++;
+	}
+	return nInc;
+}
+
+function _getNormalizedWord( a_strWord )
+{
+	var strLower = a_strWord.toLowerCase();
+	
+	return strLower;
+}
+
+function DolWord( a_strWord, a_nPosition, a_nCharLocation )
+{
+	this.strWord = a_strWord;
+	this.nPosition = a_nPosition;
+	this.nCharLocation = a_nCharLocation;
+}
+
+function dolSegment( a_strSrc )
+{
+	var nLen = a_strSrc.length;
+	var nCur = 0;
+	var nPosition = 1;
+	var strWord = "";
+	var aRslt = new Array();
+
+	nCur += _getLengthOfWordBreak( a_strSrc, nCur );
+	while ( nCur < nLen )
+	{
+		strWord = _getNormalizedWord( _getWord( a_strSrc, nCur ) );
+		aRslt[aRslt.length] = new DolWord( strWord, nPosition, nCur );
+		
+		nCur += strWord.length;
+		nPosition += _getPositionInc( a_strSrc, nCur );
+		nCur += _getLengthOfWordBreak( a_strSrc, nCur );
+	}
+	return aRslt;
+}
+
+/////////// Dom Text node ///////////////
+var s_strHlStart=null;
+var s_strHlEnd =null;
+
+function DomTextNode( a_Node, a_nFrom )
+{
+	this.node = a_Node;
+	this.nFrom = a_nFrom;
+	
+	this.aClosedRanges = new Array();
+
+	this.getClosedRanges = function( a_aRanges, a_nStart )
+	{
+		var nTo = this.nFrom + a_Node.data.length;			
+		for ( var i = a_nStart; i < a_aRanges.length; i++ )
+		{
+			if ( a_aRanges[i].nStart <= nTo &&
+				 a_aRanges[i].nEnd >= this.nFrom )
+			{
+				this.aClosedRanges[this.aClosedRanges.length] = new ClosedRange( a_aRanges[i].nStart > this.nFrom ? a_aRanges[i].nStart : this.nFrom,
+																				 a_aRanges[i].nEnd < nTo ? a_aRanges[i].nEnd : nTo );
+			}
+			if ( a_aRanges[i].nEnd > nTo )
+			{
+				return i;
+			}
+		}
+		return i;
+	}
+
+	this.doHighlight = function( a_aRanges, a_nStart )
+	{
+		s_strHlStart = "<font style='color:" + gsTextColor + "; background-color:" + gsBkgndColor + "'>";
+		s_strHlEnd = "</font>";
+
+		if ( a_nStart >= a_aRanges.length )
+			return a_nStart;
+
+		var nEnd = this.getClosedRanges( a_aRanges, a_nStart );
+		if ( this.aClosedRanges.length == 0 )
+			return nEnd;
+		var strText = this.node.data;
+		var strHTML = "";
+		var nLastStart = 0;
+		for ( var i = 0; i < this.aClosedRanges.length; i++ )
+		{
+			strHTML += strText.substring( nLastStart, this.aClosedRanges[i].nStart - this.nFrom );
+			strHTML += s_strHlStart;
+			strHTML += strText.substring( this.aClosedRanges[i].nStart - this.nFrom,
+										  this.aClosedRanges[i].nEnd - this.nFrom );
+			strHTML += s_strHlEnd;
+
+			nLastStart = this.aClosedRanges[i].nEnd - this.nFrom;
+		}
+		strHTML += strText.substr( nLastStart );
+		
+		var spanElement = document.createElement( "span" );
+		spanElement.innerHTML = strHTML;
+		this.node.parentNode.replaceChild( spanElement, this.node );
+		if(gnYPos == -1)
+		{
+			var elemObj = spanElement;
+			var curtop = 0;
+    			if (elemObj.offsetParent)
+    			{
+        			while (elemObj.offsetParent)
+        			{
+            				curtop += elemObj.offsetTop
+            				elemObj = elemObj.offsetParent;
+        			}
+    			}
+    			else if (elemObj.y)
+        			curtop += elemObj.y;
+			
+			gnYPos = curtop;
+		}
+		return nEnd;
+	};
+}
+
+function DomTexts()
+{
+	this.strText = "";
+	this.aNodes = new Array();
+	this.aRanges = new Array();
+
+	this.addElementNode = function( a_Node )
+	{
+		if ( a_Node == null || a_Node.childNodes == null )
+			return;
+
+		var nLen = a_Node.childNodes.length;
+		for ( var i = 0; i < nLen; i++ )
+		{
+			var node = a_Node.childNodes.item( i );
+			if ( node != null )
+			{
+				if ( node.nodeType == 3 )
+				{
+					this.addTextNode( node );
+				}
+				else if ( node.nodeType == 1 )
+				{
+					this.addElementNode( node );
+				}
+			}
+		}
+	}
+
+	this.addTextNode = function( a_Node )
+	{
+		if ( a_Node == null )
+			return;
+
+		var strInnerText = a_Node.data;
+		if ( strInnerText.length != 0 )
+		{
+			var nFrom = this.strText.length;
+			this.strText += strInnerText;
+			this.aNodes[this.aNodes.length] = new DomTextNode( a_Node, nFrom );
+		}
+	}
+
+	this.isWordMatch = function( a_strHlWord, a_strTextWord )
+	{
+		return a_strTextWord.indexOf(a_strHlWord.toLowerCase()) != -1;
+	}
+					 
+	this.makeHighlightRanges = function()
+	{
+		if(typeof(gaSearchTerms[0]) == "undefined")
+			return;
+
+		var str = gaSearchTerms[0].toLowerCase();
+		for(var j = 1; j < gaSearchTerms.length; j++)
+		{
+			str += "|" + gaSearchTerms[j].toLowerCase();
+			
+		}
+
+		var regexp = new RegExp(str, "i");
+
+		var aWords = dolSegment( this.strText );
+		for ( var i = 0; i < aWords.length; i++ )
+		{
+			var n = new Object;
+			n.index = 0;
+			var prevLen = 0;
+			var tmpStr1 = aWords[i].strWord.toLowerCase();
+
+			while(n != null && n.index > -1)
+			{
+				n = regexp.exec(tmpStr1);
+
+				if (n != null &&  n.index > -1 )
+				{
+					var strWord = n[0];
+					this.aRanges[this.aRanges.length] = new ClosedRange( aWords[i].nCharLocation + prevLen + n.index,
+								aWords[i].nCharLocation + prevLen + n.index + strWord.length);
+					prevLen = prevLen + n.index + strWord.length;							
+					tmpStr1 = tmpStr1.substring(n.index + strWord.length, tmpStr1.length);
+				}
+			}
+		}
+	}
+	
+	this.highlightNodes = function()
+	{
+		var nFrom = 0;
+		for ( var i = 0; i < this.aNodes.length; i++ )
+			nFrom = this.aNodes[i].doHighlight( this.aRanges, nFrom );
+	}
+
+	this.jump2FirstHighlightedWord = function()
+	{
+		if (gnYPos > 51)
+			window.scrollTo(0, gnYPos-50);
+	}
+}
+
+function processSuspendNodes( a_aNodes )
+{
+	if ( a_aNodes.length == 0 )
+		return false;
+
+	var dt = new DomTexts();
+
+	//build dom texts...
+	for ( var i = 0; i < a_aNodes.length; i++ )
+	{
+		var node = a_aNodes[i];
+		if ( node.nodeType == 1 )
+		{
+			dt.addElementNode( node );
+		}
+		else if ( node.nodeType == 3 )
+		{
+			dt.addTextNode( node );
+		}
+	}
+	
+	dt.makeHighlightRanges();
+	dt.highlightNodes();
+	dt.jump2FirstHighlightedWord();
+}
+
+var s_strRecursiveTags = "sub sup img applet object br iframe embed noembed param area input " +
+						 "select textarea button option hr frame noframes marquee label p dl " +
+						 "div center noscript blockquote form isindex table fieldset address layer " +
+						 "dt dd caption thead tfoot tbody tr th td lengend h1 h2 h3 h4 h5 h6 " +
+						 "ul ol dir menu li pre xmp listing plaintext ins del";
+
+function doesTagRecursiveProcess( a_Node )
+{
+	if ( a_Node == null )
+		return false;
+
+	var strTagName = a_Node.tagName.toLowerCase();
+	var rg = "\\b" + strTagName + "\\b";
+	var ss = s_strRecursiveTags.match( rg );
+	return ss != null;
+}
+
+function doHighLightDomElement( a_aSuspendedNodes, a_Node )
+{
+	var childNodes = a_Node.childNodes;
+	
+	if ( childNodes == null || childNodes.length == 0 )
+		return;
+
+	var nLen = childNodes.length;
+	for ( var i = 0; i < nLen; i++ )
+	{
+		var node = childNodes.item( i );
+		if ( node == null )
+			continue;
+
+		if ( node.nodeType == 1 )
+		{	//element
+			if ( doesTagRecursiveProcess( node ) )
+			{
+				if ( a_aSuspendedNodes.length > 0 )
+				{
+					processSuspendNodes( a_aSuspendedNodes );
+					a_aSuspendedNodes.length = 0;
+				}
+			}
+			doHighLightDomElement( a_aSuspendedNodes, node );
+		}
+		else if ( node.nodeType == 3 )
+		{	//text
+			a_aSuspendedNodes[a_aSuspendedNodes.length] = node;
+		}
+	}
+}
+
+function highlightDocument()
+{
+	if ( !document.body || document.body == null )
+		return;
+		
+	var aSuspendedNodes = new Array();
+	doHighLightDomElement( aSuspendedNodes, document.body );
+	processSuspendNodes( aSuspendedNodes );
+}
+
+/////// start routine /////////
+
+function highlightSearch()
+{
+	var searchSetting = gsHiliteSearchSetting.match( "^(.+),(.+),(.*)$" );
+
+	if(searchSetting == null)
+		return;
+
+	if(searchSetting[1] != "enable")
+		return;
+
+	gsBkgndColor = searchSetting[2];
+	gsTextColor = searchSetting[3];
+
+	//check pane in focus is Search pane.
+	var oMsg=new whMessage(WH_MSG_GETPANEINFO,this,1,null);
+	if(SendMessage(oMsg)) {
+		if (oMsg.oParam != "fts") 
+			return;
+	}
+
+	//check highlight result is enabled.
+	var oMsg=new whMessage(WH_MSG_HILITESEARCH,this,1,null);
+	if(SendMessage(oMsg))
+	{
+		if(oMsg.oParam == false)
+			return;
+	}
+	
+	//get string in search box.
+	var oMsg = new whMessage(WH_MSG_GETSEARCHSTR, this, 1, null);
+	var strTerms = "";
+	if (SendMessage(oMsg))
+	{
+		strTerms = oMsg.oParam;		
+	}
+
+	findSearchTerms(strTerms, false);
+
+	highlightDocument();
+
+}
+
+//////// common with FTS routines to identify stop word etc. ////////////
+
+function findSearchTerms(searchTerms, bSkip)
+{
+	if(searchTerms != "")
+	{
+		var sInput=searchTerms;
+		var sCW="";
+		var nS=-1;
+		var nSep=-1;
+		for(var nChar=0;nChar<gsFtsBreakChars.length;nChar++){
+			var nFound=sInput.indexOf(gsFtsBreakChars.charAt(nChar));
+			if((nFound!=-1)&&((nS==-1)||(nFound<nS))){
+				nS=nFound;
+				nSep=nChar;
+			}
+		}
+		if(nS==-1){
+			sCW=sInput;
+			sInput="";
+		}
+		else
+		{
+			sCW=sInput.substring(0,nS);
+			sInput=sInput.substring(nS+1);
+		}
+
+		searchTerms=sInput;
+		
+		var bAdd = true;
+		if((sCW=="or")||(sCW=="|"))
+		{
+			bSkip = false;
+			bAdd = false;
+		}
+		else if((sCW=="and")||(sCW=="&"))
+		{
+			bSkip = false;
+			bAdd = false;
+		}
+		else if((sCW=="not")||(sCW=="~"))
+		{
+			bSkip = true;
+			bAdd = false;
+		}
+
+		if(bAdd && !bSkip && sCW!="" && sCW!=" " && !IsStopWord(sCW,gaFtsStop)){
+			gaSearchTerms[gaSearchTerms.length] = sCW;
+			var stemWord = GetStem(sCW);
+			if(stemWord != sCW)
+				gaSearchTerms[gaSearchTerms.length] = stemWord;
+		}
+		findSearchTerms(searchTerms, bSkip);
+	}
+	
+}
+
+function GetStem(szWord)
+{
+	if(gaFtsStem==null||gaFtsStem.length==0)return szWord;
+	if(IsNonAscii(szWord))             return szWord;
+	var aStems=gaFtsStem;
+
+	var nStemPos=0;
+	var csStem="";
+	for(var iStem=0;iStem<aStems.length;iStem++){
+
+		if(aStems[iStem].length>=szWord.length-1)	continue;
+		nStemPos=szWord.lastIndexOf(aStems[iStem]);
+		if(nStemPos>0){
+			var cssub=szWord.substring(nStemPos);
+			if(cssub==aStems[iStem]){
+				csStem=szWord;
+				if(szWord.charAt(nStemPos-2)==szWord.charAt(nStemPos-1)){
+					csStem=csStem.substring(0,nStemPos-1);
+				}else{
+					csStem=csStem.substring(0,nStemPos);
+				}
+				return csStem;
+			}
+		}
+	}
+	return szWord;
+}
+
+function IsStopWord(sCW,aFtsStopArray)
+{
+	var nStopArrayLen=aFtsStopArray.length;
+	var nB=0;
+	var nE=nStopArrayLen-1;
+	var nM=0;
+	var bFound=false;
+	var sStopWord="";
+	while(nB<=nE){
+		nM=(nB+nE);
+		nM>>=1;
+		sStopWord=aFtsStopArray[nM];
+		if(compare(sCW,sStopWord)>0){
+			nB=(nB==nM)?nM+1:nM;
+		}else{
+			if(compare(sCW,sStopWord)<0){
+				nE=(nE==nM)?nM-1:nM;
+			}else{
+				bFound=true;
+				break;
+			}
+		}
+	}
+	return bFound;
+}
+
+/////// end highlight search rountines /////////////
 
 function setButtonFont(sType,sFontName,sFontSize,sFontColor,sFontStyle,sFontWeight,sFontDecoration)
 {

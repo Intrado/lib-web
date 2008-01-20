@@ -1,4 +1,4 @@
-//	WebHelp 5.10.004
+﻿//	WebHelp 5.10.004
 var gsFileName="";
 var gsDivName="";
 var xmlDoc=null;
@@ -7,6 +7,7 @@ var gsInsertBeforeEndHTML="";
 var sReplaceStringsSrc=new Array();
 var gsDivName="dataDiv";
 var gnLoadDivNum=0;
+var xmlHttp=null;
 sReplaceStringsSrc[0]="&amp;";
 sReplaceStringsSrc[1]="&gt;";
 sReplaceStringsSrc[2]="&lt;";
@@ -230,6 +231,38 @@ function loadDataXML(sFileName)
 		xmlDoc.addEventListener("load",initializeData,false);
 		xmlDoc.load(sdocPath,"text/xml");
 	}
+	else if(gbSafari3)
+	{
+	        if(window.XMLHttpRequest && !(window.ActiveXObject)) 
+        	{
+        	    	xmlHttp = new XMLHttpRequest();
+            		if(xmlHttp)
+            		{
+  	            		xmlHttp.onreadystatechange=onXMLResponse;
+		        	xmlHttp.open("GET", sdocPath, true);
+		        	xmlHttp.send(null);
+	        	}
+        	}
+	}
+}
+
+function onXMLResponse()
+{
+    if(xmlHttp)
+    {
+      if(xmlHttp.readyState == 4)
+      {
+        xmlDoc = xmlHttp.responseXML;
+        if(xmlDoc!=null)
+        {
+	        putDataXML(xmlDoc,sdocPath);
+	    }
+	    else
+	    {
+	        onLoadXMLError();
+	    }
+      }
+    }
 }
 
 function initializeData()
@@ -261,7 +294,7 @@ function insertDataDiv(sName)
 		sHTML+="<div id="+sName+" style=\"display:none;\"></div>";
 	else
 		sHTML+="<div id="+sName+" style=\"visibility:hidden\"></div>";
-	if((gbIE5||gbNav6)&&document.body)
+	if((gbIE5||gbNav6||gbSafari3)&&document.body)
 		document.body.insertAdjacentHTML("beforeEnd",sHTML);
 	else
 	{
@@ -299,6 +332,10 @@ function window_BUnload()
 
 function removeThis(obj)
 {
+    if(gbSafari3)
+    {
+        return;
+    }
 	if(obj.parentNode)
 		obj.parentNode.removeChild(obj);
 	else
@@ -506,6 +543,27 @@ function _browserStringToText(sBStr)
 	return sText;
 }
 
+function IsInternal(urlName)
+{
+	if(urlName.indexOf("://")==-1 && urlName.indexOf(":\\")==-1 && urlName.indexOf("jscript:")==-1 && urlName.indexOf("javascript:")==-1 && urlName.indexOf("vbscript:")==-1)
+		return true;
+	else
+		return false;
+}
+
+function IsNonAscii(szWord)
+{
+    var temp;
+    for(var iCount=0; iCount<szWord.length;iCount++)
+    {
+        temp = szWord.charCodeAt(iCount);
+        if(temp>128)
+            return true;
+    }
+    return false;
+
+}
+
 function excapeSingleQuotandSlash(str)
 {
 	if(str==null) return null;
@@ -522,6 +580,16 @@ function excapeSingleQuotandSlash(str)
 	var re=new RegExp("'","g");
 	sRes=sRes.replace(re,"\\'");
 	return sRes;
+}
+
+function    getClientHeight()
+{
+    if(gbSafari3)
+    {
+        return innerHeight;   //this is for safari
+    }
+    return document.body.clientHeight;
+    
 }
 
 var gbWhUtil=true;

@@ -1,4 +1,4 @@
-//	WebHelp 5.10.002
+﻿//	WebHelp 5.10.002
 var WH_MSG_RESIZEPANE		=0x0100;
 var WH_MSG_SHOWPANE			=0x0101;
 var WH_MSG_HIDEPANE			=0x0102;
@@ -58,6 +58,8 @@ var WH_MSG_ISAVENUESUPPORT	=0x0a09;
 var WH_MSG_GETCMD			=0x0b00;
 var	WH_MSG_GETPANE			=0x0b01;
 var WH_MSG_GETDEFPANE		=0x0b02;
+var WH_MSG_HILITESEARCH 	=0x0b03;
+var WH_MSG_GETSEARCHSTR		=0x0b04;
 
 function whMessage(nMessageId,wSender,nVersion,oParam)
 {

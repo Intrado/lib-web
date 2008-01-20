@@ -1,4 +1,4 @@
-//	WebHelp 5.10.003
+﻿//	WebHelp 5.10.003
 var gsSK2=null;
 var gsSK=null;
 var gsFtsBreakChars="\t\r\n\"\\ .,!@#$%^&*()~'`:;<>?/{}[]|+-=\x85\x92\x93\x94\x95\x96\x97\x99\xA9\xAE\xB7";
@@ -855,10 +855,22 @@ function IsStopWord(sCW,aFtsStopArray)
 	}
 	return bFound;
 }
+function IsNonAscii(szWord)
+{
+    var temp;
+    for(var iCount=0; iCount<szWord.length;iCount++)
+    {
+        temp = szWord.charCodeAt(iCount);
+        if(temp>128)
+            return true;
+    }
+    return false;
 
+}
 function GetStem(szWord)
 {
 	if(gaFtsStem==null||gaFtsStem.length==0)return szWord;
+	if(IsNonAscii(szWord))             return szWord;
 	var aStems=gaFtsStem;
 
 	var nStemPos=0;

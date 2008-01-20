@@ -1,4 +1,4 @@
-//	WebHelp 5.10.005
+﻿//	WebHelp 5.10.005
 var gaProj=new Array();
 var gnChecked=0;
 var gsProjName="";
@@ -98,7 +98,7 @@ function whCom(sName,sComFile)
 							sHTML+="100%; height:100%;\"></IFRAME>";
 						}
 						oDiv.innerHTML=sHTML;
-					}else if(gbNav6){
+					}else if(gbNav6 || gbSafari){
 						gsHTML="<IFRAME ID="+this.msIFrameId+" title=\"" + this.msName + "\" SRC=\""+strFile+"\" BORDER=0 FRAMEBORDER=no STYLE=\"width:100%;border:0;height:100%;\"></IFRAME>";
 						goDiv = oDiv;
 						setTimeout("delayLoad()", 100);
@@ -123,6 +123,8 @@ function whCom(sName,sComFile)
 			sHTML+="<DIV ID="+this.msDivId+" ALIGN=left STYLE=\"position:absolute;z-index:1;left:0;top:0;width:100%;height:100%;\">";
 		else if(gbIE4||gbWindows)
 			sHTML+="<DIV ID="+this.msDivId+" ALIGN=left STYLE=\"position:absolute;z-index:1;left:0;top:0;width:100%;height:100%;visibility:hidden\">";
+		else if(gbMac&&gbNav6)
+			sHTML+="<DIV ID="+this.msDivId+" ALIGN=left STYLE=\"position:absolute;z-index:1;left:0;top:0;width:100%;height:100%;visibility:hidden\">";
 		else
 			sHTML+="<DIV ID="+this.msDivId+" ALIGN=left STYLE=\"position:absolute;z-index:1;left:0;top:0;width:100%;height:"+parent.height+";visibility:hidden\">";
 		sHTML+="</DIV>";
@@ -146,7 +148,15 @@ function whComMan()
 		{
 			sHTML+=this.maCom[i].getDivHTML();
 		}
-		document.body.insertAdjacentHTML("beforeEnd",sHTML);
+		if(gbSafari&&!gbSafari3)
+		{
+			var range = document.createRange();
+		  	range.setStartBefore(document.body.lastChild);
+		  	var docFrag = range.createContextualFragment(sHTML);
+		   	document.body.appendChild(docFrag)		
+	   }
+		else
+			document.body.insertAdjacentHTML("beforeEnd",sHTML);
 
 	}
 	this.showById=function(nId)
@@ -289,13 +299,13 @@ function loadData2(strFile)
 function addProject(bPreferXML,sXMLName,sHTMLName)
 {
 	var bLoadXML=bPreferXML;
-	if(!gbIE4&&!gbNav6&&!gbOpera7)
+	if(!gbIE4&&!gbNav6&&!gbOpera7&&!gbSafari3)
 		return;
 	if(gbIE4&&!gbIE5)
 		bLoadXML=false;
 	if (gbIE5&&!gbMac)
 		bLoadXML=true;
-	if(gbIE55||gbNav6)
+	if(gbIE55||gbNav6||gbSafari3)
 		bLoadXML=true;
 	if(gbOpera7)
 		bLoadXML=false;		
@@ -490,6 +500,8 @@ function window_unload()
 	UnRegisterListener2(this,WH_MSG_SHOWFTS);
 	UnRegisterListener2(this,WH_MSG_SHOWGLO);
 	UnRegisterListener2(this,WH_MSG_GETPANEINFO);
+	UnRegisterListener2(this,WH_MSG_GETSEARCHSTR);
+	UnRegisterListener2(this,WH_MSG_HILITESEARCH);
 }
 
 function onSendMessage(oMsg)
@@ -550,6 +562,25 @@ function onSendMessage(oMsg)
 			oMsg.oParam=goMan.getCurrent();
 			return false;
 		}
+		else if(nMsgId==WH_MSG_HILITESEARCH)
+		{
+			oMsg.oParam=true;
+			return true;
+		}
+		else if(nMsgId==WH_MSG_GETSEARCHSTR)
+		{
+			var ftsElem = getElement("ftsIFrame");
+			if(ftsElem)
+			{
+			  if(!gbSafari3 && typeof(ftsElem.contentWindow.document.forms[0]) != "undefined")
+			  {
+			    var str1 = ftsElem.contentWindow.document.forms[0].quesn.value;
+			    oMsg.oParam = str1;
+			  }
+			}
+
+			return true;
+		}
 	}
 	return true;
 }
@@ -562,6 +593,8 @@ if(window.gbWhUtil&&window.gbWhMsg&&window.gbWhVer&&window.gbWhProxy)
 	RegisterListener2(this,WH_MSG_SHOWFTS);
 	RegisterListener2(this,WH_MSG_SHOWGLO);
 	RegisterListener2(this,WH_MSG_GETPANEINFO);
+	RegisterListener2(this,WH_MSG_GETSEARCHSTR);
+	RegisterListener2(this,WH_MSG_HILITESEARCH);
 
 	if((gbMac&&gbIE4)||(gbSunOS&&gbIE5)||gbOpera7)
 	{

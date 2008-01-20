@@ -1,4 +1,4 @@
-//	WebHelp 5.10.001
+﻿//	WebHelp 5.10.001
 var garrSortChar=new Array();
 var gaFtsStop=new Array();
 var gaFtsStem=new Array();
@@ -421,33 +421,15 @@ function getBiggestChar()
 function getCharCode(str,i)
 {
 	var code=str.charCodeAt(i)
-	if(code>256)
-	{
-		code=gaUToC[code];
-	}
 	return code;
 }
 
 function compare(strText1,strText2)
 {
-	if(garrSortChar.length<256)
-	{
-		var strt1=strText1.toLowerCase();
-		var strt2=strText2.toLowerCase();
-		if(strt1<strt2) return -1;
-		if(strt1>strt2) return 1;
-		return 0;
-	}
-	else
-	{
-		for(var i=0;i<strText1.length&&i<strText2.length;i++)
-		{
-			if(garrSortChar[getCharCode(strText1,i)]<garrSortChar[getCharCode(strText2,i)]) return -1;
-			if(garrSortChar[getCharCode(strText1,i)]>garrSortChar[getCharCode(strText2,i)]) return 1;
-		}
-		if(strText1.length<strText2.length) return -1;
-		if(strText1.length>strText2.length) return 1;
-		return 0;
-	}
+	var strt1=strText1.toLowerCase();
+	var strt2=strText2.toLowerCase();
+	if(strt1<strt2) return -1;
+	if(strt1>strt2) return 1;
+	return 0;
 }
 gbWhLang=true;

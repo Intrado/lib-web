@@ -1,4 +1,4 @@
-//	WebHelp 5.10.004
+﻿//	WebHelp 5.10.004
 var gbXML=false;
 var gaDef=new Array();
 var gsBgColor="#ffffff";
