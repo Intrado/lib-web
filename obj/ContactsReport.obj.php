@@ -6,12 +6,12 @@ class ContactsReport extends ReportGenerator {
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
-		
+
 		$orderquery = getOrderSql($this->params);
 		$rulesql = getRuleSql($this->params, "p");
-		
+
 		$userJoin = " and p.userid = '$USER->id' ";
-		
+
 		$usersql = $USER->userSQL("p");
 		$phonequery="";
 		$emailquery="";
@@ -19,7 +19,7 @@ class ContactsReport extends ReportGenerator {
 		$peoplequery = "";
 		if(isset($this->params['phone']) && $this->params['phone'] != ""){
 			$peoplephonelist = QuickQueryList("select personid from phone ph where 1 and ph.phone like '%" . DBSafe($this->params['phone']) . "%' group by personid");
-		} 
+		}
 		if(isset($this->params['email']) && $this->params['email'] != ""){
 			$peopleemaillist = QuickQueryList("select personid from email e where 1 and e.email = '" . DBSafe($this->params['email']) . "'  group by personid");
 		}
@@ -30,19 +30,19 @@ class ContactsReport extends ReportGenerator {
 
 		if(isset($peoplephonelist) && isset($peopleemaillist))
 			$peoplelist = implode("','", array_intersect($peoplephonelist, $peopleemaillist));
-		else if(isset($peoplephonelist))	
+		else if(isset($peoplephonelist))
 			$peoplelist = implode("','", $peoplephonelist);
 		else if(isset($peopleemaillist))
 			$peoplelist = implode("','", $peopleemaillist);
-		
+
 		if(isset($peoplelist))
 			$peoplequery = " and p.id in ('" . $peoplelist . "') ";
-		
+
 		$this->query = "select SQL_CALC_FOUND_ROWS
-					p.pkey as pkey, 
+					p.pkey as pkey,
 					p.id as pid,
-					p." . FieldMap::GetFirstNameField() . " as firstname, 
-					p." . FieldMap::GetLastNameField() . " as lastname, 
+					p." . FieldMap::GetFirstNameField() . " as firstname,
+					p." . FieldMap::GetLastNameField() . " as lastname,
 					concat(
 							coalesce(a.addr1,''), ' ',
 							coalesce(a.addr2,''), ' ',
@@ -50,7 +50,7 @@ class ContactsReport extends ReportGenerator {
 							coalesce(a.state,''), ' ',
 							coalesce(a.zip,'')
 						) as address
-					$fieldquery	
+					$fieldquery
 					from person p
 					left join address a on (a.personid = p.id)
 					where not p.deleted
@@ -70,15 +70,15 @@ class ContactsReport extends ReportGenerator {
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
-		
+
 		$activefields = explode(",", $this->params['activefields']);
 		$query = $this->query;
-		
+
 		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
 		$query .= "limit $pagestart, $max";
 		$result = Query($query);
 		$total = QuickQuery("select found_rows()");
-		
+
 		//fetch data with main query and populate arrays using personid as the key
 		$personlist = array();
 		$personidlist = array();
@@ -86,9 +86,9 @@ class ContactsReport extends ReportGenerator {
 			$personlist[$row[1]] = $row;
 			$personidlist[] = $row[1];
 		}
-		
+
 		// select static value "ordering" in order to order results as phone, email, sms
-		$phoneemailquery = 
+		$phoneemailquery =
 			"(select personid as pid,
 				phone as destination,
 				sequence as sequence,
@@ -119,7 +119,7 @@ class ContactsReport extends ReportGenerator {
 				personid in ('" . implode("','",$personidlist) . "')
 				) ";
 		$extraquery ="order by pid, ordering, sequence";
-		
+
 		//Don't display SMS if no sms in system
 		if(getSystemSetting("_hassms", false)){
 			$phoneemailsmsquery = $phoneemailquery . $smsquery . $extraquery;
@@ -134,8 +134,8 @@ class ContactsReport extends ReportGenerator {
 			}
 			$destinationdata[$row[0]][] = $row;
 		}
-	
-		
+
+
 		// personrow index 4 is address
 		// personrow index 5 is the start of f-fields
 		// personrow insert all destinations before f-fields
@@ -148,15 +148,22 @@ class ContactsReport extends ReportGenerator {
 				array_splice($personrow, 5, 0, array("","", ""));
 				$data[] = $personrow;
 			} else {
+				$displayed = false;
 				foreach($destinationdata[$personrow[1]] as $destination){
 					if($destination[1]){
 						array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[4]));
 						$data[] = $personrow;
+						$displayed = true;
 					}
+				}
+
+				if (!$displayed) {
+					array_splice($personrow, 5, 0, array("","-None-",""));
+					$data[] = $personrow;
 				}
 			}
 		}
-	
+
 		//Display Formatter
 		//type at index 7
 		function fmt_destination_sequence($row, $index){
@@ -166,10 +173,10 @@ class ContactsReport extends ReportGenerator {
 				return "";
 			}
 		}
-		
+
 		$titles = array("0" => "ID#",
 						"2" => "First Name",
-						"3" => "Last Name", 
+						"3" => "Last Name",
 						"4" => "Address",
 						"5" => "Sequence",
 						"6" => "Destination");
@@ -184,7 +191,7 @@ class ContactsReport extends ReportGenerator {
 
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
-		
+
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 		<?
@@ -195,27 +202,27 @@ class ContactsReport extends ReportGenerator {
 			var searchresultstable = new getObj("searchresults").obj;
 			</script>
 		<?
-		
+
 		showPageMenu($total,$pagestart,$max);
 		endWindow();
 	}
-	
+
 	function runCSV(){
-			
+
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
 		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
-		
+
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=report.csv");
 		header("Content-type: application/vnd.ms-excel");
-	
+
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-	
+
 		//generate the CSV header
 		$header = '"ID#", "First Name", "Last Name", "Address"';
 
@@ -225,11 +232,11 @@ class ContactsReport extends ReportGenerator {
 		}
 		echo $header;
 		echo "\r\n";
-	
+
 		$result = Query($this->query);
-	
+
 		while ($row = DBGetRow($result)) {
-			
+
 			$reportarray = array($row[0], $row[2], $row[3], $row[4]);
 
 			$count=0;
@@ -248,22 +255,22 @@ class ContactsReport extends ReportGenerator {
 				$reportarray[] = $email->email;
 			}
 			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
-		
+
 		}
 	}
-	
+
 	function getReportSpecificParams(){
 		return $params;
 	}
-	
+
 	function setReportFile(){
 		$this->reportfile = "Contactsreport.jasper";
 	}
-	
+
 	static function getOrdering(){
 		global $USER;
 		$fields = FieldMap::getAuthorizedFieldMaps();
-	
+
 		$ordering = array();
 		$ordering["ID#"] = "p.pkey";
 
