@@ -84,15 +84,15 @@ foreach ($fieldmaps as $fieldmap)
 //phones, emails, SMS
 $maxphones = getSystemSetting("maxphones",3);
 for ($x = 0; $x < $maxphones; $x++)
-	$maptofields["p$x"] = "Phone " . ($x + 1);
+	$maptofields["p$x"] = destination_label("phone",$x); //"Phone " . ($x + 1);
 if (getSystemSetting('_hassms', false)) {
 	$maxsms = getSystemSetting("maxsms",2);
 	for ($x = 0; $x < $maxsms; $x++)
-		$maptofields["s$x"] = "SMS " . ($x + 1);
+		$maptofields["s$x"] = destination_label("sms",$x); //"SMS " . ($x + 1);
 }
 $maxemails = getSystemSetting("maxemails",2);
 for ($x = 0; $x < $maxemails; $x++)
-	$maptofields["e$x"] = "Email " . ($x + 1);
+	$maptofields["e$x"] = destination_label("email",$x); //"Email " . ($x + 1);
 //address fields
 $maptofields["a6"] = "Address ATTN";
 $maptofields["a1"] = "Address 1";
