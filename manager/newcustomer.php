@@ -212,9 +212,9 @@ if (CheckFormSubmit($f,$s)){
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
-							('maxphones', '3'),
-							('maxemails', '2'),
-							('maxsms', '2'),
+							('maxphones', '1'),
+							('maxemails', '1'),
+							('maxsms', '1'),
 							('retry', '15'),
 							('disablerepeat', '0'),
 							('surveyurl', '" . DBSafe($surveyurl) . "'),

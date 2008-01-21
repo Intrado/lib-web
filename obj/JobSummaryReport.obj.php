@@ -1,7 +1,7 @@
 <?
 
 class JobSummaryReport extends ReportGenerator{
-	
+
 	function generateQuery(){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
@@ -37,26 +37,26 @@ class JobSummaryReport extends ReportGenerator{
 		}
 		$this->params['joblist'] = $joblist;
 		// Query for graph in pdf
-		$this->query = "select count(*) as cnt, 
-				coalesce(rc.result, rp.status) as currentstatus, 
+		$this->query = "select count(*) as cnt,
+				coalesce(rc.result, rp.status) as currentstatus,
 				sum(rc.result not in ('A','M', 'blocked', 'duplicate') and rc.numattempts < js.value) as remaining
 				from reportperson rp
 				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
-				where 1 " 
+				where 1 "
 				. $joblistquery .
 				" and rp.type='phone'
 				group by currentstatus";
 
 	}
-	
+
 	function runHtml(){
 		global $USER;
 		$validstamp = time();
 		$jobstats = array ("validstamp" => $validstamp);
-		
+
 		// Gather Job information
-		
+
 		$jobtypes = "";
 		if(isset($this->params['jobtypes'])){
 			$jobtypes = $this->params['jobtypes'];
@@ -79,8 +79,8 @@ class JobSummaryReport extends ReportGenerator{
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 			$url = "startdate=" . $startdate . "&enddate=" . $enddate . "&jobtypes=" . $jobtypes . "&surveyonly=" . $surveyonly;
 		}
-		
-		//Gather Phone Information		
+
+		//Gather Phone Information
 		$phonenumberquery = "select sum(rc.type='phone') as total,
 									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'sent', 'duplicate', 'blocked')) as remaining,
@@ -95,7 +95,7 @@ class JobSummaryReport extends ReportGenerator{
 									where rp.jobid in ('" . $this->params['joblist'] . "')
 									and rp.type='phone'";
 		$phonenumberinfo = QuickQueryRow($phonenumberquery);
-						
+
 		$emailquery = "select sum(rc.type = 'email') as total,
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'sent', 'duplicate', 'blocked')) as remaining,
@@ -107,7 +107,7 @@ class JobSummaryReport extends ReportGenerator{
 									where rp.jobid in ('" . $this->params['joblist'] . "')
 									and rp.type='email'";
 		$emailinfo = QuickQueryRow($emailquery);
-		
+
 		$smsquery = "select sum(rc.type = 'sms') as total,
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'sent', 'duplicate', 'blocked')) as remaining,
@@ -120,10 +120,10 @@ class JobSummaryReport extends ReportGenerator{
 									where rp.jobid in ('" . $this->params['joblist'] . "')
 									and rp.type='sms'";
 		$smsinfo = QuickQueryRow($smsquery);
-			
+
 		//may need to clean up, null means not called yet
 		//do math for the % completed
-		
+
 		$result = Query($this->query);
 		$cpstats = array (
 							"A" => 0,
@@ -165,8 +165,8 @@ class JobSummaryReport extends ReportGenerator{
 		$jobnumberlist = implode("", explode("','", $this->params['joblist']));
 		$_SESSION['jobstats'][$jobnumberlist] = $jobstats;
 
-		$urloptions = $url . "&valid=$validstamp";	
-		
+		$urloptions = $url . "&valid=$validstamp";
+
 		// DISPLAY
 		startWindow("Filter by");
 ?>
@@ -186,12 +186,12 @@ class JobSummaryReport extends ReportGenerator{
 			}
 ?>
 			</table>
-		<? 
+		<?
 		endWindow();
-		
+
 		?><br><?
-		
-		displayJobSummary($this->params['joblist']);	
+
+		displayJobSummary($this->params['joblist']);
 		?><br><?
 		startWindow("Totals", "padding: 3px;");
 ?>
@@ -201,7 +201,7 @@ class JobSummaryReport extends ReportGenerator{
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email">Email:</a></th>
-					<td class="bottomBorder">	
+					<td class="bottomBorder">
 						<table width="100%">
 							<tr>
 								<td>
@@ -212,7 +212,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Remaining</th>
 											<th>Duplicates Removed</th>
 											<th>No Email</th>
-											<th>Declined</th>
+											<th>No Email Selected</th>
 										</tr>
 										<tr>
 											<td><?=$emailinfo[0]+0?></td>
@@ -224,7 +224,7 @@ class JobSummaryReport extends ReportGenerator{
 										</tr>
 									</table>
 								</td>
-							</tr>						
+							</tr>
 						</table>
 					</td>
 				</tr>
@@ -234,7 +234,7 @@ class JobSummaryReport extends ReportGenerator{
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=sms">SMS:</a></th>
-					<td class="bottomBorder">	
+					<td class="bottomBorder">
 						<table width="100%">
 							<tr>
 								<td>
@@ -246,7 +246,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Blocked</th>
 											<th>Duplicates Removed</th>
 											<th>No SMS</th>
-											<th>Declined</th>
+											<th>No SMS Selected</th>
 										</tr>
 										<tr>
 											<td><?=$smsinfo[0]+0?></td>
@@ -259,7 +259,7 @@ class JobSummaryReport extends ReportGenerator{
 										</tr>
 									</table>
 								</td>
-							</tr>						
+							</tr>
 						</table>
 					</td>
 				</tr>
@@ -269,7 +269,7 @@ class JobSummaryReport extends ReportGenerator{
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=phone">Phone:</a></th>
-					<td class ="bottomBorder">	
+					<td class ="bottomBorder">
 						<table width="100%">
 							<tr>
 								<td>
@@ -281,7 +281,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Blocked</th>
 											<th>Duplicates Removed</th>
 											<th>No Phone #</th>
-											<th>Declined</th>
+											<th>No Phone Selected</th>
 											<th>Total Attempts</th>
 										</tr>
 										<tr>
@@ -293,11 +293,11 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=$phonenumberinfo[5]+0?></td>
 											<td><?=$phonenumberinfo[7]+0?></td>
 											<td><?=$phonenumberinfo[6]+0?></td>
-											
+
 										</tr>
 									</table>
 								</td>
-							</tr>						
+							</tr>
 						</table>
 					</td>
 				</tr>
@@ -339,7 +339,7 @@ class JobSummaryReport extends ReportGenerator{
 							</tr>
 						</table>
 					</td>
-				</tr>			
+				</tr>
 <?
 				}
 				if(array_sum($phonenumberinfo) < 1 && array_sum($smsinfo) < 1 && array_sum($emailinfo) < 1){
@@ -350,17 +350,17 @@ class JobSummaryReport extends ReportGenerator{
 ?>
 			</table>
 		<?
-		endWindow();				
-		
-	
+		endWindow();
+
+
 	}
-	
+
 	function setReportFile(){
 		$this->reportfile = "jobsummaryreport.jasper";
 	}
-	
+
 	function getReportSpecificParams(){
-		
+
 		$daterange = "";
 		if(isset($this->params['reldate'])){
 			list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
@@ -369,9 +369,9 @@ class JobSummaryReport extends ReportGenerator{
 		$joblist = array();
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
-		
+
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
-		
+
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange,
@@ -382,7 +382,7 @@ class JobSummaryReport extends ReportGenerator{
 	static function getOrdering(){
 		global $USER;
 		$fields = getAuthorizedFieldMaps();
-	
+
 		$ordering = array();
 		$ordering["ID#"] = "rp.pkey";
 		$ordering[$firstname->name]="rp." . $firstname->fieldnum;
@@ -392,8 +392,8 @@ class JobSummaryReport extends ReportGenerator{
 		$ordering["Attempts"] = "attempts";
 		$ordering["Last Attempt"]="date";
 		$ordering["Last Result"]="result";
-		
-		
+
+
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;
 		}

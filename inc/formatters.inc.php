@@ -463,7 +463,7 @@ function fmt_result ($row,$index) {
 		case "undelivered":
 			return "Not Contacted";
 		case "declined":
-			return "Declined";
+			return "No Destination Selected";
 		default:
 			return ucfirst($row[$index]);
 	}
@@ -531,7 +531,7 @@ function fmt_jobdetail_result($row, $index){
 			return "No Email";
 		else if($row[5] == 'sms')
 			return "No SMS";
-		else 
+		else
 			return "No Contacts";
 	} else if($row[$index] == "declined"){
 		if($row[5] == 'phone')
@@ -540,7 +540,7 @@ function fmt_jobdetail_result($row, $index){
 			return "No Email Selected";
 		else if($row[5] == 'sms')
 			return "No SMS Selected";
-		else 
+		else
 			return "No Selected";
 	} else {
 		return fmt_result($row, $index);

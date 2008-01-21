@@ -44,7 +44,7 @@ function fmt_contacthistory_result($row, $index){
 			return "No Email";
 		else if($row[3] == 'sms')
 			return "No SMS";
-		else 
+		else
 			return "No Contacts";
 	} else if($row[$index] == "declined"){
 		if($row[3] == 'phone')
@@ -53,8 +53,8 @@ function fmt_contacthistory_result($row, $index){
 			return "No Email Selected";
 		else if($row[3] == 'sms')
 			return "No SMS Selected";
-		else 
-			return "Declined";
+		else
+			return "No Destination Selected";
 	} else {
 		return fmt_result($row, $index);
 	}
@@ -76,7 +76,7 @@ $activefields = array();
 foreach($fields as $field){
 	// used in pdf,csv
 	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
-		$activefields[] = $field->fieldnum; 
+		$activefields[] = $field->fieldnum;
 	}
 }
 $options['activefields'] = implode(",",$activefields);
@@ -151,7 +151,7 @@ startWindow("Display Options", "padding: 3px;", "true");
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 			<td class="bottomBorder">
-<? 		
+<?
 				select_metadata('searchresultstable', 7, $fields);
 ?>
 			</td>
@@ -162,8 +162,8 @@ endWindow();
 ?>
 <br>
 <?
-	
-$generator->generate();	
+
+$generator->generate();
 
 include("navbottom.inc.php");
 ?>
