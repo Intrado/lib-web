@@ -182,7 +182,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 					$itemname = "sms".($x+1);
 					$sms->personid = $person->id;
 					$sms->sequence = $x;
-					$sms->sms = GetFormData($f,$s,$itemname);
+					$sms->sms = Phone::parse(GetFormData($f,$s,$itemname));
 					$sms->update();
 					$x++;
 				}
@@ -256,7 +256,7 @@ if( $reloadform )
 		$x = 0;
 		foreach ($smses as $sms) {
 			$itemname = "sms".($x+1);
-			PutFormData($f,$s,$itemname,$sms->sms,"phone",10,10);
+			PutFormData($f,$s,$itemname,Phone::format($sms->sms),"phone",10,10);
 			$x++;
 		}
 	}
