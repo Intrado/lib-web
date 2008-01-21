@@ -58,6 +58,9 @@ class Phone extends DBMappedObject {
 					$error[] = 'You do not need to include a 1 for long distance';
 				}
 			}
+		} else if ($length == 10) {
+			if ($phone[0] < 2 || $phone[3] < 2) //check for valid looking area code and prefix
+				$error[] = 'The phone number seems to be invalid';
 		}
 		return $error;
 	}
