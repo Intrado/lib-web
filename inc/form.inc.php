@@ -386,6 +386,10 @@ function CheckFormItem($form, $section, $item) {
 			}
 		}
 
+		if ($phonelen == 10 && ($phone[0] < 2 || $phone[3] < 2)) {
+			return "type";
+		}
+
 		break;
 
 	case "email":
@@ -398,15 +402,15 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.15 $
+	    # $Revision: 1.16 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
-	
+
 	    ##################################################################################
 
 		##################################################################################
 		# Beginning of Creative Commons Email Parser Code
 		##################################################################################
-			
+
         $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
 
         $dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';
@@ -436,11 +440,11 @@ function CheckFormItem($form, $section, $item) {
 		##################################################################################
 		# End of Creative Commons Email Parser Code
 		##################################################################################
-        
+
         if(!preg_match("!^$addr_spec$!", $email)){
         	return 'type';
         }
-        
+
 		break;
 	//### start number types ###
 	case "number":
