@@ -21,7 +21,7 @@ if(isset($_GET['type'])){
 }
 
 $type = isset($_SESSION['destinationtype']) ? $_SESSION['destinationtype'] : "phone";
-$default = 4;
+$default = 3;
 if($type == "email" || $type == "sms")
 	$default = 2;
 $name = $type;
