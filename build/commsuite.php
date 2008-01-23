@@ -80,7 +80,7 @@ if(isset($_ENV['WINDIR'])){
 
 
 echo "Creating database\n";
-mysql_query("create database $commsuitedbname",$custdb) 
+mysql_query("create database $commsuitedbname",$custdb)
 	or die ("Failed to create new DB $commsuitedbname : " . mysql_error($custdb));
 mysql_select_db($commsuitedbname,$custdb);
 echo "$commsuitedbname has been created\n";
@@ -102,13 +102,13 @@ if($type == "new"){
 } else if($type == "upgrade"){
 	mysql_select_db($olddbname);
 	mysql_query("delete from setting where name = 'checkpassword'");
-	
+
 	echo "Mangling\n";
 	executeSqlFile("commsuitemangle.sql");
-	
+
 	echo "Running Import Updater\n";
 	exec("php import_extractor.php");
-	
+
 	echo "Extracting old database to new database\n";
 	$output = array();
 	exec("php extract_customer.php", $output, $returncode);
@@ -118,7 +118,7 @@ if($type == "new"){
 
 	echo "Updating metadata fields\n";
 	exec("php update_metadata.php");
-	
+
 	echo "Updating Settings File\n";
 	$output = array();
 	exec("php create_new_settings.php", $output);
@@ -177,12 +177,68 @@ function generalmenu($questions = array(), $validresponses = array()){
 
 function addNewDefaults(){
 	global $custdb;
-	
+
 	echo "Adding new default values\n";
-	
+
+	mysql_query("BEGIN");
+
 	$query = "INSERT INTO `jobtype` (name, systempriority, info, issurvey,deleted) VALUES ('Survey',3,'Surveys',1,0)";
 	mysql_query($query, $custdb)
 		or die("Failed to run this query: " . $query . "\n, with this error " . mysql_error($custdb));
+
+	$res = mysql_query("select value from setting where name = 'maxphones'", $custdb);
+	$row = mysql_fetch_row($res);
+	if($row[0]){
+		$maxphones = $row[0];
+	} else {
+		$maxphones = 3;
+	}
+
+	$res = mysql_query("select value from setting  where name = 'maxemails'", $custdb);
+	$row = mysql_fetch_row($res);
+	if($row[0]){
+			$maxemails = $row[0];
+		} else {
+			$maxemails = 2;
+	}
+
+	$res = mysql_query("select id, systempriority from jobtype where not deleted", $custdb);
+	$jobtypes= array();
+	while($row = mysql_fetch_row($res)){
+		$jobtypes[$row[0]] = $row[1];
+	}
+
+	$desttype = array("phone" => $maxphones,
+						"email" => $maxemails);
+	$values = array();
+	foreach($desttype as $type => $max){
+		foreach($jobtypes as $index => $jobtypepriority){
+				mysql_query("delete from jobtypepref where jobtypeid = '" . $index . "'", $custdb);
+			for($i=0; $i < $max; $i++){
+				$enabled = 0;
+				switch($jobtypepriority){
+					case "1":
+						$enabled = 1;
+						break;
+					default:
+						if($i < 1)
+							$enabled = 1;
+						else
+							$enabled = 0;
+						break;
+				}
+				$values[] = "('" . $index . "','" . $type . "','" . $i . "','" . $enabled . "')";
+			}
+		}
+	}
+	mysql_query("INSERT INTO jobtypepref (jobtypeid, type, sequence, enabled) VALUES ". implode(",", $values), $custdb);
+
+	mysql_query("UPDATE jobtype set info = 'General Announcements' where not deleted and not issurvey and systempriority = '3'");
+	mysql_query("UPDATE jobtype set info = 'Time Critical Announcements' where not deleted and not issurvey and systempriority = '2'");
+	mysql_query("UPDATE jobtype set info = 'Emergencies Only' where not deleted and not issurvey and systempriority = '1'");
+	mysql_query("UPDATE jobtype set info = 'Surveys' where not deleted and issurvey and systempriority = '3'");
+
+	mysql_query("COMMIT");
 
 }
 ?>
