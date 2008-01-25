@@ -1,6 +1,6 @@
 <?
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-$isldap="false";
+$is_ldap="false";
 if($SETTINGS['ldap']['is_ldap']){
 	$is_ldap="true";
 }
@@ -118,7 +118,7 @@ function replaceSection($fileLines, $sectionName, $linesToAdd){
 	echo "Replacing Section: " . $sectionName . " with these lines:\n";
 	echoarray($linesToAdd);
 	echo "\n";
-	
+
 	$lineToReplace = findSection($fileLines, $sectionName);
 	if($lineToReplace == null)
 		return $fileLines;
@@ -133,7 +133,7 @@ function echoarray($someArray){
 	}
 }
 
-//takes an array of strings and a file pointer and 
+//takes an array of strings and a file pointer and
 //writes each string on a new line
 function writearray($someArray, $fp){
 	foreach($someArray as $line){
