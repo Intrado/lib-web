@@ -91,7 +91,7 @@ executeSqlFile("commsuite.sql", true);
 
 mysql_query("INSERT INTO `shard` VALUES (1,'commsuite','commsuite','localhost','" . $dbuser ."','" . $dbpass ."')");
 
-mysql_query("INSERT INTO `customer` VALUES (1,1,'default','','" . $dbuser ."','" . $dbpass . "','','2007-08-23 18:49:30',1)");
+mysql_query("INSERT INTO `customer` VALUES (1,1,'default','0000000000','" . $dbuser ."','" . $dbpass . "','','2007-08-23 18:49:30',1)");
 
 if($type == "new"){
 	executeSqlFile("commsuitedefaults.sql");
