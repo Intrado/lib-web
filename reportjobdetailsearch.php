@@ -63,11 +63,11 @@ if(isset($_GET['reportid'])){
 		redirect('unauthorized.php');
 	}
 	$_SESSION['reportid'] = $_GET['reportid']+0;
-	
+
 	$subscription = new ReportSubscription($_SESSION['reportid']+0);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
-	
+
 	$_SESSION['report']['type']="phone";
 	if(isset($options['reporttype'])){
 		if($options['reporttype']=="emaildetail")
@@ -91,7 +91,7 @@ if(isset($_GET['reportid'])){
 	$_SESSION['saved_report'] = true;
 	$_SESSION['report']['options'] = $options;
 	redirect();
-} 
+}
 
 $options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 
@@ -135,28 +135,60 @@ foreach($jobtypeobjs as $jobtype){
 $ordercount = 3;
 $ordering = JobDetailReport::getOrdering();
 
-if($_SESSION['report']['type'] == "phone"){
-	$results = array("A" => "Answered",
-					"M" => "Machine",
-					"N" => "No Answer",
-					"B" => "Busy",
-					"F" => "Unknown",
-					"X" => "Disconnected",
-					"duplicate" => "Duplicate",
-					"blocked" => "Blocked",
-					"notattempted" => "Not Attempted");
-} else if($_SESSION['report']['type'] == "notcontacted"){
-	$results = array("N" => "No Answer",
-					"B" => "Busy",
-					"F" => "Unknown",
-					"X" => "Disconnected",
-					"blocked" => "Blocked",
-					"notattempted" => "Not Attempted",
-					"unsent" => "Unsent");
-} else {
-	$results = array("sent" => "Sent",
-					"unsent" => "Unsent");
+switch($_SESSION['report']['type']){
+	case "phone":
+		$results = array("A" => "Answered",
+							"M" => "Machine",
+							"N" => "No Answer",
+							"B" => "Busy",
+							"F" => "Unknown",
+							"X" => "Disconnected",
+							"duplicate" => "Duplicate",
+							"blocked" => "Blocked",
+							"notattempted" => "Not Attempted",
+							"declined" => "No Phone Selected");
+		break;
+
+	case "notcontacted":
+		$results = array("N" => "No Answer",
+						"B" => "Busy",
+						"F" => "Unknown",
+						"X" => "Disconnected",
+						"blocked" => "Blocked",
+						"notattempted" => "Not Attempted",
+						"unsent" => "Unsent",
+						"declined" => "No Destination Selected");
+		break;
+	case "email":
+		$results = array("sent" => "Sent",
+						"unsent" => "Unsent",
+						"duplicate" => "Duplicate",
+						"declined" => "No Email Selected");
+
+		break;
+	case "sms":
+		$results = array("sent" => "Sent",
+						"unsent" => "Unsent",
+						"duplicate" => "Duplicate",
+						"declined" => "No SMS Selected");
+		break;
+	default:
+		$results = array("A" => "Answered",
+							"M" => "Machine",
+							"N" => "No Answer",
+							"B" => "Busy",
+							"F" => "Unknown",
+							"X" => "Disconnected",
+							"duplicate" => "Duplicate",
+							"blocked" => "Blocked",
+							"notattempted" => "Not Attempted",
+							"sent" => "Sent",
+							"unsent" => "Unsent",
+							"duplicate" => "Duplicate",
+							"declined" => "No Destination Selected");
+		break;
 }
+
 
 $f="reports";
 $s="jobs";
@@ -173,10 +205,10 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 	{
 		MergeSectionFormData($f, $s);
 		//do check
-		
+
 		$startdate = GetFormData($f, $s, "startdate");
 		$enddate = GetFormData($f, $s, "enddate");
-		
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
@@ -188,7 +220,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		} else if(GetFormData($f, $s, "radioselect") == "job" && !GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
 			error("You must pick a job");
 		} else {
-			$options['reporttype'] = "phonedetail";	
+			$options['reporttype'] = "phonedetail";
 			if($_SESSION['report']['type'] == "email"){
 				$options['reporttype'] = "emaildetail";
 			}else if($_SESSION['report']['type'] == "notcontacted"){
@@ -196,7 +228,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			}else if($_SESSION['report']['type'] == "sms"){
 				$options['reporttype'] = "smsdetail";
 			}
-				
+
 			$radio = GetFormData($f, $s, "radioselect");
 			switch($radio){
 				case "job":
@@ -215,7 +247,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					unset($options['jobid']);
 					unset($options['archived']);
 					$options['reldate'] = GetFormData($f, $s, "relativedate");
-			
+
 					if($options['reldate'] == "xdays"){
 						$options['lastxdays'] = GetFormData($f, $s, "xdays");
 					} else if($options['reldate'] == "daterange"){
@@ -224,7 +256,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					}
 					break;
 			}
-			
+
 			$savedjobtypes = GetFormData($f, $s, 'jobtypes');
 			if($savedjobtypes){
 				$temp = array();
@@ -233,7 +265,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$options['jobtypes'] = implode("','", $temp);
 			}else
 				$options['jobtypes'] = "";
-			
+
 			$savedresults = GetFormData($f, $s, "results");
 			if($savedresults){
 				$temp = array();
@@ -245,7 +277,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			for($i=1; $i<=$ordercount; $i++){
 				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
 			}
-			
+
 			if($rule = getRuleFromForm($f, $s)){
 				if(!isset($options['rules']))
 					$options['rules'] = array();
@@ -253,14 +285,14 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$rule->id = array_search($rule, $options['rules']);
 				$options['rules'][$rule->id] = $rule;
 			}
-			
+
 			foreach($options as $index => $option){
 				if($option == "")
 					unset($options[$index]);
 			}
-			
+
 			$_SESSION['report']['options'] = $options;
-			
+
 			if(CheckFormSubmit($f, "save")){
 				$activefields = array();
 				foreach($fieldlist as $field){
@@ -268,7 +300,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 						$activefields[] = $field->fieldnum;
 					}
 				}
-			
+
 				$options['activefields'] = implode(",",$activefields);
 				$_SESSION['report']['options'] = $options;
 				ClearFormData($f);
@@ -324,7 +356,7 @@ if($reload){
 	}
 	PutFormData($f, $s, 'jobtype', isset($options['jobtypes']) && $options['jobtypes'] !="" ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, 'jobtypes', $savedjobtypes, "array", array_keys($jobtypes));
-	
+
 	for($i=1;$i<=$ordercount;$i++){
 		$order="order$i";
 		if($i==1){
@@ -340,7 +372,7 @@ if($reload){
 			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
 		}
 	}
-	
+
 	PutFormData($f,$s,"newrulefieldnum","");
 	PutFormData($f,$s,"newruletype","text","text",1,50);
 	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
@@ -397,7 +429,7 @@ startWindow("Select", NULL, false);
 					<td>
 <?
 					dateOptions($f, $s, "daterange");
-?>	
+?>
 					</td>
 				</tr>
 				<tr>
@@ -409,7 +441,7 @@ startWindow("Select", NULL, false);
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 									NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
 									$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and j.questionnaireid is null $userJoin order by id desc");
-							
+
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
 									}
@@ -426,11 +458,11 @@ startWindow("Select", NULL, false);
 								<td aligh="left"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
 								Show archived jobs</td>
 							</tr>
-							
+
 						</table>
 					</td>
 				</tr>
-				
+
 			</table>
 		</td>
 	</tr>
@@ -442,10 +474,10 @@ startWindow("Select", NULL, false);
 						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
 							<tr>
 								<td>
-								<? 
+								<?
 									//$RULES declared above
 									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-									
+
 									include("ruleeditform.inc.php");
 								?>
 								</td>
@@ -490,7 +522,7 @@ startWindow("Select", NULL, false);
 						</table>
 					</td>
 				</tr>
-				
+
 			</table>
 		</td>
 	</tr>
