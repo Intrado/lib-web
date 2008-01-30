@@ -168,11 +168,13 @@ class JobSummaryReport extends ReportGenerator{
 		$urloptions = $url . "&valid=$validstamp";
 
 		// DISPLAY
-		startWindow("Filter by");
+
+		if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
+
+			startWindow("Filter by");
 ?>
-		<table>
+			<table>
 <?
-			if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
 				$jobtypes = explode("','", $this->params['jobtypes']);
 				$jobtypenames = array();
 				foreach($jobtypes as $jobtype){
@@ -182,14 +184,13 @@ class JobSummaryReport extends ReportGenerator{
 				$jobtypenames = implode(", ",$jobtypenames);
 ?>
 				<tr><td>Job Type: <?=$jobtypenames?></td></tr>
-<?
-			}
-?>
-			</table>
-		<?
-		endWindow();
 
-		?><br><?
+			</table>
+<?
+			endWindow();
+
+			?><br><?
+		}
 
 		displayJobSummary($this->params['joblist']);
 		?><br><?

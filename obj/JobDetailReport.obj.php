@@ -60,7 +60,7 @@ class JobDetailReport extends ReportGenerator{
 				$resultquery = " and rc.result in ('" . $this->params['result'] . "')";
 			}
 		}
-		
+
 		if(isset($this->params['status']) && $this->params['status']){
 			if($this->params['status'] == "completed")
 				$resultquery .= " and rp.status in ('success', 'fail', 'duplicate')";
@@ -166,42 +166,44 @@ class JobDetailReport extends ReportGenerator{
 
 		// DISPLAY
 
+		if( (isset($this->params['jobtypes']) && $this->params['jobtypes'] != "") || (isset($this->params['result']) && $this->params['result'] != "") || count($searchrules)){
 			startWindow("Filter By");
 ?>
-		<table>
+			<table>
 <?
-			if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
-				$jobtypes = explode("','", $this->params['jobtypes']);
-				$jobtypenames = array();
-				foreach($jobtypes as $jobtype){
-					$jobtypeobj = new JobType($jobtype);
-					$jobtypenames[] = $jobtypeobj->name;
+				if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
+					$jobtypes = explode("','", $this->params['jobtypes']);
+					$jobtypenames = array();
+					foreach($jobtypes as $jobtype){
+						$jobtypeobj = new JobType($jobtype);
+						$jobtypenames[] = $jobtypeobj->name;
+					}
+					$jobtypenames = implode(", ",$jobtypenames);
+?>
+					<tr><td>Job Type: <?=$jobtypenames?></td></tr>
+<?
 				}
-				$jobtypenames = implode(", ",$jobtypenames);
+				if(isset($this->params['result']) && $this->params['result'] != ""){
+					$results = explode("','",$this->params['result']);
+					$resultnames = array();
+					foreach($results as $result)
+						$resultnames[] = fmt_result(array($result), 0);
+					$resultnames = implode(", ", $resultnames);
 ?>
-				<tr><td>Job Type: <?=$jobtypenames?></td></tr>
+					<tr><td>Results: <?=$resultnames?></td></tr>
 <?
-			}
-			if(isset($this->params['result']) && $this->params['result'] != ""){
-				$results = explode("','",$this->params['result']);
-				$resultnames = array();
-				foreach($results as $result)
-					$resultnames[] = fmt_result(array($result), 0);
-				$resultnames = implode(", ", $resultnames);
-?>
-				<tr><td>Results: <?=$resultnames?></td></tr>
-<?
-			}
+				}
 
-			foreach($searchrules as $rule){
-				?><tr><td><?=$rule?></td></tr><?
-			}
+				foreach($searchrules as $rule){
+					?><tr><td><?=$rule?></td></tr><?
+				}
 ?>
-			</table>
-		<?
-		endWindow();
+				</table>
+			<?
+			endWindow();
 
-		?><br><?
+			?><br><?
+		}
 
 		displayJobSummary($this->params['joblist']);
 
@@ -273,7 +275,7 @@ class JobDetailReport extends ReportGenerator{
 				}
 			}
 		}
-		
+
 		// find the f-fields the same way as the query did
 		// strip off the f, use the field number as the index and
 		// it's position as the offset
@@ -322,7 +324,7 @@ class JobDetailReport extends ReportGenerator{
 
 
 			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],format_delivery_type($row[5]),$row[7],$row[11],$row[8],$row[9]);
-		
+
 			//index 13 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
@@ -345,7 +347,7 @@ class JobDetailReport extends ReportGenerator{
 					$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
 				}
 			}
-			
+
 			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
 		}
 	}
@@ -363,9 +365,9 @@ class JobDetailReport extends ReportGenerator{
 		$joblist = array();
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
-				
+
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
-		
+
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange,
