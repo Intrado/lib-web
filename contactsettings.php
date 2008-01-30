@@ -65,7 +65,9 @@ startWindow("Options", 'padding: 3px;');
 				<table>
 					<tr><td><a href='activationcodemanager.php?clear=1'>Manage Activation Codes</a></td></tr>
 					<tr><td>&nbsp;</td></tr>
+<? if(getSystemSetting('_hassms', false)){ ?>
 					<tr><td>&nbsp;</td></tr>
+<? } ?>
 				</table>
 			</td>
 <?
