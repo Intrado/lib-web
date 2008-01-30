@@ -36,7 +36,7 @@ if (!$USER->authorize('createreport')) {
 
 
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
-					
+
 if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['reportid']);
 	unset($_SESSION['report']['options']);
@@ -64,7 +64,7 @@ $activefields = array();
 foreach($fields as $field){
 	// used in pdf,csv
 	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
-		$activefields[] = $field->fieldnum; 
+		$activefields[] = $field->fieldnum;
 	}
 }
 $options['activefields'] = implode(",",$activefields);
@@ -87,7 +87,8 @@ $results = array("A" => "Answered",
 					"blocked" => "Blocked",
 					"notattempted" => "Not Attempted",
 					"sent" => "Sent",
-					"unset" => "Unsent");
+					"unset" => "Unsent",
+					"declined" => "No Destination Selected");
 
 $f = "report";
 $s = "personnotify";
@@ -103,7 +104,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 	else
 	{
 		MergeSectionFormData($f, $s);
-		
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime(GetFormData($f, $s, 'startdate'))){
@@ -119,16 +120,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 			$options['personid'] = GetFormData($f, $s, 'personid');
 			$options['phone'] = Phone::parse(GetFormData($f, $s, 'phone'));
 			$options['email'] = GetFormData($f, $s, 'email');
-			
+
 			$options['reldate'] = GetFormData($f, $s, "relativedate");
-			
+
 			if($options['reldate'] == "xdays"){
 				$options['lastxdays'] = GetFormData($f, $s, "xdays");
 			} else if($options['reldate'] == "daterange"){
 				$options['startdate'] = GetFormData($f, $s, 'startdate');
 				$options['enddate'] = GetFormData($f, $s, 'enddate');
 			}
-			
+
 			$savedjobtypes = GetFormData($f, $s, 'jobtypes');
 			if($savedjobtypes){
 				$temp = array();
@@ -137,7 +138,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 				$options['jobtypes'] = implode("','", $temp);
 			}else
 				$options['jobtypes'] = "";
-			
+
 			$savedresults = GetFormData($f, $s, "results");
 			if($savedresults){
 				$temp = array();
@@ -146,7 +147,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 				$options['results'] = implode("','", $temp);
 			}else
 				$options['results'] = "";
-			
+
 			if($rule = getRuleFromForm($f, $s)){
 				if(!isset($options['rules']))
 					$options['rules'] = array();
@@ -154,13 +155,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 				$rule->id = array_search($rule, $options['rules']);
 				$options['rules'][$rule->id] = $rule;
 			}
-			
+
 			foreach($options as $index => $option){
 				if($option == "")
 					unset($options[$index]);
 			}
 			$_SESSION['report']['options'] = $options;
-			
+
 			if(CheckFormSubmit($f, "save")){
 				ClearFormData($f);
 				redirect("reportedit.php");
@@ -185,7 +186,7 @@ if($reload){
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? Phone::format($options['phone']) : "", 'phone', "7", "10");
 	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
-	
+
 	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : "");
 	PutFormData($f, $s, 'enddate', isset($options['enddate']) ? $options['enddate'] : "");
 	$savedjobtypes = array();
@@ -198,10 +199,10 @@ if($reload){
 	if(isset($options['result'])){
 		$result = explode("','", $options['result']);
 	}
-	
+
 	PutFormData($f, $s, 'result', isset($options['result']) && $options['result'] !="" ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, 'results', $result , "array", array_keys($results));
-	
+
 	PutFormData($f,$s,"newrulefieldnum","");
 	PutFormData($f,$s,"newruletype","text","text",1,50);
 	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
@@ -209,7 +210,7 @@ if($reload){
 	PutFormData($f,$s,"newruleoperator_text","sw","text",1,50);
 	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
 }
-	
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -240,20 +241,20 @@ startWindow("Person Notification Search", "padding: 3px;");
 			<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '15'); ?></td></tr>
 			<tr><td>Email Address: </td><td><? NewFormItem($f, $s, 'email', 'text', '20', '100'); ?></td></tr>
 		</table>
-		
+
 	</td>
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter by:<br><?=help("ContactHistory_Filter")?></th>
 	<td class="bottomBorder">
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr>
 				<td><br>
-					<? 
+					<?
 						if(!isset($_SESSION['reportrules']) || is_null($_SESSION['reportrules']))
 							$_SESSION['reportrules'] = false;
-						
+
 						//$RULES declared above
 						$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-						
+
 						include("ruleeditform.inc.php");
 					?>
 				<br></td>
@@ -295,7 +296,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 	</td>
 	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:,<br><?=help('ContactHistory_DisplayFields')?></th>
 		<td class="bottomBorder">
-<? 		
+<?
 			select_metadata(null, null, $fields);
 ?>
 		</td>
