@@ -318,7 +318,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 
 <tr>
 	<td>Logo:</td>
-	<td><img src='customerlogo.img.php'></td>
+	<td><img src='customerlogo.img.php?id=<?=$currentid?>'></td>
 </tr>
 <tr>
 	<td>New Logo:</td>
