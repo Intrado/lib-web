@@ -74,6 +74,17 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managernote = GetFormData($f, $s, 'managernote');
 			$hassms = GetFormData($f, $s, 'hassms');
 			$maxsms = GetFormData($f, $s, 'maxsms');
+			if(isset($_FILES['uploadlogo']) && $_FILES['uploadlogo']['tmp_name']) {
+
+				$newname = secure_tmpname("uploadlogo",".img");
+				if(!move_uploaded_file($_FILES['uploadlogo']['tmp_name'],$newname)) {
+					error('Unable to complete file upload. Please try again');
+				} else if (!is_file($newname) || !is_readable($newname)) {
+					error('Unable to complete file upload. Please try again');
+				} else if($newlogofile = @file_get_contents($newname)) {
+					error('New logo file upload failed');
+				}
+			}
 
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
@@ -140,7 +151,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
-				
+
 
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
@@ -151,9 +162,20 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 						QuickUpdate("update language set name='" . GetFormData($f, $s, $lang) . "' where id = '" . $oldlanguage . "'", $custdb);
 					}
 				}
+
 				if(GetFormData($f,$s, "newlang")!=""){
 					QuickUpdate("insert into language(name) values ('" . GetFormData($f, $s, "newlang") . "')", $custdb);
 				}
+
+				if(isset($newlogofile)){
+					QuickUpdate("INSERT INTO content (contenttype, data) values
+								('" . $_FILES['uploadlogo']['type'] . "', '" . base64_encode($newlogofile) . "')", $custdb);
+					$logocontentid = mysql_insert_id($custdb);
+					setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);
+				}
+
+				setCustomerSystemSetting('_productname', GetFormData($f, $s, 'productname'), $custdb);
+
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
@@ -219,6 +241,11 @@ if( $reloadform ) {
 	PutformData($f, $s, "managerpassword", "", "text");
 
 	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
+
+	PutFormData($f,$s,'productname', getcustomerSystemSetting('_productname', "", true, $custdb), "text", 0, 255, true);
+
+
+
 	PutFormData($f,"Save","Save", "");
 	PutFormData($f,"Return","Save and Return", "");
 }
@@ -288,6 +315,21 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 ?>
 <td></tr>
 <tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
+
+<tr>
+	<td>Logo:</td>
+	<td><img src='customerlogo.img.php'></td>
+</tr>
+<tr>
+	<td>New Logo:</td>
+	<td><input type='file' name='uploadlogo' size='30'></td>
+</tr>
+
+<tr>
+	<td>ProductName:</td>
+	<td><? NewFormItem($f,$s,'productname', 'text', 30, 255)?></td>
+</tr>
+
 
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
