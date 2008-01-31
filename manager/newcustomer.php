@@ -283,7 +283,7 @@ if( $reloadform ){
 
 	ClearFormData($f);
 
-	PutFormData($f,$s,'name',"","text",1,50);
+	PutFormData($f,$s,'name',"","text",1,50, true);
 	PutFormData($f,$s,'hostname',"","text",5,255, true);
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
