@@ -77,7 +77,6 @@ function copytable ($custid,$table,$fields,$source,$dest,$batch,$joincustomer = 
  } while ($row);
 }
 
-
 function parseOptions ($options) {
   $temparray = explode(",",$options);
   $optionsarray = array();
@@ -250,18 +249,40 @@ copytable($customerid,"audiofile",array("id", "userid", "name", "description", "
 //BLOCKEDNUMBER
 copytable($customerid,"blockednumber",array("id","userid","description","pattern"),$db,$custdb,1000,false);
 
-//CONTENT (audio files)
-$join = "
+//CONTENT (audio files and voice reply)
+$query = "
+(select distinct content.id from content
 inner join audiofile on (contentid=content.id)
-inner join user u on (userid=u.id and u.customerid=$customerid)";
-$groupby = " group by contentid ";
-copytable($customerid,"content",array("id","contenttype","data"),$db,$custdb,1,$join, $groupby);
-
-//CONTENT (voice reply)
-$join = "
+inner join user u on (userid=u.id and u.customerid=$customerid)
+)
+union
+(select distinct content.id from content
 inner join voicereply on (contentid=content.id)
-inner join user u on (userid=u.id and u.customerid=$customerid)";
-copytable($customerid,"content",array("id","contenttype","data"),$db,$custdb,1,$join);
+inner join user u on (userid=u.id and u.customerid=$customerid)
+)
+";
+
+$sourceres = mysql_query($query,$db)
+	or die ("Failed to query $table :" . mysql_error($source));
+
+$contentids = array();
+while ($row = mysql_fetch_row($sourceres)) {
+	$contentids[] = $row[0];
+}
+
+$contentids = array_unique($contentids);
+
+foreach ($contentids as $contentid) {
+	$query = "select id,contenttype,data from content where id=$contentid";
+	$sourceres = mysql_query($query,$db)
+		or die ("Failed to query $table :" . mysql_error($source));
+
+	$row = mysql_fetch_row($sourceres);
+
+	$ins = "insert into content (id,contenttype,data) values (". escrow($row,$custdb) . ")";
+	mysql_query($ins,$custdb)
+   	 or die ("Failed to insert into content :" . mysql_error($custdb));
+}
 
 //EMAIL
 $join = "inner join person p on (personid = p.id and p.customerid=$customerid)";
