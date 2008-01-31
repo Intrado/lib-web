@@ -39,9 +39,15 @@ function genpassword() {
 ////////////////////////////////////////////////////////////////////////////////
 
 $defaultbrands = array(
-					"AutoMessenger" => "img/auto_messenger.gif",
-					"SchoolMessenger" => "img/school_messenger.gif",
-					"SkyAlert" => "img/sky_alert.gif"
+					"AutoMessenger" =>
+										array("filelocation" => "img/auto_messenger.jpg",
+										"filetype" => "jpg"),
+					"SchoolMessenger" =>
+										array("filelocation" => "img/school_messenger.gif",
+										"filetype" => "gif"),
+					"SkyAlert" =>
+										array("filelocation" => "img/sky_alert.gif",
+										"filetype" => "gif")
 					);
 
 $f = "customer";
@@ -69,7 +75,7 @@ if (CheckFormSubmit($f,$s)){
 			$managerpassword = GetFormData($f, $s, "managerpassword");
 			$shard = GetFormData($f,$s,'shard')+0;
 			$defaultbrand = GetFormData($f, $s, "logo");
-			$logofile = @file_get_contents($defaultbrands[$defaultbrand]);
+			$logofile = @file_get_contents($defaultbrands[$defaultbrand]['filelocation']);
 
 			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."'")) {
 				error('URL Path Already exists', 'Please Enter Another');
@@ -242,11 +248,10 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 
 				// Brand/LOGO Info
-				$defaultbrand = GetFormData($f, $s, "logo");
-				$logofile = file_get_contents($defaultbrands[$defaultbrand]);
+
 				if($logofile){
 					$query = "INSERT INTO `content` (`contenttype`, `data`) VALUES
-								('gif', '" . base64_encode($logofile) . "');";
+								('" . $defaultlogos[$defaultlogo]["filetype"] . "', '" . base64_encode($logofile) . "');";
 					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 					$logoid = mysql_insert_id();
 
@@ -305,13 +310,16 @@ NewFormItem($f, $s,"", 'submit');
 <tr>
 	<td>Logo/Brand:</td>
 	<td>
+		<table>
 		<?
-			NewFormItem($f, $s, "logo", "selectstart");
-			foreach($defaultbrands as $brand => $logo){
-				NewFormItem($f, $s, "logo", "selectoption", $brand, $brand);
+			foreach($defaultbrands as $brand => $logoinfo){
+				?><tr><td><?
+				NewFormItem($f, $s, "logo", "radio", null, $brand, "id='$brand'");
+				?><img src="<?=$logoinfo['filelocation']?>" onclick="new getObj('<?=$brand?>').obj.checked=true" /><?
+				?></td></tr><?
 			}
-			NewFormItem($f, $s, "logo", "selectend");
 		?>
+		</table>
 	</td>
 </tr>
 
