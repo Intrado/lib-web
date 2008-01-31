@@ -1,8 +1,8 @@
 <?
 include_once('common.inc.php');
 
-if(isset($_SESSION['currentid'])) {
-	$currentid = $_SESSION['currentid'];
+if(isset($_GET['id'])) {
+	$currentid = $_GET['id']+0;
 	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custinfo = mysql_fetch_row($custquery);
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
