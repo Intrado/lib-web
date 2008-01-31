@@ -41,13 +41,13 @@ function genpassword() {
 $defaultbrands = array(
 					"AutoMessenger" =>
 										array("filelocation" => "img/auto_messenger.jpg",
-										"filetype" => "jpg"),
+										"filetype" => "image/jpg"),
 					"SchoolMessenger" =>
 										array("filelocation" => "img/school_messenger.gif",
-										"filetype" => "gif"),
+										"filetype" => "image/gif"),
 					"SkyAlert" =>
 										array("filelocation" => "img/sky_alert.gif",
-										"filetype" => "gif")
+										"filetype" => "image/gif")
 					);
 
 $f = "customer";
@@ -256,7 +256,7 @@ if (CheckFormSubmit($f,$s)){
 
 				if($logofile && $defaultbrand != "Other"){
 					$query = "INSERT INTO `content` (`contenttype`, `data`) VALUES
-								('" . $defaultlogos[$defaultlogo]["filetype"] . "', '" . base64_encode($logofile) . "');";
+								('" . $defaultbrands[$defaultbrand]["filetype"] . "', '" . base64_encode($logofile) . "');";
 					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 					$logoid = mysql_insert_id();
 
@@ -283,7 +283,7 @@ if( $reloadform ){
 
 	ClearFormData($f);
 
-	PutFormData($f,$s,'name',"","text",1,50, true);
+	PutFormData($f,$s,'name',"","text",1,50);
 	PutFormData($f,$s,'hostname',"","text",5,255, true);
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
