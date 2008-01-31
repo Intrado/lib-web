@@ -38,6 +38,12 @@ function genpassword() {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$defaultbrands = array(
+					"AutoMessenger" => "img/auto_messenger.gif",
+					"SchoolMessenger" => "img/school_messenger.gif",
+					"SkyAlert" => "img/sky_alert.gif"
+					);
+
 $f = "customer";
 $s = "main";
 
@@ -62,6 +68,8 @@ if (CheckFormSubmit($f,$s)){
 			$hostname = GetFormData($f, $s, "hostname");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
 			$shard = GetFormData($f,$s,'shard')+0;
+			$defaultbrand = GetFormData($f, $s, "logo");
+			$logofile = @file_get_contents($defaultbrands[$defaultbrand]);
 
 			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."'")) {
 				error('URL Path Already exists', 'Please Enter Another');
@@ -69,6 +77,8 @@ if (CheckFormSubmit($f,$s)){
 				error('Bad Manager Password');
 			} else if (!$shard){
 				error('A shard needs to be chosen');
+			} else if(!$logofile){
+				error('Logo File Read error occured');
 			} else {
 
 				//choose shard info based on selection
@@ -229,7 +239,23 @@ if (CheckFormSubmit($f,$s)){
 							('spanish', 'male'),
 							('spanish', 'female')";
 
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_erryr() . " SQL: " . $query);
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
+
+				// Brand/LOGO Info
+				$defaultbrand = GetFormData($f, $s, "logo");
+				$logofile = file_get_contents($defaultbrands[$defaultbrand]);
+				if($logofile){
+					$query = "INSERT INTO `content` (`contenttype`, `data`) VALUES
+								('gif', '" . base64_encode($logofile) . "');";
+					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
+					$logoid = mysql_insert_id();
+
+					$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+								('_logocontentid', '" . $logoid . "'),
+								('_brandname', '" . DBSafe($defaultbrand) . "')";
+					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
+				}
+
 
 				redirect("customeredit.php?id=" . $customerid);
 
@@ -249,6 +275,7 @@ if( $reloadform ){
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "");
+	PutFormData($f,$s,'logo', "AutoMessenger", "test", "nomin", "nomax", true);
 }
 
 include_once("nav.inc.php");
@@ -274,6 +301,19 @@ NewFormItem($f, $s,"", 'submit');
 	NewFormItem($f, $s, 'timezone', "selectend");
 ?>
 </td></tr>
+
+<tr>
+	<td>Logo/Brand:</td>
+	<td>
+		<?
+			NewFormItem($f, $s, "logo", "selectstart");
+			foreach($defaultbrands as $brand => $logo){
+				NewFormItem($f, $s, "logo", "selectoption", $brand, $brand);
+			}
+			NewFormItem($f, $s, "logo", "selectend");
+		?>
+	</td>
+</tr>
 
 <tr><td>Shard: </td><td>
 <?
