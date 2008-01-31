@@ -74,8 +74,13 @@ if (CheckFormSubmit($f,$s)){
 			$hostname = GetFormData($f, $s, "hostname");
 			$managerpassword = GetFormData($f, $s, "managerpassword");
 			$shard = GetFormData($f,$s,'shard')+0;
+			$defaultproductname = GetformData($f, $s, "productname");
 			$defaultbrand = GetFormData($f, $s, "logo");
-			$logofile = @file_get_contents($defaultbrands[$defaultbrand]['filelocation']);
+			if($defaultbrand != "Other"){
+				$logofile = @file_get_contents($defaultbrands[$defaultbrand]['filelocation']);
+			} else {
+				$logofile = true;
+			}
 
 			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."'")) {
 				error('URL Path Already exists', 'Please Enter Another');
@@ -84,7 +89,7 @@ if (CheckFormSubmit($f,$s)){
 			} else if (!$shard){
 				error('A shard needs to be chosen');
 			} else if(!$logofile){
-				error('Logo File Read error occured');
+				error('Logo file read error occured, make sure you selected a logo');
 			} else {
 
 				//choose shard info based on selection
@@ -249,17 +254,20 @@ if (CheckFormSubmit($f,$s)){
 
 				// Brand/LOGO Info
 
-				if($logofile){
+				if($logofile && $defaultbrand != "Other"){
 					$query = "INSERT INTO `content` (`contenttype`, `data`) VALUES
 								('" . $defaultlogos[$defaultlogo]["filetype"] . "', '" . base64_encode($logofile) . "');";
 					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 					$logoid = mysql_insert_id();
 
 					$query = "INSERT INTO `setting` (`name`, `value`) VALUES
-								('_logocontentid', '" . $logoid . "'),
-								('_brandname', '" . DBSafe($defaultbrand) . "')";
+								('_logocontentid', '" . $logoid . "')";
 					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 				}
+
+				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+								('_productname', '" . DBSafe($defaultproductname) . "')";
+					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 
 
 				redirect("customeredit.php?id=" . $customerid);
@@ -275,12 +283,13 @@ if( $reloadform ){
 
 	ClearFormData($f);
 
-	PutFormData($f,$s,'name',"","text",1,50);
-	PutFormData($f,$s,'hostname',"","text",5,255);
+	PutFormData($f,$s,'name',"","text",1,50, true);
+	PutFormData($f,$s,'hostname',"","text",5,255, true);
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "");
-	PutFormData($f,$s,'logo', "AutoMessenger", "test", "nomin", "nomax", true);
+	PutFormData($f,$s,'logo', null, null, null, null);
+	PutFormData($f,$s,'productname', "", "text", null, 255);
 }
 
 include_once("nav.inc.php");
@@ -308,19 +317,40 @@ NewFormItem($f, $s,"", 'submit');
 </td></tr>
 
 <tr>
-	<td>Logo/Brand:</td>
+	<td>Logo:</td>
 	<td>
 		<table>
 		<?
 			foreach($defaultbrands as $brand => $logoinfo){
-				?><tr><td><?
-				NewFormItem($f, $s, "logo", "radio", null, $brand, "id='$brand'");
-				?><img src="<?=$logoinfo['filelocation']?>" onclick="new getObj('<?=$brand?>').obj.checked=true" /><?
-				?></td></tr><?
+				?>
+				<tr>
+					<td>
+						<?
+						NewFormItem($f, $s, "logo", "radio", null, $brand, "id='$brand'");
+						?>
+					</td>
+					<td><img src="<?=$logoinfo['filelocation']?>" onclick="new getObj('<?=$brand?>').obj.checked=true; new getObj('productname').obj.value='<?=$brand?>'" /></td>
+				</tr>
+				<?
 			}
 		?>
+			<tr>
+				<td>
+					<?
+						NewFormItem($f, $s, "logo", "radio", null, "Other", "id='other'");
+					?>
+				</td>
+				<td>
+					<div onclick="new getObj('other').obj.checked=true; new getObj('productname').obj.value='Other'">Other</div>
+				</td>
+			</tr>
 		</table>
 	</td>
+</tr>
+
+<tr>
+	<td>Brand:</td>
+	<td><? NewFormItem($f, $s, "productname", "text", 30, 255, "id='productname'"); ?></td>
 </tr>
 
 <tr><td>Shard: </td><td>
