@@ -290,5 +290,24 @@ function revokePersonTokens($personids) {
 	return false;
 }
 
+function getCustomerScheme($url){
+
+	$params = array(new XML_RPC_Value($url, 'string'));
+	$method = "AuthServer.getCustomerScheme";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['schememap'];
+	}
+	return false;
+
+	/*
+	$row = QuickQueryRow("select c.contenttype, c.data from content c inner join setting s on (s.value = c.id) where s.name = '_logocontentid'");
+	$map = array("customerLogo" => $row[1],
+				"contentType" => $row[0]);
+	return $map;
+	//return false;
+	*/
+}
 
 ?>
