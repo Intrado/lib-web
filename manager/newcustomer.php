@@ -46,8 +46,8 @@ $defaultbrands = array(
 										array("filelocation" => "img/school_messenger.gif",
 										"filetype" => "image/gif"),
 					"SkyAlert" =>
-										array("filelocation" => "img/sky_alert.gif",
-										"filetype" => "image/gif")
+										array("filelocation" => "img/sky_alert.jpg",
+										"filetype" => "image/jpg")
 					);
 
 $f = "customer";
@@ -289,7 +289,7 @@ if( $reloadform ){
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "");
 	PutFormData($f,$s,'logo', null, null, null, null);
-	PutFormData($f,$s,'productname', "", "text", null, 255);
+	PutFormData($f,$s,'productname', "", "text", null, 255, true);
 }
 
 include_once("nav.inc.php");
@@ -326,7 +326,7 @@ NewFormItem($f, $s,"", 'submit');
 				<tr>
 					<td>
 						<?
-						NewFormItem($f, $s, "logo", "radio", null, $brand, "id='$brand'");
+						NewFormItem($f, $s, "logo", "radio", null, $brand, "id='$brand' onclick='new getObj(\"productname\").obj.value=\"$brand\"'");
 						?>
 					</td>
 					<td><img src="<?=$logoinfo['filelocation']?>" onclick="new getObj('<?=$brand?>').obj.checked=true; new getObj('productname').obj.value='<?=$brand?>'" /></td>
@@ -337,11 +337,11 @@ NewFormItem($f, $s,"", 'submit');
 			<tr>
 				<td>
 					<?
-						NewFormItem($f, $s, "logo", "radio", null, "Other", "id='other'");
+						NewFormItem($f, $s, "logo", "radio", null, "Other", "id='other' onclick='new getObj(\"productname\").obj.value=\"\"'");
 					?>
 				</td>
 				<td>
-					<div onclick="new getObj('other').obj.checked=true; new getObj('productname').obj.value='Other'">Other</div>
+					<div onclick="new getObj('other').obj.checked=true; new getObj('productname').obj.value=''">Other</div>
 				</td>
 			</tr>
 		</table>
