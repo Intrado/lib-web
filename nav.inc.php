@@ -13,6 +13,9 @@ $ACTIVEMAINTABTITLE = "";
 
 $SHORTCUTS = array();
 
+$scheme = getCustomerScheme($CUSTOMERURL);
+$CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
+
 if (isset($_GET['timer']))
 	$PAGETIME = microtime(true);
 
@@ -183,12 +186,12 @@ doNavTabs($NAVTREE);
 ?>
 <html>
 <head>
-	<title>SchoolMessenger: <?= $PAGETITLE ?></title>
+	<title><?= $CustomBrand ?>: <?= $PAGETITLE ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/nav.js'></script>
 	<script src='script/sorttable.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='css/style.css' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css/dynamic_css.php' type='text/css' rel='stylesheet' media='screen'>
 </head>
 <body>
 	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
@@ -198,7 +201,8 @@ doNavTabs($NAVTREE);
 <div>
 	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif">
 	<tr>
-	<td><img src="img/logo.gif"></td>
+<?	// LOGO ?>
+	<td><img src="logo.img.php"></td>
 	<td><div class="custname"><?= htmlentities($_SESSION['custname']); ?></div></td>
 	</tr>
 	</table>
