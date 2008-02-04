@@ -95,6 +95,9 @@ if ($userid && $userid != -1) {
 			$USER->lastlogin = QuickQuery("select now()");
 			$USER->update(array("lastlogin"));
 		}
+		if (!isset($_SESSION['etagstring'])){
+				$_SESSION['etagstring'] = strtotime("now");
+		}
 		redirect("start.php");
 	}
 }
@@ -175,7 +178,7 @@ new getObj('logintext').obj.focus();
 
 <html>
 <head>
-<title>SchoolMessenger Login</title>
+<title><?=$CustomBrand?> Login</title>
 
 </head>
 <body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #365F8D;'>
@@ -265,12 +268,12 @@ document.getElementById('logintext').focus();
 	function capslockCheck(e){
 		var keypressed;
 		var shiftkey;
-		
+
 		if(e.keyCode)
 			keypressed = e.keyCode;
 		else
 			keypressed = e.which;
-		
+
 		if(e.shiftKey) {
 			shiftkey = e.shiftkey;
 		} else {
