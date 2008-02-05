@@ -25,6 +25,8 @@ if ($SETTINGS['feature']['has_ssl']) {
 	}
 }
 
+$scheme = getCustomerScheme($CUSTOMERURL);
+$CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 
 //check various ways to log in
 $badlogin = false;
@@ -96,7 +98,7 @@ if ($userid && $userid != -1) {
 			$USER->update(array("lastlogin"));
 		}
 		if (!isset($_SESSION['etagstring'])){
-				$_SESSION['etagstring'] = strtotime("now");
+				$_SESSION['etagstring'] = mt_rand();
 		}
 		redirect("start.php");
 	}
