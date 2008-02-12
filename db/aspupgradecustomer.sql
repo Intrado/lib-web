@@ -286,3 +286,10 @@ INDEX ( `messageid` )
 ) ENGINE = innodb
 $$$
 
+-- 2/12/2008 fix destlabel
+ 
+ALTER TABLE `destlabel` CHANGE `type` `type` ENUM( 'phone', 'email', 'sms' ) NOT NULL
+$$$
+
+ALTER TABLE `destlabel` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+$$$
