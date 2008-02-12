@@ -107,12 +107,20 @@ if($type == "new"){
 	executeSqlFile("commsuitemangle.sql");
 
 	echo "Running Import Updater\n";
-	exec("php import_extractor.php");
+	$output=array();
+	$returncode=1;
+	exec("php import_extractor.php", $output, $returncode);
+	if($returncode)
+		exit("Error occurred with the importextractor");
 
 	echo "Extracting old database to new database\n";
 	$output = array();
+	$returncode=1;
 	exec("php extract_customer.php", $output, $returncode);
 	echoarray($output);
+	if($returncode)
+		exit("Error occurred with the extractor");
+
 	mysql_select_db($commsuitedbname, $custdb);
 	addNewDefaults();
 
