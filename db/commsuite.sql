@@ -1556,9 +1556,9 @@ $$$
 
 -- New table for destination labels
 CREATE TABLE `destlabel` (
-`type` VARCHAR( 10 ) NOT NULL ,
+`type` ENUM( 'phone', 'email', 'sms' ) NOT NULL ,
 `sequence` TINYINT NOT NULL ,
 `label` VARCHAR( 20 ) NOT NULL ,
 PRIMARY KEY ( `type` , `sequence` )
-) ENGINE = innodb
+) ENGINE = innodb CHARACTER SET utf8
 $$$
