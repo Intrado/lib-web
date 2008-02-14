@@ -1,6 +1,7 @@
 <?
 
 function help($title, $extrahtml = NULL, $style = NULL) {
+	$theme = getBrandTheme();
 	$contents = @file_get_contents('hover' . DIRECTORY_SEPARATOR . $title . '.txt');
 	//$contents = nl2br(preg_replace('/($|\\r\\n\\r\\n)[^\\r\\n:]+?:/', '<span class="hovertitle">\\0</span>', $contents ));
 
@@ -14,7 +15,7 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 	$contents = nl2br($contents);
 
 	$hover = '<span class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
-	$hover .= '<img align="absmiddle" src="img/helpcenter' . ($style ? '_' . $style : "") . '.gif"';
+	$hover .= '<img align="absmiddle" src="img/themes/' . $theme . '/helpcenter' . ($style ? '_' . $style : "") . '.gif"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	if ($link != "")
@@ -85,7 +86,7 @@ function buttons() {
 }
 
 function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
-
+	$theme = getBrandTheme();
 	$btn = '<div class="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 
 
@@ -105,7 +106,7 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 		$btn .= "#";
 
 	$btn.= '">
-		<table><tr><td><img buttonrollover="left" src="img/button_left.gif"></td><td buttonrollover="middle" class="middle">' . $name . '</td><td><img buttonrollover="right" src="img/button_right.gif"></td></tr></table>
+		<table><tr><td><img buttonrollover="left" src="img/themes/' . $theme. '/button_left.gif"></td><td buttonrollover="middle" class="middle">' . $name . '</td><td><img buttonrollover="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table>
 	</a></div>';
 
 	return $btn;
