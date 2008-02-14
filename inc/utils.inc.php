@@ -210,15 +210,15 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.55 $
+	    # $Revision: 1.56 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
-	
+
 	    ##################################################################################
-	
+
 	    ##################################################################################
 		# Beginning of Creative Commons Email Parser Code
 		##################################################################################
-		
+
         $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
 
         $dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';
@@ -248,7 +248,7 @@ function validEmail($email){
 		##################################################################################
 		# End of Creative Commons Email Parser Code
 		##################################################################################
-		
+
         if(!preg_match("!^$addr_spec$!", $email)){
         	return false;
         }
@@ -471,4 +471,25 @@ function destination_label_popup_paragraph($type){
 	return $hover;
 
 }
+
+function getBrand(){
+	return $_SESSION['productname'];
+}
+
+function getBrandTheme(){
+	return $_SESSION['colorscheme']['_brandtheme'];
+}
+
+function getBrandPrimary(){
+	return $_SESSION['colorscheme']['_brandprimary'];
+}
+
+function getBrandTheme1(){
+	return $_SESSION['colorscheme']['_brandtheme1'];
+}
+
+function getBrandTheme2(){
+	return $_SESSION['colorscheme']['_brandtheme2'];
+}
+
 ?>
