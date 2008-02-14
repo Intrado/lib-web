@@ -384,6 +384,9 @@ copytable($customerid,"schedule",array("id", "userid", "time", "nextrun"),$db,$c
 //SCHEDULEDAY table removed, dow field added to schedule table
 restructureScheduleDay($customerid, $db, $custdb);
 
+//SETTING
+copytable($customerid,"setting",array("name", "value"),$db,$custdb,1000,false);
+
 //SPECIALTASK
 //dont copy
 
