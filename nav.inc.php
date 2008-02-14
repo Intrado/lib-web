@@ -4,6 +4,12 @@
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+?>
+	<script>
+		var _brandtheme = "<?=getBrandTheme();?>";
+	</script>
+<?
+
 $PAGETITLE = preg_replace('/\\<.+>/','',$TITLE);
 
 list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
@@ -12,9 +18,6 @@ $FIRSTACTIVETABLINK = "";
 $ACTIVEMAINTABTITLE = "";
 
 $SHORTCUTS = array();
-
-$scheme = getCustomerScheme($CUSTOMERURL);
-$CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 
 if (isset($_GET['timer']))
 	$PAGETIME = microtime(true);
@@ -110,7 +113,8 @@ else
 ////////////////////////////////////////////////////////////////////////////////
 
 function navMainTab ($title, $link, $isselected) {
-	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
+	$theme = getBrandTheme();
+	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
 }
 
 function navSubTab ($title, $link, $isselected) {
@@ -186,7 +190,7 @@ doNavTabs($NAVTREE);
 ?>
 <html>
 <head>
-	<title><?= $CustomBrand ?>: <?= $PAGETITLE ?></title>
+	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/nav.js'></script>
 	<script src='script/sorttable.js'></script>
@@ -198,12 +202,31 @@ doNavTabs($NAVTREE);
 
 <!-- ********************************************************************* -->
 
+<?
+	if(getSystemSetting('_showlogobackground'))
+		$background='background="img/themes/' . getBrandTheme() . '/header_bg.gif"';
+	else
+		$background = "";
+
+	if($clickurl = getSystemSetting('_logoclickurl'))
+		$logo =  '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php"></a>';
+	else
+		$logo = '<img src="logo.img.php">';
+?>
+
+
 <div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif">
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 <?=$background?> >
+		<tr><td>&nbsp;</td></tr>
+	</table>
+</div>
+
+<div>
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 >
 	<tr>
 <?	// LOGO ?>
-	<td><img src="logo.img.php"></td>
-	<td><div class="custname"><?= htmlentities($_SESSION['custname']); ?></div></td>
+		<td><div style="padding-left:10px; padding-bottom:10px;"><?=$logo?></div></td>
+		<td><div class="custname"><?= htmlentities($_SESSION['custname']); ?></div></td>
 	</tr>
 	</table>
 </div>
