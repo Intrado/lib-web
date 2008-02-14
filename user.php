@@ -24,6 +24,14 @@ if (!$USER->authorize('manageaccount')) {
 	redirect('unauthorized.php');
 }
 
+
+if (isset($_GET['clearrules'])) {
+	if (isset($_SESSION['userid'])) {
+		QuickUpdate("delete from userrule where userid='" . $_SESSION['userid'] . "'");
+	}
+	redirect();
+}
+
 /*CSDELETEMARKER_START*/
 if(isset($_GET['id'])){
 	$id = $_GET['id']+0;
@@ -504,13 +512,8 @@ startWindow('User Information');
 				<tr>
 					<th valign="top" align="right" class="windowRowHeader">Data View:<br><? print help('User_DataView'); ?></th>
 					<td>
-						<table>
-							<tr>
-								<td>
-									Restrict this user's access to the following data
-								</td>
-							</tr>
-						</table>
+						Restrict this user's access to the following data<br>
+						<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
 					<?
 					include('ruleeditform.inc.php');
 					?>
