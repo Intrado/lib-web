@@ -127,6 +127,8 @@ if(CheckFormSubmit($form,$section))
 				$accss->setPermission("portalaccess", (bool)GetFormData($form, $section, 'portalaccess'));
 				$accss->setPermission("generatebulktokens", (bool)GetFormData($form, $section, 'generatebulktokens'));
 			}
+			$accss->setPermission("changetheme", (bool)GetFormData($form, $section, 'changetheme'));
+
 			$_SESSION['accessid'] = $accss->id;
 			ClearFormData($form);
 			redirect('profiles.php');
@@ -196,7 +198,8 @@ if( $reloadform )
 				array("survey","bool",0,1),
 				array("leavemessage","bool",0,1),
 				array("portalaccess","bool",0,1),
-				array("generatebulktokens","bool",0,1));
+				array("generatebulktokens","bool",0,1),
+				array("changetheme", "bool", 0, 1));
 
 	foreach($permissions as $field) {
 		PutFormData($form, $section, $field[0], $accss->getValue($field[0]),$field[1],$field[2],$field[3]);
@@ -286,6 +289,17 @@ startWindow('Allowed Functions');
 				<tr>
 					<td><? NewFormItem($form,$section,"starteasy","checkbox"); ?></td>
 					<td>Enable outbound recording</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr valign="top">
+		<th align="right" class="windowRowHeader bottomBorder">Display Theme:</th>
+		<td class="bottomBorder" width="100%">
+			<table border="0" cellpadding="2" cellspacing="0">
+				<tr>
+					<td><? NewFormItem($form,$section,"changetheme","checkbox"); ?></td>
+					<td>Allow Theme based on User Preference</td>
 				</tr>
 			</table>
 		</td>
