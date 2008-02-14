@@ -42,7 +42,7 @@ if (!$_SESSION['importid'])
 
 if (isset($_GET['previewrows'])) {
 	$_SESSION['importviewrows'] = $_GET['previewrows'] + 0;
-	$_SESSION['importviewrows'] = max(5,$_SESSION['importviewrows']);
+	$_SESSION['importviewrows'] = max(1,$_SESSION['importviewrows']);
 	$_SESSION['importviewrows'] = min(50,$_SESSION['importviewrows']);
 }
 
@@ -290,7 +290,9 @@ if ($noimportdata) { ?>
 
 <div class="hoverlinks" style="margin: 5px;">
 Preview rows:
-<select onchange="if(confirm('Warning: changing the number of preview rows will undo any changes made on the page.\nClick cancel if you need to save your changes.')) {location.href='?previewrows=' + this.value;}"
+<select onchange="if(confirm('Warning: changing the number of preview rows will undo any changes made on the page.\nClick cancel if you need to save your changes.')) {location.href='?previewrows=' + this.value;}">
+
+<option value="1" <?= 1 == $_SESSION['importviewrows'] ? "selected" : "" ?>>1</option>
 <?
 	for ($x = 5; $x <= 50; $x += 5) {
 ?>
