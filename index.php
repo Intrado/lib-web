@@ -25,8 +25,9 @@ if ($SETTINGS['feature']['has_ssl']) {
 	}
 }
 
-$scheme = getCustomerScheme($CUSTOMERURL);
+$scheme = getCustomerData($CUSTOMERURL);
 $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
+$primary = isset($scheme['colors']['_brandprimary']) ? $scheme['colors']['_brandprimary'] : "" ;
 
 //check various ways to log in
 $badlogin = false;
@@ -97,9 +98,18 @@ if ($userid && $userid != -1) {
 			$USER->lastlogin = QuickQuery("select now()");
 			$USER->update(array("lastlogin"));
 		}
+		$scheme = getCustomerData($CUSTOMERURL, $USER->id);
 		if (!isset($_SESSION['etagstring'])){
 				$_SESSION['etagstring'] = mt_rand();
 		}
+		$_SESSION['colorscheme'] = array("_brandtheme" => $scheme['_brandtheme'],
+										"_brandprimary" => $scheme['colors']['_brandprimary'],
+										"_brandtheme1" => $scheme['colors']['_brandtheme1'],
+										"_brandtheme2" => $scheme['colors']['_brandtheme2'],
+										"_brandratio" => $scheme['colors']['_brandratio']);
+		$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
+		$_SESSION['_supportphone'] = $scheme['_supportphone'];
+		$_SESSION['_supportemail'] = $scheme['_supportemail'];
 		redirect("start.php");
 	}
 }
@@ -183,22 +193,23 @@ new getObj('logintext').obj.focus();
 <title><?=$CustomBrand?> Login</title>
 
 </head>
-<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #365F8D;'>
+<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #<?=$primary?>;'>
 <form action="index.php" method="POST">
 
 <table border=0 cellpadding=0 cellspacing=0 width="100%">
-<tr style="background-color: #365F8D;">
-	<td width="389"><img src="img/school_messenger_large.gif" /></td>
+<tr style="background-color: #FFFFFF;">
+	<td width="389"><div style="padding-left:5px; padding-bottom:5px;"><img src="logo.img.php" /></div></td>
 	<td width="100%">&nbsp;</td>
 </tr>
 <tr style="background-color: #666666;">
 	<td colspan="2">&nbsp;</td>
 </tr>
 <tr>
-	<td><img src="img/classroom_girl.jpg"></td>
-	<td style="background-color: #D4DDE2; color: #365F8D;">
+	<? // img/classroom_girl.jpg ?>
+	<td style="background-color: #D4DDE2;"><img src="loginpicture.img.php"></td>
+	<td style="background-color: #D4DDE2; color: #<?=$primary?>;">
 
-		<table width="100%" style="color: #365F8D; text-align: right;">
+		<table width="100%" style="color: #<?=$primary?>; text-align: right;">
 			<tr>
 				<td width="100%" style="font-size: 18px; font-weight: bold; text-align: right;"><?= htmlentities($custname) ?></div></td>
 				<td><img src="img/spacer.gif" width="25"></td>
@@ -220,7 +231,7 @@ new getObj('logintext').obj.focus();
 			</tr>
 		</table>
 
-		<div><table width="100%" style="color: #365F8D;" >
+		<div><table width="100%" style="color: #<?=$primary?>;" >
 			<tr>
 				<td width="20%">&nbsp;</td>
 				<td style="font-size: 12px;"><div style="margin-left: 50px;">Login:<br><input type="text" name="login" size="35" id="logintext"></div></td>
@@ -254,11 +265,10 @@ new getObj('logintext').obj.focus();
 	</td>
 </tr>
 
-<tr style="background-color: #365F8D; color: white;">
+<tr style="background-color: #<?=$primary?>; color: white;">
 	<td colspan="2"><div style="text-align:right; font-size: 12px; margin: 5px;">
-		<p>If you experience difficulty logging in or require assistance, please contact us:</p>
-		<p>Email:&nbsp;<a style="color: white;" href="mailto:support@schoolmessenger.com">support@schoolmessenger.com</a></p>
-		<p>Phone:&nbsp;800.920.3897</p?
+		<p>Technical Support:</p>
+		<p><a style="color: white;" href="mailto:<?=$scheme['_supportemail']?>">support@schoolmessenger.com</a>&nbsp;|&nbsp;<?=substr($scheme['_supportphone'],0,3) . "." . substr($scheme['_supportphone'],3,3) . "." . substr($scheme['_supportphone'],6,4);?></p>
 	</div></td>
 </tr>
 
