@@ -52,7 +52,7 @@ $result = Query(
 				j.type LIKE '%email%' AS has_email,
 				j.type LIKE '%print%' AS has_print,
 				j.type LIKE '%sms%' AS has_sms,
-            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts > 0 and rc.numattempts < js.value) as remaining_phone,
+            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
@@ -90,7 +90,7 @@ function fmt_total ($row, $index) {
 		$data[] = "Print:&nbsp;" . $row[$index+2];
 	if ($row[$index+7])
 		$data[] = "SMS:&nbsp;" . $row[$index+3];
-		
+
 
 	return implode("<br>",$data);
 }
