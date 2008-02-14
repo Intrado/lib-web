@@ -110,6 +110,10 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error('Bad Manager Password');
 			} else if(GetFormData($f, $s, "timeslice") == ""){
 				error("Timeslice cannot be blank");
+			} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
+				error("That is not a valid 'Primary Color'");
+			} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
+				error("The ratio can only be between 0 and .5(50%)");
 			} else {
 
 				QuickUpdate("update customer set
@@ -287,7 +291,7 @@ if( $reloadform ) {
 	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', "", true, $custdb), "text");
 	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "", true, $custdb), "text");
 	PutFormData($f, $s, "_showlogobackground", getCustomerSystemSetting('_showlogobackground', 0, true, $custdb), "bool", 0, 1);
-	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "", true, $custdb), "text");
+	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "http://", true, $custdb), "text");
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "support@schoolmessenger.com", true, $custdb), "email", "nomin", "nomax", true);
 	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "8009203897", true, $custdb)), "phone", 0, 10, true);
