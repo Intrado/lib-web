@@ -64,7 +64,7 @@ if(isset($_GET['reportid'])){
 	$subscription = new ReportSubscription($reportid);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
-	
+
 	$_SESSION['saved_report'] = true;
 	$_SESSION['report']['options'] = $options;
 } else {
@@ -92,10 +92,10 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 	{
 		MergeSectionFormData($f, $s);
 		//do check
-		
+
 		$startdate = GetformData($f, $s, "startdate");
 		$enddate = GetFormData($f, $s, "enddate");
-		
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
@@ -120,7 +120,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 					break;
 				case "date":
 					$options['reldate'] = GetFormData($f, $s, "relativedate");
-					
+
 					if($options['reldate'] == "xdays"){
 						$options['lastxdays'] = GetFormData($f, $s, "xdays")+0;
 					} else if($options['reldate'] == "daterange"){
@@ -137,12 +137,12 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$options['jobtypes'] = implode("','", $temp);
 			} else
 				$options['jobtypes'] = "";
-			
+
 			foreach($options as $index => $option){
 				if($option == "")
 					unset($options[$index]);
 			}
-			
+
 			$options['reporttype'] = "jobsummaryreport";
 			$_SESSION['report']['options'] = $options;
 			ClearFormData($f);
@@ -181,9 +181,9 @@ if($reload){
 	}
 	PutFormData($f, $s, 'jobtype', isset($options['jobtypes']) && $options['jobtypes'] !="" ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, 'jobtypes', $savedjobtypes, "array", array_keys($jobtypes));
-	
+
 	PutFormData($f, $s, "check_archived", isset($options['archived']) ? $options['archived'] : 0, "bool", "0", "1");
-	
+
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -225,7 +225,7 @@ startWindow("Select", NULL, false);
 					<td>
 <?
 					dateOptions($f, $s, "daterange");
-?>						
+?>
 					</td>
 				</tr>
 				<tr>
@@ -236,15 +236,15 @@ startWindow("Select", NULL, false);
 								<?
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 									NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job where deleted = 0 and status in ('active','complete','cancelled','cancelling') $userJoin and questionnaireid is null order by id desc ");
-							
+									$jobs = DBFindMany("Job","from job where deleted = 0 and status in ('active','complete','cancelled','cancelling') $userJoin and questionnaireid is null order by id desc limit 500");
+
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
 									}
 									NewFormItem($f, $s, "jobid", "selectend");
 									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job where deleted = 2 and status!='repeating' $userJoin and questionnaireid is null order by id desc");
+									$jobs = DBFindMany("Job","from job where deleted = 2 and status!='repeating' $userJoin and questionnaireid is null order by id desc limit 500");
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 									}
@@ -257,7 +257,7 @@ startWindow("Select", NULL, false);
 						</table>
 					</td>
 				</tr>
-				
+
 			</table>
 		</td>
 	</tr>

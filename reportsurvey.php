@@ -81,7 +81,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 	{
 		MergeSectionFormData($f, $s);
 		//do check
-		
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(!GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
@@ -93,7 +93,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$options['jobid'] = GetFormData($f, $s, "jobid_archived")+0;
 			else
 				$options['jobid'] = GetFormData($f, $s, "jobid")+0;
-			$options['archived'] = $check;		
+			$options['archived'] = $check;
 			$_SESSION['report']['options'] = $options;
 			ClearFormData($f);
 			if(CheckFormSubmit($f, "run"))
@@ -148,15 +148,15 @@ startWindow("Select", NULL, false);
 						<?
 							NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 							NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Survey --", "");
-							$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null $userjoin order by id desc");
-					
+							$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null $userjoin order by id desc limit 500");
+
 							foreach ($jobs as $job) {
 								NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
 							}
 							NewFormItem($f, $s, "jobid", "selectend");
 							NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 							NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Survey --", "");
-							$jobs = DBFindMany("Job","from job j where deleted = 2 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null $userjoin order by id desc");
+							$jobs = DBFindMany("Job","from job j where deleted = 2 and status in ('active','complete','cancelled','cancelling') and questionnaireid is not null $userjoin order by id desc limit 500");
 							foreach ($jobs as $job) {
 								NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 							}
