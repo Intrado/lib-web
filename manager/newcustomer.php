@@ -265,6 +265,15 @@ if (CheckFormSubmit($f,$s)){
 					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 				}
 
+				QuickUpdate("INSERT INTO content (contenttype, data) values
+							('image/gif', '" . base64_encode(file_get_contents("img/classroom_girl.jpg")) . "')",$newdb);
+				$loginpicturecontentid = mysql_insert_id($newdb);
+
+				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+							('_loginpicturecontentid', '" . $loginpicturecontentid . "')";
+				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
+
+
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 								('_productname', '" . DBSafe($defaultproductname) . "')";
 					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
