@@ -14,6 +14,7 @@ $rulemap = array();
 if(is_array($RULES)) {
 	foreach ($RULES as $rule) {
 		$rulemap[$rule->fieldnum][] = $rule;
+		$unusedrules[$rule->fieldnum] = true;
 	}
 }
 
@@ -25,12 +26,14 @@ foreach ($fieldmaps as $fieldmap) {
 	//only show if searchable and multisearch for rules
 	if ($fieldmap->isOptionEnabled("searchable")) {
 
-	$fieldname = $fieldmap->name;
-	$fieldnum = $fieldmap->fieldnum;
+		$fieldname = $fieldmap->name;
+		$fieldnum = $fieldmap->fieldnum;
 
-	//only show an entry for fields that have a rule defined for them
-	if (!isset($rulemap[$fieldnum]))
-		continue;
+		//only show an entry for fields that have a rule defined for them
+		if (!isset($rulemap[$fieldnum]))
+			continue;
+
+		unset($unusedrules[$fieldnum]);
 
 		foreach($rulemap[$fieldnum] as $rule) {
 
@@ -64,6 +67,11 @@ foreach ($fieldmaps as $fieldmap) {
 			echo "</td></tr>\n";
 		}
 	}
+}
+
+
+if (count($unusedrules) > 0) {
+	echo '<tr><td class="border" colspan="4" style="color: red;">WARNING: Some rules are not visible due to security restrictions or system configuration.</td></tr>';
 }
 
 ////////////////////////////////////////////////////////////////////////////////
