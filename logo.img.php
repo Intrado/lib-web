@@ -1,5 +1,19 @@
 <?
-include_once("inc/common.inc.php");
+
+$SETTINGS = parse_ini_file("inc/settings.ini.php",true);
+$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
+
+//get the customer URL
+if ($IS_COMMSUITE) {
+	$CUSTOMERURL = "default";
+} /*CSDELETEMARKER_START*/ else {
+	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+} /*CSDELETEMARKER_END*/
+
+require_once("XML/RPC.php");
+require_once("inc/auth.inc.php");
+
 
 /*
 Etag information assistance by: Matt Midboe
@@ -19,9 +33,12 @@ if (isset($headers['If-None-Match']) && strpos($headers['If-None-Match'], "asset
 	header("Expires: ");
 	header("Content-Type: ");
 	// The Etag must be enclosed with double quotes
-	header('ETag: "asset-' . $_SESSION['etagstring'] . '"');
+
+	if(isset($_SESSION['etagstring'])){
+		header('ETag: "asset-' . $_SESSION['etagstring'] . '"');
+	}
 } else {
-	$map = getCustomerScheme($CUSTOMERURL);
+	$map = getCustomerData($CUSTOMERURL);
 	if($map !== false){
 		$data = base64_decode($map['customerLogo']);
 		$contenttype = $map['contentType'];
@@ -34,12 +51,12 @@ if (isset($headers['If-None-Match']) && strpos($headers['If-None-Match'], "asset
 		// Set the content-type to something like image/jpeg and set the length
 		header("Pragma: ");
 		header("Expires: ");
+
 		// Send the browser the etag so they can cache it
-		header('ETag: "asset-' . $_SESSION['etagstring'] . '"');
+		if(isset($_SESSION['etagstring'])){
+			header('ETag: "asset-' . $_SESSION['etagstring'] . '"');
+		}
 		echo $data;
-	} else {
-		header ("Content-type: image/gif");
-		readfile("img/logo.gif");
 	}
 }
 
