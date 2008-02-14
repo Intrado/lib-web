@@ -83,7 +83,7 @@ class JobSummaryReport extends ReportGenerator{
 		//Gather Phone Information
 		$phonenumberquery = "select sum(rc.type='phone') as total,
 									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'sent', 'duplicate', 'blocked')) as remaining,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'duplicate', 'blocked')) as remaining,
 									sum(rc.result = 'blocked') as blocked,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
@@ -98,7 +98,7 @@ class JobSummaryReport extends ReportGenerator{
 
 		$emailquery = "select sum(rc.type = 'email') as total,
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'sent', 'duplicate', 'blocked')) as remaining,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rp.status = 'declined' and rc.result is null) as declined
@@ -110,7 +110,7 @@ class JobSummaryReport extends ReportGenerator{
 
 		$smsquery = "select sum(rc.type = 'sms') as total,
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'sent', 'duplicate', 'blocked')) as remaining,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
 									sum(rc.result = 'blocked') as blocked,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
