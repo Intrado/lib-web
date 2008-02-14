@@ -5,6 +5,7 @@ include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
 include_once("../obj/Phone.obj.php");
 include_once("AspAdminUser.obj.php");
+include_once("../inc/themes.inc.php");
 
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
@@ -82,6 +83,17 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				} else if (!is_file($newname) || !is_readable($newname)) {
 					error('Unable to complete file upload. Please try again');
 				} else if($newlogofile = @file_get_contents($newname)) {
+					error('New logo file upload failed');
+				}
+			}
+			if(isset($_FILES['uploadloginpicture']) && $_FILES['uploadloginpicture']['tmp_name']) {
+
+				$newname = secure_tmpname("uploadloginpicture",".img");
+				if(!move_uploaded_file($_FILES['uploadloginpicture']['tmp_name'],$newname)) {
+					error('Unable to complete file upload. Please try again');
+				} else if (!is_file($newname) || !is_readable($newname)) {
+					error('Unable to complete file upload. Please try again');
+				} else if($newloginpicturefile = @file_get_contents($newname)) {
 					error('New logo file upload failed');
 				}
 			}
@@ -167,6 +179,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					QuickUpdate("insert into language(name) values ('" . GetFormData($f, $s, "newlang") . "')", $custdb);
 				}
 
+				//Logo
 				if(isset($newlogofile)){
 					QuickUpdate("INSERT INTO content (contenttype, data) values
 								('" . $_FILES['uploadlogo']['type'] . "', '" . base64_encode($newlogofile) . "')", $custdb);
@@ -174,7 +187,27 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);
 				}
 
+				// Login image
+				if(isset($newloginpicturefile)){
+					QuickUpdate("INSERT INTO content (contenttype, data) values
+								('" . $_FILES['uploadloginpicture']['type'] . "', '" . base64_encode($newloginpicturefile) . "')", $custdb);
+					$loginpicturecontentid = mysql_insert_id($custdb);
+					setCustomerSystemSetting('_loginpicturecontentid', $loginpicturecontentid, $custdb);
+				}
+
 				setCustomerSystemSetting('_productname', GetFormData($f, $s, 'productname'), $custdb);
+				$theme = DBSafe(GetFormData($f, $s, 'theme'));
+				setCustomerSystemSetting('_brandtheme', $theme, $custdb);
+				setCustomerSystemSetting('_brandprimary', GetFormData($f, $s, '_brandprimary') ? GetFormData($f, $s, '_brandprimary') : $COLORSCHEMES[$theme]['_brandprimary'], $custdb);
+				setCustomerSystemSetting('_brandtheme1', $COLORSCHEMES[$theme]['_brandtheme1'], $custdb);
+				setCustomerSystemSetting('_brandtheme2', $COLORSCHEMES[$theme]['_brandtheme2'], $custdb);
+				setCustomerSystemSetting('_brandratio', GetFormData($f, $s, '_brandratio') ? GetFormData($f, $s, '_brandratio') : $COLORSCHEMES[$theme]['_brandratio'], $custdb);
+
+				setCustomerSystemSetting('_showlogobackground', DBSafe(GetFormData($f, $s, "_showlogobackground")), $custdb);
+				setCustomerSystemSetting('_logoclickurl', DBSafe(GetFormData($f, $s, "_logoclickurl")), $custdb);
+
+				setCustomerSystemSetting('_supportemail', DBSafe(GetFormData($f, $s, "_supportemail")), $custdb);
+				setCustomerSystemSetting('_supportphone', Phone::parse(GetFormData($f, $s, "_supportphone")), $custdb);
 
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
@@ -242,15 +275,27 @@ if( $reloadform ) {
 
 	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
 
-	PutFormData($f,$s,'productname', getcustomerSystemSetting('_productname', "", true, $custdb), "text", 0, 255, true);
+	PutFormData($f,$s,'productname', getCustomerSystemSetting('_productname', "", true, $custdb), "text", 0, 255, true);
 
 
 
 	PutFormData($f,"Save","Save", "");
 	PutFormData($f,"Return","Save and Return", "");
+
+	//Color Scheme stuff
+	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "", true, $custdb), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', "", true, $custdb), "text");
+	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "", true, $custdb), "text");
+	PutFormData($f, $s, "_showlogobackground", getCustomerSystemSetting('_showlogobackground', 0, true, $custdb), "bool", 0, 1);
+	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "", true, $custdb), "text");
+
+	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "support@schoolmessenger.com", true, $custdb), "email", "nomin", "nomax", true);
+	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "8009203897", true, $custdb)), "phone", 0, 10, true);
+
 }
 
 include_once("nav.inc.php");
+?><script src="picker.js?<?=rand()?>"></script><?
 
 //custom newform declaration to catch if manager password is submitted
 NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
@@ -329,8 +374,55 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	<td>ProductName:</td>
 	<td><? NewFormItem($f,$s,'productname', 'text', 30, 255)?></td>
 </tr>
+<tr>
+	<td>Theme:</td>
+	<td>
+		<?
+			NewFormItem($f, $s, "theme", "selectstart", null, null, "onchange='resetPrimaryAndRatio(this.value)'");
+			if(count($COLORSCHEMES)){
+				foreach($COLORSCHEMES as $index => $scheme){
+					NewFormItem($f, $s, "theme", "selectoption", $index, $index);
+				}
+			}
+			NewFormItem($f, $s, "theme", "selectend");
+		?>
+	</td>
+</tr>
+<tr>
+	<td>Primary Color(in hex):</td>
+	<td><? NewFormItem($f, $s, "_brandprimary", "text", 0, 10, "id='brandprimary'") ?><img src="img/sel.gif" onclick="TCP.popup(new getObj('brandprimary').obj)"/></td>
+</tr>
+<tr>
+	<td>Ratio of Primary to Background</td>
+	<td><? NewFormItem($f, $s, "_brandratio", "text", 0, 3, "id='brandratio'") ?></td>
+</tr>
+<tr>
+	<td>Show Logo Background:</td>
+	<td><? NewFormItem($f, $s, "_showlogobackground", "checkbox"); ?></td>
+</tr>
+<tr>
+	<td>Logo Click URL</td>
+	<td><? NewFormItem($f, $s, "_logoclickurl", "text", 30, 255); ?></td>
+</tr>
 
+<tr>
+	<td>Login Picture:</td>
+	<td><img src='customerloginpicture.img.php?id=<?=$currentid?>'></td>
+</tr>
+<tr>
+	<td>New Login Picture:</td>
+	<td><input type='file' name='uploadloginpicture' size='30'></td>
+</tr>
 
+<tr>
+	<td>Support Email:</td>
+	<td><? NewFormItem($f, $s, "_supportemail", "text", 30, 100); ?></td>
+</tr>
+
+<tr>
+	<td>Support Phone:</td>
+	<td><? NewFormItem($f, $s, "_supportphone", "text", 14); ?></td>
+</tr>
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
 	<td><? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
@@ -354,4 +446,27 @@ function setCustomerSystemSetting($name, $value, $custdb) {
 		QuickUpdate("update setting set value = '$value' where name = '$name'", $custdb);
 	}
 }
+
 ?>
+<script>
+
+	var colorscheme = new Array();
+
+<?
+	//Make js array of colorschemes
+	foreach($COLORSCHEMES as $index => $properties){
+?>
+		colorscheme['<?=$index?>'] = new Array();
+		colorscheme['<?=$index?>']['_brandprimary'] = '<?=$properties['_brandprimary']?>';
+		colorscheme['<?=$index?>']['_brandratio'] = '<?=$properties['_brandratio']?>';
+<?
+	}
+?>
+
+	function resetPrimaryAndRatio(value){
+
+		new getObj('brandprimary').obj.value = colorscheme[value]['_brandprimary'];
+		new getObj('brandratio').obj.value = colorscheme[value]['_brandratio'];
+	}
+
+</script>
