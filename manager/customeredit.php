@@ -207,7 +207,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_brandtheme2', $COLORSCHEMES[$theme]['_brandtheme2'], $custdb);
 				setCustomerSystemSetting('_brandratio', GetFormData($f, $s, '_brandratio') ? GetFormData($f, $s, '_brandratio') : $COLORSCHEMES[$theme]['_brandratio'], $custdb);
 
-				setCustomerSystemSetting('_showlogobackground', DBSafe(GetFormData($f, $s, "_showlogobackground")), $custdb);
 				setCustomerSystemSetting('_logoclickurl', DBSafe(GetFormData($f, $s, "_logoclickurl")), $custdb);
 
 				setCustomerSystemSetting('_supportemail', DBSafe(GetFormData($f, $s, "_supportemail")), $custdb);
@@ -290,7 +289,6 @@ if( $reloadform ) {
 	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "", true, $custdb), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', "", true, $custdb), "text");
 	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "", true, $custdb), "text");
-	PutFormData($f, $s, "_showlogobackground", getCustomerSystemSetting('_showlogobackground', 0, true, $custdb), "bool", 0, 1);
 	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "http://", true, $custdb), "text");
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "support@schoolmessenger.com", true, $custdb), "email", "nomin", "nomax", true);
@@ -399,10 +397,6 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr>
 	<td>Ratio of Primary to Background</td>
 	<td><? NewFormItem($f, $s, "_brandratio", "text", 0, 3, "id='brandratio'") ?></td>
-</tr>
-<tr>
-	<td>Show Logo Background:</td>
-	<td><? NewFormItem($f, $s, "_showlogobackground", "checkbox"); ?></td>
 </tr>
 <tr>
 	<td>Logo Click URL</td>
