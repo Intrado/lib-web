@@ -1,17 +1,17 @@
 <?
 
 class JobAutoReport extends ReportGenerator{
-	
+
 	function generateQuery(){
 		global $USER;
 		$instance = $this->reportinstance;
 		$params = $this->params = $instance->getParameters();
 		$this->reporttype = $params['reporttype'];
-		
+
 		$rulesql = getRuleSql($this->params, "rp");
-		
+
 		if(isset($params['jobid'])){
-			$jobid = DBSafe($params['jobid']);
+			$this->params['joblist'] = DBSafe($params['jobid']);
 		} else {
 			if(isset($params['datestart']))
 				$datestart = date("Y-m-d", strtotime($params['datestart']));
@@ -22,17 +22,18 @@ class JobAutoReport extends ReportGenerator{
 			else
 				$dateend = date("Y-m-d", strtotime("now"));
 			$joblist = QuickQueryList("select j.id from job j where j.startdate < '$dateend' and (j.finishdate > '$datestart' or j.enddate > '$datestart')");
+			$this->params['joblist'] = implode("','", $joblist);
 		}
 		$resultquery = "";
 		if(isset($params['result']) && $params['result']){
 			$resultquery = " and rc.result = '" . $params['result'] . "' ";
 		}
-		
-		$searchquery = isset($jobid) ? " and rp.jobid='$jobid'" : " and rp.jobid in ('" . implode("','", $joblist) ."')";
+
+		$searchquery = " and rp.jobid in ('". $this->params['joblist'] ."')";
 		$searchquery .= $resultquery;
 		$fieldquery = generateFields("rp");
 
-		$this->query = 
+		$this->query =
 			"select SQL_CALC_FOUND_ROWS
 			rp.pkey,
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
@@ -68,20 +69,20 @@ class JobAutoReport extends ReportGenerator{
 							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-		
+
 			where 1 "
 			. $searchquery
 			. $rulesql
 			. " order by rp." . FieldMap::GetLastNameField() . ", rp." . FieldMap::GetFirstNameField() .", rp.pkey";
 
-			
+
 	}
 
-	
+
 	function setReportFile(){
 		$this->reportfile = "jobautoreport.jasper";
 	}
-	
+
 	function getReportSpecificParams(){
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 		$params = array("jobId" => $this->params['jobid'],
