@@ -61,6 +61,9 @@ if (isset($_GET['clearall'])) {
 			case "adds":
 				QuickUpdate("delete from listentry where type='A' and listid='" . $_SESSION['listid'] . "'");
 				break;
+			case "rules":
+				QuickUpdate("delete from listentry where type='R' and listid='" . $_SESSION['listid'] . "'");
+				break;
 		}
 	}
 	redirect();
@@ -224,6 +227,7 @@ startWindow("List Content");
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder">Rules:<br><? print help('List_Rules'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;" valign="bottom">
+		<a href="?clearall=rules" onclick="return confirm('Are you sure you want to clear all rules?');">Clear All</a>
 <?
 //ruleeditform expects $RULES to be set
 $RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
@@ -253,7 +257,7 @@ if ($numAdd > 0) {
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder">Additions:<br><? print help('List_Additions'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;">
-		<a href="?clearall=adds">Clear All</a>
+		<a href="?clearall=adds" onclick="return confirm('Are you sure you want to clear all additions?');">Clear All</a>
 <?
 if ($list->id) {
 	$renderedlist->mode = "add";
@@ -277,7 +281,7 @@ if ($numSkip > 0) {
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder">Skip:<br><? print help('List_Skip'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;">
-		<a href="?clearall=skips">Clear All</a>
+		<a href="?clearall=skips" onclick="return confirm('Are you sure you want to clear all skips?');">Clear All</a>
 <?
 if ($list->id) {
 	$renderedlist->mode = "remove";
