@@ -287,7 +287,7 @@ if( $reloadform ){
 	PutFormData($f,$s,'hostname',"","text",5,255, true);
 	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
-	PutFormData($f,$s,'shard', "");
+	PutFormData($f,$s,'shard', "", "number", "nomin", "nomax", true);
 	PutFormData($f,$s,'logo', null, null, null, null);
 	PutFormData($f,$s,'productname', "", "text", null, 255, true);
 }
