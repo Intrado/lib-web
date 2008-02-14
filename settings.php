@@ -12,7 +12,7 @@ include_once("inc/text.inc.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
-
+include_once("inc/themes.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -87,6 +87,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 			error('The minimum extensions length has to be less than or equal to the maximum');
 		} else if(GetFormData($f, $s, "loginlockoutattempts") != 0 && GetFormData($f, $s, "logindisableattempts") !=0 && GetFormData($f, $s, "logindisableattempts") <= GetFormData($f, $s, "loginlockoutattempts")){
 			error("The login disable attempts must be greater than the login lockout attempts");
+		} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
+			error("That is not a valid 'Primary Color'");
+		} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
+			error("The ratio of primary to background can only be between 0 and .5(50%)");
 		} else {
 			//check the parsing
 
@@ -133,6 +137,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'));
 				setSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'));
 				setSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'));
+
+				setSetting('_brandtheme', GetFormData($f, $s, '_brandtheme'));
+				setSetting('_brandprimary', GetFormData($f, $s, '_brandprimary'));
+				setSetting('_brandratio', GetFormData($f, $s, '_brandratio'));
+				setSetting('_brandtheme1', $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
+				setSetting('_brandtheme2', $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
+
+				$_SESSION['colorscheme']['_brandtheme'] = GetFormData($f, $s, '_brandtheme');
+				$_SESSION['colorscheme']['_brandprimary'] = GetFormData($f, $s, '_brandprimary');
+				$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, '_brandratio');
+				$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"];
+				$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"];
 
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
@@ -182,7 +198,7 @@ if( $reloadform )
 		PutFormData($f, $s, "easycallmax", getSystemSetting('easycallmax', 10), "number", 0, 10);
 	}
 	if(getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess')){
-		
+
 		for($i=0; $i < $maxphones; $i++){
 			PutFormData($f, $s, "lockedphone" . $i, getSystemSetting('lockedphone' . $i, 0), "bool", 0, 1);
 		}
@@ -195,6 +211,9 @@ if( $reloadform )
 		PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 1, 365, true);
 		PutFormData($f, $s, 'priorityenforcement', getSystemSetting('priorityenforcement', 0), "bool", 0, 1);
 	}
+	PutFormData($f, $s, "_brandtheme", getSystemSetting('_brandtheme'), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "_brandratio", getSystemSetting('_brandratio'), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "_brandprimary", getSystemSetting('_brandprimary'), "text", "nomin", "nomax", true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,6 +268,9 @@ $PAGE = "admin:settings";
 $TITLE = 'Systemwide Settings';
 
 include_once("nav.inc.php");
+
+?><script src="script/picker.js?<?=rand()?>"></script><?
+
 NewForm($f);
 buttons(submit($f, $s, 'Save'));
 startWindow('Global System Settings');
@@ -262,7 +284,7 @@ startWindow('Global System Settings');
 						<tr>
 							<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName', NULL, "small"); ?></td>
 							<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 50);  ?></td>
-						<tr>
+						</tr>
 <?
 						if($IS_COMMSUITE){
 ?>
@@ -271,7 +293,7 @@ startWindow('Global System Settings');
 									Survey URL<? print help('Settings_SurveyURL', NULL, "small"); ?>
 								</td>
 								<td><? NewFormItem($f, $s, 'surveyurl', 'text', 60, 100);  ?></td>
-							<tr>
+							</tr>
 <?
 						}
 ?>
@@ -283,6 +305,34 @@ startWindow('Global System Settings');
 								<td>Systemwide Alert Message<? print help('Settings_SystemwideAlert', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'alertmessage', 'textarea',44,4);  ?></td>
 							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Display Defaults:</th>
+					<td class="bottomBorder">
+						<table border="0" cellpadding="2" cellspacing="0" width=100%>
+							<tr>
+								<td width="30%">Color Theme</td>
+								<td>
+									<?
+										NewFormItem($f, $s, '_brandtheme', 'selectstart', null, null, "onchange='resetPrimaryAndRatio(this.value)'");
+										foreach($COLORSCHEMES as $theme => $scheme){
+											NewFormItem($f, $s, '_brandtheme', 'selectoption', $theme, $theme);
+										}
+										NewFormItem($f, $s, '_brandtheme', 'selectend');
+									?>
+								</td>
+							</tr>
+							<tr>
+								<td>Primary Color(in hex):</td>
+								<td><? NewFormItem($f, $s, "_brandprimary", "text", 0, 10, "id='brandprimary'") ?><img src="img/sel.gif" onclick="TCP.popup(new getObj('brandprimary').obj)"/></td>
+							</tr>
+							<tr>
+								<td>Ratio of Primary to Background</td>
+								<td><? NewFormItem($f, $s, "_brandratio", "text", 0, 3, "id='brandratio'") ?></td>
+							</tr>
+
 						</table>
 					</td>
 				</tr>
@@ -437,7 +487,7 @@ startWindow('Global System Settings');
 													if($i< $maxphones){
 														destination_label_popup("phone", $i, $f, $s, "lockedphone" . $i);
 													} else {
-														echo "&nbsp;";	
+														echo "&nbsp;";
 													}
 ?>
 													</td>
@@ -455,7 +505,7 @@ startWindow('Global System Settings');
 													if($i< $maxemails){
 														destination_label_popup("email", $i, $f, $s, "lockedemail" . $i);
 													} else {
-														echo "&nbsp;";	
+														echo "&nbsp;";
 													}
 ?>
 													</td>
@@ -463,9 +513,9 @@ startWindow('Global System Settings');
 												}
 ?>
 											</tr>
-<?											
+<?
 											if(getSystemSetting("_hassms", false)){
-?>											
+?>
 											<tr>
 												<td align="left" class="bottomBorder"><?=destination_label_popup_paragraph("sms")?></td>
 <?
@@ -476,7 +526,7 @@ startWindow('Global System Settings');
 													if($i< $maxsms){
 														destination_label_popup("sms", $i, $f, $s, "lockedsms" . $i);
 													} else {
-														echo "&nbsp;";	
+														echo "&nbsp;";
 													}
 ?>
 													</td>
@@ -503,3 +553,26 @@ buttons();
 EndForm();
 include_once("navbottom.inc.php");
 ?>
+
+<script>
+
+	var colorscheme = new Array();
+
+<?
+	//Make js array of colorschemes
+	foreach($COLORSCHEMES as $index => $properties){
+?>
+		colorscheme['<?=$index?>'] = new Array();
+		colorscheme['<?=$index?>']['_brandprimary'] = '<?=$properties['_brandprimary']?>';
+		colorscheme['<?=$index?>']['_brandratio'] = '<?=$properties['_brandratio']?>';
+<?
+	}
+?>
+
+	function resetPrimaryAndRatio(value){
+
+		new getObj('brandprimary').obj.value = colorscheme[value]['_brandprimary'];
+		new getObj('brandratio').obj.value = colorscheme[value]['_brandratio'];
+	}
+
+</script>
