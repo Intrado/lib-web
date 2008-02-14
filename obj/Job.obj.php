@@ -169,7 +169,7 @@ class Job extends DBMappedObject {
 
 		//date/time/numer of days
 		$job->startdate = date("Y-m-d", strtotime("today"));
-		$numdays = min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2"));
+		$numdays = min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","1"));
 		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 		$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
 		$job->endtime = date("H:i", strtotime($USER->getCallLate()));
