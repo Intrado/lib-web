@@ -203,11 +203,6 @@ doNavTabs($NAVTREE);
 <!-- ********************************************************************* -->
 
 <?
-	if(getSystemSetting('_showlogobackground'))
-		$background='background="img/themes/' . getBrandTheme() . '/header_bg.gif"';
-	else
-		$background = "";
-
 	if($clickurl = getSystemSetting('_logoclickurl'))
 		$logo =  '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php"></a>';
 	else
@@ -216,7 +211,7 @@ doNavTabs($NAVTREE);
 
 
 <div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 <?=$background?> >
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/themes/<?=getBrandTheme()?>/header_bg.gif" >
 		<tr><td>&nbsp;</td></tr>
 	</table>
 </div>
