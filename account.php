@@ -142,7 +142,7 @@ if(CheckFormSubmit($f,$s))
 				$USER->setSetting("callerid",$callerid);
 
 			if($USER->authorize('changetheme')){
-				if (GetFormData($f, $s, "themeoveride")){
+				if (GetFormData($f, $s, "themeoverride")){
 					$USER->setSetting("_brandtheme", GetFormData($f, $s, "_brandtheme"));
 					$USER->setSetting("_brandtheme1", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
 					$USER->setSetting("_brandtheme2", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
