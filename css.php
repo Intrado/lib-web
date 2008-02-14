@@ -1,41 +1,17 @@
 <?
-
+include("inc/common.inc.php");
 header('Content-type: text/css');
 
-$colorarray = array("orangetheme" => array("primary" => "FF8C00",
-											"theme1" => "B8860B",
-											"theme2" => "DAA520"),
-					"dodgerblue" => array("primary" => "1E90FF",
-											"theme1" => "87CEEB",
-											"theme2" => "7FFFD4"),
-					"redtheme" =>	array("primary" => "DC143C",
-											"theme1" => "800000",
-											"theme2" => "B22222"),
-					"greentheme" => array("primary" =>"228B22",
-											"theme1" => "006400",
-											"theme2" => "32CD32"),
-					"schoolmessenger" => array("primary" => "346799",
-												"theme1" => "999999",
-												"theme2" => "CCCCCC")
-					);
-
-
-//$Primary = "FF8C00"; //darkorange;
-//$Primary = "1E90FF"; //Dodger Blue
-//$Primary = "346799"; //Original
-//theme1 is darker than theme2
-
-$theme = "dodgerblue";
-
-$Primary = $colorarray[$theme]["primary"];
-$theme1 = "#" . $colorarray[$theme]["theme1"];
-$theme2 = "#" . $colorarray[$theme]["theme2"];
+$theme = $_SESSION['colorscheme']['_brandtheme'];
+$Primary = $_SESSION['colorscheme']['_brandprimary'];
+$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
+$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
 
 $fade1 = "E5E5E5";
 $fade2 = "999999";
 $fade3 = "595959";
 
-$globalratio = .3;
+$globalratio = $_SESSION['colorscheme']['_brandratio'];
 
 $newfade1 = fadecolor($Primary, $fade1, $globalratio);
 $newfade2 = fadecolor($Primary, $fade2, $globalratio);
@@ -43,6 +19,8 @@ $newfade3 = fadecolor($Primary, $fade3, $globalratio);
 
 $Primary = "#" . $Primary;
 
+
+//Takes 2 hex color strings and 1 ratio to apply to to the primary:original
 function fadecolor($primary, $fade, $ratio){
 	$primaryarray = array(substr($primary, 0, 2), substr($primary, 2, 2), substr($primary, 4, 2));
 	$fadearray = array(substr($fade, 0, 2), substr($fade, 2, 2), substr($fade, 4, 2));
@@ -115,7 +93,7 @@ $css = "
 		height: 23px;
 		position:relative;
 		float: left;
-		background: url('img/main_nav_tab_over.gif') no-repeat;
+		background: url('img/themes/" . $theme . "/main_nav_tab_over.gif') no-repeat;
 	}
 
 	.navtab a {
@@ -175,7 +153,7 @@ $css = "
 	.subnavmenu {
 		height: 22px;
 		width: 100%;
-		background: url('img/chrome.png');
+		background: url('img/themes/" . $theme . "/chrome.png');
 	}
 
 	.subnavmenu .subnavtab {
@@ -199,7 +177,7 @@ $css = "
 	}
 
 	.subnavmenu .active {
-		background: url('img/chrome_light.png');
+		background: url('img/themes/" . $theme . "/chrome_light.png');
 		border-left: 1px solid " . $theme2 . ";
 		border-right: 1px solid " . $theme2 . ";
 
@@ -249,7 +227,7 @@ $css = "
 	.shortcuts a , .shortcuts a:link, .shortcuts a:active, .shortcuts a:visited {
 		margin-left: 5px;
 		display: block;
-		color: #346799;
+		color: " . $Primary . ";
 	}
 
 	.shortcuttitle {
@@ -318,7 +296,7 @@ $css = "
 
 
 	.windowbar {
-		background: url('img/chrome_light.png') repeat-x;
+		background: url('img/themes/" . $theme . "/chrome_light.png') repeat-x;
 		border-bottom: 1px solid " . $theme2 . " ;
 		height: 22px;
 	}
@@ -365,7 +343,7 @@ $css = "
 	}
 
 	.button .middle {
-		background: url('img/button_mid.gif') repeat-x;
+		background: url('img/themes/" . $theme . "/button_mid.gif') repeat-x;
 	}
 
 	.button table {
@@ -400,7 +378,7 @@ $css = "
 
 
 
-	input.text , select, textarea, table.form  {
+	input.text, input , select, textarea, table.form  {
 		border: " . $theme1 . " 1px solid;
 	}
 
@@ -514,18 +492,18 @@ $css = "
 	/*
 
 
-	blue, logo & cust name color, window color #346799
+		blue, logo & cust name color, window color #346799
 
-	dark gray, text on light gray background " . $newfade2 . "
+		dark gray, text on light gray background #595959
 
-	light gray, light background, highlight " . $newfade1 . "
+		light gray, light background, highlight #E5E5E5
 
-	dark blue #365F8D
-	light blue #D4DDE2
-	shaded cell #E8E8E8
-	border " . $theme2 . "
+		dark blue #365F8D
+		light blue #D4DDE2
+		shaded cell #E8E8E8
+		border #cccccc
 
-	selected blue #0E3293
+		selected blue #0E3293
 
 	*/
 ";
