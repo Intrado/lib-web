@@ -72,7 +72,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		}
 		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
 		//do check
-		
+
 		$sendphone = GetFormData($f, $s, "sendphone");
 		$sendemail = GetFormData($f, $s, "sendemail");
 		$sendsms = getSystemSetting("_hassms", false) ? GetFormData($f, $s, "sendsms") : 0;
@@ -121,16 +121,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$newsmsmessage->name = GetFormData($f, $s,'name');
 					$newsmsmessage->description = "SMS Message " . date("M d, Y h:i:s", strtotime("now"));
 					$newsmsmessage->create();
-					
+
 					foreach($parts as $part){
 						$part->messageid = $newsmsmessage->id;
 						$part->create();
 					}
-					
+
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, 'smsmessageid', $newsmsmessage->id, 'number', 'nomin', 'nomax');
 				}
-			
+
 				$fieldsarray = array("name", "jobtypeid", "description", "listid", "phonemessageid",
 				"emailmessageid","printmessageid", "smsmessageid", "starttime", "endtime",
 				"sendphone", "sendemail", "sendprint", "sendsms", "maxcallattempts");
@@ -228,22 +228,22 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			if(!$submittedmode && !$completedmode) {
 				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
-				
+
 				if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 					$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
 				} else {
 					$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 					$job->setOptionValue("callerid", $callerid);
 				}
-	
+
 				if ($USER->authorize("leavemessage"))
 					$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
-				
+
 			}
 			if(!$completedmode){
 				if (getSystemSetting('retry') != "")
 					$job->setOptionValue("retry",getSystemSetting('retry'));
-					
+
 				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 				$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));
 			}
@@ -377,7 +377,7 @@ if( $reloadform )
 	PutFormData($f,"email","newmessemail","");
 	PutFormData($f,"print","newlangprint","");
 	PutFormData($f,"print","newmessprint","");
-	
+
 	PutFormData($f,$s,"smsmessagetxt", "", "text", 0, 160);
 }
 
@@ -419,7 +419,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 	<table border=0 cellpadding=3 cellspacing=0><tr><td>
 <?
 	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? " DISABLED " : "") . $extrahtml);
-	
+
 	if($type == "sms") {
 		NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
 	} else {
@@ -549,18 +549,18 @@ startWindow('Job Information');
 				<tr>
 <?
 				if($USER->authorize('sendphone')){
-?>	
-						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('phone')\"" ?> ><img src="img/icon_phone.gif" align="absmiddle"></div></td>
+?>
+						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('phone')\"" ?> ><img src="img/themes/<?=getBrandTheme()?>/icon_phone.gif" align="absmiddle"></div></td>
 <?
 				}
 				if($USER->authorize('sendemail')){
 ?>
-						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('email')\"" ?> ><img src="img/icon_email.gif" align="absmiddle"></div></td>
+						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('email')\"" ?> ><img src="img/themes/<?=getBrandTheme()?>/icon_email.gif" align="absmiddle"></div></td>
 <?
 				}
 				if($hassms && $USER->authorize('sendsms')){
 ?>
-						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('sms')\""?> ><img src="img/icon_sms.gif" align="absmiddle"></div></td>
+						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('sms')\""?> ><img src="img/themes/<?=getBrandTheme()?>/icon_sms.gif" align="absmiddle"></div></td>
 <?
 				}
 ?>
@@ -707,13 +707,13 @@ startWindow('Job Information');
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
-			
+
 			<div id='displayphoneoptions'>
-<? 
+<?
 					if(!$submittedmode){
 ?>
 						<a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<? 
+<?
 					} else {
 ?>
 						&nbsp;
@@ -728,7 +728,7 @@ startWindow('Job Information');
 						<td><? message_select('phone',$f,$s,"phonemessageid"); ?></td>
 					</tr>
 <? if($USER->authorize('sendmulti')) { ?>
-	
+
 					<tr>
 						<td>Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
 						<td><? alternate('phone'); ?></td>
@@ -752,7 +752,7 @@ startWindow('Job Information');
 								<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 					<? } ?>
-	
+
 					<tr>
 						<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
 						<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
@@ -763,7 +763,7 @@ startWindow('Job Information');
 							<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
 						</tr>
 					<? } ?>
-	
+
 				</table>
 			</div>
 		</td>
@@ -774,11 +774,11 @@ startWindow('Job Information');
 		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 		<td class="bottomBorder">
 			<div id='displayemailoptions'>
-<? 
+<?
 					if(!$submittedmode){
 ?>
 						<a href="#" onclick="displaySection('email'); new getObj('sendemail').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<? 
+<?
 					} else {
 ?>
 						&nbsp;
@@ -812,11 +812,11 @@ startWindow('Job Information');
 		<th align="right" valign="top" class="windowRowHeader">Print</th>
 		<td>
 			<div id='displayprintoptions'>
-<? 
+<?
 					if(!$submittedmode){
 ?>
 						<a href="#" onclick="displaySection('print'); new getObj('sendprint').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<? 
+<?
 					} else {
 ?>
 						&nbsp;
@@ -858,11 +858,11 @@ startWindow('Job Information');
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
 			<div id='displaysmsoptions'>
-<? 
+<?
 					if(!$submittedmode){
 ?>
 						<a href="#" onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<? 
+<?
 					} else {
 ?>
 						&nbsp;
@@ -913,7 +913,7 @@ include_once("navbottom.inc.php");
 ?>
 	phonecheck = false;
 	emailcheck = false;
-	
+
 	if(new getObj('sendphone').obj){
 		phonecheck = new getObj('sendphone').obj.checked;
 		if(phonecheck){
@@ -943,7 +943,7 @@ include_once("navbottom.inc.php");
 			status.obj.innerHTML="<b style='color:orange;'>" + remaining + "</b>";
 		else
 			status.obj.innerHTML=remaining;
-	}	
+	}
 /*
 	Function to show the date in page text
 */
@@ -1009,14 +1009,14 @@ function hideSection(section){
 	phonecheck = false;
 	emailcheck = false;
 	smscheck = false;
-	
+
 	if(new getObj('sendphone').obj)
 		phonecheck = new getObj('sendphone').obj.checked;
 	if(new getObj('sendemail').obj)
 		emailcheck = new getObj('sendemail').obj.checked;
 	if(new getObj('sendsms').obj)
 		smscheck = new getObj('sendsms').obj.checked;
-	
+
 	if(!phonecheck && !emailcheck && !smscheck){
 		hide('settings');
 	}
@@ -1025,7 +1025,7 @@ function hideSection(section){
 function clickIcon(section){
 	var checkbox = new getObj('send' + section).obj;
 	checkbox.checked = !checkbox.checked;
-	
+
 	if(checkbox.checked){
 		displaySection(section);
 	} else {
