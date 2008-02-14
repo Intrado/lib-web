@@ -51,6 +51,22 @@ if (isset($_GET['deleterule'])) {
 	redirect();
 }
 
+
+if (isset($_GET['clearall'])) {
+	if (isset($_SESSION['listid'])) {
+		switch ($_GET['clearall']) {
+			case "skips":
+				QuickUpdate("delete from listentry where type='N' and listid='" . $_SESSION['listid'] . "'");
+				break;
+			case "adds":
+				QuickUpdate("delete from listentry where type='A' and listid='" . $_SESSION['listid'] . "'");
+				break;
+		}
+	}
+	redirect();
+}
+
+
 /****************** main message section ******************/
 
 $f = "list";
@@ -237,6 +253,7 @@ if ($numAdd > 0) {
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder">Additions:<br><? print help('List_Additions'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;">
+		<a href="?clearall=adds">Clear All</a>
 <?
 if ($list->id) {
 	$renderedlist->mode = "add";
@@ -260,6 +277,7 @@ if ($numSkip > 0) {
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder">Skip:<br><? print help('List_Skip'); ?></th>
 		<td class="bottomBorder" style="padding: 5px;">
+		<a href="?clearall=skips">Clear All</a>
 <?
 if ($list->id) {
 	$renderedlist->mode = "remove";
