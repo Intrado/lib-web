@@ -10,6 +10,7 @@ include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
 include_once("inc/text.inc.php");
 include_once("obj/Phone.obj.php");
+include_once("inc/themes.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -102,6 +103,10 @@ if(CheckFormSubmit($f,$s))
 			error("These emails are invalid", $bademaillist);
 		} elseif(strtotime(GetFormData($f, $s, 'callearly')) >= strtotime(GetFormData($f, $s, 'calllate'))) {
 			error("The earliest call time must be before the latest call time");
+		} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
+			error("That is not a valid 'Primary Color'");
+		} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
+			error("The ratio of primary to background can only be between 0 and .5(50%)");
 		} else {
 			//submit changes
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
@@ -135,6 +140,42 @@ if(CheckFormSubmit($f,$s))
 				$callerid = false;
 			if ($USER->authorize('setcallerid'))
 				$USER->setSetting("callerid",$callerid);
+
+			if($USER->authorize('changetheme')){
+				if (GetFormData($f, $s, "themeoveride")){
+					$USER->setSetting("_brandtheme", GetFormData($f, $s, "_brandtheme"));
+					$USER->setSetting("_brandtheme1", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
+					$USER->setSetting("_brandtheme2", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
+					$_SESSION['colorscheme']['_brandtheme'] = GetFormData($f, $s, "_brandtheme");
+					$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"];
+					$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"];
+
+
+
+					$USER->setSetting("_brandprimary", GetFormData($f, $s, "_brandprimary"));
+					$_SESSION['colorscheme']['_brandprimary'] = GetFormData($f, $s, "_brandprimary");
+
+
+
+					$USER->setSetting("_brandratio", GetFormData($f, $s, "_brandratio"));
+					$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, "_brandratio");
+				} else {
+
+					$USER->setSetting("_brandtheme", "");
+					$USER->setSetting("_brandtheme1", "");
+					$USER->setSetting("_brandtheme2", "");
+					$USER->setSetting("_brandprimary", "");
+					$USER->setSetting("_brandratio", "");
+
+					$_SESSION['colorscheme']['_brandtheme'] = getSystemSetting("_brandtheme");
+					$_SESSION['colorscheme']['_brandtheme1'] = getSystemSetting("_brandtheme1");
+					$_SESSION['colorscheme']['_brandtheme2'] = getSystemSetting("_brandtheme2");
+					$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
+					$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
+
+				}
+			}
+
 
 			redirect("start.php");
 		}
@@ -193,6 +234,15 @@ if( $reloadform )
 	//default to system setting unless user has a pref
 	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
+
+	PutFormData($f, $s, "_brandtheme", $USER->getSetting('_brandtheme', getSystemSetting('_brandtheme')), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "_brandratio", $USER->getSetting('_brandratio', getSystemSetting('_brandratio')), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "_brandprimary", $USER->getSetting('_brandprimary', getSystemSetting('_brandprimary')), "text", "nomin", "nomax", true);
+	$themechecked = 0;
+	if($USER->getSetting('_brandtheme')){
+		$themechecked = 1;
+	}
+	PutFormData($f, $s, "themeoverride", $themechecked, "bool", 0, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,6 +252,9 @@ $PAGE = "start:account";
 $TITLE = "Account Information: $USER->firstname $USER->lastname";
 
 include_once("nav.inc.php");
+
+?><script src="script/picker.js?<?=rand()?>"></script><?
+
 NewForm($f);
 buttons(submit($f, $s, 'Save'));
 
@@ -273,8 +326,8 @@ startWindow('User Information');
 					</td>
 				</tr>
 				<tr>
-					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Notification Defaults:</th>
-					<td>
+					<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Notification Defaults:</th>
+					<td class="bottomBorder">
 						<table border="0" cellpadding="1" cellspacing="0">
 
 							<tr>
@@ -325,6 +378,40 @@ startWindow('User Information');
 						</table>
 					</td>
 				</tr>
+<? if ($USER->authorize('changetheme')) { ?>
+				<tr>
+					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Display Defaults:</th>
+					<td>
+						<table border="0" cellpadding="1" cellspacing="0">
+							<tr>
+								<td width="30%">Customize Theme</td>
+								<td><? NewFormItem($f, $s, "themeoverride", "checkbox", null, null, "id='themeoverride' onclick='disablethemes(this.checked)'"); ?></td>
+							</tr>
+							<tr>
+								<td>Color Theme</td>
+								<td>
+									<?
+										NewFormItem($f, $s, '_brandtheme', 'selectstart', null, null, "id='themes' onchange='resetPrimaryAndRatio(this.value)'");
+										foreach($COLORSCHEMES as $theme => $scheme){
+											NewFormItem($f, $s, '_brandtheme', 'selectoption', $theme, $theme);
+										}
+										NewFormItem($f, $s, '_brandtheme', 'selectend');
+									?>
+								</td>
+							</tr>
+							<tr>
+								<td>Primary Color(in hex):</td>
+								<td><? NewFormItem($f, $s, "_brandprimary", "text", 0, 10, "id='brandprimary'") ?><img src="img/sel.gif" onclick="TCP.popup(new getObj('brandprimary').obj)"/></td>
+							</tr>
+							<tr>
+								<td>Ratio of Primary to Background</td>
+								<td><? NewFormItem($f, $s, "_brandratio", "text", 0, 3, "id='brandratio'") ?></td>
+							</tr>
+
+						</table>
+					</td>
+				</tr>
+<? } ?>
 			</table>
 		<?
 endWindow();
@@ -332,3 +419,39 @@ buttons();
 EndForm();
 include_once("navbottom.inc.php");
 ?>
+<script>
+
+	var colorscheme = new Array();
+
+<?
+	//Make js array of colorschemes
+	foreach($COLORSCHEMES as $index => $properties){
+?>
+		colorscheme['<?=$index?>'] = new Array();
+		colorscheme['<?=$index?>']['_brandprimary'] = '<?=$properties['_brandprimary']?>';
+		colorscheme['<?=$index?>']['_brandratio'] = '<?=$properties['_brandratio']?>';
+<?
+	}
+?>
+
+	disablethemes(new getObj('themeoverride').obj.checked);
+
+	function resetPrimaryAndRatio(value){
+
+		new getObj('brandprimary').obj.value = colorscheme[value]['_brandprimary'];
+		new getObj('brandratio').obj.value = colorscheme[value]['_brandratio'];
+	}
+
+	function disablethemes(checked){
+		if(checked){
+			new getObj('themes').obj.disabled=false;
+			new getObj('brandprimary').obj.disabled=false;
+			new getObj('brandratio').obj.disabled=false;
+		} else {
+			new getObj('themes').obj.disabled=true;
+			new getObj('brandprimary').obj.disabled=true;
+			new getObj('brandratio').obj.disabled=true;
+		}
+	}
+
+</script>
