@@ -26,22 +26,4 @@ $COLORSCHEMES =  array("orangetheme" => array("_brandprimary" => "FF8C00",
 											"_brandtheme2" => "1E90FF",
 											"_brandratio" => ".3"),
 					);
-
-
-$OPTIONALCOLORS = array("FF8C00",
-						"B8860B",
-						"DAA520",
-						"1E90FF",
-						"87CEEB",
-						"7FFFD4",
-						"DC143C",
-						"800000",
-						"B22222",
-						"228B22",
-						"006400",
-						"32CD32",
-						"346799",
-						"999999",
-						"CCCCCC"
-						);
 ?>
