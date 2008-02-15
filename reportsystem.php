@@ -29,22 +29,9 @@ if (!$USER->authorize('viewusagestats')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 if(isset($_GET['clear'])){
-	unset($_SESSION['usagestats']);	
+	unset($_SESSION['usagestats']);
 	redirect();
 }
-
-$clear=0;
-if(isset($_GET['showusers'])){
-	$_SESSION['usagestats']['showusers'] = $_GET['showusers'];
-	$clear = 1;
-}
-if(isset($_GET['type']) && $_GET['type'] != ""){
-	$_SESSION['usagestats']['type'] = DBSafe($_GET['type']);
-	$clear = 1;
-}
-
-if($clear)
-	redirect();
 
 $groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : FieldMap::getSchoolField(); //defaults to school f-field
 if(!$groupby)
@@ -75,7 +62,7 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		$startdate = GetFormData($f, $s, "startdate");
 		$enddate = GetFormData($f, $s, "enddate");
-		
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
@@ -89,6 +76,7 @@ if(CheckFormSubmit($f,$s))
 			$_SESSION['usagestats']['lastxdays'] = GetFormData($f, $s, "xdays");
 			$_SESSION['usagestats']['startdate'] = $startdate;
 			$_SESSION['usagestats']['enddate'] = $enddate;
+			$_SESSION['usagestats']['showusers'] = GetFormData($f, $s, "showusers");
 			redirect();
 		}
 	}
@@ -100,7 +88,7 @@ if($reload){
 	ClearFormData($f);
 	PutFormData($f, $s, "groupby", $groupby);
 	PutFormData($f, $s, "showusers", $showusers, "bool", 0, 1);
-	
+
 	PutFormData($f, $s, "relativedate", $reldate);
 	PutFormData($f, $s, 'xdays', $lastxdays, "number");
 	PutFormData($f, $s, "startdate", $startdate, "text");
@@ -116,7 +104,7 @@ if($reload){
 ////////////////////////////////////////////////////////////////////////////////
 	$joblistquery = "";
 	$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted", true);
-		
+
 	if($reldate == "xdays"){
 		list($startdate, $enddate) = getStartEndDate($reldate, array("lastxdays" =>  GetFormData($f, $s, "xdays")));
 	} else if(GetFormData($f, $s, "relativedate") != "daterange"){
@@ -125,7 +113,7 @@ if($reload){
 		$startdate = strtotime($startdate);
 		$enddate = strtotime($enddate);
 	}
-	
+
 	$joblist = getJobList($startdate, $enddate, implode("','", array_keys($jobtypelist)), "", $type);
 	$joblistquery = " and rp.jobid in ('" . implode("','", $joblist) . "') ";
 	$jobidtypelist = QuickQueryList("select id, jobtypeid from job j where j.id in ('" . implode("','",$joblist) ."') ", true);
@@ -137,7 +125,7 @@ if($reload){
 		$groupbyquery = "''";
 		$groupbyorder = "";
 	}
-	
+
 	$userlist = array();
 	$userresult = Query("Select login, id from user");
 	while($row = DBGetRow($userresult)){
@@ -148,7 +136,7 @@ if($reload){
 				rp.userid,
 				rp.jobid,
 				count(*)
-				from reportperson rp 
+				from reportperson rp
 				where rp.status in ('fail', 'success')
 				$joblistquery
 				and type = '" . DBSafe($type) . "'
@@ -193,7 +181,7 @@ if($reload){
 			else
 				$groupbyarray[$school][$userid]["total"] = (array_sum($groupbyarray[$school][$userid])/$schooltotals[$school]["total"]) * 100;
 		}
-		
+
 	}
 
 
@@ -236,7 +224,7 @@ if(getSystemSetting('_hassms', false)){
 		<tr valign="top">
 			<th align="right" class="bottomBorder windowRowHeader">Group By:</th>
 			<td class="bottomBorder">
-				<? 
+				<?
 					NewFormItem($f, $s, "groupby", "selectstart");
 					NewFormItem($f, $s, "groupby", "selectoption", " -- System -- ", "");
 					foreach($fields as $field){
@@ -249,8 +237,8 @@ if(getSystemSetting('_hassms', false)){
 		<tr valign="top">
 			<th align="right" class="bottomBorder windowRowHeader">Show Users:</th>
 			<td class="bottomBorder">
-				<? 
-					NewFormItem($f, $s, "showusers", "checkbox", null, null, "onclick=\"window.location='?showusers='+ (this.checked ? '1' : '0') + '&type=$type'\"");
+				<?
+					NewFormItem($f, $s, "showusers", "checkbox");
 				?>
 				Show Users
 			</td>
@@ -283,7 +271,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 		$alt=0;
 
 		foreach($groupbyarray as $index => $groupbyfield){
-			
+
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 			$name = FieldMap::getName($groupby);
 			$display = $index;
