@@ -14,7 +14,7 @@ function getOrderSql($params){
 		$orderquery = "order by " . implode(", ", $orderfields);
 	}
 	return $orderquery;
-	
+
 }
 
 function getRuleSql($params, $alias){
@@ -30,7 +30,7 @@ function getRuleSql($params, $alias){
 function getJobSummary($joblist){
 	global $USER;
 
-	$jobinfoquery = "Select 
+	$jobinfoquery = "Select
 							j.name,
 							jt.name,
 							u.login,
@@ -63,7 +63,11 @@ function getJobSummary($joblist){
 function displayJobSummary($joblist){
 
 		$jobinfo = getJobSummary($joblist);
-	
+
+		//Check for any sms messages
+		$smscheck = QuickQuery("select count(smsmessageid) from job where id in ('" . $joblist . "')");
+
+
 		startWindow("Summary", 'padding: 3px;');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -81,14 +85,16 @@ function displayJobSummary($joblist){
 								<th>Recipients</th>
 								<th># of Phones</th>
 								<th># of Emails</th>
+<? if($smscheck) { ?>
 								<th># of SMS</th>
+<? } ?>
 							</tr>
 <?
 							$alt=0;
 							foreach($jobinfo as $job){
 								echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-								
+
 									<td><?=$job[0]?></td>
 									<td><?=$job[1]?></td>
 									<td><?=$job[2]?></td>
@@ -98,7 +104,9 @@ function displayJobSummary($joblist){
 									<td><?=$job[8]?></td>
 									<td><?=$job[9]?></td>
 									<td><?=$job[10]?></td>
+<? if($smscheck) { ?>
 									<td><?=$job[11]?></td>
+<? } ?>
 								</tr>
 <?
 							}
