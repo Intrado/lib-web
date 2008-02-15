@@ -141,39 +141,37 @@ if(CheckFormSubmit($f,$s))
 			if ($USER->authorize('setcallerid'))
 				$USER->setSetting("callerid",$callerid);
 
-			if($USER->authorize('changetheme')){
-				if (GetFormData($f, $s, "themeoverride")){
-					$USER->setSetting("_brandtheme", GetFormData($f, $s, "_brandtheme"));
-					$USER->setSetting("_brandtheme1", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
-					$USER->setSetting("_brandtheme2", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
-					$_SESSION['colorscheme']['_brandtheme'] = GetFormData($f, $s, "_brandtheme");
-					$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"];
-					$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"];
+			if (GetFormData($f, $s, "themeoverride")){
+				$USER->setSetting("_brandtheme", GetFormData($f, $s, "_brandtheme"));
+				$USER->setSetting("_brandtheme1", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
+				$USER->setSetting("_brandtheme2", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
+				$_SESSION['colorscheme']['_brandtheme'] = GetFormData($f, $s, "_brandtheme");
+				$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"];
+				$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"];
 
 
 
-					$USER->setSetting("_brandprimary", GetFormData($f, $s, "_brandprimary"));
-					$_SESSION['colorscheme']['_brandprimary'] = GetFormData($f, $s, "_brandprimary");
+				$USER->setSetting("_brandprimary", GetFormData($f, $s, "_brandprimary"));
+				$_SESSION['colorscheme']['_brandprimary'] = GetFormData($f, $s, "_brandprimary");
 
 
 
-					$USER->setSetting("_brandratio", GetFormData($f, $s, "_brandratio"));
-					$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, "_brandratio");
-				} else {
+				$USER->setSetting("_brandratio", GetFormData($f, $s, "_brandratio"));
+				$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, "_brandratio");
+			} else {
 
-					$USER->setSetting("_brandtheme", "");
-					$USER->setSetting("_brandtheme1", "");
-					$USER->setSetting("_brandtheme2", "");
-					$USER->setSetting("_brandprimary", "");
-					$USER->setSetting("_brandratio", "");
+				$USER->setSetting("_brandtheme", "");
+				$USER->setSetting("_brandtheme1", "");
+				$USER->setSetting("_brandtheme2", "");
+				$USER->setSetting("_brandprimary", "");
+				$USER->setSetting("_brandratio", "");
 
-					$_SESSION['colorscheme']['_brandtheme'] = getSystemSetting("_brandtheme");
-					$_SESSION['colorscheme']['_brandtheme1'] = getSystemSetting("_brandtheme1");
-					$_SESSION['colorscheme']['_brandtheme2'] = getSystemSetting("_brandtheme2");
-					$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
-					$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
+				$_SESSION['colorscheme']['_brandtheme'] = getSystemSetting("_brandtheme");
+				$_SESSION['colorscheme']['_brandtheme1'] = getSystemSetting("_brandtheme1");
+				$_SESSION['colorscheme']['_brandtheme2'] = getSystemSetting("_brandtheme2");
+				$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
+				$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
 
-				}
 			}
 
 
@@ -378,7 +376,6 @@ startWindow('User Information');
 						</table>
 					</td>
 				</tr>
-<? if ($USER->authorize('changetheme')) { ?>
 				<tr>
 					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Display Defaults:</th>
 					<td>
@@ -411,7 +408,6 @@ startWindow('User Information');
 						</table>
 					</td>
 				</tr>
-<? } ?>
 			</table>
 		<?
 endWindow();

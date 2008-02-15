@@ -42,7 +42,6 @@ INSERT INTO `permission` (accessid,name,value) VALUES
 						 (@smaccessid, 'portalaccess', '1'),
 						 (@smaccessid, 'generatebulktokens', '1'),
 						 (@smaccessid, 'managetasks', '1'),
-						 (@smaccessid, 'managecontactdetailsettings', '1'),
-						 (@smaccessid, 'changetheme', '1');
+						 (@smaccessid, 'managecontactdetailsettings', '1');
 $$$
 						
