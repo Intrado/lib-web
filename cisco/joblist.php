@@ -15,13 +15,13 @@ if($min - 31 <= 0){
 }
 
 $activejoblist=QuickQueryList("select SQL_CALC_FOUND_ROWS
-	id from job where userid = '$USER->id' and status = 'active' and deleted = '0' 
+	id from job where userid = '$USER->id' and status = 'active' and deleted = '0'
 	order by id desc
 	limit 30 offset $min");
-$activecount = QuickQuery("select found_rows()");	
+$activecount = QuickQuery("select found_rows()");
 
 $completedjoblist=QuickQueryList("select SQL_CALC_FOUND_ROWS
-	id from job where userid = '$USER->id' and status = 'complete'  and deleted = '0' 
+	id from job where userid = '$USER->id' and status = 'complete'  and deleted = '0'
 	order by finishdate desc
 	limit 30 offset $min");
 $completedcount = QuickQuery("select found_rows()");
@@ -29,22 +29,22 @@ $completedcount = QuickQuery("select found_rows()");
 header("Content-type: text/xml");
 ?>
 <CiscoIPPhoneMenu>
-<Title>SchoolMessenger - Jobs</Title>
+<Title><?=$_SESSION['productname']?> - Jobs</Title>
 <Prompt>Please select a job</Prompt>
 
 <?
 
-foreach($activejoblist as $job){ 
+foreach($activejoblist as $job){
 	$newjob = new Job($job);
 ?>
 	<MenuItem>
 		<Name><?=htmlentities($newjob->name) ?></Name>
 		<URL><?= htmlentities($URL . "/status_jobgraph.php?jobid=" . $job) ?></URL>
 	</MenuItem>
-<? 
+<?
 }
 
-foreach($completedjoblist as $job){ 
+foreach($completedjoblist as $job){
 	$newjob = new Job($job);
 ?>
 	<MenuItem>

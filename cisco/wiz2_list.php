@@ -43,7 +43,7 @@ header("Content-type: text/xml");
 
 ?>
 <CiscoIPPhoneMenu>
-<Title>SchoolMessenger - Lists</Title>
+<Title><?=$_SESSION['productname']?> - Lists</Title>
 <Prompt>Please select your list</Prompt>
 
 <?

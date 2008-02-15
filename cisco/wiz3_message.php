@@ -36,7 +36,7 @@ header("Content-type: text/xml");
 
 ?>
 <CiscoIPPhoneMenu>
-<Title>SchoolMessenger - Message</Title>
+<Title><?=$_SESSION['productname']?> - Message</Title>
 <Prompt>Please select your message</Prompt>
 
 
@@ -47,7 +47,7 @@ header("Content-type: text/xml");
 	</MenuItem>
 <? } ?>
 
-<? 
+<?
 
 foreach ($messages as $message) {
 ?>
@@ -55,9 +55,9 @@ foreach ($messages as $message) {
 	<Name><?= htmlentities($message->name) ?></Name>
 	<URL><?= htmlentities($URL . "/wiz4_priority.php?message=" . $message->id) ?></URL>
 	</MenuItem>
-<? 
-	
-} 
+<?
+
+}
 ?>
 
 <SoftKeyItem>

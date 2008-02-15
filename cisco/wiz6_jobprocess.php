@@ -63,7 +63,7 @@ header("Content-type: text/xml");
 
 ?>
 <CiscoIPPhoneText>
-<Title>SchoolMessenger - Sent</Title>
+<Title><?=$_SESSION['productname']?> - Sent</Title>
 <Prompt> </Prompt>
 <Text>
 Your Job has been submitted.

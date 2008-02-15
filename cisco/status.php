@@ -38,7 +38,7 @@ foreach ($jobs as $job) {
 header("Content-type: text/xml");
 ?>
 <CiscoIPPhoneText>
-<Title>SchoolMessenger - Status</Title>
+<Title><?=$_SESSION['productname']?> - Status</Title>
 <Prompt>Showing the last <?=  count($jobs) ?> job(s)</Prompt>
 <Text><?
 

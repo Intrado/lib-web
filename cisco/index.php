@@ -17,6 +17,7 @@ if (isset($_GET['loginalpha'])) {
 
 
 $badlogin = false;
+$scheme = getCustomerData($CUSTOMERURL);
 
 //try logging in once user/pass or code/pin is checked
 function tryLogin ($userid) {
@@ -47,12 +48,13 @@ if (isset($_GET['logout'])) {
 	@session_destroy();
 	$_SESSION['dn'] = $dn;
 } else if (isset($_SESSION['user'])) {
+	$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 	sleep(1);
 	header("Location: $URL/main.php");
 	exit();
 } else if (isset($_GET['code'])) {
 	if (tryLogin(doLoginPhone($_GET['code'], $_GET['pin'],null, $CUSTOMERURL))) {
-
+		$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 		sleep(1);
 		header("Location: $URL/main.php");
 		exit();
@@ -61,6 +63,7 @@ if (isset($_GET['logout'])) {
 	}
 } else if (isset($_GET['login'])) {
 	if (tryLogin(doLogin($_GET['login'], $_GET['password'],$CUSTOMERURL))) {
+		$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 		sleep(1);
 		header("Location: $URL/main.php");
 		exit();
@@ -75,7 +78,7 @@ header("Content-type: text/xml");
 ?>
 
 <CiscoIPPhoneInput>
-<Title>SchoolMessenger - Welcome</Title>
+<Title><?=$scheme['productname']?> - Welcome</Title>
 <Prompt><?= ($badlogin) ? "Invalid code or PIN" : "Please log in" ?></Prompt>
 <URL><?= $URL . "/index.php" ?></URL>
 

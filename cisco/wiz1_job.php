@@ -19,7 +19,7 @@ if (!isset($_GET['edit'])) {
 header("Content-type: text/xml");
 ?>
 <CiscoIPPhoneInput>
-<Title>SchoolMessenger - New Job</Title>
+<Title><?=$_SESSION['productname']?> - New Job</Title>
 <Prompt>Naming your job is optional.</Prompt>
 <URL><?= htmlentities($URL . "/wiz2_list.php") ?></URL>
 

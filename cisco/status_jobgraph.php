@@ -11,7 +11,7 @@ header("Content-type: text/xml");
 
 ?>
 <CiscoIPPhoneImageFile>
-<Title>SchoolMessenger - Status</Title>
+<Title><?=$_SESSION['productname']?> - Status</Title>
 <Prompt>Active Jobs</Prompt>
 <LocationX>-1</LocationX>
 <LocationY>-1</LocationY>

@@ -37,7 +37,7 @@ header("Content-type: text/xml");
 
 ?>
 <CiscoIPPhoneMenu>
-<Title>SchoolMessenger - Languages</Title>
+<Title><?=$_SESSION['productname']?> - Languages</Title>
 
 <MenuItem>
 <Name><?= htmlentities("Default-English - Selected")?></Name>
@@ -46,7 +46,7 @@ header("Content-type: text/xml");
 <?
 $morelangs = 0;
 foreach ($languages as $language) {
-	
+
 	if($language->name == "English"){
 		continue;
 	}

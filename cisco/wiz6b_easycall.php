@@ -66,7 +66,7 @@ if (isset($_GET['dn'])) {
 header("Content-type: text/xml");
 ?>
 <CiscoIPPhoneText>
-<Title>SchoolMessenger - CallMe</Title>
+<Title><?=$_SESSION['productname']?> - CallMe</Title>
 <Prompt> </Prompt>
 
 <Text>
@@ -93,7 +93,7 @@ You should recieve a call shortly.
 header("Content-type: text/xml");
 ?>
 <CiscoIPPhoneInput>
-<Title>SchoolMessenger - CallMe</Title>
+<Title><?=$_SESSION['productname']?> - CallMe</Title>
 <Prompt>Please enter your Phone #</Prompt>
 <URL><?= htmlentities($URL . "/wiz6b_easycall.php") ?></URL>
 

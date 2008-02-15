@@ -36,7 +36,7 @@ $languages = DBFindMany("Language","from language order by name");
 header("Content-type: text/xml");
 ?>
 <CiscoIPPhoneText>
-<Title>SchoolMessenger - Confirm</Title>
+<Title><?=$_SESSION['productname']?> - Confirm</Title>
 <Prompt>Please review your job</Prompt>
 <Text><?
 echo "Job:" . (($_SESSION['newjob']['name']) ? $_SESSION['newjob']['name'] : "(Automatic)") . "\r\n";

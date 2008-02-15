@@ -30,7 +30,7 @@ header("Content-type: text/xml");
 
 ?>
 <CiscoIPPhoneMenu>
-<Title>SchoolMessenger - Priority</Title>
+<Title><?=$_SESSION['productname']?> - Priority</Title>
 <Prompt>Please select a priority</Prompt>
 
 <?
