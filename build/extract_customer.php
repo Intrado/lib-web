@@ -218,15 +218,10 @@ function genpassword() {
 
 //-------------------------------------------------------------------
 
-$result = mysql_query("select inboundnumber from customer where id = '$customerid'", $db)
-			or die ("Failed to query customer: " . mysql_error($db));
-
-$row = mysql_fetch_row($result) or die ("Failed to query customer: $customerid");
-
 echo "Doing $customerid\n";
 
 $custpass = genpassword();
-$destres = mysql_query("update customer set inboundnumber = '$row[0]' where id = '$customerid'", $custdb)
+$destres = mysql_query("update customer set inboundnumber = '0000000000' where id = '$customerid'", $custdb)
 						or die("Failed to update customer inboundnumber: " . mysql_error($custdb));
 
 //SETTING
