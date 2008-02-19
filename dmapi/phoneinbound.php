@@ -13,7 +13,7 @@ global $SESSIONDATA, $BFXML_VARS;
 if ($REQUEST_TYPE == "new") {
 	glog("///////////////////////");
 
-	$inboundNumber = (isset($BFXML_VARS['exten']) ? $BFXML_VARS['exten'] : "0000");
+	$inboundNumber = (isset($BFXML_VARS['exten']) ? $BFXML_VARS['exten'] : "0000000000");
 
 	glog("inboundNumber: ".$inboundNumber);
 	$SESSIONDATA['inboundNumber'] = $inboundNumber;
