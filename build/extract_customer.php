@@ -230,7 +230,7 @@ $destres = mysql_query("update customer set inboundnumber = '$row[0]' where id =
 						or die("Failed to update customer inboundnumber: " . mysql_error($custdb));
 
 //SETTING
-copytable($customerid,"setting",array("id", "name", "value"),$db,$custdb,1000,false);
+copytable($customerid,"setting",array("name", "value"),$db,$custdb,1000,false);
 
 //Customer fields
 customerinfo($customerid, $db, $custdb);
@@ -383,9 +383,6 @@ copytable($customerid,"schedule",array("id", "userid", "time", "nextrun"),$db,$c
 
 //SCHEDULEDAY table removed, dow field added to schedule table
 restructureScheduleDay($customerid, $db, $custdb);
-
-//SETTING
-copytable($customerid,"setting",array("name", "value"),$db,$custdb,1000,false);
 
 //SPECIALTASK
 //dont copy
