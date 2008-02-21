@@ -11,6 +11,7 @@ $fieldmapnames = FieldMap::getAuthorizedMapNames();
 $fieldmaps = FieldMap::getAuthorizedFieldMaps();
 
 $rulemap = array();
+$unusedrules = array();
 if(is_array($RULES)) {
 	foreach ($RULES as $rule) {
 		$rulemap[$rule->fieldnum][] = $rule;
