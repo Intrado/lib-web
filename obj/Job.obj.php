@@ -156,8 +156,6 @@ class Job extends DBMappedObject {
 
 		//call settings
 		$job->setOptionValue("maxcallattempts", min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4")));
-		if (getSystemSetting('retry') != "")
-			$job->setOptionValue("retry",getSystemSetting('retry'));
 
 		//options
 		$job->setOption("skipduplicates",1);
