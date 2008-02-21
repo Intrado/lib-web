@@ -67,6 +67,9 @@ $css = "
 		text-decoration: underline;
 	}
 
+	.destlabel {
+		color: " . $Primary . ";
+	}
 
 	.custname {
 		font-size: 12pt;
