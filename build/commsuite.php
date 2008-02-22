@@ -4,33 +4,43 @@ $olddbname = "dialer"; //old db name
 $initpath = "/usr/commsuite/init/";  //path where all init files exist, for linux only
 
 $error = 1;
-if(stat("../inc/settings.ini.php")){
-	$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-	if(isset($SETTINGS['db']['user'])){
-		$dbuser = $SETTINGS['db']['user'];
-		$dbpass = $SETTINGS['db']['pass'];
-		$error = 0;
+
+if(!$argv[1]){
+	$type = installtype();
+	if($type == "upgrade"){
+		$answer = confirmmangle();
+		if($answer != "y"){
+			exit("Exiting");
+		}
 	}
-}
-if($error){
-	//if file cant be found, prompt user for db connection info
-	$confirm = "n";
-	while($confirm != "y"){
-		echo "\nEnter DB User:\n";
-		$dbuser = trim(fread(STDIN, 1024));
-		echo "\nEnter DB Pass:\n";
-		$dbpass = trim(fread(STDIN, 1024));
-		echo "DBUSER: " . $dbuser . "\n";
-		echo "DBPASS: " . $dbpass . "\n";
-		$confirm = generalMenu(array("Is this information correct?", "y or n"), array("y", "n"));
-	}
+} else {
+	$type = $argv[1];
 }
 
-$type = installtype();
-if($type == "upgrade"){
-	$answer = confirmmangle();
-	if($answer != "y"){
-		exit("Exiting");
+if($argv[2]){
+	$dbuser = $argv[2];
+	$dbpass = $argv[3];
+} else {
+	if(stat("../inc/settings.ini.php")){
+		$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+		if(isset($SETTINGS['db']['user'])){
+			$dbuser = $SETTINGS['db']['user'];
+			$dbpass = $SETTINGS['db']['pass'];
+			$error = 0;
+		}
+	}
+	if($error){
+		//if file cant be found, prompt user for db connection info
+		$confirm = "n";
+		while($confirm != "y"){
+			echo "\nEnter DB User:\n";
+			$dbuser = trim(fread(STDIN, 1024));
+			echo "\nEnter DB Pass:\n";
+			$dbpass = trim(fread(STDIN, 1024));
+			echo "DBUSER: " . $dbuser . "\n";
+			echo "DBPASS: " . $dbpass . "\n";
+			$confirm = generalMenu(array("Is this information correct?", "y or n"), array("y", "n"));
+		}
 	}
 }
 
