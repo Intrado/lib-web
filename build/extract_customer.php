@@ -92,6 +92,7 @@ function parseOptions ($options) {
 }
 
 function restructureJobOptions($custid, $source, $dest, $batch, $joincustomer = false) {
+
 	$query = "select job.id, job.maxcallattempts, job.options from job ";
 
     if ($joincustomer)
@@ -119,10 +120,16 @@ function restructureJobOptions($custid, $source, $dest, $batch, $joincustomer = 
 
   	  	foreach ($optionsarray as $index => $option) {
   	  		$newrow[0] = $jobid;
+
+  	  		if($index == '' || $option == '')
+  	  			continue;
+
 			if (is_int($index)) {
 				$newrow[1] = $option;
 				$newrow[2] = 1;
 			} else {
+				if($index == 'retry')
+					continue;
 				$newrow[1] = $index;
 				$newrow[2] = $option;
   	  		}
