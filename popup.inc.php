@@ -9,7 +9,7 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 
 <html>
 <head>
-<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
+<title><?= getBrand();?>: <?= $pagetitle ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/nav.js'></script>
 	<script src='script/sorttable.js'></script>
