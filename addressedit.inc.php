@@ -74,10 +74,6 @@ if ($personid == NULL) {
 	$f = FieldMap::getLanguageField();
 	$person->$f = "English"; // default language, so that first in alphabet is not selected (example, Chinese)
 	$address = new Address();
-
-	$phones = array();
-	$emails = array();
-	$smses = array();
 } else {
 	// editing existing person
 	$person = DBFind("Person", "from person where id = " . $personid);
@@ -86,22 +82,40 @@ if ($personid == NULL) {
 
 	// get existing phones from db, then create any additional based on the max allowed
 	// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
-	$phones = array_values(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"));
-	$emails = array_values(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"));
-	$smses = array_values(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"));
+	$tempphones = resequence(DBFindMany("Phone", "from phone where personid=" . $personid . " order by sequence"),"sequence");
+	$tempemails = resequence(DBFindMany("Email", "from email where personid=" . $personid . " order by sequence"),"sequence");
+	$tempsmses = resequence(DBFindMany("Sms", "from sms where personid=" . $personid . " order by sequence"),"sequence");
 }
 
-for ($i=count($phones); $i<$maxphones; $i++) {
-	$phones[$i] = new Phone();
-	$phones[$i]->sequence = $i;
+$phones = array();
+$emails = array();
+$smses = array();
+
+
+for ($i=0; $i<$maxphones; $i++) {
+	if(!isset($tempphones[$i])){
+		$phones[$i] = new Phone();
+		$phones[$i]->sequence = $i;
+	} else {
+		$phones[$i] = $tempphones[$i];
+	}
 }
-for ($i=count($emails); $i<$maxemails; $i++) {
-	$emails[$i] = new Email();
-	$emails[$i]->sequence = $i;
+
+for ($i=0; $i<$maxemails; $i++) {
+	if(!isset($tempemails[$i])){
+		$emails[$i] = new Email();
+		$emails[$i]->sequence = $i;
+	} else {
+		$emails[$i] = $tempemails[$i];
+	}
 }
-for ($i=count($smses); $i<$maxsms; $i++) {
-	$smses[$i] = new Sms();
-	$smses[$i]->sequence = $i;
+for ($i=0; $i<$maxsms; $i++) {
+	if(!isset($tempsmses[$i])){
+		$smses[$i] = new Sms();
+		$smses[$i]->sequence = $i;
+	} else {
+		$smses[$i] = $tempsmses[$i];
+	}
 }
 
 $contactprefs = $personid ? getContactPrefs($personid) : array();
