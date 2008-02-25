@@ -18,6 +18,7 @@ include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/ListEntry.obj.php");
 include_once("obj/Sms.obj.php");
+include_once("obj/JobType.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -92,13 +93,29 @@ if ($personid == NULL) {
 
 for ($i=count($phones); $i<$maxphones; $i++) {
 	$phones[$i] = new Phone();
+	$phones[$i]->sequence = $i;
 }
 for ($i=count($emails); $i<$maxemails; $i++) {
 	$emails[$i] = new Email();
+	$emails[$i]->sequence = $i;
 }
 for ($i=count($smses); $i<$maxsms; $i++) {
 	$smses[$i] = new Sms();
+	$smses[$i]->sequence = $i;
 }
+
+$contactprefs = $personid ? getContactPrefs($personid) : array();
+$defaultcontactprefs = getDefaultContactPrefs();
+$contacttypes = array("phone", "email");
+$types = array("phone" => $phones,
+				"email" => $emails);
+if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
+	$contacttypes[] = "sms";
+	$types["sms"] = $smses;
+}
+$jobtypes = JobType::getUserJobTypes();
+
+
 
 /****************** main message section ******************/
 
@@ -204,6 +221,28 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			// unset this for next popup edit
 			setCurrentPerson("new");
 
+			foreach($contacttypes as $type){
+				if(!isset($types[$type])) continue;
+				foreach($types[$type] as $item){
+					foreach($jobtypes as $jobtype){
+						if((!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id))
+							||
+							(!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id])){
+								QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+											values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','"
+											. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "')");
+							} else if(isset($contactprefs[$type][$item->sequence][$jobtype->id]) &&
+										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id]){
+								QuickUpdate("update contactpref set enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'
+												where personid = '" . $personid . "' and jobtypeid = '" . $jobtype->id . "' and sequence = '" . $item->sequence . "'");
+						}
+					}
+				}
+			}
+
+
 			if (CheckFormSubmit($f,'saveanother')) {
 				// save and add another
 				$reloadform = 1;
@@ -260,6 +299,21 @@ if( $reloadform )
 			$x++;
 		}
 	}
+
+	foreach($contacttypes as $type){
+		if(!isset($types[$type])) continue;
+		foreach($types[$type] as $item){
+			foreach($jobtypes as $jobtype){
+				$contactpref = 0;
+				if(isset($contactprefs[$type][$item->sequence][$jobtype->id]))
+					$contactpref = $contactprefs[$type][$item->sequence][$jobtype->id];
+				else if(isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]))
+					$contactpref = $defaultcontactprefs[$type][$item->sequence][$jobtype->id];
+				PutFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, $contactpref, "bool", 0, 1);
+			}
+		}
+	}
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,54 +361,9 @@ startWindow("Contact");
 			?>
 		</td>
 	</tr>
-
-<?
-	$x = 0;
-	foreach ($phones as $phone) {
-		$header = destination_label("phone", $x) .":";
-		$itemname = "phone".($x+1);
-?>
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
+		<th align="right" valign="top" class="windowRowHeader bottomBorder" style="padding-top: 10px;">Address:</th>
 		<td class="bottomBorder">
-			<? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?>
-		</td>
-	</tr>
-<?
-		$x++;
-	}
-
-	$x = 0;
-	foreach ($emails as $email) {
-		$header = destination_label("email", $x) .":";
-		$itemname = "email".($x+1);
-?>
-	<tr>
-		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-		<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 50, 100); ?></td>
-	</tr>
-<?
-		$x++;
-	}
-	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
-		$x = 0;
-		foreach ($smses as $sms) {
-			$header = destination_label("sms", $x) .":";
-			$itemname = "sms".($x+1);
-?>
-		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
-			<td class="bottomBorder"><? NewFormItem($f, $s, $itemname, 'text', 20, 20); ?></td>
-		</tr>
-<?
-			$x++;
-		}
-	}
-?>
-
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader" style="padding-top: 10px;">Address:</th>
-		<td>
 			<table border="0">
 				<tr>
 					<td align="right">Line 1:</td>
@@ -375,6 +384,64 @@ startWindow("Contact");
 			</table>
 		</td>
 	</tr>
+	<tr>
+		<th align="right" class="windowRowHeader">Contact Details: </th>
+		<td>
+			<table  cellpadding="2" cellspacing="1">
+
+<?
+	foreach($contacttypes as $type){
+		if(!isset($types[$type])) continue;
+?>
+		<tr class="listHeader">
+			<th align="left" colspan="<?=count($jobtypes)+3; ?>"><?=format_delivery_type($type); ?></th>
+		</tr>
+		<tr class="windowRowHeader">
+			<th align="left">Contact&nbsp;Type</th>
+			<th align="left">Destination</th>
+<?
+			foreach($jobtypes as $jobtype){
+				?><th><?=jobtype_info($jobtype)?></th><?
+			}
+?>
+		</tr>
+<?
+		foreach($types[$type] as $item){
+			$header = destination_label($type, $item->sequence);
+?>
+			<tr>
+				<td class="bottomBorder"><?= $header ?></td>
+<?
+				?><td class="bottomBorder"><?
+				if($type == "email"){
+					NewFormItem($f, $s, $type . ($item->sequence + 1), "text", 30, 100, "id='" . $type . $item->sequence . "'");
+				} else {
+					NewFormItem($f, $s, $type . ($item->sequence + 1), "text", 14, null, "id='" . $type . $item->sequence . "'");
+				}
+				?></td><?
+				foreach($jobtypes as $jobtype){
+?>
+					<td align="center"  class="bottomBorder">
+<?
+						if($type != "sms" || ($type == "sms" && !$jobtype->issurvey)){
+							echo NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1);
+						} else {
+							echo "&nbsp;";
+						}
+?>
+					</td>
+<?
+				}
+?>
+			</tr>
+<?
+		}
+	}
+?>
+			</table>
+		<td>
+	</tr>
+
 
 <? if ($ORIGINTYPE == "manualadd") {	?>
 	<tr>
