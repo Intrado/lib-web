@@ -144,11 +144,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSetting('_brandtheme1', $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
 				setSetting('_brandtheme2', $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
 
-				$_SESSION['colorscheme']['_brandtheme'] = GetFormData($f, $s, '_brandtheme');
-				$_SESSION['colorscheme']['_brandprimary'] = GetFormData($f, $s, '_brandprimary');
-				$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, '_brandratio');
-				$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"];
-				$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"];
+				if(!QuickQuery("select value from usersetting where name = '_brandtheme'")){
+					$_SESSION['colorscheme']['_brandtheme'] = GetFormData($f, $s, '_brandtheme');
+					$_SESSION['colorscheme']['_brandprimary'] = GetFormData($f, $s, '_brandprimary');
+					$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, '_brandratio');
+					$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"];
+					$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"];
+				}
 
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
@@ -318,7 +320,7 @@ startWindow('Global System Settings');
 									<?
 										NewFormItem($f, $s, '_brandtheme', 'selectstart', null, null, "onchange='resetPrimaryAndRatio(this.value)'");
 										foreach($COLORSCHEMES as $theme => $scheme){
-											NewFormItem($f, $s, '_brandtheme', 'selectoption', $theme, $theme);
+											NewFormItem($f, $s, '_brandtheme', 'selectoption', $scheme['_branddisplayname'], $theme);
 										}
 										NewFormItem($f, $s, '_brandtheme', 'selectend');
 									?>
