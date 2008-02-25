@@ -390,7 +390,7 @@ startWindow('User Information');
 									<?
 										NewFormItem($f, $s, '_brandtheme', 'selectstart', null, null, "id='themes' onchange='resetPrimaryAndRatio(this.value)'");
 										foreach($COLORSCHEMES as $theme => $scheme){
-											NewFormItem($f, $s, '_brandtheme', 'selectoption', $theme, $theme);
+											NewFormItem($f, $s, '_brandtheme', 'selectoption', $scheme['_branddisplayname'], $theme);
 										}
 										NewFormItem($f, $s, '_brandtheme', 'selectend');
 									?>
