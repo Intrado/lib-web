@@ -35,6 +35,9 @@ if (isset($_SESSION['listuploadfiles'][$list->id])) {
 	unset($_SESSION['listuploadfiles'][$list->id]);
 }
 
+$maxphones = GetSystemSetting("maxphones", 3);
+$maxemails = GetSystemSetting("maxemails", 2);
+
 $f = "list";
 $s = "upload";
 $reloadform = 0;
@@ -50,7 +53,23 @@ if(isset($_FILES['listcontents']) && $_FILES['listcontents']['tmp_name'])
 		if (is_file($newname) && is_readable($newname)) {
 			$_SESSION['listuploadfiles'][$list->id] =  $newname;
 			$_SESSION['listuploadfiles']['type'] = $_POST['type'];
-			redirect("uploadlistpreview.php");
+			if(CheckFormInvalid($f))
+			{
+				error('Form was edited in another window, reloading data');
+			}
+			else
+			{
+				MergeSectionFormData($f, $s);
+
+				//do check
+				if( CheckFormSection($f, $s) ) {
+					error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+				} else {
+					$_SESSION['listupload']['phonefield'] = DBSafe(GetFormData($f, $s, "phonefield"));
+					$_SESSION['listupload']['emailfield'] = DBSafe(GetFormData($f, $s, "emailfield"));
+					redirect("uploadlistpreview.php");
+				}
+			}
 		} else {
 			error('Unable to complete file upload. Please try again.');
 		}
@@ -60,6 +79,8 @@ if(isset($_FILES['listcontents']) && $_FILES['listcontents']['tmp_name'])
 }
 
 ClearFormData($f);
+PutFormData($f, $s, "phonefield", "0", "number");
+PutFormData($f, $s, "emailfield", "0", "number");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -79,8 +100,8 @@ startWindow('Upload Call List File');
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<th align="right" class="windowRowHeader">Upload Type:</th>
-		<td>
+		<th align="right" class="windowRowHeader bottomBorder">Upload Type:</th>
+		<td class="bottomBorder">
 			<table  border="0" cellpadding="3" cellspacing="0">
 <?
 	$ischecked = false;
@@ -89,14 +110,50 @@ startWindow('Upload Call List File');
 ?>
 				<tr>
 					<td>Contact&nbsp;data:</td>
-					<td><input type="radio" name="type" size="30" value="contacts" checked></td>
-					<td width="100%">File format must be a Comma Separated Value (CSV) text file with the following field order:<br><code>First Name, Last Name, Phone w/ Area Code, Email Address (optional)</code></td>
-				</tr>
+					<td><input type="radio" name="type" size="30" value="contacts" checked onclick="if(this.checked){ show('mapping');}" ></td>
+					<td width="100%">
+						<table>
+							<tr>
+								<td>File format must be a Comma Separated Value (CSV) text file with the following field order:<br><code>First Name, Last Name, Phone w/ Area Code, Email Address (optional)</code></td>
+							</tr>
+							<tr>
+								<td>
+									<table id="mapping">
+										<tr>
+											<td>Phone Mapping:</td>
+											<td>
+<?
+												NewFormItem($f, $s, "phonefield", "selectstart");
+												for($i=0; $i<$maxphones; $i++){
+													NewFormItem($f, $s, "phonefield", "selectoption", destination_label("phone", $i), $i);
+												}
+												NewFormItem($f, $s, "phonefield", "selectend");
+?>
+											</td>
+										</tr>
+										<tr>
+											<td>Email Mapping:</td>
+											<td>
+<?
+												NewFormItem($f, $s, "emailfield", "selectstart");
+												for($i=0; $i<$maxphones; $i++){
+													NewFormItem($f, $s, "emailfield", "selectoption", destination_label("email", $i), $i);
+												}
+												NewFormItem($f, $s, "emailfield", "selectend");
+?>
+											</td>
+										</tr>
+									</table>
+								</td></td>
+							</tr>
+						</table>
+					</td>
+				<tr>
 <? } ?>
 <? if ($USER->authorize('listuploadids')) { ?>
 				<tr>
 					<td>ID#&nbsp;lookup:</td>
-					<td><input type="radio" name="type" size="30" value="ids" <?= $ischecked ? "" : "checked" ?>></td>
+					<td><input type="radio" name="type" size="30" value="ids" <?= $ischecked ? "" : "checked" ?> onclick="if(this.checked){ hide('mapping'); }" ></td>
 					<td width="100%">File must be a list of ID#s only (one per line)</td>
 				</tr>
 <? } ?>
