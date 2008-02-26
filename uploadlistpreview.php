@@ -40,6 +40,8 @@ if (isset($_SESSION['listuploadfiles'][$list->id])) {
 	$errormsg = "Please upload a file";
 }
 
+$phonefield = isset($_SESSION['listupload']['phonefield']) ? $_SESSION['listupload']['phonefield'] : 0;
+$emailfield = isset($_SESSION['listupload']['emailfield']) ? $_SESSION['listupload']['emailfield'] : 0;
 
 $f = "list";
 $s = "uploadpreview";
@@ -167,13 +169,13 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 
 			$ifph = new ImportField();
 			$ifph->importid = $importid;
-			$ifph->mapto = "p0";
+			$ifph->mapto = "p" . $phonefield;
 			$ifph->mapfrom = 2;
 			$ifph->create();
 
 			$ife = new ImportField();
 			$ife->importid = $importid;
-			$ife->mapto = "e0";
+			$ife->mapto = "e" . $emailfield;
 			$ife->mapfrom = 3;
 			$ife->create();
 
@@ -182,6 +184,14 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$import->name = "User list import (" . $USER->login . ")";
 			$import->description = substr("list (" . $list->name . ")", 0,50);
 			$import->update();
+
+			$ifph = DBFind("ImportField", "from importfield where mapto like 'p%' and importid = '" . $import->id . "'");
+			$ifph->mapto = "p" . $phonefield;
+			$ifph->update();
+
+			$ife = DBFind("ImportField", "from importfield where mapto like 'e%' and importid = '" . $import->id . "'");
+			$ife->mapto = "e" . $emailfield;
+			$ife->update();
 		}
 
 		//upload or copy the file to the main import location
