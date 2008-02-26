@@ -286,9 +286,9 @@ if( $reloadform ) {
 	PutFormData($f,"Return","Save and Return", "");
 
 	//Color Scheme stuff
-	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "", true, $custdb), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', "", true, $custdb), "text", true);
-	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "", true, $custdb), "text", true);
+	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "sm", true, $custdb), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', "0", true, $custdb), "text", true);
+	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "346799", true, $custdb), "text", true);
 	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "http://", true, $custdb), "text");
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "support@schoolmessenger.com", true, $custdb), "email", "nomin", "nomax", true);
