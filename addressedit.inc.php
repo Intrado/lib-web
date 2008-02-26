@@ -127,7 +127,7 @@ if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 	$contacttypes[] = "sms";
 	$types["sms"] = $smses;
 }
-$jobtypes = JobType::getUserJobTypes();
+$jobtypes = array_merge(JobType::getUserJobTypes(false), JobType::getUserJobTypes(true));
 
 
 
