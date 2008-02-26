@@ -130,6 +130,11 @@ $COLORSCHEMES =  array("orangeborder" => array("displayname" => "orangeborder",
 											"_brandprimary" => "000000",
 											"_brandtheme1" => "6F7177",
 											"_brandtheme2" => "6F7177",
-											"_brandratio" => ".3")
+											"_brandratio" => ".3"),
+					"redtheme" =>	array("displayname" => "Red Theme",
+											"_brandprimary" => "000000",
+											"_brandtheme1" => "BE0101",
+											"_brandtheme2" => "BE0101",
+											"_brandratio" => ".5")
 					);
 ?>
