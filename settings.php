@@ -144,7 +144,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSetting('_brandtheme1', $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
 				setSetting('_brandtheme2', $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
 
-				if(!QuickQuery("select value from usersetting where name = '_brandtheme'")){
+				if(!QuickQuery("select value from usersetting where name = '_brandtheme' and userid='" . $USER->id . "'")){
 					$_SESSION['colorscheme']['_brandtheme'] = GetFormData($f, $s, '_brandtheme');
 					$_SESSION['colorscheme']['_brandprimary'] = GetFormData($f, $s, '_brandprimary');
 					$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, '_brandratio');
