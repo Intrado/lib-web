@@ -287,8 +287,8 @@ if( $reloadform ) {
 
 	//Color Scheme stuff
 	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "", true, $custdb), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', "", true, $custdb), "text");
-	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "", true, $custdb), "text");
+	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', "", true, $custdb), "text", true);
+	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "", true, $custdb), "text", true);
 	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "http://", true, $custdb), "text");
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "support@schoolmessenger.com", true, $custdb), "email", "nomin", "nomax", true);
@@ -383,7 +383,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 			NewFormItem($f, $s, "theme", "selectstart", null, null, "onchange='resetPrimaryAndRatio(this.value)'");
 			if(count($COLORSCHEMES)){
 				foreach($COLORSCHEMES as $index => $scheme){
-					NewFormItem($f, $s, "theme", "selectoption", $index, $index);
+					NewFormItem($f, $s, "theme", "selectoption", $scheme['displayname'], $index);
 				}
 			}
 			NewFormItem($f, $s, "theme", "selectend");
