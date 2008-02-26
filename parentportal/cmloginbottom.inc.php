@@ -26,9 +26,13 @@ if(isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']=="1"){
 					<a href="http://www.verisign.com/ssl-certificate/" target="_blank"  style="color:#000000; text-decoration:none; font:bold 7px verdana,sans-serif; letter-spacing:.5px; text-align:center; margin:0px; padding:0px;">ABOUT SSL CERTIFICATES</a></td>
 					</tr>
 				</table>
-			</div>	
+			</div>
 <? } /*CSDELETEMARKER_END*/ ?>
 		</td>
+	</tr>
+	<tr style="background-color: white;">
+		<td>&nbsp;</td>
+		<td><div align="right">© Copyright 2007 Reliance Communications, Inc. All Rights Reserved.</div></td>
 	</tr>
 </table>
 <?
