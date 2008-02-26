@@ -212,7 +212,7 @@ doNavTabs($NAVTREE);
 
 
 <div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/themes/<?=getBrandTheme()?>/header_bg.gif" >
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif" >
 		<tr><td style="font-size:8px;">&nbsp;</td></tr>
 	</table>
 </div>
