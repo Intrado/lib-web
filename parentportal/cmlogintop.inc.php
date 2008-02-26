@@ -48,7 +48,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 <body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #365F8D;'>
 	<table border=0 cellpadding=0 cellspacing=0 width="100%">
 	<tr style="background-color: #365F8D;">
-		<td colspan="2"><img src="img/school_messenger.gif" /></td>
+		<td colspan="2"><div style="padding-left:5px; padding-bottom:5px;"><img src="img/school_messenger.gif" /></div></td>
 	</tr>
 	<tr style="background-color: #666666;">
 		<td colspan="2">&nbsp;</td>
