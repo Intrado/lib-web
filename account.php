@@ -221,7 +221,7 @@ if( $reloadform )
 
 
 	if (($maxjobdays = $USER->getSetting("maxjobdays")) === false) {
-		$maxjobdays = min(2,$ACCESS->getValue('maxjobdays'));
+		$maxjobdays = 1;
 	} else {
 		$maxjobdays = min($USER->getSetting("maxjobdays"), $ACCESS->getValue('maxjobdays'));
 	}
