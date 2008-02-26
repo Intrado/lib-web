@@ -292,7 +292,7 @@ if( $reloadform ) {
 	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "http://", true, $custdb), "text");
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "support@schoolmessenger.com", true, $custdb), "email", "nomin", "nomax", true);
-	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "8009203897", true, $custdb)), "phone", 0, 10, true);
+	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "8009203897", true, $custdb)), "phone", 10, 10, true);
 
 }
 
