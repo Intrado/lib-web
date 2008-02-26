@@ -155,6 +155,16 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$import->create();
 			$importid = $import->id;
 
+		} else {
+			$import = new Import($importid);
+			$import->name = "User list import (" . $USER->login . ")";
+			$import->description = substr("list (" . $list->name . ")", 0,50);
+			$import->update();
+		}
+
+		if($importid){
+			//Delete all importfield mappings and recreate, instead of trying to search and update
+			QuickUpdate("delete from importfield where importid = '" . $importid . "'");
 			$iffn = new ImportField();
 			$iffn->importid = $importid;
 			$iffn->mapto = "f01";
@@ -178,21 +188,8 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$ife->mapto = "e" . $emailfield;
 			$ife->mapfrom = 3;
 			$ife->create();
-
-		} else {
-			$import = new Import($importid);
-			$import->name = "User list import (" . $USER->login . ")";
-			$import->description = substr("list (" . $list->name . ")", 0,50);
-			$import->update();
-
-			$ifph = DBFind("ImportField", "from importfield where mapto like 'p%' and importid = '" . $import->id . "'");
-			$ifph->mapto = "p" . $phonefield;
-			$ifph->update();
-
-			$ife = DBFind("ImportField", "from importfield where mapto like 'e%' and importid = '" . $import->id . "'");
-			$ife->mapto = "e" . $emailfield;
-			$ife->update();
 		}
+
 
 		//upload or copy the file to the main import location
 		$data = file_get_contents($curfilename);
