@@ -320,7 +320,7 @@ startWindow('Global System Settings');
 									<?
 										NewFormItem($f, $s, '_brandtheme', 'selectstart', null, null, "onchange='resetPrimaryAndRatio(this.value)'");
 										foreach($COLORSCHEMES as $theme => $scheme){
-											NewFormItem($f, $s, '_brandtheme', 'selectoption', $scheme['_branddisplayname'], $theme);
+											NewFormItem($f, $s, '_brandtheme', 'selectoption', $scheme['displayname'], $theme);
 										}
 										NewFormItem($f, $s, '_brandtheme', 'selectend');
 									?>
