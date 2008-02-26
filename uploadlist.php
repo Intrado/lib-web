@@ -136,7 +136,7 @@ startWindow('Upload Call List File');
 											<td>
 <?
 												NewFormItem($f, $s, "emailfield", "selectstart");
-												for($i=0; $i<$maxphones; $i++){
+												for($i=0; $i<$maxemails; $i++){
 													NewFormItem($f, $s, "emailfield", "selectoption", destination_label("email", $i), $i);
 												}
 												NewFormItem($f, $s, "emailfield", "selectend");
