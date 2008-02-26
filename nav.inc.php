@@ -203,7 +203,8 @@ doNavTabs($NAVTREE);
 <!-- ********************************************************************* -->
 
 <?
-	if($clickurl = getSystemSetting('_logoclickurl'))
+	$clickurl = getSystemSetting('_logoclickurl');
+	if($clickurl != "" && $clickurl != "http://")
 		$logo =  '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php"></a>';
 	else
 		$logo = '<img src="logo.img.php">';
