@@ -121,7 +121,7 @@ if (count($fields) > 0) {
 
 
 ?>
-	<table border="0" cellpadding="3" cellspacing="0">
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 <?
 	foreach ($fields as $fieldmap) {
 		$fieldnum = $fieldmap->fieldnum;
