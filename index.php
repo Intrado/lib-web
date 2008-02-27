@@ -98,15 +98,26 @@ if ($userid && $userid != -1) {
 			$USER->lastlogin = QuickQuery("select now()");
 			$USER->update(array("lastlogin"));
 		}
-		$scheme = getCustomerData($CUSTOMERURL, $USER->id);
 		if (!isset($_SESSION['etagstring'])){
 				$_SESSION['etagstring'] = mt_rand();
 		}
-		$_SESSION['colorscheme'] = array("_brandtheme" => $scheme['_brandtheme'],
+		$userprefs = array();
+		$userprefs['_brandprimary'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandprimary'");
+		$userprefs['_brandtheme1'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme1'");
+		$userprefs['_brandtheme2'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme2'");
+		$userprefs['_brandratio'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandratio'");
+		$userprefs['_brandtheme'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme'");
+
+		if($userprefs['_brandprimary']){
+			$_SESSION['colorscheme'] = $userprefs;
+		} else {
+			$_SESSION['colorscheme'] = array("_brandtheme" => $scheme['_brandtheme'],
 										"_brandprimary" => $scheme['colors']['_brandprimary'],
 										"_brandtheme1" => $scheme['colors']['_brandtheme1'],
 										"_brandtheme2" => $scheme['colors']['_brandtheme2'],
 										"_brandratio" => $scheme['colors']['_brandratio']);
+		}
+
 		$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 		$_SESSION['_supportphone'] = $scheme['_supportphone'];
 		$_SESSION['_supportemail'] = $scheme['_supportemail'];
