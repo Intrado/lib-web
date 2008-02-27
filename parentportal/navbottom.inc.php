@@ -6,7 +6,7 @@
 Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
 <br>
 <? } /*CSDELETEMARKER_END*/ ?>
-&copy; 1999-2008 Reliance Communications, Inc.
+&copy; 1999-2008 Reliance Communications, Inc. All Rights Reserved.
 
 </div>
 <?
