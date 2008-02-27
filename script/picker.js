@@ -13,7 +13,7 @@ var TCP = new TColorPicker();
 function TCPopup(field) {
 	this.field = field;
 	this.initPalette = 0;
-	var w = 450, h = 250,
+	var w = 600, h = 250,
 	move = screen ? 
 		',left=' + ((screen.width - w) >> 1) + ',top=' + ((screen.height - h) >> 1) : '', 
 	o_colWindow = window.open('picker.php', null, "help=no,status=no,scrollbars=no,resizable=no" + move + ",width=" + w + ",height=" + h + ",dependent=yes", true);
