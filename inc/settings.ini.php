@@ -18,11 +18,11 @@ is_commsuite=true
 is_ldap=false
 has_ssl=true
 force_ssl=false
-log_dir="/commsuite/logs/"
-log_db_errors=true
-log_db_queries=true
-log_dmapi=true
-has_print=true
+log_dir="/usr/commsuite/logs/"
+log_db_errors=false
+log_db_queries=false
+log_dmapi=false
+has_print=false
 tmp_dir="/tmp"
 
 ;if not set, warn_earliest is set to "7:00 am"
