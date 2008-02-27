@@ -32,9 +32,9 @@ function TCBuildCell ($red, $green, $blue, $width, $height) {
 
 function BuildCells(){
 	$s = "";
-	$max = 5;
-	for($colorstep=17; $colorstep > 0; $colorstep-=3){
-		if($colorstep < 3){
+	$max = 15;
+	for($colorstep=17; $colorstep > 0; $colorstep-=2){
+		if($colorstep < 2){
 			$colorstep = 0;
 		}
 ?>
@@ -44,7 +44,7 @@ function BuildCells(){
 		$g=0;
 		$b=0;
 		do{
-			$s .= TCBuildCell($r*$colorstep*3, $g*$colorstep*3, $b*$colorstep*3, 12, 24);
+			$s .= TCBuildCell($r*$colorstep, $g*$colorstep, $b*$colorstep, 6, 6);
 			if($g!=$max && $r==$max && $b==0){
 				$g++;
 			} else if($g==$max && $r>0){
@@ -60,7 +60,7 @@ function BuildCells(){
 			}
 		} while(!($r==$max && $b==1));
 		// Draw one more time for the end case;
-		$s = $s . TCBuildCell($r*$colorstep*3, $g*$colorstep*3, $b*$colorstep*3, 12, 24);
+		$s = $s . TCBuildCell($r*$colorstep, $g*$colorstep, $b*$colorstep, 6, 6);
 
 ?>
 		</tr>
