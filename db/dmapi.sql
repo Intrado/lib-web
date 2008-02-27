@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS  `sessiondata` (
   `data` text NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `lastused` (`lastused`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
