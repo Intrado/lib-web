@@ -242,12 +242,9 @@ function asptokenLogin($asptoken, $url) {
 }
 /*CSDELETEMARKER_END*/
 
-function getCustomerData($url, $userid = null){
+function getCustomerData($url){
 
 	$params = array(new XML_RPC_Value($url, 'string'));
-	if($userid != null){
-		$params[] =new XML_RPC_Value($userid, 'int');
-	}
 	$method = "AuthServer.getCustomerData";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
