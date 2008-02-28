@@ -241,8 +241,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			}
 			if(!$completedmode){
-				if (getSystemSetting('retry') != "")
-					$job->setOptionValue("retry",getSystemSetting('retry'));
 
 				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 				$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));

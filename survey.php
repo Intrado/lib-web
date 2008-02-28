@@ -170,7 +170,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 						$job->setOption("leavemessage", false);
 				}
 			}
-			
+
 			if(!$completedmode){
 				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 			}
@@ -182,9 +182,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				$job->setOptionValue("callerid", $callerid);
 			}
 
-			if (getSystemSetting('retry') != "")
-				$job->setOptionValue("retry",getSystemSetting('retry'));
-
 
 			//reformat the dates & times to DB friendly format
 			$job->startdate = date("Y-m-d", strtotime($job->startdate));
@@ -195,7 +192,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$job->update();
 
 			setCurrentSurvey($job->id);
-			
+
 			ClearFormData($f);
 			if (CheckFormSubmit($f,'send')) {
 				redirect("surveyconfirm.php?id=" . $job->id);
