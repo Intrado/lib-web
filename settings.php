@@ -315,7 +315,7 @@ startWindow('Global System Settings');
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
-								<td width="30%">Color Theme</td>
+								<td width="30%">Color Theme<? print help('Settings_ColorTheme', NULL, "small"); ?></td>
 								<td>
 									<?
 										NewFormItem($f, $s, '_brandtheme', 'selectstart', null, null, "onchange='resetPrimaryAndRatio(this.value)'");
@@ -327,11 +327,11 @@ startWindow('Global System Settings');
 								</td>
 							</tr>
 							<tr>
-								<td>Primary Color(in hex):</td>
+								<td>Primary Color(in hex)<? print help('Settings_PrimaryColor', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, "_brandprimary", "text", 0, 10, "id='brandprimary'") ?><img src="img/sel.gif" onclick="TCP.popup(new getObj('brandprimary').obj)"/></td>
 							</tr>
 							<tr>
-								<td>Ratio of Primary to Background</td>
+								<td>Ratio of Primary to Background<? print help('Settings_Ratio', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, "_brandratio", "text", 0, 3, "id='brandratio'") ?></td>
 							</tr>
 
