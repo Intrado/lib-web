@@ -78,6 +78,7 @@ function BuildCells(){
 	</style>
 </head>
 <body leftmargin="5" topmargin="5" marginheight="5" marginwidth="5">
+<div>Hover over a color to preview it.  Click the color you want as your primary color.</div>
 <table cellpadding="0" cellspacing="0" border="0" width="184">
 	<tr>
 		<td align="center">
