@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
+The Primary Color controls the text color on tabs, buttons and titles.
