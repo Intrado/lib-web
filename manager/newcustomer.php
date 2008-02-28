@@ -191,11 +191,11 @@ if (CheckFormSubmit($f,$s)){
 							('Spanish')";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
-				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `issurvey`, `deleted`) VALUES
-							('Emergency', 1, 0, 0),
-							('Attendance', 2, 0, 0),
-							('General', 3, 0, 0),
-							('Survey', 3, 1, 0)";
+				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
+							('Emergency', 1, 'General Announcements', 0, 0),
+							('Attendance', 2, 'Time Critical Announcements', 0, 0),
+							('General', 3, 'Emergencies Only', 0, 0),
+							('Survey', 3, 'Surveys', 1, 0)";
 
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
