@@ -334,7 +334,7 @@ $$$
 insert into setting (name, value) values ('_loginpicturecontentid', @smaccessid)
 $$$
 
-insert into setting (name, value) values ('_productname', 'SchoolMessenger'), ('_brandtheme', 'sm'), ('_brandtheme1', '999999'), ('_brandtheme2', 'CCCCCC'), ('_brandprimary', '346799'), ('_brandratio', '0'), ('_supportphone', '8009203897'), ('_supportemail', 'support@schoolmessenger.com')
+insert into setting (name, value) values ('_productname', 'SchoolMessenger'), ('_brandtheme', '3dblue'), ('_brandtheme1', '89A3CE'), ('_brandtheme2', '89A3CE'), ('_brandprimary', '26477D'), ('_brandratio', '.3'), ('_supportphone', '8009203897'), ('_supportemail', 'support@schoolmessenger.com')
 $$$
 
 -- THIS SETTING IS NOT FOR COMMSUITE!!!
