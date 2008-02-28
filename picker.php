@@ -21,9 +21,9 @@ function RGBdec2hex($r, $g, $b){
 
 function TCBuildCell ($red, $green, $blue, $width, $height) {
 ?>
-	<td style="border:0px solid red; " bgcolor="#<?=RGBdec2hex($red, $green, $blue)?>">
-		<a style="border: 0px solid green;" href="javascript:P.S('<?=RGBdec2hex($red, $green, $blue)?>')" onmouseover="P.P('<?=RGBdec2hex($red, $green, $blue)?>')">
-			<img style="border: 0px solid black;" src="img/pixel.gif" width="<?=$width?>" height="<?=$height?>" border="0">
+	<td style="border:0px;" bgcolor="#<?=RGBdec2hex($red, $green, $blue)?>">
+		<a style="border: 0px;" href="javascript:P.S('<?=RGBdec2hex($red, $green, $blue)?>')" onmouseover="P.P('<?=RGBdec2hex($red, $green, $blue)?>')">
+			<img style="border: 0px;" src="img/pixel.gif" width="<?=$width?>" height="<?=$height?>" border="0">
 		</a>
 	</td>
 <?
