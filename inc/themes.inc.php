@@ -113,7 +113,12 @@ $COLORSCHEMES =  array(
 											"_brandprimary" => "000000",
 											"_brandtheme1" => "BE0101",
 											"_brandtheme2" => "BE0101",
-											"_brandratio" => ".3")
+											"_brandratio" => ".3"),
+                                        "easy_invaders" =>   array("displayname" => "Fun - Space Invaders",
+                                                                                        "_brandprimary" => "000000",
+                                                                                        "_brandtheme1" => "BE0101",
+                                                                                        "_brandtheme2" => "BE0101",
+                                                                                        "_brandratio" => ".2")
 
 					);
 ?>
