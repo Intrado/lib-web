@@ -41,6 +41,8 @@ $custdisplayname = getCustomerName($CUSTOMERURL);
 
 $reason = authorizeSurveyWeb($code, $CUSTOMERURL);
 
+$scheme = getCustomerData($CUSTOMERURL);
+
 if ($reason == 'ok') {
 	// find the jobid
 	$query = "select jobid from surveyweb where code='" . DBSafe($code) . "'";
@@ -101,20 +103,30 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 
 $TITLE= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "";
 
-
+$css = "../css.php?survey=1&theme=" . $scheme['_brandtheme']
+		. "&primary=" . $scheme['colors']['_brandprimary']
+		. "&theme1=" . $scheme['colors']['_brandtheme1']
+		. "&theme2=" . $scheme['colors']['_brandtheme2']
+		. "&ratio=" . $scheme['colors']['_brandratio'];
 ?>
 <html>
 <head>
 	<title><?= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "Survey" ?></title>
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='../css/style.css' type='text/css' rel='stylesheet' media='screen'>
+	<link href='<?=$css?>' type='text/css' rel='stylesheet' media='screen'>
 </head>
 <body>
 
+
 <div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="../img/header_bg.gif">
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="../img/header_bg.gif" >
+		<tr><td style="font-size:8px;">&nbsp;</td></tr>
+	</table>
+</div>
+<div>
+	<table width="100%" border=0 cellpadding=0 cellspacing=0>
 	<tr>
-	<td><img src="../img/logo.gif"></td>
+	<td><img src="../logo.img.php"></td>
 	<td><div class="custname"><?= htmlentities($custdisplayname) ?></div></td>
 	</tr>
 	</table>
