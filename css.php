@@ -1,17 +1,34 @@
 <?
-include("inc/common.inc.php");
 header('Content-type: text/css');
+if(!isset($_GET['survey'])){
+	include_once("inc/common.inc.php");
+}
 
-$theme = $_SESSION['colorscheme']['_brandtheme'];
-$primary = $_SESSION['colorscheme']['_brandprimary'];
-$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
-$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
+
+
+if(isset($_GET['survey'])){
+
+	$theme = $_GET['theme'];
+	$primary = $_GET['primary'];
+	$theme1 = "#" . $_GET['theme1'];
+	$theme2 = "#" . $_GET['theme2'];
+	$globalratio = $_GET['ratio'];
+
+} else {
+	$theme = $_SESSION['colorscheme']['_brandtheme'];
+	$primary = $_SESSION['colorscheme']['_brandprimary'];
+	$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
+	$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
+	$globalratio = $_SESSION['colorscheme']['_brandratio'];
+}
+
+
 
 $fade1 = "E5E5E5";
 $fade2 = "999999";
 $fade3 = "595959";
 
-$globalratio = $_SESSION['colorscheme']['_brandratio'];
+
 
 $newfade1 = fadecolor($primary, $fade1, $globalratio);
 $newfade2 = fadecolor($primary, $fade2, $globalratio);
@@ -31,6 +48,7 @@ function fadecolor($primary, $fade, $ratio){
 	$newcolor = "#" . implode("", $newcolorarray);
 	return $newcolor;
 }
+
 
 
 ?>
