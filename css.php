@@ -1,27 +1,12 @@
 <?
 header('Content-type: text/css');
-if(!isset($_GET['survey'])){
-	include_once("inc/common.inc.php");
-}
+include_once("inc/common.inc.php");
 
-
-
-if(isset($_GET['survey'])){
-
-	$theme = $_GET['theme'];
-	$primary = $_GET['primary'];
-	$theme1 = "#" . $_GET['theme1'];
-	$theme2 = "#" . $_GET['theme2'];
-	$globalratio = $_GET['ratio'];
-
-} else {
-	$theme = $_SESSION['colorscheme']['_brandtheme'];
-	$primary = $_SESSION['colorscheme']['_brandprimary'];
-	$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
-	$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
-	$globalratio = $_SESSION['colorscheme']['_brandratio'];
-}
-
+$theme = $_SESSION['colorscheme']['_brandtheme'];
+$primary = $_SESSION['colorscheme']['_brandprimary'];
+$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
+$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
+$globalratio = $_SESSION['colorscheme']['_brandratio'];
 
 
 $fade1 = "E5E5E5";
