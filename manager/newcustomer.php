@@ -170,8 +170,8 @@ if (CheckFormSubmit($f,$s)){
 						. "($accessid, 'metadata', '1'),"
 						. "($accessid, 'portalaccess', '1'),"
 						. "($accessid, 'generatebulktokens', '1'),"
-						. "($accessid, 'managetasks', '1');"
-						;
+						. "($accessid, 'managetasks', '1'), "
+						. "($accessid, 'managecontactdetailsettings', '1')";
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `user` (`accessid`, `login`,
