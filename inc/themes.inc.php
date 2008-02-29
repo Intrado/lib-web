@@ -39,7 +39,7 @@ $COLORSCHEMES =  array(
 											"_brandratio" => "0"),
 
 					"sm" => array("displayname" => "Classic - Silver",
-									"_brandprimary" => "346799",
+											"_brandprimary" => "346799",
 											"_brandtheme1" => "999999",
 											"_brandtheme2" => "CCCCCC",
 											"_brandratio" => "0"),
@@ -114,11 +114,10 @@ $COLORSCHEMES =  array(
 											"_brandtheme1" => "BE0101",
 											"_brandtheme2" => "BE0101",
 											"_brandratio" => ".3"),
-                                        "easy_invaders" =>   array("displayname" => "Fun - Space Invaders",
-                                                                                        "_brandprimary" => "000000",
-                                                                                        "_brandtheme1" => "BE0101",
-                                                                                        "_brandtheme2" => "BE0101",
-                                                                                        "_brandratio" => ".2")
-
+					"easy_invaders" =>   array("displayname" => "Fun - Space Invaders",
+											"_brandprimary" => "000000",
+											"_brandtheme1" => "BE0101",
+											"_brandtheme2" => "BE0101",
+											"_brandratio" => ".2")
 					);
 ?>
