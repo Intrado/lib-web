@@ -155,6 +155,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
 					setSetting('easycallmax', GetFormData($f, $s, 'easycallmax'));
+					setSetting('_supportphone', Phone::parse(GetFormData($f, $s, 'supportphone')));
+					setSetting('_supportemail', DBSafe(GetFormData($f, $s, 'supportemail')));
 				}
 				redirect();
 
@@ -216,6 +218,12 @@ if( $reloadform )
 	PutFormData($f, $s, "_brandtheme", getSystemSetting('_brandtheme'), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", getSystemSetting('_brandratio'), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandprimary", getSystemSetting('_brandprimary'), "text", "nomin", "nomax", true);
+
+	if($IS_COMMSUITE){
+		PutFormData($f, $s, "supportphone", Phone::format(getSystemSetting('_supportphone')), "phone", "10", "10", true);
+		PutFormData($f, $s, "supportemail", getSystemSetting('_supportemail'), "email", "nomin", "nomax", true);
+	}
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,6 +315,25 @@ startWindow('Global System Settings');
 								<td>Systemwide Alert Message<? print help('Settings_SystemwideAlert', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'alertmessage', 'textarea',44,4);  ?></td>
 							</tr>
+
+<?
+						if($IS_COMMSUITE){
+?>
+							<tr>
+								<td>
+									Technical Support Phone<? print help('Settings_SupportPhone', NULL, "small"); ?>
+								</td>
+								<td><? NewFormItem($f, $s, 'supportphone', 'text', 14, 14);  ?></td>
+							</tr>
+							<tr>
+								<td>
+									Technical Support Email<? print help('Settings_SupportEmail', NULL, "small"); ?>
+								</td>
+								<td><? NewFormItem($f, $s, 'supportemail', 'text', 30, 250);  ?></td>
+							</tr>
+<?
+						}
+?>
 						</table>
 					</td>
 				</tr>
