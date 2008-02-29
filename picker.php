@@ -21,10 +21,8 @@ function RGBdec2hex($r, $g, $b){
 
 function TCBuildCell ($red, $green, $blue, $width, $height) {
 ?>
-	<td style="border:0px;" bgcolor="#<?=RGBdec2hex($red, $green, $blue)?>">
-		<a style="border: 0px;" href="javascript:P.S('<?=RGBdec2hex($red, $green, $blue)?>')" onmouseover="P.P('<?=RGBdec2hex($red, $green, $blue)?>')">
-			<img style="border: 0px;" src="img/pixel.gif" width="<?=$width?>" height="<?=$height?>" border="0">
-		</a>
+	<td style="border:0px;" bgcolor="#<?=RGBdec2hex($red, $green, $blue)?>" onmouseup="P.S('<?=RGBdec2hex($red, $green, $blue)?>')" onmouseover="P.P('<?=RGBdec2hex($red, $green, $blue)?>')">
+		<div><img style="border: 0px;" src="img/pixel.gif" width="<?=$width?>" height="<?=$height?>" border="0"></div>
 	</td>
 <?
 }
@@ -44,7 +42,7 @@ function BuildCells(){
 		$g=0;
 		$b=0;
 		do{
-			$s .= TCBuildCell($r*$colorstep, $g*$colorstep, $b*$colorstep, 6, 6);
+			$s .= TCBuildCell($r*$colorstep, $g*$colorstep, $b*$colorstep, 6, 10);
 			if($g!=$max && $r==$max && $b==0){
 				$g++;
 			} else if($g==$max && $r>0){
@@ -60,7 +58,7 @@ function BuildCells(){
 			}
 		} while(!($r==$max && $b==1));
 		// Draw one more time for the end case;
-		$s = $s . TCBuildCell($r*$colorstep, $g*$colorstep, $b*$colorstep, 6, 6);
+		$s = $s . TCBuildCell($r*$colorstep, $g*$colorstep, $b*$colorstep, 6, 10);
 
 ?>
 		</tr>
