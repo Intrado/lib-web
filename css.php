@@ -1,6 +1,7 @@
 <?
-header('Content-type: text/css');
 include_once("inc/common.inc.php");
+header('Content-type: text/css');
+
 
 $theme = $_SESSION['colorscheme']['_brandtheme'];
 $primary = $_SESSION['colorscheme']['_brandprimary'];
