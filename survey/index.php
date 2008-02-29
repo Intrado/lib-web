@@ -103,18 +103,144 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 
 $TITLE= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "";
 
-$css = "../css.php?survey=1&theme=" . $scheme['_brandtheme']
-		. "&primary=" . $scheme['colors']['_brandprimary']
-		. "&theme1=" . $scheme['colors']['_brandtheme1']
-		. "&theme2=" . $scheme['colors']['_brandtheme2']
-		. "&ratio=" . $scheme['colors']['_brandratio'];
+
+//Do inpage CSS
+$theme = $scheme['_brandtheme'];
+$primary = $scheme['colors']['_brandprimary'];
+$theme1 = "#" . $scheme['colors']['_brandtheme1'];
+$theme2 = "#" . $scheme['colors']['_brandtheme2'];
+$globalratio = $scheme['colors']['_brandratio'];
+
+$fade1 = "E5E5E5";
+$fade2 = "999999";
+$fade3 = "595959";
+
+$newfade1 = fadecolor($primary, $fade1, $globalratio);
+$newfade2 = fadecolor($primary, $fade2, $globalratio);
+$newfade3 = fadecolor($primary, $fade3, $globalratio);
+
+$primary = "#" . $primary;
+
+
+//Takes 2 hex color strings and 1 ratio to apply to to the primary:original
+function fadecolor($primary, $fade, $ratio){
+	$primaryarray = array(substr($primary, 0, 2), substr($primary, 2, 2), substr($primary, 4, 2));
+	$fadearray = array(substr($fade, 0, 2), substr($fade, 2, 2), substr($fade, 4, 2));
+	$newcolorarray = array();
+	for($i = 0; $i<3; $i++){
+		$newcolorarray[$i] = dechex(round(hexdec($primaryarray[$i]) * $ratio + hexdec($fadearray[$i])*(1-$ratio)));
+	}
+	$newcolor = "#" . implode("", $newcolorarray);
+	return $newcolor;
+}
+
 ?>
 <html>
 <head>
 	<title><?= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "Survey" ?></title>
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='<?=$css?>' type='text/css' rel='stylesheet' media='screen'>
 </head>
+<style>
+
+body, table, form, select, input {
+	font-family: verdana, arial, helvetica;
+	font-size: 12px;
+}
+
+body {
+	margin: 0px;
+
+}
+.custname {
+	font-size: 12pt;
+	color:<?=$primary?>;
+	white-space: nowrap;
+	text-align: right;
+	margin: 10px;
+	margin-right: 25px;
+}
+
+
+/* **** content **** */
+
+.content {
+	margin-left: 15px;
+	margin-right: 15px;
+	margin-top: 5px;
+}
+
+.pagetitle {
+	margin-top: 10px;
+	margin-left: 15px;
+	font-size: 18px;
+	font-weight: bold;
+	color: <?=$primary?>;
+
+}
+
+.pagetitlesubtext {
+	margin-left: 15px;
+	font-size: 12px;
+	font-style: italic;
+	color: <?=$primary?>;
+}
+
+
+/* **** window **** */
+.window {
+	width: 100%;
+}
+
+
+.windowbar {
+	background: url('../img/themes/<?=$theme?>/chrome_light.png') repeat-x;
+	border-bottom: 1px solid <?=$theme2?> ;
+	height: 22px;
+}
+
+.windowborder {
+	border: 2px solid <?=$theme1?>;
+	border-top: 0px;
+	border-left: 1px solid <?=$theme1?>;
+}
+
+.windowtitle {
+	font-size: 12px;
+	font-weight: bold;
+	padding-left: 5px;
+	padding-top: 2px;
+	color: <?=$primary?>;
+}
+
+.windowbody {
+	display: block;
+}
+
+/* general styles */
+
+
+
+input.text, input , select, textarea, table.form  {
+	border: <?=$theme1?> 1px solid;
+}
+
+
+.windowRowHeader {
+	background-color: <?=$newfade1?>;
+	color: <?=$newfade3?>;
+	width: 85px;
+}
+
+.bottomBorder {
+	border-bottom: 1px solid <?=$theme2?>;
+}
+
+.border {
+	border: 1px solid <?=$theme2?>;
+}
+
+
+</style>
 <body>
 
 
