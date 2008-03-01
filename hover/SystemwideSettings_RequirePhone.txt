@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#the_system_tab/systemwide_reports.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
 Check this option to make sure that Contact Manager users have a phone number selected for Emergency and High Priority job types.
