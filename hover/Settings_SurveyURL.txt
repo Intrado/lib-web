@@ -1,3 +1,2 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
-If your system is exposed to the internet, then enter the system's name
-or IP address here. It must conclude with /survey.
+@help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
+If your system is exposed to the internet, then enter the system's name or IP address here. It must conclude with /survey.

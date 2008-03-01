@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
 Language codes determine which message will be delivered to individuals when the multilingual options are enabled on a job. The codes defined here must match those in the data source used to import contact information into the system.

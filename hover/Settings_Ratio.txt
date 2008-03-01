@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
 The Ratio setting controls the mix between background colors and the primary color.

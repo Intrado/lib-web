@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
 Enter the name you would like displayed in the upper right corner of every page.

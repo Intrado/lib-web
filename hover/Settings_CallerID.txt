@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_global_system_settings.htm
+@help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
 This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.
