@@ -30,7 +30,8 @@ $NAVTREE = array (
 ////////////////////////////////////////////////////////////////////////////////
 
 function navMainTab ($title, $link, $isselected) {
-	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/themes/3dblue/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
+	$theme = getBrandTheme();
+	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
 }
 
 function navSubTab ($title, $link, $isselected) {
