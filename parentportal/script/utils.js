@@ -64,16 +64,18 @@ function modifyMarkedNodes (parent,attribute,marker,callback) {
 	}
 }
 
+//variable _brandtheme needs to be declared externally of this file.
 function btn_rollover(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/button_left_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/button_right_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/button_mid_over.gif') repeat-x";});
+	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_left_over.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_right_over.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/themes/" + _brandtheme + "/button_mid_over.gif') repeat-x";});
 }
 
+//variable _brandtheme needs to be declared externally of this file.
 function btn_rollout(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/button_left.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/button_right.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/button_mid.gif') repeat-x";});
+	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_left.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_right.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/themes/" + _brandtheme + "/button_mid.gif') repeat-x";});
 }
 
 function windowHide(windowid) {
