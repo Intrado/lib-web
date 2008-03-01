@@ -15,9 +15,9 @@ else
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_custurl($row, $index){
-
+//index 2 is display name
 	if (!isset($_GET['showdisabled']))
-		$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[1] . "</a>";
+		$url = $row[2] . " (<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[1] . "</a>)";
 	else
 		$url = '<span style="color: gray;">' . $row[1] . '</span>';
 	return $url;
@@ -92,7 +92,7 @@ foreach($customers as $cust) {
 		$row[0] = $cust[0];
 		$row[1] = $cust[2];
 		$row[2] = getCustomerSystemSetting('displayname', false, true, $custdb);
-		$row[3] = getCustomerSystemSetting('inboundnumber', false, true, $custdb);
+		$row[3] = getCustomerSystemSetting('_productname', false, true, $custdb);
 		$row[4] = getCustomerSystemSetting('timezone', false, true, $custdb);
 		$row[5] = getCustomerSystemSetting('_managernote', false, true, $custdb);
 		$row[6] = getCustomerSystemSetting('disablerepeat', false, true, $custdb);
@@ -113,16 +113,15 @@ foreach($customers as $cust) {
 	}
 }
 
-$titles = array("0" => "Customer ID",
-				"2" => "Customer Name",
-				"url" => "Customer URL (link)",
-				"3" => "Toll Free Number",
+$titles = array("0" => "ID",
+				"url" => "Name",
+				"3" => "Product Name",
 				"4" => "Timezone",
 				"6" => "Status",
 				"10" => "Features",
 				"7" => "Max Users",
-				"8" => "Active Users",
-				"9" => "Active Jobs",
+				"8" => "Users",
+				"9" => "Jobs",
 				"Actions" => "Actions",
 				"5" => "NOTES: ");
 
