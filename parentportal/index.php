@@ -36,14 +36,13 @@ if (isset($_GET['logout'])) {
 
 	@session_destroy();
 }
-/*
-	TODO:unsure if needed
+
 if ($SETTINGS['feature']['has_ssl']) {
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
 		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php");
 	}
 }
-*/
+
 $login="";
 $badlogin=false;
 $id = false;
