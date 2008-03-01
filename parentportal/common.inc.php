@@ -15,12 +15,11 @@ require_once("../inc/utils.inc.php");
 if(!isset($ppNotLoggedIn)){
 	// we are logged in
 
-/*
-	TODO:unsure if needed
+
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
 		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php?logout=1");
 	}
-*/
+
 	doStartSession();
 	if(!isset($_SESSION["portaluserid"])){
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
