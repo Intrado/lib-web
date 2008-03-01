@@ -14,11 +14,11 @@ if (navigator.appName !="Netscape")
 <!--
 div.whs1 { width:100%; }
 img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
-img_whs3 { border:none; border-style:none; width:400px; height:297px; float:none; }
+img_whs3 { border:none; border-style:none; width:400px; height:322px; float:none; }
 p.whs4 { font-weight:bold; }
 p.whs5 { margin-left:40px; }
-p.whs6 { margin-left:40px; font-weight:normal; }
-p.whs7 { margin-left:0px; font-weight:bold; }
+p.whs6 { margin-left:0px; font-weight:bold; }
+p.whs7 { margin-left:40px; font-weight:normal; }
 p.whs8 { margin-left:0px; }
 p.whs9 { font-size:xx-small; }
 -->
@@ -27,7 +27,7 @@ p.whs9 { font-size:xx-small; }
 if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
 {
   var strNSS = "<style type='text/css'>";
-  strNSS += "p.whs7 {margin-left:1pt; }";
+  strNSS += "p.whs6 {margin-left:1pt; }";
   strNSS += "p.whs8 {margin-left:1pt; }";
   strNSS += "p.whs9 {font-size:x-small; }";
   strNSS +="</style>";
@@ -110,7 +110,7 @@ else
  certain global system options explained below. After you have adjusted 
  the Global System Settings, click the Save button at the top or bottom 
  of the screen to save your changes.</p>
-<p><img src="../globalsystemsettings.gif" alt="Systemwide Settings Screen" x-maintain-ratio="TRUE" width="400px" height="297px" border="0" class="img_whs3"></p>
+<p><img src="../globalsystemsettings.gif" alt="Systemwide Settings Screen" x-maintain-ratio="TRUE" width="400px" height="322px" border="0" class="img_whs3"></p>
 <p class="whs4">Customer Info:</p>
 <p class="whs5">Customer Display Name - Enter the name that 
  you would like to appear at the top of each page.</p>
@@ -119,29 +119,42 @@ else
 <p class="whs5">Systemwide Alert Message - Text entered here 
  will appear as an alert message for all users in the system. The alert 
  message appears as black text in a red box on every page.</p>
+<p class="whs5">&nbsp;</p>
+<p class="whs6">Display Defaults:</p>
+<p class="whs5">Color Theme - Use the dropdown menu to select 
+ a theme for the system's default user interface. </p>
+<p class="whs5">Primary Color (in hex) - Enter the value 
+ of the color you would like for the text and shaded areas throughout the 
+ system. This needs to be the hex value for the color like you would use 
+ in HTML. You may also click on the palette icon to the right of the field 
+ to select a color from the menu.</p>
+<p class="whs5">Ratio of Primary to Background - This setting 
+ controls how much of your primary color is blended with the shaded areas 
+ in the interface. An example shaded area can be seen on the left side 
+ of the image above. </p>
 <p class="whs4">&nbsp;</p>
 <p class="whs4">Job<span style="margin-left: 18pt;">:</span></p>
-<p class="whs6">Retry Settings - Use 
+<p class="whs7">Retry Settings - Use 
  the drop down menu to select the amount of time the system should wait 
  in between attempts to call an unanswered phone number.</p>
-<p class="whs6">Disable Repeating Jobs 
+<p class="whs7">Disable Repeating Jobs 
  - Click this checkbox to prevent the system from performing any of its 
  scheduled repeating jobs. Unchecking this box will allow the repeating 
  jobs to resume at their next scheduled time.</p>
-<p class="whs6">Default Caller ID Number 
+<p class="whs7">Default Caller ID Number 
  - Enter the phone number you would like to display in the recipient's 
  Caller ID.</p>
-<p class="whs6">Autoreport Email Address 
+<p class="whs7">Autoreport Email Address 
  - The email address entered in this field will be displayed as the from 
  address users will see in the reports which are emailed to them. It is 
  important to set this so that the users will see that the emailed report 
  is from the district and so that spam filters will not block the report 
  emails. </p>
-<p class="whs6">Autoreport Email Name 
+<p class="whs7">Autoreport Email Name 
  - The name entered here will be the name that reports are sent from. For 
  example, &quot;Anytown School District&quot;.</p>
-<p class="whs6">&nbsp;</p>
-<p class="whs7">Security:</p>
+<p class="whs7">&nbsp;</p>
+<p class="whs6">Security:</p>
 <p class="whs5">Minimum Username Length - Enter the minimum 
  number of characters that a username may contain.</p>
 <p class="whs5">Minimum Password Length - Enter the minimum 
@@ -157,8 +170,8 @@ else
  the account. This must be greater than the number of invalid logins permissible 
  before a temporary lockout.</p>
 <p class="whs8">&nbsp;</p>
-<p class="whs7">Contact Manager:</p>
-<p class="whs7"><span style="font-weight: normal;">Note: 
+<p class="whs6">Contact Manager:</p>
+<p class="whs6"><span style="font-weight: normal;">Note: 
  The options in this section affect only the Contact Manager feature and 
  will only be visible if your system has this feature. The Contact Manager 
  is a new feature from SchoolMessenger that allows your recipients to control 

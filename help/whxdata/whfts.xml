@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <fts>
-<chunkinfo url="whfwdata0.xml" first="!" last="call"/>
-<chunkinfo url="whfwdata1.xml" first="callout" last="edit"/>
-<chunkinfo url="whfwdata2.xml" first="editor" last="importanc"/>
-<chunkinfo url="whfwdata3.xml" first="important" last="nt"/>
-<chunkinfo url="whfwdata4.xml" first="numb" last="restful"/>
-<chunkinfo url="whfwdata5.xml" first="restraint" last="thoma"/>
-<chunkinfo url="whfwdata6.xml" first="thos" last="–"/>
+<chunkinfo url="whfwdata0.xml" first="!" last="cal"/>
+<chunkinfo url="whfwdata1.xml" first="calendar" last="easiest"/>
+<chunkinfo url="whfwdata2.xml" first="easy" last="if"/>
+<chunkinfo url="whfwdata3.xml" first="imag" last="nobody"/>
+<chunkinfo url="whfwdata4.xml" first="not" last="repeat"/>
+<chunkinfo url="whfwdata5.xml" first="repons" last="tell"/>
+<chunkinfo url="whfwdata6.xml" first="templat" last="–"/>
 
 <tchunkinfo first="0" last="65" url="whftdata0.xml" />
 
