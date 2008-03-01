@@ -30,7 +30,7 @@ $NAVTREE = array (
 ////////////////////////////////////////////////////////////////////////////////
 
 function navMainTab ($title, $link, $isselected) {
-	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
+	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/themes/3dblue/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
 }
 
 function navSubTab ($title, $link, $isselected) {
@@ -135,7 +135,7 @@ doNavTabs($NAVTREE);
 
 
 	<div class="subnavmenu hoverlinks"></div>
-	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/3dblue/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
 	<div class="content">
