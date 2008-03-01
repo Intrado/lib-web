@@ -17,7 +17,8 @@ if(!isset($ppNotLoggedIn)){
 
 
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
-		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php?logout=1");
+		//index page will redirect to ssl
+		redirect("index.php?logout=1");
 	}
 
 	doStartSession();
