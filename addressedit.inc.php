@@ -234,28 +234,29 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 
 			// unset this for next popup edit
 			setCurrentPerson("new");
-
-			foreach($contacttypes as $type){
-				if(!isset($types[$type])) continue;
-				foreach($types[$type] as $item){
-					foreach($jobtypes as $jobtype){
-						if((!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
-										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id))
-							||
-							(!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
-										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id])){
-								QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-											values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','"
-											. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "')");
-							} else if(isset($contactprefs[$type][$item->sequence][$jobtype->id]) &&
-										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id]){
-								QuickUpdate("update contactpref set enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'
-												where personid = '" . $personid . "' and jobtypeid = '" . $jobtype->id . "' and sequence = '" . $item->sequence . "'");
+			if($person->id){
+				$personid=$person->id;
+				foreach($contacttypes as $type){
+					if(!isset($types[$type])) continue;
+					foreach($types[$type] as $item){
+						foreach($jobtypes as $jobtype){
+							if((!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+											GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id))
+								||
+								(!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
+											GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id])){
+									QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+												values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','"
+												. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "')");
+								} else if(isset($contactprefs[$type][$item->sequence][$jobtype->id]) &&
+											GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id]){
+									QuickUpdate("update contactpref set enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'
+													where personid = '" . $personid . "' and jobtypeid = '" . $jobtype->id . "' and sequence = '" . $item->sequence . "'");
+							}
 						}
 					}
 				}
 			}
-
 
 			if (CheckFormSubmit($f,'saveanother')) {
 				// save and add another
@@ -270,7 +271,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 } else {
 	$reloadform = 1;
 }
-
 
 if( $reloadform )
 {
