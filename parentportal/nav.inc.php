@@ -75,13 +75,16 @@ doNavTabs($NAVTREE);
 ////////////////////////////////////////////////////////////////////////////////
 
 ?>
+<script>
+	var _brandtheme = "3dblue";
+</script>
 <html>
 <head>
 	<title>SchoolMessenger Contact Manager: <?= $PAGETITLE ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/sorttable.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='css/style.css' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css.php' type='text/css' rel='stylesheet' media='screen'>
 </head>
 <body>
 	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>

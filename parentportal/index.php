@@ -59,7 +59,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		$id = $result['userID'];
 	else
 		$badlogin = true;
-		
+
 } else if (!isset($_GET['logout'])){
 	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
 	$sessionstarted = true;
@@ -74,6 +74,7 @@ if($id){
 	if (!$sessionstarted)
 		doStartSession();
 	$_SESSION['portaluserid'] = $id;
+	$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
 	redirect("choosecustomer.php");
 }
 
@@ -145,12 +146,12 @@ document.getElementById('logintext').focus();
 function capslockCheck(e){
 		var keypressed;
 		var shiftkey;
-		
+
 		if(e.keyCode)
 			keypressed = e.keyCode;
 		else
 			keypressed = e.which;
-		
+
 		if(e.shiftKey) {
 			shiftkey = e.shiftkey;
 		} else {
