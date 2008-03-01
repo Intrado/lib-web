@@ -385,7 +385,7 @@ startWindow('User Information');
 								<td><? NewFormItem($f, $s, "themeoverride", "checkbox", null, null, "id='themeoverride' onclick='disablethemes(this.checked)'"); ?></td>
 							</tr>
 							<tr>
-								<td>Color Theme<? print help('Settings_ColorTheme', NULL, "small"); ?></td>
+								<td>Color Theme<? print help('Account_ColorTheme', NULL, "small"); ?></td>
 								<td>
 									<?
 										NewFormItem($f, $s, '_brandtheme', 'selectstart', null, null, "id='themes' onchange='resetPrimaryAndRatio(this.value)'");
@@ -397,11 +397,11 @@ startWindow('User Information');
 								</td>
 							</tr>
 							<tr>
-								<td>Primary Color(in hex)<? print help('Settings_PrimaryColor', NULL, "small"); ?></td>
+								<td>Primary Color(in hex)<? print help('Account_PrimaryColor', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, "_brandprimary", "text", 0, 10, "id='brandprimary'") ?><img src="img/sel.gif" onclick="TCP.popup(new getObj('brandprimary').obj)"/></td>
 							</tr>
 							<tr>
-								<td>Ratio of Primary to Background<? print help('Settings_Ratio', NULL, "small"); ?></td>
+								<td>Ratio of Primary to Background<? print help('Account_Ratio', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, "_brandratio", "text", 0, 3, "id='brandratio'") ?></td>
 							</tr>
 
