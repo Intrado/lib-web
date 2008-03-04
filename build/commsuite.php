@@ -3,6 +3,17 @@ $commsuitedbname = "commsuite";  //new db name
 $olddbname = "dialer"; //old db name
 $initpath = "/usr/commsuite/init/";  //path where all init files exist, for linux only
 
+
+$tmpPathArray = explode("/",$argv[0]);
+if (count($tmpPathArray) < 2)
+	$tmpPathArray = explode("\\",$argv[0]);
+
+var_dump($tmpPathArray);
+array_pop($tmpPathArray); // remove the php script
+array_pop($tmpPathArray); // remove the build directory
+
+$wwwpath = implode('/', $tmpPathArray);
+
 $error = 1;
 
 if(!isset($argv[1])){
@@ -97,21 +108,21 @@ echo "$commsuitedbname has been created\n";
 
 echo "Creating new tables, triggers, and procedures\n";
 
-executeSqlFile("commsuite.sql", true);
+executeSqlFile("$wwwpath/db/commsuite.sql", true);
 
 mysql_query("INSERT INTO `shard` VALUES (1,'commsuite','commsuite','localhost','" . $dbuser ."','" . $dbpass ."')");
 
 mysql_query("INSERT INTO `customer` VALUES (1,1,'default','0000000000','" . $dbuser ."','" . $dbpass . "','','2007-08-23 18:49:30',1)");
 
 if($type == "new"){
-	executeSqlFile("commsuitedefaults.sql");
+	executeSqlFile("$wwwpath/db/commsuitedefaults.sql");
 	echo "Defaults loaded.\n";
 } else if($type == "upgrade"){
 	mysql_select_db($olddbname);
 	mysql_query("delete from setting where name = 'checkpassword'");
 
 	echo "Mangling\n";
-	executeSqlFile("commsuitemangle.sql");
+	executeSqlFile("$wwwpath/db/commsuitemangle.sql");
 
 	echo "Running Import Updater\n";
 	$output=array();
@@ -139,7 +150,7 @@ if($type == "new"){
 	exec("php create_new_settings.php", $output);
 	echoarray($output);
 	echo "Cleaning up the database\n";
-	executeSqlFile("database_cleanup.sql");
+	executeSqlFile("$wwwpath/db/database_cleanup.sql");
 }
 
 echo "Done.\n";
@@ -147,7 +158,7 @@ echo "Done.\n";
 
 function executeSqlFile($sqlfile, $replace = false){
 	global $custdb;
-	$tablequeries = explode("$$$",file_get_contents("../db/" . $sqlfile));
+	$tablequeries = explode("$$$",file_get_contents($sqlfile));
 	foreach ($tablequeries as $tablequery) {
 		if (trim($tablequery)) {
 			if($replace){
