@@ -4,11 +4,11 @@ include_once("../inc/themes.inc.php");
 header('Content-type: text/css');
 
 
-$theme = "3dblue";
-$primary = $COLORSCHEMES['3dblue']['_brandprimary'];
-$theme1 = "#" . $COLORSCHEMES['3dblue']['_brandtheme1'];
-$theme2 = "#" . $COLORSCHEMES['3dblue']['_brandtheme2'];
-$globalratio = $COLORSCHEMES['3dblue']['_brandratio'];
+$theme = getBrandTheme();
+$primary = $COLORSCHEMES[$theme]['_brandprimary'];
+$theme1 = "#" . $COLORSCHEMES[$theme]['_brandtheme1'];
+$theme2 = "#" . $COLORSCHEMES[$theme]['_brandtheme2'];
+$globalratio = $COLORSCHEMES[$theme]['_brandratio'];
 
 
 $fade1 = "E5E5E5";

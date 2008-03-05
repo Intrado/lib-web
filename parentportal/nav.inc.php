@@ -77,7 +77,7 @@ doNavTabs($NAVTREE);
 
 ?>
 <script>
-	var _brandtheme = "3dblue";
+	var _brandtheme = "<?=getBrandTheme();?>";
 </script>
 <html>
 <head>
