@@ -8,7 +8,6 @@ $tmpPathArray = explode("/",$argv[0]);
 if (count($tmpPathArray) < 2)
 	$tmpPathArray = explode("\\",$argv[0]);
 
-var_dump($tmpPathArray);
 array_pop($tmpPathArray); // remove the php script
 array_pop($tmpPathArray); // remove the build directory
 
