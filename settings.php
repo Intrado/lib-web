@@ -321,13 +321,13 @@ startWindow('Global System Settings');
 ?>
 							<tr>
 								<td>
-									Technical Support Phone<? print help('Settings_SupportPhone', NULL, "small"); ?>
+									Service & Support Phone<? print help('Settings_SupportPhone', NULL, "small"); ?>
 								</td>
 								<td><? NewFormItem($f, $s, 'supportphone', 'text', 14, 14);  ?></td>
 							</tr>
 							<tr>
 								<td>
-									Technical Support Email<? print help('Settings_SupportEmail', NULL, "small"); ?>
+									Service & Support Email<? print help('Settings_SupportEmail', NULL, "small"); ?>
 								</td>
 								<td><? NewFormItem($f, $s, 'supportemail', 'text', 30, 250);  ?></td>
 							</tr>
@@ -486,15 +486,15 @@ startWindow('Global System Settings');
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 								<tr>
-									<td width="30%">Activation Code Lifetime<?=help("SystemwideSettings_ActCodeLifetime", NULL, "small")?></td>
+									<td width="30%">Activation Code Lifetime<?=help("Settings_ActCodeLifetime", NULL, "small")?></td>
 									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?> 1 - 365 days</td>
 								</tr>
 								<tr>
-									<td width="30%">Require phone numbers for Emergency and High Priority Job Types<?=help("SystemwideSettings_RequirePhone", NULL, "small")?></td>
+									<td width="30%">Require phone numbers for Emergency and High Priority Job Types<?=help("Settings_RequirePhone", NULL, "small")?></td>
 									<td><? NewFormItem($f, $s, "priorityenforcement", "checkbox"); ?></td>
 								</tr>
 								<tr>
-									<td width="30%">Restricted Destination Fields<?=help("SystemwideSettings_RestrictedDest", NULL, "small")?></td>
+									<td width="30%">Restricted Destination Fields<?=help("Settings_RestrictedDest", NULL, "small")?></td>
 									<td>
 										<table border="0" cellpadding="3" cellspacing="1">
 											<tr class="listheader">
