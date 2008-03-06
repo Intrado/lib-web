@@ -43,6 +43,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 						$forgotsuccess = true;
 						doStartSession();
 						$_SESSION['portaluserid'] = $result['userID'];
+						$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
 					}
 				} else {
 					$error = true;
@@ -67,6 +68,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			if(!$error){
 				doStartSession();
 				$_SESSION['portaluserid'] = $result['userID'];
+				$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
 			}
 		} else {
 			$error = true;
@@ -143,7 +145,7 @@ if($form){
 			<tr>
 				<td colspan="2">You should have recieved an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
 			</tr>
-			
+
 			<tr>
 				<td>Confirmation Code: </td>
 				<td><input type="text" name="token" value="<?=htmlentities($token)?>" size="35" /></td>
