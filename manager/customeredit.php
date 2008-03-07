@@ -114,6 +114,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("That is not a valid 'Primary Color'");
 			} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
 				error("The ratio can only be between 0 and .5(50%)");
+			} else if(gethostbynamel(GetFormData($f, $s, 'emaildomain')) === false){
+				error('The email domain is not valid');
 			} else {
 
 				QuickUpdate("update customer set
@@ -212,6 +214,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_supportemail', DBSafe(GetFormData($f, $s, "_supportemail")), $custdb);
 				setCustomerSystemSetting('_supportphone', Phone::parse(GetFormData($f, $s, "_supportphone")), $custdb);
 
+				setCustomerSystemSetting('emaildomain', DBSafe(trim(GetFormData($f, $s, "emaildomain"))), $custdb);
+
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
@@ -293,6 +297,8 @@ if( $reloadform ) {
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "", true, $custdb), "email", "nomin", "nomax", true);
 	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "", true, $custdb)), "phone", 10, 10, true);
+
+	PutFormData($f, $s, "emaildomain", getCustomerSystemSetting('emaildomain', "", true, $custdb), "text", 0, 255);
 
 }
 
@@ -421,6 +427,12 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	<td>Support Phone:</td>
 	<td><? NewFormItem($f, $s, "_supportphone", "text", 14); ?></td>
 </tr>
+
+<tr>
+	<td>Email Domain:</td>
+	<td><? NewFormItem($f, $s, "emaildomain", "text", 30, 255); ?></td>
+</tr>
+
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
 	<td><? NewFormItem($f, "Return","Save and Return", 'submit');?></td>

@@ -91,6 +91,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 			error("That is not a valid 'Primary Color'");
 		} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
 			error("The ratio of primary to background can only be between 0 and .5(50%)");
+		} else if(gethostbynamel(GetFormData($f, $s, 'emaildomain')) === false){
+			error('The email domain is not valid');
 		} else {
 			//check the parsing
 
@@ -151,6 +153,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 					$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"];
 					$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"];
 				}
+
+
+				setSetting('emaildomain', DBSafe(trim(GetFormData($f, $s, 'emaildomain'))));
 
 				if($IS_COMMSUITE){
 					setSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
@@ -218,6 +223,8 @@ if( $reloadform )
 	PutFormData($f, $s, "_brandtheme", getSystemSetting('_brandtheme'), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", getSystemSetting('_brandratio'), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandprimary", getSystemSetting('_brandprimary'), "text", "nomin", "nomax", true);
+
+	PutFormData($f, $s, "emaildomain", getSystemSetting('emaildomain'), "text", 0, 255);
 
 	if($IS_COMMSUITE){
 		PutFormData($f, $s, "supportphone", Phone::format(getSystemSetting('_supportphone')), "phone", "10", "10", true);
@@ -314,6 +321,10 @@ startWindow('Global System Settings');
 							<tr>
 								<td>Systemwide Alert Message<? print help('Settings_SystemwideAlert', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'alertmessage', 'textarea',44,4);  ?></td>
+							</tr>
+							<tr>
+								<td>Email Domain<? print help('Settings_EmailDomain', NULL, "small"); ?></td>
+								<td><? NewFormItem($f, $s, 'emaildomain', 'text', 30, 255);  ?></td>
 							</tr>
 
 <?
