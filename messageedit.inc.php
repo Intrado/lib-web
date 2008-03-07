@@ -127,6 +127,11 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 		//get the ID of any message with the same name and type
 		$name = DBSafe(GetFormData($form,$section,"name"));
 		$existsid = QuickQuery("select id from message where name='$name' and type='$MESSAGETYPE' and userid='$USER->id' and deleted=0");
+		if($MESSAGETYPE == "email"){
+			$emaildomain = getSystemSetting('emaildomain');
+			$fromemaildomain = substr(GetFormData($form, $section, "fromemail"), strpos(GetFormData($form, $section, "fromemail"), "@")+1);
+		}
+
 
 		//do check
 		if( CheckFormSection($form, $section) ) {
@@ -135,6 +140,8 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 			error('A message named \'' . GetFormData($form,$section,"name") . '\' already exists');
 		} else if (strlen(GetFormData($form,$section,"body")) == 0) {
 			error('The message body cannot be empty');
+		} else if ( ($MESSAGETYPE == "email") && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
+			error('That From Email is not valid', 'Please check the email domain');
 		} else if (!$uploaderror) {
 			//check the parsing
 			$message = new Message($_SESSION['messageid']);
