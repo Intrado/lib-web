@@ -141,7 +141,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 		} else if (strlen(GetFormData($form,$section,"body")) == 0) {
 			error('The message body cannot be empty');
 		} else if ( ($MESSAGETYPE == "email") && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
-			error('That From Email is not valid', 'Please check the email domain');
+			error('That From Email address is not valid', 'You must use an email address at ' . $emaildomain);
 		} else if (!$uploaderror) {
 			//check the parsing
 			$message = new Message($_SESSION['messageid']);
