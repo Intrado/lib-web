@@ -402,7 +402,7 @@ switch($MESSAGETYPE)
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder">From Email:</th>
 					<td colspan="3" class="bottomBorder">
-						<? NewFormItem($form, $section, 'fromemail', 'text', 50,100); ?> (ex: joe.smith@example.com)
+						<? NewFormItem($form, $section, 'fromemail', 'text', 50,100); ?> (ex: joe.smith@<?= getSystemSetting('emaildomain') ? getSystemSetting('emaildomain') : "example.com" ?>)
 					</td>
 				</tr>
 
