@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
-Setting for the email domain the system will use.
+If set, users will not be able to use a from email address that does not have the same email domain.
