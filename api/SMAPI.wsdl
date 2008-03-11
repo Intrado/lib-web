@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:sm="http://localhost/school/api" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SMAPI" targetNamespace="http://localhost/school/api" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://localhost/school/api">
+	<xsd:element name="login">
+		<xsd:complexType>
+			<xsd:sequence>
+
+				<xsd:element name="in" type="xsd:string"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="loginResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+
+				<xsd:element name="out" type="xsd:string"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="list">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:int"></xsd:element>
+			<xsd:element name="name" type="xsd:string"></xsd:element>
+			<xsd:element name="description" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>	<xsd:complexType name="ArrayofLists">		<xsd:sequence>			<xsd:element name="lists" type="sm:list" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="message">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:int"></xsd:element>
+			<xsd:element name="name" type="xsd:string"></xsd:element>
+			<xsd:element name="description" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ArrayofMessages">
+		<xsd:sequence>
+			<xsd:element name="messages" type="sm:message" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema></wsdl:types>
+    <wsdl:message name="loginRequest">
+    	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="password" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="loginResponse">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="login_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getListsRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getListsResponse">
+    	<wsdl:part name="lists" type="sm:ArrayofLists"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessagesRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="type" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessagesResponse">
+    	<wsdl:part name="messages" type="sm:ArrayofMessages"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setMessageBodyRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="messageid" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setMessageBodyResponse">
+    	<wsdl:part name="result" type="xsd:boolean"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="uploadAudioRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="audio" type="xsd:base64Binary"></wsdl:part>
+    	<wsdl:part name="mimetype" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="uploadAudioResponse">
+    	<wsdl:part name="audioname" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getLists_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessages_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setMessageBody_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="uploadAudio_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="SMPortType">
+    	<wsdl:operation name="login">
+    		<wsdl:input message="sm:loginRequest"></wsdl:input>
+    		<wsdl:output message="sm:loginResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:login_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="getLists">
+    		<wsdl:input message="sm:getListsRequest"></wsdl:input>
+    		<wsdl:output message="sm:getListsResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:getLists_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="getMessages">
+    		<wsdl:input message="sm:getMessagesRequest"></wsdl:input>
+    		<wsdl:output message="sm:getMessagesResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:getMessages_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="setMessageBody">
+    		<wsdl:input message="sm:setMessageBodyRequest"></wsdl:input>
+    		<wsdl:output message="sm:setMessageBodyResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:setMessageBody_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="uploadAudio">
+    		<wsdl:input message="sm:uploadAudioRequest"></wsdl:input>
+    		<wsdl:output message="sm:uploadAudioResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:uploadAudio_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="SMBinding" type="sm:SMPortType">
+
+    	<soap:binding style="rpc"
+    		transport="http://schemas.xmlsoap.org/soap/http" />
+    	<wsdl:operation name="login">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/login" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="getLists">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/getLists" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="getMessages">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/getMessages" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="setMessageBody">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/setMessageBody" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="uploadAudio">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/uploadAudio" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SMAPI">
+		<wsdl:port name="SMAPI Port" binding="sm:SMBinding">
+			<soap:address location="http://localhost/customer1/api/server.php"></soap:address>
+		</wsdl:port>
+	</wsdl:service></wsdl:definitions>
