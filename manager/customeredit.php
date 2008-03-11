@@ -75,29 +75,27 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managernote = GetFormData($f, $s, 'managernote');
 			$hassms = GetFormData($f, $s, 'hassms');
 			$maxsms = GetFormData($f, $s, 'maxsms');
+			$fileerror = false;
+			$logoname = "";
+			$loginpicturename ="";
 			if(isset($_FILES['uploadlogo']) && $_FILES['uploadlogo']['tmp_name']) {
 
-				$newname = secure_tmpname("uploadlogo",".img");
-				if(!move_uploaded_file($_FILES['uploadlogo']['tmp_name'],$newname)) {
-					error('Unable to complete file upload. Please try again');
-				} else if (!is_file($newname) || !is_readable($newname)) {
-					error('Unable to complete file upload. Please try again');
-				} else if($newlogofile = @file_get_contents($newname)) {
-					error('New logo file upload failed');
+				$logoname = secure_tmpname("uploadlogo",".img");
+				if(!move_uploaded_file($_FILES['uploadlogo']['tmp_name'],$logoname)) {
+					$fileerror=true;
+				} else if (!is_file($logoname) || !is_readable($logoname)) {
+					$fileerror=true;
 				}
 			}
 			if(isset($_FILES['uploadloginpicture']) && $_FILES['uploadloginpicture']['tmp_name']) {
 
-				$newname = secure_tmpname("uploadloginpicture",".img");
-				if(!move_uploaded_file($_FILES['uploadloginpicture']['tmp_name'],$newname)) {
-					error('Unable to complete file upload. Please try again');
-				} else if (!is_file($newname) || !is_readable($newname)) {
-					error('Unable to complete file upload. Please try again');
-				} else if($newloginpicturefile = @file_get_contents($newname)) {
-					error('New logo file upload failed');
+				$loginpicturename = secure_tmpname("uploadloginpicture",".img");
+				if(!move_uploaded_file($_FILES['uploadloginpicture']['tmp_name'],$loginpicturename)) {
+					$fileerror=true;
+				} else if (!is_file($newname) || !is_readable($loginpicturename)) {
+					$fileerror=true;
 				}
 			}
-
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' AND id != $currentid")) {
@@ -114,8 +112,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("That is not a valid 'Primary Color'");
 			} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
 				error("The ratio can only be between 0 and .5(50%)");
-			} else if(GetFormData($f, $s, 'emaildomain') && gethostbynamel(GetFormData($f, $s, 'emaildomain')) === false){
-				error('The email domain is not valid');
+			} else if($fileerror){
+				error('Unable to complete file upload. Please try again');
 			} else {
 
 				QuickUpdate("update customer set
@@ -186,19 +184,25 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				}
 
 				//Logo
-				if(isset($newlogofile)){
-					QuickUpdate("INSERT INTO content (contenttype, data) values
-								('" . $_FILES['uploadlogo']['type'] . "', '" . base64_encode($newlogofile) . "')", $custdb);
-					$logocontentid = mysql_insert_id($custdb);
-					setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);
+				if($logoname){
+					$newlogofile = file_get_contents($logoname);
+					if($newlogofile){
+						QuickUpdate("INSERT INTO content (contenttype, data) values
+									('" . $_FILES['uploadlogo']['type'] . "', '" . base64_encode($newlogofile) . "')", $custdb);
+						$logocontentid = mysql_insert_id($custdb);
+						setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);
+					}
 				}
 
 				// Login image
-				if(isset($newloginpicturefile)){
-					QuickUpdate("INSERT INTO content (contenttype, data) values
-								('" . $_FILES['uploadloginpicture']['type'] . "', '" . base64_encode($newloginpicturefile) . "')", $custdb);
-					$loginpicturecontentid = mysql_insert_id($custdb);
-					setCustomerSystemSetting('_loginpicturecontentid', $loginpicturecontentid, $custdb);
+				if($loginpicturename){
+					$newloginpicturefile = file_get_contents($loginpicturename);
+					if($newloginpicturefile){
+						QuickUpdate("INSERT INTO content (contenttype, data) values
+									('" . $_FILES['uploadloginpicture']['type'] . "', '" . base64_encode($newloginpicturefile) . "')", $custdb);
+						$loginpicturecontentid = mysql_insert_id($custdb);
+						setCustomerSystemSetting('_loginpicturecontentid', $loginpicturecontentid, $custdb);
+					}
 				}
 
 				setCustomerSystemSetting('_productname', GetFormData($f, $s, 'productname'), $custdb);
