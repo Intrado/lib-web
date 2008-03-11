@@ -114,7 +114,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("That is not a valid 'Primary Color'");
 			} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
 				error("The ratio can only be between 0 and .5(50%)");
-			} else if(gethostbynamel(GetFormData($f, $s, 'emaildomain')) === false){
+			} else if(GetFormData($f, $s, 'emaildomain') && gethostbynamel(GetFormData($f, $s, 'emaildomain')) === false){
 				error('The email domain is not valid');
 			} else {
 
