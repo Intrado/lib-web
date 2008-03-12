@@ -106,6 +106,7 @@ class SMAPI{
 
 	function uploadAudio($sessionid, $name, $mimetype, $audio){
 		global $USER;
+		error_log("uploadaudio called");
 		if(!APISession($sessionid)){
 			return new SoapFault("Server", "Invalid Session ID");
 		} else {
@@ -201,40 +202,19 @@ class SMAPI{
 			if(!$USER->id){
 				return new SoapFault("Server", "Invalid user");
 			}
-			/*
-			$jobstats = Query("select j.id,
-								sum(rc.type='phone') as total_phone,
-								sum(rc.type='email') as total_email,
-								sum(rc.type='print') as total_print,
-								sum(rc.type='sms') as total_sms,
-								j.type LIKE '%phone%' AS has_phone,
-								j.type LIKE '%email%' AS has_email,
-								j.type LIKE '%print%' AS has_print,
-								j.type LIKE '%sms%' AS has_sms,
-								sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
-								sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
-								sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
-								sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
-								ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
-								from job j
-								left join reportcontact rc
-									on j.id = rc.jobid
-								left join user jobowner
-									on j.userid = jobowner.id
-								left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-								where (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
-								group by j.id order by j.id desc");
-			*/
-			$result = Query("select id, name, description from job where status = 'active' and userid = " . $USER->id . " order by finishdate asc");
-			$jobs = array();
-			while($row = DBGetRow($result)){
-				$job = new API_Job();
-				$job->id = $row[0];
-				$job->name = $row[1];
-				$job->description = $row[2];
-				$jobs[] = $job;
+			return getJobData();
+		}
+	}
+	function getJobStatus($sessionid, $jobid){
+		global $USER;
+		if(!APISession($sessionid)){
+			return new SoapFault("Server", "Invalid Session ID");
+		} else {
+			$USER = $_SESSION['user'];
+			if(!$USER->id){
+				return new SoapFault("Server", "Invalid user");
 			}
-			return $jobs;
+			return getJobData($jobid);
 		}
 	}
 
@@ -294,10 +274,6 @@ class SMAPI{
 		//jobid
 	}
 
-
-	function getJobStatus($jobid){
-
-	}
 */
 }
 
@@ -325,6 +301,62 @@ function APISession($sessionid){
 	}
 }
 
+function getJobData($jobid=null){
+	global $USER;
+	$query = "select j.id, j.name, j.description,
+						sum(rc.type='phone') as total_phone,
+						sum(rc.type='email') as total_email,
+						sum(rc.type='print') as total_print,
+						sum(rc.type='sms') as total_sms,
+						j.type LIKE '%phone%' AS has_phone,
+						j.type LIKE '%email%' AS has_email,
+						j.type LIKE '%print%' AS has_print,
+						j.type LIKE '%sms%' AS has_sms,
+						sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
+						sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
+						sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
+						sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
+						ADDTIME(j.startdate, j.starttime), j.status, j.deleted, j.type
+						from job j
+						left join reportcontact rc
+							on j.id = rc.jobid
+						left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
+						where (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
+						and j.userid = $USER->id ";
+	if($jobid){
+		$query .= " and j.id = $jobid ";
+	}
+	$query .=" group by j.id order by j.startdate, j.starttime, j.id desc";
+	$result = Query($query);
+	$jobs = array();
+	while($row = DBGetRow($result)){
+		$job = new API_Job();
+		$job->id = $row[0];
+		$job->name = $row[1];
+		$job->description = $row[2];
+		$job->phonetotal = $row[3];
+		$job->emailtotal = $row[4];
+		$job->printtotal = $row[5];
+		$job->smstotal = $row[6];
+		$job->hasphone = $row[7];
+		$job->hasemail = $row[8];
+		$job->hasprint = $row[9];
+		$job->hassms = $row[10];
+		$job->phoneremaining = $row[11];
+		$job->emailremaining = $row[12];
+		$job->printremaining = $row[13];
+		$job->smsremaining = $row[14];
+		$job->startdate = $row[15];
+		$job->status = $row[16];
+
+		$jobs[] = $job;
+	}
+	if($jobid){
+		return $jobs[0];
+	} else {
+		return $jobs;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Server Code
@@ -356,10 +388,10 @@ require_once("../obj/JobType.obj.php");
 require_once("../obj/Job.obj.php");
 
 // API Files
-require_once("API_List.obj.php");
-require_once("API_Message.obj.php");
-require_once("API_JobType.obj.php");
-require_once("API_Job.obj.php");
+require_once("../obj/API_List.obj.php");
+require_once("../obj/API_Message.obj.php");
+require_once("../obj/API_JobType.obj.php");
+require_once("../obj/API_Job.obj.php");
 
 ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
 $server=new SoapServer("SMAPI.wsdl");
