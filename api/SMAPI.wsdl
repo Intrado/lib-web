@@ -40,6 +40,46 @@
 			<xsd:element name="messages" type="sm:message" minOccurs="0" maxOccurs="unbounded"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+	<xsd:complexType name="jobtype">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:int"></xsd:element>
+			<xsd:element name="name" type="xsd:string"></xsd:element>
+			<xsd:element name="info" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ArrayofJobTypes">
+		<xsd:sequence>
+			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ArrayofJobs">
+		<xsd:sequence>
+			<xsd:element name="jobs" type="sm:job" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="job">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:int"></xsd:element>
+			<xsd:element name="name" type="xsd:string"></xsd:element>
+			<xsd:element name="description" type="xsd:string"></xsd:element>
+			<xsd:element name="hasphone" type="xsd:string"></xsd:element>
+			<xsd:element name="hasemail" type="xsd:string"></xsd:element>
+			<xsd:element name="hasprint" type="xsd:string"></xsd:element>
+			<xsd:element name="hassms" type="xsd:string"></xsd:element>
+			<xsd:element name="phonetotal" type="xsd:string"></xsd:element>
+			<xsd:element name="emailtotal" type="xsd:string"></xsd:element>
+			<xsd:element name="printtotal" type="xsd:string"></xsd:element>
+			<xsd:element name="smstotal" type="xsd:string"></xsd:element>
+			<xsd:element name="phoneremaining" type="xsd:string"></xsd:element>
+			<xsd:element name="emailremaining" type="xsd:string"></xsd:element>
+			<xsd:element name="printremaining" type="xsd:string"></xsd:element>
+			<xsd:element name="smsremaining" type="xsd:string"></xsd:element>
+			<xsd:element name="startdate" type="xsd:string"></xsd:element>
+			<xsd:element name="status" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
@@ -93,6 +133,47 @@
     <wsdl:message name="uploadAudio_faultMsg">
     	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
     </wsdl:message>
+    <wsdl:message name="getJobTypesRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getJobTypesResponse">
+    	<wsdl:part name="jobtypes" type="sm:ArrayofJobTypes"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getJobTypes_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveJobsRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveJobsResponse">
+    	<wsdl:part name="jobs" type="sm:ArrayofJobs"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveJobs_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRepeatingJobsRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRepeatingJobsResponse">
+    	<wsdl:part name="jobs" type="sm:ArrayofJobs"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRepeatingJobs_faultMsg">
+    	<wsdl:part name="fault" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="sendRepeatingJobRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="jobid" type="xsd:int"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="sendRepeatingJobResponse">
+    	<wsdl:part name="jobid" type="xsd:int"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getJobStatusRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="jobid" type="xsd:int"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getJobStatusResponse">
+    	<wsdl:part name="job" type="sm:job"></wsdl:part>
+    </wsdl:message>
     <wsdl:portType name="SMPortType">
     	<wsdl:operation name="login">
     		<wsdl:input message="sm:loginRequest"></wsdl:input>
@@ -119,6 +200,29 @@
     		<wsdl:output message="sm:uploadAudioResponse"></wsdl:output>
             <wsdl:fault name="fault" message="sm:uploadAudio_faultMsg"></wsdl:fault>
         </wsdl:operation>
+    	<wsdl:operation name="getJobTypes">
+    		<wsdl:input message="sm:getJobTypesRequest"></wsdl:input>
+    		<wsdl:output message="sm:getJobTypesResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:getJobTypes_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="getActiveJobs">
+    		<wsdl:input message="sm:getActiveJobsRequest"></wsdl:input>
+    		<wsdl:output message="sm:getActiveJobsResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:getActiveJobs_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="getRepeatingJobs">
+    		<wsdl:input message="sm:getRepeatingJobsRequest"></wsdl:input>
+    		<wsdl:output message="sm:getRepeatingJobsResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="sm:getRepeatingJobs_faultMsg"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="sendRepeatingJob">
+    		<wsdl:input message="sm:sendRepeatingJobRequest"></wsdl:input>
+    		<wsdl:output message="sm:sendRepeatingJobResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getJobStatus">
+    		<wsdl:input message="sm:getJobStatusRequest"></wsdl:input>
+    		<wsdl:output message="sm:getJobStatusResponse"></wsdl:output>
+    	</wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMPortType">
 
@@ -164,6 +268,7 @@
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
+
     			<soap:fault use="encoded"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
     				name="fault" />
@@ -186,6 +291,7 @@
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
+
     			<soap:fault use="encoded"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
     				name="fault" />
@@ -208,6 +314,7 @@
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
+
     			<soap:fault use="encoded"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
     				name="fault" />
@@ -230,14 +337,115 @@
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
+
     			<soap:fault use="encoded"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
     				name="fault" />
     		</wsdl:fault>
     	</wsdl:operation>
+    	<wsdl:operation name="getJobTypes">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/getJobTypes" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="getActiveJobs">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/getActiveJobs" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="getRepeatingJobs">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/getRepeatingJobs" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+
+    			<soap:fault use="encoded"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    				name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="sendRepeatingJob">
+
+    		<soap:operation
+    			soapAction="http://localhost/school/api/sendRepeatingJob" />
+    		<wsdl:input>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getJobStatus">
+    		<soap:operation
+    			soapAction="http://localhost/school/api/getJobStatus" />
+    		<wsdl:input>
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="encoded"
+    				namespace="http://localhost/school/api"
+    				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+    		</wsdl:output>
+    	</wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="SMAPI">
 		<wsdl:port name="SMAPI Port" binding="sm:SMBinding">
-			<soap:address location="http://localhost/customer1/api/server.php"></soap:address>
+			<soap:address location="http://localhost/customer1/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
