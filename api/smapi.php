@@ -268,13 +268,89 @@ class SMAPI{
 			return $newjobid;
 		}
 	}
+	//jobid
+	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
+		global $USER, $ACCESS;
+		if(!APISession($sessionid)){
+			return new SoapFault("Server", "Invalid Session ID");
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+			if(!$USER->id){
+				return new SoapFault("Server", "Invalid user");
+			}
+			$job = Job::jobWithDefaults();
+			$job->name = $name;
+			$job->description = $desc;
+			$job->jobtypeid = $jobtypeid;
+			if(userOwns("list", $listid)){
+				$job->listid = $listid;
+			} else {
+				return new SoapFault("Server", "Invalid List");
+			}
+			if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid)){
+				$job->sendphone = true;
+				$job->phonemessageid = $phonemsgid;
+			} else {
+				$job->sendphone = false;
+			}
+			if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid)){
+				$job->sendemail = true;
+				$job->emailmessageid = $emailmsgid;
+			} else {
+				$job->sendemail = false;
+			}
+			if(getSystemSetting('hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid)){
+				$job->sendsms = true;
+				$job->smsmessageid = $smsmsgid;
+			} else {
+				$job->sendsms = false;
+			}
 
-/*
-	function sendJob(name, desc, listid, phonemsgid, emailmsgid, smsmsgid, starttime, endtime, startdate, daystorun, jobtype){
-		//jobid
+			$jobtypes = array();
+			if ($job->sendphone && $job->phonemessageid != 0) {
+				$jobtypes[] = "phone";
+			} else {
+				$job->phonemessageid = NULL;
+				$job->sendphone = false;
+			}
+			if ($job->sendemail && $job->emailmessageid != 0) {
+				$jobtypes[] = "email";
+			} else {
+				$job->emailmessageid = NULL;
+				$job->sendemail = false;
+			}
+			if ($job->sendprint && $job->printmessageid != 0) {
+				$jobtypes[] = "print";
+			} else {
+				$job->printmessageid = NULL;
+				$job->sendprint = false;
+			}
+			if ($hassms && $job->sendsms && $job->smsmessageid != 0) {
+				$jobtypes[] = "sms";
+			} else {
+				$job->smsmessageid = NULL;
+				$job->sendsms = false;
+			}
+			$job->type=implode(",",$jobtypes);
+
+			$job->startdate = date("Y-m-d", strtotime($startdate));
+			if($ACCESS->getValue('maxjobdays') && $daystorun > $ACCESS->getValue('maxjobdays')){
+				$daystorun = $ACCESS->getValue('maxjobdays');
+			}
+			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($daystorun - 1) * 86400));
+			$job->starttime = date("H:i", strtotime($starttime));
+			$job->endtime = date("H:i", strtotime($endtime));
+
+			$job->setOption("sendreport", 1);
+			$job->setOptionValue("maxcallattempts", $maxcallattempts);
+			$job->create();
+			$job->runNow();
+			return $job->id;
+		}
 	}
 
-*/
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
