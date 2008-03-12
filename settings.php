@@ -182,7 +182,7 @@ if( $reloadform )
 	if($IS_COMMSUITE)
 		PutFormData($f, $s, "surveyurl", getSetting('surveyurl'), 'text', 0, 100);
 	PutFormData($f,$s,"retry",getSetting('retry'),"number",5,240);
-	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 10, 10);
+	PutFormData($f, $s, "callerid", Phone::format(getSetting('callerid')), 'phone', 10, 10, true);
 
 	PutFormData($f, $s, "defaultareacode", getSetting('defaultareacode'), 'number',200,999);
 
