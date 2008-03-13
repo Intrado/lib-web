@@ -13,6 +13,12 @@ array_pop($tmpPathArray); // remove the build directory
 
 $wwwpath = implode('/', $tmpPathArray);
 
+//Attach the trailing / if not empty string
+if($wwwpath != "")
+	$wwwpath .= "/";
+else
+	$wwwpath = "../";
+
 $error = 1;
 
 if(!isset($argv[1])){
@@ -114,14 +120,14 @@ mysql_query("INSERT INTO `shard` VALUES (1,'commsuite','commsuite','localhost','
 mysql_query("INSERT INTO `customer` VALUES (1,1,'default','0000000000','" . $dbuser ."','" . $dbpass . "','','2007-08-23 18:49:30',1)");
 
 if($type == "new"){
-	executeSqlFile("$wwwpath/db/commsuitedefaults.sql");
+	executeSqlFile($wwwpath . "db/commsuitedefaults.sql");
 	echo "Defaults loaded.\n";
 } else if($type == "upgrade"){
 	mysql_select_db($olddbname);
 	mysql_query("delete from setting where name = 'checkpassword'");
 
 	echo "Mangling\n";
-	executeSqlFile("$wwwpath/db/commsuitemangle.sql");
+	executeSqlFile($wwwpath . "db/commsuitemangle.sql");
 
 	echo "Running Import Updater\n";
 	$output=array();
@@ -141,7 +147,7 @@ if($type == "new"){
 	mysql_select_db($commsuitedbname, $custdb);
 
 	echo "Cleaning up the database\n";
-	executeSqlFile("$wwwpath/db/database_cleanup.sql");
+	executeSqlFile($wwwpath . "db/database_cleanup.sql");
 
 	echo "Adding New Defaults\n";
 	addNewDefaults();
