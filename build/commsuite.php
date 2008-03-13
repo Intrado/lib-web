@@ -113,7 +113,7 @@ echo "$commsuitedbname has been created\n";
 
 echo "Creating new tables, triggers, and procedures\n";
 
-executeSqlFile("$wwwpath/db/commsuite.sql", true);
+executeSqlFile($wwwpath . "db/commsuite.sql", true);
 
 mysql_query("INSERT INTO `shard` VALUES (1,'commsuite','commsuite','localhost','" . $dbuser ."','" . $dbpass ."')");
 
