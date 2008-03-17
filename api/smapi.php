@@ -157,30 +157,6 @@ class SMAPI{
 				return new SoapFault("Server", "Invalid user");
 			}
 
-			/*
-			$result = Query("select id, name, info from jobtype jt, userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=" . $USER->id . " and jt.deleted=0 and not jt.issurvey order by systempriority, name");
-
-			$jobtypes = array();
-			while($row = DBGetRow($result)){
-				$jobtype = new API_JobType();
-				$jobtype->id = $row[0];
-				$jobtype->name = $row[1];
-				$jobtype->info = $row[2];
-				$jobtypes[] = $jobtype;
-			}
-			if(count($jobtypes) == 0){
-				$result = Query("select id, name, info from jobtype jt where jt.deleted=0 and not jt.issurvey  order by systempriority, name");
-				while($row = DBGetRow($result)){
-					$jobtype = new API_JobType();
-					$jobtype->id = $row[0];
-					$jobtype->name = $row[1];
-					$jobtype->info = $row[2];
-					$jobtypes[] = $jobtype;
-				}
-			}
-
-			*/
-
 			$userjobtypes = JobType::getUserJobTypes();
 			foreach($userjobtypes as $userjobtype){
 				$jobtype = new API_Jobtype();
