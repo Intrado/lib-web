@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<wsdl:definitions xmlns:sm="http://localhost/school/api" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SMAPI" targetNamespace="http://localhost/school/api" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
-    <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://localhost/school/api">
+<wsdl:definitions xmlns:sm="http://localhost/account/api" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SMAPI" targetNamespace="http://localhost/account/api" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://localhost/account/api">
 	<xsd:element name="login">
 		<xsd:complexType>
 			<xsd:sequence>
@@ -190,7 +190,7 @@
     <wsdl:message name="sendJobResponse">
     	<wsdl:part name="jobid" type="xsd:int"></wsdl:part>
     </wsdl:message>
-    <wsdl:portType name="SMPortType">
+    <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
     		<wsdl:input message="sm:loginRequest"></wsdl:input>
     		<wsdl:output message="sm:loginResponse"></wsdl:output>
@@ -244,24 +244,24 @@
     		<wsdl:output message="sm:sendJobResponse"></wsdl:output>
     	</wsdl:operation>
     </wsdl:portType>
-    <wsdl:binding name="SMBinding" type="sm:SMPortType">
+    <wsdl:binding name="SMBinding" type="sm:SMClient">
 
     	<soap:binding style="rpc"
     		transport="http://schemas.xmlsoap.org/soap/http" />
     	<wsdl:operation name="login">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/login" />
+    			soapAction="http://localhost/account/api/login" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -274,17 +274,17 @@
     	<wsdl:operation name="getLists">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/getLists" />
+    			soapAction="http://localhost/account/api/getLists" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -297,17 +297,17 @@
     	<wsdl:operation name="getMessages">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/getMessages" />
+    			soapAction="http://localhost/account/api/getMessages" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -320,17 +320,17 @@
     	<wsdl:operation name="setMessageBody">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/setMessageBody" />
+    			soapAction="http://localhost/account/api/setMessageBody" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -343,17 +343,17 @@
     	<wsdl:operation name="uploadAudio">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/uploadAudio" />
+    			soapAction="http://localhost/account/api/uploadAudio" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -366,17 +366,17 @@
     	<wsdl:operation name="getJobTypes">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/getJobTypes" />
+    			soapAction="http://localhost/account/api/getJobTypes" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -389,17 +389,17 @@
     	<wsdl:operation name="getActiveJobs">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/getActiveJobs" />
+    			soapAction="http://localhost/account/api/getActiveJobs" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -412,17 +412,17 @@
     	<wsdl:operation name="getRepeatingJobs">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/getRepeatingJobs" />
+    			soapAction="http://localhost/account/api/getRepeatingJobs" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     		<wsdl:fault name="fault">
@@ -435,57 +435,57 @@
     	<wsdl:operation name="sendRepeatingJob">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/sendRepeatingJob" />
+    			soapAction="http://localhost/account/api/sendRepeatingJob" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getJobStatus">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/getJobStatus" />
+    			soapAction="http://localhost/account/api/getJobStatus" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="sendJob">
 
     		<soap:operation
-    			soapAction="http://localhost/school/api/sendJob" />
+    			soapAction="http://localhost/account/api/sendJob" />
     		<wsdl:input>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="encoded"
-    				namespace="http://localhost/school/api"
+    				namespace="http://localhost/account/api"
     				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
     		</wsdl:output>
     	</wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="SMAPI">
-		<wsdl:port name="SMAPI Port" binding="sm:SMBinding">
+		<wsdl:port name="SMAPIPort" binding="sm:SMBinding">
 			<soap:address location="http://localhost/customer1/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
