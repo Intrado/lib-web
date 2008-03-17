@@ -279,7 +279,7 @@ new getObj('logintext').obj.focus();
 <tr style="background-color: #<?=$primary?>; color: white;">
 	<td colspan="2"><div style="text-align:right; font-size: 12px; margin: 5px;">
 		<p>Service & Support:</p>
-		<p><a style="color: white;" href="mailto:<?=$scheme['_supportemail']?>">support@schoolmessenger.com</a>&nbsp;|&nbsp;<?=substr($scheme['_supportphone'],0,3) . "." . substr($scheme['_supportphone'],3,3) . "." . substr($scheme['_supportphone'],6,4);?></p>
+		<p><a style="color: white;" href="mailto:<?=$scheme['_supportemail']?>"><?=$scheme['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($scheme['_supportphone'],0,3) . "." . substr($scheme['_supportphone'],3,3) . "." . substr($scheme['_supportphone'],6,4);?></p>
 	</div></td>
 </tr>
 
