@@ -92,7 +92,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				$loginpicturename = secure_tmpname("uploadloginpicture",".img");
 				if(!move_uploaded_file($_FILES['uploadloginpicture']['tmp_name'],$loginpicturename)) {
 					$fileerror=true;
-				} else if (!is_file($newname) || !is_readable($loginpicturename)) {
+				} else if (!is_file($loginpicturename) || !is_readable($loginpicturename)) {
 					$fileerror=true;
 				}
 			}
