@@ -7,6 +7,9 @@ class SMAPI{
 
 	function login($loginname, $password){
 		global $IS_COMMSUITE;
+
+		$result = array("error" => "", "sessionid" => "");
+
 		//get the customer URL
 		if ($IS_COMMSUITE) {
 			$CUSTOMERURL = "default";
@@ -17,79 +20,98 @@ class SMAPI{
 
 		$userid = doLogin($loginname, $password, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
 		if($userid == -1){
-			return new SoapFault("Server", "User is locked out");
+			$result["error"] = "User is locked out";
+			return $result;
 		} else if ($userid){
 			doStartSession();
 			loadCredentials($userid);
-			return session_id();
+			$result["sessionid"] = session_id();
+			return $result;
 		}
-
-		return new SoapFault("Server", "Invalid LoginName/Password combination");
+		$result["error"] = "Invalid LoginName/Password combination";
+		return $result;
 	}
 
 	function getLists($sessionid){
 		global $USER;
+		$result = array("error" => "", "lists" => array());
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
-			$result = Query("select id, name, description from list where userid = " . $USER->id . " and not deleted order by name");
+			$queryresult = Query("select id, name, description from list where userid = " . $USER->id . " and not deleted order by name");
 			$lists = array();
-			while($row = DBGetRow($result)){
+			while($row = DBGetRow($queryresult)){
 				$list = new API_List();
 				$list->id = $row[0];
 				$list->name = $row[1];
 				$list->description = $row[2];
 				$lists[] = $list;
 			}
-			return $lists;
+			$result["lists"] = $lists;
+			return $result;
 		}
 	}
 
 	function getMessages($sessionid, $type = "phone"){
 		global $USER;
+		$result = array("error" => "", "messages" => array());
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
-			$result = Query("select id, name, description from message where userid = " . $USER->id . " and type= '" . $type . "' and not deleted order by name");
+			$queryresult = Query("select id, name, description from message where userid = " . $USER->id . " and type= '" . $type . "' and not deleted order by name");
 			$messages = array();
-			while($row = DBGetRow($result)){
+			while($row = DBGetRow($queryresult)){
 				$message = new API_Message();
 				$message->id = $row[0];
 				$message->name = $row[1];
 				$message->description = $row[2];
 				$messages[] = $message;
 			}
-			return $messages;
+			$result["messages"] = $messages;
+			return $result;
 		}
 	}
 
 	function setMessageBody($sessionid, $messageid, $messagetext){
 		global $USER;
+		$result = array("error" => "", "result" => false);
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
 			if(!$messageid){
-				return new SoapFault("Server", "Invalid Message ID");
+				$result["error"] = "Invalid Message ID";
+				return $result;
 			}
 			if ($messagetext == ""){
-				return new SoapFault("Server", "Message Text cannot be empty");
+				$result["error"] = "Message Text cannot be empty";
+				return $result;
 			}
 
 			$message = new Message($messageid);
 			if ($message->id && $message->userid != $USER->id || $message->deleted ) {
-				return new SoapFault("Server", "Unauthorized access");
+				$result["error"] = "Unauthorized access";
+				return $result;
 			}
 
 			$parts = Message::parse($messagetext);
@@ -100,30 +122,36 @@ class SMAPI{
 				$part->messageid = $message->id;
 				$part->create();
 			}
-			return true;
+			$result["result"] = true;
+			return $result;
 		}
 	}
 
 	function uploadAudio($sessionid, $name, $mimetype, $audio){
 		global $USER;
+		$result = array("error" => "", "audioname" => "");
 		error_log("uploadaudio called");
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
-			if($name == "")
-				return new SoapFault("Server", "Name cannot be empty");
-
+			if($name == ""){
+				$result["error"] = "Name cannot be empty";
+				return $result;
+			}
 
 			$content = new Content();
 			$content->type = $mimetype;
 			$content->data = base64_decode($audio);
 			$content->create();
 			if(!$content->id){
-				return new SoapFault("Server", "Failed to create content");
+				$result["error"] = "Failed to create audio file record";
+				return $result;
 			}
 			$audiofile = new AudioFile();
 			if(QuickQuery("select count(*) from audiofile where name = '" . $name . "' and not deleted")){
@@ -138,10 +166,11 @@ class SMAPI{
 			$audiofile->create();
 
 			if(!$audiofile->id){
-				return new SoapFault("Server", "Failed to create audio file record");
+				$result["error"] = "Failed to create audio file record";
 			} else {
-				return $audiofile->name;
+				$result["audioname"] = $audiofile->name;
 			}
+			return $result;
 		}
 	}
 
@@ -149,12 +178,16 @@ class SMAPI{
 	//jobtypeid, name, info
 	function getJobTypes($sessionid){
 		global $USER;
+		$result = array("error" => "", "jobtypes" => array());
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
 
 			$userjobtypes = JobType::getUserJobTypes();
@@ -165,95 +198,119 @@ class SMAPI{
 				$jobtype->info = $userjobtype->info;
 				$jobtypes[] = $jobtype;
 			}
-			return $jobtypes;
+			$result["jobtypes"] = $jobtypes;
+			return $result;
 		}
 	}
 	//jobid, name, desc, total, remaining
 	function getActiveJobs($sessionid){
 		global $USER;
+		$result = array("error" => "", "jobs" => array());
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
-			return getJobData();
+			$result["jobs"] = getJobData();
+			return $result;
 		}
 	}
 	function getJobStatus($sessionid, $jobid){
 		global $USER;
+		$result = array("error" => "", "job" => null);
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
-			return getJobData($jobid);
+			$result["job"] = getJobData($jobid);
+			return $result;
 		}
 	}
 
 	//jobid, name, desc
 	function getRepeatingJobs($sessionid){
 		global $USER;
+		$result = array("error" => "", "jobs" => array());
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
-			$result = Query("select id, name, description from job where status = 'repeating' and userid = " . $USER->id . " order by finishdate asc");
+			$queryresult = Query("select id, name, description from job where status = 'repeating' and userid = " . $USER->id . " order by finishdate asc");
 			$jobs = array();
-			while($row = DBGetRow($result)){
+			while($row = DBGetRow($queryresult)){
 				$job = new API_Job();
 				$job->id = $row[0];
 				$job->name = $row[1];
 				$job->description = $row[2];
 				$jobs[] = $job;
 			}
-			return $jobs;
+			$result["jobs"] = $jobs;
+			return $result;
 		}
 	}
 	//jobid
 	function sendRepeatingJob($sessionid, $jobid){
 		global $USER;
+		$result = array("error" => "", "jobid" => 0);
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
 			if(!$jobid){
-				return new SoapFault("Server", "Invalid Job ID");
+				$result["error"] = "Invalid Job ID";
+				return $result;
 			}
 			$job = new Job($jobid);
 			if($job->userid != $USER->id){
-				return new SoapFault("Server", "Unauthorized access");
+				$result["error"] = "Unauthorized access";
+				return $result;
 			}
 			if($job->status != "repeating"){
-				return new SoapFault("Server", "Invalid Repeating Job");
+				$result["error"] = "Invalid Repeating Job";
+				return $result;
 			}
-			$job->runNow();
-			// run the repeating job and return the ID of the job that gets created
-			//TODO: BROKEN, last insert is into job language, not job table
-			$newjobid = mysql_insert_id();
+			$newjob = $job->runNow();
 
-			return $newjobid;
+			$result["jobid"] = $newjob->id;
+			return $result;
 		}
 	}
 	//jobid
 	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
 		global $USER, $ACCESS;
+		$result = array("error" => "", "jobid" => 0);
+
 		if(!APISession($sessionid)){
-			return new SoapFault("Server", "Invalid Session ID");
+			$result["error"] = "Invalid Session ID";
+			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			$ACCESS = $_SESSION['access'];
 			if(!$USER->id){
-				return new SoapFault("Server", "Invalid user");
+				$result["error"] = "Invalid user";
+				return $result;
 			}
 			$job = Job::jobWithDefaults();
 			$job->name = $name;
@@ -262,7 +319,8 @@ class SMAPI{
 			if(userOwns("list", $listid)){
 				$job->listid = $listid;
 			} else {
-				return new SoapFault("Server", "Invalid List");
+				$result["error"] =  "Invalid List";
+				return $result;
 			}
 			if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid)){
 				$job->sendphone = true;
@@ -276,7 +334,7 @@ class SMAPI{
 			} else {
 				$job->sendemail = false;
 			}
-			if(getSystemSetting('hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid)){
+			if(getSystemSetting('_hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid)){
 				$job->sendsms = true;
 				$job->smsmessageid = $smsmsgid;
 			} else {
@@ -302,7 +360,7 @@ class SMAPI{
 				$job->printmessageid = NULL;
 				$job->sendprint = false;
 			}
-			if ($hassms && $job->sendsms && $job->smsmessageid != 0) {
+			if (getSystemSetting('_hassms') && $job->sendsms && $job->smsmessageid != 0) {
 				$jobtypes[] = "sms";
 			} else {
 				$job->smsmessageid = NULL;
@@ -322,7 +380,8 @@ class SMAPI{
 			$job->setOptionValue("maxcallattempts", $maxcallattempts);
 			$job->create();
 			$job->runNow();
-			return $job->id;
+			$result["jobid"] = $job->id;
+			return $result;
 		}
 	}
 
@@ -379,9 +438,9 @@ function getJobData($jobid=null){
 		$query .= " and j.id = $jobid ";
 	}
 	$query .=" group by j.id order by j.startdate, j.starttime, j.id desc";
-	$result = Query($query);
+	$queryresult = Query($query);
 	$jobs = array();
-	while($row = DBGetRow($result)){
+	while($row = DBGetRow($queryresult)){
 		$job = new API_Job();
 		$job->id = $row[0];
 		$job->name = $row[1];
