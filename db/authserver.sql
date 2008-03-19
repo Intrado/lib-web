@@ -131,5 +131,18 @@ PRIMARY KEY ( `customerid` , `login` ) ,
 INDEX ( `status` )
 ) ENGINE = innodb ;
 
+-- 5.2
 
+
+CREATE TABLE `dm` (
+  `dmuuid` varchar(50) NOT NULL,
+  `type` enum('system','customer') NOT NULL default 'customer',
+  `name` varchar(255) character set utf8 NOT NULL,
+  `authorizedip` varchar(15) default NULL,
+  `lastseen` bigint(20) default NULL,
+  `lastip` varchar(15) default NULL,
+  `customerid` int(11) default NULL,
+  `enablestate` enum('new','active','disabled') NOT NULL default 'new',
+  PRIMARY KEY  (`dmuuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
