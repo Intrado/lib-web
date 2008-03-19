@@ -66,6 +66,7 @@ class Job extends DBMappedObject {
 	}
 
 	// assumes this job was already created in the database
+	// returns newjob else returns null
 	function runNow() {
 		if ($this->status=="repeating") {
 			// check for system disablerepeat
@@ -125,6 +126,7 @@ class Job extends DBMappedObject {
 
 						$newjob->runNow();
 						sleep(3);
+						return $newjob;
 
 					}
 				}
@@ -137,6 +139,7 @@ class Job extends DBMappedObject {
 				$this->update();
 			}
 		}
+		return null;
 	}
 
 	//creates a new job object prepopulated with all of the user/system defaults
