@@ -312,76 +312,103 @@ class SMAPI{
 				$result["error"] = "Invalid user";
 				return $result;
 			}
-			$job = Job::jobWithDefaults();
-			$job->name = $name;
-			$job->description = $desc;
-			$job->jobtypeid = $jobtypeid;
-			if(userOwns("list", $listid)){
-				$job->listid = $listid;
-			} else {
+			if(!strtotime($startdate)){
+				$result["error"] = "Invalid Start Date";
+				return $result;
+			} else if(!strtotime($starttime)){
+				$result["error"] = "Invalid Start Time";
+				return $result;
+			} else if(!strtotime($endtime)){
+				$result["error"] = "Invalid End Time";
+				return $result;
+			} else if(!$daystorun){
+				$result["error"] = "Invalid Run Days";
+				return $result;
+			} else if(!$maxcallattempts){
+				$result["error"] = "Invalid Max Call Attempts";
+				return $result;
+			} else if(!userOwns("list", $listid)){
 				$result["error"] =  "Invalid List";
 				return $result;
-			}
-			if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid)){
-				$job->sendphone = true;
-				$job->phonemessageid = $phonemsgid;
+			} else if($USER->authorize('sendphone') && $phonemsgid && !userOwns("message", $phonemsgid)){
+				$result["error"] =  "Invalid Phone Message ID";
+				return $result;
+			} else if($USER->authorize('sendemail') && $emailmsgid && !userOwns("message", $emailmsgid)){
+				$result["error"] =  "Invalid Email Message ID";
+				return $result;
+			} else if(getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid && !userOwns("message", $smsmsgid)){
+				$result["error"] = "Invalid SMS Message ID";
+				return $result;
+			} else if(strtotime($starttime) > strtotime($endtime)){
+				$result["error"] = "Start Time must be before End Time";
+				return $result;
 			} else {
-				$job->sendphone = false;
-			}
-			if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid)){
-				$job->sendemail = true;
-				$job->emailmessageid = $emailmsgid;
-			} else {
-				$job->sendemail = false;
-			}
-			if(getSystemSetting('_hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid)){
-				$job->sendsms = true;
-				$job->smsmessageid = $smsmsgid;
-			} else {
-				$job->sendsms = false;
-			}
+				$job = Job::jobWithDefaults();
+				$job->name = $name;
+				$job->description = $desc;
+				$job->jobtypeid = $jobtypeid;
+				$job->listid = $listid;
+				if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid)){
+					$job->sendphone = true;
+					$job->phonemessageid = $phonemsgid;
+				} else {
+					$job->sendphone = false;
+				}
+				if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid)){
+					$job->sendemail = true;
+					$job->emailmessageid = $emailmsgid;
+				} else {
+					$job->sendemail = false;
+				}
+				if(getSystemSetting('_hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid)){
+					$job->sendsms = true;
+					$job->smsmessageid = $smsmsgid;
+				} else {
+					$job->sendsms = false;
+				}
 
-			$jobtypes = array();
-			if ($job->sendphone && $job->phonemessageid != 0) {
-				$jobtypes[] = "phone";
-			} else {
-				$job->phonemessageid = NULL;
-				$job->sendphone = false;
-			}
-			if ($job->sendemail && $job->emailmessageid != 0) {
-				$jobtypes[] = "email";
-			} else {
-				$job->emailmessageid = NULL;
-				$job->sendemail = false;
-			}
-			if ($job->sendprint && $job->printmessageid != 0) {
-				$jobtypes[] = "print";
-			} else {
-				$job->printmessageid = NULL;
-				$job->sendprint = false;
-			}
-			if (getSystemSetting('_hassms') && $job->sendsms && $job->smsmessageid != 0) {
-				$jobtypes[] = "sms";
-			} else {
-				$job->smsmessageid = NULL;
-				$job->sendsms = false;
-			}
-			$job->type=implode(",",$jobtypes);
+				$jobtypes = array();
+				if ($job->sendphone && $job->phonemessageid != 0) {
+					$jobtypes[] = "phone";
+				} else {
+					$job->phonemessageid = NULL;
+					$job->sendphone = false;
+				}
+				if ($job->sendemail && $job->emailmessageid != 0) {
+					$jobtypes[] = "email";
+				} else {
+					$job->emailmessageid = NULL;
+					$job->sendemail = false;
+				}
+				if ($job->sendprint && $job->printmessageid != 0) {
+					$jobtypes[] = "print";
+				} else {
+					$job->printmessageid = NULL;
+					$job->sendprint = false;
+				}
+				if (getSystemSetting('_hassms') && $job->sendsms && $job->smsmessageid != 0) {
+					$jobtypes[] = "sms";
+				} else {
+					$job->smsmessageid = NULL;
+					$job->sendsms = false;
+				}
+				$job->type=implode(",",$jobtypes);
 
-			$job->startdate = date("Y-m-d", strtotime($startdate));
-			if($ACCESS->getValue('maxjobdays') && $daystorun > $ACCESS->getValue('maxjobdays')){
-				$daystorun = $ACCESS->getValue('maxjobdays');
-			}
-			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($daystorun - 1) * 86400));
-			$job->starttime = date("H:i", strtotime($starttime));
-			$job->endtime = date("H:i", strtotime($endtime));
+				$job->startdate = date("Y-m-d", strtotime($startdate));
+				if($ACCESS->getValue('maxjobdays') && $daystorun > $ACCESS->getValue('maxjobdays')){
+					$daystorun = $ACCESS->getValue('maxjobdays');
+				}
+				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($daystorun - 1) * 86400));
+				$job->starttime = date("H:i", strtotime($starttime));
+				$job->endtime = date("H:i", strtotime($endtime));
 
-			$job->setOption("sendreport", 1);
-			$job->setOptionValue("maxcallattempts", $maxcallattempts);
-			$job->create();
-			$job->runNow();
-			$result["jobid"] = $job->id;
-			return $result;
+				$job->setOption("sendreport", 1);
+				$job->setOptionValue("maxcallattempts", $maxcallattempts);
+				$job->create();
+				$job->runNow();
+				$result["jobid"] = $job->id;
+				return $result;
+			}
 		}
 	}
 
