@@ -263,46 +263,161 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:message>
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
+    		<wsdl:documentation>Given a valid loginname/password, a session id is generated and passed back.
+If an error occurs, error will contain the error and sessionid will be empty string.
+
+login:
+	params: string loginname, string password
+	returns: string error, string sessionid
+
+</wsdl:documentation>
     		<wsdl:input message="sm:loginRequest"></wsdl:input>
     		<wsdl:output message="sm:loginResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getLists">
+    		<wsdl:documentation>Given a valid sessionid, an array of lists will be returned.
+If only 1 list is found, a single list will be returned.
+If error occurs, error will contain error string and lists will not be set.
+
+getLists:
+	params: string sessionid
+	returns:
+		lists: array of lists or a single list
+		error: string</wsdl:documentation>
     		<wsdl:input message="sm:getListsRequest"></wsdl:input>
     		<wsdl:output message="sm:getListsResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getMessages">
+    		<wsdl:documentation>Given a valid sessionid and a valid message type, an array of messages will be returned.
+If only 1 message is found, a single message will be returned.
+If error occurs, error will contain error string and messages will not be set.
+
+Valid messages types are:
+	phone
+	email
+	sms
+
+getMessages:
+	params: string sessionid, string message type
+	returns:
+		messages: array of messages or a single message
+		error: string
+</wsdl:documentation>
     		<wsdl:input message="sm:getMessagesRequest"></wsdl:input>
     		<wsdl:output message="sm:getMessagesResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="setMessageBody">
+    		<wsdl:documentation>Given a valid sessionid, messageid and message text, the specified message
+will have its text replaced.  If successful, result will be true.
+If error occurs, error will contain error string and result will be false.
+
+setMessageBody:
+	params: string sessionid, int message id, string message text
+	returns: boolean result, string error
+</wsdl:documentation>
     		<wsdl:input message="sm:setMessageBodyRequest"></wsdl:input>
     		<wsdl:output message="sm:setMessageBodyResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="uploadAudio">
+    		<wsdl:documentation>Given a valid sessionid, name, mimetype, and audio file,
+an audio file record will be generated and its resulting
+name returned.
+If an error occurs, error will contain the error string and audioname will be empty.
+
+uploadAudio:
+	params: string sessionid, string name, string mimetype, binary audio
+	return:
+		audioname: string
+		error: string
+</wsdl:documentation>
     		<wsdl:input message="sm:uploadAudioRequest"></wsdl:input>
     		<wsdl:output message="sm:uploadAudioResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getJobTypes">
+    		<wsdl:documentation>Given a valid sessionid, an array of jobtypes or a single jobtype will be returned.
+If an error occurs, error will contain the error string and jobtypes will not be set.
+
+getJobTypes:
+	params: string sessionid
+	return:
+		jobtypes: array of jobtypes or a jobtype
+		error: string
+</wsdl:documentation>
     		<wsdl:input message="sm:getJobTypesRequest"></wsdl:input>
     		<wsdl:output message="sm:getJobTypesResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getActiveJobs">
+    		<wsdl:documentation>Given a valid sessionid, an array of jobs or a single job will be returned.
+If an error occurs, error will contain the error string and jobs will not be set.
+
+getActiveJobs:
+params: string sessionid
+return:
+	jobs: array of job objects or a job object,
+	error: string
+</wsdl:documentation>
     		<wsdl:input message="sm:getActiveJobsRequest"></wsdl:input>
     		<wsdl:output message="sm:getActiveJobsResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getRepeatingJobs">
+    		<wsdl:documentation>Given a valid sessionid, an array of jobs or a single job will be returned.
+If an error occurs, error will contain the error string and jobs will not be set.
+
+getRepeatingJobs:
+	params: string sessionid
+	return:
+		jobs: array of job objects or a job object,
+		error: string
+</wsdl:documentation>
     		<wsdl:input message="sm:getRepeatingJobsRequest"></wsdl:input>
     		<wsdl:output message="sm:getRepeatingJobsResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="sendRepeatingJob">
+    		<wsdl:documentation>Given a valid sessionid and jobid, the active job\'s id will be returned
+If an error occurs, error will contain the error string and jobid will be 0.
+
+sendRepeatingJob:
+	params: string sessionid
+	return: int jobid, string error
+</wsdl:documentation>
     		<wsdl:input message="sm:sendRepeatingJobRequest"></wsdl:input>
     		<wsdl:output message="sm:sendRepeatingJobResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getJobStatus">
+    		<wsdl:documentation>Given a valid sessionid and jobid, a single job will be returned.
+If an error occurs, error will contain the error string and job will not be set.
+
+getJobStatus:
+	params: string sessionid
+	return:
+		job: a job object,
+		error: string</wsdl:documentation>
     		<wsdl:input message="sm:getJobStatusRequest"></wsdl:input>
     		<wsdl:output message="sm:getJobStatusResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="sendJob">
+    		<wsdl:documentation>Given a valid sessionid, name, description, listid, jobtypeid,
+startdate, starttime, endtime, number of days to run, optional phone message id,
+optional email id, optional sms message id, and max call attempts,
+a job will be created and set to active.  The job id will be returned.
+If an error occurs, error will contain the error string and jobid will be 0.
+
+sendJob:
+	params: string sessionid
+			string name
+			string description
+			int listid
+			int jobtypeid
+			string startdate
+			string starttime
+			string endtime
+			int number of days to run
+			int phone message id
+			int email message id
+			int sms message id
+			int max call attempts
+	return: int jobid, string error
+</wsdl:documentation>
     		<wsdl:input message="sm:sendJobRequest"></wsdl:input>
     		<wsdl:output message="sm:sendJobResponse"></wsdl:output>
     	</wsdl:operation>
@@ -492,5 +607,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<soap:address location="http://localhost/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
+
 ';
 ?>
