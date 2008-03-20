@@ -175,7 +175,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <wsdl:message name="uploadAudioRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
     	<wsdl:part name="name" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="audio" type="xsd:base64Binary"></wsdl:part>
+    	<wsdl:part name="audio" type="xsd:string"></wsdl:part>
     	<wsdl:part name="mimetype" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="uploadAudioResponse">
@@ -324,8 +324,10 @@ an audio file record will be generated and its resulting
 name returned.
 If an error occurs, error will contain the error string and audioname will be empty.
 
+IMPORTANT: the audio data should be a base64 encoded string
+
 uploadAudio:
-	params: string sessionid, string name, string mimetype, binary audio
+	params: string sessionid, string name, string mimetype, base64 encoded string audio
 	return:
 		audioname: string
 		error: string
