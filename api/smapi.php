@@ -1,10 +1,31 @@
 <?
+/*
+* SchoolMessenger Application API
+* author: Joshua J. Lai
+* Copyright Reliance Communications, Inc
+*
+* Simple api that handles basic application uses such as returning list and message names
+* with corresponding ids.  Uses soap as transport device.
+*
+*
+*/
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Server Class
 ////////////////////////////////////////////////////////////////////////////////
 class SMAPI{
 
+	/*
+	Given a valid loginname/password, a session id is generated and passed back.
+	If an error occurs, error will contain the error and sessionid will be empty string.
+
+	login:
+		params: string loginname, string password
+		returns: string error, string sessionid
+
+	*/
 	function login($loginname, $password){
 		global $IS_COMMSUITE;
 
@@ -32,6 +53,18 @@ class SMAPI{
 		return $result;
 	}
 
+	/*
+	Given a valid sessionid, an array of lists will be returned.
+	If only 1 list is found, a single list will be returned.
+	If error occurs, error will contain error string and lists will not be set.
+
+	getLists:
+		params: string sessionid
+		returns:
+			lists: array of lists or a single list
+			error: string
+
+	*/
 	function getLists($sessionid){
 		global $USER;
 		$result = array("error" => "", "lists" => array());
@@ -59,6 +92,23 @@ class SMAPI{
 		}
 	}
 
+	/*
+	Given a valid sessionid and a valid message type, an array of messages will be returned.
+	If only 1 message is found, a single message will be returned.
+	If error occurs, error will contain error string and messages will not be set.
+
+	Valid messages types are:
+		phone
+		email
+		sms
+
+	getMessages:
+		params: string sessionid, string message type
+		returns:
+			messages: array of messages or a single message
+			error: string
+
+	*/
 	function getMessages($sessionid, $type = "phone"){
 		global $USER;
 		$result = array("error" => "", "messages" => array());
@@ -72,7 +122,7 @@ class SMAPI{
 				$result["error"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description from message where userid = " . $USER->id . " and type= '" . $type . "' and not deleted order by name");
+			$queryresult = Query("select id, name, description from message where userid = " . $USER->id . " and type= '" . strtolower($type) . "' and not deleted order by name");
 			$messages = array();
 			while($row = DBGetRow($queryresult)){
 				$message = new API_Message();
@@ -85,6 +135,17 @@ class SMAPI{
 			return $result;
 		}
 	}
+
+	/*
+	Given a valid sessionid, messageid and message text, the specified message
+	will have its text replaced.  If successful, result will be true.
+	If error occurs, error will contain error string and result will be false.
+
+	setMessageBody:
+		params: string sessionid, int message id, string message text
+		returns: boolean result, string error
+
+	*/
 
 	function setMessageBody($sessionid, $messageid, $messagetext){
 		global $USER;
@@ -126,6 +187,20 @@ class SMAPI{
 			return $result;
 		}
 	}
+
+	/*
+	Given a valid sessionid, name, mimetype, and audio file,
+	an audio file record will be generated and its resulting
+	name returned.
+	If an error occurs, error will contain the error string and audioname will be empty.
+
+	uploadAudio:
+		params: string sessionid, string name, string mimetype, binary audio
+		return:
+			audioname: string
+			error: string
+
+	*/
 
 	function uploadAudio($sessionid, $name, $mimetype, $audio){
 		global $USER;
@@ -174,8 +249,17 @@ class SMAPI{
 		}
 	}
 
+	/*
+	Given a valid sessionid, an array of jobtypes or a single jobtype will be returned.
+	If an error occurs, error will contain the error string and jobtypes will not be set.
 
-	//jobtypeid, name, info
+	getJobTypes:
+		params: string sessionid
+		return:
+			jobtypes: array of jobtypes or a jobtype
+			error: string
+
+	*/
 	function getJobTypes($sessionid){
 		global $USER;
 		$result = array("error" => "", "jobtypes" => array());
@@ -202,6 +286,19 @@ class SMAPI{
 			return $result;
 		}
 	}
+
+	/*
+	Given a valid sessionid, an array of jobs or a single job will be returned.
+	If an error occurs, error will contain the error string and jobs will not be set.
+
+	getActiveJobs:
+	params: string sessionid
+	return:
+		jobs: array of job objects or a job object,
+		error: string
+
+	*/
+
 	//jobid, name, desc, total, remaining
 	function getActiveJobs($sessionid){
 		global $USER;
@@ -220,6 +317,19 @@ class SMAPI{
 			return $result;
 		}
 	}
+
+	/*
+	Given a valid sessionid and jobid, a single job will be returned.
+	If an error occurs, error will contain the error string and job will not be set.
+
+	getJobStatus:
+		params: string sessionid
+		return:
+			job: a job object,
+			error: string
+
+	*/
+
 	function getJobStatus($sessionid, $jobid){
 		global $USER;
 		$result = array("error" => "", "job" => null);
@@ -238,7 +348,17 @@ class SMAPI{
 		}
 	}
 
-	//jobid, name, desc
+	/*
+	Given a valid sessionid, an array of jobs or a single job will be returned.
+	If an error occurs, error will contain the error string and jobs will not be set.
+
+	getRepeatingJobs:
+		params: string sessionid
+		return:
+			jobs: array of job objects or a job object,
+			error: string
+
+	*/
 	function getRepeatingJobs($sessionid){
 		global $USER;
 		$result = array("error" => "", "jobs" => array());
@@ -264,7 +384,17 @@ class SMAPI{
 			return $result;
 		}
 	}
-	//jobid
+
+	/*
+	Given a valid sessionid and jobid, the active job's id will be returned
+	If an error occurs, error will contain the error string and jobid will be 0.
+
+	sendRepeatingJob:
+		params: string sessionid
+		return: int jobid, string error
+
+	*/
+
 	function sendRepeatingJob($sessionid, $jobid){
 		global $USER;
 		$result = array("error" => "", "jobid" => 0);
@@ -297,7 +427,32 @@ class SMAPI{
 			return $result;
 		}
 	}
-	//jobid
+	/*
+	Given a valid sessionid, name, description, listid, jobtypeid,
+	startdate, starttime, endtime, number of days to run, optional phone message id,
+	optional email id, optional sms message id, and max call attempts,
+	a job will be created and set to active.  The job id will be returned.
+	If an error occurs, error will contain the error string and jobid will be 0.
+
+	sendJob:
+		params: string sessionid
+				string name
+				string description
+				int listid
+				int jobtypeid
+				string startdate
+				string starttime
+				string endtime
+				int number of days to run
+				int phone message id
+				int email message id
+				int sms message id
+				int max call attempts
+		return: int jobid, string error
+
+	*/
+
+
 	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
 		global $USER, $ACCESS;
 		$result = array("error" => "", "jobid" => 0);
@@ -404,6 +559,13 @@ class SMAPI{
 
 				$job->setOption("sendreport", 1);
 				$job->setOptionValue("maxcallattempts", $maxcallattempts);
+
+
+				if($job->sendphone && $job->sendemail && $job->sendsms){
+					$result["error"] = "You must have at least one message type";
+					return $result;
+				}
+
 				$job->create();
 				$job->runNow();
 				$result["jobid"] = $job->id;
@@ -418,6 +580,8 @@ class SMAPI{
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
+
+//starts or resumes a session with a valid session id
 function APISession($sessionid){
 	global $USER;
 	session_id($sessionid);
@@ -439,6 +603,8 @@ function APISession($sessionid){
 	}
 }
 
+//fetches job statistic data
+//grabs all active jobs if no job id is given
 function getJobData($jobid=null){
 	global $USER;
 	$query = "select j.id, j.name, j.description,
