@@ -194,8 +194,10 @@ class SMAPI{
 	name returned.
 	If an error occurs, error will contain the error string and audioname will be empty.
 
+	IMPORTANT: the audio data should be a base64 encoded string
+
 	uploadAudio:
-		params: string sessionid, string name, string mimetype, binary audio
+		params: string sessionid, string name, string mimetype, base64 encoded string audio
 		return:
 			audioname: string
 			error: string
@@ -205,7 +207,6 @@ class SMAPI{
 	function uploadAudio($sessionid, $name, $mimetype, $audio){
 		global $USER;
 		$result = array("error" => "", "audioname" => "");
-		error_log("uploadaudio called");
 		if(!APISession($sessionid)){
 			$result["error"] = "Invalid Session ID";
 			return $result;
@@ -219,10 +220,14 @@ class SMAPI{
 				$result["error"] = "Name cannot be empty";
 				return $result;
 			}
+			if($audio == ""){
+				$result["error"] = "Audio data cannot be empty";
+				return $result;
+			}
 
 			$content = new Content();
 			$content->type = $mimetype;
-			$content->data = base64_decode($audio);
+			$content->data = $audio;
 			$content->create();
 			if(!$content->id){
 				$result["error"] = "Failed to create audio file record";
