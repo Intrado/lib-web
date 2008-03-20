@@ -212,4 +212,9 @@ ALTER TABLE `qjob` ADD `jobtypeid` INT NOT NULL AFTER `timeslices` ;
 
 ALTER TABLE `qjob` ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid` ;
 
+-- ASP 5.2
 
+ALTER TABLE `jobstatdata` ADD `type` ENUM( 'system', 'customer' ) NOT NULL DEFAULT 'system' FIRST ;
+ALTER TABLE `jobstatdata` ADD INDEX `remotedm` ( `type` , `customerid` )  ;
+ALTER TABLE `qjob` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
+ALTER TABLE `specialtaskqueue` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
