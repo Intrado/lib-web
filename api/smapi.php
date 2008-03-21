@@ -55,13 +55,12 @@ class SMAPI{
 
 	/*
 	Given a valid sessionid, an array of lists will be returned.
-	If only 1 list is found, a single list will be returned.
 	If error occurs, error will contain error string and lists will not be set.
 
 	getLists:
 		params: string sessionid
 		returns:
-			lists: array of lists or a single list
+			lists: array of lists
 			error: string
 
 	*/
@@ -94,7 +93,6 @@ class SMAPI{
 
 	/*
 	Given a valid sessionid and a valid message type, an array of messages will be returned.
-	If only 1 message is found, a single message will be returned.
 	If error occurs, error will contain error string and messages will not be set.
 
 	Valid messages types are:
@@ -105,7 +103,7 @@ class SMAPI{
 	getMessages:
 		params: string sessionid, string message type
 		returns:
-			messages: array of messages or a single message
+			messages: array of messages
 			error: string
 
 	*/
@@ -255,13 +253,13 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, an array of jobtypes or a single jobtype will be returned.
+	Given a valid sessionid, an array of jobtypes will be returned.
 	If an error occurs, error will contain the error string and jobtypes will not be set.
 
 	getJobTypes:
 		params: string sessionid
 		return:
-			jobtypes: array of jobtypes or a jobtype
+			jobtypes: array of jobtypes
 			error: string
 
 	*/
@@ -293,13 +291,13 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, an array of jobs or a single job will be returned.
+	Given a valid sessionid, an array of jobs will be returned.
 	If an error occurs, error will contain the error string and jobs will not be set.
 
 	getActiveJobs:
 	params: string sessionid
 	return:
-		jobs: array of job objects or a job object,
+		jobs: array of job objects,
 		error: string
 
 	*/
@@ -354,13 +352,13 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, an array of jobs or a single job will be returned.
+	Given a valid sessionid, an array of jobs will be returned.
 	If an error occurs, error will contain the error string and jobs will not be set.
 
 	getRepeatingJobs:
 		params: string sessionid
 		return:
-			jobs: array of job objects or a job object,
+			jobs: array of job objects,
 			error: string
 
 	*/
