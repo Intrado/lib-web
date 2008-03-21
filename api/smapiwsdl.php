@@ -21,11 +21,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<xsd:complexType name="ArrayofLists">
-		<xsd:sequence>
-			<xsd:element name="lists" type="sm:list" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-		</xsd:sequence>
-	</xsd:complexType>
 
 	<xsd:complexType name="message">
 		<xsd:sequence>
@@ -35,11 +30,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<xsd:complexType name="ArrayofMessages">
-		<xsd:sequence>
-			<xsd:element name="messages" type="sm:message" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-		</xsd:sequence>
-	</xsd:complexType>
 	<xsd:complexType name="jobtype">
 		<xsd:sequence>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
@@ -48,34 +38,24 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<xsd:complexType name="ArrayofJobTypes">
-		<xsd:sequence>
-			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-		</xsd:sequence>
-	</xsd:complexType>
-	<xsd:complexType name="ArrayofJobs">
-		<xsd:sequence>
-			<xsd:element name="jobs" type="sm:job" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-		</xsd:sequence>
-	</xsd:complexType>
 
-	<xsd:complexType name="job">
+
+	<xsd:complexType name="jobstatus">
 		<xsd:sequence>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
 			<xsd:element name="name" type="xsd:string"></xsd:element>
 			<xsd:element name="description" type="xsd:string"></xsd:element>
-			<xsd:element name="hasphone" type="xsd:string"></xsd:element>
-			<xsd:element name="hasemail" type="xsd:string"></xsd:element>
-			<xsd:element name="hasprint" type="xsd:string"></xsd:element>
-			<xsd:element name="hassms" type="xsd:string"></xsd:element>
-			<xsd:element name="phonetotal" type="xsd:string"></xsd:element>
-			<xsd:element name="emailtotal" type="xsd:string"></xsd:element>
-			<xsd:element name="printtotal" type="xsd:string"></xsd:element>
-			<xsd:element name="smstotal" type="xsd:string"></xsd:element>
-			<xsd:element name="phoneremaining" type="xsd:string"></xsd:element>
-			<xsd:element name="emailremaining" type="xsd:string"></xsd:element>
-			<xsd:element name="printremaining" type="xsd:string"></xsd:element>
-			<xsd:element name="smsremaining" type="xsd:string"></xsd:element>
+			<xsd:element name="hasphone" type="xsd:boolean"></xsd:element>
+			<xsd:element name="hasemail" type="xsd:boolean"></xsd:element>
+			<xsd:element name="hassms" type="xsd:boolean"></xsd:element>
+			<xsd:element name="phonetotal" type="xsd:int"></xsd:element>
+			<xsd:element name="emailtotal" type="xsd:int"></xsd:element>
+			<xsd:element name="printtotal" type="xsd:int"></xsd:element>
+			<xsd:element name="smstotal" type="xsd:int"></xsd:element>
+			<xsd:element name="phoneremaining" type="xsd:int"></xsd:element>
+			<xsd:element name="emailremaining" type="xsd:int"></xsd:element>
+
+			<xsd:element name="smsremaining" type="xsd:int"></xsd:element>
 			<xsd:element name="startdate" type="xsd:string"></xsd:element>
 			<xsd:element name="status" type="xsd:string"></xsd:element>
 		</xsd:sequence>
@@ -88,7 +68,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		</xsd:sequence>
 	</xsd:complexType>
 
-<xsd:complexType name="NewType"></xsd:complexType>
+
 	<xsd:complexType name="getListsResult">
 		<xsd:sequence>
 			<xsd:element name="lists" type="sm:list" minOccurs="0" maxOccurs="unbounded"></xsd:element>
@@ -121,7 +101,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	</xsd:complexType>
 	<xsd:complexType name="getJobsResult">
 		<xsd:sequence>
-			<xsd:element name="jobs" type="sm:job" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0" maxOccurs="unbounded"></xsd:element>
 			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -129,7 +109,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 	<xsd:complexType name="getJobStatusResult">
 		<xsd:sequence>
-			<xsd:element name="job" type="sm:job"></xsd:element>
+			<xsd:element name="job" type="xsd:string"></xsd:element>
 			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -138,7 +118,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<xsd:element name="jobid" type="xsd:int"></xsd:element>
 			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType></xsd:schema></wsdl:types>
+	</xsd:complexType>
+
+	<xsd:complexType name="job">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:int"></xsd:element>
+			<xsd:element name="name" type="xsd:string"></xsd:element>
+			<xsd:element name="description" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
     	<wsdl:part name="password" type="xsd:string"></wsdl:part>
@@ -247,14 +236,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
     	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
     </wsdl:message>
-    <wsdl:message name="login2Request">
-    	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="password" type="xsd:string"></wsdl:part>
-    </wsdl:message>
-    <wsdl:message name="login2Response">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="error" type="xsd:string"></wsdl:part>
-    </wsdl:message>
     <wsdl:message name="Request">
     	<wsdl:part name="Request" type="xsd:string"></wsdl:part>
     </wsdl:message>
@@ -276,20 +257,18 @@ login:
         </wsdl:operation>
     	<wsdl:operation name="getLists">
     		<wsdl:documentation>Given a valid sessionid, an array of lists will be returned.
-If only 1 list is found, a single list will be returned.
 If error occurs, error will contain error string and lists will not be set.
 
 getLists:
 	params: string sessionid
 	returns:
-		lists: array of lists or a single list
+		lists: array of lists
 		error: string</wsdl:documentation>
     		<wsdl:input message="sm:getListsRequest"></wsdl:input>
     		<wsdl:output message="sm:getListsResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getMessages">
     		<wsdl:documentation>Given a valid sessionid and a valid message type, an array of messages will be returned.
-If only 1 message is found, a single message will be returned.
 If error occurs, error will contain error string and messages will not be set.
 
 Valid messages types are:
@@ -300,7 +279,7 @@ Valid messages types are:
 getMessages:
 	params: string sessionid, string message type
 	returns:
-		messages: array of messages or a single message
+		messages: array of messages
 		error: string
 </wsdl:documentation>
     		<wsdl:input message="sm:getMessagesRequest"></wsdl:input>
@@ -336,39 +315,39 @@ uploadAudio:
     		<wsdl:output message="sm:uploadAudioResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getJobTypes">
-    		<wsdl:documentation>Given a valid sessionid, an array of jobtypes or a single jobtype will be returned.
+    		<wsdl:documentation>Given a valid sessionid, an array of jobtypes will be returned.
 If an error occurs, error will contain the error string and jobtypes will not be set.
 
 getJobTypes:
 	params: string sessionid
 	return:
-		jobtypes: array of jobtypes or a jobtype
+		jobtypes: array of jobtypes
 		error: string
 </wsdl:documentation>
     		<wsdl:input message="sm:getJobTypesRequest"></wsdl:input>
     		<wsdl:output message="sm:getJobTypesResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getActiveJobs">
-    		<wsdl:documentation>Given a valid sessionid, an array of jobs or a single job will be returned.
+    		<wsdl:documentation>Given a valid sessionid, an array of jobs will be returned.
 If an error occurs, error will contain the error string and jobs will not be set.
 
 getActiveJobs:
 params: string sessionid
 return:
-	jobs: array of job objects or a job object,
+	jobs: array of job objects
 	error: string
 </wsdl:documentation>
     		<wsdl:input message="sm:getActiveJobsRequest"></wsdl:input>
     		<wsdl:output message="sm:getActiveJobsResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getRepeatingJobs">
-    		<wsdl:documentation>Given a valid sessionid, an array of jobs or a single job will be returned.
+    		<wsdl:documentation>Given a valid sessionid, an array of jobs will be returned.
 If an error occurs, error will contain the error string and jobs will not be set.
 
 getRepeatingJobs:
 	params: string sessionid
 	return:
-		jobs: array of job objects or a job object,
+		jobs: array of job objects
 		error: string
 </wsdl:documentation>
     		<wsdl:input message="sm:getRepeatingJobsRequest"></wsdl:input>
@@ -609,6 +588,5 @@ sendJob:
 			<soap:address location="http://localhost/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
-
 ';
 ?>
