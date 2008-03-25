@@ -11,10 +11,7 @@ include_once("../obj/AudioFile.obj.php");
 $specialtask = new specialtask($SESSIONDATA['specialtaskid']);
 
 if($REQUEST_TYPE == "new"){
-	?>
-	<error>Easycall3: wanted result, got new </error>
-	<?
-
+	$ERROR .= "Got new when wanted result";
 } else if($REQUEST_TYPE == "result"){
 
 	$SESSIONDATA = null;
@@ -22,7 +19,7 @@ if($REQUEST_TYPE == "new"){
 
 } else {
 	?>
-		<voice sessionid="<?= $SESSIONID ?>">
+		<voice>
 			<message>
 				<audio cmid="file://prompts/GoodBye.wav" />
 				<hangup />

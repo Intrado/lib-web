@@ -15,8 +15,8 @@ $callerid = $specialtask->getData('callerid');
 if($REQUEST_TYPE == "new") {
 	$specialtask->setData("progress", "Calling");
 	$specialtask->update();
-	?>
-	<voice sessionid="<?= $SESSIONID ?>">
+?>
+	<voice>
 		<dial callerid="<?=$callerid?>" amdhint="disable"><?=$phone?></dial>
 
 		<message name="intro">
@@ -45,6 +45,6 @@ if($REQUEST_TYPE == "new") {
 	forwardToPage("easycall2.php");
 	return;
 }
-	
-	
+
+
 ?>

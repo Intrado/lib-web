@@ -17,9 +17,7 @@ include_once("../obj/Rule.obj.php");
 $specialtask = new specialtask($SESSIONDATA['specialtaskid']);
 
 if($REQUEST_TYPE == "new"){
-	?>
-	<error>Easycall3: wanted result, got new </error>
-	<?
+		$ERROR .= "Got new when wanted result";
 } else if($REQUEST_TYPE == "result"){
 
 	if(($specialtask->getData("origin") == "cisco") && ($specialtask->getData("progress") == "Done")){
@@ -84,7 +82,7 @@ if($REQUEST_TYPE == "new"){
 
 } else {
 	?>
-		<voice sessionid="<?= $SESSIONID ?>">
+		<voice>
 			<message>
 				<?
 					if($specialtask->getData('origin') == "cisco"){

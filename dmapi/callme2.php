@@ -13,9 +13,7 @@ $phone = $specialtask->getData('phonenumber');
 //$callerid = $specialtask->getData('callerid');
 $error = 0;
 if($REQUEST_TYPE == "new") {
-	?>
-	<error> Got new when wanted continue </error>
-	<?
+		$ERROR .= "Got new when wanted continue";
 } else{
 
 	if(isset($BFXML_VARS['saveaudio']) && $BFXML_VARS['saveaudio'] == 1){
@@ -28,20 +26,20 @@ if($REQUEST_TYPE == "new") {
 			if(QuickQuery("select count(*) from audiofile where userid = '$user->id' and deleted = 0
 						and name = '" . DBSafe($name) ."'"))
 				$name = $name ." - ". date("M d, Y G:i:s");
-	
+
 			$audio->name = $name;
 			$audio->contentid = $contentid;
 			$audio->recorddate = date("Y-m-d G:i:s");
 			$audio->update();
-	
+
 			$BFXML_VARS['audiofileid'] = $audio->id;
 			$BFXML_VARS['saveaudio']=NULL;
 			$BFXML_VARS['recordaudio']=NULL;
-	
+
 			//then make a message if not from audio
 			$origin = $specialtask->getData('origin');
 			if($origin != "audio"){
-	
+
 				$message = new Message();
 				$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('count');
 				if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0'
@@ -52,15 +50,15 @@ if($REQUEST_TYPE == "new") {
 				$message->type = "phone";
 				$message->userid = $user->id;
 				$message->create();
-	
+
 				$part = new MessagePart();
 				$part->messageid = $message->id;
 				$part->type = "A";
 				$part->audiofileid = $audio->id;
 				$part->sequence = 0;
-	
+
 				$part->create();
-	
+
 				$count = $specialtask->getData('count');
 				$message = $message->id;
 				$messnum = "message" . $count;
@@ -88,7 +86,7 @@ if($REQUEST_TYPE == "new") {
 		$specialtask->update();
 		?>
 
-		<voice sessionid="<?=$SESSIONID ?>">
+		<voice>
 
 			<message name="record">
 				<field name="recordaudio" type="record" max="300">
