@@ -99,9 +99,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:complexType name="getJobsResult">
+	<xsd:complexType name="getRepeatingJobsResult">
 		<xsd:sequence>
-			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+			<xsd:element name="jobs" type="sm:job" minOccurs="0" maxOccurs="unbounded"></xsd:element>
 			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -109,7 +109,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 	<xsd:complexType name="getJobStatusResult">
 		<xsd:sequence>
-			<xsd:element name="job" type="xsd:string"></xsd:element>
+			<xsd:element name="job" type="sm:jobstatus"></xsd:element>
 			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -125,6 +125,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
 			<xsd:element name="name" type="xsd:string"></xsd:element>
 			<xsd:element name="description" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="getActiveJobsResult">
+		<xsd:sequence>
+			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema></wsdl:types>
@@ -186,7 +192,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <wsdl:message name="getActiveJobsResponse">
 
 
-    	<wsdl:part name="result" type="sm:getJobsResult"></wsdl:part>
+    	<wsdl:part name="result" type="sm:getActiveJobsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRepeatingJobsRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
@@ -194,7 +200,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <wsdl:message name="getRepeatingJobsResponse">
 
 
-    	<wsdl:part name="result" type="sm:getJobsResult"></wsdl:part>
+    	<wsdl:part name="result" type="sm:getRepeatingJobsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="sendRepeatingJobRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
@@ -588,5 +594,6 @@ sendJob:
 			<soap:address location="http://localhost/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
+
 ';
 ?>

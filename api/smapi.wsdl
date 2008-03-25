@@ -43,13 +43,19 @@
 			<xsd:element name="startdate" type="xsd:string"></xsd:element>
 			<xsd:element name="status" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="loginResult">		<xsd:sequence>			<xsd:element name="sessionid" type="xsd:string"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>		<xsd:complexType name="getListsResult">		<xsd:sequence>			<xsd:element name="lists" type="sm:list" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="getMessagesResult">		<xsd:sequence>			<xsd:element name="messages" type="sm:message" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="setMessagebodyResult">		<xsd:sequence>			<xsd:element name="result" type="xsd:boolean"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="uploadAudioResult">		<xsd:sequence>			<xsd:element name="audioname" type="xsd:string"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="getJobTypesResult">		<xsd:sequence>			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="getJobsResult">		<xsd:sequence>			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>			<xsd:complexType name="getJobStatusResult">		<xsd:sequence>			<xsd:element name="job" type="xsd:string"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="sendJobResult">		<xsd:sequence>			<xsd:element name="jobid" type="xsd:int"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>
+	</xsd:complexType>	<xsd:complexType name="loginResult">		<xsd:sequence>			<xsd:element name="sessionid" type="xsd:string"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>		<xsd:complexType name="getListsResult">		<xsd:sequence>			<xsd:element name="lists" type="sm:list" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="getMessagesResult">		<xsd:sequence>			<xsd:element name="messages" type="sm:message" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="setMessagebodyResult">		<xsd:sequence>			<xsd:element name="result" type="xsd:boolean"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="uploadAudioResult">		<xsd:sequence>			<xsd:element name="audioname" type="xsd:string"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="getJobTypesResult">		<xsd:sequence>			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="getRepeatingJobsResult">		<xsd:sequence>			<xsd:element name="jobs" type="sm:job" minOccurs="0" maxOccurs="unbounded"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>			<xsd:complexType name="getJobStatusResult">		<xsd:sequence>			<xsd:element name="job" type="sm:jobstatus"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>	<xsd:complexType name="sendJobResult">		<xsd:sequence>			<xsd:element name="jobid" type="xsd:int"></xsd:element>			<xsd:element name="error" type="xsd:string"></xsd:element>		</xsd:sequence>	</xsd:complexType>
         
 	<xsd:complexType name="job">
 		<xsd:sequence>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
 			<xsd:element name="name" type="xsd:string"></xsd:element>
 			<xsd:element name="description" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="getActiveJobsResult">
+		<xsd:sequence>
+			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+			<xsd:element name="error" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema></wsdl:types>
@@ -100,13 +106,13 @@
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getActiveJobsResponse">
-    	<wsdl:part name="result" type="sm:getJobsResult"></wsdl:part>
+    	<wsdl:part name="result" type="sm:getActiveJobsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRepeatingJobsRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRepeatingJobsResponse">
-    	<wsdl:part name="result" type="sm:getJobsResult"></wsdl:part>
+    	<wsdl:part name="result" type="sm:getRepeatingJobsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="sendRepeatingJobRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
