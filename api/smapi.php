@@ -637,7 +637,7 @@ function getJobData($jobid=null){
 	$queryresult = Query($query);
 	$jobs = array();
 	while($row = DBGetRow($queryresult)){
-		$job = new API_Job();
+		$job = new API_JobStatus();
 		$job->id = $row[0];
 		$job->name = $row[1];
 		$job->description = $row[2];
@@ -699,6 +699,8 @@ require_once("../obj/API_List.obj.php");
 require_once("../obj/API_Message.obj.php");
 require_once("../obj/API_JobType.obj.php");
 require_once("../obj/API_Job.obj.php");
+require_once("../obj/API_JobStatus.obj.php");
+
 
 ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
 $server=new SoapServer("SMAPI.wsdl");
