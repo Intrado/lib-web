@@ -628,10 +628,12 @@ function getJobData($jobid=null){
 						left join reportcontact rc
 							on j.id = rc.jobid
 						left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-						where (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
+						where 1 and j.deleted=0
 						and j.userid = $USER->id ";
 	if($jobid){
 		$query .= " and j.id = $jobid ";
+	} else {
+		$query .= " and (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') ";
 	}
 	$query .=" group by j.id order by j.startdate, j.starttime, j.id desc";
 	$queryresult = Query($query);
