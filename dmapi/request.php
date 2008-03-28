@@ -16,6 +16,9 @@ require_once("../obj/SpecialTask.obj.php");
 
 include_once("XmlToArray.obj.php");
 
+
+//TODO: MAKE SURE CHARACTER ENCODING DOES NOT BREAK WITH XMLRPC TRAFFIC
+
 // SpecialTask
 // Params:
 //		param[0] = sessionid
@@ -24,12 +27,14 @@ function specialtask($methodname, $params){
 	$ERROR="";
 
 	$SESSIONID = $params[0];
-	$SESSIONDATA = loadSessionData($SESSIONID);
-	//error_log(print_r($SESSIONDATA, true));
-	doDBConnect($SESSIONDATA);
+	session_id($SESSIONID);
+	doStartSession();
+	connectDatabase($SESSIONID);
 
 	$REQUEST_TYPE = "new";
 	$task = new SpecialTask($params[1]);
+
+	ob_start();
 	if(strtolower($task->type) == "easycall"){
 		include("easycall.php");
 	} else if($task->type == "callme"){
@@ -37,8 +42,10 @@ function specialtask($methodname, $params){
 	} else {
 		$ERROR = "Unknown Special Task Type";
 	}
+	$output = ob_get_contents();
+	ob_end_clean();
 
-	return response($ERROR, $SESSIONID, $SESSIONDATA);
+	return response($ERROR, $output);
 }
 
 // continuecompletetask
@@ -50,13 +57,21 @@ function inboundtask($sessionid, $callednumber, $callerid){
 	$ERROR="";
 
 	$SESSIONID = $params[0];
-	$SESSIONDATA = loadSessionData($SESSIONID);
-	doDBConnect($SESSIONDATA);
+	session_id($SESSIONID);
+	doStartSession();
+	connectDatabase($SESSIONID);
 
 	$REQUEST_TYPE = "new";
 	$SESSIONDATA['inboundNumber'] = $param[1];
-	forwardToPage("inboundlogin.php");
-	return response($ERROR, $SESSIONID, $SESSIONDATA);
+
+	ob_start();
+
+	include("inboundlogin.php");
+
+	$output = ob_get_contents();
+	ob_end_clean();
+
+	return response($ERROR, $output);
 }
 
 
@@ -68,8 +83,11 @@ function continuecompletetask($methodname, $params){
 	$ERROR="";
 
 	$SESSIONID = $params[0];
-	$SESSIONDATA = loadSessionData($SESSIONID);
-	doDBConnect($SESSIONDATA);
+	session_id($SESSIONID);
+	doStartSession();
+	connectDatabase($SESSIONID);
+
+
 	if($methodname = "continuetask"){
 		$REQUEST_TYPE = "continue";
 	} else if($methodname == "completetask"){
@@ -83,6 +101,7 @@ function continuecompletetask($methodname, $params){
 		}
 	}
 
+	ob_start();
 	if (isset($SESSIONDATA['_nav_curpage']) && $SESSIONDATA['_nav_curpage']) {
 		include($SESSIONDATA['_nav_curpage']);
 	} else {
@@ -90,26 +109,16 @@ function continuecompletetask($methodname, $params){
 		$SESSIONDATA = null;
 	}
 
-	return response($ERROR, $SESSIONID, $SESSIONDATA);
+	$output = ob_get_contents();
+	ob_end_clean();
+
+	return response($ERROR, $output);
 }
 
 
 //function to handle all responses
-function response($ERROR, $SESSIONID, $SESSIONDATA){
+function response($ERROR, $output){
 	global $SETTINGS;
-
-
-	//a SESSIONID was generated, but perhaps the script has opted to not used it
-	if ($SESSIONID != null) {
-		//save or delete the session data
-		if ($SESSIONDATA === null)
-			eraseSessionData($SESSIONID);
-		else
-			storeSessionData ($SESSIONID, 0, $SESSIONDATA);
-	}
-
-	$output = ob_get_contents();
-	ob_end_clean();
 
 	if ($SETTINGS['feature']['log_dmapi']) {
 		$logfilename = $SETTINGS['feature']['log_dir'] . "output.txt";
@@ -138,7 +147,6 @@ function response($ERROR, $SESSIONID, $SESSIONDATA){
 	return array("result" => $output, "resultcode" => $resultcode, "resultdescription" => $ERROR);
 }
 
-ob_start();
 
 //do the xmlrpc stuff
 $xmlrpc_server = xmlrpc_server_create();
