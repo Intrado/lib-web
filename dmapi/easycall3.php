@@ -14,7 +14,7 @@ include_once("../obj/Permission.obj.php");
 include_once("../obj/JobLanguage.obj.php");
 include_once("../obj/Rule.obj.php");
 
-$specialtask = new specialtask($SESSIONDATA['specialtaskid']);
+$specialtask = new specialtask($_SESSION['specialtaskid']);
 
 if($REQUEST_TYPE == "new"){
 		$ERROR .= "Got new when wanted result";
@@ -77,7 +77,7 @@ if($REQUEST_TYPE == "new"){
 		$specialtask->update();
 	}
 
-	$SESSIONDATA = null;
+	$_SESSION = array();
 	?> <ok /> <?
 
 } else {
