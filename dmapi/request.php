@@ -53,7 +53,7 @@ function specialtask($methodname, $params){
 //		param[0] = sessionid
 //		param[1] = called number
 //		param[2] = callerid
-function inboundtask($sessionid, $callednumber, $callerid){
+function inboundtask($methodname, $params){
 	$ERROR="";
 
 	$SESSIONID = $params[0];
@@ -62,7 +62,7 @@ function inboundtask($sessionid, $callednumber, $callerid){
 	connectDatabase($SESSIONID);
 
 	$REQUEST_TYPE = "new";
-	$SESSIONDATA['inboundNumber'] = $param[1];
+	$_SESSION['inboundNumber'] = $param[1];
 
 	ob_start();
 
@@ -102,11 +102,11 @@ function continuecompletetask($methodname, $params){
 	}
 
 	ob_start();
-	if (isset($SESSIONDATA['_nav_curpage']) && $SESSIONDATA['_nav_curpage']) {
-		include($SESSIONDATA['_nav_curpage']);
+	if (isset($_SESSION['_nav_curpage']) && $_SESSION['_nav_curpage']) {
+		include($_SESSION['_nav_curpage']);
 	} else {
 		$ERROR = "No page set!";
-		$SESSIONDATA = null;
+		$_SESSION = array();
 	}
 
 	$output = ob_get_contents();
