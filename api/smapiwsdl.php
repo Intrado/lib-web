@@ -9,8 +9,8 @@ header("Content-disposition: attachment; filename=smapi.wsdl");
 header("Content-type: text");
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<wsdl:definitions xmlns:sm="http://localhost/' . $CUSTOMERURL . '/api" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SMAPI" targetNamespace="http://localhost/' . $CUSTOMERURL . '/api" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
-    <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://localhost/' . $CUSTOMERURL . '/api">
+<wsdl:definitions xmlns:sm="http://asp.schoolmessenger.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SMAPI" targetNamespace="http://asp.schoolmessenger.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://asp.schoolmessenger.com">
 
 
 	<xsd:complexType name="list">
@@ -64,45 +64,60 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<xsd:complexType name="loginResult">
 		<xsd:sequence>
 			<xsd:element name="sessionid" type="xsd:string"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 
 	<xsd:complexType name="getListsResult">
 		<xsd:sequence>
-			<xsd:element name="lists" type="sm:list" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="lists" type="sm:list" minOccurs="0"
+				maxOccurs="unbounded">
+			</xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getMessagesResult">
 		<xsd:sequence>
-			<xsd:element name="messages" type="sm:message" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="messages" type="sm:message" minOccurs="0"
+				maxOccurs="unbounded">
+			</xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="setMessagebodyResult">
 		<xsd:sequence>
 			<xsd:element name="result" type="xsd:boolean"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="uploadAudioResult">
 		<xsd:sequence>
 			<xsd:element name="audioname" type="xsd:string"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getJobTypesResult">
 		<xsd:sequence>
-			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0"
+				maxOccurs="unbounded">
+			</xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getRepeatingJobsResult">
 		<xsd:sequence>
-			<xsd:element name="jobs" type="sm:job" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="jobs" type="sm:job" minOccurs="0"
+				maxOccurs="unbounded">
+			</xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -110,13 +125,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<xsd:complexType name="getJobStatusResult">
 		<xsd:sequence>
 			<xsd:element name="job" type="sm:jobstatus"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="sendJobResult">
 		<xsd:sequence>
 			<xsd:element name="jobid" type="xsd:int"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -129,8 +146,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	</xsd:complexType>
 	<xsd:complexType name="getActiveJobsResult">
 		<xsd:sequence>
-			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			<xsd:element name="error" type="xsd:string"></xsd:element>
+			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0"
+				maxOccurs="unbounded">
+			</xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema></wsdl:types>
@@ -417,174 +437,174 @@ sendJob:
     	<wsdl:operation name="login">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/login" />
+    			soapAction="http://asp.schoolmessenger.com/login" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getLists">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/getLists" />
+    			soapAction="http://asp.schoolmessenger.com/getLists" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getMessages">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/getMessages" />
+    			soapAction="http://asp.schoolmessenger.com/getMessages" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="setMessageBody">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/setMessageBody" />
+    			soapAction="http://asp.schoolmessenger.com/setMessageBody" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="uploadAudio">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/uploadAudio" />
+    			soapAction="http://asp.schoolmessenger.com/uploadAudio" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getJobTypes">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/getJobTypes" />
+    			soapAction="http://asp.schoolmessenger.com/getJobTypes" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getActiveJobs">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/getActiveJobs" />
+    			soapAction="http://asp.schoolmessenger.com/getActiveJobs" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getRepeatingJobs">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/getRepeatingJobs" />
+    			soapAction="http://asp.schoolmessenger.com/getRepeatingJobs" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="sendRepeatingJob">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/sendRepeatingJob" />
+    			soapAction="http://asp.schoolmessenger.com/sendRepeatingJob" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getJobStatus">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/getJobStatus" />
+    			soapAction="http://asp.schoolmessenger.com/getJobStatus" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="sendJob">
 
     		<soap:operation
-    			soapAction="http://localhost/' . $CUSTOMERURL . '/api/sendJob" />
+    			soapAction="http://asp.schoolmessenger.com/sendJob" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://localhost/' . $CUSTOMERURL . '/api" />
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
 
@@ -594,6 +614,5 @@ sendJob:
 			<soap:address location="http://localhost/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
-
 ';
 ?>
