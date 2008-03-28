@@ -33,6 +33,7 @@ function specialtask($methodname, $params){
 
 	$REQUEST_TYPE = "new";
 	$task = new SpecialTask($params[1]);
+	$_SESSION['specialtaskid'] = $task->id;
 
 	ob_start();
 	if(strtolower($task->type) == "easycall"){
@@ -120,26 +121,6 @@ function continuecompletetask($methodname, $params){
 function response($ERROR, $output){
 	global $SETTINGS;
 
-	if ($SETTINGS['feature']['log_dmapi']) {
-		$logfilename = $SETTINGS['feature']['log_dir'] . "output.txt";
-
-		//rotate log?
-
-		if (file_exists($logfilename) && filesize($logfilename) > 1000000000) {
-			if (file_exists($logfilename . ".1"))
-				unlink($logfilename . ".1");
-			rename($logfilename,$logfilename . ".1");
-		}
-
-		$fp = fopen($logfilename,"a");
-		fwrite($fp,"------" . date("Y-m-d H:i:s") . "------\n");
-		fwrite($fp,$HTTP_RAW_POST_DATA);
-		fwrite($fp,"-------------RESPONSE----------\n");
-		fwrite($fp,$output);
-		fwrite($fp,"time: " . (microtime(true) - $time) . "\n");
-		fwrite($fp,"-------------------------------\n");
-		fclose($fp);
-	}
 	$resultcode = "success";
 	if($ERROR){
 		$resultcode = "failure";
@@ -158,7 +139,31 @@ xmlrpc_server_register_method($xmlrpc_server, "completetask", "continuecompletet
 
 //error_log(print_r($HTTP_RAW_POST_DATA, true));
 
-echo xmlrpc_server_call_method($xmlrpc_server, $HTTP_RAW_POST_DATA, '');
+$output = xmlrpc_server_call_method($xmlrpc_server, $HTTP_RAW_POST_DATA, '');
+
+echo $output;
+
+if ($SETTINGS['feature']['log_dmapi']) {
+	$logfilename = $SETTINGS['feature']['log_dir'] . "output.txt";
+
+	//rotate log?
+
+	if (file_exists($logfilename) && filesize($logfilename) > 1000000000) {
+		if (file_exists($logfilename . ".1"))
+			unlink($logfilename . ".1");
+		rename($logfilename,$logfilename . ".1");
+	}
+
+	$fp = fopen($logfilename,"a");
+	fwrite($fp,"------" . date("Y-m-d H:i:s") . "------\n");
+	fwrite($fp,"-------------REQUEST----------\n");
+	fwrite($fp,$HTTP_RAW_POST_DATA);
+	fwrite($fp,"-------------RESPONSE----------\n");
+	fwrite($fp,$output . "\n");
+	fwrite($fp,"time: " . (microtime(true) - $time) . "\n");
+	fwrite($fp,"-------------------------------\n");
+	fclose($fp);
+}
 
 xmlrpc_server_destroy($xmlrpc_server);
 
