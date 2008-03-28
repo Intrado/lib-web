@@ -23,13 +23,13 @@ class SMAPI{
 
 	login:
 		params: string loginname, string password
-		returns: string error, string sessionid
+		returns: string resultcode, string resultdescription, string sessionid
 
 	*/
 	function login($loginname, $password){
 		global $IS_COMMSUITE;
 
-		$result = array("error" => "", "sessionid" => "");
+		$result = array("resultcode" => "failure", "resultdescription" => "", "sessionid" => "");
 
 		//get the customer URL
 		if ($IS_COMMSUITE) {
@@ -41,15 +41,18 @@ class SMAPI{
 
 		$userid = doLogin($loginname, $password, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
 		if($userid == -1){
-			$result["error"] = "User is locked out";
+
+			$result["resultdescription"] = "User is locked out";
 			return $result;
 		} else if ($userid){
 			doStartSession();
 			loadCredentials($userid);
+			$result["resultcode"] = "success";
 			$result["sessionid"] = session_id();
 			return $result;
 		}
-		$result["error"] = "Invalid LoginName/Password combination";
+
+		$result["resultdescription"] = "Invalid LoginName/Password combination";
 		return $result;
 	}
 
@@ -61,20 +64,21 @@ class SMAPI{
 		params: string sessionid
 		returns:
 			lists: array of lists
-			error: string
+			resultcode: string
+			resultdescription: string
 
 	*/
 	function getLists($sessionid){
 		global $USER;
-		$result = array("error" => "", "lists" => array());
+		$result = array("resultcode" => "failure", "resultdescription" => "", "lists" => array());
 
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			$queryresult = Query("select id, name, description from list where userid = " . $USER->id . " and not deleted order by name");
@@ -86,6 +90,7 @@ class SMAPI{
 				$list->description = $row[2];
 				$lists[] = $list;
 			}
+			$result["resultcode"] = "success";
 			$result["lists"] = $lists;
 			return $result;
 		}
@@ -104,23 +109,26 @@ class SMAPI{
 		params: string sessionid, string message type
 		returns:
 			messages: array of messages
-			error: string
+			resultcode: string
+			resultdescription: string
 
 	*/
 	function getMessages($sessionid, $type = "phone"){
 		global $USER;
-		$result = array("error" => "", "messages" => array());
+		$result = array("resultcode" => "failure","resultdescription" => "", "messages" => array());
 
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description from message where userid = " . $USER->id . " and type= '" . strtolower($type) . "' and not deleted order by name");
+			$queryresult = Query("select id, name, description from message where userid = " . $USER->id . " and type= '" . DBSafe(strtolower($type)) . "' and not deleted order by name");
 			$messages = array();
 			while($row = DBGetRow($queryresult)){
 				$message = new API_Message();
@@ -129,6 +137,7 @@ class SMAPI{
 				$message->description = $row[2];
 				$messages[] = $message;
 			}
+			$result["resultcode"] = "success";
 			$result["messages"] = $messages;
 			return $result;
 		}
@@ -141,35 +150,35 @@ class SMAPI{
 
 	setMessageBody:
 		params: string sessionid, int message id, string message text
-		returns: boolean result, string error
+		returns: boolean result, string resultcode, string resultdescription,
 
 	*/
 
 	function setMessageBody($sessionid, $messageid, $messagetext){
 		global $USER;
-		$result = array("error" => "", "result" => false);
+		$result = array("resultcode" => "failure","resultdescription" => "", "result" => false);
 
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			if(!$messageid){
-				$result["error"] = "Invalid Message ID";
+				$result["resultdescription"] = "Invalid Message ID";
 				return $result;
 			}
 			if ($messagetext == ""){
-				$result["error"] = "Message Text cannot be empty";
+				$result["resultdescription"] = "Message Text cannot be empty";
 				return $result;
 			}
 
 			$message = new Message($messageid);
 			if ($message->id && $message->userid != $USER->id || $message->deleted ) {
-				$result["error"] = "Unauthorized access";
+				$result["resultdescription"] = "Unauthorized access";
 				return $result;
 			}
 
@@ -181,6 +190,7 @@ class SMAPI{
 				$part->messageid = $message->id;
 				$part->create();
 			}
+			$result["resultcode"] = "success";
 			$result["result"] = true;
 			return $result;
 		}
@@ -198,28 +208,32 @@ class SMAPI{
 		params: string sessionid, string name, string mimetype, base64 encoded string audio
 		return:
 			audioname: string
-			error: string
+			resultcode: string
+			resultdescription: string
 
 	*/
 
 	function uploadAudio($sessionid, $name, $mimetype, $audio){
 		global $USER;
-		$result = array("error" => "", "audioname" => "");
+		$result = array("resultcode" => "failure","resultdescription" => "", "audioname" => "");
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			if($name == ""){
-				$result["error"] = "Name cannot be empty";
+
+				$result["resultdescription"] = "Name cannot be empty";
 				return $result;
 			}
 			if($audio == ""){
-				$result["error"] = "Audio data cannot be empty";
+
+				$result["resultdescription"] = "Audio data cannot be empty";
 				return $result;
 			}
 
@@ -228,7 +242,8 @@ class SMAPI{
 			$content->data = $audio;
 			$content->create();
 			if(!$content->id){
-				$result["error"] = "Failed to create audio file record";
+
+				$result["resultdescription"] = "Failed to create audio file record";
 				return $result;
 			}
 			$audiofile = new AudioFile();
@@ -244,8 +259,10 @@ class SMAPI{
 			$audiofile->create();
 
 			if(!$audiofile->id){
-				$result["error"] = "Failed to create audio file record";
+
+				$result["resultdescription"] = "Failed to create audio file record";
 			} else {
+				$result["resultcode"] = "success";
 				$result["audioname"] = $audiofile->name;
 			}
 			return $result;
@@ -260,20 +277,24 @@ class SMAPI{
 		params: string sessionid
 		return:
 			jobtypes: array of jobtypes
-			error: string
+			resultcode: string
+			resultdescription: string
 
 	*/
 	function getJobTypes($sessionid){
 		global $USER;
-		$result = array("error" => "", "jobtypes" => array());
+		$result = array("resultcode" => "failure","resultdescription" => "", "jobtypes" => array());
 
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+
+			$result["resultdescription"] = "Invalid Session ID";
+
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 
@@ -285,6 +306,7 @@ class SMAPI{
 				$jobtype->info = $userjobtype->info;
 				$jobtypes[] = $jobtype;
 			}
+			$result["resultcode"] = "success";
 			$result["jobtypes"] = $jobtypes;
 			return $result;
 		}
@@ -298,24 +320,28 @@ class SMAPI{
 	params: string sessionid
 	return:
 		jobs: array of job objects,
-		error: string
+		resultcode: string
+		resultdescription: string
 
 	*/
 
 	//jobid, name, desc, total, remaining
 	function getActiveJobs($sessionid){
 		global $USER;
-		$result = array("error" => "", "jobs" => array());
+		$result = array("resultcode" => "failure","resultdescription" => "", "jobs" => array());
 
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
+			$result["resultcode"] = "success";
 			$result["jobs"] = getJobData();
 			return $result;
 		}
@@ -329,23 +355,27 @@ class SMAPI{
 		params: string sessionid
 		return:
 			job: a job object,
-			error: string
+			resultcode: string
+			resultdescription: string
 
 	*/
 
 	function getJobStatus($sessionid, $jobid){
 		global $USER;
-		$result = array("error" => "", "job" => null);
-
+		$result = array("resultcode" => "failure","resultdescription" => "", "job" => null);
+		$jobid = $jobid + 0;
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
+			$result["resultcode"] = "success";
 			$result["job"] = getJobData($jobid);
 			return $result;
 		}
@@ -359,19 +389,22 @@ class SMAPI{
 		params: string sessionid
 		return:
 			jobs: array of job objects,
-			error: string
+			resultcode: string
+			resultdescription: string
 
 	*/
 	function getRepeatingJobs($sessionid){
 		global $USER;
-		$result = array("error" => "", "jobs" => array());
+		$result = array("resultcode" => "failure","resultdescription" => "", "jobs" => array());
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			$queryresult = Query("select id, name, description from job where status = 'repeating' and userid = " . $USER->id . " order by finishdate asc");
@@ -383,6 +416,7 @@ class SMAPI{
 				$job->description = $row[2];
 				$jobs[] = $job;
 			}
+			$result["resultcode"] = "success";
 			$result["jobs"] = $jobs;
 			return $result;
 		}
@@ -394,38 +428,44 @@ class SMAPI{
 
 	sendRepeatingJob:
 		params: string sessionid
-		return: int jobid, string error
+		return: int jobid, string resultcode, string resultdescription,
 
 	*/
 
 	function sendRepeatingJob($sessionid, $jobid){
 		global $USER;
-		$result = array("error" => "", "jobid" => 0);
-
+		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
+		$jobid = $jobid + 0;
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
+
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			if(!$jobid){
-				$result["error"] = "Invalid Job ID";
+
+				$result["resultdescription"] = "Invalid Job ID";
 				return $result;
 			}
 			$job = new Job($jobid);
 			if($job->userid != $USER->id){
-				$result["error"] = "Unauthorized access";
+
+				$result["resultdescription"] = "Unauthorized access";
 				return $result;
 			}
 			if($job->status != "repeating"){
-				$result["error"] = "Invalid Repeating Job";
+
+				$result["resultdescription"] = "Invalid Repeating Job";
 				return $result;
 			}
 			$newjob = $job->runNow();
-
+			$result["resultcode"] = "success";
 			$result["jobid"] = $newjob->id;
 			return $result;
 		}
@@ -451,54 +491,64 @@ class SMAPI{
 				int email message id
 				int sms message id
 				int max call attempts
-		return: int jobid, string error
+		return: int jobid, string resultcode, string resultdescription,
 
 	*/
 
 
 	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
 		global $USER, $ACCESS;
-		$result = array("error" => "", "jobid" => 0);
+		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
 
 		if(!APISession($sessionid)){
-			$result["error"] = "Invalid Session ID";
+			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 			$USER = $_SESSION['user'];
 			$ACCESS = $_SESSION['access'];
 			if(!$USER->id){
-				$result["error"] = "Invalid user";
+				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			if(!strtotime($startdate)){
-				$result["error"] = "Invalid Start Date";
+
+				$result["resultdescription"] = "Invalid Start Date";
 				return $result;
 			} else if(!strtotime($starttime)){
-				$result["error"] = "Invalid Start Time";
+
+				$result["resultdescription"] = "Invalid Start Time";
 				return $result;
 			} else if(!strtotime($endtime)){
-				$result["error"] = "Invalid End Time";
+
+				$result["resultdescription"] = "Invalid End Time";
 				return $result;
 			} else if(!$daystorun){
-				$result["error"] = "Invalid Run Days";
+
+				$result["resultdescription"] = "Invalid Run Days";
 				return $result;
 			} else if(!$maxcallattempts){
-				$result["error"] = "Invalid Max Call Attempts";
+
+				$result["resultdescription"] = "Invalid Max Call Attempts";
 				return $result;
 			} else if(!userOwns("list", $listid)){
-				$result["error"] =  "Invalid List";
+
+				$result["resultdescription"] =  "Invalid List";
 				return $result;
 			} else if($USER->authorize('sendphone') && $phonemsgid && !userOwns("message", $phonemsgid)){
-				$result["error"] =  "Invalid Phone Message ID";
+
+				$result["resultdescription"] =  "Invalid Phone Message ID";
 				return $result;
 			} else if($USER->authorize('sendemail') && $emailmsgid && !userOwns("message", $emailmsgid)){
-				$result["error"] =  "Invalid Email Message ID";
+
+				$result["resultdescription"] =  "Invalid Email Message ID";
 				return $result;
 			} else if(getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid && !userOwns("message", $smsmsgid)){
-				$result["error"] = "Invalid SMS Message ID";
+
+				$result["resultdescription"] = "Invalid SMS Message ID";
 				return $result;
 			} else if(strtotime($starttime) > strtotime($endtime)){
-				$result["error"] = "Start Time must be before End Time";
+
+				$result["resultdescription"] = "Start Time must be before End Time";
 				return $result;
 			} else {
 				$job = Job::jobWithDefaults();
@@ -538,12 +588,6 @@ class SMAPI{
 					$job->emailmessageid = NULL;
 					$job->sendemail = false;
 				}
-				if ($job->sendprint && $job->printmessageid != 0) {
-					$jobtypes[] = "print";
-				} else {
-					$job->printmessageid = NULL;
-					$job->sendprint = false;
-				}
 				if (getSystemSetting('_hassms') && $job->sendsms && $job->smsmessageid != 0) {
 					$jobtypes[] = "sms";
 				} else {
@@ -564,13 +608,15 @@ class SMAPI{
 				$job->setOptionValue("maxcallattempts", $maxcallattempts);
 
 
-				if($job->sendphone && $job->sendemail && $job->sendsms){
-					$result["error"] = "You must have at least one message type";
+				if(!$job->sendphone && !$job->sendemail && !$job->sendsms){
+
+					$result["resultdescription"] = "You must have at least one message type";
 					return $result;
 				}
 
 				$job->create();
 				$job->runNow();
+				$result["resultcode"] = "success";
 				$result["jobid"] = $job->id;
 				return $result;
 			}
@@ -608,8 +654,9 @@ function APISession($sessionid){
 
 //fetches job statistic data
 //grabs all active jobs if no job id is given
-function getJobData($jobid=null){
+function getJobData($jobid=0){
 	global $USER;
+
 	$query = "select j.id, j.name, j.description,
 						sum(rc.type='phone') as total_phone,
 						sum(rc.type='email') as total_email,
@@ -631,6 +678,7 @@ function getJobData($jobid=null){
 						where 1 and j.deleted=0
 						and j.userid = $USER->id ";
 	if($jobid){
+		$jobid = $jobid + 0;
 		$query .= " and j.id = $jobid ";
 	} else {
 		$query .= " and (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') ";
