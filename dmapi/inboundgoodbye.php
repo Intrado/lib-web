@@ -3,9 +3,8 @@
 
 function goodbye($jobSubmit=false)
 {
-	global $SESSIONID;
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="goodbye">
 <?	if ($jobSubmit) { ?>
 		<audio cmid="file://prompts/inbound/Goodbye.wav" />
@@ -26,12 +25,12 @@ if($REQUEST_TYPE == "new"){
 	<?
 } else if($REQUEST_TYPE == "result"){
 	//huh, they must have hung up
-	$SESSIONDATA = null;
+	$_SESSION = array();
 	?>
 	<ok />
 	<?
 } else {
-	if (isset($SESSIONDATA['jobSubmit'])) {
+	if (isset($_SESSION['jobSubmit'])) {
 		goodbye(true);
 	} else {
 		goodbye();

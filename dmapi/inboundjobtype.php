@@ -8,7 +8,7 @@ include_once("../inc/utils.inc.php");
 include_once("inboundutils.inc.php");
 include_once("../obj/JobType.obj.php");
 
-global $SESSIONDATA, $BFXML_VARS;
+global $BFXML_VARS;
 
 $PAGESIZE = 9;
 
@@ -16,50 +16,47 @@ $PAGESIZE = 9;
 function loadJobtypesDB()
 {
 	loadUser(); // load the user to obtain the permitted job types
-	global $SESSIONDATA, $USER;
+	global $USER;
 	return JobType::getUserJobTypes();
 }
 
 function loadJobtypes($incr)
 {
-	global $SESSIONDATA, $PAGESIZE, $USER;
+	global $PAGESIZE, $USER;
 	if (!isset($PAGESIZE)) $PAGESIZE = 9; // this is strange... why isnt it set the first time from above???
 	glog("pagesize: ".$PAGESIZE);
-	glog("loadjobtypes current page ".$SESSIONDATA['currentJobtypePage']);
+	glog("loadjobtypes current page ".$_SESSION['currentJobtypePage']);
 
 	$allJobtypes = array_values(loadJobtypesDB()); // convert indexes to 0, 1, 2, ...
 
 	// if first time, set to 0
-	if (!isset($SESSIONDATA['currentJobtypePage'])) {
-		$SESSIONDATA['currentJobtypePage'] = 0;
+	if (!isset($_SESSION['currentJobtypePage'])) {
+		$_SESSION['currentJobtypePage'] = 0;
 	// if increment
 	} else if ($incr) {
-		$SESSIONDATA['currentJobtypePage']++;
+		$_SESSION['currentJobtypePage']++;
 		// if page wrap to beginning
-		if (count($allJobtypes) <= ($SESSIONDATA['currentJobtypePage'])*$PAGESIZE) {
-			$SESSIONDATA['currentJobtypePage'] = 0;
+		if (count($allJobtypes) <= ($_SESSION['currentJobtypePage'])*$PAGESIZE) {
+			$_SESSION['currentJobtypePage'] = 0;
 		}
 	}
 
-	glog("currentJobtypePage: ".$SESSIONDATA['currentJobtypePage']);
+	glog("currentJobtypePage: ".$_SESSION['currentJobtypePage']);
 
-	$SESSIONDATA['hasPaging'] = false;
+	$_SESSION['hasPaging'] = false;
 	if (count($allJobtypes) > $PAGESIZE) {
-		$SESSIONDATA['hasPaging'] = true;
+		$_SESSION['hasPaging'] = true;
 	}
 	// group jobtypes into sets of 9 (digits 1-9 on the phone)
-	$jobtypeSubset = array_slice($allJobtypes, $SESSIONDATA['currentJobtypePage']*$PAGESIZE, $PAGESIZE, true);
+	$jobtypeSubset = array_slice($allJobtypes, $_SESSION['currentJobtypePage']*$PAGESIZE, $PAGESIZE, true);
 	return $jobtypeSubset; // the list of jobtypes for this user, page includes no more than 9
 }
 
 function playJobtypes($incr, $playprompt=true)
 {
-	global $SESSIONDATA;
-
 	$jobtypes = loadJobtypes($incr);
-	global $SESSIONID;
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice >
 	<message name="jobtypedirectory">
 <?	if (count($jobtypes) == 0) { ?>
 		<audio cmid="file://prompts/inbound/NoJobTypes.wav" />
@@ -84,7 +81,7 @@ function playJobtypes($incr, $playprompt=true)
 					$jobtypeindex++;
 				}
 				// if jobtypes are on pages, provide * option
-				if ($SESSIONDATA['hasPaging']) {
+				if ($_SESSION['hasPaging']) {
 ?>
 					<audio cmid="file://prompts/inbound/MoreJobs.wav" />
 <?
@@ -102,7 +99,7 @@ function playJobtypes($incr, $playprompt=true)
 				$jobtypeindex++;
 			}
 			// if jobtypes are on pages, provide * option
-			if ($SESSIONDATA['hasPaging']) {
+			if ($_SESSION['hasPaging']) {
 ?>
 				<choice digits="*" />
 <?
@@ -147,7 +144,7 @@ if($REQUEST_TYPE == "new"){
 		// else save jobtype selection and move to job options
 		} else {
 
-			$jobtypeindex = ($SESSIONDATA['currentJobtypePage']*$PAGESIZE)+($jobtypenumber-1);
+			$jobtypeindex = ($_SESSION['currentJobtypePage']*$PAGESIZE)+($jobtypenumber-1);
 			glog("jobtypeindex: ".$jobtypeindex);
 
 			$jobtypes = array_values(loadJobtypesDB()); // convert indexes to 0, 1, 2, ...
@@ -155,7 +152,7 @@ if($REQUEST_TYPE == "new"){
 			$jobtype = $jobtypes[$jobtypeindex];
 			glog("jobtype name: ".$jobtype->name);
 
-			$SESSIONDATA['priority'] = $jobtype->id;
+			$_SESSION['priority'] = $jobtype->id;
 
 			forwardToPage("inboundjob.php");
 
@@ -167,7 +164,7 @@ if($REQUEST_TYPE == "new"){
 
 } else {
 	//huh, they must have hung up
-	$SESSIONDATA = null;
+	$_SESSION = array();
 	?>
 	<ok />
 	<?

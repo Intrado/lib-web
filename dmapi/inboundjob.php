@@ -16,18 +16,16 @@ include_once("../obj/FieldMap.obj.php");
 include_once("inboundutils.inc.php");
 
 
-global $SESSIONDATA, $BFXML_VARS;
+global $BFXML_VARS;
 
 
 function jobOptions()
 {
-	global $SESSIONDATA;
-	$maxdays = QuickQuery("SELECT permission.value FROM permission, user WHERE permission.accessid = user.accessid and permission.name='maxjobdays' and user.id=".$SESSIONDATA['userid']);
+	$maxdays = QuickQuery("SELECT permission.value FROM permission, user WHERE permission.accessid = user.accessid and permission.name='maxjobdays' and user.id=".$_SESSION['userid']);
 	glog("maxdays".$maxdays);
 
-	global $SESSIONID;
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="joboptions">
 
 <?		if ($maxdays > 1) { ?>
@@ -74,13 +72,12 @@ function jobOptions()
 
 function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 {
-	global $SESSIONID, $SESSIONDATA;
 
 	loadUser(); // must load user before rendering list
 	global $USER, $ACCESS;
 
 	// find list size
-	$list = new PeopleList($SESSIONDATA['listid']);
+	$list = new PeopleList($_SESSION['listid']);
 	$renderedlist = new RenderedList($list);
 	$renderedlist->mode = "preview";
 	$renderedlist->renderList();
@@ -96,11 +93,11 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 		loadTimezone();
 		$now = QuickQuery("select now()");
 		$nowtime = substr($now, 11);
-		$isValid = ((strtotime($nowtime) - strtotime($SESSIONDATA['stoptime'])) < 0);
+		$isValid = ((strtotime($nowtime) - strtotime($_SESSION['stoptime'])) < 0);
 	}
 
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 
 <?	if (!$isValid) { ?>
 		<message name="jobexpired">
@@ -129,9 +126,9 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 <?				} ?>
 
 				<audio cmid="file://prompts/inbound/BetweenTheHoursOf.wav" />
-				<tts gender="female"><?= $SESSIONDATA['starttime'] ?></tts>
+				<tts gender="female"><?= $_SESSION['starttime'] ?></tts>
 				<audio cmid="file://prompts/inbound/And.wav" />
-				<tts gender="female"><?= $SESSIONDATA['stoptime'] ?></tts>
+				<tts gender="female"><?= $_SESSION['stoptime'] ?></tts>
 
 				<goto message="jobconfirm" />
 	</message>
@@ -170,16 +167,14 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 
 function confirmCallWindow()
 {
-	global $SESSIONID, $SESSIONDATA;
-
 	loadUser();
 	global $USER, $ACCESS;
 
-	$SESSIONDATA['starttime'] = $USER->getCallEarly();
-	$SESSIONDATA['stoptime'] = $USER->getCallLate();
+	$_SESSION['starttime'] = $USER->getCallEarly();
+	$_SESSION['stoptime'] = $USER->getCallLate();
 
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="confirmcallwindow">
 		<field name="usecallwin" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="1">
@@ -207,8 +202,6 @@ function confirmCallWindow()
 
 function promptStartTime($playinvalid=false, $invalidreason="none")
 {
-	global $SESSIONID;
-
 	// check user restriction
 	loadUser();
 	global $USER, $ACCESS;
@@ -228,7 +221,7 @@ function promptStartTime($playinvalid=false, $invalidreason="none")
 		$late = "11:59pm";
 	}
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="promptstarttime">
 		<field name="starttime" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
@@ -284,9 +277,8 @@ function promptStartTime($playinvalid=false, $invalidreason="none")
 
 function promptStopTime()
 {
-	global $SESSIONID;
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="promptstoptime">
 		<field name="stoptime" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
@@ -321,9 +313,8 @@ function promptStopTime()
 
 function commitJob()
 {
-	global $SESSIONDATA;
 
-	$numdays = $SESSIONDATA['numdays'];
+	$numdays = $_SESSION['numdays'];
 
 	loadUser();
 	global $USER, $ACCESS;
@@ -339,18 +330,18 @@ function commitJob()
 	$job->createdate = date("Y-m-d");
 	$job->startdate = date("Y-m-d");
 	$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
-	if (isset($SESSIONDATA['starttime'])) {
-		$job->starttime = date("H:i", strtotime($SESSIONDATA['starttime']));
+	if (isset($_SESSION['starttime'])) {
+		$job->starttime = date("H:i", strtotime($_SESSION['starttime']));
 	}
-	if (isset($SESSIONDATA['stoptime'])) {
-		$job->endtime = date("H:i", strtotime($SESSIONDATA['stoptime']));
+	if (isset($_SESSION['stoptime'])) {
+		$job->endtime = date("H:i", strtotime($_SESSION['stoptime']));
 	}
 
 
-	$job->listid = $SESSIONDATA['listid'];
-	$job->phonemessageid = $SESSIONDATA['messageid'];
+	$job->listid = $_SESSION['listid'];
+	$job->phonemessageid = $_SESSION['messageid'];
 
-	$jobtype = new JobType($SESSIONDATA['priority']);
+	$jobtype = new JobType($_SESSION['priority']);
 
 	$job->jobtypeid = $jobtype->id;
 	$job->description = $jobtype->name;
@@ -362,7 +353,7 @@ function commitJob()
 	$jobid = $job->id;
 	if ($jobid) {
 		// now create any additional language messages for this job
-		$msglangmap = $SESSIONDATA['msglangmap'];
+		$msglangmap = $_SESSION['msglangmap'];
 		if ($msglangmap) foreach($msglangmap as $lang => $msgid) {
 			glog($lang.$msgid);
 			$joblang = new JobLanguage();
@@ -385,11 +376,10 @@ function commitJob()
 
 function checkExpirationThenConfirm($playback=true)
 {
-	global $SESSIONDATA;
 
 	$invalidreason = "none";
 	$isValid = true;
-	if ($SESSIONDATA['numdays'] == "1") {
+	if ($_SESSION['numdays'] == "1") {
 		// check that current time is earlier than stop time, if numdays=1
 		loadUser();
 		global $USER, $ACCESS;
@@ -398,13 +388,13 @@ function checkExpirationThenConfirm($playback=true)
 		$now = QuickQuery("select now()");
 		$nowtime = substr($now, 11);
 
-		$isValid = ((strtotime($nowtime) - strtotime($SESSIONDATA['stoptime'])) < 0);
+		$isValid = ((strtotime($nowtime) - strtotime($_SESSION['stoptime'])) < 0);
 		if (!$isValid) $invalidreason = "past";
 	}
 	if ($isValid) {
-		$listname = $SESSIONDATA['listname'];
-		$priority = $SESSIONDATA['priority'];
-		$numdays = $SESSIONDATA['numdays'];
+		$listname = $_SESSION['listname'];
+		$priority = $_SESSION['priority'];
+		$numdays = $_SESSION['numdays'];
 		jobConfirm($listname, $priority, $numdays, $playback);
 	} else {
 		promptStartTime(true, $invalidreason);
@@ -423,11 +413,11 @@ if($REQUEST_TYPE == "new"){
 	// if they entered the job options
 	if (isset($BFXML_VARS['numdays'])) {
 
-			$SESSIONDATA['numdays'] = $BFXML_VARS['numdays'];
+			$_SESSION['numdays'] = $BFXML_VARS['numdays'];
 
 			// if they are reentering job options, jump ahead to job confirm
-			if (isset($SESSIONDATA['starttime']) &&
-				isset($SESSIONDATA['stoptime'])) {
+			if (isset($_SESSION['starttime']) &&
+				isset($_SESSION['stoptime'])) {
 
 				checkExpirationThenConfirm();
 
@@ -470,7 +460,7 @@ if($REQUEST_TYPE == "new"){
 			}
 
 			if ($isValid) {
-				$SESSIONDATA['starttime'] = $starttime;
+				$_SESSION['starttime'] = $starttime;
 				promptStopTime();
 			} else {
 				promptStartTime(true);
@@ -502,13 +492,13 @@ if($REQUEST_TYPE == "new"){
 				}
 				if ($isValid) {
 					// check that start is earlier than stop
-					$isValid = ((strtotime($SESSIONDATA['starttime']) - strtotime($stoptime)) < 0);
+					$isValid = ((strtotime($_SESSION['starttime']) - strtotime($stoptime)) < 0);
 					if (!$isValid) $invalidreason = "mismatch";
 				}
 			}
 
 			if ($isValid) {
-				$SESSIONDATA['stoptime'] = $stoptime;
+				$_SESSION['stoptime'] = $stoptime;
 				checkExpirationThenConfirm();
 			} else {
 				promptStartTime(true, $invalidreason);
@@ -522,19 +512,19 @@ if($REQUEST_TYPE == "new"){
 			if ($BFXML_VARS['sendjob'] == "1" &&
 				commitJob())
 			{
-				$SESSIONDATA['jobSubmit'] = true;
+				$_SESSION['jobSubmit'] = true;
 				forwardToPage("inboundgoodbye.php");
 			}
 			// replay list selection
 			else if ($BFXML_VARS['sendjob'] == "2")
 			{
-				unset($SESSIONDATA['currentListPage']); // reset paging
+				unset($_SESSION['currentListPage']); // reset paging
 				forwardToPage("inboundlist.php");
 			}
 			// replay job type selection
 			else if ($BFXML_VARS['sendjob'] == "3")
 			{
-				unset($SESSIONDATA['currentJobtypePage']); // reset paging
+				unset($_SESSION['currentJobtypePage']); // reset paging
 				forwardToPage("inboundjobtype.php");
 			}
 			// replay numdays option
@@ -555,11 +545,11 @@ if($REQUEST_TYPE == "new"){
 
 	// they already entered job options, but returned to select a different list
 	// so keep their options and replay the confirm
-	} else if ( isset($SESSIONDATA['listname']) &&
-				isset($SESSIONDATA['priority']) &&
-				isset($SESSIONDATA['numdays']) &&
-				isset($SESSIONDATA['starttime']) &&
-				isset($SESSIONDATA['stoptime'])) {
+	} else if ( isset($_SESSION['listname']) &&
+				isset($_SESSION['priority']) &&
+				isset($_SESSION['numdays']) &&
+				isset($_SESSION['starttime']) &&
+				isset($_SESSION['stoptime'])) {
 
 				checkExpirationThenConfirm();
 
@@ -570,7 +560,7 @@ if($REQUEST_TYPE == "new"){
 
 } else {
 	//huh, they must have hung up
-	$SESSIONDATA = null;
+	$_SESSION = array();
 	?>
 	<ok />
 	<?

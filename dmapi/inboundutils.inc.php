@@ -9,11 +9,10 @@ function glog($s)
 function loadUser()
 {
 	// load up the user and access info, used extensively throughout inbound routines
-	global $SESSIONDATA;
-	if (isset($SESSIONDATA['userid'])) {
+	if (isset($_SESSION['userid'])) {
 		global $USER, $ACCESS;
 
-		$USER = $_SESSION['user'] = new User($SESSIONDATA['userid']);
+		$USER = $_SESSION['user'] = new User($_SESSION['userid']);
 		$ACCESS = $_SESSION['access'] = new Access($USER->accessid);
 	} else {
 		glog("ERROR: inboundutils->loadUser() called before SESSIONDATA[userid] was set");
@@ -22,16 +21,15 @@ function loadUser()
 
 function loadTimezone()
 {
-	global $SESSIONDATA;
 
-	if (!isset($SESSIONDATA['timezone'])) {
-		$USER = new User($SESSIONDATA['userid']);
-		$SESSIONDATA['timezone'] = getSystemSetting("timezone");
-		glog("setting timezone: ".$SESSIONDATA['timezone']);
+	if (!isset($_SESSION['timezone'])) {
+		$USER = new User($_SESSION['userid']);
+		$_SESSION['timezone'] = getSystemSetting("timezone");
+		glog("setting timezone: ".$_SESSION['timezone']);
 	}
 
-	@date_default_timezone_set($SESSIONDATA['timezone']);
-	QuickUpdate("set time_zone='" . $SESSIONDATA['timezone'] . "'");
+	@date_default_timezone_set($_SESSION['timezone']);
+	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 }
 
 ?>

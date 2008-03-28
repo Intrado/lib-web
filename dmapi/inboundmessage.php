@@ -9,14 +9,13 @@ include_once("../obj/Message.obj.php");
 include_once("../obj/MessagePart.obj.php");
 include_once("inboundutils.inc.php");
 
-global $SESSINDATA, $BFXML_VARS;
+global $BFXML_VARS;
 
 
 function promptRecordMessage($skipwelcome=false)
 {
-	global $SESSIONID;
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="intro">
 				<field name="dummy" type="menu" timeout="10000">
 					<prompt repeat="1">
@@ -91,10 +90,9 @@ function promptRecordMessage($skipwelcome=false)
 
 function promptMultiLang()
 {
-	global $SESSIONID, $SESSIONDATA;
-	$languages = $SESSIONDATA['languageList'];
+	$languages = $_SESSION['languageList'];
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="multilang">
 		<field name="domultilang" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
@@ -166,12 +164,11 @@ function promptMultiLang()
 
 function buildLanguageList()
 {
-	global $SESSIONDATA;
 	global $languages;
 
-	if (isset($SESSIONDATA['languageList'])) return; // only load this once
+	if (isset($_SESSION['languageList'])) return; // only load this once
 
-	$user = new User($SESSIONDATA['userid']);
+	$user = new User($_SESSION['userid']);
 
 	$query = "select value from persondatavalues where fieldnum='f03' ".
 				"and value != '' and value is not null order by refcount desc limit 9";
@@ -197,32 +194,31 @@ function buildLanguageList()
 	array_unshift($languages,"default");
 
 
-	$SESSIONDATA['languageList'] = $languages;
+	$_SESSION['languageList'] = $languages;
 
-	$SESSIONDATA['langindex'] = 0; // default
+	$_SESSION['langindex'] = 0; // default
 
 }
 
 function commitMessage($contentid)
 {
-	global $SESSIONDATA;
 
-	$languages = $SESSIONDATA['languageList'];
-	$langi = $SESSIONDATA['langindex'];
+	$languages = $_SESSION['languageList'];
+	$langi = $_SESSION['langindex'];
 	$language = $languages[$langi];
 
 	loadTimezone();
 	$name = "Call In (".$language.") - ".date("M d, Y G:i:s");
 
 	$audioFile = new AudioFile();
-	$audioFile->userid = $SESSIONDATA['userid'];
+	$audioFile->userid = $_SESSION['userid'];
 	$audioFile->name = $name;
 	$audioFile->description = "";
 	$audioFile->contentid = $contentid; //$BFXML_VARS['recordaudio'];
 	$audioFile->recordDate = date("Y-m-d G:i:s");
 
 	$message = new Message();
-	$message->userid = $SESSIONDATA['userid'];
+	$message->userid = $_SESSION['userid'];
 	$message->type = "phone";
 	$message->name = $name;
 	$message->description = "";
@@ -247,11 +243,11 @@ function commitMessage($contentid)
 			// if default language then set session msgid, else add to map of msgid-lang to add into joblanguage
 			// ok to assume English is their default language, customer has no options for this (yet)
 			if ($language =="default") {
-				$SESSIONDATA['messageid'] = $messageid;
+				$_SESSION['messageid'] = $messageid;
 			} else {
-				if (!isset($SESSIONDATA['msglangmap'])) $SESSIONDATA['msglangmap'] = array();
+				if (!isset($_SESSION['msglangmap'])) $_SESSION['msglangmap'] = array();
 
-				$SESSIONDATA['msglangmap'][$languages[$langi]] = $messageid;
+				$_SESSION['msglangmap'][$languages[$langi]] = $messageid;
 			}
 			return true;
 		}
@@ -273,8 +269,8 @@ if($REQUEST_TYPE == "new"){
 	if (isset($BFXML_VARS['saveaudio'])) {
 
 		buildLanguageList();
-		$languages = $SESSIONDATA['languageList'];
-		$langi = $SESSIONDATA['langindex'];
+		$languages = $_SESSION['languageList'];
+		$langi = $_SESSION['langindex'];
 
 		// check that menu pressed is 1 to save message
 		if ($BFXML_VARS['saveaudio'] == "1" &&
@@ -283,7 +279,7 @@ if($REQUEST_TYPE == "new"){
 			// remove language from the list
 			unset($languages[$langi]);
 			$languages = array_values($languages);
-			$SESSIONDATA['languageList'] = $languages;
+			$_SESSION['languageList'] = $languages;
 			glog("langc : ".count($languages));
 
 			if (count($languages) >= 1) {
@@ -302,12 +298,12 @@ if($REQUEST_TYPE == "new"){
 		if (isset($BFXML_VARS['langtorecord'])) {
 			$selectedLang = $BFXML_VARS['langtorecord'];
 		}
-		$languages = $SESSIONDATA['languageList'];
+		$languages = $_SESSION['languageList'];
 
 		if ($BFXML_VARS['domultilang'] == 2 &&
 			$selectedLang != 0 && $selectedLang <= count($languages))
 		{
-			$SESSIONDATA['langindex'] = $selectedLang-1;
+			$_SESSION['langindex'] = $selectedLang-1;
 			promptRecordMessage(true);
 		}
 		else
@@ -322,7 +318,7 @@ if($REQUEST_TYPE == "new"){
 
 } else {
 	//huh, they must have hung up
-	$SESSIONDATA = null;
+	$_SESSION = array();
 	?>
 	<ok />
 	<?

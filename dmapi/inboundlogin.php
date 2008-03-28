@@ -7,14 +7,13 @@ include_once("../obj/Permission.obj.php");
 require_once("../inc/auth.inc.php");
 include_once("inboundutils.inc.php");
 
-global $SESSIONDATA, $BFXML_VARS;
+global $BFXML_VARS;
 
 
 function login($playerror)
 {
-	global $SESSIONID, $SESSIONDATA;
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="login">
 		<field name="code" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
@@ -51,10 +50,9 @@ function login($playerror)
 
 function authFailure()
 {
-	global $SESSIONID;
 
 ?>
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="goodbye">
 		<audio cmid="file://prompts/inbound/AuthenticationFailed.wav" />
 		<audio cmid="file://prompts/inbound/CheckIDandTryLater.wav" />
@@ -67,10 +65,9 @@ function authFailure()
 
 function welcome()
 {
-	global $SESSIONID;
 ?>
 
-<voice sessionid="<?= $SESSIONID ?>">
+<voice>
 	<message name="welcome">
 		<audio cmid="file://prompts/inbound/Welcome.wav" />
 	</message>
@@ -87,7 +84,7 @@ if($REQUEST_TYPE == "new" ||
 	if (isset($BFXML_VARS['code'])) {
 		$code = $BFXML_VARS['code'];
 		$pin = $BFXML_VARS['pin'];
-		$inboundNumber = $SESSIONDATA['inboundNumber'];
+		$inboundNumber = $_SESSION['inboundNumber'];
 
 		// find user and authenticate them against database
 		$userid = doLoginPhone($code, $pin, $inboundNumber);
@@ -102,28 +99,28 @@ if($REQUEST_TYPE == "new" ||
 				$access->getPermission("sendphone")) {
 
 				// successful login, save the userid and move on
-				$SESSIONDATA['userid'] = $userid;
+				$_SESSION['userid'] = $userid;
 				forwardToPage("inboundmessage.php");
 			}
 		}
 	}
 
 	// count authorization attempts, kick them out after 3
-	if (isset($SESSIONDATA['authcount'])) {
-		$SESSIONDATA['authcount']++; // increment
+	if (isset($_SESSION['authcount'])) {
+		$_SESSION['authcount']++; // increment
 	} else {
-		$SESSIONDATA['authcount'] = 0;
+		$_SESSION['authcount'] = 0;
 	}
 	// only allow 3 attempts to login, then hangup
-	if ($SESSIONDATA['authcount'] >= 3) {
+	if ($_SESSION['authcount'] >= 3) {
 		authFailure();
 	}
 
 	// play the prompt
-	login($SESSIONDATA['authcount'] > 0);
+	login($_SESSION['authcount'] > 0);
 } else {
 	//huh, they must have hung up
-	$SESSIONDATA = null;
+	$_SESSION = array();
 	?>
 	<ok />
 	<?
