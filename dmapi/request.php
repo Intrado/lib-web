@@ -133,7 +133,7 @@ function response($ERROR, $output){
 $xmlrpc_server = xmlrpc_server_create();
 
 xmlrpc_server_register_method($xmlrpc_server, "specialtask", "specialtask");
-xmlrpc_server_register_method($xmlrpc_server, "inbound", "inbound");
+xmlrpc_server_register_method($xmlrpc_server, "inboundtask", "inboundtask");
 xmlrpc_server_register_method($xmlrpc_server, "continuetask", "continuecompletetask");
 xmlrpc_server_register_method($xmlrpc_server, "completetask", "continuecompletetask");
 
