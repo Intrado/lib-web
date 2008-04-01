@@ -18,6 +18,10 @@ if(isset($_GET['dmid'])){
 
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
+$states = array("new", "disabled", "active");
+$types = array("customer", "system");
+$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type from dm where dmuuid = '" . DBSafe($dmid) . "'", true);
+
 $f = "dmedit";
 $s = "main";
 $reloadform = 0;
@@ -57,6 +61,15 @@ if(CheckFormSubmit($f,$s))
 							('" . DBSafe($dmid) . "', 'telco_caller_id', '" . Phone::parse($callerid) . "'),
 							('" . DBSafe($dmid) . "', 'telco_inboundtoken', '" . DBSafe(GetFormData($f, $s, 'telco_inboundtoken')) . "')
 							");
+				$newcustomerid = GetFormData($f, $s, "customerid") +0;
+				if($newcustomerid == 0){
+					$newcustomerid = "null";
+				}
+				QuickUpdate("update dm set
+							customerid = " . $newcustomerid . ",
+							enablestate = '" . DBSafe(GetFormData($f, $s, "enablestate")) . "',
+							type = '" . DBSafe(GetFormData($f, $s, "type")) . "'
+							where dmuuid = '" . DBSafe($dmid) . "'");
 
 				QuickUpdate("commit");
 				redirect("customerdms.php");
@@ -70,7 +83,7 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
-	PutFormData($f, $s, "submit", "");
+	PutFormData($f, $s, "Submit", "");
 	PutFormData($f, $s, "managerpassword", "");
 	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "text", "nomin", "nomax", true);
@@ -78,6 +91,9 @@ if( $reloadform )
 	PutFormData($f, $s, "telco_dial_timeout", getDMSetting($dmid, "telco_dial_timeout"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "telco_caller_id", Phone::format(getDMSetting($dmid, "telco_caller_id")), "phone", "10", "10", true);
 	PutFormData($f, $s, "telco_inboundtoken", getDMSetting($dmid, "telco_inboundtoken"), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "enablestate", $dm['enablestate'], "array", $states, "nomax", true);
+	PutFormData($f, $s, "customerid", $dm['customerid'], "number");
+	PutFormData($f, $s, "type", $dm['type'], "array", $types, "nomax", true);
 }
 
 
@@ -90,11 +106,39 @@ include_once("nav.inc.php");
 //custom newform declaration to catch if manager password is submitted
 NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
 ?>
-<div>Settings for <?=$dmid?></div>
+<div>Settings for <?=$dm['name']?></div>
 <table>
 <?
 //String DELMECH_ENABLED = "dm_enabled"; // remote
 ?>
+	<tr>
+		<td>Customer ID: </td>
+		<td><? NewFormItem($f, $s, "customerid", "text", "5"); ?></td>
+	</tr>
+	<tr>
+		<td>Type: </td>
+		<td>
+			<?
+				NewFormItem($f, $s, "type", "selectstart");
+				foreach($types as $type){
+					NewFormItem($f, $s, "type", "selectoption", ucfirst($type), $type);
+				}
+				NewFormItem($f, $s, "type", "selectend");
+			?>
+		</td>
+	</tr>
+	<tr>
+		<td>State: </td>
+		<td>
+			<?
+				NewFormItem($f, $s, "enablestate", "selectstart");
+				foreach($states as $state){
+					NewFormItem($f, $s, "enablestate", "selectoption", ucfirst($state), $state);
+				}
+				NewFormItem($f, $s, "enablestate", "selectend");
+			?>
+		</td>
+	</tr>
 	<tr>
 		<td>Calls per Second: </td>
 		<td><? NewFormItem($f, $s, "telco_calls_sec", "text", "5");?></td>
@@ -123,7 +167,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 //String TEST_HAS_DELAYS = "test_delay"; //remote
 ?>
 	<tr>
-		<td><? NewFormItem($f, $s, "submit", "submit", "submit"); ?></td>
+		<td><? NewFormItem($f, $s, "Submit", "submit"); ?></td>
 	</tr>
 </table>
 <?
