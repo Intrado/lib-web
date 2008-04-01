@@ -146,3 +146,9 @@ CREATE TABLE `dm` (
   PRIMARY KEY  (`dmuuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `dmsetting` (
+`dmuuid` VARCHAR( 255 ) NOT NULL ,
+`name` VARCHAR( 255 ) NOT NULL ,
+`value` VARCHAR( 255 ) NOT NULL ,
+PRIMARY KEY ( `dmuuid` , `name` )
+) ENGINE = innodb;
