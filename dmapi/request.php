@@ -125,7 +125,7 @@ function response($ERROR, $output){
 	if($ERROR){
 		$resultcode = "failure";
 	}
-	return array("result" => $output, "resultcode" => $resultcode, "resultdescription" => $ERROR);
+	return array("taskxml" => $output, "resultcode" => $resultcode, "resultdescription" => $ERROR);
 }
 
 
