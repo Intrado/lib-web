@@ -21,8 +21,8 @@ include_once("XmlToArray.obj.php");
 
 // SpecialTask
 // Params:
-//		param[0] = sessionid
-//		param[1] = taskid
+//		params[0] = sessionid
+//		params[1] = taskid
 function specialtask($methodname, $params){
 	$ERROR="";
 
@@ -51,9 +51,9 @@ function specialtask($methodname, $params){
 
 // continuecompletetask
 // Params:
-//		param[0] = sessionid
-//		param[1] = called number
-//		param[2] = callerid
+//		params[0] = sessionid
+//		params[1] = called number
+//		params[2] = callerid
 function inboundtask($methodname, $params){
 	$ERROR="";
 
@@ -63,7 +63,7 @@ function inboundtask($methodname, $params){
 	connectDatabase($SESSIONID);
 
 	$REQUEST_TYPE = "new";
-	$_SESSION['inboundNumber'] = $param[1];
+	$_SESSION['inboundNumber'] = $params[1];
 
 	ob_start();
 
@@ -78,8 +78,8 @@ function inboundtask($methodname, $params){
 
 // continuecompletetask
 // Params:
-//		param[0] = sessionid
-//		param[1] = result data
+//		params[0] = sessionid
+//		params[1] = result data
 function continuecompletetask($methodname, $params){
 	$ERROR="";
 
@@ -94,7 +94,7 @@ function continuecompletetask($methodname, $params){
 	} else if($methodname == "completetask"){
 		$REQUEST_TYPE = "result";
 	}
-	if ($datums = findChildren($param[1],"DATUM")) {
+	if ($datums = findChildren($params[1],"DATUM")) {
 		foreach ($datums as $datum) {
 			$name = $datum['attrs']['NAME'];
 			$value = (isset($datum['txt']) ? $datum['txt'] : "");
@@ -125,6 +125,7 @@ function response($ERROR, $output){
 	if($ERROR){
 		$resultcode = "failure";
 	}
+
 	return array("taskxml" => $output, "resultcode" => $resultcode, "resultdescription" => $ERROR);
 }
 
@@ -157,7 +158,7 @@ if ($SETTINGS['feature']['log_dmapi']) {
 	$fp = fopen($logfilename,"a");
 	fwrite($fp,"------" . date("Y-m-d H:i:s") . "------\n");
 	fwrite($fp,"-------------REQUEST----------\n");
-	fwrite($fp,$HTTP_RAW_POST_DATA);
+	fwrite($fp,$HTTP_RAW_POST_DATA . "\n");
 	fwrite($fp,"-------------RESPONSE----------\n");
 	fwrite($fp,$output . "\n");
 	fwrite($fp,"time: " . (microtime(true) - $time) . "\n");
@@ -166,7 +167,5 @@ if ($SETTINGS['feature']['log_dmapi']) {
 }
 
 xmlrpc_server_destroy($xmlrpc_server);
-
-
 
 ?>
