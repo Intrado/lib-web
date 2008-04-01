@@ -385,7 +385,7 @@ NewFormItem($f, $s,"", 'submit');
 <?
 
 NewFormItem($f, $s,"", 'submit');
-?><p>Manager Password: </td><td><? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?><p><?
+managerPassword($f, $s);
 EndForm();
 
 include_once("navbottom.inc.php");

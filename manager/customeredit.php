@@ -444,9 +444,10 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 
 </table>
 
-<p>Manager Password: <input id='managerpassword' type="password" name="frm[<?=$f?>][<?=$s?>][managerpassword][value]" size="25"\>
-
 <?
+managerPassword($f, $s);
+
+
 EndForm();
 
 include_once("navbottom.inc.php");

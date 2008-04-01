@@ -46,13 +46,13 @@ if(CheckFormSubmit($f, 'new')) {
 	else
 	{
 		MergeSectionFormData($f, $s);
-		
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(!$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
 				error('Bad Manager Password');
 		} else {
-		
+
 			if(GetFormData($f, $s, 'newname') != ""){
 				$name = DBSafe(GetFormData($f, $s, 'newname'));
 				QuickUpdate("insert into jobtype(name, systempriority, issurvey) values
@@ -83,7 +83,7 @@ function getPriorityName($systempriority){
 	$systemprioritynames = array(1 => "Emergency",
 								2 => "High Priority",
 								3 => "General");
-	
+
 	return $systemprioritynames[$systempriority];
 }
 
@@ -118,7 +118,7 @@ NewForm($f);
 		<td>High Priority</td>
 		<td>No</td>
 		<td><? NewFormItem($f, 'new', 'add', 'submit')?></td>
-		
+
 	</tr>
 
 </table>
@@ -128,9 +128,8 @@ NewForm($f);
 <p>If it does not fall into that category, please make the Job Type a General.
 <p>Do not forget to configure the job type call preferences for any added job types on this page.
 </div>
-<br> Manager Password: <? NewFormItem($f, $s, 'managerpassword', 'password', 25); ?></p>
-
 <?
+managerPassword($f, $s);
 EndForm();
 include("navbottom.inc.php");
 ?>
