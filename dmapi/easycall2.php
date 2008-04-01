@@ -1,5 +1,4 @@
 <?
-include_once("../inc/settings.ini.php");
 include_once("../inc/utils.inc.php");
 include_once("../obj/Job.obj.php");
 include_once("../obj/User.obj.php");
