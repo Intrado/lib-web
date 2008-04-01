@@ -86,7 +86,7 @@ if($reloadform){
 			$actions = PutFormData($f,$lockeduser[1], "Unlock");
 		}
 	}
-	PutformData($f, $s, "managerpassword", "", "text");
+	PutFormData($f, $s, "managerpassword", "", "text");
 }
 
 
@@ -118,6 +118,7 @@ function lockeduser_actions($row, $index){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 include("nav.inc.php");
+
 NewForm($f, "onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
 ?>
 <table border = 1>
@@ -126,8 +127,8 @@ showTable($lockedusers, $titles, $formatters);
 ?>
 </table>
 
-<p>Manager Password: <? NewFormItem($f, $s, 'managerpassword', 'password', 25, null, "id='managerpassword'"); ?></p>
 <?
+managerPassword($f, $s);
 EndForm($f);
 include("navbottom.inc.php");
 ?>
