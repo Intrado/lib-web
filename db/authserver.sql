@@ -152,3 +152,8 @@ CREATE TABLE `dmsetting` (
 `value` VARCHAR( 255 ) NOT NULL ,
 PRIMARY KEY ( `dmuuid` , `name` )
 ) ENGINE = innodb;
+
+ALTER TABLE `dm` DROP PRIMARY KEY ;
+ALTER TABLE `dm` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST ;
+ALTER TABLE `dm` ADD UNIQUE (`dmuuid`) ;
+
