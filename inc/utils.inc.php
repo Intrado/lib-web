@@ -210,7 +210,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.58 $
+	    # $Revision: 1.59 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -492,10 +492,5 @@ function getBrandTheme2(){
 	return $_SESSION['colorscheme']['_brandtheme2'];
 }
 
-function managerPassword($f, $s){
-?>
-	<p>Manager Password: <input id='managerpassword' type="password" name="frm[<?=$f?>][<?=$s?>][managerpassword][value]" size="25"\>
-<?
-}
 
 ?>
