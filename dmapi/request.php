@@ -24,6 +24,7 @@ include_once("XmlToArray.obj.php");
 //		params[0] = sessionid
 //		params[1] = taskid
 function specialtask($methodname, $params){
+	global $REQUEST_TYPE;
 	$ERROR="";
 
 	$SESSIONID = $params[0];
@@ -37,9 +38,9 @@ function specialtask($methodname, $params){
 
 	ob_start();
 	if(strtolower($task->type) == "easycall"){
-		include("easycall.php");
+		forwardToPage("easycall.php");
 	} else if($task->type == "callme"){
-		include("callme.php");
+		forwardToPage("callme.php");
 	} else {
 		$ERROR = "Unknown Special Task Type";
 	}
@@ -55,6 +56,7 @@ function specialtask($methodname, $params){
 //		params[1] = called number
 //		params[2] = callerid
 function inboundtask($methodname, $params){
+	global $REQUEST_TYPE;
 	$ERROR="";
 
 	$SESSIONID = $params[0];
@@ -67,7 +69,7 @@ function inboundtask($methodname, $params){
 
 	ob_start();
 
-	include("inboundlogin.php");
+	forwardToPage("inboundlogin.php");
 
 	$output = ob_get_contents();
 	ob_end_clean();
@@ -81,6 +83,7 @@ function inboundtask($methodname, $params){
 //		params[0] = sessionid
 //		params[1] = result data
 function continuecompletetask($methodname, $params){
+	global $BFXML_VARS, $REQUEST_TYPE;
 	$ERROR="";
 
 	$SESSIONID = $params[0];
@@ -89,22 +92,17 @@ function continuecompletetask($methodname, $params){
 	connectDatabase($SESSIONID);
 
 
-	if($methodname = "continuetask"){
+	if($methodname == "continuetask"){
 		$REQUEST_TYPE = "continue";
 	} else if($methodname == "completetask"){
 		$REQUEST_TYPE = "result";
 	}
-	if ($datums = findChildren($params[1],"DATUM")) {
-		foreach ($datums as $datum) {
-			$name = $datum['attrs']['NAME'];
-			$value = (isset($datum['txt']) ? $datum['txt'] : "");
-			$BFXML_VARS[$name] = $value;
-		}
-	}
+
+	$BFXML_VARS = $params[1];
 
 	ob_start();
 	if (isset($_SESSION['_nav_curpage']) && $_SESSION['_nav_curpage']) {
-		include($_SESSION['_nav_curpage']);
+		forwardToPage($_SESSION['_nav_curpage']);
 	} else {
 		$ERROR = "No page set!";
 		$_SESSION = array();
@@ -129,6 +127,20 @@ function response($ERROR, $output){
 	return array("taskxml" => $output, "resultcode" => $resultcode, "resultdescription" => $ERROR);
 }
 
+//define some helper functions
+//loads a page and adds the current page to the stack
+function setNextPage ($thepage) {
+	$_SESSION['_nav_curpage'] = $thepage;
+}
+
+function forwardToPage ($thepage, $setpage = true) {
+	//NOTE: must declare any globals to share with the script
+	global $BFXML_VARS, $REQUEST_TYPE, $SETTINGS;
+
+	if ($setpage)
+		setNextPage($thepage);
+	include($thepage);
+}
 
 //do the xmlrpc stuff
 $xmlrpc_server = xmlrpc_server_create();
@@ -160,7 +172,7 @@ if ($SETTINGS['feature']['log_dmapi']) {
 	fwrite($fp,"-------------REQUEST----------\n");
 	fwrite($fp,$HTTP_RAW_POST_DATA . "\n");
 	fwrite($fp,"-------------RESPONSE----------\n");
-	fwrite($fp,$output . "\n");
+	fwrite($fp,html_entity_decode($output) . "\n");
 	fwrite($fp,"time: " . (microtime(true) - $time) . "\n");
 	fwrite($fp,"-------------------------------\n");
 	fclose($fp);
