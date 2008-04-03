@@ -1331,3 +1331,11 @@ INDEX ( `messageid` )
 ) ENGINE = innodb
 $$$
 
+-- After ASP_5-2 april 3
+
+CREATE TABLE `custdm` (
+  `dmid` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `enablestate` enum('new','active','disabled') NOT NULL,
+  PRIMARY KEY  (`dmid`)
+) ENGINE=InnoDB;
