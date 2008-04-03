@@ -2,51 +2,59 @@
 include_once("common.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
+include_once("../inc/table.inc.php");
+include_once("../inc/formatters.inc.php");
 include_once("AspAdminUser.obj.php");
 
 $dms = array();
-$query = "select customerid, dmuuid, name, authorizedip, lastip, enablestate, lastseen from dm order by customerid, name";
+$query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
+			dm.enablestate, dm.lastseen
+			from dm dm
+			left join customer c on (c.id = dm.customerid)
+			where dm.type = 'customer'
+			order by dm.customerid, dm.name";
 $result = Query($query);
+$data = array();
 while($row = DBGetRow($result)){
-	$dm = array();
-	$dm['customerid'] = $row[0];
-	$dm['dmuuid'] = $row[1];
-	$dm['name'] = $row[2];
-	$dm['authorizedip'] = $row[3];
-	$dm['lastip'] = $row[4];
-	$dm['enablestate'] = $row[5];
-	$dm['lastseen'] = $row[6];
-	$dms[$row[1]] = $dm;
+	$data[] = $row;
+}
+
+$titles = array(0 => "DM ID",
+				1 => "Customer ID",
+				2 => "Customer Name",
+				3 => "Name",
+				4 => "Authorized IP",
+				5 => "Last IP",
+				7 => "Last Seen",
+				6 => "State",
+				"actions" => "Actions");
+
+$formatters = array(2 => "customerUrl",
+					"actions" => "editLink",
+					7 => "fmt_ms_timestamp");
+
+
+//index 2 is customer id
+//index 1 is customer url
+function customerUrl($row, $index){
+	$url = "";
+	if($row[2])
+		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" >" . $row[2] . "</a>";
+	return $url;
+}
+
+// index 1 is dmid
+function editLink($row, $index){
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>';
+	return $url;
 }
 
 include_once("nav.inc.php");
 
 ?>
 <table border="1">
-	<th>Customer ID</th>
-	<th>DM ID</th>
-	<th>Name</th>
-	<th>Authorized IP</th>
-	<th>Last IP</th>
-	<th>Last Seen</th>
-	<th>State</th>
-	<th>Actions</th>
-
 <?
-	foreach($dms as $dm){
-?>
-		<tr>
-			<td><?=$dm['customerid']?></td>
-			<td><?=$dm['dmuuid']?></td>
-			<td><?=$dm['name']?></td>
-			<td><?=$dm['authorizedip']?></td>
-			<td><?=$dm['lastip']?></td>
-			<td><?=date('M d, Y h:i:s', $dm['lastseen']/1000)?></td>
-			<td><?=$dm['enablestate']?></td>
-			<td><a href="editdm.php?dmid=<?=$dm['dmuuid']?>"/>Edit</a></td>
-		</tr>
-<?
-	}
+	showTable($data, $titles, $formatters);
 ?>
 </table>
 <?
