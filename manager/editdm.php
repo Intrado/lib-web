@@ -19,7 +19,7 @@ if(isset($_GET['dmid'])){
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $states = array("new", "disabled", "active");
-$telco_types = array("Voice-Test", "Voice-Asterisk", "Voice-Jtapi2");
+$telco_types = array("Test", "Asterisk", "Jtapi");
 $dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type from dm where id = '" . DBSafe($dmid) . "'", true);
 
 $f = "dmedit";
@@ -94,6 +94,9 @@ if(CheckFormSubmit($f,$s))
 						QuickUpdate("insert into custdm (dmid, name, enablestate) values
 									(" . $dmid . ", '" . $dm['name'] . "', '" . $dm['enablestate'] . "')
 									", $custdb);
+					} else {
+						QuickUpdate("update custdm set enablestate = '" . DBSafe(GetformData($f, $s, 'enablestate')) . "'
+									where dmid = " . $dmid, $custdb);
 					}
 
 				}
