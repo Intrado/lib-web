@@ -1350,4 +1350,4 @@ CREATE TABLE `dmroute` (
   `suffix` varchar(20) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `dmid` (`dmid`,`match`)
-) ENGINE=InnoDB DEFAULT AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB ;
