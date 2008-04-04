@@ -23,11 +23,11 @@ class ReportGenerator {
 		}
 		return $result;
 	}
-	
+
 	function generate($options = null){
 		$result = "";
 		$this->generateQuery();
-		
+
 		switch($this->format){
 			case 'html':
 				$this->runHtml();
@@ -57,7 +57,7 @@ class ReportGenerator {
 		$timeoffsetquery = "set time_zone = '$timeoffset'";
 		$xmlparams[] = new XML_RPC_Value($timeoffsetquery, 'string');
 
-		
+
 		$params = $this->generateXmlParams();
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
 
@@ -76,7 +76,7 @@ class ReportGenerator {
 		$xmlparams[] = new XML_RPC_Value($options['filename'], 'string');
 		$method = "Resizer.render";
 		$result = $this->reportxmlrpc($method, $xmlparams);
-		
+
 		return $result;
 
 	}
@@ -101,30 +101,30 @@ class ReportGenerator {
 		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
 		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
 		$reportname = report_name($this->params['reporttype']);
-		
+
 		$subname = isset($this->params['subname']) ? $this->params['subname'] : "";
 		$description = isset($this->params['description']) ? $this->params['description'] : "";
-		
+
 		$params["reportname"] = new XML_RPC_VALUE($reportname, 'string');
 		$params["subname"] = new XML_RPC_VALUE($subname, 'string');
 		$params["username"] = new XML_RPC_VALUE($USER->login, 'string');
 		$customer = QuickQuery("select value from setting where name = 'displayname'");
 		if(!$customer)
 			$customer = "";
-		$params["accountname"] = new XML_RPC_VALUE($customer, 'string'); 
-		$params["firstname"] = new XML_RPC_VALUE($USER->firstname, 'string'); 
+		$params["accountname"] = new XML_RPC_VALUE($customer, 'string');
+		$params["firstname"] = new XML_RPC_VALUE($USER->firstname, 'string');
 		$params["lastname"] = new XML_RPC_VALUE($USER->lastname, 'string');
 		$params["description"] = new XML_RPC_VALUE($description, 'string');
 		$params["createdate"] = new XML_RPC_VALUE(date("M d, Y h:i a", strtotime("now")), 'string');
 		if(isset($this->params['sorrymessage']))
 			$params["sorrymessage"] = new XML_RPC_VALUE($this->params['sorrymessage'], 'string');
 		return $params;
-	
+
 	}
 
 	function reportxmlrpc($method, $xmlparams){
 		$msg = new XML_RPC_Message($method, $xmlparams);
-
+		$msg->setSendEncoding("ISO-8859-1");
 		$cli = new XML_RPC_Client('/xmlrpc', 'localhost:8089');
 
 		$resp = $cli->send($msg, 600);
@@ -137,7 +137,7 @@ class ReportGenerator {
 			$val = $resp->value();
 	    	$data = XML_RPC_decode($val);
 			if ($data != "success") {
-				error_log($method . " " .$data);
+				error_log($method . " " . print_r($data, true));
 			} else {
 				// success;
 				return $data;
