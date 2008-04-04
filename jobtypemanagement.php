@@ -85,7 +85,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 			}
 			if(CheckFormSubmit($f, "add"))
 				redirect("jobtypeaddition.php");
-			redirect("contactsettings.php");
+			redirect("settings.php");
 		}
 	}
 } else {
@@ -106,7 +106,7 @@ if($reloadform){
 }
 
 
-$PAGE = "admin:contactsettings";
+$PAGE = "admin:settings";
 $TITLE = "Job Type Manager";
 include_once("nav.inc.php");
 NewForm($f);

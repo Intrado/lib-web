@@ -185,7 +185,7 @@ if(CheckFormSubmit($f,$s))
 				}
 			}
 		}
-		
+
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -265,7 +265,7 @@ function displayValue($s) {
 // where did we come from, list preview or contact tab
 $PAGE = "notifications:lists";
 if (strpos($_SESSION['contact_referer'],"contacts.php") !== false) $PAGE = "system:contacts";
-if (strpos($_SESSION['contact_referer'],"activationcodemanager.php") !== false) $PAGE = "admin:contactsettings";
+if (strpos($_SESSION['contact_referer'],"activationcodemanager.php") !== false) $PAGE = "admin:settings";
 
 $contactFullName = "";
 $firstnamefield = FieldMap::getFirstNameField();
@@ -280,8 +280,8 @@ NewForm($f);
 if($method == "edit"){
 	buttons(submit($f, $s, "Done"));
 } else {
-	buttons(button("Done", null, $_SESSION['contact_referer']), 
-	
+	buttons(button("Done", null, $_SESSION['contact_referer']),
+
 		$USER->authorize('managecontactdetailsettings') ? button("Edit", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php'") : "");
 }
 
@@ -405,7 +405,7 @@ foreach ($fieldmaps as $map) {
 						} else {
 							NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled);
 						}
-					
+
 				}
 				?></td><?
 				foreach($jobtypes as $jobtype){

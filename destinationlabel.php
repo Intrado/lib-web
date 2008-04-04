@@ -93,13 +93,13 @@ if(CheckFormSubmit($f,$s))
 					if(changelabel){
 						location.href="destinationlabel.php?type=<?=$type?>";
 					} else {
-						location.href="contactsettings.php";
+						location.href="settings.php";
 					}
 				</script>
 				<?
 			} else {
 */
-				redirect("contactsettings.php");
+				redirect("settings.php");
 //			}
 		}
 	}
@@ -132,7 +132,7 @@ if($reloadform){
 ////////////////////////////////////////////////////////////////////////////////
 
 $TITLE="Destination Labels - " . format_delivery_type($type);
-$PAGE = "admin:contactsettings";
+$PAGE = "admin:settings";
 include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, "Done"));
