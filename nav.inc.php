@@ -95,7 +95,6 @@ $NAVTREE = array (
 		array("Users","users.php","manageaccount",$SUBTAB=="users"),
 		array("Security","profiles.php","manageprofile",$SUBTAB=="security"),
 		array("Settings","settings.php","managesystem",$SUBTAB=="settings"),
-		array("Contact Settings", "contactsettings.php", "managesystem", $SUBTAB=="contactsettings"),
 		array("Metadata","datamanager.php","metadata",$SUBTAB=="datamanager"),
 		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager")
 		))
