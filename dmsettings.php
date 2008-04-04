@@ -15,7 +15,7 @@ if(isset($_GET['dmid'])){
 	$dmid = $_SESSION['dmid'];
 }
 
-$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " order by phonematch");
+$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " order by phonematch desc");
 $newroute = new DMRoute();
 $newroute->id = "new";
 $routes[] = $newroute;
@@ -92,7 +92,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 						continue;
 					}
 
-					if($route->id=='new' && !GetFormData($f, $s, "dm_" . $route->id ."_default")){
+					if($route->id=='new' && !GetFormData($f, $s, "dm_" . $route->id ."_default") && GetFormData($f, $s, "dm_" . $route->id ."_phonematch") == ''){
 						continue;
 					}
 					$route->dmid = $dmid;
