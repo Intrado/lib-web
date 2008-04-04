@@ -161,3 +161,15 @@ ALTER TABLE `dmsetting` DROP `dmuuid`;
 ALTER TABLE `dmsetting` DROP PRIMARY KEY;
 ALTER TABLE `dmsetting` ADD `dmid` INT NOT NULL FIRST;
 ALTER TABLE `dmsetting` ADD PRIMARY KEY ( `dmid` , `name` );
+
+-- for system dms
+CREATE TABLE `dmroute` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `match` varchar(20) NOT NULL,
+  `strip` int(11) NOT NULL,
+  `prefix` varchar(20) NOT NULL,
+  `suffix` varchar(20) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `dmid` (`dmid`,`match`)
+) ENGINE=InnoDB ;
