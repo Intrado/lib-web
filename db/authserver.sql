@@ -160,4 +160,4 @@ ALTER TABLE `dm` ADD UNIQUE (`dmuuid`) ;
 ALTER TABLE `dmsetting` DROP `dmuuid`;
 ALTER TABLE `dmsetting` DROP PRIMARY KEY;
 ALTER TABLE `dmsetting` ADD `dmid` INT NOT NULL FIRST;
-ALTER TABLE `dmsetting` ADD PRIMARY KEY ( `id` , `name` );
+ALTER TABLE `dmsetting` ADD PRIMARY KEY ( `dmid` , `name` );
