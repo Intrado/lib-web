@@ -1339,3 +1339,15 @@ CREATE TABLE `custdm` (
   `enablestate` enum('new','active','disabled') NOT NULL,
   PRIMARY KEY  (`dmid`)
 ) ENGINE=InnoDB;
+
+
+CREATE TABLE `dmroute` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `match` varchar(20) NOT NULL,
+  `strip` int(11) NOT NULL,
+  `prefix` varchar(20) NOT NULL,
+  `suffix` varchar(20) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `dmid` (`dmid`,`match`)
+) ENGINE=InnoDB DEFAULT AUTO_INCREMENT=1 ;
