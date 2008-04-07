@@ -1351,5 +1351,3 @@ CREATE TABLE `dmroute` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `dmid` (`dmid`,`match`)
 ) ENGINE=InnoDB ;
-
-ALTER TABLE `dmroute` CHANGE `match` `phonematch` VARCHAR( 20 ) NOT NULL;
