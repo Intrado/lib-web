@@ -3,7 +3,7 @@
 class DMRoute extends DBMappedObject {
 
 	var $dmid;
-	var $phonematch = "";
+	var $match = "";
 	var $strip = 0;
 	var $prefix = "";
 	var $suffix = "";
@@ -11,7 +11,7 @@ class DMRoute extends DBMappedObject {
 	function DMRoute ($id = NULL) {
 		$this->_allownulls = false;
 		$this->_tablename = "dmroute";
-		$this->_fieldlist = array("dmid", "phonematch", "strip", "prefix", "suffix");
+		$this->_fieldlist = array("dmid", "match", "strip", "prefix", "suffix");
 		DBMappedObject::DBMappedObject($id);
 	}
 

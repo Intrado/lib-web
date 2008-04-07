@@ -15,7 +15,7 @@ if(isset($_GET['dmid'])){
 	$dmid = $_SESSION['dmid'];
 }
 
-$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " order by phonematch desc");
+$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " order by `match` desc");
 $newroute = new DMRoute();
 $newroute->id = "new";
 $routes[] = $newroute;
@@ -47,9 +47,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 
 		//do check
 		if(CheckFormSubmit($f, $s)){
-			SetRequired($f, $s, "dm_new_phonematch", !GetFormData($f, $s, "dm_new_default"));
+			SetRequired($f, $s, "dm_new_match", !GetFormData($f, $s, "dm_new_default"));
 		} else {
-			SetRequired($f, $s, "dm_new_phonematch", false);
+			SetRequired($f, $s, "dm_new_match", false);
 		}
 
 		if( CheckFormSection($f, $s) ) {
@@ -62,17 +62,17 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 			$duplicatedefaults = false;
 			foreach($routes as $route){
 
-				if(GetFormData($f, $s, "dm_" . $route->id ."_phonematch") != ''){
-					if(!isset($matches[GetFormData($f, $s, "dm_" . $route->id ."_phonematch")])){
-						$matches[GetFormData($f, $s, "dm_" . $route->id ."_phonematch")] = 1;
+				if(GetFormData($f, $s, "dm_" . $route->id ."_match") != ''){
+					if(!isset($matches[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
+						$matches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = 1;
 					} else {
-						$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_phonematch")] = true;
+						$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = true;
 					}
 				}
 				if($route->id != 'new'){
-					if(!$default && GetFormData($f, $s, "dm_" . $route->id ."_phonematch") == ''){
+					if(!$default && GetFormData($f, $s, "dm_" . $route->id ."_match") == ''){
 						$default = true;
-					} else if(GetFormData($f, $s, "dm_" . $route->id ."_phonematch") == ''){
+					} else if(GetFormData($f, $s, "dm_" . $route->id ."_match") == ''){
 						$duplicatedefaults = true;
 					}
 				}
@@ -92,11 +92,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 						continue;
 					}
 
-					if($route->id=='new' && !GetFormData($f, $s, "dm_" . $route->id ."_default") && GetFormData($f, $s, "dm_" . $route->id ."_phonematch") == ''){
+					if($route->id=='new' && !GetFormData($f, $s, "dm_" . $route->id ."_default") && GetFormData($f, $s, "dm_" . $route->id ."_match") == ''){
 						continue;
 					}
 					$route->dmid = $dmid;
-					$route->phonematch = GetFormData($f, $s, "dm_" . $route->id ."_phonematch");
+					$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
 					$route->strip = GetFormData($f, $s, "dm_" . $route->id ."_strip");
 					$route->prefix = GetFormData($f, $s, "dm_" . $route->id ."_prefix");
 					$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
@@ -122,7 +122,7 @@ if( $reloadform )
 	foreach($routes as $route){
 		if($route->id == 'new')
 			PutFormData($f, $s, "dm_" . $route->id ."_default", 0, "bool", 0, 1);
-		PutFormData($f, $s, "dm_" . $route->id ."_phonematch", $route->phonematch, "number");
+		PutFormData($f, $s, "dm_" . $route->id ."_match", $route->match, "number");
 		PutFormData($f, $s, "dm_" . $route->id ."_strip", $route->strip, "number", 0, 99);
 		PutFormData($f, $s, "dm_" . $route->id ."_prefix", $route->prefix, "number");
 		PutFormData($f, $s, "dm_" . $route->id ."_suffix", $route->suffix, "number");
@@ -131,13 +131,13 @@ if( $reloadform )
 
 function dm_default($obj, $name){
 	global $f, $s;
-	if($obj->phonematch == '' && $obj->id == 'new')
-		NewFormItem($f, $s, "dm_" . $obj->id ."_default", "checkbox", null, null, "id='dm_" . $obj->id . "_default' onclick='new getObj(\"dm_" . $obj->id . "_phonematch\").obj.disabled = this.checked' ");
+	if($obj->match == '' && $obj->id == 'new')
+		NewFormItem($f, $s, "dm_" . $obj->id ."_default", "checkbox", null, null, "id='dm_" . $obj->id . "_default' onclick='new getObj(\"dm_" . $obj->id . "_match\").obj.disabled = this.checked' ");
 }
 
-function dm_phonematch($obj, $name){
+function dm_match($obj, $name){
 	global $f, $s;
-	NewFormItem($f, $s, "dm_" . $obj->id ."_phonematch", "text", 10, 20, "id='dm_" . $obj->id . "_phonematch' ");
+	NewFormItem($f, $s, "dm_" . $obj->id ."_match", "text", 10, 20, "id='dm_" . $obj->id . "_match' ");
 }
 function dm_strip($obj, $name){
 	global $f, $s;
@@ -162,14 +162,14 @@ function dm_add($obj, $name){
 }
 
 $titles = array("default" => "Default",
-				"phonematch" => "Match",
+				"match" => "Match",
 				"strip" => "Strip",
 				"prefix" => "Prefix",
 				"suffix" => "Suffix",
 				"actions" => "Actions");
 
 $formatters = array("default" => "dm_default",
-					"phonematch" => "dm_phonematch",
+					"match" => "dm_match",
 					"strip" => "dm_strip",
 					"prefix" => "dm_prefix",
 					"suffix" => "dm_suffix",
@@ -194,5 +194,5 @@ EndForm();
 include_once("navbottom.inc.php");
 ?>
 <script>
-	new getObj('dm_new_phonematch').obj.disabled = new getObj('dm_new_default').obj.checked;
+	new getObj('dm_new_match').obj.disabled = new getObj('dm_new_default').obj.checked;
 </script>
