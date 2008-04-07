@@ -156,7 +156,7 @@ function dm_add($obj, $name){
 	if($obj->id == "new"){
 		$url = submit($f, $s, "Add");
 	} else {
-		$url = submit($f, "delete_dm_" .$obj->id, "Del");
+		$url = submit($f, "delete_dm_" .$obj->id, "Delete");
 	}
 	return $url;
 }
