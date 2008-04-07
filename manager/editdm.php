@@ -1,4 +1,27 @@
 <?
+/*
+	DM Settings Manager
+	List of settings:
+		// remote properties
+		 String dmType; // Test, Asterisk, Jtapi
+		 boolean dmEnabled;
+		 int resourceCount;
+		 int inboundCount;
+		 int callsPerSecond;
+		 String callerID;
+
+		// test voice
+		 boolean testDelay; // remote
+
+		// these are in jtapi.props, why are they here?
+		 String jtapi2cmIP; // (phase2) remote - write to jtapi config and restart
+		 String jtapi2cmUser; // remote - write to jtapi config and restart
+		 String jtapi2cmPass; // remote - write to jtapi config and restart
+
+
+
+*/
+
 include_once("common.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
@@ -60,11 +83,15 @@ if(CheckFormSubmit($f,$s))
 				QuickUpdate("insert into dmsetting (dmid, name, value) values
 							('" . DBSafe($dmid) . "', 'telco_calls_sec', '" . DBSafe(GetFormData($f, $s, 'telco_calls_sec')) . "'),
 							('" . DBSafe($dmid) . "', 'delmech_resource_count', '" . DBSafe(GetFormData($f, $s, 'delmech_resource_count')) . "'),
-							('" . DBSafe($dmid) . "', 'ast_channel', '" . DBSafe(GetFormData($f, $s, 'ast_channel')) . "'),
 							('" . DBSafe($dmid) . "', 'telco_dial_timeout', '" . DBSafe(GetFormData($f, $s, 'telco_dial_timeout')) . "'),
 							('" . DBSafe($dmid) . "', 'telco_caller_id', '" . Phone::parse($callerid) . "'),
 							('" . DBSafe($dmid) . "', 'telco_inboundtoken', '" . DBSafe(GetFormData($f, $s, 'telco_inboundtoken')) . "'),
-							('" . DBSafe($dmid) . "', 'telco_type', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "')
+							('" . DBSafe($dmid) . "', 'telco_type', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'),
+							('" . DBSafe($dmid) . "', 'dm_enabled', '" . DBSafe(GetFormData($f, $s, 'dm_enabled')) . "'),
+							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "'),
+							('" . DBSafe($dmid) . "', 'jtapi2cmIP', '" . DBSafe(GetFormData($f, $s, 'jtapi2cmIP')) . "'),
+							('" . DBSafe($dmid) . "', 'jtapi2cmUser', '" . DBSafe(GetFormData($f, $s, 'jtapi2cmUser')) . "'),
+							('" . DBSafe($dmid) . "', 'jtapi2cmPass', '" . DBSafe(GetFormData($f, $s, 'jtapi2cmPass')) . "')
 							");
 				$newcustomerid = GetFormData($f, $s, "customerid") +0;
 				if($newcustomerid == 0){
@@ -117,13 +144,21 @@ if( $reloadform )
 	PutFormData($f, $s, "managerpassword", "");
 	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "ast_channel", getDMSetting($dmid, "ast_channel"), "text", "nomin", "nomax", true);
+
 	PutFormData($f, $s, "telco_dial_timeout", getDMSetting($dmid, "telco_dial_timeout"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "telco_caller_id", Phone::format(getDMSetting($dmid, "telco_caller_id")), "phone", "10", "10", true);
 	PutFormData($f, $s, "telco_inboundtoken", getDMSetting($dmid, "telco_inboundtoken"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "enablestate", $dm['enablestate'], "array", $states, "nomax", true);
 	PutFormData($f, $s, "customerid", $dm['customerid'], "number");
 	PutFormData($f, $s, "telco_type", getDMSetting($dmid, "telco_type"), "array", $telco_types, "nomax", true);
+	PutFormData($f, $s, "dm_enabled", getDMSetting($dmid, "dm_enabled"), "bool", 0, 1);
+
+	PutFormData($f, $s, "test_has_delays", getDMSetting($dmid, "test_has_delays"), "bool", 0, 1);
+	PutFormData($f, $s, "jtapi2cmIP", getDMSetting($dmid, "jtapi2cmIP"), "text");
+	PutFormData($f, $s, "jtapi2cmUser", getDMSetting($dmid, "jtapi2cmUser"), "text");
+	PutFormData($f, $s, "jtapi2cmPass", getDMSetting($dmid, "jtapi2cmPass"), "text");
+
+
 }
 
 
@@ -139,8 +174,13 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <div>Settings for <?=$dm['name']?></div>
 <table>
 <?
-//String DELMECH_ENABLED = "dm_enabled"; // remote
+
 ?>
+	<tr>
+		<td>Enable DM: </td>
+		<td><? NewFormItem($f, $s, "dm_enabled", "checkbox"); ?></td>
+	</tr>
+
 	<tr>
 		<td>Customer ID: </td>
 		<td><? NewFormItem($f, $s, "customerid", "text", "5"); ?></td>
@@ -178,10 +218,6 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td><? NewFormItem($f, $s, "delmech_resource_count", "text", "5");?></td>
 	</tr>
 	<tr>
-		<td>Asterisk Channel:</td>
-		<td><? NewFormItem($f, $s, "ast_channel", "text", "30", "255");?></td>
-	</tr>
-	<tr>
 		<td>Dial Timeout</td>
 		<td><? NewFormItem($f, $s, "telco_dial_timeout", "text", "5");?></td>
 	</tr>
@@ -193,9 +229,23 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td>Inbound Resources:</td>
 		<td><? NewFormItem($f, $s, "telco_inboundtoken", "text", "5");?></td>
 	</tr>
-<?
-//String TEST_HAS_DELAYS = "test_delay"; //remote
-?>
+	<tr>
+		<td>Test Has Delays: </td>
+		<td><? NewFormItem($f, $s, "test_has_delays", "checkbox", null, null, "id='test_has_delays'"); ?></td>
+	</tr>
+	<tr>
+			<td>JTAPI CM IP: </td>
+			<td><? NewFormItem($f, $s, "jtapi2cmIP", "text", 20); ?></td>
+	</tr>
+	<tr>
+			<td>JTAPI CM User: </td>
+			<td><? NewFormItem($f, $s, "jtapi2cmUser", "text", 20, 50); ?></td>
+	</tr>
+	<tr>
+			<td>JTAPI CM Password: </td>
+			<td><? NewFormItem($f, $s, "jtapi2cmPass", "text", 20, 50); ?></td>
+	</tr>
+
 	<tr>
 		<td><? NewFormItem($f, $s, "Submit", "submit"); ?></td>
 	</tr>
