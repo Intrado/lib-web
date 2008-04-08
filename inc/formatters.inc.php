@@ -172,6 +172,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	$runrepeatbtn = '<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
 
 	$viewresponses = '<a href="replies.php?jobid=' . $id . '">Responses</a>';
+	$unarchivebtn = '<a href="jobs.php?unarchive=' . $id . '">Unarchive</a>';
 	switch ($status) {
 		case "new":
 		case "scheduled":
@@ -197,14 +198,19 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			else
 				$usedelbtn = $archivebtn;
 
-			if($USER->authorize('createreport') && $USER->authorize('leavemessage'))
-				$buttons = array($editbtn,$reportbtn,$graphbtn, $viewresponses, $usedelbtn);
-			else if($USER->authorize('leavemessage'))
-				$buttons = array($editbtn, $viewresponses, $usedelbtn);
-			else if ($USER->authorize('createreport'))
-				$buttons = array($editbtn,$reportbtn,$graphbtn,$usedelbtn);
-			else
-				$buttons = array($editbtn,$usedelbtn);
+			$buttons = array($editbtn);
+
+			if ($USER->authorize('createreport')){
+				$buttons[] = $reportbtn;
+				$buttons[] = $graphbtn;
+			}
+			if($USER->authorize('leavemessage'))
+				$buttons[] = $viewresponses;
+
+			if($deleted == 2)
+				$buttons[] = $unarchivebtn;
+
+			$buttons[] = $usedelbtn;
 			break;
 		case "repeating":
 			$buttons = array($editrepeatingbtn,$runrepeatbtn,$deletebtn);
@@ -546,4 +552,14 @@ function fmt_jobdetail_result($row, $index){
 		return fmt_result($row, $index);
 	}
 }
+
+function fmt_confirmation($row, $index){
+	if($row[$index]){
+		$text = "Yes";
+	} else {
+		$text = "No";
+	}
+	return $text;
+}
+
 ?>
