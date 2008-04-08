@@ -1351,3 +1351,5 @@ CREATE TABLE `dmroute` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `dmid` (`dmid`,`match`)
 ) ENGINE=InnoDB ;
+
+ALTER TABLE `destlabel` ADD `note` MEDIUMTEXT NULL ;
