@@ -14,7 +14,6 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 include_once("obj/ImportJob.obj.php");
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +73,18 @@ if (isset($_GET['archive'])) {
 		$job = new Job($archiveid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 2;
+			$job->update();
+		}
+	}
+	redirectToReferrer();
+}
+
+if (isset($_GET['unarchive'])) {
+	$unarchiveid = DBSafe($_GET['unarchive']);
+	if (userOwns("job",$unarchiveid) || (customerOwnsJob($unarchiveid) && $USER->authorize('managesystemjobs'))) {
+		$job = new Job($unarchiveid);
+		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
+			$job->deleted = 0;
 			$job->update();
 		}
 	}
