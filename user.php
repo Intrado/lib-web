@@ -263,7 +263,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 				$reloadform = 1;
 			} else {
 				ClearFormData($f);
-				redirect('users.php');
+				redirect('users.php#viewrecent');
 			}
 		}
 	}

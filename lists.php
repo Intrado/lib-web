@@ -63,13 +63,13 @@ $titles = array(	"name" => "#List Name",
 					);
 
 
-startWindow('My Lists&nbsp;' . help('Lists_MyLists'), 'padding: 3px;');
+startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 
 button_bar(button('Create New List', NULL,"list.php?id=new") . help('Lists_AddList'));
 
 
 
-showObjects($data, $titles,array("Actions" => "fmt_actions", "lastused" => "fmt_obj_date"), count($data) > 10,  true);
+showObjects($data, $titles,array("Actions" => "fmt_actions", "lastused" => "fmt_obj_date"), false,  true);
 endWindow();
 
 

@@ -68,7 +68,11 @@ if (isset($_GET['enable'])) {
 
 function fmt_actions_en ($obj,$name) {
 	global $USER;
-	return '<a href="user.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
+
+	$activeuseranchor = $_SESSION['userid'] == $obj->id ? '<a name="viewrecent">' : '';
+
+
+	return $activeuseranchor . '<a href="user.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
 		. ($obj->enabled ? '<a href="./?login=' . $obj->login . '">Login&nbsp;as&nbsp;this&nbsp;user</a>' : NULL)
 		. ($obj->id == $USER->id ? "" : '&nbsp;|&nbsp;<a href="?disable=' . $obj->id . '">Disable</a>&nbsp;');
 }
@@ -113,7 +117,7 @@ $titles = array(	"firstname" => "#First Name",
 
 
 
-startWindow('Active Users ' . help('Users_ActiveUsersList'));
+startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 
 button_bar(button('Add New User', NULL,"user.php?id=new") . help('Users_UserAdd'));
 
@@ -125,12 +129,12 @@ else
 	$data = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");
 /*CSDELETEMARKER_END*/
 
-showObjects($data, $titles, array("Actions" => "fmt_actions_en", 'AccessProfile' => 'fmt_acc_profile', "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
+showObjects($data, $titles, array("Actions" => "fmt_actions_en", 'AccessProfile' => 'fmt_acc_profile', "lastlogin" => "fmt_obj_date"), false, true);
 endWindow();
 
 print '<br>';
 
-startWindow('Inactive Users ' . help('Users_InactiveUsersList'));
+startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
 $data = DBFindMany("User","from user where not enabled and deleted=0 order by lastname, firstname");
 showObjects($data, $titles, array('AccessProfile' => 'fmt_acc_profile', "Actions" => "fmt_actions_dis", "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
 endWindow();
