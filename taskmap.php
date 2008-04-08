@@ -228,6 +228,8 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'add') || CheckFormSubmit($f,
 				$count++;
 			}
 
+			$import->notes = GetFormData($f, $s, "notes");
+			$import->update();
 			if (CheckFormSubmit($f, $s))
 				redirect("tasks.php");
 			else
@@ -268,6 +270,7 @@ if ($reloadform) {
 		PutFormData($f,$s,"mapfrom_$count",$importfield->mapfrom, "array",$mapfromcols);
 		$count++;
 	}
+	PutFormData($f, $s, "notes", $import->notes, "text");
 }
 
 
@@ -289,18 +292,28 @@ if ($noimportdata) { ?>
 <? } else { ?>
 
 <div class="hoverlinks" style="margin: 5px;">
-Preview rows:
-<select onchange="if(confirm('Warning: changing the number of preview rows will undo any changes made on the page.\nClick cancel if you need to save your changes.')) {location.href='?previewrows=' + this.value;}">
+<table>
+	<tr>
+		<td>Notes:</td>
+		<td><? NewFormItem($f, $s, "notes", "textarea", 60, 3) ?></td>
+	</tr>
+	<tr>
+		<td>Preview rows:</td>
+		<td>
+		<select onchange="if(confirm('Warning: changing the number of preview rows will undo any changes made on the page.\nClick cancel if you need to save your changes.')) {location.href='?previewrows=' + this.value;}">
 
-<option value="1" <?= 1 == $_SESSION['importviewrows'] ? "selected" : "" ?>>1</option>
-<?
-	for ($x = 5; $x <= 50; $x += 5) {
-?>
-		<option value="<?=$x?>" <?= $x == $_SESSION['importviewrows'] ? "selected" : "" ?>><?=$x?></option>
-<?
-	}
-?>
-</select>
+		<option value="1" <?= 1 == $_SESSION['importviewrows'] ? "selected" : "" ?>>1</option>
+		<?
+			for ($x = 5; $x <= 50; $x += 5) {
+		?>
+				<option value="<?=$x?>" <?= $x == $_SESSION['importviewrows'] ? "selected" : "" ?>><?=$x?></option>
+		<?
+			}
+		?>
+		</select>
+		<td>
+	</tr>
+</table>
 <br>
 <a style="display:none"id="editmappinglink" href="#" onclick="hide('viewdata'); show('datamapping'); hide('editmappinglink'); show('viewdatalink'); return undefined;">Switch to Mapping Editor</a>
 <a id="viewdatalink" href="#" onclick="hide('datamapping'); show('viewdata'); show('editmappinglink'); hide('viewdatalink'); return undefined;">Switch to Data View</a>
