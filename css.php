@@ -362,23 +362,7 @@ a:hover {
 	padding: 0;
 }
 
-
-
-/* **** hover help **** */
-
-
 /* *********************************************** */
-
-
-
-
-
-/* *********************************************** */
-
-
-
-
-
 
 
 /* general styles */
@@ -494,22 +478,3 @@ div.scrollTableContainer {
 .helpclick {
 	cursor: help;
 }
-
-
-/*
-
-
-	blue, logo & cust name color, window color #346799
-
-	dark gray, text on light gray background #595959
-
-	light gray, light background, highlight #E5E5E5
-
-	dark blue #365F8D
-	light blue #D4DDE2
-	shaded cell #E8E8E8
-	border #cccccc
-
-	selected blue #0E3293
-
-*/
