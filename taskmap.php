@@ -302,8 +302,8 @@ Preview rows:
 ?>
 </select>
 <br>
-<a href="#" onclick="hide('viewdata'); show('datamapping'); return undefined;">Edit Mapping</a> |
-<a href="#" onclick="hide('datamapping'); show('viewdata'); return undefined;">View Data</a>
+<a style="display:none"id="editmappinglink" href="#" onclick="hide('viewdata'); show('datamapping'); hide('editmappinglink'); show('viewdatalink'); return undefined;">Switch to Mapping Editor</a>
+<a id="viewdatalink" href="#" onclick="hide('datamapping'); show('viewdata'); show('editmappinglink'); hide('viewdatalink'); return undefined;">Switch to Data View</a>
 </div>
 
 <div id="datamapping">
