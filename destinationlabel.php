@@ -80,8 +80,8 @@ if(CheckFormSubmit($f,$s))
 				if(ereg("[0-9\)\(]+", $label) || strripos($label,"phone") || strripos($label, "email") || strripos($label, "sms")){
 					$warning = true;
 				}
-				QuickUpdate("insert into destlabel (type, sequence, label, note) values
-								('" . DBSafe($type) . "', '" . $i . "', '" . DBSafe($label) . "', '" . DBSafe(GetFormData($f, $s, $type . $i . "note")) . "')");
+				QuickUpdate("insert into destlabel (type, sequence, label, notes) values
+								('" . DBSafe($type) . "', '" . $i . "', '" . DBSafe($label) . "', '" . DBSafe(GetFormData($f, $s, $type . $i . "notes")) . "')");
 			}
 			QuickUpdate("commit");
 
@@ -118,8 +118,8 @@ if($reloadform){
 			PutFormData($f, $s, $type . $i, "other", "text");
 			PutFormData($f, $s, $type . $i . "other", $label, "text");
 		}
-		$note = QuickQuery("select note from destlabel where type = '" . $type . "' and sequence = " . $i);
-		PutFormData($f, $s, $type . $i . "note", $note, "text");
+		$notes = QuickQuery("select notes from destlabel where type = '" . $type . "' and sequence = " . $i);
+		PutFormData($f, $s, $type . $i . "notes", $notes, "text");
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ startWindow("Labels" . help($hoverHelpLinkType));
 				<div id="otherlabel<?=$i?>" style="<?=$display?>"><? NewFormItem($f, $s, $type . $i . "other", "text", 20, 20) ?></div>
 			</td>
 			<td>
-				<? NewFormItem($f, $s, $type . $i . "note", "textarea", 40, 2) ?>
+				<? NewFormItem($f, $s, $type . $i . "notes", "textarea", 40, 2) ?>
 			</td>
 		</tr>
 <?
