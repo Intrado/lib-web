@@ -239,6 +239,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if ($USER->authorize("leavemessage"))
 					$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
 
+				$job->setOption("messageconfirmation", GetFormData($f, $s, "messageconfirmation"));
+
 			}
 			if(!$completedmode){
 
@@ -350,6 +352,8 @@ if( $reloadform )
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "text", 0, 20);
 
 	PutFormData($f,$s,"leavemessage",$job->isOption("leavemessage"), "bool", 0, 1);
+	PutFormData($f,$s,"messageconfirmation",$job->isOption("messageconfirmation"), "bool", 0, 1);
+
 	if ($JOBTYPE == "repeating") {
 		$schedule = new Schedule($job->scheduleid);
 
@@ -761,6 +765,10 @@ startWindow('Job Information');
 							<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
 						</tr>
 					<? } ?>
+					<tr>
+						<td> Allow message confirmation by recipients <?= help('Jobs_MessageConfirmation', NULL, 'small') ?> </td>
+						<td> <? NewFormItem($f, $s, "messageconfirmation", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Request Message Confirmation </td>
+					</tr>
 
 				</table>
 			</div>

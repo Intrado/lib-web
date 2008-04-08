@@ -76,7 +76,7 @@ if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime
 if($jobtype->systempriority == 1){
 	error("WARNING:  Emergency Notifications are reserved for situations that are time-critical and require action such as school closures and temporary changes to transportation schedules or that have immediate, severe or likely impact on safety");
 }
-	
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 
@@ -242,10 +242,14 @@ startWindow("Confirmation &amp; Submit");
 <? if($USER->authorize('leavemessage')) { ?>
 
 					<tr>
-						<td> Allow call recipients to leave a message</td>
-						<td><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Accept Voice Responses</td>
+						<td class="bottomBorder" > Allow call recipients to leave a message</td>
+						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Accept Voice Responses</td>
 					</tr>
 <? } ?>
+					<tr>
+						<td>Allow message confirmation by recipients</td>
+						<td><input type="checkbox" disabled <?= $job->isOption("messageconfirmation") ? "checked":"" ?>>Request Message Confirmation</td>
+					</tr>
 
 			</table>
 		</td>
