@@ -119,7 +119,7 @@ if($reloadform){
 			PutFormData($f, $s, $type . $i . "other", $label, "text");
 		}
 		$notes = QuickQuery("select notes from destlabel where type = '" . $type . "' and sequence = " . $i);
-		PutFormData($f, $s, $type . $i . "notes", $notes, "text");
+		PutFormData($f, $s, $type . $i . "notes", $notes, "text", 0, 255);
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ startWindow("Labels" . help($hoverHelpLinkType));
 				<div id="otherlabel<?=$i?>" style="<?=$display?>"><? NewFormItem($f, $s, $type . $i . "other", "text", 20, 20) ?></div>
 			</td>
 			<td>
-				<? NewFormItem($f, $s, $type . $i . "notes", "textarea", 40, 2) ?>
+				<? NewFormItem($f, $s, $type . $i . "notes", "text", 40, 255) ?>
 			</td>
 		</tr>
 <?
