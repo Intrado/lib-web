@@ -95,6 +95,8 @@ if(CheckFormSubmit($form, $section))
 				$IMPORT->ownertype = 'system';
 
 				$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
+
+				$IMPORT->notes = GetFormData($form, $section, 'notes');
 				$IMPORT->update();
 
 				$checked = GetFormData($form, $section, 'trigger_checkbox');
@@ -154,6 +156,7 @@ if( $reloadform )
 	if(count($associatedjobids))
 		$checked = true;
 	PutFormData($form, $section, 'trigger_checkbox', (bool)$checked,"bool",0,1);
+	PutFormData($form, $section, 'notes', $IMPORT->notes, "text");
 }
 
 
@@ -184,6 +187,10 @@ startWindow('Import Information ');
 				<tr>
 					<td>Description:</td>
 					<td><? NewFormItem($form, $section,"description","text", 50); ?></td>
+				</tr>
+				<tr>
+					<td>Notes:</td>
+					<td><? NewFormItem($form, $section,"notes","textarea", 60, 3); ?></td>
 				</tr>
 				<tr>
 					<td>Update Method:</td>
