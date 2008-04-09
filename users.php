@@ -69,7 +69,7 @@ if (isset($_GET['enable'])) {
 function fmt_actions_en ($obj,$name) {
 	global $USER;
 
-	$activeuseranchor = $_SESSION['userid'] == $obj->id ? '<a name="viewrecent">' : '';
+	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $obj->id) ? '<a name="viewrecent">' : '';
 
 
 	return $activeuseranchor . '<a href="user.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
