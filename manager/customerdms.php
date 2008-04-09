@@ -29,14 +29,14 @@ $titles = array(0 => "DM ID",
 				6 => "State",
 				"actions" => "Actions");
 
-$formatters = array(2 => "customerUrl",
-					"actions" => "editLink",
+$formatters = array(2 => "fmt_customerUrl",
+					"actions" => "fmt_editLink",
 					7 => "fmt_ms_timestamp");
 
 
 //index 2 is customer id
 //index 1 is customer url
-function customerUrl($row, $index){
+function fmt_customerUrl($row, $index){
 	$url = "";
 	if($row[2])
 		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" >" . $row[2] . "</a>";
@@ -44,7 +44,7 @@ function customerUrl($row, $index){
 }
 
 // index 1 is dmid
-function editLink($row, $index){
+function fmt_editLink($row, $index){
 	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>';
 	return $url;
 }
