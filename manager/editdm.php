@@ -76,6 +76,8 @@ if(CheckFormSubmit($f,$s))
 				error('Invalid Customer ID');
 			} else if (!QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
 				error('Invalid Customer ID');
+			} else if (GetFormData($f, $s, "telco_inboundtoken") > GetFormData($f, $s, "delmech_resource_count")){
+				error('Number of inbound tokens cannot exceed the max number of resources');
 			} else {
 				QuickUpdate("Begin");
 				QuickUpdate("delete from dmsetting where dmid = '" . DBSafe($dmid) . "'");
@@ -210,20 +212,20 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		</td>
 	</tr>
 	<tr>
-		<td>Calls per Second: </td>
-		<td><? NewFormItem($f, $s, "telco_calls_sec", "text", "5");?></td>
+		<td>Caller ID:</td>
+		<td><? NewFormItem($f, $s, "telco_caller_id", "text", "14");?></td>
 	</tr>
 	<tr>
-		<td># of Resources:</td>
-		<td><? NewFormItem($f, $s, "delmech_resource_count", "text", "5");?></td>
+		<td>Calls per Second: </td>
+		<td><? NewFormItem($f, $s, "telco_calls_sec", "text", "5");?></td>
 	</tr>
 	<tr>
 		<td>Dial Timeout</td>
 		<td><? NewFormItem($f, $s, "telco_dial_timeout", "text", "5");?></td>
 	</tr>
 	<tr>
-		<td>Caller ID:</td>
-		<td><? NewFormItem($f, $s, "telco_caller_id", "text", "14");?></td>
+		<td># of Resources:</td>
+		<td><? NewFormItem($f, $s, "delmech_resource_count", "text", "5");?></td>
 	</tr>
 	<tr>
 		<td>Inbound Resources:</td>
