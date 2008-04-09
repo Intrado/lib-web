@@ -254,6 +254,18 @@ function getCustomerData($url){
 	return false;
 }
 
+function auth_resetDM($dmid){
+	$params =  array(new XML_RPC_Value($dmid, 'int'));
+	$method = "AuthServer.resetDM";
+	$result = pearxmlrpc($method, $params);
+	if($result !== false) {
+		if($result['result'] == ""){
+			return true;
+		}
+	}
+	return false;
+}
+
 ////////// parent portal methods
 
 function getPortalUsers($portaluserids) {
