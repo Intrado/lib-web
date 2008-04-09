@@ -190,7 +190,11 @@ endWindow();
 buttons();
 
 EndForm();
-
+?>
+<div style="margin: 5px;">
+	<img src="img/bug_lightbulb.gif" > Please remember to reset the DM if you've made any changes
+</div>
+<?
 include_once("navbottom.inc.php");
 ?>
 <script>
