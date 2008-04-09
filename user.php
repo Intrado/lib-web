@@ -33,7 +33,7 @@ if (isset($_GET['clearrules'])) {
 }
 
 /*CSDELETEMARKER_START*/
-if(isset($_GET['id'])){
+if(!$IS_COMMSUITE && isset($_GET['id'])){
 	$id = $_GET['id']+0;
 	if(QuickQuery("select count(*) from user where login = 'schoolmessenger' and id = '$id'")){
 		redirect('unauthorized.php');
