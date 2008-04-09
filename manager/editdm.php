@@ -43,7 +43,7 @@ $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $states = array("new", "disabled", "active");
 $telco_types = array("Test", "Asterisk", "Jtapi");
-$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type from dm where id = '" . DBSafe($dmid) . "'", true);
+$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip from dm where id = '" . DBSafe($dmid) . "'", true);
 
 $f = "dmedit";
 $s = "main";
@@ -103,6 +103,9 @@ if(CheckFormSubmit($f,$s))
 							customerid = " . $newcustomerid . ",
 							enablestate = '" . DBSafe(GetFormData($f, $s, "enablestate")) . "'
 							where id = '" . DBSafe($dmid) . "'");
+				if(!$dm['authorizedip'] && GetFormData($f, $s, 'enablestate') == "active"){
+					QuickUpdate("update dm set authorizedip = '" . $dm['lastip'] . "'");
+				}
 				//refresh the dm array
 				//$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type from dm where id = '" . DBSafe($dmid) . "'", true);
 
