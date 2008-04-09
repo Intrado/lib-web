@@ -173,3 +173,5 @@ CREATE TABLE `dmroute` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `dmid` (`dmid`,`match`)
 ) ENGINE=InnoDB ;
+
+ALTER TABLE `dm` ADD `command` VARCHAR( 255 ) NULL ;
