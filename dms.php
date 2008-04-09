@@ -11,18 +11,26 @@ if (!$USER->authorize('managesystem')) {
 if(isset($_GET['resetdm'])){
 	$resetid = $_GET['resetdm']+0;
 	if(auth_resetDM($resetid)){
+		QuickUpdate("update custdm set routechange = null where dmid = " . $resetid);
 		redirect();
 	} else {
 		error("Something happened when trying to reset a DM", "Please try again later");
 	}
 }
 
-$result = Query("select dmid, name from custdm where enablestate = 'active' order by dmid");
+$result = Query("select dmid, name, routechange from custdm where enablestate = 'active' order by dmid");
 $data = array();
+$resetrequired = array();
 while($row = DBGetRow($result)){
 	$data[] = $row;
+	if($row[2]){
+		$resetrequired[] = $row[1];
+	}
 }
 
+if(count($resetrequired)){
+	error("The following DM's have had their route plans changed without being reset", $resetrequired);
+}
 
 // index 0 is dmid
 function fmt_editDMRoute($row, $index){
