@@ -95,6 +95,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 					if($route->id=='new' && !GetFormData($f, $s, "dm_" . $route->id ."_default") && GetFormData($f, $s, "dm_" . $route->id ."_match") == ''){
 						continue;
 					}
+					if(
+						$route->match != GetFormData($f, $s, "dm_" . $route->id ."_match")
+						|| $route->strip != GetFormData($f, $s, "dm_" . $route->id ."_strip")
+						|| $route->prefix != GetFormData($f, $s, "dm_" . $route->id ."_prefix")
+						|| $route->suffix != GetFormData($f, $s, "dm_" . $route->id ."_suffix")
+					){
+						QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+
+					}
 					$route->dmid = $dmid;
 					$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
 					$route->strip = GetFormData($f, $s, "dm_" . $route->id ."_strip");
@@ -102,8 +111,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 					$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
 					if($route->id == "new"){
 						$route->create();
+					} else {
+						$route->update();
 					}
-					$route->update();
 				}
 
 				if(CheckFormSubmit($f,"done"))
