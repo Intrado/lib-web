@@ -1355,3 +1355,4 @@ CREATE TABLE `dmroute` (
 ALTER TABLE `destlabel` ADD `notes` TEXT NULL ;
 ALTER TABLE `import` ADD `notes` TEXT NULL AFTER `description` ;
 ALTER TABLE `destlabel` CHANGE `notes` `notes` VARCHAR( 255 ) NULL;
+ALTER TABLE `custdm` ADD `routechange` INT NULL ;
