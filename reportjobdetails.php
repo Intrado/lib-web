@@ -135,7 +135,7 @@ $activefields = array();
 foreach($fields as $field){
 	// used in pdf,csv
 	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
-		$activefields[] = $field->fieldnum; 
+		$activefields[] = $field->fieldnum;
 	}
 }
 $options['activefields'] = implode(",",$activefields);
@@ -154,7 +154,7 @@ if(isset($options['jobid'])){
 }
 
 if(isset($jobid)){
-	$job = new Job($jobid);	
+	$job = new Job($jobid);
 }
 
 $_SESSION['report']['options'] = $options;
@@ -204,9 +204,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 				$options['hideinprogress'] = "false";
 			for($i=1; $i<=$ordercount; $i++){
 				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
-			}		
+			}
 			$_SESSION['report']['options']= $options;
-			
+
 			if(CheckFormSubmit($f, "save")){
 				$_SESSION['report']['edit'] = 1;
 				ClearFormData($f);
@@ -239,7 +239,7 @@ if($reload){
 	$hideinprog = 0;
 	if(isset($options['hideinprogress']) && $options['hideinprogress'] == 'true')
 		$hideinprog = 1;
-	
+
 	PutFormData($f, $s, "hideinprogress", $hideinprog, "bool", "0", "1");
 
 }
@@ -258,11 +258,11 @@ if($reportgenerator->format != "html"){
 		} else {
 			$name = secure_tmpname("report", ".pdf");
 			$params = createPdfParams($name);
-	
+
 			header("Pragma: private");
 			header("Cache-Control: private");
 			header("Content-disposition: attachment; filename=report.pdf");
-			header("Content-type: application/pdf");	
+			header("Content-type: application/pdf");
 			session_write_close();
 			$reportgenerator->generate($params);
 			@readfile($name);
@@ -301,10 +301,10 @@ if($error || $reportgenerator->format == "html"){
 		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
 		$DESCRIPTION = "From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
 	}
-	
+
 	include_once("nav.inc.php");
 	NewForm($f);
-	
+
 	//check to see if referer came from summary page.  if so, go to history instead of referer
 	if(isset($_SESSION['report']['jobdetail']) || $error || $submit || $pagestartflag)
 		$back = button("Back", "window.history.go(-1)");
@@ -318,8 +318,8 @@ if($error || $reportgenerator->format == "html"){
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 			<td class="bottomBorder">
-	<? 		
-				select_metadata('reportdetailstable', 10, $fields);
+	<?
+				select_metadata('reportdetailstable', 11, $fields);
 	?>
 			</td>
 		</tr>
@@ -347,7 +347,7 @@ if($error || $reportgenerator->format == "html"){
 	?>
 	<br>
 	<?
-	
+
 	if(isset($reportgenerator)){
 		$reportgenerator->runHtml();
 	}
