@@ -46,6 +46,7 @@ $formatters = array("actions" => "fmt_editDMRoute");
 $PAGE="admin:settings";
 $TITLE="DM's";
 include_once("nav.inc.php");
+buttons(button("Back", null, "settings.php"));
 startWindow("DM's");
 ?>
 <table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
@@ -55,5 +56,6 @@ startWindow("DM's");
 </table>
 <?
 endWindow();
+buttons();
 include_once("navbottom.inc.php");
 ?>
