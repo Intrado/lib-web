@@ -285,7 +285,13 @@ class JobSummaryReport extends ReportGenerator{
 											<th>No Phone #</th>
 											<th>No Phone Selected</th>
 											<th>Total Attempts</th>
-											<th>Confirmed</th>
+<?
+											if(QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
+?>
+												<th>Confirmed</th>
+<?
+											}
+?>
 										</tr>
 										<tr>
 											<td><?=$phonenumberinfo[0]+0?></td>
@@ -296,7 +302,13 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=$phonenumberinfo[5]+0?></td>
 											<td><?=$phonenumberinfo[7]+0?></td>
 											<td><?=$phonenumberinfo[6]+0?></td>
-											<td><?=$phonenumberinfo[8]+0?></td>
+<?
+											if(QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
+?>
+												<td><?=$phonenumberinfo[8]+0?></td>
+<?
+											}
+?>
 
 										</tr>
 									</table>
@@ -375,11 +387,13 @@ class JobSummaryReport extends ReportGenerator{
 			$joblist=explode("','", $this->params['joblist']);
 
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$messageconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange,
-						"hassms" => $sms);
+						"hassms" => $sms,
+						"messageconfirmation" => $messageconfirmation);
 		return $params;
 	}
 
