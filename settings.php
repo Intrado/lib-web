@@ -30,7 +30,7 @@ startWindow("Options", 'padding: 3px;');
 	<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
 		<tr class="listHeader">
 			<th align="left" class="nosort">System</th>
-			<th align="left" class="nosort">Job Types</th>
+			<th align="left" class="nosort">Job</th>
 			<th align="left" class="nosort">Destination Labels</th>
 <?
 			if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
@@ -40,27 +40,23 @@ startWindow("Options", 'padding: 3px;');
 			}
 ?>
 		</tr>
-		<tr align="left" valign="bottom">
+		<tr align="left" valign="top">
 			<td>
 				<table>
-					<tr><td><a href='systemwidesettings.php'>Systemwide Settings</a></td></tr>
+					<tr><td><a href='displaysettings.php'>Display Settings</a></td></tr>
+					<tr><td><a href='securitysettings.php'>Security Settings</a></td></tr>
 					<tr><td><a href='dms.php'>DM's</a></td></tr>
-<? if(getSystemSetting('_hassms', false)){ ?>
-					<tr><td>&nbsp;</td></tr>
-<? } ?>
 				</table>
 			</td>
 			<td>
 				<table>
+					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
 					<tr><td><a href='jobtypemanagement.php'>Edit Job Types</a></td></tr>
 					<tr><td><a href='jobtypeaddition.php'>Create New Job Type</a></td></tr>
-<? if(getSystemSetting('_hassms', false)){ ?>
-					<tr><td>&nbsp;</td></tr>
-<? } ?>
 				</table>
 			</td>
 			<td>
-				<table>
+				<div style="float:left"				<table>
 					<tr><td><a href='destinationlabel.php?type=phone'>Edit Phone Labels</a></td></tr>
 					<tr><td><a href='destinationlabel.php?type=email'>Edit Email Labels</a></td></tr>
 <? if(getSystemSetting('_hassms', false)){ ?>
@@ -73,11 +69,8 @@ startWindow("Options", 'padding: 3px;');
 ?>
 			<td>
 				<table>
+					<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
 					<tr><td><a href='activationcodemanager.php?clear=1'>Manage Activation Codes</a></td></tr>
-					<tr><td>&nbsp;</td></tr>
-<? if(getSystemSetting('_hassms', false)){ ?>
-					<tr><td>&nbsp;</td></tr>
-<? } ?>
 				</table>
 			</td>
 <?
