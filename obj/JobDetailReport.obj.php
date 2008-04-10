@@ -98,7 +98,8 @@ class JobDetailReport extends ReportGenerator{
 			rp.status,
 			rc.numattempts as numattempts,
 			rc.resultdata,
-			sw.resultdata
+			sw.resultdata,
+			rc.participated as confirmed
 			$fieldquery
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
@@ -223,12 +224,18 @@ class JobDetailReport extends ReportGenerator{
 						11 => "Attempts",
 						8 => "Last Attempt",
 						9 => "Last Result");
-		$titles = appendFieldTitles($titles, 13, $fieldlist, $activefields);
+		if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
+			$titles[14] = "Confirmed";
+		} else {
+			$titles[14] = "@Confirmed";
+		}
+		$titles = appendFieldTitles($titles, 14, $fieldlist, $activefields);
 
 		$formatters = array(5 => "fmt_delivery_type_list",
 							7 => "fmt_destination",
 							8 => "fmt_date",
-							9 => "fmt_jobdetail_result");
+							9 => "fmt_jobdetail_result",
+							14 => "fmt_confirmation");
 		showTable($data,$titles,$formatters);
 		echo "</table>";
 		showPageMenu($total,$pagestart,500);
@@ -239,7 +246,6 @@ class JobDetailReport extends ReportGenerator{
 			var reportdetailstable = new getObj("reportdetails").obj;
 		</script>
 		<?
-
 	}
 
 	function runCSV(){
@@ -290,6 +296,9 @@ class JobDetailReport extends ReportGenerator{
 		$activefields = array_flip($activefields);
 		//generate the CSV header
 		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Deliver by","Destination","Attempts","Last Attempt","Last Result"';
+		if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
+			$header .= ',"Confirmed"';
+		}
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header .= ',"' . $fieldname . '"';
@@ -325,11 +334,14 @@ class JobDetailReport extends ReportGenerator{
 
 			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],format_delivery_type($row[5]),$row[7],$row[11],$row[8],$row[9]);
 
+			if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
+				$reportarray[] = fmt_confirmation($row, 14);
+			}
 			//index 13 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
 					$num = $fieldindex[$fieldnum];
-					$reportarray[] = $row[13+$num];
+					$reportarray[] = $row[14+$num];
 				}
 			}
 			if ($issurvey) {
@@ -367,11 +379,13 @@ class JobDetailReport extends ReportGenerator{
 			$joblist=explode("','", $this->params['joblist']);
 
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$messageconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange,
-						"hassms" => $sms);
+						"hassms" => $sms,
+						"messageconfirmation" => $messageconfirmation);
 		return $params;
 	}
 
@@ -388,6 +402,7 @@ class JobDetailReport extends ReportGenerator{
 		$ordering["Attempts"] = "numattempts";
 		$ordering["Last Attempt"]="lastattempt";
 		$ordering["Last Result"]="result";
+		$ordering["Confirmed"]="confirmed";
 
 
 		foreach($fields as $field){
