@@ -88,7 +88,8 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rc.numattempts) as totalattempts,
-									sum(rp.status = 'declined' and rc.result is null) as declined
+									sum(rp.status = 'declined' and rc.result is null) as declined,
+									sum(rc.participated) as confirmed
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									inner join job j on (j.id = rp.jobid)
@@ -284,6 +285,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>No Phone #</th>
 											<th>No Phone Selected</th>
 											<th>Total Attempts</th>
+											<th>Confirmed</th>
 										</tr>
 										<tr>
 											<td><?=$phonenumberinfo[0]+0?></td>
@@ -294,6 +296,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=$phonenumberinfo[5]+0?></td>
 											<td><?=$phonenumberinfo[7]+0?></td>
 											<td><?=$phonenumberinfo[6]+0?></td>
+											<td><?=$phonenumberinfo[8]+0?></td>
 
 										</tr>
 									</table>

@@ -59,7 +59,8 @@ class JobAutoReport extends ReportGenerator{
 			j.name as jobname,
 			rc.numattempts as attempts,
 			rc.resultdata,
-			sw.resultdata
+			sw.resultdata,
+			rc.participated as confirmed
 			$fieldquery
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
@@ -85,9 +86,11 @@ class JobAutoReport extends ReportGenerator{
 
 	function getReportSpecificParams(){
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$messageconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 		$params = array("jobId" => $this->params['jobid'],
 						"jobcount" => "1",
-						"hassms" => $sms);
+						"hassms" => $sms,
+						"messageconfirmation" => $messageconfirmation);
 		return $params;
 	}
 }
