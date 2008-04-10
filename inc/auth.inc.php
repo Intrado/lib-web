@@ -255,7 +255,8 @@ function getCustomerData($url){
 }
 
 function auth_resetDM($dmid){
-	$params =  array(new XML_RPC_Value($dmid, 'int'));
+	$sessionid = session_id();
+	$params =  array(new XML_RPC_Value($dmid, 'int'), new XML_RPC_Value($sessionid, 'string'));
 	$method = "AuthServer.resetDM";
 	$result = pearxmlrpc($method, $params);
 	if($result !== false) {
