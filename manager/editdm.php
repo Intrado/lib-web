@@ -90,10 +90,7 @@ if(CheckFormSubmit($f,$s))
 							('" . DBSafe($dmid) . "', 'telco_inboundtoken', '" . DBSafe(GetFormData($f, $s, 'telco_inboundtoken')) . "'),
 							('" . DBSafe($dmid) . "', 'telco_type', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'),
 							('" . DBSafe($dmid) . "', 'dm_enabled', '" . DBSafe(GetFormData($f, $s, 'dm_enabled')) . "'),
-							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "'),
-							('" . DBSafe($dmid) . "', 'jtapi2cmIP', '" . DBSafe(GetFormData($f, $s, 'jtapi2cmIP')) . "'),
-							('" . DBSafe($dmid) . "', 'jtapi2cmUser', '" . DBSafe(GetFormData($f, $s, 'jtapi2cmUser')) . "'),
-							('" . DBSafe($dmid) . "', 'jtapi2cmPass', '" . DBSafe(GetFormData($f, $s, 'jtapi2cmPass')) . "')
+							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "')
 							");
 				$newcustomerid = GetFormData($f, $s, "customerid") +0;
 				if($newcustomerid == 0){
@@ -159,10 +156,6 @@ if( $reloadform )
 	PutFormData($f, $s, "dm_enabled", getDMSetting($dmid, "dm_enabled"), "bool", 0, 1);
 
 	PutFormData($f, $s, "test_has_delays", getDMSetting($dmid, "test_has_delays"), "bool", 0, 1);
-	PutFormData($f, $s, "jtapi2cmIP", getDMSetting($dmid, "jtapi2cmIP"), "text");
-	PutFormData($f, $s, "jtapi2cmUser", getDMSetting($dmid, "jtapi2cmUser"), "text");
-	PutFormData($f, $s, "jtapi2cmPass", getDMSetting($dmid, "jtapi2cmPass"), "text");
-
 
 }
 
@@ -238,19 +231,6 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td>Test Has Delays: </td>
 		<td><? NewFormItem($f, $s, "test_has_delays", "checkbox", null, null, "id='test_has_delays'"); ?></td>
 	</tr>
-	<tr>
-			<td>JTAPI CM IP: </td>
-			<td><? NewFormItem($f, $s, "jtapi2cmIP", "text", 20); ?></td>
-	</tr>
-	<tr>
-			<td>JTAPI CM User: </td>
-			<td><? NewFormItem($f, $s, "jtapi2cmUser", "text", 20, 50); ?></td>
-	</tr>
-	<tr>
-			<td>JTAPI CM Password: </td>
-			<td><? NewFormItem($f, $s, "jtapi2cmPass", "text", 20, 50); ?></td>
-	</tr>
-
 	<tr>
 		<td><? NewFormItem($f, $s, "Submit", "submit"); ?></td>
 	</tr>
