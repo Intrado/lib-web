@@ -71,6 +71,25 @@ function getSystemSetting($name, $defaultvalue=false) {
 	return getCustomerSystemSetting($name, $defaultvalue);
 }
 
+
+function setCustomerSystemSetting($name, $value, $custdb = false) {
+	$old = getCustomerSystemSetting($name, false, true, $custdb);
+	$name = DBSafe($name);
+	$value = DBSafe($value);
+	if($old === false && $value !== '' && $value !==NULL) {
+		QuickUpdate("insert into setting (name, value) values ('$name', '$value')", $custdb);
+	} else {
+		if($value === '' || $value === NULL)
+			QuickUpdate("delete from setting where name = '$name'", $custdb);
+		elseif($value != $old)
+			QuickUpdate("update setting set value = '$value' where name = '$name'", $custdb);
+	}
+}
+
+function setSystemSetting($name, $value) {
+	setCustomerSystemSetting($name, $value);
+}
+
 function isvalidtimestamp ($time) {
 	if ($time === -1 || $time === false)
 		return false;
@@ -210,7 +229,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.59 $
+	    # $Revision: 1.60 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
