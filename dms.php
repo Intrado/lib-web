@@ -4,7 +4,7 @@ include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
 
 
-if (!$USER->authorize('managesystem')) {
+if (!$USER->authorize('managesystem') || !getSystemSetting('_hasremotedm', false)) {
 	redirect('unauthorized.php');
 }
 
