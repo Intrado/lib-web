@@ -45,7 +45,13 @@ startWindow("Options", 'padding: 3px;');
 				<table>
 					<tr><td><a href='displaysettings.php'>Display Settings</a></td></tr>
 					<tr><td><a href='securitysettings.php'>Security Settings</a></td></tr>
+<?
+				if(getSystemSetting('_hasremotedm', false)){
+?>
 					<tr><td><a href='dms.php'>DM's</a></td></tr>
+<?
+				}
+?>
 				</table>
 			</td>
 			<td>
