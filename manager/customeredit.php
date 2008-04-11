@@ -220,6 +220,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 				setCustomerSystemSetting('emaildomain', DBSafe(trim(GetFormData($f, $s, "emaildomain"))), $custdb);
 
+				setCustomerSystemSetting('_hasremotedm', DBSafe(trim(GetFormData($f, $s, "_hasremotedm"))), $custdb);
+
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
@@ -304,6 +306,8 @@ if( $reloadform ) {
 
 	PutFormData($f, $s, "emaildomain", getCustomerSystemSetting('emaildomain', "", true, $custdb), "text", 0, 255);
 
+	PutFormData($f, $s, "_hasremotedm", getCustomerSystemSetting('_hasremotedm', "", true, $custdb), "bool", 0, 1);
+
 }
 
 include_once("nav.inc.php");
@@ -353,6 +357,8 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
 <tr><td> Has Portal </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?></td></tr>
+<tr><td> Uses Remote DM </td><td><? NewFormItem($f, $s, '_hasremotedm', 'checkbox') ?></td></tr>
+
 <tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!</b></td></tr>
 
 <tr><td>Retry:
@@ -451,18 +457,6 @@ managerPassword($f, $s);
 EndForm();
 
 include_once("navbottom.inc.php");
-
-/************FUNCTIONS***********/
-function setCustomerSystemSetting($name, $value, $custdb) {
-	$old = getCustomerSystemSetting($name, false, true, $custdb);
-	$name = DBSafe($name);
-	$value = DBSafe($value);
-	if($old === false) {
-		QuickUpdate("insert into setting (name, value) values ('$name', '$value')", $custdb);
-	} else {
-		QuickUpdate("update setting set value = '$value' where name = '$name'", $custdb);
-	}
-}
 
 ?>
 <script>
