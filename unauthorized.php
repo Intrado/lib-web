@@ -1,6 +1,6 @@
 <?
 $TITLE = "Unauthorized";
-$PAGE = "unauthorized";
+$PAGE = "unauthorized:unauthorized";
 include_once('inc/common.inc.php');
 include_once('nav.inc.php');
 ?>
