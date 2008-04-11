@@ -6,6 +6,12 @@ include_once("../inc/table.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("AspAdminUser.obj.php");
 
+if(isset($_GET['authorizeDM'])){
+	$dmid = $_GET['authorizeDM'] + 0;
+	QuickUpdate("update dm set enablestate = 'active', authorizedip = lastip where id = " . $dmid);
+	redirect();
+}
+
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen
@@ -30,7 +36,7 @@ $titles = array(0 => "DM ID",
 				"actions" => "Actions");
 
 $formatters = array(2 => "fmt_customerUrl",
-					"actions" => "fmt_editLink",
+					"actions" => "fmt_DMActions",
 					7 => "fmt_ms_timestamp");
 
 
@@ -44,8 +50,8 @@ function fmt_customerUrl($row, $index){
 }
 
 // index 1 is dmid
-function fmt_editLink($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>';
+function fmt_DMActions($row, $index){
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?authorizeDM=' . $row[0] . '">Authorize</a>';
 	return $url;
 }
 
