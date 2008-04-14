@@ -25,7 +25,7 @@ function loadJobtypes($incr)
 	global $PAGESIZE, $USER;
 	if (!isset($PAGESIZE)) $PAGESIZE = 9; // this is strange... why isnt it set the first time from above???
 	glog("pagesize: ".$PAGESIZE);
-	glog("loadjobtypes current page ".$_SESSION['currentJobtypePage']);
+	//glog("loadjobtypes current page ".$_SESSION['currentJobtypePage']);
 
 	$allJobtypes = array_values(loadJobtypesDB()); // convert indexes to 0, 1, 2, ...
 

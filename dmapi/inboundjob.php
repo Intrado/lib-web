@@ -353,8 +353,7 @@ function commitJob()
 	$jobid = $job->id;
 	if ($jobid) {
 		// now create any additional language messages for this job
-		$msglangmap = $_SESSION['msglangmap'];
-		if ($msglangmap) foreach($msglangmap as $lang => $msgid) {
+		if (isset($_SESSION['msglangmap'])) foreach($_SESSION['msglangmap'] as $lang => $msgid) {
 			glog($lang.$msgid);
 			$joblang = new JobLanguage();
 			$joblang->jobid = $jobid;

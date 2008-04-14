@@ -80,6 +80,8 @@ function welcome()
 if($REQUEST_TYPE == "new" ||
    $REQUEST_TYPE == "continue") {
 
+	$success = false; // check login successful
+
 	// if login prompt has played, gather code/pin to authenticate
 	if (isset($BFXML_VARS['code'])) {
 		$code = $BFXML_VARS['code'];
@@ -101,23 +103,25 @@ if($REQUEST_TYPE == "new" ||
 				// successful login, save the userid and move on
 				$_SESSION['userid'] = $userid;
 				forwardToPage("inboundmessage.php");
+				$success = true;
 			}
 		}
 	}
-
-	// count authorization attempts, kick them out after 3
-	if (isset($_SESSION['authcount'])) {
-		$_SESSION['authcount']++; // increment
-	} else {
-		$_SESSION['authcount'] = 0;
+	if (!$success) {
+		// count authorization attempts, kick them out after 3
+		if (isset($_SESSION['authcount'])) {
+			$_SESSION['authcount']++; // increment
+		} else {
+			$_SESSION['authcount'] = 0;
+		}
+		// only allow 3 attempts to login, then hangup
+		if ($_SESSION['authcount'] >= 3) {
+			authFailure();
+		} else {
+			// play the prompt
+			login($_SESSION['authcount'] > 0);
+		}
 	}
-	// only allow 3 attempts to login, then hangup
-	if ($_SESSION['authcount'] >= 3) {
-		authFailure();
-	}
-
-	// play the prompt
-	login($_SESSION['authcount'] > 0);
 } else {
 	//huh, they must have hung up
 	$_SESSION = array();
