@@ -39,7 +39,7 @@ function specialtask($methodname, $params){
 	ob_start();
 	if(strtolower($task->type) == "easycall"){
 		forwardToPage("easycall.php");
-	} else if($task->type == "callme"){
+	} else if(strtolower($task->type) == "callme"){
 		forwardToPage("callme.php");
 	} else {
 		$ERROR = "Unknown Special Task Type";
