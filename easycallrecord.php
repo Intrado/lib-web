@@ -18,11 +18,11 @@ if (!$USER->authorize("starteasy")) {
 }
 
 
-$specialtask = new SpecialTask($_GET['taskid']);
+$specialtask = new SpecialTask($_SESSION['easycallid']);
 $progress = $specialtask->getData("progress");
 $error = $specialtask->getData("error");
 if($progress == "Done") {
-	redirect("easycallsubmit.php?taskid=" . $_GET['taskid']);
+	redirect("easycallsubmit.php");
 } else {
 	$currlang = $specialtask->getData("currlang");
 
@@ -52,7 +52,7 @@ if (!$error) {
 	<img src="img/bug_important.gif" > You should receive a call shortly. After you save your message(s) and hangup, you will need to <b>Confirm &amp; Submit</b> your job in the next screen.
 
 </div>
-	<meta http-equiv="refresh" content="2;url=easycallrecord.php?taskid=<?= $_GET['taskid'] ?>">
+	<meta http-equiv="refresh" content="2;url=easycallrecord.php">
 
 <?
 
