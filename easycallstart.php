@@ -25,9 +25,37 @@ if (!$USER->authorize("starteasy")) {
 $VALIDJOBTYPES = JobType::getUserJobTypes();
 
 if(isset($_GET['id'])) {
-	$_SESSION['easycallid'] = null;
+	$_SESSION['easycallid'] = "new";
+	$_SESSION['easycall']['retry'] = false;
 	redirect();
 }
+if(isset($_GET['retry'])){
+	$oldtask = new SpecialTask($_GET['retry']);
+	$task = new SpecialTask();
+	$task->data = $oldtask->data;
+	$task->type = $oldtask->type;
+	$task->setData('error', "0");
+	$task->status = "new";
+	$task->create();
+	$_SESSION['easycallid'] = $task->id;
+	$_SESSION['easycall']['retry'] = true;
+	redirect();
+}
+if(isset($_SESSION['easycallid'])){
+	$task = new SpecialTask($_SESSION['easycallid']);
+	if($task->id == "new"){
+		$task->status = "new";
+	}
+} else {
+	$task = new SpecialTask();
+	$task->status = "new";
+	$_SESSION['easycall']['retry'] = false;
+}
+
+if($task->status != "new"){
+	redirect('easycallrecord.php');
+}
+
 $languages = DBFindMany("Language","from language order by name");
 
 
@@ -70,124 +98,110 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 			error('This job name is already in use, please make another');
 
 		} else {
-			if (isset($_GET['retry'])) {
-				$oldtask = new SpecialTask($_GET['retry']);
-				$task = new SpecialTask();
-				$task->data = $oldtask->data;
-				$task->type = $oldtask->type;
-				$task->setData('phonenumber', $phone);
-				$task->setData('progress', 'Creating Call');
-				$task->setData('error', "0");
-				$task->status = "queued";
-				$task->create();
-				QuickUpdate("call start_specialtask(" . $task->id . ")");
+			if($task->status != "new"){
 				ClearFormData($f);
 				redirect('easycallrecord.php?taskid=' . $task->id);
-			} else {
+			}
+			$task->type = 'EasyCall';
+			$task->setData('phonenumber', $phone);
+			$task->setData('callerid', getSystemSetting('callerid'));
+			$name = GetFormData($f, $s, 'name');
+			if($name == "")
+				$name = "EasyCall - " . date("M d, Y g:i a");
+			$task->setData('name', $name);
+			$task->setData('origin', "start");
+			$task->setData('userid', $USER->id);
+			$task->setData('listid', GetFormData($f,$s,"listid"));
+			$task->setData('jobtypeid', GetFormData($f,$s,"jobtypeid"));
+			$task->setData('progress', "Creating Call");
+			$task->setData('count', 0);
+			$task->lastcheckin = date("Y-m-d H:i:s");
 
-				if(!isset($_SESSION['easycallid'])){
-					$task = new SpecialTask();
-				} else {
-					$task = new SpecialTask($_SESSION['easycallid']);
-				}
-				$task->type = 'EasyCall';
-				$task->setData('phonenumber', $phone);
-				$task->setData('callerid', getSystemSetting('callerid'));
-				$name = GetFormData($f, $s, 'name');
-				if($name == "")
-					$name = "EasyCall - " . date("M d, Y g:i a");
-				$task->setData('name', $name);
-				$task->setData('origin', "start");
-				$task->setData('userid', $USER->id);
-				$task->setData('listid', GetFormData($f,$s,"listid"));
-				$task->setData('jobtypeid', GetFormData($f,$s,"jobtypeid"));
-				$task->setData('progress', "Creating Call");
-				$task->setData('count', 0);
-				$task->lastcheckin = date("Y-m-d H:i:s");
-				if(CheckFormSubmit($f, 'add') || $removedlang)
-					$task->status = "new";
-				else
-					$task->status = "queued";
-				if($USER->authorize('sendmulti') && GetFormData($f, $s,'addlangs')) {
-					$languagearray = array();
-					$langcount = $task->getData("totalamount");
-					if($langcount == null) {
-						$langcount = 1;
-						$languagearray[0] = "Default";
-						$task->setData("language0", "Default");
-						$task->setData("totalamount", 1);
-					} else {
-						for($i = 0; $i < $langcount; $i++){
-							$langnum = "language" . $i;
-							$languagearray[$i] = $task->getData($langnum);
-						}
-					}
-
-					$selectedlangs = getFormData($f, $s, "newlang");
-					if($selectedlangs && CheckFormSubmit($f, 'add') || $selectedlangs && CheckFormSubmit($f, $s)){
-						$used = false;
-						foreach ($languagearray as $lang) {
-							if ($lang == $selectedlangs) {
-								$used = true;
-								break;
-							}
-						}
-						if (!$used){
-							$languagearray[]=$selectedlangs;
-							$langcount = $task->getData("totalamount");
-							$langcount++;
-							$task->setData('totalamount', $langcount);
-							for($i = 0; $i < $langcount; $i++){
-								$langnum = "language" . $i;
-								$task->setData($langnum, $languagearray[$i]);
-							}
-						}
-					}
-					foreach($languagearray as $lang){
-						if(CheckFormSubmit($f, 'remove_'.$lang)){
-							$newarray = array();
-							foreach($languagearray as $language) {
-								if($language != $lang) {
-									$newarray[] = $language;
-								}
-							}
-							$langcount = $task->getData("totalamount");
-							for($i = 0; $i< $langcount; $i++){
-								$langnum = "language" . $i;
-								$task->delData($langnum);
-							}
-							$languagearray = $newarray;
-							$langcount = count($newarray);
-							$task->setData("totalamount", $langcount);
-							for($i = 0; $i < $langcount; $i++){
-								$langnum = "language" . $i;
-								$task->setData($langnum, $newarray[$i]);
-							}
-							break;
-						}
-					}
-
-				} else {
-					$languagearray = array();
+			if($USER->authorize('sendmulti') && GetFormData($f, $s,'addlangs')) {
+				$languagearray = array();
+				$langcount = $task->getData("totalamount");
+				if($langcount == null) {
 					$langcount = 1;
 					$languagearray[0] = "Default";
 					$task->setData("language0", "Default");
 					$task->setData("totalamount", 1);
-				}
-				$task->setData('currlang', $task->getdata('language0'));
-				$task->setData('langchkbox', GetFormData($f, $s, 'addlangs'));
-
-				if($task->id){
-					$task->update();
 				} else {
-					$task->create();
+					for($i = 0; $i < $langcount; $i++){
+						$langnum = "language" . $i;
+						$languagearray[$i] = $task->getData($langnum);
+					}
 				}
-				$_SESSION['easycallid'] = $task->id;
-				if(!CheckFormSubmit($f, 'add') && !$removedlang){
+
+				$selectedlangs = GetFormData($f, $s, "newlang");
+
+				if($selectedlangs && CheckFormSubmit($f, 'add') || $selectedlangs && CheckFormSubmit($f, $s)){
+					$used = false;
+					foreach ($languagearray as $lang) {
+						if ($lang == $selectedlangs) {
+							$used = true;
+							break;
+						}
+					}
+					if (!$used){
+						$languagearray[]=$selectedlangs;
+						$langcount = $task->getData("totalamount");
+						$langcount++;
+						$task->setData('totalamount', $langcount);
+						for($i = 0; $i < $langcount; $i++){
+							$langnum = "language" . $i;
+							$task->setData($langnum, $languagearray[$i]);
+						}
+					}
+				}
+				foreach($languagearray as $lang){
+					if(CheckFormSubmit($f, 'remove_'.$lang)){
+						$newarray = array();
+						foreach($languagearray as $language) {
+							if($language != $lang) {
+								$newarray[] = $language;
+							}
+						}
+						$langcount = $task->getData("totalamount");
+						for($i = 0; $i< $langcount; $i++){
+							$langnum = "language" . $i;
+							$task->delData($langnum);
+						}
+						$languagearray = $newarray;
+						$langcount = count($newarray);
+						$task->setData("totalamount", $langcount);
+						for($i = 0; $i < $langcount; $i++){
+							$langnum = "language" . $i;
+							$task->setData($langnum, $newarray[$i]);
+						}
+						break;
+					}
+				}
+
+			} else {
+				$languagearray = array();
+				$langcount = 1;
+				$languagearray[0] = "Default";
+				$task->setData("language0", "Default");
+				$task->setData("totalamount", 1);
+			}
+
+			$task->setData('currlang', $task->getdata('language0'));
+			$task->setData('langchkbox', GetFormData($f, $s, 'addlangs'));
+			if($task->id == "new"){
+				$task->create();
+			} else {
+				$task->update();
+			}
+			$_SESSION['easycallid'] = $task->id;
+			if(!CheckFormSubmit($f, 'add') && !$removedlang){
+				if($task->status == "new"){
+					$task->status = "queued";
+					$task->update();
 					QuickUpdate("call start_specialtask(" . $task->id . ")");
-					ClearFormData($f);
-					redirect('easycallrecord.php?taskid=' . $task->id);
+					$_SESSION['easycall']['retry'] = false;
 				}
+				ClearFormData($f);
+				redirect('easycallrecord.php?taskid=' . $task->id);
 			}
 		}
 	}
@@ -199,35 +213,21 @@ if($reloadform == 1) {
 
 	ClearFormData($f);
 
-	if (isset($_GET['retry'])){
-		$specialtask = new SpecialTask(DBSafe($_GET['retry']));
-	}else{
-		if(isset($_SESSION['easycallid']))
-			$specialtask = new SpecialTask($_SESSION['easycallid']);
-		else
-			$specialtask = false;
-	}
-	PutFormData($f,$s,"listid",$specialtask ? $specialtask->getData('listid') : 0, "number", "nomin", "nomax", true);
-	PutFormData($f,$s,"jobtypeid",$specialtask ? $specialtask->getData('jobtypeid') : "", "number", "nomin", "nomax", true);
+	PutFormData($f,$s,"listid",$task->getData('listid') ? $task->getData('listid') : 0, "number", "nomin", "nomax", true);
+	PutFormData($f,$s,"jobtypeid",$task->getData('jobtypeid') ? $task->getData('jobtypeid') : 0, "number", "nomin", "nomax", true);
 	$checked=false;
-	if ($specialtask) {
-		$phone = Phone::format($specialtask->getData('phonenumber'));
-		$name=$specialtask->getData("name");
-		$langcount = $specialtask->getData("totalamount");
-		$languagearray = array();
-		for($i = 0; $i < $langcount; $i++){
-			$langnum = "language" . $i;
-			$languagearray[$i] = $specialtask->getData($langnum);
-		}
-		if($specialtask->getData('langchkbox'))
-			$checked=true;
-	} else {
-		if ($USER->phone)
-			$phone = Phone::format($USER->phone);
-		else
-			$phone = "";
-		$name = "";
+
+	$phone = $task->getData('phonenumber') ? Phone::format($task->getData('phonenumber')) : Phone::format($USER->phone);;
+	$name=$task->getData("name") ? $task->getData("name") : "";
+	$langcount = $task->getData("totalamount") ? $task->getData("totalamount") : 0;
+	$languagearray = array();
+	for($i = 0; $i < $langcount; $i++){
+		$langnum = "language" . $i;
+		$languagearray[$i] = $task->getData($langnum);
 	}
+	if($task->getData('langchkbox'))
+		$checked=true;
+
 	PutFormData($f,$s,"phone",$phone,"text","2","20", true);
 	PutFormData($f,$s,"addlangs",(bool)$checked, "bool", 0, 1);
 	PutFormData($f, $s, 'name', $name , 'text', 1, 50);
@@ -235,7 +235,6 @@ if($reloadform == 1) {
 	PutFormData($f, $s, 'hidden', "");
 
 }
-
 
 //////////////
 //FUNCTIONS
@@ -394,7 +393,7 @@ startWindow("EasyCall");
 								new getObj('addlang').obj.disabled=!box.checked;
 								new getObj('hiddendropdown').obj.disabled=!box.checked;
 <?
-								if(isset($_GET['retry'])){
+								if(isset($_SESSION['easycall']['retry']) && $_SESSION['easycall']['retry'] == true){
 ?>
 									new getObj('add').obj.disabled=true;
 									new getObj('jobtype').obj.disabled=true;
