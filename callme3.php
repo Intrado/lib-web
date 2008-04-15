@@ -19,7 +19,7 @@ if (!$USER->authorize("starteasy")) {
 $f = "callme";
 $s = "main";
 
-$specialtask = new SpecialTask($_GET['taskid']);
+$specialtask = new SpecialTask($_SESSION['callmeid']);
 $messages = array();
 for($i = 1; $i < $specialtask->getData('count'); $i++){
 	$messnum = "message".$i;
@@ -129,8 +129,8 @@ startWindow("Rename Files");
 					?>
 					<tr>
 						<td>
-<? 
-								NewFormItem($f, $s, "message ".$key, "text"); 
+<?
+								NewFormItem($f, $s, "message ".$key, "text");
 ?>
 						</td>
 						<td>

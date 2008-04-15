@@ -17,12 +17,12 @@ if (!$USER->authorize("starteasy")) {
 	redirect("unauthorized.php");
 }
 
-$specialtask = new SpecialTask($_GET['taskid']);
+$specialtask = new SpecialTask($_SESSION['callmeid']);
 
 if($specialtask->getData('progress')=="Done") {
 
 	if($specialtask->getData("message1")){
-		redirect('callme3.php?taskid=' . $specialtask->id);
+		redirect('callme3.php');
 	} else {
 		$specialtask->setData('error', 'No messages saved');
 		$specialtask->update();
@@ -45,7 +45,7 @@ if ($error = $specialtask->getData('error')) {
 	?>
 		<div style="text-align: center; width: 100%; padding: 3px;">
 			<span style="color: red;">There was an error during the call: <?=$error?>.</span><br>
-			Please check the phone number and <a href="callme.php?origin=<?=$specialtask->getData('origin')?>">try again.</a>
+			Please check the phone number and <a href="callme.php?origin=<?=$specialtask->getData('origin')?>&id=new">try again.</a>
 		</div>
 	<?
 } else {
@@ -56,7 +56,7 @@ if ($error = $specialtask->getData('error')) {
 	<h3> Message Number: <?=$currnum?></h3>
 	<img src="img/progressbar.gif?date=<?= time() ?>">
 <div>
-	<meta http-equiv="refresh" content="2;url=callme2.php?taskid=<?= $_GET['taskid'] ?>">
+	<meta http-equiv="refresh" content="2;url=callme2.php">
 <?
 }
 endWindow();
