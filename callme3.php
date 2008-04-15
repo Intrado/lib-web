@@ -121,8 +121,9 @@ startWindow("Rename Files");
 ?>
 
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-
-			<th align="left" class="windowRowHeader bottomBorder">Name</td>
+		<tr>
+			<th colspan="2" align="left" class="windowRowHeader bottomBorder">Name</td>
+		</tr>
 			<?
 			if($messages){
 				foreach($messages as $key => $message){
