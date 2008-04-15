@@ -8,7 +8,16 @@ include_once("AspAdminUser.obj.php");
 
 if(isset($_GET['authorizeDM'])){
 	$dmid = $_GET['authorizeDM'] + 0;
+	$cid = QuickQuery("select customerid from dm where id = " . $dmid);
+	if($cid){
+		$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
+									where c.id = " . $cid);
+		$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $cid);
+		QuickUpdate("update custdm set enablestate = 'active'
+					where dmid = " . $dmid, $custdb);
+	}
 	QuickUpdate("update dm set enablestate = 'active', authorizedip = lastip where id = " . $dmid);
+
 	redirect();
 }
 
