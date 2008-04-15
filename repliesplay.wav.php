@@ -14,25 +14,26 @@ if(isset($_GET['id'])) {
 	if (userOwns("voicereply",$id)) {
 
 		$vr = new VoiceReply($id);
-	
+
 		if ($c = contentGet($vr->contentid))
 			list($contenttype,$data) = $c;
-	
+
 		if ($data) {
 			$size = strlen($data);
-	
+
 			header("HTTP/1.0 200 OK");
-			if (isset($_GET['download']))
+			if (isset($_GET['download'])){
+				header("Content-disposition: attachment; filename=download_preview.wav");
 				header('Content-type: application/x-octet-stream');
-			else
+			}else
 				header('Content-type: ' . $contenttype);
-	
+
 			header('Pragma: private');
 			header('Cache-control: private, must-revalidate');
 			header("Content-Length: $size");
 			header("Connection: close");
 			echo $data;
-		} 
+		}
 	}
 }
 ?>
