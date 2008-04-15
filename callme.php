@@ -14,9 +14,42 @@ include_once("inc/form.inc.php");
 include_once('inc/table.inc.php');
 
 // AUTHORIZATION //////////////////////////////////////////////////
-$origin = $_GET['origin'];
 if (!$USER->authorize("starteasy")) {
 	redirect("unauthorized.php");
+}
+
+$clear = false;
+if(isset($_GET['id'])){
+	$_SESSION['callmeid'] = $_GET['id'];
+	$clear = true;
+}
+if(isset($_GET['origin'])){
+	$_SESSION['callmeorigin'] = $_GET['origin'];
+	$clear = true;
+}
+
+if($clear){
+	redirect();
+}
+
+if(isset($_SESSION['callmeorigin'])){
+	$origin = $_SESSION['callmeorigin'];
+} else {
+	$origin = "message";
+}
+
+if(isset($_SESSION['callmeid'])){
+	$task = new SpecialTask($_SESSION['callmeid']);
+	if($task->id == "new"){
+		$task->status = "new";
+	}
+} else {
+	$task = new SpecialTask();
+	$task->status = "new";
+}
+
+if($task->status != "new"){
+	redirect('callme2.php');
 }
 
 $f = "callme";
@@ -48,7 +81,6 @@ if(CheckFormSubmit($f,$s))
 			$testname = GetFormData($f, $s, 'name') . ' ' . date("Y-m-d H:i");
 			PutFormData($f, $s, 'name', $testname, 'text', 1, 50); // Repopulate the form/session data with the generated name
 		} else {
-			$task = new SpecialTask();
 			$task->type = 'CallMe';
 			$task->setData('phonenumber', $phone);
 			$name = GetFormData($f,$s,"name");
@@ -62,12 +94,19 @@ if(CheckFormSubmit($f,$s))
 			$task->setData('progress', "Calling");
 			$task->setData('count', 1);
 			$task->lastcheckin = date("Y-m-d H:i:s");
-			$task->status = "queued";
-
-			$task->create();
-			QuickUpdate("call start_specialtask(" . $task->id . ")");
+			if($task->id == "new"){
+				$task->create();
+			} else {
+				$task->update();
+			}
+			$_SESSION['callmeid'] = $task->id;
+			if($task->status == "new"){
+				$task->status = "queued";
+				$task->update();
+				QuickUpdate("call start_specialtask(" . $task->id . ")");
+			}
 			ClearFormData($f);
-			redirect('callme2.php?taskid=' . $task->id);
+			redirect('callme2.php');
 		}
 	}
 } else {
@@ -86,7 +125,7 @@ if( $reloadform )
 	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
 	PutFormData($f,$s,"name","","text","1","50");
 	PutFormData($f,$s,"size","","text");
-	PutFormData($f,$s,"origin",$_GET['origin']);
+	PutFormData($f,$s,"origin",$origin);
 }
 
 
