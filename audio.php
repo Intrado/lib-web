@@ -68,7 +68,7 @@ $titles = array(	"preview" => "Preview",
 
 startWindow('Audio Files', 'padding: 3px;');
 
-button_bar(($USER->authorize("starteasy") ? button('Call Me To Record', NULL,"callme.php?origin=audio") . help('AudioFileEditor_CallMeToRecord') : ''), button('Upload Audio', NULL,"uploadaudio.php?id=new") . help('AudioFileEditor_UploadAudioFile'));
+button_bar(($USER->authorize("starteasy") ? button('Call Me To Record', NULL,"callme.php?origin=audio&id=new") . help('AudioFileEditor_CallMeToRecord') : ''), button('Upload Audio', NULL,"uploadaudio.php?id=new") . help('AudioFileEditor_UploadAudioFile'));
 
 showObjects($data, $titles, array("preview" => "fmt_preview", "created" => "fmt_date", "Actions" => "fmt_actions", 'method' => 'fmt_ucfirst'));
 endWindow();
