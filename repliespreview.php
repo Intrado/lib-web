@@ -107,7 +107,7 @@ TYPE="application/x-oleobject">
 </OBJECT>
 
 
-<br><a href="repliesplay.wav.php/download_preview.wav?id=<?=$id?>&download=true">Click here to download</a>
+<br><a href="repliesplay.wav.php?id=<?=$id?>&download=true">Click here to download</a>
 </div>
 <?
 endWindow();
