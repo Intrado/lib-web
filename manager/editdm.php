@@ -103,8 +103,6 @@ if(CheckFormSubmit($f,$s))
 				if(!$dm['authorizedip'] && GetFormData($f, $s, 'enablestate') == "active"){
 					QuickUpdate("update dm set authorizedip = '" . $dm['lastip'] . "'");
 				}
-				//refresh the dm array
-				//$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type from dm where id = '" . DBSafe($dmid) . "'", true);
 
 				if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
 					$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
