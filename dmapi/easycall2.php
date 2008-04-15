@@ -145,6 +145,10 @@ if($REQUEST_TYPE == "new") {
 						<default>
 							<audio cmid="file://prompts/ImSorry.wav" />
 						</default>
+						<timeout>
+							<audio cmid="file://prompts/GoodBye.wav" />
+							<hangup />
+						</timeout>
 					</field>
 				</message>
 			</voice>
