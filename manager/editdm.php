@@ -72,9 +72,9 @@ if(CheckFormSubmit($f,$s))
 				error('Bad Manager Password');
 			} else if (!ereg("[0-9]{10}",$callerid)) {
 				error('Bad Caller ID, Try Again');
-			} else if (GetformData($f, $s, "customerid") == 0){
+			} else if (GetformData($f, $s, "customerid") === 0){
 				error('Invalid Customer ID');
-			} else if (!QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
+			} else if (GetFormData($f, $s, "customerid") && !QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
 				error('Invalid Customer ID');
 			} else if (GetFormData($f, $s, "telco_inboundtoken") > GetFormData($f, $s, "delmech_resource_count")){
 				error('Number of inbound tokens cannot exceed the max number of resources');
@@ -106,16 +106,18 @@ if(CheckFormSubmit($f,$s))
 				//refresh the dm array
 				//$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type from dm where id = '" . DBSafe($dmid) . "'", true);
 
+				if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
+					$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
+																	where c.id = " . $dm['customerid']);
+					$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $dm['customerid']);
+					if(QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
+						QuickUpdate("delete from custdm where dmid = " . $dmid, $custdb);
+					}
+				}
+
 				if($newcustomerid != "null"){
 
-					if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
-						$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
-																		where c.id = " . $dm['customerid']);
-						$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $dm['customerid']);
-						if(QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-							QuickUpdate("delete from custdm where dmid = " . $dmid, $custdb);
-						}
-					}
+
 					$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
 												where c.id = " . $newcustomerid);
 					$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
