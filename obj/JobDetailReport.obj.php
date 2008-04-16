@@ -99,7 +99,8 @@ class JobDetailReport extends ReportGenerator{
 			rc.numattempts as numattempts,
 			rc.resultdata,
 			sw.resultdata,
-			rc.participated as confirmed
+			rc.participated as confirmed,
+			rc.sequence as destsource
 			$fieldquery
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
@@ -206,6 +207,14 @@ class JobDetailReport extends ReportGenerator{
 			?><br><?
 		}
 
+		//index 5 is type
+		function fmt_dst_src($row, $index){
+			if($row[$index])
+				return format_delivery_type($row[5]) . " " . ($row[$index] +1);
+			else
+				return "";
+		}
+
 		displayJobSummary($this->params['joblist']);
 
 		?><br><?
@@ -219,7 +228,7 @@ class JobDetailReport extends ReportGenerator{
 						3 => "First Name",
 						4 => "Last Name",
 						6 => "Message",
-						5 => "Deliver by",
+						15 => "Dst. Src.",
 						7 => "Destination",
 						11 => "Attempts",
 						8 => "Last Attempt",
@@ -229,13 +238,13 @@ class JobDetailReport extends ReportGenerator{
 		} else {
 			$titles[14] = "@Confirmed";
 		}
-		$titles = appendFieldTitles($titles, 14, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 15, $fieldlist, $activefields);
 
-		$formatters = array(5 => "fmt_delivery_type_list",
-							7 => "fmt_destination",
+		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
 							9 => "fmt_jobdetail_result",
-							14 => "fmt_confirmation");
+							14 => "fmt_confirmation",
+							15 => "fmt_dst_src");
 		showTable($data,$titles,$formatters);
 		echo "</table>";
 		showPageMenu($total,$pagestart,500);
