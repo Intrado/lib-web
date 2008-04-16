@@ -89,7 +89,8 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rc.numattempts) as totalattempts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
-									sum(rc.participated) as confirmed
+									sum(rc.participated) as confirmed,
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									inner join job j on (j.id = rp.jobid)
@@ -102,7 +103,8 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
-									sum(rp.status = 'declined' and rc.result is null) as declined
+									sum(rp.status = 'declined' and rc.result is null) as declined,
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
@@ -115,7 +117,8 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result = 'blocked') as blocked,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
-									sum(rp.status = 'declined' and rc.result is null) as declined
+									sum(rp.status = 'declined' and rc.result is null) as declined,
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('" . $this->params['joblist'] . "')
@@ -215,6 +218,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Duplicates Removed</th>
 											<th>No Email</th>
 											<th>No Email Selected</th>
+											<th>% Contacted</th>
 										</tr>
 										<tr>
 											<td><?=$emailinfo[0]+0?></td>
@@ -223,6 +227,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=$emailinfo[3]+0?></td>
 											<td><?=$emailinfo[4]+0?></td>
 											<td><?=$emailinfo[5]+0?></td>
+											<td><?=sprintf("%0.2f", isset($emailinfo[6]) ? $emailinfo[6] : "") . "%" ?></td>
 										</tr>
 									</table>
 								</td>
@@ -249,6 +254,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>Duplicates Removed</th>
 											<th>No SMS</th>
 											<th>No SMS Selected</th>
+											<th>% Contacted</th>
 										</tr>
 										<tr>
 											<td><?=$smsinfo[0]+0?></td>
@@ -258,6 +264,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=$smsinfo[4]+0?></td>
 											<td><?=$smsinfo[5]+0?></td>
 											<td><?=$smsinfo[6]+0?></td>
+											<td><?=sprintf("%0.2f", isset($smsinfo[7]) ? $smsinfo[7] : "") . "%" ?></td>
 										</tr>
 									</table>
 								</td>
@@ -285,6 +292,7 @@ class JobSummaryReport extends ReportGenerator{
 											<th>No Phone #</th>
 											<th>No Phone Selected</th>
 											<th>Total Attempts</th>
+
 <?
 											if(QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
 ?>
@@ -292,6 +300,7 @@ class JobSummaryReport extends ReportGenerator{
 <?
 											}
 ?>
+											<th>% Contacted</th>
 										</tr>
 										<tr>
 											<td><?=$phonenumberinfo[0]+0?></td>
@@ -309,6 +318,7 @@ class JobSummaryReport extends ReportGenerator{
 <?
 											}
 ?>
+											<td><?=sprintf("%0.2f", isset($phonenumberinfo[9]) ? $phonenumberinfo[9] : "") . "%" ?></td>
 
 										</tr>
 									</table>
