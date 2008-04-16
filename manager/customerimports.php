@@ -8,6 +8,8 @@ include_once("../inc/table.inc.php");
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 
+
+
 function fmt_alert_timestamp($row, $index) {
 	date_default_timezone_set($row[2]);
 	$timestamp = strtotime($row[$index]);
@@ -15,6 +17,19 @@ function fmt_alert_timestamp($row, $index) {
 		return "<div style='background-color: #ffcccc'>- Never -</div>";
 	} else {
 		if ($timestamp < time() - 60 * 60 * 24 * 3)
+			return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
+		else
+			return date("M j, g:i a", $timestamp);
+	}
+}
+//row index 12 contains an array of alert options
+function fmt_last_modified($row, $index){
+	date_default_timezone_set($row[2]);
+	$timestamp = strtotime($row[$index]);
+	if ($timestamp === false) {
+		return "<div style='background-color: #ffcccc'>- Never -</div>";
+	} else {
+		if(isset($row[12]['daysold']) && $row[12]['daysold'] && ($timestamp < time() - 60*60*24* $row[12]['daysold']))
 			return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
 		else
 			return date("M j, g:i a", $timestamp);
@@ -34,14 +49,24 @@ function fmt_import_status($row, $index){
 		return $row[$index];
 }
 
-function fmt_filesize($row, $index){
 
-	 if($row[$index] < 10)
+//row index 12 contains an array of alert options
+function fmt_filesize($row, $index){
+	 if((isset($row[12]['minsize']) && $row[$index] < $row[12]['minsize']) || (isset($row[12]['maxsize']) && $row[$index] > $row[12]['maxsize']))
+	 	return "<div style=\"background-color: #ffcccc; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
+	 else if(!isset($row[12]['minsize']) && !isset($row[12]['maxsize']) && $row[$index] < 10)
 	 	return "<div style=\"background-color: #ffcccc; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 	 else
 	 	return "<div style=\"width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 }
 
+
+//index 0 is customer id
+//index 3 is import id
+function fmt_importalerts($row, $index){
+	$url = "<a href='importalerts.php?cid=" . $row[0] . "&importid=" . $row[3] . "'>Edit Alerts</a>";
+	return $url;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -83,6 +108,7 @@ if(CheckFormSubmit($f, $s)) {
 if($reloadform){
 	ClearFormData($f);
 	PutFormData($f, $s, 'importtypes', $selected, "array", array_keys($selected));
+	PutFormData($f, $s, "submit", "");
 }
 
 
@@ -114,7 +140,7 @@ foreach($customers as $cust) {
 	}
 	mysql_select_db("c_" . $cust[0]);
 	if($custdb){
-		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description
+		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description, alertoptions
 					FROM import
 					where 1
 					$querytypes
@@ -123,6 +149,8 @@ foreach($customers as $cust) {
 		$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
 		$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
 		while($row = DBGetRow($list)){
+			$alertoptions = sane_parsestr($row[9]);
+			$row[9] = $alertoptions;
 			$data[] = array_merge(array($cust[0], $displayname, $timezone), $row);
 		}
 	}
@@ -139,11 +167,14 @@ $titles = array("0" => "Customer ID",
 		"2" => "TimeZone",
 		"8" => "Last Run",
 		"9" => "Last Modified",
-		"10" => "File Size in Bytes");
+		"10" => "File Size in Bytes",
+		"actions" => "Actions");
 $formatters = array("url" => "fmt_custurl",
 					"10" => "fmt_filesize",
 					"8" => "fmt_alert_timestamp",
-					"5" => "fmt_import_status");
+					"5" => "fmt_import_status",
+					"9" => "fmt_last_modified",
+					"actions" => "fmt_importalerts");
 
 /////////////////////////////
 // Display
