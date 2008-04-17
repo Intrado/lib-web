@@ -88,12 +88,12 @@ if($REQUEST_TYPE == "new" ||
 		$pin = $BFXML_VARS['pin'];
 		$inboundNumber = $_SESSION['inboundNumber'];
 
-		// find user and authenticate them against database
-		$userid = doLoginPhone($code, $pin, $inboundNumber);
-		glog("userid: ".$userid);
+		glog("inbound ".$inboundNumber);
 
-		if ($userid) {
-			$user = new User($userid);
+		// find user and authenticate them against database
+		$query = "from user where enabled=1 and deleted=0 and accesscode='".$code."' and pincode=password('".$pin."')";
+		$user = DBFind("User", $query);
+		if ($user) {
 			$access = new Access($user->accessid);
 
 			// check their permissions
@@ -101,7 +101,7 @@ if($REQUEST_TYPE == "new" ||
 				$access->getPermission("sendphone")) {
 
 				// successful login, save the userid and move on
-				$_SESSION['userid'] = $userid;
+				$_SESSION['userid'] = $user->id;
 				forwardToPage("inboundmessage.php");
 				$success = true;
 			}
