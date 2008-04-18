@@ -192,42 +192,26 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
-							('Emergency', 1, 'General Announcements', 0, 0),
-							('Attendance', 2, 'Time Critical Announcements', 0, 0),
-							('General', 3, 'Emergencies Only', 0, 0),
+							('Emergency', 1, 'Emergencies Only', 0, 0),
+							('Attendance', 2, 'Attendance', 0, 0),
+							('General', 3, 'General Announcements', 0, 0),
 							('Survey', 3, 'Surveys', 1, 0)";
 
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `jobtypepref` (`jobtypeid`,`type`,`sequence`,`enabled`) VALUES
 							(1,'phone',0,1),
-							(1,'phone',1,1),
-							(1,'phone',2,1),
 							(1,'email',0,1),
-							(1,'email',1,1),
 							(1,'sms',0,1),
-							(1,'sms',1,1),
 							(2,'phone',0,1),
-							(2,'phone',1,0),
-							(2,'phone',2,0),
 							(2,'email',0,1),
-							(2,'email',1,0),
 							(2,'sms',0,1),
-							(2,'sms',1,0),
 							(3,'phone',0,1),
-							(3,'phone',1,0),
-							(3,'phone',2,0),
 							(3,'email',0,1),
-							(3,'email',1,0),
 							(3,'sms',0,1),
-							(3,'sms',1,0),
 							(4,'phone',0,1),
-							(4,'phone',1,0),
-							(4,'phone',2,0),
 							(4,'email',0,1),
-							(4,'email',1,0),
-							(4,'sms',0,0),
-							(4,'sms',1,0)";
+							(4,'sms',0,0)";
 
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
