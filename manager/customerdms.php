@@ -21,6 +21,18 @@ if(isset($_GET['authorizeDM'])){
 	redirect();
 }
 
+if(isset($_GET['resetDM'])){
+	$dmid = $_GET['resetDM'] + 0;
+	$dmname = QuickQuery("select name from dm where id = " . $dmid);
+	QuickUpdate("update dm set command = 'reset' where id = " . $dmid);
+?>
+	<script>
+		window.alert('Reset command initiated for DM: <?=$dmname?>');
+		window.location="customerdms.php";
+	</script>
+<?
+}
+
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen
@@ -60,7 +72,7 @@ function fmt_customerUrl($row, $index){
 
 // index 1 is dmid
 function fmt_DMActions($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?authorizeDM=' . $row[0] . '">Authorize</a>';
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?authorizeDM=' . $row[0] . '">Authorize</a>&nbsp;|&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '">Reset</a>';
 	return $url;
 }
 
