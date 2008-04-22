@@ -11,8 +11,14 @@ if (!$USER->authorize('managesystem') || !getSystemSetting('_hasremotedm', false
 if(isset($_GET['resetdm'])){
 	$resetid = $_GET['resetdm']+0;
 	if(auth_resetDM($resetid)){
+		$dmname = QuickQuery("select name from custdm where dmid = " . $resetid);
 		QuickUpdate("update custdm set routechange = null where dmid = " . $resetid);
-		redirect();
+?>
+<script>
+		window.alert('Reset command initiated for DM: <?=$dmname?>');
+		window.location="dms.php";
+</script>
+<?
 	} else {
 		error("Something happened when trying to reset a DM", "Please try again later");
 	}
@@ -34,7 +40,7 @@ if(count($resetrequired)){
 
 // index 0 is dmid
 function fmt_editDMRoute($row, $index){
-	$url = '<a href="dmsettings.php?dmid=' . $row[0] . '">Edit Route Plan</a>&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '">Reset</a>';
+	$url = '<a href="dmsettings.php?dmid=' . $row[0] . '">Edit Route Plan</a>&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this DM\')">Reset</a>';
 	return $url;
 }
 
