@@ -175,3 +175,12 @@ CREATE TABLE `dmroute` (
 ) ENGINE=InnoDB ;
 
 ALTER TABLE `dm` ADD `command` VARCHAR( 255 ) NULL ;
+
+CREATE TABLE `dmcalleridroute` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `callerid` varchar(20) NOT NULL,
+  `prefix` varchar(20) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `dmid` (`dmid`,`callerid`)
+) ENGINE=InnoDB ;

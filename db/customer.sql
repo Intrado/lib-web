@@ -1458,3 +1458,16 @@ END IF;
 insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid,type,dispatchtype) values (l_custid,in_specialtaskid,l_type,dtype);
 end
 $$$
+
+
+CREATE TABLE `dmcalleridroute` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `callerid` varchar(20) NOT NULL,
+  `prefix` varchar(20) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `dmid` (`dmid`,`callerid`)
+) ENGINE=InnoDB
+$$$
+
+
