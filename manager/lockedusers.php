@@ -13,7 +13,7 @@ $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $lockedusers = array();
 
-$result = Query("select customerid, login, ipaddress, attempts, lastattempt, status from loginattempt");
+$result = Query("select customerid, login, ipaddress, attempts, lastattempt, status from loginattempt where status != 'enabled'");
 while($row = DBGetRow($result)){
 	$lockedusers[] = $row;
 }
