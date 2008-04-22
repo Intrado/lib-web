@@ -1,7 +1,6 @@
 <?
-	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
-
+$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 
 header("Pragma: private");
 header("Cache-Control: private");
@@ -611,8 +610,9 @@ sendJob:
     </wsdl:binding>
     <wsdl:service name="SMAPI">
 		<wsdl:port name="SMAPIPort" binding="sm:SMBinding">
-			<soap:address location="http://localhost/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
+			<soap:address location="http://' . $_SERVER["SERVER_NAME"] . '/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
 ';
+
 ?>
