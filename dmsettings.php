@@ -36,7 +36,7 @@ foreach($routes as $route){
 	}
 }
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "upload"))
+if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "upload") || CheckFormSubmit($f, "deleteall"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -71,11 +71,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete || C
 			} else if(CheckFormSubmit($f, "add") && GetFormData($f, $s, "dm_new_match") == ""){
 				error("You cannot add a route with an empty match string");
 			} else {
-
+				$routechange = false;
 				foreach($routes as $route){
+					if(CheckFormSubmit($f, "deleteall")){
+						$route->destroy();
+						$routechange=true;
+						continue;
+					}
 					if(CheckFormSubmit($f, "delete_dm_" . $route->id)){
 						$route->destroy();
-						QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+						$routechange=true;
 						continue;
 					}
 					if($route->id != "new"
@@ -86,7 +91,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete || C
 						|| $route->suffix != GetFormData($f, $s, "dm_" . $route->id ."_suffix")
 						)
 					){
-						QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+						$routechange = true;
 					}
 					$route->dmid = $dmid;
 					$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
@@ -94,21 +99,35 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete || C
 					$route->prefix = GetFormData($f, $s, "dm_" . $route->id ."_prefix");
 					$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
 					if($route->id == "new" && CheckFormSubmit($f, "add")){
-						QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+						$routechange = true;
 						$route->create();
 					} else {
 						$route->update();
 					}
 				}
 
-				$defaultroute->dmid = $dmid;
-				$defaultroute->match = "";
-				$defaultroute->strip = GetFormData($f, $s, "default_strip");
-				$defaultroute->prefix = GetFormData($f, $s, "default_prefix");
-				$defaultroute->suffix = GetFormData($f, $s, "default_suffix");
-				$defaultroute->update();
+				if(CheckFormSubmit($f, "deleteall")){
+					$defaultroute->destroy();
+				} else {
+					if($defaultroute->strip != GetFormData($f, $s, "default_strip")
+						|| $defaultroute->prefix != GetFormData($f, $s, "default_prefix")
+						|| $defaultroute->suffix != GetFormData($f, $s, "default_suffix")
+						){
+							$routechange = true;
+					}
 
-				if(CheckFormSubmit($f,"done"))
+					$defaultroute->dmid = $dmid;
+					$defaultroute->match = "";
+					$defaultroute->strip = GetFormData($f, $s, "default_strip");
+					$defaultroute->prefix = GetFormData($f, $s, "default_prefix");
+					$defaultroute->suffix = GetFormData($f, $s, "default_suffix");
+					$defaultroute->update();
+				}
+				if($routechange){
+					QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+				}
+
+				if(CheckFormSubmit($f,$s))
 					redirect("dms.php");
 				else if(CheckFormSubmit($f, "upload"))
 					redirect("uploadroutes.php?dmid=" . $dmid);
@@ -171,7 +190,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, "done", "Done"), submit($f, "upload", "Upload Routes"));
+buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL routes?')) submitForm('" . $f . "', 'deleteall')"));
 
 startWindow("Route Plans");
 ?>
