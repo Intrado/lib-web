@@ -15,7 +15,10 @@ if(isset($_GET['dmid'])){
 	$dmid = $_SESSION['dmid'];
 }
 
-$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " order by `match` desc");
+$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " and `match` != '' order by length(`match`) desc, `match` ASC");
+$defaultroute = DBFind("DMRoute", "from dmroute where dmid = " . $dmid . " and `match` = ''");
+if(!$defaultroute)
+	$defaultroute = new DMRoute();
 $newroute = new DMRoute();
 $newroute->id = "new";
 $routes[] = $newroute;
@@ -33,7 +36,7 @@ foreach($routes as $route){
 	}
 }
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "upload"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -46,11 +49,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 		MergeSectionFormData($f, $s);
 
 		//do check
-		if(CheckFormSubmit($f, $s)){
-			SetRequired($f, $s, "dm_new_match", !GetFormData($f, $s, "dm_new_default"));
-		} else {
-			SetRequired($f, $s, "dm_new_match", false);
-		}
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -61,63 +59,59 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"done") || $checkformdelete)
 			$default = false;
 			$duplicatedefaults = false;
 			foreach($routes as $route){
-
-				if(GetFormData($f, $s, "dm_" . $route->id ."_match") != ''){
-					if(!isset($matches[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
-						$matches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = 1;
-					} else {
-						$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = true;
-					}
-				}
-				if($route->id != 'new'){
-					if(!$default && GetFormData($f, $s, "dm_" . $route->id ."_match") == ''){
-						$default = true;
-					} else if(GetFormData($f, $s, "dm_" . $route->id ."_match") == ''){
-						$duplicatedefaults = true;
-					}
+				if(!isset($matches[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
+					$matches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = 1;
+				} else {
+					$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = true;
 				}
 			}
 
 			if(count($duplicatematches)){
 				error("You have multiple routes with the same match string", array_keys($duplicatematches));
-			} else if($default && GetFormData($f, $s, "dm_" . $route->id ."_default")){
-				error("You cannot have multiple default routes");
-			} else if($duplicatedefaults){
-				error("You cannot have multiple default routes");
+			} else if(CheckFormSubmit($f, "add") && GetFormData($f, $s, "dm_new_match") == ""){
+				error("You cannot add a route with an empty match string");
 			} else {
 
 				foreach($routes as $route){
 					if(CheckFormSubmit($f, "delete_dm_" . $route->id)){
 						$route->destroy();
+						QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
 						continue;
 					}
-
-					if($route->id=='new' && !GetFormData($f, $s, "dm_" . $route->id ."_default") && GetFormData($f, $s, "dm_" . $route->id ."_match") == ''){
-						continue;
-					}
-					if(
-						$route->match != GetFormData($f, $s, "dm_" . $route->id ."_match")
+					if($route->id != "new"
+						&&
+						($route->match != GetFormData($f, $s, "dm_" . $route->id ."_match")
 						|| $route->strip != GetFormData($f, $s, "dm_" . $route->id ."_strip")
 						|| $route->prefix != GetFormData($f, $s, "dm_" . $route->id ."_prefix")
 						|| $route->suffix != GetFormData($f, $s, "dm_" . $route->id ."_suffix")
+						)
 					){
 						QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
-
 					}
 					$route->dmid = $dmid;
 					$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
 					$route->strip = GetFormData($f, $s, "dm_" . $route->id ."_strip");
 					$route->prefix = GetFormData($f, $s, "dm_" . $route->id ."_prefix");
 					$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
-					if($route->id == "new"){
+					if($route->id == "new" && CheckFormSubmit($f, "add")){
+						QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
 						$route->create();
 					} else {
 						$route->update();
 					}
 				}
 
+				$defaultroute->dmid = $dmid;
+				$defaultroute->match = "";
+				$defaultroute->strip = GetFormData($f, $s, "default_strip");
+				$defaultroute->prefix = GetFormData($f, $s, "default_prefix");
+				$defaultroute->suffix = GetFormData($f, $s, "default_suffix");
+				$defaultroute->update();
+
 				if(CheckFormSubmit($f,"done"))
 					redirect("dms.php");
+				else if(CheckFormSubmit($f, "upload"))
+					redirect("uploadroutes.php?dmid=" . $dmid);
 				redirect();
 			}
 		}
@@ -130,24 +124,23 @@ if( $reloadform )
 {
 	ClearFormData($f);
 	foreach($routes as $route){
-		if($route->id == 'new')
-			PutFormData($f, $s, "dm_" . $route->id ."_default", 0, "bool", 0, 1);
 		PutFormData($f, $s, "dm_" . $route->id ."_match", $route->match, "number");
 		PutFormData($f, $s, "dm_" . $route->id ."_strip", $route->strip, "number", 0, 99);
 		PutFormData($f, $s, "dm_" . $route->id ."_prefix", $route->prefix, "number");
 		PutFormData($f, $s, "dm_" . $route->id ."_suffix", $route->suffix, "number");
 	}
-}
-
-function dm_default($obj, $name){
-	global $f, $s;
-	if($obj->match == '' && $obj->id == 'new')
-		NewFormItem($f, $s, "dm_" . $obj->id ."_default", "checkbox", null, null, "id='dm_" . $obj->id . "_default' onclick='new getObj(\"dm_" . $obj->id . "_match\").obj.disabled = this.checked' ");
+	PutFormData($f, $s, "default_strip", $defaultroute->strip, "number", 0, 99);
+	PutFormData($f, $s, "default_prefix", $defaultroute->prefix, "number");
+	PutFormData($f, $s, "default_suffix", $defaultroute->suffix, "number");
 }
 
 function dm_match($obj, $name){
 	global $f, $s;
 	NewFormItem($f, $s, "dm_" . $obj->id ."_match", "text", 10, 20, "id='dm_" . $obj->id . "_match' ");
+	if($obj->match == '' && $obj->id == 'new'){
+		echo "Default:";
+		NewFormItem($f, $s, "dm_" . $obj->id ."_default", "checkbox", null, null, "id='dm_" . $obj->id . "_default' onclick='new getObj(\"dm_" . $obj->id . "_match\").obj.disabled = this.checked' ");
+	}
 }
 function dm_strip($obj, $name){
 	global $f, $s;
@@ -171,19 +164,6 @@ function dm_add($obj, $name){
 	return $url;
 }
 
-$titles = array("default" => "Default",
-				"match" => "Match",
-				"strip" => "Strip",
-				"prefix" => "Prefix",
-				"suffix" => "Suffix",
-				"actions" => "Actions");
-
-$formatters = array("default" => "dm_default",
-					"match" => "dm_match",
-					"strip" => "dm_strip",
-					"prefix" => "dm_prefix",
-					"suffix" => "dm_suffix",
-					"actions" => "dm_add");
 
 $PAGE="admin:settings";
 $TITLE="Telco Settings";
@@ -191,14 +171,54 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, "done", "Done"));
+buttons(submit($f, "done", "Done"), submit($f, "upload", "Upload Routes"));
 
 startWindow("Route Plans");
-	showObjects($routes, $titles, $formatters);
+?>
+<table cellpadding="3" cellspacing="1" class="list" width="100%">
+	<tr class="listHeader">
+		<th align="left">Match</th>
+		<th align="left">Strip</th>
+		<th align="left">Prefix</th>
+		<th align="left">Suffix</th>
+		<th align="left">Actions</th>
+	</tr>
+<?
+		$alt = 0;
+		foreach($routes as $route){
+			if($route->id == "new") continue;
+			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+?>
+				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_match", "text", 10, 20, "id='dm_" . $route->id . "_match' "); ?></td>
+				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_strip", "text", 2); ?></td>
+				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_prefix", "text", 10, 20); ?></td>
+				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_suffix", "text", 10, 20); ?></td>
+				<td><?=button("Delete", "if(confirmDelete()) submitForm('" . $f . "', 'delete_dm_" . $route->id. "')");?></td>
+
+			</tr>
+<?
+		}
+		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+?>
+			<td>Default</td>
+			<td><? NewFormItem($f, $s, "default_strip", "text", 2); ?></td>
+			<td><? NewFormItem($f, $s, "default_prefix", "text", 10, 20); ?></td>
+			<td><? NewFormItem($f, $s, "default_suffix", "text", 10, 20); ?></td>
+			<td></td>
+		</tr>
+<?
+		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+?>
+			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_match", "text", 10, 20, "id='dm_" . $route->id . "_match' "); ?></td>
+			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_strip", "text", 2); ?></td>
+			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_prefix", "text", 10, 20); ?></td>
+			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_suffix", "text", 10, 20); ?></td>
+			<td><?=submit($f, "add", "Add"); ?></td>
+		</tr>
+	</table>
+<?
 endWindow();
-
 buttons();
-
 EndForm();
 ?>
 <div style="margin: 5px;">
