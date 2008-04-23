@@ -6,21 +6,6 @@ include_once("../inc/table.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("AspAdminUser.obj.php");
 
-if(isset($_GET['authorizeDM'])){
-	$dmid = $_GET['authorizeDM'] + 0;
-	$cid = QuickQuery("select customerid from dm where id = " . $dmid);
-	if($cid){
-		$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
-									where c.id = " . $cid);
-		$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $cid);
-		QuickUpdate("update custdm set enablestate = 'active'
-					where dmid = " . $dmid, $custdb);
-	}
-	QuickUpdate("update dm set enablestate = 'active', authorizedip = lastip where id = " . $dmid);
-
-	redirect();
-}
-
 if(isset($_GET['resetDM'])){
 	$dmid = $_GET['resetDM'] + 0;
 	$dmname = QuickQuery("select name from dm where id = " . $dmid);
@@ -72,7 +57,7 @@ function fmt_customerUrl($row, $index){
 
 // index 1 is dmid
 function fmt_DMActions($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?authorizeDM=' . $row[0] . '">Authorize</a>&nbsp;|&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '">Reset</a>';
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '">Reset</a>';
 	return $url;
 }
 
