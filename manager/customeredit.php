@@ -22,6 +22,45 @@ if(isset($_SESSION['currentid'])) {
 	}
 }
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function update_jobtypeprefs($max, $type, $custdb){
+	$runquery = false;
+	$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = 1 and not deleted", $custdb);
+	$result = Query("select sequence from jobtypepref where jobtypeid = " . $emergencyjobtypeid . " and type = '" . $type . "'", $custdb);
+	$currentprefs = array();
+	while($row = DBGetRow($result)){
+		$currentprefs[$row[0]] = 1;
+	}
+
+	$query = "insert into jobtypepref (jobtypeid,type, sequence,enabled)
+						values ";
+	$values = array();
+	for($i = 0; $i < $max; $i++){
+		if(!isset($currentprefs[$i])){
+			$values[] = "(" . $emergencyjobtypeid . ", '" . $type . "', " . $i . ", 1)";
+			$runquery = true;
+		}
+	}
+	if($runquery){
+		$values = implode(", ", $values);
+		$query .= $values;
+		QuickUpdate($query, $custdb);
+	}
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
 $f = "customer";
 $s = "edit";
 
@@ -142,9 +181,16 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting("displayname", $displayname, $custdb);
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
+
+				update_jobtypeprefs($maxphones, "phone", $custdb);
 				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
+
+				update_jobtypeprefs($maxemails, "email", $custdb);
 				setCustomerSystemSetting("maxemails", $maxemails, $custdb);
+
+				update_jobtypeprefs($maxsms, "sms", $custdb);
 				setCustomerSystemSetting('maxsms', $maxsms, $custdb);
+
 				setCustomerSystemSetting('retry', $retry, $custdb);
 				setCustomerSystemSetting('callerid', Phone::parse($callerid), $custdb);
 				setCustomerSystemSetting('defaultareacode', $areacode, $custdb);
@@ -309,6 +355,11 @@ if( $reloadform ) {
 	PutFormData($f, $s, "_hasremotedm", getCustomerSystemSetting('_hasremotedm', "", true, $custdb), "bool", 0, 1);
 
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
 
 include_once("nav.inc.php");
 ?><script src="picker.js?<?=rand()?>"></script><?
