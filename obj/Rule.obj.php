@@ -104,14 +104,14 @@ class Rule extends DBMappedObject {
 				$sql .= "$f='$reldate'";
 				break;
 			default:
-				$sql = "and 0"; //always default on the safe side
+				$sql = " and 0 "; //always default on the safe side
 		}
 
 		return $sql;
 	}
-	
+
 	/**static functions**/
-	
+
 	static function makeQuery ($rulesarray, $alias, $fieldoverride = false) {
 		$query = "";
 		if(is_array($rulesarray))
