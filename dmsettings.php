@@ -196,6 +196,7 @@ startWindow("Route Plans");
 ?>
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">
+		<th align="left">#</th>
 		<th align="left">Match</th>
 		<th align="left">Strip</th>
 		<th align="left">Prefix</th>
@@ -204,10 +205,13 @@ startWindow("Route Plans");
 	</tr>
 <?
 		$alt = 0;
+		$count = 0;
 		foreach($routes as $route){
 			if($route->id == "new") continue;
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+			$count++;
 ?>
+				<td><?=$count?></td>
 				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_match", "text", 10, 20, "id='dm_" . $route->id . "_match' "); ?></td>
 				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_strip", "text", 2); ?></td>
 				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_prefix", "text", 10, 20); ?></td>
@@ -218,7 +222,9 @@ startWindow("Route Plans");
 <?
 		}
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+		$count++;
 ?>
+			<td><?=$count?></td>
 			<td>Default</td>
 			<td><? NewFormItem($f, $s, "default_strip", "text", 2); ?></td>
 			<td><? NewFormItem($f, $s, "default_prefix", "text", 10, 20); ?></td>
@@ -228,6 +234,7 @@ startWindow("Route Plans");
 <?
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
+			<td>&nbsp;</td>
 			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_match", "text", 10, 20, "id='dm_" . $route->id . "_match' "); ?></td>
 			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_strip", "text", 2); ?></td>
 			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_prefix", "text", 10, 20); ?></td>
