@@ -41,15 +41,17 @@ if(isset($_GET['dmid'])){
 
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
-$states = array("new", "disabled", "active");
+
 $telco_types = array("Test", "Asterisk", "Jtapi");
-$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip from dm where id = '" . DBSafe($dmid) . "'", true);
+$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip from dm where id = '" . DBSafe($dmid) . "'", true);
+
 
 $f = "dmedit";
 $s = "main";
 $reloadform = 0;
+$refreshdm = false;
 
-if(CheckFormSubmit($f,$s))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit($f, "unauthorize"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -72,14 +74,23 @@ if(CheckFormSubmit($f,$s))
 				error('Bad Manager Password');
 			} else if (!ereg("[0-9]{10}",$callerid)) {
 				error('Bad Caller ID, Try Again');
-			} else if (GetformData($f, $s, "customerid") === 0){
-				error('Invalid Customer ID');
 			} else if (GetFormData($f, $s, "customerid") && !QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
 				error('Invalid Customer ID');
 			} else if (GetFormData($f, $s, "telco_inboundtoken") > GetFormData($f, $s, "delmech_resource_count")){
 				error('Number of inbound tokens cannot exceed the max number of resources');
 			} else {
 				QuickUpdate("Begin");
+
+				$enablestate = $dm['enablestate'];
+
+				if(CheckFormSubmit($f, "authorize")){
+					QuickUpdate("update dm set authorizedip = lastip, enablestate = 'active' where id = " . $dmid);
+					$enablestate = "active";
+				} else if(CheckFormSubmit($f, "unauthorize")){
+					QuickUpdate("update dm set enablestate = 'disabled' where id = " . $dmid);
+					$enablestate = "disabled";
+				}
+
 				QuickUpdate("delete from dmsetting where dmid = '" . DBSafe($dmid) . "'");
 
 				QuickUpdate("insert into dmsetting (dmid, name, value) values
@@ -93,16 +104,9 @@ if(CheckFormSubmit($f,$s))
 							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "')
 							");
 				$newcustomerid = GetFormData($f, $s, "customerid") +0;
-				if($newcustomerid == 0){
-					$newcustomerid = "null";
-				}
 				QuickUpdate("update dm set
-							customerid = " . $newcustomerid . ",
-							enablestate = '" . DBSafe(GetFormData($f, $s, "enablestate")) . "'
+							customerid = " . $newcustomerid . "
 							where id = '" . DBSafe($dmid) . "'");
-				if(!$dm['authorizedip'] && GetFormData($f, $s, 'enablestate') == "active"){
-					QuickUpdate("update dm set authorizedip = '" . $dm['lastip'] . "'");
-				}
 
 				if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
 					$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
@@ -113,22 +117,18 @@ if(CheckFormSubmit($f,$s))
 					}
 				}
 
-				if($newcustomerid != "null"){
-
-
-					$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
-												where c.id = " . $newcustomerid);
-					$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
-					if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-						QuickUpdate("insert into custdm (dmid, name, enablestate) values
-									(" . $dmid . ", '" . $dm['name'] . "', '" . $dm['enablestate'] . "')
-									", $custdb);
-					} else {
-						QuickUpdate("update custdm set enablestate = '" . DBSafe(GetformData($f, $s, 'enablestate')) . "'
-									where dmid = " . $dmid, $custdb);
-					}
-
+				$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
+											where c.id = " . $newcustomerid);
+				$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
+				if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
+					QuickUpdate("insert into custdm (dmid, name, enablestate) values
+								(" . $dmid . ", '" . $dm['name'] . "', '" . $dm['enablestate'] . "')
+								", $custdb);
+				} else {
+					QuickUpdate("update custdm set enablestate = '" . DBSafe($enablestate) . "'
+								where dmid = " . $dmid, $custdb);
 				}
+
 
 				QuickUpdate("commit");
 				redirect("customerdms.php");
@@ -143,15 +143,16 @@ if( $reloadform )
 {
 	ClearFormData($f);
 	PutFormData($f, $s, "Submit", "");
+	PutFormData($f, "authorize", "Authorize", "");
+	PutFormData($f, "unauthorize", "Un-authorize", "");
 	PutFormData($f, $s, "managerpassword", "");
-	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "number", "nomin", "nomax", true);
+	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "number", "nomin", "nomax", true);
 
-	PutFormData($f, $s, "telco_dial_timeout", getDMSetting($dmid, "telco_dial_timeout"), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "telco_dial_timeout", getDMSetting($dmid, "telco_dial_timeout"), "number", "nomin", "nomax", true);
 	PutFormData($f, $s, "telco_caller_id", Phone::format(getDMSetting($dmid, "telco_caller_id")), "phone", "10", "10", true);
-	PutFormData($f, $s, "telco_inboundtoken", getDMSetting($dmid, "telco_inboundtoken"), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "enablestate", $dm['enablestate'], "array", $states, "nomax", true);
-	PutFormData($f, $s, "customerid", $dm['customerid'], "number");
+	PutFormData($f, $s, "telco_inboundtoken", getDMSetting($dmid, "telco_inboundtoken"), "number", "nomin", "nomax", true);
+	PutFormData($f, $s, "customerid", $dm['customerid'], "number", "1", "nomax", true);
 	PutFormData($f, $s, "telco_type", getDMSetting($dmid, "telco_type"), "array", $telco_types, "nomax", true);
 	PutFormData($f, $s, "dm_enabled", getDMSetting($dmid, "dm_enabled"), "bool", 0, 1);
 
@@ -184,6 +185,10 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td><? NewFormItem($f, $s, "customerid", "text", "5"); ?></td>
 	</tr>
 	<tr>
+		<td>Enable State: </td>
+		<td><?=$dm['enablestate']?></td>
+	</tr>
+	<tr>
 		<td>Type: </td>
 		<td>
 			<?
@@ -192,18 +197,6 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 					NewFormItem($f, $s, "telco_type", "selectoption", $telco_type, $telco_type);
 				}
 				NewFormItem($f, $s, "telco_type", "selectend");
-			?>
-		</td>
-	</tr>
-	<tr>
-		<td>State: </td>
-		<td>
-			<?
-				NewFormItem($f, $s, "enablestate", "selectstart");
-				foreach($states as $state){
-					NewFormItem($f, $s, "enablestate", "selectoption", ucfirst($state), $state);
-				}
-				NewFormItem($f, $s, "enablestate", "selectend");
 			?>
 		</td>
 	</tr>
@@ -232,7 +225,21 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td><? NewFormItem($f, $s, "test_has_delays", "checkbox", null, null, "id='test_has_delays'"); ?></td>
 	</tr>
 	<tr>
-		<td><? NewFormItem($f, $s, "Submit", "submit"); ?></td>
+		<td>Authorized IP:</td>
+		<td><?=$dm['authorizedip']?></td>
+	</tr>
+	<tr>
+		<td>Last IP: </td>
+		<td><?=$dm['lastip']?></td>
+	</tr>
+	<tr>
+		<td colspan="3">
+<?
+			NewFormItem($f, $s, "Submit", "submit");
+			NewFormItem($f, "authorize", "Authorize", "submit");
+			NewFormItem($f, "unauthorize", "Un-authorize", "submit");
+?>
+		</td>
 	</tr>
 </table>
 <?
