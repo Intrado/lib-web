@@ -40,7 +40,7 @@ if(!CheckFormSubmit($f, "save") && $curfilename && !$errormsg){
 		$errormsg = "Unable to open the file";
 	}
 }
-
+$routechange = 0;
 if(CheckFormSubmit($f, "save")  && !$errormsg){
 	if($fp = @fopen($curfilename, "r")){
 		// CSV format is match, strip, prefix, suffix
@@ -65,7 +65,7 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 					if($dmroutes[$row[0]]->strip != $row[1]
 						|| $dmroutes[$row[0]]->prefix != $row[2]
 						|| $dmroutes[$row[0]]->suffix != $row[3]){
-							QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+							$routechange = 1;
 						}
 					$dmroutes[$row[0]]->strip = $row[1];
 					$dmroutes[$row[0]]->prefix = $row[2];
@@ -79,9 +79,13 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 					$route->prefix = $row[2];
 					$route->suffix = $row[3];
 					$route->create();
-					$update = true;
+					$dmroutes[$row[0]] = $route;
+					$routechange = 1;
 				}
 			}
+		}
+		if($routechange){
+			QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
 		}
 		redirect("dmsettings.php");
 	} else {
