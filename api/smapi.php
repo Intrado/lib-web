@@ -256,7 +256,6 @@ class SMAPI{
 				return $result;
 			}
 
-			error_log($origtempfile . " -> " . $cleanedtempfile);
 			//delete temp file that secure_tmpname generated so we can check if sox generated a file later
 			@unlink($cleanedtempfile);
 
