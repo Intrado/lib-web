@@ -182,6 +182,11 @@ class SMAPI{
 				return $result;
 			}
 
+			if($message->type == "sms"){
+				if(strlen($messagetext) > 160){
+					$messagetext = substr($messagetext, 0, 160);
+				}
+			}
 			$parts = Message::parse($messagetext);
 			$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
 			QuickUpdate("delete from messagepart where messageid=$message->id");
@@ -214,8 +219,9 @@ class SMAPI{
 	*/
 
 	function uploadAudio($sessionid, $name, $mimetype, $audio){
-		global $USER;
+		global $USER, $SETTINGS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "audioname" => "");
+
 		if(!APISession($sessionid)){
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
@@ -237,11 +243,46 @@ class SMAPI{
 				return $result;
 			}
 
-			$content = new Content();
-			$content->type = $mimetype;
-			$content->data = $audio;
-			$content->create();
-			if(!$content->id){
+			//generate 2 temp files
+			//write audio data to first file then run through sox to clean audio and output to second file
+			//read second file and base64 encode it for the DB
+
+			if(!$origtempfile = secure_tmpname($name . "origtempapiaudio", ".wav")){
+				$result["resultdescription"] = "Failed to generate audio file";
+				return $result;
+			}
+			if(!$cleanedtempfile = secure_tmpname("cleanedtempapiaudio", ".wav")){
+				$result["resultdescription"] = "Failed to generate audio file";
+				return $result;
+			}
+
+			error_log($origtempfile . " -> " . $cleanedtempfile);
+			//delete temp file that secure_tmpname generated so we can check if sox generated a file later
+			@unlink($cleanedtempfile);
+
+			if(!file_put_contents($origtempfile, base64_decode($audio))){
+				$result['resultdescription'] = "Failed to generate audio file";
+				return $result;
+			}
+
+			$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s -w \"$cleanedtempfile\" ";
+			$soxresult = exec($cmd, $res1,$res2);
+			$content = null;
+			if($res2 || !file_exists($cleanedtempfile)) {
+				$result["resultdescription"]= 'There was an error reading your audio file. Please try another file. Supported formats include: .wav, .aiff, and .au';
+				@unlink($origtempfile);
+				@unlink($cleanedtempfile);
+				return $result;
+			} else {
+				$content = new Content();
+				$content->type = $mimetype;
+				$content->data = base64_encode(file_get_contents($cleanedtempfile));
+				$content->create();
+
+				@unlink($origtempfile);
+				@unlink($cleanedtempfile);
+			}
+			if($content == null || !$content->id){
 
 				$result["resultdescription"] = "Failed to create audio file record";
 				return $result;
@@ -259,12 +300,12 @@ class SMAPI{
 			$audiofile->create();
 
 			if(!$audiofile->id){
-
 				$result["resultdescription"] = "Failed to create audio file record";
 			} else {
 				$result["resultcode"] = "success";
 				$result["audioname"] = $audiofile->name;
 			}
+			error_log(print_r($result, true));
 			return $result;
 		}
 	}
@@ -751,9 +792,8 @@ require_once("API_JobType.obj.php");
 require_once("API_Job.obj.php");
 require_once("API_JobStatus.obj.php");
 
-
 ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
-$server=new SoapServer("SMAPI.wsdl");
+$server=new SoapServer("smapi.wsdl");
 $server->setClass("SMAPI");
 $server->handle();
 //var_dump($server->getFunctions());
