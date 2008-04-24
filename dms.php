@@ -24,7 +24,7 @@ if(isset($_GET['resetdm'])){
 	}
 }
 
-$result = Query("select dmid, name, routechange from custdm where enablestate = 'active' order by dmid");
+$result = Query("select dmid, name, routechange, telco_type from custdm where enablestate = 'active' order by dmid");
 $data = array();
 $resetrequired = array();
 while($row = DBGetRow($result)){
@@ -39,8 +39,13 @@ if(count($resetrequired)){
 }
 
 // index 0 is dmid
+// index 3 is telco type
 function fmt_editDMRoute($row, $index){
-	$url = '<a href="dmsettings.php?dmid=' . $row[0] . '">Edit Route Plan</a>&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this DM\')">Reset</a>';
+	$url = '<a href="dmsettings.php?dmid=' . $row[0] . '">Edit&nbsp;Route&nbsp;Plan</a>';
+	if($row[3] == "Jtapi"){
+		$url .= '&nbsp;|&nbsp;<a href="calleridroute.php?dmid=' . $row[0] . '">Edit&nbsp;Caller&nbsp;ID&nbsp;Routes</a>';
+	}
+	$url .= '&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this DM\')">Reset</a>';
 	return $url;
 }
 
