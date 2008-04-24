@@ -101,7 +101,7 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 					if($route->id == "new" && CheckFormSubmit($f, "add")){
 						$routechange = true;
 						$route->create();
-					} else {
+					} else if($route->id != "new") {
 						$route->update();
 					}
 				}
@@ -152,37 +152,6 @@ if( $reloadform )
 	PutFormData($f, $s, "default_prefix", $defaultroute->prefix, "number");
 	PutFormData($f, $s, "default_suffix", $defaultroute->suffix, "number");
 }
-
-function dm_match($obj, $name){
-	global $f, $s;
-	NewFormItem($f, $s, "dm_" . $obj->id ."_match", "text", 10, 20, "id='dm_" . $obj->id . "_match' ");
-	if($obj->match == '' && $obj->id == 'new'){
-		echo "Default:";
-		NewFormItem($f, $s, "dm_" . $obj->id ."_default", "checkbox", null, null, "id='dm_" . $obj->id . "_default' onclick='new getObj(\"dm_" . $obj->id . "_match\").obj.disabled = this.checked' ");
-	}
-}
-function dm_strip($obj, $name){
-	global $f, $s;
-	NewFormItem($f, $s, "dm_" . $obj->id ."_strip", "text", 2);
-}
-function dm_prefix($obj, $name){
-	global $f, $s;
-	NewFormItem($f, $s, "dm_" . $obj->id ."_prefix", "text", 10, 20);
-}
-function dm_suffix($obj, $name){
-	global $f, $s;
-	NewFormItem($f, $s, "dm_" . $obj->id ."_suffix", "text", 10,20);
-}
-function dm_add($obj, $name){
-	global $f, $s;
-	if($obj->id == "new"){
-		$url = submit($f, $s, "Add");
-	} else {
-		$url = submit($f, "delete_dm_" .$obj->id, "Delete");
-	}
-	return $url;
-}
-
 
 $PAGE="admin:settings";
 $TITLE="Telco Settings";
@@ -253,6 +222,3 @@ EndForm();
 <?
 include_once("navbottom.inc.php");
 ?>
-<script>
-	new getObj('dm_new_match').obj.disabled = new getObj('dm_new_default').obj.checked;
-</script>
