@@ -332,7 +332,14 @@ class RenderedList {
 		//$this->totalrule = $this->countByRule($usersql, $listsql); //not useful
 		$this->totalremoved = $this->countRemoved();
 		$this->totaladded = $this->countAdded();
+
 		$this->total = $this->countEffectiveRule($usersql, $listsql) + $this->totaladded;
+		if ($this->mode == "add") {
+			$this->total = $this->totaladded;;
+		}
+		if ($this->mode == "remove") {
+			$this->total = $this->totalremoved;
+		}
 
 		$this->hasstats = true;
 	}
