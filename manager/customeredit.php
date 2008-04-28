@@ -56,7 +56,6 @@ function update_jobtypeprefs($max, $type, $custdb){
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,8 +265,14 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 				setCustomerSystemSetting('emaildomain', DBSafe(trim(GetFormData($f, $s, "emaildomain"))), $custdb);
 
-				setCustomerSystemSetting('_hasremotedm', DBSafe(trim(GetFormData($f, $s, "_hasremotedm"))), $custdb);
+				if(getCustomerSystemSetting('_hasremotedm', false, true, $custdb) && !GetFormData($f, $s, "_hasremotedm")){
+					$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
+					$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
+					QuickUpdate("delete from specialtaskqueue where customerid = " . $currentid, $aspsharddb);
+					QuickUpdate("update qjob set dispatchtype = 'system' where customerid = " . $currentid . " and status = 'active'", $aspsharddb);
+				}
 
+				setCustomerSystemSetting('_hasremotedm', DBSafe(GetFormData($f, $s, "_hasremotedm")), $custdb);
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
@@ -408,7 +413,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
 <tr><td> Has Portal </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?></td></tr>
-<tr><td> Uses Remote DM </td><td><? NewFormItem($f, $s, '_hasremotedm', 'checkbox') ?></td></tr>
+<tr><td> Uses Remote DM </td><td><? NewFormItem($f, $s, '_hasremotedm', 'checkbox') ?><?= getCustomerSystemSetting('_hasremotedm', "", true, $custdb) ? '<b style="color: red;">Unchecking this box will cause jobs to go out on the system!</b>' : "" ?></td></tr>
 
 <tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!</b></td></tr>
 
