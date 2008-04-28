@@ -1473,3 +1473,6 @@ $$$
 
 ALTER TABLE `custdm` ADD `telco_type` ENUM( 'Test', 'Asterisk', 'Jtapi' ) NOT NULL DEFAULT 'Test' AFTER `enablestate`
 $$$
+
+ALTER TABLE `custdm` CHANGE `routechange` `routechange` TINYINT( 4 )
+$$$
