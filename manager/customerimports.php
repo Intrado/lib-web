@@ -8,8 +8,6 @@ include_once("../inc/table.inc.php");
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
 function fmt_alert_timestamp($row, $index) {
 	date_default_timezone_set($row[2]);
 	$timestamp = strtotime($row[$index]);
@@ -26,11 +24,16 @@ function fmt_alert_timestamp($row, $index) {
 function fmt_last_modified($row, $index){
 	date_default_timezone_set($row[2]);
 	$timestamp = strtotime($row[$index]);
+	$scheduledDow = array_flip(explode(",", $row[12]['dow']));
+
 	if ($timestamp === false) {
 		return "<div style='background-color: #ffcccc'>- Never -</div>";
 	} else {
-		if(isset($row[12]['daysold']) && $row[12]['daysold'] && ($timestamp < time() - 60*60*24* $row[12]['daysold']))
-			return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
+		if(isset($row[12]['daysold']) && $row[12]['daysold'] && ($timestamp < time() - 60*60*24* $row[12]['daysold'])
+			|| !isset($scheduledDow[date("w", $timestamp)+1])
+			|| (strtotime($row[12]['time'])+60*15 < strtotime(date("H:i", $timestamp)) || strtotime($row[12]['time'])-60*15 > strtotime(date("H:i", $timestamp)))
+			)
+				return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
 		else
 			return date("M j, g:i a", $timestamp);
 	}
