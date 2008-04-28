@@ -639,14 +639,23 @@ startWindow('Job Information');
 					<td>
 						<?
 
-						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
+						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
 						NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
 						foreach ($VALIDJOBTYPES as $item) {
 							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
 						}
 						NewFormItem($f,$s,"jobtypeid", "selectend");
 						?>
+
 					</td>
+					<td><div id="jobtypeinfo" style="overflow:scroll; width:200px; height:75px;"></div></td>
+<?
+					if(getCustomerSystemSetting('_hasremotedm')){
+?>
+						<td><div id="addinfo" style="width:200px; height:75px;"></div></td>
+<?
+					}
+?>
 				</tr>
 				<tr>
 					<td>List <?= help('Job_SettingsList',NULL,"small"); ?></td>
@@ -901,6 +910,14 @@ include_once("navbottom.inc.php");
 
 ?>
 <script language="javascript">
+	var jobtypeinfo = new Array();;
+<?
+	foreach($VALIDJOBTYPES as $jobtype){
+?>
+		jobtypeinfo[<?=$jobtype->id?>] = new Array("<?=$jobtype->systempriority?>", "<?=$jobtype->info?>");
+<?
+	}
+?>
 	smscheck = false;
 <?
 	if($hassms && $USER->authorize('sendsms')) {
@@ -1039,4 +1056,18 @@ function clickIcon(section){
 	}
 }
 
+function display_jobtype_info(value){
+	new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
+<?
+	if(getCustomerSystemSetting('_hasremotedm')){
+?>
+	if(jobtypeinfo[value][0] == 1){
+		new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out on the hosted system";
+	} else {
+		new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out by your Delivery Mechanism";
+	}
+<?
+	}
+?>
+}
 </script>
