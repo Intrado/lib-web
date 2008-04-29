@@ -69,6 +69,8 @@ if(CheckFormSubmit($f, $s)){
 			} elseif($bademaillist = checkemails($emaillist)) {
 				error("These emails are invalid", $bademaillist);
 			} else {
+				//Wipe out any old settings
+				$importalert = array();
 				$importalert['minsize'] = $minsize;
 				$importalert['maxsize'] = $maxsize;
 				$importalert['daysold'] = GetFormData($f, $s, "daysold");
@@ -79,8 +81,14 @@ if(CheckFormSubmit($f, $s)){
 					}
 				}
 				$importalert['dow'] = implode(",", $newdows);
-				$importalert['time'] = date("H:i", strtotime(GetFormData($f, $s, "time")));
+				if($importalert['dow'] != "")
+					$importalert['time'] = date("H:i", strtotime(GetFormData($f, $s, "time")));
+
 				$importalert['emails'] = DBSafe($emaillist);
+				foreach($importalert as $index => $alert){
+					if($alert == "")
+						unset($importalert[$index]);
+				}
 				$importalerturl = http_build_query($importalert, false, "&");
 				QuickUpdate("update import set alertoptions = '" . DBSafe($importalerturl) . "' where id = " . $importid, $custdb);
 				redirect("customerimports.php");
