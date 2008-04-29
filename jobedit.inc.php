@@ -47,6 +47,11 @@ if (!$submittedmode && isset($_GET['deletejoblang'])) {
 
 $VALIDJOBTYPES = JobType::getUserJobTypes();
 
+//Fetch all job types in case the job has a jobtype that is not valid for the user
+//or the jobtype is deleted now
+//this array is to be used only to display the info
+$infojobtypes = DBFindMany("JobType", "from jobtype");
+
 /****************** main message section ******************/
 
 $f = "notification";
@@ -639,7 +644,7 @@ startWindow('Job Information');
 					<td>
 						<?
 
-						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
+						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, "id=jobtypeid " . ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
 						NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
 						foreach ($VALIDJOBTYPES as $item) {
 							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
@@ -912,12 +917,13 @@ include_once("navbottom.inc.php");
 <script language="javascript">
 	var jobtypeinfo = new Array();;
 <?
-	foreach($VALIDJOBTYPES as $jobtype){
+	foreach($infojobtypes as $infojobtype){
 ?>
-		jobtypeinfo[<?=$jobtype->id?>] = new Array("<?=$jobtype->systempriority?>", "<?=$jobtype->info?>");
+		jobtypeinfo[<?=$infojobtype->id?>] = new Array("<?=$infojobtype->systempriority?>", "<?=$infojobtype->info?>");
 <?
 	}
 ?>
+	display_jobtype_info(new getObj('jobtypeid').obj.value);
 	smscheck = false;
 <?
 	if($hassms && $USER->authorize('sendsms')) {
@@ -1057,17 +1063,19 @@ function clickIcon(section){
 }
 
 function display_jobtype_info(value){
-	new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
+	if(value){
+		new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
 <?
-	if(getCustomerSystemSetting('_hasremotedm')){
+		if(getCustomerSystemSetting('_hasremotedm')){
 ?>
-	if(jobtypeinfo[value][0] == 1){
-		new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out on the hosted system";
-	} else {
-		new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out by your Delivery Mechanism";
-	}
+			if(jobtypeinfo[value][0] == 1){
+				new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out on the hosted system";
+			} else {
+				new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out by your Delivery Mechanism";
+			}
 <?
-	}
+		}
 ?>
+	}
 }
 </script>
