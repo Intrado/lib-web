@@ -126,6 +126,11 @@ jobworkitem wi1 left join jobworkitem wi2 on (wi2.id > wi1.id and wi2.jobid = wi
 where wi2.id is not null
 $$$
 
+
+delete cl2 from calllog cl left join calllog cl2 on (cl.jobtaskid = cl2.jobtaskid and cl.callattempt=cl2.callattempt)
+where cl2.id > cl.id
+$$$
+
 -- report person
 
 insert into reportperson
