@@ -78,6 +78,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 				error('Invalid Customer ID');
 			} else if (GetFormData($f, $s, "telco_inboundtoken") > GetFormData($f, $s, "delmech_resource_count")){
 				error('Number of inbound tokens cannot exceed the max number of resources');
+			} else if(GetFormData($f, $s, 'telco_calls_sec') && !ereg("^[0-9]+\.?[0-9]*$", GetFormData($f, $s, 'telco_calls_sec'))){
+				error("Calls per second must be a positive number");
 			} else {
 				QuickUpdate("Begin");
 
@@ -147,7 +149,7 @@ if( $reloadform )
 	PutFormData($f, "authorize", "Authorize", "");
 	PutFormData($f, "unauthorize", "Un-authorize", "");
 	PutFormData($f, $s, "managerpassword", "");
-	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "number", "nomin", "nomax", true);
+	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "number", "nomin", "nomax", true);
 
 	PutFormData($f, $s, "telco_dial_timeout", getDMSetting($dmid, "telco_dial_timeout"), "number", "nomin", "nomax", true);
