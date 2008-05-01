@@ -1476,3 +1476,7 @@ $$$
 
 ALTER TABLE `custdm` CHANGE `routechange` `routechange` TINYINT( 4 )
 $$$
+
+ALTER TABLE `reportcontact` ADD `voicereplyid` INT(11) NULL ,
+ADD `response` TINYINT(4) NULL
+$$$
