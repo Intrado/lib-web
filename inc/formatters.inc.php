@@ -566,7 +566,7 @@ function fmt_confirmation($row, $index){
 
 //index 5 is type
 function fmt_dst_src($row, $index){
-	if($row[$index])
+	if($row[$index] != null)
 		return format_delivery_type($row[5]) . " " . ($row[$index] +1);
 	else
 		return "";
