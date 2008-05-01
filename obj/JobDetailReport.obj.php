@@ -66,6 +66,12 @@ class JobDetailReport extends ReportGenerator{
 				$resultquery .= " and rp.status in ('success', 'fail', 'duplicate')";
 			else if($this->params['status'] == "remaining")
 				$resultquery .= " and rp.status not in ('success', 'fail', 'duplicate')";
+			else if($this->params['status'] == "confirmed")
+				$resultquery = " and rc.response = 1";
+			else if($this->params['status'] == "notconfirmed")
+				$resultquery = " and rc.response = 2";
+			else if($this->params['status'] == "noconfirmation")
+				$resultquery = " and rc.response is null";
 			else
 				$resultquery .= " and rp.status = '" . $this->params['status'] . "'";
 		}
@@ -99,7 +105,7 @@ class JobDetailReport extends ReportGenerator{
 			rc.numattempts as numattempts,
 			rc.resultdata,
 			sw.resultdata,
-			rc.participated as confirmed,
+			rc.response as confirmed,
 			rc.sequence as destsource
 			$fieldquery
 			from reportperson rp
@@ -207,14 +213,6 @@ class JobDetailReport extends ReportGenerator{
 			?><br><?
 		}
 
-		//index 5 is type
-		function fmt_dst_src($row, $index){
-			if($row[$index])
-				return format_delivery_type($row[5]) . " " . ($row[$index] +1);
-			else
-				return "";
-		}
-
 		displayJobSummary($this->params['joblist']);
 
 		?><br><?
@@ -304,7 +302,7 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = array_flip($fieldindex);
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Deliver by","Destination","Attempts","Last Attempt","Last Result"';
+		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Dst. Src.","Destination","Attempts","Last Attempt","Last Result"';
 		if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
 			$header .= ',"Confirmed"';
 		}
@@ -341,7 +339,7 @@ class JobDetailReport extends ReportGenerator{
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
 
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],format_delivery_type($row[5]),$row[7],$row[11],$row[8],$row[9]);
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9]);
 
 			if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
 				$reportarray[] = fmt_confirmation($row, 14);
