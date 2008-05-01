@@ -80,6 +80,8 @@ class JobSummaryReport extends ReportGenerator{
 			$url = "startdate=" . $startdate . "&enddate=" . $enddate . "&jobtypes=" . $jobtypes . "&surveyonly=" . $surveyonly;
 		}
 
+		$hasconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')");
+
 		//Gather Phone Information
 		$phonenumberquery = "select sum(rc.type='phone') as total,
 									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
@@ -89,7 +91,6 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rc.numattempts) as totalattempts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
-									sum(rc.participated) as confirmed,
 									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
@@ -124,6 +125,19 @@ class JobSummaryReport extends ReportGenerator{
 									where rp.jobid in ('" . $this->params['joblist'] . "')
 									and rp.type='sms'";
 		$smsinfo = QuickQueryRow($smsquery);
+
+
+		if($hasconfirmation){
+			$confirmedquery = "select sum(rc.response=1),
+										sum(rc.response=2),
+										sum(rc.response is null)
+											from reportperson rp
+											left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+											inner join job j on (j.id = rp.jobid)
+											where rp.jobid in ('" . $this->params['joblist'] . "')
+										and rp.type='phone'";
+			$confirmedinfo = QuickQueryRow($confirmedquery);
+		}
 
 		//may need to clean up, null means not called yet
 		//do math for the % completed
@@ -166,6 +180,7 @@ class JobSummaryReport extends ReportGenerator{
 		}
 		$jobstats["phone"]['totalcalls'] = array_sum($jobstats["phone"]);
 		$jobstats["phone"]['remainingcalls'] = $remainingcalls;
+
 		$jobnumberlist = implode("", explode("','", $this->params['joblist']));
 		$_SESSION['jobstats'][$jobnumberlist] = $jobstats;
 
@@ -292,14 +307,6 @@ class JobSummaryReport extends ReportGenerator{
 											<th>No Phone #</th>
 											<th>No Phone Selected</th>
 											<th>Total Attempts</th>
-
-<?
-											if(QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
-?>
-												<th>Confirmed</th>
-<?
-											}
-?>
 											<th>% Contacted</th>
 										</tr>
 										<tr>
@@ -311,15 +318,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=$phonenumberinfo[5]+0?></td>
 											<td><?=$phonenumberinfo[7]+0?></td>
 											<td><?=$phonenumberinfo[6]+0?></td>
-<?
-											if(QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
-?>
-												<td><?=$phonenumberinfo[8]+0?></td>
-<?
-											}
-?>
-											<td><?=sprintf("%0.2f", isset($phonenumberinfo[9]) ? $phonenumberinfo[9] : "") . "%" ?></td>
-
+											<td><?=sprintf("%0.2f", isset($phonenumberinfo[8]) ? $phonenumberinfo[8] : "") . "%" ?></td>
 										</tr>
 									</table>
 								</td>
@@ -363,6 +362,20 @@ class JobSummaryReport extends ReportGenerator{
 									<img src="graph_detail_callprogress.png.php?<?= $urloptions ?>">
 								</td>
 							</tr>
+<?
+						if($hasconfirmation){
+?>
+							<tr>
+								<table>
+									<tr><th colspan="2">Confirmed</th></tr>
+									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?status=confirmed"/a>Yes:</a.</td><td><?=$confirmedinfo[0]+0?></td></tr>
+									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?status=notconfirmed"/a>No:</a></td><td><?=$confirmedinfo[1]+0?></td></tr>
+									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?status=noconfirmation"/a>No Response:</a></td><td><?=$confirmedinfo[2]+0?></td></tr>
+								</table>
+							</tr>
+<?
+						}
+?>
 						</table>
 					</td>
 				</tr>
