@@ -43,7 +43,8 @@ $titles = array(0 => "DM ID",
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
-					7 => "fmt_ms_timestamp");
+					7 => "fmt_ms_timestamp",
+					6 => "fmt_state");
 
 
 //index 2 is customer id
@@ -59,6 +60,10 @@ function fmt_customerUrl($row, $index){
 function fmt_DMActions($row, $index){
 	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '">Reset</a>';
 	return $url;
+}
+
+function fmt_state($row, $index){
+	return ucfirst($row[$index]);
 }
 
 include_once("nav.inc.php");
