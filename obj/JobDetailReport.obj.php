@@ -44,7 +44,7 @@ class JobDetailReport extends ReportGenerator{
 		$resultquery = "";
 		if(isset($this->params['result']) && $this->params['result']){
 			if($this->params['result'] == "undelivered"){
-				//TODO: rename newflag
+
 				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from reportperson rp
 											left join reportperson rp2 on (rp2.personid = rp.duplicateid and rp2.jobid = rp.jobid and rp2.type = rp.type)
 											where rp.jobid in ('" . $joblist . "') group by rp.jobid, rp.personid having cnt = 0 and (cnt2 = 0 or cnt2 is null)", true);
@@ -55,9 +55,9 @@ class JobDetailReport extends ReportGenerator{
 					$resultquery .= " and rp.status in ('fail', 'nocontacts', 'blocked', 'declined') ";
 				}
 			} else if($this->params['result'] == "nocontacts"){
-				$resultquery = " and rp.status = 'nocontacts' ";
+				$resultquery .= " and rp.status = 'nocontacts' ";
 			} else {
-				$resultquery = " and rc.result in ('" . $this->params['result'] . "')";
+				$resultquery .= " and rc.result in ('" . $this->params['result'] . "')";
 			}
 		}
 
@@ -67,11 +67,11 @@ class JobDetailReport extends ReportGenerator{
 			else if($this->params['status'] == "remaining")
 				$resultquery .= " and rp.status not in ('success', 'fail', 'duplicate')";
 			else if($this->params['status'] == "confirmed")
-				$resultquery = " and rc.response = 1";
+				$resultquery .= " and rc.response = 1";
 			else if($this->params['status'] == "notconfirmed")
-				$resultquery = " and rc.response = 2";
+				$resultquery .= " and rc.response = 2";
 			else if($this->params['status'] == "noconfirmation")
-				$resultquery = " and rc.response is null";
+				$resultquery .= " and rc.response is null";
 			else
 				$resultquery .= " and rp.status = '" . $this->params['status'] . "'";
 		}
@@ -106,7 +106,8 @@ class JobDetailReport extends ReportGenerator{
 			rc.resultdata,
 			sw.resultdata,
 			rc.response as confirmed,
-			rc.sequence as destsource
+			rc.sequence as destsource,
+			rc.voicereplyid as voicereplyid
 			$fieldquery
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
@@ -173,7 +174,6 @@ class JobDetailReport extends ReportGenerator{
 		}
 
 		// DISPLAY
-
 		if( (isset($this->params['jobtypes']) && $this->params['jobtypes'] != "") || (isset($this->params['result']) && $this->params['result'] != "") || count($searchrules)){
 			startWindow("Filter By");
 ?>
@@ -236,7 +236,7 @@ class JobDetailReport extends ReportGenerator{
 		} else {
 			$titles[14] = "@Confirmed";
 		}
-		$titles = appendFieldTitles($titles, 15, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 16, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
@@ -348,7 +348,7 @@ class JobDetailReport extends ReportGenerator{
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
 					$num = $fieldindex[$fieldnum];
-					$reportarray[] = $row[14+$num];
+					$reportarray[] = $row[16+$num];
 				}
 			}
 			if ($issurvey) {
