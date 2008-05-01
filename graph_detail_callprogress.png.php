@@ -20,7 +20,7 @@ if(isset($_GET['jobid'])){
 
 $jobstats = $_SESSION['jobstats'][$jobid];
 if ($_GET['valid'] != $jobstats['validstamp']){
-	redirect('unauthorized.php');	
+	redirect('unauthorized.php');
 }
 
 $phonestats = $jobstats['phone'];
@@ -59,13 +59,13 @@ $colors = array();
 $labels = array();
 $count=0;
 foreach($cpcodes as $index => $code){
-	$data = array_fill(0, 10, 0);
+	$data = array_fill(0, count($cpcolors), 0);
 	$count++;
 	$color = $cpcolors[$index];
 	$data[$count-1] = $phonestats[$index];
 	$legend = $code;
 	$labels[] = $code;
-	
+
 	$barname = "bar" . $count;
 	$$barname = new BarPlot($data);
 	$$barname->SetFillColor($color);
