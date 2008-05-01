@@ -60,8 +60,9 @@ class JobAutoReport extends ReportGenerator{
 			rc.numattempts as attempts,
 			rc.resultdata,
 			sw.resultdata,
-			rc.participated as confirmed,
-			rc.sequence as destsource
+			rc.response as confirmed,
+			rc.sequence as destsource,
+			rc.voicereplyid as voicereplyid
 			$fieldquery
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
