@@ -90,6 +90,8 @@ if(isset($_GET['status'])){
 	$_SESSION['report']['jobdetail']=1;
 	unset($_SESSION['reportid']);
 	$options = $_SESSION['report']['options'];
+	unset($options['status']);
+	unset($options['result']);
 	$options['status'] = DBSafe($_GET['status']);
 	$options['order1'] = 'rp.pkey';
 	$_SESSION['report']['options'] = $options;
@@ -100,8 +102,9 @@ if(isset($_GET['result'])){
 	$_SESSION['report']['jobdetail']=1;
 	unset($_SESSION['reportid']);
 	$options = $_SESSION['report']['options'];
+	unset($options['status']);
+	unset($options['result']);
 	$options['result'] = DBSafe($_GET['result']);
-
 	if($_GET['result'] == "undelivered"){
 		$options['reporttype'] = "notcontacted";
 	} else {
