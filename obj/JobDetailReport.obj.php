@@ -241,7 +241,7 @@ class JobDetailReport extends ReportGenerator{
 						11 => "Attempts",
 						8 => "Last Attempt",
 						9 => "Last Result");
-		if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
+		if(QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
 			$titles[14] = "Confirmed";
 		} else {
 			$titles[14] = "@Confirmed";
@@ -313,7 +313,7 @@ class JobDetailReport extends ReportGenerator{
 		$activefields = array_flip($activefields);
 		//generate the CSV header
 		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Dst. Src.","Destination","Attempts","Last Attempt","Last Result"';
-		if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
+		if(QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
 			$header .= ',"Confirmed"';
 		}
 		foreach($fieldlist as $fieldnum => $fieldname){
@@ -396,7 +396,7 @@ class JobDetailReport extends ReportGenerator{
 			$joblist=explode("','", $this->params['joblist']);
 
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
-		$messageconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),

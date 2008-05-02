@@ -88,7 +88,7 @@ class JobAutoReport extends ReportGenerator{
 
 	function getReportSpecificParams(){
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
-		$messageconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 		$params = array("jobId" => $this->params['jobid'],
 						"jobcount" => "1",
 						"hassms" => $sms,
