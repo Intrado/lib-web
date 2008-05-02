@@ -56,6 +56,12 @@ class JobDetailReport extends ReportGenerator{
 				}
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery .= " and rp.status = 'nocontacts' ";
+			} else if($this->params['result'] == "confirmed"){
+				$resultquery .= " and rc.response = 1";
+			} else if($this->params['result'] == "notconfirmed"){
+				$resultquery .= " and rc.response = 2";
+			} else if($this->params['result'] == "noconfirmation"){
+				$resultquery .= " and rc.response is null";
 			} else {
 				$resultquery .= " and rc.result in ('" . $this->params['result'] . "')";
 			}
@@ -66,12 +72,6 @@ class JobDetailReport extends ReportGenerator{
 				$resultquery .= " and rp.status in ('success', 'fail', 'duplicate')";
 			else if($this->params['status'] == "remaining")
 				$resultquery .= " and rp.status not in ('success', 'fail', 'duplicate')";
-			else if($this->params['status'] == "confirmed")
-				$resultquery .= " and rc.response = 1";
-			else if($this->params['status'] == "notconfirmed")
-				$resultquery .= " and rc.response = 2";
-			else if($this->params['status'] == "noconfirmation")
-				$resultquery .= " and rc.response is null";
 			else
 				$resultquery .= " and rp.status = '" . $this->params['status'] . "'";
 		}
@@ -174,7 +174,7 @@ class JobDetailReport extends ReportGenerator{
 		}
 
 		// DISPLAY
-		if( (isset($this->params['jobtypes']) && $this->params['jobtypes'] != "") || (isset($this->params['result']) && $this->params['result'] != "") || count($searchrules)){
+		if( (isset($this->params['jobtypes']) && $this->params['jobtypes'] != "") || (isset($this->params['result']) && $this->params['result'] != "") || count($searchrules) || (isset($this->params['status']) && $this->params['status'] != "") ){
 			startWindow("Filter By");
 ?>
 			<table>
@@ -189,6 +189,16 @@ class JobDetailReport extends ReportGenerator{
 					$jobtypenames = implode(", ",$jobtypenames);
 ?>
 					<tr><td>Job Type: <?=$jobtypenames?></td></tr>
+<?
+				}
+				if(isset($this->params['status']) && $this->params['status'] != ""){
+					$statuses = explode("','",$this->params['status']);
+					$statusnames = array();
+					foreach($statuses as $status)
+						$statusnames[] = fmt_status($status);
+					$statusnames = implode(", ", $statusnames);
+?>
+					<tr><td>Status: <?=$statusnames?></td></tr>
 <?
 				}
 				if(isset($this->params['result']) && $this->params['result'] != ""){
