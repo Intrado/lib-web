@@ -559,17 +559,6 @@ function fmt_jobdetail_result($row, $index){
 	}
 }
 
-function fmt_confirmation($row, $index){
-	if($row[$index] == "1"){
-		$text = "Yes";
-	} else if($row[$index] == "2"){
-		$text = "No";
-	} else {
-		$text = "";
-	}
-	return $text;
-}
-
 //index 5 is type
 function fmt_dst_src($row, $index){
 	if($row[$index] != null)
