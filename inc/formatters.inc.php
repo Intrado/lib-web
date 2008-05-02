@@ -470,6 +470,12 @@ function fmt_result ($row,$index) {
 			return "Not Contacted";
 		case "declined":
 			return "No Destination Selected";
+		case "confirmed":
+			return "Confirmed";
+		case "notconfirmed":
+			return "Not Confirmed";
+		case "noconfirmation":
+			return "No Confirmation Response";
 		default:
 			return ucfirst($row[$index]);
 	}
