@@ -80,7 +80,7 @@ class JobSummaryReport extends ReportGenerator{
 			$url = "startdate=" . $startdate . "&enddate=" . $enddate . "&jobtypes=" . $jobtypes . "&surveyonly=" . $surveyonly;
 		}
 
-		$hasconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')");
+		$hasconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')");
 
 		//Gather Phone Information
 		$phonenumberquery = "select sum(rc.type='phone') as total,
@@ -362,20 +362,26 @@ class JobSummaryReport extends ReportGenerator{
 									<img src="graph_detail_callprogress.png.php?<?= $urloptions ?>">
 								</td>
 							</tr>
+						</table>
+					</td>
+				</tr>
 <?
-						if($hasconfirmation){
+				}
+				if($hasconfirmation){
 ?>
+				<tr>
+					<th align="right" class="windowRowHeader bottomBorder">Message Confirmation:</th>
+					<td class="bottomBorder">
+						<table width="100%">
 							<tr>
-								<table>
-									<tr><th colspan="2">Confirmed</th></tr>
-									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=confirmed&type=phone"/a>Yes:</a.</td><td><?=$confirmedinfo[0]+0?></td></tr>
-									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=notconfirmed&type=phone"/a>No:</a></td><td><?=$confirmedinfo[1]+0?></td></tr>
-									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=noconfirmation&type=phone"/a>No Response:</a></td><td><?=$confirmedinfo[2]+0?></td></tr>
-								</table>
+								<td>
+									<table>
+										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=confirmed&type=phone"/a>Yes:</a.</td><td><?=$confirmedinfo[0]+0?></td></tr>
+										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=notconfirmed&type=phone"/a>No:</a></td><td><?=$confirmedinfo[1]+0?></td></tr>
+										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=noconfirmation&type=phone"/a>No Response:</a></td><td><?=$confirmedinfo[2]+0?></td></tr>
+									</table>
+								<td>
 							</tr>
-<?
-						}
-?>
 						</table>
 					</td>
 				</tr>
@@ -410,7 +416,7 @@ class JobSummaryReport extends ReportGenerator{
 			$joblist=explode("','", $this->params['joblist']);
 
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
-		$messageconfirmation = QuickQuery("select value from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
