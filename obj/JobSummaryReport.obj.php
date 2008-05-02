@@ -368,9 +368,9 @@ class JobSummaryReport extends ReportGenerator{
 							<tr>
 								<table>
 									<tr><th colspan="2">Confirmed</th></tr>
-									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?status=confirmed"/a>Yes:</a.</td><td><?=$confirmedinfo[0]+0?></td></tr>
-									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?status=notconfirmed"/a>No:</a></td><td><?=$confirmedinfo[1]+0?></td></tr>
-									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?status=noconfirmation"/a>No Response:</a></td><td><?=$confirmedinfo[2]+0?></td></tr>
+									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=confirmed&type=phone"/a>Yes:</a.</td><td><?=$confirmedinfo[0]+0?></td></tr>
+									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=notconfirmed&type=phone"/a>No:</a></td><td><?=$confirmedinfo[1]+0?></td></tr>
+									<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=noconfirmation&type=phone"/a>No Response:</a></td><td><?=$confirmedinfo[2]+0?></td></tr>
 								</table>
 							</tr>
 <?
