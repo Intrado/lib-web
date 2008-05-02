@@ -145,6 +145,21 @@ class JobDetailReport extends ReportGenerator{
 
 	function runHtml(){
 
+		//index 16 is voicereply id
+		function fmt_confirmresponse($row, $index){
+			$text = "";
+			if($row[16] != null){
+				$text .= '<img src="img/phone.png" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)">';
+			}
+
+			if($row[$index] == "1"){
+				$text .= "Yes";
+			} else if($row[$index] == "2"){
+				$text .= "No";
+			}
+			return $text;
+		}
+
 		$typequery = "";
 		if(isset($this->params['type']))
 			$typequery = " and rp.type = '" . $this->params['type'] . "'";
@@ -251,7 +266,7 @@ class JobDetailReport extends ReportGenerator{
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
 							9 => "fmt_jobdetail_result",
-							14 => "fmt_confirmation",
+							14 => "fmt_confirmresponse",
 							15 => "fmt_dst_src");
 		showTable($data,$titles,$formatters);
 		echo "</table>";
@@ -266,6 +281,18 @@ class JobDetailReport extends ReportGenerator{
 	}
 
 	function runCSV(){
+
+
+		function fmt_confirmation($row, $index){
+			if($row[$index] == "1"){
+				$text = "Yes";
+			} else if($row[$index] == "2"){
+				$text = "No";
+			} else {
+				$text = "";
+			}
+			return $text;
+		}
 
 		$options = $this->params;
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
