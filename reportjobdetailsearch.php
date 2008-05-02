@@ -146,7 +146,10 @@ switch($_SESSION['report']['type']){
 							"duplicate" => "Duplicate",
 							"blocked" => "Blocked",
 							"notattempted" => "Not Attempted",
-							"declined" => "No Phone Selected");
+							"declined" => "No Phone Selected",
+							"confirmed" => "Confirmed",
+							"notconfirmed" => "Not Confirmed",
+							"noconfirmation" => "No Confirmation Response");
 		break;
 
 	case "notcontacted":
