@@ -616,7 +616,8 @@ startWindow('Job Information');
 					<td>Repeat this job every:</td>
 					<td>
 						<table border="0" cellpadding="2" cellspacing="1" class="list">
-							<tr class="listHeader" align="left" valign="bottom"><th>Su</th>
+							<tr class="listHeader" align="left" valign="bottom">
+								<th>Su</th>
 								<th>M</th>
 								<th>Tu</th>
 								<th>W</th>
@@ -642,25 +643,31 @@ startWindow('Job Information');
 				<tr>
 					<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
 					<td>
-						<?
+						<table border="0" cellpadding="2" cellspacing="1" id="jobtypetable">
+							<tr>
+								<td valign="top">
+									<?
 
-						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, "id=jobtypeid " . ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
-						NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
-						foreach ($VALIDJOBTYPES as $item) {
-							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
+									NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, "id=jobtypeid " . ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
+									NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
+									foreach ($VALIDJOBTYPES as $item) {
+										NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
+									}
+									NewFormItem($f,$s,"jobtypeid", "selectend");
+									?>
+								</td>
+
+								<td><div class="listheader" style="font-weight:bold">Info:</div><div id="jobtypeinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
+<?
+						if(getCustomerSystemSetting('_hasremotedm')){
+?>
+								<td><div class="listheader" style="font-weight:bold">Delivery:</div><div id="addinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
+<?
 						}
-						NewFormItem($f,$s,"jobtypeid", "selectend");
-						?>
-
+?>
+							</tr>
+						</table>
 					</td>
-					<td><div id="jobtypeinfo" style="overflow:scroll; width:200px; height:75px;"></div></td>
-<?
-					if(getCustomerSystemSetting('_hasremotedm')){
-?>
-						<td><div id="addinfo" style="width:200px; height:75px;"></div></td>
-<?
-					}
-?>
 				</tr>
 				<tr>
 					<td>List <?= help('Job_SettingsList',NULL,"small"); ?></td>
@@ -915,7 +922,8 @@ include_once("navbottom.inc.php");
 
 ?>
 <script language="javascript">
-	var jobtypeinfo = new Array();;
+	var jobtypeinfo = new Array();
+	jobtypeinfo[""] = new Array("", "");
 <?
 	foreach($infojobtypes as $infojobtype){
 ?>
@@ -1063,19 +1071,29 @@ function clickIcon(section){
 }
 
 function display_jobtype_info(value){
-	if(value){
-		new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
-<?
-		if(getCustomerSystemSetting('_hasremotedm')){
-?>
-			if(jobtypeinfo[value][0] == 1){
-				new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out on the hosted system";
-			} else {
-				new getObj("addinfo").obj.innerHTML = "Phone calls will be sent out by your Delivery Mechanism";
-			}
-<?
-		}
-?>
+	new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
+	var jobtypetable = new getObj("jobtypetable").obj;
+	if(jobtypeinfo[value][0] == 1){
+		jobtypetable.style.border="1px solid red";
+	} else {
+		jobtypetable.style.border="none";
 	}
+<?
+	if(getCustomerSystemSetting('_hasremotedm')){
+?>
+		var addinfo = new getObj("addinfo").obj;
+
+		if(jobtypeinfo[value][0] == 1){
+			addinfo.innerHTML = "Phone calls will be sent out on the hosted system";
+
+		} else {
+			addinfo.innerHTML = "Phone calls will be sent out by your Delivery Mechanism";
+		}
+	if(value == ""){
+		new getObj("addinfo").obj.innerHTML ="";
+	}
+<?
+	}
+?>
 }
 </script>
