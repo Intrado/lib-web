@@ -298,7 +298,7 @@ document.getElementById('logintext').focus();
 			keypressed = e.which;
 
 		if(e.shiftKey) {
-			shiftkey = e.shiftkey;
+			shiftkey = e.shiftKey;
 		} else {
 			if(keypressed == 16) {
 				shiftkey = true;
@@ -308,8 +308,9 @@ document.getElementById('logintext').focus();
 		}
 		if(((keypressed >= 65 && keypressed <= 90) && !shiftkey) || ((keypressed >= 97 && keypressed <= 122) && shiftkey)){
 			new getObj('capslockwarning').style.display = 'block';
-		} else
+		} else {
 			new getObj('capslockwarning').style.display = 'none';
+		}
 	}
 
 	function getObj(name)
