@@ -149,7 +149,11 @@ class JobDetailReport extends ReportGenerator{
 		function fmt_confirmresponse($row, $index){
 			$text = "";
 			if($row[16] != null){
-				$text .= '<img src="img/phone.png" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)">';
+				if(QuickQuery("select count(*) from voicereply where id = " . $row[16])){
+					$text .= '<img src="img/phone.png" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)">';
+				} else {
+					$text .= '<img src="img/phone_2.png">';
+				}
 			}
 
 			if($row[$index] == "1"){
@@ -158,6 +162,17 @@ class JobDetailReport extends ReportGenerator{
 				$text .= "No";
 			}
 			return $text;
+		}
+
+		function fmt_person_status($status){
+			switch ($status){
+				case 'nocontacts':
+					return "No Contacts";
+				case 'declined':
+					return "Declined";
+				default;
+					return ucfirst($status);
+			}
 		}
 
 		$typequery = "";
@@ -210,7 +225,7 @@ class JobDetailReport extends ReportGenerator{
 					$statuses = explode("','",$this->params['status']);
 					$statusnames = array();
 					foreach($statuses as $status)
-						$statusnames[] = fmt_status($status);
+						$statusnames[] = fmt_person_status($status);
 					$statusnames = implode(", ", $statusnames);
 ?>
 					<tr><td>Status: <?=$statusnames?></td></tr>
