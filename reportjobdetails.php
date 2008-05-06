@@ -134,6 +134,17 @@ $options["pagestart"] = $pagestart;
 if(!isset($_SESSION['reportid']))
 	$_SESSION['saved_report'] = false;
 
+if(!isset($_SESSION['report']['fields'])){
+	foreach($fields as $field){
+		$fieldnum = $field->fieldnum;
+		$usersetting = DBFind("UserSetting", "from usersetting where name = '" . DBSafe($field->fieldnum) . "' and userid = '$USER->id'");
+		$_SESSION['report']['fields'][$fieldnum] = false;
+		if($usersetting!= null && $usersetting->value == "true"){
+			$_SESSION['report']['fields'][$fieldnum] = true;
+		}
+	}
+}
+
 $activefields = array();
 foreach($fields as $field){
 	// used in pdf,csv
