@@ -15,6 +15,7 @@ if(isset($_GET['dmid'])){
 	$dmid = $_SESSION['dmid'];
 }
 
+$dmname = QuickQuery("select name from custdm where dmid = " . $dmid);
 $routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " and `match` != '' order by length(`match`) desc, `match` ASC");
 $defaultroute = DBFind("DMRoute", "from dmroute where dmid = " . $dmid . " and `match` = ''");
 if(!$defaultroute)
@@ -154,7 +155,7 @@ if( $reloadform )
 }
 
 $PAGE="admin:settings";
-$TITLE="Telco Settings";
+$TITLE="Telco Settings: $dmname";
 include_once("nav.inc.php");
 
 NewForm($f);
