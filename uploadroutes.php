@@ -62,7 +62,13 @@ startWindow("Upload Routes");
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
 		<th align="right" class="windowRowHeader">Upload File:</th>
-		<td><input type="file" name="routeupload" size="30"></td>
+		<td>
+			<div>File format must be a Comma Separated Value (CSV) text file with the following field order:
+				<br>Match, Strip, Prefix, Suffix
+			</div>
+			<br>
+			<input type="file" name="routeupload" size="30">
+		</td>
 	</tr>
 	</table>
 <?
