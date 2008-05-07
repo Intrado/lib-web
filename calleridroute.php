@@ -140,7 +140,7 @@ if( $reloadform )
 {
 	ClearFormData($f);
 	foreach($calleridroutes as $calleridroute){
-		PutFormData($f, $s, "dm_" . $calleridroute->id ."_callerid", Phone::format($calleridroute->callerid), "phone");
+		PutFormData($f, $s, "dm_" . $calleridroute->id ."_callerid", Phone::format($calleridroute->callerid), "phone", 10, 10);
 		PutFormData($f, $s, "dm_" . $calleridroute->id ."_prefix", $calleridroute->prefix, "number");
 	}
 	PutFormData($f, $s, "default_prefix", $defaultcalleridroute->prefix, "number");
@@ -186,8 +186,8 @@ startWindow("Caller ID Route Plans");
 <?
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-			<td><? NewFormItem($f, $s, "dm_" . $calleridroute->id ."_callerid", "text", 14, 20, "id='dm_" . $calleridroute->id . "_callerid' "); ?></td>
-			<td><? NewFormItem($f, $s, "dm_" . $calleridroute->id ."_prefix", "text", 10, 20); ?></td>
+			<td><? NewFormItem($f, $s, "dm_new_callerid", "text", 14, 20, "id='dm_new_callerid' "); ?></td>
+			<td><? NewFormItem($f, $s, "dm_new_prefix", "text", 10, 20); ?></td>
 			<td><?=submit($f, "add", "Add"); ?></td>
 		</tr>
 	</table>
