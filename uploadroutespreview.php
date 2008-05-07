@@ -29,10 +29,25 @@ $f="uploadroutepreview";
 $s="main";
 $reloadform = 0;
 
-if(!CheckFormSubmit($f, "save") && $curfilename && !$errormsg){
+if($curfilename && !$errormsg){
 	if($fp = @fopen($curfilename, "r")){
 		while($row = fgetcsv($fp)){
 			if(count($row) == 4){
+				//validate each item in the row.
+				//match, prefix, and suffix should be numbers or empty string
+				//strip must be a number
+				if(!ereg("^[0-9]*$", $row[0])){
+					continue;
+				}
+				if(!ereg("^[0-9]+$", $row[1])){
+					continue;
+				}
+				if(!ereg("^[0-9]*$", $row[2])){
+					continue;
+				}
+				if(!ereg("^[0-9]*$", $row[3])){
+					continue;
+				}
 				$routes[$row[0]] = $row;
 			}
 		}
@@ -42,55 +57,49 @@ if(!CheckFormSubmit($f, "save") && $curfilename && !$errormsg){
 }
 $routechange = 0;
 if(CheckFormSubmit($f, "save")  && !$errormsg){
-	if($fp = @fopen($curfilename, "r")){
-		// CSV format is match, strip, prefix, suffix
-		while($row = fgetcsv($fp)){
-			if(count($row) == 4){
-				//validate each item in the row.
-				//match, prefix, and suffix should be numbers or empty string
-				//strip must be a number
-				if($row[0] && $row[0] != $row[0]+0){
-					$continue;
-				}
-				if($row[1] != $row[1]+0){
-					$continue;
-				}
-				if($row[2] && $row[2] != $row[2]+0){
-					$continue;
-				}
-				if($row[3] && $row[3] != $row[3]+0){
-					$continue;
-				}
-				if(isset($dmroutes[$row[0]])){
-					if($dmroutes[$row[0]]->strip != $row[1]
-						|| $dmroutes[$row[0]]->prefix != $row[2]
-						|| $dmroutes[$row[0]]->suffix != $row[3]){
-							$routechange = 1;
-						}
-					$dmroutes[$row[0]]->strip = $row[1];
-					$dmroutes[$row[0]]->prefix = $row[2];
-					$dmroutes[$row[0]]->suffix = $row[3];
-					$dmroutes[$row[0]]->update();
-				} else {
-					$route = new DMRoute();
-					$route->dmid = $dmid;
-					$route->match = $row[0];
-					$route->strip = $row[1];
-					$route->prefix = $row[2];
-					$route->suffix = $row[3];
-					$route->create();
-					$dmroutes[$row[0]] = $route;
+	// CSV format is match, strip, prefix, suffix
+	foreach($routes as $row){
+		//validate each item in the row.
+		//match, prefix, and suffix should be numbers or empty string
+		//strip must be a number
+		if(!ereg("^[0-9]*$", $row[0])){
+			continue;
+		}
+		if(!ereg("^[0-9]+$", $row[1])){
+			continue;
+		}
+		if(!ereg("^[0-9]*$", $row[2])){
+			continue;
+		}
+		if(!ereg("^[0-9]*$", $row[3])){
+			continue;
+		}
+		if(isset($dmroutes[$row[0]])){
+			if($dmroutes[$row[0]]->strip != $row[1]
+				|| $dmroutes[$row[0]]->prefix != $row[2]
+				|| $dmroutes[$row[0]]->suffix != $row[3]){
 					$routechange = 1;
 				}
-			}
+			$dmroutes[$row[0]]->strip = $row[1];
+			$dmroutes[$row[0]]->prefix = $row[2];
+			$dmroutes[$row[0]]->suffix = $row[3];
+			$dmroutes[$row[0]]->update();
+		} else {
+			$route = new DMRoute();
+			$route->dmid = $dmid;
+			$route->match = $row[0];
+			$route->strip = $row[1];
+			$route->prefix = $row[2];
+			$route->suffix = $row[3];
+			$route->create();
+			$dmroutes[$row[0]] = $route;
+			$routechange = 1;
 		}
-		if($routechange){
-			QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
-		}
-		redirect("dmsettings.php");
-	} else {
-		$errormsg = "Unable to open the file";
 	}
+	if($routechange){
+		QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+	}
+	redirect("dmsettings.php");
 } else {
 	$reloadform=1;
 }
