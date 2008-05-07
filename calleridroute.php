@@ -3,6 +3,7 @@ include_once("inc/common.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/form.inc.php");
+include_once("obj/Phone.obj.php");
 include_once("obj/DMCallerIDRoute.obj.php");
 
 if (!$USER->authorize('managesystem')) {
@@ -15,6 +16,7 @@ if(isset($_GET['dmid'])){
 	$dmid = $_SESSION['dmid'];
 }
 
+$dmname = QuickQuery("select name from custdm where dmid = " . $dmid);
 $calleridroutes = DBFindMany("DMCallerIDRoute", "from dmcalleridroute where dmid = " . $dmid . " and callerid != '' order by callerid ASC");
 $defaultcalleridroute = DBFind("DMCallerIDRoute", "from dmcalleridroute where dmid = " . $dmid . " and `callerid` = ''");
 if(!$defaultcalleridroute)
@@ -36,7 +38,7 @@ foreach($calleridroutes as $calleridroute){
 	}
 }
 
-if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "deleteall"))
+if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "deleteall")|| CheckFormSubmit($f, "upload"))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -58,11 +60,13 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			$duplicatematches = array();
 			$default = false;
 			$duplicatedefaults = false;
+			$callerid = "";
 			foreach($calleridroutes as $calleridroute){
-				if(!isset($matches[GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid")])){
-					$matches[GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid")] = 1;
+				$callerid = Phone::parse(GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid"));
+				if(!isset($matches[$callerid])){
+					$matches[$callerid] = 1;
 				} else {
-					$duplicatematches[GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid")] = true;
+					$duplicatematches[$callerid] = true;
 				}
 			}
 
@@ -72,7 +76,9 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 				error("You cannot add a route with an empty caller id");
 			} else {
 				$routechange = false;
+				$callerid = "";
 				foreach($calleridroutes as $calleridroute){
+					$callerid = Phone::parse(GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid"));
 					if(CheckFormSubmit($f, "deleteall")){
 						$calleridroute->destroy();
 						$calleridroutechange=true;
@@ -85,14 +91,14 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 					}
 					if($calleridroute->id != "new"
 						&&
-						($calleridroute->callerid != GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid")
+						($calleridroute->callerid != $callerid
 						|| $calleridroute->prefix != GetFormData($f, $s, "dm_" . $calleridroute->id ."_prefix")
 						)
 					){
 						$routechange = true;
 					}
 					$calleridroute->dmid = $dmid;
-					$calleridroute->callerid = GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid");
+					$calleridroute->callerid = $callerid;
 					$calleridroute->prefix = GetFormData($f, $s, "dm_" . $calleridroute->id ."_prefix");
 					if($calleridroute->id == "new" && CheckFormSubmit($f, "add")){
 						$routechange = true;
@@ -121,7 +127,7 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 				if(CheckFormSubmit($f,$s))
 					redirect("dms.php");
 				else if(CheckFormSubmit($f, "upload"))
-					redirect("uploadroutes.php?dmid=" . $dmid);
+					redirect("uploadcallerid.php?dmid=" . $dmid);
 				redirect();
 			}
 		}
@@ -134,7 +140,7 @@ if( $reloadform )
 {
 	ClearFormData($f);
 	foreach($calleridroutes as $calleridroute){
-		PutFormData($f, $s, "dm_" . $calleridroute->id ."_callerid", $calleridroute->callerid, "number");
+		PutFormData($f, $s, "dm_" . $calleridroute->id ."_callerid", Phone::format($calleridroute->callerid), "phone");
 		PutFormData($f, $s, "dm_" . $calleridroute->id ."_prefix", $calleridroute->prefix, "number");
 	}
 	PutFormData($f, $s, "default_prefix", $defaultcalleridroute->prefix, "number");
@@ -142,12 +148,13 @@ if( $reloadform )
 
 
 $PAGE="admin:settings";
-$TITLE="Telco Settings";
+$TITLE="Telco Settings: $dmname";
+$DESCRIPTION="Jtapi Caller ID";
 include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL caller id routes?')) submitForm('" . $f . "', 'deleteall')"));
+buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Caller ID Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL caller id routes?')) submitForm('" . $f . "', 'deleteall')"));
 
 startWindow("Caller ID Route Plans");
 ?>
