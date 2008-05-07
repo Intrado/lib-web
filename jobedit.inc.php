@@ -643,7 +643,18 @@ startWindow('Job Information');
 				<tr>
 					<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
 					<td>
-						<table border="0" cellpadding="2" cellspacing="1" id="jobtypetable">
+						<table border="0" cellpadding="2" cellspacing="1" class="list" id="jobtypetable">
+							<tr class="listHeader" align="left" valign="bottom">
+								<th>Name</th>
+								<th>Info</th>
+<?
+						if(getCustomerSystemSetting('_hasremotedm')){
+?>
+								<th>Delivery System</th>
+<?
+						}
+?>
+							</tr>
 							<tr>
 								<td valign="top">
 									<?
@@ -657,11 +668,11 @@ startWindow('Job Information');
 									?>
 								</td>
 
-								<td><div class="listheader" style="font-weight:bold">Info:</div><div id="jobtypeinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
+								<td><div id="jobtypeinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
 <?
 						if(getCustomerSystemSetting('_hasremotedm')){
 ?>
-								<td><div class="listheader" style="font-weight:bold">Delivery:</div><div id="addinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
+								<td><div id="addinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
 <?
 						}
 ?>
@@ -922,6 +933,7 @@ include_once("navbottom.inc.php");
 
 ?>
 <script language="javascript">
+	var jobtypetablestyle = new getObj("jobtypetable").obj.style.border;
 	var jobtypeinfo = new Array();
 	jobtypeinfo[""] = new Array("", "");
 <?
@@ -1076,7 +1088,7 @@ function display_jobtype_info(value){
 	if(jobtypeinfo[value][0] == 1){
 		jobtypetable.style.border="1px solid red";
 	} else {
-		jobtypetable.style.border="none";
+		jobtypetable.style.border=jobtypetablestyle;
 	}
 <?
 	if(getCustomerSystemSetting('_hasremotedm')){
