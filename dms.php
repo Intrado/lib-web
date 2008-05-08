@@ -55,10 +55,10 @@ $titles = array(1 => "Name",
 $formatters = array("actions" => "fmt_editDMRoute");
 
 $PAGE="admin:settings";
-$TITLE="DM's";
+$TITLE="DM Manager";
 include_once("nav.inc.php");
 buttons(button("Back", null, "settings.php"));
-startWindow("DM's");
+startWindow("DM's" . help('Settings_DMs'));
 ?>
 <table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
 <?
