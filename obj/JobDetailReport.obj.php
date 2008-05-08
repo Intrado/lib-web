@@ -56,14 +56,26 @@ class JobDetailReport extends ReportGenerator{
 				}
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery .= " and rp.status = 'nocontacts' ";
-			} else if($this->params['result'] == "confirmed"){
-				$resultquery .= " and rc.response = 1";
-			} else if($this->params['result'] == "notconfirmed"){
-				$resultquery .= " and rc.response = 2";
-			} else if($this->params['result'] == "noconfirmation"){
-				$resultquery .= " and rc.response is null";
 			} else {
-				$resultquery .= " and rc.result in ('" . $this->params['result'] . "')";
+				$resultarray = array_flip(explode("','", $this->params['result']));
+				$resultqueryarray = array();
+				if(isset($resultarray["confirmed"])){
+					$resultqueryarray[] = " rc.response = 1 ";
+					unset($resultarray["confirmed"]);
+				}
+				if(isset($resultarray["notconfirmed"])){
+					$resultqueryarray[] = " rc.response = 2 ";
+					unset($resultarray["notconfirmed"]);
+				}
+				if(isset($resultarray["noconfirmation"])){
+					$resultqueryarray[] = " rc.response is null ";
+					unset($resultarray["noconfirmation"]);
+				}
+				if(count($resultarray)){
+					$resultqueryarray[] = "rc.result in ('" . implode("','",array_flip($resultarray)) . "')";
+				}
+
+				$resultquery .= " and (" . implode(" OR ",$resultqueryarray) . ") ";
 			}
 		}
 
