@@ -113,6 +113,12 @@ if( $reloadform )
 if ($errormsg)
 	error($errormsg);
 
+function fmt_route($row, $index){
+	if($row[$index] == "")
+		return "Default";
+	else
+		return $row[$index];
+}
 
 $titles = array(0 => "Match",
 				1 => "Strip",
@@ -129,7 +135,7 @@ startWindow("Routes Preview");
 ?>
 	<table cellpadding="3" cellspacing="1" class="list" width="100%">
 <?
-		showTable($routes, $titles, array());
+		showTable($routes, $titles, array("0" => "fmt_route"));
 ?>
 	</table>
 <?
