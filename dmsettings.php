@@ -155,14 +155,14 @@ if( $reloadform )
 }
 
 $PAGE="admin:settings";
-$TITLE="Telco Settings: $dmname";
+$TITLE="Route Plan Manager: $dmname";
 include_once("nav.inc.php");
 
 NewForm($f);
 
 buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL routes?')) submitForm('" . $f . "', 'deleteall')"));
 
-startWindow("Route Plans");
+startWindow("Route Plans" . help("Settings_RoutePlans"));
 ?>
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">

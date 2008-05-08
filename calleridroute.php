@@ -148,7 +148,7 @@ if( $reloadform )
 
 
 $PAGE="admin:settings";
-$TITLE="Telco Settings: $dmname";
+$TITLE="Caller ID Routes Manager: $dmname";
 $DESCRIPTION="Jtapi Caller ID";
 include_once("nav.inc.php");
 
@@ -156,7 +156,7 @@ NewForm($f);
 
 buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Caller ID Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL caller id routes?')) submitForm('" . $f . "', 'deleteall')"));
 
-startWindow("Caller ID Route Plans");
+startWindow("Caller ID Route Plans" . help("Settings_CallerIDRoutes"));
 ?>
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">
