@@ -798,7 +798,7 @@ startWindow('Job Information');
 						</tr>
 					<? } ?>
 					<tr>
-						<td> Allow message confirmation by recipients <?= help('Jobs_MessageConfirmation', NULL, 'small') ?> </td>
+						<td> Allow message confirmation by recipients <?= help('Job_MessageConfirmation', NULL, 'small') ?> </td>
 						<td> <? NewFormItem($f, $s, "messageconfirmation", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Request Message Confirmation </td>
 					</tr>
 
