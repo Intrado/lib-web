@@ -39,6 +39,9 @@ if($curfilename && !$errormsg){
 				//validate each item in the row.
 				//callerid, prefix
 				$row[0] = Phone::parse($row[0]);
+				if(strlen($row[0]) != 10){
+					continue;
+				}
 				if(!ereg("^[0-9]*$", $row[1])){
 					continue;
 				}
