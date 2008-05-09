@@ -251,7 +251,7 @@ startWindow("Select", NULL, false);
 									NewFormItem($f, $s, "jobid_archived", "selectend");
 								?>
 								</td>
-								<td aligh="left"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
+								<td align="left"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
 								Show archived jobs</td>
 							</tr>
 						</table>
