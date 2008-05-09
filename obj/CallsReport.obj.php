@@ -11,7 +11,7 @@ class CallsReport extends ReportGenerator{
 		} else {
 			$userjoin = "";
 		}
-		
+
 		$rulesql = getRuleSql($this->params, "rp");
 		$personquery="";
 		$phonequery="";
@@ -20,7 +20,7 @@ class CallsReport extends ReportGenerator{
 		$reldatequery = "";
 		$resultquery="";
 		$jobquery = "";
-		
+
 		if(isset($this->params['pid'])){
 			$personquery = " and rp.personid like '" . DBSafe($this->params['pid']) . "'";
 		}
@@ -34,23 +34,23 @@ class CallsReport extends ReportGenerator{
 		if(isset($this->params['jobtypes'])){
 			$jobtypesquery = $this->params['jobtypes'] ? " and j.jobtypeid in ('" . $this->params['jobtypes'] . "')" : "";
 		}
-	
+
 		if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
 			$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 			$this->params['joblist'] = implode("','", getJobList($startdate, $enddate));
 			$jobquery = " and rp.jobid in ('" . $this->params['joblist'] . "')";
 		}
-		
+
 		if(isset($this->params['result']) && $this->params['result'] != ""){
 			$resultquery = " and rc.result in ('" . $this->params['result'] . "') ";
 		}
-			
+
 		$search = $personquery . $phonequery . $emailquery . $jobtypesquery . $resultquery  . $jobquery;
-		
+
 		$fieldquery = generateFields("rp");
-		
-		$this->query = 
+
+		$this->query =
 				"Select
 					j.name as jobname,
 					u.login as username,
@@ -67,7 +67,8 @@ class CallsReport extends ReportGenerator{
 							coalesce(rc.zip,''))
 							) as destination,
 					rc.attemptdata as attemptdata,
-					coalesce(rc.result, rp.status) as status
+					coalesce(rc.result, rp.status) as status,
+					rc.sequence as sequence
 					$fieldquery
 					from reportperson rp
 					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
@@ -84,24 +85,24 @@ class CallsReport extends ReportGenerator{
 	}
 
 	function runHtml(){
-		
+
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
 		$activefields = explode(",", $this->params['activefields']);
-		
+
 		//fetch f-fields just like the query and explode the string into an array for an easier count
 		$queryfields = explode(",",generateFields("rp"));
-		
+
 		$result = Query($this->query);
 		$data = array();
 		// parse through data and seperate attempts.
 		// if no attempt made, look at rp.status for reason(index 5)
 		while($row = DBGetRow($result)){
 			$tmp = explode(",",$row[6]);
-			
+
 			foreach($tmp as $attempt){
 				$line = array();
 				if($attempt == ""){
@@ -118,9 +119,10 @@ class CallsReport extends ReportGenerator{
 				$line[] = $row[5];
 				$line[] = $time;
 				$line[] = $res;
+				$line[] = $row[8];
 				//generatefields returns a string beginning with a comma so the count of generatefields is 1 plus the count of f-fields
 				for($i=0; $i<count($queryfields)-1; $i++){
-					$line[] = $row[8+$i];
+					$line[] = $row[9+$i];
 				}
 				$data[] = $line;
 			}
@@ -134,35 +136,36 @@ class CallsReport extends ReportGenerator{
 		$tempdata=array();
 		if(asort($temparray, SORT_NUMERIC)){
 			$count=0;
-			foreach($temparray as $taindex => $value){					
+			foreach($temparray as $taindex => $value){
 				$tempdata[$count] = $data[$taindex];
 				$count++;
 			}
 			$data = $tempdata;
 		}
 
-		
-		
+
+
 		$titles = array("0" => "Job Name",
 						"1" => "Submitted by",
 						"2" => "Job Type",
 						"4" => "Message",
-						"3" => "Deliver by",
+						"8" => "Dst. Src.",
 						"5" => "Destination",
 						"6" => "Date/Time",
 						"7" => "Result");
-		$titles = appendFieldTitles($titles, 7, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 8, $fieldlist, $activefields);
 
 		$formatters = array("3" => "fmt_delivery_type_list",
 							"5" => "fmt_destination",
 							"6" => "fmt_ms_timestamp",
-							"7" => "fmt_contacthistory_result");
-		
+							"7" => "fmt_contacthistory_result",
+							"8" => "fmt_dst_src");
+
 		$searchrules = array();
 		if(isset($this->params['rules']) && $this->params['rules']){
 			$searchrules = displayRules($this->params['rules']);
 		}
-	
+
 		startWindow("Search Parameters");
 ?>
 		<table>
@@ -170,7 +173,7 @@ class CallsReport extends ReportGenerator{
 			if(isset($this->params['personid']) && $this->params['personid'] != ""){
 ?>
 				<tr><td>ID#: <?=$this->params['personid']?></td></tr>
-<?	
+<?
 			}
 			if(isset($this->params['phone']) && $this->params['phone'] != ""){
 ?>
@@ -216,7 +219,7 @@ class CallsReport extends ReportGenerator{
 			}
 ?>
 			</table>
-		<? 
+		<?
 		endWindow();
 		?>
 		<br>
@@ -239,7 +242,7 @@ class CallsReport extends ReportGenerator{
 		endWindow();
 ?>
 <br>
-<?		
+<?
 
 		startWindow("Contact History", "padding: 3px;");
 ?>
@@ -250,10 +253,10 @@ class CallsReport extends ReportGenerator{
 		</table>
 <?
 		endWindow();
-		
+
 		?>
 		<script langauge="javascript">
-			var searchresultstable = new getObj("searchresults").obj;	
+			var searchresultstable = new getObj("searchresults").obj;
 		<?
 			$count=1;
 			foreach($fieldlist as $index => $field){
@@ -265,7 +268,7 @@ class CallsReport extends ReportGenerator{
 		?>
 		</script>
 		<?
-		
+
 	}
 
 	function runCSV(){
@@ -294,12 +297,12 @@ class CallsReport extends ReportGenerator{
 			$persondata[$row[3]] = $row;
 		}
 		$total = QuickQuery("select found_rows()");
-		
+
 		$fieldquery = generateFields("rp");
 		$personcalls = array();
 		foreach($persondata as $info){
 			$query = "select j.name as jobname,
-					from_unixtime(rc.starttime/1000) as date, 
+					from_unixtime(rc.starttime/1000) as date,
 					rp.status as status
 					$fieldquery
 					,j.id
@@ -326,9 +329,9 @@ class CallsReport extends ReportGenerator{
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=report.csv");
 		header("Content-type: application/vnd.ms-excel");
-	
+
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-	
+
 		$titles = "Person ID, First Name,Last Name,Job Name,Date";
 		foreach($fieldlist as $index => $field){
 			if(in_array($index, $activefields)){
@@ -358,21 +361,21 @@ class CallsReport extends ReportGenerator{
 			}
 		}
 	}
-	
+
 	function setReportFile(){
 		$this->reportfile = "CallsReport.jasper";
 	}
-	
+
 	function getReportSpecificParams(){
 		return array();
 	}
-	
+
 	/**static functions**/
 
 	static function getOrdering(){
 		global $USER;
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
-	
+
 		$ordering = array();
 		$ordering["Job Name"]="jobname";
 		$ordering["Message"] = "message";
@@ -386,4 +389,15 @@ class CallsReport extends ReportGenerator{
 	}
 
 }
+
+//Formatter functions that are report specific
+
+//index 3 is type
+function fmt_dst_src($row, $index){
+	if($row[$index] != null)
+		return format_delivery_type($row[3]) . " " . ($row[$index] +1);
+	else
+		return "";
+}
+
 ?>
