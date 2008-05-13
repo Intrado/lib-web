@@ -73,17 +73,19 @@ if(CheckFormSubmit($f, $s)){
 				$importalert = array();
 				$importalert['minsize'] = $minsize;
 				$importalert['maxsize'] = $maxsize;
-				$importalert['daysold'] = GetFormData($f, $s, "daysold");
-				$newdows = array();
-				foreach($dow as $index => $day){
-					if(GetFormData($f, $s, $day)){
-						$newdows[] = $index;
+				if(GetFormData($f, $s, "scheduled") == "no"){
+					$importalert['daysold'] = GetFormData($f, $s, "daysold");
+				} else {
+					$newdows = array();
+					foreach($dow as $index => $day){
+						if(GetFormData($f, $s, $day)){
+							$newdows[] = $index;
+						}
 					}
+					$importalert['dow'] = implode(",", $newdows);
+					if($importalert['dow'] != "")
+						$importalert['time'] = date("H:i", strtotime(GetFormData($f, $s, "time")));
 				}
-				$importalert['dow'] = implode(",", $newdows);
-				if($importalert['dow'] != "")
-					$importalert['time'] = date("H:i", strtotime(GetFormData($f, $s, "time")));
-
 				$importalert['emails'] = DBSafe($emaillist);
 				foreach($importalert as $index => $alert){
 					if($alert == "")
@@ -117,6 +119,7 @@ if($reloadform){
 	}
 	PutFormData($f, $s, "time", isset($importalert['time']) ? date("g:i a", strtotime($importalert['time'])) : "", "text");
 	PutFormData($f, $s, "emails", isset($importalert['emails']) ? $importalert['emails'] : "", "text");
+	PutFormData($f, $s, "scheduled", isset($importalert['dow']) ? "yes" : "no");
 }
 
 
@@ -127,39 +130,101 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <table>
 	<tr><td>Min Size:</td><td><? NewFormItem($f, $s, "minsize", "text", 10, 20)?></td></tr>
 	<tr><td>Max Size:</td><td><? NewFormItem($f, $s, "maxsize", "text", 10, 20)?></td></tr>
-	<tr><td>Days Old:</td><td><? NewFormItem($f, $s, "daysold", "text", 10, 20)?></td></tr>
 	<tr>
-		<td>Schedule:</td>
+		<td><? NewFormItem($f, $s, "scheduled","radio", null, "no", "id='no' onclick=\"hide('dow');show('daysold')\"");?>Use Age</td>
+		<td><? NewFormItem($f, $s, "scheduled","radio", null, "yes", "id='yes' onclick=\"hide('daysold');show('dow')\"");?>Use Schedule</td>
+	</tr>
+</table>
+<table>
+	<tr>
 		<td>
-			<table border="1px" margin="1px">
-				<tr>
+			<div id='daysold'>
+				<table>
+					<tr><td>Days Old:</td><td><? NewFormItem($f, $s, "daysold", "text", 10, 20)?></td></tr>
+				</table>
+			</div>
+			<div id='dow'>
+				<table>
+					<tr>
+						<td>Schedule:</td>
+						<td>
+							<table border="1px" margin="1px">
+								<tr>
 <?
-				foreach($dow as $day){
-					?><th><?=ucfirst($day)?></th><?
-				}
+								foreach($dow as $day){
+									?><th><?=ucfirst($day)?></th><?
+								}
 ?>
-					<th>Time</th>
-				</tr>
-				<tr>
+									<th>Time</th>
+								</tr>
+								<tr>
 <?
-				foreach($dow as $day){
-					?><td><? NewFormItem($f, $s, $day, "checkbox"); ?></td><?
-				}
+								foreach($dow as $day){
+									?><td><? NewFormItem($f, $s, $day, "checkbox"); ?></td><?
+								}
 ?>
-					<td><? time_select($f, $s, "time") ?></td>
-				</tr>
+									<td><? time_select($f, $s, "time") ?></td>
+								</tr>
 
-			</table>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div>
 		</td>
 	</tr>
+</table>
+<table>
 	<tr>
 		<td>Emails:</td>
 		<td><? NewFormItem($f, $s, "emails", "text", 50, 255);?></td>
 	</tr>
 </table>
-<div><? NewFormItem($f, $s, "Save", 'submit'); ?></div>
+<div><? NewFormItem($f, $s, "Save", 'submit'); ?><a href="customerimports.php">Cancel</a></div>
 <?
 managerPassword($f, $s);
+
 EndForm();
+
 include_once("navbottom.inc.php");
 ?>
+<script>
+if(new getObj('no').obj.checked){
+	hide('dow');
+} else {
+	hide('daysold');
+}
+
+
+function getObj(name)
+{
+  if (document.getElementById)
+  {
+  	this.obj = document.getElementById(name);
+  }
+  else if (document.all)
+  {
+	this.obj = document.all[name];
+  }
+  else if (document.layers)
+  {
+   	this.obj = document.layers[name];
+  }
+  if(this.obj)
+	this.style = this.obj.style;
+}
+
+function show(name)
+{
+	var x = new getObj(name);
+	if (x.style)
+		x.style.display = "block";
+}
+
+function hide(name)
+{
+	var x = new getObj(name);
+	if (x.style)
+		x.style.display =  "none";
+}
+</script>
