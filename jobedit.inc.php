@@ -124,7 +124,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$newsmsmessage->userid = $USER->id;
 					$newsmsmessage->type = 'sms';
 					$newsmsmessage->name = GetFormData($f, $s,'name');
-					$newsmsmessage->description = "SMS Message " . date("M d, Y h:i:s", strtotime("now"));
+					$newsmsmessage->description = "SMS Message " . date("M j, Y g:i:s", strtotime("now"));
 					$newsmsmessage->create();
 
 					foreach($parts as $part){
@@ -244,7 +244,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if ($USER->authorize("leavemessage"))
 					$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
 
-				$job->setOption("messageconfirmation", GetFormData($f, $s, "messageconfirmation"));
+				if ($USER->authorize("messageconfirmation"))
+					$job->setOption("messageconfirmation", GetFormData($f, $s, "messageconfirmation"));
 
 			}
 			if(!$completedmode){
@@ -791,17 +792,23 @@ startWindow('Job Information');
 						<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
 						<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 					</tr>
+
 					<? if($USER->authorize('leavemessage')) { ?>
 						<tr>
 							<td> Allow call recipients to leave a message <?= help('Jobs_VoiceResponse', NULL, 'small') ?> </td>
 							<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
 						</tr>
-					<? } ?>
+					<?
+						}
+						if ($USER->authorize("messageconfirmation")){
+					?>
 					<tr>
 						<td> Allow message confirmation by recipients <?= help('Job_MessageConfirmation', NULL, 'small') ?> </td>
 						<td> <? NewFormItem($f, $s, "messageconfirmation", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Request Message Confirmation </td>
 					</tr>
-
+					<?
+						}
+					?>
 				</table>
 			</div>
 		</td>
