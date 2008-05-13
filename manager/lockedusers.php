@@ -26,7 +26,7 @@ $titles = array("0" => "Customer ID",
 				"5" => "Status",
 				"Actions" => "Actions");
 
-$formatters = array("4" => "fmt_last_attempt",
+$formatters = array("4" => "fmt_date",
 					"Actions" => "lockeduser_actions");
 
 $f="lockedusers";
@@ -93,13 +93,6 @@ if($reloadform){
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
-
-function fmt_last_attempt($row, $index){
-	if(strtotime($row[$index]))
-		return date("M d, Y h:i:s", strtotime($row[$index]));
-	else
-		return $row[$index];
-}
 
 //index 5 is status
 function lockeduser_actions($row, $index){
