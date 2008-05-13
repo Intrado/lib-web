@@ -68,9 +68,9 @@ if(CheckFormSubmit($form,$section))
 
 			$accss = new Access($_SESSION['accessid']);
 			$accss->moduserid = $USER->id;
-			$accss->modified = date("Y-m-d H:i:s");
+			$accss->modified = date("Y-m-d g:i:s");
 			if(!$accss->id)
-				$accss->created = date("Y-m-d H:i:s");
+				$accss->created = date("Y-m-d g:i:s");
 
 			//TODO set options
 
@@ -123,6 +123,7 @@ if(CheckFormSubmit($form,$section))
 			$accss->setPermission("viewsystemcompleted", (bool)GetFormData($form, $section, 'viewsystemcompleted'));
 			$accss->setPermission("survey", (bool)GetFormData($form, $section, 'survey'));
 			$accss->setPermission("leavemessage", (bool)GetFormData($form, $section, 'leavemessage'));
+			$accss->setPermission("messageconfirmation", (bool)GetFormData($form, $section, 'messageconfirmation'));
 			if(getSystemSetting("_hasportal", false)){
 				$accss->setPermission("portalaccess", (bool)GetFormData($form, $section, 'portalaccess'));
 				$accss->setPermission("generatebulktokens", (bool)GetFormData($form, $section, 'generatebulktokens'));
@@ -196,6 +197,7 @@ if( $reloadform )
 				array("viewsystemcompleted","bool",0,1),
 				array("survey","bool",0,1),
 				array("leavemessage","bool",0,1),
+				array("messageconfirmation", "bool", 0, 1),
 				array("portalaccess","bool",0,1),
 				array("generatebulktokens","bool",0,1));
 
@@ -316,6 +318,10 @@ startWindow('Allowed Functions');
 				<tr>
 					<td><? NewFormItem($form, $section, "leavemessage", "checkbox"); ?></td>
 					<td>Allow voice responses</td>
+				</tr>
+				<tr>
+					<td><? NewFormItem($form, $section, "messageconfirmation", "checkbox"); ?></td>
+					<td>Allow message confirmations</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form,$section,"sendemail","checkbox"); ?></td>
