@@ -84,7 +84,7 @@ function fmt_updatemethod ($import,$field) {
 
 function fmt_datamodifiedtime ($import,$field) {
 	if ($import->datamodifiedtime != null) {
-		return date("M j, g:i a",strtotime($import->datamodifiedtime));
+		return date("M j, Y g:i a",strtotime($import->datamodifiedtime));
 	} else {
 		return "Not Found";
 	}
