@@ -51,7 +51,7 @@ class Message extends DBMappedObject {
 		return QuickQuery("select voiceid from messagepart where messageid = $this->id order by sequence limit 1");
 	}
 
-	function parse ($data, &$errors = NULL) {
+	function parse ($data, &$errors = NULL, $defaultvoiceid=null) {
 		global $USER;
 
 		if ($errors == NULL)
@@ -60,27 +60,34 @@ class Message extends DBMappedObject {
 		$txtpart = "";
 		$parts = array();
 		$partcount = 0;
+		$defaultvoice = new Voice($defaultvoiceid);
+		$currvoiceid = null;
 		while (true) {
+			error_log("Data: " . $data);
 			//get dist to next field and type of field
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
+			$pos_l = strpos($data,"[[");
 
-			if ($pos_a !== false && $pos_f !== false) {
-				if ($pos_a < $pos_f) {
-					$pos = $pos_a;
-					$type = "A";
-				} else {
-					$pos = $pos_f;
-					$type = "V";
-				}
-			} else if ($pos_a !== false) {
-				$pos = $pos_a;
-				$type = "A";
-			} else if ($pos_f !== false) {
-				$pos = $pos_f;
-				$type = "V";
-			} else {
+			$poses = array();
+			if($pos_f !== false)
+				$poses[] = $pos_f;
+			if($pos_a !== false)
+				$poses[] = $pos_a;
+			if($pos_l !== false)
+				$poses[] = $pos_l;
+
+			if(!count($poses))
 				break;
+
+			$pos = min($poses);
+			if($pos !== false){
+				if($pos === $pos_f)
+					$type = "V";
+				if($pos === $pos_a)
+					$type = "A";
+				if($pos === $pos_l)
+					$type = "newlang";
 			}
 
 			//make a text part up to the pos of the field
@@ -91,14 +98,27 @@ class Message extends DBMappedObject {
 				$part->txt = $txt;
 				//$part->messageid = $this->id; // assign ID afterwards so ID is set
 				$part->sequence = $partcount++;
+				if($currvoiceid !== null)
+					$part->voiceid = $currvoiceid;
 				$parts[] = $part;
 			}
 
 			$pos += 2; // pass over the begintoken
 
-			$endtoken = ($type == "A") ? "}}" : ">>";
+			switch($type){
+				case "A":
+					$endtoken = "}}";
+					break;
+				case "V":
+					$endtoken = ">>";
+					break;
+				case "newlang":
+					$endtoken = "]]";
+					break;
+			}
+			//$endtoken = ($type == "A") ? "}}" : ">>";
 			$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
-
+			error_log("length was: " . $length);
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
 				$length = 0;
@@ -141,10 +161,20 @@ class Message extends DBMappedObject {
 						if ($fieldnum !== false) {
 							$part->fieldnum = $fieldnum;
 							$part->defaultvalue = $defvalue;
-
+							if($currvoiceid !== null)
+								$part->voiceid = $currvoiceid;
 							$parts[] = $part;
 						} else {
 							$errors[] = "Can't find field named '$fieldname'";
+						}
+						break;
+					case "newlang":
+						if(isset($defaultvoice->gender)){
+							$currvoiceid = QuickQuery("select id from ttsvoice where language = '" . DBSafe(strtolower($token)) . "' and gender = '" . $defaultvoice->gender ."'");
+							if($currvoiceid == false){
+								$errors[] = "Can't find that language: " . $token;
+								$currvoiceid = null;
+							}
 						}
 						break;
 				}
@@ -165,6 +195,8 @@ class Message extends DBMappedObject {
 			$part->txt = $data;
 			//$part->messageid = $this->id; // assign ID afterwards so ID is set
 			$part->sequence = $partcount++;
+			if($currvoiceid !== null)
+				$part->voiceid = $currvoiceid;
 			$parts[] = $part;
 		}
 
@@ -175,6 +207,8 @@ class Message extends DBMappedObject {
 
 		$map = FieldMap::getMapNames();
 		$data = "";
+		$voices = DBFindMany("Voice", "from ttsvoice");
+		$currvoiceid=$this->firstVoiceID();
 		foreach ($parts as $part) {
 			switch ($part->type) {
 			case 'A':
@@ -182,9 +216,17 @@ class Message extends DBMappedObject {
 				$data .= "{{" . $part->audiofile->name . "}}";
 				break;
 			case 'T':
+				if($part->voiceid != $currvoiceid){
+					$data .= "[[" . $voices[$part->voiceid]->language . "]]";
+					$currvoiceid = $part->voiceid;
+				}
 				$data .= $part->txt;
 				break;
 			case 'V':
+				if($part->voiceid != $currvoiceid){
+					$data .= "[[" . $voices[$part->voiceid]->language . "]]";
+					$currvoiceid = $part->voiceid;
+				}
 				$data .= "<<" . $map[$part->fieldnum];
 
 				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
@@ -196,7 +238,7 @@ class Message extends DBMappedObject {
 
 		return $data;
 	}
-	
+
 	static function playAudio($id, $fields){
 
 	$message = new Message($id);
