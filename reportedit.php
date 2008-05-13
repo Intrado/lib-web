@@ -140,7 +140,7 @@ if($reload){
 		$dowarray = explode(",", $dows);
 		$dom = $subscription->dayofmonth;
 		if($subscription->type == 'once')
-			$rundate = date("M d, Y", strtotime($subscription->nextrun));
+			$rundate = date("M j, Y", strtotime($subscription->nextrun));
 	}
 	for($i=1; $i<8;$i++){
 		PutFormData($f, $s, "dow$i", in_array($i, $dowarray) ? "1" : "0", "bool", "0", "1");
@@ -194,7 +194,7 @@ startWindow("Report Details");
 				<tr><td>Type:</td><td><?=report_name($options['reporttype'])?></td></tr>
 				<tr><td>Report Name:</td><td><? NewFormItem($f, $s, 'name', 'text', '50')?></td></tr>
 				<tr><td>Description:</td><td><? NewFormItem($f, $s, 'description', 'text', '50')?></td></tr>
-				
+
 			</table>
 		</td>
 	</tr>

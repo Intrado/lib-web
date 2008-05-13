@@ -23,7 +23,7 @@ if($REQUEST_TYPE == "new") {
 			$name = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
 			if(QuickQuery("select count(*) from audiofile where userid = '$user->id' and deleted = 0
 						and name = '" . DBSafe($name) ."'"))
-				$name = $name ."-". date("M d, Y G:i:s");
+				$name = $name ."-". date("M j, Y G:i:s");
 
 			$audio->name = $name;
 			$audio->contentid = $contentid;
@@ -38,7 +38,7 @@ if($REQUEST_TYPE == "new") {
 			$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
 			if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0'
 							and name = '" . DBSafe($messagename) . "'"))
-				$messagename = $messagename . " - " . date("M d, Y G:i:s");
+				$messagename = $messagename . " - " . date("M j, Y G:i:s");
 			$message->name = $messagename;
 			$message->description = "Easy Call - " . $messagename;
 			$message->type = "phone";

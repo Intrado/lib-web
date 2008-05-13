@@ -39,9 +39,9 @@ if (!$specialtask->getData('jobid')) {
 	$name = $specialtask->getData('name');
 
 	if (!$name)
-		$name = "EasyCall - " . date("M d, Y g:i a");
+		$name = "EasyCall - " . date("M j, Y g:i a");
 	$job->name = $name;
-	$job->description = "EasyCall - " . date("M d, Y g:i a");
+	$job->description = "EasyCall - " . date("M j, Y g:i a");
 	$type = $specialtask->getData('jobtypeid');
 	$job->listid = $specialtask->getData('listid');
 	$job->jobtypeid = $type;

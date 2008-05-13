@@ -136,7 +136,7 @@ if (isset($personid)) {
 	if($tokendata){
 		$creationuser = new User($tokendata['creationuserid']);
 		$tokendata['creationusername'] = $creationuser->firstname . " " . $creationuser->lastname;
-		$tokendata['expirationdate'] = ($tokendata['expirationdate'] != "") ? date("M d, Y", strtotime($tokendata['expirationdate'])) : "";
+		$tokendata['expirationdate'] = ($tokendata['expirationdate'] != "") ? date("M j, Y", strtotime($tokendata['expirationdate'])) : "";
 		if(strtotime($tokendata['expirationdate']) < strtotime("now")){
 			$tokendata['token'] = "Expired";
 		}
@@ -447,7 +447,7 @@ foreach ($fieldmaps as $map) {
 <?
 				foreach($associates as $portaluserid => $associate){
 					if($associate['portaluser.lastlogin']){
-						$lastlogin = date("M d, Y h:i a", $associate['portaluser.lastlogin'] / 1000);
+						$lastlogin = date("M j, Y g:i a", $associate['portaluser.lastlogin'] / 1000);
 					} else {
 						$lastlogin = "Never";
 					}

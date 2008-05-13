@@ -208,7 +208,7 @@ function commitMessage($contentid)
 	$language = $languages[$langi];
 
 	loadTimezone();
-	$name = "Call In (".$language.") - ".date("M d, Y G:i:s");
+	$name = "Call In (".$language.") - ".date("M j, Y G:i:s");
 
 	$audioFile = new AudioFile();
 	$audioFile->userid = $_SESSION['userid'];
