@@ -17,7 +17,7 @@ $cust = mysql_fetch_row($custquery);
 function fmt_lastlogin($row, $index){
 	$lastlogin = strtotime($row[$index]);
 	if ($lastlogin !== -1 && $lastlogin !== false && $lastlogin != "0000-00-00 00:00:00")
-		$lastlogin = date("M j, g:i a",$lastlogin);
+		$lastlogin = date("M j, Y g:i a",$lastlogin);
 	else
 		$lastlogin = "- Never -";
 
