@@ -4,7 +4,7 @@ function fmt_obj_date ($obj,$name) {
 	if (isset($obj->$name) && $obj->$name != "") {
 		$time = strtotime($obj->$name);
 		if ($time !== -1 && $obj->$name != "0000-00-00 00:00:00")
-			return date("M j, g:i a",$time);
+			return date("M j, Y g:i a",$time);
 	}
 	return "- Never -";
 }
@@ -13,7 +13,7 @@ function fmt_date ($row,$index) {
 	if (isset($row[$index])) {
 		$time = strtotime($row[$index]);
 		if ($time !== -1 && $time !== false)
-			return date("M j, g:i a",$time);
+			return date("M j, Y g:i a",$time);
 	}
 	return "&nbsp;";
 }
@@ -227,13 +227,13 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 
 function fmt_job_enddate ($obj,$name) {
 	if ($obj->finishdate)
-		return date("M j, g:i a",strtotime($obj->finishdate));
+		return date("M j, Y g:i a",strtotime($obj->finishdate));
 	else
-		return date("M j, g:i a",strtotime($obj->enddate . " " . $obj->endtime));
+		return date("M j, Y g:i a",strtotime($obj->enddate . " " . $obj->endtime));
 }
 
 function fmt_job_startdate ($obj,$name) {
-	return date("M j, g:i a",strtotime($obj->startdate . " " . $obj->starttime));
+	return date("M j, Y g:i a",strtotime($obj->startdate . " " . $obj->starttime));
 }
 
 function fmt_status($obj, $name) {
@@ -496,7 +496,7 @@ function display_rel_date($string, $arg1="", $arg2=""){
 		case 'xdays':
 			return "Last $arg1 days";
 		case 'daterange':
-			return date("M d, Y", strtotime($arg1)) . " To: " . date("M d, Y", strtotime($arg2));
+			return date("M j, Y", strtotime($arg1)) . " To: " . date("M j, Y", strtotime($arg2));
 		default:
 			return $string;
 	}
