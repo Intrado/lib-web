@@ -41,7 +41,7 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone', 
 
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['-- Reports & Status --'] = "false;";
-	if ($USER->authorize('createreport')) {
+	if ($USER->authorize('createreport') || $USER->authorize('viewsystemreports')) {
 		$SHORTCUTS['Create a Report'] = "reports.php";
 		$SHORTCUTS['View Job Summary'] = "reportjobsearch.php";
 	}
@@ -77,8 +77,8 @@ $NAVTREE = array (
 		array("Surveys","surveys.php","survey",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
-	array("Reports","reports.php",array('createreport',"viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
-		array("Reports", "reports.php", "createreport", $SUBTAB=="reports"),
+	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
+		array("Reports", "reports.php", array("createreport", "viewsystemreports"), $SUBTAB=="reports"),
 		array("Usage Stats","reportsystem.php?clear=1","viewusagestats",$SUBTAB=="system"),
 		array("Call Distribution","reportsystemdistribution.php","viewcalldistribution",$SUBTAB=="distribution")
 		)),
