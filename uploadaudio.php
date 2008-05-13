@@ -79,7 +79,7 @@ if(CheckFormSubmit($f,$s))
 					$ext = "wav";
 				}
 
-				$audio->recorddate = date("Y-m-d H:i:s");
+				$audio->recorddate = date("Y-m-d G:i:s");
 
 				$source = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . 'orig.' . $ext;
 				$dest = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
