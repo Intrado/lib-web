@@ -63,7 +63,6 @@ class Message extends DBMappedObject {
 		$defaultvoice = new Voice($defaultvoiceid);
 		$currvoiceid = null;
 		while (true) {
-			error_log("Data: " . $data);
 			//get dist to next field and type of field
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
@@ -118,7 +117,7 @@ class Message extends DBMappedObject {
 			}
 			//$endtoken = ($type == "A") ? "}}" : ">>";
 			$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
-			error_log("length was: " . $length);
+
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
 				$length = 0;
