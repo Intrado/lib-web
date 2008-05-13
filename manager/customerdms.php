@@ -18,6 +18,37 @@ if(isset($_GET['resetDM'])){
 <?
 }
 
+
+//index 2 is customer id
+//index 1 is customer url
+function fmt_customerUrl($row, $index){
+	$url = "";
+	if($row[2])
+		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" >" . $row[2] . "</a>";
+	return $url;
+}
+
+// index 1 is dmid
+function fmt_DMActions($row, $index){
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '">Reset</a>';
+	return $url;
+}
+
+function fmt_state($row, $index){
+	return ucfirst($row[$index]);
+}
+
+function fmt_lastseen($row, $index){
+	$output = fmt_ms_timestamp($row, $index);
+	if($row[$index]/1000 > strtotime("now") - (5*60) && $row[$index]/1000 < strtotime("now")-10){
+		$output = "<div style=\"background-color:yellow\">" . $output . "</div>";
+	} else if($row[$index]/1000 < strtotime("now") - (5*60)){
+		$output = "<div style=\"background-color:red\">" . $output . "</div>";
+	}
+	return $output;
+}
+
+
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen
@@ -43,28 +74,8 @@ $titles = array(0 => "DM ID",
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
-					7 => "fmt_ms_timestamp",
+					7 => "fmt_lastseen",
 					6 => "fmt_state");
-
-
-//index 2 is customer id
-//index 1 is customer url
-function fmt_customerUrl($row, $index){
-	$url = "";
-	if($row[2])
-		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" >" . $row[2] . "</a>";
-	return $url;
-}
-
-// index 1 is dmid
-function fmt_DMActions($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '"/>Edit</a>&nbsp;|&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '">Reset</a>';
-	return $url;
-}
-
-function fmt_state($row, $index){
-	return ucfirst($row[$index]);
-}
 
 include_once("nav.inc.php");
 
