@@ -147,7 +147,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 			$message = new Message($_SESSION['messageid']);
 			$message->readHeaders();
 			$errors = array();
-			$parts = $message->parse(GetFormData($form,$section,"body"),$errors);
+			$parts = $message->parse(GetFormData($form,$section,"body"),$errors, GetFormData($form,$section,"voiceid"));
 			$charcount = 0;
 			if($MESSAGETYPE == "sms"){
 				foreach($parts as $part){
@@ -217,7 +217,8 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 				//update the parts
 				QuickUpdate("delete from messagepart where messageid=$message->id");
 				foreach ($parts as $part) {
-					$part->voiceid = GetFormData($form,$section,"voiceid");
+					if(!isset($part->voiceid))
+						$part->voiceid = GetFormData($form,$section,"voiceid");
 					$part->messageid = $message->id;
 					$part->create();
 				}
