@@ -87,7 +87,7 @@ function message_action($row, $index){
 }
 
 function format_date($row, $index){
-	return date("M d, Y", strtotime($row[$index]));
+	return date("M j, Y", strtotime($row[$index]));
 }
 
 function sender($row, $index){

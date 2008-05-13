@@ -67,7 +67,7 @@ if($jobid != 0 && $personid != 0){
 			rp." . FieldMap::GetLastNameField()
 			. generateFields("rp")
 			. ",
-			j.name as jobname, 
+			j.name as jobname,
 			j.startdate as startdate
 			from reportperson rp
 			left join job j on (j.id = rp.jobid)
@@ -95,41 +95,41 @@ function formatText($messageid, $historicdata) {
 	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = " . $messageid . " order by sequence");
 	$data = Message::format($messageparts);
 	$message = "";
-	
+
 	if (!isset($errors))
 		$errors = array();
-	
+
 	$txtpart = "";
 	while (true) {
 		//get dist to next field and type of field
 		$pos_f = strpos($data,"<<");
-	
+
 		if ($pos_f !== false) {
 			$pos = $pos_f;
 		} else {
 			break;
 		}
-	
+
 		//make a text part up to the pos of the field
 		$txt = substr($data,0,$pos);
 		if (strlen($txt) > 0) {
 			$message .= $txt;
 		}
-	
+
 		$pos += 2; // pass over the begintoken
-	
+
 		$endtoken = ">>";
 		$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
-	
+
 		if ($length === false) {
 			$errors[] = "Can't find end of field, was expecting '$endtoken'";
 			$length = 0;
 		} else {
 			$length -= $pos;
-	
+
 			$token  = substr($data,$pos,$length);
-	
-	
+
+
 			if (strpos($token,":") !== false) {
 				list($fieldname,$defvalue) = explode(":",$token);
 			} else {
@@ -139,9 +139,9 @@ function formatText($messageid, $historicdata) {
 			}
 			$fieldname = DBSafe($fieldname);
 			$query = "select fieldnum from fieldmap where name='$fieldname'";
-	
+
 			$fieldnum = QuickQuery($query);
-	
+
 			if ($fieldnum !== false) {
 				$message .= " " . $historicdata[$fieldnum] . " ";
 			} else {
@@ -153,14 +153,14 @@ function formatText($messageid, $historicdata) {
 			$skip = $pos + $length +2;
 		else
 			$skip = $pos + $length ;
-	
+
 		$data = substr($data,$skip );
 	}
 	//get trailling text if exists.
 	if (strlen($data) > 0) {
 		$message .= $data;
 	}
-	
+
 	if(count($errors)){
 		return $errors;
 	} else {
@@ -192,7 +192,7 @@ startWindow('Details', 'padding: 3px;');
 		</tr>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder">Date:</td>
-			<td class="bottomBorder"><?=date("M d, Y", strtotime($historicdata['startdate']))?></td>
+			<td class="bottomBorder"><?=date("M j, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
 <?
 	if($email && count($attachments)){
@@ -228,27 +228,27 @@ endWindow();
 if($phone){
 	startWindow('Message', 'padding: 3px;');
 	?>
-	
+
 		<div align="center">
-	
+
 		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
 		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
 		STANDBY="Loading Windows Media Player components..."
 		TYPE="application/x-oleobject">
-	
+
 		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>">
 		<param name="controller" value="true">
 		<EMBED SRC="preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>" AUTOSTART="TRUE"></EMBED>
 		</OBJECT>
-	
-	
+
+
 		<br><a href="preview.wav.php/download_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true">Click here to download</a>
 		</div>
 	<?
 	endWindow();
 } else if ($email || $sms){
 	startWindow('Message', 'padding: 3px;');
-	
+
 	if(is_array($message)){
 		error($message);
 	} else {
