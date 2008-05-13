@@ -245,12 +245,17 @@ startWindow("Confirmation &amp; Submit");
 						<td class="bottomBorder" > Allow call recipients to leave a message</td>
 						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Accept Voice Responses</td>
 					</tr>
-<? } ?>
+<?
+}
+if ($USER->authorize("messageconfirmation")){
+?>
 					<tr>
 						<td>Allow message confirmation by recipients</td>
 						<td><input type="checkbox" disabled <?= $job->isOption("messageconfirmation") ? "checked":"" ?>>Request Message Confirmation</td>
 					</tr>
-
+<?
+}
+?>
 			</table>
 		</td>
 	</tr>
