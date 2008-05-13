@@ -82,7 +82,7 @@ class ReportSubscription extends DBMappedObject {
 
 	function createDefaults($name){
 		global $USER;
-		$this->name = $name . " " . date("M d, g:i A", strtotime("now"));;
+		$this->name = $name . " " . date("M j, g:i a", strtotime("now"));;
 		$this->type = "notscheduled";
 		$this->userid = $USER->id;
 		$this->description = "";
