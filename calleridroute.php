@@ -25,7 +25,7 @@ $newcalleridroute = new DMCallerIDRoute();
 $newcalleridroute->id = "new";
 $calleridroutes[] = $newcalleridroute;
 
-$f = "template";
+$f = "calleridroutes";
 $s = "main";
 $reloadform = 0;
 

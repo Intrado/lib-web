@@ -24,7 +24,7 @@ $newroute = new DMRoute();
 $newroute->id = "new";
 $routes[] = $newroute;
 
-$f = "template";
+$f = "dmsettings";
 $s = "main";
 $reloadform = 0;
 
