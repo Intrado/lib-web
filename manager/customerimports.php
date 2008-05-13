@@ -40,6 +40,11 @@ function fmt_last_modified($row, $index){
 			//if the last scheduled run is later than last run, display error
 			$currentdow=date("w")+1;
 			$daysago = 0;
+			if(strtotime($row[13]['time']) > strtotime("now")){
+				$currentdow--;
+				$daysago++;
+			}
+
 			while(!isset($scheduledDow[$currentdow])){
 				$daysago++;
 				$currentdow--;
@@ -188,7 +193,7 @@ $titles = array("0" => "ID",
 		"6" =>  "Status",
 		"7" => "Type ",
 		"8" => "Upd. Method",
-		"3" => "TimeZone",
+		"2" => "TimeZone",
 		"9" => "Last Run",
 		"10" => "Last Modified",
 		"11" => "File Size in Bytes",
