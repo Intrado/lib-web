@@ -15,35 +15,51 @@ function fmt_alert_timestamp($row, $index) {
 		return "<div style='background-color: #ffcccc'>- Never -</div>";
 	} else {
 		if ($timestamp < time() - 60 * 60 * 24 * 3)
-			return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
+			return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
 		else
-			return date("M j, g:i a", $timestamp);
+			return fmt_date($row, $index);
 	}
 }
-//row index 12 contains an array of alert options
+//row index 13 contains an array of alert options
 function fmt_last_modified($row, $index){
 	date_default_timezone_set($row[2]);
 	$timestamp = strtotime($row[$index]);
 	$scheduledDow=array();
-	if(isset($row[12]['dow'])){
-		$scheduledDow = array_flip(explode(",", $row[12]['dow']));
+	if(isset($row[13]['dow'])){
+		$scheduledDow = array_flip(explode(",", $row[13]['dow']));
 	}
 
 	if ($timestamp === false) {
 		return "<div style='background-color: #ffcccc'>- Never -</div>";
 	} else {
-		if(isset($row[12]['daysold']) && $row[12]['daysold'] && ($timestamp < time() - 60*60*24* $row[12]['daysold'])
-			|| (isset($row[12]['dow']) && !isset($scheduledDow[date("w", $timestamp)+1]))
-			|| (isset($row[12]['time']) && (strtotime($row[12]['time'])+60*15 < strtotime(date("H:i", $timestamp)) || strtotime($row[12]['time'])-60*15 > strtotime(date("H:i", $timestamp))))
-			)
-				return "<div style='background-color: #ffcccc'>" . date("M j, g:i a", $timestamp) . "</div>";
-		else
-			return date("M j, g:i a", $timestamp);
+		if(isset($row[13]['daysold']) && $row[13]['daysold'] && ($timestamp < time() - 60*60*24* $row[13]['daysold'])){
+			return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
+		} else if(isset($row[13]['dow'])){
+			//if dow is set (schedule is set)
+			//find the last weekday it should have run, including today.
+			//if the last scheduled run is later than last run, display error
+			$currentdow=date("w")+1;
+			$daysago = 0;
+			while(!isset($scheduledDow[$currentdow])){
+				$daysago++;
+				$currentdow--;
+				if($currentdow < 1){
+					$currentdow = $currentdow+7;
+				}
+			}
+			//calculate unix time and allow 15 min leeway
+			$scheduledlastrun = strtotime(" -$daysago days " . $row[13]['time']) - (60*15);
+			if($scheduledlastrun > $timestamp){
+				return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
+			}
+		}
+
+		return fmt_date($row, $index);
 	}
 }
 
 function fmt_custurl($row, $index){
-	$url = "<a href=\"customerlink.php?id=". $row[0] . "\" >" . $row[1] . "</a>";
+	$url = $row[1] . " (<a href=\"customerlink.php?id=". $row[0] . "\" >" . $row[3] . "</a>)";
 	return $url;
 }
 
@@ -58,9 +74,9 @@ function fmt_import_status($row, $index){
 
 //row index 12 contains an array of alert options
 function fmt_filesize($row, $index){
-	 if((isset($row[12]['minsize']) && $row[$index] < $row[12]['minsize']) || (isset($row[12]['maxsize']) && $row[$index] > $row[12]['maxsize']))
+	 if((isset($row[13]['minsize']) && $row[$index] < $row[13]['minsize']) || (isset($row[13]['maxsize']) && $row[$index] > $row[13]['maxsize']))
 	 	return "<div style=\"background-color: #ffcccc; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
-	 else if(!isset($row[12]['minsize']) && !isset($row[12]['maxsize']) && $row[$index] < 10)
+	 else if(!isset($row[13]['minsize']) && !isset($row[13]['maxsize']) && $row[$index] < 10)
 	 	return "<div style=\"background-color: #ffcccc; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 	 else
 	 	return "<div style=\"width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
@@ -70,7 +86,10 @@ function fmt_filesize($row, $index){
 //index 0 is customer id
 //index 3 is import id
 function fmt_importalerts($row, $index){
-	$url = "<a href='importalerts.php?cid=" . $row[0] . "&importid=" . $row[3] . "'>Edit Alerts</a>";
+	$url = "<a href='importalerts.php?cid=" . $row[0] . "&importid=" . $row[4] . "'>Edit Alerts</a>";
+	if(count($row[13])){
+		$url = "*" . $url;
+	}
 	return $url;
 }
 
@@ -157,29 +176,28 @@ foreach($customers as $cust) {
 		while($row = DBGetRow($list)){
 			$alertoptions = sane_parsestr($row[9]);
 			$row[9] = $alertoptions;
-			$data[] = array_merge(array($cust[0], $displayname, $timezone), $row);
+			$data[] = array_merge(array($cust[0], $displayname, $timezone, $cust[2]), $row);
 		}
 	}
 }
-$titles = array("0" => "Customer ID",
-		"1" => "Customer Name",
-		"url" => "Customer URL",
-		"3" => "Import ID ",
-		"4" => "Import Name",
-		"11" => "Description",
-		"5" =>  "Status",
-		"6" => "Type ",
-		"7" => "Upd. Method",
-		"2" => "TimeZone",
-		"8" => "Last Run",
-		"9" => "Last Modified",
-		"10" => "File Size in Bytes",
-		"actions" => "Actions");
+$titles = array("0" => "ID",
+		"url" => "Name",
+		"4" => "Imp ID ",
+		"5" => "Imp Name",
+		"12" => "Description",
+		"6" =>  "Status",
+		"7" => "Type ",
+		"8" => "Upd. Method",
+		"3" => "TimeZone",
+		"9" => "Last Run",
+		"10" => "Last Modified",
+		"11" => "File Size in Bytes",
+		"actions" => "Alerts");
 $formatters = array("url" => "fmt_custurl",
-					"10" => "fmt_filesize",
-					"8" => "fmt_alert_timestamp",
-					"5" => "fmt_import_status",
-					"9" => "fmt_last_modified",
+					"11" => "fmt_filesize",
+					"9" => "fmt_alert_timestamp",
+					"6" => "fmt_import_status",
+					"10" => "fmt_last_modified",
 					"actions" => "fmt_importalerts");
 
 /////////////////////////////
