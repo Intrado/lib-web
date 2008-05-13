@@ -87,7 +87,7 @@ function fmt_filesize($row, $index){
 //index 3 is import id
 function fmt_importalerts($row, $index){
 	$url = "<a href='importalerts.php?cid=" . $row[0] . "&importid=" . $row[4] . "'>Edit Alerts</a>";
-	if(count($row[13])){
+	if(isset($row[13]['dow'])){
 		$url = "*" . $url;
 	}
 	return $url;
