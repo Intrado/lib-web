@@ -28,18 +28,6 @@ function fmt_report_actions($obj){
 	return "<a href='reportedit.php?reportid=$obj->id' >Edit Schedule</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id' >Edit Options</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id&runreport=true' >View</a>&nbsp;|&nbsp;<a href='reports.php?delete=$obj->id' onclick='return confirm(\"Are you sure you want to delete this?\")';>Delete</a>";
 }
 
-function fmt_next_run($obj){
-	if($obj->nextrun != null)
-		return date("M j, Y g:i a", strtotime($obj->nextrun));
-	return "";
-}
-
-function fmt_last_run($obj){
-	if($obj->lastrun != null)
-		return date("M j, Y g:i a", strtotime($obj->lastrun));
-	return "";
-}
-
 function fmt_report_type($obj){
 	$instance = new ReportInstance($obj->reportinstanceid);
 	$options = $instance->getParameters();
@@ -83,7 +71,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 					<tr><td><a href='reportjobsearch.php?clear=1'/>Notification Summary</a></td></tr>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Phone Log</a></td></tr>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Log</a></td></tr>
-					
+
 <? if(getSystemSetting('_hassms', false)){ ?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms'/>SMS Log</a></td></tr>
 <? } ?>
@@ -94,7 +82,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>
-					
+
 <? if(getSystemSetting('_hassms', false)){ ?>
 					<tr><td>&nbsp;</td></tr>
 <? } ?>
@@ -105,7 +93,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>
-					
+
 <? if(getSystemSetting('_hassms', false)){ ?>
 					<tr><td>&nbsp;</td></tr>
 <? } ?>
@@ -123,13 +111,13 @@ $data = DBFindMany("ReportSubscription", "from reportsubscription where userid =
 $titles = array("name" => "Name",
 				"description" => "Description",
 				"Type"	=> "Type",
-				"Next Scheduled Run" => "Next Scheduled Run",
-				"Last Run" => "Last Run",
+				"nextrun" => "Next Scheduled Run",
+				"lastrun" => "Last Run",
 				"Actions" => "Actions");
 $formatters = array("Actions" => "fmt_report_actions",
-					"Next Scheduled Run" => "fmt_next_run",
+					"nextrun" => "fmt_obj_date",
 					"Type" => "fmt_report_type",
-					"Last Run" => "fmt_last_run");
+					"lastrun" => "fmt_obj_date");
 $scroll = false;
 
 startWindow("My Saved Reports" . help('Reports_MySavedReports'), 'padding: 3px;');
