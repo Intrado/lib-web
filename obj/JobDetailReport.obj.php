@@ -158,16 +158,16 @@ class JobDetailReport extends ReportGenerator{
 	function runHtml(){
 
 		//index 16 is voicereply id
-		function fmt_confirmresponse($row, $index){
+		function fmt_detailedresponse($row, $index){
 			$text = "";
+
 			if($row[16] != null){
 				if(QuickQuery("select count(*) from voicereply where id = " . $row[16])){
-					$text .= '<img src="img/phone.png" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)">';
+					$text .= ' <span style="float:right"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
 				} else {
-					$text .= '<img src="img/phone_2.png">';
+					$text .= ' <span style="float:right"><img src="img/speaker2.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
 				}
 			}
-
 			if($row[$index] == "1"){
 				$text .= "Yes";
 			} else if($row[$index] == "2"){
@@ -282,18 +282,14 @@ class JobDetailReport extends ReportGenerator{
 						7 => "Destination",
 						11 => "Attempts",
 						8 => "Last Attempt",
-						9 => "Last Result");
-		if(QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
-			$titles[14] = "Confirmed";
-		} else {
-			$titles[14] = "@Confirmed";
-		}
+						9 => "Last Result",
+						14 => "Responses");
 		$titles = appendFieldTitles($titles, 16, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
 							9 => "fmt_jobdetail_result",
-							14 => "fmt_confirmresponse",
+							14 => "fmt_detailedresponse",
 							15 => "fmt_dst_src");
 		showTable($data,$titles,$formatters);
 		echo "</table>";
@@ -450,13 +446,11 @@ class JobDetailReport extends ReportGenerator{
 			$joblist=explode("','", $this->params['joblist']);
 
 		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
-		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')") ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange,
-						"hassms" => $sms,
-						"messageconfirmation" => $messageconfirmation);
+						"hassms" => $sms);
 		return $params;
 	}
 
@@ -483,14 +477,5 @@ class JobDetailReport extends ReportGenerator{
 	}
 }
 
-//Formatter functions that are report specific
 
-
-//index 5 is type
-function fmt_dst_src($row, $index){
-	if($row[$index] != null)
-		return format_delivery_type($row[5]) . " " . ($row[$index] +1);
-	else
-		return "";
-}
 ?>
