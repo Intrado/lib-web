@@ -37,23 +37,25 @@ $titles = array("0" => "In List",
 				"2" => "ID#",
 				"3" => "First Name",
 				"4" => "Last Name",
-				"5" => "Language",
-				"6" => destination_label("phone", 0),
-				"7" => destination_label("email", 0));
+				"5" => "Language");
 $formatters = array("0" => "fmt_checkbox",
 					"2" => "fmt_idmagnify",
 					"6" => "fmt_phone",
-					"7" => "fmt_email");
+					"7" => "fmt_email",
+					"8" => "fmt_phone",
+					"9" => "fmt_null");
 
-if(getSystemSetting("_hassms")){
-	$titles["8"] = destination_label("sms", 0);
-	$formatters["8"] = "fmt_phone";
-	$titles["9"] = "Address";
-	$formatters["9"] = "fmt_null";
-} else {
-	$titles["8"] = "Address";
-	$formatters["8"] = "fmt_null";
+if($USER->authorize('sendphone')){
+	$titles[6] = destination_label("phone", 0);
 }
+if($USER->authorize('sendemail')){
+	$titles[7] = destination_label("email", 0);
+}
+if(getSystemSetting("_hassms") && $USER->authorize('sendsms')){
+	$titles[8] = destination_label("sms", 0);
+}
+$titles["9"] = "Address";
+
 
 showTable($data, $titles,$formatters);
 

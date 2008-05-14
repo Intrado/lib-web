@@ -120,14 +120,23 @@ for ($i=0; $i<$maxsms; $i++) {
 
 $contactprefs = $personid ? getContactPrefs($personid) : array();
 $defaultcontactprefs = getDefaultContactPrefs();
-$contacttypes = array("phone", "email");
-$types = array("phone" => $phones,
-				"email" => $emails);
+$contacttypes = array();
+$types = array();
+if($USER->authorize('sendphone')){
+	$contacttypes[] = "phone";
+	$types["phone"] = $phones;
+}
+if($USER->authorize('sendemail')){
+	$contacttypes[] = "email";
+	$types["email"] = $emails;
+}
 if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 	$contacttypes[] = "sms";
 	$types["sms"] = $smses;
 }
-$jobtypes = array_merge(JobType::getUserJobTypes(false), JobType::getUserJobTypes(true));
+$jobtypes = JobType::getUserJobTypes(false);
+if($USER->authorize('survey'))
+	$jobtypes = array_merge($jobtypes, JobType::getUserJobTypes(true));
 
 
 
@@ -187,26 +196,29 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 			$address->personid = $person->id;
 			$address->update();
 
-			$x = 0;
-			foreach ($phones as $phone) {
-				$itemname = "phone".($x+1);
-				$phone->personid = $person->id;
-				$phone->sequence = $x;
-				$phone->phone = Phone::parse(GetFormData($f,$s,$itemname));
-				$phone->update();
-				$x++;
+			if($USER->authorize('sendphone')){
+				$x = 0;
+				foreach ($phones as $phone) {
+					$itemname = "phone".($x+1);
+					$phone->personid = $person->id;
+					$phone->sequence = $x;
+					$phone->phone = Phone::parse(GetFormData($f,$s,$itemname));
+					$phone->update();
+					$x++;
+				}
 			}
 
-			$x = 0;
-			foreach ($emails as $email) {
-				$itemname = "email".($x+1);
-				$email->personid = $person->id;
-				$email->sequence = $x;
-				$email->email = GetFormData($f,$s,$itemname);
-				$email->update();
-				$x++;
+			if($USER->authorize('sendemail')){
+				$x = 0;
+				foreach ($emails as $email) {
+					$itemname = "email".($x+1);
+					$email->personid = $person->id;
+					$email->sequence = $x;
+					$email->email = GetFormData($f,$s,$itemname);
+					$email->update();
+					$x++;
+				}
 			}
-
 			if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 				$x = 0;
 				foreach ($smses as $sms) {
@@ -292,18 +304,21 @@ if( $reloadform )
 										array("state","text",1,2),
 										array("zip","text",1,10)));
 
-	$x = 0;
-	foreach ($phones as $phone) {
-		$itemname = "phone".($x+1);
-		PutFormData($f,$s,$itemname,Phone::format($phone->phone),"phone",10,10);
-		$x++;
+	if($USER->authorize('sendphone')){
+		$x = 0;
+		foreach ($phones as $phone) {
+			$itemname = "phone".($x+1);
+			PutFormData($f,$s,$itemname,Phone::format($phone->phone),"phone",10,10);
+			$x++;
+		}
 	}
-
-	$x = 0;
-	foreach ($emails as $email) {
-		$itemname = "email".($x+1);
-		PutFormData($f,$s,$itemname,$email->email,"email",5,100);
-		$x++;
+	if($USER->authorize('sendemail')){
+		$x = 0;
+		foreach ($emails as $email) {
+			$itemname = "email".($x+1);
+			PutFormData($f,$s,$itemname,$email->email,"email",5,100);
+			$x++;
+		}
 	}
 	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 		$x = 0;
