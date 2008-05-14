@@ -283,7 +283,7 @@ class JobDetailReport extends ReportGenerator{
 						11 => "Attempts",
 						8 => "Last Attempt",
 						9 => "Last Result",
-						14 => "Responses");
+						14 => "Response");
 		$titles = appendFieldTitles($titles, 16, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
@@ -362,10 +362,7 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = array_flip($fieldindex);
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Dst. Src.","Destination","Attempts","Last Attempt","Last Result"';
-		if(QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')")){
-			$header .= ',"Confirmed"';
-		}
+		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response"';
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header .= ',"' . $fieldname . '"';
@@ -399,11 +396,7 @@ class JobDetailReport extends ReportGenerator{
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
 
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9]);
-
-			if(QuickQuery("select count(*) from jobsetting where jobid in ('" . $this->params['joblist'] . "') and name = 'messageconfirmation'")){
-				$reportarray[] = fmt_confirmation($row, 14);
-			}
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9],fmt_confirmation($row, 14));
 			//index 13 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
