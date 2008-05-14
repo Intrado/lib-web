@@ -390,14 +390,4 @@ class CallsReport extends ReportGenerator{
 
 }
 
-//Formatter functions that are report specific
-
-//index 3 is type
-function fmt_dst_src($row, $index){
-	if($row[$index] != null)
-		return format_delivery_type($row[3]) . " " . ($row[$index] +1);
-	else
-		return "";
-}
-
 ?>
