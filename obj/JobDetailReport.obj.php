@@ -165,7 +165,7 @@ class JobDetailReport extends ReportGenerator{
 				if(QuickQuery("select count(*) from voicereply where id = " . $row[16])){
 					$text .= ' <span style="float:right"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
 				} else {
-					$text .= ' <span style="float:right"><img src="img/speaker2.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
+					$text .= ' <span style="float:right"><img src="img/speaker2.gif"></span>';
 				}
 			}
 			if($row[$index] == "1"){
