@@ -179,6 +179,10 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td>Emails:</td>
 		<td><? NewFormItem($f, $s, "emails", "text", 50, 255);?></td>
 	</tr>
+	<tr>
+		<td>Last Notified:</td>
+		<td><?= isset($importalert['lastnotified']) ? date("M j, Y g:i a", $importalert['lastnotified']) : "--Never--" ?></td>
+	</tr>
 </table>
 <div><? NewFormItem($f, $s, "Save", 'submit'); ?><a href="customerimports.php">Cancel</a></div>
 <?
