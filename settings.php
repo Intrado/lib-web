@@ -62,7 +62,7 @@ startWindow("Options", 'padding: 3px;');
 				</table>
 			</td>
 			<td>
-				<div style="float:left"				<table>
+				<table>
 					<tr><td><a href='destinationlabel.php?type=phone'>Edit Phone Labels</a></td></tr>
 					<tr><td><a href='destinationlabel.php?type=email'>Edit Email Labels</a></td></tr>
 <? if(getSystemSetting('_hassms', false)){ ?>
