@@ -288,7 +288,7 @@ class SMAPI{
 			}
 			$audiofile = new AudioFile();
 			if(QuickQuery("select count(*) from audiofile where name = '" . $name . "' and not deleted")){
-				$audiofile->name = $name . " - " . date("M d, Y G:i:s");
+				$audiofile->name = $name . " - " . date("M j, Y G:i:s");
 			} else {
 				$audiofile->name = $name;
 			}
