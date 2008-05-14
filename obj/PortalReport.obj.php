@@ -72,7 +72,7 @@ class PortalReport extends ReportGenerator{
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
 		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
-		$query = $this->query . " order by p.id" . " limit $pagestart, $max";
+		$query = $this->query . " order by p.pkey" . " limit $pagestart, $max";
 		$result = Query($query);
 		$this->reporttotal = QuickQuery("select found_rows()");
 		$data = array();
