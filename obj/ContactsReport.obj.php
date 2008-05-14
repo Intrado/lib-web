@@ -93,7 +93,8 @@ class ContactsReport extends ReportGenerator {
 				phone as destination,
 				sequence as sequence,
 				'1' as ordering,
-				'phone' as type
+				'phone' as type,
+				editlock
 				from phone ph
 				where
 				personid in ('" . implode("','",$personidlist) . "')
@@ -103,7 +104,8 @@ class ContactsReport extends ReportGenerator {
 				email as destination,
 				sequence as sequence,
 				'2' as ordering,
-				'email' as type
+				'email' as type,
+				editlock
 				from email
 				where
 				personid in ('" . implode("','",$personidlist) . "')
@@ -113,7 +115,8 @@ class ContactsReport extends ReportGenerator {
 				sms as destination,
 				sequence as sequence,
 				'3' as ordering,
-				'sms' as type
+				'sms' as type,
+				editlock
 				from sms
 				where
 				personid in ('" . implode("','",$personidlist) . "')
@@ -129,8 +132,8 @@ class ContactsReport extends ReportGenerator {
 		$result = Query($phoneemailsmsquery);
 		$destinationdata = array();
 		while($row = DBGetRow($result)){
-			if(!isset($phoneemailsmsdata[$row[0]])){
-				$phoneemailsmsdata[$row[0]] = array();
+			if(!isset($destinationdata[$row[0]])){
+				$destinationdata[$row[0]] = array();
 			}
 			$destinationdata[$row[0]][] = $row;
 		}
@@ -142,23 +145,25 @@ class ContactsReport extends ReportGenerator {
 		// array_splice inserts data after 2nd argument's array index
 		// destination index 1 is phone/email/sms
 		// destination index 2 is sequence
+		// destination index 4 is type
+		// destination index 5 is editlock
 		$data = array();
 		foreach($personlist as $personrow){
 			if(!isset($destinationdata[$personrow[1]])){
-				array_splice($personrow, 5, 0, array("","", ""));
+				array_splice($personrow, 5, 0, array("","-None-","",""));
 				$data[] = $personrow;
 			} else {
 				$displayed = false;
 				foreach($destinationdata[$personrow[1]] as $destination){
 					if($destination[1]!=""){
-						array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[4]));
+						array_splice($personrow, 5, 0, array($destination[2],$destination[1], $destination[4], $destination[5]));
 						$data[] = $personrow;
 						$displayed = true;
 					}
 				}
 
 				if (!$displayed) {
-					array_splice($personrow, 5, 0, array("","-None-",""));
+					array_splice($personrow, 5, 0, array("","-None-","", ""));
 					$data[] = $personrow;
 				}
 			}
@@ -174,6 +179,15 @@ class ContactsReport extends ReportGenerator {
 			}
 		}
 
+		//index 8 should be the editlock flag;
+		function fmt_editlocked_destination($row, $index){
+			$output = fmt_destination($row, $index);
+			if($row[8] == 1){
+				$output = "<img src='img/padlock.gif'>&nbsp;" . $output;
+			}
+			return $output;
+		}
+
 		$titles = array("0" => "ID#",
 						"2" => "First Name",
 						"3" => "Last Name",
@@ -183,11 +197,11 @@ class ContactsReport extends ReportGenerator {
 		// index 7 is a flag to tell what type of destination
 		// so set the title of starting f-field at appropriate place
 		// append begins after index specified
-		$titles = appendFieldTitles($titles, 7, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 8, $fieldlist, $activefields);
 
 		$formatters = array("0" => "fmt_idmagnify",
 							"5" => "fmt_destination_sequence",
-							"6" => "fmt_destination");
+							"6" => "fmt_editlocked_destination");
 
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
