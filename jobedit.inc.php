@@ -649,7 +649,7 @@ startWindow('Job Information');
 								<th>Name</th>
 								<th>Info</th>
 <?
-						if(in_array(getSystemSetting('_dmmethod', ""), array('cs','hybrid'))){
+						if(getSystemSetting('_dmmethod', "")=='hybrid'){
 ?>
 								<th>Delivery System</th>
 <?
@@ -671,7 +671,7 @@ startWindow('Job Information');
 
 								<td><div id="jobtypeinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
 <?
-						if(in_array(getSystemSetting('_dmmethod', ""), array('cs','hybrid'))){
+						if(getSystemSetting('_dmmethod', "")=='hybrid'){
 ?>
 								<td><div id="addinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
 <?
@@ -1098,7 +1098,7 @@ function display_jobtype_info(value){
 		jobtypetable.style.border=jobtypetablestyle;
 	}
 <?
-	if(in_array(getSystemSetting('_dmmethod', ""), array('cs','hybrid'))){
+	if(getSystemSetting('_dmmethod', "")=='hybrid'){
 ?>
 		var addinfo = new getObj("addinfo").obj;
 
