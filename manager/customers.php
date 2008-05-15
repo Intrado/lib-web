@@ -107,7 +107,7 @@ foreach($customers as $cust) {
 			$customerfeatures[] = "Portal";
 		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
-		if(getCustomerSystemSetting('_hasremotedm', false, true, $custdb))
+		if(in_array(getCustomerSystemSetting('_dmmethod', "", true, $custdb), array('hybrid', 'cs')))
 			$customerfeatures[] = "Remote DM";
 		$row[10] = implode(", ", $customerfeatures);
 
