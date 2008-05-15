@@ -460,7 +460,7 @@ class JobDetailReport extends ReportGenerator{
 		$ordering["Attempts"] = "numattempts";
 		$ordering["Last Attempt"]="lastattempt";
 		$ordering["Last Result"]="result";
-		$ordering["Confirmed"]="confirmed";
+		$ordering["Response"]="confirmed DESC, voicereplyid DESC";
 
 
 		foreach($fields as $field){
