@@ -131,6 +131,9 @@ startWindow('Upload Call List File');
 ?>
 											</td>
 										</tr>
+<?
+if($USER->authorize("sendemail")){
+?>
 										<tr>
 											<td>Email Mapping:</td>
 											<td>
@@ -143,6 +146,9 @@ startWindow('Upload Call List File');
 ?>
 											</td>
 										</tr>
+<?
+}
+?>
 									</table>
 								</td></td>
 							</tr>
