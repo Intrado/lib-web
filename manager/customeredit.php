@@ -357,7 +357,7 @@ if( $reloadform ) {
 
 	PutFormData($f, $s, "emaildomain", getCustomerSystemSetting('emaildomain', "", true, $custdb), "text", 0, 255);
 
-	PutFormData($f, $s, "_dmmethod", getCustomerSystemSetting('_dmmethod', "", true, $custdb), "array", array('cs','hybrid','asp'));
+	PutFormData($f, $s, "_dmmethod", getCustomerSystemSetting('_dmmethod', "", true, $custdb), "array", array('asp','hybrid','cs'), null, true);
 
 }
 
@@ -415,12 +415,12 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td> Has Portal </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?></td></tr>
 
 <tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!</b></td></tr>
-<tr><td> Uses Remote DM </td>
+<tr><td> Delivery Mechanism Method </td>
 	<td><?
 			NewFormItem($f, $s, '_dmmethod', 'selectstart');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite', 'cs');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'Hybrid', 'hybrid');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'ASP', 'asp');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'Hybrid', 'hybrid');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite', 'cs');
 			NewFormItem($f, $s, '_dmmethod', 'selectend');
 		?>
 		<span>
