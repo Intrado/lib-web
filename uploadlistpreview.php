@@ -304,10 +304,16 @@ if ($errormsg) {
 
 	if ($type == "contacts") {
 
-		$titles = array(0 => "First Name", 1 => "Last Name", 2 => "Phone Number", 3 => "Email");
+		$titles = array(0 => "First Name", 1 => "Last Name", 2 => "Phone Number");
+		if($USER->authorize('sendemail')){
+			$titles[3] = "Email";
+		}
 		$formatters = array(3 => "fmt_email");
 	} else {
-		$titles = array(0 => "ID#", 1=> "First Name", 2 => "Last Name", 3 => "Phone Number", 4 => "Email");
+		$titles = array(0 => "ID#", 1=> "First Name", 2 => "Last Name", 3 => "Phone Number");
+		if($USER->authorize('sendemail')){
+			$titles[4] = "Email";
+		}
 		$formatters = array();
 	}
 
