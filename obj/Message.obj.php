@@ -128,10 +128,11 @@ class Message extends DBMappedObject {
 				$part = new MessagePart();
 				$part->type = $type;
 				//$part->messageid = $this->id; // assign ID afterwards so ID is set
-				$part->sequence = $partcount++;
+
 
 				switch ($type) {
 					case "A":
+						$part->sequence = $partcount++;
 						$audioname = DBSafe($token);
 						$query = "select id from audiofile where userid=$USER->id and name='$audioname' and deleted = 0";
 
@@ -146,6 +147,7 @@ class Message extends DBMappedObject {
 
 						break;
 					case "V":
+						$part->sequence = $partcount++;
 						if (strpos($token,":") !== false) {
 							list($fieldname,$defvalue) = explode(":",$token);
 						} else {
