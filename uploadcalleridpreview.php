@@ -31,21 +31,27 @@ $f="uploadcalleridpreview";
 $s="main";
 $reloadform = 0;
 
+$count=5000;
 if($curfilename && !$errormsg){
 	if($fp = @fopen($curfilename, "r")){
 		while($row = trim(fgets($fp))){
-			$row = explode("=", $row);
-			if(count($row) == 2){
-				//validate each item in the row.
-				//callerid, prefix
-				$row[0] = Phone::parse($row[0]);
-				if(strlen($row[0]) != 10){
-					continue;
+			if($count > 0){
+				$row = explode("=", $row);
+				if(count($row) == 2){
+					//validate each item in the row.
+					//callerid, prefix
+					$row[0] = Phone::parse($row[0]);
+					if(strlen($row[0]) != 10){
+						continue;
+					}
+					if(!ereg("^[0-9]*$", $row[1])){
+						continue;
+					}
+					if(!CheckFormSubmit($f, "save")){
+						$count--;
+					}
+					$callerids[$row[0]] = $row;
 				}
-				if(!ereg("^[0-9]*$", $row[1])){
-					continue;
-				}
-				$callerids[$row[0]] = $row;
 			}
 		}
 	} else {
@@ -55,6 +61,7 @@ if($curfilename && !$errormsg){
 $routechange = 0;
 if(CheckFormSubmit($f, "save")  && !$errormsg){
 	// CSV format is match, strip, prefix, suffix
+	$newcalleridroutes = array();
 	foreach($callerids as $row){
 		//validate each item in the row.
 		//callerid, prefix
@@ -71,14 +78,12 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 			$calleridroutes[$row[0]]->prefix = $row[1];
 			$calleridroutes[$row[0]]->update();
 		} else {
-			$route = new DMCallerIDRoute();
-			$route->dmid = $dmid;
-			$route->callerid = $row[0];
-			$route->prefix = $row[1];
-			$route->create();
-			$calleridroutes[$row[0]] = $route;
+			$newcalleridroutes[] = "('" . $dmid . "','" . implode("','", $row) . "')";
 			$routechange = 1;
 		}
+	}
+	if(count($newcalleridroutes)){
+		QuickUpdate("insert into dmcalleridroute (dmid, callerid, prefix) values " . implode(",",$newcalleridroutes));
 	}
 	if($routechange){
 		QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
@@ -107,7 +112,7 @@ $PAGE="admin:settings";
 $TITLE="Upload Caller ID Routes Preview: " . $dmname;
 include("nav.inc.php");
 buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadcallerid.php"), button("Cancel", null, "calleridroute.php"));
-startWindow("Routes Preview");
+startWindow("Routes Preview" . ($count <= 0 ? " - First 5000 Records" : ""));
 ?>
 	<table cellpadding="3" cellspacing="1" class="list" width="100%">
 <?

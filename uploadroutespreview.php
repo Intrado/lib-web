@@ -28,11 +28,11 @@ $routes = array();
 $f="uploadroutepreview";
 $s="main";
 $reloadform = 0;
-
+$count=5000;
 if($curfilename && !$errormsg){
 	if($fp = @fopen($curfilename, "r")){
 		while($row = fgetcsv($fp)){
-			if(count($row) == 4){
+			if($count > 0 && count($row) == 4){
 				//validate each item in the row.
 				//match, prefix, and suffix should be numbers or empty string
 				//strip must be a number
@@ -48,6 +48,9 @@ if($curfilename && !$errormsg){
 				if(!ereg("^[0-9]*$", $row[3])){
 					continue;
 				}
+				if(!CheckFormSubmit($f, "save")){
+					$count--;
+				}
 				$routes[$row[0]] = $row;
 			}
 		}
@@ -58,6 +61,7 @@ if($curfilename && !$errormsg){
 $routechange = 0;
 if(CheckFormSubmit($f, "save")  && !$errormsg){
 	// CSV format is match, strip, prefix, suffix
+	$newroutes = array();
 	foreach($routes as $row){
 		//validate each item in the row.
 		//match, prefix, and suffix should be numbers or empty string
@@ -85,16 +89,12 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 			$dmroutes[$row[0]]->suffix = $row[3];
 			$dmroutes[$row[0]]->update();
 		} else {
-			$route = new DMRoute();
-			$route->dmid = $dmid;
-			$route->match = $row[0];
-			$route->strip = $row[1];
-			$route->prefix = $row[2];
-			$route->suffix = $row[3];
-			$route->create();
-			$dmroutes[$row[0]] = $route;
+			$newroutes[] = "('" . $dmid . "','" . implode("','", $row) . "')";
 			$routechange = 1;
 		}
+	}
+	if(count($newroutes)){
+		QuickUpdate("insert into dmroute (dmid, `match`, strip, prefix, suffix) values " . implode(",", $newroutes));
 	}
 	if($routechange){
 		QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
@@ -131,7 +131,7 @@ $PAGE="admin:settings";
 $TITLE="Upload Telco Settings Preview: " . $dmname;
 include("nav.inc.php");
 buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadroutes.php"), button("Cancel", null, "dmsettings.php"));
-startWindow("Routes Preview");
+startWindow("Routes Preview" . ($count <= 0 ? " - First 5000 Records" : ""));
 ?>
 	<table cellpadding="3" cellspacing="1" class="list" width="100%">
 <?
