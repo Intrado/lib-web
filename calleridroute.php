@@ -56,6 +56,12 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 
+			if(CheckFormSubmit($f, "deleteall")){
+				QuickUpdate("delete from dmcalleridroute where dmid = " . $dmid);
+				QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+				redirect();
+			}
+
 			$matches = array();
 			$duplicatematches = array();
 			$default = false;
@@ -78,12 +84,8 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 				$routechange = false;
 				$callerid = "";
 				foreach($calleridroutes as $calleridroute){
+					$updateroute = false;
 					$callerid = Phone::parse(GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid"));
-					if(CheckFormSubmit($f, "deleteall")){
-						$calleridroute->destroy();
-						$calleridroutechange=true;
-						continue;
-					}
 					if(CheckFormSubmit($f, "delete_dm_" . $calleridroute->id)){
 						$calleridroute->destroy();
 						$routechange=true;
@@ -96,30 +98,29 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 						)
 					){
 						$routechange = true;
+						$updateroute = true;
+						$calleridroute->dmid = $dmid;
+						$calleridroute->callerid = $callerid;
+						$calleridroute->prefix = GetFormData($f, $s, "dm_" . $calleridroute->id ."_prefix");
 					}
-					$calleridroute->dmid = $dmid;
-					$calleridroute->callerid = $callerid;
-					$calleridroute->prefix = GetFormData($f, $s, "dm_" . $calleridroute->id ."_prefix");
 					if($calleridroute->id == "new" && CheckFormSubmit($f, "add")){
 						$routechange = true;
 						$calleridroute->create();
-					} else if($calleridroute->id != "new"){
+					} else if($updateroute){
 						$calleridroute->update();
 					}
 				}
 
-				if(CheckFormSubmit($f, "deleteall")){
-					$defaultcalleridroute->destroy();
-				} else {
-					if($defaultcalleridroute->prefix != GetFormData($f, $s, "default_prefix")){
-						$routechange = true;
-					}
 
-					$defaultcalleridroute->dmid = $dmid;
-					$defaultcalleridroute->callerid = "";
-					$defaultcalleridroute->prefix = GetFormData($f, $s, "default_prefix");
-					$defaultcalleridroute->update();
+				if($defaultcalleridroute->prefix != GetFormData($f, $s, "default_prefix")){
+					$routechange = true;
 				}
+
+				$defaultcalleridroute->dmid = $dmid;
+				$defaultcalleridroute->callerid = "";
+				$defaultcalleridroute->prefix = GetFormData($f, $s, "default_prefix");
+				$defaultcalleridroute->update();
+
 				if($routechange){
 					QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
 				}
