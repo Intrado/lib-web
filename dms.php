@@ -60,7 +60,7 @@ include_once("nav.inc.php");
 buttons(button("Back", null, "settings.php"));
 startWindow("DM's" . help('Settings_DMs'));
 ?>
-<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
+<table border="0" width="100%" cellpadding="3" cellspacing="1" class="list" >
 <?
 	showTable($data, $titles, $formatters);
 ?>
