@@ -54,6 +54,11 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
+			if(CheckFormSubmit($f, "deleteall")){
+				QuickUpdate("delete from dmroute where dmid = " . $dmid);
+				QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+				redirect();
+			}
 
 			$matches = array();
 			$duplicatematches = array();
@@ -74,11 +79,7 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			} else {
 				$routechange = false;
 				foreach($routes as $route){
-					if(CheckFormSubmit($f, "deleteall")){
-						$route->destroy();
-						$routechange=true;
-						continue;
-					}
+					$updateroute = false;
 					if(CheckFormSubmit($f, "delete_dm_" . $route->id)){
 						$route->destroy();
 						$routechange=true;
@@ -93,37 +94,33 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 						)
 					){
 						$routechange = true;
+						$updateroute = true;
+						$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
+						$route->strip = GetFormData($f, $s, "dm_" . $route->id ."_strip");
+						$route->prefix = GetFormData($f, $s, "dm_" . $route->id ."_prefix");
+						$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
 					}
-					$route->dmid = $dmid;
-					$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
-					$route->strip = GetFormData($f, $s, "dm_" . $route->id ."_strip");
-					$route->prefix = GetFormData($f, $s, "dm_" . $route->id ."_prefix");
-					$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
 					if($route->id == "new" && CheckFormSubmit($f, "add")){
 						$routechange = true;
 						$route->create();
-					} else if($route->id != "new") {
+					} else if($updateroute) {
 						$route->update();
 					}
 				}
 
-				if(CheckFormSubmit($f, "deleteall")){
-					$defaultroute->destroy();
-				} else {
-					if($defaultroute->strip != GetFormData($f, $s, "default_strip")
-						|| $defaultroute->prefix != GetFormData($f, $s, "default_prefix")
-						|| $defaultroute->suffix != GetFormData($f, $s, "default_suffix")
-						){
-							$routechange = true;
-					}
-
-					$defaultroute->dmid = $dmid;
-					$defaultroute->match = "";
-					$defaultroute->strip = GetFormData($f, $s, "default_strip");
-					$defaultroute->prefix = GetFormData($f, $s, "default_prefix");
-					$defaultroute->suffix = GetFormData($f, $s, "default_suffix");
-					$defaultroute->update();
+				if($defaultroute->strip != GetFormData($f, $s, "default_strip")
+					|| $defaultroute->prefix != GetFormData($f, $s, "default_prefix")
+					|| $defaultroute->suffix != GetFormData($f, $s, "default_suffix")
+					){
+						$routechange = true;
 				}
+
+				$defaultroute->dmid = $dmid;
+				$defaultroute->match = "";
+				$defaultroute->strip = GetFormData($f, $s, "default_strip");
+				$defaultroute->prefix = GetFormData($f, $s, "default_prefix");
+				$defaultroute->suffix = GetFormData($f, $s, "default_suffix");
+				$defaultroute->update();
 				if($routechange){
 					QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
 				}
