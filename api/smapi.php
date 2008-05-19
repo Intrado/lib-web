@@ -304,7 +304,6 @@ class SMAPI{
 				$result["resultcode"] = "success";
 				$result["audioname"] = $audiofile->name;
 			}
-			error_log(print_r($result, true));
 			return $result;
 		}
 	}

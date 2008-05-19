@@ -37,7 +37,7 @@ if(isset($options['jobid'])){
 	list($startdate, $enddate) = getStartEndDate($reldate, $options);
 	$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes));
 }
-error_log($joblist);
+
 $jobidquery = " and jobid in ('" . $joblist . "')";
 $big = isset($_GET['big']) ? true : false;
 
