@@ -15,8 +15,18 @@ if(isset($_GET['dmid'])){
 	$dmid = $_SESSION['dmid'];
 }
 
+$limit = "";
+$max = 500;
+$pagestart = 0;
+if(isset($_GET['pagestart'])){
+	$pagestart = $_GET['pagestart']+0;
+}
+$limit = " limit " . $pagestart . ", $max ";
+
 $dmname = QuickQuery("select name from custdm where dmid = " . $dmid);
-$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " and `match` != '' order by length(`match`) desc, `match` ASC");
+$routes = DBFindMany("DMRoute", "from dmroute where dmid = " . $dmid . " and `match` != '' order by length(`match`) desc, `match` ASC $limit");
+$routes = resequence($routes, "match");
+$matchlist = QuickQueryList("select `match` from dmroute where dmid = " . $dmid . " and `match` != ''");
 $defaultroute = DBFind("DMRoute", "from dmroute where dmid = " . $dmid . " and `match` = ''");
 if(!$defaultroute)
 	$defaultroute = new DMRoute();
@@ -64,8 +74,11 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			$duplicatematches = array();
 			$default = false;
 			$duplicatedefaults = false;
+			$modmatchlist =  array_flip(array_diff($matchlist, array_keys($routes)));
 			foreach($routes as $route){
-				if(!isset($matches[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
+				if(isset($modmatchlist[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
+					$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = true;
+				} else if(!isset($matches[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
 					$matches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = 1;
 				} else {
 					$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = true;
@@ -95,11 +108,12 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 					){
 						$routechange = true;
 						$updateroute = true;
-						$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
-						$route->strip = GetFormData($f, $s, "dm_" . $route->id ."_strip");
-						$route->prefix = GetFormData($f, $s, "dm_" . $route->id ."_prefix");
-						$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
 					}
+					$route->dmid = $dmid;
+					$route->match = GetFormData($f, $s, "dm_" . $route->id ."_match");
+					$route->strip = GetFormData($f, $s, "dm_" . $route->id ."_strip");
+					$route->prefix = GetFormData($f, $s, "dm_" . $route->id ."_prefix");
+					$route->suffix = GetFormData($f, $s, "dm_" . $route->id ."_suffix");
 					if($route->id == "new" && CheckFormSubmit($f, "add")){
 						$routechange = true;
 						$route->create();
@@ -129,7 +143,7 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 					redirect("dms.php");
 				else if(CheckFormSubmit($f, "upload"))
 					redirect("uploadroutes.php?dmid=" . $dmid);
-				redirect();
+				redirect("?pagestart=" . $pagestart);
 			}
 		}
 	}
@@ -160,6 +174,7 @@ NewForm($f);
 buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL routes?')) submitForm('" . $f . "', 'deleteall')"));
 
 startWindow("Route Plans" . help("Settings_RoutePlans"));
+showPageMenu(count($matchlist),$pagestart,$max);
 ?>
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">
@@ -172,7 +187,7 @@ startWindow("Route Plans" . help("Settings_RoutePlans"));
 	</tr>
 <?
 		$alt = 0;
-		$count = 0;
+		$count = $pagestart;
 		foreach($routes as $route){
 			if($route->id == "new") continue;
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
@@ -184,14 +199,13 @@ startWindow("Route Plans" . help("Settings_RoutePlans"));
 				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_prefix", "text", 10, 20); ?></td>
 				<td><? NewFormItem($f, $s, "dm_" . $route->id ."_suffix", "text", 10, 20); ?></td>
 				<td><?=button("Delete", "if(confirmDelete()) submitForm('" . $f . "', 'delete_dm_" . $route->id. "')");?></td>
-
 			</tr>
 <?
 		}
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 		$count++;
 ?>
-			<td><?=$count?></td>
+			<td>&nbsp;</td>
 			<td>Default</td>
 			<td><? NewFormItem($f, $s, "default_strip", "text", 2); ?></td>
 			<td><? NewFormItem($f, $s, "default_prefix", "text", 10, 20); ?></td>
@@ -210,6 +224,7 @@ startWindow("Route Plans" . help("Settings_RoutePlans"));
 		</tr>
 	</table>
 <?
+showPageMenu(count($matchlist),$pagestart,$max);
 endWindow();
 buttons();
 EndForm();

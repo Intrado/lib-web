@@ -16,8 +16,17 @@ if(isset($_GET['dmid'])){
 	$dmid = $_SESSION['dmid'];
 }
 
+$pagestart=0;
+$max = 500;
+if(isset($_GET['pagestart'])){
+	$pagestart = $_GET['pagestart'] +0;
+}
+$limit = " limit " . $pagestart . ", " . $max . " ";
+
 $dmname = QuickQuery("select name from custdm where dmid = " . $dmid);
-$calleridroutes = DBFindMany("DMCallerIDRoute", "from dmcalleridroute where dmid = " . $dmid . " and callerid != '' order by callerid ASC");
+$calleridroutes = DBFindMany("DMCallerIDRoute", "from dmcalleridroute where dmid = " . $dmid . " and callerid != '' order by callerid ASC " . $limit);
+$calleridroutes = resequence($calleridroutes, "callerid");
+$calleridlist = QuickQueryList("select callerid from dmcalleridroute where dmid = " . $dmid . " and callerid != ''");
 $defaultcalleridroute = DBFind("DMCallerIDRoute", "from dmcalleridroute where dmid = " . $dmid . " and `callerid` = ''");
 if(!$defaultcalleridroute)
 	$defaultcalleridroute = new DMCallerIDRoute();
@@ -25,10 +34,13 @@ $newcalleridroute = new DMCallerIDRoute();
 $newcalleridroute->id = "new";
 $calleridroutes[] = $newcalleridroute;
 
+function phoneformattercallback($phone){
+	return Phone::format($phone);
+}
+
 $f = "calleridroutes";
 $s = "main";
 $reloadform = 0;
-
 
 $checkformdelete = false;
 
@@ -66,10 +78,12 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			$duplicatematches = array();
 			$default = false;
 			$duplicatedefaults = false;
-			$callerid = "";
+			$modcalleridlist = array_flip(array_diff($calleridlist, array_keys($calleridroutes)));
 			foreach($calleridroutes as $calleridroute){
 				$callerid = Phone::parse(GetFormData($f, $s, "dm_" . $calleridroute->id ."_callerid"));
-				if(!isset($matches[$callerid])){
+				if(isset($modcalleridlist[$callerid])){
+					$duplicatematches[$callerid] = true;
+				} else if(!isset($matches[$callerid])){
 					$matches[$callerid] = 1;
 				} else {
 					$duplicatematches[$callerid] = true;
@@ -77,7 +91,8 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			}
 
 			if(count($duplicatematches)){
-				error("You have multiple caller id routes with the same caller id", array_keys($duplicatematches));
+				$duplicatematches = array_map("phoneformattercallback", array_keys($duplicatematches));
+				error("You have multiple caller id routes with the same caller id",$duplicatematches);
 			} else if(CheckFormSubmit($f, "add") && GetFormData($f, $s, "dm_new_callerid") == ""){
 				error("You cannot add a route with an empty caller id");
 			} else {
@@ -99,10 +114,10 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 					){
 						$routechange = true;
 						$updateroute = true;
-						$calleridroute->dmid = $dmid;
-						$calleridroute->callerid = $callerid;
-						$calleridroute->prefix = GetFormData($f, $s, "dm_" . $calleridroute->id ."_prefix");
 					}
+					$calleridroute->dmid = $dmid;
+					$calleridroute->callerid = $callerid;
+					$calleridroute->prefix = GetFormData($f, $s, "dm_" . $calleridroute->id ."_prefix");
 					if($calleridroute->id == "new" && CheckFormSubmit($f, "add")){
 						$routechange = true;
 						$calleridroute->create();
@@ -158,6 +173,7 @@ NewForm($f);
 buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Caller ID Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL caller id routes?')) submitForm('" . $f . "', 'deleteall')"));
 
 startWindow("Caller ID Route Plans" . help("Settings_CallerIDRoutes"));
+showPageMenu(count($calleridlist),$pagestart,$max);
 ?>
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">
@@ -193,6 +209,7 @@ startWindow("Caller ID Route Plans" . help("Settings_CallerIDRoutes"));
 		</tr>
 	</table>
 <?
+showPageMenu(count($calleridlist),$pagestart,$max);
 endWindow();
 buttons();
 EndForm();
