@@ -34,7 +34,7 @@ function fmt_jobcount($row, $index){
 
 function fmt_accssname($row, $index){
 	global $custdb;
-	$accessname = QuickQuery("select name from access where id = '" . $row[9] ."'", $custdb);
+	$accessname = QuickQuery("select name from access where id = '" . $row[10] ."'", $custdb);
 	return $accessname;
 }
 
