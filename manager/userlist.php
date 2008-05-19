@@ -32,12 +32,6 @@ function fmt_jobcount($row, $index){
 	return $link;
 }
 
-function fmt_accssname($row, $index){
-	global $custdb;
-	$accessname = QuickQuery("select name from access where id = '" . $row[10] ."'", $custdb);
-	return $accessname;
-}
-
 function fmt_custurl($row, $index){
 
 	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[2] . "</a>";
@@ -54,7 +48,7 @@ include_once("nav.inc.php");
 if($custdb = DBConnect($cust[0], $cust[1], $cust[2], "c_$customerid")){
 	$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
 	$custinfo = array($customerid, $displayname, $cust[3]);
-	$result = Query("select id, login, firstname, lastname, lastlogin, phone, email, accessid from user where enabled=1 AND deleted=0", $custdb);
+	$result = Query("select u.id, u.login, u.firstname, u.lastname, u.lastlogin, u.phone, u.email, a.name from user u left join access a on (u.accessid = a.id) where enabled=1 AND deleted=0", $custdb);
 	$users = array();
 	while($row = DBGetRow($result)){
 		$users[] = array_merge($custinfo, $row);
@@ -71,14 +65,13 @@ $titles = array("0" => "Customer ID",
 				"6" => "First Name",
 				"7" => "Last Login",
 				"activejobs" => "Active Jobs",
-				"access" => "Access Profile",
+				"10" => "Access Profile",
 				"8" => "Phone",
 				"9" => "Email");
 
 $formatters = array("url" => "fmt_custurl",
 					"7" => "fmt_lastlogin",
-					"activejobs" => "fmt_jobcount",
-					"access" => "fmt_accssname");
+					"activejobs" => "fmt_jobcount");
 
 ?>
 <table border=1>
