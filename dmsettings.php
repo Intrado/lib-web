@@ -190,8 +190,9 @@ startWindow("Default Route Plan" . help("Settings_DefaultRoutePlan"));
 </table>
 <?
 endWindow();
-
-
+?>
+<br>
+<?
 startWindow("Custom Route Plans" . help("Settings_RoutePlans"));
 
 ?>
