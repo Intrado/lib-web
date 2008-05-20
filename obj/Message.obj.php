@@ -173,7 +173,7 @@ class Message extends DBMappedObject {
 						if(isset($defaultvoice->gender)){
 							$currvoiceid = QuickQuery("select id from ttsvoice where language = '" . DBSafe(strtolower($token)) . "' and gender = '" . $defaultvoice->gender ."'");
 							if($currvoiceid == false){
-								$errors[] = "Can't find that language: " . $token;
+								$errors[] = "Can't find that language: " . $token . ". Only English and Spanish are available";
 								$currvoiceid = null;
 							}
 						}
@@ -218,14 +218,14 @@ class Message extends DBMappedObject {
 				break;
 			case 'T':
 				if($part->voiceid != $currvoiceid){
-					$data .= "[[" . $voices[$part->voiceid]->language . "]]";
+					$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
 					$currvoiceid = $part->voiceid;
 				}
 				$data .= $part->txt;
 				break;
 			case 'V':
 				if($part->voiceid != $currvoiceid){
-					$data .= "[[" . $voices[$part->voiceid]->language . "]]";
+					$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
 					$currvoiceid = $part->voiceid;
 				}
 				$data .= "<<" . $map[$part->fieldnum];
