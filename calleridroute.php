@@ -172,7 +172,37 @@ NewForm($f);
 
 buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Caller ID Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL caller id routes?')) submitForm('" . $f . "', 'deleteall')"));
 
-startWindow("Caller ID Route Plans" . help("Settings_CallerIDRoutes"));
+startWindow("Default Caller ID Route Plan" . help("Settings_DefaultCallerIDRoute"));
+?>
+<table cellpadding="3" cellspacing="1" class="list" width="100%">
+	<tr class="listHeader">
+		<th align="left">Caller ID</th>
+		<th align="left">Prefix</th>
+	</tr>
+	<tr>
+		<td>Default</td>
+		<td><? NewFormItem($f, $s, "default_prefix", "text", 10, 20); ?></td>
+	</tr>
+</table>
+<?
+endWindow();
+
+
+startWindow("Custom Caller ID Route Plans" . help("Settings_CallerIDRoutes"));
+?>
+<table cellpadding="3" cellspacing="1" width="100%">
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">New Custom Caller ID Route:</th>
+		<td class="bottomBorder">
+			<table width="50%">
+				<tr><td>Caller ID</td><td><? NewFormItem($f, $s, "dm_new_callerid", "text", 14, 20, "id='dm_new_callerid' "); ?></td></tr>
+				<tr><td>Prefix</td><td><? NewFormItem($f, $s, "dm_new_prefix", "text", 10, 20); ?></td></tr>
+				<tr><td>&nbsp;</td><td><?=submit($f, "add", "Add"); ?></td></tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<?
 showPageMenu(count($calleridlist),$pagestart,$max);
 ?>
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
@@ -194,19 +224,7 @@ showPageMenu(count($calleridlist),$pagestart,$max);
 			</tr>
 <?
 		}
-		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-			<td>Default</td>
-			<td><? NewFormItem($f, $s, "default_prefix", "text", 10, 20); ?></td>
-			<td></td>
-		</tr>
-<?
-		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-?>
-			<td><? NewFormItem($f, $s, "dm_new_callerid", "text", 14, 20, "id='dm_new_callerid' "); ?></td>
-			<td><? NewFormItem($f, $s, "dm_new_prefix", "text", 10, 20); ?></td>
-			<td><?=submit($f, "add", "Add"); ?></td>
-		</tr>
 	</table>
 <?
 showPageMenu(count($calleridlist),$pagestart,$max);

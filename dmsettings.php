@@ -172,8 +172,44 @@ include_once("nav.inc.php");
 NewForm($f);
 
 buttons(submit($f, $s, "Done"), submit($f, "upload", "Upload Routes"), button("Delete All", "if(confirm('Are you sure you want to delete ALL routes?')) submitForm('" . $f . "', 'deleteall')"));
+startWindow("Default Route Plan" . help("Settings_DefaultRoutePlan"));
+?>
+<table cellpadding="3" cellspacing="1" class="list" width="100%">
+	<tr class="listHeader">
+			<th align="left"></th>
+			<th align="left">Strip</th>
+			<th align="left">Prefix</th>
+			<th align="left">Suffix</th>
+	</tr>
+	<tr>
+		<td>Default</td>
+		<td><? NewFormItem($f, $s, "default_strip", "text", 2); ?></td>
+		<td><? NewFormItem($f, $s, "default_prefix", "text", 10, 20); ?></td>
+		<td><? NewFormItem($f, $s, "default_suffix", "text", 10, 20); ?></td>
+	</tr>
+</table>
+<?
+endWindow();
 
-startWindow("Route Plans" . help("Settings_RoutePlans"));
+
+startWindow("Custom Route Plans" . help("Settings_RoutePlans"));
+
+?>
+<table cellpadding="3" cellspacing="1" width="100%">
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">New Custom Route Plan:</th>
+		<td class="bottomBorder">
+			<table width="50%">
+				<tr><td width="30%">Match</td><td><? NewFormItem($f, $s, "dm_" . $route->id ."_match", "text", 10, 20, "id='dm_" . $route->id . "_match' "); ?></td></tr>
+				<tr><td>Strip</td><td><? NewFormItem($f, $s, "dm_" . $route->id ."_strip", "text", 2); ?></td></tr>
+				<tr><td>Prefix</td><td><? NewFormItem($f, $s, "dm_" . $route->id ."_prefix", "text", 10, 20); ?></td></tr>
+				<tr><td>Suffix</td><td><? NewFormItem($f, $s, "dm_" . $route->id ."_suffix", "text", 10, 20); ?></td></tr>
+				<tr><td>&nbsp;</td><td><?=submit($f, "add", "Add"); ?></td></tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<?
 showPageMenu(count($matchlist),$pagestart,$max);
 ?>
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
@@ -202,26 +238,7 @@ showPageMenu(count($matchlist),$pagestart,$max);
 			</tr>
 <?
 		}
-		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-		$count++;
 ?>
-			<td>&nbsp;</td>
-			<td>Default</td>
-			<td><? NewFormItem($f, $s, "default_strip", "text", 2); ?></td>
-			<td><? NewFormItem($f, $s, "default_prefix", "text", 10, 20); ?></td>
-			<td><? NewFormItem($f, $s, "default_suffix", "text", 10, 20); ?></td>
-			<td></td>
-		</tr>
-<?
-		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-?>
-			<td>&nbsp;</td>
-			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_match", "text", 10, 20, "id='dm_" . $route->id . "_match' "); ?></td>
-			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_strip", "text", 2); ?></td>
-			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_prefix", "text", 10, 20); ?></td>
-			<td><? NewFormItem($f, $s, "dm_" . $route->id ."_suffix", "text", 10, 20); ?></td>
-			<td><?=submit($f, "add", "Add"); ?></td>
-		</tr>
 	</table>
 <?
 showPageMenu(count($matchlist),$pagestart,$max);
