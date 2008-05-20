@@ -1,2 +1,2 @@
 --Need Link--
-The Default Route Plan is used when a phone number does not have the match string in any Custom Route Plans.
+The Default Route Plan is used when a phone number does not contain the match string of any Custom Route Plans.
