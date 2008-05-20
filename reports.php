@@ -63,16 +63,31 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 		<tr class="listHeader">
 			<th align="left" class="nosort">Job and Date Range</th>
 			<th align="left" class="nosort">Individual</th>
+<?
+if($USER->authorize('viewsystemreports') || $USER->authorize("survey")){
+?>
 			<th align="left" class="nosort">Survey</th>
+
+<?
+}
+?>
+
 		</tr>
-		<tr align="left" valign="bottom">
+		<tr align="left" valign="top">
 			<td>
 				<table>
 					<tr><td><a href='reportjobsearch.php?clear=1'/>Notification Summary</a></td></tr>
+<? if($USER->authorize('viewsystemreports') || $USER->authorize("sendphone")){ ?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Phone Log</a></td></tr>
+<?
+	}
+	if($USER->authorize('viewsystemreports') || $USER->authorize("sendemail")){
+?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Log</a></td></tr>
-
-<? if(getSystemSetting('_hassms', false)){ ?>
+<?
+	}
+	if(getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
+?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms'/>SMS Log</a></td></tr>
 <? } ?>
 				</table>
@@ -80,25 +95,15 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 			<td>
 				<table>
 					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
-					<tr><td>&nbsp;</td></tr>
-					<tr><td>&nbsp;</td></tr>
-
-<? if(getSystemSetting('_hassms', false)){ ?>
-					<tr><td>&nbsp;</td></tr>
-<? } ?>
 				</table>
 			</td>
+<? if($USER->authorize('viewsystemreports') || $USER->authorize("survey")){ ?>
 			<td>
 				<table>
 					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
-					<tr><td>&nbsp;</td></tr>
-					<tr><td>&nbsp;</td></tr>
-
-<? if(getSystemSetting('_hassms', false)){ ?>
-					<tr><td>&nbsp;</td></tr>
-<? } ?>
 				</table>
 			</td>
+<? } ?>
 		</tr>
 	</table>
 <?
