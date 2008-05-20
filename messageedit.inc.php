@@ -159,7 +159,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 			}
 
 			if (count($errors) > 0) {
-				error('There was an error parsing the message', implode("",$errors));
+				error('There was an error parsing the message', $errors);
 			} else if($MESSAGETYPE == "sms" && $charcount > 160){
 				error("There are too many characters for an SMS message: " . $charcount, "You can only have 160 characters");
 			} else {
