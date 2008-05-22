@@ -137,7 +137,6 @@ $s = "send";
 
 include_once("nav.inc.php");
 
-NewForm($f, "jobsubmit.php?jobid=$jobid");
 if ($renderedlist->total > 0)
 	buttons(button('Save For Later', null, 'jobs.php'),
 			button('Modify Job Settings',null, 'job.php'),
@@ -352,7 +351,6 @@ echo htmlentities($smsmessage->name);
 <?
 endWindow();
 buttons();
-EndForm();
 
 
 
