@@ -1366,78 +1366,6 @@ ALTER TABLE `import` ADD `alertoptions` TEXT NULL
 $$$
 
 
-drop trigger insert_repeating_job
-$$$
-
-CREATE TRIGGER insert_repeating_job
-AFTER INSERT ON job FOR EACH ROW
-BEGIN
-DECLARE cc INTEGER;
-DECLARE tz VARCHAR(50);
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
-DECLARE rdm VARCHAR(50);
-DECLARE dtype VARCHAR(50) DEFAULT 'system';
-
-IF NEW.status IN ('repeating') THEN
-  SELECT value INTO tz FROM setting WHERE name='timezone';
-  SELECT value INTO rdm FROM setting WHERE name='_hasremotedm';
-  IF rdm='1' THEN
-    SET dtype = 'customer';
-  END IF;
-
-  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql, dispatchtype)
-         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.jobtypeid, NEW.thesql, dtype);
-
-  -- copy the jobsettings
-  INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
-
-  -- do not copy schedule because it was inserted via the insert_schedule trigger
-
-END IF;
-END
-$$$
-
-drop trigger update_job
-$$$
-
-CREATE TRIGGER update_job
-AFTER UPDATE ON job FOR EACH ROW
-BEGIN
-DECLARE cc INTEGER;
-DECLARE tz VARCHAR(50);
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
-DECLARE rdm VARCHAR(50);
-DECLARE dtype VARCHAR(50) DEFAULT 'system';
-
-SELECT value INTO tz FROM setting WHERE name='timezone';
-
-SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
-IF cc = 0 THEN
--- we expect the status to be 'scheduled' when we insert the shard job
--- status 'new' is for jobs that are not yet submitted
-  IF NEW.status='scheduled' THEN
-
-    SELECT value INTO rdm FROM setting WHERE name='_hasremotedm';
-    IF rdm='1' THEN
-      SET dtype = 'customer';
-    END IF;
-
-    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql, dispatchtype)
-           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid, NEW.thesql, dtype);
-    -- copy the jobsettings
-    INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
-  END IF;
-ELSE
--- update job fields
-  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, smsmessageid=NEW.smsmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
-  IF NEW.status IN ('processing', 'procactive', 'active', 'cancelling') THEN
-    UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
-  END IF;
-END IF;
-END
-$$$
-
-
 drop procedure start_specialtask
 $$$
 
@@ -1450,8 +1378,8 @@ DECLARE dtype VARCHAR(50) DEFAULT 'system';
 
 select type from specialtask where id=in_specialtaskid into l_type;
 
-SELECT value INTO rdm FROM setting WHERE name='_hasremotedm';
-IF rdm='1' THEN
+SELECT value INTO rdm FROM setting WHERE name='_dmmethod';
+IF rdm='hybrid' or rdm='cs' THEN
   SET dtype = 'customer';
 END IF;
 
@@ -1480,3 +1408,4 @@ $$$
 ALTER TABLE `reportcontact` ADD `voicereplyid` INT(11) NULL ,
 ADD `response` TINYINT(4) NULL
 $$$
+
