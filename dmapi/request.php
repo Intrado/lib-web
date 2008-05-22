@@ -6,11 +6,9 @@ $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("XML/RPC.php");
 require_once("../inc/auth.inc.php");
-require_once("dmapidb.inc.php");
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
-require_once("dmapisessiondata.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/SpecialTask.obj.php");
 
