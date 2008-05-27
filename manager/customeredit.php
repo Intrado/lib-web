@@ -436,6 +436,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td> Delivery Mechanism Method </td>
 	<td><?
 			NewFormItem($f, $s, '_dmmethod', 'selectstart');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', '--Choose a Method--', '');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'ASP', 'asp');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'Hybrid', 'hybrid');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite', 'cs');
