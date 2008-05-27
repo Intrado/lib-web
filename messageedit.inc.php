@@ -576,14 +576,16 @@ ta.onmouseup();
 <?
 //now focus on the correct field
 switch($MESSAGETYPE) {
-	case 'phone':
-		echo "var field = new getObj('bodytext').obj; field.focus(); ";
-		break;
 	case 'email':
 		echo "var field = new getObj('subject').obj; field.focus(); ";
 		break;
 	case 'print':
 		echo "var field = new getObj('header1').obj; field.focus(); ";
+		break;
+	case 'phone':
+	case 'sms':
+	default:
+		echo "var field = new getObj('bodytext').obj; field.focus(); ";
 		break;
 }
 ?>
