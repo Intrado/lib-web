@@ -568,11 +568,18 @@ include_once("navbottom.inc.php");
 ?>
 
 <script language="javascript">
-ta = new getObj('bodytext').obj;
-ta.focus();
-ta.onmouseup = ta.onkeyup = function() { if(document.selection) this.sel = document.selection.createRange(); };
-ta.onmouseup();
-
+<?
+//only execute this code if its not sms
+//sms does not allow message inserts
+if($MESSAGETYPE != "sms"){
+?>
+	ta = new getObj('bodytext').obj;
+	ta.focus();
+	ta.onmouseup = ta.onkeyup = function() { if(document.selection) this.sel = document.selection.createRange(); };
+	ta.onmouseup();
+<?
+}
+?>
 <?
 //now focus on the correct field
 switch($MESSAGETYPE) {
