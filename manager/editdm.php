@@ -93,12 +93,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 					$enablestate = "disabled";
 				}
 
-				QuickUpdate("delete from dmsetting where dmid = '" . DBSafe($dmid) . "'");
+				$dialtimeout = getDMSetting($dmid, "telco_dial_timeout");
+								if($dialtimeout == false){
+									$dialtimeout = 45000;
+				}
 
+				QuickUpdate("delete from dmsetting where dmid = '" . DBSafe($dmid) . "'");
 				QuickUpdate("insert into dmsetting (dmid, name, value) values
 							('" . DBSafe($dmid) . "', 'telco_calls_sec', '" . DBSafe(GetFormData($f, $s, 'telco_calls_sec')) . "'),
 							('" . DBSafe($dmid) . "', 'delmech_resource_count', '" . DBSafe(GetFormData($f, $s, 'delmech_resource_count')) . "'),
-							('" . DBSafe($dmid) . "', 'telco_dial_timeout', '" . DBSafe(GetFormData($f, $s, 'telco_dial_timeout')) . "'),
+							('" . DBSafe($dmid) . "', 'telco_dial_timeout', '" . $dialtimeout . "'),
 							('" . DBSafe($dmid) . "', 'telco_caller_id', '" . Phone::parse($callerid) . "'),
 							('" . DBSafe($dmid) . "', 'telco_inboundtoken', '" . DBSafe(GetFormData($f, $s, 'telco_inboundtoken')) . "'),
 							('" . DBSafe($dmid) . "', 'telco_type', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'),
@@ -152,7 +156,6 @@ if( $reloadform )
 	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "number", "nomin", "nomax", true);
 
-	PutFormData($f, $s, "telco_dial_timeout", getDMSetting($dmid, "telco_dial_timeout"), "number", "nomin", "nomax", true);
 	PutFormData($f, $s, "telco_caller_id", Phone::format(getDMSetting($dmid, "telco_caller_id")), "phone", "10", "10", true);
 	PutFormData($f, $s, "telco_inboundtoken", getDMSetting($dmid, "telco_inboundtoken"), "number", "nomin", "nomax", true);
 	PutFormData($f, $s, "customerid", $dm['customerid'], "number", "1", "nomax", true);
@@ -210,10 +213,6 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	<tr>
 		<td>Calls per Second: </td>
 		<td><? NewFormItem($f, $s, "telco_calls_sec", "text", "5");?></td>
-	</tr>
-	<tr>
-		<td>Dial Timeout</td>
-		<td><? NewFormItem($f, $s, "telco_dial_timeout", "text", "5");?></td>
 	</tr>
 	<tr>
 		<td># of Resources:</td>
