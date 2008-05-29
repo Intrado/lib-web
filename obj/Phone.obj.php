@@ -31,7 +31,7 @@ class Phone extends DBMappedObject {
 		global $IS_COMMSUITE;
 
 		$phone = Phone::parse($phone);
-		if ($IS_COMMSUITE) {
+		if ($IS_COMMSUITE || getSystemSetting('_dmmethod') != 'asp') {
 			$min = getSystemSetting('easycallmin', 10);
 			$max = getSystemSetting('easycallmax', 10);
 		} else {
