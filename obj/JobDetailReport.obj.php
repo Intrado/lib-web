@@ -118,7 +118,7 @@ class JobDetailReport extends ReportGenerator{
 			rc.resultdata,
 			sw.resultdata,
 			rc.response as confirmed,
-			rc.sequence as destsource,
+			rc.sequence as sequence,
 			rc.voicereplyid as voicereplyid
 			$fieldquery
 			from reportperson rp
@@ -159,13 +159,14 @@ class JobDetailReport extends ReportGenerator{
 
 		//index 16 is voicereply id
 		function fmt_detailedresponse($row, $index){
+			global $USER;
 			$text = "";
 
 			if($row[16] != null){
-				if(QuickQuery("select count(*) from voicereply where id = " . $row[16])){
-					$text .= ' <span style="float:right"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
+				if(QuickQuery("select count(*) from voicereply where id = " . $row[16] . " and userid = " . $USER->id)){
+					$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
 				} else {
-					$text .= ' <span style="float:right"><img src="img/speaker2.gif"></span>';
+					$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
 				}
 			}
 			if($row[$index] == "1"){
@@ -278,7 +279,7 @@ class JobDetailReport extends ReportGenerator{
 						3 => "First Name",
 						4 => "Last Name",
 						6 => "Message",
-						15 => "Dst. Src.",
+						15 => "Sequence",
 						7 => "Destination",
 						11 => "Attempts",
 						8 => "Last Attempt",
