@@ -478,3 +478,12 @@ div.scrollTableContainer {
 .helpclick {
 	cursor: help;
 }
+
+.voicereplyclickableicon {
+	cursor: pointer;
+	float: right;
+}
+
+.voicereplyicon {
+	float: right;
+}
