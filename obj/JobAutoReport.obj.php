@@ -61,7 +61,7 @@ class JobAutoReport extends ReportGenerator{
 			rc.resultdata,
 			sw.resultdata,
 			rc.response as confirmed,
-			rc.sequence as destsource,
+			rc.sequence as sequence,
 			rc.voicereplyid as voicereplyid
 			$fieldquery
 			from reportperson rp
