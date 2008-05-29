@@ -29,13 +29,7 @@ $data = array();
 $resetrequired = array();
 while($row = DBGetRow($result)){
 	$data[] = $row;
-	if($row[2]){
-		$resetrequired[] = $row[1];
-	}
-}
 
-if(count($resetrequired)){
-	error("The following DM's have had their route plans changed without being reset", $resetrequired);
 }
 
 // index 0 is dmid
@@ -49,10 +43,20 @@ function fmt_editDMRoute($row, $index){
 	return $url;
 }
 
+function fmt_dm_status($row, $index){
+	if($row[2]){
+		return "Route plan change detected, requires reset";
+	} else {
+		return "";
+	}
+}
+
 $titles = array(1 => "Name",
+				2 => "Status",
 				"actions" => "Actions");
 
-$formatters = array("actions" => "fmt_editDMRoute");
+$formatters = array("actions" => "fmt_editDMRoute",
+					2 => "fmt_dm_status");
 
 $PAGE="admin:settings";
 $TITLE="DM Manager";
