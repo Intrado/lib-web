@@ -644,10 +644,10 @@ startWindow('Job Information');
 				<tr>
 					<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
 					<td>
-						<table border="0" cellpadding="2" cellspacing="1" class="list" id="jobtypetable">
+						<table border="0" cellpadding="2px" cellspacing="1px" class="list" id="jobtypetable">
 							<tr class="listHeader" align="left" valign="bottom">
 								<th>Name</th>
-								<th>Info</th>
+								<th style="padding-left:6px;">Info</th>
 <?
 						if(getSystemSetting('_dmmethod', "")=='hybrid'){
 ?>
@@ -656,8 +656,8 @@ startWindow('Job Information');
 						}
 ?>
 							</tr>
-							<tr>
-								<td valign="top">
+							<tr valign="top">
+								<td>
 									<?
 
 									NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, "id=jobtypeid " . ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
@@ -669,13 +669,13 @@ startWindow('Job Information');
 									?>
 								</td>
 
-								<td><div id="jobtypeinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
+								<td style="padding-left:6px;"><div id="jobtypeinfo" style="float:left;"></div></td>
 <?
-						if(getSystemSetting('_dmmethod', "")=='hybrid'){
+							if(getSystemSetting('_dmmethod', "")=='hybrid'){
 ?>
-								<td><div id="addinfo" style="float:left; overflow:auto; width:200px; height:75px;"></div></td>
+								<td><div id="addinfo"></div></td>
 <?
-						}
+							}
 ?>
 							</tr>
 						</table>
@@ -1101,7 +1101,7 @@ function display_jobtype_info(value){
 	new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
 	var jobtypetable = new getObj("jobtypetable").obj;
 	if(jobtypeinfo[value][0] == 1){
-		jobtypetable.style.border="1px solid red";
+		jobtypetable.style.border="3px double red";
 	} else {
 		jobtypetable.style.border=jobtypetablestyle;
 	}
