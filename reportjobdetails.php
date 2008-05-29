@@ -39,7 +39,7 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 //index 5 is type
 function fmt_dst_src($row, $index){
 	if($row[$index] != null)
-		return format_delivery_type($row[5]) . " " . ($row[$index] +1);
+		return destination_label($row[5], $row[$index]);
 	else
 		return "";
 }
