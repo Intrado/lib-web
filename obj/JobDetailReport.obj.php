@@ -119,8 +119,10 @@ class JobDetailReport extends ReportGenerator{
 			sw.resultdata,
 			rc.response as confirmed,
 			rc.sequence as sequence,
-			rc.voicereplyid as voicereplyid
+			rc.voicereplyid as voicereplyid,
+			vr.id as vrid
 			$fieldquery
+			, dl.label as label
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
@@ -129,7 +131,8 @@ class JobDetailReport extends ReportGenerator{
 							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-
+			left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)
+			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . ")
 			where 1
 			$searchquery
 			$rulesql
@@ -146,7 +149,8 @@ class JobDetailReport extends ReportGenerator{
 								(m.id = rp.messageid)
 				left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 				left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-
+				left join destlabel dl on (rc.sequence = dl.sequence)
+				left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and u.id = vr.userid)
 				where 1
 				$searchquery
 				$rulesql
@@ -163,7 +167,7 @@ class JobDetailReport extends ReportGenerator{
 			$text = "";
 
 			if($row[16] != null){
-				if(QuickQuery("select count(*) from voicereply where id = " . $row[16] . " and userid = " . $USER->id)){
+				if($row[17] != null){
 					$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
 				} else {
 					$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
@@ -285,7 +289,7 @@ class JobDetailReport extends ReportGenerator{
 						8 => "Last Attempt",
 						9 => "Last Result",
 						14 => "Response");
-		$titles = appendFieldTitles($titles, 16, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 17, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
