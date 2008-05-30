@@ -63,8 +63,8 @@ startWindow("Upload Caller ID Routes");
 	<tr>
 		<th align="right" class="windowRowHeader">Upload File:</th>
 		<td>
-			<div>File format must be a text file with format:
-				<br>CallerID = Prefix
+			<div>File format must be a csv file with format:
+				<br>CallerID, Prefix
 			</div>
 			<br>
 			<input type="file" name="calleridrouteupload" size="30">
