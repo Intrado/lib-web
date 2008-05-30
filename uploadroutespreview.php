@@ -32,26 +32,37 @@ $count=5000;
 if($curfilename && !$errormsg){
 	if($fp = @fopen($curfilename, "r")){
 		while($row = fgetcsv($fp)){
-			if($count > 0 && count($row) == 4){
+			if($count > 0 && count($row) >= 2){
 				//validate each item in the row.
 				//match, prefix, and suffix should be numbers or empty string
 				//strip must be a number
-				if(!ereg("^[0-9]*$", $row[0])){
-					continue;
+				//keep track of the original match so that different invalid entries are no combined
+				$match = $row[0];
+				if(ereg_replace("[^0-9]*", "", $row[0]) == ""){
+					$row[0] = "Invalid";
+				} else {
+					$row[0] = ereg_replace("[^0-9]*", "", $row[0]);
+					$match = $row[0];
 				}
 				if(!ereg("^[0-9]+$", $row[1])){
-					continue;
+					$row[1] = "Invalid";
 				}
-				if(!ereg("^[0-9]*$", $row[2])){
-					continue;
+				if(isset($row[2]) && !ereg("^[0-9]*$", $row[2])){
+					$row[2] = "Invalid";
 				}
-				if(!ereg("^[0-9]*$", $row[3])){
-					continue;
+				if(isset($row[3]) && !ereg("^[0-9]*$", $row[3])){
+					$row[3] = "Invalid";
 				}
 				if(!CheckFormSubmit($f, "save")){
 					$count--;
 				}
-				$routes[$row[0]] = $row;
+				if(!isset($row[2]))
+					$row[2] = "";
+				if(!isset($row[3]))
+					$row[3] = "";
+				$routes[$match] = $row;
+			} else {
+				$routes[$row[0]] = array("Invalid", "", "", "");
 			}
 		}
 	} else {
@@ -64,20 +75,26 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 	$newroutes = array();
 	foreach($routes as $row){
 		//validate each item in the row.
-		//match, prefix, and suffix should be numbers or empty string
+		//match, prefix, and suffix should be numbers
 		//strip must be a number
-		if(!ereg("^[0-9]*$", $row[0])){
+		if(ereg_replace("[^0-9]*", "", $row[0]) == ""){
 			continue;
+		} else {
+			$row[0] = ereg_replace("[^0-9]*", "", $row[0]);
 		}
 		if(!ereg("^[0-9]+$", $row[1])){
 			continue;
 		}
-		if(!ereg("^[0-9]*$", $row[2])){
+		if(isset($row[2]) && !ereg("^[0-9]*$", $row[2])){
 			continue;
 		}
-		if(!ereg("^[0-9]*$", $row[3])){
+		if(isset($row[3]) && !ereg("^[0-9]*$", $row[3])){
 			continue;
 		}
+		if(!isset($row[2]))
+			$row[2] = "";
+		if(!isset($row[3]))
+			$row[3] = "";
 		if(isset($dmroutes[$row[0]])){
 			if($dmroutes[$row[0]]->strip != $row[1]
 				|| $dmroutes[$row[0]]->prefix != $row[2]
