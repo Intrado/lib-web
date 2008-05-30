@@ -30,49 +30,30 @@ if(isset($_SESSION['currentid'])) {
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function update_jobtypeprefs($max, $type, $custdb){
+function update_jobtypeprefs($min, $max, $type, $custdb){
 	$runquery = false;
-	$res = Query("select id, systempriority, issurvey from jobtype where not deleted", $custdb);
-	$jobtypes = array();
-	while($row=DBGetRow($res)){
-		$jobtypes[$row[0]] = array($row[1], $row[2]);
+	$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = 1 and not deleted", $custdb);
+	$result = Query("select sequence from jobtypepref where jobtypeid = " . $emergencyjobtypeid . " and type = '" . $type . "'", $custdb);
+	$currentprefs = array();
+	while($row = DBGetRow($result)){
+		$currentprefs[$row[0]] = 1;
 	}
 
-	$res= Query("select jobtypeid, sequence from jobtypepref where type = '" . $type . "'", $custdb);
-	$jobtypeprefs = array();
-	while($row=DBGetRow($res)){
-		if(!isset($jobtypeprefs[$row[0]])){
-			$jobtypeprefs[$row[0]] = array();
-		}
-		if(!isset($jobtypeprefs[$row[0]][$row[1]])){
-			$jobtypeprefs[$row[0]][$row[1]] = 1;
-		}
-	}
-
-	//for each job type, iterate through sequence to find any missing jobtypes based on new max
 	$query = "insert into jobtypepref (jobtypeid,type, sequence,enabled)
 						values ";
 	$values = array();
-	//row 0 is systempriority, row 1 is issurvey
-	foreach($jobtypes as $id => $row){
-		if($row[1] && $type == "sms")
-			continue;
-		for($i=0; $i < $max; $i++){
-			if(!isset($jobtypeprefs[$id][$i])){
-				$runquery = true;
-				//if not emergency, set enabled to 0, else set to 1
-				if($row[0] != 1){
-					$values[] = "(" . $id . ", '" . $type . "', " . $i . ", 0)";
-				} else {
-					$values[] = "(" . $id . ", '" . $type . "', " . $i . ", 1)";
-				}
-			}
+	for($i = $min-1; $i < $max; $i++){
+		if(!isset($currentprefs[$i])){
+			$values[] = "(" . $emergencyjobtypeid . ", '" . $type . "', " . $i . ", 1)";
+			$runquery = true;
 		}
 	}
-
 	if($runquery){
-		QuickUpdate($query . implode(", ", $values), $custdb);
+		$values = implode(", ", $values);
+		$query .= $values;
+		QuickUpdate($query, $custdb);
 	}
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,13 +180,13 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
 
-				update_jobtypeprefs($maxphones, "phone", $custdb);
+				update_jobtypeprefs(getCustomerSystemSetting('maxphones', 1, true, $custdb), $maxphones, "phone", $custdb);
 				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
 
-				update_jobtypeprefs($maxemails, "email", $custdb);
+				update_jobtypeprefs(getCustomerSystemSetting('maxemails', 1, true, $custdb),$maxemails, "email", $custdb);
 				setCustomerSystemSetting("maxemails", $maxemails, $custdb);
 
-				update_jobtypeprefs($maxsms, "sms", $custdb);
+				update_jobtypeprefs(getCustomerSystemSetting('maxsms', 1, true, $custdb), $maxsms, "sms", $custdb);
 				setCustomerSystemSetting('maxsms', $maxsms, $custdb);
 
 				setCustomerSystemSetting('retry', $retry, $custdb);
@@ -317,11 +298,11 @@ if( $reloadform ) {
 	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', false, true, $custdb)),"phone",10,10);
 	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', false, true, $custdb),"phone", 3, 3);
 
-	$currentmaxphone = getCustomerSystemSetting('maxphones', 3, true, $custdb);
+	$currentmaxphone = getCustomerSystemSetting('maxphones', 1, true, $custdb);
 	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",$currentmaxphone,"nomax",true);
-	$currentmaxemail = getCustomerSystemSetting('maxemails', 2, true, $custdb);
+	$currentmaxemail = getCustomerSystemSetting('maxemails', 1, true, $custdb);
 	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",$currentmaxemail,"nomax",true);
-	$currentmaxsms = getCustomerSystemSetting('maxsms', 2, true, $custdb);
+	$currentmaxsms = getCustomerSystemSetting('maxsms', 1, true, $custdb);
 	PutFormData($f,$s,'maxsms',$currentmaxsms,"number",$currentmaxsms,"nomax",true);
 
 	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', false, true, $custdb),"text",1,255);
