@@ -34,23 +34,26 @@ $reloadform = 0;
 $count=5000;
 if($curfilename && !$errormsg){
 	if($fp = @fopen($curfilename, "r")){
-		while($row = trim(fgets($fp))){
+		while($row = fgetcsv($fp)){
 			if($count > 0){
-				$row = explode("=", $row);
 				if(count($row) == 2){
 					//validate each item in the row.
 					//callerid, prefix
-					$row[0] = Phone::parse($row[0]);
-					if(strlen($row[0]) != 10){
-						continue;
+					$callerid = Phone::parse($row[0]);
+					if(strlen($callerid) != 10){
+						$row[0]= "Invalid";
+					} else {
+						$row[0] = $callerid;
 					}
 					if(!ereg("^[0-9]*$", $row[1])){
-						continue;
+						$row[1]= "Invalid";
 					}
 					if(!CheckFormSubmit($f, "save")){
 						$count--;
 					}
-					$callerids[$row[0]] = $row;
+					$callerids[$callerid] = $row;
+				} else {
+					$callerids[] = array("Invalid", "");
 				}
 			}
 		}
@@ -65,7 +68,8 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 	foreach($callerids as $row){
 		//validate each item in the row.
 		//callerid, prefix
-		if(!ereg("^[0-9]+$", $row[0])){
+		$row[0] = Phone::parse($row[0]);
+		if(strlen($row[0]) != 10){
 			continue;
 		}
 		if(!ereg("^[0-9]*$", $row[1])){
@@ -106,6 +110,15 @@ if ($errormsg)
 $titles = array(0 => "Caller ID",
 				1 => "Prefix");
 
+//custom formatter to detect if its a phone number or not
+function fmt_callerid_upload($row, $index){
+	if(Phone::parse($row[$index])){
+		return fmt_phone($row, $index);
+	} else {
+		return $row[$index];
+	}
+}
+
 
 NewForm($f);
 $PAGE="admin:settings";
@@ -116,7 +129,7 @@ startWindow("Routes Preview" . ($count <= 0 ? " - First 5000 Records" : ""));
 ?>
 	<table cellpadding="3" cellspacing="1" class="list" width="100%">
 <?
-		showTable($callerids, $titles, array(0 => "fmt_phone"));
+		showTable($callerids, $titles, array(0 => "fmt_callerid_upload"));
 ?>
 	</table>
 <?
