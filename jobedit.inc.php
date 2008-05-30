@@ -955,7 +955,8 @@ include_once("navbottom.inc.php");
 <?
 	if($hassms && $USER->authorize('sendsms')) {
 ?>
-		if(new getObj('smsmessageid').obj.value != ""){
+		var smsmessageobj = new getObj('smsmessageid').obj;
+		if(smsmessageobj && smsmessageobj.value != ""){
 				new getObj('sendsms').obj.checked = true;
 		}
 		smscheck = new getObj('sendsms').obj.checked;
@@ -972,10 +973,12 @@ include_once("navbottom.inc.php");
 ?>
 	phonecheck = false;
 	emailcheck = false;
-	if(new getObj('phonemessageid').obj.value != ""){
+	var phonemessageobj = new getObj('phonemessageid').obj;
+	if(phonemessageobj  && phonemessageobj .value != ""){
 		new getObj('sendphone').obj.checked = true;
 	}
-	if(new getObj('emailmessageid').obj.value != ""){
+	var emailmessageobj = new getObj('emailmessageid').obj;
+	if(emailmessageobj && emailmessageobj .value != ""){
 			new getObj('sendemail').obj.checked = true;
 	}
 	if(new getObj('sendphone').obj){
