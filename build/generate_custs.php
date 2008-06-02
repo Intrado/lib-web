@@ -4,7 +4,7 @@
 	requires customer.sql to be local
 
 	query used to dump default db:
-	mysqldump --no-create-db --no-create-info --single-transaction -u root -opt --skip-triggers c_4 > base_customer.sql
+	mysqldump --no-create-db --no-create-info --single-transaction -u root --opt --skip-triggers c_19 > base_customer.sql
 	settings table insert moved to top of sql file because triggers read data from it
 
 */
@@ -31,6 +31,12 @@ $authserveruser="root";
 $authserverpass="";
 
 $shardid=1;
+
+
+$timezones = array("US/Central",
+					"US/Pacific",
+					"US/Eastern",
+					"US/Mountain");
 
 
 if(!file_exists($customer_schema)){
@@ -99,6 +105,15 @@ for($i=0; $i < $count; $i++){
 		}
 	}
 	mysql_query("update setting set value='customer" . $customerid . "' where name = 'displayname'",$shard_con);
+	mysql_query("update setting set value='" . $timezones[$customerid%4] . "' where name = 'timezone'", $shard_con);
+
+	mysql_select_db("aspshard", $shard_con);
+
+	//Update timezone on aspshard
+	mysql_query("update qschedule set timezone = '" . $timezones[$customerid%4] . "' where customerid = " . $customerid, $shard_con);
+
+
+
 	echo "Finished inserting base sql for Customer " . $newdbname . "\n";
 }
 //last, profit
