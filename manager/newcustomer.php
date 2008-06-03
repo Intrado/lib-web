@@ -349,7 +349,7 @@ NewFormItem($f, $s,"", 'submit');
 
 <tr><td>Shard: </td><td>
 <?
-	$shardquery = Query("select id, name from shard order by id");
+	$shardquery = Query("select id, name from shard where not isfull order by id");
 	$shards = array();
 	while($row = DBGetRow($shardquery, true)){
 		$shards[] = $row;
