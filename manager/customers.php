@@ -107,10 +107,9 @@ foreach($customers as $cust) {
 			$customerfeatures[] = "Portal";
 		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
-		if(in_array(getCustomerSystemSetting('_dmmethod', "", true, $custdb), array('hybrid', 'cs')))
-			$customerfeatures[] = "Remote DM";
-		$row[10] = implode(", ", $customerfeatures);
 
+		$row[10] = implode(", ", $customerfeatures);
+		$row[11] = ucfirst(getCustomerSystemSetting('_dmmethod', "", true, $custdb));
 		$data[] = $row;
 	}
 }
@@ -120,6 +119,7 @@ $titles = array("0" => "ID",
 				"3" => "Product Name",
 				"4" => "Timezone",
 				"6" => "Status",
+				"11" => "DM Method",
 				"10" => "Features",
 				"7" => "Max Users",
 				"8" => "Users",
