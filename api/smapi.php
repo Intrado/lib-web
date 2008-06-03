@@ -782,6 +782,7 @@ require_once("../obj/AudioFile.obj.php");
 require_once("../obj/Content.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/Job.obj.php");
+require_once("../obj/Voice.obj.php");
 
 // API Files
 require_once("API_List.obj.php");
