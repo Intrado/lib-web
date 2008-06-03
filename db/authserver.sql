@@ -185,4 +185,4 @@ CREATE TABLE `dmcalleridroute` (
   UNIQUE KEY `dmid` (`dmid`,`callerid`)
 ) ENGINE=InnoDB ;
 
-ALTER TABLE `shard` ADD `is_full` TINYINT NOT NULL DEFAULT '0';
+ALTER TABLE `shard` ADD `isfull` TINYINT NOT NULL DEFAULT '0';
