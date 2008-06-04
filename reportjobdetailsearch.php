@@ -508,14 +508,7 @@ startWindow("Select", NULL, false);
 						<table>
 							<tr valign="top">
 								<td><? NewFormItem($f,$s,"result","checkbox",NULL,NULL,'id="result" onclick="clearAllIfNotChecked(this,\'resultselect\');"'); ?></td>
-								<td>
-								<?
-									if((isset($options['reporttype']) && $options['reporttype'] == "emaildetails") || $_SESSION['report']['type']=="email")
-										echo "Status:";
-									else
-										echo "Call Result:"
-								?>
-								</td>
+								<td>Result:</td>
 								<td>
 									<?
 									NewFormItem($f, $s, 'results', 'selectmultiple',  "6", $results, 'id="resultselect" onmousedown="setChecked(\'result\');"');
