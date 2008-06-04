@@ -210,7 +210,7 @@ class CallsReport extends ReportGenerator{
 					$resultnames[] = fmt_result(array($result), 0);
 				$resultnames = implode(", ", $resultnames);
 ?>
-				<tr><td>Results: <?=$resultnames?></td></tr>
+				<tr><td>Result: <?=$resultnames?></td></tr>
 <?
 			}
 

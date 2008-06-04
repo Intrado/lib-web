@@ -65,7 +65,7 @@ $jobtypequery = "";
 
 if(isset($options['personid']) && $options['personid'] != "")
 	$personsql = " and rp.pkey = '" . DBSafe($options['personid']) . "'";
-	
+
 if(isset($options['phone']) && $options['phone'] != "")
 	$phonesql = " and rc.phone like '%" . DBSafe($options['phone']) . "%'";
 
@@ -80,7 +80,7 @@ if(isset($options['jobtypes']) && $options['jobtypes'] != ""){
 	$jobtypequery = " and j.jobtypeid in ('". $jobtypes ."') ";
 }
 if(isset($options['results']) && $options['results'] != "")
-	$resultsql = " and rc.result in ('" . $options['results'] . "')";	
+	$resultsql = " and rc.result in ('" . $options['results'] . "')";
 
 if(isset($options['reldate']) && $options['reldate'] != ""){
 	list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
@@ -103,7 +103,7 @@ $query = "select rp.pkey,
 			$emailsql
 			$resultsql
 			$jobquery
-			$jobtypequery 
+			$jobtypequery
 			$rulesql
 			group by rp.personid";
 
@@ -119,12 +119,12 @@ if(count($data) == 1){
 	redirect("reportcallsperson.php?pid=" . $data[0][3]);
 }
 unset($_SESSION['report']['singleperson']);
-	
-	
+
+
 $titles = array("0" => "ID#",
 				"1" => "First Name",
 				"2" => "Last Name");
-				
+
 $formatters = array("0" => "drilldownOnId",
 					"1" => "drilldownOnId",
 					"2" => "drilldownOnId");
@@ -141,10 +141,10 @@ if(isset($options['rules']) && $options['rules']){
 	$PAGE = "reports:reports";
 	$TITLE = "Contact History";
 
-	
+
 	include_once("nav.inc.php");
 	buttons(button('Back', null, 'reportcallssearch.php'));
-	
+
 	startWindow("Search Parameters");
 ?>
 	<table>
@@ -188,7 +188,7 @@ if(isset($options['rules']) && $options['rules']){
 				$resultnames[] = fmt_result(array($result), 0);
 			$resultnames = implode(", ", $resultnames);
 ?>
-			<tr><td>Results: <?=$resultnames?></td></tr>
+			<tr><td>Result: <?=$resultnames?></td></tr>
 <?
 		}
 		foreach($searchrules as $rule){
@@ -204,7 +204,7 @@ if(isset($options['rules']) && $options['rules']){
 	startWindow("Search Results");
 		if(count($data) > 0){
 ?>
-			<div>Your search returned more than one result. 
+			<div>Your search returned more than one result.
 			<br>Please select one of the following:<div>
 <?
 		} else {
@@ -212,10 +212,10 @@ if(isset($options['rules']) && $options['rules']){
 			<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
 <?
 		}
-?>	
-	<br>	
+?>
+	<br>
 	<table class="list" cellpadding="3" cellspacing="1" >
-		
+
 <?
 		showTable($data, $titles, $formatters);
 ?>
