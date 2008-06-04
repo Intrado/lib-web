@@ -229,9 +229,9 @@ if( $reloadform )
 	PutFormData($f, $s, 'maxjobdays', $maxjobdays, 'number', 1, 7, true);
 
 	//Default caller ID
-	//default to system setting unless user has a pref
+	//default to empty string because if set to empty string, setting will not be set and system default will be used
 	$callerid = $USER->getSetting("callerid","");
-	PutFormData($f,$s,"callerid", Phone::format($callerid), "text", 0, 20);
+	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
 
 	PutFormData($f, $s, "_brandtheme", $USER->getSetting('_brandtheme', getSystemSetting('_brandtheme')), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", $USER->getSetting('_brandratio', getSystemSetting('_brandratio')), "text", "nomin", "nomax", true);
