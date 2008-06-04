@@ -294,7 +294,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 			</tr>
 		</table>
 	</td>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:,<br><?=help('ContactHistory_DisplayFields')?></th>
+	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:<br><?=help('ContactHistory_DisplayFields')?></th>
 		<td class="bottomBorder">
 <?
 			select_metadata(null, null, $fields);
