@@ -60,6 +60,9 @@ $shardpass = $row[2];
 
 //second connect to the shard and create a customer just like new customer
 $shard_con = mysql_connect($shardhost, $sharduser, $shardpass, true);
+$tablequeries = explode("$$$",file_get_contents($customer_schema));
+$base_customer_sql_contents = explode("$$$",file_get_contents($base_customer_sql));
+
 for($i=0; $i < $count; $i++){
 	$dbpassword = genpassword();
 
@@ -83,7 +86,7 @@ for($i=0; $i < $count; $i++){
 
 
 	//third, create tables using base schema
-	$tablequeries = explode("$$$",file_get_contents($customer_schema));
+
 	foreach ($tablequeries as $tablequery) {
 		if (trim($tablequery)) {
 			$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
@@ -96,7 +99,7 @@ for($i=0; $i < $count; $i++){
 
 
 	//fourth instead of inserting defaults, insert base customer sql
-	$base_customer_sql_contents = explode("$$$",file_get_contents($base_customer_sql));
+
 	foreach ($base_customer_sql_contents as $query) {
 		if (trim($query)) {
 			$tablequery = str_replace('_$CUSTOMERID_', $customerid, $query);
@@ -112,7 +115,8 @@ for($i=0; $i < $count; $i++){
 	//Update timezone on aspshard
 	mysql_query("update qschedule set timezone = '" . $timezones[$customerid%4] . "' where customerid = " . $customerid, $shard_con);
 
-
+	//update qjob qj left join qschedule qs on (qs.id = qj.scheduleid and qs.customerid = qj.customerid) set qj.timezone = qs.timezone where qj.status = 'repeating'
+	mysql_query("update qjob set timezone = '" . $timezones[$customerid%4] . "' where customerid = " . $customerid . " and status = 'repeating'", $shard_con);
 
 	echo "Finished inserting base sql for Customer " . $newdbname . "\n";
 }
