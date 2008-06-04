@@ -282,7 +282,7 @@ startWindow("Person Notification Search", "padding: 3px;");
 						</tr>
 						<tr valign="top">
 							<td><? NewFormItem($f,$s,"result","checkbox",NULL,NULL,'id="result" onclick="clearAllIfNotChecked(this,\'resultselect\');"'); ?></td>
-							<td>Call Result:</td>
+							<td>Result:</td>
 							<td>
 								<?
 								NewFormItem($f, $s, 'results', 'selectmultiple',  "6", $results, 'id="resultselect" onmousedown="setChecked(\'result\');"');
