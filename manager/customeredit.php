@@ -295,7 +295,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,'inboundnumber',getCustomerSystemSetting('inboundnumber', false, true, $custdb),"phone",10,10);
 	PutFormData($f,$s,'timezone', getCustomerSystemSetting('timezone', false, true, $custdb), "text", 1, 255);
 
-	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', false, true, $custdb)),"phone",10,10);
+	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', false, true, $custdb)),"phone",10,10, true);
 	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', false, true, $custdb),"phone", 3, 3);
 
 	$currentmaxphone = getCustomerSystemSetting('maxphones', 1, true, $custdb);
