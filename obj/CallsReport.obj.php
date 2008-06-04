@@ -149,7 +149,7 @@ class CallsReport extends ReportGenerator{
 						"1" => "Submitted by",
 						"2" => "Job Type",
 						"4" => "Message",
-						"8" => "Dst. Src.",
+						"8" => "Sequence",
 						"5" => "Destination",
 						"6" => "Date/Time",
 						"7" => "Result");
