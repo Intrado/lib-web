@@ -268,7 +268,7 @@ class SMAPI{
 			$soxresult = exec($cmd, $res1,$res2);
 			$content = null;
 			if($res2 || !file_exists($cleanedtempfile)) {
-				$result["resultdescription"]= 'There was an error reading your audio file. Please try another file. Supported formats include: .wav, .aiff, and .au';
+				$result["resultdescription"]= 'There was an error reading your audio file. Please try another file. Supported formats include: .wav';
 				@unlink($origtempfile);
 				@unlink($cleanedtempfile);
 				return $result;
