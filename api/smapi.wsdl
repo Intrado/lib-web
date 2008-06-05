@@ -248,7 +248,7 @@ setMessageBody:
 an audio file record will be generated and its resulting
 name returned.
 If an error occurs, error will contain the error string and audioname will be empty.
-
+Only .wav files are supported, mime type would be audio/wav
 IMPORTANT: the audio data should be a base64 encoded string
 
 uploadAudio:
