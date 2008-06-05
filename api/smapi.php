@@ -218,7 +218,7 @@ class SMAPI{
 
 	*/
 
-	function uploadAudio($sessionid, $name, $mimetype, $audio){
+	function uploadAudio($sessionid, $name, $audio, $mimetype){
 		global $USER, $SETTINGS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "audioname" => "");
 
@@ -263,7 +263,6 @@ class SMAPI{
 				$result['resultdescription'] = "Failed to generate audio file";
 				return $result;
 			}
-
 			$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s -w \"$cleanedtempfile\" ";
 			$soxresult = exec($cmd, $res1,$res2);
 			$content = null;
