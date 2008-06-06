@@ -59,10 +59,10 @@ $formatters = array("actions" => "fmt_editDMRoute",
 					2 => "fmt_dm_status");
 
 $PAGE="admin:settings";
-$TITLE="DM Manager";
+$TITLE="Remote Telephony Appliance Manager";
 include_once("nav.inc.php");
 buttons(button("Back", null, "settings.php"));
-startWindow("DM's" . help('Settings_DMs'));
+startWindow("Authorized Appliances" . help('Settings_DMs'));
 ?>
 <table border="0" width="100%" cellpadding="3" cellspacing="1" class="list" >
 <?
