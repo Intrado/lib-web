@@ -418,7 +418,7 @@ startWindow("EasyCall");
 			<?
 		}
 
-		if($IS_COMMSUITE){
+		if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 			?> <tr><td colspan=2 style="padding: 10px;"><img src="img/bug_important.gif" > If dialing an outside line, please include the area code.</td><tr> <?
 		} else {
 			?> <tr><td colspan=2 style="padding: 10px;"><img src="img/bug_important.gif" > Enter the 10-digit direct-dial phone number where you are currently located.</td></tr> <?
