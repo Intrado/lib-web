@@ -128,13 +128,14 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description from message where userid = " . $USER->id . " and type= '" . DBSafe(strtolower($type)) . "' and not deleted order by name");
+			$queryresult = Query("select id, name, description, type from message where userid = " . $USER->id . " and type= '" . DBSafe(strtolower($type)) . "' and not deleted order by name");
 			$messages = array();
 			while($row = DBGetRow($queryresult)){
 				$message = new API_Message();
 				$message->id = $row[0];
 				$message->name = $row[1];
 				$message->description = $row[2];
+				$message->type = $row[3];
 				$messages[] = $message;
 			}
 			$result["resultcode"] = "success";
@@ -445,15 +446,85 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description from job where status = 'repeating' and userid = " . $USER->id . " order by finishdate asc");
+
+			$queryresult = Query("select id, name, description, phonemessageid, emailmessageid, smsmessageid
+									from job where status = 'repeating' and userid = " . $USER->id . " order by finishdate asc");
+
+			//fetch all messages
+			$messages['phone'] = DBFindMany("Message", "from message where type='phone' and not deleted and userid = " . $USER->id);
+			$messages['email'] = DBFindMany("Message", "from message where type='phone' and not deleted and userid = " . $USER->id);
+			$messages['sms'] = DBFindMany("Message", "from message where type='phone' and not deleted and userid = " . $USER->id);
+
 			$jobs = array();
 			while($row = DBGetRow($queryresult)){
+				$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $row[0]);
+				$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $row[0]);
+				$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $row[0]);
+
 				$job = new API_Job();
 				$job->id = $row[0];
 				$job->name = $row[1];
 				$job->description = $row[2];
+
+				$phonemessages = array();
+				$emailmessages = array();
+				$smsmessages = array();
+				//only set message array if exists
+				//do not return alternative job langs if defaults are not set(this should never happen)
+				$types = array();
+				if($row[3]){
+					$phonemessage = new API_Message();
+					$phonemessage->id = $row[3];
+					$phonemessage->name = $messages['phone'][$row[3]]->name;
+					$phonemessage->type = 'phone';
+					$phonemessage->language = 'default';
+					$phonemessages[] = $phonemessage;
+					$types[] = "phone";
+				}
+				if($row[4]){
+					$emailmessage = new API_Message();
+					$emailmessage->id = $row[4];
+					$emailmessage->name = $messages['email'][$row[4]]->name;
+					$emailmessage->type = 'email';
+					$emailmessage->language = 'default';
+					$emailmessages[] = $emailmessage;
+					$types[] = "email";
+				}
+				if(getSystemSetting('_hassms') && $row[5]){
+					$smsmessage = new API_Message();
+					$smsmessage->id = $row[5];
+					$smsmessage->name = $messages['sms'][$row[5]]->name;
+					$smsmessage->type = 'sms';
+					$smsmessage->language = 'default';
+					$smsmessages[] = $smsmessage;
+					$types[] = "sms";
+				}
+				if($USER->authorize('sendmulti')){
+					foreach($types as $type){
+						$arrayname = $type . "messages";
+						error_log(print_r($arrayname,  true));
+						foreach($joblangs[$type] as $joblang){
+							$joblangmessage = new API_Message();
+							$joblangmessage->id = $joblang->messageid;
+							$joblangmessage->name = $messages[$type][$joblang->messageid]->name;
+							$joblangmessage->type = $type;
+							$joblangmessage->language = $joblang->language;
+							if($type == 'phone')
+								$phonemessages[] = $joblangmessage;
+							else if($type == 'email')
+								$emailmessages[] = $joblangmessage;
+							else if($type == 'sms')
+								$smsmessages[] = $joblangmessage;
+						}
+					}
+				}
+
+				$job->phonemessages = $phonemessages;
+				$job->emailmessages = $emailmessages;
+				$job->smsmessages = $smsmessages;
 				$jobs[] = $job;
 			}
+
 			$result["resultcode"] = "success";
 			$result["jobs"] = $jobs;
 			return $result;
@@ -782,6 +853,7 @@ require_once("../obj/Content.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../obj/Voice.obj.php");
+require_once("../obj/JobLanguage.obj.php");
 
 // API Files
 require_once("API_List.obj.php");
