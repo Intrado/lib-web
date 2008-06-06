@@ -167,7 +167,7 @@ startWindow("Confirmation &amp; Submit");
 							<tr>
 								<td width="30%"><?= htmlentities($jobtype->name); ?></td>
 <?
-								if($jobtype->systempriority == 1 && getSystemSetting('_dmmethod', "")=='hybrid'){
+								if($jobtype->systempriority == 1 && getSystemSetting('_dmmethod', "asp")=='hybrid'){
 ?>
 									<td style="color:red"><?="Phone calls will be sent out on the hosted system"?></td>
 <?

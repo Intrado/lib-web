@@ -69,7 +69,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSystemSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
 				setSystemSetting('autoreport_replyname', GetFormData($f, $s, 'autoreport_replyname'));
 
-				if($IS_COMMSUITE || getSystemSetting('_dmmethod') != 'asp'){
+				if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 					setSystemSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
 					setSystemSetting('easycallmax', GetFormData($f, $s, 'easycallmax'));
 				}
@@ -90,7 +90,7 @@ if( $reloadform )
 	PutFormData($f, $s, "callerid", Phone::format(getSystemSetting('callerid')), 'phone', 10, 10, true);
 
 
-	if($IS_COMMSUITE || getSystemSetting('_dmmethod') != 'asp'){
+	if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 		PutFormData($f, $s, "easycallmin", getSystemSetting('easycallmin', 10), "number", 0, 10);
 		PutFormData($f, $s, "easycallmax", getSystemSetting('easycallmax', 10), "number", 0, 10);
 	}
@@ -167,7 +167,7 @@ startWindow('Settings');
 					</td>
 				</tr>
 <?
-				if($IS_COMMSUITE || getSystemSetting('_dmmethod') != 'asp'){
+				if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">EasyCall/<br>Call Me:</th>

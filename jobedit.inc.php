@@ -649,7 +649,7 @@ startWindow('Job Information');
 								<th>Name</th>
 								<th style="padding-left:6px;">Info</th>
 <?
-						if(getSystemSetting('_dmmethod', "")=='hybrid'){
+						if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
 ?>
 								<th>Delivery System</th>
 <?
@@ -671,7 +671,7 @@ startWindow('Job Information');
 
 								<td style="padding-left:6px;"><div id="jobtypeinfo" style="float:left;"></div></td>
 <?
-							if(getSystemSetting('_dmmethod', "")=='hybrid'){
+							if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
 ?>
 								<td><div id="addinfo"></div></td>
 <?
@@ -1109,7 +1109,7 @@ function display_jobtype_info(value){
 		jobtypetable.style.border=jobtypetablestyle;
 	}
 <?
-	if(getSystemSetting('_dmmethod', "")=='hybrid'){
+	if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
 ?>
 		var addinfo = new getObj("addinfo").obj;
 
