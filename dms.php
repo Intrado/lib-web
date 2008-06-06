@@ -4,7 +4,7 @@ include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
 
 
-if (!$USER->authorize('managesystem') || !in_array(getSystemSetting('_dmmethod', ''), array('hybrid', 'cs'))) {
+if (!$USER->authorize('managesystem') || getSystemSetting('_dmmethod', 'asp')=='asp') {
 	redirect('unauthorized.php');
 }
 
