@@ -26,6 +26,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
 			<xsd:element name="name" type="xsd:string"></xsd:element>
 			<xsd:element name="description" type="xsd:string"></xsd:element>
+			<xsd:element name="type" type="xsd:string"></xsd:element>
+			<xsd:element name="language" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -141,6 +143,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
 			<xsd:element name="name" type="xsd:string"></xsd:element>
 			<xsd:element name="description" type="xsd:string"></xsd:element>
+			<xsd:element name="phonemessages" type="sm:message" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="emailmessages" type="sm:message" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="smsmessages" type="sm:message" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getActiveJobsResult">
@@ -610,9 +615,10 @@ sendJob:
     </wsdl:binding>
     <wsdl:service name="SMAPI">
 		<wsdl:port name="SMAPIPort" binding="sm:SMBinding">
-			<soap:address location="http://' . $_SERVER["SERVER_NAME"] . '/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
+			<soap:address location="http://' . $_SERVER["SERVER_NAME"] .'/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
+
 ';
 
 ?>
