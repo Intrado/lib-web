@@ -107,7 +107,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 							('" . DBSafe($dmid) . "', 'telco_inboundtoken', '" . DBSafe(GetFormData($f, $s, 'telco_inboundtoken')) . "'),
 							('" . DBSafe($dmid) . "', 'telco_type', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'),
 							('" . DBSafe($dmid) . "', 'dm_enabled', '" . DBSafe(GetFormData($f, $s, 'dm_enabled')) . "'),
-							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "')
+							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "'),
+							('" . DBSafe($dmid) . "', 'testweightedresults','" . DBSafe(GetFormData($f, $s, 'testweightedresults'))."')
 							");
 				$newcustomerid = GetFormData($f, $s, "customerid") +0;
 				QuickUpdate("update dm set
@@ -164,6 +165,7 @@ if( $reloadform )
 
 	PutFormData($f, $s, "test_has_delays", getDMSetting($dmid, "test_has_delays"), "bool", 0, 1);
 
+	PutFormData($f, $s, "testweightedresults", getDMSetting($dmid, "testweightedresults"), "text");
 }
 
 
@@ -198,13 +200,17 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td>Type: </td>
 		<td>
 			<?
-				NewFormItem($f, $s, "telco_type", "selectstart");
+				NewFormItem($f, $s, "telco_type", "selectstart", null, null, "id='telco_type' onchange='if(this.value==\"Test\"){ show(\"weightedresult1\"); show(\"weightedresult2\"); } else { hide(\"weightedresult1\"); hide(\"weightedresult2\"); }'" );
 				foreach($telco_types as $telco_type){
 					NewFormItem($f, $s, "telco_type", "selectoption", $telco_type, $telco_type);
 				}
 				NewFormItem($f, $s, "telco_type", "selectend");
 			?>
 		</td>
+	</tr>
+	<tr>
+		<td><div id='weightedresult1' style='display:none'>Test Weighted Results:</span></td>
+		<td><div id='weightedresult2' style='display:none'><?=NewFormItem($f, $s, "testweightedresults", "text", 30, 250)?></span></td>
 	</tr>
 	<tr>
 		<td>Caller ID:</td>
@@ -249,3 +255,44 @@ managerPassword($f, $s);
 EndForm();
 include_once("navbottom.inc.php");
 ?>
+<script>
+if(new getObj('telco_type') == 'Test'){
+	show('weightedresult1');
+	show('weightedresult2');
+}
+
+
+function getObj(name)
+{
+  if (document.getElementById)
+  {
+  	this.obj = document.getElementById(name);
+  }
+  else if (document.all)
+  {
+	this.obj = document.all[name];
+  }
+  else if (document.layers)
+  {
+   	this.obj = document.layers[name];
+  }
+  if(this.obj)
+	this.style = this.obj.style;
+}
+
+function show(name)
+{
+	var x = new getObj(name);
+	if (x.style)
+		x.style.display = "block";
+}
+
+function hide(name)
+{
+	var x = new getObj(name);
+	if (x.style)
+		x.style.display =  "none";
+}
+
+
+</script>
