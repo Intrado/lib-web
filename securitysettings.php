@@ -32,7 +32,7 @@ $f = "securitysettings";
 $s = "main";
 $reloadform = 0;
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
+if(CheckFormSubmit($f,$s))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -51,23 +51,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 		} else if(GetFormData($f, $s, "loginlockoutattempts") != 0 && GetFormData($f, $s, "logindisableattempts") !=0 && GetFormData($f, $s, "logindisableattempts") <= GetFormData($f, $s, "loginlockoutattempts")){
 			error("The login disable attempts must be greater than the login lockout attempts");
 		} else {
-			//check the parsing
+			setSystemSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
+			setSystemSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
 
-			if (isset($errors) && count($errors) > 0) {
-				error('There was an error parsing the setting', implode("",$errors));
-			} else {
+			setSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'));
+			setSystemSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'));
+			setSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'));
 
-				setSystemSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
-				setSystemSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
-
-
-				setSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'));
-				setSystemSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'));
-				setSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'));
-
-
-				redirect("settings.php");
-			}
+			redirect("settings.php");
 		}
 	}
 } else {
@@ -86,7 +77,6 @@ if( $reloadform )
 	PutFormData($f, $s,"usernamelength", getSystemSetting('usernamelength', "5"), "number", 0, 10);
 	PutFormData($f, $s,"passwordlength", getSystemSetting('passwordlength', "5"), "number", 0, 10);
 
-
 }
 
 
@@ -95,17 +85,17 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Security Settings';
+$TITLE = 'Systemwide Security';
 
 include_once("nav.inc.php");
 
 NewForm($f);
 buttons(submit($f, $s, 'Save'));
-startWindow('Global Security Settings');
+startWindow('Login Settings');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Security:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
