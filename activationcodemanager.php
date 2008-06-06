@@ -221,7 +221,7 @@ if($reportgenerator->format == "csv"){
 	////////////////////////////////////////////////////////////////////////////////
 	// Display
 	////////////////////////////////////////////////////////////////////////////////
-	$PAGE = "admin:settings";
+	$PAGE = "system:contacts";
 	$TITLE = "Activation Code Manager";
 
 	include_once("nav.inc.php");
@@ -240,9 +240,9 @@ if($reportgenerator->format == "csv"){
 		} else {
 			$extrajs = "if(confirmGenerate())";
 		}
-		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), button("Generate Activation Codes", $extrajs . " window.location='?generate=1'"));
+		buttons(button("Back", null, "contacts.php?clear=1"), submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), button("Generate Activation Codes", $extrajs . " window.location='?generate=1'"));
 	} else {
-		buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
+		buttons(button("Back", null, "contacts.php?clear=1"), submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
 	}
 	startWindow("Contact Search", "padding: 3px;");
 
