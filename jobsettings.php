@@ -64,9 +64,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				setSystemSetting('retry', GetFormData($f, $s, 'retry'));
 				setSystemSetting('callerid', Phone::parse(GetFormData($f, $s, 'callerid')));
 
-				setSystemSetting('defaultareacode', GetFormData($f, $s, 'defaultareacode'));
-
-				setSystemSetting('disablerepeat', GetFormData($f, $s, 'disablerepeat'));
 				setSystemSetting('alertmessage', trim(GetFormData($f, $s, 'alertmessage')));
 
 				setSystemSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
@@ -92,14 +89,11 @@ if( $reloadform )
 	PutFormData($f,$s,"retry",getSystemSetting('retry'),"number",5,240);
 	PutFormData($f, $s, "callerid", Phone::format(getSystemSetting('callerid')), 'phone', 10, 10, true);
 
-	PutFormData($f, $s, "defaultareacode", getSystemSetting('defaultareacode'), 'number',200,999);
+
 	if($IS_COMMSUITE || getSystemSetting('_dmmethod') != 'asp'){
 		PutFormData($f, $s, "easycallmin", getSystemSetting('easycallmin', 10), "number", 0, 10);
 		PutFormData($f, $s, "easycallmax", getSystemSetting('easycallmax', 10), "number", 0, 10);
 	}
-
-	PutFormData($f, $s, "disablerepeat", getSystemSetting('disablerepeat'), 'bool');
-
 
 	PutFormData($f, $s, "autoreport_replyemail", getSystemSetting('autoreport_replyemail'), 'email',0,100);
 	PutFormData($f, $s, "autoreport_replyname", getSystemSetting('autoreport_replyname'), 'text',0,100);
@@ -111,17 +105,17 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Job Settings';
+$TITLE = 'Systemwide Job Settings';
 
 include_once("nav.inc.php");
 
 NewForm($f);
 buttons(submit($f, $s, 'Save'));
-startWindow('Global Job Settings');
+startWindow('Settings');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Job:</th>
+					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
 					<td class="bottomBorder">
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
@@ -148,24 +142,6 @@ startWindow('Global Job Settings');
 										</tr>
 									</table>
 								</td>
-							</tr>
-							<tr>
-								<td>
-									Disable Repeating Jobs<? print help('Settings_DisableRepeat', NULL, "small"); ?>
-								</td>
-								<td>
-									<table border="0" cellpadding="2" cellspacing="0">
-										<tr>
-											<td><? NewFormItem($f, $s, 'disablerepeat', 'checkbox'); ?></td>
-											<td>This setting will prevent all scheduled repeating jobs from running.</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-
-							<tr>
-								<td width="30%">Default Local Area Code<? print help('Settings_DefaultLocalAreaCode', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?></td>
 							</tr>
 							<tr>
 								<td>
