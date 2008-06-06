@@ -152,6 +152,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 					}
 				}
 			}
+			redirect('settings.php');
 		}
 
 		$reloadform = true;
@@ -212,13 +213,13 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "admin:datamanager";
+$PAGE = "admin:settings";
 $TITLE = "Metadata Manager";
 
 include_once("nav.inc.php");
 
 NewForm($form);
-buttons(submit($form, $section));
+buttons(submit($form, $section, 'Save'));
 startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 ?>
 
