@@ -43,12 +43,23 @@ startWindow("Options", 'padding: 3px;');
 		<tr align="left" valign="top">
 			<td>
 				<table>
-					<tr><td><a href='displaysettings.php'>Display Settings</a></td></tr>
-					<tr><td><a href='securitysettings.php'>Security Settings</a></td></tr>
+
+					<tr><td><a href='systemwidealertmessage.php'>Systemwide Alert Message</a></td></tr>
+					<tr><td><a href='customerinfo.php'>Customer Information</a></td></tr>
 <?
-				if(in_array(getSystemSetting('_dmmethod', ""), array('cs','hybrid'))){
+					if($USER->authorize('metadata')){
 ?>
-					<tr><td><a href='dms.php'>DM's</a></td></tr>
+					<tr><td><a href='datamanager.php'>Field Definitions</a></td></tr>
+<?
+					}
+?>
+					<tr><td><a href='securitysettings.php'>Security</a></td></tr>
+					<tr><td><a href='displaysettings.php'>Display</a></td></tr>
+
+<?
+				if(getSystemSetting('_dmmethod', "")!='asp'){
+?>
+					<tr><td><a href='dms.php'>Remote Telephony Appliance</a></td></tr>
 <?
 				}
 ?>
@@ -56,17 +67,17 @@ startWindow("Options", 'padding: 3px;');
 			</td>
 			<td>
 				<table>
+					<tr><td><a href='disablerepeatingjobs.php'>Enable/Disable Repeating Jobs</a></td></tr>
 					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
-					<tr><td><a href='jobtypemanagement.php'>Edit Job Types</a></td></tr>
-					<tr><td><a href='jobtypeaddition.php'>Create New Job Type</a></td></tr>
+					<tr><td><a href='jobtypemanagement.php'>Job Types</a></td></tr>
 				</table>
 			</td>
 			<td>
 				<table>
-					<tr><td><a href='destinationlabel.php?type=phone'>Edit Phone Labels</a></td></tr>
-					<tr><td><a href='destinationlabel.php?type=email'>Edit Email Labels</a></td></tr>
+					<tr><td><a href='destinationlabel.php?type=phone'>Phone Labels</a></td></tr>
+					<tr><td><a href='destinationlabel.php?type=email'>Email Labels</a></td></tr>
 <? if(getSystemSetting('_hassms', false)){ ?>
-					<tr><td><a href='destinationlabel.php?type=sms'>Edit SMS Labels</a></td></tr>
+					<tr><td><a href='destinationlabel.php?type=sms'>SMS Labels</a></td></tr>
 <? } ?>
 				</table>
 			</td>
@@ -76,7 +87,6 @@ startWindow("Options", 'padding: 3px;');
 			<td>
 				<table>
 					<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
-					<tr><td><a href='activationcodemanager.php?clear=1'>Manage Activation Codes</a></td></tr>
 				</table>
 			</td>
 <?
