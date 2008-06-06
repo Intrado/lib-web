@@ -502,7 +502,6 @@ class SMAPI{
 				if($USER->authorize('sendmulti')){
 					foreach($types as $type){
 						$arrayname = $type . "messages";
-						error_log(print_r($arrayname,  true));
 						foreach($joblangs[$type] as $joblang){
 							$joblangmessage = new API_Message();
 							$joblangmessage->id = $joblang->messageid;
