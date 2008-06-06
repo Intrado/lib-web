@@ -256,7 +256,7 @@ EndForm();
 include_once("navbottom.inc.php");
 ?>
 <script>
-if(new getObj('telco_type') == 'Test'){
+if(new getObj('telco_type').obj.value == 'Test'){
 	show('weightedresult1');
 	show('weightedresult2');
 }
