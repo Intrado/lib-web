@@ -235,7 +235,7 @@ $FIELDMAP = FieldMap::getMapNames();
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "admin:security";
+$PAGE = "admin:profiles";
 $TITLE = "Edit Access Profile: " . (GetFormData($form, $section, 'name') == NULL ? "New Access Profile" : GetFormData($form, $section, 'name'));
 $DESCRIPTION = GetFormData($form, $section, 'description');
 

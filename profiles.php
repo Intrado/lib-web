@@ -51,7 +51,7 @@ function fmt_actions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "admin:security";
+$PAGE = "admin:profiles";
 $TITLE = "Access Profiles";
 
 include_once("nav.inc.php");
