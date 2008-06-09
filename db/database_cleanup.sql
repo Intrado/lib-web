@@ -71,7 +71,18 @@ and		not exists (
 		FROM	voicereply vr
 		WHERE	vr.contentid = c.id
 	)
-
+and		not exists (
+		SELECT *
+		FROM	settings
+		where name = 'logocontentid'
+		and value = c.id
+	)
+and		not exists (
+		SELECT *
+		FROM	settings
+		where name = '_loginpicturecontentid'
+		and value = c.id
+	)
 $$$
 
 -- List deletion
