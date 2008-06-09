@@ -117,14 +117,15 @@ foreach ($shards as $shardid => $sharddb) {
 	$res = Query($query,$sharddb);
 	while ($row = DBGetRow($res)) {
 		list($hours,$minutes,$seconds) = explode(":",$row[6]);
-		$days = floor($hours/24);
+		$days = floor(abs($hours)/24);
+		if($hours < 0)
+			$days = 0 - $days;
 		$hours = $hours%24;
 		$timetorun = implode(":",array($hours,$minutes,$seconds)) . ($days ? " + $days Days" : "");
 		$schedjobs[$row[0]][] = array ($row[1], $customers[$row[1]], $row[2], $row[3], $row[4], $row[5], $timetorun);
 
 	}
 }
-
 
 include("nav.inc.php");
 
