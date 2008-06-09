@@ -1409,3 +1409,6 @@ ALTER TABLE `reportcontact` ADD `voicereplyid` INT(11) NULL ,
 ADD `response` TINYINT(4) NULL
 $$$
 
+ALTER TABLE `user` CHANGE `password` `password` VARCHAR( 50 ) NOT NULL ,
+CHANGE `pincode` `pincode` VARCHAR( 50 ) NOT NULL
+$$$
