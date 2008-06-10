@@ -54,7 +54,7 @@ if (count($jobs) > 0) {
 			$output .= "    People:\t\t\t\t\t\t\t" . $job->stats[0] . "\r\n";
 			$output .= "    Duplicates:\t\t\t\t" . $job->stats[5] . "\r\n";
 			$output .= "    Successful:\t\t\t\t" . $job->stats[2] . "\r\n";
-			$output .= "    Failed:\t\t\t\t\t\t\t" . $job->stats[3] . "\r\n";
+			$output .= "    Unknown:\t\t\t\t\t\t\t" . $job->stats[3] . "\r\n";
 			$output .= "    In Progress:\t\t\t" . $job->stats[4] . "\r\n";
 		} else if (doesSupport("CiscoIPPhoneImageFile")) {
 			$output .= "--$job->name (" . fmt_status($job,"status") . ")--\r\n";
@@ -63,7 +63,7 @@ if (count($jobs) > 0) {
 			$output .= "    People:\t\t\t\t\t" . $job->stats[0] . "\r\n";
 			$output .= "    Duplicates:\t\t\t" . $job->stats[5] . "\r\n";
 			$output .= "    Successful:\t\t" . $job->stats[2] . "\r\n";
-			$output .= "    Failed:\t\t\t\t\t" . $job->stats[3] . "\r\n";
+			$output .= "    Unknown:\t\t\t\t\t" . $job->stats[3] . "\r\n";
 			$output .= "    In Progress:\t\t" . $job->stats[4] . "\r\n";
 		} else {
 			$output .= "--$job->name (" . fmt_status($job,"status") . ")--\r\n";
@@ -72,7 +72,7 @@ if (count($jobs) > 0) {
 			$output .= "    People:\t\t\t\t" . $job->stats[0] . "\r\n";
 			$output .= "    Duplicates:\t\t" . $job->stats[5] . "\r\n";
 			$output .= "    Successful:\t\t" . $job->stats[2] . "\r\n";
-			$output .= "    Failed:\t\t\t\t\t" . $job->stats[3] . "\r\n";
+			$output .= "    Unknown:\t\t\t\t\t" . $job->stats[3] . "\r\n";
 			$output .= "    In Progress:\t" . $job->stats[4] . "\r\n";
 		}
 	}
