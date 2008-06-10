@@ -43,8 +43,11 @@ if (isset($headers['If-None-Match']) && strpos($headers['If-None-Match'], "asset
 		$data = base64_decode($map['loginPicture']);
 		$contenttype = $map['loginPictureType'];
 		$ext = substr($contenttype, strpos($contenttype, "/")+1);
-
-
+	} else {
+		$data = file_get_contents("img/classroom_girl.jpg");
+		$contenttype = "image/jpeg";
+		$ext = ".jpg";
+	}
 		header("Content-disposition: filename=picture." . $ext);
 		header("Cache-Control: private");
 		header("Content-type: " . $contenttype);
@@ -57,7 +60,7 @@ if (isset($headers['If-None-Match']) && strpos($headers['If-None-Match'], "asset
 			header('ETag: "asset-' . $_SESSION['etagstring'] . '"');
 		}
 		echo $data;
-	}
+
 }
 
 ?>
