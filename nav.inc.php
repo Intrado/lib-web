@@ -94,7 +94,7 @@ $NAVTREE = array (
 							'metadata', 'managetasks'),$MAINTAB=="admin",array(
 		array("Users","users.php","manageaccount",$SUBTAB=="users"),
 		array("Profiles","profiles.php","manageprofile",$SUBTAB=="profiles"),
-		array("Settings","settings.php","managesystem",$SUBTAB=="settings"),
+		array("Settings","settings.php",array("managesystem", "portalaccess","metadata"),$SUBTAB=="settings"),
 		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager")
 		))
 );
