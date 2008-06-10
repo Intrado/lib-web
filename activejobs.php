@@ -56,7 +56,7 @@ $result = Query(
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
-            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type
+            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type, j.percentprocessed, j.cancelleduserid
             from job j
             left join reportcontact rc
             	on j.id = rc.jobid
@@ -110,6 +110,21 @@ function fmt_remaining ($row, $index) {
 	return implode("<br>",$data);
 }
 
+// index 22 is percent processed
+// index 23 is cancelled user id
+function fmt_status_index($row, $index) {
+	global $USER;
+	if($row[$index] == 'procactive'){
+		return "Processing (" . $row[22] . ")";
+	} else {
+		if ($row[23] && $row[23] != $USER->id) {
+			$usr = new User($row[23]);
+			return "Cancelled (" . $usr->login . ")";
+		} else {
+			return $row[$index] == 'new' ? 'Not Submitted' : ucfirst($row[$index]);
+		}
+	}
+}
 
 $titles = array(
 				"0" => 'Submitted by',
