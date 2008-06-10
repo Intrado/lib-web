@@ -26,8 +26,14 @@ if ($SETTINGS['feature']['has_ssl']) {
 }
 
 $scheme = getCustomerData($CUSTOMERURL);
+if($scheme == false){
+	$scheme = array("_brandtheme" => "3dblue",
+					"_supportemail" => "support@schoolmessenger.com",
+					"_supportphone" => "800.920.3897",
+					"colors" => array("_brandprimary" => "26477D"));
+}
 $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
-$primary = isset($scheme['colors']['_brandprimary']) ? $scheme['colors']['_brandprimary'] : "" ;
+$primary = $scheme['colors']['_brandprimary'];
 
 //check various ways to log in
 $badlogin = false;
