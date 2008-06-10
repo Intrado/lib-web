@@ -114,7 +114,7 @@ include("nav.inc.php");
 
 NewForm($f, "onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
 ?>
-<table border = 1>
+<table class=list>
 <?
 showTable($lockedusers, $titles, $formatters);
 ?>

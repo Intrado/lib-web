@@ -96,7 +96,7 @@ include("nav.inc.php");
 NewForm($f);
 ?>
 
-<table border=1>
+<table class=list>
 	<tr>
 		<td>Name</td>
 		<td>System Priority</td>

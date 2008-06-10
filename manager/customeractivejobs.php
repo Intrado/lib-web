@@ -226,7 +226,7 @@ for ($pri = 1; $pri <=3 ; $pri++) {
 
 ?>
 	Active Jobs:
-	<table border=1>
+	<table>
 <?
 
 	$titles = array("Customer id",

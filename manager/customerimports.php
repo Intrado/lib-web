@@ -233,7 +233,7 @@ NewForm($f);
 EndForm();
 
 ?>
-<table border=1>
+<table class=list>
 <?
 showTable($data, $titles, $formatters);
 ?>

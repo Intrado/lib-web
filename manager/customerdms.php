@@ -94,7 +94,7 @@ $formatters = array(2 => "fmt_customerUrl",
 include_once("nav.inc.php");
 
 ?>
-<table border="1">
+<table class=list>
 <?
 	showTable($data, $titles, $formatters);
 ?>
