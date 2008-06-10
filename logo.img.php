@@ -43,21 +43,23 @@ if (isset($headers['If-None-Match']) && strpos($headers['If-None-Match'], "asset
 		$data = base64_decode($map['customerLogo']);
 		$contenttype = $map['contentType'];
 		$ext = substr($contenttype, strpos($contenttype, "/")+1);
-
-
-		header("Content-disposition: filename=logo." . $ext);
-		header("Cache-Control: private");
-		header("Content-type: " . $contenttype);
-		// Set the content-type to something like image/jpeg and set the length
-		header("Pragma: ");
-		header("Expires: ");
-
-		// Send the browser the etag so they can cache it
-		if(isset($_SESSION['etagstring'])){
-			header('ETag: "asset-' . $_SESSION['etagstring'] . '"');
-		}
-		echo $data;
+	} else {
+		$data = file_get_contents("img/logo_large.gif");
+		$contenttype = "image/gif";
+		$ext = ".gif";
 	}
+	header("Content-disposition: filename=logo." . $ext);
+	header("Cache-Control: private");
+	header("Content-type: " . $contenttype);
+	// Set the content-type to something like image/jpeg and set the length
+	header("Pragma: ");
+	header("Expires: ");
+
+	// Send the browser the etag so they can cache it
+	if(isset($_SESSION['etagstring'])){
+		header('ETag: "asset-' . $_SESSION['etagstring'] . '"');
+	}
+	echo $data;
 }
 
 ?>
