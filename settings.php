@@ -12,7 +12,7 @@ require_once("inc/utils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("inc/form.inc.php");
 
-if (!$USER->authorize('managesystem')) {
+if (!($USER->authorize('managesystem') || $USER->authorize('metadata') || $USER->authorize('portalaccess'))) {
 	redirect('unauthorized.php');
 }
 
@@ -29,42 +29,62 @@ startWindow("Options", 'padding: 3px;');
 ?>
 	<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
 		<tr class="listHeader">
-			<th align="left" class="nosort">System</th>
-			<th align="left" class="nosort">Job</th>
-			<th align="left" class="nosort">Destination Labels</th>
 <?
+			if($USER->authorize('managesystem') || $USER->authorize('metadata')){
+?>
+				<th align="left" class="nosort">System</th>
+<?
+			}
+			if($USER->authorize('managesystem')){
+?>
+				<th align="left" class="nosort">Job</th>
+				<th align="left" class="nosort">Destination Labels</th>
+<?
+			}
 			if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
 ?>
-			<th align="left" class="nosort">Contact Manager Administration</th>
+				<th align="left" class="nosort">Contact Manager Administration</th>
 <?
 			}
 ?>
 		</tr>
 		<tr align="left" valign="top">
+<?
+		if($USER->authorize('managesystem') || $USER->authorize('metadata')){
+?>
 			<td>
 				<table>
-
-					<tr><td><a href='systemwidealertmessage.php'>Systemwide Alert Message</a></td></tr>
-					<tr><td><a href='customerinfo.php'>Customer Information</a></td></tr>
 <?
+					if($USER->authorize('managesystem')){
+?>
+						<tr><td><a href='systemwidealertmessage.php'>Systemwide Alert Message</a></td></tr>
+						<tr><td><a href='customerinfo.php'>Customer Information</a></td></tr>
+<?
+					}
 					if($USER->authorize('metadata')){
 ?>
-					<tr><td><a href='datamanager.php'>Field Definitions</a></td></tr>
+						<tr><td><a href='datamanager.php'>Field Definitions</a></td></tr>
+<?
+					}
+					if($USER->authorize('managesystem')){
+?>
+						<tr><td><a href='securitysettings.php'>Security</a></td></tr>
+						<tr><td><a href='displaysettings.php'>Display</a></td></tr>
+
+<?
+					}
+					if($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp'){
+?>
+						<tr><td><a href='dms.php'>Remote Telephony Appliance</a></td></tr>
 <?
 					}
 ?>
-					<tr><td><a href='securitysettings.php'>Security</a></td></tr>
-					<tr><td><a href='displaysettings.php'>Display</a></td></tr>
-
-<?
-				if(getSystemSetting('_dmmethod', "")!='asp'){
-?>
-					<tr><td><a href='dms.php'>Remote Telephony Appliance</a></td></tr>
-<?
-				}
-?>
 				</table>
 			</td>
+<?
+		}
+		if($USER->authorize('managesystem')){
+?>
 			<td>
 				<table>
 					<tr><td><a href='disablerepeatingjobs.php'>Enable/Disable Repeating Jobs</a></td></tr>
@@ -82,7 +102,8 @@ startWindow("Options", 'padding: 3px;');
 				</table>
 			</td>
 <?
-			if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
+		}
+		if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
 ?>
 			<td>
 				<table>
@@ -90,7 +111,7 @@ startWindow("Options", 'padding: 3px;');
 				</table>
 			</td>
 <?
-			}
+		}
 ?>
 		</tr>
 	</table>
