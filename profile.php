@@ -440,7 +440,7 @@ startWindow('Allowed Functions');
 					<td>Manage Access Profiles</td>
 				</tr>
 				<tr>
-					<td><? NewFormItem($form,$section,"managesystem","checkbox"); ?></td>
+					<td><? NewFormItem($form,$section,"managesystem","checkbox", null, null, "id='managesystem'"); ?></td>
 					<td>Manage Systemwide Settings</td>
 				</tr>
 			</table>
@@ -515,7 +515,7 @@ startWindow('Allowed Functions');
 					<td>Manage systemwide jobs</td>
 				</tr>
 				<tr>
-					<td><? NewFormItem($form,$section,"metadata","checkbox"); ?></td>
+					<td><? NewFormItem($form,$section,"metadata","checkbox", null, null, "onclick='if(this.checked){new getObj(\"managesystem\").obj.checked = true}'"); ?></td>
 					<td>Manage Metadata</td>
 				</tr>
 				<tr>
