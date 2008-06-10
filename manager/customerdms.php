@@ -43,7 +43,7 @@ function fmt_customerUrl($row, $index){
 
 // index 1 is dmid
 function fmt_DMActions($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '" title="Restart><img src="img/s-restart.png" border=0></a>';
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '" title="Restart"><img src="img/s-restart.png" border=0></a>';
 	return $url;
 }
 
