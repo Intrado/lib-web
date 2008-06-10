@@ -440,7 +440,7 @@ startWindow('Allowed Functions');
 					<td>Manage Access Profiles</td>
 				</tr>
 				<tr>
-					<td><? NewFormItem($form,$section,"managesystem","checkbox", null, null, "id='managesystem'"); ?></td>
+					<td><? NewFormItem($form,$section,"managesystem","checkbox"); ?></td>
 					<td>Manage Systemwide Settings</td>
 				</tr>
 			</table>
@@ -451,7 +451,7 @@ startWindow('Allowed Functions');
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
-					<td><? NewFormItem($form,$section,"viewcontacts","checkbox"); ?></td>
+					<td><? NewFormItem($form,$section,"viewcontacts","checkbox", null, null, "id='viewcontacts'"); ?></td>
 					<td>View Contacts</td>
 				</tr>
 				<tr>
@@ -469,7 +469,7 @@ startWindow('Allowed Functions');
 		<td class="bottomBorder" width="100%">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
-					<td><? NewFormItem($form,$section,"portalaccess","checkbox"); ?></td>
+					<td><? NewFormItem($form,$section,"portalaccess","checkbox", null, null, "onclick='if(this.checked){new getObj(\"viewcontacts\").obj.checked=true}'"); ?></td>
 					<td>Access Contact Manager Administration Options</td>
 				</tr>
 				<tr>
@@ -515,8 +515,8 @@ startWindow('Allowed Functions');
 					<td>Manage systemwide jobs</td>
 				</tr>
 				<tr>
-					<td><? NewFormItem($form,$section,"metadata","checkbox", null, null, "onclick='if(this.checked){new getObj(\"managesystem\").obj.checked = true}'"); ?></td>
-					<td>Manage Metadata</td>
+					<td><? NewFormItem($form,$section,"metadata","checkbox"); ?></td>
+					<td>Manage Field Definitions</td>
 				</tr>
 				<tr>
 					<td><? NewFormItem($form,$section,"managetasks","checkbox"); ?></td>
