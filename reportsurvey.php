@@ -133,7 +133,7 @@ buttons(button('Back', null, "reports.php"), submit($f, "run", "View Report"), s
 
 
 //--------------- Select window ---------------
-startWindow("Select", NULL, false);
+startWindow("Select ".help('ReportSurvey_Select'), NULL, false);
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
