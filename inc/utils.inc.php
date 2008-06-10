@@ -229,7 +229,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.61 $
+	    # $Revision: 1.62 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -446,10 +446,10 @@ function fetch_labels($type, $sequence, $refresh=false){
 function destination_label($type, $sequence){
 	$label = fetch_labels($type, $sequence);
 	if($label){
-		$text = format_delivery_type($type). "&nbsp;". ($sequence+1) . " (" . $label . ")";
+		$text = format_delivery_type($type). " ". ($sequence+1) . " (" . $label . ")";
 		return $text;
 	} else {
-		return format_delivery_type($type). "&nbsp;". ($sequence+1);
+		return format_delivery_type($type). " ". ($sequence+1);
 	}
 }
 
