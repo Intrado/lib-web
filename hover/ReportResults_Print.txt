@@ -1,6 +1,0 @@
-@help/schoolmessenger_help.htm#reports/understanding_report_results.htm
-Total: The number of print notifications included in this report
-
-% Completed: The percent of the total that has been sent thus far.
-
-Remaining: The number of print notifications remaining to be sent.

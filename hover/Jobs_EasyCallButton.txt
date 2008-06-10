@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_job_with_easycall.htm
-The EasyCall feature is the quickest way to send a basic phone notification job to an existing list. Simply click the EasyCall button to use this feature. Fill in the information in the popup window so the system can call you to record your message. Then simply send your job.

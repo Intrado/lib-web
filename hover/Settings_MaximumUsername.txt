@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
-Enter the maximum number of characters acceptable for a user name.

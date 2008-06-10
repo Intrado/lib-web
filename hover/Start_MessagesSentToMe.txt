@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/the_start_page.htm
-Below is a list of the most recent messages that were sent to you. Click the message name to review the message.

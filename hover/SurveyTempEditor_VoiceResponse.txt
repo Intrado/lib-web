@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#receiving_responses/enabling_the_voice_response_option.htm
-Enable the Voice Response feature to allow recipients to leave you a message. Make sure to include instructions in your message.

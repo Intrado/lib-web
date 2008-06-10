@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/the_import_manager.htm
-Click the Refresh Map Data button to display the first few records of your import data file. Map each field defined in the system to the corresponding field in your data source. Select Not Used to skip any fields you don't want to import.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/creating_notification_reports.htm
-Select any of the options to narrow the results of your report to specific job types, call results and/or delivery types.

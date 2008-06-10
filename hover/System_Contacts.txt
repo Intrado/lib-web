@@ -1,8 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/the_contact_database.htm
-To locate individuals perform the following steps:
-
-1. Select the field you wish to filter on.
-2. Select the comparison operator you wish to use.
-3. Select the data to include in the filter (Hint: Hold down the Ctrl key to select multiple items.)
-4. Click the Add button to add the rule you created. Individuals matching your criteria will be displayed.
-5. Repeat the steps to add more rules in order to narrow your search results.

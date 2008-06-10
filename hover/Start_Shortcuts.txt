@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/the_start_page.htm
-The Shortcuts section contains links to the most commonly used features in the system and, if enabled on your account, a button to access EasyCall. EasyCall is the fastest way to send a phone message to an existing list.

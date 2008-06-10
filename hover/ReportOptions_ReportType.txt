@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/creating_notification_reports.htm
-A report can be for a specific notification job, a date range, or a relative date. Dates can be entered in almost any typical date format. You can even enter date references such as "yesterday", "last weekday" or "last Tuesday."
