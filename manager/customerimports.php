@@ -102,9 +102,18 @@ function fmt_importalerts($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+if(isset($_GET['clear'])){
+	unset($_SESSION['customerid']);
+	redirect();
+}
 
 if(isset($_GET['customer'])){
-	$customerID = $_GET['customer']+0;
+	$_SESSION['customerid'] = $_GET['customer']+0;
+	redirect();
+}
+
+if(isset($_SESSION['customerid'])){
+	$customerID = $_SESSION['customerid'];
 	$queryextra = "AND ID='$customerID'";
 } else {
 	$queryextra=" and enabled";
