@@ -545,31 +545,31 @@ class SMAPI{
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
 		$jobid = $jobid + 0;
 		if(!APISession($sessionid)){
-
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
 
 			$USER = $_SESSION['user'];
 			if(!$USER->id){
-
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			if(!$jobid){
-
 				$result["resultdescription"] = "Invalid Job ID";
 				return $result;
 			}
 			$job = new Job($jobid);
-			if($job->userid != $USER->id){
 
+			if($job->userid != $USER->id){
 				$result["resultdescription"] = "Unauthorized access";
 				return $result;
 			}
 			if($job->status != "repeating"){
-
 				$result["resultdescription"] = "Invalid Repeating Job";
+				return $result;
+			}
+			if(getSystemSetting("disablerepeat")){
+				$result["resultdescription"] = "Repeating jobs are disabled";
 				return $result;
 			}
 			$newjob = $job->runNow();
