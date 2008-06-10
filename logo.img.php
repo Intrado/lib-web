@@ -44,7 +44,7 @@ if (isset($headers['If-None-Match']) && strpos($headers['If-None-Match'], "asset
 		$contenttype = $map['contentType'];
 		$ext = substr($contenttype, strpos($contenttype, "/")+1);
 	} else {
-		$data = file_get_contents("img/logo_large.gif");
+		$data = file_get_contents("img/logo_small.gif");
 		$contenttype = "image/gif";
 		$ext = ".gif";
 	}
