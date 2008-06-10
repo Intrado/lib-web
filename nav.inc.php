@@ -232,7 +232,13 @@ doNavTabs($NAVTREE);
 
 	<div class="applinks hoverlinks">
 		<a href="addresses.php">Address Book</a> |
+<?
+if($USER->authorize('managemyaccount')){
+?>
 		<a href="account.php">Account</a> |
+<?
+}
+?>
 		<a href="#" onclick="window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
 		<a href="index.php?logout=1">Logout</a>
 	</div>
