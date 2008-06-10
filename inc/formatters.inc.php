@@ -329,13 +329,6 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 }
 
-/**
-	Function using a numeric index rather than a field name to access the column to print
-*/
-function fmt_status_index($row, $index) {
-	return $row[$index] == 'new' ? 'Not Submitted' : ucfirst($row[$index]);
-}
-
 function fmt_csv_list ($row,$index) {
 	$data = explode(",", $row[$index]);
 	$data = array_map("ucfirst",$data);
