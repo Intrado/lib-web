@@ -18,6 +18,19 @@ if(isset($_GET['resetDM'])){
 <?
 }
 
+$queryextra = "";
+
+if(isset($_GET['clear'])){
+	unset($_SESSION['customerid']);
+	redirect();
+}
+if(isset($_GET['cid'])){
+	$_SESSION['customerid'] = $_GET['cid'] +0;
+	redirect();
+}
+if(isset($_SESSION['customerid'])){
+	$queryextra = " and c.id = " . $_SESSION['customerid'] . " ";
+}
 
 //index 2 is customer id
 //index 1 is customer url
@@ -55,6 +68,7 @@ $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip,
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			where dm.type = 'customer'
+			" . $queryextra . "
 			order by dm.customerid, dm.name";
 $result = Query($query);
 $data = array();
