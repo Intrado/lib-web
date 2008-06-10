@@ -217,7 +217,9 @@ class Message extends DBMappedObject {
 				$data .= "{{" . $part->audiofile->name . "}}";
 				break;
 			case 'T':
-				if($part->voiceid != $currvoiceid){
+				if($currvoiceid == null){
+					$currvoiceid = $part->voiceid;
+				} else if($part->voiceid != $currvoiceid){
 					$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
 					$currvoiceid = $part->voiceid;
 				}
