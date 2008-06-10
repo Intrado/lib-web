@@ -68,7 +68,7 @@ function displayJobSummary($joblist){
 		$smscheck = QuickQuery("select count(smsmessageid) from job where id in ('" . $joblist . "')");
 
 
-		startWindow("Summary", 'padding: 3px;');
+		startWindow("Summary ". help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr valign="top">

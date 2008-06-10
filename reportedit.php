@@ -184,7 +184,7 @@ else {
 	$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 }
 buttons($back, submit($f, $s, "Save"));
-startWindow("Report Details");
+startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">

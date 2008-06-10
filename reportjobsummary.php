@@ -192,7 +192,7 @@ if($generator->format != "html"){
 	}
 	buttons($back, button('Refresh', 'window.location.reload()'), submit($f, $s, "Save/Schedule"));
 	
-		startWindow("Related Links", "padding: 3px;");
+		startWindow("Related Links ".help('ReportJobSummary_RelatedLinks'), "padding: 3px;");
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
 			<tr>

@@ -204,7 +204,7 @@ NewForm($f);
 buttons( button('Back', null, "reports.php"), submit($f, "view", "View Report"),submit($f, "save", "Save/Schedule"));
 
 //--------------- Select window ---------------
-startWindow("Select", NULL, false);
+startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
