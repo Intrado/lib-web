@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#reports/reports.htm
+Simple report overview information, displaying schedule, status and destination types/quantities.

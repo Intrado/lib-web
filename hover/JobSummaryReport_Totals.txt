@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#reports/understanding_call_logs.htm
+Job completion statistics for all destination types. Includes information about successful and unsuccessful notification attempts.
