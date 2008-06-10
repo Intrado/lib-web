@@ -1,7 +1,9 @@
 <?
 $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 ?>
-var _brandtheme = "<?=getBrandTheme();?>";
+<script>
+	var _brandtheme = "<?=getBrandTheme();?>";
+</script>
 <html>
 <head>
 <title>SchoolMessenger: <?= $pagetitle ?></title>
