@@ -46,13 +46,22 @@ $formatters = array("0" => "fmt_checkbox",
 					"9" => "fmt_null");
 
 if($USER->authorize('sendphone')){
-	$titles[6] = destination_label("phone", 0);
+	$titles[6] = "Phone 1";
+	if($phonelabel = fetch_labels("phone", 0)){
+		$titles[6] .= "(" . $phonelabel . ")";
+	}
 }
 if($USER->authorize('sendemail')){
-	$titles[7] = destination_label("email", 0);
+	$titles[7] = "Email 1";
+	if($emaillabel = fetch_labels("email", 0)){
+		$titles[7] .= "(" . $emaillabel . ")";
+	}
 }
 if(getSystemSetting("_hassms") && $USER->authorize('sendsms')){
-	$titles[8] = destination_label("sms", 0);
+	$titles[8] = "SMS 1";
+	if($smslabel = fetch_labels("sms", 0)){
+		$titles[8] .= "(" . $smslabel . ")";
+	}
 }
 $titles["9"] = "Address";
 
