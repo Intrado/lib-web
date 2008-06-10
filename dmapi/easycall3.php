@@ -13,6 +13,8 @@ include_once("../obj/Permission.obj.php");
 include_once("../obj/JobLanguage.obj.php");
 include_once("../obj/Rule.obj.php");
 
+
+global $USER, $ACCESS;
 $specialtask = new specialtask($_SESSION['specialtaskid']);
 
 if($REQUEST_TYPE == "new"){
