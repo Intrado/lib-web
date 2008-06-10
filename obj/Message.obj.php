@@ -209,7 +209,7 @@ class Message extends DBMappedObject {
 		$map = FieldMap::getMapNames();
 		$data = "";
 		$voices = DBFindMany("Voice", "from ttsvoice");
-		$currvoiceid=$this->firstVoiceID();
+		$currvoiceid=null;
 		foreach ($parts as $part) {
 			switch ($part->type) {
 			case 'A':
@@ -224,7 +224,9 @@ class Message extends DBMappedObject {
 				$data .= $part->txt;
 				break;
 			case 'V':
-				if($part->voiceid != $currvoiceid){
+				if($currvoiceid == null){
+					$currvoiceid = $part->voiceid;
+				} else if($part->voiceid != $currvoiceid){
 					$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
 					$currvoiceid = $part->voiceid;
 				}
