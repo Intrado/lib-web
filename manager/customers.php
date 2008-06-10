@@ -42,7 +42,13 @@ function fmt_users($row, $index){
 }
 
 function fmt_actions($row, $index){
-	$actions = '<a href="customeredit.php?id=' . $row[0] .'">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=' . $row[0] . '">Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=' . $row[0] . '">Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=' . $row[0] . '">Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=' . $row[0] . '">Priorities</a>&nbsp;|&nbsp;<a href="customerdms.php?cid=' . $row[0] . '">DMs</a>';
+	$actions = '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;';
+	$actions .= '<a href="userlist.php?customer=' . $row[0] . '" title="Users"><img src="img/s-users.png" border=0></a>&nbsp;';
+	$actions .= '<a href="customerimports.php?customer=' . $row[0] . '" title="Imports"><img src="img/s-imports.png" border=0></a>&nbsp;';
+	$actions .= '<a href="customeractivejobs.php?customer=' . $row[0] . '" title="Jobs"><img src="img/s-jobs.png" border=0></a>&nbsp;';
+	$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="img/s-priorities.png" border=0></a>&nbsp;';
+	$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="img/s-rdms.png" border=0></a>';
+
 	return $actions;
 }
 
@@ -107,7 +113,6 @@ foreach($customers as $cust) {
 			$customerfeatures[] = "Portal";
 		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
-
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = ucfirst(getCustomerSystemSetting('_dmmethod', "", true, $custdb));
 		$data[] = $row;
@@ -138,7 +143,7 @@ include_once("nav.inc.php");
 
 Show disabled: <input type="checkbox" onclick="window.location='customers.php?' + (this.checked ? 'showdisabled' : '');" <?= isset($_GET['showdisabled']) ? "checked" : ""?>>
 
-<table border=1>
+<table class=list>
 <?
 showTable($data, $titles, $formatters);
 ?>

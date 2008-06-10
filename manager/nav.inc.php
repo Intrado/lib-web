@@ -23,14 +23,36 @@
 		window.open(url, '_blank', 'width=' + width + ',height=' + height + 'location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=no');
 	}
 </script>
-<table border = 1>
+
+<style>
+
+.imagelink td {
+	text-align: center;
+	font-size: 60%;
+}
+
+.listAlt {
+	background-color: #dddddd;
+}
+
+.listHeader {
+	color: white;
+	background-color: #999999;
+}
+
+.list {
+	border: 1px solid gray;
+}
+
+</style>
+<table border=0 cellpadding=5 class=imagelink>
 	<tr>
-		<td><a href="customers.php">Customer&nbsp;List</a></td>
-		<td><a href="customerimports.php?clear">Customer&nbsp;Imports</a></td>
-		<td><a href="customeractivejobs.php">Active&nbsp;Jobs</a></td>
-		<td><a href="newcustomer.php">New&nbsp;Customer</a></td>
-		<td><a href="lockedusers.php">Locked&nbsp;Users</a></td>
-		<td><a href="customerdms.php?clear">DMs</a></td>
-		<td><a href="./?logout=1">Log&nbsp;Out</a></td>
+		<td><a href="customers.php" title="Customer&nbsp;List"><img src="img/custlist.png" border=0><div>Customer&nbsp;List</div></a></td>
+		<td><a href="customerimports.php?clear" title="Customer&nbsp;Imports"><img src="img/custimports.png" border=0><div>Customer&nbsp;Imports</div></a></td>
+		<td><a href="customeractivejobs.php" title="Active&nbsp;Jobs"><img src="img/activejobs.png" border=0><div>Active&nbsp;Jobs</div></a></td>
+		<td><a href="newcustomer.php" title="New&nbsp;Customer"><img src="img/newcustomer.png" border=0><div>New&nbsp;Customer</div></a></td>
+		<td><a href="lockedusers.php" title="Locked&nbsp;Users"><img src="img/lockedusers.png" border=0><div>Locked&nbsp;Users</div></a></td>
+		<td><a href="customerdms.php?clear" title="DM's"><img src="img/rdms.png" border=0><div>DM's</div></a></td>
+		<td><a href="./?logout=1" title="Log&nbsp;Out"><img src="img/logout.png" border=0><div>Log&nbsp;Out</div></a></td>
 	</tr>
 </table>
