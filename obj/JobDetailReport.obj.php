@@ -273,7 +273,7 @@ class JobDetailReport extends ReportGenerator{
 		displayJobSummary($this->params['joblist']);
 
 		?><br><?
-		startWindow("Report Details", 'padding: 3px;', false);
+		startWindow("Report Details ".help("JobDetailReport_ReportDetails"), 'padding: 3px;', false);
 
 		showPageMenu($total,$pagestart,500);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';

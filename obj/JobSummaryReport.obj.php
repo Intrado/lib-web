@@ -213,7 +213,7 @@ class JobSummaryReport extends ReportGenerator{
 
 		displayJobSummary($this->params['joblist']);
 		?><br><?
-		startWindow("Totals", "padding: 3px;");
+		startWindow("Totals ".help("JobSummaryReport_Totals"), "padding: 3px;");
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 <?
