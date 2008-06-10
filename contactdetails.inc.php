@@ -265,7 +265,7 @@ function displayValue($s) {
 // where did we come from, list preview or contact tab
 $PAGE = "notifications:lists";
 if (strpos($_SESSION['contact_referer'],"contacts.php") !== false) $PAGE = "system:contacts";
-if (strpos($_SESSION['contact_referer'],"activationcodemanager.php") !== false) $PAGE = "admin:settings";
+if (strpos($_SESSION['contact_referer'],"activationcodemanager.php") !== false) $PAGE = "system:contacts";
 
 $contactFullName = "";
 $firstnamefield = FieldMap::getFirstNameField();
