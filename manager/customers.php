@@ -42,7 +42,7 @@ function fmt_users($row, $index){
 }
 
 function fmt_actions($row, $index){
-	$actions = '<a href="customeredit.php?id=' . $row[0] .'">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=' . $row[0] . '">Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=' . $row[0] . '">Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=' . $row[0] . '">Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=' . $row[0] . '">Priorities</a>';
+	$actions = '<a href="customeredit.php?id=' . $row[0] .'">Edit</a>&nbsp;|&nbsp;<a href="userlist.php?customer=' . $row[0] . '">Users</a>&nbsp;|&nbsp;<a href="customerimports.php?customer=' . $row[0] . '">Imports</a>&nbsp;|&nbsp;<a href="customeractivejobs.php?customer=' . $row[0] . '">Jobs</a>&nbsp;|&nbsp;<a href="customerpriorities.php?id=' . $row[0] . '">Priorities</a>&nbsp;|&nbsp;<a href="customerdms.php?cid=' . $row[0] . '">DMs</a>';
 	return $actions;
 }
 
