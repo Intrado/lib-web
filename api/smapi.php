@@ -452,8 +452,8 @@ class SMAPI{
 
 			//fetch all messages
 			$messages['phone'] = DBFindMany("Message", "from message where type='phone' and not deleted and userid = " . $USER->id);
-			$messages['email'] = DBFindMany("Message", "from message where type='phone' and not deleted and userid = " . $USER->id);
-			$messages['sms'] = DBFindMany("Message", "from message where type='phone' and not deleted and userid = " . $USER->id);
+			$messages['email'] = DBFindMany("Message", "from message where type='email' and not deleted and userid = " . $USER->id);
+			$messages['sms'] = DBFindMany("Message", "from message where type='sms' and not deleted and userid = " . $USER->id);
 
 			$jobs = array();
 			while($row = DBGetRow($queryresult)){
@@ -614,6 +614,7 @@ class SMAPI{
 		} else {
 			$USER = $_SESSION['user'];
 			$ACCESS = $_SESSION['access'];
+
 			if(!$USER->id){
 				$result["resultdescription"] = "Invalid user";
 				return $result;
@@ -664,19 +665,22 @@ class SMAPI{
 				$job->description = $desc;
 				$job->jobtypeid = $jobtypeid;
 				$job->listid = $listid;
-				if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid)){
+				if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid) &&
+					QuickQuery("select type from message where id = " . $phonemsgid) == "phone"){
 					$job->sendphone = true;
 					$job->phonemessageid = $phonemsgid;
 				} else {
 					$job->sendphone = false;
 				}
-				if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid)){
+				if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid) &&
+					QuickQuery("select type from message where id = " . $emailmsgid) == "phone"){
 					$job->sendemail = true;
 					$job->emailmessageid = $emailmsgid;
 				} else {
 					$job->sendemail = false;
 				}
-				if(getSystemSetting('_hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid)){
+				if(getSystemSetting('_hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid) &&
+					QuickQuery("select type from message where id = " . $smsmsgid) == "phone"){
 					$job->sendsms = true;
 					$job->smsmessageid = $smsmsgid;
 				} else {
