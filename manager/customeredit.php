@@ -264,7 +264,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 				setCustomerSystemSetting('emaildomain', DBSafe(trim(GetFormData($f, $s, "emaildomain"))), $custdb);
 
-				if(in_array(getCustomerSystemSetting('_dmmethod', '', true, $custdb), array('hybrid','cs')) && GetFormData($f, $s, "_dmmethod") == 'asp'){
+				if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp') && GetFormData($f, $s, "_dmmethod") == 'asp'){
 					$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 					$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
 					QuickUpdate("delete from specialtaskqueue where customerid = " . $currentid, $aspsharddb);
