@@ -73,7 +73,7 @@ startWindow('Reply Info', 'padding: 3px;');
 
 	</tr>
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Person ID</td>
+		<th align="right" class="windowRowHeader bottomBorder">ID#</td>
 		<td class="bottomBorder"><?=$responses[0] ? $responses[0] : "&nbsp" ?></td>
 	</tr>
 	<tr>
