@@ -528,11 +528,11 @@ switch($MESSAGETYPE)
 		<?
 		break;
 	case 'sms':
-		startWindow('Message Content ' . help('MessageSms_Message') );
+		startWindow('Message Content ' . help('MessageSms_MessageContent') );
 		?>
 			<table>
 				<tr>
-					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessageEmail_Body'); ?></th>
+					<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Body:<br><? print help('MessageSms_Body'); ?></th>
 					<td>
 						<? NewFormItem($form, $section,"body","textarea",60,NULL,'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"'); ?>
 					</td>
