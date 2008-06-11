@@ -109,7 +109,7 @@ startWindow("Confirmation &amp; Submit");
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Total people in list:</td>
-					<td class="bottomBorder" ><?= $renderedlist->total ?></td>
+					<td class="bottomBorder" ><span style="font-weight:bold; font-size: 120%;"><?= number_format($renderedlist->total) ?></span></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Start Date</td>
