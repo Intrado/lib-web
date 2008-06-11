@@ -155,7 +155,7 @@ startWindow("Call Me to Record");
 		</tr>
 
 <?
-		if($IS_COMMSUITE){
+		if($IS_COMMSUITE || getSystemSetting('_dmmethod') != "asp"){
 			?> <tr><td colspan=3 style="padding: 10px;">If dialing an outside line, please include the area code.</td><tr> <?
 		} else {
 			?> <tr><td colspan=3 style="padding: 10px;">Enter the 10-digit direct-dial phone number where you are currently located.</td><tr> <?
