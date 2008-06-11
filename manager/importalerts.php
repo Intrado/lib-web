@@ -39,7 +39,7 @@ $dow = array(1 => "su", 2=>"m", 3=>"tu", 4=>"w", 5=>"th", 6=>"f", 7=>"s");
 // DB Connection
 $custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s left join customer c on (s.id = c.shardid) where c.id = " . $customerid);
 $custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $customerid);
-
+$customername = QuickQuery("select value from setting where name = 'displayname'", $custdb);
 $import = QuickQueryRow("select id, name, description, lastrun, updatemethod, datamodifiedtime, alertoptions from import where id = " . $importid, true, $custdb);
 if($import['alertoptions']){
 	$importalert = sane_parsestr($import['alertoptions']);
@@ -126,7 +126,8 @@ if($reloadform){
 include_once("nav.inc.php");
 NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
 ?>
-<div>Import Alerts for <?=$import['name']?></div>
+<div>Customer: <?=$customername?></div>
+<div>Import Alerts for: <?=$import['name']?></div>
 <table>
 	<tr><td>Min Size:</td><td><? NewFormItem($f, $s, "minsize", "text", 10, 20)?></td></tr>
 	<tr><td>Max Size:</td><td><? NewFormItem($f, $s, "maxsize", "text", 10, 20)?></td></tr>
