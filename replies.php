@@ -217,7 +217,7 @@ while($row = DBGetRow($responses)){
 }
 
 $titles = array(
-					"0" => "ID",
+					"0" => "ID#",
 					"1" => "First Name",
 					"2" => "Last Name",
 					"3" => "Phone",
