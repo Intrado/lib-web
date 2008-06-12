@@ -195,4 +195,5 @@ startWindow("Labels" . help($hoverHelpLinkType));
 endWindow();
 buttons();
 EndForm();
+include("navbottom.inc.php");
 ?>
