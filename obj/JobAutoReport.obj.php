@@ -74,7 +74,7 @@ class JobAutoReport extends ReportGenerator{
 							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-			left join destlabel dl on (rc.sequence = dl.sequence)
+			left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)
 			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . ")
 			where 1 "
 			. $searchquery
