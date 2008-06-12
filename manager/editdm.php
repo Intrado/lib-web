@@ -78,7 +78,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 				error('Invalid Customer ID');
 			} else if (GetFormData($f, $s, "telco_inboundtoken") > GetFormData($f, $s, "delmech_resource_count")){
 				error('Number of inbound tokens cannot exceed the max number of resources');
-			} else if(GetFormData($f, $s, 'telco_calls_sec') && !ereg("^[0-9]+\.?[0-9]*$", GetFormData($f, $s, 'telco_calls_sec'))){
+			} else if(GetFormData($f, $s, 'telco_calls_sec') && !ereg("^[0-9]*\.?[0-9]*$", GetFormData($f, $s, 'telco_calls_sec'))){
 				error("Calls per second must be a positive number");
 			} else {
 				QuickUpdate("Begin");
