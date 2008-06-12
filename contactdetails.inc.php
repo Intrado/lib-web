@@ -377,7 +377,16 @@ foreach ($fieldmaps as $map) {
 			<th align="left">Destination</th>
 <?
 			foreach($jobtypes as $jobtype){
-				?><th><?=jobtype_info($jobtype)?></th><?
+?>
+				<th>
+<?
+					if($type=='sms' && $jobtype->issurvey)
+						echo "&nbsp;";
+					else
+						echo jobtype_info($jobtype);
+?>
+				</th>
+<?
 			}
 ?>
 		</tr>
@@ -412,10 +421,10 @@ foreach ($fieldmaps as $map) {
 ?>
 					<td align="center"  class="bottomBorder">
 <?
-						if($type != "sms" || ($type == "sms" && !$jobtype->issurvey)){
-							echo NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1, $FORMDISABLE);
-						} else {
+						if($type == "sms" && $jobtype->issurvey){
 							echo "&nbsp;";
+						} else {
+							echo NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1, $FORMDISABLE);
 						}
 ?>
 					</td>
