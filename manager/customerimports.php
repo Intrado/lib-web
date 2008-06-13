@@ -240,7 +240,8 @@ showTable($data, $titles, $formatters);
 </table>
 <div> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.<div>
 <div > All time stamps are in customer time. </div>
-<div>Red cells indicate import or file dates that are more than 3 days old</div>
+<div>If an import does not have an alert, their import and file date will display RED if they are older than 3 days.</div>
+<div>If an import has an alert, their import and file date will display RED based on the import alert.</div>
 
 <?
 date_default_timezone_set("US/Pacific");
