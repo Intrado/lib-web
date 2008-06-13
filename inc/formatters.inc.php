@@ -213,7 +213,11 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			$buttons[] = $usedelbtn;
 			break;
 		case "repeating":
-			$buttons = array($editrepeatingbtn,$runrepeatbtn,$deletebtn);
+			$buttons = array($editrepeatingbtn);
+			if(!getSystemSetting('disablerepeat')){
+				$buttons[] = $runrepeatbtn;
+			}
+			$buttons[] = $deletebtn;
 			break;
 		default:
 			if ($USER->authorize('createreport'))
