@@ -189,67 +189,67 @@
   </stems>
 
 	<paneskin>
-		<background color="#d4dde2" img="" />
-		<font name="Arial" size="8pt" color="#42646f" style="Normal" weight="Normal" decoration="none" />
+		<background color="#ffffff" img="" />
+		<font name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="none" />
 		<toc>
-			<background color="#f3f3f3" img="" />
+			<background color="#5c80ca" img="sidebar2.gif" />
 			<icons>
-				<book open="chr_book_op.gif" close="chr_book_clo.gif" />
-				<item  local="chr_page.gif" remote="chr_webpage.gif" />
+				<book open="wht_toc2.gif" close="wht_toc1.gif" />
+				<item  local="wht_toc3.gif" remote="wht_toc4.gif" />
 				<newbook open="" close="" />
 				<newitem  local="" remote="" />
 			</icons>
 			<fonts>
-				<normal name="Arial" size="8pt" color="#4e5a78" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Arial" size="8pt" color="#42646f" style="Normal" weight="Normal" decoration="underline" />
+				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
+				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
 			</fonts>
-			<activebackgroundcolor attr="#e4e4e4" />
+			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />
 			<indent attr="" />
 		</toc>
 		<index>
 			<form>
 				<fonts>
-					<title name="Arial" size="8pt" color="#42646f" style="Normal" weight="Normal" decoration="none" />
+					<title name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="none" />
 				</fonts>
 				<button normal="" hover="" />
 				<editwith value="20" />
 			</form>
-			<background color="#f3f3f3" img="" />
+			<background color="#5c80ca" img="sidebar2.gif" />
 			<fonts>
-				<normal name="Arial" size="8pt" color="#4e5a78" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Arial" size="8pt" color="#42646f" style="Normal" weight="Normal" decoration="underline" />
+				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
+				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
 				<empty name="" size="8pt" color="" style="" weight="" decoration="" />
 			</fonts>
-			<activebackgroundcolor attr="#e4e4e4" />
+			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />
 			<indent attr="" />
 		</index>
 		<fts>
 			<form>
 				<fonts>
-					<title name="Arial" size="8pt" color="#42646f" style="Normal" weight="Normal" decoration="none" />
+					<title name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="none" />
 				</fonts>
 				<button normal="" hover="" />
 				<editwith value="20" />
 			</form>
-			<background color="#f3f3f3" img="" />
+			<background color="#5c80ca" img="sidebar2.gif" />
 			<fonts>
-				<normal name="Arial" size="8pt" color="#4e5a78" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Arial" size="8pt" color="#42646f" style="Normal" weight="Normal" decoration="underline" />
-				<error name="Arial" size="8pt" color="#4e5a78" style="Normal" weight="Normal" decoration="none" />
+				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
+				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
+				<error name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
 			</fonts>
-			<activebackgroundcolor attr="#e4e4e4" />
+			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />
 			<indent attr="" />
 		</fts>
 		<glossary>
-			<background color="#f3f3f3" img="" />
+			<background color="#5c80ca" img="sidebar2.gif" />
 			<fonts>
-				<normal name="Arial" size="8pt" color="#4e5a78" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Arial" size="8pt" color="#42646f" style="Normal" weight="Normal" decoration="underline" />
+				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
+				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
 			</fonts>
-			<activebackgroundcolor attr="#e4e4e4" />
+			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />
 			<indent attr="" />
 		</glossary>

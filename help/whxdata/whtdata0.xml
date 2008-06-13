@@ -78,15 +78,17 @@
 <book name="The Admin Tab" >
   <item name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
   <item name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
-  <item name="Managing Systemwide Settings" url="the_admin_tab/managing_systemwide_settings.htm" />
-  <item name="Contact Settings" url="the_admin_tab/contact_settings.htm" />
-  <item name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
+  <item name="Settings" url="the_admin_tab/settings.htm" />
   <item name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
 </book>
 <book name="Contact Manager" >
   <item name="Contact Manager Overview" url="the_contact_manager/contact_manager_overview.htm" />
   <item name="Bulk Activation Code Management" url="the_contact_manager/bulk_activation_code_management.htm" />
   <item name="Generate an Individual Activation Code" url="the_contact_manager/generate_an_individual_activation_code.htm" />
+  <item name="Contact Manager Settings" url="the_contact_manager/contact_manager_settings.htm" />
+</book>
+<book name="Remote Telephony Appliance" >
+  <item name="Configuring a Hybrid System" url="remote_telephony_appliance/configuring_a_hybrid_system.htm" />
 </book>
 
 </tocdata>

@@ -16,15 +16,15 @@ body {margin:0;}
 <script language="javascript1.2" src="whmozemu.js"></script>
 <script language="javascript1.2" src="whtbar.js"></script>
 </head>
-<body marginheight="0"  marginwidth="0"  bgcolor="#315a85"     scroll="no">
+<body marginheight="0"  marginwidth="0"  bgcolor="#bbd5ea"    background="bar2.gif"  scroll="no">
 <script language="javascript1.2">
 <!--
 if (window.gbWhTBar)
 {
-	setButtonFont("avprev","Arial","8pt","#4e5a78","Normal","Normal","none");
-setButtonFont("avnext","Arial","8pt","#4e5a78","Normal","Normal","none");
-setButtonFont("synctoc","Arial","8pt","#4e5a78","Normal","Normal","none");
-setButtonFont("hide2","Arial","8pt","#4e5a78","Normal","Normal","none");
+	setButtonFont("avprev","Tahoma","8pt","Black","Normal","Normal","none");
+setButtonFont("avnext","Tahoma","8pt","Black","Normal","Normal","none");
+setButtonFont("synctoc","Tahoma","8pt","Black","Normal","Normal","none");
+setButtonFont("hide2","Tahoma","8pt","Black","Normal","Normal","none");
 
 	gsIPrev = "wht_prev.gif";
 	gsIPrevD = "wht_prev_g.gif";
@@ -32,13 +32,13 @@ setButtonFont("hide2","Arial","8pt","#4e5a78","Normal","Normal","none");
 	gsINextD = "wht_next_g.gif";
 	gsISync = "wht_sync.gif";
 	gsIHide = "wht_hide.gif";
-	setBackgroundcolor("#315a85");
+	setBackgroundcolor("#bbd5ea");
+	setBackground("bar2.gif");
 	
-	
-	addButton("avprev",BTN_TEXT|BTN_IMG,"","","","","",0,0,"chr_arrow_le_on.gif","","","chr_arrow_le_out.gif","","");
-addButton("avnext",BTN_TEXT|BTN_IMG,"","","","","",0,0,"chr_arrow_ri_on.gif","","","chr_arrow_ri_out.gif","","");
-addButton("synctoc",BTN_TEXT|BTN_IMG,"","","","","",0,0,"chr_sync.gif","","","","","");
-addButton("hide2",BTN_TEXT|BTN_IMG,"","","","","",0,0,"chr_hide.gif","","","","","");
+	addButton("avprev",BTN_TEXT|BTN_IMG,"","","","","",0,0,"","","","","","");
+addButton("avnext",BTN_TEXT|BTN_IMG,"","","","","",0,0,"","","","","","");
+addButton("synctoc",BTN_TEXT|BTN_IMG,"","","","","",0,0,"","","","","","");
+addButton("hide2",BTN_TEXT|BTN_IMG,"","","","","",0,0,"","","","","","");
 
 	addButton("blankblock");
 	writeStyle(true);

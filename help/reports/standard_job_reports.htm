@@ -15,17 +15,19 @@ if (navigator.appName !="Netscape")
 p.whs1 { font-weight:bold; }
 img_whs2 { border:none; width:400px; height:31px; float:none; border-style:none; }
 ol.whs3 { list-style:decimal; }
-img_whs4 { border:none; float:none; width:400px; height:135px; border-style:none; }
-img_whs5 { border:none; width:400px; height:162px; float:none; border-style:none; }
-img_whs6 { border:none; width:400px; height:321px; float:none; border-style:none; }
+img_whs4 { border:none; width:400px; height:127px; float:none; border-style:none; }
+img_whs5 { border:none; width:400px; height:121px; float:none; border-style:none; }
+img_whs6 { border:none; border-style:none; width:400px; height:304px; float:none; }
 p.whs7 { margin-left:40px; }
 img_whs8 { border:none; width:334px; height:297px; float:none; border-style:none; }
 p.whs9 { margin-left:0px; font-weight:bold; }
 p.whs10 { margin-left:0px; }
 p.whs11 { line-height:Normal; margin-left:80px; }
 p.whs12 { margin-left:80px; }
-div.whs13 { width:100%; }
-p.whs14 { font-size:xx-small; }
+ol.whs13 { list-style:disc; }
+ul.whs14 { list-style:disc; }
+div.whs15 { width:100%; }
+p.whs16 { font-size:xx-small; }
 -->
 </style><script type="text/javascript" language="JavaScript">
 <!--
@@ -34,7 +36,7 @@ if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
   var strNSS = "<style type='text/css'>";
   strNSS += "p.whs9 {margin-left:1pt; }";
   strNSS += "p.whs10 {margin-left:1pt; }";
-  strNSS += "p.whs14 {font-size:x-small; }";
+  strNSS += "p.whs16 {font-size:x-small; }";
   strNSS +="</style>";
   document.write(strNSS);
 }
@@ -139,12 +141,12 @@ else
 	<li class=p><p>Click on the Reports tab. You will be taken to the Report 
  Builder as shown below.</p></li>
 </ol>
-<p><img src="../reportbuilder.gif" x-maintain-ratio="TRUE" width="400px" height="135px" border="0" class="img_whs4"></p>
+<p><img src="../reportbuilder.gif" x-maintain-ratio="TRUE" alt="The Report Builder page." width="400px" height="127px" border="0" class="img_whs4"></p>
 <ol start="2" type="1" class="whs3">
 	<li class=p><p>Click on the Notification Summary link to access the 
  Notification Summary screen as shown below.</p></li>
 </ol>
-<p><img src="../reportnotificationsummary.gif" alt="Accessing the Notification Summary of an Archived Job" x-maintain-ratio="TRUE" width="400px" height="162px" border="0" class="img_whs5"></p>
+<p><img src="../reportnotificationsummary.gif" alt="Accessing the Notification Summary of an Archived Job" x-maintain-ratio="TRUE" width="400px" height="121px" border="0" class="img_whs5"></p>
 <ol start="3" type="1" class="whs3">
 	<li class=p><p>Check the box labeled &quot;Show Archived Jobs&quot;</p></li>
 	<li class=p><p>Find the archived job in the list. You may search by 
@@ -155,7 +157,7 @@ else
 <p>The Notification Summary, shown below, is divided into four sections 
  designed to give you a quick overview of what happened with your job. 
  You may also find additional information by using the Related Links. </p>
-<p><img src="../reportsnotificationsumm.gif" alt="Notification Summary" x-maintain-ratio="TRUE" width="400px" height="321px" border="0" class="img_whs6"></p>
+<p><img src="../reportsnotificationsumm.gif" alt="Notification Summary" x-maintain-ratio="TRUE" width="400px" height="304px" border="0" class="img_whs6"></p>
 <p class="whs1"><span style="font-weight: bold;"><B>Related 
  Links</B></span></p>
 <p>The Related Links section contains links which are also relevant to 
@@ -206,10 +208,29 @@ else
  the phone.</p>
 <p class="whs11">Disconnect: This is 
  typically a number which has been disconnected.</p>
-<p class="whs12">Unknown: When a message is not delivered 
- successfully and the reason for the failure is not determined to be a 
- busy or unanswered phone, the call status is set to Unknown and the call 
- is retried.</p>
+<p class="whs12">Unknown: Unknown most commonly results from 
+ the system encountering one of the following circumstances:</p>
+<ol type="disc" class="whs13">
+	<ul type="disc" class="whs14">
+		<li class=p><p class="whs12">The system attempted 
+ to deliver a message to a full voice mail.</p></li>
+		<li class=p><p class="whs12">The number dialed was 
+ answered by an automated attendant message that was requesting some sort 
+ of interaction.</p></li>
+		<li class=p><p class="whs12">The call was answered 
+ by an answering machine with a greeting message which was longer than 
+ 45 seconds. </p></li>
+		<li class=p><p class="whs12">The recipient hung up 
+ before the message started playing.</p></li>
+		<li class=p><p class="whs12">The local phone company 
+ switch rejected the call.</p></li>
+		<li class=p><p class="whs12">The local phone company 
+ switch was unable to connect the call within 45 seconds.</p></li>
+		<li class=p><p class="whs12">The number is disconnected, 
+ but the local phone company doesn't return standard digital disconnect 
+ indicator codes.</p></li>
+	</ul>
+</ol>
 <p class="whs11">Duplicate: The number 
  of recipients with duplicate phone numbers, such as siblings in different 
  grades. Unchecking the &quot;Skip duplicate phone numbers&quot; box when 
@@ -231,8 +252,8 @@ else
  them yet, the job's scheduled time ran out before they could be processed, 
  or the job was cancelled.</p>
 <p>&nbsp;</p>
-<div placeholder id="footer" class="whs13">
- <p class="whs14"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©2007 
+<div placeholder id="footer" class="whs15">
+ <p class="whs16"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©2007 
  Reliance Communications, Inc.</font></span></p>
 </div>
 <script type="text/javascript" language="JavaScript">

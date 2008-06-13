@@ -14,7 +14,7 @@ if (navigator.appName !="Netscape")
 <!--
 div.whs1 { width:100%; }
 img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
-img_whs3 { border:none; width:400px; height:278px; float:none; border-style:none; }
+img_whs3 { border:none; border-style:none; width:400px; height:224px; float:none; }
 ol.whs4 { list-style:decimal; }
 p.whs5 { margin-left:80px; }
 p.whs6 { margin-left:0px; }
@@ -82,8 +82,7 @@ if (window.gbWhTopic)
 {
 	if (window.addTocInfo)
 	{
-	addTocInfo("The Admin Tab\nThe Metadata Manager");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	}
 	if (window.writeBtnStyle)
@@ -94,10 +93,7 @@ addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	if(1)
 	{
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../schoolmessenger_help.htm", "", ">", "Home", "../getting_started/getting_started.htm");
-document.write("<a href=\"managing_access_profiles.htm\">The Admin Tab</a> > The Metadata Manager</p>");
-
+	
 	}
 
 	if (window.setRelStartPage)
@@ -134,7 +130,7 @@ else
  Metadata tab. After defining the fields in the Metadata Manager, you will 
  need to create a data import in the <a title="Click to learn more about the Task Editor." href="the_import_manager.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about the Task Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Import Manager</a> in order to populate 
  the data. &nbsp;</p>
-<p><img src="../metadatamanager.gif" alt="The Metadata Manager Page" x-maintain-ratio="TRUE" width="400px" height="278px" border="0" class="img_whs3"></p>
+<p><img src="../metadatamanager.gif" alt="The Metadata Manager Page" x-maintain-ratio="TRUE" width="400px" height="224px" border="0" class="img_whs3"></p>
 <p>By default, your system will contain First Name, Last Name, and Language 
  metadata as shown in the image above. These fields cannot be deleted or 
  edited in any way.</p>
@@ -189,9 +185,6 @@ if (window.writeIntopicBar)
 	writeIntopicBar(0);
 if(0)
 {
-document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../schoolmessenger_help.htm", "", ">", "Home", "../getting_started/getting_started.htm");
-document.write("<a href=\"managing_access_profiles.htm\">The Admin Tab</a> > The Metadata Manager</p>");
 
 }
 //-->

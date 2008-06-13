@@ -39,6 +39,8 @@
 <topic name="Remote Telephone Access Overview" url="remote_telephone_access/remote_telephone_access_overview.htm" />
 <topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
 <topic name="Remotely Create a Single Language Job" url="remote_telephone_access/remotely_create_a_single_language_job.htm" />
+<topic name="Configuring a Hybrid System" url="remote_telephony_appliance/configuring_a_hybrid_system.htm" />
+<topic name="Remote Telephony Appliance Overview" url="remote_telephony_appliance/remote_telephony_appliance_overview.htm" />
 <topic name="Call Distribution Report" url="reports/call_distribution_report.htm" />
 <topic name="Contact History Report" url="reports/contact_history_report.htm" />
 <topic name="Using the Report Builder" url="reports/querying_report_data.htm" />
@@ -57,10 +59,12 @@
 <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
 <topic name="Managing Systemwide Settings" url="the_admin_tab/managing_systemwide_settings.htm" />
 <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
+<topic name="Settings" url="the_admin_tab/settings.htm" />
 <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
 <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
 <topic name="Bulk Activation Code Management" url="the_contact_manager/bulk_activation_code_management.htm" />
 <topic name="Contact Manager Overview" url="the_contact_manager/contact_manager_overview.htm" />
+<topic name="Contact Manager Settings" url="the_contact_manager/contact_manager_settings.htm" />
 <topic name="Generate an Individual Activation Code" url="the_contact_manager/generate_an_individual_activation_code.htm" />
 <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
 <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />

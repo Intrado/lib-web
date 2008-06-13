@@ -14,7 +14,7 @@ if (navigator.appName !="Netscape")
 <!--
 div.whs1 { width:100%; }
 img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
-img_whs3 { border:none; border-style:none; width:400px; height:322px; float:none; }
+img_whs3 { border:none; border-style:none; float:none; width:400px; height:363px; }
 p.whs4 { font-weight:bold; }
 p.whs5 { margin-left:40px; }
 p.whs6 { margin-left:0px; font-weight:bold; }
@@ -66,8 +66,7 @@ if (window.gbWhTopic)
 {
 	if (window.addTocInfo)
 	{
-	addTocInfo("The Admin Tab\nManaging Systemwide Settings");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	}
 	if (window.writeBtnStyle)
@@ -78,10 +77,7 @@ addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	if(1)
 	{
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../schoolmessenger_help.htm", "", ">", "Home", "../getting_started/getting_started.htm");
-document.write("<a href=\"managing_access_profiles.htm\">The Admin Tab</a> > Managing Systemwide Settings</p>");
-
+	
 	}
 
 	if (window.setRelStartPage)
@@ -110,7 +106,7 @@ else
  certain global system options explained below. After you have adjusted 
  the Global System Settings, click the Save button at the top or bottom 
  of the screen to save your changes.</p>
-<p><img src="../globalsystemsettings.gif" alt="Systemwide Settings Screen" x-maintain-ratio="TRUE" width="400px" height="322px" border="0" class="img_whs3"></p>
+<p><img src="../globalsystemsettings.gif" alt="Systemwide Settings Screen" x-maintain-ratio="TRUE" width="400px" height="363px" border="0" class="img_whs3"></p>
 <p class="whs4">Customer Info:</p>
 <p class="whs5">Customer Display Name - Enter the name that 
  you would like to appear at the top of each page.</p>
@@ -119,6 +115,9 @@ else
 <p class="whs5">Systemwide Alert Message - Text entered here 
  will appear as an alert message for all users in the system. The alert 
  message appears as black text in a red box on every page.</p>
+<p class="whs5">Email Domain - Entering an email domain here 
+ will prevent users from sending emails with a different &quot;From&quot; 
+ address.</p>
 <p class="whs5">&nbsp;</p>
 <p class="whs6">Display Defaults:</p>
 <p class="whs5">Color Theme - Use the dropdown menu to select 
@@ -198,9 +197,6 @@ if (window.writeIntopicBar)
 	writeIntopicBar(0);
 if(0)
 {
-document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../schoolmessenger_help.htm", "", ">", "Home", "../getting_started/getting_started.htm");
-document.write("<a href=\"managing_access_profiles.htm\">The Admin Tab</a> > Managing Systemwide Settings</p>");
 
 }
 //-->
