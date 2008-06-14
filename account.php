@@ -352,7 +352,7 @@ startWindow('User Information');
 							</tr>
 
 							<tr>
-								<td>Days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
+								<td>Days to run <?= help('Account_NumDays', NULL, "small"); ?></td>
 								<td>
 								<?
 								NewFormItem($f, $s, 'maxjobdays', "selectstart");
