@@ -12,27 +12,28 @@ if (navigator.appName !="Netscape")
 </script>
 <style type="text/css">
 <!--
-img_whs1 { border:none; width:20px; height:20px; float:none; border-style:none; }
-p.whs2 { font-weight:bold; }
-ol.whs3 { list-style:decimal; }
-img_whs4 { border:none; border-style:none; width:400px; height:104px; float:none; }
-p.whs5 { margin-left:40px; }
-img_whs6 { border:none; border-style:none; width:400px; height:131px; float:none; }
-p.whs7 { margin-left:80px; }
-p.whs8 { margin-left:0px; font-weight:bold; }
-p.whs9 { margin-left:0px; font-weight:normal; }
-img_whs10 { border:none; border-style:none; width:400px; height:224px; float:none; }
-ul.whs11 { list-style:disc; }
-p.whs12 { margin-left:0px; }
+div.whs1 { width:100%; }
+img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
+p.whs3 { font-weight:bold; }
+ol.whs4 { list-style:decimal; }
+img_whs5 { border:none; width:400px; height:104px; float:none; border-style:none; }
+p.whs6 { margin-left:40px; }
+img_whs7 { border:none; width:400px; height:131px; float:none; border-style:none; }
+p.whs8 { margin-left:80px; }
+p.whs9 { margin-left:0px; font-weight:bold; }
+p.whs10 { margin-left:0px; font-weight:normal; }
+img_whs11 { border:none; width:400px; height:224px; float:none; border-style:none; }
+ul.whs12 { list-style:disc; }
+p.whs13 { margin-left:0px; }
 -->
 </style><script type="text/javascript" language="JavaScript">
 <!--
 if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
 {
   var strNSS = "<style type='text/css'>";
-  strNSS += "p.whs8 {margin-left:1pt; }";
   strNSS += "p.whs9 {margin-left:1pt; }";
-  strNSS += "p.whs12 {margin-left:1pt; }";
+  strNSS += "p.whs10 {margin-left:1pt; }";
+  strNSS += "p.whs13 {margin-left:1pt; }";
   strNSS +="</style>";
   document.write(strNSS);
 }
@@ -121,22 +122,25 @@ else
 
 //-->
 </script>
+<div placeholder id="header" class="whs1">
+ <p><a href="javascript:top.window.close()">Exit Help</a></p>
+</div>
 <h1>The Import Manager</h1>
-<p><span style="font-weight: bold;"><B><img src="../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> 
+<p><span style="font-weight: bold;"><B><img src="../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs2"> Important:</B></span><span style="font-style: italic;"><I> 
  Modifying data field definitions after users have begun using your system 
  can cause unexpected results. Please contact support services for assistance 
  before modifying your field definitions. Call 800-920-3897.</I></span></p>
-<p><span style="font-weight: bold;"><B><img src="../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> 
+<p><span style="font-weight: bold;"><B><img src="../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs2"> Important:</B></span><span style="font-style: italic;"><I> 
  Only those features that you have been granted access to will display. 
  For access to additional features contact your system administrator.</I></span></p>
 <p>The Import Manager is a powerful tool which allows you to configure 
  new data imports for the system. This page can be accessed by clicking 
  the Admin tab followed by the Imports tab. </p>
 <p>Before you configure a new data import, you should assign fields for 
- all of the custom metadata you plan to include using the <a title="Click to learn more about the Metadata Manager." href="the_metadata_manager.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about the Metadata Manager.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Metadata Manager</a>.</p>
-<p class="whs2">Creating a New Data Import</p>
+ all of the custom metadata you plan to include using the <a title="Click to learn more about the Metadata Manager." href="settings.htm#Field_Definitions" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about the Metadata Manager.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Metadata Manager</a>.</p>
+<p class="whs3">Creating a New Data Import</p>
 <p>There are three basic steps to setting up a new data import in the system.</p>
-<ol type="1" class="whs3">
+<ol type="1" class="whs4">
 	<li class=p><p>Create a CSV (Comma Separated Value) file of the data 
  to be imported and upload the file to the system's server.</p></li>
 	<li class=p><p>Add a new import to the Import Manager and schedule 
@@ -146,141 +150,141 @@ else
 <p>Each of these steps contain several configuration options that you will 
  need to use in order to successfully import your data. The following sections 
  will explain these options, screen by screen, in detail.</p>
-<p class="whs2">The Import Manager Screen</p>
-<p class="whs2"><span style="font-weight: normal;">The Import 
+<p class="whs3">The Import Manager Screen</p>
+<p class="whs3"><span style="font-weight: normal;">The Import 
  Manager screen shown in the image below, contains a list of data imports 
  that are currently saved in the system. It also serves as the starting 
  point for adding new data imports to the system. </span></p>
-<p><img src="../dataimportmanager.gif" alt="The Data Import Manager" x-maintain-ratio="TRUE" width="400px" height="104px" border="0" class="img_whs4"></p>
+<p><img src="../dataimportmanager.gif" alt="The Data Import Manager" x-maintain-ratio="TRUE" width="400px" height="104px" border="0" class="img_whs5"></p>
 <p>The various parts of the Import Manager screen are as follows:</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Add New 
+<p class="whs6"><span style="font-weight: bold;"><B>Add New 
  Import</B></span> - Click this button to begin adding a new import to the 
  system. You will be taken to the Import Editor screen where you can configure 
  the new import.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Name</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Name</B></span> 
  - This is the name that was assigned to the import in the Import Editor.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Description</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Description</B></span> 
  - This is the description that was assigned to the import in the Import 
  Editor.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Type</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Type</B></span> 
  - This is the type of data import that has been assigned in the Import 
  Editor. </p>
-<p class="whs5"><span style="font-weight: bold;"><B>Upload Key</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Upload Key</B></span> 
  - This is the unique import item identifier that is used with the SchoolMessenger 
  upload utility program.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Status</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Status</B></span> 
  - This shows whether the import is running, idle, or if there was an error.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Last Run 
+<p class="whs6"><span style="font-weight: bold;"><B>Last Run 
  - </B></span><span>The date of the last time this import was run.</span></p>
-<p class="whs5"><span style="font-weight: bold;"><B>File Date</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>File Date</B></span> 
  - This is the date of the last file upload.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Upload</B></span><span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Upload</B></span><span> 
  - Allows you to manually browse your computer for a CSV file to upload.</span></p>
-<p class="whs5"><span style="font-weight: bold;"><B>Run Now</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Run Now</B></span> 
  - Click Run Now to import the uploaded data into the database.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Edit</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Edit</B></span> 
  - This will take you to the Import Editor screen where you can rename 
  or reschedule the import.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Map Fields</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Map Fields</B></span> 
  - This link will take you to the Import Field Mapping screen where you 
  can assign fields to the data you are importing.</p>
-<p class="whs5">&nbsp;</p>
-<p class="whs2">The Import Editor Screen</p>
-<p class="whs2"><span style="font-weight: normal;">The Import 
+<p class="whs6">&nbsp;</p>
+<p class="whs3">The Import Editor Screen</p>
+<p class="whs3"><span style="font-weight: normal;">The Import 
  Editor screen, shown in the image below, is used to configure data imports.</span></p>
-<p><img src="../importeditor.gif" alt="The Import Editor" x-maintain-ratio="TRUE" width="400px" height="131px" border="0" class="img_whs6"></p>
+<p><img src="../importeditor.gif" alt="The Import Editor" x-maintain-ratio="TRUE" width="400px" height="131px" border="0" class="img_whs7"></p>
 <p>There are a few parts to the Import Editor. The first part is the Settings 
  area which contains:</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Name</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Name</B></span> 
  - Enter the name for the import here.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Description</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Description</B></span> 
  - Enter a description of the type of data being imported here.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Update Method</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Update Method</B></span> 
  - There are three possible values in this menu.</p>
-<p class="whs7"><span style="font-weight: bold;"><B>Update only</B></span> 
+<p class="whs8"><span style="font-weight: bold;"><B>Update only</B></span> 
  - This will update existing information for people already in the system's 
  database. If there are new people in the import or people missing from 
  the import, they will not be added or removed from the system's database. 
  Nothing new is created and only existing information is updated.</p>
-<p class="whs7"><span style="font-weight: bold;"><B>Update</B></span> 
+<p class="whs8"><span style="font-weight: bold;"><B>Update</B></span> 
  <span style="font-weight: bold;"><B>&amp; create</B></span> - This will update 
  existing information for people already in the system's database and add 
  any new people from your import to the system's database. If people are 
  not in your import, but exist in the system's database, they will not 
  be deleted.</p>
-<p class="whs7"><span style="font-weight: bold;"><B>Update, 
+<p class="whs8"><span style="font-weight: bold;"><B>Update, 
  create, delete</B></span> -This will completely synchronize the database with 
  the data in your import. If there are people in the system's database 
  who are not in the import's CSV file when the import is run, they will 
  be deleted from the database. If there are new people in the most recent 
  import they will be added to the system's database.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Skip Header 
+<p class="whs6"><span style="font-weight: bold;"><B>Skip Header 
  Lines</B></span><span> - Specify the number of records at the top of your 
  import file to be skipped.</span></p>
-<p class="whs5"><span style="font-weight: bold;"><B>Automated 
+<p class="whs6"><span style="font-weight: bold;"><B>Automated 
  Upload</B></span> - Check this box if you use the SchoolMessenger upload utility 
  and would like the data to be automatically imported into the system's 
  database when the latest CSV file is uploaded.</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Associated 
+<p class="whs6"><span style="font-weight: bold;"><B>Associated 
  Jobs</B></span> - Select any repeating jobs that you wish to have triggered 
  after the data has finished being imported into the system's database.</p>
-<p class="whs8">The Import Field Mapping 
- Screen</p>
 <p class="whs9">The Import Field Mapping 
+ Screen</p>
+<p class="whs10">The Import Field Mapping 
  screen allows you to map the data from your data import to the corresponding 
  fields in the system's database. After uploading a CSV file, you will 
  be directed to the Import Field Mapping page, shown below. </p>
-<p class="whs9"><img src="../importfieldmapping.gif" alt="Import Field Mapping" x-maintain-ratio="TRUE" width="400px" height="224px" border="0" class="img_whs10"></p>
-<p class="whs9">To map the data from 
+<p class="whs10"><img src="../importfieldmapping.gif" alt="Import Field Mapping" x-maintain-ratio="TRUE" width="400px" height="224px" border="0" class="img_whs11"></p>
+<p class="whs10">To map the data from 
  your data import to the fields in the system:</p>
-<ol type="1" class="whs3">
-	<li style=" font-weight: normal; " class=p><p class="whs9">Select 
+<ol type="1" class="whs4">
+	<li style=" font-weight: normal; " class=p><p class="whs10">Select 
  the field to map, for example &quot;School&quot;, from the drop down menu. 
  </p></li>
-	<li style=" font-weight: normal; " class=p><p class="whs9">Specify 
+	<li style=" font-weight: normal; " class=p><p class="whs10">Specify 
  the appropriate translator for the data type that you are importing and 
  enter the import format from the source data file in the Translator options 
  field. For example, if your data includes the date in YYYY/MM/DD format, 
  specify this in the options for the Date translator which can then transform 
  the data into MM/DD/YYYY format, which is the format the system requires.</p></li>
-	<li style=" font-weight: normal; " class=p><p class="whs9">Select 
+	<li style=" font-weight: normal; " class=p><p class="whs10">Select 
  the field in the CSV corresponding to the field you selected in the first 
  column. You will see an automatic preview of the data in that column to 
  confirm your selection. </p></li>
-	<li style=" font-weight: normal; " class=p><p class="whs9">If 
+	<li style=" font-weight: normal; " class=p><p class="whs10">If 
  the data looks correct, click the Add button to proceed to the next field. 
  </p></li>
-	<li style=" font-weight: normal; " class=p><p class="whs9">After 
+	<li style=" font-weight: normal; " class=p><p class="whs10">After 
  all of the data fields have been mapped, click the Submit button to save 
  your changes. </p></li>
 </ol>
-<p class="whs9">Your settings will be 
+<p class="whs10">Your settings will be 
  saved for future imports and only need to be changed if your source file 
  layout changes.</p>
-<p class="whs8">Translator Types</p>
-<ul type="disc" class="whs11">
-	<li class=p><p class="whs9">Copy 
+<p class="whs9">Translator Types</p>
+<ul type="disc" class="whs12">
+	<li class=p><p class="whs10">Copy 
  - Maps the exact value from the import file into the database without 
  modifying the data. </p></li>
-	<li class=p><p class="whs9">Static 
+	<li class=p><p class="whs10">Static 
  Value - Maps the specified value into the database for every contact record. 
  For example, you may want to specify a contact type &quot;Student&quot; 
  for all student records.</p></li>
-	<li class=p><p class="whs9">Current 
+	<li class=p><p class="whs10">Current 
  Date - Automatically inserts the current date for every record.</p></li>
-	<li class=p><p class="whs9">Currency 
+	<li class=p><p class="whs10">Currency 
  - Automatically converts numbers into standard currency format. For example 
  $05.27 would be converted into $5.27.</p></li>
-	<li class=p><p class="whs9">Date 
+	<li class=p><p class="whs10">Date 
  - Converts common date formats into MM/DD/YYYY format.</p></li>
-	<li class=p><p class="whs9">Data 
+	<li class=p><p class="whs10">Data 
  Lookup - Maps specific input values to specified output values. For example, 
  converting school numeric codes into descriptions such as 027=Springfield 
  HS.</p></li>
 </ul>
-<p class="whs8">Important Considerations 
+<p class="whs9">Important Considerations 
  When Mapping Your Data</p>
-<p class="whs5"><span style="font-weight: bold;"><B>Unique ID</B></span> 
+<p class="whs6"><span style="font-weight: bold;"><B>Unique ID</B></span> 
  - Each person that is imported must be associated with a unique non-changing 
  ID number to be viewed as a potential recipient by the system. When importing 
  students, use the student ID as the Unique ID. If there are members of 
@@ -288,8 +292,8 @@ else
  be used as their Unique IDs. <span style="font-weight: bold;"><B>Note:</B></span> 
  <span style="font-style: italic;"><I>Every ID must be unique in the system. 
  For example, all staff IDs must be different from student IDs.</I></span></p>
-<p class="whs5">&nbsp;</p>
-<p class="whs12">&nbsp;</p>
+<p class="whs6">&nbsp;</p>
+<p class="whs13">&nbsp;</p>
 <p>&nbsp;</p>
 <script type="text/javascript" language="JavaScript">
 <!--
