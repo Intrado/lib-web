@@ -42,6 +42,7 @@ class JobAutoReport extends ReportGenerator{
 			coalesce(m.name, sq.name) as messagename,
 			coalesce(rc.phone,
 						rc.email,
+						rc.sms,
 						concat(
 							coalesce(rc.addr1,''), ' ',
 							coalesce(rc.addr2,''), ' ',
