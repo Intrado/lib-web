@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <fts>
 <chunkinfo url="whfwdata0.xml" first="!" last="both"/>
-<chunkinfo url="whfwdata1.xml" first="bottom" last="digital"/>
-<chunkinfo url="whfwdata2.xml" first="direct" last="graphical"/>
-<chunkinfo url="whfwdata3.xml" first="great" last="management"/>
-<chunkinfo url="whfwdata4.xml" first="manager'" last="preparednes"/>
-<chunkinfo url="whfwdata5.xml" first="pres" last="should"/>
-<chunkinfo url="whfwdata6.xml" first="show" last="valid"/>
-<chunkinfo url="whfwdata7.xml" first="valu" last="–"/>
+<chunkinfo url="whfwdata1.xml" first="bottom" last="disabl"/>
+<chunkinfo url="whfwdata2.xml" first="disappointment" last="grey"/>
+<chunkinfo url="whfwdata3.xml" first="group" last="mary"/>
+<chunkinfo url="whfwdata4.xml" first="match" last="pric"/>
+<chunkinfo url="whfwdata5.xml" first="primary" last="sign"/>
+<chunkinfo url="whfwdata6.xml" first="significanc" last="version"/>
+<chunkinfo url="whfwdata7.xml" first="versu" last="–"/>
 
 <tchunkinfo first="0" last="69" url="whftdata0.xml" />
 
