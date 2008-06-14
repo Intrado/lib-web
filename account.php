@@ -369,7 +369,7 @@ startWindow('User Information');
 							</tr>
 <? if ($USER->authorize('setcallerid')) { ?>
 							<tr>
-									<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
+									<td>Caller&nbsp;ID <?= help('Account_CallerID',NULL,"small"); ?></td>
 									<td><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
 							</tr>
 <? } ?>
