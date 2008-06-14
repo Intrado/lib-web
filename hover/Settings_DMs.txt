@@ -1,2 +1,2 @@
---Need Link--
+@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
 The Remote Telephony Appliance Manager allows you to view your active Remote Telephony Appliances as well as edit your call routes.

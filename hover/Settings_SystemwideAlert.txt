@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_systemwide_settings.htm
+@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Systemwide%20Alert%20Message
 Text entered here will appear as an alert message for all users in the system. The alert message appears as black text in a red box on every page.
