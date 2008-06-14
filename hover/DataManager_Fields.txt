@@ -1,2 +1,2 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Field_Definitions:
+@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Field_Definitions
 Create new fields in the system's database for your custom metadata here. Metadata includes information such as lunch balance, absent date, and school name.
