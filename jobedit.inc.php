@@ -945,8 +945,10 @@ include_once("navbottom.inc.php");
 	jobtypeinfo[""] = new Array("", "");
 <?
 	foreach($infojobtypes as $infojobtype){
+		$info = htmlentities($infojobtype->info);
+		$info = str_replace(array("\r\n","\n","\r"),"<br>",$info);
 ?>
-		jobtypeinfo[<?=$infojobtype->id?>] = new Array("<?=$infojobtype->systempriority?>", "<?=$infojobtype->info?>");
+		jobtypeinfo[<?=$infojobtype->id?>] = new Array("<?=$infojobtype->systempriority?>", "<?=$info?>");
 <?
 	}
 ?>
