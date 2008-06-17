@@ -31,7 +31,12 @@ include_once("../inc/html.inc.php");
 
 
 if(isset($_GET['dmid'])){
-	$_SESSION['dmid'] = $dmid = $_GET['dmid'];
+	$dmid = $_GET['dmid']+0;
+	if(!QuickQuery("select count(*) from dm where id = " . $dmid) || QuickQuery("select type from dm where id = " . $dmid) != "customer"){
+		echo "That is an invalid DM";
+		exit();
+	}
+	$_SESSION['dmid'] = $dmid;
 	redirect();
 } else {
 	$dmid = $_SESSION['dmid'];
