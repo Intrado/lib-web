@@ -22,6 +22,7 @@ CREATE TABLE `dmsetting` (
 PRIMARY KEY ( `dmuuid` , `name` )
 ) ENGINE = innodb;
 
+ALTER TABLE `dm` ADD `command` VARCHAR( 255 ) NULL ;
 ALTER TABLE `dm` DROP PRIMARY KEY ;
 ALTER TABLE `dm` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST ;
 ALTER TABLE `dm` ADD UNIQUE (`dmuuid`) ;
@@ -32,27 +33,6 @@ ALTER TABLE `dmsetting` ADD `dmid` INT NOT NULL FIRST;
 ALTER TABLE `dmsetting` ADD PRIMARY KEY ( `dmid` , `name` );
 
 -- for system dms
-CREATE TABLE `dmroute` (
-  `id` int(11) NOT NULL auto_increment,
-  `dmid` int(11) NOT NULL,
-  `match` varchar(20) NOT NULL,
-  `strip` int(11) NOT NULL,
-  `prefix` varchar(20) NOT NULL,
-  `suffix` varchar(20) NOT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `dmid` (`dmid`,`match`)
-) ENGINE=InnoDB ;
-
-ALTER TABLE `dm` ADD `command` VARCHAR( 255 ) NULL ;
-
-CREATE TABLE `dmcalleridroute` (
-  `id` int(11) NOT NULL auto_increment,
-  `dmid` int(11) NOT NULL,
-  `callerid` varchar(20) NOT NULL,
-  `prefix` varchar(20) NOT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `dmid` (`dmid`,`callerid`)
-) ENGINE=InnoDB ;
 
 ALTER TABLE `shard` ADD `isfull` TINYINT NOT NULL DEFAULT '0';
 
@@ -145,6 +125,11 @@ $$$
 
 ALTER TABLE `reportcontact` ADD `voicereplyid` INT(11) NULL ,
 ADD `response` TINYINT(4) NULL
+$$$
+
+delete from setting where name = '_dmmethod'
+$$$
+insert into setting (name, value) values ('_dmmethod', 'cs')
 $$$
 
 delimiter ;
