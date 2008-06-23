@@ -231,7 +231,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$deleteids = array_diff($oldids, $personids);
 			$addids = array_diff($personids, $oldids);
 
-			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "')";
+			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $list->id;
 			QuickUpdate($query);
 			if (count($addids) > 0) {
 				$query = "insert into listentry (listid, type, personid) values ($list->id,'A','" . implode("'),($list->id,'A','",$addids) . "')";
