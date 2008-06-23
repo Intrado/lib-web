@@ -211,6 +211,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 
 		$personids = array();
 		if ($fp = fopen($curfilename, "r")) {
+			$temppersonids = array();
 			while ($row = fgetcsv($fp,4096)) {
 				$pkey = DBSafe(trim($row[0]));
 				if ($pkey == "")
@@ -221,11 +222,14 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 					where p.pkey='$pkey' and not p.deleted $usersql
 				";
 
-				if ($personid = QuickQuery($query))
-					$personids[] = $personid;
+				if ($personid = QuickQuery($query)){
+					//use associative array to dedupe pids
+					$temppersonids[$personid] = 1;
+				}
 			}
 			fclose($fp);
-
+			//flip associative array
+			$personids = array_keys($temppersonids);
 
 			$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='A' and p.userid is null and le.listid=$list->id");
 			$deleteids = array_diff($oldids, $personids);
