@@ -1,12 +1,17 @@
 <?
 //////////////////////////////////////
 // migrate a customer into this shard database (could be from a commsuite or moving between shards)
-// Usage: php shard_migrate_customer.php <customer ID> <shard user> <shard pass>
+// Usage: php shard_migrate_customer.php <customer ID> <customerdata.sql> <shardhost> <shard user> <shard pass>
 //////////////////////////////////////
 
 include_once("relianceutils.php");
 
 $customerid = "";
+$customerdatafile = "";
+$shardhost = "";
+$dbuser = "";
+$dbpass = "";
+
 
 if (isset($argv[1])) {
 	$customerid = $argv[1];
@@ -15,10 +20,28 @@ if (isset($argv[1])) {
 	exit();
 }
 
-if(isset($argv[2])){
-	$dbuser = $argv[2];
+if (isset($argv[2])) {
+	$customerdatafile = $argv[2];
+	if (!file_exists($customerdatafile)) {
+		echo "file does not exist : ".$customerdatafile;
+		exit();
+	}
+} else {
+	echo "please provide the customer sql data file";
+	exit();
+}
+
+if (isset($argv[3])) {
+	$shardhost = $argv[3];
+} else {
+	echo "please provide the shard hostname or IP";
+	exit();
+}
+
+if(isset($argv[4])){
+	$dbuser = $argv[4];
 	$dbpass = "";
-	if (isset($argv[3])) $dbpass = $argv[3];
+	if (isset($argv[5])) $dbpass = $argv[5];
 } else {
 	$confirm = "n";
 	while($confirm != "y"){
@@ -33,7 +56,7 @@ if(isset($argv[2])){
 }
 
 echo "Connecting to mysql...\n";
-$custdb = mysql_connect("127.0.0.1", $dbuser, $dbpass)
+$custdb = mysql_connect($shardhost, $dbuser, $dbpass)
 	or die("Failed to connect to database");
 echo "connection ok\n";
 
@@ -76,7 +99,11 @@ foreach ($sqlqueries as $query) {
 //////////////////////////////////////
 // import data
 
-
+echo("import customer data\n");
+$sqlqueries = explode(";",file_get_contents($customerdatafile));
+foreach ($sqlqueries as $query) {
+	mysql_query($query,$custdb);
+}
 
 
 //////////////////////////////////////
@@ -109,6 +136,13 @@ mysql_query($query,$custdb)
 $query = "INSERT ignore INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) select id, ".$customerid.", daysofweek, time, nextrun, ".$timezone." from schedule";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
+
+// future job
+$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)" .
+         " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'scheduled', jobtypeid, thesql from job where status='scheduled'";
+mysql_query($query,$custdb)
+	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
+
 
 
 //////////////////////////////////////
