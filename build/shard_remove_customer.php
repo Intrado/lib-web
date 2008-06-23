@@ -1,12 +1,15 @@
 <?
 //////////////////////////////////////
 // cleanup all references to a customer from this shard
-// Usage: php shard_remove_customer.php <customer ID> <shard user> <shard pass>
+// Usage: php shard_remove_customer.php <customer ID> <shardhost> <shard user> <shard pass>
 //////////////////////////////////////
 
 include_once("relianceutils.php");
 
 $customerid = "";
+$shardhost = "";
+$dbuser = "";
+$dbpass = "";
 
 if (isset($argv[1])) {
 	$customerid = $argv[1];
@@ -15,10 +18,17 @@ if (isset($argv[1])) {
 	exit();
 }
 
-if(isset($argv[2])){
-	$dbuser = $argv[2];
+if (isset($argv[2])) {
+	$shardhost = $argv[2];
+} else {
+	echo "please provide the shard hostname or IP";
+	exit();
+}
+
+if(isset($argv[3])){
+	$dbuser = $argv[3];
 	$dbpass = "";
-	if (isset($argv[3])) $dbpass = $argv[3];
+	if (isset($argv[4])) $dbpass = $argv[4];
 } else {
 	$confirm = "n";
 	while($confirm != "y"){
@@ -33,7 +43,7 @@ if(isset($argv[2])){
 }
 
 echo "Connecting to mysql...\n";
-$sharddb = mysql_connect("127.0.0.1", $dbuser, $dbpass)
+$sharddb = mysql_connect($shardhost, $dbuser, $dbpass)
 	or die("Failed to connect to database");
 echo "connection ok\n";
 mysql_select_db("aspshard");
