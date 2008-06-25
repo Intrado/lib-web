@@ -1,3 +1,41 @@
+-- Delete Jobs older than given date
+-- Removes old job, jobsetting and joblanguage entries
+
+DELETE 	j,
+		js,
+		jl
+FROM	job j
+	LEFT JOIN jobsetting js on
+		j.id = js.jobid
+	LEFT JOIN joblanguage jl on
+		j.id = jl.jobid
+WHERE	j.enddate < '1970-01-01'
+AND		j.status in ('complete','canceled')
+
+$$$
+
+-- Delete report person entries not associated with a job
+
+DELETE	rp
+FROM	reportperson rp
+WHERE	not exists (
+		SELECT	*
+		FROM	job j
+		WHERE	j.id = rp.jobid)
+		
+$$$
+
+-- Remove reportcontact entries that are not associated with a job.
+
+DELETE 	rc
+FROM	reportcontact rc
+WHERE	not exists (
+		SELECT 	*
+		FROM	job j
+		WHERE	j.id = rc.jobid)
+
+$$$
+
 -- Messages for deletion
 -- Remove all messages that are deleted and not associated with any job.
 -- Remove message parts for deleted messages also
@@ -148,6 +186,28 @@ FROM	person p
 WHERE	p.lastimport < (now() - interval 6 month)
 and 	p.deleted
 
+$$$
+
+-- Delete Contactpref entries
+-- Remove contact preferences for people who don't exist
+
+DELETE	cp
+FROM	contactpref cp
+WHERE	not exists (
+		SELECT 	*
+		FROM	person p
+		WHERE	p.id = cp.personid)
+$$$
+
+-- Delete address entries
+-- Remove addresses for people who are no longer in the person table.
+
+DELETE	a
+FROM	address a
+WHERE	not exists (
+		SELECT 	*
+		FROM	person p
+		WHERE	p.id = a.personid)
 $$$
 
 -- Delete import fields
