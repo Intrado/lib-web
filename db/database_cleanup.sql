@@ -1,18 +1,70 @@
 -- Delete Jobs older than given date
--- Removes old job, jobsetting and joblanguage entries
+-- Removes old job entries
 
-DELETE 	j,
-		js,
-		jl
+DELETE 	j
 FROM	job j
-	LEFT JOIN jobsetting js on
-		j.id = js.jobid
-	LEFT JOIN joblanguage jl on
-		j.id = jl.jobid
-WHERE	j.enddate < '1970-01-01'
+WHERE	j.finishdate < '1970-01-01'
 AND		j.status in ('complete','canceled')
-
 $$$
+
+-- Delete joblanguage
+-- remove joblanguage without a job
+
+DELETE	jl
+FROM 	joblanguage jl
+WHERE	not exists (
+		SELECT *
+		FROM	job j
+		WHERE	j.id = jl.jobid
+	)
+$$$
+
+-- Delete jobsetting
+-- remove jobsetting without a job
+
+DELETE	js
+FROM 	jobsetting js
+WHERE	not exists (
+		SELECT *
+		FROM	job j
+		WHERE	j.id = js.jobid
+	)
+$$$
+
+-- Delete survey templates
+-- Remove survey templates not associated with a job and deleted.
+
+DELETE	sq
+FROM	surveyquestionnaire sq
+WHERE	sq.deleted
+AND		not exists (
+		SELECT 	*
+		FROM	job j
+		WHERE	j.questionnaireid = sq.id)
+$$$
+
+-- Delete surveyquestion entries
+-- Remove survey question records not associated with a survey questionnaire
+
+DELETE	s
+FROM	surveyquestion s
+WHERE	not exists (
+		SELECT	*
+		FROM	surveyquestionnaire sq
+		WHERE	sq.id = s.questionnaireid)
+$$$
+
+-- Delete surveyresponse 
+-- Remove survey responses for jobs that don't exist
+
+DELETE	sr
+FROM	surveyresponse sr
+WHERE	not exists (
+		SELECT	*
+		FROM	job j
+		WHERE	j.id = sr.jobid)
+$$$
+
 
 -- Delete report person entries not associated with a job
 
@@ -21,8 +73,7 @@ FROM	reportperson rp
 WHERE	not exists (
 		SELECT	*
 		FROM	job j
-		WHERE	j.id = rp.jobid)
-		
+		WHERE	j.id = rp.jobid)	
 $$$
 
 -- Remove reportcontact entries that are not associated with a job.
@@ -36,30 +87,39 @@ WHERE	not exists (
 
 $$$
 
--- Messages for deletion
+-- Delete Messages
 -- Remove all messages that are deleted and not associated with any job.
 -- Remove message parts for deleted messages also
 
-DELETE	m,
-	mp
+DELETE	m
 FROM	message m
-	LEFT JOIN messagepart mp on
-		(m.id = mp.messageid)
 WHERE	m.deleted
-and		not exists (
+AND		not exists (
 		SELECT 	*
 		FROM 	job j
 		WHERE	j.phonemessageid = m.id or
-			j.emailmessageid = m.id or
-			j.printmessageid = m.id or
-			j.smsmessageid = m.id
-	)
-and		not exists (
+				j.emailmessageid = m.id or
+				j.printmessageid = m.id or
+				j.smsmessageid = m.id)
+AND		not exists (
 		SELECT 	*
 		FROM 	joblanguage jl
-		WHERE	jl.messageid = m.id
-	)
+		WHERE	jl.messageid = m.id)
+AND		not exists (
+		SELECT	*
+		FROM	surveyquestion sq
+		WHERE	sq.phonemessageid = m.id)
+$$$
 
+-- Delete message parts
+-- Remove messageparts that are not associated with a message
+
+DELETE	mp
+FROM	messagepart mp
+WHERE	not exists (
+		SELECT	*
+		FROM	message m
+		WHERE 	m.id = mp.messageid)
 $$$
 
 -- Audiofiles for deletion
@@ -199,6 +259,28 @@ WHERE	not exists (
 		WHERE	p.id = cp.personid)
 $$$
 
+-- Delete portalpersontokens
+-- Remove portal tokens for persons that don't exist
+
+DELETE	ppt
+FROM	portalpersontoken ppt
+WHERE	not exists (
+		SELECT	*
+		FROM	person p
+		WHERE	p.id = ppt.personid)
+$$$
+
+-- Delete portalpersons
+-- Remove portal person records for persons that don't exist
+
+DELETE	pp
+FROM	portalperson pp
+WHERE	not exists (
+		SELECT	*
+		FROM	person p
+		WHERE	p.id = pp.personid)
+$$$
+
 -- Delete address entries
 -- Remove addresses for people who are no longer in the person table.
 
@@ -258,32 +340,6 @@ WHERE	not exists (
 	)
 $$$
 
--- Delete joblanguage
--- remove joblanguage without a job
-
-DELETE	jl
-FROM 	joblanguage jl
-WHERE	not exists (
-		SELECT *
-		FROM	job j
-		WHERE	j.id = jl.jobid
-	)
-$$$
-
-
--- Delete jobsetting
--- remove jobsetting without a job
-
-DELETE	js
-FROM 	jobsetting js
-WHERE	not exists (
-		SELECT *
-		FROM	job j
-		WHERE	j.id = js.jobid
-	)
-$$$
-
-
 -- Delete rule
 -- remove rules without a userrule or listentry
 
@@ -321,8 +377,12 @@ and		not exists (
 $$$
 
 
--- delete specialtask
-delete from specialtask where status='done'
+-- Delete specialtask
+-- Remove completed special tasks
+
+DELETE	st
+FROM	specialtask st
+WHERE	status = 'done'
 $$$
 
 
