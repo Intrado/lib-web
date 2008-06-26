@@ -211,27 +211,21 @@ class Message extends DBMappedObject {
 		$voices = DBFindMany("Voice", "from ttsvoice");
 		$currvoiceid=null;
 		foreach ($parts as $part) {
+			if($currvoiceid == null){
+				$currvoiceid = $part->voiceid;
+			} else if($part->voiceid != $currvoiceid){
+				$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
+				$currvoiceid = $part->voiceid;
+			}
 			switch ($part->type) {
 			case 'A':
 				$part->audiofile = new AudioFile($part->audiofileid);
 				$data .= "{{" . $part->audiofile->name . "}}";
 				break;
 			case 'T':
-				if($currvoiceid == null){
-					$currvoiceid = $part->voiceid;
-				} else if($part->voiceid != $currvoiceid){
-					$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
-					$currvoiceid = $part->voiceid;
-				}
 				$data .= $part->txt;
 				break;
 			case 'V':
-				if($currvoiceid == null){
-					$currvoiceid = $part->voiceid;
-				} else if($part->voiceid != $currvoiceid){
-					$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
-					$currvoiceid = $part->voiceid;
-				}
 				$data .= "<<" . $map[$part->fieldnum];
 
 				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
