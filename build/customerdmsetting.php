@@ -54,7 +54,6 @@ while ($row=mysql_fetch_row($res)) {
 }
 $dmselect = generalMenu(array("Please select the DM to manage"), $dmrow);
 $dmid = mysql_result($res, $dmselect-1, 0);
-$dmidsafe = mysql_real_escape_string($dmid, $authdb);
 $dmname = mysql_result($res, $dmselect-1, 1);
 
 
@@ -63,37 +62,41 @@ $dmname = mysql_result($res, $dmselect-1, 1);
 
 printSettings();
 
-$action = generalMenu(array("What action would you like to perform?", "q=quit, e=edit, a=auth, u=unauth, r=reset"), array("q", "e", "a", "u", "r"));
+$action = "";
+while ($action != "q") {
+	$action = generalMenu(array("What action would you like to perform?", "q=quit, e=edit, a=auth, u=unauth, p=print, r=reset"), array("q", "e", "a", "u", "p", "r"));
+	// edit
+	if ($action == "e") {
+		editSettings();
+	}
+	// authorize
+	if ($action == "a") {
+		authorize();
+	}
+	// unauthorize
+	if ($action == "u") {
+		unauthorize();
+	}
+	// print
+	if ($action == "p") {
+		printSettings();
+	}
+	// reset
+	if ($action == "r") {
+		dmreset();
+	}
+}
 
-// quit
-if ($action == "q") {
-	echo "Good bye\n";
-	exit();
-}
-// edit
-if ($action == "e") {
-	editSettings();
-}
-// authorize
-if ($action == "a") {
-	authorize();
-}
-// unauthorize
-if ($action == "u") {
-	unauthorize();
-}
-// reset
-if ($action == "r") {
-	dmreset();
-}
+echo "Good bye\n";
+exit();
 
 
 function readSettings() {
-	global $dmidsafe, $authdb;
+	global $dmid, $authdb;
 	global $enabled, $telcotype, $testweightedresults, $callerid, $callsec, $rescount, $inbound, $hasdelay;
 
 	// enabled
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='dm_enabled'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='dm_enabled'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -101,7 +104,7 @@ function readSettings() {
 	}
 
 	// telcotype
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='telco_type'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='telco_type'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -109,7 +112,7 @@ function readSettings() {
 	}
 
 	// testweightedresults
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='testweightedresults'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='testweightedresults'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -117,7 +120,7 @@ function readSettings() {
 	}
 
 	// callerid
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='telco_caller_id'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='telco_caller_id'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -125,7 +128,7 @@ function readSettings() {
 	}
 
 	// calls_per_sec
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='telco_calls_sec'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='telco_calls_sec'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -133,7 +136,7 @@ function readSettings() {
 	}
 
 	// resource count
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='delmech_resource_count'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='delmech_resource_count'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -141,7 +144,7 @@ function readSettings() {
 	}
 
 	// inbound
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='telco_inboundtoken'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='telco_inboundtoken'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -149,7 +152,7 @@ function readSettings() {
 	}
 
 	// test hasdelay
-	$query = "select value from dmsetting where dmid=".$dmidsafe." and name='test_has_delays'";
+	$query = "select value from dmsetting where dmid=".$dmid." and name='test_has_delays'";
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -160,7 +163,7 @@ function readSettings() {
 }
 
 function printSettings() {
-	global $dmidsafe, $authdb;
+	global $dmid, $authdb;
 	global $enabled, $telcotype, $testweightedresults, $callerid, $callsec, $rescount, $inbound, $hasdelay;
 
 	readSettings();
@@ -168,7 +171,7 @@ function printSettings() {
 	////////////////////////
 	// status
 	$value = "";
-	$query = "select authorizedip from dm where id=".$dmidsafe;
+	$query = "select authorizedip from dm where id=".$dmid;
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -177,7 +180,7 @@ function printSettings() {
 	echo "\nAuthorized IP : ".$value;
 
 	$value = "";
-	$query = "select lastip from dm where id=".$dmidsafe;
+	$query = "select lastip from dm where id=".$dmid;
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -186,7 +189,7 @@ function printSettings() {
 	echo "\nLast IP       : ".$value;
 
 	$value = "";
-	$query = "select lastseen from dm where id=".$dmidsafe;
+	$query = "select lastseen from dm where id=".$dmid;
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -195,7 +198,7 @@ function printSettings() {
 	echo "\nLast Seen     : ".date("M j, Y g:i a", $value/1000);
 
 	$value = "";
-	$query = "select enablestate from dm where id=".$dmidsafe;
+	$query = "select enablestate from dm where id=".$dmid;
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	if (mysql_num_rows($res)==1) {
@@ -217,56 +220,56 @@ function printSettings() {
 }
 
 function editSettings() {
-	global $dmidsafe, $authdb, $dmname;
+	global $dmid, $authdb, $dmname;
 	global $enabled, $telcotype, $testweightedresults, $callerid, $callsec, $rescount, $inbound, $hasdelay;
 
 	$value = $enabled;
 	if ($value == "") $value = "0";
 	echo "\nDM Enabled (0|1): [".$value."] ";
-	$enabled = trim(fread(STDIN, 1024));
+	$enabled = trim(fread(STDIN, 1024)) +0;
 	if ($enabled == "") $enabled = $value;
 
 	$value = $telcotype;
 	if ($value == "") $value = "Test";
 	echo "\nTelco Type (Asterisk|Jtapi|Test): [".$value."] ";
-	$telcotype = trim(fread(STDIN, 1024));
+	$telcotype = mysql_real_escape_string(trim(fread(STDIN, 1024)));
 	if ($telcotype == "") $telcotype = $value;
 
 	if ($telcotype == "Test") {
 		$value = $testweightedresults;
 		if ($value == "") $value = "A=1";
 		echo "\nTest Weighted Results: [".$value."] ";
-		$testweightedresults = trim(fread(STDIN, 1024));
+		$testweightedresults = mysql_real_escape_string(trim(fread(STDIN, 1024)));
 		if ($testweightedresults == "") $testweightedresults = $value;
 
 		$value = $hasdelay;
 		if ($value == "") $value = "1";
 		echo "\nTest Has Delay (0|1): [".$value."] ";
-		$hasdelay = trim(fread(STDIN, 1024));
+		$hasdelay = trim(fread(STDIN, 1024)) +0;
 		if ($hasdelay == "") $hasdelay = $value;
 	}
 
 	$value = $callerid;
 	echo "\nCaller ID: [".$value."] ";
-	$callerid = trim(fread(STDIN, 1024));
+	$callerid = ereg_replace("[^0-9]*","",trim(fread(STDIN, 1024)));
 	if ($callerid == "") $callerid = $value;
 
 	$value = $callsec;
 	if ($value == "") $value = "60";
 	echo "\nCalls Per Second: [".$value."] ";
-	$callsec = trim(fread(STDIN, 1024));
+	$callsec = trim(fread(STDIN, 1024)) +0;
 	if ($callsec == "") $callsec = $value;
 
 	$value = $rescount;
 	if ($value == "") $value = "23";
 	echo "\nResource Count: [".$value."] ";
-	$rescount = trim(fread(STDIN, 1024));
+	$rescount = trim(fread(STDIN, 1024)) +0;
 	if ($rescount == "") $rescount = $value;
 
 	$value = $inbound;
 	if ($value == "") $value = "1";
 	echo "\nInbound Count: [".$value."] ";
-	$inbound = trim(fread(STDIN, 1024));
+	$inbound = trim(fread(STDIN, 1024)) +0;
 	if ($inbound == "") $inbound = $value;
 
 
@@ -294,43 +297,43 @@ function editSettings() {
 }
 
 function saveSettings() {
-	global $dmidsafe, $authdb;
+	global $dmid, $authdb;
 	global $enabled, $telcotype, $testweightedresults, $callerid, $callsec, $rescount, $inbound, $hasdelay;
 
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'dm_enabled', '".mysql_real_escape_string($enabled, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($enabled, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'dm_enabled', '".mysql_real_escape_string($enabled, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($enabled, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'delmech_resource_count', '".mysql_real_escape_string($rescount, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($rescount, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'delmech_resource_count', '".mysql_real_escape_string($rescount, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($rescount, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'testweightedresults', '".mysql_real_escape_string($testweightedresults, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($testweightedresults, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'testweightedresults', '".mysql_real_escape_string($testweightedresults, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($testweightedresults, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'test_has_delays', '".mysql_real_escape_string($hasdelay, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($hasdelay, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'test_has_delays', '".mysql_real_escape_string($hasdelay, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($hasdelay, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'telco_inboundtoken', '".mysql_real_escape_string($inbound, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($inbound, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'telco_inboundtoken', '".mysql_real_escape_string($inbound, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($inbound, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'telco_calls_sec', '".mysql_real_escape_string($callsec, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($callsec, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'telco_calls_sec', '".mysql_real_escape_string($callsec, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($callsec, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'telco_caller_id', '".mysql_real_escape_string($callerid, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($callerid, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'telco_caller_id', '".mysql_real_escape_string($callerid, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($callerid, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
 	// telco type
-	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'telco_type', '".mysql_real_escape_string($telcotype, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($telcotype, $authdb)."'";
+	$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'telco_type', '".mysql_real_escape_string($telcotype, $authdb)."') on duplicate key update `value` = '".mysql_real_escape_string($telcotype, $authdb)."'";
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "update custdm set `telco_type`='".mysql_real_escape_string($telcotype, $authdb)."' where dmid=".$dmidsafe;
+	$query = "update custdm set `telco_type`='".mysql_real_escape_string($telcotype, $authdb)."' where dmid=".$dmid;
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
@@ -339,19 +342,19 @@ function saveSettings() {
 }
 
 function authorize() {
-	global $dmidsafe, $authdb, $dmname;
+	global $dmid, $authdb, $dmname;
 
 	// if there are no settings, do not authorize just exit
-	$query = "select count(*) from dmsetting where dmid=".$dmidsafe;
+	$query = "select count(*) from dmsetting where dmid=".$dmid;
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n".mysql_error($authdb));
 	if (mysql_result($res,0,0) == 0) {
 		echo "The DM has no settings.  You must first edit settings prior to authorizing/activation of this DM\n";
-		exit();
+		return;
 	}
 
 	// if this is the first time authorized, create custdm record and a few settings once
-	$query = "select count(*) from custdm where dmid=".$dmidsafe;
+	$query = "select count(*) from custdm where dmid=".$dmid;
 	$res = mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	$custdmcount = mysql_result($res, 0, 0);
@@ -363,26 +366,26 @@ function authorize() {
 		$telco_type = mysql_result($res, 0, 0);
 
 		// custdm record
-		$query = "insert into custdm (`dmid`, `name`, `enablestate`, `telco_type`) values ('".$dmidsafe."','".$dmname."','active','".$telco_type."')";
+		$query = "insert into custdm (`dmid`, `name`, `enablestate`, `telco_type`) values ('".$dmid."','".$dmname."','active','".$telco_type."')";
 		mysql_query($query,$authdb)
 			or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
 		// customerid=1
-		$query = "update dm set customerid=1 where id=".$dmidsafe;
+		$query = "update dm set customerid=1 where id=".$dmid;
 		mysql_query($query,$authdb)
 			or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 		// telco_dial_timeout=45000
-		$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmidsafe."', 'telco_dial_timeout', '45000') on duplicate key update `value` = '45000'";
+		$query = "INSERT INTO `dmsetting` ( `dmid` , `name` , `value` ) VALUES ('".$dmid."', 'telco_dial_timeout', '45000') on duplicate key update `value` = '45000'";
 		mysql_query($query,$authdb)
 			or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 	}
 
 	// update authorized state on dm and custdm
-	$query = "update dm set authorizedip = lastip, enablestate = 'active' where id = ".$dmidsafe;
+	$query = "update dm set authorizedip = lastip, enablestate = 'active' where id = ".$dmid;
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "update custdm set `enablestate`='active' where dmid=".$dmidsafe;
+	$query = "update custdm set `enablestate`='active' where dmid=".$dmid;
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
@@ -390,13 +393,13 @@ function authorize() {
 }
 
 function unauthorize() {
-	global $dmidsafe, $authdb;
+	global $dmid, $authdb;
 
-	$query = "update dm set enablestate = 'disabled' where id = ".$dmidsafe;
+	$query = "update dm set enablestate = 'disabled' where id = ".$dmid;
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
-	$query = "update custdm set `enablestate`='disabled' where dmid=".$dmidsafe;
+	$query = "update custdm set `enablestate`='disabled' where dmid=".$dmid;
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
@@ -404,9 +407,9 @@ function unauthorize() {
 }
 
 function dmreset() {
-	global $dmidsafe, $authdb;
+	global $dmid, $authdb;
 
-	$query = "update dm set command='reset' where id=".$dmidsafe;
+	$query = "update dm set command='reset' where id=".$dmid;
 	mysql_query($query,$authdb)
 		or die ("Failed to execute statement \n$query\n\n" . mysql_error($authdb));
 
