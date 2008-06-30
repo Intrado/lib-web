@@ -66,7 +66,8 @@ WHERE	not exists (
 $$$
 
 
--- Delete report person entries not associated with a job
+-- Delete reportperson 
+-- Remove report person entries not associated with a job
 
 DELETE	rp
 FROM	reportperson rp
@@ -76,6 +77,7 @@ WHERE	not exists (
 		WHERE	j.id = rp.jobid)	
 $$$
 
+-- Delete reportcontact
 -- Remove reportcontact entries that are not associated with a job.
 
 DELETE 	rc
@@ -84,7 +86,6 @@ WHERE	not exists (
 		SELECT 	*
 		FROM	job j
 		WHERE	j.id = rc.jobid)
-
 $$$
 
 -- Delete Messages
@@ -133,7 +134,6 @@ and		not exists (
 		FROM	messagepart mp
 		WHERE	mp.audiofileid = a.id
 	)
-
 $$$
 
 -- Email message attachments for deletion
@@ -146,7 +146,6 @@ WHERE	not exists (
 		FROM	message m
 		WHERE	ma.messageid = m.id
 	)
-
 $$$
 
 -- Content deletion
@@ -221,7 +220,6 @@ or		(le.ruleid is not null
 		WHERE	r.id = le.ruleid
 		)
 	)
-
 $$$
 
 -- List import removal
@@ -235,7 +233,6 @@ and		not exists (
 		FROM 	list l
 		WHERE 	l.id = i.listid
 	)
-
 $$$
 
 -- Delete persons
@@ -245,7 +242,6 @@ DELETE 	p
 FROM	person p
 WHERE	p.lastimport < (now() - interval 6 month)
 and 	p.deleted
-
 $$$
 
 -- Delete Contactpref entries
@@ -355,7 +351,6 @@ and		not exists (
 		FROM	listentry le
 		WHERE	le.ruleid = r.id
 	)
-
 $$$
 
 -- Delete schedule
@@ -373,7 +368,6 @@ and		not exists (
 		FROM	import i
 		WHERE	i.scheduleid = s.id
 	)
-
 $$$
 
 
