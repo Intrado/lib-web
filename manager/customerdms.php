@@ -6,13 +6,30 @@ include_once("../inc/table.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("AspAdminUser.obj.php");
 
-if(isset($_GET['resetDM'])){
-	$dmid = $_GET['resetDM'] + 0;
-	$dmname = QuickQuery("select name from dm where id = " . $dmid);
-	QuickUpdate("update dm set command = 'reset' where id = " . $dmid);
+
+if(isset($_GET['resetDM']) || isset($_GET['update']) || isset($_GET['datfile'])){
+	if(isset($_GET['resetDM'])){
+		$dmid = $_GET['resetDM'] + 0;
+		$command = "reset";
+	} else if(isset($_GET['update'])){
+		$dmid = $_GET['update'] + 0;
+		$command = "update";
+	} else if(isset($_GET['datfile'])){
+		$dmid = $_GET['datfile'] + 0;
+		$command = "datfile";
+	}
+	$dmrow = QuickQueryRow("select name, command from dm where id = " . $dmid);
+	$dmname = $dmrow[0];
+	$dmcommand = $dmrow[1];
+	if($dmcommand == ""){
+		$dmcommand = $command;
+	} else {
+		$dmcommand = $dmcommand . "," . $command;
+	}
+	QuickUpdate("update dm set command = '" . $dmcommand ."' where id = " . $dmid);
 ?>
 	<script>
-		window.alert('Reset command initiated for DM: <?=$dmname?>');
+		window.alert('<?=ucfirst($command)?> command initiated for DM: <?=$dmname?>');
 		window.location="customerdms.php";
 	</script>
 <?
@@ -41,9 +58,9 @@ function fmt_customerUrl($row, $index){
 	return $url;
 }
 
-// index 1 is dmid
+// index 0 is dmid
 function fmt_DMActions($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '" title="Restart"><img src="img/s-restart.png" border=0></a>';
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="dmdatfiles.php?dmid=' . $row[0] . '">Dat Files</a>&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;<a href="customerdms.php?update=' . $row[0] . '">Update</a>&nbsp;<a href="customerdms.php?datfile=' . $row[0] . '">Update DatFile</a>';
 	return $url;
 }
 
@@ -64,7 +81,7 @@ function fmt_lastseen($row, $index){
 
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
-			dm.enablestate, dm.lastseen
+			dm.enablestate, dm.lastseen, dm.command
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			where dm.type = 'customer'
@@ -84,6 +101,7 @@ $titles = array(0 => "DM ID",
 				5 => "Last IP",
 				7 => "Last Seen",
 				6 => "State",
+				8 => "Current Commands",
 				"actions" => "Actions");
 
 $formatters = array(2 => "fmt_customerUrl",
