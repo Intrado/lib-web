@@ -39,6 +39,8 @@ if(CheckFormSubmit($f,$s))
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if(QuickQuery("select command from dm where id = " . $_SESSION['dmid']) != ""){
+			error("This DM already has a command queued. Please try again in a few moments");
 		} else {
 			if(isset($_FILES['dmupload']) && $_FILES['dmupload']['tmp_name'])
 			{
@@ -48,9 +50,12 @@ if(CheckFormSubmit($f,$s))
 					error('Unable to complete file upload. Please try again.');
 				} else {
 					if (is_file($newname) && is_readable($newname)) {
+						QuickUpdate("begin");
 						QuickUpdate("insert into dmdatfile (dmid, data, notes) values
 									('" . $_SESSION['dmid'] . "', '" . base64_encode(file_get_contents($newname)) . "','" . GetFormData($f, $s, "notes") . "')");
-						redirect("dmdatfiles.php");
+						QuickUpdate("update dm set command = 'datfile' where id = " . $_SESSION['dmid']);
+						QuickUpdate("commit");
+						redirect("customerdms.php");
 					} else {
 						error('Unable to complete file upload. Please try again.');
 					}
@@ -97,7 +102,7 @@ NewForm($f);
 <table>
 	<tr>
 		<td><? NewFormItem($f, $s, "submit", "submit", "Upload"); ?></td>
-		<td><a href="dmdatfiles.php">Cancel</a></td>
+		<td><a href="customerdms.php">Cancel</a></td>
 	</tr>
 </table>
 <?
