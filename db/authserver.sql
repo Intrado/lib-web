@@ -186,3 +186,15 @@ CREATE TABLE `dmcalleridroute` (
 ) ENGINE=InnoDB ;
 
 ALTER TABLE `shard` ADD `isfull` TINYINT NOT NULL DEFAULT '0';
+
+-- ASP 6.0 June 14, 2008
+
+CREATE TABLE `dmdatfile` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `uploaddate` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `data` mediumtext NOT NULL,
+  `notes` TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB ;
+
