@@ -7,26 +7,24 @@ include_once("../inc/formatters.inc.php");
 include_once("AspAdminUser.obj.php");
 
 
-if(isset($_GET['resetDM']) || isset($_GET['update']) || isset($_GET['datfile'])){
+if(isset($_GET['resetDM']) || isset($_GET['update'])){
 	if(isset($_GET['resetDM'])){
 		$dmid = $_GET['resetDM'] + 0;
 		$command = "reset";
 	} else if(isset($_GET['update'])){
 		$dmid = $_GET['update'] + 0;
 		$command = "update";
-	} else if(isset($_GET['datfile'])){
-		$dmid = $_GET['datfile'] + 0;
-		$command = "datfile";
 	}
 	$dmrow = QuickQueryRow("select name, command from dm where id = " . $dmid);
-	$dmname = $dmrow[0];
-	$dmcommand = $dmrow[1];
-	if($dmcommand == ""){
-		$dmcommand = $command;
-	} else {
-		$dmcommand = $dmcommand . "," . $command;
+	if($dmrow[1] != ""){
+?>
+	<script>
+		window.alert('That DM already has a command queued.  Please try again in a few moments');
+		window.location="customerdms.php";
+	</script>
+<?
 	}
-	QuickUpdate("update dm set command = '" . $dmcommand ."' where id = " . $dmid);
+	QuickUpdate("update dm set command = '" . $command ."' where id = " . $dmid);
 ?>
 	<script>
 		window.alert('<?=ucfirst($command)?> command initiated for DM: <?=$dmname?>');
@@ -60,7 +58,7 @@ function fmt_customerUrl($row, $index){
 
 // index 0 is dmid
 function fmt_DMActions($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="dmdatfiles.php?dmid=' . $row[0] . '">Dat Files</a>&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;<a href="customerdms.php?update=' . $row[0] . '">Update</a>&nbsp;<a href="customerdms.php?datfile=' . $row[0] . '">Update DatFile</a>';
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;<a href="customerdms.php?update=' . $row[0] . '" title="Update"><img src="img/s-update.png" border=0></a>&nbsp;<a href="dmupload.php?dmid=' . $row[0] . '" title="Upload DatFile"><img src="img/s-dat.png" border=0></a>';
 	return $url;
 }
 
@@ -81,7 +79,7 @@ function fmt_lastseen($row, $index){
 
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
-			dm.enablestate, dm.lastseen, dm.command
+			dm.enablestate, dm.lastseen
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			where dm.type = 'customer'
@@ -101,7 +99,6 @@ $titles = array(0 => "DM ID",
 				5 => "Last IP",
 				7 => "Last Seen",
 				6 => "State",
-				8 => "Current Commands",
 				"actions" => "Actions");
 
 $formatters = array(2 => "fmt_customerUrl",
