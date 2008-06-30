@@ -25,6 +25,8 @@ if(!isset($_SESSION['dmid'])){
 	exit();
 }
 
+$dmname = QuickQuery("select name from dm where id = " . $_SESSION['dmid']);
+
 $res = Query("select id, uploaddate, notes, dmid from dmdatfile where dmid = " . $_SESSION['dmid'] . " order by id ASC");
 $data= array();
 $count=1;
@@ -51,7 +53,7 @@ function dm_actions($row, $index){
 
 include_once("nav.inc.php");
 ?>
-<a href="dmupload.php?dmid=<?=$_SESSION['dmid']?>">Add Dat File</a>&nbsp;|&nbsp;<a href="customerdms.php">Back</a>
+<div>Dat File History for: <?=$dmname?></div>
 <table class="list">
 <?
 	showTable($data, $titles, $functions);
