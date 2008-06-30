@@ -258,6 +258,10 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <?
 managerPassword($f, $s);
 EndForm();
+?>
+<br>
+<a href="dmdatfiles.php?dmid=<?=$_SESSION['dmid']?>">Dat File History</a>
+<?
 include_once("navbottom.inc.php");
 ?>
 <script>
