@@ -12,10 +12,10 @@ function fmt_alert_timestamp($row, $index) {
 	date_default_timezone_set($row[2]);
 	$timestamp = strtotime($row[$index]);
 	if ($timestamp === false) {
-		return "<div style='background-color: #ffcccc'>- Never -</div>";
+		return "<div style='background-color: #ff0000'>- Never -</div>";
 	} else {
 		if ($timestamp < time() - 60 * 60 * 24 * 3)
-			return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
+			return "<div style='background-color: #FFFF00'>" . fmt_date($row, $index) . "</div>";
 		else
 			return fmt_date($row, $index);
 	}
@@ -30,7 +30,7 @@ function fmt_last_modified($row, $index){
 	}
 
 	if ($timestamp === false) {
-		return "<div style='background-color: #ffcccc'>- Never -</div>";
+		return "<div style='background-color: #ff0000'>- Never -</div>";
 	} else {
 		if(isset($row[13]['daysold']) && $row[13]['daysold'] && ($timestamp < time() - 60*60*24* $row[13]['daysold'])){
 			return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
@@ -57,6 +57,8 @@ function fmt_last_modified($row, $index){
 			if($scheduledlastrun > $timestamp){
 				return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
 			}
+		} else if ($timestamp < time() - 60*60*24*3){
+			return "<div style='background-color: #FFFF00'>" . fmt_date($row, $index) . "</div>";
 		}
 
 		return fmt_date($row, $index);
@@ -80,9 +82,11 @@ function fmt_import_status($row, $index){
 //row index 12 contains an array of alert options
 function fmt_filesize($row, $index){
 	 if((isset($row[13]['minsize']) && $row[$index] < $row[13]['minsize']) || (isset($row[13]['maxsize']) && $row[$index] > $row[13]['maxsize']))
-	 	return "<div style=\"background-color: #ffcccc; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
-	 else if(!isset($row[13]['minsize']) && !isset($row[13]['maxsize']) && $row[$index] < 10)
-	 	return "<div style=\"background-color: #ffcccc; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
+	 	return "<div style=\"background-color: #FFCCCC; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
+	 else if(!isset($row[13]['minsize']) && !isset($row[13]['maxsize']) && $row[$index] < 10 && $row[$index] > 0)
+	 	return "<div style=\"background-color: #FFFF00; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
+	 else if($row[$index] == 0)
+	 	return "<div style=\"background-color: #FF0000; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 	 else
 	 	return "<div style=\"width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 }
@@ -240,9 +244,29 @@ showTable($data, $titles, $formatters);
 </table>
 <div> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.<div>
 <div > All time stamps are in customer time. </div>
-<div>If an import does not have an alert, their import and file date will display RED if they are older than 3 days.</div>
-<div>If an import has an alert, their import and file date will display RED based on the import alert.</div>
-
+<table class=list>
+	<tr>
+		<th align="left" class="listheader">&nbsp;</th>
+		<th align="left" class="listheader">Last Run</th>
+		<th align="left" class="listheader">File Date</th>
+		<th align="left" class="listheader">File Size</th>
+	</tr>
+	<tr>
+		<th class="listheader">No Alert</th>
+		<td><span style="background-color: #FFFF00">Yellow</span> if older than 3 days</td>
+		<td><span style="background-color: #FFFF00">Yellow</span> if older than 3 days</td>
+		<td><span style="background-color: #FFFF00">Yellow</span> if data size less than 10 bytes</td>
+	</tr>
+	<tr>
+		<th class="listheader">With Alerts</th>
+		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert
+		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
+		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
+	</tr>
+	<tr>
+		<td colspan="4" align="middle"><span style="background-color: #FF0000">Red</span> if does not exist</td>
+	</tr>
+</table>
 <?
 date_default_timezone_set("US/Pacific");
 include("navbottom.inc.php");
