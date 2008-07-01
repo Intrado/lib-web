@@ -69,6 +69,7 @@ if(CheckFormSubmit($f, $s)){
 			} elseif($bademaillist = checkemails($emaillist)) {
 				error("These emails are invalid", $bademaillist);
 			} else {
+				$oldimportalert = $importalert;
 				//Wipe out any old settings
 				$importalert = array();
 				$importalert['minsize'] = $minsize;
@@ -91,6 +92,21 @@ if(CheckFormSubmit($f, $s)){
 					if($alert == "")
 						unset($importalert[$index]);
 				}
+				//check all old options compared to new options to see if there is a change
+				//if a change exists, erase the last notified flag
+				$optionsarray = array("minsize", "maxsize", "dow", "daysold", "time");
+				$changed = false;
+				foreach($optionsarray as $item){
+					if(!isset($importalert[$item]) && !isset($oldimportalert[$item]))
+						continue;
+					if($importalert[$item] != $oldimportalert[$item]){
+						$changed = true;
+						break;
+					}
+				}
+				if(!$changed)
+					$importalert['lastnotified'] = $oldimportalert['lastnotified'];
+
 				$importalerturl = http_build_query($importalert, false, "&");
 				QuickUpdate("update import set alertoptions = '" . DBSafe($importalerturl) . "' where id = " . $importid, $custdb);
 				redirect("customerimports.php");
