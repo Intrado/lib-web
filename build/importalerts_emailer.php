@@ -55,22 +55,25 @@ foreach($customers as $cust) {
 	mysql_select_db("c_" . $cust[0]);
 
 	//use customer timezone for all calculations
-	$res = mysql_query("select value from setting where name = 'timezone'");
+	$res = mysql_query("select value from setting where name = 'timezone'", $custdb);
 	$row = mysql_fetch_row($res);
 	$timezone = $row[0];
 	date_default_timezone_set($timezone);
 
-	$res = mysql_query("select id, name, datamodifiedtime, length(data), alertoptions from import where alertoptions != ''");
+	$res = mysql_query("select id, name, datamodifiedtime, length(data), alertoptions from import where alertoptions != ''", $custdb);
 	$imports = array();
 	while($row = mysql_fetch_row($res)){
 		$imports[] = $row;
 	}
 	foreach($imports as $import){
-
+		$notified = false;
 		$alertoptions = sane_parsestr($import[4]);
 		//skip all import alerts with no email addresses
 
 		if(!isset($alertoptions['emails']) || $alertoptions['emails'] == "")
+			continue;
+
+		if(isset($alertoptions['lastnotified']) && $alertoptions['lastnotified'] >= (time() - 60*60*8))
 			continue;
 
 		$emaillist = explode(";",$alertoptions['emails']);
@@ -78,14 +81,17 @@ foreach($customers as $cust) {
 		if(isset($alertoptions['minsize']) && $import[3] < $alertoptions['minsize']){
 			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file smaller than " . number_format($alertoptions['minsize']) . " bytes.";
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
+			$notified = true;
 		}
 		if(isset($alertoptions['maxsize']) && $import[3] < $alertoptions['maxsize']){
 			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file larger than " . number_format($alertoptions['maxsize']) . " bytes.";
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
+			$notified = true;
 		}
 		if(isset($alertoptions['daysold']) && $alertoptions['daysold'] && ($import[2] < (time() - 60*60*24*$alertoptions['daysold']))){
 			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a file modified date before " . $alertoptions['daysold'] . " days ago.";
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
+			$notified = true;
 		}
 		if(isset($alertoptions['dow'])){
 			$scheduledDow=array();
@@ -113,7 +119,13 @@ foreach($customers as $cust) {
 			if($scheduledlastrun > $import[2]){
 				$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " did not run at the scheduled time: " . date("M d, Y G:i:s", $scheduledlastrun);
 				$emailmessages = generateMessage($emailmessages, $emaillist, $message);
+				$notified = true;
 			}
+		}
+		if($notified){
+			$alertoptions['lastnotified'] = strtotime("now");
+			$importalerturl = http_build_query($alertoptions, false, "&");
+			mysql_query("update import set alertoptions = '" . mysql_escape_string($importalerturl) . "' where id = " . $import[0], $custdb);
 		}
 	}
 }
