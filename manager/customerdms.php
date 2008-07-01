@@ -79,7 +79,7 @@ function fmt_lastseen($row, $index){
 
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
-			dm.enablestate, dm.lastseen
+			dm.enablestate, dm.lastseen, dm.version
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			where dm.type = 'customer'
@@ -99,6 +99,7 @@ $titles = array(0 => "DM ID",
 				5 => "Last IP",
 				7 => "Last Seen",
 				6 => "State",
+				8 => "Version",
 				"actions" => "Actions");
 
 $formatters = array(2 => "fmt_customerUrl",
@@ -106,8 +107,13 @@ $formatters = array(2 => "fmt_customerUrl",
 					7 => "fmt_lastseen",
 					6 => "fmt_state");
 
-include_once("nav.inc.php");
 
+include_once("nav.inc.php");
+if(file_exists("dmbuild.txt")){
+?>
+	<div>Latest Version: <?=file_get_contents("dmbuild.txt");?></div>
+<?
+}
 ?>
 <table class=list>
 <?
