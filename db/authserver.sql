@@ -198,3 +198,4 @@ CREATE TABLE `dmdatfile` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 
+ALTER TABLE `dm` ADD `version` VARCHAR( 255 ) NULL ;
