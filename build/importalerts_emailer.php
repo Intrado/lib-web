@@ -117,7 +117,7 @@ foreach($customers as $cust) {
 			//calculate unix time and allow 15 min leeway
 			$scheduledlastrun = strtotime(" -$daysago days " . $alertoptions['time']) - (60*15);
 			if($scheduledlastrun > $import[2]){
-				$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " did not run at the scheduled time: " . date("M d, Y G:i:s", $scheduledlastrun);
+				$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " did not run at the scheduled time: " . date("M d, Y g:i a", $scheduledlastrun);
 				$emailmessages = generateMessage($emailmessages, $emaillist, $message);
 				$notified = true;
 			}
