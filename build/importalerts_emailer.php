@@ -6,7 +6,7 @@ import alerts that have email addresses.
 */
 
 //need trailing "/" for simple emailer path
-$simpleemailerpath = "/commsuite/server/simpleemail/";
+$simpleemailerpath = "/usr/commsuite/server/simpleemail/";
 
 if(file_exists("/usr/commsuite/server/authserver/authserver.properties")){
 	$authsettings = @parse_ini_file("/usr/commsuite/server/authserver/authserver.properties");
