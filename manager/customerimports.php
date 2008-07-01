@@ -96,7 +96,7 @@ function fmt_filesize($row, $index){
 //index 3 is import id
 function fmt_importalerts($row, $index){
 	$url = "<a href='importalerts.php?cid=" . $row[0] . "&importid=" . $row[4] . "' title='Configure Alerts'><img src='img/s-config.png' border=0></a>";
-	if(isset($row[13]['dow'])){
+	if(isset($row[13]) && $row[13] != null && $row[13] != ""){
 		$url = "*" . $url;
 	}
 	return $url;
