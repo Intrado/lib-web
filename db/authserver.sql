@@ -199,3 +199,8 @@ CREATE TABLE `dmdatfile` (
 ) ENGINE=InnoDB ;
 
 ALTER TABLE `dm` ADD `version` VARCHAR( 255 ) NULL ;
+
+-- ASP 6.0.1
+
+ALTER TABLE `dm` ADD `routetype` VARCHAR( 50 ) NOT NULL ;
+
