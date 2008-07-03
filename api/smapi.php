@@ -865,6 +865,10 @@ class SMAPI{
 					if($contact->destination!="" && $error = Phone::validate($contact->destination)){
 						$badfields[] = ucfirst($contact->type) . " sequence " . $contact->sequence . " has an invalid destination field";
 					}
+				} else if($contact->type == "email"){
+					if($contact->destination != "" && !validEmail($contact->destination)){
+						$badfields[] = ucfirst($contact->type) . " sequence " . $contact->sequence . " has an invalid destination field";
+					}
 				}
 				// if a bad field is found, continue checking all contacts but do not save
 				if(count($badfields)){
