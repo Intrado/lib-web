@@ -735,7 +735,218 @@ class SMAPI{
 		}
 	}
 
+	/*
+		getDestinations
+			params: String sessionid
+					String pkey
 
+			return:
+					Destinations: array of destination objs
+
+	*/
+
+	function getContacts($sessionid, $pkey){
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure","resultdescription" => "", "contacts" => null);
+
+		if(!APISession($sessionid)){
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+
+			if(!$USER->id){
+				$result["resultdescription"] = "Invalid user";
+				return $result;
+			}
+			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($pkey) . "' and not deleted " . $USER->userSQL("p"));
+			if(!$personid){
+				$result["resultdescription"] = "Person not found";
+				return $result;
+			}
+			// build multidimensional array to reduce duplicate code when building return objects
+			$contactdata = array();
+			$contactdata["phone"] = resequence(DBFindMany("Phone", "from phone where personid = " . $personid), "sequence");
+			$contactdata["email"] = resequence(DBFindMany("Email", "from email where personid = " . $personid), "sequence");
+			$contactdata["sms"] = resequence(DBFindMany("Sms", "from sms where personid = " . $personid), "sequence");
+
+			//Generate missing contact fields that do not yet exist
+			if(count($contactdata["phone"]) != getSystemSetting("maxphones",1)){
+				for($i = 0; $i < getSystemSetting("maxphones"); $i++){
+					if(!isset($contactdata["phone"][$i])){
+						$newphone=new Phone();
+						$newphone->personid = $personid;
+						$newphone->sequence = $i;
+						$contactdata["phone"][$i] = $newphone;
+					}
+				}
+			}
+			if(count($contactdata["email"]) != getSystemSetting("maxemails",1)){
+				for($i=0; $i < getSystemSetting("maxemails"); $i++){
+					if(!isset($contactdata["email"][$i])){
+						$newemail=new Email();
+						$newemail->personid = $personid;
+						$newemail->sequence = $i;
+						$contactdata["email"][$i] = $newemail;
+					}
+				}
+			}
+			if(count($contactdata["sms"]) != getSystemSetting("maxsms",1)){
+				for($i=0; $i < getSystemSetting("maxsms"); $i++){
+					if(!isset($contactdata["sms"][$i])){
+						$newsms=new Sms();
+						$newsms->personid = $personid;
+						$newsms->sequence = $i;
+						$contactdata["sms"][$i] = $newsms;
+					}
+				}
+			}
+
+			$contactprefs = getContactPrefs($personid);
+			$defaultcontactprefs = getDefaultContactPrefs();
+
+			$contacts = array();
+			foreach(array("phone", "email", "sms") as $type){
+				foreach($contactdata[$type] as $object){
+					$contact = new API_Contact();
+					$contact->pkey = $pkey;
+					$contact->type = $type;
+					$contact->destination = $object->$type;
+					$contact->sequence = $object->sequence;
+					$contactpreferences = array();
+					if(isset($contactprefs[$type][$object->sequence])){
+						$pref = $contactprefs[$type][$object->sequence];
+					} else {
+						$pref = $defaultcontactprefs[$type][$object->sequence];
+					}
+					foreach($pref as $jobtypeid => $enabled){
+						$contactpreference = new API_ContactPreference();
+						$contactpreference->jobtypeid = $jobtypeid;
+						$contactpreference->enabled = (bool)$enabled;
+						$contactpreferences[] = $contactpreference;
+					}
+					$contact->contactpreferences = $contactpreferences;
+					$contacts[] = $contact;
+				}
+			}
+			$result['contacts'] = $contacts;
+			$result['resultcode'] = "success";
+			return $result;
+		}
+	}
+
+	function setContacts($sessionid, $contacts){
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure","resultdescription" => "", "contacts" => null);
+		if(!APISession($sessionid)){
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+
+			if(!$USER->id){
+				$result["resultdescription"] = "Invalid user";
+				return $result;
+			}
+
+			$badfields = array();
+			$personarray = array();
+			$personcontact = array();
+			$personcontactprefs = array();
+			foreach($contacts->contacts as $contact){
+
+				if(!in_array($contact->type, array("phone", "email", "sms"))){
+					$result["resultdescription"] = "Bad type in contact object: " . $badtype;
+					return $result;
+				}
+				if($contact->type == "phone" || $contact->type == "sms"){
+					if($contact->destination!="" && $error = Phone::validate($contact->destination)){
+						$badfields[] = ucfirst($contact->type) . " sequence " . $contact->sequence . " has an invalid destination field";
+					}
+				}
+				// if a bad field is found, continue checking all contacts but do not save
+				if(count($badfields)){
+					continue;
+				}
+				//keep track of pkeys to personids so that we don't have to double check each contact's
+				//pkey authorization
+				if(!isset($personarray[$contact->pkey])){
+					$personid = QuickQuery("select id from person where pkey = '" . DBSafe($contact->pkey) . "' and not deleted " . $USER->userSQL("p"));
+					if($personid)
+						$personarray[$contact->pkey] = $personid;
+				}
+				//fetch contact data for person so that we can cache it and update records
+				if(!isset($personcontact[$contact->pkey])){
+					$personcontact[$contact->pkey] = array();
+					$personcontact[$contact->pkey]['phone'] = resequence(DBFindMany("Phone", "from phone where personid = " . $personarray[$contact->pkey]), "sequence");
+					$personcontact[$contact->pkey]['email'] = resequence(DBFindMany("Email", "from email where personid = " . $personarray[$contact->pkey]), "sequence");
+					$personcontact[$contact->pkey]['sms'] = resequence(DBFindMany("Sms", "from sms where personid = " . $personarray[$contact->pkey]), "sequence");
+				}
+
+				//if the contact obj doesn't exist, create a new one in the db
+				//else update the one we found
+				if(!isset($personcontact[$contact->pkey][$contact->type][$contact->sequence])){
+					if($contact->type == "phone"){
+						$obj = new Phone();
+					} else if($contact->type == "email"){
+						$obj = new Email();
+					} else if($contact->type == "sms"){
+						$obj = new Sms();
+					}
+					$obj->$type = $contact->destination;
+					$obj->personid = $personarray[$contact->pkey];
+					$obj->editlock = 1;
+					$obj->sequence = $contact->sequence;
+					$obj->create();
+					$personcontact[$contact->pkey][$contact->type][$contact->sequence] = $obj;
+				} else {
+					$type = $contact->type;
+					$obj = $personcontact[$contact->pkey][$type][$contact->sequence];
+					$obj->editlock = 1;
+					$obj->$type = $contact->destination;
+					$obj->update();
+				}
+
+				//generate array of contact prefs so that we can build a single insert later
+				if(!isset($personcontactprefs[$personarray[$contact->pkey]])){
+					$personcontactprefs[$personarray[$contact->pkey]] = array();
+				}
+				if(!isset($personcontactprefs[$personarray[$contact->pkey]][$contact->type])){
+					$personcontactprefs[$personarray[$contact->pkey]][$contact->type] = array();
+				}
+				if(!isset($personcontactprefs[$personarray[$contact->pkey]][$contact->type][$contact->sequence])){
+					$personcontactprefs[$personarray[$contact->pkey]][$contact->type][$contact->sequence] = array();
+				}
+				foreach($contact->contactpreferences as $contactpreference){
+					$personcontactprefs[$personarray[$contact->pkey]][$contact->type][$contact->sequence][$contactpreference->jobtypeid] = ($contactpreference->enabled ? "1" : "0");
+				}
+			}
+
+			if(count($badfields)){
+				$result['resultdescription'] = implode("\n", $badfields);
+				return $result;
+			}
+
+			QuickUpdate("begin");
+			foreach($personcontactprefs as $personid => $contactpreference){
+				foreach($contactpreference as $type => $row){
+					foreach($row as $sequence => $preference){
+						foreach($preference as $jobtypeid => $enabled){
+							QuickUpdate("delete from contactpref where personid = " . $personid . " and jobtypeid = " . $jobtypeid . "  and type = '" . $type . "' and sequence = " . $sequence);
+							QuickUpdate("insert into contactpref values (" . $personid . ", " . $jobtypeid . ", '" . $type . "', " . $sequence . ", '" . $enabled . "')");
+						}
+					}
+				}
+			}
+
+			QuickUpdate("commit");
+
+			$result["resultcode"] = "success";
+			return $result;
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -857,6 +1068,9 @@ require_once("../obj/JobType.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../obj/Voice.obj.php");
 require_once("../obj/JobLanguage.obj.php");
+require_once("../obj/Phone.obj.php");
+require_once("../obj/Email.obj.php");
+require_once("../obj/Sms.obj.php");
 
 // API Files
 require_once("API_List.obj.php");
@@ -864,6 +1078,8 @@ require_once("API_Message.obj.php");
 require_once("API_JobType.obj.php");
 require_once("API_Job.obj.php");
 require_once("API_JobStatus.obj.php");
+require_once("API_Contact.obj.php");
+require_once("API_ContactPreference.obj.php");
 
 ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
 $server=new SoapServer("smapi.wsdl");
