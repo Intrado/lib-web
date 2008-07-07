@@ -736,12 +736,19 @@ class SMAPI{
 	}
 
 	/*
-		getDestinations
+		Given a valid session id and pkey, an array of contact objects is returned.
+		A contact object contains a pkey, contact type(phone,email,sms), sequence number,
+		contact information, and an array of contact preference objects.  A contact
+		preference object contains a job type id and an enabled flag(boolean).
+
+		The max number of contacts are always returned.
+
+		getContacts
 			params: String sessionid
 					String pkey
 
 			return:
-					Destinations: array of destination objs
+					contacts: array of contact objs
 
 	*/
 
@@ -762,7 +769,7 @@ class SMAPI{
 			}
 			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($pkey) . "' and not deleted " . $USER->userSQL("p"));
 			if(!$personid){
-				$result["resultdescription"] = "Person not found";
+				$result["resultdescription"] = "Invalid person";
 				return $result;
 			}
 			// build multidimensional array to reduce duplicate code when building return objects
@@ -836,6 +843,22 @@ class SMAPI{
 		}
 	}
 
+	/*
+		Given a valid session id and an array of contact objects,
+		setContacts will update contact information in the system.  If any
+		of the objects contains an invalid person id, the function will not process
+		the list.
+
+		setContacts
+			params: String sessionid
+					contacts: array of contact objs
+
+			return:
+					Success/Fail
+
+	*/
+
+
 	function setContacts($sessionid, $contacts){
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "contacts" => null);
@@ -855,32 +878,72 @@ class SMAPI{
 			$personarray = array();
 			$personcontact = array();
 			$personcontactprefs = array();
-			foreach($contacts->contacts as $contact){
+			$maxphones = getSystemSetting("maxphones", 1);
+			$maxemails = getSystemSetting("maxemails", 1);
+			$maxsms = getSystemSetting("maxsms", 1);
 
-				if(!in_array($contact->type, array("phone", "email", "sms"))){
-					$result["resultdescription"] = "Bad type in contact object: " . $badtype;
-					return $result;
-				}
-				if($contact->type == "phone" || $contact->type == "sms"){
-					if($contact->destination!="" && $error = Phone::validate($contact->destination)){
-						$badfields[] = ucfirst($contact->type) . " sequence " . $contact->sequence . " has an invalid destination field";
-					}
-				} else if($contact->type == "email"){
-					if($contact->destination != "" && !validEmail($contact->destination)){
-						$badfields[] = ucfirst($contact->type) . " sequence " . $contact->sequence . " has an invalid destination field";
-					}
-				}
-				// if a bad field is found, continue checking all contacts but do not save
-				if(count($badfields)){
-					continue;
-				}
+			//go through all contacts once to make sure all fields are valid
+			//if any fields are invalid, do not update system and return problems
+			foreach($contacts->contacts as $contact){
 				//keep track of pkeys to personids so that we don't have to double check each contact's
 				//pkey authorization
 				if(!isset($personarray[$contact->pkey])){
 					$personid = QuickQuery("select id from person where pkey = '" . DBSafe($contact->pkey) . "' and not deleted " . $USER->userSQL("p"));
 					if($personid)
 						$personarray[$contact->pkey] = $personid;
+					else {
+						$result["resultdescription"] = "Invalid person: " . $contact->pkey;
+						return $result;
+					}
 				}
+				if(!in_array($contact->type, array("phone", "email", "sms"))){
+					$result["resultdescription"] = "Bad type in contact object: " . $contact->type;
+					return $result;
+				}
+				// use flags so that error message doesn't need to be duplicated everywhere
+				$badsequence = false;
+				$baddestination = false;
+				if($contact->type == "phone" || $contact->type == "sms"){
+					if($contact->destination!="" && $error = Phone::validate($contact->destination)){
+						$baddestination = true;
+					}
+				} else if($contact->type == "email"){
+					if($contact->destination != "" && !validEmail($contact->destination)){
+						$baddestination = true;
+					}
+				}
+
+				if($contact->sequence < 0){
+					$badfields[] = ucfirst($contact->type) . " " . $contact->sequence . " has an invalid sequence";
+				}
+
+				if($contact->type == "phone"){
+					if($contact->sequence >= $maxphones){
+						$badsequence = true;
+					}
+				} else if($contact->type == "sms"){
+					if($contact->sequence >= $maxsms){
+						$badsequence = true;
+					}
+				} else if($contact->type == "email"){
+					if($contact->sequence >= $maxemails){
+						$badsequence = true;
+					}
+				}
+				if($badsequence){
+					$badfields[] = ucfirst($contact->type) . " " . $contact->sequence . " exceeds the max sequence of this type";
+				}
+				if($baddestination){
+					$badfields[] = ucfirst($contact->type) . " " . $contact->sequence . " has an invalid destination field";
+				}
+			}
+
+			if(count($badfields)){
+				$result['resultdescription'] = implode(", ", $badfields);
+				return $result;
+			}
+
+			foreach($contacts->contacts as $contact){
 				//fetch contact data for person so that we can cache it and update records
 				if(!isset($personcontact[$contact->pkey])){
 					$personcontact[$contact->pkey] = array();
@@ -892,6 +955,7 @@ class SMAPI{
 				//if the contact obj doesn't exist, create a new one in the db
 				//else update the one we found
 				if(!isset($personcontact[$contact->pkey][$contact->type][$contact->sequence])){
+
 					if($contact->type == "phone"){
 						$obj = new Phone();
 					} else if($contact->type == "email"){
@@ -913,7 +977,7 @@ class SMAPI{
 					$obj->update();
 				}
 
-				//generate array of contact prefs so that we can build a single insert later
+				//generate array of contact prefs so that we can iterate later in a transaction
 				if(!isset($personcontactprefs[$personarray[$contact->pkey]])){
 					$personcontactprefs[$personarray[$contact->pkey]] = array();
 				}
@@ -926,11 +990,6 @@ class SMAPI{
 				foreach($contact->contactpreferences as $contactpreference){
 					$personcontactprefs[$personarray[$contact->pkey]][$contact->type][$contact->sequence][$contactpreference->jobtypeid] = ($contactpreference->enabled ? "1" : "0");
 				}
-			}
-
-			if(count($badfields)){
-				$result['resultdescription'] = implode("\n", $badfields);
-				return $result;
 			}
 
 			QuickUpdate("begin");
