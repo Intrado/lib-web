@@ -48,7 +48,7 @@ function fmt_actions($row, $index){
 	$actions .= '<a href="customerimports.php?customer=' . $row[0] . '" title="Imports"><img src="img/s-imports.png" border=0></a>&nbsp;';
 	$actions .= '<a href="customeractivejobs.php?customer=' . $row[0] . '" title="Jobs"><img src="img/s-jobs.png" border=0></a>&nbsp;';
 	$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="img/s-priorities.png" border=0></a>&nbsp;';
-	if($row[11] != "Asp")
+	if($row[11] != "asp")
 		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="img/s-rdms.png" border=0></a>';
 
 	return $actions;
@@ -67,6 +67,10 @@ function fmt_hasportal($row, $index){
 		return "Yes";
 	else
 		return "No";
+}
+
+function fmt_dmmethod($row, $index){
+	return ucfirst($row[$index]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +120,7 @@ foreach($customers as $cust) {
 		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
 		$row[10] = implode(", ", $customerfeatures);
-		$row[11] = ucfirst(getCustomerSystemSetting('_dmmethod', "", true, $custdb));
+		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
 		$row[12] = $cust[3];
 		$row[13] = $cust[4];
 		$data[] = $row;
@@ -142,7 +146,8 @@ $formatters = array("url" => "fmt_custurl",
 					"6" => "fmt_status",
 					"8" => "fmt_users",
 					"9" => "fmt_jobcount",
-					"Actions" => "fmt_actions");
+					"Actions" => "fmt_actions",
+					"11" => "fmt_dmmethod");
 
 include_once("nav.inc.php");
 ?>
