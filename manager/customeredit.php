@@ -14,7 +14,7 @@ if (isset($_GET['id'])) {
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 if(isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
-	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
+	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oemid, c.nsid from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custinfo = mysql_fetch_row($custquery);
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
 	if(!$custdb) {
@@ -156,7 +156,9 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				QuickUpdate("update customer set
 						urlcomponent = '" . DBSafe($hostname) ."',
 						inboundnumber = '" . DBSafe($inboundnumber) ."',
-						enabled=" . (GetFormData($f,$s,"enabled") + 0) ."
+						enabled=" . (GetFormData($f,$s,"enabled") + 0) .",
+						oemid='" . DBSafe(GetFormData($f, $s,"oemid")) . "',
+						nsid='" . DBSafe(GetFormData($f, $s, "nsid")) . "'
 						where id = '$currentid'");
 
 				// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
@@ -358,6 +360,9 @@ if( $reloadform ) {
 
 	PutFormData($f, $s, "_dmmethod", getCustomerSystemSetting('_dmmethod', "", true, $custdb), "array", array('asp','hybrid','cs'), null, true);
 
+	PutFormData($f, $s, "oemid", $custinfo[5], "text");
+	PutFormData($f, $s, "nsid", $custinfo[6], "text");
+
 }
 
 
@@ -446,7 +451,10 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 
 ?>
 <td></tr>
+
 <tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
+<tr><td>OEM ID: </td><td><? NewFormitem($f, $s, 'oemid', 'text', 10, 50) ?></td></tr>
+<tr><td>NetSuite ID: </td><td><? NewFormitem($f, $s, 'nsid', 'text', 10, 50) ?></td></tr>
 
 <tr>
 	<td>Logo:</td>
