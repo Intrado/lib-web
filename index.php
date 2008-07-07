@@ -79,6 +79,8 @@ if (isset($_GET['login'])) {
 		$badlogin = true;
 		error_log("ASPTOKEN login failure");
 	}
+	if($userid)
+		$updatelogin = true;
 } else if (!isset($_GET['logout'])){
 	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
 	$sessionstarted = true;
