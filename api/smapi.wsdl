@@ -404,10 +404,34 @@ sendJob:
     	</wsdl:operation>
 
     	<wsdl:operation name="getContacts">
+    		<wsdl:documentation>Given a valid session id and pkey, an array of contact objects is returned.
+		A contact object contains a pkey, contact type(phone,email,sms), sequence number,
+		contact information, and an array of contact preference objects.  A contact
+		preference object contains a job type id and an enabled flag(boolean).
+
+		The max number of contacts are always returned.
+
+		getContacts
+			params: String sessionid
+					String pkey
+
+			return:
+					contacts: array of contact objs</wsdl:documentation>
     		<wsdl:input message="sm:getContactsRequest"></wsdl:input>
     		<wsdl:output message="sm:getContactsResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="setContacts">
+    		<wsdl:documentation>Given a valid session id and an array of contact objects,
+		setContacts will update contact information in the system.  If any
+		of the objects contains an invalid person id, the function will not process
+		the list.
+
+		setContacts
+			params: String sessionid
+					contacts: array of contact objs
+
+			return:
+					Success/Fail</wsdl:documentation>
     		<wsdl:input message="sm:setContactsRequest"></wsdl:input>
     		<wsdl:output message="sm:setContactsResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
