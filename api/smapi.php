@@ -958,12 +958,14 @@ class SMAPI{
 
 					if($contact->type == "phone"){
 						$obj = new Phone();
+						$obj->$type = Phone::parse($contact->destination);
 					} else if($contact->type == "email"){
 						$obj = new Email();
 					} else if($contact->type == "sms"){
 						$obj = new Sms();
+						$obj->$type = Phone::parse($contact->destination);
 					}
-					$obj->$type = $contact->destination;
+
 					$obj->personid = $personarray[$contact->pkey];
 					$obj->editlock = 1;
 					$obj->sequence = $contact->sequence;
@@ -973,7 +975,11 @@ class SMAPI{
 					$type = $contact->type;
 					$obj = $personcontact[$contact->pkey][$type][$contact->sequence];
 					$obj->editlock = 1;
-					$obj->$type = $contact->destination;
+					if($type == 'phone' || $type == 'sms'){
+						$obj->$type = Phone::parse($contact->destination);
+					} else {
+						$obj->$type = $contact->destination;
+					}
 					$obj->update();
 				}
 
