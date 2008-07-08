@@ -17,6 +17,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 class SMAPI{
 
+	function getCustomerURL($oem, $oemid){
+		global $IS_COMMSUITE;
+		$result = array("resultcode" => "failure", "resultdescription" => "", "customerurl" => "");
+		$customerurl = api_getCustomerURL($oem, $oemid);
+		if($customerurl != false){
+			$result['customerurl'] = $customerurl;
+			$result['resultcode'] = "success";
+		}
+
+		return $result;
+	}
+
+
 	/*
 	Given a valid loginname/password, a session id is generated and passed back.
 	If an error occurs, error will contain the error and sessionid will be empty string.
