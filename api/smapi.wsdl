@@ -131,11 +131,6 @@
 			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-            <xsd:complexType name="ContactArray">
-            	<xsd:sequence>
-            		<xsd:element name="contacts" type="sm:Contact" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-            	</xsd:sequence>
-            </xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
@@ -235,11 +230,11 @@
     <wsdl:message name="getContactsResponse">
     	<wsdl:part name="result" type="sm:getContactsResult"></wsdl:part>
     </wsdl:message>
-    <wsdl:message name="setContactsRequest">
+    <wsdl:message name="setContactRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="contacts" type="sm:ContactArray"></wsdl:part>
+    	<wsdl:part name="contacts" type="sm:Contact"></wsdl:part>
     </wsdl:message>
-    <wsdl:message name="setContactsResponse">
+    <wsdl:message name="setContactResponse">
     	<wsdl:part name="result" type="sm:setContactsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="SMClient">
@@ -420,7 +415,7 @@ sendJob:
     		<wsdl:input message="sm:getContactsRequest"></wsdl:input>
     		<wsdl:output message="sm:getContactsResponse"></wsdl:output>
     	</wsdl:operation>
-    	<wsdl:operation name="setContacts">
+    	<wsdl:operation name="setContact">
     		<wsdl:documentation>Given a valid session id and an array of contact objects,
 		setContacts will update contact information in the system.  If any
 		of the objects contains an invalid person id, the function will not process
@@ -428,256 +423,219 @@ sendJob:
 
 		setContacts
 			params: String sessionid
-					contacts: array of contact objs
+					contacts: contact object
 
 			return:
 					Success/Fail</wsdl:documentation>
-    		<wsdl:input message="sm:setContactsRequest"></wsdl:input>
-    		<wsdl:output message="sm:setContactsResponse"></wsdl:output>
+    		<wsdl:input message="sm:setContactRequest"></wsdl:input>
+    		<wsdl:output message="sm:setContactResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMClient">
 
     	<soap:binding style="rpc"
-    		transport="http://schemas.xmlsoap.org/soap/http">
-    	</soap:binding>
+    		transport="http://schemas.xmlsoap.org/soap/http" />
     	<wsdl:operation name="login">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/login">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/login" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getLists">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/getLists">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/getLists" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getMessages">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/getMessages">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/getMessages" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="setMessageBody">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/setMessageBody">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/setMessageBody" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="uploadAudio">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/uploadAudio">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/uploadAudio" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getJobTypes">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/getJobTypes">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/getJobTypes" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getActiveJobs">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/getActiveJobs">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/getActiveJobs" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="getRepeatingJobs">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/getRepeatingJobs">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/getRepeatingJobs" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
 
     	</wsdl:operation>
     	<wsdl:operation name="sendRepeatingJob">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/sendRepeatingJob">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/sendRepeatingJob" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getJobStatus">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/getJobStatus">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/getJobStatus" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="sendJob">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/sendJob">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/sendJob" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
 
     	<wsdl:operation name="getContacts">
 
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/getContacts">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/getContacts" />
     		<wsdl:input>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
 
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
-    	<wsdl:operation name="setContacts">
+    	<wsdl:operation name="setContact">
+
     		<soap:operation
-    			soapAction="http://asp.schoolmessenger.com/setContacts">
-    		</soap:operation>
+    			soapAction="http://asp.schoolmessenger.com/setContact" />
     		<wsdl:input>
+
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:input>
     		<wsdl:output>
+
     			<soap:body use="literal"
-    				namespace="http://asp.schoolmessenger.com">
-    			</soap:body>
+    				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
     </wsdl:binding>
