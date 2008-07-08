@@ -844,14 +844,13 @@ class SMAPI{
 	}
 
 	/*
-		Given a valid session id and an array of contact objects,
-		setContacts will update contact information in the system.  If any
-		of the objects contains an invalid person id, the function will not process
-		the list.
+		Given a valid session id and a contact object,
+		setContact will update contact information in the system.  If any
+		part of the contact object is invalid, an error is returned
 
 		setContacts
 			params: String sessionid
-					contacts: array of contact objs
+					contact: contact object
 
 			return:
 					Success/Fail
