@@ -883,7 +883,7 @@ class SMAPI{
 
 			//if any fields are invalid, do not update system and return problems
 			if(!in_array($contact->type, array("phone", "email", "sms"))){
-				$result["resultdescription"] = "Wrong type: " . $contact->type;
+				$result["resultdescription"] = "Invalid type";
 				return $result;
 			}
 
