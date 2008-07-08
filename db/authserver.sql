@@ -206,3 +206,5 @@ ALTER TABLE `dm` ADD `routetype` VARCHAR( 50 ) NOT NULL DEFAULT '';
 
 ALTER TABLE `customer` ADD `oemid` VARCHAR( 50 ) NOT NULL AFTER `id` ,
 ADD `nsid` VARCHAR( 50 ) NOT NULL AFTER `oemid` ;
+
+ALTER TABLE `customer` ADD `oem` VARCHAR( 50 ) NOT NULL AFTER `id` ;
