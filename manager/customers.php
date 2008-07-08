@@ -83,7 +83,7 @@ while($row = DBGetRow($res)){
 	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
 }
 
-$customerquery = Query("select id, shardid, urlcomponent, oemid, nsid from customer $customersql order by shardid, id");
+$customerquery = Query("select id, shardid, urlcomponent, oem, oemid, nsid from customer $customersql order by shardid, id");
 $customers = array();
 while($row = DBGetRow($customerquery)){
 	$customers[] = $row;
@@ -123,6 +123,7 @@ foreach($customers as $cust) {
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
 		$row[12] = $cust[3];
 		$row[13] = $cust[4];
+		$row[14] = $cust[5];
 		$data[] = $row;
 	}
 }
@@ -139,8 +140,9 @@ $titles = array("0" => "ID",
 				"9" => "Jobs",
 				"Actions" => "Actions",
 				"5" => "NOTES: ",
-				"OEM ID",
-				"NetSuite ID");
+				"12" => "OEM",
+				"13" => "OEM ID",
+				"14" => "NetSuite");
 
 $formatters = array("url" => "fmt_custurl",
 					"6" => "fmt_status",
