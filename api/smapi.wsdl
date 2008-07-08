@@ -131,6 +131,14 @@
 			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+
+	<xsd:complexType name="getCustomerURLResult">
+		<xsd:sequence>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="customerurl" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
@@ -236,6 +244,13 @@
     </wsdl:message>
     <wsdl:message name="setContactResponse">
     	<wsdl:part name="result" type="sm:setContactsResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getCustomerURLRequest">
+    	<wsdl:part name="oem" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="oemid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getCustomerURLResponse">
+    	<wsdl:part name="result" type="sm:getCustomerURLResult"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
@@ -428,6 +443,10 @@ sendJob:
 					Success/Fail</wsdl:documentation>
     		<wsdl:input message="sm:setContactRequest"></wsdl:input>
     		<wsdl:output message="sm:setContactResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getCustomerURL">
+    		<wsdl:input message="sm:getCustomerURLRequest"></wsdl:input>
+    		<wsdl:output message="sm:getCustomerURLResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMClient">
 
@@ -626,6 +645,21 @@ sendJob:
 
     		<soap:operation
     			soapAction="http://asp.schoolmessenger.com/setContact" />
+    		<wsdl:input>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getCustomerURL">
+
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getCustomerURL" />
     		<wsdl:input>
 
     			<soap:body use="literal"
