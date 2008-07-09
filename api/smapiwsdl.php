@@ -11,7 +11,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <wsdl:definitions xmlns:sm="http://asp.schoolmessenger.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SMAPI" targetNamespace="http://asp.schoolmessenger.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
     <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://asp.schoolmessenger.com">
 
-
 	<xsd:complexType name="list">
 		<xsd:sequence>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
@@ -40,7 +39,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	</xsd:complexType>
 
 
-
 	<xsd:complexType name="jobstatus">
 		<xsd:sequence>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
@@ -55,7 +53,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<xsd:element name="smstotal" type="xsd:int"></xsd:element>
 			<xsd:element name="phoneremaining" type="xsd:int"></xsd:element>
 			<xsd:element name="emailremaining" type="xsd:int"></xsd:element>
-
 			<xsd:element name="smsremaining" type="xsd:int"></xsd:element>
 			<xsd:element name="startdate" type="xsd:string"></xsd:element>
 			<xsd:element name="status" type="xsd:string"></xsd:element>
@@ -157,28 +154,72 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+	<xsd:complexType name="getContactsResult">
+		<xsd:sequence>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="contacts" type="sm:Contact" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Contact">
+		<xsd:sequence>
+			<xsd:element name="pkey" type="xsd:string"></xsd:element>
+			<xsd:element name="type" type="xsd:string"></xsd:element>
+			<xsd:element name="destination" type="xsd:string"></xsd:element>
+			<xsd:element name="sequence" type="xsd:string"></xsd:element>
+			<xsd:element name="contactpreferences" type="sm:ContactPreference" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ContactPreference">
+		<xsd:sequence>
+			<xsd:element name="jobtypeid" type="xsd:int"></xsd:element>
+			<xsd:element name="enabled" type="xsd:boolean"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="setContactsResult">
+		<xsd:sequence>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="getCustomerURLResult">
+		<xsd:sequence>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="customerurl" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="loginToCustomerResult">
+		<xsd:sequence>
+
+                    <xsd:element name="sessionid" type="xsd:string"></xsd:element>
+                    <xsd:element name="resultcode" type="xsd:string"></xsd:element>
+                    <xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+                </xsd:sequence>
+	</xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
     	<wsdl:part name="password" type="xsd:string"></wsdl:part>
+
     </wsdl:message>
     <wsdl:message name="loginResponse">
     	<wsdl:part name="result" type="sm:loginResult"></wsdl:part>
-
     </wsdl:message>
     <wsdl:message name="getListsRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getListsResponse">
     	<wsdl:part name="result" type="sm:getListsResult"></wsdl:part>
-
     </wsdl:message>
     <wsdl:message name="getMessagesRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
     	<wsdl:part name="type" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getMessagesResponse">
-
 
     	<wsdl:part name="result" type="sm:getMessagesResult"></wsdl:part>
     </wsdl:message>
@@ -189,7 +230,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:message>
     <wsdl:message name="setMessageBodyResponse">
     	<wsdl:part name="result" type="sm:setMessagebodyResult"></wsdl:part>
-
     </wsdl:message>
     <wsdl:message name="uploadAudioRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
@@ -199,14 +239,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:message>
     <wsdl:message name="uploadAudioResponse">
 
-
     	<wsdl:part name="result" type="sm:uploadAudioResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobTypesRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobTypesResponse">
-
 
     	<wsdl:part name="result" type="sm:getJobTypesResult"></wsdl:part>
     </wsdl:message>
@@ -215,14 +253,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:message>
     <wsdl:message name="getActiveJobsResponse">
 
-
     	<wsdl:part name="result" type="sm:getActiveJobsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRepeatingJobsRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRepeatingJobsResponse">
-
 
     	<wsdl:part name="result" type="sm:getRepeatingJobsResult"></wsdl:part>
     </wsdl:message>
@@ -232,7 +268,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:message>
     <wsdl:message name="sendRepeatingJobResponse">
 
-
     	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobStatusRequest">
@@ -240,7 +275,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     	<wsdl:part name="jobid" type="xsd:int"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobStatusResponse">
-
 
     	<wsdl:part name="result" type="sm:getJobStatusResult"></wsdl:part>
     </wsdl:message>
@@ -250,7 +284,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     	<wsdl:part name="description" type="xsd:string"></wsdl:part>
     	<wsdl:part name="listid" type="xsd:int"></wsdl:part>
     	<wsdl:part name="jobtypeid" type="xsd:int"></wsdl:part>
-
         <wsdl:part name="startdate" type="xsd:string"></wsdl:part>
         <wsdl:part name="starttime" type="xsd:string"></wsdl:part>
         <wsdl:part name="endtime" type="xsd:string"></wsdl:part>
@@ -263,7 +296,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     	<wsdl:part name="maxcallattempts" type="xsd:int"></wsdl:part></wsdl:message>
     <wsdl:message name="sendJobResponse">
 
-
     	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="Request">
@@ -271,6 +303,35 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:message>
     <wsdl:message name="Response">
     	<wsdl:part name="Response" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getContactsRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="pkey" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getContactsResponse">
+    	<wsdl:part name="result" type="sm:getContactsResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setContactRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="contacts" type="sm:Contact"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setContactResponse">
+    	<wsdl:part name="result" type="sm:setContactsResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getCustomerURLRequest">
+    	<wsdl:part name="oem" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="oemid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getCustomerURLResponse">
+    	<wsdl:part name="result" type="sm:getCustomerURLResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="loginToCustomerRequest">
+    	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="password" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="customerurl" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="loginToCustomerResponse">
+    	<wsdl:part name="result" type="sm:loginToCustomerResult"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
@@ -433,7 +494,45 @@ sendJob:
     		<wsdl:output message="sm:sendJobResponse"></wsdl:output>
     	</wsdl:operation>
 
-    	    </wsdl:portType>
+    	<wsdl:operation name="getContacts">
+    		<wsdl:documentation>Given a valid session id and pkey, an array of contact objects is returned.
+		A contact object contains a pkey, contact type(phone,email,sms), sequence number,
+		contact information, and an array of contact preference objects.  A contact
+		preference object contains a job type id and an enabled flag(boolean).
+
+		The max number of contacts are always returned.
+
+		getContacts
+			params: String sessionid
+					String pkey
+
+			return:
+					contacts: array of contact objs</wsdl:documentation>
+    		<wsdl:input message="sm:getContactsRequest"></wsdl:input>
+    		<wsdl:output message="sm:getContactsResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="setContact">
+    		<wsdl:documentation>		Given a valid session id and a contact object,
+		setContact will update contact information in the system.  If any
+		part of the contact object is invalid, an error is returned
+
+		setContacts
+			params: String sessionid
+					contact: contact object
+
+			return:
+					Success/Fail</wsdl:documentation>
+    		<wsdl:input message="sm:setContactRequest"></wsdl:input>
+    		<wsdl:output message="sm:setContactResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getCustomerURL">
+    		<wsdl:input message="sm:getCustomerURLRequest"></wsdl:input>
+    		<wsdl:output message="sm:getCustomerURLResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="loginToCustomer">
+    		<wsdl:input message="sm:loginToCustomerRequest"></wsdl:input>
+    		<wsdl:output message="sm:loginToCustomerResponse"></wsdl:output>
+    	</wsdl:operation></wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMClient">
 
     	<soap:binding style="rpc"
@@ -612,13 +711,69 @@ sendJob:
     		</wsdl:output>
     	</wsdl:operation>
 
+    	<wsdl:operation name="getContacts">
+
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getContacts" />
+    		<wsdl:input>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="setContact">
+
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/setContact" />
+    		<wsdl:input>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getCustomerURL">
+
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getCustomerURL" />
+    		<wsdl:input>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="loginToCustomer">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/loginToCustomer" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="SMAPI">
 		<wsdl:port name="SMAPIPort" binding="sm:SMBinding">
 			<soap:address location="http://' . $_SERVER["SERVER_NAME"] .'/' . $CUSTOMERURL . '/api/smapi.php"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
-
 ';
 
 ?>
