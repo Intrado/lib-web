@@ -33,6 +33,11 @@ if(isset($_GET['resetDM']) || isset($_GET['update'])){
 <?
 }
 
+$showuuid = "";
+if(isset($_GET['showuuid'])){
+	$showuuid = ", dmuuid";
+}
+
 $queryextra = "";
 
 if(isset($_GET['clear'])){
@@ -79,8 +84,9 @@ function fmt_lastseen($row, $index){
 
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
-			dm.enablestate, dm.lastseen, dm.version
-			from dm dm
+			dm.enablestate, dm.lastseen, dm.version "
+			. $showuuid .
+			" from dm dm
 			left join customer c on (c.id = dm.customerid)
 			where dm.type = 'customer'
 			" . $queryextra . "
@@ -91,16 +97,19 @@ while($row = DBGetRow($result)){
 	$data[] = $row;
 }
 
-$titles = array(0 => "DM ID",
-				1 => "Customer ID",
-				2 => "Customer Name",
-				3 => "Name",
-				4 => "Authorized IP",
-				5 => "Last IP",
-				7 => "Last Seen",
-				6 => "State",
-				8 => "Version",
-				"actions" => "Actions");
+$titles = array(0 => "DM ID");
+if($showuuid != ""){
+	$titles[9] = "DM UUID";
+}
+$titles[1] = "Customer ID";
+$titles[2] = "Customer Name";
+$titles[3] = "Name";
+$titles[4] = "Authorized IP";
+$titles[5] = "Last IP";
+$titles[7] = "Last Seen";
+$titles[6] = "State";
+$titles[8] = "Version";
+$titles["actions"] = "Actions";
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
