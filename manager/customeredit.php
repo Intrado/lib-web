@@ -157,7 +157,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 						urlcomponent = '" . DBSafe($hostname) ."',
 						inboundnumber = '" . DBSafe($inboundnumber) ."',
 						enabled=" . (GetFormData($f,$s,"enabled") + 0) .",
-						oem='" . DBSafe(GetFormData($f, $s, "oem")) . "',
+						oem='" . DBSafe(strtolower(GetFormData($f, $s, "oem"))) . "',
 						oemid='" . DBSafe(GetFormData($f, $s,"oemid")) . "',
 						nsid='" . DBSafe(GetFormData($f, $s, "nsid")) . "'
 						where id = '$currentid'");
