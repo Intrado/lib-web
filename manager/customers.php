@@ -83,7 +83,7 @@ while($row = DBGetRow($res)){
 	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
 }
 
-$customerquery = Query("select id, shardid, urlcomponent, oem, oemid, nsid from customer $customersql order by shardid, id");
+$customerquery = Query("select id, shardid, urlcomponent, oem, oemid, nsid from customer $customersql order by id");
 $customers = array();
 while($row = DBGetRow($customerquery)){
 	$customers[] = $row;
