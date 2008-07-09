@@ -20,7 +20,7 @@ class SMAPI{
 	function getCustomerURL($oem, $oemid){
 		global $IS_COMMSUITE;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "customerurl" => "");
-		$customerurl = api_getCustomerURL($oem, $oemid);
+		$customerurl = api_getCustomerURL(strtolower($oem), $oemid);
 		if($customerurl != false){
 			$result['customerurl'] = $customerurl;
 			$result['resultcode'] = "success";
@@ -41,32 +41,21 @@ class SMAPI{
 	*/
 	function login($loginname, $password){
 		global $IS_COMMSUITE;
+		return systemLogin($loginname, $password);
+	}
 
-		$result = array("resultcode" => "failure", "resultdescription" => "", "sessionid" => "");
+	/*
+	Given a valid loginname/password/customerurl combination, a session id is generated and passed back.
+	If an error occurs, error will contain the error and sessionid will be empty string.
 
-		//get the customer URL
-		if ($IS_COMMSUITE) {
-			$CUSTOMERURL = "default";
-		} /*CSDELETEMARKER_START*/ else {
-			$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-			$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
-		} /*CSDELETEMARKER_END*/
+	login:
+		params: string loginname, string password, string customerurl
+		returns: string resultcode, string resultdescription, string sessionid
 
-		$userid = doLogin($loginname, $password, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
-		if($userid == -1){
-
-			$result["resultdescription"] = "User is locked out";
-			return $result;
-		} else if ($userid){
-			doStartSession();
-			loadCredentials($userid);
-			$result["resultcode"] = "success";
-			$result["sessionid"] = session_id();
-			return $result;
-		}
-
-		$result["resultdescription"] = "Invalid LoginName/Password combination";
-		return $result;
+	*/
+	function loginToCustomer($loginname, $password, $customerurl){
+		global $IS_COMMSUITE;
+		return systemLogin($loginname, $password, $customerurl);
 	}
 
 	/*
@@ -987,6 +976,41 @@ class SMAPI{
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
+
+//login function with shared code from login and loginToCustomer
+
+function systemLogin($loginname, $password, $CUSTOMERURL=null){
+
+	global $IS_COMMSUITE;
+	$result = array("resultcode" => "failure", "resultdescription" => "", "sessionid" => "");
+
+	if($CUSTOMERURL === null){
+		//get the customer URL
+		if ($IS_COMMSUITE) {
+			$CUSTOMERURL = "default";
+		} /*CSDELETEMARKER_START*/ else {
+			$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+			$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+		} /*CSDELETEMARKER_END*/
+	}
+
+	$userid = doLogin($loginname, $password, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
+	if($userid == -1){
+
+		$result["resultdescription"] = "User is locked out";
+		return $result;
+	} else if ($userid){
+		doStartSession();
+		loadCredentials($userid);
+		$result["resultcode"] = "success";
+		$result["sessionid"] = session_id();
+		return $result;
+	}
+
+	$result["resultdescription"] = "Invalid LoginName/Password combination";
+	return $result;
+}
+
 
 //starts or resumes a session with a valid session id
 function APISession($sessionid){
