@@ -992,6 +992,12 @@ function systemLogin($loginname, $password, $CUSTOMERURL=null){
 			$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
 			$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 		} /*CSDELETEMARKER_END*/
+	} else {
+		//make sure customer url is alphanumeric
+		if(!ereg("^[a-zA-Z0-9]*$", $CUSTOMERURL)) {
+			$result['resultdescription'] = "Invalid Customer URL";
+			return $result;
+		}
 	}
 
 	$userid = doLogin($loginname, $password, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
