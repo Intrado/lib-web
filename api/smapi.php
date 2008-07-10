@@ -34,7 +34,7 @@ class SMAPI{
 			$result['customerurl'] = $customerurl;
 			$result['resultcode'] = "success";
 		} else {
-			$result['resultdescription'] = "An error occurred";
+			$result['resultdescription'] = "Invalid OEM/OEMID combination";
 		}
 
 		return $result;
