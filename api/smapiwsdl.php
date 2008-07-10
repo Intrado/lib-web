@@ -9,6 +9,7 @@ header("Content-type: text");
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <wsdl:definitions xmlns:sm="http://asp.schoolmessenger.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SMAPI" targetNamespace="http://asp.schoolmessenger.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <wsdl:documentation></wsdl:documentation>
     <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://asp.schoolmessenger.com">
 
 	<xsd:complexType name="list">
@@ -526,10 +527,22 @@ sendJob:
     		<wsdl:output message="sm:setContactResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getCustomerURL">
+    		<wsdl:documentation>	Given a valid oem/oemid combination, the customer url corresponding to the
+	matching customer is returned
+
+	getCustomerUrl:
+		params: string oem, string oemid
+		returns: string customerurl</wsdl:documentation>
     		<wsdl:input message="sm:getCustomerURLRequest"></wsdl:input>
     		<wsdl:output message="sm:getCustomerURLResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="loginToCustomer">
+    		<wsdl:documentation>	Given a valid loginname/password/customerurl combination, a session id is generated and passed back.
+	If an error occurs, error will contain the error and sessionid will be empty string.
+
+	loginToCustomer:
+		params: string loginname, string password, string customerurl
+		returns: string resultcode, string resultdescription, string sessionid</wsdl:documentation>
     		<wsdl:input message="sm:loginToCustomerRequest"></wsdl:input>
     		<wsdl:output message="sm:loginToCustomerResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
