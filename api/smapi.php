@@ -17,6 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 class SMAPI{
 
+	/*
+	Given a valid oem/oemid combination, the customer url corresponding to the
+	matching customer is returned
+
+	getCustomerUrl:
+		params: string oem, string oemid
+		returns: string customerurl
+
+	*/
+
 	function getCustomerURL($oem, $oemid){
 		global $IS_COMMSUITE;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "customerurl" => "");
@@ -60,7 +70,7 @@ class SMAPI{
 	Given a valid loginname/password/customerurl combination, a session id is generated and passed back.
 	If an error occurs, error will contain the error and sessionid will be empty string.
 
-	login:
+	loginToCustomer:
 		params: string loginname, string password, string customerurl
 		returns: string resultcode, string resultdescription, string sessionid
 
