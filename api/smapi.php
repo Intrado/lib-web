@@ -20,10 +20,21 @@ class SMAPI{
 	function getCustomerURL($oem, $oemid){
 		global $IS_COMMSUITE;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "customerurl" => "");
+		if($oem == ""){
+			$result['resultdescription'] = "Missing OEM";
+			return $result;
+		}
+		if($oemid == ""){
+			$result['resultdescription'] = "Missing OEM ID";
+			return $result;
+		}
+
 		$customerurl = api_getCustomerURL(strtolower($oem), $oemid);
 		if($customerurl != false){
 			$result['customerurl'] = $customerurl;
 			$result['resultcode'] = "success";
+		} else {
+			$result['resultdescription'] = "An error occurred";
 		}
 
 		return $result;
