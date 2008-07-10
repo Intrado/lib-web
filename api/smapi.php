@@ -1008,6 +1008,9 @@ function systemLogin($loginname, $password, $CUSTOMERURL=null){
 		if(!ereg("^[a-zA-Z0-9]*$", $CUSTOMERURL)) {
 			$result['resultdescription'] = "Invalid Customer URL";
 			return $result;
+		} else if ($CUSTOMERURL === ""){
+			$result['resultdescription'] = "Invalid Customer URL";
+			return $result;
 		}
 	}
 
