@@ -134,7 +134,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 				$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
 				if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
 					QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type) values
-								(" . $dmid . ", '" . $dm['name'] . "', '" . $dm['enablestate'] . "', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "')
+								(" . $dmid . ", '" . $dm['name'] . "', '" . DBSafe($enablestate) . "', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "')
 								", $custdb);
 				} else {
 					QuickUpdate("update custdm set enablestate = '" . DBSafe($enablestate) . "',
