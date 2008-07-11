@@ -159,7 +159,7 @@ NewForm($f);
 
 	<tr>
 		<td>Number:</td>
-		<td><? NewFormItem($f, $s, "number", "text", 10) ?></td>
+		<td><? NewFormItem($f, $s, "number", "text", 14) ?></td>
 	</tr>
 	<tr>
 		<td><? NewFormItem($f, $s, "Submit", "submit")?></td>
