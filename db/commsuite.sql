@@ -1711,4 +1711,23 @@ $$$
 insert into setting (name, value) values ('_dmmethod', 'cs')
 $$$
 
+drop procedure start_specialtask
+$$$
 
+create procedure start_specialtask( in_specialtaskid int)
+begin
+declare l_custid int DEFAULT 1;
+declare l_type varchar(50);
+DECLARE rdm VARCHAR(50);
+DECLARE dtype VARCHAR(50) DEFAULT 'system';
+
+select type from specialtask where id=in_specialtaskid into l_type;
+
+SELECT value INTO rdm FROM setting WHERE name='_dmmethod';
+IF rdm='hybrid' or rdm='cs' THEN
+  SET dtype = 'customer';
+END IF;
+
+insert ignore into specialtaskqueue (customerid,localspecialtaskid,type,dispatchtype) values (l_custid,in_specialtaskid,l_type,dtype);
+end
+$$$

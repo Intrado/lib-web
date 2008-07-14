@@ -101,7 +101,7 @@ IF rdm='hybrid' or rdm='cs' THEN
   SET dtype = 'customer';
 END IF;
 
-insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid,type,dispatchtype) values (l_custid,in_specialtaskid,l_type,dtype);
+insert ignore into specialtaskqueue (customerid,localspecialtaskid,type,dispatchtype) values (l_custid,in_specialtaskid,l_type,dtype);
 end
 $$$
 
