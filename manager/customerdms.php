@@ -63,7 +63,7 @@ function fmt_customerUrl($row, $index){
 
 // index 0 is dmid
 function fmt_DMActions($row, $index){
-	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="customerdms.php?resetDM=' . $row[0] . '" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;<a href="customerdms.php?update=' . $row[0] . '" title="Update"><img src="img/s-update.png" border=0></a>&nbsp;<a href="dmupload.php?dmid=' . $row[0] . '" title="Upload DatFile"><img src="img/s-dat.png" border=0></a>';
+	$url = '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;<a href="#" onclick="if(confirm(\'Are you sure you want to reset DM ' . $row[3] . '?\')) window.location=\'customerdms.php?resetDM=' . $row[0] . '\'" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;<a href="#" onclick="if(confirm(\'Are you sure you want to update DM ' . $row[3] . '?\')) window.location=\'customerdms.php?update=' . $row[0] . '\'" title="Update"><img src="img/s-update.png" border=0></a>&nbsp;<a href="dmupload.php?dmid=' . $row[0] . '" title="Upload DatFile"><img src="img/s-dat.png" border=0></a>';
 	return $url;
 }
 
