@@ -28,6 +28,7 @@ $titles = array("0" => "Customer ID",
 				"Actions" => "Actions");
 
 $formatters = array("4" => "fmt_date",
+					"5" => "fmt_locked_status",
 					"Actions" => "lockeduser_actions");
 
 $f="lockedusers";
@@ -106,6 +107,16 @@ function lockeduser_actions($row, $index){
 		$actions = NewFormItem($f,$row[1], "Unlock", "submit");
 	}
 	return $actions;
+}
+
+function fmt_locked_status($row,$index){
+	if($row[$index] == 'lockout'){
+		return "Temporarily Locked";
+	} else if($row[$index] == 'disabled'){
+		return "Disabled";
+	} else {
+		return ucfirst($row[$index]);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
