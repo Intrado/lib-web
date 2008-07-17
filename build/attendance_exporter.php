@@ -5,7 +5,7 @@ $outputfile="attendance_result.csv";
 
 $dbhost="localhost";
 $dbusername="cswww";
-$dbpassword="admin";
+$dbpassword="";
 
 $logfile="attendance_exporter.log";
 
@@ -76,9 +76,10 @@ $joblistquery = "select j.id from job j
 							(
 								(j.startdate >= '$startdate' and j.startdate < date_add('$enddate',interval 1 day))
 								or
-								(ifnull(j.finishdate, j.enddate) >= '$startdate' and ifnull(j.finishdate, j.enddate) < '$startdate')
+								(ifnull(j.finishdate, j.enddate) >= '$startdate' and ifnull(j.finishdate, j.enddate) < date_add('$enddate',interval 1 day))
 							)
-						and j.jobtypeid = $jobtypeid";
+						and j.jobtypeid = $jobtypeid
+						and j.status in ('complete', 'active')";
 //echo $joblistquery . "\n";
 
 $jobidarray = array();
@@ -107,6 +108,7 @@ $query="select SQL_CALC_FOUND_ROWS
 			and rp.jobid in ('" . $jobidlist . "')
 			and date(from_unixtime(rc.starttime/1000)) >= $startdate
 			and date(from_unixtime(rc.starttime/1000)) < date_add('$enddate',interval 1 day)
+			and rp.type = 'phone'
 			order by rp." . $firstname . ", rp." . $lastname .", rp.pkey";
 
 //echo $query . "\n";
