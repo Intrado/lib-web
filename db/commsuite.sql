@@ -1731,3 +1731,9 @@ END IF;
 insert ignore into specialtaskqueue (customerid,localspecialtaskid,type,dispatchtype) values (l_custid,in_specialtaskid,l_type,dtype);
 end
 $$$
+
+drop table jobtaskactive
+$$$
+
+drop table jobtaaskcomplete
+$$$
