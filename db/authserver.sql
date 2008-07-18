@@ -208,3 +208,5 @@ ALTER TABLE `customer` ADD `oemid` VARCHAR( 50 ) NOT NULL AFTER `id` ,
 ADD `nsid` VARCHAR( 50 ) NOT NULL AFTER `oemid` ;
 
 ALTER TABLE `customer` ADD `oem` VARCHAR( 50 ) NOT NULL AFTER `id` ;
+
+ALTER TABLE `customer` ADD `notes` VARCHAR( 255 ) NOT NULL AFTER `logintokenexpiretime` ;
