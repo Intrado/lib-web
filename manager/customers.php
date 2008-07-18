@@ -83,7 +83,7 @@ while($row = DBGetRow($res)){
 	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
 }
 
-$customerquery = Query("select id, shardid, urlcomponent, oem, oemid, nsid from customer $customersql order by id");
+$customerquery = Query("select id, shardid, urlcomponent, oem, oemid, nsid, notes from customer $customersql order by id");
 $customers = array();
 while($row = DBGetRow($customerquery)){
 	$customers[] = $row;
@@ -106,7 +106,7 @@ foreach($customers as $cust) {
 		$row[2] = getCustomerSystemSetting('displayname', false, true, $custdb);
 		$row[3] = getCustomerSystemSetting('_productname', false, true, $custdb);
 		$row[4] = getCustomerSystemSetting('timezone', false, true, $custdb);
-		$row[5] = getCustomerSystemSetting('_managernote', false, true, $custdb);
+		$row[5] = $cust[6];
 		$row[6] = getCustomerSystemSetting('disablerepeat', false, true, $custdb);
 
 		$row[7] = getCustomerSystemSetting('_maxusers', false, true, $custdb);
