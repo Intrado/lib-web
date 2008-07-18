@@ -14,7 +14,7 @@ if (isset($_GET['id'])) {
 $accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 if(isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
-	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
+	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custinfo = mysql_fetch_row($custquery);
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
 	if(!$custdb) {
@@ -159,7 +159,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 						enabled=" . (GetFormData($f,$s,"enabled") + 0) .",
 						oem='" . DBSafe(strtolower(GetFormData($f, $s, "oem"))) . "',
 						oemid='" . DBSafe(GetFormData($f, $s,"oemid")) . "',
-						nsid='" . DBSafe(GetFormData($f, $s, "nsid")) . "'
+						nsid='" . DBSafe(GetFormData($f, $s, "nsid")) . "',
+						notes='" . DBSafe($managernote) . "'
 						where id = '$currentid'");
 
 				// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
@@ -210,7 +211,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				if($maxusers == "")
 					$maxusers = "unlimited";
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
-				setCustomerSystemSetting('_managernote', $managernote, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
@@ -320,7 +320,7 @@ if( $reloadform ) {
 	if($maxusers == "unlimited")
 		$maxusers = "";
 	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
-	PutFormData($f,$s,"managernote", getCustomerSystemSetting('_managernote', false, true, $custdb), "text", 0, 255);
+	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 150, 900);
