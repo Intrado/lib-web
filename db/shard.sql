@@ -218,3 +218,14 @@ ALTER TABLE `jobstatdata` ADD `type` ENUM( 'system', 'customer' ) NOT NULL DEFAU
 ALTER TABLE `jobstatdata` ADD INDEX `remotedm` ( `type` , `customerid` )  ;
 ALTER TABLE `qjob` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
 ALTER TABLE `specialtaskqueue` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
+
+-- ASP 5.3 aka 6.0
+
+CREATE TABLE `smsblock` (
+`sms` VARCHAR( 20 ) NOT NULL ,
+`status` ENUM( 'block', 'pendingoptin' ) NOT NULL default 'pendingoptin',
+`lastupdate` timestamp NOT NULL default CURRENT_TIMESTAMP,
+PRIMARY KEY ( `sms` )
+) ENGINE = innodb;
+
+
