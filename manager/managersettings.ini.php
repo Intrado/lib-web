@@ -1,5 +1,10 @@
 ;<?/* this prevents browsers from seeing anything
 
+;authentication server connection information
+[authserver]
+host="localhost:8088"
+path="/xmlrpc"
+
 ;authdb for manager use
 [db]
 persistent=true
