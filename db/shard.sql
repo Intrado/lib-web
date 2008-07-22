@@ -223,9 +223,11 @@ ALTER TABLE `specialtaskqueue` ADD `dispatchtype` ENUM( 'customer', 'system' ) N
 
 CREATE TABLE `smsblock` (
 `sms` VARCHAR( 20 ) NOT NULL ,
-`status` ENUM( 'block', 'pendingoptin' ) NOT NULL default 'pendingoptin',
-`lastupdate` timestamp NOT NULL default CURRENT_TIMESTAMP,
+`status` ENUM( 'block', 'pendingoptin', 'optin' ) NOT NULL default 'pendingoptin',
+`lastupdate` timestamp NOT NULL default CURRENT_TIMESTAMP  on update CURRENT_TIMESTAMP,
+`notes` VARCHAR( 255 ) NOT NULL DEFAULT '',
 PRIMARY KEY ( `sms` )
 ) ENGINE = innodb;
+
 
 
