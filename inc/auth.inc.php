@@ -294,7 +294,11 @@ function resetPassword($activationcode, $password){
 	$method = "AuthServer.resetPassword";
 	$result = pearxmlrpc($method, $params);
 	if($result !== false){
-		return $result;
+		if($result['result'] == ""){
+			// login success
+			session_id($result['sessionID']); // set the session id
+			return $result['userID'];
+		}
 	}
 	return false;
 }
