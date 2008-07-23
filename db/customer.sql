@@ -1412,3 +1412,6 @@ $$$
 ALTER TABLE `user` CHANGE `password` `password` VARCHAR( 50 ) NOT NULL ,
 CHANGE `pincode` `pincode` VARCHAR( 50 ) NOT NULL
 $$$
+
+ALTER TABLE `user` ADD `aremail` TEXT NOT NULL AFTER `email`
+$$$

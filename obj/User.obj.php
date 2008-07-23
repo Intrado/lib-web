@@ -11,6 +11,7 @@ class User extends DBMappedObject {
 	var $description = "";
 	var $phone = "";
 	var $email = "";
+	var $aremail = "";
 	var $enabled = 0;
 	var $lastlogin;
 	var $deleted = 0;
@@ -21,7 +22,7 @@ class User extends DBMappedObject {
 		$this->_allownulls = true;
 		$this->_tablename = "user";
 		$this->_fieldlist = array("accessid", "login", "accesscode", "firstname",
-								"lastname", "description", "email", "phone", "enabled","lastlogin","deleted", "ldap");
+								"lastname", "description", "email", "aremail", "phone", "enabled","lastlogin","deleted", "ldap");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
