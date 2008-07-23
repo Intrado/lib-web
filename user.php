@@ -45,27 +45,6 @@ if(!$IS_COMMSUITE && isset($_GET['id'])){
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-//Checks the password for required chars
-//returns false if fails the test
-function passwordcheck($f, $s){
-	$tally = 0;
-	$password = GetFormData($f,$s,'password');
-	if(ereg("^0*$", $password)){
-		return true;
-	}
-	if(ereg("[0-9]", $password))
-		$tally++;
-	if(ereg("[a-zA-Z]", $password))
-		$tally++;
-	if(ereg("[\!\@\#\$\%\^\&\*]", $password))
-		$tally++;
-
-	if($tally >= 2)
-		return true;
-
-	return false;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +112,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$callerid = Phone::parse(GetFormData($f,$s, "callerid"));
 		$usr = new User($_SESSION['userid']);
-		$emaillist = GetFormData($f, $s, "email");
+		$email = GetFormData($f, $s, "email");
+		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$password = trim(GetFormData($f, $s, "password"));
 		$passwordconfirm = trim(GetFormData($f, $s, "passwordconfirm"));
@@ -174,7 +154,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
-		} elseif(!passwordcheck($f, $s)){
+		} elseif(!passwordcheck(GetFormData($f, $s))){
 			error('Your password must contain at least 2 of the following: a letter, a number or a symbol', $securityrules);
 		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($issame=validateNewPassword($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')))) {
 			error($issame, $securityrules);
@@ -203,7 +183,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			}
 
 			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname","description"));
-			$usr->email = $emaillist;
+			$usr->email = $email;
+			$usr->aremail = $emaillist;
 			$usr->login = $login;
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
 			if($IS_LDAP){
@@ -291,7 +272,8 @@ if( $reloadform )
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
 			array("description","text",0,50),
-			array("email","text"),
+			array("email","email"),
+			array("aremail", "text")
 			);
 
 	PopulateForm($f,$s,$usr,$fields);
@@ -398,6 +380,10 @@ startWindow('User Information');
 							<tr>
 								<td align="right">Email(s):</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 72, 10000); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Auto Report Email(s):</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'aremail', 'text', 72, 10000); ?></td>
 							</tr>
 							<tr>
 								<td align="right">Phone:</td>
