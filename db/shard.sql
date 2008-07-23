@@ -226,7 +226,8 @@ CREATE TABLE `smsblock` (
 `status` ENUM( 'block', 'pendingoptin', 'optin' ) NOT NULL default 'pendingoptin',
 `lastupdate` timestamp NOT NULL default CURRENT_TIMESTAMP  on update CURRENT_TIMESTAMP,
 `notes` VARCHAR( 255 ) NOT NULL DEFAULT '',
-PRIMARY KEY ( `sms` )
+PRIMARY KEY ( `sms` ),
+INDEX ( `status` )
 ) ENGINE = innodb;
 
 
