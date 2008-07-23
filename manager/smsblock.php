@@ -11,17 +11,22 @@ require_once("XML/RPC.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+
+$number="";
+if(isset($_GET['sms'])){
+	$number = $_GET['sms']+0;
+}
+
 $f = "smsblock";
 $s = "main";
 $reloadform = 0;
-$number = "";
 $error = 0;
 
 $data = array();
 $titles = array();
 $formatters = array();
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "unblock") || CheckFormSubmit($f, "block") || CheckFormSubmit($f, "optin"))
+if(CheckFormSubmit($f, "search") || CheckFormSubmit($f, "operate"))
 {
 	if(CheckFormInvalid($f))
 	{
@@ -36,45 +41,22 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "unblock") || CheckFormSubmit(
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			$error = 1;
 		} else {
-
-			if(CheckFormSubmit($f, $s)){
+			if(CheckFormSubmit($f, "operate")){
+				$number = ereg_replace("[^0-9]*","",CheckFormSubmit($f, "operate"));
+			} else {
 				$number = ereg_replace("[^0-9]*","",GetFormData($f, $s, "number"));
-				if(GetFormData($f, $s, "operation") == "block"){
-					if(strlen(ereg_replace("[^0-9]*","",$number)) != 10){
-						error("Invalid phone number");
-						$error=1;
-					} else {
-						blocksms($number, "block");
-					}
-				}
-			} else if(CheckFormSubmit($f, "unblock")){
-				$number = CheckFormSubmit($f, "unblock");
-				blocksms($number, 'unblock');
-			} else if(CheckFormSubmit($f, "block")){
-				$number = CheckFormSubmit($f, "block");
-				blocksms($number, 'block');
-			} else if(CheckFormSubmit($f, "optin")){
-				$number = CheckFormSubmit($f, "optin");
-				blocksms($number, 'unblock');
 			}
-			// Search all shard databases for number that was operated on
-
-			$res = Query("select id, dbhost, dbusername, dbpassword from shard limit 1");
-			$shardinfo = array();
-			while($row = DBGetRow($res)){
-				$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
-			}
-			$data = array();
-			foreach($shardinfo as $shardid => $shard) {
-
-				$sharddb = mysql_connect($shard[0],$shard[1], $shard[2], true)
-					or die("Could not connect to shard database: " . mysql_error());
-				mysql_select_db("aspshard");
-				$res = Query("select sms, status, lastupdate from smsblock where sms like '" . DBSafe($number) . "%'", $sharddb);
-
-				while($row = DBGetRow($res)){
-					$data[] = $row;
+			if(strlen($number) != 10){
+				error("Invalid phone number");
+				$error = 1;
+			} else if ($number[0] < 2 || $number[3] < 2){ //check for valid looking area code and prefix
+				error("The phone number seems to be invalid");
+				$error = 1;
+			} else {
+				if(CheckFormSubmit($f, "operate")){
+					blocksms($number, GetFormData($f, $s, "operation"), GetFormData($f, $s, "notes"));
 				}
+				redirect("?sms=$number");
 			}
 		}
 	}
@@ -83,31 +65,29 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "unblock") || CheckFormSubmit(
 //Always reload the form
 if(!$error){
 	ClearFormData($f);
-	PutFormData($f, $s, "operation", "search");
-	PutFormData($f, $s, "number", isset($number) ? $number : "", "phone");
-	PutFormData($f, $s, "Submit", "");
-	PutFormData($f, $s, "Unblock", "", "text");
-	PutFormData($f, $s, "Block", "", "text");
-	PutFormData($f, $s, "Optin", "", "text");
-	PutFormData($f, $s, "managerpassword", "text");
+	PutFormData($f, $s, "operation", "", "text");
+	PutFormData($f, $s, "number", $number, "phone");
+	PutFormData($f, "search", "Go!", "");
+	PutFormData($f, "operate", "Make it so...", "");
+	PutFormData($f, $s, "managerpassword", "", "text");
+	PutFormData($f, $s, "sms", $number, "phone");
 }
 
+// Search if number is valid
+if($number && !$error){
+	$shard = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard limit 1");
 
+	$sharddb = mysql_connect($shard[1],$shard[2], $shard[3], true)
+		or die("Could not connect to shard database: " . mysql_error());
+	mysql_select_db("aspshard", $sharddb);
+	$data = QuickQueryRow("select sms, status, lastupdate, notes from smsblock where sms like '" . DBSafe($number) . "%'", false, $sharddb);
 
-$titles = array(0 => "SMS",
-				1 => "Status",
-				2 => "Date",
-				"actions" => "Actions");
-
-$formatters = array(0 => "fmt_phone_number",
-					1 => "fmt_block_status",
-					2 => "fmt_date",
-					"actions" => "fmt_sms_block_options");
+}
 
 // Customer phone formatter function because we can't use phone.obj.php
-function fmt_phone_number($row, $index){
-	if($row[$index])
-		return "(" . substr($row[$index],0,3) . ") " . substr($row[$index],3,3) . "-" . substr($row[$index],6,4);
+function fmt_phone_number($number){
+	if(strlen($number) == 10)
+		return "(" . substr($number,0,3) . ") " . substr($number,3,3) . "-" . substr($number,6,4);
 	else
 		return "";
 }
@@ -144,39 +124,79 @@ function fmt_block_status($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 
 include_once("nav.inc.php");
-NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+//Only require manager password if user can block
+
+if($number){
+	NewForm($f);
+} else {
+	NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+}
 ?>
 <div>SMS Block</div>
-
+<?
+if(!$number){
+?>
 <table>
 	<tr>
-		<td>Search:</td>
-		<td><? NewFormItem($f, $s, "operation", "radio", null, "search"); ?></td>
-	</tr>
-	<tr>
-		<td>Block Number:</td>
-		<td><? NewFormItem($f, $s, "operation", "radio", null, "block"); ?></td>
-	</tr>
-	<tr>
 		<td>Number:</td>
-		<td><? NewFormItem($f, $s, "number", "text", 14) ?></td>
-	</tr>
-	<tr>
-		<td><? NewFormItem($f, $s, "Submit", "submit")?></td>
+		<td><? NewFormItem($f, $s, "number", "text", 14); ?></td>
+		<td><? NewFormItem($f, "search", "Go!", "submit")?></td>
 	</tr>
 </table>
 <?
-managerPassword($f, $s);
+}
+if($number){
 ?>
-<br>
-<br>
-<table class="list">
+	<table class="list">
+		<tr>
+			<th class="listheader">SMS</th>
+			<th class="listheader">Status</th>
+			<th class="listheader">Last Modified</th>
+			<th class="listheader">Notes</th>
+		</tr>
+		<tr>
+			<td><?= $data ? $data[0] : $number ?></td>
+			<td><?= $data ? $data[1] : "No Record" ?></td>
+			<td><?= $data ? $data[2] : "" ?></td>
+			<td><?= $data ? $data[3] : ""?></td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td>Operation:</td>
+			<td>
 <?
-		showTable($data, $titles, $formatters);
+				NewFormItem($f, $s, "operation", "selectstart");
+				NewFormItem($f, $s, "operation", "--Select an Operation--", "");
+				//index 1 is status
+				if($data && $data[1] == 'block'){
+					NewFormItem($f, $s, "operation", "selectoption", "Opt-In", "optin");
+				} else if($data && $data[1] == 'optin'){
+					NewFormItem($f, $s, "operation", "selectoption", "Block", "block");
+				} else {
+					NewFormItem($f, $s, "operation", "selectoption", "Opt-In", "optin");
+					NewFormItem($f, $s, "operation", "selectoption", "Block", "block");
+				}
+				NewFormItem($f, $s, "operation", "selectend");
 ?>
-</table>
+			</td>
+		</tr>
+		<tr>
+			<td>Notes:</td>
+			<td>
+				<?
+					PutFormData($f, $s, "notes", "", "text", "nomin", "nomax", true);
+					NewFormItem($f, $s, "notes", "textarea", 40, 3);
+				?>
+			</td>
+		</tr>
+		<tr>
+			<td><? NewFormItem($f, "operate", "Make it so...", "submit", null, null, "onclick='submitForm(\"$f\", \"operate\",\"$number\"); return false;'")?></td>
+		</tr>
+	</table>
 <?
-
+	managerpassword($f, $s);
+}
 EndForm();
 include_once("navbottom.inc.php");
 
@@ -213,8 +233,8 @@ function pearxmlrpc($method, $params) {
 	return false;
 }
 
-function blocksms($sms, $action){
-	$params = array(new XML_RPC_Value($sms, 'string'), new XML_RPC_Value($action, 'string'));
+function blocksms($sms, $action, $notes){
+	$params = array(new XML_RPC_Value($sms, 'string'), new XML_RPC_Value($action, 'string'), new XML_RPC_Value($notes, 'string'));
 	$method = "AuthServer.updateBlockedNumber";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
