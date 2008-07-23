@@ -92,30 +92,11 @@ function fmt_phone_number($number){
 		return "";
 }
 
-
-//index 1 is status
-//index 0 is sms number
-function fmt_sms_block_options($row,$index){
-	global $f, $s;
-	$urlarray = array();;
-	if($row[1] == 'block'){
-		$urlarray[] = "<a href='#' onclick=\"if(confirm('Are you sure you want to unblock this number?')) submitForm('" . $f . "','unblock','" . $row[0]. "'); else return false;\" >Unblock</a>";
-	}
-	if($row[1] == 'pendingoptin'){
-		$urlarray[] = "<a href='#' onclick=\"if(confirm('Are you sure you want to block this number?')) submitForm('" . $f . "','block','" . $row[0]. "'); else return false;\" >Block</a>";
-	}
-	if($row[1] != 'pendingoptin'){
-		$urlarray[] = "<a href='#' onclick=\"if(confirm('Are you sure you want to opt-in this number?')) submitForm('" . $f . "','optin','" . $row[0]. "'); else return false;\" >Opt-In</a>";
-	}
-
-	return implode("&nbsp|&nbsp", $urlarray);
-}
-
-function fmt_block_status($row, $index){
-	if($row[$index] == 'pendingoptin'){
+function fmt_block_status($status){
+	if($status == 'pendingoptin'){
 		return "Pending Opt-In";
 	} else {
-		return ucfirst($row[$index]);
+		return ucfirst($status);
 	}
 }
 
@@ -155,9 +136,9 @@ if($number){
 			<th class="listheader">Notes</th>
 		</tr>
 		<tr>
-			<td><?= $data ? $data[0] : $number ?></td>
-			<td><?= $data ? $data[1] : "No Record" ?></td>
-			<td><?= $data ? $data[2] : "" ?></td>
+			<td><?= $data ? fmt_phone_number($data[0]) : fmt_phone_number($number) ?></td>
+			<td><?= $data ? fmt_block_status($data[1]) : "No Record" ?></td>
+			<td><?= $data ? fmt_date($data, 2) : "" ?></td>
 			<td><?= $data ? $data[3] : ""?></td>
 		</tr>
 	</table>
