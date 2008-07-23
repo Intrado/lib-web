@@ -49,16 +49,16 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			} else {
 				$userid = resetPassword($token, $password1, $_SERVER['REMOTE_ADDR']);
 				if($userid){
+					doStartSession();
 					loadCredentials($userid);
 					if (!$USER->enabled || $USER->deleted | !$ACCESS->getValue('loginweb')) {
 						@session_destroy();
 						$badlogin = true;
 						error_log("User trying to log in but is disabled or doesnt have access");
 					} else {
-						if ($updatelogin) {
-							$USER->lastlogin = QuickQuery("select now()");
-							$USER->update(array("lastlogin"));
-						}
+
+						$USER->lastlogin = QuickQuery("select now()");
+						$USER->update(array("lastlogin"));
 						if (!isset($_SESSION['etagstring'])){
 								$_SESSION['etagstring'] = mt_rand();
 						}
