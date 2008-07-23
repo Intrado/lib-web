@@ -210,3 +210,13 @@ ADD `nsid` VARCHAR( 50 ) NOT NULL AFTER `oemid` ;
 ALTER TABLE `customer` ADD `oem` VARCHAR( 50 ) NOT NULL AFTER `id` ;
 
 ALTER TABLE `customer` ADD `notes` VARCHAR( 255 ) NOT NULL AFTER `logintokenexpiretime` ;
+
+
+CREATE TABLE `useractivation` (
+`activationtoken` VARCHAR( 255 ) NOT NULL ,
+`creation` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+`customerid` INT NOT NULL ,
+`userid` INT NOT NULL
+) ENGINE = innodb;
+
+
