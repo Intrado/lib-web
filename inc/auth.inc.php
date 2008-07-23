@@ -279,6 +279,35 @@ function api_getCustomerURL($oem, $oemid){
 	return false;
 }
 
+function forgotPassword($username, $customerurl){
+	$params = array(new XML_RPC_Value($username, 'string'), new XML_RPC_Value($customerurl, 'string'));
+	$method = "AuthServer.forgotPassword";
+	$result = pearxmlrpc($method, $params);
+	if($result !== false){
+		return $result;
+	}
+	return false;
+}
+
+function resetPassword($activationcode, $password){
+	$params = array(new XML_RPC_Value($activationcode, 'string'), new XML_RPC_Value($password, 'string'));
+	$method = "AuthServer.resetPassword";
+	$result = pearxmlrpc($method, $params);
+	if($result !== false){
+		return $result;
+	}
+	return false;
+}
+
+function prefetchUserInfo($activationcode){
+	$params = array(new XML_RPC_Value($activationcode, 'string'));
+	$method = "AuthServer.prefetchUserInfo";
+	$result = pearxmlrpc($method, $params);
+	if($result !== false){
+		return $result;
+	}
+	return false;
+}
 ////////// parent portal methods
 
 function getPortalUsers($portaluserids) {
