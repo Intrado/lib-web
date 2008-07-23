@@ -137,6 +137,25 @@ function validateNewPassword($user, $pass, $firstname, $lastname) {
 	return false;
 }
 
+//Checks the password for required chars
+//returns false if fails the test
+function passwordcheck($password){
+	$tally = 0;
+	if(ereg("^0*$", $password)){
+		return true;
+	}
+	if(ereg("[0-9]", $password))
+		$tally++;
+	if(ereg("[a-zA-Z]", $password))
+		$tally++;
+	if(ereg("[\!\@\#\$\%\^\&\*]", $password))
+		$tally++;
+
+	if($tally >= 2)
+		return true;
+
+	return false;
+}
 /**
 	returns false if password is complex
 	returns msg string if password is not complex
@@ -229,7 +248,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.62 $
+	    # $Revision: 1.63 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
