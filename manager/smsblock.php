@@ -5,12 +5,14 @@ include_once("../inc/table.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("../inc/html.inc.php");
+include_once("AspAdminUser.obj.php");
 require_once("XML/RPC.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $number="";
 if(isset($_GET['sms'])){
@@ -40,6 +42,8 @@ if(CheckFormSubmit($f, "search") || CheckFormSubmit($f, "operate"))
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			$error = 1;
+		} else if(CheckFormSubmit($f, "operate") && !$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
+			error('Bad Manager Password');
 		} else {
 			if(CheckFormSubmit($f, "operate")){
 				$number = ereg_replace("[^0-9]*","",CheckFormSubmit($f, "operate"));
@@ -107,7 +111,7 @@ function fmt_block_status($status){
 include_once("nav.inc.php");
 //Only require manager password if user can block
 
-if($number){
+if(!$number){
 	NewForm($f);
 } else {
 	NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
