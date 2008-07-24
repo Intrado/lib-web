@@ -289,8 +289,8 @@ function forgotPassword($username, $customerurl){
 	return false;
 }
 
-function resetPassword($activationcode, $password){
-	$params = array(new XML_RPC_Value($activationcode, 'string'), new XML_RPC_Value($password, 'string'));
+function resetPassword($activationcode, $password, $ipaddr){
+	$params = array(new XML_RPC_Value($activationcode, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($ipaddr, 'string'));
 	$method = "AuthServer.resetPassword";
 	$result = pearxmlrpc($method, $params);
 	if($result !== false){
