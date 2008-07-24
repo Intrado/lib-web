@@ -54,7 +54,7 @@
 		<td><a href="lockedusers.php" title="Locked&nbsp;Users"><img src="img/lockedusers.png" border=0><div>Locked&nbsp;Users</div></a></td>
 		<td><a href="customerdms.php?clear" title="DM's"><img src="img/rdms.png" border=0><div>DM's</div></a></td>
 		<td><a href="customercontactsearch.php" title="Contact Search"><img src="img/search.png" border=0><div>ContactSearch</div></a></td>
-		<td><a href="smsblock.php" title="SMS Block"><img src="img/search.png" border=0><div>SMSBlock</div></a></td>
+		<td><a href="smsblock.php" title="SMS Block"><img src="img/s-smsblock.png" border=0><div>SMSBlock</div></a></td>
 		<td><a href="./?logout=1" title="Log&nbsp;Out"><img src="img/logout.png" border=0><div>Log&nbsp;Out</div></a></td>
 	</tr>
 </table>
