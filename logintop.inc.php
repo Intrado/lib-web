@@ -12,20 +12,7 @@ $primary = $scheme['colors']['_brandprimary'];
 $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
 
 if ($IS_COMMSUITE) {
-// Custom CSS for CommSuites
 ?>
-<style type="text/css">
-	a, a:link, a:active, a:visited {
-		color:<?=$primary?>;
-		text-decoration: none;
-	}
-
-	a:hover {
-		color: <?=$primary?>;
-		text-decoration: underline;
-	}
-
-</style>
 <html>
 <head>
 <title>SchoolMessenger <?=$TITLE?></title>
