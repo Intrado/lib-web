@@ -41,7 +41,8 @@ if(CheckFormSubmit($f, "search") || CheckFormSubmit($f, "operate"))
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-			$error = 1;
+			if(CheckFormSubmit($f, "operate"))
+				$number = CheckFormSubmit($f, "operate");
 		} else if(CheckFormSubmit($f, "operate") && !$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
 			error('Bad Manager Password');
 		} else {
