@@ -57,7 +57,8 @@ if(CheckFormSubmit($f,$s))
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
 		$login = trim(GetFormData($f, $s, 'login'));
-		$emaillist = GetFormData($f, $s, "email");
+		$email = GetFormData($f, $s, "email");
+		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		//do check
 		if( CheckFormSection($f, $s) ) {
@@ -112,7 +113,8 @@ if(CheckFormSubmit($f,$s))
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
 			$USER->login = $login;
 			$USER->phone = Phone::parse(GetFormData($f,$s,"phone"));
-			$USER->email = $emaillist;
+			$USER->email = $email;
+			$USER->aremail = $emaillist;
 			$USER->update();
 
 			// If the password is all 0 characters then it was a default form value, so ignore it
@@ -191,7 +193,8 @@ if( $reloadform )
 			array("accesscode","number","nomin","nomax"),
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
-			array("email","text")
+			array("email","email"),
+			array("aremail", "text")
 			);
 
 	PopulateForm($f,$s,$USER,$fields);
@@ -300,8 +303,12 @@ startWindow('User Information');
 								<td><? NewFormItem($f,$s, 'pincodeconfirm', 'password', 20,100); ?></td>
 							</tr>
 							<tr>
-								<td align="right">Email(s):</td>
+								<td align="right">Email:</td>
 								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 72,10000); ?></td>
+							</tr>
+							<tr>
+								<td align="right">Auto Report Email(s):</td>
+								<td colspan="4"><? NewFormItem($f,$s, 'aremail', 'text', 72,10000); ?></td>
 							</tr>
 							<tr>
 								<td align="right">Phone:</td>
