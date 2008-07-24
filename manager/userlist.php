@@ -48,7 +48,7 @@ include_once("nav.inc.php");
 if($custdb = DBConnect($cust[0], $cust[1], $cust[2], "c_$customerid")){
 	$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
 	$custinfo = array($customerid, $displayname, $cust[3]);
-	$result = Query("select u.id, u.login, u.firstname, u.lastname, u.lastlogin, u.phone, u.email, a.name from user u left join access a on (u.accessid = a.id) where enabled=1 AND deleted=0", $custdb);
+	$result = Query("select u.id, u.login, u.firstname, u.lastname, u.lastlogin, u.phone, u.email, a.name, u.aremail from user u left join access a on (u.accessid = a.id) where enabled=1 AND deleted=0", $custdb);
 	$users = array();
 	while($row = DBGetRow($result)){
 		$users[] = array_merge($custinfo, $row);
@@ -67,7 +67,8 @@ $titles = array("0" => "Customer ID",
 				"activejobs" => "Active Jobs",
 				"10" => "Access Profile",
 				"8" => "Phone",
-				"9" => "Email");
+				"9" => "Email",
+				"11" => "AutoReport Email");
 
 $formatters = array("url" => "fmt_custurl",
 					"7" => "fmt_lastlogin",
