@@ -41,7 +41,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			if($password1 !== $password2){
 				error("The passwords do not match");
 			} else if(strlen($password1) < $user['passwordlength']){
-				error("Passwords must be at least 5 characters long");
+				error("Passwords must be at least " . $user['passwordlength'] . " characters long");
 			} else if($password1 && $passworderror = validateNewPassword($user['user.login'], $password1, $user['user.firstname'], $user['user.lastname'])){
 				error($passworderror);
 			} elseif(!passwordcheck($password1)){
@@ -51,47 +51,10 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 				if($userid){
 					doStartSession();
 					loadCredentials($userid);
-					if (!$USER->enabled || $USER->deleted | !$ACCESS->getValue('loginweb')) {
-						@session_destroy();
-						$badlogin = true;
-						error_log("User trying to log in but is disabled or doesnt have access");
-					} else {
-
-						$USER->lastlogin = QuickQuery("select now()");
-						$USER->update(array("lastlogin"));
-						if (!isset($_SESSION['etagstring'])){
-								$_SESSION['etagstring'] = mt_rand();
-						}
-						// fetch default scheme
-						$scheme = getCustomerData($CUSTOMERURL);
-						if($scheme == false){
-							$scheme = array("_brandtheme" => "3dblue",
-											"_supportemail" => "support@schoolmessenger.com",
-											"_supportphone" => "800.920.3897",
-											"colors" => array("_brandprimary" => "26477D"));
-						}
-						$userprefs = array();
-						$userprefs['_brandprimary'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandprimary'");
-						$userprefs['_brandtheme1'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme1'");
-						$userprefs['_brandtheme2'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme2'");
-						$userprefs['_brandratio'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandratio'");
-						$userprefs['_brandtheme'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme'");
-
-						if($userprefs['_brandprimary']){
-							$_SESSION['colorscheme'] = $userprefs;
-						} else {
-							$_SESSION['colorscheme'] = array("_brandtheme" => $scheme['_brandtheme'],
-														"_brandprimary" => $scheme['colors']['_brandprimary'],
-														"_brandtheme1" => $scheme['colors']['_brandtheme1'],
-														"_brandtheme2" => $scheme['colors']['_brandtheme2'],
-														"_brandratio" => $scheme['colors']['_brandratio']);
-						}
-
-						$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
-						$_SESSION['_supportphone'] = $scheme['_supportphone'];
-						$_SESSION['_supportemail'] = $scheme['_supportemail'];
-						redirect("start.php");
-					}
+					$USER->lastlogin = QuickQuery("select now()");
+					$USER->update(array("lastlogin"));
+					loadDisplaySettings();
+					redirect("start.php");
 				} else {
 					error("That code is invalid or has expired");
 				}
