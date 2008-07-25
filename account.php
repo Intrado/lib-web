@@ -83,9 +83,9 @@ if(CheckFormSubmit($f,$s))
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $USER->id);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
-		} elseif( !ereg("^0*$", GetFormData($f,$s,'password')) && (!ereg("[0-9]", GetFormData($f, $s, 'password')) || !ereg("[a-zA-Z]", GetFormData($f, $s, 'password')))){
-			error('Your password must contain at least one letter and one number', $securityrules);
-		} elseif($issame=validateNewPassword($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')) && !$USER->ldap) {
+		} elseif(!passwordcheck(GetFormData($f, $s, "password"))){
+			error('Your password must contain at least 2 of the following: a letter, a number or a symbol', $securityrules);
+		} elseif(($issame=validateNewPassword($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) && !$USER->ldap) {
 			error($issame, $securityrules);
 		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !$USER->ldap){
 			error($iscomplex, $securityrules);
