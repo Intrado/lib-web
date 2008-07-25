@@ -26,7 +26,7 @@ while($row = mysql_fetch_row($customerresult)){
 
 $emailfile = "email_backups.txt";
 if(!$fp = fopen($emailfile, "a")){
-	echo "Failed to open notes file\n";
+	echo "Failed to open email backups file\n";
 	exit();
 }
 
@@ -44,7 +44,7 @@ foreach($customerinfo as $customer){
 				or die("Could not select customer db: " . mysql_error($custdb));
 
 	//Fetch all users that have emails
-	$emailresult = mysql_query("select id, email from user where email != ''", $custdb);
+	$emailresult = mysql_query("select id, aremail from user where aremail != ''", $custdb);
 	$emails = array();
 
 	//split email on ";" and array_shift first email off
