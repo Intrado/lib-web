@@ -248,7 +248,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.63 $
+	    # $Revision: 1.64 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -530,5 +530,44 @@ function getBrandTheme2(){
 	return $_SESSION['colorscheme']['_brandtheme2'];
 }
 
+
+//Load display settings based on system or user preference
+//user must be loaded
+//customer url must also be loaded
+function loadDisplaySettings(){
+	global $USER, $CUSTOMERURL;
+
+	if (!isset($_SESSION['etagstring'])){
+			$_SESSION['etagstring'] = mt_rand();
+	}
+	// fetch default scheme
+	$scheme = getCustomerData($CUSTOMERURL);
+	if($scheme == false){
+		$scheme = array("_brandtheme" => "3dblue",
+						"_supportemail" => "support@schoolmessenger.com",
+						"_supportphone" => "800.920.3897",
+						"colors" => array("_brandprimary" => "26477D"));
+	}
+	$userprefs = array();
+	$userprefs['_brandprimary'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandprimary'");
+	$userprefs['_brandtheme1'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme1'");
+	$userprefs['_brandtheme2'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme2'");
+	$userprefs['_brandratio'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandratio'");
+	$userprefs['_brandtheme'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme'");
+
+	if($userprefs['_brandprimary']){
+		$_SESSION['colorscheme'] = $userprefs;
+	} else {
+		$_SESSION['colorscheme'] = array("_brandtheme" => $scheme['_brandtheme'],
+									"_brandprimary" => $scheme['colors']['_brandprimary'],
+									"_brandtheme1" => $scheme['colors']['_brandtheme1'],
+									"_brandtheme2" => $scheme['colors']['_brandtheme2'],
+									"_brandratio" => $scheme['colors']['_brandratio']);
+	}
+
+	$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
+	$_SESSION['_supportphone'] = $scheme['_supportphone'];
+	$_SESSION['_supportemail'] = $scheme['_supportemail'];
+}
 
 ?>
