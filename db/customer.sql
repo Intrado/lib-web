@@ -1413,5 +1413,13 @@ ALTER TABLE `user` CHANGE `password` `password` VARCHAR( 50 ) NOT NULL ,
 CHANGE `pincode` `pincode` VARCHAR( 50 ) NOT NULL
 $$$
 
+-- After 6.0.1
+
 ALTER TABLE `user` ADD `aremail` TEXT NOT NULL AFTER `email`
+$$$
+UPDATE `user` set `aremail` = `email`
+$$$
+UPDATE `user` set `email` = ''
+$$$
+ALTER TABLE `user` CHANGE `email` `email` VARCHAR( 255 ) NOT NULL
 $$$
