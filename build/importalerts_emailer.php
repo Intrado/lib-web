@@ -5,6 +5,12 @@ to find all customer connections to traverse for import alerts.  It will only lo
 import alerts that have email addresses.
 */
 
+
+//flag for windows pathing
+$IS_WINDOWS=true;
+
+
+
 //need trailing "/" for simple emailer path
 $simpleemailerpath = "/usr/commsuite/server/simpleemail/";
 
@@ -19,8 +25,8 @@ if(file_exists("/usr/commsuite/server/authserver/authserver.properties")){
 	$authpass="";
 }
 
-//flag for windows pathing
-$IS_WINDOWS=true;
+
+
 if($IS_WINDOWS)
 	$windows = "/cygdrive/c";
 else
@@ -83,7 +89,7 @@ foreach($customers as $cust) {
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
 			$notified = true;
 		}
-		if(isset($alertoptions['maxsize']) && $import[3] < $alertoptions['maxsize']){
+		if(isset($alertoptions['maxsize']) && $import[3] > $alertoptions['maxsize']){
 			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file larger than " . number_format($alertoptions['maxsize']) . " bytes.";
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
 			$notified = true;
@@ -135,8 +141,12 @@ foreach($emailmessages as $address => $messages){
 	//implode all the messages together and write it to a file so that new lines are executed correctly
 	//then read the file back into a temp variable and output to command line
 	$body = implode("\n", $messages);
-	$tempfile = secure_tmpname();
-	$fp = fopen($tempfile, "w");
+	if(!$tempfile = secure_tmpname()){
+		exit("Failed to create temp file name\n");
+	}
+	if(!$fp = fopen($tempfile, "w")){
+		exit("Failed to open temp file: " . $tempfile . "\n");
+	}
 	fwrite($fp, $body);
 	fclose($fp);
 	if($body == ""){
