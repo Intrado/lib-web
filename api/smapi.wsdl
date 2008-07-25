@@ -718,6 +718,6 @@ sendJob:
     </wsdl:binding>
     <wsdl:service name="SMAPI">
 		<wsdl:port name="SMAPIPort" binding="sm:SMBinding">
-			<soap:address location="http://localhost/account/api/smapi.php"></soap:address>
+			<soap:address location="smapiurl"></soap:address>
 		</wsdl:port>
 	</wsdl:service></wsdl:definitions>
