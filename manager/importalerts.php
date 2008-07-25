@@ -99,12 +99,22 @@ if(CheckFormSubmit($f, $s)){
 				foreach($optionsarray as $item){
 					if(!isset($importalert[$item]) && !isset($oldimportalert[$item]))
 						continue;
+
+					if(!isset($importalert[$item])){
+						$changed = true;
+						break;
+					}
+					if(!isset($oldimportalert[$item])){
+						$changed = true;
+						break;
+					}
 					if($importalert[$item] != $oldimportalert[$item]){
 						$changed = true;
 						break;
 					}
 				}
-				if(!$changed)
+
+				if(!$changed && isset($oldimportalert['lastnotified']))
 					$importalert['lastnotified'] = $oldimportalert['lastnotified'];
 
 				$importalerturl = http_build_query($importalert, false, "&");
