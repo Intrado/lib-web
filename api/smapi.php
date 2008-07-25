@@ -10,6 +10,25 @@
 *
 */
 
+$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+
+if(isset($_GET['wsdl'])){
+
+	$wsdl = file_get_contents("smapi.wsdl");
+
+	//keyword stored in wsdl for service url is smapiurl
+	$wsdl = preg_replace("[smapiurl]", 'http://' . $_SERVER["SERVER_NAME"] .'/' . $CUSTOMERURL . '/api',$wsdl);
+
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-disposition: attachment; filename=smapi.wsdl");
+	header("Content-type: text");
+
+	echo $wsdl;
+	exit();
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +81,6 @@ class SMAPI{
 
 	*/
 	function login($loginname, $password){
-		global $IS_COMMSUITE;
 		return systemLogin($loginname, $password);
 	}
 
@@ -76,7 +94,6 @@ class SMAPI{
 
 	*/
 	function loginToCustomer($loginname, $password, $customerurl){
-		global $IS_COMMSUITE;
 		return systemLogin($loginname, $password, $customerurl);
 	}
 
@@ -183,6 +200,8 @@ class SMAPI{
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "result" => false);
 
+		$messageid = $messageid+0;
+
 		if(!APISession($sessionid)){
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
@@ -192,6 +211,7 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
+
 			if(!$messageid){
 				$result["resultdescription"] = "Invalid Message ID";
 				return $result;
@@ -631,6 +651,14 @@ class SMAPI{
 	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
+
+		$listid = $listid+0;
+		$jobtypeid = $jobtypeid+0;
+		$daystorun = $daystorun+0;
+		$phonemsgid = $phonemsgid+0;
+		$emailmsgid = $emailmsgid+0;
+		$smsmsgid = $smsmsgid+0;
+		$maxcallattempts = $maxcallattempts+0;
 
 		if(!APISession($sessionid)){
 			$result["resultdescription"] = "Invalid Session ID";
