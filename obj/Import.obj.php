@@ -10,6 +10,7 @@ class Import extends DBMappedObject {
 	var $notes;
 	var $status;
 	var $type;
+	var $datatype;
 	var $ownertype;
 	var $updatemethod;
 	var $lastrun;
@@ -19,7 +20,7 @@ class Import extends DBMappedObject {
 	function Import ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "import";
-		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "notes", "status", "type","ownertype", "updatemethod", "lastrun","datamodifiedtime","skipheaderlines");
+		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "notes", "status", "type","datatype","ownertype", "updatemethod", "lastrun","datamodifiedtime","skipheaderlines");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

@@ -1423,3 +1423,13 @@ UPDATE `user` set `email` = ''
 $$$
 ALTER TABLE `user` CHANGE `email` `email` VARCHAR( 255 ) NOT NULL
 $$$
+
+ALTER TABLE `import` ADD `datatype` ENUM( 'person', 'user', 'association' ) NOT NULL DEFAULT 'person' AFTER `type`,
+CHANGE `updatemethod` `updatemethod` ENUM( 'updateonly', 'update', 'full', 'createonly' ) NOT NULL DEFAULT 'full'
+$$$
+
+ALTER TABLE `user` ADD `staffpkey` VARCHAR( 255 ) NULL,
+ADD `importid` TINYINT NULL ,
+ADD `lastimport` DATETIME NULL
+$$$
+

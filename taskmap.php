@@ -70,38 +70,71 @@ foreach ($importfields as $importfield) {
 	}
 }
 
-//make a menu of all available fields
+// find the data type of import
+$datatype = $import->datatype;
+if ($datatype == "person") {
 
-$fieldmaps = DBFindMany("FieldMap","from fieldmap order by fieldnum");
+	//make a menu of all available fields
+	$fieldmaps = DBFindMany("FieldMap","from fieldmap order by fieldnum");
 
-$maptofields = array();
-$maptofields[""] = "- Unmapped -";
-$maptofields["key"] = "Unique ID";
-//F fields
-foreach ($fieldmaps as $fieldmap)
-	$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
+	$maptofields = array();
+	$maptofields[""] = "- Unmapped -";
+	$maptofields["key"] = "Unique ID";
+	//F fields
+	foreach ($fieldmaps as $fieldmap)
+		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 
-//phones, emails, SMS
-$maxphones = getSystemSetting("maxphones",3);
-for ($x = 0; $x < $maxphones; $x++)
-	$maptofields["p$x"] = destination_label("phone",$x); //"Phone " . ($x + 1);
-if (getSystemSetting('_hassms', false)) {
-	$maxsms = getSystemSetting("maxsms",2);
-	for ($x = 0; $x < $maxsms; $x++)
-		$maptofields["s$x"] = destination_label("sms",$x); //"SMS " . ($x + 1);
+	//phones, emails, SMS
+	$maxphones = getSystemSetting("maxphones",3);
+	for ($x = 0; $x < $maxphones; $x++)
+		$maptofields["p$x"] = destination_label("phone",$x); //"Phone " . ($x + 1);
+	if (getSystemSetting('_hassms', false)) {
+		$maxsms = getSystemSetting("maxsms",2);
+		for ($x = 0; $x < $maxsms; $x++)
+			$maptofields["s$x"] = destination_label("sms",$x); //"SMS " . ($x + 1);
+	}
+	$maxemails = getSystemSetting("maxemails",2);
+	for ($x = 0; $x < $maxemails; $x++)
+		$maptofields["e$x"] = destination_label("email",$x); //"Email " . ($x + 1);
+	//address fields
+	$maptofields["a6"] = "Address ATTN";
+	$maptofields["a1"] = "Address 1";
+	$maptofields["a2"] = "Address 2";
+	$maptofields["a3"] = "City";
+	$maptofields["a4"] = "State";
+	$maptofields["a5"] = "Zip";
+
+} else if ($datatype == "user") {
+
+	$maptofields = array();
+	$maptofields[""] = "- Unmapped -";
+	$maptofields["u1"] = "First Name";
+	$maptofields["u2"] = "Last Name";
+	$maptofields["u3"] = "Login";
+	$maptofields["u4"] = "Phone";
+	$maptofields["u5"] = "Email";
+	$maptofields["u6"] = "Profile Name";
+	$maptofields["u7"] = "Restricted Job Types";
+	$maptofields["u10"] = "Staff ID";
+	$maptofields["u11"] = "Inbound Code";
+	$maptofields["u12"] = "Inbound PIN";
+	$maptofields["u13"] = "Auto Report Emails";
+	$maptofields["u14"] = "Description";
+
+	//F fields, limit to multisearch
+	$fieldmaps = DBFindMany("FieldMap","from fieldmap order by fieldnum");
+	foreach ($fieldmaps as $fieldmap) {
+		if ($fieldmap->isOptionEnabled("multisearch")) {
+			$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
+		}
+	}
+
+} else if ($datatype == "association") {
+
 }
-$maxemails = getSystemSetting("maxemails",2);
-for ($x = 0; $x < $maxemails; $x++)
-	$maptofields["e$x"] = destination_label("email",$x); //"Email " . ($x + 1);
-//address fields
-$maptofields["a6"] = "Address ATTN";
-$maptofields["a1"] = "Address 1";
-$maptofields["a2"] = "Address 2";
-$maptofields["a3"] = "City";
-$maptofields["a4"] = "State";
-$maptofields["a5"] = "Zip";
 
 
+// actions
 $actions = array('copy' => "Copy",
 				'staticvalue' => "Static Value",
 				'curdate' => "Current Date",
