@@ -72,13 +72,29 @@ include_once("nav.inc.php");
 startWindow('System Imports ' . help('Tasks_SystemTasks'), 'padding: 3px;');
 button_bar(button('Add New Import', null, "task.php?id=new"),button('Refresh', 'window.location.reload()'));
 
+function fmt_datatype ($import,$field) {
+	if ($import->$field == "person")
+		return "Person";
+	else if ($import->$field == "user")
+		return "User";
+	else if ($import->$field == "association")
+		return "Association";
+}
+
 function fmt_updatemethod ($import,$field) {
-	if ($import->$field == "full")
-		return "Update, create, delete";
+	if ($import->$field == "full") {
+		if ($import->datatype == "user") {
+			return "Update, create, disable";
+		} else {
+			return "Update, create, delete";
+		}
+	}
 	else if ($import->$field == "update")
 		return "Update & create";
 	else if ($import->$field == "updateonly")
 		return "Update only";
+	else if ($import->$field == "createonly")
+		return "Create only";
 }
 
 
@@ -111,7 +127,8 @@ function fmt_actions ($import,$dummy) {
 
 $titles = array("name" => "#Name",
 				"description" => "#Description",
-				"updatemethod" => "#Type",
+				"datatype" => "#Type",
+				"updatemethod" => "#Method",
 				"uploadkey" => "Upload Key",
 				"status" => "#Status",
 				"lastrun" => "Last Run",
@@ -120,7 +137,7 @@ $titles = array("name" => "#Name",
 $titles['Actions'] = "Actions";
 
 
-$formatters = array("updatemethod" => "fmt_updatemethod",
+$formatters = array("datatype" => "fmt_datatype",
 					"status" => "fmt_ucfirst",
 					"lastrun" => "fmt_obj_date",
 					"updatemethod" => "fmt_updatemethod",

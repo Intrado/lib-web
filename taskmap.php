@@ -130,6 +130,11 @@ if ($datatype == "person") {
 	}
 
 } else if ($datatype == "association") {
+	$maptofields = array();
+	$maptofields[""] = "- Unmapped -";
+	$maptofields["x1"] = "Staff ID";
+	$maptofields["x2"] = "Person ID";
+
 
 }
 

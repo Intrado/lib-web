@@ -71,14 +71,19 @@ function fmt_actions_en ($obj,$name) {
 
 	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $obj->id) ? '<a name="viewrecent">' : '';
 
+	$editviewaction = "Edit";
+	if ($obj->importid > 0) $editviewaction = "View";
 
-	return $activeuseranchor . '<a href="user.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
+	return $activeuseranchor . '<a href="user.php?id=' . $obj->id . '">'.$editviewaction.'</a>&nbsp;|&nbsp;'
 		. ($obj->enabled ? '<a href="./?login=' . $obj->login . '">Login&nbsp;as&nbsp;this&nbsp;user</a>' : NULL)
 		. ($obj->id == $USER->id ? "" : '&nbsp;|&nbsp;<a href="?disable=' . $obj->id . '">Disable</a>&nbsp;');
 }
 
 function fmt_actions_dis ($obj,$name) {
-	return '<a href="user.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
+	$editviewaction = "Edit";
+	if ($obj->importid > 0) $editviewaction = "View";
+
+	return '<a href="user.php?id=' . $obj->id . '">'.$editviewaction.'</a>&nbsp;|&nbsp;'
 		. '<a href="?enable=' . $obj->id . '">Enable</a>&nbsp;|&nbsp;'
 		. '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 }

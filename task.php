@@ -55,6 +55,9 @@ foreach($associatedjobs as $importjob){
 	$associatedjobids[$importjob->jobid] = $importjob->jobid;
 }
 
+$associationdataexists = false;
+if (QuickQuery("select count(*) from import where datatype='association'")) $associationdataexists = true;
+
 
 /****************** main message section ******************/
 $form = "taskeditor";
@@ -197,7 +200,8 @@ startWindow('Import Information ');
 							NewFormItem($form, $section, 'datatype', 'selectstart');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "Person", 'person');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "User", 'user');
-							NewFormItem($form, $section, 'datatype', 'selectoption', "Association", 'association');
+							if (!$associationdataexists)
+								NewFormItem($form, $section, 'datatype', 'selectoption', "Association", 'association');
 							NewFormItem($form, $section, 'datatype', 'selectend');
 						} else {
 							echo $IMPORT->datatype;
@@ -231,7 +235,7 @@ startWindow('Import Information ');
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Create only", 'createonly');
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update, create, disable", 'full');
 							} else if ($IMPORT->datatype == "association") {
-
+								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update, create, delete", 'full');
 							}
 							NewFormItem($form, $section, 'updatemethod', 'selectend');
 						?>
