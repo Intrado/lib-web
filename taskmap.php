@@ -75,7 +75,7 @@ $datatype = $import->datatype;
 if ($datatype == "person") {
 
 	//make a menu of all available fields
-	$fieldmaps = DBFindMany("FieldMap","from fieldmap order by fieldnum");
+	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
 
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
@@ -122,7 +122,7 @@ if ($datatype == "person") {
 	$maptofields["u14"] = "Description";
 
 	//F fields, limit to multisearch
-	$fieldmaps = DBFindMany("FieldMap","from fieldmap order by fieldnum");
+	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
 	foreach ($fieldmaps as $fieldmap) {
 		if ($fieldmap->isOptionEnabled("multisearch")) {
 			$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
@@ -132,10 +132,12 @@ if ($datatype == "person") {
 } else if ($datatype == "association") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
-	$maptofields["x1"] = "Staff ID";
-	$maptofields["x2"] = "Person ID";
+	$maptofields["pkey"] = "Person ID";
 
-
+	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");
+	//C fields
+	foreach ($fieldmaps as $fieldmap)
+		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 }
 
 

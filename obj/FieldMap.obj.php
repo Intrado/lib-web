@@ -50,6 +50,9 @@ class FieldMap extends DBMappedObject {
 	static function getGradeField(){
 		return QuickQuery("select fieldnum from fieldmap where options like '%grade%'");
 	}
+	static function getStaffField(){
+		return QuickQuery("select fieldnum from fieldmap where options like '%staff%'");
+	}
 
 	static function getMapNames () {
 		global $USER;

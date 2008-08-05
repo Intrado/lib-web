@@ -1,18 +1,5 @@
 <?
-
-////////////////////////////////////////////////////////////////////////////////
-// Includes
-////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("obj/Job.obj.php");
-include_once("obj/Schedule.obj.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
-require_once("inc/table.inc.php");
-require_once("inc/utils.inc.php");
-require_once("inc/securityhelper.inc.php");
-require_once("inc/formatters.inc.php");
-require_once("obj/FieldMap.obj.php");
+// SHARED GUI CODE between F-Field and C-Field definitions
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,18 +30,32 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['clear'])) {
 	$fieldnum = DBSafe($_GET['clear']);
 	if (ereg("^f[0-9]{2}$",$fieldnum)) {
-		QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
+		if ($DATATYPE == "person") {
+			QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
+		} else {
+			// TODO schedule data
+		}
 	}
 
 	redirect();
 }
 
 
+// person data
 $VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,language', 'multisearch,grade',
 						'multisearch,school', 'text,firstname',  'text,lastname', 'grade', 'school', 'firstname', 'lastname', 'language');
-$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
+$numfields = 20;
+$dt = "f%";
+// schedule data
+if ($DATATYPE == "schedule") {
+	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,staff', 'staff');
+	$numfields = 10;
+	$dt = "c%";
+}
+
+$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
 $availablefields = array();
-for ($x = 1; $x <= 20; $x++)
+for ($x = 1; $x <= $numfields; $x++)
 	$availablefields[] = sprintf("%02d",$x);
 
 
@@ -94,14 +95,18 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				// Submit new item
 				$specialtype = GetFormData($form, $section, "newfield_specialtype");
 				$newfield->name = $cleanedname;
-				$newfield->fieldnum = "f" . GetFormData($form,$section,"newfield_fieldnum");
+				$temp = "f";
+				if ($DATATYPE == "schedule") {
+					$temp = "c";
+				}
+				$newfield->fieldnum = $temp . GetFormData($form,$section,"newfield_fieldnum");
 				$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
 										DBSafe(GetFormData($form, $section, "newfield_type") .
 										($specialtype ? ',' . DBSafe($specialtype) : ''));
 
 				if ($newfield->update()) {
 					// Requery to get the newly inserted row
-					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
+					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
 				} else {
 					error("Uknown database error: unable to add new field data");
 				}
@@ -113,7 +118,8 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 					$fieldnum != FieldMap::getLastNameField() &&
 					$fieldnum != FieldMap::getLanguageField() &&
 					$fieldnum != FieldMap::getSchoolField() &&
-					$fieldnum != FieldMap::getGradeField() )
+					$fieldnum != FieldMap::getGradeField() &&
+					$fieldnum != FieldMap::getStaffField() )
 					{
 					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
 					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
@@ -132,7 +138,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 						$updatefield->options = ($searchable ? 'searchable,' : '') . $type;
 						$updatefield->update();
 						// Requery to get the newly inserted row
-						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
+						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
 					}
 				} else {
 					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
@@ -148,7 +154,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 						$updatefield->name = $cleanedname;
 						$updatefield->update();
 						// Requery to get the newly inserted row
-						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
+						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
 					}
 				}
 			}
@@ -162,7 +168,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 }
 
 //load this after possibly saving a new field
-$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap"));
+$availablefields = array_diff($availablefields, QuickQueryList("select right(fieldnum,2) from fieldmap where fieldnum like '".$dt."'"));
 
 if( $reloadform )
 {
@@ -179,6 +185,8 @@ if( $reloadform )
 			$type = 'school';
 		} else if ($field->isOptionEnabled('grade')) {
 			$type = 'grade';
+		} else if ($field->isOptionEnabled('staff')) {
+			$type = 'staff';
 		} else if ($field->isOptionEnabled('firstname')) {
 			$type = 'firstname';
 		} else if ($field->isOptionEnabled('lastname')) {
@@ -197,7 +205,7 @@ if( $reloadform )
 		PutFormData($form, $section, 'type_' . $fieldnum, $type, 'text');
 		PutFormData($form, $section, 'searchable_' . $fieldnum, $searchable, 'bool');
 	}
-	if(count($FIELDMAPS) < 20){
+	if(count($FIELDMAPS) < $numfields){
 		PutFormData($form, $section, 'newfield_type', 'text', 'text');
 		PutFormData($form, $section, 'newfield_name', '', 'text', 1, 20, false); // This item is only required on an add operation
 		PutFormData($form, $section, 'newfield_type', 'text', 'text');
@@ -244,6 +252,8 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 			$types["School"] = 'multisearch,school';
 		if(!FieldMap::getGradeField())
 			$types["Grade"] = 'multisearch,grade';
+		if(!FieldMap::getGradeField())
+			$types["Staff ID"] = 'multisearch,staff';
 
 	if (count($FIELDMAPS) > 0) {
 
@@ -263,7 +273,8 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 				$fieldnum != $field->getLastNameField() &&
 				$fieldnum != $field->getLanguageField() &&
 				$fieldnum != $field->getGradeField() &&
-				$fieldnum !=  $field->getSchoolField()) {
+				$fieldnum != $field->getSchoolField() &&
+				$fieldnum != $field->getStaffField() ) {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20'); ?></td>
 				<td>
@@ -293,7 +304,7 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 
 	// Print extra row for adding new items
 	// only if they have more f-fields to use
-	if(count($FIELDMAPS) < 20){
+	if(count($FIELDMAPS) < $numfields){
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
 		<td>
