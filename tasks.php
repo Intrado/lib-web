@@ -73,20 +73,15 @@ startWindow('System Imports ' . help('Tasks_SystemTasks'), 'padding: 3px;');
 button_bar(button('Add New Import', null, "task.php?id=new"),button('Refresh', 'window.location.reload()'));
 
 function fmt_datatype ($import,$field) {
-	if ($import->$field == "person")
-		return "Person";
-	else if ($import->$field == "user")
-		return "User";
-	else if ($import->$field == "association")
-		return "Association";
+	return ucfirst($import->$field);
 }
 
 function fmt_updatemethod ($import,$field) {
 	if ($import->$field == "full") {
-		if ($import->datatype == "user") {
-			return "Update, create, disable";
-		} else {
+		if ($import->datatype == "person") {
 			return "Update, create, delete";
+		} else {
+			return "Full Sync";
 		}
 	}
 	else if ($import->$field == "update")
@@ -115,12 +110,13 @@ function fmt_actions ($import,$dummy) {
 		$confirm = $extra. $confirm;
 	}
 	$res = "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;";
-	if ($import->datamodifiedtime != null)
-		$res .= "<a href=\"taskdownload.php?id=$import->id\">Download</a>&nbsp;|&nbsp;";
-	$res .= "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;"
-			."<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
-			."<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>&nbsp;|&nbsp;"
-			."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\nThis will deactivate all associated contact records!');\">Delete</a>";
+	if ($import->datamodifiedtime != null) {
+		$res .= "<a href=\"taskdownload.php?id=$import->id\">Download</a>&nbsp;|&nbsp;"
+			 . "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;"
+			 . "<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>&nbsp;|&nbsp;";
+	}
+	$res .= "<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
+		 ."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\nThis will deactivate all associated contact records!');\">Delete</a>";
 	return $res;
 }
 

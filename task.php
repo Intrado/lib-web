@@ -204,7 +204,7 @@ startWindow('Import Information ');
 								NewFormItem($form, $section, 'datatype', 'selectoption', "Association", 'association');
 							NewFormItem($form, $section, 'datatype', 'selectend');
 						} else {
-							echo $IMPORT->datatype;
+							echo ucfirst($IMPORT->datatype);
 						}
 						?>
 					</td>
@@ -223,6 +223,8 @@ startWindow('Import Information ');
 					<td>Notes:</td>
 					<td><? NewFormItem($form, $section,"notes","textarea", 60, 3); ?></td>
 				</tr>
+<?				if ($IMPORT->datatype == "person" || $IMPORT->datatype == "user") {
+?>
 				<tr>
 					<td>Update Method:</td>
 					<td><?
@@ -233,14 +235,14 @@ startWindow('Import Information ');
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update, create, delete", 'full');
 							} else if ($IMPORT->datatype == "user") {
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Create only", 'createonly');
-								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update, create, disable", 'full');
-							} else if ($IMPORT->datatype == "association") {
-								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Update, create, delete", 'full');
-							}
+								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Full Synchronization", 'full');
+							} // else association is always 'full' and not displayed
 							NewFormItem($form, $section, 'updatemethod', 'selectend');
 						?>
 					</td>
 				</tr>
+<?				}
+?>
 				<tr>
 					<td>Skip Header Lines:</td>
 					<td><? NewFormItem($form, $section,"skipheaderlines","text", 10); ?></td>

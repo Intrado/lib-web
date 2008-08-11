@@ -47,18 +47,26 @@ class FieldMap extends DBMappedObject {
 	static function getSchoolField(){
 		return QuickQuery("select fieldnum from fieldmap where options like '%school%'");
 	}
+
 	static function getGradeField(){
 		return QuickQuery("select fieldnum from fieldmap where options like '%grade%'");
 	}
+
 	static function getStaffField(){
-		return QuickQuery("select fieldnum from fieldmap where options like '%staff%'");
+		$field = QuickQuery("select fieldnum from fieldmap where options like '%staff%'");
+		if(!$field)
+			$field = "c01";
+		return $field;
 	}
 
 	static function getMapNames () {
+		return FieldMap::getMapNamesLike("f%");
+	}
+
+	static function getMapNamesLike ($likewhat) {
 		global $USER;
 		$map = array();
-		$query = "select name,fieldnum from fieldmap"
-				." order by fieldnum";
+		$query = "select name, fieldnum from fieldmap where fieldnum like '".$likewhat."' order by fieldnum";
 		if ($result = Query($query)) {
 			while ($row = DBGetRow($result)) {
 				$map[$row[1]] = $row[0];
@@ -68,10 +76,13 @@ class FieldMap extends DBMappedObject {
 	}
 
 	static function getAuthorizedMapNames () {
+		return FieldMap::getAuthorizedMapNamesLike("f%");
+	}
+
+	static function getAuthorizedMapNamesLike ($likewhat) {
 		global $USER;
 		$map = array();
-		$query = "select name,fieldnum from fieldmap"
-				." order by fieldnum";
+		$query = "select name, fieldnum from fieldmap where fieldnum like '".$likewhat."' order by fieldnum";
 		if ($result = Query($query)) {
 			while ($row = DBGetRow($result)) {
 				if($USER->authorizeField($row[1]))
@@ -82,18 +93,24 @@ class FieldMap extends DBMappedObject {
 	}
 
 	static function getAuthorizedFieldMaps () {
+		return FieldMap::getAuthorizedFieldMapsLike("f%");
+	}
+
+	static function getAuthorizedFieldMapsLike ($likewhat) {
 		global $USER;
-		$fieldmaps = DBFindMany("FieldMap", "from fieldmap order by fieldnum");
+		$query = "from fieldmap where fieldnum like '".$likewhat."' order by fieldnum";
+		$fieldmaps = DBFindMany("FieldMap", $query);
 		foreach($fieldmaps as $key => $fieldmap)
 			if(!$USER->authorizeField($fieldmap->fieldnum))
 				unset($fieldmaps[$key]);
 		return $fieldmaps;
 	}
 
+	// only return F-fields other than first/last name (do not return C-fields)
 	static function getOptionalAuthorizedFieldMaps(){
-		$fieldmaps = FieldMap::getAuthorizedFieldMaps();
+		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("f%");
 		foreach($fieldmaps as $index => $fieldmap){
-			if($fieldmap->isOptionEnabled("firstname") || $fieldmap->isOptionEnabled("lastname")){
+			if($fieldmap->isOptionEnabled("firstname") || $fieldmap->isOptionEnabled("lastname")) {
 				unset($fieldmaps[$index]);
 			}
 		}

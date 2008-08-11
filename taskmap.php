@@ -108,24 +108,25 @@ if ($datatype == "person") {
 
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
-	$maptofields["u1"] = "First Name";
-	$maptofields["u2"] = "Last Name";
-	$maptofields["u3"] = "Login";
-	$maptofields["u4"] = "Phone";
-	$maptofields["u5"] = "Email";
-	$maptofields["u6"] = "Profile Name";
-	$maptofields["u7"] = "Restricted Job Types";
-	$maptofields["u10"] = "Staff ID";
-	$maptofields["u11"] = "Inbound Code";
-	$maptofields["u12"] = "Inbound PIN";
-	$maptofields["u13"] = "Auto Report Emails";
-	$maptofields["u14"] = "Description";
+	$maptofields["u1"] = "Username";
+	$maptofields["u2"] = "First Name";
+	$maptofields["u3"] = "Last Name";
+	$maptofields["u4"] = "Description";
+	$maptofields["u5"] = "Telephone User ID";
+	$maptofields["u6"] = "Email";
+	$maptofields["u7"] = "Auto Report Emails";
+	$maptofields["u8"] = "Phone";
+	$maptofields["u9"] = "Caller ID";
+	$maptofields["u10"] = "Teacher ID";
+	$maptofields["u11"] = "Access Profile";
+	$maptofields["u12"] = "Restricted Job Types";
+	$maptofields["sep"] = "--------------";
 
 	//F fields, limit to multisearch
 	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
 	foreach ($fieldmaps as $fieldmap) {
 		if ($fieldmap->isOptionEnabled("multisearch")) {
-			$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
+			$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
 		}
 	}
 

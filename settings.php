@@ -63,13 +63,13 @@ startWindow("Options", 'padding: 3px;');
 					}
 					if($USER->authorize('metadata')){
 ?>
-						<tr><td><a href='persondatamanager.php'>F-Field Definitions</a></td></tr>
+						<tr><td><a href='persondatamanager.php'>Field Definitions</a></td></tr>
 <?
 					}
 
 					if($USER->authorize('metadata')){
 ?>
-						<tr><td><a href='scheduledatamanager.php'>C-Field Definitions</a></td></tr>
+						<tr><td><a href='scheduledatamanager.php'>Association Field Definitions</a></td></tr>
 <?
 					}
 

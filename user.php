@@ -45,6 +45,11 @@ if(!$IS_COMMSUITE && isset($_GET['id'])){
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+function showmode($type) {
+	global $RULEMODE, $fieldmap;
+	return $fieldmap->isOptionEnabled($type) && ($RULEMODE[$type]);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +228,9 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 				$callerid = false;
 			$usr->setSetting("callerid",$callerid);
 
+			$staffid = GetFormData($f, $s, "staffid");
+			$usr->staffpkey = $staffid;
+
 			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
 			if ($fieldnum != -1 && $usr->id) {
 				$type = GetFormData($f,$s,"newruletype");
@@ -320,11 +328,17 @@ if( $reloadform )
 	PutFormData($f,$s,"newruleoperator_text","eq","text",1,50);
 	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
 	PutFormData($f,$s,"callerid", Phone::format($usr->getSetting("callerid","",true)), "text", 0, 20);
+	PutFormData($f,$s,"staffid",$usr->staffpkey,"text");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+$usr = new User($_SESSION['userid']);
+$readonly = $usr->importid != null;
+$dis = "";
+if ($readonly) $dis = "disabled";
+
 $PAGE = "admin:users";
 $TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : GetFormData($f,$s,"firstname") . ' ' . GetFormData($f,$s,"lastname"));
 include_once("nav.inc.php");
@@ -340,18 +354,42 @@ startWindow('User Information');
 						<table border="0" cellpadding="1" cellspacing="0">
 							<tr>
 								<td align="right">First Name:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'firstname', 'text', 20, 50); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->firstname;
+								} else {
+									NewFormItem($f,$s, 'firstname', 'text', 20, 50);
+								} ?>
+								</td>
 							</tr>
 							<tr>
 								<td align="right">Last Name:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'lastname', 'text', 20, 50); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->firstname;
+								} else {
+									NewFormItem($f,$s, 'lastname', 'text', 20, 50);
+								} ?>
+								</td>
 							</tr>
 							<tr>
 								<td align="right">Description:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'description', 'text', 20, 50); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->description;
+								} else {
+									NewFormItem($f,$s, 'description', 'text', 20, 50);
+								} ?>
+								</td>
 							</tr>							<tr>
 								<td align="right">Username:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'login', 'text', 20); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->login;
+								} else {
+									NewFormItem($f,$s, 'login', 'text', 20);
+								} ?>
+								</td>
 							</tr>
 							<tr>
 								<td align="right">Password:</td>
@@ -368,7 +406,13 @@ startWindow('User Information');
 							<? } ?>
 							<tr>
 								<td align="right">Telephone User ID#:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'accesscode', 'text', 10); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->accesscode;
+								} else {
+									NewFormItem($f,$s, 'accesscode', 'text', 10);
+								} ?>
+								</td>
 							</tr>
 							<tr>
 								<td align="right">Telephone Pin Code #:</td>
@@ -379,21 +423,57 @@ startWindow('User Information');
 							</tr>
 							<tr>
 								<td align="right">Email:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'email', 'text', 72, 10000); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->email;
+								} else {
+									NewFormItem($f,$s, 'email', 'text', 72, 10000);
+								} ?>
+								</td>
 							</tr>
 							<tr>
 								<td align="right">Auto Report Email(s):</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'aremail', 'text', 72, 10000); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->aremail;
+								} else {
+									NewFormItem($f,$s, 'aremail', 'text', 72, 10000);
+								} ?>
+								</td>
 							</tr>
 							<tr>
 								<td align="right">Phone:</td>
-								<td colspan="4"><? NewFormItem($f,$s, 'phone', 'text', 20); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo Phone::format($usr->aremail);
+								} else {
+									NewFormItem($f,$s, 'phone', 'text', 20);
+								} ?>
+								</td>
 							</tr>
 
 							<tr>
 								<td align="right">Caller&nbsp;ID:</td>
-								<td colspan="4"><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo Phone::format($usr->getSetting("callerid","",true));
+								} else {
+									NewFormItem($f,$s, 'callerid', 'text', 20,20);
+								} ?>
+								</td>
 							</tr>
+
+							<tr>
+								<td align="right">Staff&nbsp;ID:</td>
+								<td colspan="4">
+								<? if ($readonly) {
+									echo $usr->staffpkey;
+								} else {
+									NewFormItem($f,$s, 'staffid', 'text', 20, 255);
+								} ?>
+								</td>
+							</tr>
+
 							<?
 								if($IS_LDAP && $IS_COMMSUITE) {
 							?>
@@ -421,22 +501,26 @@ startWindow('User Information');
 								 	Access Profile:
 								</td>
 								<td>
-								<?
-								NewFormItem($f,$s,'accessid','selectstart');
+								<? if ($readonly) {
+									$profilename = QuickQuery("select name from access where id=".$usr->accessid);
+									echo $profilename;
+								} else {
+									NewFormItem($f,$s,'accessid','selectstart');
 
-								if($IS_COMMSUITE)
-									$accss = DBFindMany('Access', "from access");
-								/*CSDELETEMARKER_START*/
-								else
-									$accss = DBFindMany('Access', "from access where name != 'SchoolMessenger Admin'");
-								/*CSDELETEMARKER_END*/
+									if($IS_COMMSUITE)
+										$accss = DBFindMany('Access', "from access");
+									/*CSDELETEMARKER_START*/
+									else
+										$accss = DBFindMany('Access', "from access where name != 'SchoolMessenger Admin'");
+									/*CSDELETEMARKER_END*/
 
-								if(count($accss))
-									foreach($accss as $acc)
-										NewFormItem($f,$s,'accessid','selectoption',$acc->name,$acc->id);
-								else
-									NewFormItem($f,$s,'accessid','selectoption','No Access Profiles Defined',0);
-								NewFormItem($f,$s,'accessid','selectend');
+									if(count($accss))
+										foreach($accss as $acc)
+											NewFormItem($f,$s,'accessid','selectoption',$acc->name,$acc->id);
+									else
+										NewFormItem($f,$s,'accessid','selectoption','No Access Profiles Defined',0);
+									NewFormItem($f,$s,'accessid','selectend');
+								}
 								?>
 								</td>
 							</tr>
@@ -445,7 +529,7 @@ startWindow('User Information');
 									<table>
 										<tr>
 											<td>
-												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,'id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?>
+												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,$dis.' id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?>
 											</td>
 											<td>
 												Restrict this user to the following types of jobs
@@ -458,11 +542,16 @@ startWindow('User Information');
 								<td align="right" valign="top" style="padding-top: 4px;">Job Types:</td>
 								<td>
 								<?
-									// changed query from name, id to id, name; jjl
-									$options = QuickQueryList("select id, name from jobtype where deleted=0 and not issurvey order by systempriority, name asc", true);
-									if(!count($options))
-										$options['No Job Types Defined'] = 0;
-									NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,'id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');
+									if ($readonly) {
+										$userjobtypes = QuickQueryList("select name from jobtype where id in (select jobtypeid from userjobtypes where userid=".$usr->id.") and deleted=0 and not issurvey order by systempriority, name asc");
+										echo implode(", ",$userjobtypes);
+									} else {
+										// changed query from name, id to id, name; jjl
+										$options = QuickQueryList("select id, name from jobtype where deleted=0 and not issurvey order by systempriority, name asc", true);
+										if(!count($options))
+											$options['No Job Types Defined'] = 0;
+										NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,$dis.' id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');
+									}
 								?>
 								</td>
 							</tr>
@@ -471,7 +560,7 @@ startWindow('User Information');
 									<table>
 										<tr>
 											<td>
-												<? NewFormItem($f,$s,'restrictsurveytypes','checkbox',NULL,NULL,'id="restrictsurveytypes" onclick="clearAllIfNotChecked(this,\'surveyjobtypeselect\'); "'); ?>
+												<? NewFormItem($f,$s,'restrictsurveytypes','checkbox',NULL,NULL,$dis.' id="restrictsurveytypes" onclick="clearAllIfNotChecked(this,\'surveyjobtypeselect\'); "'); ?>
 											</td>
 											<td>
 												Restrict this user to the following types of survey jobs
@@ -484,11 +573,16 @@ startWindow('User Information');
 								<td align="right" valign="top" style="padding-top: 4px;">Survey Job Types:</td>
 								<td>
 								<?
+								if ($readonly) {
+									$userjobtypes = QuickQueryList("select name from jobtype where id in (select jobtypeid from userjobtypes where userid=".$usr->id.") and deleted=0 and issurvey=1 order by systempriority, name asc");
+									echo implode(", ",$userjobtypes);
+								} else {
 									// changed query from name, id to id, name; jjl
 									$surveyoptions = QuickQueryList("select id, name from jobtype where deleted=0 and issurvey=1 order by systempriority, name asc", true);
 									if(!count($surveyoptions))
 										$surveyoptions['No Job Types Defined'] = 0;
-									NewFormItem($f,$s,'surveyjobtypes','selectmultiple',3,$surveyoptions,'id="surveyjobtypeselect" onmousedown="setChecked(\'restrictsurveytypes\')"');
+									NewFormItem($f,$s,'surveyjobtypes','selectmultiple',3,$surveyoptions,$dis.' id="surveyjobtypeselect" onmousedown="setChecked(\'restrictsurveytypes\')"');
+								}
 								?>
 								</td>
 							</tr>
@@ -499,10 +593,71 @@ startWindow('User Information');
 					<th valign="top" align="right" class="windowRowHeader">Data View:<br><? print help('User_DataView'); ?></th>
 					<td>
 						Restrict this user's access to the following data<br>
-						<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
-					<?
-					include('ruleeditform.inc.php');
-					?>
+
+<?						if ($readonly) {
+// TODO clean this up, or add $readonly to the ruleeditform code
+
+echo "<table border=\"0\" cellspacing=\"3\" cellpadding=\"2\" class=\"border\" width=\"50%\">";
+
+
+//get all possible rules
+$fieldmapnames = FieldMap::getAuthorizedMapNamesLike("%"); // get all fields (not only ffields)
+$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("%"); // get all fields (not only ffields, like reports would)
+
+$rulemap = array();
+if(is_array($RULES)) {
+	foreach ($RULES as $rule) {
+		$rulemap[$rule->fieldnum][] = $rule;
+	}
+}
+
+foreach ($fieldmaps as $fieldmap) {
+	//only show if searchable and multisearch for rules
+	if ($fieldmap->isOptionEnabled("searchable")) {
+
+		$fieldname = $fieldmap->name;
+		$fieldnum = $fieldmap->fieldnum;
+
+		//only show an entry for fields that have a rule defined for them
+		if (!isset($rulemap[$fieldnum]))
+			continue;
+
+		foreach($rulemap[$fieldnum] as $rule) {
+			echo '<tr><td class="border">' . htmlentities($fieldname) . '</td>';
+
+			if(showmode("text")) {
+				echo '<td class="border" nowrap>' . array_search($rule->op, $RULE_OPERATORS) . '</td><td class="border">' . ($rule->val ? $rule->val : '&nbsp;') . '</td>';
+			} elseif(showmode("reldate")) {
+				echo '<td class="border" nowrap>is</td><td class="border">' . $RELDATE_OPTIONS[$rule->val] . '</td>';
+			} elseif(showmode("multisearch")) {
+				if ($rule->logical == "and") {
+								echo '<td class="border" nowrap>is</td>';
+				} else {
+								echo '<td class="border" nowrap>is NOT</td>';
+				}
+				echo '<td class="border">';
+				$values = explode("|",$rule->val);
+				$formattedvalues = implode(", ",$values);
+				if ($formattedvalues == "")
+					$formattedvalues = "&nbsp;";
+				echo $formattedvalues;
+				echo '</td>';
+			}
+
+			echo "</tr>\n";
+		}
+	}
+}
+
+echo "</table>";
+
+						} else {
+?>
+							<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
+<?
+							include('ruleeditform.inc.php');
+						}
+?>
 					</td>
 				</tr>
 				<? } ?>

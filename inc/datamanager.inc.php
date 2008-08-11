@@ -222,7 +222,10 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = "Metadata Manager";
+$TITLE = "Field Definitions";
+if ($DATATYPE == "schedule") {
+	$TITLE = "Association Field Definitions";
+}
 
 include_once("nav.inc.php");
 
@@ -233,7 +236,13 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
 	<tr class="listHeader">
-		<th align="left">Field</th><th align="left">Name</th><th align="left">Type</th><th align="left">Searchable</th><th align="left"></th>
+		<th align="left">Field</th><th align="left">Name</th><th align="left">Type</th>
+<?		if ($DATATYPE == "person") {
+?>
+		<th align="left">Searchable</th>
+<?		}
+?>
+		<th align="left">Actions</th>
 	</tr>
 <?
 	$alt = 0;
@@ -241,6 +250,9 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 	$types = array("Text" => 'text',
 					"Date" => 'reldate',
 					"List" => 'multisearch');
+	if ($DATATYPE == "schedule") {
+		$types = array("List" => 'multisearch');
+	}
 
 		if(!FieldMap::getName(FieldMap::getFirstNameField()))
 			$types["First Name"] = 'text,firstname';
@@ -253,7 +265,7 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 		if(!FieldMap::getGradeField())
 			$types["Grade"] = 'multisearch,grade';
 		if(!FieldMap::getGradeField())
-			$types["Staff ID"] = 'multisearch,staff';
+			$types["Teacher ID"] = 'multisearch,staff';
 
 	if (count($FIELDMAPS) > 0) {
 
@@ -268,6 +280,10 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 ?>
 			</td>
 <?
+			$datapage = "persondatamanager.php";
+			if ($DATATYPE == "schedule") {
+				$datapage = "scheduledatamanager.php";
+			}
 			// These 5 items are special cases
 			if ($fieldnum != $field->getFirstNameField() &&
 				$fieldnum != $field->getLastNameField() &&
@@ -285,16 +301,30 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 					NewFormItem($form, $section, 'type_' . $fieldnum, 'selectend');
 ?>
 				</td>
-				<td><? NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox'); ?></td>
-				<td><a href='datamanager.php?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='datamanager.php?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+<?				if ($DATATYPE == "person") {
+?>
+					<td>
+					<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox');?>
+					</td>
+					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+<?
+				} else {
+?>
+					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a></td>
+<?				}
+?>
+
 <?
 			} else {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20');?></td>
 				<td><?=ucfirst(GetFormData($form, $section, "type_$fieldnum")); ?></td>
+<?				if ($DATATYPE == "person") {
+?>
 				<td><? NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, 'DISABLED');?></td>
-				<td><a href='datamanager.php?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='datamanager.php?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+				<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
 <?
+				}
 			}
 ?>
 		</tr>
@@ -328,7 +358,11 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 		NewFormItem($form, $section, 'newfield_type', 'selectend');
 ?>
 		</td>
+<?		if ($DATATYPE == "person") {
+?>
 		<td><? NewFormItem($form, $section, 'newfield_searchable', 'checkbox', '', '', 'id=newfield_searchable'); ?> </td>
+<?		}
+?>
 		<td><? echo submit($form, 'add', 'Add'); ?></td>
 	</tr>
 <?

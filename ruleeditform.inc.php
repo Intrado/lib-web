@@ -6,9 +6,8 @@ function showmode($type) {
 }
 
 //get all possible rules
-$fieldmapnames = FieldMap::getAuthorizedMapNames();
-
-$fieldmaps = FieldMap::getAuthorizedFieldMaps();
+$fieldmapnames = FieldMap::getAuthorizedMapNamesLike("%"); // get all fields (not only ffields)
+$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("%"); // get all fields (not only ffields, like reports would)
 
 $rulemap = array();
 $unusedrules = array();
