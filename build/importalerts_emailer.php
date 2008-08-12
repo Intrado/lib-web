@@ -84,18 +84,18 @@ foreach($customers as $cust) {
 
 		$emaillist = explode(";",$alertoptions['emails']);
 
-		if(isset($alertoptions['minsize']) && $import[3] < $alertoptions['minsize']){
-			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file smaller than " . number_format($alertoptions['minsize']) . " bytes.";
+		if(isset($alertoptions['minsize']) && ($import[3] + 0) < $alertoptions['minsize']){
+			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file too small. " . number_format($import[3]) . " < " . number_format($alertoptions['minsize']) . " (bytes).";
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
 			$notified = true;
 		}
-		if(isset($alertoptions['maxsize']) && $import[3] > $alertoptions['maxsize']){
-			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file larger than " . number_format($alertoptions['maxsize']) . " bytes.";
+		if(isset($alertoptions['maxsize']) && ($import[3] + 0) > $alertoptions['maxsize']){
+			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file too large." . number_format($import[3]) . " > " . number_format($alertoptions['maxsize']) . " (bytes).";
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
 			$notified = true;
 		}
-		if(isset($alertoptions['daysold']) && $alertoptions['daysold'] && ($import[2] < (time() - 60*60*24*$alertoptions['daysold']))){
-			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a file modified date before " . $alertoptions['daysold'] . " days ago.";
+		if(isset($alertoptions['daysold']) && $alertoptions['daysold'] && ($import[2] < (time() - (15 + 60*60*24*$alertoptions['daysold'])))){
+			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a file modified date before " . $alertoptions['daysold'] . " days ago. " . date("M j, Y g:i a (e)",$import[2]);
 			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
 			$notified = true;
 		}
@@ -121,9 +121,9 @@ foreach($customers as $cust) {
 				}
 			}
 			//calculate unix time and allow 15 min leeway
-			$scheduledlastrun = strtotime(" -$daysago days " . $alertoptions['time']) - (60*15);
-			if($scheduledlastrun > $import[2]){
-				$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " did not run at the scheduled time: " . date("M d, Y g:i a", $scheduledlastrun);
+			$scheduledlastrun = strtotime(" -$daysago days " . $alertoptions['time']);
+			if($import[2] > ($scheduledlastrun + 60*15) || $import[2] < ($scheduledlastrun - 60*15)){
+				$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " did not run at the scheduled time: " . date("M d, Y g:i a", $import[2]);
 				$emailmessages = generateMessage($emailmessages, $emaillist, $message);
 				$notified = true;
 			}
