@@ -130,6 +130,15 @@ if ($datatype == "person") {
 		}
 	}
 
+	$maptofields["sep2"] = "--------------";
+
+	//C fields (all assumed multisearch)
+	$cfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");
+	foreach ($cfieldmaps as $fieldmap) {
+		if ($fieldmap->fieldnum == "c01") continue; // skip the teacherid
+		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
+	}
+
 } else if ($datatype == "association") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
