@@ -45,7 +45,7 @@ if(!$IS_COMMSUITE && isset($_GET['id'])){
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function showmode($type) {
+function showmodeRO($type) {
 	global $RULEMODE, $fieldmap;
 	return $fieldmap->isOptionEnabled($type) && ($RULEMODE[$type]);
 }
@@ -625,11 +625,11 @@ foreach ($fieldmaps as $fieldmap) {
 		foreach($rulemap[$fieldnum] as $rule) {
 			echo '<tr><td class="border">' . htmlentities($fieldname) . '</td>';
 
-			if(showmode("text")) {
+			if(showmodeRO("text")) {
 				echo '<td class="border" nowrap>' . array_search($rule->op, $RULE_OPERATORS) . '</td><td class="border">' . ($rule->val ? $rule->val : '&nbsp;') . '</td>';
-			} elseif(showmode("reldate")) {
+			} elseif(showmodeRO("reldate")) {
 				echo '<td class="border" nowrap>is</td><td class="border">' . $RELDATE_OPTIONS[$rule->val] . '</td>';
-			} elseif(showmode("multisearch")) {
+			} elseif(showmodeRO("multisearch")) {
 				if ($rule->logical == "and") {
 								echo '<td class="border" nowrap>is</td>';
 				} else {
