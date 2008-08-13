@@ -1119,7 +1119,7 @@ function display_jobtype_info(value){
 			addinfo.innerHTML = "Phone calls will be sent out on the hosted system";
 
 		} else {
-			addinfo.innerHTML = "Phone calls will be sent out by your Remote Telephony Appliance";
+			addinfo.innerHTML = "Phone calls will be sent out by your Flex Appliance";
 		}
 	if(value == ""){
 		new getObj("addinfo").obj.innerHTML ="";

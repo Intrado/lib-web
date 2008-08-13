@@ -82,7 +82,7 @@ startWindow("Options", 'padding: 3px;');
 					}
 					if($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp'){
 ?>
-						<tr><td><a href='dms.php'>Remote Telephony Appliance</a></td></tr>
+						<tr><td><a href='dms.php'>Flex Appliance</a></td></tr>
 <?
 					}
 ?>
