@@ -425,13 +425,13 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	<td><?
 			NewFormItem($f, $s, '_dmmethod', 'selectstart');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', '--Choose a Method--', '');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'ASP', 'asp');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'Hybrid', 'hybrid');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite', 'cs');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite', 'asp');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CSFlexEmerg', 'hybrid');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CSFlex', 'cs');
 			NewFormItem($f, $s, '_dmmethod', 'selectend');
 		?>
 		<span>
-			<?= in_array(getCustomerSystemSetting('_dmmethod', "", true, $custdb), array('hybrid','cs')) ? '<b style="color: red;">Changing this to "ASP" will cause jobs to go out on the system!</b>' : "" ?>
+			<?= in_array(getCustomerSystemSetting('_dmmethod', "", true, $custdb), array('hybrid','cs')) ? '<b style="color: red;">Changing this to "CommSuite" will cause jobs to go out on the system!</b>' : "" ?>
 		</span>
 	</td>
 </tr>

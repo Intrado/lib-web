@@ -70,7 +70,16 @@ function fmt_hasportal($row, $index){
 }
 
 function fmt_dmmethod($row, $index){
-	return ucfirst($row[$index]);
+	if ($row[$index] === "asp") {
+		return "CommSuite";
+	}
+	if ($row[$index] === "hybrid") {
+		return "CSFlexEmerg";
+	}
+	if ($row[$index] === "cs") {
+		return "CSFlex";
+	}
+	return "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
