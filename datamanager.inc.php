@@ -252,8 +252,11 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 					"List" => 'multisearch');
 	if ($DATATYPE == "schedule") {
 		$types = array("List" => 'multisearch');
-	}
 
+		if(!FieldMap::getStaffField())
+			$types["Teacher ID"] = 'multisearch,staff';
+
+	} else {
 		if(!FieldMap::getName(FieldMap::getFirstNameField()))
 			$types["First Name"] = 'text,firstname';
 		if(!FieldMap::getName(FieldMap::getLastNameField()))
@@ -264,8 +267,7 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 			$types["School"] = 'multisearch,school';
 		if(!FieldMap::getGradeField())
 			$types["Grade"] = 'multisearch,grade';
-		if(!FieldMap::getGradeField())
-			$types["Teacher ID"] = 'multisearch,staff';
+	}
 
 	if (count($FIELDMAPS) > 0) {
 

@@ -62,7 +62,10 @@ class Job extends DBMappedObject {
 		else
 			$listsql = "0";//dont assume anyone is in the list if there are no rules
 
-		$this->thesql = "1 $usersql and $listsql";
+		$allrules = array_merge($user->rules(), $listrules);
+		$assocsql = Rule::makeAssociationQuery($allrules,"p");
+
+		$this->thesql = "1 $usersql and $listsql $assocsql";
 	}
 
 	// assumes this job was already created in the database

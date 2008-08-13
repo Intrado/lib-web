@@ -65,6 +65,9 @@ class RenderedList {
 
 		$usersql = $USER->userSQL("p");
 
+		$allrules = array_merge($USER->rules(), $this->list->getListRules());
+		$assocsql = Rule::makeAssociationQuery($allrules,"p");
+
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
 			$pagesql = "";
@@ -142,7 +145,7 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where not p.deleted and p.userid is null $modesql1 and $listsql $usersql)
+			where not p.deleted and p.userid is null $modesql1 and $listsql $usersql $assocsql)
 
 			union all
 
@@ -202,6 +205,9 @@ class RenderedList {
 		global $USER;
 
 		$usersql = $USER->userSQL("p");
+
+		$allrules = array_merge($USER->rules(), $this->list->getListRules());
+		$assocsql = Rule::makeAssociationQuery($allrules,"p");
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -279,6 +285,7 @@ class RenderedList {
 		$query .="
 			where p.userid is null and not p.deleted
 			$usersql
+			$assocsql
 			$searchsql
 			$orderby
 			$pagesql
@@ -326,11 +333,13 @@ class RenderedList {
 		$usersql = $USER->userSQL("p");
 		$listsql = $this->list->getListRuleSQL();
 
-		//$this->totalrule = $this->countByRule($usersql, $listsql); //not useful
+		$allrules = array_merge($USER->rules(), $this->list->getListRules());
+		$assocsql = Rule::makeAssociationQuery($allrules,"p");
+
 		$this->totalremoved = $this->countRemoved();
 		$this->totaladded = $this->countAdded();
 
-		$this->total = $this->countEffectiveRule($usersql, $listsql) + $this->totaladded;
+		$this->total = $this->countEffectiveRule($usersql, $listsql, $assocsql) + $this->totaladded;
 		if ($this->mode == "add") {
 			$this->total = $this->totaladded;;
 		}
@@ -341,19 +350,11 @@ class RenderedList {
 		$this->hasstats = true;
 	}
 
-	function countEffectiveRule ($usersql, $listsql) {
+	function countEffectiveRule ($usersql, $listsql, $assocsql) {
 		$query = "select count(*)
 				from person p
 				left join listentry le on (le.personid=p.id and le.listid = " . $this->list->id . ")
-				where le.type is null and p.userid is null and not p.deleted and $listsql $usersql
-		";
-		return QuickQuery($query);
-	}
-
-	function countByRule ($usersql, $listsql) {
-		$query = "select count(*)
-				from person p
-				where p.userid is null and not p.deleted and $listsql $usersql
+				where le.type is null and p.userid is null and not p.deleted and $listsql $usersql $assocsql
 		";
 		return QuickQuery($query);
 	}

@@ -184,7 +184,8 @@ if (CheckFormSubmit($f,$s)){
 				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
 							('f01', 'First Name', 'searchable,text,firstname'),
 							('f02', 'Last Name', 'searchable,text,lastname'),
-							('f03', 'Language', 'searchable,multisearch,language')";
+							('f03', 'Language', 'searchable,multisearch,language'),
+							('c01', 'Teacher ID', 'searchable,multisearch,staff')";
 				QuickUpdate($query, $newdb) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 
 				$query = "INSERT INTO `language` (`name`) VALUES

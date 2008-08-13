@@ -84,7 +84,9 @@ class User extends DBMappedObject {
 	}
 
 	function userSQL ($alias = false) {
-		return Rule::makeQuery($this->rules(), $alias);
+		$r = Rule::makeQuery($this->rules(), $alias);
+//echo "USERRULE ".$r;
+		return $r;
 	}
 
 	function getCustomer () {

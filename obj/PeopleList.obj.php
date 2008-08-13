@@ -16,15 +16,20 @@ class PeopleList extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	function getListRules() {
+		return DBFindMany("Rule","from listentry le, rule r where le.type='R'
+				and le.ruleid=r.id and le.listid='" . $this->id .  "'", "r");
+	}
+
 	function getListRuleSQL () {
 		//get and compose list rules
-		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
-				and le.ruleid=r.id and le.listid='" . $this->id .  "'", "r");
+		$listrules = $this->getListRules();
 
 		if (count($listrules) > 0)
 			$listsql = "1" . Rule::makeQuery($listrules, "p");
 		else
 			$listsql = "0";//dont assume anyone is in the list if there are no rules
+//echo (" LISTSQL ".$listsql);
 		return $listsql;
 	}
 }

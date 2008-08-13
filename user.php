@@ -199,6 +199,10 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 					$usr->ldap=0;
 				}
 			}
+
+			$staffid = GetFormData($f, $s, "staffid");
+			$usr->staffpkey = $staffid;
+
 			$usr->update();
 
 			QuickUpdate("delete from userjobtypes where userid = $usr->id");
@@ -227,9 +231,6 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			if (strlen($callerid) == 0 )
 				$callerid = false;
 			$usr->setSetting("callerid",$callerid);
-
-			$staffid = GetFormData($f, $s, "staffid");
-			$usr->staffpkey = $staffid;
 
 			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
 			if ($fieldnum != -1 && $usr->id) {

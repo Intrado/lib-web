@@ -17,4 +17,4 @@ require_once("obj/FieldMap.obj.php");
 
 $DATATYPE = "schedule";
 
-include_once("inc/datamanager.inc.php");
+include_once("datamanager.inc.php");

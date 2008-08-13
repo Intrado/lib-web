@@ -17,4 +17,4 @@ require_once("obj/FieldMap.obj.php");
 
 $DATATYPE = "person";
 
-include_once("inc/datamanager.inc.php");
+include_once("datamanager.inc.php");
