@@ -425,9 +425,9 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	<td><?
 			NewFormItem($f, $s, '_dmmethod', 'selectstart');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', '--Choose a Method--', '');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite', 'asp');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CSFlexEmerg', 'hybrid');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CSFlex', 'cs');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite (fully hosted)', 'asp');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex + Emergency', 'hybrid');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex (data only)', 'cs');
 			NewFormItem($f, $s, '_dmmethod', 'selectend');
 		?>
 		<span>
