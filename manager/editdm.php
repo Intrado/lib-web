@@ -198,8 +198,22 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 		<td><? NewFormItem($f, $s, "customerid", "text", "5"); ?></td>
 	</tr>
 	<tr>
-		<td>Enable State: </td>
-		<td><?=$dm['enablestate']?></td>
+		<td>Authorized: </td>
+		<td><?
+		
+		switch ($dm['enablestate']) {
+		case "active":
+			echo "Authorized";
+			break;
+		case "new":
+			echo "New";
+			break;
+		case "disabled":
+			echo "Unauthorized";
+			break;
+		}
+		
+		?></td>
 	</tr>
 	<tr>
 		<td>Type: </td>
