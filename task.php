@@ -252,7 +252,7 @@ startWindow('Import Information ');
 		</td>
 	</tr>
 
-	<? if ($IMPORT->id && $IMPORT->datatype == "person") { ?>
+	<? if ($IMPORT->id) { ?>
 
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">*Automated upload:<br><? print help('ImportEditor_AutomatedUpload'); ?></th>
@@ -262,6 +262,10 @@ startWindow('Import Information ');
 			</table>
 		</td>
 	</tr>
+	<?}?>
+
+	<? if ($IMPORT->id && $IMPORT->datatype == "person") { ?>
+
 	<tr>
 		<th align="right" class="windowRowHeader">*Associated Jobs:<br><? print help('ImportEditor_AssociatedJobs'); ?></th>
 		<td >

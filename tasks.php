@@ -32,19 +32,43 @@ if (isset($_GET['delete'])) {
 	$id = $_GET['delete'] + 0;
 	$import = new Import($id);
 
-	//deactivate everyone with this importid
-	QuickUpdate("update person set deleted=1, lastimport=now() where importid=$id");
-	//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
-	QuickUpdate("delete le from listentry le
-				left join person p on (p.id = le.personid)
-				where p.id is null and le.personid is not null");
+	switch ($import->datatype) {
+	case "person" :
+		//deactivate everyone with this importid
+		QuickUpdate("update person set deleted=1, lastimport=now() where importid=$id");
+		//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
+		QuickUpdate("delete le from listentry le
+					left join person p on (p.id = le.personid)
+					where p.id is null and le.personid is not null");
 
-	//recalc pdvalues for all fields mapped
-	$fieldnums = QuickQueryList("select distinct mapto from importfield where mapto like 'f%' and importid=$id");
-	if (count($fieldnums) > 0) {
-		$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
-		foreach ($fields as $field)
-			$field->updatePersonDataValues();
+		//recalc pdvalues for all fields mapped
+		$fieldnums = QuickQueryList("select distinct mapto from importfield where mapto like 'f%' and importid=$id");
+		if (count($fieldnums) > 0) {
+			$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
+			foreach ($fields as $field)
+				$field->updatePersonDataValues();
+		}
+	break;
+	case "user" :
+		// disable all users with this importid and set importid to null
+		QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=$id");
+
+	break;
+	case "association" :
+		// TODO how to remove userrules
+
+		// clear out data
+		QuickUpdate("delete from personassociation");
+
+		//recalc pdvalues for all fields mapped
+		$fieldnums = QuickQueryList("select distinct mapto from importfield where mapto like 'c%' and importid=$id");
+		if (count($fieldnums) > 0) {
+			$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
+			foreach ($fields as $field)
+				$field->updatePersonDataValues();
+		}
+
+	break;
 	}
 
 	//delete mappings
@@ -102,6 +126,18 @@ function fmt_datamodifiedtime ($import,$field) {
 }
 
 function fmt_actions ($import,$dummy) {
+	$deletewarning = "";
+	switch ($import->datatype) {
+	case "person" :
+		$deletewarning = "This will deactivate all associated contact records!";
+	break;
+	case "user" :
+		$deletewarning = "This will disable all associated users!";
+	break;
+	case "association" :
+		$deletewarning = "This will delete all association data!";
+	break;
+	}
 	$associatedjobcount = QuickQuery("Select count(*) from importjob where importid = '$import->id'");
 	$confirm = "Are you sure you want to run this import now?";
 	if($associatedjobcount > 0){
@@ -116,7 +152,9 @@ function fmt_actions ($import,$dummy) {
 			 . "<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>&nbsp;|&nbsp;";
 	}
 	$res .= "<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
-		 ."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\nThis will deactivate all associated contact records!');\">Delete</a>";
+		 ."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\n"
+		 . $deletewarning
+		 . "');\">Delete</a>";
 	return $res;
 }
 

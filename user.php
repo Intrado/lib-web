@@ -657,6 +657,12 @@ echo "</table>";
 							<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
 <?
 							include('ruleeditform.inc.php');
+
+							// if user has a staffid and cfield restrictions, warn them of association data override
+							//if ($usr->staffpkey !== "") {
+								echo "Warning, Association Field restrictions may be overwritten by association data import.<br>";
+							//}
+
 						}
 ?>
 					</td>
