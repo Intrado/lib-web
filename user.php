@@ -182,7 +182,6 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error("No access profile was chosen");
 		} else {
 			// Submit changes
-
 			if ($usr->id == NULL) {
 				$usr->enabled = 1;
 			}
@@ -597,6 +596,9 @@ startWindow('User Information');
 
 <?						if ($readonly) {
 // TODO clean this up, or add $readonly to the ruleeditform code
+
+PutFormData($f,$s,"newrulefieldnum","-1"); // set to -1 for save button to exit
+
 
 echo "<table border=\"0\" cellspacing=\"3\" cellpadding=\"2\" class=\"border\" width=\"50%\">";
 
