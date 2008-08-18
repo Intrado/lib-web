@@ -446,7 +446,7 @@ startWindow('User Information');
 								<td align="right">Phone:</td>
 								<td colspan="4">
 								<? if ($readonly) {
-									echo Phone::format($usr->aremail);
+									echo Phone::format($usr->phone);
 								} else {
 									NewFormItem($f,$s, 'phone', 'text', 20);
 								} ?>
