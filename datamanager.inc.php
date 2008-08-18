@@ -302,7 +302,7 @@ case "schedule" :
 		$types = array("List" => 'multisearch');
 
 		if(!FieldMap::getStaffField())
-			$types["Teacher ID"] = 'multisearch,staff';
+			$types["Staff ID"] = 'multisearch,staff';
 break;
 }
 
