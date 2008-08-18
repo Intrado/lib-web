@@ -75,13 +75,17 @@ $datatype = $import->datatype;
 if ($datatype == "person") {
 
 	//make a menu of all available fields
-	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
+	$fieldmaps  = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
+	$gfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'g%' order by fieldnum");
 
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["key"] = "Unique ID";
 	//F fields
 	foreach ($fieldmaps as $fieldmap)
+		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
+	//G fields
+	foreach ($gfieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 
 	//phones, emails, SMS
@@ -131,6 +135,13 @@ if ($datatype == "person") {
 	}
 
 	$maptofields["sep2"] = "--------------";
+
+	//G fields
+	$gfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'g%' order by fieldnum");
+	foreach ($gfieldmaps as $fieldmap)
+		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
+
+	$maptofields["sep3"] = "--------------";
 
 	//C fields (all assumed multisearch)
 	$cfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");

@@ -185,6 +185,7 @@ if (CheckFormSubmit($f,$s)){
 							('f01', 'First Name', 'searchable,text,firstname'),
 							('f02', 'Last Name', 'searchable,text,lastname'),
 							('f03', 'Language', 'searchable,multisearch,language'),
+							('g01', 'School', 'searchable,multisearch,school'),
 							('c01', 'Teacher ID', 'searchable,multisearch,staff')";
 				QuickUpdate($query, $newdb) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
 

@@ -1,5 +1,5 @@
 <?
-// SHARED GUI CODE between F-Field and C-Field definitions
+// SHARED GUI CODE between F-Field, G-Field, and C-Field definitions
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,10 +30,16 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['clear'])) {
 	$fieldnum = DBSafe($_GET['clear']);
 	if (ereg("^f[0-9]{2}$",$fieldnum)) {
-		if ($DATATYPE == "person") {
+		switch ($DATATYPE) {
+		case "person" :
 			QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
-		} else {
-			// TODO schedule data
+		break;
+		case "group" :
+			// TODO
+		break;
+		case "schedule" :
+			// TODO
+		break;
 		}
 	}
 
@@ -41,17 +47,25 @@ if (isset($_GET['clear'])) {
 }
 
 
-// person data
-$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,language', 'multisearch,grade',
-						'multisearch,school', 'text,firstname',  'text,lastname', 'grade', 'school', 'firstname', 'lastname', 'language');
-$numfields = 20;
-$dt = "f%";
-// schedule data
-if ($DATATYPE == "schedule") {
-	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,staff', 'staff');
+switch ($DATATYPE) {
+case "person" :
+	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,language', 'multisearch,grade',
+						 'text,firstname', 'text,lastname', 'grade', 'firstname', 'lastname', 'language');
+	$numfields = 20;
+	$dt = "f%";
+break;
+case "group" :
+	$VALID_TYPES = array('multisearch', 'multisearch,school', 'school');
+	$numfields = 10;
+	$dt = "g%";
+break;
+case "schedule" :
+	$VALID_TYPES = array('multisearch', 'multisearch,staff', 'staff');
 	$numfields = 10;
 	$dt = "c%";
+break;
 }
+
 
 $FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
 $availablefields = array();
@@ -95,9 +109,16 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
 				// Submit new item
 				$specialtype = GetFormData($form, $section, "newfield_specialtype");
 				$newfield->name = $cleanedname;
-				$temp = "f";
-				if ($DATATYPE == "schedule") {
+				switch ($DATATYPE) {
+				case "person" :
+					$temp = "f";
+				break;
+				case "group" :
+					$temp = "g";
+				break;
+				case "schedule" :
 					$temp = "c";
+				break;
 				}
 				$newfield->fieldnum = $temp . GetFormData($form,$section,"newfield_fieldnum");
 				$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
@@ -222,9 +243,17 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
+
+switch ($DATATYPE) {
+case "person" :
 $TITLE = "Field Definitions";
-if ($DATATYPE == "schedule") {
-	$TITLE = "Association Field Definitions";
+break;
+case "group" :
+$TITLE = "Group Field Definitions";
+break;
+case "schedule" :
+$TITLE = "Association Field Definitions";
+break;
 }
 
 include_once("nav.inc.php");
@@ -247,27 +276,35 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 <?
 	$alt = 0;
 
+
+switch ($DATATYPE) {
+case "person" :
 	$types = array("Text" => 'text',
 					"Date" => 'reldate',
 					"List" => 'multisearch');
-	if ($DATATYPE == "schedule") {
-		$types = array("List" => 'multisearch');
 
-		if(!FieldMap::getStaffField())
-			$types["Teacher ID"] = 'multisearch,staff';
-
-	} else {
 		if(!FieldMap::getName(FieldMap::getFirstNameField()))
 			$types["First Name"] = 'text,firstname';
 		if(!FieldMap::getName(FieldMap::getLastNameField()))
 			$types["Last Name"] = 'text,lastname';
 		if(!FieldMap::getName(FieldMap::getLanguageField()))
 			$types["Language"] = 'multisearch,language';
-		if(!FieldMap::getSchoolField())
-			$types["School"] = 'multisearch,school';
 		if(!FieldMap::getGradeField())
 			$types["Grade"] = 'multisearch,grade';
-	}
+break;
+case "group" :
+		$types = array("List" => 'multisearch');
+
+		if(!FieldMap::getSchoolField())
+			$types["School"] = 'multisearch,school';
+break;
+case "schedule" :
+		$types = array("List" => 'multisearch');
+
+		if(!FieldMap::getStaffField())
+			$types["Teacher ID"] = 'multisearch,staff';
+break;
+}
 
 	if (count($FIELDMAPS) > 0) {
 
@@ -282,10 +319,19 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 ?>
 			</td>
 <?
-			$datapage = "persondatamanager.php";
-			if ($DATATYPE == "schedule") {
-				$datapage = "scheduledatamanager.php";
-			}
+
+switch ($DATATYPE) {
+case "person" :
+	$datapage = "persondatamanager.php";
+break;
+case "group" :
+	$datapage = "groupdatamanager.php";
+break;
+case "schedule" :
+	$datapage = "scheduledatamanager.php";
+break;
+}
+
 			// These 5 items are special cases
 			if ($fieldnum != $field->getFirstNameField() &&
 				$fieldnum != $field->getLastNameField() &&
@@ -335,7 +381,7 @@ startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
 	}
 
 	// Print extra row for adding new items
-	// only if they have more f-fields to use
+	// only if they have more fields to use
 	if(count($FIELDMAPS) < $numfields){
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
