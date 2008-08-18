@@ -112,27 +112,18 @@ class Rule extends DBMappedObject {
 
 	/**static functions**/
 
-	// ffield and gfield data (no cfield because we must combine userrule and listrule for association data)
 	static function makeQuery ($rulesarray, $alias, $fieldoverride = false) {
 		$fquery = ""; // ffield
 		$gquery = ""; // gfield
+		$cquery = ""; // cfield
 		if(is_array($rulesarray)) {
 			foreach ($rulesarray as $rule) {
 				if (strpos($rule->fieldnum, "f") === 0) {
 					$fquery .= $rule->toSql($alias, $fieldoverride);
 				}
 				if (strpos($rule->fieldnum, "g") === 0) {
+					// TODO
 				}
-			}
-		}
-		return $fquery . $gquery;
-	}
-
-	// cfield data only (used to combine userrule and listrule)
-	static function makeAssociationQuery($rulesarray, $alias) {
-		$cquery = ""; // cfield
-		if(is_array($rulesarray)) {
-			foreach ($rulesarray as $rule) {
 				if (strpos($rule->fieldnum, "c") === 0) {
 					if ($cquery == "") $cquery = " and exists (select null from personassociation a where ".$alias.".id=a.personid ";
 					$cquery .= $rule->toSql("a");
@@ -140,11 +131,11 @@ class Rule extends DBMappedObject {
 			}
 		}
 		if ($cquery != "") $cquery .= ")";
-//echo (" ASSOC ".$cquery);
-		return $cquery;
+
+//echo "SQL " . $fquery . $gquery . $cquery;
+		return $fquery . $gquery . $cquery;
 	}
 }
-
 
 $RULE_OPERATORS = array(
 				'equals' => 'eq',

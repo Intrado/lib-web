@@ -62,11 +62,8 @@ class RenderedList {
 	//handles preview,add,remove modes
 	function renderList($getdata = true) {
 		global $USER;
-
-		$usersql = $USER->userSQL("p");
-
 		$allrules = array_merge($USER->rules(), $this->list->getListRules());
-		$assocsql = Rule::makeAssociationQuery($allrules,"p");
+		$rulesql = Rule::makeQuery($allrules, "p");
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -74,8 +71,6 @@ class RenderedList {
 
 		$listid = $this->list->id;
 		$orderby = $this->orderby ? "order by " . $this->orderby : "";
-
-		$listsql = $this->list->getListRuleSQL();
 
 		//get a list of the fieldmaps to show the persondata
 		//$fieldmap = FieldMap::getMapNames();
@@ -145,7 +140,7 @@ class RenderedList {
 			";
 		}
 		$query .="
-			where not p.deleted and p.userid is null $modesql1 and $listsql $usersql $assocsql)
+			where not p.deleted and p.userid is null $modesql1 $rulesql)
 
 			union all
 
@@ -203,11 +198,8 @@ class RenderedList {
 
 	function renderSearch ($getdata = true) {
 		global $USER;
-
-		$usersql = $USER->userSQL("p");
-
 		$allrules = array_merge($USER->rules(), $this->list->getListRules());
-		$assocsql = Rule::makeAssociationQuery($allrules,"p");
+		$rulesql = Rule::makeQuery($allrules, "p");
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -215,8 +207,6 @@ class RenderedList {
 
 		$listid = $this->list->id;
 		$orderby = $this->orderby ? "order by " . $this->orderby : "";
-
-		$listsql = $this->list->getListRuleSQL();
 
 		//compose rules for search
 		if($this->searchrules === false)
@@ -284,8 +274,7 @@ class RenderedList {
 		}
 		$query .="
 			where p.userid is null and not p.deleted
-			$usersql
-			$assocsql
+			$rulesql
 			$searchsql
 			$orderby
 			$pagesql
@@ -329,17 +318,13 @@ class RenderedList {
 
 	function calcStats () {
 		global $USER;
-
-		$usersql = $USER->userSQL("p");
-		$listsql = $this->list->getListRuleSQL();
-
 		$allrules = array_merge($USER->rules(), $this->list->getListRules());
-		$assocsql = Rule::makeAssociationQuery($allrules,"p");
+		$rulesql = Rule::makeQuery($allrules, "p");
 
 		$this->totalremoved = $this->countRemoved();
 		$this->totaladded = $this->countAdded();
 
-		$this->total = $this->countEffectiveRule($usersql, $listsql, $assocsql) + $this->totaladded;
+		$this->total = $this->countEffectiveRule($rulesql) + $this->totaladded;
 		if ($this->mode == "add") {
 			$this->total = $this->totaladded;;
 		}
@@ -350,11 +335,11 @@ class RenderedList {
 		$this->hasstats = true;
 	}
 
-	function countEffectiveRule ($usersql, $listsql, $assocsql) {
+	function countEffectiveRule ($rulesql) {
 		$query = "select count(*)
 				from person p
 				left join listentry le on (le.personid=p.id and le.listid = " . $this->list->id . ")
-				where le.type is null and p.userid is null and not p.deleted and $listsql $usersql $assocsql
+				where le.type is null and p.userid is null and not p.deleted $rulesql
 		";
 		return QuickQuery($query);
 	}
@@ -368,8 +353,6 @@ class RenderedList {
 		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid and not p.deleted) where  le.type='A' and le.listid = " . $this->list->id;
 		return QuickQuery($query);
 	}
-
-
 
 
 }
