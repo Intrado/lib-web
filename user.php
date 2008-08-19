@@ -54,6 +54,17 @@ function showmodeRO($type) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+if (isset($_GET['resetpass'])) {
+	// TODO should we save form first?
+
+	if (isset($_GET['id'])) {
+		$usr = new User($_GET['id']);
+		global $CUSTOMERURL;
+		forgotPassword($usr->login, $CUSTOMERURL);
+		redirect(); // TODO this takes a few seconds...
+	}
+}
+
 if (isset($_GET['id'])) {
 	setCurrentUser($_GET['id']);
 	redirect();
@@ -79,7 +90,6 @@ if(isset($_GET['deleterule'])) {
 
 	redirect();
 }
-
 
 
 /****************** main message section ******************/
@@ -397,6 +407,8 @@ startWindow('User Information');
 								<td>&nbsp;</td>
 								<td align="right">Confirm Password:</td>
 								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50, 'id="passwordfield2"'); ?></td>
+								<td>&nbsp;</td>
+								<td><? print button('Reset', "if(confirm('Are you sure you want to reset this password?')) window.location='?resetpass=1&id=$usr->id'"); ?></td>
 							</tr>
 							<? if($IS_LDAP && GetFormData($f,$s,'ldap')) { ?>
 								<script>

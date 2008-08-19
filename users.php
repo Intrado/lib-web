@@ -28,6 +28,28 @@ $usercount = QuickQuery("select count(*) from user where enabled = 1 and login !
 $maxusers = getSystemSetting("_maxusers","unlimited");
 /*CSDELETEMARKER_END*/
 
+
+if (isset($_GET['resetpass'])) {
+	$maxreached = false;
+
+	/*CSDELETEMARKER_START*/
+	if(($maxusers != "unlimited") && $maxusers <= $usercount){
+		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
+		$maxreached = true;
+	}
+	/*CSDELETEMARKER_END*/
+
+	if(!$maxreached){
+		$id = DBSafe($_GET['enable']);
+		QuickUpdate("update user set enabled = 1 where id = '$id'");
+
+		$usr = new User($id);
+		global $CUSTOMERURL;
+		forgotPassword($usr->login, $CUSTOMERURL);
+		redirect(); // TODO this takes a few seconds...
+	}
+}
+
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
 	if (isset($_SESSION['userid']) && $_SESSION['userid'] == $deleteid)
@@ -83,8 +105,14 @@ function fmt_actions_dis ($obj,$name) {
 	$editviewaction = "Edit";
 	if ($obj->importid > 0) $editviewaction = "View";
 
+	$resetpass = "";
+	if (QuickQuery("select id from user where id=$obj->id and password='new'")) {
+		$resetpass = '<a href="?enable=' . $obj->id . '&resetpass=1">Enable with Reset Password</a>&nbsp;|&nbsp;';
+	}
+
 	return '<a href="user.php?id=' . $obj->id . '">'.$editviewaction.'</a>&nbsp;|&nbsp;'
 		. '<a href="?enable=' . $obj->id . '">Enable</a>&nbsp;|&nbsp;'
+		. $resetpass
 		. '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 }
 
