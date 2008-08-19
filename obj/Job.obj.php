@@ -57,9 +57,14 @@ class Job extends DBMappedObject {
 		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
 				and le.ruleid=r.id and le.listid='" . $this->listid .  "'", "r");
 
-		$allrules = array_merge($user->rules(), $listrules);
+		if (count($listrules) > 0) {
+			$allrules = array_merge($user->rules(), $listrules);
+			$rulesql = "1 " . Rule::makeQuery($allrules, "p");
+		} else {
+			$rulesql = "0";
+		}
 
-		$this->thesql = "1 " . Rule::makeQuery($allrules, "p");
+		$this->thesql = $rulesql;
 	}
 
 	// assumes this job was already created in the database

@@ -6,8 +6,15 @@ function showmode($type) {
 }
 
 //get all possible rules
-$fieldmapnames = FieldMap::getAuthorizedMapNamesLike("%"); // get all fields (not only ffields)
-$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("%"); // get all fields (not only ffields, like reports would)
+$ffields = FieldMap::getAuthorizedMapNamesLike("f%");
+$gfields = FieldMap::getAuthorizedMapNamesLike("g%");
+$cfields = FieldMap::getAuthorizedMapNamesLike("c%");
+$fieldmapnames = $ffields + $gfields + $cfields; // GUI preffered order
+
+$ffields = FieldMap::getAuthorizedFieldMapsLike("f%");
+$gfields = FieldMap::getAuthorizedFieldMapsLike("g%");
+$cfields = FieldMap::getAuthorizedFieldMapsLike("c%");
+$fieldmaps = $ffields + $gfields + $cfields; // GUI preffered order
 
 $rulemap = array();
 $unusedrules = array();

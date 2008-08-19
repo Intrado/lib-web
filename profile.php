@@ -226,7 +226,13 @@ if( $reloadform )
 }
 
 
-$FIELDMAP = FieldMap::getMapNames();
+$ffields = FieldMap::getMapNamesLike("f%");
+$gfields = FieldMap::getMapNamesLike("g%");
+$cfields = FieldMap::getMapNamesLike("c%");
+
+$FIELDMAP = $ffields + $gfields + $cfields; // GUI preferred ordering
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////

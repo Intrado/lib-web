@@ -63,7 +63,11 @@ class RenderedList {
 	function renderList($getdata = true) {
 		global $USER;
 		$allrules = array_merge($USER->rules(), $this->list->getListRules());
-		$rulesql = Rule::makeQuery($allrules, "p");
+		if (count($this->list->getListRules()) > 0) {
+			$rulesql = Rule::makeQuery($allrules, "p");
+		} else {
+			$rulesql = "and 0";
+		}
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -199,7 +203,11 @@ class RenderedList {
 	function renderSearch ($getdata = true) {
 		global $USER;
 		$allrules = array_merge($USER->rules(), $this->list->getListRules());
-		$rulesql = Rule::makeQuery($allrules, "p");
+		if (count($this->list->getListRules()) > 0) {
+			$rulesql = Rule::makeQuery($allrules, "p");
+		} else {
+			$rulesql = "and 0";
+		}
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -319,7 +327,11 @@ class RenderedList {
 	function calcStats () {
 		global $USER;
 		$allrules = array_merge($USER->rules(), $this->list->getListRules());
-		$rulesql = Rule::makeQuery($allrules, "p");
+		if (count($this->list->getListRules()) > 0) {
+			$rulesql = Rule::makeQuery($allrules, "p");
+		} else {
+			$rulesql = "and 0";
+		}
 
 		$this->totalremoved = $this->countRemoved();
 		$this->totaladded = $this->countAdded();
