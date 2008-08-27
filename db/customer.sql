@@ -1454,7 +1454,7 @@ CREATE TABLE `groupdata` (
 `personid` INT NOT NULL ,
 `fieldnum` TINYINT NOT NULL ,
 `value` VARCHAR( 255 ) NOT NULL,
-KEY `personfield`  (`personid`,`fieldnum`),
+KEY `personfield`  (`personid`,`fieldnum`)
 ) ENGINE = innodb
 $$$
 
@@ -1464,7 +1464,7 @@ CREATE TABLE `reportgroupdata` (
 `personid` INT NOT NULL ,
 `fieldnum` TINYINT NOT NULL ,
 `value` VARCHAR( 255 ) NOT NULL,
-KEY `jobpersonfield`  (`jobid`,`personid`,`fieldnum`),
+KEY `jobpersonfield`  (`jobid`,`personid`,`fieldnum`)
 ) ENGINE = innodb
 $$$
 
