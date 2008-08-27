@@ -15,6 +15,7 @@ include_once("obj/RenderedList.obj.php");
 include_once("obj/Rule.obj.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Phone.obj.php");
+include_once("ruleeditform.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +150,9 @@ elseif(!isset($_SESSION['searchrules']) || is_null($_SESSION['searchrules']))
 
 $RULES = &$_SESSION['searchrules'];
 $RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-include("ruleeditform.inc.php");
+//include("ruleeditform.inc.php");
+drawRuleTable($f, $s, false, true, true, true);
+
 endWindow();
 ?>
 <br>

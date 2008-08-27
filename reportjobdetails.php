@@ -49,7 +49,9 @@ function fmt_dst_src($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
+$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+$fields = $ffields + $gfields;
 
 unset($_SESSION['report']['edit']);
 $redirect = 0;

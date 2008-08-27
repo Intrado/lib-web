@@ -15,6 +15,8 @@ include_once("obj/JobType.obj.php");
 include_once("obj/User.obj.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Phone.obj.php");
+include_once("ruleeditform.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -27,7 +29,20 @@ if (!$USER->authorize('manageaccount')) {
 
 if (isset($_GET['clearrules'])) {
 	if (isset($_SESSION['userid'])) {
-		QuickUpdate("delete from userrule where userid='" . $_SESSION['userid'] . "'");
+		$usr = new User($_SESSION['userid']);
+
+		// always remove Ffield and Gfield restrictions
+		// optionally remove Cfield restrictions, only if 'by data'
+		$query = "select id from rule r join userrule ur where ur.userid=$usr->id and r.id=ur.ruleid";
+		if ($usr->staffpkey != null && strlen($usr->staffpkey) > 0) {
+			$query = $query . " and (fieldnum like 'f%' or fieldnum like 'g%')";
+		}
+		$ruleids = QuickQueryList($query);
+		if (count($ruleids) > 0) {
+			$csv = implode("," , $ruleids);
+			QuickUpdate("delete from userrule where ruleid in ($csv)");
+			QuickUpdate("delete from rule where id in ($csv)");
+		}
 	}
 	redirect();
 }
@@ -45,23 +60,19 @@ if(!$IS_COMMSUITE && isset($_GET['id'])){
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function showmodeRO($type) {
-	global $RULEMODE, $fieldmap;
-	return $fieldmap->isOptionEnabled($type) && ($RULEMODE[$type]);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['resetpass'])) {
-	// TODO should we save form first?
+	// NOTE: form is not saved by this button, uses existing email from database record
 
-	if (isset($_GET['id'])) {
-		$usr = new User($_GET['id']);
+	if (isset($_SESSION['userid'])) {
+		$usr = new User($_SESSION['userid']);
 		global $CUSTOMERURL;
-		forgotPassword($usr->login, $CUSTOMERURL);
-		redirect(); // TODO this takes a few seconds...
+		forgotPassword($usr->login, $CUSTOMERURL);  // TODO this takes a few seconds...
+		redirect();
 	}
 }
 
@@ -113,7 +124,7 @@ if($checkpassword){
 	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least 2 of the following: a letter, a number or a symbol";
 }
 
-if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreached) // A hack to be able to differentiate between a submit and an add button click
+if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSubmit($f,'applybutton')) && !$maxreached) // A hack to be able to differentiate between a submit and an add button click
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -190,6 +201,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 			error("These emails are invalid", $bademaillist);
 		} elseif(!GetFormData($f,$s,"accessid")){
 			error("No access profile was chosen");
+		} elseif((GetFormData($f, $s, "radioselect") == "bystaff") && strlen(GetFormData($f, $s, "staffid")) == 0) {
+			error("You must enter a Staff ID when 'By Staff ID' is selected");
 		} else {
 			// Submit changes
 			if ($usr->id == NULL) {
@@ -209,8 +222,23 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 				}
 			}
 
-			$staffid = GetFormData($f, $s, "staffid");
-			$usr->staffpkey = $staffid;
+			if (GetFormData($f, $s, "radioselect") == "bydata") {
+				$usr->staffpkey = "";
+			} else { // bystaff
+				if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+					// if it was bydata and now bystaff, create the user rule
+					$rule = new Rule();
+					$rule->logical = "and";
+					$rule->op = "in";
+					$rule->val = GetFormData($f,$s,"staffid");
+					$rule->fieldnum = "c01";
+					$rule->create();
+
+					$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
+					Query($query);
+				}
+				$usr->staffpkey = GetFormData($f, $s, "staffid");
+			}
 
 			$usr->update();
 
@@ -259,6 +287,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton')) && !$maxreache
 					$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
 					Query($query);
 				}
+				$reloadform = 1;
+			} else if(CheckFormSubmit($f,'applybutton')) {
 				$reloadform = 1;
 			} else {
 				ClearFormData($f);
@@ -339,6 +369,14 @@ if( $reloadform )
 	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
 	PutFormData($f,$s,"callerid", Phone::format($usr->getSetting("callerid","",true)), "text", 0, 20);
 	PutFormData($f,$s,"staffid",$usr->staffpkey,"text");
+
+	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+		$radio = "bydata";
+	} else {
+		$radio = "bystaff";
+	}
+	PutFormData($f, $s, "radioselect", $radio);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,7 +391,7 @@ $PAGE = "admin:users";
 $TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : GetFormData($f,$s,"firstname") . ' ' . GetFormData($f,$s,"lastname"));
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, 'submitbutton', 'Save'));
+buttons(submit($f, 'submitbutton', 'Save'), button('Email Password Reset', "if(confirm('Are you sure you want to Email this user to reset their password?')) window.location='?resetpass=1&id=$usr->id'"));
 
 startWindow('User Information');
 ?>
@@ -407,8 +445,6 @@ startWindow('User Information');
 								<td>&nbsp;</td>
 								<td align="right">Confirm Password:</td>
 								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50, 'id="passwordfield2"'); ?></td>
-								<td>&nbsp;</td>
-								<td><? print button('Reset', "if(confirm('Are you sure you want to reset this password?')) window.location='?resetpass=1&id=$usr->id'"); ?></td>
 							</tr>
 							<? if($IS_LDAP && GetFormData($f,$s,'ldap')) { ?>
 								<script>
@@ -471,17 +507,6 @@ startWindow('User Information');
 									echo Phone::format($usr->getSetting("callerid","",true));
 								} else {
 									NewFormItem($f,$s, 'callerid', 'text', 20,20);
-								} ?>
-								</td>
-							</tr>
-
-							<tr>
-								<td align="right">Staff&nbsp;ID:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->staffpkey;
-								} else {
-									NewFormItem($f,$s, 'staffid', 'text', 20, 255);
 								} ?>
 								</td>
 							</tr>
@@ -604,86 +629,64 @@ startWindow('User Information');
 				<tr>
 					<th valign="top" align="right" class="windowRowHeader">Data View:<br><? print help('User_DataView'); ?></th>
 					<td>
-						Restrict this user's access to the following data<br>
+						<table>
+							<tr>
+								<td><? $extrahtml = "";
+									if ($readonly) $extrahtml = "disabled=\"disabled\"";
+									NewFormItem($f, $s, "radioselect", "radio", null, "bydata", "onclick='hide(\"bystaff\"); hide(\"ruleform\");' ".$extrahtml); ?> By Data</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "bystaff","onclick='show(\"bystaff\"); hide(\"ruleform\");' ".$extrahtml); ?> By Staff ID</td>
+								<td><? if (!$readonly) print submit($f, 'applybutton', 'Apply'); ?> </td>
+							</tr>
+							<tr></tr>
+						</table>
 
-<?						if ($readonly) {
-// TODO clean this up, or add $readonly to the ruleeditform code
+						<table id="bystaff" width="1200">
+							<tr>
+								<td>Staff&nbsp;ID:&nbsp;&nbsp;
+								<? if ($readonly) {
+									echo $usr->staffpkey;
+								} else {
+									NewFormItem($f,$s, 'staffid', 'text', 20, 255);
+								} ?>
+								</td>
+							</tr>
+						</table>
 
-PutFormData($f,$s,"newrulefieldnum","-1"); // set to -1 for save button to exit
-
-
-echo "<table border=\"0\" cellspacing=\"3\" cellpadding=\"2\" class=\"border\" width=\"50%\">";
-
-
-//get all possible rules
-$fieldmapnames = FieldMap::getAuthorizedMapNamesLike("%"); // get all fields (not only ffields)
-$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("%"); // get all fields (not only ffields, like reports would)
-
-$rulemap = array();
-if(is_array($RULES)) {
-	foreach ($RULES as $rule) {
-		$rulemap[$rule->fieldnum][] = $rule;
-	}
-}
-
-foreach ($fieldmaps as $fieldmap) {
-	//only show if searchable and multisearch for rules
-	if ($fieldmap->isOptionEnabled("searchable")) {
-
-		$fieldname = $fieldmap->name;
-		$fieldnum = $fieldmap->fieldnum;
-
-		//only show an entry for fields that have a rule defined for them
-		if (!isset($rulemap[$fieldnum]))
-			continue;
-
-		foreach($rulemap[$fieldnum] as $rule) {
-			echo '<tr><td class="border">' . htmlentities($fieldname) . '</td>';
-
-			if(showmodeRO("text")) {
-				echo '<td class="border" nowrap>' . array_search($rule->op, $RULE_OPERATORS) . '</td><td class="border">' . ($rule->val ? $rule->val : '&nbsp;') . '</td>';
-			} elseif(showmodeRO("reldate")) {
-				echo '<td class="border" nowrap>is</td><td class="border">' . $RELDATE_OPTIONS[$rule->val] . '</td>';
-			} elseif(showmodeRO("multisearch")) {
-				if ($rule->logical == "and") {
-								echo '<td class="border" nowrap>is</td>';
-				} else {
-								echo '<td class="border" nowrap>is NOT</td>';
-				}
-				echo '<td class="border">';
-				$values = explode("|",$rule->val);
-				$formattedvalues = implode(", ",$values);
-				if ($formattedvalues == "")
-					$formattedvalues = "&nbsp;";
-				echo $formattedvalues;
-				echo '</td>';
-			}
-
-			echo "</tr>\n";
-		}
-	}
-}
-
-echo "</table>";
-
+						<table id="ruleform" width="100%">
+						<tr><td>
+						<?
+						echo "Restrict this user's access to the following data<BR>";
+						if ($readonly) {
+							echo "<BR>";
 						} else {
-?>
+							?>
 							<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
-<?
-							include('ruleeditform.inc.php');
-
-							// if user has a staffid and cfield restrictions, warn them of association data override
-							//if ($usr->staffpkey !== "") {
-								echo "Warning, Association Field restrictions may be overwritten by association data import.<br>";
-							//}
-
+							<?
 						}
-?>
+						if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+							$cfield = true;
+						} else {
+							$cfield = $readonly; // if readonly, display cfield restrictions otherwise do not
+						}
+
+						drawRuleTable($f, $s, $readonly, true, true, $cfield);
+						?>
+						</td></tr></table>
+
+
 					</td>
 				</tr>
 				<? } ?>
 			</table>
-		<?
+<script>
+<?
+if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+	?>hide("bystaff");<?
+}
+?>
+</script>
+
+<?
 endWindow();
 buttons();
 EndForm();

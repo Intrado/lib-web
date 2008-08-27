@@ -22,6 +22,8 @@ require_once("inc/date.inc.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/CallsReport.obj.php");
 require_once("inc/rulesutils.inc.php");
+include_once("ruleeditform.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -255,7 +257,8 @@ startWindow("Person Notification Search", "padding: 3px;");
 						//$RULES declared above
 						$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 
-						include("ruleeditform.inc.php");
+						//include("ruleeditform.inc.php");
+						drawRuleTable($f, $s, false, true, true, false);
 					?>
 				<br></td>
 			</tr>

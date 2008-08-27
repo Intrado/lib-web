@@ -22,7 +22,7 @@ require_once("inc/date.inc.php");
 require_once("obj/ContactsReport.obj.php");
 require_once("obj/Person.obj.php");
 require_once("inc/rulesutils.inc.php");
-
+include_once("ruleeditform.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -60,7 +60,9 @@ if(isset($options['rules']) && $options['rules']){
 $ordercount = 3;
 $ordering = ContactsReport::getOrdering();
 
-$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
+$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+$fields = $ffields + $gfields;
 
 $activefields = array();
 $fieldlist = array();
@@ -213,7 +215,9 @@ startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 
 									//$RULES is declared above
 									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 
-									include("ruleeditform.inc.php");
+									//include("ruleeditform.inc.php");
+									drawRuleTable($f, $s, false, true, true, false);
+
 								?>
 								</td>
 							</tr>

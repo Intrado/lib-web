@@ -21,6 +21,8 @@ require_once("inc/date.inc.php");
 require_once("obj/Person.obj.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/PortalReport.obj.php");
+include_once("ruleeditform.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -98,7 +100,7 @@ if(isset($options['rules']) && $options['rules']){
 	$RULES = $options['rules'];
 }
 
-$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike("g%");
 
 $activefields = array();
 $fieldlist = array();
@@ -277,7 +279,9 @@ if($reportgenerator->format == "csv"){
 										//$RULES is declared above
 										$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 
-										include("ruleeditform.inc.php");
+										//include("ruleeditform.inc.php");
+										drawRuleTable($f, $s, false, true, true, false);
+
 									?>
 									</td>
 								</tr>

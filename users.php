@@ -143,7 +143,7 @@ $titles = array(	"firstname" => "#First Name",
 					"lastname" => "#Last Name",
 					"login" => "#Username",
 					"description" => "#Description",
-					"AccessProfile" => "#Security Profile",
+					"AccessProfile" => "#Profile",
 					"lastlogin" => "Last Login",
 					"Actions" => "Actions"
 					);

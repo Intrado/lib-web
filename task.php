@@ -64,7 +64,7 @@ $form = "taskeditor";
 $section = "main";
 $reloadform = false;
 
-if(CheckFormSubmit($form, $section))
+if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'mapfields'))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($form))
@@ -78,7 +78,7 @@ if(CheckFormSubmit($form, $section))
 		if( CheckFormSection($form, $section) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (CheckFormSubmit($form, $section)) {
+		} else {
 			if (QuickQuery("select count(*) from import where name = '" . DBSafe(GetFormData($form, $section, 'name')) .
 							"' and id != '$IMPORT->id'")) {
 				error("Please choose a unique import task name. This one is already in use.");
@@ -145,6 +145,10 @@ if(CheckFormSubmit($form, $section))
 
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
 
+				if (CheckFormSubmit($form,'mapfields')) {
+					redirect('taskmap.php?id=' . $_SESSION['importid']);
+				}
+
 				redirect("tasks.php");
 			}
 		}
@@ -184,7 +188,11 @@ $TITLE = "Import Editor: " . ($IMPORT->id ? $IMPORT->name : 'New Import');
 include_once("nav.inc.php");
 
 NewForm($form);
-buttons(submit($form, $section));
+if (!$IMPORT->id) {
+	buttons(submit($form, $section));
+} else {
+	buttons(submit($form, $section), submit($form, 'mapfields', 'Map Fields'));
+}
 startWindow('Import Information ');
 ?>
 
@@ -209,6 +217,16 @@ startWindow('Import Information ');
 						?>
 					</td>
 				</tr>
+<?
+				if ($IMPORT->id) {
+?>
+				<tr>
+					<td>Upload Key:</td>
+					<td> <?echo $IMPORT->uploadkey ;?> </td>
+				</tr>
+<?
+				}
+?>
 				<tr>
 					<td>Name:</td>
 					<td><? NewFormItem($form, $section,"name","text", 30); ?></td>

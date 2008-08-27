@@ -21,6 +21,8 @@ require_once("obj/JobDetailReport.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/rulesutils.inc.php");
+include_once("ruleeditform.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -481,7 +483,9 @@ startWindow("Select ".help('ReportJobDetailSearch_Select'), NULL, false);
 									//$RULES declared above
 									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 
-									include("ruleeditform.inc.php");
+									//include("ruleeditform.inc.php");
+									drawRuleTable($f, $s, false, true, true, false);
+
 								?>
 								</td>
 							</tr>

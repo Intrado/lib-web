@@ -762,15 +762,27 @@ startWindow('Job Information');
 						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 						<td><? message_select('phone',$f,$s,"phonemessageid"); ?></td>
 					</tr>
+				</table>
+			</div>
+
+			<div id='displayphonedetails' style="display:none">
+				<a href="#" onclick="displaySection('phone', true); ">Show advanced options.</a>
+			</div>
+
+
+			<div id='phonedetails' style="display:none">
+				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+
+
 <? if($USER->authorize('sendmulti')) { ?>
 
 					<tr>
-						<td>Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
+						<td width="30%">Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
 						<td><? alternate('phone'); ?></td>
 					</tr>
 <? } ?>
 					<tr>
-						<td>Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
+						<td width="30%">Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
 						<td>
 							<?
 							$max = first($ACCESS->getValue('callmax'), 1);
@@ -811,6 +823,7 @@ startWindow('Job Information');
 					?>
 				</table>
 			</div>
+
 		</td>
 	</tr>
 <? } ?>
@@ -987,6 +1000,7 @@ include_once("navbottom.inc.php");
 		phonecheck = new getObj('sendphone').obj.checked;
 		if(phonecheck){
 			show('phoneoptions');
+			show('displayphonedetails');
 			hide('displayphoneoptions');
 		}
 	}
@@ -1034,10 +1048,17 @@ function formatDate(Ob) {
 	} // TODO - add on change handler to the start date text box
 }
 
-function displaySection(section){
+function displaySection(section, details){
 	switch(section){
 		case 'phone':
 			show('phoneoptions');
+			if (details) {
+				show('phonedetails');
+				hide('displayphonedetails');
+			} else {
+				hide('phonedetails');
+				show('displayphonedetails');
+			}
 			hide('displayphoneoptions');
 			break;
 		case 'email':
@@ -1060,6 +1081,8 @@ function hideSection(section){
 	switch(section){
 		case 'phone':
 			hide('phoneoptions');
+			hide('displayphonedetails');
+			hide('phonedetails');
 			show('displayphoneoptions');
 			break;
 		case 'email':

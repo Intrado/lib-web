@@ -33,6 +33,7 @@ if(isset($_GET['clear'])){
 	redirect();
 }
 
+// TODO groupby Gfield school will not work
 $groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : FieldMap::getSchoolField(); //defaults to school f-field
 if(!$groupby)
 	$groupby = ""; //but if school is not used, default to blank

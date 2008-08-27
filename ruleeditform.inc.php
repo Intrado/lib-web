@@ -1,20 +1,35 @@
-			<table border="0" cellspacing="3" cellpadding="2" class="border" width="50%">
 <?
+
 function showmode($type) {
 	global $RULEMODE, $fieldmap;
 	return $fieldmap->isOptionEnabled($type) && ($RULEMODE[$type]);
 }
 
-//get all possible rules
-$ffields = FieldMap::getAuthorizedMapNamesLike("f%");
-$gfields = FieldMap::getAuthorizedMapNamesLike("g%");
-$cfields = FieldMap::getAuthorizedMapNamesLike("c%");
-$fieldmapnames = $ffields + $gfields + $cfields; // GUI preffered order
+function drawRuleTable($f, $s, $readonly = false, $withffields = true, $withgfields = true, $withcfields = true) {
+global $RULES, $fieldmap, $USER, $RULE_OPERATORS;
 
-$ffields = FieldMap::getAuthorizedFieldMapsLike("f%");
-$gfields = FieldMap::getAuthorizedFieldMapsLike("g%");
-$cfields = FieldMap::getAuthorizedFieldMapsLike("c%");
+?>
+<table border="0" cellspacing="3" cellpadding="2" class="border" width="50%">
+<?
+
+
+//get all possible rules
+$sepval = array();
+$temp = FieldMap::getSeparatorFieldMap(1);
+$sepval[$temp->fieldnum] = $temp;
+$sepval2 = array();
+$temp = FieldMap::getSeparatorFieldMap(2);
+$sepval2[$temp->fieldnum] = $temp;
+$ffields = array();
+if ($withffields) $ffields = FieldMap::getAuthorizedFieldMapsLike("f%");
+$gfields = array();
+if ($withgfields) $gfields = FieldMap::getAuthorizedFieldMapsLike("g%");
+if (count($gfields) > 0) $gfields = $sepval + $gfields;
+$cfields = array();
+if ($withcfields) $cfields = FieldMap::getAuthorizedFieldMapsLike("c%");
+if (count($cfields)) $cfields = $sepval2 + $cfields;
 $fieldmaps = $ffields + $gfields + $cfields; // GUI preffered order
+
 
 $rulemap = array();
 $unusedrules = array();
@@ -63,19 +78,18 @@ foreach ($fieldmaps as $fieldmap) {
 					$formattedvalues = "&nbsp;";
 				echo $formattedvalues;
 				echo '</td>';
-			} elseif(showmode("classschedule")) {
-
-				//TODO
-
 			}
-
+if (!$readonly) {
 			echo '<td>';
 			echo button('Delete', NULL, '?deleterule=' . $rule->id);
-			echo "</td></tr>\n";
+			echo "</td>";
+}
+			echo "</tr>\n";
 		}
 	}
 }
 
+if (!$readonly) {
 
 if (count($unusedrules) > 0) {
 	echo '<tr><td class="border" colspan="4" style="color: red;">WARNING: Some rules are not visible due to security restrictions or system configuration.</td></tr>';
@@ -125,7 +139,9 @@ foreach ($fieldmaps as $fieldmap) {
 			NewFormItem($f,$s,"newrulefieldnum","selectoption",$fieldname,$fieldnum);
 		} elseif(showmode("multisearch")) {
 			$typemap[] = 'multisearch';
-			NewFormItem($f,$s,"newrulefieldnum","selectoption",$fieldname,$fieldnum);
+			$extrahtml = "";
+			if ($fieldmap->isOptionEnabled("disabled")) $extrahtml = "disabled=\"disabled\"";
+			NewFormItem($f,$s,"newrulefieldnum","selectoption",$fieldname,$fieldnum,$extrahtml);
 		}
 	}
 }
@@ -234,8 +250,10 @@ echo '</td><td>';
 
 echo submit($f,$s,"Add");
 
-//NewFormItem($f,$s,"Add","image", 'add');
 echo "</tr>";
+} // end readonly
 
+echo "</table>";
+
+} // end function drawRuleTable
 ?>
-			</table>

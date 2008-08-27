@@ -309,7 +309,7 @@ startWindow('Contact');
 	</tr>
 <?
 
-
+// Ffields
 $fieldmaps = FieldMap::getAuthorizedFieldMaps();
 foreach ($fieldmaps as $map) {
 	$fname = $map->fieldnum;
@@ -324,12 +324,28 @@ foreach ($fieldmaps as $map) {
 
 ?>
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?></th>
+		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?>:</th>
+		<td class="bottomBorder"><? displayValue($fval); ?></td>
+	</tr>
+<?
+}
+
+// Gfields
+$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("g%");
+foreach ($fieldmaps as $map) {
+	$fname = $map->fieldnum;
+	$header = $map->name;
+	$query = "select group_concat(value separator ', ') from groupdata where fieldnum=".substr($fname,1)." and personid=".$personid;
+	$fval = QuickQuery($query);
+?>
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder"><?= $header ?>:</th>
 		<td class="bottomBorder"><? displayValue($fval); ?></td>
 	</tr>
 <?
 }
 ?>
+
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder" style="padding-top: 10px;">Address:</th>
 		<td class="bottomBorder">
@@ -439,6 +455,48 @@ foreach ($fieldmaps as $map) {
 			</table>
 		<td>
 	</tr>
+
+
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder">Association Data:</th>
+		<td class="bottomBorder">
+		<table border="1" cellpadding="3">
+<?
+		$assocdata = QuickQueryMultiRow("select c01, c02, c03, c04, c05, c06, c07, c08, c09, c10 from personassociation where personid=".$personid, true);
+		//var_dump($assocdata);
+
+		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("c%");
+?>
+		<tr>
+<?
+		foreach ($fieldmaps as $map) {
+			$header = $map->name;
+?>
+			<th align="left" class="windowRowHeader"><?=$header?></th>
+<?
+		}
+?>
+		</tr>
+<?
+		foreach ($assocdata as $row) {
+?>
+			<tr>
+<?
+			foreach ($fieldmaps as $map) {
+?>
+			<td><?=$row[$map->fieldnum]?></td>
+<?
+			}
+?>
+			</tr>
+<?
+		}
+?>
+		</table>
+		</td>
+	</tr>
+
+
 <?
 	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && $associates){
 ?>

@@ -30,19 +30,11 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['clear'])) {
 	$fieldnum = DBSafe($_GET['clear']);
 	if (ereg("^f[0-9]{2}$",$fieldnum)) {
-		switch ($DATATYPE) {
-		case "person" :
-			QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
-		break;
-		case "group" :
-			// TODO
-		break;
-		case "schedule" :
-			// TODO
-		break;
-		}
+		QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
 	}
-
+	if (ereg("^g[0-9]{2}$",$fieldnum)) {
+		QuickUpdate("delete from groupdata where fieldnum=".substr($fieldnum, 1));
+	}
 	redirect();
 }
 
@@ -349,29 +341,48 @@ break;
 					NewFormItem($form, $section, 'type_' . $fieldnum, 'selectend');
 ?>
 				</td>
-<?				if ($DATATYPE == "person") {
+<?				switch ($DATATYPE) {
+				case "person" :
 ?>
 					<td>
 					<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox');?>
 					</td>
 					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
 <?
-				} else {
+				break;
+				case "group" :
+?>
+					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+<?
+				break;
+				case "schedule" :
 ?>
 					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a></td>
-<?				}
-?>
-
 <?
+				break;
+				}
 			} else {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20');?></td>
 				<td><?=ucfirst(GetFormData($form, $section, "type_$fieldnum")); ?></td>
-<?				if ($DATATYPE == "person") {
+
+<?				switch ($DATATYPE) {
+				case "person" :
 ?>
-				<td><? NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, 'DISABLED');?></td>
-				<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+					<td>
+					<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, 'DISABLED');?>
+					</td>
+					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
 <?
+				break;
+				case "group" :
+?>
+					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+<?
+				break;
+				case "schedule" :
+					// staffID field is unremovable
+				break;
 				}
 			}
 ?>

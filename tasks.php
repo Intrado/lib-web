@@ -148,8 +148,7 @@ function fmt_actions ($import,$dummy) {
 	$res = "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;";
 	if ($import->datamodifiedtime != null) {
 		$res .= "<a href=\"taskdownload.php?id=$import->id\">Download</a>&nbsp;|&nbsp;"
-			 . "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;"
-			 . "<a href=\"taskmap.php?id=$import->id\">Map&nbsp;Fields</a>&nbsp;|&nbsp;";
+			 . "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;";
 	}
 	$res .= "<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
 		 ."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\n"
@@ -163,7 +162,6 @@ $titles = array("name" => "#Name",
 				"description" => "#Description",
 				"datatype" => "#Type",
 				"updatemethod" => "#Method",
-				"uploadkey" => "Upload Key",
 				"status" => "#Status",
 				"lastrun" => "Last Run",
 				"datamodifiedtime" => "File Date");

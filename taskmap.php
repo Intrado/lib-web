@@ -121,9 +121,9 @@ if ($datatype == "person") {
 	$maptofields["u7"] = "Auto Report Emails";
 	$maptofields["u8"] = "Phone";
 	$maptofields["u9"] = "Caller ID";
-	$maptofields["u10"] = "Teacher ID";
 	$maptofields["u11"] = "Access Profile";
 	$maptofields["u12"] = "Restricted Job Types";
+	$maptofields["u10"] = "Staff ID";
 	$maptofields["sep"] = "--------------";
 
 	//F fields, limit to multisearch
@@ -395,8 +395,11 @@ if ($noimportdata) { ?>
 		<td>
 <?
 			NewFormItem($f,$s,"mapto_$count","selectstart");
-			foreach ($maptofields as $mapto => $name)
-				NewFormItem($f,$s,"mapto_$count","selectoption",$name,$mapto);
+			foreach ($maptofields as $mapto => $name) {
+				$extrahtml = "";
+				if (strpos($mapto,"sep") === 0) $extrahtml = "disabled=\"disabled\"";
+				NewFormItem($f,$s,"mapto_$count","selectoption",$name,$mapto,$extrahtml);
+			}
 			NewFormItem($f,$s,"mapto_$count","selectend");
 ?>
 		</td>
