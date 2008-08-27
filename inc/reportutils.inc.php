@@ -20,6 +20,19 @@ function generateFields($tablealias){
 	return $fieldstring;
 }
 
+function generateGFieldQuery($personidalias) {
+	$fieldstring = "";
+	for ($i=1; $i<10; $i++) {
+		if($i<10){
+			$num = "g0".$i;
+		}else{
+			$num = "g".$i;
+		}
+		$fieldstring .= ", (select group_concat(value separator ', ') from groupdata where fieldnum=$i and personid=$personidalias) as $num";
+	}
+	return $fieldstring;
+}
+
 function select_metadata($tablename=null, $start=null, $fields){
 	global $USER;
 	if(isset($_SESSION['saved_report']) && $_SESSION['saved_report']){
@@ -91,7 +104,7 @@ function selectOrderBy($f, $s, $ordercount, $ordering){
 				NewFormItem($f, $s, $order, 'selectoption', " -- Not Selected --", "");
 				foreach($ordering as $index => $item){
 					NewFormItem($f, $s, $order, 'selectoption', $index, $item);
-				}	
+				}
 				NewFormItem($f, $s, $order, 'selectend');
 ?>
 			</td>
@@ -119,7 +132,7 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	global $USER;
 	//expects unix time stamps as input
 	//returns any jobs between the date range.
-	
+
 	//if this user can see systemwide reports, then lock them to the customerid
 	//otherwise lock them to jobs that they own
 	if (!$USER->authorize('viewsystemreports')) {
@@ -132,10 +145,10 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	if("phone" == $deliverymethod){
 		$deliveryquery = " and (j.phonemessageid is not null OR sq.hasphone != '0' )";
 	} else if("email" == $deliverymethod) {
-		$deliveryquery = " and (j.emailmessageid is not null OR sq.hasweb != '0' )";	
+		$deliveryquery = " and (j.emailmessageid is not null OR sq.hasweb != '0' )";
 	} else if("sms" == $deliverymethod) {
-		$deliveryquery = " and (j.smsmessageid is not null)";	
-	}	
+		$deliveryquery = " and (j.smsmessageid is not null)";
+	}
 	$surveyfilter = "";
 	if($surveyonly == "true"){
 		$surveyfilter = " and j.questionnaireid is not null ";
@@ -148,12 +161,12 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	if($jobtypes != ""){
 		$jobtypequery = " and j.jobtypeid in ('" . $jobtypes . "') ";
 	}
-	$joblist = QuickQueryList("select j.id from job j 
+	$joblist = QuickQueryList("select j.id from job j
 							left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 							where ( (j.startdate >= '$startdate' and j.startdate < date_add('$enddate',interval 1 day) )
 							or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$startdate' and j.startdate <= date_add('$enddate',interval 1 day)
 							and j.status in ('active', 'complete', 'cancelled')
-							$userJoin 
+							$userJoin
 							$surveyfilter
 							$deliveryquery
 							$surveydeliveryquery
@@ -179,7 +192,7 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Last X Days', 'xdays');
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Date Range(inclusive)', 'daterange');
 				NewFormItem($f, $s, 'relativedate', 'selectend');
-				
+
 				?>
 			</td>
 			<td><div id="xdays">Days: <? NewFormItem($f, $s, 'xdays', 'text', '3'); ?><div></td>
@@ -191,7 +204,7 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 			}
 			if(new getObj("reldate").obj.value!="daterange"){
 				hide("date");
-			
+
 			}
 		</script>
 	</table>
@@ -214,7 +227,12 @@ function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
 	$fieldindex = array_flip($fieldindex);
 
 	foreach($fieldlist as $fieldnum => $fieldname){
-		$num = $fieldindex[$fieldnum];
+		if (strpos($fieldnum, "g") === 0) {
+			$num = 18 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname, lastname, 18 more ffields)
+		} else {
+			$num = $fieldindex[$fieldnum]; // ffield
+		}
+
 		if(!in_array($fieldnum, $activefields)){
 			$titles[$startindex + $num] = "@" . $fieldname;
 		} else {
@@ -229,7 +247,7 @@ function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
 //only used in job detail report and survey report as of 11/7
 //index 5 is delivery type
 function parse_survey_data($row, $index){
-	
+
 	$x = substr($index, strlen("question"));
 	$questiondata = array();
 	if ($row[5] == "phone")
@@ -237,6 +255,6 @@ function parse_survey_data($row, $index){
 	else if ($row[5] == "email")
 		parse_str($row[13],$questiondata);
 	return isset($questiondata["q" . ($x-1)]) ? $questiondata["q" . ($x-1)] : "";
-	
+
 }
 ?>

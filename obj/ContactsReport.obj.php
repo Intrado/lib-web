@@ -27,6 +27,7 @@ class ContactsReport extends ReportGenerator {
 			$personquery = $this->params['personid'] ? " and p.pkey = '" . DBSafe($this->params['personid']) . "'" : "";
 		}
 		$fieldquery = generateFields("p");
+		$gfieldquery = generateGFieldQuery("p.id");
 
 		if(isset($peoplephonelist) && isset($peopleemaillist))
 			$peoplelist = implode("','", array_intersect($peoplephonelist, $peopleemaillist));
@@ -51,6 +52,7 @@ class ContactsReport extends ReportGenerator {
 							coalesce(a.zip,'')
 						) as address
 					$fieldquery
+					$gfieldquery
 					from person p
 					left join address a on (a.personid = p.id)
 					where not p.deleted
@@ -65,7 +67,9 @@ class ContactsReport extends ReportGenerator {
 
 	function runHtml(){
 		$max = 100;
-		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
+		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+		$fields = $ffields + $gfields;
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
