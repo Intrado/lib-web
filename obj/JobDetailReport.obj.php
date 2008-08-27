@@ -91,6 +91,7 @@ class JobDetailReport extends ReportGenerator{
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
 		$fieldquery = generateFields("rp");
+		$gfieldquery = generateGFieldQuery("rp.personid");
 		$this->query =
 			"select SQL_CALC_FOUND_ROWS
 			j.name as jobname,
@@ -122,6 +123,7 @@ class JobDetailReport extends ReportGenerator{
 			rc.voicereplyid as voicereplyid,
 			vr.id as vrid
 			$fieldquery
+			$gfieldquery
 			, dl.label as label
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
@@ -197,7 +199,9 @@ class JobDetailReport extends ReportGenerator{
 			$typequery = " and rp.type = '" . $this->params['type'] . "'";
 
 		$activefields = explode(",", $this->params['activefields']);
-		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
+		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+		$fields = $ffields + $gfields;
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
@@ -323,7 +327,9 @@ class JobDetailReport extends ReportGenerator{
 		}
 
 		$options = $this->params;
-		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
+		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+		$fields = $ffields + $gfields;
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
@@ -405,7 +411,11 @@ class JobDetailReport extends ReportGenerator{
 			//index 13 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
-					$num = $fieldindex[$fieldnum];
+					if (strpos($fieldnum, "g") === 0) {
+						$num = 18 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname, lastname, 18 more ffields)
+					} else {
+						$num = $fieldindex[$fieldnum]; // ffield
+					}
 					$reportarray[] = $row[16+$num];
 				}
 			}
