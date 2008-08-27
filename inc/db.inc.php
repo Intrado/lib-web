@@ -111,6 +111,34 @@ function QuickQueryRow ($query, $assoc = false, $dbconnect = false) {
 	return $row;
 }
 
+function QuickQueryMultiRow ($query, $assoc = false, $dbconnect = false) {
+	DBDebug($query);
+	global $_dbcon;
+	$list = array();
+	$i = 0;
+	if($dbconnect)
+		$connection = $dbconnect;
+	else
+		$connection = $_dbcon;
+	$row = false;
+	if ($result = DBQueryWrapper($query,$connection)) {
+		if ($assoc)
+			$row = mysql_fetch_assoc($result);
+		else
+			$row = mysql_fetch_row($result);
+		while ($row) {
+			$list[$i++] = $row;
+			if ($assoc)
+				$row = mysql_fetch_assoc($result);
+			else
+				$row = mysql_fetch_row($result);
+		}
+		mysql_free_result($result);
+	}
+
+	return $list;
+}
+
 function QuickQueryList ($query, $pair = false, $dbconnect = false) {
 	DBDebug($query);
 	global $_dbcon;
