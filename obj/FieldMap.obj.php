@@ -23,6 +23,14 @@ class FieldMap extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	static function getSeparatorFieldMap($i) {
+		$fieldmap = new FieldMap();
+		$fieldmap->fieldnum = "sep".$i;
+		$fieldmap->name = "----------";
+		$fieldmap->options = "searchable,multisearch,disabled";
+		return $fieldmap;
+	}
+
 	static function getFirstNameField() {
 		$field = QuickQuery("select fieldnum from fieldmap where options like '%firstname%'");
 		if(!$field)
@@ -44,12 +52,13 @@ class FieldMap extends DBMappedObject {
 		return $field;
 	}
 
-	static function getSchoolField(){
-		return QuickQuery("select fieldnum from fieldmap where options like '%school%'");
-	}
-
 	static function getGradeField(){
 		return QuickQuery("select fieldnum from fieldmap where options like '%grade%'");
+	}
+
+	// NOTE 'school' moved from Ffield to Gfield in release 6.1
+	static function getSchoolField(){
+		return QuickQuery("select fieldnum from fieldmap where options like '%school%'");
 	}
 
 	static function getStaffField(){
@@ -108,7 +117,10 @@ class FieldMap extends DBMappedObject {
 
 	// only return F-fields other than first/last name (do not return C-fields)
 	static function getOptionalAuthorizedFieldMaps(){
-		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("f%");
+		return FieldMap::getOptionalAuthorizedFieldMapsLike("f%");
+	}
+	static function getOptionalAuthorizedFieldMapsLike($likewhat){
+		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike($likewhat);
 		foreach($fieldmaps as $index => $fieldmap){
 			if($fieldmap->isOptionEnabled("firstname") || $fieldmap->isOptionEnabled("lastname")) {
 				unset($fieldmaps[$index]);
