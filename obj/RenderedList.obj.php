@@ -62,11 +62,13 @@ class RenderedList {
 	//handles preview,add,remove modes
 	function renderList($getdata = true) {
 		global $USER;
-		$allrules = array_merge($USER->rules(), $this->list->getListRules());
+
+		// if there are list rules, combine with the user rules for association data integration
 		if (count($this->list->getListRules()) > 0) {
+			$allrules = array_merge($USER->rules(), $this->list->getListRules());
 			$rulesql = Rule::makeQuery($allrules, "p");
 		} else {
-			$rulesql = "and 0";
+			$rulesql = "and 0"; // no list rules, no persons to render
 		}
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
@@ -76,11 +78,6 @@ class RenderedList {
 		$listid = $this->list->id;
 		$orderby = $this->orderby ? "order by " . $this->orderby : "";
 
-		//get a list of the fieldmaps to show the persondata
-		//$fieldmap = FieldMap::getMapNames();
-		//$pdfields = DBMappedObject::getFieldList(false,array_keys($fieldmap), "pd");
-		//if (strlen($pdfields) > 0)
-		//	$pdfields = "," . $pdfields;
 		$pfields = "p.id";
 		$contactfields = "";
 		$sms = "";
@@ -174,7 +171,7 @@ class RenderedList {
 			$pagesql
 			";
 
-//echo $query;
+//echo "<br>renderList ". $query;
 
 		//load page to memory
 		$this->pageids = array();
@@ -202,12 +199,9 @@ class RenderedList {
 
 	function renderSearch ($getdata = true) {
 		global $USER;
-		$allrules = array_merge($USER->rules(), $this->list->getListRules());
-		if (count($this->list->getListRules()) > 0) {
-			$rulesql = Rule::makeQuery($allrules, "p");
-		} else {
-			$rulesql = "and 0";
-		}
+
+		// NOTE usersql and listsql are used separately, thus we do not combine rules to form rulesql (as in renderList above)
+		$usersql = $USER->userSQL("p");
 
 		$pagesql = "limit $this->pageoffset,$this->pagelimit";
 		if ($this->pagelimit == -1)
@@ -215,6 +209,8 @@ class RenderedList {
 
 		$listid = $this->list->id;
 		$orderby = $this->orderby ? "order by " . $this->orderby : "";
+
+		$listsql = $this->list->getListRuleSQL();
 
 		//compose rules for search
 		if($this->searchrules === false)
@@ -282,13 +278,13 @@ class RenderedList {
 		}
 		$query .="
 			where p.userid is null and not p.deleted
-			$rulesql
+			$usersql
 			$searchsql
 			$orderby
 			$pagesql
 		";
 
-//echo $query;
+//echo "<br>renderSearch ". $query;
 
 		//load page to memory
 		$this->pageids = array();
@@ -326,11 +322,13 @@ class RenderedList {
 
 	function calcStats () {
 		global $USER;
-		$allrules = array_merge($USER->rules(), $this->list->getListRules());
+
+		// if there are list rules, combine with the user rules for association data integration
 		if (count($this->list->getListRules()) > 0) {
+			$allrules = array_merge($USER->rules(), $this->list->getListRules());
 			$rulesql = Rule::makeQuery($allrules, "p");
 		} else {
-			$rulesql = "and 0";
+			$rulesql = "and 0"; // no list rules, no persons to render
 		}
 
 		$this->totalremoved = $this->countRemoved();
@@ -353,6 +351,7 @@ class RenderedList {
 				left join listentry le on (le.personid=p.id and le.listid = " . $this->list->id . ")
 				where le.type is null and p.userid is null and not p.deleted $rulesql
 		";
+//echo "<br>count ".$query;
 		return QuickQuery($query);
 	}
 
