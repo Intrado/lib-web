@@ -33,11 +33,10 @@ if(isset($_GET['clear'])){
 	redirect();
 }
 
-// TODO groupby Gfield school will not work
-$groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : FieldMap::getSchoolField(); //defaults to school f-field
+$groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : FieldMap::getSchoolField(); //defaults to school field
 if(!$groupby)
 	$groupby = ""; //but if school is not used, default to blank
-$fields = DBFindMany("FieldMap", "from fieldmap where options like '%multisearch%'");
+$fields = DBFindMany("FieldMap", "from fieldmap where options like '%multisearch%' and (fieldnum like 'f%' or fieldnum like 'g%') order by fieldnum");
 
 $showusers = isset($_SESSION['usagestats']['showusers']) ? $_SESSION['usagestats']['showusers'] : "0";
 $type = isset($_SESSION['usagestats']['type']) ? $_SESSION['usagestats']['type'] : "phone";
@@ -119,8 +118,15 @@ if($reload){
 	$joblistquery = " and rp.jobid in ('" . implode("','", $joblist) . "') ";
 	$jobidtypelist = QuickQueryList("select id, jobtypeid from job j where j.id in ('" . implode("','",$joblist) ."') ", true);
 	$groupbyquery = "";
+	$groupbyorder = "";
+	$rgroupdata = "";
 	if($groupby != ""){
-		$groupbyquery = "rp." . $groupby;
+		if (strpos($groupby, "g") === 0) {
+			$groupbyquery = "rgd.value"; // reportgroupdata
+			$rgroupdata = "join reportgroupdata rgd on (rgd.personid=rp.personid and rgd.jobid=rp.jobid and rgd.fieldnum=".substr($groupby,1).")";
+		} else {
+			$groupbyquery = "rp." . $groupby; // reportperson
+		}
 		$groupbyorder = $groupbyquery . ", ";
 	} else {
 		$groupbyquery = "''";
@@ -138,11 +144,12 @@ if($reload){
 				rp.jobid,
 				count(*)
 				from reportperson rp
+				$rgroupdata
 				where rp.status in ('fail', 'success')
 				$joblistquery
 				and type = '" . DBSafe($type) . "'
 				group by $groupbyorder rp.jobid, rp.userid";
-
+//echo $query;
 	$result = Query($query);
 	$data = array();
 	$userlistarray = array();

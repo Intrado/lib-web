@@ -20,15 +20,21 @@ function generateFields($tablealias){
 	return $fieldstring;
 }
 
-function generateGFieldQuery($personidalias) {
+function generateGFieldQuery($personidalias, $joblist = false) {
 	$fieldstring = "";
+	$gdtable = "groupdata";
+	$jidstr = "";
+	if ($joblist) {
+		$gdtable = "reportgroupdata";
+		$jidstr = " and jobid in(".$joblist.")";
+	}
 	for ($i=1; $i<10; $i++) {
 		if($i<10){
 			$num = "g0".$i;
 		}else{
 			$num = "g".$i;
 		}
-		$fieldstring .= ", (select group_concat(value separator ', ') from groupdata where fieldnum=$i and personid=$personidalias) as $num";
+		$fieldstring .= ", (select group_concat(value separator ', ') from $gdtable where fieldnum=$i and personid=$personidalias $jidstr) as $num";
 	}
 	return $fieldstring;
 }
