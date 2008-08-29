@@ -694,14 +694,24 @@ startWindow('Job Information');
 						?>
 					</td>
 				</tr>
+			</table>
+			</div>
+
+			<div id='displaysettingsdetails' style="display:none">
+				<a href="#" onclick="displaySection('settings', true); ">Show advanced options.</a>
+			</div>
+
+			<div id="settingsdetails" style="display:none">
+			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<? if ($JOBTYPE != "repeating") { ?>
 					<tr>
-						<td>Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
+						<td width="30%">Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
 						<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "")); ?></td>
 					</tr>
 				<? } ?>
+
 				<tr>
-					<td>Number of days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
+					<td width="30%">Number of days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
 					<td>
 					<?
 					NewFormItem($f, $s, 'numdays', "selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
@@ -736,6 +746,11 @@ startWindow('Job Information');
 				</tr>
 			</table>
 			</div>
+
+			<div id='displaysettingsbasic' style="display:none">
+				<a href="#" onclick="displaySection('settings', false); ">Show basic options.</a>
+			</div>
+
 		</td>
 	</tr>
 <? if($USER->authorize('sendphone')) { ?>
@@ -762,15 +777,26 @@ startWindow('Job Information');
 						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 						<td><? message_select('phone',$f,$s,"phonemessageid"); ?></td>
 					</tr>
+				</table>
+			</div>
+
+			<div id='displayphonedetails' style="display:none">
+				<a href="#" onclick="displaySection('phone', true); ">Show advanced options.</a>
+			</div>
+
+			<div id='phonedetails' style="display:none">
+				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+
+
 <? if($USER->authorize('sendmulti')) { ?>
 
 					<tr>
-						<td>Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
+						<td width="30%">Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
 						<td><? alternate('phone'); ?></td>
 					</tr>
 <? } ?>
 					<tr>
-						<td>Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
+						<td width="30%">Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
 						<td>
 							<?
 							$max = first($ACCESS->getValue('callmax'), 1);
@@ -811,6 +837,11 @@ startWindow('Job Information');
 					?>
 				</table>
 			</div>
+
+			<div id='displayphonebasic' style="display:none">
+				<a href="#" onclick="displaySection('phone', false); ">Show basic options.</a>
+			</div>
+
 		</td>
 	</tr>
 <? } ?>
@@ -831,24 +862,39 @@ startWindow('Job Information');
 					}
 ?>
 			</div>
+
 			<div id='emailoptions' style="display:none">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
 						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 						<td><? message_select('email',$f, $s,"emailmessageid"); ?></td>
 					</tr>
+				</table>
+			</div>
+
+			<div id='displayemaildetails' style="display:none">
+				<a href="#" onclick="displaySection('email', true); ">Show advanced options.</a>
+			</div>
+
+			<div id='emaildetails' style="display:none">
+				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 <? if($USER->authorize('sendmulti')) { ?>
 					<tr>
-						<td>Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
+						<td width="30%">Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
 						<td><? alternate('email'); ?></td>
 					</tr>
 <? } ?>
 					<tr>
-						<td>Skip duplicate email addresses <?=  help('Job_EmailSkipDuplicates', NULL, 'small') ?></td>
+						<td width="30%">Skip duplicate email addresses <?=  help('Job_EmailSkipDuplicates', NULL, 'small') ?></td>
 						<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 					</tr>
 				</table>
-			<div>
+			</div>
+
+			<div id='displayemailbasic' style="display:none">
+				<a href="#" onclick="displaySection('email', false); ">Show basic options.</a>
+			</div>
+
 		</td>
 	</tr>
 <? } ?>
@@ -940,8 +986,12 @@ include_once("navbottom.inc.php");
 
 ?>
 <script language="javascript">
+	var displaysettingsdetailsstate = 'visible';
+	var displayphonedetailsstate = 'visible';
+	var displayemaildetailsstate = 'visible';
 	var jobtypetablestyle = new getObj("jobtypetable").obj.style.border;
 	var jobtypeinfo = new Array();
+
 	jobtypeinfo[""] = new Array("", "");
 <?
 	foreach($infojobtypes as $infojobtype){
@@ -987,18 +1037,65 @@ include_once("navbottom.inc.php");
 		phonecheck = new getObj('sendphone').obj.checked;
 		if(phonecheck){
 			show('phoneoptions');
-			hide('displayphoneoptions');
+<?
+	$diffvalues = $job->compareWithDefaults();
+	if (isset($diffvalues['phonelang']) ||
+		isset($diffvalues['maxcallattempts']) ||
+		isset($diffvalues['callerid']) ||
+		isset($diffvalues['skipduplicates']) ||
+		isset($diffvalues['leavemessage']) ||
+		isset($diffvalues['messageconfirmation'])
+		) {
+		?> displayphonedetailsstate = 'hidden'; <?
+	}
+?>
+			if (displayphonedetailsstate == 'visible') {
+				show('displayphonedetails');
+			} else {
+				show('phonedetails');
+				show('displayphonebasic');
+			}
 		}
 	}
 	if(new getObj('sendemail').obj){
 		emailcheck = new getObj('sendemail').obj.checked;
 		if(emailcheck){
 			show('emailoptions');
-			hide('displayemailoptions');
+<?
+	$diffvalues = $job->compareWithDefaults();
+	if (isset($diffvalues['emaillang']) ||
+		isset($diffvalues['skipemailduplicates'])
+		) {
+		?> displayemaildetailsstate = 'hidden'; <?
+	}
+?>
+			if (displayemaildetailsstate == 'visible') {
+				show('displayemaildetails');
+			} else {
+				show('emaildetails');
+				show('displayemailbasic');
+			}
 		}
 	}
 	if( phonecheck || emailcheck || smscheck ){
 		show('settings');
+<?
+	$diffvalues = $job->compareWithDefaults();
+	if (isset($diffvalues['startdate']) ||
+		isset($diffvalues['enddate']) ||
+		isset($diffvalues['starttime']) ||
+		isset($diffvalues['endtime']) ||
+		isset($diffvalues['sendreport'])
+		) {
+		?> displaysettingsdetailsstate = 'hidden'; <?
+	}
+?>
+		if (displaysettingsdetailsstate == 'visible') {
+			show('displaysettingsdetails');
+		} else {
+			show('settingsdetails');
+			show('displaysettingsbasic');
+		}
 	}
 
 	function limit_chars(field) {
@@ -1034,14 +1131,32 @@ function formatDate(Ob) {
 	} // TODO - add on change handler to the start date text box
 }
 
-function displaySection(section){
+function displaySection(section, details){
 	switch(section){
 		case 'phone':
 			show('phoneoptions');
+			if (details) {
+				show('phonedetails');
+				hide('displayphonedetails');
+				show('displayphonebasic');
+			} else {
+				hide('phonedetails');
+				show('displayphonedetails');
+				hide('displayphonebasic');
+			}
 			hide('displayphoneoptions');
 			break;
 		case 'email':
 			show('emailoptions');
+			if (details) {
+				show('emaildetails');
+				hide('displayemaildetails');
+				show('displayemailbasic');
+			} else {
+				hide('emaildetails');
+				show('displayemaildetails');
+				hide('displayemailbasic');
+			}
 			hide('displayemailoptions');
 			break;
 		case 'print':
@@ -1052,18 +1167,48 @@ function displaySection(section){
 			show('smsoptions');
 			hide('displaysmsoptions');
 			break;
+		case 'settings':
+			if (details) {
+				displaysettingsdetailsstate = 'hidden';
+				show('settingsdetails');
+				show('displaysettingsbasic');
+				hide('displaysettingsdetails');
+			} else {
+				displaysettingsdetailsstate = 'visible';
+				hide('settingsdetails');
+				hide('displaysettingsbasic');
+				show('displaysettingsdetails');
+			}
+			break;
 	}
 	show('settings');
+
+	if (section != 'settings') {
+		if (displaysettingsdetailsstate == 'hidden') {
+			show('displaysettingsbasic');
+			hide('displaysettingsdetails');
+		} else {
+			displaysettingsdetailsstate = 'visible';
+			hide('displaysettingsbasic');
+			show('displaysettingsdetails');
+		}
+	}
 }
 
 function hideSection(section){
 	switch(section){
 		case 'phone':
 			hide('phoneoptions');
+			hide('displayphonedetails');
+			hide('phonedetails');
+			hide('displayphonebasic');
 			show('displayphoneoptions');
 			break;
 		case 'email':
 			hide('emailoptions');
+			hide('displayemaildetails');
+			hide('emaildetails');
+			hide('displayemailbasic');
 			show('displayemailoptions');
 			break;
 		case 'print':
@@ -1088,6 +1233,10 @@ function hideSection(section){
 
 	if(!phonecheck && !emailcheck && !smscheck){
 		hide('settings');
+		hide('displaysettingsdetails');
+		hide('settingsdetails');
+		hide('displaysettingsbasic');
+		displaysettingsdetailsstate = 'visible';
 	}
 }
 
