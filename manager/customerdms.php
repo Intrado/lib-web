@@ -89,7 +89,7 @@ function fmt_dmstatus($row,$index) {
 		if ($row[4] != $row[5])
 			$problems[] = "IP Mismatch";
 		
-		if ($row[7]/1000 < time() - 10)
+		if ($row[7]/1000 < time() - 30)
 			$problems[] = "DM Lost Connection";
 		
 		if ($row[1] == null || $row[1] <= 0)
