@@ -71,7 +71,7 @@ while($confirm != "y"){
 	if ($confirm == "n") exit();
 }
 
-
+/////////////////////////////////////
 // check active jobs
 echo "Checking for active jobs\n";
 $res = mysql_query("select count(*) from job where status in ('processing', 'procactive', 'active')", $custdb);
@@ -95,6 +95,89 @@ foreach ($sqlqueries as $query) {
 		// ignore failure caused by not exists
 	}
 }
+
+//////////////////////////////////////
+// truncate customer tables
+
+echo("Truncating all customer tables. Backing up to $customerdbname_backup.sql");
+exec("mysqldump -u $dbuser -p$dbpass --no-create-info $customerdbname > $customerdbname_backup.sql");
+
+mysql_select_db("aspshard");
+$tablearray = array("importqueue", "jobstatdata", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
+foreach ($tablearray as $t) {
+	echo (".");
+	$query = "delete from ".$t." where customerid=$customerid";
+	if (!mysql_query($query,$custdb)) {
+		echo("Failed to execute statement \n$query\n\n : " . mysql_error($custdb));
+	}
+}
+
+$customertables = array(
+	"access",
+	"address",
+	"audiofile",
+	"blockednumber",
+	"contactpref",
+	"content",
+	"custdm",
+	"destlabel",
+	"dmcalleridroute",
+	"dmroute",
+	"email",
+	"fieldmap",
+	"import",
+	"importfield",
+	"importjob",
+	"job",
+	"joblanguage",
+	"jobsetting",
+	"jobstatdata",
+	"jobstats",
+	"jobtype",
+	"jobtypepref",
+	"language",
+	"list",
+	"listentry",
+	"message",
+	"messageattachment",
+	"messagepart",
+	"permission",
+	"person",
+	"persondatavalues",
+	"phone",
+	"portalperson",
+	"portalpersontoken",
+	"reportcontact",
+	"reportinstance",
+	"reportperson",
+	"reportsubscription",
+	"rule",
+	"schedule",
+	"setting",
+	"sms",
+	"specialtask",
+	"surveyquestion",
+	"surveyquestionnaire",
+	"surveyresponse",
+	"surveyweb",
+	"systemstats",
+	"ttsvoice",
+	"user",
+	"userjobtypes",
+	"userrule",
+	"usersetting",
+	"voicereply");
+	
+mysql_select_db("C_$customerid");
+foreach ($customertables as $t) {
+	echo (".");
+	$query = "truncate table $t";
+	if (!mysql_query($query,$custdb)) {
+		echo("Failed to execute statement \n$query\n\n : " . mysql_error($custdb));
+	}
+	
+}
+echo "\n";
 
 //////////////////////////////////////
 // import data
