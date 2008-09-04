@@ -91,7 +91,7 @@ if($REQUEST_TYPE == "new" ||
 		glog("inbound ".$inboundNumber);
 
 		// find user and authenticate them against database
-		$query = "from user where enabled=1 and deleted=0 and accesscode='".$code."' and pincode=password('".$pin."')";
+		$query = "from user where enabled=1 and deleted=0 and accesscode='".$code."' and (pincode=password('".$pin."') or pincode=old_password('".$pin."'))";
 		$user = DBFind("User", $query);
 		if ($user) {
 			$access = new Access($user->accessid);
