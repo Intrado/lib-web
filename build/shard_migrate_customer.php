@@ -4,8 +4,26 @@
 // Usage: php shard_migrate_customer.php <customer ID> <customerdata.sql> <shardhost> <shard user> <shard pass>
 //////////////////////////////////////
 
-include_once("relianceutils.php");
 include_once("../manager/managerutils.inc.php");
+
+
+function echoarray($somearray){
+	foreach($somearray as $line){
+		echo $line . "\n";
+	}
+}
+
+function generalmenu($questions = array(), $validresponses = array()){
+	echoarray($questions);
+	$response = fread(STDIN, 1024);
+	$response = trim($response);
+	while(!in_array($response, $validresponses)){
+		echo "\nThat was not an option\n";
+		$response = fread(STDIN, 1024);
+		$response = trim($response);
+	}
+	return $response;
+}
 
 
 // command line arguments
@@ -100,6 +118,7 @@ foreach ($sqlqueries as $query) {
 		// ignore failure caused by not exists
 	}
 }
+
 
 //////////////////////////////////////
 // backup data
@@ -249,7 +268,6 @@ $query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, 
          " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'scheduled', jobtypeid, thesql from job where status='scheduled'";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
-
 
 
 //////////////////////////////////////
