@@ -5,7 +5,10 @@
 //////////////////////////////////////
 
 include_once("relianceutils.php");
+include_once("../manager/managerutils.inc.php");
 
+
+// command line arguments
 $customerid = "";
 $customerdatafile = "";
 $shardhost = "";
@@ -42,7 +45,7 @@ if (!$shardhost && isset($argv[3])) {
 
 if(!$dbuser && isset($argv[4])){
 	$dbuser = $argv[4];
-	if (!$dbpass && isset($argv[5])) 
+	if (!$dbpass && isset($argv[5]))
 		$dbpass = $argv[5];
 } else {
 	$confirm = "n";
@@ -62,6 +65,7 @@ $custdb = mysql_connect($shardhost, $dbuser, $dbpass)
 	or die("Failed to connect to database");
 echo "connection ok\n";
 
+$customerid = mysql_real_escape_string($customerid, $custdb);
 $customerdbname = "c_".$customerid;
 
 mysql_select_db($customerdbname);
@@ -99,12 +103,18 @@ foreach ($sqlqueries as $query) {
 
 //////////////////////////////////////
 // truncate customer tables
+/*
+$backupfilename = $customerdbname . "_backup.sql";
+echo("Truncating all customer tables. Backing up to $backupfilename \n");
+exec("mysqldump -u$dbuser -p$dbpass --no-create-info $customerdbname > $backupfilename", $output, $return_var);
+if ($return_var) {
+	echo "mysqldump failed with return var ".$return_var."\n";
+	die();
+}
+*/
 
-echo("Backing up to $customerdbname_backup.sql");
-exec("mysqldump -u $dbuser -p$dbpass --no-create-info $customerdbname > $customerdbname_backup.sql");
-
+// remove any data from shard (customer may have been active for a bit in testing)
 echo "Removing shard bits\n";
-
 mysql_select_db("aspshard");
 $tablearray = array("importqueue", "jobstatdata", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
 foreach ($tablearray as $t) {
@@ -115,6 +125,7 @@ foreach ($tablearray as $t) {
 	}
 }
 
+// now truncate the tables
 echo "Truncating all customer tables.\n";
 mysql_select_db($customerdbname);
 $customertables = array(
@@ -136,7 +147,6 @@ $customertables = array(
 	"job",
 	"joblanguage",
 	"jobsetting",
-	"jobstatdata",
 	"jobstats",
 	"jobtype",
 	"jobtypepref",
@@ -172,23 +182,33 @@ $customertables = array(
 	"userrule",
 	"usersetting",
 	"voicereply");
-	
+
 foreach ($customertables as $t) {
 	echo (".");
 	$query = "truncate table $t";
 	if (!mysql_query($query,$custdb)) {
 		echo("Failed to execute statement \n$query\n\n : " . mysql_error($custdb));
 	}
-	
 }
 echo "\n";
+
 
 //////////////////////////////////////
 // import data
 
 echo("import customer data\n");
-
 exec("mysql -u $dbuser -p$dbpass $customerdbname < $customerdatafile");
+
+
+
+//if another schoolmessenger user exists rename it
+$query = "update user set login='schoolmessenger_old' where login='schoolmessenger";
+mysql_query($query,$custdb);
+
+/////////////////////////////////////
+// create default customer data (was lost in truncation)
+createSMUserProfile($custdb);
+
 
 //////////////////////////////////////
 // copy job/schedule/reportsubscription to shard
@@ -227,9 +247,7 @@ $query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, 
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
-//if another schoolmessenger user exists rename it
-$query = "update user set login='schoolmessenger_old' where login='schoolmessenger";
-mysql_query($query,$custdb);
+
 
 //////////////////////////////////////
 // create triggers
