@@ -102,17 +102,17 @@ foreach ($sqlqueries as $query) {
 }
 
 //////////////////////////////////////
-// truncate customer tables
-/*
+// backup data
 $backupfilename = $customerdbname . "_backup.sql";
-echo("Truncating all customer tables. Backing up to $backupfilename \n");
+echo("Backing up to $backupfilename \n");
 exec("mysqldump -u$dbuser -p$dbpass --no-create-info $customerdbname > $backupfilename", $output, $return_var);
 if ($return_var) {
 	echo "mysqldump failed with return var ".$return_var."\n";
 	die();
 }
-*/
 
+
+///////////////////////////////////////
 // remove any data from shard (customer may have been active for a bit in testing)
 echo "Removing shard bits\n";
 mysql_select_db("aspshard");
@@ -125,6 +125,7 @@ foreach ($tablearray as $t) {
 	}
 }
 
+//////////////////////////////////////
 // now truncate the tables
 echo "Truncating all customer tables.\n";
 mysql_select_db($customerdbname);
@@ -195,10 +196,12 @@ echo "\n";
 
 //////////////////////////////////////
 // import data
-
 echo("import customer data\n");
-exec("mysql -u $dbuser -p$dbpass $customerdbname < $customerdatafile");
-
+exec("mysql -u $dbuser -p$dbpass $customerdbname < $customerdatafile", $output, $return_var);
+if ($return_var) {
+	echo "import failed with return var ".$return_var."\n";
+	die();
+}
 
 
 //if another schoolmessenger user exists rename it
