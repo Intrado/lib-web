@@ -14,7 +14,9 @@ $dbpass = "";
 
 
 if (isset($argv[1])) {
-	$customerid = $argv[1];
+	$customerid = $argv[1] + 0;
+	if ($customerid == 0)
+		die("invalid customer id");
 } else {
 	echo "please provide the customer ID";
 	exit();
@@ -31,17 +33,17 @@ if (isset($argv[2])) {
 	exit();
 }
 
-if (isset($argv[3])) {
+if (!$shardhost && isset($argv[3])) {
 	$shardhost = $argv[3];
 } else {
 	echo "please provide the shard hostname or IP";
 	exit();
 }
 
-if(isset($argv[4])){
+if(!$dbuser && isset($argv[4])){
 	$dbuser = $argv[4];
-	$dbpass = "";
-	if (isset($argv[5])) $dbpass = $argv[5];
+	if (!$dbpass && isset($argv[5])) 
+		$dbpass = $argv[5];
 } else {
 	$confirm = "n";
 	while($confirm != "y"){
@@ -60,7 +62,6 @@ $custdb = mysql_connect($shardhost, $dbuser, $dbpass)
 	or die("Failed to connect to database");
 echo "connection ok\n";
 
-$customerid = mysql_real_escape_string($customerid, $custdb);
 $customerdbname = "c_".$customerid;
 
 mysql_select_db($customerdbname);
@@ -99,8 +100,10 @@ foreach ($sqlqueries as $query) {
 //////////////////////////////////////
 // truncate customer tables
 
-echo("Truncating all customer tables. Backing up to $customerdbname_backup.sql");
+echo("Backing up to $customerdbname_backup.sql");
 exec("mysqldump -u $dbuser -p$dbpass --no-create-info $customerdbname > $customerdbname_backup.sql");
+
+echo "Removing shard bits\n";
 
 mysql_select_db("aspshard");
 $tablearray = array("importqueue", "jobstatdata", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
@@ -112,6 +115,8 @@ foreach ($tablearray as $t) {
 	}
 }
 
+echo "Truncating all customer tables.\n";
+mysql_select_db($customerdbname);
 $customertables = array(
 	"access",
 	"address",
@@ -168,7 +173,6 @@ $customertables = array(
 	"usersetting",
 	"voicereply");
 	
-mysql_select_db("C_$customerid");
 foreach ($customertables as $t) {
 	echo (".");
 	$query = "truncate table $t";
@@ -183,11 +187,8 @@ echo "\n";
 // import data
 
 echo("import customer data\n");
-$sqlqueries = explode(";",file_get_contents($customerdatafile));
-foreach ($sqlqueries as $query) {
-	mysql_query($query,$custdb);
-}
 
+exec("mysql -u $dbuser -p$dbpass $customerdbname < $customerdatafile");
 
 //////////////////////////////////////
 // copy job/schedule/reportsubscription to shard
@@ -226,7 +227,9 @@ $query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, 
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
-
+//if another schoolmessenger user exists rename it
+$query = "update user set login='schoolmessenger_old' where login='schoolmessenger";
+mysql_query($query,$custdb);
 
 //////////////////////////////////////
 // create triggers
