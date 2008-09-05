@@ -244,7 +244,7 @@ case "group" :
 $TITLE = "Group Field Definitions";
 break;
 case "schedule" :
-$TITLE = "Association Field Definitions";
+$TITLE = "Enrollment Field Definitions";
 break;
 }
 

@@ -35,11 +35,13 @@ class CallsReport extends ReportGenerator{
 			$jobtypesquery = $this->params['jobtypes'] ? " and j.jobtypeid in ('" . $this->params['jobtypes'] . "')" : "";
 		}
 
+		$joblist = false;
 		if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
 			$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 			$this->params['joblist'] = implode("','", getJobList($startdate, $enddate));
 			$jobquery = " and rp.jobid in ('" . $this->params['joblist'] . "')";
+			$joblist = $this->params['joblist'];
 		}
 
 		if(isset($this->params['result']) && $this->params['result'] != ""){
@@ -49,6 +51,7 @@ class CallsReport extends ReportGenerator{
 		$search = $personquery . $phonequery . $emailquery . $jobtypesquery . $resultquery  . $jobquery;
 
 		$fieldquery = generateFields("rp");
+		$gfieldquery = generateGFieldQuery("rp.personid", $joblist);
 
 		$this->query =
 				"Select
@@ -69,7 +72,7 @@ class CallsReport extends ReportGenerator{
 					rc.attemptdata as attemptdata,
 					coalesce(rc.result, rp.status) as status,
 					rc.sequence as sequence
-					$fieldquery
+					$fieldquery $gfieldquery
 					from reportperson rp
 					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
 					inner join job j on (rp.jobid= j.id)
@@ -86,7 +89,9 @@ class CallsReport extends ReportGenerator{
 
 	function runHtml(){
 
-		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
+		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+		$fields = $ffields + $gfields;
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
@@ -94,8 +99,13 @@ class CallsReport extends ReportGenerator{
 		$activefields = explode(",", $this->params['activefields']);
 
 		//fetch f-fields just like the query and explode the string into an array for an easier count
-		$queryfields = explode(",",generateFields("rp"));
+		$joblist = false;
+		if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
+			$joblist = $this->params['joblist'];
+		}
+		//$queryfields = explode(",",generateFields("rp")) + explode(",",generateGFieldQuery("rp.personid", $joblist));
 
+//echo count($queryfields);
 		$result = Query($this->query);
 		$data = array();
 		// parse through data and seperate attempts.
@@ -121,7 +131,8 @@ class CallsReport extends ReportGenerator{
 				$line[] = $res;
 				$line[] = $row[8];
 				//generatefields returns a string beginning with a comma so the count of generatefields is 1 plus the count of f-fields
-				for($i=0; $i<count($queryfields)-1; $i++){
+				// TODO hardcode 27 ffields+gfields ugh...
+				for($i=0; $i<27; $i++){
 					$line[] = $row[9+$i];
 				}
 				$data[] = $line;

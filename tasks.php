@@ -54,11 +54,11 @@ if (isset($_GET['delete'])) {
 		QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=$id");
 
 	break;
-	case "association" :
+	case "enrollment" :
 		// TODO how to remove userrules
 
 		// clear out data
-		QuickUpdate("delete from personassociation");
+		QuickUpdate("delete from enrollment");
 
 		//recalc pdvalues for all fields mapped
 		$fieldnums = QuickQueryList("select distinct mapto from importfield where mapto like 'c%' and importid=$id");
@@ -134,8 +134,8 @@ function fmt_actions ($import,$dummy) {
 	case "user" :
 		$deletewarning = "This will disable all associated users!";
 	break;
-	case "association" :
-		$deletewarning = "This will delete all association data!";
+	case "enrollment" :
+		$deletewarning = "This will delete all enrollment data!";
 	break;
 	}
 	$associatedjobcount = QuickQuery("Select count(*) from importjob where importid = '$import->id'");

@@ -698,7 +698,11 @@ startWindow('Job Information');
 			</div>
 
 			<div id='displaysettingsdetails' style="display:none">
-				<a href="#" onclick="displaySection('settings', true); ">Show advanced options.</a>
+				<a href="#" onclick="displaySection('settings', true); ">Show advanced options</a>
+			</div>
+
+			<div id='displaysettingsbasic' style="display:none">
+				<a href="#" onclick="displaySection('settings', false); ">Hide advanced options</a>
 			</div>
 
 			<div id="settingsdetails" style="display:none">
@@ -747,10 +751,6 @@ startWindow('Job Information');
 			</table>
 			</div>
 
-			<div id='displaysettingsbasic' style="display:none">
-				<a href="#" onclick="displaySection('settings', false); ">Show basic options.</a>
-			</div>
-
 		</td>
 	</tr>
 <? if($USER->authorize('sendphone')) { ?>
@@ -781,7 +781,11 @@ startWindow('Job Information');
 			</div>
 
 			<div id='displayphonedetails' style="display:none">
-				<a href="#" onclick="displaySection('phone', true); ">Show advanced options.</a>
+				<a href="#" onclick="displaySection('phone', true); ">Show advanced options</a>
+			</div>
+
+			<div id='displayphonebasic' style="display:none">
+				<a href="#" onclick="displaySection('phone', false); ">Hide advanced options</a>
 			</div>
 
 			<div id='phonedetails' style="display:none">
@@ -838,10 +842,6 @@ startWindow('Job Information');
 				</table>
 			</div>
 
-			<div id='displayphonebasic' style="display:none">
-				<a href="#" onclick="displaySection('phone', false); ">Show basic options.</a>
-			</div>
-
 		</td>
 	</tr>
 <? } ?>
@@ -873,7 +873,11 @@ startWindow('Job Information');
 			</div>
 
 			<div id='displayemaildetails' style="display:none">
-				<a href="#" onclick="displaySection('email', true); ">Show advanced options.</a>
+				<a href="#" onclick="displaySection('email', true); ">Show advanced options</a>
+			</div>
+
+			<div id='displayemailbasic' style="display:none">
+				<a href="#" onclick="displaySection('email', false); ">Hide advanced options</a>
 			</div>
 
 			<div id='emaildetails' style="display:none">
@@ -889,10 +893,6 @@ startWindow('Job Information');
 						<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
 					</tr>
 				</table>
-			</div>
-
-			<div id='displayemailbasic' style="display:none">
-				<a href="#" onclick="displaySection('email', false); ">Show basic options.</a>
 			</div>
 
 		</td>

@@ -125,7 +125,7 @@ class Rule extends DBMappedObject {
 					$gquery .= " and exists (select null from groupdata g where g.fieldnum=".substr($rule->fieldnum,1)." and g.personid=$alias.id ".$rule->toSql('g','value').")";
 				}
 				if (strpos($rule->fieldnum, "c") === 0) {
-					if ($cquery == "") $cquery = " and exists (select null from personassociation a where ".$alias.".id=a.personid ";
+					if ($cquery == "") $cquery = " and exists (select null from enrollment a where ".$alias.".id=a.personid ";
 					$cquery .= $rule->toSql("a");
 				}
 			}

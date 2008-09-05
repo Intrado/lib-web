@@ -63,7 +63,7 @@ class RenderedList {
 	function renderList($getdata = true) {
 		global $USER;
 
-		// if there are list rules, combine with the user rules for association data integration
+		// if there are list rules, combine with the user rules for enrollment data integration
 		if (count($this->list->getListRules()) > 0) {
 			$allrules = array_merge($USER->rules(), $this->list->getListRules());
 			$rulesql = Rule::makeQuery($allrules, "p");
@@ -323,7 +323,7 @@ class RenderedList {
 	function calcStats () {
 		global $USER;
 
-		// if there are list rules, combine with the user rules for association data integration
+		// if there are list rules, combine with the user rules for enrollment data integration
 		if (count($this->list->getListRules()) > 0) {
 			$allrules = array_merge($USER->rules(), $this->list->getListRules());
 			$rulesql = Rule::makeQuery($allrules, "p");

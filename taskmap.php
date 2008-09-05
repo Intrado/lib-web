@@ -84,9 +84,12 @@ if ($datatype == "person") {
 	//F fields
 	foreach ($fieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
+
+	$maptofields["sep"] = "--------------";
 	//G fields
 	foreach ($gfieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
+	$maptofields["sep2"] = "--------------";
 
 	//phones, emails, SMS
 	$maxphones = getSystemSetting("maxphones",3);
@@ -150,7 +153,7 @@ if ($datatype == "person") {
 		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
 	}
 
-} else if ($datatype == "association") {
+} else if ($datatype == "enrollment") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["pkey"] = "Person ID";

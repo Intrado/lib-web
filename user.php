@@ -631,10 +631,15 @@ startWindow('User Information');
 					<td>
 						<table>
 							<tr>
+								<td colspan="2">
+								Restrict this user's data access:
+								</td>
+							</tr>
+							<tr>
 								<td><? $extrahtml = "";
 									if ($readonly) $extrahtml = "disabled=\"disabled\"";
-									NewFormItem($f, $s, "radioselect", "radio", null, "bydata", "onclick='hide(\"bystaff\"); hide(\"ruleform\");' ".$extrahtml); ?> By Data</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "bystaff","onclick='show(\"bystaff\"); hide(\"ruleform\");' ".$extrahtml); ?> By Staff ID</td>
+									NewFormItem($f, $s, "radioselect", "radio", null, "bydata", "onclick='toggleDataViewRestriction(\"bydata\");' ".$extrahtml); ?> By Data</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "bystaff","onclick='toggleDataViewRestriction(\"bystaff\");' ".$extrahtml); ?> By Staff ID</td>
 								<td><? if (!$readonly) print submit($f, 'applybutton', 'Apply'); ?> </td>
 							</tr>
 							<tr></tr>
@@ -655,7 +660,6 @@ startWindow('User Information');
 						<table id="ruleform" width="100%">
 						<tr><td>
 						<?
-						echo "Restrict this user's access to the following data<BR>";
 						if ($readonly) {
 							echo "<BR>";
 						} else {
@@ -673,17 +677,52 @@ startWindow('User Information');
 						?>
 						</td></tr></table>
 
+						<table id="mustapply" width="1200">
+							<tr>
+								<td>
+								Click 'Apply' to edit data view restrictions.
+								</td>
+							</tr>
+						</table>
+
 
 					</td>
 				</tr>
 				<? } ?>
 			</table>
-<script>
+<script language="javascript">
+
 <?
 if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-	?>hide("bystaff");<?
+	?>hide("bystaff"); hide("mustapply");<?
+} else {
+	?>hide("mustapply");<?
 }
 ?>
+
+
+function toggleDataViewRestriction(bytype) {
+	if (bytype == "bydata") {
+		hide("bystaff");
+<?
+if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+	?>show("ruleform"); hide("mustapply");<?
+} else {
+	?>hide("ruleform"); show("mustapply");<?
+}
+?>
+	} else {
+		show("bystaff");
+<?
+if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+	?>hide("ruleform"); show("mustapply");<?
+} else {
+	?>show("ruleform"); hide("mustapply");<?
+}
+?>
+	}
+}
+
 </script>
 
 <?

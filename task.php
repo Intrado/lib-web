@@ -55,8 +55,8 @@ foreach($associatedjobs as $importjob){
 	$associatedjobids[$importjob->jobid] = $importjob->jobid;
 }
 
-$associationdataexists = false;
-if (QuickQuery("select count(*) from import where datatype='association'")) $associationdataexists = true;
+$enrollmentdataexists = false;
+if (QuickQuery("select count(*) from import where datatype='enrollment'")) $enrollmentdataexists = true;
 
 
 /****************** main message section ******************/
@@ -208,8 +208,8 @@ startWindow('Import Information ');
 							NewFormItem($form, $section, 'datatype', 'selectstart');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "Person", 'person');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "User", 'user');
-							if (!$associationdataexists)
-								NewFormItem($form, $section, 'datatype', 'selectoption', "Association", 'association');
+							if (!$enrollmentdataexists)
+								NewFormItem($form, $section, 'datatype', 'selectoption', "Enrollment", 'enrollment');
 							NewFormItem($form, $section, 'datatype', 'selectend');
 						} else {
 							echo ucfirst($IMPORT->datatype);
@@ -254,7 +254,7 @@ startWindow('Import Information ');
 							} else if ($IMPORT->datatype == "user") {
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Create only", 'createonly');
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Full Synchronization", 'full');
-							} // else association is always 'full' and not displayed
+							} // else enrollment is always 'full' and not displayed
 							NewFormItem($form, $section, 'updatemethod', 'selectend');
 						?>
 					</td>
@@ -315,7 +315,12 @@ startWindow('Import Information ');
 </table>
 <?
 endWindow();
-?><br><div style="margin-left: 10px;">[*Note: This option does not apply to data files that are manually uploaded using the Browse option.]</div><?
+
+if ($IMPORT->id) {
+?>
+	<br><div style="margin-left: 10px;">[*Note: This option does not apply to data files that are manually uploaded using the Browse option.]</div>
+<?
+}
 buttons();
 EndForm();
 

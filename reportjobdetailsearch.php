@@ -445,7 +445,18 @@ startWindow("Select ".help('ReportJobDetailSearch_Select'), NULL, false);
 								<?
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 									NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and j.questionnaireid is null $userJoin order by id desc limit 500");
+
+									$jobtypefilter = "";
+									if (isset($_SESSION['report']['type'])) {
+										if ($_SESSION['report']['type'] == "phone") {
+											$jobtypefilter = " and phonemessageid is not null ";
+										} else if ($_SESSION['report']['type'] == "email") {
+											$jobtypefilter = " and emailmessageid is not null ";
+										} else if ($_SESSION['report']['type'] == "sms") {
+											$jobtypefilter = " and smsmessageid is not null ";
+										}
+									}
+									$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and j.questionnaireid is null $userJoin $jobtypefilter order by id desc limit 500");
 
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
@@ -453,7 +464,7 @@ startWindow("Select ".help('ReportJobDetailSearch_Select'), NULL, false);
 									NewFormItem($f, $s, "jobid", "selectend");
 									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job j where deleted = 2 and status!='repeating' and j.questionnaireid is null $userJoin order by id desc limit 500");
+									$jobs = DBFindMany("Job","from job j where deleted = 2 and status!='repeating' and j.questionnaireid is null $userJoin $jobtypefilter order by id desc limit 500");
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 									}
