@@ -1468,4 +1468,27 @@ KEY `jobpersonfield`  (`jobid`,`personid`,`fieldnum`)
 ) ENGINE = innodb
 $$$
 
+ALTER TABLE `import` CHANGE `datatype` `datatype` ENUM( 'person', 'user', 'enrollment' ) NOT NULL DEFAULT 'person'
+$$$
 
+drop table `personassociation`
+$$$
+
+CREATE TABLE `enrollment` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`personid` INT NOT NULL ,
+`c01` VARCHAR( 255 ) NOT NULL ,
+`c02` VARCHAR( 255 ) NOT NULL ,
+`c03` VARCHAR( 255 ) NOT NULL ,
+`c04` VARCHAR( 255 ) NOT NULL ,
+`c05` VARCHAR( 255 ) NOT NULL ,
+`c06` VARCHAR( 255 ) NOT NULL ,
+`c07` VARCHAR( 255 ) NOT NULL ,
+`c08` VARCHAR( 255 ) NOT NULL ,
+`c09` VARCHAR( 255 ) NOT NULL ,
+`c10` VARCHAR( 255 ) NOT NULL
+) ENGINE = innodb
+$$$
+
+ALTER TABLE `enrollment` ADD INDEX `staffid` ( `c01` )
+$$$
