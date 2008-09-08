@@ -1,176 +1,168 @@
 <?
+//ini_set('error_reporting', E_ALL);
+//ini_set('display_errors', '1');
+
 include_once("common.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../inc/html.inc.php");
+include_once("AspAdminUser.obj.php");
 
-$clear = false;
-if(isset($_GET['cid'])){
-	$_SESSION['cid'] = $_GET['cid'] +0;
-	$clear = true;
-}
-
-if(isset($_GET['importid'])){
-	$_SESSION['importid'] = $_GET['importid']+0;
-	$clear = true;
-}
-
-if($clear){
+// Set session variables if user got here from the customerimports.php
+if (isset($_GET['cid']) && isset($_GET['importid'])) {
+	$_SESSION['cid'] = $_GET['cid'] + 0;
+	$_SESSION['importid'] = $_GET['importid'] + 0;
 	redirect();
 }
 
-if(isset($_SESSION['importid'])){
-	$importid = $_SESSION['importid'];
-}
+// Manager account
+$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
-if(isset($_SESSION['cid'])){
-	$customerid = $_SESSION['cid'];
-}
+// Check session variables
+if (!isset($_SESSION['cid']) && !isset($_SESSION['importid']))
+	die("You got here without using the proper URL.  Please return to the imports page and use the Import Alert links");
 
+$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s left join customer c on (s.id = c.shardid) where c.id = {$_SESSION['cid']}");
+$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_{$_SESSION['cid']}");
+if (!$custdb)
+	die("Connection failed for {$custinfo[0]}, c_{$_SESSION['cid']}");
+// Useful data
+$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
+$timezone = QuickQuery("select value from setting where name = 'timezone'", $custdb);
+$import = QuickQueryRow("select id, name, description, lastrun, updatemethod, length(data) as filesize, datamodifiedtime, alertoptions from import where id = {$_SESSION['importid']}", true, $custdb);
+$alertoptions = sane_parsestr($import['alertoptions']);
 
-if(!isset($customerid, $importid)){
-	echo "You got here without using the proper URL.  Please return to the imports page and use the Import Alert links";
-	exit();
-}
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+$daysinweek = array("su", "m", "tu", "w", "th", "f", "s");
+$f = "importalerts";
+$s = "main";
 
-$dow = array(1 => "su", 2=>"m", 3=>"tu", 4=>"w", 5=>"th", 6=>"f", 7=>"s");
+date_default_timezone_set($timezone);
 
-// DB Connection
-$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s left join customer c on (s.id = c.shardid) where c.id = " . $customerid);
-$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $customerid);
-$customername = QuickQuery("select value from setting where name = 'displayname'", $custdb);
-$import = QuickQueryRow("select id, name, description, lastrun, updatemethod, datamodifiedtime, alertoptions from import where id = " . $importid, true, $custdb);
-if($import['alertoptions']){
-	$importalert = sane_parsestr($import['alertoptions']);
-} else {
-	$importalert = array();
-}
-//var_dump($importalert);
-
-$f="importalerts";
-$s="main";
-$reloadform = 0;
-
-if(CheckFormSubmit($f, $s)){
-	if(CheckFormInvalid($f)){
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
+$reloadform = false;
+if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, "Clear")) {
+	if (CheckFormInvalid($f)) {
+		error("Form was edited in another window, reloading data");
+		$reloadform = true;
 	} else {
 		MergeSectionFormData($f, $s);
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+
+		// Gets rid of error message if submitting for Scheduled Days but input for Stale Data is invalid; don't care about Stale Data if Scheduled Days is chosen
+		if (GetFormData($f, $s, "scheduled"))
+			PutFormData($f, $s, "staledatamindays", "");
+
+		// Input validation
+		if (CheckFormSection($f, $s)) {
+			error("There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly");
+		} else if (GetFormData($f,$s,'filesizemax') >= 1 && GetFormData($f,$s,'filesizemin') >= 1 && GetFormData($f,$s,'filesizemax') < GetFormData($f,$s,'filesizemin')) {
+			error("Max size must be greater than min size", "If you don't want a max size, set it to blank");
+		} else if ($bad = checkemails(GetFormdata($f,$s,'emailaddresses'))) {
+			error("Please make sure email addresses are valid.");
+		} else if (!$accountcreator->runCheck(GetFormData($f,$s,'managerpassword'))) {
+			error ("Bad Manager Password");
+		// No errors found
 		} else {
-			$minsize = ereg_replace("[^0-9]*","",GetFormData($f, $s, "minsize"));
-			$maxsize = ereg_replace("[^0-9]*","",GetFormData($f, $s, "maxsize"));
-			$emaillist = GetFormData($f, $s, "emails");
-			if($maxsize !== "" && $maxsize < $minsize){
-				error("Max size must be greater than min size", "If you don't want a max size, set it to blank");
-			} elseif($bademaillist = checkemails($emaillist)) {
-				error("These emails are invalid", $bademaillist);
-			} else {
-				$oldimportalert = $importalert;
-				//Wipe out any old settings
-				$importalert = array();
-				$importalert['minsize'] = $minsize;
-				$importalert['maxsize'] = $maxsize;
-				if(GetFormData($f, $s, "scheduled") == "no"){
-					$importalert['daysold'] = GetFormData($f, $s, "daysold");
-				} else {
-					$newdows = array();
-					foreach($dow as $index => $day){
-						if(GetFormData($f, $s, $day)){
-							$newdows[] = $index;
-						}
-					}
-					$importalert['dow'] = implode(",", $newdows);
-					if($importalert['dow'] != "")
-						$importalert['time'] = date("H:i", strtotime(GetFormData($f, $s, "time")));
+			$newalertoptions = array();
+			// Filesize
+			if (GetFormData($f,$s,'filesizemin'))
+				$newalertoptions['minsize'] = GetFormData($f,$s,'filesizemin');
+			if (GetFormData($f,$s,'filesizemax'))
+				$newalertoptions['maxsize'] = GetFormData($f,$s,'filesizemax');
+			// Stale Data
+			if (!GetFormData($f, $s, "scheduled") && GetFormData($f,$s,'staledatamindays')) {
+				$newalertoptions['daysold'] = GetFormData($f,$s,'staledatamindays');
+			// Scheduled Day
+			} else if (GetFormData($f, $s, "scheduled")) {
+				$fscheduleddays = array();
+				foreach ($daysinweek as $i => $day) {
+					if (GetFormData($f, $s, $day) == 1)
+						$fscheduleddays[] = $i;
 				}
-				$importalert['emails'] = DBSafe($emaillist);
-				foreach($importalert as $index => $alert){
-					if($alert == "")
-						unset($importalert[$index]);
+				if (!empty($fscheduleddays)) {
+					$newalertoptions['dow'] = implode(",", $fscheduleddays);
+					$newalertoptions['time'] = date("H:i", strtotime(GetFormData($f,$s,'scheduledtime')));
+					$newalertoptions['scheduledwindowminutes'] = GetFormData($f,$s,'scheduledwindowminutes');
 				}
-				//check all old options compared to new options to see if there is a change
-				//if a change exists, erase the last notified flag
-				$optionsarray = array("minsize", "maxsize", "dow", "daysold", "time");
-				$changed = false;
-				foreach($optionsarray as $item){
-					if(!isset($importalert[$item]) && !isset($oldimportalert[$item]))
-						continue;
-
-					if(!isset($importalert[$item])){
-						$changed = true;
-						break;
-					}
-					if(!isset($oldimportalert[$item])){
-						$changed = true;
-						break;
-					}
-					if($importalert[$item] != $oldimportalert[$item]){
-						$changed = true;
-						break;
-					}
-				}
-
-				if(!$changed && isset($oldimportalert['lastnotified']))
-					$importalert['lastnotified'] = $oldimportalert['lastnotified'];
-
-				$importalerturl = http_build_query($importalert, false, "&");
-				QuickUpdate("update import set alertoptions = '" . DBSafe($importalerturl) . "' where id = " . $importid, $custdb);
-				redirect("customerimports.php");
 			}
+			// Email Addresses
+			if (GetFormdata($f,$s,'emailaddresses')) {
+				$newalertoptions['emails'] = GetFormdata($f,$s,'emailaddresses');
+			}
+			
+			// Update the database
+			$alertoptionsurl = http_build_query($newalertoptions, false, "&");
+			if (CheckFormSubmit($f, "Clear") || $alertoptionsurl != substr($import['alertoptions'], strpos("&lastnotified")))
+				QuickUpdate("update import set alertoptions = '" . DBSafe($alertoptionsurl) . "' where id = {$_SESSION['importid']}", $custdb);
+			
+			redirect("customerimports.php");
 		}
 	}
 } else {
-	$reloadform = 1;
+	$reloadform = true;
 }
 
-if($reloadform){
+if ($reloadform === true) {
 	ClearFormData($f);
-	PutFormData($f, $s, "minsize", isset($importalert['minsize']) && $importalert['minsize'] ? number_format($importalert['minsize']) : "", "text");
-	PutFormData($f, $s, "maxsize", isset($importalert['maxsize']) && $importalert['maxsize'] ? number_format($importalert['maxsize']) : "", "text");
-	PutFormData($f, $s, "daysold", isset($importalert['daysold']) ? $importalert['daysold'] : "", "text");
 	PutFormData($f, $s, "managerpassword", "", "text");
-	PutFormData($f, $s, "Save", "");
-
-	if(isset($importalert['dow'])){
-		$storeddow = array_flip(explode(",", $importalert['dow']));
-	} else {
-		$storeddow = array();
+	// Alert Options (form input)
+	PutFormData($f, $s, "emailaddresses", isset($alertoptions['emails']) ? $alertoptions['emails'] : "", "text");
+	PutFormData($f, $s, "filesizemin", isset($alertoptions['minsize']) ? $alertoptions['minsize'] : "", "number", 0);
+	PutFormData($f, $s, "filesizemax", isset($alertoptions['maxsize']) ? $alertoptions['maxsize'] : "", "number", 0);
+	PutFormData($f, $s, "scheduled", isset($alertoptions['dow']) ? 1 : 0, "text");
+	PutFormData($f, $s, "staledatamindays", isset($alertoptions['daysold']) ? $alertoptions['daysold'] : "", "number", 1);
+	$scheduleddays = (isset($alertoptions['dow'])) ? array_flip(explode(",", $alertoptions['dow'])) : array();
+	foreach ($daysinweek as $i => $day) {
+		PutFormData($f, $s, $day, isset($scheduleddays[$i]) ? 1 : 0, "bool");
 	}
-	foreach($dow as $index => $day){
-		PutFormData($f, $s, $day, isset($storeddow[$index]) ? 1 : 0, "bool", 0, 1);
-	}
-	PutFormData($f, $s, "time", isset($importalert['time']) ? date("g:i a", strtotime($importalert['time'])) : "", "text");
-	PutFormData($f, $s, "emails", isset($importalert['emails']) ? $importalert['emails'] : "", "text");
-	PutFormData($f, $s, "scheduled", isset($importalert['dow']) ? "yes" : "no");
+	PutFormData($f, $s, "scheduledtime", isset($alertoptions['time']) ? date("g:i a", strtotime($alertoptions['time'])) : "", "text");
+	PutFormData($f, $s, "scheduledwindowminutes", isset($alertoptions['scheduledwindowminutes']) ? $alertoptions['scheduledwindowminutes'] : "", "text");
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
 
 include_once("nav.inc.php");
-NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ winscheduleddays.alert(\"Enter Your Manager Password\"); return false;}'");
 ?>
-<div>Customer: <?=$customername?></div>
+<div>Customer: <?=$displayname?></div>
 <div>Import Alerts for: <?=$import['name']?></div>
 <table>
-	<tr><td>Min Size:</td><td><? NewFormItem($f, $s, "minsize", "text", 10, 20)?></td></tr>
-	<tr><td>Max Size:</td><td><? NewFormItem($f, $s, "maxsize", "text", 10, 20)?></td></tr>
 	<tr>
-		<td><? NewFormItem($f, $s, "scheduled","radio", null, "no", "id='no' onclick=\"hide('dow');show('daysold')\"");?>Use Age</td>
-		<td><? NewFormItem($f, $s, "scheduled","radio", null, "yes", "id='yes' onclick=\"hide('daysold');show('dow')\"");?>Use Schedule</td>
+		<td>Current File Size: </td>
+		<td id="actualsizetarget">
+			<?=number_format($import['filesize'])?> (bytes)
+			&plusmn;
+			<?php
+				NewFormItem($f,$s,"filesizepercent", "selectstart", NULL, NULL, "id='filesizepercent'");
+				for ($i = 10; $i <= 100; $i += 10) {
+					NewFormItem($f,$s,"filesizepercent", "selectoption", $i, $i);
+				}
+				NewFormItem($f,$s,"filesizepercent", "selectend");
+			?>
+			%
+			<button type='button' onclick='calculateminmax()'>Calculate</button></td></tr>
+	<tr><td colspan=6><input id="filesizechecking" onblur="togglefilesizecheck(true)" onclick="togglefilesizecheck()" type="checkbox"/><label for="filesizechecking">Enable File Size Checking</label></td></tr>
+	<tr><td>Min Size:</td><td><? NewFormItem($f, $s, "filesizemin", "text", 10, 20, "id='minsizeinput' onblur='togglefilesizecheck(true)' onfocus='togglefilesizecheck(false,true)' onkeyup='togglefilesizecheck(true)'")?> (bytes)</td></tr>
+	<tr><td>Max Size:</td><td><? NewFormItem($f, $s, "filesizemax", "text", 10, 20, "id='maxsizeinput' onblur='togglefilesizecheck(true)' onfocus='togglefilesizecheck(false,true)' onkeyup='togglefilesizecheck(true)'")?> (bytes)</td></tr>
+	<tr><td colspan=6><i>The number of days from the last upload is used to determine when data is stale; for recurring uploads within a week, set a time window instead.</i></td></tr>
+	<tr>
+		<td><? NewFormItem($f, $s, "scheduled","radio", null, 0, "id='dostaledata' onclick=\"hide('scheduleddays');show('staledatamindays')\"");?>Stale Data</td>
+		<td><? NewFormItem($f, $s, "scheduled","radio", null, 1, "id='doscheduleddays' onclick=\"hide('staledatamindays');show('scheduleddays')\"");?>Weekly Schedule</td>
 	</tr>
 </table>
 <table>
 	<tr>
 		<td>
-			<div id='daysold'>
+			<div id='staledatamindays'>
 				<table>
-					<tr><td>Days Old:</td><td><? NewFormItem($f, $s, "daysold", "text", 10, 20)?></td></tr>
+					<tr><td>How many days before an import is stale?</td><td><? NewFormItem($f, $s, "staledatamindays", "text", 10, 20)?></td></tr>
 				</table>
 			</div>
-			<div id='dow'>
+			<div id='scheduleddays'>
 				<table>
 					<tr>
 						<td>Schedule:</td>
@@ -178,19 +170,31 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 							<table border="1px" margin="1px">
 								<tr>
 <?
-								foreach($dow as $day){
+								foreach($daysinweek as $day){
 									?><th><?=ucfirst($day)?></th><?
 								}
 ?>
 									<th>Time</th>
+									<th>Window</th>
 								</tr>
 								<tr>
 <?
-								foreach($dow as $day){
+								foreach($daysinweek as $day){
 									?><td><? NewFormItem($f, $s, $day, "checkbox"); ?></td><?
 								}
 ?>
-									<td><? time_select($f, $s, "time") ?></td>
+									<td><? time_select($f, $s, "scheduledtime") ?></td>
+									<td>
+										&plusmn;
+										<?php
+											NewFormItem($f,$s,"scheduledwindowminutes", "selectstart");
+											for ($i = 10; $i <= 140; $i += 15) {
+												NewFormItem($f,$s,"scheduledwindowminutes", "selectoption", $i, $i);
+											}
+											NewFormItem($f,$s,"scheduledwindowminutes", "selectend");
+											?>
+											minutes
+									</td>
 								</tr>
 
 							</table>
@@ -202,13 +206,18 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	</tr>
 </table>
 <table>
+	<tr><td colspan=6><i>The above settings are optional; failed uploads will be alerted regardless of the above settings.</i></td></tr>
+	<tr><td colspan=6><i>If there are no email recipients, no alerts will be sent.</i></td></tr>
 	<tr>
-		<td>Emails:</td>
-		<td><? NewFormItem($f, $s, "emails", "text", 50, 255);?></td>
+		<td>Email Recipients:</td>
+		<td><? NewFormItem($f, $s, "emailaddresses", "textarea", 50, 5, "id='emailaddressesinput' style='overflow: auto;'");?>
+		<button type="button" id="addmebutton" onclick='addme()'>Add Me</button></td>
 	</tr>
 	<tr>
 		<td>Last Notified:</td>
-		<td><?= isset($importalert['lastnotified']) ? date("M j, Y g:i a", $importalert['lastnotified']) : "--Never--" ?></td>
+		<td><?= isset($alertoptions['lastnotified']) ? date("M j, Y g:i a", $alertoptions['lastnotified']) : "--Never--" ?>
+			<?php NewFormItem($f, "Clear", "Clear", 'submit'); ?>
+		</td>
 	</tr>
 </table>
 <div><? NewFormItem($f, $s, "Save", 'submit'); ?><a href="customerimports.php">Cancel</a></div>
@@ -220,12 +229,17 @@ EndForm();
 include_once("navbottom.inc.php");
 ?>
 <script>
-if(new getObj('no').obj.checked){
-	hide('dow');
+if(new getObj('dostaledata').obj.checked){
+	hide('scheduleddays');
 } else {
-	hide('daysold');
+	hide('staledatamindays');
 }
 
+<?php
+if (isset($alertoptions['minsize']) || isset($alertoptions['maxsize'])) {
+	print "togglefilesizecheck(false, true);";
+}
+?>
 
 function getObj(name)
 {
@@ -243,6 +257,43 @@ function getObj(name)
   }
   if(this.obj)
 	this.style = this.obj.style;
+}
+
+function addme() {
+	var emailsinput = new getObj('emailaddressesinput').obj;
+	emailsinput.value += ";" + "<?= $accountcreator->email ?>";
+	//emailsinput.value = emailsinput.value.replace(/^[^_@.a-zA-Z0-9]+/, "");
+}
+
+function togglefilesizecheck(valuecheck, forcechecked) {
+	var checking = new getObj('filesizechecking').obj;
+	var mininput = new getObj('minsizeinput').obj;
+	var maxinput = new getObj('maxsizeinput').obj;
+
+	if (forcechecked) {
+		checking.checked = true;
+	}
+
+	if (valuecheck && mininput.value == "" && maxinput.value == "") {
+		checking.checked = false;
+	}
+
+	if (!checking.checked) {
+		mininput.value = "";
+		maxinput.value = "";
+	}
+}
+
+function calculateminmax() {
+	var mininput = new getObj('minsizeinput').obj;
+	var maxinput = new getObj('maxsizeinput').obj;
+
+	var percent = new getObj('filesizepercent').obj;
+
+	mininput.value = parseInt(<?=$import['filesize']?> * (1.0 - parseFloat(percent.value/100.0)));
+	maxinput.value = parseInt(<?=$import['filesize']?> * (1.0 + parseFloat(percent.value/100.0)));
+
+	togglefilesizecheck(true, true);
 }
 
 function show(name)

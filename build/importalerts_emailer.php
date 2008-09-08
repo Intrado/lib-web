@@ -1,182 +1,163 @@
-<?
-/*
-Simple emailer script for import alerts.  The script will connect to the authserver
-to find all customer connections to traverse for import alerts.  It will only look at
-import alerts that have email addresses.
-*/
+<?php
+ini_set('error_reporting', E_ERROR);
+ini_set('display_errors', '1');
 
+//-------------------------------------
+// Latest author: Kee-Yip Chan (kchan@schoolmessenger.com)
+// In the dev wiki: [[Import alerts, emailer]]
+//-------------------------------------
+// Simple emailer script for import alerts.
+// This script will connect to the authserver
+// to find all customer connections to traverse for import alerts.
+// It will only look at import alerts with email addresses.
 
-//flag for windows pathing
-$IS_WINDOWS=true;
+$java = '/usr/commsuite/java/j2sdk/bin/java';
+$emailer = '/usr/commsuite/server/simpleemail/simpleemail.jar';
+$authpropertiesfile = '/usr/commsuite/server/authserver/authserver.properties';
+$nextemailwaithours = 24;
+$staledataleewayhours = 1;
+$defaultwindowminutes = 10;
+define('MINUTESPERHOUR', 60);
+define('SECONDSPERHOUR', 3600);
+define('SECONDSPERMINUTE', 60);
+define('HOURSPERDAY', 24);
 
+// Gather authserver properties
+file_exists($authpropertiesfile) or die("Missing auth properties file: $authpropertiesfile");
+$settings = parse_ini_file($authpropertiesfile);
+if (empty($settings))
+	die("No settings defined");
 
-
-//need trailing "/" for simple emailer path
-$simpleemailerpath = "/usr/commsuite/server/simpleemail/";
-
-if(file_exists("/usr/commsuite/server/authserver/authserver.properties")){
-	$authsettings = @parse_ini_file("/usr/commsuite/server/authserver/authserver.properties");
-	$authhost = $authsettings['authdb.host'];
-	$authuser = $authsettings['authdb.username'];
-	$authpass = $authsettings['authdb.password'];
-} else {
-	$authhost="";
-	$authuser="";
-	$authpass="";
+// Gather shardsinfo.
+mysql_connect($settings['authdb.host'], $settings['authdb.username'], $settings['authdb.password'], true) or die(mysql_error());
+mysql_select_db($settings['authdb.dbname']) or die(mysql_error());
+$shardsinfo = array();
+$shardquery = mysql_query("SELECT id, dbhost, dbusername, dbpassword FROM shard ORDER BY id");
+while ($sh = mysql_fetch_assoc($shardquery)) {
+	$shardsinfo[$sh['id']] = $sh;
 }
+if (empty($shardsinfo))
+	die("No shardsinfo available");
 
-
-
-if($IS_WINDOWS)
-	$windows = "/cygdrive/c";
-else
-	$windows = "";
-
-$authconn = mysql_connect($authhost, $authuser, $authpass, true);
-mysql_select_db("authserver", $authconn);
-
-//gather shard data so we can use super user
-//to traverse customer db's instead of opening a new connection to each customer
-$res = mysql_query("select id, dbhost, dbusername, dbpassword from shard order by id");
-$shardinfo = array();
-while($row = mysql_fetch_row($res)){
-	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
-}
-
-$customerquery = mysql_query("select id, shardid, urlcomponent from customer order by shardid, id");
-$customers = array();
-while($row = mysql_fetch_row($customerquery)){
-	$customers[] = $row;
-}
-$currhost = "";
-$custdb;
-$emailmessages = array();
-foreach($customers as $cust) {
-	echo "Doing customer " . $cust[0] . "\n";
-	if($currhost != $cust[1]){
-		$custdb = mysql_connect($shardinfo[$cust[1]][0],$shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2], true)
-			or die("Could not connect to customer database: " . mysql_error());
-		$currhost = $cust[1];
-	}
-	mysql_select_db("c_" . $cust[0]);
-
-	//use customer timezone for all calculations
-	$res = mysql_query("select value from setting where name = 'timezone'", $custdb);
-	$row = mysql_fetch_row($res);
-	$timezone = $row[0];
+// Process customers.
+$customerquery = mysql_query("SELECT id, shardid, urlcomponent FROM customer ORDER BY shardid, id");
+while ($c = mysql_fetch_assoc($customerquery)) {
+	$cshardinfo = $shardsinfo[$c['shardid']];
+	mysql_connect($cshardinfo['dbhost'], $cshardinfo['dbusername'], $cshardinfo['dbpassword'], true) or die(mysql_error());
+	mysql_select_db("c_{$c['id']}") or die(mysql_error());
+	$settingquery = mysql_query("SELECT value FROM setting WHERE name = 'displayname'");
+	$displayname = mysql_fetch_assoc($settingquery);
+	$displayname = $displayname['value'];
+	$settingquery = mysql_query("SELECT value FROM setting WHERE name = 'timezone'");
+	$timezone = mysql_fetch_assoc($settingquery);
+	$timezone = $timezone['value'];
+	if (!$timezone)
+		die("Customer {$c['urlcomponent']}: Can't go further, need timezone settings to be specified\n");
+	// Use this customer's timezone for all date related calculations
 	date_default_timezone_set($timezone);
 
-	$res = mysql_query("select id, name, datamodifiedtime, length(data), alertoptions from import where alertoptions != ''", $custdb);
-	$imports = array();
-	while($row = mysql_fetch_row($res)){
-		$imports[] = $row;
-	}
-	foreach($imports as $import){
-		$notified = false;
-		$alertoptions = sane_parsestr($import[4]);
-		//skip all import alerts with no email addresses
-
-		if(!isset($alertoptions['emails']) || $alertoptions['emails'] == "")
+	// Process this customer's imports.
+	$importsquery = mysql_query("SELECT id, name, status, datamodifiedtime AS lastuploaded, LENGTH(data) AS actualsize, alertoptions FROM import WHERE alertoptions != ''");
+	while ($import = mysql_fetch_assoc($importsquery)) {
+		$import['lastuploaded'] = strtotime($import['lastuploaded']);
+		$alertoptions = sane_parsestr($import['alertoptions']);
+		if (!isset($alertoptions['emails']))
 			continue;
 
-		if(isset($alertoptions['lastnotified']) && $alertoptions['lastnotified'] >= (time() - 60*60*8))
-			continue;
+		$currenttimestamp = time();
+		$alerts = array();
+		print "Customer {$c['urlcomponent']}, import {$import['id']}:\n";
+		print_r($alertoptions);
 
-		$emaillist = explode(";",$alertoptions['emails']);
-
-		if(isset($alertoptions['minsize']) && ($import[3] + 0) < $alertoptions['minsize']){
-			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file too small. " . number_format($import[3]) . " < " . number_format($alertoptions['minsize']) . " (bytes).";
-			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
-			$notified = true;
-		}
-		if(isset($alertoptions['maxsize']) && ($import[3] + 0) > $alertoptions['maxsize']){
-			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a data file too large." . number_format($import[3]) . " > " . number_format($alertoptions['maxsize']) . " (bytes).";
-			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
-			$notified = true;
-		}
-		if(isset($alertoptions['daysold']) && $alertoptions['daysold'] && ($import[2] < (time() - (15 + 60*60*24*$alertoptions['daysold'])))){
-			$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " has a file modified date before " . $alertoptions['daysold'] . " days ago. " . date("M j, Y g:i a (e)",$import[2]);
-			$emailmessages = generateMessage($emailmessages, $emaillist, $message);
-			$notified = true;
-		}
-		if(isset($alertoptions['dow'])){
-			$scheduledDow=array();
-			$scheduledDow = array_flip(explode(",", $alertoptions['dow']));
-
-			//if dow is set (schedule is set)
-			//find the last weekday it should have run, including today.
-			//if the last scheduled run is later than last run, display error
-			$currentdow=date("w")+1;
-			$daysago = 0;
-			if(strtotime($alertoptions['time']) > strtotime("now")){
-				$currentdow--;
-				$daysago++;
+		// Determine if an alert was recently sent; if so, skip this import alert
+		if (!empty($alertoptions['lastnotified'])) {
+			$hoursuntil = SECONDSPERHOUR * $nextemailwaithours;
+			$timediff = $currenttimestamp - $alertoptions['lastnotified'];
+			if ($timediff < $hoursuntil) {
+				print "Don't want to spam; last notified = " . date("F d, Y h:i:s a", $alertoptions['lastnotified']) . "; now = " . date("F d, Y h:i:s a", $currenttimestamp) . " ($timezone)\n";
+				continue;
 			}
-
-			while(!isset($scheduledDow[$currentdow])){
-				$daysago++;
-				$currentdow--;
-				if($currentdow < 1){
-					$currentdow = $currentdow+7;
+		// Alert if a file has never been uploaded
+		} else if (empty($import['lastuploaded'])) {
+			$alerts[] = "No file has ever been uploaded.";
+		// Alert if upload status indicates a problem
+		} else if ($import['status'] === 'error') {
+			$alerts[] = "Upload status is ERROR";
+		} else {
+			// Stale Data Alert
+			if (isset($alertoptions['daysold']) && ($alertoptions['daysold'] > 0)) {
+				print "current time: " . date("F d, Y h:i a", $currenttimestamp) . " ($timezone)\n";
+				$timediffallowed = ($alertoptions['daysold'] * HOURSPERDAY * SECONDSPERHOUR) + ($staledataleewayhours * SECONDSPERHOUR);
+				$timediff = $currenttimestamp - $import['lastuploaded'];
+				if ($timediff > $timediffallowed)
+					$alerts[] = "Data is stale; specified {$alertoptions['daysold']} day(s) until stale, but last uploadeded " . date("F d, Y h:i a", $import['lastuploaded']) . " ($timezone)";
+			// Scheduled Days Alert
+			} else if (isset($alertoptions['dow'])) {
+				print "current time: " . date("F d, Y h:i a", $currenttimestamp) . " ($timezone)\n";
+				if (!isset($alertoptions['scheduledwindowminutes']))
+					$alertoptions['scheduledwindowminutes'] = $defaultwindowminutes;
+				$daytocheck =  date('w', $currenttimestamp - ($alertoptions['scheduledwindowminutes'] * SECONDSPERMINUTE));
+				// Determine if now is the appropriate time to check for a Scheduled Days Alert
+				// First, $daytocheck must be a scheduled day
+				if (strpos($alertoptions['dow'], $daytocheck) !== false) {
+					$timestampforscheduledday = strtotime($alertoptions['time'] . ":00 " . date("F d, Y", $currenttimestamp - ($alertoptions['scheduledwindowminutes'] * SECONDSPERMINUTE)));
+					$lowerbound = $timestampforscheduledday - ($alertoptions['scheduledwindowminutes'] * SECONDSPERMINUTE);
+					// Then, check for the alert only if the current time is past the scheduled time window
+					if ($lowerbound <= $currenttimestamp - 2*($alertoptions['scheduledwindowminutes'] * SECONDSPERMINUTE)) {
+						$diffuploadtime = $import['lastuploaded'] - $lowerbound;
+						if ($diffuploadtime < 0)
+							$alerts[] = "Import data out of date; scheduled time " . date("F d, Y h:i a", $timestampforscheduledday) . ", but last upload occurred " . date("F d, Y h:i a", $import['lastuploaded']) . " ($timezone)";
+						else if($diffuploadtime > 2*($alertoptions['scheduledwindowminutes'] * SECONDSPERMINUTE))
+							$alerts[] = "Import data uploaded late; scheduled time " . date("F d, Y h:i a", $timestampforscheduledday) . ", but the upload occurred at " . date("F d, Y h:i a", $import['lastuploaded']) . " ($timezone)";
+					}
 				}
 			}
-			//calculate unix time and allow 15 min leeway
-			$scheduledlastrun = strtotime(" -$daysago days " . $alertoptions['time']);
-			if($import[2] > ($scheduledlastrun + 60*15) || $import[2] < ($scheduledlastrun - 60*15)){
-				$message = "Customer ID: " . $cust[0] . " Import ID: " . $import[0] . " Import Name: " . $import[1] . " did not run at the scheduled time: " . date("M d, Y g:i a", $import[2]);
-				$emailmessages = generateMessage($emailmessages, $emaillist, $message);
-				$notified = true;
+
+			// Filesize Minimum Alert
+			if (isset($alertoptions['minsize']) && ($alertoptions['minsize'] > 0)) {
+				if ($import['actualsize'] < $alertoptions['minsize'])
+					$alerts[] = "File too small; minimum " . number_format($alertoptions['minsize']) . " bytes, but actual size is " . number_format($import['actualsize']) . " byte(s).";
+			}
+
+			// Filesize Maximum Alert
+			if (isset($alertoptions['maxsize']) && ($alertoptions['maxsize'] > 0)) {
+				if ($import['actualsize'] > $alertoptions['maxsize'])
+					$alerts[] = "File too large; maximum " . number_format($alertoptions['maxsize']) . " bytes, but actual size is " . number_format($import['actualsize']) . " byte(s).";
 			}
 		}
-		if($notified){
-			$alertoptions['lastnotified'] = strtotime("now");
+
+		// Email any alerts and update this customer's database
+		if (!empty($alerts)) {
+			$subject = "Import Alert: cid " . $c['id'] . ", " . $c['urlcomponent'] . ", import " . $import['id'] . ", " . $import['name'] . ", " . count($alerts) . " alert(s)";
+			$body = "Customer, $displayname,\n" . implode("\n", $alerts);
+			$emailaddresses = explode(";", $alertoptions['emails']);
+			$emailaddresses = array_unique($emailaddresses);
+			foreach ($emailaddresses as $i => $address) {
+				$emailaddresses[$i] = trim($address);
+				if (trim($address) == "")
+					continue;
+				$cmd = $java . " -jar " . $emailer;
+				$cmd .= " -s \"$subject\"";
+				$cmd .= " -f \"noreply@schoolmessenger.com\"";
+				$cmd .= " -t \"" . trim($address) . "\"";
+				$process = popen($cmd, "w");
+				fwrite($process, $body);
+				fclose($process);
+			}
+			print implode(";", $emailaddresses) . "\n" .  $subject . "\n" . $body . "\n";
+
+			// Update database
+			$alertoptions['lastnotified'] = $currenttimestamp;
 			$importalerturl = http_build_query($alertoptions, false, "&");
-			mysql_query("update import set alertoptions = '" . mysql_escape_string($importalerturl) . "' where id = " . $import[0], $custdb);
+			mysql_query("UPDATE import SET alertoptions='" . mysql_escape_string($importalerturl) . "' WHERE id = " . $import['id']);
+		// No alerts found
+		} else {
+			print "Nothing to worry about.\n";
 		}
 	}
 }
 
-foreach($emailmessages as $address => $messages){
-	echo "Sending alert to " . $address . "\n";
-	//implode all the messages together and write it to a file so that new lines are executed correctly
-	//then read the file back into a temp variable and output to command line
-	$body = implode("\n", $messages);
-	if(!$tempfile = secure_tmpname()){
-		exit("Failed to create temp file name\n");
-	}
-	if(!$fp = fopen($tempfile, "w")){
-		exit("Failed to open temp file: " . $tempfile . "\n");
-	}
-	fwrite($fp, $body);
-	fclose($fp);
-	if($body == ""){
-		echo "Body is empty\n";
-		continue;
-	}
-	$cmd = "cat " . $windows . $tempfile . " | ";
-	$cmd .= "java -jar " . $simpleemailerpath . "simpleemail.jar ";
-	$cmd .= "-s \"Import Alerts\" ";
-	$cmd .= "-f noreply@schoolmessenger.com ";
-	$cmd .= "-t \"$address\" ";
-	$result = exec($cmd);
-	unlink($tempfile);
-}
-
-echo "Finished sending out alerts";
-
-function generateMessage($emailmessages, $emaillist, $message){
-	foreach($emaillist as $email){
-		//trip all emails before using
-		$email = trim($email);
-		if(!isset($emailmessages[$email])){
-			$emailmessages[$email] = array();
-		}
-		$emailmessages[$email][] = $message;
-	}
-	return $emailmessages;
-}
-
-// use sane_parsestr since old parse_str has a bug in an old version of php
+//----------------------------------
 function sane_parsestr($url) {
 	$data = array();
 	if($url == "")
@@ -195,27 +176,5 @@ function sane_parsestr($url) {
 	}
 
 	return $data;
-}
-
-function secure_tmpname($prefix = 'tmp', $postfix = '.dat') {
-	$dir = "/tmp";
-
-   // validate arguments
-	if (! (isset($postfix) && is_string($postfix))) {
-		return false;
-	}
-	if (! (isset($prefix) && is_string($prefix))) {
-		return false;
-	}
-
-	$filename = $dir . "/" . $prefix . microtime(true) . mt_rand() . $postfix;
-
-	$fp = fopen($filename, "w");
-	if(file_exists($filename)){
-		fclose($fp);
-		return $filename;
-	} else {
-	   return false;
-	}
 }
 ?>

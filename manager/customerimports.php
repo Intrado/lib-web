@@ -4,6 +4,12 @@ include_once("../inc/formatters.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 
+$staledataleewayhours = 1;
+$defaultwindowminutes = 10;
+define('SECONDSPERHOUR', 3600);
+define('SECONDSPERMINUTE', 60);
+define('HOURSPERDAY', 24);
+
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
@@ -13,51 +19,75 @@ function fmt_alert_timestamp($row, $index) {
 	$timestamp = strtotime($row[$index]);
 	if ($timestamp === false) {
 		return "<div style='background-color: #ff0000'>- Never -</div>";
+	// 3 Days Old
 	} else {
-		if ($timestamp < time() - 60 * 60 * 24 * 3)
+		if ($timestamp < time() - SECONDSPERHOUR * HOURSPERDAY * 3)
 			return "<div style='background-color: #FFFF00'>" . fmt_date($row, $index) . "</div>";
 		else
 			return fmt_date($row, $index);
 	}
 }
 //row index 13 contains an array of alert options
-function fmt_last_modified($row, $index){
+function fmt_last_modified($row, $index) {
+	global $staledataleewayhours;
+	global $defaultwindowminutes;
 	date_default_timezone_set($row[2]);
 	$timestamp = strtotime($row[$index]);
-	$scheduledDow=array();
-	if(isset($row[13]['dow'])){
-		$scheduledDow = array_flip(explode(",", $row[13]['dow']));
-	}
-
 	if ($timestamp === false) {
 		return "<div style='background-color: #ff0000'>- Never -</div>";
 	} else {
-		if(isset($row[13]['daysold']) && $row[13]['daysold'] && ($timestamp < time() - 60*60*24* $row[13]['daysold'])){
-			return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
-		} else if(isset($row[13]['dow'])){
-			//if dow is set (schedule is set)
+		// Stale Data
+		if (isset($row[13]['daysold']) && $row[13]['daysold']) {
+			$timediffallowed = ($row[13]['daysold'] * HOURSPERDAY * SECONDSPERHOUR) + ($staledataleewayhours * SECONDSPERHOUR);
+			$timediff = time() - $timestamp;
+			if ($timediff > $timediffallowed)
+				return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
+		// Scheduled Days
+		} else if(isset($row[13]['dow'])) {
+			if (!isset($row[13]['scheduledwindowminutes']))
+				$row[13]['scheduledwindowminutes'] = $defaultwindowminutes;
+			$daytocheck =  date('w', time() - ($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE));
+
+			// ['dow'] is a string of possibly more than one days
+			if (strpos($row[13]['dow'], $daytocheck) !== false) {
+				$timestampforscheduledday = strtotime($row[13]['time'] . ":00 " . date("F d, Y", time() - ($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE)));
+				$lowerbound = $timestampforscheduledday - ($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE);
+				// Check for the alert only if the current time is past the scheduled time window
+				if ($lowerbound <= time() - 2*($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE)) {
+					$diffuploadtime = $timestamp - $lowerbound;
+					if ($diffuploadtime < 0 || $diffuploadtime > 2*($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE))
+						return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
+				}
+			}
+/******
 			//find the last weekday it should have run, including today.
 			//if the last scheduled run is later than last run, display error
-			$currentdow=date("w")+1;
+			$scheduleddays=array();
+			if(isset($row[13]['dow']))
+			$scheduleddays = array_flip(explode(",", $row[13]['dow']));
+
 			$daysago = 0;
 			if(strtotime($row[13]['time']) > strtotime("now")){
-				$currentdow--;
+				$daytocheck--;
 				$daysago++;
 			}
 
-			while(!isset($scheduledDow[$currentdow])){
+			while(!isset($scheduleddays[$daytocheck])){
 				$daysago++;
-				$currentdow--;
-				if($currentdow < 1){
-					$currentdow = $currentdow+7;
+				$daytocheck--;
+				if($daytocheck < 1){
+					$daytocheck = $daytocheck+7;
 				}
 			}
+
 			//calculate unix time and allow 15 min leeway
 			$scheduledlastrun = strtotime(" -$daysago days " . $row[13]['time']) - (60*15);
 			if($scheduledlastrun > $timestamp){
 				return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
 			}
-		} else if ($timestamp < time() - 60*60*24*3){
+******/
+		// 3 Days Old
+		} else if ($timestamp < time() - SECONDSPERHOUR * HOURSPERDAY * 3) {
 			return "<div style='background-color: #FFFF00'>" . fmt_date($row, $index) . "</div>";
 		}
 
