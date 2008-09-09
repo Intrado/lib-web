@@ -1492,3 +1492,10 @@ $$$
 
 ALTER TABLE `enrollment` ADD INDEX `staffid` ( `c01` )
 $$$
+ALTER TABLE `userrule` ADD INDEX ( `userid` )
+$$$
+ALTER TABLE `user` ADD INDEX ( `staffpkey` )
+$$$
+ALTER TABLE `enrollment` ADD INDEX ( `personid` )
+$$$
+
