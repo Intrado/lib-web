@@ -115,7 +115,6 @@ if(CheckFormSubmit($f,$s))
 			$USER->phone = Phone::parse(GetFormData($f,$s,"phone"));
 			$USER->email = $email;
 			$USER->aremail = $emaillist;
-			$USER->staffpkey = GetFormData($f,$s,"staffpkey");
 			$USER->update();
 
 			// If the password is all 0 characters then it was a default form value, so ignore it
@@ -195,8 +194,7 @@ if( $reloadform )
 			array("firstname","text",1,50,true),
 			array("lastname","text",1,50,true),
 			array("email","email"),
-			array("aremail", "text"),
-			array("staffpkey", "text")
+			array("aremail", "text")
 			);
 
 	PopulateForm($f,$s,$USER,$fields);
@@ -360,17 +358,6 @@ startWindow('User Information');
 								} ?>
 								</td>
 							</tr>
-							<tr>
-								<td align="right">Staff ID:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $USER->staffpkey;
-								} else {
-									NewFormItem($f,$s, 'staffpkey', 'text', 20,255);
-								} ?>
-								</td>
-							</tr>
-
 						</table>
 
 <? /*CSDELETEMARKER_START*/
