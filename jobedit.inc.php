@@ -977,14 +977,7 @@ startWindow('Job Information');
 	</tr>
 <? } ?>
 </table>
-<?
-endWindow();
 
-buttons();
-EndForm();
-include_once("navbottom.inc.php");
-
-?>
 <script language="javascript">
 	var displaysettingsdetailsstate = 'visible';
 	var displayphonedetailsstate = 'visible';
@@ -1038,7 +1031,10 @@ include_once("navbottom.inc.php");
 		if(phonecheck){
 			show('phoneoptions');
 <?
-	$diffvalues = $job->compareWithDefaults();
+
+	if ($_SESSION['jobid'] != null) {
+		$diffvalues = $job->compareWithDefaults();
+	}
 	if (isset($diffvalues['phonelang']) ||
 		isset($diffvalues['maxcallattempts']) ||
 		isset($diffvalues['callerid']) ||
@@ -1062,7 +1058,9 @@ include_once("navbottom.inc.php");
 		if(emailcheck){
 			show('emailoptions');
 <?
-	$diffvalues = $job->compareWithDefaults();
+	if ($_SESSION['jobid'] != null) {
+		$diffvalues = $job->compareWithDefaults();
+	}
 	if (isset($diffvalues['emaillang']) ||
 		isset($diffvalues['skipemailduplicates'])
 		) {
@@ -1080,7 +1078,9 @@ include_once("navbottom.inc.php");
 	if( phonecheck || emailcheck || smscheck ){
 		show('settings');
 <?
-	$diffvalues = $job->compareWithDefaults();
+	if ($_SESSION['jobid'] != null) {
+		$diffvalues = $job->compareWithDefaults();
+	}
 	if (isset($diffvalues['startdate']) ||
 		isset($diffvalues['enddate']) ||
 		isset($diffvalues['starttime']) ||
@@ -1278,3 +1278,9 @@ function display_jobtype_info(value){
 ?>
 }
 </script>
+<?
+endWindow();
+buttons();
+EndForm();
+include_once("navbottom.inc.php");
+?>
