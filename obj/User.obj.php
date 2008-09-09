@@ -115,6 +115,16 @@ class User extends DBMappedObject {
 		else
 			return false;
 	}
+	//see if the Staff ID is used
+	function checkDuplicateStaffID ($newstaffid, $id) {
+		$newstaffid = DBSafe($newstaffid);
+		if ($newstaffid == "") return false;
+
+		if (QuickQuery("select count(*) from user where id!=" . (0+ $id) . " and staffpkey='$newstaffid' and deleted=0") > 0 )
+			return true;
+		else
+			return false;
+	}
 
 
 

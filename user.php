@@ -143,8 +143,12 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$password = trim(GetFormData($f, $s, "password"));
 		$passwordconfirm = trim(GetFormData($f, $s, "passwordconfirm"));
-
 		$login = trim(GetFormData($f, $s, 'login'));
+		if (GetFormData($f, $s, "radioselect") == "bydata") {
+			$staffid = "";
+		} else {
+			$staffid = trim(GetFormData($f, $s, 'staffid'));
+		}
 
 		// If a user has also submitted dataview rules then prepare an error message in case
 		//	those rules get lost, which is what happens when there is an error() call below.
@@ -153,7 +157,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		} else {
 			$extraMsg= "";
 		}
-				// do check
+		// do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
 		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($password=="") && ($passwordconfirm=="")) {
@@ -174,6 +178,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
 		} elseif (User::checkDuplicateLogin($login, $_SESSION['userid'])) {
 			error('This username already exists, please choose another' . $extraMsg);
+		} elseif (User::checkDuplicateStaffID($staffid, $_SESSION['userid'])) {
+			error('This staff ID already exists, please choose another' . $extraMsg);
 		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $_SESSION['userid'])) {
 			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid']);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
@@ -221,25 +227,37 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 					$usr->ldap=0;
 				}
 			}
+			$usr->update(); // create or update the user
 
+			// we need a user id for this
 			if (GetFormData($f, $s, "radioselect") == "bydata") {
-				$usr->staffpkey = "";
-			} else { // bystaff
-				if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-					// if it was bydata and now bystaff, create the user rule
-					$rule = new Rule();
-					$rule->logical = "and";
-					$rule->op = "in";
-					$rule->val = GetFormData($f,$s,"staffid");
-					$rule->fieldnum = "c01";
-					$rule->create();
-
-					$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
+				if (strlen($usr->staffpkey) > 0) {
+					// if it was bystaff and now bydata, remove old c01 rule
+					$query = "delete r,ur from rule r inner join userrule ur on (ur.ruleid=r.id) where ur.userid=$usr->id and r.fieldnum='c01'";
 					Query($query);
 				}
-				$usr->staffpkey = GetFormData($f, $s, "staffid");
+				$usr->staffpkey = "";
+			} else { // bystaff
+				// remove any existing c01 rule
+				$query = "delete r,ur from rule r inner join userrule ur on (ur.ruleid=r.id) where ur.userid=$usr->id and r.fieldnum='c01'";
+				Query($query);
+
+				// create the c01 rule based on current staffid
+				$rule = new Rule();
+				$rule->logical = "and";
+				$rule->op = "in";
+				$rule->val = $staffid;
+				$rule->fieldnum = "c01";
+				$rule->create();
+
+				$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
+				Query($query);
+
+				// set current staffid
+				$usr->staffpkey = $staffid;
 			}
 
+			// update again for staffid
 			$usr->update();
 
 			QuickUpdate("delete from userjobtypes where userid = $usr->id");
@@ -361,7 +379,7 @@ if( $reloadform )
 		}
 		PutFormData($f,$s,"ldap",(bool)$checked, "bool", 0, 1);
 	}
-	PutFormData($f,$s,"newrulefieldnum","");
+	PutFormData($f,$s,"newrulefieldnum","-1");
 	PutFormData($f,$s,"newruletype","text","text",1,50);
 	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
 	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
@@ -693,10 +711,20 @@ startWindow('User Information');
 <script language="javascript">
 
 <?
-if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-	?>hide("bystaff"); hide("mustapply");<?
+if (GetFormData($f, $s, "radioselect") == "bydata") {
+	?>hide("bystaff");<?
+	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+		?>show("ruleform"); hide("mustapply");<?
+	} else {
+		?>hide("ruleform"); show("mustapply");<?
+	}
 } else {
-	?>hide("mustapply");<?
+	?>show("bystaff");<?
+	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+		?>hide("ruleform"); show("mustapply");<?
+	} else {
+		?>show("ruleform"); hide("mustapply");<?
+	}
 }
 ?>
 
