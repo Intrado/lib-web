@@ -432,7 +432,7 @@ startWindow('User Information');
 								<td align="right">Last Name:</td>
 								<td colspan="4">
 								<? if ($readonly) {
-									echo $usr->firstname;
+									echo $usr->lastname;
 								} else {
 									NewFormItem($f,$s, 'lastname', 'text', 20, 50);
 								} ?>
