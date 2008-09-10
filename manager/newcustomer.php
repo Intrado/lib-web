@@ -84,7 +84,7 @@ if (CheckFormSubmit($f,$s)){
 				$logofile = true;
 			}
 
-			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' where enabled")) {
+			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' and enabled=1")) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if(!$accountcreator->runCheck($managerpassword)) {
 				error('Bad Manager Password');
