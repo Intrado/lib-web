@@ -93,6 +93,9 @@
   <key name="block number" >
     <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
   </key>
+  <key name="log" >
+    <topic name="Phone Logs" url="reports/understanding_call_logs.htm" />
+  </key>
   <key name="message" >
     <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
     <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
@@ -144,6 +147,7 @@
   <key name="email" >
     <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
     <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+    <topic name="Email Logs" url="reports/email_logs.htm" />
   </key>
   <key name="filter options" >
     <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />

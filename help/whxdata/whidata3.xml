@@ -11,9 +11,20 @@
   </key>
   <key name="playing" >
     <topic name="Recipient Responses" url="receiving_responses/reviewing_your_response_messages.htm" />
+    <topic name="Phone Logs" url="reports/understanding_call_logs.htm" />
   </key>
   <key name="survey" >
     <topic name="Recipient Responses" url="receiving_responses/reviewing_your_response_messages.htm" />
+  </key>
+</key>
+<key name="SMS" >
+  <topic name="SMS Logs" url="reports/sms_logs.htm" />
+  <topic name="Creating a New Job Using the Job Editor" url="creating_a_notification_job/creating_a_new_job.htm" />
+  <key name="job" >
+    <topic name="Creating a New Job Using the Job Editor" url="creating_a_notification_job/creating_a_new_job.htm" />
+  </key>
+  <key name="log" >
+    <topic name="SMS Logs" url="reports/sms_logs.htm" />
   </key>
 </key>
 <key name="Survey" >

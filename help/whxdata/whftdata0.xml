@@ -43,23 +43,28 @@
 <topic name="Remote Telephony Appliance Overview" url="remote_telephony_appliance/remote_telephony_appliance_overview.htm" />
 <topic name="Call Distribution Report" url="reports/call_distribution_report.htm" />
 <topic name="Contact History Report" url="reports/contact_history_report.htm" />
+<topic name="Email Logs" url="reports/email_logs.htm" />
 <topic name="Using the Report Builder" url="reports/querying_report_data.htm" />
 <topic name="Reports Overview" url="reports/reports.htm" />
 <topic name="Saving and Scheduling Reports" url="reports/saving_and_scheduling_reports.htm" />
+<topic name="SMS Logs" url="reports/sms_logs.htm" />
 <topic name="SMS Reports" url="reports/sms_reports.htm" />
 <topic name="Notification Summaries" url="reports/standard_job_reports.htm" />
 <topic name="Survey Reports" url="reports/survey_job_reports.htm" />
-<topic name="Phone and Email Log Reports" url="reports/understanding_call_logs.htm" />
+<topic name="Phone Logs" url="reports/understanding_call_logs.htm" />
 <topic name="Usage Stats Report" url="reports/usage_stats_report.htm" />
 <topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
 <topic name="Step-by-Step:Send a Job with EasyCall" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
 <topic name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
 <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
 <topic name="Contact Settings" url="the_admin_tab/contact_settings.htm" />
+<topic name="Destination Labels" url="the_admin_tab/destination_labels.htm" />
+<topic name="Job" url="the_admin_tab/job.htm" />
 <topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
 <topic name="Managing Systemwide Settings" url="the_admin_tab/managing_systemwide_settings.htm" />
 <topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
 <topic name="Settings" url="the_admin_tab/settings.htm" />
+<topic name="System" url="the_admin_tab/system.htm" />
 <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
 <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
 <topic name="Bulk Activation Code Management" url="the_contact_manager/bulk_activation_code_management.htm" />

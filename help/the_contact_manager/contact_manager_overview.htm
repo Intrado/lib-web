@@ -14,8 +14,20 @@ if (navigator.appName !="Netscape")
 <!--
 div.whs1 { width:100%; }
 ul.whs2 { list-style:disc; }
+p.whs3 { font-size:xx-small; }
 -->
-</style><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+</style><script type="text/javascript" language="JavaScript">
+<!--
+if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
+{
+  var strNSS = "<style type='text/css'>";
+  strNSS += "p.whs3 {font-size:x-small; }";
+  strNSS +="</style>";
+  document.write(strNSS);
+}
+//-->
+</script>
+<script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
 <!--
 function reDo() {
   if (innerWidth != origWidth || innerHeight != origHeight)
@@ -83,10 +95,10 @@ else
  <p><a href="javascript:top.window.close()">Exit Help</a></p>
 </div>
 <h1>Contact Manager Overview</h1>
-<p>The Contact Manager is an extra feature which enables your message recipients 
- to control the ways in which they may be contacted and manage their contact 
- information. For more information regarding this feature, please contact 
- your SchoolMessenger representative at 1-800-527-5225.</p>
+<p>The Contact Manager is a special feature which enables your message 
+ recipients to control the ways in which they may be contacted and manage 
+ their contact information. For more information regarding this feature, 
+ please contact your SchoolMessenger representative at 1-800-527-5225.</p>
 <p>If you already have Contact Manager on your account, use the following 
  topics to help you manage your Contact Manager users.</p>
 <ul type="disc" class="whs2">
@@ -97,6 +109,14 @@ else
 	<li class=p><p><a HREF="contact_manager_settings.htm">Contact Manager 
  Settings</a></p></li>
 </ul>
+<p>Additionally, you may download the <a HREF="../contactmanagerwelcomepack.zip">Contact 
+ Manager Welcome Package</a> which contains detailed instructions for site 
+ administrators and system administrators as well as form letters for distributing 
+ activation codes. </p>
+<div placeholder id="footer" class="whs1">
+ <p class="whs3"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©2008 
+ Reliance Communications, Inc.</font></span></p>
+</div>
 <script type="text/javascript" language="javascript1.2">
 <!--
 highlightSearch();

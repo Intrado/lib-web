@@ -13,10 +13,22 @@ if (navigator.appName !="Netscape")
 <style type="text/css">
 <!--
 div.whs1 { width:100%; }
-img_whs2 { border:none; width:400px; height:292px; float:none; border-style:none; }
+img_whs2 { border:none; border-style:none; width:400px; height:259px; float:none; }
 p.whs3 { margin-left:40px; }
+p.whs4 { font-size:xx-small; }
 -->
-</style><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+</style><script type="text/javascript" language="JavaScript">
+<!--
+if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
+{
+  var strNSS = "<style type='text/css'>";
+  strNSS += "p.whs4 {font-size:x-small; }";
+  strNSS +="</style>";
+  document.write(strNSS);
+}
+//-->
+</script>
+<script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
 <!--
 function reDo() {
   if (innerWidth != origWidth || innerHeight != origHeight)
@@ -86,7 +98,7 @@ else
 <h1>Managing Your Account Settings</h1>
 <p>You may edit your account preferences by clicking on the Account link 
  at the top of any screen. You will be taken to the page shown below. &nbsp;</p>
-<p><img src="../accountsettings.gif" alt="The User Information Screen" x-maintain-ratio="TRUE" width="400px" height="292px" border="0" class="img_whs2"></p>
+<p><img src="../accountsettings.gif" alt="The Account Settings Screen" x-maintain-ratio="TRUE" width="400px" height="259px" border="0" class="img_whs2"></p>
 <p>You may use this screen to change most of your account settings. Settings 
  you may edit are:</p>
 <p class="whs3">First Name - Your first name.</p>
@@ -98,9 +110,12 @@ else
  may need use to log into the phone system for Remote Access. </p>
 <p class="whs3">Telephone PIN Code # - The PIN code that 
  you use to log into the phone system.</p>
-<p class="whs3">Email(s) - Any email addresses you wish to 
- use to receive reports. If you would like to include multiple email addresses, 
- separate them with commas.</p>
+<p class="whs3">Email(s) - Your email address. You must enter 
+ an email address to use the reset password feature should you forget your 
+ password.</p>
+<p class="whs3">Auto Report Email(s) -Any email addresses 
+ that will receive reports when your jobs are completed. Multiple email 
+ addresses may be separated with a comma or semicolon.</p>
 <p class="whs3">Phone - The phone number where you can be 
  reached directly.</p>
 <p class="whs3">Default Delivery Window - The earliest and 
@@ -128,6 +143,10 @@ else
  controls how much of your primary color is blended with the shaded areas 
  in the interface. An example shaded area can be seen on the left side 
  of the image above. </p>
+<div placeholder id="footer" class="whs1">
+ <p class="whs4"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©2008 
+ Reliance Communications, Inc.</font></span></p>
+</div>
 <script type="text/javascript" language="javascript1.2">
 <!--
 highlightSearch();

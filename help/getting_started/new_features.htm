@@ -15,8 +15,20 @@ if (navigator.appName !="Netscape")
 div.whs1 { width:100%; }
 p.whs2 { font-weight:normal; }
 ul.whs3 { list-style:disc; }
+p.whs4 { font-size:xx-small; }
 -->
 </style><script type="text/javascript" language="JavaScript">
+<!--
+if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
+{
+  var strNSS = "<style type='text/css'>";
+  strNSS += "p.whs4 {font-size:x-small; }";
+  strNSS +="</style>";
+  document.write(strNSS);
+}
+//-->
+</script>
+<script type="text/javascript" language="JavaScript">
 <!--
 function ehlp_showtip(current,e,text)
 {
@@ -118,12 +130,29 @@ else
  languages in the same <a title="Click to learn more about Multilingual TTS messages." href="../creating_a_message/creating_an_advanced_phone_message.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Multilingual TTS messages.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">message</a> 
  to enhance pronunciation and message clarity.</p></li>
 	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Message 
- Confirmation</B></span> - You may now request a confirmation of your message. 
- Recipients may press 1 for &quot;yes&quot; or 2 for &quot;no&quot;.</p></li>
+ Confirmation</B></span> - You may now request a confirmation of your message 
+ while you are setting up a job. Recipients may press 1 for &quot;yes&quot; 
+ or 2 for &quot;no&quot;.</p></li>
 	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Message 
  Playback from Reports</B></span> - When looking at the Phone Log for a job 
  in which the recipients were asked to record a message, you may now view 
  and listen to their responses from within the report.</p></li>
+	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Phone 
+ Sequence added to Reports</B></span> - &nbsp;Instead of simply 
+ displaying the phone number that was called, <a title="Click to read more about Phone Logs." href="../reports/understanding_call_logs.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about Phone Logs.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Phone Logs</a> additionally 
+ indicates which phone sequence number, for example, Phone 3, that the 
+ number is assigned to and the destination label. </p></li>
+	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Improved 
+ Contact Database Interface</B></span> - When a contact's information has been 
+ edited in the Contact Information screen and the Override checkbox has 
+ been selected, the overridden destination will be protected during subsequent 
+ data imports. When this feature has been selected, a padlock icon will 
+ appear next to the locked information on the contact database screen.</p></li>
+	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Enhanced 
+ Job Editor</B></span> - Now the <a title="Click to read more about Job Type descriptions." href="../the_admin_tab/settings.htm#Job_Types" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about Job Type descriptions.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Job Type</a> description 
+ text displays in the <a title="Click to read more about the Job Editor." href="../creating_a_notification_job/creating_a_new_job.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about the Job Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Job Editor</a>, 
+ next to the Job Type. Additionally, when you select the &quot;Emergency&quot; 
+ job type, the selection box will be outlined in red.</p></li>
 </ul>
 <p class="whs2">Version 5.2</p>
 <ul type="disc" class="whs3">
@@ -195,6 +224,10 @@ else
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
+<div placeholder id="footer" class="whs1">
+ <p class="whs4"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©2008 
+ Reliance Communications, Inc.</font></span></p>
+</div>
 <script type="text/javascript" language="JavaScript">
 <!--
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
