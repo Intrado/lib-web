@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Enrollment_Field_Definitions
+Create new fields in the system's database for your custom enrollment metadata here. Enrollment metadata includes information such as Section, Course, Teacher Name, or Building.

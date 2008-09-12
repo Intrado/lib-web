@@ -190,15 +190,17 @@ include_once("nav.inc.php");
 NewForm($form);
 if (!$IMPORT->id) {
 	buttons(submit($form, $section));
+	$hover = "ImportEditor_Settings";
 } else {
 	buttons(submit($form, $section), submit($form, 'mapfields', 'Map Fields'));
+	$hover = "ImportEditor_EditSettings";
 }
 startWindow('Import Information ');
 ?>
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Settings:<br><? print help('ImportEditor_Settings'); ?></th>
+		<th align="right" class="windowRowHeader bottomBorder">Settings:<br><? print help($hover); ?></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>

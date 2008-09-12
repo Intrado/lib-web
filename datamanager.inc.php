@@ -240,12 +240,15 @@ $PAGE = "admin:settings";
 switch ($DATATYPE) {
 case "person" :
 $TITLE = "Field Definitions";
+$hover = "DataManager_Fields";
 break;
 case "group" :
 $TITLE = "Group Field Definitions";
+$hover = "DataManager_GFields";
 break;
 case "schedule" :
 $TITLE = "Enrollment Field Definitions";
+$hover = "DataManager_CFields";
 break;
 }
 
@@ -253,7 +256,7 @@ include_once("nav.inc.php");
 
 NewForm($form);
 buttons(submit($form, $section, 'Save'));
-startWindow('Fields ' . help('DataManager_Fields'), 'padding: 3px;');
+startWindow('Fields ' . help($hover), 'padding: 3px;');
 ?>
 
 <table cellpadding="3" cellspacing="1" class="list" width="100%">
