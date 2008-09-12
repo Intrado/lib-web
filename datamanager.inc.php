@@ -42,7 +42,8 @@ if (isset($_GET['clear'])) {
 switch ($DATATYPE) {
 case "person" :
 	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,language', 'multisearch,grade',
-						 'text,firstname', 'text,lastname', 'grade', 'firstname', 'lastname', 'language');
+						 'text,firstname', 'text,lastname', 'grade', 'firstname', 'lastname', 'language',
+						 'multisearch,school', 'school');
 	$numfields = 20;
 	$dt = "f%";
 break;
@@ -283,6 +284,8 @@ case "person" :
 			$types["Language"] = 'multisearch,language';
 		if(!FieldMap::getGradeField())
 			$types["Grade"] = 'multisearch,grade';
+		if(!FieldMap::getSchoolField())
+			$types["School"] = 'multisearch,school';
 break;
 case "group" :
 		$types = array("List" => 'multisearch');
