@@ -26,7 +26,9 @@ class ReportGenerator {
 
 	function generate($options = null){
 		$result = "";
-		$this->generateQuery();
+		$hackPDF = false; // used for Gfields display
+		if ($this->format == "pdf") $hackPDF = true;
+		$this->generateQuery($hackPDF);
 
 		switch($this->format){
 			case 'html':
@@ -65,7 +67,10 @@ class ReportGenerator {
 
 		$active = array();
 		foreach($activefields as $index){
-			$newindex = preg_replace("{f}", "", $index);
+			$newindex = substr($index, 1);
+			if (strpos($index, "g") === 0) {
+				$newindex = 20 + substr($index, 1);
+			}
 			$active[$newindex] = new XML_RPC_VALUE("true", 'string');
 		}
 		if(count($active) == 0)
@@ -83,6 +88,7 @@ class ReportGenerator {
 	function generateXmlParams(){
 		global $USER;
 		$params = array();
+		// Ffields
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
 		foreach($fields as $field){
@@ -92,6 +98,18 @@ class ReportGenerator {
 			$newindex = preg_replace("{f}", "flex_title_", $index);
 			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
 		}
+		// Gfields
+		$fields = FieldMap::getOptionalAuthorizedFieldMapsLike("g%");
+		$fieldlist = array();
+		foreach($fields as $field){
+			$fieldlist[$field->fieldnum] = $field->name;
+		}
+		foreach($fieldlist as $index => $title){
+			$index = 20 + substr($index,1); // strip the g and add twenty
+			$newindex = "flex_title_".$index;
+			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
+		}
+		// more params
 		$specificparams = $this->getReportSpecificParams();
 		if(count($specificparams)){
 			foreach($specificparams as $index => $value){

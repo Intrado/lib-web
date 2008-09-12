@@ -2,7 +2,7 @@
 
 class JobDetailReport extends ReportGenerator{
 
-	function generateQuery(){
+	function generateQuery($hackPDF = false){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
@@ -91,7 +91,7 @@ class JobDetailReport extends ReportGenerator{
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
 		$fieldquery = generateFields("rp");
-		$gfieldquery = generateGFieldQuery("rp.personid", $joblist);
+		$gfieldquery = generateGFieldQuery("rp.personid", $joblist, $hackPDF);
 		$this->query =
 			"select SQL_CALC_FOUND_ROWS
 			j.name as jobname,
