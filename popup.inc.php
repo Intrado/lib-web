@@ -26,10 +26,7 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 <!-- ********************************************************************* -->
 
 <?
-	if($clickurl = getSystemSetting('_logoclickurl'))
-		$logo =  '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php"></a>';
-	else
-		$logo = '<img src="logo.img.php">';
+	$logo = '<img src="logo.img.php">';
 ?>
 
 
