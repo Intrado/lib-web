@@ -1265,10 +1265,10 @@ function display_jobtype_info(value){
 		var addinfo = new getObj("addinfo").obj;
 
 		if(jobtypeinfo[value][0] == 1){
-			addinfo.innerHTML = "Phone calls will be sent out on the hosted system";
+			addinfo.innerHTML = "High capacity emergency call routing";
 
 		} else {
-			addinfo.innerHTML = "Phone calls will be sent out by your Flex Appliance";
+			addinfo.innerHTML = "Standard call routing";
 		}
 	if(value == ""){
 		new getObj("addinfo").obj.innerHTML ="";
