@@ -81,7 +81,7 @@ if(!$success){
 			<td>&nbsp;</td>
 			<td>
 				<div style="margin:5px; font-size:12px">
-					Check your email to receive the password reset link.
+					Check your email to receive the password reset link.  If you do not recieve an email within 24 hours, please contact your System Administrator for help.
 					<br>You will be redirected to the reset password page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a>
 				</div>
 				<meta http-equiv="refresh" content="10;url=index.php?f">
