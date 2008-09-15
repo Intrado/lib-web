@@ -148,6 +148,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			$import->description = substr("list (" . $list->name . ")", 0,50);
 			$import->status = "idle";
 			$import->type = "list";
+			$import->datatype = "person";
 			$import->scheduleid = NULL;
 			$import->ownertype = "user";
 			$import->updatemethod = "full";
