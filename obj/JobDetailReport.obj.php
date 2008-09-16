@@ -406,17 +406,16 @@ class JobDetailReport extends ReportGenerator{
 			}
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
-
 			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9],fmt_confirmation($row, 14));
 			//index 15 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
 					if (strpos($fieldnum, "g") === 0) {
-						$num = 20 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname, lastname, 18 more ffields)
+						$num = 18 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname/lastname excluded, 18 more ffields)
 					} else {
 						$num = $fieldindex[$fieldnum]; // ffield
 					}
-					$reportarray[] = $row[15+$num];
+					$reportarray[] = $row[17+$num]; // 15 is last index, plus 2 for first/lastname, $num starts at 1 for f03
 				}
 			}
 			if ($issurvey) {
