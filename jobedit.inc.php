@@ -1035,13 +1035,14 @@ startWindow('Job Information');
 	if ($_SESSION['jobid'] != null) {
 		$diffvalues = $job->compareWithDefaults();
 	}
-	if (isset($diffvalues['phonelang']) ||
+	if ((isset($diffvalues['phonelang']) ||
 		isset($diffvalues['maxcallattempts']) ||
 		isset($diffvalues['callerid']) ||
 		isset($diffvalues['skipduplicates']) ||
 		isset($diffvalues['leavemessage']) ||
 		isset($diffvalues['messageconfirmation'])
-		) {
+		) ||
+		($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling")) {
 		?> displayphonedetailsstate = 'hidden'; <?
 	}
 ?>
@@ -1061,9 +1062,10 @@ startWindow('Job Information');
 	if ($_SESSION['jobid'] != null) {
 		$diffvalues = $job->compareWithDefaults();
 	}
-	if (isset($diffvalues['emaillang']) ||
+	if ((isset($diffvalues['emaillang']) ||
 		isset($diffvalues['skipemailduplicates'])
-		) {
+		) ||
+		($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling")) {
 		?> displayemaildetailsstate = 'hidden'; <?
 	}
 ?>
@@ -1081,12 +1083,13 @@ startWindow('Job Information');
 	if ($_SESSION['jobid'] != null) {
 		$diffvalues = $job->compareWithDefaults();
 	}
-	if (isset($diffvalues['startdate']) ||
+	if ((isset($diffvalues['startdate']) ||
 		isset($diffvalues['enddate']) ||
 		isset($diffvalues['starttime']) ||
 		isset($diffvalues['endtime']) ||
 		isset($diffvalues['sendreport'])
-		) {
+		) ||
+		($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling")) {
 		?> displaysettingsdetailsstate = 'hidden'; <?
 	}
 ?>
