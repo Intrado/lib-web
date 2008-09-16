@@ -44,6 +44,12 @@ H1 {
     font-weight:bold;  }
 LI.H1 { 
        font-size:18pt;  }
+P { 
+   margin-left:40px; 
+   font-family:"Lucida Grande"  , Verdana, Arial, Helvetica, sans-serif; 
+   font-size:10pt; 
+   color:#595959;  }
+LI.P {  }
 ul { 
     color:#595959;  }
 ol { 

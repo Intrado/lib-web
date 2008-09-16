@@ -93,8 +93,8 @@
   <item name="Generate an Individual Activation Code" url="the_contact_manager/generate_an_individual_activation_code.htm" />
   <item name="Contact Manager Settings" url="the_contact_manager/contact_manager_settings.htm" />
 </book>
-<book name="Remote Telephony Appliance" >
-  <item name="Configuring a Hybrid System" url="remote_telephony_appliance/configuring_a_hybrid_system.htm" />
+<book name="Flex Appliance" >
+  <item name="Configuring the Flex Appliance" url="remote_telephony_appliance/configuring_a_hybrid_system.htm" />
 </book>
 
 </tocdata>

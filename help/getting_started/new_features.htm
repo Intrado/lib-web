@@ -13,16 +13,20 @@ if (navigator.appName !="Netscape")
 <style type="text/css">
 <!--
 div.whs1 { width:100%; }
-p.whs2 { font-weight:normal; }
-ul.whs3 { list-style:disc; }
-p.whs4 { font-size:xx-small; }
+p.whs2 { margin-left:0px; }
+p.whs3 { font-weight:normal; }
+ul.whs4 { list-style:disc; }
+p.whs5 { margin-left:0px; font-weight:bold; }
+p.whs6 { font-size:xx-small; }
 -->
 </style><script type="text/javascript" language="JavaScript">
 <!--
 if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
 {
   var strNSS = "<style type='text/css'>";
-  strNSS += "p.whs4 {font-size:x-small; }";
+  strNSS += "p.whs2 {margin-left:1pt; }";
+  strNSS += "p.whs5 {margin-left:1pt; }";
+  strNSS += "p.whs6 {font-size:x-small; }";
   strNSS +="</style>";
   document.write(strNSS);
 }
@@ -115,47 +119,82 @@ else
  <p><a href="javascript:top.window.close()">Exit Help</a></p>
 </div>
 <h1>New Features</h1>
-<p>We've added several new features to enhance security, productivity, 
- and user experience including:</p>
-<p class="whs2">Version 6.0</p>
-<ul type="disc" class="whs3">
-	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Remote 
+<p class="whs2">We've added several new features to enhance 
+ security, productivity, and user experience including:</p>
+<p class="whs3">Version 6.1</p>
+<ul type="disc" class="whs4">
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Simplified 
+ Job Editor</B></span> - <a title="Click to learn more about creating a job with the Job Editor." href="../creating_a_notification_job/creating_a_new_job.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating a job with the Job Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Creating 
+ a job with the Job Editor</a> is easier than ever. The Job Editor now 
+ displays the most basic elements required for sending a job, greatly simplifying 
+ the process of sending a message. Advanced scheduling and multilingual 
+ options are still easily accessible as Advanced Options in the editor.</p></li>
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>User 
+ Data Imports</B></span> - Setting up and maintaining users can now be done 
+ with a <a title="Click to learn more about user data imports." href="../the_admin_tab/the_import_manager.htm#The_Import_Editor_Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about user data imports.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">data 
+ import</a>, greatly simplifying user account setup and maintenance.</p></li>
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Enrollment 
+ Data Imports</B></span> - Now you can import your student's scheduling data 
+ and restrict certain users to only seeing data for students who are associated 
+ with them. This feature makes it much easier for teachers to use the system 
+ to send messages to only the students enrolled in their classes. &nbsp;</p></li>
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Improved 
+ Field Options</B></span> - In 6.1 you will find two new fields which data 
+ may be mapped to: <a title="Click to learn more about Group Field definitions." href="../the_admin_tab/system.htm#Group_Field_Definitions" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Group Field definitions.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Group Fields</a> 
+ and <a title="Click to learn more about Enrollment Fields." href="../the_admin_tab/system.htm#Enrollment_Field_Definitions" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Enrollment Fields.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Enrollment 
+ Fields</a>. Group Fields allow you to map data like multiple enrollments 
+ or afterschool activities in a more organized and simple way. For example, 
+ a student who is enrolled in two schools can now be associated with both 
+ schools without having their contact information duplicated between schools. 
+ Enrollment Fields allow you to connect students to staff and include additional 
+ enrollment information such as class names and class section codes.</p></li>
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>SMS 
+ Shortcode Compliant</B></span> - Contacts may now opt out of receiving SMS 
+ messages by replying to an SMS message with the shortcode from the message. 
+ </p></li>
+</ul>
+<p class="whs2">&nbsp;</p>
+<p class="whs5">New Features from Previous 
+ Releases</p>
+<p class="whs3">Version 6.0</p>
+<ul type="disc" class="whs4">
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Remote 
  Telephony Appliance</B></span> - This feature allows you to use your own telco 
  for day-to-day calling and take advantage of the high-volume capabilities 
  of the ASP for emergencies. When using this feature, your database will 
  be hosted on the SchoolMessenger ASP, reducing the need for maintenance 
  and simplifying setup.</p></li>
-	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Multilingual 
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Multilingual 
  Text-to-Speech Support</B></span> - Now you can easily go between text-to-speech 
  languages in the same <a title="Click to learn more about Multilingual TTS messages." href="../creating_a_message/creating_an_advanced_phone_message.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Multilingual TTS messages.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">message</a> 
  to enhance pronunciation and message clarity.</p></li>
-	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Message 
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Message 
  Confirmation</B></span> - You may now request a confirmation of your message 
  while you are setting up a job. Recipients may press 1 for &quot;yes&quot; 
  or 2 for &quot;no&quot;.</p></li>
-	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Message 
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Message 
  Playback from Reports</B></span> - When looking at the Phone Log for a job 
  in which the recipients were asked to record a message, you may now view 
  and listen to their responses from within the report.</p></li>
-	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Phone 
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Phone 
  Sequence added to Reports</B></span> - &nbsp;Instead of simply 
  displaying the phone number that was called, <a title="Click to read more about Phone Logs." href="../reports/understanding_call_logs.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about Phone Logs.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Phone Logs</a> additionally 
  indicates which phone sequence number, for example, Phone 3, that the 
  number is assigned to and the destination label. </p></li>
-	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Improved 
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Improved 
  Contact Database Interface</B></span> - When a contact's information has been 
  edited in the Contact Information screen and the Override checkbox has 
  been selected, the overridden destination will be protected during subsequent 
  data imports. When this feature has been selected, a padlock icon will 
  appear next to the locked information on the contact database screen.</p></li>
-	<li class=p><p class="whs2"><span style="font-weight: bold;"><B>Enhanced 
+	<li class=p><p class="whs3"><span style="font-weight: bold;"><B>Enhanced 
  Job Editor</B></span> - Now the <a title="Click to read more about Job Type descriptions." href="../the_admin_tab/settings.htm#Job_Types" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about Job Type descriptions.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Job Type</a> description 
  text displays in the <a title="Click to read more about the Job Editor." href="../creating_a_notification_job/creating_a_new_job.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about the Job Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Job Editor</a>, 
  next to the Job Type. Additionally, when you select the &quot;Emergency&quot; 
  job type, the selection box will be outlined in red.</p></li>
 </ul>
-<p class="whs2">Version 5.2</p>
-<ul type="disc" class="whs3">
+<p class="whs3">Version 5.2</p>
+<ul type="disc" class="whs4">
 	<li class=p><p><span style="font-weight: bold;"><B>Color Themes -</B></span> 
  Now you can choose a different color theme for the system's interface. 
  This can be done as a <a href="../the_admin_tab/managing_systemwide_settings.htm" title="Click to view more information about systemwide settings." onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view more information about systemwide settings.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">system 
@@ -225,8 +264,7 @@ else
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <div placeholder id="footer" class="whs1">
- <p class="whs4"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©2008 
- Reliance Communications, Inc.</font></span></p>
+ <p class="whs6">©1999-2008 Reliance Communications, Inc.</p>
 </div>
 <script type="text/javascript" language="JavaScript">
 <!--
