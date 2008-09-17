@@ -10,7 +10,7 @@ class Import extends DBMappedObject {
 	var $notes;
 	var $status;
 	var $type;
-	var $datatype;
+	var $datatype = "person";
 	var $ownertype;
 	var $updatemethod;
 	var $lastrun;
