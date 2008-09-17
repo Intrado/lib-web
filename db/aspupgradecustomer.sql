@@ -1,85 +1,69 @@
--- Upgrade from release 5.2 to 5.3 -- June 13, 2008
+-- Upgrade from release 6.0.1 to 6.1 Sept 19, 2008
 
-CREATE TABLE `custdm` (
-  `dmid` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `enablestate` enum('new','active','disabled') NOT NULL,
-  PRIMARY KEY  (`dmid`)
-) ENGINE=InnoDB
+
+ALTER TABLE `user` ADD `aremail` TEXT NOT NULL AFTER `email`
+$$$
+UPDATE `user` set `aremail` = `email`
+$$$
+UPDATE `user` set `email` = ''
+$$$
+ALTER TABLE `user` CHANGE `email` `email` VARCHAR( 255 ) NOT NULL
 $$$
 
-
-CREATE TABLE `dmroute` (
-  `id` int(11) NOT NULL auto_increment,
-  `dmid` int(11) NOT NULL,
-  `match` varchar(20) NOT NULL,
-  `strip` int(11) NOT NULL,
-  `prefix` varchar(20) NOT NULL,
-  `suffix` varchar(20) NOT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `dmid` (`dmid`,`match`)
-) ENGINE=InnoDB
+ALTER TABLE `import` ADD `datatype` ENUM( 'person', 'user', 'enrollment' ) NOT NULL DEFAULT 'person' AFTER `type`,
+CHANGE `updatemethod` `updatemethod` ENUM( 'updateonly', 'update', 'full', 'createonly' ) NOT NULL DEFAULT 'full'
 $$$
 
-ALTER TABLE `destlabel` ADD `notes` TEXT NULL
-$$$
-ALTER TABLE `import` ADD `notes` TEXT NULL AFTER `description`
-$$$
-ALTER TABLE `destlabel` CHANGE `notes` `notes` VARCHAR( 255 ) NULL
-$$$
-ALTER TABLE `custdm` ADD `routechange` INT NULL
-$$$
-ALTER TABLE `import` ADD `alertoptions` TEXT NULL
+ALTER TABLE `user` ADD `staffpkey` VARCHAR( 255 ) NULL,
+ADD `importid` TINYINT NULL ,
+ADD `lastimport` DATETIME NULL
 $$$
 
-
-drop procedure start_specialtask
+CREATE TABLE `groupdata` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`personid` INT NOT NULL ,
+`fieldnum` TINYINT NOT NULL ,
+`value` VARCHAR( 255 ) NOT NULL,
+KEY `personfield`  (`personid`,`fieldnum`)
+) ENGINE = innodb
 $$$
 
-create procedure start_specialtask( in_specialtaskid int)
-begin
-declare l_custid int DEFAULT _$CUSTOMERID_;
-declare l_type varchar(50);
-DECLARE rdm VARCHAR(50);
-DECLARE dtype VARCHAR(50) DEFAULT 'system';
-
-select type from specialtask where id=in_specialtaskid into l_type;
-
-SELECT value INTO rdm FROM setting WHERE name='_dmmethod';
-IF rdm='hybrid' or rdm='cs' THEN
-  SET dtype = 'customer';
-END IF;
-
-insert ignore into aspshard.specialtaskqueue (customerid,localspecialtaskid,type,dispatchtype) values (l_custid,in_specialtaskid,l_type,dtype);
-end
+CREATE TABLE `reportgroupdata` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`jobid` INT NOT NULL,
+`personid` INT NOT NULL ,
+`fieldnum` TINYINT NOT NULL ,
+`value` VARCHAR( 255 ) NOT NULL,
+KEY `jobpersonfield`  (`jobid`,`personid`,`fieldnum`)
+) ENGINE = innodb
 $$$
 
-
-CREATE TABLE `dmcalleridroute` (
-  `id` int(11) NOT NULL auto_increment,
-  `dmid` int(11) NOT NULL,
-  `callerid` varchar(20) NOT NULL,
-  `prefix` varchar(20) NOT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `dmid` (`dmid`,`callerid`)
-) ENGINE=InnoDB
+CREATE TABLE `enrollment` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`personid` INT NOT NULL ,
+`c01` VARCHAR( 255 ) NOT NULL ,
+`c02` VARCHAR( 255 ) NOT NULL ,
+`c03` VARCHAR( 255 ) NOT NULL ,
+`c04` VARCHAR( 255 ) NOT NULL ,
+`c05` VARCHAR( 255 ) NOT NULL ,
+`c06` VARCHAR( 255 ) NOT NULL ,
+`c07` VARCHAR( 255 ) NOT NULL ,
+`c08` VARCHAR( 255 ) NOT NULL ,
+`c09` VARCHAR( 255 ) NOT NULL ,
+`c10` VARCHAR( 255 ) NOT NULL,
+KEY `personid` (`personid`),
+KEY `staffid` (`c01`)
+) ENGINE = innodb
 $$$
 
-
-ALTER TABLE `custdm` ADD `telco_type` ENUM( 'Test', 'Asterisk', 'Jtapi' ) NOT NULL DEFAULT 'Test' AFTER `enablestate`
+ALTER TABLE `userrule` ADD INDEX ( `userid` )
 $$$
 
-ALTER TABLE `custdm` CHANGE `routechange` `routechange` TINYINT( 4 )
-$$$
-
-ALTER TABLE `reportcontact` ADD `voicereplyid` INT(11) NULL ,
-ADD `response` TINYINT(4) NULL
+ALTER TABLE `user` ADD INDEX ( `staffpkey` )
 $$$
 
 -- ---------------------------------------------------------------------
 -- data changes (not just schema) from here on...
 
-insert into setting (name, value) values ('_dmmethod', 'asp')
+INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES ('c01', 'Staff ID', 'searchable,multisearch,staff')
 $$$
-
-
