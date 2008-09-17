@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <ftswdata>
+<key name="forgot"> 32, </key>
 <key name="format"> 67,39,10,12,43,32,51,47,55,56,16,65,9, </key>
 <key name="forth"> 31,32, </key>
 <key name="forward"> 31, </key>
@@ -114,7 +115,7 @@
 <key name="imag"> 25,0,1,2,3,57,10,61,62,30,55,64,16,65,8,66, </key>
 <key name="immediate"> 18,28,31, </key>
 <key name="immunization"> 31, </key>
-<key name="import"> 60,62,32,65,66, </key>
+<key name="import"> 60,62,30,32,65,66, </key>
 <key name="import'"> 65, </key>
 <key name="importanc"> 31, </key>
 <key name="important"> 25,71,23,67,41,39,69,57,17,10,18,4,19,11,12,13,58,34,70,24,59,21,6,60,61,62,31,37,38,45,35,26,22,63,48,53,54,55,56,27,50,64,16,65,66,33,9,52, </key>
@@ -161,7 +162,7 @@
 <key name="invitation"> 25,31, </key>
 <key name="involvement"> 31, </key>
 <key name="isp"> 10, </key>
-<key name="it'"> 25,23,11,12,43,24,31,51,26,47, </key>
+<key name="it'"> 25,23,11,12,43,24,31,32,51,26,47, </key>
 <key name="item"> 0,3,36,53,54,55,56,73,44, </key>
 <key name="itself"> 39, </key>
 <key name="january"> 31, </key>
@@ -195,7 +196,5 @@
 <key name="left"> 0,2,3,18,19,61,30,31,51,53,54,55,56,64,8,74, </key>
 <key name="length"> 13,24,59,61,63,64, </key>
 <key name="les"> 23,24, </key>
-<key name="let"> 34,24,31,72,33, </key>
-<key name="letter"> 68, </key>
 
 </ftswdata>  

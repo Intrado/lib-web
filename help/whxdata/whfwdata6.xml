@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <ftswdata>
+<key name="sampl"> 25,1,12,34,31, </key>
+<key name="san"> 31, </key>
 <key name="sanchez"> 31, </key>
 <key name="sat9"> 31, </key>
 <key name="saturday"> 31, </key>
@@ -162,7 +164,7 @@
 <key name="tel"> 49, </key>
 <key name="telco"> 32,40, </key>
 <key name="telephon"> 12,29,21,62,30,36,37,38,16, </key>
-<key name="telephony"> 59,32,40,63, </key>
+<key name="telephony"> 59,40,63, </key>
 <key name="tell"> 31,49,48,74, </key>
 <key name="templat"> 25,23,14,34,24,46,26,55,56,27,44, </key>
 <key name="temporari"> 61,32,64, </key>
@@ -175,7 +177,5 @@
 <key name="them"> 67,18,11,12,59,60,61,62,30,31,32,49,46,63,53,55,56,64,16,65,8,66, </key>
 <key name="themselv"> 33, </key>
 <key name="there'"> 31, </key>
-<key name="thereby"> 39, </key>
-<key name="therefor"> 23,12, </key>
 
 </ftswdata>  
