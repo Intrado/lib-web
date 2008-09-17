@@ -9,7 +9,9 @@
 			<xsd:element name="name" type="xsd:string"></xsd:element>
 			<xsd:element name="description" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	
+	</xsd:complexType>
+
+	
 	<xsd:complexType name="message">
 		<xsd:sequence>
 			<xsd:element name="id" type="xsd:int"></xsd:element>
@@ -47,39 +49,81 @@
 			<xsd:element name="startdate" type="xsd:string"></xsd:element>
 			<xsd:element name="status" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="loginResult">		<xsd:sequence>			<xsd:element name="sessionid" type="xsd:string"></xsd:element>			<xsd:element name="resultcode" type="xsd:string"></xsd:element>			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+	</xsd:complexType>
+
+	<xsd:complexType name="loginResult">
+		<xsd:sequence>
+			<xsd:element name="sessionid" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>		<xsd:complexType name="getListsResult">		<xsd:sequence>			<xsd:element name="lists" type="sm:list" minOccurs="0"
+	</xsd:complexType>
+	
+
+	<xsd:complexType name="getListsResult">
+		<xsd:sequence>
+			<xsd:element name="lists" type="sm:list" minOccurs="0"
 				maxOccurs="unbounded">
 			</xsd:element>
 			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
 			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="getMessagesResult">		<xsd:sequence>			<xsd:element name="messages" type="sm:message" minOccurs="0"
+	</xsd:complexType>
+	<xsd:complexType name="getMessagesResult">
+		<xsd:sequence>
+			<xsd:element name="messages" type="sm:message" minOccurs="0"
 				maxOccurs="unbounded">
 			</xsd:element>
 			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
 			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="setMessagebodyResult">		<xsd:sequence>			<xsd:element name="result" type="xsd:boolean"></xsd:element>			<xsd:element name="resultcode" type="xsd:string"></xsd:element>			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+	</xsd:complexType>
+	<xsd:complexType name="setMessagebodyResult">
+		<xsd:sequence>
+			<xsd:element name="result" type="xsd:boolean"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="uploadAudioResult">		<xsd:sequence>			<xsd:element name="audioname" type="xsd:string"></xsd:element>			<xsd:element name="resultcode" type="xsd:string"></xsd:element>			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+	</xsd:complexType>
+	<xsd:complexType name="uploadAudioResult">
+		<xsd:sequence>
+			<xsd:element name="audioname" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="getJobTypesResult">		<xsd:sequence>			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0"
+	</xsd:complexType>
+	<xsd:complexType name="getJobTypesResult">
+		<xsd:sequence>
+			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0"
 				maxOccurs="unbounded">
 			</xsd:element>
 			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
 			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="getRepeatingJobsResult">		<xsd:sequence>			<xsd:element name="jobs" type="sm:job" minOccurs="0"
+	</xsd:complexType>
+	<xsd:complexType name="getRepeatingJobsResult">
+		<xsd:sequence>
+			<xsd:element name="jobs" type="sm:job" minOccurs="0"
 				maxOccurs="unbounded">
 			</xsd:element>
 			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
 			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>			<xsd:complexType name="getJobStatusResult">		<xsd:sequence>			<xsd:element name="job" type="sm:jobstatus"></xsd:element>			<xsd:element name="resultcode" type="xsd:string"></xsd:element>			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+	</xsd:complexType>
+	
+	
+	<xsd:complexType name="getJobStatusResult">
+		<xsd:sequence>
+			<xsd:element name="job" type="sm:jobstatus"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>	<xsd:complexType name="sendJobResult">		<xsd:sequence>			<xsd:element name="jobid" type="xsd:int"></xsd:element>			<xsd:element name="resultcode" type="xsd:string"></xsd:element>			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+	</xsd:complexType>
+	<xsd:complexType name="sendJobResult">
+		<xsd:sequence>
+			<xsd:element name="jobid" type="xsd:int"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
         
@@ -146,6 +190,20 @@
                     <xsd:element name="resultcode" type="xsd:string"></xsd:element>
                     <xsd:element name="resultdescription" type="xsd:string"></xsd:element>
                 </xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="getLabelsResult">
+		<xsd:sequence>
+			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="labels" type="sm:Label" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Label">
+		<xsd:sequence>
+			<xsd:element name="sequence" type="xsd:string"></xsd:element>
+			<xsd:element name="label" type="xsd:string"></xsd:element>
+		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
@@ -229,7 +287,10 @@
         <wsdl:part name="daystorun" type="xsd:int"></wsdl:part>
         <wsdl:part name="phonemsgid" type="xsd:int"></wsdl:part>
         <wsdl:part name="emailmsgid" type="xsd:int"></wsdl:part>
-    	<wsdl:part name="smsmsgid" type="xsd:int"></wsdl:part>    	    	<wsdl:part name="maxcallattempts" type="xsd:int"></wsdl:part></wsdl:message>
+    	<wsdl:part name="smsmsgid" type="xsd:int"></wsdl:part>
+
+    	
+    	<wsdl:part name="maxcallattempts" type="xsd:int"></wsdl:part></wsdl:message>
     <wsdl:message name="sendJobResponse">
     	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
     </wsdl:message>
@@ -267,6 +328,19 @@
     </wsdl:message>
     <wsdl:message name="loginToCustomerResponse">
     	<wsdl:part name="result" type="sm:loginToCustomerResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getLabelsRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="type" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getLabelsResponse">
+    	<wsdl:part name="result" type="sm:getLabelsResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getSurveyJobTypesRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getSurveyJobTypesResponse">
+    	<wsdl:part name="result" type="sm:getJobTypesResult"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
@@ -479,6 +553,32 @@ sendJob:
 		returns: string resultcode, string resultdescription, string sessionid</wsdl:documentation>
     		<wsdl:input message="sm:loginToCustomerRequest"></wsdl:input>
     		<wsdl:output message="sm:loginToCustomerResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getLabels">
+    		<wsdl:documentation>Given a valid sessionid and type, an array of labels will be returned.
+Valid types are phone, email and sms.
+If an error occurs, error will contain the error string and labels will not be set.
+
+getLabels:
+	params: string sessionid,string type
+	return:
+		labels: array of labeltypes
+		error: string</wsdl:documentation>
+    		<wsdl:input message="sm:getLabelsRequest"></wsdl:input>
+    		<wsdl:output message="sm:getLabelsResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getSurveyJobTypes">
+    		<wsdl:documentation>Similar to getJobType however all types are surveys.
+Given a valid sessionid, an array of jobtypes will be returned.
+If an error occurs, error will contain the error string and jobtypes will not be set.
+
+getJobTypes:
+	params: string sessionid
+	return:
+		jobtypes: array of jobtypes
+		error: string</wsdl:documentation>
+    		<wsdl:input message="sm:getSurveyJobTypesRequest"></wsdl:input>
+    		<wsdl:output message="sm:getSurveyJobTypesResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMClient">
 
@@ -706,6 +806,30 @@ sendJob:
     	<wsdl:operation name="loginToCustomer">
     		<soap:operation
     			soapAction="http://asp.schoolmessenger.com/loginToCustomer" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getLabels">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getLabels" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getSurveyJobTypes">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getSurveyJobTypes" />
     		<wsdl:input>
     			<soap:body use="literal"
     				namespace="http://asp.schoolmessenger.com" />

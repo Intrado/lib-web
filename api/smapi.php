@@ -1,14 +1,14 @@
 <?
 /*
-* SchoolMessenger Application API
-* author: Joshua J. Lai
-* Copyright Reliance Communications, Inc
-*
-* Simple api that handles basic application uses such as returning list and message names
-* with corresponding ids.  Uses soap as transport device.
-*
-*
-*/
+ * SchoolMessenger Application API
+ * author: Joshua J. Lai
+ * Copyright Reliance Communications, Inc
+ *
+ * Simple api that handles basic application uses such as returning list and message names
+ * with corresponding ids.  Uses soap as transport device.
+ *
+ *
+ */
 
 $CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
 $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
@@ -37,14 +37,14 @@ if(isset($_GET['wsdl'])){
 class SMAPI{
 
 	/*
-	Given a valid oem/oemid combination, the customer url corresponding to the
-	matching customer is returned
+	 Given a valid oem/oemid combination, the customer url corresponding to the
+	 matching customer is returned
 
-	getCustomerUrl:
+	 getCustomerUrl:
 		params: string oem, string oemid
 		returns: string customerurl
 
-	*/
+		*/
 
 	function getCustomerURL($oem, $oemid){
 		global $IS_COMMSUITE;
@@ -72,43 +72,43 @@ class SMAPI{
 
 
 	/*
-	Given a valid loginname/password, a session id is generated and passed back.
-	If an error occurs, error will contain the error and sessionid will be empty string.
+	 Given a valid loginname/password, a session id is generated and passed back.
+	 If an error occurs, error will contain the error and sessionid will be empty string.
 
-	login:
+	 login:
 		params: string loginname, string password
 		returns: string resultcode, string resultdescription, string sessionid
 
-	*/
+		*/
 	function login($loginname, $password){
 		return systemLogin($loginname, $password);
 	}
 
 	/*
-	Given a valid loginname/password/customerurl combination, a session id is generated and passed back.
-	If an error occurs, error will contain the error and sessionid will be empty string.
+	 Given a valid loginname/password/customerurl combination, a session id is generated and passed back.
+	 If an error occurs, error will contain the error and sessionid will be empty string.
 
-	loginToCustomer:
+	 loginToCustomer:
 		params: string loginname, string password, string customerurl
 		returns: string resultcode, string resultdescription, string sessionid
 
-	*/
+		*/
 	function loginToCustomer($loginname, $password, $customerurl){
 		return systemLogin($loginname, $password, $customerurl);
 	}
 
 	/*
-	Given a valid sessionid, an array of lists will be returned.
-	If error occurs, error will contain error string and lists will not be set.
+	 Given a valid sessionid, an array of lists will be returned.
+	 If error occurs, error will contain error string and lists will not be set.
 
-	getLists:
+	 getLists:
 		params: string sessionid
 		returns:
-			lists: array of lists
-			resultcode: string
-			resultdescription: string
+		lists: array of lists
+		resultcode: string
+		resultdescription: string
 
-	*/
+		*/
 	function getLists($sessionid){
 		global $USER;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "lists" => array());
@@ -138,22 +138,22 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid and a valid message type, an array of messages will be returned.
-	If error occurs, error will contain error string and messages will not be set.
+	 Given a valid sessionid and a valid message type, an array of messages will be returned.
+	 If error occurs, error will contain error string and messages will not be set.
 
-	Valid messages types are:
+	 Valid messages types are:
 		phone
 		email
 		sms
 
-	getMessages:
+		getMessages:
 		params: string sessionid, string message type
 		returns:
-			messages: array of messages
-			resultcode: string
-			resultdescription: string
+		messages: array of messages
+		resultcode: string
+		resultdescription: string
 
-	*/
+		*/
 	function getMessages($sessionid, $type = "phone"){
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messages" => array());
@@ -186,15 +186,15 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, messageid and message text, the specified message
-	will have its text replaced.  If successful, result will be true.
-	If error occurs, error will contain error string and result will be false.
+	 Given a valid sessionid, messageid and message text, the specified message
+	 will have its text replaced.  If successful, result will be true.
+	 If error occurs, error will contain error string and result will be false.
 
-	setMessageBody:
+	 setMessageBody:
 		params: string sessionid, int message id, string message text
 		returns: boolean result, string resultcode, string resultdescription,
 
-	*/
+		*/
 
 	function setMessageBody($sessionid, $messageid, $messagetext){
 		global $USER;
@@ -247,21 +247,21 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, name, mimetype, and audio file,
-	an audio file record will be generated and its resulting
-	name returned.
-	If an error occurs, error will contain the error string and audioname will be empty.
+	 Given a valid sessionid, name, mimetype, and audio file,
+	 an audio file record will be generated and its resulting
+	 name returned.
+	 If an error occurs, error will contain the error string and audioname will be empty.
 
-	IMPORTANT: the audio data should be a base64 encoded string
+	 IMPORTANT: the audio data should be a base64 encoded string
 
-	uploadAudio:
+	 uploadAudio:
 		params: string sessionid, string name, string mimetype, base64 encoded string audio
 		return:
-			audioname: string
-			resultcode: string
-			resultdescription: string
+		audioname: string
+		resultcode: string
+		resultdescription: string
 
-	*/
+		*/
 
 	function uploadAudio($sessionid, $name, $audio, $mimetype){
 		global $USER, $SETTINGS;
@@ -353,17 +353,17 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, an array of jobtypes will be returned.
-	If an error occurs, error will contain the error string and jobtypes will not be set.
+	 Given a valid sessionid, an array of jobtypes will be returned.
+	 If an error occurs, error will contain the error string and jobtypes will not be set.
 
-	getJobTypes:
+	 getJobTypes:
 		params: string sessionid
 		return:
-			jobtypes: array of jobtypes
-			resultcode: string
-			resultdescription: string
+		jobtypes: array of jobtypes
+		resultcode: string
+		resultdescription: string
 
-	*/
+		*/
 	function getJobTypes($sessionid){
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobtypes" => array());
@@ -396,17 +396,60 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, an array of jobs will be returned.
-	If an error occurs, error will contain the error string and jobs will not be set.
+	 Given a valid sessionid, an array of jobtypes will be returned.
+	 If an error occurs, error will contain the error string and jobtypes will not be set.
 
-	getActiveJobs:
-	params: string sessionid
-	return:
+	 getJobTypes:
+		params: string sessionid
+		return:
+		jobtypes: array of jobtypes
+		resultcode: string
+		resultdescription: string
+
+		*/
+	function getSurveyJobTypes($sessionid){
+		global $USER;
+		$result = array("resultcode" => "failure","resultdescription" => "", "jobtypes" => array());
+
+		if(!APISession($sessionid)){
+
+			$result["resultdescription"] = "Invalid Session ID";
+
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			if(!$USER->id){
+
+				$result["resultdescription"] = "Invalid user";
+				return $result;
+			}
+
+			$userjobtypes = JobType::getUserJobTypes(true);
+			foreach($userjobtypes as $userjobtype){
+				$jobtype = new API_Jobtype();
+				$jobtype->id = $userjobtype->id;
+				$jobtype->name = $userjobtype->name;
+				$jobtype->info = $userjobtype->info;
+				$jobtypes[] = $jobtype;
+			}
+			$result["resultcode"] = "success";
+			$result["jobtypes"] = $jobtypes;
+			return $result;
+		}
+	}
+
+	/*
+	 Given a valid sessionid, an array of jobs will be returned.
+	 If an error occurs, error will contain the error string and jobs will not be set.
+
+	 getActiveJobs:
+	 params: string sessionid
+	 return:
 		jobs: array of job objects,
 		resultcode: string
 		resultdescription: string
 
-	*/
+		*/
 
 	//jobid, name, desc, total, remaining
 	function getActiveJobs($sessionid){
@@ -431,17 +474,17 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid and jobid, a single job will be returned.
-	If an error occurs, error will contain the error string and job will not be set.
+	 Given a valid sessionid and jobid, a single job will be returned.
+	 If an error occurs, error will contain the error string and job will not be set.
 
-	getJobStatus:
+	 getJobStatus:
 		params: string sessionid
 		return:
-			job: a job object,
-			resultcode: string
-			resultdescription: string
+		job: a job object,
+		resultcode: string
+		resultdescription: string
 
-	*/
+		*/
 
 	function getJobStatus($sessionid, $jobid){
 		global $USER;
@@ -465,17 +508,17 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid, an array of jobs will be returned.
-	If an error occurs, error will contain the error string and jobs will not be set.
+	 Given a valid sessionid, an array of jobs will be returned.
+	 If an error occurs, error will contain the error string and jobs will not be set.
 
-	getRepeatingJobs:
+	 getRepeatingJobs:
 		params: string sessionid
 		return:
-			jobs: array of job objects,
-			resultcode: string
-			resultdescription: string
+		jobs: array of job objects,
+		resultcode: string
+		resultdescription: string
 
-	*/
+		*/
 	function getRepeatingJobs($sessionid){
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobs" => array());
@@ -553,11 +596,11 @@ class SMAPI{
 							$joblangmessage->type = $type;
 							$joblangmessage->language = $joblang->language;
 							if($type == 'phone')
-								$phonemessages[] = $joblangmessage;
+							$phonemessages[] = $joblangmessage;
 							else if($type == 'email')
-								$emailmessages[] = $joblangmessage;
+							$emailmessages[] = $joblangmessage;
 							else if($type == 'sms')
-								$smsmessages[] = $joblangmessage;
+							$smsmessages[] = $joblangmessage;
 						}
 					}
 				}
@@ -575,14 +618,14 @@ class SMAPI{
 	}
 
 	/*
-	Given a valid sessionid and jobid, the active job's id will be returned
-	If an error occurs, error will contain the error string and jobid will be 0.
+	 Given a valid sessionid and jobid, the active job's id will be returned
+	 If an error occurs, error will contain the error string and jobid will be 0.
 
-	sendRepeatingJob:
+	 sendRepeatingJob:
 		params: string sessionid
 		return: int jobid, string resultcode, string resultdescription,
 
-	*/
+		*/
 
 	function sendRepeatingJob($sessionid, $jobid){
 		global $USER;
@@ -623,29 +666,29 @@ class SMAPI{
 		}
 	}
 	/*
-	Given a valid sessionid, name, description, listid, jobtypeid,
-	startdate, starttime, endtime, number of days to run, optional phone message id,
-	optional email id, optional sms message id, and max call attempts,
-	a job will be created and set to active.  The job id will be returned.
-	If an error occurs, error will contain the error string and jobid will be 0.
+	 Given a valid sessionid, name, description, listid, jobtypeid,
+	 startdate, starttime, endtime, number of days to run, optional phone message id,
+	 optional email id, optional sms message id, and max call attempts,
+	 a job will be created and set to active.  The job id will be returned.
+	 If an error occurs, error will contain the error string and jobid will be 0.
 
-	sendJob:
+	 sendJob:
 		params: string sessionid
-				string name
-				string description
-				int listid
-				int jobtypeid
-				string startdate
-				string starttime
-				string endtime
-				int number of days to run
-				int phone message id
-				int email message id
-				int sms message id
-				int max call attempts
+		string name
+		string description
+		int listid
+		int jobtypeid
+		string startdate
+		string starttime
+		string endtime
+		int number of days to run
+		int phone message id
+		int email message id
+		int sms message id
+		int max call attempts
 		return: int jobid, string resultcode, string resultdescription,
 
-	*/
+		*/
 
 
 	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
@@ -718,21 +761,21 @@ class SMAPI{
 				$job->jobtypeid = $jobtypeid;
 				$job->listid = $listid;
 				if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid) &&
-					QuickQuery("select type from message where id = " . $phonemsgid) == "phone"){
+				QuickQuery("select type from message where id = " . $phonemsgid) == "phone"){
 					$job->sendphone = true;
 					$job->phonemessageid = $phonemsgid;
 				} else {
 					$job->sendphone = false;
 				}
 				if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid) &&
-					QuickQuery("select type from message where id = " . $emailmsgid) == "phone"){
+				QuickQuery("select type from message where id = " . $emailmsgid) == "phone"){
 					$job->sendemail = true;
 					$job->emailmessageid = $emailmsgid;
 				} else {
 					$job->sendemail = false;
 				}
 				if(getSystemSetting('_hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid) &&
-					QuickQuery("select type from message where id = " . $smsmsgid) == "phone"){
+				QuickQuery("select type from message where id = " . $smsmsgid) == "phone"){
 					$job->sendsms = true;
 					$job->smsmessageid = $smsmsgid;
 				} else {
@@ -788,6 +831,55 @@ class SMAPI{
 	}
 
 	/*
+		Given a valid session id the labels are returned
+
+		getLabels
+		params: String sessionid
+
+		return:
+		Labels: array of label objs
+
+		*/
+
+	function getLabels($sessionid,$type){
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure","resultdescription" => "", "labels" => null);
+
+		if(!APISession($sessionid)){
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+
+			if(!$USER->id){
+				$result["resultdescription"] = "Invalid user";
+				return $result;
+			}
+				
+			$query = "select sequence, label from destlabel ";
+			if($type == "phone" || $type == "email" || $type == "sms"){
+				$query .= "where type='$type'";
+			}else{
+				$result["resultdescription"] = "Invalid type";
+				return $result;
+			}
+			$queryresult = Query($query);
+			$labels = array();
+			while($row = DBGetRow($queryresult)){
+				$label = new API_Label();
+				$label->sequence = $row[0];
+				$label->label = $row[1];
+				$labels[] = $label;
+			}
+
+			$result['labels'] = $labels;
+			$result['resultcode'] = "success";
+			return $result;
+		}
+	}
+
+	/*
 		Given a valid session id and pkey, an array of contact objects is returned.
 		A contact object contains a pkey, contact type(phone,email,sms), sequence number,
 		contact information, and an array of contact preference objects.  A contact
@@ -796,13 +888,13 @@ class SMAPI{
 		The max number of contacts are always returned.
 
 		getContacts
-			params: String sessionid
-					String pkey
+		params: String sessionid
+		String pkey
 
-			return:
-					contacts: array of contact objs
+		return:
+		contacts: array of contact objs
 
-	*/
+		*/
 
 	function getContacts($sessionid, $pkey){
 		global $USER, $ACCESS;
@@ -901,13 +993,13 @@ class SMAPI{
 		part of the contact object is invalid, an error is returned
 
 		setContacts
-			params: String sessionid
-					contact: contact object
+		params: String sessionid
+		contact: contact object
 
-			return:
-					Success/Fail
+		return:
+		Success/Fail
 
-	*/
+		*/
 
 
 	function setContact($sessionid, $contact){
@@ -1077,7 +1169,7 @@ function APISession($sessionid){
 	session_id($sessionid);
 	doStartSession();
 	if (!isset($_SESSION['user']) || !isset($_SESSION['access']))
-		return false;
+	return false;
 	else {
 		$USER = &$_SESSION['user'];
 		$USER->refresh();
@@ -1099,25 +1191,25 @@ function getJobData($jobid=0){
 	global $USER;
 
 	$query = "select j.id, j.name, j.description,
-						sum(rc.type='phone') as total_phone,
-						sum(rc.type='email') as total_email,
-						sum(rc.type='print') as total_print,
-						sum(rc.type='sms') as total_sms,
-						j.type LIKE '%phone%' AS has_phone,
-						j.type LIKE '%email%' AS has_email,
-						j.type LIKE '%print%' AS has_print,
-						j.type LIKE '%sms%' AS has_sms,
-						sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
-						sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
-						sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
-						sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
-						ADDTIME(j.startdate, j.starttime), j.status, j.deleted, j.type
-						from job j
-						left join reportcontact rc
-							on j.id = rc.jobid
-						left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-						where 1 and j.deleted=0
-						and j.userid = $USER->id ";
+	sum(rc.type='phone') as total_phone,
+	sum(rc.type='email') as total_email,
+	sum(rc.type='print') as total_print,
+	sum(rc.type='sms') as total_sms,
+	j.type LIKE '%phone%' AS has_phone,
+	j.type LIKE '%email%' AS has_email,
+	j.type LIKE '%print%' AS has_print,
+	j.type LIKE '%sms%' AS has_sms,
+	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
+	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
+	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
+	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
+	ADDTIME(j.startdate, j.starttime), j.status, j.deleted, j.type
+	from job j
+	left join reportcontact rc
+	on j.id = rc.jobid
+	left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
+	where 1 and j.deleted=0
+	and j.userid = $USER->id ";
 	if($jobid){
 		$jobid = $jobid + 0;
 		$query .= " and j.id = $jobid ";
