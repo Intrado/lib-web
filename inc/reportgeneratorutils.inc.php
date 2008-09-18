@@ -20,7 +20,7 @@ function getOrderSql($params){
 function getRuleSql($params, $alias){
 	$rulesql = "";
 	if(isset($params['rules'])){
-		$rulesql = Rule::makeQuery($params['rules'], $alias);
+		$rulesql = Rule::makeQuery($params['rules'], $alias,false,true);
 	}
 	return $rulesql;
 }

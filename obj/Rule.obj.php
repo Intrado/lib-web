@@ -14,7 +14,7 @@ class Rule extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function toSql ($alias = false, $fieldoverride = false) {
+	function toSql ($alias = false, $fieldoverride = false, $isreport = false) {
 		$val = DBSafe($this->val);
 		$f = ($alias ? "$alias.":"") . ($fieldoverride ? $fieldoverride : $this->fieldnum);
 		
@@ -22,7 +22,11 @@ class Rule extends DBMappedObject {
 		
 		//check if this needs a subquery
 		if (strpos($this->fieldnum, "g") === 0) {
-			$sql .= "exists (select null from groupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$alias.id and ";
+			if ($isreport) {
+				$sql .= "exists (select null from reportgroupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$alias.id and g.jobid=j.id and ";
+			} else {
+				$sql .= "exists (select null from groupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$alias.id and ";
+			}
 			//override f to point to g field data
 			$f = "g.value";
 		}
@@ -125,7 +129,8 @@ class Rule extends DBMappedObject {
 
 	/**static functions**/
 
-	static function makeQuery ($rulesarray, $alias, $fieldoverride = false) {
+	//isreport flags that we need to join differently for group fields
+	static function makeQuery ($rulesarray, $alias, $fieldoverride = false, $isreport = false) {
 		$fquery = ""; // ffield
 		$gquery = ""; // gfield
 		$cquery = ""; // cfield
@@ -135,7 +140,8 @@ class Rule extends DBMappedObject {
 					$fquery .= $rule->toSql($alias, $fieldoverride);
 				}
 				if (strpos($rule->fieldnum, "g") === 0) {
-					$gquery .=  $rule->toSql($alias, $fieldoverride); //field override not used, but we still need to pass any alaias we're using for person record
+					//field override not used, but we still need to pass any alaias we're using for person record
+					$gquery .=  $rule->toSql($alias, $fieldoverride, $isreport); 
 				}
 				if (strpos($rule->fieldnum, "c") === 0) {
 					if ($cquery == "") $cquery = " and exists (select null from enrollment a where ".$alias.".id=a.personid ";
