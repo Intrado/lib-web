@@ -207,7 +207,7 @@ $f = "taskmap";
 $s = "main";
 $reloadform = false;
 
-if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'add') || CheckFormSubmit($f, 'delete') !== false) {
+if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'run') || CheckFormSubmit($f, 'add') || CheckFormSubmit($f, 'delete') !== false) {
 	//check to see if formdata is valid
 	if (CheckFormInvalid($f)) {
 		error('Form was edited in another window, reloading data');
@@ -292,10 +292,14 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'add') || CheckFormSubmit($f,
 
 			$import->notes = GetFormData($f, $s, "notes");
 			$import->update();
-			if (CheckFormSubmit($f, $s))
+			if (CheckFormSubmit($f, $s)) {
 				redirect("tasks.php");
-			else
+			} else if (CheckFormSubmit($f, 'run')) {
+				$import->runNow();
+				redirect("tasks.php");
+			} else {
 				redirect();
+			}
 		}
 	}
 } else {
@@ -347,7 +351,11 @@ $DESCRIPTION = count($usedcols) . " of $colcount input columns mapped";
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(($noimportdata ? button('Done',NULL,'tasks.php') : submit($f, $s)));
+if ($noimportdata) {
+	buttons(button('Done',NULL,'tasks.php'));
+} else {
+	buttons(submit($f, $s), submit($f,'run',"Submit and Run Now"));
+}
 startWindow('Field Mapping');
 if ($noimportdata) { ?>
 			<br><h3>No import data could be found. Please check that a non empty file has been uploaded.</h3><br>
