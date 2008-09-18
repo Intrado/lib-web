@@ -1499,3 +1499,12 @@ $$$
 ALTER TABLE `enrollment` ADD INDEX ( `personid` )
 $$$
 
+TRUNCATE `groupdata`
+$$$
+
+ALTER TABLE `groupdata` ADD `importid` TINYINT NOT NULL
+$$$
+
+ALTER TABLE `groupdata` ADD INDEX ( `importid` )
+$$$
+
