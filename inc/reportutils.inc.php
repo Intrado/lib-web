@@ -26,7 +26,7 @@ function generateGFieldQuery($personidalias, $joblist = false, $hackPDF = false)
 	$jidstr = "";
 	if ($joblist) {
 		$gdtable = "reportgroupdata";
-		$jidstr = " and jobid in(".$joblist.")";
+		$jidstr = " and jobid in('".$joblist."')";
 	}
 	for ($i=1; $i<=10; $i++) {
 		if($i<10){
