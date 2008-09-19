@@ -1290,6 +1290,7 @@ require_once("API_Job.obj.php");
 require_once("API_JobStatus.obj.php");
 require_once("API_Contact.obj.php");
 require_once("API_ContactPreference.obj.php");
+require_once("API_Label.obj.php");
 
 ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
 $server=new SoapServer("smapi.wsdl");
