@@ -132,7 +132,7 @@ class CallsReport extends ReportGenerator{
 				$line[] = $row[8];
 				//generatefields returns a string beginning with a comma so the count of generatefields is 1 plus the count of f-fields
 				// TODO hardcode 27 ffields+gfields ugh...
-				for($i=0; $i<27; $i++){
+				for($i=0; $i<=27; $i++){
 					$line[] = $row[9+$i];
 				}
 				$data[] = $line;
