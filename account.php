@@ -252,7 +252,7 @@ if( $reloadform )
 $readonly = $USER->importid != null;
 
 $PAGE = "start:account";
-$TITLE = "Account Information: $USER->firstname $USER->lastname";
+$TITLE = "Account Information: " . htmlentities($USER->firstname) . " " . htmlentities($USER->lastname);
 
 include_once("nav.inc.php");
 

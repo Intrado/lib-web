@@ -522,7 +522,7 @@ foreach($joblangs[$type] as $joblang) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:jobs";
-$TITLE = ($JOBTYPE == 'repeating' ? 'Repeating Job Editor: ' : 'Job Editor: ') . ($jobid == NULL ? "New Job" : $job->name);
+$TITLE = ($JOBTYPE == 'repeating' ? 'Repeating Job Editor: ' : 'Job Editor: ') . ($jobid == NULL ? "New Job" : htmlentities($job->name));
 if (isset($job))
 	$DESCRIPTION = "Job status: " . fmt_status($job, NULL);
 

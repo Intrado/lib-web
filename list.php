@@ -185,7 +185,7 @@ $renderedlist = new RenderedList($list);
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:lists";
-$TITLE = 'List Editor: ' . ($_SESSION['listid'] == NULL ? "New List" : $list->name);
+$TITLE = 'List Editor: ' . ($_SESSION['listid'] == NULL ? "New List" : htmlentities($list->name));
 
 include_once("nav.inc.php");
 

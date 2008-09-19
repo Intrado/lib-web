@@ -34,12 +34,12 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_question($row, $index){
-	return "<div style='text-decoration: underline'>$row[$index]</div>";	
+	return "<div style='text-decoration: underline'>$row[$index]</div>";
 }
 
 function fmt_answer($row, $index){
 	$offset = $index+12;
-	return "<div style='font-weight:bold; text-decoration: underline'>" . (isset($row[$offset]) ? $row[$offset] : "") . "</div><br><div>$row[$index]</div>";	
+	return "<div style='font-weight:bold; text-decoration: underline'>" . (isset($row[$offset]) ? $row[$offset] : "") . "</div><br><div>$row[$index]</div>";
 }
 
 
@@ -76,7 +76,7 @@ if(isset($_GET['reportid'])){
 	$subscription = new ReportSubscription($reportid);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
-	
+
 	$_SESSION['reportid'] = $reportid;
 	$_SESSION['report']['options'] = $options;
 	redirect();
@@ -87,7 +87,7 @@ if(isset($_GET['reportid'])){
 		$jobid= $options['jobid'];
 	}
 	if(isset($jobid)){
-		
+
 		//check userowns or customerowns and viewsystemreports
 		if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports'))) {
 			redirect('unauthorized.php');
@@ -156,26 +156,26 @@ if($generator->format != "html"){
 		$name = secure_tmpname("report", ".pdf");
 		$params = createPdfParams($name);
 		session_write_close();
-		
+
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=report.pdf");
 		header("Content-type: application/pdf");
-		$result = $generator->generate($params);	
+		$result = $generator->generate($params);
 		@readfile($name, "r");
 		unlink($name);
 	} else {
 		$generator->generate();
 	}
 } else {
-	
+
 	$PAGE = "reports:reports";
 	$TITLE = "Notification Summary";
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
-		$TITLE .= " - " . $subscription->name;
+		$TITLE .= " - " . htmlentities($subscription->name);
 	} else if((isset($jobid) && $jobid)){
-		$TITLE .= " - " . $job->name;
+		$TITLE .= " - " . htmlentities($job->name);
 	}
 	if(isset($options['reldate'])){
 		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
@@ -191,7 +191,7 @@ if($generator->format != "html"){
 		$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
 	buttons($back, button('Refresh', 'window.location.reload()'), submit($f, $s, "Save/Schedule"));
-	
+
 		startWindow("Related Links ".help('ReportJobSummary_RelatedLinks'), "padding: 3px;");
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -199,12 +199,12 @@ if($generator->format != "html"){
 				<td>
 					<a href="reportjobsummary.php/report.pdf?pdf=1">PDF</a>&nbsp;|&nbsp;<a href="#" onclick="popup('graph_job_hourly.png.php',500,500); return false;"/>Time Distribution</a>&nbsp;|&nbsp;<a href="reportjobdetails.php?result=undelivered"/>Recipients&nbsp;Not&nbsp;Contacted</a>
 				</td>
-				
+
 			</tr>
 		</table>
 		<?
 	endWindow();
-	
+
 	?><br><?
 
 	$generator->generate();

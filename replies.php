@@ -139,7 +139,7 @@ function fmt_replies_status($row, $index){
 
 $PAGE = "notifications:responses";
 if(isset($job)){
-	$TITLE = "Responses to: " . $job->name;
+	$TITLE = "Responses to: " . htmlentities($job->name);
 	$warning = "Are you sure you want to delete all played messages for: " . $job->name . "?";
 } else {
 	$TITLE = "Responses to: All Jobs";

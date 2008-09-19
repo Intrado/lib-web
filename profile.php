@@ -242,7 +242,7 @@ $FIELDMAP = $ffields + $gfields + $cfields; // GUI preferred ordering
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:profiles";
-$TITLE = "Edit Access Profile: " . (GetFormData($form, $section, 'name') == NULL ? "New Access Profile" : GetFormData($form, $section, 'name'));
+$TITLE = "Edit Access Profile: " . (GetFormData($form, $section, 'name') == NULL ? "New Access Profile" : htmlentities(GetFormData($form, $section, 'name')));
 $DESCRIPTION = GetFormData($form, $section, 'description');
 
 include_once("nav.inc.php");

@@ -92,7 +92,7 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = 'Rename Message: ' . GetFormData($form,$section,"name");
+$TITLE = 'Rename Message: ' . htmlentities(GetFormData($form,$section,"name"));
 
 include_once("nav.inc.php");
 

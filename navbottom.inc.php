@@ -12,7 +12,7 @@ Use of this system is subject to the <a href="privacy.html" target="_blank">Priv
 
 </div>
 <?
-print "<div id='logininfo' class='noprint' >Logged in as $USER->firstname $USER->lastname ($USER->login) <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
+print "<div id='logininfo' class='noprint' >Logged in as ".htmlentities($USER->firstname)." ".htmlentities($USER->lastname)." (".htmlentities($USER->login).") <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
 
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {

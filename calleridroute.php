@@ -164,7 +164,7 @@ if( $reloadform )
 
 
 $PAGE="admin:settings";
-$TITLE="Caller ID Routes Manager: $dmname";
+$TITLE="Caller ID Routes Manager: ".htmlentities($dmname);
 $DESCRIPTION="Jtapi Caller ID";
 include_once("nav.inc.php");
 

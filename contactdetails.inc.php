@@ -273,7 +273,7 @@ $contactFullName .= $data->$firstnamefield;
 $lastnamefield = FieldMap::getLastNameField();
 $contactFullName .= " ".$data->$lastnamefield;
 
-$TITLE = "View Contact Information: " . $contactFullName;
+$TITLE = "View Contact Information: " . htmlentities($contactFullName);
 
 include_once("nav.inc.php");
 NewForm($f);

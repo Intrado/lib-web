@@ -302,7 +302,7 @@ $fieldmap = FieldMap::getAuthorizedMapNames();
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = format_delivery_type($MESSAGETYPE) . ' Message Editor: ' . (GetFormData($form,$section,"name") ? GetFormData($form,$section,"name") : "New Message" );
+$TITLE = format_delivery_type($MESSAGETYPE) . ' Message Editor: ' . (GetFormData($form,$section,"name") ? htmlentities(GetFormData($form,$section,"name")) : "New Message" );
 $ICON = $MESSAGETYPE . ".gif";
 
 include_once("nav.inc.php");

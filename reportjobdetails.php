@@ -312,12 +312,12 @@ if($error || $reportgenerator->format == "html"){
 	}
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
-		$TITLE .= " - " . $subscription->name;
+		$TITLE .= " - " . htmlentities($subscription->name);
 	} else if(isset($jobid)){
 		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
 			$DESCRIPTION = $job->name;
 		} else {
-			$TITLE .= " - " . $job->name;
+			$TITLE .= " - " . htmlentities($job->name);
 		}
 	}
 	if(isset($options['reldate'])){

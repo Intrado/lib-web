@@ -45,7 +45,7 @@ function fmt_surveyactions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = 'start:start';
-$TITLE = 'Welcome ' . $USER->firstname . ' ' . $USER->lastname;
+$TITLE = 'Welcome ' . htmlentities($USER->firstname) . ' ' . htmlentities($USER->lastname);
 
 if($USER->authorize("leavemessage")){
 	if($count > 0){

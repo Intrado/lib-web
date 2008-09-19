@@ -406,7 +406,7 @@ $dis = "";
 if ($readonly) $dis = "disabled";
 
 $PAGE = "admin:users";
-$TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : GetFormData($f,$s,"firstname") . ' ' . GetFormData($f,$s,"lastname"));
+$TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : htmlentities(GetFormData($f,$s,"firstname")) . ' ' . htmlentities(GetFormData($f,$s,"lastname")));
 include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, 'submitbutton', 'Save'), button('Email Password Reset', "if(confirm('Are you sure you want to Email this user to reset their password?')) window.location='?resetpass=1&id=$usr->id'"));

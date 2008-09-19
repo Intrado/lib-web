@@ -145,7 +145,7 @@ $titles = array(0 => "Match",
 
 NewForm($f);
 $PAGE="admin:settings";
-$TITLE="Upload Telco Settings Preview: " . $dmname;
+$TITLE="Upload Telco Settings Preview: " . htmlentities($dmname);
 include("nav.inc.php");
 buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadroutes.php"), button("Cancel", null, "dmsettings.php"));
 startWindow("Routes Preview" . ($count <= 0 ? " - First 5000 Records" : ""));

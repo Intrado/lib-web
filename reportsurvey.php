@@ -125,7 +125,7 @@ if($reload){
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:reports";
-$TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+$TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . htmlentities($job->name) : "");
 
 include_once("nav.inc.php");
 NewForm($f);

@@ -34,16 +34,16 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 function fmt_survey_graph($row, $index){
 	global $jobid;
 	echo "<div><img src=\"graph_survey_result.png.php?jobid=" . $jobid . "&question=" . ($row[0] -1) . "&valid=".$row[14] ."\"></div>";
-	
+
 }
 
 function fmt_question($row, $index){
-	return "<div style='text-decoration: underline'>$row[$index]</div>";	
+	return "<div style='text-decoration: underline'>$row[$index]</div>";
 }
 
 function fmt_answer($row, $index){
 	$offset = $index+12;
-	return "<div style='font-weight:bold; text-decoration: underline'>" . (isset($row[$offset]) ? $row[$offset] : "") . "</div><br><div>$row[$index]</div>";	
+	return "<div style='font-weight:bold; text-decoration: underline'>" . (isset($row[$offset]) ? $row[$offset] : "") . "</div><br><div>$row[$index]</div>";
 }
 
 function fmt_questionnumber($row, $index){
@@ -76,7 +76,7 @@ if(isset($_GET['reportid'])){
 	$_SESSION['report']['surveysummary'] = 1;
 } else {
 	$jobid = 0;
-	
+
 	if (isset($_GET['jobid'])) {
 		$jobid = $_GET['jobid'] + 0;
 		$_SESSION['report']['surveysummary'] = 1;
@@ -86,12 +86,12 @@ if(isset($_GET['reportid'])){
 	}
 	$options['reporttype'] = "surveyreport";
 	if($jobid){
-		
+
 		//check userowns or customerowns and viewsystemreports
 		if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports'))) {
 			redirect('unauthorized.php');
 		}
-		
+
 		unset($_SESSION['jobstats'][$jobid]);
 		$job = new Job($jobid);
 		$options['jobid'] = $jobid;
@@ -157,11 +157,11 @@ if($generator->format != "html"){
 		$name = secure_tmpname("report", ".pdf");
 		$params = createPdfParams($name);
 		$result = $generator->generate($params);
-		
+
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=report.pdf");
-		header("Content-type: application/pdf");	
+		header("Content-type: application/pdf");
 		session_write_close();
 		$fp = fopen($name, "r");
 		while($line = fgets($fp)){
@@ -172,9 +172,9 @@ if($generator->format != "html"){
 		$generator->generate();
 	}
 } else {
-	
+
 	$PAGE = "reports:reports";
-	$TITLE = "Survey Results" . ((isset($jobid) && $jobid) ? " - " . $job->name : "");
+	$TITLE = "Survey Results" . ((isset($jobid) && $jobid) ? " - " . htmlentities($job->name) : "");
 
 	include_once("nav.inc.php");
 	NewForm($f);
@@ -186,7 +186,7 @@ if($generator->format != "html"){
 		$back = button("Back", "location.href=' " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
 	buttons($back, submit($f, $s, "Save/Schedule"),button('Refresh', 'window.location.reload()'));
-	
+
 		startWindow("Related Links", "padding: 3px;");
 		?>
 		<table border="0" cellpadding="3" cellspacing="0" width="100%">

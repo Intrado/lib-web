@@ -166,7 +166,7 @@ if( $reloadform )
 }
 
 $PAGE="admin:settings";
-$TITLE="Route Plan Manager: $dmname";
+$TITLE="Route Plan Manager: ".htmlentities($dmname);
 include_once("nav.inc.php");
 
 NewForm($f);

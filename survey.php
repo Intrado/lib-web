@@ -249,7 +249,7 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:survey";
-$TITLE = "Survey Scheduler: " . (getCurrentSurvey() == NULL ? "New Survey" : $job->name);
+$TITLE = "Survey Scheduler: " . (getCurrentSurvey() == NULL ? "New Survey" : htmlentities($job->name));
 
 include_once("nav.inc.php");
 NewForm($f);

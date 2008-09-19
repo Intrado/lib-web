@@ -194,9 +194,9 @@ $PAGE = "reports:reports";
 $TITLE = "Notification Summary";
 if(isset($_SESSION['reportid'])){
 	$subscription = new ReportSubscription($_SESSION['reportid']);
-	$TITLE .= " - " . $subscription->name;
+	$TITLE .= " - " . htmlentities($subscription->name);
 } else if((isset($jobid) && $jobid)){
-	$TITLE .= " - " . $job->name;
+	$TITLE .= " - " . htmlentities($job->name);
 }
 include_once("nav.inc.php");
 NewForm($f);

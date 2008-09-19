@@ -183,7 +183,7 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:taskmanager";
-$TITLE = "Import Editor: " . ($IMPORT->id ? $IMPORT->name : 'New Import');
+$TITLE = "Import Editor: " . ($IMPORT->id ? htmlentities($IMPORT->name) : 'New Import');
 
 include_once("nav.inc.php");
 
