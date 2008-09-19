@@ -34,6 +34,8 @@ if (isset($_GET['delete'])) {
 
 	switch ($import->datatype) {
 	case "person" :
+		// delete all groupdata with this importid
+		QuickUpdate("delete from groupdata where importid=$id");
 		//deactivate everyone with this importid
 		QuickUpdate("update person set deleted=1, lastimport=now() where importid=$id");
 		//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
@@ -42,7 +44,7 @@ if (isset($_GET['delete'])) {
 					where p.id is null and le.personid is not null");
 
 		//recalc pdvalues for all fields mapped
-		$fieldnums = QuickQueryList("select distinct mapto from importfield where mapto like 'f%' and importid=$id");
+		$fieldnums = QuickQueryList("select distinct mapto from importfield where (mapto like 'f%' or mapto like 'g%') and importid=$id");
 		if (count($fieldnums) > 0) {
 			$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
 			foreach ($fields as $field)
@@ -58,16 +60,10 @@ if (isset($_GET['delete'])) {
 		// TODO how to remove userrules
 
 		// clear out data
-		QuickUpdate("delete from enrollment");
+		QuickUpdate("truncate enrollment");
 
-		//recalc pdvalues for all fields mapped
-		$fieldnums = QuickQueryList("select distinct mapto from importfield where mapto like 'c%' and importid=$id");
-		if (count($fieldnums) > 0) {
-			$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
-			foreach ($fields as $field)
-				$field->updatePersonDataValues();
-		}
-
+		//remove pdvalues for all Cfields
+		QuickUpdate("delete from persondatavalues where fieldnum like 'c%'");
 	break;
 	}
 
