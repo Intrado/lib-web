@@ -17,20 +17,31 @@ class Rule extends DBMappedObject {
 	function toSql ($alias = false, $fieldoverride = false, $isreport = false) {
 		$val = DBSafe($this->val);
 		$f = ($alias ? "$alias.":"") . ($fieldoverride ? $fieldoverride : $this->fieldnum);
-		
+
 		$sql = " " . $this->logical . " ";
-		
+
 		//check if this needs a subquery
 		if (strpos($this->fieldnum, "g") === 0) {
 			if ($isreport) {
-				$sql .= "exists (select null from reportgroupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$alias.id and g.jobid=j.id and ";
+				switch ($alias) {
+					case "rp" :
+					$aliasid = "rp.personid";
+					break;
+					case "p" :
+					$aliasid = "p.id";
+					break;
+					default:
+					$aliasid = $alias . ".id";
+					break;
+				}
+				$sql .= "exists (select null from reportgroupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$aliasid and g.jobid=j.id and ";
 			} else {
 				$sql .= "exists (select null from groupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$alias.id and ";
 			}
 			//override f to point to g field data
 			$f = "g.value";
 		}
-		
+
 		//now put together the value checks
 		switch ($this->op) {
 			case "eq":
@@ -118,7 +129,7 @@ class Rule extends DBMappedObject {
 			default:
 				$sql = " and 0 "; //always default on the safe side
 		}
-		
+
 		//see if we need to close off a subquery parens
 		if (strpos($this->fieldnum, "g") === 0) {
 			$sql .= ")";
@@ -141,7 +152,7 @@ class Rule extends DBMappedObject {
 				}
 				if (strpos($rule->fieldnum, "g") === 0) {
 					//field override not used, but we still need to pass any alaias we're using for person record
-					$gquery .=  $rule->toSql($alias, $fieldoverride, $isreport); 
+					$gquery .=  $rule->toSql($alias, $fieldoverride, $isreport);
 				}
 				if (strpos($rule->fieldnum, "c") === 0) {
 					if ($cquery == "") $cquery = " and exists (select null from enrollment a where ".$alias.".id=a.personid ";
