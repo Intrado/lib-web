@@ -146,13 +146,30 @@ class FieldMap extends DBMappedObject {
 			$query = "delete from persondatavalues where fieldnum='$fieldnum '";
 			QuickUpdate($query);
 
-			$count = QuickUpdate("insert into persondatavalues (fieldnum,value,refcount) "
+			switch ($fieldnum[0]) {
+				case "f" :
+				$query = "insert into persondatavalues (fieldnum,value,refcount) "
 							. "select '$fieldnum' as fieldnum, "
 							. "p.$fieldnum as value, "
 							. "count(*) "
 							. "from person p "
 							. "where not p.deleted and p.type = 'system' "
-							. "group by value");
+							. "group by value";
+				break;
+				case "g" :
+				$query = "insert into persondatavalues (fieldnum,value,refcount) "
+							. "select '$fieldnum' as fieldnum, "
+							. "gd.value as value, "
+							. "count(*) "
+							. "from groupdata gd "
+							. "where fieldnum=" . substr($fieldnum,1) . " "
+							. "group by value";
+				break;
+				case "c" :
+				// nothing, handled via enrollment import only
+				break;
+			}
+			$count = QuickUpdate($query);
 		}
 	}
 
