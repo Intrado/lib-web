@@ -7,7 +7,7 @@ class PortalReport extends ReportGenerator{
 	function generateQuery(){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
-		$rulesql = getRuleSql($this->params, "p");
+		$rulesql = getRuleSql($this->params, "p", false);
 		$usersql = $USER->userSQL("p");
 		$pkeysql = "";
 		$hideactivecodes = "";

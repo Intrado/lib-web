@@ -14,7 +14,7 @@ class Rule extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function toSql ($alias = false, $fieldoverride = false, $isreport = false) {
+	function toSql ($alias = false, $fieldoverride = false, $isjobreport = false) {
 		$val = DBSafe($this->val);
 		$f = ($alias ? "$alias.":"") . ($fieldoverride ? $fieldoverride : $this->fieldnum);
 
@@ -22,7 +22,7 @@ class Rule extends DBMappedObject {
 
 		//check if this needs a subquery
 		if (strpos($this->fieldnum, "g") === 0) {
-			if ($isreport) {
+			if ($isjobreport) {
 				switch ($alias) {
 					case "rp" :
 					$aliasid = "rp.personid";

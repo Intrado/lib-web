@@ -17,10 +17,10 @@ function getOrderSql($params){
 
 }
 
-function getRuleSql($params, $alias){
+function getRuleSql($params, $alias, $isjobreport=true){
 	$rulesql = "";
 	if(isset($params['rules'])){
-		$rulesql = Rule::makeQuery($params['rules'], $alias,false,true);
+		$rulesql = Rule::makeQuery($params['rules'], $alias,false,$isjobreport);
 	}
 	return $rulesql;
 }

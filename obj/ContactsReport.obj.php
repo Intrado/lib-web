@@ -8,7 +8,7 @@ class ContactsReport extends ReportGenerator {
 		$this->reporttype = $this->params['reporttype'];
 
 		$orderquery = getOrderSql($this->params);
-		$rulesql = getRuleSql($this->params, "p");
+		$rulesql = getRuleSql($this->params, "p", false);
 
 		$userJoin = " and p.userid = '$USER->id' ";
 
