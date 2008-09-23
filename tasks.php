@@ -57,7 +57,8 @@ if (isset($_GET['delete'])) {
 
 	break;
 	case "enrollment" :
-		// TODO how to remove userrules
+		// NOTE: do not remove userrules... do not inadvertently grant access to persons they should not see.
+		// Next enrollment import (assuming there is a new one set up) will recreate necessary rules at that time
 
 		// clear out data
 		QuickUpdate("truncate enrollment");
