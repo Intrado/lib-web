@@ -958,7 +958,8 @@ class SMAPI{
 			$defaultcontactprefs = getDefaultContactPrefs();
 
 			$contacts = array();
-			foreach(array("phone", "email", "sms") as $type){
+			//array("phone", "email", "sms")
+			foreach(array_keys($contactdata) as $type){
 				foreach($contactdata[$type] as $object){
 					$contact = new API_Contact();
 					$contact->pkey = $pkey;
@@ -1096,19 +1097,22 @@ class SMAPI{
 				}
 				$obj->update();
 			}
+            if(is_array($contact->contactpreferences)){
+			    //generate array of contact prefs so that we can iterate later in a transaction
+		    	foreach($contact->contactpreferences as $contactpreference){
+				 	$personcontactprefs[($contactpreference->jobtypeid+0)] = ($contactpreference->enabled ? "1" : "0");
+				}
 
-			//generate array of contact prefs so that we can iterate later in a transaction
-			foreach($contact->contactpreferences as $contactpreference){
-				$personcontactprefs[($contactpreference->jobtypeid+0)] = ($contactpreference->enabled ? "1" : "0");
-			}
-
-			QuickUpdate("begin");
-			foreach($personcontactprefs as $jobtypeid => $enabled){
-				QuickUpdate("delete from contactpref where personid = " . $personid . " and jobtypeid = " . $jobtypeid . "  and type = '" . $contact->type . "' and sequence = " . ($contact->sequence + 0));
-				QuickUpdate("insert into contactpref values (" . $personid . ", " . $jobtypeid . ", '" . $contact->type . "', " . ($contact->sequence + 0) . ", '" . $enabled . "')");
-			}
-			QuickUpdate("commit");
-
+				QuickUpdate("begin");
+				foreach($personcontactprefs as $jobtypeid => $enabled){
+					QuickUpdate("delete from contactpref where personid = " . $personid . " and jobtypeid = " . $jobtypeid . "  and type = '" . $contact->type . "' and sequence = " . ($contact->sequence + 0));
+					QuickUpdate("insert into contactpref values (" . $personid . ", " . $jobtypeid . ", '" . $contact->type . "', " . ($contact->sequence + 0) . ", '" . $enabled . "')");
+				}
+				QuickUpdate("commit");
+            }
+            else{
+            	// No valid content preferences
+            }
 			$result["resultcode"] = "success";
 			return $result;
 		}
