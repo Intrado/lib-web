@@ -972,11 +972,13 @@ class SMAPI{
 					} else {
 						$pref = $defaultcontactprefs[$type][$object->sequence];
 					}
-					foreach($pref as $jobtypeid => $enabled){
+					if(isset($pref)){   // if has sms is not set in manager the pref is not set 
+					  foreach($pref as $jobtypeid => $enabled){
 						$contactpreference = new API_ContactPreference();
 						$contactpreference->jobtypeid = $jobtypeid;
 						$contactpreference->enabled = (bool)$enabled;
 						$contactpreferences[] = $contactpreference;
+					  }
 					}
 					$contact->contactpreferences = $contactpreferences;
 					$contacts[] = $contact;
