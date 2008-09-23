@@ -20,13 +20,13 @@ function generateFields($tablealias){
 	return $fieldstring;
 }
 
-function generateGFieldQuery($personidalias, $joblist = false, $hackPDF = false) {
+function generateGFieldQuery($personidalias, $isreporthistory = false, $hackPDF = false) {
 	$fieldstring = "";
 	$gdtable = "groupdata";
 	$jidstr = "";
-	if ($joblist) {
+	if ($isreporthistory) {
 		$gdtable = "reportgroupdata";
-		$jidstr = " and jobid in('".$joblist."')";
+		$jidstr = " and jobid=j.id ";
 	}
 	for ($i=1; $i<=10; $i++) {
 		if($i<10){

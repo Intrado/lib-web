@@ -91,7 +91,7 @@ class JobDetailReport extends ReportGenerator{
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
 		$fieldquery = generateFields("rp");
-		$gfieldquery = generateGFieldQuery("rp.personid", $joblist, $hackPDF);
+		$gfieldquery = generateGFieldQuery("rp.personid", true, $hackPDF);
 		$this->query =
 			"select SQL_CALC_FOUND_ROWS
 			j.name as jobname,

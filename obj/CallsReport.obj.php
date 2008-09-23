@@ -51,7 +51,7 @@ class CallsReport extends ReportGenerator{
 		$search = $personquery . $phonequery . $emailquery . $jobtypesquery . $resultquery  . $jobquery;
 
 		$fieldquery = generateFields("rp");
-		$gfieldquery = generateGFieldQuery("rp.personid", $joblist);
+		$gfieldquery = generateGFieldQuery("rp.personid", true);
 
 		$this->query =
 				"Select
