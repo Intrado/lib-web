@@ -330,7 +330,7 @@ class Message extends DBMappedObject {
 		echo $data;
 
 	} else {
-		echo "oops";
+		echo "An error occuring trying to generate the preview file. Please try again.";
 	}
 
 	@unlink($outname);
