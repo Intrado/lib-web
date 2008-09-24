@@ -57,13 +57,13 @@ if (isset($_SERVER['HTTP_X_CISCOIPPHONEMODELNAME']))
 else
 	$_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'] = isset($_SESSION['HTTP_X_CISCOIPPHONEMODELNAME']) ? $_SESSION['HTTP_X_CISCOIPPHONEMODELNAME'] : null;
 
-
+/*
 $fp = fopen("foo.txt","w");
 ob_start();
 var_dump($GLOBALS);
 fwrite($fp,ob_get_clean());
 fclose($fp);
-
+*/
 
 $PHONE_FEATURES = array(
 "CiscoIPPhoneText" 				=> array("7905" => true, 	"7912" => true, 	"7920" => true, 	"7940" => true,		"7941" => true, 	"7960" => true, 	"7970" => true, 	"IP Communicator" => true),
