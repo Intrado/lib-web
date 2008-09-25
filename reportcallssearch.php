@@ -89,7 +89,7 @@ $results = array("A" => "Answered",
 					"blocked" => "Blocked",
 					"notattempted" => "Not Attempted",
 					"sent" => "Sent",
-					"unset" => "Unsent",
+					"unsent" => "Unsent",
 					"declined" => "No Destination Selected");
 
 $f = "report";
