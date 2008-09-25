@@ -458,7 +458,7 @@ foreach ($fieldmaps as $map) {
 
 
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Enrollment Data:</th>
+		<th align="right" class="windowRowHeader bottomBorder sortable">Enrollment Data:</th>
 		<td class="bottomBorder">
 		<table border="1" cellpadding="3">
 <?
