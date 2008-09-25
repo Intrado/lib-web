@@ -8,7 +8,7 @@ function pearxmlrpc($method, $params) {
 
 	$cli = new XML_RPC_Client('/xmlrpc', $authhost);
 
-	$resp = $cli->send($msg);
+	$resp = $cli->send($msg, 90);
 
 	if (!$resp) {
     	error_log($method . ' communication error: ' . $cli->errstr);
