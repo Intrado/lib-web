@@ -20,8 +20,10 @@ $ACTIVEMAINTABTITLE = "";
 
 $SHORTCUTS = array();
 
-if (isset($_GET['timer']))
+if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 	$PAGETIME = microtime(true);
+	$_SESSION['timer'] == true;
+}
 
 if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
 	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
