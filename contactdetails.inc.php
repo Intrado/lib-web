@@ -458,33 +458,32 @@ foreach ($fieldmaps as $map) {
 
 
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder sortable">Enrollment Data:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Enrollment Data:</th>
 		<td class="bottomBorder">
-		<table border="1" cellpadding="3">
+		<table border="1" cellpadding="3" class="list sortable">
 <?
 		$assocdata = QuickQueryMultiRow("select c01, c02, c03, c04, c05, c06, c07, c08, c09, c10 from enrollment where personid=".$personid, true);
 		//var_dump($assocdata);
 
 		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("c%");
 ?>
-		<tr>
+		<tr class="listHeader">
 <?
 		foreach ($fieldmaps as $map) {
 			$header = $map->name;
 ?>
-			<th align="left" class="windowRowHeader"><?=$header?></th>
+			<th align="left"><?=htmlentities($header)?></th>
 <?
 		}
 ?>
 		</tr>
 <?
+		$alt = 0;
 		foreach ($assocdata as $row) {
-?>
-			<tr>
-<?
+			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 			foreach ($fieldmaps as $map) {
 ?>
-			<td><?=$row[$map->fieldnum]?></td>
+			<td><?=htmlentities($row[$map->fieldnum])?></td>
 <?
 			}
 ?>
