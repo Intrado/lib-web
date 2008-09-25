@@ -460,7 +460,7 @@ foreach ($fieldmaps as $map) {
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Enrollment Data:</th>
 		<td class="bottomBorder">
-		<table border="1" cellpadding="3" class="list sortable">
+		<table cellpadding="3" cellspacing="1" class="list sortable" id="enrollmenttable">
 <?
 		$assocdata = QuickQueryMultiRow("select c01, c02, c03, c04, c05, c06, c07, c08, c09, c10 from enrollment where personid=".$personid, true);
 		//var_dump($assocdata);
