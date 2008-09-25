@@ -4,13 +4,6 @@
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 header('Content-type: text/html; charset=ISO-8859-1');
-
-?>
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-	</script>
-<?
-
 $PAGETITLE = preg_replace('/\\<.+>/','',$TITLE);
 
 list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
@@ -199,6 +192,10 @@ doNavTabs($NAVTREE);
 	<link href='css.php' type='text/css' rel='stylesheet' media='screen'>
 </head>
 <body>
+	<script>
+		var _brandtheme = "<?=getBrandTheme();?>";
+	</script>
+
 	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
 
 <!-- ********************************************************************* -->

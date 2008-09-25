@@ -2,9 +2,7 @@
 $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 ?>
 
-<script>
-	var _brandtheme = "<?=getBrandTheme();?>";
-</script>
+
 
 
 <html>
@@ -19,8 +17,10 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 
 
 <body onload="try {UpdateTimer();} catch (e) {}" style="margin: 0px; background-color: white;">
+	<script>
+		var _brandtheme = "<?=getBrandTheme();?>";
+	</script>
 	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
-
 
 
 <!-- ********************************************************************* -->
