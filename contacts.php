@@ -216,7 +216,7 @@ startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 
 									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
 
 									//include("ruleeditform.inc.php");
-									drawRuleTable($f, $s, false, true, true, false);
+									drawRuleTable($f, $s, false, true, true, true);
 
 								?>
 								</td>
