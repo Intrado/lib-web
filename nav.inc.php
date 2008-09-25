@@ -15,7 +15,7 @@ $SHORTCUTS = array();
 
 if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 	$PAGETIME = microtime(true);
-	$_SESSION['timer'] == true;
+	$_SESSION['timer'] = true;
 }
 
 if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
