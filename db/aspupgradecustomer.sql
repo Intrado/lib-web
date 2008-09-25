@@ -20,7 +20,7 @@ ADD `lastimport` DATETIME NULL
 $$$
 
 CREATE TABLE `groupdata` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `personid` INT NOT NULL ,
 `fieldnum` TINYINT NOT NULL ,
 `value` VARCHAR( 255 ) NOT NULL,
@@ -31,7 +31,7 @@ KEY `importid` (`importid`)
 $$$
 
 CREATE TABLE `reportgroupdata` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `jobid` INT NOT NULL,
 `personid` INT NOT NULL ,
 `fieldnum` TINYINT NOT NULL ,

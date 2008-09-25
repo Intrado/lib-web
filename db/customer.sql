@@ -1508,3 +1508,9 @@ $$$
 ALTER TABLE `groupdata` ADD INDEX ( `importid` )
 $$$
 
+ALTER TABLE `groupdata` CHANGE `id` `id` BIGINT( 11 ) NOT NULL AUTO_INCREMENT
+$$$
+
+ALTER TABLE `reportgroupdata` CHANGE `id` `id` BIGINT( 11 ) NOT NULL AUTO_INCREMENT
+$$$
+
