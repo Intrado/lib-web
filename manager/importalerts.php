@@ -92,11 +92,13 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, "Clear")) {
 				$newalertoptions['emails'] = GetFormdata($f,$s,'emailaddresses');
 			}
 			
-			// Update the database
+			// Update the database only if there are any changes, or if the Clear button was pressed.
 			$alertoptionsurl = http_build_query($newalertoptions, false, "&");
-			if (CheckFormSubmit($f, "Clear") || $alertoptionsurl != substr($import['alertoptions'], 0, strpos($import['alertoptions'], "&lastnotified")))
+			$existingoptions = substr($import['alertoptions'], 0, strpos($import['alertoptions'], "&lastnotified"));
+			if (CheckFormSubmit($f, "Clear") || $alertoptionsurl != $existingoptions)
 				QuickUpdate("update import set alertoptions = '" . DBSafe($alertoptionsurl) . "' where id = {$_SESSION['importid']}", $custdb);
 			
+			ClearFormData($f);
 			redirect("customerimports.php");
 		}
 	}
@@ -111,6 +113,7 @@ if ($reloadform === true) {
 	PutFormData($f, $s, "emailaddresses", isset($alertoptions['emails']) ? $alertoptions['emails'] : "", "text");
 	PutFormData($f, $s, "filesizemin", isset($alertoptions['minsize']) ? $alertoptions['minsize'] : "", "number", 0);
 	PutFormData($f, $s, "filesizemax", isset($alertoptions['maxsize']) ? $alertoptions['maxsize'] : "", "number", 0);
+	PutFormData($f, $s, "filesizepercent", "", "number");
 	PutFormData($f, $s, "scheduled", isset($alertoptions['dow']) ? 1 : 0, "text");
 	PutFormData($f, $s, "staledatamindays", isset($alertoptions['daysold']) ? $alertoptions['daysold'] : "", "number", 1);
 	$scheduleddays = (isset($alertoptions['dow'])) ? array_flip(explode(",", $alertoptions['dow'])) : array();
@@ -216,11 +219,11 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	<tr>
 		<td>Last Notified:</td>
 		<td><?= isset($alertoptions['lastnotified']) ? date("M j, Y g:i a", $alertoptions['lastnotified']) : "--Never--" ?>
-			<?php NewFormItem($f, "Clear", "Clear", 'submit'); ?>
+			<?php NewFormItem($f, "Clear", "Clear", "submit"); ?>
 		</td>
 	</tr>
 </table>
-<div><? NewFormItem($f, $s, "Save", 'submit'); ?><a href="customerimports.php">Cancel</a></div>
+<div><? NewFormItem($f, $s, "Save", "submit"); ?><a href="customerimports.php">Cancel</a></div>
 <?
 managerPassword($f, $s);
 
