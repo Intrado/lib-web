@@ -191,19 +191,20 @@ if($reload){
 
 	PutFormData($f, $s, 'startdate', isset($options['startdate']) ? $options['startdate'] : "");
 	PutFormData($f, $s, 'enddate', isset($options['enddate']) ? $options['enddate'] : "");
-	$savedjobtypes = array();
-	if(isset($options['jobtype'])){
-		$savedjobtypes = explode("','", $options['jobtype']);
-	}
-	PutFormData($f, $s, 'jobtype', isset($options['jobtype']) && $options['jobtype'] !="" ? 1 : 0, "bool", 0, 1);
-	PutFormData($f, $s, 'jobtypes', $savedjobtypes, "array", array_keys($jobtypes));
-	$result = array();
-	if(isset($options['result'])){
-		$result = explode("','", $options['result']);
-	}
 
-	PutFormData($f, $s, 'result', isset($options['result']) && $options['result'] !="" ? 1 : 0, "bool", 0, 1);
-	PutFormData($f, $s, 'results', $result , "array", array_keys($results));
+	$savedjobtypes = array();
+	if(isset($options['jobtypes'])){
+		$savedjobtypes = explode("','", $options['jobtypes']);
+	}
+	PutFormData($f, $s, 'jobtype', isset($options['jobtypes']) && $options['jobtypes'] !="" ? 1 : 0, "bool", 0, 1);
+	PutFormData($f, $s, 'jobtypes', $savedjobtypes, "array", array_keys($jobtypes));
+
+	$savedresults = array();
+	if(isset($options['results'])){
+		$savedresults = explode("','", $options['results']);
+	}
+	PutFormData($f, $s, 'result', isset($options['results']) && $options['results'] !="" ? 1 : 0, "bool", 0, 1);
+	PutFormData($f, $s, 'results', $savedresults, "array", array_keys($results));
 
 	PutFormData($f,$s,"newrulefieldnum","");
 	PutFormData($f,$s,"newruletype","text","text",1,50);

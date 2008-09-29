@@ -44,8 +44,8 @@ class CallsReport extends ReportGenerator{
 			$joblist = $this->params['joblist'];
 		}
 
-		if(isset($this->params['result']) && $this->params['result'] != ""){
-			$resultquery = " and rc.result in ('" . $this->params['result'] . "') ";
+		if(isset($this->params['results']) && $this->params['results'] != ""){
+			$resultquery = " and rc.result in ('" . $this->params['results'] . "') ";
 		}
 
 		$search = $personquery . $phonequery . $emailquery . $jobtypesquery . $resultquery  . $jobquery;
