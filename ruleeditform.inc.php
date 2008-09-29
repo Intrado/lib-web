@@ -6,7 +6,7 @@ function showmode($type) {
 }
 
 function drawRuleTable($f, $s, $readonly = false, $withffields = true, $withgfields = true, $withcfields = true) {
-global $RULES, $fieldmap, $USER, $RULE_OPERATORS;
+global $RULES, $fieldmap, $USER, $RULE_OPERATORS, $RELDATE_OPTIONS;
 
 ?>
 <table border="0" cellspacing="3" cellpadding="2" class="border" width="50%">
