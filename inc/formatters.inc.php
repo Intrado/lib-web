@@ -45,7 +45,7 @@ function fmt_obj_email ($obj,$name) {
 
 function fmt_null ($row,$index) {
 	if (isset($row[$index]))
-		return $row[$index];
+		return htmlentities($row[$index]);
 	else
 		return "&nbsp;";
 }
