@@ -62,7 +62,7 @@ if (isset($_GET['logout'])) {
 		$badlogin = true;
 	}
 } else if (isset($_GET['login'])) {
-	if (tryLogin(doLogin($_GET['login'], $_GET['password'],$CUSTOMERURL))) {
+	if (tryLogin(doLogin($_GET['login'], $_GET['password'], $CUSTOMERURL,$_SERVER['REMOTE_ADDR']))) {
 		$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 		sleep(1);
 		header("Location: $URL/main.php");
