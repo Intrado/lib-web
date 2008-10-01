@@ -5,21 +5,21 @@ foreach ($_GET as $k => $v) {
 	$line .= "$k=$v&";
 	$body .= "$k=$v\n";
 }
-$message = $_GET["Message"];
+$message = $_GET["MessageText"];
 $replyto = $_GET["SourceAddr"];
 $message = strtolower($message);
 
-$keywords = array("stop","help","cancel");
+$keywords = array("end","stop","quit","cancel","unsubscribe");
 
-if(!array_key_exists($message,$keywords)){ // Send a reply message if not in out keyword list
+if(!in_array($message,$keywords)){ // Send a reply message if not in out keyword list
 	$client = new SoapClient(null,array("location" => "http://api.cmsmobilesuite.com:8080/axis2-1.3/services/NmApi", "uri" => "http://nmapi.cmsmobilesuite.com"));
 
 	if(client){
 		try{
 			$response = $client->SubmitSMS("schoolmessenger","h3qfh221","45305",$replyto,"This is an automated response. To stop future Schoolmessenger messagas reply: \"stop\" or for more options reply: \"help\"");
-		    //	echo "Sending SMS";   // For testing, Log later
+			//echo "Sending SMS";// For testing
 		} catch (SoapFault $fault) {
-		    error_log("SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})");
+			error_log("SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})");
 		}
 	}
 	else{
@@ -28,21 +28,30 @@ if(!array_key_exists($message,$keywords)){ // Send a reply message if not in out
 
 }
 else{ // Send a email to support
-	echo "Emailing";
+	//echo "Emailing";// For testing
 
 	$cmd = "/usr/commsuite/java/j2sdk/bin/java -jar /usr/commsuite/server/simpleemail/simpleemail.jar";
 	$cmd .= " -s \"New SMS Message\"";
 	$cmd .= " -f \"noreply@schoolmessenger.com\"";
 	$cmd .= " -t \"marnberg@schoolmessenger.com\"";
 	$process = popen($cmd, "w");
-	fwrite($process, $body);
-	fclose($process);
+	if($process){
+		fwrite($process, $body);
+		fclose($process);
+	}
+	else{
+		error_log("Unable to email SMS message from $replyto");
+	}
 }
 // Always log all incomming texts
 $fp = fopen("../txtreply.txt","a");
-fwrite($fp, $line . "\n");
-fclose($fp);
-
+if($fp){
+	fwrite($fp, $line . "\n");
+	fclose($fp);
+}
+else{
+	error_log("Unable to Log SMS message from $replyto in ../txtreply.txt");
+}
 
 
 
