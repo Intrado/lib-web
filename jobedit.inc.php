@@ -5,6 +5,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
+	$job = new Job($_GET['id'] + 0);
+	if ($job->type == "survey")
+		redirect("survey.php?id=" . ($_GET['id'] + 0));
+	
 	setCurrentJob($_GET['id']);
 	redirect();
 }
