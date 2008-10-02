@@ -28,14 +28,16 @@ $username2 = "";
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$username1 = get_magic_quotes_gpc() ? stripslashes($_POST['username1']) : $_POST['username1'];
 	$username2 = get_magic_quotes_gpc() ? stripslashes($_POST['username2']) : $_POST['username2'];
-	if ($username1 !== $username2){
+	if ($username1 !== $username2) {
 		error("The usernames you have entered do not match");
-	} else if ($username1 == ""){
+	} else if ($username1 == "") {
 		error("Please enter your username");
 	} else {
 		$result = forgotPassword($username1, $CUSTOMERURL);
-		if($result['result'] == ""){
+		if ($result['result'] == "") {
 			$success = true;
+		} else if ($result['result'] == "invalid data") {
+			error("There was a problem with your request.  Either the username you entered is not valid, or there is no email address associated with this user. Please contact your System Administrator or call support for assistance.");
 		} else {
 			error("There was a problem with your request.  Please try again later");
 		}
@@ -53,7 +55,7 @@ if(!$success){
 						<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 					</tr>
 					<tr>
-						<td colspan="2">To begin the password reset process, enter your username.</td>
+						<td colspan="2">To begin the password reset process, enter your username.<BR><BR></td>
 					</tr>
 					<tr>
 						<td>Username:</td>
@@ -81,8 +83,8 @@ if(!$success){
 			<td>&nbsp;</td>
 			<td>
 				<div style="margin:5px; font-size:12px">
-					Check your email to receive the password reset link.  If you do not recieve an email within 24 hours, please contact your System Administrator for help.
-					<br>You will be redirected to the reset password page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a>
+					You should receive an email containing a confirmation code shortly.  If you do not receive the email, please contact your System Administrator or call support for assistance.
+					<br>You will be redirected to the password assistance page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a>
 				</div>
 				<meta http-equiv="refresh" content="10;url=index.php?f">
 			</td>

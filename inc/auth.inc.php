@@ -1,6 +1,7 @@
 <?
 
-function pearxmlrpc($method, $params) {
+// if returndata, return data regardless of result success/failuer
+function pearxmlrpc($method, $params, $returndata = false) {
 	global $SETTINGS;
 	$authhost = $SETTINGS['authserver']['host'];
 
@@ -26,6 +27,7 @@ function pearxmlrpc($method, $params) {
 			// error
 			error_log($method . " " .$data['result']);
 		}
+		if ($returndata) return $data;
 	}
 	return false;
 }
@@ -282,7 +284,7 @@ function api_getCustomerURL($oem, $oemid){
 function forgotPassword($username, $customerurl){
 	$params = array(new XML_RPC_Value($username, 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "AuthServer.forgotPassword";
-	$result = pearxmlrpc($method, $params);
+	$result = pearxmlrpc($method, $params, true);
 	if($result !== false){
 		return $result;
 	}
