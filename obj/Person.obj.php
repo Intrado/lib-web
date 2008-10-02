@@ -35,7 +35,7 @@ class Person extends DBMappedObject {
 		$this->_tablename = "person";
 		$this->_fieldlist = array("userid", "pkey", "importid", "lastimport", "type", "deleted",
 									"f01", "f02", "f03", "f04", "f05", "f06", "f07", "f08", "f09", "f10",
-									"f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19");
+									"f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -61,7 +61,7 @@ class Person extends DBMappedObject {
 	function getEmails () {
 		return DBFindMany("Email", "from email where personid = '" . $this->id . "'");
 	}
-	
+
 	function getSmses () {
 		return DBFindMany("Sms", "from sms where personid = '" . $this->id . "'");
 	}
