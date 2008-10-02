@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <ftswdata>
+<key name="forget"> 62,30,31,32, </key>
 <key name="forgot"> 32, </key>
 <key name="format"> 67,39,10,12,43,32,51,47,55,56,16,65,9, </key>
 <key name="forth"> 31,32, </key>
@@ -177,7 +178,7 @@
 <key name="jsmith"> 9, </key>
 <key name="just"> 23,39,17,18,12,13,34,29,31,37,38,26,48,54,55,56,27, </key>
 <key name="keep"> 10,24,30, </key>
-<key name="key"> 3,24,60,62,53,54,55,56,73,65, </key>
+<key name="key"> 3,24,60,62,32,53,54,55,56,73,65, </key>
 <key name="kind"> 74, </key>
 <key name="know"> 19,28,34,29,24,31,72, </key>
 <key name="la"> 12, </key>
@@ -195,6 +196,5 @@
 <key name="leav"> 23,18,19,34,35,33,9, </key>
 <key name="left"> 0,2,3,18,19,61,30,31,51,53,54,55,56,64,8,74, </key>
 <key name="length"> 13,24,59,61,63,64, </key>
-<key name="les"> 23,24, </key>
 
 </ftswdata>  

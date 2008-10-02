@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <ftswdata>
+<key name="participant"> 25,24, </key>
 <key name="participat"> 25,34,50, </key>
 <key name="participation"> 25,50, </key>
-<key name="particular"> 10,12,56,73,65,44, </key>
+<key name="particular"> 10,12,32,56,73,65,44, </key>
 <key name="pas"> 31, </key>
 <key name="password"> 60,61,62,30,32,53,64,65, </key>
 <key name="past"> 32,45, </key>
@@ -105,7 +106,7 @@
 <key name="quick"> 29,24,6,15,32,49,33, </key>
 <key name="quickest"> 49,54, </key>
 <key name="quickstart"> 29, </key>
-<key name="quit"> 10, </key>
+<key name="quit"> 10,32, </key>
 <key name="r"> 34,31, </key>
 <key name="radio"> 70, </key>
 <key name="rafael"> 31, </key>
@@ -203,6 +204,5 @@
 <key name="saf"> 73, </key>
 <key name="safety"> 31, </key>
 <key name="sal"> 31, </key>
-<key name="sam"> 25,23,18,19,12,24,32,55, </key>
 
 </ftswdata>  
