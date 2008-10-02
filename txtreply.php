@@ -3,7 +3,8 @@ $username = "schoolmessenger";
 $password = "h3qfh221";
 $shortcode = "45305";
 $logfile = "/usr/commsuite/logs/txt.log";
-
+$javadir = "/usr/commsuite/java/j2sdk/bin/java";
+$emailjar = "/usr/commsuite/server/simpleemail/simpleemail.jar";
 
 $body="";
 $line = date("Y-m-d H:i:s,");
@@ -20,6 +21,9 @@ if ($fp) {
 else {
 	error_log("Unable to log SMS message from $replyto in $logfile");
 }
+
+
+
 
 $message = $_GET["MessageText"];
 $replyto = $_GET["SourceAddr"];
@@ -39,8 +43,8 @@ if (!in_array($message,$keywords)) {
 
 	if (client) {
 		try {
-			//$response = $client->SubmitSMS($username,$password,$shortcode,$replyto,"This is the SchoolMessenger automated notification system. For more information, reply HELP. Send STOP to opt out. Std rates/other chgs may apply.");
-			echo "Sending SMS";// For testing
+			$response = $client->SubmitSMS($username,$password,$shortcode,$replyto,"This is the SchoolMessenger automated notification system. For more information, reply HELP. Send STOP to opt out. Std rates/other chgs may apply.");
+			//echo "Sending SMS";// For testing
 		} catch (SoapFault $fault) {
 			error_log("SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})");
 		}
@@ -49,9 +53,9 @@ if (!in_array($message,$keywords)) {
 	}
 
 } else { // Send a email to support
-	echo "Emailing";// For testing
+	//echo "Emailing";// For testing
 
-	$cmd = "/usr/commsuite/java/j2sdk/bin/java -jar /usr/commsuite/server/simpleemail/simpleemail.jar";
+	$cmd = "$javadir -jar $emailjar";
 	$cmd .= " -s \"New SMS Message\"";
 	$cmd .= " -f \"noreply@schoolmessenger.com\"";
 	$cmd .= " -t \"marnberg@schoolmessenger.com\"";
