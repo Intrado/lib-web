@@ -106,7 +106,7 @@ function fmt_actions_dis ($obj,$name) {
 	if ($obj->importid > 0) $editviewaction = "View";
 
 	$resetpass = "";
-	if (QuickQuery("select id from user where id=$obj->id and password='new'")) {
+	if (QuickQuery("select id from user where id=$obj->id and password='new' and email != \"\"")) {
 		$resetpass = '<a href="?enable=' . $obj->id . '&resetpass=1">Enable with Reset Password</a>&nbsp;|&nbsp;';
 	}
 
