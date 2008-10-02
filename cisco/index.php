@@ -69,6 +69,7 @@ if (isset($_GET['logout'])) {
 		exit();
 	} else {
 		$badlogin = true;
+		$_SESSION['loginalpha'] = true;
 	}
 }
 
@@ -79,7 +80,7 @@ header("Content-type: text/xml");
 
 <CiscoIPPhoneInput>
 <Title><?=$scheme['productname']?> - Welcome</Title>
-<Prompt><?= ($badlogin) ? "Invalid code or PIN" : "Please log in" ?></Prompt>
+<Prompt><?= ($badlogin) ? ($_SESSION['loginalpha'] ? "Invalid username or password":"Invalid code or PIN") : "Please log in" ?></Prompt>
 <URL><?= $URL . "/index.php" ?></URL>
 
 
