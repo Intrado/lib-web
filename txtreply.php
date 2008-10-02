@@ -9,6 +9,8 @@ $sourcelog = "/usr/commsuite/logs/txtsourceday.log";
 $javadir = "/usr/commsuite/java/j2sdk/bin/java";
 $emailjar = "/usr/commsuite/server/simpleemail/simpleemail.jar";
 
+$supportemail = "support@schoolmessenger.com";
+
 $keywords = array("end","stop","quit","cancel","unsubscribe");
 
 $body="";
@@ -89,7 +91,7 @@ if (!in_array($message,$keywords)) {
 	$cmd = "$javadir -jar $emailjar";
 	$cmd .= " -s \"New SMS Message\"";
 	$cmd .= " -f \"noreply@schoolmessenger.com\"";
-	$cmd .= " -t \"marnberg@schoolmessenger.com\"";
+	$cmd .= " -t \"$supportemail\"";
 	$process = popen($cmd, "w");
 	if ($process) {
 		fwrite($process, $body);
