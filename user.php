@@ -666,7 +666,8 @@ startWindow('User Information');
 							<tr></tr>
 						</table>
 
-						<table id="bystaff" width="100%">
+						<div id="bystaff" style="width:100%;">
+						<table width="100%">
 							<tr>
 								<td>Staff&nbsp;ID:&nbsp;&nbsp;
 								<? if ($readonly) {
@@ -677,29 +678,31 @@ startWindow('User Information');
 								</td>
 							</tr>
 						</table>
+						</div>
 
 						<div id="ruleform" style="width:100%;">
 						<table width="100%">
-						<tr>
-							<td>
-						<?
-						if ($readonly) {
-							echo "<BR>";
-						} else {
-							?>
-							<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
-							<?
-						}
-						if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-							$cfield = true;
-						} else {
-							$cfield = $readonly; // if readonly, display cfield restrictions otherwise do not
-						}
+							<tr>
+								<td>
+								<?
+								if ($readonly) {
+									echo "<BR>";
+								} else {
+									?>
+									<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
+									<?
+								}
+								if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
+									$cfield = true;
+								} else {
+									$cfield = $readonly; // if readonly, display cfield restrictions otherwise do not
+								}
 
-						drawRuleTable($f, $s, $readonly, true, true, $cfield);
-						?>
-							</td>
-						</tr></table>
+								drawRuleTable($f, $s, $readonly, true, true, $cfield);
+								?>
+								</td>
+							</tr>
+						</table>
 						</div>
 
 						<div id="mustapply" style="width:100%;">
@@ -711,7 +714,6 @@ startWindow('User Information');
 							</tr>
 						</table>
 						</div>
-
 
 					</td>
 				</tr>
