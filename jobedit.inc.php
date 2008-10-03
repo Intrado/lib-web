@@ -702,11 +702,11 @@ startWindow('Job Information');
 			</div>
 
 			<div id='displaysettingsdetails' style="display:none">
-				<a href="#displaysettingsdetails" onclick="displaySection('settings', true); ">Show advanced options</a>
+				<a href="#" onclick="displaySection('settings', true); return false; ">Show advanced options</a>
 			</div>
 
 			<div id='displaysettingsbasic' style="display:none">
-				<a href="#displaysettingsbasic" onclick="displaySection('settings', false); ">Hide advanced options</a>
+				<a href="#" onclick="displaySection('settings', false); return false; ">Hide advanced options</a>
 			</div>
 
 			<div id="settingsdetails" style="display:none">
@@ -785,11 +785,11 @@ startWindow('Job Information');
 			</div>
 
 			<div id='displayphonedetails' style="display:none">
-				<a href="#displayphonedetails" onclick="displaySection('phone', true); ">Show advanced options</a>
+				<a href="#" onclick="displaySection('phone', true); return false; ">Show advanced options</a>
 			</div>
 
 			<div id='displayphonebasic' style="display:none">
-				<a href="#displayphonebasic" onclick="displaySection('phone', false); ">Hide advanced options</a>
+				<a href="#" onclick="displaySection('phone', false); return false; ">Hide advanced options</a>
 			</div>
 
 			<div id='phonedetails' style="display:none">
@@ -877,11 +877,11 @@ startWindow('Job Information');
 			</div>
 
 			<div id='displayemaildetails' style="display:none">
-				<a href="#displayemaildetails" onclick="displaySection('email', true);">Show advanced options</a>
+				<a href="#" onclick="displaySection('email', true); return false; ">Show advanced options</a>
 			</div>
 
 			<div id='displayemailbasic' style="display:none">
-				<a href="#displayemailbasic" onclick="displaySection('email', false);">Hide advanced options</a>
+				<a href="#" onclick="displaySection('email', false); return false; ">Hide advanced options</a>
 			</div>
 
 			<div id='emaildetails' style="display:none">
