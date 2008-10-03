@@ -116,7 +116,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && (strtotime(GetFormData($f, $s, 'startdate')) > strtotime(GetFormData($f, $s, 'enddate')))){
 			error("The end date must be before the start date");
 		} else if((GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
-			error('You must enter a number');
+			error('You must enter a number for X days');
 		} else if(GetFormData($f, $s, 'personid') == "" && GetFormData($f, $s, 'phone') == "" &&  GetFormData($f, $s, 'email')== ""){
 			error("At least one search criteria must have input");
 		} else {
