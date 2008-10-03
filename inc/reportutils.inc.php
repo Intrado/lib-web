@@ -36,7 +36,7 @@ function generateGFieldQuery($personidalias, $isreporthistory = false, $hackPDF 
 			$num = "g".$i;
 			if ($hackPDF) $num = "f30";
 		}
-		$fieldstring .= ", (select group_concat(value separator ', ') from $gdtable where fieldnum=$i and personid=$personidalias $jidstr) as $num";
+		$fieldstring .= ", (select group_concat(value separator ', ') from $gdtable where fieldnum=$i and personid=$personidalias $jidstr) as $num\n";
 	}
 	return $fieldstring;
 }
