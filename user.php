@@ -666,7 +666,7 @@ startWindow('User Information');
 							<tr></tr>
 						</table>
 
-						<table id="bystaff" width="1200">
+						<table id="bystaff">
 							<tr>
 								<td>Staff&nbsp;ID:&nbsp;&nbsp;
 								<? if ($readonly) {
@@ -678,9 +678,10 @@ startWindow('User Information');
 							</tr>
 						</table>
 
-						<table id="ruleform" width="100%">
-						<tr><td>
+						<table id="ruleform">
+						<tr><td width="1200">
 						<?
+
 						if ($readonly) {
 							echo "<BR>";
 						} else {
@@ -698,7 +699,7 @@ startWindow('User Information');
 						?>
 						</td></tr></table>
 
-						<table id="mustapply" width="1200">
+						<table id="mustapply">
 							<tr>
 								<td>
 								Click 'Apply' to edit data view restrictions.
