@@ -59,6 +59,9 @@ class JobDetailReport extends ReportGenerator{
 			} else {
 				$resultarray = array_flip(explode("','", $this->params['result']));
 				$resultqueryarray = array();
+				
+				//check for specific results that aren't just reportcontact results, and make exceptions for them
+				//remove them from the array so we can do a big rc.result in (...)
 				if(isset($resultarray["confirmed"])){
 					$resultqueryarray[] = " rc.response = 1 ";
 					unset($resultarray["confirmed"]);
@@ -71,10 +74,16 @@ class JobDetailReport extends ReportGenerator{
 					$resultqueryarray[] = " rc.response is null ";
 					unset($resultarray["noconfirmation"]);
 				}
+				if(isset($resultarray["declined"])){
+					$resultqueryarray[] = " rp.status='declined' ";
+					unset($resultarray["declined"]);
+				}
+				
+				//combine the rest, assuming they are rc.result codes
 				if(count($resultarray)){
 					$resultqueryarray[] = "rc.result in ('" . implode("','",array_flip($resultarray)) . "')";
 				}
-
+				
 				$resultquery .= " and (" . implode(" OR ",$resultqueryarray) . ") ";
 			}
 		}
