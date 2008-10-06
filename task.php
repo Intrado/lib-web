@@ -96,7 +96,15 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'mapfields'))
 					$IMPORT->status = "idle";
 					$IMPORT->type = "automatic";
 					$IMPORT->ownertype = "system";
-					$IMPORT->updatemethod = "full";
+					switch ($IMPORT->datatype) {
+						case "person" : $defaultupdatemethod = "updateonly";
+						break;
+						case "user" : $defaultupdatemethod = "createonly";
+						break;
+						default : $defaultupdatemethod = "full";
+						break;
+					}
+					$IMPORT->updatemethod = $defaultupdatemethod;
 					$IMPORT->create();
 
 					$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
@@ -163,7 +171,18 @@ if( $reloadform )
 	PutFormData($form, $section, 'datatype', $IMPORT->datatype, 'text');
 	PutFormData($form, $section, 'name', $IMPORT->name, 'text', 1, 50, true);
 	PutFormData($form, $section, 'description', $IMPORT->description, 'text', 1, 50);
-	PutFormData($form, $section, 'updatemethod', ($IMPORT->updatemethod != null ? $IMPORT->updatemethod : 'updateonly'), 'text');
+	$defaultupdatemethod = $IMPORT->updatemethod;
+	if ($IMPORT->updatemethod == null) {
+		switch ($IMPORT->datatype) {
+			case "person" : $defaultupdatemethod = "updateonly";
+			break;
+			case "user" : $defaultupdatemethod = "createonly";
+			break;
+			default : $defaultupdatemethod = "full";
+			break;
+		}
+	}
+	PutFormData($form, $section, 'updatemethod', $defaultupdatemethod, 'text');
 
 	PutFormData($form, $section, "skipheaderlines", $IMPORT->skipheaderlines, 1,10);
 
