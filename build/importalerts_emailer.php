@@ -1,9 +1,9 @@
 <?php
-ini_set('error_reporting', E_ERROR);
-ini_set('display_errors', '1');
 
 //-------------------------------------
-// Latest author: Kee-Yip Chan (kchan@schoolmessenger.com)
+// Author Joshua Lai
+// Modified by Kee-Yip Chan (kchan@schoolmessenger.com)
+// Modified by Ben
 // In the dev wiki: [[Import alerts, emailer]]
 //-------------------------------------
 // Simple emailer script for import alerts.
@@ -11,6 +11,7 @@ ini_set('display_errors', '1');
 // to find all customer connections to traverse for import alerts.
 // It will only look at import alerts with email addresses.
 
+$logfile = "/usr/commsuite/logs/importalerts.log";
 $java = '/usr/commsuite/java/j2sdk/bin/java';
 $emailer = '/usr/commsuite/server/simpleemail/simpleemail.jar';
 $authpropertiesfile = '/usr/commsuite/server/authserver/authserver.properties';
@@ -22,29 +23,34 @@ define('SECONDSPERHOUR', 3600);
 define('SECONDSPERMINUTE', 60);
 define('HOURSPERDAY', 24);
 
+
+$logfp = fopen($logfile,"a") or die("Can't open log file for writing");
+
+wlog("Starting");
+
 // Gather authserver properties
-file_exists($authpropertiesfile) or die("Missing auth properties file: $authpropertiesfile");
-$settings = parse_ini_file($authpropertiesfile);
+file_exists($authpropertiesfile) or wlogdie("Missing auth properties file: $authpropertiesfile");
+$settings = @parse_ini_file($authpropertiesfile);
 if (empty($settings))
-	die("No settings defined");
+	wlogdie("No settings defined");
 
 // Gather shardsinfo.
-mysql_connect($settings['authdb.host'], $settings['authdb.username'], $settings['authdb.password'], true) or die(mysql_error());
-mysql_select_db($settings['authdb.dbname']) or die(mysql_error());
+mysql_connect($settings['authdb.host'], $settings['authdb.username'], $settings['authdb.password'], true) or wlogdie("Error connecting to authserver mysql:" . mysql_error());
+mysql_select_db($settings['authdb.dbname']) or wlogdie(mysql_error());
 $shardsinfo = array();
 $shardquery = mysql_query("SELECT id, dbhost, dbusername, dbpassword FROM shard ORDER BY id");
 while ($sh = mysql_fetch_assoc($shardquery)) {
 	$shardsinfo[$sh['id']] = $sh;
 }
 if (empty($shardsinfo))
-	die("No shardsinfo available");
+	wlogdie("No shardsinfo available");
 
 // Process customers.
 $customerquery = mysql_query("SELECT id, shardid, urlcomponent FROM customer ORDER BY shardid, id");
 while ($c = mysql_fetch_assoc($customerquery)) {
 	$cshardinfo = $shardsinfo[$c['shardid']];
-	mysql_connect($cshardinfo['dbhost'], $cshardinfo['dbusername'], $cshardinfo['dbpassword'], true) or die(mysql_error());
-	mysql_select_db("c_{$c['id']}") or die(mysql_error());
+	mysql_connect($cshardinfo['dbhost'], $cshardinfo['dbusername'], $cshardinfo['dbpassword'], true) or wlogdie("Error connecting to customer mysql:" . mysql_error());
+	mysql_select_db("c_{$c['id']}") or wlogdie("Error selcting customer db: " . mysql_error());
 	$settingquery = mysql_query("SELECT value FROM setting WHERE name = 'displayname'");
 	$displayname = mysql_fetch_assoc($settingquery);
 	$displayname = $displayname['value'];
@@ -52,7 +58,7 @@ while ($c = mysql_fetch_assoc($customerquery)) {
 	$timezone = mysql_fetch_assoc($settingquery);
 	$timezone = $timezone['value'];
 	if (!$timezone)
-		die("Customer {$c['urlcomponent']}: Can't go further, need timezone settings to be specified\n");
+		wlogdie("Customer {$c['id']} No timezone found in settings!!!");
 	// Use this customer's timezone for all date related calculations
 	date_default_timezone_set($timezone);
 
@@ -66,19 +72,10 @@ while ($c = mysql_fetch_assoc($customerquery)) {
 
 		$currenttimestamp = time();
 		$alerts = array();
-		print "Customer {$c['urlcomponent']}, import {$import['id']}:\n";
-		print_r($alertoptions);
+//		wlog("Processing cid:" . $c['id'] . " importid:" . $import['id']);
 
-		// Determine if an alert was recently sent; if so, skip this import alert
-		if (!empty($alertoptions['lastnotified'])) {
-			$hoursuntil = SECONDSPERHOUR * $nextemailwaithours;
-			$timediff = $currenttimestamp - $alertoptions['lastnotified'];
-			if ($timediff < $hoursuntil) {
-				print "Don't want to spam; last notified = " . date("F d, Y h:i:s a", $alertoptions['lastnotified']) . "; now = " . date("F d, Y h:i:s a", $currenttimestamp) . " ($timezone)\n";
-				continue;
-			}
 		// Alert if a file has never been uploaded
-		} else if (empty($import['lastuploaded'])) {
+		if (empty($import['lastuploaded'])) {
 			$alerts[] = "No file has ever been uploaded.";
 		// Alert if upload status indicates a problem
 		} else if ($import['status'] === 'error') {
@@ -86,14 +83,12 @@ while ($c = mysql_fetch_assoc($customerquery)) {
 		} else {
 			// Stale Data Alert
 			if (isset($alertoptions['daysold']) && ($alertoptions['daysold'] > 0)) {
-				print "current time: " . date("F d, Y h:i a", $currenttimestamp) . " ($timezone)\n";
 				$timediffallowed = ($alertoptions['daysold'] * HOURSPERDAY * SECONDSPERHOUR) + ($staledataleewayhours * SECONDSPERHOUR);
 				$timediff = $currenttimestamp - $import['lastuploaded'];
 				if ($timediff > $timediffallowed)
 					$alerts[] = "Data is stale; specified {$alertoptions['daysold']} day(s) until stale, but last uploadeded " . date("F d, Y h:i a", $import['lastuploaded']) . " ($timezone)";
 			// Scheduled Days Alert
 			} else if (isset($alertoptions['dow'])) {
-				print "current time: " . date("F d, Y h:i a", $currenttimestamp) . " ($timezone)\n";
 				if (!isset($alertoptions['scheduledwindowminutes']))
 					$alertoptions['scheduledwindowminutes'] = $defaultwindowminutes;
 				$daytocheck =  date('w', $currenttimestamp - ($alertoptions['scheduledwindowminutes'] * SECONDSPERMINUTE));
@@ -128,6 +123,21 @@ while ($c = mysql_fetch_assoc($customerquery)) {
 
 		// Email any alerts and update this customer's database
 		if (!empty($alerts)) {
+			
+			foreach ($alerts as $alert)
+				wlog("Alert for cid:" . $c['id'] . " importid:" . $import['id'] . " alert:" . $alert);
+			
+			// Determine if an alert was recently sent; if so, skip this import alert
+			if (!empty($alertoptions['lastnotified'])) {
+				$hoursuntil = SECONDSPERHOUR * $nextemailwaithours;
+				$timediff = $currenttimestamp - $alertoptions['lastnotified'];
+				if ($timediff < $hoursuntil) {
+					wlog("Not emailing, already notified " . seconds_to_str($timediff) . " ago");
+					continue;
+				}
+			}
+			
+			
 			$subject = "Import Alert: cid " . $c['id'] . ", " . $c['urlcomponent'] . ", import " . $import['id'] . ", " . $import['name'] . ", " . count($alerts) . " alert(s)";
 			$body = "Customer, $displayname,\n" . implode("\n", $alerts);
 			$emailaddresses = explode(";", $alertoptions['emails']);
@@ -142,9 +152,11 @@ while ($c = mysql_fetch_assoc($customerquery)) {
 				$cmd .= " -t \"" . trim($address) . "\"";
 				$process = popen($cmd, "w");
 				fwrite($process, $body);
-				fclose($process);
+				$retval = pclose($process);
+				if ($retval)
+					wlog("Simple email exited with non zero value: $retval");
 			}
-			print implode(";", $emailaddresses) . "\n" .  $subject . "\n" . $body . "\n";
+			wlog("Sent alert email to " . implode(";", $emailaddresses));
 
 			// Update database
 			$alertoptions['lastnotified'] = $currenttimestamp;
@@ -152,10 +164,14 @@ while ($c = mysql_fetch_assoc($customerquery)) {
 			mysql_query("UPDATE import SET alertoptions='" . mysql_escape_string($importalerturl) . "' WHERE id = " . $import['id']);
 		// No alerts found
 		} else {
-			print "Nothing to worry about.\n";
+			wlog("No alerts for cid:" . $c['id'] . " importid:" . $import['id']);
 		}
 	}
 }
+
+wlog("Done");
+fclose($logfp);
+
 
 //----------------------------------
 function sane_parsestr($url) {
@@ -177,4 +193,24 @@ function sane_parsestr($url) {
 
 	return $data;
 }
+
+function seconds_to_str ($time) {
+	$time = abs($time);
+	$h = floor($time/(60*60));
+	$time = $time % (60*60);
+	$m = floor($time/60);
+	$s = $time % (60);
+	return sprintf("%02d:%02d:%02d",$h,$m,$s);
+}
+
+function wlog ($str) {
+	global $logfp;
+	fwrite($logfp, date("Y-m-d H:i:s - ") . $str . "\n");
+}
+
+function wlogdie ($str) {
+	wlog($str);
+	die($str);
+}
+
 ?>
