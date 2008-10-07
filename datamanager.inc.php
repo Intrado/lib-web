@@ -13,6 +13,26 @@ if (!$USER->authorize('metadata')) {
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+function cleanedname($name) {
+	// alphanumeric, space, underscore, pound (replace invalid chars with pound)
+	return preg_replace('/[^a-zA-Z0-9 _#]/', '#', $name);
+}
+function validate($name, $type, $allnamessofar) {
+	global $VALID_TYPES;
+	$isvalid = true;
+	$cleanedname = cleanedname($name);
+	if (strlen($cleanedname) < 1) {
+		error("Please choose a field name that is at least one character long (alphanumeric, space, underscore, pound)");
+		$isvalid = false;
+	} else if (array_key_exists(strtolower($cleanedname), $allnamessofar)) {
+		error("Please choose a unique field name. '$cleanedname' is already in use");
+		$isvalid = false;
+	} else if (!in_array($type, $VALID_TYPES)) {
+		error("The field type, $type, is not valid");
+		$isvalid = false;
+	}
+	return $isvalid;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -59,7 +79,6 @@ case "schedule" :
 break;
 }
 
-
 $FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
 $availablefields = array();
 for ($x = 1; $x <= $numfields; $x++)
@@ -72,110 +91,95 @@ $form = "datamanager";
 $section = "main";
 $reloadform = false;
 
-if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add'))
-{
+if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 	//check to see if formdata is valid
-	if(CheckFormInvalid($form))
-	{
+	if (CheckFormInvalid($form)) {
 		error('Form was edited in another window, reloading data');
 		$reloadform = true;
-	}
-	else
-	{
+	} else {
 		MergeSectionFormData($form, $section);
-		if( CheckFormSection($form, $section) )
-		{
+		if (CheckFormSection($form, $section)) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (CheckFormSubmit($form, 'add')) { // The add button was chosen
-			// Check that new name contains only alphanumerics, underscores, and spaces
-			$cleanedname = DBSafe(preg_replace('/[^\w\ \-\.]/', '#', GetFormData($form, $section, "newfield_name")));
-			$type = DBSafe(GetFormData($form, $section, 'newfield_type'));
-			PutFormData($form, $section, 'newfield_name', $cleanedname);
-			if (!preg_match("/[a-zA-Z0-9]/", $cleanedname)) { // Find at least one alphanumeric character
-				error("Please choose a field name that is at least one alphanumeric character long");
-			} else if (QuickQuery("select count(*) from fieldmap where name = '$cleanedname'")) {
-				error("Please choose a unique field name. This one is already in use.");
-			} else if (!in_array($type, $VALID_TYPES)) {
-				error("The field type, $type, is not valid");
-			} else if(count($FIELDMAPS) < 20){
-				$newfield = new FieldMap();
-				// Submit new item
-				$specialtype = GetFormData($form, $section, "newfield_specialtype");
-				$newfield->name = $cleanedname;
-				switch ($DATATYPE) {
-				case "person" :
-					$temp = "f";
-				break;
-				case "group" :
-					$temp = "g";
-				break;
-				case "schedule" :
-					$temp = "c";
-				break;
-				}
-				$newfield->fieldnum = $temp . GetFormData($form,$section,"newfield_fieldnum");
-				$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
+		} else {
+			$isvalid = true; // are the fields all valid to save
+
+			// build list of all field names to check for duplicates (from other field types, plus those being edited)
+			$othernames = QuickQueryList("select name from fieldmap where fieldnum not like '$dt'");
+			$allnamessofar = array();
+			foreach ($othernames as $othername) {
+				$allnamessofar[strtolower($othername)] = $othername;
+			}
+
+			// if there is a new field to add, validate it
+			$isadd = false;
+			$name = DBSafe(GetFormData($form, $section, "newfield_name"));
+			if ($name != "") {
+				$isadd = true;
+				$type = DBSafe(GetFormData($form, $section, 'newfield_type'));
+				$isvalid = validate($name, $type, $allnamessofar);
+				$allnamessofar[strtolower(cleanedname($name))] = $name;
+			}
+
+			// for each existing field, check for any modified values
+			if ($isvalid) foreach ($FIELDMAPS as $field) {
+				$fieldnum = $field->fieldnum;
+				$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
+				$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
+				$isvalid = validate($name, $type, $allnamessofar);
+				if (!$isvalid) break;
+				$allnamessofar[strtolower(cleanedname($name))] = $name;
+			}
+
+			// if everything is valid, then save the changes
+			if ($isvalid) {
+				if ($isadd) {
+					$newfield = new FieldMap();
+					// Submit new item
+					$specialtype = GetFormData($form, $section, "newfield_specialtype");
+					$newfield->name = cleanedname(DBSafe(GetFormData($form, $section, "newfield_name")));
+					switch ($DATATYPE) {
+					case "person" :
+						$temp = "f";
+					break;
+					case "group" :
+						$temp = "g";
+					break;
+					case "schedule" :
+						$temp = "c";
+					break;
+					}
+					$newfield->fieldnum = $temp . GetFormData($form,$section,"newfield_fieldnum");
+					$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
 										DBSafe(GetFormData($form, $section, "newfield_type") .
 										($specialtype ? ',' . DBSafe($specialtype) : ''));
 
-				if ($newfield->update()) {
-					// Requery to get the newly inserted row
-					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
-				} else {
-					error("Uknown database error: unable to add new field data");
+					$newfield->update();
 				}
-			}
-		} else { // Error check then submit changes
-			foreach($FIELDMAPS as $field) {
-				$fieldnum = $field->fieldnum;
-				if ($fieldnum != FieldMap::getFirstNameField() &&
-					$fieldnum != FieldMap::getLastNameField() &&
-					$fieldnum != FieldMap::getLanguageField() &&
-					$fieldnum != FieldMap::getSchoolField() &&
-					$fieldnum != FieldMap::getGradeField() &&
-					$fieldnum != FieldMap::getStaffField() )
-					{
+
+				// update each existing field
+				foreach($FIELDMAPS as $field) {
+					$fieldnum = $field->fieldnum;
 					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
 					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
 					$searchable = GetFormData($form, $section, "searchable_$fieldnum");
 
-					// Check that new name contains only alphanumerics, underscores, and spaces
-					$cleanedname = preg_replace('/[^\w ]/', '#', $name);
-					PutFormData($form, $section, 'newfield_name', $cleanedname);
-					if (!preg_match("/\w/", $cleanedname)) { // Find at least one alphanumeric or underscore character
-						error("Please choose a field name that is at least one alphanumeric character long");
-					} else if (!in_array($type, $VALID_TYPES)) {
-						error("The field type, $type, is not valid");
-					} else if ($name !== null || $type !== null || $searchable !== null) {
+					if ($name !== null || $type !== null || $searchable !== null) {
 						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
-						$updatefield->name = $cleanedname;
+						$updatefield->name = cleanedname($name);
 						$updatefield->options = ($searchable ? 'searchable,' : '') . $type;
 						$updatefield->update();
-						// Requery to get the newly inserted row
-						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
-					}
-				} else {
-					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
-					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
-					$cleanedname = preg_replace('/[^\w ]/', '#', DBSafe(GetFormData($form, $section, "name_$fieldnum")));
-					PutFormData($form, $section, 'newfield_name', $cleanedname);
-					if (!preg_match("/\w/", $cleanedname)) { // Find at least one alphanumeric or underscore character
-						error("Please choose a field name that is at least one alphanumeric character long");
-					} else if (!in_array($type, $VALID_TYPES)) {
-						error("The field type, $type, is not valid");
-					} else if ($name !== null || $type !== null || $searchable !== null) {
-						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
-						$updatefield->name = $cleanedname;
-						$updatefield->update();
-						// Requery to get the newly inserted row
-						$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
 					}
 				}
-			}
-			redirect('settings.php');
-		}
 
-		$reloadform = true;
+				// redraw or redirect
+				if ($isadd) {
+					$FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
+					$reloadform = true;
+				} else {
+					redirect('settings.php');
+				}
+			}
+		}
 	}
 } else {
 	$reloadform = true;
@@ -378,8 +382,17 @@ break;
 					<td>
 					<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, 'DISABLED');?>
 					</td>
-					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+					<td>
 <?
+					// firstname, lastname, language are unremovable
+					if ($fieldnum != $field->getFirstNameField() &&
+						$fieldnum != $field->getLastNameField() &&
+						$fieldnum != $field->getLanguageField()) {
+?>
+					<a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a>
+<?
+					}
+					?></td><?
 				break;
 				case "group" :
 ?>
