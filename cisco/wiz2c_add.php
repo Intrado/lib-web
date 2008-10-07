@@ -1,7 +1,6 @@
 <?
 require_once("common.inc.php");
 require_once("../obj/Person.obj.php");
-require_once("../obj/PersonData.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/PeopleList.obj.php");
 include_once("../obj/Rule.obj.php");
@@ -37,24 +36,17 @@ if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone
 		$prompt = "Must be exactly 10 digits";
 	} else {
 		//make the person and go back to the list info page
-
-
-		$person = new Person();
-		$person->userid = $USER->id;
-		$person->deleted = 0;
-		$person->create();
-
-		$data = new PersonData();
 		$fnf = FieldMap::getFirstNameField();
 		$lnf = FieldMap::getLastNameField();
 		$langf = FieldMap::getLanguageField();
 
-		$data->$fnf = $fname;
-		$data->$lnf = $lname;
-		$data->$langf = "English";
-
-		$data->personid = $person->id;
-		$data->update();
+		$person = new Person();
+		$person->userid = $USER->id;
+		$person->deleted = 0;
+		$person->$fnf = $fname;
+		$person->$lnf = $lname;
+		$person->$langf = "English";
+		$person->create();
 
 		$ph = new Phone();
 		$ph->personid = $person->id;
