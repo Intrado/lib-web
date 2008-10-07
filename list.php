@@ -11,7 +11,6 @@ include_once("inc/text.inc.php");
 include_once("inc/date.inc.php");
 include_once("obj/Language.obj.php");
 include_once("obj/Person.obj.php");
-include_once("obj/PersonData.obj.php");
 include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");

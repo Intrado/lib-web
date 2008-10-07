@@ -8,7 +8,6 @@ include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/date.inc.php");
 include_once("obj/Person.obj.php");
-include_once("obj/PersonData.obj.php");
 include_once("obj/PeopleList.obj.php");
 include_once("obj/ListEntry.obj.php");
 include_once("obj/RenderedList.obj.php");
