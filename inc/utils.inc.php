@@ -248,7 +248,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.64 $
+	    # $Revision: 1.65 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -476,15 +476,14 @@ function destination_label($type, $sequence){
 //code or text. ex startHover, endHover
 function destination_label_popup($type, $sequence, $f, $s, $itemname){
 	$label = fetch_labels($type, $sequence);
-	if(!$label)
-		$label = "&nbsp";
 
 	$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	?><div <?=$hover?>><?
 	NewFormItem($f, $s, $itemname, "checkbox", 0, 1);
 	?></div><?
-	echo '<div class="hoverhelp">' . $label . '</div>';
+	if ($label) 
+		echo '<div class="hoverhelp">' . $label . '</div>';
 }
 
 function destination_label_popup_paragraph($type){
