@@ -69,6 +69,8 @@ if(CheckFormSubmit($f,$s))
 			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
 			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
+		} else if((GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
+			error('You must enter a number for X days');
 		} else {
 			$_SESSION['usagestats']['groupby'] = DBSafe(GetFormData($f, $s, "groupby"));
 			$_SESSION['usagestats']['reldate'] = GetFormData($f, $s, "relativedate");
