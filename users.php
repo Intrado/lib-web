@@ -56,6 +56,7 @@ if (isset($_GET['delete'])) {
 		$_SESSION['userid'] = NULL;
 
 	QuickUpdate("update user set enabled=0, deleted=1 where id='$deleteid'");
+	QuickUpdate("delete from schedule where id in (select scheduleid from job where status='repeating' and userid='$deleteid')");
 	QuickUpdate("delete from job where status='repeating' and userid='$deleteid'");
 
 	redirect();
