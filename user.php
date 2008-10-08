@@ -166,8 +166,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			error('You must enter a password');
 		} elseif( $password != $passwordconfirm ) {
 			error('Password confirmation does not match' . $extraMsg);
-		} elseif( GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') ) {
-			error('Telephone Pin Code confirmation does not match' . $extraMsg);
+		} elseif( strlen(GetFormData($f, $s, 'accesscode')) > 0 && ( !GetFormData($f, $s, 'pincode') || !GetFormData($f, $s, 'pincodeconfirm') || GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') )) {
+			error('Telephone Pin Code confirmation does not match, or is blank' . $extraMsg);
 		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
 			error($error);
 		} elseif(GetFormData($f, $s, "callerid") && strlen($callerid) != 10){
