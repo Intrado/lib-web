@@ -8,45 +8,33 @@ class Access extends DBMappedObject {
 	var $permissions;
 
 	function Access ($id = NULL) {
-		$this->permissions = array();
+		$this->permissions = false;
 		$this->_allownulls = true;
 		$this->_tablename = "access";
 		$this->_fieldlist = array("name","description");
-		$this->_relations['permission'] = new DBRelationMap('Permission', $this->permissions, 'accessid', $this->id);
+//		$this->_relations['permission'] = new DBRelationMap('Permission', $this->permissions, 'accessid', $this->id);
 		
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
 	
+	function loadPermissions($force = false) {
+		if ($this->id && ($force || $this->permissions === false)) {
+			$this->permissions = DBFindMany("Permission", "from permission where accessid=$this->id");
+		}
+	}
+	
 	function getValue($action) {
+		$this->loadPermissions();
 		$permission = $this->getPermission($action);
 		return $permission ? $permission->value : false;
 	}
 	
 	function getPermission($action) {
+		$this->loadPermissions();
 		foreach($this->permissions as $permission)
 			if($permission->name == $action)
 				return $permission;
-	}
-	
-	function setPermission($action, $value) {
-		$permission = $this->getPermission($action);
-		if($value) {
-			if($permission) {
-				$permission->value = $value;
-				$permission->update();
-			} else {
-				$permission = new Permission();
-				$permission->name = $action;
-				$permission->value = $value;
-				$this->_relations['permission']->add($permission);
-
-			}
-		} else {
-			if($permission) {
-				$permission->destroy();
-			}
-		}
 	}
 }
 

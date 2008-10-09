@@ -42,7 +42,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 		$USER->optionsarray = false; /* will be reconstructed if needed */
 
 		$ACCESS = &$_SESSION['access'];
-		$ACCESS->refresh(NULL, true);
+		$ACCESS->loadPermissions(true);
 
 		if (!$USER->enabled || $USER->deleted || !$USER->authorize('loginweb')) {
 			redirect("./?logout=1");

@@ -43,7 +43,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 		$USER->optionsarray = false; /* will be reconstructed if needed */
 
 		$ACCESS = &$_SESSION['access'];
-		$ACCESS->refresh(NULL, true);
+		$ACCESS->loadPermissions(true);
 
 		if (!$USER->enabled || !$USER->authorize('loginphone')) {
 			header("Location: $URL/index.php?logout=1");
