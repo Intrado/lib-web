@@ -47,7 +47,8 @@ class Access extends DBMappedObject {
 				$permission = new Permission();
 				$permission->name = $action;
 				$permission->value = $value;
-				$this->permissions[] = $permission;
+				$permission->accessid = $this->id;
+				$permission->create();
 			}
 		} else {
 			if($permission) {
