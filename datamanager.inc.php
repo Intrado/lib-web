@@ -15,7 +15,7 @@ if (!$USER->authorize('metadata')) {
 
 function cleanedname($name) {
 	// alphanumeric, space, underscore, pound (replace invalid chars with pound)
-	return preg_replace('/[^a-zA-Z0-9 _#]/', '#', $name);
+	return trim(preg_replace('/[^a-zA-Z0-9 _#]/', '#', $name));
 }
 function validate($name, $type, $allnamessofar) {
 	global $VALID_TYPES;
@@ -102,6 +102,10 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			$isvalid = true; // are the fields all valid to save
+			if (CheckFormSubmit($form, 'add') && strlen(cleanedname(DBSafe(GetFormData($form, $section, "newfield_name")))) == 0) {
+				error("Please choose a field name that is at least one character long (alphanumeric, space, underscore, pound)");
+				$isvalid = false;
+			}
 
 			// build list of all field names to check for duplicates (from other field types, plus those being edited)
 			$othernames = QuickQueryList("select name from fieldmap where fieldnum not like '$dt'");
@@ -113,7 +117,7 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 			// if there is a new field to add, validate it
 			$isadd = false;
 			$name = DBSafe(GetFormData($form, $section, "newfield_name"));
-			if ($name != "") {
+			if ($isvalid && $name != "") {
 				$isadd = true;
 				$type = DBSafe(GetFormData($form, $section, 'newfield_type'));
 				$isvalid = validate($name, $type, $allnamessofar);
