@@ -85,6 +85,14 @@ if (isset($_GET['enable'])) {
 	}
 }
 
+
+//preload names for all of the access profiles
+$accessprofiles = QuickQueryList("select id,name from access",true);
+
+
+//preload new disabled users with an email
+$newusers = QuickQueryList("select id,1 from user where not enabled and deleted=0 and password='new' and email != ''", true);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,12 +111,14 @@ function fmt_actions_en ($obj,$name) {
 }
 
 function fmt_actions_dis ($obj,$name) {
+	global $newusers;
 	$editviewaction = "Edit";
 	if ($obj->importid > 0) $editviewaction = "View";
 
 	$resetpass = "";
-	if (QuickQuery("select id from user where id=$obj->id and password='new' and email != \"\"")) {
-		$resetpass = '<a href="?enable=' . $obj->id . '&resetpass=1">Enable with Reset Password</a>&nbsp;|&nbsp;';
+	
+	if(isset($newusers[$obj->id])) {
+		$resetpass = '<a href="?enable=' . $obj->id . '&resetpass=1">Enable &amp; Reset Password</a>&nbsp;|&nbsp;';
 	}
 
 	return '<a href="user.php?id=' . $obj->id . '">'.$editviewaction.'</a>&nbsp;|&nbsp;'
@@ -121,8 +131,8 @@ function fmt_actions_dis ($obj,$name) {
 	Callback to format the access profile name for a user
 */
 function fmt_acc_profile ($obj,$name) {
-	$profile = QuickQuery("select name from access where access.id = $obj->accessid");
-	return $profile;
+	global $accessprofiles;
+	return htmlentities($accessprofiles[$obj->accessid]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
