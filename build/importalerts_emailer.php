@@ -25,7 +25,7 @@ define('HOURSPERDAY', 24);
 
 
 $logfp = fopen($logfile,"a") or die("Can't open log file for writing");
-
+$scripttz = date_default_timezone_get(); //keep a copy of the current TZ so we don't go insane while processing customer imports
 wlog("Starting");
 
 // Gather authserver properties
@@ -204,8 +204,11 @@ function seconds_to_str ($time) {
 }
 
 function wlog ($str) {
-	global $logfp;
+	global $logfp,$scripttz;
+	$oldtz = date_default_timezone_get();
+	date_default_timezone_set($scripttz);
 	fwrite($logfp, date("Y-m-d H:i:s - ") . $str . "\n");
+	date_default_timezone_set($oldtz);
 }
 
 function wlogdie ($str) {
