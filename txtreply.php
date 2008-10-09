@@ -43,17 +43,17 @@ else {
 }
 
 // Check if message starts with help
+$splitmessage = explode(" ",$message,2);
+
 if (
-stripos($message,"help") === 0       ||
-stripos($message,"yes") === 0        ||
-stripos($message,"school") === 0     ||
-stripos($message,"schooldemo") === 0) {
+$splitmessage[0] === "help"   ||
+$splitmessage[0] === "yes"    ||
+$splitmessage[0] === "school" ||
+$splitmessage[0] === "schooldemo") {
 	//echo "help,yes,school or schooldemo : do nothing. ";// For testing
 	exit(); // Nothing else to do, response handled by 3CI
 }
 
-
-$splitmessage = explode(" ",$message,2);
 //check to see if this txt message has any of our keywords
 $haskeyword = false;
 foreach ($keywords as $keyword) {
