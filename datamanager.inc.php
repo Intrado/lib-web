@@ -40,8 +40,13 @@ function validate($name, $type, $allnamessofar) {
 
 if (isset($_GET['delete'])) {
 	$id = DBSafe($_GET['delete']);
-	if (customerOwns("fieldmap",$id)) {
-		$fm = new FieldMap($id);
+	$fm = new FieldMap($id);
+	if (!$fm->isOptionEnabled('firstname') &&
+		!$fm->isOptionEnabled('lastname') &&
+		!$fm->isOptionEnabled('language') &&
+		!$fm->isOptionEnabled('staff')) {
+		// do not destroy required fields
+
 		$fm->destroy();
 	}
 	redirect();
@@ -49,6 +54,14 @@ if (isset($_GET['delete'])) {
 
 if (isset($_GET['clear'])) {
 	$fieldnum = DBSafe($_GET['clear']);
+	if ($fieldnum === FieldMap::getFirstNameField() ||
+		$fieldnum === FieldMap::getLastNameField() ||
+		$fieldnum === FieldMap::getLanguageField() ||
+		$fieldnum === FieldMap::getStaffField()) {
+		// do not clear data of required fields
+		redirect();
+	}
+
 	if (ereg("^f[0-9]{2}$",$fieldnum)) {
 		QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
 	}
