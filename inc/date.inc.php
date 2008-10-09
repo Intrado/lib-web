@@ -42,8 +42,8 @@ $RELDATE_OPTIONS = array('today' => 'Today', 'yesterday' => 'Yesterday', 'lastwe
 
 function getStartEndDate($type, $arguments = array()){
 	switch($type){
-		case 'today':			
-		case 'lastweekday':					
+		case 'today':
+		case 'lastweekday':
 		case 'yesterday':
 			$enddate = $startdate = reldate($type, true);
 			break;
@@ -51,9 +51,9 @@ function getStartEndDate($type, $arguments = array()){
 		case 'monthtodate':
 			$startdate = reldate($type, true);
 			$enddate = reldate("today", true);
-			break;					
+			break;
 		case 'xdays':
-			$lastxdays = $arguments['lastxdays'];
+			$lastxdays = 0 + $arguments['lastxdays'];
 			$startdate = QuickQuery("select date_sub(curdate(),interval $lastxdays day)");
 			$startdate = strtotime($startdate);
 			$enddate = reldate("today", true);
