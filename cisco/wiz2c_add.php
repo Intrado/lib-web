@@ -46,6 +46,7 @@ if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone
 		$person->$fnf = $fname;
 		$person->$lnf = $lname;
 		$person->$langf = "English";
+		$person->type = "manualadd";
 		$person->create();
 
 		$ph = new Phone();
