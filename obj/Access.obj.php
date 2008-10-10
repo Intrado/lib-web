@@ -21,6 +21,8 @@ class Access extends DBMappedObject {
 	function loadPermissions($force = false) {
 		if ($this->id && ($force || $this->permissions === false)) {
 			$this->permissions = DBFindMany("Permission", "from permission where accessid=$this->id");
+		} else if (!$this->id) {
+			$this->permissions = array();
 		}
 	}
 	
