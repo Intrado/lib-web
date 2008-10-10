@@ -183,7 +183,16 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 					if ($name !== null || $type !== null || $searchable !== null) {
 						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
 						$updatefield->name = cleanedname($name);
-						$updatefield->options = ($searchable ? 'searchable,' : '') . $type;
+						if ($fieldnum != FieldMap::getFirstNameField() &&
+							$fieldnum != FieldMap::getLastNameField() &&
+							$fieldnum != FieldMap::getLanguageField() &&
+							$fieldnum != FieldMap::getSchoolField() &&
+							$fieldnum != FieldMap::getGradeField() &&
+							$fieldnum != FieldMap::getStaffField() ) {
+
+							// only update options for non-specialfield
+							$updatefield->options = ($searchable ? 'searchable,' : '') . $type;
+						}
 						$updatefield->update();
 					}
 				}
