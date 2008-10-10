@@ -169,7 +169,7 @@ startWindow("Confirmation &amp; Submit");
 <?
 								if($jobtype->systempriority == 1 && getSystemSetting('_dmmethod', "asp")=='hybrid'){
 ?>
-									<td style="color:red"><?="Phone calls will be sent out on the hosted system"?></td>
+									<td style="color:red"><?="High capacity emergency call routing"?></td>
 <?
 								}
 ?>
