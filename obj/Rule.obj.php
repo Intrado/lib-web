@@ -34,10 +34,12 @@ class Rule extends DBMappedObject {
 					$aliasid = ($alias ? $alias . ".id" : "id");
 					break;
 				}
-				$sql .= "exists (select null from reportgroupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$aliasid and g.jobid=j.id and ";
+				$personsql = ($alias ? "and g.personid=$aliasid" : "");
+				$sql .= "exists (select null from reportgroupdata g where g.fieldnum=".substr($this->fieldnum,1)." $personsql and g.jobid=j.id and ";
 			} else {
 				$aliasid = ($alias ? $alias . ".id" : "id");
-				$sql .= "exists (select null from groupdata g where g.fieldnum=".substr($this->fieldnum,1)." and g.personid=$aliasid and ";
+				$personsql = ($alias ? "and g.personid=$aliasid" : "");
+				$sql .= "exists (select null from groupdata g where g.fieldnum=".substr($this->fieldnum,1)." $personsql and ";
 			}
 			//override f to point to g field data
 			$f = "g.value";
