@@ -102,7 +102,7 @@ class User extends DBMappedObject {
 	function checkDuplicateLogin ($newlogin, $id) {
 		$newlogin = DBSafe($newlogin);
 
-		if (QuickQuery("select count(*) from user where id !=" . (0+ $id) . " and login='$newlogin' and deleted=0") > 0 )
+		if (QuickQuery("select count(*) from user where id != " . (0+ $id) . " and login='$newlogin' and deleted = 0") > 0 )
 			return true;
 		else
 			return false;
@@ -110,7 +110,7 @@ class User extends DBMappedObject {
 	//see if the accesscode is used
 	function checkDuplicateAccesscode ($newaccesscode, $id = 0) {
 		$newaccesscode = DBSafe($newaccesscode);
-		if (QuickQuery("select count(*) from user where id!=$id and accesscode='$newaccesscode'") > 0)
+		if (QuickQuery("select count(*) from user where id != $id and accesscode = '$newaccesscode'") > 0)
 			return true;
 		else
 			return false;
@@ -120,7 +120,7 @@ class User extends DBMappedObject {
 		$newstaffid = DBSafe($newstaffid);
 		if ($newstaffid == "") return false;
 
-		if (QuickQuery("select count(*) from user where id!=" . (0+ $id) . " and staffpkey='$newstaffid' and deleted=0") > 0 )
+		if (QuickQuery("select count(*) from user where id != " . (0+ $id) . " and staffpkey = '$newstaffid' and deleted = 0") > 0 )
 			return true;
 		else
 			return false;
