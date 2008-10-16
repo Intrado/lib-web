@@ -115,7 +115,7 @@ if($options['reporttype'] == 'phonedetail' || $options['reporttype'] == 'emailde
 
 }
 if($result == ""){
-	$generator->generateQuery();
+	$generator->generateQuery(true); // hackPDF to set g01-g10 as f21-f30
 	echo "finished generating query\n";
 	$generator->setReportFile();
 	echo "finished setting report file to use\n";
