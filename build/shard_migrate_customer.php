@@ -2,11 +2,25 @@
 //////////////////////////////////////
 // migrate a customer into this shard database (could be from a commsuite or moving between shards)
 // Usage: php shard_migrate_customer.php <customer ID> <customerdata.sql> <shardhost> <shard user> <shard pass>
+//
+// EDIT VARIABLES AT TOP OF SCRIPT, avoid entering on command line or prompts
 //////////////////////////////////////
 
+// VARIABLES MUST BE SET!!!
+$customerid = "";
+$customerdatafile = "";
+$fromcommsuite = true; // true if data is from commsuite 5.2 migration, false if moving 6.x between shards
+$shardhost = "";
+$dbuser = "";
+$dbpass = "";
+
+
+/////////////
+// include
 include_once("../manager/managerutils.inc.php");
 
-
+/////////////
+// functions
 function echoarray($somearray){
 	foreach($somearray as $line){
 		echo $line . "\n";
@@ -25,15 +39,10 @@ function generalmenu($questions = array(), $validresponses = array()){
 	return $response;
 }
 
+///////////////////////
+// main program
 
-// command line arguments
-$customerid = "";
-$customerdatafile = "";
-$shardhost = "";
-$dbuser = "";
-$dbpass = "";
-
-
+/*
 if (isset($argv[1])) {
 	$customerid = $argv[1] + 0;
 	if ($customerid == 0)
@@ -77,6 +86,8 @@ if(!$dbuser && isset($argv[4])){
 		$confirm = generalMenu(array("Is this information correct?", "y or n"), array("y", "n"));
 	}
 }
+*/
+
 
 echo "Connecting to mysql...\n";
 $custdb = mysql_connect($shardhost, $dbuser, $dbpass)
@@ -103,12 +114,23 @@ if($count[0] > 0){
 	echo "There are active jobs.  Exiting script.\n";
 	exit();
 }
-echo "No active jobs found.\n";
+echo "No active jobs found\n";
+
+
+//////////////////////////////////////
+// backup data
+$backupfilename = $customerdbname . "_backup.sql";
+echo("Backing up to $backupfilename \n");
+exec("mysqldump -u$dbuser -p$dbpass $customerdbname > $backupfilename", $output, $return_var);
+if ($return_var) {
+	echo "mysqldump failed with return var ".$return_var."\n";
+	die();
+}
 
 
 //////////////////////////////////////
 // drop triggers
-echo("drop triggers\n");
+echo("Drop triggers\n");
 $sqlqueries = explode("$$$",file_get_contents("../db/droptriggers.sql"));
 foreach ($sqlqueries as $query) {
 	if (trim($query)) {
@@ -117,17 +139,6 @@ foreach ($sqlqueries as $query) {
 		// "if exists" not recognized, mysql extension
 		// ignore failure caused by not exists
 	}
-}
-
-
-//////////////////////////////////////
-// backup data
-$backupfilename = $customerdbname . "_backup.sql";
-echo("Backing up to $backupfilename \n");
-exec("mysqldump -u$dbuser -p$dbpass --no-create-info $customerdbname > $backupfilename", $output, $return_var);
-if ($return_var) {
-	echo "mysqldump failed with return var ".$return_var."\n";
-	die();
 }
 
 
@@ -143,10 +154,49 @@ foreach ($tablearray as $t) {
 		echo("Failed to execute statement \n$query\n\n : " . mysql_error($custdb));
 	}
 }
+echo ("\n");
+
+//////////////////////////////////////
+// save some customer settings that we do not want to overwrite, will rewrite them after import
+// if from commsuite, we want to save these settings because commsuite 5.2 did not have them
+// if moving between shards, we do not need to because the c_x export will contain them
+if ($fromcommsuite) {
+echo ("Saving a few settings to restore after import\n");
+$surveyurl = "";
+$arname = "";
+$aremail = "";
+$inboundnumber = "";
+$supportemail = "";
+$supportphone = "";
+$custdomain = "";
+
+mysql_select_db($customerdbname);
+$query = "select name, value from setting where name in ('surveyurl', 'autoreport_replyname', 'autoreport_replyemail', 'emaildomain', 'inboundnumber', '_supportemail', '_supportphone')";
+$result = mysql_query($query)
+	or die("Failure to execute query $query ". mysql_error());
+while ($row = mysql_fetch_assoc($result)) {
+	switch ($row["name"]) {
+		case "surveyurl" : $surveyurl = $row["value"];
+		break;
+		case "autoreport_replyname" : $arname = $row["value"];
+		break;
+		case "autoreport_replyemail" : $aremail = $row["value"];
+		break;
+		case "emaildomain" : $custdomain = $row["value"];
+		break;
+		case "inboundnumber" : $inboundnumber = $row["value"];
+		break;
+		case "_supportemail" : $supportemail = $row["value"];
+		break;
+		case "_supportphone" : $supportphone = $row["value"];
+		break;
+	}
+}
+}
 
 //////////////////////////////////////
 // now truncate the tables
-echo "Truncating all customer tables.\n";
+echo "Truncating all customer tables\n";
 mysql_select_db($customerdbname);
 $customertables = array(
 	"access",
@@ -155,10 +205,7 @@ $customertables = array(
 	"blockednumber",
 	"contactpref",
 	"content",
-	"custdm",
 	"destlabel",
-	"dmcalleridroute",
-	"dmroute",
 	"email",
 	"fieldmap",
 	"import",
@@ -203,6 +250,15 @@ $customertables = array(
 	"usersetting",
 	"voicereply");
 
+// if from commsuite, do not drop the DM records becuase they may have already configured their Flex Appliance (and 5.2 data does not contain these tables)
+if (!$fromcommsuite) {
+	$dmtables = array(
+		"custdm",
+		"dmcalleridroute",
+		"dmroute");
+	$customertables = array_merge($customertables, $dmtables);
+}
+
 foreach ($customertables as $t) {
 	echo (".");
 	$query = "truncate table $t";
@@ -215,22 +271,33 @@ echo "\n";
 
 //////////////////////////////////////
 // import data
-echo("import customer data\n");
+echo("Import customer data\n");
 exec("mysql -u $dbuser -p$dbpass $customerdbname < $customerdatafile", $output, $return_var);
 if ($return_var) {
 	echo "import failed with return var ".$return_var."\n";
 	die();
 }
 
-
-//if another schoolmessenger user exists rename it
-$query = "update user set login='schoolmessenger_old' where login='schoolmessenger";
-mysql_query($query,$custdb);
-
 /////////////////////////////////////
-// create default customer data (was lost in truncation)
-createSMUserProfile($custdb);
+// if from commsuite, build the default schoolmessenger profile and user
+// also if from commsuite, reset saved customer settings
+// if moving between shards, this already exists
+if ($fromcommsuite) {
+	//if another schoolmessenger user exists rename it
+	$query = "update user set login='schoolmessenger_old' where login='schoolmessenger";
+	mysql_query($query,$custdb);
 
+	// create default customer data (was lost in truncation)
+	createSMUserProfile($custdb);
+
+	// reset saved customer settings
+	$query = "delete from setting where name in ('surveyurl', 'autoreport_replyname', 'autoreport_replyemail', 'emaildomain', 'inboundnumber', '_supportemail', '_supportphone')";
+	mysql_query($query)
+		or die("Failure to execute query $query ". mysql_error());
+	$query = "insert into setting (name, value) values ('surveyurl', $surveyurl), ('autoreport_replyname', $arname), ('autoreport_replyemail', $aremail), ('emaildomain', $custdomain),  ('inboundnumber', $inboundnumber),  ('_supportemail', $supportemail), ('_supportphone', $supportphone)";
+	mysql_query($query)
+		or die("Failure to execute query $query ". mysql_error());
+}
 
 //////////////////////////////////////
 // copy job/schedule/reportsubscription to shard
@@ -241,13 +308,13 @@ if (!$res) die ("Failed to execute statement \n$query\n\nfor $customerdbname : "
 $timezone = "'".mysql_result($res, 0)."'";
 
 // reportsubscription
-echo ("copy reportsubscriptions\n");
+echo ("Copy reportsubscriptions\n");
 $query = "INSERT ignore INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) select id, ".$customerid.", userid, type, daysofweek, dayofmonth, time, ".$timezone.", nextrun, email from reportsubscription";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
 // jobsetting
-echo ("copy repeating jobs and settings\n");
+echo ("Copy repeating jobs and settings\n");
 $query = "INSERT ignore INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status='repeating')";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
@@ -272,7 +339,7 @@ mysql_query($query,$custdb)
 
 //////////////////////////////////////
 // create triggers
-echo("create triggers\n");
+echo("Create triggers\n");
 $sqlqueries = explode("$$$",file_get_contents("../db/createtriggers.sql"));
 foreach ($sqlqueries as $query) {
 	if (trim($query)) {
