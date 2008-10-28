@@ -64,11 +64,12 @@ function inboundtask($methodname, $params){
 
 	$REQUEST_TYPE = "new";
 	$_SESSION['inboundNumber'] = $params[1];
+	$_SESSION['callerid'] = $params[2];
 
 	ob_start();
 
-	forwardToPage("inboundlogin.php");
-
+	forwardToPage("inboundstart.php");
+	
 	$output = ob_get_contents();
 	ob_end_clean();
 
