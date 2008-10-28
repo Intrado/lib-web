@@ -11,6 +11,7 @@ require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/SpecialTask.obj.php");
+require_once("msgcallbackMessagePlayback.obj.php");
 
 include_once("XmlToArray.obj.php");
 
@@ -53,6 +54,7 @@ function specialtask($methodname, $params){
 //		params[0] = sessionid
 //		params[1] = called number
 //		params[2] = callerid
+//		params[3] = customerid
 function inboundtask($methodname, $params){
 	global $REQUEST_TYPE;
 	$ERROR="";
@@ -65,11 +67,12 @@ function inboundtask($methodname, $params){
 	$REQUEST_TYPE = "new";
 	$_SESSION['inboundNumber'] = $params[1];
 	$_SESSION['callerid'] = $params[2];
+	$_SESSION['customerid'] = $params[3];
 
 	ob_start();
 
 	forwardToPage("inboundstart.php");
-	
+
 	$output = ob_get_contents();
 	ob_end_clean();
 
