@@ -1,5 +1,5 @@
 <?
-include_once("inboundutils.inc.php");
+//include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;
 
@@ -36,7 +36,6 @@ function makenumeric($studentid){
 
 
 function enterstudentid($error, $studentids) {
-glog("enterstudentid");
 ?>
 <voice>
 	<message name="choosestudentid">
@@ -47,17 +46,12 @@ glog("enterstudentid");
 			<?
 				while($row = DBGetRow($studentids)) {
 					$numeric = makenumeric($row[0]);
-					glog("Student id: $row[0] amd numeric: $numeric");
 					?>
 					<choice digits="<? echo $numeric; ?>">
 						<setvar name="success" value="1" />
-						<tts gender="female" language="english">You have entered a correct student I. D.</tts>
 					</choice>
 
-					<?
-
-				}
-			?>
+			<?	}?>
 			<default>
 	        	<tts gender="female" language="english">Sorry. That student number did not match our records. Remember that letters in the students I. D. correspond to a number on you phone. For example the letter A. is represented by the number 2. </tts>
 			</default>
@@ -75,7 +69,7 @@ function hangup() {
 ?>
 <voice>
 	<message name="hangup">
-	       	<tts gender="female">Thank you. Goodbye </tts>
+	       	<tts gender="female">An error occurred while processing your request. Please call back and try again. Goodbye.</tts>
 	       	<hangup />
 
 	</message>
@@ -86,21 +80,16 @@ function hangup() {
 if($REQUEST_TYPE == "new") {
 	forwardToPage("inboundstart.php");
 } else if($REQUEST_TYPE == "continue") {
-
 	if(isset($BFXML_VARS['studentid']) && isset($BFXML_VARS['success'])){
-		glog("Entered a valid student id: implement forward");
 		forwardToPage("msgcallbackgetlist.php");
 	} else {
-		glog("student id continue");
 		$phonenumber = $_SESSION['contactphone'];
 		$query = "select y.pkey as id from phone x, person y where x.phone=$phonenumber and x.personid=y.id and y.pkey is not null";
-		glog("Query $query");
 		$results = Query($query);
 
 		if ($results) {
 			enterstudentid(0,$results);
 		} else {
-			glog("SQL: no result hang up");
 			hangup();
 		}
 	}

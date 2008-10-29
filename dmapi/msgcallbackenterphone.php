@@ -1,10 +1,9 @@
 <?
-include_once("inboundutils.inc.php");
+//include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;
 
 function entercallerid($attempt) {
-glog("confirmcallerid");
 ?>
 <voice>
 	<message name="entercallerid">
@@ -42,28 +41,23 @@ function invalidend() {
 if($REQUEST_TYPE == "new") {
 	forwardToPage("inboundstart.php");
 } else if($REQUEST_TYPE == "continue") {
-	glog("continue");
 	if(isset($BFXML_VARS['phone'])){
 		$phonenumber = $BFXML_VARS['phone'];
-		glog("Entered phone number \"$phonenumber\"");
 
 		if(strlen($phonenumber) == 7 && substr($phonenumber,0,1) != "0") {
 			$query = "select value as areacode from setting where name=\"defaultareacode\"";
 
 			$areacode = QuickQuery($query);
-			glog("Getting area code $areacode");
 
 			if($areacode !== false){
 				$phonenumber = $areacode . $phonenumber;
 			}
 		}
 		if(strpos($phonenumber,'*') === false && strlen($phonenumber) == 10 && substr($phonenumber,0,1) != "1" && substr($phonenumber,0,1) != "0" ){
-			glog("Valid; implement correct forward. Lookup if student id is needed");
 			$_SESSION['contactphone'] = $phonenumber; // store the phone number used to playback messages
 
 			$query = "select value from setting where name=\"msgcallbackrequireid\"";
 			$requirestudentid = QuickQuery($query);
-			glog("Getting require id setting: $requirestudentid");
 
 			if($requirestudentid == 1){
 				forwardToPage("msgcallbackenterstudentid.php");
@@ -73,7 +67,6 @@ if($REQUEST_TYPE == "new") {
 		} else {
 			$attempt = $BFXML_VARS['attempt'];
 			$attempt++;
-			glog("Not Valid Attempt " . $attempt);
 			if($attempt > 2) {
 				invalidend();
 			} else {

@@ -1,10 +1,9 @@
 <?
-include_once("inboundutils.inc.php");
+//include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;
 
 function confirmcallerid($callerid) {
-glog("confirmcallerid");
 ?>
 <voice>
 	<message name="choosecallerid">
@@ -34,15 +33,12 @@ glog("confirmcallerid");
 if($REQUEST_TYPE == "new") {
 	forwardToPage("inboundstart.php");
 } else if($REQUEST_TYPE == "continue") {
-	glog("continue");
 	if(isset($BFXML_VARS['callerid'])){
 		if($BFXML_VARS['callerid'] == 1){
 			$_SESSION['contactphone'] = $_SESSION['callerid']; // set the phone number used to playback messages
-			glog("Caller id confirmed: implement correct forward. Lookup if student id is needed");
 
 			$query = "select value from setting where name=\"msgcallbackrequireid\"";
 			$requirestudentid = QuickQuery($query);
-			glog("Getting require id setting: $requirestudentid");
 
 			if($requirestudentid == 1){
 				forwardToPage("msgcallbackenterstudentid.php");
@@ -50,14 +46,11 @@ if($REQUEST_TYPE == "new") {
 				forwardToPage("msgcallbackgetlist.php");
 			}
 		} else {
-			glog("Need to enter number");
 			forwardToPage("msgcallbackenterphone.php");
 		}
 	} else if(isset($_SESSION['callerid'])){   // Neet to test this from a unknown number
-		glog("option of entering number");
 		confirmcallerid($_SESSION['callerid']);
 	} else {
-		glog("have to enter number");
 		forwardToPage("msgcallbackenterphone.php");
 	}
 
