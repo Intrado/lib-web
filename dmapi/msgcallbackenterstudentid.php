@@ -62,7 +62,7 @@ glog("enterstudentid");
 	        	<tts gender="female" language="english">Sorry. That student number did not match our records. Remember that letters in the students I. D. correspond to a number on you phone. For example the letter A. is represented by the number 2. </tts>
 			</default>
 			<timeout>
-				<tts gender="female" language="english">I was not able to understand your response, goodbye</tts>
+				<tts gender="female" language="english">I was not able to understand your response. Goodbye.</tts>
 				<hangup />
 			</timeout>
 		</field>

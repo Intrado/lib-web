@@ -40,7 +40,15 @@ if($REQUEST_TYPE == "new") {
 			$_SESSION['contactphone'] = $_SESSION['callerid']; // set the phone number used to playback messages
 			glog("Caller id confirmed: implement correct forward. Lookup if student id is needed");
 
-			forwardToPage("msgcallbackenterstudentid.php");
+			$query = "select value from setting where name=\"msgcallbackrequireid\"";
+			$requirestudentid = QuickQuery($query);
+			glog("Getting require id setting: $requirestudentid");
+
+			if($requirestudentid == 1){
+				forwardToPage("msgcallbackenterstudentid.php");
+			} else {
+				forwardToPage("msgcallbackgetlist.php");
+			}
 		} else {
 			glog("Need to enter number");
 			forwardToPage("msgcallbackenterphone.php");

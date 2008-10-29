@@ -14,7 +14,7 @@ glog("confirmcallerid");
 			<?} ?>
 			<field name="phone" type="dtmf" timeout="5000" max="11">
 				<prompt repeat="2">
-				<tts gender="female" language="english">Please enter the phone number that recieved the call followed by the pound key</tts>
+				<tts gender="female" language="english">Please enter the phone number that recieved the call followed by the pound key.</tts>
 				</prompt>
 				<timeout>
 					<tts gender="female" language="english">I was not able to understand your response. Goodbye.</tts>
@@ -60,7 +60,16 @@ if($REQUEST_TYPE == "new") {
 		if(strpos($phonenumber,'*') === false && strlen($phonenumber) == 10 && substr($phonenumber,0,1) != "1" && substr($phonenumber,0,1) != "0" ){
 			glog("Valid; implement correct forward. Lookup if student id is needed");
 			$_SESSION['contactphone'] = $phonenumber; // store the phone number used to playback messages
-			forwardToPage("msgcallbackenterstudentid.php");
+
+			$query = "select value from setting where name=\"msgcallbackrequireid\"";
+			$requirestudentid = QuickQuery($query);
+			glog("Getting require id setting: $requirestudentid");
+
+			if($requirestudentid == 1){
+				forwardToPage("msgcallbackenterstudentid.php");
+			} else {
+				forwardToPage("msgcallbackgetlist.php");
+			}
 		} else {
 			$attempt = $BFXML_VARS['attempt'];
 			$attempt++;
