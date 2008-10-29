@@ -58,6 +58,8 @@ if(CheckFormSubmit($f,$s))
 			setSystemSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'));
 			setSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'));
 
+			setSystemSetting('msgcallbackrequireid', GetFormData($f, $s, 'msgcallbackrequireid'));
+			
 			redirect("settings.php");
 		}
 	}
@@ -77,6 +79,7 @@ if( $reloadform )
 	PutFormData($f, $s,"usernamelength", getSystemSetting('usernamelength', "5"), "number", 0, 10);
 	PutFormData($f, $s,"passwordlength", getSystemSetting('passwordlength', "5"), "number", 0, 10);
 
+	PutFormData($f, $s, "msgcallbackrequireid", getSystemSetting('msgcallbackrequireid'), 'bool', 0, 1);
 }
 
 
@@ -117,6 +120,10 @@ startWindow('Login Settings');
 							<tr>
 								<td>Invalid Login Disable Account<? print help('Settings_LoginDisableAccount', NULL, "small"); ?></td>
 								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
+							</tr>
+							<tr>
+								<td>Require Student ID on Call Back<? print help('Settings_MSGCallBackRequireID', NULL, "small"); ?></td>
+								<td><? NewFormItem($f, $s, 'msgcallbackrequireid', 'checkbox'); ?></td>
 							</tr>
 						</table>
 					</td>
