@@ -32,7 +32,7 @@ if($REQUEST_TYPE == "new"){
 
 	if (isset($_SESSION['contactphone'])) {
 		$timesince = (time() - (30*24*60*60)) * 1000; // 30 days ago, in milliseconds since 1970
-		$query = "select j.id, j.userid, rc.sequence, j.phonemessageid, rc.personid from reportcontact rc join job j where rc.type='phone' and rc.phone='".$_SESSION['contactphone']."' and j.id=rc.jobid and rc.starttime>$timesince order by rc.starttime";
+		$query = "select j.id, j.userid, rc.sequence, j.phonemessageid, rc.personid from reportcontact rc join job j where rc.type='phone' and rc.phone='".$_SESSION['contactphone']."' and j.id=rc.jobid and rc.starttime>$timesince order by rc.starttime desc";
 		glog($query);
 		$resultlist = QuickQueryMultiRow($query);
 		$messagelist = array();
@@ -42,6 +42,7 @@ if($REQUEST_TYPE == "new"){
 			$msg->jobid = $row[0];
 			$msg->userid = $row[1];
 			$msg->sequence = $row[2];
+			$msg->messageid = $row[3];
 			$msg->messageparts = DBFindMany("MessagePart", "from messagepart where messageid=$row[3]");
 			$msg->person = DBFind("Person", "from person where id=$row[4]"); // TODO use reportperson
 			$msg->leavemessage = QuickQuery("select value from jobsetting where jobid=$row[0] and name='leavemessage'");

@@ -45,40 +45,37 @@ function endoflist()
 }
 
 
-function renderMessageParts($playback, $ttsvoices) {
+function renderMessageParts($playback) {
 	$customerid = $_SESSION['customerid'];
-	$messageparts = $playback->messageparts;
+	$msgid = $playback->messageid;
 	$person = $playback->person;
+	$fields = array();
+	for ($i=1; $i<=20; $i++) {
+		$fieldnum = sprintf("f%02d", $i);
+		$fields[$fieldnum] = $person->$fieldnum;
+	}
 
-	foreach ($messageparts as $part) {
-		switch ($part->type) {
-			case "A" :
-				$contentid = QuickQuery("select contentid from audiofile where id=".$part->audiofileid);
-				$guid = md5("$contentid".":"."$customerid");
-				?>
-				<audio cmid="<?echo $contentid?>" guid="<?echo $guid?>"/>
-				<?
-			break;
-			case "T" :
-				// TODO combine parts if same lang/gender
-				?>
-				<tts language="<?echo $ttsvoices[$part->voiceid]->language?>" gender="<?echo $ttsvoices[$part->voiceid]->gender?>"> <?echo $part->txt?></tts>
-				<?
-			break;
-			case "V" :
-				$fnum = $part->fieldnum;
-				$vtxt = $person->$fnum;
-				if ($vtxt === "") $vtxt = $part->defaultvalue;
-				?>
-				<tts language="<?echo $ttsvoices[$part->voiceid]->language?>" gender="<?echo $ttsvoices[$part->voiceid]->gender?>"> <?echo $vtxt?></tts>
-				<?
-			break;
+	$renderedparts = Message::renderMessageParts($msgid, $fields);
+	$voices = DBFindMany("Voice","from ttsvoice");
+
+	foreach ($renderedparts as $part) {
+		if ($part[0] == "a") {
+			$contentid = $part[1];
+			$guid = md5("$contentid".":"."$customerid");
+			?>
+			<audio cmid="<?echo $contentid?>" guid="<?echo $guid?>"/>
+			<?
+		} else if ($part[0] == "t") {
+			$voice = $voices[$part[2]];
+			?>
+			<tts language="<?echo $voice->language?>" gender="<?echo $voice->gender?>"> <?echo $part[1]?></tts>
+			<?
 		}
 	}
 }
 
 
-function playback($messageindex, $messagetotal, $playback, $ttsvoices, $playintro = false) {
+function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	$messageparts = $playback->messageparts;
 	$person = $playback->person;
 ?>
@@ -86,13 +83,21 @@ function playback($messageindex, $messagetotal, $playback, $ttsvoices, $playintr
 	<message name="playback">
 		<field name="doplayback" type="menu" timeout="5000">
 			<prompt>
-				<?if ($playintro) {?>
-					<tts gender="female">There are <?echo $messagetotal?> messages in the last 30 days.  You may press the pound key at any time to skip to the next message, or press the star key to repeat. </tts>
+				<?if ($playintro) {
+					if ($messagetotal == 1) {?>
+						<tts gender="female">There is one message in the last 30 days.  You may press the star key to repeat. </tts>
+					<?} else {?>
+						<tts gender="female">There are <?echo $messagetotal?> messages in the last 30 days.  You may press the pound key at any time to skip to the next message, or press the star key to repeat. </tts>
+					<?}?>
 				<?}?>
 
-				<tts gender="female">Message <?echo($messageindex +1)?> of <?echo $messagetotal?> for <?echo ("$person->f01 $person->f02");?>.  </tts>
+				<? if ($messagetotal == 1) {?>
+					<tts gender="female">Message for <?echo ("$person->f01 $person->f02");?>.  </tts>
+				<?} else {?>
+					<tts gender="female">Message <?echo($messageindex +1)?> of <?echo $messagetotal?> for <?echo ("$person->f01 $person->f02");?>.  </tts>
+				<?}?>
 
-				<?renderMessageParts($playback, $ttsvoices);?>
+				<?renderMessageParts($playback);?>
 			</prompt>
 
 			<choice digits="*" />
@@ -213,9 +218,8 @@ if($REQUEST_TYPE == "new"){
 		// next message
 		} else {
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']];
-			$ttsvoices = DBFindMany("Voice", "from ttsvoice"); // TODO move out of loop?
 
-			playback($_SESSION['messageindex'], $_SESSION['messagetotal'], $playback, $ttsvoices, $playintro);
+			playback($_SESSION['messageindex'], $_SESSION['messagetotal'], $playback, $playintro);
 			$_SESSION['messageindex'] = $_SESSION['messageindex'] + 1; // increment to next message
 		}
 	} else {

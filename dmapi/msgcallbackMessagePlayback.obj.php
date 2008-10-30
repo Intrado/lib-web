@@ -6,6 +6,7 @@ class MessagePlayback {
 	var $jobid;					// job that sent this message
 	var $userid;				// user who sent this message
 	var $sequence;				// contact sequence (phone1, 2, ... used by voicereply)
+	var $messageid;				// id of this message
 	var $messageparts; 			// array of message parts
 	var $person; 				// person message was sent for
 	var $leavemessage; 			// job option
