@@ -81,22 +81,22 @@ function fmt_state($row, $index){
 
 function fmt_dmstatus($row,$index) {
 	$problems = array();
-	
-	
+
+
 	if ($row[6] != "active") {
 		$problems[] = "Not Authorized";
 	} else {
 		if ($row[4] != $row[5])
 			$problems[] = "IP Mismatch";
-		
+
 		if ($row[7]/1000 < time() - 30)
 			$problems[] = "DM Lost Connection";
-		
+
 		if ($row[1] == null || $row[1] <= 0)
 			$problems[] = "Invalid Customer ID";
 	}
-	
-	if (count($problems)) 
+
+	if (count($problems))
 		return "<div style=\"background-color:red\">" . implode(", ", $problems) . "</div>";
 	else
 		return "OK";
@@ -104,7 +104,7 @@ function fmt_dmstatus($row,$index) {
 
 function fmt_lastseen($row, $index){
 	$output = date("M j, Y g:i:s a", $row[$index]/1000);
-	if($row[$index]/1000 > strtotime("now") - (5*60) && $row[$index]/1000 < strtotime("now")-10){
+	if($row[$index]/1000 > strtotime("now") - (5*60) && $row[$index]/1000 < strtotime("now")-60){
 		$output = "<div style=\"background-color:yellow\">" . $output . "</div>";
 	} else if($row[$index]/1000 < strtotime("now") - (5*60)){
 		$output = "<div style=\"background-color:red\">" . $output . "</div>";
