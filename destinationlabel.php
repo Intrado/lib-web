@@ -75,7 +75,7 @@ if(CheckFormSubmit($f,$s))
 			for($i = 0; $i < $max; $i++){
 				$label = GetFormData($f, $s, $type . $i);
 				if($label == "other"){
-					$label = GetFormData($f, $s, $type . $i . "other");
+					$label = trim(GetFormData($f, $s, $type . $i . "other"));
 				}
 				if(ereg("[0-9\)\(]+", $label) || strripos($label,"phone") || strripos($label, "email") || strripos($label, "sms")){
 					$warning = true;
