@@ -138,12 +138,27 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$callerid = Phone::parse(GetFormData($f,$s, "callerid"));
 		$usr = new User($_SESSION['userid']);
-		$email = GetFormData($f, $s, "email");
+		$email = trim(GetFormData($f, $s, "email"));
+		PutFormData($f,$s,"email",$email);
+		
 		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
+		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
+		
 		$password = trim(GetFormData($f, $s, "password"));
 		$passwordconfirm = trim(GetFormData($f, $s, "passwordconfirm"));
 		$login = trim(GetFormData($f, $s, 'login'));
+		
+		$accesscode = trim(GetFormData($f, $s, 'accesscode'));
+		PutFormData($f,$s,"accesscode",$accesscode,"number","nomin","nomax");
+		
+		$pincode = trim(GetFormData($f, $s, 'pincode'));
+		PutFormData($f,$s,"pincode",$pincode,"number","nomin","nomax");
+		$pincodeconfirm = trim(GetFormData($f, $s, 'pincodeconfirm'));
+		PutFormData($f,$s,"pincodeconfirm",$pincodeconfirm,"number","nomin","nomax");
+
+		
+		
 		if (GetFormData($f, $s, "radioselect") == "bydata") {
 			$staffid = "";
 		} else {
@@ -166,7 +181,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			error('You must enter a password');
 		} elseif( $password != $passwordconfirm ) {
 			error('Password confirmation does not match' . $extraMsg);
-		} elseif( strlen(GetFormData($f, $s, 'accesscode')) > 0 && ( !GetFormData($f, $s, 'pincode') || !GetFormData($f, $s, 'pincodeconfirm') || GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') )) {
+		} elseif( strlen($accesscode) > 0 && ( !$pincode || !$pincodeconfirm || $pincode != $pincodeconfirm )) {
 			error('Telephone Pin Code confirmation does not match, or is blank' . $extraMsg);
 		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
 			error($error);
@@ -180,9 +195,9 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			error('This username already exists, please choose another' . $extraMsg);
 		} elseif (User::checkDuplicateStaffID($staffid, $_SESSION['userid'])) {
 			error('This staff ID already exists, please choose another' . $extraMsg);
-		} elseif(strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $_SESSION['userid'])) {
-			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $_SESSION['userid']);
-			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
+		} elseif(strlen($accesscode) > 0 && User::checkDuplicateAccesscode($accesscode, $_SESSION['userid'])) {
+			$accesscode = getNextAvailableAccessCode(DBSafe($accesscode), $_SESSION['userid']);
+			PutFormData($f, $s, 'accesscode', $accesscode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
@@ -192,16 +207,16 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			error($issame, $securityrules);
 		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && $checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password'))){
 			error($iscomplex, $securityrules);
-		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+		} elseif($accesscode === $pincode && (($accesscode !== "" && $pincode!== ""))) {
 			error('User ID and Pin code cannot be the same');
-		} elseif((strlen(GetFormData($f, $s, 'accesscode')) < 4 || strlen(GetformData($f, $s, 'pincode')) < 4) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+		} elseif((strlen($accesscode) < 4 || strlen($pincode) < 4) && (($accesscode !== "" && $pincode!== ""))) {
 			error('User ID and Pin code must have at least 4 digits');
-		} elseif ((!ereg("^[0-9]*$", GetFormData($f, $s, 'accesscode')) || !ereg("^[0-9]*$", GetformData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+		} elseif ((!ereg("^[0-9]*$", $accesscode) || !ereg("^[0-9]*$", $pincode)) && (($accesscode !== "" && $pincode!== ""))) {
 			error('User ID and Pin code must all be numeric');
-		} elseif((isAllSameDigit(GetFormData($f, $s, 'accesscode')) || isAllSameDigit(GetFormData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))
-					&& (!ereg("^0*$", GetFormData($f, $s, 'pincode'))) ){
+		} elseif((isAllSameDigit($accesscode) || isAllSameDigit($pincode)) && (($accesscode !== "" && $pincode!== ""))
+					&& (!ereg("^0*$", $pincode)) ){
 			error('User ID and Pin code cannot have all the same digits');
-		} elseif(isSequential(GetFormData($f, $s, 'pincode')) && !$IS_COMMSUITE) {
+		} elseif(isSequential($pincode) && !$IS_COMMSUITE) {
 			error('Cannot have sequential numbers for Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
@@ -219,6 +234,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			$usr->email = $email;
 			$usr->aremail = $emaillist;
 			$usr->login = $login;
+			
+			
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
 			if($IS_LDAP){
 				if(GetFormData($f, $s, "ldap")) {
@@ -278,7 +295,6 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			}
 
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
-			$pincode = GetFormData($f, $s, 'pincode');
 			if (!ereg("^0*$", $pincode)) {
 				$usr->setPincode($pincode);
 			}
@@ -328,7 +344,6 @@ if( $reloadform )
 {
 	ClearFormData($f);
 
-
 	$usr = new User($_SESSION['userid']);
 
 	$fields = array(
@@ -352,7 +367,8 @@ if( $reloadform )
 
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
-
+	
+		
 	if ($usr->id){
 		$surveytypes = array();
 		$types = QuickQueryList("select ujt.jobtypeid, issurvey from userjobtypes ujt inner join jobtype jt on (jt.id = ujt.jobtypeid) where userid = $usr->id", true);
