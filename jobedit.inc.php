@@ -85,6 +85,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		$sendphone = GetFormData($f, $s, "sendphone");
 		$sendemail = GetFormData($f, $s, "sendemail");
 		$sendsms = getSystemSetting("_hassms", false) ? GetFormData($f, $s, "sendsms") : 0;
+		
+		$name = trim(GetFormData($f,$s,"name"));
+		if ( empty($name) ) {
+			PutFormData($f,$s,"name",'',"text",1,$JOBTYPE == "repeating" ? 30: 50,true);
+		}
+		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
@@ -103,8 +109,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('The end date has already passed. Please correct this problem before proceeding');
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
-			error('A job named \'' . GetFormData($f,$s,"name") . '\' already exists');
+		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
+			error('A job named \'' . $name . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else {
@@ -118,9 +124,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//TODO check userowns on all messages, lists, etc
 			//only allow editing some fields
 			if ($completedmode) {
-				PopulateObject($f,$s,$job,array("name", "description"));
+				$job->name = $name;
+				$job->description = trim(GetFormData($f,$s,"description"));
 			} else if ($submittedmode) {
-				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
+				$job->name = $name;
+				$job->description = trim(GetFormData($f,$s,"description"));
+				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
 			} else {
 				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
 					$newsmsmessage = new Message();
@@ -139,8 +148,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, 'smsmessageid', $newsmsmessage->id, 'number', 'nomin', 'nomax');
 				}
-
-				$fieldsarray = array("name", "jobtypeid", "description", "listid", "phonemessageid",
+				$job->name = $name;
+				$job->description = trim(GetFormData($f,$s,"description"));
+				$fieldsarray = array("jobtypeid", "listid", "phonemessageid",
 				"emailmessageid","printmessageid", "smsmessageid", "starttime", "endtime",
 				"sendphone", "sendemail", "sendprint", "sendsms", "maxcallattempts");
 				PopulateObject($f,$s,$job,$fieldsarray);
