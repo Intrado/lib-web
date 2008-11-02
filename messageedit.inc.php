@@ -125,8 +125,11 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 		MergeSectionFormData($form, $section);
 
 		//get the ID of any message with the same name and type
-		$name = DBSafe(GetFormData($form,$section,"name"));
-		$existsid = QuickQuery("select id from message where name='$name' and type='$MESSAGETYPE' and userid='$USER->id' and deleted=0");
+		$name = trim(GetFormData($form,$section,"name"));
+		if ( empty($name) ) {
+			PutFormData($form,$section,"name",'',"text",1,50,true);
+		}
+		$existsid = QuickQuery("select id from message where name='" . DBSafe($name) . "' and type='$MESSAGETYPE' and userid='$USER->id' and deleted=0");
 		if($MESSAGETYPE == "email"){
 			$emaildomain = getSystemSetting('emaildomain');
 			$fromemaildomain = substr(GetFormData($form, $section, "fromemail"), strpos(GetFormData($form, $section, "fromemail"), "@")+1);
@@ -137,7 +140,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 		if( CheckFormSection($form, $section) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if ($existsid && $existsid != $_SESSION['messageid']) {
-			error('A message named \'' . GetFormData($form,$section,"name") . '\' already exists');
+			error('A message named \'' . $name . '\' already exists');
 		} else if (strlen(GetFormData($form,$section,"body")) == 0) {
 			error('The message body cannot be empty');
 		} else if ( ($MESSAGETYPE == "email") && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
@@ -170,7 +173,11 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 				if ($message->id && !userOwns("message",$message->id) || $message->deleted ) {
 					exit("nope!"); //TODO
 				}
-				$fields = array("name","description","body");
+				
+				$message->name = $name;
+				$message->description = trim(GetFormData($form,$section,"description"));
+				
+				$fields = array("body");
 				if ($MESSAGETYPE == "email") {
 					$fields[] = "subject";
 					$fields[] = "fromname";
@@ -289,6 +296,8 @@ if( $reloadform )
 
 	PutFormData($form,$section,"voiceid",$newmsg ? 0 : $message->firstVoiceID(),"nomin","nomax",true);
 
+	
+	
 	PopulateForm($form,$section,$message,$fields);
 
 	//do some custom stuff for the options
@@ -302,7 +311,7 @@ $fieldmap = FieldMap::getAuthorizedMapNames();
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = format_delivery_type($MESSAGETYPE) . ' Message Editor: ' . (GetFormData($form,$section,"name") ? htmlentities(GetFormData($form,$section,"name")) : "New Message" );
+$TITLE = format_delivery_type($MESSAGETYPE) . ' Message Editor: ' . (trim(GetFormData($form,$section,"name")) ? htmlentities(trim(GetFormData($form,$section,"name"))) : "New Message" );
 $ICON = $MESSAGETYPE . ".gif";
 
 include_once("nav.inc.php");

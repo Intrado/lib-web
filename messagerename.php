@@ -54,17 +54,23 @@ if(CheckFormSubmit($form,$section))
 
 		$message = new Message($_SESSION['messageid']);
 		//get the ID of any message with the same name and type
-		$name = DBSafe(GetFormData($form,$section,"name"));
-		$existsid = QuickQuery("select id from message where name='$name' and type='$message->type' and userid='$USER->id' and deleted=0");
+		$name = trim(GetFormData($form,$section,"name"));
+		if ( empty($name) ) {
+			PutFormData($form,$section,"name",'',"text",1,50,true);
+		}
+		
+		$existsid = QuickQuery("select id from message where name='" . DBSafe($name) . "' and type='$message->type' and userid='$USER->id' and deleted=0");
 
 		//do check
 		if( CheckFormSection($form, $section) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if ($existsid && $existsid != $_SESSION['messageid']) {
-			error('A message named \'' . GetFormData($form,$section,"name") . '\' already exists');
+			error('A message named \'' . $name . '\' already exists');
 		} else {
 
-			PopulateObject($form,$section,$message,array("name", "description"));
+			$message->name = $name;
+			$message->description = trim(GetFormData($form,$section,"description"));
+			
 			$message->update();
 			ClearFormData($form);
 			redirect('messages.php');
@@ -92,7 +98,7 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = 'Rename Message: ' . htmlentities(GetFormData($form,$section,"name"));
+$TITLE = 'Rename Message: ' . htmlentities(trim(GetFormData($form,$section,"name")));
 
 include_once("nav.inc.php");
 
