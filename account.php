@@ -53,13 +53,26 @@ if(CheckFormSubmit($f,$s))
 	else
 	{
 		MergeSectionFormData($f, $s);
-
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 		$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
 		$login = trim(GetFormData($f, $s, 'login'));
-		$email = GetFormData($f, $s, "email");
+		$email = trim(GetFormData($f, $s, "email"));
+		PutFormData($f,$s,"email",$email);
+		
 		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
+		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
+		
+		$accesscode = trim(GetFormData($f, $s, 'accesscode'));
+		PutFormData($f,$s,"accesscode",$accesscode,"number","nomin","nomax");
+		
+		$pincode = trim(GetFormData($f, $s, 'pincode'));
+		PutFormData($f,$s,"pincode",$pincode,"number","nomin","nomax");
+		$pincodeconfirm = trim(GetFormData($f, $s, 'pincodeconfirm'));
+		PutFormData($f,$s,"pincodeconfirm",$pincodeconfirm,"number","nomin","nomax");
+		
+		
+		
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -67,7 +80,7 @@ if(CheckFormSubmit($f,$s))
 			error('You must enter a password');
 		} elseif ( GetFormData($f, $s, 'password') != GetFormData($f, $s, 'passwordconfirm') ) {
 			error('Password confirmation does not match');
-		} elseif( strlen(GetFormData($f, $s, 'accesscode')) > 0 && ( !GetFormData($f, $s, 'pincode') || !GetFormData($f, $s, 'pincodeconfirm') || GetFormData($f, $s, 'pincode') != GetFormData($f, $s, 'pincodeconfirm') )) {
+		} elseif( strlen($accesscode) > 0 && ( !$pincode || !$pincodeconfirm || $pincode != $pincodeconfirm )) {
 			error('Telephone Pin Code confirmation does not match, or is blank');
 		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
 			error($error);
@@ -79,8 +92,8 @@ if(CheckFormSubmit($f,$s))
 			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
 		} elseif (User::checkDuplicateLogin($login, $USER->id)) {
 			error('This username already exists, please choose another');
-		} elseif (strlen(GetFormData($f, $s, 'accesscode')) > 0 && User::checkDuplicateAccesscode(GetFormData($f, $s, 'accesscode'), $USER->id)) {
-			$newcode = getNextAvailableAccessCode(DBSafe(GetFormData($f, $s, 'accesscode')), $USER->id);
+		} elseif (strlen($accesscode) > 0 && User::checkDuplicateAccesscode($accesscode, $USER->id)) {
+			$newcode = getNextAvailableAccessCode(DBSafe($accesscode), $USER->id);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif(!passwordcheck(GetFormData($f, $s, "password"))){
@@ -89,16 +102,16 @@ if(CheckFormSubmit($f,$s))
 			error($issame, $securityrules);
 		} elseif($checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password')) && !$USER->ldap){
 			error($iscomplex, $securityrules);
-		} elseif(GetFormData($f, $s, 'accesscode') === GetformData($f, $s, 'pincode') && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+		} elseif($accesscode === $pincode && (($accesscode !== "" && $pincode!== ""))) {
 			error('User ID and Pin code cannot be the same');
-		} elseif((strlen(GetFormData($f, $s, 'accesscode')) < 4 || strlen(GetformData($f, $s, 'pincode')) < 4) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+		} elseif((strlen($accesscode) < 4 || strlen($pincode) < 4) && (($accesscode !== "" && $pincode!== ""))) {
 			error('User ID and Pin code must have at least 4 digits');
-		} elseif ((!ereg("^[0-9]*$", GetFormData($f, $s, 'accesscode')) || !ereg("^[0-9]*$", GetformData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))) {
+		} elseif ((!ereg("^[0-9]*$", $accesscode) || !ereg("^[0-9]*$", $pincode)) && (($accesscode !== "" && $pincode!== ""))) {
 			error('User ID and Pin code must all be numeric');
-		} elseif((isAllSameDigit(GetFormData($f, $s, 'accesscode')) || isAllSameDigit(GetFormData($f, $s, 'pincode'))) && ((GetFormData($f, $s, 'accesscode') !== "" && GetformData($f, $s, 'pincode')!== ""))
-			&& (!ereg("^0*$", GetFormData($f, $s, 'pincode')))){
+		} elseif((isAllSameDigit($accesscode) || isAllSameDigit($pincode)) && (($accesscode !== "" && $pincode!== ""))
+			&& (!ereg("^0*$", $pincode))){
 			error('User ID and Pin code cannot have all the same digits');
-		} elseif( isSequential(GetFormData($f, $s, 'pincode'))) {
+		} elseif( isSequential($pincode)) {
 			error('Cannot have sequential numbers for Pin code');
 		} elseif($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
@@ -125,7 +138,7 @@ if(CheckFormSubmit($f,$s))
 			}
 
 			// If the pincode is all 0 characters then it was a default form value, so ignore it
-			$newpin = GetFormData($f, $s, 'pincode');
+			$newpin = $pincode;
 			if (!ereg("^0*$", $newpin))
 				$USER->setPincode($newpin);
 
