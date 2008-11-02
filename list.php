@@ -89,18 +89,23 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 	{
 		MergeSectionFormData($f, $s);
 
+		$name = trim(GetFormData($f,$s,"name"));
+		if ( empty($name) ) {
+			PutFormData($f,$s,"name",'',"text",1,50,true);
+		}		
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (QuickQuery('select id from list where name = \'' . DBSafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and deleted=0 and id != " . (0 + $_SESSION['listid']))) {
-			error('A list named \'' . GetFormData($f,$s,"name") . '\' already exists');
+		} else if (QuickQuery('select id from list where name = \'' . DBSafe($name) . "' and userid = $USER->id and deleted=0 and id != " . (0 + $_SESSION['listid']))) {
+			error('A list named \'' . $name . '\' already exists');
 		} else {
 			//submit changes
 
 			$list = new PeopleList($_SESSION['listid']);
 
-			PopulateObject($f,$s,$list,array("name","description"));
-
+			$list->name = $name;
+			$list->description = trim(GetFormData($f,$s,"description"));
+			
 			$list->userid = $USER->id;
 			$list->deleted = '0';
 			$list->update();
