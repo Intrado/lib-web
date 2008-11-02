@@ -94,6 +94,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 	{
 		MergeSectionFormData($f, $s);
 
+		$name = trim(GetFormData($f,$s,"name"));
+		if ( empty($name) ) {
+			PutFormData($f,$s,"name",'',"text",1,50,true);
+		}
+		
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -109,8 +114,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			error('The end date has already passed. Please correct this problem before proceeding');
 		} else if ( (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (QuickQuery("select count(*) from job where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id!= " . (0 + getCurrentSurvey()))) {
-			error('A job or survey named \'' . GetFormData($f,$s,"name") . '\' already exists');
+		} else if (QuickQuery("select count(*) from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id!= " . (0 + getCurrentSurvey()))) {
+			error('A job or survey named \'' . $name . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else {
@@ -145,9 +150,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 
 			//only allow editing some fields
 			if ($completedmode) {
-				PopulateObject($f,$s,$job,array("name", "description"));
+				$job->name = $name;
+				$job->description = trim(GetFormData($f,$s,"description"));
 			} else if ($submittedmode) {
-				$fieldsarray = array("name", "description","startdate", "starttime", "endtime");
+				$job->name = $name;
+				$job->description = trim(GetFormData($f,$s,"description"));
+				$fieldsarray = array("startdate", "starttime", "endtime");
 				PopulateObject($f,$s,$job,$fieldsarray);
 				if ($questionnaire->hasphone)
 					$job->setOption("maxcallattempts", GetFormData($f, $s, 'maxcallattempts'));
@@ -155,7 +163,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 								$numdays = GetFormData($f, $s, 'numdays');
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			} else {
-				$fieldsarray = array("name", "jobtypeid", "description", "listid",
+				$job->name = $name;
+				$job->description = trim(GetFormData($f,$s,"description"));
+				$fieldsarray = array("jobtypeid","listid",
 							"starttime", "endtime","startdate");
 				PopulateObject($f,$s,$job,$fieldsarray);
 				if ($questionnaire->hasphone)
