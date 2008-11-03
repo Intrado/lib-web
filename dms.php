@@ -34,10 +34,11 @@ while($row = DBGetRow($result)){
 
 // index 0 is dmid
 // index 3 is telco type
-function fmt_editDMRoute($row, $index){
-	$url = '<a href="dmsettings.php?dmid=' . $row[0] . '">Edit&nbsp;Route&nbsp;Plan</a>';
+function fmt_dm_actions($row, $index){
+	$url = '<a href="dmschedule.php?dmid=' . $row[0] . '">Resource&nbsp;Schedule</a>';
+	$url .= '&nbsp;|&nbsp;<a href="dmsettings.php?dmid=' . $row[0] . '">Route&nbsp;Plan</a>';
 	if($row[3] == "Jtapi"){
-		$url .= '&nbsp;|&nbsp;<a href="calleridroute.php?dmid=' . $row[0] . '">Edit&nbsp;Caller&nbsp;ID&nbsp;Routes</a>';
+		$url .= '&nbsp;|&nbsp;<a href="calleridroute.php?dmid=' . $row[0] . '">Caller&nbsp;ID&nbsp;Routes</a>';
 	}
 	$url .= '&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this DM\')">Reset</a>';
 	return $url;
@@ -55,7 +56,7 @@ $titles = array(1 => "Name",
 				2 => "Status",
 				"actions" => "Actions");
 
-$formatters = array("actions" => "fmt_editDMRoute",
+$formatters = array("actions" => "fmt_dm_actions",
 					2 => "fmt_dm_status");
 
 $PAGE="admin:settings";
