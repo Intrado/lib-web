@@ -1617,7 +1617,7 @@ $$$
 -- ----------------------------------------------------------------------------------
 -- shard database
 
-ALTER TABLE `jobstatdata` ADD `type` ENUM( 'system', 'customer' ) NOT NULL DEFAULT 'system' FIRST 
+ALTER TABLE `jobstatdata` ADD `type` ENUM( 'system', 'customer' ) NOT NULL DEFAULT 'system' FIRST
 $$$
 ALTER TABLE `jobstatdata` ADD INDEX `remotedm` ( `type` , `customerid` )
 $$$
@@ -1735,5 +1735,5 @@ $$$
 drop table jobtaskactive
 $$$
 
-drop table jobtaaskcomplete
+drop table jobtaskcomplete
 $$$
