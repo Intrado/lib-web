@@ -42,7 +42,7 @@ if ($dmschedule === false) {
 
 $f = "dmschedule";
 $s = "main";
-$reloadform = 1;
+$reloadform = 0;
 
 if(CheckFormSubmit($f,$s)) {
 		//check to see if formdata is valid
@@ -55,21 +55,37 @@ if(CheckFormSubmit($f,$s)) {
 	{
 		MergeSectionFormData($f, $s);
 
-		$dow = array();
-		for ($x = 1; $x < 8; $x++) {
-			if(GetFormData($f,$s,"dow$x")) {
-				$dow[$x-1] = $x;
-			}
-		}
-		$dmschedule->daysofweek = implode(",",$dow);
+		$starttime = strtotime(GetFormData($f, $s, "starttime"));
+		$endtime = strtotime(GetFormData($f, $s, "endtime"));		
 		
-		$dmschedule->resourcepercentage = GetFormData($f, $s, "throttle");	 
-		$dmschedule->starttime = date("H:i", strtotime(GetFormData($f, $s, "starttime")));
-		$dmschedule->endtime = date("H:i", strtotime(GetFormData($f, $s, "endtime")));
+		if( CheckFormSection($f, $s) ) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if ($starttime === -1 || $starttime === false) {
+			error('The start time is invalid');
+		} else if ($endtime === -1 || $endtime === false) {
+			error('The end time is invalid');
+		} else if ($endtime <= $starttime) {
+			error('The end time cannot be before or the same as the start time');
+		} else if ($endtime-(30*60) < $starttime){
+			error('The end time must be at least 30 minutes after the start time');
+		} else {
 			
-		$dmschedule->update();		
+			$dow = array();
+			for ($x = 1; $x < 8; $x++) {
+				if(GetFormData($f,$s,"dow$x")) {
+					$dow[$x-1] = $x;
+				}
+			}
+			$dmschedule->daysofweek = implode(",",$dow);
 		
-		redirect("dms.php");
+			$dmschedule->resourcepercentage = GetFormData($f, $s, "throttle");	 
+			$dmschedule->starttime = date("H:i", strtotime(GetFormData($f, $s, "starttime")));
+			$dmschedule->endtime = date("H:i", strtotime(GetFormData($f, $s, "endtime")));
+			
+			$dmschedule->update();		
+		
+			redirect("dms.php");
+		}
 	}
 } else {
 	$reloadform = 1;
