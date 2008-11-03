@@ -1514,3 +1514,19 @@ $$$
 ALTER TABLE `reportgroupdata` CHANGE `id` `id` BIGINT( 11 ) NOT NULL AUTO_INCREMENT
 $$$
 
+-- Begin release 6.2
+
+CREATE TABLE `dmschedule` (
+`id` INT NOT NULL auto_increment ,
+`dmid` INT NOT NULL ,
+`daysofweek` VARCHAR( 20 ) NOT NULL ,
+`starttime` TIME NOT NULL ,
+`endtime` TIME NOT NULL ,
+`resourcepercentage` float NOT NULL DEFAULT '1',
+PRIMARY KEY ( `id` )
+) ENGINE = innodb;
+
+
+
+
+
