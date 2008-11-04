@@ -145,7 +145,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
 		
-		$password = trim(GetFormData($f, $s, "password"));
+		$password = GetFormData($f, $s, "password");
 		$passwordconfirm = trim(GetFormData($f, $s, "passwordconfirm"));
 		$login = trim(GetFormData($f, $s, 'login'));
 		
