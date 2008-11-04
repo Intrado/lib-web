@@ -84,7 +84,15 @@ $query = "update fieldmap set fieldnum='$gfield' where fieldnum='$ffield'";
 $res = mysql_query($query)
 	or die("Failed to execute: $query ".mysql_error());
 
-
+$query = "select accessid, value from permission where name='datafields' and value like '%$ffield%'";
+$res = mysql_query($query)
+	or die("Failed to execute: $query ".mysql_error());
+while ($row = mysql_fetch_row($res)) {
+	$newvalue = str_replace($ffield, $gfield, $row[1]);
+	$query = "update permission set value='$newvalue' where name='datafields' and accessid=$row[0]";
+	mysql_query($query)
+		or die("Failed to execute: $query ".mysql_error());
+}
 
 echo "SUCCESS\n";
 
