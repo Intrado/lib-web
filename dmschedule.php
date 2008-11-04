@@ -38,7 +38,7 @@ if ($dmschedule === false) {
 	$dmschedule = new DMResourceSchedule();
 	$dmschedule->dmid = $dmid;
 }
-
+$showdetail = $dmschedule->resourcepercentage;
 
 $f = "dmschedule";
 $s = "main";
@@ -57,16 +57,17 @@ if(CheckFormSubmit($f,$s)) {
 
 		$starttime = strtotime(GetFormData($f, $s, "starttime"));
 		$endtime = strtotime(GetFormData($f, $s, "endtime"));		
-		
+		$throttle = GetFormData($f, $s, "throttle");
+		$showdetail = $throttle;
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if ($starttime === -1 || $starttime === false) {
+		} else if ($throttle != 1 && ($starttime === -1 || $starttime === false)) {
 			error('The start time is invalid');
-		} else if ($endtime === -1 || $endtime === false) {
+		} else if ($throttle != 1 && ($endtime === -1 || $endtime === false)) {
 			error('The end time is invalid');
-		} else if ($endtime <= $starttime) {
+		} else if ($throttle != 1 && ($endtime <= $starttime)) {
 			error('The end time cannot be before or the same as the start time');
-		} else if ($endtime-(30*60) < $starttime){
+		} else if ($throttle != 1 && ($endtime-(30*60) < $starttime)){
 			error('The end time must be at least 30 minutes after the start time');
 		} else {
 			
@@ -78,10 +79,12 @@ if(CheckFormSubmit($f,$s)) {
 			}
 			$dmschedule->daysofweek = implode(",",$dow);
 		
-			$dmschedule->resourcepercentage = GetFormData($f, $s, "throttle");	 
-			$dmschedule->starttime = date("H:i", strtotime(GetFormData($f, $s, "starttime")));
-			$dmschedule->endtime = date("H:i", strtotime(GetFormData($f, $s, "endtime")));
+			$dmschedule->resourcepercentage = $throttle;	 
 			
+			if ($throttle != 1) {
+				$dmschedule->starttime = date("H:i", $starttime);
+				$dmschedule->endtime = date("H:i", $endtime);
+			}
 			$dmschedule->update();		
 		
 			redirect("dms.php");
@@ -140,7 +143,7 @@ startWindow("Schedule" . help("Schedule_Resources"));
 					     </td>
 			     	</tr>
 			   	</table>
-			    <div id='details' style=<? if ($dmschedule->resourcepercentage == 1) {?>"display:none"<?} else {?>"display:block"<?}?>>
+			    <div id='details' style=<? if ($showdetail == 1) {?>"display:none"<?} else {?>"display:block"<?}?>>
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			     	
 					<tr>
