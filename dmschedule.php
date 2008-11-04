@@ -120,7 +120,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 buttons(submit($f, $s, 'Save'));
-startWindow("Schedule" . help("Schedule_Resources"));
+startWindow("Schedule");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>
