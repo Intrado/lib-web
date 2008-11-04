@@ -199,6 +199,10 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			$accesscode = getNextAvailableAccessCode(DBSafe($accesscode), $_SESSION['userid']);
 			PutFormData($f, $s, 'accesscode', $accesscode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
+		} elseif (empty($accesscode) && !ereg("^0*$", $pincode)) {
+			$accesscode = getNextAvailableAccessCode("0000", $_SESSION['userid']);
+			PutFormData($f, $s, 'accesscode', $accesscode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
+			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
 		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
 			error('Please select a field');
 		} elseif(!passwordcheck(GetFormData($f, $s,'password'))){
@@ -365,6 +369,7 @@ if( $reloadform )
 	PutFormData($f,$s,"password",$pass,"text");
 	PutFormData($f,$s,"passwordconfirm",$pass,"text");
 
+	$pass = $usr->accesscode ? '00000000' : '';
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
 	
