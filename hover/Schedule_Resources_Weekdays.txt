@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
+Exclude days when the Flex appliance is allowed to run at full capacity. 

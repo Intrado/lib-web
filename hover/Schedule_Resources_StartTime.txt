@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
+The flex will run at full capacity until the start time and the configured limit after the start time.
