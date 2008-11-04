@@ -22,7 +22,7 @@ echo "connection ok\n";
 // verify data
 echo "Verifying existing data is ok to move\n";
 
-$query = "select count(*) from messagepart where fieldnum='$ffield'";
+$query = "select count(*) from messagepart mp left join message m on (m.id = mp.messageid) where fieldnum='$ffield' and not m.deleted";
 $res = mysql_query($query)
 	or die("Failed to execute: $query ".mysql_error());
 $count = mysql_fetch_row($res);
