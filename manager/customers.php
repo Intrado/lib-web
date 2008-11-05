@@ -124,10 +124,16 @@ foreach($customers as $cust) {
 		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
 								WHERE job.status = 'active'", $custdb);
 		$customerfeatures = array();
+
 		if(getCustomerSystemSetting('_hasportal', false, true, $custdb))
-			$customerfeatures[] = "Portal";
+			$customerfeatures[] = "ContactMgr";
 		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
+		if(getCustomerSystemSetting('_hassurvey', true, true, $custdb))
+			$customerfeatures[] = "Survey";
+		if(getCustomerSystemSetting('_hascallback', false, true, $custdb))
+			$customerfeatures[] = "Callback";
+
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
 		$row[12] = $cust[3];
