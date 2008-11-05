@@ -32,7 +32,7 @@ if($REQUEST_TYPE == "new"){
 
 	if (isset($_SESSION['contactphone'])) {
 		$timesince = (time() - (30*24*60*60)) * 1000; // 30 days ago, in milliseconds since 1970
-		$query = "select j.id, j.userid, rc.sequence, j.phonemessageid, rc.personid from reportcontact rc join job j where rc.type='phone' and rc.phone='".$_SESSION['contactphone']."' and j.id=rc.jobid and rc.starttime>$timesince order by rc.starttime desc";
+		$query = "select j.id, j.userid, rc.sequence, j.phonemessageid, rc.personid from reportcontact rc join job j where rc.type='phone' and rc.phone='".$_SESSION['contactphone']."' and j.id=rc.jobid and j.phonemessageid is not null and rc.starttime>$timesince order by rc.starttime desc";
 		glog($query);
 		$resultlist = QuickQueryMultiRow($query);
 		$messagelist = array();
