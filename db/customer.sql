@@ -1514,7 +1514,17 @@ $$$
 ALTER TABLE `reportgroupdata` CHANGE `id` `id` BIGINT( 11 ) NOT NULL AUTO_INCREMENT
 $$$
 
--- Begin release 6.2
+-- ASP 6.1
+
+
+create table if not exists customercallstats (
+  jobid int(11) NOT NULL,
+  userid int(11) NOT NULL,
+  finishdate datetime default NULL,
+  attempted int(11),
+  primary key (jobid)
+) engine=innodb
+$$$
 
 CREATE TABLE `dmschedule` (
 `id` INT NOT NULL auto_increment ,
@@ -1524,7 +1534,9 @@ CREATE TABLE `dmschedule` (
 `endtime` TIME NOT NULL ,
 `resourcepercentage` float NOT NULL DEFAULT '1',
 PRIMARY KEY ( `id` )
-) ENGINE = innodb;
+) ENGINE = innodb
+
+$$$
 
 
 
