@@ -7,9 +7,11 @@ $IS_LDAP = $SETTINGS['feature']['is_ldap'];
 //get the customer URL
 if ($IS_COMMSUITE) {
 	$CUSTOMERURL = "default";
+	$BASEURL = "/";
 } /*CSDELETEMARKER_START*/ else {
 	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+	$BASEURL = "/$CUSTOMERURL";
 } /*CSDELETEMARKER_END*/
 
 require_once("db.inc.php");
@@ -35,7 +37,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 
 	if (!isset($_SESSION['user']) || !isset($_SESSION['access'])) {
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
-		redirect("./?logout=1");
+		redirect("$BASEURL/?logout=1");
 	} else {
 		$USER = &$_SESSION['user'];
 		$USER->refresh();
@@ -45,7 +47,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 		$ACCESS->loadPermissions(true);
 
 		if (!$USER->enabled || $USER->deleted || !$USER->authorize('loginweb')) {
-			redirect("./?logout=1");
+			redirect("$BASEURL/?logout=1");
 		}
 	}
 }
