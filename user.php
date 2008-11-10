@@ -140,25 +140,25 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$usr = new User($_SESSION['userid']);
 		$email = trim(GetFormData($f, $s, "email"));
 		PutFormData($f,$s,"email",$email);
-		
+
 		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
-		
+
 		$password = GetFormData($f, $s, "password");
 		$passwordconfirm = trim(GetFormData($f, $s, "passwordconfirm"));
 		$login = trim(GetFormData($f, $s, 'login'));
-		
+
 		$accesscode = trim(GetFormData($f, $s, 'accesscode'));
 		PutFormData($f,$s,"accesscode",$accesscode,"number","nomin","nomax");
-		
+
 		$pincode = trim(GetFormData($f, $s, 'pincode'));
 		PutFormData($f,$s,"pincode",$pincode,"number","nomin","nomax");
 		$pincodeconfirm = trim(GetFormData($f, $s, 'pincodeconfirm'));
 		PutFormData($f,$s,"pincodeconfirm",$pincodeconfirm,"number","nomin","nomax");
 
-		
-		
+
+
 		if (GetFormData($f, $s, "radioselect") == "bydata") {
 			$staffid = "";
 		} else {
@@ -240,8 +240,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 			$usr->email = $email;
 			$usr->aremail = $emaillist;
 			$usr->login = $login;
-			
-			
+
+
 			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
 			if($IS_LDAP){
 				if(GetFormData($f, $s, "ldap")) {
@@ -374,8 +374,8 @@ if( $reloadform )
 	$pass = $usr->accesscode ? '00000000' : '';
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
-	
-		
+
+
 	if ($usr->id){
 		$surveytypes = array();
 		$types = QuickQueryList("select ujt.jobtypeid, issurvey from userjobtypes ujt inner join jobtype jt on (jt.id = ujt.jobtypeid) where userid = $usr->id", true);
@@ -636,6 +636,9 @@ startWindow('User Information');
 								?>
 								</td>
 							</tr>
+
+<? if (getSystemSetting('_hassurvey', true)) { ?>
+
 							<tr>
 								<td colspan="2">
 									<table>
@@ -667,6 +670,7 @@ startWindow('User Information');
 								?>
 								</td>
 							</tr>
+<? } ?>
 						</table>
 					</td>
 				</tr>

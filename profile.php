@@ -399,10 +399,16 @@ startWindow('Allowed Functions');
 					<td><? NewFormItem($form,$section,"createrepeat","checkbox"); ?></td>
 					<td>Create Repeating Jobs</td>
 				</tr>
+<?
+	if (getSystemSetting("_hassurvey", true)) {
+?>
 				<tr>
 					<td><? NewFormItem($form,$section,"survey","checkbox"); ?></td>
 					<td>Create Survey Jobs</td>
 				</tr>
+<?
+	}
+?>
 				<tr>
 					<td><? NewFormItem($form,$section,"setcallerid","checkbox"); ?></td>
 					<td>Set the job caller ID</td>

@@ -134,10 +134,10 @@ foreach($systemprioritynames as $index => $name){
 			continue;
 		displayJobtypeForm($f, $s, $type->id, $maxphones, $maxemails, $maxsms, false);
 	}
-?>
-<?
 }
+if (getSystemSetting('_hassurvey', true)) {
 ?>
+
 	<tr class="listheader">
 		<th align="left" colspan="4">Surveys<th>
 	<tr>
@@ -151,6 +151,7 @@ foreach($systemprioritynames as $index => $name){
 	foreach($surveytypes as $surveytype) {
 		displayJobtypeForm($f, $s, $surveytype->id, $maxphones, $maxemails, $maxsms, false);
 	}
+}
 ?>
 </table>
 <?

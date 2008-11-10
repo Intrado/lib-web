@@ -64,7 +64,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 			<th align="left" class="nosort">Job and Date Range</th>
 			<th align="left" class="nosort">Individual</th>
 <?
-if($USER->authorize('viewsystemreports') || $USER->authorize("survey")){
+if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){
 ?>
 			<th align="left" class="nosort">Survey</th>
 
@@ -97,7 +97,7 @@ if($USER->authorize('viewsystemreports') || $USER->authorize("survey")){
 					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
 				</table>
 			</td>
-<? if($USER->authorize('viewsystemreports') || $USER->authorize("survey")){ ?>
+<? if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
 			<td>
 				<table>
 					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>

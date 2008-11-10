@@ -148,12 +148,17 @@ startWindow("Add a Job Type");
 ?>
 					</td>
 				</tr>
+
+<? if (getSystemSetting('_hassurvey', true)) { ?>
+
 				<tr>
 					<td width="30%">Check if this is a survey</td>
 					<td>
 						<? NewFormItem($f, $s, "issurvey", "checkbox", 0, 1, "onclick='if(this.checked) displaysurveytable(); else hidesurveytable();'");?>
 					</td>
 				</tr>
+<? } ?>
+
 				<tr>
 					<td width="30%">Display Information</td>
 					<td ><? NewFormItem($f, $s, "jobtypedesc", "textarea", 20, 3);?></td>
