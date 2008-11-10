@@ -85,12 +85,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		$sendphone = GetFormData($f, $s, "sendphone");
 		$sendemail = GetFormData($f, $s, "sendemail");
 		$sendsms = getSystemSetting("_hassms", false) ? GetFormData($f, $s, "sendsms") : 0;
-		
+
 		$name = trim(GetFormData($f,$s,"name"));
 		if ( empty($name) ) {
 			PutFormData($f,$s,"name",'',"text",1,$JOBTYPE == "repeating" ? 30: 50,true);
 		}
-		
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
@@ -250,6 +250,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 				if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
 					$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
+					// if customer has callback feature
+					if (getSystemSetting('_hascallback', false)) {
+						$radio = "0";
+						if (GetFormData($f, $s, "radiocallerid") == "byuser") {
+							$radio = "1";
+						}
+						$job->setSetting('prefermycallerid', $radio);
+					}
 				} else {
 					$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 					$job->setOptionValue("callerid", $callerid);
@@ -370,6 +378,14 @@ if( $reloadform )
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "phone", 10, 10);
+
+	if ($job->getSetting("prefermycallerid","0") == "1") {
+		$radio = "byuser";
+	} else {
+		$radio = "bydefault";
+	}
+	PutFormData($f, $s, "radiocallerid", $radio);
+
 
 	PutFormData($f,$s,"leavemessage",$job->isOption("leavemessage"), "bool", 0, 1);
 	PutFormData($f,$s,"messageconfirmation",$job->isOption("messageconfirmation"), "bool", 0, 1);
@@ -825,13 +841,29 @@ startWindow('Job Information');
 							?>
 						</td>
 					</tr>
-					<? if ($USER->authorize('setcallerid')) { ?>
-						<tr>
-								<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
-								<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
-						</tr>
-					<? } ?>
-
+<?
+if ($USER->authorize('setcallerid')) {
+	if (getSystemSetting('_hascallback', false)) {
+?>
+					<tr>
+						<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",($submittedmode ? "DISABLED" : "")); ?> Use default Caller ID</td>
+						<td><? echo Phone::format(getSystemSetting('callerid')); ?></td>
+					</tr>
+					<tr>
+						<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",($submittedmode ? "DISABLED" : "")); ?> Preferred Caller ID</td>
+						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
+					</tr>
+<?
+	} else {
+?>
+					<tr>
+						<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
+						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
+					</tr>
+<?
+ 	}
+}
+?>
 					<tr>
 						<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
 						<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>

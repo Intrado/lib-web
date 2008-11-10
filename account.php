@@ -58,21 +58,21 @@ if(CheckFormSubmit($f,$s))
 		$login = trim(GetFormData($f, $s, 'login'));
 		$email = trim(GetFormData($f, $s, "email"));
 		PutFormData($f,$s,"email",$email);
-		
+
 		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
-		
+
 		$accesscode = trim(GetFormData($f, $s, 'accesscode'));
 		PutFormData($f,$s,"accesscode",$accesscode,"number","nomin","nomax");
-		
+
 		$pincode = trim(GetFormData($f, $s, 'pincode'));
 		PutFormData($f,$s,"pincode",$pincode,"number","nomin","nomax");
 		$pincodeconfirm = trim(GetFormData($f, $s, 'pincodeconfirm'));
 		PutFormData($f,$s,"pincodeconfirm",$pincodeconfirm,"number","nomin","nomax");
-		
-		
-		
+
+
+
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -153,8 +153,17 @@ if(CheckFormSubmit($f,$s))
 			//dont save any callerid stuff if they don't have access to change it
 			if (strlen($callerid) == 0 )
 				$callerid = false;
-			if ($USER->authorize('setcallerid'))
+			if ($USER->authorize('setcallerid')) {
 				$USER->setSetting("callerid",$callerid);
+				// if customer has callback feature, and
+				if (getSystemSetting('_hascallback', false)) {
+					$radio = "0";
+					if (GetFormData($f, $s, "radiocallerid") == "byuser")
+						$radio = "1";
+					$USER->setSetting('prefermycallerid', $radio);
+				}
+			}
+
 
 			if (GetFormData($f, $s, "themeoverride")){
 				$USER->setSetting("_brandtheme", GetFormData($f, $s, "_brandtheme"));
@@ -248,6 +257,14 @@ if( $reloadform )
 	//default to empty string because if set to empty string, setting will not be set and system default will be used
 	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
+
+	if ($USER->getSetting("prefermycallerid","0") == "1") {
+		$radio = "byuser";
+	} else {
+		$radio = "bydefault";
+	}
+	PutFormData($f, $s, "radiocallerid", $radio);
+
 
 	PutFormData($f, $s, "_brandtheme", $USER->getSetting('_brandtheme', getSystemSetting('_brandtheme')), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", $USER->getSetting('_brandratio', getSystemSetting('_brandratio')), "text", "nomin", "nomax", true);
@@ -430,18 +447,35 @@ startWindow('User Information');
 								?>
 								</td>
 							</tr>
-<? if ($USER->authorize('setcallerid')) { ?>
+<?
+if ($USER->authorize('setcallerid')) {
+	if (getSystemSetting('_hascallback', false)) {
+?>
 							<tr>
-									<td>Caller&nbsp;ID <?= help('Account_CallerID',NULL,"small"); ?></td>
-									<td>
-									<? if ($readonly) {
-										echo Phone::format($callerid);
-									} else {
-										NewFormItem($f,$s,"callerid","text", 20, 20);
-									} ?>
-									</td>
+								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",""); ?> Use default Caller ID</td>
+								<td><? echo Phone::format(getSystemSetting('callerid')); ?></td>
 							</tr>
-<? } ?>
+							<tr>
+								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",""); ?> Preferred Caller ID</td>
+								<td><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
+							</tr>
+<?
+	} else {
+?>
+							<tr>
+								<td>Caller&nbsp;ID <?= help('Account_CallerID',NULL,"small"); ?></td>
+								<td>
+								<? if ($readonly) {
+									echo Phone::format($callerid);
+								} else {
+									NewFormItem($f,$s,"callerid","text", 20, 20);
+								} ?>
+								</td>
+							</tr>
+<?
+ 	}
+}
+?>
 						</table>
 					</td>
 				</tr>

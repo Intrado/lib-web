@@ -59,7 +59,7 @@ if(CheckFormSubmit($f,$s))
 			setSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'));
 
 			setSystemSetting('msgcallbackrequireid', GetFormData($f, $s, 'msgcallbackrequireid'));
-			
+
 			redirect("settings.php");
 		}
 	}
@@ -121,10 +121,12 @@ startWindow('Login Settings');
 								<td>Invalid Login Disable Account<? print help('Settings_LoginDisableAccount', NULL, "small"); ?></td>
 								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
 							</tr>
+<? if (getSystemSetting('_hascallback', false)) { ?>
 							<tr>
 								<td>Require Student ID on Call Back<? print help('Settings_MSGCallBackRequireID', NULL, "small"); ?></td>
 								<td><? NewFormItem($f, $s, 'msgcallbackrequireid', 'checkbox'); ?></td>
 							</tr>
+<? } ?>
 						</table>
 					</td>
 				</tr>

@@ -148,7 +148,13 @@ startWindow('Settings');
 									Default Caller ID Number<? print help('Settings_CallerID', NULL, "small"); ?>
 								</td>
 								<td>
-								<? NewFormItem($f, $s, 'callerid', 'text', 20);  ?>
+								<?
+								if (getSystemSetting('_hascallback', false)) {
+									echo Phone::format(getSystemSetting('callerid'));
+								} else {
+									NewFormItem($f, $s, 'callerid', 'text', 20);
+								}
+								?>
 								</td>
 							</tr>
 							<tr>
