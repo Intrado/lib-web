@@ -197,6 +197,7 @@ class Job extends DBMappedObject {
 		if ($phonelang) $fielddiffs['phonelang'] = 1;
 		if ($this->getOptionValue("maxcallattempts") != $defaultjob->getOptionValue("maxcallattempts")) $fielddiffs['maxcallattempts'] = 1;
 		if ($this->getOptionValue("callerid") != $defaultjob->getOptionValue("callerid")) $fielddiffs['callerid'] = 1;
+		if ($this->getOptionValue("prefermycallerid") != $defaultjob->getOptionValue("prefermycallerid")) $fielddiffs['radiocallerid'] = 1;
 		if ($this->isOption("skipduplicates") != $defaultjob->isOption("skipduplicates")) $fielddiffs['skipduplicates'] = 1;
 		if ($this->isOption("leavemessage") != $defaultjob->isOption("leavemessage")) $fielddiffs['leavemessage'] = 1;
 		if ($this->isOption("messageconfirmation") != $defaultjob->isOption("messageconfirmation")) $fielddiffs['messageconfirmation'] = 1;

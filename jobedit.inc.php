@@ -1084,6 +1084,7 @@ if ($USER->authorize('setcallerid')) {
 	if ((isset($diffvalues['phonelang']) ||
 		isset($diffvalues['maxcallattempts']) ||
 		isset($diffvalues['callerid']) ||
+		isset($diffvalues['radiocallerid']) ||
 		isset($diffvalues['skipduplicates']) ||
 		isset($diffvalues['leavemessage']) ||
 		isset($diffvalues['messageconfirmation'])
