@@ -115,7 +115,7 @@ function fmt_remaining ($row, $index) {
 function fmt_status_index($row, $index) {
 	global $USER;
 	if($row[$index] == 'procactive'){
-		return "Processing (" . $row[22] . ")";
+		return "Processing (" . $row[22] . "%)";
 	} else {
 		if ($row[23] && $row[23] != $USER->id) {
 			$usr = new User($row[23]);
