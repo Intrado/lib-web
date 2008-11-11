@@ -33,12 +33,12 @@ if($REQUEST_TYPE == "new"){
 	if (isset($_SESSION['contactphone'])) {
 		$timesince = (time() - (30*24*60*60)) * 1000; // 30 days ago, in milliseconds since 1970
 		$query = "select j.id, j.userid, rc.sequence, j.phonemessageid, rc.personid from reportcontact rc join job j where rc.type='phone' and rc.phone='".$_SESSION['contactphone']."' and j.id=rc.jobid and j.phonemessageid is not null and rc.starttime>$timesince order by rc.starttime desc";
-		glog($query);
+		//error_log($query);
 		$resultlist = QuickQueryMultiRow($query);
 		$messagelist = array();
 		foreach ($resultlist as $row) {
 			$msg = new MessagePlayback();
-			//glog("0->".$row[0] ." 1->". $row[1] . " 2->".$row[2]);
+			////error_log("0->".$row[0] ." 1->". $row[1] . " 2->".$row[2]);
 			$msg->jobid = $row[0];
 			$msg->userid = $row[1];
 			$msg->sequence = $row[2];
@@ -59,7 +59,7 @@ if($REQUEST_TYPE == "new"){
 		}
 
 	} else {
-		glog("MISSING CONTACT PHONE");
+		//error_log("MISSING CONTACT PHONE");
 		?>
 		<error>msgcallbackgetlist: continue requires contactphone </error>
 		<?

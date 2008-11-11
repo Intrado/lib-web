@@ -165,7 +165,7 @@ if($REQUEST_TYPE == "new"){
 	if (isset($_SESSION['messageindex'])) {
 
 		if (isset($BFXML_VARS['voicereply'])) {
-			glog("voicereply cmid=".$BFXML_VARS['voicereply']);
+			//error_log("voicereply cmid=".$BFXML_VARS['voicereply']);
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
 			$person = $playback->person;
 
@@ -184,7 +184,7 @@ if($REQUEST_TYPE == "new"){
 		}
 
 		if (isset($BFXML_VARS['messageconfirm'])) {
-			glog("messageconfirm ".$BFXML_VARS['messageconfirm']);
+			//error_log("messageconfirm ".$BFXML_VARS['messageconfirm']);
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
 			$person = $playback->person;
 
@@ -209,7 +209,7 @@ if($REQUEST_TYPE == "new"){
 			$playintro = false;
 		}
 
-		glog("messageindex = ".$_SESSION['messageindex']);
+		//error_log("messageindex = ".$_SESSION['messageindex']);
 
 		// end of list
 		if ($_SESSION['messageindex'] == $_SESSION['messagetotal']) {
@@ -223,7 +223,7 @@ if($REQUEST_TYPE == "new"){
 			$_SESSION['messageindex'] = $_SESSION['messageindex'] + 1; // increment to next message
 		}
 	} else {
-		glog("MISSING INDEX");
+		//error_log("MISSING INDEX");
 		?>
 		<error>msgcallbackplayback: continue requires messageindex </error>
 		<?

@@ -61,7 +61,7 @@ function loadLists($incr)
 {
 	global $PAGESIZE;
 	if (!isset($PAGESIZE)) $PAGESIZE = 9; // this is strange... why isnt it set the first time from above???
-	glog("pagesize: ".$PAGESIZE);
+	//error_log("pagesize: ".$PAGESIZE);
 
 	// TODO should find way to save lists on the sessiondata, do not want to query database more than once
 /*
@@ -88,7 +88,7 @@ function loadLists($incr)
 		}
 	}
 
-	glog("currentListPage: ".$_SESSION['currentListPage']);
+	//error_log("currentListPage: ".$_SESSION['currentListPage']);
 
 	$_SESSION['hasPaging'] = false;
 	if (count($allLists) > $PAGESIZE) {
@@ -101,7 +101,7 @@ function loadLists($incr)
 
 function playLists($incr, $emptylist = false, $playprompt=true)
 {
-	glog("playlists, empty? ".$emptylist);
+	//error_log("playlists, empty? ".$emptylist);
 
 	$lists = loadLists($incr);
 ?>
@@ -191,7 +191,7 @@ if($REQUEST_TYPE == "new"){
 	if (isset($BFXML_VARS['listnumber'])) {
 
 		$listnumber = $BFXML_VARS['listnumber'];
-		glog("list number selected: ".$listnumber);
+		//error_log("list number selected: ".$listnumber);
 
 		// if they want to hear the next page of lists
 		if ($listnumber == "*") {
@@ -200,12 +200,12 @@ if($REQUEST_TYPE == "new"){
 		} else {
 
 			$listindex = ($_SESSION['currentListPage']*$PAGESIZE)+($listnumber-1);
-			glog("listindex: ".$listindex);
+			//error_log("listindex: ".$listindex);
 
 			$lists = array_values(loadListsDB()); // convert indexes to 0, 1, 2, ...
 			//var_dump($lists);
 			$list = $lists[$listindex];
-			glog("list name: ".$list->name);
+			//error_log("list name: ".$list->name);
 
 			$_SESSION['listid'] = $list->id;
 			$_SESSION['listname'] = $list->name;
@@ -217,7 +217,7 @@ if($REQUEST_TYPE == "new"){
 			$renderedlist->mode = "preview";
 			$renderedlist->renderList();
 			$listsize = $renderedlist->total;
-			glog("number of people in list: ".$listsize);
+			//error_log("number of people in list: ".$listsize);
 
 			if ($listsize == 0) {
 				playLists(true, true);

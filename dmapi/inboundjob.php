@@ -22,7 +22,7 @@ global $BFXML_VARS;
 function jobOptions()
 {
 	$maxdays = QuickQuery("SELECT permission.value FROM permission, user WHERE permission.accessid = user.accessid and permission.name='maxjobdays' and user.id=".$_SESSION['userid']);
-	glog("maxdays".$maxdays);
+	//error_log("maxdays".$maxdays);
 
 ?>
 <voice>
@@ -84,7 +84,7 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 	$listsize = $renderedlist->total;
 	$jobtype = new JobType($priority);
 
-	glog("number of people in list: ".$listsize);
+	//error_log("number of people in list: ".$listsize);
 
 	// if job is one day, and stop time is in the past... warn them about a job that is ineffective
 	// NOTE this case should not exist, should be handled by checkExpirationThenConfirm() method
@@ -206,11 +206,11 @@ function promptStartTime($playinvalid=false, $invalidreason="none")
 	loadUser();
 	global $USER, $ACCESS;
 
-	glog("access early ".$ACCESS->getValue("callearly"));
-	glog("access late  ".$ACCESS->getValue("calllate"));
+	//error_log("access early ".$ACCESS->getValue("callearly"));
+	//error_log("access late  ".$ACCESS->getValue("calllate"));
 
 	$playrestriction = ($ACCESS->getValue("callearly") | $ACCESS->getValue("calllate"));
-	glog("playrestrict: ".$playrestriction);
+	//error_log("playrestrict: ".$playrestriction);
 	// if one restricted but the other is not, set default
 	$early = $ACCESS->getValue("callearly");
 	if (!$early) {
@@ -346,26 +346,26 @@ function commitJob()
 	$job->jobtypeid = $jobtype->id;
 	$job->description = $jobtype->name;
 
-	glog("priority: ".$jobtype->name."   id: ".$job->jobtypeid);
+	//error_log("priority: ".$jobtype->name."   id: ".$job->jobtypeid);
 
-	glog("about to create the job!!!");
+	//error_log("about to create the job!!!");
 	$job->create();
 	$jobid = $job->id;
 	if ($jobid) {
 		// now create any additional language messages for this job
 		if (isset($_SESSION['msglangmap'])) foreach($_SESSION['msglangmap'] as $lang => $msgid) {
-			glog($lang.$msgid);
+			//error_log($lang.$msgid);
 			$joblang = new JobLanguage();
 			$joblang->jobid = $jobid;
 			$joblang->messageid = $msgid;
 			$joblang->type = "phone";
 			$joblang->language = $lang;
 			$joblang->create();
-			glog("created joblang");
+			//error_log("created joblang");
 		}
 
 		// now we submit this job
-		glog("now submit the job to process ".$jobid);
+		//error_log("now submit the job to process ".$jobid);
 		$job->runNow();
 
 		return true;
@@ -407,7 +407,7 @@ if($REQUEST_TYPE == "new"){
 	<error>inboundjob: wanted continue, got new </error>
 	<?
 } else if($REQUEST_TYPE == "continue") {
-	glog("job continue...");
+	//error_log("job continue...");
 
 	// if they entered the job options
 	if (isset($BFXML_VARS['numdays'])) {
@@ -445,7 +445,7 @@ if($REQUEST_TYPE == "new"){
 			} else {
 				$starttime = $starttime."pm";
 			}
-			glog("starttime: ".$starttime);
+			//error_log("starttime: ".$starttime);
 
 			$isValid = strtotime($starttime);
 
@@ -477,7 +477,7 @@ if($REQUEST_TYPE == "new"){
 			} else {
 				$stoptime = $stoptime."pm";
 			}
-			glog("stoptime: ".$stoptime);
+			//error_log("stoptime: ".$stoptime);
 
 			$invalidreason = "none";
 			$isValid = strtotime($stoptime);
@@ -505,7 +505,7 @@ if($REQUEST_TYPE == "new"){
 
 	// if they listened to confirmation
 	} else if (isset($BFXML_VARS['sendjob'])) {
-			glog("sendjob ".$BFXML_VARS['sendjob']);
+			//error_log("sendjob ".$BFXML_VARS['sendjob']);
 
 			// send the job
 			if ($BFXML_VARS['sendjob'] == "1" &&

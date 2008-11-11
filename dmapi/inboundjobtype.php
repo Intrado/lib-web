@@ -24,8 +24,8 @@ function loadJobtypes($incr)
 {
 	global $PAGESIZE, $USER;
 	if (!isset($PAGESIZE)) $PAGESIZE = 9; // this is strange... why isnt it set the first time from above???
-	glog("pagesize: ".$PAGESIZE);
-	//glog("loadjobtypes current page ".$_SESSION['currentJobtypePage']);
+	//error_log("pagesize: ".$PAGESIZE);
+	////error_log("loadjobtypes current page ".$_SESSION['currentJobtypePage']);
 
 	$allJobtypes = array_values(loadJobtypesDB()); // convert indexes to 0, 1, 2, ...
 
@@ -41,7 +41,7 @@ function loadJobtypes($incr)
 		}
 	}
 
-	glog("currentJobtypePage: ".$_SESSION['currentJobtypePage']);
+	//error_log("currentJobtypePage: ".$_SESSION['currentJobtypePage']);
 
 	$_SESSION['hasPaging'] = false;
 	if (count($allJobtypes) > $PAGESIZE) {
@@ -136,7 +136,7 @@ if($REQUEST_TYPE == "new"){
 	if (isset($BFXML_VARS['jobtypenumber'])) {
 
 		$jobtypenumber = $BFXML_VARS['jobtypenumber'];
-		glog("jobtype number selected: ".$jobtypenumber);
+		//error_log("jobtype number selected: ".$jobtypenumber);
 
 		// if they want to hear the next page of jobtypes
 		if ($jobtypenumber == "*") {
@@ -145,12 +145,12 @@ if($REQUEST_TYPE == "new"){
 		} else {
 
 			$jobtypeindex = ($_SESSION['currentJobtypePage']*$PAGESIZE)+($jobtypenumber-1);
-			glog("jobtypeindex: ".$jobtypeindex);
+			//error_log("jobtypeindex: ".$jobtypeindex);
 
 			$jobtypes = array_values(loadJobtypesDB()); // convert indexes to 0, 1, 2, ...
 			//var_dump($jobtypes);
 			$jobtype = $jobtypes[$jobtypeindex];
-			glog("jobtype name: ".$jobtype->name);
+			//error_log("jobtype name: ".$jobtype->name);
 
 			$_SESSION['priority'] = $jobtype->id;
 

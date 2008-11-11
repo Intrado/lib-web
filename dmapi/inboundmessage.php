@@ -229,11 +229,11 @@ function commitMessage($contentid)
 	// now commit to database
 	$audioFile->create();
 	$audiofileid = $audioFile->id;
-	glog("audiofileid: ".$audiofileid);
+	//error_log("audiofileid: ".$audiofileid);
 	if ($audiofileid) {
 		$message->create();
 		$messageid = $message->id;
-		glog("messageid: ".$messageid);
+		//error_log("messageid: ".$messageid);
 		if ($messageid) {
 			$messagePart->messageid = $messageid;
 			$messagePart->audiofileid = $audiofileid;
@@ -280,7 +280,7 @@ if($REQUEST_TYPE == "new"){
 			unset($languages[$langi]);
 			$languages = array_values($languages);
 			$_SESSION['languageList'] = $languages;
-			glog("langc : ".count($languages));
+			//error_log("langc : ".count($languages));
 
 			if (count($languages) >= 1) {
 				promptMultiLang();

@@ -88,7 +88,7 @@ if($REQUEST_TYPE == "new" ||
 		$pin = $BFXML_VARS['pin'];
 		$inboundNumber = $_SESSION['inboundNumber'];
 
-		glog("inbound ".$inboundNumber);
+		//error_log("inbound ".$inboundNumber);
 
 		// do not allow empty code/pin
 		if ($code != "" && $pin != "") {
