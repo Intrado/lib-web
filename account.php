@@ -70,8 +70,9 @@ if(CheckFormSubmit($f,$s))
 		PutFormData($f,$s,"pincode",$pincode,"number","nomin","nomax");
 		$pincodeconfirm = trim(GetFormData($f, $s, 'pincodeconfirm'));
 		PutFormData($f,$s,"pincodeconfirm",$pincodeconfirm,"number","nomin","nomax");
-
-
+		PutFormData($f,$s,"firstname",trim(GetFormData($f,$s,'firstname')),"text",1,50,true);
+		PutFormData($f,$s,"lastname",trim(GetFormData($f,$s,'lastname')),"text",1,50,true);
+		
 
 		//do check
 		if( CheckFormSection($f, $s) ) {
