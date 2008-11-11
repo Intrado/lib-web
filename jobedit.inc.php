@@ -62,6 +62,11 @@ $f = "notification";
 $s = "main" . $JOBTYPE;
 $reloadform = 0;
 
+// used to determine if advanced settings need to be expanded to show error
+$hassettingsdetailerror = false;
+$hasphonedetailerror = false;
+$hasemaildetailerror = false;
+
 if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'email') || CheckFormSubmit($f,'print') || CheckFormSubmit($f,'sms') || CheckFormSubmit($f,'send'))
 {
 	//check to see if formdata is valid
@@ -92,26 +97,38 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		}
 
 		if( CheckFormSection($f, $s) ) {
+			$hassettingsdetailerror = true;
+			$hasphonedetailerror = true;
+			$hasemaildetailerror = true;
+
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
 			error("Plese select a delivery type");
 		} else if ($JOBTYPE == 'normal' && (strtotime(GetFormData($f,$s,"startdate")) === -1 || strtotime(GetFormData($f,$s,"startdate")) === false)) {
+			$hassettingsdetailerror = true;
 			error('The start date is invalid');
 		} else if ($JOBTYPE=='normal' && (strtotime(GetFormData($f,$s,"starttime")) === -1 || strtotime(GetFormData($f,$s,"starttime")) === false)) {
+			$hassettingsdetailerror = true;
 			error('The start time is invalid');
 		} else if ($JOBTYPE=='normal' && (strtotime(GetFormData($f,$s,"endtime")) === -1 || strtotime(GetFormData($f,$s,"endtime")) === false)) {
+			$hassettingsdetailerror = true;
 			error('The end time is invalid');
 		} else if (strtotime(GetFormData($f,$s,"endtime")) <= strtotime(GetFormData($f,$s,"starttime")) ) {
+			$hassettingsdetailerror = true;
 			error('The end time cannot be before or the same as the start time');
 		} else if (strtotime(GetFormData($f, $s,"endtime"))-(30*60) < strtotime(GetFormData($f,$s,"starttime"))){
+			$hassettingsdetailerror = true;
 			error('The end time must be at least 30 minutes after the start time');
 		} else if ($JOBTYPE == "normal" &&  (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) < strtotime("today")) && !$completedmode){
+			$hassettingsdetailerror = true;
 			error('The end date has already passed. Please correct this problem before proceeding');
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
+			$hassettingsdetailerror = true;
 			error('The end time has already passed. Please correct this problem before proceeding');
 		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . $name . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
+			$hasphonedetailerror = true;
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else {
 			//submit changes
@@ -1026,8 +1043,17 @@ if ($USER->authorize('setcallerid')) {
 
 <script language="javascript">
 	var displaysettingsdetailsstate = 'visible';
+	<? if ($hassettingsdetailerror) { ?>
+		displaysettingsdetailsstate = 'hidden';
+	<?}?>
 	var displayphonedetailsstate = 'visible';
+	<? if ($hasphonedetailerror) { ?>
+		displayphonedetailsstate = 'hidden';
+	<? } ?>
 	var displayemaildetailsstate = 'visible';
+	<? if ($hasemaildetailerror) { ?>
+		displayemaildetailsstate = 'hidden';
+	<? } ?>
 	var jobtypetablestyle = new getObj("jobtypetable").obj.style.border;
 	var jobtypeinfo = new Array();
 
