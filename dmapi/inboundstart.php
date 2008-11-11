@@ -13,7 +13,7 @@ function welcomemessage() {
 		<goto message="choose" />
 	</message>
 	<message name="choose">
-			<field name="redirect" type="menu" timeout="5000" sticky="false">
+			<field name="redirect" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
 	    	    <tts gender="female" language="english">To retrieve messages sent to you, press 1. If you are a user and want to log in, press 2</tts>
 			</prompt>

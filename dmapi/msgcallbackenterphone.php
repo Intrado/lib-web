@@ -7,7 +7,6 @@ function entercallerid($attempt) {
 ?>
 <voice>
 	<message name="entercallerid">
-			<setvar name="attempt" value="<?echo $attempt;?>" />
 			<?if ($attempt > 0) { ?>
 					<tts gender="female" language="english">Invalid phone number. Phone number must be 10 digits including area code.</tts>
 			<?} ?>
@@ -65,17 +64,16 @@ if($REQUEST_TYPE == "new") {
 				forwardToPage("msgcallbackgetlist.php");
 			}
 		} else {
-			$attempt = $BFXML_VARS['attempt'];
-			$attempt++;
-			if($attempt > 2) {
+			$_SESSION['phoneattempts']++;
+			if($_SESSION['phoneattempts'] > 2) {
 				invalidend();
 			} else {
-				entercallerid($attempt);
+				entercallerid($_SESSION['phoneattempts']);
 			}
 		}
 	} else {
 		$_SESSION['phoneattempts'] = 0;
-		entercallerid(0);
+		entercallerid($_SESSION['phoneattempts']);
 	}
 }
 

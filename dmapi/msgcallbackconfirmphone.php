@@ -7,7 +7,7 @@ function confirmcallerid($callerid) {
 ?>
 <voice>
 	<message name="choosecallerid">
-			<field name="callerid" type="menu" timeout="5000" sticky="false">
+			<field name="callerid" type="menu" timeout="5000" sticky="true">
 			<prompt repeat="2">
 			    <tts gender="female" language="english">It looks like you are calling from </tts>
 	    	    <tts gender="female" language="english"><? echo substr($callerid,0,3) . " " . substr($callerid,3,3)   . " " . substr($callerid,6); ?>. </tts>
