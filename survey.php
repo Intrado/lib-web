@@ -20,7 +20,7 @@ include_once("obj/Phone.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('survey')) {
+if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey')) {
 	redirect('unauthorized.php');
 }
 
@@ -98,7 +98,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 		if ( empty($name) ) {
 			PutFormData($f,$s,"name",'',"text",1,50,true);
 		}
-		
+
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');

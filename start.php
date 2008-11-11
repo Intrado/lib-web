@@ -147,7 +147,7 @@ if ($USER->authorize("startstats")) {
 			endWindow();
 
 
-			if ($USER->authorize("survey")) {
+			if (getSystemSetting('_hassurvey', true) && $USER->authorize("survey")) {
 
 				startWindow('My Active and Pending Surveys ' . help('Start_MyActiveJobs'),NULL,true);
 				button_bar(button('Refresh', 'window.location.reload()'));

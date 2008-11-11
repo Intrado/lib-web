@@ -135,7 +135,7 @@ if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')){
 	$types["sms"] = $smses;
 }
 $jobtypes = JobType::getUserJobTypes(false);
-if($USER->authorize('survey'))
+if (getSystemSetting('_hassurvey', true) && $USER->authorize('survey'))
 	$jobtypes = array_merge($jobtypes, JobType::getUserJobTypes(true));
 
 

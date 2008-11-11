@@ -1,5 +1,4 @@
 <?
-
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -160,7 +159,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		PutFormData($f,$s,"firstname",trim(GetFormData($f,$s,'firstname')),"text",1,50,true);
 		PutFormData($f,$s,"lastname",trim(GetFormData($f,$s,'lastname')),"text",1,50,true);
 		PutFormData($f,$s,"description",trim(GetFormData($f,$s,'description')),"text",0,50);
-			
+
+
 
 		if (GetFormData($f, $s, "radioselect") == "bydata") {
 			$staffid = "";
@@ -288,11 +288,11 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 
 			QuickUpdate("delete from userjobtypes where userid = $usr->id");
 			if(GetFormData($f,$s,"restricttypes") && count(GetFormData($f,$s,'jobtypes')) > 0)
-			foreach(GetFormData($f,$s,'jobtypes') as $type)
-				QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($type) . "')");
-				if(GetFormData($f,$s,"restrictsurveytypes") && count(GetFormData($f,$s,'surveyjobtypes')) > 0)
-			foreach(GetFormData($f,$s,'surveyjobtypes') as $surveytype)
-				QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($surveytype) . "')");
+				foreach(GetFormData($f,$s,'jobtypes') as $type)
+					QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($type) . "')");
+			if(GetFormData($f,$s,"restrictsurveytypes") && count(GetFormData($f,$s,'surveyjobtypes')) > 0)
+				foreach(GetFormData($f,$s,'surveyjobtypes') as $surveytype)
+					QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($surveytype) . "')");
 
 			$_SESSION['userid'] = $usr->id;
 

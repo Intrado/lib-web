@@ -23,7 +23,7 @@ include_once("obj/SurveyQuestionnaire.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if (!$USER->authorize('survey')) {
+if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey')) {
 	redirect('unauthorized.php');
 }
 

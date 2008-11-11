@@ -207,7 +207,7 @@ if($USER->authorize('sendprint')) {
 }
 
 
-if($USER->authorize('survey')) {
+if (getSystemSetting('_hassurvey', true) && $USER->authorize('survey')) {
 
 	startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates'),'padding: 3px;', true, true);
 	button_bar(button('Create New Survey Template', null,"surveytemplate.php?id=new") . help('Surveys_CreateNewTemplateButton') );
