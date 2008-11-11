@@ -1515,7 +1515,7 @@ ALTER TABLE `reportgroupdata` CHANGE `id` `id` BIGINT( 11 ) NOT NULL AUTO_INCREM
 $$$
 
 -- ASP 6.1
-
+-- Start here for release 6.2
 
 create table if not exists customercallstats (
   jobid int(11) NOT NULL,
@@ -1535,9 +1535,10 @@ CREATE TABLE `dmschedule` (
 `resourcepercentage` float NOT NULL DEFAULT '1',
 PRIMARY KEY ( `id` )
 ) ENGINE = innodb
-
 $$$
 
+ALTER TABLE `groupdata` CHANGE `importid` `importid` INT NOT NULL
+$$$
 
 
 
