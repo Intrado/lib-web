@@ -56,7 +56,7 @@ if(CheckFormSubmit($f,$s)) {
 		MergeSectionFormData($f, $s);
 
 		$starttime = strtotime(GetFormData($f, $s, "starttime"));
-		$endtime = strtotime(GetFormData($f, $s, "endtime"));		
+		$endtime = strtotime(GetFormData($f, $s, "endtime"));
 		$throttle = GetFormData($f, $s, "throttle");
 		$showdetail = $throttle;
 		if( CheckFormSection($f, $s) ) {
@@ -70,23 +70,23 @@ if(CheckFormSubmit($f,$s)) {
 		} else if ($throttle != 1 && ($endtime-(30*60) < $starttime)){
 			error('The end time must be at least 30 minutes after the start time');
 		} else {
-			
-			$dow = array();
-			for ($x = 1; $x < 8; $x++) {
-				if(GetFormData($f,$s,"dow$x")) {
-					$dow[$x-1] = $x;
-				}
-			}
-			$dmschedule->daysofweek = implode(",",$dow);
-		
-			$dmschedule->resourcepercentage = $throttle;	 
-			
+
+			$dmschedule->resourcepercentage = $throttle;
+
 			if ($throttle != 1) {
 				$dmschedule->starttime = date("H:i", $starttime);
 				$dmschedule->endtime = date("H:i", $endtime);
+
+				$dow = array();
+				for ($x = 1; $x < 8; $x++) {
+					if (!GetFormData($f,$s,"dow$x")) {
+						$dow[$x-1] = $x;
+					}
+				}
+				$dmschedule->daysofweek = implode(",",$dow);
 			}
-			$dmschedule->update();		
-		
+			$dmschedule->update();
+
 			redirect("dms.php");
 		}
 	}
@@ -100,20 +100,20 @@ if( $reloadform ) {
 	$scheduledows = array();
 	$data = explode(",", $dmschedule->daysofweek);
 	for ($x = 1; $x < 8; $x++) {
-	    $scheduledows[$x] = in_array($x,$data);
+	    $scheduledows[$x] = !in_array($x,$data);
 	}
 	for ($x = 1; $x < 8; $x++) {
 		PutFormData($f,$s,"dow$x",(isset($scheduledows[$x]) ? $scheduledows[$x] : 0),"bool",0,1);
 	}
-	
+
 	PutFormData($f, $s, "throttle", $dmschedule->resourcepercentage, "select", 0.25, 0.75, true);
 	PutFormData($f, $s, "starttime",date("g:i a", strtotime($dmschedule->starttime)), "select", "12:00 am", "11:45 pm", true);
 	PutFormData($f, $s, "endtime",date("g:i a", strtotime($dmschedule->endtime)), "select", "12:00 am", "11:45 pm", true);
 }
 
-	
 
-	
+
+
 $PAGE="admin:settings";
 $TITLE="Resource Schedule Manager: ".htmlentities($dmname);
 include_once("nav.inc.php");
@@ -127,10 +127,10 @@ startWindow("Schedule");
 			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
 			<td class="bottomBorder">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-		
+
 				    <tr>
 				    	<td width="30%">Limit Resources<? print help('Schedule_Resources_Limit', NULL, "small"); ?></td>
-				  
+
 					     <td>
 					   		<?
 								NewFormItem($f, $s, 'throttle', 'selectstart', null, null, "onchange=checkSelection(this)");
@@ -145,11 +145,11 @@ startWindow("Schedule");
 			   	</table>
 			    <div id='details' style=<? if ($showdetail == 1) {?>"display:none"<?} else {?>"display:block"<?}?>>
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-			     	
+
 					<tr>
-						<td width="30%">Start Time<? print help('Schedule_Resources_StartTime', NULL, "small"); ?></td>						
+						<td width="30%">Start Time<? print help('Schedule_Resources_StartTime', NULL, "small"); ?></td>
 						<td><? time_select($f,$s,"starttime", NULL, NULL, NULL, NULL, NULL); ?></td>
-						
+
 					</tr>
 					<tr>
 						<td width="30%">End Time<? print help('Schedule_Resources_EndTime', NULL, "small"); ?></td>
@@ -181,17 +181,17 @@ startWindow("Schedule");
 						</td>
 					</tr>
 				</table>
-				
+
 				</div>
-				
+
 			</td>
 		</tr>
 	</table>
-	
-	
+
+
 <script>
 function checkSelection(dropdown)
-{   
+{
    if(dropdown.selectedIndex > 0) {
 	   show('details');
    } else {
