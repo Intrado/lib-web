@@ -22,6 +22,7 @@ function goodbye($jobSubmit=false)
 if($REQUEST_TYPE == "new"){
 	?>
 	<error>inboundgoodbye: wanted result or continue, got new </error>
+	<hangup />
 	<?
 } else if($REQUEST_TYPE == "result"){
 	//huh, they must have hung up

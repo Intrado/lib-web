@@ -10,7 +10,7 @@ function loadUser()
 		$USER = $_SESSION['user'] = new User($_SESSION['userid']);
 		$ACCESS = $_SESSION['access'] = new Access($USER->accessid);
 	} else {
-		//error_log("ERROR: inboundutils->loadUser() called before SESSIONDATA[userid] was set");
+		error_log("ERROR: inboundutils->loadUser() called before SESSIONDATA[userid] was set");
 	}
 }
 

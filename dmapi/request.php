@@ -11,7 +11,13 @@ require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/SpecialTask.obj.php");
-require_once("msgcallbackMessagePlayback.obj.php");
+// need these objects for serialization of sessiondata used by inbound message callback
+include_once("../obj/Message.obj.php");
+include_once("../obj/MessagePart.obj.php");
+include_once("../obj/Person.obj.php");
+include_once("../obj/Voice.obj.php");
+include_once("../obj/AudioFile.obj.php");
+include_once("../obj/VoiceReply.obj.php");
 
 include_once("XmlToArray.obj.php");
 

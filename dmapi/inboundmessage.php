@@ -262,6 +262,7 @@ function commitMessage($contentid)
 if($REQUEST_TYPE == "new"){
 	?>
 	<error>inboundmessage: wanted continue, got new </error>
+	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue") {
 

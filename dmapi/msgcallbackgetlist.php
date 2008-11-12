@@ -6,7 +6,6 @@ include_once("../obj/MessagePart.obj.php");
 include_once("../obj/Person.obj.php");
 include_once("../obj/Voice.obj.php");
 include_once("../obj/AudioFile.obj.php");
-include_once("msgcallbackMessagePlayback.obj.php");
 
 
 global $BFXML_VARS;
@@ -27,6 +26,7 @@ function nomessages() {
 if($REQUEST_TYPE == "new"){
 	?>
 	<error>msgcallbackgetlist: wanted result or continue, got new </error>
+	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue"){
 
@@ -37,6 +37,7 @@ if($REQUEST_TYPE == "new"){
 		$resultlist = QuickQueryMultiRow($query);
 		$messagelist = array();
 		foreach ($resultlist as $row) {
+			/*
 			$msg = new MessagePlayback();
 			////error_log("0->".$row[0] ." 1->". $row[1] . " 2->".$row[2]);
 			$msg->jobid = $row[0];
@@ -47,6 +48,17 @@ if($REQUEST_TYPE == "new"){
 			$msg->person = DBFind("Person", "from person where id=$row[4]"); // TODO use reportperson
 			$msg->leavemessage = QuickQuery("select value from jobsetting where jobid=$row[0] and name='leavemessage'");
 			$msg->messageconfirmation = QuickQuery("select value from jobsetting where jobid=$row[0] and name='messageconfirmation'");
+			*/
+			$msg = array();
+			$msg['jobid'] = $row[0];
+			$msg['userid'] = $row[1];
+			$msg['sequence'] = $row[2];
+			$msg['messageid'] = $row[3];
+			$msg['messageparts'] = DBFindMany("MessagePart", "from messagepart where messageid=$row[3]");
+			$msg['person'] = DBFind("Person", "from person where id=$row[4]"); // TODO use reportperson
+			$msg['leavemessage'] = QuickQuery("select value from jobsetting where jobid=$row[0] and name='leavemessage'");
+			$msg['messageconfirmation'] = QuickQuery("select value from jobsetting where jobid=$row[0] and name='messageconfirmation'");
+
 			$messagelist[] = $msg;
 		}
 		if (count($messagelist) === 0) {
@@ -59,11 +71,10 @@ if($REQUEST_TYPE == "new"){
 		}
 
 	} else {
-		//error_log("MISSING CONTACT PHONE");
+		error_log("msgcallbackgetlist is missing required argument 'contactphone'");
 		?>
 		<error>msgcallbackgetlist: continue requires contactphone </error>
 		<hangup />
-		
 		<?
 	}
 
@@ -72,7 +83,6 @@ if($REQUEST_TYPE == "new"){
 	$_SESSION = array();
 	?>
 	<ok />
-	<hangup />
 	<?
 }
 

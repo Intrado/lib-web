@@ -405,6 +405,7 @@ function checkExpirationThenConfirm($playback=true)
 if($REQUEST_TYPE == "new"){
 	?>
 	<error>inboundjob: wanted continue, got new </error>
+	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue") {
 	//error_log("job continue...");

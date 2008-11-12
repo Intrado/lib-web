@@ -9,7 +9,6 @@ include_once("../obj/Person.obj.php");
 include_once("../obj/Voice.obj.php");
 include_once("../obj/AudioFile.obj.php");
 include_once("../obj/VoiceReply.obj.php");
-include_once("msgcallbackMessagePlayback.obj.php");
 
 global $BFXML_VARS;
 
@@ -47,8 +46,8 @@ function endoflist()
 
 function renderMessageParts($playback) {
 	$customerid = $_SESSION['customerid'];
-	$msgid = $playback->messageid;
-	$person = $playback->person;
+	$msgid = $playback['messageid'];
+	$person = $playback['person'];
 	$fields = array();
 	for ($i=1; $i<=20; $i++) {
 		$fieldnum = sprintf("f%02d", $i);
@@ -76,8 +75,8 @@ function renderMessageParts($playback) {
 
 
 function playback($messageindex, $messagetotal, $playback, $playintro = false) {
-	$messageparts = $playback->messageparts;
-	$person = $playback->person;
+	$messageparts = $playback['messageparts'];
+	$person = $playback['person'];
 ?>
 <voice>
 	<message name="playback">
@@ -103,12 +102,12 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 			<choice digits="*" />
 			<choice digits="#" />
 
-			<?if ($playback->leavemessage === "1") {?>
+			<?if ($playback['leavemessage'] === "1") {?>
 				<choice digits="0">
 					<goto message="recordvoicereply" />
 				</choice>
 			<?}?>
-			<?if ($playback->messageconfirmation === "1") {?>
+			<?if ($playback['messageconfirmation'] === "1") {?>
 				<choice digits="1">
 					<goto message="messageconfirmyes" />
 				</choice>
@@ -123,7 +122,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 		</field>
 	</message>
 
-	<?if ($playback->leavemessage === "1") {?>
+	<?if ($playback['leavemessage'] === "1") {?>
 	<message name="recordvoicereply">
 		<field name="voicereply" type="record" max="60">
 			<prompt>
@@ -135,7 +134,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	</message>
 	<?}?>
 
-	<?if ($playback->messageconfirmation === "1") {?>
+	<?if ($playback['messageconfirmation'] === "1") {?>
 	<message name="messageconfirmyes">
 		<setvar name="messageconfirm" value="1"/>
 		<tts>Thank you, your response has been noted.</tts>
@@ -168,28 +167,28 @@ if($REQUEST_TYPE == "new"){
 		if (isset($BFXML_VARS['voicereply'])) {
 			//error_log("voicereply cmid=".$BFXML_VARS['voicereply']);
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
-			$person = $playback->person;
+			$person = $playback['person'];
 
 			$vr = new VoiceReply();
 			$vr->personid = $person->id;
-			$vr->jobid = $playback->jobid;
-			$vr->sequence = $playback->sequence;
-			$vr->userid = $playback->userid;
+			$vr->jobid = $playback['jobid'];
+			$vr->sequence = $playback['sequence'];
+			$vr->userid = $playback['userid'];
 			$vr->contentid = $BFXML_VARS['voicereply'];
 			$vr->replytime = time()*1000;
 			$vr->listened = 0;
 			$vr->update();
 
-			$query = "update reportcontact set participated=1, voicereplyid=".$vr->id." where jobid=".$playback->jobid." and personid=".$person->id." and type='phone' and sequence=".$playback->sequence;
+			$query = "update reportcontact set participated=1, voicereplyid=".$vr->id." where jobid=".$playback['jobid']." and personid=".$person->id." and type='phone' and sequence=".$playback['sequence'];
 			QuickUpdate($query);
 		}
 
 		if (isset($BFXML_VARS['messageconfirm'])) {
 			//error_log("messageconfirm ".$BFXML_VARS['messageconfirm']);
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
-			$person = $playback->person;
+			$person = $playback['person'];
 
-			$query = "update reportcontact set participated=1, response=".$BFXML_VARS['messageconfirm']." where jobid=".$playback->jobid." and personid=".$person->id." and type='phone' and sequence=".$playback->sequence;
+			$query = "update reportcontact set participated=1, response=".$BFXML_VARS['messageconfirm']." where jobid=".$playback['jobid']." and personid=".$person->id." and type='phone' and sequence=".$playback['sequence'];
 			QuickUpdate($query);
 		}
 
@@ -224,9 +223,10 @@ if($REQUEST_TYPE == "new"){
 			$_SESSION['messageindex'] = $_SESSION['messageindex'] + 1; // increment to next message
 		}
 	} else {
-		//error_log("MISSING INDEX");
+		error_log("msgcallbackplayback is missing required argument 'messageindex'");
 		?>
 		<error>msgcallbackplayback: continue requires messageindex </error>
+		<hangup />
 		<?
 	}
 } else {

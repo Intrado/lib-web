@@ -129,6 +129,7 @@ function playJobtypes($incr, $playprompt=true)
 if($REQUEST_TYPE == "new"){
 	?>
 	<error>inboundjobtype: wanted continue, got new </error>
+	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue") {
 

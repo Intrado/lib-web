@@ -184,6 +184,7 @@ function playLists($incr, $emptylist = false, $playprompt=true)
 if($REQUEST_TYPE == "new"){
 	?>
 	<error>inboundlist: wanted continue, got new </error>
+	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue") {
 
