@@ -54,7 +54,6 @@ ALTER TABLE `messageattachment`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general
 ALTER TABLE `messagepart`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
 ALTER TABLE `permission`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
 ALTER TABLE `person`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
-ALTER TABLE `personassociation`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
 ALTER TABLE `persondatavalues`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
 ALTER TABLE `phone`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
 ALTER TABLE `portalperson`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
