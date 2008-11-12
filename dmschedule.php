@@ -1,14 +1,20 @@
 <?
-
-//error_reporting(E_ALL);
-
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
+include_once("inc/securityhelper.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
+include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
+include_once("inc/text.inc.php");
 include_once("obj/DMResourceSchedule.obj.php");
 
-if (!$USER->authorize('managesystem')) {
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+if (!$USER->authorize('template')) {
 	redirect('unauthorized.php');
 }
 if(isset($_GET['dmid'])){
@@ -19,8 +25,11 @@ if(isset($_GET['dmid'])){
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
 
-
+/****************** main message section ******************/
 $limit = "";
 $max = 500;
 $pagestart = 0;
@@ -53,12 +62,16 @@ if(CheckFormSubmit($f,$s)) {
 	}
 	else
 	{
+		
 		MergeSectionFormData($f, $s);
 
 		$starttime = strtotime(GetFormData($f, $s, "starttime"));
 		$endtime = strtotime(GetFormData($f, $s, "endtime"));
 		$throttle = GetFormData($f, $s, "throttle");
 		$showdetail = $throttle;
+		
+		
+		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if ($throttle != 1 && ($starttime === -1 || $starttime === false)) {
@@ -70,7 +83,8 @@ if(CheckFormSubmit($f,$s)) {
 		} else if ($throttle != 1 && ($endtime-(30*60) < $starttime)){
 			error('The end time must be at least 30 minutes after the start time');
 		} else {
-
+			//submit changes
+			
 			$dmschedule->resourcepercentage = $throttle;
 
 			if ($throttle != 1) {
@@ -112,14 +126,18 @@ if( $reloadform ) {
 }
 
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
 
 $PAGE="admin:settings";
 $TITLE="Resource Schedule Manager: ".escapehtml($dmname);
-include_once("nav.inc.php");
 
+include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, 'Save'));
+
+
 startWindow("Schedule");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -200,10 +218,6 @@ function checkSelection(dropdown)
 }
 </script>
 <?
-
-
-
-
 endWindow();
 buttons();
 EndForm();
