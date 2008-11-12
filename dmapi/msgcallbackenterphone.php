@@ -38,7 +38,10 @@ function invalidend() {
 
 
 if($REQUEST_TYPE == "new") {
-	forwardToPage("inboundstart.php");
+	?>
+	<error>msgcallbackenterphone: wanted result or continue, got new </error>
+	<hangup />
+	<?
 } else if($REQUEST_TYPE == "continue") {
 	if(isset($BFXML_VARS['phone'])){
 		$phonenumber = $BFXML_VARS['phone'];

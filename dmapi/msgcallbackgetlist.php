@@ -62,6 +62,8 @@ if($REQUEST_TYPE == "new"){
 		//error_log("MISSING CONTACT PHONE");
 		?>
 		<error>msgcallbackgetlist: continue requires contactphone </error>
+		<hangup />
+		
 		<?
 	}
 
@@ -70,6 +72,7 @@ if($REQUEST_TYPE == "new"){
 	$_SESSION = array();
 	?>
 	<ok />
+	<hangup />
 	<?
 }
 

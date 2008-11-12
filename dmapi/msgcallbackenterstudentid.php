@@ -46,7 +46,10 @@ function hangup() {
 }
 
 if($REQUEST_TYPE == "new") {
-	forwardToPage("inboundstart.php");
+	?>
+	<error>msgcallbackenterstudentid: wanted result or continue, got new </error>
+	<hangup />
+	<?
 } else if($REQUEST_TYPE == "continue") {
 	if(isset($BFXML_VARS['studentid']) && isset($BFXML_VARS['success'])){
 		forwardToPage("msgcallbackgetlist.php");

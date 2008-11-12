@@ -31,7 +31,10 @@ function confirmcallerid($callerid) {
 
 
 if($REQUEST_TYPE == "new") {
-	forwardToPage("inboundstart.php");
+	?>
+	<error>msgcallbackconfirmphone: wanted result or continue, got new </error>
+	<hangup />
+	<?
 } else if($REQUEST_TYPE == "continue") {
 	if(isset($BFXML_VARS['callerid'])){
 		if($BFXML_VARS['callerid'] == 1){

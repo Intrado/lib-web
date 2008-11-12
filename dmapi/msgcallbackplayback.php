@@ -159,6 +159,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 if($REQUEST_TYPE == "new"){
 	?>
 	<error>msgcallbackplayback: wanted result or continue, got new </error>
+	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue"){
 
