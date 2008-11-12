@@ -106,7 +106,7 @@ if(isset($_ENV['WINDIR'])){
 
 
 echo "Creating database\n";
-mysql_query("create database $commsuitedbname",$custdb)
+mysql_query("create database $commsuitedbname  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$custdb)
 	or die ("Failed to create new DB $commsuitedbname : " . mysql_error($custdb));
 mysql_select_db($commsuitedbname,$custdb);
 echo "$commsuitedbname has been created\n";

@@ -74,7 +74,7 @@ for($i=0; $i < $count; $i++){
 	$newdbname = "c_$customerid";
 	mysql_query("update customer set dbusername = '" . $newdbname . "', urlcomponent = 'customer" . $customerid . "' where id = '" . $customerid . "'", $auth_con);
 
-	mysql_query("create database $newdbname",$shard_con)
+	mysql_query("create database $newdbname  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$shard_con)
 		or die ("Failed to create new DB $newdbname : " . mysql_error($shard_con));
 	mysql_select_db($newdbname, $shard_con)
 		or die("Error selecting new database:" . mysql_error($shard_con));

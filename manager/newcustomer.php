@@ -112,7 +112,7 @@ if (CheckFormSubmit($f,$s)){
 
 				$newdb = mysql_connect($shardhost, $sharduser, $shardpass)
 					or die("Failed to connect to DBHost $shardhost : " . mysql_error($newdb));
-				QuickUpdate("create database $newdbname",$newdb)
+				QuickUpdate("create database $newdbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$newdb)
 					or die ("Failed to create new DB $newdbname : " . mysql_error($newdb));
 				mysql_select_db($newdbname,$newdb)
 					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
