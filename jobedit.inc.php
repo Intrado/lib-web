@@ -96,14 +96,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			PutFormData($f,$s,"name",'',"text",1,$JOBTYPE == "repeating" ? 30: 50,true);
 		}
 
-		if( CheckFormSection($f, $s) ) {
+		// check this before CheckFormSection() because we do not want to expand sections if nothing selected
+		if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
+			error("Plese select a delivery type");
+		} else if( CheckFormSection($f, $s) ) {
 			$hassettingsdetailerror = true;
 			$hasphonedetailerror = true;
 			$hasemaildetailerror = true;
 
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
-			error("Plese select a delivery type");
 		} else if ($JOBTYPE == 'normal' && (strtotime(GetFormData($f,$s,"startdate")) === -1 || strtotime(GetFormData($f,$s,"startdate")) === false)) {
 			$hassettingsdetailerror = true;
 			error('The start date is invalid');
