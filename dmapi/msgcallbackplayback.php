@@ -119,6 +119,9 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 			<default>
 				<tts gender="female">Sorry, that was not a valid option. </tts>
 			</default>
+			<timeout>
+				<setvar name="timeout" value="1" />
+			</timeout>
 		</field>
 	</message>
 
@@ -153,6 +156,18 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 <?
 }
 
+function hangup() {
+?>
+<voice>
+	<message name="hangup">
+	       	<tts gender="female">You may call back to listen to your messages. Goodbye.</tts>
+	       	<hangup />
+
+	</message>
+</voice>
+<?
+}
+
 
 ////////////////////////////////////////
 if($REQUEST_TYPE == "new"){
@@ -163,6 +178,8 @@ if($REQUEST_TYPE == "new"){
 } else if($REQUEST_TYPE == "continue"){
 
 	if (isset($_SESSION['messageindex'])) {
+
+		$dohangup = false;
 
 		if (isset($BFXML_VARS['voicereply'])) {
 			//error_log("voicereply cmid=".$BFXML_VARS['voicereply']);
@@ -194,25 +211,50 @@ if($REQUEST_TYPE == "new"){
 
 		$playintro = false;
 		if (isset($BFXML_VARS['doplayback'])) {
-			if ($BFXML_VARS['doplayback'] === "*") {
+			if ($BFXML_VARS['doplayback'] === "#" ||
+				isset($BFXML_VARS['timeout'])) {
+				// skip to next message, do nothing
+			} else if ($BFXML_VARS['doplayback'] === "*") {
 				// repeat last message
 				$_SESSION['messageindex'] = $_SESSION['messageindex'] - 1;
+			} else {
+				// invalid option, repeat but only 3 times then move on
+				if (!isset($_SESSION['invalidcounter']))
+					$_SESSION['invalidcounter'] = 0;
+				$_SESSION['invalidcounter'] ++;
+
+				if ($_SESSION['invalidcounter'] >= 3) {
+					$_SESSION['invalidcounter'] = 0;
+					// let's move on... skip to next message, do nothing
+				} else {
+					// repeat last message with instructions
+					$playintro = true;
+					$_SESSION['messageindex'] = $_SESSION['messageindex'] - 1;
+				}
 			}
-			// pound #, or anything else just go to next message
 		} else {
 			$playintro = true;
 		}
 
 		if (isset($BFXML_VARS['doendoflist'])) {
-			// pound # pressed on end of list, reset to beginning
-			$_SESSION['messageindex'] = 0;
-			$playintro = false;
+error_log("end of list ".$BFXML_VARS['doendoflist']);
+			if ($BFXML_VARS['doendoflist'] === "#") {
+				// pound # pressed on end of list, reset to beginning
+				$_SESSION['messageindex'] = 0;
+				$playintro = false;
+			} else {
+				// invalid option
+				$dohangup = true;
+			}
 		}
 
 		//error_log("messageindex = ".$_SESSION['messageindex']);
 
+		if ($dohangup) {
+			hangup();
+
 		// end of list
-		if ($_SESSION['messageindex'] == $_SESSION['messagetotal']) {
+		} else if ($_SESSION['messageindex'] == $_SESSION['messagetotal']) {
 			endoflist();
 
 		// next message
