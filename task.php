@@ -115,7 +115,7 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'mapfields'))
 				$IMPORT->skipheaderlines = GetFormData($form, $section, 'skipheaderlines');
 
 				$IMPORT->updatemethod = GetFormData($form, $section, 'updatemethod');
-				$IMPORT->status = 'idle';
+				//$IMPORT->status = 'idle'; //don't update the status (new imports handled above)
 				$IMPORT->ownertype = 'system';
 
 				$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
