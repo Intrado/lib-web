@@ -182,7 +182,7 @@ if(isset($contactList) && $contactList){
 	foreach ($titles as $title) {
 
 		echo '<th align="left">';
-		echo htmlentities($title) . '</th>';
+		echo escapehtml($title) . '</th>';
 	}
 	echo "</tr>\n";
 
@@ -201,7 +201,7 @@ if(isset($contactList) && $contactList){
 				$fn = $formatters[$index];
 				$cel = $fn($obj,$index);
 			} else {
-				$cel = htmlentities($obj->$index);
+				$cel = escapehtml($obj->$index);
 			}
 			echo $cel . "</td>";
 		}

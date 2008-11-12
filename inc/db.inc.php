@@ -175,7 +175,12 @@ function DBConnect($host, $user, $pass, $database){
 		return false;
 	}
 	if(mysql_select_db($database, $custdb)){
-		return $custdb;
+		if (mysql_set_charset("utf8",$custdb)) {
+			return $custdb;
+		} else {
+			error_log("Couldn't set mysql charset. e:" . mysql_error());
+			return false;
+		} 
 	} else {
 		error_log("Problem connecting to MySQL database: " . $database . " error:" . mysql_error());
 		return false;

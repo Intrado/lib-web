@@ -222,7 +222,9 @@ function doDBConnect($result) {
 	$_dbcon = mysql_connect($_DBHOST, $_DBUSER, $_DBPASS);
 	if (!$_dbcon) {
 		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . mysql_error());
-	} else if (mysql_select_db($_DBNAME)) {
+	} else if (mysql_select_db($_DBNAME,$_dbcon)) {
+		//set charset for this connection
+		mysql_set_charset("utf8",$_dbcon) or error_log("Can't set mysql charset. e:" . mysql_error());
 		// successful connection to customer database
 		return true;
 	} else {

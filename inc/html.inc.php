@@ -101,7 +101,7 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$btn .= '><a href="';
 
 	if ($href)
-		$btn .= htmlentities($href);
+		$btn .= escapehtml($href);
 	else
 		$btn .= "#";
 

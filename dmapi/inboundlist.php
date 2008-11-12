@@ -131,7 +131,7 @@ function playLists($incr, $emptylist = false, $playprompt=true)
 				{
 ?>
 					<audio cmid="file://prompts/inbound/Press<?= $listindex ?>For.wav" />
-					<tts gender="female"><?= htmlentities($list->name, ENT_COMPAT, "UTF-8") ?></tts>
+					<tts gender="female"><?= escapehtml($list->name) ?></tts>
 <?
 					$listindex++;
 				}

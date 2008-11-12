@@ -197,8 +197,12 @@ function doDBConnect($result) {
 	if (!$_dbcon) {
 		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . mysql_error());
 	} else if (mysql_select_db($_DBNAME)) {
-		// successful connection to customer database
-		return true;
+		if (mysql_set_charset("utf8",$_dbcon)) {
+			// successful connection to customer database
+			return true;
+		} else {
+			error_log("Couldn't select mysql charset. e:" . mysql_error());
+		}
 	} else {
 		error_log("Problem selecting database for " . $_DBHOST . " error:" . mysql_error());
 	}

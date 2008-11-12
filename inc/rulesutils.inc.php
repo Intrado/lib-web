@@ -48,7 +48,7 @@ function displayRules($rules){
 	$rulesdisplay = array();
 	foreach($rules as $rule){
 		$fieldname = QuickQuery("select name from fieldmap where fieldnum = '$rule->fieldnum'");
-		$rulesdisplay[] = htmlentities($fieldname . ": " . preg_replace("{\|}", ", ", $rule->val));
+		$rulesdisplay[] = escapehtml($fieldname . ": " . preg_replace("{\|}", ", ", $rule->val));
 	}
 	return $rulesdisplay;
 }

@@ -93,11 +93,11 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>Email&nbsp;(this will be your login name):</td>
-				<td><input type="text" name="login" value="<?=htmlentities($login)?>" size="50" maxlength="255"/> </td>
+				<td><input type="text" name="login" value="<?=escapehtml($login)?>" size="50" maxlength="255"/> </td>
 			</tr>
 			<tr>
 				<td>Confirm Email:</td>
-				<td><input type="text" name="confirmlogin" value="<?=htmlentities($confirmlogin)?>" size="50" maxlength="255"/> </td>
+				<td><input type="text" name="confirmlogin" value="<?=escapehtml($confirmlogin)?>" size="50" maxlength="255"/> </td>
 			</tr>
 			<tr>
 				<td>Password: </td>
@@ -109,15 +109,15 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>First Name:</td>
-				<td><input type="text" name="firstname" value="<?=htmlentities($firstname)?>" maxlength="100"/></td>
+				<td><input type="text" name="firstname" value="<?=escapehtml($firstname)?>" maxlength="100"/></td>
 			</tr>
 			<tr>
 				<td>Last Name:</td>
-				<td><input type="text" name="lastname" value="<?=htmlentities($lastname)?>" maxlength="100"/></td>
+				<td><input type="text" name="lastname" value="<?=escapehtml($lastname)?>" maxlength="100"/></td>
 			</tr>
 			<tr>
 				<td>ZIP Code:</td>
-				<td><input type="text" name="zipcode" value="<?=htmlentities($zipcode)?>" size="5" maxlength="5"/></td>
+				<td><input type="text" name="zipcode" value="<?=escapehtml($zipcode)?>" size="5" maxlength="5"/></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="checkbox" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>&nbsp;Email me when I have a new phone message.</td>

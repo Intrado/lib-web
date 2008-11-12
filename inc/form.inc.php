@@ -50,26 +50,26 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 	case "text":
 		echo "<input $extrahtml type=\"text\" name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" value=\""
-				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
+				. escapehtml($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
 				. "maxlength=\"" . ($optionvalue === 'nooption' ? $option : $optionvalue) . "\">";
 		break;
 	case "hidden":
 		echo "<input $extrahtml type=\"hidden\" name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" value=\""
-				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\">";
+				. escapehtml($_SESSION['formdata'][$form][$section][$item]['value']) . "\">";
 		break;
 	case "textarea":
 		$rows = ($optionvalue === "nooption" || $optionvalue == NULL) ? $option/6 : $optionvalue;
 		echo "<textarea $extrahtml name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" "
 				. "cols=\"" . $option . "\" rows=\"" . $rows . "\">";
-		echo htmlentities($_SESSION['formdata'][$form][$section][$item]['value']);
+		echo escapehtml($_SESSION['formdata'][$form][$section][$item]['value']);
 		echo "</textarea>";
 		break;
 	case "password":
 		echo "<input $extrahtml type=\"password\" name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" value=\""
-				. htmlentities($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
+				. escapehtml($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
 				. "maxlength=\"" . ($optionvalue === 'nooption' ? $option : $optionvalue) . "\">";
 		break;
 	case "checkbox":
@@ -103,7 +103,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 
 		echo "<input $extrahtml type=\"radio\" name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" value=\""
-				. htmlentities($usevalue) . "\" ";
+				. escapehtml($usevalue) . "\" ";
 
 		if(	$usevalue == $_SESSION['formdata'][$form][$section][$item]['value'] ) {
 			echo "checked";
@@ -135,7 +135,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 		}
 
 
-		echo "<option $extrahtml value=\"" . htmlentities($usevalue) . "\" ";
+		echo "<option $extrahtml value=\"" . escapehtml($usevalue) . "\" ";
 
 		//when checking if this should be selected, check against the difference of "0" and ""
 		//but allow "5" and 5 to be equivalent.
@@ -146,7 +146,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 
 		echo ">";
 
-		echo htmlentities($usename) . "</option>";
+		echo escapehtml($usename) . "</option>";
 
 		break;
 	case "selectend":
@@ -175,12 +175,12 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 		echo "<select $extrahtml size=\"" . $useoption . "\" multiple name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value][]\">";
 		foreach ($optionvalue as $value => $name) {
-			echo "<option value=\"" . htmlentities($value) . "\" ";
+			echo "<option value=\"" . escapehtml($value) . "\" ";
 			if (in_array($value,$usevalue)) {
 				echo "selected";
 			}
 			echo ">";
-			echo htmlentities($name) . "</option>";
+			echo escapehtml($name) . "</option>";
 		}
 		echo "</select>";
 
@@ -410,7 +410,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.18 $
+	    # $Revision: 1.19 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################

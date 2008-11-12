@@ -4,7 +4,10 @@ function microtime_float()
     list($usec, $sec) = explode(" ", microtime());
     return ((float)$usec + (float)$sec);
 }
-
+//quick utf8 aware replacement for htmlentities
+function escapehtml($var) {
+	return htmlentities($var, ENT_COMPAT, 'UTF-8') ;
+}
 
 function array_append (&$ar1, $ar2) {
 	foreach ($ar2 as $index => $value) {
@@ -248,7 +251,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.66 $
+	    # $Revision: 1.67 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################

@@ -18,7 +18,7 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 		if (strpos($title,"#") === 0)
 			$title = substr($title,1);
 
-		 echo htmlentities($title) . '</th>';
+		 echo escapehtml($title) . '</th>';
 	}
 	echo "</tr>\n";
 
@@ -34,7 +34,7 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 				$fn = $formatters[$index];
 				$cel = $fn($obj,$index);
 			} else {
-				$cel = htmlentities($obj->$index);
+				$cel = escapehtml($obj->$index);
 			}
 			echo $cel . "</td>";
 		}
@@ -72,7 +72,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 		} else {
 			$displaytitle = $title;
 		}
-		echo htmlentities($displaytitle) . "</th>";
+		echo escapehtml($displaytitle) . "</th>";
 	}
 	echo "</tr>\n";
 
@@ -105,7 +105,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 						$fn = $formatters[$index];
 						$cel = $fn($row,$index);
 					} else {
-						$cel = htmlentities($row[$index]);
+						$cel = escapehtml($row[$index]);
 					}
 				} else {
 					$cel = "&nbsp;";

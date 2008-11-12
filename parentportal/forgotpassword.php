@@ -48,11 +48,11 @@ if(!$success){
 		</tr>
 		<tr>
 			<td>Email:</td>
-			<td><input type="text" name="email1" size="50" maxlength="255" value="<?=htmlentities($email1)?>"></td>
+			<td><input type="text" name="email1" size="50" maxlength="255" value="<?=escapehtml($email1)?>"></td>
 		</tr>
 		<tr>
 			<td>Confirm Email:</td>
-			<td><input type="text" name="email2" size="50" maxlength="255" value="<?=htmlentities($email2)?>"></td>
+			<td><input type="text" name="email2" size="50" maxlength="255" value="<?=escapehtml($email2)?>"></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>

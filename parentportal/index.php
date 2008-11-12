@@ -104,7 +104,7 @@ include_once("cmlogintop.inc.php");
 			</td>
 		<tr>
 			<td>Email:</td>
-			<td><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=htmlentities($login)?>"/></td>
+			<td><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=escapehtml($login)?>"/></td>
 			<td>&nbsp;</td>
 
 		</tr>

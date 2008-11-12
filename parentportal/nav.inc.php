@@ -99,7 +99,7 @@ doNavTabs($NAVTREE);
 <?
 		if(!isset($hidenav) || !$hidenav){
 ?>
-		<td><div class="custname"><?= isset($_SESSION['custname']) ? htmlentities($_SESSION['custname']) : ""; ?></div></td>
+		<td><div class="custname"><?= isset($_SESSION['custname']) ? escapehtml($_SESSION['custname']) : ""; ?></div></td>
 <?
 		}
 ?>

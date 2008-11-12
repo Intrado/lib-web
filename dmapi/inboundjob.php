@@ -114,9 +114,9 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 <?				} else { ?>
 					<audio cmid="file://prompts/inbound/PeopleUsingList.wav" />
 <? 				} ?>
-				<tts gender="female"><?= htmlentities($listname, ENT_COMPAT, "UTF-8") ?></tts>
+				<tts gender="female"><?= escapehtml($listname) ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation2.wav" />
-				<tts gender="female"><?= htmlentities($jobtype->name, ENT_COMPAT, "UTF-8") ?></tts>
+				<tts gender="female"><?= escapehtml($jobtype->name) ?></tts>
 				<audio cmid="file://prompts/inbound/Confirmation3.wav" />
 
 <?				if ($numdays > 1) { ?>

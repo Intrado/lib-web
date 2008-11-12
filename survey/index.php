@@ -101,7 +101,7 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 	$exitmsg = true; // display the exit message
 }
 
-$TITLE= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "";
+$TITLE= isset($questionnaire->webpagetitle) ? escapehtml($questionnaire->webpagetitle) : "";
 
 
 //Do inpage CSS
@@ -137,7 +137,7 @@ function fadecolor($primary, $fade, $ratio){
 ?>
 <html>
 <head>
-	<title><?= isset($questionnaire->webpagetitle) ? htmlentities($questionnaire->webpagetitle) : "Survey" ?></title>
+	<title><?= isset($questionnaire->webpagetitle) ? escapehtml($questionnaire->webpagetitle) : "Survey" ?></title>
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 </head>
 <style>
@@ -253,7 +253,7 @@ input.text, input , select, textarea, table.form  {
 	<table width="100%" border=0 cellpadding=0 cellspacing=0>
 	<tr>
 	<td><img src="../logo.img.php"></td>
-	<td><div class="custname"><?= htmlentities($custdisplayname) ?></div></td>
+	<td><div class="custname"><?= escapehtml($custdisplayname) ?></div></td>
 	</tr>
 	</table>
 </div>
@@ -290,7 +290,7 @@ if ($reason != 'ok' && $reason != 'prevresponse' && $reason != 'expired') {
 			echo "<br><br>";
 		} else {
 			echo '<br><br><h3 style="margin-left: 15px;">';
-			echo nl2br(htmlentities($questionnaire->webexitmessage));
+			echo nl2br(escapehtml($questionnaire->webexitmessage));
 			echo "</h3<<br><br>";
 		}
 
@@ -352,7 +352,7 @@ function validate_survey () {
 ?>
 		<tr valign="top">
 			<th align="right" class="windowRowHeader bottomBorder" rowspan="2">Question <?= $displaynumber ?></th>
-			<td><?= $questionnaire->usehtml ? $question->webmessage : nl2br(htmlentities($question->webmessage)) ?></td>
+			<td><?= $questionnaire->usehtml ? $question->webmessage : nl2br(escapehtml($question->webmessage)) ?></td>
 		</tr>
 		<tr>
 			<td class="bottomBorder" style="vertical-align: middle;">
