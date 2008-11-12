@@ -51,7 +51,7 @@ if (!mysql_select_db($db['db'])) {
 	exit(-1);
 }
 
-if (!mysql_set_charset("utf8",$db['db'])) {
+if (!mysql_set_charset("utf8",$_dbcon)) {
 	echo("Problem selecting charset for " . $db['host'] . " error:" . mysql_error() . "\n");
 	exit(-1);
 }
