@@ -248,7 +248,7 @@ CREATE TABLE `jobsetting` (
   `name` varchar(50) NOT NULL,
   `value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`jobid`,`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 -- --------------------------------------------------------
@@ -261,7 +261,7 @@ CREATE TABLE `jobstats` (
   `jobid` int(11) NOT NULL,
   `count` int(11) NOT NULL,
   PRIMARY KEY  (`jobid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 -- --------------------------------------------------------
@@ -529,7 +529,7 @@ CREATE TABLE `reportinstance` (
   `activefields` text,
   `instancehash` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 -- --------------------------------------------------------
@@ -597,7 +597,7 @@ CREATE TABLE `reportsubscription` (
   PRIMARY KEY  (`id`),
   KEY `subscription` (`userid`,`reportinstanceid`),
   KEY `nextrun` (`nextrun`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 -- --------------------------------------------------------
@@ -666,7 +666,7 @@ CREATE TABLE `smsjob` (
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `status` (`status`)
-) ENGINE=innodb DEFAULT CHARSET=latin1
+) ENGINE=innodb DEFAULT CHARSET=utf8
 $$$
 
 -- --------------------------------------------------------
@@ -682,7 +682,7 @@ CREATE TABLE `smsmsg` (
   `sequence` tinyint(4) NOT NULL,
   `phone` varchar(10) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=innodb DEFAULT CHARSET=latin1
+) ENGINE=innodb DEFAULT CHARSET=utf8
 $$$
 
 -- --------------------------------------------------------
@@ -797,7 +797,7 @@ CREATE TABLE `systemstats` (
   `failed` int(11) NOT NULL,
   `disconnect` int(11) NOT NULL,
   PRIMARY KEY  (`jobid`,`date`,`hour`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 -- --------------------------------------------------------
@@ -901,7 +901,7 @@ CREATE TABLE `voicereply` (
   KEY `jobid` (`jobid`),
   KEY `userid` (`userid`),
   KEY `replytime` (`replytime`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 
@@ -1084,7 +1084,7 @@ CREATE TABLE `portalperson` (
   `portaluserid` int(11) NOT NULL,
   `personid` int(11) NOT NULL,
   PRIMARY KEY  (`portaluserid`,`personid`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `portalpersontoken` (
@@ -1094,7 +1094,7 @@ CREATE TABLE `portalpersontoken` (
   `creationuserid` int(11) NOT NULL,
   PRIMARY KEY  (`token`),
   UNIQUE KEY `personid` (`personid`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 ALTER TABLE `jobtype`
@@ -1108,7 +1108,7 @@ CREATE TABLE `jobtypepref` (
 `sequence` TINYINT NOT NULL ,
 `enabled` TINYINT NOT NULL DEFAULT '0',
 PRIMARY KEY ( `jobtypeid` , `type` , `sequence` )
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `contactpref` (
@@ -1118,7 +1118,7 @@ CREATE TABLE `contactpref` (
 `sequence` TINYINT NOT NULL,
 `enabled` TINYINT NOT NULL DEFAULT '0',
 PRIMARY KEY ( `personid` , `jobtypeid` , `type` , `sequence` )
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL default 'notattempted'
@@ -1328,7 +1328,7 @@ CREATE TABLE `messageattachment` (
 `size` INT NOT NULL ,
 `deleted` TINYINT NOT NULL DEFAULT '0',
 INDEX ( `messageid` )
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 -- After ASP_5-2 april 3
@@ -1338,7 +1338,7 @@ CREATE TABLE `custdm` (
   `name` varchar(255) NOT NULL,
   `enablestate` enum('new','active','disabled') NOT NULL,
   PRIMARY KEY  (`dmid`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 
@@ -1351,7 +1351,7 @@ CREATE TABLE `dmroute` (
   `suffix` varchar(20) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `dmid` (`dmid`,`match`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 ALTER TABLE `destlabel` ADD `notes` TEXT NULL
@@ -1395,7 +1395,7 @@ CREATE TABLE `dmcalleridroute` (
   `prefix` varchar(20) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `dmid` (`dmid`,`callerid`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 
@@ -1446,7 +1446,7 @@ CREATE TABLE `personassociation` (
 `c08` VARCHAR( 255 ) NOT NULL ,
 `c09` VARCHAR( 255 ) NOT NULL ,
 `c10` VARCHAR( 255 ) NOT NULL
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `groupdata` (
@@ -1455,7 +1455,7 @@ CREATE TABLE `groupdata` (
 `fieldnum` TINYINT NOT NULL ,
 `value` VARCHAR( 255 ) NOT NULL,
 KEY `personfield`  (`personid`,`fieldnum`)
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `reportgroupdata` (
@@ -1465,7 +1465,7 @@ CREATE TABLE `reportgroupdata` (
 `fieldnum` TINYINT NOT NULL ,
 `value` VARCHAR( 255 ) NOT NULL,
 KEY `jobpersonfield`  (`jobid`,`personid`,`fieldnum`)
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 ALTER TABLE `import` CHANGE `datatype` `datatype` ENUM( 'person', 'user', 'enrollment' ) NOT NULL DEFAULT 'person'
@@ -1487,7 +1487,7 @@ CREATE TABLE `enrollment` (
 `c08` VARCHAR( 255 ) NOT NULL ,
 `c09` VARCHAR( 255 ) NOT NULL ,
 `c10` VARCHAR( 255 ) NOT NULL
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 ALTER TABLE `enrollment` ADD INDEX `staffid` ( `c01` )
@@ -1523,7 +1523,7 @@ create table if not exists customercallstats (
   finishdate datetime default NULL,
   attempted int(11),
   primary key (jobid)
-) engine=innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `dmschedule` (
@@ -1534,7 +1534,7 @@ CREATE TABLE `dmschedule` (
 `endtime` TIME NOT NULL ,
 `resourcepercentage` float NOT NULL DEFAULT '1',
 PRIMARY KEY ( `id` )
-) ENGINE = innodb
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 ALTER TABLE `groupdata` CHANGE `importid` `importid` INT NOT NULL
