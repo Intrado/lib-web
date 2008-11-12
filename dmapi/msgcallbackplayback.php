@@ -237,7 +237,6 @@ if($REQUEST_TYPE == "new"){
 		}
 
 		if (isset($BFXML_VARS['doendoflist'])) {
-error_log("end of list ".$BFXML_VARS['doendoflist']);
 			if ($BFXML_VARS['doendoflist'] === "#") {
 				// pound # pressed on end of list, reset to beginning
 				$_SESSION['messageindex'] = 0;
