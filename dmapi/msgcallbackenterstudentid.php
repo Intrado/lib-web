@@ -33,7 +33,7 @@ function enterstudentid($error, $studentids) {
 <?
 }
 
-function hangup() {
+function errorhangup() {
 ?>
 <voice>
 	<message name="hangup">
@@ -45,15 +45,33 @@ function hangup() {
 <?
 }
 
-if($REQUEST_TYPE == "new") {
+function nomatchhangup() {
+?>
+<voice>
+	<message name="hangup">
+	       	<tts gender="female">Sorry. That student number did not match our records.  Please verify your student I. D. and try again later. Goodbye.</tts>
+	       	<hangup />
+
+	</message>
+</voice>
+<?
+}
+
+
+if ($REQUEST_TYPE == "new") {
 	?>
 	<error>msgcallbackenterstudentid: wanted result or continue, got new </error>
 	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue") {
-	if(isset($BFXML_VARS['studentid']) && isset($BFXML_VARS['success'])){
-		forwardToPage("msgcallbackgetlist.php");
+	if (isset($BFXML_VARS['studentid'])) {
+		if (isset($BFXML_VARS['success'])) {
+			forwardToPage("msgcallbackgetlist.php");
+		} else {
+			nomatchhangup();
+		}
 	} else {
+		// first time through, gather valid studentids for this caller's phone
 		$phonenumber = $_SESSION['contactphone'];
 		$query = "select y.pkey as id from phone x, person y where x.phone=$phonenumber and x.personid=y.id and y.pkey is not null";
 		$results = Query($query);
@@ -61,13 +79,9 @@ if($REQUEST_TYPE == "new") {
 		if ($results) {
 			enterstudentid(0,$results);
 		} else {
-			hangup();
+			errorhangup();
 		}
 	}
-
 }
-
-
-
 
  ?>
