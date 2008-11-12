@@ -14,7 +14,7 @@ include_once("obj/DMResourceSchedule.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('template')) {
+if (!$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 if(isset($_GET['dmid'])){
@@ -217,6 +217,7 @@ function checkSelection(dropdown)
    }
 }
 </script>
+
 <?
 endWindow();
 buttons();
