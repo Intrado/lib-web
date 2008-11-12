@@ -53,27 +53,34 @@ if(CheckFormSubmit($f,$s))
 	else
 	{
 		MergeSectionFormData($f, $s);
-		$phone = Phone::parse(GetFormData($f,$s,"phone"));
-		$callerid = Phone::parse(GetFormData($f, $s, 'callerid'));
-		$login = trim(GetFormData($f, $s, 'login'));
-		$email = trim(GetFormData($f, $s, "email"));
-		PutFormData($f,$s,"email",$email);
-
+		
+		/* Trim fields that are not processed bellow. */
+		TrimFormItem($f, $s,'firstname');
+		TrimFormItem($f, $s,'lastname');
+		
+		/* Password should not be trimmed*/
+		$password = GetFormData($f, $s, "password");
+		$passwordconfirm = GetFormData($f, $s, "passwordconfirm");
+		
+		/* Trim and get data from fields that are processed.*/
+		$login = GetTrimFormData($f, $s, 'login');
+		$accesscode = GetTrimFormData($f, $s, 'accesscode');
+		$pincode = GetTrimFormData($f, $s, 'pincode');
+		$pincodeconfirm = GetTrimFormData($f, $s, 'pincodeconfirm');
+		$email = GetTrimFormData($f, $s, "email");
+		
+		/* Email list will need a special trim since the list could end with ; etc. 
+		 * There is no need to put the trimmed data back to the form since 
+		 * the email list form field does not check for errors.
+		 * */
 		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
-
-		$accesscode = trim(GetFormData($f, $s, 'accesscode'));
-		PutFormData($f,$s,"accesscode",$accesscode,"number","nomin","nomax");
-
-		$pincode = trim(GetFormData($f, $s, 'pincode'));
-		PutFormData($f,$s,"pincode",$pincode,"number","nomin","nomax");
-		$pincodeconfirm = trim(GetFormData($f, $s, 'pincodeconfirm'));
-		PutFormData($f,$s,"pincodeconfirm",$pincodeconfirm,"number","nomin","nomax");
-		PutFormData($f,$s,"firstname",trim(GetFormData($f,$s,'firstname')),"text",1,50,true);
-		PutFormData($f,$s,"lastname",trim(GetFormData($f,$s,'lastname')),"text",1,50,true);
+			
+		$phone = Phone::parse(GetFormData($f,$s,"phone"));
+		$callerid = Phone::parse(GetFormData($f,$s, "callerid"));
 		
-
+		
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -126,7 +133,7 @@ if(CheckFormSubmit($f,$s))
 			//submit changes
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
 			$USER->login = $login;
-			$USER->phone = Phone::parse(GetFormData($f,$s,"phone"));
+			$USER->phone = $phone;
 			$USER->email = $email;
 			$USER->aremail = $emaillist;
 			$USER->update();
