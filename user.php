@@ -164,8 +164,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
 		
 		
-		$phone = Phone::parse(GetFormData($f,$s,"phone"));
-		$callerid = Phone::parse(GetFormData($f,$s, "callerid"));
+		$phone = Phone::parse(GetTrimFormData($f,$s,"phone"));
+		$callerid = Phone::parse(GetTrimFormData($f,$s, "callerid"));
 						
 		if (GetFormData($f, $s, "radioselect") == "bydata") {
 			$staffid = "";

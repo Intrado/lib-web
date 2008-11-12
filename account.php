@@ -77,8 +77,8 @@ if(CheckFormSubmit($f,$s))
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
 			
-		$phone = Phone::parse(GetFormData($f,$s,"phone"));
-		$callerid = Phone::parse(GetFormData($f,$s, "callerid"));
+		$phone = Phone::parse(GetTrimFormData($f,$s,"phone"));
+		$callerid = Phone::parse(GetTrimFormData($f,$s, "callerid"));
 		
 		
 		//do check
