@@ -141,7 +141,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		/* Trim fields that are not processed bellow. */
 		TrimFormItem($f, $s,'firstname');
 		TrimFormItem($f, $s,'lastname');
-		TrimFormItem($f, $s,'lastname');
+		TrimFormItem($f, $s,'description');
 
 		
 		/* Password should not be trimmed*/
