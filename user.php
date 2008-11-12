@@ -139,9 +139,9 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$usr = new User($_SESSION['userid']);
 
 		/* Trim fields that are not processed bellow. */
-		TrimFormItem($f, $s,'firstname');
-		TrimFormItem($f, $s,'lastname');
-		TrimFormItem($f, $s,'description');
+		TrimFormData($f, $s,'firstname');
+		TrimFormData($f, $s,'lastname');
+		TrimFormData($f, $s,'description');
 
 		
 		/* Password should not be trimmed*/
@@ -149,11 +149,11 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$passwordconfirm = GetFormData($f, $s, "passwordconfirm");
 		
 		/* Trim and get data from fields that are processed.*/
-		$login = GetTrimFormData($f, $s, 'login');
-		$accesscode = GetTrimFormData($f, $s, 'accesscode');
-		$pincode = GetTrimFormData($f, $s, 'pincode');
-		$pincodeconfirm = GetTrimFormData($f, $s, 'pincodeconfirm');
-		$email = GetTrimFormData($f, $s, "email");
+		$login = TrimFormData($f, $s, 'login');
+		$accesscode = TrimFormData($f, $s, 'accesscode');
+		$pincode = TrimFormData($f, $s, 'pincode');
+		$pincodeconfirm = TrimFormData($f, $s, 'pincodeconfirm');
+		$email = TrimFormData($f, $s, "email");
 		
 		/* Email list will need a special trim since the list could end with ; etc. 
 		 * There is no need to put the trimmed data back to the form since 
@@ -164,8 +164,8 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
 		
 		
-		$phone = Phone::parse(GetTrimFormData($f,$s,"phone"));
-		$callerid = Phone::parse(GetTrimFormData($f,$s, "callerid"));
+		$phone = Phone::parse(TrimFormData($f,$s,"phone"));
+		$callerid = Phone::parse(TrimFormData($f,$s, "callerid"));
 						
 		if (GetFormData($f, $s, "radioselect") == "bydata") {
 			$staffid = "";

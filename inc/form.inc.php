@@ -248,7 +248,14 @@ function GetFormData ($form, $section, $item) {
 		return null;
 	}
 }
-function GetTrimFormData ($form, $section, $item) {
+
+/***************** TrimFormData *****************
+
+Will trim the form item and put it back into the form.
+Return the trimmed value if it exists 
+
+*/
+function TrimFormData ($form, $section, $item) {
 	if (isset($_SESSION['formdata'][$form][$section][$item]['value'])) {
 		$_SESSION['formdata'][$form][$section][$item]['value'] = trim($_SESSION['formdata'][$form][$section][$item]['value']);
 		return $_SESSION['formdata'][$form][$section][$item]['value'];
@@ -410,7 +417,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.19 $
+	    # $Revision: 1.20 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -563,23 +570,6 @@ function CheckFormSection($form, $section) {
 	}
 	return 0;
 }
-
-
-/***************** TrimFormItem *****************
-
-Will trim the form item and put it back into the form.
-Return true for successful trim. 
-
-*/
-function TrimFormItem($form,$section,$item) {
-	if (isset($_SESSION['formdata'][$form][$section][$item]['value'])) {
-		$_SESSION['formdata'][$form][$section][$item]['value'] = trim($_SESSION['formdata'][$form][$section][$item]['value']);
-		return true;
-	} else {
-		return false;
-	}
-}
-
 
 
 /***************** MergeSectionFormData *****************
