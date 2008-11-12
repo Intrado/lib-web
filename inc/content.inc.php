@@ -113,7 +113,7 @@ function renderTts ($text,$language,$gender) {
 		// tts priority 0=normal, 1=high
 		$req = "POST " . $path. "?language=" . urlencode($language)
 				. "&gender=" . urlencode($gender) . "&priority=1"
-				. " HTTP/1.0\r\nContent-Length: " . strlen($text) . "\r\nConnection: close\r\n\r\n" . $text;
+				. " HTTP/1.0\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: " . strlen($text) . "\r\nConnection: close\r\n\r\n" . $text;
 		if (fwrite($fp,$req)) {
 			$data = getHttpResponseContents($fp);
 			fclose($fp);
