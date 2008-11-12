@@ -758,7 +758,7 @@ startWindow('Job Information');
 				<? if ($JOBTYPE != "repeating") { ?>
 					<tr>
 						<td width="30%">Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
-						<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "")); ?></td>
+						<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this)\" onclick=\"event.cancelBubble=true;this.select();lcs(this)\"")); ?></td>
 					</tr>
 				<? } ?>
 
@@ -1355,6 +1355,7 @@ function display_jobtype_info(value){
 ?>
 }
 </script>
+<script SRC="script/calendar.js"></script>
 <?
 endWindow();
 buttons();
