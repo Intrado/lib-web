@@ -3,7 +3,7 @@
 By Oliver Bryant
 http://calendar.swazz.org */
 
-function getObj(objID)
+function getCalObj(objID)
 {
     if (document.getElementById) {return document.getElementById(objID);}
     else if (document.all) {return document.all[objID];}
@@ -13,9 +13,9 @@ function getObj(objID)
 function checkClick(e) {
 	e?evt=e:evt=event;
 	CSE=evt.target?evt.target:evt.srcElement;
-	if (getObj('fc'))
-		if (!isChild(CSE,getObj('fc')))
-			getObj('fc').style.display='none';
+	if (getCalObj('fc'))
+		if (!isChild(CSE,getCalObj('fc')))
+			getCalObj('fc').style.display='none';
 }
 
 function isChild(s,d) {
@@ -85,9 +85,9 @@ var ccy=now.getFullYear();
 var updobj;
 function lcs(ielem) {
 	updobj=ielem;
-	getObj('fc').style.left=Left(ielem);
-	getObj('fc').style.top=Top(ielem)+ielem.offsetHeight;
-	getObj('fc').style.display='';
+	getCalObj('fc').style.left=Left(ielem);
+	getCalObj('fc').style.top=Top(ielem)+ielem.offsetHeight;
+	getCalObj('fc').style.display='';
 	
 	// First check date is valid
 	curdt=ielem.value;
@@ -122,7 +122,7 @@ function cs_out(e) {
 }
 function cs_click(e) {
 	updobj.value=calvalarr[evtTgt(EvtObj(e)).id.substring(1,evtTgt(EvtObj(e)).id.length)];
-	getObj('fc').style.display='none';
+	getCalObj('fc').style.display='none';
 	
 }
 
@@ -169,38 +169,38 @@ function prepcalendar(hd,cm,cy) {
 	td.setFullYear(cy);
 	td.setMonth(cm);
 	cd=td.getDay();
-	getObj('mns').innerHTML=mn[cm]+ ' ' + cy;
+	getCalObj('mns').innerHTML=mn[cm]+ ' ' + cy;
 	marr=((cy%4)==0)?mnl:mnn;
 	for(var d=1;d<=42;d++) {
-		f_cps(getObj('v'+parseInt(d)));
+		f_cps(getCalObj('v'+parseInt(d)));
 		if ((d >= (cd -(-1))) && (d<=cd-(-marr[cm]))) {
 			dip=((d-cd < sd)&&(cm==sccm)&&(cy==sccy));
 			htd=((hd!='')&&(d-cd==hd));
 			if (dip)
-				f_cpps(getObj('v'+parseInt(d)));
+				f_cpps(getCalObj('v'+parseInt(d)));
 			else if (htd)
-				f_hds(getObj('v'+parseInt(d)));
+				f_hds(getCalObj('v'+parseInt(d)));
 			else
-				f_cps(getObj('v'+parseInt(d)));
+				f_cps(getCalObj('v'+parseInt(d)));
 
-			getObj('v'+parseInt(d)).onmouseover=(dip)?null:cs_over;
-			getObj('v'+parseInt(d)).onmouseout=(dip)?null:cs_out;
-			getObj('v'+parseInt(d)).onclick=(dip)?null:cs_click;
+			getCalObj('v'+parseInt(d)).onmouseover=(dip)?null:cs_over;
+			getCalObj('v'+parseInt(d)).onmouseout=(dip)?null:cs_out;
+			getCalObj('v'+parseInt(d)).onclick=(dip)?null:cs_click;
 			
-			getObj('v'+parseInt(d)).innerHTML=d-cd;	
+			getCalObj('v'+parseInt(d)).innerHTML=d-cd;	
 			calvalarr[d]=''+(cm-(-1))+'/'+(d-cd)+'/'+cy;
 		}
 		else {
-			getObj('v'+d).innerHTML='&nbsp;';
-			getObj('v'+parseInt(d)).onmouseover=null;
-			getObj('v'+parseInt(d)).onmouseout=null;
-			getObj('v'+parseInt(d)).style.cursor='default';
+			getCalObj('v'+d).innerHTML='&nbsp;';
+			getCalObj('v'+parseInt(d)).onmouseover=null;
+			getCalObj('v'+parseInt(d)).onmouseout=null;
+			getCalObj('v'+parseInt(d)).style.cursor='default';
 			}
 	}
 }
 
 prepcalendar('',ccm,ccy);
-//getObj('fc'+cc).style.visibility='hidden';
+//getCalObj('fc'+cc).style.visibility='hidden';
 
 function caddm() {
 	marr=((ccy%4)==0)?mnl:mnn;
@@ -232,6 +232,6 @@ if ((ccy>sccy)|((ccy==sccy)&&(ccm>=sccm)))
 else {
 	ccy=sccy;
 	ccm=sccm;
-	cfd=scfd;
+	//cfd=scfd;
 	}
 }
