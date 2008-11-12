@@ -122,7 +122,7 @@ function fmt_callerid_upload($row, $index){
 
 NewForm($f);
 $PAGE="admin:settings";
-$TITLE="Upload Caller ID Routes Preview: " . htmlentities($dmname);
+$TITLE="Upload Caller ID Routes Preview: " . escapehtml($dmname);
 include("nav.inc.php");
 buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadcallerid.php"), button("Cancel", null, "calleridroute.php"));
 startWindow("Routes Preview" . ($count <= 0 ? " - First 5000 Records" : ""));

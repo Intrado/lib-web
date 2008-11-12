@@ -59,7 +59,7 @@ foreach ($fieldmaps as $fieldmap) {
 
 		foreach($rulemap[$fieldnum] as $rule) {
 
-			echo '<tr><td class="border">' . htmlentities($fieldname) . '</td>';
+			echo '<tr><td class="border">' . escapehtml($fieldname) . '</td>';
 
 			if(showmode("text")) {
 				echo '<td class="border" nowrap>' . array_search($rule->op, $RULE_OPERATORS) . '</td><td class="border">' . ($rule->val ? $rule->val : '&nbsp;') . '</td>';

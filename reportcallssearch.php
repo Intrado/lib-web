@@ -228,7 +228,7 @@ $TITLE = "Contact History";
 
 if(isset($_SESSION['reportid'])){
 	$subscription = new ReportSubscription($_SESSION['reportid']);
-	$TITLE .= ": " . htmlentities($subscription->name);
+	$TITLE .= ": " . escapehtml($subscription->name);
 }
 
 include_once("nav.inc.php");

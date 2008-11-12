@@ -39,7 +39,7 @@ if (isset($_GET['id'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:lists";
-$TITLE = 'List Preview: ' . htmlentities(QuickQuery("select name from list where id = $_SESSION[listid]"));
+$TITLE = 'List Preview: ' . escapehtml(QuickQuery("select name from list where id = $_SESSION[listid]"));
 
 include_once("nav.inc.php");
 

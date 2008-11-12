@@ -100,7 +100,7 @@ if($form){
 
 			<tr>
 				<td>Confirmation Code: </td>
-				<td><input type="text" name="token" value="<?=htmlentities($token)?>" size="35" /></td>
+				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="35" /></td>
 			</tr>
 
 			<tr>

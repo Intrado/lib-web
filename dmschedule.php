@@ -115,7 +115,7 @@ if( $reloadform ) {
 
 
 $PAGE="admin:settings";
-$TITLE="Resource Schedule Manager: ".htmlentities($dmname);
+$TITLE="Resource Schedule Manager: ".escapehtml($dmname);
 include_once("nav.inc.php");
 
 NewForm($f);

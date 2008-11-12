@@ -51,7 +51,7 @@ ClearFormData($f);
 
 
 $PAGE="admin:settings";
-$TITLE="Upload Caller ID Routes: " . htmlentities($dmname);
+$TITLE="Upload Caller ID Routes: " . escapehtml($dmname);
 
 NewForm($f);
 include_once("nav.inc.php");

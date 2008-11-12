@@ -270,7 +270,7 @@ if ($errormsg)
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:lists";
-$TITLE = "Upload List: " . htmlentities($list-> name);
+$TITLE = "Upload List: " . escapehtml($list-> name);
 
 include_once("nav.inc.php");
 

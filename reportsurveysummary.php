@@ -174,7 +174,7 @@ if($generator->format != "html"){
 } else {
 
 	$PAGE = "reports:reports";
-	$TITLE = "Survey Results" . ((isset($jobid) && $jobid) ? " - " . htmlentities($job->name) : "");
+	$TITLE = "Survey Results" . ((isset($jobid) && $jobid) ? " - " . escapehtml($job->name) : "");
 
 	include_once("nav.inc.php");
 	NewForm($f);

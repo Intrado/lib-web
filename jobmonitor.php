@@ -43,7 +43,7 @@ $noupdate = isset($_GET['noupdate']) ? "noupdate" : false;
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$TITLE = htmlentities($job->name);
+$TITLE = escapehtml($job->name);
 
 include_once("popup.inc.php");
 

@@ -59,11 +59,11 @@ if(!$success){
 					</tr>
 					<tr>
 						<td>Username:</td>
-						<td><input type="text" name="username1" size="50" maxlength="255" value="<?=htmlentities($username1)?>"></td>
+						<td><input type="text" name="username1" size="50" maxlength="255" value="<?=escapehtml($username1)?>"></td>
 					</tr>
 					<tr>
 						<td>Confirm Username:</td>
-						<td><input type="text" name="username2" size="50" maxlength="255" value="<?=htmlentities($username2)?>"></td>
+						<td><input type="text" name="username2" size="50" maxlength="255" value="<?=escapehtml($username2)?>"></td>
 					</tr>
 					<tr>
 						<td>&nbsp;</td>

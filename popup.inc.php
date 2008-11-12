@@ -1,13 +1,13 @@
 <?
 $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
+header('Content-type: text/html; charset=UTF-8') ;
+
 ?>
-
-
-
 
 <html>
 <head>
-<title><?= getBrand();?>: <?= $pagetitle ?></title>
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<title><?= getBrand();?>: <?= $pagetitle ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/nav.js'></script>
 	<script src='script/sorttable.js'></script>

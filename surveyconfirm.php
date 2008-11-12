@@ -93,19 +93,19 @@ startWindow("Confirmation &amp; Submit");
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
 					<td class="bottomBorder" width="30%" >Survey Name</td>
-					<td class="bottomBorder" ><?= htmlentities($job->name); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($job->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Description</td>
-					<td class="bottomBorder" ><?= htmlentities($job->description); ?>&nbsp;</td>
+					<td class="bottomBorder" ><?= escapehtml($job->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Job Type</td>
-					<td class="bottomBorder" ><?= htmlentities($jobtype->name); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($jobtype->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >List</td>
-					<td class="bottomBorder" ><?= htmlentities($list->name); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($list->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Total people in list:</td>
@@ -113,7 +113,7 @@ startWindow("Confirmation &amp; Submit");
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Start Date</td>
-					<td class="bottomBorder" ><?= htmlentities(date("F jS, Y", strtotime($job->startdate))); ?></td>
+					<td class="bottomBorder" ><?= escapehtml(date("F jS, Y", strtotime($job->startdate))); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Number of days to run</td>
@@ -123,11 +123,11 @@ startWindow("Confirmation &amp; Submit");
 					<td colspan="2">Survey Time Window:</td>
 				<tr>
 					<td class="bottomBorder" >&nbsp;&nbsp;Earliest</td>
-					<td class="bottomBorder" ><?= htmlentities(date("g:i a", strtotime($job->starttime))); ?></td>
+					<td class="bottomBorder" ><?= escapehtml(date("g:i a", strtotime($job->starttime))); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >&nbsp;&nbsp;Latest</td>
-					<td class="bottomBorder" ><?= htmlentities(date("g:i a", strtotime($job->endtime))); ?></td>
+					<td class="bottomBorder" ><?= escapehtml(date("g:i a", strtotime($job->endtime))); ?></td>
 				</tr>
 				<tr>
 					<td>Email a report when the job completes</td>
@@ -144,7 +144,7 @@ startWindow("Confirmation &amp; Submit");
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
 					<td width="30%" class="bottomBorder" >Maximum attempts</td>
-					<td class="bottomBorder" ><?= htmlentities($job->getOptionValue("maxcallattempts")); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($job->getOptionValue("maxcallattempts")); ?></td>
 				</tr>
 <? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
@@ -163,11 +163,11 @@ startWindow("Confirmation &amp; Submit");
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
 					<td width="30%" class="bottomBorder" >Template Name</td>
-					<td class="bottomBorder" ><?= htmlentities($questionnaire->name); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($questionnaire->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Description</td>
-					<td class="bottomBorder" ><?= htmlentities($questionnaire->description); ?>&nbsp;</td>
+					<td class="bottomBorder" ><?= escapehtml($questionnaire->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Randomize Question Order</td>

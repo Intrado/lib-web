@@ -74,13 +74,14 @@ doNavTabs($NAVTREE);
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-
+header('Content-type: text/html; charset=UTF-8') ;
 ?>
 <script>
 	var _brandtheme = "<?=getBrandTheme();?>";
 </script>
 <html>
 <head>
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title>SchoolMessenger Contact Manager: <?= $PAGETITLE ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/sorttable.js'></script>

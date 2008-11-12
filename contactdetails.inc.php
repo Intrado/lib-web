@@ -273,7 +273,7 @@ $contactFullName .= $data->$firstnamefield;
 $lastnamefield = FieldMap::getLastNameField();
 $contactFullName .= " ".$data->$lastnamefield;
 
-$TITLE = "View Contact Information: " . htmlentities($contactFullName);
+$TITLE = "View Contact Information: " . escapehtml($contactFullName);
 
 include_once("nav.inc.php");
 NewForm($f);
@@ -472,7 +472,7 @@ foreach ($fieldmaps as $map) {
 		foreach ($fieldmaps as $map) {
 			$header = $map->name;
 ?>
-			<th align="left"><?=htmlentities($header)?></th>
+			<th align="left"><?=escapehtml($header)?></th>
 <?
 		}
 ?>
@@ -483,7 +483,7 @@ foreach ($fieldmaps as $map) {
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 			foreach ($fieldmaps as $map) {
 ?>
-			<td><?=htmlentities($row[$map->fieldnum])?></td>
+			<td><?=escapehtml($row[$map->fieldnum])?></td>
 <?
 			}
 ?>
@@ -522,7 +522,7 @@ foreach ($fieldmaps as $map) {
 						<td class="bottomBorder"><?=$associate['portaluser.firstname']?></td>
 						<td class="bottomBorder"><?=$associate['portaluser.lastname']?></td>
 						<td class="bottomBorder"><?=$associate['portaluser.username']?></td>
-						<td class="bottomBorder"><?=htmlentities($lastlogin)?></td>
+						<td class="bottomBorder"><?=escapehtml($lastlogin)?></td>
 						<td class="bottomBorder"><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid?>'" />Disassociate</a></td>
 					</tr>
 <?

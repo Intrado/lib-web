@@ -32,7 +32,7 @@ if (file_exists($logofilename) ) {
 <table align="center" cellpadding="8" cellspacing="0" style="border: 7px solid #9B9B9B; background-color: white;">
 	<tr>
 		<td bgcolor="#365F8D"><img style="margin-left: 10px; margin-top: 5px; margin-bottom: 5px; display: inline;" src='img/school_messenger.gif' /></td>
-		<td bgcolor="#365F8D" align="center"><div style='margin-top: 3px; margin-right: 10px; font-size: large; display: inline; float: right; color: white;'><?= htmlentities($custname) ?></div></td>
+		<td bgcolor="#365F8D" align="center"><div style='margin-top: 3px; margin-right: 10px; font-size: large; display: inline; float: right; color: white;'><?= escapehtml($custname) ?></div></td>
 	</tr>
 	<tr>
 		<td colspan="2">
@@ -61,7 +61,7 @@ if (file_exists($logofilename) ) {
 
 		<table width="100%" style="color: #<?=$primary?>; text-align: right;">
 			<tr>
-				<td width="100%" style="font-size: 18px; font-weight: bold; text-align: right;"><?= htmlentities($custname) ?></div></td>
+				<td width="100%" style="font-size: 18px; font-weight: bold; text-align: right;"><?= escapehtml($custname) ?></div></td>
 				<td><img src="img/spacer.gif" width="25"></td>
 			</tr>
 		</table>

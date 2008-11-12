@@ -437,7 +437,7 @@ $dis = "";
 if ($readonly) $dis = "disabled";
 
 $PAGE = "admin:users";
-$TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : htmlentities(GetFormData($f,$s,"firstname")) . ' ' . htmlentities(GetFormData($f,$s,"lastname")));
+$TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : escapehtml(GetFormData($f,$s,"firstname")) . ' ' . escapehtml(GetFormData($f,$s,"lastname")));
 include_once("nav.inc.php");
 NewForm($f);
 if ($_SESSION['userid'] == NULL || (isset($usr) && $usr->email === "") ) {

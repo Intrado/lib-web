@@ -311,7 +311,7 @@ $fieldmap = FieldMap::getAuthorizedMapNames();
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = format_delivery_type($MESSAGETYPE) . ' Message Editor: ' . (trim(GetFormData($form,$section,"name")) ? htmlentities(trim(GetFormData($form,$section,"name"))) : "New Message" );
+$TITLE = format_delivery_type($MESSAGETYPE) . ' Message Editor: ' . (trim(GetFormData($form,$section,"name")) ? escapehtml(trim(GetFormData($form,$section,"name"))) : "New Message" );
 $ICON = $MESSAGETYPE . ".gif";
 
 include_once("nav.inc.php");
@@ -430,7 +430,7 @@ switch($MESSAGETYPE)
 		foreach ($attachments as $attachment) {
 ?>
 						<tr>
-							<td><a href="messageattachmentdownload.php?id=<?= $attachment->id ?>"><?= htmlentities($attachment->filename)?></a></td>
+							<td><a href="messageattachmentdownload.php?id=<?= $attachment->id ?>"><?= escapehtml($attachment->filename)?></a></td>
 							<td><?= max(1,round($attachment->size/1024)) ?>K</td>
 							<td><?= submit($form,'delete',"Delete",$attachment->id); ?></td>
 						</tr>
@@ -440,7 +440,7 @@ switch($MESSAGETYPE)
 		if (isset($_SESSION['emailattachment'])) {
 ?>
 						<tr>
-							<td><?= htmlentities($_SESSION['emailattachment']['filename']) ?></td>
+							<td><?= escapehtml($_SESSION['emailattachment']['filename']) ?></td>
 							<td><?= max(1,round($_SESSION['emailattachment']['size']/1024)) ?>K</td>
 							<td>&nbsp;</td>
 						</tr>

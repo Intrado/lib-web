@@ -113,7 +113,7 @@ foreach($joblangs[$type] as $joblang) {
 <? if ($type == "phone") { ?>
 					<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $message->id . "', 400, 400);"); ?></div>
 <? } ?>
-					<?= htmlentities($message->name) ?>
+					<?= escapehtml($message->name) ?>
 				</td>
 			</tr>
 <?
@@ -154,18 +154,18 @@ startWindow("Confirmation &amp; Submit");
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
 					<td class="bottomBorder" width="30%" >Job Name</td>
-					<td class="bottomBorder" ><?= htmlentities($job->name); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($job->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Description</td>
-					<td class="bottomBorder" ><?= htmlentities($job->description); ?>&nbsp;</td>
+					<td class="bottomBorder" ><?= escapehtml($job->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Job Type</td>
 					<td class="bottomBorder" >
 						<table>
 							<tr>
-								<td width="30%"><?= htmlentities($jobtype->name); ?></td>
+								<td width="30%"><?= escapehtml($jobtype->name); ?></td>
 <?
 								if($jobtype->systempriority == 1 && getSystemSetting('_dmmethod', "asp")=='hybrid'){
 ?>
@@ -179,7 +179,7 @@ startWindow("Confirmation &amp; Submit");
 				</tr>
 				<tr>
 					<td class="bottomBorder" >List</td>
-					<td class="bottomBorder" ><?= htmlentities($list->name); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($list->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Total people in list:</td>
@@ -187,7 +187,7 @@ startWindow("Confirmation &amp; Submit");
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Start date</td>
-					<td class="bottomBorder" ><?= htmlentities(date("F jS, Y", strtotime($job->startdate))); ?></td>
+					<td class="bottomBorder" ><?= escapehtml(date("F jS, Y", strtotime($job->startdate))); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Number of days to run</td>
@@ -197,11 +197,11 @@ startWindow("Confirmation &amp; Submit");
 					<td colspan="2">Delivery window:</td>
 				<tr>
 					<td class="bottomBorder" >&nbsp;&nbsp;Earliest</td>
-					<td class="bottomBorder" ><?= htmlentities(date("g:i a", strtotime($job->starttime))); ?></td>
+					<td class="bottomBorder" ><?= escapehtml(date("g:i a", strtotime($job->starttime))); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >&nbsp;&nbsp;Latest</td>
-					<td class="bottomBorder" ><?= htmlentities(date("g:i a", strtotime($job->endtime))); ?></td>
+					<td class="bottomBorder" ><?= escapehtml(date("g:i a", strtotime($job->endtime))); ?></td>
 				</tr>
 				<tr>
 					<td>Email a report when the job completes</td>
@@ -222,7 +222,7 @@ startWindow("Confirmation &amp; Submit");
 							<td>
 <?
 						$phonemessage = new Message($job->phonemessageid);
-						echo htmlentities($phonemessage->name);
+						echo escapehtml($phonemessage->name);
 ?>
 							</td><td><?= button('Play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);") ?>
 								</td></tr></table>
@@ -237,7 +237,7 @@ startWindow("Confirmation &amp; Submit");
 <? } ?>
 				<tr>
 					<td class="bottomBorder" >Maximum attempts</td>
-					<td class="bottomBorder" ><?= htmlentities($job->getOptionValue('maxcallattempts')); ?></td>
+					<td class="bottomBorder" ><?= escapehtml($job->getOptionValue('maxcallattempts')); ?></td>
 				</tr>
 				<? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
@@ -293,7 +293,7 @@ if ($USER->authorize("messageconfirmation")){
 					<td class="bottomBorder" >
 <?
 $emailmessage = new Message($job->emailmessageid);
-echo htmlentities($emailmessage->name);
+echo escapehtml($emailmessage->name);
 ?>
 					</td>
 				</tr>
@@ -323,7 +323,7 @@ echo htmlentities($emailmessage->name);
 					<td class="bottomBorder" >
 <?
 $printmessage = new Message($job->printmessageid);
-echo htmlentities($printmessage->name);
+echo escapehtml($printmessage->name);
 ?>
 					</td>
 				</tr>
@@ -348,7 +348,7 @@ echo htmlentities($printmessage->name);
 					<td>
 <?
 $smsmessage = new Message($job->smsmessageid);
-echo htmlentities($smsmessage->name);
+echo escapehtml($smsmessage->name);
 ?>
 					</td>
 				</tr>

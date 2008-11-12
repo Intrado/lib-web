@@ -405,7 +405,7 @@ if(isset($_SESSION['report']['type'])){
 }
 
 if(isset($_SESSION['reportid']))
-	$TITLE .= " - " . htmlentities($subscription->name);
+	$TITLE .= " - " . escapehtml($subscription->name);
 
 include_once("nav.inc.php");
 NewForm($f);

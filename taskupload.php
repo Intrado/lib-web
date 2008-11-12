@@ -67,7 +67,7 @@ ClearFormData($f);
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:taskmanager";
-$TITLE = "Import Upload: " . htmlentities($import->name);
+$TITLE = "Import Upload: " . escapehtml($import->name);
 
 include_once("nav.inc.php");
 

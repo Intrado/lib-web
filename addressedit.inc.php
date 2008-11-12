@@ -353,7 +353,7 @@ $PAGE = ($ORIGINTYPE == "nav") ? "start:addressbook" : "notifications:lists";
 
 $name = GetFormData($f, $s, FieldMap::getFirstNameField()) . ' ' . GetFormData($f, $s, FieldMap::getLastNameField());
 if (!$personid) $name = "New Contact";
-$TITLE = "Enter Contact Information: " . htmlentities($name);
+$TITLE = "Enter Contact Information: " . escapehtml($name);
 
 include_once("nav.inc.php");
 NewForm($f);

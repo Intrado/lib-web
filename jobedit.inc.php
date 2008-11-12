@@ -570,7 +570,7 @@ foreach($joblangs[$type] as $joblang) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:jobs";
-$TITLE = ($JOBTYPE == 'repeating' ? 'Repeating Job Editor: ' : 'Job Editor: ') . ($jobid == NULL ? "New Job" : htmlentities($job->name));
+$TITLE = ($JOBTYPE == 'repeating' ? 'Repeating Job Editor: ' : 'Job Editor: ') . ($jobid == NULL ? "New Job" : escapehtml($job->name));
 if (isset($job))
 	$DESCRIPTION = "Job status: " . fmt_status($job, NULL);
 
@@ -1061,7 +1061,7 @@ if ($USER->authorize('setcallerid')) {
 	jobtypeinfo[""] = new Array("", "");
 <?
 	foreach($infojobtypes as $infojobtype){
-		$info = htmlentities($infojobtype->info);
+		$info = escapehtml($infojobtype->info);
 		$info = str_replace(array("\r\n","\n","\r"),"<br>",$info);
 ?>
 		jobtypeinfo[<?=$infojobtype->id?>] = new Array("<?=$infojobtype->systempriority?>", "<?=$info?>");

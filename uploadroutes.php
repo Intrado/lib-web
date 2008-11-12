@@ -51,7 +51,7 @@ ClearFormData($f);
 
 
 $PAGE="admin:settings";
-$TITLE="Upload Telco Settings: " . htmlentities($dmname);
+$TITLE="Upload Telco Settings: " . escapehtml($dmname);
 
 NewForm($f);
 include_once("nav.inc.php");

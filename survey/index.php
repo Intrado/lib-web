@@ -22,6 +22,7 @@ header("Cache-Control: post-check=0,pre-check=0");
 header("Cache-Control: max-age=0");
 header("Pragma: no-cache");
 
+
 require_once("XML/RPC.php");
 require_once("../inc/auth.inc.php");
 require_once("../inc/db.inc.php");
@@ -134,9 +135,11 @@ function fadecolor($primary, $fade, $ratio){
 	return $newcolor;
 }
 
+header('Content-type: text/html; charset=UTF-8') ;
 ?>
 <html>
 <head>
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title><?= isset($questionnaire->webpagetitle) ? escapehtml($questionnaire->webpagetitle) : "Survey" ?></title>
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 </head>

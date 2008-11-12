@@ -97,7 +97,7 @@ $NAVTREE = array (
 
 
 if (strlen($SYSTEMALERT = getSystemSetting("alertmessage")) > 0)
-	$SYSTEMALERT = "<div class='alertmessage noprint'>" . nl2br(htmlentities($SYSTEMALERT)) . "</div>";
+	$SYSTEMALERT = "<div class='alertmessage noprint'>" . nl2br(escapehtml($SYSTEMALERT)) . "</div>";
 else
 	$SYSTEMALERT = "";
 
@@ -153,7 +153,7 @@ function doShortcuts ($shortcuts) {
 			if (strpos($name,"--") === 0) {
 				?><div class="shortcuttitle"><?= $name ?></div><?
 			} else {
-				?><a href="<?= htmlentities($value) ?>"><?= $name ?></a><?
+				?><a href="<?= escapehtml($value) ?>"><?= $name ?></a><?
 			}
 		}
 	}
@@ -180,10 +180,12 @@ doNavTabs($NAVTREE);
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-
+//set the charset if we are spitting out html
+header('Content-type: text/html; charset=UTF-8') ;
 ?>
 <html>
 <head>
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/nav.js'></script>
@@ -220,7 +222,7 @@ doNavTabs($NAVTREE);
 	<tr>
 <?	// LOGO ?>
 		<td><div style="padding-left:10px; padding-bottom:10px;"><?=$logo?></div></td>
-		<td><div class="custname"><?= htmlentities($_SESSION['custname']); ?></div></td>
+		<td><div class="custname"><?= escapehtml($_SESSION['custname']); ?></div></td>
 	</tr>
 	</table>
 </div>

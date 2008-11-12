@@ -345,7 +345,7 @@ if ($reloadform) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:taskmanager";
-$TITLE = "Import Field Mapping: " . htmlentities($import->name);
+$TITLE = "Import Field Mapping: " . escapehtml($import->name);
 $DESCRIPTION = count($usedcols) . " of $colcount input columns mapped";
 
 include_once("nav.inc.php");
@@ -501,7 +501,7 @@ if ($noimportdata) { ?>
 		for ($ci = 0; $ci < $previewrows; $ci++) {
 			$cel = isset($importdata[$x][$ci]) ? $importdata[$x][$ci] : "";
 ?>
-			<tr ><td style="border-bottom: 1px dotted black; padding-left: 3px; <?= $import->skipheaderlines > $ci ? ' background: #cccccc;' : ' background: white;'?>"><?= $cel == "" ? "&nbsp;" : htmlentities($cel) ?></td></tr>
+			<tr ><td style="border-bottom: 1px dotted black; padding-left: 3px; <?= $import->skipheaderlines > $ci ? ' background: #cccccc;' : ' background: white;'?>"><?= empty($cel) ? "-" : escapehtml($cel) ?></td></tr>
 <?
 		}
 ?>

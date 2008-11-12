@@ -25,7 +25,7 @@ if (!$USER->authorize('viewcalldistribution')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:distribution";
-$TITLE = "Call Distribution for " . htmlentities(getSystemSetting("displayname"));
+$TITLE = "Call Distribution for " . escapehtml(getSystemSetting("displayname"));
 
 include_once("nav.inc.php");
 

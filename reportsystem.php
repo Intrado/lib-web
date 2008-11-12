@@ -286,7 +286,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 			$name = FieldMap::getName($groupby);
 			$display = $index;
 			if($display == "")
-				$display = htmlentities("<Not Assigned>");
+				$display = escapehtml("<Not Assigned>");
 			if(!$name)
 				$name = "System";
 			else

@@ -132,7 +132,7 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:lists";
-$TITLE = 'List Search: ' . htmlentities(QuickQuery("select name from list where id = $_SESSION[listid]"));
+$TITLE = 'List Search: ' . escapehtml(QuickQuery("select name from list where id = $_SESSION[listid]"));
 
 include_once("nav.inc.php");
 

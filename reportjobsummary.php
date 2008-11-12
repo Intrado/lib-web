@@ -173,9 +173,9 @@ if($generator->format != "html"){
 	$TITLE = "Notification Summary";
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
-		$TITLE .= " - " . htmlentities($subscription->name);
+		$TITLE .= " - " . escapehtml($subscription->name);
 	} else if((isset($jobid) && $jobid)){
-		$TITLE .= " - " . htmlentities($job->name);
+		$TITLE .= " - " . escapehtml($job->name);
 	}
 	if(isset($options['reldate'])){
 		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);

@@ -132,7 +132,7 @@ function fmt_actions_dis ($obj,$name) {
 */
 function fmt_acc_profile ($obj,$name) {
 	global $accessprofiles;
-	return htmlentities($accessprofiles[$obj->accessid]);
+	return escapehtml($accessprofiles[$obj->accessid]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
