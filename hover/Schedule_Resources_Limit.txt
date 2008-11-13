@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-Set the limit of telephone resources that the Flex appliance is allowed to use.
+The Flex Applience capacity can be reduces to allow other telephones to share the same resources. 

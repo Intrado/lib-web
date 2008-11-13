@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-The flex will run at the configured limit until the end time and resume full capacity after end time.
+Set the end time of reduced capacity.
