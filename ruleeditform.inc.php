@@ -62,9 +62,18 @@ foreach ($fieldmaps as $fieldmap) {
 			echo '<tr><td class="border">' . escapehtml($fieldname) . '</td>';
 
 			if(showmode("text")) {
-				echo '<td class="border" nowrap>' . array_search($rule->op, $RULE_OPERATORS) . '</td><td class="border">' . ($rule->val ? $rule->val : '&nbsp;') . '</td>';
+				echo '<td class="border" nowrap>' . $RULE_OPERATORS['text'][$rule->op] . '</td><td class="border">' . ($rule->val != "" ? $rule->val : '&nbsp;') . '</td>';
 			} elseif(showmode("reldate")) {
-				echo '<td class="border" nowrap>is</td><td class="border">' . $RELDATE_OPTIONS[$rule->val] . '</td>';
+				
+				echo '<td class="border" nowrap>' . $RULE_OPERATORS['reldate'][$rule->op] . '</td>';
+				if ($rule->op == "reldate") {
+					echo '<td class="border">' . $RELDATE_OPTIONS[$rule->val] . '</td>';
+				} else if ($rule->op == "date_range") {
+					$values = explode("|",$rule->val);
+					echo '<td class="border">' . $values[0] . ' and ' . $values[1] . '</td>';
+				} else {
+					echo '<td class="border">' . ($rule->val != "" ? $rule->val : '&nbsp;') . '</td>';
+				}
 			} elseif(showmode("multisearch")) {
 				if ($rule->logical == "and") {
 								echo '<td class="border" nowrap>is</td>';
@@ -78,6 +87,15 @@ foreach ($fieldmaps as $fieldmap) {
 					$formattedvalues = "&nbsp;";
 				echo $formattedvalues;
 				echo '</td>';
+			} elseif(showmode("numeric")) {
+				//TODO
+				echo '<td class="border" nowrap>' . $RULE_OPERATORS['numeric'][$rule->op] . '</td>';
+				if ($rule->op == "num_range") {
+					$values = explode("|",$rule->val);
+					echo '<td class="border">' . $values[0] . ' and ' . $values[1] . '</td>';
+				} else {
+					echo '<td class="border">' . ($rule->val != "" ? $rule->val : '&nbsp;') . '</td>';
+				}
 			}
 if (!$readonly) {
 			echo '<td>';
@@ -142,6 +160,9 @@ foreach ($fieldmaps as $fieldmap) {
 			$extrahtml = "";
 			if ($fieldmap->isOptionEnabled("disabled")) $extrahtml = "disabled=\"disabled\"";
 			NewFormItem($f,$s,"newrulefieldnum","selectoption",$fieldname,$fieldnum,$extrahtml);
+		} else if(showmode("numeric")) {
+			$typemap[] = 'numeric';
+			NewFormItem($f,$s,"newrulefieldnum","selectoption",$fieldname,$fieldnum);
 		}
 	}
 }
@@ -163,9 +184,8 @@ echo '<div id="operator_">&nbsp;</div>';
 echo '<div id="operator_text" style="display: none;">';
 NewFormItem($f,$s,"newrulelogical_text","hidden","and");
 NewFormItem($f,$s,"newruleoperator_text","selectstart");
-foreach($RULE_OPERATORS as $name => $code)
-	if($code != 'in')
-		NewFormItem($f,$s,"newruleoperator_text","selectoption",$name,$code);
+foreach($RULE_OPERATORS['text'] as $code => $name)
+	NewFormItem($f,$s,"newruleoperator_text","selectoption",$name,$code);
 NewFormItem($f,$s,"newruleoperator_text","selectend");
 echo '</div>';
 
@@ -173,7 +193,16 @@ echo '</div>';
 echo '<div id="operator_reldate" style="display: none;">';
 PutFormData($f,$s,"newrulelogical_reldate","and");
 PutFormData($f,$s,"newruleoperator_reldate","reldate");
-echo "is";
+
+$extrahtml = "onchange=\"setDependentVisibility(this.form,'reldate_reldate',this.value == 'reldate'); "
+					."setDependentVisibility(this.form,'reldate_val2',this.value == 'eq' || this.value == 'date_range'); "
+					."setDependentVisibility(this.form,'reldate_val3',this.value == 'date_range');\"";
+
+NewFormItem($f,$s,"newrulelogical_reldate","hidden","and");
+NewFormItem($f,$s,"newruleoperator_reldate","selectstart",NULL,NULL,$extrahtml);
+foreach($RULE_OPERATORS['reldate'] as $code => $name)
+	NewFormItem($f,$s,"newruleoperator_reldate","selectoption",$name,$code);
+NewFormItem($f,$s,"newruleoperator_reldate","selectend");
 echo '</div>';
 
 //Multisearch Operators
@@ -184,6 +213,18 @@ NewFormItem($f,$s,"newrulelogical_multisearch","selectoption","is NOT","and not"
 NewFormItem($f,$s,"newrulelogical_multisearch","selectend");
 PutFormData($f,$s,"newruleoperator_multisearch","in");
 NewFormItem($f,$s,"newruleoperator_multisearch","hidden","in");
+echo '</div>';
+
+//Numeric Operators
+
+$extrahtml = "onchange=\"setDependentVisibility(this.form,'numeric_range_field',this.value=='num_range') ;\"";
+
+echo '<div id="operator_numeric" style="display: none;">';
+NewFormItem($f,$s,"newrulelogical_numeric","hidden","and");
+NewFormItem($f,$s,"newruleoperator_numeric","selectstart",NULL,NULL,$extrahtml);
+foreach($RULE_OPERATORS['numeric'] as $code => $name)
+	NewFormItem($f,$s,"newruleoperator_numeric","selectoption",$name,$code);
+NewFormItem($f,$s,"newruleoperator_numeric","selectend");
 echo '</div>';
 
 echo '</td><td>';
@@ -203,19 +244,29 @@ foreach ($fieldmaps as $fieldmap) {
 
 		echo '<div id="rule_' . $fieldnum . '" style="display: none">';
 
-		if(showmode("text")) {
+		if (showmode("text")) {
 			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","text");
 			NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",20);
 
-		} elseif(showmode("reldate")) {
+		} else if (showmode("reldate")) {
+			echo '<table border=0 cellpadding=0 cellspacing=0><tr><td nowrap><div dependson="reldate_reldate">';
 			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","array",array_keys($RELDATE_OPTIONS));
 			NewFormItem($f, $s, "newrulevalue_" . $fieldnum, "selectstart");
 			foreach($RELDATE_OPTIONS as $name => $value) {
 				NewFormItem($f, $s, "newrulevalue_" . $fieldnum, "selectoption",$value,$name);
 			}
 			NewFormItem($f, $s, "newrulevalue_" . $fieldnum, "selectend");
+			
+			echo '</div></td><td nowrap><div dependson="reldate_val2" style="display: none;">';
+			PutFormData($f,$s,"newrulevalue2_" . $fieldnum,"","text");
+			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20);
+			echo '</div></td><td nowrap><div dependson="reldate_val3" style="display: none;">&nbsp;and&nbsp;';
+			PutFormData($f,$s,"newrulevalue3_" . $fieldnum,"","text");
+			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",8,20);
+			echo '</div></td></tr></table>';
+			
 
-		} elseif(showmode("multisearch")) {
+		} else if (showmode("multisearch")) {
 
 			//skip any field that has a rule defined for it
 			if (isset($rulemap[$fieldnum])) {
@@ -241,6 +292,14 @@ foreach ($fieldmaps as $fieldmap) {
 				}
 				NewFormSelect($f,$s,"newrulevalue_" . $fieldnum,$arrayvalues);
 			}
+		} else if (showmode("numeric")) {
+			echo '<table border=0 cellpadding=0 cellspacing=0><tr><td nowrap>';
+			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","text");
+			NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",8,20);
+			echo '</td><td nowrap><div dependson="numeric_range_field" style="display: none;">&nbsp;and&nbsp;';
+			PutFormData($f,$s,"newrulevalue2_" . $fieldnum,"","text");
+			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20);
+			echo '</div></td></tr></table>';
 		}
 
 		echo "</div>\n";

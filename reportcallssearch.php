@@ -208,12 +208,9 @@ if($reload){
 	PutFormData($f, $s, 'result', isset($options['results']) && $options['results'] !="" ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, 'results', $savedresults, "array", array_keys($results));
 
-	PutFormData($f,$s,"newrulefieldnum","");
-	PutFormData($f,$s,"newruletype","text","text",1,50);
-	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
-	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
-	PutFormData($f,$s,"newruleoperator_text","sw","text",1,50);
-	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
+	putRuleFormData($f, $s);
+
+
 }
 
 
@@ -258,9 +255,8 @@ startWindow("Person Notification Search", "padding: 3px;");
 							$_SESSION['reportrules'] = false;
 
 						//$RULES declared above
-						$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
+						$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
 
-						//include("ruleeditform.inc.php");
 						drawRuleTable($f, $s, false, true, true, false);
 					?>
 				<br></td>

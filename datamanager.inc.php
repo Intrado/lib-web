@@ -74,7 +74,7 @@ if (isset($_GET['clear'])) {
 
 switch ($DATATYPE) {
 case "person" :
-	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'multisearch,language', 'multisearch,grade',
+	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'numeric', 'multisearch,language', 'multisearch,grade',
 						 'text,firstname', 'text,lastname', 'grade', 'firstname', 'lastname', 'language',
 						 'multisearch,school', 'school');
 	$numfields = 20;
@@ -86,7 +86,7 @@ case "group" :
 	$dt = "g%";
 break;
 case "schedule" :
-	$VALID_TYPES = array('multisearch', 'multisearch,staff', 'staff');
+	$VALID_TYPES = array('multisearch', 'numeric', 'multisearch,staff', 'staff');
 	$numfields = 10;
 	$dt = "c%";
 break;
@@ -241,6 +241,8 @@ if( $reloadform )
 			$type = 'reldate';
 		} else if ($field->isOptionEnabled('multisearch')) {
 			$type = 'multisearch';
+		} else if ($field->isOptionEnabled('numeric')) {
+			$type = 'numeric';
 		} else {
 			$type = 'text';
 		}
@@ -307,7 +309,8 @@ switch ($DATATYPE) {
 case "person" :
 	$types = array("Text" => 'text',
 					"Date" => 'reldate',
-					"List" => 'multisearch');
+					"List" => 'multisearch', 
+					"Numeric" => 'numeric');
 
 		if(!FieldMap::getName(FieldMap::getFirstNameField()))
 			$types["First Name"] = 'text,firstname';

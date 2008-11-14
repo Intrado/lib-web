@@ -16,6 +16,7 @@ include_once("obj/User.obj.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("ruleeditform.inc.php");
+require_once("inc/rulesutils.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -317,24 +318,12 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 				$callerid = false;
 			$usr->setSetting("callerid",$callerid);
 
-			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-			if ($fieldnum != -1 && $usr->id) {
-				$type = GetFormData($f,$s,"newruletype");
-				$logic = GetFormData($f,$s,"newrulelogical_$type");
-				$op = GetFormData($f,$s,"newruleoperator_$type");
-				$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-				if (count($value) > 0) {
-					$rule = new Rule();
-					$rule->logical = $logic;
-					$rule->op = $op;
-					$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-					$rule->fieldnum = $fieldnum;
-
-					$rule->create();
-					//FIXME use UserRule.obj
-					$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
-					Query($query);
-				}
+			$rule = getRuleFromForm($f,$s);			
+			if ($rule != null && $usr->id) {
+				$rule->create();
+				//FIXME use UserRule.obj
+				$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
+				Query($query);
 				$reloadform = 1;
 			} else if(CheckFormSubmit($f,'applybutton')) {
 				$reloadform = 1;
@@ -348,7 +337,7 @@ if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSub
 	$reloadform = 1;
 }
 
-$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => false);
+$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => false, 'numeric' => true);
 if ($_SESSION['userid'])
 	$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
 else
@@ -410,12 +399,8 @@ if( $reloadform )
 		}
 		PutFormData($f,$s,"ldap",(bool)$checked, "bool", 0, 1);
 	}
-	PutFormData($f,$s,"newrulefieldnum","-1");
-	PutFormData($f,$s,"newruletype","text","text",1,50);
-	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
-	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
-	PutFormData($f,$s,"newruleoperator_text","eq","text",1,50);
-	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
+	putRuleFormData($f, $s);
+
 	PutFormData($f,$s,"callerid", Phone::format($usr->getSetting("callerid","",true)), "text", 0, 20);
 	PutFormData($f,$s,"staffid",$usr->staffpkey,"text");
 

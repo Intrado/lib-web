@@ -2,25 +2,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("inc/date.inc.php");
-include_once("obj/Language.obj.php");
-include_once("obj/Person.obj.php");
-include_once("obj/Address.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("obj/Email.obj.php");
-include_once("obj/PeopleList.obj.php");
-include_once("obj/AudioFile.obj.php");
-include_once("obj/FieldMap.obj.php");
-include_once("obj/Rule.obj.php");
-include_once("obj/ListEntry.obj.php");
-include_once("obj/RenderedList.obj.php");
-include_once("ruleeditform.inc.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/text.inc.php");
+require_once("inc/date.inc.php");
+require_once("obj/Language.obj.php");
+require_once("obj/Person.obj.php");
+require_once("obj/Address.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/AudioFile.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/Rule.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("ruleeditform.inc.php");
+require_once("inc/rulesutils.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,28 +114,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 			$fieldaddsubmit = false;
 			if ($list->id) {
 				//now see if there is a new list rule
-				$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-				if ($fieldnum != "" && $fieldnum != -1) {
-					$type = GetFormData($f,$s,"newruletype");
-					$logic = GetFormData($f,$s,"newrulelogical_$type");
-					$op = GetFormData($f,$s,"newruleoperator_$type");
-					$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-					if (count($value) > 0) {
-						$rule = new Rule();
-						$rule->logical = $logic;
-						$rule->op = $op;
-						$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-						$rule->fieldnum = $fieldnum;
+				$rule = getRuleFromForm($f,$s);
+				if ($rule != null) {
+					$rule->create();
 
-						$rule->create();
-
-						$le = new ListEntry();
-						$le->listid = $list->id;
-						$le->type = "R";
-						$le->ruleid = $rule->id;
-						$le->create();
-						$fieldaddsubmit = true;
-					}
+					$le = new ListEntry();
+					$le->listid = $list->id;
+					$le->type = "R";
+					$le->ruleid = $rule->id;
+					$le->create();
+					$fieldaddsubmit = true;
 				}
 			}
 
@@ -170,13 +159,7 @@ if( $reloadform )
 				);
 	PopulateForm($f,$s,$list,$fields);
 
-	PutFormData($f,$s,"newrulefieldnum","");
-	PutFormData($f,$s,"newruletype","text","text",1,50);
-	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
-	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
-	PutFormData($f,$s,"newruleoperator_text","eq","text",1,50);
-	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
-
+	putRuleFormData($f, $s);
 }
 //if we don't already have a list loaded, get one
 if ($list == NULL)
@@ -236,10 +219,10 @@ startWindow("List Content");
 		<a href="?clearall=rules" onclick="return confirm('Are you sure you want to clear all rules?');">Clear All</a>
 <?
 //ruleeditform expects $RULES to be set
-$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
+$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
 $RULES = DBFindMany("Rule", "from rule r,listentry le
 			where le.ruleid=r.id and le.listid='" . $_SESSION['listid'] . "'" ,"r");
-//include("ruleeditform.inc.php");
+
 drawRuleTable($f, $s, false, true, true, true);
 
 ?>

@@ -15,6 +15,7 @@ include_once("obj/Rule.obj.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("ruleeditform.inc.php");
+require_once("inc/rulesutils.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,33 +61,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'refresh'))
 			print '<div class="warning">There was a problem trying to save your changes. <br> Please verify that all required field information has been entered properly.</div>';
 		} else {
 			//submit changes
-			$fieldnum = GetFormData($f,$s,"newrulefieldnum");
-			if ($fieldnum != "" && $fieldnum != -1) {
-				$type = GetFormData($f,$s,"newruletype");
-
-				if ($type == "text")
-					$logic = "and";
-				else
-					$logic = GetFormData($f,$s,"newrulelogical_$type");
-
-				if ($type == "multisearch")
-					$op = "in";
-				else
-					$op = GetFormData($f,$s,"newruleoperator_$type");
-
-				$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-				if (count($value) > 0) {
-					$rule = new Rule();
-					$rule->logical = $logic;
-					$rule->op = $op;
-					$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
-					$rule->fieldnum = $fieldnum;
-					if(is_array($_SESSION['searchrules']))
+			
+			$rule = getRuleFromForm($f,$s);
+			if ($rule != null) {
+				if(is_array($_SESSION['searchrules']))
 					$_SESSION['searchrules'][] = $rule;
-					else
-						$_SESSION['searchrules'] = array($rule);
-					$rule->id = array_search($rule, $_SESSION['searchrules']);
-				}
+				else
+					$_SESSION['searchrules'] = array($rule);
+				$rule->id = array_search($rule, $_SESSION['searchrules']);
 			}
 
 			$reloadform = 1;
@@ -113,12 +95,8 @@ if( $reloadform )
 
 	}
 
-	PutFormData($f,$s,"newrulefieldnum","");
-	PutFormData($f,$s,"newruletype","text","text",1,50);
-	PutFormData($f,$s,"newrulelogical_text","and","text",1,50);
-	PutFormData($f,$s,"newrulelogical_multisearch","and","text",1,50);
-	PutFormData($f,$s,"newruleoperator_text","sw","text",1,50);
-	PutFormData($f,$s,"newruleoperator_multisearch","in","text",1,50);
+	putRuleFormData($f, $s);
+
 
 }
 
@@ -148,8 +126,8 @@ elseif(!isset($_SESSION['searchrules']) || is_null($_SESSION['searchrules']))
 	$_SESSION['searchrules'] = false;
 
 $RULES = &$_SESSION['searchrules'];
-$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
-//include("ruleeditform.inc.php");
+$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
+
 drawRuleTable($f, $s, false, true, true, true);
 
 endWindow();

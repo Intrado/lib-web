@@ -47,26 +47,12 @@ class Rule extends DBMappedObject {
 
 		//now put together the value checks
 		switch ($this->op) {
+			//text
 			case "eq":
 				$sql .= "$f='$val'";
 				break;
 			case "ne":
 				$sql .= "$f!='$val'";
-				break;
-			case "gt":
-				$sql .= "$f>'$val'";
-				break;
-			case "ge":
-				$sql .= "$f>='$val'";
-				break;
-			case "lt":
-				$sql .= "$f<'$val'";
-				break;
-			case "le":
-				$sql .= "$f<='$val'";
-				break;
-			case "lk":
-				$sql .= "$f like '$val'";
 				break;
 			case "sw":
 				$sql .= "$f like '$val%'";
@@ -77,14 +63,39 @@ class Rule extends DBMappedObject {
 			case "cn":
 				$sql .= "$f like '%$val%'";
 				break;
-			case "in":
 
+			//numeric
+			case "num_eq":
+				$sql .= "($f regexp '[0-9]' and replace($f,'$','')=" . ($val + 0.0) . ")";
+				break;
+			case "num_ne":
+				$sql .= "($f regexp '[0-9]' and replace($f,'$','')!=" . ($val + 0.0) . ")";
+				break;
+			case "num_gt":
+				$sql .= "($f regexp '[0-9]' and replace($f,'$','')>" . ($val + 0.0) . ")";
+				break;
+			case "num_ge":
+				$sql .= "($f regexp '[0-9]' and replace($f,'$','')>=" . ($val + 0.0) . ")";
+				break;
+			case "num_lt":
+				$sql .= "($f regexp '[0-9]' and replace($f,'$','')<" . ($val + 0.0) . ")";
+				break;
+			case "num_le":
+				$sql .= "($f regexp '[0-9]' and replace($f,'$','')<=" . ($val + 0.0) . ")";
+				break;
+			case "num_range":
+				$values = explode("|",$this->val);
+				$s = min($values[0] + 0.0,$values[1] + 0.0);
+				$b = max($values[0] + 0.0,$values[1] + 0.0);
+				$sql .= "($f regexp '[0-9]' and replace($f,'$','') between $s and $b)";
+				break;
+				
+			//multisearch
+			case "in":
 				//split the values
 				$values = explode("|",$this->val);
 				if (count($values) > 0) {
-
 					$sql .= "(";
-
 					//make the values safe
 					$safevales = array();
 					foreach ($values as $index => $val) {
@@ -101,33 +112,22 @@ class Rule extends DBMappedObject {
 							break;
 						}
 					}
-
-
 					$sql .= ")";
 				} else {
 					$sql .= "0";
 				}
 
 				break;
-			case "insubstr":
-				//split the values
-				$values = explode("|",$this->val);
-				if (count($values) > 0) {
-					//make the values safe
-					foreach ($values as $index => $val) {
-						$values[$index] = DBSafe($val);
-					}
-					//make a big or group of the possible values
-					$sql .= "($f like'%" . implode($values, "%' or $f like '%") . "%')";
-				} else {
-					$sql .= "0";
-				}
-
-
-				break;
+			//date
 			case "reldate":
 				$reldate = reldate($this->val);
 				$sql .= "$f='$reldate'";
+				break;
+			case "date_range":
+				$values = explode("|",$this->val);
+				$d1 = date('Y-m-d',strtotime($values[0]));
+				$d2 = date('Y-m-d',strtotime($values[1]));
+				$sql .= "(str_to_date($f, '%m/%d/%Y') between '$d1' and '$d2')";
 				break;
 			default:
 				$sql = " and 0 "; //always default on the safe side
@@ -170,16 +170,31 @@ class Rule extends DBMappedObject {
 	}
 }
 
-$RULE_OPERATORS = array(
-				'equals' => 'eq',
-				'does not equal' => 'ne',
-//				'is greater than' => 'gt',
-//				'is greater than or equal to' => 'ge',
-//				'is less than' => 'lt',
-//				'is less than or equal to' => 'le',
-				'is like' => 'lk',
-				'starts with' => 'sw',
-				'ends with' => 'ew',
-				'contains' => 'cn',
-				'is in' => 'in');
+$RULE_OPERATORS = array( 
+	"text" => array (
+		'eq' => 'equals',
+		'ne' => 'does not equal',
+		'sw' => 'starts with',
+		'ew' => 'ends with',
+		'cn' => 'contains'
+	),
+	"numeric" => array (
+		'num_eq' => 'equals',
+		'num_ne' => 'does not equal',
+		'num_gt' => 'is greater than',
+		'num_ge' => 'is greater than or equal to',
+		'num_lt' => 'is less than',
+		'num_le' => 'is less than or equal to',
+		'num_range' => 'is between (inclusive)'
+	),
+	"reldate" => array (
+		'reldate' => 'relative date',
+		'eq' => 'equals',
+		'date_range' => 'is between (inclusive)'
+	),
+	"multisearch" => array (
+		'in' => 'is in'
+	)
+);
+
 ?>

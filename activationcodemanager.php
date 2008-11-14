@@ -3,7 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
+require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/form.inc.php");
@@ -21,7 +21,7 @@ require_once("inc/date.inc.php");
 require_once("obj/Person.obj.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/PortalReport.obj.php");
-include_once("ruleeditform.inc.php");
+require_once("ruleeditform.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,7 +277,7 @@ if($reportgenerator->format == "csv"){
 									<td>
 									<?
 										//$RULES is declared above
-										$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true);
+										$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
 
 										//include("ruleeditform.inc.php");
 										drawRuleTable($f, $s, false, true, true, false);
