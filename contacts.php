@@ -87,6 +87,9 @@ $reportgenerator->reportinstance = $reportinstance;
 $reportgenerator->userid = $USER->id;
 $reportgenerator->format = "html";
 
+$searchby = "criteria";
+
+
 $f = "person";
 $s = "all";
 $reloadform = 0;
@@ -101,8 +104,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 	else
 	{
 		MergeSectionFormData($f, $s);
+		$radio = GetFormData($f, $s, "radioselect");
+		if ($radio == "criteria" || GetFormData($f, $s, "showall") || GetFormData($f, $s, "refresh")) {
+			$searchby = "criteria";
+			PutFormData($f, $s, 'personid',"", 'text');
+			PutFormData($f, $s, 'phone',"", 'phone', "7", "10");
+			PutFormData($f, $s, 'email',"", 'email');				
+		} elseif ($radio == "person"){
+			$searchby = "person";
+		}
+		
 		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+			error('The search field could not be processed', 'Please verify that all required field information has been entered properly');					
 		} else {
 
 			if(CheckFormSubmit($f, "showall")){
@@ -117,7 +130,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 				$options['reporttype']="contacts";
 				if(CheckFormSubmit($f, 'search') || CheckFormSubmit($f, $s))
 					unset($options['showall']);
-				if(GetFormData($f, $s, "radioselect") == "person"){
+				if($radio == "person"){
 					unset($options['rules']);
 					$options['personid'] = GetFormData($f, $s, 'personid');
 					$options['phone']= Phone::parse(GetFormData($f, $s, 'phone'));
@@ -126,7 +139,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 					unset($options['personid']);
 					unset($options['phone']);
 					unset($options['email']);
-
+					PutFormData($f, $s, 'personid',"", 'text');
+					PutFormData($f, $s, 'phone',"", 'phone', "7", "10");
+					PutFormData($f, $s, 'email',"", 'email');
+					
 					if($rule = getRuleFromForm($f, $s)){
 						if(!isset($options['rules']))
 							$options['rules'] = array();
@@ -134,6 +150,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 						$rule->id = array_search($rule, $options['rules']);
 						$options['rules'][$rule->id] = $rule;
 					}
+					$reloadform = 1;
 				}
 				for($i=1; $i<=$ordercount; $i++){
 					$options["order$i"] = GetFormData($f, $s, "order$i");
@@ -144,20 +161,25 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 				}
 				$_SESSION['contacts']['options'] = $options;
 				redirect();
-			}
+			}			
 		}
 	}
 } else {
 	$reloadform = 1;
 }
+
 if($reloadform){
 	ClearFormData($f);
 	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
 
-	if(isset($options['personid']) || isset($options['phone']) || isset($options['email']))
+	if(isset($options['personid']) || isset($options['phone']) || isset($options['email'])) {
 		$radio = "person";
-	else
+		$searchby = "person";
+	} else {
 		$radio = "criteria";
+		$searchby = "criteria";
+		
+	}
 	PutFormData($f, $s, "radioselect", $radio);
 	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
 	PutFormData($f, $s, 'phone', isset($options['phone']) ? Phone::format($options['phone']) : "", 'phone', "7", "10");
@@ -254,7 +276,7 @@ startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 
 </table>
 <script>
 	<?
-		if(isset($options['personid'])|| isset($options['phone']) || isset($options['email'])){
+		if($searchby == "person"){
 			?>hide("searchcriteria");<?
 		} else {
 			?>hide("singleperson");<?
