@@ -42,7 +42,13 @@ function welcomemessage() {
 }
 
 if ($REQUEST_TYPE == "new") {
-	welcomemessage();
+	// if customer _hascallback feature, give a choice, else inbound login only
+	$hascallback = QuickQuery("select value from setting where name='_hascallback'");
+	if ($hascallback === "1") {
+		welcomemessage();
+	} else {
+		forwardToPage("inboundlogin.php");
+	}
 } else if ($REQUEST_TYPE == "continue") {
 	if ($BFXML_VARS['redirect'] == 2) {
 		forwardToPage("inboundlogin.php");
