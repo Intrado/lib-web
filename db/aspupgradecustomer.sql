@@ -107,6 +107,15 @@ CHANGE `description` `description` VARCHAR( 50 ) NOT NULL
 $$$
 
 
+-- rule changes
+-- depricate like operator
+update rule set op='eq' where op='lk'
+$$$
+
+ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range', 
+	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range' ) NOT NULL DEFAULT 'eq' 
+$$$
+
 
 
 
