@@ -326,6 +326,9 @@ if($reportgenerator->format == "csv"){
 	}
 	buttons();
 	EndForm();
+?>
+<script SRC="script/calendar.js"></script>
+<?
 	include_once("navbottom.inc.php");
 ?>
 <script>

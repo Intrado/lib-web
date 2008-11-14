@@ -560,6 +560,9 @@ startWindow("Select ".help('ReportJobDetailSearch_Select'), NULL, false);
 endWindow();
 buttons();
 EndForm();
+?>
+<script SRC="script/calendar.js"></script>
+<?
 include_once("navbottom.inc.php");
 ?>
 

@@ -291,5 +291,9 @@ if(isset($options['personid']) || isset($options['phone']) || isset($options['em
 buttons();
 EndForm();
 
+?>
+<script SRC="script/calendar.js"></script>
+<?
+
 include_once("navbottom.inc.php");
 ?>
