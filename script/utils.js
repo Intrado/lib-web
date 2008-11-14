@@ -55,8 +55,6 @@ function setHiddenIfChecked (checkbox, name)
 			x.style.display =  "block";
 		}
 	}
-	
-	// alert('Box is ' + checkbox.checked + ' so ' + name + ' is now: ' + x.style.display);
 }
 
 function setVisibleIfChecked (checkbox, name)
@@ -69,8 +67,6 @@ function setVisibleIfChecked (checkbox, name)
 			x.style.display =  "none";
 		}
 	}
-	
-	// alert('Box is ' + checkbox.checked + ' so ' + name + ' is now: ' + x.style.display);
 }
 
 function insert(text, dest) {
@@ -93,12 +89,10 @@ function enable(exc, obj, yes) {
 		if(obj.disabled != null) {
 			obj.disabled = !yes;
 		}
-		//
-		//if(obj.childNodes) {
-			for(node in obj.childNodes) {
-				enable(exc, obj.childNodes[node], yes);
-			}
-		//}
+
+		for(node in obj.childNodes) {
+			enable(exc, obj.childNodes[node], yes);
+		}
 	}
 }
 
@@ -194,7 +188,8 @@ function isSelected(id, enclosingBlock) {
 
 
 function isCheckboxChecked(id) {
-	if(document.getElementById(id) != null && document.getElementById(id).checked){
+	var checkbox = new getObj(id);
+	if(checkbox.obj && checkbox.obj.checked){
 		return true;
 	}
 	return false;
@@ -242,7 +237,7 @@ marker = which value to look for in the "dependson" attribute.
 visability = true|false
 */
 
-function setDependantVisibility (parent,marker,visability) {
+function setDependentVisibility (parent,marker,visability) {
 	var setvisability = function(obj) { obj.style.display = visability ? "block" : "none";};
 	modifyMarkedNodes(parent,'dependson',marker,setvisability);
 }
