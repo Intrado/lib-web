@@ -196,7 +196,8 @@ PutFormData($f,$s,"newruleoperator_reldate","reldate");
 
 $extrahtml = "onchange=\"setDependentVisibility(this.form,'reldate_reldate',this.value == 'reldate'); "
 					."setDependentVisibility(this.form,'reldate_val2',this.value == 'eq' || this.value == 'date_range'); "
-					."setDependentVisibility(this.form,'reldate_val3',this.value == 'date_range');\"";
+					."setDependentVisibility(this.form,'reldate_val3',this.value == 'date_range'); "
+					."setDependentVisibility(this.form,'reldate_val4',this.value == 'date_offset');\"";
 
 NewFormItem($f,$s,"newrulelogical_reldate","hidden","and");
 NewFormItem($f,$s,"newruleoperator_reldate","selectstart",NULL,NULL,$extrahtml);
@@ -259,10 +260,13 @@ foreach ($fieldmaps as $fieldmap) {
 			
 			echo '</div></td><td nowrap><div dependson="reldate_val2" style="display: none;">';
 			PutFormData($f,$s,"newrulevalue2_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20);
+			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,false)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false)\"");
 			echo '</div></td><td nowrap><div dependson="reldate_val3" style="display: none;">&nbsp;and&nbsp;';
 			PutFormData($f,$s,"newrulevalue3_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",8,20);
+			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,false)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false)\"");
+			echo '</div></td><td nowrap><div dependson="reldate_val4" style="display: none;">';
+			PutFormData($f,$s,"newrulevalue4_" . $fieldnum,"","numeric");
+			NewFormItem($f,$s,"newrulevalue4_" . $fieldnum,"text",8,20);
 			echo '</div></td></tr></table>';
 			
 

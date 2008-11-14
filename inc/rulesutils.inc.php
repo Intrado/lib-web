@@ -14,7 +14,7 @@ function getRuleFromForm($f, $s){
 		$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
 		$value2 = GetFormData($f,$s,"newrulevalue2_" . $fieldnum);
 		$value3 = GetFormData($f,$s,"newrulevalue3_" . $fieldnum);
-		
+		$value4 = GetFormData($f,$s,"newrulevalue4_" . $fieldnum);
 		if (count($value) > 0) {
 			$rule = new Rule();
 			$rule->logical = $logic;
@@ -25,6 +25,8 @@ function getRuleFromForm($f, $s){
 				$rule->val = date('m/d/Y',strtotime($value2 == "" ? "today" : $value2)) . "|" . date('m/d/Y',strtotime($value3 == "" ? "today" : $value3));
 			else if ($type == "reldate" && $op == "eq")
 				$rule->val = date('m/d/Y',strtotime($value2 == "" ? "today" : $value2));
+			else if ($type == "reldate" && $op == "date_offset")
+				$rule->val = $value4 + 0;
 			else
 				$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
 			$rule->fieldnum = $fieldnum;

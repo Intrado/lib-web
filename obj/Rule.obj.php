@@ -129,6 +129,9 @@ class Rule extends DBMappedObject {
 				$d2 = date('Y-m-d',strtotime($values[1]));
 				$sql .= "(str_to_date($f, '%m/%d/%Y') between '$d1' and '$d2')";
 				break;
+			case "date_offset":
+				$sql .= "$f=date_format(now() + interval " . ($this->val + 0) . " day,'%m/%d/%Y')";
+				break;
 			default:
 				$sql = " and 0 "; //always default on the safe side
 		}
@@ -189,6 +192,7 @@ $RULE_OPERATORS = array(
 	),
 	"reldate" => array (
 		'reldate' => 'relative date',
+		'date_offset' => 'is offset from today by (days)',
 		'eq' => 'equals',
 		'date_range' => 'is between (inclusive)'
 	),
