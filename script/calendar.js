@@ -81,9 +81,13 @@ var sccm=now.getMonth();
 var sccy=now.getFullYear();
 var ccm=now.getMonth();
 var ccy=now.getFullYear();
+var predate;
 
 var updobj;
-function lcs(ielem) {
+
+// Main function Pass in the element text element that the calendar is working on 
+function lcs(ielem,pastdates) {
+	predate=pastdates;
 	updobj=ielem;
 	getCalObj('fc').style.left=Left(ielem);
 	getCalObj('fc').style.top=Top(ielem)+ielem.offsetHeight;
@@ -101,8 +105,8 @@ function lcs(ielem) {
 		ccm=curdtarr[0]-1;
 		ccy=curdtarr[2];
 		prepcalendar(curdtarr[1],curdtarr[0]-1,curdtarr[2]);
-	}
-	
+	} else 
+		prepcalendar('',ccm,ccy);	
 }
 
 function evtTgt(e)
@@ -174,7 +178,12 @@ function prepcalendar(hd,cm,cy) {
 	for(var d=1;d<=42;d++) {
 		f_cps(getCalObj('v'+parseInt(d)));
 		if ((d >= (cd -(-1))) && (d<=cd-(-marr[cm]))) {
-			dip=((d-cd < sd)&&(cm==sccm)&&(cy==sccy));
+			
+			dip=false;
+			if(predate&&(cm==sccm)&&(cy==sccy))
+				dip=!(d-cd <= sd);
+			else
+				dip=((d-cd < sd)&&(cm==sccm)&&(cy==sccy));
 			htd=((hd!='')&&(d-cd==hd));
 			if (dip)
 				f_cpps(getCalObj('v'+parseInt(d)));
@@ -199,6 +208,7 @@ function prepcalendar(hd,cm,cy) {
 	}
 }
 
+// set calander to current month and year
 prepcalendar('',ccm,ccy);
 //getCalObj('fc'+cc).style.visibility='hidden';
 
@@ -227,8 +237,12 @@ function csubm() {
 }
 
 function cdayf() {
-if ((ccy>sccy)|((ccy==sccy)&&(ccm>=sccm)))
+if (!predate&&((ccy>sccy)|((ccy==sccy)&&(ccm>=sccm)))){
 	return;
+} else if (predate&&((ccy<sccy)|((ccy==sccy)&&(ccm<=sccm)))){
+	return;
+}
+
 else {
 	ccy=sccy;
 	ccm=sccm;
