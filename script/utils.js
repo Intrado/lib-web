@@ -193,6 +193,13 @@ function isSelected(id, enclosingBlock) {
 }
 
 
+function isCheckboxChecked(id) {
+	if(document.getElementById(id) != null && document.getElementById(id).checked){
+		return true;
+	}
+	return false;
+}
+
 /* Function to enable or disable the target checkbox if none 
 	of the source checkboxes are checked.
 	@param sources An array of the source (i.e., master checkboxed)

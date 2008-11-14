@@ -18,12 +18,12 @@ $hassms = getSystemSetting('_hassms', false);
 
 // Set up variables that determine later editability of the form
 /*
-If a job is in completed mode then it is complete or cancelled.
-If a job is in submitted mode then it is active, complete, or cancelled.
+ If a job is in completed mode then it is complete or cancelled.
+ If a job is in submitted mode then it is active, complete, or cancelled.
 
-A completed job may only have its name and description edited.
-A submitted job may only have its name/description, date/time, and selected message options edited.
-*/
+ A completed job may only have its name and description edited.
+ A submitted job may only have its name/description, date/time, and selected message options edited.
+ */
 $completedmode = false; // Flag indicating that a job is complete or cancelled so only allow editing of name and description.
 $submittedmode = false; // Flag indicating that a job has been submitted, allowing editing of date/time, name/desc, and a few selected options.
 
@@ -62,6 +62,8 @@ $f = "notification";
 $s = "main" . $JOBTYPE;
 $reloadform = 0;
 
+$languagearray = array("Spanish" => 1,"French" => 0,"Chinese" => 1);  // Must be a set. two of the same may not work, Test this.
+
 // used to determine if advanced settings need to be expanded to show error
 $hassettingsdetailerror = false;
 $hasphonedetailerror = false;
@@ -80,11 +82,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		MergeSectionFormData($f, $s);
 		foreach (array("phone","email","print","sms") as $type){
 			MergeSectionFormData($f, $type);
-			if($type == "sms")
+			if($type == "sms" || $type == "phone")
 				continue;
 			SetRequired($f, $s, $type . "messageid", (bool)GetFormData($f, $s, 'send' . $type));
 		}
 		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
+		SetRequired($f, $s, "phonetextarea", GetFormData($f, $s, 'sendphone') && GetFormData($f, $s, 'phonemessageid') == "");
+		
 		//do check
 
 		$sendphone = GetFormData($f, $s, "sendphone");
@@ -149,14 +153,31 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->description = trim(GetFormData($f,$s,"description"));
 				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
 			} else {
+				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phonemessageid") == "" ){
+					$newphonemessage = new Message();
+					$parts = $newphonemessage->parse(GetFormData($f, $s, 'phonetextarea'));
+					$newphonemessage->userid = $USER->id;
+					$newphonemessage->type = 'phone';
+					$newphonemessage->name = GetFormData($f, $s,'name') . date(" M j, Y g:i:s", strtotime("now"));
+					$newphonemessage->description = "Translated message";
+					$newphonemessage->deleted = 1;
+					$newphonemessage->create();
+
+					foreach($parts as $part){
+						$part->messageid = $newphonemessage->id;
+						$part->create();
+					}
+					//Do a putform on message select so if there is an error later on, another message does not get created
+					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');
+				}
+					
 				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
 					$newsmsmessage = new Message();
 					$parts = $newsmsmessage->parse(GetFormData($f, $s, 'smsmessagetxt'));
 					$newsmsmessage->userid = $USER->id;
 					$newsmsmessage->type = 'sms';
-					$newsmsmessage->name = GetFormData($f, $s,'name');
-					$newsmsmessage->description = "SMS Message " . date("M j, Y g:i:s", strtotime("now"));
-					$newsmsmessage->create();
+					$newsmsmessage->name = GetFormData($f, $s,'name') . date(" M j, Y g:i:s", strtotime("now"));
+					$newsmsmessage->description = "SMS Message";
 
 					foreach($parts as $part){
 						$part->messageid = $newsmsmessage->id;
@@ -389,6 +410,27 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
+	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
+
+	PutFormData($f,$s,"voiceselect",1);
+	PutFormData($f,$s,"phonetextarea","","text");
+	
+	
+	$phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'");	
+	if($phonemessage != NULL) {
+			$parts = DBFindMany("MessagePart","from messagepart where messageid=$phonemessage->id order by sequence");
+			$body = $phonemessage->format($parts);
+			PutFormData($f,$s,"phonetextarea",$body,'text');
+	}
+	
+	foreach($languagearray as $language => $languageisset) {
+		$language = htmlentities($language);
+		PutFormData($f,$s,"translate_$language",$languageisset,"bool",0,1);
+		PutFormData($f,$s,"translationtext_$language","translation","text","nomin","nomax",false);
+		PutFormData($f,$s,"translationtextexpand_$language","translation second box","text","nomin","nomax",false);
+		PutFormData($f,$s,"retranslationtext_$language","retranslation","text","nomin","nomax",false);
+	}
+
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
@@ -417,7 +459,7 @@ if( $reloadform )
 		} else {
 			$data = explode(",", $schedule->daysofweek);
 			for ($x = 1; $x < 8; $x++)
-			    $scheduledows[$x] = in_array($x,$data);
+				$scheduledows[$x] = in_array($x,$data);
 		}
 		for ($x = 1; $x < 8; $x++) {
 			PutFormData($f,$s,"dow$x",(isset($scheduledows[$x]) ? $scheduledows[$x] : 0),"bool",0,1);
@@ -472,26 +514,29 @@ $peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where useri
 function message_select($type, $form, $section, $name, $extrahtml = "") {
 	global $messages, $submittedmode;
 ?>
-	<table border=0 cellpadding=3 cellspacing=0><tr><td>
-<?
-	NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? " DISABLED " : "") . $extrahtml);
+<table border=0 cellpadding=3 cellspacing=0>
+	<tr>
+		<td><?
+		NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? " DISABLED " : "") . $extrahtml);
 
-	if($type == "sms") {
-		NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
-	} else {
-		NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
-	}
-	foreach ($messages[$type] as $message) {
-		NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
-	}
-	NewFormItem($form,$section,$name, "selectend");
-?>
-	</td>
-<?	if ($type == "phone") { ?>
+		if($type == "sms") {
+			NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
+		} elseif ($type == "phone") {
+			NewFormItem($form,$section,$name, "selectoption", ' -- Create a Message -- ', "");
+		} else {
+			NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
+		}
+		foreach ($messages[$type] as $message) {
+			NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
+		}
+		NewFormItem($form,$section,$name, "selectend");
+		?></td>
+		<?	if ($type == "phone") { ?>
 		<td><?= button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);") ?>
 		</td>
-<?	} ?>
-	</tr></table>
+		<?	} ?>
+	</tr>
+</table>
 <?
 }
 
@@ -520,44 +565,37 @@ function alternate($type) {
 	global $USER, $f, $job, $messages, $joblangs, $submittedmode, $JOBTYPE;
 	if($USER->authorize('sendmulti')) {
 ?>
-	<table border="0" cellpadding="2" cellspacing="1" class="list">
-		<tr class="listHeader" align="left" valign="bottom">
-			<th>Language Preference</th>
-			<th>Message to Send</th>
-			<th>&nbsp;</th>
-		</tr>
-<?
-$id = $type . 'messageid';
-//just show the selected options? allowing to edit could cause the page to become slow
-//with many languages/messages
-foreach($joblangs[$type] as $joblang) {
-?>
-			<tr valign="middle">
-				<td><?= $joblang->language ?>
-				</td>
-				<td>
-<? if ($type == "phone") { ?>
-					<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
-<? } ?>
-					<?= $messages[$type][$joblang->messageid]->name ?>
-				</td>
-				<td>
-				<? if (!$submittedmode) { ?>
-							<a href="<?= ($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php") ?>?deletejoblang=<?= $joblang->id ?>">Delete</a>
-					<? } ?>
-				</td>
-			</tr>
-<?
-}
-?>
-		<tr valign="middle">
-			<td><? language_select($f,$type,"newlang" . $type, $type); ?>
-			</td>
-			<td><? message_select($type, $f, $type, 'newmess' . $type); ?></td>
-			<td><? 	if (!$submittedmode)
-						echo submit($f, $type, 'Add'); ?></td>
-		</tr>
-	</table>
+<table border="0" cellpadding="2" cellspacing="1" class="list">
+	<tr class="listHeader" align="left" valign="bottom">
+		<th>Language Preference</th>
+		<th>Message to Send</th>
+		<th>&nbsp;</th>
+	</tr>
+	<?
+	$id = $type . 'messageid';
+	//just show the selected options? allowing to edit could cause the page to become slow
+	//with many languages/messages
+	foreach($joblangs[$type] as $joblang) {
+	?>
+	<tr valign="middle">
+		<td><?= $joblang->language ?></td>
+		<td><? if ($type == "phone") { ?>
+		<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
+		<? } ?> <?= $messages[$type][$joblang->messageid]->name ?></td>
+		<td><? if (!$submittedmode) { ?> <a
+			href="<?= ($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php") ?>?deletejoblang=<?= $joblang->id ?>">Delete</a>
+			<? } ?></td>
+	</tr>
+	<?
+	}
+	?>
+	<tr valign="middle">
+		<td><? language_select($f,$type,"newlang" . $type, $type); ?></td>
+		<td><? message_select($type, $f, $type, 'newmess' . $type); ?></td>
+		<td><? 	if (!$submittedmode)
+		echo submit($f, $type, 'Add'); ?></td>
+	</tr>
+</table>
 
 <?
 	} else {
@@ -590,456 +628,523 @@ if ($JOBTYPE == "normal") {
 
 startWindow('Job Information');
 
-	if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
+if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td align=center><div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div></td></tr></table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td align=center>
+		<div class='alertmessage noprint'>The System Administrator has
+		disabled all Repeating Jobs. <br>
+		No Repeating Jobs can be run while this setting remains in effect.</div>
+		</td>
+	</tr>
+</table>
 <?
-	}
+}
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Delivery Type:<br></th>
 		<td class="bottomBorder">
-			<table border="0" cellpadding="2" cellspacing="0" >
-				<tr>
-<?
-				if($USER->authorize('sendphone')){
-?>
-						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('phone')\"" ?> ><img src="img/themes/<?=getBrandTheme()?>/icon_phone.gif" align="absmiddle"></div></td>
-<?
-				}
-				if($USER->authorize('sendemail')){
-?>
-						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('email')\"" ?> ><img src="img/themes/<?=getBrandTheme()?>/icon_email.gif" align="absmiddle"></div></td>
-<?
-				}
-				if($hassms && $USER->authorize('sendsms')){
-?>
-						<td align="center" style="padding-left:15px"><div <?=$submittedmode ? "" : "onclick=\"clickIcon('sms')\""?> ><img src="img/themes/<?=getBrandTheme()?>/icon_sms.gif" align="absmiddle"></div></td>
-<?
-				}
-?>
-				</tr>
-				<tr>
-<?
-				if($USER->authorize('sendphone')){
-?>
-					<td style="padding-left:15px">Phone:<? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('phone'); else hideSection('phone')\""); ?></td>
-<?
-				}
-				if($USER->authorize('sendemail')){
-?>
+		<table border="0" cellpadding="2" cellspacing="0">
+			<tr>
+			<?
+			if($USER->authorize('sendphone')){
+				?>
+				<td align="center" style="padding-left: 15px">
+				<div <?=$submittedmode ? "" : "onclick=\"clickIcon('phone')\"" ?>><img
+					src="img/themes/<?=getBrandTheme()?>/icon_phone.gif"
+					align="absmiddle"></div>
+				</td>
+				<?
+			}
+			if($USER->authorize('sendemail')){
+				?>
+				<td align="center" style="padding-left: 15px">
+				<div <?=$submittedmode ? "" : "onclick=\"clickIcon('email')\"" ?>><img
+					src="img/themes/<?=getBrandTheme()?>/icon_email.gif"
+					align="absmiddle"></div>
+				</td>
+				<?
+			}
+			if($hassms && $USER->authorize('sendsms')){
+				?>
+				<td align="center" style="padding-left: 15px">
+				<div <?=$submittedmode ? "" : "onclick=\"clickIcon('sms')\""?>><img
+					src="img/themes/<?=getBrandTheme()?>/icon_sms.gif"
+					align="absmiddle"></div>
+				</td>
+				<?
+			}
+			?>
+			</tr>
+			<tr>
+			<?
+			if($USER->authorize('sendphone')){
+				?>
+				<td style="padding-left: 15px">Phone:<? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('phone'); else hideSection('phone')\""); ?></td>
+				<?
+			}
+			if($USER->authorize('sendemail')){
+				?>
 
-					<td style="padding-left:15px">Email:<? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('email'); else hideSection('email');\""); ?></td>
-<?
-				}
-				if($hassms && $USER->authorize('sendsms')){
-?>
-					<td style="padding-left:15px">SMS:<? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('sms'); else hideSection('sms');\""); ?></td>
-<?
-				}
-?>
-				</tr>
-			</table>
+				<td style="padding-left: 15px">Email:<? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('email'); else hideSection('email');\""); ?></td>
+				<?
+			}
+			if($hassms && $USER->authorize('sendsms')){
+				?>
+				<td style="padding-left: 15px">SMS:<? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('sms'); else hideSection('sms');\""); ?></td>
+				<?
+			}
+			?>
+			</tr>
+		</table>
 		</td>
 	</tr>
 
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Settings:<br></th>
-		<td class="bottomBorder">
-			&nbsp;
-			<div id="settings" style="display:none">
-			<table border="0" cellpadding="2" cellspacing="0" width="100%">
-				<tr>
-					<td width="30%" >Job Name</td>
-					<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
-				</tr>
-				<tr>
-					<td>Description</td>
-					<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
-				</tr>
+		<td class="bottomBorder">&nbsp;
+		<div id="settings" style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width="100%">
+			<tr>
+				<td width="30%">Job Name</td>
+				<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
+			</tr>
+			<tr>
+				<td>Description</td>
+				<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
+			</tr>
 
-<? if ($JOBTYPE == "repeating") { ?>
-				<tr>
-					<td>Repeat this job every:</td>
-					<td>
-						<table border="0" cellpadding="2" cellspacing="1" class="list">
-							<tr class="listHeader" align="left" valign="bottom">
-								<th>Su</th>
-								<th>M</th>
-								<th>Tu</th>
-								<th>W</th>
-								<th>Th</th>
-								<th>F</th>
-								<th>Sa</th>
-								<th>Time</th>
-							</tr>
-							<tr>
-								<td><? NewFormItem($f,$s,"dow1","checkbox"); ?></td>
-								<td><? NewFormItem($f,$s,"dow2","checkbox"); ?></td>
-								<td><? NewFormItem($f,$s,"dow3","checkbox"); ?></td>
-								<td><? NewFormItem($f,$s,"dow4","checkbox"); ?></td>
-								<td><? NewFormItem($f,$s,"dow5","checkbox"); ?></td>
-								<td><? NewFormItem($f,$s,"dow6","checkbox"); ?></td>
-								<td><? NewFormItem($f,$s,"dow7","checkbox"); ?></td>
-								<td><? time_select($f,$s,"scheduletime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-<? } ?>
-				<tr>
-					<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
-					<td>
-						<table border="0" cellpadding="2px" cellspacing="1px" class="list" id="jobtypetable">
-							<tr class="listHeader" align="left" valign="bottom">
-								<th>Name</th>
-								<th style="padding-left:6px;">Info</th>
-<?
-						if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
-?>
-								<th>Delivery System</th>
-<?
-						}
-?>
-							</tr>
-							<tr valign="top">
-								<td>
-									<?
-
-									NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, "id=jobtypeid " . ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
-									NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
-									foreach ($VALIDJOBTYPES as $item) {
-										NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
-									}
-									NewFormItem($f,$s,"jobtypeid", "selectend");
-									?>
-								</td>
-
-								<td style="padding-left:6px;"><div id="jobtypeinfo" style="float:left;"></div></td>
-<?
-							if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
-?>
-								<td><div id="addinfo"></div></td>
-<?
-							}
-?>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>List <?= help('Job_SettingsList',NULL,"small"); ?></td>
-					<td>
-						<?
-						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
-						NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
-						foreach ($peoplelists as $plist) {
-							NewFormItem($f,$s,"listid", "selectoption", $plist->name, $plist->id);
-						}
-						NewFormItem($f,$s,"listid", "selectend");
-						?>
-					</td>
-				</tr>
-			</table>
-			</div>
-
-			<div id='displaysettingsdetails' style="display:none">
-				<a href="#" onclick="displaySection('settings', true); return false; ">Show advanced options</a>
-			</div>
-
-			<div id='displaysettingsbasic' style="display:none">
-				<a href="#" onclick="displaySection('settings', false); return false; ">Hide advanced options</a>
-			</div>
-
-			<div id="settingsdetails" style="display:none">
-			<table border="0" cellpadding="2" cellspacing="0" width="100%">
-				<? if ($JOBTYPE != "repeating") { ?>
-					<tr>
-						<td width="30%">Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
-						<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this)\" onclick=\"event.cancelBubble=true;this.select();lcs(this)\"")); ?></td>
+			<? if ($JOBTYPE == "repeating") { ?>
+			<tr>
+				<td>Repeat this job every:</td>
+				<td>
+				<table border="0" cellpadding="2" cellspacing="1" class="list">
+					<tr class="listHeader" align="left" valign="bottom">
+						<th>Su</th>
+						<th>M</th>
+						<th>Tu</th>
+						<th>W</th>
+						<th>Th</th>
+						<th>F</th>
+						<th>Sa</th>
+						<th>Time</th>
 					</tr>
-				<? } ?>
+					<tr>
+						<td><? NewFormItem($f,$s,"dow1","checkbox"); ?></td>
+						<td><? NewFormItem($f,$s,"dow2","checkbox"); ?></td>
+						<td><? NewFormItem($f,$s,"dow3","checkbox"); ?></td>
+						<td><? NewFormItem($f,$s,"dow4","checkbox"); ?></td>
+						<td><? NewFormItem($f,$s,"dow5","checkbox"); ?></td>
+						<td><? NewFormItem($f,$s,"dow6","checkbox"); ?></td>
+						<td><? NewFormItem($f,$s,"dow7","checkbox"); ?></td>
+						<td><? time_select($f,$s,"scheduletime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+			<? } ?>
+			<tr>
+				<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
+				<td>
+				<table border="0" cellpadding="2px" cellspacing="1px" class="list"
+					id="jobtypetable">
+					<tr class="listHeader" align="left" valign="bottom">
+						<th>Name</th>
+						<th style="padding-left: 6px;">Info</th>
+						<?
+						if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
+							?>
+						<th>Delivery System</th>
+						<?
+						}
+						?>
+					</tr>
+					<tr valign="top">
+						<td><?
 
-				<tr>
-					<td width="30%">Number of days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
-					<td>
-					<?
-					NewFormItem($f, $s, 'numdays', "selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
-							//. " onchange=\"showDate('" . date("Y M d", ($job!= null ? strtotime($job->startdate) : 'today')) . "', this.options[this.selectedIndex].value);\"");
-					$maxdays = $ACCESS->getValue('maxjobdays');
-					if ($maxdays == null) {
-						$maxdays = 7; // Max out at 7 days if the permission is not set.
-					}
-					for ($i = 1; $i <= $maxdays; $i++) {
-						NewFormItem($f, $s, 'numdays', "selectoption", $i, $i);
-					}
-					NewFormItem($f, $s, 'numdays', "selectend");
-					?>
-					<!--
+						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, "id=jobtypeid " . ($submittedmode ? "DISABLED" : "") . " onchange='display_jobtype_info(this.value)' ");
+						NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
+						foreach ($VALIDJOBTYPES as $item) {
+							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
+						}
+						NewFormItem($f,$s,"jobtypeid", "selectend");
+						?></td>
+
+						<td style="padding-left: 6px;">
+						<div id="jobtypeinfo" style="float: left;"></div>
+						</td>
+						<?
+						if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
+							?>
+						<td>
+						<div id="addinfo"></div>
+						</td>
+						<?
+						}
+						?>
+					</tr>
+				</table>
+				</td>
+			</tr>
+			<tr>
+				<td>List <?= help('Job_SettingsList',NULL,"small"); ?></td>
+				<td><?
+				NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
+				NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
+				foreach ($peoplelists as $plist) {
+					NewFormItem($f,$s,"listid", "selectoption", $plist->name, $plist->id);
+				}
+				NewFormItem($f,$s,"listid", "selectend");
+				?></td>
+			</tr>
+		</table>
+		</div>
+
+		<div id='displaysettingsdetails' style="display: none"><a href="#"
+			onclick="displaySection('settings', true); return false; ">Show
+		advanced options</a></div>
+
+		<div id='displaysettingsbasic' style="display: none"><a href="#"
+			onclick="displaySection('settings', false); return false; ">Hide
+		advanced options</a></div>
+
+		<div id="settingsdetails" style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width="100%">
+		<? if ($JOBTYPE != "repeating") { ?>
+			<tr>
+				<td width="30%">Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
+				<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this)\" onclick=\"event.cancelBubble=true;this.select();lcs(this)\"")); ?></td>
+			</tr>
+			<? } ?>
+
+			<tr>
+				<td width="30%">Number of days to run <?= help('Job_SettingsNumDays', NULL, "small"); ?></td>
+				<td><?
+				NewFormItem($f, $s, 'numdays', "selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
+				//. " onchange=\"showDate('" . date("Y M d", ($job!= null ? strtotime($job->startdate) : 'today')) . "', this.options[this.selectedIndex].value);\"");
+				$maxdays = $ACCESS->getValue('maxjobdays');
+				if ($maxdays == null) {
+					$maxdays = 7; // Max out at 7 days if the permission is not set.
+				}
+				for ($i = 1; $i <= $maxdays; $i++) {
+					NewFormItem($f, $s, 'numdays', "selectoption", $i, $i);
+				}
+				NewFormItem($f, $s, 'numdays', "selectend");
+				?> <!--
 					<span id="job_end_date">You have scheduled this job to end on <?= isset($job) ? $job->enddate : "" ?></span>
-					-->
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">Delivery window:</td>
-				<tr>
-					<td>&nbsp;&nbsp;Earliest <?= help('Job_PhoneEarliestTime', NULL, 'small') ?></td>
-					<td><? time_select($f,$s,"starttime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
-				</tr>
-				<tr>
-					<td>&nbsp;&nbsp;Latest <?= help('Job_PhoneLatestTime', NULL, 'small') ?></td>
-					<td><? time_select($f,$s,"endtime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
-				</tr>
-				<tr>
-					<td>Email a report when the job completes <?= help('Job_SendReport', NULL, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendreport","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Report</td>
-				</tr>
-			</table>
-			</div>
+					--></td>
+			</tr>
+			<tr>
+				<td colspan="2">Delivery window:</td>
+			
+			
+			<tr>
+				<td>&nbsp;&nbsp;Earliest <?= help('Job_PhoneEarliestTime', NULL, 'small') ?></td>
+				<td><? time_select($f,$s,"starttime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
+			</tr>
+			<tr>
+				<td>&nbsp;&nbsp;Latest <?= help('Job_PhoneLatestTime', NULL, 'small') ?></td>
+				<td><? time_select($f,$s,"endtime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
+			</tr>
+			<tr>
+				<td>Email a report when the job completes <?= help('Job_SendReport', NULL, 'small'); ?></td>
+				<td><? NewFormItem($f,$s,"sendreport","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Report</td>
+			</tr>
+		</table>
+		</div>
 
 		</td>
 	</tr>
-<? if($USER->authorize('sendphone')) { ?>
+	<? if($USER->authorize('sendphone')) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
 
-			<div id='displayphoneoptions'>
-<?
-					if(!$submittedmode){
-?>
-						<a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<?
-					} else {
-?>
-						&nbsp;
-<?
-					}
-?>
-			</div>
-			<div id='phoneoptions' style="display:none">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-					<tr>
-						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-						<td><? message_select('phone',$f,$s,"phonemessageid"); ?></td>
-					</tr>
-				</table>
-			</div>
+		<div id='displayphoneoptions'>
+			<? if(!$submittedmode){ ?>
+				<a href="#" onclick="displaySection('phone'); new getObj('sendphone').obj.checked=true; return false;">Click here</a> or select checkbox above. 
+			<?	} else { ?>
+					 &nbsp;
+			<?	}	?>
+		</div>
 
-			<div id='displayphonedetails' style="display:none">
-				<a href="#" onclick="displaySection('phone', true); return false; ">Show advanced options</a>
-			</div>
+		<div id='phoneoptions' style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+			<tr>
+				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+				<td><? 							
+				message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid' onclick=\"if(this.value == 0){ show('newphonetext'); hide('recordedlanguages'); }else{ hide('newphonetext'); show('recordedlanguages'); }\""); ?>
+				<div id='newphonetext'>
+					Type Your English Message Here | 
+					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
+					Automaticaly Translate 
+					<br />
+					<? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?>
+					<br />
+					Preferred Voice:
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female", "checked")?> Female 
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male")?> Male
 
-			<div id='displayphonebasic' style="display:none">
-				<a href="#" onclick="displaySection('phone', false); return false; ">Hide advanced options</a>
-			</div>
+					<div id='translationdetails' style="display: block">
+						<a href="#" onclick="translationoptions(true); return false; ">Show translation	options</a>
+					</div>
+					<div id='translationbasic' style="display: none">
+						<a href="#"	onclick="translationoptions(false); return false; ">Hide translation options</a>
+					</div>
 
-			<div id='phonedetails' style="display:none">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+					<div id='translationoptions' style="display: none">
+					<table border="0" cellpadding="2" cellspacing="0" width=100%>
 
 
-<? if($USER->authorize('sendmulti')) { ?>
+						<?
+						foreach($languagearray as $language => $languageisset) {
+							$language = htmlentities($language);
+						?>
+							<tr>
+								<td valign="top"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); ?>
+								<? echo $language; ?></td>
+								<td>
+									<div id='language_<? echo $language?>' style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">
+									<? NewFormItem($f,$s,"translationtext_$language", "text", 50,50,"id='translationtext_$language' disabled"); ?>
+									</div>
+									<div id='languageexpand_<? echo $language?>' style="display: none">
+										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 40, 3); ?>
+									</div>
+									<div id='languagedetails_<? echo $language?>' style="display: none">
+										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 40, 3); ?>
+									</div>
+								</td>
+								<td valign="top">
+									<div id='translationdetails_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
+										<a href="#"	onclick="langugaedetails('<? echo $language;?>',true); return false;">Show details</a>
+									</div>
+									<div id='translationbasic_<? echo $language?>' style="display: none">
+										<a href="#" onclick="langugaedetails('<? echo $language;?>',false); return false;">Hide details</a>
+									</div>
+								</td>
+							</tr>
+						<?}	?>
+					</table>
+				</div>
+				</div>
+				</td>
+			</tr>
+		</table>
+		</div>
 
-					<tr>
-						<td width="30%">Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
-						<td><? alternate('phone'); ?></td>
-					</tr>
-<? } ?>
-					<tr>
-						<td width="30%">Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
-						<td>
-							<?
-							$max = first($ACCESS->getValue('callmax'), 1);
-							NewFormItem($f,$s,"maxcallattempts","selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
-							for($i = 1; $i <= $max; $i++)
-							NewFormItem($f,$s,"maxcallattempts","selectoption",$i,$i);
-							NewFormItem($f,$s,"maxcallattempts","selectend");
-							?>
-						</td>
-					</tr>
-<?
-if ($USER->authorize('setcallerid')) {
-	if (getSystemSetting('_hascallback', false)) {
-?>
-					<tr>
-						<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",($submittedmode ? "DISABLED" : "")); ?> Use default Caller ID</td>
-						<td><? echo Phone::format(getSystemSetting('callerid')); ?></td>
-					</tr>
-					<tr>
-						<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",($submittedmode ? "DISABLED" : "")); ?> Preferred Caller ID</td>
-						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
-					</tr>
-<?
-	} else {
-?>
-					<tr>
-						<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
-						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
-					</tr>
-<?
- 	}
-}
-?>
-					<tr>
-						<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
-						<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
-					</tr>
+		<div id='displayphonedetails' style="display: none"><a href="#"
+			onclick="displaySection('phone', true); return false; ">Show advanced
+		options</a></div>
 
-					<? if($USER->authorize('leavemessage')) { ?>
-						<tr>
-							<td> Allow call recipients to leave a message <?= help('Jobs_VoiceResponse', NULL, 'small') ?> </td>
-							<td> <? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Accept Voice Responses </td>
-						</tr>
-					<?
-						}
-						if ($USER->authorize("messageconfirmation")){
+		<div id='displayphonebasic' style="display: none"><a href="#"
+			onclick="displaySection('phone', false); return false; ">Hide
+		advanced options</a></div>
+
+		<div id='phonedetails' style="display: none"><? if($USER->authorize('sendmulti')) { ?>
+		<div id='multilingualphoneoption' style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+			<tr>
+				<td width="30%">Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
+				<td><? alternate('phone'); ?></td>
+			</tr>
+		</table>
+		</div>
+		<? } ?>
+		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+			<tr>
+				<td width="30%">Maximum attempts <?= help('Job_PhoneMaxAttempts', NULL, 'small')  ?></td>
+				<td><?
+				$max = first($ACCESS->getValue('callmax'), 1);
+				NewFormItem($f,$s,"maxcallattempts","selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
+				for($i = 1; $i <= $max; $i++)
+				NewFormItem($f,$s,"maxcallattempts","selectoption",$i,$i);
+				NewFormItem($f,$s,"maxcallattempts","selectend");
+				?></td>
+			</tr>
+
+
+			<?
+			if ($USER->authorize('setcallerid')) {
+				if (getSystemSetting('_hascallback', false)) {
 					?>
-					<tr>
-						<td> Allow message confirmation by recipients <?= help('Job_MessageConfirmation', NULL, 'small') ?> </td>
-						<td> <? NewFormItem($f, $s, "messageconfirmation", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?> Request Message Confirmation </td>
-					</tr>
-					<?
-						}
+			<tr>
+				<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",($submittedmode ? "DISABLED" : "")); ?>
+				Use default Caller ID</td>
+				<td><? echo Phone::format(getSystemSetting('callerid')); ?></td>
+			</tr>
+			<tr>
+				<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",($submittedmode ? "DISABLED" : "")); ?>
+				Preferred Caller ID</td>
+				<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
+			</tr>
+			<?
+				} else {
 					?>
-				</table>
-			</div>
+			<tr>
+				<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
+				<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
+			</tr>
+			<?
+				}
+			}
+			?>
+			<tr>
+				<td>Skip duplicate phone numbers <?=  help('Job_PhoneSkipDuplicates', NULL, 'small') ?></td>
+				<td><? NewFormItem($f,$s,"skipduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip
+				Duplicates</td>
+			</tr>
+
+			<? if($USER->authorize('leavemessage')) { ?>
+			<tr>
+				<td>Allow call recipients to leave a message <?= help('Jobs_VoiceResponse', NULL, 'small') ?>
+				</td>
+				<td><? NewFormItem($f, $s, "leavemessage", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?>
+				Accept Voice Responses</td>
+			</tr>
+			<?
+			}
+			if ($USER->authorize("messageconfirmation")){
+				?>
+			<tr>
+				<td>Allow message confirmation by recipients <?= help('Job_MessageConfirmation', NULL, 'small') ?>
+				</td>
+				<td><? NewFormItem($f, $s, "messageconfirmation", "checkbox", 0, NULL, ($submittedmode ? "DISABLED" : "")); ?>
+				Request Message Confirmation</td>
+			</tr>
+			<?
+			}
+			?>
+		</table>
+		</div>
 
 		</td>
 	</tr>
-<? } ?>
-<? if($USER->authorize('sendemail')) { ?>
+	<? } ?>
+	<? if($USER->authorize('sendemail')) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 		<td class="bottomBorder">
-			<div id='displayemailoptions'>
-<?
-					if(!$submittedmode){
-?>
-						<a href="#" onclick="displaySection('email'); new getObj('sendemail').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<?
-					} else {
-?>
-						&nbsp;
-<?
-					}
-?>
-			</div>
+		<div id='displayemailoptions'><?
+		if(!$submittedmode){
+			?> <a href="#"
+			onclick="displaySection('email'); new getObj('sendemail').obj.checked=true; return false;">Click
+		here</a> or select checkbox above. <?
+		} else {
+			?> &nbsp; <?
+		}
+		?></div>
 
-			<div id='emailoptions' style="display:none">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-					<tr>
-						<td width="30%" >Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-						<td><? message_select('email',$f, $s,"emailmessageid"); ?></td>
-					</tr>
-				</table>
-			</div>
+		<div id='emailoptions' style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+			<tr>
+				<td width="30%">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+				<td><? message_select('email',$f, $s,"emailmessageid"); ?></td>
+			</tr>
+		</table>
+		</div>
 
-			<div id='displayemaildetails' style="display:none">
-				<a href="#" onclick="displaySection('email', true); return false; ">Show advanced options</a>
-			</div>
+		<div id='displayemaildetails' style="display: none"><a href="#"
+			onclick="displaySection('email', true); return false; ">Show advanced
+		options</a></div>
 
-			<div id='displayemailbasic' style="display:none">
-				<a href="#" onclick="displaySection('email', false); return false; ">Hide advanced options</a>
-			</div>
+		<div id='displayemailbasic' style="display: none"><a href="#"
+			onclick="displaySection('email', false); return false; ">Hide
+		advanced options</a></div>
 
-			<div id='emaildetails' style="display:none">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-<? if($USER->authorize('sendmulti')) { ?>
-					<tr>
-						<td width="30%">Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
-						<td><? alternate('email'); ?></td>
-					</tr>
-<? } ?>
-					<tr>
-						<td width="30%">Skip duplicate email addresses <?=  help('Job_EmailSkipDuplicates', NULL, 'small') ?></td>
-						<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip Duplicates</td>
-					</tr>
-				</table>
-			</div>
+		<div id='emaildetails' style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+		<? if($USER->authorize('sendmulti')) { ?>
+			<tr>
+				<td width="30%">Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
+				<td><? alternate('email'); ?></td>
+			</tr>
+			<? } ?>
+			<tr>
+				<td width="30%">Skip duplicate email addresses <?=  help('Job_EmailSkipDuplicates', NULL, 'small') ?></td>
+				<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip
+				Duplicates</td>
+			</tr>
+		</table>
+		</div>
 
 		</td>
 	</tr>
-<? } ?>
-<? if($USER->authorize('sendprint')) { ?>
+	<? } ?>
+	<? if($USER->authorize('sendprint')) { ?>
 	<tr valign="top">
 		<th align="right" valign="top" class="windowRowHeader">Print</th>
 		<td>
-			<div id='displayprintoptions'>
-<?
-					if(!$submittedmode){
-?>
-						<a href="#" onclick="displaySection('print'); new getObj('sendprint').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<?
-					} else {
-?>
-						&nbsp;
-<?
-					}
-?>
-			</div>
-			<div id='printoptions' style="display:none">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-					<tr>
-						<td width="30%" >Send printed letters <? print help('Job_PrintOptions', null, 'small'); ?></td>
-						<td><? NewFormItem($f,$s,"sendprint","checkbox",NULL,NULL,"id='sendprint' " . ($submittedmode ? "DISABLED" : "")); ?>Print</td>
-					</tr>
-					<tr>
-						<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-						<td><? message_select('print', $f, $s, "printmessageid"); ?></td>
-					</tr>
-<? if($USER->authorize('sendmulti')) { ?>
-					<tr>
-						<td>Multilingual message options <?= help('Job_MultilingualPrintOption',NULL,"small"); ?></td>
-						<td><? alternate('print'); ?></td>
-					</tr>
-<? } ?>
-<? if (0) { ?>
-					<tr>
-						<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"1"); ?> Send to all valid addresses in this list</td>
-					</tr>
-					<tr>
-						<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"0"); ?> After job completes, print letters for anyone who was not contacted</td>
-					</tr>
-<? } ?>
-				</table>
-			</div>
+		<div id='displayprintoptions'><?
+		if(!$submittedmode){
+			?> <a href="#"
+			onclick="displaySection('print'); new getObj('sendprint').obj.checked=true; return false;">Click
+		here</a> or select checkbox above. <?
+		} else {
+			?> &nbsp; <?
+		}
+		?></div>
+		<div id='printoptions' style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+			<tr>
+				<td width="30%">Send printed letters <? print help('Job_PrintOptions', null, 'small'); ?></td>
+				<td><? NewFormItem($f,$s,"sendprint","checkbox",NULL,NULL,"id='sendprint' " . ($submittedmode ? "DISABLED" : "")); ?>Print</td>
+			</tr>
+			<tr>
+				<td>Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+				<td><? message_select('print', $f, $s, "printmessageid"); ?></td>
+			</tr>
+			<? if($USER->authorize('sendmulti')) { ?>
+			<tr>
+				<td>Multilingual message options <?= help('Job_MultilingualPrintOption',NULL,"small"); ?></td>
+				<td><? alternate('print'); ?></td>
+			</tr>
+			<? } ?>
+			<? if (0) { ?>
+			<tr>
+				<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"1"); ?>
+				Send to all valid addresses in this list</td>
+			</tr>
+			<tr>
+				<td colspan="2"><? NewFormItem($f,$s,"printall","radio",NULL,"0"); ?>
+				After job completes, print letters for anyone who was not contacted</td>
+			</tr>
+			<? } ?>
+		</table>
+		</div>
 		</td>
 	</tr>
-<? } ?>
-<? if($hassms && $USER->authorize('sendsms')) { ?>
+	<? } ?>
+	<? if($hassms && $USER->authorize('sendsms')) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
-			<div id='displaysmsoptions'>
-<?
-					if(!$submittedmode){
-?>
-						<a href="#" onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true; return false;">Click here</a> or select checkbox above.
-<?
-					} else {
-?>
-						&nbsp;
-<?
-					}
-?>
-			</div>
-			<div id='smsoptions' style="display:none">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-					<tr>
-						<td width="30%" >Default message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
-						<td>
-							<? message_select('sms',$f, $s,"smsmessageid", "onclick='if(this.value == 0){ show(\"newsmstext\") }else{ hide(\"newsmstext\") }'"); ?>
-							<div id='newsmstext'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
-							<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span> characters remaining.</div>
-						</td>
-					</tr>
-				</table>
-			</div>
+		<div id='displaysmsoptions'><?
+		if(!$submittedmode){
+			?> <a href="#"
+			onclick="displaySection('sms'); new getObj('sendsms').obj.checked=true; return false;">Click
+		here</a> or select checkbox above. <?
+		} else {
+			?> &nbsp; <?
+		}
+		?></div>
+		<div id='smsoptions' style="display: none">
+		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+			<tr>
+				<td width="30%">Default message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
+				<td><? message_select('sms',$f, $s,"smsmessageid", "onclick='if(this.value == 0){ show(\"newsmstext\") }else{ hide(\"newsmstext\") }'"); ?>
+				<div id='newsmstext'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
+				<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span>
+				characters remaining.</div>
+				</td>
+			</tr>
+		</table>
+		</div>
 		</td>
 	</tr>
-<? } ?>
+	<? } ?>
 </table>
 
 <script language="javascript">
@@ -1059,114 +1164,117 @@ if ($USER->authorize('setcallerid')) {
 	var jobtypeinfo = new Array();
 
 	jobtypeinfo[""] = new Array("", "");
-<?
+	<?
 	foreach($infojobtypes as $infojobtype){
 		$info = escapehtml($infojobtype->info);
 		$info = str_replace(array("\r\n","\n","\r"),"<br>",$info);
-?>
+	?>
 		jobtypeinfo[<?=$infojobtype->id?>] = new Array("<?=$infojobtype->systempriority?>", "<?=$info?>");
-<?
-	}
-?>
+	<? } ?>
 	display_jobtype_info(new getObj('jobtypeid').obj.value);
-	smscheck = false;
-<?
+
+	var typeischecked = false;
+
+	<?
 	if($hassms && $USER->authorize('sendsms')) {
-?>
+	?>
 		var smsmessageobj = new getObj('smsmessageid').obj;
 		if(smsmessageobj && smsmessageobj.value != ""){
 				new getObj('sendsms').obj.checked = true;
 		}
-		smscheck = new getObj('sendsms').obj.checked;
 		var smsmessagedropdown = new getObj('smsmessageid').obj;
 		if(smsmessagedropdown.value != ""){
 			hide('newsmstext');
 		}
-		if(smscheck){
+		if(isCheckboxChecked('sendsms')){
+			typeischecked = true;
 			show('smsoptions');
 			hide('displaysmsoptions');
+			hide('displaysmsoptions');	
 		}
-<?
-	}
-?>
-	phonecheck = false;
-	emailcheck = false;
+	<?}?>
+
 	var phonemessageobj = new getObj('phonemessageid').obj;
 	if(phonemessageobj  && phonemessageobj .value != ""){
 		new getObj('sendphone').obj.checked = true;
 	}
 	var emailmessageobj = new getObj('emailmessageid').obj;
 	if(emailmessageobj && emailmessageobj .value != ""){
-			new getObj('sendemail').obj.checked = true;
+		new getObj('sendemail').obj.checked = true;
 	}
-	if(new getObj('sendphone').obj){
-		phonecheck = new getObj('sendphone').obj.checked;
-		if(phonecheck){
-			show('phoneoptions');
-<?
+	if(isCheckboxChecked('sendphone')){
+		typeischecked = true;
+		show('phoneoptions');
+		hide('displayphoneoptions');	
 
-	if ($_SESSION['jobid'] != null) {
-		$diffvalues = $job->compareWithDefaults();
-	}
-	if ((isset($diffvalues['phonelang']) ||
-		isset($diffvalues['maxcallattempts']) ||
-		isset($diffvalues['callerid']) ||
-		isset($diffvalues['radiocallerid']) ||
-		isset($diffvalues['skipduplicates']) ||
-		isset($diffvalues['leavemessage']) ||
-		isset($diffvalues['messageconfirmation'])
-		) ||
-		(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
-		?> displayphonedetailsstate = 'hidden'; <?
-	}
-?>
-			if (displayphonedetailsstate == 'visible') {
+		if(document.getElementById('phonemessageid') != null && document.getElementById('phonemessageid').value == 0) { 
+			show('newphonetext');
+			hide('recordedlanguages'); 
+		} else {
+			hide('newphonetext');
+			show('recordedlanguages');
+		}
+
+		
+		<?
+		if ($_SESSION['jobid'] != null) {
+			$diffvalues = $job->compareWithDefaults();
+		}
+		if ((isset($diffvalues['phonelang']) ||
+			isset($diffvalues['maxcallattempts']) ||
+			isset($diffvalues['callerid']) ||
+			isset($diffvalues['radiocallerid']) ||
+			isset($diffvalues['skipduplicates']) ||
+			isset($diffvalues['leavemessage']) ||
+			isset($diffvalues['messageconfirmation'])) ||
+			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
+		?> 
+			displayphonedetailsstate = 'hidden'; 
+		<? } ?>
+		if (displayphonedetailsstate == 'visible') {
 				show('displayphonedetails');
-			} else {
-				show('phonedetails');
-				show('displayphonebasic');
-			}
+		} else {
+			show('phonedetails');
+			show('displayphonebasic');
+		}	
+	}
+	if(isCheckboxChecked('sendemail')){
+		typeischecked = true;
+		show('emailoptions');
+		hide('displayemailoptions');
+		
+		<?
+		if ($_SESSION['jobid'] != null) {
+			$diffvalues = $job->compareWithDefaults();
+		}
+		if ((isset($diffvalues['emaillang']) ||
+			isset($diffvalues['skipemailduplicates'])) ||
+			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
+		?>
+			displayemaildetailsstate = 'hidden';
+		<? } ?>
+		if (displayemaildetailsstate == 'visible') {
+			show('displayemaildetails');
+		} else {
+			show('emaildetails');
+			show('displayemailbasic');
 		}
 	}
-	if(new getObj('sendemail').obj){
-		emailcheck = new getObj('sendemail').obj.checked;
-		if(emailcheck){
-			show('emailoptions');
-<?
-	if ($_SESSION['jobid'] != null) {
-		$diffvalues = $job->compareWithDefaults();
-	}
-	if ((isset($diffvalues['emaillang']) ||
-		isset($diffvalues['skipemailduplicates'])
-		) ||
-		(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
-		?> displayemaildetailsstate = 'hidden'; <?
-	}
-?>
-			if (displayemaildetailsstate == 'visible') {
-				show('displayemaildetails');
-			} else {
-				show('emaildetails');
-				show('displayemailbasic');
-			}
-		}
-	}
-	if( phonecheck || emailcheck || smscheck ){
+	if(	typeischecked == true ){
 		show('settings');
-<?
-	if ($_SESSION['jobid'] != null) {
-		$diffvalues = $job->compareWithDefaults();
-	}
-	if ((isset($diffvalues['startdate']) ||
-		isset($diffvalues['enddate']) ||
-		isset($diffvalues['starttime']) ||
-		isset($diffvalues['endtime']) ||
-		isset($diffvalues['sendreport'])
-		) ||
-		(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
-		?> displaysettingsdetailsstate = 'hidden'; <?
-	}
-?>
+		<?
+		if ($_SESSION['jobid'] != null) {
+			$diffvalues = $job->compareWithDefaults();
+		}
+		if ((isset($diffvalues['startdate']) ||
+			isset($diffvalues['enddate']) ||
+			isset($diffvalues['starttime']) ||
+			isset($diffvalues['endtime']) ||
+			isset($diffvalues['sendreport'])) ||
+			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
+		?> 
+			displaysettingsdetailsstate = 'hidden'; 
+		<? } ?>
 		if (displaysettingsdetailsstate == 'visible') {
 			show('displaysettingsdetails');
 		} else {
@@ -1297,18 +1405,22 @@ function hideSection(section){
 			show('displaysmsoptions');
 			break;
 	}
-	phonecheck = false;
-	emailcheck = false;
-	smscheck = false;
 
-	if(new getObj('sendphone').obj)
-		phonecheck = new getObj('sendphone').obj.checked;
-	if(new getObj('sendemail').obj)
-		emailcheck = new getObj('sendemail').obj.checked;
-	if(new getObj('sendsms').obj)
-		smscheck = new getObj('sendsms').obj.checked;
-
-	if(!phonecheck && !emailcheck && !smscheck){
+	var typeischecked = false;
+	if(isCheckboxChecked('sendphone')){
+		typeischecked = true;
+		hide('displayphoneoptions');
+	}
+	if(isCheckboxChecked('sendemail')){
+		typeischecked = true;
+		hide('displayemailoptions');
+	}
+	if(isCheckboxChecked('sendsms')){
+		typeischecked = true;
+		hide('displaysmsoptions');	
+	}
+	
+	if(typeischecked == false){
 		hide('settings');
 		hide('displaysettingsdetails');
 		hide('settingsdetails');
@@ -1320,11 +1432,64 @@ function hideSection(section){
 function clickIcon(section){
 	var checkbox = new getObj('send' + section).obj;
 	checkbox.checked = !checkbox.checked;
-
+	
 	if(checkbox.checked){
 		displaySection(section);
 	} else {
 		hideSection(section);
+	}
+}
+
+// If Automatic translation is selected
+function automatictranslation(){
+	if(isCheckboxChecked('translatecheckone')){
+		show('translationdetails');
+	} else {
+		hide('translationdetails');
+	}	
+	hide('translationbasic');
+	hide('translationoptions');
+}
+// Show Translation options
+function translationoptions(details){
+	if (details) {
+		show('translationoptions');
+		hide('translationdetails');
+		show('translationbasic');
+	} else {
+		hide('translationoptions');
+		show('translationdetails');
+		hide('translationbasic');
+	}
+}
+
+// If language checkbox is selected
+function translationlanguage(language){
+	if(isCheckboxChecked('translate_' + language)){
+		show('language_' + language);
+		show('translationdetails_' + language);
+	} else {
+		hide('language_' + language);
+		hide('translationdetails_' + language);
+	}	
+	hide('languageexpand_' + language);
+	hide('languagedetails_' + language);	
+}
+
+//If language details is clicked
+function langugaedetails(language, details){
+	if(details){
+		hide('language_' + language);
+		show('languageexpand_' + language);
+		show('languagedetails_' + language);
+		show('translationbasic_' + language);
+		hide('translationdetails_' + language);
+	} else {
+		show('language_' + language);
+		hide('languageexpand_' + language);
+		hide('languagedetails_' + language);
+		hide('translationbasic_' + language);
+		show('translationdetails_' + language);	
 	}
 }
 
