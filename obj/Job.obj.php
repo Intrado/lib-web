@@ -127,7 +127,6 @@ class Job extends DBMappedObject {
 							from joblanguage where jobid=$this->id");
 
 						$newjob->runNow();
-						sleep(3);
 						return $newjob;
 
 					}
