@@ -200,7 +200,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	<tr>
 		<td>Authorized: </td>
 		<td><?
-		
+
 		switch ($dm['enablestate']) {
 		case "active":
 			echo "Authorized";
@@ -212,7 +212,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 			echo "Unauthorized";
 			break;
 		}
-		
+
 		?></td>
 	</tr>
 	<tr>
@@ -229,7 +229,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	</tr>
 	<tr>
 		<td><div id='weightedresult1' style='display:none'>Test Weighted Results:</span></td>
-		<td><div id='weightedresult2' style='display:none'><?=NewFormItem($f, $s, "testweightedresults", "text", 30, 250)?></span></td>
+		<td><div id='weightedresult2' style='display:none'><?=NewFormItem($f, $s, "testweightedresults", "text", 30, 250)?>  A=3&M=3&B=2&N=2&X=1&F=1</span></td>
 	</tr>
 	<tr>
 		<td>Caller ID:</td>
