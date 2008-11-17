@@ -153,29 +153,33 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->description = trim(GetFormData($f,$s,"description"));
 				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
 			} else {
+				
+				// If this is a phonemessage and no message was selected the message is a translation message and the phonetextarea is requerd to be fuild in. 
 				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phonemessageid") == ""){
 					$themessageid = null;
-					// If this Message was create in job editor we are free to edit the message, otherwise we have to create a new message
-					if($job->getSetting('translationmessage')) {
+					// If this Message was created in job editor we are free to edit the message, otherwise we have to create a new message
+					if($job->getSetting('translationmessage') && $job->phonemessageid) {
 						$themessageid = $job->phonemessageid;
-						//update the parts
+						//Delete the part(s) of the message 
 						QuickUpdate("delete from messagepart where messageid=$themessageid");
-					} else {
-						$job->setSetting('translationmessage', 1); // Tell the job that this message was created here
-					}					
-					$newphonemessage = new Message($themessageid);		
-					$parts = $newphonemessage->parse(GetFormData($f, $s, 'phonetextarea'));
+					} 
+					$job->setSetting('translationmessage', 1); // Tell the job that this message was created here
+					$newphonemessage = new Message($themessageid);	
 					$newphonemessage->userid = $USER->id;
 					$newphonemessage->type = 'phone';
 					$newphonemessage->name = GetFormData($f, $s,'name') . date(" M j, Y g:i:s", strtotime("now"));
 					$newphonemessage->description = "Translated message";
 					$newphonemessage->deleted = 1;
 					$newphonemessage->update();
-
-					foreach($parts as $part){
-						$part->messageid = $newphonemessage->id;
-						$part->create();
-					}		
+					
+					$part = new MessagePart();
+					$part->messageid = $newphonemessage->id;
+					$part->type="T";
+					$part->voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = '" . DBSafe(GetFormData($f, $s, 'voiceselect')) . "'");
+					$part->txt = GetFormData($f, $s, 'phonetextarea');
+					$part->sequence = 0;
+					$part->create();	
+	
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');	
 				}
@@ -191,8 +195,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$job->setSetting('jobcreatedsms', 1); // Tell the job that this message was created here
 					}		
 					$newsmsmessage = new Message($themessageid);
-					
-					$parts = $newsmsmessage->parse(GetFormData($f, $s, 'smsmessagetxt'));
 					$newsmsmessage->userid = $USER->id;
 					$newsmsmessage->type = 'sms';
 					$newsmsmessage->name = GetFormData($f, $s,'name') . date(" M j, Y g:i:s", strtotime("now"));
@@ -200,10 +202,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$newsmsmessage->deleted = 1;
 					$newsmsmessage->update();
 					
-					foreach($parts as $part){
-						$part->messageid = $newsmsmessage->id;
-						$part->create();
-					}
+					$part = new MessagePart();
+					$part->messageid = $newsmsmessage->id;
+					$part->type="T";
+					$part->txt = GetFormData($f, $s, 'smsmessagetxt');
+					$part->sequence = 0;
+					$part->create();	
 					
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, 'smsmessageid', $newsmsmessage->id, 'number', 'nomin', 'nomax');
