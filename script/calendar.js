@@ -158,7 +158,7 @@ function f_cpps(obj) {
 }
 
 function f_hds(obj) {
-	obj.style.background='#FFF799';
+	obj.style.background='#FFF799';//'#FF0000';
 	obj.style.font='bold 10px Arial';
 	obj.style.color='#333333';
 	obj.style.textAlign='center';
@@ -178,7 +178,8 @@ function prepcalendar(hd,cm,cy) {
 	getCalObj('mns').innerHTML=mn[cm]+ ' ' + cy;
 	marr=((cy%4)==0)?mnl:mnn;
 	for(var d=1;d<=42;d++) {
-		f_cps(getCalObj('v'+parseInt(d)));
+		var strd = 'v'+parseInt(d);
+		f_cps(getCalObj(strd));          // Set to standard square
 		if ((d >= (cd -(-1))) && (d<=cd-(-marr[cm]))) {
 			
 			dip=false;
@@ -187,26 +188,26 @@ function prepcalendar(hd,cm,cy) {
 			else if(!allowpast&&allowfuture)
 				dip=((d-cd < sd)&&(cm==sccm)&&(cy==sccy));
 			htd=((hd!='')&&(d-cd==hd));
-			if (dip)
-				f_cpps(getCalObj('v'+parseInt(d)));
-			else if (htd)
-				f_hds(getCalObj('v'+parseInt(d)));
-			else
-				f_cps(getCalObj('v'+parseInt(d)));
-
-			getCalObj('v'+parseInt(d)).onmouseover=(dip)?null:cs_over;
-			getCalObj('v'+parseInt(d)).onmouseout=(dip)?null:cs_out;
-			getCalObj('v'+parseInt(d)).onclick=(dip)?null:cs_click;
+			if (dip) {
+				f_cpps(getCalObj(strd));  // Blocked square
+			} else if (htd) {
+				f_hds(getCalObj(strd));   // Highlight current date selected
+			}
+			getCalObj(strd).onmouseover=(dip)?null:cs_over;
+			getCalObj(strd).onmouseout=(dip)?null:cs_out;
+			getCalObj(strd).onclick=(dip)?null:cs_click;
 			
-			getCalObj('v'+parseInt(d)).innerHTML=d-cd;	
+			getCalObj(strd).innerHTML=d-cd;	
 			calvalarr[d]=''+(cm-(-1))+'/'+(d-cd)+'/'+cy;
 		}
 		else {
 			getCalObj('v'+d).innerHTML='&nbsp;';
-			getCalObj('v'+parseInt(d)).onmouseover=null;
-			getCalObj('v'+parseInt(d)).onmouseout=null;
-			getCalObj('v'+parseInt(d)).style.cursor='default';
-			}
+			getCalObj(strd).onmouseover=null;
+			getCalObj(strd).onmouseout=null;
+			getCalObj(strd).onclick=null;
+
+			getCalObj(strd).style.cursor='default';
+		}
 	}
 }
 
