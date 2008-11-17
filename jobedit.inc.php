@@ -846,7 +846,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<? if ($JOBTYPE != "repeating") { ?>
 			<tr>
 				<td width="30%">Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
-				<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this,true,false)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,false)\"")); ?></td>
+				<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")); ?></td>
 			</tr>
 			<? } ?>
 
