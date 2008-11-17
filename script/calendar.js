@@ -14,8 +14,13 @@ function checkClick(e) {
 	e?evt=e:evt=event;
 	CSE=evt.target?evt.target:evt.srcElement;
 	if (getCalObj('fc'))
-		if (!isChild(CSE,getCalObj('fc')))
+		if (!isChild(CSE,getCalObj('fc'))) {
 			getCalObj('fc').style.display='none';
+			if( document.getElementById("hideforcalendar") ){
+				calendarframe = document.getElementById("hideforcalendar");
+				calendarframe.style.display = "none";
+			}
+		}
 }
 
 function isChild(s,d) {
@@ -58,8 +63,13 @@ function Top(obj)
 		curtop += obj.y;
 	return curtop;
 }
-	
-document.write('<table id="fc" style="position:absolute;border-collapse:collapse;background:#FFFFFF;border:1px solid #ABABAB;display:none" cellpadding=2>');
+
+//IE stuff
+
+
+
+
+document.write('<table id="fc" style="position:absolute;z-index:1;display:none;border-collapse:collapse;background:#FFFFFF;border:1px solid #ABABAB" cellpadding=2>');
 document.write('<tr><td style="cursor:pointer" onclick="csubm()"><img src="img/arrowleftmonth.gif"></td><td colspan=5 id="mns" align="center" style="font:bold 13px Arial"></td><td align="right" style="cursor:pointer" onclick="caddm()"><img src="img/arrowrightmonth.gif"></td></tr>');
 document.write('<tr><td align=center style="background:#ABABAB;font:12px Arial">S</td><td align=center style="background:#ABABAB;font:12px Arial">M</td><td align=center style="background:#ABABAB;font:12px Arial">T</td><td align=center style="background:#ABABAB;font:12px Arial">W</td><td align=center style="background:#ABABAB;font:12px Arial">T</td><td align=center style="background:#ABABAB;font:12px Arial">F</td><td align=center style="background:#ABABAB;font:12px Arial">S</td></tr>');
 for(var kk=1;kk<=6;kk++) {
@@ -91,10 +101,28 @@ function lcs(ielem,allowpast,allowfuture) {
 	this.allowpast=allowpast;
 	this.allowfuture=allowfuture;
 	updobj=ielem;
+	getCalObj('fc').style.display='';
 	getCalObj('fc').style.left=Left(ielem);
 	getCalObj('fc').style.top=Top(ielem)+ielem.offsetHeight;
-	getCalObj('fc').style.display='';
-	
+
+
+	if(!document.getElementById("hideforcalendar")) {
+		calendarframe = document.createElement("iframe");
+		calendarframe.id = "hideforcalendar";
+		calendarframe.frameBorder = "0";
+		calendarframe.src = "about:blank";
+		calendarframe.scrolling = "no";
+		calendarframe.style.position = "absolute";
+		calendarframe.style.zIndex = "0";
+		document.body.appendChild(calendarframe);
+	} 
+	calendarframe = document.getElementById("hideforcalendar");
+	calendarframe.style.display = "block";
+	calendarframe.style.top = (getCalObj('fc').offsetTop).toString() + "px";
+	calendarframe.style.left = (getCalObj('fc').offsetLeft).toString() + "px";
+	calendarframe.style.width = (getCalObj('fc').offsetWidth).toString() + "px";
+	calendarframe.style.height = (getCalObj('fc').offsetHeight).toString() + "px";
+	//alert("ok");
 	// First check date is valid
 	curdt=ielem.value;
 	curdtarr=curdt.split('/');
@@ -129,6 +157,9 @@ function cs_out(e) {
 function cs_click(e) {
 	updobj.value=calvalarr[evtTgt(EvtObj(e)).id.substring(1,evtTgt(EvtObj(e)).id.length)];
 	getCalObj('fc').style.display='none';
+	
+	calendarframe = document.getElementById("hideforcalendar");
+	calendarframe.style.display = "none";
 	
 }
 
