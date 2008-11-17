@@ -81,13 +81,15 @@ var sccm=now.getMonth();
 var sccy=now.getFullYear();
 var ccm=now.getMonth();
 var ccy=now.getFullYear();
-var predate;
+var allowpast = true;
+var allowfuture = true;
 
 var updobj;
 
 // Main function Pass in the element text element that the calendar is working on 
-function lcs(ielem,pastdates) {
-	predate=pastdates;
+function lcs(ielem,allowpast,allowfuture) {
+	this.allowpast=allowpast;
+	this.allowfuture=allowfuture;
 	updobj=ielem;
 	getCalObj('fc').style.left=Left(ielem);
 	getCalObj('fc').style.top=Top(ielem)+ielem.offsetHeight;
@@ -180,9 +182,9 @@ function prepcalendar(hd,cm,cy) {
 		if ((d >= (cd -(-1))) && (d<=cd-(-marr[cm]))) {
 			
 			dip=false;
-			if(predate&&(cm==sccm)&&(cy==sccy))
+			if(allowpast&&!allowfuture&&(cm==sccm)&&(cy==sccy))
 				dip=!(d-cd <= sd);
-			else
+			else if(!allowpast&&allowfuture)
 				dip=((d-cd < sd)&&(cm==sccm)&&(cy==sccy));
 			htd=((hd!='')&&(d-cd==hd));
 			if (dip)
@@ -237,13 +239,13 @@ function csubm() {
 }
 
 function cdayf() {
-if (!predate&&((ccy>sccy)|((ccy==sccy)&&(ccm>=sccm)))){
+if (allowfuture&&((ccy>sccy)|((ccy==sccy)&&(ccm>=sccm)))){
 	return;
-} else if (predate&&((ccy<sccy)|((ccy==sccy)&&(ccm<=sccm)))){
+} else if (allowpast&&((ccy<sccy)|((ccy==sccy)&&(ccm<=sccm)))){
 	return;
-}
-
-else {
+} else if (allowpast&&allowfuture) {
+	return;
+}else {
 	ccy=sccy;
 	ccm=sccm;
 	//cfd=scfd;

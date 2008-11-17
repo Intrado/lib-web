@@ -260,10 +260,10 @@ foreach ($fieldmaps as $fieldmap) {
 			
 			echo '</div></td><td nowrap><div dependson="reldate_val2" style="display: none;">';
 			PutFormData($f,$s,"newrulevalue2_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,false)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false)\"");
+			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,true)\"");
 			echo '</div></td><td nowrap><div dependson="reldate_val3" style="display: none;">&nbsp;and&nbsp;';
 			PutFormData($f,$s,"newrulevalue3_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,false)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false)\"");
+			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,true)\"");
 			echo '</div></td><td nowrap><div dependson="reldate_val4" style="display: none;">';
 			PutFormData($f,$s,"newrulevalue4_" . $fieldnum,"","numeric");
 			NewFormItem($f,$s,"newrulevalue4_" . $fieldnum,"text",8,20);
