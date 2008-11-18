@@ -107,6 +107,17 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,"view")){
 	{
 		MergeSectionFormData($f, $s);
 
+		if(GetFormData($f, $s, "relativedate") != "xdays") {
+			PutFormData($f, $s, 'xdays',"", "number");
+		} else {
+			TrimFormData($f, $s,'xdays');
+		}
+		TrimFormData($f, $s,'personid');
+		TrimFormData($f, $s,'phone');
+		TrimFormData($f, $s,'email');
+		TrimFormData($f, $s,'startdate');
+		TrimFormData($f, $s,'enddate');
+			
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime(GetFormData($f, $s, 'startdate'))){

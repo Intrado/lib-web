@@ -93,9 +93,15 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		MergeSectionFormData($f, $s);
 		//do check
 
-		$startdate = GetformData($f, $s, "startdate");
-		$enddate = GetFormData($f, $s, "enddate");
+		$startdate = TrimFormData($f, $s, "startdate");
+		$enddate = TrimFormData($f, $s, "enddate");
 
+		if(GetFormData($f, $s, "relativedate") != "xdays") {
+			PutFormData($f, $s, 'xdays',"", "number");
+		} else {
+			TrimFormData($f, $s,'xdays');
+		}
+		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
