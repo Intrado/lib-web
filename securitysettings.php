@@ -44,6 +44,12 @@ if(CheckFormSubmit($f,$s))
 	{
 		MergeSectionFormData($f, $s);
 
+		TrimFormData($f, $s, "usernamelength");
+		TrimFormData($f, $s, "passwordlength");
+		TrimFormData($f, $s, "loginlockoutattempts");
+		TrimFormData($f, $s, "loginlockouttime");
+		TrimFormData($f, $s, "logindisableattempts");
+		
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
