@@ -340,5 +340,8 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 endWindow();
 buttons();
 endForm();
+?>
+<script SRC="script/calendar.js"></script>
+<? 
 include_once("navbottom.inc.php");
 ?>
