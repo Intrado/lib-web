@@ -69,8 +69,15 @@ if(CheckFormSubmit($f, $s))
 	else
 	{
 		MergeSectionFormData($f, $s);
+		
 		$emaillist = GetFormData($f, $s, "email");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
+		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
+		
+		TrimFormData($f, $s,'name');
+		TrimFormData($f, $s,'description');
+		TrimFormData($f, $s,'date');		
+		
 		$radio = GetFormData($f, $s, "radio");
 		//do check
 		if( CheckFormSection($f, $s) ) {
@@ -223,7 +230,7 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 									<div id='monthly'>Day of Month</div>
 								</td>
 								<td>
-									<div id='date2'><? NewFormItem($f, $s, 'date', 'text', '25')?></div>
+									<div id='date2'><? NewFormItem($f, $s, 'date', 'text', '25',NULL,"onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")?></div>
 									<div id='weekly2'>
 										<table border="0" cellpadding="2" cellspacing="1" class="list">
 											<tr class="listHeader" align="left" valign="bottom">
@@ -274,8 +281,10 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 EndWindow();
 buttons();
 EndForm();
+
 include("navbottom.inc.php");
 ?>
+<script SRC="script/calendar.js"></script>
 <script>
 <?
 	switch($radio){
