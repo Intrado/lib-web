@@ -19,16 +19,21 @@ function getRuleFromForm($f, $s){
 			$rule = new Rule();
 			$rule->logical = $logic;
 			$rule->op = $op;
+			
 			if ($op == "num_range") //if its a range, we need to get the other value too
-				$rule->val = ($value + 0.0) . "|" . ($value2 + 0.0);
+				$rule->val = (ereg_replace("[^0-9\-\.]*","",$value) + 0.0) . "|" . (ereg_replace("[^0-9\-\.]*","",$value2) + 0.0);
 			else if ($op == "date_range") //if its a range, we need to get the other value too
 				$rule->val = date('m/d/Y',strtotime($value2 == "" ? "today" : $value2)) . "|" . date('m/d/Y',strtotime($value3 == "" ? "today" : $value3));
 			else if ($type == "reldate" && $op == "eq")
 				$rule->val = date('m/d/Y',strtotime($value2 == "" ? "today" : $value2));
 			else if ($type == "reldate" && $op == "date_offset")
-				$rule->val = $value4 + 0;
+				$rule->val = ereg_replace("[^0-9\-]*","",$value4) + 0;
+			else if (strpos($op,"num_") === 0)
+				$rule->val = ereg_replace("[^0-9\-\.]*","",$value) + 0.0;
+			else if ($type == 'multisearch' && is_array($value))
+				$rule->val = implode("|",$value);
 			else
-				$rule->val = ($type == 'multisearch' && is_array($value)) ? implode("|",$value) : $value;
+				$rule->val = $value;
 			$rule->fieldnum = $fieldnum;
 		}
 	}
