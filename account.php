@@ -104,6 +104,10 @@ if(CheckFormSubmit($f,$s))
 			$newcode = getNextAvailableAccessCode(DBSafe($accesscode), $USER->id);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
+		} elseif (empty($accesscode) && !ereg("^0*$", $pincode)) {
+			$accesscode = getNextAvailableAccessCode("0000", $_SESSION['userid']);
+			PutFormData($f, $s, 'accesscode', $accesscode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
+			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif(!passwordcheck(GetFormData($f, $s, "password"))){
 			error('Your password must contain at least 2 of the following: a letter, a number or a symbol', $securityrules);
 		} elseif(($issame=validateNewPassword($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname'))) && !$USER->ldap) {
@@ -233,6 +237,7 @@ if( $reloadform )
 	$pass = $USER->id ? '00000000' : '';
 	PutFormData($f,$s,"password",$pass,"text");
 	PutFormData($f,$s,"passwordconfirm",$pass,"text");
+	$pass = $USER->accesscode ? '00000000' : '';
 	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
 	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
 
