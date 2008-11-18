@@ -23,32 +23,41 @@ if (!$USER->authorize("sendphone")) {
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+$_SESSION['textpreview'] = false;
 
 if (isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
 	if (userOwns("message", $id)) {
 		$_SESSION['previewmessageid'] = $id;
 	}
-
+	$_SESSION['ttstext'] = NULL;
+	$_SESSION['ttslanguage'] = NULL;
+	$_SESSION['ttsgender'] = NULL;
+	redirect();
+} else if (isset($_GET['text'])&&isset($_GET['language'])&&isset($_GET['gender'])) {
+	$_SESSION['ttstext'] = $_GET['text'];
+	$_SESSION['ttslanguage'] = $_GET['language'];
+	$_SESSION['ttsgender'] = $_GET['gender'];
+	$_SESSION['previewmessageid'] = NULL;
 	redirect();
 }
 
+
 $messageid = $_SESSION['previewmessageid'];
 
-//find all unique fields used in this message
-
-$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
-
-$dopreview = 0;
 $fields = array();
-if (count($messagefields) > 0) {
-	foreach ($messagefields as $fieldmap)
-		$fields[$fieldmap->fieldnum] = $fieldmap;
-} else {
-	$dopreview = 1; //go ahead and preview w/o submiting form if there are no fields in the message
-	$previewdata = "&qt=";
-}
+$dopreview = 1; //go ahead and preview w/o submiting form if there are no fields in the message
+$previewdata = "&qt=";
 
+if($messageid) {	
+	//find all unique fields used in this message
+	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
+	if (count($messagefields) > 0) {
+		$dopreview = 0;
+		foreach ($messagefields as $fieldmap)
+			$fields[$fieldmap->fieldnum] = $fieldmap;
+	}
+}
 /****************** main message section ******************/
 
 $f = "messagepreview";
@@ -82,8 +91,6 @@ if(CheckFormSubmit($f,$s)) {
 
 if ($reloadform) {
 	ClearFormData($f);
-
-
 
 	if (isset($fields['f01']))
 		PutFormData($f,$s,"f01",$USER->firstname);
@@ -181,11 +188,19 @@ if ($dopreview) {
 
 	<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id=<?= $messageid ?><?= $previewdata ?>">
 	<param name="controller" value="true">
-	<EMBED SRC="preview.wav.php/embed_preview.wav?id=<?= $messageid ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>
+	
+	<? if ($_SESSION['ttstext']) { ?>
+		<EMBED SRC="preview.wav.php/embed_preview.wav?text=<?= $_SESSION['ttstext'] ?>&language=<?= $_SESSION['ttslanguage']  ?>&gender=<?=	$_SESSION['ttsgender'] ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>	
+	<? } else {?>
+		<EMBED SRC="preview.wav.php/embed_preview.wav?id=<?= $messageid ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>
+	<? } ?>
 	</OBJECT>
 
-
-	<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>">Click here to download</a>
+	<? if ($_SESSION['ttstext']) { ?>
+		<br><a href="preview.wav.php/download_preview.wav?text=<?= $_SESSION['ttstext'] ?>&language=<?= $_SESSION['ttslanguage'] ?>&gender=<?= $_SESSION['ttsgender'] ?>&download=true<?= $previewdata ?>">Click here to download</a>	
+	<? } else {?>
+		<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>">Click here to download</a>
+	<? } ?>
 	</div>
 <?
 	endWindow();
