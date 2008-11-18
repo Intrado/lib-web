@@ -1,4 +1,5 @@
 <?
+error_reporting(E_NOTICE);
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,8 +106,8 @@ if(CheckFormSubmit($f,$s))
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif (empty($accesscode) && !ereg("^0*$", $pincode)) {
-			$accesscode = getNextAvailableAccessCode("0000", $_SESSION['userid']);
-			PutFormData($f, $s, 'accesscode', $accesscode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
+			$newcode = getNextAvailableAccessCode(DBSafe($accesscode), $USER->id);
+			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif(!passwordcheck(GetFormData($f, $s, "password"))){
 			error('Your password must contain at least 2 of the following: a letter, a number or a symbol', $securityrules);
