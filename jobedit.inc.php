@@ -562,7 +562,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 		NewFormItem($form,$section,$name, "selectend");
 		?></td>
 		<?	if ($type == "phone") { ?>
-		<td><?= button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);") ?>
+		<td><?= button('Play', "previewplay()")?>
 		</td>
 		<?	} ?>
 	</tr>
@@ -915,8 +915,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?>
 					<br />
 					Preferred Voice:
-					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female", "checked")?> Female 
-					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male")?> Male
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked")?> Female 
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice'")?> Male
 
 					<div id='translationdetails' style="display: block">
 						<a href="#" onclick="translationoptions(true); return false; ">Show translation	options</a>
@@ -941,13 +941,19 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									<? NewFormItem($f,$s,"translationtext_$language", "text", 50,50,"id='translationtext_$language' disabled"); ?>
 									</div>
 									<div id='languageexpand_<? echo $language?>' style="display: none">
-										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 40, 3); ?>
+										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 40, 3,"id='translationtextexpand_$language'"); ?>
 									</div>
 									<div id='languagedetails_<? echo $language?>' style="display: none">
 										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 40, 3); ?>
 									</div>
 								</td>
 								<td valign="top">
+									<div id='translationpreview_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
+										<?= button('Play', "previewlanguage('$language')")?>
+									</div>
+								</td>
+								<td valign="top">
+
 									<div id='translationdetails_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
 										<a href="#"	onclick="langugaedetails('<? echo $language;?>',true); return false;">Show details</a>
 									</div>
@@ -1497,9 +1503,11 @@ function translationoptions(details){
 function translationlanguage(language){
 	if(isCheckboxChecked('translate_' + language)){
 		show('language_' + language);
+		show('translationpreview_' + language);
 		show('translationdetails_' + language);
 	} else {
 		hide('language_' + language);
+		hide('translationpreview_' + language);
 		hide('translationdetails_' + language);
 	}	
 	hide('languageexpand_' + language);
@@ -1549,6 +1557,31 @@ function display_jobtype_info(value){
 	}
 ?>
 }
+
+function previewplay() {
+	var audio = new getObj('phonemessageid').obj;
+	var textarea = new getObj('phonetextarea').obj;	
+	if(audio.selectedIndex >= 1)
+		popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);
+	else {
+		var voice = 'female';
+		if(isCheckboxChecked('male_voice')) {
+			voice = 'male';
+		}	
+		popup('previewmessage.php?text=' + textarea.value + '&language=english&gender=' + voice, 400, 400);
+	}
+}
+function previewlanguage(language) {
+	var voice = 'female';
+	if(isCheckboxChecked('male_voice')) {
+		voice = 'male';
+	}	
+	var text = new getObj('translationtextexpand_' + language).obj;
+	popup('previewmessage.php?text=' + text.value + '&language=english&gender=' + voice, 400, 400);
+}
+
+
+
 </script>
 <script SRC="script/calendar.js"></script>
 <?
