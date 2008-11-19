@@ -72,7 +72,7 @@ foreach ($fieldmaps as $fieldmap) {
 					$values = explode("|",$rule->val);
 					echo '<td class="border">' . $values[0] . ' and ' . $values[1] . '</td>';
 				} else {
-					echo '<td class="border">' . ($rule->val != "" ? $rule->val : '&nbsp;') . '</td>';
+					echo '<td class="border">' . $rule->val . '</td>';
 				}
 			} elseif(showmode("multisearch")) {
 				if ($rule->logical == "and") {
@@ -94,7 +94,7 @@ foreach ($fieldmaps as $fieldmap) {
 					$values = explode("|",$rule->val);
 					echo '<td class="border">' . $values[0] . ' and ' . $values[1] . '</td>';
 				} else {
-					echo '<td class="border">' . ($rule->val != "" ? $rule->val : '&nbsp;') . '</td>';
+					echo '<td class="border">' . $rule->val . '</td>';
 				}
 			}
 if (!$readonly) {
@@ -260,13 +260,13 @@ foreach ($fieldmaps as $fieldmap) {
 			
 			echo '</div></td><td nowrap><div dependson="reldate_val2" style="display: none;">';
 			PutFormData($f,$s,"newrulevalue2_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,true)\"");
+			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",10,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false)\"");
 			echo '</div></td><td nowrap><div dependson="reldate_val3" style="display: none;">&nbsp;and&nbsp;';
 			PutFormData($f,$s,"newrulevalue3_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",8,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,true)\"");
+			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",10,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false)\"");
 			echo '</div></td><td nowrap><div dependson="reldate_val4" style="display: none;">';
 			PutFormData($f,$s,"newrulevalue4_" . $fieldnum,"","numeric");
-			NewFormItem($f,$s,"newrulevalue4_" . $fieldnum,"text",8,20);
+			NewFormItem($f,$s,"newrulevalue4_" . $fieldnum,"text",10,20);
 			echo '</div></td></tr></table>';
 			
 
@@ -299,10 +299,10 @@ foreach ($fieldmaps as $fieldmap) {
 		} else if (showmode("numeric")) {
 			echo '<table border=0 cellpadding=0 cellspacing=0><tr><td nowrap>';
 			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",8,20);
+			NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",10,20);
 			echo '</td><td nowrap><div dependson="numeric_range_field" style="display: none;">&nbsp;and&nbsp;';
 			PutFormData($f,$s,"newrulevalue2_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",8,20);
+			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",10,20);
 			echo '</div></td></tr></table>';
 		}
 
