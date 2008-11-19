@@ -11,11 +11,14 @@ $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 $primary = $scheme['colors']['_brandprimary'];
 $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
 
+header('Content-type: text/html; charset=UTF-8') ;
+
 if ($IS_COMMSUITE) {
 ?>
 <html>
 <head>
-<title>SchoolMessenger <?=$TITLE?></title>
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<title>SchoolMessenger <?=$TITLE?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/nav.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
@@ -41,8 +44,8 @@ if (file_exists($logofilename) ) {
 ?>
 <html>
 <head>
-<title><?=$CustomBrand?> <?=$TITLE?></title>
-
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<title><?=$CustomBrand?> <?=$TITLE?></title>
 </head>
 <body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #<?=$primary?>;'>
 
