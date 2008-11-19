@@ -212,7 +212,9 @@ if($REQUEST_TYPE == "new"){
 		$playintro = false;
 		if (isset($BFXML_VARS['doplayback'])) {
 			if ($BFXML_VARS['doplayback'] === "#" ||
-				isset($BFXML_VARS['timeout'])) {
+				isset($BFXML_VARS['timeout']) ||
+				isset($BFXML_VARS['voicereply']) ||
+				isset($BFXML_VARS['messageconfirm'])) {
 				// skip to next message, do nothing
 			} else if ($BFXML_VARS['doplayback'] === "*") {
 				// repeat last message
