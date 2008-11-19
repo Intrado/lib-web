@@ -27,7 +27,7 @@ if(isset($_GET['resetDM']) || isset($_GET['update'])){
 	QuickUpdate("update dm set command = '" . $command ."' where id = " . $dmid);
 ?>
 	<script>
-		window.alert('<?=ucfirst($command)?> command initiated for DM: <?=$dmname?>');
+		window.alert('<?=ucfirst($command)?> command initiated for DM: <?=$dmrow[0]?>');
 		window.location="customerdms.php";
 	</script>
 <?
