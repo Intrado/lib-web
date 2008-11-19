@@ -219,4 +219,39 @@ CREATE TABLE `useractivation` (
 `userid` INT NOT NULL
 ) ENGINE = innodb;
 
+-- ASP 6.2 starts below
+
+ ALTER TABLE `loginattempt`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+ ALTER TABLE `loginattempt` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL ;
+
+ ALTER TABLE `persontoken`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+ ALTER TABLE `persontoken`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+ ALTER TABLE `persontoken` CHANGE `validationdata` `validationdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL  ;
+
+ ALTER TABLE `portalactivation`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+ ALTER TABLE `portalactivation` CHANGE `activationtoken` `activationtoken` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL  ;
+
+ ALTER TABLE `portalactivation` CHANGE `newusername` `newusername` VARCHAR( 255 ) NULL DEFAULT NULL  ;
+
+ ALTER TABLE `portaluser`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+ ALTER TABLE `portaluser` CHANGE `username` `username` VARCHAR( 255 ) NOT NULL ,
+CHANGE `password` `password` VARCHAR( 50 ) NOT NULL DEFAULT ' ',
+CHANGE `firstname` `firstname` VARCHAR( 100 ) NOT NULL ,
+CHANGE `lastname` `lastname` VARCHAR( 100 ) NOT NULL ,
+CHANGE `zipcode` `zipcode` VARCHAR( 10 ) NOT NULL ;
+
+ ALTER TABLE `useractivation`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+ ALTER TABLE `useractivation` CHANGE `activationtoken` `activationtoken` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL  ;
+
+
+
+
+
+
 
