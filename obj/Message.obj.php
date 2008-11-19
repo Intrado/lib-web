@@ -245,39 +245,20 @@ class Message extends DBMappedObject {
 		$renderedparts = array();
 		$curpart = 0;
 
-		$lastVoice = null;
-
 		foreach ($parts as $part) {
 			switch ($part->type) {
 			case "A":
-				// invalidate the tts joining (audio breaks tts)
-				$lastVoice = null;
-
 				$af = new AudioFile($part->audiofileid);
 				$renderedparts[++$curpart] = array("a",$af->contentid);
 				break;
 			case "T":
-				//see if we should combine, or make a new one
-				if ($lastVoice == $part->voiceid) {
-					//just append to the last one
-					$renderedparts[$curpart][1] .= " " . $part->txt;
-				} else {
-					$renderedparts[++$curpart] = array("t",$part->txt,$part->voiceid);
-					$lastVoice = $part->voiceid;
-				}
+				$renderedparts[++$curpart] = array("t",$part->txt,$part->voiceid);
 				break;
 			case "V":
 				if (!($value = $fields[$part->fieldnum])) {
 					$value = $part->defaultvalue;
 				}
-				//see if we should combine, or make a new one
-				if ($lastVoice == $part->voiceid) {
-					//just append to the last one
-					$renderedparts[$curpart][1] .= " " . $value;
-				} else {
-					$renderedparts[++$curpart] = array("t",$value,$part->voiceid);
-					$lastVoice = $part->voiceid;
-				}
+				$renderedparts[++$curpart] = array("t",$value,$part->voiceid);
 				break;
 			}
 		}
