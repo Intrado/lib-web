@@ -129,7 +129,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	<message name="recordvoicereply">
 		<field name="voicereply" type="record" max="60">
 			<prompt>
-				<tts>Please leave a message after the beep. </tts>
+				<tts>Please leave a message after the beep. When you are finished recording, press any key to continue. </tts>
 			</prompt>
 		</field>
 		<uploadaudio name="voicereply"/>
