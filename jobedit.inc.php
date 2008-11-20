@@ -64,7 +64,7 @@ while($row = DBGetRow($queryresult)){
 } 
 
 //Get Selected languages
-if($jobid){
+if($jobid && $job->getSetting('translationmessage')){
 	$queryresult = Query("SELECT j.language, m.id as messageid FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1");
 	while($row = DBGetRow($queryresult)){		
 		$languagearray[htmlentities($row[0])] = $row[1];
@@ -170,7 +170,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->description = trim(GetFormData($f,$s,"description"));
 				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
 			} else {
-				
 				// If this is a phonemessage and no message was selected the message is a translation message and the phonetextarea is requerd to be fuild in. 
 				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phonemessageid") == ""){
 					$themessageid = null;
@@ -198,45 +197,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$part->create();	
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');	
-					
-					foreach($languagearray as $language => $messageid) {	
-						if(GetFormData($f, $s, "translate_$language")){								
-								$message = new Message($messageid);	
-								$message->userid = $USER->id;
-								$message->type = 'phone';
-								$message->name = GetFormData($f, $s,'name') . "_$language";
-								$message->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
-								$message->deleted = 1;
-								$message->update();
-								
-								$part = NULL;
-								if ($messageid != NULL) {   // if messageid is not null there should be an existing message 
-									$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0 and type='T'");
-								} 
-								if(!$part) {
-									$part = new MessagePart();
-									$newjoblanguage = new Joblanguage();
-									$newjoblanguage->jobid = $job->id;
-									$newjoblanguage->messageid = $message->id;
-									$newjoblanguage->type = 'phone';
-									$newjoblanguage->language = $language;
-									$newjoblanguage->create();
-								}
-								$part->messageid = $message->id;
-								$part->type="T";
-								// Voice select is a hack. requirement, is that there is only one male and one female.
-								$part->voiceid = QuickQuery("SELECT id FROM ttsvoice where language='$language' order by gender " . GetFormData($f, $s, 'voiceselect')?"desc":"" . "LIMIT 1");	
-								$part->txt = GetFormData($f, $s, "translationtextexpand_" . $language);
-								$part->sequence = 0;
-								$part->update();
-							
-						} else {
-							//delete message if exist
-						}
-							
-					}
-					
+				} else {
+					$job->setSetting('translationmessage', 0);
+					QuickUpdate("delete from joblanguage where jobid=" . $job->id);
+					// Only delete the assosiation and not the messages 
 				}
+				
+				
 					
 				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
 					$themessageid = null;
@@ -414,7 +381,55 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			//now add any language options
 			$addlang = false;
-			if($USER->authorize('sendmulti')) {
+			if ($job->getSetting('translationmessage') ) {
+				foreach($languagearray as $language => $messageid) {	
+					if(GetFormData($f, $s, "translate_$language")){
+						$part = NULL;
+						$joblanguage = NULL;
+					
+						$message = new Message($messageid);	
+						if($messageid != NULL) {
+							 // if messageid is not null there should be an existing message and joblanguage
+							$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0 and type='T'");
+							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " messageid= " . $message->id);
+							
+						}
+						$message->userid = $USER->id;
+						$message->type = 'phone';
+						$message->name = GetFormData($f, $s,'name') . "_$language";
+						$message->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
+						$message->deleted = 1;
+						$message->update();
+						
+						if (!$joblanguage) {  
+							$joblanguage = new Joblanguage();	
+						}
+						$joblanguage->jobid = $job->id;
+						$joblanguage->messageid = $message->id;
+						$joblanguage->type = 'phone';
+						$joblanguage->language = $language;
+						$joblanguage->update();
+						
+						if(!$part) {
+							$part = new MessagePart();
+						}
+						$part->messageid = $message->id;
+						$part->type="T";
+						// Voice select is a hack. requirement, is that there is only one male and one female.
+						$part->voiceid = QuickQuery("SELECT id FROM ttsvoice where language='$language' order by gender " . GetFormData($f, $s, 'voiceselect')?"desc":"" . "LIMIT 1");	
+						$part->txt = GetFormData($f, $s, "translationtextexpand_" . $language);
+						$part->sequence = 0;
+						$part->update();			
+					} else {
+						//TODO delete message if exist
+						if($messageid){
+							QuickUpdate("delete from joblanguage where messageid=$messageid");
+							QuickUpdate("delete from message where id=$messageid");
+							QuickUpdate("delete from messagepart where messageid=$messageid");
+						}
+					}					
+				}
+			} elseif($USER->authorize('sendmulti')) {
 				foreach (array("phone","email","print") as $type) {
 					if (CheckFormSubmit($f,$type))
 						$addlang = true;
@@ -431,6 +446,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					}
 				}
 			}
+			
 
 			//TODO check for send button
 			if ($JOBTYPE == "normal" && CheckFormSubmit($f,'send')) {
@@ -518,7 +534,7 @@ if( $reloadform )
 				PutFormData($f,$s,"translationtext_$language","empty translation first box","text","nomin","nomax",false);
 				PutFormData($f,$s,"translationtextexpand_$language","empty translation second box","text","nomin","nomax",false);
 				PutFormData($f,$s,"retranslationtext_$language","empty retranslation","text","nomin","nomax",false);
-				PutFormData($f,$s,"translate_$language",0,"bool",0,1);
+				PutFormData($f,$s,"translate_$language",$jobid?0:1,"bool",0,1);
 		}
 	}
 
@@ -595,7 +611,7 @@ if ($submittedmode || $completedmode) {
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
 if (isset($job->id)) {
-	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where type='phone' and id IN (select j.id from joblanguage j ,message m where j.messageid = m.id and m.deleted<>1 and j.jobid=" .  $job->id. ")");
+	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where type='phone' and jobid=" . $job->id);
 	$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 	$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
 	$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $job->id);
@@ -670,21 +686,23 @@ function alternate($type) {
 		<th>&nbsp;</th>
 	</tr>
 	<?
-	$id = $type . 'messageid';
-	//just show the selected options? allowing to edit could cause the page to become slow
-	//with many languages/messages
-	foreach($joblangs[$type] as $joblang) {
-	?>
-	<tr valign="middle">
-		<td><?= $joblang->language ?></td>
-		<td><? if ($type == "phone") { ?>
-		<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
-		<? } ?> <?= $messages[$type][$joblang->messageid]->name ?></td>
-		<td><? if (!$submittedmode) { ?> <a
-			href="<?= ($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php") ?>?deletejoblang=<?= $joblang->id ?>">Delete</a>
-			<? } ?></td>
-	</tr>
-	<?
+	if ($job && $job->getSetting('translationmessage') === false){
+		$id = $type . 'messageid';
+		//just show the selected options? allowing to edit could cause the page to become slow
+		//with many languages/messages
+		foreach($joblangs[$type] as $joblang) {
+		?>
+		<tr valign="middle">
+			<td><?= $joblang->language ?></td>
+			<td><? if ($type == "phone") { ?>
+			<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
+			<? } ?> <?= $messages[$type][$joblang->messageid]->name ?></td>
+			<td><? if (!$submittedmode) { ?> <a
+				href="<?= ($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php") ?>?deletejoblang=<?= $joblang->id ?>">Delete</a>
+				<? } ?></td>
+		</tr>
+		<?
+		}
 	}
 	?>
 	<tr valign="middle">
@@ -999,7 +1017,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 						<?
 						foreach($languagearray as $language => $messageid) {
-							$languageisset = $messageid?1:0;
+							$languageisset = $messageid?1:($jobid?0:1);
 						?>
 							<tr>
 								<td valign="top"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); ?>
