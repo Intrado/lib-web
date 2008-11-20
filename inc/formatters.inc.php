@@ -343,7 +343,7 @@ function fmt_obj_csv_list ($obj, $name) {
 
 
 function fmt_ucfirst($obj, $name) {
-	return ucfirst($obj->status);
+	return ucfirst($obj->$name);
 }
 
 
