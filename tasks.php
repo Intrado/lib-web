@@ -147,6 +147,9 @@ function fmt_actions ($import,$dummy) {
 		$res .= "<a href=\"taskdownload.php?id=$import->id\">Download</a>&nbsp;|&nbsp;"
 			 . "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;";
 	}
+	if ($import->lastrun != null) {
+		$res .= "<a href=\"tasklog.php?id=$import->id\">Log</a>&nbsp;|&nbsp;";
+	}
 	$res .= "<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
 		 ."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\n"
 		 . $deletewarning
