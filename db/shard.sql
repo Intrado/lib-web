@@ -230,5 +230,7 @@ PRIMARY KEY ( `sms` ),
 INDEX ( `status` )
 ) ENGINE = innodb;
 
+ALTER TABLE `qjobtask` ADD `lastdispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
+
 
 

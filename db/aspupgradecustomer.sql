@@ -117,10 +117,19 @@ ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'r
 $$$
 
 
+CREATE TABLE IF NOT EXISTS `importlogentry` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `importid` int(11) NOT NULL,
+  `severity` enum('info','error','warn') NOT NULL,
+  `txt` varchar(255) NOT NULL,
+  `linenum` int(11) NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
-
-
-
+-- this will take forever
+ALTER TABLE `reportcontact` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
+$$$
 
 
 

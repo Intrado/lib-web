@@ -1540,6 +1540,16 @@ $$$
 ALTER TABLE `groupdata` CHANGE `importid` `importid` INT NOT NULL
 $$$
 
+CREATE TABLE IF NOT EXISTS `importlogentry` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `importid` int(11) NOT NULL,
+  `severity` enum('info','error','warn') NOT NULL,
+  `txt` varchar(255) NOT NULL,
+  `linenum` int(11) NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
-
+ALTER TABLE `reportcontact` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
+$$$
 
