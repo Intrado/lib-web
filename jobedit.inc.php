@@ -595,8 +595,7 @@ if ($submittedmode || $completedmode) {
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
 if (isset($job->id)) {
-	//	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
-	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage INNER JOIN message on joblanguage.messageid = message.id and message.deleted<>1 where joblanguage.type = 'phone' and jobid = " . $job->id);
+	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where type='phone' and id IN (select j.id from joblanguage j ,message m where j.messageid = m.id and m.deleted<>1 and j.jobid=" .  $job->id. ")");
 	$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 	$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
 	$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $job->id);
