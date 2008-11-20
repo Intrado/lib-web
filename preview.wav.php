@@ -24,23 +24,14 @@ if(isset($_GET['id'])) {
 		Message::playAudio($id, $fields);
 	}
 } elseif (isset($_GET['text'])&&isset($_GET['language'])&&isset($_GET['gender'])) {
-	$voice = new Voice();
-	$voice->language = DBSafe($_GET['language']);
-	$voice->gender = DBSafe($_GET['gender']);
-	$ttstext = DBSafe($_GET['text']);
-	
-	list($contenttype, $data) = renderTts($ttstext, $voice->language, $voice->gender);
-	$outname = writeWav($data);
+	list($contenttype, $data) = renderTts($_GET['text'], $_GET['language'], $_GET['gender']);
 
-	if (file_exists($outname)) {
-
-		$data = file_get_contents ($outname); //readfile seems to cause problems
-
+	if ($data !== false) {
 		header("HTTP/1.0 200 OK");
 		if (isset($_GET['download']))
 			header('Content-type: application/x-octet-stream');
 		else
-			header("Content-Type: audio/wav");
+			header("Content-Type: $contenttype");
 
 		header('Pragma: private');
 		header('Cache-control: private, must-revalidate');
@@ -48,10 +39,7 @@ if(isset($_GET['id'])) {
 		header("Connection: close");
 
 		echo $data;
-
-	}
-	@unlink($outname);
-	
+	}	
 }
 
 ?>
