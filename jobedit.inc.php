@@ -56,13 +56,30 @@ $VALIDJOBTYPES = JobType::getUserJobTypes();
 //this array is to be used only to display the info
 $infojobtypes = DBFindMany("JobType", "from jobtype");
 
+ //Get available languages
+$queryresult = Query("SELECT DISTINCT l.name FROM language l INNER JOIN ttsvoice t ON t.language = l.name and l.name <> 'english'");
+$languagearray = array();
+while($row = DBGetRow($queryresult)){		
+	$languagearray[htmlentities($row[0])] = NULL;
+} 
+
+//Get Selected languages
+if($jobid){
+	$queryresult = Query("SELECT j.language, m.id as messageid FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1");
+	while($row = DBGetRow($queryresult)){		
+		$languagearray[htmlentities($row[0])] = $row[1];
+	}
+}
+
+
 /****************** main message section ******************/
 
 $f = "notification";
 $s = "main" . $JOBTYPE;
 $reloadform = 0;
 
-$languagearray = array("Spanish" => 1,"French" => 0,"Chinese" => 1);  // Must be a set. two of the same may not work, Test this.
+
+
 
 // used to determine if advanced settings need to be expanded to show error
 $hassettingsdetailerror = false;
@@ -167,8 +184,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$newphonemessage = new Message($themessageid);	
 					$newphonemessage->userid = $USER->id;
 					$newphonemessage->type = 'phone';
-					$newphonemessage->name = GetFormData($f, $s,'name') . date(" M j, Y g:i:s", strtotime("now"));
-					$newphonemessage->description = "Translated message";
+					$newphonemessage->name = GetFormData($f, $s,'name');
+					$newphonemessage->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
 					$newphonemessage->deleted = 1;
 					$newphonemessage->update();
 					
@@ -179,9 +196,46 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$part->txt = GetFormData($f, $s, 'phonetextarea');
 					$part->sequence = 0;
 					$part->create();	
-	
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');	
+					
+					foreach($languagearray as $language => $messageid) {	
+						if(GetFormData($f, $s, "translate_$language")){								
+								$message = new Message($messageid);	
+								$message->userid = $USER->id;
+								$message->type = 'phone';
+								$message->name = GetFormData($f, $s,'name') . "_$language";
+								$message->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
+								$message->deleted = 1;
+								$message->update();
+								
+								$part = NULL;
+								if ($messageid != NULL) {   // if messageid is not null there should be an existing message 
+									$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0 and type='T'");
+								} 
+								if(!$part) {
+									$part = new MessagePart();
+									$newjoblanguage = new Joblanguage();
+									$newjoblanguage->jobid = $job->id;
+									$newjoblanguage->messageid = $message->id;
+									$newjoblanguage->type = 'phone';
+									$newjoblanguage->language = $language;
+									$newjoblanguage->create();
+								}
+								$part->messageid = $message->id;
+								$part->type="T";
+								// Voice select is a hack. requirement, is that there is only one male and one female.
+								$part->voiceid = QuickQuery("SELECT id FROM ttsvoice where language='$language' order by gender " . GetFormData($f, $s, 'voiceselect')?"desc":"" . "LIMIT 1");	
+								$part->txt = GetFormData($f, $s, "translationtextexpand_" . $language);
+								$part->sequence = 0;
+								$part->update();
+							
+						} else {
+							//delete message if exist
+						}
+							
+					}
+					
 				}
 					
 				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
@@ -197,8 +251,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$newsmsmessage = new Message($themessageid);
 					$newsmsmessage->userid = $USER->id;
 					$newsmsmessage->type = 'sms';
-					$newsmsmessage->name = GetFormData($f, $s,'name') . date(" M j, Y g:i:s", strtotime("now"));
-					$newsmsmessage->description = "SMS Message";
+					$newsmsmessage->name = GetFormData($f, $s,'name');
+					$newsmsmessage->description = "SMS Message " . date(" M j, Y g:i:s", strtotime("now"));
 					$newsmsmessage->deleted = 1;
 					$newsmsmessage->update();
 					
@@ -445,13 +499,27 @@ if( $reloadform )
 	} else {
 		PutFormData($f,$s,"phonetextarea","","text");
 	}
-	
-	foreach($languagearray as $language => $languageisset) {
-		$language = htmlentities($language);
-		PutFormData($f,$s,"translate_$language",$languageisset,"bool",0,1);
-		PutFormData($f,$s,"translationtext_$language","translation","text","nomin","nomax",false);
-		PutFormData($f,$s,"translationtextexpand_$language","translation second box","text","nomin","nomax",false);
-		PutFormData($f,$s,"retranslationtext_$language","retranslation","text","nomin","nomax",false);
+
+	foreach($languagearray as $language => $messageid) {		
+		$messagefound = false;
+		if($messageid) {
+			$translationmessage = DBFind("Message","from message where id='$messageid' and deleted=1 and type='phone'");	
+			if($translationmessage != NULL) {				
+				$parts = DBFindMany("MessagePart","from messagepart where messageid=$messageid order by sequence");
+				$body = $translationmessage->format($parts);
+				PutFormData($f,$s,"translationtext_$language",$body,"text","nomin","nomax",false);
+				PutFormData($f,$s,"translationtextexpand_$language",$body,"text","nomin","nomax",false);
+				PutFormData($f,$s,"retranslationtext_$language","retranslation","text","nomin","nomax",false);
+				PutFormData($f,$s,"translate_$language",1,"bool",0,1);
+				$messagefound = true;
+			} 
+		} 
+		if(!$messagefound) {
+				PutFormData($f,$s,"translationtext_$language","empty translation first box","text","nomin","nomax",false);
+				PutFormData($f,$s,"translationtextexpand_$language","empty translation second box","text","nomin","nomax",false);
+				PutFormData($f,$s,"retranslationtext_$language","empty retranslation","text","nomin","nomax",false);
+				PutFormData($f,$s,"translate_$language",0,"bool",0,1);
+		}
 	}
 
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
@@ -527,7 +595,8 @@ if ($submittedmode || $completedmode) {
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
 if (isset($job->id)) {
-	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
+	//	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
+	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage INNER JOIN message on joblanguage.messageid = message.id and message.deleted<>1 where joblanguage.type = 'phone' and jobid = " . $job->id);
 	$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 	$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
 	$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $job->id);
@@ -906,7 +975,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td><? 							
-				message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid' onclick=\"if(this.value == 0){ show('newphonetext'); hide('recordedlanguages'); }else{ hide('newphonetext'); show('recordedlanguages'); }\""); ?>
+				message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid' onclick=\"if(this.value == 0){ show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
 				<div id='newphonetext'>
 					Type Your English Message Here | 
 					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
@@ -930,8 +999,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 
 						<?
-						foreach($languagearray as $language => $languageisset) {
-							$language = htmlentities($language);
+						foreach($languagearray as $language => $messageid) {
+							$languageisset = $messageid?1:0;
 						?>
 							<tr>
 								<td valign="top"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); ?>
@@ -981,12 +1050,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 		<div id='phonedetails' style="display: none"><? if($USER->authorize('sendmulti')) { ?>
 		<div id='multilingualphoneoption' style="display: none">
-		<table border="0" cellpadding="2" cellspacing="0" width=100%>
+			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%">Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
 				<td><? alternate('phone'); ?></td>
 			</tr>
-		</table>
+			</table>
 		</div>
 		<? } ?>
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
@@ -1245,10 +1314,10 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 		if(document.getElementById('phonemessageid') != null && document.getElementById('phonemessageid').value == 0) { 
 			show('newphonetext');
-			hide('recordedlanguages'); 
+			hide('multilingualphoneoption'); 
 		} else {
 			hide('newphonetext');
-			show('recordedlanguages');
+			show('multilingualphoneoption');
 		}
 
 		
