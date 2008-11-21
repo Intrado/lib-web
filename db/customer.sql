@@ -1550,6 +1550,9 @@ CREATE TABLE IF NOT EXISTS `importlogentry` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+ALTER TABLE `reportcontact` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system'
+$$$
+
 CREATE TABLE `joblist` (
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `jobid` INT NOT NULL ,
