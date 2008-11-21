@@ -199,7 +199,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');	
 				} else {
 					$job->setSetting('translationmessage', 0);
-					QuickUpdate("delete from joblanguage where jobid=" . $job->id);
+					if($job->id) {
+						QuickUpdate("delete from joblanguage where jobid=" . $job->id);
+					}
 					// Only delete the assosiation and not the messages 
 				}
 				
@@ -686,7 +688,7 @@ function alternate($type) {
 		<th>&nbsp;</th>
 	</tr>
 	<?
-	if ($job && $job->getSetting('translationmessage') === false){
+	if ($job && !$job->getSetting('translationmessage')){
 		$id = $type . 'messageid';
 		//just show the selected options? allowing to edit could cause the page to become slow
 		//with many languages/messages
@@ -995,7 +997,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid' onclick=\"if(this.value == 0){ show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
 				<div id='newphonetext'>
 					Type Your English Message Here | 
-					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
+					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onchange=\"automatictranslation()\"") ?>
 					Automaticaly Translate 
 					<br />
 					<? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?>
@@ -1015,10 +1017,10 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<table border="0" cellpadding="2" cellspacing="0" width=100%>
 
 
-						<?
+<?
 						foreach($languagearray as $language => $messageid) {
 							$languageisset = $messageid?1:($jobid?0:1);
-						?>
+?>
 							<tr>
 								<td valign="top"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); ?>
 								<? echo $language; ?></td>
@@ -1405,6 +1407,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		}
 	}
 
+	checkboxhelper(false,true);
+
 	function limit_chars(field) {
 		if (field.value.length > 160)
 			field.value = field.value.substring(0,160);
@@ -1562,17 +1566,19 @@ function clickIcon(section){
 	}
 }
 
-// If Automatic translation is selected
+
+<? // If Automatic translation is selected ?>
 function automatictranslation(){
 	if(isCheckboxChecked('translatecheckone')){
 		show('translationdetails');
+		checkboxhelper(true,false);
 	} else {
 		hide('translationdetails');
 	}	
 	hide('translationbasic');
 	hide('translationoptions');
 }
-// Show Translation options
+<? // Show Translation options ?>
 function translationoptions(details){
 	if (details) {
 		show('translationoptions');
@@ -1585,9 +1591,71 @@ function translationoptions(details){
 	}
 }
 
-// If language checkbox is selected
+<? 
+/* 
+* Checkbox helper will show and hide language options
+* - Set all languages if automatic translation is clicked 
+* - On loading the page. This will ensure that the right boxes show up if there is an error message to the user
+* - if not checkall and loading the checkbox helper will unselect automatic translation if no Languages are selected
+*/ ?>
+function checkboxhelper(checkall,loading) {
+<?
+	$languagestring = "";
+	foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
+	$languagestring = substr($languagestring,1);
+?>
+	var languagelist=new Array(<? echo $languagestring; ?>);
+
+	if(checkall == true){
+		for (i = 0; i < languagelist.length; i++) {		
+			setChecked('translate_' + languagelist[i]);
+			show('language_' + languagelist[i]);
+			show('translationpreview_' + languagelist[i]);
+			show('translationdetails_' + languagelist[i]);
+		}
+	} else if(loading) {
+		var checked = false;
+		for (i = 0; i < languagelist.length; i++) {
+			var language = languagelist[i]
+			if(isCheckboxChecked('translate_' + language)){
+				show('language_' + language);
+				show('translationpreview_' + language);
+				show('translationdetails_' + language);
+				checked = true;
+			} else {
+				hide('language_' + language);
+				hide('translationpreview_' + language);
+				hide('translationdetails_' + language);
+			}
+			hide('languageexpand_' + language);
+			hide('languagedetails_' + language);	
+			hide('translationbasic_' + language);	
+		}
+		if(!checked) {
+			var x = new getObj('translatecheckone');
+			x.obj.checked = false;
+			automatictranslation();
+		}
+	} else {
+		var checked = false;
+		for (i = 0; i < languagelist.length; i++) {
+			if(isCheckboxChecked('translate_' + languagelist[i])){
+				checked = true;
+			}
+		}
+		if(!checked) {
+			var x = new getObj('translatecheckone');
+			x.obj.checked = false;
+			automatictranslation();
+		}
+	}
+	
+}
+
+<? // If language checkbox is selected ?>
 function translationlanguage(language){
-	if(isCheckboxChecked('translate_' + language)){
+	checkboxhelper(false,false);
+	if (isCheckboxChecked('translate_' + language)){
 		show('language_' + language);
 		show('translationpreview_' + language);
 		show('translationdetails_' + language);
@@ -1600,7 +1668,7 @@ function translationlanguage(language){
 	hide('languagedetails_' + language);	
 }
 
-//If language details is clicked
+<? //If language details is clicked ?>
 function langugaedetails(language, details){
 	if(details){
 		hide('language_' + language);
