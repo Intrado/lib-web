@@ -174,11 +174,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phonemessageid") == ""){
 					$themessageid = null;
 					// If this Message was created in job editor we are free to edit the message, otherwise we have to create a new message
-					if($job->getSetting('translationmessage') && $job->phonemessageid) {
-						$themessageid = $job->phonemessageid;
-						//Delete the part(s) of the message 
-						QuickUpdate("delete from messagepart where messageid=$themessageid");
-					} 
+					if($job->getSetting('translationmessage')) {
+						if( $job->phonemessageid ) {
+							$themessageid = $job->phonemessageid;
+							//Delete the part(s) of the message 
+							QuickUpdate("delete from messagepart where messageid=$themessageid");
+						}
+					} else {
+						QuickUpdate("delete from joblanguage where jobid=" . $job->id);  // If translation mode switched we need to rease the previous joblanguage assosiations			
+					}
 					$job->setSetting('translationmessage', 1); // Tell the job that this message was created here
 					$newphonemessage = new Message($themessageid);	
 					$newphonemessage->userid = $USER->id;
@@ -198,10 +202,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');	
 				} else {
-					$job->setSetting('translationmessage', 0);
-					if($job->id) {
+					if($job->getSetting('translationmessage') && $job->id) {
 						QuickUpdate("delete from joblanguage where jobid=" . $job->id);
-					}
+					}	
+					$job->setSetting('translationmessage', 0);
+
 					// Only delete the assosiation and not the messages 
 				}
 				
@@ -423,7 +428,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$part->sequence = 0;
 						$part->update();			
 					} else {
-						//TODO delete message if exist
+						// delete message if exist
 						if($messageid){
 							QuickUpdate("delete from joblanguage where messageid=$messageid");
 							QuickUpdate("delete from message where id=$messageid");
@@ -633,11 +638,17 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 <table border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td><?
+		$defaultmessage = false;
+		if($type == "defaultphone"){
+			$type = "phone";
+			$defaultmessage = true;	
+		}		
+		
 		NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? " DISABLED " : "") . $extrahtml);
 
 		if($type == "sms") {
 			NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
-		} elseif ($type == "phone") {
+		} elseif ($type == "phone" && $defaultmessage) {
 			NewFormItem($form,$section,$name, "selectoption", ' -- Create a Message -- ', "");
 		} else {
 			NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
@@ -648,7 +659,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 		NewFormItem($form,$section,$name, "selectend");
 		?></td>
 		<?	if ($type == "phone") { ?>
-		<td><?= button('Play', "previewplay()")?>
+		<td><?= button('Play', "previewplay('$name')")?>		
 		</td>
 		<?	} ?>
 	</tr>
@@ -994,7 +1005,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td><? 							
-				message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid' onchange=\"if(this.value == 0){ checkboxhelper(true,false); show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
+				message_select('defaultphone',$f, $s,"phonemessageid", "id='phonemessageid' onchange=\"if(this.value == 0){ checkboxhelper(true,false); show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
 				<div id='newphonetext'>
 					Type Your English Message Here | 
 					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onchange=\"automatictranslation()\"") ?>
@@ -1720,12 +1731,12 @@ function display_jobtype_info(value){
 ?>
 }
 
-function previewplay() {
-	var audio = new getObj('phonemessageid').obj;
-	var textarea = new getObj('phonetextarea').obj;	
+function previewplay(name) {
+	var audio = new getObj(name).obj;
 	if(audio.selectedIndex >= 1)
 		popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);
 	else {
+		var textarea = new getObj('phonetextarea').obj;	
 		var voice = 'female';
 		if(isCheckboxChecked('male_voice')) {
 			voice = 'male';
