@@ -1612,6 +1612,7 @@ function checkboxhelper(checkall,loading) {
 			show('language_' + languagelist[i]);
 			show('translationpreview_' + languagelist[i]);
 			show('translationdetails_' + languagelist[i]);
+			hide('translationbasic_' + languagelist[i]);
 		}
 	} else if(loading) {
 		var checked = false;
@@ -1665,7 +1666,8 @@ function translationlanguage(language){
 		hide('translationdetails_' + language);
 	}	
 	hide('languageexpand_' + language);
-	hide('languagedetails_' + language);	
+	hide('languagedetails_' + language);
+	hide('translationbasic_' + language);		
 }
 
 <? //If language details is clicked ?>
