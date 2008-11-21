@@ -230,7 +230,16 @@ PRIMARY KEY ( `sms` ),
 INDEX ( `status` )
 ) ENGINE = innodb;
 
+-- start here for ASP 6.2
+
 ALTER TABLE `qjobtask` ADD `lastdispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system';
 
-
-
+CREATE TABLE `qjoblist` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`customerid` int(11) NOT NULL,
+`jobid` INT NOT NULL ,
+`listid` INT NOT NULL ,
+`thesql` TEXT,
+KEY `jobid` (`customerid`,`jobid`,`listid`)
+) ENGINE = innodb DEFAULT CHARSET=utf8
+;

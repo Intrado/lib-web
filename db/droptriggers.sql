@@ -29,5 +29,11 @@ drop procedure start_import
 $$$
 drop procedure start_specialtask
 $$$
+drop trigger insert_joblist
+$$$
+drop trigger update_joblist
+$$$
+drop trigger delete_joblist
+$$$
 
 

@@ -11,6 +11,7 @@ require_once("../obj/User.obj.php");
 require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
 require_once("../obj/Job.obj.php");
+require_once("../obj/JobList.obj.php");
 require_once("../obj/JobLanguage.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/Rule.obj.php");
@@ -51,10 +52,12 @@ if (!mysql_select_db($db['db'])) {
 	exit(-1);
 }
 
+/*
 if (!mysql_set_charset("utf8",$_dbcon)) {
 	echo("Problem selecting charset for " . $db['host'] . " error:" . mysql_error() . "\n");
 	exit(-1);
 }
+*/
 
 if (!QuickQuery("select count(*) from job where id=".$jobid)) {
 	echo("Error: job not found\n");
@@ -72,6 +75,15 @@ $job = new Job($jobid);
 $job->generateSql();
 
 echo "new sql is: " . $job->thesql . "\n";
+
+// check additional lists
+$joblists = DBFindMany('JobList', "from joblist where jobid=$jobid");
+foreach ($joblists as $joblist) {
+	$joblist->generateSql($job->userid); // update thesql
+	echo "new sql for listid ".$joblist->listid." is : ".$joblist->thesql . "\n";
+	$joblist->update();
+}
+
 
 $job->update();
 

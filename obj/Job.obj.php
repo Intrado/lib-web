@@ -67,6 +67,26 @@ class Job extends DBMappedObject {
 		$this->thesql = $rulesql;
 	}
 
+	function hasPeople($listid, $thesql) {
+		$hasPeople = false;
+		// find all person ids from list rules
+		$query = "select p.id from person p " .
+			"left join listentry le on (p.id=le.personid and le.listid=".$listid.") " .
+			"where ".$thesql." and not p.deleted and le.type is null and p.userid is null " .
+			"limit 1";
+		$p = QuickQuery($query);
+		if ($p) $hasPeople = true;
+
+		$query = "select p.id " .
+			"from listentry le " .
+			"straight_join person p on (p.id=le.personid and not p.deleted) " .
+			"where le.listid=".$listid." and le.type='A' " .
+			"limit 1";
+		$p = QuickQuery($query);
+		if ($p) $hasPeople = true;
+		return $hasPeople;
+	}
+
 	// assumes this job was already created in the database
 	// returns newjob else returns null
 	function runNow() {
@@ -78,23 +98,16 @@ class Job extends DBMappedObject {
 					// check for empty list
 					$this->generateSql(); // update thesql
 
-					$hasPeople = false;
-					// with latest list, be sure at least one person (otherwise, why bother copying this job that does nothing)
-					// find all person ids from list rules
-					$query = "select p.id from person p " .
-						"left join listentry le on (p.id=le.personid and le.listid=".$this->listid.") " .
-						"where ".$this->thesql." and not p.deleted and le.type is null and p.userid is null " .
-						"limit 1";
-					$p = QuickQuery($query);
-					if ($p) $hasPeople = true;
+					// with latest lists, be sure at least one person (otherwise, why bother copying this job that does nothing)
+					$hasPeople = $this->hasPeople($this->listid, $this->thesql);
 
-					$query = "select p.id " .
-						"from listentry le " .
-						"straight_join person p on (p.id=le.personid and not p.deleted) " .
-						"where le.listid=".$this->listid." and le.type='A' " .
-						"limit 1";
-					$p = QuickQuery($query);
-					if ($p) $hasPeople = true;
+					// check additional lists
+					$joblists = DBFindMany('JobList', "from joblist where jobid=$this->id");
+					foreach ($joblists as $joblist) {
+						$joblist->generateSql($this->userid); // update thesql
+						$p = $this->hasPeople($joblist->listid, $joblist->thesql);
+						if ($p) $hasPeople = true;
+					}
 
 					if ($hasPeople == true) {
 						// copy this repeater job to a normal job then run it
@@ -125,6 +138,11 @@ class Job extends DBMappedObject {
 						QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
 							select $newjob->id, messageid, type,language
 							from joblanguage where jobid=$this->id");
+
+						//copy all the job lists
+						QuickUpdate("insert into joblist (jobid,listid,thesql)
+							select $newjob->id, listid, thesql
+							from joblist where jobid=$this->id");
 
 						$newjob->runNow();
 						return $newjob;

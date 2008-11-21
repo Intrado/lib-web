@@ -16,11 +16,15 @@ IF NEW.status IN ('repeating') THEN
   -- copy the jobsettings
   INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
 
+  -- copy the joblists
+  INSERT INTO aspshard.qjoblist (customerid, jobid, listid, thesql) SELECT custid, NEW.id, listid, thesql FROM joblist WHERE jobid=NEW.id;
+
   -- do not copy schedule because it was inserted via the insert_schedule trigger
 
 END IF;
 END
 $$$
+
 
 CREATE TRIGGER update_job
 AFTER UPDATE ON job FOR EACH ROW
@@ -40,6 +44,8 @@ IF cc = 0 THEN
            VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid, NEW.thesql);
     -- copy the jobsettings
     INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
+    -- copy the joblists
+    INSERT INTO aspshard.qjoblist (customerid, jobid, listid, thesql) SELECT custid, NEW.id, listid, thesql FROM joblist WHERE jobid=NEW.id;
   END IF;
 ELSE
 -- update job fields
@@ -51,6 +57,7 @@ END IF;
 END
 $$$
 
+
 CREATE TRIGGER delete_job
 AFTER DELETE ON job FOR EACH ROW
 BEGIN
@@ -58,6 +65,7 @@ DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
 -- only repeating jobs ever get deleted
 DELETE FROM aspshard.qjob WHERE customerid=custid AND id=OLD.id;
 DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.id;
+DELETE FROM aspshard.qjoblist WHERE customerid=custid AND jobid=OLD.id;
 END
 $$$
 
@@ -88,6 +96,36 @@ AFTER DELETE ON jobsetting FOR EACH ROW
 BEGIN
 DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
 DELETE FROM aspshard.qjobsetting WHERE customerid=custid AND jobid=OLD.jobid AND name=OLD.name;
+END
+$$$
+
+CREATE TRIGGER insert_joblist
+AFTER INSERT ON joblist FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DECLARE cc INTEGER;
+
+-- the job must be inserted before the lists
+SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.jobid;
+IF cc = 1 THEN
+    INSERT INTO aspshard.qjoblist (customerid, jobid, listid, thesql) VALUES (custid, NEW.jobid, NEW.listid, NEW.thesql);
+END IF;
+END
+$$$
+
+CREATE TRIGGER update_joblist
+AFTER UPDATE ON joblist FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+UPDATE aspshard.qjoblist SET thesql=NEW.thesql WHERE customerid=custid AND jobid=NEW.jobid AND listid=NEW.listid;
+END
+$$$
+
+CREATE TRIGGER delete_joblist
+AFTER DELETE ON joblist FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+DELETE FROM aspshard.qjoblist WHERE customerid=custid AND jobid=OLD.jobid AND listid=OLD.listid;
 END
 $$$
 

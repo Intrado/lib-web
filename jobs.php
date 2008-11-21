@@ -4,6 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
 include_once("obj/Job.obj.php");
+include_once("obj/JobList.obj.php");
 include_once("obj/Schedule.obj.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
