@@ -393,7 +393,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						if($messageid != NULL) {
 							 // if messageid is not null there should be an existing message and joblanguage
 							$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0 and type='T'");
-							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " messageid= " . $message->id);
+							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and messageid= " . $message->id);
 							
 						}
 						$message->userid = $USER->id;
@@ -692,7 +692,7 @@ function alternate($type) {
 		$id = $type . 'messageid';
 		//just show the selected options? allowing to edit could cause the page to become slow
 		//with many languages/messages
-		foreach($joblangs[$type] as $joblang) {
+		foreach($joblangs[$type] as $joblang) {			
 		?>
 		<tr valign="middle">
 			<td><?= $joblang->language ?></td>
@@ -994,7 +994,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td><? 							
-				message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid' onclick=\"if(this.value == 0){ show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
+				message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid' onchange=\"if(this.value == 0){ checkboxhelper(true,false); show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
 				<div id='newphonetext'>
 					Type Your English Message Here | 
 					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onchange=\"automatictranslation()\"") ?>
@@ -1022,9 +1022,9 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							$languageisset = $messageid?1:($jobid?0:1);
 ?>
 							<tr>
-								<td valign="top"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); ?>
+								<td valign="top" align="left"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); ?>
 								<? echo $language; ?></td>
-								<td>
+								<td valign="top" align="right" width="50">
 									<div id='language_<? echo $language?>' style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">
 									<? NewFormItem($f,$s,"translationtext_$language", "text", 50,50,"id='translationtext_$language' disabled"); ?>
 									</div>
@@ -1035,7 +1035,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 40, 3); ?>
 									</div>
 								</td>
-								<td valign="top">
+								<td valign="top" align="left">
 									<div id='translationpreview_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
 										<?= button('Play', "previewlanguage('$language')")?>
 									</div>
@@ -1048,6 +1048,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									<div id='translationbasic_<? echo $language?>' style="display: none">
 										<a href="#" onclick="langugaedetails('<? echo $language;?>',false); return false;">Hide details</a>
 									</div>
+								</td>
+								<td>&nbsp;
 								</td>
 							</tr>
 						<?}	?>
@@ -1607,6 +1609,10 @@ function checkboxhelper(checkall,loading) {
 	var languagelist=new Array(<? echo $languagestring; ?>);
 
 	if(checkall == true){
+		setChecked('translatecheckone');
+		show('translationdetails');
+		hide('translationbasic');
+		hide('translationoptions');
 		for (i = 0; i < languagelist.length; i++) {		
 			setChecked('translate_' + languagelist[i]);
 			show('language_' + languagelist[i]);
