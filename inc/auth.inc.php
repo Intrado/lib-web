@@ -146,19 +146,6 @@ function authorizeSpecialTask($shardid, $taskuuid) {
 	return false;
 }
 
-// used by dmapi to pass an authserver sessionID to get the customer database connection, spanning life of specialtask
-function connectDatabase($sessionID) {
-	$params = array(new XML_RPC_Value($sessionID, 'string'));
-	$method = "AuthServer.getCustomerDatabaseInfo";
-	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
-
-		// success
-		if (doDBConnect($result)) return true;
-	}
-	return false;
-}
-
 function getSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));
 	$method = "AuthServer.getSessionData";

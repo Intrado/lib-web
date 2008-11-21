@@ -6,6 +6,8 @@ $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("XML/RPC.php");
 require_once("../inc/auth.inc.php");
+require_once("../inc/sessionhandler.inc.php");
+
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
@@ -35,7 +37,6 @@ function specialtask($methodname, $params){
 	$SESSIONID = $params[0];
 	session_id($SESSIONID);
 	doStartSession();
-	connectDatabase($SESSIONID);
 
 	$REQUEST_TYPE = "new";
 	$task = new SpecialTask($params[1]);
@@ -68,7 +69,6 @@ function inboundtask($methodname, $params){
 	$SESSIONID = $params[0];
 	session_id($SESSIONID);
 	doStartSession();
-	connectDatabase($SESSIONID);
 
 	$REQUEST_TYPE = "new";
 	$_SESSION['inboundNumber'] = $params[1];
@@ -97,8 +97,6 @@ function continuecompletetask($methodname, $params){
 	$SESSIONID = $params[0];
 	session_id($SESSIONID);
 	doStartSession();
-	connectDatabase($SESSIONID);
-
 
 	if($methodname == "continuetask"){
 		$REQUEST_TYPE = "continue";
@@ -107,7 +105,6 @@ function continuecompletetask($methodname, $params){
 	}
 
 	$BFXML_VARS = $params[1];
-
 	ob_start();
 	if (isset($_SESSION['_nav_curpage']) && $_SESSION['_nav_curpage']) {
 		forwardToPage($_SESSION['_nav_curpage']);
