@@ -203,11 +203,21 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');	
 				} else {
 					if($job->getSetting('translationmessage') && $job->id) {
-						QuickUpdate("delete from joblanguage where jobid=" . $job->id);
+						QuickUpdate("delete joblanguage jl, message ms, messagepart mp
+											FROM joblanguage jl, message ms, messagepart mp 
+											where 
+											jl.jobid=" . $job->id . " and 
+											jl.messageid = ms.id and 
+											jl.messageid = mp.messageid");
+						
+						if( $job->phonemessageid ) {
+							QuickUpdate("delete message ms, messagepart mp FROM message ms, messagepart mp
+											 where 
+											 ms.id=" . $job->phonemessageid . " and 
+											 mp.messageid = ms.id");
+						}
 					}	
 					$job->setSetting('translationmessage', 0);
-
-					// Only delete the assosiation and not the messages 
 				}
 				
 				
