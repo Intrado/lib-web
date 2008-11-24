@@ -71,6 +71,13 @@ if($jobid && $job->getSetting('translationmessage')){
 	}
 }
 
+$voicearray = array();
+$voices = DBFindMany("Voice","from ttsvoice");
+foreach ($voices as $voice) {
+	$voicearray[$voice->gender][$voice->language] = $voice->id;
+}
+
+
 
 /****************** main message section ******************/
 
@@ -195,7 +202,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$part = new MessagePart();
 					$part->messageid = $newphonemessage->id;
 					$part->type="T";
-					$part->voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = '" . DBSafe(GetFormData($f, $s, 'voiceselect')) . "'");
+					$part->voiceid = $voicearray[GetFormData($f, $s, 'voiceselect')]["english"];
 					$part->txt = GetFormData($f, $s, 'phonetextarea');
 					$part->sequence = 0;
 					$part->create();	
@@ -433,7 +440,26 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$part->messageid = $message->id;
 						$part->type="T";
 						// Voice select is a hack. requirement, is that there is only one male and one female.
-						$part->voiceid = QuickQuery("SELECT id FROM ttsvoice where language='$language' order by gender " . GetFormData($f, $s, 'voiceselect')?"desc":"" . "LIMIT 1");	
+						
+						$langstr = strtolower($language);
+						if (GetFormData($f, $s, 'voiceselect') == "female") {
+							if(isset($voicearray['female'][$langstr])){
+								$part->voiceid = $voicearray['female'][$langstr];
+							} else if(isset($voicearray['male'][$langstr])){
+								$part->voiceid = $voicearray['male'][$langstr];					
+							} else {
+								error_log("Warning no voice found for $langstr");
+							}
+						} else {
+							if(isset($voicearray['male'][$langstr])){
+								$part->voiceid = $voicearray['male'][$langstr];
+							} else if(isset($voicearray['female'][$langstr])){
+								$part->voiceid = $voicearray['female'][$langstr];					
+							} else {
+								error_log("Warning no voice found for $langstr");
+							}
+						}
+							
 						$part->txt = GetFormData($f, $s, "translationtextexpand_" . $language);
 						$part->sequence = 0;
 						$part->update();			
@@ -497,7 +523,8 @@ if( $reloadform )
 	}
 
 	//beautify the dates & times
-	$job->startdate = date("F jS, Y", strtotime($job->startdate));
+	$job->startdate = date("m/j/Y", strtotime($job->startdate));
+	//$job->startdate = date("F jS, Y", strtotime($job->startdate));
 	$job->enddate = date("F jS, Y", strtotime($job->enddate));
 	$job->starttime = date("g:i a", strtotime($job->starttime));
 	$job->endtime = date("g:i a", strtotime($job->endtime));
@@ -678,21 +705,23 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 }
 
 function language_select($form, $section, $name, $skipusedtype) {
-	global $languages, $joblangs, $submittedmode;
+	global $job, $languages, $joblangs, $submittedmode;
 
 	NewFormItem($form, $section, $name, 'selectstart', NULL, NULL, ($submittedmode ? "DISABLED" : ""));
 	NewFormItem($form, $section, $name, 'selectoption'," -- Select a Language -- ","");
 	foreach ($languages as $language) {
-		$used = false;
-		foreach ($joblangs[$skipusedtype] as $joblang) {
-			if ($joblang->language == $language->name) {
-				$used = true;
-				break;
+		if($job && !$job->getSetting('translationmessage')) {
+			$used = false;
+			foreach ($joblangs[$skipusedtype] as $joblang) {
+				if ($joblang->language == $language->name) {
+					$used = true;
+					break;
+				}
 			}
+	
+			if ($used)
+			continue;
 		}
-
-		if ($used)
-		continue;
 		NewFormItem($form, $section, $name, 'selectoption', $language->name, $language->name);
 	}
 	NewFormItem($form, $section, $name, 'selectend');
@@ -1058,7 +1087,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 								</td>
 								<td valign="top" align="left">
 									<div id='translationpreview_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
-										<?= button('Play', "previewlanguage('$language')")?>
+										<?=	button('Play', "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")")?>
 									</div>
 								</td>
 								<td valign="top">
@@ -1677,7 +1706,6 @@ function checkboxhelper(checkall,loading) {
 			automatictranslation();
 		}
 	}
-	
 }
 
 <? // If language checkbox is selected ?>
@@ -1754,13 +1782,16 @@ function previewplay(name) {
 		popup('previewmessage.php?text=' + textarea.value + '&language=english&gender=' + voice, 400, 400);
 	}
 }
-function previewlanguage(language) {
-	var voice = 'female';
-	if(isCheckboxChecked('male_voice')) {
+function previewlanguage(language,female,male) {
+	var voice = 'default';
+	if(isCheckboxChecked('male_voice') && male) {
 		voice = 'male';
-	}	
+	} else if(isCheckboxChecked('female_voice') && female) {
+		voice = 'female';
+	}
+		
 	var text = new getObj('translationtextexpand_' + language).obj;
-	popup('previewmessage.php?text=' + text.value + '&language=english&gender=' + voice, 400, 400);
+	popup('previewmessage.php?text=' + text.value + '&language=' + language +'&gender=' + voice, 400, 400);
 }
 
 
