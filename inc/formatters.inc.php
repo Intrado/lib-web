@@ -159,20 +159,28 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 
 	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
+
 	if ($type == "survey")
 		$reportbtn = '<a href="reportsurveysummary.php?jobid=' . $id . '">Report</a>';
 	else
 		$reportbtn = '<a href="reportjobsummary.php?jobid=' . $id . '">Report</a>';
+
 	$monitorbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '\', 500, 450);" >Monitor</a>';
+
 	$graphbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '&noupdate\', 500, 450);" >Graph</a>';
 
 	$deletebtn = '<a href="jobs.php?delete=' . $id . '" onclick="return confirmDelete();">Delete</a>';
+
 	$archivebtn = '<a href="jobs.php?archive=' . $id . '">Archive</a>';
 
 	$runrepeatbtn = '<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
 
 	$viewresponses = '<a href="replies.php?jobid=' . $id . '">Responses</a>';
+
 	$unarchivebtn = '<a href="jobs.php?unarchive=' . $id . '">Unarchive</a>';
+
+	$copybtn = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
+
 	switch ($status) {
 		case "new":
 		case "scheduled":
@@ -198,7 +206,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			else
 				$usedelbtn = $archivebtn;
 
-			$buttons = array($editbtn);
+			$buttons = array($editbtn, $copybtn);
 
 			if ($USER->authorize('createreport')){
 				$buttons[] = $reportbtn;

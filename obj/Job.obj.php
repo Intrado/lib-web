@@ -67,6 +67,39 @@ class Job extends DBMappedObject {
 		$this->thesql = $rulesql;
 	}
 
+	function copyNew() {
+		//make a copy of this job
+		$newjob = new Job($this->id);
+		$newjob->id = NULL;
+		$newjob->name .= " - " . date("M j, g:i a");
+		$newjob->status = "new";
+		$newjob->assigned = NULL;
+		$newjob->scheduleid = NULL;
+		$newjob->finishdate = NULL;
+
+		$newjob->createdate = QuickQuery("select now()");
+
+		//refresh the dates to present
+		$daydiff = strtotime($newjob->enddate) - strtotime($newjob->startdate);
+
+		$newjob->startdate = date("Y-m-d", time());
+		$newjob->enddate = date("Y-m-d", time() + $daydiff);
+
+		$newjob->create();
+
+		//copy all the job language settings
+		QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
+			select $newjob->id, messageid, type,language
+			from joblanguage where jobid=$this->id");
+
+		//copy all the job lists
+		QuickUpdate("insert into joblist (jobid,listid,thesql)
+			select $newjob->id, listid, thesql
+			from joblist where jobid=$this->id");
+
+		return $newjob;
+	}
+
 	function hasPeople($listid, $thesql) {
 		$hasPeople = false;
 		// find all person ids from list rules
@@ -115,35 +148,7 @@ class Job extends DBMappedObject {
 						//update the finishdate (reused as last run for repeating jobs)
 						QuickUpdate("update job set finishdate=now() where id='$this->id'");
 
-						//make a copy of this job and run it
-						$newjob = new Job($this->id);
-						$newjob->id = NULL;
-						$newjob->name .= " - " . date("M j, g:i a");
-						$newjob->status = "new";
-						$newjob->assigned = NULL;
-						$newjob->scheduleid = NULL;
-						$newjob->finishdate = NULL;
-
-						$newjob->createdate = QuickQuery("select now()");
-
-						//refresh the dates to present
-						$daydiff = strtotime($newjob->enddate) - strtotime($newjob->startdate);
-
-						$newjob->startdate = date("Y-m-d", time());
-						$newjob->enddate = date("Y-m-d", time() + $daydiff);
-
-						$newjob->create();
-
-						//copy all the job language settings
-						QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
-							select $newjob->id, messageid, type,language
-							from joblanguage where jobid=$this->id");
-
-						//copy all the job lists
-						QuickUpdate("insert into joblist (jobid,listid,thesql)
-							select $newjob->id, listid, thesql
-							from joblist where jobid=$this->id");
-
+						$newjob = $this->copyNew();
 						$newjob->runNow();
 						return $newjob;
 

@@ -101,6 +101,15 @@ if (isset($_GET['runrepeating'])) {
 	redirectToReferrer();
 }
 
+if (isset($_GET['copy'])) {
+	$copyid = DBSafe($_GET['copy']);
+	if (userOwns("job",$copyid) || (customerOwnsJob($copyid) && $USER->authorize('managesystemjobs'))) {
+		$job = new Job($copyid);
+		$job->copyNew();
+	}
+	redirectToReferrer();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
