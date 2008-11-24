@@ -69,6 +69,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				}
 				setSystemSetting('tokenlife', GetFormData($f, $s, 'tokenlife'));
 				setSystemSetting('priorityenforcement', GetFormData($f, $s, 'priorityenforcement'));
+				setSystemSetting('cmphoneactivation', GetFormData($f, $s, 'allowphoneactivation'));
 
 				redirect("settings.php");
 			}
@@ -95,6 +96,7 @@ if( $reloadform )
 	}
 	PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 1, 365, true);
 	PutFormData($f, $s, 'priorityenforcement', getSystemSetting('priorityenforcement', 0), "bool", 0, 1);
+	PutFormData($f, $s, 'allowphoneactivation', getSystemSetting('cmphoneactivation', 0), "bool", 0, 1);
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -118,10 +120,17 @@ startWindow('Contact Manager Settings');
 									<td width="30%">Activation Code Lifetime<?=help("Settings_ActCodeLifetime", NULL, "small")?></td>
 									<td><? NewFormItem($f, $s, "tokenlife", "text", 3); ?> 1 - 365 days</td>
 								</tr>
+
+								<tr>
+									<td width="30%">Allow activation via phone <?=help("Settings_CmPhoneActivation", NULL, "small")?></td>
+									<td><? NewFormItem($f, $s, "allowphoneactivation", "checkbox"); ?></td>
+								</tr>
+
 								<tr>
 									<td width="30%">Require phone numbers for Emergency and High Priority Job Types<?=help("Settings_RequirePhone", NULL, "small")?></td>
 									<td><? NewFormItem($f, $s, "priorityenforcement", "checkbox"); ?></td>
 								</tr>
+
 								<tr>
 									<td width="30%">Restricted Destination Fields<?=help("Settings_RestrictedDest", NULL, "small")?></td>
 									<td>
