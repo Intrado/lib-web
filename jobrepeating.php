@@ -21,6 +21,8 @@ include_once("obj/Schedule.obj.php");
 include_once("inc/formatters.inc.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Sms.obj.php");
+include_once("obj/Voice.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
