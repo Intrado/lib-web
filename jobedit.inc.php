@@ -1050,7 +1050,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				message_select('defaultphone',$f, $s,"phonemessageid", "id='phonemessageid' onchange=\"if(this.value == 0){ checkboxhelper(true,false); show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
 				<div id='newphonetext'>
 					Type Your English Message Here | 
-					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onchange=\"automatictranslation()\"") ?>
+					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
 					Automaticaly Translate 
 					<br />
 					<? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?>
