@@ -228,7 +228,7 @@ if( $reloadform )
 	}
 
 	//beautify the dates & times
-	$job->startdate = date("F jS, Y", strtotime($job->startdate));
+	$job->startdate = date("m/j/Y", strtotime($job->startdate));
 	$job->enddate = date("F jS, Y", strtotime($job->enddate));
 	$job->starttime = date("g:i a", strtotime($job->starttime));
 	$job->endtime = date("g:i a", strtotime($job->endtime));
@@ -326,7 +326,8 @@ startWindow('Survey Information');
 				</tr>
 				<tr>
 					<td>Start Date <?= help('SurveyScheduler_StartDate',NULL,"small"); ?></td>
-					<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "")); ?></td>
+					<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")); ?>
+					</td>
 				</tr>
 				<tr>
 					<td>Number of days to run <?= help('SurveyScheduler_NumberOfDays', NULL, "small"); ?></td>
@@ -418,8 +419,7 @@ if (q.obj.selectedIndex)
 	checkphonesurvey(q.obj.options[q.obj.selectedIndex].value);
 
 </script>
-
-
+<script SRC="script/calendar.js"></script>
 
 <?
 include_once("navbottom.inc.php");
