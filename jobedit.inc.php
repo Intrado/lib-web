@@ -188,7 +188,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							QuickUpdate("delete from messagepart where messageid=$themessageid");
 						}
 					} else {
-						QuickUpdate("delete from joblanguage where jobid=" . $job->id);  // If translation mode switched we need to rease the previous joblanguage assosiations			
+						if($job->id)
+							QuickUpdate("delete from joblanguage where jobid=" . $job->id);  // If translation mode switched we need to rease the previous joblanguage assosiations			
 					}
 					$job->setSetting('translationmessage', 1); // Tell the job that this message was created here
 					$newphonemessage = new Message($themessageid);	
@@ -551,14 +552,16 @@ if( $reloadform )
 
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	PutFormData($f,$s,"voiceselect",1);
-	$phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'");	
-	if($phonemessage != NULL) {
-		$parts = DBFindMany("MessagePart","from messagepart where messageid=$phonemessage->id order by sequence");
-		$body = $phonemessage->format($parts);
-		PutFormData($f,$s,"phonetextarea",$body,'text');
-	} else {
-		PutFormData($f,$s,"phonetextarea","","text");
+	
+	PutFormData($f,$s,"phonetextarea","","text");	
+	if($job->getSetting('translationmessage')) {
+		if($phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'")) {
+			$parts = DBFindMany("MessagePart","from messagepart where messageid=$phonemessage->id order by sequence");
+			$body = $phonemessage->format($parts);
+			PutFormData($f,$s,"phonetextarea",$body,'text');
+		}
 	}
+
 
 	foreach($languagearray as $language => $messageid) {		
 		$messagefound = false;
