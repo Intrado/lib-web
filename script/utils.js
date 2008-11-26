@@ -321,3 +321,78 @@ function submitForm (formname,section,value) {
 		theform.submit();
 	}
 }
+
+
+if( typeof XMLHttpRequest == "undefined" ) {
+	XMLHttpRequest = function() {
+		try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch(e) {};
+		try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch(e) {};
+		try { return new ActiveXObject("Msxml2.XMLHTTP"); }     catch(e) {};
+		try { return new ActiveXObject("Microsoft.XMLHTTP"); }  catch(e) {};
+		throw new Error("This browser does not support XMLHttpRequest or XMLHTTP.");
+	};
+}
+
+function ajax(url, vars, callbackFunction, args)
+{
+	var request =  new XMLHttpRequest();
+	request.open("POST", url, true);
+	request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	request.onreadystatechange = function() {
+		try {
+			if (request.readyState == 4 && request.status == 200) {
+				if (request.responseText) {
+					callbackFunction(request.responseText,args);
+				}
+			}
+		} catch(e) {};
+	};
+	request.send(vars);
+}
+
+function serialize(someForm) {
+	var serialized = [];
+	for (var i=0; i < someForm.elements.length; i++) {
+		var el = someForm.elements[i];
+		if (el.disabled || !el.name)
+			continue;
+			
+		switch (el.tagName.toLowerCase()) {
+		case "input":
+			switch (el.type.toLowerCase()) {
+				case "radio":
+				case "checkbox":
+					if (el.checked)
+						serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
+					break;
+				case "file": // don't do anything
+					break;
+				default:
+					serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
+					break;
+			}
+			break;
+		case "select":
+			for (var j=0; j < el.options.length; j++)
+				if (el.options[j].selected)
+					serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.options[j].value));
+			break;
+		case "textarea":
+		case "button":
+		default:
+			serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
+			break;
+		}
+	}
+	return serialized.join("&");
+}
+
+function keyuptimer (e, t, ignoreenterkey, fn, args) {
+	if (this.timeoutid)
+		clearTimeout(this.timeoutid);
+	var e=window.event || e;
+	var keyunicode=e.charCode || e.keyCode;
+	if (keyunicode != 13 || !ignoreenterkey)
+		this.timeoutid = setTimeout(fn,t,args);
+}
+
