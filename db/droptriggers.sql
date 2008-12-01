@@ -1,39 +1,39 @@
 -- drop all triggers and stored procedures from customer database
 -- used by customer data migration script for release 6.0
 
-drop trigger insert_repeating_job
+drop trigger if exists insert_repeating_job
 $$$
-drop trigger update_job
+drop trigger if exists update_job
 $$$
-drop trigger delete_job
+drop trigger if exists delete_job
 $$$
-drop trigger insert_jobsetting
+drop trigger if exists insert_jobsetting
 $$$
-drop trigger update_jobsetting
+drop trigger if exists update_jobsetting
 $$$
-drop trigger delete_jobsetting
+drop trigger if exists delete_jobsetting
 $$$
-drop trigger insert_schedule
+drop trigger if exists insert_schedule
 $$$
-drop trigger update_schedule
+drop trigger if exists update_schedule
 $$$
-drop trigger delete_schedule
+drop trigger if exists delete_schedule
 $$$
-drop trigger insert_reportsubscription
+drop trigger if exists insert_reportsubscription
 $$$
-drop trigger update_reportsubscription
+drop trigger if exists update_reportsubscription
 $$$
-drop trigger delete_reportsubscription
+drop trigger if exists delete_reportsubscription
 $$$
-drop procedure start_import
+drop procedure if exists start_import
 $$$
-drop procedure start_specialtask
+drop procedure if exists start_specialtask
 $$$
-drop trigger insert_joblist
+drop trigger if exists insert_joblist
 $$$
-drop trigger update_joblist
+drop trigger if exists update_joblist
 $$$
-drop trigger delete_joblist
+drop trigger if exists delete_joblist
 $$$
 
 
