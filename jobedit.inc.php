@@ -552,15 +552,15 @@ if( $reloadform )
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	PutFormData($f,$s,"voiceselect",1);
 	
+	PutFormData($f,$s,"messageselect","create");
 	PutFormData($f,$s,"phonetextarea","","text");	
 	if($job->getSetting('translationmessage')) {
-		PutFormData($f,$s,"messageselect","create");
 		if($phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'")) {
 			$parts = DBFindMany("MessagePart","from messagepart where messageid=$phonemessage->id order by sequence");
 			$body = $phonemessage->format($parts);
 			PutFormData($f,$s,"phonetextarea",$body,'text');
 		}
-	} else {
+	} else if ($jobid != NULL) { 
 		PutFormData($f,$s,"messageselect","select");
 	}
 
@@ -1045,12 +1045,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <? 	
 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\"");	echo "Create a Message"; 					
 					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\""); echo "Select a Message";  
-?>				<div id='selectphonemessage'>
+?>				<div id='selectphonemessage' style="display: none">
 <?
 					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");
 ?>				
 				</div>
-				<div id='newphonetext'>
+				<div id='newphonetext' style="display: block">
 					Type Your English Message Here | 
 					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
 					Automaticaly Translate 
@@ -1412,7 +1412,7 @@ foreach($languagearray as $language => $messageid) {
 		show('phoneoptions');
 		hide('displayphoneoptions');	
 
-		if(isCheckboxChecked('radio_create')) { 
+		if(isCheckboxChecked('radio_create')) {
 			show('newphonetext');
 			hide('selectphonemessage');
 			hide('multilingualphoneoption'); 
