@@ -60,14 +60,14 @@ $infojobtypes = DBFindMany("JobType", "from jobtype");
 $queryresult = Query("SELECT DISTINCT l.name FROM language l INNER JOIN ttsvoice t ON t.language = l.name and l.name <> 'english'");
 $languagearray = array();
 while($row = DBGetRow($queryresult)){		
-	$languagearray[htmlentities($row[0])] = NULL;
+	$languagearray[htmlentities(strtolower($row[0]))] = NULL;
 } 
 
 //Get Selected languages
 if($jobid && $job->getSetting('translationmessage')){
 	$queryresult = Query("SELECT j.language, m.id as messageid FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1");
 	while($row = DBGetRow($queryresult)){		
-		$languagearray[htmlentities($row[0])] = $row[1];
+		$languagearray[htmlentities(strtolower($row[0]))] = $row[1];
 	}
 }
 
@@ -178,7 +178,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
 			} else {
 				// If this is a phonemessage and no message was selected the message is a translation message and the phonetextarea is requerd to be fuild in. 
-				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phonemessageid") == ""){
+				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "messageselect") == "create"){
 					$themessageid = null;
 					// If this Message was created in job editor we are free to edit the message, otherwise we have to create a new message
 					if($job->getSetting('translationmessage')) {
@@ -407,7 +407,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//now add any language options
 			$addlang = false;
 			if ($job->getSetting('translationmessage') ) {
-				foreach($languagearray as $language => $messageid) {	
+				foreach($languagearray as $language => $messageid) {
 					if(GetFormData($f, $s, "translate_$language")){
 						$part = NULL;
 						$joblanguage = NULL;
@@ -417,7 +417,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							 // if messageid is not null there should be an existing message and joblanguage
 							$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0 and type='T'");
 							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and messageid= " . $message->id);
-							
 						}
 						$message->userid = $USER->id;
 						$message->type = 'phone';
@@ -549,17 +548,20 @@ if( $reloadform )
 	);
 
 	PopulateForm($f,$s,$job,$fields);
-
+	
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	PutFormData($f,$s,"voiceselect",1);
 	
 	PutFormData($f,$s,"phonetextarea","","text");	
 	if($job->getSetting('translationmessage')) {
+		PutFormData($f,$s,"messageselect","create");
 		if($phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'")) {
 			$parts = DBFindMany("MessagePart","from messagepart where messageid=$phonemessage->id order by sequence");
 			$body = $phonemessage->format($parts);
 			PutFormData($f,$s,"phonetextarea",$body,'text');
 		}
+	} else {
+		PutFormData($f,$s,"messageselect","select");
 	}
 
 
@@ -583,6 +585,7 @@ if( $reloadform )
 				PutFormData($f,$s,"retranslationtext_$language","empty retranslation","text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",$jobid?0:1,"bool",0,1);
 		}
+		PutFormData($f,$s,"tr_edit_$language",0,"bool",0,1);			
 	}
 
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
@@ -678,18 +681,10 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 <table border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td><?
-		$defaultmessage = false;
-		if($type == "defaultphone"){
-			$type = "phone";
-			$defaultmessage = true;	
-		}		
-		
 		NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? " DISABLED " : "") . $extrahtml);
 
 		if($type == "sms") {
 			NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
-		} elseif ($type == "phone" && $defaultmessage) {
-			NewFormItem($form,$section,$name, "selectoption", ' -- Create a Message -- ', "");
 		} else {
 			NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
 		}
@@ -699,7 +694,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 		NewFormItem($form,$section,$name, "selectend");
 		?></td>
 		<?	if ($type == "phone") { ?>
-		<td><?= button('Play', "previewplay('$name')")?>		
+		<td><?= button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);") ?>
 		</td>
 		<?	} ?>
 	</tr>
@@ -1046,67 +1041,98 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-				<td><? 							
-				message_select('defaultphone',$f, $s,"phonemessageid", "id='phonemessageid' onchange=\"if(this.value == 0){ checkboxhelper(true,false); show('newphonetext');hide('multilingualphoneoption'); }else{ hide('newphonetext');show('multilingualphoneoption'); }\""); ?>
+				<td>
+<? 	
+					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\"");	echo "Create a Message"; 					
+					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\""); echo "Select a Message";  
+?>				<div id='selectphonemessage'>
+<?
+					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");
+?>				
+				</div>
 				<div id='newphonetext'>
 					Type Your English Message Here | 
 					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
 					Automaticaly Translate 
 					<br />
-					<? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?>
-					<br />
+					<table>
+					<tr>
+					<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?></td>
+					<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
+					</tr>
+					</table>
 					Preferred Voice:
-					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked")?> Female 
-					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice'")?> Male
-
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked"); ?> Female 
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice'"); ?> Male
+					<br />
 					<div id='translationdetails' style="display: block">
-						<a href="#" onclick="translationoptions(true); return false; ">Show translation	options</a>
+						<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>
 					</div>
 					<div id='translationbasic' style="display: none">
-						<a href="#"	onclick="translationoptions(false); return false; ">Hide translation options</a>
+						<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>
 					</div>
 
 					<div id='translationoptions' style="display: none">
-					<table border="0" cellpadding="2" cellspacing="0" width=100%>
-
-
+					<br />
+					
+						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 <?
-						foreach($languagearray as $language => $messageid) {
-							$languageisset = $messageid?1:($jobid?0:1);
-?>
+foreach($languagearray as $language => $messageid) {
+	$languageisset = $messageid?1:($jobid?0:1);
+?>				
 							<tr>
-								<td valign="top" align="left"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); ?>
-								<? echo $language; ?></td>
-								<td valign="top" align="right" width="50">
-									<div id='language_<? echo $language?>' style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">
-									<? NewFormItem($f,$s,"translationtext_$language", "text", 50,50,"id='translationtext_$language' disabled"); ?>
+								<td style="white-space:nowrap;" valign="top" class="bottomBorder"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); echo "&nbsp;" . ucfirst($language) . ": ";?>
+								</td>
+								<td valign="top" class="bottomBorder">
+									<table width="100%" style="table-layout:fixed;">
+									<tr>
+										<td>
+									<div class="chop" id='language_<? echo $language?>' style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">			
+										<?echo GetFormData($f, $s, "translationtext_$language"); ?> 
 									</div>
+										</td>
+									</tr>
+									</table>
 									<div id='languageexpand_<? echo $language?>' style="display: none">
-										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 40, 3,"id='translationtextexpand_$language'"); ?>
-									</div>
-									<div id='languagedetails_<? echo $language?>' style="display: none">
-										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 40, 3); ?>
-									</div>
+										Translation <?= help('Job_Translation',NULL,"small"); ?> <br />
+										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 45, 3,"id='translationtextexpand_$language'  disabled"); ?>
+										<br />
+										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language' onclick=\"editlanguage('$language')\"") ?> Edit Translation <?= help('Job_EditTranslation',NULL,"small"); ?> 
+										
+										<br /><br />
+										Retranslation <?= help('Job_Retranslation',NULL,"small"); ?> <br />
+										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3," disabled"); ?>
+									</div>						
 								</td>
-								<td valign="top" align="left">
-									<div id='translationpreview_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
-										<?=	button('Play', "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")")?>
-									</div>
-								</td>
-								<td valign="top">
-
+								<td style="white-space:nowrap;" valign="top" class="bottomBorder">
 									<div id='translationdetails_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
-										<a href="#"	onclick="langugaedetails('<? echo $language;?>',true); return false;">Show details</a>
+										<table border="0"> 
+										<tr>
+										<td><?=	button('Play', "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")");?>
+										</td>
+										<td>
+										<a href="#"	onclick="langugaedetails('<? echo $language;?>',true); return false;">Show&nbsp;details</a>
+										</td>
+										</tr>
+										</table>
 									</div>
 									<div id='translationbasic_<? echo $language?>' style="display: none">
-										<a href="#" onclick="langugaedetails('<? echo $language;?>',false); return false;">Hide details</a>
+										<table border="0"> 
+										<tr>
+										<td><?=	button('Play', "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")");?>
+										</td>
+										<td>
+										<a href="#" onclick="langugaedetails('<? echo $language;?>',false); return false;">Hide&nbsp;details</a>	
+										</td>
+										</tr>
+										</table>
 									</div>
 								</td>
-								<td>&nbsp;
-								</td>
-							</tr>
-						<?}	?>
-					</table>
+							</tr>							
+<?}	?>
+							</table>
+							
+
 				</div>
 				</div>
 				</td>
@@ -1386,15 +1412,15 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		show('phoneoptions');
 		hide('displayphoneoptions');	
 
-		if(document.getElementById('phonemessageid') != null && document.getElementById('phonemessageid').value == 0) { 
+		if(isCheckboxChecked('radio_create')) { 
 			show('newphonetext');
+			hide('selectphonemessage');
 			hide('multilingualphoneoption'); 
 		} else {
 			hide('newphonetext');
+			show('selectphonemessage');
 			show('multilingualphoneoption');
 		}
-
-		
 		<?
 		if ($_SESSION['jobid'] != null) {
 			$diffvalues = $job->compareWithDefaults();
@@ -1462,7 +1488,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		}
 	}
 
-	checkboxhelper(false,true);
+	checkboxhelper('loading');
 
 	function limit_chars(field) {
 		if (field.value.length > 160)
@@ -1625,13 +1651,10 @@ function clickIcon(section){
 <? // If Automatic translation is selected ?>
 function automatictranslation(){
 	if(isCheckboxChecked('translatecheckone')){
-		show('translationdetails');
-		checkboxhelper(true,false);
+		checkboxhelper('all');
 	} else {
-		hide('translationdetails');
-	}	
-	hide('translationbasic');
-	hide('translationoptions');
+		checkboxhelper('none');
+	}
 }
 <? // Show Translation options ?>
 function translationoptions(details){
@@ -1653,7 +1676,7 @@ function translationoptions(details){
 * - On loading the page. This will ensure that the right boxes show up if there is an error message to the user
 * - if not checkall and loading the checkbox helper will unselect automatic translation if no Languages are selected
 */ ?>
-function checkboxhelper(checkall,loading) {
+function checkboxhelper(mode) {
 <?
 	$languagestring = "";
 	foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
@@ -1661,42 +1684,47 @@ function checkboxhelper(checkall,loading) {
 ?>
 	var languagelist=new Array(<? echo $languagestring; ?>);
 
-	if(checkall == true){
-		setChecked('translatecheckone');
-		show('translationdetails');
-		hide('translationbasic');
-		hide('translationoptions');
-		for (i = 0; i < languagelist.length; i++) {		
-			setChecked('translate_' + languagelist[i]);
-			show('language_' + languagelist[i]);
-			show('translationpreview_' + languagelist[i]);
-			show('translationdetails_' + languagelist[i]);
-			hide('translationbasic_' + languagelist[i]);
+	if(mode == 'all'){
+		for (i = 0; i < languagelist.length; i++) {	
+			var language = languagelist[i]
+			setChecked('translate_' + language);
+			show('language_' + language);
+			show('translationdetails_' + language);
+			hide('languageexpand_' + language);
+			hide('translationbasic_' + language);
 		}
-	} else if(loading) {
+		var x = new getObj('translatecheckone');
+		x.obj.checked = true;
+	} else if(mode == 'none'){		
+		for (i = 0; i < languagelist.length; i++) {	
+			var language = languagelist[i]
+			var x = new getObj('translate_' + language);
+			x.obj.checked = false;			
+			hide('language_' + language);
+			hide('translationdetails_' + language);
+			hide('languageexpand_' + language);
+			hide('translationbasic_' + language);	
+		}
+	} else if(mode == 'loading') {
 		var checked = false;
 		for (i = 0; i < languagelist.length; i++) {
 			var language = languagelist[i]
 			if(isCheckboxChecked('translate_' + language)){
 				show('language_' + language);
-				show('translationpreview_' + language);
 				show('translationdetails_' + language);
 				checked = true;
 			} else {
 				hide('language_' + language);
-				hide('translationpreview_' + language);
 				hide('translationdetails_' + language);
 			}
 			hide('languageexpand_' + language);
-			hide('languagedetails_' + language);	
 			hide('translationbasic_' + language);	
 		}
 		if(!checked) {
 			var x = new getObj('translatecheckone');
 			x.obj.checked = false;
-			automatictranslation();
 		}
-	} else {
+	} else { // default
 		var checked = false;
 		for (i = 0; i < languagelist.length; i++) {
 			if(isCheckboxChecked('translate_' + languagelist[i])){
@@ -1706,25 +1734,22 @@ function checkboxhelper(checkall,loading) {
 		if(!checked) {
 			var x = new getObj('translatecheckone');
 			x.obj.checked = false;
-			automatictranslation();
 		}
 	}
 }
 
 <? // If language checkbox is selected ?>
 function translationlanguage(language){
-	checkboxhelper(false,false);
+	checkboxhelper('default');
 	if (isCheckboxChecked('translate_' + language)){
+		setChecked('translatecheckone');
 		show('language_' + language);
-		show('translationpreview_' + language);
 		show('translationdetails_' + language);
 	} else {
 		hide('language_' + language);
-		hide('translationpreview_' + language);
 		hide('translationdetails_' + language);
 	}	
 	hide('languageexpand_' + language);
-	hide('languagedetails_' + language);
 	hide('translationbasic_' + language);		
 }
 
@@ -1733,16 +1758,19 @@ function langugaedetails(language, details){
 	if(details){
 		hide('language_' + language);
 		show('languageexpand_' + language);
-		show('languagedetails_' + language);
 		show('translationbasic_' + language);
 		hide('translationdetails_' + language);
 	} else {
 		show('language_' + language);
 		hide('languageexpand_' + language);
-		hide('languagedetails_' + language);
 		hide('translationbasic_' + language);
 		show('translationdetails_' + language);	
 	}
+}
+
+function editlanguage(language) {
+	var textbox = new getObj('translationtextexpand_' + language).obj;	
+	textbox.disabled = !isCheckboxChecked('tr_edit_' + language);	
 }
 
 function display_jobtype_info(value){
@@ -1772,19 +1800,6 @@ function display_jobtype_info(value){
 ?>
 }
 
-function previewplay(name) {
-	var audio = new getObj(name).obj;
-	if(audio.selectedIndex >= 1)
-		popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);
-	else {
-		var textarea = new getObj('phonetextarea').obj;	
-		var voice = 'female';
-		if(isCheckboxChecked('male_voice')) {
-			voice = 'male';
-		}	
-		popup('previewmessage.php?text=' + textarea.value + '&language=english&gender=' + voice, 400, 400);
-	}
-}
 function previewlanguage(language,female,male) {
 	var voice = 'default';
 	if(isCheckboxChecked('male_voice') && male) {
@@ -1792,8 +1807,12 @@ function previewlanguage(language,female,male) {
 	} else if(isCheckboxChecked('female_voice') && female) {
 		voice = 'female';
 	}
-		
-	var text = new getObj('translationtextexpand_' + language).obj;
+	var text;
+	if(language == 'english')
+		text = new getObj('phonetextarea').obj;
+	else 
+		text = new getObj('translationtextexpand_' + language).obj;
+	 
 	popup('previewmessage.php?text=' + text.value + '&language=' + language +'&gender=' + voice, 400, 400);
 }
 
