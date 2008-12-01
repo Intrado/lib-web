@@ -382,7 +382,14 @@ input.text, input , select, textarea, table.form  {
 	width: 85px;
 }
 
-
+.chop {
+		width: 100%;
+		white-space:nowrap;
+		overflow: hidden;
+		color: #666666;
+		border: 1px solid <?=$theme1?>;
+}
+  
 /* Scrolling window style settings */
 div.scrollTableContainer {
 	height: 220px; /* Set scrolling window size */
