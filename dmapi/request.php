@@ -47,6 +47,8 @@ function specialtask($methodname, $params){
 		forwardToPage("easycall.php");
 	} else if(strtolower($task->type) == "callme"){
 		forwardToPage("callme.php");
+	} else if(strtolower($task->type) == "cmphoneactivation"){
+		forwardToPage("cmphoneactivation.php");
 	} else {
 		$ERROR = "Unknown Special Task Type";
 	}

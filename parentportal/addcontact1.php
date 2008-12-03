@@ -28,39 +28,49 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			//submit changes
-			$result = portalAssociatePerson(GetFormData($f, $s, "code"), GetFormData($f, $s, "pkey"));
-			if($result['result'] == ""){
-				if(!isset($_SESSION['pidlist'][$result['customerid']])){
-					$_SESSION['pidlist'][$result['customerid']] = array();
-				}
-				
-				if(!isset($_SESSION['customerid'])){
-					$associationresult = portalGetCustomerAssociations();
-					if($associationresult['result'] == ""){
-						$customerlist = $associationresult['custmap'];
-						$customeridlist = array_keys($customerlist);
-					} else {
-						$customeridlist = array();
-					}
-					$_SESSION['customerid'] = $result['customerid'];
-					
-					$_SESSION['custname'] = $customerlist[$customeridlist[0]];
-					$accessresult = portalAccessCustomer($customeridlist[0]);
-					if($accessresult['result'] != ""){
-						error("There was an unknown problem connecting to that customer");
-					}
-					//make sure timezone gets updated to the current customer's tz
-					$timezone = getSystemSetting("timezone");
-					$_SESSION['timezone'] = $timezone;
-				}
 
-				$_SESSION['pidlist'][$result['customerid']][] = $result['personid'];
-				$_SESSION['currentpid'] = $result['personid'];
-				$_SESSION['currentcid'] = $result['customerid'];
-				redirect("addcontact2.php");
+			// by phone
+			if (GetFormData($f, $s, "radioselect") == "byphone") {
+				$pkey = GetFormData($f, $s, "pkey");
+				$_SESSION['phoneactivationpkeylist'] = array();
+				$_SESSION['phoneactivationpkeylist'][] = $pkey;
+				redirect("phoneactivation1.php");
 			} else {
-				error("That is not a valid Activation Code and Person ID combination");
-			}
+				// by code
+				$result = portalAssociatePerson(GetFormData($f, $s, "code"), GetFormData($f, $s, "pkey"));
+				if($result['result'] == ""){
+					if(!isset($_SESSION['pidlist'][$result['customerid']])){
+						$_SESSION['pidlist'][$result['customerid']] = array();
+					}
+
+					if(!isset($_SESSION['customerid'])){
+						$associationresult = portalGetCustomerAssociations();
+						if($associationresult['result'] == ""){
+							$customerlist = $associationresult['custmap'];
+							$customeridlist = array_keys($customerlist);
+						} else {
+							$customeridlist = array();
+						}
+						$_SESSION['customerid'] = $result['customerid'];
+
+						$_SESSION['custname'] = $customerlist[$customeridlist[0]];
+						$accessresult = portalAccessCustomer($customeridlist[0]);
+						if($accessresult['result'] != ""){
+							error("There was an unknown problem connecting to that customer");
+						}
+						//make sure timezone gets updated to the current customer's tz
+						$timezone = getSystemSetting("timezone");
+						$_SESSION['timezone'] = $timezone;
+					}
+
+					$_SESSION['pidlist'][$result['customerid']][] = $result['personid'];
+					$_SESSION['currentpid'] = $result['personid'];
+					$_SESSION['currentcid'] = $result['customerid'];
+					redirect("addcontact2.php");
+				} else {
+					error("That is not a valid Contact Identification Number and Activation Code combination");
+				}
+			} // end radio selection bycode
 		}
 	}
 } else {
@@ -70,31 +80,49 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
-	PutFormData($f, $s, "pkey", "", "text");
-	PutFormData($f, $s, "code", "", "text");
 
+	PutFormData($f, $s, "radioselect", "bycode");
+
+	PutFormData($f, $s, "pkey", "", "text", 1, 255, true);
+	PutFormData($f, $s, "code", "", "text");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Add A Contact";
+$TITLE = "Contact Activation";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'Add'), button("Cancel", NULL, "addcontact3.php"));
+buttons(submit($f, $s, 'Next'), button("Cancel", NULL, "addcontact3.php"));
 
 
-startWindow('Add');
+startWindow('Activation Method');
 ?>
 <table>
 	<tr>
-		<td>ID#</td><td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
+		<td>Contact Identification Number:</td><td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
+	</tr>
+<?	if ($INBOUND_ACTIVATION) { ?>
+	<tr>
+		<td>
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "bycode", ""); ?> I have an Activation Code:
+		</td>
+
+		<td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
+
 	</tr>
 	<tr>
-		<td>Activation Code: </td><td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
+		<td>
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "byphone", ""); ?> I need an Activation Code by phone.
+		</td>
 	</tr>
+<?	} else { ?>
+	<tr>
+		<td>Activation Code:</td><td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
+	</tr>
+<?	} ?>
 </table>
 <?
 endWindow();

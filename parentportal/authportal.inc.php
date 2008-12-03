@@ -35,8 +35,16 @@ function pearxmlrpc($method, $params) {
 }
 
 
-function portalCreateAccount($username, $password, $firstname, $lastname, $zipcode, $notifyType) {
-	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'), new XML_RPC_Value(trim($notifyType), 'string'));
+function portalCreateAccount($username, $password, $firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms) {
+	$customerurl = "";
+	if (isset($_GET['u'])) {
+		$customerurl = $_GET['u'];
+	}
+	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'),
+			new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'),
+			new XML_RPC_Value(trim($zipcode), 'string'), new XML_RPC_Value(trim($notifyType), 'string'),
+			new XML_RPC_Value(trim($notifysmsType), 'string'), new XML_RPC_Value($customerurl, 'string'),
+			new XML_RPC_Value($sms, 'string'));
 	$method = "PortalServer.portal_createAccount";
 	$result = pearxmlrpc($method, $params);
 	return $result; // we do nothing for success/fail
@@ -77,7 +85,11 @@ function portalLogin($username, $password) {
 
 function portalGetCustomerAssociations() {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'));
+	$customerurl = "";
+	if (isset($_GET['u'])) {
+		$customerurl = $_GET['u'];
+	}
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_getCustomerAssociations";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -110,7 +122,11 @@ function portalAssociatePerson($token, $validationdata) {
 
 
 function portalForgotPassword($username) {
-	$params = array(new XML_RPC_Value(trim($username), 'string'));
+	$customerurl = "";
+	if (isset($_GET['u'])) {
+		$customerurl = $_GET['u'];
+	}
+	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_forgotPassword";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -126,9 +142,12 @@ function portalGetPortalUser() {
 }
 
 
-function portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType) {
+function portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'), new XML_RPC_Value(trim($notifyType), 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'),
+			new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'),
+			new XML_RPC_Value(trim($notifyType), 'string'), new XML_RPC_Value(trim($notifysmsType), 'string'),
+			new XML_RPC_Value($sms, 'string'));
 	$method = "PortalServer.portal_updateMyPortalUser";
 	$result = pearxmlrpc($method, $params);
 	return $result;
@@ -152,6 +171,14 @@ function portalUpdatePortalUsername($username, $password) {
 	return $result;
 }
 
+function portalCreatePhoneActivation($customerid, $portaluserid, $pkeyList) {
+	$pkeyListCSV = implode(",", $pkeyList); // TODO does pkey have a comma in it?
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'), new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($pkeyListCSV, 'string'));
+	$method = "PortalServer.portal_createPhoneActivation";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
 
 function portalGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));
@@ -200,7 +227,7 @@ function doDBConnect($result) {
 		if (mysql_set_charset("utf8",$_dbcon)) {
 			// successful connection to customer database
 			return true;
-		} else {
+	} else {
 			error_log("Couldn't select mysql charset. e:" . mysql_error());
 		}
 	} else {
@@ -219,7 +246,6 @@ function doStartSession() {
 		@date_default_timezone_set($_SESSION['timezone']);
 		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 	}
-
 }
 
 

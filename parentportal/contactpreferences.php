@@ -46,7 +46,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 }
 
 if($PERSONID){
-	
+
 	$maxphones = getSystemSetting("maxphones", 3);
 	$maxemails = getSystemSetting("maxemails", 2);
 	$maxsms = getSystemSetting("maxsms", 2);
@@ -122,7 +122,7 @@ if($PERSONID){
 					error("You must have at least one phone number that can receive calls for these job types: " . implode(", ", $error));
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
-					
+
 					if(GetFormData($f, $s, "savetoall")){
 						//Fetch all person id's associated with this user on this customer
 						//then remove the current person id from the list
@@ -166,17 +166,17 @@ if($PERSONID){
 }
 include_once("nav.inc.php");
 startWindow("Contacts" . help("Contactpreferences"), 'padding: 3px;');
+buttons(button("Add A Contact", null, "addcontact1.php"));
 
 if(isset($contactList) && $contactList){
-	buttons(button("Add A Contact", null, "addcontact1.php"));
 
 	$titles = array("pkey" => "ID#",
 					$firstnamefield => "First Name",
 					$lastnamefield => "Last Name",
 					"Actions" => "Actions");
 	$formatters = array("Actions" => "contact_actions");
-	
-	
+
+
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
 	echo '<tr class="listHeader">';
 	foreach ($titles as $title) {
@@ -209,7 +209,7 @@ if(isset($contactList) && $contactList){
 		echo "</tr>\n";
 	}
 	echo "</table>";
-	
+
 }
 endWindow();
 

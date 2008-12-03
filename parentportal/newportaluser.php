@@ -7,11 +7,19 @@ $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../obj/Phone.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
+
+// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
+$appendcustomerurl = "";
+if (isset($_GET['u'])) {
+	$appendcustomerurl = "?u=".$_GET['u'];
+}
 
 $login = "";
 $confirmlogin="";
@@ -19,6 +27,8 @@ $firstname = "";
 $lastname = "";
 $zipcode = "";
 $notify = 0;
+$notifysms = 0;
+$sms = "";
 $success = false;
 $tos = file_get_contents("terms.html");
 
@@ -31,6 +41,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$password1 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password1'])) : trim($_POST['password1']);
 	$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
 	$notify = isset($_POST['notify']) ? $_POST['notify'] : 0;
+	$notifysms = isset($_POST['notifysms']) ? $_POST['notifysms'] : 0;
+	$sms = get_magic_quotes_gpc() ? stripslashes($_POST['sms']) : $_POST['sms'];
 	$acceptterms = isset($_POST['acceptterms']);
 	if($login != $confirmlogin){
 		error("The emails you have entered do not match");
@@ -48,13 +60,20 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error("Passwords must be at least 5 characters long");
 	} else if($passworderror = validateNewPassword($login, $password1, $firstname, $lastname)){
 		error($passworderror);
+	} else if ($phoneerror = Phone::validate($sms)) {
+		error($phoneerror);
 	} else {
-		if($notify){
+		if ($notify) {
 			$notifyType = "message";
 		} else {
 			$notifyType = "none";
 		}
-		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode, $notifyType);
+		if ($notifysms) {
+			$notifysmsType = "message";
+		} else {
+			$notifysmsType = "none";
+		}
+		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms);
 		if($result['result'] != ""){
 			if($result['result'] == "duplicate"){
 				$errordetails = "That email address is already in use";
@@ -80,7 +99,7 @@ $TITLE = "Create a New Account";
 include_once("cmlogintop.inc.php");
 if(!$success){
 ?>
-	<form method="POST" action="newportaluser.php" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
+	<form method="POST" action="newportaluser.php<?echo $appendcustomerurl;?>" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
 		<table width="100%" style="color: #365F8D;" >
 			<tr>
 				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
@@ -123,6 +142,13 @@ if(!$success){
 				<td colspan="2"><input type="checkbox" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>&nbsp;Email me when I have a new phone message.</td>
 			</tr>
 			<tr>
+				<td colspan="2"><input type="checkbox" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?>/>&nbsp;Text me when I have a new phone message.</td>
+			</tr>
+			<tr>
+				<td>Mobile Phone for Text Messaging:</td>
+				<td><input type="text" name="sms" value="<?=Phone::format($sms)?>" size="20" maxlength="20"/></td>
+			</tr>
+			<tr>
 				<td colspan="2"><div style="overflow:scroll; height:250px; width:525px;"><?=$tos ?></div></td>
 			</tr>
 			<tr>
@@ -132,7 +158,7 @@ if(!$success){
 				<td colspan="2"><div><input type="image" src="img/createaccount.gif" onmouseover="this.src='img/createaccount_over.gif';" onmouseout="this.src='img/createaccount.gif';"></div></td>
 			</tr>
 			<tr>
-				<td colspan="2"><br><a href="index.php">Return to Sign In</a></td>
+				<td colspan="2"><br><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
 			</tr>
 		</table>
 	</form>
@@ -146,9 +172,9 @@ if(!$success){
 				<div style="margin:5px">
 					Thank you, Your account has been created.
 					<br>Please check your email to activate your account.
-					<br>You will be redirected to the activate page in 10 seconds or <a href="index.php?n">Click Here.</a>
+					<br>You will be redirected to the activate page in 10 seconds or <a href="index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?n"; else echo "&n"; ?>">Click Here.</a>
 				</div>
-				<meta http-equiv="refresh" content="10;url=index.php?n">
+				<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?n"; else echo "&n"; ?>">
 			</td>
 			<td>&nbsp;</td>
 		</tr>

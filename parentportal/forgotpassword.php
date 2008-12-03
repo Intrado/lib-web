@@ -4,6 +4,12 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
+// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
+$appendcustomerurl = "";
+if (isset($_GET['u'])) {
+	$appendcustomerurl = "?u=".$_GET['u'];
+}
+
 $success = false;
 $emailnotfound = false;
 $generalerror = false;
@@ -24,7 +30,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			if($result['result'] == "invalid argument"){
 				$success = true;
 			} else {
-				$generalerror = true;	
+				$generalerror = true;
 			}
 		}
 	}
@@ -38,7 +44,7 @@ if($generalerror){
 
 if(!$success){
 ?>
-<form method="POST" action="forgotpassword.php" name="forgotpassword">
+<form method="POST" action="forgotpassword.php<?echo $appendcustomerurl;?>" name="forgotpassword">
 	<table width="100%" style="color: #365F8D;" >
 		<tr>
 			<td colspan="2""><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
@@ -60,7 +66,7 @@ if(!$success){
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><br><a href="index.php">Return to Sign In</a></td>
+			<td><br><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
 		</tr>
 	</table>
 </form>
@@ -74,9 +80,9 @@ if(!$success){
 			<td>
 				<div style="margin:5px">
 					Check your email to receive the password reset link.
-					<br>You will be redirected to the Activation page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a>
+					<br>You will be redirected to the Activation page in 10 seconds, or you can <a href="index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?f"; else echo "&f"; ?>">Click Here to continue.</a>
 				</div>
-				<meta http-equiv="refresh" content="10;url=index.php?f">
+				<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?f"; else echo "&f"; ?>">
 			</td>
 		</tr>
 	</table>

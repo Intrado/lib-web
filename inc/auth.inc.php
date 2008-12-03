@@ -1,6 +1,6 @@
 <?
 
-// if returndata, return data regardless of result success/failuer
+// if returndata, return data regardless of result success/failure
 function pearxmlrpc($method, $params, $returndata = false) {
 	global $SETTINGS;
 	$authhost = $SETTINGS['authserver']['host'];
@@ -350,6 +350,21 @@ function revokePersonTokens($personids) {
 	return false;
 }
 
+function inboundCmFindCallerid($callerid) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($callerid, 'string'));
+	$method = "PortalServer.inbound_findCallerid";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
+
+function inboundCmPhoneActivation($callerid, $code) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($callerid, 'string'), new XML_RPC_Value($code, 'string'));
+	$method = "PortalServer.inbound_activate";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
 
 
 ?>

@@ -8,6 +8,8 @@ require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Person.obj.php");
 require_once("../inc/formatters.inc.php");
 require_once("../obj/Message.obj.php");
+require_once("../obj/Phone.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -114,6 +116,12 @@ $PAGE = 'messages:messages';
 include_once("nav.inc.php");
 if(isset($contactList) && $contactList){
 	?><div><b>Messages from the last 30 days</b></div><br><?
+
+	// if customer has message callback feature, let the user know about it
+	if ($INBOUND_HASCALLBACK) {
+		echo "You may call ".Phone::format($INBOUND_HASCALLBACK)." at any time to listen to your phone messages.<BR><BR>";
+	}
+
 	$counter = 1000;
 	foreach($contactList as $personid){
 		$counter++;

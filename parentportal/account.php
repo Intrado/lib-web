@@ -3,7 +3,7 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
-
+require_once("../obj/Phone.obj.php");
 
 $error_failedupdate = "There was an error updating your information";
 $error_failedupdatepassword = "There was an error updating your password";
@@ -29,6 +29,7 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		$newpassword1 = trim(GetFormData($f, $s, "newpassword1"));
 		$newpassword2 = trim(GetFormData($f, $s, "newpassword2"));
+		$sms = trim(GetFormData($f, $s, "sms"));
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(strlen($newpassword1) > 0 && strlen($newpassword1) < 5){
@@ -37,6 +38,8 @@ if(CheckFormSubmit($f,$s))
 			error($passworderror);
 		} else if($newpassword1 != $newpassword2){
 			error('Password confirmation does not match');
+		} else if ($phoneerror = Phone::validate($sms)) {
+			error($phoneerror);
 		} else {
 			//submit changes
 			if(GetFormData($f, $s, "notify")){
@@ -44,7 +47,12 @@ if(CheckFormSubmit($f,$s))
 			} else {
 				$notifyType = "none";
 			}
-			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType);
+			if(GetFormData($f, $s, "notifysms")){
+				$notifysmsType = "message";
+			} else {
+				$notifysmsType = "none";
+			}
+			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType, $notifysmsType, GetFormData($f, $s, "sms"));
 			if($result['result'] != ""){
 				$updateuser = false;
 				error($error_failedupdate);
@@ -81,6 +89,8 @@ if( $reloadform )
 	PutFormData($f, $s, "oldpassword", "", "text");
 	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999");
 	PutFormData($f, $s, "notify",  ($_SESSION['portaluser']['portaluser.notifytype'] == "message") ? 1 : 0, "bool", 0, 1);
+	PutFormData($f, $s, "notifysms",  ($_SESSION['portaluser']['portaluser.notifysmstype'] == "message") ? 1 : 0, "bool", 0, 1);
+	PutFormData($f, $s, "sms", Phone::format($_SESSION['portaluser']['portaluser.sms']), "text", "2", "20"); // 20 is the max to accomodate formatting chars
 }
 
 $PAGE = "account:account";
@@ -134,9 +144,17 @@ startWindow('User Information');
 			<td  class="bottomBorder">
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>
-						<td><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Email me when I have a new phone message.</td>
+						<td colspan="2"><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Email me when I have a new phone message.</td>
 					</tr>
-	</table>
+					<tr>
+						<td colspan="2"><? NewFormItem($f,$s, 'notifysms', 'checkbox'); ?>&nbsp;Text me when I have a new phone message.</td>
+					</tr>
+					<tr>
+						<td align="right">Mobile Phone for Text Messaging:</td>
+						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20); ?></td>
+					</tr>
+
+				</table>
 			<td>
 		</tr>
 	</table>

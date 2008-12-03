@@ -4,6 +4,11 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
+// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
+$appendcustomerurl = "";
+if (isset($_GET['u'])) {
+	$appendcustomerurl = "?u=".$_GET['u'];
+}
 
 $form = true;
 $forgotsuccess = false;
@@ -79,17 +84,26 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 }
 
-if($forgot){
+if ($forgot) {
 	$TITLE = "Password Assistance";
-	$action = "?f";
+	if ($appendcustomerurl == "")
+		$action = "?f";
+	else
+		$action = $appendcustomerurl."&f";
 	$text = "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address";
-} else if($changeuser){
+} else if ($changeuser) {
 	$TITLE = "Change Email";
-	$action = "?c";
+	if ($appendcustomerurl == "")
+		$action = "?c";
+	else
+		$action = $appendcustomerurl."&c";
 	$text = "your password";
 } else {
 	$TITLE = "Activate Account";
-	$action = "?n";
+	if ($appendcustomerurl == "")
+		$action = "?n";
+	else
+		$action = $appendcustomerurl."&n";
 	$text = "your password";
 }
 include("cmlogintop.inc.php");
@@ -106,25 +120,25 @@ if($forgotsuccess){
 	?>
 	<div style="margin:5px">
 		Thank you, your password has been reset.
-		<br>You will be redirected to the main page in 10 seconds or <a href="choosecustomer.php">Click Here.</a>
+		<br>You will be redirected to the main page in 10 seconds or <a href="choosecustomer.php<?echo $appendcustomerurl;?>">Click Here.</a>
 	</div>
-	<meta http-equiv="refresh" content="10;url=choosecustomer.php">
+	<meta http-equiv="refresh" content="10;url=choosecustomer.php<?echo $appendcustomerurl;?>">
 	<?
 } else if($success){
 	?>
 	<div style="margin:5px">
 		Thank you, your account has been activated.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php">Click Here.</a>
+		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
 	</div>
-	<meta http-equiv="refresh" content="10;url=index.php">
+	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
 	<?
 } else if($newusersuccess){
 	?>
 	<div style="margin:5px">
 		Thank you, your email address has been changed.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php">Click Here.</a>
+		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
 	</div>
-	<meta http-equiv="refresh" content="10;url=index.php">
+	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
 	<?
 }
 if($forgotsuccess || $success || $newusersuccess){
@@ -195,7 +209,7 @@ if($form){
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><a href="index.php">Return to Sign In</a></td>
+			<td><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
 		</tr>
 		</table>
 	</form>

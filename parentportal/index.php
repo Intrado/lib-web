@@ -5,6 +5,11 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
+// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
+$appendcustomerurl = "";
+if (isset($_GET['u'])) {
+	$appendcustomerurl = "?u=".$_GET['u'];
+}
 
 $changeuser = false;
 $forgot = false;
@@ -39,9 +44,10 @@ if (isset($_GET['logout'])) {
 
 if ($SETTINGS['feature']['has_ssl']) {
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
-		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php");
+		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php".$appendcustomerurl);
 	}
 }
+
 
 $login="";
 $badlogin=false;
@@ -62,9 +68,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 } else if (!isset($_GET['logout'])){
 	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
 	$sessionstarted = true;
-
 	if (isset($_SESSION['portaluserid'])) {
-		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php';
+		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php'.$appendcustomerurl;
 		unset($_SESSION['lasturi']);
 		redirect($redirpage);
     }
@@ -74,16 +79,17 @@ if($id){
 		doStartSession();
 	$_SESSION['portaluserid'] = $id;
 	$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
-	redirect("choosecustomer.php");
+
+	redirect("choosecustomer.php".$appendcustomerurl);
 }
+
 
 $TITLE= "Sign In";
 
 include_once("cmlogintop.inc.php");
 
-
 ?>
-<form method="POST" action="index.php" name="login">
+<form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
 	<table style="color: #365F8D;" >
 		<tr>
 			<td colspan="3">
@@ -111,7 +117,7 @@ include_once("cmlogintop.inc.php");
 		<tr>
 			<td>Password&nbsp;(case&nbsp;sensitive):</td>
 			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
-			<td align="left"><a href="forgotpassword.php">Forgot your password? Click Here</a></td>
+			<td align="left"><a href="forgotpassword.php<?echo $appendcustomerurl;?>">Forgot your password? Click Here</a></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -127,7 +133,7 @@ include_once("cmlogintop.inc.php");
 			<td colspan="3">First time accessing the SchoolMessenger Contact Manager?</td>
 		</tr>
 		<tr>
-			<td colspan="3"><a href="newportaluser.php"><b>Sign up now</b></a></td>
+			<td colspan="3"><a href="newportaluser.php<?echo $appendcustomerurl;?>"><b>Sign up now</b></a></td>
 		</tr>
 	</table>
 </form>
