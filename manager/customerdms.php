@@ -142,6 +142,11 @@ $titles[6] = "Auth";
 $titles["status"] = "Status";
 $titles[8] = "Version";
 $titles["actions"] = "Actions";
+// Add # to each title to make them sortable, except for "Actions"
+foreach ($titles as &$title) {
+	if ($title === "Actions") continue;
+	$title = "#$title";
+}
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
@@ -157,7 +162,7 @@ if(file_exists("dmbuild.txt")){
 <?
 }
 ?>
-<table class=list>
+<table class="list sortable" id="customer_dm_table">
 <?
 	showTable($data, $titles, $formatters);
 ?>

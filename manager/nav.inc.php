@@ -24,6 +24,8 @@
 	}
 </script>
 
+<script src="../script/sorttable.js"></script>
+
 <style>
 
 .imagelink td {
