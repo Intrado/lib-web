@@ -249,9 +249,18 @@ CHANGE `zipcode` `zipcode` VARCHAR( 10 ) NOT NULL ;
 
  ALTER TABLE `useractivation` CHANGE `activationtoken` `activationtoken` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL  ;
 
+CREATE TABLE `cmphoneactivation` (
+  `id` int(11) NOT NULL auto_increment,
+  `customerid` int(11) NOT NULL ,
+  `personid` int(11) NOT NULL ,
+  `portaluserid` int(11) NOT NULL ,
+  `code` VARCHAR( 20 ) NOT NULL ,
+  `phone` VARCHAR( 20 ) NOT NULL ,
+  `expirationdate` DATETIME NOT NULL ,
+  PRIMARY KEY ( `id` ) ,
+  INDEX ( `phone` )
+) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
-
-
-
-
+ALTER TABLE `portaluser` ADD `notifysmstype` ENUM( 'none', 'message' ) NOT NULL DEFAULT 'none',
+ADD `sms` VARCHAR( 20 ) NOT NULL ;
 
