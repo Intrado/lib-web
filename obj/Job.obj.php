@@ -97,6 +97,16 @@ class Job extends DBMappedObject {
 			select $newjob->id, listid, thesql
 			from joblist where jobid=$this->id");
 
+		// do not need to copy jobsetting, these are handled by the job object
+
+		// if _hascallback and user profile does not allow job callerid, be sure the option is set to use the default callerid
+		$a = QuickQuery("select value from setting where name='_hascallback'");
+		$b = QuickQuery("select p.value from permission p join user u " .
+				"where p.name='setcallerid' and p.accessid=u.accessid and u.id=$newjob->userid");
+		if ($a == "1" && $b != "1") {
+			QuickUpdate("delete from jobsetting where jobid=$newjob->id and name='prefermycallerid'");
+		}
+
 		return $newjob;
 	}
 
