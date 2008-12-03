@@ -268,22 +268,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					PutFormData($f, $s, 'smsmessageid', $newsmsmessage->id, 'number', 'nomin', 'nomax');
 				}
 				
-				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");				
 				if(GetFormData($f, $s, "listradio") == "single") {
 					$job->listid = GetFormData($f, $s, "listid");
 				} else {
-					$batchvalues = array();
-					$listids = GetFormData($f,$s,'listids');
-					$job->listid = array_shift($listids);
-					foreach($listids as $id) {
-						$values = "($job->id,". DBSafe($id) . ")";
-						$batchvalues[] = $values;
-					}
-					if(!empty($batchvalues)){
-						$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
-						$sql .= implode(",",$batchvalues);
-						QuickUpdate($sql);
-					}					
+					$job->listid = array_shift(GetFormData($f,$s,'listids'));
 				}
 				
 				$job->name = $name;
@@ -430,8 +418,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$_SESSION['jobid'] = $job->id;
 			//echo $job->_lastsql;
 			//echo mysql_error();
-
-
+			
+			
 			//now add any language options
 			$addlang = false;
 			if ($job->getSetting('translationmessage') ) {
@@ -517,6 +505,23 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				}
 			}
 			
+			/* Store multilists*/
+			QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");				
+			if(GetFormData($f, $s, "listradio") == "multi") {
+				$batchvalues = array();
+				$listids = GetFormData($f,$s,'listids');
+				
+				array_shift($listids);  // The first list has already been added to the job above
+				foreach($listids as $id) {
+					$values = "($job->id,". DBSafe($id) . ")";
+					$batchvalues[] = $values;
+				}
+				if(!empty($batchvalues)){
+					$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
+					$sql .= implode(",",$batchvalues);
+					QuickUpdate($sql);
+				}					
+			}
 
 			//TODO check for send button
 			if ($JOBTYPE == "normal" && CheckFormSubmit($f,'send')) {
@@ -576,11 +581,17 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 	
-	$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);	
-	PutFormData($f,$s,"listradio",empty($selectedlists)?"single":"multi");
-	if($job->listid) {
-		$selectedlists[] = $job->listid;
+	$selectedlists = "";
+	PutFormData($f,$s,"listradio","single");
+	
+	if($jobid){
+		$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);	
+		PutFormData($f,$s,"listradio",empty($selectedlists)?"single":"multi");
+		if($job->listid) {
+			$selectedlists[] = $job->listid;
+		}
 	}
+
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists));
 		
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
@@ -994,7 +1005,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<? NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' checked  onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>Single&nbsp;List<br />
 					<? NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multi&nbsp;List
 				</td>
-				<td valign="center" width="100%" style="white-space:nowrap;">
+				<td valign="top" width="100%" style="white-space:nowrap;">
 				<div id='singlelist' style="padding-left: 2em;display: none">					
 <?
 						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
@@ -1007,7 +1018,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</div>
 				<div id='multilist' style="padding-left: 2em;display: none">					
 <?
-						NewFormItem($f,$s,"listids", "selectmultiple",5, $peoplelists, ($submittedmode ? "DISABLED" : ""));
+					NewFormItem($f,$s,"listids", "selectmultiple",10, $peoplelists, ($submittedmode ? "DISABLED" : ""));
 ?>
 				</td>
 			</tr>
