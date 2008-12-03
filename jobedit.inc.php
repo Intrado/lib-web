@@ -77,6 +77,7 @@ foreach ($voices as $voice) {
 	$voicearray[$voice->gender][$voice->language] = $voice->id;
 }
 
+$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name", true);
 
 
 /****************** main message section ******************/
@@ -439,7 +440,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						}
 						$part->messageid = $message->id;
 						$part->type="T";
-						// Voice select is a hack. requirement, is that there is only one male and one female.
 						
 						$langstr = strtolower($language);
 						if (GetFormData($f, $s, 'voiceselect') == "female") {
@@ -549,6 +549,12 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 	
+	PutFormData($f,$s,"listradio",1);
+	$selectedlists = QuickQueryList("select id from joblist where jobid=$job->id", false);
+	if($job->listid)
+		$selectedlists[] = $job->listid;
+	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists));
+		
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	PutFormData($f,$s,"voiceselect",1);
 	
@@ -669,7 +675,6 @@ if (isset($job->id)) {
 
 $languages = DBFindMany("Language","from language");
 
-$peoplelists = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -876,11 +881,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<table border="0" cellpadding="2" cellspacing="0" width="100%">
 			<tr>
 				<td width="30%">Job Name</td>
-				<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
+				<td colspan="2"><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
 			</tr>
 			<tr>
 				<td>Description</td>
-				<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
+				<td colspan="2"><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
 			</tr>
 
 			<? if ($JOBTYPE == "repeating") { ?>
@@ -914,7 +919,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<? } ?>
 			<tr>
 				<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
-				<td>
+				<td colspan="2">
 				<table border="0" cellpadding="2px" cellspacing="1px" class="list"
 					id="jobtypetable">
 					<tr class="listHeader" align="left" valign="bottom">
@@ -956,15 +961,27 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</td>
 			</tr>
 			<tr>
-				<td>List <?= help('Job_SettingsList',NULL,"small"); ?></td>
-				<td><?
-				NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
-				NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
-				foreach ($peoplelists as $plist) {
-					NewFormItem($f,$s,"listid", "selectoption", $plist->name, $plist->id);
-				}
-				NewFormItem($f,$s,"listid", "selectend");
-				?></td>
+				<td valign="top">List <?= help('Job_SettingsList',NULL,"small"); ?></td>
+				<td style="white-space:nowrap;">
+					<? NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' checked  onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>Single&nbsp;List<br />
+					<? NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multi&nbsp;List
+				</td>
+				<td valign="center" width="100%" style="white-space:nowrap;">
+				<div id='singlelist' style="padding-left: 2em;display: block">					
+<?
+						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
+						NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
+						foreach ($peoplelists as $id => $name) {
+							NewFormItem($f,$s,"listid", "selectoption", $name, $id);
+						}
+						NewFormItem($f,$s,"listid", "selectend");
+?>
+				</div>
+				<div id='multilist' style="padding-left: 2em;display: none">					
+<?
+						NewFormItem($f,$s,"listids", "selectmultiple",5, $peoplelists, ($submittedmode ? "DISABLED" : ""));
+?>
+				</td>
 			</tr>
 		</table>
 		</div>
