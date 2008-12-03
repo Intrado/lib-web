@@ -30,14 +30,14 @@ function confirmcallerid($callerid) {
 
 
 
-if($REQUEST_TYPE == "new") {
+if ($REQUEST_TYPE == "new") {
 	?>
 	<error>msgcallbackconfirmphone: wanted result or continue, got new </error>
 	<hangup />
 	<?
-} else if($REQUEST_TYPE == "continue") {
-	if(isset($BFXML_VARS['callerid'])){
-		if($BFXML_VARS['callerid'] == 1){
+} else if ($REQUEST_TYPE == "continue") {
+	if (isset($BFXML_VARS['callerid'])) {
+		if ($BFXML_VARS['callerid'] == 1) {
 			$_SESSION['contactphone'] = $_SESSION['callerid']; // set the phone number used to playback messages
 
 			$query = "select value from setting where name=\"msgcallbackrequireid\"";
@@ -51,15 +51,17 @@ if($REQUEST_TYPE == "new") {
 		} else {
 			forwardToPage("msgcallbackenterphone.php");
 		}
-	} else if(isset($_SESSION['callerid'])){   // Neet to test this from a unknown number
+	} else if (isset($_SESSION['callerid'])) {   // Neet to test this from a unknown number
 		confirmcallerid($_SESSION['callerid']);
 	} else {
 		forwardToPage("msgcallbackenterphone.php");
 	}
-
+} else {
+	//huh, they must have hung up
+	$SESSIONDATA = null;
+?>
+	<ok />
+<?
 }
 
-
-
-
- ?>
+?>

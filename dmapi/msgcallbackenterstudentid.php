@@ -82,6 +82,12 @@ if ($REQUEST_TYPE == "new") {
 			errorhangup();
 		}
 	}
+} else {
+	//huh, they must have hung up
+	$SESSIONDATA = null;
+?>
+	<ok />
+<?
 }
 
  ?>

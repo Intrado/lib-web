@@ -23,12 +23,12 @@ function nomessages() {
 }
 
 ////////////////////////////////////////
-if($REQUEST_TYPE == "new"){
+if ($REQUEST_TYPE == "new") {
 	?>
 	<error>msgcallbackgetlist: wanted result or continue, got new </error>
 	<hangup />
 	<?
-} else if($REQUEST_TYPE == "continue"){
+} else if ($REQUEST_TYPE == "continue") {
 
 	if (isset($_SESSION['contactphone'])) {
 		$timesince = (time() - (30*24*60*60)) * 1000; // 30 days ago, in milliseconds since 1970
@@ -80,10 +80,10 @@ if($REQUEST_TYPE == "new"){
 
 } else {
 	//huh, they must have hung up
-	$_SESSION = array();
-	?>
+	$SESSIONDATA = null;
+?>
 	<ok />
-	<?
+<?
 }
 
 ?>

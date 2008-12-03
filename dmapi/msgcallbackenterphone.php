@@ -78,9 +78,13 @@ if($REQUEST_TYPE == "new") {
 		$_SESSION['phoneattempts'] = 0;
 		entercallerid($_SESSION['phoneattempts']);
 	}
+} else {
+	//huh, they must have hung up
+	$SESSIONDATA = null;
+?>
+	<ok />
+<?
 }
-
-
 
 
  ?>
