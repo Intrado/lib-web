@@ -113,6 +113,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		}
 		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
 		SetRequired($f, $s, "phonetextarea", GetFormData($f, $s, 'sendphone') && GetFormData($f, $s, 'phonemessageid') == "");
+		SetRequired($f, $s, "listid", 1);
+		if(GetFormData($f, $s, "listradio") == "single") {
+			SetRequired($f, $s, "listid", 1);
+			SetRequired($f, $s, "listids", 0);
+		} else {
+			SetRequired($f, $s, "listid", 0);
+			SetRequired($f, $s, "listids", 1);
+		}
 		
 		//do check
 
@@ -259,9 +267,28 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, 'smsmessageid', $newsmsmessage->id, 'number', 'nomin', 'nomax');
 				}
+				
+				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");				
+				if(GetFormData($f, $s, "listradio") == "single") {
+					$job->listid = GetFormData($f, $s, "listid");
+				} else {
+					$batchvalues = array();
+					$listids = GetFormData($f,$s,'listids');
+					$job->listid = array_shift($listids);
+					foreach($listids as $id) {
+						$values = "($job->id,". DBSafe($id) . ")";
+						$batchvalues[] = $values;
+					}
+					if(!empty($batchvalues)){
+						$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
+						$sql .= implode(",",$batchvalues);
+						QuickUpdate($sql);
+					}					
+				}
+				
 				$job->name = $name;
 				$job->description = trim(GetFormData($f,$s,"description"));
-				$fieldsarray = array("jobtypeid", "listid", "phonemessageid",
+				$fieldsarray = array("jobtypeid", "phonemessageid",
 				"emailmessageid","printmessageid", "smsmessageid", "starttime", "endtime",
 				"sendphone", "sendemail", "sendprint", "sendsms", "maxcallattempts");
 				PopulateObject($f,$s,$job,$fieldsarray);
@@ -534,7 +561,7 @@ if( $reloadform )
 	array("name","text",1,$JOBTYPE == "repeating" ? 30: 50,true),
 	array("description","text",1,50,false),
 	array("jobtypeid","number","nomin","nomax", true),
-	array("listid","number","nomin","nomax",true),
+	array("listid","number","nomin","nomax",false),   // Set required if single list is selected but set listid required to false here.
 	array("phonemessageid","number","nomin","nomax"),
 	array("emailmessageid","number","nomin","nomax"),
 	array("printmessageid","number","nomin","nomax"),
@@ -549,10 +576,11 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 	
-	PutFormData($f,$s,"listradio",1);
-	$selectedlists = QuickQueryList("select id from joblist where jobid=$job->id", false);
-	if($job->listid)
+	$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);	
+	PutFormData($f,$s,"listradio",empty($selectedlists)?"single":"multi");
+	if($job->listid) {
 		$selectedlists[] = $job->listid;
+	}
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists));
 		
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
@@ -962,12 +990,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			</tr>
 			<tr>
 				<td valign="top">List <?= help('Job_SettingsList',NULL,"small"); ?></td>
-				<td style="white-space:nowrap;">
+				<td valign="top" style="white-space:nowrap;">
 					<? NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' checked  onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>Single&nbsp;List<br />
 					<? NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multi&nbsp;List
 				</td>
 				<td valign="center" width="100%" style="white-space:nowrap;">
-				<div id='singlelist' style="padding-left: 2em;display: block">					
+				<div id='singlelist' style="padding-left: 2em;display: none">					
 <?
 						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
 						NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
@@ -1506,7 +1534,12 @@ foreach($languagearray as $language => $messageid) {
 	}
 
 	checkboxhelper('loading');
-
+	if(isCheckboxChecked('listradio_single')){
+		show('singlelist');hide('multilist');
+	} else {
+		hide('singlelist');show('multilist');
+	}
+	
 	function limit_chars(field) {
 		if (field.value.length > 160)
 			field.value = field.value.substring(0,160);
