@@ -118,8 +118,8 @@ if(isset($contactList) && $contactList){
 	?><div><b>Messages from the last 30 days</b></div><br><?
 
 	// if customer has message callback feature, let the user know about it
-	if ($INBOUND_HASCALLBACK) {
-		echo "You may call ".Phone::format($INBOUND_HASCALLBACK)." at any time to listen to your phone messages.<BR><BR>";
+	if ($INBOUND_MSGCALLBACK) {
+		echo "You may call ".Phone::format($INBOUND_MSGCALLBACK)." at any time to listen to your phone messages.<BR><BR>";
 	}
 
 	$counter = 1000;
