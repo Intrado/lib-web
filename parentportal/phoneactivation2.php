@@ -18,8 +18,7 @@ $pkeynophone = array();
 $pkeynotallow = array();
 $pkeyok = array();
 
-// TODO customerid, portaluserid
-$result = portalCreatePhoneActivation(20, 1, $_SESSION['phoneactivationpkeylist']);
+$result = portalCreatePhoneActivation($_SESSION['customerid'], $_SESSION["portaluserid"], $_SESSION['phoneactivationpkeylist']);
 if ($result['result'] == "") {
 	$phones = explode(",", $result['phonelist']);
 	$code = $result['code'];
