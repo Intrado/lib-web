@@ -38,7 +38,7 @@ if(CheckFormSubmit($f,$s))
 	else
 	{
 		MergeSectionFormData($f, $s);
-
+		TrimFormData($f, $s, 'name');
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -47,7 +47,7 @@ if(CheckFormSubmit($f,$s))
 		} else {
 			//submit changes
 			$audio = new AudioFile(getCurrentAudio());
-			$testname = GetFormData($f, $s, 'name');
+			$testname = TrimFormData($f, $s, 'name');
 			// Strip extra whitespace from name
 			$words = explode(' ', $testname);
 			$testname = '';
@@ -56,13 +56,13 @@ if(CheckFormSubmit($f,$s))
 					$testname .= "$word ";
 				}
 			}
-			$testname = trim($testname); // Remove leading and trailing white space
+
 			PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
 
 			if (QuickQuery("select * from audiofile where userid = {$USER->id} and deleted = 0 and name = '" .
 				  DBSafe($testname) . "' and id != '" . $audio->id. "'")) {
 				error('This audio file name is already in use, a unique one was generated');
-				$testname = GetFormData($f, $s, 'name') . ' ' . date("F jS, Y h:i a");
+				$testname = TrimFormData($f, $s, 'name') . ' ' . date("F jS, Y h:i a");
 				PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
 			}
 
