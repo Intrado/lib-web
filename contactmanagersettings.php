@@ -45,7 +45,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 	else
 	{
 		MergeSectionFormData($f, $s);
-
+		TrimFormData($f, $s, 'tokenlife');
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
@@ -67,7 +67,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				for($i = 0; $i < $maxsms; $i++){
 					setSystemSetting('lockedsms' . $i, GetFormData($f, $s, 'lockedsms' . $i));
 				}
-				setSystemSetting('tokenlife', GetFormData($f, $s, 'tokenlife'));
+				setSystemSetting('tokenlife', TrimFormData($f, $s, 'tokenlife'));
 				setSystemSetting('priorityenforcement', GetFormData($f, $s, 'priorityenforcement'));
 				setSystemSetting('cmphoneactivation', GetFormData($f, $s, 'allowphoneactivation'));
 
