@@ -247,7 +247,11 @@ foreach ($fieldmaps as $fieldmap) {
 
 		if (showmode("text")) {
 			PutFormData($f,$s,"newrulevalue_" . $fieldnum,"","text");
-			NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",20);
+			if (in_array($fieldnum, array("f01","f02"))) {
+				NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",20,50);
+			} else {
+				NewFormItem($f,$s,"newrulevalue_" . $fieldnum,"text",20,255);
+			}
 
 		} else if (showmode("reldate")) {
 			echo '<table border=0 cellpadding=0 cellspacing=0><tr><td nowrap><div dependson="reldate_reldate">';
