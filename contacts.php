@@ -253,7 +253,7 @@ startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 
 				<tr>
 					<td>
 						<table id="singleperson">
-							<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'personid', 'text', '15'); ?></td></tr>
+							<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'personid', 'text', 15, 255); ?></td></tr>
 							<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '15'); ?></td></tr>
 							<tr><td>Email Address: </td><td><? NewFormItem($f, $s, 'email', 'text', '100'); ?></td></tr>
 							<tr><td><?=submit($f,'search', 'Search')?></td></tr>
