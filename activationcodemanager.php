@@ -313,10 +313,12 @@ if($reportgenerator->format == "csv"){
 				</table>
 			</td>
 		</tr>
-		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder"><a href="activationcodemanager.php/report.csv?csv=true">CSV</a></td>
-		</tr>
+		<?if(isset($options['pkey']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){?>
+			<tr>
+				<th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
+				<td class="bottomBorder"><a href="activationcodemanager.php/report.csv?csv=true">CSV</a></td>
+			</tr>
+		<?}?>
 	</table>
 		<?
 	endWindow();
