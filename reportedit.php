@@ -227,7 +227,7 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 			<table>
 				<tr>
 					<td>
-						<table id='schedule'>
+						<table style="display:<?if($radio!=="none"){echo('block');}else{echo('none');}?>" id='schedule'>
 							<tr align="left">
 								<td>Time: </td>
 								<td><? time_select($f,$s,"time"); ?></td>
