@@ -35,7 +35,7 @@ if (isset($_GET['id'])) {
 	$_SESSION['ttsgender'] = NULL;
 	redirect();
 } else if (isset($_GET['text'])&&isset($_GET['language'])&&isset($_GET['gender'])) {
-	$_SESSION['ttstext'] = $_GET['text'];
+	$_SESSION['ttstext'] = stripslashes($_GET['text']);
 	$_SESSION['ttslanguage'] = $_GET['language'];
 	$_SESSION['ttsgender'] = $_GET['gender'];
 	$_SESSION['previewmessageid'] = NULL;

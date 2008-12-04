@@ -24,7 +24,11 @@ if(isset($_GET['id'])) {
 		Message::playAudio($id, $fields);
 	}
 } elseif (isset($_GET['text'])&&isset($_GET['language'])&&isset($_GET['gender'])) {
-	list($contenttype, $data) = renderTts($_GET['text'], $_GET['language'], $_GET['gender']);
+
+	// GET does urldecoding automatically but adds two backslashes to apostrophe and quotation.
+	// We have to stripp them here otherwise we add more slashes later 
+	// NOTE: Do Not Put $_GET['text'] in database without escaping
+	list($contenttype, $data) = renderTts(stripslashes($_GET['text']), $_GET['language'], $_GET['gender']);
 
 	if ($data !== false) {
 		header("HTTP/1.0 200 OK");

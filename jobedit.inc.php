@@ -112,16 +112,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			SetRequired($f, $s, $type . "messageid", (bool)GetFormData($f, $s, 'send' . $type));
 		}
 		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
-		SetRequired($f, $s, "phonetextarea", GetFormData($f, $s, 'sendphone') && GetFormData($f, $s, 'phonemessageid') == "");
-		SetRequired($f, $s, "listid", 1);
-		if(GetFormData($f, $s, "listradio") == "single") {
-			SetRequired($f, $s, "listid", 1);
-			SetRequired($f, $s, "listids", 0);
-		} else {
-			SetRequired($f, $s, "listid", 0);
-			SetRequired($f, $s, "listids", 1);
-		}
 		
+		if(GetFormData($f, $s, 'sendphone')) {
+			SetRequired($f, $s, "phonemessageid", GetFormData($f, $s, "messageselect") == "select");
+			SetRequired($f, $s, "phonetextarea", GetFormData($f, $s, "messageselect") == "create");
+			
+			SetRequired($f, $s, "listid", GetFormData($f, $s, "listradio") == "single");
+			SetRequired($f, $s, "listids", GetFormData($f, $s, "listradio") == "multi");
+		}
 		//do check
 
 		$sendphone = GetFormData($f, $s, "sendphone");
@@ -566,8 +564,8 @@ if( $reloadform )
 	array("name","text",1,$JOBTYPE == "repeating" ? 30: 50,true),
 	array("description","text",1,50,false),
 	array("jobtypeid","number","nomin","nomax", true),
-	array("listid","number","nomin","nomax",false),   // Set required if single list is selected but set listid required to false here.
-	array("phonemessageid","number","nomin","nomax"),
+	array("listid","number","nomin","nomax",true), 
+	array("phonemessageid","number","nomin","nomax",true),
 	array("emailmessageid","number","nomin","nomax"),
 	array("printmessageid","number","nomin","nomax"),
 	array("smsmessageid","number","nomin","nomax"),
@@ -592,7 +590,7 @@ if( $reloadform )
 		}
 	}
 
-	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists));
+	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax",true);
 		
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	PutFormData($f,$s,"voiceselect",1);
@@ -1873,8 +1871,11 @@ function previewlanguage(language,female,male) {
 		text = new getObj('phonetextarea').obj;
 	else 
 		text = new getObj('translationtextexpand_' + language).obj;
-	 
-	popup('previewmessage.php?text=' + text.value + '&language=' + language +'&gender=' + voice, 400, 400);
+
+	var encodedtext=escape(text.value);
+	encodedtext=encodedtext.replace("+", "%2B");
+	encodedtext=encodedtext.replace("/", "%2F"); 	
+	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
 
 
