@@ -104,6 +104,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 	else
 	{
 		MergeSectionFormData($f, $s);
+		
+		TrimFormData($f, $s, 'personid');
+		TrimFormData($f, $s, 'phone');
+		TrimFormData($f, $s, 'email');
+		
 		$radio = GetFormData($f, $s, "radioselect");
 		if ($radio == "criteria" || GetFormData($f, $s, "showall") || GetFormData($f, $s, "refresh")) {
 			$searchby = "criteria";
