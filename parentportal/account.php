@@ -29,7 +29,7 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		$newpassword1 = trim(GetFormData($f, $s, "newpassword1"));
 		$newpassword2 = trim(GetFormData($f, $s, "newpassword2"));
-		$sms = trim(GetFormData($f, $s, "sms"));
+		$sms = GetFormData($f, $s, "sms");
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(strlen($newpassword1) > 0 && strlen($newpassword1) < 5){
@@ -42,6 +42,7 @@ if(CheckFormSubmit($f,$s))
 			error($phoneerror);
 		} else {
 			//submit changes
+			$sms = Phone::parse($sms);
 			if(GetFormData($f, $s, "notify")){
 				$notifyType = "message";
 			} else {
@@ -52,7 +53,7 @@ if(CheckFormSubmit($f,$s))
 			} else {
 				$notifysmsType = "none";
 			}
-			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType, $notifysmsType, GetFormData($f, $s, "sms"));
+			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType, $notifysmsType, $sms);
 			if($result['result'] != ""){
 				$updateuser = false;
 				error($error_failedupdate);
