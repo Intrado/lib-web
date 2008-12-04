@@ -58,12 +58,12 @@ if(CheckFormSubmit($f,$s))
 				setSystemSetting('surveyurl', GetFormData($f, $s, 'surveyurl'));
 			}
 
-			setSystemSetting('emaildomain', DBSafe(trim(GetFormData($f, $s, 'emaildomain'))));
+			setSystemSetting('emaildomain', trim(GetFormData($f, $s, 'emaildomain')));
 			setSystemSetting('defaultareacode', GetFormData($f, $s, 'defaultareacode'));
 
 			if($IS_COMMSUITE){
 				setSystemSetting('_supportphone', Phone::parse(GetFormData($f, $s, 'supportphone')));
-				setSystemSetting('_supportemail', DBSafe(GetFormData($f, $s, 'supportemail')));
+				setSystemSetting('_supportemail', trim(GetFormData($f, $s, 'supportemail')));
 			}
 			redirect("settings.php");
 		}
