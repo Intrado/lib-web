@@ -159,13 +159,22 @@ if($reload){
 	PutFormData($f, $s, "name", isset($subscription) ? $subscription->name : "", "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "email", isset($subscription) ? $subscription->email : $USER->email, "text");
 
-	$radio = "none";
-	if($rundate){
-		$radio= "runonce";
-	} else if($dows){
-		$radio= "dow";
-	} else if($dom){
-		$radio= "dom";
+	switch($subscription->type) {
+		case "notscheduled":
+			$radio = "none";
+			break;
+		case "once":
+			$radio = "runonce";
+			break;
+		case "weekly":
+			$radio = "dow";
+			break;
+		case "monthly":
+			$radio = "dom";
+			break;
+		default:
+			$radio = "none";
+			break;
 	}
 	PutFormData($f, $s, "radio", $radio);
 
