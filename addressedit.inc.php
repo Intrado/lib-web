@@ -161,8 +161,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (!GetFormData($f,$s,FieldMap::getFirstNameField()) &&
-				   !GetFormData($f,$s,FieldMap::getLastNameField())) {
+		} else if (!TrimFormData($f,$s,FieldMap::getFirstNameField()) &&
+				   !TrimFormData($f,$s,FieldMap::getLastNameField())) {
 			error('First Name or Last Name is required');
 		} else {
 
@@ -202,7 +202,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 					$itemname = "phone".($x+1);
 					$phone->personid = $person->id;
 					$phone->sequence = $x;
-					$phone->phone = Phone::parse(GetFormData($f,$s,$itemname));
+					$phone->phone = Phone::parse(TrimFormData($f,$s,$itemname));
 					$phone->update();
 					$x++;
 				}
@@ -214,7 +214,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 					$itemname = "email".($x+1);
 					$email->personid = $person->id;
 					$email->sequence = $x;
-					$email->email = GetFormData($f,$s,$itemname);
+					$email->email = TrimFormData($f,$s,$itemname);
 					$email->update();
 					$x++;
 				}
@@ -225,7 +225,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 					$itemname = "sms".($x+1);
 					$sms->personid = $person->id;
 					$sms->sequence = $x;
-					$sms->sms = Phone::parse(GetFormData($f,$s,$itemname));
+					$sms->sms = Phone::parse(TrimFormData($f,$s,$itemname));
 					$sms->update();
 					$x++;
 				}
@@ -351,7 +351,7 @@ if( $reloadform )
 
 $PAGE = ($ORIGINTYPE == "nav") ? "start:addressbook" : "notifications:lists";
 
-$name = GetFormData($f, $s, FieldMap::getFirstNameField()) . ' ' . GetFormData($f, $s, FieldMap::getLastNameField());
+$name = TrimFormData($f, $s, FieldMap::getFirstNameField()) . ' ' . TrimFormData($f, $s, FieldMap::getLastNameField());
 if (!$personid) $name = "New Contact";
 $TITLE = "Enter Contact Information: " . escapehtml($name);
 
