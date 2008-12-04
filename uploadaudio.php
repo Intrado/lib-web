@@ -56,7 +56,7 @@ if(CheckFormSubmit($f,$s))
 					$testname .= "$word ";
 				}
 			}
-			$testname = rtrim($testname); // Remove trailing space
+			$testname = trim($testname); // Remove leading and trailing white space
 			PutFormData($f, $s, 'name', $testname, 'text', 1, 50, true); // Repopulate the form/session data with the generated name
 
 			if (QuickQuery("select * from audiofile where userid = {$USER->id} and deleted = 0 and name = '" .
