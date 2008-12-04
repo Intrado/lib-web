@@ -220,7 +220,7 @@ if( $reloadform )
 	if ($accss->getValue('blocknumbers')) {
 		PutFormData($form, $section, 'callblockingperms', $accss->getValue('callblockingperms'));
 	} else {
-		PutFormData($form, $section, 'callblockingperms', 'none');
+		PutFormData($form, $section, 'callblockingperms', 'viewonly');
 	}
 
 }
