@@ -42,7 +42,9 @@ if(CheckFormSubmit($f,$s))
 	else
 	{
 		MergeSectionFormData($f, $s);
-
+		TrimFormData($f, $s, 'custdisplayname');
+		TrimFormData($f, $s, 'emaildomain');
+		TrimFormData($f, $s, 'defaultareacode');
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
