@@ -234,13 +234,13 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 							</tr>
 							<tr>
 								<td>
-									<div id='date'>Date:</div>
-									<div id='weekly'>Day(s):</div>
-									<div id='monthly'>Day of Month</div>
+									<div style="display:none" id='date'>Date:</div>
+									<div style="display:none" id='weekly'>Day(s):</div>
+									<div style="display:none" id='monthly'>Day of Month</div>
 								</td>
 								<td>
-									<div id='date2'><? NewFormItem($f, $s, 'date', 'text', '25',NULL,"onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")?></div>
-									<div id='weekly2'>
+									<div style="display:none" id='date2'><? NewFormItem($f, $s, 'date', 'text', '25',NULL,"onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")?></div>
+									<div style="display:none" id='weekly2'>
 										<table border="0" cellpadding="2" cellspacing="1" class="list">
 											<tr class="listHeader" align="left" valign="bottom">
 												<th>Su</th>
@@ -262,7 +262,7 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 											</tr>
 										</table>
 									</div>
-									<div id='monthly2'>
+									<div style="display:none" id='monthly2'>
 										<?
 											NewFormItem($f, $s, 'dom', 'selectstart');
 											NewFormItem($f, $s, 'dom', 'selectoption', " -- Day of Month -- ", "");
