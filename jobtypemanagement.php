@@ -50,7 +50,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 	else
 	{
 		MergeSectionFormData($f, $s);
-
+		
+		foreach($systemprioritynames as $index => $name) 
+			foreach($types[$index] as $type) {
+				TrimFormData($f, $s, "jobtypedesc" . $type->id);
+				TrimFormData($f, $s, "jobtypename" . $type->id);
+			}	
+		
+		foreach($surveytypes as $surveytype){
+			TrimFormData($f, $s, "jobtypedesc" . $surveytype->id);
+			TrimFormData($f, $s, "jobtypename" . $surveytype->id);
+		}
+		
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
