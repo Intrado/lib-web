@@ -32,12 +32,12 @@ include_once("nav.inc.php");
 startWindow("Average Systemwide Daily and Hourly Call Distribution (Last 4 Weeks)", "padding: 3px;");
 ?>
 
-	<div style="float: left;cursor: pointer">
-	<img src="graph_weekly.png.php" onclick="popup('graph_weekly.png.php?big',790,500);" />
+	<div style="float: left;">
+	<img style="cursor: pointer" src="graph_weekly.png.php" onclick="popup('graph_weekly.png.php?big',790,500);" />
 	</div>
 
-	<div style="cursor: pointer">
-	<img src="graph_hourly.png.php" onclick="popup('graph_hourly.png.php?big',790,500);" />
+	<div>
+	<img style="cursor: pointer" src="graph_hourly.png.php" onclick="popup('graph_hourly.png.php?big',790,500);" />
 	</div>
 <?
 endWindow();
@@ -46,8 +46,8 @@ endWindow();
 
 startWindow("Total Systemwide Call Distribution (Last 4 Weeks)", "padding: 3px;");
 ?>
-	<div style="cursor: pointer">
-	<img src="graph_daily.png.php" onclick="popup('graph_daily.png.php?big',790,500);" />
+	<div>
+	<img style="cursor: pointer" src="graph_daily.png.php" onclick="popup('graph_daily.png.php?big',790,500);" />
 	</div>
 <?
 endWindow();
@@ -55,8 +55,8 @@ endWindow();
 
 startWindow("Total Systemwide Call Distribution (Last 12 Months)", "padding: 3px;");
 ?>
-	<div style="cursor: pointer">
-	<img src="graph_monthly.png.php" onclick="popup('graph_monthly.png.php?big',790,500);" />
+	<div>
+	<img style="cursor: pointer" src="graph_monthly.png.php" onclick="popup('graph_monthly.png.php?big',790,500);" />
 	</div>
 <?
 endWindow();
