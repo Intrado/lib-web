@@ -44,6 +44,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 	{
 		MergeSectionFormData($f, $s);
 
+		TrimFormData($f, $s, 'alertmessage');
+		TrimFormData($f, $s, 'autoreport_replyemail');		
+		TrimFormData($f, $s, 'autoreport_replyname');
+		TrimFormData($f, $s, 'surveyurl');
+		TrimFormData($f, $s, 'callerid');
+		
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
