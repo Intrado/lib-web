@@ -69,7 +69,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				}
 				setSystemSetting('tokenlife', TrimFormData($f, $s, 'tokenlife'));
 				setSystemSetting('priorityenforcement', GetFormData($f, $s, 'priorityenforcement'));
-				setSystemSetting('cmphoneactivation', GetFormData($f, $s, 'allowphoneactivation'));
+				setSystemSetting('portalphoneactivation', GetFormData($f, $s, 'allowphoneactivation'));
 
 				redirect("settings.php");
 			}
@@ -96,7 +96,7 @@ if( $reloadform )
 	}
 	PutFormData($f, $s, "tokenlife", getSystemSetting('tokenlife', 30), 'number', 1, 365, true);
 	PutFormData($f, $s, 'priorityenforcement', getSystemSetting('priorityenforcement', 0), "bool", 0, 1);
-	PutFormData($f, $s, 'allowphoneactivation', getSystemSetting('cmphoneactivation', 0), "bool", 0, 1);
+	PutFormData($f, $s, 'allowphoneactivation', getSystemSetting('portalphoneactivation', 0), "bool", 0, 1);
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -122,7 +122,7 @@ startWindow('Contact Manager Settings');
 								</tr>
 
 								<tr>
-									<td width="30%">Allow activation via phone <?=help("Settings_CmPhoneActivation", NULL, "small")?></td>
+									<td width="30%">Allow activation via phone <?=help("Settings_PortalPhoneActivation", NULL, "small")?></td>
 									<td><? NewFormItem($f, $s, "allowphoneactivation", "checkbox"); ?></td>
 								</tr>
 

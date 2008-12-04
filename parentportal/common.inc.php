@@ -40,7 +40,7 @@ if(!isset($ppNotLoggedIn)){
 		$n = QuickQuery("select value from setting where name='inboundnumber'");
 
 	    // find if this customer allows phone activation
-	    if (QuickQuery("select value from setting where name='cmphoneactivation'") == "1") {
+	    if (QuickQuery("select value from setting where name='portalphoneactivation'") == "1") {
  	    	if ($n != false && $n != "")
     			$INBOUND_ACTIVATION = $n;
 	    }

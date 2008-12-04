@@ -76,20 +76,20 @@ function failGoodbye() {
 // process request
 if ($REQUEST_TYPE == "new") {
 	?>
-	<error>cmphoneactivation: wanted result or continue, got new </error>
+	<error>portalphoneactivation: wanted result or continue, got new </error>
 	<hangup />
 	<?
 } else if ($REQUEST_TYPE == "continue") {
 	if (isset($BFXML_VARS['code'])) {
 		$code = $BFXML_VARS['code'];
 		$callerid = $_SESSION['callerid'];
-		if (inboundCmPhoneActivation($callerid, $code)) {
+		if (inboundPortalPhoneActivation($callerid, $code)) {
 			okGoodbye();
 		} else {
 			failGoodbye();
 		}
 	} else if (isset($_SESSION['callerid'])) {
-		if (inboundCmFindCallerid($_SESSION['callerid'])) {
+		if (inboundPortalFindCallerid($_SESSION['callerid'])) {
 			promptCode();
 		} else {
 			calleridUnknown();

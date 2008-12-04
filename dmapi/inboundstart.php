@@ -63,7 +63,7 @@ if ($REQUEST_TYPE == "new") {
 	} else {
 		$hascallback = false;
 	}
-	$hasphoneactivation = QuickQuery("select value from setting where name='cmphoneactivation'");
+	$hasphoneactivation = QuickQuery("select value from setting where name='portalphoneactivation'");
 	$hasportal = QuickQuery("select value from setting where name='_hasportal'");
 	if ($hasphoneactivation== "1" && $hasportal == "1") {
 		$hasphoneactivation = true;
@@ -78,7 +78,7 @@ if ($REQUEST_TYPE == "new") {
 	}
 } else if ($REQUEST_TYPE == "continue") {
 	if ($BFXML_VARS['redirect'] == 3) {
-		forwardToPage("cmphoneactivation.php");
+		forwardToPage("portalphoneactivation.php");
 	} else if ($BFXML_VARS['redirect'] == 2) {
 		forwardToPage("inboundlogin.php");
 	} else if ($BFXML_VARS['redirect'] == 1) {

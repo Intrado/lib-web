@@ -350,7 +350,7 @@ function revokePersonTokens($personids) {
 	return false;
 }
 
-function inboundCmFindCallerid($callerid) {
+function inboundPortalFindCallerid($callerid) {
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($callerid, 'string'));
 	$method = "PortalServer.inbound_findCallerid";
@@ -358,7 +358,7 @@ function inboundCmFindCallerid($callerid) {
 	return $result;
 }
 
-function inboundCmPhoneActivation($callerid, $code) {
+function inboundPortalPhoneActivation($callerid, $code) {
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($callerid, 'string'), new XML_RPC_Value($code, 'string'));
 	$method = "PortalServer.inbound_activate";

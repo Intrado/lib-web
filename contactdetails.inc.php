@@ -221,6 +221,9 @@ if(CheckFormSubmit($f,$s))
 					}
 				}
 			}
+			$portalphoneactivation = GetFormData($f, $s, 'allowphoneactivation');
+			// TODO update the person
+
 			redirect($_SESSION['contact_referer']);
 		}
 	}
@@ -249,6 +252,8 @@ if( $reloadform )
 			}
 		}
 	}
+	$portalphoneactivation = 0; // TODO
+	PutFormData($f, $s, 'allowphoneactivation', $portalphoneactivation, "bool", 0, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -539,6 +544,18 @@ foreach ($fieldmaps as $map) {
 		<th align="right" class="windowRowHeader">Activation Code Information:</th>
 		<td>
 			<table>
+<?
+			if (getSystemSetting("portalphoneactivation", false)) {
+?>
+				<tr>
+					<td><? $disabled = "";
+							if ($FORMDISABLE)
+								$disabled = "disabled";
+							NewFormItem($f, $s, "allowphoneactivation", "checkbox", 40, "nooption", $disabled); ?>
+						Allow activation via phone <?=help("Person_PortalPhoneActivation", NULL, "small")?></td>
+				</tr>
+<?			} ?>
+
 				<tr>
 					<td>Activation Code:</td>
 					<td><?=$tokendata['token'] ?></td>
