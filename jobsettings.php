@@ -59,15 +59,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
 				//submit changes
 
 				if($IS_COMMSUITE){
-					setSystemSetting('surveyurl', GetFormData($f, $s, 'surveyurl'));
+					setSystemSetting('surveyurl', TrimFormData($f, $s, 'surveyurl'));
 				}
 				setSystemSetting('retry', GetFormData($f, $s, 'retry'));
-				setSystemSetting('callerid', Phone::parse(GetFormData($f, $s, 'callerid')));
+				setSystemSetting('callerid', Phone::parse(TrimFormData($f, $s, 'callerid')));
 
-				setSystemSetting('alertmessage', trim(GetFormData($f, $s, 'alertmessage')));
+				setSystemSetting('alertmessage', TrimFormData($f, $s, 'alertmessage'));
 
-				setSystemSetting('autoreport_replyemail', GetFormData($f, $s, 'autoreport_replyemail'));
-				setSystemSetting('autoreport_replyname', GetFormData($f, $s, 'autoreport_replyname'));
+				setSystemSetting('autoreport_replyemail', TrimFormData($f, $s, 'autoreport_replyemail'));
+				setSystemSetting('autoreport_replyname', TrimFormData($f, $s, 'autoreport_replyname'));
 
 				if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 					setSystemSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
