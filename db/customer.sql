@@ -1569,3 +1569,5 @@ $$$
 ALTER TABLE `portalperson` ADD `notifysms` VARCHAR( 20 ) NULL
 $$$
 
+ALTER TABLE `user` CHANGE `importid` `importid` INT( 11 ) NULL DEFAULT NULL
+$$$
