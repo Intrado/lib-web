@@ -595,15 +595,15 @@ if( $reloadform )
 	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	PutFormData($f,$s,"voiceselect",1);
 	
-	PutFormData($f,$s,"messageselect","create");
 	PutFormData($f,$s,"phonetextarea","","text");	
 	if($job->getSetting('translationmessage')) {
+		PutFormData($f,$s,"messageselect","create");
 		if($phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'")) {
 			$parts = DBFindMany("MessagePart","from messagepart where messageid=$phonemessage->id order by sequence");
 			$body = $phonemessage->format($parts);
 			PutFormData($f,$s,"phonetextarea",$body,'text');
 		}
-	} else if ($jobid != NULL) { 
+	} else { 
 		PutFormData($f,$s,"messageselect","select");
 	}
 
@@ -918,11 +918,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<table border="0" cellpadding="2" cellspacing="0" width="100%">
 			<tr>
 				<td width="30%">Job Name</td>
-				<td colspan="2"><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
+				<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
 			</tr>
 			<tr>
 				<td>Description</td>
-				<td colspan="2"><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
+				<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
 			</tr>
 
 			<? if ($JOBTYPE == "repeating") { ?>
@@ -956,7 +956,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<? } ?>
 			<tr>
 				<td>Job Type <?= help('Job_SettingsType',NULL,"small"); ?></td>
-				<td colspan="2">
+				<td>
 				<table border="0" cellpadding="2px" cellspacing="1px" class="list"
 					id="jobtypetable">
 					<tr class="listHeader" align="left" valign="bottom">
@@ -999,12 +999,10 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			</tr>
 			<tr>
 				<td valign="top">List <?= help('Job_SettingsList',NULL,"small"); ?></td>
-				<td valign="top" style="white-space:nowrap;">
-					<? NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' checked  onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>Single&nbsp;List<br />
-					<? NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multi&nbsp;List
-				</td>
 				<td valign="top" width="100%" style="white-space:nowrap;">
-				<div id='singlelist' style="padding-left: 2em;display: none">					
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' checked  onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>Single List&nbsp;
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multi List
+				<div id='singlelist' style="padding-top: 1em;display: none">					
 <?
 						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
 						NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
@@ -1014,7 +1012,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 						NewFormItem($f,$s,"listid", "selectend");
 ?>
 				</div>
-				<div id='multilist' style="padding-left: 2em;display: none">					
+				<div id='multilist' style="padding-top: 1em;display: none">					
 <?
 					NewFormItem($f,$s,"listids", "selectmultiple",10, $peoplelists, ($submittedmode ? "DISABLED" : ""));
 ?>
@@ -1095,25 +1093,22 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
-				<td>
-<? 	
-					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\"");	echo "Create a Message"; 					
-					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\""); echo "Select a Message";  
-?>				<div id='selectphonemessage' style="display: none">
-<?
-					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");
-?>				
+				<td style="white-space:nowrap;">
+<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\""); ?> Select a Message&nbsp;  
+<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\"");	?> Create a Message
+				<div id='selectphonemessage' style="display: none">
+<?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
-				<div id='newphonetext' style="display: block">
+				<div id='newphonetext' style="display: none">
 					Type Your English Message Here | 
 					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
 					Automaticaly Translate 
 					<br />
 					<table>
-					<tr>
-					<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?></td>
-					<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
-					</tr>
+						<tr>
+							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?></td>
+							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
+						</tr>
 					</table>
 					Preferred Voice:
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked"); ?> Female 
@@ -1131,13 +1126,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 <?
-foreach($languagearray as $language => $messageid) {
-	$languageisset = $messageid?1:($jobid?0:1);
+						foreach($languagearray as $language => $messageid) {
+							$languageisset = $messageid?1:($jobid?0:1);
 ?>				
 							<tr>
-								<td style="white-space:nowrap;" valign="top" class="bottomBorder"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); echo "&nbsp;" . $language . ": ";?>
+								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); echo "&nbsp;" . $language . ": ";?>
 								</td>
-								<td valign="top" class="bottomBorder">
+								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
@@ -1158,8 +1153,8 @@ foreach($languagearray as $language => $messageid) {
 										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3," disabled"); ?>
 									</div>						
 								</td>
-								<td style="white-space:nowrap;" valign="top" class="bottomBorder">
-									<div id='translationdetails_<? echo $language?>' style=<? if($languageisset) echo "display:block"; else  echo "display:none";?>>
+								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
+									<div id='translationdetails_<? echo $language?>' style="display: none">
 										<table border="0"> 
 										<tr>
 										<td><?=	button('Play', "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")");?>
@@ -1183,11 +1178,9 @@ foreach($languagearray as $language => $messageid) {
 									</div>
 								</td>
 							</tr>							
-<?}	?>
-							</table>
-							
-
-				</div>
+<?}?>
+						</table>
+					</div>
 				</div>
 				</td>
 			</tr>
@@ -1466,15 +1459,6 @@ foreach($languagearray as $language => $messageid) {
 		show('phoneoptions');
 		hide('displayphoneoptions');	
 
-		if(isCheckboxChecked('radio_create')) {
-			show('newphonetext');
-			hide('selectphonemessage');
-			hide('multilingualphoneoption'); 
-		} else {
-			hide('newphonetext');
-			show('selectphonemessage');
-			show('multilingualphoneoption');
-		}
 		<?
 		if ($_SESSION['jobid'] != null) {
 			$diffvalues = $job->compareWithDefaults();
@@ -1547,6 +1531,15 @@ foreach($languagearray as $language => $messageid) {
 		show('singlelist');hide('multilist');
 	} else {
 		hide('singlelist');show('multilist');
+	}
+	if(isCheckboxChecked('radio_create')) {
+		show('newphonetext');
+		hide('selectphonemessage');
+		hide('multilingualphoneoption'); 
+	} else {
+		hide('newphonetext');
+		show('selectphonemessage');
+		show('multilingualphoneoption');
 	}
 	
 	function limit_chars(field) {
@@ -1871,10 +1864,12 @@ function previewlanguage(language,female,male) {
 		text = new getObj('phonetextarea').obj;
 	else 
 		text = new getObj('translationtextexpand_' + language).obj;
-
-	var encodedtext=escape(text.value);
-	encodedtext=encodedtext.replace("+", "%2B");
-	encodedtext=encodedtext.replace("/", "%2F"); 	
+	var encodedtext=encodeURIComponent(text.value);
+	//var encodedtext=escape(text.value);
+	//alert('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice);
+	//encodeURIComponent(text.value);
+	//encodedtext=encodedtext.replace("+", "%2B");
+	//encodedtext=encodedtext.replace("/", "%2F"); 	
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
 
