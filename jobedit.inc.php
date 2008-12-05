@@ -1865,11 +1865,7 @@ function previewlanguage(language,female,male) {
 	else 
 		text = new getObj('translationtextexpand_' + language).obj;
 	var encodedtext=encodeURIComponent(text.value);
-	//var encodedtext=escape(text.value);
-	//alert('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice);
-	//encodeURIComponent(text.value);
-	//encodedtext=encodedtext.replace("+", "%2B");
-	//encodedtext=encodedtext.replace("/", "%2F"); 	
+	
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
 
