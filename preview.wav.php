@@ -28,7 +28,13 @@ if(isset($_GET['id'])) {
 	// GET does urldecoding automatically but adds two backslashes to apostrophe and quotation.
 	// We have to stripp them here otherwise we add more slashes later 
 	// NOTE: Do Not Put $_GET['text'] in database without escaping
-	list($contenttype, $data) = renderTts(stripslashes($_GET['text']), $_GET['language'], $_GET['gender']);
+	if(get_magic_quotes_gpc()) {
+		$text = stripslashes($_GET['text']);
+	} else {
+		$text = $_GET['text'];
+	}
+	error_log($text);
+	list($contenttype, $data) = renderTts($text, $_GET['language'], $_GET['gender']);
 
 	if ($data !== false) {
 		header("HTTP/1.0 200 OK");
