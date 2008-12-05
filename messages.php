@@ -48,30 +48,28 @@ if (isset($_GET['deletetemplate'])) {
 	redirectToReferrer();
 }
 
+//preload audiofile information to determine simple/advanced phone messages
+//save messageid => audiofileid
+$query = "select m.id, mp.audiofileid, count(*) as cnt, mp.type
+from message m inner join messagepart mp on (m.id=mp.messageid)
+where m.type='phone' and m.userid=" . $USER->id . " and m.deleted=0
+group by m.id
+having cnt = 1 and mp.type='A' ";
+$SIMPLEPHONEMESSAGES = QuickQueryList($query,true);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_actions ($obj,$name) {
-	if ($obj->type == "phone") {
-		$query = "select mp.audiofileid, count(*) as cnt, mp.type, mp.id
-					from message m, messagepart mp
-					where m.id=mp.messageid
-					and m.id='" . DBSafe($obj->id) . "'
-					group by m.id
-					having cnt = 1 and mp.type='A' ";
-		$audiofileid = QuickQuery($query);
-	} else {
-		$audiofileid = null;
-	}
-
+	global $SIMPLEPHONEMESSAGES;
 
 	$advancedplaybtn = button("Play", "popup('previewmessage.php?close=1&id=$obj->id', 400, 500);");
 	$editbtn = '<a href="message' . $obj->type . '.php?id=' . $obj->id . '">Edit</a>';
 	$deletebtn = '<a href="messages.php?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 	$renamebtn = '<a href="messagerename.php?id=' . $obj->id . '">Rename</a>';
 
-	if ($audiofileid) {
+	if ($obj->type == "phone" && isset($SIMPLEPHONEMESSAGES[$obj->id])) {
 		return  "$advancedplaybtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
 	} else {
 		if ($obj->type == "phone") {
@@ -83,15 +81,8 @@ function fmt_actions ($obj,$name) {
 }
 
 function fmt_phonetype ($obj,$name) {
-
-	$query = "select mp.audiofileid, count(*) as cnt, mp.type, mp.id
-				from message m, messagepart mp
-				where m.id=mp.messageid
-				and m.id='" . DBSafe($obj->id) . "'
-				group by m.id
-				having cnt = 1 and mp.type='A' ";
-	$audiofileid = QuickQuery($query);
-	if ($audiofileid) {
+	global $SIMPLEPHONEMESSAGES;
+	if (isset($SIMPLEPHONEMESSAGES[$obj->id])) {
 		return "Simple";
 	} else {
 		return "Advanced";
