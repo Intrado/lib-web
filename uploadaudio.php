@@ -71,48 +71,51 @@ if(CheckFormSubmit($f,$s))
 			$audio->deleted = 0;
 
 			if(isset($_FILES['audio'])) {
-				$path_parts = pathinfo($_FILES['audio']['name']);
-
-				$ext = $path_parts['extension'];
-
-				if (strlen($ext) < 1) {
-					$ext = "wav";
-				}
-
-				$audio->recorddate = date("Y-m-d G:i:s");
-
-				$source = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . 'orig.' . $ext;
-				$dest = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
-				if(!move_uploaded_file($_FILES['audio']['tmp_name'],$source)) {
+				if (!$_FILES['audio']['name']) {
 					error('There was an error reading your audio file','Please try another file');
-					@unlink($source);
-					@unlink($dest);
 				} else {
-
-					$cmd = "sox \"$source\" -r 8000 -c 1 -s -w \"$dest\" ";
-					$result = exec($cmd, $res1,$res2);
-
-					if($res2 || !file_exists($dest)) {
-						error('There was an error reading your audio file','Please try another file',
-						'Supported formats include: .wav, .aiff, and .au');
+					$path_parts = pathinfo($_FILES['audio']['name']);
+	
+					$ext = $path_parts['extension'];
+	
+					if (strlen($ext) < 1) {
+						$ext = "wav";
+					}
+					$audio->recorddate = date("Y-m-d G:i:s");
+	
+					$source = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . 'orig.' . $ext;
+					$dest = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
+					if(!move_uploaded_file($_FILES['audio']['tmp_name'],$source)) {
+						error('There was an error reading your audio file','Please try another file');
 						@unlink($source);
 						@unlink($dest);
 					} else {
-						$contentid = contentPut($dest,"audio/wav");
-
-						@unlink($source);
-						@unlink($dest);
-
-						if ($contentid) {
-							$audio->contentid = $contentid;
-							$audio->update();
-							setCurrentAudio($audio->id);
-
-							ClearFormData($f);
-							redirect('audio.php');
-						} else {
-							error('There was an error uploading your audio file','Please try again',
+	
+						$cmd = "sox \"$source\" -r 8000 -c 1 -s -w \"$dest\" ";
+						$result = exec($cmd, $res1,$res2);
+	
+						if($res2 || !file_exists($dest)) {
+							error('There was an error reading your audio file','Please try another file',
 							'Supported formats include: .wav, .aiff, and .au');
+							@unlink($source);
+							@unlink($dest);
+						} else {
+							$contentid = contentPut($dest,"audio/wav");
+	
+							@unlink($source);
+							@unlink($dest);
+	
+							if ($contentid) {
+								$audio->contentid = $contentid;
+								$audio->update();
+								setCurrentAudio($audio->id);
+	
+								ClearFormData($f);
+								redirect('audio.php');
+							} else {
+								error('There was an error uploading your audio file','Please try again',
+								'Supported formats include: .wav, .aiff, and .au');
+							}
 						}
 					}
 				}
