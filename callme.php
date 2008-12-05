@@ -70,6 +70,7 @@ if(CheckFormSubmit($f,$s))
 
 		$phone = Phone::parse(GetFormData($f,$s,"phone"));
 
+		TrimFormData($f, $s, 'name');
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -79,7 +80,7 @@ if(CheckFormSubmit($f,$s))
 				   DBSafe(GetFormData($f, $s, 'name')) . "'")) {
 			error('This audio file name is already in use, so a unique one was generated');
 			$testname = GetFormData($f, $s, 'name') . ' ' . date("Y-m-d H:i");
-			PutFormData($f, $s, 'name', $testname, 'text', 1, 50); // Repopulate the form/session data with the generated name
+			PutFormData($f, $s, 'name', $testname, 'text', 1, 30); // Repopulate the form/session data with the generated name
 		} else {
 			$task->type = 'CallMe';
 			$task->setData('phonenumber', $phone);
@@ -123,7 +124,7 @@ if( $reloadform )
 		$phone = "";
 
 	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
-	PutFormData($f,$s,"name","","text","1","50");
+	PutFormData($f,$s,"name","","text","1","30");
 	PutFormData($f,$s,"size","","text");
 	PutFormData($f,$s,"origin",$origin);
 }
@@ -147,7 +148,7 @@ startWindow("Call Me to Record");
 
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder"><?= (GetFormData($f,$s,"origin") == "message" ? "Message&nbsp;Name:" : "Audio&nbsp;File&nbsp;Name:") ?></td>
-			<td class="bottomBorder"><? NewFormItem($f,$s,"name","text",30,50); ?></td>
+			<td class="bottomBorder"><? NewFormItem($f,$s,"name","text",30); ?></td>
 		</tr>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder">Phone&nbsp;Number:</td>
