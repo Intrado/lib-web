@@ -222,7 +222,8 @@ if(CheckFormSubmit($f,$s))
 				}
 			}
 			$portalphoneactivation = GetFormData($f, $s, 'allowphoneactivation');
-			// TODO update the person
+			QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
+			QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
 
 			redirect($_SESSION['contact_referer']);
 		}
@@ -252,7 +253,9 @@ if( $reloadform )
 			}
 		}
 	}
-	$portalphoneactivation = 0; // TODO
+	$portalphoneactivation = QuickQuery("select value from personsetting where personid=$personid and name='portalphoneactivation'");
+	if ($portalphoneactivation === false)
+		$portalphoneactivation = "1"; // default is checked
 	PutFormData($f, $s, 'allowphoneactivation', $portalphoneactivation, "bool", 0, 1);
 }
 

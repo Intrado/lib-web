@@ -1571,3 +1571,13 @@ $$$
 
 ALTER TABLE `user` CHANGE `importid` `importid` INT( 11 ) NULL DEFAULT NULL
 $$$
+
+CREATE TABLE `personsetting` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`personid` INT NOT NULL ,
+`name` VARCHAR( 50 ) NOT NULL ,
+`value` VARCHAR( 255 ) NOT NULL ,
+INDEX ( `personid` , `name` )
+) ENGINE = innodb DEFAULT CHARSET=utf8
+$$$
+
