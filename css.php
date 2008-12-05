@@ -389,7 +389,7 @@ input.text, input , select, textarea, table.form  {
 		color: #666666;
 		border: 1px solid <?=$theme1?>;
 }
-  
+
 /* Scrolling window style settings */
 div.scrollTableContainer {
 	height: 220px; /* Set scrolling window size */
@@ -409,6 +409,10 @@ div.scrollTableContainer {
 
 .listAlt {
 	background-color: <?=$newfade1?>;
+}
+
+.topBorder {
+	border-top: 1px solid <?=$theme2?>;
 }
 
 .bottomBorder {
