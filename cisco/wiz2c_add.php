@@ -21,9 +21,18 @@ $flagphone = false;
 
 if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone'])) {
 
-	$fname = $_SESSION['manualadd']['firstname'] = $_GET['firstname'];
-	$lname = $_SESSION['manualadd']['lasttname'] = $_GET['lasttname'];
-	$phone = Phone::parse($_SESSION['manualadd']['phone'] = $_GET['phone']);
+	$fname='';
+	$lname='';
+	$phone='';
+
+	if ($_GET['firstname'])
+		$fname = $_SESSION['manualadd']['firstname'] = $_GET['firstname'];
+		
+	if ($_GET['lasttname'])
+			$lname = $_SESSION['manualadd']['lasttname'] = $_GET['lasttname'];
+			
+	if ($_GET['phone'])
+			$phone = Phone::parse($_SESSION['manualadd']['phone'] = $_GET['phone']);
 
 	if (strlen($fname) == 0) {
 		$flagfname = true;
