@@ -60,14 +60,14 @@ $infojobtypes = DBFindMany("JobType", "from jobtype");
 $queryresult = Query("SELECT DISTINCT l.name FROM language l INNER JOIN ttsvoice t ON t.language = l.name and l.name <> 'english'");
 $languagearray = array();
 while($row = DBGetRow($queryresult)){		
-	$languagearray[htmlentities(strtolower($row[0]))] = NULL;
+	$languagearray[htmlentities($row[0])] = NULL;
 } 
 
 //Get Selected languages
 if($jobid && $job->getSetting('translationmessage')){
 	$queryresult = Query("SELECT j.language, m.id as messageid FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1");
 	while($row = DBGetRow($queryresult)){		
-		$languagearray[htmlentities(strtolower($row[0]))] = $row[1];
+		$languagearray[htmlentities($row[0])] = $row[1];
 	}
 }
 
@@ -1135,7 +1135,7 @@ foreach($languagearray as $language => $messageid) {
 	$languageisset = $messageid?1:($jobid?0:1);
 ?>				
 							<tr>
-								<td style="white-space:nowrap;" valign="top" class="bottomBorder"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); echo "&nbsp;" . ucfirst($language) . ": ";?>
+								<td style="white-space:nowrap;" valign="top" class="bottomBorder"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); echo "&nbsp;" . $language . ": ";?>
 								</td>
 								<td valign="top" class="bottomBorder">
 									<table width="100%" style="table-layout:fixed;">
@@ -1877,8 +1877,6 @@ function previewlanguage(language,female,male) {
 	encodedtext=encodedtext.replace("/", "%2F"); 	
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
-
-
 
 </script>
 <script SRC="script/calendar.js"></script>
