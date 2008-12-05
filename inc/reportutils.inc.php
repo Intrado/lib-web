@@ -83,7 +83,7 @@ function select_metadata($tablename=null, $start=null, $fields){
 					if($tablename == null && $start ==null){
 						$result .= "\">";
 					} else {
-						$result .= "toggleHiddenField('$fieldnum'); setColVisability($tablename, $start+$count, new getObj('hiddenfield$fieldnum').obj.checked); \">";
+						$result .= "toggleHiddenField('$fieldnum'); try { setColVisability($tablename, $start+$count, new getObj('hiddenfield$fieldnum').obj.checked); } catch (e) {}; \">";
 					}
 					echo $result;
 					echo "<input style='display: none;' type='checkbox' id='hiddenfield$fieldnum' " . $checked;
