@@ -102,6 +102,8 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			TrimFormData($f, $s,'xdays');
 		}
 		
+		$radio = GetFormData($f, $s, "radioselect");
+		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
@@ -114,7 +116,6 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 			error('You must pick a job');
 		} else {
 			$options = array();
-			$radio = GetFormData($f, $s, "radioselect");
 			switch($radio){
 				case "job":
 					$check = GetFormData($f, $s, "check_archived");
@@ -229,14 +230,16 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 				</tr>
 				<tr>
 					<td>
+						<div id="daterange" style="display:<?if($radio=='date'){echo("block");}else{echo("none");}?>">
 <?
-					dateOptions($f, $s, "daterange");
+					dateOptions($f, $s, "daterangetbl");
 ?>
+						</div>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="jobs">
+						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="jobs" style="display:<?if($radio=='jobs'){echo("block");}else{echo("none");}?>">
 							<tr>
 								<td width="1%">
 								<?
