@@ -80,7 +80,7 @@ header("Content-type: text/xml");
 
 <CiscoIPPhoneInput>
 <Title><?=$scheme['productname']?> - Welcome</Title>
-<Prompt><?= ($badlogin) ? ($_SESSION['loginalpha'] ? "Invalid username or password":"Invalid code or PIN") : "Please log in" ?></Prompt>
+<Prompt><?= ($badlogin) ? ((isset($_SESSION['loginalpha']) && $_SESSION['loginalpha']) ? "Invalid username or password":"Invalid code or PIN") : "Please log in" ?></Prompt>
 <URL><?= $URL . "/index.php" ?></URL>
 
 
