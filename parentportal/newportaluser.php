@@ -63,6 +63,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	} else if ($phoneerror = Phone::validate($sms)) {
 		error($phoneerror);
 	} else {
+		$sms = Phone::parse($sms);
 		if ($notify) {
 			$notifyType = "message";
 		} else {
