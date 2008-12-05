@@ -216,7 +216,7 @@ $TITLE = "Contact Database";
 include_once("nav.inc.php");
 
 NewForm($f);
-buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), (getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess') ? button("Manage Activation Codes", null, "activationcodemanager.php?clear=1") : null) );
+buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), (getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess') ? button("Manage Activation Codes", null, "activationcodemanager.php") : null) );
 startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 3px;");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
