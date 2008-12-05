@@ -156,20 +156,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 				$options['reporttype']="portal";
 				if(CheckFormSubmit($f, 'search') || CheckFormSubmit($f, $s))
 					unset($options['showall']);
-				if(GetFormData($f, $s, "radioselect") == "person"){
-					unset($options['rules']);
-					$options['pkey'] = GetFormData($f, $s, 'pkey');
-				} else {
-					unset($options['pkey']);
 
-					if($rule = getRuleFromForm($f, $s)){
-						if(!isset($options['rules']))
-							$options['rules'] = array();
-						$options['rules'][] = $rule;
-						$rule->id = array_search($rule, $options['rules']);
-						$options['rules'][$rule->id] = $rule;
-					}
+				if($rule = getRuleFromForm($f, $s)){
+					if(!isset($options['rules']))
+						$options['rules'] = array();
+					$options['rules'][] = $rule;
+					$rule->id = array_search($rule, $options['rules']);
+					$options['rules'][$rule->id] = $rule;
 				}
+
 				foreach($options as $index => $option){
 					if($option == "")
 						unset($options[$index]);
@@ -188,13 +183,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($
 if($reloadform){
 	ClearFormData($f);
 	$options = isset($_SESSION['portal']['options']) ? $_SESSION['portal']['options'] : array();
-
-	if(isset($options['pkey']))
-		$radio = "person";
-	else
-		$radio = "criteria";
-	PutFormData($f, $s, "radioselect", $radio);
-	PutFormData($f, $s, 'pkey', isset($options['pkey']) ? $options['pkey'] : "", 'text');
 
 	putRuleFormData($f, $s);
 	PutFormData($f, $s, "hideactivecodes", isset($options['hideactivecodes']) ? $options['hideactivecodes'] : 0, "bool", 0, 1);
@@ -248,13 +236,6 @@ if($reportgenerator->format == "csv"){
 	}
 	startWindow("Contact Search", "padding: 3px;");
 
-	if(isset($options['pkey'])){
-		$singlepersondisplay = '';
-		$searchbardisplay = 'style="display:none"';
-	} else {
-		$singlepersondisplay = 'style="display:none"';
-		$searchbardisplay = '';
-	}
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search:</th>
@@ -262,17 +243,7 @@ if($reportgenerator->format == "csv"){
 				<table border="0" cellpadding="3" cellspacing="0" width="100%">
 					<tr>
 						<td>
-							<table>
-								<tr>
-									<td><? NewFormItem($f, $s, "radioselect", "radio", null, "criteria", "onclick='hide(\"singleperson\"); show(\"searchcriteria\")'");?> By Criteria</td>
-									<td><? NewFormItem($f, $s, "radioselect", "radio", null, "person", "onclick='hide(\"searchcriteria\"); show(\"singleperson\")'");?> By Person</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria" <?=$searchbardisplay?> >
+							<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
 								<tr>
 									<td>
 									<?
@@ -280,18 +251,11 @@ if($reportgenerator->format == "csv"){
 										$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
 
 										//include("ruleeditform.inc.php");
-										drawRuleTable($f, $s, false, true, true, false);
+										drawRuleTable($f, $s, false, true, true, true);
 
 									?>
 									</td>
 								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<table id="singleperson" <?=$singlepersondisplay?> >
-								<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'pkey', 'text', '15'); ?></td><td><?=submit($f,'search', 'Search')?></td></tr>
 							</table>
 						</td>
 					</tr>
@@ -313,7 +277,7 @@ if($reportgenerator->format == "csv"){
 				</table>
 			</td>
 		</tr>
-		<?if(isset($options['pkey']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){?>
+		<?if((isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){?>
 			<tr>
 				<th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
 				<td class="bottomBorder"><a href="activationcodemanager.php/report.csv?csv=true">CSV</a></td>
@@ -323,7 +287,7 @@ if($reportgenerator->format == "csv"){
 		<?
 	endWindow();
 
-	if(isset($options['pkey']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
+	if((isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
 		$reportgenerator->generate();
 	}
 	buttons();
