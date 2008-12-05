@@ -414,10 +414,6 @@ function checkphonesurvey(id) {
 	modifyMarkedNodes (document.forms[0],"dependson","phonesurvey",callback)
 }
 
-var q = new getObj('questionnaireselect');
-if (q.obj.selectedIndex)
-	checkphonesurvey(q.obj.options[q.obj.selectedIndex].value);
-
 </script>
 <script SRC="script/calendar.js"></script>
 
