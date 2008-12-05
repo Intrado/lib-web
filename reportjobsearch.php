@@ -239,7 +239,7 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 				</tr>
 				<tr>
 					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="jobs" style="display:<?if($radio=='jobs'){echo("block");}else{echo("none");}?>">
+						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="jobs" style="display:<?if($radio=='job'){echo("block");}else{echo("none");}?>">
 							<tr>
 								<td width="1%">
 								<?
