@@ -56,8 +56,28 @@ $jobtype = new JobType($job->jobtypeid);
 $list = new PeopleList($job->listid);
 $renderedlist = new RenderedList($list);
 $renderedlist->calcStats();
+$totalpersons = $renderedlist->total;
 
-if ($renderedlist->total == 0)
+$ismultilist = false;
+$multilistids = QuickQueryList("select listid from joblist where jobid=".$job->id);
+if (count($multilistids) > 0) {
+	$ismultilist = true;
+	$multilist = array();
+	$multirenderedlist = array();
+	$multilist[] = $list;
+	$multirenderedlist[] = $renderedlist;
+	foreach ($multilistids as $listid) {
+		$nextlist = new PeopleList($listid);
+		$nextrenderedlist = new RenderedList($nextlist);
+		$nextrenderedlist->calcStats();
+		$multilist[] = $nextlist;
+		$multirenderedlist[] = $nextrenderedlist;
+		$totalpersons += $nextrenderedlist->total;
+	}
+}
+
+
+if ($totalpersons == 0)
 	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
 
 $warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
@@ -126,6 +146,38 @@ foreach($joblangs[$type] as $joblang) {
 	}
 }
 
+
+function displayMultilist() {
+	global $multilist, $multirenderedlist, $totalpersons;
+?>
+	<table border="0" cellpadding="2" cellspacing="1" class="list">
+		<tr class="listHeader" align="left" valign="bottom">
+			<th>List</th>
+			<th>Total People</th>
+		</tr>
+<?
+$count = 0;
+foreach($multilist as $mlist) {
+	$rlist = $multirenderedlist[$count++];
+?>
+			<tr valign="middle">
+				<td><?= $mlist->name ?>
+				</td>
+				<td>
+					<?= $rlist->total ?>
+				</td>
+			</tr>
+<?
+}
+?>
+			<tr>
+				<td class="topBorder">TOTAL:</td>
+				<td class="topBorder"><span style="font-weight:bold; font-size: 120%;"><?= number_format($totalpersons) ?></span></td>
+			</tr>
+	</table>
+<?
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:jobs";
@@ -177,14 +229,25 @@ startWindow("Confirmation &amp; Submit");
 							</tr>
 						</table>
 				</tr>
+<?				if ($ismultilist) {
+?>
+				<tr>
+					<td class="bottomBorder" >List selections</td>
+					<td class="bottomBorder" ><? displayMultilist(); ?></td>
+				</tr>
+
+<?				} else {
+?>
 				<tr>
 					<td class="bottomBorder" >List</td>
 					<td class="bottomBorder" ><?= escapehtml($list->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Total people in list:</td>
-					<td class="bottomBorder" ><span style="font-weight:bold; font-size: 120%;"><?= number_format($renderedlist->total) ?></span></td>
+					<td class="bottomBorder" ><span style="font-weight:bold; font-size: 120%;"><?= number_format($totalpersons) ?></span></td>
 				</tr>
+<?				}
+?>
 				<tr>
 					<td class="bottomBorder" >Start date</td>
 					<td class="bottomBorder" ><?= escapehtml(date("F jS, Y", strtotime($job->startdate))); ?></td>
