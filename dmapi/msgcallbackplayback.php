@@ -67,7 +67,7 @@ function renderMessageParts($playback) {
 		} else if ($part[0] == "t") {
 			$voice = $voices[$part[2]];
 			?>
-			<tts language="<?echo $voice->language?>" gender="<?echo $voice->gender?>"> <?echo $part[1]?></tts>
+			<tts language="<?echo $voice->language?>" gender="<?echo $voice->gender?>"> <?echo escapehtml($part[1]);?></tts>
 			<?
 		}
 	}
@@ -129,7 +129,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	<message name="recordvoicereply">
 		<field name="voicereply" type="record" max="60">
 			<prompt>
-				<tts>Please leave a message after the beep. When you are finished recording, press any key to continue. </tts>
+				<tts gender="female">Please leave a message after the beep. When you are finished recording, press any key to continue. </tts>
 			</prompt>
 		</field>
 		<uploadaudio name="voicereply"/>
@@ -140,11 +140,11 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	<?if ($playback['messageconfirmation'] === "1") {?>
 	<message name="messageconfirmyes">
 		<setvar name="messageconfirm" value="1"/>
-		<tts>Thank you, your response has been noted.</tts>
+		<tts gender="female">Thank you, your response has been noted.</tts>
 	</message>
 	<message name="messageconfirmno">
 		<setvar name="messageconfirm" value="2"/>
-		<tts>Thank you, your response has been noted.</tts>
+		<tts gender="female">Thank you, your response has been noted.</tts>
 	</message>
 	<?}?>
 
