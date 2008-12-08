@@ -43,8 +43,8 @@ function portalCreateAccount($username, $password, $firstname, $lastname, $zipco
 	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'),
 			new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'),
 			new XML_RPC_Value(trim($zipcode), 'string'), new XML_RPC_Value(trim($notifyType), 'string'),
-			new XML_RPC_Value(trim($notifysmsType), 'string'), new XML_RPC_Value($customerurl, 'string'),
-			new XML_RPC_Value($sms, 'string'));
+			new XML_RPC_Value(trim($notifysmsType), 'string'), new XML_RPC_Value($sms, 'string'),
+			new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_createAccount";
 	$result = pearxmlrpc($method, $params);
 	return $result; // we do nothing for success/fail
