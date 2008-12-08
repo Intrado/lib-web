@@ -119,7 +119,7 @@ startWindow('Phone');
 <?		} ?>
 <?	} ?>
 
-<?	if ($phones[0] != "") { ?>
+<?	if (count($phones[]) > 0 && count($pkeyok) > 0) { ?>
 		<tr>
 			<td>The following contacts will be added:</td>
 		</tr>
@@ -151,6 +151,10 @@ startWindow('Phone');
 		<tr>
 			<td>There are no contacts available for phone activation.  They do not share a common number, you may try to enter one contact at a time, or please contact support.</td>
 		</tr>
+<?		foreach ($pkeyok as $pkey) { ?>
+			<tr><td><?echo $pkey ?></td></tr>
+<?		} ?>
+
 <?	} ?>
 
 </table>
