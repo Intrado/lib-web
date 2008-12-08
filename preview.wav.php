@@ -33,7 +33,7 @@ if(isset($_GET['id'])) {
 	} else {
 		$text = $_GET['text'];
 	}
-	error_log($text);
+	
 	list($contenttype, $data) = renderTts($text, $_GET['language'], $_GET['gender']);
 
 	if ($data !== false) {
