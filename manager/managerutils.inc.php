@@ -61,5 +61,67 @@ function createSMUserProfile($newdb) {
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 }
 
+function show_column_selector($tablename=null, $fields, $lockedFields=array()){
+?>
+	<table border="0" cellpadding="2" cellspacing="1" class="list">
+		<tr class="listHeader" align="left" valign="bottom">
+<?
+			$showFields = array();
+			$fieldnum = 0;
+			foreach($fields as $id => $field){
+				if (strpos($field,"@") === 0){
+					$displaytitle = substr($field,1);
+					$showFields[$id] = array($fieldnum, false);
+				} else if (strpos($field,"#") === 0){
+					$displaytitle = substr($field,1);
+					$showFields[$id] = array($fieldnum, true);
+				} else {
+					$displaytitle = $field;
+					$showFields[$id] = array($fieldnum, true);
+				}
+				if (!in_array($id, $lockedFields, true)) {
+					?><td><?=$displaytitle;?></td><?
+				}
+				$fieldnum++;
+			}
+?>
+		</tr>
+		<tr>
+<?
+			foreach($showFields as $id => $details){
+				$fieldnum = $details[0];
+				$display = $details[1];
+				if (!in_array($id, $lockedFields, true)) {
+					?><td><div align="center">
+					<?
+						if ($display) {
+							$result = "<img src=\"../img/checkbox-rule.png\" " .
+									"onclick=\"var x = new getObj('hiddenfield$fieldnum'); " .
+									"if(x.obj.checked){this.src='../img/checkbox-clear.png'}else{this.src='../img/checkbox-rule.png'};";
+							$checked = "checked>";
+						} else {
+							$result = "<img src=\"../img/checkbox-clear.png\" " .
+									"onclick=\"var x = new getObj('hiddenfield$fieldnum'); " .
+									"if(x.obj.checked){this.src='../img/checkbox-clear.png'}else{this.src='../img/checkbox-rule.png'};";
+							$checked = ">";
+						}
+	
+						if($tablename == null){
+							$result .= "\">";
+						} else {
+							$result .= "toggleHiddenField('$fieldnum');" .
+									" try { setColVisability(new getObj('$tablename').obj, $fieldnum, new getObj('hiddenfield$fieldnum').obj.checked); } catch (e) {}; \">";
+						}
+						echo $result;
+						echo "<input style='display: none;' type='checkbox' id='hiddenfield$fieldnum' " . $checked;
+					?>
+					</div></td><?
+				}
+			}
+?>
+		</tr>
+	</table>
+<?
+}
 
 ?>
