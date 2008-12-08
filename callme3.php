@@ -37,7 +37,14 @@ if(CheckFormSubmit($f, $s)){
 	else
 	{
 		MergeSectionFormData($f, $s);
-				//do check
+		
+		if($messages){
+			foreach($messages as $key => $message) {
+				TrimFormData($f, $s, "message ".$key);
+			}
+		}
+		
+		//do check		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
