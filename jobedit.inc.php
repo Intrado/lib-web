@@ -592,7 +592,6 @@ if( $reloadform )
 
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax",true);
 		
-	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	PutFormData($f,$s,"voiceselect",1);
 	
 	PutFormData($f,$s,"phonetextarea","","text");	
@@ -607,7 +606,8 @@ if( $reloadform )
 		PutFormData($f,$s,"messageselect","select");
 	}
 
-
+	if($USER->authorize('sendmulti')) {
+	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 	foreach($languagearray as $language => $messageid) {		
 		$messagefound = false;
 		if($messageid) {
@@ -629,6 +629,7 @@ if( $reloadform )
 				PutFormData($f,$s,"translate_$language",$jobid?0:1,"bool",0,1);
 		}
 		PutFormData($f,$s,"tr_edit_$language",0,"bool",0,1);			
+	}
 	}
 
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
@@ -1100,9 +1101,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
 				<div id='newphonetext' style="display: none">
-					Type Your English Message Here | 
-					<? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
-					Automaticaly Translate 
+					Type Your English Message Here
+<?					if($USER->authorize('sendmulti')) { ?>
+						 | <? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
+						Automaticaly Translate 
+<? 					} ?>
 					<br />
 					<table>
 						<tr>
@@ -1110,10 +1113,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
 						</tr>
 					</table>
-					Preferred Voice:
+<?					if($USER->authorize('sendmulti')) { ?>
+					Preferred <? } ?>Voice:
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked"); ?> Female 
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice'"); ?> Male
 					<br />
+<?					if($USER->authorize('sendmulti')) { ?>
 					<div id='translationdetails' style="display: block">
 						<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>
 					</div>
@@ -1178,9 +1183,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									</div>
 								</td>
 							</tr>							
-<?}?>
+<?						} // End of languages ?>
 						</table>
 					</div>
+<? 					} // End of automatic translations ?>  
+
 				</div>
 				</td>
 			</tr>
@@ -1700,6 +1707,8 @@ function clickIcon(section){
 }
 
 
+
+<?if($USER->authorize('sendmulti')) { ?>
 <? // If Automatic translation is selected ?>
 function automatictranslation(){
 	if(isCheckboxChecked('translatecheckone')){
@@ -1721,6 +1730,42 @@ function translationoptions(details){
 	}
 }
 
+<? // If language checkbox is selected ?>
+function translationlanguage(language){
+	checkboxhelper('default');
+	if (isCheckboxChecked('translate_' + language)){
+		setChecked('translatecheckone');
+		show('language_' + language);
+		show('translationdetails_' + language);
+	} else {
+		hide('language_' + language);
+		hide('translationdetails_' + language);
+	}	
+	hide('languageexpand_' + language);
+	hide('translationbasic_' + language);		
+}
+
+<? //If language details is clicked ?>
+function langugaedetails(language, details){
+	if(details){
+		hide('language_' + language);
+		show('languageexpand_' + language);
+		show('translationbasic_' + language);
+		hide('translationdetails_' + language);
+	} else {
+		show('language_' + language);
+		hide('languageexpand_' + language);
+		hide('translationbasic_' + language);
+		show('translationdetails_' + language);	
+	}
+}
+function editlanguage(language) {
+	var textbox = new getObj('translationtextexpand_' + language).obj;	
+	textbox.disabled = !isCheckboxChecked('tr_edit_' + language);	
+}
+<? } ?>
+
+
 <? 
 /* 
 * Checkbox helper will show and hide language options
@@ -1729,7 +1774,8 @@ function translationoptions(details){
 * - if not checkall and loading the checkbox helper will unselect automatic translation if no Languages are selected
 */ ?>
 function checkboxhelper(mode) {
-<?
+<? 
+if($USER->authorize('sendmulti')) { 
 	$languagestring = "";
 	foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
 	$languagestring = substr($languagestring,1);
@@ -1788,42 +1834,12 @@ function checkboxhelper(mode) {
 			x.obj.checked = false;
 		}
 	}
+<?
+}
+?>
 }
 
-<? // If language checkbox is selected ?>
-function translationlanguage(language){
-	checkboxhelper('default');
-	if (isCheckboxChecked('translate_' + language)){
-		setChecked('translatecheckone');
-		show('language_' + language);
-		show('translationdetails_' + language);
-	} else {
-		hide('language_' + language);
-		hide('translationdetails_' + language);
-	}	
-	hide('languageexpand_' + language);
-	hide('translationbasic_' + language);		
-}
 
-<? //If language details is clicked ?>
-function langugaedetails(language, details){
-	if(details){
-		hide('language_' + language);
-		show('languageexpand_' + language);
-		show('translationbasic_' + language);
-		hide('translationdetails_' + language);
-	} else {
-		show('language_' + language);
-		hide('languageexpand_' + language);
-		hide('translationbasic_' + language);
-		show('translationdetails_' + language);	
-	}
-}
-
-function editlanguage(language) {
-	var textbox = new getObj('translationtextexpand_' + language).obj;	
-	textbox.disabled = !isCheckboxChecked('tr_edit_' + language);	
-}
 
 function display_jobtype_info(value){
 	new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
