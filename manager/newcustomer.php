@@ -4,7 +4,6 @@ include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
 include_once("AspAdminUser.obj.php");
-include_once("managerutils.inc.php");
 
 
 $timezones = array(	"US/Alaska",
