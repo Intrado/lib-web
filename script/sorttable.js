@@ -86,8 +86,8 @@ function ts_resortTable(lnk,clid) {
     sortfn = ts_sort_caseinsensitive;
     if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d\d\d$/)) sortfn = ts_sort_date;
     if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d$/)) sortfn = ts_sort_date;
-    if (itm.match(/^[£$]/)) sortfn = ts_sort_currency;
-    if (itm.match(/^[\d\.]+$/)) sortfn = ts_sort_numeric;
+    if (itm.match(/^[ï¿½$]/)) sortfn = ts_sort_currency;
+    if (itm.match(/^[\d\.,]+$/)) sortfn = ts_sort_numeric;
     SORT_COLUMN_INDEX = column;
     var firstRow = new Array();
     var newRows = new Array();
@@ -173,9 +173,9 @@ function ts_sort_currency(a,b) {
 }
 
 function ts_sort_numeric(a,b) { 
-    aa = parseFloat(ts_getInnerText(a.cells[SORT_COLUMN_INDEX]));
+    aa = parseFloat(ts_getInnerText(a.cells[SORT_COLUMN_INDEX]).replace(/,/g, ""));
     if (isNaN(aa)) aa = 0;
-    bb = parseFloat(ts_getInnerText(b.cells[SORT_COLUMN_INDEX])); 
+    bb = parseFloat(ts_getInnerText(b.cells[SORT_COLUMN_INDEX]).replace(/,/g, ""));
     if (isNaN(bb)) bb = 0;
     return aa-bb;
 }
