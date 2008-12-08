@@ -1,11 +1,10 @@
 <?
-include_once("common.inc.php");
-include_once("../inc/form.inc.php");
-include_once("../inc/html.inc.php");
-include_once("../inc/table.inc.php");
-include_once("../inc/formatters.inc.php");
-include_once("AspAdminUser.obj.php");
-
+require_once("common.inc.php");
+require_once("../inc/form.inc.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/table.inc.php");
+require_once("../inc/formatters.inc.php");
+require_once("AspAdminUser.obj.php");
 
 if(isset($_GET['resetDM']) || isset($_GET['update'])){
 	if(isset($_GET['resetDM'])){
@@ -19,7 +18,7 @@ if(isset($_GET['resetDM']) || isset($_GET['update'])){
 	if($dmrow[1] != ""){
 ?>
 	<script>
-		window.alert('That DM already has a command queued.  Please try again in a few moments');
+		window.alert('That DM already had a command queued.  New command queued instead.');
 		window.location="customerdms.php";
 	</script>
 <?
@@ -31,11 +30,6 @@ if(isset($_GET['resetDM']) || isset($_GET['update'])){
 		window.location="customerdms.php";
 	</script>
 <?
-}
-
-$showuuid = "";
-if(isset($_GET['showuuid'])){
-	$showuuid = ", dmuuid";
 }
 
 $queryextra = "";
@@ -103,7 +97,7 @@ function fmt_dmstatus($row,$index) {
 }
 
 function fmt_lastseen($row, $index){
-	$output = date("M j, Y g:i:s a", $row[$index]/1000);
+	$output = date("Y-m-d G:i:s", $row[$index]/1000);
 	if($row[$index]/1000 > strtotime("now") - (5*60) && $row[$index]/1000 < strtotime("now")-60){
 		$output = "<div style=\"background-color:yellow\">" . $output . "</div>";
 	} else if($row[$index]/1000 < strtotime("now") - (5*60)){
@@ -115,9 +109,8 @@ function fmt_lastseen($row, $index){
 
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
-			dm.enablestate, dm.lastseen, dm.version "
-			. $showuuid .
-			" from dm dm
+			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command 
+			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			where dm.type = 'customer'
 			" . $queryextra . "
@@ -128,25 +121,23 @@ while($row = DBGetRow($result)){
 	$data[] = $row;
 }
 
-$titles = array(0 => "DM ID");
-if($showuuid != ""){
-	$titles[9] = "DM UUID";
-}
-$titles[1] = "Customer ID";
-$titles[2] = "Customer Name";
-$titles[3] = "Name";
-$titles[4] = "Authorized IP";
-$titles[5] = "Last IP";
-$titles[7] = "Last Seen";
-$titles[6] = "Auth";
-$titles["status"] = "Status";
-$titles[8] = "Version";
+// Add field titles, leading # means it is sortable leading @ means it is hidden by default
+$titles = array(0 => "#DM ID");
+$titles[1] = "#Cust ID";
+$titles[2] = "#Customer URL";
+$titles[3] = "#Name";
+$titles[4] = "#Authorized IP";
+$titles[5] = "#Last IP";
+$titles[7] = "#Last Seen";
+$titles[6] = "#Auth";
+$titles["status"] = "#Status";
+$titles[8] = "#Version";
+$titles[9] = "@DM UUID";
+$titles[10] = "@Cmd";
 $titles["actions"] = "Actions";
-// Add # to each title to make them sortable, except for "Actions"
-foreach ($titles as &$title) {
-	if ($title === "Actions") continue;
-	$title = "#$title";
-}
+
+// Do not provide a checkbox to hide these columns.
+$lockedTitles = array(0, "status", "actions");
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
@@ -154,8 +145,14 @@ $formatters = array(2 => "fmt_customerUrl",
 					7 => "fmt_lastseen",
 					6 => "fmt_state");
 
+/////////////////////////////
+// Display
+/////////////////////////////
 
 include_once("nav.inc.php");
+
+show_column_selector('customer_dm_table', $titles, $lockedTitles);
+
 if(file_exists("dmbuild.txt")){
 ?>
 	<div>Latest Version: <?=file_get_contents("dmbuild.txt");?></div>
