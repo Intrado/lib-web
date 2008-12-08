@@ -88,6 +88,8 @@ if(CheckFormSubmit($f, $s))
 			error('An email address is required');
 		} else if($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
+		} else if($radio == "dom" && !GetFormData($f, $s, "dom")) {	
+			error("The day of the month must be set");
 		} else {
 			$subscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
 			$subscription->type = 'notscheduled';
