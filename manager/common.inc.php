@@ -1,4 +1,5 @@
 <?
+
 $SETTINGS = parse_ini_file("managersettings.ini.php",true);
 $IS_COMMSUITE = false;
 
@@ -10,6 +11,7 @@ require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
+require_once("managerutils.inc.php");
 
 session_start();
 if(!isset($isasplogin)){
