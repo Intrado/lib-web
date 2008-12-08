@@ -9,11 +9,9 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
 
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
 $appendcustomerurl = "";
@@ -42,7 +40,10 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
 	$notify = isset($_POST['notify']) ? $_POST['notify'] : 0;
 	$notifysms = isset($_POST['notifysms']) ? $_POST['notifysms'] : 0;
-	$sms = get_magic_quotes_gpc() ? stripslashes($_POST['sms']) : $_POST['sms'];
+	$sms = "";
+	if (isset($_POST['sms'])) {
+		$sms = get_magic_quotes_gpc() ? stripslashes($_POST['sms']) : $_POST['sms'];
+	}
 	$acceptterms = isset($_POST['acceptterms']);
 	if($login != $confirmlogin){
 		error("The emails you have entered do not match");
@@ -60,10 +61,9 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error("Passwords must be at least 5 characters long");
 	} else if($passworderror = validateNewPassword($login, $password1, $firstname, $lastname)){
 		error($passworderror);
-	} else if ($phoneerror = Phone::validate($sms)) {
+	} else if ($notifysms && $phoneerror = Phone::validate($sms)) {
 		error($phoneerror);
 	} else {
-		$sms = Phone::parse($sms);
 		if ($notify) {
 			$notifyType = "message";
 		} else {
@@ -71,8 +71,10 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		}
 		if ($notifysms) {
 			$notifysmsType = "message";
+			$sms = Phone::parse($sms);
 		} else {
 			$notifysmsType = "none";
+			$sms = "";
 		}
 		$result = portalCreateAccount($login, $password1, $firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms);
 		if($result['result'] != ""){
@@ -143,11 +145,11 @@ if(!$success){
 				<td colspan="2"><input type="checkbox" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>&nbsp;Email me when I have a new phone message.</td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="checkbox" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?>/>&nbsp;Text me when I have a new phone message.</td>
+				<td colspan="2"><input type="checkbox" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?> onclick="document.getElementById('smsbox').disabled=!this.checked"/>&nbsp;Text me when I have a new phone message.</td>
 			</tr>
 			<tr>
 				<td>Mobile Phone for Text Messaging:</td>
-				<td><input type="text" name="sms" value="<?=Phone::format($sms)?>" size="20" maxlength="20"/></td>
+				<td><input type="text" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" disabled="true"/></td>
 			</tr>
 			<tr>
 				<td colspan="2"><div style="overflow:scroll; height:250px; width:525px;"><?=$tos ?></div></td>

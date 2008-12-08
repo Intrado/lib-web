@@ -29,6 +29,7 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		$newpassword1 = trim(GetFormData($f, $s, "newpassword1"));
 		$newpassword2 = trim(GetFormData($f, $s, "newpassword2"));
+		$notifysms = GetFormData($f, $s, "notifysms");
 		$sms = GetFormData($f, $s, "sms");
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -38,20 +39,21 @@ if(CheckFormSubmit($f,$s))
 			error($passworderror);
 		} else if($newpassword1 != $newpassword2){
 			error('Password confirmation does not match');
-		} else if ($phoneerror = Phone::validate($sms)) {
+		} else if ($notifysms && $phoneerror = Phone::validate($sms)) {
 			error($phoneerror);
 		} else {
 			//submit changes
-			$sms = Phone::parse($sms);
 			if(GetFormData($f, $s, "notify")){
 				$notifyType = "message";
 			} else {
 				$notifyType = "none";
 			}
-			if(GetFormData($f, $s, "notifysms")){
+			if($notifysms){
 				$notifysmsType = "message";
+				$sms = Phone::parse($sms);
 			} else {
 				$notifysmsType = "none";
+				$sms = "";
 			}
 			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType, $notifysmsType, $sms);
 			if($result['result'] != ""){
@@ -80,6 +82,7 @@ if(CheckFormSubmit($f,$s))
 	$reloadform = 1;
 }
 
+$smsdisable = "";
 if( $reloadform )
 {
 	ClearFormData($f);
@@ -148,11 +151,11 @@ startWindow('User Information');
 						<td colspan="2"><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Email me when I have a new phone message.</td>
 					</tr>
 					<tr>
-						<td colspan="2"><? NewFormItem($f,$s, 'notifysms', 'checkbox'); ?>&nbsp;Text me when I have a new phone message.</td>
+						<td colspan="2"><? NewFormItem($f,$s, 'notifysms', 'checkbox', null, "", "id=\"smscheck\" onclick=\"document.getElementById('smsbox').disabled=!this.checked\""); ?>&nbsp;Text me when I have a new phone message.</td>
 					</tr>
 					<tr>
 						<td align="right">Mobile Phone for Text Messaging:</td>
-						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20); ?></td>
+						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ".$smsdisable); ?></td>
 					</tr>
 
 				</table>
