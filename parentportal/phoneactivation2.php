@@ -21,6 +21,8 @@ $pkeyok = array();
 $result = portalCreatePhoneActivation($_SESSION['customerid'], $_SESSION["portaluserid"], $_SESSION['phoneactivationpkeylist']);
 if ($result['result'] == "") {
 	$phones = explode(",", $result['phonelist']);
+	if (count($phones) == 1 && $phones[0] == "")
+		$phones = array(); // empty the array of no phones
 	$code = $result['code'];
 	$pkeyresults = explode(",", $result['pkeyresults']);
 	foreach ($pkeyresults as $pair) {
@@ -119,7 +121,7 @@ startWindow('Phone');
 <?		} ?>
 <?	} ?>
 
-<?	if (count($phones[]) > 0 && count($pkeyok) > 0) { ?>
+<?	if (count($phones) > 0 && count($pkeyok) > 0) { ?>
 		<tr>
 			<td>The following contacts will be added:</td>
 		</tr>
@@ -141,10 +143,13 @@ startWindow('Phone');
 			<td>Please note, if your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.</td>
 		</tr>
 		<tr>
-			<td>Step 2. When prompted, enter this code  <? echo $code; ?></td>
+			<td>Step 2. When prompted, select option 3.</td>
 		</tr>
 		<tr>
-			<td>Step 3. When the call is completed, return to the Contacts page to view and edit your preferences.</td>
+			<td>Step 3. When prompted, enter this code  <? echo $code; ?></td>
+		</tr>
+		<tr>
+			<td>Step 4. When the call is completed, return to the Contacts page to view and edit your preferences.</td>
 		</tr>
 
 <?	} else { ?>
