@@ -112,14 +112,17 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			SetRequired($f, $s, $type . "messageid", (bool)GetFormData($f, $s, 'send' . $type));
 		}
 		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
+		SetRequired($f, $s, "listid", GetFormData($f, $s, "listradio") == "single");
+		SetRequired($f, $s, "listids", GetFormData($f, $s, "listradio") == "multi");
 		
 		if(GetFormData($f, $s, 'sendphone')) {
 			SetRequired($f, $s, "phonemessageid", GetFormData($f, $s, "messageselect") == "select");
 			SetRequired($f, $s, "phonetextarea", GetFormData($f, $s, "messageselect") == "create");
-			
-			SetRequired($f, $s, "listid", GetFormData($f, $s, "listradio") == "single");
-			SetRequired($f, $s, "listids", GetFormData($f, $s, "listradio") == "multi");
+		} else {
+			SetRequired($f, $s, "phonemessageid",0);
+			SetRequired($f, $s, "phonetextarea",0);
 		}
+		
 		//do check
 
 		$sendphone = GetFormData($f, $s, "sendphone");
@@ -565,7 +568,7 @@ if( $reloadform )
 	array("description","text",1,50,false),
 	array("jobtypeid","number","nomin","nomax", true),
 	array("listid","number","nomin","nomax",true), 
-	array("phonemessageid","number","nomin","nomax",true),
+	array("phonemessageid","number","nomin","nomax"),
 	array("emailmessageid","number","nomin","nomax"),
 	array("printmessageid","number","nomin","nomax"),
 	array("smsmessageid","number","nomin","nomax"),
