@@ -212,6 +212,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$part->type="T";
 					$part->voiceid = $voicearray[GetFormData($f, $s, 'voiceselect')]["english"];
 					$part->txt = GetFormData($f, $s, 'phonetextarea');
+					$part->txt = preg_replace  ("/<<|>>|{{|}}|\[\[|\]\]/","", GetFormData($f, $s, 'phonetextarea')); // Strip out any characters combination that mey cause problem.					
 					$part->sequence = 0;
 					$part->create();	
 					//Do a putform on message select so if there is an error later on, another message does not get created
@@ -259,6 +260,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$part->messageid = $newsmsmessage->id;
 					$part->type="T";
 					$part->txt = GetFormData($f, $s, 'smsmessagetxt');
+					$part->txt = preg_replace  ("/<<|>>|{{|}}|\[\[|\]\]/","", GetFormData($f, $s, 'smsmessagetxt')); // Strip out any characters combination that mey cause problem.					
 					$part->sequence = 0;
 					$part->create();	
 					
@@ -473,7 +475,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							}
 						}
 							
-						$part->txt = GetFormData($f, $s, "translationtextexpand_" . $language);
+						$part->txt = preg_replace  ("/<<|>>|{{|}}|\[\[|\]\]/","", GetFormData($f, $s, "translationtextexpand_" . $language)); // Strip out any characters combination that mey cause problem.	
 						$part->sequence = 0;
 						$part->update();			
 					} else {
