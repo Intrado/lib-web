@@ -184,7 +184,30 @@ if (CheckFormSubmit($f,$s)){
 							('english', 'male'),
 							('english', 'female'),
 							('spanish', 'male'),
-							('spanish', 'female')";
+							('spanish', 'female'),
+							('catalan', 'female'),
+							('catalan', 'male'),
+							('mandarin', 'female'),
+							('dutch', 'female'),
+							('dutch', 'male'),
+							('finnish', 'female'),
+							('french', 'female'),
+							('french', 'male'),
+							('german', 'female'),
+							('german', 'male'),
+							('greek', 'female'),
+							('italian', 'female'),
+							('italian', 'male'),
+							('polish', 'female'),
+							('polish', 'male'),
+							('portuguese', 'female'),
+							('portuguese', 'male'),
+							('russian', 'female'),
+							('swedish', 'female'),
+							('swedish', 'male'),
+							('brazilian', 'female'),
+							('brazilian', 'male')
+							";
 
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
 
