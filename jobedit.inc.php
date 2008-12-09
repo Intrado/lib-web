@@ -595,7 +595,7 @@ if( $reloadform )
 
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax",true);
 		
-	PutFormData($f,$s,"voiceselect",1);
+	PutFormData($f,$s,"voiceselect",1); //TODO pull info on female and male voice
 	
 	PutFormData($f,$s,"phonetextarea","","text");	
 	if($job->getSetting('translationmessage')) {
@@ -1002,10 +1002,10 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</td>
 			</tr>
 			<tr>
-				<td valign="top">List <?= help('Job_SettingsList',NULL,"small"); ?></td>
+				<td valign="top">List(s) <?= help('Job_SettingsList',NULL,"small"); ?></td>
 				<td valign="top" width="100%" style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' checked  onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>Single List&nbsp;
-<?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multi List
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\"")); ?>One List&nbsp;
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\"")); ?>Multiple Lists
 				<div id='singlelist' style="padding-top: 1em;display: none">					
 <?
 						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
@@ -1098,28 +1098,28 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\""); ?> Select a Message&nbsp;  
-<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\"");	?> Create a Message
+<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a Message&nbsp;  
+<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a Message
 				<div id='selectphonemessage' style="display: none">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
 				<div id='newphonetext' style="display: none">
 					Type Your English Message Here
 <?					if($USER->authorize('sendmulti')) { ?>
-						 | <? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone' onclick=\"automatictranslation()\"") ?>
-						Automaticaly Translate 
+						 | <? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>
+						Translate 
 <? 					} ?>
 					<br />
 					<table>
 						<tr>
-							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'"); ?></td>
+							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'" . ($submittedmode ? "DISABLED" : "")); ?></td>
 							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
 						</tr>
 					</table>
 <?					if($USER->authorize('sendmulti')) { ?>
 					Preferred <? } ?>Voice:
-					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked"); ?> Female 
-					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice'"); ?> Male
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked " . ($submittedmode ? "DISABLED" : "")); ?> Female 
+					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice' " . ($submittedmode ? "DISABLED" : "")); ?> Male
 					<br />
 <?					if($USER->authorize('sendmulti')) { ?>
 					<div id='translationdetails' style="display: block">
@@ -1138,7 +1138,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							$languageisset = $messageid?1:($jobid?0:1);
 ?>				
 							<tr>
-								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' onclick=\"translationlanguage('$language')\""); echo "&nbsp;" . $language . ": ";?>
+								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
 								</td>
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
 									<table width="100%" style="table-layout:fixed;">
@@ -1154,7 +1154,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										Translation <?= help('Job_Translation',NULL,"small"); ?> <br />
 										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 45, 3,"id='translationtextexpand_$language'  disabled"); ?>
 										<br />
-										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language' onclick=\"editlanguage('$language')\"") ?> Edit Translation <?= help('Job_EditTranslation',NULL,"small"); ?> 
+										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Edit Translation <?= help('Job_EditTranslation',NULL,"small"); ?> 
 										
 										<br /><br />
 										Retranslation <?= help('Job_Retranslation',NULL,"small"); ?> <br />
