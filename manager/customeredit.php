@@ -217,6 +217,9 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
 
+				setCustomerSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'), $custdb);
+				setCustomerSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'), $custdb);
+				setCustomerSystemSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'), $custdb);
 
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
