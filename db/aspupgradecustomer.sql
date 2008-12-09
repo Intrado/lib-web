@@ -182,3 +182,5 @@ insert into ttsvoice (language, gender) values
 	('brazilian', 'male')
 $$$
 
+ALTER TABLE `joblanguage` ADD `translationeditlock` tinyint(4) NOT NULL default 0
+$$$
