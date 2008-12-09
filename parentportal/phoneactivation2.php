@@ -143,7 +143,7 @@ startWindow('Phone');
 			<td>Please note, if your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.</td>
 		</tr>
 		<tr>
-			<td>Step 2. When prompted, select option 3.</td>
+			<td>Step 2. When prompted, select option 2 to activate contacts.</td>
 		</tr>
 		<tr>
 			<td>Step 3. When prompted, enter this code  <? echo $code; ?></td>
