@@ -1,4 +1,4 @@
--- Upgrade from release 6.1 to 6.2 
+-- Upgrade from release 6.1 to 6.2
 
 
 create table if not exists customercallstats (
@@ -81,7 +81,7 @@ ALTER TABLE `usersetting`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$
 ALTER TABLE `voicereply`  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci $$$
 
 
- ALTER TABLE `custdm` CHANGE `name` `name` VARCHAR( 255 ) NOT NULL  
+ ALTER TABLE `custdm` CHANGE `name` `name` VARCHAR( 255 ) NOT NULL
 $$$
 
  ALTER TABLE `enrollment` CHANGE `c01` `c01` VARCHAR( 255 ) NOT NULL ,
@@ -93,17 +93,18 @@ CHANGE `c06` `c06` VARCHAR( 255 ) NOT NULL ,
 CHANGE `c07` `c07` VARCHAR( 255 ) NOT NULL ,
 CHANGE `c08` `c08` VARCHAR( 255 ) NOT NULL ,
 CHANGE `c09` `c09` VARCHAR( 255 ) NOT NULL ,
-CHANGE `c10` `c10` VARCHAR( 255 ) NOT NULL 
+CHANGE `c10` `c10` VARCHAR( 255 ) NOT NULL
 $$$
 
- ALTER TABLE `groupdata` CHANGE `value` `value` VARCHAR( 255 ) NOT NULL  
+ ALTER TABLE `groupdata` CHANGE `value` `value` VARCHAR( 255 ) NOT NULL,
+  CHANGE `importid` `importid` INT NOT NULL
 $$$
 
- ALTER TABLE `reportgroupdata` CHANGE `value` `value` VARCHAR( 255 ) NOT NULL  
+ ALTER TABLE `reportgroupdata` CHANGE `value` `value` VARCHAR( 255 ) NOT NULL
 $$$
 
  ALTER TABLE `reportsubscription` CHANGE `name` `name` VARCHAR( 50 ) NOT NULL ,
-CHANGE `description` `description` VARCHAR( 50 ) NOT NULL 
+CHANGE `description` `description` VARCHAR( 50 ) NOT NULL
 $$$
 
 
@@ -112,8 +113,8 @@ $$$
 update rule set op='eq' where op='lk'
 $$$
 
-ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range', 
-	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range', 'date_offset' ) NOT NULL DEFAULT 'eq' 
+ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range',
+	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range', 'date_offset' ) NOT NULL DEFAULT 'eq'
 $$$
 
 
@@ -132,5 +133,52 @@ ALTER TABLE `reportcontact` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT 
 $$$
 
 
+CREATE TABLE if not exists `joblist` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`jobid` INT NOT NULL ,
+`listid` INT NOT NULL ,
+`thesql` TEXT,
+KEY `jobid` (`jobid`,`listid`)
+) ENGINE = innodb DEFAULT CHARSET=utf8
+$$$
 
+ALTER TABLE `portalperson` ADD `notifysms` VARCHAR( 20 ) NULL
+$$$
+
+ALTER TABLE `user` CHANGE `importid` `importid` INT( 11 ) NULL DEFAULT NULL
+$$$
+
+CREATE TABLE if not exists `personsetting` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`personid` INT NOT NULL ,
+`name` VARCHAR( 50 ) NOT NULL ,
+`value` VARCHAR( 255 ) NOT NULL ,
+INDEX ( `personid` , `name` )
+) ENGINE = innodb DEFAULT CHARSET=utf8
+$$$
+
+insert into ttsvoice (language, gender) values
+	('catalan', 'female'),
+	('catalan', 'male'),
+	('mandarin', 'female'),
+	('dutch', 'female'),
+	('dutch', 'male'),
+	('finnish', 'female'),
+	('french', 'female'),
+	('french', 'male'),
+	('german', 'female'),
+	('german', 'male'),
+	('greek', 'female'),
+	('italian', 'female'),
+	('italian', 'male'),
+	('polish', 'female'),
+	('polish', 'male'),
+	('portuguese', 'female'),
+	('portuguese', 'male'),
+	('russian', 'female'),
+	('swedish', 'female'),
+	('swedish', 'male'),
+	('brazilian', 'female'),
+	('brazilian', 'male')
+$$$
 
