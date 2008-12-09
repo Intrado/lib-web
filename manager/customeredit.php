@@ -429,7 +429,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?></td></tr>
 <tr><td> Has Callback </td><td><? NewFormItem($f, $s, 'hascallback', 'checkbox') ?></td></tr>
 
-<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!<BR>  All repeating jobs will be stopped.<BR>  All scheduled jobs must be cancelled manually.<BR><BR></b></td></tr>
+<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!<BR>  All repeating jobs will be stopped.<BR>  All scheduled jobs must be canceled manually.<BR><BR></b></td></tr>
 <tr><td> Delivery Mechanism Method </td>
 	<td><?
 			NewFormItem($f, $s, '_dmmethod', 'selectstart');
