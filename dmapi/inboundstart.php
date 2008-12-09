@@ -27,20 +27,21 @@ function welcomemessage($hascallback, $hasphoneactivation) {
 <?				if ($hascallback) { ?>
 					<tts gender="female" language="english">To retrieve messages sent to you, press 1.</tts>
 <?				} ?>
-					<tts gender="female" language="english">If you are a user and want to log in, press 2.</tts>
 <?				if ($hasphoneactivation) { ?>
-					<tts gender="female" language="english">To activate contacts, press 3.</tts>
+					<tts gender="female" language="english">To activate contacts, press 2.</tts>
 <?				} ?>
+
+					<tts gender="female" language="english">If you are a user and want to log in, press 9.</tts>
 			</prompt>
 
 <?			if ($hascallback) { ?>
 				<choice digits="1" />
 <?			} ?>
-				<choice digits="2" />
 <?			if ($hasphoneactivation) { ?>
-				<choice digits="3" />
+				<choice digits="2" />
 <?			} ?>
 
+				<choice digits="9" />
 			<default>
 				<tts gender="female" language="english">Sorry. That was not a valid option.</tts>
 			</default>
@@ -77,9 +78,9 @@ if ($REQUEST_TYPE == "new") {
 		forwardToPage("inboundlogin.php");
 	}
 } else if ($REQUEST_TYPE == "continue") {
-	if ($BFXML_VARS['redirect'] == 3) {
+	if ($BFXML_VARS['redirect'] == 2) {
 		forwardToPage("portalphoneactivation.php");
-	} else if ($BFXML_VARS['redirect'] == 2) {
+	} else if ($BFXML_VARS['redirect'] == 9) {
 		forwardToPage("inboundlogin.php");
 	} else if ($BFXML_VARS['redirect'] == 1) {
 		forwardToPage("msgcallbackconfirmphone.php");
