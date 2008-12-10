@@ -29,6 +29,9 @@ if($USER->authorize("leavemessage")){
 	$count = QuickQuery("select count(*) from voicereply where userid = '$USER->id' and listened = '0'");
 }
 
+if (isset($_GET['closewhatsnew'])) {
+	QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'closewhatsnew', '1')");
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -64,16 +67,23 @@ if ($USER->authorize("startstats")) {
 		<td valign="top">
 			<table border=0 cellpadding=0 cellspacing=0>
 <?
-		  	$startCustomTitle = "What's New";
-		  	$startCustomFile = "motd.txt";
-
-			if (file_exists($startCustomFile)) {
+		  	if (!$USER->getSetting("closewhatsnew")) {
 			?><tr><td><?
+			  	$startCustomTitle = "What's New";
 				startWindow($startCustomTitle,NULL);
-				?><div align="center" style="margin: 5px;">
-<?					readfile($startCustomFile); ?>
-					</div><?
-				endWindow();
+				button_bar(button('Close', null, 'start.php?closewhatsnew'));
+
+?>				<div align="center" style="margin: 5px;">
+					<div style="text-align: left; padding: 5px;">
+					<p>Update 6.2</p>
+					<A style="padding: 5 px;" CLASS=hoverlinks HREF="help/schoolmessenger_help.htm#getting_started/new_features.htm" target=_blank>
+					<img src="img/bug_lightbulb.gif" >Click here to see what's new.
+					</A>
+					</div>
+					<BR>
+				</div>
+
+<?				endWindow();
 			?><br></td></tr><?
 			}
 ?>
