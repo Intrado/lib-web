@@ -69,7 +69,7 @@ $NAVTREE = array (
 		array("Lists","lists.php","createlist",$SUBTAB=="lists"),
 		array("Messages","messages.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="messages"),
 		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
-		array("Surveys","surveys.php","survey",$SUBTAB=="survey"),
+		array("Surveys","surveys.php",getSystemSetting("_hassurvey", true) ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
 	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
