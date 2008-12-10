@@ -62,15 +62,15 @@ if(CheckFormSubmit($f,$s)) {
 	}
 	else
 	{
-		
+
 		MergeSectionFormData($f, $s);
 
 		$starttime = strtotime(GetFormData($f, $s, "starttime"));
 		$endtime = strtotime(GetFormData($f, $s, "endtime"));
 		$throttle = GetFormData($f, $s, "throttle");
 		$showdetail = $throttle;
-		
-		
+
+
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -84,10 +84,17 @@ if(CheckFormSubmit($f,$s)) {
 			error('The end time must be at least 30 minutes after the start time');
 		} else {
 			//submit changes
-			
+			$changes = false;
+			if ($dmschedule->resourcepercentage != $throttle)
+				$changes = true;
+
 			$dmschedule->resourcepercentage = $throttle;
 
 			if ($throttle != 1) {
+				if ($dmschedule->starttime != date("H:i", $starttime) ||
+					$dmschedule->endtime != date("H:i", $endtime))
+					$changes = true;
+
 				$dmschedule->starttime = date("H:i", $starttime);
 				$dmschedule->endtime = date("H:i", $endtime);
 
@@ -97,9 +104,16 @@ if(CheckFormSubmit($f,$s)) {
 						$dow[$x-1] = $x;
 					}
 				}
+				if ($dmschedule->daysofweek != implode(",",$dow))
+					$changes = true;
+
 				$dmschedule->daysofweek = implode(",",$dow);
 			}
 			$dmschedule->update();
+
+			if ($changes) {
+				QuickUpdate("update custdm set routechange=1 where dmid = " . $dmid);
+			}
 
 			redirect("dms.php");
 		}
@@ -135,7 +149,7 @@ $TITLE="Resource Schedule Manager: ".escapehtml($dmname);
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'Save'));
+buttons(submit($f, $s, 'Done'));
 
 
 startWindow("Schedule");
@@ -222,5 +236,10 @@ function checkSelection(dropdown)
 endWindow();
 buttons();
 EndForm();
+?>
+<div style="margin: 5px;">
+	<img src="img/bug_lightbulb.gif" > Please reset the Flex Appliance after you save any changes.
+</div>
+<?
 include_once("navbottom.inc.php");
 ?>

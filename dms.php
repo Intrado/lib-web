@@ -15,12 +15,12 @@ if(isset($_GET['resetdm'])){
 		QuickUpdate("update custdm set routechange = null where dmid = " . $resetid);
 ?>
 <script>
-		window.alert('Reset command initiated for DM: <?=$dmname?>');
+		window.alert('Reset command initiated for Flex Appliance: <?=$dmname?>');
 		window.location="dms.php";
 </script>
 <?
 	} else {
-		error("Something happened when trying to reset a DM", "Please try again later");
+		error("An error occured when trying to reset a Flex Appliance", "Please try again later");
 	}
 }
 
@@ -40,13 +40,13 @@ function fmt_dm_actions($row, $index){
 	if($row[3] == "Jtapi"){
 		$url .= '&nbsp;|&nbsp;<a href="calleridroute.php?dmid=' . $row[0] . '">Caller&nbsp;ID&nbsp;Routes</a>';
 	}
-	$url .= '&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this DM\')">Reset</a>';
+	$url .= '&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this Flex Appliance?\')">Reset</a>';
 	return $url;
 }
 
 function fmt_dm_status($row, $index){
 	if($row[2]){
-		return "Route plan change detected, requires reset";
+		return "Unsubmitted changes detected, requires reset";
 	} else {
 		return "";
 	}
