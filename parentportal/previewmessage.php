@@ -94,79 +94,22 @@ if($email || $sms){
 
 function formatText($messageid, $historicdata) {
 	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = " . $messageid . " order by sequence");
-	$data = Message::format($messageparts);
-	$message = "";
-
-	if (!isset($errors))
-		$errors = array();
-
-	$txtpart = "";
-	while (true) {
-		//get dist to next field and type of field
-		$pos_f = strpos($data,"<<");
-
-		if ($pos_f !== false) {
-			$pos = $pos_f;
-		} else {
+	$message = "";	
+	foreach ($messageparts as $part) {
+		switch ($part->type) {
+		case 'T':
+			$message .= $part->txt;
+			break;
+		case 'V':
+			$d = $historicdata[$part->fieldnum];
+			if ($d == "")
+				$d = $part->defaultvalue;
+			$message .= $d;			
 			break;
 		}
-
-		//make a text part up to the pos of the field
-		$txt = substr($data,0,$pos);
-		if (strlen($txt) > 0) {
-			$message .= $txt;
-		}
-
-		$pos += 2; // pass over the begintoken
-
-		$endtoken = ">>";
-		$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
-
-		if ($length === false) {
-			$errors[] = "Can't find end of field, was expecting '$endtoken'";
-			$length = 0;
-		} else {
-			$length -= $pos;
-
-			$token  = substr($data,$pos,$length);
-
-
-			if (strpos($token,":") !== false) {
-				list($fieldname,$defvalue) = explode(":",$token);
-			} else {
-				$fieldname = $token;
-				$defvalue = "";
-				$maxlen = null;
-			}
-			$fieldname = DBSafe($fieldname);
-			$query = "select fieldnum from fieldmap where name='$fieldname'";
-
-			$fieldnum = QuickQuery($query);
-
-			if ($fieldnum !== false) {
-				$message .= " " . $historicdata[$fieldnum] . " ";
-			} else {
-				$errors[] = "Can't find field named '$fieldname'";
-			}
-		}
-		//skip the end if we found it
-		if ($length)
-			$skip = $pos + $length +2;
-		else
-			$skip = $pos + $length ;
-
-		$data = substr($data,$skip );
 	}
-	//get trailling text if exists.
-	if (strlen($data) > 0) {
-		$message .= $data;
-	}
-
-	if(count($errors)){
-		return $errors;
-	} else {
-		return $message;
-	}
+	
+	return $message;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,12 +192,9 @@ if($phone){
 	endWindow();
 } else if ($email || $sms){
 	startWindow('Message', 'padding: 3px;');
-
-	if(is_array($message)){
-		error($message);
-	} else {
-		?><div><?=$message?></div><?
-	}
+?>
+		<div><?= escapehtml($message)?></div>
+<?
 	endWindow();
 }
 
