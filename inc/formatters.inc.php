@@ -151,12 +151,13 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	//return "$id, $status, $deleted";
 	global $USER;
 
-	if ($type == "survey")
+	if ($type == "survey") {
 		$editbtn = '<a href="survey.php?id=' . $id . '">Edit</a>';
-	else
+		$copybtn = ''; // no copy survey feature
+	} else {
 		$editbtn = '<a href="job.php?id=' . $id . '">Edit</a>';
-
-	$copybtn = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
+		$copybtn = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
+	}
 
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 
@@ -188,17 +189,38 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 		case "scheduled":
 		case "processing":
 		case "procactive":
-			$buttons = array($editbtn, $copybtn, $cancelbtn);
+			if ($type == "survey") {
+				$buttons = array($editbtn, $cancelbtn);
+			} else {
+				$buttons = array($editbtn, $copybtn, $cancelbtn);
+			}
 			break;
 		case "active":
-			if($USER->authorize('createreport') && $USER->authorize('leavemessage'))
-				$buttons = array($editbtn, $copybtn, $reportbtn, $monitorbtn, $viewresponses, $cancelbtn);
-			else if($USER->authorize('leavemessage'))
-				$buttons = array($editbtn, $copybtn, $viewresponses, $cancelbtn);
-			else if ($USER->authorize('createreport'))
-				$buttons = array($editbtn, $copybtn, $reportbtn, $monitorbtn, $cancelbtn);
-			else
-				$buttons = array($editbtn, $copybtn, $cancelbtn);
+			if($USER->authorize('createreport') && $USER->authorize('leavemessage')) {
+				if ($type == "survey") {
+					$buttons = array($editbtn, $reportbtn, $monitorbtn, $viewresponses, $cancelbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn, $reportbtn, $monitorbtn, $viewresponses, $cancelbtn);
+				}
+			} else if($USER->authorize('leavemessage')) {
+				if ($type == "survey") {
+					$buttons = array($editbtn, $viewresponses, $cancelbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn, $viewresponses, $cancelbtn);
+				}
+			} else if ($USER->authorize('createreport')) {
+				if ($type == "survey") {
+					$buttons = array($editbtn, $reportbtn, $monitorbtn, $cancelbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn, $reportbtn, $monitorbtn, $cancelbtn);
+				}
+			} else {
+				if ($type == "survey") {
+					$buttons = array($editbtn, $cancelbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn, $cancelbtn);
+				}
+			}
 			break;
 		case "complete":
 		case "cancelled":
@@ -208,7 +230,11 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			else
 				$usedelbtn = $archivebtn;
 
-			$buttons = array($editbtn, $copybtn);
+			if ($type == "survey") {
+				$buttons = array($editbtn);
+			} else {
+				$buttons = array($editbtn, $copybtn);
+			}
 
 			if ($USER->authorize('createreport')){
 				$buttons[] = $reportbtn;
@@ -226,10 +252,19 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			$buttons = array($editrepeatingbtn, $copyrepeatingbtn, $runrepeatbtn, $deletebtn);
 			break;
 		default:
-			if ($USER->authorize('createreport'))
-				$buttons = array($editbtn, $copybtn, $reportbtn, $graphbtn);
-			else
-				$buttons = array($editbtn, $copybtn);
+			if ($USER->authorize('createreport')) {
+				if ($type == "survey") {
+					$buttons = array($editbtn, $reportbtn, $graphbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn, $reportbtn, $graphbtn);
+				}
+			} else {
+				if ($type == "survey") {
+					$buttons = array($editbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn);
+				}
+			}
 			break;
 	}
 	return implode("&nbsp;|&nbsp;", $buttons);
@@ -277,17 +312,30 @@ function fmt_jobs_actions_customer($row, $index) {
 		$jobowner = new User($row->userid);
 		$jobownerlogin = $jobowner->login;
 		$jobownerid = $jobowner->id;
+		$type = "job";
+		if ($row->questionnaireid != null) {
+			$type = "survey";
+		}
 	} else {
 		$id = $row[$index];
 		$status = $row[$index + 1];
 		$deleted = $row[$index + 2];
 		$jobownerlogin = $row[$index + 3];
 		$jobownerid = $row[$index + 4];//change to id
+		$type = "job";
+		if ($row[21] == "survey") {
+			$type = "survey";
+		}
+
 	}
 
 	if ($USER->id == $jobownerid) {
 		$editLink = '<a href="job.php?id=' . $id . '">Edit</a>';
-		$copyLink = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
+		if ($type == 'survey') {
+			$copyLink = ''; // no copy survey feature
+		} else {
+			$copyLink = '&nbsp;|&nbsp;<a href="jobs.php?copy=' . $id . '">Copy</a>';
+		}
 	} elseif ($USER->authorize('manageaccount')) {
 		$editLink = '<a href="./?login=' . $jobownerlogin . '">Login&nbsp;as&nbsp;this&nbsp;user</a>';
 		$copyLink = '';
@@ -334,7 +382,7 @@ function fmt_jobs_actions_customer($row, $index) {
 		case "repeating":
 			if ($USER->id == $jobownerid) {
 				$editLink = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
-				$copyLink = '<a href="jobrepeating.php?copy=' . $id . '">Copy</a>';
+				$copyLink = '&nbsp;|&nbsp;<a href="jobrepeating.php?copy=' . $id . '">Copy</a>';
 			}
 			return "$editLink$copyLink$runrepeatLink$deleteLink";
 		default:
