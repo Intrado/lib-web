@@ -161,8 +161,6 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
 
-	$copyrepeatingbtn = '<a href="jobrepeating.php?copy=' . $id . '">Copy</a>';
-
 	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
 
 	if ($type == "survey")
@@ -249,7 +247,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			$buttons[] = $usedelbtn;
 			break;
 		case "repeating":
-			$buttons = array($editrepeatingbtn, $copyrepeatingbtn, $runrepeatbtn, $deletebtn);
+			$buttons = array($editrepeatingbtn, $copybtn, $runrepeatbtn, $deletebtn);
 			break;
 		default:
 			if ($USER->authorize('createreport')) {
@@ -382,7 +380,7 @@ function fmt_jobs_actions_customer($row, $index) {
 		case "repeating":
 			if ($USER->id == $jobownerid) {
 				$editLink = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
-				$copyLink = '&nbsp;|&nbsp;<a href="jobrepeating.php?copy=' . $id . '">Copy</a>';
+				$copyLink = '&nbsp;|&nbsp;<a href="jobs.php?copy=' . $id . '">Copy</a>';
 			}
 			return "$editLink$copyLink$runrepeatLink$deleteLink";
 		default:

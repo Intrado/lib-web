@@ -72,9 +72,16 @@ class Job extends DBMappedObject {
 		$newjob = new Job($this->id);
 		$newjob->id = NULL;
 		$newjob->name .= " - " . date("M j, g:i a");
-		$newjob->status = "new";
+		if ($newjob->status != "repeating") {
+			$newjob->status = "new";
+			$newjob->scheduleid = NULL;
+		} else {
+			$schedule = new Schedule($newjob->scheduleid);
+			$schedule->id = null;
+			$schedule->create();
+			$newjob->scheduleid = $schedule->id;
+		}
 		$newjob->assigned = NULL;
-		$newjob->scheduleid = NULL;
 		$newjob->finishdate = NULL;
 
 		$newjob->createdate = QuickQuery("select now()");
