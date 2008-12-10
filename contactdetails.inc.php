@@ -191,20 +191,31 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			//submit changes
+			$error = false;
 			foreach($contacttypes as $type){
-				if(!isset($types[$type])) continue;
+				if ($error) continue;
+				if (!isset($types[$type])) continue;
 				foreach($types[$type] as $item){
 					if(GetFormData($f, $s, "editlock_" . $type . $item->sequence) || $item->editlock != GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
 						$item->editlock = GetFormData($f, $s, "editlock_" . $type . $item->sequence);
 						if($item->editlock){
 							if($type == "email")
-								$item->$type = GetFormData($f, $s, $type . $item->sequence);
-							else
-								$item->$type = Phone::parse(GetFormData($f,$s, $type . $item->sequence));
+								$item->$type = trim(GetFormData($f, $s, $type . $item->sequence));
+							else {
+								$p = GetFormData($f, $s, $type . $item->sequence);
+								if ($p != "" && $phoneerror = Phone::validate($p)) {
+									error($phoneerror);
+									$error = true;
+									continue;
+								}
+								$item->$type = Phone::parse($p);
+							}
 						}
-						$item->update();
+						if (!$error)
+							$item->update();
 					}
-					foreach($jobtypes as $jobtype){
+					if (!$error) {
+					  foreach($jobtypes as $jobtype){
 						if((!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
 										GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id))
 							||
@@ -218,14 +229,17 @@ if(CheckFormSubmit($f,$s))
 								QuickUpdate("update contactpref set enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'
 												where personid = '" . $personid . "' and jobtypeid = '" . $jobtype->id . "' and sequence = '" . $item->sequence . "' and type='$type'");
 						}
+					  }
 					}
 				}
 			}
-			$portalphoneactivation = GetFormData($f, $s, 'allowphoneactivation');
-			QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
-			QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
+			if (!$error) {
+				$portalphoneactivation = GetFormData($f, $s, 'allowphoneactivation');
+				QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
+				QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
 
-			redirect($_SESSION['contact_referer']);
+				redirect($_SESSION['contact_referer']);
+			}
 		}
 	}
 } else {
