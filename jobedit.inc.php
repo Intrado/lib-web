@@ -613,6 +613,9 @@ if( $reloadform )
 	PutFormData($f,$s,"translatecheck",0,"bool",0,1);
 	foreach($languagearray as $language => $messageid) {		
 		$messagefound = false;
+		// The submitTranslations depend on this text so when edeting this text take a look at submitTranslations script
+		$retranslationtext = "Click retranslation to verify the translation.";
+		//
 		if($messageid) {
 			$translationmessage = DBFind("Message","from message where id='$messageid' and deleted=1 and type='phone'");	
 			if($translationmessage != NULL) {				
@@ -620,16 +623,16 @@ if( $reloadform )
 				$body = $translationmessage->format($parts);
 				PutFormData($f,$s,"translationtext_$language",$body,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translationtextexpand_$language",$body,"text","nomin","nomax",false);
-				PutFormData($f,$s,"retranslationtext_$language","retranslation","text","nomin","nomax",false);
+				PutFormData($f,$s,"retranslationtext_$language",$retranslationtext,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",1,"bool",0,1);
 				$messagefound = true;
 				PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 			} 
 		} 
 		if(!$messagefound) {
-				PutFormData($f,$s,"translationtext_$language","empty translation first box","text","nomin","nomax",false);
-				PutFormData($f,$s,"translationtextexpand_$language","empty translation second box","text","nomin","nomax",false);
-				PutFormData($f,$s,"retranslationtext_$language","empty retranslation","text","nomin","nomax",false);
+				PutFormData($f,$s,"translationtext_$language","","text","nomin","nomax",false);
+				PutFormData($f,$s,"translationtextexpand_$language","","text","nomin","nomax",false);
+				PutFormData($f,$s,"retranslationtext_$language",$retranslationtext,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",$jobid?0:1,"bool",0,1);
 		}
 		PutFormData($f,$s,"tr_edit_$language",0,"bool",0,1);			
@@ -1174,8 +1177,9 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Edit Translation <?= help('Job_EditTranslation',NULL,"small"); ?> 
 										
 										<br /><br />
-										Retranslation <?= help('Job_Retranslation',NULL,"small"); ?> <br />
-										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3," disabled"); ?>
+										<a href="#" onclick="retranslation('<? echo $language?>');return false;">Retranslation</a>
+										<?= help('Job_Retranslation',NULL,"small"); ?> <br />
+										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3,"id='retranslationtext_$language' disabled"); ?>
 									</div>						
 								</td>
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
@@ -1759,7 +1763,7 @@ function translationlanguage(language){
 	if (isCheckboxChecked('translate_' + language)){
 		setChecked('translatecheck');
 		show('google');
-		submitTranslation(language);
+		submitTranslation(language,false);
 		show('language_' + language);
 		show('translationdetails_' + language);
 	} else {
@@ -1927,16 +1931,15 @@ function previewlanguage(language,female,male) {
 
 <? // These scripts contol the translation ?>
 <? if($USER->authorize('sendmulti')) { ?>
-<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<? //<script src="http://www.google.com/jsapi" type="text/javascript"></script>?>
 <script>
 <? 
-	$languagestring = "";
-	foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
-	$languagestring = substr($languagestring,1);
+$languagestring = "";
+foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
+$languagestring = substr($languagestring,1);
 ?>
-	var languagelist=new Array(<? echo $languagestring; ?>);
-    google.load("language", "1");
-    google.setOnLoadCallback(init);
+var languagelist=new Array(<? echo $languagestring; ?>);
+
 
     
 function init() {
@@ -1964,11 +1967,13 @@ function submitTranslations() {
 	var help = new getObj('refreshhelp').obj;
 	help.innerHTML = "";
 	for (l in languagelist) {
-		submitTranslation(languagelist[l]); 
+		var text = new getObj('retranslationtext_' + languagelist[l]).obj.value;
+		submitTranslation(languagelist[l],(text.substring(0,19) != "Click retranslation")); 		
 	}
 }
 
-function submitTranslation(language) {
+function submitTranslation(language,verify) {
+
 	if (!isCheckboxChecked('translate_' + language)){
 		return;
 	}
@@ -1977,20 +1982,29 @@ function submitTranslation(language) {
 		help.innerHTML = "Note: Languages that are edited will not refresh.";
 		return;		
 	}
+	if(typeof(google) == "undefined" || typeof(google.language) == "undefined"){
+		var tr = new getObj('language_' + language).obj;
+		tr.innerHTML = '&nbsp;';
+		return;
+	}
+	
 	
     var text = new getObj('phonetextarea').obj.value;
     var lngCode = google.language.Languages[language.toUpperCase()];
-
-	if(lngCode){
+	var tr = new getObj('language_' + language).obj;
+	var trexpand = new getObj('translationtextexpand_' + language).obj;
+    
+	if(lngCode && text){
   	  google.language.translate(text, "en", lngCode, function(result) {
 	  	  
-		var tr = new getObj('language_' + language).obj;
-		var trexpand = new getObj('translationtextexpand_' + language).obj;
+
 
   		if (result.translation) {
   			var str = result.translation.replace('>', '&gt;').replace('<', '&lt;');
   			tr.innerHTML = str;
-  			trexpand.value = str;  			
+  			trexpand.value = str;
+  			if(verify)
+  				retranslation(language);
   		} else {
   			translationerror(language);
   		    var text = new getObj('phonetextarea').obj.value;
@@ -2001,16 +2015,64 @@ function submitTranslation(language) {
   	  } );
 	} else {
 		translationerror(language);
+		tr.innerHTML = '&nbsp;';
 	}
 }
+function retranslation(language){
+	if(typeof(google) == "undefined" || typeof(google.language) == "undefined"){
+		return;
+	}
+	var lngCode = google.language.Languages[language.toUpperCase()];
+	var trexpand = new getObj('translationtextexpand_' + language).obj.value;
+	var retranslation = new getObj('retranslationtext_' + language).obj;
+	
+	if(lngCode && trexpand){
+		google.language.translate(trexpand,lngCode,"en", function(result) {
 
+  		if (result.translation) {
+  			var str = result.translation.replace('>', '&gt;').replace('<', '&lt;');
+  			retranslation.value = str;  			
+  		} else {
+  			retranslation.value = "Retranslation Unavailable"; 
+   		}
+  		
+	} );
+	} else {
+		retranslation.value = "Retranslation Unavailable"; 
+	}
+}
 function translationerror(language) {
 		var x = new getObj('translationwarning');
 		x.obj.innerHTML = "Unavailable. to translate into " + language + ". Replacing translation with English text.";
 }
-
-
 </script>
+<? // This scipt will determine if google is available on the client side and enable or disable translation ?>
+
+<div id="preloadarea">
+	<script>
+		function checkpreload() {
+			if (window['google']) {
+					return;
+			}
+			var nobrand = new getObj('branding').obj;
+			nobrand.innerHTML = "Unavailable";
+			var newscript = document.getElementById("googlescript");
+			var headID = document.getElementById("preloadarea");  
+			headID.removeChild(newScript);
+		}
+		var headID = document.getElementById("preloadarea");         
+		var newScript = document.createElement('script');
+		newScript.id = "googlescript";
+		newScript.type = 'text/javascript';
+		newScript.src ="http://www.google.com/jsapi";
+		headID.appendChild(newScript);
+		newScript.onload = function() {
+			google.load("language", "1");
+			google.setOnLoadCallback(init);
+		}
+		setTimeout('checkpreload()', 1000);
+	</script>
+</div>
 
 <? } ?>
 <script SRC="script/calendar.js"></script>
