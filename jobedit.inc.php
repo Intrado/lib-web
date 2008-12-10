@@ -1147,6 +1147,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 						<?=	button('Refresh Translations', "submitTranslations();");?>
 						<br />
 						<br />
+						<div id='refreshhelp'></div>
 					
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 <?
@@ -1781,6 +1782,11 @@ function langugaedetails(language, details){
 		hide('languageexpand_' + language);
 		hide('translationbasic_' + language);
 		show('translationdetails_' + language);	
+		if(isCheckboxChecked('tr_edit_' + language)){
+			var tr = new getObj('language_' + language).obj;
+			var trexpand = new getObj('translationtextexpand_' + language).obj;
+  			tr.innerHTML = trexpand.value;
+		}
 	}
 }
 function editlanguage(language) {
@@ -1810,9 +1816,9 @@ if($USER->authorize('sendmulti')) {
 		for (i = 0; i < languagelist.length; i++) {	
 			var language = languagelist[i]
 			var x = new getObj('translate_' + language);
+			show('language_' + language);
 			if(!x.obj.disabled) {
 				x.obj.checked = true;		
-				show('language_' + language);
 				show('translationdetails_' + language);
 			}
 			hide('languageexpand_' + language);
@@ -1942,26 +1948,35 @@ function init() {
 			x.obj.checked = false;
 			x.obj.disabled = true;
 			disabled = true;
-			hide('language_' + languagelist[l]);
-			hide('translationdetails_' + languagelist[l]);
+			show('language_' + languagelist[l]);
+			var tr = new getObj('language_' + languagelist[l]).obj;
+			tr.innerHTML = "This language is unavailable. Please see help pages for more information";
 		}      
 	}
 	if(disabled) {
 		var x = new getObj('translationwarning');
-		x.obj.innerHTML = "One or more languages are unavailable. Please read the help pages for more info.";
+		x.obj.innerHTML = "One or more languages are unavailable. Please read the help pages for more information.";		
 	}
     google.language.getBranding('branding');
 }
 
 function submitTranslations() {
+	var help = new getObj('refreshhelp').obj;
+	help.innerHTML = "";
 	for (l in languagelist) {
 		submitTranslation(languagelist[l]); 
 	}
 }
 
 function submitTranslation(language) {
-	if (!isCheckboxChecked('translate_' + language) || isCheckboxChecked('tr_edit_' + language))
+	if (!isCheckboxChecked('translate_' + language)){
 		return;
+	}
+	if (isCheckboxChecked('tr_edit_' + language)) {
+		var help = new getObj('refreshhelp').obj;
+		help.innerHTML = "Note: Languages that are edited will not refresh.";
+		return;		
+	}
 	
     var text = new getObj('phonetextarea').obj.value;
     var lngCode = google.language.Languages[language.toUpperCase()];
