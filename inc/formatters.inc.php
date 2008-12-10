@@ -323,7 +323,7 @@ function fmt_jobs_actions_customer($row, $index) {
 		$jobownerlogin = $row[$index + 3];
 		$jobownerid = $row[$index + 4];//change to id
 		$type = "job";
-		if ($row[21] == "survey") {
+		if (isset($row[21]) && $row[21] == "survey") {
 			$type = "survey";
 		}
 
