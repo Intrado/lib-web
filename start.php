@@ -21,6 +21,8 @@ require_once("inc/formatters.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$CURRENTVERSION = "6.2";
+
 if ($USER->authorize("loginweb") === false) {
 	redirect('unauthorized');
 }
@@ -30,7 +32,8 @@ if($USER->authorize("leavemessage")){
 }
 
 if (isset($_GET['closewhatsnew'])) {
-	QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'closewhatsnew', '1')");
+	QuickUpdate("delete from usersetting where userid=$USER->id and name='whatsnewversion'");
+	QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'whatsnewversion', $CURRENTVERSION)");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +70,7 @@ if ($USER->authorize("startstats")) {
 		<td valign="top">
 			<table border=0 cellpadding=0 cellspacing=0>
 <?
-		  	if (!$USER->getSetting("closewhatsnew")) {
+		  	if ($USER->getSetting("whatsnewversion") != $CURRENTVERSION) {
 			?><tr><td><?
 			  	$startCustomTitle = "What's New";
 				startWindow($startCustomTitle,NULL);
