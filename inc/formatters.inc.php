@@ -156,7 +156,11 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 	else
 		$editbtn = '<a href="job.php?id=' . $id . '">Edit</a>';
 
+	$copybtn = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
+
 	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
+
+	$copyrepeatingbtn = '<a href="jobrepeating.php?copy=' . $id . '">Copy</a>';
 
 	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
 
@@ -179,24 +183,22 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 
 	$unarchivebtn = '<a href="jobs.php?unarchive=' . $id . '">Unarchive</a>';
 
-	$copybtn = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
-
 	switch ($status) {
 		case "new":
 		case "scheduled":
 		case "processing":
 		case "procactive":
-			$buttons = array($editbtn,$cancelbtn);
+			$buttons = array($editbtn, $copybtn, $cancelbtn);
 			break;
 		case "active":
 			if($USER->authorize('createreport') && $USER->authorize('leavemessage'))
-				$buttons = array($editbtn,$reportbtn,$monitorbtn, $viewresponses, $cancelbtn);
+				$buttons = array($editbtn, $copybtn, $reportbtn, $monitorbtn, $viewresponses, $cancelbtn);
 			else if($USER->authorize('leavemessage'))
-				$buttons = array($editbtn, $viewresponses, $cancelbtn);
+				$buttons = array($editbtn, $copybtn, $viewresponses, $cancelbtn);
 			else if ($USER->authorize('createreport'))
-				$buttons = array($editbtn,$reportbtn,$monitorbtn,$cancelbtn);
+				$buttons = array($editbtn, $copybtn, $reportbtn, $monitorbtn, $cancelbtn);
 			else
-				$buttons = array($editbtn,$cancelbtn);
+				$buttons = array($editbtn, $copybtn, $cancelbtn);
 			break;
 		case "complete":
 		case "cancelled":
@@ -221,13 +223,13 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			$buttons[] = $usedelbtn;
 			break;
 		case "repeating":
-			$buttons = array($editrepeatingbtn,$runrepeatbtn,$deletebtn);
+			$buttons = array($editrepeatingbtn, $copyrepeatingbtn, $runrepeatbtn, $deletebtn);
 			break;
 		default:
 			if ($USER->authorize('createreport'))
-				$buttons = array($editbtn,$reportbtn,$graphbtn);
+				$buttons = array($editbtn, $copybtn, $reportbtn, $graphbtn);
 			else
-				$buttons = array($editbtn);
+				$buttons = array($editbtn, $copybtn);
 			break;
 	}
 	return implode("&nbsp;|&nbsp;", $buttons);
@@ -267,9 +269,8 @@ function fmt_status($obj, $name) {
 */
 function fmt_jobs_actions_customer($row, $index) {
 	global $USER;
-	//return fmt_jobs_generic($row[$index], $row[$index + 1], $row[$index + 2]);
-	if ($row instanceof Job) {
 
+	if ($row instanceof Job) {
 		$id = $row->id;
 		$status = $row->status;
 		$deleted = $row->deleted;
@@ -286,10 +287,13 @@ function fmt_jobs_actions_customer($row, $index) {
 
 	if ($USER->id == $jobownerid) {
 		$editLink = '<a href="job.php?id=' . $id . '">Edit</a>';
+		$copyLink = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
 	} elseif ($USER->authorize('manageaccount')) {
 		$editLink = '<a href="./?login=' . $jobownerlogin . '">Login&nbsp;as&nbsp;this&nbsp;user</a>';
+		$copyLink = '';
 	} else {
 		$editLink= '';
+		$copyLink= '';
 	}
 
 	if ($USER->authorize('viewsystemreports')) {
@@ -316,24 +320,25 @@ function fmt_jobs_actions_customer($row, $index) {
 
 	switch ($status) {
 		case "new":
-			return "$editLink$cancelLink";
+			return "$editLink$copyLink$cancelLink";
 		case "active":
-			return "$editLink$reportLink$cancelLink";
+			return "$editLink$copyLink$reportLink$cancelLink";
 		case "complete":
 		case "cancelled":
 		case "cancelling":
 			if ($deleted == 2) {
-				return "$editLink$reportLink$deleteLink";
+				return "$editLink$copyLink$reportLink$deleteLink";
 			} else {
-				return "$editLink$reportLink$archiveLink";
+				return "$editLink$copyLink$reportLink$archiveLink";
 			}
 		case "repeating":
 			if ($USER->id == $jobownerid) {
 				$editLink = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
+				$copyLink = '<a href="jobrepeating.php?copy=' . $id . '">Copy</a>';
 			}
-			return "$editLink$runrepeatLink$deleteLink";
+			return "$editLink$copyLink$runrepeatLink$deleteLink";
 		default:
-			return "$editLink$reportLink";
+			return "$editLink$copyLink$reportLink";
 	}
 }
 

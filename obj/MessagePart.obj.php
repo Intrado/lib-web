@@ -24,6 +24,13 @@ class MessagePart extends DBMappedObject {
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
+
+	function copyNew() {
+		$newpart = new MessagePart($this->id);
+		$newpart->id = null;
+		$newpart->create();
+		return $newpart;
+	}
 }
 
 

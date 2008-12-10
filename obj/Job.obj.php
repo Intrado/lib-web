@@ -87,10 +87,56 @@ class Job extends DBMappedObject {
 
 		$newjob->create();
 
-		//copy all the job language settings
-		QuickUpdate("insert into joblanguage (jobid,messageid,type,language)
-			select $newjob->id, messageid, type,language
-			from joblanguage where jobid=$this->id");
+		// copy the messages
+		// if message is not deleted, then we can point to it directly
+		// but if message is deleted, it's either already a copy from a previous run (uneditable)
+		// or it's a translation message and we need to make another copy of these
+		if ($newjob->isOption('translationphonemessage')) {
+			$msg = new Message($newjob->phonemessageid);
+			if ($msg->deleted) {
+				$newmsg = $msg->copyNew();
+				$newjob->phonemessageid = $newmsg->id;
+				$newjob->update();
+			}
+			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=$this->id and type='phone'");
+			foreach ($joblangs as $jl) {
+				$newmsg = new Message($jl->messageid);
+				$newmsg = $newmsg->copyNew();
+				$newjl = $jl->copyNew();
+				$newjl->messageid = $newmsg->id;
+				$newjl->jobid = $newjob->id;
+				$newjl->update();
+			}
+		} else {
+			//copy all the job language settings
+			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
+				select $newjob->id, messageid, 'phone', language
+				from joblanguage where jobid=$this->id");
+		}
+		// email messages
+		if ($newjob->isOption('translationemailmessage')) {
+			$msg = new Message($newjob->emailmessageid);
+			if ($msg->deleted) {
+				$newmsg = $msg->copyNew();
+				$newjob->emailmessageid = $newmsg->id;
+				$newjob->update();
+			}
+			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=$this->id and type='email'");
+			foreach ($joblangs as $jl) {
+				$newmsg = new Message($jl->messageid);
+				$newmsg = $newmsg->copyNew();
+				$newjl = $jl->copyNew();
+				$newjl->messageid = $newmsg->id;
+				$newjl->jobid = $newjob->id;
+				$newjl->update();
+			}
+		} else {
+			//copy all the job language settings
+			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
+				select $newjob->id, messageid, 'email', language
+				from joblanguage where jobid=$this->id");
+		}
+		// sms has no translation or joblanguage, no need to copy
 
 		//copy all the job lists
 		QuickUpdate("insert into joblist (jobid,listid,thesql)
@@ -98,6 +144,8 @@ class Job extends DBMappedObject {
 			from joblist where jobid=$this->id");
 
 		// do not need to copy jobsetting, these are handled by the job object
+		// remove the 'translationexpire' jobsetting to force retranslation
+		QuickUpdate("delete from jobsetting where jobid=$newjob->id and name='translationexpire'");
 
 		// if _hascallback and user profile does not allow job callerid, be sure the option is set to use the default callerid
 		$a = QuickQuery("select value from setting where name='_hascallback'");

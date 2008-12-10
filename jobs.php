@@ -4,6 +4,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
 include_once("obj/Job.obj.php");
+include_once("obj/Message.obj.php");
+include_once("obj/MessagePart.obj.php");
+include_once("obj/AudioFile.obj.php");
+include_once("obj/JobLanguage.obj.php");
 include_once("obj/JobList.obj.php");
 include_once("obj/Schedule.obj.php");
 include_once("inc/form.inc.php");

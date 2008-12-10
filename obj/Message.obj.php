@@ -319,7 +319,27 @@ class Message extends DBMappedObject {
 	}
 
 	@unlink($outname);
-}
+	}
+
+	// copy this message, the parts, and attachments
+	function copyNew() {
+		$newmsg = new Message($this->id);
+		$newmsg->id = null;
+		$newmsg->create();
+
+		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$this->id");
+		foreach ($parts as $part) {
+			$newpart = $part->copyNew(); // TODO should this instead take the messageid as a param? would we ever copy without updating the messageid
+			$newpart->messageid = $newmsg->id;
+			$newpart->update();
+		}
+
+		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
+					"select $newmsg->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
+					"from messageattachment ma where ma.messageid=$this->id and not deleted");
+
+		return $newmsg;
+	}
 }
 
 
