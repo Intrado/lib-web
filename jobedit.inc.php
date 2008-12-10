@@ -610,7 +610,7 @@ if( $reloadform )
 	}
 
 	if($USER->authorize('sendmulti')) {
-	PutFormData($f,$s,"translatecheck",1,"bool",0,1);
+	PutFormData($f,$s,"translatecheck",0,"bool",0,1);
 	foreach($languagearray as $language => $messageid) {		
 		$messagefound = false;
 		if($messageid) {
@@ -623,6 +623,7 @@ if( $reloadform )
 				PutFormData($f,$s,"retranslationtext_$language","retranslation","text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",1,"bool",0,1);
 				$messagefound = true;
+				PutFormData($f,$s,"translatecheck",1,"bool",0,1);
 			} 
 		} 
 		if(!$messagefound) {
@@ -1103,12 +1104,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<div id='selectphonemessage' style="display: none">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
-				<div id='newphonetext' style="display: none">
-					Type Your English Message Here
+				<div id='newphonetext' style="white-space: nowrap;display: none">
+					Type Your English Message Here 
 <?					if($USER->authorize('sendmulti')) { ?>
-						 | <? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheckone'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>
-						Translate 
+							| <? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>
+							Translate
 <? 					} ?>
+					<div id='translationwarning' style="color: red"></div>
 					<br />
 					<table>
 						<tr>
@@ -1122,15 +1124,29 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice' " . ($submittedmode ? "DISABLED" : "")); ?> Male
 					<br />
 <?					if($USER->authorize('sendmulti')) { ?>
+					<table>
+						<tr>
+						<td>
 					<div id='translationdetails' style="display: block">
 						<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>
 					</div>
 					<div id='translationbasic' style="display: none">
 						<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>
 					</div>
-
+						</td>
+						<td width="100%">&nbsp;</td>
+						<td align="left">
+							<div id='google' style="white-space:nowrap;display: block">
+							Translations are
+							<div id='branding'></div>
+							</div>
+						</td>
+						</tr>
+					</table>
 					<div id='translationoptions' style="display: none">
-					<br />
+						<?=	button('Refresh Translations', "submitTranslations();");?>
+						<br />
+						<br />
 					
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 <?
@@ -1709,20 +1725,23 @@ function clickIcon(section){
 	}
 }
 
-
-
 <?if($USER->authorize('sendmulti')) { ?>
 <? // If Automatic translation is selected ?>
 function automatictranslation(){
-	if(isCheckboxChecked('translatecheckone')){
+	show('translationwarning');
+	if(isCheckboxChecked('translatecheck')){
 		checkboxhelper('all');
+		submitTranslations();
+		show('translationwarning');		
 	} else {
 		checkboxhelper('none');
+		hide('translationwarning');	
 	}
 }
 <? // Show Translation options ?>
 function translationoptions(details){
 	if (details) {
+		submitTranslations();
 		show('translationoptions');
 		hide('translationdetails');
 		show('translationbasic');
@@ -1737,7 +1756,9 @@ function translationoptions(details){
 function translationlanguage(language){
 	checkboxhelper('default');
 	if (isCheckboxChecked('translate_' + language)){
-		setChecked('translatecheckone');
+		setChecked('translatecheck');
+		show('google');
+		submitTranslation(language);
 		show('language_' + language);
 		show('translationdetails_' + language);
 	} else {
@@ -1788,14 +1809,18 @@ if($USER->authorize('sendmulti')) {
 	if(mode == 'all'){
 		for (i = 0; i < languagelist.length; i++) {	
 			var language = languagelist[i]
-			setChecked('translate_' + language);
-			show('language_' + language);
-			show('translationdetails_' + language);
+			var x = new getObj('translate_' + language);
+			if(!x.obj.disabled) {
+				x.obj.checked = true;		
+				show('language_' + language);
+				show('translationdetails_' + language);
+			}
 			hide('languageexpand_' + language);
 			hide('translationbasic_' + language);
 		}
-		var x = new getObj('translatecheckone');
+		var x = new getObj('translatecheck');
 		x.obj.checked = true;
+		show('google');		
 	} else if(mode == 'none'){		
 		for (i = 0; i < languagelist.length; i++) {	
 			var language = languagelist[i]
@@ -1804,7 +1829,8 @@ if($USER->authorize('sendmulti')) {
 			hide('language_' + language);
 			hide('translationdetails_' + language);
 			hide('languageexpand_' + language);
-			hide('translationbasic_' + language);	
+			hide('translationbasic_' + language);
+			hide('google');	
 		}
 	} else if(mode == 'loading') {
 		var checked = false;
@@ -1822,8 +1848,9 @@ if($USER->authorize('sendmulti')) {
 			hide('translationbasic_' + language);	
 		}
 		if(!checked) {
-			var x = new getObj('translatecheckone');
+			var x = new getObj('translatecheck');
 			x.obj.checked = false;
+			hide('google');
 		}
 	} else { // default
 		var checked = false;
@@ -1833,8 +1860,9 @@ if($USER->authorize('sendmulti')) {
 			}
 		}
 		if(!checked) {
-			var x = new getObj('translatecheckone');
+			var x = new getObj('translatecheck');
 			x.obj.checked = false;
+			hide('google');
 		}
 	}
 <?
@@ -1889,6 +1917,87 @@ function previewlanguage(language,female,male) {
 }
 
 </script>
+
+
+<? // These scripts contol the translation ?>
+<? if($USER->authorize('sendmulti')) { ?>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script>
+<? 
+	$languagestring = "";
+	foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
+	$languagestring = substr($languagestring,1);
+?>
+	var languagelist=new Array(<? echo $languagestring; ?>);
+    google.load("language", "1");
+    google.setOnLoadCallback(init);
+
+    
+function init() {
+	var disabled = false;
+	for (l in languagelist) {
+		var lngCode = google.language.Languages[languagelist[l].toUpperCase()];
+		if (!(lngCode && google.language.isTranslatable(lngCode))) {
+			var x = new getObj('translate_' + languagelist[l]);
+			x.obj.checked = false;
+			x.obj.disabled = true;
+			disabled = true;
+			hide('language_' + languagelist[l]);
+			hide('translationdetails_' + languagelist[l]);
+		}      
+	}
+	if(disabled) {
+		var x = new getObj('translationwarning');
+		x.obj.innerHTML = "One or more languages are unavailable. Please read the help pages for more info.";
+	}
+    google.language.getBranding('branding');
+}
+
+function submitTranslations() {
+	for (l in languagelist) {
+		submitTranslation(languagelist[l]); 
+	}
+}
+
+function submitTranslation(language) {
+	if (!isCheckboxChecked('translate_' + language) || isCheckboxChecked('tr_edit_' + language))
+		return;
+	
+    var text = new getObj('phonetextarea').obj.value;
+    var lngCode = google.language.Languages[language.toUpperCase()];
+
+	if(lngCode){
+  	  google.language.translate(text, "en", lngCode, function(result) {
+	  	  
+		var tr = new getObj('language_' + language).obj;
+		var trexpand = new getObj('translationtextexpand_' + language).obj;
+
+  		if (result.translation) {
+  			var str = result.translation.replace('>', '&gt;').replace('<', '&lt;');
+  			tr.innerHTML = str;
+  			trexpand.value = str;  			
+  		} else {
+  			translationerror(language);
+  		    var text = new getObj('phonetextarea').obj.value;
+  			tr.innerHTML = str;
+  			trexpand.value = text;
+   		}
+  		
+  	  } );
+	} else {
+		translationerror(language);
+	}
+}
+
+function translationerror(language) {
+		var x = new getObj('translationwarning');
+		x.obj.innerHTML = "Unavailable. to translate into " + language + ". Replacing translation with English text.";
+}
+
+
+</script>
+
+<? } ?>
 <script SRC="script/calendar.js"></script>
 <?
 endWindow();
