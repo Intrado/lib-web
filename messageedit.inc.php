@@ -150,21 +150,15 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 			$message = new Message($_SESSION['messageid']);
 			$message->readHeaders();
 			$errors = array();
-			$parts = $message->parse(GetFormData($form,$section,"body"),$errors, GetFormData($form,$section,"voiceid"));
-			$charcount = 0;
-			if($MESSAGETYPE == "sms"){
-				foreach($parts as $part){
-					if($part->maxlen)
-						$charcount += $part->maxlen;
-					else
-						$charcount += strlen($part->txt);
-				}
+			
+			if($MESSAGETYPE != "sms"){
+				$parts = $message->parse(GetFormData($form,$section,"body"),$errors, GetFormData($form,$section,"voiceid"));
+			} else if(strlen(GetFormData($form,$section,"body")) > 160){
+				error("There are too many characters for an SMS message: " . strlen(GetFormData($form,$section,"body")), "You can only have 160 characters");
 			}
 
 			if (count($errors) > 0) {
 				error('There was an error parsing the message', $errors);
-			} else if($MESSAGETYPE == "sms" && $charcount > 160){
-				error("There are too many characters for an SMS message: " . $charcount, "You can only have 160 characters");
 			} else {
 				//submit changes
 				$message->type = $MESSAGETYPE;
@@ -223,13 +217,21 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 
 				//update the parts
 				QuickUpdate("delete from messagepart where messageid=$message->id");
-				foreach ($parts as $part) {
-					if(!isset($part->voiceid))
-						$part->voiceid = GetFormData($form,$section,"voiceid");
+				if($MESSAGETYPE == "sms"){
+					$part = new MessagePart();
 					$part->messageid = $message->id;
-					$part->create();
+					$part->type="T";
+					$part->txt = GetFormData($form,$section,"body");
+					$part->sequence = 0;
+					$part->create();	
+				} else {
+					foreach ($parts as $part) {
+						if(!isset($part->voiceid))
+							$part->voiceid = GetFormData($form,$section,"voiceid");
+						$part->messageid = $message->id;
+						$part->create();
+					}
 				}
-
 
 				$_SESSION['messageid'] = $message->id;
 
