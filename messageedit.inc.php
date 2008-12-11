@@ -150,7 +150,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 			$message = new Message($_SESSION['messageid']);
 			$message->readHeaders();
 			$errors = array();
-			
+
 			if($MESSAGETYPE != "sms"){
 				$parts = $message->parse(GetFormData($form,$section,"body"),$errors, GetFormData($form,$section,"voiceid"));
 			} else if(strlen(GetFormData($form,$section,"body")) > 160){
@@ -167,10 +167,10 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 				if ($message->id && !userOwns("message",$message->id) || $message->deleted ) {
 					exit("nope!"); //TODO
 				}
-				
+
 				$message->name = $name;
 				$message->description = trim(GetFormData($form,$section,"description"));
-				
+
 				$fields = array("body");
 				if ($MESSAGETYPE == "email") {
 					$fields[] = "subject";
@@ -223,7 +223,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 					$part->type="T";
 					$part->txt = GetFormData($form,$section,"body");
 					$part->sequence = 0;
-					$part->create();	
+					$part->create();
 				} else {
 					foreach ($parts as $part) {
 						if(!isset($part->voiceid))
@@ -298,8 +298,8 @@ if( $reloadform )
 
 	PutFormData($form,$section,"voiceid",$newmsg ? 0 : $message->firstVoiceID(),"nomin","nomax",true);
 
-	
-	
+
+
 	PopulateForm($form,$section,$message,$fields);
 
 	//do some custom stuff for the options
@@ -377,7 +377,7 @@ switch($MESSAGETYPE)
 					<th align="right" class="windowRowHeader">Text-to-Speech:<br><? print help('MessagePhone_TextToSpeech'); ?></th>
 					<td>
 <?
-		$fields = DBFindMany("Voice","from ttsvoice order by language, gender desc");
+		$fields = getTTSVoices();
 		NewFormItem($form,$section, 'voiceid', 'selectstart');
 		foreach($fields as $file)
 		{
