@@ -65,9 +65,9 @@ while($row = DBGetRow($queryresult)){
 
 //Get Selected languages
 if($jobid && $job->getSetting('translationmessage')){
-	$queryresult = Query("SELECT j.language, m.id as messageid FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1");
-	while($row = DBGetRow($queryresult)){		
-		$languagearray[htmlentities($row[0])] = $row[1];
+	$translationjoblanguage = DBFindMany('JobLanguage', "FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1","j");
+	foreach ($translationjoblanguage as $obj) {
+		$languagearray[htmlentities($obj->language)] = $obj;
 	}
 }
 
@@ -424,7 +424,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//now add any language options
 			$addlang = false;
 			if ($job->getSetting('translationmessage') ) {
-				foreach($languagearray as $language => $messageid) {
+				foreach($languagearray as $language => $joblanguageobject) {
+					$messageid = $joblanguageobject?($joblanguageobject->messageid):NULL;
 					if(GetFormData($f, $s, "translate_$language")){
 						$part = NULL;
 						$joblanguage = NULL;
@@ -449,6 +450,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$joblanguage->messageid = $message->id;
 						$joblanguage->type = 'phone';
 						$joblanguage->language = $language;
+						$joblanguage->translationeditlock = GetFormData($f, $s,'tr_edit_' . $language);
 						$joblanguage->update();
 						
 						if(!$part) {
@@ -611,12 +613,13 @@ if( $reloadform )
 
 	if($USER->authorize('sendmulti')) {
 	PutFormData($f,$s,"translatecheck",0,"bool",0,1);
-	foreach($languagearray as $language => $messageid) {		
+	foreach($languagearray as $language => $joblanguageobject) {
 		$messagefound = false;
 		// The submitTranslations depend on this text so when edeting this text take a look at submitTranslations script
 		$retranslationtext = "Click retranslation to verify the translation.";
 		//
-		if($messageid) {
+		if($joblanguageobject) {
+			$messageid = $joblanguageobject->messageid;
 			$translationmessage = DBFind("Message","from message where id='$messageid' and deleted=1 and type='phone'");	
 			if($translationmessage != NULL) {				
 				$parts = DBFindMany("MessagePart","from messagepart where messageid=$messageid order by sequence");
@@ -625,8 +628,9 @@ if( $reloadform )
 				PutFormData($f,$s,"translationtextexpand_$language",$body,"text","nomin","nomax",false);
 				PutFormData($f,$s,"retranslationtext_$language",$retranslationtext,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",1,"bool",0,1);
-				$messagefound = true;
+				PutFormData($f,$s,"tr_edit_$language",$joblanguageobject->translationeditlock,"bool",0,1);	
 				PutFormData($f,$s,"translatecheck",1,"bool",0,1);
+				$messagefound = true;
 			} 
 		} 
 		if(!$messagefound) {
@@ -634,8 +638,8 @@ if( $reloadform )
 				PutFormData($f,$s,"translationtextexpand_$language","","text","nomin","nomax",false);
 				PutFormData($f,$s,"retranslationtext_$language",$retranslationtext,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",$jobid?0:1,"bool",0,1);
+				PutFormData($f,$s,"tr_edit_$language",0,"bool",0,1);
 		}
-		PutFormData($f,$s,"tr_edit_$language",0,"bool",0,1);			
 	}
 	}
 
@@ -1102,18 +1106,17 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a Message&nbsp;  
-<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a Message
+<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;  
+<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text to speach message
 				<div id='selectphonemessage' style="display: none">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
 				<div id='newphonetext' style="white-space: nowrap;display: none">
-					Type Your English Message Here 
+					Type Your English Message Here
 <?					if($USER->authorize('sendmulti')) { ?>
-							| <? NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>
-							Translate
-<? 					} ?>
-					<div id='translationwarning' style="color: red"></div>
+					| <?  NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>		
+					Translate
+<? } ?>
 					<br />
 					<table>
 						<tr>
@@ -1121,41 +1124,36 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
 						</tr>
 					</table>
-<?					if($USER->authorize('sendmulti')) { ?>
-					Preferred <? } ?>Voice:
+					Voice: 
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked " . ($submittedmode ? "DISABLED" : "")); ?> Female 
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice' " . ($submittedmode ? "DISABLED" : "")); ?> Male
 					<br />
 <?					if($USER->authorize('sendmulti')) { ?>
+					<div id='translationwarning' style="color: red"></div>
 					<table>
 						<tr>
-						<td>
-					<div id='translationdetails' style="display: block">
-						<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>
-					</div>
-					<div id='translationbasic' style="display: none">
-						<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>
-					</div>
-						</td>
-						<td width="100%">&nbsp;</td>
-						<td align="left">
-							<div id='google' style="white-space:nowrap;display: block">
-							Translations are
-							<div id='branding'></div>
-							</div>
-						</td>
-						</tr>
+						<td style="white-space:nowrap;">
+					</td>
+					<td width="100%" style="padding-left: 0px;"><?=	button('Preview Translations', "submitTranslations();");?>
+						<div id='branding' style="text-align: left;float: left;	padding-left: 100px;font-size: 10px;font-weight: bold;color: gray;white-space:nowrap;"></div>
+					</td>
+					<td >
+						<div id='translationdetails' style="display: block">
+							<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>
+						</div>
+						<div id='translationbasic' style="display: none">
+							<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>
+						</div>
+					</td>
+					</tr>
 					</table>
 					<div id='translationoptions' style="display: none">
-						<?=	button('Refresh Translations', "submitTranslations();");?>
-						<br />
-						<br />
 						<div id='refreshhelp'></div>
 					
 						<table border="0" cellpadding="2" cellspacing="0" width="100%">
 <?
-						foreach($languagearray as $language => $messageid) {
-							$languageisset = $messageid?1:($jobid?0:1);
+						foreach($languagearray as $language => $joblanguageobject) {
+							$languageisset = $joblanguageobject?1:($jobid?0:1);
 ?>				
 							<tr>
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
@@ -1171,8 +1169,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									</tr>
 									</table>
 									<div id='languageexpand_<? echo $language?>' style="display: none">
-										Translation <?= help('Job_Translation',NULL,"small"); ?> <br />
-										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 45, 3,"id='translationtextexpand_$language'  disabled"); ?>
+										<br />
+										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 45, 3,"id='translationtextexpand_$language'"); ?>
 										<br />
 										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Edit Translation <?= help('Job_EditTranslation',NULL,"small"); ?> 
 										
@@ -1811,7 +1809,7 @@ function checkboxhelper(mode) {
 <? 
 if($USER->authorize('sendmulti')) { 
 	$languagestring = "";
-	foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
+	foreach($languagearray as $language => $joblanguageobject) { $languagestring .= ",'$language'";} 
 	$languagestring = substr($languagestring,1);
 ?>
 	var languagelist=new Array(<? echo $languagestring; ?>);
@@ -1855,7 +1853,11 @@ if($USER->authorize('sendmulti')) {
 				hide('translationdetails_' + language);
 			}
 			hide('languageexpand_' + language);
-			hide('translationbasic_' + language);	
+			hide('translationbasic_' + language);
+			if(!isCheckboxChecked('tr_edit_' + language)){
+				var x = new getObj('translationtextexpand_' + language);
+				x.obj.disabled = true;	
+			}
 		}
 		if(!checked) {
 			var x = new getObj('translatecheck');
@@ -1935,7 +1937,7 @@ function previewlanguage(language,female,male) {
 <script>
 <? 
 $languagestring = "";
-foreach($languagearray as $language => $messageid) { $languagestring .= ",'$language'";} 
+foreach($languagearray as $language => $joblanguageobject) { $languagestring .= ",'$language'";} 
 $languagestring = substr($languagestring,1);
 ?>
 var languagelist=new Array(<? echo $languagestring; ?>);
@@ -1957,9 +1959,11 @@ function init() {
 		}      
 	}
 	if(disabled) {
-		var x = new getObj('translationwarning');
-		x.obj.innerHTML = "One or more languages are unavailable. Please read the help pages for more information.";		
+		//var x = new getObj('translationwarning');
+		//x.obj.innerHTML = "One or more languages are unavailable. Please read the help pages for more information.";		
 	}
+	var add = new getObj('branding');
+	add.obj.innerHTML = "Translations ";		
     google.language.getBranding('branding');
 }
 
@@ -2042,8 +2046,8 @@ function retranslation(language){
 	}
 }
 function translationerror(language) {
-		var x = new getObj('translationwarning');
-		x.obj.innerHTML = "Unavailable. to translate into " + language + ". Replacing translation with English text.";
+		//var x = new getObj('translationwarning');
+		//x.obj.innerHTML = "Unavailable. to translate into " + language + ". Replacing translation with English text.";
 }
 </script>
 <? // This scipt will determine if google is available on the client side and enable or disable translation ?>
@@ -2054,11 +2058,9 @@ function translationerror(language) {
 			if (window['google']) {
 					return;
 			}
-			var nobrand = new getObj('branding').obj;
-			nobrand.innerHTML = "Unavailable";
 			var newscript = document.getElementById("googlescript");
 			var headID = document.getElementById("preloadarea");  
-			headID.removeChild(newScript);
+			headID.removeChild(newscript);
 		}
 		var headID = document.getElementById("preloadarea");         
 		var newScript = document.createElement('script');
