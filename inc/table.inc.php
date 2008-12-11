@@ -65,7 +65,9 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 			echo '>';
 		}
 
-		if (strpos($title,"@") === 0){
+		if (strpos($title,"@#") === 0){
+			$displaytitle = substr($title,2);		
+		} else if (strpos($title,"@") === 0){
 			$displaytitle = substr($title,1);
 		} else if (strpos($title,"#") === 0){
 			$displaytitle = substr($title,1);
