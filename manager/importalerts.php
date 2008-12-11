@@ -2,12 +2,12 @@
 //ini_set('error_reporting', E_ALL);
 //ini_set('display_errors', '1');
 
-include_once("common.inc.php");
-include_once("../inc/formatters.inc.php");
-include_once("../inc/form.inc.php");
-include_once("../inc/table.inc.php");
-include_once("../inc/html.inc.php");
-include_once("AspAdminUser.obj.php");
+require_once("common.inc.php");
+require_once("../inc/formatters.inc.php");
+require_once("../inc/form.inc.php");
+require_once("../inc/table.inc.php");
+require_once("../inc/html.inc.php");
+require_once("AspAdminUser.obj.php");
 
 // Set session variables if user got here from the customerimports.php
 if (isset($_GET['cid']) && isset($_GET['importid'])) {
