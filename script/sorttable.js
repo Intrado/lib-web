@@ -118,10 +118,16 @@ function ts_resortTable(lnk,clid) {
     }
     
     //redo all the row styles if we have styles for them
-    if (table._oddrowstyle || table._evenrowstyle)
-	for (j=1;j<table.rows.length;j++) {
-		table.rows[j].className = j%2 == 0 ? table._evenrowstyle : table._oddrowstyle;
-	}
+    if (table._oddrowstyle || table._evenrowstyle) {
+	    var setStyle = 0;
+		for (j=1;j<table.rows.length;j++) {
+			// only set styles on visible rows
+			if (table.rows[j].style.display != 'none') {
+				table.rows[j].className = setStyle ? table._evenrowstyle : table._oddrowstyle;
+				setStyle = !setStyle;
+			}
+		}
+    }
     
     // Delete any other arrows there may be showing
     var allspans = document.getElementsByTagName("span");
