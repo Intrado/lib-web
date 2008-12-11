@@ -109,7 +109,7 @@ function fmt_surveyactions ($obj,$name) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = "Message " . (getSystemSetting('_hassurvey', true) && $USER->authorize("survey")) ? "& Survey Template " : "" . "Builder";
+$TITLE = "Message " . ((getSystemSetting('_hassurvey', true) && $USER->authorize("survey")) ? "& Survey Template " : "") . "Builder";
 
 include_once("nav.inc.php");
 
