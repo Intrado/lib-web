@@ -1,33 +1,45 @@
 <?
-include_once("common.inc.php");
-include_once("../inc/formatters.inc.php");
-include_once("../inc/form.inc.php");
-include_once("../inc/table.inc.php");
+require_once("common.inc.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/formatters.inc.php");
+require_once("../inc/form.inc.php");
+require_once("../inc/table.inc.php");
 
 $staledataleewayhours = 1;
 $defaultwindowminutes = 10;
 define('SECONDSPERHOUR', 3600);
 define('SECONDSPERMINUTE', 60);
 define('HOURSPERDAY', 24);
+define('SECONDSPERDAY', 86400);
 
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 
+function fmt_import_date($row,$index) {
+	if (isset($row[$index])) {
+		$time = strtotime($row[$index]);
+		if ($time !== -1 && $time !== false)
+			return date("Y-m-d G:i:s",$time);
+	}
+	return "&nbsp;";
+}
+
 function fmt_alert_timestamp($row, $index) {
+	global $staledataleewayhours;
 	date_default_timezone_set($row[2]);
 	$timestamp = strtotime($row[$index]);
 	if ($timestamp === false) {
 		return "<div style='background-color: #ff0000'>- Never -</div>";
-	// 3 Days Old
 	} else {
-		if ($timestamp < time() - SECONDSPERHOUR * HOURSPERDAY * 3)
-			return "<div style='background-color: #FFFF00'>" . fmt_date($row, $index) . "</div>";
-		else
-			return fmt_date($row, $index);
+		if ($timestamp + ($staledataleewayhours * SECONDSPERHOUR) < strtotime($row[10]))
+			return "<div style='background-color: #ff0000'>" . fmt_import_date($row, $index) . "</div>";
 	}
+	
+	return fmt_import_date($row, $index);
 }
-//row index 13 contains an array of alert options
+
+//row index 14 contains an array of alert options
 function fmt_last_modified($row, $index) {
 	global $staledataleewayhours;
 	global $defaultwindowminutes;
@@ -37,61 +49,31 @@ function fmt_last_modified($row, $index) {
 		return "<div style='background-color: #ff0000'>- Never -</div>";
 	} else {
 		// Stale Data
-		if (isset($row[13]['daysold']) && $row[13]['daysold']) {
-			$timediffallowed = ($row[13]['daysold'] * HOURSPERDAY * SECONDSPERHOUR) + ($staledataleewayhours * SECONDSPERHOUR);
+		if (isset($row[14]['daysold']) && $row[14]['daysold']) {
+			$timediffallowed = ($row[14]['daysold'] * HOURSPERDAY * SECONDSPERHOUR) + ($staledataleewayhours * SECONDSPERHOUR);
 			$timediff = time() - $timestamp;
 			if ($timediff > $timediffallowed)
-				return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
+				return "<div style='background-color: #ffcccc'>" . fmt_import_date($row, $index) . "</div>";
 		// Scheduled Days
-		} else if(isset($row[13]['dow'])) {
-			if (!isset($row[13]['scheduledwindowminutes']))
-				$row[13]['scheduledwindowminutes'] = $defaultwindowminutes;
-			$daytocheck =  date('w', time() - ($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE));
+		} else if(isset($row[14]['dow'])) {
+			if (!isset($row[14]['scheduledwindowminutes']))
+				$row[14]['scheduledwindowminutes'] = $defaultwindowminutes;
+			$daytocheck =  date('w', time() - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE));
 
 			// ['dow'] is a string of possibly more than one days
-			if (strpos($row[13]['dow'], $daytocheck) !== false) {
-				$timestampforscheduledday = strtotime($row[13]['time'] . ":00 " . date("F d, Y", time() - ($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE)));
-				$lowerbound = $timestampforscheduledday - ($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE);
+			if (strpos($row[14]['dow'], $daytocheck) !== false) {
+				$timestampforscheduledday = strtotime($row[14]['time'] . ":00 " . date("F d, Y", time() - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE)));
+				$lowerbound = $timestampforscheduledday - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE);
 				// Check for the alert only if the current time is past the scheduled time window
-				if ($lowerbound <= time() - 2*($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE)) {
+				if ($lowerbound <= time() - 2*($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE)) {
 					$diffuploadtime = $timestamp - $lowerbound;
-					if ($diffuploadtime < 0 || $diffuploadtime > 2*($row[13]['scheduledwindowminutes']*SECONDSPERMINUTE))
-						return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
+					if ($diffuploadtime < 0 || $diffuploadtime > 2*($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE))
+						return "<div style='background-color: #ffcccc'>" . fmt_import_date($row, $index) . "</div>";
 				}
 			}
-/******
-			//find the last weekday it should have run, including today.
-			//if the last scheduled run is later than last run, display error
-			$scheduleddays=array();
-			if(isset($row[13]['dow']))
-			$scheduleddays = array_flip(explode(",", $row[13]['dow']));
-
-			$daysago = 0;
-			if(strtotime($row[13]['time']) > strtotime("now")){
-				$daytocheck--;
-				$daysago++;
-			}
-
-			while(!isset($scheduleddays[$daytocheck])){
-				$daysago++;
-				$daytocheck--;
-				if($daytocheck < 1){
-					$daytocheck = $daytocheck+7;
-				}
-			}
-
-			//calculate unix time and allow 15 min leeway
-			$scheduledlastrun = strtotime(" -$daysago days " . $row[13]['time']) - (60*15);
-			if($scheduledlastrun > $timestamp){
-				return "<div style='background-color: #ffcccc'>" . fmt_date($row, $index) . "</div>";
-			}
-******/
-		// 3 Days Old
-		} else if ($timestamp < time() - SECONDSPERHOUR * HOURSPERDAY * 3) {
-			return "<div style='background-color: #FFFF00'>" . fmt_date($row, $index) . "</div>";
 		}
 
-		return fmt_date($row, $index);
+		return fmt_import_date($row, $index);
 	}
 }
 
@@ -111,9 +93,9 @@ function fmt_import_status($row, $index){
 
 //row index 12 contains an array of alert options
 function fmt_filesize($row, $index){
-	 if((isset($row[13]['minsize']) && $row[$index] < $row[13]['minsize']) || (isset($row[13]['maxsize']) && $row[$index] > $row[13]['maxsize']))
+	 if((isset($row[14]['minsize']) && $row[$index] < $row[14]['minsize']) || (isset($row[14]['maxsize']) && $row[$index] > $row[14]['maxsize']))
 	 	return "<div style=\"background-color: #FFCCCC; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
-	 else if(!isset($row[13]['minsize']) && !isset($row[13]['maxsize']) && $row[$index] < 10 && $row[$index] > 0)
+	 else if(!isset($row[14]['minsize']) && !isset($row[14]['maxsize']) && $row[$index] < 10 && $row[$index] > 0)
 	 	return "<div style=\"background-color: #FFFF00; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 	 else if($row[$index] == 0)
 	 	return "<div style=\"background-color: #FF0000; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
@@ -125,16 +107,111 @@ function fmt_filesize($row, $index){
 //index 0 is customer id
 //index 3 is import id
 function fmt_importalerts($row, $index){
-	$url = "<a href='importalerts.php?cid=" . $row[0] . "&importid=" . $row[4] . "' title='Configure Alerts'><img src='img/s-config.png' border=0></a>";
-	if(isset($row[13]) && $row[13] != null && $row[13] != ""){
-		$url = "*" . $url;
+	$url = '<a href="importalerts.php?cid=' . $row[0] . '&importid=' . $row[4] . '" title="Configure Alerts"><img src="img/s-config.png" border=0></a>';
+	if(isset($row[14]) && $row[14] != null && $row[14] != ""){
+		$url = '<div style="background-color: #3cff00">' . $url . "</div>";
 	}
 	return $url;
+}
+
+// row index 14 is the alert options. The whole mess is in a text field.
+function fmt_alert_email($row, $index) {
+	if (isset($row[$index]['emails']) && $row[$index]['emails']) {
+		return str_replace(";", "\n", $row[$index]['emails']);
+	} else {
+		return "";
+	}
+}
+
+function fmt_daysold($row, $index) {
+	if (isset($row[10]) && $row[10]) {
+		return intval((strtotime(date("Y-m-d G:i:s")) - strtotime($row[10])) / SECONDSPERDAY);
+	} else {
+		return '<div style="background-color: #ff0000">99999</div>';
+	}
+}
+
+function fmt_updatemethod($row, $index) {
+	switch ($row[$index]) {
+		case "full":
+			return "Update, create, delete";
+			break;
+		case "updateonly":
+			return "Update only";
+			break;
+		case "update":
+			return "Update & create";
+			break;
+		default:
+			return $row[$index];
+	}
+}
+
+function fmt_alert($row, $index) {
+	global $staledataleewayhours;
+	global $defaultwindowminutes;
+	$timestamp = strtotime($row[10]);
+	if (isset($row[14]['daysold']) && $row[14]['daysold']) {
+		$timediffallowed = ($row[14]['daysold'] * HOURSPERDAY * SECONDSPERHOUR) + ($staledataleewayhours * SECONDSPERHOUR);
+		$timediff = time() - $timestamp;
+		if ($timediff > $timediffallowed)
+			return "Alert";
+	// Scheduled Days
+	} else if(isset($row[14]['dow'])) {
+		if (!isset($row[14]['scheduledwindowminutes']))
+			$row[14]['scheduledwindowminutes'] = $defaultwindowminutes;
+		$daytocheck =  date('w', time() - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE));
+
+		// ['dow'] is a string of possibly more than one days
+		if (strpos($row[14]['dow'], $daytocheck) !== false) {
+			$timestampforscheduledday = strtotime($row[14]['time'] . ":00 " . date("F d, Y", time() - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE)));
+			$lowerbound = $timestampforscheduledday - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE);
+			// Check for the alert only if the current time is past the scheduled time window
+			if ($lowerbound <= time() - 2*($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE)) {
+				$diffuploadtime = $timestamp - $lowerbound;
+				if ($diffuploadtime < 0 || $diffuploadtime > 2*($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE))
+					return "Alert";
+			}
+		}
+	} else if (strtotime($row[9]) + ($staledataleewayhours * SECONDSPERHOUR) < $timestamp) {
+		return "Alert";
+	} else if ((isset($row[14]['minsize']) && $row[11] < $row[14]['minsize']) || (isset($row[14]['maxsize']) && $row[11] > $row[14]['maxsize'])) {
+		return "Alert";
+	} else if(!isset($row[14]['minsize']) && !isset($row[14]['maxsize']) && $row[11] < 10 && $row[11] > 0) {
+		return "Alert";
+	} else if($row[11] == 0) {
+		return "Alert";
+	} else {
+		return "None";
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
+$f = "form";
+$s = "imports";
+$reloadform = 0;
+
+if(CheckFormSubmit($f, $s)) {
+	//check to see if formdata is valid
+	if(CheckFormInvalid($f)) {
+		error('Form was edited in another window, reloading data');
+		$reloadform = 1;
+	} else {
+		MergeSectionFormData($f, $s);
+		if( CheckFormSection($f, $s) ){
+			?><div>An error occurred somehow </div><?
+		}
+	}
+} else {
+	$reloadform = 1;
+}
+
+if($reloadform){
+	ClearFormData($f);
+}
 
 if(isset($_GET['clear'])){
 	unset($_SESSION['customerid']);
@@ -146,46 +223,36 @@ if(isset($_GET['customer'])){
 	redirect();
 }
 
-if(isset($_SESSION['customerid'])){
-	$customerID = $_SESSION['customerid'];
-	$queryextra = "AND ID='$customerID'";
-} else {
-	$queryextra=" and enabled";
+if (isset($_GET['cid'])) {
+	if ($_GET['cid']) {
+		$queryextra = " AND id in (";
+		foreach (explode(",", $_GET['cid']) as $cid)
+			$queryextra .= "'". DBSafe($cid) . "',";
+			
+		$queryextra = substr($queryextra, 0, -1) . ") ";
+	}
 }
 
-
-$f = "form";
-$s = "imports";
-$reloadform = 0;
-$types = array("automatic" => "automatic", "manual" => "manual", "list" => "list", "addressbook" => "addressbook");
-$selected = array("automatic", "manual");
-$querytypes = "";
-
-
-if(CheckFormSubmit($f, $s)) {
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f)) {
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	} else {
-		MergeSectionFormData($f, $s);
-		if( CheckFormSection($f, $s) ){
-			?><div>An error occurred somehow </div><?
-		} else {
-			$selected = GetFormData($f, $s, 'importtypes');
-		}
+if (isset($_POST['showmatch'])) {
+	if (isset($_POST['alerttxt']) && trim($_POST['alerttxt'])) {
+		$alerttxt = escapehtml(trim($_POST['alerttxt']));
+		$querytypes = " and alertoptions like '%" . DBSafe(trim($_POST['alerttxt'])) . "%' ";
+	}
+	if (isset($_POST['custtxt']) && trim($_POST['custtxt'])) {
+		$custtxt = escapehtml(trim($_POST['custtxt']));
+		$queryextra = " and urlcomponent like '%" . DBSafe(trim($_POST['custtxt'])) . "%'";
 	}
 } else {
-	$reloadform = 1;
-}
-if($reloadform){
-	ClearFormData($f);
-	PutFormData($f, $s, 'importtypes', $selected, "array", array_keys($selected));
-	PutFormData($f, $s, "submit", "");
+	$alerttxt = "";
+	$custtxt = "";
 }
 
-
-
+if(isset($_SESSION['customerid'])){
+	$customerID = $_SESSION['customerid'];
+	$queryextra = " AND ID='$customerID' ";
+} else {
+	$queryextra .= " and enabled ";
+}
 
 $res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 $shardinfo = array();
@@ -196,105 +263,182 @@ $custquery = Query("select id, shardid, urlcomponent from customer where 1 $quer
 $customers = array();
 while($row= DBGetRow($custquery)){
 	$customers[] = $row;
-}
+	$currhost="";
+	$data = array();
+	foreach($customers as $cust) {
 
-if($selected){
-	$querytypes = "and import.type in ('" . implode("','", $selected) . "')";
-}
-
-$currhost="";
-$data = array();
-foreach($customers as $cust) {
-
-	if($currhost != $cust[1]){
-		$custdb = mysql_connect($shardinfo[$cust[1]][0], $shardinfo[$cust[1]][1],$shardinfo[$cust[1]][2])
-			or die("Could not connect to customer database: " . mysql_error());
-		$currhost = $cust[1];
-	}
-	mysql_select_db("c_" . $cust[0]);
-	if($custdb){
-		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description, alertoptions
-					FROM import
-					where 1
-					$querytypes
-					order by id";
-		$list = Query($query, $custdb);
-		$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
-		$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
-		while($row = DBGetRow($list)){
-			$alertoptions = sane_parsestr($row[9]);
-			$row[9] = $alertoptions;
-			$data[] = array_merge(array($cust[0], $displayname, $timezone, $cust[2]), $row);
+		if($currhost != $cust[1]){
+			$custdb = mysql_connect($shardinfo[$cust[1]][0], $shardinfo[$cust[1]][1],$shardinfo[$cust[1]][2])
+				or die("Could not connect to customer database: " . mysql_error());
+			$currhost = $cust[1];
+		}
+		mysql_select_db("c_" . $cust[0]);
+		if($custdb){
+			$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description, notes, alertoptions, datatype
+						FROM import
+						where type in ('automatic', 'manual')
+						$querytypes
+						order by id";
+			$list = Query($query, $custdb);
+			$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
+			$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
+			while($row = DBGetRow($list)){
+				$alertoptions = sane_parsestr($row[10]);
+				$row[10] = $alertoptions;
+				$data[] = array_merge(array($cust[0], $displayname, $timezone, $cust[2]), $row);
+			}
 		}
 	}
 }
-$titles = array("0" => "ID",
-		"url" => "Name",
-		"4" => "Imp ID ",
-		"5" => "Imp Name",
-		"12" => "Description",
-		"6" =>  "Status",
-		"7" => "Type ",
-		"8" => "Upd. Method",
-		"2" => "TimeZone",
-		"9" => "Last Run",
-		"10" => "Last Modified",
-		"11" => "File Size in Bytes",
-		"actions" => "Alerts");
+$titles = array("0" => "#ID",
+		"alert" => "#Alert",
+		"url" => "#Cust Name",
+		"4" => "@#Imp ID ",
+		"5" => "#Imp Name",
+		"12" => "@#Description",
+		"13" => "@#Notes",
+		"6" =>  "@#Status",
+		"7" => "@#Type",
+		"15" => "@#Data Type",
+		"8" => "@#Upd. Method",
+		"2" => "#TimeZone",
+		"9" => "#Last Run",
+		"10" => "#Last Modified",
+		"daysold" => "#Days Old",
+		"11" => "#File Size in Bytes",
+		"14" => "@#Alert Email",
+		"actions" => "Actions");
+		
 $formatters = array("url" => "fmt_custurl",
 					"11" => "fmt_filesize",
 					"9" => "fmt_alert_timestamp",
 					"6" => "fmt_import_status",
 					"10" => "fmt_last_modified",
-					"actions" => "fmt_importalerts");
+					"14" => "fmt_alert_email",
+					"actions" => "fmt_importalerts",
+					"daysold" => "fmt_daysold",
+					"8" => "fmt_updatemethod",
+					"alert" => "fmt_alert");
+					
+// Do not provide a checkbox to hide these columns.
+$lockedTitles = array(0, "actions", "url", 5);
+
+// only format these fields when filtering
+$filterFormatters = array("8" => "fmt_updatemethod",
+					"alert" => "fmt_alert");
+					
+// allow these fields for filtering
+$filterTitles = array("alert", 6, 7, 15, 8, 2);
 
 /////////////////////////////
 // Display
 /////////////////////////////
 
 include("nav.inc.php");
-NewForm($f);
-?>
-<table>
-	<tr><td>
-		<?
-			NewFormItem($f, $s, 'importtypes', 'selectmultiple', "4", $types);
-		?>
-	</td></tr>
-	<tr><td><? NewFormItem($f, $s, 'submit', 'submit'); ?></td><tr>
-</table>
-<?
-EndForm();
 
 ?>
-<table class=list>
+<form method="POST" action="customerimports.php">
+<a href='customerimports.php'>Show All Customers</a>
+<table>
+	<tr>
+		<td valign="top">
+			<table border="0" cellpadding="2" cellspacing="1" class="list">
+				<tr class="listHeader" align="left" valign="bottom">
+					<td>
+						Search (can match partial urls/emails)
+					</td>
+				</tr>
+				<tr>
+					<td valign="top">
+						<table>
+							<tr>
+								<td valign="top" align="left">
+									Search Cust:
+								</td>
+								<td>
+									<input type="text" name="custtxt" id="custtxt" value="<?=$custtxt?>" size="20" maxlength="50" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="top" align="left">
+									Search Emails:
+								</td>
+								<td>
+									<input type="text" name="alerttxt" id="alerttxt" value="<?=$alerttxt?>" size="20" maxlength="50" />
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<input type="submit" name="showmatch" id="showmatch" value="Search" />   
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign="top">
+			<?
+			// show the row data filters
+			show_row_filter('customer_imports_table', $data, $titles, $filterTitles, $filterFormatters);
+			
+			?>
+		</td>
+	</tr>
+</table>
+</form>
+<?
+
+// Show the column data hide/select check boxes.
+show_column_selector('customer_imports_table', $titles, $lockedTitles);
+
+?>
+<table class="list sortable" id="customer_imports_table">
 <?
 showTable($data, $titles, $formatters);
+
 ?>
 </table>
-<div> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.<div>
-<div > All time stamps are in customer time. </div>
-<table class=list>
+
+<?// assign row ids for the row filter function?>
+<script language="javascript">
+	var table = new getObj('customer_imports_table').obj;
+	var trows = table.rows;
+	for (var i = 0, length = trows.length; i < length; i++) {
+		trows[i].id = 'row'+i;
+	}
+</script>
+
+<div> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.</div>
+<div> All time stamps are in customer time. </div>
+<table class="list">
 	<tr>
 		<th align="left" class="listheader">&nbsp;</th>
 		<th align="left" class="listheader">Last Run</th>
 		<th align="left" class="listheader">File Date</th>
 		<th align="left" class="listheader">File Size</th>
+		<th align="left" class="listheader">Days Old</th>		
 	</tr>
 	<tr>
 		<th class="listheader">No Alert</th>
-		<td><span style="background-color: #FFFF00">Yellow</span> if older than 3 days</td>
-		<td><span style="background-color: #FFFF00">Yellow</span> if older than 3 days</td>
+		<td><span style="background-color: #FFFF00">Yellow</span> if older than Last Modified</td>
+		<td><span style="background-color: #FFFF00"></span></td>
 		<td><span style="background-color: #FFFF00">Yellow</span> if data size less than 10 bytes</td>
+		<td><span style="background-color: #FFFF00"></span></td>
 	</tr>
 	<tr>
 		<th class="listheader">With Alerts</th>
-		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert
+		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
+		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
 		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
 		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
 	</tr>
 	<tr>
-		<td colspan="4" align="middle"><span style="background-color: #FF0000">Red</span> if does not exist</td>
+		<th class="listheader"></th>
+		<td><span style="background-color: #FF0000">Red</span> if older than File Date</td>
+		<td><span style="background-color: #FF0000">Red</span> if does not exist</td>
+		<td><span style="background-color: #FF0000">Red</span> if does not exist</td>
+		<td><span style="background-color: #FF0000">Red</span> if does not exist</td>
 	</tr>
 </table>
 <?
