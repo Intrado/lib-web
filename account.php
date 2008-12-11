@@ -53,34 +53,34 @@ if(CheckFormSubmit($f,$s))
 	else
 	{
 		MergeSectionFormData($f, $s);
-		
+
 		/* Trim fields that are not processed bellow. */
 		TrimFormData($f, $s,'firstname');
 		TrimFormData($f, $s,'lastname');
-		
+
 		/* Password should not be trimmed*/
 		$password = GetFormData($f, $s, "password");
 		$passwordconfirm = GetFormData($f, $s, "passwordconfirm");
-		
+
 		/* Trim and get data from fields that are processed.*/
 		$login = TrimFormData($f, $s, 'login');
 		$accesscode = TrimFormData($f, $s, 'accesscode');
 		$pincode = TrimFormData($f, $s, 'pincode');
 		$pincodeconfirm = TrimFormData($f, $s, 'pincodeconfirm');
 		$email = TrimFormData($f, $s, "email");
-		
-		/* Email list will need a special trim since the list could end with ; etc. 
-		 * There is no need to put the trimmed data back to the form since 
+
+		/* Email list will need a special trim since the list could end with ; etc.
+		 * There is no need to put the trimmed data back to the form since
 		 * the email list form field does not check for errors.
 		 * */
 		$emaillist = GetFormData($f, $s, "aremail");
 		$emaillist = preg_replace('[,]' , ';', $emaillist);
 		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
-			
+
 		$phone = Phone::parse(TrimFormData($f,$s,"phone"));
 		$callerid = Phone::parse(TrimFormData($f,$s, "callerid"));
-		
-		
+
+
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -131,8 +131,10 @@ if(CheckFormSubmit($f,$s))
 			error("The earliest call time must be before the latest call time");
 		} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
 			error("That is not a valid 'Primary Color'");
-		} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
+		} else if (GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5) {
 			error("The ratio of primary to background can only be between 0 and .5(50%)");
+		} else if (getSystemSetting('_hascallback', false) && (GetFormData($f, $s, "radiocallerid") == "byuser") && (strlen($callerid) == 0)) {
+			error("Please enter a valid caller ID");
 		} else {
 			//submit changes
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
@@ -163,7 +165,7 @@ if(CheckFormSubmit($f,$s))
 			$USER->setSetting("maxjobdays",GetFormData($f, $s, 'maxjobdays'));
 
 			//dont save any callerid stuff if they don't have access to change it
-			if (strlen($callerid) == 0 )
+			if (strlen($callerid) == 0)
 				$callerid = false;
 			if ($USER->authorize('setcallerid')) {
 				$USER->setSetting("callerid",$callerid);
@@ -423,6 +425,7 @@ startWindow('User Information');
 
 							<tr>
 								<td colspan="2">Default Delivery Window:</td>
+							</tr>
 							<tr>
 								<td width="30%">&nbsp;&nbsp;Earliest <?= help('Account_PhoneEarliestTime', NULL, 'small') ?></td>
 								<td><? time_select($f,$s,"callearly", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate')); ?></td>
@@ -465,7 +468,7 @@ if ($USER->authorize('setcallerid')) {
 	if (getSystemSetting('_hascallback', false)) {
 ?>
 							<tr>
-								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",""); ?> Use default Caller ID</td>
+								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",""); ?> Use default Caller&nbsp;ID</td>
 								<td><? echo Phone::format(getSystemSetting('callerid')); ?></td>
 							</tr>
 							<tr>
