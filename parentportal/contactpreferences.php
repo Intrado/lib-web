@@ -162,7 +162,7 @@ function contact_actions($obj, $index){
 $PAGE = "contacts:contactpreferences";
 $TITLE = "Contact Preferences";
 if($PERSONID){
-	$TITLE .= " - " . $person->$firstnamefield . " " . $person->$lastnamefield;
+	$TITLE .= " - " . escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield);
 }
 include_once("nav.inc.php");
 startWindow("Contacts" . help("Contactpreferences"), 'padding: 3px;');

@@ -27,15 +27,20 @@ if(CheckFormSubmit($f,$s))
 		MergeSectionFormData($f, $s);
 
 		//do check
-		$newpassword1 = trim(GetFormData($f, $s, "newpassword1"));
-		$newpassword2 = trim(GetFormData($f, $s, "newpassword2"));
+		$firstname = DBSafe(GetFormData($f,$s,"firstname"));
+		$lastname = DBSafe(GetFormData($f,$s,"lastname"));
+		$zipcode = DBSafe(GetFormData($f,$s,"zipcode"));
+		$oldpassword = DBSafe(GetFormData($f,$s,"oldpassword"));
+		$newpassword1 = DBSafe(GetFormData($f, $s, "newpassword1"));
+		$newpassword2 = DBSafe(GetFormData($f, $s, "newpassword2"));
+		$notify = GetFormData($f, $s, "notify");
 		$notifysms = GetFormData($f, $s, "notifysms");
-		$sms = GetFormData($f, $s, "sms");
+		$sms = DBSafe(GetFormData($f, $s, "sms"));
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(strlen($newpassword1) > 0 && strlen($newpassword1) < 5){
 			error("Passwords must be at least 5 characters long");
-		} else if($newpassword1 && $passworderror = validateNewPassword($_SESSION['portaluser']['portaluser.username'], $newpassword1, GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"))){
+		} else if($newpassword1 && $passworderror = validateNewPassword($_SESSION['portaluser']['portaluser.username'], $newpassword1, $firstname, $lastname)){
 			error($passworderror);
 		} else if($newpassword1 != $newpassword2){
 			error('Password confirmation does not match');
@@ -43,26 +48,26 @@ if(CheckFormSubmit($f,$s))
 			error($phoneerror);
 		} else {
 			//submit changes
-			if(GetFormData($f, $s, "notify")){
+			if ($notify){
 				$notifyType = "message";
 			} else {
 				$notifyType = "none";
 			}
-			if($notifysms){
+			if ($notifysms){
 				$notifysmsType = "message";
 				$sms = Phone::parse($sms);
 			} else {
 				$notifysmsType = "none";
 				$sms = "";
 			}
-			$result = portalUpdatePortalUser(GetFormData($f, $s, "firstname"), GetFormData($f, $s, "lastname"), GetFormData($f, $s, "zipcode"), $notifyType, $notifysmsType, $sms);
+			$result = portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms);
 			if($result['result'] != ""){
 				$updateuser = false;
 				error($error_failedupdate);
 				$error = 1;
 			}
 			if($newpassword1){
-				$result = portalUpdatePortalUserPassword($newpassword1, GetFormData($f, $s, "oldpassword"));
+				$result = portalUpdatePortalUserPassword($newpassword1, $oldpassword);
 				if($result['result'] != ""){
 					$updateuser = false;
 					$error = 1;
@@ -98,7 +103,7 @@ if( $reloadform )
 }
 
 $PAGE = "account:account";
-$TITLE = "Account Information: " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
+$TITLE = "Account Information: " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " . escapehtml($_SESSION['portaluser']['portaluser.lastname']);
 include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, 'Save'), button("Change Email",NULL, "changeemail.php"));
@@ -112,7 +117,7 @@ startWindow('User Information');
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>
 						<td align="right">Email:</td>
-						<td><?=$_SESSION['portaluser']['portaluser.username']?></td>
+						<td><?= escapehtml($_SESSION['portaluser']['portaluser.username']) ?></td>
 					</tr>
 					<tr>
 						<td align="right">First Name:</td>

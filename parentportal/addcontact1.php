@@ -37,7 +37,9 @@ if(CheckFormSubmit($f,$s))
 				redirect("phoneactivation1.php");
 			} else {
 				// by code
-				$result = portalAssociatePerson(GetFormData($f, $s, "code"), GetFormData($f, $s, "pkey"));
+				$code = GetFormData($f, $s, "code");
+				$pkey = GetFormData($f, $s, "pkey");
+				$result = portalAssociatePerson($code, $pkey);
 				if($result['result'] == ""){
 					if(!isset($_SESSION['pidlist'][$result['customerid']])){
 						$_SESSION['pidlist'][$result['customerid']] = array();

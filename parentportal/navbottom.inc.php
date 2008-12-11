@@ -6,12 +6,12 @@
 Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
 <br>
 <? } /*CSDELETEMARKER_END*/ ?>
-&copy; 1999-2008 Reliance Communications, Inc. All Rights Reserved.
+&copy; 1999-2009 Reliance Communications, Inc. All Rights Reserved.
 
 </div>
 <?
 
-print "<div id='logininfo' class='noprint' >Logged in as " . $_SESSION['portaluser']['portaluser.firstname'] . " " .$_SESSION['portaluser']['portaluser.lastname'] . " (" . $_SESSION['portaluser']['portaluser.username'] . ") <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
+print "<div id='logininfo' class='noprint' >Logged in as " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " .escapehtml($_SESSION['portaluser']['portaluser.lastname'] . " (" . $_SESSION['portaluser']['portaluser.username']) . ") <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
 
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {

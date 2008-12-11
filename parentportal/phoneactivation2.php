@@ -99,7 +99,7 @@ startWindow('Phone');
 			<td>The following contacts were not found in the system:</td>
 		</tr>
 <?		foreach ($pkeynotfound as $pkey) { ?>
-			<tr><td><?echo $pkey ?></td></tr>
+			<tr><td><?=escapehtml($pkey) ?></td></tr>
 <?		} ?>
 <?	} ?>
 
@@ -108,7 +108,7 @@ startWindow('Phone');
 			<td>The following contacts do not allow phone activation:</td>
 		</tr>
 <?		foreach ($pkeynotallow as $pkey) { ?>
-			<tr><td><?echo $pkey ?></td></tr>
+			<tr><td><?=escapehtml($pkey) ?></td></tr>
 <?		} ?>
 <?	} ?>
 
@@ -117,7 +117,7 @@ startWindow('Phone');
 			<td>The following contacts have no phone information in the system:</td>
 		</tr>
 <?		foreach ($pkeynophone as $pkey) { ?>
-			<tr><td><?echo $pkey ?></td></tr>
+			<tr><td><?=escapehtml($pkey) ?></td></tr>
 <?		} ?>
 <?	} ?>
 
@@ -126,7 +126,7 @@ startWindow('Phone');
 			<td>The following contacts will be added:</td>
 		</tr>
 <?		foreach ($pkeyok as $pkey) { ?>
-			<tr><td><?echo $pkey ?></td></tr>
+			<tr><td><?=escapehtml($pkey) ?></td></tr>
 <?		} ?>
 		<tr>
 			<td>You must follow these steps to complete the activation of these contacts by phone.</td>
@@ -146,7 +146,7 @@ startWindow('Phone');
 			<td>Step 2. When prompted, select option 2 to activate contacts.</td>
 		</tr>
 		<tr>
-			<td>Step 3. When prompted, enter this code  <? echo $code; ?></td>
+			<td>Step 3. When prompted, enter this code  <?=escapehtml($code) ?></td>
 		</tr>
 		<tr>
 			<td>Step 4. When the call is completed, return to the Contacts page to view and edit your preferences.</td>
@@ -157,7 +157,7 @@ startWindow('Phone');
 			<td>There are no contacts available for phone activation.  They do not share a common number, you may try to enter one contact at a time, or please contact support.</td>
 		</tr>
 <?		foreach ($pkeyok as $pkey) { ?>
-			<tr><td><?echo $pkey ?></td></tr>
+			<tr><td><?=escapehtml($pkey) ?></td></tr>
 <?		} ?>
 
 <?	} ?>

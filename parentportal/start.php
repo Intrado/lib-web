@@ -111,7 +111,7 @@ function sender($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$TITLE="Welcome - " . $_SESSION['portaluser']['portaluser.firstname'] . " " . $_SESSION['portaluser']['portaluser.lastname'];
+$TITLE="Welcome - " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " . escapehtml($_SESSION['portaluser']['portaluser.lastname']);
 $PAGE = 'messages:messages';
 include_once("nav.inc.php");
 if(isset($contactList) && $contactList){
@@ -127,7 +127,7 @@ if(isset($contactList) && $contactList){
 		$counter++;
 		$data = $allData[$personid];
 		$person = new Person($personid);
-		startWindow($person->$firstnameField . " " . $person->$lastnameField,'padding: 3px;', true);
+		startWindow(escapehtml($person->$firstnameField) . " " . escapehtml($person->$lastnameField), 'padding: 3px;', true);
 		$scroll="";
 		if(count($data) > 6)
 			$scroll = 'class="scrollTableContainer"';

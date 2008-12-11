@@ -7,7 +7,7 @@ require_once("../inc/table.inc.php");
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
 $appendcustomerurl = "";
 if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".$_GET['u'];
+	$appendcustomerurl = "?u=".urlencode($_GET['u']);
 }
 
 $form = true;
@@ -18,16 +18,16 @@ $success = false;
 $error = false;
 $result = null;
 if(isset($_GET['t'])){
-	$token = $_GET['t'];
+	$token = DBSafe($_GET['t']);
 }
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
-	$token = get_magic_quotes_gpc() ? stripslashes($_POST['token']) : $_POST['token'];
+	$token = DBSafe(get_magic_quotes_gpc() ? stripslashes($_POST['token']) : $_POST['token']);
 
 	if(isset($_POST['password1']) && isset($_POST['password2'])){
-		$password1 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password1'])) : trim($_POST['password1']);
-		$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
+		$password1 = DBSafe(get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1']);
+		$password2 = DBSafe(get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2']);
 		$result = portalPreactivateForgottenPassword($token);
 		if($result['result'] == ""){
 			$user = $result['portaluser'];

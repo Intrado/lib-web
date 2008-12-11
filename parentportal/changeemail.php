@@ -36,7 +36,9 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			//submit changes
-			$result = portalUpdatePortalUsername(GetFormData($f, $s, "newemail"), GetFormData($f, $s, "password"));
+			$email = DBSafe(GetFormData($f, $s, "newemail"));
+			$pass = DBSafe(GetFormData($f, $s, "password"));
+			$result = portalUpdatePortalUsername($email, $pass);
 			if($result['result'] == ""){
 				$success = true;
 			} else {

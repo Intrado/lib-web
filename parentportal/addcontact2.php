@@ -33,7 +33,7 @@ include("nav.inc.php");
 startWindow("Add Successful");
 ?>
 	<div style="margin:5px">
-		You have successfully added <?=$person->$firstnamefield?> <?=$person->$lastnamefield?>.
+		You have successfully added <?=escapehtml($person->$firstnamefield)?> <?=escapehtml($person->$lastnamefield)?>.
 	<br>
 		Would you like to add another contact?
 	</div>

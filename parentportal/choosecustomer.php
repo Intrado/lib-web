@@ -64,7 +64,7 @@ startWindow("Select Account");
 			$class = "";
 			if($alt++ % 2)
 				$class="class=\"listAlt\"";
-			?><tr><td <?=$class?> ><a href="choosecustomer.php?customerid=<?=$index?>"/><?=$customername?></a></td></tr><br><?
+			?><tr><td <?=$class?> ><a href="choosecustomer.php?customerid=<?=$index?>"/><?=escapehtml($customername)?></a></td></tr><br><?
 		}
 ?>
 	</table>

@@ -49,15 +49,15 @@ if(isset($_SESSION['currentpid'])){
 	}
 	$PERSONID = end($customerpidlist);
 	$personindex = key($customerpidlist);
-	
+
 	$_SESSION['custname'] = $customerlist[$_SESSION['customerid']];
 	$result = portalAccessCustomer($_SESSION['customerid']);
-	
+
 	if($result['result'] != ""){
 		error("An error occurred, please try again");
 		$error = 1;
 	}
-	
+
 	$person = new Person($PERSONID);
 } else {
 	redirect("contactpreferences.php?clear=1");
@@ -175,10 +175,10 @@ if($PERSONID){
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Edit Contact Details - " . $person->$firstnamefield . " " . $person->$lastnamefield;
+$TITLE = "Edit Contact Details - " . escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield);
 
 include("nav.inc.php");
-startWindow($person->$firstnamefield . " " . $person->$lastnamefield);
+startWindow(escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield));
 ?>
 <table>
 	<tr>

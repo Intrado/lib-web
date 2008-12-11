@@ -8,7 +8,7 @@ require_once("../inc/table.inc.php");
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
 $appendcustomerurl = "";
 if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".$_GET['u'];
+	$appendcustomerurl = "?u=".urlencode($_GET['u']);
 }
 
 $changeuser = false;

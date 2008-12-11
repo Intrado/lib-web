@@ -38,7 +38,7 @@ function pearxmlrpc($method, $params) {
 function portalCreateAccount($username, $password, $firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms) {
 	$customerurl = "";
 	if (isset($_GET['u'])) {
-		$customerurl = $_GET['u'];
+		$customerurl = DBSafe($_GET['u']);
 	}
 	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'),
 			new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'),
@@ -87,7 +87,7 @@ function portalGetCustomerAssociations() {
 	$sessionid = session_id();
 	$customerurl = "";
 	if (isset($_GET['u'])) {
-		$customerurl = $_GET['u'];
+		$customerurl = DBSafe($_GET['u']);
 	}
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_getCustomerAssociations";
@@ -124,7 +124,7 @@ function portalAssociatePerson($token, $validationdata) {
 function portalForgotPassword($username) {
 	$customerurl = "";
 	if (isset($_GET['u'])) {
-		$customerurl = $_GET['u'];
+		$customerurl = DBSafe($_GET['u']);
 	}
 	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_forgotPassword";
@@ -227,7 +227,7 @@ function doDBConnect($result) {
 		if (mysql_set_charset("utf8",$_dbcon)) {
 			// successful connection to customer database
 			return true;
-	} else {
+		} else {
 			error_log("Couldn't select mysql charset. e:" . mysql_error());
 		}
 	} else {
