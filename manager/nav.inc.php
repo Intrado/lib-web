@@ -1,3 +1,10 @@
+<?
+if (isset($_COOKIE["favcustomers"]))
+	$favcid = "?cid=" . urlencode($_COOKIE["favcustomers"]);
+else
+	$favcid= "";
+?>
+
 <html>
 <body>
 <image src="manager.png">
@@ -47,10 +54,11 @@
 }
 
 </style>
+
 <table border=0 cellpadding=5 class=imagelink>
 	<tr>
 		<td><a href="customers.php" title="Customer&nbsp;List"><img src="img/custlist.png" border=0><div>Customer&nbsp;List</div></a></td>
-		<td><a href="customerimports.php?clear" title="Customer&nbsp;Imports"><img src="img/custimports.png" border=0><div>Customer&nbsp;Imports</div></a></td>
+		<td><a href="customerimports.php<?=$favcid?>" title="Customer&nbsp;Imports"><img src="img/custimports.png" border=0><div>Customer&nbsp;Imports</div></a></td>
 		<td><a href="customeractivejobs.php" title="Active&nbsp;Jobs"><img src="img/activejobs.png" border=0><div>Active&nbsp;Jobs</div></a></td>
 		<td><a href="newcustomer.php" title="New&nbsp;Customer"><img src="img/newcustomer.png" border=0><div>New&nbsp;Customer</div></a></td>
 		<td><a href="lockedusers.php" title="Locked&nbsp;Users"><img src="img/lockedusers.png" border=0><div>Locked&nbsp;Users</div></a></td>
