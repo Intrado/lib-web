@@ -232,7 +232,6 @@ CREATE TABLE `joblanguage` (
   `messageid` int(11) NOT NULL default '0',
   `type` enum('phone','email','print') NOT NULL default 'phone',
   `language` varchar(255) NOT NULL default '',
-  `translationeditlock` tinyint(4) NOT NULL default 0,
   PRIMARY KEY  (`id`),
   KEY `jobid` (`jobid`,`language`(50))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -1580,5 +1579,8 @@ CREATE TABLE `personsetting` (
 `value` VARCHAR( 255 ) NOT NULL ,
 INDEX ( `personid` , `name` )
 ) ENGINE = innodb DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `joblanguage` ADD `translationeditlock` tinyint(4) NOT NULL default 0
 $$$
 
