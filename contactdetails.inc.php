@@ -541,9 +541,9 @@ foreach ($fieldmaps as $map) {
 					}
 ?>
 					<tr>
-						<td class="bottomBorder"><?=$associate['portaluser.firstname']?></td>
-						<td class="bottomBorder"><?=$associate['portaluser.lastname']?></td>
-						<td class="bottomBorder"><?=$associate['portaluser.username']?></td>
+						<td class="bottomBorder"><?=escapehtml($associate['portaluser.firstname'])?></td>
+						<td class="bottomBorder"><?=escapehtml($associate['portaluser.lastname'])?></td>
+						<td class="bottomBorder"><?=escapehtml($associate['portaluser.username'])?></td>
 						<td class="bottomBorder"><?=escapehtml($lastlogin)?></td>
 						<td class="bottomBorder"><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid?>'" />Disassociate</a></td>
 					</tr>
