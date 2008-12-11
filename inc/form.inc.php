@@ -417,7 +417,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.21 $
+	    # $Revision: 1.22 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -456,7 +456,7 @@ function CheckFormItem($form, $section, $item) {
 		# End of Creative Commons Email Parser Code
 		##################################################################################
 
-        if(!preg_match("!^$addr_spec$!", trim($email))){
+        if(!preg_match("!^$addr_spec$!", $email)){
         	return 'type';
         }
 
