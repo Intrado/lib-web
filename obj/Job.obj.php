@@ -67,12 +67,12 @@ class Job extends DBMappedObject {
 		$this->thesql = $rulesql;
 	}
 
-	function copyNew() {
+	function copyNew($isrepeatingrunnow = false) {
 		//make a copy of this job
 		$newjob = new Job($this->id);
 		$newjob->id = NULL;
 		$newjob->name .= " - " . date("M j, g:i a");
-		if ($newjob->status != "repeating") {
+		if ($isrepeatingrunnow || $newjob->status != "repeating") {
 			$newjob->status = "new";
 			$newjob->scheduleid = NULL;
 		} else {
@@ -94,6 +94,7 @@ class Job extends DBMappedObject {
 
 		$newjob->create();
 
+		if (!$isrepeatingrunnow) {
 		// copy the messages
 		// if message is not deleted, then we can point to it directly
 		// but if message is deleted, it's either already a copy from a previous run (uneditable)
@@ -144,6 +145,8 @@ class Job extends DBMappedObject {
 				from joblanguage where jobid=$this->id");
 		}
 		// sms has no translation or joblanguage, no need to copy
+		}
+
 
 		//copy all the job lists
 		QuickUpdate("insert into joblist (jobid,listid,thesql)
@@ -159,8 +162,10 @@ class Job extends DBMappedObject {
 		$b = QuickQuery("select p.value from permission p join user u " .
 				"where p.name='setcallerid' and p.accessid=u.accessid and u.id=$newjob->userid");
 		if ($a == "1" && $b != "1") {
-			QuickUpdate("delete from jobsetting where jobid=$newjob->id and name='prefermycallerid'");
+			QuickUpdate("delete from jobsetting where jobid=".$newjob->id." and name='prefermycallerid'");
+			QuickUpdate("delete from jobsetting where jobid=".$newjob->id." and name='callerid'");
 		}
+		$newjob->loadSettings(); // reload without the ones we deleted
 
 		return $newjob;
 	}
@@ -213,7 +218,7 @@ class Job extends DBMappedObject {
 						//update the finishdate (reused as last run for repeating jobs)
 						QuickUpdate("update job set finishdate=now() where id='$this->id'");
 
-						$newjob = $this->copyNew();
+						$newjob = $this->copyNew(true);
 						$newjob->runNow();
 						return $newjob;
 
