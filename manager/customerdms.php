@@ -137,7 +137,7 @@ $titles[10] = "@Cmd";
 $titles["actions"] = "Actions";
 
 // Do not provide a checkbox to hide these columns.
-$lockedTitles = array(0, "status", "actions");
+$lockedTitles = array(0, "status", "actions", 2, 3);
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
