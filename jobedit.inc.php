@@ -617,40 +617,45 @@ if( $reloadform )
 	}
 
 	$expired = true;
-	$expire = $job->getSetting('translationexpire');
+	$expire = $job->getSetting('translationexpire');	
 	if($expire && strtotime($expire) > strtotime(date("Y-m-d"))) {
 		$expired = false;
 	}
 
 	if($USER->authorize('sendmulti')) {
 	PutFormData($f,$s,"translatecheck",0,"bool",0,1);
-	foreach($languagearray as $language => $joblanguageobject) {
-		$messagefound = false;
-		// The submitTranslations depend on this text so when edeting this text take a look at submitTranslations script
-		$retranslationtext = "Click retranslation to verify the translation.";
-		if($joblanguageobject && ($joblanguageobject->translationeditlock || $expired == false)) {
-			$messageid = $joblanguageobject->messageid;
-			$translationmessage = DBFind("Message","from message where id='$messageid' and deleted=1 and type='phone'");
-			if($translationmessage != NULL) {
-				$parts = DBFindMany("MessagePart","from messagepart where messageid=$messageid order by sequence");
-				$body = $translationmessage->format($parts);
+		foreach($languagearray as $language => $joblanguageobject) {
+			$messagefound = false;
+			// The submitTranslations depend on this text so when edeting this text take a look at submitTranslations script
+			$retranslationtext = "Click retranslation to verify the translation.";
+			if($joblanguageobject) {
+				$messageid = $joblanguageobject->messageid;
+				$body = "";
+				if ($joblanguageobject->translationeditlock || $expired == false) {	
+					$translationmessage = DBFind("Message","from message where id='$messageid' and deleted=1 and type='phone'");
+					if($translationmessage != NULL) {
+						$parts = DBFindMany("MessagePart","from messagepart where messageid=$messageid order by sequence");
+						$body = $translationmessage->format($parts);
+						$messagefound = true;
+					}
+				} else {
+						$messagefound = true;	
+				}
 				PutFormData($f,$s,"translationtext_$language",$body,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translationtextexpand_$language",$body,"text","nomin","nomax",false);
 				PutFormData($f,$s,"retranslationtext_$language",$retranslationtext,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",1,"bool",0,1);
 				PutFormData($f,$s,"tr_edit_$language",$joblanguageobject->translationeditlock,"bool",0,1);
 				PutFormData($f,$s,"translatecheck",1,"bool",0,1);
-				$messagefound = true;
 			}
-		}
-		if(!$messagefound) {
+			if(!$messagefound) {
 				PutFormData($f,$s,"translationtext_$language","","text","nomin","nomax",false);
 				PutFormData($f,$s,"translationtextexpand_$language","","text","nomin","nomax",false);
 				PutFormData($f,$s,"retranslationtext_$language",$retranslationtext,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translate_$language",$jobid?0:1,"bool",0,1);
 				PutFormData($f,$s,"tr_edit_$language",0,"bool",0,1);
+			}
 		}
-	}
 	}
 
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
@@ -722,35 +727,6 @@ if ($submittedmode || $completedmode) {
 	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
 	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
-	// find if this was a copied job, with deleted messages
-	$copiedmessages = DBFindMany("Message","from message where id='$job->phonemessageid' or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
-	foreach ($copiedmessages as $m) {
-		if ($m->deleted == "1") {
-			$m->name = "(copy) ".$m->name;
-			$messages['phone'][] = $m;
-		}
-	}
-	$copiedmessages = DBFindMany("Message","from message where id='$job->emailmessageid' or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
-	foreach ($copiedmessages as $m) {
-		if ($m->deleted == "1") {
-			$m->name = "(copy) ".$m->name;
-			$messages['email'][] = $m;
-		}
-	}
-	$copiedmessages = DBFindMany("Message","from message where id='$job->printmessageid' or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
-	foreach ($copiedmessages as $m) {
-		if ($m->deleted == "1") {
-			$m->name = "(copy) ".$m->name;
-			$messages['print'][] = $m;
-		}
-	}
-	$copiedmessages = DBFindMany("Message","from message where id='$job->smsmessageid' or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
-	foreach ($copiedmessages as $m) {
-		if ($m->deleted == "1") {
-			$m->name = "(copy) ".$m->name;
-			$messages['sms'][] = $m;
-		}
-	}
 }
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
