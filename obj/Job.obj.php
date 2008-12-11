@@ -83,6 +83,7 @@ class Job extends DBMappedObject {
 		}
 		$newjob->assigned = NULL;
 		$newjob->finishdate = NULL;
+		$newjob->deleted = 0; // copy archived job is ok so we must set this to undeleted
 
 		$newjob->createdate = QuickQuery("select now()");
 
