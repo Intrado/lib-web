@@ -206,6 +206,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							QuickUpdate("delete from joblanguage where jobid=" . $job->id);  // If translation mode switched we need to rease the previous joblanguage assosiations
 					}
 					$job->setSetting('translationmessage', 1); // Tell the job that this message was created here
+					$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
 					$newphonemessage = new Message($themessageid);
 					$newphonemessage->userid = $USER->id;
 					$newphonemessage->type = 'phone';
@@ -615,14 +616,19 @@ if( $reloadform )
 		PutFormData($f,$s,"messageselect","select");
 	}
 
+	$expired = true;
+	$expire = $job->getSetting('translationexpire');	
+	if($expire && strtotime($expire) > strtotime(date("Y-m-d"))) {
+		$expired = false;
+	}
+
 	if($USER->authorize('sendmulti')) {
 	PutFormData($f,$s,"translatecheck",0,"bool",0,1);
 	foreach($languagearray as $language => $joblanguageobject) {
 		$messagefound = false;
 		// The submitTranslations depend on this text so when edeting this text take a look at submitTranslations script
 		$retranslationtext = "Click retranslation to verify the translation.";
-		//
-		if($joblanguageobject) {
+		if($joblanguageobject && ($joblanguageobject->translationeditlock || $expired == false)) {
 			$messageid = $joblanguageobject->messageid;
 			$translationmessage = DBFind("Message","from message where id='$messageid' and deleted=1 and type='phone'");
 			if($translationmessage != NULL) {
