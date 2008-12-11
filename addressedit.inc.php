@@ -301,8 +301,8 @@ if( $reloadform )
 	PopulateForm($f,$s,$address,array(array("addr1","text",1,50),
 										array("addr2","text",1,50),
 										array("city","text",1,50),
-										array("state","text",1,2),
-										array("zip","text",1,10)));
+										array("state","alpha",2,2),
+										array("zip","number",10000,99999)));
 
 	if($USER->authorize('sendphone')){
 		$x = 0;
