@@ -69,7 +69,10 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array()){
 			$showFields = array();
 			$fieldnum = 0;
 			foreach($fields as $id => $field){
-				if (strpos($field,"@") === 0){
+				if (strpos($field,"@#") === 0){
+					$displaytitle = substr($field,2);
+					$showFields[$id] = array($fieldnum, false);
+				} else if (strpos($field,"@") === 0){
 					$displaytitle = substr($field,1);
 					$showFields[$id] = array($fieldnum, false);
 				} else if (strpos($field,"#") === 0){
@@ -121,6 +124,123 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array()){
 ?>
 		</tr>
 	</table>
+<?
+}
+
+function show_row_filter($tablename, $data, $fields, $filterFields, $formatters) {
+?>
+	<table border="0" cellpadding="2" cellspacing="1" class="list">
+		<tr class="listHeader" align="left" valign="bottom">
+<?
+			foreach($fields as $id => $field){
+				if (strpos($field,"@#") === 0){
+					$displaytitle = substr($field,2);
+				} else if (strpos($field,"@") === 0){
+					$displaytitle = substr($field,1);
+				} else if (strpos($field,"#") === 0){
+					$displaytitle = substr($field,1);
+				} else {
+					$displaytitle = $field;
+				}
+				if (in_array($id, $filterFields, true)) {
+					?><td><?=$displaytitle;?></td><?
+				}
+			}
+
+?>
+		</tr>
+<?
+		$filterVals = array();
+		foreach ($filterFields as $id) {
+			$rownum = 1;
+			foreach ($data as $row) {
+				if (isset($formatters[$id])) {
+					$fn = $formatters[$id];
+					$cel = $fn($row,$id);
+				} else {
+					$cel = $row[$id];
+				}
+				if (!isset($filterVals[$id][$cel])) {
+					$filterVals[$id][$cel] = array($rownum);
+				} else {
+					$filterVals[$id][$cel][] = $rownum;
+				}
+				$rownum++;
+			} 
+		}
+?>
+		<script language="javascript">
+			var optionToDataAssociation = <?=json_encode($filterVals)?>;	
+		</script>
+
+		<tr>
+<?	
+
+// fill out multi-select boxes with field data values and put them here.
+
+			foreach ($filterVals as $id => $dataVals) {
+				?><td valign="top"><SELECT MULTIPLE>	<?
+				foreach ($dataVals as $data => $rows) {
+					echo "<OPTION ID=\"option$id"."_"."$data\" VALUE=\"$data\" SELECTED> $data";
+				}
+				echo "</SELECT></td>";
+			}
+
+?>
+		</tr>
+		<tr>
+			<td colspan="2"><input type="button" class="button" name="filterRows" value="Apply Filters" onclick="displayRows(new getObj('<?=$tablename?>').obj);" /></td>
+			
+		</tr>
+	</table>
+
+	<script language="javascript">
+	
+	function displayRows(table) {
+		var filters = 0;
+		var trows = table.rows;
+		var showRows = new Array();
+		for (var i = 1, length = trows.length; i < length + 1; i++) {
+			showRows.push(0);
+		}
+		
+		var fields;
+		for ( a in optionToDataAssociation ) {
+			filters++;
+			for (b in optionToDataAssociation[a]) {
+				opt = new getObj('option' + a + '_' + b);
+				if (opt.obj.selected) {
+					for ( c in optionToDataAssociation[a][b] ) {
+						showRows[optionToDataAssociation[a][b][c]]++;
+					}
+				}
+			}
+		}
+		
+		for (var d = 1, length = trows.length; d < length; d++) {
+			var rowId = 'row'+d;
+			var modrow = new getObj(rowId).obj;
+			if (showRows[d] >= filters) {
+				modrow.style.display = '';
+			} else {
+				modrow.style.display = 'none';
+			}
+		}
+		
+		var color = 0;
+		for (var d = 1, length = trows.length; d < length; d++) {
+			if (trows[d].style.display != 'none') {
+				if (color) {
+					trows[d].className = 'listAlt';
+				} else {
+					trows[d].className = '';
+				}
+				color = !color;
+			}
+		}	
+	}
+	
+	</script>
 <?
 }
 
