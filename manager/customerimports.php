@@ -353,7 +353,7 @@ include("nav.inc.php");
 						<table>
 							<tr>
 								<td valign="top" align="left">
-									Search Cust:
+									Cust URL:
 								</td>
 								<td>
 									<input type="text" name="custtxt" id="custtxt" value="<?=$custtxt?>" size="20" maxlength="50" />
@@ -361,7 +361,7 @@ include("nav.inc.php");
 							</tr>
 							<tr>
 								<td valign="top" align="left">
-									Search Emails:
+									Alert Emails:
 								</td>
 								<td>
 									<input type="text" name="alerttxt" id="alerttxt" value="<?=$alerttxt?>" size="20" maxlength="50" />
