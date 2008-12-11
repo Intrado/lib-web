@@ -617,7 +617,7 @@ if( $reloadform )
 	}
 
 	$expired = true;
-	$expire = $job->getSetting('translationexpire');	
+	$expire = $job->getSetting('translationexpire');
 	if($expire && strtotime($expire) > strtotime(date("Y-m-d"))) {
 		$expired = false;
 	}
@@ -722,6 +722,35 @@ if ($submittedmode || $completedmode) {
 	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
 	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
+	// find if this was a copied job, with deleted messages
+	$copiedmessages = DBFindMany("Message","from message where id='$job->phonemessageid' or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['phone'][] = $m;
+		}
+	}
+	$copiedmessages = DBFindMany("Message","from message where id='$job->emailmessageid' or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['email'][] = $m;
+		}
+	}
+	$copiedmessages = DBFindMany("Message","from message where id='$job->printmessageid' or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['print'][] = $m;
+		}
+	}
+	$copiedmessages = DBFindMany("Message","from message where id='$job->smsmessageid' or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['sms'][] = $m;
+		}
+	}
 }
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
@@ -1117,7 +1146,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text to speach message
+<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
 				<div id='selectphonemessage' style="display: none">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
