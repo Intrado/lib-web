@@ -193,7 +193,11 @@ function fmt_alert($row, $index) {
 $f = "form";
 $s = "imports";
 $reloadform = 0;
-
+$queryextra = "";
+$querytypes = "";
+$alerttxt = "";
+$custtxt = "";
+	
 if(CheckFormSubmit($f, $s)) {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f)) {
@@ -242,9 +246,6 @@ if (isset($_POST['showmatch'])) {
 		$custtxt = escapehtml(trim($_POST['custtxt']));
 		$queryextra = " and urlcomponent like '%" . DBSafe(trim($_POST['custtxt'])) . "%'";
 	}
-} else {
-	$alerttxt = "";
-	$custtxt = "";
 }
 
 if(isset($_SESSION['customerid'])){
