@@ -126,7 +126,7 @@ function selectOrderBy($f, $s, $ordercount, $ordering){
 
 function createPdfParams($filename){
 	global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
-	$host = "jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME;
+	$host = "jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME . "?useServerPrepStmts=false&useUnicode=true&characterEncoding=UTF-8";
 	$user = $_DBUSER;
 	$pass = $_DBPASS;
 	$params = array("host" => $host,

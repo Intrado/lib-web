@@ -50,7 +50,7 @@ class ReportGenerator {
 		$instance = $this->reportinstance;
 		$xmlparams = array();
 		$xmlparams[] = new XML_RPC_Value($this->reportfile, 'string');
-		$xmlparams[] = new XML_RPC_Value("jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME, 'string');
+		$xmlparams[] = new XML_RPC_Value("jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME . "?useServerPrepStmts=false&useUnicode=true&characterEncoding=UTF-8", 'string');
 		$xmlparams[] = new XML_RPC_Value($_DBUSER, 'string');
 		$xmlparams[] = new XML_RPC_Value($_DBPASS, 'string');
 		$xmlparams[] = new XML_RPC_Value($this->query, 'string');
@@ -142,7 +142,7 @@ class ReportGenerator {
 
 	function reportxmlrpc($method, $xmlparams){
 		$msg = new XML_RPC_Message($method, $xmlparams);
-		$msg->setSendEncoding("ISO-8859-1");
+		$msg->setSendEncoding("UTF-8");
 		$cli = new XML_RPC_Client('/xmlrpc', 'localhost:8089');
 
 		$resp = $cli->send($msg, 600);
