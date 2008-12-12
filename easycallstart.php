@@ -88,7 +88,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'add') || $removedlang)
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if ($phoneerror = Phone::validate($phone)){
+		} else if ($phoneerror = Phone::validateEasyCall($phone)){
 			error($phoneerror);
 		} else if (GetFormData($f,$s,"listid") <=0 ) {
 			error('Please choose a list');

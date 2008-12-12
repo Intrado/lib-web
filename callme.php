@@ -74,7 +74,7 @@ if(CheckFormSubmit($f,$s))
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if ($phoneerror = Phone::validate($phone)){
+		} else if ($phoneerror = Phone::validateEasyCall($phone)){
 			error($phoneerror);
 		} else if (QuickQuery("select count(*) from audiofile where userid = '$USER->id' and deleted = 0 and name = '" .
 				   DBSafe(GetFormData($f, $s, 'name')) . "'")) {
