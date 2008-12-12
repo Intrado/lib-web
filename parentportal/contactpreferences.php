@@ -215,7 +215,7 @@ endWindow();
 
 if($PERSONID){
 ?><a name="edit"></a><?
-	startWindow($person->$firstnamefield . " " . $person->$lastnamefield, 'padding: 3px;');
+	startWindow(escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield), 'padding: 3px;');
 ?>
 	<table width="100%">
 		<tr>
