@@ -727,6 +727,35 @@ if ($submittedmode || $completedmode) {
 	$messages['email'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
 	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
+	// find if this was a copied job, with deleted messages
+	$copiedmessages = DBFindMany("Message","from message where id='$job->phonemessageid' or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['phone'][] = $m;
+		}
+	}
+	$copiedmessages = DBFindMany("Message","from message where id='$job->emailmessageid' or id in (select messageid from joblanguage where type='email' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['email'][] = $m;
+		}
+	}
+	$copiedmessages = DBFindMany("Message","from message where id='$job->printmessageid' or id in (select messageid from joblanguage where type='print' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['print'][] = $m;
+		}
+	}
+	$copiedmessages = DBFindMany("Message","from message where id='$job->smsmessageid' or id in (select messageid from joblanguage where type='sms' and jobid=$job->id)");
+	foreach ($copiedmessages as $m) {
+		if ($m->deleted == "1") {
+			$m->name = "(copy) ".$m->name;
+			$messages['sms'][] = $m;
+		}
+	}
 }
 
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
@@ -1145,20 +1174,19 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<br />
 <?					if($USER->authorize('sendmulti')) { ?>
 					<div id='translationwarning' style="color: red"></div>
-					<table>
+					<table width="100%">
 						<tr>
-						<td style="white-space:nowrap;">
-					</td>
-					<td width="100%" style="padding-left: 0px;"><?=	button('Preview Translations', "submitTranslations();");?>
-						<div id='branding' style="text-align: left;float: left;	padding-left: 100px;font-size: 10px;font-weight: bold;color: gray;white-space:nowrap;"></div>
-					</td>
-					<td >
-						<div id='translationdetails' style="display: block">
-							<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>
+					<td style="white-space:nowrap;"><?=	button('Preview Translations', "translationoptions(true);submitTranslations();");?>
+						<div id='translationdetails' style="white-space:nowrap;display: block">
+					<? // 		&nbsp;<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>?>
 						</div>
-						<div id='translationbasic' style="display: none">
-							<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>
+						<div id='translationbasic' style="white-space:nowrap;display: none">
+							<?=	button('Hide Translations', "translationoptions(false);");?>
+					<? // 		&nbsp;<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>?>
 						</div>
+					</td>
+					<td style="white-space:nowrap;">
+						<div id='branding' style="text-align: left;float: right;font-size: 10px;font-weight: bold;color: gray;white-space:nowrap;"></div>
 					</td>
 					</tr>
 					</table>
@@ -1172,6 +1200,10 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
 							<tr>
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
+								
+								<a href="#" onclick="langugaedetails('<?echo $language?>',true);pencillanguage('<?echo $language?>');return false;"><img src="img/pencil.png"></a>	
+								
+								
 								</td>
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
 									<table width="100%" style="table-layout:fixed;">
@@ -1184,7 +1216,6 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									</tr>
 									</table>
 									<div id='languageexpand_<? echo $language?>' style="display: none">
-										<br />
 										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 45, 3,"id='translationtextexpand_$language'"); ?>
 										<br />
 										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Edit Translation <?= help('Job_EditTranslation',NULL,"small"); ?>
@@ -1749,7 +1780,7 @@ function automatictranslation(){
 	show('translationwarning');
 	if(isCheckboxChecked('translatecheck')){
 		checkboxhelper('all');
-		submitTranslations();
+		//submitTranslations();
 		show('translationwarning');
 	} else {
 		checkboxhelper('none');
@@ -1759,7 +1790,6 @@ function automatictranslation(){
 <? // Show Translation options ?>
 function translationoptions(details){
 	if (details) {
-		submitTranslations();
 		show('translationoptions');
 		hide('translationdetails');
 		show('translationbasic');
@@ -1768,6 +1798,7 @@ function translationoptions(details){
 		show('translationdetails');
 		hide('translationbasic');
 	}
+	return false;
 }
 
 <? // If language checkbox is selected ?>
@@ -1776,7 +1807,7 @@ function translationlanguage(language){
 	if (isCheckboxChecked('translate_' + language)){
 		setChecked('translatecheck');
 		show('google');
-		submitTranslation(language,false);
+		//submitTranslation(language,false);
 		show('language_' + language);
 		show('translationdetails_' + language);
 	} else {
@@ -1809,6 +1840,12 @@ function langugaedetails(language, details){
 function editlanguage(language) {
 	var textbox = new getObj('translationtextexpand_' + language).obj;
 	textbox.disabled = !isCheckboxChecked('tr_edit_' + language);
+}
+function pencillanguage(language) {
+	var textbox = new getObj('translationtextexpand_' + language).obj;
+	textbox.disabled = false;
+	var edit = new getObj('tr_edit_' + language).obj;
+	edit.checked = true;
 }
 <? } ?>
 
@@ -2036,6 +2073,7 @@ function submitTranslation(language,verify) {
 		translationerror(language);
 		tr.innerHTML = '&nbsp;';
 	}
+	return false;
 }
 function retranslation(language){
 	if(typeof(google) == "undefined" || typeof(google.language) == "undefined"){
