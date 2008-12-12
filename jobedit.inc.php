@@ -589,7 +589,7 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
-	$selectedlists = "";
+	$selectedlists = ""; // ids
 	PutFormData($f,$s,"listradio","single");
 
 	if($jobid){
@@ -599,8 +599,9 @@ if( $reloadform )
 			$selectedlists[] = $job->listid;
 		}
 	}
-
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax",true);
+	// names to display in submittedmode
+	$selectedlistnames = QuickQueryList("select name from list where id in (".implode(",", $selectedlists).")");
 
 	PutFormData($f,$s,"voiceselect",1); //TODO pull info on female and male voice
 
@@ -617,7 +618,7 @@ if( $reloadform )
 	}
 
 	$expired = true;
-	$expire = $job->getSetting('translationexpire');	
+	$expire = $job->getSetting('translationexpire');
 	if($expire && strtotime($expire) > strtotime(date("Y-m-d"))) {
 		$expired = false;
 	}
@@ -631,7 +632,7 @@ if( $reloadform )
 			if($joblanguageobject) {
 				$messageid = $joblanguageobject->messageid;
 				$body = "";
-				if ($joblanguageobject->translationeditlock || $expired == false) {	
+				if ($joblanguageobject->translationeditlock || $expired == false) {
 					$translationmessage = DBFind("Message","from message where id='$messageid' and deleted=1 and type='phone'");
 					if($translationmessage != NULL) {
 						$parts = DBFindMany("MessagePart","from messagepart where messageid=$messageid order by sequence");
@@ -639,7 +640,7 @@ if( $reloadform )
 						$messagefound = true;
 					}
 				} else {
-						$messagefound = true;	
+						$messagefound = true;
 				}
 				PutFormData($f,$s,"translationtext_$language",$body,"text","nomin","nomax",false);
 				PutFormData($f,$s,"translationtextexpand_$language",$body,"text","nomin","nomax",false);
@@ -1055,6 +1056,17 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			</tr>
 			<tr>
 				<td valign="top">List(s) <?= help('Job_SettingsList',NULL,"small"); ?></td>
+<?				if ($submittedmode) {
+?>
+				<td>
+<?					foreach ($selectedlistnames as $listname) {
+						echo $listname."<br>";
+					}
+?>
+				</td>
+
+<?				} else {
+?>
 				<td valign="top" width="100%" style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\"")); ?>One List&nbsp;
 <?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\"")); ?>Multiple Lists
@@ -1073,6 +1085,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					NewFormItem($f,$s,"listids", "selectmultiple",10, $peoplelists, ($submittedmode ? "DISABLED" : ""));
 ?>
 				</td>
+<?				}
+?>
 			</tr>
 		</table>
 		</div>
@@ -1200,10 +1214,10 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
 							<tr>
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
-								
-								<a href="#" onclick="langugaedetails('<?echo $language?>',true);pencillanguage('<?echo $language?>');return false;"><img src="img/pencil.png"></a>	
-								
-								
+
+								<a href="#" onclick="langugaedetails('<?echo $language?>',true);pencillanguage('<?echo $language?>');return false;"><img src="img/pencil.png"></a>
+
+
 								</td>
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
 									<table width="100%" style="table-layout:fixed;">
