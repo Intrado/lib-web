@@ -1196,12 +1196,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 						<tr>
 					<td style="white-space:nowrap;">
 						<div id='translationdetails' style="white-space:nowrap;display: block">
-							<? button_bar(button('Show Translations', "translationoptions(true);submitTranslations();"));?>
+							<? button_bar(button('Show Translations', "translationoptions(true);submitTranslations()"," "));?>
 						
 					<? // 		&nbsp;<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>?>
 						</div>
 						<div id='translationbasic' style="white-space:nowrap;display: none">
-							<? button_bar(button('Hide Translations', "translationoptions(false);"),button('Refresh Translations', "submitTranslations();"));?>							
+							<? button_bar(button('Hide Translations', "translationoptions(false);"," "),button('Refresh Translations', "submitTranslations();"," "));?>							
 					<? // 		&nbsp;<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>?>
 						</div>
 					</td>
@@ -1222,13 +1222,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
 								</td>
 								<td class="bottomBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/spacer10px.gif"></td>
-								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
+								<td class="bottomBorder" valign="top" style="white-space:nowrap;" width="100%">
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
-									<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;" style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">
+										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;" style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">
 										<?echo GetFormData($f, $s, "translationtext_$language"); ?>
-									</div>
+										</div>
 										</td>
 									</tr>
 									</table>
@@ -2053,6 +2053,7 @@ function submitTranslations() {
 		var text = new getObj('retranslationtext_' + languagelist[l]).obj.value;
 		submitTranslation(languagelist[l],(text.substring(0,19) != "Click retranslation"));
 	}
+	return false;
 }
 
 function submitTranslation(language,verify) {
@@ -2085,14 +2086,14 @@ function submitTranslation(language,verify) {
   		if (result.translation) {
   			var str = result.translation.replace('>', '&gt;').replace('<', '&lt;');
   			tr.innerHTML = str;
-  			trexpand.value = str;
+  			trexpand.innerHTML = str;
   			if(verify)
   				retranslation(language);
   		} else {
   			translationerror(language);
   		    var text = new getObj('phonetextarea').obj.value;
   			tr.innerHTML = str;
-  			trexpand.value = text;
+  			trexpand.innerHTML = text;
    		}
 
   	  } );
@@ -2152,7 +2153,7 @@ function translationerror(language) {
 			google.load("language", "1");
 			google.setOnLoadCallback(init);
 		}
-		setTimeout('checkpreload()', 1000);
+		setTimeout('checkpreload()', 3000);
 	</script>
 </div>
 

@@ -383,6 +383,7 @@ input.text, input , select, textarea, table.form  {
 }
 
 .chop {
+	text-align: left;
 	width: 100%;
 	white-space:nowrap;
 	overflow: hidden;
