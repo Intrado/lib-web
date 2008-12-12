@@ -383,11 +383,14 @@ input.text, input , select, textarea, table.form  {
 }
 
 .chop {
-		width: 100%;
-		white-space:nowrap;
-		overflow: hidden;
-		color: #666666;
-		border: 1px solid <?=$theme1?>;
+	width: 100%;
+	white-space:nowrap;
+	overflow: hidden;
+	color: #666666;
+	border: 1px solid <?=$theme1?>;
+}
+div.gBranding {
+	display:inline;
 }
 
 /* Scrolling window style settings */
