@@ -589,7 +589,7 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
-	$selectedlists = ""; // ids
+	$selectedlists = array(); // ids
 	PutFormData($f,$s,"listradio","single");
 
 	if($jobid){
@@ -1068,11 +1068,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?				} else {
 ?>
 				<td valign="top" width="100%" style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\"")); ?>One List&nbsp;
-<?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\"")); ?>Multiple Lists
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>One List&nbsp;
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multiple Lists
 				<div id='singlelist' style="padding-top: 1em;display: none">
 <?
-						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
+						NewFormItem($f,$s,"listid", "selectstart");
 						NewFormItem($f,$s,"listid", "selectoption", "-- Select a list --", NULL);
 						foreach ($peoplelists as $id => $name) {
 							NewFormItem($f,$s,"listid", "selectoption", $name, $id);
@@ -1082,7 +1082,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</div>
 				<div id='multilist' style="padding-top: 1em;display: none">
 <?
-					NewFormItem($f,$s,"listids", "selectmultiple",10, $peoplelists, ($submittedmode ? "DISABLED" : ""));
+					NewFormItem($f,$s,"listids", "selectmultiple",10, $peoplelists, "");
 ?>
 				</td>
 <?				}
