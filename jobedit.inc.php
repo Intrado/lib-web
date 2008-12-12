@@ -1166,7 +1166,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<div id='phoneoptions' style="display: none">
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
-				<td width="30%" valign="top">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
 <? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
@@ -1174,7 +1174,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
 				<div id='newphonetext' style="white-space: nowrap;display: none">
-					Type Your English Message Here
+					Type Your English Message 
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					| <?  NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>
 					Automatically translate to other languages
@@ -1213,16 +1213,17 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<div id='translationoptions' style="display: none">
 						<div id='refreshhelp'></div>
 
-						<table border="0" cellpadding="2" cellspacing="0" width="100%">
+						<table border="0" cellpadding="2" cellspacing="0" width="100%" style="empty-cells:show;">
 <?
 						foreach($languagearray as $language => $joblanguageobject) {
 							$languageisset = $joblanguageobject?1:($jobid?0:1);
+							$playaction = "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")"
 ?>
 							<tr>
-								<td class="bottomBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
+								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
 								</td>
-								<td class="bottomBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/spacer10px.gif"></td>
-								<td class="bottomBorder" valign="top" style="white-space:nowrap;" width="100%">
+								<td class="topBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/spacer10px.gif"></td>
+								<td class="topBorder" valign="top" style="white-space:nowrap;" width="100%">
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
@@ -1241,30 +1242,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3,"id='retranslationtext_$language' disabled"); ?>
 									</div>
 								</td>
-								<td class="bottomBorder" valign="top" style="white-space:nowrap;">
+								<td class="topBorder" valign="top" style="white-space:nowrap;">
 									<div id='translationdetails_<? echo $language?>' style="display: none">
-										<table border="0">
-										<tr>
-										<td><?=	button('Play', "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")");?>
-										</td>
-										<td style="white-space:nowrap;">
-										<div class="menucollapse"><a href="#" onclick="langugaedetails('<? echo $language;?>',true); return false;"><img src="img/arrow_right.gif"></a></div>
-										<?// <a href="#"	onclick=" return false;">Show&nbsp;details</a>?>
-										</td>
-										</tr>
-										</table>
+										<? button_bar(button('Play',$playaction," "),button('Show', "langugaedetails('$language',true); return false;"));?>
 									</div>
 									<div id='translationbasic_<? echo $language?>' style="display: none">
-										<table border="0">
-										<tr>
-										<td><?=	button('Play', "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")");?>
-										</td>
-										<td style="white-space:nowrap;">
-										<div class="menucollapse"><a href="#" onclick="langugaedetails('<? echo $language;?>',false); return false;"><img src="img/arrow_down.gif"></a></div>
-										<?// <a href="#" onclick=" return false;">Hide&nbsp;details</a>?>
-										</td>
-										</tr>
-										</table>
+										<? button_bar(button('Play',$playaction," "),button('Hide', "langugaedetails('$language',false); return false;"));?>
 									</div>
 								</td>
 							</tr>
@@ -2064,7 +2047,7 @@ function submitTranslation(language,verify) {
 	if (isCheckboxChecked('tr_edit_' + language)) {
 		var help = new getObj('refreshhelp').obj;
 		tr.innerHTML = trexpand.value;
-		help.innerHTML = "Note: Languages with a <img src=\"img/padlock.gif\"> icon are edited and will not refresh ";
+		help.innerHTML = ""; //"Note: Languages with a <img src=\"img/padlock.gif\"> icon are edited and will not refresh ";
 		return;
 	}
 	if(typeof(google) == "undefined" || typeof(google.language) == "undefined"){
