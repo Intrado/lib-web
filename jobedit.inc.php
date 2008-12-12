@@ -601,7 +601,9 @@ if( $reloadform )
 	}
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax",true);
 	// names to display in submittedmode
-	$selectedlistnames = QuickQueryList("select name from list where id in (".implode(",", $selectedlists).")");
+	$selectedlistnames = array();
+	if (count($selectedlists) > 0)
+		$selectedlistnames = QuickQueryList("select name from list where id in (".implode(",", $selectedlists).")");
 
 	PutFormData($f,$s,"voiceselect",1); //TODO pull info on female and male voice
 
@@ -729,7 +731,7 @@ if ($submittedmode || $completedmode) {
 	$messages['print'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='print' order by name");
 	$messages['sms'] = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
 	// find if this was a copied job, with deleted messages
-	if (isset($job)) {
+	if (isset($job) && $job->id != null) {
 		$copiedmessages = DBFindMany("Message","from message where id='$job->phonemessageid' or id in (select messageid from joblanguage where type='phone' and jobid=$job->id)");
 		foreach ($copiedmessages as $m) {
 			if ($m->deleted == "1") {
