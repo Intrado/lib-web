@@ -1175,7 +1175,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</div>
 				<div id='newphonetext' style="white-space: nowrap;display: none">
 					Type Your English Message Here
-<?					if($USER->authorize('sendmulti')) { ?>
+<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					| <?  NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>
 					Automatically translate to other languages
 <? } ?>
@@ -1190,7 +1190,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "female","id='female_voice' checked " . ($submittedmode ? "DISABLED" : "")); ?> Female
 					<? NewFormItem($f, $s, "voiceselect", "radio", NULL, "male","id='male_voice' " . ($submittedmode ? "DISABLED" : "")); ?> Male
 					<br />
-<?					if($USER->authorize('sendmulti')) { ?>
+<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					<div id='translationwarning' style="color: red"></div>
 					<table width="100%">
 						<tr>
@@ -1794,7 +1794,7 @@ function clickIcon(section){
 	}
 }
 
-<?if($USER->authorize('sendmulti')) { ?>
+<?if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 <? // If Automatic translation is selected ?>
 function automatictranslation(){
 	show('translationwarning');
@@ -1888,7 +1888,7 @@ function pencillanguage(language) {
 */ ?>
 function checkboxhelper(mode) {
 <?
-if($USER->authorize('sendmulti')) {
+if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {
 	$languagestring = "";
 	foreach($languagearray as $language => $joblanguageobject) { $languagestring .= ",'$language'";}
 	$languagestring = substr($languagestring,1);
@@ -2011,7 +2011,7 @@ function previewlanguage(language,female,male) {
 
 
 <? // These scripts contol the translation ?>
-<? if($USER->authorize('sendmulti')) { ?>
+<? if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 <? //<script src="http://www.google.com/jsapi" type="text/javascript"></script>?>
 <script>
 <?
@@ -2116,14 +2116,14 @@ function retranslation(language){
 
   		if (result.translation) {
   			var str = result.translation.replace('>', '&gt;').replace('<', '&lt;');
-  			retranslation.value = str;
+  			retranslation.innerHTML = str;
   		} else {
-  			retranslation.value = "Retranslation Unavailable";
+  			retranslation.innerHTML = "Retranslation Unavailable";
    		}
 
 	} );
 	} else {
-		retranslation.value = "Retranslation Unavailable";
+		retranslation.innerHTML = "Retranslation Unavailable";
 	}
 }
 function translationerror(language) {
@@ -2137,7 +2137,7 @@ function translationerror(language) {
 	<script>
 		function checkpreload() {
 			if (window['google']) {
-					return;
+				return;
 			}
 			var newscript = document.getElementById("googlescript");
 			var headID = document.getElementById("preloadarea");
