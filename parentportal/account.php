@@ -12,7 +12,7 @@ $f="portaluser";
 $s="main";
 $reloadform = 0;
 $error = 0;
-
+$notifysms = 0;
 
 if(CheckFormSubmit($f,$s))
 {
@@ -87,7 +87,6 @@ if(CheckFormSubmit($f,$s))
 	$reloadform = 1;
 }
 
-$smsdisable = "";
 if( $reloadform )
 {
 	ClearFormData($f);
@@ -160,7 +159,7 @@ startWindow('User Information');
 					</tr>
 					<tr>
 						<td align="right">Mobile Phone for Text Messaging:</td>
-						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ".$smsdisable); ?></td>
+						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ". ($notifysms ? "" : "disabled=\"true\"")); ?></td>
 					</tr>
 
 				</table>

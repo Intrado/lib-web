@@ -149,7 +149,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td>Mobile Phone for Text Messaging:</td>
-				<td><input type="text" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" disabled="true"/></td>
+				<td><input type="text" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/></td>
 			</tr>
 			<tr>
 				<td colspan="2"><div style="overflow:scroll; height:250px; width:525px;"><?=$tos ?></div></td>
