@@ -43,10 +43,10 @@ class Phone extends DBMappedObject {
 	static function validate ($phone, $min=10, $max=10) {
 		$phone = Phone::parse($phone);
 		$length = strlen($phone);
-		$error=array();
-		if(!(($length >= $min && $length <= $max) || $length == 10)){
-			if($min == $max) {
-				if($max == 10) {
+		$error = array();
+		if (!(($length >= $min && $length <= $max) || $length == 10)) {
+			if ($min == $max) {
+				if ($max == 10) {
 					$error[] = 'The phone number must be exactly 10 digits long (including area code)';
 					$error[] = 'You do not need to include a 1 for long distance';
 				} else {
@@ -54,7 +54,7 @@ class Phone extends DBMappedObject {
 					$error[] = 'You do not need to include a 1 for long distance';
 				}
 			} else {
-				if($max == 10 || $max == 9) {
+				if ($max == 10 || $max == 9) {
 					$error[] = 'The phone number must be '. $min .'-10 digits long (including area code)';
 					$error[] = 'You do not need to include a 1 for long distance';
 				} else {
@@ -63,8 +63,20 @@ class Phone extends DBMappedObject {
 				}
 			}
 		} else if ($length == 10) {
-			if ($phone[0] < 2 || $phone[3] < 2) //check for valid looking area code and prefix
+			// based on North American Numbering Plan
+			// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
+
+			if (($phone[0] < 2) || // areacode cannot start with 0 or 1
+				($phone[3] < 2) || // prefix cannot start with 0 or 1
+				($phone[1] == 1 && $phone[2] == 1) || // areacode cannot be N11
+				($phone[4] == 1 && $phone[5] == 1) || // prefix cannot be N11
+				($phone[0] == 5 && $phone[1] == 5 && $phone[2] == 5) || // areacode cannot be 555
+				($phone[3] == 5 && $phone[4] == 5 && $phone[5] == 5) || // prefix cannot be 555
+				($phone[0] == 9 && $phone[1] == 5 && $phone[2] == 0) || // areacode cannot be 905
+				($phone[3] == 9 && $phone[4] == 5 && $phone[5] == 0) // prefix cannot be 905
+				) {
 				$error[] = 'The phone number seems to be invalid';
+			}
 		}
 		return $error;
 	}
