@@ -294,7 +294,7 @@ if ($fromcommsuite) {
 	$query = "delete from setting where name in ('surveyurl', 'autoreport_replyname', 'autoreport_replyemail', 'emaildomain', 'inboundnumber', '_supportemail', '_supportphone')";
 	mysql_query($query)
 		or die("Failure to execute query $query ". mysql_error());
-	$query = "insert into setting (name, value) values ('surveyurl', $surveyurl), ('autoreport_replyname', $arname), ('autoreport_replyemail', $aremail), ('emaildomain', $custdomain),  ('inboundnumber', $inboundnumber),  ('_supportemail', $supportemail), ('_supportphone', $supportphone)";
+	$query = "insert into setting (name, value) values ('surveyurl', '$surveyurl'), ('autoreport_replyname', '$arname'), ('autoreport_replyemail', '$aremail'), ('emaildomain', '$custdomain'),  ('inboundnumber', '$inboundnumber'),  ('_supportemail', '$supportemail'), ('_supportphone', '$supportphone')";
 	mysql_query($query)
 		or die("Failure to execute query $query ". mysql_error());
 }
