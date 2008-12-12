@@ -68,6 +68,10 @@ class Job extends DBMappedObject {
 	}
 
 	function copyNew($isrepeatingrunnow = false) {
+		// never copy a survey
+		if ($this->questionnaireid != null)
+			return false;
+
 		//make a copy of this job
 		$newjob = new Job($this->id);
 		$newjob->id = NULL;
