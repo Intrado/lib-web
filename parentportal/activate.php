@@ -157,7 +157,7 @@ if($form){
 				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 			</tr>
 			<tr>
-				<td colspan="2">You should have recieved an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
+				<td colspan="2">You should have received an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
 			</tr>
 
 			<tr>
