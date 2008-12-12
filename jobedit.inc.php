@@ -1226,9 +1226,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
-										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;" style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">
-										<?echo GetFormData($f, $s, "translationtext_$language"); ?>
-										</div>
+										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;" style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">&nbsp;</div>
 										</td>
 									</tr>
 									</table>
@@ -2058,31 +2056,26 @@ function submitTranslations() {
 
 function submitTranslation(language,verify) {
 
+	var tr = new getObj('language_' + language).obj;
+	var trexpand = new getObj('translationtextexpand_' + language).obj;
 	if (!isCheckboxChecked('translate_' + language)){
 		return;
 	}
 	if (isCheckboxChecked('tr_edit_' + language)) {
 		var help = new getObj('refreshhelp').obj;
+		tr.innerHTML = trexpand.value;
 		help.innerHTML = "Note: Languages with a <img src=\"img/padlock.gif\"> icon are edited and will not refresh ";
 		return;
 	}
 	if(typeof(google) == "undefined" || typeof(google.language) == "undefined"){
-		var tr = new getObj('language_' + language).obj;
 		tr.innerHTML = '&nbsp;';
 		return;
 	}
-
-
     var text = new getObj('phonetextarea').obj.value;
     var lngCode = google.language.Languages[language.toUpperCase()];
-	var tr = new getObj('language_' + language).obj;
-	var trexpand = new getObj('translationtextexpand_' + language).obj;
 
 	if(lngCode && text){
-  	  google.language.translate(text, "en", lngCode, function(result) {
-
-
-
+  		google.language.translate(text, "en", lngCode, function(result) {
   		if (result.translation) {
   			var str = result.translation.replace('>', '&gt;').replace('<', '&lt;');
   			tr.innerHTML = str;
