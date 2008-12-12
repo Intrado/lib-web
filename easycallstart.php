@@ -234,7 +234,7 @@ if($reloadform == 1) {
 	if($task->getData('langchkbox'))
 		$checked=true;
 
-	PutFormData($f,$s,"phone",$phone,"text","2","20", true);
+	PutFormData($f,$s,"phoneeasycall",$phone,"text","2","20", true);
 	PutFormData($f,$s,"addlangs",(bool)$checked, "bool", 0, 1);
 	PutFormData($f, $s, 'name', $name , 'text', 1, 50);
 	PutFormData($f, $s, 'newlang', "");

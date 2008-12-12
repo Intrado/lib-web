@@ -252,7 +252,7 @@ function GetFormData ($form, $section, $item) {
 /***************** TrimFormData *****************
 
 Will trim the form item and put it back into the form.
-Return the trimmed value if it exists 
+Return the trimmed value if it exists
 
 */
 function TrimFormData ($form, $section, $item) {
@@ -375,36 +375,16 @@ function CheckFormItem($form, $section, $item) {
 		}
 		break;
 
+	case "phoneeasycall":
+		if (Phone::validateEasyCall($theitem['value'])) {
+			return "type";
+		}
+		break;
+
 	case "phone":
-
-		// Somewhat basic algorithm chosen for simplicty.
-		// The algorithm is to strip all customary phone number formatting chars from
-		//	the string and ensure that what remains is a number that is between minval and
-		//  maxval if they are specified.  If unspecified, unlimited len is permitted.
-		// jjl
-		$phone = ereg_replace("[^0-9]*","",$theitem['value']); // Strip all non-numeric chars from string
-		$phonelen = strlen($phone);
-
-		// Check for input that does not contain any numbers.
-		if(!$phonelen && strlen($theitem['value']))
-			return "type";
-
-		if($theitem['minval'] != "nomin") {
-			if($phonelen < $theitem['minval']) {
-				return "range";
-			}
-		}
-
-		if($theitem['maxval'] != "nomax") {
-			if($phonelen > $theitem['maxval']) {
-				return "range";
-			}
-		}
-
-		if ($phonelen == 10 && ($phone[0] < 2 || $phone[3] < 2)) {
+		if (Phone::validate($theitem['value'])) {
 			return "type";
 		}
-
 		break;
 
 	case "email":
@@ -417,7 +397,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.22 $
+	    # $Revision: 1.23 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################

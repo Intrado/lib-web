@@ -123,7 +123,7 @@ if( $reloadform )
 	else
 		$phone = "";
 
-	PutFormData($f,$s,"phone",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
+	PutFormData($f,$s,"phoneeasycall",$phone,"text","2","20"); // 20 is the max to accomodate formatting chars
 	PutFormData($f,$s,"name","","text","1","30");
 	PutFormData($f,$s,"size","","text");
 	PutFormData($f,$s,"origin",$origin);
