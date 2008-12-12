@@ -189,7 +189,7 @@ $s = "send";
 
 include_once("nav.inc.php");
 
-if ($renderedlist->total > 0)
+if ($totalpersons > 0)
 	buttons(button('Save For Later', null, 'jobs.php'),
 			button('Modify Job Settings',null, 'job.php'),
 			button('Submit Job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
