@@ -1,12 +1,15 @@
 <?
 
 // prompt for activation code
-function promptCode() {
+function promptCode($retry = false) {
 ?>
 <voice>
 	<message name="activate">
 		<field name="code" type="dtmf" timeout="5000" max="20">
 			<prompt repeat="2">
+<?			if ($retry) { ?>
+				<tts gender="female" language="english">Sorry, the activation code is invalid or expired.</tts>
+<?  		} ?>
 				<tts gender="female" language="english">Please enter your activation code, followed by the pound key.</tts>
 			</prompt>
 			<timeout>
@@ -86,10 +89,16 @@ if ($REQUEST_TYPE == "new") {
 		if (inboundPortalPhoneActivation($callerid, $code)) {
 			okGoodbye();
 		} else {
-			failGoodbye();
+			$_SESSION['phoneattempts']++;
+			if ($_SESSION['phoneattempts'] >= 3) {
+				failGoodbye();
+			} else {
+				promptCode(true);
+			}
 		}
 	} else if (isset($_SESSION['callerid'])) {
 		if (inboundPortalFindCallerid($_SESSION['callerid'])) {
+			$_SESSION['phoneattempts'] = 0;
 			promptCode();
 		} else {
 			calleridUnknown();
