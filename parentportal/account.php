@@ -99,6 +99,7 @@ if( $reloadform )
 	PutFormData($f, $s, "notify",  ($_SESSION['portaluser']['portaluser.notifytype'] == "message") ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, "notifysms",  ($_SESSION['portaluser']['portaluser.notifysmstype'] == "message") ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, "sms", Phone::format($_SESSION['portaluser']['portaluser.sms']), "phone", "2", "20"); // 20 is the max to accomodate formatting chars
+	$notifysms = ($_SESSION['portaluser']['portaluser.notifysmstype'] == "message") ? 1 : 0;
 }
 
 $PAGE = "account:account";
