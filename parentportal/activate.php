@@ -10,6 +10,8 @@ if (isset($_GET['u'])) {
 	$appendcustomerurl = "?u=".urlencode($_GET['u']);
 }
 
+$forgot = false;
+$changeuser = false;
 $form = true;
 $forgotsuccess = false;
 $newusersuccess = false;
