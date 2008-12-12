@@ -300,7 +300,7 @@ class JobSummaryReport extends ReportGenerator{
 									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th># of Phones</th>
-											<th>Done</th>
+											<th>Completed</th>
 											<th>Remaining</th>
 											<th>Blocked</th>
 											<th>Duplicates Removed</th>
