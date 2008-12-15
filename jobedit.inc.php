@@ -1219,7 +1219,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							<tr>
 								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
 								</td>
-								<td class="topBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/spacer10px.gif"></td>
+								<td class="topBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/pixel.gif" width="10" height="1"></td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;" width="100%">
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
