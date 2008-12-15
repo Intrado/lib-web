@@ -98,7 +98,7 @@ function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	if ($extrahtml)
 		$btn .= $extrahtml;
 
-	$btn .= '><a onclick="return false;" href="';
+	$btn .= '><a href="';
 
 	if ($href)
 		$btn .= escapehtml($href);
