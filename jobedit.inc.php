@@ -1168,21 +1168,21 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {setChecked('translatecheck');translationoptions(false);automatictranslation();show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
-				<div id='selectphonemessage' style="display: none">
+<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"setChecked('translatecheck');translationoptions(false);automatictranslation();":"") . "show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
+				<div id='selectphonemessage' style="display: block">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
 				<div id='newphonetext' style="white-space: nowrap;display: none">
 					Type Your English Message 
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
-					| <?  NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck'" . ($submittedmode ? "DISABLED" : "onclick=\"automatictranslation()\"")); ?>
+					| <?  NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation()\"")); ?>
 					Automatically translate to other languages
 <? } ?>
 					<br />
 					<table>
 						<tr>
-							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea'" . ($submittedmode ? "DISABLED" : "")); ?></td>
+							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea' " . ($submittedmode ? "DISABLED" : "")); ?></td>
 							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
 						</tr>
 					</table>
@@ -1599,22 +1599,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		}
 	}
 
-	checkboxhelper('loading');
+	// Loading List View
 	if(isCheckboxChecked('listradio_single')){
 		show('singlelist');hide('multilist');
 	} else {
 		hide('singlelist');show('multilist');
 	}
-	if(isCheckboxChecked('radio_create')) {
-		show('newphonetext');
-		hide('selectphonemessage');
-		hide('multilingualphoneoption');
-	} else {
-		hide('newphonetext');
-		show('selectphonemessage');
-		show('multilingualphoneoption');
-	}
-
+	
 	function limit_chars(field) {
 		if (field.value.length > 160)
 			field.value = field.value.substring(0,160);
@@ -1772,180 +1763,6 @@ function clickIcon(section){
 	}
 }
 
-<?if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
-<? // If Automatic translation is selected ?>
-function automatictranslation(){
-	show('translationwarning');
-	if(isCheckboxChecked('translatecheck')){
-		checkboxhelper('all');
-		show('translationwarning');
-		var basic = new getObj('translationbasic').obj;
-		if(basic.style.display != "block")
-			show('translationdetails');
-	} else {
-		checkboxhelper('none');
-		hide('translationwarning');
-		hide('translationdetails');
-		hide('translationbasic');
-		hide('translationoptions');
-	}
-}
-<? // Show Translation options ?>
-function translationoptions(details){
-	if (details) {
-		show('translationoptions');
-		hide('translationdetails');
-		show('translationbasic');
-	} else {
-		hide('translationoptions');
-		show('translationdetails');
-		hide('translationbasic');
-	}
-	return false;
-}
-
-<? // If language checkbox is selected ?>
-function translationlanguage(language){
-	checkboxhelper('default');
-	if (isCheckboxChecked('translate_' + language)){
-		setChecked('translatecheck');
-		show('language_' + language);
-		show('translationdetails_' + language);
-	} else {
-		hide('language_' + language);
-		hide('translationdetails_' + language);
-	}
-	editlanguage(language);
-	hide('languageexpand_' + language);
-	hide('translationbasic_' + language);
-}
-
-<? //If language details is clicked ?>
-function langugaedetails(language, details){
-	if(details){
-		hide('language_' + language);
-		show('languageexpand_' + language);
-		show('translationbasic_' + language);
-		hide('translationdetails_' + language);
-	} else {
-		show('language_' + language);
-		hide('languageexpand_' + language);
-		hide('translationbasic_' + language);
-		show('translationdetails_' + language);
-		if(isCheckboxChecked('tr_edit_' + language)){
-			var tr = new getObj('language_' + language).obj;
-			var trexpand = new getObj('translationtextexpand_' + language).obj;
-			if(trexpand.value != "") {
-  				tr.innerHTML = trexpand.value;
-			} else {
-				tr.innerHTML = "&nbsp;" //May want to warn about this
-			}	
-		}
-	}
-}
-function editlanguage(language) {
-	var textbox = new getObj('translationtextexpand_' + language).obj;
-	textbox.disabled = !isCheckboxChecked('tr_edit_' + language);
-	if(isCheckboxChecked('translate_' + language) && isCheckboxChecked('tr_edit_' + language)){
-		show('lock_' + language);
-	} else {
-		hide('lock_' + language);
-	}
-}
-function pencillanguage(language) {
-	var textbox = new getObj('translationtextexpand_' + language).obj;
-	textbox.disabled = false;
-	var edit = new getObj('tr_edit_' + language).obj;
-	edit.checked = true;
-}
-<? } ?>
-
-
-<?
-/*
-* Checkbox helper will show and hide language options
-* - Set all languages if automatic translation is clicked
-* - On loading the page. This will ensure that the right boxes show up if there is an error message to the user
-* - if not checkall and loading the checkbox helper will unselect automatic translation if no Languages are selected
-*/ ?>
-function checkboxhelper(mode) {
-<?
-if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {
-	$languagestring = "";
-	foreach($languagearray as $language => $joblanguageobject) { $languagestring .= ",'$language'";}
-	$languagestring = substr($languagestring,1);
-?>
-	var languagelist=new Array(<? echo $languagestring; ?>);
-
-	if(mode == 'all'){
-		for (i = 0; i < languagelist.length; i++) {
-			var language = languagelist[i]
-			var x = new getObj('translate_' + language);
-			show('language_' + language);
-			if(!x.obj.disabled) {
-				x.obj.checked = true;
-				show('translationdetails_' + language);
-			}
-			editlanguage(language);
-			hide('languageexpand_' + language);
-			hide('translationbasic_' + language);
-		}
-		var x = new getObj('translatecheck');
-		x.obj.checked = true;
-	} else if(mode == 'none'){
-		for (i = 0; i < languagelist.length; i++) {
-			var language = languagelist[i];
-			var x = new getObj('translate_' + language);
-			x.obj.checked = false;
-			hide('language_' + language);
-			hide('translationdetails_' + language);
-			hide('languageexpand_' + language);
-			hide('translationbasic_' + language);
-		}
-	} else if(mode == 'loading') {
-		var checked = false;
-		show('translationdetails');
-		for (i = 0; i < languagelist.length; i++) {
-			var language = languagelist[i]
-			if(isCheckboxChecked('translate_' + language)){
-				show('language_' + language);
-				show('translationdetails_' + language);
-				checked = true;
-			} else {
-				hide('language_' + language);
-				hide('translationdetails_' + language);
-			}
-			editlanguage(language);
-			hide('languageexpand_' + language);
-			hide('translationbasic_' + language);
-			if(!isCheckboxChecked('tr_edit_' + language)){
-				var x = new getObj('translationtextexpand_' + language);
-				x.obj.disabled = true;
-			}
-		}
-		if(!checked) {
-			var x = new getObj('translatecheck');
-			x.obj.checked = false;
-			hide('translationdetails');
-		}
-	} else { // default
-		var checked = false;
-		for (i = 0; i < languagelist.length; i++) {
-			if(isCheckboxChecked('translate_' + languagelist[i])){
-				checked = true;
-			}
-		}
-		if(!checked) {
-			var x = new getObj('translatecheck');
-			x.obj.checked = false;
-		}
-	}
-<?
-}
-?>
-}
-
-
 
 function display_jobtype_info(value){
 	new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
@@ -1990,23 +1807,173 @@ function previewlanguage(language,female,male) {
 
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
-
 </script>
 
-
 <? // These scripts contol the translation ?>
-<? if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
-<? //<script src="http://www.google.com/jsapi" type="text/javascript"></script>?>
-<script>
-<?
+<? if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { 
 $languagestring = "";
 foreach($languagearray as $language => $joblanguageobject) { $languagestring .= ",'$language'";}
 $languagestring = substr($languagestring,1);
 ?>
+<script>
 var languagelist=new Array(<? echo $languagestring; ?>);
 var googleready = false;
 var cancelgoogle = false;
 
+// Loading Message View
+if(isCheckboxChecked('radio_select')) {
+	hide('newphonetext');
+	show('selectphonemessage');
+	show('multilingualphoneoption');
+} else {
+	show('newphonetext');
+	hide('selectphonemessage');
+	hide('multilingualphoneoption');
+	
+	// Loading the translation setup
+	var checked = false;
+	show('translationdetails');
+	for (i = 0; i < languagelist.length; i++) {
+		var language = languagelist[i];
+		if(isCheckboxChecked('translate_' + language)){
+			show('language_' + language);
+			show('translationdetails_' + language);
+			checked = true;
+		} else {
+			hide('language_' + language);
+			hide('translationdetails_' + language);
+		}
+		editlanguage(language);
+		hide('languageexpand_' + language);
+		hide('translationbasic_' + language);
+		if(!isCheckboxChecked('tr_edit_' + language)){
+			var x = new getObj('translationtextexpand_' + language);
+			x.obj.disabled = true;
+		}
+	}
+	if(!checked) {
+		var x = new getObj('translatecheck');
+		x.obj.checked = false;
+		hide('translationdetails');
+	}
+}
+
+<?
+/*
+ * If The Automatic translation check is clicked or the user switch from select a message to create a message 
+ * If The checkbox is selected all the languages should be selected too.
+ * If a user has unselected all languages the translatecheck is unselected to avoid both show and hide translation 
+ * to show at the same time the show('translationdetails'); has to be conditional
+ *
+ */
+?>
+function automatictranslation(){
+	show('translationwarning');
+	if(isCheckboxChecked('translatecheck')){
+		for (i = 0; i < languagelist.length; i++) {
+			var language = languagelist[i]
+			var x = new getObj('translate_' + language);
+			show('language_' + language);
+			if(!x.obj.disabled) {
+				x.obj.checked = true;
+				show('translationdetails_' + language);
+			}
+			editlanguage(language);
+			hide('languageexpand_' + language);
+			hide('translationbasic_' + language);
+		}
+		show('translationwarning');
+		var basic = new getObj('translationbasic').obj;
+		if(basic.style.display != "block")
+			show('translationdetails');
+	} else {
+		for (i = 0; i < languagelist.length; i++) {
+			var language = languagelist[i];
+			var x = new getObj('translate_' + language);
+			x.obj.checked = false;
+			hide('language_' + language);
+			hide('translationdetails_' + language);
+			hide('languageexpand_' + language);
+			hide('translationbasic_' + language);
+		}
+		hide('translationwarning');
+		hide('translationdetails');
+		hide('translationbasic');
+		hide('translationoptions');
+	}
+}
+<? // Show Translation options ?>
+function translationoptions(details){
+	if (details) {
+		show('translationoptions');
+		hide('translationdetails');
+		show('translationbasic');
+	} else {
+		hide('translationoptions');
+		show('translationdetails');
+		hide('translationbasic');
+	}
+	return false;
+}
+
+<? // If language checkbox is selected ?>
+function translationlanguage(language){
+	var checked = false;
+	for (i = 0; i < languagelist.length; i++) {
+		if(isCheckboxChecked('translate_' + languagelist[i])){
+			checked = true;
+		}
+	}
+	if(!checked) {
+		var x = new getObj('translatecheck');
+		x.obj.checked = false;
+	}
+	if (isCheckboxChecked('translate_' + language)){
+		setChecked('translatecheck');
+		show('language_' + language);
+		show('translationdetails_' + language);
+	} else {
+		hide('language_' + language);
+		hide('translationdetails_' + language);
+	}
+	editlanguage(language); <? // To show or hide the lock symbol ?>
+	hide('languageexpand_' + language);
+	hide('translationbasic_' + language);
+}
+
+<? //If language details is clicked ?>
+function langugaedetails(language, details){
+	if(details){
+		hide('language_' + language);
+		show('languageexpand_' + language);
+		show('translationbasic_' + language);
+		hide('translationdetails_' + language);
+	} else {
+		show('language_' + language);
+		hide('languageexpand_' + language);
+		hide('translationbasic_' + language);
+		show('translationdetails_' + language);
+		<? // If the translation is edited the text will need to be copied when the language box is collapsed ?>
+		if(isCheckboxChecked('tr_edit_' + language)){
+			var tr = new getObj('language_' + language).obj;
+			var trexpand = new getObj('translationtextexpand_' + language).obj;
+			if(trexpand.value != "") {
+  				tr.innerHTML = trexpand.value;
+			} else {
+				tr.innerHTML = "&nbsp;" <? //May want to warn about this ?>
+			}	
+		}
+	}
+}
+function editlanguage(language) {
+	var textbox = new getObj('translationtextexpand_' + language).obj;
+	textbox.disabled = !isCheckboxChecked('tr_edit_' + language);
+	if(isCheckboxChecked('translate_' + language) && isCheckboxChecked('tr_edit_' + language)){
+		show('lock_' + language);
+	} else {
+		hide('lock_' + language);
+	}
+}
 
 
 function submitTranslations() {
@@ -2147,7 +2114,7 @@ function translationerror(language) {
 	</script>
 </div>
 
-<? } ?>
+<? } // End of Translation - This block will be removed if it is a repeating job or sendmulti is not enabled   ?>
 <script SRC="script/calendar.js"></script>
 <?
 endWindow();
