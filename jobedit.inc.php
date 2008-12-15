@@ -1168,8 +1168,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) { hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {checkboxhelper('all'); show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
+<?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : "onclick=\"if(this.checked == true) {setChecked('translatecheck');translationoptions(false);automatictranslation();show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
 				<div id='selectphonemessage' style="display: none">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
