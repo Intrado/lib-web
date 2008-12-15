@@ -1,13 +1,22 @@
 <?
-//include_once("inboundutils.inc.php");
-
 global $BFXML_VARS;
+
+function invalidgoodbye2() {
+?>
+<voice>
+	<message name="welcome">
+    	<tts gender="female" language="english">I did not understand your response.  Goodbye.</tts>
+		<hangup />
+	</message>
+</voice>
+<?
+}
 
 function confirmcallerid($callerid) {
 ?>
 <voice>
 	<message name="choosecallerid">
-			<field name="callerid" type="menu" timeout="5000" sticky="true">
+			<field name="callerid" type="menu" timeout="5000">
 			<prompt repeat="2">
 			    <tts gender="female" language="english">It looks like you are calling from </tts>
 	    	    <tts gender="female" language="english"><? echo substr($callerid,0,3) . " " . substr($callerid,3,3)   . " " . substr($callerid,6); ?>. </tts>
@@ -29,7 +38,6 @@ function confirmcallerid($callerid) {
 }
 
 
-
 if ($REQUEST_TYPE == "new") {
 	?>
 	<error>msgcallbackconfirmphone: wanted result or continue, got new </error>
@@ -48,12 +56,15 @@ if ($REQUEST_TYPE == "new") {
 			} else {
 				forwardToPage("msgcallbackgetlist.php");
 			}
-		} else {
+		} else if ($BFXML_VARS['callerid'] == 2) {
 			forwardToPage("msgcallbackenterphone.php");
+		} else {
+			invalidgoodbye2();
 		}
-	} else if (isset($_SESSION['callerid'])) {   // Neet to test this from a unknown number
+	} else if (isset($_SESSION['callerid']) && $_SESSION['callerid'] != "Unknown") {
 		confirmcallerid($_SESSION['callerid']);
 	} else {
+		// from blocked callerid phone "Unknown"
 		forwardToPage("msgcallbackenterphone.php");
 	}
 } else {
