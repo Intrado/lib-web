@@ -1195,14 +1195,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<table width="100%">
 						<tr>
 					<td style="white-space:nowrap;">
-						<div id='translationdetails' style="white-space:nowrap;display: block">
-							<? button_bar(button('Show Translations', "translationoptions(true);submitTranslations()"," "));?>
-						
-					<? // 		&nbsp;<a href="#" onclick="translationoptions(true); return false; ">Show&nbsp;translation&nbsp;options</a>?>
+						<div id='translationdetails' style="white-space:nowrap;display: none">
+							<? button_bar(button('Show Translations', "translationoptions(true);submitTranslations();"));?>
 						</div>
 						<div id='translationbasic' style="white-space:nowrap;display: none">
-							<? button_bar(button('Hide Translations', "translationoptions(false);"," "),button('Refresh Translations', "submitTranslations();"," "));?>							
-					<? // 		&nbsp;<a href="#"	onclick="translationoptions(false); return false; ">Hide&nbsp;translation&nbsp;options</a>?>
+							<? button_bar(button('Hide Translations', "translationoptions(false);"),button('Refresh Translations', "submitTranslations();"));?>							
 						</div>
 					</td>
 					<td style="white-space:nowrap;">
@@ -1781,11 +1778,16 @@ function automatictranslation(){
 	show('translationwarning');
 	if(isCheckboxChecked('translatecheck')){
 		checkboxhelper('all');
-		//submitTranslations();
 		show('translationwarning');
+		var basic = new getObj('translationbasic').obj;
+		if(basic.style.display != "block")
+			show('translationdetails');
 	} else {
 		checkboxhelper('none');
 		hide('translationwarning');
+		hide('translationdetails');
+		hide('translationbasic');
+		hide('translationoptions');
 	}
 }
 <? // Show Translation options ?>
@@ -1807,7 +1809,6 @@ function translationlanguage(language){
 	checkboxhelper('default');
 	if (isCheckboxChecked('translate_' + language)){
 		setChecked('translatecheck');
-		//submitTranslation(language,false);
 		show('language_' + language);
 		show('translationdetails_' + language);
 	} else {
@@ -1893,7 +1894,7 @@ if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {
 		x.obj.checked = true;
 	} else if(mode == 'none'){
 		for (i = 0; i < languagelist.length; i++) {
-			var language = languagelist[i]
+			var language = languagelist[i];
 			var x = new getObj('translate_' + language);
 			x.obj.checked = false;
 			hide('language_' + language);
@@ -1903,6 +1904,7 @@ if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {
 		}
 	} else if(mode == 'loading') {
 		var checked = false;
+		show('translationdetails');
 		for (i = 0; i < languagelist.length; i++) {
 			var language = languagelist[i]
 			if(isCheckboxChecked('translate_' + language)){
@@ -1924,6 +1926,7 @@ if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {
 		if(!checked) {
 			var x = new getObj('translatecheck');
 			x.obj.checked = false;
+			hide('translationdetails');
 		}
 	} else { // default
 		var checked = false;
@@ -2001,31 +2004,10 @@ foreach($languagearray as $language => $joblanguageobject) { $languagestring .= 
 $languagestring = substr($languagestring,1);
 ?>
 var languagelist=new Array(<? echo $languagestring; ?>);
+var googleready = false;
+var cancelgoogle = false;
 
 
-
-function init() {
-	var disabled = false;
-	for (l in languagelist) {
-		var lngCode = google.language.Languages[languagelist[l].toUpperCase()];
-		if (!(lngCode && google.language.isTranslatable(lngCode))) {
-			var x = new getObj('translate_' + languagelist[l]);
-			x.obj.checked = false;
-			x.obj.disabled = true;
-			disabled = true;
-			show('language_' + languagelist[l]);
-			var tr = new getObj('language_' + languagelist[l]).obj;
-			tr.innerHTML = "This language is unavailable. Please see help pages for more information";
-		}
-	}
-	if(disabled) {
-		//var x = new getObj('translationwarning');
-		//x.obj.innerHTML = "One or more languages are unavailable. Please read the help pages for more information.";
-	}
-	var add = new getObj('branding');
-	add.obj.innerHTML = "<span style='vertical-align: middle;'>Translation </span>";
-    google.language.getBranding('branding');
-}
 
 function submitTranslations() {
 	var help = new getObj('refreshhelp').obj;
@@ -2109,27 +2091,59 @@ function translationerror(language) {
 </script>
 <? // This scipt will determine if google is available on the client side and enable or disable translation ?>
 
-<div id="preloadarea">
-	<script>
-		function checkpreload() {
-			if (window['google']) {
+<!-- Load Google API -->
+<div id="loadgooglestatus" style="width: 10px; height: 10px; background-color: rgb(210,210,210);">
+	<script type="text/javascript">
+		function checkloadgoogle() {
+			if (window['google'])
 				return;
+			//Translation API is taking too long to load
+			var loadgooglestatus = document.getElementById('loadgooglestatus');
+			var googlejsapi = document.getElementById('googlejsapi');
+			if (googlejsapi) {
+				loadgooglestatus.removeChild(googlejsapi);
+				// Removed script
 			}
-			var newscript = document.getElementById("googlescript");
-			var headID = document.getElementById("preloadarea");
-			headID.removeChild(newscript);
+			googlejsapi = document.getElementById('googlejsapi');
+			if (!googlejsapi)
+				// Removal Confirmed
+			cancelgoogle = true;
 		}
-		var headID = document.getElementById("preloadarea");
-		var newScript = document.createElement('script');
-		newScript.id = "googlescript";
-		newScript.type = 'text/javascript';
-		newScript.src ="http://www.google.com/jsapi";
-		headID.appendChild(newScript);
-		newScript.onload = function() {
-			google.load("language", "1");
-			google.setOnLoadCallback(init);
+		setTimeout("checkloadgoogle()", 2000);
+	</script>
+	<script id="googlejsapi" type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<script type="text/javascript">
+		function initTranslate() {
+			if (googleready)
+				return;
+			googleready = true;
+			var disabled = false;
+			for (l in languagelist) {
+				var lngCode = google.language.Languages[languagelist[l].toUpperCase()];
+				if (!(lngCode && google.language.isTranslatable(lngCode))) {
+					var x = new getObj('translate_' + languagelist[l]);
+					x.obj.checked = false;
+					x.obj.disabled = true;
+					disabled = true;
+					show('language_' + languagelist[l]);
+					var tr = new getObj('language_' + languagelist[l]).obj;
+					tr.innerHTML = "This language is unavailable. Please see help pages for more information";
+				}
+			}
+			if(disabled) {
+				//var x = new getObj('translationwarning');
+				//x.obj.innerHTML = "One or more languages are unavailable. Please read the help pages for more information.";
+			}
+			var add = new getObj('branding');
+			add.obj.innerHTML = "<span style='vertical-align: middle;'>Translation </span>";
+		    google.language.getBranding('branding');
 		}
-		setTimeout('checkpreload()', 3000);
+		if (window['google'] && !cancelgoogle) {
+			google.load('language', '1');
+			google.setOnLoadCallback(initTranslate);
+		} else {
+			alert('Cancelled Google');
+		}
 	</script>
 </div>
 
