@@ -10,7 +10,7 @@
 $customerid = "";
 $customerdatafile = "";
 $fromcommsuite = true; // true if data is from commsuite 5.2 migration, false if moving 6.x between shards
-$shardhost = "";
+$shardhost = "localhost"; // you want to run on the db machine for the 'mysqldump' to work
 $dbuser = "";
 $dbpass = "";
 
@@ -161,37 +161,23 @@ echo ("\n");
 // if from commsuite, we want to save these settings because commsuite 5.2 did not have them
 // if moving between shards, we do not need to because the c_x export will contain them
 if ($fromcommsuite) {
-echo ("Saving a few settings to restore after import\n");
-$surveyurl = "";
-$arname = "";
-$aremail = "";
-$inboundnumber = "";
-$supportemail = "";
-$supportphone = "";
-$custdomain = "";
+	echo ("Saving a few settings to restore after import\n");
 
-mysql_select_db($customerdbname);
-$query = "select name, value from setting where name in ('surveyurl', 'autoreport_replyname', 'autoreport_replyemail', 'emaildomain', 'inboundnumber', '_supportemail', '_supportphone')";
-$result = mysql_query($query)
-	or die("Failure to execute query $query ". mysql_error());
-while ($row = mysql_fetch_assoc($result)) {
-	switch ($row["name"]) {
-		case "surveyurl" : $surveyurl = $row["value"];
-		break;
-		case "autoreport_replyname" : $arname = $row["value"];
-		break;
-		case "autoreport_replyemail" : $aremail = $row["value"];
-		break;
-		case "emaildomain" : $custdomain = $row["value"];
-		break;
-		case "inboundnumber" : $inboundnumber = $row["value"];
-		break;
-		case "_supportemail" : $supportemail = $row["value"];
-		break;
-		case "_supportphone" : $supportphone = $row["value"];
-		break;
+	mysql_select_db($customerdbname);
+
+	$settings = array();
+	$settings['surveyurl'] = "";
+	$settings['autoreport_replyname'] = "";
+	$settings['autoreport_replyemail'] = "";
+	$settings['inboundnumber'] = "";
+	$settings['_supportemail'] = "";
+	$settings['_supportphone'] = "";
+	$settings['emaildomain'] = "";
+
+	foreach ($settings as $name => $value) {
+		$settings[$name] = QuickQuery("select value from setting where name='$name'", $custdb);
+		echo "$name is $settings[$name] \n";
 	}
-}
 }
 
 //////////////////////////////////////
@@ -291,12 +277,16 @@ if ($fromcommsuite) {
 	createSMUserProfile($custdb);
 
 	// reset saved customer settings
-	$query = "delete from setting where name in ('surveyurl', 'autoreport_replyname', 'autoreport_replyemail', 'emaildomain', 'inboundnumber', '_supportemail', '_supportphone')";
-	mysql_query($query)
-		or die("Failure to execute query $query ". mysql_error());
-	$query = "insert into setting (name, value) values ('surveyurl', '$surveyurl'), ('autoreport_replyname', '$arname'), ('autoreport_replyemail', '$aremail'), ('emaildomain', '$custdomain'),  ('inboundnumber', '$inboundnumber'),  ('_supportemail', '$supportemail'), ('_supportphone', '$supportphone')";
-	mysql_query($query)
-		or die("Failure to execute query $query ". mysql_error());
+	foreach ($settings as $name => $value) {
+		$query = "delete from setting where name='$name'";
+		mysql_query($query)
+			or die("Failure to execute query $query ". mysql_error());
+		$name = DBSafe($name, $custdb);
+		$value = DBSafe($value, $custdb);
+		$query = "insert into setting (name, value) values ('$name', '$value')";
+		mysql_query($query)
+			or die("Failure to execute query $query ". mysql_error());
+	}
 }
 
 //////////////////////////////////////
