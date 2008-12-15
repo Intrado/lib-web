@@ -86,14 +86,21 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 					if ($messagetotal == 1) {?>
 						<tts gender="female">There is one message in the last 30 days.  You may press the star key to repeat. </tts>
 					<?} else {?>
-						<tts gender="female">There are <?echo $messagetotal?> messages in the last 30 days.  You may press the pound key at any time to skip to the next message, or press the star key to repeat. </tts>
+						<tts gender="female">There are</tts>
+						<tts gender="female"><?echo $messagetotal?></tts>
+						<tts gender="female">messages in the last 30 days.  You may press the pound key at any time to skip to the next message, or press the star key to repeat. </tts>
 					<?}?>
 				<?}?>
 
 				<? if ($messagetotal == 1) {?>
-					<tts gender="female">Message for <?echo ("$person->f01 $person->f02");?>.  </tts>
+					<tts gender="female">Message for</tts> 
+					<tts gender="female"><?=escapehtml($person->f01)?></tts>
+					<tts gender="female"><?=escapehtml($person->f02);?></tts>
 				<?} else {?>
-					<tts gender="female">Message <?echo($messageindex +1)?> of <?echo $messagetotal?> for <?echo ("$person->f01 $person->f02");?>.  </tts>
+					<tts gender="female">Message</tts>
+					<tts gender="female"><?echo($messageindex +1)?> of <?echo $messagetotal?> for </tts>
+					<tts gender="female"><?=escapehtml($person->f01)?></tts>
+					<tts gender="female"><?=escapehtml($person->f02);?></tts>
 				<?}?>
 
 				<?renderMessageParts($playback);?>
