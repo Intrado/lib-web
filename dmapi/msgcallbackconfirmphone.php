@@ -19,7 +19,9 @@ function confirmcallerid($callerid) {
 			<field name="callerid" type="menu" timeout="5000">
 			<prompt repeat="2">
 			    <tts gender="female" language="english">It looks like you are calling from </tts>
-	    	    <tts gender="female" language="english"><? echo substr($callerid,0,3) . " " . substr($callerid,3,3)   . " " . substr($callerid,6); ?>. </tts>
+<?				for ($i=0; $i<strlen($callerid); $i++) { ?>
+		    	    <tts gender="female" language="english"><? echo $callerid[$i] ?></tts>
+<?			    } ?>
 	    	    <tts gender="female" language="english">Press 1 if this is the number that recieved the call, otherwise Press 2.</tts>
 			</prompt>
 			<choice digits="1" />
