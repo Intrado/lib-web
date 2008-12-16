@@ -38,7 +38,7 @@ if(CheckFormSubmit($f,$s))
 				redirect("phoneactivation2.php");
 			} else {
 				// add another
-				$pkey = DBSafe(GetFormData($f, $s, "pkey"));
+				$pkey = GetFormData($f, $s, "pkey");
 				if ($pkey == "")
 					error("Please enter a Contact Identification Number");
 
