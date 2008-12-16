@@ -1939,6 +1939,12 @@ function translationlanguage(language){
 	} else {
 		hide('language_' + language);
 		hide('translationdetails_' + language);
+		var tr = new getObj('language_' + language).obj;
+		tr.innerHTML = "&nbsp;";
+		var trexpand = new getObj('translationtextexpand_' + language).obj;
+		trexpand.value = "";
+		var edit = new getObj('tr_edit_' + language).obj;
+		edit.checked = false;
 	}
 	editlanguage(language); <? // To show or hide the lock symbol ?>
 	hide('languageexpand_' + language);
