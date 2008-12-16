@@ -37,13 +37,13 @@ if (!$USER->authorize('createlist')) {
 
 $list = NULL;
 
+if (isset($_GET['origin'])) {
+	$_SESSION['origin'] = trim($_GET['origin']);
+}
+
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
 	redirect();
-}
-
-if (isset($_GET['origin'])) {
-	$_SESSION['origin'] = trim($_GET['origin']);
 }
 
 if (isset($_GET['deleterule'])) {
