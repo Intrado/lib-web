@@ -377,7 +377,7 @@ switch($MESSAGETYPE)
 					<th align="right" class="windowRowHeader">Text-to-Speech:<br><? print help('MessagePhone_TextToSpeech'); ?></th>
 					<td>
 <?
-		$fields = getTTSVoices();
+		$fields = Voice::getTTSVoices();
 		NewFormItem($form,$section, 'voiceid', 'selectstart');
 		foreach($fields as $file)
 		{

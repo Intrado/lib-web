@@ -251,7 +251,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.68 $
+	    # $Revision: 1.69 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -577,11 +577,6 @@ function loadDisplaySettings(){
 	$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 	$_SESSION['_supportphone'] = $scheme['_supportphone'];
 	$_SESSION['_supportemail'] = $scheme['_supportemail'];
-}
-
-// return array of Voice objects based on customer language table
-function getTTSVoices() {
-	return DBFindMany("Voice","from ttsvoice t join language l where l.name = t.language order by t.language, t.gender desc", "t");
 }
 
 ?>
