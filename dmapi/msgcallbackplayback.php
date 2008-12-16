@@ -80,7 +80,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 ?>
 <voice>
 	<message name="playback">
-		<field name="doplayback" type="menu" timeout="5000">
+		<field name="doplayback" type="menu" timeout="500">
 			<prompt>
 				<?if ($playintro) {
 					if ($messagetotal == 1) {?>
@@ -88,22 +88,25 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 					<?} else {?>
 						<tts gender="female">There are</tts>
 						<tts gender="female"><?echo $messagetotal?></tts>
-						<tts gender="female">messages in the last 30 days.  You may press the pound key at any time to skip to the next message, or press the star key to repeat. </tts>
+						<tts gender="female">messages in the last 30 days.  At any time, press the star key to repeat the message, or pound to skip to the next message. </tts>
 					<?}?>
 				<?}?>
 
 				<? if ($messagetotal == 1) {?>
-					<tts gender="female">Message for</tts> 
+					<tts gender="female">Message for</tts>
 					<tts gender="female"><?=escapehtml($person->f01)?></tts>
 					<tts gender="female"><?=escapehtml($person->f02);?></tts>
 				<?} else {?>
 					<tts gender="female">Message</tts>
-					<tts gender="female"><?echo($messageindex +1)?> of <?echo $messagetotal?> for </tts>
+					<tts gender="female"><?echo($messageindex +1)?> of <?echo $messagetotal?>, for -- </tts>
 					<tts gender="female"><?=escapehtml($person->f01)?></tts>
 					<tts gender="female"><?=escapehtml($person->f02);?></tts>
 				<?}?>
 
 				<?renderMessageParts($playback);?>
+
+
+				<tts gender="female">Press the star key to repeat the message, or pound to skip to the next message.</tts>
 			</prompt>
 
 			<choice digits="*" />
