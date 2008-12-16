@@ -15,7 +15,12 @@ class Voice extends DBMappedObject {
 
 	// return array of Voice objects (indexed "language:gender") based on customer language table
 	static function getTTSVoices() {
-		$voices = DBFindMany("Voice","from ttsvoice t join language l where l.name = t.language order by t.language, t.gender desc", "t");
+		if (getSystemSetting("_dmmethod", "asp") == "asp") {
+			$voices = DBFindMany("Voice","from ttsvoice t join language l where l.name = t.language order by t.language, t.gender desc", "t");
+		} else {
+			// if flex customer, limit to English and Spanish
+			$voices = DBFindMany("Voice","from ttsvoice t join language l where l.name in ('English', 'Spanish') and l.name = t.language order by t.language, t.gender desc", "t");
+		}
 		$retval = array();
 		foreach ($voices as $voice) {
 			$retval[$voice->language.":".$voice->gender] = $voice;
@@ -25,7 +30,12 @@ class Voice extends DBMappedObject {
 
 	// return array of strings, all supported languages for tts, based on customer language table
 	static function getTTSLanguages() {
-		return QuickQueryList("select distinct t.language from ttsvoice t join language l where l.name = t.language order by t.language");
+		if (getSystemSetting("_dmmethod", "asp") == "asp") {
+			return QuickQueryList("select distinct t.language from ttsvoice t join language l where l.name = t.language order by t.language");
+		} else {
+			// if flex customer, limit to English and Spanish
+			return QuickQueryList("select distinct t.language from ttsvoice t join language l where l.name in ('English', 'Spanish') and l.name = t.language order by t.language");
+		}
 	}
 
 }
