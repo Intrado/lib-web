@@ -1,28 +1,17 @@
 <?php
-//include_once("inboundutils.inc.php");
+include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;
-
-function invalidgoodbye() {
-?>
-<voice>
-	<message name="welcome">
-    	<tts gender="female" language="english">I did not understand your response.  Goodbye.</tts>
-		<hangup />
-	</message>
-</voice>
-<?
-}
 
 function welcomemessage($hascallback, $hasphoneactivation) {
 ?>
 <voice>
 	<message name="welcome">
-		<tts gender="female" language="english">Welcome to the Schoolmessenger Phone Service.</tts>
+		<tts gender="female" language="english">Welcome to the School Messenger Phone Service.</tts>
 		<goto message="choose" />
 	</message>
 	<message name="choose">
-			<field name="redirect" type="menu" timeout="5000">
+			<field name="redirect" type="menu" timeout="10000">
 			<prompt repeat="2">
 <?				if ($hascallback) { ?>
 					<tts gender="female" language="english">To retrieve messages sent to you, press 1.</tts>

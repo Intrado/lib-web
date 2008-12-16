@@ -57,4 +57,15 @@ function makenumeric($input) {
 	return $numeric;
 }
 
+function invalidgoodbye() {
+?>
+<voice>
+	<message name="welcome">
+    	<tts gender="female" language="english">I did not understand your response.  Goodbye.</tts>
+		<hangup />
+	</message>
+</voice>
+<?
+}
+
 ?>

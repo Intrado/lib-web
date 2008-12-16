@@ -7,7 +7,7 @@ function enterstudentid($error, $studentids) {
 ?>
 <voice>
 	<message name="choosestudentid">
-			<field type="dtmf" name="studentid" timeout="5000">
+			<field type="dtmf" name="studentid" timeout="10000">
 			<prompt repeat="2">
 			    <tts gender="female" language="english">Please enter the numeric Student I. D. for one of your students, followed by the pound key.</tts>
 			</prompt>

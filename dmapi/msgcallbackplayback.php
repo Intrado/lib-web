@@ -18,7 +18,7 @@ function endoflist()
 ?>
 <voice>
 	<message name="endoflist">
-		<field name="doendoflist" type="menu" timeout="5000">
+		<field name="doendoflist" type="menu" timeout="10000">
 			<prompt repeat="2">
 				<tts gender="female">There are no more messages.  To listen to your messages from the beginning, press the pound key.  Otherwise, you may end the call by hanging up.  </tts>
 			</prompt>

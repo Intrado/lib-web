@@ -10,9 +10,9 @@ function entercallerid($attempt) {
 			<?if ($attempt > 0) { ?>
 					<tts gender="female" language="english">Invalid phone number. Phone number must be 10 digits including area code.</tts>
 			<?} ?>
-			<field name="phone" type="dtmf" timeout="5000" max="11">
+			<field name="phone" type="dtmf" timeout="10000" max="11">
 				<prompt repeat="2">
-				<tts gender="female" language="english">Please enter the phone number that recieved the call followed by the pound key.</tts>
+				<tts gender="female" language="english">Please enter the phone number that received the call followed by the pound key.</tts>
 				</prompt>
 				<timeout>
 					<tts gender="female" language="english">I was not able to understand your response. Goodbye.</tts>

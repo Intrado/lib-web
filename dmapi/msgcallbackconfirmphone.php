@@ -1,27 +1,17 @@
 <?
+include_once("inboundutils.inc.php");
 include_once("../obj/Phone.obj.php");
 
 global $BFXML_VARS;
-
-function invalidgoodbye2() {
-?>
-<voice>
-	<message name="welcome">
-    	<tts gender="female" language="english">I did not understand your response.  Goodbye.</tts>
-		<hangup />
-	</message>
-</voice>
-<?
-}
 
 function confirmcallerid($callerid) {
 ?>
 <voice>
 	<message name="choosecallerid">
-			<field name="callerid" type="menu" timeout="5000">
+			<field name="callerid" type="menu" timeout="10000">
 			<prompt repeat="2">
 			    <tts gender="female" language="english">It looks like you are calling from <? echo Phone::format($callerid) ?>. </tts>
-	    	    <tts gender="female" language="english">Press 1 if this is the number that recieved the call, otherwise Press 2.</tts>
+	    	    <tts gender="female" language="english">Press 1 if this is the number that received the call, otherwise press 2.</tts>
 			</prompt>
 			<choice digits="1" />
 			<choice digits="2" />
@@ -60,7 +50,7 @@ if ($REQUEST_TYPE == "new") {
 		} else if ($BFXML_VARS['callerid'] == 2) {
 			forwardToPage("msgcallbackenterphone.php");
 		} else {
-			invalidgoodbye2();
+			invalidgoodbye();
 		}
 	} else if (isset($_SESSION['callerid']) && $_SESSION['callerid'] != "Unknown") {
 		confirmcallerid($_SESSION['callerid']);
