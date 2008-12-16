@@ -1235,7 +1235,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Override Translation <?= help('Job_EditTranslation',NULL,"small"); ?>
 
 										<br /><br />
-										<a href="#" onclick="retranslation('<? echo $language?>');return false;">Retranslation</a>
+										<a href="#" onclick="submitRetranslation('<? echo $language?>');return false;">Retranslation</a>
 										<?= help('Job_Retranslation',NULL,"small"); ?> <br />
 										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3,"id='retranslationtext_$language' disabled"); ?>
 									</div>
@@ -2000,15 +2000,19 @@ function setTranslations (html, langstring) {
 			if (result[i].responseStatus == 200){	
 				var tr = new getObj('language_' + language).obj;
 				var trexpand = new getObj('translationtextexpand_' + language).obj;
+				var retranslation = new getObj('retranslationtext_' + language).obj;
+				retranslation.innerHTML = "";
 				tr.innerHTML = result[i].responseData.translatedText;
-				trexpand.innerHTML = result[i].responseData.translatedText;		
+				trexpand.value = result[i].responseData.translatedText;		
 			}
 		}
 	} else {
 		var tr = new getObj('language_' + trlanguages[0]).obj;
 		var trexpand = new getObj('translationtextexpand_' + trlanguages[0]).obj;
 		tr.innerHTML = result.translatedText;
-		trexpand.innerHTML = result.translatedText;			
+		trexpand.value = result.translatedText;	
+		var retranslation = new getObj('retranslationtext_' + trlanguages[0]).obj;
+		retranslation.innerHTML = "";		
 	}
 }
 	
@@ -2032,6 +2036,47 @@ function submitTranslations() {
 	ajax('translate.php',"english=" + encodeURIComponent(text) + "&languages=" + languages, setTranslations, languages);
 	return false;
 }
+
+function setRetranslation (html, language) {
+	response = JSON.parse(html, function (key, value) {	return value;}); //See documentation at http://www.json.org/js.html on how this function can be used
+	result = response.responseData;
+	if (response.responseStatus != 200){	
+		return;
+	}
+	
+	if(result instanceof Array) {
+		for ( i in result) {
+			if (result[i].responseStatus == 200){	
+				var retranslation = new getObj('retranslationtext_' + language).obj;
+				retranslation.value = result[i].responseData.translatedText;
+			}
+		}
+	} else {
+		var retranslation = new getObj('retranslationtext_' + language).obj;
+		retranslation.value = result.translatedText;		
+	}
+}
+
+function submitRetranslation(language) {
+	var text = new getObj('translationtextexpand_' + language).obj.value;
+	var retranslation = new getObj('retranslationtext_' + language).obj;
+	
+	if(text == "")
+		return;
+	
+	var serialized = [];
+	var trlanguages = [];
+	for (l in languagelist) {
+		if (isCheckboxChecked('translate_' + languagelist[l])){
+			serialized.push(encodeURIComponent(languagelist[l]));
+		}
+	}
+	
+	var languages = serialized.join(";");
+	ajax('translate.php',"text=" + encodeURIComponent(text) + "&language=" + language, setRetranslation, language);
+	return false;
+}
+
 
 function retranslation(language){
 	if(typeof(google) == "undefined" || typeof(google.language) == "undefined"){
