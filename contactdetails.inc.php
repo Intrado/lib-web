@@ -172,7 +172,7 @@ if(CheckFormSubmit($f,$s))
 	{
 		MergeSectionFormData($f, $s);
 
-		//do check
+		// trim or blank all fields
 		foreach($contacttypes as $type){
 			if(!isset($types[$type])) continue;
 			foreach($types[$type] as $item){
@@ -183,10 +183,11 @@ if(CheckFormSubmit($f,$s))
 					}
 					PutFormData($f, $s, $type . $item->sequence, "", $putformtype);
 				}
+				TrimFormData($f, $s, $type . $item->sequence);
 			}
 		}
 
-
+		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
@@ -200,7 +201,7 @@ if(CheckFormSubmit($f,$s))
 						$item->editlock = GetFormData($f, $s, "editlock_" . $type . $item->sequence);
 						if($item->editlock){
 							if($type == "email")
-								$item->$type = trim(GetFormData($f, $s, $type . $item->sequence));
+								$item->$type = GetFormData($f, $s, $type . $item->sequence);
 							else {
 								$p = GetFormData($f, $s, $type . $item->sequence);
 								if ($p != "" && $phoneerror = Phone::validate($p)) {
