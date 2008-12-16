@@ -115,7 +115,7 @@ if ($USER->authorize("startstats")) {
 					</tr>
 					<tr align="center" style="display: block;">
 						<td>
-							<?=button('Create New Job', NULL,"job.php?origin=start")?>
+							<?=button('Create New Job', NULL,"job.php?origin=start&id=new")?>
 						</td>
 					</tr>
 				<?
@@ -126,7 +126,7 @@ if ($USER->authorize("startstats")) {
 					</tr>
 					<tr align="center" style="display: block;">
 						<td>
-							<?=button('Create New List', NULL,"list.php?origin=start")?>
+							<?=button('Create New List', NULL,"list.php?origin=start&id=new")?>
 						</td>
 					</tr>
 					<tr>
