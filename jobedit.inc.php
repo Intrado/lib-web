@@ -57,11 +57,12 @@ $VALIDJOBTYPES = JobType::getUserJobTypes();
 $infojobtypes = DBFindMany("JobType", "from jobtype");
 
  //Get available languages
-$queryresult = Query("SELECT DISTINCT l.name FROM language l INNER JOIN ttsvoice t ON t.language = l.name and l.name <> 'english'");
+$ttslanguages = Voice::getTTSLanguages();
 $languagearray = array();
-while($row = DBGetRow($queryresult)){
-	$languagearray[htmlentities($row[0])] = NULL;
+foreach ($ttslanguages as $lang) {
+	$languagearray[htmlentities(ucfirst($lang))] = NULL;
 }
+unset($languagearray["English"]);
 
 //Get Selected languages
 if($jobid && $job->getSetting('translationmessage')){
