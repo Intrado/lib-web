@@ -1,4 +1,6 @@
 <?
+include_once("../obj/Phone.obj.php");
+
 global $BFXML_VARS;
 
 function invalidgoodbye2() {
@@ -18,10 +20,7 @@ function confirmcallerid($callerid) {
 	<message name="choosecallerid">
 			<field name="callerid" type="menu" timeout="5000">
 			<prompt repeat="2">
-			    <tts gender="female" language="english">It looks like you are calling from </tts>
-<?				for ($i=0; $i<strlen($callerid); $i++) { ?>
-		    	    <tts gender="female" language="english"><? echo $callerid[$i] ?></tts>
-<?			    } ?>
+			    <tts gender="female" language="english">It looks like you are calling from <? echo Phone::format($callerid) ?>. </tts>
 	    	    <tts gender="female" language="english">Press 1 if this is the number that recieved the call, otherwise Press 2.</tts>
 			</prompt>
 			<choice digits="1" />
