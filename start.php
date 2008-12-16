@@ -2,19 +2,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("obj/Job.obj.php");
-include_once("obj/JobType.obj.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/PeopleList.obj.php");
-include_once("obj/Message.obj.php");
-include_once("obj/AudioFile.obj.php");
-include_once("obj/FieldMap.obj.php");
-include_once("obj/SurveyQuestionnaire.obj.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("obj/Job.obj.php");
+require_once("obj/JobType.obj.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/text.inc.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/Message.obj.php");
+require_once("obj/AudioFile.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/SurveyQuestionnaire.obj.php");
 require_once("inc/formatters.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,6 +35,8 @@ if (isset($_GET['closewhatsnew'])) {
 	QuickUpdate("delete from usersetting where userid=$USER->id and name='whatsnewversion'");
 	QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'whatsnewversion', $CURRENTVERSION)");
 }
+
+$listsdata = DBFindMany("PeopleList"," from list where userid=$USER->id and deleted=0");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -89,17 +91,51 @@ if ($USER->authorize("startstats")) {
 <?				endWindow();
 			?><br></td></tr><?
 			}
-?>
-
-<?
 			if ($USER->authorize("starteasy")) {
 				$theme = getBrandTheme();
 			?><tr><td><?
-				startWindow('EasyCall ' . help('Start_EasyCall'),NULL);
-				?><div align="center" style="margin: 5px;"><img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);");"
-					onmouseover="this.src='img/themes/<?=$theme?>/b2_easycall2.gif'"
-					onmouseout="this.src='img/themes/<?=$theme?>/b1_easycall2.gif'">
-					</div><?
+				startWindow('Quick Start ' . help('Start_EasyCall'),NULL);
+				?>
+				<table border="0" cellpadding="3" cellspacing="0" width=100%>
+				<?			
+				if ($listsdata) {
+					?>
+					<tr>
+						<th align="left" class="bottomBorder">EasyCall:</th>
+					</tr>
+					<tr>
+						<td align="center" style="display: block;">
+							<img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);"
+							onmouseover="this.src='img/themes/<?=$theme?>/b2_easycall2.gif'"
+							onmouseout="this.src='img/themes/<?=$theme?>/b1_easycall2.gif'">
+						</td>
+					</tr>
+					<tr>
+						<th align="left" class="bottomBorder">Advanced Jobs:</th>
+					</tr>
+					<tr align="center" style="display: block;">
+						<td>
+							<?=button('Create New Job', NULL,"job.php?origin=start")?>
+						</td>
+					</tr>
+				<?
+				}
+				?>
+					<tr>
+						<th align="left" class="bottomBorder">New List:</th>
+					</tr>
+					<tr align="center" style="display: block;">
+						<td>
+							<?=button('Create New List', NULL,"list.php?origin=start")?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div style="font-size: x-small">Tip: Lists are reusable.</div>
+						</td>
+					</tr>
+				</table>
+				<?		
 				endWindow();
 			?><br></td></tr><?
 			}
