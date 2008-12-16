@@ -42,6 +42,9 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
+if (isset($_GET['origin'])) {
+	$_SESSION['origin'] = trim($_GET['origin']);
+}
 
 if (isset($_GET['deleterule'])) {
 	$ruleid = DBSafe($_GET['deleterule']);
@@ -130,7 +133,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 			$_SESSION['listid'] = $list->id;
 
 			if (CheckFormSubmit($f,'save')) {
-				redirect('lists.php');
+				if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
+					unset($_SESSION['origin']);
+					redirect('start.php');
+				} else {
+					unset($_SESSION['origin']);
+					redirect('lists.php');
+				}
 			} elseif (CheckFormSubmit($f,'preview')) {
 				redirect('showlist.php?id=' . $_SESSION['listid']);
 			} elseif (CheckFormSubmit($f,'search')) {
@@ -190,16 +199,53 @@ else
 	buttons(submit($f,'refresh','Refresh'),
 		submit($f,'search','Search &amp; Add') , submit($f, 'preview','Preview'),submit($f,'save','Done'));
 
-startWindow('List Information', 'padding: 3px;');
-print 'Name: ';
-NewFormItem($f,$s,"name","text", 20,50);
-print '&nbsp;&nbsp;Description: ';
-NewFormItem($f,$s,"description","text", 20,50);
-
-if ($list->id) {
-	$renderedlist->calcStats();
-	print("&nbsp;&nbsp; Total People in List: <b>$renderedlist->total</b>");
-}
+startWindow('List Information');
+?>
+<table border="0" cellpadding="3" cellspacing="0" width=100%>
+	<tr>
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Important Tips:</th>
+		<td class="bottomBorder" style="padding: 5px;" valign="bottom">
+			<img src="img/bug_important.gif" >
+			When creating a list, keep the name as generic as possible. 
+			Remember that lists can be used multiple times. 
+			There is no reason to have more than one list of any specific type.<br>
+			Example: A good list name of "All Students" can be used on any job where the desired recipients are all of your enrollment. 
+			You do not need more than one of this list.
+		</td>
+	</tr>
+	<tr>
+		<th align="right" valign="top" class="windowRowHeader">List Name:</th>
+		<td style="padding: 5px;" valign="bottom">
+			<?
+			NewFormItem($f,$s,"name","text", 20,50);
+			?>
+		</td>
+	</tr>
+	<tr>
+		<th align="right" valign="top" class="windowRowHeader">Description:</th>
+		<td style="padding: 5px;" valign="bottom">
+			<?
+			NewFormItem($f,$s,"description","text", 20,50);
+			?>
+		</td>
+	</tr>
+	<?
+	if ($list->id) {
+	?>
+	<tr>
+		<th align="right" valign="top" class="windowRowHeader">People in List:</th>
+		<td style="padding: 5px;" valign="bottom">
+			<?
+			$renderedlist->calcStats();
+			print("<b>$renderedlist->total</b>");
+			?>
+		</td>
+	</tr>
+	<?
+	}
+	?>
+</table>
+<?
 endWindow();
 
 print '<br>';
