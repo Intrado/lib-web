@@ -37,7 +37,7 @@ class Phone extends DBMappedObject {
 			$min = 10;
 			$max = 10;
 		}
-		return validate($phone, $min, $max);
+		return Phone::validate($phone, $min, $max);
 	}
 
 	static function validate ($phone, $min=10, $max=10) {
