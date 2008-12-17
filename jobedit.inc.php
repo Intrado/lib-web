@@ -2028,7 +2028,6 @@ function setTranslations (html, langstring) {
 	
 function submitTranslations() {
 	if(translationstate){
-		alert("no need for tranlation");
 		return; //There are no changes to the text or a new language has not been added
 	}
 	var help = new getObj('refreshhelp').obj;
@@ -2101,7 +2100,6 @@ function sendjobconfirm() {
 	status.innerHTML = "Generating Translations<br /><img src=\"img/progressbar.gif?date=" + <?= time() ?> + "\">";
 	scroll(0,0);
 	submitTranslations();
-	//submitForm(formname,section);	
 }
 </script>
 
