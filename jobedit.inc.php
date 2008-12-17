@@ -2003,14 +2003,14 @@ function setTranslations (html, langstring) {
 				var retranslation = new getObj('retranslationtext_' + language).obj;
 				retranslation.innerHTML = "";
 				tr.innerHTML = result[i].responseData.translatedText;
-				trexpand.value = tr.innerHTML;		
+				trexpand.value = result[i].responseData.translatedText;//tr.innerHTML;		
 			}
 		}
 	} else {
 		var tr = new getObj('language_' + trlanguages[0]).obj;
 		var trexpand = new getObj('translationtextexpand_' + trlanguages[0]).obj;
 		tr.innerHTML = result.translatedText;
-		trexpand.value = tr.innerHTML;	
+		trexpand.value = result.translatedText;//tr.innerHTML;	
 		var retranslation = new getObj('retranslationtext_' + trlanguages[0]).obj;
 		retranslation.innerHTML = "";		
 	}
@@ -2077,34 +2077,6 @@ function submitRetranslation(language) {
 	return false;
 }
 
-
-function retranslation(language){
-	if(typeof(google) == "undefined" || typeof(google.language) == "undefined"){
-		return;
-	}
-	var lngCode = google.language.Languages[language.toUpperCase()];
-	var trexpand = new getObj('translationtextexpand_' + language).obj.value;
-	var retranslation = new getObj('retranslationtext_' + language).obj;
-
-	if(lngCode && trexpand){
-		google.language.translate(trexpand,lngCode,"en", function(result) {
-
-  		if (result.translation) {
-  			var str = result.translation.replace('>', '&gt;').replace('<', '&lt;');
-  			retranslation.innerHTML = str;
-  		} else {
-  			retranslation.innerHTML = "Retranslation Unavailable";
-   		}
-
-	} );
-	} else {
-		retranslation.innerHTML = "Retranslation Unavailable";
-	}
-}
-function translationerror(language) {
-		//var x = new getObj('translationwarning');
-		//x.obj.innerHTML = "Unavailable. to translate into " + language + ". Replacing translation with English text.";
-}
 </script>
 
 <? } // End of Translation - This block will be removed if it is a repeating job or sendmulti is not enabled   ?>
