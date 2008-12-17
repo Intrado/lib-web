@@ -1217,7 +1217,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?
 						foreach($languagearray as $language => $joblanguageobject) {
 							$languageisset = $joblanguageobject?1:($jobid?0:1);
-							$playaction = "previewlanguage('$language'," . (isset($voicearray["female"][$language])?"'true'":"'false'") . "," . (isset($voicearray["male"][$language])?"'true'":"'false'") . ")"
+							$playaction = "previewlanguage('$language'," . (isset($voicearray["female"][strtolower($language)])?"true":"false") . "," . (isset($voicearray["male"][strtolower($language)])?"true":"false") . ")"
 ?>
 							<tr>
 								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
@@ -1802,7 +1802,7 @@ function previewlanguage(language,female,male) {
 	var voice = 'default';
 	if(isCheckboxChecked('male_voice') && male) {
 		voice = 'male';
-	} else if(isCheckboxChecked('female_voice') && female) {
+	} else if(female) {
 		voice = 'female';
 	}
 	var text;
