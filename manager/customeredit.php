@@ -328,7 +328,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', true, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hascallback", getCustomerSystemSetting('_hascallback', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 150, 900);
 
