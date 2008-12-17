@@ -62,7 +62,17 @@
     		error_log("Unable to read from $url");
    			return; 		
        	}    	
-       	echo $response;
+		$decoded = json_decode($response);
+       	if($decoded->responseStatus == 200) {
+			if(is_array($decoded->responseData)){
+				foreach($decoded->responseData as $obj){
+					$obj->responseData->translatedText = html_entity_decode($obj->responseData->translatedText,ENT_QUOTES,"UTF-8");
+				}
+			} else {
+				$decoded->responseData->translatedText = html_entity_decode($decoded->responseData->translatedText,ENT_QUOTES,"UTF-8");
+			}
+       	}
+       	echo json_encode($decoded);
     }
     
 ?>
