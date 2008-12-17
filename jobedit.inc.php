@@ -2003,14 +2003,14 @@ function setTranslations (html, langstring) {
 				var retranslation = new getObj('retranslationtext_' + language).obj;
 				retranslation.innerHTML = "";
 				tr.innerHTML = result[i].responseData.translatedText;
-				trexpand.value = result[i].responseData.translatedText;		
+				trexpand.value = tr.innerHTML;		
 			}
 		}
 	} else {
 		var tr = new getObj('language_' + trlanguages[0]).obj;
 		var trexpand = new getObj('translationtextexpand_' + trlanguages[0]).obj;
 		tr.innerHTML = result.translatedText;
-		trexpand.value = result.translatedText;	
+		trexpand.value = tr.innerHTML;	
 		var retranslation = new getObj('retranslationtext_' + trlanguages[0]).obj;
 		retranslation.innerHTML = "";		
 	}
@@ -2028,7 +2028,17 @@ function submitTranslations() {
 	var trlanguages = [];
 	for (l in languagelist) {
 		if (isCheckboxChecked('translate_' + languagelist[l])){
-			serialized.push(encodeURIComponent(languagelist[l]));
+			if(isCheckboxChecked('tr_edit_' + languagelist[l])) {
+				var tr = new getObj('language_' + languagelist[l]).obj;
+				var trexpand = new getObj('translationtextexpand_' + languagelist[l]).obj;
+				if(trexpand.value != "") {
+	  				tr.innerHTML = trexpand.value;
+				} else {
+					tr.innerHTML = "&nbsp;" <? //May want to warn about this ?>
+				}
+			} else {
+				serialized.push(encodeURIComponent(languagelist[l]));
+			}
 		}
 	}
 	
