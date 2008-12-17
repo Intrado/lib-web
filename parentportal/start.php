@@ -39,10 +39,14 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 		and j.questionnaireid is null
 		group by j.id, rp.personid
 		order by j.startdate desc, j.starttime, j.id desc");
-	while($row = DBGetRow($result)){
-		array_splice($row, 0, 0, $contactCount[$row[6]]);
-		$allData[$row[7]][] = $row;
-		$contactCount[$row[7]]++;
+	while ($row = DBGetRow($result)) {
+		// TODO performance issue
+		$expire = QuickQuery("select value from jobsetting where jobid=$row[0] and name='translationexpire'");
+		if ($expire == "" || strtotime($expire) > strtotime(date("Y-m-d"))) {
+			array_splice($row, 0, 0, $contactCount[$row[6]]);
+			$allData[$row[7]][] = $row;
+			$contactCount[$row[7]]++;
+		}
 	}
 	$titles = array("0" => "##",
 					"2" => "Date",

@@ -64,26 +64,44 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Contact Activation";
+$TITLE = "Contact Activation - Step 2";
 
 include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, 'Next'), button("Cancel", NULL, "addcontact3.php"));
 
 
-startWindow('Activation Method');
+startWindow('Add Contact');
 ?>
 <table>
 	<tr>
 		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "havenone", ""); ?> I am finished adding contacts.
+		You may add one or more people to your account with a single phone call to our toll free number.
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "havemore", ""); ?> I want to add another Contact Identification Number:
+		After you enter all of your ID Numbers, you will be given instructions for how to use the automated phone confirmation service.<br>
+		<br>
+		The people with the following ID Numbers will be added once the phone confirmation is complete.
 		</td>
-		<td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
+	</tr>
+<?	foreach ($_SESSION['phoneactivationpkeylist'] as $pkey) { ?>
+		<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
+<?	} ?>
+	<tr><td class="bottomBorder">&nbsp;</td></tr>
+
+	<tr><td>Do you have another ID Number to enter now?</td></tr>
+	<tr>
+		<td>
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "havemore", "onclick=\"document.getElementById('pkeybox').disabled=false\""); ?> Yes, add another ID Number:
+			<? NewFormItem($f, $s, "pkey", "text", "20", "255", "id=\"pkeybox\" disabled=false"); ?>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "havenone", "onclick=\"document.getElementById('pkeybox').disabled=true\""); ?> No, I am ready for the confirmation step.
+		</td>
 	</tr>
 </table>
 <?

@@ -83,53 +83,85 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Phone Selection";
+$TITLE = "Contact Activation - Step 3";
 
 include_once("nav.inc.php");
 NewForm($f);
 buttons(button("Done", NULL, "addcontact3.php"));
 
 
-startWindow('Phone');
+startWindow('Phone Confirmation');
 ?>
-<table>
+<table border="0" cellpadding="3" cellspacing="0" width="100%">
 
+<?	// OK section
+	if (count($phones) > 0 && count($pkeyok) > 0) { ?>
+	<tr>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Add People:</th>
+		<td>
+			<table>
+			<tr>
+				<td>The people with the following ID Numbers will be added:</td>
+			</tr>
+<?			foreach ($pkeyok as $pkey) { ?>
+				<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
+<?			} ?>
+			</table>
+		</td>
+	</tr>
+<?	} ?>
+
+
+
+<?	// Warning section
+	if ((count($pkeynotfound) > 0) ||
+		(count($pkeynotallow) > 0) ||
+		(count($pkeynophone) > 0)) { ?>
+	<tr>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Skip People:</th>
+		<td>
+		<table>
 <?	if (count($pkeynotfound) > 0) { ?>
 		<tr>
-			<td>The following contacts were not found in the system:</td>
+			<td>The people with the following ID Numbers were not found in the system:</td>
 		</tr>
 <?		foreach ($pkeynotfound as $pkey) { ?>
-			<tr><td><?=escapehtml($pkey) ?></td></tr>
+			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
 <?		} ?>
 <?	} ?>
 
 <?	if (count($pkeynotallow) > 0) { ?>
 		<tr>
-			<td>The following contacts do not allow phone activation:</td>
+			<td>The people with the following ID Numbers do not allow phone activation:</td>
 		</tr>
 <?		foreach ($pkeynotallow as $pkey) { ?>
-			<tr><td><?=escapehtml($pkey) ?></td></tr>
+			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
 <?		} ?>
 <?	} ?>
 
 <?	if (count($pkeynophone) > 0) { ?>
 		<tr>
-			<td>The following contacts have no phone information in the system:</td>
+			<td>The people with the following ID Numbers have no phone information in the system:</td>
 		</tr>
 <?		foreach ($pkeynophone as $pkey) { ?>
-			<tr><td><?=escapehtml($pkey) ?></td></tr>
+			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
 <?		} ?>
 <?	} ?>
 
-<?	if (count($phones) > 0 && count($pkeyok) > 0) { ?>
+		</table>
+		</td>
+	</tr>
+<?	} ?>
+
+
+<?	// Steps to proceed section
+	if (count($phones) > 0 && count($pkeyok) > 0) { ?>
+	<tr>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Confirm:</th>
+		<td>
+		<table>
 		<tr>
-			<td>The following contacts will be added:</td>
-		</tr>
-<?		foreach ($pkeyok as $pkey) { ?>
-			<tr><td><?=escapehtml($pkey) ?></td></tr>
-<?		} ?>
-		<tr>
-			<td>You must follow these steps to complete the activation of these contacts by phone.</td>
+			<td>You must follow these steps to confirm adding these people to your account.<BR><BR></td>
 		</tr>
 		<tr>
 			<td>Step 1. Call <?echo Phone::format($INBOUND_ACTIVATION) ?> from one of the following phones.</td>
@@ -146,20 +178,42 @@ startWindow('Phone');
 			<td>Step 2. When prompted, select option 2 to activate contacts.</td>
 		</tr>
 		<tr>
-			<td>Step 3. When prompted, enter this code  <?=escapehtml($code) ?></td>
+			<td>Step 3. When prompted, enter this code  <span style="font-weight:bold; font-size: 140%;"><?=escapehtml($code) ?></span></td>
 		</tr>
 		<tr>
-			<td>Step 4. When the call is completed, return to the Contacts page to view and edit your preferences.</td>
+			<td>Step 4. When the call is completed, click the 'Contacts' tab above to view and edit your notification preferences.</td>
 		</tr>
+		</table>
+		</td>
+	</tr>
 
-<?	} else { ?>
+<?	// else no matching phones on record
+	} else { ?>
+	<tr>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">No Match:</th>
+		<td>
+		<table>
 		<tr>
-			<td>There are no contacts available for phone activation.  They do not share a common number, you may try to enter one contact at a time, or please contact support.</td>
+			<td>Sorry, there are no people available for phone confirmation with the following ID Numbers:</td>
 		</tr>
 <?		foreach ($pkeyok as $pkey) { ?>
-			<tr><td><?=escapehtml($pkey) ?></td></tr>
+			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
 <?		} ?>
-
+		<tr>
+			<td><BR>All people being added must share a common phone number in the system database.</td>
+		</tr>
+		<tr>
+			<td>This phone must be used to call the toll free service used by the confirmation process.</td>
+		</tr>
+		<tr>
+			<td><BR>You may try again by entering a single ID Number.</td>
+		</tr>
+		<tr>
+			<td>Or, please contact your system administrator at <?=escapehtml($_SESSION['custname']);?>.  Thank you.</td>
+		</tr>
+		</table>
+		</td>
+	</tr>
 <?	} ?>
 
 </table>

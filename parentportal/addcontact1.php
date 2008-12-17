@@ -93,7 +93,7 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Contact Activation";
+$TITLE = "Contact Activation - Step 1";
 
 include_once("nav.inc.php");
 NewForm($f);
@@ -104,20 +104,20 @@ startWindow('Activation Method');
 ?>
 <table>
 	<tr>
-		<td>Contact Identification Number:</td><td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
+		<td>ID Number of the person to add:</td><td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
 	</tr>
 <?	if ($INBOUND_ACTIVATION) { ?>
 	<tr>
 		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "bycode", ""); ?> I have an Activation Code:
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "bycode", "onclick=\"document.getElementById('codebox').disabled=false\""); ?> I have an Activation Code to enter now:
 		</td>
 
-		<td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
+		<td><? NewFormItem($f, $s, "code", "text", "10", null, "id=\"codebox\"") ?></td>
 
 	</tr>
 	<tr>
 		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "byphone", ""); ?> I need an Activation Code by phone.
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "byphone", "onclick=\"document.getElementById('codebox').disabled=true\""); ?> I do not have an Activation Code and want to activate by phone.
 		</td>
 	</tr>
 <?	} else { ?>
