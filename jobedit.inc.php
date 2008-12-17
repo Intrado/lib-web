@@ -883,14 +883,16 @@ if (isset($job))
 	$DESCRIPTION = "Job status: " . fmt_status($job, NULL);
 
 include_once("nav.inc.php");
-
+?>
+<div id="translationstatus" align="center" style="display: none;font-size: 14px;font-weight: bold;"></div>
+<?
 NewForm($f);
 
 if ($JOBTYPE == "normal") {
 	if ($submittedmode)
 	buttons(submit($f, $s, 'Save'));
 	else
-	buttons(submit($f, $s, 'Save For Later'),submit($f, 'send','Proceed To Confirmation'));
+	buttons(submit($f, $s, 'Save For Later'),button('Proceed To Confirmation',($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"sendjobconfirm();":"submitForm('$f','send');"));
 } else {
 	buttons(submit($f, $s, 'Save'));
 }
@@ -1183,7 +1185,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<br />
 					<table>
 						<tr>
-							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea' " . ($submittedmode ? "DISABLED" : "")); ?></td>
+							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea' onkeyup=\"translationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
 							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
 						</tr>
 					</table>
@@ -1476,6 +1478,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 </table>
 
 <script language="javascript">
+	var submitstate = false;
+	var translationstate = false;
 	var displaysettingsdetailsstate = 'visible';
 	<? if ($hassettingsdetailerror) { ?>
 		displaysettingsdetailsstate = 'hidden';
@@ -1933,6 +1937,7 @@ function translationlanguage(language){
 		x.obj.checked = false;
 	}
 	if (isCheckboxChecked('translate_' + language)){
+		translationstate = false; // To make enable the refresh button
 		setChecked('translatecheck');
 		show('language_' + language);
 		show('translationdetails_' + language);
@@ -2003,7 +2008,8 @@ function setTranslations (html, langstring) {
 				var retranslation = new getObj('retranslationtext_' + language).obj;
 				retranslation.innerHTML = "";
 				tr.innerHTML = result[i].responseData.translatedText;
-				trexpand.value = result[i].responseData.translatedText;//tr.innerHTML;		
+				trexpand.value = result[i].responseData.translatedText;
+				translationstate = true;
 			}
 		}
 	} else {
@@ -2012,11 +2018,19 @@ function setTranslations (html, langstring) {
 		tr.innerHTML = result.translatedText;
 		trexpand.value = result.translatedText;//tr.innerHTML;	
 		var retranslation = new getObj('retranslationtext_' + trlanguages[0]).obj;
-		retranslation.innerHTML = "";		
+		retranslation.innerHTML = "";
+		translationstate = true;
 	}
+	if(submitstate && translationstate) {
+		submitForm('<? echo $f; ?>','send');
+	}		
 }
 	
 function submitTranslations() {
+	if(translationstate){
+		alert("no need for tranlation");
+		return; //There are no changes to the text or a new language has not been added
+	}
 	var help = new getObj('refreshhelp').obj;
 	help.innerHTML = "";
 	
@@ -2076,7 +2090,19 @@ function submitRetranslation(language) {
 	ajax('translate.php',"text=" + encodeURIComponent(text) + "&language=" + language, setRetranslation, language);
 	return false;
 }
-
+function sendjobconfirm() {
+	if(translationstate) {
+		submitForm('<? echo $f; ?>','send');
+		return;
+	}	
+	submitstate = true;
+	var status = new getObj('translationstatus').obj;
+	show('translationstatus');
+	status.innerHTML = "Generating Translations<br /><img src=\"img/progressbar.gif?date=" + <?= time() ?> + "\">";
+	scroll(0,0);
+	submitTranslations();
+	//submitForm(formname,section);	
+}
 </script>
 
 <? } // End of Translation - This block will be removed if it is a repeating job or sendmulti is not enabled   ?>
