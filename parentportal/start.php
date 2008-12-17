@@ -30,6 +30,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 
 	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.emailmessageid
 		from job j
+		left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
 		left join reportperson rp on (rp.jobid = j.id)
 		inner join user u on (u.id = j.userid)
 		where
@@ -37,16 +38,13 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 		and rp.personid in ('" . $contactListString . "')
 		and j.status in ('active', 'complete')
 		and j.questionnaireid is null
+		and (js.value is null or js.value >= date_sub(curdate(),interval 15 day))
 		group by j.id, rp.personid
 		order by j.startdate desc, j.starttime, j.id desc");
 	while ($row = DBGetRow($result)) {
-		// TODO performance issue
-		$expire = QuickQuery("select value from jobsetting where jobid=$row[0] and name='translationexpire'");
-		if ($expire == "" || strtotime($expire) > strtotime(date("Y-m-d"))) {
 			array_splice($row, 0, 0, $contactCount[$row[6]]);
 			$allData[$row[7]][] = $row;
 			$contactCount[$row[7]]++;
-		}
 	}
 	$titles = array("0" => "##",
 					"2" => "Date",
