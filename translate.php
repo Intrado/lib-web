@@ -11,10 +11,15 @@
     }
     
     if(isset($_POST['english']) && isset($_POST['languages'])) {
-	    $languagearray = explode(";",$_POST['languages']);
-	    
-		$src_text = $_POST['english'];
-		
+    	$languages = $_POST['languages'];
+    	$src_text = $_POST['english'];
+    	if(get_magic_quotes_gpc()) {
+    		$languages = stripslashes($_POST['languages']);
+    		$src_text = stripslashes($_POST['english']);	
+    	}
+    	
+	    $languagearray = explode(";",$languages);
+	    		
 		$destinationlanguages = array();
 		foreach($languagearray as $language) {
 				$destinationlanguages[] = $language; 
@@ -30,14 +35,21 @@
 		$text = "&q=".urlencode($src_text);
 		
     } elseif(isset($_POST['text']) && isset($_POST['language'])){
-    	$language = strtolower($_POST['language']);
+        $language = $_POST['language'];
+    	$text = $_POST['text'];
+    	if(get_magic_quotes_gpc()) {
+    		$language = stripslashes($_POST['language']);
+    		$text = stripslashes($_POST['text']);	
+    	}
+    	
+    	
+    	$language = strtolower($language);
     	if(array_key_exists($language,$supportedlanguages)) {
-    		$text = "&q=" . urlencode($_POST['text']);
+    		$text = "&q=" . urlencode($text);
     		$lang_pairs = "&langpair=" . urlencode($supportedlanguages[$language] . "|en");
 		}
     }
     if($text != "" && $lang_pairs != "") {
-	
     	$context_options = array ('http' => array ('method' => 'POST','header'=> "Referer: $referer",'content' => $text . $lang_pairs));
 		$context = stream_context_create($context_options);
     	$fp = @fopen($url, 'rb', false, $context);
@@ -51,16 +63,6 @@
    			return; 		
        	}    	
        	echo $response;
-    	/*
-    	$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_REFERER, $referer);   
-		$body = curl_exec($ch);
-		curl_close($ch);
-	
-		echo $body;
-		*/
     }
     
 ?>
