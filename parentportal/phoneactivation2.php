@@ -132,7 +132,7 @@ startWindow('Phone Confirmation');
 
 <?	if (count($pkeynotallow) > 0) { ?>
 		<tr>
-			<td>The people with the following ID Numbers do not allow phone activation:</td>
+			<td>The people with the following ID Numbers do not allow phone confirmation:</td>
 		</tr>
 <?		foreach ($pkeynotallow as $pkey) { ?>
 			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
@@ -194,7 +194,7 @@ startWindow('Phone Confirmation');
 		<td>
 		<table>
 		<tr>
-			<td>Sorry, there are no people available for phone confirmation with the following ID Numbers:</td>
+			<td>Sorry, there are no people available for phone confirmation.</td>
 		</tr>
 <?		foreach ($pkeyok as $pkey) { ?>
 			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
