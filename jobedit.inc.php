@@ -2043,18 +2043,8 @@ function setRetranslation (html, language) {
 	if (response.responseStatus != 200){	
 		return;
 	}
-	
-	if(result instanceof Array) {
-		for ( i in result) {
-			if (result[i].responseStatus == 200){	
-				var retranslation = new getObj('retranslationtext_' + language).obj;
-				retranslation.value = result[i].responseData.translatedText;
-			}
-		}
-	} else {
-		var retranslation = new getObj('retranslationtext_' + language).obj;
-		retranslation.value = result.translatedText;		
-	}
+	var retranslation = new getObj('retranslationtext_' + language).obj;
+	retranslation.innerHTML = result.translatedText;
 }
 
 function submitRetranslation(language) {
