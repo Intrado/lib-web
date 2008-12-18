@@ -606,15 +606,17 @@ if( $reloadform )
 	if (count($selectedlists) > 0)
 		$selectedlistnames = QuickQueryList("select name from list where id in (".implode(",", $selectedlists).")");
 
-	PutFormData($f,$s,"voiceselect",1); //TODO pull info on female and male voice
-
+	PutFormData($f,$s,"voiceselect","female");
 	PutFormData($f,$s,"phonetextarea","","text");
 	if($job->getSetting('translationmessage')) {
 		PutFormData($f,$s,"messageselect","create");
 		if($phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'")) {
-			$parts = DBFindMany("MessagePart","from messagepart where messageid=$phonemessage->id order by sequence");
-			$body = $phonemessage->format($parts);
-			PutFormData($f,$s,"phonetextarea",$body,'text');
+			$part = DBFind("MessagePart","from messagepart where messageid=$phonemessage->id and sequence=0");
+			//$body = $phonemessage->format($parts);
+			PutFormData($f,$s,"phonetextarea",$part->txt,'text');
+			
+			if($part->voiceid == $voicearray['male']['english'])
+				PutFormData($f,$s,"voiceselect","male");			
 		}
 	} else {
 		PutFormData($f,$s,"messageselect","select");
