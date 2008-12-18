@@ -1987,6 +1987,7 @@ function editlanguage(language) {
 		show('lock_' + language);
 	} else {
 		hide('lock_' + language);
+		translationstate = false; <? // Enable update translations  ?>
 	}
 }
 
