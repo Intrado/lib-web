@@ -1817,6 +1817,17 @@ function previewlanguage(language,female,male) {
 
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
+
+//Loading Message View
+if(isCheckboxChecked('radio_select')) {
+	hide('newphonetext');
+	show('selectphonemessage');
+	show('multilingualphoneoption');
+} else {
+	show('newphonetext');
+	hide('selectphonemessage');
+	hide('multilingualphoneoption');
+}
 </script>
 
 <? // These scripts contol the translation ?>
@@ -1831,17 +1842,8 @@ var languagelist=new Array(<? echo $languagestring; ?>);
 var googleready = false;
 var cancelgoogle = false;
 
-// Loading Message View
-if(isCheckboxChecked('radio_select')) {
-	hide('newphonetext');
-	show('selectphonemessage');
-	show('multilingualphoneoption');
-} else {
-	show('newphonetext');
-	hide('selectphonemessage');
-	hide('multilingualphoneoption');
-	
-	// Loading the translation setup
+// Loading the translation setup
+if(isCheckboxChecked('radio_create')) {
 	var checked = false;
 	show('translationdetails');
 	for (i = 0; i < languagelist.length; i++) {
