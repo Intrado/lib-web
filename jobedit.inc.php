@@ -166,6 +166,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			$hassettingsdetailerror = true;
 			error('The end time has already passed. Please correct this problem before proceeding');
+		} else if ($JOBTYPE == "normal" && GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "messageselect") == "create" && (strtotime(GetFormData($f,$s,"startdate"))-(7*86400) > strtotime("today")) && !$completedmode) {
+			$hassettingsdetailerror = true;
+			error('The start date must be within 7 days when creating a text-to-speach message');
 		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . $name . '\' already exists');
 		} else if ($callerid != "" && strlen($callerid) != 10) {
