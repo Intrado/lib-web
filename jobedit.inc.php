@@ -65,7 +65,7 @@ foreach ($ttslanguages as $lang) {
 unset($languagearray["English"]);
 
 //Get Selected languages
-if($jobid && $job->getSetting('translationmessage')){
+if($jobid && $job->getSetting('translationphonemessage')){
 	$translationjoblanguage = DBFindMany('JobLanguage', "FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1","j");
 	foreach ($translationjoblanguage as $obj) {
 		$languagearray[htmlentities($obj->language)] = $obj;
@@ -199,7 +199,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "messageselect") == "create"){
 					$themessageid = null;
 					// If this Message was created in job editor we are free to edit the message, otherwise we have to create a new message
-					if($job->getSetting('translationmessage')) {
+					if($job->getSetting('translationphonemessage')) {
 						if( $job->phonemessageid ) {
 							$themessageid = $job->phonemessageid;
 							//Delete the part(s) of the message
@@ -209,7 +209,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						if($job->id)
 							QuickUpdate("delete from joblanguage where jobid=" . $job->id);  // If translation mode switched we need to rease the previous joblanguage assosiations
 					}
-					$job->setSetting('translationmessage', 1); // Tell the job that this message was created here
+					$job->setSetting('translationphonemessage', 1); // Tell the job that this message was created here
 					$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
 					$newphonemessage = new Message($themessageid);
 					$newphonemessage->userid = $USER->id;
@@ -229,7 +229,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');
 				} else {
-					if($job->getSetting('translationmessage') && $job->id) {
+					if($job->getSetting('translationphonemessage') && $job->id) {
 						QuickUpdate("delete joblanguage jl, message ms, messagepart mp
 											FROM joblanguage jl, message ms, messagepart mp
 											where
@@ -244,7 +244,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 											 mp.messageid = ms.id");
 						}
 					}
-					$job->setSetting('translationmessage', 0);
+					$job->setSetting('translationphonemessage', 0);
 				}
 
 
@@ -432,7 +432,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			//now add any language options
 			$addlang = false;
-			if ($job->getSetting('translationmessage') ) {
+			if ($job->getSetting('translationphonemessage') ) {
 				foreach($languagearray as $language => $joblanguageobject) {
 					$messageid = $joblanguageobject?($joblanguageobject->messageid):NULL;
 					if(GetFormData($f, $s, "translate_$language")){
@@ -611,7 +611,7 @@ if( $reloadform )
 
 	PutFormData($f,$s,"voiceselect","female");
 	PutFormData($f,$s,"phonetextarea","","text");
-	if($job->getSetting('translationmessage')) {
+	if($job->getSetting('translationphonemessage')) {
 		PutFormData($f,$s,"messageselect","create");
 		if($phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'")) {
 			$part = DBFind("MessagePart","from messagepart where messageid=$phonemessage->id and sequence=0");
@@ -815,7 +815,7 @@ function language_select($form, $section, $name, $skipusedtype) {
 	NewFormItem($form, $section, $name, 'selectstart', NULL, NULL, ($submittedmode ? "DISABLED" : ""));
 	NewFormItem($form, $section, $name, 'selectoption'," -- Select a Language -- ","");
 	foreach ($languages as $language) {
-		if($job && !$job->getSetting('translationmessage')) {
+		if($job && !$job->getSetting('translationphonemessage')) {
 			$used = false;
 			foreach ($joblangs[$skipusedtype] as $joblang) {
 				if ($joblang->language == $language->name) {
@@ -843,7 +843,7 @@ function alternate($type) {
 		<th>&nbsp;</th>
 	</tr>
 	<?
-	if ($job && !$job->getSetting('translationmessage')){
+	if ($job && !$job->getSetting('translationphonemessage')){
 		$id = $type . 'messageid';
 		//just show the selected options? allowing to edit could cause the page to become slow
 		//with many languages/messages
