@@ -5,7 +5,6 @@ include_once("inboundutils.inc.php");
 
 include_once("../obj/Message.obj.php");
 include_once("../obj/MessagePart.obj.php");
-include_once("../obj/Person.obj.php");
 include_once("../obj/Voice.obj.php");
 include_once("../obj/AudioFile.obj.php");
 include_once("../obj/VoiceReply.obj.php");
@@ -47,12 +46,7 @@ function endoflist()
 function renderMessageParts($playback) {
 	$customerid = $_SESSION['customerid'];
 	$msgid = $playback['messageid'];
-	$person = $playback['person'];
-	$fields = array();
-	for ($i=1; $i<=20; $i++) {
-		$fieldnum = sprintf("f%02d", $i);
-		$fields[$fieldnum] = $person->$fieldnum;
-	}
+	$fields = $playback['personfields'];
 
 	$renderedparts = Message::renderMessageParts($msgid, $fields);
 	$voices = DBFindMany("Voice","from ttsvoice");
@@ -76,7 +70,7 @@ function renderMessageParts($playback) {
 
 function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	$messageparts = $playback['messageparts'];
-	$person = $playback['person'];
+	$fields = $playback['personfields'];
 ?>
 <voice>
 	<message name="playback">
@@ -94,14 +88,12 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 
 				<? if ($messagetotal == 1) {?>
 					<tts gender="female">Message for</tts>
-					<tts gender="female"><?=escapehtml($person->f01)?></tts>
-					<tts gender="female"><?=escapehtml($person->f02);?></tts>
 				<?} else {?>
 					<tts gender="female">Message</tts>
 					<tts gender="female"><?echo($messageindex +1)?> of <?echo $messagetotal?>, for -- </tts>
-					<tts gender="female"><?=escapehtml($person->f01)?></tts>
-					<tts gender="female"><?=escapehtml($person->f02);?></tts>
 				<?}?>
+				<tts gender="female"><?=escapehtml($fields['f01'])?></tts>
+				<tts gender="female"><?=escapehtml($fields['f02'])?></tts>
 
 				<?renderMessageParts($playback);?>
 
@@ -194,10 +186,10 @@ if($REQUEST_TYPE == "new"){
 		if (isset($BFXML_VARS['voicereply'])) {
 			//error_log("voicereply cmid=".$BFXML_VARS['voicereply']);
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
-			$person = $playback['person'];
+			$personid = $playback['personid'];
 
 			$vr = new VoiceReply();
-			$vr->personid = $person->id;
+			$vr->personid = $personid;
 			$vr->jobid = $playback['jobid'];
 			$vr->sequence = $playback['sequence'];
 			$vr->userid = $playback['userid'];
@@ -213,9 +205,9 @@ if($REQUEST_TYPE == "new"){
 		if (isset($BFXML_VARS['messageconfirm'])) {
 			//error_log("messageconfirm ".$BFXML_VARS['messageconfirm']);
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
-			$person = $playback['person'];
+			$personid = $playback['personid'];
 
-			$query = "update reportcontact set participated=1, response=".$BFXML_VARS['messageconfirm']." where jobid=".$playback['jobid']." and personid=".$person->id." and type='phone' and sequence=".$playback['sequence'];
+			$query = "update reportcontact set participated=1, response=".$BFXML_VARS['messageconfirm']." where jobid=".$playback['jobid']." and personid=".$personid." and type='phone' and sequence=".$playback['sequence'];
 			QuickUpdate($query);
 		}
 
