@@ -612,9 +612,7 @@ if( $reloadform )
 		PutFormData($f,$s,"messageselect","create");
 		if($phonemessage = DBFind("Message","from message where id='$job->phonemessageid' and deleted=1 and type='phone'")) {
 			$part = DBFind("MessagePart","from messagepart where messageid=$phonemessage->id and sequence=0");
-			//$body = $phonemessage->format($parts);
 			PutFormData($f,$s,"phonetextarea",$part->txt,'text');
-			
 			if($part->voiceid == $voicearray['male']['english'])
 				PutFormData($f,$s,"voiceselect","male");			
 		}
@@ -2023,11 +2021,16 @@ function setTranslations (html, langstring) {
 		var trexpand = new getObj('translationtextexpand_' + trlanguages[0]).obj;
 		tr.innerHTML = result.translatedText;
 		trexpand.value = result.translatedText;//tr.innerHTML;	
+		
 		var retranslation = new getObj('retranslationtext_' + trlanguages[0]).obj;
 		retranslation.innerHTML = "";
 		translationstate = true;
 	}
 	if(submitstate && translationstate) {
+		for (i = 0; i < languagelist.length; i++) {
+			var trexpand = new getObj('translationtextexpand_' + languagelist[i]).obj;
+			trexpand.disabled = false;
+		}		
 		submitForm('<? echo $f; ?>','send');
 	}		
 }
@@ -2097,6 +2100,10 @@ function submitRetranslation(language) {
 }
 function sendjobconfirm() {
 	if(isCheckboxChecked('radio_select') || !isCheckboxChecked('translatecheck') || translationstate) {
+		for (i = 0; i < languagelist.length; i++) {
+			var trexpand = new getObj('translationtextexpand_' + languagelist[i]).obj;
+			trexpand.disabled = false;
+		}
 		submitForm('<? echo $f; ?>','send');
 		return;
 	}	
