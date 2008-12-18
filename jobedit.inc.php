@@ -1996,6 +1996,10 @@ function setTranslations (html, langstring) {
 	response = JSON.parse(html, function (key, value) {	return value;}); //See documentation at http://www.json.org/js.html on how this function can be used
 	result = response.responseData;
 	if (response.responseStatus != 200){	
+		if (submitstate){	
+			var status = new getObj('translationstatus').obj;
+			status.innerHTML = "Unable to generate translations<br />Please read the help for more information";
+		}		
 		return;
 	}
 	
@@ -2090,7 +2094,7 @@ function submitRetranslation(language) {
 	return false;
 }
 function sendjobconfirm() {
-	if(translationstate) {
+	if(isCheckboxChecked('radio_select') || !isCheckboxChecked('translatecheck') || translationstate) {
 		submitForm('<? echo $f; ?>','send');
 		return;
 	}	
