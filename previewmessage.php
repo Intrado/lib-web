@@ -192,11 +192,11 @@ if ($dopreview) {
 	TYPE="application/x-oleobject">
 
 	<? if ($_SESSION['ttstext']) { ?>
-		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?text=<?= $_SESSION['ttstext'] ?>&language=<?= $_SESSION['ttslanguage']  ?>&gender=<?=	$_SESSION['ttsgender'] ?><?= $previewdata ?>">
+		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?text=<?= urlencode($_SESSION['ttstext']) ?>&language=<?= $_SESSION['ttslanguage']  ?>&gender=<?=	$_SESSION['ttsgender'] ?><?= $previewdata ?>">
 		<param name="controller" value="true">
-		<EMBED SRC="preview.wav.php/embed_preview.wav?text=<?= $_SESSION['ttstext'] ?>&language=<?= $_SESSION['ttslanguage']  ?>&gender=<?=	$_SESSION['ttsgender'] ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>	
+		<EMBED SRC="preview.wav.php/embed_preview.wav?text=<?= urlencode($_SESSION['ttstext']) ?>&language=<?= $_SESSION['ttslanguage']  ?>&gender=<?=	$_SESSION['ttsgender'] ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>	
 		</OBJECT>
-		<br><a href="preview.wav.php/download_preview.wav?text=<?= $_SESSION['ttstext'] ?>&language=<?= $_SESSION['ttslanguage'] ?>&gender=<?= $_SESSION['ttsgender'] ?>&download=true<?= $previewdata ?>">Click here to download</a>	
+		<br><a href="preview.wav.php/download_preview.wav?text=<?= urlencode($_SESSION['ttstext']) ?>&language=<?= $_SESSION['ttslanguage'] ?>&gender=<?= $_SESSION['ttsgender'] ?>&download=true<?= $previewdata ?>">Click here to download</a>	
 	<? } else {?>
 		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id=<?= $messageid ?><?= $previewdata ?>">
 		<param name="controller" value="true">
