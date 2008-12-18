@@ -55,13 +55,22 @@
     	$fp = @fopen($url, 'rb', false, $context);
 		if (!$fp) {
 			error_log("Unable to send to $url");
-			return;
-     	}
+			$enc->responseData = "";
+    		$enc->responseDetails = NULL;
+    		$enc->responseStatus = 503;
+    		echo json_encode($enc);
+   			exit(); 		
+}
         $response = @stream_get_contents($fp);
     	if ($response === false) {
     		error_log("Unable to read from $url");
-   			return; 		
-       	}    	
+			$enc->responseData = "";
+    		$enc->responseDetails = NULL;
+    		$enc->responseStatus = 503;
+    		echo json_encode($enc);
+   			exit(); 		
+       	}    	       	
+       	//$start = microtime(true);
 		$decoded = json_decode($response);
        	if($decoded->responseStatus == 200) {
 			if(is_array($decoded->responseData)){
@@ -73,6 +82,8 @@
 			}
        	}
        	echo json_encode($decoded);
+       	//$end = microtime(true);
+		//error_log("Time to JSON_decode->html_entity_decode->JSON_encode: " . ($end - $start));
     }
     
 ?>
