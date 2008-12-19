@@ -38,12 +38,25 @@ if(isset($_GET['clear'])){
 	unset($_SESSION['customerid']);
 	redirect();
 }
-if(isset($_GET['cid'])){
-	$_SESSION['customerid'] = $_GET['cid'] +0;
-	redirect();
+if (isset($_GET['cid'])) {
+	if ($_GET['cid']) {
+		$queryextra = " AND dm.customerid in (";
+		foreach (explode(",", $_GET['cid']) as $cid)
+			$queryextra .= "'". DBSafe($cid) . "',";
+			
+		$queryextra = substr($queryextra, 0, -1) . ") ";
+	}
 }
+
+if (isset($_POST['showmatch'])) {
+	if (isset($_POST['custtxt']) && trim($_POST['custtxt'])) {
+		$custtxt = escapehtml(trim($_POST['custtxt']));
+		$queryextra = " and c.urlcomponent like '%" . DBSafe(trim($_POST['custtxt'])) . "%'";
+	}
+}
+
 if(isset($_SESSION['customerid'])){
-	$queryextra = " and c.id = " . $_SESSION['customerid'] . " ";
+	$queryextra = " and dm.customerid = " . $_SESSION['customerid'] . " ";
 }
 
 //index 2 is customer id
@@ -121,9 +134,9 @@ function fmt_dmstatus_nohtml($row,$index, $usehtml=true) {
 
 function fmt_lastseen($row, $index){
 	$output = date("Y-m-d G:i:s", $row[$index]/1000);
-	if($row[$index]/1000 > strtotime("now") - (5*60) && $row[$index]/1000 < strtotime("now")-60){
+	if($row[$index]/1000 > strtotime("now") - (1800) && $row[$index]/1000 < strtotime("now")-600){
 		$output = "<div style=\"background-color:yellow\">" . $output . "</div>";
-	} else if($row[$index]/1000 < strtotime("now") - (5*60)){
+	} else if($row[$index]/1000 < strtotime("now") - (1800)){
 		$output = "<div style=\"background-color:red\">" . $output . "</div>";
 	}
 	return $output;
@@ -195,16 +208,55 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",6 => "fmt_state");
 
 include_once("nav.inc.php");
 
-// show the row data filters
-show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
+?>
 
+<form method="POST" action="customerdms.php">
+<a href='customerdms.php'>Show All Customers</a>
+<table>
+	<tr>
+		<td valign="top">
+			<table border="0" cellpadding="2" cellspacing="1" class="list">
+				<tr class="listHeader" align="left" valign="bottom">
+					<td>
+						Search (can match partial urls)
+					</td>
+				</tr>
+				<tr>
+					<td valign="top">
+						<table>
+							<tr>
+								<td valign="top" align="left">
+									Cust URL:
+								</td>
+								<td>
+									<input type="text" name="custtxt" id="custtxt" value="<?=$custtxt?>" size="20" maxlength="50" />
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<input type="submit" name="showmatch" id="showmatch" value="Search" />   
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign="top">
+			<?
+			// show the row data filters
+			show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
+			
+			?>
+		</td>
+	</tr>
+</table>
+</form>
+<?
+
+// Show the column data hide/select check boxes.
 show_column_selector('customer_dm_table', $titles, $lockedTitles);
 
-if(file_exists("dmbuild.txt")){
-?>
-	<div>Latest Version: <?=file_get_contents("dmbuild.txt");?></div>
-<?
-}
 ?>
 <table class="list sortable" id="customer_dm_table">
 <?
@@ -219,5 +271,10 @@ if(file_exists("dmbuild.txt")){
 	}
 </script>
 <?
+if(file_exists("dmbuild.txt")){
+?>
+	<div>Latest Version: <?=file_get_contents("dmbuild.txt");?></div>
+<?
+}
 include_once("navbottom.inc.php");
 ?>
