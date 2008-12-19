@@ -87,25 +87,27 @@ $TITLE = "Contact Activation - Step 3";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(button("Done", NULL, "addcontact3.php"));
 
 
-startWindow('Phone Confirmation');
+startWindow('Phone Activation');
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 
 <?	// OK section
 	if (count($phones) > 0 && count($pkeyok) > 0) { ?>
 	<tr>
-		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Add People:</th>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Allowed:</th>
 		<td>
 			<table>
 			<tr>
-				<td>The people with the following ID Numbers will be added:</td>
+				<td>The people with the following ID Numbers may be added by following the confirmation steps below.</td>
 			</tr>
+			<tr><td><table border="1" cellpadding="3" cellspacing="0" width="10%">
 <?			foreach ($pkeyok as $pkey) { ?>
-				<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
+				<tr><td align="center"><b><?=escapehtml($pkey) ?></b></td></tr>
 <?			} ?>
+			</td></tr></table>
+			<tr><td>&nbsp;</td></tr>
 			</table>
 		</td>
 	</tr>
@@ -118,36 +120,34 @@ startWindow('Phone Confirmation');
 		(count($pkeynotallow) > 0) ||
 		(count($pkeynophone) > 0)) { ?>
 	<tr>
-		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Skip People:</th>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Not Allowed:</th>
 		<td>
 		<table>
-<?	if (count($pkeynotfound) > 0) { ?>
 		<tr>
-			<td>The people with the following ID Numbers were not found in the system:</td>
+			<td>The people with the following ID Numbers cannot be added to your account for the following reasons:</td>
 		</tr>
+
+		<tr><td><table border="1" cellpadding="3" cellspacing="0" width="100%">
+
+<?	if (count($pkeynotfound) > 0) { ?>
 <?		foreach ($pkeynotfound as $pkey) { ?>
-			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
+			<tr><td align="center"><b><?=escapehtml($pkey) ?></b></td><td>ID Number was not found in the system</td></tr>
 <?		} ?>
 <?	} ?>
 
 <?	if (count($pkeynotallow) > 0) { ?>
-		<tr>
-			<td>The people with the following ID Numbers do not allow phone confirmation:</td>
-		</tr>
 <?		foreach ($pkeynotallow as $pkey) { ?>
-			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
+			<tr><td align="center"><b><?=escapehtml($pkey) ?></b></td><td>Person with this ID Number has been blocked by the system administrator</td></tr>
 <?		} ?>
 <?	} ?>
 
 <?	if (count($pkeynophone) > 0) { ?>
-		<tr>
-			<td>The people with the following ID Numbers have no phone information in the system:</td>
-		</tr>
 <?		foreach ($pkeynophone as $pkey) { ?>
-			<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
+			<tr><td align="center"><b><?=escapehtml($pkey) ?></b></td><td>There are no phone numbers on record</td></tr>
 <?		} ?>
 <?	} ?>
-
+		</td></tr></table>
+		<tr><td>&nbsp;</td></tr>
 		</table>
 		</td>
 	</tr>
@@ -157,31 +157,34 @@ startWindow('Phone Confirmation');
 <?	// Steps to proceed section
 	if (count($phones) > 0 && count($pkeyok) > 0) { ?>
 	<tr>
-		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Confirm:</th>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Confirmation Steps:</th>
 		<td>
 		<table>
 		<tr>
-			<td>You must follow these steps to confirm adding these people to your account.<BR><BR></td>
+			<td>You must follow these steps within 24 hours to add the allowed people to your account.<BR><BR></td>
 		</tr>
+		<tr><td><table cellpadding="2">
 		<tr>
-			<td>Step 1. Call <?echo Phone::format($INBOUND_ACTIVATION) ?> from one of the following phones.</td>
+			<td valign="top">Step 1.</td><td>Call <font color="blue"><?echo Phone::format($INBOUND_ACTIVATION) ?> </font> from one of the phones listed.<br>
+			For security reasons, we have hidden parts of your phone numbers with "xxx".
+			</td>
 		</tr>
 <?		foreach ($phones as $phone) { ?>
 		<tr>
-			<td> <? echo "&nbsp;&nbsp;&nbsp;&nbsp;(xxx)xxx-x".substr($phone, 7, 10); ?> </td>
+			<td>&nbsp;</td><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<? echo "(xxx)xxx-x".substr($phone, 7, 10); ?> </td>
 		</tr>
 <?		} ?>
 		<tr>
-			<td>Please note, if your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.</td>
+			<td>&nbsp;</td><td>[NOTE] If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.</td>
 		</tr>
 		<tr>
-			<td>Step 2. When prompted, select option 2 to activate contacts.</td>
+			<td>Step 2.</td><td>When prompted, select option 2 to activate the ID Numbers you have added.</td>
 		</tr>
 		<tr>
-			<td>Step 3. When prompted, enter this code  <span style="font-weight:bold; font-size: 140%;"><?=escapehtml($code) ?></span></td>
+			<td>Step 3.</td><td>When prompted, enter this activation code  <span style="font-weight:bold; font-size: 140%;"><?=escapehtml($code) ?></span></td>
 		</tr>
 		<tr>
-			<td>Step 4. When the call is completed, click the 'Contacts' tab above to view and edit your notification preferences.</td>
+			<td>Step 4.</td><td>When the call is complete, click the 'Contacts' tab to edit your notification preferences.</td>
 		</tr>
 		</table>
 		</td>
@@ -219,7 +222,7 @@ startWindow('Phone Confirmation');
 </table>
 <?
 endWindow();
-buttons();
+buttons(button("Done", NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>

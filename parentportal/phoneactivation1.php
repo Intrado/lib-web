@@ -68,7 +68,6 @@ $TITLE = "Contact Activation - Step 2";
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'Next'), button("Cancel", NULL, "addcontact3.php"));
 
 
 startWindow('Add Contact');
@@ -106,7 +105,7 @@ startWindow('Add Contact');
 </table>
 <?
 endWindow();
-buttons();
+buttons(submit($f, $s, 'Next'), button("Cancel", NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>
