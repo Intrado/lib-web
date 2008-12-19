@@ -96,6 +96,29 @@ function fmt_dmstatus($row,$index) {
 		return "OK";
 }
 
+function fmt_dmstatus_nohtml($row,$index, $usehtml=true) {
+	$problems = array();
+
+
+	if ($row[6] != "active") {
+		$problems[] = "Not Authorized";
+	} else {
+		if ($row[4] != $row[5])
+			$problems[] = "IP Mismatch";
+
+		if ($row[7]/1000 < time() - 30)
+			$problems[] = "DM Lost Connection";
+
+		if ($row[1] == null || $row[1] <= 0)
+			$problems[] = "Invalid Customer ID";
+	}
+
+	if (count($problems))
+		return implode(", ", $problems);
+	else
+		return "OK";
+}
+
 function fmt_lastseen($row, $index){
 	$output = date("Y-m-d G:i:s", $row[$index]/1000);
 	if($row[$index]/1000 > strtotime("now") - (5*60) && $row[$index]/1000 < strtotime("now")-60){
@@ -132,12 +155,14 @@ $titles[7] = "#Last Seen";
 $titles[6] = "#Auth";
 $titles["status"] = "#Status";
 $titles[8] = "#Version";
-$titles[9] = "@DM UUID";
-$titles[10] = "@Cmd";
+$titles[9] = "@#DM UUID";
+$titles[10] = "@#Cmd";
 $titles["actions"] = "Actions";
 
 // Do not provide a checkbox to hide these columns.
 $lockedTitles = array(0, "status", "actions", 2, 3);
+
+$filterTitles = array(6,"status",8);
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
@@ -145,11 +170,15 @@ $formatters = array(2 => "fmt_customerUrl",
 					7 => "fmt_lastseen",
 					6 => "fmt_state");
 
+$filterFormatters = array("status" => "fmt_dmstatus_nohtml",6 => "fmt_state");
 /////////////////////////////
 // Display
 /////////////////////////////
 
 include_once("nav.inc.php");
+
+// show the row data filters
+show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
 
 show_column_selector('customer_dm_table', $titles, $lockedTitles);
 
@@ -164,6 +193,13 @@ if(file_exists("dmbuild.txt")){
 	showTable($data, $titles, $formatters);
 ?>
 </table>
+<script language="javascript">
+	var table = new getObj('customer_dm_table').obj;
+	var trows = table.rows;
+	for (var i = 0, length = trows.length; i < length; i++) {
+		trows[i].id = 'row'+i;
+	}
+</script>
 <?
 include_once("navbottom.inc.php");
 ?>
