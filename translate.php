@@ -1,30 +1,30 @@
 <?
-	$supportedlanguages = array("catalan"=>"ca", "mandarin" =>"zh-TW","dutch"=>"nl", "english"=>"en", "finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "italian"=>"it", "polish"=>"pl", "portuguese"=>"pt-PT", "russian"=>"ru", "spanish"=>"es", "swedish"=>"sv");
+	$supportedlanguages = array("catalan"=>"ca", "chinese" =>"zh-TW","dutch"=>"nl", "english"=>"en", "finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "italian"=>"it", "polish"=>"pl", "portuguese"=>"pt-PT", "russian"=>"ru", "spanish"=>"es", "swedish"=>"sv");
 	//$googlelanguages = array("arabic"=>"ar", "bulgarian"=>"bg", "catalan"=>"ca", "chinese"=>"zh", "chinese_simplified"=>"zh-CN", "chinese_traditional"=>"zh-TW", "croatian"=>"hr", "czech"=>"cs", "danish"=>"da", "dutch"=>"nl", "english"=>"en", "finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "hebrew"=>"iw", "hindi"=>"hi", "indonesian"=>"id", "italian"=>"it", "japanese"=>"ja", "korean"=>"ko", "latvian"=>"lv", "lithuanian"=>"lt", "norwegian"=>"no", "polish"=>"pl", "portuguese"=>"pt-PT", "romanian"=>"ro", "russian"=>"ru", "serbian"=>"sr", "slovak"=>"sk", "slovenian"=>"sl", "spanish"=>"es", "swedish"=>"sv", "ukrainian"=>"uk", "vietnamese"=>"vi");
 	$url = "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0";
 	$text = "";
 	$lang_pairs = "";
-	
+
     $referer = $_SERVER["HTTP_REFERER"];
     if (!$referer) {
     	$referer = "asp.schoolmessanger.com";
     }
-    
+
     if(isset($_POST['english']) && isset($_POST['languages'])) {
     	$languages = $_POST['languages'];
     	$src_text = $_POST['english'];
     	if(get_magic_quotes_gpc()) {
     		$languages = stripslashes($_POST['languages']);
-    		$src_text = stripslashes($_POST['english']);	
+    		$src_text = stripslashes($_POST['english']);
     	}
-    	
+
 	    $languagearray = explode(";",$languages);
-	    		
+
 		$destinationlanguages = array();
 		foreach($languagearray as $language) {
-				$destinationlanguages[] = $language; 
+				$destinationlanguages[] = $language;
 		}
-		
+
 		$lang_pairs = "";
 		foreach ($destinationlanguages as $destlang){
 			$lang = strtolower($destlang);
@@ -33,16 +33,16 @@
 			}
 		}
 		$text = "&q=".urlencode($src_text);
-		
+
     } elseif(isset($_POST['text']) && isset($_POST['language'])){
         $language = $_POST['language'];
     	$text = $_POST['text'];
     	if(get_magic_quotes_gpc()) {
     		$language = stripslashes($_POST['language']);
-    		$text = stripslashes($_POST['text']);	
+    		$text = stripslashes($_POST['text']);
     	}
-    	
-    	
+
+
     	$language = strtolower($language);
     	if(array_key_exists($language,$supportedlanguages)) {
     		$text = "&q=" . urlencode($text);
@@ -59,7 +59,7 @@
     		$enc->responseDetails = NULL;
     		$enc->responseStatus = 503;
     		echo json_encode($enc);
-   			exit(); 		
+   			exit();
 }
         $response = @stream_get_contents($fp);
     	if ($response === false) {
@@ -68,8 +68,8 @@
     		$enc->responseDetails = NULL;
     		$enc->responseStatus = 503;
     		echo json_encode($enc);
-   			exit(); 		
-       	}    	       	
+   			exit();
+       	}
        	//$start = microtime(true);
 		$decoded = json_decode($response);
        	if($decoded->responseStatus == 200) {
@@ -85,7 +85,7 @@
        	//$end = microtime(true);
 		//error_log("Time to JSON_decode->html_entity_decode->JSON_encode: " . ($end - $start));
     }
-    
+
 ?>
 
 
