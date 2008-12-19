@@ -160,7 +160,7 @@ $$$
 insert into ttsvoice (language, gender) values
 	('catalan', 'female'),
 	('catalan', 'male'),
-	('mandarin', 'female'),
+	('chinese', 'female'),
 	('dutch', 'female'),
 	('dutch', 'male'),
 	('finnish', 'female'),
