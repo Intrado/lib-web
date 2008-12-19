@@ -1,5 +1,11 @@
 <?
+//////////////////////////////////////
+// STEP 1 in moving customer from one shard to another
+//
 // Use to export customer data from existing shard customer, intended to move to a different shard
+//
+// EDIT VARIABLES AT TOP OF SCRIPT, avoid entering on command line or prompts
+//////////////////////////////////////
 
 $customerid = "";
 $shardhost = "";

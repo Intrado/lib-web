@@ -1,7 +1,8 @@
 <?
 //////////////////////////////////////
+// STEP 3 in moving customer from one shard to another
+//
 // migrate a customer into this shard database (could be from a commsuite or moving between shards)
-// Usage: php shard_migrate_customer.php <customer ID> <customerdata.sql> <shardhost> <shard user> <shard pass>
 //
 // EDIT VARIABLES AT TOP OF SCRIPT, avoid entering on command line or prompts
 //////////////////////////////////////
@@ -10,9 +11,15 @@
 $customerid = "";
 $customerdatafile = "";
 $fromcommsuite = true; // true if data is from commsuite 5.2 migration, false if moving 6.x between shards
-$shardhost = "localhost"; // you want to run on the db machine for the 'mysqldump' to work
+$shardhost = ""; // you want to run on the db machine for the 'mysqldump' to work
 $dbuser = "";
 $dbpass = "";
+
+// need authdb for ASP shard to shard migration
+$authhost = "";
+$authuser = "";
+$authpass = "";
+$newshardid = "";
 
 
 /////////////
@@ -42,57 +49,26 @@ function generalmenu($questions = array(), $validresponses = array()){
 ///////////////////////
 // main program
 
-/*
-if (isset($argv[1])) {
-	$customerid = $argv[1] + 0;
-	if ($customerid == 0)
-		die("invalid customer id");
-} else {
-	echo "please provide the customer ID";
-	exit();
+if (!$fromcommsuite) {
+	// connect to authdb
+	echo "Connecting to authdb...\n";
+	$authdb = mysql_connect($authhost, $authuser, $authpass)
+		or die("Failed to connect to auth database");
+	echo "auth connection ok\n";
+	mysql_select_db("authserver", $authdb);
+
+	echo "Creating new customer database...\n";
+	// create new customer database on the shard
+	createNewCustomer($authdb, $newshardid, '', $customerid);
+
+// end ASP shard migration (!commsuite)
 }
 
-if (isset($argv[2])) {
-	$customerdatafile = $argv[2];
-	if (!file_exists($customerdatafile)) {
-		echo "file does not exist : ".$customerdatafile;
-		exit();
-	}
-} else {
-	echo "please provide the customer sql data file";
-	exit();
-}
-
-if (!$shardhost && isset($argv[3])) {
-	$shardhost = $argv[3];
-} else {
-	echo "please provide the shard hostname or IP";
-	exit();
-}
-
-if(!$dbuser && isset($argv[4])){
-	$dbuser = $argv[4];
-	if (!$dbpass && isset($argv[5]))
-		$dbpass = $argv[5];
-} else {
-	$confirm = "n";
-	while($confirm != "y"){
-		echo "\nEnter DB User:\n";
-		$dbuser = trim(fread(STDIN, 1024));
-		echo "\nEnter DB Pass:\n";
-		$dbpass = trim(fread(STDIN, 1024));
-		echo "DBUSER: " . $dbuser . "\n";
-		echo "DBPASS: " . $dbpass . "\n";
-		$confirm = generalMenu(array("Is this information correct?", "y or n"), array("y", "n"));
-	}
-}
-*/
-
-
-echo "Connecting to mysql...\n";
+echo "Connecting to aspshard...\n";
 $custdb = mysql_connect($shardhost, $dbuser, $dbpass)
 	or die("Failed to connect to database");
 echo "connection ok\n";
+
 
 $customerid = mysql_real_escape_string($customerid, $custdb);
 $customerdbname = "c_".$customerid;
@@ -117,6 +93,8 @@ if($count[0] > 0){
 echo "No active jobs found\n";
 
 
+if ($fromcommsuite) {
+
 //////////////////////////////////////
 // backup data
 $backupfilename = $customerdbname . "_backup.sql";
@@ -127,6 +105,7 @@ if ($return_var) {
 	die();
 }
 
+}
 
 //////////////////////////////////////
 // drop triggers
