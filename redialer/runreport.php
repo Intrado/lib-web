@@ -1,4 +1,5 @@
 <?
+setlocale(LC_ALL, 'en_US.UTF-8');
 
 if ($argc < 7) {
 	echo "Usage: reportsubscriptionid | jobid, type 'subscription' | 'job', filename, dbhost, dbname, dbuser, dbpass";

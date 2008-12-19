@@ -1,6 +1,7 @@
 <?
 // redialer.schedulemanager executes this to populate job.thesql field
 
+setlocale(LC_ALL, 'en_US.UTF-8');
 
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
