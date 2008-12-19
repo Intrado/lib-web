@@ -28,6 +28,13 @@ function fmt_custid($row, $index){
 		return "<a title='Remove Favorite' href='$urlget" . "removefavorites={$row[0]}'><img style='margin-right: 4px;' src='img/removefav.png' border=0/></a>" . $row[0];
 }
 
+function fmt_hasdm($row, $index) {
+	if($row[$index])
+		return "Has Flex";
+	else
+		return "&nbsp;";
+}
+
 function fmt_custurl($row, $index){
 //index 1 is url
 //index 2 is display name
@@ -227,6 +234,7 @@ foreach($customers as $cust) {
 		$row[13] = $cust[4];
 		$row[14] = $cust[5];
 		$row[15] = $cust[8];
+		$row[16] = QuickQuery("SELECT COUNT(*) FROM custdm", $custdb);
 		$data[] = $row;
 	}
 }
@@ -251,6 +259,7 @@ $titles = array("0" => "#ID",
 		"3" => "#Product Name",
 		"4" => "#Timezone",
 		"6" => "#Status",
+		"16" => "@#Has Flex DM",
 		"11" => "#DM Method",
 		"10" => "#Features",
 		"7" => "#Max Users",
@@ -268,7 +277,8 @@ $formatters = array("0" => "fmt_custid",
 		"8" => "fmt_users",
 		"9" => "fmt_jobcount",
 		"Actions" => "fmt_actions",
-		"11" => "fmt_dmmethod");
+		"11" => "fmt_dmmethod",
+		"16" => "fmt_hasdm");
 
 $lockedTitles = array(0, "status", "actions");
 
