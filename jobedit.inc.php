@@ -630,7 +630,7 @@ if( $reloadform )
 	}
 
 	if($USER->authorize('sendmulti')) {
-	PutFormData($f,$s,"translatecheck",0,"bool",0,1);
+		PutFormData($f,$s,"translatecheck",0,"bool",0,1);
 		foreach($languagearray as $language => $joblanguageobject) {
 			$messagefound = false;
 			// The submitTranslations depend on this text so when edeting this text take a look at submitTranslations script
@@ -1175,15 +1175,15 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "messageselect", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('newphonetext');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"setChecked('translatecheck');translationoptions(false);automatictranslation();":"") . "show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
+<? 					NewFormItem($f, $s, "messageselect", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"translationoptions(false);automatictranslation();":"") . "show('newphonetext');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
 				<div id='selectphonemessage' style="display: block">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
 				<div id='newphonetext' style="white-space: nowrap;display: none">
-					Type Your English Message 
+					Type Your English Message
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					| <?  NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation()\"")); ?>
-					Automatically translate to other languages
+					Automatically translate to other languages<table style="display: inline"><tr><td><?= help('Job_AutomaticallyTranslate',NULL,"small"); ?></td></tr></table>
 <? } ?>
 					<br />
 					<table>
@@ -1237,11 +1237,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									<div id='languageexpand_<? echo $language?>' style="display: none">
 										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 45, 3,"id='translationtextexpand_$language'"); ?>
 										<br />
-										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Override Translation <?= help('Job_EditTranslation',NULL,"small"); ?>
-
+										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Override Translation 
+										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
 										<a href="#" onclick="submitRetranslation('<? echo $language?>');return false;">Retranslation</a>
-										<?= help('Job_Retranslation',NULL,"small"); ?> <br />
+										<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table> <br />
 										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3,"id='retranslationtext_$language' disabled"); ?>
 									</div>
 								</td>
@@ -2051,7 +2051,10 @@ function submitTranslations() {
     var text = new getObj('phonetextarea').obj.value;
 	if(text == "")
 		return;
-	
+	if(text != text.substring(0, 2000)){
+		text = text.substring(0, 2000);
+		alert("The message is too long. Only the first 2000 characters are submitted for translation.");
+	}
 	var serialized = [];
 	var trlanguages = [];
 	for (l in languagelist) {
@@ -2091,7 +2094,10 @@ function submitRetranslation(language) {
 	
 	if(text == "")
 		return;
-	
+	if(text != text.substring(0, 2000)){
+		text = text.substring(0, 2000);
+		alert("The message is too long. Only the first 2000 characters are submitted for translation.");
+	}
 	var serialized = [];
 	var trlanguages = [];
 	for (l in languagelist) {

@@ -1,0 +1,2 @@
+@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
+With automatic translation the list contacts will recieve the message in their native language. You may preview the translations by clicking the Show Translations button.
