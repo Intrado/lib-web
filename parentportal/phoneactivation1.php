@@ -75,21 +75,20 @@ startWindow('Add Contact');
 <table>
 	<tr>
 		<td>
-		You may add one or more people to your account with a single phone call to our toll free number.
+		The following people will be added once the phone confirmation is complete.
 		</td>
 	</tr>
-	<tr>
-		<td>
-		After you enter all of your ID Numbers, you will be given instructions for how to use the automated phone confirmation service.<br>
-		<br>
-		The people with the following ID Numbers will be added once the phone confirmation is complete.
-		</td>
-	</tr>
-<?	foreach ($_SESSION['phoneactivationpkeylist'] as $pkey) { ?>
-		<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<b><?=escapehtml($pkey) ?></b></td></tr>
-<?	} ?>
-	<tr><td class="bottomBorder">&nbsp;</td></tr>
 
+<tr><td><table border="1" cellpadding="3" cellspacing="0" width="70%">
+<th>&nbsp;</th><th>ID Number</th>
+
+<? $i = 1; ?>
+<?	foreach ($_SESSION['phoneactivationpkeylist'] as $pkey) { ?>
+		<tr><td width="10%"><?=$i++?></td><td align="center"><b><?=escapehtml($pkey) ?></b></td></tr>
+<?	} ?>
+</td></tr></table>
+	<tr><td class="bottomBorder">&nbsp;</td></tr>
+	<tr><td>You may enter one or more people to your account with a single phone call to our toll free number.</td></tr>
 	<tr><td>Do you have another ID Number to enter now?</td></tr>
 	<tr>
 		<td>

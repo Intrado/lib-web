@@ -178,7 +178,7 @@ startWindow('Phone Activation');
 			<td>&nbsp;</td><td>[NOTE] If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.</td>
 		</tr>
 		<tr>
-			<td>Step 2.</td><td>When prompted, select option 2 to activate the ID Numbers you have added.</td>
+			<td>Step 2.</td><td>When prompted, select option 2.</td>
 		</tr>
 		<tr>
 			<td>Step 3.</td><td>When prompted, enter this activation code  <span style="font-weight:bold; font-size: 140%;"><?=escapehtml($code) ?></span></td>
@@ -222,7 +222,7 @@ startWindow('Phone Activation');
 </table>
 <?
 endWindow();
-buttons(button("Done", NULL, "addcontact3.php"));
+buttons(button("Back", NULL, "phoneactivation1.php"), button("Done", NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>
