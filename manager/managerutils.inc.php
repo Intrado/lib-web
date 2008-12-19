@@ -1,6 +1,65 @@
 <?
 require_once("../inc/db.inc.php");
 
+function genpassword($digits = 15) {
+	$passwd = "";
+	$chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	while ($digits--) {
+		$passwd .= $chars[mt_rand(0,strlen($chars)-1)];
+	}
+	return $passwd;
+}
+
+
+/*
+ *
+ */
+function createNewCustomer($authdb = false, $shardid = 0, $hostname = '', $customerid = 0) {
+
+ 				//choose shard info based on selection
+				$shardinfo = QuickQueryRow("select dbhost, dbusername, dbpassword from shard where id=$shardid", true, $authdb);
+				$shardhost = $shardinfo['dbhost'];
+				$sharduser = $shardinfo['dbusername'];
+				$shardpass = $shardinfo['dbpassword'];
+
+				$dbpassword = genpassword();
+				if ($customerid == 0) {
+					QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword,enabled) values
+												('" . DBSafe($hostname) . "','$shardid', '$dbpassword', '1')", $authdb )
+						or die("failed to insert customer into auth server");
+					$customerid = mysql_insert_id();
+				} else {
+					$query = "update authserver.customer set shardid=$shardid, dbpassword='$dbpassword' and enabled=1 where id=$customerid";
+					QuickUpdate($query, $authdb)
+						or die("failed to update customer record on auth server");
+				}
+
+				$newdbname = "c_$customerid";
+				QuickUpdate("update customer set dbusername = '" . $newdbname . "' where id = '" . $customerid . "'", $authdb);
+
+				$newdb = mysql_connect($shardhost, $sharduser, $shardpass)
+					or die("Failed to connect to DBHost $shardhost : " . mysql_error($newdb));
+				QuickUpdate("create database $newdbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$newdb)
+					or die ("Failed to create new DB $newdbname : " . mysql_error($newdb));
+				mysql_select_db($newdbname,$newdb)
+					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
+
+				QuickUpdate("drop user '$newdbname'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
+				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
+				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
+
+				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
+				foreach ($tablequeries as $tablequery) {
+					if (trim($tablequery)) {
+						$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
+						Query($tablequery,$newdb)
+							or die ("Failed to execute statement \n$tablequery\n\nfor $newdbname : " . mysql_error($newdb));
+					}
+				}
+
+ }
+
+
 /*
  * create SchooMessenger user and profile
  * (used by both manager newcustomer and the commsuite migration scripts)
@@ -108,7 +167,7 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array()){
 									"if(x.obj.checked){this.src='../img/checkbox-clear.png'}else{this.src='../img/checkbox-rule.png'};";
 							$checked = ">";
 						}
-	
+
 						if($tablename == null){
 							$result .= "\">";
 						} else {
@@ -166,15 +225,15 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 					$filterVals[$id][$cel][] = $rownum;
 				}
 				$rownum++;
-			} 
+			}
 		}
 ?>
 		<script language="javascript">
-			var optionToDataAssociation = <?=json_encode($filterVals)?>;	
+			var optionToDataAssociation = <?=json_encode($filterVals)?>;
 		</script>
 
 		<tr>
-<?	
+<?
 
 // fill out multi-select boxes with field data values and put them here.
 
@@ -190,12 +249,12 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 		</tr>
 		<tr>
 			<td colspan="2"><input type="button" class="button" name="filterRows" value="Apply Filters" onclick="displayRows(new getObj('<?=$tablename?>').obj);" /></td>
-			
+
 		</tr>
 	</table>
 
 	<script language="javascript">
-	
+
 	function displayRows(table) {
 		var filters = 0;
 		var trows = table.rows;
@@ -203,7 +262,7 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 		for (var i = 1, length = trows.length; i < length + 1; i++) {
 			showRows.push(0);
 		}
-		
+
 		var fields;
 		for ( a in optionToDataAssociation ) {
 			filters++;
@@ -216,7 +275,7 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 				}
 			}
 		}
-		
+
 		for (var d = 1, length = trows.length; d < length; d++) {
 			var rowId = 'row'+d;
 			var modrow = new getObj(rowId).obj;
@@ -226,7 +285,7 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 				modrow.style.display = 'none';
 			}
 		}
-		
+
 		var color = 0;
 		for (var d = 1, length = trows.length; d < length; d++) {
 			if (trows[d].style.display != 'none') {
@@ -237,9 +296,9 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 				}
 				color = !color;
 			}
-		}	
+		}
 	}
-	
+
 	</script>
 <?
 }

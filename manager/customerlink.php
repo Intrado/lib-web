@@ -8,15 +8,6 @@ include_once("../inc/html.inc.php");
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function genpassword() {
-	$digits = 32;
-	$passwd = "";
-	$chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-	while ($digits--) {
-		$passwd .= $chars[mt_rand(0,strlen($chars)-1)];
-	}
-	return $passwd;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -33,7 +24,7 @@ if(isset($_POST["password"])){
 	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	if($manager->runCheck($password)){
 		$customerurl = QuickQuery("select urlcomponent from customer where id = '$custid'");
-		$string = md5(genpassword() . $manager->login . microtime() . $customerurl);
+		$string = md5(genpassword(32) . $manager->login . microtime() . $customerurl);
 		// TODO we may want to set the expiration interval in the properties file
 		QuickUpdate("update customer set logintoken = '$string', logintokenexpiretime = now() + interval 10 minute where id = '$custid'");
 	} else {
