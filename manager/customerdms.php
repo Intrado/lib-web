@@ -132,9 +132,23 @@ function fmt_lastseen($row, $index){
 
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
-			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command 
+			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
+			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
+			s_telco_inboundtoken.value as telco_inboundtoken
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
+			left join dmsetting s_telco_calls_sec on 
+					(dm.id = s_telco_calls_sec.dmid 
+					and s_telco_calls_sec.name = 'telco_calls_sec')
+			left join dmsetting s_telco_type on 
+					(dm.id = s_telco_type.dmid 
+					and s_telco_type.name = 'telco_type')
+			left join dmsetting s_delmech_resource_count on 
+					(dm.id = s_delmech_resource_count.dmid 
+					and s_delmech_resource_count.name = 'delmech_resource_count')
+			left join dmsetting s_telco_inboundtoken on 
+					(dm.id = s_telco_inboundtoken.dmid 
+					and s_telco_inboundtoken.name = 'telco_inboundtoken')
 			where dm.type = 'customer'
 			" . $queryextra . "
 			order by dm.customerid, dm.name";
@@ -155,6 +169,10 @@ $titles[7] = "#Last Seen";
 $titles[6] = "#Auth";
 $titles["status"] = "#Status";
 $titles[8] = "#Version";
+$titles[11] = "@#Calls/Sec";
+$titles[12] = "#Type";
+$titles[13] = "@#Resources";
+$titles[14] = "@#Inbound";
 $titles[9] = "@#DM UUID";
 $titles[10] = "@#Cmd";
 $titles["actions"] = "Actions";
@@ -162,7 +180,7 @@ $titles["actions"] = "Actions";
 // Do not provide a checkbox to hide these columns.
 $lockedTitles = array(0, "status", "actions", 2, 3);
 
-$filterTitles = array(6,"status",8);
+$filterTitles = array(6,"status",8,12);
 
 $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
