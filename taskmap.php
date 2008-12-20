@@ -2,14 +2,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("obj/Schedule.obj.php");
+require_once("inc/common.inc.php");
+require_once("obj/Schedule.obj.php");
 require_once("obj/Import.obj.php");
 require_once("obj/ImportField.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("obj/FieldMap.obj.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
@@ -183,7 +183,7 @@ if ($fp && filesize($importfile) > 0 ) {
 		if (count($row) == 1 && trim($row[0]) === "")
 			continue;
 		for ($x = 0; $x < count($row); $x++)
-			$importdata[$x][] = $row[$x] ;
+			$importdata[$x][$previewrows - $count] = $row[$x] ;
 		$colcount = max($colcount,count($row));
 		$count--;
 	}
