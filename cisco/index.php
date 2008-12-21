@@ -52,7 +52,7 @@ if (isset($_GET['logout'])) {
 	sleep(1);
 	header("Location: $URL/main.php");
 	exit();
-} else if (isset($_GET['code'])) {
+} else if (isset($_GET['code']) && isset($_GET['pin'])) {
 	if (tryLogin(doLoginPhone($_GET['code'], $_GET['pin'],null, $CUSTOMERURL))) {
 		$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 		sleep(1);
@@ -61,7 +61,7 @@ if (isset($_GET['logout'])) {
 	} else {
 		$badlogin = true;
 	}
-} else if (isset($_GET['login'])) {
+} else if (isset($_GET['login']) && isset($_GET['password'])) {
 	if (tryLogin(doLogin($_GET['login'], $_GET['password'], $CUSTOMERURL,$_SERVER['REMOTE_ADDR']))) {
 		$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 		sleep(1);
