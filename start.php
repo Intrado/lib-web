@@ -101,7 +101,7 @@ if ($USER->authorize("startstats")) {
 				if ($listsdata) {
 					?>
 					<tr>
-						<th align="left" class="bottomBorder">EasyCall:</th>
+						<th align="left" class="bottomBorder">EasyCall:<?=help('Start_EasyCall', '', 'small')?></th>
 					</tr>
 					<tr>
 						<td align="center" style="display: block;">
@@ -111,19 +111,31 @@ if ($USER->authorize("startstats")) {
 						</td>
 					</tr>
 					<tr>
-						<th align="left" class="bottomBorder">Advanced Jobs:</th>
+						<th align="left" class="bottomBorder">Advanced Jobs:<?=help('Jobs_AddStandardJob', '', 'small')?></th>
 					</tr>
 					<tr align="center" style="display: block;">
 						<td>
 							<?=button('Create New Job', NULL,"job.php?origin=start&id=new")?>
 						</td>
 					</tr>
+					<tr>
+						<th align="left" class="bottomBorder">New List:<?=help('Lists_AddList', '', 'small')?></th>
+					</tr>
+				<?
+				} else {
+				?>
+					<tr>
+						<th align="left" class="bottomBorder">New List:<?=help('Lists_AddList', '', 'small')?></th>
+					</tr>
+					<tr>
+						<td>
+							<span style="text-decoration: underline; color: blue; cursor: help;" onclick="window.open('help/schoolmessenger_help.htm#/creating_a_list/listsoverview.htm', '_blank', 'width=750,height=500,location=no,menub ar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Make a List</span>
+							 - For every notification job, you must have a list of people whom you wish to receive your message. Your list can be static or dynamic (automatically updated every time it is used). Your lists can always be saved and easily reused.
+						</td>
+					</tr>
 				<?
 				}
 				?>
-					<tr>
-						<th align="left" class="bottomBorder">New List:</th>
-					</tr>
 					<tr align="center" style="display: block;">
 						<td>
 							<?=button('Create New List', NULL,"list.php?origin=start&id=new")?>
