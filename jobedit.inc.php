@@ -1193,20 +1193,18 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<br />
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					<table width="100%">
-						<tr>
+					<tr>
 					<td style="white-space:nowrap;">
-						<div id='translationdetails' style="white-space:nowrap;display: none">
-							<? button_bar(button('Show Translations', "toggletranslations('phone',true);submitTranslations();"));?>
+						<div id='phonetranslationsshow' style="white-space:nowrap;display: none">
+							<? button_bar(button('Show Translations', "toggletranslations('phone',true);submitTranslations('phone');"));?>
 						</div>
-						<div id='translationbasic' style="white-space:nowrap;display: none">
-							<? button_bar(button('Hide Translations', "toggletranslations('phone',false);"),button('Refresh Translations', "submitTranslations();"));?>							
+						<div id='phonetranslationshide' style="white-space:nowrap;display: none">
+							<? button_bar(button('Hide Translations', "toggletranslations('phone',false);"),button('Refresh Translations', "submitTranslations('phone');"));?>							
 						</div>
 					</td>
 					</tr>
 					</table>
 					<div id='phonetranslations' style="display: none">
-						<div id='refreshhelp'></div>
-
 						<table border="0" cellpadding="2" cellspacing="0" width="100%" style="empty-cells:show;">
 <?
 						foreach($ttslanguages as $ttslanguage) {
@@ -1214,21 +1212,21 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							$playaction = "previewlanguage('$language'," . (isset($voicearray["female"][strtolower($language)])?"true":"false") . "," . (isset($voicearray["male"][strtolower($language)])?"true":"false") . ")"
 ?>
 							<tr>
-								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"phone_$language","checkbox",NULL, NULL,"id='phone_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
+								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"phone_$language","checkbox",NULL, NULL,"id='phone_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('phone','$language')\"")); echo "&nbsp;" . $language . ": ";?>
 								</td>
-								<td class="topBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/pixel.gif" width="10" height="1"></td>
+								<td class="topBorder" valign="top" ><div id='phonelock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/pixel.gif" width="10" height="1"></td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;" width="100%">
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
-										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;">&nbsp;</div>
+										<div class="chop" id='phonetxt_<? echo $language?>'  onclick="langugaedetails('phone','<? echo $language;?>',true); return false;">&nbsp;</div>
 										</td>
 									</tr>
 									</table>
-									<div id='languageexpand_<? echo $language?>' style="display: none">
+									<div id='phoneexpandtxt_<? echo $language?>' style="display: none">
 										<? NewFormItem($f,$s,"phoneexpand_$language", "textarea", 45, 3,"id='phoneexpand_$language'"); ?>
 										<br />
-										<? NewFormItem($f,$s,"phoneedit_$language","checkbox",1, NULL,"id='phoneedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Override Translation 
+										<? NewFormItem($f,$s,"phoneedit_$language","checkbox",1, NULL,"id='phoneedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('phone','$language')\"")); ?> Override Translation 
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
 										<a href="#" onclick="submitRetranslation('<? echo $language?>');return false;">Retranslation</a>
@@ -1237,11 +1235,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									</div>
 								</td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;">
-									<div id='translationdetails_<? echo $language?>' style="display: none">
-										<? button_bar(button('Play',$playaction," "),button('Show', "langugaedetails('$language',true); return false;"));?>
+									<div id='phoneshow_<? echo $language?>' style="display: none">
+										<? button_bar(button('Play',$playaction," "),button('Show', "langugaedetails('phone','$language',true); return false;"));?>
 									</div>
-									<div id='translationbasic_<? echo $language?>' style="display: none">
-										<? button_bar(button('Play',$playaction," "),button('Hide', "langugaedetails('$language',false); return false;"));?>
+									<div id='phonehide_<? echo $language?>' style="display: none">
+										<? button_bar(button('Play',$playaction," "),button('Hide', "langugaedetails('phone','$language',false); return false;"));?>
 									</div>
 								</td>
 							</tr>
@@ -1364,7 +1362,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<div id='emailoptions' style="display: none">
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
-				<td width="30%">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
+				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='email_select' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createemailmessage');show('selectemailmessage'); show('multilingualemailoption');}\"")); ?> Select a message&nbsp;
 <? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='eamil_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('createemailmessage');hide('selectemailmessage');hide('multilingualemailoption'); }\""));	?> Create a message
@@ -1380,31 +1378,39 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<br />
 					<table>
 						<tr>
-							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='phonetextarea' onkeyup=\"translationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
+							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='emailtextarea' onkeyup=\"translationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 					</table>
+					<div id='emailtranslationsshow' style="white-space:nowrap;display: none">
+						<? button_bar(button('Show Translations', "toggletranslations('email',true);submitTranslations('email');"));?>
+					</div>
+					<div id='emailtranslationshide' style="white-space:nowrap;display: none">
+						<? button_bar(button('Hide Translations', "toggletranslations('email',false);"),button('Refresh Translations', "submitTranslations('email');"));?>							
+					</div>
 					<div id='emailtranslations' style="display: none">
+
+					
 						<table border="0" cellpadding="2" cellspacing="0" width="100%" style="empty-cells:show;">
 <?			
 						foreach($ttslanguages as $ttslanguage) {
 							$language = escapehtml(ucfirst($ttslanguage));
 ?>
 							<tr>
-								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"email_$language","checkbox",NULL, NULL,"id='email_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
+								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"email_$language","checkbox",NULL, NULL,"id='email_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('email','$language')\"")); echo "&nbsp;" . $language . ": ";?>
 								</td>
-								<td class="topBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/pixel.gif" width="10" height="1"></td>
+								<td class="topBorder" valign="top" ><div id='emaillock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/pixel.gif" width="10" height="1"></td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;" width="100%">
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
-										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;">&nbsp;</div>
+										<div class="chop" id='emailtxt_<? echo $language?>'  onclick="langugaedetails('email','<? echo $language;?>',true); return false;">&nbsp;</div>
 										</td>
 									</tr>
 									</table>
-									<div id='languageexpand_<? echo $language?>' style="display: none">
+									<div id='emailexpandtxt_<? echo $language?>' style="display: none">
 										<? NewFormItem($f,$s,"emailexpand_$language", "textarea", 45, 3,"id='emailexpand_$language'"); ?>
 										<br />
-										<? NewFormItem($f,$s,"emailedit_$language","checkbox",1, NULL,"id='emailedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"emailedit('$language')\"")); ?> Override Translation 
+										<? NewFormItem($f,$s,"emailedit_$language","checkbox",1, NULL,"id='emailedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('email','$language')\"")); ?> Override Translation 
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
 										<a href="#" onclick="submitRetranslation('<? echo $language?>');return false;">Retranslation</a>
@@ -1413,11 +1419,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									</div>
 								</td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;">
-									<div id='translationdetails_<? echo $language?>' style="display: none">
-										<? button_bar(button('Play',$playaction," "),button('Show', "langugaedetails('$language',true); return false;"));?>
+									<div id='emailshow_<? echo $language?>' style="display: none">
+										<? button_bar(button('Show', "langugaedetails('email','$language',true); return false;"));?>
 									</div>
-									<div id='translationbasic_<? echo $language?>' style="display: none">
-										<? button_bar(button('Play',$playaction," "),button('Hide', "langugaedetails('$language',false); return false;"));?>
+									<div id='emailhide_<? echo $language?>' style="display: none">
+										<? button_bar(button('Hide', "langugaedetails('email','$language',false); return false;"));?>
 									</div>
 								</td>
 							</tr>
@@ -1895,24 +1901,25 @@ $languagestring = substr($languagestring,1);
 var languagelist=new Array(<? echo $languagestring; ?>);
 var googleready = false;
 var cancelgoogle = false;
+var callbacksection = 'phone';
 
 // Loading the translation setup
 if(isCheckboxChecked('radio_create')) {
 	var checked = false;
-	show('translationdetails');
+	show('phonetranslationsshow');
 	for (i = 0; i < languagelist.length; i++) {
 		var language = languagelist[i];
 		if(isCheckboxChecked('phone_' + language)){
-			show('language_' + language);
-			show('translationdetails_' + language);
+			show('phonetxt_' + language);
+			show('phoneshow_' + language);
 			checked = true;
 		} else {
-			hide('language_' + language);
-			hide('translationdetails_' + language);
+			hide('phonetxt_' + language);
+			hide('phoneshow_' + language);
 		}
-		editlanguage(language);
-		hide('languageexpand_' + language);
-		hide('translationbasic_' + language);
+		editlanguage('phone',language);
+		hide('phoneexpandtxt_' + language);
+		hide('phonehide_' + language);
 		if(!isCheckboxChecked('phoneedit_' + language)){
 			var x = new getObj('phoneexpand_' + language);
 			x.obj.disabled = true;
@@ -1921,7 +1928,7 @@ if(isCheckboxChecked('radio_create')) {
 	if(!checked) {
 		var x = new getObj('phonetranslatecheck');
 		x.obj.checked = false;
-		hide('translationdetails');
+		hide('phonetranslationsshow');
 	}
 }
 
@@ -1930,112 +1937,104 @@ if(isCheckboxChecked('radio_create')) {
  * If The Automatic translation check is clicked or the user switch from select a message to create a message 
  * If The checkbox is selected all the languages should be selected too.
  * If a user has unselected all languages the phonetranslatecheck is unselected to avoid both show and hide translation 
- * to show at the same time the show('translationdetails'); has to be conditional
+ * to show at the same time the show('phonetranslationsshow'); has to be conditional
  *
  */
 ?>
 function automatictranslation(section){
-	if(section == 'phone'){
-		if(isCheckboxChecked('phonetranslatecheck')){
-			for (i = 0; i < languagelist.length; i++) {
-				var language = languagelist[i]
-				var x = new getObj('phone_' + language);
-				show('language_' + language);
-				if(!x.obj.disabled) {
-					x.obj.checked = true;
-					show('translationdetails_' + language);
-				}
-				editlanguage(language);
-				hide('languageexpand_' + language);
-				hide('translationbasic_' + language);
+	if(isCheckboxChecked(section + 'translatecheck')){
+		for (i = 0; i < languagelist.length; i++) {
+			var language = languagelist[i]
+			var x = new getObj(section + '_' + language);
+			show(section + 'txt_' + language);
+			if(!x.obj.disabled) {
+				x.obj.checked = true;
+				show(section + 'show_' + language);
 			}
-			var basic = new getObj('translationbasic').obj;
-			if(basic.style.display != "block")
-				show('translationdetails');
-		} else {
-			for (i = 0; i < languagelist.length; i++) {
-				var language = languagelist[i];
-				var x = new getObj('phone_' + language);
-				x.obj.checked = false;
-				hide('language_' + language);
-				hide('translationdetails_' + language);
-				hide('languageexpand_' + language);
-				hide('translationbasic_' + language);
-			}
-			hide('translationdetails');
-			hide('translationbasic');
-			hide('phonetranslations');
+			editlanguage(section,language);
+			hide(section + 'expandtxt_' + language);
+			hide(section + 'hide_' + language);
 		}
-	} else if(section == 'email') {
- 
+		var basic = new getObj(section + 'translationshide').obj;
+		if(basic.style.display != "block")
+			show(section + 'translationsshow');
+	} else {
+		for (i = 0; i < languagelist.length; i++) {
+			var language = languagelist[i];
+			var x = new getObj(section + '_' + language);
+			x.obj.checked = false;
+			hide(section + 'txt_' + language);
+			hide(section + 'show_' + language);
+			hide(section + 'expandtxt_' + language);
+			hide(section + 'hide_' + language);
+		}
+		hide(section + 'translationsshow');
+		hide(section + 'translationshide');
+		hide(section + 'translations');
 	}
 }
 <? // Show Translation options ?>
 function toggletranslations(section,showtranslation){
-	if(section == 'phone'){
-		if (showtranslation) {
-			show('phonetranslations');
-			hide('translationdetails');
-			show('translationbasic');
-		} else {
-			hide('phonetranslations');
-			show('translationdetails');
-			hide('translationbasic');
-		}
-	} else if(section == 'email') {
- 
+	if (showtranslation) {
+		show(section + 'translations');
+		hide(section + 'translationsshow');
+		show(section + 'translationshide');
+	} else {
+		hide(section + 'translations');
+		show(section + 'translationsshow');
+		hide(section + 'translationshide');
 	}
 	return false;
 }
 
 <? // If language checkbox is selected ?>
-function translationlanguage(language){
+function translationlanguage(section,language){
 	var checked = false;
 	for (i = 0; i < languagelist.length; i++) {
-		if(isCheckboxChecked('phone_' + languagelist[i])){
+		if(isCheckboxChecked(section + '_' + languagelist[i])){
 			checked = true;
 		}
 	}
 	if(!checked) {
-		var x = new getObj('phonetranslatecheck');
+		var x = new getObj(section + 'translatecheck');
 		x.obj.checked = false;
 	}
-	if (isCheckboxChecked('phone_' + language)){
+	if (isCheckboxChecked(section + '_' + language)){
 		translationstate = false; // To make enable the refresh button
-		setChecked('phonetranslatecheck');
-		show('language_' + language);
-		show('translationdetails_' + language);
+		setChecked(section + 'translatecheck');
+		show(section + 'txt_' + language);
+		show(section + 'show_' + language);
 	} else {
-		hide('language_' + language);
-		hide('translationdetails_' + language);
-		var tr = new getObj('language_' + language).obj;
+		hide(section + 'txt_' + language);
+		hide(section + 'show_' + language);
+		var tr = new getObj(section + 'txt_' + language).obj;
 		tr.innerHTML = "&nbsp;";
-		var trexpand = new getObj('phoneexpand_' + language).obj;
+		var trexpand = new getObj(section + 'expand_' + language).obj;
 		trexpand.value = "";
-		var edit = new getObj('phoneedit_' + language).obj;
+		var edit = new getObj(section + 'edit_' + language).obj;
 		edit.checked = false;
 	}
-	editlanguage(language); <? // To show or hide the lock symbol ?>
-	hide('languageexpand_' + language);
-	hide('translationbasic_' + language);
+	editlanguage(section,language); <? // To show or hide the lock symbol ?>
+	hide(section + 'expandtxt_' + language);
+	hide(section + 'hide_' + language);
 }
 
 <? //If language details is clicked ?>
-function langugaedetails(language, details){
+function langugaedetails(section,language, details){
 	if(details){
-		hide('language_' + language);
-		show('languageexpand_' + language);
-		show('translationbasic_' + language);
-		hide('translationdetails_' + language);
+		hide(section + 'txt_' + language);
+		show(section + 'expandtxt_' + language);
+		show(section + 'hide_' + language);
+		hide(section + 'show_' + language);
 	} else {
-		show('language_' + language);
-		hide('languageexpand_' + language);
-		hide('translationbasic_' + language);
-		show('translationdetails_' + language);
+		show(section + 'txt_' + language);
+		hide(section + 'expandtxt_' + language);
+		hide(section + 'hide_' + language);
+		show(section + 'show_' + language);
 		<? // If the translation is edited the text will need to be copied when the language box is collapsed ?>
-		if(isCheckboxChecked('phoneedit_' + language)){
-			var tr = new getObj('language_' + language).obj;
-			var trexpand = new getObj('phoneexpand_' + language).obj;
+		if(isCheckboxChecked(section + 'edit_' + language)){
+			var tr = new getObj(section + 'txt_' + language).obj;
+			var trexpand = new getObj(section + 'expand_' + language).obj;
 			if(trexpand.value != "") {
   				tr.innerHTML = trexpand.value;
 			} else {
@@ -2044,19 +2043,20 @@ function langugaedetails(language, details){
 		}
 	}
 }
-function editlanguage(language) {
-	var textbox = new getObj('phoneexpand_' + language).obj;
-	textbox.disabled = !isCheckboxChecked('phoneedit_' + language);
-	if(isCheckboxChecked('phone_' + language) && isCheckboxChecked('phoneedit_' + language)){
-		show('lock_' + language);
+function editlanguage(section,language) {
+	var textbox = new getObj(section + 'expand_' + language).obj;
+	textbox.disabled = !isCheckboxChecked(section + 'edit_' + language);
+	if(isCheckboxChecked(section + '_' + language) && isCheckboxChecked(section + 'edit_' + language)){
+		show(section + 'lock_' + language);
 	} else {
-		hide('lock_' + language);
+		hide(section + 'lock_' + language);
 		translationstate = false; <? // Enable update translations  ?>
 	}
 }
 
-
 function setTranslations (html, langstring) {
+	section = callbacksection;
+	
 	var trlanguages = langstring.split(";");
 	response = JSON.parse(html, function (key, value) {	return value;}); //See documentation at http://www.json.org/js.html on how this function can be used
 	result = response.responseData;
@@ -2067,47 +2067,47 @@ function setTranslations (html, langstring) {
 		}		
 		return;
 	}
-	
+
 	if(result instanceof Array) {
 		for ( i in result) {
 			var language = trlanguages.shift();
 			if (result[i].responseStatus == 200){	
-				var tr = new getObj('language_' + language).obj;
-				var trexpand = new getObj('phoneexpand_' + language).obj;
-				var retranslation = new getObj('phoneverify_' + language).obj;
+				var tr = new getObj(section + 'txt_' + language).obj;
+				var trexpand = new getObj(section + 'expand_' + language).obj;
+				var retranslation = new getObj(section + 'verify_' + language).obj;
 				retranslation.innerHTML = "";
+				alert('translate ' + section);
+				
 				tr.innerHTML = result[i].responseData.translatedText;
 				trexpand.value = result[i].responseData.translatedText;
 				translationstate = true;
 			}
 		}
 	} else {
-		var tr = new getObj('language_' + trlanguages[0]).obj;
-		var trexpand = new getObj('phoneexpand_' + trlanguages[0]).obj;
+		var tr = new getObj(section + 'txt_' + trlanguages[0]).obj;
+		var trexpand = new getObj(section + 'expand_' + trlanguages[0]).obj;
 		tr.innerHTML = result.translatedText;
-		trexpand.value = result.translatedText;//tr.innerHTML;	
+		trexpand.value = result.translatedText;
 		
-		var retranslation = new getObj('phoneverify_' + trlanguages[0]).obj;
+		var retranslation = new getObj(section + 'verify_' + trlanguages[0]).obj;
 		retranslation.innerHTML = "";
 		translationstate = true;
 	}
 	if(submitstate && translationstate) {
 		for (i = 0; i < languagelist.length; i++) {
-			var trexpand = new getObj('phoneexpand_' + languagelist[i]).obj;
+			var trexpand = new getObj(section + 'expand_' + languagelist[i]).obj;
 			trexpand.disabled = false;
 		}		
 		submitForm('<? echo $f; ?>','send');
 	}		
 }
 	
-function submitTranslations() {
+function submitTranslations(section) {
 	if(translationstate){
 		return; //There are no changes to the text or a new language has not been added
 	}
-	var help = new getObj('refreshhelp').obj;
-	help.innerHTML = "";
 	
-    var text = new getObj('phonetextarea').obj.value;
+    var text = new getObj(section + 'textarea').obj.value;
 	if(text == "")
 		return;
 	if(text != text.substring(0, 2000)){
@@ -2117,10 +2117,10 @@ function submitTranslations() {
 	var serialized = [];
 	var trlanguages = [];
 	for (l in languagelist) {
-		if (isCheckboxChecked('phone_' + languagelist[l])){
-			if(isCheckboxChecked('phoneedit_' + languagelist[l])) {
-				var tr = new getObj('language_' + languagelist[l]).obj;
-				var trexpand = new getObj('phoneexpand_' + languagelist[l]).obj;
+		if (isCheckboxChecked(section + '_' + languagelist[l])){
+			if(isCheckboxChecked(section + 'edit_' + languagelist[l])) {
+				var tr = new getObj(section + 'txt_' + languagelist[l]).obj;
+				var trexpand = new getObj(section + 'expand_' + languagelist[l]).obj;
 				if(trexpand.value != "") {
 	  				tr.innerHTML = trexpand.value;
 				} else {
@@ -2133,6 +2133,7 @@ function submitTranslations() {
 	}
 	
 	var languages = serialized.join(";");
+	callbacksection = section;
 	ajax('translate.php',"english=" + encodeURIComponent(text) + "&languages=" + languages, setTranslations, languages);
 	return false;
 }
@@ -2183,7 +2184,7 @@ function sendjobconfirm() {
 	show('translationstatus');
 	status.innerHTML = "Generating Translations<br /><img src=\"img/progressbar.gif?date=" + <?= time() ?> + "\">";
 	scroll(0,0);
-	submitTranslations();
+	submitTranslations('phone');
 }
 </script>
 
