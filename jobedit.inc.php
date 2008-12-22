@@ -1374,12 +1374,24 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%">Default message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='email_select' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('newemailtext');show('selectemailmessage'); show('multilingualemailoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='eamil_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('newemailtext');hide('selectemailmessage');hide('multilingualemailoption'); }\""));	?> Create a message
-				<div id='selectphonemessage' style="display: block">
+<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='email_select' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createemailmessage');show('selectemailmessage'); show('multilingualemailoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='eamil_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('createemailmessage');hide('selectemailmessage');hide('multilingualemailoption'); }\""));	?> Create a message
+				<div id='selectemailmessage' style="display: block">
 <?					message_select('email',$f, $s,"emailmessageid", "id='emailmessageid'");?>
 				</div>
-				<div id='phonetranslations' style="display: none">
+				<div id='createemailmessage' style="white-space: nowrap;display: none">
+					Type Your English Message
+<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
+					| <?  NewFormItem($f,$s,"emailtranslatecheck","checkbox",1, NULL,"id='emailtranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('email')\"")); ?>
+					Automatically translate to other languages<table style="display: inline"><tr><td><?= help('Job_AutomaticallyTranslate',NULL,"small"); ?></td></tr></table>
+<? } ?>
+					<br />
+					<table>
+						<tr>
+							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='phonetextarea' onkeyup=\"translationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
+						</tr>
+					</table>
+				
 				</div>
 				</td>
 			</tr>
