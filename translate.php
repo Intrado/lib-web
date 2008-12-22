@@ -7,7 +7,7 @@
 
     $referer = $_SERVER["HTTP_REFERER"];
     if (!$referer) {
-    	$referer = "asp.schoolmessanger.com";
+    	$referer = "http://asp.schoolmessenger.com";
     }
 
     if(isset($_POST['english']) && isset($_POST['languages'])) {
