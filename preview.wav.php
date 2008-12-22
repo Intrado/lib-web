@@ -30,11 +30,15 @@ if(isset($_GET['id'])) {
 	// NOTE: Do Not Put $_GET['text'] in database without escaping
 	if(get_magic_quotes_gpc()) {
 		$text = stripslashes($_GET['text']);
+		$language = stripslashes($_GET['language']);
+		$gender = stripslashes($_GET['gender']);
 	} else {
 		$text = $_GET['text'];
+		$language = $_GET['language'];
+		$gender = $_GET['gender'];
 	}
 	
-	list($contenttype, $data) = renderTts($text, $_GET['language'], $_GET['gender']);
+	list($contenttype, $data) = renderTts($text, $language, $gender);
 
 	if ($data !== false) {
 		header("HTTP/1.0 200 OK");

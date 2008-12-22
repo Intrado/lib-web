@@ -37,12 +37,13 @@ if (isset($_GET['id'])) {
 } else if (isset($_GET['text'])&&isset($_GET['language'])&&isset($_GET['gender'])) {
 	if(get_magic_quotes_gpc()) {
 		$_SESSION['ttstext'] = stripslashes($_GET['text']);
+		$_SESSION['ttslanguage'] = stripslashes($_GET['language']);
+		$_SESSION['ttsgender'] = stripslashes($_GET['gender']);
 	} else {
 		$_SESSION['ttstext'] = $_GET['text'];
+		$_SESSION['ttslanguage'] = $_GET['language'];
+		$_SESSION['ttsgender'] = $_GET['gender'];
 	}
-	
-	$_SESSION['ttslanguage'] = $_GET['language'];
-	$_SESSION['ttsgender'] = $_GET['gender'];
 	$_SESSION['previewmessageid'] = NULL;
 	redirect();
 }
