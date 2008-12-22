@@ -60,15 +60,15 @@ $infojobtypes = DBFindMany("JobType", "from jobtype");
 $ttslanguages = Voice::getTTSLanguages();
 $languagearray = array();
 foreach ($ttslanguages as $lang) {
-	$languagearray[htmlentities(ucfirst($lang))] = NULL;
+	$languagearray[escapehtml(ucfirst($lang))] = NULL;
 }
 unset($languagearray["English"]);
 
 //Get Selected languages
 if($jobid && $job->getSetting('translationphonemessage')){
-	$translationjoblanguage = DBFindMany('JobLanguage', "FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid and m.deleted=1","j");
+	$translationjoblanguage = DBFindMany('JobLanguage', "FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid","j");
 	foreach ($translationjoblanguage as $obj) {
-		$languagearray[htmlentities($obj->language)] = $obj;
+		$languagearray[escapehtml($obj->language)] = $obj;
 	}
 }
 
@@ -432,7 +432,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			//now add any language options
 			$addlang = false;
-			if ($job->getSetting('translationphonemessage') ) {
+			if ($USER->authorize('sendmulti') && $job->getSetting('translationphonemessage') ) {
 				foreach($languagearray as $language => $joblanguageobject) {
 					$messageid = $joblanguageobject?($joblanguageobject->messageid):NULL;
 					if(GetFormData($f, $s, "translate_$language")){
@@ -444,10 +444,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							 // if messageid is not null there should be an existing message and joblanguage
 							$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0 and type='T'");
 							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and messageid= " . $message->id);
+							$message->userid = $USER->id;
+							$message->type = 'phone';
 						}
-						$message->userid = $USER->id;
-						$message->type = 'phone';
-						$message->name = GetFormData($f, $s,'name') . "_$language";
+						$message->name = GetFormData($f, $s,'name') . "- $language";
 						$message->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
 						$message->deleted = 1;
 						$message->update();
@@ -499,8 +499,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						}
 					}
 				}
-			} elseif($USER->authorize('sendmulti')) {
-				foreach (array("phone","email","print") as $type) {
+			}
+			if($USER->authorize('sendmulti')) {
+				$types = array();
+				if(!$job->getSetting('translationphonemessage'))
+					$types[] = "phone";
+				if(!$job->getSetting('translationemailmessage'))
+					$types[] = "email";	
+				$types[] = "print";	
+				
+				foreach ($types as $type) {
 					if (CheckFormSubmit($f,$type))
 						$addlang = true;
 
