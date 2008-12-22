@@ -1415,7 +1415,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<br /><br />
 										<a href="#" onclick="submitRetranslation('<? echo $language?>');return false;">Retranslation</a>
 										<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table> <br />
-										<? NewFormItem($f,$s,"emailverify_$language", "textarea", 45, 3,"id='verify_$language' disabled"); ?>
+										<? NewFormItem($f,$s,"emailverify_$language", "textarea", 45, 3,"id='emailverify_$language' disabled"); ?>
 									</div>
 								</td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;">
@@ -2067,17 +2067,14 @@ function setTranslations (html, langstring) {
 		}		
 		return;
 	}
-
 	if(result instanceof Array) {
 		for ( i in result) {
-			var language = trlanguages.shift();
-			if (result[i].responseStatus == 200){	
+			var language = trlanguages.shift();		
+			if (result[i].responseStatus == 200){
 				var tr = new getObj(section + 'txt_' + language).obj;
 				var trexpand = new getObj(section + 'expand_' + language).obj;
 				var retranslation = new getObj(section + 'verify_' + language).obj;
-				retranslation.innerHTML = "";
-				alert('translate ' + section);
-				
+				retranslation.innerHTML = "";		
 				tr.innerHTML = result[i].responseData.translatedText;
 				trexpand.value = result[i].responseData.translatedText;
 				translationstate = true;
