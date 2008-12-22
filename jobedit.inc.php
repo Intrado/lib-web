@@ -58,19 +58,9 @@ $infojobtypes = DBFindMany("JobType", "from jobtype");
 
  //Get available languages
 $ttslanguages = Voice::getTTSLanguages();
-$languagearray = array();
-foreach ($ttslanguages as $lang) {
-	$languagearray[escapehtml(ucfirst($lang))] = NULL;
-}
-unset($languagearray["English"]);
-
-//Get Selected languages
-if($jobid && $job->getSetting('translationphonemessage')){
-	$translationjoblanguage = DBFindMany('JobLanguage', "FROM joblanguage j, message m where j.messageid = m.id and j.jobid=$jobid","j");
-	foreach ($translationjoblanguage as $obj) {
-		$languagearray[escapehtml($obj->language)] = $obj;
-	}
-}
+$englishkey = array_search('english', $ttslanguages);
+if($englishkey !== false)
+	unset($ttslanguages[$englishkey]);
 
 $voicearray = array();
 $voices = DBFindMany("Voice","from ttsvoice");
@@ -442,69 +432,52 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//now add any language options
 			$addlang = false;
 			if ($USER->authorize('sendmulti') && $job->getSetting('translationphonemessage') ) {
-				foreach($languagearray as $language => $joblanguageobject) {
-					$messageid = $joblanguageobject?($joblanguageobject->messageid):NULL;
-					if(GetFormData($f, $s, "translate_$language")){
-						$part = NULL;
-						$joblanguage = NULL;
+				foreach($ttslanguages as $ttslanguage) {
+					$language = escapehtml(ucfirst($ttslanguage));
+					$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$ttslanguage'");
 
-						$message = new Message($messageid);
-						if($messageid != NULL) {
-							 // if messageid is not null there should be an existing message and joblanguage
-							$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0 and type='T'");
-							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and messageid= " . $message->id);
-						}
-						$message->userid = $USER->id;
-						$message->type = 'phone';
-						$message->name = GetFormData($f, $s,'name') . "-$language";
-						$message->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
-						$message->deleted = 1;
-						$message->update();
-
-						if (!$joblanguage) {
-							$joblanguage = new Joblanguage();
-						}
-						$joblanguage->jobid = $job->id;
-						$joblanguage->messageid = $message->id;
-						$joblanguage->type = 'phone';
-						$joblanguage->language = $language;
-						$joblanguage->translationeditlock = GetFormData($f, $s,'tr_edit_' . $language);
-						$joblanguage->update();
-
-						if(!$part) {
-							$part = new MessagePart();
-						}
-						$part->messageid = $message->id;
-						$part->type="T";
-
-						$langstr = strtolower($language);
+					if(GetFormData($f, $s, "phone_$language")){
+						// --------- Select the voice id depending on choice and availability 
+						$voiceid = NULL;
 						if (GetFormData($f, $s, 'voiceradio') == "female") {
-							if(isset($voicearray['female'][$langstr])){
-								$part->voiceid = $voicearray['female'][$langstr];
-							} else if(isset($voicearray['male'][$langstr])){
-								$part->voiceid = $voicearray['male'][$langstr];
-							} else {
-								error_log("Warning no voice found for $langstr");
+							if(isset($voicearray['female'][$ttslanguage])){
+								$voiceid = $voicearray['female'][$ttslanguage];
+							} else if(isset($voicearray['male'][$ttslanguage])){
+								$voiceid = $voicearray['male'][$ttslanguage];
 							}
 						} else {
-							if(isset($voicearray['male'][$langstr])){
-								$part->voiceid = $voicearray['male'][$langstr];
-							} else if(isset($voicearray['female'][$langstr])){
-								$part->voiceid = $voicearray['female'][$langstr];
-							} else {
-								error_log("Warning no voice found for $langstr");
+							if(isset($voicearray['male'][$ttslanguage])){
+								$voiceid = $voicearray['male'][$ttslanguage];
+							} else if(isset($voicearray['female'][$ttslanguage])){
+								$voiceid = $voicearray['female'][$ttslanguage];
 							}
 						}
-
-						$part->txt = GetFormData($f, $s, "translationtextexpand_" . $language);
-						$part->sequence = 0;
-						$part->update();
+						if(!$voiceid)
+							error_log("Warning no voice found for $ttslanguage");
+						// --------- End of voice selection
+						if($joblanguage) {
+							if($part = DBFind("MessagePart","from messagepart where messageid=" . $joblanguage->messageid ." and sequence=0")){
+								$part->voiceid = $voiceid;						
+								$part->txt = GetFormData($f, $s, "phoneexpand_" . $language);
+								$part->update();
+							}
+						} else {
+							$message = new Message();
+							$message->userid = $USER->id;$message->type = 'phone';$message->name = "$language translation";$message->description = "";$message->deleted = 1;
+							$message->create();
+							$part = new MessagePart();
+							$part->messageid = $message->id;$part->type="T";$part->sequence = 0;
+							$part->txt = GetFormData($f, $s, "phoneexpand_" . $language);
+							$part->create();
+							$joblanguage = new Joblanguage();
+							$joblanguage->jobid = $job->id;$joblanguage->messageid = $message->id;$joblanguage->type = 'phone';$joblanguage->language=$language;
+						}	
+						$joblanguage->translationeditlock = GetFormData($f, $s,'phoneedit_' . $language);
+						$joblanguage->update();				
 					} else {
-						// delete message if exist
-						if($messageid){
-							QuickUpdate("delete from joblanguage where messageid=$messageid");
-							QuickUpdate("delete from message where id=$messageid");
-							QuickUpdate("delete from messagepart where messageid=$messageid");
+						if($joblanguage) {
+							QuickUpdate("delete joblanguage, message, messagepart FROM joblanguage, message, messagepart where 
+							joblanguage.messageid = $joblanguage->messageid and joblanguage.messageid = message.id and joblanguage.messageid = messagepart.messageid");
 						}
 					}
 				}
@@ -631,15 +604,15 @@ if( $reloadform )
 	PutFormData($f,$s,"emailtextarea","","text");
 	PutFormData($f,$s,"phoneradio","select");
 	if($USER->authorize('sendmulti')) {
-		PutFormData($f,$s,"translatecheck",0,"bool",0,1);
+		PutFormData($f,$s,"phonetranslatecheck",0,"bool",0,1);
 		PutFormData($f,$s,"emailtranslatecheck",0,"bool",0,1);
 		
 		foreach($ttslanguages as $ttslanguage) {
 			$language = escapehtml(ucfirst($ttslanguage));
-			PutFormData($f,$s,"translationtextexpand_$language","","text","nomin","nomax",false);
-			PutFormData($f,$s,"retranslationtext_$language","","text","nomin","nomax",false);
-			PutFormData($f,$s,"translate_$language",0,"bool",0,1);
-			PutFormData($f,$s,"tr_edit_$language",0,"bool",0,1);	
+			PutFormData($f,$s,"phoneexpand_$language","","text","nomin","nomax",false);
+			PutFormData($f,$s,"phoneverify_$language","","text","nomin","nomax",false);
+			PutFormData($f,$s,"phone_$language",0,"bool",0,1);
+			PutFormData($f,$s,"phoneedit_$language",0,"bool",0,1);	
 
 			PutFormData($f,$s,"emailexpand_$language","","text","nomin","nomax",false);
 			PutFormData($f,$s,"emailverify_$language","","text","nomin","nomax",false);
@@ -661,19 +634,24 @@ if( $reloadform )
 			}	
 			foreach($joblangs['phone'] as $joblang){
 				$language = escapehtml(ucfirst($joblang->language));				
-				PutFormData($f,$s,"translatecheck",1,"bool",0,1);
-				PutFormData($f,$s,"translate_$language",1,"bool",0,1);
+				PutFormData($f,$s,"phonetranslatecheck",1,"bool",0,1);
+				PutFormData($f,$s,"phone_$language",1,"bool",0,1);
+				PutFormData($f,$s,"phoneid_$language",$joblang->messageid,"hidden","nomin","nomax",false);
 				if ($joblang->translationeditlock != 0 || $expired === false) {
 					if($part = DBFind("MessagePart","from messagepart where messageid=$joblang->messageid and sequence = 0")) {
 						$body = escapehtml($part->txt);
 						PutFormData($f,$s,"translationtext_$language",$body,"text","nomin","nomax",false);
-						PutFormData($f,$s,"translationtextexpand_$language",$body,"text","nomin","nomax",false);
-						PutFormData($f,$s,"tr_edit_$language",$joblang->translationeditlock,"bool",0,1);			
+						PutFormData($f,$s,"phoneexpand_$language",$body,"text","nomin","nomax",false);
+						PutFormData($f,$s,"phoneedit_$language",$joblang->translationeditlock,"bool",0,1);			
 					}
 				}			
 			}
 		}
 		if($job->getSetting('translationemailmessage')) {
+			PutFormData($f,$s,"emailradio","create");
+			if($part = DBFind("MessagePart","from messagepart where messageid=$job->emailmessageid and sequence=0")) {
+				PutFormData($f,$s,"emailtextarea",escapehtml($part->txt),'text');		
+			}	
 			foreach($joblangs['email'] as $joblang){
 				$language = escapehtml(ucfirst($joblang->language));				
 				PutFormData($f,$s,"emailtranslatecheck",1,"bool",0,1);
@@ -1158,11 +1136,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 			<tr>
 				<td>&nbsp;&nbsp;Earliest <?= help('Job_PhoneEarliestTime', NULL, 'small') ?></td>
-				<td><? time_select($f,$s,"starttime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
+				<td><? time_select($f,$s,"starttime", NULL, 5, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
 			</tr>
 			<tr>
 				<td>&nbsp;&nbsp;Latest <?= help('Job_PhoneLatestTime', NULL, 'small') ?></td>
-				<td><? time_select($f,$s,"endtime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
+				<td><? time_select($f,$s,"endtime", NULL, 5, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
 			</tr>
 			<tr>
 				<td>Email a report when the job completes <?= help('Job_SendReport', NULL, 'small'); ?></td>
@@ -1199,7 +1177,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<div id='createphonemessage' style="white-space: nowrap;display: none">
 					Type Your English Message
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
-					| <?  NewFormItem($f,$s,"translatecheck","checkbox",1, NULL,"id='translatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('phone')\"")); ?>
+					| <?  NewFormItem($f,$s,"phonetranslatecheck","checkbox",1, NULL,"id='phonetranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('phone')\"")); ?>
 					Automatically translate to other languages<table style="display: inline"><tr><td><?= help('Job_AutomaticallyTranslate',NULL,"small"); ?></td></tr></table>
 <? } ?>
 					<br />
@@ -1231,31 +1209,31 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 						<table border="0" cellpadding="2" cellspacing="0" width="100%" style="empty-cells:show;">
 <?
-						foreach($languagearray as $language => $joblanguageobject) {
-							$languageisset = $joblanguageobject?1:($jobid?0:1);
+						foreach($ttslanguages as $ttslanguage) {
+							$language = escapehtml(ucfirst($ttslanguage));
 							$playaction = "previewlanguage('$language'," . (isset($voicearray["female"][strtolower($language)])?"true":"false") . "," . (isset($voicearray["male"][strtolower($language)])?"true":"false") . ")"
 ?>
 							<tr>
-								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"translate_$language","checkbox",NULL, NULL,"id='translate_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
+								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"phone_$language","checkbox",NULL, NULL,"id='phone_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
 								</td>
 								<td class="topBorder" valign="top" ><div id='lock_<? echo $language?>'><img src="img/padlock.gif"></div><img src="img/pixel.gif" width="10" height="1"></td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;" width="100%">
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
-										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;" style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">&nbsp;</div>
+										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;">&nbsp;</div>
 										</td>
 									</tr>
 									</table>
 									<div id='languageexpand_<? echo $language?>' style="display: none">
-										<? NewFormItem($f,$s,"translationtextexpand_$language", "textarea", 45, 3,"id='translationtextexpand_$language'"); ?>
+										<? NewFormItem($f,$s,"phoneexpand_$language", "textarea", 45, 3,"id='phoneexpand_$language'"); ?>
 										<br />
-										<? NewFormItem($f,$s,"tr_edit_$language","checkbox",1, NULL,"id='tr_edit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Override Translation 
+										<? NewFormItem($f,$s,"phoneedit_$language","checkbox",1, NULL,"id='phoneedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('$language')\"")); ?> Override Translation 
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
 										<a href="#" onclick="submitRetranslation('<? echo $language?>');return false;">Retranslation</a>
 										<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table> <br />
-										<? NewFormItem($f,$s,"retranslationtext_$language", "textarea", 45, 3,"id='retranslationtext_$language' disabled"); ?>
+										<? NewFormItem($f,$s,"phoneverify_$language", "textarea", 45, 3,"id='phoneverify_$language' disabled"); ?>
 									</div>
 								</td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;">
@@ -1407,9 +1385,9 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					</table>
 					<div id='emailtranslations' style="display: none">
 						<table border="0" cellpadding="2" cellspacing="0" width="100%" style="empty-cells:show;">
-<?
-						foreach($languagearray as $language => $joblanguageobject) {
-							$languageisset = $joblanguageobject?1:($jobid?0:1);
+<?			
+						foreach($ttslanguages as $ttslanguage) {
+							$language = escapehtml(ucfirst($ttslanguage));
 ?>
 							<tr>
 								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"email_$language","checkbox",NULL, NULL,"id='email_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('$language')\"")); echo "&nbsp;" . $language . ": ";?>
@@ -1419,7 +1397,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									<table width="100%" style="table-layout:fixed;">
 									<tr>
 										<td>
-										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;" style="<? if($languageisset) echo "display:block"; else  echo "display:none";?>">&nbsp;</div>
+										<div class="chop" id='language_<? echo $language?>'  onclick="langugaedetails('<? echo $language;?>',true); return false;">&nbsp;</div>
 										</td>
 									</tr>
 									</table>
@@ -1888,7 +1866,7 @@ function previewlanguage(language,female,male) {
 	if(language == 'english')
 		text = new getObj('phonetextarea').obj;
 	else
-		text = new getObj('translationtextexpand_' + language).obj;
+		text = new getObj('phoneexpand_' + language).obj;
 	var encodedtext=encodeURIComponent(text.value);
 
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
@@ -1909,7 +1887,7 @@ if(isCheckboxChecked('radio_select')) {
 <? // These scripts contol the translation ?>
 <? if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { 
 $languagestring = "";
-foreach($languagearray as $language => $joblanguageobject) { $languagestring .= ",'$language'";}
+foreach($ttslanguages as $ttslanguage) { $languagestring .= ",'" . escapehtml(ucfirst($ttslanguage)) . "'";}
 $languagestring = substr($languagestring,1);
 ?>
 <script src='script/json2.js'></script>
@@ -1924,7 +1902,7 @@ if(isCheckboxChecked('radio_create')) {
 	show('translationdetails');
 	for (i = 0; i < languagelist.length; i++) {
 		var language = languagelist[i];
-		if(isCheckboxChecked('translate_' + language)){
+		if(isCheckboxChecked('phone_' + language)){
 			show('language_' + language);
 			show('translationdetails_' + language);
 			checked = true;
@@ -1935,13 +1913,13 @@ if(isCheckboxChecked('radio_create')) {
 		editlanguage(language);
 		hide('languageexpand_' + language);
 		hide('translationbasic_' + language);
-		if(!isCheckboxChecked('tr_edit_' + language)){
-			var x = new getObj('translationtextexpand_' + language);
+		if(!isCheckboxChecked('phoneedit_' + language)){
+			var x = new getObj('phoneexpand_' + language);
 			x.obj.disabled = true;
 		}
 	}
 	if(!checked) {
-		var x = new getObj('translatecheck');
+		var x = new getObj('phonetranslatecheck');
 		x.obj.checked = false;
 		hide('translationdetails');
 	}
@@ -1951,17 +1929,17 @@ if(isCheckboxChecked('radio_create')) {
 /*
  * If The Automatic translation check is clicked or the user switch from select a message to create a message 
  * If The checkbox is selected all the languages should be selected too.
- * If a user has unselected all languages the translatecheck is unselected to avoid both show and hide translation 
+ * If a user has unselected all languages the phonetranslatecheck is unselected to avoid both show and hide translation 
  * to show at the same time the show('translationdetails'); has to be conditional
  *
  */
 ?>
 function automatictranslation(section){
 	if(section == 'phone'){
-		if(isCheckboxChecked('translatecheck')){
+		if(isCheckboxChecked('phonetranslatecheck')){
 			for (i = 0; i < languagelist.length; i++) {
 				var language = languagelist[i]
-				var x = new getObj('translate_' + language);
+				var x = new getObj('phone_' + language);
 				show('language_' + language);
 				if(!x.obj.disabled) {
 					x.obj.checked = true;
@@ -1977,7 +1955,7 @@ function automatictranslation(section){
 		} else {
 			for (i = 0; i < languagelist.length; i++) {
 				var language = languagelist[i];
-				var x = new getObj('translate_' + language);
+				var x = new getObj('phone_' + language);
 				x.obj.checked = false;
 				hide('language_' + language);
 				hide('translationdetails_' + language);
@@ -2014,17 +1992,17 @@ function toggletranslations(section,showtranslation){
 function translationlanguage(language){
 	var checked = false;
 	for (i = 0; i < languagelist.length; i++) {
-		if(isCheckboxChecked('translate_' + languagelist[i])){
+		if(isCheckboxChecked('phone_' + languagelist[i])){
 			checked = true;
 		}
 	}
 	if(!checked) {
-		var x = new getObj('translatecheck');
+		var x = new getObj('phonetranslatecheck');
 		x.obj.checked = false;
 	}
-	if (isCheckboxChecked('translate_' + language)){
+	if (isCheckboxChecked('phone_' + language)){
 		translationstate = false; // To make enable the refresh button
-		setChecked('translatecheck');
+		setChecked('phonetranslatecheck');
 		show('language_' + language);
 		show('translationdetails_' + language);
 	} else {
@@ -2032,9 +2010,9 @@ function translationlanguage(language){
 		hide('translationdetails_' + language);
 		var tr = new getObj('language_' + language).obj;
 		tr.innerHTML = "&nbsp;";
-		var trexpand = new getObj('translationtextexpand_' + language).obj;
+		var trexpand = new getObj('phoneexpand_' + language).obj;
 		trexpand.value = "";
-		var edit = new getObj('tr_edit_' + language).obj;
+		var edit = new getObj('phoneedit_' + language).obj;
 		edit.checked = false;
 	}
 	editlanguage(language); <? // To show or hide the lock symbol ?>
@@ -2055,9 +2033,9 @@ function langugaedetails(language, details){
 		hide('translationbasic_' + language);
 		show('translationdetails_' + language);
 		<? // If the translation is edited the text will need to be copied when the language box is collapsed ?>
-		if(isCheckboxChecked('tr_edit_' + language)){
+		if(isCheckboxChecked('phoneedit_' + language)){
 			var tr = new getObj('language_' + language).obj;
-			var trexpand = new getObj('translationtextexpand_' + language).obj;
+			var trexpand = new getObj('phoneexpand_' + language).obj;
 			if(trexpand.value != "") {
   				tr.innerHTML = trexpand.value;
 			} else {
@@ -2067,9 +2045,9 @@ function langugaedetails(language, details){
 	}
 }
 function editlanguage(language) {
-	var textbox = new getObj('translationtextexpand_' + language).obj;
-	textbox.disabled = !isCheckboxChecked('tr_edit_' + language);
-	if(isCheckboxChecked('translate_' + language) && isCheckboxChecked('tr_edit_' + language)){
+	var textbox = new getObj('phoneexpand_' + language).obj;
+	textbox.disabled = !isCheckboxChecked('phoneedit_' + language);
+	if(isCheckboxChecked('phone_' + language) && isCheckboxChecked('phoneedit_' + language)){
 		show('lock_' + language);
 	} else {
 		hide('lock_' + language);
@@ -2095,8 +2073,8 @@ function setTranslations (html, langstring) {
 			var language = trlanguages.shift();
 			if (result[i].responseStatus == 200){	
 				var tr = new getObj('language_' + language).obj;
-				var trexpand = new getObj('translationtextexpand_' + language).obj;
-				var retranslation = new getObj('retranslationtext_' + language).obj;
+				var trexpand = new getObj('phoneexpand_' + language).obj;
+				var retranslation = new getObj('phoneverify_' + language).obj;
 				retranslation.innerHTML = "";
 				tr.innerHTML = result[i].responseData.translatedText;
 				trexpand.value = result[i].responseData.translatedText;
@@ -2105,17 +2083,17 @@ function setTranslations (html, langstring) {
 		}
 	} else {
 		var tr = new getObj('language_' + trlanguages[0]).obj;
-		var trexpand = new getObj('translationtextexpand_' + trlanguages[0]).obj;
+		var trexpand = new getObj('phoneexpand_' + trlanguages[0]).obj;
 		tr.innerHTML = result.translatedText;
 		trexpand.value = result.translatedText;//tr.innerHTML;	
 		
-		var retranslation = new getObj('retranslationtext_' + trlanguages[0]).obj;
+		var retranslation = new getObj('phoneverify_' + trlanguages[0]).obj;
 		retranslation.innerHTML = "";
 		translationstate = true;
 	}
 	if(submitstate && translationstate) {
 		for (i = 0; i < languagelist.length; i++) {
-			var trexpand = new getObj('translationtextexpand_' + languagelist[i]).obj;
+			var trexpand = new getObj('phoneexpand_' + languagelist[i]).obj;
 			trexpand.disabled = false;
 		}		
 		submitForm('<? echo $f; ?>','send');
@@ -2139,10 +2117,10 @@ function submitTranslations() {
 	var serialized = [];
 	var trlanguages = [];
 	for (l in languagelist) {
-		if (isCheckboxChecked('translate_' + languagelist[l])){
-			if(isCheckboxChecked('tr_edit_' + languagelist[l])) {
+		if (isCheckboxChecked('phone_' + languagelist[l])){
+			if(isCheckboxChecked('phoneedit_' + languagelist[l])) {
 				var tr = new getObj('language_' + languagelist[l]).obj;
-				var trexpand = new getObj('translationtextexpand_' + languagelist[l]).obj;
+				var trexpand = new getObj('phoneexpand_' + languagelist[l]).obj;
 				if(trexpand.value != "") {
 	  				tr.innerHTML = trexpand.value;
 				} else {
@@ -2165,13 +2143,13 @@ function setRetranslation (html, language) {
 	if (response.responseStatus != 200){	
 		return;
 	}
-	var retranslation = new getObj('retranslationtext_' + language).obj;
+	var retranslation = new getObj('phoneverify_' + language).obj;
 	retranslation.innerHTML = result.translatedText;
 }
 
 function submitRetranslation(language) {
-	var text = new getObj('translationtextexpand_' + language).obj.value;
-	var retranslation = new getObj('retranslationtext_' + language).obj;
+	var text = new getObj('phoneexpand_' + language).obj.value;
+	var retranslation = new getObj('phoneverify_' + language).obj;
 	
 	if(text == "")
 		return;
@@ -2182,7 +2160,7 @@ function submitRetranslation(language) {
 	var serialized = [];
 	var trlanguages = [];
 	for (l in languagelist) {
-		if (isCheckboxChecked('translate_' + languagelist[l])){
+		if (isCheckboxChecked('phone_' + languagelist[l])){
 			serialized.push(encodeURIComponent(languagelist[l]));
 		}
 	}
@@ -2192,9 +2170,9 @@ function submitRetranslation(language) {
 	return false;
 }
 function sendjobconfirm() {
-	if(isCheckboxChecked('radio_select') || !isCheckboxChecked('translatecheck') || translationstate) {
+	if(isCheckboxChecked('radio_select') || !isCheckboxChecked('phonetranslatecheck') || translationstate) {
 		for (i = 0; i < languagelist.length; i++) {
-			var trexpand = new getObj('translationtextexpand_' + languagelist[i]).obj;
+			var trexpand = new getObj('phoneexpand_' + languagelist[i]).obj;
 			trexpand.disabled = false;
 		}
 		submitForm('<? echo $f; ?>','send');
