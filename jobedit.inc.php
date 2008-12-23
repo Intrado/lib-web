@@ -195,13 +195,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->description = trim(GetFormData($f,$s,"description"));
 				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
 			} else {
+				
+foreach (array("phone","email") as $type){	
+				$mstr = $type . "messageid";
 				// If this is a phonemessage and no message was selected the message is a translation message and the phonetextarea is requerd to be fuild in.
-				if(GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create"){
+				if(GetFormData($f, $s, "send" . $type) && GetFormData($f, $s, $type . "radio") == "create"){
 					$themessageid = null;
 					// If this Message was created in job editor we are free to edit the message, otherwise we have to create a new message
-					if($job->getSetting('translationphonemessage')) {
-						if( $job->phonemessageid ) {
-							$themessageid = $job->phonemessageid;
+					if($job->getSetting("translation" . $type . "message")) {	
+						$themessageid = $job->$mstr;
+						if($themessageid) {
 							//Delete the part(s) of the message
 							QuickUpdate("delete from messagepart where messageid=$themessageid");
 						}
@@ -209,46 +212,46 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						if($job->id)
 							QuickUpdate("delete from joblanguage where jobid=" . $job->id);  // If translation mode switched we need to rease the previous joblanguage assosiations
 					}
-					$job->setSetting('translationphonemessage', 1); // Tell the job that this message was created here
+					$job->setSetting("translation" . $type . "message", 1); // Tell the job that this message was created here
 					$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
-					$newphonemessage = new Message($themessageid);
-					$newphonemessage->userid = $USER->id;
-					$newphonemessage->type = 'phone';
-					$newphonemessage->name = GetFormData($f, $s,'name');
-					$newphonemessage->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
-					$newphonemessage->deleted = 1;
-					$newphonemessage->update();
+					$newmessage = new Message($themessageid);
+					if($type == "email") {
+						$newmessage->subject = GetFormData($f, $s, 'emailsubject');
+						$newmessage->fromname = $USER->firstname;
+						$newmessage->fromaddress = $USER->lastname;
+						$useremails = explode(";", $USER->email);
+						$newmessage->fromemail = $useremails[0];
+						$newmessage->stuffHeaders();
+					}
+					
+					$newmessage->userid = $USER->id;
+					$newmessage->type = $type;
+					$newmessage->name = GetFormData($f, $s,'name');
+					$newmessage->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
+					$newmessage->deleted = 1;
+					$newmessage->update();
 
 					$part = new MessagePart();
-					$part->messageid = $newphonemessage->id;
+					$part->messageid = $newmessage->id;
 					$part->type="T";
-					$part->voiceid = $voicearray[GetFormData($f, $s, 'voiceradio')]["english"];
-					$part->txt = GetFormData($f, $s, 'phonetextarea');
+					$part->voiceid = ($type == "phone")?$voicearray[GetFormData($f, $s, 'voiceradio')]["english"]:NULL;
+					$part->txt = GetFormData($f, $s, $type . "textarea");
 					$part->sequence = 0;
 					$part->create();
 					//Do a putform on message select so if there is an error later on, another message does not get created
-					PutFormData($f, $s, "phonemessageid", $newphonemessage->id, 'number', 'nomin', 'nomax');
+					PutFormData($f, $s, $type . "messageid", $newmessage->id, 'number', 'nomin', 'nomax');
 				} else {
-					if($job->getSetting('translationphonemessage') && $job->id) {
-						QuickUpdate("delete joblanguage jl, message ms, messagepart mp
-											FROM joblanguage jl, message ms, messagepart mp
-											where
-											jl.jobid=" . $job->id . " and
-											jl.messageid = ms.id and
-											jl.messageid = mp.messageid");
-
-						if( $job->phonemessageid ) {
-							QuickUpdate("delete message ms, messagepart mp FROM message ms, messagepart mp
-											 where
-											 ms.id=" . $job->phonemessageid . " and
-											 mp.messageid = ms.id");
+					if($job->getSetting("translation" . $type . "message") && $job->id) {
+						QuickUpdate("delete joblanguage j, message m, messagepart p FROM joblanguage j, message m, messagepart p where
+											j.jobid=" . $job->id . " and j.messageid = m.id and m.type = '" . $type . "' and j.messageid = p.messageid");	
+						if($job->$mstr) {
+							QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where 
+								m.id=" . $job->$mstr . " and m.type = '" . $type . "' and p.messageid = m.id");
 						}
 					}
-					$job->setSetting('translationphonemessage', 0);
+					$job->setSetting("translation" . $type . "message", 0);
 				}
-
-
-
+}
 				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
 					$themessageid = null;
 					// If this Message was create in job editor we are free to edit the message, otherwise we have to create a new message
@@ -603,7 +606,12 @@ if( $reloadform )
 	PutFormData($f,$s,"voiceradio","female");
 	PutFormData($f,$s,"phonetextarea","","text");
 	PutFormData($f,$s,"emailtextarea","","text");
+	PutFormData($f,$s,"emailsubject","","text");
 	PutFormData($f,$s,"phoneradio","select");
+	PutFormData($f,$s,"emailradio","select");
+	
+	$useremails = explode(";", $USER->email);
+	PutFormData($f,$s,"fromemail",$useremails[0],"hidden");
 	if($USER->authorize('sendmulti')) {
 		PutFormData($f,$s,"phonetranslatecheck",0,"bool",0,1);
 		PutFormData($f,$s,"emailtranslatecheck",0,"bool",0,1);
@@ -628,7 +636,7 @@ if( $reloadform )
 		}
 		if($job->getSetting('translationphonemessage')) {
 			PutFormData($f,$s,"phoneradio","create");
-			if($part = DBFind("MessagePart","from messagepart where messageid=$job->phonemessageid and sequence=0")) {
+			if($job->phonemessageid && $part = DBFind("MessagePart","from messagepart where messageid=$job->phonemessageid and sequence=0")) {
 				PutFormData($f,$s,"phonetextarea",escapehtml($part->txt),'text');
 				if($part->voiceid == $voicearray['male']['english'])
 					PutFormData($f,$s,"voiceradio","male");			
@@ -637,9 +645,8 @@ if( $reloadform )
 				$language = escapehtml(ucfirst($joblang->language));				
 				PutFormData($f,$s,"phonetranslatecheck",1,"bool",0,1);
 				PutFormData($f,$s,"phone_$language",1,"bool",0,1);
-				PutFormData($f,$s,"phoneid_$language",$joblang->messageid,"hidden","nomin","nomax",false);
 				if ($joblang->translationeditlock != 0 || $expired === false) {
-					if($part = DBFind("MessagePart","from messagepart where messageid=$joblang->messageid and sequence = 0")) {
+					if($joblang->messageid && $part = DBFind("MessagePart","from messagepart where messageid=$joblang->messageid and sequence = 0")) {
 						$body = escapehtml($part->txt);
 						PutFormData($f,$s,"translationtext_$language",$body,"text","nomin","nomax",false);
 						PutFormData($f,$s,"phoneexpand_$language",$body,"text","nomin","nomax",false);
@@ -650,6 +657,10 @@ if( $reloadform )
 		}
 		if($job->getSetting('translationemailmessage')) {
 			PutFormData($f,$s,"emailradio","create");
+			if($job->emailmessageid && $message = DBFind("Message","from message where id=$job->emailmessageid")) {
+				$message->readHeaders();
+				PutFormData($f,$s,"emailsubject",escapehtml($message->subject),'text');		
+			}	
 			if($part = DBFind("MessagePart","from messagepart where messageid=$job->emailmessageid and sequence=0")) {
 				PutFormData($f,$s,"emailtextarea",escapehtml($part->txt),'text');		
 			}	
@@ -658,7 +669,7 @@ if( $reloadform )
 				PutFormData($f,$s,"emailtranslatecheck",1,"bool",0,1);
 				PutFormData($f,$s,"email_$language",1,"bool",0,1);
 				if ($joblang->translationeditlock || $expired == false) {
-					if($part = DBFind("MessagePart","from messagepart where messageid=$joblang->messageid and sequence = 0")) {
+					if($joblang->messageid && $part = DBFind("MessagePart","from messagepart where messageid=$joblang->messageid and sequence = 0")) {
 						$body = escapehtml($part->txt);
 						PutFormData($f,$s,"emailtext_$language",$body,"text","nomin","nomax",false);
 						PutFormData($f,$s,"emailexpand_$language",$body,"text","nomin","nomax",false);
@@ -714,7 +725,6 @@ if( $reloadform )
 	PutFormData($f,"print","newlangprint","");
 	PutFormData($f,"print","newmessprint","");
 	
-	PutFormData($f,$s,"emailradio","select");
 	
 	
 	$smsmessage = DBFind("Message","from message where id='$job->smsmessageid' and deleted=1 and type='sms'");
@@ -981,8 +991,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<table border="0" cellpadding="2" cellspacing="0" width="100%">
 			<tr>
 				<td width="30%">Job Name</td>
-				<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?></td>
-			</tr>
+				<td><? NewFormItem($f,$s,"name","text", 30,$JOBTYPE == "repeating" ? 30:50); ?>
+			</td>
 			<tr>
 				<td>Description</td>
 				<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
@@ -1170,12 +1180,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createphonemessage');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('phone',false);automatictranslation('phone');":"") . "show('createphonemessage');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
-				<div id='selectphonemessage' style="display: block">
+<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('phonecreatemessage');show('phoneselectmessage'); show('phonemultilingualoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('phone',false);automatictranslation('phone');":"") . "show('phonecreatemessage');hide('phoneselectmessage');hide('phonemultilingualoption'); }\""));	?> Create a text-to-speech message
+				<div id='phoneselectmessage' style="display: block">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
-				<div id='createphonemessage' style="white-space: nowrap;display: none">
+				<div id='phonecreatemessage' style="white-space: nowrap;display: none">
 					Type Your English Message
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					| <?  NewFormItem($f,$s,"phonetranslatecheck","checkbox",1, NULL,"id='phonetranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('phone')\"")); ?>
@@ -1267,7 +1277,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		advanced options</a></div>
 
 		<div id='phonedetails' style="display: none"><? if($USER->authorize('sendmulti')) { ?>
-		<div id='multilingualphoneoption' style="display: none">
+		<div id='phonemultilingualoption' style="display: none">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%">Multilingual message options <?= help('Job_MultilingualPhoneOption',NULL,"small"); ?></td>
@@ -1365,12 +1375,16 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createemailmessage');show('selectemailmessage'); show('multilingualemailoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('createemailmessage');hide('selectemailmessage');hide('multilingualemailoption'); }\""));	?> Create a message
-				<div id='selectemailmessage' style="display: block">
+<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('emailcreatemessage');show('emailselectmessage'); show('emailmultilingualoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {checkemail();" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('emailcreatemessage');hide('emailselectmessage');hide('emailmultilingualoption'); }\""));	?> Create a message
+				<div id='emailselectmessage' style="display: block">
 <?					message_select('email',$f, $s,"emailmessageid", "id='emailmessageid'");?>
 				</div>
-				<div id='createemailmessage' style="white-space: nowrap;display: none">
+				<div id='emailcreatemessage' style="white-space: nowrap;display: none">
+					<div>
+					
+					<? NewFormItem($f, $s, 'fromemail', 'hidden', 30, 50,'id="fromemail"'); ?>
+					Subject: <br /><? NewFormItem($f, $s, 'emailsubject', 'text', 30, 50,'id="emailsubject"'); ?> </div>
 					Type Your English Message
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					| <?  NewFormItem($f,$s,"emailtranslatecheck","checkbox",1, NULL,"id='emailtranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('email')\"")); ?>
@@ -1449,21 +1463,24 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		advanced options</a></div>
 
 		<div id='emaildetails' style="display: none">
-		<table border="0" cellpadding="2" cellspacing="0" width=100%>
-		<? if($USER->authorize('sendmulti')) { ?>
+		<div id='emailmultilingualoption' style="display: none">
+<? if($USER->authorize('sendmulti')) { ?>
+			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%">Multilingual message options <?= help('Job_MultilingualEmailOption',NULL,"small"); ?></td>
 				<td><? alternate('email'); ?></td>
 			</tr>
-			<? } ?>
-			<tr>
+			</table>
+<? } ?>
+		</div>
+			<table border="0" cellpadding="2" cellspacing="0" width=100%>
+				<tr>
 				<td width="30%">Skip duplicate email addresses <?=  help('Job_EmailSkipDuplicates', NULL, 'small') ?></td>
 				<td><? NewFormItem($f,$s,"skipemailduplicates","checkbox",1, NULL, ($submittedmode ? "DISABLED" : "")); ?>Skip
 				Duplicates</td>
-			</tr>
-		</table>
+				</tr>
+			</table>
 		</div>
-
 		</td>
 	</tr>
 	<? } ?>
@@ -1880,17 +1897,27 @@ function previewlanguage(language,female,male) {
 
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
+function checkemail() {
+	fromemail = new getObj('fromemail').obj.value;
+	if(fromemail == "") {
+		alert("To be able to create and send a email message please save this job and set your email address on the accout page");
+	}
+}
 
 //Loading Message View
-if(isCheckboxChecked('phoneselect')) {
-	hide('createphonemessage');
-	show('selectphonemessage');
-	show('multilingualphoneoption');
-} else {
-	show('createphonemessage');
-	hide('selectphonemessage');
-	hide('multilingualphoneoption');
+var types=Array('phone','email');
+for(var i=0;i<2;i++){
+	if(isCheckboxChecked(types[i] + 'select')) {
+		hide(types[i] + 'createmessage');
+		show(types[i] + 'selectmessage');
+		show(types[i] + 'multilingualoption');
+	} else {
+		show(types[i] + 'createmessage');
+		hide(types[i] + 'selectmessage');
+		hide(types[i] + 'multilingualoption');
+	}
 }
+
 </script>
 
 <? // These scripts contol the translation ?>
