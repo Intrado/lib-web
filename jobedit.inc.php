@@ -114,13 +114,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
 		SetRequired($f, $s, "listid", GetFormData($f, $s, "listradio") == "single");
 		SetRequired($f, $s, "listids", GetFormData($f, $s, "listradio") == "multi");
-
-		if(GetFormData($f, $s, 'sendphone')) {
-			SetRequired($f, $s, "phonemessageid", GetFormData($f, $s, "phoneradio") == "select");
-			SetRequired($f, $s, "phonetextarea", GetFormData($f, $s, "phoneradio") == "create");
-		} else {
-			SetRequired($f, $s, "phonemessageid",0);
-			SetRequired($f, $s, "phonetextarea",0);
+		foreach (array("phone","email") as $type){
+			if(GetFormData($f, $s, "send" . $type)) {
+				SetRequired($f, $s, $type . "messageid", GetFormData($f, $s, $type . "radio") == "select");
+				SetRequired($f, $s, $type . "textarea", GetFormData($f, $s, $type . "radio") == "create");
+			} else {
+				SetRequired($f, $s, $type . "messageid",0);
+				SetRequired($f, $s, $type . "textarea",0);
+			}
 		}
 
 		//do check
@@ -1169,8 +1170,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='radio_select' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createphonemessage');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='radio_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('phone',false);automatictranslation('phone');":"") . "show('createphonemessage');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
+<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createphonemessage');show('selectphonemessage'); show('multilingualphoneoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('phone',false);automatictranslation('phone');":"") . "show('createphonemessage');hide('selectphonemessage');hide('multilingualphoneoption'); }\""));	?> Create a text-to-speech message
 				<div id='selectphonemessage' style="display: block">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
@@ -1183,7 +1184,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<br />
 					<table>
 						<tr>
-							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea' onkeyup=\"translationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
+							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea' onkeyup=\"phonetranslationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
 							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
 						</tr>
 					</table>
@@ -1364,8 +1365,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='email_select' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createemailmessage');show('selectemailmessage'); show('multilingualemailoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='eamil_create' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('createemailmessage');hide('selectemailmessage');hide('multilingualemailoption'); }\""));	?> Create a message
+<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('createemailmessage');show('selectemailmessage'); show('multilingualemailoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('createemailmessage');hide('selectemailmessage');hide('multilingualemailoption'); }\""));	?> Create a message
 				<div id='selectemailmessage' style="display: block">
 <?					message_select('email',$f, $s,"emailmessageid", "id='emailmessageid'");?>
 				</div>
@@ -1378,7 +1379,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<br />
 					<table>
 						<tr>
-							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='emailtextarea' onkeyup=\"translationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
+							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='emailtextarea' onkeyup=\"phonetranslationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 					</table>
 					<div id='emailtranslationsshow' style="white-space:nowrap;display: none">
@@ -1541,8 +1542,10 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 </table>
 
 <script language="javascript">
-	var submitstate = false;
-	var translationstate = false;
+	var phonesubmitstate = false;
+	var emailsubmitstate = false;
+	var phonetranslationstate = false;
+	var emailtranslationstate = false;
 	var displaysettingsdetailsstate = 'visible';
 	<? if ($hassettingsdetailerror) { ?>
 		displaysettingsdetailsstate = 'hidden';
@@ -1879,7 +1882,7 @@ function previewlanguage(language,female,male) {
 }
 
 //Loading Message View
-if(isCheckboxChecked('radio_select')) {
+if(isCheckboxChecked('phoneselect')) {
 	hide('createphonemessage');
 	show('selectphonemessage');
 	show('multilingualphoneoption');
@@ -1904,7 +1907,7 @@ var cancelgoogle = false;
 var callbacksection = 'phone';
 
 // Loading the translation setup
-if(isCheckboxChecked('radio_create')) {
+if(isCheckboxChecked('phonecreate')) {
 	var checked = false;
 	show('phonetranslationsshow');
 	for (i = 0; i < languagelist.length; i++) {
@@ -2000,7 +2003,10 @@ function translationlanguage(section,language){
 		x.obj.checked = false;
 	}
 	if (isCheckboxChecked(section + '_' + language)){
-		translationstate = false; // To make enable the refresh button
+		switch(section) {
+			case 'phone': phonetranslationstate = false; break;
+			case 'email': emailtranslationstate = false; break;
+		}
 		setChecked(section + 'translatecheck');
 		show(section + 'txt_' + language);
 		show(section + 'show_' + language);
@@ -2050,7 +2056,10 @@ function editlanguage(section,language) {
 		show(section + 'lock_' + language);
 	} else {
 		hide(section + 'lock_' + language);
-		translationstate = false; <? // Enable update translations  ?>
+		switch(section) {
+			case 'phone': phonetranslationstate = false; break;
+			case 'email': emailtranslationstate = false; break;
+		}	 
 	}
 }
 
@@ -2061,7 +2070,7 @@ function setTranslations (html, langstring) {
 	response = JSON.parse(html, function (key, value) {	return value;}); //See documentation at http://www.json.org/js.html on how this function can be used
 	result = response.responseData;
 	if (response.responseStatus != 200){	
-		if (submitstate){	
+		if (phonesubmitstate || emailsubmitstate){	
 			var status = new getObj('translationstatus').obj;
 			status.innerHTML = "Unable to generate translations<br />Please read the help for more information";
 		}		
@@ -2077,7 +2086,10 @@ function setTranslations (html, langstring) {
 				retranslation.innerHTML = "";		
 				tr.innerHTML = result[i].responseData.translatedText;
 				trexpand.value = result[i].responseData.translatedText;
-				translationstate = true;
+				switch(section) {
+					case 'phone': phonetranslationstate = true; break;
+					case 'email': emailtranslationstate = true; break;
+				}
 			}
 		}
 	} else {
@@ -2088,19 +2100,27 @@ function setTranslations (html, langstring) {
 		
 		var retranslation = new getObj(section + 'verify_' + trlanguages[0]).obj;
 		retranslation.innerHTML = "";
-		translationstate = true;
+		switch(section) {
+			case 'phone': phonetranslationstate = true; break;
+			case 'email': emailtranslationstate = true; break;
+		}
 	}
-	if(submitstate && translationstate) {
-		for (i = 0; i < languagelist.length; i++) {
-			var trexpand = new getObj(section + 'expand_' + languagelist[i]).obj;
-			trexpand.disabled = false;
-		}		
+	if(section == 'phone' && phonesubmitstate && phonetranslationstate) {
+		if(isCheckboxChecked('sendemail') && isCheckboxChecked('emailcreate') && isCheckboxChecked('emailtranslatecheck') && !emailtranslationstate) {			
+			emailsubmitstate = true;
+			phonesubmitstate = false;
+			submitTranslations('email');
+			return;
+		} 
 		submitForm('<? echo $f; ?>','send');
-	}		
+	} 
+	if(section == 'email' && emailsubmitstate && emailtranslationstate) {		
+		submitForm('<? echo $f; ?>','send');
+	} 
 }
-	
+
 function submitTranslations(section) {
-	if(translationstate){
+	if((section == 'phone' && phonetranslationstate) || (section == 'email' && emailtranslationstate)){
 		return; //There are no changes to the text or a new language has not been added
 	}
 	
@@ -2167,21 +2187,34 @@ function submitRetranslation(language) {
 	ajax('translate.php',"text=" + encodeURIComponent(text) + "&language=" + language, setRetranslation, language);
 	return false;
 }
-function sendjobconfirm() {
-	if(isCheckboxChecked('radio_select') || !isCheckboxChecked('phonetranslatecheck') || translationstate) {
-		for (i = 0; i < languagelist.length; i++) {
-			var trexpand = new getObj('phoneexpand_' + languagelist[i]).obj;
-			trexpand.disabled = false;
-		}
-		submitForm('<? echo $f; ?>','send');
-		return;
+function enablesection(section) {
+	for (i = 0; i < languagelist.length; i++) {
+		var trexpand = new getObj(section + 'expand_' + languagelist[i]).obj;
+		trexpand.disabled = false;
 	}	
-	submitstate = true;
-	var status = new getObj('translationstatus').obj;
-	show('translationstatus');
-	status.innerHTML = "Generating Translations<br /><img src=\"img/progressbar.gif?date=" + <?= time() ?> + "\">";
+}
+function sendjobconfirm() {
+	phonesubmitstate = false;
+	emailsubmitstate = false;
 	scroll(0,0);
-	submitTranslations('phone');
+	enablesection('phone');
+	enablesection('email');
+	
+	if(isCheckboxChecked('sendphone') && isCheckboxChecked('phonecreate') && isCheckboxChecked('phonetranslatecheck') && !phonetranslationstate) {
+		phonesubmitstate = true;
+		submitTranslations('phone');
+	}
+	if(!phonesubmitstate && isCheckboxChecked('sendemail') && isCheckboxChecked('emailcreate') && isCheckboxChecked('emailtranslatecheck') && !emailtranslationstate) {
+		emailsubmitstate = true;
+		submitTranslations('email');
+	}
+	if(!phonesubmitstate && !emailsubmitstate) {
+		submitForm('<? echo $f; ?>','send');
+	} else {
+		show('translationstatus');
+		var status = new getObj('translationstatus').obj;
+		status.innerHTML = "Generating Translations<br /><img src=\"img/progressbar.gif?date=" + <?= time() ?> + "\">";
+	}
 }
 </script>
 
