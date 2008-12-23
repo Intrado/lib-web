@@ -118,15 +118,15 @@ if ($USER->authorize("startstats")) {
 							<?=button('Create New Job', NULL,"job.php?origin=start&id=new")?>
 						</td>
 					</tr>
-					<tr>
-						<th align="left" class="bottomBorder">New List:<?=help('Lists_AddList', '', 'small')?></th>
-					</tr>
 				<?
-				} else {
+				}
 				?>
 					<tr>
 						<th align="left" class="bottomBorder">New List:<?=help('Lists_AddList', '', 'small')?></th>
 					</tr>
+				<?
+				if (!$listsdata) {
+				?>
 					<tr>
 						<td>
 							<span style="text-decoration: underline; color: blue; cursor: help;" onclick="window.open('help/schoolmessenger_help.htm#creating_a_list/listsoverview.htm', '_blank', 'width=750,height=500,location=no,menub ar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Make a List</span>
@@ -141,11 +141,18 @@ if ($USER->authorize("startstats")) {
 							<?=button('Create New List', NULL,"list.php?origin=start&id=new")?>
 						</td>
 					</tr>
+				<?
+				if ($listsdata) {
+				?>
+				
 					<tr>
 						<td>
 							<div style="font-size: x-small">Tip: Lists are reusable.</div>
 						</td>
 					</tr>
+				<?
+				}
+				?>
 				</table>
 				<?		
 				endWindow();
