@@ -6,6 +6,8 @@ require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
 require_once("AspAdminUser.obj.php");
 
+$custtxt = "";
+
 if(isset($_GET['resetDM']) || isset($_GET['update'])){
 	if(isset($_GET['resetDM'])){
 		$dmid = $_GET['resetDM'] + 0;
