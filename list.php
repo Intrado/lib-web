@@ -242,7 +242,7 @@ print '<br>';
 if (!$list->id) {
 ?>
 	<div style="margin-left: 10px;"><img src="img/bug_important.gif" > Please name your list and then click Save to continue.<br> 
-			<span style="text-decoration: underline; color: blue; cursor: help;" onclick="window.open('help/schoolmessenger_help.htm#/creating_a_list/listsoverview.htm', '_blank', 'width=750,height=500,location=no,menub ar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Make a List</span>
+			<span style="text-decoration: underline; color: blue; cursor: help;" onclick="window.open('help/schoolmessenger_help.htm#creating_a_list/listsoverview.htm', '_blank', 'width=750,height=500,location=no,menub ar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Make a List</span>
 			 - For every notification job, you must have a list of people whom you wish to receive your message. Your list can be static or dynamic (automatically updated every time it is used). Your lists can always be saved and easily reused.
 	</div><br>
 <?
