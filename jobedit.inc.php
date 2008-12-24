@@ -195,90 +195,84 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->description = trim(GetFormData($f,$s,"description"));
 				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
 			} else {
-				
-foreach (array("phone","email") as $type){	
-				$mstr = $type . "messageid";
-				// If this is a phonemessage and no message was selected the message is a translation message and the phonetextarea is requerd to be fuild in.
-				if(GetFormData($f, $s, "send" . $type) && GetFormData($f, $s, $type . "radio") == "create"){
-					$themessageid = null;
-					// If this Message was created in job editor we are free to edit the message, otherwise we have to create a new message
-					if($job->getSetting("translation" . $type . "message")) {	
-						$themessageid = $job->$mstr;
-						if($themessageid) {
-							//Delete the part(s) of the message
-							QuickUpdate("delete from messagepart where messageid=$themessageid");
+			
+				/* Process the create a message for phone and email */
+				foreach (array("phone","email") as $type){	
+					$mstr = $type . "messageid";
+					// If this is a phonemessage and no message was selected the message is a translation message and the phonetextarea is requerd to be fuild in.
+					if(GetFormData($f, $s, "send" . $type) && GetFormData($f, $s, $type . "radio") == "create"){
+						$themessageid = null;
+						$part = null;
+						// A translation message is a message that was created in the jobeditor. It does not mean that if is translated
+						if($job->getSetting("translation" . $type . "message")) {	
+							$themessageid = $job->$mstr;
+							if($themessageid) {
+								$part = DBFind("MessagePart","from messagepart where messageid=" . $themessageid ." and sequence=0");	
+							}
+						} else {
+							if($job->id) // If translation mode switched we need to erase the previous joblanguage associations
+								QuickUpdate("delete from joblanguage where type='$type' and jobid=" . $job->id);  
 						}
+						$job->setSetting("translation" . $type . "message", 1); // Tell the job that this message was created here
+						$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
+						$message = new Message($themessageid);
+						if($type == "email") {
+							$message->subject = GetFormData($f, $s, 'emailsubject');
+							$message->fromname = $USER->firstname;
+							$message->fromaddress = $USER->lastname;
+							$useremails = explode(";", $USER->email);
+							$message->fromemail = $useremails[0];
+							$message->stuffHeaders();
+						}
+						$message->userid = $USER->id;$message->type = $type;$message->deleted = 1;						
+						$message->name = GetFormData($f, $s,'name');
+						$message->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
+						$message->update();
+						if(!$part) {
+							$part = new MessagePart();
+							$part->messageid = $message->id;$part->type="T";$part->sequence=0;	
+						}
+						$part->voiceid = ($type == "phone")?$voicearray[GetFormData($f, $s, 'voiceradio')]["english"]:NULL;
+						$part->txt = GetFormData($f, $s, $type . "textarea");
+						$part->update();
+						//Do a putform on message select so if there is an error later on, another message does not get created
+						PutFormData($f, $s, $type . "messageid", $message->id, 'number', 'nomin', 'nomax');
 					} else {
-						if($job->id)
-							QuickUpdate("delete from joblanguage where jobid=" . $job->id);  // If translation mode switched we need to rease the previous joblanguage assosiations
-					}
-					$job->setSetting("translation" . $type . "message", 1); // Tell the job that this message was created here
-					$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
-					$newmessage = new Message($themessageid);
-					if($type == "email") {
-						$newmessage->subject = GetFormData($f, $s, 'emailsubject');
-						$newmessage->fromname = $USER->firstname;
-						$newmessage->fromaddress = $USER->lastname;
-						$useremails = explode(";", $USER->email);
-						$newmessage->fromemail = $useremails[0];
-						$newmessage->stuffHeaders();
-					}
-					
-					$newmessage->userid = $USER->id;
-					$newmessage->type = $type;
-					$newmessage->name = GetFormData($f, $s,'name');
-					$newmessage->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
-					$newmessage->deleted = 1;
-					$newmessage->update();
-
-					$part = new MessagePart();
-					$part->messageid = $newmessage->id;
-					$part->type="T";
-					$part->voiceid = ($type == "phone")?$voicearray[GetFormData($f, $s, 'voiceradio')]["english"]:NULL;
-					$part->txt = GetFormData($f, $s, $type . "textarea");
-					$part->sequence = 0;
-					$part->create();
-					//Do a putform on message select so if there is an error later on, another message does not get created
-					PutFormData($f, $s, $type . "messageid", $newmessage->id, 'number', 'nomin', 'nomax');
-				} else {
-					if($job->getSetting("translation" . $type . "message") && $job->id) {
-						QuickUpdate("delete joblanguage j, message m, messagepart p FROM joblanguage j, message m, messagepart p where
-											j.jobid=" . $job->id . " and j.messageid = m.id and m.type = '" . $type . "' and j.messageid = p.messageid");	
-						if($job->$mstr) {
-							QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where 
-								m.id=" . $job->$mstr . " and m.type = '" . $type . "' and p.messageid = m.id");
+						if($job->getSetting("translation" . $type . "message") && $job->id) {
+							//If translation mode switched we need to erase the previous joblanguage associations
+							QuickUpdate("delete joblanguage j, message m, messagepart p FROM joblanguage j, message m, messagepart p where
+												j.jobid=" . $job->id . " and j.messageid = m.id and m.type = '" . $type . "' and j.messageid = p.messageid");	
+							if($job->$mstr) {
+								QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where 
+									m.id=" . $job->$mstr . " and m.type = '" . $type . "' and p.messageid = m.id");
+							}
 						}
+						$job->setSetting("translation" . $type . "message", 0);
 					}
-					$job->setSetting("translation" . $type . "message", 0);
-				}
-}
+				}				
+				
 				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
-					$themessageid = null;
+					$part = null;
 					// If this Message was create in job editor we are free to edit the message, otherwise we have to create a new message
-					if($job->getSetting('jobcreatedsms')) {
-						$themessageid = $job->smsmessageid;
-						//update the parts
-						QuickUpdate("delete from messagepart where messageid=$themessageid");
+					if($job->getSetting('jobcreatedsms') && $job->smsmessageid) {
+						if($job->smsmessageid)
+							$part = DBFind("MessagePart","from messagepart where messageid=" . $job->smsmessageid ." and sequence=0");	
 					} else {
 						$job->setSetting('jobcreatedsms', 1); // Tell the job that this message was created here
 					}
-					$newsmsmessage = new Message($themessageid);
-					$newsmsmessage->userid = $USER->id;
-					$newsmsmessage->type = 'sms';
-					$newsmsmessage->name = GetFormData($f, $s,'name');
-					$newsmsmessage->description = "SMS Message " . date(" M j, Y g:i:s", strtotime("now"));
-					$newsmsmessage->deleted = 1;
-					$newsmsmessage->update();
-
-					$part = new MessagePart();
-					$part->messageid = $newsmsmessage->id;
-					$part->type="T";
+					$message = new Message($job->smsmessageid);
+					$message->userid=$USER->id;$message->type = 'sms';$message->deleted = 1;					
+					$message->name = GetFormData($f, $s,'name');
+					$message->description = "SMS Message " . date(" M j, Y g:i:s", strtotime("now"));
+					$message->update();
+					if(!$part) {
+						$part = new MessagePart();
+						$part->messageid = $message->id;$part->type="T";$part->sequence = 0;
+					}
 					$part->txt = GetFormData($f, $s, 'smsmessagetxt');
-					$part->sequence = 0;
-					$part->create();
-
+					$part->update();
 					//Do a putform on message select so if there is an error later on, another message does not get created
-					PutFormData($f, $s, 'smsmessageid', $newsmsmessage->id, 'number', 'nomin', 'nomax');
+					PutFormData($f, $s, 'smsmessageid', $message->id, 'number', 'nomin', 'nomax');
 				}
 
 				if(GetFormData($f, $s, "listradio") == "single") {
@@ -435,53 +429,64 @@ foreach (array("phone","email") as $type){
 
 			//now add any language options
 			$addlang = false;
-			if ($USER->authorize('sendmulti') && $job->getSetting('translationphonemessage') ) {
-				foreach($ttslanguages as $ttslanguage) {
-					$language = escapehtml(ucfirst($ttslanguage));
-					$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$ttslanguage'");
-
-					if(GetFormData($f, $s, "phone_$language")){
-						// --------- Select the voice id depending on choice and availability 
-						$voiceid = NULL;
-						if (GetFormData($f, $s, 'voiceradio') == "female") {
-							if(isset($voicearray['female'][$ttslanguage])){
-								$voiceid = $voicearray['female'][$ttslanguage];
-							} else if(isset($voicearray['male'][$ttslanguage])){
-								$voiceid = $voicearray['male'][$ttslanguage];
+			foreach (array("phone","email") as $type){	
+				if ($USER->authorize('sendmulti') && $job->getSetting("translation".$type."message") ) {
+					foreach($ttslanguages as $ttslanguage) {
+						$language = escapehtml(ucfirst($ttslanguage));
+						$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$ttslanguage' and type='$type'");
+						if(GetFormData($f, $s, $type . "_$language")){
+							$voiceid = NULL;
+							if($type == "phone"){
+								if (GetFormData($f, $s, 'voiceradio') == "female") {
+									if(isset($voicearray['female'][$ttslanguage])){
+										$voiceid = $voicearray['female'][$ttslanguage];
+									} else if(isset($voicearray['male'][$ttslanguage])){
+										$voiceid = $voicearray['male'][$ttslanguage];
+									}
+								} else {
+									if(isset($voicearray['male'][$ttslanguage])){
+										$voiceid = $voicearray['male'][$ttslanguage];
+									} else if(isset($voicearray['female'][$ttslanguage])){
+										$voiceid = $voicearray['female'][$ttslanguage];
+									}
+								}
+								if(!$voiceid)
+									error_log("Warning no voice found for $ttslanguage");		
 							}
+							if(!$joblanguage) {
+								$joblanguage = new Joblanguage();
+								$joblanguage->jobid=$job->id;
+							}
+							$message = new Message($joblanguage->messageid);
+							$message->userid=$USER->id;$message->type=$type;$message->name ="$language translation";$message->description="";$message->deleted=1;
+							if($type == "email") {
+								$message->subject = GetFormData($f, $s, 'emailsubject');
+								$message->fromname = $USER->firstname;
+								$message->fromaddress = $USER->lastname;
+								$useremails = explode(";", $USER->email);
+								$message->fromemail = $useremails[0];
+								$message->stuffHeaders();
+							}
+							$message->update();
+							$part = NULL;
+							if($message->id) {
+								$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0");				
+							}
+							if(!$part) {
+								$part = new MessagePart();
+								$part->messageid=$message->id;$part->type="T";$part->sequence=0;
+							}
+							$part->txt = GetFormData($f, $s, $type."expand_" . $language); // If textarea box is disabled the return value will be blank. 			
+							$part->voiceid = $voiceid;		
+							$part->update();
+							$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=$language;
+							$joblanguage->translationeditlock = GetFormData($f, $s,$type."edit_$language");
+							$joblanguage->update();			
 						} else {
-							if(isset($voicearray['male'][$ttslanguage])){
-								$voiceid = $voicearray['male'][$ttslanguage];
-							} else if(isset($voicearray['female'][$ttslanguage])){
-								$voiceid = $voicearray['female'][$ttslanguage];
+							if($joblanguage) {
+								QuickUpdate("delete joblanguage, message, messagepart FROM joblanguage, message, messagepart where 
+								joblanguage.messageid = $joblanguage->messageid and joblanguage.messageid = message.id and joblanguage.type='$type' and joblanguage.messageid = messagepart.messageid");
 							}
-						}
-						if(!$voiceid)
-							error_log("Warning no voice found for $ttslanguage");
-						// --------- End of voice selection
-						if($joblanguage) {
-							if($part = DBFind("MessagePart","from messagepart where messageid=" . $joblanguage->messageid ." and sequence=0")){
-								$part->voiceid = $voiceid;						
-								$part->txt = GetFormData($f, $s, "phoneexpand_" . $language);
-								$part->update();
-							}
-						} else {
-							$message = new Message();
-							$message->userid = $USER->id;$message->type = 'phone';$message->name = "$language translation";$message->description = "";$message->deleted = 1;
-							$message->create();
-							$part = new MessagePart();
-							$part->messageid = $message->id;$part->type="T";$part->sequence = 0;
-							$part->txt = GetFormData($f, $s, "phoneexpand_" . $language);
-							$part->create();
-							$joblanguage = new Joblanguage();
-							$joblanguage->jobid = $job->id;$joblanguage->messageid = $message->id;$joblanguage->type = 'phone';$joblanguage->language=$language;
-						}	
-						$joblanguage->translationeditlock = GetFormData($f, $s,'phoneedit_' . $language);
-						$joblanguage->update();				
-					} else {
-						if($joblanguage) {
-							QuickUpdate("delete joblanguage, message, messagepart FROM joblanguage, message, messagepart where 
-							joblanguage.messageid = $joblanguage->messageid and joblanguage.messageid = message.id and joblanguage.messageid = messagepart.messageid");
 						}
 					}
 				}
@@ -610,8 +615,9 @@ if( $reloadform )
 	PutFormData($f,$s,"phoneradio","select");
 	PutFormData($f,$s,"emailradio","select");
 	
+	PutFormData($f,$s,"fromname",$USER->firstname . " " . $USER->lastname,"text");
 	$useremails = explode(";", $USER->email);
-	PutFormData($f,$s,"fromemail",$useremails[0],"hidden");
+	PutFormData($f,$s,"fromemail",$useremails[0],"text");
 	if($USER->authorize('sendmulti')) {
 		PutFormData($f,$s,"phonetranslatecheck",0,"bool",0,1);
 		PutFormData($f,$s,"emailtranslatecheck",0,"bool",0,1);
@@ -673,7 +679,7 @@ if( $reloadform )
 						$body = escapehtml($part->txt);
 						PutFormData($f,$s,"emailtext_$language",$body,"text","nomin","nomax",false);
 						PutFormData($f,$s,"emailexpand_$language",$body,"text","nomin","nomax",false);
-						PutFormData($f,$s,"emailedit_$language",1,"bool",0,1);
+						PutFormData($f,$s,"emailedit_$language",$joblang->translationeditlock,"bool",0,1);
 					}
 				}			
 			}
@@ -1382,9 +1388,18 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</div>
 				<div id='emailcreatemessage' style="white-space: nowrap;display: none">
 					<div>
-					
-					<? NewFormItem($f, $s, 'fromemail', 'hidden', 30, 50,'id="fromemail"'); ?>
-					Subject: <br /><? NewFormItem($f, $s, 'emailsubject', 'text', 30, 50,'id="emailsubject"'); ?> </div>
+					<table>			
+						<tr>
+						<td>From Name:</td><td> <? NewFormItem($f, $s, 'fromname', 'text', 25, 50,'id="fromname"'); ?></td>
+						</tr>
+						<tr>
+						<td>From Email:</td><td> <? NewFormItem($f, $s, 'fromemail', 'text', 25, 50,'id="fromemail"'); ?></td>
+						</tr>
+						<tr>
+						<td>Subject:</td><td><? NewFormItem($f, $s, 'emailsubject', 'text', 40, 50,'id="emailsubject"'); ?></td>
+						</tr>
+					</table>
+					 </div>
 					Type Your English Message
 <?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
 					| <?  NewFormItem($f,$s,"emailtranslatecheck","checkbox",1, NULL,"id='emailtranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('email')\"")); ?>
@@ -1934,31 +1949,38 @@ var cancelgoogle = false;
 var callbacksection = 'phone';
 
 // Loading the translation setup
-if(isCheckboxChecked('phonecreate')) {
-	var checked = false;
-	show('phonetranslationsshow');
-	for (i = 0; i < languagelist.length; i++) {
-		var language = languagelist[i];
-		if(isCheckboxChecked('phone_' + language)){
-			show('phonetxt_' + language);
-			show('phoneshow_' + language);
-			checked = true;
-		} else {
-			hide('phonetxt_' + language);
-			hide('phoneshow_' + language);
+for(var j=0;j<2;j++){	
+	var type = types[j];
+	if(isCheckboxChecked(type + 'create')) {
+		var checked = false;
+		
+		show(type + 'translationsshow');
+		for (i = 0; i < languagelist.length; i++) {
+			
+			var language = languagelist[i];
+			
+			if(isCheckboxChecked(type + '_' + language)){
+				show(type + 'txt_' + language);
+				show(type + 'show_' + language);
+				checked = true;
+			} else {
+				hide(type + 'txt_' + language);
+				hide(type + 'show_' + language);
+			}
+			editlanguage(type,language);
+			hide(type + 'expandtxt_' + language);
+			hide(type + 'hide_' + language);
+			if(!isCheckboxChecked(type + 'edit_' + language)){
+				var x = new getObj(type + 'expand_' + language);
+				x.obj.disabled = true;
+			}
+		}	
+		if(!checked) {
+			var x = new getObj(type + 'translatecheck');
+			x.obj.checked = false;
+			hide(type + 'translationsshow');
 		}
-		editlanguage('phone',language);
-		hide('phoneexpandtxt_' + language);
-		hide('phonehide_' + language);
-		if(!isCheckboxChecked('phoneedit_' + language)){
-			var x = new getObj('phoneexpand_' + language);
-			x.obj.disabled = true;
-		}
-	}
-	if(!checked) {
-		var x = new getObj('phonetranslatecheck');
-		x.obj.checked = false;
-		hide('phonetranslationsshow');
+		
 	}
 }
 
