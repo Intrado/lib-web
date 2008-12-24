@@ -251,20 +251,21 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					}
 				}				
 				
-				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, 'smsmessageid') == "" ){
+				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, "smsradio") == "create"){
 					$part = null;
 					// If this Message was create in job editor we are free to edit the message, otherwise we have to create a new message
 					if($job->getSetting('jobcreatedsms') && $job->smsmessageid) {
-						if($job->smsmessageid)
-							$part = DBFind("MessagePart","from messagepart where messageid=" . $job->smsmessageid ." and sequence=0");	
+						$part = DBFind("MessagePart","from messagepart where messageid=" . $job->smsmessageid ." and sequence=0");	
 					} else {
 						$job->setSetting('jobcreatedsms', 1); // Tell the job that this message was created here
+						$job->smsmessageid = null;
 					}
 					$message = new Message($job->smsmessageid);
 					$message->userid=$USER->id;$message->type = 'sms';$message->deleted = 1;					
 					$message->name = GetFormData($f, $s,'name');
 					$message->description = "SMS Message " . date(" M j, Y g:i:s", strtotime("now"));
 					$message->update();
+					$job->smsmessageid = $message->id;
 					if(!$part) {
 						$part = new MessagePart();
 						$part->messageid = $message->id;$part->type="T";$part->sequence = 0;
@@ -273,6 +274,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$part->update();
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, 'smsmessageid', $message->id, 'number', 'nomin', 'nomax');
+				} else {
+					if($job->smsmessageid) {
+						QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where m.id=" . $job->smsmessageid . " and p.messageid = m.id");
+					}
+					$job->setSetting('jobcreatedsms', 0);	
 				}
 
 				if(GetFormData($f, $s, "listradio") == "single") {
@@ -731,15 +737,13 @@ if( $reloadform )
 	PutFormData($f,"print","newlangprint","");
 	PutFormData($f,"print","newmessprint","");
 	
-	
-	
-	$smsmessage = DBFind("Message","from message where id='$job->smsmessageid' and deleted=1 and type='sms'");
-	if($smsmessage != NULL) {
-		$parts = DBFindMany("MessagePart","from messagepart where messageid=$smsmessage->id order by sequence");
-		$body = $smsmessage->format($parts);
-		PutFormData($f,$s,"smsmessagetxt",$body,'text');
-	} else {
-		PutFormData($f,$s,"smsmessagetxt", "", "text", 0, 160);
+	PutFormData($f,$s,"smsmessagetxt", "", "text", 0, 160);
+	PutFormData($f,$s,"smsradio","select");
+	if($job->getSetting('jobcreatedsms') && $job->smsmessageid) {
+		PutFormData($f,$s,"smsradio","create");
+		if($part = DBFind("MessagePart","from messagepart where messageid=$job->smsmessageid and sequence=0")){
+			PutFormData($f,$s,"smsmessagetxt", $part->txt, "text", 0, 160);
+		}
 	}
 }
 
@@ -801,12 +805,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 	<tr>
 		<td><?
 		NewFormItem($form,$section,$name, "selectstart", NULL, NULL, "id='$name' style='float:left;' " . ($submittedmode ? " DISABLED " : "") . $extrahtml);
-
-		if($type == "sms") {
-			NewFormItem($form,$section,$name,"selectoption", ' -- Create a Message -- ', "");
-		} else {
-			NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
-		}
+		NewFormItem($form,$section,$name, "selectoption", ' -- Select a Message -- ', "");
 		foreach ($messages[$type] as $message) {
 			NewFormItem($form,$section,$name, "selectoption", $message->name, $message->id);
 		}
@@ -1560,13 +1559,20 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%">Default message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
-				<td><? message_select('sms',$f, $s,"smsmessageid", "onclick='if(this.value == 0){ show(\"newsmstext\") }else{ hide(\"newsmstext\") }'"); ?>
-				<div id='newsmstext'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
-				<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span>
-				characters remaining.</div>
+				<td>
+<?					NewFormItem($f, $s, "smsradio", "radio", NULL, "select","id='smsselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('smscreatemessage');show('smsselectmessage');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "smsradio", "radio", NULL, "create","id='smscreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {show('smscreatemessage');hide('smsselectmessage'); }\""));	?> Create a message
+				<div id='smsselectmessage' style="display: block">
+					<? message_select('sms',$f, $s,"smsmessageid", "id='smsmessageid'"); ?>
+				</div>
+				<div id='smscreatemessage'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
+					<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span>
+					characters remaining.
+				</div>
 				</td>
 			</tr>
 		</table>
+		<div id='smsmultilingualoption'></sms>
 		</div>
 		</td>
 	</tr>
@@ -1614,7 +1620,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		}
 		var smsmessagedropdown = new getObj('smsmessageid').obj;
 		if(smsmessagedropdown.value != ""){
-			hide('newsmstext');
+			hide('smscreatemessage');
 		}
 		if(isCheckboxChecked('sendsms')){
 			typeischecked = true;
@@ -1920,8 +1926,8 @@ function checkemail() {
 }
 
 //Loading Message View
-var types=Array('phone','email');
-for(var i=0;i<2;i++){
+var types=Array('phone','email','sms');
+for(var i=0;i<3;i++){
 	if(isCheckboxChecked(types[i] + 'select')) {
 		hide(types[i] + 'createmessage');
 		show(types[i] + 'selectmessage');
