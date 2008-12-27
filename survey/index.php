@@ -57,9 +57,9 @@ if ($reason == 'ok') {
 
 		$questions = array_values(DBFindMany("SurveyQuestion","from surveyquestion where questionnaireid=$questionnaire->id order by questionnumber"));
 
-		//if we need to randomize question order, we should do it in a determinable way based on the workitemid or something so that if the user returns to the form multiple times or reloads the page the questions dont move around.
+		//if we need to randomize question order, we should do it in a determinable way so that if the user returns to the form multiple times or reloads the page the questions dont move around.
 		if ($questionnaire->dorandomizeorder) {
-			mt_srand($workitemid); //seed random generator w/ determinable data
+			mt_srand(abs(crc32($code))); //seed random generator w/ determinable data
 			//go through the array and randomly swap items into each element from the rest of the array
 			for ($x = 0; $x < count($questions) -1; $x++) {
 				$dest = mt_rand($x,count($questions)-1);
