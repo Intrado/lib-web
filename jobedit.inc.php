@@ -1414,7 +1414,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<br />
 					<table>
 						<tr>
-							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='emailtextarea' onkeyup=\"phonetranslationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
+							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='emailtextarea' onkeyup=\"emailtranslationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 					</table>
 					<div id='emailtranslationsshow' style="white-space:nowrap;display: none">
@@ -2113,6 +2113,8 @@ function langugaedetails(section,language, details){
 		show(section + 'expandtxt_' + language);
 		show(section + 'hide_' + language);
 		hide(section + 'show_' + language);
+		var retranslation = new getObj(section + 'verify_' + language).obj;
+		retranslation.value = "";
 	} else {
 		show(section + 'txt_' + language);
 		hide(section + 'expandtxt_' + language);
@@ -2164,7 +2166,7 @@ function setTranslations (html, langstring) {
 				var tr = new getObj(section + 'txt_' + language).obj;
 				var trexpand = new getObj(section + 'expand_' + language).obj;
 				var retranslation = new getObj(section + 'verify_' + language).obj;
-				retranslation.innerHTML = "";		
+				retranslation.value = "";		
 				tr.innerHTML = result[i].responseData.translatedText;
 				trexpand.value = result[i].responseData.translatedText;
 				switch(section) {
@@ -2180,7 +2182,7 @@ function setTranslations (html, langstring) {
 		trexpand.value = result.translatedText;
 		
 		var retranslation = new getObj(section + 'verify_' + trlanguages[0]).obj;
-		retranslation.innerHTML = "";
+		retranslation.value = "";
 		switch(section) {
 			case 'phone': phonetranslationstate = true; break;
 			case 'email': emailtranslationstate = true; break;
@@ -2248,12 +2250,11 @@ function setRetranslation (html, language) {
 		return;
 	}
 	var retranslation = new getObj(callbacksection + 'verify_' + language).obj;
-	retranslation.innerHTML = result.translatedText;
+	retranslation.value = result.translatedText;
 }
 
 function submitRetranslation(section,language) {
 	var text = new getObj(section + 'expand_' + language).obj.value;
-	var retranslation = new getObj(section + 'verify_' + language).obj;
 	if(text == "")
 		return;
 	if(text != text.substring(0, 2000)){
