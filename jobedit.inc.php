@@ -204,7 +204,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$themessageid = null;
 						$part = null;
 						// A translation message is a message that was created in the jobeditor. It does not mean that if is translated
-						if($job->getSetting("translation" . $type . "message")) {	
+						if($job->getSetting("jobcreated" . $type)) {	
 							$themessageid = $job->$mstr;
 							if($themessageid) {
 								$part = DBFind("MessagePart","from messagepart where messageid=" . $themessageid ." and sequence=0");	
@@ -212,8 +212,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						} else {
 							if($job->id) // If translation mode switched we need to erase the previous joblanguage associations
 								QuickUpdate("delete from joblanguage where type='$type' and jobid=" . $job->id);  
-						}
-						$job->setSetting("translation" . $type . "message", 1); // Tell the job that this message was created here
+						}						
+						$job->setSetting("jobcreated" . $type, 1); // Tell the job that this message was created here
 						$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
 						$message = new Message($themessageid);
 						if($type == "email") {
@@ -238,7 +238,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						//Do a putform on message select so if there is an error later on, another message does not get created
 						PutFormData($f, $s, $type . "messageid", $message->id, 'number', 'nomin', 'nomax');
 					} else {
-						if($job->getSetting("translation" . $type . "message") && $job->id) {
+						if($job->getSetting("jobcreated" . $type) && $job->id) {
 							//If translation mode switched we need to erase the previous joblanguage associations
 							QuickUpdate("delete joblanguage j, message m, messagepart p FROM joblanguage j, message m, messagepart p where
 												j.jobid=" . $job->id . " and j.messageid = m.id and m.type = '" . $type . "' and j.messageid = p.messageid");	
@@ -247,7 +247,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 									m.id=" . $job->$mstr . " and m.type = '" . $type . "' and p.messageid = m.id");
 							}
 						}
-						$job->setSetting("translation" . $type . "message", 0);
+						$job->setSetting("jobcreated" . $type, 0);
 					}
 				}				
 				
@@ -436,7 +436,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//now add any language options
 			$addlang = false;
 			foreach (array("phone","email") as $type){	
-				if ($USER->authorize('sendmulti') && $job->getSetting("translation".$type."message") ) {
+				if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) ) {
 					($type == "phone") ? $languages = &$ttslanguages : $languages = &$alllanguages;
 					foreach($languages as $language) {
 						if($language == "English")
@@ -502,9 +502,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			}
 			if($USER->authorize('sendmulti')) {
 				$types = array();
-				if(!$job->getSetting('translationphonemessage'))
+				if(!$job->getSetting('jobcreatedphone'))
 					$types[] = "phone";
-				if(!$job->getSetting('translationemailmessage'))
+				if(!$job->getSetting('jobcreatedemail'))
 					$types[] = "email";	
 				$types[] = "print";	
 				
@@ -653,7 +653,7 @@ if( $reloadform )
 		if($expire && strtotime($expire) > strtotime(date("Y-m-d"))) {
 			$expired = false;
 		}
-		if($job->getSetting('translationphonemessage')) {
+		if($job->getSetting('jobcreatedphone')) {
 			PutFormData($f,$s,"phoneradio","create");
 			if($job->phonemessageid && $part = DBFind("MessagePart","from messagepart where messageid=$job->phonemessageid and sequence=0")) {
 				PutFormData($f,$s,"phonetextarea",escapehtml($part->txt),'text');
@@ -674,7 +674,7 @@ if( $reloadform )
 				}			
 			}
 		}
-		if($job->getSetting('translationemailmessage')) {
+		if($job->getSetting('jobcreatedemail')) {
 			PutFormData($f,$s,"emailradio","create");
 			if($job->emailmessageid && $message = DBFind("Message","from message where id=$job->emailmessageid")) {
 				$message->readHeaders();
@@ -833,7 +833,7 @@ function language_select($form, $section, $name, $skipusedtype) {
 	NewFormItem($form, $section, $name, 'selectstart', NULL, NULL, ($submittedmode ? "DISABLED" : ""));
 	NewFormItem($form, $section, $name, 'selectoption'," -- Select a Language -- ","");
 	foreach ($alllanguages as $language) {
-		if($job && !$job->getSetting('translationphonemessage')) {
+		if($job && !$job->getSetting('jobcreatedphone')) {
 			$used = false;
 			foreach ($joblangs[$skipusedtype] as $joblang) {
 				if ($joblang->language == $language) {
@@ -861,7 +861,7 @@ function alternate($type) {
 		<th>&nbsp;</th>
 	</tr>
 	<?
-	if ($job && !$job->getSetting('translationphonemessage')){
+	if ($job && $job->getSetting('jobcreatedphone') === 0){
 		$id = $type . 'messageid';
 		//just show the selected options? allowing to edit could cause the page to become slow
 		//with many languages/messages

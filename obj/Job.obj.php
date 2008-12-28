@@ -104,7 +104,7 @@ class Job extends DBMappedObject {
 		// if message is not deleted, then we can point to it directly
 		// but if message is deleted, it's either already a copy from a previous run (uneditable)
 		// or it's a translation message and we need to make another copy of these
-		if ($newjob->isOption('translationphonemessage')) {
+		if ($newjob->isOption('jobcreatedphone')) {
 			$msg = new Message($newjob->phonemessageid);
 			if ($msg->deleted) {
 				$newmsg = $msg->copyNew();
@@ -127,7 +127,7 @@ class Job extends DBMappedObject {
 				from joblanguage where jobid=$this->id");
 		}
 		// email messages
-		if ($newjob->isOption('translationemailmessage')) {
+		if ($newjob->isOption('jobcreatedemail')) {
 			$msg = new Message($newjob->emailmessageid);
 			if ($msg->deleted) {
 				$newmsg = $msg->copyNew();
