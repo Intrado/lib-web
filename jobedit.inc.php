@@ -111,10 +111,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				continue;
 			SetRequired($f, $s, $type . "messageid", (bool)GetFormData($f, $s, 'send' . $type));
 		}
-		SetRequired($f, $s, "smsmessagetxt", GetFormData($f, $s, 'sendsms') && GetFormData($f, $s, 'smsmessageid') == "");
 		SetRequired($f, $s, "listid", GetFormData($f, $s, "listradio") == "single");
 		SetRequired($f, $s, "listids", GetFormData($f, $s, "listradio") == "multi");
-		foreach (array("phone","email") as $type){
+		foreach (array("phone","email","sms") as $type){
 			if(GetFormData($f, $s, "send" . $type)) {
 				SetRequired($f, $s, $type . "messageid", GetFormData($f, $s, $type . "radio") == "select");
 				SetRequired($f, $s, $type . "textarea", GetFormData($f, $s, $type . "radio") == "create");
@@ -123,7 +122,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				SetRequired($f, $s, $type . "textarea",0);
 			}
 		}
-
+		if(GetFormData($f, $s, 'sendemail') && GetFormData($f, $s,"emailradio") == "create") {
+			SetRequired($f, $s, "fromemail",1);
+			SetRequired($f, $s, "fromname",1);
+			SetRequired($f, $s, "emailsubject",1);
+			$emaildomain = getSystemSetting('emaildomain');
+			$fromemaildomain = substr(GetFormData($f, $s, "fromemail"), strpos(GetFormData($f, $s, "fromemail"), "@")+1);
+		} else {
+			SetRequired($f, $s, "fromemail",0);
+			SetRequired($f, $s, "fromname",0);
+			SetRequired($f, $s, "emailsubject",0);
+		}			
+				
 		//do check
 
 		$sendphone = GetFormData($f, $s, "sendphone");
@@ -177,6 +187,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if (getSystemSetting('_hascallback', false) && (GetFormData($f, $s, "radiocallerid") == "byuser") && (strlen($callerid) == 0)) {
 			$hasphonedetailerror = true;
 			error('The Caller ID must be exactly 10 digits long (including area code)');
+		} else if($sendemail && GetFormData($f, $s,"emailradio") == "create" && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
+			error('The From Email address is not valid', 'You must use an email address at ' . $emaildomain);
 		} else {
 			//submit changes
 
@@ -270,7 +282,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$part = new MessagePart();
 						$part->messageid = $message->id;$part->type="T";$part->sequence = 0;
 					}
-					$part->txt = GetFormData($f, $s, 'smsmessagetxt');
+					$part->txt = GetFormData($f, $s, 'smstextarea');
 					$part->update();
 					//Do a putform on message select so if there is an error later on, another message does not get created
 					PutFormData($f, $s, 'smsmessageid', $message->id, 'number', 'nomin', 'nomax');
@@ -744,12 +756,12 @@ if( $reloadform )
 	PutFormData($f,"print","newlangprint","");
 	PutFormData($f,"print","newmessprint","");
 	
-	PutFormData($f,$s,"smsmessagetxt", "", "text", 0, 160);
+	PutFormData($f,$s,"smstextarea", "", "text", 0, 160);
 	PutFormData($f,$s,"smsradio","select");
 	if($job->getSetting('jobcreatedsms') && $job->smsmessageid) {
 		PutFormData($f,$s,"smsradio","create");
 		if($part = DBFind("MessagePart","from messagepart where messageid=$job->smsmessageid and sequence=0")){
-			PutFormData($f,$s,"smsmessagetxt", $part->txt, "text", 0, 160);
+			PutFormData($f,$s,"smstextarea", $part->txt, "text", 0, 160);
 		}
 	}
 }
@@ -1574,8 +1586,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<div id='smsselectmessage' style="display: block">
 					<? message_select('sms',$f, $s,"smsmessageid", "id='smsmessageid'"); ?>
 				</div>
-				<div id='smscreatemessage'><? NewFormItem($f,$s,"smsmessagetxt", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
-					<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smsmessagetxt")) ?></span>
+				<div id='smscreatemessage'><? NewFormItem($f,$s,"smstextarea", "textarea", 20, 3, 'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"' . ($submittedmode ? " DISABLED " : "")); ?>
+					<span id="charsleft"><?= 160 - strlen(GetFormData($f,$s,"smstextarea")) ?></span>
 					characters remaining.
 				</div>
 				</td>
