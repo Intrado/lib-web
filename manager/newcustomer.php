@@ -84,7 +84,42 @@ if (CheckFormSubmit($f,$s)){
 				error('Logo file read error occured, make sure you selected a logo');
 			} else {
 
-				$newdb = createNewCustomer(false, $shard, $hostname);
+				//choose shard info based on selection
+				$shardinfo = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard where id = '$shard'", true);
+				$shardid = $shardinfo['id'];
+				$shardhost = $shardinfo['dbhost'];
+				$sharduser = $shardinfo['dbusername'];
+				$shardpass = $shardinfo['dbpassword'];
+
+				$dbpassword = genpassword();
+				QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword,enabled) values
+												('" . DBSafe($hostname) . "','$shardid', '$dbpassword', '1')" )
+						or die("failed to insert customer into auth server");
+				$customerid = mysql_insert_id();
+
+				$newdbname = "c_$customerid";
+				QuickUpdate("update customer set dbusername = '" . $newdbname . "' where id = '" . $customerid . "'");
+
+				$newdb = mysql_connect($shardhost, $sharduser, $shardpass)
+					or die("Failed to connect to DBHost $shardhost : " . mysql_error($newdb));
+				QuickUpdate("create database $newdbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$newdb)
+					or die ("Failed to create new DB $newdbname : " . mysql_error($newdb));
+				mysql_select_db($newdbname,$newdb)
+					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
+
+				QuickUpdate("drop user '$newdbname'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
+				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
+				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
+
+				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
+				foreach ($tablequeries as $tablequery) {
+					if (trim($tablequery)) {
+						$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
+						Query($tablequery,$newdb)
+							or die ("Failed to execute statement \n$tablequery\n\nfor $newdbname : " . mysql_error($newdb));
+					}
+				}
+
 				createSMUserProfile($newdb);
 
 				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
