@@ -99,14 +99,14 @@ if ($reloadform) {
 		if($messages){
 			foreach($messages as $key => $message){
 				$mess = new Message($message);
-				PutFormData($f, $s, "message ".$key, $mess->name);
+				PutFormData($f, $s, "message ".$key, $mess->name,"text","1","50",true);
 			}
 		}
 	} else if($specialtask->getData("origin") == "audio") {
 		if($messages){
 			foreach($messages as $key => $message){
 				$mess = new AudioFile($message);
-				PutFormData($f, $s, "message ".$key, $mess->name);
+				PutFormData($f, $s, "message ".$key, $mess->name,"text","1","50",true);
 			}
 		}
 	}
