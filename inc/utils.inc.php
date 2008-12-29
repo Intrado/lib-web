@@ -251,7 +251,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.69 $
+	    # $Revision: 1.70 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -432,7 +432,7 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 	$hover .= '<div style="color:#346799"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	$hover .= '>&nbsp;' . $jobtype->name . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
+	$hover .= '>&nbsp;' . escapehtml($jobtype->name) . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
 
 	return $hover;
 }

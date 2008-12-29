@@ -3,7 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
+require_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/table.inc.php");
@@ -276,7 +276,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 <?
 			foreach($jobtypelist as $id => $name){
 ?>
-			<td><?=$name?></td>
+			<td><?=escapehtml($name)?></td>
 <?
 			}
 ?>

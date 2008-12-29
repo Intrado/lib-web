@@ -93,9 +93,9 @@ function displayJobSummary($joblist){
 								echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
 
-									<td><?=$job[0]?></td>
-									<td><?=$job[1]?></td>
-									<td><?=$job[2]?></td>
+									<td><?=escapehtml($job[0])?></td>
+									<td><?=escapehtml($job[1])?></td>
+									<td><?=escapehtml($job[2])?></td>
 									<td><?=fmt_scheduled_date($job,3)?></td>
 									<td><?=fmt_scheduled_time($job,5)?></td>
 									<td><?=ucfirst($job[7])?></td>
