@@ -213,7 +213,6 @@ include_once("nav.inc.php");
 ?>
 
 <form method="POST" action="customerdms.php">
-<a href='customerdms.php'>Show All Customers</a>
 <table>
 	<tr>
 		<td valign="top">
@@ -253,6 +252,7 @@ include_once("nav.inc.php");
 		</td>
 	</tr>
 </table>
+<a href='customerdms.php'>Show All Customers</a>
 </form>
 <?
 

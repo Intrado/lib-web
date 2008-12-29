@@ -339,7 +339,6 @@ include("nav.inc.php");
 
 ?>
 <form method="POST" action="customerimports.php">
-<a href='customerimports.php'>Show All Customers</a>
 <table>
 	<tr>
 		<td valign="top">
@@ -387,6 +386,7 @@ include("nav.inc.php");
 		</td>
 	</tr>
 </table>
+<a href='customerimports.php'>Show All Customers</a>
 </form>
 <?
 
