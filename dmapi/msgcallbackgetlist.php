@@ -41,7 +41,8 @@ if ($REQUEST_TYPE == "new") {
 		and j.questionnaireid is null
 		and rc.phone='".$_SESSION['contactphone']."'
 		and (js.value is null or js.value >= date_sub(curdate(),interval 15 day))
-		order by j.startdate desc, j.starttime, j.id desc";
+		order by j.startdate desc, j.starttime, j.id desc
+		limit 10";
 
 //error_log($query);
 		$resultlist = QuickQueryMultiRow($query);
