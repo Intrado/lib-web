@@ -25,13 +25,13 @@ if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone
 	$lname='';
 	$phone='';
 
-	if ($_GET['firstname'])
+	if (isset($_GET['firstname']) && $_GET['firstname'])
 		$fname = $_SESSION['manualadd']['firstname'] = $_GET['firstname'];
 		
-	if ($_GET['lasttname'])
+	if (isset($_GET['lasttname']) && $_GET['lasttname'])
 			$lname = $_SESSION['manualadd']['lasttname'] = $_GET['lasttname'];
 			
-	if ($_GET['phone'])
+	if (isset($_GET['phone']) && $_GET['phone'])
 			$phone = Phone::parse($_SESSION['manualadd']['phone'] = $_GET['phone']);
 
 	if (strlen($fname) == 0) {
