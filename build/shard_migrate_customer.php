@@ -1,25 +1,15 @@
 <?
 //////////////////////////////////////
-// STEP 3 in moving customer from one shard to another
-//
-// migrate a customer into this shard database (could be from a commsuite or moving between shards)
+// Migrate a customer into this shard database (From a CommSuite with Flex Appliance)
 //
 // EDIT VARIABLES AT TOP OF SCRIPT, avoid entering on command line or prompts
 //////////////////////////////////////
 
-// VARIABLES MUST BE SET!!!
-$customerid = "";
-$customerdatafile = "";
-$fromcommsuite = true; // true if data is from commsuite 5.2 migration, false if moving 6.x between shards
+$customerid = ""; // asp customer id exists before we migrate the old commsuite data in
+$customerdatafile = ""; // file exported from old commsuite
 $shardhost = ""; // you want to run on the db machine for the 'mysqldump' to work
 $dbuser = "";
 $dbpass = "";
-
-// need authdb for ASP shard to shard migration
-$authhost = "";
-$authuser = "";
-$authpass = "";
-$newshardid = "";
 
 
 /////////////
@@ -48,21 +38,6 @@ function generalmenu($questions = array(), $validresponses = array()){
 
 ///////////////////////
 // main program
-
-if (!$fromcommsuite) {
-	// connect to authdb
-	echo "Connecting to authdb...\n";
-	$authdb = mysql_connect($authhost, $authuser, $authpass)
-		or die("Failed to connect to auth database");
-	echo "auth connection ok\n";
-	mysql_select_db("authserver", $authdb);
-
-	echo "Creating new customer database...\n";
-	// create new customer database on the shard
-	createNewCustomer($authdb, $newshardid, '', $customerid);
-
-// end ASP shard migration (!commsuite)
-}
 
 echo "Connecting to aspshard...\n";
 $custdb = mysql_connect($shardhost, $dbuser, $dbpass)
@@ -93,8 +68,6 @@ if($count[0] > 0){
 echo "No active jobs found\n";
 
 
-if ($fromcommsuite) {
-
 //////////////////////////////////////
 // backup data
 $backupfilename = $customerdbname . "_backup.sql";
@@ -105,7 +78,6 @@ if ($return_var) {
 	die();
 }
 
-}
 
 //////////////////////////////////////
 // drop triggers
@@ -138,26 +110,24 @@ echo ("\n");
 //////////////////////////////////////
 // save some customer settings that we do not want to overwrite, will rewrite them after import
 // if from commsuite, we want to save these settings because commsuite 5.2 did not have them
-// if moving between shards, we do not need to because the c_x export will contain them
-if ($fromcommsuite) {
-	echo ("Saving a few settings to restore after import\n");
+echo ("Saving a few settings to restore after import\n");
 
-	mysql_select_db($customerdbname);
+mysql_select_db($customerdbname);
 
-	$settings = array();
-	$settings['surveyurl'] = "";
-	$settings['autoreport_replyname'] = "";
-	$settings['autoreport_replyemail'] = "";
-	$settings['inboundnumber'] = "";
-	$settings['_supportemail'] = "";
-	$settings['_supportphone'] = "";
-	$settings['emaildomain'] = "";
+$settings = array();
+$settings['surveyurl'] = "";
+$settings['autoreport_replyname'] = "";
+$settings['autoreport_replyemail'] = "";
+$settings['inboundnumber'] = "";
+$settings['_supportemail'] = "";
+$settings['_supportphone'] = "";
+$settings['emaildomain'] = "";
 
-	foreach ($settings as $name => $value) {
-		$settings[$name] = QuickQuery("select value from setting where name='$name'", $custdb);
-		echo "$name is $settings[$name] \n";
-	}
+foreach ($settings as $name => $value) {
+	$settings[$name] = QuickQuery("select value from setting where name='$name'", $custdb);
+	echo "$name is $settings[$name] \n";
 }
+
 
 //////////////////////////////////////
 // now truncate the tables
@@ -215,15 +185,6 @@ $customertables = array(
 	"usersetting",
 	"voicereply");
 
-// if from commsuite, do not drop the DM records becuase they may have already configured their Flex Appliance (and 5.2 data does not contain these tables)
-if (!$fromcommsuite) {
-	$dmtables = array(
-		"custdm",
-		"dmcalleridroute",
-		"dmroute");
-	$customertables = array_merge($customertables, $dmtables);
-}
-
 foreach ($customertables as $t) {
 	echo (".");
 	$query = "truncate table $t";
@@ -244,29 +205,27 @@ if ($return_var) {
 }
 
 /////////////////////////////////////
-// if from commsuite, build the default schoolmessenger profile and user
-// also if from commsuite, reset saved customer settings
-// if moving between shards, this already exists
-if ($fromcommsuite) {
-	//if another schoolmessenger user exists rename it
-	$query = "update user set login='schoolmessenger_old' where login='schoolmessenger";
-	mysql_query($query,$custdb);
+// build the default schoolmessenger profile and user
+// reset saved customer settings
+//if another schoolmessenger user exists rename it
+$query = "update user set login='schoolmessenger_old' where login='schoolmessenger";
+mysql_query($query,$custdb);
 
-	// create default customer data (was lost in truncation)
-	createSMUserProfile($custdb);
+// create default customer data (was lost in truncation)
+createSMUserProfile($custdb);
 
-	// reset saved customer settings
-	foreach ($settings as $name => $value) {
-		$query = "delete from setting where name='$name'";
-		mysql_query($query)
-			or die("Failure to execute query $query ". mysql_error());
-		$name = DBSafe($name, $custdb);
-		$value = DBSafe($value, $custdb);
-		$query = "insert into setting (name, value) values ('$name', '$value')";
-		mysql_query($query)
-			or die("Failure to execute query $query ". mysql_error());
-	}
+// reset saved customer settings
+foreach ($settings as $name => $value) {
+	$query = "delete from setting where name='$name'";
+	mysql_query($query)
+		or die("Failure to execute query $query ". mysql_error());
+	$name = DBSafe($name, $custdb);
+	$value = DBSafe($value, $custdb);
+	$query = "insert into setting (name, value) values ('$name', '$value')";
+	mysql_query($query)
+		or die("Failure to execute query $query ". mysql_error());
 }
+
 
 //////////////////////////////////////
 // copy job/schedule/reportsubscription to shard
