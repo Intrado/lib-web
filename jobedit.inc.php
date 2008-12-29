@@ -230,10 +230,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$message = new Message($themessageid);
 						if($type == "email") {
 							$message->subject = GetFormData($f, $s, 'emailsubject');
-							$message->fromname = $USER->firstname;
-							$message->fromaddress = $USER->lastname;
+							$message->fromname = GetFormData($f, $s, 'fromname');
 							$useremails = explode(";", $USER->email);
-							$message->fromemail = $useremails[0];
+							$message->fromemail = GetFormData($f, $s, 'fromemail');
 							$message->stuffHeaders();
 						}
 						$message->userid = $USER->id;$message->type = $type;$message->deleted = 1;						
@@ -639,6 +638,26 @@ if( $reloadform )
 	PutFormData($f,$s,"fromname",$USER->firstname . " " . $USER->lastname,"text");
 	$useremails = explode(";", $USER->email);
 	PutFormData($f,$s,"fromemail",$useremails[0],"text");
+	if($job->getSetting('jobcreatedphone')) {
+		PutFormData($f,$s,"phoneradio","create");
+		if($job->phonemessageid && $part = DBFind("MessagePart","from messagepart where messageid=$job->phonemessageid and sequence=0")) {
+			PutFormData($f,$s,"phonetextarea",escapehtml($part->txt),'text');
+			if($part->voiceid == $voicearray['male']['english'])
+				PutFormData($f,$s,"voiceradio","male");			
+		}	
+	}
+	if($job->getSetting('jobcreatedemail')) {
+		PutFormData($f,$s,"emailradio","create");
+		if($job->emailmessageid && $message = DBFind("Message","from message where id=$job->emailmessageid")) {
+			$message->readHeaders();
+			PutFormData($f,$s,"emailsubject",escapehtml($message->subject),'text');	
+			PutFormData($f,$s,"fromname",escapehtml($message->fromname),"text");
+			PutFormData($f,$s,"fromemail",escapehtml($message->fromemail),"text");
+		}	
+		if($part = DBFind("MessagePart","from messagepart where messageid=$job->emailmessageid and sequence=0")) {
+			PutFormData($f,$s,"emailtextarea",escapehtml($part->txt),'text');		
+		}	
+	}
 	if($USER->authorize('sendmulti')) {
 		PutFormData($f,$s,"phonetranslatecheck",0,"bool",0,1);
 		PutFormData($f,$s,"emailtranslatecheck",0,"bool",0,1);
@@ -659,19 +678,12 @@ if( $reloadform )
 			PutFormData($f,$s,"email_$language",0,"bool",0,1);
 			PutFormData($f,$s,"emailedit_$language",0,"bool",0,1);	
 		}
-		
 		$expired = true;
 		$expire = $job->getSetting('translationexpire');
 		if($expire && strtotime($expire) > strtotime(date("Y-m-d"))) {
 			$expired = false;
 		}
 		if($job->getSetting('jobcreatedphone')) {
-			PutFormData($f,$s,"phoneradio","create");
-			if($job->phonemessageid && $part = DBFind("MessagePart","from messagepart where messageid=$job->phonemessageid and sequence=0")) {
-				PutFormData($f,$s,"phonetextarea",escapehtml($part->txt),'text');
-				if($part->voiceid == $voicearray['male']['english'])
-					PutFormData($f,$s,"voiceradio","male");			
-			}	
 			foreach($joblangs['phone'] as $joblang){
 				$language = escapehtml(ucfirst($joblang->language));				
 				PutFormData($f,$s,"phonetranslatecheck",1,"bool",0,1);
@@ -687,14 +699,6 @@ if( $reloadform )
 			}
 		}
 		if($job->getSetting('jobcreatedemail')) {
-			PutFormData($f,$s,"emailradio","create");
-			if($job->emailmessageid && $message = DBFind("Message","from message where id=$job->emailmessageid")) {
-				$message->readHeaders();
-				PutFormData($f,$s,"emailsubject",escapehtml($message->subject),'text');		
-			}	
-			if($part = DBFind("MessagePart","from messagepart where messageid=$job->emailmessageid and sequence=0")) {
-				PutFormData($f,$s,"emailtextarea",escapehtml($part->txt),'text');		
-			}	
 			foreach($joblangs['email'] as $joblang){
 				$language = escapehtml(ucfirst($joblang->language));				
 				PutFormData($f,$s,"emailtranslatecheck",1,"bool",0,1);
@@ -1285,7 +1289,6 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 						</div>
 					</div>
 <? 					} // End of automatic translations ?>
-
 				</div>
 				</td>
 			</tr>
@@ -1429,6 +1432,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='emailtextarea' onkeyup=\"emailtranslationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 					</table>
+<? 					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {  ?>						
 					<div id='emailtranslationsshow' style="white-space:nowrap;display: none">
 						<? button_bar(button('Show Translations', "toggletranslations('email',true);submitTranslations('email');"));?>
 					</div>
@@ -1481,7 +1485,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 						</table>
 						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
 					</div>
-<? 			//		} // End of automatic translations ?>
+<? 					} // End of automatic translations ?>
 				
 				</div>
 				</td>
@@ -1668,7 +1672,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		if ($_SESSION['jobid'] != null) {
 			$diffvalues = $job->compareWithDefaults();
 		}
-		if ((isset($diffvalues['phonelang']) ||
+		if (((isset($diffvalues['phonelang']) && $job->getSetting('jobcreatedphone') === 0)  ||
 			isset($diffvalues['maxcallattempts']) ||
 			isset($diffvalues['callerid']) ||
 			isset($diffvalues['radiocallerid']) ||
@@ -1695,7 +1699,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		if ($_SESSION['jobid'] != null) {
 			$diffvalues = $job->compareWithDefaults();
 		}
-		if ((isset($diffvalues['emaillang']) ||
+		if (((isset($diffvalues['emaillang']) && $job->getSetting('jobcreatedemail') === 0) ||
 			isset($diffvalues['skipemailduplicates'])) ||
 			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
 		?>
