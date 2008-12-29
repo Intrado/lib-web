@@ -1,5 +1,6 @@
 <?
 include_once("common.inc.php");
+include_once("../obj/Phone.obj.php");
 include_once("../obj/Customer.obj.php");
 include_once("../inc/table.inc.php");
 include_once("../inc/form.inc.php");
