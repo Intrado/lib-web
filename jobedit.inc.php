@@ -1409,7 +1409,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('emailcreatemessage');show('emailselectmessage'); show('emailmultilingualoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {checkemail();" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('emailcreatemessage');hide('emailselectmessage');hide('emailmultilingualoption'); }\""));	?> Create a message
+<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('emailcreatemessage');hide('emailselectmessage');hide('emailmultilingualoption'); }\""));	?> Create a message
 				<div id='emailselectmessage' style="display: block">
 <?					message_select('email',$f, $s,"emailmessageid", "id='emailmessageid'");?>
 				</div>
@@ -1948,12 +1948,6 @@ function previewlanguage(language,female,male) {
 	var encodedtext=encodeURIComponent(text.value);
 
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
-}
-function checkemail() {
-	fromemail = new getObj('fromemail').obj.value;
-	if(fromemail == "") {
-		alert("To be able to create and send a email message please save this job and set your email address on the accout page");
-	}
 }
 
 //Loading Message View
