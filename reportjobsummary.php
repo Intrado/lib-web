@@ -3,7 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
+require_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("inc/html.inc.php");
