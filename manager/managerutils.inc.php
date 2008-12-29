@@ -56,7 +56,7 @@ function createNewCustomer($authdb = false, $shardid = 0, $hostname = '', $custo
 							or die ("Failed to execute statement \n$tablequery\n\nfor $newdbname : " . mysql_error($newdb));
 					}
 				}
-
+				return $newdb;
  }
 
 

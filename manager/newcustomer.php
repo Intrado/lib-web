@@ -84,7 +84,7 @@ if (CheckFormSubmit($f,$s)){
 				error('Logo file read error occured, make sure you selected a logo');
 			} else {
 
-				createNewCustomer(false, $shard, $hostname);
+				$newdb = createNewCustomer(false, $shard, $hostname);
 				createSMUserProfile($newdb);
 
 				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
