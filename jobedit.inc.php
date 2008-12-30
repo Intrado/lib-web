@@ -210,7 +210,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			} else {
 
 				/* Process the create a message for phone and email */
-				foreach (array("phone","email") as $type){
+				foreach (array("phone","email","sms") as $type){
 					$mstr = $type . "messageid";
 					// If this is a phonemessage and no message was selected the message is a translation message and the phonetextarea is requerd to be fuild in.
 					if($USER->authorize('send' . $type) && GetFormData($f, $s, "send" . $type) && GetFormData($f, $s, $type . "radio") == "create"){
@@ -223,7 +223,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 								$part = DBFind("MessagePart","from messagepart where messageid=" . $themessageid ." and sequence=0");
 							}
 						} else {
-							if($job->id) // If translation mode switched we need to erase the previous joblanguage associations
+							if($job->id && $type != "sms") // If translation mode switched we need to erase the previous joblanguage associations
 								QuickUpdate("delete from joblanguage where type='$type' and jobid=" . $job->id);
 						}
 						$job->setSetting("jobcreated" . $type, 1); // Tell the job that this message was created here
@@ -238,7 +238,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						}
 						$message->userid = $USER->id;$message->type = $type;$message->deleted = 1;
 						$message->name = GetFormData($f, $s,'name');
-						$message->description = "Translated message " . date(" M j, Y g:i:s", strtotime("now"));
+						$message->description = "Job Created Message " . date(" M j, Y g:i:s", strtotime("now"));
 						$message->update();
 						if(!$part) {
 							$part = new MessagePart();
@@ -252,8 +252,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					} else {
 						if($job->getSetting("jobcreated" . $type) == "1" && $job->id) {
 							//If translation mode switched we need to erase the previous joblanguage associations
-							QuickUpdate("delete joblanguage j, message m, messagepart p FROM joblanguage j, message m, messagepart p where
-												j.jobid=" . $job->id . " and j.messageid = m.id and m.type = '" . $type . "' and j.messageid = p.messageid");
+							if($type != "sms") {
+								QuickUpdate("delete joblanguage j, message m, messagepart p FROM joblanguage j, message m, messagepart p where
+										j.jobid=" . $job->id . " and j.messageid = m.id and m.type = '" . $type . "' and j.messageid = p.messageid");
+							}
 							if($job->$mstr) {
 								QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where
 									m.id=" . $job->$mstr . " and m.type = '" . $type . "' and p.messageid = m.id");
@@ -261,36 +263,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						}
 						$job->setSetting("jobcreated" . $type, 0);
 					}
-				}
-
-				if($hassms && $USER->authorize('sendsms') && GetFormData($f, $s, "sendsms") && GetFormData($f, $s, "smsradio") == "create"){
-					$part = null;
-					// If this Message was create in job editor we are free to edit the message, otherwise we have to create a new message
-					if($job->getSetting('jobcreatedsms') == "1" && $job->smsmessageid) {
-						$part = DBFind("MessagePart","from messagepart where messageid=" . $job->smsmessageid ." and sequence=0");
-					} else {
-						$job->setSetting('jobcreatedsms', 1); // Tell the job that this message was created here
-						$job->smsmessageid = null;
-					}
-					$message = new Message($job->smsmessageid);
-					$message->userid=$USER->id;$message->type = 'sms';$message->deleted = 1;
-					$message->name = GetFormData($f, $s,'name');
-					$message->description = "SMS Message " . date(" M j, Y g:i:s", strtotime("now"));
-					$message->update();
-					$job->smsmessageid = $message->id;
-					if(!$part) {
-						$part = new MessagePart();
-						$part->messageid = $message->id;$part->type="T";$part->sequence = 0;
-					}
-					$part->txt = GetFormData($f, $s, 'smstextarea');
-					$part->update();
-					//Do a putform on message select so if there is an error later on, another message does not get created
-					PutFormData($f, $s, 'smsmessageid', $message->id, 'number', 'nomin', 'nomax');
-				} else {
-					if($job->smsmessageid) {
-						QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where m.id=" . $job->smsmessageid . " and p.messageid = m.id");
-					}
-					$job->setSetting('jobcreatedsms', 0);
 				}
 
 				if(GetFormData($f, $s, "listradio") == "single") {
