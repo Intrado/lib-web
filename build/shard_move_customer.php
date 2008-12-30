@@ -1,15 +1,24 @@
 <?
 //settings
 
-$customerid = 2;
-$srcshard = 2; //remember on the asp shard2 actually has shardid=1
-$destshard = 1;
-
 //authserver db info
 $authhost = "10.25.25.68";
 $authuser = "root";
 $authpass = "";
 
+
+if ($argc < 4)
+exit("need args: customerid sourceshard destshard\n");
+
+
+$customerid = $argv[1];
+$srcshard = $argv[2]; //remember on the asp shard2 actually has shardid=1
+$destshard = $argv[3];
+
+
+echo "Doing c: $customerid from shard $srcshard to shard $destshard\n press enter to continue";
+
+fgets(STDIN);
 
 //----------------------------------------------------------------------
 
