@@ -112,6 +112,7 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
 
 				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
+				$tablequeries = array_merge($tablequeryies, explode("$$$",file_get_contents("../db/createtriggers.sql")));
 				foreach ($tablequeries as $tablequery) {
 					if (trim($tablequery)) {
 						$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
