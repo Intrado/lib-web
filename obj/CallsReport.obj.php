@@ -246,8 +246,8 @@ class CallsReport extends ReportGenerator{
 ?>
 			<table  width="100%" cellpadding="3" cellspacing="1">
 				<tr><td>ID#: <?=$pkey?></td></tr>
-				<tr><td>First Name: <?=$firstname?></td></tr>
-				<tr><td>Last Name: <?=$lastname?></td></tr>
+				<tr><td>First Name: <?=escapehtml($firstname)?></td></tr>
+				<tr><td>Last Name: <?=escapehtml($lastname)?></td></tr>
 			</table>
 <?
 		endWindow();
