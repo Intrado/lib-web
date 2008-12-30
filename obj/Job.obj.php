@@ -99,12 +99,11 @@ class Job extends DBMappedObject {
 
 		$newjob->create();
 
-		if (!$isrepeatingrunnow) {
 		// copy the messages
 		// if message is not deleted, then we can point to it directly
 		// but if message is deleted, it's either already a copy from a previous run (uneditable)
 		// or it's a translation message and we need to make another copy of these
-		if ($newjob->isOption('jobcreatedphone')) {
+		if (!$isrepeatingrunnow && $newjob->isOption('jobcreatedphone')) {
 			$msg = new Message($newjob->phonemessageid);
 			if ($msg->deleted) {
 				$newmsg = $msg->copyNew();
@@ -124,10 +123,10 @@ class Job extends DBMappedObject {
 			//copy all the job language settings
 			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
 				select $newjob->id, messageid, 'phone', language
-				from joblanguage where jobid=$this->id");
+				from joblanguage where jobid=$this->id and type='phone'");
 		}
 		// email messages
-		if ($newjob->isOption('jobcreatedemail')) {
+		if (!$isrepeatingrunnow && $newjob->isOption('jobcreatedemail')) {
 			$msg = new Message($newjob->emailmessageid);
 			if ($msg->deleted) {
 				$newmsg = $msg->copyNew();
@@ -147,10 +146,9 @@ class Job extends DBMappedObject {
 			//copy all the job language settings
 			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
 				select $newjob->id, messageid, 'email', language
-				from joblanguage where jobid=$this->id");
+				from joblanguage where jobid=$this->id and type='email'");
 		}
 		// sms has no translation or joblanguage, no need to copy
-		}
 
 
 		//copy all the job lists
