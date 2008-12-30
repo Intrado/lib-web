@@ -70,7 +70,7 @@ if(CheckFormSubmit($f, $s)){
 					}
 				}
 			}
-			ClearFormData($f);
+			
 			if ($specialtask->getData('origin') == "audio") {
 				redirect("audio.php");
 			} else {
