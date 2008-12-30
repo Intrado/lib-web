@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `importlogentry` (
   `txt` varchar(255) NOT NULL,
   `linenum` int(11) NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 $$$
 
 -- this will take forever
@@ -139,7 +139,7 @@ CREATE TABLE if not exists `joblist` (
 `listid` INT NOT NULL ,
 `thesql` TEXT,
 KEY `jobid` (`jobid`,`listid`)
-) ENGINE = innodb DEFAULT CHARSET=utf8
+) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 $$$
 
 ALTER TABLE `portalperson` ADD `notifysms` VARCHAR( 20 ) NULL
@@ -154,7 +154,7 @@ CREATE TABLE if not exists `personsetting` (
 `name` VARCHAR( 50 ) NOT NULL ,
 `value` VARCHAR( 255 ) NOT NULL ,
 INDEX ( `personid` , `name` )
-) ENGINE = innodb DEFAULT CHARSET=utf8
+) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 $$$
 
 insert into ttsvoice (language, gender) values

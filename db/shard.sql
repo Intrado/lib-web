@@ -241,5 +241,5 @@ CREATE TABLE `qjoblist` (
 `listid` INT NOT NULL ,
 `thesql` TEXT,
 KEY `jobid` (`customerid`,`jobid`,`listid`)
-) ENGINE = innodb DEFAULT CHARSET=utf8
-;
+) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
