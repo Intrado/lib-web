@@ -1229,8 +1229,9 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<? NewFormItem($f,$s,"phoneedit_$language","checkbox",1, NULL,"id='phoneedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('phone','$language')\"")); ?> Override Translation
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
-										<a href="#" onclick="submitRetranslation('phone','<? echo $language?>');return false;">Retranslation</a>
-										<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table> <br />
+										Retranslation:<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table>
+										<a href="#" onclick="submitRetranslation('email','<? echo $language?>');return false;">Show/Refresh</a>
+										<br />
 										<? NewFormItem($f,$s,"phoneverify_$language", "textarea", 45, 3,"id='phoneverify_$language' disabled"); ?>
 									</div>
 								</td>
@@ -1426,8 +1427,9 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<? NewFormItem($f,$s,"emailedit_$language","checkbox",1, NULL,"id='emailedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('email','$language')\"")); ?> Override Translation
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
-										<a href="#" onclick="submitRetranslation('email','<? echo $language?>');return false;">Retranslation</a>
-										<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table> <br />
+										Retranslation:<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table>
+										<a href="#" onclick="submitRetranslation('email','<? echo $language?>');return false;">Show/Refresh</a>
+										<br />
 										<? NewFormItem($f,$s,"emailverify_$language", "textarea", 45, 3,"id='emailverify_$language' disabled"); ?>
 									</div>
 								</td>
@@ -2102,6 +2104,8 @@ function langugaedetails(section,language, details){
 function editlanguage(section,language) {
 	var textbox = new getObj(section + 'expand_' + language).obj;
 	textbox.disabled = !isCheckboxChecked(section + 'edit_' + language);
+	var retranslation = new getObj(section + 'verify_' + language).obj;
+	retranslation.value = "";
 	if(isCheckboxChecked(section + '_' + language) && isCheckboxChecked(section + 'edit_' + language)){
 		show(section + 'lock_' + language);
 	} else {
