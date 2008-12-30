@@ -423,26 +423,27 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) == "1" ) {
 					($type == "phone") ? $languages = &$ttslanguages : $languages = &$emaillanguages;
 					foreach($languages as $language) {
-						$language = escapehtml(ucfirst($language));
+						$escapedlanguage = escapehtml(ucfirst($language));
 						$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$language' and type='$type'");
-						if(GetFormData($f, $s, $type . "_$language")){
+						if(GetFormData($f, $s, $type . "_$escapedlanguage")){
 							$voiceid = NULL;
 							if($type == "phone"){
+								$lclanguage = strtolower($language);
 								if (GetFormData($f, $s, 'voiceradio') == "female") {
-									if(isset($voicearray['female'][$language])){
-										$voiceid = $voicearray['female'][$language];
-									} else if(isset($voicearray['male'][$language])){
-										$voiceid = $voicearray['male'][$language];
+									if(isset($voicearray['female'][$lclanguage])){
+										$voiceid = $voicearray['female'][$lclanguage];
+									} else if(isset($voicearray['male'][$lclanguage])){
+										$voiceid = $voicearray['male'][$lclanguage];
 									}
 								} else {
-									if(isset($voicearray['male'][$language])){
-										$voiceid = $voicearray['male'][$language];
-									} else if(isset($voicearray['female'][$language])){
-										$voiceid = $voicearray['female'][$language];
+									if(isset($voicearray['male'][$lclanguage])){
+										$voiceid = $voicearray['male'][$lclanguage];
+									} else if(isset($voicearray['female'][$lclanguage])){
+										$voiceid = $voicearray['female'][$lclanguage];
 									}
 								}
 								if(!$voiceid)
-									error_log("Warning no voice found for $language");
+									error_log("Warning no voice found for $lclanguage");
 							}
 							if(!$joblanguage) {
 								$joblanguage = new Joblanguage();
@@ -467,7 +468,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 								$part = new MessagePart();
 								$part->messageid=$message->id;$part->type="T";$part->sequence=0;
 							}
-							$part->txt = GetFormData($f, $s, $type."expand_" . $language); // If textarea box is disabled the return value will be blank.
+							$part->txt = GetFormData($f, $s, $type."expand_" . $escapedlanguage); // If textarea box is disabled the return value will be blank.
 							$part->voiceid = $voiceid;
 							$part->update();
 							$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=$language;
@@ -1538,7 +1539,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<div id='smsoptions' style="display: none">
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
-				<td width="30%">Default message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
+				<td width="30%" valign="top">Message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
 				<td>
 <?					NewFormItem($f, $s, "smsradio", "radio", NULL, "select","id='smsselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('smscreatemessage');show('smsselectmessage');}\"")); ?> Select a message&nbsp;
 <? 					NewFormItem($f, $s, "smsradio", "radio", NULL, "create","id='smscreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {show('smscreatemessage');hide('smsselectmessage'); }\""));	?> Create a message
