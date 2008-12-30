@@ -469,6 +469,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 								$part->messageid=$message->id;$part->type="T";$part->sequence=0;
 							}
 							$part->txt = GetFormData($f, $s, $type."expand_" . $escapedlanguage); // If textarea box is disabled the return value will be blank.
+							if($type == "email") {
+								$part->txt .= "\nOriginal Message:\n " . GetFormData($f, $s, $type . "textarea");
+							}
 							$part->voiceid = $voiceid;
 							$part->update();
 							$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=$language;
@@ -690,7 +693,7 @@ if( $reloadform )
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
-
+	
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "phone", 10, 10);
