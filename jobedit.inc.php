@@ -141,12 +141,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		$sendemail = GetFormData($f, $s, "sendemail");
 		$sendsms = getSystemSetting("_hassms", false) ? GetFormData($f, $s, "sendsms") : 0;
 
-		$name = trim(GetFormData($f,$s,"name"));
+		$name = TrimFormData($f,$s,"name");
+		TrimFormData($f,$s,"description");
 		if ( empty($name) ) {
 			PutFormData($f,$s,"name",'',"text",1,$JOBTYPE == "repeating" ? 30: 50,true);
 		}
 		$callerid = Phone::parse(GetFormData($f,$s,"callerid"));
-
+		$expire = $job->getSetting('translationexpire');
 		// check this before CheckFormSection() because we do not want to expand sections if nothing selected
 		if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
 			error("Plese select a delivery type");
@@ -177,6 +178,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			$hassettingsdetailerror = true;
 			error('The end time has already passed. Please correct this problem before proceeding');
+		} else if (($completedmode || $submittedmode) && ($job->getSetting('jobcreatedphone') == "1" || $job->getSetting('jobcreatedemail') == "1") && 
+						$expire && strtotime($expire) - (8*86400) < strtotime(GetFormData($f,$s,"startdate"))) {
+			error('The start date for a message created in the job editor may not be rescheduled for more than 7 days past the date it was submitted');				
 		} else if ($JOBTYPE == "normal" && GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create" && (strtotime(GetFormData($f,$s,"startdate"))-(7*86400) > strtotime("today")) && !$completedmode) {
 			$hassettingsdetailerror = true;
 			error('The start date must be within 7 days when creating a text-to-speach message');
@@ -201,12 +205,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//TODO check userowns on all messages, lists, etc
 			//only allow editing some fields
 			if ($completedmode) {
-				$job->name = $name;
-				$job->description = trim(GetFormData($f,$s,"description"));
+				PopulateObject($f,$s,$job,array("name", "description"));
 			} else if ($submittedmode) {
-				$job->name = $name;
-				$job->description = trim(GetFormData($f,$s,"description"));
-				PopulateObject($f,$s,$job,array("startdate", "starttime", "endtime"));
+				PopulateObject($f,$s,$job,array("name", "description","startdate", "starttime", "endtime"));
 			} else {
 
 				/* Process the create a message for phone and email */
@@ -271,9 +272,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$job->listid = array_shift(GetFormData($f,$s,'listids'));
 				}
 
-				$job->name = $name;
-				$job->description = trim(GetFormData($f,$s,"description"));
-				$fieldsarray = array("jobtypeid", "phonemessageid",
+				$fieldsarray = array("jobtypeid","name","description", "phonemessageid",
 				"emailmessageid","printmessageid", "smsmessageid", "starttime", "endtime",
 				"sendphone", "sendemail", "sendprint", "sendsms", "maxcallattempts");
 				PopulateObject($f,$s,$job,$fieldsarray);
@@ -601,10 +600,6 @@ if( $reloadform )
 	}
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax");
 	SetRequired($f, $s, "listids", empty($selectedlists));// Since multiselect show required even when the ids are selected
-	// names to display in submittedmode
-	$selectedlistnames = array();
-	if (count($selectedlists) > 0)
-		$selectedlistnames = QuickQueryList("select name from list where id in (".implode(",", $selectedlists).")");
 
 	PutFormData($f,$s,"voiceradio","female");
 	PutFormData($f,$s,"phonetextarea","","text");
@@ -1067,9 +1062,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?				if ($submittedmode) {
 ?>
 				<td>
-<?					foreach ($selectedlistnames as $listname) {
+<?				
+				$selectedlistnames = QuickQueryList("select list.name from joblist, list where joblist.jobid=$job->id and joblist.listid=list.id");
+				foreach ($selectedlistnames as $listname) {
 						echo $listname."<br>";
-					}
+				}
+				echo $peoplelists[$job->listid];
 ?>
 				</td>
 
