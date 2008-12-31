@@ -122,7 +122,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 				} else {
 					$questions = array();
 				}
-
+				TrimFormData($f,$s,"name");
+				TrimFormData($f,$s,"description");
 				//save general stuff
 				PopulateObject($f,$s,$questionnaire,array("name", "description",
 								"hasphone", "hasweb", "dorandomizeorder",
