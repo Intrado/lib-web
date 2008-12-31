@@ -415,119 +415,119 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$_SESSION['jobid'] = $job->id;
 			//echo $job->_lastsql;
 			//echo mysql_error();
-
-
-			//now add any language options
 			$addlang = false;
-			foreach (array("phone","email") as $type){
-				if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) == "1" ) {
-					($type == "phone") ? $languages = &$ttslanguages : $languages = &$emaillanguages;
-					foreach($languages as $language) {
-						$escapedlanguage = escapehtml(ucfirst($language));
-						$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$language' and type='$type'");
-						if(GetFormData($f, $s, $type . "_$escapedlanguage")){
-							$voiceid = NULL;
-							if($type == "phone"){
-								$lclanguage = strtolower($language);
-								if (GetFormData($f, $s, 'voiceradio') == "female") {
-									if(isset($voicearray['female'][$lclanguage])){
-										$voiceid = $voicearray['female'][$lclanguage];
-									} else if(isset($voicearray['male'][$lclanguage])){
-										$voiceid = $voicearray['male'][$lclanguage];
+			
+			if(!$submittedmode && !$completedmode) {
+				//now add any language options
+				foreach (array("phone","email") as $type){
+					if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) == "1" ) {
+						($type == "phone") ? $languages = &$ttslanguages : $languages = &$emaillanguages;
+						foreach($languages as $language) {
+							$escapedlanguage = escapehtml(ucfirst($language));
+							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$language' and type='$type'");
+							if(GetFormData($f, $s, $type . "_$escapedlanguage")){
+								$voiceid = NULL;
+								if($type == "phone"){
+									$lclanguage = strtolower($language);
+									if (GetFormData($f, $s, 'voiceradio') == "female") {
+										if(isset($voicearray['female'][$lclanguage])){
+											$voiceid = $voicearray['female'][$lclanguage];
+										} else if(isset($voicearray['male'][$lclanguage])){
+											$voiceid = $voicearray['male'][$lclanguage];
+										}
+									} else {
+										if(isset($voicearray['male'][$lclanguage])){
+											$voiceid = $voicearray['male'][$lclanguage];
+										} else if(isset($voicearray['female'][$lclanguage])){
+											$voiceid = $voicearray['female'][$lclanguage];
+										}
 									}
-								} else {
-									if(isset($voicearray['male'][$lclanguage])){
-										$voiceid = $voicearray['male'][$lclanguage];
-									} else if(isset($voicearray['female'][$lclanguage])){
-										$voiceid = $voicearray['female'][$lclanguage];
-									}
+									if(!$voiceid)
+										error_log("Warning no voice found for $lclanguage");
 								}
-								if(!$voiceid)
-									error_log("Warning no voice found for $lclanguage");
-							}
-							if(!$joblanguage) {
-								$joblanguage = new Joblanguage();
-								$joblanguage->jobid=$job->id;
-							}
-							$message = new Message($joblanguage->messageid);
-							$message->userid=$USER->id;$message->type=$type;$message->name ="$language translation";$message->description="";$message->deleted=1;
-							if($type == "email") {
-								$message->subject = GetFormData($f, $s, 'emailsubject');
-								$message->fromname = $USER->firstname;
-								$message->fromaddress = $USER->lastname;
-								$useremails = explode(";", $USER->email);
-								$message->fromemail = $useremails[0];
-								$message->stuffHeaders();
-							}
-							$message->update();
-							$part = NULL;
-							if($message->id) {
-								$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0");
-							}
-							if(!$part) {
-								$part = new MessagePart();
-								$part->messageid=$message->id;$part->type="T";$part->sequence=0;
-							}
-							$part->txt = GetFormData($f, $s, $type."expand_" . $escapedlanguage); // If textarea box is disabled the return value will be blank.
-							if($type == "email") {
-								$part->txt .= "\nOriginal Message:\n " . GetFormData($f, $s, $type . "textarea");
-							}
-							$part->voiceid = $voiceid;
-							$part->update();
-							$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=$language;
-							$joblanguage->translationeditlock = GetFormData($f, $s,$type."edit_$language");
-							$joblanguage->update();
-						} else {
-							if($joblanguage) {
-								QuickUpdate("delete joblanguage, message, messagepart FROM joblanguage, message, messagepart where
-								joblanguage.messageid = $joblanguage->messageid and joblanguage.messageid = message.id and joblanguage.type='$type' and joblanguage.messageid = messagepart.messageid");
+								if(!$joblanguage) {
+									$joblanguage = new Joblanguage();
+									$joblanguage->jobid=$job->id;
+								}
+								$message = new Message($joblanguage->messageid);
+								$message->userid=$USER->id;$message->type=$type;$message->name ="$language translation";$message->description="";$message->deleted=1;
+								if($type == "email") {
+									$message->subject = GetFormData($f, $s, 'emailsubject');
+									$message->fromname = $USER->firstname;
+									$message->fromaddress = $USER->lastname;
+									$useremails = explode(";", $USER->email);
+									$message->fromemail = $useremails[0];
+									$message->stuffHeaders();
+								}
+								$message->update();
+								$part = NULL;
+								if($message->id) {
+									$part = DBFind("MessagePart","from messagepart where messageid=" . $message->id ." and sequence=0");
+								}
+								if(!$part) {
+									$part = new MessagePart();
+									$part->messageid=$message->id;$part->type="T";$part->sequence=0;
+								}
+								$part->txt = GetFormData($f, $s, $type."expand_" . $escapedlanguage); // If textarea box is disabled the return value will be blank.
+								if($type == "email") {
+									$part->txt .= "\nOriginal Message:\n " . GetFormData($f, $s, $type . "textarea");
+								}
+								$part->voiceid = $voiceid;
+								$part->update();
+								$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=$language;
+								$joblanguage->translationeditlock = GetFormData($f, $s,$type."edit_$language");
+								$joblanguage->update();
+							} else {
+								if($joblanguage) {
+									QuickUpdate("delete joblanguage, message, messagepart FROM joblanguage, message, messagepart where
+									joblanguage.messageid = $joblanguage->messageid and joblanguage.messageid = message.id and joblanguage.type='$type' and joblanguage.messageid = messagepart.messageid");
+								}
 							}
 						}
 					}
 				}
-			}
-			if($USER->authorize('sendmulti')) {
-				$types = array();
-				if($job->getSetting('jobcreatedphone',"0") != "1")
-					$types[] = "phone";
-				if($job->getSetting('jobcreatedemail',"0") != "1")
-					$types[] = "email";
-				$types[] = "print";
-
-				foreach ($types as $type) {
-					if (CheckFormSubmit($f,$type))
-						$addlang = true;
-
-					if (GetFormData($f,$type,"newlang" . $type) && GetFormData($f,$type,"newmess" . $type)) {
-						MergeSectionFormData($f, $type);
-						$joblang = new JobLanguage();
-						$joblang->type = $type;
-						$joblang->language = GetFormData($f,$type,"newlang" . $type);
-						$joblang->messageid = GetFormData($f,$type,"newmess" . $type);
-						$joblang->jobid = $job->id;
-						if ($joblang->language && $joblang->messageid)
-						$joblang->create();
-						$joblangs[$type] = DBFindMany('JobLanguage', "from joblanguage where type='$type' and jobid=" . $job->id); // Reaload the joblanguage array for the language to show up after add
+				if($USER->authorize('sendmulti')) {
+					$types = array();
+					if($job->getSetting('jobcreatedphone',"0") != "1")
+						$types[] = "phone";
+					if($job->getSetting('jobcreatedemail',"0") != "1")
+						$types[] = "email";
+					$types[] = "print";
+	
+					foreach ($types as $type) {
+						if (CheckFormSubmit($f,$type))
+							$addlang = true;
+	
+						if (GetFormData($f,$type,"newlang" . $type) && GetFormData($f,$type,"newmess" . $type)) {
+							MergeSectionFormData($f, $type);
+							$joblang = new JobLanguage();
+							$joblang->type = $type;
+							$joblang->language = GetFormData($f,$type,"newlang" . $type);
+							$joblang->messageid = GetFormData($f,$type,"newmess" . $type);
+							$joblang->jobid = $job->id;
+							if ($joblang->language && $joblang->messageid)
+							$joblang->create();
+							$joblangs[$type] = DBFindMany('JobLanguage', "from joblanguage where type='$type' and jobid=" . $job->id); // Reaload the joblanguage array for the language to show up after add
+						}
+	
 					}
-
 				}
-			}
-
-			/* Store multilists*/
-			QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
-			if(GetFormData($f, $s, "listradio") == "multi") {
-				$batchvalues = array();
-				$listids = GetFormData($f,$s,'listids');
-
-				array_shift($listids);  // The first list has already been added to the job above
-				foreach($listids as $id) {
-					$values = "($job->id,". ($id+0) . ")";
-					$batchvalues[] = $values;
-				}
-				if(!empty($batchvalues)){
-					$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
-					$sql .= implode(",",$batchvalues);
-					QuickUpdate($sql);
+				/* Store multilists*/
+				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
+				if(GetFormData($f, $s, "listradio") == "multi") {
+					$batchvalues = array();
+					$listids = GetFormData($f,$s,'listids');
+	
+					array_shift($listids);  // The first list has already been added to the job above
+					foreach($listids as $id) {
+						$values = "($job->id,". ($id+0) . ")";
+						$batchvalues[] = $values;
+					}
+					if(!empty($batchvalues)){
+						$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
+						$sql .= implode(",",$batchvalues);
+						QuickUpdate($sql);
+					}
 				}
 			}
 
