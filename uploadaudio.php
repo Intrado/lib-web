@@ -78,7 +78,7 @@ if(CheckFormSubmit($f,$s))
 	
 					$ext = $path_parts['extension'];
 	
-					if (strlen($ext) < 1) {
+					if (strlen($ext) < 1 || !in_array(strtolower($ext),array('wav','aiff','au','aif'))) {
 						$ext = "wav";
 					}
 					$audio->recorddate = date("Y-m-d G:i:s");
