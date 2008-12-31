@@ -1233,7 +1233,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
 										Retranslation:<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table>
-										<a href="#" onclick="submitRetranslation('email','<? echo $language?>');return false;">Show/Refresh</a>
+										<a href="#" onclick="submitRetranslation('phone','<? echo $language?>');return false;">Show/Refresh</a>
 										<br />
 										<? NewFormItem($f,$s,"phoneverify_$language", "textarea", 45, 3,"id='phoneverify_$language' disabled"); ?>
 									</div>
