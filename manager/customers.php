@@ -1,7 +1,7 @@
 <?
-include_once("common.inc.php");
-include_once("../obj/Customer.obj.php");
-include_once("../inc/table.inc.php");
+require_once("common.inc.php");
+require_once("../obj/Customer.obj.php");
+require_once("../inc/table.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
@@ -215,8 +215,8 @@ foreach($customers as $cust) {
 		$row[7] = getCustomerSystemSetting('_maxusers', false, true, $custdb);
 
 		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
-		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)
-								WHERE job.status = 'active'", $custdb);
+		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)	WHERE job.status = 'active'", $custdb);
+		
 		$customerfeatures = array();
 
 		if(getCustomerSystemSetting('_hasportal', false, true, $custdb))
@@ -235,6 +235,10 @@ foreach($customers as $cust) {
 		$row[14] = $cust[5];
 		$row[15] = $cust[8];
 		$row[16] = QuickQuery("SELECT COUNT(*) FROM custdm", $custdb);
+		$row[17] = getCustomerSystemSetting('_timeslice', false, true, $custdb);
+		$row[18] = getCustomerSystemSetting('emaildomain', false, true, $custdb);
+		$row[19] = getCustomerSystemSetting('autoreport_replyname', false, true, $custdb);
+		$row[20] = getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb);
 		$data[] = $row;
 	}
 }
@@ -243,7 +247,7 @@ if (isset($_GET["ajax"])) {
 	$titles = array("0" => "#ID",
 			"1" => "#URL",
 			"15" => "#Inbound",
-			"5" => "#NOTES:");
+			"5" => "#Notes");
 
 	$formatters = array("1" => "fmt_custurl");
 
@@ -259,12 +263,17 @@ $titles = array("0" => "#ID",
 		"3" => "#Product Name",
 		"4" => "#Timezone",
 		"6" => "#Status",
+		"15" => "@#Inbound",
 		"16" => "@#Has Flex DM",
 		"11" => "#DM Method",
 		"10" => "#Features",
 		"7" => "#Max Users",
 		"8" => "#Users",
 		"9" => "#Jobs",
+		"17" => "@#Timeslice",
+		"18" => "@#Email Domain",
+		"19" => "@#AutoReport Name",
+		"20" => "@#AutoReport Addr",
 		"Actions" => "Actions",
 		"5" => "#NOTES: ",
 		"12" => "@#OEM",
