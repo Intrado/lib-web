@@ -104,7 +104,7 @@ if ($listsdata) {
 				if ($USER->authorize("starteasy") && $USER->authorize('sendphone')) {
 					?>
 					<tr>
-						<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Basic<?=help('Start_EasyCall', '', 'small')?></div></td>
+						<td align="right" valign="center" class="bottomBorder"><div NOWRAP class="destlabel">Basic<?=help('Start_EasyCall', '', 'small')?></div></td>
 						<td class="bottomBorder" style="padding: 5px;" valign="center">
 							<img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);"
 							onmouseover="this.src='img/themes/<?=$theme?>/b2_easycall2.gif'"
@@ -116,7 +116,7 @@ if ($listsdata) {
 				if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendprint') || $USER->authorize('sendsms')) {
 					?>
 					<tr>
-						<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Advanced<?=help('Jobs_AddStandardJob', '', 'small')?></div></td>
+						<td align="right" valign="center" class="bottomBorder"><div NOWRAP class="destlabel">Advanced<?=help('Jobs_AddStandardJob', '', 'small')?></div></td>
 						<td class="bottomBorder" style="padding: 5px;" valign="center"><?=button_bar(button('Create New Job', NULL,"job.php?origin=start&id=new"))?></td>
 					</tr>
 					<?
@@ -124,7 +124,7 @@ if ($listsdata) {
 				if ($USER->authorize('createlist')) {
 					?>
 					<tr>
-						<td NOWRAP align="right" valign="center"><div class="destlabel">List<?=help('Lists_AddList', '', 'small')?></div></td>
+						<td align="right" valign="center"><div NOWRAP class="destlabel">List<?=help('Lists_AddList', '', 'small')?></div></td>
 						<td style="padding: 5px;" valign="center"><?=button_bar(button('Create New List', NULL,"list.php?origin=start&id=new"))?></td>
 					</tr>
 				<?
@@ -262,7 +262,6 @@ if ($listsdata) {
 		QuickUpdate("delete from usersetting where userid=$USER->id and name='whatsnewversion'");
 		QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'whatsnewversion', $CURRENTVERSION)");
 	}
-	$theme = getBrandTheme();
 ?>
 	<table border=0 width="500px"><tr><td><?
 	startWindow('Getting Started ',NULL);
