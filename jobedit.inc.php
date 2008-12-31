@@ -592,14 +592,15 @@ if( $reloadform )
 	$selectedlists = array(); // ids
 	PutFormData($f,$s,"listradio","single");
 
-	if($jobid){
+	if($job && $job->id){
 		$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);
 		PutFormData($f,$s,"listradio",empty($selectedlists)?"single":"multi");
 		if($job->listid) {
 			$selectedlists[] = $job->listid;
 		}
 	}
-	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax",true);
+	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax");
+	SetRequired($f, $s, "listids", empty($selectedlists));// Since multiselect show required even when the ids are selected
 	// names to display in submittedmode
 	$selectedlistnames = array();
 	if (count($selectedlists) > 0)
@@ -744,6 +745,8 @@ if( $reloadform )
 		}
 	}
 }
+
+
 
 $messages = array();
 // if submitted or completed, gather only the selected messageids used by this job
