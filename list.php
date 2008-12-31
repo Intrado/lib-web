@@ -249,7 +249,7 @@ endWindow();
 
 if (!$list->id) {
 ?>
-	<div style="margin-left: 10px;"><img src="img/bug_lightbulb.gif" > Tip: Before sending a job you must create a list. Choose a name that clearly describes which people are included on this list. Most lists automatically update and can be reused indefinitely.
+	<div style="margin-left: 10px;"><img src="img/bug_lightbulb.gif" > Tip: Choose a name that clearly describes which people are included on this list. Most lists automatically update and can be reused indefinitely.
 	</div><br>
 <?
 } else {
