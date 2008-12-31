@@ -229,6 +229,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$job->setSetting("jobcreated" . $type, 1); // Tell the job that this message was created here
 						$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
 						$message = new Message($themessageid);
+						$message->userid = $USER->id;$message->type = $type;$message->deleted = 1;	
 						if($type == "email") {
 							$message->subject = GetFormData($f, $s, 'emailsubject');
 							$message->fromname = GetFormData($f, $s, 'fromname');
@@ -236,7 +237,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							$message->fromemail = GetFormData($f, $s, 'fromemail');
 							$message->stuffHeaders();
 						}
-						$message->userid = $USER->id;$message->type = $type;$message->deleted = 1;
 						$message->name = GetFormData($f, $s,'name');
 						$message->description = "Job Created Message " . date(" M j, Y g:i:s", strtotime("now"));
 						$message->update();
