@@ -81,7 +81,7 @@ $f = "list";
 $s = "main";
 $reloadform = 0;
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'refresh') || CheckFormSubmit($f,'search') || CheckFormSubmit($f,'preview'))
+if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'refresh') || CheckFormSubmit($f,'search') || CheckFormSubmit($f,'preview') || CheckFormSubmit($f,'manualAdd') || CheckFormSubmit($f,'addressBookAdd') || CheckFormSubmit($f,'uploadList'))
 {
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
@@ -144,6 +144,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 				redirect('showlist.php?id=' . $_SESSION['listid']);
 			} elseif (CheckFormSubmit($f,'search')) {
 				redirect('search.php');
+			} elseif (CheckFormSubmit($f,'manualAdd')) {
+				redirect('addressmanualadd.php?id=new');
+			} elseif (CheckFormSubmit($f,'addressBookAdd')) {
+				redirect('addressesmanualadd.php');
+			} elseif (CheckFormSubmit($f,'uploadList')) {
+				redirect('uploadlist.php');
 			}
 
 			//$reloadform = 1;
@@ -196,8 +202,7 @@ NewForm($f);
 if (!$list->id)
 	buttons(submit($f,'refresh','Save'));
 else
-	buttons(submit($f,'refresh','Refresh'),
-		submit($f,'search','Search &amp; Add') , submit($f, 'preview','Preview'),submit($f,'save','Done'));
+	buttons(submit($f,'refresh','Refresh'),submit($f,'save','Done'));
 
 startWindow('List Information');
 ?>
@@ -222,12 +227,17 @@ startWindow('List Information');
 	if ($list->id) {
 	?>
 	<tr>
-		<th align="right" valign="top" class="windowRowHeader">People in List:</th>
-		<td style="padding: 5px;" valign="bottom">
+		<th align="right" valign="top" class="windowRowHeader">People:</th>
+		<td style="padding: 5px;">
 			<?
 			$renderedlist->calcStats();
-			print("<b>$renderedlist->total</b>");
 			?>
+			<table border="0" cellspacing="3" cellpadding="2" class="border" width="150px">
+				<tr>
+					<td  class="border" valign="center" width="100px"><b><?=$renderedlist->total?></b></td>
+					<td align="right"><?=submit($f, 'preview','Preview')?></td>
+				</tr>
+			</table>
 		</td>
 	</tr>
 	<?
@@ -237,13 +247,9 @@ startWindow('List Information');
 <?
 endWindow();
 
-print '<br>';
-
 if (!$list->id) {
 ?>
-	<div style="margin-left: 10px;"><img src="img/bug_important.gif" > Please name your list and then click Save to continue.<br> 
-			<span style="text-decoration: underline; color: blue; cursor: help;" onclick="window.open('help/schoolmessenger_help.htm#creating_a_list/listsoverview.htm', '_blank', 'width=750,height=500,location=no,menub ar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Make a List</span>
-			 - For every notification job, you must have a list of people whom you wish to receive your message. Your list can be static or dynamic (automatically updated every time it is used). Your lists can always be saved and easily reused.
+	<div style="margin-left: 10px;"><img src="img/bug_lightbulb.gif" > Tip: Before sending a job you must create a list. Choose a name that clearly describes which people are included on this list. Most lists automatically update and can be reused indefinitely.
 	</div><br>
 <?
 } else {
@@ -322,34 +328,26 @@ if ($list->id) {
 ?>
 		</td>
 	</tr>
+
 <?
 // end of list skips
 }
 ?>
-
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Search Database:<br><? print help('List_SearchAndAdd'); ?></th>
-		<td style="padding: 5px;"><?= submit($f,'search','Search &amp; Add') ?></td>
-	</tr>
-
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Manual Add:<br><? print help('List_ManualAdd'); ?></th>
-		<td style="padding: 5px;"><?= button("Enter Contacts",NULL,"addressmanualadd.php?id=new")?></td>
-	</tr>
-
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Address Book:<br><? print help('List_AddressBookAdd'); ?></th>
-		<td style="padding: 5px;"><?= button("Open Address Book",NULL,"addressesmanualadd.php"); ?></td>
-	</tr>
-
-<? if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) { ?>
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Upload List:<br><? print help('List_UploadList'); ?></th>
-		<td style="padding: 5px;"><?= button("Upload List",NULL,"uploadlist.php"); ?></td>
-	</tr>
-<? } ?>
 </table>
 <?
+endWindow();
+
+startWindow("Advanced Tools");
+if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) {
+	button_bar(submit($f,'search','Search Contacts') . help('List_SearchAndAdd'),
+			submit($f,'manualAdd',"Enter Contacts") . help('List_ManualAdd'),
+			submit($f,'addressBookAdd',"Open Address Book") . help('List_AddressBookAdd'),
+			submit($f,'uploadList',"Upload List") . help('List_UploadList'));
+} else {
+	button_bar(submit($f,'search','Search Contacts') . help('List_SearchAndAdd'),
+			submit($f,'manualAdd',"Enter Contacts") . help('List_ManualAdd'),
+			submit($f,'addressBookAdd',"Open Address Book") . help('List_AddressBookAdd'));
+}
 endWindow();
 
 }
