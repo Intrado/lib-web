@@ -63,14 +63,12 @@ if($USER->authorize("leavemessage")){
 }
 include_once("nav.inc.php");
 
-
-
-if ($USER->authorize("startstats")) {
+if ($listsdata) {
 ?>
 	<table border=0 cellpadding=0 cellspacing=5>
 	<tr>
 		<td valign="top">
-			<table border=0 cellpadding=0 cellspacing=0>
+			<table width="300px" border=0 cellpadding=0 cellspacing=0>
 <?
 		  	if ($USER->getSetting("whatsnewversion") != $CURRENTVERSION) {
 			?><tr><td><?
@@ -91,89 +89,58 @@ if ($USER->authorize("startstats")) {
 <?				endWindow();
 			?><br></td></tr><?
 			}
-			if (($USER->authorize("starteasy") && $USER->authorize('sendphone') && $listsdata)
-				|| ($USER->authorize('sendphone') && $listsdata)
-				|| ($USER->authorize('sendemail') && $listsdata)
-				|| ($USER->authorize('sendprint') && $listsdata)
-				|| ($USER->authorize('sendsms') && $listsdata)
+			if ( (( ($USER->authorize("starteasy") && $USER->authorize('sendphone'))
+				|| $USER->authorize('sendphone')
+				|| $USER->authorize('sendemail')
+				|| $USER->authorize('sendprint')
+				|| $USER->authorize('sendsms')) && $listsdata)
 				|| $USER->authorize('createlist')) {
 				$theme = getBrandTheme();
 			?><tr><td><?
 				startWindow('Quick Start ' . help('Start_EasyCall'),NULL);
 				?>
 				<table border="0" cellpadding="3" cellspacing="0" width=100%>
-				<?			
-				if ($listsdata && $USER->authorize("starteasy") && $USER->authorize('sendphone')) {
+				<?
+				if ($USER->authorize("starteasy") && $USER->authorize('sendphone')) {
 					?>
 					<tr>
-						<th align="left" class="bottomBorder">EasyCall:<?=help('Start_EasyCall', '', 'small')?></th>
-					</tr>
-					<tr>
-						<td align="center" style="display: block;">
+						<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Basic<?=help('Start_EasyCall', '', 'small')?></div></td>
+						<td class="bottomBorder" style="padding: 5px;" valign="center">
 							<img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);"
 							onmouseover="this.src='img/themes/<?=$theme?>/b2_easycall2.gif'"
 							onmouseout="this.src='img/themes/<?=$theme?>/b1_easycall2.gif'">
 						</td>
 					</tr>
-				<?
+					<?
 				}
-				if ($listsdata && ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendprint') || $USER->authorize('sendsms'))) {
-				?>
+				if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendprint') || $USER->authorize('sendsms')) {
+					?>
 					<tr>
-						<th align="left" class="bottomBorder">Advanced Jobs:<?=help('Jobs_AddStandardJob', '', 'small')?></th>
+						<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Advanced<?=help('Jobs_AddStandardJob', '', 'small')?></div></td>
+						<td class="bottomBorder" style="padding: 5px;" valign="center"><?=button_bar(button('Create New Job', NULL,"job.php?origin=start&id=new"))?></td>
 					</tr>
-					<tr align="center" style="display: block;">
-						<td>
-							<?=button('Create New Job', NULL,"job.php?origin=start&id=new")?>
-						</td>
-					</tr>
-				<?
+					<?
 				}
 				if ($USER->authorize('createlist')) {
 					?>
-						<tr>
-							<th align="left" class="bottomBorder">New List:<?=help('Lists_AddList', '', 'small')?></th>
-						</tr>
-					<?
-					if (!$listsdata) {
-					?>
-						<tr>
-							<td>
-								<span style="text-decoration: underline; color: blue; cursor: help;" onclick="window.open('help/schoolmessenger_help.htm#creating_a_list/listsoverview.htm', '_blank', 'width=750,height=500,location=no,menub ar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Make a List</span>
-								 - For every notification job, you must have a list of people whom you wish to receive your message. Your list can be static or dynamic (automatically updated every time it is used). Your lists can always be saved and easily reused.
-							</td>
-						</tr>
-					<?
-					}
-					?>
-						<tr align="center" style="display: block;">
-							<td>
-								<?=button('Create New List', NULL,"list.php?origin=start&id=new")?>
-							</td>
-						</tr>
-					<?
-					if ($listsdata) {
-					?>
-					
-						<tr>
-							<td>
-								<div style="font-size: x-small">Tip: Lists are reusable.</div>
-							</td>
-						</tr>
-					<?
-					}
+					<tr>
+						<td NOWRAP align="right" valign="center"><div class="destlabel">List<?=help('Lists_AddList', '', 'small')?></div></td>
+						<td style="padding: 5px;" valign="center"><?=button_bar(button('Create New List', NULL,"list.php?origin=start&id=new"))?></td>
+					</tr>
+				<?
 				}
 				?>
 				</table>
-				<?		
+				<?
 				endWindow();
 			?><br></td></tr><?
 			}
+			if ($USER->authorize("startstats")) {
 ?>
 			<tr><td><?
 				startWindow('My Active Calls',NULL);
 				button_bar(button('Refresh', 'window.location.reload()'));
-				?><div align="center"><img width="300" height="200" src="graph_start_actrive_breakdown.png.php?junk=<?= rand() ?>" /></div><?
+				?><div align="center"><img src="graph_start_actrive_breakdown.png.php?junk=<?= rand() ?>" /></div><?
 				endWindow();
 ?>
 				</td>
@@ -185,8 +152,7 @@ if ($USER->authorize("startstats")) {
 
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
-			startWindow('My Active and Pending Notifications ' . help('Start_MyActiveJobs'),NULL,true);
-			button_bar(button('Refresh', 'window.location.reload()'));
+			startWindow('My Jobs ' . help('Start_MyActiveJobs'),NULL,true);
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='scheduled' or status='procactive' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Job Name",
@@ -200,13 +166,18 @@ if ($USER->authorize("startstats")) {
 				unset($titles["responses"]);
 				unset($formatters["responses"]);
 			}
-			showObjects($data, $titles, $formatters);
+			if (count($data)) {
+				button_bar(button('Refresh', 'window.location.reload()'));
+				showObjects($data, $titles, $formatters);
+			} else {
+				?><div style="font-size: xx-small; float:left; color: grey;" >You have no active jobs...</div><?
+			}
 			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
 
 
 
-			startWindow('My Completed Notifications ' . help('Start_MyCompletedJobs'),NULL,true);
+			startWindow('My Completed Jobs ' . help('Start_MyCompletedJobs'),NULL,true);
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Job Name",
@@ -221,15 +192,18 @@ if ($USER->authorize("startstats")) {
 				unset($titles["responses"]);
 				unset($formatters["responses"]);
 			}
-			showObjects($data, $titles, $formatters);
+			if (count($data)) {
+				showObjects($data, $titles, $formatters);
+			} else {
+				?><div style="font-size: xx-small; float:left; color: grey;" >You have no completed jobs...</div><?
+			}
 			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
 			endWindow();
 
 
 			if (getSystemSetting('_hassurvey', true) && $USER->authorize("survey")) {
 
-				startWindow('My Active and Pending Surveys ' . help('Start_MyActiveJobs'),NULL,true);
-				button_bar(button('Refresh', 'window.location.reload()'));
+				startWindow('My Surveys ' . help('Start_MyActiveJobs'),NULL,true);
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='procactive' or status='processing' or status='scheduled') and type='survey' and deleted = 0 order by id desc limit $limit");
 				$titles = array(	"name" => "Job Name",
@@ -243,7 +217,13 @@ if ($USER->authorize("startstats")) {
 					unset($titles["responses"]);
 					unset($formatters["responses"]);
 				}
-				showObjects($data, $titles, $formatters);
+
+				if (count($data)) {
+					button_bar(button('Refresh', 'window.location.reload()'));
+					showObjects($data, $titles, $formatters);
+				} else {
+					?><div style="font-size: xx-small; float:left; color: grey;" >You have no active surveys...</div><?
+				}
 				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
 				endWindow();
 
@@ -264,24 +244,47 @@ if ($USER->authorize("startstats")) {
 					unset($titles["responses"]);
 					unset($formatters["responses"]);
 				}
-				showObjects($data, $titles, $formatters);
+				if (count($data)) {
+					showObjects($data, $titles, $formatters);
+				} else {
+					?><div style="font-size: xx-small; float:left; color: grey;" >You have no completed surveys...</div><?
+				}
 				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
 				endWindow();
 			}
-
+			}
 
 
 	?></td></tr></table><?
 
-} else if ($USER->authorize("starteasy")) {
+} else {
+	if ($USER->getSetting("whatsnewversion") != $CURRENTVERSION) {
+		QuickUpdate("delete from usersetting where userid=$USER->id and name='whatsnewversion'");
+		QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'whatsnewversion', $CURRENTVERSION)");
+	}
 	$theme = getBrandTheme();
 ?>
-	<table border=0 width="250"><tr><td><?
-	startWindow('EasyCall',NULL);
-	?><div align="center" style="margin: 5px;"><img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);");"
-					onmouseover="this.src='img/themes/<?=$theme?>/b2_easycall2.gif'"
-					onmouseout="this.src='img/themes/<?=$theme?>/b1_easycall2.gif'">
-					</div><?;
+	<table border=0 width="500px"><tr><td><?
+	startWindow('Getting Started ',NULL);
+	?>
+	<table border="0" cellpadding="3" cellspacing="0" width=100%>
+		<tr>
+			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Help</div></td>
+			<td class="bottomBorder">This system comes with thorough and easy to use online help. Topics are organized within the table of contents in such a way as to make finding what you’re looking for as easy as possible.</td>
+			<td class="bottomBorder"><?=button_bar(button('Go&nbsp;To&nbsp;Help', "window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"))?>
+		</tr>
+		<tr>
+			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">New User</div></td>
+			<td class="bottomBorder">Download the step-by-step new user training guide.</td>
+			<td class="bottomBorder"><?=button_bar(button('Training&nbsp;Guide', NULL, "help/new_user_training_guide.pdf"))?>
+		</tr>
+		<tr>
+			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">List</div></td>
+			<td class="bottomBorder">Ready to start? Before sending a job you must create a list. Choose a name that clearly describes which people are included on this list. Most lists automatically update and can be reused indefinitely.</td>
+			<td class="bottomBorder"><?=button_bar(button('Create&nbsp;New&nbsp;List', NULL,"list.php?origin=start&id=new"))?>
+		</tr>
+	</table>
+	<?
 	endWindow();
 	?></td></tr></table><?
 }
