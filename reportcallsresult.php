@@ -3,7 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
+require_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/table.inc.php");
@@ -42,7 +42,7 @@ if (!$USER->authorize('viewsystemreports')) {
 
 function drilldownOnId($row, $index){
 	//index 3 is personid
-	$url = "<a href='reportcallsperson.php?pid=" . $row[3] . "'/>" . $row[$index] . "</a>";
+	$url = "<a href='reportcallsperson.php?pid=" . $row[3] . "'/>" . escapehtml($row[$index]) . "</a>";
 	return $url;
 
 }
