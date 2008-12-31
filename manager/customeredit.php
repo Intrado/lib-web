@@ -1,11 +1,11 @@
 <?
-include_once("common.inc.php");
-include_once("../inc/form.inc.php");
-include_once("../inc/html.inc.php");
-include_once("../inc/utils.inc.php");
-include_once("../obj/Phone.obj.php");
-include_once("AspAdminUser.obj.php");
-include_once("../inc/themes.inc.php");
+require_once("common.inc.php");
+require_once("../inc/form.inc.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/utils.inc.php");
+require_once("../obj/Phone.obj.php");
+require_once("AspAdminUser.obj.php");
+require_once("../inc/themes.inc.php");
 
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
@@ -388,7 +388,21 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 ?>
 <br>
 <table>
-<tr><td>Customer display name: </td><td> <? NewFormItem($f, $s, 'name', 'text', 25, 50); ?></td></tr>
+<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?>Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.</td></tr>
+<tr><td> Delivery Mechanism Method </td>
+	<td><?
+			NewFormItem($f, $s, '_dmmethod', 'selectstart');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', '--Choose a Method--', '');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite (fully hosted)', 'asp');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex + Emergency', 'hybrid');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex (data only)', 'cs');
+			NewFormItem($f, $s, '_dmmethod', 'selectend');
+		?>
+		<span>
+			<?= in_array(getCustomerSystemSetting('_dmmethod', "", true, $custdb), array('hybrid','cs')) ? '<b style="color: red;">Changing this to "CommSuite" will cause jobs to go out on the system!</b>' : "" ?>
+		</span>
+	</td>
+</tr><tr><td>Customer display name: </td><td> <? NewFormItem($f, $s, 'name', 'text', 25, 50); ?></td></tr>
 <tr><td>URL path name: </td><td><? NewFormItem($f, $s, 'hostname', 'text', 25, 255); ?> (Must be 5 or more characters)</td></tr>
 <tr><td>800 inbound number: </td><td><? NewFormItem($f, $s, 'inboundnumber', 'text', 10, 10); ?></td></tr>
 <tr><td>Timezone: </td><td>
@@ -424,29 +438,12 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	}
 ?>
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
-<tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?></td></tr>
-<tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?></td></tr>
-<tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?></td></tr>
-<tr><td> Has Callback </td><td><? NewFormItem($f, $s, 'hascallback', 'checkbox') ?></td></tr>
+<tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
+<tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
+<tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?> Survey</td></tr>
+<tr><td> Has Callback </td><td><? NewFormItem($f, $s, 'hascallback', 'checkbox') ?> Callback</td></tr>
 
-<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?><b style="color: red;">Unchecking this box will disable this customer!<BR>  All repeating jobs will be stopped.<BR>  All scheduled jobs must be canceled manually.<BR><BR></b></td></tr>
-<tr><td> Delivery Mechanism Method </td>
-	<td><?
-			NewFormItem($f, $s, '_dmmethod', 'selectstart');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', '--Choose a Method--', '');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite (fully hosted)', 'asp');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex + Emergency', 'hybrid');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex (data only)', 'cs');
-			NewFormItem($f, $s, '_dmmethod', 'selectend');
-		?>
-		<span>
-			<?= in_array(getCustomerSystemSetting('_dmmethod', "", true, $custdb), array('hybrid','cs')) ? '<b style="color: red;">Changing this to "CommSuite" will cause jobs to go out on the system!</b>' : "" ?>
-		</span>
-	</td>
-</tr>
-
-
-<tr><td>Retry:
+<tr><td>Retry:</td><td>
 
 <?
 	NewFormItem($f,$s,'retry','selectstart');
@@ -510,7 +507,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 
 <tr>
 	<td>Login Picture:</td>
-	<td><img src='customerloginpicture.img.php?id=<?=$currentid?>'></td>
+	<td><img width="100px" src='customerloginpicture.img.php?id=<?=$currentid?>'></td>
 </tr>
 <tr>
 	<td>New Login Picture:</td>
