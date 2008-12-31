@@ -103,6 +103,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 		SetRequired($f,$s,"intromessageid",(bool) GetFormData($f,$s,"hasintro") && $hasphone);
 		SetRequired($f,$s,"exitmessageid",(bool) GetFormData($f,$s,"hasexit") && $hasphone);
 
+		TrimFormData($f,$s,"name");
+		TrimFormData($f,$s,"description");
+		
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
@@ -122,8 +125,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 				} else {
 					$questions = array();
 				}
-				TrimFormData($f,$s,"name");
-				TrimFormData($f,$s,"description");
+
 				//save general stuff
 				PopulateObject($f,$s,$questionnaire,array("name", "description",
 								"hasphone", "hasweb", "dorandomizeorder",
