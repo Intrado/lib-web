@@ -78,6 +78,7 @@ if(CheckFormSubmit($f, $s))
 		TrimFormData($f, $s,'description');
 		TrimFormData($f, $s,'date');		
 		
+		$dom = (int)GetFormData($f, $s, "dom");
 		$radio = GetFormData($f, $s, "radio");
 		//do check
 		if( CheckFormSection($f, $s) ) {
@@ -88,7 +89,7 @@ if(CheckFormSubmit($f, $s))
 			error('An email address is required');
 		} else if($bademaillist = checkemails($emaillist)) {
 			error("These emails are invalid", $bademaillist);
-		} else if($radio == "dom" && !GetFormData($f, $s, "dom")) {	
+		} else if($radio == "dom" && ($dom == 0 || $dom<-1 || $dom>28)) {	
 			error("The day of the month must be set");
 		} else {
 			$subscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
