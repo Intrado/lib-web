@@ -74,19 +74,22 @@ if ($listsdata) {
 			?><tr><td><?
 			  	$startCustomTitle = "What's New";
 				startWindow($startCustomTitle,NULL);
-				button_bar(button('Close', null, 'start.php?closewhatsnew'));
 
 ?>				<div align="center" style="margin: 5px;">
 					<div style="text-align: left; padding: 5px;">
 					<p>Update 6.2</p>
-					<A style="padding: 5 px;" CLASS=hoverlinks HREF="help/schoolmessenger_help.htm#getting_started/new_features.htm" target=_blank>
-					<img src="img/bug_lightbulb.gif" >Click here to see what's new.
-					</A>
+					<a href="#" onclick="window.open('help/schoolmessenger_help.htm#getting_started/new_features.htm', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">
+					<img src="img/bug_lightbulb.gif" >Click here to see what's new.</a>
 					</div>
 					<BR>
 				</div>
 
-<?				endWindow();
+				<table align="center"><tr><td>
+<?				echo button('Close', null, 'start.php?closewhatsnew'); ?>
+				</td></tr></table>
+
+<?
+				endWindow();
 			?><br></td></tr><?
 			}
 			if ( (( ($USER->authorize("starteasy") && $USER->authorize('sendphone'))
