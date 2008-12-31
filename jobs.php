@@ -2,22 +2,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("obj/Job.obj.php");
-include_once("obj/Message.obj.php");
-include_once("obj/MessagePart.obj.php");
-include_once("obj/AudioFile.obj.php");
-include_once("obj/JobLanguage.obj.php");
-include_once("obj/JobList.obj.php");
-include_once("obj/Schedule.obj.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
+require_once("inc/common.inc.php");
+require_once("obj/Job.obj.php");
+require_once("obj/Message.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/AudioFile.obj.php");
+require_once("obj/JobLanguage.obj.php");
+require_once("obj/JobList.obj.php");
+require_once("obj/Schedule.obj.php");
+require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
-include_once("obj/ImportJob.obj.php");
+require_once("obj/ImportJob.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -149,7 +149,7 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Active and Pending Notification Jobs ' . help('Jobs_MyActiveJobs'), 'padding: 3px;', true, true);
+startWindow('My Jobs ' . help('Jobs_MyActiveJobs'), 'padding: 3px;', true, true);
 
 button_bar(button('Create New Job', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'), ($USER->authorize("starteasy") ? button('EasyCall',"var namefield = new getObj('easycallname');popup('easycallstart.php?id=new',500,450);") . help('Start_EasyCall') : ''),button('Refresh', 'window.location.reload()'));
 
@@ -173,7 +173,7 @@ if ($USER->authorize('createrepeat')) {
 	if (count($data) > $scrollThreshold) {
 		$scroll = true;
 	}
-	startWindow('My Repeating Notification Jobs ' . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
+	startWindow('My Repeating Jobs ' . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
 	if (count($data) > 0 && getSystemSetting("disablerepeat") ) {
 ?>
 		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td align=center><div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div></td></tr></table>
@@ -215,7 +215,7 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Completed Notification Jobs ' . help('Jobs_MyCompletedJobs'),'padding: 3px;', true, true);
+startWindow('My Completed Jobs ' . help('Jobs_MyCompletedJobs'),'padding: 3px;', true, true);
 showObjects($data, $titles, $formatters, $scroll, true);
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
