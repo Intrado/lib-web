@@ -138,7 +138,7 @@ function add($name, $file = 'add') {
 function button_bar() {
 	$buttons = func_get_args();
 ?>
-		<table border=0 cellspacing=3 cellpadding=0><tr><td>
+		<table border=0 cellspacing=6 cellpadding=0><tr><td>
 <?
 		echo implode('</td><td>', $buttons);
 ?>
