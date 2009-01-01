@@ -24,6 +24,9 @@ if($result['result'] == ""){
 	$customeridlist = array();
 }
 
+// if no contacts, return to single start page, no tabs
+if (!isset($contactList) || !$contactList)
+	redirect("start.php");
 
 $ADDWIZARD = true;
 $PERSONID = 0;

@@ -88,6 +88,7 @@ function portalGetCustomerAssociations() {
 	$customerurl = "";
 	if (isset($_GET['u'])) {
 		$customerurl = $_GET['u'];
+		$_SESSION['customerurl'] = $customerurl; // store this for logout to append
 	}
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_getCustomerAssociations";
@@ -171,10 +172,11 @@ function portalUpdatePortalUsername($username, $password) {
 	return $result;
 }
 
-function portalCreatePhoneActivation($customerid, $portaluserid, $pkeyList) {
+function portalCreatePhoneActivation($customerid, $portaluserid, $pkeyList, $createCode) {
+	sleep(2); // slow down any DOS attack
 	$pkeyListCSV = implode(",", $pkeyList); // TODO does pkey have a comma in it?
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'), new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($pkeyListCSV, 'string'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'), new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($pkeyListCSV, 'string'), new XML_RPC_Value($createCode, 'boolean'));
 	$method = "PortalServer.portal_createPhoneActivation";
 	$result = pearxmlrpc($method, $params);
 	return $result;

@@ -8,56 +8,106 @@ require_once("../inc/table.inc.php");
 if (!$INBOUND_ACTIVATION)
 	redirect("addcontact1.php");
 
+global $oktogo;
+$oktogo = true;
+
+function checkIDStatus() {
+	global $oktogo;
+	$oktogo = false;
+
+	// if we have some pkeys, find their status
+	if (isset($_SESSION['phoneactivationpkeylist']) && count($_SESSION['phoneactivationpkeylist'])) {
+		$result = portalCreatePhoneActivation($_SESSION['customerid'], $_SESSION["portaluserid"], array_keys($_SESSION['phoneactivationpkeylist']), false);
+		if ($result['result'] == "") {
+			$phones = explode(",", $result['phonelist']);
+			if (count($phones) == 1 && $phones[0] == "")
+				$phones = array(); // empty the array of no phones
+			if (count($phones))
+				$oktogo = true;
+
+			$pkeyresults = explode(",", $result['pkeyresults']);
+			foreach ($pkeyresults as $pair) {
+				$pairsplit = explode(":", $pair);
+				$status = $pairsplit[1];
+				if ($status == "ok" && !count($phones))
+					$status = "nophonematch";
+
+				$_SESSION['phoneactivationpkeylist'][$pairsplit[0]] = $status;
+				if ($status != "ok")
+					$oktogo = false;
+			}
+		} else {
+			// TODO error
+			error_log("portalcreatephoneactivation failed ");
+		}
+	}
+}
+
 
 $f="addstudent";
 $s="main";
 $reloadform = 0;
 
 
-if(CheckFormSubmit($f,$s))
-{
+if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
+	if (CheckFormInvalid($f)) {
 		error('Form was edited in another window, reloading data');
 		$reloadform = 1;
-	}
-	else
-	{
+	} else {
 		MergeSectionFormData($f, $s);
 
 		//do check
-
-		if( CheckFormSection($f, $s) ) {
+		if ( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if (CheckFormSubmit($f, 'add') && (GetFormData($f, $s, "pkeyadd") == "")) {
+			error('Please enter a Contact Identification Number');
 		} else {
-			//submit changes
+			$_SESSION['phoneactivationpkeylist'] = array(); // clear out any previous pkeys
 
-			// all done
-			if (GetFormData($f, $s, "radioselect") == "havenone") {
-				redirect("phoneactivation2.php");
-			} else {
-				// add another
-				$pkey = GetFormData($f, $s, "pkey");
-				if ($pkey == "")
-					error("Please enter a Contact Identification Number");
+			// save any changed pkeys
+				$i = 0;
+				while (GetFormData($f, $s, "pkey".$i)) {
+					$pkey = GetFormData($f, $s, "pkey".$i);
+					if ($pkey != "")
+						$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
+					$i++;
+				}
+				$pkey = GetFormData($f, $s, "pkeyadd");
+				if ($pkey != "")
+					$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
 
-				$_SESSION['phoneactivationpkeylist'][] = $pkey;
-				$reloadform = 1;
-			} // end radio selection bycode
+			// add another
+			if (CheckFormSubmit($f, 'add')) {
+				//$_SESSION['phoneactivationpkeylist'][""] = "Unknown";
+			} else if (CheckFormSubmit($f, $s)) {
+				// Next button, must verify all pkey status ok to continue
+				checkIDStatus();
+				if ($oktogo)
+					redirect("phoneactivationcode.php");
+				else
+					error('You must edit or remove ID Numbers until all are OK before proceeding to the Next step');
+			}
+			$reloadform = 1;
 		}
 	}
 } else {
 	$reloadform = 1;
 }
 
-if( $reloadform )
-{
+if ($reloadform) {
 	ClearFormData($f);
 
-	PutFormData($f, $s, "radioselect", "havenone");
+	PutFormData($f, $s, "pkeyadd", "", "text", 1, 255, false); // Add new ID
 
-	PutFormData($f, $s, "pkey", "", "text", 1, 255, false);
+	// existing IDs
+	if (isset($_SESSION['phoneactivationpkeylist']) && count($_SESSION['phoneactivationpkeylist'])) {
+		$i = 0;
+		foreach (array_keys($_SESSION['phoneactivationpkeylist']) as $pkey) {
+			PutFormData($f, $s, "pkey".$i, $pkey, "text", 1, 255, false);
+			$i++;
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,35 +122,57 @@ NewForm($f);
 
 startWindow('Add Contact');
 ?>
-<table>
+<table cellpadding="3">
+
 	<tr>
 		<td>
 		The following people will be added once the phone confirmation is complete.
 		</td>
 	</tr>
 
-<tr><td><table border="1" cellpadding="3" cellspacing="0" width="70%">
+<tr><td><table border="1" cellpadding="3" cellspacing="0">
 <th>&nbsp;</th><th>ID Number</th>
+<? if (!$oktogo) { ?>
+<th>Status</th>
+<? } ?>
 
-<? $i = 1; ?>
-<?	foreach ($_SESSION['phoneactivationpkeylist'] as $pkey) { ?>
-		<tr><td width="10%"><?=$i++?></td><td align="center"><b><?=escapehtml($pkey) ?></b></td></tr>
-<?	} ?>
-</td></tr></table>
+<? $i = 0; ?>
+<?	foreach (array_keys($_SESSION['phoneactivationpkeylist']) as $pkey) { ?>
+		<tr><td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkey".$i, "text", "20", "255"); ?></td>
+<? if (!$oktogo) {
+		$statustext = "Unknown";
+		if ($_SESSION['phoneactivationpkeylist'][$pkey] == "notfound") {
+			$statustext = "Not found in the system";
+		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "nophone") {
+			$statustext = "There are no phone numbers on record";
+		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "notallow") {
+			$statustext = "Blocked by the system administrator";
+		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "nophonematch") {
+			$statustext = "Unable to activate this person with the others";
+		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "ok") {
+			$statustext = "OK";
+		}
+?>
+		<td><?=$statustext?></td>
+<? } ?>
+		</tr>
+<?		$i++;
+	}
+?>
+
+		<tr><td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkeyadd", "text", "20", "255"); ?></td>
+		<td></td>
+		</tr>
+
+</table></td></tr>
+
+	<tr><td>You may edit the ID Numbers in the table above.</td></tr>
+	<tr><td> <? echo submit($f, 'add', 'Add More'); ?>  </td></tr>
+
 	<tr><td class="bottomBorder">&nbsp;</td></tr>
-	<tr><td>You may enter one or more people to your account with a single phone call to our toll free number.</td></tr>
-	<tr><td>Do you have another ID Number to enter now?</td></tr>
-	<tr>
-		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "havemore", "onclick=\"document.getElementById('pkeybox').disabled=false\""); ?> Yes, add another ID Number:
-			<? NewFormItem($f, $s, "pkey", "text", "20", "255", "id=\"pkeybox\" disabled=false"); ?>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "havenone", "onclick=\"document.getElementById('pkeybox').disabled=true\""); ?> No, I am ready for the confirmation step.
-		</td>
-	</tr>
+
+	<tr><td>You can activate multiple ID Numbers in a single call to our toll free number.</td></tr>
+	<tr><td>Click Next after you have entered all of your ID Numbers.</td></tr>
 </table>
 <?
 endWindow();

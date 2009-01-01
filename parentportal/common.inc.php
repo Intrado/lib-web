@@ -17,21 +17,24 @@ require_once("../inc/utils.inc.php");
 if(!isset($ppNotLoggedIn)){
 	// we are logged in
 
-
+	$logout = "?logout=1";
+	if (isset($_SESSION['customerurl'])) {
+		$logout += "&u=".urlencode($_SESSION['customerurl']);
+	}
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
 		//index page will redirect to ssl
-		redirect("index.php?logout=1");
+		redirect("index.php".$logout);
 	}
 	doStartSession();
 	if(!isset($_SESSION["portaluserid"])){
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
-		redirect("./?logout=1");
+		redirect("./".$logout);
     } else {
     	$result = portalGetPortalUser();
     	if($result['result'] == ""){
 	    	$_SESSION['portaluser'] = $result['portaluser'];
     	} else {
-    		redirect("./?logout=1");
+    		redirect("./".$logout);
     	}
     }
 

@@ -166,7 +166,7 @@ if($PERSONID){
 }
 include_once("nav.inc.php");
 startWindow("Contacts" . help("Contactpreferences"), 'padding: 3px;');
-buttons(button("Add A Contact", null, "addcontact1.php"));
+buttons(button("Add A Contact", null, "phoneactivation0.php"));
 
 if(isset($contactList) && $contactList){
 

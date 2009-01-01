@@ -148,15 +148,17 @@ if(isset($contactList) && $contactList){
 <?
 	}
 } else {
-	startWindow("Welcome", 'padding: 3px;');
+	startWindow("Getting Started", 'padding: 3px;');
 ?>
-
-	<div style="margin:5px; width:600px">
+	<table cellpadding="3">
+	<tr><td>
 		The Contact Manager allows you to customize your message delivery preferences and enables you to review past messages.
-		<br>
-		<br>
-		To begin, <a href="addcontact1.php">Click Here</a> and enter the ID number and activation code that you received for each person that will be associated with your account.
-	</div>
+	</td></tr>
+
+	<tr><td>
+		<? echo button("Click here to begin", NULL, "phoneactivation0.php"); ?>
+	</td></tr>
+	</table>
 
 <?
 	endWindow();

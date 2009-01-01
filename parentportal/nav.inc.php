@@ -69,7 +69,10 @@ function doNavTabs ($navtree) {
 	}
 }
 
-doNavTabs($NAVTREE);
+// only show tabs if they have contacts
+if (isset($contactList) && $contactList)
+	doNavTabs($NAVTREE);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -111,7 +114,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<div class="navmenuspacer">
 	<div class="navmenu">
 
-		<? if(isset($_SESSION['customerid'])) echo $MAINTABS ?>
+		<? if (isset($contactList) && $contactList) echo $MAINTABS ?>
 
 		<div class="applinks hoverlinks">
 			<a href="account.php">My Account</a> |
@@ -129,7 +132,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 			}
 	?>
 			<a href="#" onclick="window.open('help/index.html', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
-			<a href="index.php?logout=1">Logout</a>
+<?
+	$logout = "index.php?logout=1";
+	if (isset($_SESSION['customerurl'])) {
+		$logout .= "&u=".urlencode($_SESSION['customerurl']);
+	}
+?>
+			<a href="<?=$logout?>">Logout</a>
 		</div>
 
 	</div>
