@@ -59,6 +59,16 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 	{
 		MergeSectionFormData($f, $s);
 
+		TrimFormData($f, $s, "default_strip");
+		TrimFormData($f, $s, "default_prefix");
+		TrimFormData($f, $s, "default_suffix");
+		foreach($routes as $route){
+			TrimFormData($f, $s, "dm_" . $route->id ."_match");
+			TrimFormData($f, $s, "dm_" . $route->id ."_strip");
+			TrimFormData($f, $s, "dm_" . $route->id ."_prefix");
+			TrimFormData($f, $s, "dm_" . $route->id ."_suffix");
+		}
+		
 		//do check
 
 		if( CheckFormSection($f, $s) ) {
@@ -76,12 +86,13 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			$duplicatedefaults = false;
 			$modmatchlist =  array_flip(array_diff($matchlist, array_keys($routes)));
 			foreach($routes as $route){
-				if(isset($modmatchlist[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
-					$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = true;
-				} else if(!isset($matches[GetFormData($f, $s, "dm_" . $route->id ."_match")])){
-					$matches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = 1;
+				$routematch = GetFormData($f, $s, "dm_" . $route->id ."_match");
+				if(isset($modmatchlist[$routematch])){
+					$duplicatematches[$routematch] = true;
+				} else if(!isset($matches[$routematch])){
+					$matches[$routematch] = 1;
 				} else {
-					$duplicatematches[GetFormData($f, $s, "dm_" . $route->id ."_match")] = true;
+					$duplicatematches[$routematch] = true;
 				}
 			}
 
