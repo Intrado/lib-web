@@ -46,6 +46,9 @@ if($REQUEST_TYPE == "new") {
 	if(isset($BFXML_VARS['phone'])){
 		$phonenumber = $BFXML_VARS['phone'];
 
+		if(strlen($phonenumber) == 11 && substr($phonenumber,0,1) == "1") 
+			$phonenumber = substr($phonenumber,0,-1);
+			
 		if(strlen($phonenumber) == 7 && substr($phonenumber,0,1) != "0") {
 			$query = "select value as areacode from setting where name=\"defaultareacode\"";
 
