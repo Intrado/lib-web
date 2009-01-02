@@ -1,9 +1,9 @@
 <?
-include_once("common.inc.php");
-include_once("../inc/form.inc.php");
-include_once("../inc/html.inc.php");
-include_once("../inc/utils.inc.php");
-include_once("AspAdminUser.obj.php");
+require_once("common.inc.php");
+require_once("../inc/form.inc.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/utils.inc.php");
+require_once("AspAdminUser.obj.php");
 
 
 $timezones = array(	"US/Alaska",
@@ -37,7 +37,7 @@ $defaultbrands = array(
 					"SchoolMessenger" =>
 										array("filelocation" => "img/logo_small.gif",
 										"filetype" => "image/gif"),
-					"SkyAlert" =>
+					"Skylert" =>
 										array("filelocation" => "img/sky_alert.jpg",
 										"filetype" => "image/jpg")
 					);
@@ -328,10 +328,6 @@ NewFormItem($f, $s,"", 'submit');
 ?>
 </td></tr>
 </table>
-<br>
-<div style="color:green" >
-	Please remember to double check the customer settings on the following edit page.
-</div>
 <br>
 <?
 
