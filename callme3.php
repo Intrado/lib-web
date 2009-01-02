@@ -38,15 +38,21 @@ if(CheckFormSubmit($f, $s)){
 	{
 		MergeSectionFormData($f, $s);
 		
+		$existsnames = array();
 		if($messages){
 			foreach($messages as $key => $message) {
-				TrimFormData($f, $s, "message ".$key);
+				$name = TrimFormData($f, $s, "message ".$key);
+				if(0 != QuickQuery("select count(id) from message where name='" . DBSafe($name) . "' and id!=$message and type='phone' and userid='$USER->id' and deleted=0")){
+					$existsnames[] = "'$name'";
+				}
 			}
 		}
 		
 		//do check		
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if (!empty($existsnames)) {
+			error('Message(s) named ' . implode(",",$existsnames) . ' already exists');
 		} else {
 			if($specialtask->getData("origin") == "message"){
 				if($messages){
