@@ -9,7 +9,7 @@ function enterstudentid($error, $studentids) {
 	<message name="choosestudentid">
 			<field type="dtmf" name="studentid" timeout="10000">
 			<prompt repeat="2">
-			    <tts gender="female" language="english">Please enter the numeric Student I. D. for one of your students, followed by the pound key.</tts>
+			    <tts gender="female" language="english">Using your  touch tone phone, please enter the ID number for any of your students. Then press the pound key.</tts>
 			</prompt>
 			<?
 				while($row = DBGetRow($studentids)) {
@@ -21,10 +21,10 @@ function enterstudentid($error, $studentids) {
 
 			<?	}?>
 			<default>
-	        	<tts gender="female" language="english">Sorry. That student number did not match our records. Remember that letters in the students I. D. correspond to a number on you phone. For example the letter A. is represented by the number 2. </tts>
+	        	<tts gender="female" language="english">I'm sorry, but I was not able to locate that Student ID Number. </tts>
 			</default>
 			<timeout>
-				<tts gender="female" language="english">I was not able to understand your response. Goodbye.</tts>
+				<tts gender="female" language="english">I'm sorry, but I was not able to locate that Student ID Number. Please verify your Student ID Number and try again. goodbye!</tts>
 				<hangup />
 			</timeout>
 		</field>
@@ -37,7 +37,7 @@ function errorhangup() {
 ?>
 <voice>
 	<message name="hangup">
-	       	<tts gender="female">An error occurred while processing your request. Please call back and try again. Goodbye.</tts>
+	       	<tts gender="female">I'm sorry, but there was an error while processing your request. Please call back and try again. goodbye</tts>
 	       	<hangup />
 
 	</message>
@@ -49,7 +49,7 @@ function nomatchhangup() {
 ?>
 <voice>
 	<message name="hangup">
-	       	<tts gender="female">Sorry. That student number did not match our records.  Please verify your student I. D. and try again later. Goodbye.</tts>
+	       	<tts gender="female">I'm sorry, but I was not able to locate that Student ID Number. Please verify your Student ID Number and try again. goodbye!</tts>
 	       	<hangup />
 
 	</message>

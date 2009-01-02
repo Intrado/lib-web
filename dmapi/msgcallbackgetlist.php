@@ -14,7 +14,7 @@ function nomessages() {
 ?>
 <voice>
 	<message name="nomessages">
-		<tts gender="female">There are no messages at this time.  You may call back later to listen to messages that were sent to you. Goodbye.  </tts>
+		<tts gender="female">There are no new messages for this phone number. To check for messages sent to a different phone number, press 9. </tts>
 		<hangup />
 	</message>
 </voice>

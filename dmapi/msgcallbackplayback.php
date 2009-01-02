@@ -19,13 +19,13 @@ function endoflist()
 	<message name="endoflist">
 		<field name="doendoflist" type="menu" timeout="10000">
 			<prompt repeat="2">
-				<tts gender="female">There are no more messages.  To listen to your messages from the beginning, press the pound key.  Otherwise, you may end the call by hanging up.  </tts>
+				<tts gender="female">There are no more messages for this phone number. To hear your messages again, press the pound key. To check messages for a different phone number, press 9. Otherwise, you may simply hang up to end this call.  </tts>
 			</prompt>
 
 			<choice digits="#" />
 
 			<default>
-				<tts gender="female">Sorry, that was not a valid option. </tts>
+				<tts gender="female">Sorry, that was not a valid selection. </tts>
 			</default>
 
 			<timeout>
@@ -35,7 +35,7 @@ function endoflist()
 	</message>
 
 	<message name="error">
-		<tts gender="female">You may call back to listen to your messages. Goodbye.</tts>
+		<tts gender="female">You may call again to listen to your messages. goodbye!</tts>
 		<hangup />
 	</message>
 </voice>
@@ -78,11 +78,11 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 			<prompt>
 				<?if ($playintro) {
 					if ($messagetotal == 1) {?>
-						<tts gender="female">There is one message in the last 30 days.  You may press the star key to repeat. </tts>
+						<tts gender="female">There is 1  message for this phone number. At any time while the message is playing, you may press the star key to repeat the message, or the pound key to skip to the next message. </tts>
 					<?} else {?>
 						<tts gender="female">There are</tts>
 						<tts gender="female"><?echo $messagetotal?></tts>
-						<tts gender="female">messages in the last 30 days.  At any time, press the star key to repeat the message, or pound to skip to the next message. </tts>
+						<tts gender="female">messages for this phone number. At any time while the message is playing, you may press the star key to repeat the message, or the pound key to skip to the next message. </tts>
 					<?}?>
 				<?}?>
 
@@ -98,7 +98,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 				<?renderMessageParts($playback);?>
 
 
-				<tts gender="female">Press the star key to repeat the message, or pound to skip to the next message.</tts>
+				<tts gender="female">Please press the star key to repeat the message, or the pound key to skip to the next message.</tts>
 			</prompt>
 
 			<choice digits="*" />
@@ -119,7 +119,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 			<?}?>
 
 			<default>
-				<tts gender="female">Sorry, that was not a valid option. </tts>
+				<tts gender="female">Sorry, that was not a valid selection. </tts>
 			</default>
 			<timeout>
 				<setvar name="timeout" value="1" />
@@ -151,7 +151,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	<?}?>
 
 	<message name="error">
-		<tts gender="female">I was not able to understand your response.  Goodbye.</tts>
+		<tts gender="female">I'm sorry, but I was not able to understand your selection. Please call back and try again. goodbye!</tts>
 		<hangup />
 	</message>
 </voice>
@@ -162,7 +162,7 @@ function hangup() {
 ?>
 <voice>
 	<message name="hangup">
-	       	<tts gender="female">You may call back to listen to your messages. Goodbye.</tts>
+	       	<tts gender="female">Your session has timed out. You may call again to listen to your messages. goodbye!</tts>
 	       	<hangup />
 
 	</message>

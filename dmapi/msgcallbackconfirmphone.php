@@ -10,16 +10,16 @@ function confirmcallerid($callerid) {
 	<message name="choosecallerid">
 			<field name="callerid" type="menu" timeout="10000">
 			<prompt repeat="2">
-			    <tts gender="female" language="english">It looks like you are calling from <? echo Phone::format($callerid) ?>. </tts>
-	    	    <tts gender="female" language="english">Press 1 if this is the number that received the call, otherwise press 2.</tts>
+			    <tts gender="female" language="english">It looks like you're calling from <? echo Phone::format($callerid) ?>. </tts>
+	    	    <tts gender="female" language="english">If this is the phone number which received the call,  please press 1, or press 2 to enter a different phone number.</tts>
 			</prompt>
 			<choice digits="1" />
 			<choice digits="2" />
 			<default>
-	        	<tts gender="female" language="english">Sorry. That was not a valid option</tts>
+	        	<tts gender="female" language="english">Sorry, that was not a valid selection.</tts>
 			</default>
 			<timeout>
-				<tts gender="female" language="english">I was not able to understand your response. Goodbye.</tts>
+				<tts gender="female" language="english">I'm sorry, but I was not able to understand your selection. Please call back and try again. goodbye!</tts>
 				<hangup />
 			</timeout>
 		</field>

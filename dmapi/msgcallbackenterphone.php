@@ -8,14 +8,14 @@ function entercallerid($attempt) {
 <voice>
 	<message name="entercallerid">
 			<?if ($attempt > 0) { ?>
-					<tts gender="female" language="english">Invalid phone number. Phone number must be 10 digits including area code.</tts>
+					<tts gender="female" language="english">I'm sorry, but the phone number you entered is not valid. You must enter a ten digit number, beginning with the area code.</tts>
 			<?} ?>
 			<field name="phone" type="dtmf" timeout="10000" max="11">
 				<prompt repeat="2">
-				<tts gender="female" language="english">Please enter the phone number that received the call followed by the pound key.</tts>
+				<tts gender="female" language="english">Please enter the phone number which received the call, then press the pound key.</tts>
 				</prompt>
 				<timeout>
-					<tts gender="female" language="english">I was not able to understand your response. Goodbye.</tts>
+					<tts gender="female" language="english">I'm sorry, but I was not able to understand your selection. Please call back and try again. goodbye!</tts>
 					<hangup />
 				</timeout>
 			</field>
@@ -27,7 +27,7 @@ function invalidend() {
 ?>
 <voice>
 	<message name="invalidend">
-	       	<tts gender="female">Invalid phone number. Please call back and try again. Goodbye.</tts>
+	       	<tts gender="female">I'm sorry, but I was not able to understand your selection. Please call back and try again. goodbye!</tts>
 	       	<hangup />
 	</message>
 </voice>
