@@ -123,6 +123,9 @@ if(isset($_GET['result'])){
 	$_SESSION['report']['options'] = $options;
 	$redirect = 1;
 }
+if(!isset($_SESSION['report']['options'])){
+	redirect("reports.php");
+}
 
 if($redirect)
 	redirect();
