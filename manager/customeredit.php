@@ -22,10 +22,6 @@ if(isset($_SESSION['currentid'])) {
 	}
 }
 
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +58,39 @@ function update_jobtypeprefs($min, $max, $type, $custdb){
 $f = "customer";
 $s = "edit";
 
+$googlangs = array(	"Arabic", 
+					"Bulgarian", 
+					"Catalan", 
+					"Chinese", 
+					"Croatian", 
+					"Czech", 
+					"Danish", 
+					"Dutch", 
+					"Finnish", 
+					"French", 
+					"German", 
+					"Greek", 
+					"Hebrew", 
+					"Hindi", 
+					"Indonesian", 
+					"Italian", 
+					"Japanese", 
+					"Korean", 
+					"Latvian", 
+					"Lithuanian", 
+					"Norwegian", 
+					"Polish", 
+					"Portuguese", 
+					"Romanian", 
+					"Russian", 
+					"Serbian", 
+					"Slovak", 
+					"Slovenian", 
+					"Spanish", 
+					"Swedish", 
+					"Ukrainian", 
+					"Vietnamese");
+					
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",
 					"US/Arizona",
@@ -77,7 +106,9 @@ $timezones = array(	"US/Alaska",
 $reloadform = 0;
 
 $refresh = 0;
-$languages = QuickQueryList("select id, name from language order by name", true, $custdb);
+$languages = QuickQueryList("select id, name from language order by id", true, $custdb);
+$ttslangs = QuickQueryList("select id, language from ttsvoice", true, $custdb);
+$ttslangs = array_flip($ttslangs);
 
 if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 	if(CheckFormInvalid($f))
@@ -296,7 +327,7 @@ if( $reloadform ) {
 
 	ClearFormData($f);
 	if($refresh){
-		$languages = QuickQueryList("select id, name from language order by name", true, $custdb);
+		$languages = QuickQueryList("select id, name from language order by id", true, $custdb);
 	}
 	PutFormData($f,$s,'name',getCustomerSystemSetting('displayname', "", true, $custdb),"text",1,50,true);
 	PutFormData($f,$s,'hostname',$custinfo[3],"text",1,255,true);
@@ -431,13 +462,36 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td>Number of minutes for login lockout:</td><td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td></tr>
 
 <?
-
-	foreach($languages as $index => $language){
-		$lang = "Language" . $index;
-		?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50) ?></td></tr><?
-	}
+foreach($languages as $index => $language){
+	$lang = "Language" . $index;
+	?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang'") ?>
+	<? 
+	if ($index > 1) {?>
+		<select onchange="var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;">
+		<?foreach ($googlangs as $googlang) {
+			$ttsLangSup = '';
+			if (isset($ttslangs[strtolower($googlang)]))
+				$ttsLangSup .= " (TTS Support)";
+			?>
+			<option value="<?=$googlang?>" <?=($googlang == $language)?"selected":""?>><?=$googlang . $ttsLangSup?></option>
+		<?}?>
+		</select>
+	<?}?>
+	</td></tr><?
+}
 ?>
-<tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50) ?></td></tr>
+<tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50, "id='newlanginput' onkeyup=\"var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;\"")?>
+		<select id='newlanginputselect' onchange="var o = new getObj('newlanginput'); if (this.selectedIndex !== 0) o.obj.value = this.options[this.selectedIndex].value;">
+		<option value=0> -- Choose a Language -- </option>
+		<?foreach ($googlangs as $googlang) {
+			$ttsLangSup = '';
+			if (isset($ttslangs[strtolower($googlang)]))
+				$ttsLangSup .= " (TTS Support)";
+			?>
+			<option value="<?=$googlang?>" ><?=$googlang . $ttsLangSup?></option>
+		<?}?>
+		</select>
+</td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
 <tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
 <tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?> Survey</td></tr>
