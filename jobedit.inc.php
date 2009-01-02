@@ -72,8 +72,11 @@ foreach ($voices as $voice) {
 
 $peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name", true);
 
+
+$expired = true;
 $joblangs = array("phone" => array(), "email" => array(), "print" => array(), "sms" => array());
 if (isset($job->id)) {
+	$expire = $job->getSetting('translationexpire');
 	$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where type='phone' and jobid=" . $job->id);
 	$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
 	$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
@@ -147,7 +150,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			PutFormData($f,$s,"name",'',"text",1,$JOBTYPE == "repeating" ? 30: 50,true);
 		}
 		$callerid = Phone::parse(GetFormData($f,$s,"callerid"));
-		$expire = $job->getSetting('translationexpire');
 		// check this before CheckFormSection() because we do not want to expand sections if nothing selected
 		if(!$submittedmode && !$sendphone && !$sendemail && !$sendsms){
 			error("Plese select a delivery type");
@@ -649,9 +651,7 @@ if( $reloadform )
 			PutFormData($f,$s,"email_$language",0,"bool",0,1);
 			PutFormData($f,$s,"emailedit_$language",0,"bool",0,1);
 		}
-		$expired = true;
-		$expire = $job->getSetting('translationexpire');
-		if($expire && strtotime($expire) > strtotime(date("Y-m-d"))) {
+		if(isset($expire) && strtotime($expire) > strtotime(date("Y-m-d"))) {
 			$expired = false;
 		}
 		if($job->getSetting('jobcreatedphone') == "1") {
