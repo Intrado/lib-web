@@ -8,6 +8,8 @@ require_once("../inc/table.inc.php");
 if (!$INBOUND_ACTIVATION)
 	redirect("addcontact1.php");
 
+$maxcontacts = 10;
+
 global $oktogo;
 $oktogo = true;
 
@@ -66,16 +68,16 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 			$_SESSION['phoneactivationpkeylist'] = array(); // clear out any previous pkeys
 
 			// save any changed pkeys
-				$i = 0;
-				while (GetFormData($f, $s, "pkey".$i)) {
-					$pkey = GetFormData($f, $s, "pkey".$i);
-					if ($pkey != "")
-						$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
-					$i++;
-				}
-				$pkey = GetFormData($f, $s, "pkeyadd");
+			$i = 0;
+			while ($i < $maxcontacts) {
+				$pkey = GetFormData($f, $s, "pkey".$i);
 				if ($pkey != "")
 					$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
+				$i++;
+			}
+			$pkey = GetFormData($f, $s, "pkeyadd");
+			if ($pkey != "")
+				$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
 
 			// add another
 			if (CheckFormSubmit($f, 'add')) {
@@ -160,14 +162,16 @@ startWindow('Add Contact');
 	}
 ?>
 
-		<tr><td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkeyadd", "text", "20", "255"); ?></td>
+<?		if ($i < $maxcontacts) { ?>
+		<tr><td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkeyadd", "text", "20", "255"); $i++; ?></td>
 		<td></td>
 		</tr>
+<?		} ?>
 
 </table></td></tr>
 
 	<tr><td>You may edit the ID Numbers in the table above.</td></tr>
-	<tr><td> <? echo submit($f, 'add', 'Add More'); ?>  </td></tr>
+	<tr><td> <? if ($i < $maxcontacts) echo submit($f, 'add', 'Add More'); ?>  </td></tr>
 
 	<tr><td class="bottomBorder">&nbsp;</td></tr>
 
