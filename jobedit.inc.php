@@ -475,7 +475,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 								}
 								$part->voiceid = $voiceid;
 								$part->update();
-								$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=$language;
+								$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=ucfirst($language);
 								$joblanguage->translationeditlock = GetFormData($f, $s,$type."edit_$language");
 								$joblanguage->update();
 							} else {
