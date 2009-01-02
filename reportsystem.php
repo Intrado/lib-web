@@ -208,8 +208,8 @@ if($reload){
 
 $PAGE = "reports:system";
 $TITLE = "Usage Statistics";
-NewForm($f);
 include_once("nav.inc.php");
+NewForm($f);
 buttons(submit($f, $s, "Refresh"));
 startWindow("Display Options" . help("UsageStats_DisplayOptions"), "padding: 3px;");
 ?>
