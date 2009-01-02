@@ -67,11 +67,11 @@ startWindow('Phone Activation');
 
 <?	if (count($phones) > 0 && count($pkeyok) > 0) { ?>
 	<tr>
-		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Allowed:</th>
+		<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">People to Add:</th>
 		<td>
 			<table>
 			<tr>
-				<td>The people with the following ID Numbers may be added by following the confirmation steps below.</td>
+				<td>The people with the following ID Numbers can be added by following the confirmation steps below.</td>
 			</tr>
 			<tr><td><table border="1" cellpadding="3" cellspacing="0" width="10%">
 <?			foreach ($pkeyok as $pkey) { ?>
