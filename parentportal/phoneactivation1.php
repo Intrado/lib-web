@@ -87,8 +87,6 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 				checkIDStatus();
 				if ($oktogo)
 					redirect("phoneactivationcode.php");
-				else
-					error('You must edit or remove ID Numbers until all are OK before proceeding to the Next step');
 			}
 			$reloadform = 1;
 		}
@@ -126,11 +124,20 @@ startWindow('Add Contact');
 ?>
 <table cellpadding="3">
 
-	<tr>
-		<td>
-		The following people will be added once the phone confirmation is complete.
-		</td>
-	</tr>
+<? if (!$oktogo) { ?>
+	<tr><td>There were problems with one or more of the ID numbers you entered.</td></tr>
+	<tr><td>Try modifying or removing the ID numbers that are causing the errors.</td></tr>
+	<tr><td>If you still experience problems try activating only one ID number at a time.</td></tr>
+
+<?	} else { ?>
+
+	<tr><td>Enter the ID numbers of the people you wish to add to your account.</td></tr>
+	<tr><td>You can add multiple people to your account in a single call to our toll free number.</td></tr>
+	<tr><td>Enter all of your ID numbers by using the Add More button.</td></tr>
+	<tr><td>Clear any ID numbers you don't want to include, then click Next.</td></tr>
+<?	} ?>
+
+	<tr><td class="bottomBorder">&nbsp;</td></tr>
 
 <tr><td><table border="1" cellpadding="3" cellspacing="0">
 <th>&nbsp;</th><th>ID Number</th>
@@ -144,13 +151,13 @@ startWindow('Add Contact');
 <? if (!$oktogo) {
 		$statustext = "Unknown";
 		if ($_SESSION['phoneactivationpkeylist'][$pkey] == "notfound") {
-			$statustext = "Not found in the system";
+			$statustext = "Error: Unable to locate this ID number in the system.";
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "nophone") {
-			$statustext = "There are no phone numbers on record";
+			$statustext = "Error: There are no phone numbers on record for this ID number.";
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "notallow") {
-			$statustext = "Blocked by the system administrator";
+			$statustext = "Error: This ID number is blocked from phone activation.  Contact the system administrator for ".escapehtml($_SESSION['custname'])." for assistance.";
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "nophonematch") {
-			$statustext = "Unable to activate this person with the others";
+			$statustext = "Error: This ID number cannot be activated along with the others you entered.";
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "ok") {
 			$statustext = "OK";
 		}
@@ -170,13 +177,8 @@ startWindow('Add Contact');
 
 </table></td></tr>
 
-	<tr><td>You may edit the ID Numbers in the table above.</td></tr>
 	<tr><td> <? if ($i < $maxcontacts) echo submit($f, 'add', 'Add More'); ?>  </td></tr>
 
-	<tr><td class="bottomBorder">&nbsp;</td></tr>
-
-	<tr><td>You can activate multiple ID Numbers in a single call to our toll free number.</td></tr>
-	<tr><td>Click Next after you have entered all of your ID Numbers.</td></tr>
 </table>
 <?
 endWindow();

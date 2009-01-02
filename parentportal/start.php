@@ -155,6 +155,8 @@ if(isset($contactList) && $contactList){
 		The Contact Manager allows you to customize your message delivery preferences and enables you to review past messages.
 	</td></tr>
 
+	<tr><td class="bottomBorder">&nbsp;</td></tr>
+
 	<tr><td>
 		<? echo button("Click here to begin", NULL, "phoneactivation0.php"); ?>
 	</td></tr>

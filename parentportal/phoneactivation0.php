@@ -66,6 +66,10 @@ NewForm($f);
 startWindow('Activation Method');
 ?>
 <table>
+	<tr><td>Start by choosing the method you'll use to add people to your account.</td</tr>
+
+	<tr><td class="bottomBorder">&nbsp;</td></tr>
+
 	<tr>
 		<td>
 			<? NewFormItem($f, $s, "radioselect", "radio", null, "bycode"); ?> I have an Activation Code to enter now.

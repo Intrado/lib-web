@@ -88,14 +88,14 @@ startWindow('Phone Activation');
 		<td>
 		<table>
 		<tr>
-			<td>You must follow these steps within 24 hours to add the allowed people to your account.<BR><BR></td>
+			<td>You must follow these steps within 24 hours to add the above people to your account.<BR><BR></td>
 		</tr>
 		<tr>
 			<td><? echo button("Print this page now", "window.print()"); ?> <BR><BR><BR></td>
 		</tr>
 		<tr><td><table cellpadding="2">
 		<tr>
-			<td valign="top">Step 1.</td><td>You must call from one of the phones listed, in order to verify your caller id on record.<br><br>
+			<td valign="top">Step 1.</td><td>You must call from one of the phones listed below in order to verify your caller ID with our records.<br><br>
 			For security reasons, we have hidden parts of your phone numbers with "xxx".
 			</td>
 		</tr>
@@ -121,7 +121,7 @@ startWindow('Phone Activation');
 			<td>Step 4.</td><td>When prompted, enter this activation code  <span style="font-weight:bold; font-size: 140%;"><?=escapehtml($code) ?></span></td>
 		</tr>
 		<tr>
-			<td>Step 5.</td><td>When the call is complete, click the 'Contacts' tab to edit your notification preferences.</td>
+			<td>Step 5.</td><td>When the call is complete, log back into your Contact Manager account to edit your notification preferences.</td>
 		</tr>
 		</table>
 		</td>
