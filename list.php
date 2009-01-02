@@ -232,7 +232,7 @@ startWindow('List Information');
 			<?
 			$renderedlist->calcStats();
 			?>
-			<table border="0" cellspacing="3" cellpadding="2" class="border" width="150px">
+			<table border="0" cellspacing="3" cellpadding="2" width="150px">
 				<tr>
 					<td  class="border" valign="center" width="100px"><b><?=$renderedlist->total?></b></td>
 					<td align="right"><?=submit($f, 'preview','Preview')?></td>
