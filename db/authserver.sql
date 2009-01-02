@@ -277,3 +277,14 @@ CREATE TABLE `portalphoneactivation` (
   PRIMARY KEY ( `id` ) ,
   INDEX ( `phone` )
 ) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
+ALTER TABLE `portalactivation` ADD INDEX ( `creation` )
+$$$
+
+ALTER TABLE `persontoken` ADD INDEX ( `expirationdate` )
+$$$
+
+ALTER TABLE `portalphoneactivation` ADD INDEX ( `expirationdate` )
+$$$
+
