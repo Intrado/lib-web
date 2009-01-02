@@ -80,15 +80,15 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 	else
 	{
 		MergeSectionFormData($f, $s);
+				
+		$check = GetFormData($f, $s, "check_archived");
+		
 		//do check
-
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(!GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
+		} else if((!$check && !GetFormData($f, $s, "jobid")) || ($check && !GetFormData($f, $s, "jobid_archived"))){
 			error('You must pick a survey');
 		} else {
-
-			$check = GetFormData($f, $s, "check_archived");
 			if($check)
 				$options['jobid'] = GetFormData($f, $s, "jobid_archived")+0;
 			else
