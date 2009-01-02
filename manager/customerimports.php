@@ -16,6 +16,15 @@ define('SECONDSPERDAY', 86400);
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 
+function fmt_custid($row, $index){
+	global $favcustomers;
+
+	if (isset($favcustomers[$row[$index]]))
+		return "<img style='margin-right: 4px;' src='img/fav.png' border=0/>" . $row[$index];
+	else
+		return $row[$index];
+}
+
 function fmt_import_date($row,$index) {
 	if (isset($row[$index])) {
 		$time = strtotime($row[$index]);
@@ -217,6 +226,12 @@ if($reloadform){
 	ClearFormData($f);
 }
 
+// FAVORITES
+// Favorite customers are indexed by customer ID.
+if (isset($_COOKIE["favcustomers"])) {
+	$favcustomers = array_flip(explode(",", $_COOKIE["favcustomers"]));
+}
+
 if(isset($_GET['clear'])){
 	unset($_SESSION['customerid']);
 	redirect();
@@ -235,6 +250,12 @@ if (isset($_GET['cid'])) {
 			
 		$queryextra = substr($queryextra, 0, -1) . ") ";
 	}
+} else if ($favcustomers && !isset($_GET['showall'])) {
+	$queryextra = " AND id in (";
+	foreach ($favcustomers as $cid => $junk)
+		$queryextra .= "'". DBSafe($cid) . "',";
+		
+	$queryextra = substr($queryextra, 0, -1) . ") ";
 }
 
 if (isset($_POST['showmatch'])) {
@@ -310,7 +331,8 @@ $titles = array("0" => "#ID",
 		"14" => "@#Alert Email",
 		"actions" => "Actions");
 		
-$formatters = array("url" => "fmt_custurl",
+$formatters = array("0" => "fmt_custid",
+					"url" => "fmt_custurl",
 					"11" => "fmt_filesize",
 					"9" => "fmt_alert_timestamp",
 					"6" => "fmt_import_status",
@@ -386,7 +408,12 @@ include("nav.inc.php");
 		</td>
 	</tr>
 </table>
-<a href='customerimports.php'>Show All Customers</a>
+<?
+if ((!isset($_GET["showall"]) && !empty($favcustomers)) && !isset($_GET["search"]))
+	print "<a href='customerimports.php?showall'>Show All Customers</a>";
+else
+	print "<a href='customerimports.php'> <img src='img/fav.png' border=0/>Show Favorites</a>";
+?>
 </form>
 <?
 
