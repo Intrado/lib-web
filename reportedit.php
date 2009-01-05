@@ -149,8 +149,14 @@ if($reload){
 		$dows = $subscription->daysofweek;
 		$dowarray = explode(",", $dows);
 		$dom = $subscription->dayofmonth;
-		if($subscription->type == 'once')
-			$rundate = date("M j, Y", strtotime($subscription->nextrun));
+		if($subscription->type == 'once') {
+			if ($subscription->nextrun)
+				$rundate = date("M j, Y", strtotime($subscription->nextrun));
+			else {
+				$rundate = "";
+				$subscription->type = "notscheduled";
+			}
+		}
 	}
 	for($i=1; $i<8;$i++){
 		PutFormData($f, $s, "dow$i", in_array($i, $dowarray) ? "1" : "0", "bool", "0", "1");
