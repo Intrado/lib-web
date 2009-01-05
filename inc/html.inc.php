@@ -177,7 +177,7 @@ function audio($name) {
 		<option value="0"> -- Select an Audio File -- </option>
 	<?
 	foreach($files as $audio)
-		print "<option value=\"$audio->id\">$audio->name</option>";
+		print "<option value=\"$audio->id\">" . escapehtml($audio->name) . "</option>";
 	?>
 	</select>
 	<?
