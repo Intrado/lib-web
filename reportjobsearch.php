@@ -146,7 +146,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 				$options['jobtypes'] = "";
 
 			foreach($options as $index => $option){
-				if($option == "")
+				if($option === "")
 					unset($options[$index]);
 			}
 
@@ -172,7 +172,7 @@ if($reload){
 		$radio = "date";
 	PutFormData($f, $s, "radioselect", $radio);
 	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "today");
-	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number",1);
+	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
 	PutFormData($f, $s, "startdate", isset($options['startdate']) ? $options['startdate'] : "", "text");
 	PutFormData($f, $s, "enddate", isset($options['enddate']) ? $options['enddate'] : "", "text");
 	if(isset($options['archived']) && $options['archived']){
