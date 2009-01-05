@@ -2,7 +2,7 @@
 $isasplogin=1;
 
 require_once("common.inc.php");
-include_once("AspAdminUser.obj.php");
+require_once("AspAdminUser.obj.php");
 
 if(isset($_GET["logout"])) {
 	@session_destroy();
