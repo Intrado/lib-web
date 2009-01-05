@@ -53,7 +53,7 @@ if(CheckFormSubmit($f,$s))
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
-		print '<div class="warning">Form was edited in another window, reloading data.</div>';
+		error('Form was edited in another window, reloading data');
 		$reload = 1;
 	}
 	else
