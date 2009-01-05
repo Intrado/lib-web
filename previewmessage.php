@@ -104,6 +104,10 @@ if ($reloadform) {
 		PutFormData($f,$s,"f02",$USER->lastname);
 	if (isset($fields['f03']))
 		PutFormData($f,$s,"f03","English");
+	for ($x = 4; $x <= 20; $x++)
+		if (isset($fields['f'.substr("0".$x, -2)]))
+			PutFormData($f,$s,'f'.substr("0".$x, -2),"");
+		
 }
 
 
