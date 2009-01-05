@@ -192,7 +192,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('The start date must be within 7 days when creating a text-to-speach message');
 		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . $name . '\' already exists');
-		} else if ($callerid != "" && strlen($callerid) != 10) {
+		} else if ($sendphone && $callerid != "" && strlen($callerid) != 10) {
 			$hasphonedetailerror = true;
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else if($sendemail && GetFormData($f, $s,"emailradio") == "create" && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
@@ -369,7 +369,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->userid = $USER->id;
 
 			// make sure we don't resave these options on an already submitted or completed job
-			if(!$submittedmode && !$completedmode) {
+			if($job->sendphone && !$submittedmode && !$completedmode) {
 				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
 
@@ -405,10 +405,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 				if ($USER->authorize("messageconfirmation"))
 					$job->setOption("messageconfirmation", GetFormData($f, $s, "messageconfirmation"));
-
 			}
 			if(!$completedmode){
-
 				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 				$job->setOptionValue("maxcallattempts", GetFormData($f,$s,"maxcallattempts"));
 			}
@@ -416,12 +414,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->update();
 				status('Updated Job information successfully');
 			} else {
-				if ($JOBTYPE == "normal") {
-					$job->status = "new";
-				} else {
-					$job->status = "repeating";
-				}
-
+				$job->status = ($JOBTYPE == "normal")?"new":"repeating";
 				$job->createdate = QuickQuery("select now()");
 				$job->create();
 			}
