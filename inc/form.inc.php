@@ -231,8 +231,10 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 function NewFormSelect ($f,$s,$item,$map) {
 	NewFormItem($f,$s,$item,"selectstart");
 
-	foreach ($map as $value => $name) {
-		NewFormItem($f,$s,$item,"selectoption",$name,$value);
+	if ($map) {
+		foreach ($map as $value => $name) {
+			NewFormItem($f,$s,$item,"selectoption",$name,$value);
+		}
 	}
 	NewFormItem($f,$s,$item,"selectend");
 }
@@ -397,7 +399,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.23 $
+	    # $Revision: 1.24 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
