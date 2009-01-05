@@ -76,14 +76,14 @@ class Job extends DBMappedObject {
 		$newjob = new Job($this->id);
 		$newjob->id = NULL;
 		$tmpJobName = $newjob->name;
-		$copySuffix = "... (Copy)";
-		if(strlen($tmpJobName) > 40)
-			$tmpJobName = substr($tmpJobName,0,40);
+		$copySuffix = " (Copy)";
+		if (strlen($tmpJobName) > 40)
+			$tmpJobName = substr($tmpJobName,0,40) . "... ";
 		$copyCount = 1;
 		while (DBFind("Job", "from job where name = '".DBSafe($tmpJobName.$copySuffix)."' and deleted = 0 and cancelleduserid is NULL")) {
-			$copySuffix = "... (Copy $copyCount)";
-			if(strlen($tmpJobName) > 39 - strlen($copyCount))
-				$tmpJobName = substr($tmpJobName,0,39 - strlen($copyCount));
+			$copySuffix = " (Copy $copyCount)";
+			if (strlen($tmpJobName) > 39 - strlen($copyCount))
+				$tmpJobName = substr($tmpJobName,0,39 - strlen($copyCount)) . "... ";
 			$copyCount++;
 		}
 		$newjob->name = DBSafe($tmpJobName . $copySuffix);
