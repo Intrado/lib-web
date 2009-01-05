@@ -294,7 +294,7 @@ if ($reason != 'ok' && $reason != 'prevresponse' && $reason != 'expired') {
 		} else {
 			echo '<br><br><h3 style="margin-left: 15px;">';
 			echo nl2br(escapehtml($questionnaire->webexitmessage));
-			echo "</h3<<br><br>";
+			echo "</h3><br><br>";
 		}
 
 	}
