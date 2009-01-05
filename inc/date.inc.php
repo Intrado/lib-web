@@ -1,7 +1,7 @@
 <?
 
 
-function reldate ($reldate, $timestamp = false) {
+function reldate ($reldate, $astimestamp = false) {
 	switch($reldate) {
 		default:
 		case "today":
@@ -25,14 +25,14 @@ function reldate ($reldate, $timestamp = false) {
 
 			$targetdate = QuickQuery("select date_sub(curdate(),interval $daydiff day)");
 			break;
-		case "weektodate":
-			$targetdate = QuickQuery("select date_sub(curdate(),interval 1 week)");
+		case "weektodate": //note that this actually just returns the first day of this week, or last sunday if today is a sunday
+			$targetdate = date("Y-m-d",strtotime("last sunday"));
 			break;
-		case "monthtodate":
-			$targetdate = QuickQuery("select date_sub(curdate(),interval 1 month)");
+		case "monthtodate": //note that this actually just returns the first day of this month
+			$targetdate = date("Y-m-01");
 			break;
 	}
-	if($timestamp)
+	if($astimestamp)
 		return strtotime($targetdate);
 	else
 		return date("m/d/Y", strtotime($targetdate));
