@@ -461,7 +461,7 @@ startWindow('Survey Template Information',NULL,true, false);
 					<td>
 						<table border=0 cellpadding=0 cellspacing=0>
 						<tr>
-							<td><? NewFormItem($f, $s, "leavemessage", "checkbox") ?></td>
+							<td><? NewFormItem($f, $s, "leavemessage", "checkbox",NULL,NULL,"dependson=\"phonesurvey\"") ?></td>
 						</tr>
 						</table>
 					</td>
