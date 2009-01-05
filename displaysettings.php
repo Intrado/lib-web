@@ -47,8 +47,8 @@ if(CheckFormSubmit($f,$s))
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
-			error("That is not a valid 'Primary Color'");
+		} else if(!eregi("^[0-9A-F]{6}$", TrimFormData($f, $s, "_brandprimary"))){
+			error("That is not a valid 'Primary Color'. Please enter only a 6 digit hexadecimal value");
 		} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
 			error("The ratio of primary to background can only be between 0 and .5(50%)");
 		} else {

@@ -129,8 +129,8 @@ if(CheckFormSubmit($f,$s))
 			error("These emails are invalid", $bademaillist);
 		} elseif(strtotime(GetFormData($f, $s, 'callearly')) >= strtotime(GetFormData($f, $s, 'calllate'))) {
 			error("The earliest call time must be before the latest call time");
-		} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
-			error("That is not a valid 'Primary Color'");
+		} else if(!eregi("^[0-9A-F]{6}$", TrimFormData($f, $s, "_brandprimary"))){
+			error("That is not a valid 'Primary Color'. Please enter only a 6 digit hexadecimal value");
 		} else if (GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5) {
 			error("The ratio of primary to background can only be between 0 and .5(50%)");
 		} else {
