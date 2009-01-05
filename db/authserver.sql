@@ -285,4 +285,5 @@ ALTER TABLE `persontoken` ADD INDEX ( `expirationdate` );
 
 ALTER TABLE `portalphoneactivation` ADD INDEX ( `expirationdate` );
 
+ALTER TABLE `customer` ADD INDEX ( `oem` , `oemid` ) ;
 
