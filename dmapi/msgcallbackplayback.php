@@ -137,18 +137,20 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 			</prompt>
 		</field>
 		<uploadaudio name="voicereply"/>
-		<tts gender="female">Thank you, your message has been saved. </tts>
+		<tts gender="female">-- Thank you, your message has been saved. </tts>
 	</message>
 	<?}?>
 
 	<?if ($playback['messageconfirmation'] === "1") {?>
 	<message name="messageconfirmyes">
 		<setvar name="messageconfirm" value="1"/>
-		<tts gender="female">Thank you, your response has been noted.</tts>
+		<tts> -- </tts>
+		<tts gender="female">-- Thank you, your response has been noted.</tts>
 	</message>
 	<message name="messageconfirmno">
 		<setvar name="messageconfirm" value="2"/>
-		<tts gender="female">Thank you, your response has been noted.</tts>
+		<tts> -- </tts>
+		<tts gender="female">-- Thank you, your response has been noted.</tts>
 	</message>
 	<?}?>
 
