@@ -343,7 +343,11 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->authorize('viewsystemreports')) {
-		$reportLink = '&nbsp;|&nbsp;<a href="reportjobsummary.php?jobid=' . $id . '">Report</a>';
+		if ($type == 'survey') {
+			$reportLink = '&nbsp;|&nbsp;<a href="reportsurveysummary.php?jobid=' . $id . '">Report</a>';
+		} else {
+			$reportLink = '&nbsp;|&nbsp;<a href="reportjobsummary.php?jobid=' . $id . '">Report</a>';
+		}
 	} else {
 		$reportLink = '';
 	}
