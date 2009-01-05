@@ -17,11 +17,11 @@ $pkeyok = array();
 
 $result = portalCreatePhoneActivation($_SESSION['customerid'], $_SESSION['portaluserid'], array_keys($_SESSION['phoneactivationpkeylist']), true);
 if ($result['result'] == "") {
-	$phones = explode(",", $result['phonelist']);
+	$phones = $result['phonelist'];
 	if (count($phones) == 1 && $phones[0] == "")
 		$phones = array(); // empty the array of no phones
 	$code = $result['code'];
-	$pkeyresults = explode(",", $result['pkeyresults']);
+	$pkeyresults = $result['pkeyresults'];
 	foreach ($pkeyresults as $pair) {
 		$pairsplit = explode(":", $pair);
 		if ($pairsplit[1] == "ok") {

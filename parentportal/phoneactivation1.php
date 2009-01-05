@@ -21,13 +21,13 @@ function checkIDStatus() {
 	if (isset($_SESSION['phoneactivationpkeylist']) && count($_SESSION['phoneactivationpkeylist'])) {
 		$result = portalCreatePhoneActivation($_SESSION['customerid'], $_SESSION["portaluserid"], array_keys($_SESSION['phoneactivationpkeylist']), false);
 		if ($result['result'] == "") {
-			$phones = explode(",", $result['phonelist']);
+			$phones = $result['phonelist'];
 			if (count($phones) == 1 && $phones[0] == "")
 				$phones = array(); // empty the array of no phones
 			if (count($phones))
 				$oktogo = true;
 
-			$pkeyresults = explode(",", $result['pkeyresults']);
+			$pkeyresults = $result['pkeyresults'];
 			foreach ($pkeyresults as $pair) {
 				$pairsplit = explode(":", $pair);
 				$status = $pairsplit[1];

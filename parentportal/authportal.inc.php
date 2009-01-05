@@ -174,9 +174,13 @@ function portalUpdatePortalUsername($username, $password) {
 
 function portalCreatePhoneActivation($customerid, $portaluserid, $pkeyList, $createCode) {
 	sleep(2); // slow down any DOS attack
-	$pkeyListCSV = implode(",", $pkeyList); // TODO does pkey have a comma in it?
+
+	$pkeyarray = array();
+	foreach ($pkeyList as $pkey) {
+		$pkeyarray[] = new XML_RPC_Value($pkey, 'string');
+	}
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'), new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($pkeyListCSV, 'string'), new XML_RPC_Value($createCode, 'boolean'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'), new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($pkeyarray, 'array'), new XML_RPC_Value($createCode, 'boolean'));
 	$method = "PortalServer.portal_createPhoneActivation";
 	$result = pearxmlrpc($method, $params);
 	return $result;
