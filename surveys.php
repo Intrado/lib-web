@@ -2,17 +2,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/formatters.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/SurveyQuestionnaire.obj.php");
-include_once("obj/SurveyQuestion.obj.php");
-include_once("obj/Job.obj.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/formatters.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/text.inc.php");
+require_once("obj/SurveyQuestionnaire.obj.php");
+require_once("obj/SurveyQuestion.obj.php");
+require_once("obj/Job.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -41,7 +41,7 @@ $TITLE = "Survey Builder";
 include_once("nav.inc.php");
 
 
-startWindow('My Active and Pending Surveys ' . help('SurveyBuilder_MyActiveAndPending'),'padding: 3px;',true, true);
+startWindow('My Surveys ' . help('SurveyBuilder_MyActiveAndPending'),'padding: 3px;',true, true);
 
 button_bar(button('Schedule Survey', null,"survey.php?id=new") );
 
