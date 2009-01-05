@@ -128,7 +128,7 @@ startWindow('Phone Activation');
 		</td></tr></table>
 
 		<tr>
-			<td>&nbsp;</td><td><img src="../img/bug_lightbulb.gif" > If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.</td>
+			<td>&nbsp;</td><td><img src="img/bug_lightbulb.gif" > If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.</td>
 		</tr>
 		<tr>
 			<td>Step 2.</td><td>Call <b><?echo Phone::format($INBOUND_ACTIVATION) ?> </b></td>
