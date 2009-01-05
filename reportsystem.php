@@ -113,15 +113,10 @@ if($reload){
 	$joblistquery = "";
 	$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted", true);
 
-	if($reldate == "xdays"){
-		list($startdate, $enddate) = getStartEndDate($reldate, array("lastxdays" =>  GetFormData($f, $s, "xdays")));
-	} else if(GetFormData($f, $s, "relativedate") != "daterange"){
-		list($startdate, $enddate) = getStartEndDate($reldate);
-	} else {
-		$startdate = strtotime($startdate);
-		$enddate = strtotime($enddate);
-	}
+	$paramdata = array("lastxdays" =>  GetFormData($f, $s, "xdays"), "startdate" => $startdate, "enddate" => $enddate);
 
+	list($startdate, $enddate) = getStartEndDate($reldate, $paramdata);
+	
 	$joblist = getJobList($startdate, $enddate, implode("','", array_keys($jobtypelist)), "", $type);
 	$joblistquery = " and rp.jobid in ('" . implode("','", $joblist) . "') ";
 	$jobidtypelist = QuickQueryList("select id, jobtypeid from job j where j.id in ('" . implode("','",$joblist) ."') ", true);

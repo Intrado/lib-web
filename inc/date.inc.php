@@ -66,7 +66,8 @@ function getStartEndDate($type, $arguments = array()){
 			$enddate = $startdate = reldate("today", true);
 			break;
 	}
-	return array($startdate, $enddate);
-
+	$res = array($startdate, $enddate);
+	sort($res); //ensure between order
+	return $res;
 }
 ?>
