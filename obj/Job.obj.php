@@ -75,7 +75,18 @@ class Job extends DBMappedObject {
 		//make a copy of this job
 		$newjob = new Job($this->id);
 		$newjob->id = NULL;
-		$newjob->name .= " - " . date("M j, g:i a");
+		$tmpJobName = $newjob->name;
+		$copySuffix = "... (Copy)";
+		if(strlen($tmpJobName) > 40)
+			$tmpJobName = substr($tmpJobName,0,40);
+		$copyCount = 1;
+		while (DBFind("Job", "from job where name = '".DBSafe($tmpJobName.$copySuffix)."' and deleted = 0 and cancelleduserid is NULL")) {
+			$copySuffix = "... (Copy $copyCount)";
+			if(strlen($tmpJobName) > 39 - strlen($copyCount))
+				$tmpJobName = substr($tmpJobName,0,39 - strlen($copyCount));
+			$copyCount++;
+		}
+		$newjob->name = DBSafe($tmpJobName . $copySuffix);
 		if ($isrepeatingrunnow || $newjob->status != "repeating") {
 			$newjob->status = "new";
 			$newjob->scheduleid = NULL;
