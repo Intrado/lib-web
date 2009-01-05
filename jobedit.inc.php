@@ -140,6 +140,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 		//do check
 
+		if (!GetFormData($f, $s, 'sendphone')) {
+			PutFormData($f, $s, "callerid", "", "phone", 10, 10);
+		}
+
 		$sendphone = GetFormData($f, $s, "sendphone");
 		$sendemail = GetFormData($f, $s, "sendemail");
 		$sendsms = getSystemSetting("_hassms", false) ? GetFormData($f, $s, "sendsms") : 0;
