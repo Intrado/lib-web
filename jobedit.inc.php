@@ -180,18 +180,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			$hassettingsdetailerror = true;
 			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (($completedmode || $submittedmode) && ($job->getSetting('jobcreatedphone') == "1" || $job->getSetting('jobcreatedemail') == "1") && 
+		} else if (($completedmode || $submittedmode) && ($job->getSetting('jobcreatedphone') == "1" || $job->getSetting('jobcreatedemail') == "1") &&
 						$expire && strtotime($expire) - (8*86400) < strtotime(GetFormData($f,$s,"startdate"))) {
-			error('The start date for a message created in the job editor may not be rescheduled for more than 7 days past the date it was submitted');				
+			error('The start date for a message created in the job editor may not be rescheduled for more than 7 days past the date it was submitted');
 		} else if ($JOBTYPE == "normal" && GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create" && (strtotime(GetFormData($f,$s,"startdate"))-(7*86400) > strtotime("today")) && !$completedmode) {
 			$hassettingsdetailerror = true;
 			error('The start date must be within 7 days when creating a text-to-speach message');
 		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . $name . '\' already exists');
 		} else if ($callerid != "" && strlen($callerid) != 10) {
-			$hasphonedetailerror = true;
-			error('The Caller ID must be exactly 10 digits long (including area code)');
-		} else if (getSystemSetting('_hascallback', false) && (GetFormData($f, $s, "radiocallerid") == "byuser") && (strlen($callerid) == 0)) {
 			$hasphonedetailerror = true;
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else if($sendemail && GetFormData($f, $s,"emailradio") == "create" && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
@@ -232,7 +229,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$job->setSetting("jobcreated" . $type, 1); // Tell the job that this message was created here
 						$job->setSetting('translationexpire', date("Y-m-d", strtotime(date("Y-m-d")) + (15 * 86400))); // now plus 15 days
 						$message = new Message($themessageid);
-						$message->userid = $USER->id;$message->type = $type;$message->deleted = 1;	
+						$message->userid = $USER->id;$message->type = $type;$message->deleted = 1;
 						if($type == "email") {
 							$message->subject = GetFormData($f, $s, 'emailsubject');
 							$message->fromname = GetFormData($f, $s, 'fromname');
@@ -372,18 +369,30 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
 
-				if ($USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
-					$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
+				if ($USER->authorize('setcallerid')) {
+					$callerid = Phone::parse(GetFormData($f, $s, "callerid"));
+					if ($callerid == "") {
+						$callerid = getSystemSetting("callerid");
+					}
+					$job->setOptionValue("callerid",$callerid);
+
 					// if customer has callback feature
 					if (getSystemSetting('_hascallback', false)) {
-						$radio = "0";
 						if (GetFormData($f, $s, "radiocallerid") == "byuser") {
 							$radio = "1";
+						} else {
+							$radio = "0";
+							// set to toll free number
+							$job->setOptionValue("callerid", getSystemSetting('inboundnumber'));
 						}
 						$job->setSetting('prefermycallerid', $radio);
 					}
 				} else {
-					$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
+					if (getSystemSetting('_hascallback', false)) {
+						$callerid = getSystemSetting('inboundnumber');
+					} else {
+						$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
+					}
 					$job->setOptionValue("callerid", $callerid);
 				}
 
@@ -417,7 +426,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			//echo $job->_lastsql;
 			//echo mysql_error();
 			$addlang = false;
-			
+
 			if(!$submittedmode && !$completedmode) {
 				//now add any language options
 				foreach (array("phone","email") as $type){
@@ -494,11 +503,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					if($job->getSetting('jobcreatedemail',"0") != "1")
 						$types[] = "email";
 					$types[] = "print";
-	
+
 					foreach ($types as $type) {
 						if (CheckFormSubmit($f,$type))
 							$addlang = true;
-	
+
 						if (GetFormData($f,$type,"newlang" . $type) && GetFormData($f,$type,"newmess" . $type)) {
 							MergeSectionFormData($f, $type);
 							$joblang = new JobLanguage();
@@ -510,7 +519,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							$joblang->create();
 							$joblangs[$type] = DBFindMany('JobLanguage', "from joblanguage where type='$type' and jobid=" . $job->id); // Reaload the joblanguage array for the language to show up after add
 						}
-	
+
 					}
 				}
 				/* Store multilists*/
@@ -518,7 +527,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if(GetFormData($f, $s, "listradio") == "multi") {
 					$batchvalues = array();
 					$listids = GetFormData($f,$s,'listids');
-	
+
 					array_shift($listids);  // The first list has already been added to the job above
 					foreach($listids as $id) {
 						$values = "($job->id,". ($id+0) . ")";
@@ -689,17 +698,19 @@ if( $reloadform )
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
 	PutFormData($f,$s,"skipduplicates",$job->isOption("skipduplicates"), "bool",0,1);
 	PutFormData($f,$s,"skipemailduplicates",$job->isOption("skipemailduplicates"), "bool",0,1);
-	
+
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
-	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "phone", 10, 10);
 
+	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 	if ($job->getSetting("prefermycallerid","0") == "1") {
 		$radio = "byuser";
+		$callerid = $job->getOptionValue("callerid");
 	} else {
 		$radio = "bydefault";
 	}
 	PutFormData($f, $s, "radiocallerid", $radio);
+	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
 
 
 	PutFormData($f,$s,"leavemessage",$job->isOption("leavemessage"), "bool", 0, 1);
@@ -1062,7 +1073,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?				if ($submittedmode) {
 ?>
 				<td>
-<?				
+<?
 				$selectedlistnames = QuickQueryList("select list.name from joblist, list where joblist.jobid=$job->id and joblist.listid=list.id");
 				foreach ($selectedlistnames as $listname) {
 						echo $listname."<br>";
@@ -1295,12 +1306,12 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					?>
 			<tr>
 				<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",($submittedmode ? "DISABLED" : "")); ?>
-				Use default Caller ID</td>
-				<td><? echo Phone::format(getSystemSetting('callerid')); ?></td>
+				Use toll free Caller ID</td>
+				<td><? echo Phone::format(getSystemSetting('inboundnumber')); ?></td>
 			</tr>
 			<tr>
 				<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",($submittedmode ? "DISABLED" : "")); ?>
-				Preferred Caller ID</td>
+				Use my Caller ID</td>
 				<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
 			</tr>
 			<?

@@ -133,8 +133,6 @@ if(CheckFormSubmit($f,$s))
 			error("That is not a valid 'Primary Color'");
 		} else if (GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5) {
 			error("The ratio of primary to background can only be between 0 and .5(50%)");
-		} else if (getSystemSetting('_hascallback', false) && (GetFormData($f, $s, "radiocallerid") == "byuser") && (strlen($callerid) == 0)) {
-			error("Please enter a valid caller ID");
 		} else {
 			//submit changes
 			PopulateObject($f,$s,$USER,array("accesscode","firstname","lastname"));
@@ -421,7 +419,7 @@ startWindow('User Information');
 				<tr>
 					<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Notification Defaults:</th>
 					<td class="bottomBorder">
-						<table border="0" cellpadding="1" cellspacing="0">
+						<table border="0" cellpadding="1" cellspacing="0" width="70%">
 
 							<tr>
 								<td colspan="2">Default Delivery Window:</td>
@@ -468,11 +466,11 @@ if ($USER->authorize('setcallerid')) {
 	if (getSystemSetting('_hascallback', false)) {
 ?>
 							<tr>
-								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",""); ?> Use default Caller&nbsp;ID</td>
-								<td><? echo Phone::format(getSystemSetting('callerid')); ?></td>
+								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",""); ?> Use toll free Caller&nbsp;ID</td>
+								<td><? echo Phone::format(getSystemSetting('inboundnumber')); ?></td>
 							</tr>
 							<tr>
-								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",""); ?> Preferred Caller ID</td>
+								<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",""); ?> Use my Caller ID</td>
 								<td><? NewFormItem($f,$s,"callerid","text", 20, 20); ?></td>
 							</tr>
 <?
