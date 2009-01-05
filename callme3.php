@@ -38,14 +38,26 @@ if(CheckFormSubmit($f, $s)){
 	{
 		MergeSectionFormData($f, $s);
 		
+		$newnames = array();
 		$existsnames = array();
 		if($messages){
-			foreach($messages as $key => $message) {
-				$name = TrimFormData($f, $s, "message ".$key);
-				if(0 != QuickQuery("select count(id) from message where name='" . DBSafe($name) . "' and id!=$message and type='phone' and userid='$USER->id' and deleted=0")){
-					$existsnames[] = "'$name'";
+			if($specialtask->getData("origin") == "message"){
+				foreach($messages as $key => $message) {
+					$name = TrimFormData($f, $s, "message ".$key);
+					if(0 != QuickQuery("select count(id) from message where name='" . DBSafe($name) . "' and id!=$message and type='phone' and userid='$USER->id' and deleted=0")){
+						$existsnames[] = "'$name'";
+					}
+					$newnames[] = $name;
 				}
-			}
+			} else if($specialtask->getData("origin") == "audio") {
+				foreach($messages as $key => $message) {
+					$name = TrimFormData($f, $s, "message ".$key);
+					if(0 != QuickQuery("select count(id) from audiofile where name='" . DBSafe($name) . "' and id!=$message and userid='$USER->id' and deleted=0")){
+						$existsnames[] = "'$name'";
+					}
+					$newnames[] = $name;
+				}
+			}	
 		}
 		
 		//do check		
@@ -53,6 +65,8 @@ if(CheckFormSubmit($f, $s)){
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if (!empty($existsnames)) {
 			error('Message(s) named ' . implode(",",$existsnames) . ' already exists');
+		} else if (sizeof(array_unique($newnames)) != sizeof($messages)) {
+			error('Messages can not be named the same');	
 		} else {
 			if($specialtask->getData("origin") == "message"){
 				if($messages){
@@ -91,7 +105,8 @@ if(CheckFormSubmit($f, $s)){
 						}
 					?>
 				</script>
-			<?
+			<?	
+				exit(); 
 			}
 		}
 	}
