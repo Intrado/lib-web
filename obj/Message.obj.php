@@ -155,7 +155,7 @@ class Message extends DBMappedObject {
 							$defvalue = "";
 						}
 						$fieldname = DBSafe($fieldname);
-						$query = "select fieldnum from fieldmap where name='$fieldname'";
+						$query = "select fieldnum from fieldmap where name='$fieldname' and fieldnum like 'f%'";
 
 						$fieldnum = QuickQuery($query);
 
