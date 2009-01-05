@@ -2,16 +2,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("obj/Message.obj.php");
-include_once("obj/MessagePart.obj.php");
-include_once("obj/AudioFile.obj.php");
-include_once("obj/FieldMap.obj.php");
-include_once("obj/SurveyQuestionnaire.obj.php");
-include_once("obj/SurveyQuestion.obj.php");
-include_once("inc/html.inc.php");
-include_once("inc/form.inc.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("obj/Message.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/AudioFile.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/SurveyQuestionnaire.obj.php");
+require_once("obj/SurveyQuestion.obj.php");
+require_once("inc/html.inc.php");
+require_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/formatters.inc.php");
