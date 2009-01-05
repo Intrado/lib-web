@@ -31,13 +31,13 @@ $success = false;
 $tos = file_get_contents("terms.html");
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
-	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
-	$confirmlogin = get_magic_quotes_gpc() ? stripslashes($_POST['confirmlogin']) : $_POST['confirmlogin'];
+	$login = trim(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login']);
+	$confirmlogin = trim(get_magic_quotes_gpc() ? stripslashes($_POST['confirmlogin']) : $_POST['confirmlogin']);
 	$firstname = get_magic_quotes_gpc() ? stripslashes($_POST['firstname']) : $_POST['firstname'];
 	$lastname = get_magic_quotes_gpc() ? stripslashes($_POST['lastname']) : $_POST['lastname'];
 	$zipcode = get_magic_quotes_gpc() ? stripslashes($_POST['zipcode']) : $_POST['zipcode'];
-	$password1 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password1'])) : trim($_POST['password1']);
-	$password2 = get_magic_quotes_gpc() ? trim(stripslashes($_POST['password2'])) : trim($_POST['password2']);
+	$password1 = get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1'];
+	$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
 	$notify = isset($_POST['notify']) ? $_POST['notify'] : 0;
 	$notifysms = isset($_POST['notifysms']) ? $_POST['notifysms'] : 0;
 	$sms = "";
