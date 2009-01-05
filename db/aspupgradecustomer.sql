@@ -109,7 +109,7 @@ $$$
 
 
 -- rule changes
--- depricate like operator
+-- deprecate like operator
 update rule set op='eq' where op='lk'
 $$$
 
@@ -183,4 +183,8 @@ insert into ttsvoice (language, gender) values
 $$$
 
 ALTER TABLE `joblanguage` ADD `translationeditlock` tinyint(4) NOT NULL default 0
+$$$
+
+ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range',
+	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range', 'date_offset', 'reldate_range' ) NOT NULL DEFAULT 'eq'
 $$$

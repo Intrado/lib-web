@@ -130,7 +130,11 @@ class Rule extends DBMappedObject {
 				$sql .= "(str_to_date($f, '%m/%d/%Y') between '$d1' and '$d2')";
 				break;
 			case "date_offset":
-				$sql .= "$f=date_format(now() + interval " . ($this->val + 0) . " day,'%m/%d/%Y')";
+				$sql .= "$f=date_format(curdate() + interval " . ($this->val + 0) . " day,'%m/%d/%Y')";
+				break;
+			case "reldate_range":
+				$values = explode("|",$this->val);
+				$sql .= "(str_to_date($f, '%m/%d/%Y') between curdate() + interval " . ($values[0] + 0) . " day and curdate() + interval " . ($values[1] + 0) . " day)";
 				break;
 			default:
 				$sql = " and 0 "; //always default on the safe side
@@ -192,9 +196,10 @@ $RULE_OPERATORS = array(
 	),
 	"reldate" => array (
 		'reldate' => 'relative date',
-		'date_offset' => 'is offset from today by (days)',
-		'eq' => 'equals',
-		'date_range' => 'is between (inclusive)'
+		'eq' => 'equals (specific date)',
+		'date_range' => 'is between (specific dates)',
+		'date_offset' => 'today offset by (relative days)',
+		'reldate_range' => 'is between (relative days)'
 	),
 	"multisearch" => array (
 		'in' => 'is in'

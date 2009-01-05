@@ -68,7 +68,7 @@ foreach ($fieldmaps as $fieldmap) {
 				echo '<td class="border" nowrap>' . $RULE_OPERATORS['reldate'][$rule->op] . '</td>';
 				if ($rule->op == "reldate") {
 					echo '<td class="border">' . $RELDATE_OPTIONS[$rule->val] . '</td>';
-				} else if ($rule->op == "date_range") {
+				} else if ($rule->op == "date_range" || $rule->op == "reldate_range") {
 					$values = explode("|",$rule->val);
 					echo '<td class="border">' . $values[0] . ' and ' . $values[1] . '</td>';
 				} else {
@@ -197,7 +197,8 @@ PutFormData($f,$s,"newruleoperator_reldate","reldate");
 $extrahtml = "onchange=\"setDependentVisibility(this.form,'reldate_reldate',this.value == 'reldate'); "
 					."setDependentVisibility(this.form,'reldate_val2',this.value == 'eq' || this.value == 'date_range'); "
 					."setDependentVisibility(this.form,'reldate_val3',this.value == 'date_range'); "
-					."setDependentVisibility(this.form,'reldate_val4',this.value == 'date_offset');\"";
+					."setDependentVisibility(this.form,'reldate_val4',this.value == 'date_offset' || this.value == 'reldate_range'); "
+					."setDependentVisibility(this.form,'reldate_val5',this.value == 'reldate_range');\"";
 
 NewFormItem($f,$s,"newrulelogical_reldate","hidden","and");
 NewFormItem($f,$s,"newruleoperator_reldate","selectstart",NULL,NULL,$extrahtml);
@@ -270,9 +271,11 @@ foreach ($fieldmaps as $fieldmap) {
 			NewFormItem($f,$s,"newrulevalue3_" . $fieldnum,"text",10,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,true)\"");
 			echo '</div></td><td nowrap><div dependson="reldate_val4" style="display: none;">';
 			PutFormData($f,$s,"newrulevalue4_" . $fieldnum,"","numeric");
-			NewFormItem($f,$s,"newrulevalue4_" . $fieldnum,"text",10,20);
+			NewFormItem($f,$s,"newrulevalue4_" . $fieldnum,"text",5,5);
+			echo '</div></td><td nowrap><div dependson="reldate_val5" style="display: none;">&nbsp;and&nbsp;';
+			PutFormData($f,$s,"newrulevalue5_" . $fieldnum,"","numeric");
+			NewFormItem($f,$s,"newrulevalue5_" . $fieldnum,"text",5,5);
 			echo '</div></td></tr></table>';
-			
 
 		} else if (showmode("multisearch")) {
 
