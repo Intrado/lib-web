@@ -70,12 +70,12 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 			// save any changed pkeys
 			$i = 0;
 			while ($i < $maxcontacts) {
-				$pkey = GetFormData($f, $s, "pkey".$i);
+				$pkey = trim(GetFormData($f, $s, "pkey".$i));
 				if ($pkey != "")
 					$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
 				$i++;
 			}
-			$pkey = GetFormData($f, $s, "pkeyadd");
+			$pkey = trim(GetFormData($f, $s, "pkeyadd"));
 			if ($pkey != "")
 				$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
 
