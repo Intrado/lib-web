@@ -19,7 +19,7 @@ function endoflist()
 	<message name="endoflist">
 		<field name="doendoflist" type="menu" timeout="10000">
 			<prompt repeat="2">
-				<tts gender="female">There are no more messages for this phone number. To hear your messages again, press the pound key. To check messages for a different phone number, press 9. Otherwise, you may simply hang up to end this call.  </tts>
+				<tts gender="female">There are no more messages for this phone number. To hear your messages again, press the pound key. To check for messages sent to a different phone number, please hang up and call again. Otherwise, you may simply hang up to end this call.  </tts>
 			</prompt>
 
 			<choice digits="#" />
@@ -87,13 +87,14 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 				<?}?>
 
 				<? if ($messagetotal == 1) {?>
-					<tts gender="female">Message for</tts>
+					<tts gender="female">Message for -- </tts>
 				<?} else {?>
 					<tts gender="female">Message</tts>
 					<tts gender="female"><?echo($messageindex +1)?> of <?echo $messagetotal?>, for -- </tts>
 				<?}?>
 				<tts gender="female"><?=escapehtml($fields['f01'])?></tts>
 				<tts gender="female"><?=escapehtml($fields['f02'])?></tts>
+				<tts> -- </tts>
 
 				<?renderMessageParts($playback);?>
 
@@ -231,8 +232,6 @@ if($REQUEST_TYPE == "new"){
 					$_SESSION['invalidcounter'] = 0;
 					// let's move on... skip to next message, do nothing
 				} else {
-					// repeat last message with instructions
-					$playintro = true;
 					$_SESSION['messageindex'] = $_SESSION['messageindex'] - 1;
 				}
 			}
