@@ -134,7 +134,7 @@ function fmt_idmagnify ($row,$index) {
 	} else {
 		$result = "<a href=\"addresspreview.php?id=$row[1]\">  <img src=\"img/pencil.png\"></a>";
 	}
-	$result .= "&nbsp;".$row[$index];
+	$result .= "&nbsp;". escapehtml($row[$index]);
 	return $result;
 }
 
