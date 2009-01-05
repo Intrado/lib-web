@@ -2,10 +2,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("obj/FieldMap.obj.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
+require_once("inc/common.inc.php");
+require_once("obj/FieldMap.obj.php");
+require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
@@ -143,7 +143,7 @@ if (count($fields) > 0) {
 			<th align="right" class="windowRowHeader bottomBorder"><?= $fieldmap->name ?></td>
 			<td class="bottomBorder">
 <?
-		if($fieldmap->isOptionEnabled("text")) {
+		if($fieldmap->isOptionEnabled("text") || $fieldmap->isOptionEnabled("numeric")) {
 
 			NewFormItem($f,$s,$fieldnum,"text",20,255);
 
