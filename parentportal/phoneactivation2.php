@@ -71,7 +71,13 @@ startWindow('Phone Activation');
 		<td>
 			<table>
 			<tr>
-				<td>The people with the following ID Numbers can be added by following the confirmation steps below.</td>
+				<td>
+<?				if (count($pkeyok) > 1) { ?>
+					The people with the following ID Numbers can be added by following the confirmation steps below.
+<?				} else { ?>
+					The person with the following ID Number can be added by following the confirmation steps below.
+<?				} ?>
+				</td>
 			</tr>
 			<tr><td><table border="1" cellpadding="3" cellspacing="0" width="10%">
 <?			foreach ($pkeyok as $pkey) { ?>
@@ -88,15 +94,28 @@ startWindow('Phone Activation');
 		<td>
 		<table>
 		<tr>
-			<td>You must follow these steps within 24 hours to add the above people to your account.<BR><BR></td>
+			<td>
+<?			if (count($pkeyok) > 1) { ?>
+				You must follow these steps within 24 hours to add the above people to your account.
+<?			} else { ?>
+				You must follow these steps within 24 hours to add the above person to your account.
+<?			} ?>
+			<BR><BR></td>
 		</tr>
 		<tr>
 			<td><? echo button("Print this page now", "window.print()"); ?> <BR><BR><BR></td>
 		</tr>
 		<tr><td><table cellpadding="2">
 		<tr>
-			<td valign="top">Step 1.</td><td>You must call from one of the phones listed below in order to verify your caller ID with our records.<br><br>
-			For security reasons, we have hidden parts of your phone numbers with "xxx".
+			<td valign="top">Step 1.</td>
+			<td>
+<?			if (count($phones) > 1) { ?>
+				You must call from one of the phones listed below in order to verify your caller ID with our records.<br><br>
+				For security reasons, we have hidden parts of your phone numbers with "xxx".
+<?			} else { ?>
+				You must call from the phone listed below in order to verify your caller ID with our records.<br><br>
+				For security reasons, we have hidden parts of your phone number with "xxx".
+<?			} ?>
 			</td>
 		</tr>
 
