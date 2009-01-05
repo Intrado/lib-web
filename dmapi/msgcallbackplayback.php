@@ -74,18 +74,19 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 ?>
 <voice>
 	<message name="playback">
+
+<?	if ($playintro) {
+		if ($messagetotal == 1) {?>
+			<tts gender="female">There is 1  message for this phone number. At any time while the message is playing, you may press the star key to repeat the message, or the pound key to skip to the next message. </tts>
+		<?} else {?>
+			<tts gender="female">There are</tts>
+			<tts gender="female"><?echo $messagetotal?></tts>
+			<tts gender="female">messages for this phone number. At any time while the message is playing, you may press the star key to repeat the message, or the pound key to skip to the next message. </tts>
+		<?}?>
+<?	} ?>
+
 		<field name="doplayback" type="menu" timeout="500">
 			<prompt>
-				<?if ($playintro) {
-					if ($messagetotal == 1) {?>
-						<tts gender="female">There is 1  message for this phone number. At any time while the message is playing, you may press the star key to repeat the message, or the pound key to skip to the next message. </tts>
-					<?} else {?>
-						<tts gender="female">There are</tts>
-						<tts gender="female"><?echo $messagetotal?></tts>
-						<tts gender="female">messages for this phone number. At any time while the message is playing, you may press the star key to repeat the message, or the pound key to skip to the next message. </tts>
-					<?}?>
-				<?}?>
-
 				<? if ($messagetotal == 1) {?>
 					<tts gender="female">Message for -- </tts>
 				<?} else {?>
