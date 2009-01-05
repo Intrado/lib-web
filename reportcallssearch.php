@@ -3,7 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
+require_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/table.inc.php");
@@ -22,7 +22,7 @@ require_once("inc/date.inc.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/CallsReport.obj.php");
 require_once("inc/rulesutils.inc.php");
-include_once("ruleeditform.inc.php");
+require_once("ruleeditform.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
