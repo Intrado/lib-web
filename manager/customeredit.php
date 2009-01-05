@@ -419,6 +419,10 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 ?>
 <br>
 <table>
+<tr>
+	<td><? NewFormItem($f, "Save","Save", 'submit');?>
+	<? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
+</tr>
 <tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?>Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.</td></tr>
 <tr><td> Delivery Mechanism Method </td>
 	<td><?
@@ -460,7 +464,7 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <tr><td width="30%">Failed login attempts to cause lockout:</td><td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td></tr>
 <tr><td>Failed login attempts before account disable:</td><td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td></tr>
 <tr><td>Number of minutes for login lockout:</td><td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td></tr>
-
+<td></td><th align="left">Language:/ Google and TTS Support:</th>
 <?
 foreach($languages as $index => $language){
 	$lang = "Language" . $index;
@@ -468,6 +472,7 @@ foreach($languages as $index => $language){
 	<? 
 	if ($index > 1) {?>
 		<select onchange="var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;">
+		<option value=0> -- No Translation Support -- </option>
 		<?foreach ($googlangs as $googlang) {
 			$ttsLangSup = '';
 			if (isset($ttslangs[strtolower($googlang)]))
@@ -476,13 +481,15 @@ foreach($languages as $index => $language){
 			<option value="<?=$googlang?>" <?=($googlang == $language)?"selected":""?>><?=$googlang . $ttsLangSup?></option>
 		<?}?>
 		</select>
+	<?} else {?>
+		This Language should always be set to English
 	<?}?>
 	</td></tr><?
 }
 ?>
 <tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50, "id='newlanginput' onkeyup=\"var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;\"")?>
 		<select id='newlanginputselect' onchange="var o = new getObj('newlanginput'); if (this.selectedIndex !== 0) o.obj.value = this.options[this.selectedIndex].value;">
-		<option value=0> -- Choose a Language -- </option>
+		<option value=0> -- No Translation Support -- </option>
 		<?foreach ($googlangs as $googlang) {
 			$ttsLangSup = '';
 			if (isset($ttslangs[strtolower($googlang)]))
@@ -491,6 +498,7 @@ foreach($languages as $index => $language){
 			<option value="<?=$googlang?>" ><?=$googlang . $ttsLangSup?></option>
 		<?}?>
 		</select>
+		<? NewFormItem($f, "Save","Add", 'submit');?>
 </td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
 <tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
@@ -584,8 +592,8 @@ foreach($languages as $index => $language){
 </tr>
 
 <tr>
-	<td><? NewFormItem($f, "Save","Save", 'submit');?> </td>
-	<td><? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
+	<td><? NewFormItem($f, "Save","Save", 'submit');?>
+	<? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
 </tr>
 
 </table>
