@@ -468,10 +468,10 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 <?
 foreach($languages as $index => $language){
 	$lang = "Language" . $index;
-	?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang'") ?>
+	?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang' onkeyup=\"var s = new getObj('$lang"."_select'); s.obj.selectedIndex = 0;\" onchange=\"var sel = new getObj('$lang"."_select');	for (var i in sel.obj.options) if (this.value == sel.obj.options[i].value) sel.obj.selectedIndex = i;\"") ?>
 	<? 
 	if ($index > 1) {?>
-		<select onchange="var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;">
+		<select id='<?="$lang"."_select"?>' onchange="if (this.selectedIndex != 0) {var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;}">
 		<option value=0> -- No Translation Support -- </option>
 		<?foreach ($googlangs as $googlang) {
 			$ttsLangSup = '';
