@@ -34,7 +34,7 @@ if ($REQUEST_TYPE == "new") {
 		from job j
 		left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
 		left join reportcontact rc on (rc.jobid = j.id and rc.type='phone')
-		left join reportperson rp on (rp.jobid = j.id and rp.personid=rc.personid)
+		left join reportperson rp on (rp.jobid = j.id and rp.personid=rc.personid and rp.type='phone')
 		where
 		j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
 		and j.status in ('active', 'complete')
