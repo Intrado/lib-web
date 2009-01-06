@@ -109,11 +109,11 @@ startWindow('Login Settings');
 						<table border="0" cellpadding="2" cellspacing="0" width=100%>
 							<tr>
 								<td width="30%">Minimum Username Length<? print help('Settings_MinimumUsername', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?> Must be between 4 amd 10.</td>
+								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?> Must be between 4 and 10.</td>
 							</tr>
 							<tr>
 								<td>Minimum Password Length<? print help('Settings_MinimumPassword', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?> Must be between 4 amd 10.</td>
+								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?> Must be between 4 and 10.</td>
 							</tr>
 							<tr>
 								<td>Invalid Login Lockout<? print help('Settings_InvalidLoginLockout', NULL, "small"); ?></td>
