@@ -82,8 +82,8 @@ if( $reloadform )
 	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', "0"), "number", 0, 15, true);
 	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', "5"), "number", 1, 60, true);
 
-	PutFormData($f, $s,"usernamelength", getSystemSetting('usernamelength', "5"), "number", 0, 10);
-	PutFormData($f, $s,"passwordlength", getSystemSetting('passwordlength', "5"), "number", 0, 10);
+	PutFormData($f, $s,"usernamelength", getSystemSetting('usernamelength', "5"), "number", 4, 10);
+	PutFormData($f, $s,"passwordlength", getSystemSetting('passwordlength', "5"), "number", 4, 10);
 
 	PutFormData($f, $s, "msgcallbackrequireid", getSystemSetting('msgcallbackrequireid'), 'bool', 0, 1);
 }
