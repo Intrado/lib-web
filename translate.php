@@ -1,13 +1,16 @@
 <?
+require_once("inc/common.inc.php");
+
 	//$supportedlanguages = array("catalan"=>"ca", "chinese" =>"zh-TW","dutch"=>"nl", "english"=>"en", "finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "italian"=>"it", "polish"=>"pl", "portuguese"=>"pt-PT", "russian"=>"ru", "spanish"=>"es", "swedish"=>"sv");
 	$supportedlanguages = array("arabic"=>"ar", "bulgarian"=>"bg", "catalan"=>"ca", "chinese"=>"zh", "croatian"=>"hr", "czech"=>"cs", "danish"=>"da", "dutch"=>"nl", "english"=>"en", "finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "hebrew"=>"iw", "hindi"=>"hi", "indonesian"=>"id", "italian"=>"it", "japanese"=>"ja", "korean"=>"ko", "latvian"=>"lv", "lithuanian"=>"lt", "norwegian"=>"no", "polish"=>"pl", "portuguese"=>"pt-PT", "romanian"=>"ro", "russian"=>"ru", "serbian"=>"sr", "slovak"=>"sk", "slovenian"=>"sl", "spanish"=>"es", "swedish"=>"sv", "ukrainian"=>"uk", "vietnamese"=>"vi");
 	$url = "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0";
+	$url .= isset($SETTINGS['translation']['apikey'])?"&key=" . $SETTINGS['translation']['apikey']:"";
 	$text = "";
 	$lang_pairs = "";
 
     $referer = $_SERVER["HTTP_REFERER"];
     if (!$referer) {
-    	$referer = "http://asp.schoolmessenger.com";
+    	$referer = isset($SETTINGS['translation']['referer'])?$SETTINGS['translation']['referer']:"http://asp.schoolmessenger.com";
     }
 
     if(isset($_POST['english']) && isset($_POST['languages'])) {
