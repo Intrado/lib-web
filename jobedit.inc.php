@@ -374,42 +374,46 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->userid = $USER->id;
 
 			// make sure we don't resave these options on an already submitted or completed job
-			if($job->sendphone && !$submittedmode && !$completedmode) {
-				$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
-				$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
-
-				if ($USER->authorize('setcallerid')) {
-					$callerid = Phone::parse(GetFormData($f, $s, "callerid"));
-					if ($callerid == "") {
-						$callerid = getSystemSetting("callerid");
-					}
-					$job->setOptionValue("callerid",$callerid);
-
-					// if customer has callback feature
-					if (getSystemSetting('_hascallback', false)) {
-						if (GetFormData($f, $s, "radiocallerid") == "byuser") {
-							$radio = "1";
-						} else {
-							$radio = "0";
-							// set to toll free number
-							$job->setOptionValue("callerid", getSystemSetting('inboundnumber'));
-						}
-						$job->setSetting('prefermycallerid', $radio);
-					}
-				} else {
-					if (getSystemSetting('_hascallback', false)) {
-						$callerid = getSystemSetting('inboundnumber');
-					} else {
-						$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-					}
-					$job->setOptionValue("callerid", $callerid);
+			if(!$submittedmode && !$completedmode) {
+				if($job->sendemail) {
+					$job->setOption("skipemailduplicates",GetFormData($f,$s,"skipemailduplicates"));
 				}
-
-				if ($USER->authorize("leavemessage"))
-					$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
-
-				if ($USER->authorize("messageconfirmation"))
-					$job->setOption("messageconfirmation", GetFormData($f, $s, "messageconfirmation"));
+				if($job->sendphone) {
+					$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
+	
+					if ($USER->authorize('setcallerid')) {
+						$callerid = Phone::parse(GetFormData($f, $s, "callerid"));
+						if ($callerid == "") {
+							$callerid = getSystemSetting("callerid");
+						}
+						$job->setOptionValue("callerid",$callerid);
+	
+						// if customer has callback feature
+						if (getSystemSetting('_hascallback', false)) {
+							if (GetFormData($f, $s, "radiocallerid") == "byuser") {
+								$radio = "1";
+							} else {
+								$radio = "0";
+								// set to toll free number
+								$job->setOptionValue("callerid", getSystemSetting('inboundnumber'));
+							}
+							$job->setSetting('prefermycallerid', $radio);
+						}
+					} else {
+						if (getSystemSetting('_hascallback', false)) {
+							$callerid = getSystemSetting('inboundnumber');
+						} else {
+							$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
+						}
+						$job->setOptionValue("callerid", $callerid);
+					}
+	
+					if ($USER->authorize("leavemessage"))
+						$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
+	
+					if ($USER->authorize("messageconfirmation"))
+						$job->setOption("messageconfirmation", GetFormData($f, $s, "messageconfirmation"));
+				}
 			}
 			if(!$completedmode){
 				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
@@ -1683,7 +1687,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		if ($_SESSION['jobid'] != null) {
 			$diffvalues = $job->compareWithDefaults();
 		}
-		if (((isset($diffvalues['emaillang']) && $job->getSetting('jobcreatedemail') == "0") ||
+		if (((isset($diffvalues['emaillang']) && $job->getSetting('jobcreatedemail',"0") == "0") ||
 			isset($diffvalues['skipemailduplicates'])) ||
 			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
 		?>
