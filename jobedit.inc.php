@@ -12,6 +12,9 @@ if (isset($_GET['id'])) {
 	setCurrentJob($_GET['id']);
 	redirect();
 }
+if (isset($_GET['origin'])) {
+	$_SESSION['origin'] = trim($_GET['origin']);
+}
 
 $jobid = $_SESSION['jobid'];
 $hassms = getSystemSetting('_hassms', false);
@@ -547,7 +550,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			} else if (!$addlang) {
 				if ($job->phonemessageid || $job->emailmessageid || $job->printmessageid || $job->smsmessageid)	{
 					ClearFormData($f);
-					redirect('jobs.php');
+					if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
+						unset($_SESSION['origin']);
+						redirect('start.php');
+					} else { 
+						redirect('jobs.php');
+					}
 				}
 			} else {
 				$reloadform = 1;
