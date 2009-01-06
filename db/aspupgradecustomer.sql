@@ -177,9 +177,7 @@ insert into ttsvoice (language, gender) values
 	('portuguese', 'male'),
 	('russian', 'female'),
 	('swedish', 'female'),
-	('swedish', 'male'),
-	('brazilian', 'female'),
-	('brazilian', 'male')
+	('swedish', 'male')
 $$$
 
 ALTER TABLE `joblanguage` ADD `translationeditlock` tinyint(4) NOT NULL default 0

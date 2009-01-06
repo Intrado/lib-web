@@ -196,9 +196,7 @@ if (CheckFormSubmit($f,$s)){
 							('portuguese', 'male'),
 							('russian', 'female'),
 							('swedish', 'female'),
-							('swedish', 'male'),
-							('brazilian', 'female'),
-							('brazilian', 'male')
+							('swedish', 'male')
 							";
 
 				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
