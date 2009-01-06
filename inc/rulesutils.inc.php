@@ -12,10 +12,13 @@ function getRuleFromForm($f, $s){
 		$logic = GetFormData($f,$s,"newrulelogical_$type");
 		$op = GetFormData($f,$s,"newruleoperator_$type");
 		$value = GetFormData($f,$s,"newrulevalue_" . $fieldnum);
-		$value2 = GetFormData($f,$s,"newrulevalue2_" . $fieldnum);
-		$value3 = GetFormData($f,$s,"newrulevalue3_" . $fieldnum);
-		$value4 = GetFormData($f,$s,"newrulevalue4_" . $fieldnum);
-		$value5 = GetFormData($f,$s,"newrulevalue5_" . $fieldnum);
+		if(!is_array($value)) {
+			$value = trim($value);
+		}
+		$value2 = TrimFormData($f,$s,"newrulevalue2_" . $fieldnum);
+		$value3 = TrimFormData($f,$s,"newrulevalue3_" . $fieldnum);
+		$value4 = TrimFormData($f,$s,"newrulevalue4_" . $fieldnum);
+		$value5 = TrimFormData($f,$s,"newrulevalue5_" . $fieldnum);
 
 		if (count($value) > 0) {
 			$rule = new Rule();
