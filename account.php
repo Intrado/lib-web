@@ -266,15 +266,19 @@ if( $reloadform )
 
 	PutFormData($f, $s, 'maxjobdays', $maxjobdays, 'number', 1, 7, true);
 
-	//Default caller ID
+	// if callerid is blank
+		// if _hascallback feature, then use customer inboundnumber, aka toll free
+		// else no callback, use customer default callerid
 	//default to empty string because if set to empty string, setting will not be set and system default will be used
 	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
 
-	if ($USER->getSetting("prefermycallerid","0") == "1") {
+	// if the user prefers their callerid, or they have no setting preference but have set callerid then default to "byuser"
+	if (($USER->getSetting("prefermycallerid","0") == "1") ||
+		($USER->getSetting("prefermycallerid") === false && $callerid != "")) {
 		$radio = "byuser";
 	} else {
-		$radio = "bydefault";
+		$radio = "bydefault"; // use customer inboundnumber (aka toll free number)
 	}
 	PutFormData($f, $s, "radiocallerid", $radio);
 

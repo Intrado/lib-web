@@ -555,7 +555,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
 						unset($_SESSION['origin']);
 						redirect('start.php');
-					} else { 
+					} else {
 						redirect('jobs.php');
 					}
 				}
@@ -709,12 +709,16 @@ if( $reloadform )
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
 
+	// if job callerid is blank
+		// if _hascallback feature, then use customer inboundnumber, aka toll free
+		// else no callback, use customer default callerid
 	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-	if ($job->getSetting("prefermycallerid","0") == "1") {
+	if (($job->getSetting("prefermycallerid","0") == "1") ||
+		($job->getSetting("prefermycallerid") === false && $USER->getSetting("callerid","") != "")) {
 		$radio = "byuser";
 		$callerid = $job->getOptionValue("callerid");
 	} else {
-		$radio = "bydefault";
+		$radio = "bydefault"; // customer inboundnumber, aka toll free number
 	}
 	PutFormData($f, $s, "radiocallerid", $radio);
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
