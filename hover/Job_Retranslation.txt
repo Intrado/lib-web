@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-To verify that the translation is reasonable you may click Retranslation to translate back to English.
+To verify that the translation is reasonable you may click Show/Refresh to translate back to English.
