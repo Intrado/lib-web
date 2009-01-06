@@ -191,9 +191,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						$expire && strtotime($expire) - (8*86400) < strtotime(GetFormData($f,$s,"startdate"))) {
 			error('The start date for a message created in the job editor may not be rescheduled for more than 7 days past the date it was submitted');
 			$reloadform = 1;
-		} else if ($JOBTYPE == "normal" && GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create" && (strtotime(GetFormData($f,$s,"startdate"))-(7*86400) > strtotime("today")) && !$completedmode) {
+		} else if (!$completedmode && $JOBTYPE == "normal" && ((GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create") || (GetFormData($f, $s, "sendemail") && GetFormData($f, $s, "emailradio") == "create"))
+				 && (strtotime(GetFormData($f,$s,"startdate"))-(7*86400) > strtotime("today"))) {
 			$hassettingsdetailerror = true;
-			error('The start date must be within 7 days when creating a text-to-speach message');
+			error('The start date must be within 7 days for a message created in the job editor');
 		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . $name . '\' already exists');
 		} else if ($sendphone && $callerid != "" && strlen($callerid) != 10) {
