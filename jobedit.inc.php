@@ -190,6 +190,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if (($completedmode || $submittedmode) && ($job->getSetting('jobcreatedphone') == "1" || $job->getSetting('jobcreatedemail') == "1") &&
 						$expire && strtotime($expire) - (8*86400) < strtotime(GetFormData($f,$s,"startdate"))) {
 			error('The start date for a message created in the job editor may not be rescheduled for more than 7 days past the date it was submitted');
+			$reloadform = 1;
 		} else if ($JOBTYPE == "normal" && GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create" && (strtotime(GetFormData($f,$s,"startdate"))-(7*86400) > strtotime("today")) && !$completedmode) {
 			$hassettingsdetailerror = true;
 			error('The start date must be within 7 days when creating a text-to-speach message');
@@ -460,7 +461,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 									$joblanguage->jobid=$job->id;
 								}
 								$message = new Message($joblanguage->messageid);
-								$message->userid=$USER->id;$message->type=$type;$message->name ="$language translation";$message->description="";$message->deleted=1;
+								$message->userid=$USER->id;$message->type=$type;$message->name = ucfirst($language) . " translation";$message->description="";$message->deleted=1;
 								if($type == "email") {
 									$message->subject = GetFormData($f, $s, 'emailsubject');
 									$message->fromname = $USER->firstname;
@@ -1193,7 +1194,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</div>
 				<div id='phonecreatemessage' style="white-space: nowrap;display: none">
 					Type Your English Message
-<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
+<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating' && !empty($ttslanguages)) { ?>
 					| <?  NewFormItem($f,$s,"phonetranslatecheck","checkbox",1, NULL,"id='phonetranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('phone')\"")); ?>
 					Automatically translate to other languages<table style="display: inline"><tr><td><?= help('Job_AutomaticallyTranslate',NULL,"small"); ?></td></tr></table>
 <? } ?>
@@ -1401,7 +1402,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					</table>
 					 </div>
 					Type Your English Message
-<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
+<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating' && !empty($emaillanguages)) { ?>
 					| <?  NewFormItem($f,$s,"emailtranslatecheck","checkbox",1, NULL,"id='emailtranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('email')\"")); ?>
 					Automatically translate to other languages<table style="display: inline"><tr><td><?= help('Job_AutomaticallyTranslate',NULL,"small"); ?></td></tr></table>
 <? } ?>
