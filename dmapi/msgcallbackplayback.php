@@ -100,7 +100,8 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 				<?renderMessageParts($playback);?>
 
 
-				<tts gender="female">Please press the star key to repeat the message, or the pound key to skip to the next message.</tts>
+				<tts gender="female">To repeat the message press the star key.</tts>
+				<delay duration="1000"/>
 			</prompt>
 
 			<choice digits="*" />
