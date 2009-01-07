@@ -380,14 +380,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				}
 				if($job->sendphone) {
 					$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
-	
+
 					if ($USER->authorize('setcallerid')) {
 						$callerid = Phone::parse(GetFormData($f, $s, "callerid"));
 						if ($callerid == "") {
 							$callerid = getSystemSetting("callerid");
 						}
 						$job->setOptionValue("callerid",$callerid);
-	
+
 						// if customer has callback feature
 						if (getSystemSetting('_hascallback', false)) {
 							if (GetFormData($f, $s, "radiocallerid") == "byuser") {
@@ -407,10 +407,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						}
 						$job->setOptionValue("callerid", $callerid);
 					}
-	
+
 					if ($USER->authorize("leavemessage"))
 						$job->setOption("leavemessage", GetFormData($f,$s,"leavemessage"));
-	
+
 					if ($USER->authorize("messageconfirmation"))
 						$job->setOption("messageconfirmation", GetFormData($f, $s, "messageconfirmation"));
 				}
@@ -788,13 +788,12 @@ if ($submittedmode || $completedmode) {
 		foreach (array("phone", "email", "print", "sms") as $type) {
 			// if job created message, then it was not from a copied job so skip it
 			if ($job->getSetting('jobcreated'.$type) == "1") continue;
-
 			$msgtype = $type . "messageid";
 			$copiedmessages = DBFindMany("Message","from message where id='".$job->$msgtype."' or id in (select messageid from joblanguage where type='$type' and jobid=$job->id)");
 			foreach ($copiedmessages as $m) {
 				if ($m->deleted == "1") {
 					$m->name = "(copy) ".$m->name;
-					$messages['$type'][] = $m;
+					$messages[$type][$m->id] = $m;
 				}
 			}
 		}

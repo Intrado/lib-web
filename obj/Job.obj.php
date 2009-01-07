@@ -67,6 +67,29 @@ class Job extends DBMappedObject {
 		$this->thesql = $rulesql;
 	}
 
+	function copyMessage($msgid) {
+		// copy the message
+		$newmsg = new Message($msgid);
+		$newmsg->id = null;
+		$newmsg->create();
+
+		// copy the parts
+		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+		foreach ($parts as $part) {
+			$newpart = new MessagePart($part->id);
+			$newpart->id = null;
+			$newpart->messageid = $newmsg->id;
+			$newpart->create();
+		}
+
+		// copy the attachments
+		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
+			"select $newmsg->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
+			"from messageattachment ma where ma.messageid=$msgid and not deleted");
+
+		return $newmsg;
+	}
+
 	function copyNew($isrepeatingrunnow = false) {
 		// never copy a survey
 		if ($this->questionnaireid != null)
@@ -122,18 +145,19 @@ class Job extends DBMappedObject {
 		if (!$isrepeatingrunnow && $newjob->isOption('jobcreatedphone')) {
 			$msg = new Message($newjob->phonemessageid);
 			if ($msg->deleted) {
-				$newmsg = $msg->copyNew();
+				$newmsg = Job::copyMessage($msg->id);
 				$newjob->phonemessageid = $newmsg->id;
 				$newjob->update();
 			}
 			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=$this->id and type='phone'");
 			foreach ($joblangs as $jl) {
-				$newmsg = new Message($jl->messageid);
-				$newmsg = $newmsg->copyNew();
-				$newjl = $jl->copyNew();
+				$newmsg = Job::copyMessage($jl->messageid);
+
+				$newjl = new JobLanguage($jl->id);
+				$newjl->id = null;
 				$newjl->messageid = $newmsg->id;
 				$newjl->jobid = $newjob->id;
-				$newjl->update();
+				$newjl->create();
 			}
 		} else {
 			//copy all the job language settings
@@ -145,18 +169,19 @@ class Job extends DBMappedObject {
 		if (!$isrepeatingrunnow && $newjob->isOption('jobcreatedemail')) {
 			$msg = new Message($newjob->emailmessageid);
 			if ($msg->deleted) {
-				$newmsg = $msg->copyNew();
+				$newmsg = Job::copyMessage($msg->id);
 				$newjob->emailmessageid = $newmsg->id;
 				$newjob->update();
 			}
 			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=$this->id and type='email'");
 			foreach ($joblangs as $jl) {
-				$newmsg = new Message($jl->messageid);
-				$newmsg = $newmsg->copyNew();
-				$newjl = $jl->copyNew();
+				$newmsg = Job::copyMessage($jl->messageid);
+
+				$newjl = new JobLanguage($jl->id);
+				$newjl->id = null;
 				$newjl->messageid = $newmsg->id;
 				$newjl->jobid = $newjob->id;
-				$newjl->update();
+				$newjl->create();
 			}
 		} else {
 			//copy all the job language settings

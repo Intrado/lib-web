@@ -14,12 +14,5 @@ class JobLanguage extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function copyNew() {
-		$newjl = new JobLanguage($this->id);
-		$newjl->id = null;
-		$newjl->create();
-		return $newjl;
-	}
-
 }
 ?>
