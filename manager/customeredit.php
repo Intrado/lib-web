@@ -419,7 +419,7 @@ NewForm($f);
 	<td><? NewFormItem($f, "Save","Save", 'submit');?>
 	<? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
 </tr>
-<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox') ?>Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.</td></tr>
+<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox', 40,'',"onchange='if (this.checked == 0) confirm(\"Are you sure you want to DISABLE this customer?\")? this.checked = false : this.checked = true;'") ?>Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.</td></tr>
 <tr><td> Delivery Mechanism Method </td>
 	<td><?
 			NewFormItem($f, $s, '_dmmethod', 'selectstart');
