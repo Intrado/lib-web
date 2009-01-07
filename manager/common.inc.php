@@ -22,16 +22,22 @@ if(!isset($isasplogin)){
 	}
 
 	if(!isset($_SESSION["aspadminuserid"]))
-		redirect("./?logout=1");
-	
+		redirect("./?logout=1&reason=nosession");
+		
+	if (time() > $_SESSION['expiretime'])
+		redirect("./?logout=1&reason=timeout");
+		
 	$MANAGERUSER = new AspAdminUser($_SESSION['aspadminuserid']);
 
 	//check to make sure the url component is the username
 	$expectedusername = substr($_SERVER["SCRIPT_NAME"],1);
 	$expectedusername = strtolower(substr($expectedusername,0,strpos($expectedusername,"/")));
 	if ($MANAGERUSER->login != $expectedusername) {
-		redirect("index.php?logout=1");
+		redirect("index.php?logout=1&reason=badurl");
 	}
+	
+	//refresh idle timer
+	$_SESSION['expiretime'] = time() + 60*30; //30 minutes
 }
 
 ?>

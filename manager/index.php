@@ -5,7 +5,10 @@ require_once("common.inc.php");
 
 if(isset($_GET["logout"])) {
 	@session_destroy();
-	redirect();
+	if (isset($_GET['reason']))
+		redirect("?reason=" . urlencode($_GET['reason']));
+	else
+		redirect();
 }
 
 if ($SETTINGS['feature']['has_ssl']) {
@@ -32,6 +35,8 @@ if(isset($_POST["submit"])) {
 	if($id){
 		error_log("Manager login by $login");
 		$_SESSION['aspadminuserid'] = $id;
+		
+		$_SESSION['expiretime'] = time() + 60*30; //30 minutes
 
 		redirect("/$login/manager/customers.php");
 	} else {
@@ -58,6 +63,13 @@ if ($badlogin) {
 ?>
 	<div style="color: red;">Incorrect username/password. Please try again.</div>
 <?
+} else if (isset($_GET['reason'])) {
+	switch ($_GET['reason']) {
+		case "nosession" : echo "<em>Logout due to invalid session data</em>"; break;
+		case "timeout" : echo "<em>Logout due to inactivity timeout</em>"; break;
+		case "badurl" : echo "<em>Url/name mismatch</em>"; break;
+		case "request" : echo "<em>Logout by user request</em>"; break;		
+	}
 }
 ?>
 
