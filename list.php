@@ -337,7 +337,7 @@ if ($list->id) {
 <?
 endWindow();
 
-startWindow("Advanced Tools");
+startWindow("List Tools");
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) {
 	button_bar(submit($f,'search','Search Contacts') . help('List_SearchAndAdd'),
 			submit($f,'manualAdd',"Enter Contacts") . help('List_ManualAdd'),
