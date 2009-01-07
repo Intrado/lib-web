@@ -112,15 +112,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 	else
 	{
 		MergeSectionFormData($f, $s);
-		foreach (array("phone","email","print","sms") as $type){
-			MergeSectionFormData($f, $type);
-			if($type == "sms" || $type == "phone")
-				continue;
-			SetRequired($f, $s, $type . "messageid", (bool)GetFormData($f, $s, 'send' . $type));
-		}
 		SetRequired($f, $s, "listid", GetFormData($f, $s, "listradio") == "single");
 		SetRequired($f, $s, "listids", GetFormData($f, $s, "listradio") == "multi");
 		foreach (array("phone","email","sms") as $type){
+			MergeSectionFormData($f, $type);
 			if(GetFormData($f, $s, "send" . $type)) {
 				SetRequired($f, $s, $type . "messageid", GetFormData($f, $s, $type . "radio") == "select");
 				SetRequired($f, $s, $type . "textarea", GetFormData($f, $s, $type . "radio") == "create");
@@ -202,6 +197,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('The Caller ID must be exactly 10 digits long (including area code)');
 		} else if($sendemail && GetFormData($f, $s,"emailradio") == "create" && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
 			error('The From Email address is not valid', 'You must use an email address at ' . $emaildomain);
+		} else if((bool)GetFormData($f,"phone","newlangphone") XOR (bool)GetFormData($f,"phone","newmessphone")) {
+			error('Select both a language and a message');
+			$hasphonedetailerror = true;
+		} else if((bool)GetFormData($f,"email","newlangemail") XOR (bool)GetFormData($f,"email","newmessemail")) {
+			error('Select both a language and a message');
+			$hasemaildetailerror = true;	
 		} else {
 			//submit changes
 
