@@ -310,18 +310,7 @@ startWindow("Confirmation &amp; Submit");
 				<? if ($USER->authorize('setcallerid')) { ?>
 					<tr>
 						<td class="bottomBorder" >Caller&nbsp;ID</td>
-						<td class="bottomBorder" >
-						<?
-							if (getSystemSetting('_hascallback', false)) {
-								if ($job->isOption("prefermycallerid", false)) {
-									echo Phone::format($job->getOptionValue("callerid"));
-								} else {
-									echo Phone::format(getSystemSetting('callerid'));
-								}
-							} else {
-								echo Phone::format($job->getOptionValue("callerid"));
-							}
-						?>&nbsp;</td>
+						<td class="bottomBorder" ><?= Phone::format($job->getOptionValue("callerid")) ?>&nbsp;</td>
 					</tr>
 				<? } ?>
 
