@@ -109,7 +109,8 @@ if (isset($_GET['copy'])) {
 	$copyid = DBSafe($_GET['copy']);
 	if (userOwns("job",$copyid) || (customerOwnsJob($copyid) && $USER->authorize('managesystemjobs'))) {
 		$job = new Job($copyid);
-		$job->copyNew();
+		$newjob = $job->copyNew();
+		redirect('job.php?id='.$newjob->id);
 	}
 	redirectToReferrer();
 }
