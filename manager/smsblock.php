@@ -6,14 +6,11 @@ include_once("../inc/table.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/formatters.inc.php");
 include_once("../inc/html.inc.php");
-include_once("AspAdminUser.obj.php");
 require_once("XML/RPC.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
-$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $number="";
 if(isset($_GET['sms'])){

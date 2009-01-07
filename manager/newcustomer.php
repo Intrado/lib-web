@@ -3,7 +3,6 @@ require_once("common.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
-require_once("AspAdminUser.obj.php");
 
 
 $timezones = array(	"US/Alaska",
@@ -46,7 +45,6 @@ $f = "customer";
 $s = "main";
 
 $reloadform = 0;
-$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 // If user submitted the form
 if (CheckFormSubmit($f,$s)){

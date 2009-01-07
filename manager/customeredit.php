@@ -4,14 +4,12 @@ require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
-require_once("AspAdminUser.obj.php");
 require_once("../inc/themes.inc.php");
 
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
 	redirect();
 }
-$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 if(isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
 	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");

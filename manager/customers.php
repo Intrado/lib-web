@@ -8,11 +8,11 @@ require_once("../inc/table.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_custid($row, $index){
-	global $favcustomers;
+	global $MANAGERUSER;
 
 	if (isset($_GET["search"]))
-		$urlget = "?search=" . escapehtml($_GET["search"]);
-	else if (isset($_GET["showall"]) || empty($favcustomers))
+		$urlget = "?search=" . urlencode($_GET["search"]);
+	else if (isset($_GET["showall"]) || !$MANAGERUSER->preference("favcustomers"))
 		$urlget = "?showall";
 
 	if (isset($urlget) && isset($_GET["showdisabled"]))
@@ -22,7 +22,7 @@ function fmt_custid($row, $index){
 
 	$urlget = "customers.php" . (isset($urlget) ? "$urlget&" : "?");
 
-	if (!isset($favcustomers[$row[0]]))
+	if (!in_array($row[0],$MANAGERUSER->preference("favcustomers")))
 		return "<a title='Add Favorite' href='$urlget" . "addfavorites={$row[0]}'><img style='margin-right: 4px;' src='img/addfav.png' border=0/></a>" . $row[0];
 	else
 		return "<a title='Remove Favorite' href='$urlget" . "removefavorites={$row[0]}'><img style='margin-right: 4px;' src='img/removefav.png' border=0/></a>" . $row[0];
@@ -38,14 +38,10 @@ function fmt_hasdm($row, $index) {
 function fmt_custurl($row, $index){
 //index 1 is url
 //index 2 is display name
-	global $disabledcustomers;
-
-	if (isset($disabledcustomers[$row[0]]))
+	if (!$row[22])
 		return '<span style="color: gray;">' . escapehtml($row[1]) . '</span>';
-
 	if (isset($_GET["ajax"]))
 		return escapehtml($row[1]);
-
 	return escapehtml($row[2]) . " (<a href='customerlink.php?id=" . $row[0] ."' target=\"_blank\">" . escapehtml($row[1]) . "</a>)";
 }
 
@@ -88,87 +84,58 @@ function fmt_jobcount($row, $index){
 	}
 }
 
-function fmt_hasportal($row, $index){
-	if($row[$index])
-		return "Yes";
-	else
-		return "No";
-}
-
 function fmt_dmmethod($row, $index){
-	if ($row[$index] === "asp") {
-		return "CommSuite";
+	switch ($row[$index]) {
+		case "asp": return "CommSuite";
+		case "hybrid" : return "CSFlexEmerg";
+		case "cs" : return "CSFlex";
 	}
-	if ($row[$index] === "hybrid") {
-		return "CSFlexEmerg";
-	}
-	if ($row[$index] === "cs") {
-		return "CSFlex";
-	}
-	return "";
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// request/cookie handling
+// request handling
 ////////////////////////////////////////////////////////////////////////////////
 
 // FAVORITES
-// Favorite customers are indexed by customer ID.
-if (isset($_COOKIE["favcustomers"])) {
-	$favcustomers = array_flip(explode(",", $_COOKIE["favcustomers"]));
-}
 if (isset($_GET["addfavorites"])) {
-	if (!isset($favcustomers))
-		$favcustomers = array();
-	$favcustomers = $favcustomers + array_flip(explode(",", preg_replace("/[ \t]+/", "", $_GET["addfavorites"])));
+	$MANAGERUSER->addFavCustomer($_GET["addfavorites"]);
 }
-if (isset($_GET["removefavorites"]) && isset($favcustomers)) {
-	$remove = explode(",", preg_replace("/[ \t]+/", "", $_GET["removefavorites"]));
-	foreach ($remove as $id)
-		unset($favcustomers[$id]);
+if (isset($_GET["removefavorites"])) {
+	$MANAGERUSER->delFavCustomer($_GET["removefavorites"]);
 }
 if (isset($_GET["clearfavorites"])) {
-	setcookie("favcustomers", "", strtotime("+1 week"));
-	$_COOKIE['favcustomers'] = "";
-	redirect("customers.php");
+	$MANAGERUSER->setPreference("favcustomers",false);
+	$MANAGERUSER->update();
 }
-// Update/create cookie.
-if (isset($favcustomers)) {
-	unset($favcustomers[""]); // in case there's an empty input value
-	$cids = implode(",", array_keys($favcustomers));
-	setcookie("favcustomers", $cids, strtotime("+1 week"));
-	$_COOKIE['favcustomers'] = $cids;
-}
-
 // SEARCH
-$sqlsearch = "1=1"; // Expect all customers.
-if (isset($_GET["search"]))
-	$_GET["search"] = trim($_GET["search"]);
-if (isset($_GET["search"]) && $_GET["search"] !== "") {
-	$safesearch = DBSafe(trim($_GET["search"]));
-	if ($safesearch === "")
-		$sqlsearch = "1=0"; // Expect no customers.
+$sqlsearch = "1"; // default to everything
+if (isset($_GET["search"])) {
+	$safesearch =  DBSafe(trim($_GET["search"]));
+	if ($safesearch == "")
+		$sqlsearch = "0"; // Expect no customers.
 	else
-		$sqlsearch = "id='$safesearch' or urlcomponent like '%$safesearch%' or inboundnumber='$safesearch'";
+		$sqlsearch = "(id='$safesearch' or urlcomponent like '%$safesearch%' or inboundnumber='$safesearch')";
 }
 
 // SHOW DISABLED
 if (isset($_GET["showdisabled"]))
-	$sqltoggledisabled = "not enabled and";
+	$sqltoggledisabled = "and not enabled";
 else
-	$sqltoggledisabled = "enabled and";
-if (!isset($_GET["search"]) && !isset($_GET["showall"]) && isset($favcustomers)) { // When viewing favorites, don't hide disabled customers.
-	$sqltoggledisabled = "";
-}
+	$sqltoggledisabled = "and enabled";
 
+$favidsql = "";
+if (!isset($_GET["ajax"]) && !isset($_GET["showall"]) && !isset($_GET["showdisabled"])) {
+	//Favorite customers
+	if ($MANAGERUSER->preference("favcustomers")) {
+		$favidsql = "and id in (" . implode(",",$MANAGERUSER->preference("favcustomers")) . ")";
+		$sqltoggledisabled = ""; //dont filter out disabled favorites
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
-
-// Keep an array of disabled customers, indexed by customer ID.
-$disabledcustomers = array();
 
 // First, get a list of every shard, $shardinfo[], indexed by ID, storing dbhost, dbusername, and dbpassword.
 $res = Query("select id, dbhost, dbusername, dbpassword, name from shard order by id");
@@ -178,16 +145,10 @@ while($row = DBGetRow($res)){
 }
 
 // Secondly, get a list of customers.
-$customerquery = Query("select id, shardid, urlcomponent, oem, oemid, nsid, notes, enabled, inboundnumber from customer where $sqltoggledisabled ($sqlsearch) order by id");
+$query = "select id, shardid, urlcomponent, oem, oemid, nsid, notes, enabled, inboundnumber from customer where $sqlsearch $sqltoggledisabled $favidsql order by id";
+$customerquery = Query($query);
 $customers = array();
 while($row = DBGetRow($customerquery)){
-	// If viewing only favorite customers, skip appropriately.
-	if (isset($favcustomers) && !isset($_GET["showall"]) && !isset($_GET["search"]) && !isset($favcustomers[$row[0]]))
-		continue;
-	
-	if($row[7] == 0)
-		$disabledcustomers[$row[0]] = "disabled";
-
 	$customers[] = $row;
 }
 
@@ -240,6 +201,7 @@ foreach($customers as $cust) {
 		$row[19] = getCustomerSystemSetting('autoreport_replyname', false, true, $custdb);
 		$row[20] = getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb);
 		$row[21] = $shardinfo[$cust[1]][3];
+		$row[22] = $cust[7]; //enabled
 		$data[] = $row;
 	}
 }
@@ -337,7 +299,7 @@ function submitform (name) {
 <label for="showdisabled">Show Disabled</label>
 
 <?
-if ((!isset($_GET["showall"]) && !empty($favcustomers)) && !isset($_GET["search"]))
+if (!isset($_GET["showall"]) && $MANAGERUSER->preference("favcustomers") && !isset($_GET["search"]))
 	print "<a href='customers.php?showall'>Show All Customers</a> <a style='margin-left: 4px' href='?clearfavorites'><i>Clear Favorites</i></a>";
 else
 	print "<a href='customers.php'> <img src='img/fav.png' border=0/>Show Favorites</a>";

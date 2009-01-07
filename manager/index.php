@@ -2,7 +2,6 @@
 $isasplogin=1;
 
 require_once("common.inc.php");
-require_once("AspAdminUser.obj.php");
 
 if(isset($_GET["logout"])) {
 	@session_destroy();
@@ -39,6 +38,22 @@ if(isset($_POST["submit"])) {
 		$badlogin = true;
 	}
 }
+?>
+<html>
+<head>
+	<title>Manager Login</title>
+</head>
+<body onload="
+var p = document.forms[0].password;
+var l = document.forms[0].login;
+if(p.value || l.value) {
+		alert('You have saved your username and/or password in your browser. This is a security risk, and you should delete them immediately.');
+};
+p.value='';
+l.value='';
+l.focus();">
+
+<?
 if ($badlogin) {
 ?>
 	<div style="color: red;">Incorrect username/password. Please try again.</div>
@@ -51,3 +66,5 @@ if ($badlogin) {
 		<p>Password: <input type="password" name="password" /> </p>
 		<p><input type="submit" name="submit" /></p>
 	</form>
+</body>
+</html>

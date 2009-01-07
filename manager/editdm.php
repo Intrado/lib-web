@@ -26,7 +26,6 @@ include_once("common.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../obj/Phone.obj.php");
-include_once("AspAdminUser.obj.php");
 include_once("../inc/html.inc.php");
 
 
@@ -43,9 +42,6 @@ if(isset($_GET['dmid'])){
 }
 
 //Fetch dm settings from dmsettings table
-
-$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
-
 
 $telco_types = array("Test", "Asterisk", "Jtapi");
 $dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip from dm where id = '" . DBSafe($dmid) . "'", true);

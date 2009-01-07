@@ -228,8 +228,8 @@ if($reloadform){
 
 // FAVORITES
 // Favorite customers are indexed by customer ID.
-if (isset($_COOKIE["favcustomers"])) {
-	$favcustomers = array_flip(explode(",", $_COOKIE["favcustomers"]));
+if ($MANAGERUSER->preference("favcustomers")) {
+	$favcustomers = array_flip(explode(",", $MANAGERUSER->preference("favcustomers")));
 }
 
 if(isset($_GET['clear'])){

@@ -4,7 +4,6 @@ include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../inc/formatters.inc.php");
-include_once("AspAdminUser.obj.php");
 
 if(isset($_GET['dmid'])){
 	$_SESSION['dmid'] = $_GET['dmid']+0;
@@ -15,8 +14,6 @@ if(!isset($_SESSION['dmid'])){
 	echo "Please go back and choose a DM";
 	exit();
 }
-
-$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 $dmname = QuickQuery("select name from dm where id = " . $_SESSION['dmid']);
 

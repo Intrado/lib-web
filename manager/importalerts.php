@@ -7,7 +7,6 @@ require_once("../inc/formatters.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/html.inc.php");
-require_once("AspAdminUser.obj.php");
 
 // Set session variables if user got here from the customerimports.php
 if (isset($_GET['cid']) && isset($_GET['importid'])) {
@@ -15,9 +14,6 @@ if (isset($_GET['cid']) && isset($_GET['importid'])) {
 	$_SESSION['importid'] = $_GET['importid'] + 0;
 	redirect();
 }
-
-// Manager account
-$accountcreator = new AspAdminUser($_SESSION['aspadminuserid']);
 
 // Check session variables
 if (!isset($_SESSION['cid']) && !isset($_SESSION['importid']))
@@ -259,8 +255,9 @@ function getObj(name)
 }
 
 function addme() {
+	global $MANAGERUSER;
 	var emailsinput = new getObj('emailaddressesinput').obj;
-	emailsinput.value += ";" + "<?= $accountcreator->email ?>";
+	emailsinput.value += ";" + "<?= $MANAGERUSER->email ?>";
 	//emailsinput.value = emailsinput.value.replace(/^[^_@.a-zA-Z0-9]+/, "");
 }
 

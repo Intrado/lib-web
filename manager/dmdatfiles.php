@@ -4,7 +4,6 @@ include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../inc/formatters.inc.php");
-include_once("AspAdminUser.obj.php");
 
 
 if(isset($_GET['dmid'])){

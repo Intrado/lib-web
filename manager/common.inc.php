@@ -12,6 +12,7 @@ require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 require_once("managerutils.inc.php");
+require_once("AspAdminUser.obj.php");
 
 session_start();
 if(!isset($isasplogin)){
@@ -22,15 +23,15 @@ if(!isset($isasplogin)){
 
 	if(!isset($_SESSION["aspadminuserid"]))
 		redirect("./?logout=1");
+	
+	$MANAGERUSER = new AspAdminUser($_SESSION['aspadminuserid']);
 
 	//check to make sure the url component is the username
 	$expectedusername = substr($_SERVER["SCRIPT_NAME"],1);
 	$expectedusername = strtolower(substr($expectedusername,0,strpos($expectedusername,"/")));
-	$username = QuickQuery("select login from aspadminuser where id=" . $_SESSION["aspadminuserid"]);
-	if ($username != $expectedusername) {
+	if ($MANAGERUSER->login != $expectedusername) {
 		redirect("index.php?logout=1");
 	}
-
 }
 
 ?>

@@ -4,7 +4,6 @@ require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
-require_once("AspAdminUser.obj.php");
 
 $custtxt = "";
 
