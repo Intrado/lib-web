@@ -49,8 +49,6 @@ if(CheckFormSubmit($f, 'new')) {
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(!$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
-				error('Bad Manager Password');
 		} else {
 
 			if(GetFormData($f, $s, 'newname') != ""){
@@ -71,7 +69,6 @@ if(CheckFormSubmit($f, 'new')) {
 if($reload){
 	ClearFormData($f);
 	PutFormData($f, $s, 'newname', "", 'text');
-	PutFormData($f, $s, 'managerpassword', "", "text");
 	PutFormData($f, 'new', 'add', '');
 }
 
@@ -129,7 +126,5 @@ NewForm($f);
 <p>Do not forget to configure the job type call preferences for any added job types on this page.
 </div>
 <?
-managerPassword($f, $s);
 EndForm();
-include("navbottom.inc.php");
 ?>

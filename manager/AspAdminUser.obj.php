@@ -26,19 +26,6 @@ class AspAdminUser extends DBMappedObject{
 					AND password=password('$password')";
 		return QuickQuery($query);
 	}
-
-	function runCheck($password) {
-
-		$password = DBSafe($password);
-		$login = DBSafe($this->login);
-		$query = "SELECT id FROM aspadminuser
-					WHERE login = '$login'
-					AND password = password('$password')";
-		if(QuickQuery($query)){
-			return TRUE;
-		}
-		return FALSE;
-	}
 }
 
 ?>

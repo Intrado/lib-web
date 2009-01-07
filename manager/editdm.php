@@ -80,9 +80,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 		} else {
 			$callerid = Phone::parse(GetFormData($f, $s, "telco_caller_id"));
 
-			if(!$accountcreator->runCheck(GetFormData($f, $s, "managerpassword"))) {
-				error('Bad Manager Password');
-			} else if (!ereg("[0-9]{10}",$callerid)) {
+			if (!ereg("[0-9]{10}",$callerid)) {
 				error('Bad Caller ID, Try Again');
 			} else if (GetFormData($f, $s, "customerid") && !QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
 				error('Invalid Customer ID');
@@ -163,7 +161,6 @@ if( $reloadform )
 	PutFormData($f, $s, "Submit", "");
 	PutFormData($f, "authorize", "Authorize", "");
 	PutFormData($f, "unauthorize", "Un-authorize", "");
-	PutFormData($f, $s, "managerpassword", "");
 	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "number", "nomin", "nomax", true);
 
@@ -186,7 +183,7 @@ function getDMSetting($dmid, $setting){
 include_once("nav.inc.php");
 
 //custom newform declaration to catch if manager password is submitted
-NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+NewForm($f);
 ?>
 <div>Settings for <?=$dm['name']?></div>
 <table>
@@ -275,7 +272,6 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 	</tr>
 </table>
 <?
-managerPassword($f, $s);
 EndForm();
 ?>
 <br>

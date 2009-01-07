@@ -64,7 +64,6 @@ if (CheckFormSubmit($f,$s)){
 			$displayname = GetFormData($f,$s,"name");
 			$timezone = GetFormData($f, $s, "timezone");
 			$hostname = GetFormData($f, $s, "hostname");
-			$managerpassword = GetFormData($f, $s, "managerpassword");
 			$shard = GetFormData($f,$s,'shard')+0;
 			$defaultproductname = GetformData($f, $s, "productname");
 			$defaultbrand = GetFormData($f, $s, "logo");
@@ -76,8 +75,6 @@ if (CheckFormSubmit($f,$s)){
 
 			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' and enabled=1")) {
 				error('URL Path Already exists', 'Please Enter Another');
-			} else if(!$accountcreator->runCheck($managerpassword)) {
-				error('Bad Manager Password');
 			} else if (!$shard){
 				error('A shard needs to be chosen');
 			} else if(!$logofile){
@@ -243,7 +240,6 @@ if( $reloadform ){
 
 	PutFormData($f,$s,'name',"","text",1,50, true);
 	PutFormData($f,$s,'hostname',"","text",5,255, true);
-	PutFormData($f,$s,'managerpassword',"", "text");
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "", "number", "nomin", "nomax", true);
 	PutFormData($f,$s,'logo', null, null, null, null);
@@ -330,7 +326,6 @@ NewFormItem($f, $s,"", 'submit');
 <?
 
 NewFormItem($f, $s,"", 'submit');
-managerPassword($f, $s);
 EndForm();
 
 include_once("navbottom.inc.php");

@@ -35,9 +35,13 @@ else
 <script src='../script/utils.js'></script>
 <style>
 
+table {
+	font-size: 9pt;
+}
+
 .imagelink td {
 	text-align: center;
-	font-size: 60%;
+	font-size: 7pt;
 }
 
 .listAlt {

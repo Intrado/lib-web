@@ -46,7 +46,7 @@ function fmt_custurl($row, $index){
 	if (isset($_GET["ajax"]))
 		return escapehtml($row[1]);
 
-	return escapehtml($row[2]) . " (<a href='customerlink.php?id=" . $row[0] ."' >" . escapehtml($row[1]) . "</a>)";
+	return escapehtml($row[2]) . " (<a href='customerlink.php?id=" . $row[0] ."' target=\"_blank\">" . escapehtml($row[1]) . "</a>)";
 }
 
 function fmt_status($row, $index){
@@ -171,10 +171,10 @@ if (!isset($_GET["search"]) && !isset($_GET["showall"]) && isset($favcustomers))
 $disabledcustomers = array();
 
 // First, get a list of every shard, $shardinfo[], indexed by ID, storing dbhost, dbusername, and dbpassword.
-$res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
+$res = Query("select id, dbhost, dbusername, dbpassword, name from shard order by id");
 $shardinfo = array();
 while($row = DBGetRow($res)){
-	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3]);
+	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3], $row[4]);
 }
 
 // Secondly, get a list of customers.
@@ -239,6 +239,7 @@ foreach($customers as $cust) {
 		$row[18] = getCustomerSystemSetting('emaildomain', false, true, $custdb);
 		$row[19] = getCustomerSystemSetting('autoreport_replyname', false, true, $custdb);
 		$row[20] = getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb);
+		$row[21] = $shardinfo[$cust[1]][3];
 		$data[] = $row;
 	}
 }
@@ -259,6 +260,7 @@ if (isset($_GET["ajax"])) {
 }
 
 $titles = array("0" => "#ID",
+		"21" => "@#Shard",
 		"url" => "#Name",
 		"3" => "#Product Name",
 		"4" => "#Timezone",
@@ -342,7 +344,7 @@ else
 
 show_column_selector('customers_table', $titles, $lockedTitles);
 ?>
-
+<hr>
 <table class="list sortable" id="customers_table">
 <?
 showTable($data, $titles, $formatters);

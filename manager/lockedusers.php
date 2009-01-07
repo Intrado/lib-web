@@ -60,8 +60,6 @@ if($checkformsubmit){
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(!$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
-			error('Bad Manager Password');
 		} else {
 			$customerinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = $submitteduser[0]");
 			$cust_db = DBConnect($customerinfo[0], $customerinfo[1], $customerinfo[2],"c_" . $submitteduser[0]);
@@ -88,7 +86,6 @@ if($reloadform){
 			$actions = PutFormData($f,$lockeduser[1], "Unlock");
 		}
 	}
-	PutFormData($f, $s, "managerpassword", "", "text");
 }
 
 
@@ -124,7 +121,7 @@ function fmt_locked_status($row,$index){
 ////////////////////////////////////////////////////////////////////////////////
 include("nav.inc.php");
 
-NewForm($f, "onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+NewForm($f);
 ?>
 <table class=list>
 <?
@@ -133,7 +130,6 @@ showTable($lockedusers, $titles, $formatters);
 </table>
 
 <?
-managerPassword($f, $s);
 EndForm($f);
 include("navbottom.inc.php");
 ?>

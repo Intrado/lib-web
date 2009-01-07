@@ -137,7 +137,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$autoemail = GetFormData($f, $s, 'autoemail');
 			$renewaldate = GetFormData($f, $s, 'renewaldate');
 			$callspurchased = ereg_replace("[^0-9]*","",GetFormData($f, $s, 'callspurchased'));
-			$managerpassword = GetFormData($f, $s, 'managerpassword');
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
 			$maxusers = GetFormData($f, $s, 'maxusers');
 			$managernote = GetFormData($f, $s, 'managernote');
@@ -172,8 +171,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error('Bad Toll Free Number Format, Try Again');
 			} else if ((strlen($custinfo[3]) >= 5) && (strlen($hostname) < 5)){
 				error('Customer URL\'s cannot be shorter than 5 unless their account was already made');
-			} else if(!$accountcreator->runCheck($managerpassword)) {
-				error('Bad Manager Password');
 			} else if(GetFormData($f, $s, "timeslice") == ""){
 				error("Timeslice cannot be blank");
 			} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
@@ -375,7 +372,6 @@ if( $reloadform ) {
 	}
 	PutFormData($f, $s, "oldlanguages", $oldlanguages);
 	PutFormData($f, $s, "newlang", "", "text");
-	PutformData($f, $s, "managerpassword", "", "text");
 
 	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
 
@@ -414,7 +410,7 @@ include_once("nav.inc.php");
 ?><script src="picker.js?<?=rand()?>"></script><?
 
 //custom newform declaration to catch if manager password is submitted
-NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+NewForm($f);
 
 ?>
 <br>
@@ -599,9 +595,6 @@ foreach($languages as $index => $language){
 </table>
 
 <?
-managerPassword($f, $s);
-
-
 EndForm();
 
 include_once("navbottom.inc.php");

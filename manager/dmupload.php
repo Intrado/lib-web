@@ -43,8 +43,6 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(QuickQuery("select command from dm where id = " . $_SESSION['dmid']) != ""){
 			error("This DM already has a command queued. Please try again in a few moments");
-		} else if(!$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
-			error('Bad Manager Password');
 		} else {
 			if(isset($_FILES['dmupload']) && $_FILES['dmupload']['tmp_name'])
 			{
@@ -79,14 +77,13 @@ if($reloadform){
 	ClearFormData($f);
 	PutFormData($f, $s, "notes", "", "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "submit", "");
-	PutFormData($f, $s, "managerpassword", "", "text");
 }
 
 include_once("nav.inc.php");
 ?>
 <div>Upload File for DM: <?=$dmname?></div>
 <?
-NewForm($f, "onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+NewForm($f);
 ?>
 <table>
 
@@ -111,7 +108,6 @@ NewForm($f, "onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ wi
 	</tr>
 </table>
 <?
-managerpassword($f, $s);
 EndForm();
 include_once("navbottom.inc.php");
 ?>

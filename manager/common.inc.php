@@ -33,10 +33,4 @@ if(!isset($isasplogin)){
 
 }
 
-
-function managerPassword($f, $s){
-?>
-	<p>Manager Password: <input id='managerpassword' type="password" name="frm[<?=$f?>][<?=$s?>][managerpassword][value]" size="25"\>
-<?
-}
 ?>

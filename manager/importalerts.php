@@ -61,8 +61,6 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, "Clear")) {
 			error("Max size must be greater than min size", "If you don't want a max size, set it to blank");
 		} else if ($bad = checkemails(GetFormdata($f,$s,'emailaddresses'))) {
 			error("Please make sure email addresses are valid.");
-		} else if (!$accountcreator->runCheck(GetFormData($f,$s,'managerpassword'))) {
-			error ("Bad Manager Password");
 		// No errors found
 		} else {
 			$newalertoptions = array();
@@ -108,7 +106,6 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, "Clear")) {
 
 if ($reloadform === true) {
 	ClearFormData($f);
-	PutFormData($f, $s, "managerpassword", "", "text");
 	// Alert Options (form input)
 	PutFormData($f, $s, "emailaddresses", isset($alertoptions['emails']) ? $alertoptions['emails'] : "", "text");
 	PutFormData($f, $s, "filesizemin", isset($alertoptions['minsize']) ? $alertoptions['minsize'] : "", "number", 0);
@@ -129,7 +126,7 @@ if ($reloadform === true) {
 ////////////////////////////////////////////////////////////////////////////////
 
 include_once("nav.inc.php");
-NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ winscheduleddays.alert(\"Enter Your Manager Password\"); return false;}'");
+NewForm($f);
 ?>
 <div>Customer: <?=$displayname?></div>
 <div>Import Alerts for: <?=$import['name']?></div>
@@ -225,7 +222,6 @@ NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ win
 </table>
 <div><? NewFormItem($f, $s, "Save", "submit"); ?><a href="customerimports.php">Cancel</a></div>
 <?
-managerPassword($f, $s);
 
 EndForm();
 

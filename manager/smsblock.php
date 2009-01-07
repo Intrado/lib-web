@@ -44,8 +44,6 @@ if(CheckFormSubmit($f, "search") || CheckFormSubmit($f, "operate"))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			if(CheckFormSubmit($f, "operate"))
 				$number = CheckFormSubmit($f, "operate");
-		} else if(CheckFormSubmit($f, "operate") && !$accountcreator->runCheck(GetFormData($f, $s, 'managerpassword'))) {
-			error('Bad Manager Password');
 		} else {
 			if(CheckFormSubmit($f, "operate")){
 				$number = ereg_replace("[^0-9]*","",CheckFormSubmit($f, "operate"));
@@ -75,7 +73,6 @@ if(!$error){
 	PutFormData($f, $s, "number", $number, "phone");
 	PutFormData($f, "search", "Go!", "");
 	PutFormData($f, "operate", "Make it so...", "");
-	PutFormData($f, $s, "managerpassword", "", "text");
 	PutFormData($f, $s, "sms", $number, "phone");
 }
 
@@ -116,7 +113,7 @@ include_once("nav.inc.php");
 if(!$number){
 	NewForm($f);
 } else {
-	NewForm($f,"onSubmit='if(new getObj(\"managerpassword\").obj.value == \"\"){ window.alert(\"Enter Your Manager Password\"); return false;}'");
+	NewForm($f);
 }
 ?>
 <div>SMS Block</div>
@@ -182,7 +179,6 @@ if($number){
 		</tr>
 	</table>
 <?
-	managerpassword($f, $s);
 }
 EndForm();
 include_once("navbottom.inc.php");
