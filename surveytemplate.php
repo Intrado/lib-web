@@ -111,6 +111,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'sc
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if( $USER->authorize("leavemessage") && GetFormData($f, $s, "leavemessage") && !GetFormData($f, $s, "hasexit") ) {
 			error('You must have an exit message to allow recipients to leave a message');
+		} else if (QuickQuery("select id from surveyquestionnaire where deleted = 0 and name = '" . DBsafe(GetFormData($f,$s,"name")) . "' and userid = $USER->id and id != " . ( 0+ getCurrentQuestionnaire()))) {
+			error('A template named \'' . GetFormData($f,$s,"name") . '\' already exists');
 		} else {
 
 			if (!$hasphone && !$hasweb) {
