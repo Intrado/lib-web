@@ -192,6 +192,13 @@ reports\standard_job_reports.htm
 reports\survey_job_reports.htm
 reports\understanding_call_logs.htm
 reports\usage_stats_report.htm
+step-by-step_guides\basics\intro.htm
+step-by-step_guides\basics\step1_-_making_a_list.htm
+step-by-step_guides\basics\step2_-_send_an_easycall.htm
+step-by-step_guides\basics\step3_-_send_an_email.htm
+step-by-step_guides\common_tasks\making_a_list_for_emergencies.htm
+step-by-step_guides\common_tasks\sending_a_job_with_calls_and_emails.htm
+step-by-step_guides\common_tasks\sending_a_text-to-speech_message.htm
 step-by-step_guides\step-by-step_create_a_list.htm
 step-by-step_guides\step-by-step_send_a_call_job.htm
 step-by-step_guides\step-by-step_send_a_phone_and_email_job.htm
@@ -206,6 +213,7 @@ the_admin_tab\settings.htm
 the_admin_tab\system.htm
 the_admin_tab\the_import_manager.htm
 the_admin_tab\the_metadata_manager.htm
+the_contact_manager\activating_by_phone.htm
 the_contact_manager\bulk_activation_code_management.htm
 the_contact_manager\contact_manager_overview.htm
 the_contact_manager\contact_manager_settings.htm
@@ -224,6 +232,7 @@ robohhre.lng
 schoolmessenger_new_user_training_guide.pdf
 schoolmessenger_help.glo
 help.css
+basics-emailingself.gif
 settingswithremotedm.gif
 smsmessageeditor.gif
 contactdetails.gif
@@ -238,6 +247,7 @@ surveyreportdetails.gif
 responsetab.gif
 metadatamanager.gif
 helpmark.gif
+basics-easycallconfirm.gif
 settingssystemwidealert.gif
 activationcodeforoneperson.gif
 accountsettings.gif
@@ -248,12 +258,14 @@ surveysamplewebpage.gif
 surveytemplateeditorwebopti.gif
 uploadlistscreen.gif
 important.gif
+contactmanagerdisableactbyp.gif
 contactsettingshomenocm.gif
 phonelog.gif
 userlist.gif
 jobeditor.gif
 dataimportmanager.gif
 listeditorbuttons.gif
+makinglisttutorialrules.gif
 settingscustomerinfo.gif
 contactdatabasewithcontactm.gif
 settingsremotedmmanager.gif
@@ -263,6 +275,9 @@ smsjobeditor.gif
 reportsnotificationsumm.gif
 surveyscheduler.gif
 jobeditoremail.gif
+basics-easycall.gif
+jobeditoremailautotranslate.gif
+jobeditorautotranslate.gif
 importeditornewimport.gif
 settingsenrollmentfielddef.gif
 settingsgroupfielddefinitio.gif
@@ -280,16 +295,19 @@ surveyconfirmation.gif
 reportbuilder.gif
 completedjobs.gif
 addressbook.gif
+basics-emailconfirm.gif
 settingsdisplaysettings.gif
 jobacceptresponses.gif
 callmetorecord.gif
 easycallstart.gif
 listeditoraddressbook.gif
+basics-makealist.gif
 contactsettingsdestlabelpho.gif
 reportsaveschedule.gif
 importeditor.gif
 listinformation.gif
 easycallsubmitjob.gif
+startpagenewuser.gif
 reportemaillog.gif
 settingscontactmanagersetti.gif
 contactsettingsdestlabelsms.gif
@@ -359,6 +377,7 @@ whxdata\whfwdata4.xml
 whxdata\whfwdata5.xml
 whxdata\whfwdata6.xml
 whxdata\whfwdata7.xml
+whxdata\whfwdata8.xml
 whdata\whtdata0.htm
 whdata\whidata0.htm
 whdata\whidata1.htm
@@ -373,6 +392,7 @@ whdata\whfwdata4.htm
 whdata\whfwdata5.htm
 whdata\whfwdata6.htm
 whdata\whfwdata7.htm
+whdata\whfwdata8.htm
 whgdata\whlstt0.htm
 whgdata\whlstt1.htm
 whgdata\whlstt2.htm
@@ -388,6 +408,8 @@ whgdata\whlstt11.htm
 whgdata\whlstt12.htm
 whgdata\whlstt13.htm
 whgdata\whlstt14.htm
+whgdata\whlstt15.htm
+whgdata\whlstt16.htm
 whgdata\whlsti0.htm
 whgdata\whlsti1.htm
 whgdata\whlstfl0.htm
@@ -436,6 +458,8 @@ whgdata\whlstf19.htm
 whgdata\whlstf20.htm
 whgdata\whlstf21.htm
 whgdata\whlstf22.htm
+whgdata\whlstf23.htm
+whgdata\whlstf24.htm
 whgdata\whlstg0.htm
 schoolmessenger_help.htm
 schoolmessenger_help_csh.htm
