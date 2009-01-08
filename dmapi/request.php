@@ -5,6 +5,8 @@ $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("XML/RPC.php");
+require_once("XML/RPC/Server.php");
+
 require_once("../inc/auth.inc.php");
 require_once("../inc/sessionhandler.inc.php");
 
@@ -23,23 +25,20 @@ require_once("../obj/VoiceReply.obj.php");
 
 require_once("XmlToArray.obj.php");
 
-
-//TODO: MAKE SURE CHARACTER ENCODING DOES NOT BREAK WITH XMLRPC TRAFFIC
-
 // SpecialTask
 // Params:
 //		params[0] = sessionid
 //		params[1] = taskid
-function specialtask($methodname, $params){
+function specialtask($msg){
 	global $REQUEST_TYPE;
 	$ERROR="";
 
-	$SESSIONID = $params[0];
-	session_id($SESSIONID);
+	$SESSIONID = $msg->getParam(0);
+	session_id($SESSIONID->scalarval());
 	doStartSession();
 
 	$REQUEST_TYPE = "new";
-	$task = new SpecialTask($params[1]);
+	$task = new SpecialTask($msg->getParam(1)->scalarval());
 	$_SESSION['specialtaskid'] = $task->id;
 
 	ob_start();
@@ -62,18 +61,18 @@ function specialtask($methodname, $params){
 //		params[1] = called number
 //		params[2] = callerid
 //		params[3] = customerid
-function inboundtask($methodname, $params){
+function inboundtask($msg){
 	global $REQUEST_TYPE;
 	$ERROR="";
 
-	$SESSIONID = $params[0];
-	session_id($SESSIONID);
+	$SESSIONID = $msg->getParam(0);
+	session_id($SESSIONID->scalarval());
 	doStartSession();
 
 	$REQUEST_TYPE = "new";
-	$_SESSION['inboundNumber'] = $params[1];
-	$_SESSION['callerid'] = $params[2];
-	$_SESSION['customerid'] = $params[3];
+	$_SESSION['inboundNumber'] = $msg->getParam(1)->scalarval();
+	$_SESSION['callerid'] = $msg->getParam(2)->scalarval();
+	$_SESSION['customerid'] = $msg->getParam(3)->scalarval();
 
 	ob_start();
 
@@ -86,25 +85,21 @@ function inboundtask($methodname, $params){
 }
 
 
-// continuecompletetask
+// completetask
 // Params:
 //		params[0] = sessionid
 //		params[1] = result data
-function continuecompletetask($methodname, $params){
+function completetask($msg){
 	global $BFXML_VARS, $REQUEST_TYPE;
 	$ERROR="";
 
-	$SESSIONID = $params[0];
-	session_id($SESSIONID);
+	$SESSIONID = $msg->getParam(0);
+	session_id($SESSIONID->scalarval());
 	doStartSession();
+	
+	$REQUEST_TYPE = "result";
 
-	if($methodname == "continuetask"){
-		$REQUEST_TYPE = "continue";
-	} else if($methodname == "completetask"){
-		$REQUEST_TYPE = "result";
-	}
-
-	$BFXML_VARS = $params[1];
+	$BFXML_VARS = XML_RPC_decode($msg->getParam(1));
 	ob_start();
 	if (isset($_SESSION['_nav_curpage']) && $_SESSION['_nav_curpage']) {
 		forwardToPage($_SESSION['_nav_curpage']);
@@ -119,6 +114,34 @@ function continuecompletetask($methodname, $params){
 	return response($ERROR, $output);
 }
 
+// continuetask
+// Params:
+//		params[0] = sessionid
+//		params[1] = result data
+function continuetask($msg){
+	global $BFXML_VARS, $REQUEST_TYPE;
+	$ERROR="";
+
+	$SESSIONID = $msg->getParam(0);
+	session_id($SESSIONID->scalarval());
+	doStartSession();
+	
+	$REQUEST_TYPE = "continue";
+
+	$BFXML_VARS = XML_RPC_decode($msg->getParam(1));
+	ob_start();
+	if (isset($_SESSION['_nav_curpage']) && $_SESSION['_nav_curpage']) {
+		forwardToPage($_SESSION['_nav_curpage']);
+	} else {
+		$ERROR = "No page set!";
+		$_SESSION = array();
+	}
+
+	$output = ob_get_contents();
+	ob_end_clean();
+
+	return response($ERROR, $output);
+}
 
 //function to handle all responses
 function response($ERROR, $output){
@@ -128,8 +151,13 @@ function response($ERROR, $output){
 	if($ERROR){
 		$resultcode = "failure";
 	}
-
-	return array("taskxml" => $output, "resultcode" => $resultcode, "resultdescription" => $ERROR);
+            
+	$result = new XML_RPC_Value(array(
+		"taskxml" => new XML_RPC_Value($output, "string"), 
+		"resultcode" => new XML_RPC_Value($resultcode, "string"), 
+		"resultdescription" => new XML_RPC_Value($ERROR, "string")), "struct");
+	
+	return new XML_RPC_Response($result);
 }
 
 //define some helper functions
@@ -148,19 +176,19 @@ function forwardToPage ($thepage, $setpage = true) {
 }
 
 //do the xmlrpc stuff
-$xmlrpc_server = xmlrpc_server_create();
 
-xmlrpc_server_register_method($xmlrpc_server, "specialtask", "specialtask");
-xmlrpc_server_register_method($xmlrpc_server, "inboundtask", "inboundtask");
-xmlrpc_server_register_method($xmlrpc_server, "continuetask", "continuecompletetask");
-xmlrpc_server_register_method($xmlrpc_server, "completetask", "continuecompletetask");
+$functionMap = array(
+	"specialtask" => array("function" => "specialtask", "signature" => array(array("string","string","string","string","string")), "docstring" => ""),
+	"inboundtask" => array("function" => "inboundtask", "signature" => array(array("string","string","string","string","int")), "docstring" => ""),
+	"continuetask" => array("function" => "continuetask", "signature" => array(array("string","string","struct")), "docstring" => ""),
+	"completetask" => array("function" => "completetask", "signature" => array(array("string","string","struct")), "docstring" => ""));
 
-//error_log(print_r($HTTP_RAW_POST_DATA, true));
-
-$output = xmlrpc_server_call_method($xmlrpc_server, $HTTP_RAW_POST_DATA, '');
-
+ob_start();
+$xmlrpc_server = new XML_RPC_Server($functionMap);
+$output = ob_get_contents();
+ob_end_clean();
 echo $output;
-
+	
 if ($SETTINGS['feature']['log_dmapi']) {
 	$logfilename = $SETTINGS['feature']['log_dir'] . "output.txt";
 
