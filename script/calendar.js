@@ -122,7 +122,7 @@ function lcs(ielem,allowpast,allowfuture) {
 	calendarframe.style.left = (getCalObj('fc').offsetLeft).toString() + "px";
 	calendarframe.style.width = (getCalObj('fc').offsetWidth).toString() + "px";
 	calendarframe.style.height = (getCalObj('fc').offsetHeight).toString() + "px";
-	//alert("ok");
+
 	// First check date is valid
 	curdt=ielem.value;
 	curdtarr=curdt.split('/');
