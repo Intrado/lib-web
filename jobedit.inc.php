@@ -487,7 +487,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 								}
 								$part->txt = GetFormData($f, $s, $type."expand_" . $escapedlanguage); // If textarea box is disabled the return value will be blank.
 								if($type == "email") {
-									$part->txt .= "\nOriginal Message:\n " . GetFormData($f, $s, $type . "textarea");
+									$part->txt .= "\n\n\nOriginal Message:\n " . GetFormData($f, $s, $type . "textarea");
 								}
 								$part->voiceid = $voiceid;
 								$part->update();
@@ -793,7 +793,7 @@ if ($submittedmode || $completedmode) {
 			$copiedmessages = DBFindMany("Message","from message where id='".$job->$msgtype."' or id in (select messageid from joblanguage where type='$type' and jobid=$job->id)");
 			foreach ($copiedmessages as $m) {
 				if ($m->deleted == "1") {
-					$m->name = "(copy) ".$m->name;
+					$m->name = $m->name . " (Copy)";
 					$messages[$type][$m->id] = $m;
 				}
 			}
