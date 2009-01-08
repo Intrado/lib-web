@@ -76,8 +76,7 @@ if(CheckFormSubmit($f,$s))
 				} else {
 					$path_parts = pathinfo($_FILES['audio']['name']);
 	
-					$ext = $path_parts['extension'];
-	
+					$ext = isset($path_parts['extension'])?$path_parts['extension']:"wav";
 					if (strlen($ext) < 1 || !in_array(strtolower($ext),array('wav','aiff','au','aif'))) {
 						$ext = "wav";
 					}
