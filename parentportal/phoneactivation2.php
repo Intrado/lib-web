@@ -96,9 +96,9 @@ startWindow('Phone Activation');
 		<tr>
 			<td>
 <?			if (count($pkeyok) > 1) { ?>
-				You must follow these steps within 24 hours to add the above people to your account.
+				You must follow these steps within <b>24 hours</b> to add the above people to your account.
 <?			} else { ?>
-				You must follow these steps within 24 hours to add the above person to your account.
+				You must follow these steps within <b>24 hours</b> to add the above person to your account.
 <?			} ?>
 			<BR><BR></td>
 		</tr>
