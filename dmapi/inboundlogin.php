@@ -84,8 +84,8 @@ if($REQUEST_TYPE == "new" ||
 
 	// if login prompt has played, gather code/pin to authenticate
 	if (isset($BFXML_VARS['code'])) {
-		$code = $BFXML_VARS['code'];
-		$pin = $BFXML_VARS['pin'];
+		$code = DBSafe($BFXML_VARS['code']);
+		$pin = DBSafe($BFXML_VARS['pin']);
 		$inboundNumber = $_SESSION['inboundNumber'];
 
 		//error_log("inbound ".$inboundNumber);

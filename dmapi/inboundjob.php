@@ -413,7 +413,7 @@ if($REQUEST_TYPE == "new"){
 	// if they entered the job options
 	if (isset($BFXML_VARS['numdays'])) {
 
-			$_SESSION['numdays'] = $BFXML_VARS['numdays'];
+			$_SESSION['numdays'] = $BFXML_VARS['numdays'] +0;
 
 			// if they are reentering job options, jump ahead to job confirm
 			if (isset($_SESSION['starttime']) &&

@@ -199,7 +199,7 @@ if($REQUEST_TYPE == "new"){
 			$vr->jobid = $playback['jobid'];
 			$vr->sequence = $playback['sequence'];
 			$vr->userid = $playback['userid'];
-			$vr->contentid = $BFXML_VARS['voicereply'];
+			$vr->contentid = DBSafe($BFXML_VARS['voicereply']);
 			$vr->replytime = time()*1000;
 			$vr->listened = 0;
 			$vr->update();
@@ -213,7 +213,7 @@ if($REQUEST_TYPE == "new"){
 			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
 			$personid = $playback['personid'];
 
-			$query = "update reportcontact set participated=1, response=".$BFXML_VARS['messageconfirm']." where jobid=".$playback['jobid']." and personid=".$personid." and type='phone' and sequence=".$playback['sequence'];
+			$query = "update reportcontact set participated=1, response=".DBSafe($BFXML_VARS['messageconfirm'])." where jobid=".$playback['jobid']." and personid=".$personid." and type='phone' and sequence=".$playback['sequence'];
 			QuickUpdate($query);
 		}
 

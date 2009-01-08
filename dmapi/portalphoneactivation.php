@@ -84,7 +84,7 @@ if ($REQUEST_TYPE == "new") {
 	<?
 } else if ($REQUEST_TYPE == "continue") {
 	if (isset($BFXML_VARS['code'])) {
-		$code = $BFXML_VARS['code'];
+		$code = DBSafe($BFXML_VARS['code']);
 		$callerid = $_SESSION['callerid'];
 		if (inboundPortalPhoneActivation($callerid, $code)) {
 			okGoodbye();

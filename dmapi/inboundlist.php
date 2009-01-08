@@ -191,7 +191,7 @@ if($REQUEST_TYPE == "new"){
 	// if they selected a list
 	if (isset($BFXML_VARS['listnumber'])) {
 
-		$listnumber = $BFXML_VARS['listnumber'];
+		$listnumber = $BFXML_VARS['listnumber'] +0;
 		//error_log("list number selected: ".$listnumber);
 
 		// if they want to hear the next page of lists

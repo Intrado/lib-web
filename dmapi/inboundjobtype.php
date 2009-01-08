@@ -136,7 +136,7 @@ if($REQUEST_TYPE == "new"){
 	// if they selected a jobtype
 	if (isset($BFXML_VARS['jobtypenumber'])) {
 
-		$jobtypenumber = $BFXML_VARS['jobtypenumber'];
+		$jobtypenumber = $BFXML_VARS['jobtypenumber'] +0;
 		//error_log("jobtype number selected: ".$jobtypenumber);
 
 		// if they want to hear the next page of jobtypes

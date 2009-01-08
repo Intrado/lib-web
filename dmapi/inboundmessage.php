@@ -275,7 +275,7 @@ if($REQUEST_TYPE == "new"){
 
 		// check that menu pressed is 1 to save message
 		if ($BFXML_VARS['saveaudio'] == "1" &&
-			commitMessage($BFXML_VARS['recordaudio'])) {
+			commitMessage($BFXML_VARS['recordaudio'] +0)) {
 
 			// remove language from the list
 			unset($languages[$langi]);
@@ -297,7 +297,7 @@ if($REQUEST_TYPE == "new"){
 
 		$selectedLang = 0;
 		if (isset($BFXML_VARS['langtorecord'])) {
-			$selectedLang = $BFXML_VARS['langtorecord'];
+			$selectedLang = $BFXML_VARS['langtorecord'] +0;
 		}
 		$languages = $_SESSION['languageList'];
 
