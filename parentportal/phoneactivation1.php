@@ -59,10 +59,11 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 	} else {
 		MergeSectionFormData($f, $s);
 
+		TrimFormData($f, $s, "pkeyadd");
 		//do check
 		if ( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (CheckFormSubmit($f, 'add') && (GetFormData($f, $s, "pkeyadd") == "")) {
+		} else if (CheckFormSubmit($f, 'add') && GetFormData($f, $s, "pkeyadd") == "") {
 			error('Please enter a Contact Identification Number');
 		} else {
 			$_SESSION['phoneactivationpkeylist'] = array(); // clear out any previous pkeys
@@ -75,7 +76,7 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 					$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
 				$i++;
 			}
-			$pkey = trim(GetFormData($f, $s, "pkeyadd"));
+			$pkey = GetFormData($f, $s, "pkeyadd");
 			if ($pkey != "")
 				$_SESSION['phoneactivationpkeylist'][$pkey] = "Unknown";
 
