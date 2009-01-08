@@ -379,6 +379,7 @@ if( $reloadform ) {
 
 	PutFormData($f,"Save","Save", "");
 	PutFormData($f,"Return","Save and Return", "");
+	PutFormData($f,"Save","Add", "");
 
 	//Color Scheme stuff
 	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "3dblue", true, $custdb), "text", "nomin", "nomax", true);
