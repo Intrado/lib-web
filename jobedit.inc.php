@@ -1400,13 +1400,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<div>
 					<table>
 						<tr>
+						<td>Subject:</td><td><? NewFormItem($f, $s, "emailsubject", "text", 40, 50,"id='emailsubject'" . ($submittedmode ? "DISABLED" : "")); ?></td>
+						</tr>
+						<tr>
 						<td>From Name:</td><td> <? NewFormItem($f, $s, "fromname", "text", 25, 50,"id='fromname'" . ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 						<tr>
 						<td>From Email:</td><td> <? NewFormItem($f, $s, "fromemail", "text", 25, 50,"id='fromemail'" . ($submittedmode ? "DISABLED" : "")); ?></td>
-						</tr>
-						<tr>
-						<td>Subject:</td><td><? NewFormItem($f, $s, "emailsubject", "text", 40, 50,"id='emailsubject'" . ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 					</table>
 					 </div>
