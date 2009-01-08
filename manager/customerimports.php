@@ -229,7 +229,7 @@ if($reloadform){
 // FAVORITES
 // Favorite customers are indexed by customer ID.
 if ($MANAGERUSER->preference("favcustomers")) {
-	$favcustomers = array_flip(explode(",", $MANAGERUSER->preference("favcustomers")));
+	$favcustomers = array_flip($MANAGERUSER->preference("favcustomers"));
 }
 
 if(isset($_GET['clear'])){
@@ -250,7 +250,7 @@ if (isset($_GET['cid'])) {
 			
 		$queryextra = substr($queryextra, 0, -1) . ") ";
 	}
-} else if ($favcustomers && !isset($_GET['showall'])) {
+} else if (!empty($favcustomers) && !isset($_GET['showall'])) {
 	$queryextra = " AND id in (";
 	foreach ($favcustomers as $cid => $junk)
 		$queryextra .= "'". DBSafe($cid) . "',";
