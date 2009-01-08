@@ -22,10 +22,10 @@ function fmt_custid($row, $index){
 
 	$urlget = "customers.php" . (isset($urlget) ? "$urlget&" : "?");
 
-	if (!in_array($row[0],$MANAGERUSER->preference("favcustomers")))
-		return "<a title='Add Favorite' href='$urlget" . "addfavorites={$row[0]}'><img style='margin-right: 4px;' src='img/addfav.png' border=0/></a>" . $row[0];
-	else
+	if ($MANAGERUSER->preference("favcustomers") && in_array($row[0],$MANAGERUSER->preference("favcustomers")))
 		return "<a title='Remove Favorite' href='$urlget" . "removefavorites={$row[0]}'><img style='margin-right: 4px;' src='img/removefav.png' border=0/></a>" . $row[0];
+	else
+		return "<a title='Add Favorite' href='$urlget" . "addfavorites={$row[0]}'><img style='margin-right: 4px;' src='img/addfav.png' border=0/></a>" . $row[0];
 }
 
 function fmt_hasdm($row, $index) {
