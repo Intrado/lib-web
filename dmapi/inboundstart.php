@@ -32,6 +32,9 @@ function welcomemessage($hascallback, $hasphoneactivation, $displayname) {
 <?			} ?>
 
 				<choice digits="9" />
+				<choice digits="*">
+					<goto message="choose" />		
+				</choice>		
 			<default>
 				<tts gender="female" language="english">Sorry, that was not a valid selection.</tts>
 			</default>
