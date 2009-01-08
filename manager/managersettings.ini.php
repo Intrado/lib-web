@@ -9,13 +9,13 @@ path="/xmlrpc"
 [db]
 persistent=true
 host="localhost"
-user="authserver"
-pass="aQ9V6THETJWAQpzX"
+user="root"
+pass=""
 db="authserver"
 
 
 [feature]
-log_dir="/usr/commsuite/logs/"
+log_dir="/commsuite/logs/"
 log_db_errors=true
 log_db_queries=true
 tmp_dir="/tmp"
