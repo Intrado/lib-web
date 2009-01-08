@@ -6,7 +6,7 @@ require_once("common.inc.php");
 if(isset($_GET["logout"])) {
 	@session_destroy();
 	if (isset($_GET['reason']))
-		redirect("?reason=" . urlencode($_GET['reason']));
+		redirect("index.php?reason=" . urlencode($_GET['reason']));
 	else
 		redirect();
 }
