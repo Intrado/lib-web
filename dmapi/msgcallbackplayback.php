@@ -61,7 +61,7 @@ function renderMessageParts($playback) {
 		} else if ($part[0] == "t") {
 			$voice = $voices[$part[2]];
 			?>
-			<tts language="<?echo $voice->language?>" gender="<?echo $voice->gender?>"><![CDATA[ <?=$part[1]?>]]></tts>
+			<tts language="<?echo $voice->language?>" gender="<?echo $voice->gender?>"><![CDATA[ <?=str_replace(']]>', '', $part[1])?>]]></tts>
 			<?
 		}
 	}
