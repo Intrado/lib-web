@@ -125,7 +125,7 @@ else
 	$sqltoggledisabled = "and enabled";
 
 $favidsql = "";
-if (!isset($_GET["ajax"]) && !isset($_GET["showall"]) && !isset($_GET["showdisabled"])) {
+if (!isset($_GET["search"]) && !isset($_GET["showall"]) && !isset($_GET["showdisabled"])) {
 	//Favorite customers
 	if ($MANAGERUSER->preference("favcustomers")) {
 		$favidsql = "and id in (" . implode(",",$MANAGERUSER->preference("favcustomers")) . ")";
