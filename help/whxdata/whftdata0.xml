@@ -53,6 +53,13 @@
 <topic name="Survey Reports" url="reports/survey_job_reports.htm" />
 <topic name="Phone Logs" url="reports/understanding_call_logs.htm" />
 <topic name="Usage Stats Report" url="reports/usage_stats_report.htm" />
+<topic name="Intro" url="step-by-step_guides/basics/intro.htm" />
+<topic name="Basics - Making a List" url="step-by-step_guides/basics/step1_-_making_a_list.htm" />
+<topic name="Step2 - Send an EasyCall" url="step-by-step_guides/basics/step2_-_send_an_easycall.htm" />
+<topic name="Step3 - Send an Email" url="step-by-step_guides/basics/step3_-_send_an_email.htm" />
+<topic name="Make a List for Emergencies" url="step-by-step_guides/common_tasks/making_a_list_for_emergencies.htm" />
+<topic name="Sending a Job with Calls and Emails" url="step-by-step_guides/common_tasks/sending_a_job_with_calls_and_emails.htm" />
+<topic name="Sending a Text-to-Speech Message" url="step-by-step_guides/common_tasks/sending_a_text-to-speech_message.htm" />
 <topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
 <topic name="Step-by-Step:Send a Job with EasyCall" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
 <topic name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
@@ -67,6 +74,7 @@
 <topic name="System" url="the_admin_tab/system.htm" />
 <topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
 <topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
+<topic name="Activating by Phone" url="the_contact_manager/activating_by_phone.htm" />
 <topic name="Bulk Activation Code Management" url="the_contact_manager/bulk_activation_code_management.htm" />
 <topic name="Contact Manager Overview" url="the_contact_manager/contact_manager_overview.htm" />
 <topic name="Contact Manager Settings" url="the_contact_manager/contact_manager_settings.htm" />
