@@ -287,8 +287,6 @@ ALTER TABLE `portalphoneactivation` ADD INDEX ( `expirationdate` );
 
 ALTER TABLE `customer` ADD INDEX ( `oem` , `oemid` ) ;
 
--- 6.2 --
-
 ALTER TABLE `aspadminuser` ADD `preferences` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
 ADD `permissions` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
 
