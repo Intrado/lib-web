@@ -235,7 +235,7 @@ if (CheckFormSubmit($f,$s)){
 if( $reloadform ){
 
 	ClearFormData($f);
-
+	PutFormData($f,$s,"Submit", "");
 	PutFormData($f,$s,'name',"","text",1,50, true);
 	PutFormData($f,$s,'hostname',"","text",5,255, true);
 	PutFormData($f,$s,'timezone', "");
@@ -250,7 +250,7 @@ NewForm($f);
 
 ?><br><?
 
-NewFormItem($f, $s,"", 'submit');
+NewFormItem($f, $s,"Submit", 'submit');
 
 ?>
 
@@ -323,7 +323,7 @@ NewFormItem($f, $s,"", 'submit');
 <br>
 <?
 
-NewFormItem($f, $s,"", 'submit');
+NewFormItem($f, $s,"Submit", 'submit');
 EndForm();
 
 include_once("navbottom.inc.php");
