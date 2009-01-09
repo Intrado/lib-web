@@ -23,7 +23,7 @@ while ($row = mysql_fetch_assoc($res))
 	$customers[$row['id']] = $row;
 
 
-foreach ($customers as $customer) {
+foreach ($customers as  $customerid => $customer) {
 	
 	echo "doing $customerid\n";
 
