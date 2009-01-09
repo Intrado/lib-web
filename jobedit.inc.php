@@ -487,8 +487,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 									$part->messageid=$message->id;$part->type="T";$part->sequence=0;
 								}
 								$part->txt = GetFormData($f, $s, $type."expand_" . $escapedlanguage); // If textarea box is disabled the return value will be blank.
-								if($type == "email") {
-									$part->txt .= "\n\n\nOriginal Message:\n " . GetFormData($f, $s, $type . "textarea");
+								if($type == "email" && !GetFormData($f, $s,$type."edit_$language")) {
+									$part->txt .= "\n\n\nOriginal Message:\n" . GetFormData($f, $s, $type . "textarea");
 								}
 								$part->voiceid = $voiceid;
 								$part->update();
