@@ -38,7 +38,7 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 		and rp.personid in ('" . $contactListString . "')
 		and j.status in ('active', 'complete')
 		and j.questionnaireid is null
-		and (js.value is null or js.value >= date_sub(curdate(),interval 15 day))
+		and (js.value is null or js.value >= curdate())
 		group by j.id, rp.personid
 		order by j.startdate desc, j.starttime, j.id desc");
 	while ($row = DBGetRow($result)) {

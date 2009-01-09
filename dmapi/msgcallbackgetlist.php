@@ -40,7 +40,7 @@ if ($REQUEST_TYPE == "new") {
 		and j.status in ('active', 'complete')
 		and j.questionnaireid is null
 		and rc.phone='".$_SESSION['contactphone']."'
-		and (js.value is null or js.value >= date_sub(curdate(),interval 15 day))
+		and (js.value is null or js.value >= curdate())
 		order by j.startdate desc, j.starttime, j.id desc
 		limit 10";
 
