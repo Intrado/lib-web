@@ -204,7 +204,7 @@ if($REQUEST_TYPE == "new"){
 			$vr->listened = 0;
 			$vr->update();
 
-			$query = "update reportcontact set participated=1, voicereplyid=".$vr->id." where jobid=".$playback['jobid']." and personid=".$person->id." and type='phone' and sequence=".$playback['sequence'];
+			$query = "update reportcontact set participated=1, voicereplyid=".$vr->id." where jobid=".$playback['jobid']." and personid=".$personid." and type='phone' and sequence=".$playback['sequence'];
 			QuickUpdate($query);
 		}
 
