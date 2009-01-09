@@ -8,6 +8,9 @@ require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/html.inc.php");
 
+if (!$MANAGERUSER->authorized("imports"))
+	exit("Not Authorized");
+
 // Set session variables if user got here from the customerimports.php
 if (isset($_GET['cid']) && isset($_GET['importid'])) {
 	$_SESSION['cid'] = $_GET['cid'] + 0;

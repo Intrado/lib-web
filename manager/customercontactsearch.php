@@ -4,6 +4,8 @@ include_once("../obj/Customer.obj.php");
 include_once("../inc/table.inc.php");
 include_once("../inc/form.inc.php");
 
+if (!$MANAGERUSER->authorized("customercontacts"))
+	exit("Not Authorized");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling

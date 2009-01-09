@@ -5,6 +5,9 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
 
+if (!$MANAGERUSER->authorized("editdm"))
+	exit("Not Authorized");
+
 $custtxt = "";
 
 if(isset($_GET['resetDM']) || isset($_GET['update'])){

@@ -5,6 +5,9 @@ require_once("../inc/formatters.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 
+if (!$MANAGERUSER->authorized("imports"))
+	exit("Not Authorized");
+
 $staledataleewayhours = 1;
 $defaultwindowminutes = 10;
 define('SECONDSPERHOUR', 3600);

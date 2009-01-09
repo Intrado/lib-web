@@ -3,6 +3,9 @@ include_once("common.inc.php");
 include_once("../inc/table.inc.php");
 
 
+if (!$MANAGERUSER->authorized("activejobs"))
+	exit("Not Authorized");
+
 if(isset($_GET['customer'])){
 	$customerid = $_GET['customer'] + 0;
 	$extrasql = " and j.customerid = $customerid ";

@@ -28,6 +28,8 @@ include_once("../inc/table.inc.php");
 include_once("../obj/Phone.obj.php");
 include_once("../inc/html.inc.php");
 
+if (!$MANAGERUSER->authorized("editdm"))
+	exit("Not Authorized");
 
 if(isset($_GET['dmid'])){
 	$dmid = $_GET['dmid']+0;

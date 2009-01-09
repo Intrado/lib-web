@@ -4,6 +4,10 @@ include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
 
+if (!$MANAGERUSER->authorized("editpriorities"))
+	exit("Not Authorized");
+	
+	
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
 	redirect();

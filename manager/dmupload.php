@@ -5,6 +5,9 @@ include_once("../inc/html.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../inc/formatters.inc.php");
 
+if (!$MANAGERUSER->authorized("editdm"))
+	exit("Not Authorized");
+
 if(isset($_GET['dmid'])){
 	$_SESSION['dmid'] = $_GET['dmid']+0;
 	redirect();

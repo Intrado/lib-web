@@ -5,6 +5,9 @@ include_once("../obj/Access.obj.php");
 include_once("../obj/Permission.obj.php");
 include_once("../inc/table.inc.php");
 
+if (!$MANAGERUSER->authorized("users"))
+	exit("Not Authorized");
+	
 $customerid = $_GET["customer"] + 0;
 
 $custquery = Query("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
@@ -25,17 +28,23 @@ function fmt_lastlogin($row, $index){
 }
 
 function fmt_jobcount($row, $index){
-	global $custdb;
+	global $custdb, $MANAGERUSER;
 	$jobcount = QuickQuery("SELECT COUNT(*) FROM job WHERE job.userid = '" . $row[3] . "'
 							AND job.status = 'active'", $custdb);
-	$link = "<a href=\"customeractivejobs.php?user=" . $row['3'] . "&customer=" . $row[0] . "\">" . $jobcount . "</a>";
+							
+	if ($MANAGERUSER->authorized("activejobs"))
+		$link = "<a href=\"customeractivejobs.php?user=" . $row['3'] . "&customer=" . $row[0] . "\">" . $jobcount . "</a>";
+	else
+		$link = $jobcount;
 	return $link;
 }
 
 function fmt_custurl($row, $index){
-
-	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[2] . "</a>";
-	return $url;
+	global $MANAGERUSER;
+	if ($MANAGERUSER->authorized("logincustomer"))
+		return escapehtml($row[2]) . " (<a href='customerlink.php?id=" . $row[0] ."' target=\"_blank\">" . escapehtml($row[1]) . "</a>)";
+	else
+		return escapehtml($row[2] . " (" . $row[1] . ")");
 }
 
 

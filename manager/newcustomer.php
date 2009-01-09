@@ -4,6 +4,8 @@ require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
 
+if (!$MANAGERUSER->authorized("newcustomer"))
+	exit("Not Authorized");
 
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",

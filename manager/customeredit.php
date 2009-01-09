@@ -6,6 +6,9 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
 
+if (!$MANAGERUSER->authorized("editcustomer"))
+	exit("Not Authorized");
+
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
 	redirect();
