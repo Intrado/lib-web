@@ -720,7 +720,7 @@ if( $reloadform )
 		// else no callback, use customer default callerid
 	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 	if (($job->getSetting("prefermycallerid","0") == "1") ||
-		($job->getSetting("prefermycallerid") === false && $USER->getSetting("callerid","") != "")) {
+		($job->getSetting("prefermycallerid") === false && $USER->getSetting("prefermycallerid","0") != "0" && $USER->getSetting("callerid","") != "")) {
 		$radio = "byuser";
 		$callerid = $job->getOptionValue("callerid");
 	} else {
