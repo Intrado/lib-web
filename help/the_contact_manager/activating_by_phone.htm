@@ -15,9 +15,22 @@ if (navigator.appName !="Netscape")
 img_whs1 { border:none; width:20px; height:20px; float:none; border-style:none; }
 p.whs2 { font-weight:bold; }
 ol.whs3 { list-style:decimal; }
-img_whs4 { border:none; width:321px; height:109px; float:none; }
+img_whs4 { border:none; width:321px; height:109px; float:none; border-style:none; }
+div.whs5 { width:100%; }
+p.whs6 { font-size:xx-small; }
 -->
-</style><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+</style><script type="text/javascript" language="JavaScript">
+<!--
+if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
+{
+  var strNSS = "<style type='text/css'>";
+  strNSS += "p.whs6 {font-size:x-small; }";
+  strNSS +="</style>";
+  document.write(strNSS);
+}
+//-->
+</script>
+<script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
 <!--
 function reDo() {
   if (innerWidth != origWidth || innerHeight != origHeight)
@@ -82,11 +95,11 @@ else
 //-->
 </script>
 <h1>Activating by Phone</h1>
-<p><span style="font-weight: bold;"><B><img src="../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> This feature 
- is only visible if your system includes the Contact Manager feature. The 
- Contact Manager is a new feature from SchoolMessenger that allows your 
- recipients to control the ways in which they may be contacted. For more 
- information regarding Contact Manager, please call 1-800-527-5225.</I></span></p>
+<p><span style="font-weight: bold;"><B><img src="../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> 
+ This feature is only visible if your system includes the Contact Manager 
+ feature. The Contact Manager is a new feature from SchoolMessenger that 
+ allows your recipients to control the ways in which they may be contacted. 
+ For more information regarding Contact Manager, please call 1-800-527-5225.</I></span></p>
 <p>Another way your Contact Manager users can activate their accounts is 
  by phone. Simply check the Allow Activation via Phone checkbox in the 
  <a href="contact_manager_settings.htm">Contact Manager Settings</a> screen 
@@ -106,14 +119,18 @@ else
  you may do so by unchecking the Allow Activation by Phone checkbox in 
  the contact's details. </p>
 <ol type="1" class="whs3">
-	<li class=P><p>Go to the System Tab and click on the Contacts subtab.</p></li>
-	<li class=P><p>Search for the contact.</p></li>
-	<li class=P><p>Click the icon next to the contact's name.</p></li>
-	<li class=P><p>Click the Edit button at the top or bottom of the screen.</p></li>
-	<li class=P><p>Uncheck the Allow Activation by Phone checkbox at the 
+	<li class=p><p>Go to the System Tab and click on the Contacts subtab.</p></li>
+	<li class=p><p>Search for the contact.</p></li>
+	<li class=p><p>Click the icon next to the contact's name.</p></li>
+	<li class=p><p>Click the Edit button at the top or bottom of the screen.</p></li>
+	<li class=p><p>Uncheck the Allow Activation by Phone checkbox at the 
  bottom of the contact's details, shown below.</p></li>
 </ol>
 <p><img src="../contactmanagerdisableactbyp.gif" alt="Allow Activation via Phone checkbox in Contact Details." x-maintain-ratio="TRUE" width="321px" height="109px" border="0" class="img_whs4"></p>
+<div placeholder id="footer" class="whs5">
+ <p class="whs6"><span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©1999-2009 
+ Reliance Communications, Inc.</font></span></p>
+</div>
 <script type="text/javascript" language="javascript1.2">
 <!--
 highlightSearch();

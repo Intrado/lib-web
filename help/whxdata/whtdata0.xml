@@ -8,7 +8,7 @@
   <item name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
   <item name="Managing Your Account Settings" url="getting_started/managing_your_account_settings.htm" />
 </book>
-<book name="Training Guides" >
+<book name="Tutorials" >
   <book name="Basic Training" >
     <item name="Introduction to Basic Training" url="step-by-step_guides/basics/intro.htm" />
     <item name="Step1:Make a List to Call Yourself" url="step-by-step_guides/basics/step1_-_making_a_list.htm" />
@@ -18,6 +18,7 @@
   <book name="Common Tasks" >
     <item name="Making a List for Emergencies" url="step-by-step_guides/common_tasks/making_a_list_for_emergencies.htm" />
     <item name="Sending a Text-to-Speech Message" url="step-by-step_guides/common_tasks/sending_a_text-to-speech_message.htm" />
+    <item name="Sending a Job with Calls and Emails" url="step-by-step_guides/common_tasks/sending_a_job_with_calls_and_emails.htm" />
   </book>
 </book>
 <book name="Creating a List" >
@@ -47,6 +48,7 @@
   <item name="Creating a New Job Using the Job Editor" url="creating_a_notification_job/creating_a_new_job.htm" />
   <item name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
   <item name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  <item name="Copying a Job" url="creating_a_notification_job/copying_a_job.htm" />
 </book>
 <book name="Creating a Survey Job" >
   <item name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
