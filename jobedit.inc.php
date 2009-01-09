@@ -440,7 +440,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) == "1" ) {
 						($type == "phone") ? $languages = &$ttslanguages : $languages = &$emaillanguages;
 						foreach($languages as $language) {
-							$escapedlanguage = escapehtml(ucfirst($language));
+							$language = ucfirst($language);
+							$escapedlanguage = escapehtml($language);
 							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$language' and type='$type'");
 							if(GetFormData($f, $s, $type . "_$escapedlanguage")){
 								$voiceid = NULL;
@@ -467,7 +468,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 									$joblanguage->jobid=$job->id;
 								}
 								$message = new Message($joblanguage->messageid);
-								$message->userid=$USER->id;$message->type=$type;$message->name = ucfirst($language) . " translation";$message->description="";$message->deleted=1;
+								$message->userid=$USER->id;$message->type=$type;$message->name = $language . " translation";$message->description="";$message->deleted=1;
 								if($type == "email") {
 									$message->subject = GetFormData($f, $s, 'emailsubject');
 									$message->fromname = $USER->firstname;
@@ -491,7 +492,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 								}
 								$part->voiceid = $voiceid;
 								$part->update();
-								$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=ucfirst($language);
+								$joblanguage->messageid=$message->id;$joblanguage->type=$type;$joblanguage->language=$language;
 								$joblanguage->translationeditlock = GetFormData($f, $s,$type."edit_$language");
 								$joblanguage->update();
 							} else {
@@ -1253,7 +1254,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									<div id='phoneexpandtxt_<? echo $language?>' style="display: none">
 										<? NewFormItem($f,$s,"phoneexpand_$language", "textarea", 45, 3,"id='phoneexpand_$language'"); ?>
 										<br />
-										<? NewFormItem($f,$s,"phoneedit_$language","checkbox",1, NULL,"id='phoneedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('phone','$language')\"")); ?> Override Translation
+										<? NewFormItem($f,$s,"phoneedit_$language","checkbox",1, NULL,"id='phoneedit_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('phone','$language')\"")); ?> Override Translation
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
 										<br /><br />
 										Retranslation:<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table>
