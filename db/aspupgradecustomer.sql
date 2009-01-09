@@ -157,6 +157,22 @@ INDEX ( `personid` , `name` )
 ) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 $$$
 
+ALTER TABLE `joblanguage` ADD `translationeditlock` tinyint(4) NOT NULL default 0
+$$$
+
+ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range',
+	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range', 'date_offset', 'reldate_range' ) NOT NULL DEFAULT 'eq'
+$$$
+
+insert into setting (name, value) values ('_hassurvey', '1')
+$$$
+
+
+create procedure temp_insert_ttsvoice( )
+begin
+DECLARE rdm VARCHAR(50);
+SELECT value INTO rdm FROM setting WHERE name='_dmmethod';
+IF rdm='asp' THEN
 insert into ttsvoice (language, gender) values
 	('catalan', 'female'),
 	('catalan', 'male'),
@@ -177,12 +193,16 @@ insert into ttsvoice (language, gender) values
 	('portuguese', 'male'),
 	('russian', 'female'),
 	('swedish', 'female'),
-	('swedish', 'male')
+	('swedish', 'male');
+END IF;
+end
 $$$
 
-ALTER TABLE `joblanguage` ADD `translationeditlock` tinyint(4) NOT NULL default 0
+call temp_insert_ttsvoice()
 $$$
 
-ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range',
-	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range', 'date_offset', 'reldate_range' ) NOT NULL DEFAULT 'eq'
+drop procedure temp_insert_ttsvoice
 $$$
+
+
+
