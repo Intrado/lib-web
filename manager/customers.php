@@ -120,15 +120,7 @@ if (isset($_GET["clearfavorites"])) {
 	$MANAGERUSER->setPreference("favcustomers",false);
 	$MANAGERUSER->update();
 }
-// SEARCH
-$sqlsearch = "1"; // default to everything
-if (isset($_GET["search"])) {
-	$safesearch =  DBSafe(trim($_GET["search"]));
-	if ($safesearch == "")
-		$sqlsearch = "0"; // Expect no customers.
-	else
-		$sqlsearch = "(id='$safesearch' or urlcomponent like '%$safesearch%' or inboundnumber='$safesearch')";
-}
+
 
 // SHOW DISABLED
 if (isset($_GET["showdisabled"]))
@@ -145,6 +137,20 @@ if (!isset($_GET["search"]) && !isset($_GET["showall"]) && !isset($_GET["showdis
 	}
 }
 
+$shownone = true;
+if (isset($_GET["search"]) || isset($_GET["showall"]) || isset($_GET["showdisabled"]) || $MANAGERUSER->preference("favcustomers"))
+	$shownone = false;
+
+// SEARCH
+$sqlsearch = "1"; // default to everything
+if (isset($_GET["search"])) {
+	$safesearch =  DBSafe(trim($_GET["search"]));
+	if ($safesearch == "") {
+		$sqlsearch = "0"; // Expect no customers.
+		$shownone = true;
+	} else
+		$sqlsearch = "(id='$safesearch' or urlcomponent like '%$safesearch%' or inboundnumber='$safesearch')";
+}
 ////////////////////////////////////////////////////////////////////////////////
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -160,10 +166,11 @@ while($row = DBGetRow($res)){
 $query = "select id, shardid, urlcomponent, oem, oemid, nsid, notes, enabled, inboundnumber from customer where $sqlsearch $sqltoggledisabled $favidsql order by id";
 $customerquery = Query($query);
 $customers = array();
-while($row = DBGetRow($customerquery)){
-	$customers[] = $row;
+if (!$shownone) {
+	while($row = DBGetRow($customerquery)){
+		$customers[] = $row;
+	}
 }
-
 // With the list of customers ready, connect to each customer's shard and retrieve a bunch of helpful information about the customer.
 $currhost = "";
 $custdb;
@@ -311,17 +318,22 @@ function submitform (name) {
 <label for="showdisabled">Show Disabled</label>
 
 <?
-if (!isset($_GET["showall"]) && $MANAGERUSER->preference("favcustomers") && !isset($_GET["search"]))
-	print "<a href='customers.php?showall'>Show All Customers</a> <a style='margin-left: 4px' href='?clearfavorites'><i>Clear Favorites</i></a>";
-else
-	print "<a href='customers.php'> <img src='img/fav.png' border=0/>Show Favorites</a>";
+if (!isset($_GET["showall"]))
+	print "<a href='customers.php?showall'>Show All Customers</a> ";
+else if ($MANAGERUSER->preference("favcustomers")) {
+	echo "<a href='customers.php'> <img src='img/fav.png' border=0/>Show Favorites</a>";
+	echo "<a style='margin-left: 4px' href='?clearfavorites'><i>Clear Favorites</i></a>";
+}
 
 show_column_selector('customers_table', $titles, $lockedTitles);
 ?>
 <hr>
 <table class="list sortable" id="customers_table">
 <?
-showTable($data, $titles, $formatters);
+if ($shownone)
+	echo "<h3>Hiding customer list by default, click show all to see everyone, or use the handy search feature</h3>";
+else 
+	showTable($data, $titles, $formatters);
 ?>
 </table>
 
