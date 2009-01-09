@@ -290,3 +290,9 @@ ALTER TABLE `customer` ADD INDEX ( `oem` , `oemid` ) ;
 ALTER TABLE `aspadminuser` ADD `preferences` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
 ADD `permissions` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
 
+
+-- set superuser on id 1
+UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,editpriorities,customercontacts,users,imports,editimportalerts,lockedusers,smsblock,activejobs,editdm,superuser' where id=1;
+-- everyone else gets full perms by default
+UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,editpriorities,customercontacts,users,imports,editimportalerts,lockedusers,smsblock,activejobs,editdm' where id!=1;
+
