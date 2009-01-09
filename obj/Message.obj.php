@@ -306,7 +306,7 @@ class Message extends DBMappedObject {
 		else
 			header("Content-Type: audio/wav");
 
-
+		header("Content-disposition: attachment; filename=message.wav");
 		header('Pragma: private');
 		header('Cache-control: private, must-revalidate');
 		header("Content-Length: " . strlen($data));
