@@ -179,7 +179,7 @@ function forwardToPage ($thepage, $setpage = true) {
 
 $functionMap = array(
 	"specialtask" => array("function" => "specialtask", "signature" => array(array("string","string","string","string","string")), "docstring" => ""),
-	"inboundtask" => array("function" => "inboundtask", "signature" => array(array("string","string","string","string","int")), "docstring" => ""),
+	"inboundtask" => array("function" => "inboundtask", "signature" => array(array("string","string","int")), "docstring" => ""),
 	"continuetask" => array("function" => "continuetask", "signature" => array(array("string","string","struct")), "docstring" => ""),
 	"completetask" => array("function" => "completetask", "signature" => array(array("string","string","struct")), "docstring" => ""));
 
