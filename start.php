@@ -278,7 +278,7 @@ if ($listsdata) {
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">New User:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">This printable PDF training guide teaches product basics in an simple step-by-step format.</td>
-			<td class="bottomBorder"><?=button_bar(button('Training&nbsp;Guide', NULL, "help/new_user_training_guide.pdf"))?>
+			<td class="bottomBorder"><?=button_bar(button('Training&nbsp;Guide', NULL, "help/getting_started_online.pdf"))?>
 		</tr>
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">List:&nbsp;&nbsp; </div></td>
