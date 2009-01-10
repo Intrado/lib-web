@@ -178,8 +178,8 @@ function forwardToPage ($thepage, $setpage = true) {
 //do the xmlrpc stuff
 
 $functionMap = array(
-	"specialtask" => array("function" => "specialtask", "signature" => array(array("string","string","string","string","string")), "docstring" => ""),
-	"inboundtask" => array("function" => "inboundtask", "signature" => array(array("string","string","int")), "docstring" => ""),
+	"specialtask" => array("function" => "specialtask", "signature" => array(array("string","string","int")), "docstring" => ""),
+	"inboundtask" => array("function" => "inboundtask", "signature" => array(array("string","string","struct","string","int")), "docstring" => ""),
 	"continuetask" => array("function" => "continuetask", "signature" => array(array("string","string","struct")), "docstring" => ""),
 	"completetask" => array("function" => "completetask", "signature" => array(array("string","string","struct")), "docstring" => ""));
 
