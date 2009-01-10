@@ -34,8 +34,8 @@ else
 	}
 </script>
 
-<script src="../script/sorttable.js"></script>
-<script src='../script/utils.js'></script>
+<script src="sorttable.js"></script>
+<script src='utils.js'></script>
 <style>
 
 table {
