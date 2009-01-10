@@ -109,12 +109,12 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array()){
 						if ($display) {
 							$result = "<img src=\"../img/checkbox-rule.png\" " .
 									"onclick=\"var x = new getObj('hiddenfield$fieldnum'); " .
-									"if(x.obj.checked){this.src='../img/checkbox-clear.png'}else{this.src='../img/checkbox-rule.png'};";
+									"if(x.obj.checked){this.src='img/checkbox-clear.png'}else{this.src='img/checkbox-rule.png'};";
 							$checked = "checked>";
 						} else {
 							$result = "<img src=\"../img/checkbox-clear.png\" " .
 									"onclick=\"var x = new getObj('hiddenfield$fieldnum'); " .
-									"if(x.obj.checked){this.src='../img/checkbox-clear.png'}else{this.src='../img/checkbox-rule.png'};";
+									"if(x.obj.checked){this.src='img/checkbox-clear.png'}else{this.src='img/checkbox-rule.png'};";
 							$checked = ">";
 						}
 
