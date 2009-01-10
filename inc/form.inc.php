@@ -42,7 +42,7 @@ calls CheckFormItem, puts red * for bad/missing values
 function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="nooption", $extrahtml = "") {
 
 
-	if (!isset($_SESSION['formdata'][$form][$section][$item]))
+	if ($type != "submit" && !isset($_SESSION['formdata'][$form][$section][$item]))
 		error_log("Attempt to call NewFormItem with non initialized object $form,$section,$item");
 
 
@@ -399,7 +399,7 @@ function CheckFormItem($form, $section, $item) {
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.24 $
+	    # $Revision: 1.25 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
