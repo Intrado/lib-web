@@ -193,7 +193,7 @@ if($phone){
 } else if ($email || $sms){
 	startWindow('Message', 'padding: 3px;');
 ?>
-		<div><?= escapehtml($message)?></div>
+		<div><?= str_replace("\n", "<br/>", escapehtml($message))?></div>
 <?
 	endWindow();
 }
