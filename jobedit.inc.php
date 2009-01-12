@@ -2188,17 +2188,22 @@ function setTranslations (html, langstring) {
 		}
 	}
 	if(section == 'phone' && phonesubmitstate && phonetranslationstate) {
+<?if($USER->authorize('sendemail')) { ?>
 		if(isCheckboxChecked('sendemail') && isCheckboxChecked('emailcreate') && isCheckboxChecked('emailtranslatecheck') && !emailtranslationstate) {
+			enablesection('email');
 			emailsubmitstate = true;
 			phonesubmitstate = false;
 			submitTranslations('email');
 			return;
 		}
+<?}?>
 		submitForm('<? echo $f; ?>','send');
 	}
+<? if($USER->authorize('sendemail')) { ?>
 	if(section == 'email' && emailsubmitstate && emailtranslationstate) {
 		submitForm('<? echo $f; ?>','send');
 	}
+<?}?>
 }
 
 function submitTranslations(section) {
@@ -2279,17 +2284,20 @@ function sendjobconfirm() {
 	phonesubmitstate = false;
 	emailsubmitstate = false;
 	scroll(0,0);
-	enablesection('phone');
-	enablesection('email');
-
+<? if($USER->authorize('sendphone')) { ?>
 	if(isCheckboxChecked('sendphone') && isCheckboxChecked('phonecreate') && isCheckboxChecked('phonetranslatecheck') && !phonetranslationstate) {
+		enablesection('phone');	
 		phonesubmitstate = true;
 		submitTranslations('phone');
 	}
+<?}?>
+<? if($USER->authorize('sendemail')) { ?>
 	if(!phonesubmitstate && isCheckboxChecked('sendemail') && isCheckboxChecked('emailcreate') && isCheckboxChecked('emailtranslatecheck') && !emailtranslationstate) {
+		enablesection('email');
 		emailsubmitstate = true;
 		submitTranslations('email');
 	}
+<?}?>
 	if(!phonesubmitstate && !emailsubmitstate) {
 		submitForm('<? echo $f; ?>','send');
 	} else {
