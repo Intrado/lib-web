@@ -291,6 +291,8 @@ ALTER TABLE `aspadminuser` ADD `preferences` TEXT CHARACTER SET utf8 COLLATE utf
 ADD `permissions` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
 
 
+insert into dmsetting (dmid,name,value) select id,'disable_congestion_throttle','1' from dm where `type`='system';
+
 -- set superuser on id 1
 UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,editpriorities,customercontacts,users,imports,editimportalerts,lockedusers,smsblock,activejobs,editdm,superuser' where id=1;
 -- everyone else gets full perms by default
