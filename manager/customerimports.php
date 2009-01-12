@@ -90,7 +90,7 @@ function fmt_last_modified($row, $index) {
 }
 
 function fmt_custurl($row, $index){
-	$url = $row[1] . " (<a href=\"customerlink.php?id=". $row[0] . "\" >" . $row[3] . "</a>)";
+	$url = $row[1] . " (<a href=\"customerlink.php?id=". $row[0] . "\" target=\"_blank\">" . $row[3] . "</a>)";
 	return $url;
 }
 

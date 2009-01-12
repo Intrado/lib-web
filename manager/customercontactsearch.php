@@ -126,7 +126,7 @@ function fmt_dest_type($row, $index){
 //index 0 is the id
 function fmt_customer_url($row, $index){
 	if (!isset($_GET['showdisabled']))
-		$url = $row[2] . " (<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[1] . "</a>)";
+		$url = $row[2] . " (<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[1] . "</a>)";
 	else
 		$url = '<span style="color: gray;">' . $row[1] . '</span>';
 	return $url;

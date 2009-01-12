@@ -68,7 +68,7 @@ if(isset($_SESSION['customerid'])){
 function fmt_customerUrl($row, $index){
 	$url = "";
 	if($row[2])
-		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" >" . $row[2] . "</a>";
+		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" target=\"_blank\">" . $row[2] . "</a>";
 	return $url;
 }
 

@@ -59,7 +59,7 @@ function fmt_number ($row,$index) {
 }
 
 function fmt_custurl($row, $index){
-	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" >" . $row[1] . "</a>";
+	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[1] . "</a>";
 	return $url;
 }
 
