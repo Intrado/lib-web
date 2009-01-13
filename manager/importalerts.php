@@ -258,7 +258,6 @@ function getObj(name)
 }
 
 function addme() {
-	global $MANAGERUSER;
 	var emailsinput = new getObj('emailaddressesinput').obj;
 	emailsinput.value += ";" + "<?= $MANAGERUSER->email ?>";
 	//emailsinput.value = emailsinput.value.replace(/^[^_@.a-zA-Z0-9]+/, "");
