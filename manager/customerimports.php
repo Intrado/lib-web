@@ -253,7 +253,7 @@ if (isset($_GET['cid'])) {
 			
 		$queryextra = substr($queryextra, 0, -1) . ") ";
 	}
-} else if (!empty($favcustomers) && !isset($_GET['showall'])) {
+} else if (!empty($favcustomers) && !isset($_GET['showall']) && !isset($_POST['showmatch'])) {
 	$queryextra = " AND id in (";
 	foreach ($favcustomers as $cid => $junk)
 		$queryextra .= "'". DBSafe($cid) . "',";
