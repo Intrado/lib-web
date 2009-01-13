@@ -33,6 +33,7 @@ class User extends DBMappedObject {
 
 
 	function setPassword ($password) {
+		$password = DBSafe($password);
 		$query = "update user set password=password('$password') "
 				."where id=$this->id";
 		QuickUpdate($query);
