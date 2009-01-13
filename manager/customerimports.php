@@ -288,33 +288,35 @@ $custquery = Query("select id, shardid, urlcomponent from customer where 1 $quer
 $customers = array();
 while($row= DBGetRow($custquery)){
 	$customers[] = $row;
-	$currhost="";
-	$data = array();
-	foreach($customers as $cust) {
+}
 
-		if($currhost != $cust[1]){
-			$custdb = mysql_connect($shardinfo[$cust[1]][0], $shardinfo[$cust[1]][1],$shardinfo[$cust[1]][2])
-				or die("Could not connect to customer database: " . mysql_error());
-			$currhost = $cust[1];
-		}
-		mysql_select_db("c_" . $cust[0]);
-		if($custdb){
-			$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description, notes, alertoptions, datatype
-						FROM import
-						where type in ('automatic', 'manual')
-						$querytypes
-						order by id";
-			$list = Query($query, $custdb);
-			$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
-			$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
-			while($row = DBGetRow($list)){
-				$alertoptions = sane_parsestr($row[10]);
-				$row[10] = $alertoptions;
-				$data[] = array_merge(array($cust[0], $displayname, $timezone, $cust[2]), $row);
-			}
+$currhost="";
+$data = array();
+foreach($customers as $cust) {
+
+	if($currhost != $cust[1]){
+		$custdb = mysql_connect($shardinfo[$cust[1]][0], $shardinfo[$cust[1]][1],$shardinfo[$cust[1]][2])
+			or die("Could not connect to customer database: " . mysql_error());
+		$currhost = $cust[1];
+	}
+	mysql_select_db("c_" . $cust[0]);
+	if($custdb){
+		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description, notes, alertoptions, datatype
+					FROM import
+					where type in ('automatic', 'manual')
+					$querytypes
+					order by id";
+		$list = Query($query, $custdb);
+		$timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
+		$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
+		while($row = DBGetRow($list)){
+			$alertoptions = sane_parsestr($row[10]);
+			$row[10] = $alertoptions;
+			$data[] = array_merge(array($cust[0], $displayname, $timezone, $cust[2]), $row);
 		}
 	}
 }
+
 $titles = array("0" => "#ID",
 		"alert" => "#Alert",
 		"url" => "#Cust Name",
