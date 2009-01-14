@@ -1,8 +1,9 @@
 <?
-include_once("common.inc.php");
-include_once("../obj/Customer.obj.php");
-include_once("../inc/table.inc.php");
-include_once("../inc/form.inc.php");
+require_once("common.inc.php");
+require_once("../obj/Customer.obj.php");
+require_once("../inc/table.inc.php");
+require_once("../inc/form.inc.php");
+require_once("../obj/Phone.obj.php");
 
 if (!$MANAGERUSER->authorized("customercontacts"))
 	exit("Not Authorized");
