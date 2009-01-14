@@ -6,8 +6,8 @@ include_once("../inc/table.inc.php");
 if (!$MANAGERUSER->authorized("activejobs"))
 	exit("Not Authorized");
 
-if(isset($_GET['customer'])){
-	$customerid = $_GET['customer'] + 0;
+if(isset($_GET['cid'])){
+	$customerid = $_GET['cid'] + 0;
 	$extrasql = " and j.customerid = $customerid ";
 	if(isset($_GET['user'])){
 		$userid = $_GET['user'] + 0;
@@ -17,7 +17,16 @@ if(isset($_GET['customer'])){
 	$extrasql = "";
 }
 
-
+if (isset($_GET['customer'])){
+	$dispatchtype = 'customer';
+	$extrasql .= " and j.dispatchtype = 'customer' ";
+} else if (isset($_GET['system'])) {
+	$dispatchtype = 'system';
+	$extrasql .= " and j.dispatchtype = 'system' ";	
+} else {
+	$dispatchtype = 'system';
+	$extrasql .= " and j.dispatchtype = 'system' ";	
+}
 
 
 /*
@@ -74,7 +83,6 @@ function fmt_play_link($row, $index){
 
 $customers = QuickQueryList("select id, urlcomponent from customer",true);
 
-
 $res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 $shards = array();
 while($row = DBGetRow($res)){
@@ -82,13 +90,11 @@ while($row = DBGetRow($res)){
 	mysql_select_db("aspshard",$db);
 }
 
-
-
-
 $calldata = array();
 $jobs = array();
 $schedjobs = array();
 foreach ($shards as $shardid => $sharddb) {
+	mysql_select_db("aspshard",$sharddb);
 	$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
 					jt.status, j.phonetaskcount, j.timeslices, count(*)
 			from qjobtask jt
@@ -113,9 +119,9 @@ foreach ($shards as $shardid => $sharddb) {
 	QuickUpdate("set time_zone='GMT'",$sharddb);
 
 	$query = "select j.systempriority, j.customerid, j.id, j.startdate, j.starttime, j.timezone,
-			timediff(addtime(j.startdate,j.starttime), convert_tz(now(),'GMT',j.timezone)) as timetostart
+			timediff(addtime(j.startdate,j.starttime), convert_tz(now(),'GMT',j.timezone)) as timetostart, j.jobtypeid
 			from qjob j where j.status='scheduled'
-			order by timetostart, j.systempriority, j.customerid, j.id
+			order by hour(timetostart), minute(timetostart), second(timetostart), j.systempriority, j.customerid, j.id
 			";
 	$res = Query($query,$sharddb);
 	while ($row = DBGetRow($res)) {
@@ -124,14 +130,31 @@ foreach ($shards as $shardid => $sharddb) {
 		if($hours < 0)
 			$days = 0 - $days;
 		$hours = $hours%24;
+		// row 7 is the job type id.
+		// TODO: Use the systempriority once the trigger has been corrected to set this properly.
+		if ($row[7] > 3)
+			$row[7] = 3;
+			
 		$timetorun = implode(":",array($hours,$minutes,$seconds)) . ($days ? " + $days Days" : "");
-		$schedjobs[$row[0]][] = array ($row[1], $customers[$row[1]], $row[2], $row[3], $row[4], $row[5], $timetorun);
+		$schedjobs[$row[7]][($days*24*60*60)+($hours*60*60)+($minutes*60)+$seconds][] = array ($row[1], $customers[$row[1]], $row[2], $row[3], $row[4], $row[5], $timetorun);
 
 	}
 }
 
-include("nav.inc.php");
+///////////////////////////////////////////////////
+// Display
+///////////////////////////////////////////////////
 
+include("nav.inc.php");
+?>
+
+Task dispatch type:&nbsp;
+<select id='dispatchtypeselect' onchange="window.location='customeractivejobs.php?'+this.options[this.selectedIndex].value;">
+<option value='system' <?=($dispatchtype=='system')?"selected":""?>>Asp</option>
+<option value='customer' <?=($dispatchtype=='customer')?"selected":""?>>Flex</option>
+</select>
+
+<?
 
 $prinames = array (1 => "Emergency", 2 => "Attendance", 3 => "General");
 $pricolors = array (1 => "#ff0000", 2 => "#ffff00", 3 => "#0000ff");
@@ -275,7 +298,7 @@ for ($pri = 1; $pri <=3 ; $pri++) {
 		<hr>Scheduled jobs:
 		<table border=1>
 <?
-		$titles = array ("Customer id",
+			$titles = array ("Customer id",
 						"Customer url",
 						"Job id",
 						"Start Date",
@@ -283,9 +306,14 @@ for ($pri = 1; $pri <=3 ; $pri++) {
 						"Timezone",
 						"Time until run"
 					);
-
-		showTable($schedjobs[$pri], $titles, array(1 => "fmt_custurl"));
-
+		ksort($schedjobs[$pri]);
+		$scheddata = array();
+		foreach ($schedjobs[$pri] as $schedstart => $schedjob) 
+			foreach ($schedjob as $job)
+				$scheddata[] = $job;
+		
+		showTable($scheddata, $titles, array(1 => "fmt_custurl"));
+	
 ?>
 		</table>
 <?
