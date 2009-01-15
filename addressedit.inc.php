@@ -4,21 +4,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/table.inc.php");
-include_once("obj/FieldMap.obj.php");
-include_once("obj/Person.obj.php");
-include_once("obj/Address.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("obj/Email.obj.php");
-include_once("obj/Language.obj.php");
-include_once("obj/ListEntry.obj.php");
-include_once("obj/Sms.obj.php");
-include_once("obj/JobType.obj.php");
+require_once("inc/common.inc.php");
+require_once("inc/utils.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/table.inc.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/Person.obj.php");
+require_once("obj/Address.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/Language.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/Sms.obj.php");
+require_once("obj/JobType.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -164,6 +164,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 		} else if (!TrimFormData($f,$s,FieldMap::getFirstNameField()) &&
 				   !TrimFormData($f,$s,FieldMap::getLastNameField())) {
 			error('First Name or Last Name is required');
+		} else if (TrimFormData($f,$s,'zip') && strlen(TrimFormData($f,$s,'zip')) !== 5) {
+			error('Zip Code must contain zero or five digits');
 		} else {
 
 			//submit changes
@@ -302,7 +304,7 @@ if( $reloadform )
 										array("addr2","text",1,50),
 										array("city","text",1,50),
 										array("state","alpha",2,2),
-										array("zip","number",10000,99999)));
+										array("zip","number",0,99999)));
 
 	if($USER->authorize('sendphone')){
 		$x = 0;
