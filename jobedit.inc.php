@@ -182,14 +182,16 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
 			$hassettingsdetailerror = true;
 			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (($completedmode || $submittedmode) && ($job->getSetting('jobcreatedphone') == "1" || $job->getSetting('jobcreatedemail') == "1") &&
+		} else if (($completedmode || $submittedmode) && (($job->getSetting('jobcreatedphone') == "1" && (bool)GetFormData($f, $s, "phonetranslatecheck"))
+				|| ($job->getSetting('jobcreatedemail') == "1" && (bool)GetFormData($f, $s, "emailtranslatecheck"))) &&
 						$expire && strtotime($expire) - (8*86400) < strtotime(GetFormData($f,$s,"startdate"))) {
-			error('The start date for a message created in the job editor may not be rescheduled for more than 7 days past the date it was submitted');
+			error('The start date for a translation message may not be rescheduled for more than 7 days past the date it was submitted');
 			$reloadform = 1;
-		} else if (!$completedmode && $JOBTYPE == "normal" && ((GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create") || (GetFormData($f, $s, "sendemail") && GetFormData($f, $s, "emailradio") == "create"))
+		} else if (!$completedmode && $JOBTYPE == "normal" && ((GetFormData($f, $s, "sendphone") && GetFormData($f, $s, "phoneradio") == "create" && (bool)GetFormData($f, $s, "phonetranslatecheck"))
+				 ||	(GetFormData($f, $s, "sendemail") && GetFormData($f, $s, "emailradio") == "create" && (bool)GetFormData($f, $s, "emailtranslatecheck")))
 				 && (strtotime(GetFormData($f,$s,"startdate"))-(7*86400) > strtotime("today"))) {
 			$hassettingsdetailerror = true;
-			error('The start date must be within 7 days for a message created in the job editor');
+			error('The start date must be within 7 days for a translation message');
 		} else if (QuickQuery("select id from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id != " . ( 0+ $_SESSION['jobid']))) {
 			error('A job named \'' . $name . '\' already exists');
 		} else if ($sendphone && $callerid != "" && strlen($callerid) != 10) {
@@ -437,13 +439,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			if(!$submittedmode && !$completedmode) {
 				//now add any language options
 				foreach (array("phone","email") as $type){
-					if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) == "1" ) {
+					if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) == "1") {						
 						($type == "phone") ? $languages = &$ttslanguages : $languages = &$emaillanguages;
 						foreach($languages as $language) {
 							$language = ucfirst($language);
 							$escapedlanguage = escapehtml($language);
 							$joblanguage = DBFind("JobLanguage","from joblanguage where jobid=" . $job->id . " and language='$language' and type='$type'");
-							if(GetFormData($f, $s, $type . "_$escapedlanguage")){
+							if((bool)GetFormData($f, $s, $type . "translatecheck") && GetFormData($f, $s, $type . "_$escapedlanguage")){
 								$voiceid = NULL;
 								if($type == "phone"){
 									$lclanguage = strtolower($language);
