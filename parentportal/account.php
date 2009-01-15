@@ -27,17 +27,19 @@ if(CheckFormSubmit($f,$s))
 		MergeSectionFormData($f, $s);
 
 		//do check
-		$firstname = GetFormData($f,$s,"firstname");
-		$lastname = GetFormData($f,$s,"lastname");
-		$zipcode = GetFormData($f,$s,"zipcode");
-		$oldpassword = GetFormData($f,$s,"oldpassword");
-		$newpassword1 = GetFormData($f, $s, "newpassword1");
-		$newpassword2 = GetFormData($f, $s, "newpassword2");
-		$notify = GetFormData($f, $s, "notify");
-		$notifysms = GetFormData($f, $s, "notifysms");
-		$sms = GetFormData($f, $s, "sms");
+		$firstname = TrimFormData($f,$s,"firstname");
+		$lastname = TrimFormData($f,$s,"lastname");
+		$zipcode = TrimFormData($f,$s,"zipcode");
+		$oldpassword = TrimFormData($f,$s,"oldpassword");
+		$newpassword1 = TrimFormData($f, $s, "newpassword1");
+		$newpassword2 = TrimFormData($f, $s, "newpassword2");
+		$notify = TrimFormData($f, $s, "notify");
+		$notifysms = TrimFormData($f, $s, "notifysms");
+		$sms = TrimFormData($f, $s, "sms");
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if(strlen($zipcode) < 5){
+			error("ZIP Code must be at least 5 digits long");
 		} else if(strlen($newpassword1) > 0 && strlen($newpassword1) < 5){
 			error("Passwords must be at least 5 characters long");
 		} else if($newpassword1 && $passworderror = validateNewPassword($_SESSION['portaluser']['portaluser.username'], $newpassword1, $firstname, $lastname)){
@@ -95,7 +97,7 @@ if( $reloadform )
 	PutFormData($f, $s, "newpassword1", "", "text");
 	PutFormData($f, $s, "newpassword2", "", "text");
 	PutFormData($f, $s, "oldpassword", "", "text");
-	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "10000", "99999", true);
+	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "0", "99999", true);
 	PutFormData($f, $s, "notify",  ($_SESSION['portaluser']['portaluser.notifytype'] == "message") ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, "notifysms",  ($_SESSION['portaluser']['portaluser.notifysmstype'] == "message") ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, "sms", Phone::format($_SESSION['portaluser']['portaluser.sms']), "phone", "2", "20"); // 20 is the max to accomodate formatting chars
