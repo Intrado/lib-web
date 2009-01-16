@@ -4,6 +4,7 @@ require_once("../obj/Customer.obj.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../obj/Phone.obj.php");
+require_once("../inc/html.inc.php");
 
 if (!$MANAGERUSER->authorized("customercontacts"))
 	exit("Not Authorized");
@@ -32,7 +33,7 @@ if(CheckFormSubmit($f,$s))
 		MergeSectionFormData($f, $s);
 
 		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+			error('There was a problem trying to use your selections', 'Please verify that all required field information has been entered properly');
 		} else {
 			$number = ereg_replace("[^0-9]*","",GetFormData($f, $s, "number"));
 
