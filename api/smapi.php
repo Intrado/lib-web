@@ -768,14 +768,14 @@ class SMAPI{
 					$job->sendphone = false;
 				}
 				if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid) &&
-				QuickQuery("select type from message where id = " . $emailmsgid) == "phone"){
+				QuickQuery("select type from message where id = " . $emailmsgid) == "email"){
 					$job->sendemail = true;
 					$job->emailmessageid = $emailmsgid;
 				} else {
 					$job->sendemail = false;
 				}
-				if(getSystemSetting('_hassms') & $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid) &&
-				QuickQuery("select type from message where id = " . $smsmsgid) == "phone"){
+				if(getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid) &&
+				QuickQuery("select type from message where id = " . $smsmsgid) == "sms"){
 					$job->sendsms = true;
 					$job->smsmessageid = $smsmsgid;
 				} else {
