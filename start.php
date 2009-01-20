@@ -280,11 +280,17 @@ if ($listsdata) {
 			<td class="bottomBorder">This printable PDF training guide teaches product basics in an simple step-by-step format.</td>
 			<td class="bottomBorder"><?=button_bar(button('Training&nbsp;Guide', NULL, "help/getting_started_online.pdf"))?>
 		</tr>
+	<?
+	if ($USER->authorize('createlist')) {
+	?>
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">List:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">Ready to start? Before sending a job you'll need to create a list.</td>
 			<td class="bottomBorder"><?=button_bar(button('Create&nbsp;New&nbsp;List', NULL,"list.php?origin=start&id=new"))?>
 		</tr>
+	<?
+	}
+	?>
 	</table>
 	<?
 	endWindow();
