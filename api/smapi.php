@@ -1282,6 +1282,7 @@ require_once("../obj/AudioFile.obj.php");
 require_once("../obj/Content.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/Job.obj.php");
+require_once("../obj/JobList.obj.php");
 require_once("../obj/Voice.obj.php");
 require_once("../obj/JobLanguage.obj.php");
 require_once("../obj/Phone.obj.php");
