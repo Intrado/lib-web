@@ -18,7 +18,7 @@ if(isset($_GET['wsdl'])){
 	$wsdl = file_get_contents("smapi.wsdl");
 
 	//keyword stored in wsdl for service url is smapiurl
-	$wsdl = preg_replace("[smapiurl]", 'http://' . $_SERVER["SERVER_NAME"] .'/' . $CUSTOMERURL . '/api/',$wsdl);
+	$wsdl = preg_replace("[smapiurl]", 'https://' . $_SERVER["SERVER_NAME"] .'/' . $CUSTOMERURL . '/api/',$wsdl);
 
 	header("Pragma: private");
 	header("Cache-Control: private");
