@@ -170,9 +170,9 @@ buttons(button("Add A Contact", null, "phoneactivation0.php"));
 
 if(isset($contactList) && $contactList){
 
-	$titles = array("pkey" => "ID#",
-					$firstnamefield => "First Name",
+	$titles = array($firstnamefield => "First Name",
 					$lastnamefield => "Last Name",
+					"pkey" => "ID#",
 					"Actions" => "Actions");
 	$formatters = array("Actions" => "contact_actions");
 
