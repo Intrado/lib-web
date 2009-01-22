@@ -2170,10 +2170,6 @@ function setTranslations (html, langstring) {
 				retranslation.value = "";
 				tr.innerHTML = result[i].responseData.translatedText;
 				trexpand.value = result[i].responseData.translatedText;
-				switch(section) {
-					case 'phone': phonetranslationstate = true; break;
-					case 'email': emailtranslationstate = true; break;
-				}
 			}
 		}
 	} else {
@@ -2184,28 +2180,13 @@ function setTranslations (html, langstring) {
 
 		var retranslation = new getObj(section + 'verify_' + trlanguages[0]).obj;
 		retranslation.value = "";
-		switch(section) {
-			case 'phone': phonetranslationstate = true; break;
-			case 'email': emailtranslationstate = true; break;
-		}
 	}
-	if(section == 'phone' && phonesubmitstate && phonetranslationstate) {
-<?if($USER->authorize('sendemail')) { ?>
-		if(isCheckboxChecked('sendemail') && isCheckboxChecked('emailcreate') && isCheckboxChecked('emailtranslatecheck') && !emailtranslationstate) {
-			enablesection('email');
-			emailsubmitstate = true;
-			phonesubmitstate = false;
-			submitTranslations('email');
-			return;
-		}
-<?}?>
-		submitForm('<? echo $f; ?>','send');
+	switch(section) {
+		case 'phone': phonetranslationstate = true; break;
+		case 'email': emailtranslationstate = true; break;
 	}
-<? if($USER->authorize('sendemail')) { ?>
-	if(section == 'email' && emailsubmitstate && emailtranslationstate) {
-		submitForm('<? echo $f; ?>','send');
-	}
-<?}?>
+	if(emailsubmitstate || phonesubmitstate)
+		sendjobconfirm();
 }
 
 function submitTranslations(section) {
@@ -2243,9 +2224,18 @@ function submitTranslations(section) {
 		}
 	}
 
-	var seriallang = serialized.join(";");
-	callbacksection = section;
-	ajax('translate.php',"english=" + encodeURIComponent(text) + "&languages=" + seriallang, setTranslations, seriallang);
+	if(serialized.length != 0){
+		var seriallang = serialized.join(";");
+		callbacksection = section;
+		ajax('translate.php',"english=" + encodeURIComponent(text) + "&languages=" + seriallang, setTranslations, seriallang);
+	} else {
+		switch(section) {
+			case 'phone': phonetranslationstate = true; break;
+			case 'email': emailtranslationstate = true; break;
+		}
+		if(emailsubmitstate || phonesubmitstate)
+			sendjobconfirm();
+	}
 	return false;
 }
 
