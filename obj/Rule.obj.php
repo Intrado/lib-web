@@ -14,14 +14,14 @@ class Rule extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function toSql ($alias = false, $fieldoverride = false, $isjobreport = false) {
+	function toSql ($alias = false, $fieldoverride = false, $isjobreport = false, $ignoreGfield = false) {
 		$val = DBSafe($this->val);
 		$f = ($alias ? "$alias.":"") . ($fieldoverride ? $fieldoverride : $this->fieldnum);
 
 		$sql = " " . $this->logical . " ";
 
 		//check if this needs a subquery
-		if (strpos($this->fieldnum, "g") === 0) {
+		if (!$ignoreGfield && strpos($this->fieldnum, "g") === 0) {
 			if ($isjobreport) {
 				switch ($alias) {
 					case "rp" :
@@ -89,7 +89,7 @@ class Rule extends DBMappedObject {
 				$b = max($values[0] + 0.0,$values[1] + 0.0);
 				$sql .= "($f regexp '[0-9]' and replace($f,'$','') between $s and $b)";
 				break;
-				
+
 			//multisearch
 			case "in":
 				//split the values
@@ -141,7 +141,7 @@ class Rule extends DBMappedObject {
 		}
 
 		//see if we need to close off a subquery parens
-		if (strpos($this->fieldnum, "g") === 0) {
+		if (!$ignoreGfield && strpos($this->fieldnum, "g") === 0) {
 			$sql .= ")";
 		}
 
@@ -177,7 +177,7 @@ class Rule extends DBMappedObject {
 	}
 }
 
-$RULE_OPERATORS = array( 
+$RULE_OPERATORS = array(
 	"text" => array (
 		'eq' => 'equals',
 		'ne' => 'does not equal',

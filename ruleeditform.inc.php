@@ -64,7 +64,7 @@ foreach ($fieldmaps as $fieldmap) {
 			if(showmode("text")) {
 				echo '<td class="border" nowrap>' . $RULE_OPERATORS['text'][$rule->op] . '</td><td class="border">' . ($rule->val != "" ? $rule->val : '&nbsp;') . '</td>';
 			} elseif(showmode("reldate")) {
-				
+
 				echo '<td class="border" nowrap>' . $RULE_OPERATORS['reldate'][$rule->op] . '</td>';
 				if ($rule->op == "reldate") {
 					echo '<td class="border">' . $RELDATE_OPTIONS[$rule->val] . '</td>';
@@ -262,7 +262,7 @@ foreach ($fieldmaps as $fieldmap) {
 				NewFormItem($f, $s, "newrulevalue_" . $fieldnum, "selectoption",$value,$name);
 			}
 			NewFormItem($f, $s, "newrulevalue_" . $fieldnum, "selectend");
-			
+
 			echo '</div></td><td nowrap><div dependson="reldate_val2" style="display: none;">';
 			PutFormData($f,$s,"newrulevalue2_" . $fieldnum,"","text");
 			NewFormItem($f,$s,"newrulevalue2_" . $fieldnum,"text",10,20,"onfocus=\"this.select();lcs(this,true,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,true)\"");
@@ -286,7 +286,7 @@ foreach ($fieldmaps as $fieldmap) {
 			}
 
 			$limit = DBFind('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $USER->id and fieldnum = '$fieldnum'");
-			$limitsql = $limit ? $limit->toSQL(false,"value") : "";
+			$limitsql = $limit ? $limit->toSQL(false, "value", false, true) : "";
 			$query = "select value from persondatavalues
 						where fieldnum='$fieldnum' $limitsql order by value";
 
