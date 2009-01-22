@@ -179,9 +179,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if ($JOBTYPE == "normal" &&  (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) < strtotime("today")) && !$completedmode){
 			$hassettingsdetailerror = true;
 			error('The end date has already passed. Please correct this problem before proceeding');
-		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
+		} else if ($JOBTYPE == "normal" && (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")+1800 ) && !$completedmode) {
 			$hassettingsdetailerror = true;
-			error('The end time has already passed. Please correct this problem before proceeding');
+			error('The end time can not be less than 30 minutes from now. Please correct this problem before proceeding');
 		} else if (($completedmode || $submittedmode) && (($job->getSetting('jobcreatedphone') == "1" && (bool)GetFormData($f, $s, "phonetranslatecheck"))
 				|| ($job->getSetting('jobcreatedemail') == "1" && (bool)GetFormData($f, $s, "emailtranslatecheck"))) &&
 						$expire && strtotime($expire) - (8*86400) < strtotime(GetFormData($f,$s,"startdate"))) {
