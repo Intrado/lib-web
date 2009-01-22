@@ -2274,19 +2274,19 @@ function sendjobconfirm() {
 	scroll(0,0);
 <? if($USER->authorize('sendphone')) { ?>
 	if(isCheckboxChecked('sendphone') && isCheckboxChecked('phonecreate') && isCheckboxChecked('phonetranslatecheck') && !phonetranslationstate) {
-		enablesection('phone');	
 		phonesubmitstate = true;
 		submitTranslations('phone');
 	}
 <?}?>
 <? if($USER->authorize('sendemail')) { ?>
 	if(!phonesubmitstate && isCheckboxChecked('sendemail') && isCheckboxChecked('emailcreate') && isCheckboxChecked('emailtranslatecheck') && !emailtranslationstate) {
-		enablesection('email');
 		emailsubmitstate = true;
 		submitTranslations('email');
 	}
 <?}?>
 	if(!phonesubmitstate && !emailsubmitstate) {
+		enablesection('email');
+		enablesection('phone');	
 		submitForm('<? echo $f; ?>','send');
 	} else {
 		show('translationstatus');
