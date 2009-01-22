@@ -59,6 +59,10 @@ $VALIDJOBTYPES = JobType::getUserJobTypes();
 //this array is to be used only to display the info
 $infojobtypes = DBFindMany("JobType", "from jobtype");
 
+$allowAutoTranslate = false;
+if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {
+	$allowAutoTranslate = isset($SETTINGS['translation']['disableAutoTranslate'])?(!$SETTINGS['translation']['disableAutoTranslate']):true;
+}
  //Get available languages
 $alllanguages = QuickQueryList("select name from language");
 $emaillanguages = array_intersect($alllanguages,array("Arabic", "Bulgarian", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Indonesian", "Italian", "Japanese", "Korean", "Latvian", "Lithuanian", "Norwegian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Slovenian", "Spanish", "Swedish", "Ukrainian", "Vietnamese"));
@@ -439,7 +443,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			if(!$submittedmode && !$completedmode) {
 				//now add any language options
 				foreach (array("phone","email") as $type){
-					if ($USER->authorize('sendmulti') && $job->getSetting("jobcreated" . $type) == "1") {						
+					if ($allowAutoTranslate && $job->getSetting("jobcreated" . $type) == "1") {						
 						($type == "phone") ? $languages = &$ttslanguages : $languages = &$emaillanguages;
 						foreach($languages as $language) {
 							$language = ucfirst($language);
@@ -913,7 +917,7 @@ if ($JOBTYPE == "normal") {
 	if ($submittedmode)
 	buttons(submit($f, $s, 'Save'));
 	else
-	buttons(submit($f, $s, 'Save For Later'),button('Proceed To Confirmation',($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"sendjobconfirm();":"submitForm('$f','send');"));
+	buttons(submit($f, $s, 'Save For Later'),button('Proceed To Confirmation',($allowAutoTranslate)?"sendjobconfirm();":"submitForm('$f','send');"));
 } else {
 	buttons(submit($f, $s, 'Save'));
 }
@@ -1196,13 +1200,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('phonecreatemessage');show('phoneselectmessage'); show('phonemultilingualoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('phone',false);automatictranslation('phone');":"") . "show('phonecreatemessage');hide('phoneselectmessage');hide('phonemultilingualoption'); }\""));	?> Create a text-to-speech message
+<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('phone',false);automatictranslation('phone');":"") . "show('phonecreatemessage');hide('phoneselectmessage');hide('phonemultilingualoption'); }\""));	?> Create a text-to-speech message
 				<div id='phoneselectmessage' style="display: block">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
 				<div id='phonecreatemessage' style="white-space: nowrap;display: none">
 					Type Your English Message
-<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating' && !empty($ttslanguages)) { ?>
+<?					if($allowAutoTranslate && !empty($ttslanguages)) { ?>
 					| <?  NewFormItem($f,$s,"phonetranslatecheck","checkbox",1, NULL,"id='phonetranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('phone')\"")); ?>
 					Automatically translate to other languages<table style="display: inline"><tr><td><?= help('Job_AutomaticallyTranslate',NULL,"small"); ?></td></tr></table>
 <? } ?>
@@ -1217,7 +1221,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<? NewFormItem($f, $s, "voiceradio", "radio", NULL, "female","id='voiceradio_female' checked " . ($submittedmode ? "DISABLED" : "")); ?> Female
 					<? NewFormItem($f, $s, "voiceradio", "radio", NULL, "male","id='voiceradio_male' " . ($submittedmode ? "DISABLED" : "")); ?> Male
 					<br />
-<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
+<?					if($allowAutoTranslate) { ?>
 					<table width="100%">
 					<tr>
 					<td style="white-space:nowrap;">
@@ -1391,7 +1395,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
 <?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('emailcreatemessage');show('emailselectmessage'); show('emailmultilingualoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($USER->authorize('sendmulti') && $JOBTYPE != 'repeating')?"toggletranslations('email',false);automatictranslation('email');":"") . "show('emailcreatemessage');hide('emailselectmessage');hide('emailmultilingualoption'); }\""));	?> Create a message
+<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('email',false);automatictranslation('email');":"") . "show('emailcreatemessage');hide('emailselectmessage');hide('emailmultilingualoption'); }\""));	?> Create a message
 				<div id='emailselectmessage' style="display: block">
 <?					message_select('email',$f, $s,"emailmessageid", "id='emailmessageid'");?>
 				</div>
@@ -1410,7 +1414,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					</table>
 					 </div>
 					Type Your English Message
-<?					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating' && !empty($emaillanguages)) { ?>
+<?					if($allowAutoTranslate && !empty($emaillanguages)) { ?>
 					| <?  NewFormItem($f,$s,"emailtranslatecheck","checkbox",1, NULL,"id='emailtranslatecheck' " . ($submittedmode ? "DISABLED" : " onclick=\"automatictranslation('email')\"")); ?>
 					Automatically translate to other languages<table style="display: inline"><tr><td><?= help('Job_AutomaticallyTranslate',NULL,"small"); ?></td></tr></table>
 <? } ?>
@@ -1420,7 +1424,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							<td><? NewFormItem($f,$s,"emailtextarea", "textarea", 50, 5,"id='emailtextarea' onkeyup=\"emailtranslationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
 						</tr>
 					</table>
-<? 					if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {  ?>
+<? 					if($allowAutoTranslate) {  ?>
 					<div id='emailtranslationsshow' style="white-space:nowrap;display: none">
 						<? button_bar(button('Show Translations', "toggletranslations('email',true);submitTranslations('email');"));?>
 					</div>
@@ -1948,7 +1952,7 @@ for(var i=0;i<3;i++){
 </script>
 
 <? // These scripts contol the translation ?>
-<? if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') { ?>
+<? if($allowAutoTranslate) { ?>
 <script src='script/json2.js'></script>
 <script>
 <?
