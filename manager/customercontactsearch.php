@@ -83,7 +83,7 @@ if( $reloadform )
 {
 	ClearFormData($f);
 	PutFormData($f, $s, "type", "phone");
-	PutFormData($f, $s, "number", "", "phone");
+	PutFormData($f, $s, "number", "", "phone", "", "", true);
 	PutFormData($f, $s, "Submit", "");
 
 }
