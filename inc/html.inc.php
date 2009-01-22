@@ -150,7 +150,7 @@ function button_bar() {
 function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL) {
 	if(!$inc) $inc = 5;
 	if(!$start) $start = '12:00 am';
-	if(!$stop) $stop = '11:45 pm';
+	if(!$stop) $stop = '11:55 pm';
 	$current = strtotime($start);
 	$end = strtotime($stop);
 	$customtime = GetFormData($form, $section, $field);
