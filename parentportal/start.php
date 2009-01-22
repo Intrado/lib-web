@@ -129,19 +129,28 @@ if(isset($contactList) && $contactList){
 		$counter++;
 		$data = $allData[$personid];
 		$person = new Person($personid);
+		// if person id deleted and has no messages, do not show
+		if ($person->deleted && count($data) == 0) continue;
+
 		startWindow(escapehtml($person->$firstnameField) . " " . escapehtml($person->$lastnameField), 'padding: 3px;', true);
-		$scroll="";
-		if(count($data) > 6)
-			$scroll = 'class="scrollTableContainer"';
+		if (count($data) == 0) {
 ?>
-		<div <?=$scroll?>>
-			<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="tableid<?=$counter?>">
+			<div>No Messages</div>
 <?
-				showTable($data, $titles, $formatters);
+		} else {
+			$scroll="";
+			if(count($data) > 6)
+				$scroll = 'class="scrollTableContainer"';
 ?>
-			</table>
-		</div>
+			<div <?=$scroll?>>
+				<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="tableid<?=$counter?>">
 <?
+					showTable($data, $titles, $formatters);
+?>
+				</table>
+			</div>
+<?
+		}
 		endWindow();
 ?>
 		<br>
