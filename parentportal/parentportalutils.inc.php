@@ -1,12 +1,14 @@
 <?
 
 function getContactIDs($portaluserid){
-	return QuickQueryList("select personid from portalperson where portaluserid = '$portaluserid' order by personid");
+	$firstnameField = FieldMap::getFirstNameField();
+	return QuickQueryList("select personid from portalperson join person on portalperson.personid = person.id where portaluserid = '$portaluserid' order by person.$firstnameField");
 }
 
 function getContacts($portaluserid) {
+	$firstnameField = FieldMap::getFirstNameField();
 	$contactList = getContactIDs($portaluserid);
-	return resequence(DBFindMany("Person", "from person where id in ('" . implode("','", $contactList) . "') and not deleted order by id"), "pkey");
+	return resequence(DBFindMany("Person", "from person where id in ('" . implode("','", $contactList) . "') and not deleted order by $firstnameField"), "pkey");
 }
 
 //put form data for contact details
