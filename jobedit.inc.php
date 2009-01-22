@@ -685,9 +685,7 @@ if( $reloadform )
 				PutFormData($f,$s,"phone_$language",1,"bool",0,1);
 				if ($joblang->translationeditlock != 0 || $expired === false) {
 					if($joblang->messageid && $part = DBFind("MessagePart","from messagepart where messageid=$joblang->messageid and sequence = 0")) {
-						$body = escapehtml($part->txt);
-						PutFormData($f,$s,"translationtext_$language",$body,"text","nomin","nomax",false);
-						PutFormData($f,$s,"phoneexpand_$language",$body,"text","nomin","nomax",false);
+						PutFormData($f,$s,"phoneexpand_$language",$part->txt,"text","nomin","nomax",false);
 						PutFormData($f,$s,"phoneedit_$language",$joblang->translationeditlock,"bool",0,1);
 					}
 				}
@@ -700,9 +698,7 @@ if( $reloadform )
 				PutFormData($f,$s,"email_$language",1,"bool",0,1);
 				if ($joblang->translationeditlock || $expired === false) {
 					if($joblang->messageid && $part = DBFind("MessagePart","from messagepart where messageid=$joblang->messageid and sequence = 0")) {
-						$body = escapehtml($part->txt);
-						PutFormData($f,$s,"emailtext_$language",$body,"text","nomin","nomax",false);
-						PutFormData($f,$s,"emailexpand_$language",$body,"text","nomin","nomax",false);
+						PutFormData($f,$s,"emailexpand_$language",$part->txt,"text","nomin","nomax",false);
 						PutFormData($f,$s,"emailedit_$language",$joblang->translationeditlock,"bool",0,1);
 					}
 				}
