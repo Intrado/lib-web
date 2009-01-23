@@ -42,5 +42,6 @@ put="localhost,80,/foobar/xxx-put.php"
 [translation]
 apikey="ABQIAAAAsHD6V_IqbLuYzx5sdmQ-TxQg47NEwCDk0BAJwz_RiAOR27B3BhRP2lCFovHb2pUntvaPoLjZtfK4gQ"
 referer="http://asp.schoolmessenger.com"
+disableAutoTranslate=false
 
 ;*/?>
