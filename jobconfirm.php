@@ -76,24 +76,28 @@ if (count($multilistids) > 0) {
 	}
 }
 
-
-if ($totalpersons == 0)
-	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
-
+$blocksubmit = false;
+if ($totalpersons == 0){
+	$blocksubmit = true;
+	error("The list you've selected does not have any people in it","Click 'Modify Job Settings' to return to the Job configuration page");
+}
 $warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
 $warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
 if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
 	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) ) && $job->phonemessageid != null)
 	{
+		error("........................................"); // Spacing for readability between error messages
 		error("WARNING: The call window for this job is set for: ". date("g:i a", strtotime($job->starttime)) . " - " . date("g:i a", strtotime($job->endtime)));
 		error("These times fall outside the range of typical calling hours");
 	}
 
-
-if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) <= strtotime("now"))) {
-	error('The end time has already passed. Please correct this problem before proceeding');
+if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now")+1800)) {
+	$blocksubmit = true;
+	error("........................................");// Spacing for readability between error messages
+	error("The end time can not be less than 30 minutes from now","Click 'Modify Job Settings' to return to the Job configuration page.");
 }
 if($jobtype->systempriority == 1){
+	error("........................................");// Spacing for readability between error messages
 	error("WARNING:  Emergency Notifications are reserved for situations that are time-critical and require action such as school closures and temporary changes to transportation schedules or that have immediate, severe or likely impact on safety");
 }
 
@@ -194,13 +198,13 @@ $s = "send";
 
 include_once("nav.inc.php");
 
-if ($totalpersons > 0)
+if (!$blocksubmit)
 	buttons(button('Save For Later', null, 'jobs.php'),
 			button('Modify Job Settings',null, 'job.php'),
 			button('Submit Job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
-else
-	buttons(button('Cancel',null, 'job.php'));
-
+else {
+	buttons(button('Modify Job Settings',null, 'job.php'));
+}
 
 startWindow("Confirmation &amp; Submit");
 ?>
