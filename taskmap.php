@@ -167,7 +167,9 @@ if ($datatype == "person") {
 $actions = array('copy' => "Copy",
 				'staticvalue' => "Static Value",
 				'curdate' => "Current Date",
+				'numeric' => "Numeric",
 				'currency' => "Currency",
+				'currencyleadingzero' => "Currency with leading zero",
 				'date' => "Date",
 				'lookup' => "Data Lookup");
 //scan the file
