@@ -167,6 +167,7 @@ if(CheckFormSubmit($f,$s))
 				$callerid = false;
 			if ($USER->authorize('setcallerid')) {
 				$USER->setSetting("callerid",$callerid);
+				/*CSDELETEMARKER_START*/
 				// if customer has callback feature, and
 				if (getSystemSetting('_hascallback', false)) {
 					$radio = "0";
@@ -174,6 +175,7 @@ if(CheckFormSubmit($f,$s))
 						$radio = "1";
 					$USER->setSetting('prefermycallerid', $radio);
 				}
+				/*CSDELETEMARKER_END*/
 			}
 
 
@@ -267,12 +269,13 @@ if( $reloadform )
 	PutFormData($f, $s, 'maxjobdays', $maxjobdays, 'number', 1, 7, true);
 
 	// if callerid is blank
-		// if _hascallback feature, then use customer inboundnumber, aka toll free
-		// else no callback, use customer default callerid
 	//default to empty string because if set to empty string, setting will not be set and system default will be used
 	$callerid = $USER->getSetting("callerid","");
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
 
+	/*CSDELETEMARKER_START*/
+		// if _hascallback feature, then use customer inboundnumber, aka toll free
+		// else no callback, use customer default callerid
 	// if the user prefers their callerid, or they have no setting preference but have set callerid then default to "byuser"
 	if (($USER->getSetting("prefermycallerid","0") == "1") ||
 		($USER->getSetting("prefermycallerid") === false && $callerid != "")) {
@@ -281,7 +284,7 @@ if( $reloadform )
 		$radio = "bydefault"; // use customer inboundnumber (aka toll free number)
 	}
 	PutFormData($f, $s, "radiocallerid", $radio);
-
+	/*CSDELETEMARKER_END*/
 
 	PutFormData($f, $s, "_brandtheme", $USER->getSetting('_brandtheme', getSystemSetting('_brandtheme')), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", $USER->getSetting('_brandratio', getSystemSetting('_brandratio')), "text", "nomin", "nomax", true);
@@ -467,6 +470,7 @@ startWindow('User Information');
 							</tr>
 <?
 if ($USER->authorize('setcallerid')) {
+	/*CSDELETEMARKER_START*/
 	if (getSystemSetting('_hascallback', false)) {
 ?>
 							<tr>
@@ -479,6 +483,7 @@ if ($USER->authorize('setcallerid')) {
 							</tr>
 <?
 	} else {
+	/*CSDELETEMARKER_END*/
 ?>
 							<tr>
 								<td>Caller&nbsp;ID <?= help('Account_CallerID',NULL,"small"); ?></td>
@@ -491,7 +496,9 @@ if ($USER->authorize('setcallerid')) {
 								</td>
 							</tr>
 <?
- 	}
+	/*CSDELETEMARKER_START*/
+	}
+	/*CSDELETEMARKER_END*/
 }
 ?>
 						</table>
