@@ -24,7 +24,7 @@ $hasportal = false;
 $hassurvey = true;
 $hascallback = false;
 $timeslice = 450;
-$hostname = 'default';
+$customerurl = 'default';
 $shard = 'shard1';
 $defaultbrand = 'SchoolMessenger';
 $logofile = @file_get_contents("../img/logo_small.gif");
@@ -47,8 +47,8 @@ if (!$authdb = mysql_connect('localhost', $argv[1], $argv[2]))
 
 mysql_select_db('authserver',$authdb);
 
-if (QuickQuery("SELECT COUNT(*) FROM customer id=1", $authdb)) 
-	die("Customer 1 already exists.");
+if (QuickQuery("SELECT COUNT(*) FROM customer", $authdb))
+	die("Customer(s) already exists.");
 
 //choose shard info based on selection
 $query = "select id, dbhost, dbusername, dbpassword from shard where name = '$shard'";
@@ -60,7 +60,7 @@ $sharduser = $shardinfo['dbusername'];
 $shardpass = $shardinfo['dbpassword'];
 
 $dbpassword = genpassword();
-					
+
 while (!trim($displayname)) {
 	echo("Customer Display Name: ");
 	$displayname = trim(fgets(STDIN));
@@ -75,25 +75,20 @@ while (!trim($timezone)) {
 			echo "   $tz\n";
 		$timezone = '';
 	}
-	
+
 }
 
 while (!trim($callerid)) {
 	echo("Default Caller ID: ");
 	$callerid = trim(fgets(STDIN));
-	if (strlen($callerid) < 10) {
+	if (strlen($callerid) !== 10) {
 		echo "\nINVALID Callerid!\n";
 		$callerid = '';
 	}
 }
 
-while (!trim($areacode)) {
-	echo("Default Area Code: ");
-	$areacode = trim(fgets(STDIN));
-}
-
-$query = "insert into customer (urlcomponent, shardid, dbpassword,enabled) values
-	('" . DBSafe($hostname, $authdb) . "','$shardid', '$dbpassword', '1')";
+$query = "insert into customer (urlcomponent, shardid, dbpassword, enabled) values
+	('" . DBSafe($customerurl, $authdb) . "','$shardid', '$dbpassword', '1')";
 QuickUpdate($query, $authdb) or die("failed to insert customer into auth server");
 
 $customerid = mysql_insert_id();
@@ -160,17 +155,17 @@ $query = "INSERT INTO `jobtypepref` (`jobtypeid`,`type`,`sequence`,`enabled`) VA
 
 QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
 
-$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
+$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $customerurl . "/survey/";
 $query = "INSERT INTO `setting` (`name`, `value`) VALUES
 	('maxphones', '$maxphones'),
 	('maxemails', '$maxemails'),
 	('maxsms', '$maxsms'),
 	('retry', '$retry'),
 	('disablerepeat', '0'),
-	('surveyurl', ''),
+	('surveyurl', '" . DBSafe($surveyurl, $newdb) . "'),
 	('displayname', '" . DBSafe($displayname, $newdb) . "'),
 	('timezone', '" . DBSafe($timezone, $newdb) . "'),
-	('callerid', '$callerid'),	
+	('callerid', '$callerid'),
 	('defaultareacode', '$areacode'),
 	('autoreport_replyname', ''),
 	('autoreport_replyemail', ''),
