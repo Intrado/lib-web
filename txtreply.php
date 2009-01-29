@@ -26,6 +26,10 @@ $body="";
 $line = date("Y-m-d H:i:s,");
 $sourceaddress = trim($_GET["SourceAddr"]);
 $message = strtolower($_GET["MessageText"]);
+$message = str_replace("\n"," ",$message);
+$message = str_replace("\r"," ",$message);
+$message = trim($message);
+
 $subject = "SMS from $sourceaddress: " . $_GET['MessageText'];
 
 foreach ($_GET as $k => $v) {
@@ -57,7 +61,8 @@ $splitmessage[0] === "schooldemo") {
 //check to see if this txt message has any of our keywords
 $haskeyword = false;
 foreach ($keywords as $keyword) {
-	if ($splitmessage[0] === $keyword) {
+	if ($splitmessage[0] === $keyword || $splitmessage[0] === "$keyword!") {
+		//echo "Keyword found. \n";// For testing
 		$haskeyword = true;
 	}
 }
