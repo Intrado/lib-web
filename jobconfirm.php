@@ -86,15 +86,15 @@ $warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_lat
 if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
 	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) ) && $job->phonemessageid != null)
 	{
-		error("........................................"); // Spacing for readability between error messages
 		error("WARNING: The call window for this job is set for: ". date("g:i a", strtotime($job->starttime)) . " - " . date("g:i a", strtotime($job->endtime)));
 		error("These times fall outside the range of typical calling hours");
 	}
-
-if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now")+1800)) {
+if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now"))) {
 	$blocksubmit = true;
-	error("........................................");// Spacing for readability between error messages
-	error("The end time can not be less than 30 minutes from now","Click 'Modify Job Settings' to return to the Job configuration page.");
+	error("The end time has passed","Click 'Modify Job Settings' to return to the Job configuration page");
+} else if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now")+1800)) {
+	$blocksubmit = true;
+	error("The end time can not be less than 30 minutes from now","Click 'Modify Job Settings' to return to the Job configuration page");
 }
 if($jobtype->systempriority == 1){
 	error("........................................");// Spacing for readability between error messages
