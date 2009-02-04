@@ -31,7 +31,7 @@ include_once("obj/Sms.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendprint') && !$USER->authorize('sendsms')) {
+if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendsms')) {
 	redirect('unauthorized.php');
 }
 
@@ -107,7 +107,6 @@ if($jobtype->systempriority == 1){
 $joblangs = array();
 $joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
 $joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
-$joblangs['print'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'print' and jobid = " . $job->id);
 $joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $job->id);
 
 
@@ -373,31 +372,6 @@ echo escapehtml($emailmessage->name);
 		</td>
 	</tr>
 
-<? } ?>
-<? if(strpos($job->type,"print") !== false) { ?>
-	<tr valign="top">
-		<th align="right" valign="top" class="windowRowHeader">Print</th>
-		<td>
-			<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				<tr>
-					<td class="bottomBorder"  width="30%" >Default Message </td>
-					<td class="bottomBorder" >
-<?
-$printmessage = new Message($job->printmessageid);
-echo escapehtml($printmessage->name);
-?>
-					</td>
-				</tr>
-<? if($USER->authorize('sendmulti')) { ?>
-
-				<tr>
-					<td>Multilingual message options </td>
-					<td><? alternate('print'); ?></td>
-				</tr>
-<? } ?>
-			</table>
-		</td>
-	</tr>
 <? } ?>
 <? if(strpos($job->type,"sms") !== false) { ?>
 	<tr valign="top">
