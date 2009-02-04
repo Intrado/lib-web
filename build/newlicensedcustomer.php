@@ -104,7 +104,7 @@ mysql_select_db($newdbname,$newdb)
 	or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
 
 QuickUpdate("drop user '$newdbname'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
-QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
+QuickUpdate("create user '$newdbname'@'localhost' identified by '$dbpassword'", $newdb);
 QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'@'localhost'", $newdb);
 
 $tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
