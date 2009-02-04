@@ -5,14 +5,6 @@
 host="localhost:8088"
 path="/xmlrpc"
 
-;optional seperate server for outbound notifications
-;[dmapidb]
-;persistent=true
-;host="localhost"
-;user="root"
-;pass=""
-;db="commsuite"
-
 [feature]
 is_commsuite=true
 is_ldap=false
