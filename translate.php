@@ -83,6 +83,8 @@ require_once("inc/common.inc.php");
 			} else {
 				$decoded->responseData->translatedText = html_entity_decode($decoded->responseData->translatedText,ENT_QUOTES,"UTF-8");
 			}
+       	} else {
+			error_log("Google Translation Error: " . $response);
        	}
        	echo json_encode($decoded);
        	//$end = microtime(true);
