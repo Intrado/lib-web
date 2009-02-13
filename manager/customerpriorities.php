@@ -49,14 +49,17 @@ if(CheckFormSubmit($f, 'new')) {
 	{
 		MergeSectionFormData($f, $s);
 
+		$priority = GetFormData($f, $s, 'priority') + 0;
+
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		} else if ($priority !== 1 && $priority !== 2) {			
+			error('Priority must be between 0 and 2, 0 for Emergency and 2 for High Priority');		
 		} else {
-
 			if(GetFormData($f, $s, 'newname') != ""){
 				$name = DBSafe(GetFormData($f, $s, 'newname'));
 				QuickUpdate("insert into jobtype(name, systempriority, issurvey) values
-							('$name', '2', '0')", $custdb);
+							('$name', $priority, '0')", $custdb);
 				redirect();
 			} else {
 				error("You cannot add a job type that has a blank name");
@@ -72,6 +75,7 @@ if($reload){
 	ClearFormData($f);
 	PutFormData($f, $s, 'newname', "", 'text');
 	PutFormData($f, 'new', 'add', '');
+	PutFormData($f,$s,'priority', 2, "number");
 }
 
 //////////////////////////////////////////
@@ -114,7 +118,14 @@ NewForm($f);
 ?>
 	<tr>
 		<td><? NewFormItem($f, $s, 'newname', 'text', 20)?></td>
-		<td>High Priority</td>
+		<td>
+		<?
+			NewFormItem($f, $s, 'priority', 'selectstart');
+			NewFormItem($f, $s, 'priority', 'selectoption', 'Energency', 1);
+			NewFormItem($f, $s, 'priority', 'selectoption', 'High Priority', 2);
+			NewFormItem($f, $s, 'priority', 'selectend');
+		?>
+		</td>
 		<td>No</td>
 		<td><? NewFormItem($f, 'new', 'add', 'submit')?></td>
 
