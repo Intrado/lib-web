@@ -61,7 +61,7 @@ $splitmessage[0] === "schooldemo") {
 //check to see if this txt message has any of our keywords
 $haskeyword = false;
 foreach ($keywords as $keyword) {
-	if ($keyword == substr($splitmessage[0], 0, strlen($keyword))   ) {
+	if (stripos($splitmessage[0],$keyword) === 0) {
 		//echo "Keyword found. \n";// For testing
 		$haskeyword = true;
 	}
