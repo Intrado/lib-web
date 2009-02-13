@@ -298,9 +298,3 @@ UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,edit
 -- everyone else gets full perms by default
 UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,editpriorities,customercontacts,users,imports,editimportalerts,lockedusers,smsblock,activejobs,editdm' where id!=1;
 
--- end of ASP_6-2 release
-
-ALTER TABLE `sessiondata` DROP `data`;
-
-
-
