@@ -34,31 +34,16 @@ function getHttpResponseContents ($fp) {
 
 function contentGet ($cmid, $base64 = false) {
 	global $SETTINGS;
-	if (!$SETTINGS['content']['externalcontent']) {
-		$c = new Content($cmid);
-		if (strlen($c->data) > 0) {
-			$contenttype = $c->contenttype;
-			if (!$base64)
-				$data = base64_decode($c->data);
-			else
-				$data = $c->data;
-			return array($contenttype,$data);
-		}
-
-	} else {
-		list($fp,$server) = connectToContentServer("get");
-		list($host,$port,$path) = $server;
-		if ($fp) {
-			$req = "GET " . $path . "?cmid=$cmid" . " HTTP/1.0\r\nConnection: close\r\n\r\n";
-			if (fwrite($fp,$req))
-				$data = getHttpResponseContents($fp);
-				fclose($fp);
-				if (!$base64)
-					return $data;
-				else
-					return base64_encode($data);
-		}
+	$c = new Content($cmid);
+	if (strlen($c->data) > 0) {
+		$contenttype = $c->contenttype;
+		if (!$base64)
+			$data = base64_decode($c->data);
+		else
+			$data = $c->data;
+		return array($contenttype,$data);
 	}
+
 	return false;
 }
 
@@ -66,43 +51,18 @@ function contentPut ($filename,$contenttype, $base64 = false) {
 	global $SETTINGS;
 	$result = false;
 
-	if (!$SETTINGS['content']['externalcontent']) {
-		$content = new Content();
+	$content = new Content();
 
-		if (!$base64)
-			$content->data = base64_encode(file_get_contents($filename));
-		else
-			$content->data = file_get_contents($filename);
+	if (!$base64)
+		$content->data = base64_encode(file_get_contents($filename));
+	else
+		$content->data = file_get_contents($filename);
 
-		$content->contenttype = $contenttype;
-		if ($content->update()) {
-			$result = $content->id;
-		}
-	} else {
-		if (is_file($filename) && is_readable($filename) && ($filesize = filesize($filename)) > 0) {
-			if ($fp_file = fopen($filename,"r")) {
-
-				list($fpc,$server) = connectToContentServer("put");
-				list($host,$port,$path) = $server;
-				if ($fpc) {
-					$req = "POST " . $path . " HTTP/1.0\r\nContent-Length: $filesize\r\nContent-Type: $contenttype\r\nConnection: close\r\n\r\n";
-					fwrite($fpc,$req);
-
-					if (!$base64)
-						$data = file_get_contents($filename);
-					else
-						$data = base64_decode(file_get_contents($filename));
-
-					fwrite($fpc,$data);
-
-					$result = getHttpResponseContents($fpc);
-					$result = (int)$result[1];
-					fclose($fpc);
-				}
-				fclose($fp_file);
-			}
-		}
+	$content->contenttype = $contenttype;
+	if ($content->update()) {
+		$result = $content->id;
 	}
+	
 	return $result;
 }
 
