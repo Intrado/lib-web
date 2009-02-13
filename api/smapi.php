@@ -331,7 +331,7 @@ class SMAPI{
 				return $result;
 			}
 			$audiofile = new AudioFile();
-			if(QuickQuery("select count(*) from audiofile where name = '" . $name . "' and not deleted")){
+			if(QuickQuery("select count(*) from audiofile where name = '" . DBsafe($name) . "' and not deleted")){
 				$audiofile->name = $name . " - " . date("M j, Y G:i:s");
 			} else {
 				$audiofile->name = $name;
