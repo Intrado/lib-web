@@ -715,21 +715,19 @@ if( $reloadform )
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
 
 	// if job callerid is blank
-	$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-	if (($job->getSetting("prefermycallerid","0") == "1") ||
-		($job->getSetting("prefermycallerid") === false && $USER->getSetting("prefermycallerid","0") != "0" && $USER->getSetting("callerid","") != "")) {
-
-		$callerid = $job->getOptionValue("callerid");
-	/*CSDELETEMARKER_START*/
-		// if _hascallback feature, then use customer inboundnumber, aka toll free
-		// else no callback, use customer default callerid
-		$radio = "byuser";
-	} else {
+	if( !$job->getOptionValue("callerid") || 
+		(getSystemSetting('_hascallback', false) && $job->getSetting("prefermycallerid","0") == "0")) {
+		$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
 		$radio = "bydefault"; // customer inboundnumber, aka toll free number
-	/*CSDELETEMARKER_END*/
+	} else {
+		$callerid = $job->getOptionValue("callerid");
+		$radio = "byuser";
 	}
+
 	/*CSDELETEMARKER_START*/
-	PutFormData($f, $s, "radiocallerid", $radio);
+	if (getSystemSetting('_hascallback', false)) {
+		PutFormData($f, $s, "radiocallerid", $radio);
+	}
 	/*CSDELETEMARKER_END*/
 	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
 
