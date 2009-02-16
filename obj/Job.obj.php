@@ -127,7 +127,9 @@ class Job extends DBMappedObject {
 		$newjob->assigned = NULL;
 		$newjob->finishdate = NULL;
 		$newjob->deleted = 0; // copy archived job is ok so we must set this to undeleted
-
+		$newjob->cancelleduserid = NULL;
+		$newjob->percentprocessed = 0;
+		
 		$newjob->createdate = QuickQuery("select now()");
 
 		//refresh the dates to present
