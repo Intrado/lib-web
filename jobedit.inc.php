@@ -2210,14 +2210,17 @@ function submitRetranslation(section,language) {
 	return false;
 }
 function enablesection(section) {
-	languages = phonelanguages;
-	if(section == 'email')
-		languages = emaillanguages;
-
-	for (i = 0; i < languages.length; i++) {
-		var trexpand = new getObj(section + 'expand_' + languages[i]).obj;
-		trexpand.disabled = false;
-	}
+	try
+	{			
+		languages = phonelanguages;
+		if(section == 'email')
+			languages = emaillanguages;
+	
+		for (i = 0; i < languages.length; i++) {
+			var trexpand = new getObj(section + 'expand_' + languages[i]).obj;
+			trexpand.disabled = false;
+		}
+	} catch(err) {}
 }
 function sendjobconfirm() {
 	phonesubmitstate = false;
