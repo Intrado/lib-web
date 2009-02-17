@@ -98,7 +98,7 @@ class Job extends DBMappedObject {
 		//make a copy of this job
 		$newjob = new Job($this->id);
 		$newjob->id = NULL;
-		if ($isrepeatingrunnow) {
+		if ($isrepeatingrunnow || $newjob->status == "repeating") {
 			$tmpDate = date("M j, g:i a");
 			$newjob->name = DBSafe(substr($newjob->name,0,47 - strlen($tmpDate)) . " - $tmpDate");
 		} else {
@@ -115,15 +115,9 @@ class Job extends DBMappedObject {
 			}
 			$newjob->name = DBSafe($tmpJobName . $copySuffix);
 		}
-		if ($isrepeatingrunnow || $newjob->status != "repeating") {
-			$newjob->status = "new";
-			$newjob->scheduleid = NULL;
-		} else {
-			$schedule = new Schedule($newjob->scheduleid);
-			$schedule->id = null;
-			$schedule->create();
-			$newjob->scheduleid = $schedule->id;
-		}
+
+		$newjob->status = "new";
+		$newjob->scheduleid = null;
 		$newjob->assigned = NULL;
 		$newjob->finishdate = NULL;
 		$newjob->deleted = 0; // copy archived job is ok so we must set this to undeleted
