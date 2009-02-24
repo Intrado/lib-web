@@ -298,3 +298,8 @@ UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,edit
 -- everyone else gets full perms by default
 UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,editpriorities,customercontacts,users,imports,editimportalerts,lockedusers,smsblock,activejobs,editdm' where id!=1;
 
+-- ASP_6-2
+
+ALTER TABLE `dm` ADD `poststatus` TEXT NOT NULL default '' ;
+
+

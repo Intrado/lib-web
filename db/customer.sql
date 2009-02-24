@@ -1348,3 +1348,8 @@ $$$
 ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate', 
 	'numeric', 'currencyleadingzero' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy'
 $$$
+
+
+ALTER TABLE `custdm` ADD `poststatus` TEXT NOT NULL default ''
+$$$
+
