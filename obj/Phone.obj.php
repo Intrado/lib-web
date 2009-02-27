@@ -77,6 +77,30 @@ class Phone extends DBMappedObject {
 				($phone[0] == 5 && $phone[1] == 5 && $phone[2] == 5) || // areacode cannot be 555
 				($phone[3] == 5 && $phone[4] == 5 && $phone[5] == 5) // prefix cannot be 555
 				) {
+				// check special case N11 prefix with toll-free area codes
+				// en.wikipedia.org/wiki/Toll-free_telephone_number
+				if (($phone[4] == 1 && $phone[5] == 1) && (
+					($phone[0] == 8 && $phone[1] == 0 && $phone[2] == 0) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 8) ||
+					($phone[0] == 8 && $phone[1] == 7 && $phone[2] == 7) ||
+					($phone[0] == 8 && $phone[1] == 6 && $phone[2] == 6) ||
+					($phone[0] == 8 && $phone[1] == 5 && $phone[2] == 5) ||
+					($phone[0] == 8 && $phone[1] == 4 && $phone[2] == 4) ||
+					($phone[0] == 8 && $phone[1] == 3 && $phone[2] == 3) ||
+					($phone[0] == 8 && $phone[1] == 2 && $phone[2] == 2) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 0) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 1) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 2) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 3) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 4) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 5) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 6) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 7) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 8) ||
+					($phone[0] == 8 && $phone[1] == 8 && $phone[2] == 9)
+					)) {
+					return array(); // OK special case
+				}
 				$error[] = 'The phone number seems to be invalid';
 			}
 		} else {
