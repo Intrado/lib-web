@@ -302,4 +302,6 @@ UPDATE aspadminuser set permissions='logincustomer,newcustomer,editcustomer,edit
 
 ALTER TABLE `dm` ADD `poststatus` TEXT NOT NULL default '' ;
 
+ALTER TABLE `dm` CHANGE `authorizedip` `authorizedip` VARCHAR( 31 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ;
+
 

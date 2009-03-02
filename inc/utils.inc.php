@@ -251,7 +251,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.71 $
+	    # $Revision: 1.72 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -376,6 +376,47 @@ function sane_parsestr($url) {
 	}
 
 	return $data;
+}
+
+
+function ip4CalcNetmaskFromBits ($bitcount) {
+	$mask = 0;
+	for (; $bitcount > 0; $bitcount--) {
+		$mask >>= 1;
+		$mask |= 0x80000000;
+	}
+	return $mask;
+}
+
+function ip4HostIsInNetwork($host,$network) {
+	
+	$ip_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
+	$slaship_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})/([0-9]{1,2})$";
+	$netmask_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}) ([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
+	
+	if ($host == $network)
+		return true; //assumes at least one of the arguments is properly formatted, would return true if both are blank or something
+	
+	$srcaddr = ip2long($host);
+	
+	$regs = array();
+	if (ereg($ip_pattern,$network,$regs)) {
+		$allowaddr = ip2long($regs[1]);
+		$allowmask = ip2long("255.255.255.255");
+	} else if (ereg($slaship_pattern,$network,$regs)) {
+		$allowaddr = ip2long($regs[1]);
+		$allowmask = ip4CalcNetmaskFromBits($regs[2]);
+	} else if (ereg($netmask_pattern,$network,$regs)) {
+		$allowaddr = ip2long($regs[1]);
+		$allowmask = ip2long($regs[2]);
+	} else {
+		return false;
+	}
+		
+	if (($srcaddr & $allowmask) == $allowaddr)
+		return true;
+	else
+		return false;
 }
 
 function writeWav ($data) {

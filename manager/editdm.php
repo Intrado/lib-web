@@ -77,6 +77,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			$callerid = Phone::parse(GetFormData($f, $s, "telco_caller_id"));
+			
+			$ip_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
+			$slaship_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})/([0-9]{1,2})$";
+			$netmask_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}) ([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
+			
+			$authorizedip = TrimFormData($f, $s, "authorizedip");
+			$authorizedippatternok = ereg($ip_pattern,$authorizedip) || ereg($slaship_pattern,$authorizedip) || ereg($netmask_pattern,$authorizedip);
 
 			if (!ereg("[0-9]{10}",$callerid)) {
 				error('Bad Caller ID, Try Again');
@@ -86,13 +93,15 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 				error('Number of inbound tokens cannot exceed the max number of resources');
 			} else if(GetFormData($f, $s, 'telco_calls_sec') && !ereg("^[0-9]*\.?[0-9]*$", GetFormData($f, $s, 'telco_calls_sec'))){
 				error("Calls per second must be a positive number");
+			} else if (!$authorizedippatternok) {
+				error("Authorized IP must be in one of the 3 listed formats");
 			} else {
 				QuickUpdate("Begin");
 
 				$enablestate = $dm['enablestate'];
 
 				if(CheckFormSubmit($f, "authorize")){
-					QuickUpdate("update dm set authorizedip = lastip, enablestate = 'active' where id = " . $dmid);
+					QuickUpdate("update dm set enablestate = 'active' where id = " . $dmid);
 					$enablestate = "active";
 				} else if(CheckFormSubmit($f, "unauthorize")){
 					QuickUpdate("update dm set enablestate = 'disabled' where id = " . $dmid);
@@ -118,6 +127,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 							");
 				$newcustomerid = GetFormData($f, $s, "customerid") +0;
 				QuickUpdate("update dm set
+							authorizedip = '" . DBSafe($authorizedip) . "',
 							customerid = " . $newcustomerid . "
 							where id = '" . DBSafe($dmid) . "'");
 
@@ -159,6 +169,9 @@ if( $reloadform )
 	PutFormData($f, $s, "Submit", "");
 	PutFormData($f, "authorize", "Authorize", "");
 	PutFormData($f, "unauthorize", "Un-authorize", "");
+	
+	PutFormData($f,$s,"authorizedip",$dm['authorizedip'],"text","7","31",true);
+	
 	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "number", "nomin", "nomax", true);
 
@@ -251,14 +264,21 @@ NewForm($f);
 		<td><div id='hasdelay1' style='display:none'>Test Has Delays: </span></td>
 		<td><div id='hasdelay2' style='display:none'><? NewFormItem($f, $s, "test_has_delays", "checkbox", null, null, "id='test_has_delays'"); ?></span></td>
 	</tr>
-	<tr>
-		<td>Authorized IP:</td>
-		<td><?=$dm['authorizedip']?></td>
-	</tr>
+
 	<tr>
 		<td>Last IP: </td>
-		<td><?=$dm['lastip']?></td>
+		<td><?=$dm['lastip']?> <a href="#" onclick="var field = new getObj('authorizedip'); field.obj.value = '<?=$dm['lastip']?>'; return false;" >Copy to authorized ip</a></td>
 	</tr>
+	<tr>
+		<td valign=top>Authorized IP:</td>
+		<td><? NewFormItem($f,$s,"authorizedip","text",31,31,'id="authorizedip"'); ?> <br>
+		<em>Accepts either single IP format (11.22.33.44)<br>
+		network slash notation (11.22.33.0/24)<br> 
+		or netmask notation (11.22.33.0 255.255.255.0)<br>
+		</em>
+		</td>
+	</tr>
+
 	<tr>
 		<td colspan="3">
 <?
