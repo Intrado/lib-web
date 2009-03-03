@@ -120,7 +120,7 @@ function fmt_dmstatus_nohtml($row,$index, $usehtml=true) {
 	if ($row[6] != "active") {
 		$problems[] = "Not Authorized";
 	} else {
-		if ($row[4] != $row[5])
+		if (!ip4HostIsInNetwork($row[5],$row[4]))
 			$problems[] = "IP Mismatch";
 
 		if ($row[7]/1000 < time() - 30)
