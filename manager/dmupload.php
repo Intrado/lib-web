@@ -54,7 +54,7 @@ if(CheckFormSubmit($f,$s))
 					if (is_file($newname) && is_readable($newname)) {
 						QuickUpdate("begin");
 						QuickUpdate("insert into dmdatfile (dmid, data, notes) values
-									('" . $_SESSION['dmid'] . "', '" . base64_encode(file_get_contents($newname)) . "','" . GetFormData($f, $s, "notes") . "')");
+									('" . $_SESSION['dmid'] . "', '" . base64_encode(file_get_contents($newname)) . "','" . DBSafe(GetFormData($f, $s, "notes")) . "')");
 						QuickUpdate("update dm set command = 'datfile' where id = " . $_SESSION['dmid']);
 						QuickUpdate("commit");
 						redirect("customerdms.php");
