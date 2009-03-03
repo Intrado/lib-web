@@ -23,8 +23,8 @@ warn_earliest=
 warn_latest=
 
 [content]
-tts="localhost,8080,/phone/Tts"
-;tts="10.25.25.16,8080,/tts/ttsloquendo"
+tts="localhost,8123,/tts"
+;tts="10.25.25.16,8080,/tts/ttsserver"
 
 externalcontent=false
 ; format is "host,port,path;host2,port2,path2;..." reserved chars= ';' and ','
