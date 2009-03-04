@@ -164,7 +164,7 @@ $titles["actions"] = "Actions";
 // Do not provide a checkbox to hide these columns.
 $lockedTitles = array(0, "status", "actions", 2, 3);
 
-$filterTitles = array(6,"status",8,12);
+$filterTitles = array(4,"status",6);
 
 $formatters = array("actions" => "fmt_DMActions",
 					"status" => "fmt_dmstatus",
