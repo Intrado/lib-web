@@ -63,6 +63,19 @@ if(isset($_SESSION['customerid'])){
 	$queryextra = " and dm.customerid = " . $_SESSION['customerid'] . " ";
 }
 
+if(isset($_GET['showdisabled'])) {
+	$showingDisabledDMs = true;
+	$queryextra .= " and s_dm_enabled.value = '0' ";
+} else {
+	$showingDisabledDMs = false;
+	$queryextra .= " and s_dm_enabled.value = '1' ";
+}
+
+if(isset($_GET['showall'])) {
+	$showingDisabledDMs = false;
+	$queryextra = "";
+}
+
 //index 2 is customer id
 //index 1 is customer url
 function fmt_customerUrl($row, $index){
@@ -166,6 +179,9 @@ $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip,
 			left join dmsetting s_telco_inboundtoken on 
 					(dm.id = s_telco_inboundtoken.dmid 
 					and s_telco_inboundtoken.name = 'telco_inboundtoken')
+			left join dmsetting s_dm_enabled on 
+					(dm.id = s_dm_enabled.dmid 
+					and s_dm_enabled.name = 'dm_enabled')			
 			where dm.type = 'customer'
 			" . $queryextra . "
 			order by dm.customerid, dm.name";
@@ -254,7 +270,14 @@ include_once("nav.inc.php");
 		</td>
 	</tr>
 </table>
-<a href='customerdms.php'>Show All Customers</a>
+<a href='customerdms.php?showall=1'>Show All DMs</a> 
+<? 
+if($showingDisabledDMs) {
+	?><a href='customerdms.php'>Show Enabled DMs</a><? 
+} else {
+	?><a href='customerdms.php?showdisabled=1'>Show Disabled DMs</a><?
+}
+?>
 </form>
 <?
 
