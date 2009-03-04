@@ -80,6 +80,9 @@ table {
 	<? if ($MANAGERUSER->authorized("editdm")) { ?>
 		<td><a href="customerdms.php?clear" title="Flex Appliances"><img src="img/rdms.png" border=0><div>Flex</div></a></td>
 	<? } ?>
+	<? if ($MANAGERUSER->authorized("systemdm")) { ?>
+		<td><a href="systemdms.php" title="System DMs"><img src="img/rdms.png" border=0><div>System&nbsp;DMs</div></a></td>
+	<? } ?>
 	<? if ($MANAGERUSER->authorized("customercontacts")) { ?>
 		<td><a href="customercontactsearch.php" title="Contact Search"><img src="img/search.png" border=0><div>Contact&nbsp;Search</div></a></td>
 	<? } ?>

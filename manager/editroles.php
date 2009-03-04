@@ -1,10 +1,10 @@
 <?
 
 require_once("common.inc.php");
-include_once("../inc/form.inc.php");
-include_once("../inc/table.inc.php");
-include_once("../obj/Phone.obj.php");
-include_once("../inc/html.inc.php");
+require_once("../inc/form.inc.php");
+require_once("../inc/table.inc.php");
+require_once("../obj/Phone.obj.php");
+require_once("../inc/html.inc.php");
 
 
 if (!$MANAGERUSER->authorized("superuser"))
@@ -23,6 +23,7 @@ $roles = array(
 	"smsblock" => "Manage SMS blocked numbers",
 	"activejobs" => "View active jobs",
 	"editdm" => "Edit Flex Appliances",
+	"systemdm" => "Manage System DMs",
 	"superuser" => "Edit Manager Roles (this page)"
 );
 
@@ -113,7 +114,7 @@ if( $reloadform ) {
 
 //---------------------------------
 
-include_once("nav.inc.php");
+require_once("nav.inc.php");
 
 
 NewForm($f);
