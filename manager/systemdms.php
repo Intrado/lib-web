@@ -181,45 +181,12 @@ include_once("nav.inc.php");
 ?>
 
 <form method="POST" action="systemdms.php">
-<table>
-	<tr>
-		<td valign="top">
-			<table border="0" cellpadding="2" cellspacing="1" class="list">
-				<tr class="listHeader" align="left" valign="bottom">
-					<td>
-						Search (can match partial urls)
-					</td>
-				</tr>
-				<tr>
-					<td valign="top">
-						<table>
-							<tr>
-								<td valign="top" align="left">
-									Cust URL:
-								</td>
-								<td>
-									<input type="text" name="custtxt" id="custtxt" value="<?=$custtxt?>" size="20" maxlength="50" />
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2">
-									<input type="submit" name="showmatch" id="showmatch" value="Search" />   
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</td>
-		<td valign="top">
-			<?
-			// show the row data filters
-			show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
-			
-			?>
-		</td>
-	</tr>
-</table>
+<?
+// show the row data filters
+show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
+
+?>
+
 <a href='systemdms.php?showall=1'>Show All DMs</a> 
 <? 
 if($showingDisabledDMs) {
