@@ -93,7 +93,7 @@ function fmt_dmstatus_nohtml($row,$index, $usehtml=true) {
 		if (!ip4HostIsInNetwork($row[3],$row[2]))
 			$problems[] = "IP Mismatch";
 
-		if ($row[7]/1000 < time() - 30)
+		if ($row[5]/1000 < time() - 30)
 			$problems[] = "DM Lost Connection";
 	}
 
