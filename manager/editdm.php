@@ -27,14 +27,18 @@ include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../obj/Phone.obj.php");
 include_once("../inc/html.inc.php");
+$dmType = '';
 
-if (!$MANAGERUSER->authorized("editdm"))
+if (!$MANAGERUSER->authorized("editdm") && !$MANAGERUSER->authorized("systemdm"))
 	exit("Not Authorized");
 
 if(isset($_GET['dmid'])){
 	$dmid = $_GET['dmid']+0;
-	if(!QuickQuery("select count(*) from dm where id = " . $dmid) || QuickQuery("select type from dm where id = " . $dmid) != "customer"){
-		echo "That is an invalid DM";
+	$dmType = QuickQuery("select type from dm where id = " . $dmid);
+	if(!QuickQuery("select count(*) from dm where id = " . $dmid) || 
+			!(($MANAGERUSER->authorized("editdm") && $dmType == "customer") ||
+			($MANAGERUSER->authorized("systemdm") && $dmType == "system"))){
+		echo "Invalid DM, or not authorized to edit this DM.";
 		exit();
 	}
 	$_SESSION['dmid'] = $dmid;
@@ -87,7 +91,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 
 			if (!ereg("[0-9]{10}",$callerid)) {
 				error('Bad Caller ID, Try Again');
-			} else if (GetFormData($f, $s, "customerid") && !QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
+			} else if ($dmType == 'customer' && GetFormData($f, $s, "customerid") && !QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
 				error('Invalid Customer ID');
 			} else if (GetFormData($f, $s, "telco_inboundtoken") > GetFormData($f, $s, "delmech_resource_count")){
 				error('Number of inbound tokens cannot exceed the max number of resources');
@@ -130,32 +134,35 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 							authorizedip = '" . DBSafe($authorizedip) . "',
 							customerid = " . $newcustomerid . "
 							where id = '" . DBSafe($dmid) . "'");
+				if ($dmType == 'customer') {
+					if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
+						$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
+																		where c.id = " . $dm['customerid']);
+						$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $dm['customerid']);
+						if(QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
+							QuickUpdate("delete from custdm where dmid = " . $dmid, $custdb);
+						}
+					}
 
-				if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
 					$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
-																	where c.id = " . $dm['customerid']);
-					$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $dm['customerid']);
-					if(QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-						QuickUpdate("delete from custdm where dmid = " . $dmid, $custdb);
+												where c.id = " . $newcustomerid);
+					$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
+					if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
+						QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type) values
+									(" . $dmid . ", '" . DBSafe($dm['name']) . "', '" . DBSafe($enablestate) . "', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "')
+									", $custdb);
+					} else {
+						QuickUpdate("update custdm set enablestate = '" . DBSafe($enablestate) . "',
+									telco_type = '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'
+									where dmid = " . $dmid, $custdb);
 					}
 				}
 
-				$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
-											where c.id = " . $newcustomerid);
-				$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
-				if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-					QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type) values
-								(" . $dmid . ", '" . DBSafe($dm['name']) . "', '" . DBSafe($enablestate) . "', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "')
-								", $custdb);
-				} else {
-					QuickUpdate("update custdm set enablestate = '" . DBSafe($enablestate) . "',
-								telco_type = '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'
-								where dmid = " . $dmid, $custdb);
-				}
-
-
 				QuickUpdate("commit");
-				redirect("customerdms.php");
+				if ($dmType == 'customer')
+					redirect("customerdms.php");
+				else
+					redirect("systemdms.php");
 			}
 		}
 	}
@@ -177,7 +184,9 @@ if( $reloadform )
 
 	PutFormData($f, $s, "telco_caller_id", Phone::format(getDMSetting($dmid, "telco_caller_id")), "phone", "10", "10", true);
 	PutFormData($f, $s, "telco_inboundtoken", getDMSetting($dmid, "telco_inboundtoken"), "number", "nomin", "nomax", true);
-	PutFormData($f, $s, "customerid", $dm['customerid'], "number", "1", "nomax", true);
+	if ($dmType == 'customer')
+		PutFormData($f, $s, "customerid", $dm['customerid'], "number", "1", "nomax", true);
+	
 	PutFormData($f, $s, "telco_type", getDMSetting($dmid, "telco_type"), "array", $telco_types, "nomax", true);
 	PutFormData($f, $s, "dm_enabled", getDMSetting($dmid, "dm_enabled"), "bool", 0, 1);
 
@@ -205,11 +214,14 @@ NewForm($f);
 		<td>Enable DM: </td>
 		<td><? NewFormItem($f, $s, "dm_enabled", "checkbox"); ?></td>
 	</tr>
-
+<?
+if ($dmType == 'customer') {?>
 	<tr>
 		<td>Customer ID: </td>
 		<td><? NewFormItem($f, $s, "customerid", "text", "5"); ?></td>
 	</tr>
+<?}
+?>
 	<tr>
 		<td>Authorized: </td>
 		<td><?
