@@ -4,7 +4,7 @@
 DELETE 	j
 FROM	job j
 WHERE	j.finishdate < '1970-01-01'
-AND		j.status in ('complete','canceled')
+AND		j.status in ('complete','cancelled')
 $$$
 
 -- Delete joblanguage
@@ -15,8 +15,7 @@ FROM 	joblanguage jl
 WHERE	not exists (
 		SELECT *
 		FROM	job j
-		WHERE	j.id = jl.jobid
-	)
+		WHERE	j.id = jl.jobid)
 $$$
 
 -- Delete jobsetting
@@ -27,8 +26,7 @@ FROM 	jobsetting js
 WHERE	not exists (
 		SELECT *
 		FROM	job j
-		WHERE	j.id = js.jobid
-	)
+		WHERE	j.id = js.jobid)
 $$$
 
 -- Delete survey templates
@@ -110,6 +108,43 @@ AND		not exists (
 		SELECT	*
 		FROM	surveyquestion sq
 		WHERE	sq.phonemessageid = m.id)
+AND		not exists (
+		SELECT 	*
+		FROM	surveyquestionnaire sq
+		WHERE	sq.machinemessageid = m.id or
+				sq.emailmessageid = m.id or
+				sq.intromessageid = m.id or
+				sq.exitmessageid = m.id)
+$$$
+
+-- Delete Messages
+-- Remove all messages not used since a specific date and not reference by any existing jobs.
+
+DELETE	m
+FROM	message m
+WHERE	m.lastused < '1970-01-01'
+AND		not exists (
+		SELECT 	*
+		FROM 	job j
+		WHERE	j.phonemessageid = m.id or
+				j.emailmessageid = m.id or
+				j.printmessageid = m.id or
+				j.smsmessageid = m.id)
+AND		not exists (
+		SELECT 	*
+		FROM 	joblanguage jl
+		WHERE	jl.messageid = m.id)
+AND		not exists (
+		SELECT	*
+		FROM	surveyquestion sq
+		WHERE	sq.phonemessageid = m.id)
+AND		not exists (
+		SELECT 	*
+		FROM	surveyquestionnaire sq
+		WHERE	sq.machinemessageid = m.id or
+				sq.emailmessageid = m.id or
+				sq.intromessageid = m.id or
+				sq.exitmessageid = m.id)
 $$$
 
 -- Delete message parts
@@ -132,8 +167,20 @@ WHERE	a.deleted
 and		not exists (
 		SELECT	*
 		FROM	messagepart mp
-		WHERE	mp.audiofileid = a.id
-	)
+		WHERE	mp.audiofileid = a.id)
+$$$
+
+-- Audiofiles for deletion
+-- Remove audiofiles that are not associated with any message parts and are
+-- before specified record date.
+
+DELETE	a
+FROM	audiofile a
+WHERE	a.recorddate < '1970-01-01'
+and		not exists (
+		SELECT	*
+		FROM	messagepart mp
+		WHERE	mp.audiofileid = a.id)
 $$$
 
 -- Email message attachments for deletion
@@ -144,8 +191,7 @@ FROM	messageattachment ma
 WHERE	not exists (
 		SELECT	*
 		FROM	message m
-		WHERE	ma.messageid = m.id
-	)
+		WHERE	ma.messageid = m.id)
 $$$
 
 -- Content deletion
@@ -156,30 +202,25 @@ FROM	content c
 WHERE	not exists (
 		SELECT	*
 		FROM	audiofile a
-		WHERE	a.contentid = c.id
-	)
+		WHERE	a.contentid = c.id)
 and 	not exists (
 		SELECT	*
 		FROM	messageattachment ma
-		WHERE	ma.contentid = c.id
-	)
+		WHERE	ma.contentid = c.id)
 and		not exists (
 		SELECT	*
 		FROM	voicereply vr
-		WHERE	vr.contentid = c.id
-	)
+		WHERE	vr.contentid = c.id)
 and		not exists (
 		SELECT *
 		FROM	setting
 		where name = '_logocontentid'
-		and value = c.id
-	)
+		and value = c.id)
 and		not exists (
 		SELECT *
 		FROM	setting
 		where name = '_loginpicturecontentid'
-		and value = c.id
-	)
+		and value = c.id)
 $$$
 
 -- List deletion
@@ -191,8 +232,7 @@ WHERE	l.deleted
 and		not exists (
 		SELECT 	*
 		FROM 	job j
-		WHERE 	j.listid = l.id
-	)
+		WHERE 	j.listid = l.id)
 
 $$$
 
@@ -204,22 +244,17 @@ FROM	listentry le
 WHERE	not exists (
 		SELECT 	*
 		FROM 	list l
-		WHERE 	l.id = le.listid
-	)
+		WHERE 	l.id = le.listid)
 or		(le.personid is not null
 		and not exists (
 		SELECT	*
 		FROM	person p
-		WHERE	p.id = le.personid
-		)
-	)
+		WHERE	p.id = le.personid))
 or		(le.ruleid is not null
 		and	not exists (
 		SELECT	*
 		FROM	rule r
-		WHERE	r.id = le.ruleid
-		)
-	)
+		WHERE	r.id = le.ruleid))
 $$$
 
 -- List import removal
@@ -231,8 +266,7 @@ WHERE 	i.type = 'list'
 and		not exists (
 		SELECT 	*
 		FROM 	list l
-		WHERE 	l.id = i.listid
-	)
+		WHERE 	l.id = i.listid)
 $$$
 
 -- Delete persons
@@ -296,8 +330,7 @@ FROM	importfield imf
 WHERE	not exists (
 		SELECT 	*
 		FROM 	import i
-		WHERE	i.id = imf.importid
-	)
+		WHERE	i.id = imf.importid)
 $$$
 
 -- Delete phone
@@ -308,8 +341,7 @@ FROM 	phone ph
 WHERE	not exists (
 		SELECT *
 		FROM	person p
-		WHERE	p.id = ph.personid
-	)
+		WHERE	p.id = ph.personid)
 $$$
 
 -- Delete email
@@ -320,8 +352,7 @@ FROM 	email e
 WHERE	not exists (
 		SELECT *
 		FROM	person p
-		WHERE	p.id = e.personid
-	)
+		WHERE	p.id = e.personid)
 $$$
 
 -- Delete sms
@@ -332,8 +363,7 @@ FROM 	sms s
 WHERE	not exists (
 		SELECT *
 		FROM	person p
-		WHERE	p.id = s.personid
-	)
+		WHERE	p.id = s.personid)
 $$$
 
 -- Delete rule
@@ -344,13 +374,11 @@ FROM 	rule r
 WHERE	not exists (
 		SELECT *
 		FROM	userrule ur
-		WHERE	ur.ruleid = r.id
-	)
+		WHERE	ur.ruleid = r.id)
 and		not exists (
 		SELECT *
 		FROM	listentry le
-		WHERE	le.ruleid = r.id
-	)
+		WHERE	le.ruleid = r.id)
 $$$
 
 -- Delete schedule
@@ -361,13 +389,11 @@ FROM 	schedule s
 WHERE	not exists (
 		SELECT *
 		FROM	job j
-		WHERE	j.scheduleid = s.id
-	)
+		WHERE	j.scheduleid = s.id)
 and		not exists (
 		SELECT *
 		FROM	import i
-		WHERE	i.scheduleid = s.id
-	)
+		WHERE	i.scheduleid = s.id)
 $$$
 
 
