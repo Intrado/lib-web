@@ -336,7 +336,17 @@ a:hover {
 	height: 23px;
 
 	float: left;
+	background-color: transparent; 
+	border: 0px; 
+	width: auto; 
+	overflow: visible; 
+	vertical-align: middle; 
+	padding: 0 .25em 3px; .25em;
+}
 
+.button .middle img {
+		vertical-align: -3px;
+		padding-right: 3px;
 }
 
 .button td {
@@ -346,7 +356,7 @@ a:hover {
 .button a, .button td {
 	text-decoration: none;
 	color: <?=$primary?>;
-	font-size: 9px;
+	/*font-size: 9px;*/
 	font-weight: bold;
 	cursor: pointer;
 }

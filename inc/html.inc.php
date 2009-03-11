@@ -85,32 +85,36 @@ function buttons() {
 <?
 }
 
-function button($name, $onclick = NULL, $href = NULL, $extrahtml = NULL) {
+function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
-	$btn = '<div class="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
-
-
+	$btn = '<button class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 	if ($onclick)
-		$btn .= ' onclick="' . $onclick . '; return false;" ';
+		$btn .= ' onclick="' . $onclick . ';" ';
 	else if ($href)
-		$btn .= ' onclick="window.location=\'' . $href . '\'; return false;" ';
+		$btn .= ' onclick="window.location=\'' . $href . '\';" ';
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-
-	$btn .= '><a href="';
-
-	if ($href)
-		$btn .= escapehtml($href);
-	else
-		$btn .= "#";
-
-	$btn.= '">
-		<table><tr><td><img buttonrollover="left" src="img/themes/' . $theme. '/button_left.gif"></td><td buttonrollover="middle" class="middle">' . $name . '</td><td><img buttonrollover="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table>
-	</a></div>';
-
+	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle"><img src="img/icons/'.$icon.'.gif" alt="">' . $name . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table></button>';
+	
 	return $btn;
 }
+
+function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
+	$theme = getBrandTheme();
+	$btn = '<button class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	if ($onclick)
+		$btn .= ' onclick="' . $onclick . ';" ';
+	else if ($href)
+		$btn .= ' onclick="window.location=\'' . $href . '\';" ';
+
+	if ($extrahtml)
+		$btn .= $extrahtml;
+	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle"><img src="img/pixel.gif" alt="" height="16" width="1">' . $name . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table></button>';
+	
+	return $btn;
+}
+
 
 function submit($form, $section, $name = 'Submit',$val = null) {
 	//ugly hack. in order for enter key to submit form, either we need to add JS to each text field, or there must be an actual submit button
