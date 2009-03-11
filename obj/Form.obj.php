@@ -19,7 +19,7 @@ class Form {
 	function render () {
 		$lasthelpstep = false;
 		$str = '
-		<form id="'.$this->name.'" name="'.$this->name.'" method="POST">';
+		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST">';
 		
 		foreach ($this->formpres as $name => $itemdata) {			
 			$formclass = $itemdata[0];
