@@ -1,52 +1,32 @@
-function getObj(name)
-{
-  if (document.getElementById)
-  {
-  	this.obj = document.getElementById(name);
-  }
-  else if (document.all)
-  {
-	this.obj = document.all[name];
-  }
-  else if (document.layers)
-  {
-   	this.obj = document.layers[name];
-  }
-  if(this.obj)
-	this.style = this.obj.style;
+/* wrap $ for compatability */
+function getObj (name) {
+	this.obj = $(name);
+	if(this.obj)
+		this.style = this.obj.style;
 }
 
-function toggleVisible(name)
-{
-	var x = new getObj(name);
-	if (x.style) {
-		x.style.display = (x.style.display == "block") ? "none" : "block";
-		return x.style.display == "block";
-	}
+/* compat */
+function toggleVisible (name) {
+	$(name).toggle();
 }
 
-function setState(field, set)
-{
+/* compat */
+function show (name) {
+	$(name).show();
+}
+
+/* compat */
+function hide (name) {
+	$(name).hide();
+}
+
+function setState(field, set) {
 		var x = new getObj('state');
 		x.obj.src = 'state.php?_state=' + escape(field) + '&_set=' + escape(set) + '&_page=' + escape(window.location.pathname);
 }
 
-function show(name)
-{
-	var x = new getObj(name);
-	if (x.style)
-		x.style.display = "block";
-}
 
-function hide(name)
-{
-	var x = new getObj(name);
-	if (x.style)
-		x.style.display =  "none";
-}
-
-function setHiddenIfChecked (checkbox, name)
-{
+function setHiddenIfChecked (checkbox, name) {
 	var x = new getObj(name);
 	if (x.style) {
 		if (checkbox.checked) {
@@ -57,8 +37,7 @@ function setHiddenIfChecked (checkbox, name)
 	}
 }
 
-function setVisibleIfChecked (checkbox, name)
-{
+function setVisibleIfChecked (checkbox, name) {
 	var x = new getObj(name);
 	if (x.style) {
 		if (checkbox.checked) {
@@ -200,8 +179,7 @@ function isCheckboxChecked(id) {
 	@param sources An array of the source (i.e., master checkboxed)
 	@param targets An array of the target (i.e., slave checkboxes)
 */
-function syncCheckboxState(sources, targets)
-{
+function syncCheckboxState(sources, targets) {
 	var chkObj = null;
 	var anyChecked = false;
 	
@@ -278,18 +256,33 @@ function toggleHiddenField(i){
 	checkbox.checked = !checkbox.checked;
 }
 
-//variable _brandtheme needs to be declared externally of this file.
-function btn_rollover(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_left_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_right_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/themes/" + _brandtheme + "/button_mid_over.gif') repeat-x";});
+function parse_theme_from_url (url) {
+	var t = url.substring(11+url.indexOf("img/themes/"));
+	return t.substring(0,t.indexOf("/"));
 }
 
-//variable _brandtheme needs to be declared externally of this file.
+function btn_roll(obj,over) {
+	obj = $(obj);
+	over = over ? "_over" : "";
+	
+	var leftimg = obj.down('.left');
+	var rightimg = obj.down('.right');
+	var midtb = obj.down('.middle');
+	
+	//parse one of the button images for the theme
+	var theme = parse_theme_from_url(leftimg.src); 
+	
+	leftimg.src='img/themes/' + theme + '/button_left' + over + '.gif';
+	rightimg.src='img/themes/' + theme + '/button_right' + over + '.gif';
+	midtb.style.background = "url('img/themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
+}
+
+function btn_rollover(obj) {
+	btn_roll(obj,true);
+}
+
 function btn_rollout(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_left.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_right.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/themes/" + _brandtheme + "/button_mid.gif') repeat-x";});
+	btn_roll(obj,false);
 }
 
 function windowHide(windowid) {
@@ -320,79 +313,5 @@ function submitForm (formname,section,value) {
 	if(!(theform.onsubmit && theform.onsubmit() == false)){
 		theform.submit();
 	}
-}
-
-
-if( typeof XMLHttpRequest == "undefined" ) {
-	XMLHttpRequest = function() {
-		try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch(e) {};
-		try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch(e) {};
-		try { return new ActiveXObject("Msxml2.XMLHTTP"); }     catch(e) {};
-		try { return new ActiveXObject("Microsoft.XMLHTTP"); }  catch(e) {};
-		throw new Error("This browser does not support XMLHttpRequest or XMLHTTP.");
-	};
-}
-
-function ajax(url, vars, callbackFunction, args)
-{
-	var request =  new XMLHttpRequest();
-	request.open("POST", url, true);
-	request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	request.onreadystatechange = function() {
-		try {
-			if (request.readyState == 4 && request.status == 200) {
-				if (request.responseText) {
-					callbackFunction(request.responseText,args);
-				}
-			}
-		} catch(e) {};
-	};
-	request.send(vars);
-}
-
-function serialize(someForm) {
-	var serialized = [];
-	for (var i=0; i < someForm.elements.length; i++) {
-		var el = someForm.elements[i];
-		if (el.disabled || !el.name)
-			continue;
-			
-		switch (el.tagName.toLowerCase()) {
-		case "input":
-			switch (el.type.toLowerCase()) {
-				case "radio":
-				case "checkbox":
-					if (el.checked)
-						serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
-					break;
-				case "file": // don't do anything
-					break;
-				default:
-					serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
-					break;
-			}
-			break;
-		case "select":
-			for (var j=0; j < el.options.length; j++)
-				if (el.options[j].selected)
-					serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.options[j].value));
-			break;
-		case "textarea":
-		case "button":
-		default:
-			serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
-			break;
-		}
-	}
-	return serialized.join("&");
-}
-
-function keyuptimer (e, t, ignoreenterkey, fn, args) {
-	if (this.timeoutid)
-		clearTimeout(this.timeoutid);
-	var e=window.event || e;
-	var keyunicode=e.charCode || e.keyCode;
-	if (keyunicode != 13 || !ignoreenterkey)
-		this.timeoutid = setTimeout(fn,t,args);
 }
 

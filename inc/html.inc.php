@@ -77,12 +77,24 @@ function buttons() {
 		$buttons = func_get_args();
 	}
 ?>
-		<table border=0 cellspacing=3 cellpadding=0><tr><td>
+		<div style="clear: left; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
 <?
-		echo implode('</td><td>', $buttons);
+		echo implode('', $buttons);
 ?>
-		</td></tr></table>
+		<div style="clear: left; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
 <?
+}
+
+function button_bar() {
+	$buttons = func_get_args();
+?>
+		<div style="clear: both; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
+<?
+		echo implode('', $buttons);
+?>
+		<div style="clear: both; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
+<?
+
 }
 
 function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
@@ -135,21 +147,7 @@ function add($name, $file = 'add') {
 
 
 
-/*
-	Function to create a bar of buttons and UI elements from the list of input parameters,
-		which are each HTML strings.
-*/
-function button_bar() {
-	$buttons = func_get_args();
-?>
-		<table border=0 cellspacing=6 cellpadding=0><tr><td>
-<?
-		echo implode('</td><td>', $buttons);
-?>
-		</td></tr></table>
-<?
 
-}
 
 function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL) {
 	if(!$inc) $inc = 5;

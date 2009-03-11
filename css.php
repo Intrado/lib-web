@@ -328,6 +328,11 @@ a:hover {
 	display: block;
 }
 
+.windowtitle .hoverhelpicon {
+	display: inline;
+	float: none;
+}
+
 /* **** button **** */
 
 
@@ -455,6 +460,8 @@ div.scrollTableContainer {
 .hoverhelpicon {
 	margin-left: 5px;
 	margin-right: 5px;
+	display: block;
+	float: left;
 }
 
 
