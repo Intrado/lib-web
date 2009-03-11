@@ -68,7 +68,7 @@ if(isset($_GET['showdisabled'])) {
 	$queryextra .= " and s_dm_enabled.value = '0' ";
 } else {
 	$showingDisabledDMs = false;
-	$queryextra .= " and s_dm_enabled.value = '1' ";
+	$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
 }
 
 if(isset($_GET['showall'])) {
@@ -120,6 +120,9 @@ function fmt_dmstatus($row,$index) {
 			$problems[] = "Invalid Customer ID";
 	}
 
+	if ($row['dmmethod'] == 'asp')
+		$problems[] = "Customer set to Hosted";
+
 	if (count($problems))
 		return "<div style=\"background-color:red\">" . implode(", ", $problems) . "</div>";
 	else
@@ -128,7 +131,6 @@ function fmt_dmstatus($row,$index) {
 
 function fmt_dmstatus_nohtml($row,$index, $usehtml=true) {
 	$problems = array();
-
 
 	if ($row[6] != "active") {
 		$problems[] = "Not Authorized";
@@ -142,6 +144,9 @@ function fmt_dmstatus_nohtml($row,$index, $usehtml=true) {
 		if ($row[1] == null || $row[1] <= 0)
 			$problems[] = "Invalid Customer ID";
 	}
+	
+	if ($row['dmmethod'] == 'asp')
+		$problems[] = "Customer set to Hosted";
 
 	if (count($problems))
 		return implode(", ", $problems);
@@ -187,8 +192,28 @@ $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip,
 			order by dm.customerid, dm.name";
 $result = Query($query);
 $data = array();
-while($row = DBGetRow($result)){
+while($row = DBGetRow($result))
 	$data[] = $row;
+
+if ($data) {
+	// First, get a list of every shard, $shardinfo[], indexed by ID, storing dbhost, dbusername, and dbpassword.
+	$result = Query("select id, dbhost, dbusername, dbpassword, name from shard order by id");
+	$shardinfo = array();
+	while($row = DBGetRow($result)){
+		$shardinfo[$row[0]] = array($row[1], $row[2], $row[3], $row[4]);
+	}
+	
+	// Connect to each customer's shard and retrieve dmmethod
+	$custdb;
+	foreach($data as $dataPos => $cust) {
+		$custdb = mysql_connect($shardinfo[$cust[1]][0],$shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2])
+			or die("Could not connect to customer database: " . mysql_error());
+		
+		mysql_select_db("c_" . $cust[1]);
+		$query = "select value from setting where name = '_dmmethod' limit 1";
+		if($custdb)
+			$data[$dataPos]['dmmethod'] = QuickQuery($query, $custdb);	
+	}
 }
 
 // Add field titles, leading # means it is sortable leading @ means it is hidden by default
