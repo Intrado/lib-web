@@ -45,6 +45,7 @@ if(isset($_GET['dmid'])){
 	redirect();
 } else {
 	$dmid = $_SESSION['dmid'];
+	$dmType = QuickQuery("select type from dm where id = " . $dmid);
 }
 
 //Fetch dm settings from dmsettings table
