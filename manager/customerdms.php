@@ -169,7 +169,7 @@ $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
-			s_telco_inboundtoken.value as telco_inboundtoken
+			s_telco_inboundtoken.value as telco_inboundtoken, c.shardid
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			left join dmsetting s_telco_calls_sec on 
@@ -206,13 +206,18 @@ if ($data) {
 	// Connect to each customer's shard and retrieve dmmethod
 	$custdb;
 	foreach($data as $dataPos => $cust) {
-		$custdb = mysql_connect($shardinfo[$cust[1]][0],$shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2])
-			or die("Could not connect to customer database: " . mysql_error());
+		if ($cust[1] + 0 > 0) {
+			$custdb = mysql_connect($shardinfo[$cust[15]][0],$shardinfo[$cust[15]][1], $shardinfo[$cust[15]][2])
+				or die("Could not connect to customer database: " . mysql_error());
+			
+			mysql_select_db("c_" . $cust[1]);
+			$query = "select value from setting where name = '_dmmethod' limit 1";
+			if($custdb)
+			$data[$dataPos]['dmmethod'] = QuickQuery($query, $custdb);
+		} else {
+			$data[$dataPos]['dmmethod'] = '';
+		}
 		
-		mysql_select_db("c_" . $cust[1]);
-		$query = "select value from setting where name = '_dmmethod' limit 1";
-		if($custdb)
-			$data[$dataPos]['dmmethod'] = QuickQuery($query, $custdb);	
 	}
 }
 
