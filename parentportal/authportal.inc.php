@@ -139,16 +139,17 @@ function portalGetPortalUser() {
 	$params = array(new XML_RPC_Value($sessionid, 'string'));
 	$method = "PortalServer.portal_getMyPortalUser";
 	$result = pearxmlrpc($method, $params);
+	$result['portaluser']['portaluser.preferences'] = json_decode($result['portaluser']['portaluser.preferences'], true);
 	return $result;
 }
 
 
-function portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms) {
+function portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms, $preferences) {
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'),
 			new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'),
 			new XML_RPC_Value(trim($notifyType), 'string'), new XML_RPC_Value(trim($notifysmsType), 'string'),
-			new XML_RPC_Value($sms, 'string'));
+			new XML_RPC_Value($sms, 'string'), new XML_RPC_Value(json_encode($preferences), 'string'));
 	$method = "PortalServer.portal_updateMyPortalUser";
 	$result = pearxmlrpc($method, $params);
 	return $result;
