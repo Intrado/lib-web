@@ -304,4 +304,4 @@ ALTER TABLE `dm` ADD `poststatus` TEXT NOT NULL default '' ;
 
 ALTER TABLE `dm` CHANGE `authorizedip` `authorizedip` VARCHAR( 31 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ;
 
-
+ALTER TABLE `portaluser` ADD `preferences` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER `sms` ;
