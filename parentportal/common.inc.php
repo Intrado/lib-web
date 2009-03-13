@@ -57,4 +57,6 @@ if(!isset($ppNotLoggedIn)){
 	// we are not logged in
 }
 
+// load customer/user locale 
+require_once("../inc/locale.inc.php");
 ?>
