@@ -29,7 +29,6 @@ require_once("obj/Access.obj.php");
 require_once("obj/Permission.obj.php");
 require_once("obj/Rule.obj.php"); //for search and sec profile rules
 
-
 if (!isset($isindexpage) || !$isindexpage) {
 	doStartSession();
 	//force ssl?
@@ -54,5 +53,7 @@ if (!isset($isindexpage) || !$isindexpage) {
 	}
 }
 
+// load customer/user locale 
+require_once("inc/locale.inc.php");
 
 ?>
