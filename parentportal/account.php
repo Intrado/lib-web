@@ -36,6 +36,7 @@ if(CheckFormSubmit($f,$s))
 		$notify = TrimFormData($f, $s, "notify");
 		$notifysms = TrimFormData($f, $s, "notifysms");
 		$sms = TrimFormData($f, $s, "sms");
+		$_SESSION['portaluser']['portaluser.preferences']['_locale'] = getFormData($f, $s, "_locale");
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(strlen($zipcode) < 5){
@@ -50,6 +51,7 @@ if(CheckFormSubmit($f,$s))
 			error($phoneerror);
 		} else {
 			//submit changes
+
 			if ($notify){
 				$notifyType = "message";
 			} else {
@@ -62,7 +64,7 @@ if(CheckFormSubmit($f,$s))
 				$notifysmsType = "none";
 				$sms = "";
 			}
-			$result = portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms);
+			$result = portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms, $_SESSION['portaluser']['portaluser.preferences']);
 			if($result['result'] != ""){
 				$updateuser = false;
 				error($error_failedupdate);
@@ -98,6 +100,7 @@ if( $reloadform )
 	PutFormData($f, $s, "newpassword2", "", "text");
 	PutFormData($f, $s, "oldpassword", "", "text");
 	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "0", "99999", true);
+	PutFormData($f, $s, "_locale", $_SESSION['portaluser']['portaluser.preferences']['_locale'], "text", "nomin", "nomax");
 	PutFormData($f, $s, "notify",  ($_SESSION['portaluser']['portaluser.notifytype'] == "message") ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, "notifysms",  ($_SESSION['portaluser']['portaluser.notifysmstype'] == "message") ? 1 : 0, "bool", 0, 1);
 	PutFormData($f, $s, "sms", Phone::format($_SESSION['portaluser']['portaluser.sms']), "phone", "2", "20"); // 20 is the max to accomodate formatting chars
@@ -108,9 +111,9 @@ $PAGE = "account:account";
 $TITLE = "Account Information: " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " . escapehtml($_SESSION['portaluser']['portaluser.lastname']);
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, 'Save'), button("Change Email",NULL, "changeemail.php"));
+buttons(submit($f, $s, _L('Save')), button(_L("Change Email"), NULL, "changeemail.php"));
 
-startWindow('User Information');
+startWindow(_L('User Information'));
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>
@@ -118,50 +121,62 @@ startWindow('User Information');
 			<td class="bottomBorder">
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>
-						<td align="right">Email:</td>
+						<td align="right"><?=_L("Email")?>:</td>
 						<td><?= escapehtml($_SESSION['portaluser']['portaluser.username']) ?></td>
 					</tr>
 					<tr>
-						<td align="right">First Name:</td>
+						<td align="right"><?=_L("First Name")?>:</td>
 						<td><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
 					</tr>
 					<tr>
-						<td align="right">Last Name:</td>
+						<td align="right"><?=_L("Last Name")?>:</td>
 						<td><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
 					</tr>
 					<tr>
-						<td align="right">ZIP Code:</td>
+						<td align="right"><?=_L("ZIP Code")?>:</td>
 						<td><? NewFormItem($f, $s, 'zipcode', 'text', '5'); ?></td>
 					</tr>
 					<tr>
-						<td align="right">*Old Password:</td>
+						<td align="right">*<?=_L("Old Password")?>:</td>
 						<td><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
 					</tr>
 					<tr>
-						<td align="right">*New Password:</td>
+						<td align="right">*<?=_L("New Password")?>:</td>
 						<td><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
 					</tr>
 					<tr>
-						<td align="right">*Confirm New Password:</td>
+						<td align="right">*<?=_L("Confirm New Password")?>:</td>
 						<td><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
 					</tr>
 
 				</table>
-				<div>*Only required for changing your password</div>
+				<div>*<?=_L("Only required for changing your password")?></div>
 			</td>
 		</tr>
 		<tr>
-			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Preferences:</th>
+			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;"><?=_L("Preferences")?>:</th>
 			<td  class="bottomBorder">
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>
-						<td colspan="2"><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;Email me when I have a new phone message.</td>
+						<td width="30%"><?=_L("Change Interface Language")?>:</td>
+						<td>
+							<?
+								NewFormItem($f, $s, '_locale', 'selectstart', null, null, "id='locale'");
+								foreach($LOCALES as $loc => $lang){
+									NewFormItem($f, $s, '_locale', 'selectoption', $lang, $loc);
+								}
+								NewFormItem($f, $s, '_locale', 'selectend');
+							?>
+						</td>
 					</tr>
 					<tr>
-						<td colspan="2"><? NewFormItem($f,$s, 'notifysms', 'checkbox', null, "", "id=\"smscheck\" onclick=\"document.getElementById('smsbox').disabled=!this.checked\""); ?>&nbsp;Text me when I have a new phone message.</td>
+						<td colspan="2"><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;<?=_L("Email me when I have a new phone message.")?></td>
 					</tr>
 					<tr>
-						<td align="right">Mobile Phone for Text Messaging:</td>
+						<td colspan="2"><? NewFormItem($f,$s, 'notifysms', 'checkbox', null, "", "id=\"smscheck\" onclick=\"document.getElementById('smsbox').disabled=!this.checked\""); ?>&nbsp;<?=_L("Text me when I have a new phone message.")?></td>
+					</tr>
+					<tr>
+						<td align="right"><?=_L("Mobile Phone for Text Messaging")?>:</td>
 						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ". ($notifysms ? "" : "disabled=\"true\"")); ?></td>
 					</tr>
 
