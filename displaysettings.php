@@ -53,6 +53,7 @@ if(CheckFormSubmit($f,$s))
 			error("The ratio of primary to background can only be between 0 and .5(50%)");
 		} else {
 			//submit changes
+			setSystemSetting('_locale', GetFormData($f, $s, '_locale'));
 			setSystemSetting('_brandtheme', GetFormData($f, $s, '_brandtheme'));
 			setSystemSetting('_brandprimary', GetFormData($f, $s, '_brandprimary'));
 			setSystemSetting('_brandratio', GetFormData($f, $s, '_brandratio'));
@@ -79,6 +80,7 @@ if( $reloadform )
 
 	//check for new setting name/desc from settings.php
 
+	PutFormData($f, $s, "_locale", getSystemSetting('_locale'), "text", "nomin", "nomax");
 	PutFormData($f, $s, "_brandtheme", getSystemSetting('_brandtheme'), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", getSystemSetting('_brandratio'), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandprimary", getSystemSetting('_brandprimary'), "text", "nomin", "nomax", true);
@@ -105,6 +107,18 @@ startWindow('Defaults');
 			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
 			<td class="bottomBorder">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
+					<tr>
+						<td width="30%">Change Language</td>
+						<td>
+							<?
+								NewFormItem($f, $s, '_locale', 'selectstart', null, null, "id='locale'");
+								foreach($LOCALES as $loc => $lang){
+									NewFormItem($f, $s, '_locale', 'selectoption', $lang, $loc);
+								}
+								NewFormItem($f, $s, '_locale', 'selectend');
+							?>
+						</td>
+					</tr>
 					<tr>
 						<td width="30%">Color Theme<? print help('Settings_ColorTheme', NULL, "small"); ?></td>
 						<td>
