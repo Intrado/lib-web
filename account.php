@@ -180,6 +180,7 @@ if(CheckFormSubmit($f,$s))
 
 
 			if (GetFormData($f, $s, "themeoverride")){
+				$USER->setSetting("_locale", GetFormData($f, $s, "_locale"));
 				$USER->setSetting("_brandtheme", GetFormData($f, $s, "_brandtheme"));
 				$USER->setSetting("_brandtheme1", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
 				$USER->setSetting("_brandtheme2", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
@@ -197,7 +198,7 @@ if(CheckFormSubmit($f,$s))
 				$USER->setSetting("_brandratio", GetFormData($f, $s, "_brandratio"));
 				$_SESSION['colorscheme']['_brandratio'] = GetFormData($f, $s, "_brandratio");
 			} else {
-
+				$USER->setSetting("_locale", "");
 				$USER->setSetting("_brandtheme", "");
 				$USER->setSetting("_brandtheme1", "");
 				$USER->setSetting("_brandtheme2", "");
@@ -286,6 +287,8 @@ if( $reloadform )
 	PutFormData($f, $s, "radiocallerid", $radio);
 	/*CSDELETEMARKER_END*/
 
+	// Display settings
+	PutFormData($f, $s, "_locale", $USER->getSetting('_locale', getSystemSetting('_locale')), "text", "nomin", "nomax");
 	PutFormData($f, $s, "_brandtheme", $USER->getSetting('_brandtheme', getSystemSetting('_brandtheme')), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", $USER->getSetting('_brandratio', getSystemSetting('_brandratio')), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandprimary", $USER->getSetting('_brandprimary', getSystemSetting('_brandprimary')), "text", "nomin", "nomax", true);
@@ -509,8 +512,20 @@ if ($USER->authorize('setcallerid')) {
 					<td>
 						<table border="0" cellpadding="1" cellspacing="0">
 							<tr>
-								<td width="30%">Customize Theme</td>
+								<td width="30%">Customize Display</td>
 								<td><? NewFormItem($f, $s, "themeoverride", "checkbox", null, null, "id='themeoverride' onclick='disablethemes(this.checked)'"); ?></td>
+							</tr>
+							<tr>
+								<td width="30%">Change Language</td>
+								<td>
+									<?
+										NewFormItem($f, $s, '_locale', 'selectstart', null, null, "id='locale'");
+										foreach($LOCALES as $loc => $lang){
+											NewFormItem($f, $s, '_locale', 'selectoption', $lang, $loc);
+										}
+										NewFormItem($f, $s, '_locale', 'selectend');
+									?>
+								</td>
 							</tr>
 							<tr>
 								<td>Color Theme<? print help('Account_ColorTheme', NULL, "small"); ?></td>
@@ -568,10 +583,12 @@ include_once("navbottom.inc.php");
 
 	function disablethemes(checked){
 		if(checked){
+			new getObj('locale').obj.disabled=false;
 			new getObj('themes').obj.disabled=false;
 			new getObj('brandprimary').obj.disabled=false;
 			new getObj('brandratio').obj.disabled=false;
 		} else {
+			new getObj('locale').obj.disabled=true;
 			new getObj('themes').obj.disabled=true;
 			new getObj('brandprimary').obj.disabled=true;
 			new getObj('brandratio').obj.disabled=true;
