@@ -309,7 +309,7 @@ $TITLE = "Account Information: " . escapehtml($USER->firstname) . " " . escapeht
 
 include_once("nav.inc.php");
 
-?><script src="script/picker.js?<?=rand()?>"></script><?
+?><script src="script/picker.js"></script><?
 
 NewForm($f);
 buttons(submit($f, $s, 'Save'));
