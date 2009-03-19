@@ -174,6 +174,15 @@ function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 	return $crumbhtml;
 }
 
+function doLogo () {
+	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
+	$clickurl = getSystemSetting("_logoclickurl");
+	if($clickurl != "" && $clickurl != "http://")
+		echo '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php?hash=' . $logohash .'></a>';
+	else
+		echo '<img src="logo.img.php?hash=' . $logohash .'">';
+}
+
 doNavTabs($NAVTREE);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,10 +199,12 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/prototype.js" type="text/javascript"></script>
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
 
-	<script src='script/utils.js'></script>
-	<script src='script/sorttable.js'></script>
-	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='css.php' type='text/css' rel='stylesheet' media='screen'>
+	<script src="script/utils.js"></script>
+	<script src="script/sorttable.js"></script>
+	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">
+
+	
 	
 	<script src="script/form.js.php" type="text/javascript"></script>
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">	
@@ -207,15 +218,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <!-- ********************************************************************* -->
 
-<?
-	$clickurl = getSystemSetting('_logoclickurl');
-	if($clickurl != "" && $clickurl != "http://")
-		$logo =  '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php"></a>';
-	else
-		$logo = '<img src="logo.img.php">';
-?>
-
-
 <div>
 	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif" >
 		<tr><td style="font-size:8px;">&nbsp;</td></tr>
@@ -225,8 +227,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <div>
 	<table width="100%" border=0 cellpadding=0 cellspacing=0>
 	<tr>
-<?	// LOGO ?>
-		<td><div style="padding-left:10px; padding-bottom:10px;"><?=$logo?></div></td>
+		<td><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
 		<td><div class="custname"><?= escapehtml($_SESSION['custname']); ?></div></td>
 	</tr>
 	</table>

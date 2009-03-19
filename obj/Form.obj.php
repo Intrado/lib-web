@@ -4,49 +4,73 @@
 /* use the 3 column fieldset layout, each form item on a line by itself*/
 class Form {
 	var $name = "formname";
-	var $formpres = array();
 	var $formdata = array();
 	var $tindex = 1;
+	var $serialnum = "";
 	
-	function Form ($formpres, $formdata, $name = null) {
-		$this->formpres = $formpres;
+	function Form ($formdata, $name) {
 		$this->formdata = $formdata;
 		if (!isset($name ))
 			$name = sprintf("form%u",crc32(mt_rand() + time()));
 		$this->name = $name;
+		
+		$this->serialnum = $_SESSION["formsnum_$name"] = md5("form" . mt_rand() . microtime());
 	}
 
 	function render () {
 		$lasthelpstep = false;
 		$str = '
-		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST">';
+		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST">
+		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">';
 		
-		foreach ($this->formpres as $name => $itemdata) {			
-			$formclass = $itemdata[0];
-			$item = new $formclass($name, $itemdata[1],$itemdata[2],$itemdata[3],$itemdata[4]);
+		foreach ($this->formdata as $name => $itemdata) {
+			if (isset($itemdata['control'])) {
+				$control = $itemdata['control'];
+			} else {
+				//set a hidden field
+				$control = array("Hidden");
+			}
+			
+			$formclass = $control[0];
+			$item = new $formclass($name, $control);
 
-			if ($lasthelpstep && $lasthelpstep != $item->helpstep) {
+			if ($lasthelpstep && $lasthelpstep != $itemdata['helpstep']) {
 				$str .= '
 			</fieldset>';
 			}
 			
-			if ($lasthelpstep != $item->helpstep) {
-				$lasthelpstep = $item->helpstep;
+			if ($lasthelpstep != $itemdata['helpstep']) {
+				$lasthelpstep = $itemdata['helpstep'];
 				$str .= '<fieldset id="helpsection_'.$lasthelpstep.'">';
 				$this->helpsteps[] = $lasthelpstep;
 			}
 			
 			$n = $this->name."_".$item->name;
 			$t = $this->tindex++;
-			$l = $item->label;
+			$l = $itemdata['label'];
 			$i = "img/pixel.gif";
-			$value = $this->formdata[$item->name][0];
-			$style = "";
+			$value = $itemdata['value'];
+			$style = "";	
 			$msg = "";
-			if ($item->style == "style-required") {
-				$i = "img/icons/error.gif";
-				$style = 'style="background: rgb(255,255,220);"' ;
-				$msg = "Required";
+			
+			//see if valrequired is any of the validators
+			$isrequired = false;
+			foreach ($itemdata['validators'] as $v) {
+				if ($v[0] == "ValRequired") {
+					$isrequired = true;
+					$i = "img/icons/error.gif";
+					$style = 'style="background: rgb(255,255,220);"' ;
+					$msg = "Required";
+					break;
+				}
+			}
+			//check the value, and set style accordingly, dont count required fields with no value
+			$valresult = $isrequired && mb_strlen($value) == 0 ? true : Validator::validate_item($this->formdata,$name,$value);
+			
+			if ($valresult !== true) {
+				list($validator,$msg) =  $valresult;
+				$i = "img/icons/exclamation.gif";
+				$style = 'style="background: rgb(255,200,200);"' ;
 			}
 			
 			$str.= '
@@ -81,7 +105,6 @@ class Form {
 		<script type="text/javascript">
 		form_load("'.$this->name.'",
 			"'. $_SERVER['SCRIPT_NAME'] .'",
-			'.json_encode($this->formpres).',
 			'.json_encode($this->formdata).'
 		);
 		</script>

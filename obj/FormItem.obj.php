@@ -2,10 +2,7 @@
 
 abstract class FormItem {
 	var $name;
-	var $label;
-	var $helpstep;
 	var $args;
-	var $style;
 	
 	abstract function render ($form,$value) ;
 }
@@ -15,12 +12,9 @@ abstract class FormItem {
 
 class TextField extends FormItem {
 	
-	function TextField ($name,$label,$helpstep,$args,$style = "") {
+	function TextField ($name,$args) {
 		$this->name = $name;
-		$this->label = $label;
-		$this->helpstep = $helpstep;
 		$this->args = $args;
-		$this->style = $style;
 	}
 	function render ($form,$value) {
 		$n = $form->name."_".$this->name;
@@ -33,12 +27,9 @@ class TextField extends FormItem {
 
 class CheckBox extends FormItem {
 	
-	function CheckBox ($name,$label,$helpstep,$args,$style = "") {
+	function CheckBox ($name,$args) {
 		$this->name = $name;
-		$this->label = $label;
-		$this->helpstep = $helpstep;
 		$this->args = $args;
-		$this->style = $style;
 	}
 	function render ($form,$value) {
 		$n = $form->name."_".$this->name;
@@ -49,12 +40,9 @@ class CheckBox extends FormItem {
 
 class RadioButton extends FormItem {
 	
-	function RadioButton ($name,$label,$helpstep,$args,$style = "") {
+	function RadioButton ($name,$args) {
 		$this->name = $name;
-		$this->label = $label;
-		$this->helpstep = $helpstep;
 		$this->args = $args;
-		$this->style = $style;
 	}
 	function render ($form,$value) {
 		$n = $form->name."_".$this->name;

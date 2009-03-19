@@ -5,7 +5,8 @@ abstract class Validator {
 	var $label;
 	var $onlyserverside = false; //set this if you don't have a JS validator
 	
-	function handleAjaxRequest($formdata, $formpres) {
+	/* static */
+	function handleAjaxRequest($formdata) {
 		if (!isset($_GET['ajax']))
 			return false; //nothing to do
 		$result = array();
@@ -14,7 +15,7 @@ abstract class Validator {
 		
 		list($form,$item) = explode("_",$_GET['formitem']);
 		
-		$itemresult = validate_item($formdata,$formpres,$item,$_GET['value']);
+		$itemresult = Validator::validate_item($formdata,$item,$_GET['value']);
 		if ($itemresult === true) {
 			$result['validatorresult'] = true;
 		} else {
@@ -23,17 +24,71 @@ abstract class Validator {
 			$result['validatormsg'] = $msg;
 			$result['validator'] = $validator;
 		}
-		
+				
 		header("Content-Type: application/json");
 		echo json_encode($result);
 		
 		exit();
 	}
 	
+	/* static
+	 * spits out javascript required to install a validator in the form 
+	 * Takes a list of class names
+	 */
+	function load_validators ($validators) {
+		
+		echo "if (!document.validators) document.validators = {};\n";
+		
+		foreach ($validators as $validator) {
+			$obj = new $validator();
+?>
+		//constructor for <?=$validator?>
+		
+		document.validators["<?=$validator?>"] = 
+			function (element, name, label, args) {
+				this.validator = "<?=$validator?>";
+				this.onlyserverside = <?= $obj->onlyserverside ? "true" : "false" ?>;
+				this.element = element;
+				this.name = name;
+				this.label = label;
+				this.args = args;
+				this.validate = <?= $obj->getJSValidator() ?>;
+		};
+<?
+			
+		}
+	}
+	
+	/* static
+	 * works pre-merge 
+	 */
+	function validate_item ($formdata,$name,$value) {
+		$validators = $formdata[$name]['validators'];
+		
+		foreach ($validators as $validatordata) {
+			$validator = $validatordata[0];
+			//only validate non empty values (unless its the ValRequired validator)
+			if (mb_strlen($value) > 0 || $validator == "ValRequired") {		
+				$obj = new $validator();
+				$obj->label = $formdata[$name]['label'];
+				$obj->name = $name;
+				
+				$res = $obj->validate($value, $validatordata);
+				
+				if ($res !== true)
+					return array($validator,$res);
+			}
+		}
+		return true;
+	}
+
+
+	/* abstract */
 	function validate($value, $args) {
 		return false;
 	}
 	
+	/* abstract */
 	function getJSValidator () {
 		return '
 			function (name, label, value, args) {
@@ -42,6 +97,7 @@ abstract class Validator {
 			}
 		';
 	}
+	
 }
 
 class ValRequired extends Validator {
@@ -171,55 +227,8 @@ class ValNumeric extends Validator {
 	}
 }
 
-/* 
- * spits out javascript required to install a validator in the form 
- * Takes a list of class names
- */
-function load_validators ($validators) {
-	
-	echo "if (!document.validators) document.validators = {};\n";
-	
-	foreach ($validators as $validator) {
-		$obj = new $validator();
-?>
-	//constructor for <?=$validator?>
-	
-	document.validators["<?=$validator?>"] = 
-		function (element, name, label, args) {
-			this.validator = "<?=$validator?>";
-			this.onlyserverside = <?= $obj->onlyserverside ? "true" : "false" ?>;
-			this.element = element;
-			this.name = name;
-			this.label = label;
-			this.args = args;
-			this.validate = <?= $obj->getJSValidator() ?>;
-	};
-<?
-		
-	}
-}
 
 
-function validate_item ($formdata,$formpres,$name,$value) {
-	$validators = $formdata[$name][1];
-	
-	foreach ($validators as $validatordata) {
-		$validator = array_shift($validatordata);
-		$args = $validatordata;
-		
-		//only validate non empty values (unless its the ValRequired validator)
-		if (mb_strlen($value) > 0 || $validator == "ValRequired") {		
-			$obj = new $validator();
-			$obj->label = $formpres[$name][1];
-			$obj->name = $name;
-			
-			$res = $obj->validate($value, $args);
-			
-			if ($res !== true)
-				return array($validator,$res);
-		}
-	}
-	return true;
-}
+
 
 ?>

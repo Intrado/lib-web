@@ -2,13 +2,14 @@
 require_once("../obj/Validator.obj.php");
 
 //set expire time to + 1 hour so browsers cache this file
-header("Expires: " . date("r",time() + 60*60));
+header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
 header("Content-Type: text/javascript");
+header("Cache-Control: private");
 
 ?>
 
 /* ======= BEGIN VALIDATORS =======  */
-<? load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric")); ?>
+<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric")); ?>
 /* ======= END VALIDATORS =======  */
 
 
@@ -155,13 +156,13 @@ function form_highlight_section (num) {
 //exclamation.png - !
 //error.png - hazard
 //accept.png - check
-function form_load(name,scriptname,formpres,formdata) {
+function form_load(name,scriptname,formdata) {
 	var form = $(name);
 	form.scriptname = scriptname; //used for any ajax calls for this form
 	form.validators = {};
 	//make appropriate validators for each field
-	for (fieldname in formpres) {		
-		var label = formpres[fieldname][1];
+	for (fieldname in formdata) {		
+		var label = formdata[fieldname].label;
 		var id = form.id+"_"+fieldname;
 		var e = $(id);
 		
@@ -181,7 +182,7 @@ function form_load(name,scriptname,formpres,formdata) {
 		//if any of the validators is onlyserverside, then install a single ajax validator
 		//still include ValRequired
 		
-		var validatordata = formdata[fieldname][1];
+		var validatordata = formdata[fieldname]['validators'];
 		//create an initial array of validator instances from the data
 		var validators = validatordata.map(function (data) {
 			var validatorname = data[0];
