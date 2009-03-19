@@ -1,9 +1,4 @@
 <?
-function microtime_float()
-{
-    list($usec, $sec) = explode(" ", microtime());
-    return ((float)$usec + (float)$sec);
-}
 //quick utf8 aware replacement for htmlentities
 function escapehtml($var) {
 	return htmlentities($var, ENT_COMPAT, 'UTF-8') ;
@@ -251,7 +246,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.72 $
+	    # $Revision: 1.73 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -587,9 +582,6 @@ function getBrandTheme2(){
 function loadDisplaySettings(){
 	global $USER, $CUSTOMERURL;
 
-	if (!isset($_SESSION['etagstring'])){
-			$_SESSION['etagstring'] = mt_rand();
-	}
 	// fetch default scheme
 	$scheme = getCustomerData($CUSTOMERURL);
 	if($scheme == false){

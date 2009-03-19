@@ -45,9 +45,6 @@ include_once("nav.inc.php");
 
 buttons(button('Refresh', '', $_SERVER["REQUEST_URI"] ), button("Done","",$_SESSION['listreferer']));
 
-
-$starttime = microtime_float();
-
 //TODO these need to come from a form or something
 
 //now show the data
@@ -65,7 +62,6 @@ startWindow("Preview " . help('ShowList_Preview'));
 include("list.inc.php"); //expects $renderedlist to be set
 endWindow();
 
-$endtime = microtime_float();
 buttons(button('Refresh', '', $_SERVER["REQUEST_URI"] ), button("Done","","list.php"));
 
 include_once("navbottom.inc.php");
