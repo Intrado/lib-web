@@ -22,7 +22,6 @@ if(isset($_GET['resetDM']) || isset($_GET['update'])){
 	if($dmrow[1] != ""){
 ?>
 	<script>
-		window.alert('That DM already had a command queued.  New command queued instead.');
 		window.location="customerdms.php";
 	</script>
 <?
@@ -30,7 +29,6 @@ if(isset($_GET['resetDM']) || isset($_GET['update'])){
 	QuickUpdate("update dm set command = '" . $command ."' where id = " . $dmid);
 ?>
 	<script>
-		window.alert('<?=ucfirst($command)?> command initiated for DM: <?=addslashes($dmrow[0])?>');
 		window.location="customerdms.php";
 	</script>
 <?
