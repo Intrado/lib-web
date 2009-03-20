@@ -36,7 +36,7 @@ if(isset($_SESSION['currentpid'])){
 	$_SESSION['custname'] = $customerlist[$_SESSION['customerid']];
 	$result = portalAccessCustomer($_SESSION['customerid']);
 	if($result['result'] != ""){
-		error("An error occurred, please try again");
+		error(_L("An error occurred, please try again"));
 		$error = 1;
 	}
 	$customerpidlist = $_SESSION['pidlist'][$_SESSION['customerid']];
@@ -57,7 +57,7 @@ if(isset($_SESSION['currentpid'])){
 	$result = portalAccessCustomer($_SESSION['customerid']);
 
 	if($result['result'] != ""){
-		error("An error occurred, please try again");
+		error(_L("An error occurred, please try again"));
 		$error = 1;
 	}
 
@@ -129,7 +129,7 @@ if($PERSONID){
 		//check to see if formdata is valid
 		if(CheckFormInvalid($f))
 		{
-			error('Form was edited in another window, reloading data');
+			error(_L('Form was edited in another window, reloading data'));
 			$reloadform = 1;
 		}
 		else
@@ -141,7 +141,7 @@ if($PERSONID){
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
 				if(getSystemSetting('priorityenforcement') && $error = checkPriorityPhone($f, $s, $phones)){
-					error("You must have at least one phone number that can receive calls for these job types", $error);
+					error(_L("You must have at least one phone number that can receive calls for these job types"), $error);
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
 					unset($_SESSION['pidlist'][$_SESSION['customerid']][$personindex]);
@@ -178,7 +178,7 @@ if($PERSONID){
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Edit Contact Details - " . escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield);
+$TITLE = _L('Edit Contact Details - %1$s %2$s', escapehtml($person->$firstnamefield), escapehtml($person->$lastnamefield));
 
 include("nav.inc.php");
 startWindow(escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield));

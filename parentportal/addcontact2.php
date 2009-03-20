@@ -33,12 +33,12 @@ include("nav.inc.php");
 startWindow("Add Successful");
 ?>
 	<div style="margin:5px">
-		You have successfully added <?=escapehtml($person->$firstnamefield)?> <?=escapehtml($person->$lastnamefield)?>.
+		<?=_L('You have successfully added %1$s %2$s.', escapehtml($person->$firstnamefield), escapehtml($person->$lastnamefield))?>
 	<br>
-		Would you like to add another contact?
+		<?=_L('Would you like to add another contact?')?>
 	</div>
 <?
-buttons(button("Yes", NULL, "addcontact1.php"), button("No", NULL, "addcontact3.php"));
+buttons(button(_L("Yes"), NULL, "addcontact1.php"), button(_L("No"), NULL, "addcontact3.php"));
 endWindow();
 
 include("navbottom.inc.php");

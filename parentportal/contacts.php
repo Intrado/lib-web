@@ -35,7 +35,7 @@ if($_SESSION['customerid']){
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_contact_actions($obj){
-	$actions = '<a href="contactpreferences.php?id=' . $obj->id . '">Edit Contact Preferences</a>';
+	$actions = '<a href="contactpreferences.php?id=' . $obj->id . '">' . _L("Edit Contact Preferences") . '</a>';
 	return $actions;
 }
 
@@ -43,17 +43,17 @@ function fmt_contact_actions($obj){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE="contacts:contacts";
-$TITLE="Your Contacts";
+$TITLE=_L("Your Contacts");
 include_once("nav.inc.php");
 
-startWindow("Contacts",'padding: 3px;');
-button_bar(button("Add A Contact", null, "addcontact.php"));
+startWindow(_L("Contacts"),'padding: 3px;');
+button_bar(button(_L("Add A Contact"), null, "addcontact.php"));
 if($data){
 	showObjects($data, $titles, $formatters);
 } else {
 	?>
 	<table>
-		<tr><td>You are not associated with any contacts.  If you would like to add a contact, <a href="addcontact.php"/>Click Here</a></td></tr>
+		<tr><td><?=_L("You are not associated with any contacts.  If you would like to add a contact,")?> <a href="addcontact.php"/><?=_L("Click Here")?></a></td></tr>
 	</table>
 <?
 }

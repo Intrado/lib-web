@@ -44,14 +44,14 @@ $TITLE = "Contact Activation - ERROR";
 
 include_once("nav.inc.php");
 NewForm("addstudent");
-startWindow('Phone Activation');
+startWindow(_L('Phone Activation'));
 ?>
 
-<BR>Sorry, an unexpected error occured.  Please go back and try again.<BR><BR>
+<BR><?=_L("Sorry, an unexpected error occured.  Please go back and try again.")?><BR><BR>
 
 <?
 endWindow();
-buttons(button("Back", NULL, "phoneactivation1.php"));
+buttons(button(_L("Back"), NULL, "phoneactivation1.php"));
 EndForm();
 include_once("navbottom.inc.php");
 

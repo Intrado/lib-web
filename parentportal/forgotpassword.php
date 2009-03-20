@@ -1,4 +1,7 @@
 <?
+if (!isset($_SESSION['_locale']))
+	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
@@ -19,9 +22,9 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$email1 = get_magic_quotes_gpc() ? stripslashes($_POST['email1']) : $_POST['email1'];
 	$email2 = get_magic_quotes_gpc() ? stripslashes($_POST['email2']) : $_POST['email2'];
 	if ($email1 !== $email2){
-		error("The 2 emails you have entered do not match");
+		error(_L("The 2 emails you have entered do not match"));
 	} else if(!validEmail($email1)){
-		error("That is not a valid email address");
+		error(_L("That is not a valid email address"));
 	} else {
 		$result = portalForgotPassword($email1);
 		if($result['result'] == ""){
@@ -36,10 +39,10 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 }
 
-$TITLE = "Password Assistance";
+$TITLE = _L("Password Assistance");
 include_once("cmlogintop.inc.php");
 if($generalerror){
-	error("There was a problem with your request.  Please try again later");
+	error(_L("There was a problem with your request.  Please try again later"));
 }
 
 if(!$success){
@@ -50,7 +53,7 @@ if(!$success){
 			<td colspan="2""><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 		</tr>
 		<tr>
-			<td colspan="2">To begin the password reset process, enter your email address.</td>
+			<td colspan="2"><?=_L("To begin the password reset process, enter your email address.")?></td>
 		</tr>
 		<tr>
 			<td>Email:</td>
@@ -62,11 +65,11 @@ if(!$success){
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><div><input type="image" src="img/submit.gif" onmouseover="this.src='img/submit_over.gif';" onmouseout="this.src='img/submit.gif';"></div></td>
+			<td><div><input type="submit" name="submit" value="<?=_L("Submit")?>"></div></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><br><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
+			<td><br><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></td>
 		</tr>
 	</table>
 </form>
@@ -79,8 +82,8 @@ if(!$success){
 			<td>&nbsp;</td>
 			<td>
 				<div style="margin:5px">
-					Check your email to receive the password reset link.
-					<br>You will be redirected to the Activation page in 10 seconds, or you can <a href="index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?f"; else echo "&f"; ?>">Click Here to continue.</a>
+					<?=_L("Check your email to receive the password reset link.")?>
+					<br><?=_L("You will be redirected to the Activation page in 10 seconds, or you can")?> <a href="index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?f"; else echo "&f"; ?>"><?=_L("Click Here to continue.")?></a>
 				</div>
 				<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?f"; else echo "&f"; ?>">
 			</td>

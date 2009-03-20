@@ -48,16 +48,16 @@ if(isset($_GET['customerid']) && $_GET['customerid']){
 }
 
 $PAGE = ":";
-$TITLE = "Select an Account";
+$TITLE = _L("Select an Account");
 $hidenav = 1;
 include_once("nav.inc.php");
-startWindow("Select Account");
+startWindow(_L("Select Account"));
 ?>
 <div style="margin:5px">
-	You have contacts associated with more than one customer account.
-	<br>Please select the account you would like to access:
+	<?=_L("You have contacts associated with more than one customer account.")?>
+	<br><?=_L("Please select the account you would like to access")?>:
 	<table cellpadding="3" cellspacing="1" class="list">
-		<tr><th class="listHeader">Customer Accounts</th></tr>
+		<tr><th class="listHeader"><?=_L("Customer Accounts")?></th></tr>
 <?
 		$alt = 0;
 		foreach($customerlist as $index => $customername){

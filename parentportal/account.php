@@ -108,16 +108,16 @@ if( $reloadform )
 }
 
 $PAGE = "account:account";
-$TITLE = "Account Information: " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " . escapehtml($_SESSION['portaluser']['portaluser.lastname']);
+$TITLE = _L("Account Information") . ": " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " . escapehtml($_SESSION['portaluser']['portaluser.lastname']);
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, _L('Save')), button(_L("Change Email"), NULL, "changeemail.php"));
+buttons(submit($f, $s, _L('Save')), button(_L("Change Email"), NULL, "changeemail.php"), button(_L("Cancel"), NULL, "start.php"));
 
 startWindow(_L('User Information'));
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>
-			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;">Account Info:</th>
+			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;"><?=_L("Account Info")?>:</th>
 			<td class="bottomBorder">
 				<table border="0" cellpadding="1" cellspacing="0">
 					<tr>

@@ -12,8 +12,8 @@ if($PERSONID){
 			<th align="left" colspan="<?=count($jobtypes)+2; ?>"><?=format_delivery_type($type); ?></th>
 		</tr>
 		<tr class="windowRowHeader" >
-			<th align="left">Contact&nbsp;Type</th>
-			<th align="left">Destination</th>
+			<th align="left"><?=_L("Contact Type")?></th>
+			<th align="left"><?=_L("Destination")?></th>
 <?
 			foreach($jobtypes as $jobtype){
 				?><th><?=jobtype_info($jobtype)?></th><?
@@ -87,8 +87,8 @@ if($PERSONID){
 					<th align="left" colspan="<?=count($jobtypes)+3; ?>"><?=format_delivery_type($type); ?></th>
 				</tr>
 				<tr class="windowRowHeader" >
-					<th align="left">Contact&nbsp;Type</th>
-					<th align="left">Destination</th>
+					<th align="left"><?=_L("Contact Type")?></th>
+					<th align="left"><?=_L("Destination")?></th>
 <?
 					foreach($jobtypes as $jobtype){
 						?><th><?=jobtype_info($jobtype)?></th><?
@@ -121,10 +121,10 @@ if($PERSONID){
 			}
 ?>
 	</table>
-	<div><? NewFormItem($f, $s, "savetoall", "checkbox"); ?> Save To All Contacts</div>
+	<div><? NewFormItem($f, $s, "savetoall", "checkbox"); ?> <?=_L("Save To All Contacts")?></div>
 	<br>
 <?
-	echo submit($f, $s, "Save");
+	echo submit($f, $s, _L("Save"));
 	EndForm();
 }
 ?>

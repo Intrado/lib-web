@@ -54,7 +54,7 @@ $reloadform = 0;
 if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 	//check to see if formdata is valid
 	if (CheckFormInvalid($f)) {
-		error('Form was edited in another window, reloading data');
+		error(_L('Form was edited in another window, reloading data'));
 		$reloadform = 1;
 	} else {
 		MergeSectionFormData($f, $s);
@@ -62,9 +62,9 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
 		TrimFormData($f, $s, "pkeyadd");
 		//do check
 		if ( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+			error(_L('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly'));
 		} else if (CheckFormSubmit($f, 'add') && GetFormData($f, $s, "pkeyadd") == "") {
-			error('Please enter a Contact Identification Number');
+			error(_L('Please enter a Contact Identification Number'));
 		} else {
 			$_SESSION['phoneactivationpkeylist'] = array(); // clear out any previous pkeys
 
@@ -126,16 +126,16 @@ startWindow('Add Contact');
 <table cellpadding="3">
 
 <? if (!$oktogo) { ?>
-	<tr><td>There were problems with one or more of the ID numbers you entered.</td></tr>
-	<tr><td>Try modifying or removing the ID numbers that are causing the errors.</td></tr>
-	<tr><td>If you still experience problems try activating only one ID number at a time.</td></tr>
+	<tr><td><?=_L("There were problems with one or more of the ID numbers you entered.")?></td></tr>
+	<tr><td><?=_L("Try modifying or removing the ID numbers that are causing the errors.")?></td></tr>
+	<tr><td><?=_L("If you still experience problems try activating only one ID number at a time.")?></td></tr>
 
 <?	} else { ?>
 
-	<tr><td>Enter the ID numbers of the people you wish to add to your account.</td></tr>
-	<tr><td>You can add multiple people to your account in a single call to our toll free number.</td></tr>
-	<tr><td>Enter all of your ID numbers by using the Add More button.</td></tr>
-	<tr><td>Clear any ID numbers you don't want to include, then click Next.</td></tr>
+	<tr><td><?=_L("Enter the ID numbers of the people you wish to add to your account.")?></td></tr>
+	<tr><td><?=_L("You can add multiple people to your account in a single call to our toll free number.")?></td></tr>
+	<tr><td><?=_L("Enter all of your ID numbers by using the Add More button.")?></td></tr>
+	<tr><td><?=_L("Clear any ID numbers you don't want to include, then click Next.")?></td></tr>
 <?	} ?>
 
 	<tr><td class="bottomBorder">&nbsp;</td></tr>
@@ -150,17 +150,17 @@ startWindow('Add Contact');
 <?	foreach (array_keys($_SESSION['phoneactivationpkeylist']) as $pkey) { ?>
 		<tr><td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkey".$i, "text", "20", "255"); ?></td>
 <? if (!$oktogo) {
-		$statustext = "Unknown";
+		$statustext = _L("Unknown");
 		if ($_SESSION['phoneactivationpkeylist'][$pkey] == "notfound") {
-			$statustext = "Error: Unable to locate this ID number in the system.";
+			$statustext = _L("Error: Unable to locate this ID number in the system.");
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "nophone") {
-			$statustext = "Error: There are no phone numbers on record for this ID number.";
+			$statustext = _L("Error: There are no phone numbers on record for this ID number.");
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "notallow") {
-			$statustext = "Error: This ID number is blocked from phone activation.  Contact the system administrator for ".escapehtml($_SESSION['custname'])." for assistance.";
+			$statustext = _L("Error: This ID number is blocked from phone activation.") . _L("Contact the system administrator at %s for assistance.", escapehtml($_SESSION['custname']));
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "nophonematch") {
-			$statustext = "Error: This ID number cannot be activated along with the others you entered.";
+			$statustext = _L("Error: This ID number cannot be activated along with the others you entered.");
 		} else if ($_SESSION['phoneactivationpkeylist'][$pkey] == "ok") {
-			$statustext = "OK";
+			$statustext = _L("OK");
 		}
 ?>
 		<td><?=$statustext?></td>
@@ -178,12 +178,12 @@ startWindow('Add Contact');
 
 </table></td></tr>
 
-	<tr><td> <? if ($i < $maxcontacts) echo submit($f, 'add', 'Add More'); ?>  </td></tr>
+	<tr><td> <? if ($i < $maxcontacts) echo submit($f, 'add', _('Add More')); ?>  </td></tr>
 
 </table>
 <?
 endWindow();
-buttons(submit($f, $s, 'Next'), button("Cancel", NULL, "addcontact3.php"));
+buttons(submit($f, $s, 'Next'), button(_L("Cancel"), NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>

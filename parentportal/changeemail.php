@@ -9,9 +9,9 @@ require_once("../inc/table.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 
-$error_badpass = "That password is incorrect";
-$error_generalproblem = "There was a problem changing your username, please try again later";
-$error_badusername = "That username is already in use";
+$error_badpass = _L("That password is incorrect");
+$error_generalproblem = _L("There was a problem changing your username, please try again later");
+$error_badusername = _L("That username is already in use");
 /****************** main message section ******************/
 
 $f = "changeemail";
@@ -24,7 +24,7 @@ if(CheckFormSubmit($f,$s))
 	//check to see if formdata is valid
 	if(CheckFormInvalid($f))
 	{
-		error('Form was edited in another window, reloading data');
+		error(_L('Form was edited in another window, reloading data'));
 		$reloadform = 1;
 	}
 	else
@@ -35,7 +35,7 @@ if(CheckFormSubmit($f,$s))
 
 		//do check
 		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+			error(_L('There was a problem trying to save your changes'), _L('Please verify that all required field information has been entered properly'));
 		} else {
 			//submit changes
 			$email = GetFormData($f, $s, "newemail");
@@ -78,17 +78,17 @@ $TITLE = "Change Email";
 include_once("nav.inc.php");
 
 if($success){
-	startWindow('Change Email' . help("Changeemail"));
+	startWindow(_L('Change Email') . help("Changeemail"));
 	?>
-	<div style="margin:5px">You should receive an email shortly at the new address with a confirmation code.</div>
+	<div style="margin:5px"><?=_L("You should receive an email shortly at the new address with a confirmation code.")?></div>
 	<form method='POST' action="index.php?c" name="activate" id="activate">
 		<table>
 			<tr>
-				<td>Confirmation Code: </td>
+				<td><?=_L("Confirmation Code")?>: </td>
 				<td><input type="text" name="token" size="50" /></td>
 			</tr>
 			<tr>
-				<td>Password:</td>
+				<td><?=_L("Password")?>:</td>
 				<td><input type="password" name="password" /></td>
 			</tr>
 			<tr>
@@ -102,16 +102,16 @@ if($success){
 } else {
 	NewForm($f);
 	if(!$success)
-		buttons(submit($f, $s, 'Submit'));
-	startWindow('Change Email' . help("Changeemail"));
+		buttons(submit($f, $s, 'Submit'), button(_L("Cancel"), NULL, "start.php"));
+	startWindow(_L('Change Email') . help("Changeemail"));
 ?>
 	<table>
 		<tr>
-			<td>New Email Address:</td>
+			<td><?=_L("New Email Address")?>:</td>
 			<td><? NewFormItem($f, $s, "newemail", "text", "50", "100") ?> </td>
 		</tr>
 		<tr>
-			<td>Password:</td>
+			<td><?=_L("Password")?>:</td>
 			<td><? NewFormItem($f, $s, "password", "password", "20", "100") ?> </td>
 		</tr>
 	</table>

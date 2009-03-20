@@ -107,7 +107,7 @@ if($PERSONID){
 		//check to see if formdata is valid
 		if(CheckFormInvalid($f))
 		{
-			error('Form was edited in another window, reloading data');
+			error(_L('Form was edited in another window, reloading data'));
 			$reloadform = 1;
 		}
 		else
@@ -119,7 +119,7 @@ if($PERSONID){
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
 				if(getSystemSetting('priorityenforcement') && $error = checkPriorityPhone($f, $s, $phones)){
-					error("You must have at least one phone number that can receive calls for these job types: " . implode(", ", $error));
+					error(_L("You must have at least one phone number that can receive calls for these job types: ") . implode(", ", $error));
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
 
@@ -165,15 +165,15 @@ if($PERSONID){
 	$TITLE .= " - " . escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield);
 }
 include_once("nav.inc.php");
-startWindow("Contacts" . help("Contactpreferences"), 'padding: 3px;');
-buttons(button("Add A Contact", null, "phoneactivation0.php"));
+startWindow(_L("Contacts") . help("Contactpreferences"), 'padding: 3px;');
+buttons(button(_L("Add A Contact"), null, "phoneactivation0.php"));
 
 if(isset($contactList) && $contactList){
 
-	$titles = array($firstnamefield => "First Name",
-					$lastnamefield => "Last Name",
-					"pkey" => "ID#",
-					"Actions" => "Actions");
+	$titles = array($firstnamefield => _L("First Name"),
+					$lastnamefield => _L("Last Name"),
+					"pkey" => _L("ID#"),
+					"Actions" => _L("Actions"));
 	$formatters = array("Actions" => "contact_actions");
 
 

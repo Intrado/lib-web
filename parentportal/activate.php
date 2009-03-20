@@ -89,21 +89,21 @@ if ($forgot) {
 		$action = "?f";
 	else
 		$action = $appendcustomerurl."&f";
-	$text = "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address";
+	$text = _L("Please enter it below along with your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address");
 } else if ($changeuser) {
 	$TITLE = "Change Email";
 	if ($appendcustomerurl == "")
 		$action = "?c";
 	else
 		$action = $appendcustomerurl."&c";
-	$text = "your password";
+	$text = _L("Please enter it below along with your password");
 } else {
 	$TITLE = "Activate Account";
 	if ($appendcustomerurl == "")
 		$action = "?n";
 	else
 		$action = $appendcustomerurl."&n";
-	$text = "your password";
+	$text = _L("Please enter it below along with your password");
 }
 include("cmlogintop.inc.php");
 
@@ -118,24 +118,24 @@ if($forgotsuccess || $success || $newusersuccess){
 if($forgotsuccess){
 	?>
 	<div style="margin:5px">
-		Thank you, your password has been reset.
-		<br>You will be redirected to the main page in 10 seconds or <a href="choosecustomer.php<?echo $appendcustomerurl;?>">Click Here.</a>
+		<?=_L("Thank you, your password has been reset.")?>
+		<br><?=_L("You will be redirected to the main page in 10 seconds or")?> <a href="choosecustomer.php<?echo $appendcustomerurl;?>"><?=_L("Click Here.")?></a>
 	</div>
 	<meta http-equiv="refresh" content="10;url=choosecustomer.php<?echo $appendcustomerurl;?>">
 	<?
 } else if($success){
 	?>
 	<div style="margin:5px">
-		Thank you, your account has been activated.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
+		<?=_L("Thank you, your account has been activated.")?>
+		<br><?=_L("You will be redirected to the main page in 10 seconds or")?> <a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Click Here.")?></a>
 	</div>
 	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
 	<?
 } else if($newusersuccess){
 	?>
 	<div style="margin:5px">
-		Thank you, your email address has been changed.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
+		<?=_L("Thank you, your email address has been changed.")?>
+		<br><?=_L("You will be redirected to the main page in 10 seconds or")?> <a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Click Here.")?></a>
 	</div>
 	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
 	<?
@@ -156,29 +156,29 @@ if($form){
 				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 			</tr>
 			<tr>
-				<td colspan="2">You should have received an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
+				<td colspan="2"><?=_L("You should have received an email containing a confirmation code.")?> <?=$text?>.<br></td>
 			</tr>
 
 			<tr>
-				<td>Confirmation Code: </td>
+				<td><?=_L("Confirmation Code")?>: </td>
 				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="35" /></td>
 			</tr>
 <?
 		if($forgot){
 ?>
 			<tr>
-				<td>New Password:</td>
+				<td><?=_L("New Password")?>:</td>
 				<td><input type="password" name="password1"  size="35" maxlength="50" /></td>
 			</tr>
 			<tr>
-				<td>Confirm Password:</td>
+				<td><?=_L("Confirm Password")?>:</td>
 				<td><input type="password" name="password2"  size="35" maxlength="50" /></td>
 			</tr>
 <?
 		} else {
 ?>
 			<tr>
-				<td>Password:</td>
+				<td><?=_L("Password")?>:</td>
 				<td><input type="password" name="password"  size="35" maxlength="50"/></td>
 			</tr>
 <?
@@ -186,7 +186,7 @@ if($form){
 ?>
 		<tr>
 			<td>&nbsp;</td>
-			<td><div><input type="image" src="img/submit.gif" onmouseover="this.src='img/submit_over.gif';" onmouseout="this.src='img/submit.gif';"></div></td>
+			<td><div><input type="submit" name="submit" value="Submit"></div></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -194,11 +194,11 @@ if($form){
 <?
 		if ($error && $forgot){
 ?>
-			<div style="color: red;">That code is invalid or has expired.</div>
+			<div style="color: red;"><?=_L("That code is invalid or has expired.")?></div>
 <?
 		} else if ($error){
 ?>
-			<div style="color: red;">That code is invalid or has expired or that is an incorrect password.</div>
+			<div style="color: red;"><?=_L("That code is invalid or has expired or that is an incorrect password.")?></div>
 <?
 		} else {
 			echo "&nbsp;";
@@ -208,7 +208,7 @@ if($form){
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
+			<td><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></td>
 		</tr>
 		</table>
 	</form>

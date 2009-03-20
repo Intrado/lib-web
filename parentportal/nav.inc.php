@@ -85,7 +85,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
-	<title>SchoolMessenger Contact Manager: <?= $PAGETITLE ?></title>
+	<title><?=_L("SchoolMessenger Contact Manager")?>: <?= $PAGETITLE ?></title>
 	<script src='script/utils.js'></script>
 	<script src='script/sorttable.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
@@ -117,7 +117,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<? if (isset($contactList) && $contactList) echo $MAINTABS ?>
 
 		<div class="applinks hoverlinks">
-			<a href="account.php">My Account</a> |
+			<a href="account.php"><?=_L("My Account")?></a> |
 	<?
 			$result = portalGetCustomerAssociations();
 			if($result['result'] == ""){
@@ -128,17 +128,17 @@ header('Content-type: text/html; charset=UTF-8') ;
 			}
 
 			if(count($customeridlist) > 1){
-				?><a href="choosecustomer.php">Change Customer</a> |<?
+				?><a href="choosecustomer.php"><?=_L("Change Customer")?></a> |<?
 			}
 	?>
-			<a href="#" onclick="window.open('help/index.html', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
+			<a href="#" onclick="window.open('<?=isset($LOCALE)?"locale/$LOCALE/help/index.html":"help/index.html"?>', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"><?=_L("Help")?></a> |
 <?
 	$logout = "index.php?logout=1";
 	if (isset($_SESSION['customerurl'])) {
 		$logout .= "&u=".urlencode($_SESSION['customerurl']);
 	}
 ?>
-			<a href="<?=$logout?>">Logout</a>
+			<a href="<?=$logout?>"><?=_L("Logout")?></a>
 		</div>
 
 	</div>

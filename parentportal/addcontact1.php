@@ -25,7 +25,7 @@ if(CheckFormSubmit($f,$s))
 		//do check
 
 		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+			error(_L('There was a problem trying to save your changes'), _L('Please verify that all required field information has been entered properly'));
 		} else {
 			//submit changes
 			$result = portalAssociatePerson(GetFormData($f, $s, "code"), GetFormData($f, $s, "pkey"));
@@ -47,7 +47,7 @@ if(CheckFormSubmit($f,$s))
 					$_SESSION['custname'] = $customerlist[$customeridlist[0]];
 					$accessresult = portalAccessCustomer($customeridlist[0]);
 					if($accessresult['result'] != ""){
-						error("There was an unknown problem connecting to that customer");
+						error(_L("There was an unknown problem connecting to that customer"));
 					}
 					//make sure timezone gets updated to the current customer's tz
 					$timezone = getSystemSetting("timezone");
@@ -59,7 +59,7 @@ if(CheckFormSubmit($f,$s))
 				$_SESSION['currentcid'] = $result['customerid'];
 				redirect("addcontact2.php");
 			} else {
-				error("That is not a valid Activation Code and Person ID combination");
+				error(_L("That is not a valid Activation Code and Person ID combination"));
 			}
 		}
 	}
@@ -79,24 +79,24 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Add A Contact";
+$TITLE = _L("Add A Contact");
 
 include_once("nav.inc.php");
 NewForm($f);
 
-startWindow('Add');
+startWindow(_L('Add'));
 ?>
 <table>
 	<tr>
-		<td>ID#</td><td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
+		<td><?=_L("ID#")?></td><td><? NewFormItem($f, $s, "pkey", "text", "20", "255") ?></td>
 	</tr>
 	<tr>
-		<td>Activation Code: </td><td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
+		<td><?=_L("Activation Code")?>: </td><td><? NewFormItem($f, $s, "code", "text", "10") ?></td>
 	</tr>
 </table>
 <?
 endWindow();
-buttons(submit($f, $s, 'Add'), button("Cancel", NULL, "addcontact3.php"));
+buttons(submit($f, $s, _L('Add')), button(_L("Cancel"), NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>

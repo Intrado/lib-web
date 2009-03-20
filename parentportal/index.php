@@ -1,9 +1,12 @@
 <?
+if (!isset($_SESSION['_locale']))
+	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
 
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../inc/form.inc.php");
 
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
 $appendcustomerurl = "";
@@ -40,6 +43,16 @@ if (isset($_GET['logout'])) {
 	portalputSessionData(session_id(), ""); // write empty data to flush the user
 
 	@session_destroy();
+}
+
+if (isset($_GET['locale'])) {
+	setcookie('locale', $_GET['locale']);
+	redirect();
+}
+
+if (isset($_GET['deletelocale'])) {
+	setcookie('locale', '');
+	redirect();
 }
 
 if ($SETTINGS['feature']['has_ssl']) {
@@ -83,17 +96,27 @@ if($id){
 	redirect("choosecustomer.php".$appendcustomerurl);
 }
 
+PutFormData("login", "main", "_locale", isset($LOCALE)?$LOCALE:"en_US", "text", "nomin", "nomax");
 
-$TITLE= "Sign In";
+$TITLE= _L("Sign In");
 
 include_once("cmlogintop.inc.php");
-
 ?>
 <form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
 	<table style="color: #365F8D;" >
 		<tr>
 			<td colspan="3">
-				<div style="font-size: 20px; font-weight: bold;">SchoolMessenger Contact Manager</div>
+				<div><div style="font-size: 20px; font-weight: bold; float: left"><?=_L("SchoolMessenger Contact Manager")?></div>
+				<div style="float:right;"> 
+				<?
+					NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"index.php?locale=\"+this.options[this.selectedIndex].value'");
+					foreach($LOCALES as $loc => $lang){
+						NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
+					}
+					NewFormItem("login", "main", '_locale', 'selectend');
+				?>
+				</div></div>
+				<br>
 				<br>
 				<br>
 			</td>
@@ -103,37 +126,37 @@ include_once("cmlogintop.inc.php");
 <?
 				if ($badlogin) {
 				?>
-					<div style="color: red;">Incorrect username/password. Please try again.</div><br>
+					<div style="color: red;"><?=_L("Incorrect username/password. Please try again.")?></div><br>
 				<?
 				}
 ?>
 			</td>
 		<tr>
-			<td>Email:</td>
-			<td><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=escapehtml($login)?>"/></td>
+			<td><?=_L("Email")?>:</td>
+			<td><input type="text" id="logintext" name="login" size="30" maxlength="255" value="<?=escapehtml($login)?>"/></td>
 			<td>&nbsp;</td>
 
 		</tr>
 		<tr>
-			<td>Password&nbsp;(case&nbsp;sensitive):</td>
-			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
-			<td align="left"><a href="forgotpassword.php<?echo $appendcustomerurl;?>">Forgot your password? Click Here</a></td>
+			<td><?=str_replace(" ", "&nbsp;", _L("Password (case sensitive)"))?>:</td>
+			<td><input type="password" name="password" size = "30" maxlength="50" onkeypress="capslockCheck(event)"/></td>
+			<td align="left"><a href="forgotpassword.php<?echo $appendcustomerurl;?>"><?=_L("Forgot your password? Click Here")?></a></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;">Warning! Your Caps Lock key is on.</div></td>
+			<td><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div></td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td align="right"><div style="text-align: right;"><input type="image" src="img/signin.gif" onmouseover="this.src='img/signin_over.gif';" onmouseout="this.src='img/signin.gif';"></div></td>
+			<td align="right"><div style="text-align: right;"><input type="submit" name="signin" value="<?=_L("Sign In")?>"></div></td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan="3">First time accessing the SchoolMessenger Contact Manager?</td>
+			<td colspan="3"><?=_L("First time accessing the SchoolMessenger Contact Manager?")?></td>
 		</tr>
 		<tr>
-			<td colspan="3"><a href="newportaluser.php<?echo $appendcustomerurl;?>"><b>Sign up now</b></a></td>
+			<td colspan="3"><a href="newportaluser.php<?echo $appendcustomerurl;?>"><b><?=_L("Sign up now")?></b></a></td>
 		</tr>
 	</table>
 </form>

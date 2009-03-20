@@ -3,15 +3,15 @@
 
 <div id="termsinfo">
 <? /*CSDELETEMARKER_START*/ if (!$IS_COMMSUITE) { ?>
-Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
+<?=_L('Use of this system is subject to the %1$s and %2$s', '<a href="locale/' . $LOCALE . '/privacy.html" target="_blank">' . _L("Privacy Policy") . "</a>", '<a href="locale/' . $LOCALE . '/terms.html" target="_blank">' . _L("Terms of Service") . "</a>")?>
 <br>
 <? } /*CSDELETEMARKER_END*/ ?>
-&copy; 1999-2009 Reliance Communications, Inc. All Rights Reserved.
+&copy; 1999-2009 Reliance Communications, Inc. <?=_L("All Rights Reserved.")?>
 
 </div>
 <?
 
-print "<div id='logininfo' class='noprint' >Logged in as " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " .escapehtml($_SESSION['portaluser']['portaluser.lastname'] . " (" . $_SESSION['portaluser']['portaluser.username']) . ") <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
+print "<div id='logininfo' class='noprint' >" . _L('Logged in as %1$s %2$s (%3$s) ', escapehtml($_SESSION['portaluser']['portaluser.firstname']), escapehtml($_SESSION['portaluser']['portaluser.lastname']), $_SESSION['portaluser']['portaluser.username']) . " <br> " . _L('Current system time is %s', date("F jS, Y h:i a (e)")) . "</div>";
 
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {

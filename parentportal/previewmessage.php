@@ -116,38 +116,38 @@ function formatText($messageid, $historicdata) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$TITLE = "Message";
+$TITLE = _L("Message");
 
 include_once("popup.inc.php");
 
-buttons(button('Done', 'window.close()'));
+buttons(button(_L('Done'), 'window.close()'));
 
 
-startWindow('Details', 'padding: 3px;');
+startWindow(_L('Details'), 'padding: 3px;');
 ?>
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Message For:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</td>
 			<td class="bottomBorder"><?=$historicdata['f01'] . " " . $historicdata['f02']?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Job Name:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</td>
 			<td class="bottomBorder"><?=$historicdata['jobname']?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Date:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</td>
 			<td class="bottomBorder"><?=date("M j, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
 <?
 	if($email && count($attachments)){
 ?>
 			<tr>
-				<th align="right" class="windowRowHeader bottomBorder">Attachments:</th>
+				<th align="right" class="windowRowHeader bottomBorder"><?=_L("Attachments")?>:</th>
 				<td colspan="3" class="bottomBorder">
 					<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 					<tr class="listHeader" align="left" valign="bottom">
-						<th>Name</th>
-						<th>Size</th>
+						<th><?=_L("Name")?></th>
+						<th><?=_L("Size")?></th>
 					</tr>
 <?
 				foreach ($attachments as $attachment) {
@@ -170,14 +170,14 @@ startWindow('Details', 'padding: 3px;');
 endWindow();
 
 if($phone){
-	startWindow('Message', 'padding: 3px;');
+	startWindow(_L('Message'), 'padding: 3px;');
 	?>
 
 		<div align="center">
 
 		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
 		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-		STANDBY="Loading Windows Media Player components..."
+		STANDBY="<?=_L("Loading Windows Media Player components...")?>"
 		TYPE="application/x-oleobject">
 
 		<PARAM NAME="FileName" VALUE="preview.wav.php?jid=<?= $jobid ?>&pid=<?= $personid ?>">
@@ -186,12 +186,12 @@ if($phone){
 		</OBJECT>
 
 
-		<br><a href="preview.wav.php?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true">Click here to download</a>
+		<br><a href="preview.wav.php?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true"><?=_L("Click here to download")?></a>
 		</div>
 	<?
 	endWindow();
 } else if ($email || $sms){
-	startWindow('Message', 'padding: 3px;');
+	startWindow(_L('Message'), 'padding: 3px;');
 ?>
 		<div><?= str_replace("\n", "<br/>", escapehtml($message))?></div>
 <?
