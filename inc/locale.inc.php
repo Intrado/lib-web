@@ -6,21 +6,19 @@ $LOCALES = array("en_US" => "English",
 				"es_US" => "Español",
 				"fr_CA" => "Français");
 
-if (isset($_SESSION['portaluser']['portaluser.preferences']['_locale']))
-	$locale = $_SESSION['portaluser']['portaluser.preferences']['_locale'];
-	
 if (isset($_SESSION['_locale']))
-	$locale = $_SESSION['_locale'];
+	$LOCALE = $_SESSION['_locale'];
 
-if (isset($_SESSION['user']))
-	$locale = $USER->getSetting('_locale', getSystemSetting('_locale'));
+if (isset($_SESSION['portaluser']['portaluser.preferences']['_locale']))
+	$LOCALE = $_SESSION['portaluser']['portaluser.preferences']['_locale'];
 
-if (!isset($locale) || !isset($locale, $LOCALES))
-	$locale = 'en_US';
+if (!isset($LOCALE) || !isset($LOCALE, $LOCALES)) {
+	$LOCALE = 'en_US';
+}
 
-putenv("LANGUAGE=$locale");
-putenv("LC_ALL=$locale");
-setlocale(LC_ALL,$locale);
+putenv("LANGUAGE=$LOCALE");
+putenv("LC_ALL=$LOCALE");
+setlocale(LC_ALL,$LOCALE);
 bindtextdomain("messages", "./locale");
 bind_textdomain_codeset("messages", 'UTF-8');
 textdomain("messages");

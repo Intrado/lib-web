@@ -246,7 +246,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.73 $
+	    # $Revision: 1.74 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -587,7 +587,7 @@ function loadDisplaySettings(){
 	if($scheme == false){
 		$scheme = array("_brandtheme" => "3dblue",
 						"_supportemail" => "support@schoolmessenger.com",
-						"_supportphone" => "800.920.3897",
+						"_supportphone" => "8009203897",
 						"colors" => array("_brandprimary" => "26477D"));
 	}
 	$userprefs = array();
@@ -610,6 +610,9 @@ function loadDisplaySettings(){
 	$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 	$_SESSION['_supportphone'] = $scheme['_supportphone'];
 	$_SESSION['_supportemail'] = $scheme['_supportemail'];
+	
+	// set locale
+	$_SESSION['_locale'] = $USER->getSetting('_locale', getSystemSetting('_locale'));
 }
 
 ?>

@@ -2,7 +2,9 @@
 
 function help($title, $extrahtml = NULL, $style = NULL) {
 	$theme = getBrandTheme();
-	$contents = @file_get_contents('hover' . DIRECTORY_SEPARATOR . $title . '.txt');
+	global $LOCALE;
+	$hoverfolder = isset($LOCALE)?"locale/$LOCALE/hover/$title.txt":"hover/$title.txt";
+	$contents = @file_get_contents($hoverfolder);
 	//$contents = nl2br(preg_replace('/($|\\r\\n\\r\\n)[^\\r\\n:]+?:/', '<span class="hovertitle">\\0</span>', $contents ));
 
 	if (substr($contents,0,1) == "@" && ($contentpos = strpos($contents,"\n")) !== false) {
