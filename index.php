@@ -147,6 +147,9 @@ if ($IS_COMMSUITE) {
 ?>
 
 	<form action="index.php" method="POST">
+
+<? if (!($custname === false)) { ?>
+	
 		<table width="100%" style="color: #<?=$primary?>; text-align: right; ">
 			<tr>
 
@@ -154,15 +157,12 @@ if ($IS_COMMSUITE) {
 				<td width="100%" style="font-size: 12px; font-weight: bold; color: red;">Incorrect username/password. Please try again.</td>
 <? } else if ($softlock) { ?>
 				<td width="100%" style="font-size: 12px; font-weight: bold; color: red;">You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.</td>
-<? } else if ($custname === false) { ?>
-				<td width="100%" style="font-size: 12px; font-weight: bold; color: red;">Invalid customer URL. Please check the URL and try again.</td>
 <? } else { ?>
 				<td width="100%">&nbsp;</td>
 <? } ?>
 				<td><img src="img/spacer.gif" width="25"></td>
 			</tr>
 		</table>
-
 
 		<div><table width="100%" style="color: #<?=$primary?>;" >
 			<tr>
@@ -190,6 +190,9 @@ if ($IS_COMMSUITE) {
 				<td colspan="2" style="font-size: 9px; font-style: italic;"><div style="margin-left: 50px;">Usernames and passwords are case-sensitive.</div></td>
 			</tr>
 		</table>
+<? } else { ?>
+		<div width="100%" style="font-size: 16px; font-weight: bold; color: red;">&nbsp;&nbsp;Invalid customer URL. Please check the web address and try again.</div>
+<? }?>
 	</form>
 <?
 } /*CSDELETEMARKER_END*/
