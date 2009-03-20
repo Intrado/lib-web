@@ -4,7 +4,7 @@ $scheme = getCustomerData($CUSTOMERURL);
 if($scheme == false){
 	$scheme = array("_brandtheme" => "3dblue",
 					"_supportemail" => "support@schoolmessenger.com",
-					"_supportphone" => "800.920.3897",
+					"_supportphone" => "8009203897",
 					"colors" => array("_brandprimary" => "26477D"));
 }
 $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
