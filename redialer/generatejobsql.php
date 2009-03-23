@@ -43,18 +43,9 @@ $db['user'] = $argv[5];
 
 // 	now connect to the customer database
 global $_dbcon;
-$_dbcon = mysql_connect($db['host'], $db['user'], $db['pass']);
+$_dbcon = DBConnect($db['host'], $db['user'], $db['pass'], $db['db']);
 if (!$_dbcon) {
-	echo("Problem connecting to MySQL server at " . $db['host'] . " error:" . mysql_error() . "\n");
-	exit(-1);
-}
-if (!mysql_select_db($db['db'])) {
-	echo("Problem selecting database for " . $db['host'] . " error:" . mysql_error() . "\n");
-	exit(-1);
-}
-
-if (!mysql_set_charset("utf8",$_dbcon)) {
-	echo("Problem selecting charset for " . $db['host'] . " error:" . mysql_error() . "\n");
+	echo("Problem connecting to MySQL server at " . $db['host'] . "\n");
 	exit(-1);
 }
 

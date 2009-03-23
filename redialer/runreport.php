@@ -17,10 +17,10 @@ $_DBUSER = $argv[6];
 
 $params = array("filename" => $filename);
 
-$_dbcon = mysql_connect($_DBHOST, $_DBUSER, $_DBPASS) or die("Could not connect to: ". $_DBHOST);
-mysql_select_db($_DBNAME, $_dbcon) or die("Could not select db: " . $_DBNAME);
+global $_dbcon;
+$_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME)
+	or die("Could not connect to database: ".$_DBNAME);
 
-mysql_set_charset("utf8",$_dbcon) or die ("Counldn't set charset. e:" . mysql_error());
 
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
