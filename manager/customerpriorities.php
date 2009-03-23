@@ -6,17 +6,16 @@ include_once("../inc/utils.inc.php");
 
 if (!$MANAGERUSER->authorized("editpriorities"))
 	exit("Not Authorized");
-	
-	
+
 if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
 	redirect();
 }
-if(isset($_SESSION['currentid'])) {
+if (isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
-	$custqueryinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
+	$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
-	if(!$custdb) {
+	if (!$custdb) {
 		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
 	}
 }
