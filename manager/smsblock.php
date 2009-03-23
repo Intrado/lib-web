@@ -77,14 +77,12 @@ if(!$error){
 }
 
 // Search if number is valid
-if($number && !$error){
+if ($number && !$error) {
 	$shard = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard limit 1");
 
-	$sharddb = mysql_connect($shard[1],$shard[2], $shard[3], true)
-		or die("Could not connect to shard database: " . mysql_error());
-	mysql_select_db("aspshard", $sharddb);
+	$sharddb = DBConnect($shard[1], $shard[2], $shard[3], "aspshard")
+		or die("Could not connect to shard database");
 	$data = QuickQueryRow("select sms, status, lastupdate, notes from smsblock where sms like '" . DBSafe($number) . "%'", false, $sharddb);
-
 }
 
 // Customer phone formatter function because we can't use phone.obj.php

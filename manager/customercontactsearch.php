@@ -45,31 +45,31 @@ if(CheckFormSubmit($f,$s))
 
 			$customerquery = Query("select id, shardid, urlcomponent from customer order by shardid, id");
 			$customers = array();
-			while($row = DBGetRow($customerquery)){
+			while ($row = DBGetRow($customerquery)) {
 				$customers[] = $row;
 			}
 			$currhost = "";
 			$custdb;
 			$data = array();
-			foreach($customers as $cust) {
+			foreach ($customers as $cust) {
 
-				if($currhost != $cust[1]){
-					$custdb = mysql_connect($shardinfo[$cust[1]][0],$shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2], true)
-						or die("Could not connect to customer database: " . mysql_error());
+				if ($currhost != $cust[1]) {
+					$dsn = 'mysql:dbname=c_'.$cust[0].';host='.$shardinfo[$cust[1]][0];
+					$custdb = new PDO($dsn, $shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2]);
 					$currhost = $cust[1];
 				}
-				mysql_select_db("c_" . $cust[0]);
+				Query("use c_" . $cust[0], $custdb);
 
 				$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
-				if(GetFormData($f, $s, "type") == "sms"){
+				if (GetFormData($f, $s, "type") == "sms") {
 					$res = Query("select p.id, p.pkey, p.f01, p.f02 from person p left join sms s on (s.personid = p.id)
 									where s.sms = '" . $number . "'", $custdb);
-				} else if(GetFormData($f, $s, "type") == "phone"){
+				} else if(GetFormData($f, $s, "type") == "phone") {
 					$res = Query("select p.id, p.pkey, p.f01, p.f02 from person p left join phone ph on (ph.personid = p.id)
 									where ph.phone = '" . $number . "'", $custdb);
 				}
 				$persons = array();
-				while($row = DBGetRow($res)){
+				while ($row = DBGetRow($res)) {
 					$data[] = array_merge(array($cust[0], $cust[2], $displayname), $row, array(GetFormData($f, $s, "type"), $number));
 				}
 			}

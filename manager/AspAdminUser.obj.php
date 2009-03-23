@@ -61,12 +61,9 @@ class AspAdminUser extends DBMappedObject{
 	/**static functions**/
 
 	function doLogin($login, $password) {
-		$login = dbsafe($login);
-		$password = dbsafe($password);
-
-		$query = "SELECT id FROM aspadminuser WHERE login='$login'
-					AND password=password('$password')";
-		return QuickQuery($query);
+		$query = "SELECT id FROM aspadminuser WHERE login=?
+					AND password=password(?)";
+		return QuickQuery($query, false, array($login, $password));
 	}
 }
 

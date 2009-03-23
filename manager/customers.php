@@ -155,6 +155,9 @@ if (isset($_GET["search"])) {
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
 
+
+global $_dbcon;
+
 // First, get a list of every shard, $shardinfo[], indexed by ID, storing dbhost, dbusername, and dbpassword.
 $res = Query("select id, dbhost, dbusername, dbpassword, name from shard order by id");
 $shardinfo = array();
@@ -167,22 +170,24 @@ $query = "select id, shardid, urlcomponent, oem, oemid, nsid, notes, enabled, in
 $customerquery = Query($query);
 $customers = array();
 if (!$shownone) {
-	while($row = DBGetRow($customerquery)){
+	while ($row = DBGetRow($customerquery)) {
 		$customers[] = $row;
 	}
 }
 // With the list of customers ready, connect to each customer's shard and retrieve a bunch of helpful information about the customer.
 $currhost = "";
-$custdb;
+$custdb; // customer database, using shard connection
 $data = array();
-foreach($customers as $cust) {
-	if($currhost != $cust[1]){
-		$custdb = mysql_connect($shardinfo[$cust[1]][0],$shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2])
-			or die("Could not connect to customer database: " . mysql_error());
+foreach ($customers as $cust) {
+	if ($currhost != $cust[1]) {
+		$dsn = 'mysql:dbname=c_'.$cust[0].';host='.$shardinfo[$cust[1]][0];
+		$custdb = new PDO($dsn, $shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2]);
 		$currhost = $cust[1];
 	}
-	mysql_select_db("c_" . $cust[0]);
-	if($custdb){
+	
+	if ($custdb) {
+		$custdb->query("use c_".$cust[0]);
+		
 		$row = array();
 		$row[0] = $cust[0];
 		$row[1] = $cust[2];
@@ -199,13 +204,13 @@ foreach($customers as $cust) {
 		
 		$customerfeatures = array();
 
-		if(getCustomerSystemSetting('_hasportal', false, true, $custdb))
+		if (getCustomerSystemSetting('_hasportal', false, true, $custdb))
 			$customerfeatures[] = "ContactMgr";
-		if(getCustomerSystemSetting('_hassms', false, true, $custdb))
+		if (getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
-		if(getCustomerSystemSetting('_hassurvey', true, true, $custdb))
+		if (getCustomerSystemSetting('_hassurvey', true, true, $custdb))
 			$customerfeatures[] = "Survey";
-		if(getCustomerSystemSetting('_hascallback', false, true, $custdb))
+		if (getCustomerSystemSetting('_hascallback', false, true, $custdb))
 			$customerfeatures[] = "Callback";
 
 		$row[10] = implode(", ", $customerfeatures);

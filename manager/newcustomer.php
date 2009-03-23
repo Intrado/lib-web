@@ -20,6 +20,7 @@ $timezones = array(	"US/Alaska",
 					"US/Pacific",
 					"US/Samoa"	);
 
+global $_dbcon;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@ if (CheckFormSubmit($f,$s)){
 				$logofile = true;
 			}
 
-			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' and enabled=1")) {
+			if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent=? and enabled=1", false, array($hostname))) {
 				error('URL Path Already exists', 'Please Enter Another');
 			} else if (!$shard){
 				error('A shard needs to be chosen');
@@ -89,24 +90,25 @@ if (CheckFormSubmit($f,$s)){
 				$shardpass = $shardinfo['dbpassword'];
 
 				$dbpassword = genpassword();
-				QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword,enabled) values
-												('" . DBSafe($hostname) . "','$shardid', '$dbpassword', '1')" )
-						or die("failed to insert customer into auth server");
-				$customerid = mysql_insert_id();
+				QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword, enabled) 
+												values (?, ?, ?, '1')", false, array($hostname, $shardid, $dbpassword) )
+						or dieWithError("failed to insert customer into auth server", $_dbcon);
+				$customerid = $_dbcon->lastInsertId();
 
 				$newdbname = "c_$customerid";
 				QuickUpdate("update customer set dbusername = '" . $newdbname . "' where id = '" . $customerid . "'");
 
-				$newdb = mysql_connect($shardhost, $sharduser, $shardpass)
-					or die("Failed to connect to DBHost $shardhost : " . mysql_error($newdb));
+				$newdb = DBConnect($shardhost, $sharduser, $shardpass, "aspshard");
 				QuickUpdate("create database $newdbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$newdb)
-					or die ("Failed to create new DB $newdbname : " . mysql_error($newdb));
-				mysql_select_db($newdbname,$newdb)
-					or die ("Failed to connect to DB $newdbname : " . mysql_error($newdb));
+					or dieWithError("Failed to create new DB ".$newdbname, $newdb);
+				$newdb->query("use ".$newdbname)
+					or dieWithError("Failed to connect to DB ".$newdbname, $newdb);
 
 				QuickUpdate("drop user '$newdbname'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
 				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
+				QuickUpdate("create user '$newdbname'@'localhost' identified by '$dbpassword'", $newdb);
 				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
+				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'@'localhost'", $newdb);
 
 				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
 				$tablequeries = array_merge($tablequeries, explode("$$$",file_get_contents("../db/createtriggers.sql")));
@@ -114,7 +116,7 @@ if (CheckFormSubmit($f,$s)){
 					if (trim($tablequery)) {
 						$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
 						Query($tablequery,$newdb)
-							or die ("Failed to execute statement \n$tablequery\n\nfor $newdbname : " . mysql_error($newdb));
+							or dieWithError("Failed to execute statement \n$tablequery\n\nfor $newdbname", $newdb);
 					}
 				}
 
@@ -125,12 +127,12 @@ if (CheckFormSubmit($f,$s)){
 							('f02', 'Last Name', 'searchable,text,lastname'),
 							('f03', 'Language', 'searchable,multisearch,language'),
 							('c01', 'Staff ID', 'searchable,multisearch,staff')";
-				QuickUpdate($query, $newdb) or die( "ERROR:" . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb) or dieWithError("SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `language` (`name`) VALUES
 							('English'),
 							('Spanish')";
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb) or dieWithError("SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
 							('Emergency', 1, 'Emergencies Only', 0, 0),
@@ -138,7 +140,7 @@ if (CheckFormSubmit($f,$s)){
 							('General', 3, 'General Announcements', 0, 0),
 							('Survey', 3, 'Surveys', 1, 0)";
 
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb) or dieWithError(" SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `jobtypepref` (`jobtypeid`,`type`,`sequence`,`enabled`) VALUES
 							(1,'phone',0,1),
@@ -154,7 +156,7 @@ if (CheckFormSubmit($f,$s)){
 							(4,'email',0,1),
 							(4,'sms',0,0)";
 
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb) or dieWithError(" SQL:" . $query, $newdb);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
@@ -163,11 +165,11 @@ if (CheckFormSubmit($f,$s)){
 							('maxsms', '1'),
 							('retry', '15'),
 							('disablerepeat', '0'),
-							('surveyurl', '" . DBSafe($surveyurl) . "'),
-							('displayname', '" . DBSafe($displayname) . "'),
-							('timezone', '" . DBSafe($timezone) . "')";
+							('surveyurl', ?),
+							('displayname', ?),
+							('timezone', ?)";
 
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb, array($surveyurl, $displayname, $timezone)) or dieWithError(" SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
 							('english', 'male'),
@@ -196,34 +198,32 @@ if (CheckFormSubmit($f,$s)){
 							('swedish', 'male')
 							";
 
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
+				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
 
 				// Brand/LOGO Info
 
 				if($logofile && $defaultbrand != "Other"){
 					$query = "INSERT INTO `content` (`contenttype`, `data`) VALUES
 								('" . $defaultbrands[$defaultbrand]["filetype"] . "', '" . base64_encode($logofile) . "');";
-					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
-					$logoid = mysql_insert_id();
+					QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
+					$logoid = $newdb->lastInsertId();
 
 					$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 								('_logocontentid', '" . $logoid . "')";
-					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
+					QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
 				}
 
 				QuickUpdate("INSERT INTO content (contenttype, data) values
 							('image/gif', '" . base64_encode(file_get_contents("img/classroom_girl.jpg")) . "')",$newdb);
-				$loginpicturecontentid = mysql_insert_id($newdb);
+				$loginpicturecontentid = $newdb->lastInsertId();
 
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 							('_loginpicturecontentid', '" . $loginpicturecontentid . "')";
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
-
+				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
 
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
-								('_productname', '" . DBSafe($defaultproductname) . "')";
-					QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL: " . $query);
-
+							('_productname', ?)";
+				QuickUpdate($query, $newdb, array($defaultproductname)) or dieWithError(" SQL: " . $query, $newdb);
 
 				redirect("customeredit.php?id=" . $customerid);
 

@@ -93,7 +93,7 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, "Clear")) {
 			$alertoptionsurl = http_build_query($newalertoptions, false, "&");
 			$existingoptions = substr($import['alertoptions'], 0, strpos($import['alertoptions'], "&lastnotified"));
 			if (CheckFormSubmit($f, "Clear") || $alertoptionsurl != $existingoptions)
-				QuickUpdate("update import set alertoptions = '" . DBSafe($alertoptionsurl) . "' where id = {$_SESSION['importid']}", $custdb);
+				QuickUpdate("update import set alertoptions = ? where id = ?", $custdb, array($alertoptionsurl, $_SESSION['importid']));
 			
 			ClearFormData($f);
 			redirect("customerimports.php");

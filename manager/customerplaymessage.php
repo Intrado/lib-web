@@ -25,10 +25,9 @@ if(isset($_GET['customerid']) && isset($_GET['jobid'])){
 	redirect();
 }
 
-$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled from customer c inner join shard s on (c.shardid = s.id) where c.id = '" . $_SESSION['previewmessage_customerid'] ."'");
-$custinfo = mysql_fetch_row($custquery);
+$custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled from customer c inner join shard s on (c.shardid = s.id) where c.id = '" . $_SESSION['previewmessage_customerid'] ."'");
 $_dbcon = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $_SESSION['previewmessage_customerid']);
-if(!$_dbcon) {
+if (!$_dbcon) {
 	exit("Connection failed for customer: $custinfo[0], db: c_" .  $_SESSION['previewmessage_customerid']);
 }
 $messageid = QuickQuery("select phonemessageid from job j where id = '" . $_SESSION['previewmessage_jobid'] . "'");

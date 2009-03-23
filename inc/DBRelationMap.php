@@ -66,7 +66,8 @@ class DBRelationMap {
 	}
 
 	function update () {
-
+		global $_dbcon;
+		
 		//parent's id must not be 0
 		if (!$this->_parentid)
 			return false;
@@ -74,7 +75,7 @@ class DBRelationMap {
 
 		//first get a list of the current objects in the db
 		$query = "select id from " . $this->_tablename
-				." where `" . $this->_linkidvar . "`='" . mysql_real_escape_string($this->_parentid) . "'";
+				." where `" . $this->_linkidvar . "`='" . mysqli_real_escape_string($_dbcon, $this->_parentid) . "'";
 		$dblist = QuickQueryList($query);
 		$newlist = $this->getIDs($this->children);
 		if ($dblist)
@@ -96,14 +97,15 @@ class DBRelationMap {
 	}
 
 	function refresh () {
-
+		global $_dbcon;
+		
 		//parent's id must not be 0
 		if (!$this->_parentid)
 			return false;
 
 		//first get a list of the current objects in the db
 		$query = "select id from " . $this->_tablename
-				." where `" . $this->_linkidvar . "`='" . mysql_real_escape_string($this->_parentid) . "'";
+				." where `" . $this->_linkidvar . "`='" . mysqli_real_escape_string($_dbcon, $this->_parentid) . "'";
 		$dblist = QuickQueryList($query);
 
 		//check to see if we need to remove some children from the array
@@ -137,9 +139,10 @@ class DBRelationMap {
 	//deletes from an array of ids
 	//(used for cleaning the db)
 	function destroychildren ($idarray) {
+		global $_dbcon;
 		foreach ($idarray as $id) {
 			$query = "delete from " . $this->_tablename
-				." where id='" . mysql_real_escape_string($id) . "'";
+				." where id='" . mysql_real_escape_string($_dbcon, $id) . "'";
 			QuickUpdate($query);
 		}
 	}

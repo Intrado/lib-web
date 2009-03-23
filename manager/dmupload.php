@@ -52,10 +52,13 @@ if(CheckFormSubmit($f,$s))
 					error('Unable to complete file upload. Please try again.');
 				} else {
 					if (is_file($newname) && is_readable($newname)) {
+						$notes = GetFormData($f, $s, "notes");
+						$b64data = base64_encode(file_get_contents($newname));
+						
 						QuickUpdate("begin");
 						QuickUpdate("insert into dmdatfile (dmid, data, notes) values
-									('" . $_SESSION['dmid'] . "', '" . base64_encode(file_get_contents($newname)) . "','" . DBSafe(GetFormData($f, $s, "notes")) . "')");
-						QuickUpdate("update dm set command = 'datfile' where id = " . $_SESSION['dmid']);
+									(?, ?, ?)", false, array($_SESSION['dmid'], $b64data, $notes));
+						QuickUpdate("update dm set command = 'datfile' where id = ?", false, array($_SESSION['dmid']));
 						QuickUpdate("commit");
 						redirect("customerdms.php");
 					} else {

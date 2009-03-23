@@ -10,8 +10,8 @@ if (!$MANAGERUSER->authorized("users"))
 	
 $customerid = $_GET["customer"] + 0;
 
-$custquery = Query("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
-$cust = mysql_fetch_row($custquery);
+$cust = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // formatters

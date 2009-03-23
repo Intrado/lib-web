@@ -60,6 +60,8 @@ class DBMappedObject {
 	}
 
 	function create ($specificfields = NULL, $createchildren = false) {
+		global $_dbcon;
+		
 		if ($specificfields == NULL) {
 			$specificfields = $this->_fieldlist;
 		}
@@ -87,7 +89,7 @@ class DBMappedObject {
 				."values (" . $this->getValueList($specificfields) . ")";
 		$this->_lastsql = $query;
 		if ($result = Query($query)) {
-			$this->id = mysql_insert_id();
+			$this->id = $_dbcon->lastInsertId();
 		} else {
 			return false;
 		}
@@ -110,7 +112,7 @@ class DBMappedObject {
 
 		$query = "select " . $this->getFieldList(false, $specificfields)
 				." from " . $this->_tablename
-				." where id='" . mysql_real_escape_string($this->id) . "'";
+				." where id=".$this->id;
 		$this->_lastsql = $query;
 		if ($result = Query($query)) {
 			if ($row = DBGetRow($result)) {
@@ -122,7 +124,7 @@ class DBMappedObject {
 				}
 				$isrefreshed = true;
 			}
-			mysql_free_result($result);
+			$result = null;
 		}
 
 		//refresh children
@@ -182,15 +184,15 @@ class DBMappedObject {
 				if ($this->_allownulls && $this->$name === NULL)
 					$list[] = "`$name`=NULL";
 				else
-					$list[] = "`$name`='" . mysql_real_escape_string($this->$name) . "'";
+					$list[] = "`$name`='" . DBSafe($this->$name) . "'";
 			}
 
 			//put them into an update list
 			$query .= implode(",", $list);
-			$query .= " where id='" . mysql_real_escape_string($this->id) . "'";
+			$query .= " where id=".$this->id;
 			$this->_lastsql = $query;
 			if ($result = Query($query)) {
-				if (mysql_affected_rows())
+				if ($result->rowCount())
 					$isupdated = true;
 			}
 		} else {
@@ -225,7 +227,7 @@ class DBMappedObject {
 
 		if (isset($this->id)) {
 			$query = "delete from " . $this->_tablename
-					." where id='" . mysql_real_escape_string($this->id) . "'";
+					." where id=".$this->id;
 			$this->_lastsql = $query;
 			Query($query);
 			$this->id = 0;
@@ -249,7 +251,7 @@ class DBMappedObject {
 				if ($this->_allownulls && $this->$name === NULL)
 					$values[] = "NULL";
 				else
-					$values[] = "'" . mysql_real_escape_string($this->$name) . "'";
+					$values[] = "'" . DBSafe($this->$name) . "'";
 			} else {
 				$values[] = $this->$name;
 			}
@@ -290,15 +292,23 @@ function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = fals
 
 
 //query = from ... where ...
-function DBFindMany ($classname, $query, $alias = false) {
+function DBFindMany ($classname, $query, $alias = false, $args = false) {
+	return _DBFindPDO(true, $classname, $query, $alias, $args);
+}
+
+function DBFind ($classname, $query, $alias = false, $args = false) {
+	return _DBFindPDO(false, $classname, $query, $alias, $args);
+}
+
+function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false) {
 	//make a dummy object of this to get the field list
 	$dummy = new $classname();
 
 	$many = array();
 
 	$query = "select " . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
-	if ($result = Query($query)) {
-		while($row = DBGetRow($result)) {
+	if ($result = Query($query, $args)) {
+		while ($row = DBGetRow($result)) {
 			$newobj = new $classname();
 
 			$newobj->id = $row[0];
@@ -311,29 +321,17 @@ function DBFindMany ($classname, $query, $alias = false) {
 			}
 
 			$many[$newobj->id] = $newobj;
+			if (!$isMany) break;
 		}
 	}
-	return $many;
-}
-
-function DBFind ($classname, $query, $alias = false) {
-	//make an object of this to get the field list
-	$newobj = new $classname();
-
-	$query = "select " . generateFieldList(true,$newobj->_fieldlist,$alias) ." ". $query;
-	if ($result = Query($query)) {
-		if ($row = DBGetRow($result)) {
-			$newobj->id = $row[0];
-			foreach ($newobj->_fieldlist as $index => $field) {
-				if ($newobj->_allownulls && $row[$index+1] === NULL)
-					$newobj->$field = NULL;
-				else
-					$newobj->$field = ($row[$index+1]);
-			}
-			return $newobj;
-		}
+	if ($isMany) {
+		return $many;
+	} else {
+		if (count($many) == 0)
+			return false;
+		// else return first row object
+		return $many[$newobj->id];
 	}
-	return false;
 }
 
 

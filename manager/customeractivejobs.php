@@ -86,15 +86,15 @@ $customers = QuickQueryList("select id, urlcomponent from customer",true);
 $res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 $shards = array();
 while($row = DBGetRow($res)){
-	$shards[$row[0]] = $db = mysql_connect($row[1], $row[2], $row[3],true);
-	mysql_select_db("aspshard",$db);
+	$dsn = 'mysql:dbname=aspshard;host='.$row[1];
+	$shards[$row[0]] = $db = new PDO($dsn, $row[2], $row[3]);
 }
 
 $calldata = array();
 $jobs = array();
 $schedjobs = array();
 foreach ($shards as $shardid => $sharddb) {
-	mysql_select_db("aspshard",$sharddb);
+	Query("use aspshard", $sharddb);
 	$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
 					jt.status, j.phonetaskcount, j.timeslices, count(*)
 			from qjobtask jt

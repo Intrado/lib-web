@@ -1,12 +1,11 @@
 <?
 include_once('common.inc.php');
 
-if(isset($_GET['id'])) {
+if (isset($_GET['id'])) {
 	$currentid = $_GET['id']+0;
-	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
-	$custinfo = mysql_fetch_row($custquery);
+	$custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
-	if(!$custdb) {
+	if (!$custdb) {
 		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
 	}
 } else {
@@ -16,7 +15,7 @@ if(isset($_GET['id'])) {
 
 $query = "select c.contenttype, c.data from content c inner join setting s on (s.value = c.id) where s.name = '_loginpicturecontentid'";
 $row = QuickQueryRow($query, false, $custdb);
-if($row){
+if ($row) {
 	$data = base64_decode($row[1]);
 
 	$ext = substr($row[0], strpos($row[0], "/")+1);

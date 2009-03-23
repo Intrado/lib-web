@@ -15,10 +15,13 @@ function genpassword($digits = 15) {
  * (used by both manager newcustomer and the commsuite migration scripts)
  */
 function createSMUserProfile($newdb) {
-
-				$query = "insert into access (name) values ('SchoolMessenger Admin')";
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error());
-				$accessid = mysql_insert_id();
+				try {
+					$query = "insert into access (name) values ('SchoolMessenger Admin')";
+					QuickUpdate($query, $newdb);
+					$accessid = $newdb->lastInsertId();
+				} catch (PDOException $e) {
+					die("ERROR: ".$e->getMessage());
+				}
 
 				$query = "INSERT INTO `permission` (accessid,name,value) VALUES "
 						. "($accessid, 'loginweb', '1'),"
@@ -61,13 +64,13 @@ function createSMUserProfile($newdb) {
 						. "($accessid, 'managetasks', '1'), "
 						. "($accessid, 'managecontactdetailsettings', '1'),"
 						. "($accessid, 'messageconfirmation', '1')";
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb);
 
 				$query = "INSERT INTO `user` (`accessid`, `login`,
 							`firstname`, `lastname`, `enabled`, `deleted`) VALUES
 							( '$accessid' , 'schoolmessenger',
 							'School', 'Messenger', 1 ,0)";
-				QuickUpdate($query, $newdb) or die( "ERROR: " . mysql_error() . " SQL:" . $query);
+				QuickUpdate($query, $newdb);
 }
 
 function show_column_selector($tablename=null, $fields, $lockedFields=array()){
@@ -251,6 +254,16 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 
 	</script>
 <?
+}
+
+
+function dieWithError($error, $pdo = false) {
+	$dberr;
+	if ($pdo) {
+		$e = $pdo->errorInfo();
+		$dberr = $e[2];
+	}
+	die ($error . " : " . $dberr);
 }
 
 ?>

@@ -14,8 +14,7 @@ if (isset($_GET['id'])) {
 }
 if(isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
-	$custquery = Query("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
-	$custinfo = mysql_fetch_row($custquery);
+	$custqueryinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
 	if(!$custdb) {
 		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
@@ -57,9 +56,9 @@ if(CheckFormSubmit($f, 'new')) {
 			error('Priority must be between 0 and 2, 0 for Emergency and 2 for High Priority');		
 		} else {
 			if(GetFormData($f, $s, 'newname') != ""){
-				$name = DBSafe(GetFormData($f, $s, 'newname'));
+				$name = GetFormData($f, $s, 'newname');
 				QuickUpdate("insert into jobtype(name, systempriority, issurvey) values
-							('$name', $priority, '0')", $custdb);
+							(?, ?, '0')", $custdb, array($name, $priority));
 				redirect();
 			} else {
 				error("You cannot add a job type that has a blank name");

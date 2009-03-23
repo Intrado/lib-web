@@ -3,9 +3,14 @@
 $SETTINGS = parse_ini_file("managersettings.ini.php",true);
 $IS_COMMSUITE = false;
 
-$_dbcon = mysql_connect($SETTINGS['db']['host'], $SETTINGS['db']['user'], $SETTINGS['db']['pass']);
-mysql_select_db($SETTINGS['db']['db'], $_dbcon);
+$dsn = 'mysql:dbname='.$SETTINGS['db']['db'].';host='.$SETTINGS['db']['host'];
 
+global $_dbcon;
+try {
+	$_dbcon = new PDO($dsn, $SETTINGS['db']['user'], $SETTINGS['db']['pass']);
+} catch (PDOException $e) {
+	error_log("PDO Exception : ".$e->getMessage());
+}
 
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");

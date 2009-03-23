@@ -205,13 +205,16 @@ if ($data) {
 	$custdb;
 	foreach($data as $dataPos => $cust) {
 		if ($cust[1] + 0 > 0) {
-			$custdb = mysql_connect($shardinfo[$cust[15]][0],$shardinfo[$cust[15]][1], $shardinfo[$cust[15]][2])
-				or die("Could not connect to customer database: " . mysql_error());
-			
-			mysql_select_db("c_" . $cust[1]);
+			try {
+				$dsn = 'mysql:dbname=c_'.$cust[1].';host='.$shardinfo[$cust[15]][0];
+				$custdb = new PDO($dsn, $shardinfo[$cust[15]][1], $shardinfo[$cust[15]][2]);
+			} catch (PDOException $e) {
+				die("Could not connect to customer database: ".$e->getMessage());
+			}
+			Query("use c_" . $cust[1], $custdb);
 			$query = "select value from setting where name = '_dmmethod' limit 1";
-			if($custdb)
-			$data[$dataPos]['dmmethod'] = QuickQuery($query, $custdb);
+			if ($custdb)
+				$data[$dataPos]['dmmethod'] = QuickQuery($query, $custdb);
 		} else {
 			$data[$dataPos]['dmmethod'] = '';
 		}

@@ -13,12 +13,11 @@ if (isset($_GET['id'])) {
 	$_SESSION['currentid']= $_GET['id']+0;
 	redirect();
 }
-if(isset($_SESSION['currentid'])) {
+if (isset($_SESSION['currentid'])) {
 	$currentid = $_SESSION['currentid'];
-	$custquery = Query("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
-	$custinfo = mysql_fetch_row($custquery);
+	$custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
-	if(!$custdb) {
+	if (!$custdb) {
 		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
 	}
 }
@@ -195,8 +194,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
 				if ($timezone != getCustomerSystemSetting('timezone', false, true, $custdb)) {
 					$currentid = $_SESSION['currentid'];
-					$shardquery = Query("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = '$currentid'");
-					$shardinfo = mysql_fetch_row($shardquery);
+					$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = '$currentid'");
 					$sharddb = DBConnect($shardinfo[0], $shardinfo[1], $shardinfo[2], "aspshard");
 					if(!$sharddb) {
 						exit("Connection failed for customer: $currentid, shardhost: $shardinfo[0]");
@@ -270,7 +268,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					if($newlogofile){
 						QuickUpdate("INSERT INTO content (contenttype, data) values
 									('" . $_FILES['uploadlogo']['type'] . "', '" . base64_encode($newlogofile) . "')", $custdb);
-						$logocontentid = mysql_insert_id($custdb);
+						$logocontentid = $custdb->lastInsertId();
 						setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);
 					}
 				}
@@ -281,7 +279,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					if($newloginpicturefile){
 						QuickUpdate("INSERT INTO content (contenttype, data) values
 									('" . $_FILES['uploadloginpicture']['type'] . "', '" . base64_encode($newloginpicturefile) . "')", $custdb);
-						$loginpicturecontentid = mysql_insert_id($custdb);
+						$loginpicturecontentid = $custdb->lastInsertId();
 						setCustomerSystemSetting('_loginpicturecontentid', $loginpicturecontentid, $custdb);
 					}
 				}
