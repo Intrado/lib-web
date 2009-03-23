@@ -68,8 +68,12 @@ function fmt_users($row, $index){
 	}
 }
 
-//row 11 is dm method
-function fmt_actions($row, $index){
+// row 11 is dm method
+function fmt_actions($row, $index) {
+	$dmmethod = "system";
+	if ($row[11] != 'asp')
+		$dmmethod = "customer";
+		
 	global $MANAGERUSER;
 	$actions = "";
 	if ($MANAGERUSER->authorized("editcustomer"))
@@ -79,7 +83,7 @@ function fmt_actions($row, $index){
 	if ($MANAGERUSER->authorized("imports"))
 		$actions .= '<a href="customerimports.php?customer=' . $row[0] . '" title="Imports"><img src="img/s-imports.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("activejobs"))
-		$actions .= '<a href="customeractivejobs.php?customer=' . $row[0] . '" title="Jobs"><img src="img/s-jobs.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customeractivejobs.php?' . $dmmethod . '&cid=' . $row[0] . '" title="Jobs"><img src="img/s-jobs.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("editpriorities"))
 		$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="img/s-priorities.png" border=0></a>&nbsp;';
 	if($row[11] != "asp" && $MANAGERUSER->authorized("editdm"))

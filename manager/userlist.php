@@ -31,9 +31,12 @@ function fmt_jobcount($row, $index){
 	global $custdb, $MANAGERUSER;
 	$jobcount = QuickQuery("SELECT COUNT(*) FROM job WHERE job.userid = '" . $row[3] . "'
 							AND job.status = 'active'", $custdb);
+	$dmmethod = "system";
+	if ($row[12] != 'asp')
+		$dmmethod = "customer";
 							
 	if ($MANAGERUSER->authorized("activejobs"))
-		$link = "<a href=\"customeractivejobs.php?user=" . $row['3'] . "&customer=" . $row[0] . "\">" . $jobcount . "</a>";
+		$link = "<a href=\"customeractivejobs.php?user=" . $row['3'] . "&" . $dmmethod . "&cid=" . $row[0] . "\">" . $jobcount . "</a>";
 	else
 		$link = $jobcount;
 	return $link;
@@ -56,11 +59,12 @@ include_once("nav.inc.php");
 
 if($custdb = DBConnect($cust[0], $cust[1], $cust[2], "c_$customerid")){
 	$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
+	$dmmethod = QuickQuery("select value from setting where name = '_dmmethod'", $custdb);
 	$custinfo = array($customerid, $displayname, $cust[3]);
 	$result = Query("select u.id, u.login, u.firstname, u.lastname, u.lastlogin, u.phone, u.email, a.name, u.aremail from user u left join access a on (u.accessid = a.id) where enabled=1 AND deleted=0", $custdb);
 	$users = array();
 	while($row = DBGetRow($result)){
-		$users[] = array_merge($custinfo, $row);
+		$users[] = array_merge($custinfo, $row, array($dmmethod));
 	}
 }
 
