@@ -216,6 +216,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Survey";
 		if (getCustomerSystemSetting('_hascallback', false, true, $custdb))
 			$customerfeatures[] = "Callback";
+		if (getCustomerSystemSetting('_hasselfsignup', false, true, $custdb))
+			$customerfeatures[] = "Self-Signup";
 
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);

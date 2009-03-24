@@ -242,6 +242,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
 				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
 				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
+				setCustomerSystemSetting('_hasselfsignup', GetFormData($f, $s, 'hasselfsignup'), $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
 
 				setCustomerSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'), $custdb);
@@ -357,6 +358,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', true, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hascallback", getCustomerSystemSetting('_hascallback', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hasselfsignup", getCustomerSystemSetting('_hasselfsignup', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 150, 900);
 
 	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
@@ -500,6 +502,7 @@ foreach($languages as $index => $language){
 <tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
 <tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?> Survey</td></tr>
 <tr><td> Has Callback </td><td><? NewFormItem($f, $s, 'hascallback', 'checkbox') ?> Callback</td></tr>
+<tr><td> Has Self-Signup </td><td><? NewFormItem($f, $s, 'hasselfsignup', 'checkbox') ?> Self-Signup</td></tr>
 
 <tr><td>Retry:</td><td>
 
