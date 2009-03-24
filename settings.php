@@ -41,9 +41,12 @@ startWindow("Options", 'padding: 3px;');
 				<th align="left" class="nosort">Destination Labels</th>
 <?
 			}
-			if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
+			// features - if contact manager, or self-signup, or flex appliance
+			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
+				(getSystemSetting('_hasselfsignup', false)) ||
+				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
 ?>
-				<th align="left" class="nosort">Contact Manager Administration</th>
+				<th align="left" class="nosort">Features</th>
 <?
 			}
 ?>
@@ -76,11 +79,6 @@ startWindow("Options", 'padding: 3px;');
 
 <?
 					}
-					if($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp'){
-?>
-						<tr><td><a href='dms.php'>Flex Appliance</a></td></tr>
-<?
-					}
 ?>
 				</table>
 			</td>
@@ -106,11 +104,30 @@ startWindow("Options", 'padding: 3px;');
 			</td>
 <?
 		}
-		if(getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')){
+		// features - if contact manager, or self-signup, or flex appliance
+		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
+			(getSystemSetting('_hasselfsignup', false)) ||
+			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
 ?>
 			<td>
 				<table>
-					<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
+<?
+					if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) {
+?>				
+						<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
+<?
+					}					
+					if (getSystemSetting('_hasselfsignup', false)) {
+?>				
+						<tr><td><a href='subscribersettings.php'>Subscriber Self-Signup Settings</a></td></tr>
+<?
+					}					
+					if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
+?>
+						<tr><td><a href='dms.php'>Flex Appliance</a></td></tr>
+<?
+					}
+?>					
 				</table>
 			</td>
 <?
