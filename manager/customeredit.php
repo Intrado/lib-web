@@ -142,6 +142,9 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managernote = GetFormData($f, $s, 'managernote');
 			$hassms = GetFormData($f, $s, 'hassms');
 			$maxsms = GetFormData($f, $s, 'maxsms');
+			$hasportal = GetFormData($f, $s, 'hasportal');
+			$hasselfsignup = GetFormData($f, $s, 'hasselfsignup');
+			
 			$fileerror = false;
 			$logoname = "";
 			$loginpicturename ="";
@@ -179,6 +182,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("The ratio can only be between 0 and .5(50%)");
 			} else if($fileerror){
 				error('Unable to complete file upload. Please try again');
+			} else if ($hasportal && $hasselfsignup) {
+				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
 			} else {
 
 				QuickUpdate("update customer set
@@ -239,10 +244,10 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					$maxusers = "unlimited";
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
-				setCustomerSystemSetting('_hasportal', GetFormData($f, $s, 'hasportal'), $custdb);
+				setCustomerSystemSetting('_hasportal', $hasportal, $custdb);
 				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
 				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
-				setCustomerSystemSetting('_hasselfsignup', GetFormData($f, $s, 'hasselfsignup'), $custdb);
+				setCustomerSystemSetting('_hasselfsignup', $hasselfsignup, $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
 
 				setCustomerSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'), $custdb);
