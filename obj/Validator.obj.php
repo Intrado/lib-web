@@ -5,32 +5,6 @@ abstract class Validator {
 	var $label;
 	var $onlyserverside = false; //set this if you don't have a JS validator
 	
-	/* static */
-	function handleAjaxRequest($formdata) {
-		if (!isset($_GET['ajax']))
-			return false; //nothing to do
-		$result = array();
-		//TODO handle any ajax validator request by looking at 
-		//incomming data and calling the appropriate validator
-		
-		list($form,$item) = explode("_",$_GET['formitem']);
-		
-		$itemresult = Validator::validate_item($formdata,$item,$_GET['value']);
-		if ($itemresult === true) {
-			$result['validatorresult'] = true;
-		} else {
-			list($validator,$msg) = $itemresult;
-			$result['validatorresult'] = false;
-			$result['validatormsg'] = $msg;
-			$result['validator'] = $validator;
-		}
-				
-		header("Content-Type: application/json");
-		echo json_encode($result);
-		
-		exit();
-	}
-	
 	/* static
 	 * spits out javascript required to install a validator in the form 
 	 * Takes a list of class names

@@ -50,7 +50,7 @@ class RadioButton extends FormItem {
 		$str = '<div id='.$n.' class="radiobox">';
 		
 		$counter = 1;
-		foreach ($this->args as $radiovalue => $radioname) {
+		foreach ($this->args['values'] as $radiovalue => $radioname) {
 			$id = $n.'-'.$counter;
 			$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /><label for='.$id.'>'.escapehtml($radioname).'</label><br />
 				';

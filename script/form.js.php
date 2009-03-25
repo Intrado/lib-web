@@ -33,25 +33,24 @@ function form_event_handler (event) {
 
 }
 
-function form_get_value (form, element) {
-	var value;
-		
-	switch (element.type) {
-		default:
-		case "text": value = element.value.strip(); break;
-		case "checkbox": value = element.checked ? "true": ""; break;
-		case "radio": 
-			value = "";
-			//for radio boxes, we actually wrap them in a div with an ID for the control name
-			//to get the value, we get the div, and check each child input for being 'checked'
-			var radios = $(element.name).childElements();
-			for (var i = 0; i < radios.length; i++) {
-				if (radios[i].checked)
-					value = radios[i].value;
+function form_get_value (form,targetname) {
+	var value = "";
+	
+	var elements = form.elements[targetname];
+	if (elements.length) {
+		if (elements[0].type == "radio") {
+			for (var i = 0; i < elements.length; i++) {
+				if (elements[i].checked)
+					value = elements[i].value;
 			}
-			break;
+		} else if (els[0].type == "checkbox") {
+			//TODO
+		}
+	} else {
+		value = elements.value;
 	}
-	return value;
+
+	return value.strip();
 }
 
 function form_do_validation (form, element) {
@@ -59,32 +58,30 @@ function form_do_validation (form, element) {
 	
 	if (form.validators && form.validators[targetname]) {
 		var validators = form.validators[targetname];
-		var value = form_get_value(form,element);
+		var value = form_get_value(form,targetname);
 		
-		if (validators == "ajax") {
-			//special case, if we are doing ajax call, then validators isn't an array, just call ajax for the result
-			
-			new Ajax.Request(form.scriptname,
-				{
-					method:'get',
-					parameters: {ajax: true,
-								formitem: targetname,
-								value: value},
-					onSuccess: function(transport){
-						var response = transport.responseJSON;
-						if (response.validatorresult != true) {
-							form_validation_display(element,"error",response.validatormsg);
-						} else {
-							//checked out ok
-							if (value.length > 0)
-								form_validation_display(element,"valid","OK");
-							else
-								form_validation_display(element,"blank","");
-						}
-					},
-					onFailure: function(){ alert('Something went wrong...') }
-				});
-
+		//special case, if we are doing ajax call, then validators isn't an array, just call ajax for the result
+		if (validators == "ajax") {	
+			//tack on some stuff to GET query (see in logs which POSTs are just validation) and hide the value (dont need to see that in logs)
+			var posturl = form.scriptname + (form.scriptname.include('?') ? '&' : '?') + "ajaxvalidator=true&formitem=" + targetname;
+			new Ajax.Request(posturl, {
+				method:'post',
+				parameters: {value: value},
+				onSuccess: function(response){
+					var res = response.responseJSON;
+					if (res.vres != true) {
+						form_validation_display(element,"error",res.vmsg);
+					} else {
+						//checked out ok
+						if (value.length > 0)
+							form_validation_display(element,"valid","OK");
+						else
+							form_validation_display(element,"blank","");
+					}
+				},
+				onFailure: function(){ alert('Something went wrong...') } //TODO better error handling
+			});
+		//otherwise, do normal client-side validation
 		} else {
 			for (var i = 0; i < validators.length; i++) {
 				var v = validators[i];
@@ -97,7 +94,7 @@ function form_do_validation (form, element) {
 					}
 				}
 			}
-			if (value.length > 0)
+			if (value.length > 0) 
 				form_validation_display(element,"valid","OK");
 			else
 				form_validation_display(element,"blank","");
@@ -108,11 +105,14 @@ function form_do_validation (form, element) {
 function form_validation_display(element,style, msgtext) {
 	e = $(element);
 	
-	var fieldarea = $(e.id + "_fieldarea");
-	var icon = $(e.id + "_icon");
-	var msg = $(e.id + "_msg");
-	var css = 'background: rgb(255,255,255);';
+	//if radio button, get the id of the container div
+	var name = e.type == "radio" ? e.up().id : e.id;
 	
+	var fieldarea = $(name + "_fieldarea");
+	var icon = $(name + "_icon");
+	var msg = $(name + "_msg");
+	var css = 'background: rgb(255,255,255);';
+		
 	if (style == "error") {
 		css = 'background: rgb(255,200,200);';
 		icon.src = "img/icons/exclamation.gif";
@@ -142,23 +142,16 @@ function form_validation_display(element,style, msgtext) {
 	}
 }
 
-function form_highlight_section (num) {
-	var e;
-	for (var i = 1; e = $('helpsection_'+i); i++) {
-		e.style.borderColor = 'rgb(255,255,255)';
-		if (i == num) {
-			new Effect.Morph(e, {style: 'border-color: rgb(255,200,100);', duration: 1.2, transition: Effect.Transitions.pulse});
-		}
-	}
-}
-
-
 //exclamation.png - !
 //error.png - hazard
 //accept.png - check
-function form_load(name,scriptname,formdata) {
+function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	var form = $(name);
+	form.formdata = formdata;
 	form.scriptname = scriptname; //used for any ajax calls for this form
+	form.helpsteps = helpsteps;
+	form.ajaxsubmit = ajaxsubmit;
+	form.currentstep = 0;
 	form.validators = {};
 	//make appropriate validators for each field
 	for (fieldname in formdata) {		
@@ -201,5 +194,144 @@ function form_load(name,scriptname,formdata) {
 		e.validators = form.validators[id] = validators;
 	}
 	
+	//install click handlers for (name + '_helper') hrefs
+	$(form.id + "_helper").down("a",0).observe("click",function (event) {form_step_handler(form,-1,null); Event.stop(event);});
+	$(form.id + "_helper").down("a",1).observe("click",function (event) {form_step_handler(form,+1,null); Event.stop(event);});
+	
+	//install click handlers for fieldsets
+	form.select('fieldset').map(function(e) { e.observe("click",form_fieldset_handler)});
+	
+	//submit handler
+	form.observe("submit",form_handle_submit.curry(form));
+}
+
+function form_fieldset_handler (event) {
+	var form = event.findElement("form");
+	var e = event.element();
+	
+	if (!e.match("label") && !e.match("input")) {		
+		var fieldset = e.match("fieldset") ? e : e.up("fieldset");
+		var step = fieldset.id.substring(fieldset.id.lastIndexOf("_")+1);
+		form_step_handler(form,null,step);
+	}
+}
+
+
+function form_step_handler (form, direction, specificstep) {
+	form = $(form);
+	if (!form || !form.id)
+		return false;
+	
+	if (form.scrolling)
+		return false;
+		
+	if (specificstep) {
+		form.currentstep = specificstep;
+	} else {
+		form.currentstep += direction;
+	}
+	
+	form.currentstep = Math.min(form.currentstep,form.helpsteps.length-1);
+	form.currentstep = Math.max(form.currentstep,1);
+	
+	$(form.id + "_helpercontent").innerHTML = form.helpsteps[form.currentstep];
+	
+	//find the section of the form for this step, blink it, and scroll to it
+	var e;
+	for (var i = 1; e = $(form.id + '_helpsection_'+i); i++) {
+		e.style.border = 'none';
+		
+		if (i == form.currentstep) {
+			form.scrolling = true;
+			var helper_y = e.offsetTop;
+			var viewport_offset = Math.max(0, document.viewport.getHeight() - e.getHeight());
+
+			//new Effect.Morph(e, {style: 'border-color: rgb(255,200,100);', duration: 0.8, transition: Effect.Transitions.pulse});
+			e.style.border = "2px solid rgb(255,200,100)";
+			
+			new Effect.Move(form.id + '_helper', { y:helper_y, mode:'absolute', duration: 0.8,
+				afterFinish: function() {
+					form.scrolling = false;
+				}
+			});
+			if (!specificstep)
+				new Effect.ScrollTo(e, {offset: -viewport_offset/2.0, duration: 0.6});
+		}
+	}
+	return false;
+}
+
+
+//used for submit buttons onclick, because we override default submit behavior, we need to
+//insert something to mark which submit button was pressed.
+//ie is retarded, and will actually put the button's html contents as the value, so we need another arg for that
+function form_submit (event, value) {
+	event = Event.extend(event);
+
+	var form = event.findElement("form");
+	var e = event.element();
+
+	var submit = document.createElement('input');
+	submit.setAttribute('name','submit');
+	submit.value = value || e.value;
+	submit.setAttribute('type','hidden');
+	form.appendChild(submit);
+	
+	form_handle_submit(form,event);
+}
+
+function form_handle_submit(form,event) {
+	form = $(form);
+	//only continue here if we are going to override the default submit behavior
+	if (!form.ajaxsubmit)
+		return;
+	
+	Event.stop(event); //we'll take it from here with ajax
+		
+	//prep an ajax call with entire form contents and post back to server
+	//server side will validate
+	//if successful, results with have some action to take and/or code
+	//otherwise responce has validation results for each item,
+	//update each element's msg area, and throw up an alert box explaining there are unresolved issues.
+
+	//add an ajax marker
+	var posturl = form.scriptname + (form.scriptname.include('?') ? '&' : '?') + "ajax=true";
+	new Ajax.Request(posturl, {
+		method:'post',
+		parameters: form.serialize(true),
+		onSuccess: function(response) {
+			var res = response.responseJSON;
+			
+			if ("fail" == res.status) {
+				//show the validation results
+				
+				res.validationerrors.each(function(res) {
+					try {
+					var targetname = form.name+"_"+res.name;
+					var element = $(targetname);
+					var value = form_get_value(form,targetname);
+					if (res.vres != true) {
+						form_validation_display(element,"error",res.vmsg);
+					} else {
+						//checked out ok
+						if (value.length > 0)
+							form_validation_display(element,"valid","OK");
+						else
+							form_validation_display(element,"blank","");
+					}
+					} catch (error) { alert(res.name + " " + error)};
+				});
+			
+				alert("There are some errors on this form.\nPlease correct them before trying again.");
+				
+			} else if ("success" == res.status) {
+				
+				if (res.nexturl)
+					window.location=res.nexturl;
+				
+			}
+		},
+		onFailure: function(){ alert('Something went wrong...') } //TODO better error handling
+	});
 	
 }

@@ -99,6 +99,20 @@ function button_bar() {
 
 }
 
+function submit_button($name, $value = "submit", $icon = null) {
+	$theme = getBrandTheme();
+	$btn = '<button class="button" type="submit" name="submit" value="'.escapehtml($value).'" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);" onclick="return form_submit(event,\''.escapehtml($value).'\');"><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle">';
+
+	if ($icon == null)
+		$btn .= '<img src="img/pixel.gif" alt="" height="16" width="1">';		
+	else
+		$btn .= '<img src="img/icons/'.$icon.'.gif" alt="">';
+	
+	$btn .= escapehtml($name) . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table></button>';
+	
+	return $btn;
+}
+
 function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
 	$btn = '<button class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
@@ -109,7 +123,7 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle"><img src="img/icons/'.$icon.'.gif" alt="">' . $name . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table></button>';
+	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle"><img src="img/icons/'.$icon.'.gif" alt="">' . escapehtml($name) . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table></button>';
 	
 	return $btn;
 }
@@ -124,7 +138,7 @@ function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle"><img src="img/pixel.gif" alt="" height="16" width="1">' . $name . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table></button>';
+	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle"><img src="img/pixel.gif" alt="" height="16" width="1">' . escapehtml($name) . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif"></td></tr></table></button>';
 	
 	return $btn;
 }

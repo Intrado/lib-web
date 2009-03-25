@@ -302,6 +302,7 @@ function windowHide(windowid) {
 	setState('window_' + windowid, vis ? "closed" : "open");
 }
 
+//old
 function submitForm (formname,section,value) {
 	var theform = document.forms[formname];
 	//make a new hidden element to emulate the data that would normally be passed back from a submit button
