@@ -43,7 +43,7 @@ startWindow("Options", 'padding: 3px;');
 			}
 			// features - if contact manager, or self-signup, or flex appliance
 			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
-				(getSystemSetting('_hasselfsignup', false)) ||
+				(getSystemSetting('_hasselfsignup', false) && $USER->authorize('metadata')) ||
 				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
 ?>
 				<th align="left" class="nosort">Features</th>
@@ -106,7 +106,7 @@ startWindow("Options", 'padding: 3px;');
 		}
 		// features - if contact manager, or self-signup, or flex appliance
 		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
-			(getSystemSetting('_hasselfsignup', false)) ||
+			(getSystemSetting('_hasselfsignup', false) && $USER->authorize('metadata')) ||
 			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
 ?>
 			<td>
@@ -117,7 +117,7 @@ startWindow("Options", 'padding: 3px;');
 						<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
 <?
 					}					
-					if (getSystemSetting('_hasselfsignup', false)) {
+					if (getSystemSetting('_hasselfsignup', false) && $USER->authorize('metadata')) {
 ?>				
 						<tr><td><a href='subscribersettings.php'>Subscriber Self-Signup Settings</a></td></tr>
 <?
