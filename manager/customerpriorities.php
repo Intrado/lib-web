@@ -119,7 +119,7 @@ NewForm($f);
 		<td>
 		<?
 			NewFormItem($f, $s, 'priority', 'selectstart');
-			NewFormItem($f, $s, 'priority', 'selectoption', 'Energency', 1);
+			NewFormItem($f, $s, 'priority', 'selectoption', 'Emergency', 1);
 			NewFormItem($f, $s, 'priority', 'selectoption', 'High Priority', 2);
 			NewFormItem($f, $s, 'priority', 'selectend');
 		?>
