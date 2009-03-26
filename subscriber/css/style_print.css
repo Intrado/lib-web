@@ -1,0 +1,23 @@
+@import url(style.css);
+
+
+.list {
+	font-size: 9px;
+}
+
+.noprint {
+	display: none;
+}
+
+.hoverhelpicon {
+	display: none;
+}
+
+.button {
+	display: none;
+}
+
+body {
+	margin: 0px;
+	padding: 0px;
+}

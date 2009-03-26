@@ -1,0 +1,795 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ContactManager 7.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-03-18 11:37-0600\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Nickolas Heckman <nheckman@schoolmessenger.com>\n"
+"Language-Team:  <nheckman@schoolmessenger.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Spanish\n"
+"X-Poedit-Country: UNITED STATES\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: _L\n"
+"X-Poedit-Basepath: /home/nrheckman/workspace/kona/parentportal\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: account.php:111
+msgid "Account Information"
+msgstr "Información del usuario"
+
+#: account.php:114
+#: contactedit.php:127
+msgid "Save"
+msgstr "Salvar"
+
+#: account.php:114
+#: changeemail.php:81
+#: changeemail.php:106
+msgid "Change Email"
+msgstr "Cambio de correo electrónico"
+
+#: account.php:114
+#: addcontact1.php:99
+#: changeemail.php:105
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: account.php:116
+msgid "User Information"
+msgstr "Información del usuario"
+
+#: account.php:120
+msgid "Account Info"
+msgstr "Mi Cuenta"
+
+#: account.php:124
+msgid "Email"
+msgstr "Correo electrónico"
+
+#: account.php:128
+#: contactpreferences.php:173
+msgid "First Name"
+msgstr "Nombre Primero"
+
+#: account.php:132
+#: contactpreferences.php:174
+msgid "Last Name"
+msgstr "Nombre de Familia"
+
+#: account.php:136
+msgid "ZIP Code"
+msgstr "Código postal"
+
+#: account.php:140
+msgid "Old Password"
+msgstr "Contraseña antigua"
+
+#: account.php:144
+#: activate.php:170
+msgid "New Password"
+msgstr "Nueva contraseña"
+
+#: account.php:148
+msgid "Confirm New Password"
+msgstr "Confirmar nueva contraseña"
+
+#: account.php:153
+msgid "Only required for changing your password"
+msgstr "Sólo es necesario para cambiar su contraseña"
+
+#: account.php:157
+msgid "Preferences"
+msgstr "Preferencias"
+
+#: account.php:161
+msgid "Change Interface Language"
+msgstr "Cambiar Idioma de la Interfaz"
+
+#: account.php:173
+msgid "Email me when I have a new phone message."
+msgstr "Reciba por email cuando tengo un teléfono nuevo mensaje."
+
+#: account.php:176
+msgid "Text me when I have a new phone message."
+msgstr "Texto de mí cuando tengo un teléfono nuevo mensaje."
+
+#: account.php:179
+msgid "Mobile Phone for Text Messaging"
+msgstr "Teléfono móvil para mensajes de texto"
+
+#: activate.php:92
+msgid "Please enter it below along with your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address"
+msgstr "Por favor, introduzca a continuación junto con su nueva contraseña. Las contraseñas deben ser de 5 caracteres de longitud y no puede ser similar a su nombre, apellido, o dirección de correo electrónico."
+
+#: activate.php:99
+#: activate.php:106
+msgid "Please enter it below along with your password"
+msgstr "Por favor, introduzca a continuación junto con tu contraseña"
+
+#: activate.php:121
+msgid "Thank you, your password has been reset."
+msgstr "Gracias, su contraseña se ha restablecido."
+
+#: activate.php:122
+#: activate.php:130
+#: activate.php:138
+msgid "You will be redirected to the main page in 10 seconds or"
+msgstr "Usted va a ser redirigido a la página principal en 10 segundos o"
+
+#: activate.php:122
+#: activate.php:130
+#: activate.php:138
+msgid "Click Here."
+msgstr "Haga clic aquí."
+
+#: activate.php:129
+msgid "Thank you, your account has been activated."
+msgstr "Gracias, su cuenta ha sido activada."
+
+#: activate.php:137
+msgid "Thank you, your email address has been changed."
+msgstr "Gracias, tu dirección de correo electrónico ha cambiado."
+
+#: activate.php:159
+msgid "You should have received an email containing a confirmation code."
+msgstr "Usted debería haber recibido un mensaje de correo electrónico que contiene un código de confirmación."
+
+#: activate.php:163
+#: changeemail.php:87
+msgid "Confirmation Code"
+msgstr "Código de confirmación"
+
+#: activate.php:174
+msgid "Confirm Password"
+msgstr "Confirmar contraseña"
+
+#: activate.php:181
+#: changeemail.php:91
+#: changeemail.php:114
+msgid "Password"
+msgstr "Contraseña"
+
+#: activate.php:197
+msgid "That code is invalid or has expired."
+msgstr "Ese código no es válido o ha caducado."
+
+#: activate.php:201
+msgid "That code is invalid or has expired or that is an incorrect password."
+msgstr "Ese código no es válida o ha expirado o que es una contraseña incorrecta."
+
+#: activate.php:211
+#: forgotpassword.php:72
+msgid "Return to Sign In"
+msgstr "Volver a Entrar"
+
+#: addcontact1.php:28
+#: changeemail.php:38
+msgid "There was a problem trying to save your changes"
+msgstr "Hubo un problema al intentar guardar los cambios"
+
+#: addcontact1.php:28
+#: changeemail.php:38
+msgid "Please verify that all required field information has been entered properly"
+msgstr "Por favor, compruebe que todos los requerimientos de información de campo se ha introducido correctamente"
+
+#: addcontact1.php:50
+msgid "There was an unknown problem connecting to that customer"
+msgstr "Hubo un problema desconocido para la conexión de dicho cliente"
+
+#: addcontact1.php:62
+msgid "That is not a valid Activation Code and Person ID combination"
+msgstr "Que no es un código de activación válida la identificación de la persona y de combinación"
+
+#: addcontact1.php:82
+#: contactpreferences.php:169
+#: contacts.php:50
+msgid "Add A Contact"
+msgstr "Añadir un contacto"
+
+#: addcontact1.php:87
+#: addcontact1.php:99
+msgid "Add"
+msgstr "Agregar"
+
+#: addcontact1.php:91
+#: contactpreferences.php:175
+msgid "ID#"
+msgstr "Número de Identificación"
+
+#: addcontact1.php:94
+msgid "Activation Code"
+msgstr "Código de confirmación"
+
+#: addcontact2.php:36
+#, php-format
+msgid "You have successfully added %1$s %2$s."
+msgstr "Ha agregado %1$s %2$s."
+
+#: addcontact2.php:38
+msgid "Would you like to add another contact?"
+msgstr "¿Desea agregar otro contacto?"
+
+#: addcontact2.php:41
+msgid "Yes"
+msgstr "Sí"
+
+#: addcontact2.php:41
+msgid "No"
+msgstr "No"
+
+#: addcontact3.php:39
+#: addcontact3.php:60
+msgid "An error occurred, please try again"
+msgstr "Se ha producido un error, por favor, inténtelo de nuevo"
+
+#: addcontact3.php:132
+#: changeemail.php:27
+#: contactpreferences.php:110
+msgid "Form was edited in another window, reloading data"
+msgstr "Fue editado en forma de una ventana a otra, la carga de datos"
+
+#: addcontact3.php:144
+msgid "You must have at least one phone number that can receive calls for these job types"
+msgstr "Debe tener al menos un número de teléfono que puede recibir llamadas de estos tipos de trabajo"
+
+#: addcontact3.php:181
+#, php-format
+msgid "Edit Contact Details - %1$s %2$s"
+msgstr "Modificar detalles - %1$s %2$s"
+
+#: changeemail.php:12
+msgid "That password is incorrect"
+msgstr "Que la contraseña es incorrecta"
+
+#: changeemail.php:13
+msgid "There was a problem changing your username, please try again later"
+msgstr "Hubo un problema al intentar guardar los cambios"
+
+#: changeemail.php:14
+msgid "That username is already in use"
+msgstr "Nombre de usuario que ya está en uso"
+
+#: changeemail.php:83
+msgid "You should receive an email shortly at the new address with a confirmation code."
+msgstr "Usted debería haber recibido un mensaje de correo electrónico que contiene un código de confirmación."
+
+#: changeemail.php:110
+msgid "New Email Address"
+msgstr "Nueva dirección de correo electrónico"
+
+#: choosecustomer.php:51
+msgid "Select an Account"
+msgstr "Seleccione una cuenta"
+
+#: choosecustomer.php:54
+msgid "Select Account"
+msgstr "Seleccione Cuenta"
+
+#: choosecustomer.php:57
+msgid "You have contacts associated with more than one customer account."
+msgstr "Usted tiene contactos asociados con más de una cuenta de cliente."
+
+#: choosecustomer.php:58
+msgid "Please select the account you would like to access"
+msgstr "Por favor, seleccione la cuenta que le gustaría tener acceso a"
+
+#: choosecustomer.php:60
+msgid "Customer Accounts"
+msgstr "Cuentas de clientes"
+
+#: cmloginbottom.inc.php:23
+#: cmlogintop.inc.php:23
+msgid "Click to Verify - This site chose VeriSign SSL for secure e-commerce and confidential communications."
+msgstr "Haga clic aquí para Verificar - Este sitio escogió SSL de VeriSign para la seguridad del comercio electrónico y comunicaciones confidenciales."
+
+#: cmloginbottom.inc.php:26
+#: cmlogintop.inc.php:26
+msgid "ABOUT SSL CERTIFICATES"
+msgstr "ACERCA DE LOS CERTIFICADOS SSL"
+
+#: cmloginbottom.inc.php:35
+msgid "1999-2009 Reliance Communications, Inc. All Rights Reserved."
+msgstr "1999-2009 Reliance Communications, Inc. Todos los derechos reservados."
+
+#: cmlogintop.inc.php:4
+msgid "Contact Manager"
+msgstr "Contacto Director"
+
+#: contactedit.php:15
+#: contactedit.php:90
+msgid "Contact Type"
+msgstr "Tipo de Contacto"
+
+#: contactedit.php:16
+#: contactedit.php:91
+msgid "Destination"
+msgstr "Destino"
+
+#: contactedit.php:124
+msgid "Save To All Contacts"
+msgstr "Añadir un contacto"
+
+#: contactpreferences.php:122
+msgid "You must have at least one phone number that can receive calls for these job types: "
+msgstr "Debe tener al menos un número de teléfono que puede recibir llamadas de estos tipos de trabajos:"
+
+#: contactpreferences.php:168
+#: contacts.php:49
+msgid "Contacts"
+msgstr "Contacts"
+
+#: contactpreferences.php:176
+msgid "Actions"
+msgstr "Acciones"
+
+#: contacts.php:38
+msgid "Edit Contact Preferences"
+msgstr "Editar Preferencias de contacto"
+
+#: contacts.php:46
+msgid "Your Contacts"
+msgstr "Sus Contactos"
+
+#: contacts.php:56
+msgid "You are not associated with any contacts.  If you would like to add a contact,"
+msgstr "Usted no se ha asociado con ningún contacto. Si desea agregar un contacto,"
+
+#: contacts.php:56
+msgid "Click Here"
+msgstr "Haga clic aquí"
+
+#: forgotpassword.php:25
+msgid "The 2 emails you have entered do not match"
+msgstr "Los 2 mensajes de correo electrónico que ha introducido no coinciden"
+
+#: forgotpassword.php:27
+msgid "That is not a valid email address"
+msgstr "Que no es un código de activación válida la identificación de la persona y de combinación"
+
+#: forgotpassword.php:42
+msgid "Password Assistance"
+msgstr "Asistencia para contraseñas"
+
+#: forgotpassword.php:45
+msgid "There was a problem with your request.  Please try again later"
+msgstr "Ha habido un problema con su solicitud. Por favor, inténtelo de nuevo más tarde"
+
+#: forgotpassword.php:56
+msgid "To begin the password reset process, enter your email address."
+msgstr "Para empezar el proceso de restablecimiento de contraseña, introduzca su dirección de correo electrónico."
+
+#: forgotpassword.php:68
+msgid "Submit"
+msgstr "Enviar"
+
+#: forgotpassword.php:85
+msgid "Check your email to receive the password reset link."
+msgstr "Revise su correo electrónico para recibir el enlace de restablecimiento de contraseña."
+
+#: forgotpassword.php:86
+msgid "You will be redirected to the Activation page in 10 seconds, or you can"
+msgstr "Va a ser redirigido a la página de activación en 10 segundos, o puede haga"
+
+#: forgotpassword.php:86
+msgid "Click Here to continue."
+msgstr "Haga clic aquí para continuar."
+
+#: index.php:101
+#: index.php:152
+msgid "Sign In"
+msgstr "Ingresar"
+
+#: index.php:109
+#: nav.inc.php:88
+msgid "SchoolMessenger Contact Manager"
+msgstr "SchoolMessenger Contacto Director"
+
+#: index.php:129
+msgid "Incorrect username/password. Please try again."
+msgstr "Incorrecto nombre de usuario / contraseña. Por favor, inténtelo de nuevo."
+
+#: index.php:141
+msgid "Password (case sensitive)"
+msgstr "Contraseña (mayúsculas y minúsculas)"
+
+#: index.php:143
+msgid "Forgot your password? Click Here"
+msgstr "¿Olvidaste tu contraseña? Haga clic aquí"
+
+#: index.php:147
+msgid "Warning! Your Caps Lock key is on."
+msgstr "¡Advertencia! Tecla de bloqueo de mayúsculas está activado."
+
+#: index.php:156
+msgid "First time accessing the SchoolMessenger Contact Manager?"
+msgstr "¿Primera vez el acceso a la SchoolMessenger Contacto Director?"
+
+#: index.php:159
+msgid "Sign up now"
+msgstr "Regístrese ahora"
+
+#: nav.inc.php:120
+msgid "My Account"
+msgstr "Mi Cuenta"
+
+#: nav.inc.php:131
+msgid "Change Customer"
+msgstr "Cambiar al cliente"
+
+#: nav.inc.php:134
+msgid "Help"
+msgstr "Ayuda"
+
+#: nav.inc.php:141
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+#: navbottom.inc.php:6
+msgid "Privacy Policy"
+msgstr "Política de privacidad"
+
+#: navbottom.inc.php:6
+msgid "Terms of Service"
+msgstr "Condiciones del servicio"
+
+#: navbottom.inc.php:6
+#, php-format
+msgid "Use of this system is subject to the %1$s and %2$s"
+msgstr "El uso de este sistema está sujeto a las %1$s y %2$s"
+
+#: navbottom.inc.php:9
+msgid "All Rights Reserved."
+msgstr "Todos los derechos reservados."
+
+#: navbottom.inc.php:14
+#, php-format
+msgid "Logged in as %1$s %2$s (%3$s) "
+msgstr "Conectado como %1$s %2$s (%3$s) "
+
+#: navbottom.inc.php:14
+#, php-format
+msgid "Current system time is %s"
+msgstr "Sistema actual el tiempo es %s"
+
+#: newportaluser.php:61
+msgid "The emails you have entered do not match"
+msgstr "Los mensajes de correo electrónico que ha introducido no coinciden"
+
+#: newportaluser.php:63
+msgid "That is not a valid email format"
+msgstr "Que no es un formato de correo válida"
+
+#: newportaluser.php:65
+#: newportaluser.php:67
+msgid "Zip code must be a 5 digit number"
+msgstr "Código postal debe ser un número de 5 dígitos"
+
+#: newportaluser.php:69
+msgid "You must enter a password"
+msgstr "Debe introducir una contraseña"
+
+#: newportaluser.php:71
+msgid "Your passwords don't match"
+msgstr "Las contraseñas no coinciden"
+
+#: newportaluser.php:73
+msgid "Passwords must be at least 5 characters long"
+msgstr "Las contraseñas deben tener al menos 5 caracteres"
+
+#: newportaluser.php:116
+msgid "Create a New Account"
+msgstr "Crear una cuenta nueva"
+
+#: newportaluser.php:135
+msgid "Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address."
+msgstr "Por favor, introduzca a continuación junto con su nueva contraseña. Las contraseñas deben ser de 5 caracteres de longitud y no puede ser similar a su nombre, apellido, o dirección de correo electrónico."
+
+#: newportaluser.php:141
+msgid "Email (this will be your login name)"
+msgstr "Correo electrónico (este será su nombre de usuario)"
+
+#: newportaluser.php:145
+msgid "Confirm Email"
+msgstr "Cambio de correo electrónico"
+
+#: newportaluser.php:182
+msgid "Accept Terms of Service"
+msgstr "Condiciones del servicio"
+
+#: newportaluser.php:185
+msgid "Create Account"
+msgstr "Crear Cuenta"
+
+#: newportaluser.php:200
+msgid "Thank you, Your account has been created."
+msgstr "Gracias, Su cuenta ha sido creada."
+
+#: newportaluser.php:201
+msgid "Please check your email to activate your account."
+msgstr "Por favor, compruebe su correo electrónico para activar tu cuenta."
+
+#: newportaluser.php:202
+msgid "You will be redirected to the activate page in 10 seconds."
+msgstr "Va a ser redirigido a la página activa en 10 segundos."
+
+#: newportaluser.php:202
+msgid "Click Here to redirect now."
+msgstr "Haga clic aquí para reorientar ahora."
+
+#: phoneactivation0.php:69
+msgid "Start by choosing the method you'll use to add people to your account."
+msgstr "Empiece por elegir el método que utilizará para añadir personas a su cuenta."
+
+#: phoneactivation0.php:75
+msgid "I have an Activation Code to enter now."
+msgstr "Tengo un código de activación para entrar ahora."
+
+#: phoneactivation0.php:80
+msgid "I do not have an Activation Code and want to activate by phone."
+msgstr "No tengo un código de activación y desea activar por teléfono."
+
+#: phoneactivation1.php:67
+msgid "Please enter a Contact Identification Number"
+msgstr "Por favor, introduzca un número de identificación de contacto"
+
+#: phoneactivation1.php:129
+msgid "There were problems with one or more of the ID numbers you entered."
+msgstr "Había problemas con uno o más de los números de identificación que ha introducido."
+
+#: phoneactivation1.php:130
+msgid "Try modifying or removing the ID numbers that are causing the errors."
+msgstr "Trate de modificar o eliminar los números de identificación que están causando los errores."
+
+#: phoneactivation1.php:131
+msgid "If you still experience problems try activating only one ID number at a time."
+msgstr "Si sigue experimentando problemas intentar activar sólo un número de identificación a la vez."
+
+#: phoneactivation1.php:135
+msgid "Enter the ID numbers of the people you wish to add to your account."
+msgstr "Introduzca los números de identificación de la gente que desea agregar a su cuenta."
+
+#: phoneactivation1.php:136
+msgid "You can add multiple people to your account in a single call to our toll free number."
+msgstr "Puede agregar varias personas a su cuenta en una sola llamada a nuestro número gratuito."
+
+#: phoneactivation1.php:137
+msgid "Enter all of your ID numbers by using the Add More button."
+msgstr "Introduzca todos los números de identificación mediante el botón Añadir más."
+
+#: phoneactivation1.php:138
+msgid "Clear any ID numbers you don't want to include, then click Next."
+msgstr "Borrar cualquier números de identificación que no desea incluir, haga clic en Siguiente."
+
+#: phoneactivation1.php:153
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: phoneactivation1.php:155
+msgid "Error: Unable to locate this ID number in the system."
+msgstr "Error: No se ha podido localizar este número de identificación en el sistema."
+
+#: phoneactivation1.php:157
+msgid "Error: There are no phone numbers on record for this ID number."
+msgstr "Error: No hay constancia de los números de teléfono para este número de identificación."
+
+#: phoneactivation1.php:159
+msgid "Error: This ID number is blocked from phone activation."
+msgstr "Error: Este número de identificación del teléfono se bloquea la activación."
+
+#: phoneactivation1.php:159
+#, php-format
+msgid "Contact the system administrator at %s for assistance."
+msgstr "Póngase en contacto con el administrador del sistema en% s para obtener asistencia."
+
+#: phoneactivation1.php:161
+msgid "Error: This ID number cannot be activated along with the others you entered."
+msgstr "Error: Este número de identificación no se puede activar, junto con los demás que ha introducido."
+
+#: phoneactivation1.php:163
+msgid "OK"
+msgstr "OK"
+
+#: phoneactivation1.php:181
+msgid "Add More"
+msgstr "Añadir más"
+
+#: phoneactivation2.php:59
+msgid "Contact Activation - Step 3"
+msgstr "Contacto de activación - Paso 3"
+
+#: phoneactivation2.php:64
+#: phoneactivationcode.php:47
+msgid "Phone Activation"
+msgstr "Activación del teléfono"
+
+#: phoneactivation2.php:76
+msgid "The people with the following ID Numbers can be added by following the confirmation steps below."
+msgstr "Las personas con los siguientes números de identificación se puede añadir, siguiendo los pasos de confirmación."
+
+#: phoneactivation2.php:78
+msgid "The person with the following ID Number can be added by following the confirmation steps below."
+msgstr "La persona con el siguiente número de ID puede añadir después de la confirmación de los pasos a continuación."
+
+#: phoneactivation2.php:93
+msgid "Confirmation Steps"
+msgstr "Confirmación Pasos"
+
+#: phoneactivation2.php:99
+msgid "You must follow these steps within <b>24 hours</b> to add the above people to your account."
+msgstr "Usted debe seguir estos pasos <b> dentro de 24 horas </ b> para añadir las personas a su cuenta."
+
+#: phoneactivation2.php:101
+msgid "You must follow these steps within <b>24 hours</b> to add the above person to your account."
+msgstr "Usted debe seguir estos pasos <b> dentro de 24 horas </ b> para añadir la persona a su cuenta."
+
+#: phoneactivation2.php:106
+msgid "Print this page now"
+msgstr "Imprimir esta página ahora"
+
+#: phoneactivation2.php:110
+msgid "Step 1."
+msgstr "Paso 1."
+
+#: phoneactivation2.php:113
+msgid "You must call from one of the phones listed below in order to verify your caller ID with our records."
+msgstr "Usted debe llamar a uno de los teléfonos que figuran a continuación con el fin de verificar su identificador de llamadas con nuestros registros."
+
+#: phoneactivation2.php:114
+msgid "For security reasons, we have hidden parts of your phone numbers with \"xxx\"."
+msgstr "Por razones de seguridad nos han ocultado parte de sus números de teléfono con \"xxx\"."
+
+#: phoneactivation2.php:116
+msgid "You must call from the phone listed below in order to verify your caller ID with our records."
+msgstr "Usted debe llamar desde el teléfono que figuran a continuación con el fin de verificar su identificador de llamadas con nuestros registros."
+
+#: phoneactivation2.php:117
+msgid "For security reasons, we have hidden parts of your phone number with \"xxx\"."
+msgstr "Por razones de seguridad, que han ocultado partes de su número de teléfono con \"xxx\"."
+
+#: phoneactivation2.php:131
+msgid "If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call."
+msgstr "Si su teléfono de servicio de identificación de llamadas ha bloqueado, primero debe marcar *82 para desbloquearlo para la presente convocatoria."
+
+#: phoneactivation2.php:137
+msgid "When prompted, select option 2."
+msgstr "Cuando se le pida, seleccione la opción 2."
+
+#: phoneactivation2.php:140
+#, php-format
+msgid "When prompted, enter this activation code %s"
+msgstr " \tCuando se le solicite, introduzca el código de activación de %s"
+
+#: phoneactivation2.php:143
+msgid "When the call is complete, log back into your Contact Manager account to edit your notification preferences."
+msgstr "Cuando la llamada se completa, volver a iniciar sesión en su cuenta Contact Manager para editar sus preferencias de notificación."
+
+#: phoneactivation2.php:155
+#: phoneactivationcode.php:50
+msgid "Sorry, an unexpected error occured.  Please go back and try again."
+msgstr "Lo sentimos, se produjo un error inesperado. Por favor, regrese y vuelva a intentarlo."
+
+#: phoneactivation2.php:164
+#: phoneactivationcode.php:54
+msgid "Back"
+msgstr "Regresar"
+
+#: phoneactivation2.php:164
+#: previewmessage.php:123
+msgid "Done"
+msgstr "Hecho"
+
+#: previewmessage.php:119
+#: previewmessage.php:173
+#: previewmessage.php:194
+msgid "Message"
+msgstr "Mensaje"
+
+#: previewmessage.php:126
+msgid "Details"
+msgstr "Detalles"
+
+#: previewmessage.php:130
+msgid "Message For"
+msgstr "Por mensaje"
+
+#: previewmessage.php:134
+msgid "Job Name"
+msgstr "Nombre del Empleo"
+
+#: previewmessage.php:138
+msgid "Date"
+msgstr "Fecha"
+
+#: previewmessage.php:145
+msgid "Attachments"
+msgstr "Adjuntos"
+
+#: previewmessage.php:149
+msgid "Name"
+msgstr "Nombre"
+
+#: previewmessage.php:150
+msgid "Size"
+msgstr "Tamaño"
+
+#: previewmessage.php:180
+msgid "Loading Windows Media Player components..."
+msgstr "Cargando los componentes del Reproductor de Windows Media ..."
+
+#: previewmessage.php:189
+msgid "Click here to download"
+msgstr "Haga clic aquí para descargar"
+
+#: start.php:52
+msgid "Sent By"
+msgstr "Enviado por"
+
+#: start.php:53
+msgid "Delivery Type"
+msgstr "Tipo de entrega"
+
+#: start.php:82
+msgid "Play"
+msgstr "Jugar"
+
+#: start.php:85
+msgid "Read Email"
+msgstr "Leer el correo electrónico"
+
+#: start.php:88
+msgid "Read SMS"
+msgstr "Leer SMS"
+
+#: start.php:116
+#, php-format
+msgid "Welcome - %1$s %2$s"
+msgstr "Bienvenido - %1$s %2$s"
+
+#: start.php:121
+msgid "Messages from the last 30 days"
+msgstr "Mensajes de los últimos 30 días"
+
+#: start.php:125
+#, php-format
+msgid "You may call %s at any time to listen to your phone messages."
+msgstr "Usted puede llamar a %s en cualquier momento para escuchar sus mensajes telefónicos."
+
+#: start.php:139
+msgid "No Messages"
+msgstr "Mensajes no"
+
+#: start.php:165
+msgid "The Contact Manager allows you to customize your message delivery preferences and enables you to review past messages."
+msgstr "El Contacto Director le permite personalizar sus preferencias de la entrega de mensajes y le permite examinar los mensajes."
+
+#: start.php:171
+msgid "Click here to begin"
+msgstr "Haga clic aquí para comenzar"
+
+#: unauthorized.php:3
+msgid "Unauthorized"
+msgstr "No autorizado"
+
+#: unauthorized.php:11
+msgid "Sorry, you are not authorized to use this feature"
+msgstr "Lo sentimos, no está autorizado a utilizar esta función"
+
+#: unauthorized.php:11
+msgid "Sorry, your session has expired"
+msgstr "Lo sentimos, tu sesión ha caducado"
+
+#: unauthorized.php:12
+msgid "Please navigate to another page"
+msgstr "Por favor, vaya a otra página"
+
+#: unauthorized.php:12
+msgid "Click here to log in"
+msgstr "Haga clic aquí para acceder"
+
+#: unauthorized.php:13
+msgid "You will be automatically redirected in 10 seconds"
+msgstr "Usted será redirigido automáticamente en 10 segundos"
+
