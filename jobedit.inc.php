@@ -436,8 +436,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			}
 
 			$_SESSION['jobid'] = $job->id;
-			//echo $job->_lastsql;
-			//echo mysql_error();
 			$addlang = false;
 
 			if(!$submittedmode && !$completedmode) {

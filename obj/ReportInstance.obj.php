@@ -150,9 +150,9 @@ class ReportInstance extends DBMappedObject {
 	//returns an array of files from this report
 	function getFileList () {
 		$query = "select filename from reportinstancefile where id=$this->id order by fileorder asc";
-		$result = mysql_query($query);
+		$result = Query($query);
 		$files = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = DBGetRow($result)) {
 			$files[] = $row[0];
 		}
 		

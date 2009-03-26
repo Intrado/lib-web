@@ -93,7 +93,6 @@ class SurveyReport extends ReportGenerator{
 		$query = $this->query;
 		
 		$res = Query($query);
-		echo mysql_error();
 	
 		$questions = array();
 		$questiontext = array();

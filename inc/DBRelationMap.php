@@ -139,11 +139,10 @@ class DBRelationMap {
 	//deletes from an array of ids
 	//(used for cleaning the db)
 	function destroychildren ($idarray) {
-		global $_dbcon;
 		foreach ($idarray as $id) {
 			$query = "delete from " . $this->_tablename
-				." where id='" . mysql_real_escape_string($_dbcon, $id) . "'";
-			QuickUpdate($query);
+				." where id=?";
+			QuickUpdate($query, false, array($id));
 		}
 	}
 

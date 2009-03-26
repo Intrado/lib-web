@@ -29,7 +29,6 @@ $legend = array("Contacted: %d", "Not Contacted: %d", "Duplicates: %d", "No Cont
 $colors = array("lightgreen", "red", "lightgray", "yellow");
 
 
-//echo mysql_error();
 //var_dump($data);
 //var_dump($legend);
 //var_dump($colors);

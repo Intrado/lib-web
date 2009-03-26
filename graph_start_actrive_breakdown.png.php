@@ -98,7 +98,6 @@ $data = array_values($data);
 $legend = array_values($legend);
 $colors = array_values($colors);
 
-//echo mysql_error();
 //var_dump($data);
 //var_dump($legend);
 //var_dump($colors);

@@ -23,7 +23,6 @@ $legend = array("Queued: %d", "Processing: %d");
 $colors = array("blue", "yellow");
 
 
-//echo mysql_error();
 //var_dump($data);
 //var_dump($legend);
 //var_dump($colors);

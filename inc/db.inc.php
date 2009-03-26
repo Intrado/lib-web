@@ -21,7 +21,7 @@ function DBDebug($query) {
 	fwrite($logfp,"--- t:" . $cid . " --------------------------\n$query\n");
 }
 
-//wrap mysql_query, and optionally log query errors
+//wrap mysql query, and optionally log query errors
 function DBQueryWrapper($dbcon, $query, $args=false) {
 	global $SETTINGS;
 

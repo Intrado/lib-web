@@ -225,20 +225,18 @@ function doDBConnect($result) {
 	$_DBPASS = $result['dbpass'];
 	$_DBNAME = $result['dbname'];
 
-	// 	now connect to the customer database
 	global $_dbcon;
-	$_dbcon = mysql_connect($_DBHOST, $_DBUSER, $_DBPASS);
-	if (!$_dbcon) {
-		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . mysql_error());
-	} else if (mysql_select_db($_DBNAME)) {
-		if (mysql_set_charset("utf8",$_dbcon)) {
-			// successful connection to customer database
-			return true;
-		} else {
-			error_log("Couldn't select mysql charset. e:" . mysql_error());
-		}
-	} else {
-		error_log("Problem selecting database for " . $_DBHOST . " error:" . mysql_error());
+	try {
+		$dsn = 'mysql:dbname='.$_DBNAME.';host='.$_DBHOST;
+		$_dbcon = new PDO($dsn, $_DBUSER, $_DBPASS);
+		
+		// TODO set charset
+		$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
+		$_dbcon->query($setcharset);
+		
+		return true;
+	} catch (PDOException $e) {
+		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . $e->getMessage());
 	}
 	return false;
 }
