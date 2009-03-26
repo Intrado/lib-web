@@ -198,7 +198,7 @@ if ($IS_COMMSUITE) {
 } /*CSDELETEMARKER_END*/
 include_once("loginbottom.inc.php");
 
-?>
+if (!($custname === false)) { ?>
 <script langauge="javascript">
 
 new getObj('logintext').obj.focus();
@@ -247,3 +247,4 @@ function getObj(name)
 }
 
 </script>
+<?}?>
