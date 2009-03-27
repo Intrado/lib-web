@@ -1,7 +1,7 @@
 <?
 //expects $person to be set
 
-	NewForm($f);
+//	NewForm($f);
 ?>
 	<table cellpadding="3" cellspacing="1" width="100%">
 <?
@@ -122,7 +122,7 @@
 	</table>
 	<br>
 <?
-	echo submit($f, $s, "Save");
-	EndForm();
+//	echo submit($f, $s, "Save");
+//	EndForm();
 
 ?>

@@ -16,12 +16,20 @@ require_once("subscriberutils.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$firstnamefield = FieldMap::getFirstNameField();
-$lastnamefield = FieldMap::getLastNameField();
+$pid = $_SESSION['personid'];
+$person = new Person($_SESSION['personid']);
+
+$firstnameField = FieldMap::getFirstNameField();
+$lastnameField = FieldMap::getLastNameField();
+$subscribeFields = FieldMap::getSubscribeMapNames();
+
+$subscribeFieldValues = array();
+foreach ($subscribeFields as $fieldnum => $name) {
+	$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+}
+
 $jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 
-$pid = $_SESSION['personid'];
-$person = DBFind("Person", "from person where id=".$pid);
 
 	$maxphones = getSystemSetting("maxphones", 3);
 	$maxemails = getSystemSetting("maxemails", 2);
@@ -77,11 +85,10 @@ $person = DBFind("Person", "from person where id=".$pid);
 	$s = "main";
 	$reloadform = 0;
 
-
-	if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "all"))
+	if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "all"))
 	{
 		//check to see if formdata is valid
-		if(CheckFormInvalid($f))
+		if (CheckFormInvalid($f))
 		{
 			error('Form was edited in another window, reloading data');
 			$reloadform = 1;
@@ -91,12 +98,34 @@ $person = DBFind("Person", "from person where id=".$pid);
 			MergeSectionFormData($f, $s);
 
 			//do check
+			
+			$firstname = TrimFormData($f,$s,"firstname");
+			$lastname = TrimFormData($f,$s,"lastname");
+			
 			if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
 				if(getSystemSetting('priorityenforcement') && $error = checkPriorityPhone($f, $s, $phones)){
 					error("You must have at least one phone number that can receive calls for these job types: " . implode(", ", $error));
 				} else {
+					$person->$firstnameField = $firstname;
+					$person->$lastnameField = $lastname;
+			
+					foreach ($subscribeFields as $fieldnum => $name) {
+						$val = GetFormData($f, $s, "fnum_".$fieldnum);
+						error_log("VALVAL ".$val);
+				
+						if ('f' == substr($fieldnum, 0, 1)) {
+							$person->$fieldnum = $subscribeFieldValues[$fieldnum][$val];
+						} else { // 'g'
+							// TODO groupdata
+						}
+					}
+					$person->update();
+
+					$_SESSION['subscriber.firstname'] = $person->$firstnameField;
+					$_SESSION['subscriber.lastname'] = $person->$lastnameField;
+							
 					getsetContactFormData($f, $s, $pid, $phones, $emails, $smses, $jobtypes, $locked);
 
 					redirect();
@@ -107,11 +136,19 @@ $person = DBFind("Person", "from person where id=".$pid);
 		$reloadform = 1;
 	}
 
-	if( $reloadform )
-	{
-		ClearFormData($f);
-		putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked);
+if ($reloadform) {
+	ClearFormData($f);
+
+	PutFormData($f, $s, "firstname", $_SESSION['subscriber.firstname'], "text", "1", "100", true);
+	PutFormData($f, $s, "lastname", $_SESSION['subscriber.lastname'], "text", "1", "100", true);
+
+	foreach ($subscribeFields as $fieldnum => $name) {
+		$val = $person->$fieldnum;
+		PutFormData($f, $s, "fnum_".$fieldnum, $val, "text", "nomin", "nomax");
 	}
+
+	putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked);
+}
 
 
 
@@ -119,21 +156,65 @@ $person = DBFind("Person", "from person where id=".$pid);
 // Functions
 ///////////////////////////////////////////////////////////////////
 
-function contact_actions($obj, $index){
-	return "<a href='contactpreferences.php?id=" . $obj->pkey . "#edit'>Edit</a>";
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Contact Preferences";
-$TITLE .= " - " . escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield);
+$TITLE = "Contact Information";
 
 include_once("nav.inc.php");
 
+NewForm($f);
+
+startWindow(_L('Personal Information'));
+?>
+	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+		<tr>
+			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;"><?=_L("Account Info")?>:</th>
+			<td class="bottomBorder">
+				<table border="0" cellpadding="1" cellspacing="0">
+					<tr>
+						<td align="right"><?=_L("First Name")?>:</td>
+						<td><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
+					</tr>
+					<tr>
+						<td align="right"><?=_L("Last Name")?>:</td>
+						<td><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
+					</tr>
+					
+<?
+					foreach ($subscribeFields as $fieldnum => $name) {
+?>
+					<tr>
+						<td align="right"><?=$name ?>:</td>
+						<td>
+<?
+							NewFormItem($f, $s, "fnum_".$fieldnum, 'selectstart', null, null, "id='fnum_".$fieldnum."'");
+							foreach ($subscribeFieldValues[$fieldnum] as $index => $value) {
+								NewFormItem($f, $s, "fnum_".$fieldnum, 'selectoption', $value, $index);
+							}
+							NewFormItem($f, $s, "fnum_".$fieldnum, 'selectend');
+?>
+						</td>
+					</tr>
+					
+<?					
+					}
+?>					
+				</table>
+			</td>
+		</tr>
+	</table>
+
+<?
+endWindow();
+
+
+
+
 ?><a name="edit"></a><?
-startWindow(escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield), 'padding: 3px;');
+startWindow("Contact Preferences", 'padding: 3px;');
 ?>
 	<table width="100%">
 		<tr>
@@ -146,6 +227,9 @@ startWindow(escapehtml($person->$firstnamefield) . " " . escapehtml($person->$la
 	</table>
 <?
 endWindow();
+
+buttons(submit($f, $s, _L('Save')));
+EndForm();
 
 include_once("navbottom.inc.php");
 ?>

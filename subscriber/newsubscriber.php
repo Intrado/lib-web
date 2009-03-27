@@ -5,9 +5,17 @@ $isNotLoggedIn = 1;
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("common.inc.php");
+require_once("recaptchalib.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
+
+
+// reCaptcha keys
+$publickey = "6LcVswUAAAAAAOaU8PxzEpv22culkZ7OG0FHjMOX";
+$privatekey = "6LcVswUAAAAAAMFesdVgOw3VDSiRjOGGVQ9bqvd1";
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -31,6 +39,12 @@ $success = false;
 $tos = file_get_contents("terms.html");
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
+
+	$resp = recaptcha_check_answer ($privatekey,
+                                $_SERVER["REMOTE_ADDR"],
+                                $_POST["recaptcha_challenge_field"],
+                                $_POST["recaptcha_response_field"]);
+
 	$login = trim(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login']);
 	$confirmlogin = trim(get_magic_quotes_gpc() ? stripslashes($_POST['confirmlogin']) : $_POST['confirmlogin']);
 	$firstname = get_magic_quotes_gpc() ? stripslashes($_POST['firstname']) : $_POST['firstname'];
@@ -38,24 +52,28 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	$password1 = get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1'];
 	$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
 	$acceptterms = isset($_POST['acceptterms']);
-	if($login != $confirmlogin){
+	if ($login != $confirmlogin) {
 		error("The emails you have entered do not match");
-	} else if(!validEmail($login)){
+	} else if (!validEmail($login)) {
 		error("That is not a valid email format");
-	} else if($_POST['password1'] == ""){
+	} else if ($_POST['password1'] == "") {
 		error("You must enter a password");
-	} else if($password1 != $password2){
+	} else if ($password1 != $password2) {
 		error("Your passwords don't match");
-	} else if(strlen($password1) < 5){
+	} else if (strlen($password1) < 5) {
 		error("Passwords must be at least 5 characters long");
-	} else if($passworderror = validateNewPassword($login, $password1, $firstname, $lastname)){
+	} else if ($passworderror = validateNewPassword($login, $password1, $firstname, $lastname)) {
 		error($passworderror);
+	} else if (!$resp->is_valid) {
+		error("The reCAPTCHA wasn't entered correctly. Go back and try it again." .
+		   			"(reCAPTCHA said: " . $resp->error . ")");
 	} else {
+	
 		$options = json_encode(array('firstname' => $firstname, 'lastname' => $lastname));
 		
 		$result = subscriberCreateAccount($CUSTOMERURL, $login, $password1, $options);
-		if($result['result'] != ""){
-			if($result['result'] == "duplicate"){
+		if ($result['result'] != "") {
+			if ($result['result'] == "duplicate") {
 				$errordetails = "That email address is already in use";
 			} else {
 				$errordetails = "An unknown error occured, please try again";
@@ -119,6 +137,11 @@ if (!$success) {
 			</tr>
 			<tr>
 				<td colspan="2"><input type="checkbox" name="acceptterms" id="tos"/> Accept Terms of Service</td>
+			</tr>
+			<tr>
+				<td>
+				<? echo recaptcha_get_html($publickey); ?>
+				</td>
 			</tr>
 			<tr>
 				<td colspan="2"><div><input type="image" src="img/createaccount.gif" onmouseover="this.src='img/createaccount_over.gif';" onmouseout="this.src='img/createaccount.gif';"></div></td>

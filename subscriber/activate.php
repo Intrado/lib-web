@@ -18,29 +18,28 @@ $token = "";
 $success = false;
 $error = false;
 $result = null;
-if(isset($_GET['t'])){
+if (isset($_GET['t'])) {
 	$token = $_GET['t'];
 }
 
-if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
+if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 
 	$token = get_magic_quotes_gpc() ? stripslashes($_POST['token']) : $_POST['token'];
 	if(isset($_POST['password1']) && isset($_POST['password2'])){
 		$password1 = get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1'];
 		$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
-		$result = portalPreactivateForgottenPassword($token);
+		$result = subscriberPreactivateForgottenPassword($token);
 		if($result['result'] == ""){
-			$user = $result['portaluser'];
-			if($password1 !== $password2){
+			if ($password1 !== $password2) {
 				error("The passwords do not match");
-			} else if(strlen($password1) < 5){
+			} else if (strlen($password1) < 5) {
 				error("Passwords must be at least 5 characters long");
-			} else if($password1 && $passworderror = validateNewPassword($user['portaluser.username'], $password1, $user['portaluser.firstname'], $user['portaluser.lastname'])){
+			} else if($password1 && $passworderror = validateNewPassword($result['subscriber.username'], $password1, $result['subscriber.firstname'], $result['subscriber.lastname'])) {
 				error($passworderror);
 			} else {
-				$result = portalActivateAccount($token, $password1);
+				$result = subscriberActivateAccount($token, $password1);
 				if($result['result'] == ""){
-					if(!$forgot && $result['functionCode'] != 'forgotpassword'){
+					if (!$forgot && $result['functionCode'] != 'forgotpassword') {
 						error("An unknown error occurred");
 						$error = true;
 					} else {

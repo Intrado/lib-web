@@ -123,7 +123,9 @@ function subscriberForgotPassword($username) {
 	if (isset($_GET['u'])) {
 		$customerurl = $_GET['u'];
 	}
-	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value($customerurl, 'string'));
+	global $CUSTOMERURL;
+	$customerurl = $CUSTOMERURL;
+	$params = array(new XML_RPC_Value($customerurl, 'string'), new XML_RPC_Value(trim($username), 'string'));
 	$method = "SubscriberServer.subscriber_forgotPassword";
 	$result = pearxmlrpc($method, $params);
 	return $result;

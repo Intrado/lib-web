@@ -55,24 +55,6 @@ if (CheckFormSubmit($f,$s)) {
 		} else {
 			//submit changes
 			
-			$person->$firstnameField = $firstname;
-			$person->$lastnameField = $lastname;
-			
-			foreach ($subscribeFields as $fieldnum => $name) {
-				$val = GetFormData($f, $s, "fnum_".$fieldnum);
-				error_log("VALVAL ".$val);
-				
-				if ('f' == substr($fieldnum, 0, 1)) {
-					$person->$fieldnum = $subscribeFieldValues[$fieldnum][$val];
-				} else { // 'g'
-					// TODO groupdata
-				}
-			}
-			
-			$person->update();
-
-			$_SESSION['subscriber.firstname'] = $person->$firstnameField;
-			$_SESSION['subscriber.lastname'] = $person->$lastnameField;
 
 			if ($newpassword1) {
 			/*
@@ -100,17 +82,11 @@ if (CheckFormSubmit($f,$s)) {
 if ($reloadform) {
 	ClearFormData($f);
 	
-	PutFormData($f, $s, "firstname", $_SESSION['subscriber.firstname'], "text", "1", "100", true);
-	PutFormData($f, $s, "lastname", $_SESSION['subscriber.lastname'], "text", "1", "100", true);
 	PutFormData($f, $s, "newpassword1", "", "text");
 	PutFormData($f, $s, "newpassword2", "", "text");
 	PutFormData($f, $s, "oldpassword", "", "text");
+
 	PutFormData($f, $s, "_locale", $_SESSION['_locale'], "text", "nomin", "nomax");
-	
-	foreach ($subscribeFields as $fieldnum => $name) {
-		$val = $person->$fieldnum;
-		PutFormData($f, $s, "fnum_".$fieldnum, $val, "text", "nomin", "nomax");
-	}
 }
 
 $PAGE = "account:account";
@@ -130,35 +106,6 @@ startWindow(_L('User Information'));
 						<td align="right"><?=_L("Email")?>:</td>
 						<td><?= escapehtml($_SESSION['subscriber.username']) ?></td>
 					</tr>
-					<tr>
-						<td align="right"><?=_L("First Name")?>:</td>
-						<td><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
-					</tr>
-					<tr>
-						<td align="right"><?=_L("Last Name")?>:</td>
-						<td><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
-					</tr>
-					
-<?
-					foreach ($subscribeFields as $fieldnum => $name) {
-?>
-					<tr>
-						<td align="right"><?=$name ?>:</td>
-						<td>
-<?
-							NewFormItem($f, $s, "fnum_".$fieldnum, 'selectstart', null, null, "id='fnum_".$fieldnum."'");
-							foreach ($subscribeFieldValues[$fieldnum] as $index => $value) {
-								NewFormItem($f, $s, "fnum_".$fieldnum, 'selectoption', $value, $index);
-							}
-							NewFormItem($f, $s, "fnum_".$fieldnum, 'selectend');
-?>
-						</td>
-					</tr>
-					
-<?					
-					}
-?>					
-
 					<tr>
 						<td align="right">*<?=_L("Old Password")?>:</td>
 						<td><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
