@@ -100,6 +100,13 @@ class FieldMap extends DBMappedObject {
 		}
 		return $map;
 	}
+	
+	static function getSubscribeMapNames() {
+		$query = "select fieldnum, name from fieldmap where options like '%subscribe%' order by fieldnum";
+		$map = QuickQueryList($query, true);
+		return $map;
+	}
+	
 
 	static function getAuthorizedFieldMaps () {
 		return FieldMap::getAuthorizedFieldMapsLike("f%");
