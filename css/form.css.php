@@ -14,7 +14,8 @@ header("Cache-Control: private");
 form.newform {
 	position: relative; /* allows offsetParent to be correct for helper*/
 	float: left;
-	width: 75%;
+	width: 75%; /* leave room for guide */
+	overflow: auto;
 }
 
 .helpicon {
@@ -62,7 +63,7 @@ form.newform {
 .newform label {
 	padding: 3px;
 	padding-left: 10px;
-	width: 31%;
+	width: 28%;
 	display: block;
 	float: left;
 }
@@ -70,8 +71,24 @@ form.newform {
 .newform input {
 	display: block;
 	float: left;
-	left: 31%;
-	width: 31%;
+	left: 28%;
+	width: 40%;
+	margin: 3px;
+}
+
+.newform textarea {
+	display: block;
+	float: left;
+	left: 28%;
+	width: 40%;
+	margin: 3px;
+}
+
+.newform select {
+	display: block;
+	float: left;
+	left: 28%;
+	width: 40%;
 	margin: 3px;
 }
 
@@ -83,9 +100,10 @@ input[type=hidden] {
 .newform fieldset .radiobox {
 	display: block;
 	float: left;
-	left: 31%;
-	width: 31%;
+	left: 28%;
+	width: 40%;
 	margin: 3px;
+	border: 1px dotted gray;
 }
 
 .newform .radiobox input {
@@ -103,7 +121,7 @@ input[type=hidden] {
 
 
 .newform fieldset div .msgarea {
-	width: 31%;
+	width: 25%;
 	display: block;
 	float: left;
 }

@@ -76,7 +76,7 @@ abstract class Validator {
 
 class ValRequired extends Validator {
 	function validate ($value, $args) {
-		if (mb_strlen($value) == 0)
+		if ((is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0))
 			return "$this->label is required";		
 		return true;
 	}
@@ -202,6 +202,12 @@ class ValNumeric extends Validator {
 }
 
 
+//alpha
+//alphanumeric
+//phone
+//phoneeasycall ??
+//email
+//matches array
 
 
 

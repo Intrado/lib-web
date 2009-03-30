@@ -16,7 +16,7 @@ header("Cache-Control: private");
 function form_event_handler (event) {
 	var form = event.findElement("form");
 	var e = event.element();
-			
+				
 	if (event.type == "keyup" && event.keyCode == Event.KEY_TAB)
 		return;
 	
@@ -36,25 +36,42 @@ function form_event_handler (event) {
 function form_get_value (form,targetname) {
 	var value = "";
 	
-	var elements = form.elements[targetname];
-	if (elements.length) {
-		if (elements[0].type == "radio") {
-			for (var i = 0; i < elements.length; i++) {
-				if (elements[i].checked)
-					value = elements[i].value;
+	try {
+		value = $F(targetname);
+		return value;
+	} catch (e) {
+		
+		//prototype doesn't handle radio boxes or multicheckboxes so well, so try to handle them here
+		var elements = form.elements[targetname] || form.elements[targetname + "[]"];
+		if (elements.length) {
+			switch (elements[0].type) {
+			case "radio":
+				for (var i = 0; i < elements.length; i++) {
+					if (elements[i].checked) {
+						value = elements[i].value.strip();
+						break;
+					}
+				}
+				break;
+			case "checkbox":
+				value = [];
+				for (var i = 0; i < elements.length; i++) {
+					if (elements[i].checked)
+						value.push(elements[i].value);
+				}
+				break;
 			}
-		} else if (els[0].type == "checkbox") {
-			//TODO
 		}
-	} else {
-		value = elements.value;
 	}
-
-	return value.strip();
+	
+	return value;
 }
 
 function form_do_validation (form, element) {
 	var targetname = element.name;
+	
+	//might need to strip off the some brackets from the name
+	targetname = targetname.replace("[]","");
 	
 	if (form.validators && form.validators[targetname]) {
 		var validators = form.validators[targetname];
@@ -100,13 +117,18 @@ function form_do_validation (form, element) {
 				form_validation_display(element,"blank","");
 		}
 	}
+
 }
 
 function form_validation_display(element,style, msgtext) {
 	e = $(element);
-	
+		
 	//if radio button, get the id of the container div
-	var name = e.type == "radio" ? e.up().id : e.id;
+	var name;
+	if (e.up().match(".radiobox"))
+		name = e.up().id;
+	else
+		name = e.id;
 	
 	var fieldarea = $(name + "_fieldarea");
 	var icon = $(name + "_icon");
@@ -162,13 +184,18 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		if (e.tagName.toLowerCase() == 'div' && e.hasClassName('radiobox')) {
 			//attach event listeners to each of the radio boxes
 			e.childElements().each(function (obj) {
-				e.observe("click",form_event_handler);
+				obj.observe("click",form_event_handler);
 				obj.observe("blur",form_event_handler);
 				obj.observe("change",form_event_handler);
 			});
 		} else {
+			if (e.type == "checkbox") {
+				e.observe("change",form_event_handler);
+			} else if (e.type == "select" || e.type == "select-multiple") {
+				e.observe("change",form_event_handler);
+			}
+			
 			e.observe("blur",form_event_handler);
-			//e.observe("change",form_event_handler);
 			e.observe("keyup",form_event_handler);
 		}
 		
@@ -209,7 +236,7 @@ function form_fieldset_handler (event) {
 	var form = event.findElement("form");
 	var e = event.element();
 	
-	if (!e.match("label") && !e.match("input")) {		
+	if (["label","input","textarea","select","option"].indexOf(e.tagName.toLowerCase()) == -1 && !e.match(".radiobox")) {		
 		var fieldset = e.match("fieldset") ? e : e.up("fieldset");
 		var step = fieldset.id.substring(fieldset.id.lastIndexOf("_")+1);
 		form_step_handler(form,null,step);
@@ -304,25 +331,31 @@ function form_handle_submit(form,event) {
 			
 			if ("fail" == res.status) {
 				//show the validation results
+				if (res.validationerrors) {
+					res.validationerrors.each(function(res) {
+						try {
+						var targetname = form.name+"_"+res.name;
+						var element = $(targetname);
+						var value = form_get_value(form,targetname);
+						if (res.vres != true) {
+							form_validation_display(element,"error",res.vmsg);
+						} else {
+							//checked out ok
+							if (value.length > 0)
+								form_validation_display(element,"valid","OK");
+							else
+								form_validation_display(element,"blank","");
+						}
+						} catch (error) { alert(res.name + " " + error)};
+					});
 				
-				res.validationerrors.each(function(res) {
-					try {
-					var targetname = form.name+"_"+res.name;
-					var element = $(targetname);
-					var value = form_get_value(form,targetname);
-					if (res.vres != true) {
-						form_validation_display(element,"error",res.vmsg);
-					} else {
-						//checked out ok
-						if (value.length > 0)
-							form_validation_display(element,"valid","OK");
-						else
-							form_validation_display(element,"blank","");
-					}
-					} catch (error) { alert(res.name + " " + error)};
-				});
-			
-				alert("There are some errors on this form.\nPlease correct them before trying again.");
+					alert("There are some errors on this form.\nPlease correct them before trying again.");
+				}
+				
+				if (res.datachange) {
+					alert("The data on this form has changed.\nYou're changes cannot be saved.");
+					window.location=form.scriptname;
+				}
 				
 			} else if ("success" == res.status) {
 				

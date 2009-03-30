@@ -20,7 +20,7 @@ class Form {
 		if (isset($buttons))
 			$this->buttons = $buttons;
 		
-		$this->serialnum = $_SESSION["formsnum_$name"] = md5("form" . mt_rand() . microtime());
+		$this->serialnum = md5(serialize($formdata));
 	}
 	
 	function handleRequest() {
@@ -50,12 +50,27 @@ class Form {
 		
 		//ajax post form - merge in data, check validation, etc
 		if ($_POST['submit']) {
+			
+			//check the form snum vs loaded formdata
+			if (isset($_REQUEST['ajax']) && $this->checkForDataChange()) {
+				$result = array("status" => "fail", "datachange" => true);
+				header("Content-Type: application/json");
+				echo json_encode($result);
+				exit();
+			}
+			
 			foreach ($_POST as $name => $value) {
 				if ($name == "submit")
 					continue;
 				list($form,$item) = explode("_",$name);
 				if (isset($this->formdata[$item])) {
-					$this->formdata[$item]['value'] = trim($value);
+					if (is_array($value)) {
+						foreach ($value as $k => $v)
+							$value[$k] = trim($v);
+						$this->formdata[$item]['value'] = $value;
+					} else {
+						$this->formdata[$item]['value'] = trim($value);
+					}
 				}
 			}
 			
@@ -89,11 +104,16 @@ class Form {
 				$control = $itemdata['control'];
 			} else {
 				//set a hidden field
-				$control = array("Hidden");
+				$control = array("HiddenField");
 			}
 			
 			$formclass = $control[0];
 			$item = new $formclass($name, $control);
+			
+			if ($formclass == "HiddenField") {
+				$str.= $item->render($this,$value);
+				continue;
+			}
 
 			if ($lasthelpstep && $lasthelpstep != $itemdata['helpstep']) {
 				$str .= '
@@ -118,28 +138,28 @@ class Form {
 			foreach ($itemdata['validators'] as $v) {
 				if ($v[0] == "ValRequired") {
 					$isrequired = true;
-					$i = "img/icons/error.gif";
-					$style = 'style="background: rgb(255,255,220);"' ;
-					$msg = "Required";
 					break;
 				}
 			}
-			//check the value, and set style accordingly, dont count required fields with no value
-			if ($this->getSubmit()) {
+			
+			//if not posted and required and value is blank
+			if (!$this->getSubmit() && $isrequired && mb_strlen($value) == 0) {
+				//show required highlight
+				$i = "img/icons/error.gif";
+				$style = 'style="background: rgb(255,255,220);"' ;
+				$msg = "Required";
+			} else {
+				//otherwise, validate and show normally
 				$valresult = Validator::validate_item($this->formdata,$name,$value);
-				if ($valresult === true && mb_strlen($value) > 0) {
+				if ($valresult === true) {
 					$i = "img/icons/accept.gif";
 					$style = 'style="background: rgb(225,255,225);"' ;
 					$msg = "OK";
+				} else {
+					list($validator,$msg) =  $valresult;
+					$i = "img/icons/exclamation.gif";
+					$style = 'style="background: rgb(255,200,200);"' ;
 				}
-			} else {
-				$valresult = $isrequired && mb_strlen($value) == 0 ? true : Validator::validate_item($this->formdata,$name,$value);
-			}
-			
-			if ($valresult !== true) {
-				list($validator,$msg) =  $valresult;
-				$i = "img/icons/exclamation.gif";
-				$style = 'style="background: rgb(255,200,200);"' ;
 			}
 			
 			$str.= '
@@ -192,6 +212,9 @@ class Form {
 		return $str;
 	}
 	
+	function checkForDataChange() {
+		return $this->serialnum != $_POST['formsnum_' . $this->name];
+	}
 
 	function validate () {
 		if ($this->validationresults !== null)
