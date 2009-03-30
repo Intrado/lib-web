@@ -39,7 +39,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 			} else {
 				$result = subscriberActivateAccount($token, $password1);
 				if($result['result'] == ""){
-					if (!$forgot && $result['functionCode'] != 'forgotpassword') {
+					if (!$forgot && $result['functionCode'] != 'token_forgotpassword') {
 						error("An unknown error occurred");
 						$error = true;
 					} else {
@@ -59,9 +59,9 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 		$result = subscriberActivateAccount($token, $password);
 		if($result['result'] == ""){
 			$form = false;
-			if($result['functionCode'] == 'newaccount'){
+			if($result['functionCode'] == 'token_newsubscriber'){
 				$success = true;
-			} else if ($result['functionCode'] == 'changeusername' && $changeuser){
+			} else if ($result['functionCode'] == 'token_changeemail' && $changeuser){
 				$newusersuccess = true;
 			} else {
 				error("An unknown error occurred");
@@ -102,7 +102,7 @@ if ($forgot) {
 	$text = "your password";
 }
 
-include("cmlogintop.inc.php");
+include("logintop.inc.php");
 
 if ($forgotsuccess || $success || $newusersuccess) {
 ?>
@@ -212,5 +212,5 @@ if ($form) {
 <?
 }
 
-include_once("cmloginbottom.inc.php");
+include_once("loginbottom.inc.php");
 ?>

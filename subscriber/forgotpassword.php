@@ -40,7 +40,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 }
 
 $TITLE = _L("Password Assistance");
-include_once("cmlogintop.inc.php");
+include_once("logintop.inc.php");
 if($generalerror){
 	error(_L("There was a problem with your request.  Please try again later"));
 }
@@ -91,5 +91,5 @@ if(!$success){
 	</table>
 <?
 }
-include_once("cmloginbottom.inc.php");
+include_once("loginbottom.inc.php");
 ?>

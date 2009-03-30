@@ -5,15 +5,15 @@ $isNotLoggedIn = 1;
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("common.inc.php");
-require_once("recaptchalib.php");
+//require_once("recaptchalib.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
 
 
 // reCaptcha keys
-$publickey = "6LcVswUAAAAAAOaU8PxzEpv22culkZ7OG0FHjMOX";
-$privatekey = "6LcVswUAAAAAAMFesdVgOw3VDSiRjOGGVQ9bqvd1";
+//$publickey = "6LcVswUAAAAAAOaU8PxzEpv22culkZ7OG0FHjMOX";
+//$privatekey = "6LcVswUAAAAAAMFesdVgOw3VDSiRjOGGVQ9bqvd1";
 
 
 
@@ -40,10 +40,10 @@ $tos = file_get_contents("terms.html");
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
-	$resp = recaptcha_check_answer ($privatekey,
-                                $_SERVER["REMOTE_ADDR"],
-                                $_POST["recaptcha_challenge_field"],
-                                $_POST["recaptcha_response_field"]);
+//	$resp = recaptcha_check_answer ($privatekey,
+  //                              $_SERVER["REMOTE_ADDR"],
+    //                            $_POST["recaptcha_challenge_field"],
+      //                          $_POST["recaptcha_response_field"]);
 
 	$login = trim(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login']);
 	$confirmlogin = trim(get_magic_quotes_gpc() ? stripslashes($_POST['confirmlogin']) : $_POST['confirmlogin']);
@@ -64,9 +64,9 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error("Passwords must be at least 5 characters long");
 	} else if ($passworderror = validateNewPassword($login, $password1, $firstname, $lastname)) {
 		error($passworderror);
-	} else if (!$resp->is_valid) {
-		error("The reCAPTCHA wasn't entered correctly. Go back and try it again." .
-		   			"(reCAPTCHA said: " . $resp->error . ")");
+//	} else if (!$resp->is_valid) {
+//		error("The reCAPTCHA wasn't entered correctly. Go back and try it again." .
+//		   			"(reCAPTCHA said: " . $resp->error . ")");
 	} else {
 	
 		$options = json_encode(array('firstname' => $firstname, 'lastname' => $lastname));
@@ -94,7 +94,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $TITLE = "Create a New Account";
-include_once("cmlogintop.inc.php");
+include_once("logintop.inc.php");
 if (!$success) {
 ?>
 	<form method="POST" action="newsubscriber.php<?echo $appendcustomerurl;?>" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
@@ -139,11 +139,6 @@ if (!$success) {
 				<td colspan="2"><input type="checkbox" name="acceptterms" id="tos"/> Accept Terms of Service</td>
 			</tr>
 			<tr>
-				<td>
-				<? echo recaptcha_get_html($publickey); ?>
-				</td>
-			</tr>
-			<tr>
 				<td colspan="2"><div><input type="image" src="img/createaccount.gif" onmouseover="this.src='img/createaccount_over.gif';" onmouseout="this.src='img/createaccount.gif';"></div></td>
 			</tr>
 			<tr>
@@ -170,5 +165,5 @@ if (!$success) {
 	</table>
 <?
 }
-include_once("cmloginbottom.inc.php");
+include_once("loginbottom.inc.php");
 ?>

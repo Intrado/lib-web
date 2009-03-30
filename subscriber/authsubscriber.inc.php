@@ -261,7 +261,11 @@ function doStartSession($subscriberID = false) {
 		$_SESSION['subscriber.firstname'] = QuickQuery("select ".$firstnameField." from person where id=?", false, array($pid));
 		$_SESSION['subscriber.lastname'] = QuickQuery("select ".$lastnameField." from person where id=?", false, array($pid));
 	
-		$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
+		$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
+		$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
+		$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
+		$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+		$_SESSION['colorscheme']['_brandratio']   = ".3";
 	}
 }
 

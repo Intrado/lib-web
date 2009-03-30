@@ -87,7 +87,7 @@ if ($id) {
 
 $TITLE= "Sign In";
 
-include_once("cmlogintop.inc.php");
+include_once("logintop.inc.php");
 
 ?>
 <form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
@@ -164,7 +164,7 @@ $form->render();
 */
 
 
-include("cmloginbottom.inc.php");
+include("loginbottom.inc.php");
 ?>
 <script langauge="javascript">
 document.getElementById('logintext').focus();
