@@ -7,7 +7,7 @@ abstract class FormItem {
 	abstract function render ($form,$value) ;
 }
 
-// HiddenField | TextField | PasswordField | CheckBox | RadioButton | TextArea | MultiSelect | MultiCheckbox
+// HiddenField | TextField | PasswordField | CheckBox | RadioButton | TextArea | MultiSelect | MultiCheckBox
 
 class HiddenField extends FormItem {
 	function HiddenField ($name,$args) {
@@ -123,9 +123,9 @@ class MultiSelect extends FormItem {
 	}
 }
 
-class MultiCheckbox extends FormItem {
+class MultiCheckBox extends FormItem {
 	
-	function MultiCheckbox ($name,$args) {
+	function MultiCheckBox ($name,$args) {
 		$this->name = $name;
 		$this->args = $args;
 	}
@@ -146,6 +146,18 @@ class MultiCheckbox extends FormItem {
 		$str .= '</div>';
 		
 		return $str;		
+	}
+}
+
+// allows ad-hoc html
+class FormHtml extends FormItem {
+	
+	function FormHtml ($name,$args) {
+		$this->name = $name;
+		$this->args = $args;
+	}
+	function render ($form,$value) {
+		return $this->args['html'];
 	}
 }
 

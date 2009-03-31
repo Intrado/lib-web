@@ -16,8 +16,10 @@ header("Cache-Control: private");
 function form_event_handler (event) {
 	var form = event.findElement("form");
 	var e = event.element();
+	
+	
 				
-	if (event.type == "keyup" && event.keyCode == Event.KEY_TAB)
+	if (event.type == "keyup" && event.keyCode == Event.KEY_TAB || e.tagName.toLowerCase() == "input")
 		return;
 	
 	if (form.keyuptimer) {
@@ -37,7 +39,7 @@ function form_get_value (form,targetname) {
 	var value = "";
 	
 	try {
-		value = $F(targetname);
+		value = $F(targetname) || "";
 		return value;
 	} catch (e) {
 		

@@ -59,6 +59,15 @@ class Form {
 				exit();
 			}
 			
+			
+			//we need to set all checkboxes to false becasue if they are unchecked we won't see any 
+			//POST data for them if they are checked, the POST data will reset them to true
+			foreach ($this->formdata as $name => $data) {
+				if (isset($data['control']) && $data['control'][0] == "CheckBox") {
+					$this->formdata[$name]['value'] = false;
+				}
+			}
+			
 			foreach ($_POST as $name => $value) {
 				if ($name == "submit")
 					continue;
@@ -112,6 +121,7 @@ class Form {
 			
 			if ($formclass == "HiddenField") {
 				$str.= $item->render($this,$value);
+				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 				continue;
 			}
 
@@ -133,47 +143,60 @@ class Form {
 			$style = "";
 			$msg = "";
 			
-			//see if valrequired is any of the validators
-			$isrequired = false;
-			foreach ($itemdata['validators'] as $v) {
-				if ($v[0] == "ValRequired") {
-					$isrequired = true;
-					break;
-				}
-			}
 			
-			//if not posted and required and value is blank
-			if (!$this->getSubmit() && $isrequired && mb_strlen($value) == 0) {
-				//show required highlight
-				$i = "img/icons/error.gif";
-				$style = 'style="background: rgb(255,255,220);"' ;
-				$msg = "Required";
-			} else {
-				//otherwise, validate and show normally
-				$valresult = Validator::validate_item($this->formdata,$name,$value);
-				if ($valresult === true) {
-					$i = "img/icons/accept.gif";
-					$style = 'style="background: rgb(225,255,225);"' ;
-					$msg = "OK";
-				} else {
-					list($validator,$msg) =  $valresult;
-					$i = "img/icons/exclamation.gif";
-					$style = 'style="background: rgb(255,200,200);"' ;
-				}
-			}
-			
-			$str.= '
-			<div id="'.$n.'_fieldarea" '.$style.' >
-				<div class="prop"></div>
-				<label for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label>
-				'.$item->render($this,$value).'
-				<div class="msgarea">
-					<img alt="" id="'.$n.'_icon" src="'.$i.'" />
-					<span id="'.$n.'_msg">'.$msg.'</span>
+			if ($formclass == "FormHtml") {
+				$str.= '
+				<div>
+					<div class="prop"></div>
+					<label>'.$l.'</label>
+					<div class="formhtml">'.$item->render($this,$value).'</div>
+					<div class="clear"></div>
 				</div>
-				<div class="clear"></div>
-			</div>
-			';
+				';
+				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
+			} else {
+				//see if valrequired is any of the validators
+				$isrequired = false;
+				foreach ($itemdata['validators'] as $v) {
+					if ($v[0] == "ValRequired") {
+						$isrequired = true;
+						break;
+					}
+				}
+				
+				//if not posted and required and value is blank
+				if (!$this->getSubmit() && $isrequired && mb_strlen($value) == 0) {
+					//show required highlight
+					$i = "img/icons/error.gif";
+					$style = 'style="background: rgb(255,255,220);"' ;
+					$msg = "Required";
+				} else {
+					//otherwise, validate and show normally
+					$valresult = Validator::validate_item($this->formdata,$name,$value);
+					if ($valresult === true) {
+						$i = "img/icons/accept.gif";
+						$style = 'style="background: rgb(225,255,225);"' ;
+						$msg = "OK";
+					} else {
+						list($validator,$msg) =  $valresult;
+						$i = "img/icons/exclamation.gif";
+						$style = 'style="background: rgb(255,200,200);"' ;
+					}
+				}
+				
+				$str.= '
+				<div id="'.$n.'_fieldarea" '.$style.' >
+					<div class="prop"></div>
+					<label for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label>
+					'.$item->render($this,$value).'
+					<div class="msgarea">
+						<img alt="" id="'.$n.'_icon" src="'.$i.'" />
+						<span id="'.$n.'_msg">'.$msg.'</span>
+					</div>
+					<div class="clear"></div>
+				</div>
+				';
+			}
 		} //foreach
 		
 		if ($lasthelpstep)

@@ -51,8 +51,6 @@ form.newform {
 	padding: 3px;
 }
 
-
-
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 .newform fieldset {
 	border: none;
@@ -61,49 +59,50 @@ form.newform {
 
 /* these 3 items share aprox 1/3 the space in the form */
 .newform label {
-	padding: 3px;
-	padding-left: 10px;
+	padding: 3px 0px 3px 1%;
 	width: 28%;
 	display: block;
 	float: left;
+	overflow: hidden;
 }
 
 .newform input {
 	display: block;
 	float: left;
-	left: 28%;
 	width: 40%;
-	margin: 3px;
+	margin: 3px 1% 3px 0px;
+}
+input[type=hidden] {
+	display: none;
 }
 
 .newform textarea {
 	display: block;
 	float: left;
-	left: 28%;
 	width: 40%;
-	margin: 3px;
+	margin: 3px 1% 3px 0px;
 }
 
 .newform select {
 	display: block;
 	float: left;
-	left: 28%;
 	width: 40%;
-	margin: 3px;
+	margin: 3px 1% 3px 0px;
 }
-
-input[type=hidden] {
-	display: none;
-}
-
 
 .newform fieldset .radiobox {
 	display: block;
 	float: left;
-	left: 28%;
 	width: 40%;
-	margin: 3px;
+	margin: 3px 1% 3px 0px;
 	border: 1px dotted gray;
+}
+
+.newform .formhtml {
+	display: block;
+	float: left;
+	width: 70%;
+	margin: 3px 0px 3px 0px;
 }
 
 .newform .radiobox input {
