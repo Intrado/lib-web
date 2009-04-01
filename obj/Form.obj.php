@@ -136,13 +136,7 @@ class Form {
 			}
 			
 			$n = $this->name."_".$item->name;
-			$t = $this->tindex++;
 			$l = $itemdata['label'];
-			$i = "img/pixel.gif";
-			$value = $itemdata['value'];
-			$style = "";
-			$msg = "";
-			
 			
 			if ($formclass == "FormHtml") {
 				$str.= '
@@ -155,6 +149,12 @@ class Form {
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
+				$t = $this->tindex++;
+				$i = "img/pixel.gif";
+				$value = $itemdata['value'];
+				$style = "";
+				$msg = "";
+			
 				//see if valrequired is any of the validators
 				$isrequired = false;
 				foreach ($itemdata['validators'] as $v) {
@@ -165,7 +165,7 @@ class Form {
 				}
 				
 				//if not posted and required and value is blank
-				if (!$this->getSubmit() && $isrequired && mb_strlen($value) == 0) {
+				if (!$this->getSubmit() && $isrequired && ((is_array($value) && !count($value)) || mb_strlen($value) == 0)) {
 					//show required highlight
 					$i = "img/icons/error.gif";
 					$style = 'style="background: rgb(255,255,220);"' ;
@@ -248,6 +248,8 @@ class Form {
 		
 		$anyerrors = false;
 		foreach ($this->formdata as $name => $data) {
+			if (!isset($data['validators']))
+				continue;
 			$itemresult = Validator::validate_item($this->formdata,$name,$data['value']);
 			if ($itemresult === true) {
 				$this->validationresults[] = array("name" => $name,"vres" => true);
@@ -269,7 +271,8 @@ class Form {
 	function getData () {
 		$res = array();
 		foreach ($this->formdata as $name => $data) {
-			$res[$name] = $data['value'];
+			if (isset($data['value']))
+				$res[$name] = $data['value'];
 		}
 		return $res;
 	}
