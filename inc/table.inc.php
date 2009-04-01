@@ -159,6 +159,7 @@ function endWindow()
 	<tr>
 		<td background="img/window_shadow_bot.gif"><img src="img/window_shadow_botleft.gif"></td>
 		<td><img src="img/window_shadow_botright.gif"></td>
+	</tr>
 	</table>
 </div>
 <?
