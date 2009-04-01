@@ -41,7 +41,7 @@ abstract class Validator {
 		foreach ($validators as $validatordata) {
 			$validator = $validatordata[0];
 			//only validate non empty values (unless its the ValRequired validator)
-			if (mb_strlen($value) > 0 || $validator == "ValRequired") {		
+			if ($validator == "ValRequired" || ((is_array($value) && count($value)) || mb_strlen($value) > 0)) {		
 				$obj = new $validator();
 				$obj->label = $formdata[$name]['label'];
 				$obj->name = $name;
