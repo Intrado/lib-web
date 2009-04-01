@@ -200,12 +200,35 @@ class ValNumeric extends Validator {
 	}
 }
 
+//
+// requires inc/utils.inc.php validEmail()
+//
+class ValEmail extends Validator {
+	
+	function validate ($value, $args) {
+		if (!validEmail($value))
+			return "$this->label is not a valid email format";
+
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				var reg = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+				if (!reg.test(value))
+					return label + " is an invalid email format";
+
+				return true;
+			}';
+	}
+}
+
 
 //alpha
 //alphanumeric
 //phone
 //phoneeasycall ??
-//email
 //matches array
 
 

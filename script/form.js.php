@@ -9,7 +9,7 @@ header("Cache-Control: private");
 ?>
 
 /* ======= BEGIN VALIDATORS =======  */
-<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric")); ?>
+<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail")); ?>
 /* ======= END VALIDATORS =======  */
 
 
