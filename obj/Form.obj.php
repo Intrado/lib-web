@@ -212,12 +212,13 @@ class Form {
 		</form>
 		
 		<div id="'.$this->name.'_helper" class="helper">
-			<div class="toolbar" >
-				<a href="#" style="float:left;" ><img src="img/arrowleftmonth.gif" border=0></a>
-				<a href="#" style="float:right;" ><img src="img/arrowrightmonth.gif" border=0></a>
-				Guide
-			</div>
+			<div class="title">Guide</div>
 			<div class="content" id="'.$this->name.'_helpercontent" >'.$this->helpsteps[0].'</div>
+			<div class="toolbar" >
+				<a href="#" style="float:left;"><img style="opacity: 0.33;" src="img/icons/control_rewind.gif" border=0></a>
+				<a href="#" style="float:right;" ><img src="img/icons/control_fastforward_blue.gif" border=0></a>
+				<div id="'.$this->name.'_helperinfo" class="info">Click the arrow to begin</div>
+			</div>
 		</div>
 		
 		</div>

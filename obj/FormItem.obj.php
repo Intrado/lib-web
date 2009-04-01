@@ -98,10 +98,17 @@ class SelectMenu extends FormItem {
 	}
 	function render ($form,$value) {
 		$n = $form->name."_".$this->name;
-		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
-		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" '.$max.' '.$size.'/>';
+		$str = '<select id='.$n.' name="'.$n.'[]" '.$size .' >';
+		foreach ($this->args['values'] as $selectvalue => $selectname) {
+			$checked = $value == $selectvalue || (is_array($value) && in_array($selectvalue, $value));
+			$str .= '<option value="'.escapehtml($selectvalue).'" '.$checked.' >'.escapehtml($selectname).'</option>
+				';
+		}
+		$str .= '</select>';
+		return $str;
 	}
+
 }
 
 class MultiSelect extends FormItem {

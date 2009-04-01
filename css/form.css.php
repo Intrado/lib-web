@@ -23,6 +23,7 @@ form.newform {
 }
 
 .helper {
+	font-family: sans-serif;
 	display: block;
 	overflow: hidden;
 	float: left;
@@ -31,7 +32,7 @@ form.newform {
 	padding: 0;
 	
 	background-color: white;
-	border: 2px solid rgb(255,200,100);
+	border: 2px solid rgb(150,150,255);
 }
 
 .helper .content {
@@ -42,13 +43,27 @@ form.newform {
 
 .helper .toolbar {
 	padding-bottom: 3px;
-	border-bottom: 1px solid #CCCCCC;
+	border-top: 1px solid #CCCCCC;
+	background-color: rgb(240,240,255);
+	height: 20px;
+}
+
+.helper .info {
+	padding-top: 4pt;
+	font-size: 8pt;
 	text-align: center;
-	background-color: rgb(255,255,220)
+}
+
+.helper .title {
+	border-bottom: 1px solid #CCCCCC;
+	font-size: 12pt;
+	font-weight: bold;
+	text-align: center;
+	background-color: rgb(240,240,255);
 }
 
 .helper .toolbar img {
-	padding: 3px;
+	padding: 3px 3px 0px 3px;
 }
 
 /* fieldset is a container for a set of field elements, typ associated with a help page */

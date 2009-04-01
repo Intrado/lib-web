@@ -19,10 +19,9 @@ abstract class Validator {
 		//constructor for <?=$validator?>
 		
 		document.validators["<?=$validator?>"] = 
-			function (element, name, label, args) {
+			function (name, label, args) {
 				this.validator = "<?=$validator?>";
 				this.onlyserverside = <?= $obj->onlyserverside ? "true" : "false" ?>;
-				this.element = element;
 				this.name = name;
 				this.label = label;
 				this.args = args;
