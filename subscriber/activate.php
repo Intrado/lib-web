@@ -3,7 +3,7 @@ $isNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
-
+require_once("../obj/FieldMap.obj.php");
 
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
 $appendcustomerurl = "";

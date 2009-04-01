@@ -3,8 +3,14 @@
 <head>
 	<title>SUBSCRIBER<?=isset($TITLE) ? ": " . $TITLE : ""?></title>
 	<script src='../script/utils.js'></script>
+	<script src="../script/prototype.js" type="text/javascript"></script>
+    <script src="../script/scriptaculous.js" type="text/javascript"></script>
+	
+    <script src="../script/form.js.php" type="text/javascript"></script>
+	<link href="../css/form.css.php" type="text/css" rel="stylesheet">
+	
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='css/loginstyle.css' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css.php' type='text/css' rel='stylesheet' media='screen'>
 </head>
 
 <?

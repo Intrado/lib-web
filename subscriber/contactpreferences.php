@@ -209,9 +209,8 @@ $helpsteps = array (
     "Ffields are defined by the admin"
 );
 
-$buttons = array(submit_button("Submit","submit","tick"),
-                submit_button("Save","save","emoticon_smile"),
-                icon_button("Cancel","cross",null,"superform.php?cancel"));
+$buttons = array(submit_button("Save","save","tick"),
+                icon_button("Cancel","cross",null,"contactpreferences.php?cancel"));
 
 $formname = "gjbtest";                
 $_REQUEST['form'] = $formname;                
@@ -270,109 +269,11 @@ $TITLE = "Contact Information";
 
 include_once("nav.inc.php");
 
-//NewForm($f);
-
 startWindow(_L('Personal Information'));
 
-?>
+echo $form->render();
 
-<script type="text/javascript">
-<? Validator::load_validators(array("ValServertest")); ?>
-</script>
-
-<div style="width: 80%; border: 5px inset;">
-
-<? if (isset($_GET['thanksajax'])) { ?>
-    <h1>Thanks for using ajax!</h1>
-<? } else if (isset($_GET['thanksnormal'])) { ?>
-    <h1>Thanks for using normal browser post!</h1>
-<? } else { ?>
-
-<script type="text/javascript">
-var errors = <?= json_encode($errors) ?>;
-if (errors)
-    alert("this form contains some errors");
-</script>
-
-<noscript>
-<h1><?= $errors ? "This form contains some errors" : "" ?></h1>
-</noscript>
-
-
-<?= $form->render() ?>
-
-<? } ?>
-
-</div>
-
-<?
-/*
-?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr>
-			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;"><?=_L("Account Info")?>:</th>
-			<td class="bottomBorder">
-				<table border="0" cellpadding="1" cellspacing="0">
-					<tr>
-						<td align="right"><?=_L("First Name")?>:</td>
-						<td><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
-					</tr>
-					<tr>
-						<td align="right"><?=_L("Last Name")?>:</td>
-						<td><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
-					</tr>
-					
-<?
-					foreach ($subscribeFields as $fieldnum => $name) {
-?>
-					<tr>
-						<td align="right"><?=$name ?>:</td>
-						<td>
-<?
-							NewFormItem($f, $s, "fnum_".$fieldnum, 'selectstart', null, null, "id='fnum_".$fieldnum."'");
-							foreach ($subscribeFieldValues[$fieldnum] as $index => $value) {
-								NewFormItem($f, $s, "fnum_".$fieldnum, 'selectoption', $value, $index);
-							}
-							NewFormItem($f, $s, "fnum_".$fieldnum, 'selectend');
-?>
-						</td>
-					</tr>
-					
-<?					
-					}
-?>					
-				</table>
-			</td>
-		</tr>
-	</table>
-
-<?
-
-*/
 endWindow();
-
-
-
-/*
-?><a name="edit"></a><?
-startWindow("Contact Preferences", 'padding: 3px;');
-?>
-	<table width="100%">
-		<tr>
-			<td>
-<?
-	include_once("contactedit.php");
-?>
-			</td>
-		</tr>
-	</table>
-<?
-endWindow();
-
-buttons(submit($f, $s, _L('Save')));
-EndForm();
-*/
-
 
 include_once("navbottom.inc.php");
 ?>

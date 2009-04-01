@@ -89,63 +89,68 @@ if ($reloadform) {
 	PutFormData($f, $s, "_locale", $_SESSION['_locale'], "text", "nomin", "nomax");
 }
 
+
+
+$formdata = array(
+    "locale" => array(
+        "label" => "Choose your display language:",
+        "value" => "",
+        "validators" => array(    
+            array("ValRequired")
+        ),
+        "control" => array("RadioButton","values" => array(1 => "English", 2 => "Spanish",3 => "French")),
+        "helpstep" => 1
+    )
+);
+
+$helpsteps = array (
+    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
+	"Select a language"
+);
+
+$buttons = array(submit_button("Submit","submit","tick"),
+                icon_button("Cancel","cross",null,"account.php"));
+
+$form = new Form("accountform",$formdata,$helpsteps,$buttons);
+$form->ajaxsubmit = true;
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+            
+        
+        //save data here
+        
+        $_SESSION['postdata'] = $postdata;
+        
+        
+        
+        if ($ajax)
+            $form->sendTo("account.php");
+        else
+            redirect("account.php");
+    }
+}
+
+
 $PAGE = "account:account";
 $TITLE = _L("Account Information") . ": " . escapehtml($_SESSION['subscriber.firstname']) . " " . escapehtml($_SESSION['subscriber.lastname']);
 include_once("nav.inc.php");
-NewForm($f);
-buttons(submit($f, $s, _L('Save')), button(_L("Change Email"), NULL, "changeemail.php"), button(_L("Cancel"), NULL, "start.php"));
 
 startWindow(_L('User Information'));
-?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr>
-			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;"><?=_L("Account Info")?>:</th>
-			<td class="bottomBorder">
-				<table border="0" cellpadding="1" cellspacing="0">
-					<tr>
-						<td align="right"><?=_L("Email")?>:</td>
-						<td><?= escapehtml($_SESSION['subscriber.username']) ?></td>
-					</tr>
-					<tr>
-						<td align="right">*<?=_L("Old Password")?>:</td>
-						<td><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
-					</tr>
-					<tr>
-						<td align="right">*<?=_L("New Password")?>:</td>
-						<td><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
-					</tr>
-					<tr>
-						<td align="right">*<?=_L("Confirm New Password")?>:</td>
-						<td><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
-					</tr>
-
-				</table>
-				<div>*<?=_L("Only required for changing your password")?></div>
-			</td>
-		</tr>
-		<tr>
-			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;"><?=_L("Preferences")?>:</th>
-			<td  class="bottomBorder">
-				<table border="0" cellpadding="1" cellspacing="0">
-					<tr>
-						<td width="30%"><?=_L("Change Interface Language")?>:</td>
-						<td>
-							<?
-								NewFormItem($f, $s, '_locale', 'selectstart', null, null, "id='locale'");
-								foreach($LOCALES as $loc => $lang){
-									NewFormItem($f, $s, '_locale', 'selectoption', $lang, $loc);
-								}
-								NewFormItem($f, $s, '_locale', 'selectend');
-							?>
-						</td>
-					</tr>
-				</table>
-			<td>
-		</tr>
-	</table>
-
-<?
+echo $form->render();
 endWindow();
-buttons();
+
 include_once("navbottom.inc.php");
 ?>

@@ -132,44 +132,6 @@ function subscriberForgotPassword($username) {
 }
 
 
-function subscriberGetPortalUser() {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'));
-	$method = "SubscriberServer.subscriber_getMyPortalUser";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
-function subscriberUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms) {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'),
-			new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'),
-			new XML_RPC_Value(trim($notifyType), 'string'), new XML_RPC_Value(trim($notifysmsType), 'string'),
-			new XML_RPC_Value($sms, 'string'));
-	$method = "SubscriberServer.subscriber_updateMyPortalUser";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
-function subscriberUpdatePortalUserPassword($newpassword, $oldpassword) {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($newpassword), 'string'), new XML_RPC_Value(trim($oldpassword), 'string'));
-	$method = "SubscriberServer.subscriber_updateMyPortalUserPassword";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
-function subscriberUpdatePortalUsername($username, $password) {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($password), 'string'), new XML_RPC_Value(trim($username), 'string'));
-	$method = "SubscriberServer.subscriber_updateMyPortalUsername";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
 function subscriberCreatePhoneActivation($customerid, $subscriberid, $pkeyList, $createCode) {
 	sleep(2); // slow down any DOS attack
 
@@ -183,6 +145,12 @@ function subscriberCreatePhoneActivation($customerid, $subscriberid, $pkeyList, 
 	$result = pearxmlrpc($method, $params);
 	return $result;
 }
+
+
+function subscriberUpdateUsername($username, $password) {
+	return array("result" => "");
+}
+
 
 function subscriberGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));

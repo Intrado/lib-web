@@ -23,9 +23,9 @@ require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 
-//require_once("../obj/Form.obj.php");
-//require_once("../obj/FormItem.obj.php");
-//require_once("../obj/Validator.obj.php");
+require_once("../obj/Form.obj.php");
+require_once("../obj/FormItem.obj.php");
+require_once("../obj/Validator.obj.php");
 
 
 if (!isset($isNotLoggedIn)) {

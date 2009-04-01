@@ -21,7 +21,15 @@ if (isset($_GET['timer']))
 
 $NAVTREE = array (
 	array("Messages","start.php",NULL,$MAINTAB=="messages",array()),
-	array("Contact Info", "contactpreferences.php?clear=1", NULL, $MAINTAB=="contacts", array()
+	array("Contact Info", "contactpreferences.php", array("personal","notifications"), $MAINTAB=="contacts", array(
+			array("Personal","contactpreferences.php","personal",$SUBTAB=="personal"),
+			array("Notification","notificationpreferences.php","notifications",$SUBTAB=="notifications")
+		)),
+	array("My Account", "account.php", array("accountpref", "changeemail", "changepass"), $MAINTAB=="account", array(
+			array("Preferences","account.php","accountpref",$SUBTAB=="preferences"),
+			array("Username","changeemail.php","changeemail",$SUBTAB=="username"),
+			array("Password","changepass.php","changepass",$SUBTAB=="password")
+		)
 	)
 );
 
@@ -39,17 +47,14 @@ function navSubTab ($title, $link, $isselected) {
 }
 
 function doNavTabs ($navtree) {
-	global $USER, $FIRSTACTIVETABLINK, $ACTIVEMAINTABTITLE, $MAINTABS, $SUBTABS;
+	global $USER, $FIRSTACTIVETABLINK, $ACTIVEMAINTABTITLE, $MAINTABS,$SUBTABS;
 
 	$MAINTABS = "";
 	$SUBTABS = "";
 	foreach ($navtree as $maintab) {
-		//make sure this tab is enabled
-		if ($maintab[2] == NULL || $USER->authorize($maintab[2])) {
 			//do the subtabs first, if there are any
 			$maintablink = false;
 			foreach ($maintab[4] as $subtab) {
-				if ($subtab[2] == NULL || $USER->authorize($subtab[2])) {
 					//set the maintablink to the first enabled subtab's link
 					if ($maintablink === false)
 						$maintablink = $subtab[1];
@@ -59,13 +64,11 @@ function doNavTabs ($navtree) {
 						$ACTIVEMAINTABTITLE = $maintab[0];
 						$SUBTABS .= navSubTab($subtab[0],$subtab[1],$subtab[3]);
 					}
-				}
 			}
 			//if we didnt get a link, then use the default
 			$maintablink = $maintablink === false ? $maintab[1] : $maintablink;
 
 			$MAINTABS .= navMainTab($maintab[0],$maintablink,$maintab[3]);
-		}
 	}
 }
 
@@ -122,7 +125,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<? echo $MAINTABS ?>
 
 		<div class="applinks hoverlinks">
-			<a href="account.php"><?=_L("My Account")?></a> |
 			<a href="#" onclick="window.open('<?=isset($LOCALE)?"locale/$LOCALE/help/index.html":"help/index.html"?>', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"><?=_L("Help")?></a> |
 <?
 	$logout = "index.php?logout=1";
@@ -136,8 +138,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 	</div>
 	</div>
 
+<div class="subnavmenu hoverlinks">
+	<?= $SUBTABS ?>
+</div>
 
-	<div class="subnavmenu hoverlinks"></div>
 	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/3dblue/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 

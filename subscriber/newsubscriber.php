@@ -10,10 +10,22 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
 
+require_once("../obj/Validator.obj.php");
+require_once("../obj/Form.obj.php");
+require_once("../obj/FormItem.obj.php");
+
 
 // reCaptcha keys
 //$publickey = "6LcVswUAAAAAAOaU8PxzEpv22culkZ7OG0FHjMOX";
 //$privatekey = "6LcVswUAAAAAAMFesdVgOw3VDSiRjOGGVQ9bqvd1";
+
+
+
+		$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
+		$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
+		$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
+		$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+		$_SESSION['colorscheme']['_brandratio']   = ".3";
 
 
 
@@ -85,6 +97,163 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	}
 }
 
+
+
+$formdata = array(
+    "username" => array(
+        "label" => "Email (this will be your login name)",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 50)
+        ),
+        "requires" => "confirmusername",
+        "control" => array("TextField","maxlength" => 50),
+        "helpstep" => 1
+    ),
+    "confirmusername" => array(
+        "label" => "Confirm Email",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 50)
+        ),
+        "requires" => "username",
+        "control" => array("TextField","maxlength" => 50),
+        "helpstep" => 1
+    ),
+    "password" => array(
+        "label" => "Password",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 50)
+        ),
+        "requires" => "confirmpassword",
+        "control" => array("PasswordField","maxlength" => 50),
+        "helpstep" => 2
+    ),
+    "confirmpassword" => array(
+        "label" => "Confirm Password",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 50)
+        ),
+        "requires" => "password",
+        "control" => array("PasswordField","maxlength" => 50),
+        "helpstep" => 2
+    ),
+    "firstname" => array(
+        "label" => "First Name",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 50)
+        ),
+        "control" => array("TextField","maxlength" => 50),
+        "helpstep" => 3
+    ),
+    "lastname" => array(
+        "label" => "Last Name",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 50)
+        ),
+        "control" => array("TextField","maxlength" => 50),
+        "helpstep" => 3
+    ),
+    "terms" => array(
+        "label" => "Terms Of Service",
+        "value" => "blah blah blah",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 500)
+        ),
+        "control" => array("TextArea","rows" => 10),
+        "helpstep" => 4
+    ),
+    "acceptterms" => array(
+        "label" => "I accept the terms of service",
+        "value" => false,
+        "validators" => array(
+            array("ValRequired")
+        ),
+        "control" => array("CheckBox"),
+        "helpstep" => 4
+    )
+);
+
+$helpsteps = array (
+    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
+	"Your email",
+	"Your password",
+	"Your name",
+	"The terms"
+);
+
+$buttons = array(submit_button("Create Account","save","tick"));
+//$buttons = array();
+
+
+$form = new Form("createaccount",$formdata,$helpsteps,$buttons);
+$form->ajaxsubmit = true;
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+        
+        // do more validation
+	if (false) {        
+        // TODO
+        
+	} else {
+	
+		$options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname']));
+		
+		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $options);
+		if ($result['result'] != "") {
+			if ($result['result'] == "duplicate") {
+				$errordetails = "That email address is already in use";
+			} else {
+				$errordetails = "An unknown error occured, please try again";
+			}
+			$errors .= "Your account was not created" . $errordetails;
+		} else {
+			$success = true;
+		}
+	}
+	
+	if ($success) {
+        if ($ajax)
+            $form->sendTo("activate.php");
+        else
+            redirect("activate.php");
+	} else {
+        if ($ajax)
+            $form->sendTo("newsubscriber.php?formerrors");
+        else
+            redirect("newsubscriber.php?formerrors");
+	}
+	
+	
+    }
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,8 +265,25 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 $TITLE = "Create a New Account";
 include_once("logintop.inc.php");
 if (!$success) {
+
+if (isset($_GET['formerrors'])) {
 ?>
-	<form method="POST" action="newsubscriber.php<?echo $appendcustomerurl;?>" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
+    <h1>Form Errors: <?=$_SESSION['formerrors']?> </h1>
+<?
+}
+?>
+
+<script type="text/javascript">
+var errors = <?= json_encode($errors) ?>;
+if (errors)
+    alert("this form contains some errors");
+</script>
+
+<noscript>
+<h1><?= $errors ? "This form contains some errors" : "" ?></h1>
+</noscript>
+
+
 		<table width="100%" style="color: #365F8D;" >
 			<tr>
 				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
@@ -109,43 +295,17 @@ if (!$success) {
 				<td colspan="4">&nbsp;</td>
 			</tr>
 			<tr>
-				<td>Email&nbsp;(this will be your login name):</td>
-				<td><input type="text" name="login" value="<?=escapehtml($login)?>" size="50" maxlength="255"/> </td>
-			</tr>
-			<tr>
-				<td>Confirm Email:</td>
-				<td><input type="text" name="confirmlogin" value="<?=escapehtml($confirmlogin)?>" size="50" maxlength="255"/> </td>
-			</tr>
-			<tr>
-				<td>Password: </td>
-				<td><input type="password" name="password1"  size="35" maxlength="50"/> </td>
-			</tr>
-			<tr>
-				<td>Confirm Password: </td>
-				<td><input type="password" name="password2"  size="35" maxlength="50"/> </td>
-			</tr>
-			<tr>
-				<td>First Name:</td>
-				<td><input type="text" name="firstname" value="<?=escapehtml($firstname)?>" maxlength="100"/></td>
-			</tr>
-			<tr>
-				<td>Last Name:</td>
-				<td><input type="text" name="lastname" value="<?=escapehtml($lastname)?>" maxlength="100"/></td>
-			</tr>
-			<tr>
-				<td colspan="2"><div style="overflow:scroll; height:250px; width:525px;"><?=$tos ?></div></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="checkbox" name="acceptterms" id="tos"/> Accept Terms of Service</td>
-			</tr>
-			<tr>
-				<td colspan="2"><div><input type="image" src="img/createaccount.gif" onmouseover="this.src='img/createaccount_over.gif';" onmouseout="this.src='img/createaccount.gif';"></div></td>
+				<td>
+
+<?= $form->render(); ?>
+
+				</td>
 			</tr>
 			<tr>
 				<td colspan="2"><br><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
 			</tr>
 		</table>
-	</form>
+			
 <?
 } else {
 ?>
