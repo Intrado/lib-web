@@ -30,143 +30,14 @@ $subscribeFields = FieldMap::getSubscribeMapNames();
 
 $subscribeFieldValues = array();
 foreach ($subscribeFields as $fieldnum => $name) {
-	$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
-}
-
-$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
-
-
-	$maxphones = getSystemSetting("maxphones", 3);
-	$maxemails = getSystemSetting("maxemails", 2);
-	$maxsms = getSystemSetting("maxsms", 2);
-	$tempphones = resequence($person->getPhones(), "sequence");
-	$phones = array();
-	for ($i=0; $i<$maxphones; $i++) {
-		if(!isset($tempphones[$i])){
-			$phones[$i] = new Phone();
-			$phones[$i]->sequence = $i;
-			$phones[$i]->personid = $pid;
-		} else {
-			$phones[$i] = $tempphones[$i];
-		}
-	}
-	$tempemails = resequence($person->getEmails(), "sequence");
-	$emails = array();
-	for ($i=0; $i<$maxemails; $i++) {
-		if(!isset($tempemails[$i])){
-			$emails[$i] = new Email();
-			$emails[$i]->sequence = $i;
-			$emails[$i]->personid = $pid;
-		} else {
-			$emails[$i] = $tempemails[$i];
-		}
-	}
-	if(getSystemSetting("_hassms")){
-		$tempsmses = resequence($person->getSmses(), "sequence");
-		$smses = array();
-		for ($i=0; $i<$maxsms; $i++) {
-			if(!isset($tempsmses[$i])){
-				$smses[$i] = new Sms();
-				$smses[$i]->sequence = $i;
-				$smses[$i]->personid = $pid;
-			} else {
-				$smses[$i] = $tempsmses[$i];
-			}
-		}
+	if ('f' == substr($fieldnum, 0, 1)) {
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
 	} else {
-		$smses = array();
+		$gfield = substr($fieldnum, 1, 3);
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from groupdata where fieldnum='".$gfield."' and personid=0 and importid=0", true);
 	}
-	$locked = getLockedDestinations($maxphones, $maxemails, $maxsms);
-	$lockedphones = $locked['phones'];
-	$lockedemails = $locked['emails'];
-	$lockedsms = $locked['sms'];
-
-	$contactprefs = getContactPrefs($pid);
-	$defaultcontactprefs = getDefaultContactPrefs();
-
-	/****************** main message section ******************/
-
-	$f = "contactpreferences";
-	$s = "main";
-	$reloadform = 0;
-
-	if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "all"))
-	{
-		//check to see if formdata is valid
-		if (CheckFormInvalid($f))
-		{
-			error('Form was edited in another window, reloading data');
-			$reloadform = 1;
-		}
-		else
-		{
-			MergeSectionFormData($f, $s);
-
-			//do check
-			
-			$firstname = TrimFormData($f,$s,"firstname");
-			$lastname = TrimFormData($f,$s,"lastname");
-			
-			if( CheckFormSection($f, $s) ) {
-				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-			} else {
-				if(getSystemSetting('priorityenforcement') && $error = checkPriorityPhone($f, $s, $phones)){
-					error("You must have at least one phone number that can receive calls for these job types: " . implode(", ", $error));
-				} else {
-					$person->$firstnameField = $firstname;
-					$person->$lastnameField = $lastname;
-			
-					foreach ($subscribeFields as $fieldnum => $name) {
-						$val = GetFormData($f, $s, "fnum_".$fieldnum);
-						error_log("VALVAL ".$val);
-				
-						if ('f' == substr($fieldnum, 0, 1)) {
-							$person->$fieldnum = $subscribeFieldValues[$fieldnum][$val];
-						} else { // 'g'
-							// TODO groupdata
-						}
-					}
-					$person->update();
-
-					$_SESSION['subscriber.firstname'] = $person->$firstnameField;
-					$_SESSION['subscriber.lastname'] = $person->$lastnameField;
-							
-					getsetContactFormData($f, $s, $pid, $phones, $emails, $smses, $jobtypes, $locked);
-
-					redirect();
-				}
-			}
-		}
-	} else {
-		$reloadform = 1;
-	}
-
-if ($reloadform) {
-	ClearFormData($f);
-
-	PutFormData($f, $s, "firstname", $_SESSION['subscriber.firstname'], "text", "1", "100", true);
-	PutFormData($f, $s, "lastname", $_SESSION['subscriber.lastname'], "text", "1", "100", true);
-
-	foreach ($subscribeFields as $fieldnum => $name) {
-		$val = $person->$fieldnum;
-		PutFormData($f, $s, "fnum_".$fieldnum, $val, "text", "nomin", "nomax");
-	}
-
-	putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked);
 }
 
-
-
-class ValServertest extends Validator {
-    var $onlyserverside = true;
-    
-    function validate ($value, $args) {    
-        if ($args[1] + $args[2] != $value)
-            return "$this->label should be " . $args[1] ."+". $args[2];
-        
-        return true;
-    }
-}
 
 $formdata = array(
     "firstname" => array(
@@ -174,9 +45,8 @@ $formdata = array(
         "value" => $_SESSION['subscriber.firstname'],
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
+            array("ValLength","min" => 1,"max" => 50)
         ),
-        "requires" => "someotherfield",
         "control" => array("TextField","maxlength" => 50),
         "helpstep" => 1
     ),
@@ -185,34 +55,46 @@ $formdata = array(
         "value" => $_SESSION['subscriber.lastname'],
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
+            array("ValLength","min" => 1,"max" => 50)
         ),
-        "requires" => "someotherfield",
         "control" => array("TextField","maxlength" => 50),
         "helpstep" => 1
     )
 );
 
 foreach ($subscribeFields as $fieldnum => $name) {
-	$formdata[$fieldnum] = array (
-        "label" => $name,
-        "value" => $subscribeFieldValues[$fieldnum][$person->$fieldnum],
-        "validators" => array(),
-        "control" => array("RadioButton","values" => $subscribeFieldValues[$fieldnum]),
-        "helpstep" => 2
-	);
+	if ('f' == substr($fieldnum, 0, 1)) {
+		$formdata[$fieldnum] = array (
+    	    "label" => $name,
+        	"value" => $subscribeFieldValues[$fieldnum][$person->$fieldnum],
+        	"validators" => array(),
+        	"control" => array("RadioButton","values" => $subscribeFieldValues[$fieldnum]),
+        	"helpstep" => 2
+		);
+	} else { // Gfield
+		$gfield = substr($fieldnum, 1, 3);
+		$arr = QuickQueryList("select value, value from groupdata where personid=".$person->id." and fieldnum=".$gfield);
+		$formdata[$fieldnum] = array (
+    	    "label" => $name,
+        	"value" => $arr,
+        	"validators" => array(),
+        	"control" => array("MultiCheckbox", "values" => $subscribeFieldValues[$fieldnum]),
+        	"helpstep" => 3
+		);
+	}
 }
 
 $helpsteps = array (
     "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
     "Step 1, name please",
-    "Ffields are defined by the admin"
+    "Ffields are defined by the admin",
+    "Group fields are defined by the admin"
 );
 
 $buttons = array(submit_button("Save","save","tick"),
                 icon_button("Cancel","cross",null,"contactpreferences.php?cancel"));
 
-$formname = "gjbtest";                
+$formname = "contactinfo";                
 $_REQUEST['form'] = $formname;                
 $form = new Form($formname,$formdata,$helpsteps,$buttons);
 $form->ajaxsubmit = true;
@@ -238,7 +120,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ('f' == substr($fieldnum, 0, 1)) {
 				$person->$fieldnum = $subscribeFieldValues[$fieldnum][$val];
 			} else { // 'g'
-				// TODO groupdata
+				$gfield = substr($fieldnum, 1, 3);
+				QuickUpdate("delete from groupdata where fieldnum=".$gfield." and personid=".$person->id);
+				
+				if (count($val) > 0) {
+					$query = "insert into groupdata (personid, fieldnum, value, importid) values ";
+					$args = array();
+					foreach ($val as $v) {
+						$query .= "(?, ?, ?, 0), ";
+						$args[] = $person->id;
+						$args[] = $gfield;
+						$args[] = $v;
+					}
+					$query = substr($query, 0, strlen($query)-2); // remove trailing comma
+					QuickUpdate($query, false, $args);
+				}
 			}
 		}
         
@@ -246,12 +142,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $_SESSION['subscriber.firstname'] = $person->$firstnameField;
         $_SESSION['subscriber.lastname'] = $person->$lastnameField;
         
-/*        
         if ($ajax)
-            $form->sendTo("superform.php?thanksajax");
+            $form->sendTo("contactpreferences.php");
         else
-            redirect("superform.php?thanksnormal");
-*/
+            redirect("contactpreferences.php");
     }
 }
 

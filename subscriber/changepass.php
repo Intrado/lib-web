@@ -3,6 +3,8 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
+require_once("subscribervalidators.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -12,66 +14,6 @@ require_once("../inc/table.inc.php");
 $error_badpass = _L("That password is incorrect");
 $error_generalproblem = _L("There was a problem changing your password, please try again later");
 
-/****************** main message section ******************/
-
-$f = "changepass";
-$s = "main";
-$reloadform = 0;
-$success = false;
-
-if(CheckFormSubmit($f,$s))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error(_L('Form was edited in another window, reloading data'));
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-
-		TrimFormData($f, $s, "newpass");
-
-		//do check
-		if( CheckFormSection($f, $s) ) {
-			error(_L('There was a problem trying to save your changes'), _L('Please verify that all required field information has been entered properly'));
-		} else {
-			//submit changes
-			$email = GetFormData($f, $s, "newpass");
-			$pass = GetFormData($f, $s, "password");
-			
-			$result = subscriberUpdateUsername($email, $pass);
-			if($result['result'] == ""){
-				$success = true;
-			} else {
-				$resultcode = $result['result'];
-				if($resultcode == "invalid argument"){
-					if(strpos($result['resultdetail'], "username") !== false){
-						error($error_badusername);
-					} else {
-						error($error_badpass);
-					}
-				} else {
-					error($error_generalproblem);
-				}
-			}
-		}
-	}
-} else {
-	$reloadform = 1;
-}
-
-if( $reloadform )
-{
-	ClearFormData($f);
-	PutFormData($f, $s, "newpass", "", "text", "0", "100", true);
-	PutFormData($f, $s, "password", "", "text", "0", "100", true);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 
 $formdata = array(
     "newpassword1" => array(
@@ -99,7 +41,7 @@ $formdata = array(
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
+            array("ValSubscriberPassword")
         ),
         "control" => array("PasswordField","maxlength" => 50),
         "helpstep" => 1
@@ -108,7 +50,7 @@ $formdata = array(
 
 $helpsteps = array (
     "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
-	"Enter a new email address.  Then enter your account password."
+	"Enter a new password.  Then enter your account password."
 );
 
 $buttons = array(submit_button("Submit","submit","tick"),
@@ -132,14 +74,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
             
+        $params = "?err";
         
-        //save data here
-        
+        // more validation
+        if ($postdata['newpassword1'] != $postdata['newpassword2'])
+        	$error = "passwords do not match";
+         else {
+        	// success
+        	QuickUpdate("update subscriber set `password`=password(?) where id=?", false, array($postdata['newpassword1'], $_SESSION['subscriberid']));
+        	$params = "?thanks";
+        }
         
         if ($ajax)
-            $form->sendTo("account.php");
+            $form->sendTo("changepass.php".$params);
         else
-            redirect("account.php");
+            redirect("changepass.php".$params);
     }
 }
 
@@ -152,30 +101,40 @@ $TITLE = "Change Password";
 
 include_once("nav.inc.php");
 
-if($success){
-	startWindow(_L('Change Password') . help("Changepass"));
-	?>
-	<div style="margin:5px"><?=_L("You should receive an email shortly at the new address with a confirmation code.")?></div>
-	<form method='POST' action="index.php?c" name="activate" id="activate">
-		<table>
-			<tr>
-				<td><?=_L("Confirmation Code")?>: </td>
-				<td><input type="text" name="token" size="50" /></td>
-			</tr>
-			<tr>
-				<td><?=_L("Password")?>:</td>
-				<td><input type="password" name="password" /></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td><?=submit("activate", "main", "Submit")?></td>
-			</tr>
-		</table>
-	</form>
-	<?
-	endWindow();
+?>
+<script type="text/javascript">
+Event.observe( document, 'unload', Event.unloadCache );
+
+<? Validator::load_validators(array("ValSubscriberPassword")); ?>
+
+<? if ($datachange) { ?>
+
+alert("data has changed on this form!");
+window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+
+<? } ?>
+
+</script>
+
+<?
+if (isset($_GET['thanks'])) {
+?>
+	<div>
+	<h2>Thank you.  Your password has been changed.</h2>
+	</div>
+	<br>
+	<br>
+<?
 } else {
-	startWindow(_L('Change Password') . help("Changepass"));
+	startWindow(_L('Change Password'));
+	if (isset($_GET['err'])) {
+?>
+	<div>
+	<h3>&nbsp;Sorry, an error has occurred.  Please try again.</h3>
+	</div>
+	<br>
+<?
+	}
 	echo $form->render();
 	endWindow();
 }
