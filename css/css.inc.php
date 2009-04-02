@@ -4,25 +4,30 @@ header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire
 header("Content-Type: text/css");
 header("Cache-Control: private");
 
+// hack for pages not logged in (no session)
+if (!isset($_SESSION)) {
+	$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
+	$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
+	$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
+	$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+	$_SESSION['colorscheme']['_brandratio']   = ".3";
+}
+
 $theme = $_SESSION['colorscheme']['_brandtheme'];
 $primary = $_SESSION['colorscheme']['_brandprimary'];
 $theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
 $theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
 $globalratio = $_SESSION['colorscheme']['_brandratio'];
 
-
 $fade1 = "E5E5E5";
 $fade2 = "999999";
 $fade3 = "595959";
-
-
 
 $newfade1 = fadecolor($primary, $fade1, $globalratio);
 $newfade2 = fadecolor($primary, $fade2, $globalratio);
 $newfade3 = fadecolor($primary, $fade3, $globalratio);
 
 $primary = "#" . $primary;
-
 
 //Takes 2 hex color strings and 1 ratio to apply to to the primary:original
 function fadecolor($primary, $fade, $ratio){
@@ -35,8 +40,6 @@ function fadecolor($primary, $fade, $ratio){
 	$newcolor = "#" . implode("", $newcolorarray);
 	return $newcolor;
 }
-
-
 
 ?>
 body, table, form, select, input {
