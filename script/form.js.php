@@ -9,7 +9,7 @@ header("Cache-Control: private");
 ?>
 
 /* ======= BEGIN VALIDATORS =======  */
-<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail")); ?>
+<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValFieldComfirmation")); ?>
 /* ======= END VALIDATORS =======  */
 
 
@@ -72,21 +72,34 @@ function form_get_value (form,targetname) {
 function form_do_validation (form, element) {
 	var targetname = element.name;
 	var formvars = document.formvars[form.name];
-	
-	//might need to strip off the some brackets from the name
-	targetname = targetname.replace("[]","");
+	targetname = targetname.replace("[]",""); //might need to strip off the some brackets from the name
+	var itemname = targetname.split("_")[1];
 	
 	if (formvars.validators && formvars.validators[targetname]) {
 		var validators = formvars.validators[targetname];
+		var requiredfields = formvars.formdata[itemname].requires;
 		var value = form_get_value(form,targetname);
+		
+		//see if we need additional fields for validation
+		var requiredvalues = {};
+		if (requiredfields) {
+			for (var i = 0; i < requiredfields.length; i++) {
+				var requiredname = requiredfields[i];
+				requiredvalues[requiredname] = form_get_value(form,form.name+"_"+requiredname);
+			}
+		}
 		
 		//special case, if we are doing ajax call, then validators isn't an array, just call ajax for the result
 		if (validators == "ajax") {	
 			//tack on some stuff to GET query (see in logs which POSTs are just validation) and hide the value (dont need to see that in logs)
 			var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajaxvalidator=true&formitem=" + targetname;
+			var postData = {
+				value: value,
+				requiredvalues: requiredvalues
+			};
 			new Ajax.Request(posturl, {
 				method:'post',
-				parameters: {value: value},
+				parameters: {json: Object.toJSON(postData)}, //do this so that arrays and such are sent (regular form encoded data is flat)
 				onSuccess: function(response){
 					var res = response.responseJSON;
 					if (res.vres != true) {
@@ -107,7 +120,7 @@ function form_do_validation (form, element) {
 				var v = validators[i];
 				var res;
 				if (value.length > 0 || v.validator == "ValRequired") {
-					res = v.validate(v.name,v.label,value,v.args);
+					res = v.validate(v.name,v.label,value,v.args,requiredvalues);
 					if (res != true) {
 						form_validation_display(element,"error",res);
 						return;

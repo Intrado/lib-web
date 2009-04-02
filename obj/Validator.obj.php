@@ -4,7 +4,8 @@ abstract class Validator {
 	var $name;
 	var $label;
 	var $onlyserverside = false; //set this if you don't have a JS validator
-	
+	var $requiredfields = array();
+
 	/* static
 	 * spits out javascript required to install a validator in the form 
 	 * Takes a list of class names
@@ -35,7 +36,7 @@ abstract class Validator {
 	/* static
 	 * works pre-merge 
 	 */
-	function validate_item ($formdata,$name,$value) {
+	function validate_item ($formdata,$name,$value,$requiredvalues = array()) {
 		$validators = $formdata[$name]['validators'];
 		
 		foreach ($validators as $validatordata) {
@@ -46,7 +47,7 @@ abstract class Validator {
 				$obj->label = $formdata[$name]['label'];
 				$obj->name = $name;
 				
-				$res = $obj->validate($value, $validatordata);
+				$res = $obj->validate($value, $validatordata,$requiredvalues);
 				
 				if ($res !== true)
 					return array($validator,$res);
@@ -219,6 +220,25 @@ class ValEmail extends Validator {
 				if (!reg.test(value))
 					return label + " is an invalid email format";
 
+				return true;
+			}';
+	}
+}
+
+/*
+ * must set args[field] to the same as the formdata['requires'] field
+ */
+class ValFieldComfirmation extends Validator {	
+	function validate ($value, $args, $requiredvalues) {	
+		if ($requiredvalues[$args['field']] != $value)
+			return "$this->label does not match!";	
+		return true;
+	}
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args, requiredvalues) {
+				if (requiredvalues[args["field"]] != value)
+					return this.label +" does not match!";
 				return true;
 			}';
 	}
