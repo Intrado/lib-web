@@ -146,11 +146,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 $PAGE = "account:account";
 $TITLE = _L("Account Information") . ": " . escapehtml($_SESSION['subscriber.firstname']) . " " . escapehtml($_SESSION['subscriber.lastname']);
-include_once("nav.inc.php");
+require_once("nav.inc.php");
 
 startWindow(_L('User Information'));
 echo $form->render();
 endWindow();
 
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>

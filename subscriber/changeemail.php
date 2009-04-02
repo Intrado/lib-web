@@ -119,7 +119,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 $PAGE = "account:account";
 $TITLE = "Change Email";
 
-include_once("nav.inc.php");
+require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
@@ -159,5 +159,5 @@ if (isset($_GET['thanks'])) {
 	endWindow();
 }
 
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>

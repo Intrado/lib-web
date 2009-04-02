@@ -79,45 +79,6 @@ function subscriberLogin($customerurl, $username, $password) {
 }
 
 
-function subscriberGetCustomerAssociations() {
-	$sessionid = session_id();
-	$customerurl = "";
-	if (isset($_GET['u'])) {
-		$customerurl = $_GET['u'];
-		$_SESSION['customerurl'] = $customerurl; // store this for logout to append
-	}
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerurl, 'string'));
-	$method = "SubscriberServer.subscriber_getCustomerAssociations";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
-function subscriberAccessCustomer($customerid) {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'));
-	$method = "SubscriberServer.subscriber_accessCustomer";
-	$result = pearxmlrpc($method, $params);
-	if ($result['result'] == "") {
-		// success
-		if (!doDBConnect($result)) {
-			$result['result'] = "unknown error";
-			$result['resultdetail'] = "unexpected failure condition";
-		}
-	}
-	return $result;
-}
-
-
-function subscriberAssociatePerson($token, $validationdata) {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($token), 'string'), new XML_RPC_Value(trim($validationdata), 'string'));
-	$method = "SubscriberServer.subscriber_associatePerson";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
 function subscriberForgotPassword($username) {
 	$customerurl = "";
 	if (isset($_GET['u'])) {

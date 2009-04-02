@@ -44,10 +44,7 @@ if (!isset($isNotLoggedIn)) {
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
 		redirect("./".$logout);
     }
-
-} else {
-	// we are not logged in
-}
+} // else we are not logged in
 
 // load subscriber locale 
 require_once("../inc/locale.inc.php");

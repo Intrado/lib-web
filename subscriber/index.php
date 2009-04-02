@@ -1,10 +1,21 @@
 <?
-
 $isNotLoggedIn = 1;
+
+global $_SESSION;
+$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
+$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
+$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
+$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+$_SESSION['colorscheme']['_brandratio']   = ".3";
+
+
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/FieldMap.obj.php");
+
+
+
 
 
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
@@ -15,16 +26,18 @@ if (isset($_GET['u'])) {
 
 $changeuser = false;
 $forgot = false;
+
+
 if(isset($_GET['c'])){
 	$changeuser = true;
-	include("activate.php");
+	require_once("activate.php");
 	exit();
 } else if(isset($_GET['f'])){
 	$forgot = true;
-	include("activate.php");
+	require_once("activate.php");
 	exit();
 } else if(isset($_GET['n'])){
-	include("activate.php");
+	require_once("activate.php");
 	exit();
 }
 
@@ -51,10 +64,12 @@ if ($SETTINGS['feature']['has_ssl']) {
 }
 
 
+
 $login="";
 $badlogin=false;
 $id = false;
 $sessionstarted = false;
+
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
@@ -77,6 +92,8 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
     }
 }
 
+
+
 if ($id) {
 	if (!$sessionstarted)
 		doStartSession($id);
@@ -87,7 +104,7 @@ if ($id) {
 
 $TITLE= "Sign In";
 
-include_once("logintop.inc.php");
+require_once("logintop.inc.php");
 
 ?>
 <form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
@@ -127,7 +144,12 @@ include_once("logintop.inc.php");
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td align="right"><div style="text-align: right;"><input type="image" src="img/signin.gif" onmouseover="this.src='img/signin_over.gif';" onmouseout="this.src='img/signin.gif';"></div></td>
+			<td align="right"><?= submit_button("Sign In","save","tick") ?></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
@@ -164,7 +186,7 @@ $form->render();
 */
 
 
-include("loginbottom.inc.php");
+require_once("loginbottom.inc.php");
 ?>
 <script langauge="javascript">
 document.getElementById('logintext').focus();

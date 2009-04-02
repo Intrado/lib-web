@@ -40,7 +40,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 }
 
 $TITLE = _L("Password Assistance");
-include_once("logintop.inc.php");
+require_once("logintop.inc.php");
 if($generalerror){
 	error(_L("There was a problem with your request.  Please try again later"));
 }
@@ -65,7 +65,7 @@ if(!$success){
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><div><input type="submit" name="submit" value="<?=_L("Submit")?>"></div></td>
+			<td align="right"><?= submit_button("Submit","save","tick") ?></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -91,5 +91,5 @@ if(!$success){
 	</table>
 <?
 }
-include_once("loginbottom.inc.php");
+require_once("loginbottom.inc.php");
 ?>

@@ -64,11 +64,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 $PAGE = "contacts:notifications";
 $TITLE = "Notification Preferences";
 
-include_once("nav.inc.php");
+require_once("nav.inc.php");
 
 startWindow(_L('Notifications') . help("Notifications"));
 echo $form->render();
 endWindow();
-
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>

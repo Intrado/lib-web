@@ -108,7 +108,7 @@ function sender($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE="Welcome - " . escapehtml($_SESSION['subscriber.firstname']) . " " . escapehtml($_SESSION['subscriber.lastname']);
 $PAGE = 'messages:messages';
-include_once("nav.inc.php");
+require_once("nav.inc.php");
 ?>	<div><b>Messages from the last 30 days</b></div><br><?
 
 	// if customer has message callback feature, let the user know about it
@@ -148,5 +148,5 @@ include_once("nav.inc.php");
 		<br>
 <?
 	}
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>

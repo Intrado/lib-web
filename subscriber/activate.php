@@ -102,7 +102,7 @@ if ($forgot) {
 	$text = "your password";
 }
 
-include("logintop.inc.php");
+require_once("logintop.inc.php");
 
 if ($forgotsuccess || $success || $newusersuccess) {
 ?>
@@ -212,5 +212,5 @@ if ($form) {
 <?
 }
 
-include_once("loginbottom.inc.php");
+require_once("loginbottom.inc.php");
 ?>

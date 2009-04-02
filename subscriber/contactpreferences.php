@@ -161,7 +161,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 $PAGE = "contacts:contactpreferences";
 $TITLE = "Contact Information";
 
-include_once("nav.inc.php");
+require_once("nav.inc.php");
 
 startWindow(_L('Personal Information'));
 
@@ -169,5 +169,5 @@ echo $form->render();
 
 endWindow();
 
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>

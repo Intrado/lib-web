@@ -14,6 +14,7 @@ require_once("../obj/Phone.obj.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+
 $_SESSION['colorscheme']['_brandtheme']   = "3dblue";
 $_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
 $_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
@@ -139,17 +140,29 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
             
-        
-        //save data here
+        $options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname']));
+		
+		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $options);
+		if ($result['result'] != "") {
+			if ($result['result'] == "duplicate") {
+				$errordetails = "That email address is already in use";
+			} else {
+				$errordetails = "An unknown error occured, please try again";
+			}
+			$errors .= "Your account was not created" . $errordetails;
+		} else {
+			// success
+        	if ($ajax)
+            	$form->sendTo("activate.php");
+        	else
+	            redirect("activate.php");
+		}
         
         $_SESSION['postdata'] = $postdata;
-        
-        
-        
         if ($ajax)
-            $form->sendTo("activate.php");
+            $form->sendTo("newsubscriber.php?err");
         else
-            redirect("activate.php");
+            redirect("newsubscriber.php?err");
     }
 }
 
@@ -164,11 +177,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $TITLE = "Create a New Account";
-include_once("logintop.inc.php");
+require_once("logintop.inc.php");
 
-if (isset($_GET['formerrors'])) {
+if (isset($_GET['err'])) {
 ?>
-    <h1>Form Errors: <?=$_SESSION['formerrors']?> </h1>
+    <h2>Sorry, an error has occurred.  Please try again.</h2>
 <?
 }
 ?>
@@ -183,16 +196,15 @@ if (errors)
 <h1><?= $errors ? "This form contains some errors" : "" ?></h1>
 </noscript>
 
-
 		<table width="100%" style="color: #365F8D;" >
 			<tr>
-				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+				<td><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 			</tr>
 			<tr>
-				<td colspan="2">Please complete this form to create your SUBSCRIBER account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
+				<td>Please complete this form to create your SUBSCRIBER account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
 			</tr>
 			<tr>
-				<td colspan="4">&nbsp;</td>
+				<td>&nbsp;</td>
 			</tr>
 			<tr>
 				<td>
@@ -202,10 +214,10 @@ if (errors)
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><br><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
+				<td><br><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
 			</tr>
 		</table>
 			
 <?
-include_once("loginbottom.inc.php");
+require_once("loginbottom.inc.php");
 ?>
