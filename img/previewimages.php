@@ -4,7 +4,7 @@
 
 img {
 	border: 0px;
-	padding: 3px;
+	margin: 3px;
 }
 
 .clear {
@@ -47,7 +47,6 @@ $folders = array(
 	"themes/chromeblue",
 	"themes/chromeorange",
 	"themes/chromepurple",
-	"themes/CVS",
 	"themes/easy_invaders",
 	"themes/gold",
 	"themes/grass",
