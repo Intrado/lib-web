@@ -246,7 +246,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.74 $
+	    # $Revision: 1.75 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -560,7 +560,10 @@ function getBrand(){
 }
 
 function getBrandTheme(){
-	return $_SESSION['colorscheme']['_brandtheme'];
+	if (isset($_SESSION['colorscheme']))
+		return $_SESSION['colorscheme']['_brandtheme'];
+	else
+		return "3dblue"; // hack for buttons on pages not yet logged in
 }
 
 function getBrandPrimary(){
