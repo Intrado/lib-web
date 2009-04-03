@@ -54,7 +54,7 @@ class Form {
 		}
 		
 		//ajax post form - merge in data, check validation, etc
-		if ($_POST['submit']) {
+		if (isset($_POST['submit'])) {
 			
 			//check the form snum vs loaded formdata
 			if (isset($_REQUEST['ajax']) && $this->checkForDataChange()) {
@@ -177,7 +177,7 @@ class Form {
 					$msg = "Required";
 				} else {
 					//otherwise, validate and show normally
-					$valresult = Validator::validate_item($this->formdata,$name,$value,$this->collectRequiredValues($name));
+					$valresult = Validator::validate_item($this->formdata,$name,$value);
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
 						$style = 'style="background: rgb(225,255,225);"' ;
@@ -244,17 +244,6 @@ class Form {
 	function checkForDataChange() {
 		return $this->serialnum != $_POST['formsnum_' . $this->name];
 	}
-	
-	function collectRequiredValues ($name) {
-		$requiredvalues = array();
-		if (isset($this->formdata[$name]['requires'])) {
-			foreach ($this->formdata[$name]['requires'] as $requiredname) {
-				$requiredvalues[$requiredname] = $this->formdata[$requiredname]['value'];
-			}
-		}
-		
-		return $requiredvalues;
-	}
 
 	function validate () {
 		if ($this->validationresults !== null)
@@ -266,8 +255,7 @@ class Form {
 		foreach ($this->formdata as $name => $data) {
 			if (!isset($data['validators']))
 				continue;
-						
-			$itemresult = Validator::validate_item($this->formdata,$name,$data['value'],$this->collectRequiredValues($name));
+			$itemresult = Validator::validate_item($this->formdata,$name,$data['value']);
 			if ($itemresult === true) {
 				$this->validationresults[] = array("name" => $name,"vres" => true);
 			} else {
