@@ -28,14 +28,26 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 	static $initdblog = false;
 	static $logfp;
 
-	$stmt = $dbcon->prepare($query);
-	if ($args)
+	if ($args) {
+		$stmt = $dbcon->prepare($query);
 		$queryok = $stmt->execute($args);
-	else
-		$queryok = $stmt->execute();
+	} else {
+		$queryok = true;
+		$stmt = $dbcon->query($query);
+		if ($stmt == null) $queryok = false;
+	}
 		
 	if (!$queryok && $SETTINGS['feature']['log_db_errors']) {
-		$errInfo = $stmt->errorInfo();
+		if ($args)
+			$errInfo = $stmt->errorInfo();
+		else
+			$errInfo = $dbcon->errorInfo();
+		
+		if ($errInfo[2] == null)
+			$detail = "unknown";
+		else
+			$detail = $errInfo[2];
+			
 		if (!$initdblog) {
 			$logfp = fopen($SETTINGS['feature']['log_dir'] . "dberrors.txt","a");
 			$initdblog = true;
@@ -43,7 +55,7 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 		list($usec,$sec) = explode(" ", microtime());
 		$temp = $dbcon->query("select connection_id()");
 		$cid = $temp->fetchColumn();
-		$errorstr = "\n" . date("Y-m-d H:i:") . sprintf("%.3f",$usec + ($sec %60)) . " t:" . $cid . " e:" . $errInfo[0] . " " . $errInfo[2] . " q:" . preg_replace('/\s\s+/', ' ',$query);
+		$errorstr = "\n" . date("Y-m-d H:i:") . sprintf("%.3f",$usec + ($sec %60)) . " t:" . $cid . " e:" . $errInfo[0] . " " . $detail . " q:" . preg_replace('/\s\s+/', ' ',$query);
 
 		fwrite($logfp, $errorstr);
 	}
