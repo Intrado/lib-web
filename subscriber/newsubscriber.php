@@ -130,6 +130,7 @@ $form->ajaxsubmit = true;
 $form->handleRequest();
 
 $datachange = false;
+$errors = "";
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
@@ -189,7 +190,7 @@ if (isset($_GET['err'])) {
 <script type="text/javascript">
 var errors = <?= json_encode($errors) ?>;
 if (errors)
-    alert("this form contains some errors");
+    alert("This form contains some errors");
 </script>
 
 <noscript>

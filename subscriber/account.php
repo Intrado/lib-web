@@ -20,85 +20,14 @@ foreach ($subscribeFields as $fieldnum => $name) {
 }
 
 
-$error_failedupdate = "There was an error updating your information";
-$error_failedupdatepassword = "There was an error updating your password";
-$error_badpassword = "The old password provided is invalid";
-
-$f="subscriber";
-$s="main";
-$reloadform = 0;
-$error = 0;
-
-if (CheckFormSubmit($f,$s)) {
-	//check to see if formdata is valid
-	if (CheckFormInvalid($f)) {
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	} else {
-		MergeSectionFormData($f, $s);
-
-		//do check
-		$firstname = TrimFormData($f,$s,"firstname");
-		$lastname = TrimFormData($f,$s,"lastname");
-		$oldpassword = TrimFormData($f,$s,"oldpassword");
-		$newpassword1 = TrimFormData($f, $s, "newpassword1");
-		$newpassword2 = TrimFormData($f, $s, "newpassword2");
-		$_SESSION['_locale'] = getFormData($f, $s, "_locale");
-		if (CheckFormSection($f, $s)) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(strlen($newpassword1) > 0 && strlen($newpassword1) < 5){
-			error("Passwords must be at least 5 characters long");
-		} else if($newpassword1 && $passworderror = validateNewPassword($_SESSION['portaluser']['portaluser.username'], $newpassword1, $firstname, $lastname)){
-			error($passworderror);
-		} else if($newpassword1 != $newpassword2){
-			error('Password confirmation does not match');
-		} else {
-			//submit changes
-			
-
-			if ($newpassword1) {
-			/*
-				$result = portalUpdatePortalUserPassword($newpassword1, $oldpassword);
-				if ($result['result'] != "") {
-					$updateuser = false;
-					$error = 1;
-					if(strpos($result['resultdetail'], "oldpassword") !== false){
-						error($error_badpassword);
-					} else {
-						error($error_failedupdatepassword);
-					}
-				}
-			*/
-			}
-			if (!$error) {
-				redirect("start.php");
-			}
-		}
-	}
-} else {
-	$reloadform = 1;
-}
-
-if ($reloadform) {
-	ClearFormData($f);
-	
-	PutFormData($f, $s, "newpassword1", "", "text");
-	PutFormData($f, $s, "newpassword2", "", "text");
-	PutFormData($f, $s, "oldpassword", "", "text");
-
-	PutFormData($f, $s, "_locale", $_SESSION['_locale'], "text", "nomin", "nomax");
-}
-
-
-
 $formdata = array(
     "locale" => array(
         "label" => "Choose your display language:",
-        "value" => "",
+        "value" => $_SESSION['_locale'],
         "validators" => array(    
             array("ValRequired")
         ),
-        "control" => array("RadioButton","values" => array(1 => "English", 2 => "Spanish",3 => "French")),
+        "control" => array("RadioButton","values" => $LOCALES),
         "helpstep" => 1
     )
 );
@@ -128,14 +57,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $datachange = true;
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-            
-        
-        //save data here
-        
-        $_SESSION['postdata'] = $postdata;
-        
-        
-        
+
+        $preferences = array();
+        $preferences['_locale'] = $postdata['locale'];
+        $prefs = json_encode($preferences);
+
+		QuickUpdate("update subscriber set preferences=? where id=?", false, array($prefs, $_SESSION['subscriberid']));
+		$_SESSION['_locale'] = $postdata['locale'];        
+
         if ($ajax)
             $form->sendTo("account.php");
         else

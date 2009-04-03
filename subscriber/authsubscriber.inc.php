@@ -195,6 +195,14 @@ function doStartSession($subscriberID = false) {
 		$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
 		$_SESSION['colorscheme']['_brandprimary'] = "26477D";
 		$_SESSION['colorscheme']['_brandratio']   = ".3";
+		
+		$prefs = QuickQuery("select preferences from subscriber where id=?", false, array($subscriberID));
+		$preferences = json_decode($prefs, true);
+		if (isset($preferences['_locale']))
+			$_SESSION['_locale'] = $preferences['_locale'];
+		else
+			$_SESSION['_locale'] = "en_US"; // US English
+			
 	}
 }
 
