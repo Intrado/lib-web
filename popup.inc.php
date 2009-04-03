@@ -15,7 +15,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src='script/utils.js'></script>
 	<script src='script/sorttable.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href="css/css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen">
+	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen">
 	
 	<script src="script/form.js.php" type="text/javascript"></script>
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">	
