@@ -1096,8 +1096,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?				} else {
 ?>
 				<td valign="top" width="100%" style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' onclick=\"if(this.checked == true) {show('singlelist');hide('multilist');} else{hide('singlelist');show('multilist');}\""); ?>One List&nbsp;
-<?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {hide('singlelist');show('multilist');} else{show('singlelist');hide('multilist');}\""); ?>Multiple Lists
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "single","id='listradio_single' onclick=\"if(this.checked == true) {Element.show('singlelist');Element.hide('multilist');} else{Element.hide('singlelist');Element.show('multilist');}\""); ?>One List&nbsp;
+<?					NewFormItem($f, $s, "listradio", "radio", NULL, "multi","id='listradio_multi' onclick=\"if(this.checked == true) {Element.hide('singlelist');Element.show('multilist');} else{Element.show('singlelist');Element.hide('multilist');}\""); ?>Multiple Lists
 				<div id='singlelist' style="padding-top: 1em;display: none">
 <?
 						NewFormItem($f,$s,"listid", "selectstart");
@@ -1192,8 +1192,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('phonecreatemessage');show('phoneselectmessage'); show('phonemultilingualoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('phone',false);automatictranslation('phone');":"") . "show('phonecreatemessage');hide('phoneselectmessage');hide('phonemultilingualoption'); }\""));	?> Create a text-to-speech message
+<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.hide('phonecreatemessage');Element.show('phoneselectmessage'); Element.show('phonemultilingualoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('phone',false);automatictranslation('phone');":"") . "Element.show('phonecreatemessage');Element.hide('phoneselectmessage');Element.hide('phonemultilingualoption'); }\""));	?> Create a text-to-speech message
 				<div id='phoneselectmessage' style="display: block">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
@@ -1391,8 +1391,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('emailcreatemessage');show('emailselectmessage'); show('emailmultilingualoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('email',false);automatictranslation('email');":"") . "show('emailcreatemessage');hide('emailselectmessage');hide('emailmultilingualoption'); }\""));	?> Create a message
+<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.hide('emailcreatemessage');Element.show('emailselectmessage'); Element.show('emailmultilingualoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('email',false);automatictranslation('email');":"") . "Element.show('emailcreatemessage');Element.hide('emailselectmessage');Element.hide('emailmultilingualoption'); }\""));	?> Create a message
 				<div id='emailselectmessage' style="display: block">
 <?					message_select('email',$f, $s,"emailmessageid", "id='emailmessageid'");?>
 				</div>
@@ -1529,8 +1529,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
 				<td>
-<?					NewFormItem($f, $s, "smsradio", "radio", NULL, "select","id='smsselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {hide('smscreatemessage');show('smsselectmessage');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "smsradio", "radio", NULL, "create","id='smscreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {show('smscreatemessage');hide('smsselectmessage'); }\""));	?> Create a message
+<?					NewFormItem($f, $s, "smsradio", "radio", NULL, "select","id='smsselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.hide('smscreatemessage');Element.show('smsselectmessage');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "smsradio", "radio", NULL, "create","id='smscreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.show('smscreatemessage');Element.hide('smsselectmessage'); }\""));	?> Create a message
 				<div id='smsselectmessage' style="display: block">
 					<? message_select('sms',$f, $s,"smsmessageid", "id='smsmessageid'"); ?>
 				</div>
@@ -1589,13 +1589,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		}
 		var smsmessagedropdown = new getObj('smsmessageid').obj;
 		if(smsmessagedropdown.value != ""){
-			hide('smscreatemessage');
+			Element.hide('smscreatemessage');
 		}
 		if(isCheckboxChecked('sendsms')){
 			typeischecked = true;
-			show('smsoptions');
-			hide('displaysmsoptions');
-			hide('displaysmsoptions');
+			Element.show('smsoptions');
+			Element.hide('displaysmsoptions');
+			Element.hide('displaysmsoptions');
 		}
 	<?}?>
 
@@ -1609,8 +1609,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 	}
 	if(isCheckboxChecked('sendphone')){
 		typeischecked = true;
-		show('phoneoptions');
-		hide('displayphoneoptions');
+		Element.show('phoneoptions');
+		Element.hide('displayphoneoptions');
 
 		<?
 		if ($_SESSION['jobid'] != null) {
@@ -1628,16 +1628,16 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			displayphonedetailsstate = 'hidden';
 		<? } ?>
 		if (displayphonedetailsstate == 'visible') {
-				show('displayphonedetails');
+				Element.show('displayphonedetails');
 		} else {
-			show('phonedetails');
-			show('displayphonebasic');
+			Element.show('phonedetails');
+			Element.show('displayphonebasic');
 		}
 	}
 	if(isCheckboxChecked('sendemail')){
 		typeischecked = true;
-		show('emailoptions');
-		hide('displayemailoptions');
+		Element.show('emailoptions');
+		Element.hide('displayemailoptions');
 
 		<?
 		if ($_SESSION['jobid'] != null) {
@@ -1650,14 +1650,14 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			displayemaildetailsstate = 'hidden';
 		<? } ?>
 		if (displayemaildetailsstate == 'visible') {
-			show('displayemaildetails');
+			Element.show('displayemaildetails');
 		} else {
-			show('emaildetails');
-			show('displayemailbasic');
+			Element.show('emaildetails');
+			Element.show('displayemailbasic');
 		}
 	}
 	if(	typeischecked == true ){
-		show('settings');
+		Element.show('settings');
 		<?
 		if ($_SESSION['jobid'] != null) {
 			$diffvalues = $job->compareWithDefaults();
@@ -1672,18 +1672,18 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			displaysettingsdetailsstate = 'hidden';
 		<? } ?>
 		if (displaysettingsdetailsstate == 'visible') {
-			show('displaysettingsdetails');
+			Element.show('displaysettingsdetails');
 		} else {
-			show('settingsdetails');
-			show('displaysettingsbasic');
+			Element.show('settingsdetails');
+			Element.show('displaysettingsbasic');
 		}
 	}
 
 	// Loading List View
 	if(isCheckboxChecked('listradio_single')){
-		show('singlelist');hide('multilist');
+		Element.show('singlelist');Element.hide('multilist');
 	} else {
-		hide('singlelist');show('multilist');
+		Element.hide('singlelist');Element.show('multilist');
 	}
 
 	function limit_chars(field) {
@@ -1722,59 +1722,59 @@ function formatDate(Ob) {
 function displaySection(section, details){
 	switch(section){
 		case 'phone':
-			show('phoneoptions');
+			Element.show('phoneoptions');
 			if (details) {
-				show('phonedetails');
-				hide('displayphonedetails');
-				show('displayphonebasic');
+				Element.show('phonedetails');
+				Element.hide('displayphonedetails');
+				Element.show('displayphonebasic');
 			} else {
-				hide('phonedetails');
-				show('displayphonedetails');
-				hide('displayphonebasic');
+				Element.hide('phonedetails');
+				Element.show('displayphonedetails');
+				Element.hide('displayphonebasic');
 			}
-			hide('displayphoneoptions');
+			Element.hide('displayphoneoptions');
 			break;
 		case 'email':
-			show('emailoptions');
+			Element.show('emailoptions');
 			if (details) {
-				show('emaildetails');
-				hide('displayemaildetails');
-				show('displayemailbasic');
+				Element.show('emaildetails');
+				Element.hide('displayemaildetails');
+				Element.show('displayemailbasic');
 			} else {
-				hide('emaildetails');
-				show('displayemaildetails');
-				hide('displayemailbasic');
+				Element.hide('emaildetails');
+				Element.show('displayemaildetails');
+				Element.hide('displayemailbasic');
 			}
-			hide('displayemailoptions');
+			Element.hide('displayemailoptions');
 			break;
 		case 'sms':
-			show('smsoptions');
-			hide('displaysmsoptions');
+			Element.show('smsoptions');
+			Element.hide('displaysmsoptions');
 			break;
 		case 'settings':
 			if (details) {
 				displaysettingsdetailsstate = 'hidden';
-				show('settingsdetails');
-				show('displaysettingsbasic');
-				hide('displaysettingsdetails');
+				Element.show('settingsdetails');
+				Element.show('displaysettingsbasic');
+				Element.hide('displaysettingsdetails');
 			} else {
 				displaysettingsdetailsstate = 'visible';
-				hide('settingsdetails');
-				hide('displaysettingsbasic');
-				show('displaysettingsdetails');
+				Element.hide('settingsdetails');
+				Element.hide('displaysettingsbasic');
+				Element.show('displaysettingsdetails');
 			}
 			break;
 	}
-	show('settings');
+	Element.show('settings');
 
 	if (section != 'settings') {
 		if (displaysettingsdetailsstate == 'hidden') {
-			show('displaysettingsbasic');
-			hide('displaysettingsdetails');
+			Element.show('displaysettingsbasic');
+			Element.hide('displaysettingsdetails');
 		} else {
 			displaysettingsdetailsstate = 'visible';
-			hide('displaysettingsbasic');
-			show('displaysettingsdetails');
+			Element.hide('displaysettingsbasic');
+			Element.show('displaysettingsdetails');
 		}
 	}
 }
@@ -1782,44 +1782,44 @@ function displaySection(section, details){
 function hideSection(section){
 	switch(section){
 		case 'phone':
-			hide('phoneoptions');
-			hide('displayphonedetails');
-			hide('phonedetails');
-			hide('displayphonebasic');
-			show('displayphoneoptions');
+			Element.hide('phoneoptions');
+			Element.hide('displayphonedetails');
+			Element.hide('phonedetails');
+			Element.hide('displayphonebasic');
+			Element.show('displayphoneoptions');
 			break;
 		case 'email':
-			hide('emailoptions');
-			hide('displayemaildetails');
-			hide('emaildetails');
-			hide('displayemailbasic');
-			show('displayemailoptions');
+			Element.hide('emailoptions');
+			Element.hide('displayemaildetails');
+			Element.hide('emaildetails');
+			Element.hide('displayemailbasic');
+			Element.show('displayemailoptions');
 			break;
 		case 'sms':
-			hide('smsoptions');
-			show('displaysmsoptions');
+			Element.hide('smsoptions');
+			Element.show('displaysmsoptions');
 			break;
 	}
 
 	var typeischecked = false;
 	if(isCheckboxChecked('sendphone')){
 		typeischecked = true;
-		hide('displayphoneoptions');
+		Element.hide('displayphoneoptions');
 	}
 	if(isCheckboxChecked('sendemail')){
 		typeischecked = true;
-		hide('displayemailoptions');
+		Element.hide('displayemailoptions');
 	}
 	if(isCheckboxChecked('sendsms')){
 		typeischecked = true;
-		hide('displaysmsoptions');
+		Element.hide('displaysmsoptions');
 	}
 
 	if(typeischecked == false){
-		hide('settings');
-		hide('displaysettingsdetails');
-		hide('settingsdetails');
-		hide('displaysettingsbasic');
+		Element.hide('settings');
+		Element.hide('displaysettingsdetails');
+		Element.hide('settingsdetails');
+		Element.hide('displaysettingsbasic');
 		displaysettingsdetailsstate = 'visible';
 	}
 }
@@ -1884,13 +1884,13 @@ function previewlanguage(language,female,male) {
 var types=Array('phone','email','sms');
 for(var i=0;i<3;i++){
 	if(isCheckboxChecked(types[i] + 'select')) {
-		hide(types[i] + 'createmessage');
-		show(types[i] + 'selectmessage');
-		show(types[i] + 'multilingualoption');
+		Element.hide(types[i] + 'createmessage');
+		Element.show(types[i] + 'selectmessage');
+		Element.show(types[i] + 'multilingualoption');
 	} else {
-		show(types[i] + 'createmessage');
-		hide(types[i] + 'selectmessage');
-		hide(types[i] + 'multilingualoption');
+		Element.show(types[i] + 'createmessage');
+		Element.hide(types[i] + 'selectmessage');
+		Element.hide(types[i] + 'multilingualoption');
 	}
 }
 
@@ -1922,23 +1922,23 @@ for(var j=0;j<2;j++){
 	var type = types[j];
 	if(isCheckboxChecked(type + 'create')) {
 		var checked = false;
-		show(type + 'translationsshow');
+		Element.show(type + 'translationsshow');
 		languages = phonelanguages;
 		if(type == 'email')
 			languages = emaillanguages;
 		for (i = 0; i < languages.length; i++) {
 			var language = languages[i];
 			if(isCheckboxChecked(type + '_' + language)){
-				show(type + 'txt_' + language);
-				show(type + 'show_' + language);
+				Element.show(type + 'txt_' + language);
+				Element.show(type + 'show_' + language);
 				checked = true;
 			} else {
-				hide(type + 'txt_' + language);
-				hide(type + 'show_' + language);
+				Element.hide(type + 'txt_' + language);
+				Element.hide(type + 'show_' + language);
 			}
 			editlanguage(type,language);
-			hide(type + 'expandtxt_' + language);
-			hide(type + 'hide_' + language);
+			Element.hide(type + 'expandtxt_' + language);
+			Element.hide(type + 'hide_' + language);
 			if(!isCheckboxChecked(type + 'edit_' + language)){
 				var x = new getObj(type + 'expand_' + language);
 				x.obj.disabled = true;
@@ -1947,7 +1947,7 @@ for(var j=0;j<2;j++){
 		if(!checked) {
 			var x = new getObj(type + 'translatecheck');
 			x.obj.checked = false;
-			hide(type + 'translationsshow');
+			Element.hide(type + 'translationsshow');
 		}
 	}
 }
@@ -1957,7 +1957,7 @@ for(var j=0;j<2;j++){
  * If The Automatic translation check is clicked or the user switch from select a message to create a message
  * If The checkbox is selected all the languages should be selected too.
  * If a user has unselected all languages the phonetranslatecheck is unselected to avoid both show and hide translation
- * to show at the same time the show('phonetranslationsshow'); has to be conditional
+ * to show at the same time the Element.show('phonetranslationsshow'); has to be conditional
  *
  */
 ?>
@@ -1970,43 +1970,43 @@ function automatictranslation(section){
 		for (i = 0; i < languages.length; i++) {
 			var language = languages[i]
 			var x = new getObj(section + '_' + language);
-			show(section + 'txt_' + language);
+			Element.show(section + 'txt_' + language);
 			if(!x.obj.disabled) {
 				x.obj.checked = true;
-				show(section + 'show_' + language);
+				Element.show(section + 'show_' + language);
 			}
 			editlanguage(section,language);
-			hide(section + 'expandtxt_' + language);
-			hide(section + 'hide_' + language);
+			Element.hide(section + 'expandtxt_' + language);
+			Element.hide(section + 'hide_' + language);
 		}
 		var basic = new getObj(section + 'translationshide').obj;
 		if(basic.style.display != "block")
-			show(section + 'translationsshow');
+			Element.show(section + 'translationsshow');
 	} else {
 		for (i = 0; i < languages.length; i++) {
 			var language = languages[i];
 			var x = new getObj(section + '_' + language);
 			x.obj.checked = false;
-			hide(section + 'txt_' + language);
-			hide(section + 'show_' + language);
-			hide(section + 'expandtxt_' + language);
-			hide(section + 'hide_' + language);
+			Element.hide(section + 'txt_' + language);
+			Element.hide(section + 'show_' + language);
+			Element.hide(section + 'expandtxt_' + language);
+			Element.hide(section + 'hide_' + language);
 		}
-		hide(section + 'translationsshow');
-		hide(section + 'translationshide');
-		hide(section + 'translations');
+		Element.hide(section + 'translationsshow');
+		Element.hide(section + 'translationshide');
+		Element.hide(section + 'translations');
 	}
 }
 <? // Show Translation options ?>
 function toggletranslations(section,showtranslation){
 	if (showtranslation) {
-		show(section + 'translations');
-		hide(section + 'translationsshow');
-		show(section + 'translationshide');
+		Element.show(section + 'translations');
+		Element.hide(section + 'translationsshow');
+		Element.show(section + 'translationshide');
 	} else {
-		hide(section + 'translations');
-		show(section + 'translationsshow');
-		hide(section + 'translationshide');
+		Element.hide(section + 'translations');
+		Element.show(section + 'translationsshow');
+		Element.hide(section + 'translationshide');
 	}
 	return false;
 }
@@ -2033,11 +2033,11 @@ function translationlanguage(section,language){
 			case 'email': emailtranslationstate = false; break;
 		}
 		setChecked(section + 'translatecheck');
-		show(section + 'txt_' + language);
-		show(section + 'show_' + language);
+		Element.show(section + 'txt_' + language);
+		Element.show(section + 'show_' + language);
 	} else {
-		hide(section + 'txt_' + language);
-		hide(section + 'show_' + language);
+		Element.hide(section + 'txt_' + language);
+		Element.hide(section + 'show_' + language);
 		var tr = new getObj(section + 'txt_' + language).obj;
 		tr.innerHTML = "&nbsp;";
 		var trexpand = new getObj(section + 'expand_' + language).obj;
@@ -2046,24 +2046,24 @@ function translationlanguage(section,language){
 		edit.checked = false;
 	}
 	editlanguage(section,language); <? // To show or hide the lock symbol ?>
-	hide(section + 'expandtxt_' + language);
-	hide(section + 'hide_' + language);
+	Element.hide(section + 'expandtxt_' + language);
+	Element.hide(section + 'hide_' + language);
 }
 
 <? //If language details is clicked ?>
 function langugaedetails(section,language, details){
 	if(details){
-		hide(section + 'txt_' + language);
-		show(section + 'expandtxt_' + language);
-		show(section + 'hide_' + language);
-		hide(section + 'show_' + language);
+		Element.hide(section + 'txt_' + language);
+		Element.show(section + 'expandtxt_' + language);
+		Element.show(section + 'hide_' + language);
+		Element.hide(section + 'show_' + language);
 		var retranslation = new getObj(section + 'verify_' + language).obj;
 		retranslation.value = "";
 	} else {
-		show(section + 'txt_' + language);
-		hide(section + 'expandtxt_' + language);
-		hide(section + 'hide_' + language);
-		show(section + 'show_' + language);
+		Element.show(section + 'txt_' + language);
+		Element.hide(section + 'expandtxt_' + language);
+		Element.hide(section + 'hide_' + language);
+		Element.show(section + 'show_' + language);
 		<? // If the translation is edited the text will need to be copied when the language box is collapsed ?>
 		if(isCheckboxChecked(section + 'edit_' + language)){
 			var tr = new getObj(section + 'txt_' + language).obj;
@@ -2082,9 +2082,9 @@ function editlanguage(section,language) {
 	var retranslation = new getObj(section + 'verify_' + language).obj;
 	retranslation.value = "";
 	if(isCheckboxChecked(section + '_' + language) && isCheckboxChecked(section + 'edit_' + language)){
-		show(section + 'lock_' + language);
+		Element.show(section + 'lock_' + language);
 	} else {
-		hide(section + 'lock_' + language);
+		Element.hide(section + 'lock_' + language);
 		switch(section) {
 			case 'phone': phonetranslationstate = false; break;
 			case 'email': emailtranslationstate = false; break;
@@ -2172,7 +2172,13 @@ function submitTranslations(section) {
 	if(serialized.length != 0){
 		var seriallang = serialized.join(";");
 		callbacksection = section;
-		ajax('translate.php',"english=" + encodeURIComponent(text) + "&languages=" + seriallang, setTranslations, seriallang);
+		new Ajax.Request('translate.php',
+			{ method:'post', postBody: "english=" + encodeURIComponent(text) + "&languages=" + seriallang, 
+				onSuccess: function(result) {
+					setTranslations(result.responseText, seriallang);
+				}
+			}
+		);
 	} else {
 		switch(section) {
 			case 'phone': phonetranslationstate = true; break;
@@ -2204,7 +2210,13 @@ function submitRetranslation(section,language) {
 	}
 	var urllang = encodeURIComponent(language);
 	callbacksection = section;
-	ajax('translate.php',"text=" + encodeURIComponent(text) + "&language=" + urllang, setRetranslation, urllang);
+	new AjaxRequest('translate.php',
+		{ method:'post', postBody:"text=" + encodeURIComponent(text) + "&language=" + urllang, 
+			onSuccess: function(result) {
+				setRetranslation(result.responseText, urllang);
+			}
+		}
+	);
 	return false;
 }
 function enablesection(section) {
@@ -2241,7 +2253,7 @@ function sendjobconfirm() {
 		enablesection('phone');	
 		submitForm('<? echo $f; ?>','send');
 	} else {
-		show('translationstatus');
+		Element.show('translationstatus');
 		var status = new getObj('translationstatus').obj;
 		status.innerHTML = "Generating Translations<br /><img src=\"img/progressbar.gif?date=" + <?= time() ?> + "\">";
 	}
