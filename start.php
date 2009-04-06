@@ -273,12 +273,12 @@ if ($listsdata) {
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Help:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">Need Assistance? Try the comprehensive online help system by clicking the button to the right or by using the Help link in the top right of the page.</td>
-			<td class="bottomBorder"><?=button_bar(button('Go&nbsp;To&nbsp;Help', "window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"))?>
+			<td class="bottomBorder"><?=button_bar(button('Go To Help', "window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"))?>
 		</tr>
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">New User:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">This printable PDF training guide teaches product basics in an simple step-by-step format.</td>
-			<td class="bottomBorder"><?=button_bar(button('Training&nbsp;Guide', NULL, "help/getting_started_online.pdf"))?>
+			<td class="bottomBorder"><?=button_bar(button('Training Guide', NULL, "help/getting_started_online.pdf"))?>
 		</tr>
 	<?
 	if ($USER->authorize('createlist')) {
@@ -286,7 +286,7 @@ if ($listsdata) {
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">List:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">Ready to start? Before sending a job you'll need to create a list.</td>
-			<td class="bottomBorder"><?=button_bar(button('Create&nbsp;New&nbsp;List', NULL,"list.php?origin=start&id=new"))?>
+			<td class="bottomBorder"><?=button_bar(button('Create New List', NULL,"list.php?origin=start&id=new"))?>
 		</tr>
 	<?
 	}
