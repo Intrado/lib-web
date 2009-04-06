@@ -33,16 +33,15 @@ class User extends DBMappedObject {
 
 
 	function setPassword ($password) {
-		$password = DBSafe($password);
-		$query = "update user set password=password('$password') "
-				."where id=$this->id";
-		QuickUpdate($query);
+		$query = "update user set password=password(?) "
+				."where id=?";
+		QuickUpdate($query, false, array($password, $this->id));
 	}
 
 	function setPincode ($password) {
-		$query = "update user set pincode=password('$password')"
-				."where id=$this->id";
-		QuickUpdate($query);
+		$query = "update user set pincode=password(?)"
+				."where id=?";
+		QuickUpdate($query, false, array($password, $this->id));
 	}
 
 	function authorize () {
@@ -101,27 +100,23 @@ class User extends DBMappedObject {
 
 	//see if the login is used
 	function checkDuplicateLogin ($newlogin, $id) {
-		$newlogin = DBSafe($newlogin);
-
-		if (QuickQuery("select count(*) from user where id != " . (0 + $id) . " and login='$newlogin' and deleted = 0") > 0 )
+		if (QuickQuery("select count(*) from user where id != ? and login=? and deleted = 0", false, array($id, $newlogin)) > 0 )
 			return true;
 		else
 			return false;
 	}
 	//see if the accesscode is used
 	function checkDuplicateAccesscode ($newaccesscode, $id) {
-		$newaccesscode = DBSafe($newaccesscode);
-		if (QuickQuery("select count(*) from user where id != " . (0 + $id) . " and accesscode = '$newaccesscode'") > 0)
+		if (QuickQuery("select count(*) from user where id != ? and accesscode = ? and deleted = 0", false, array($id, $newaccesscode)) > 0)
 			return true;
 		else
 			return false;
 	}
 	//see if the Staff ID is used
 	function checkDuplicateStaffID ($newstaffid, $id) {
-		$newstaffid = DBSafe($newstaffid);
 		if ($newstaffid == "") return false;
 
-		if (QuickQuery("select count(*) from user where id != " . (0 + $id) . " and staffpkey = '$newstaffid' and deleted = 0") > 0 )
+		if (QuickQuery("select count(*) from user where id != ? and staffpkey = ? and deleted = 0", false, array($id, $newstaffid)) > 0 )
 			return true;
 		else
 			return false;

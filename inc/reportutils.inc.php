@@ -63,7 +63,7 @@ function select_metadata($tablename=null, $start=null, $fields){
 			foreach($fields as $field){
 				$fieldnum = $field->fieldnum;
 				if($saved == "false"){
-					$usersetting = DBFind("UserSetting", "from usersetting where name = '" . DBSafe($field->fieldnum) . "' and userid = '$USER->id'");
+					$usersetting = DBFind("UserSetting", "from usersetting where name = ? and userid = ?", false, array($field->fieldnum, $USER->id));
 					$_SESSION['report']['fields'][$fieldnum] = false;
 					if($usersetting!= null){
 						if($usersetting->value == "true"){

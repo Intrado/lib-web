@@ -45,8 +45,9 @@ function getNextAvailableAccessCode($currentCode, $userid) {
 	$result=1;
 	while($result !=0) {
 		$nextCode = rand(1000,999999);
-		$result = QuickQuery("select count(*) from user where accesscode = '$nextCode' and id != '$userid'
-								AND enabled = '1'");
+		$query = "select count(*) from user where accesscode = ? and id != ?
+								AND enabled = '1'";
+		$result = QuickQuery($query, false, array($nextCode, $userid));
 	}
 	return $nextCode;
 }
@@ -57,7 +58,7 @@ function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false, $c
 	if (isset($settings[$name]) && !$refresh)
 		return $settings[$name];
 
-	$value = QuickQuery("select value from setting where name = '" . DBSafe($name) . "'", $custdb);
+	$value = QuickQuery("select value from setting where name = ?", $custdb, array($name));
 
 	if($value === false) {
 		$value = $defaultvalue;
@@ -72,15 +73,13 @@ function getSystemSetting($name, $defaultvalue=false) {
 
 function setCustomerSystemSetting($name, $value, $custdb = false) {
 	$old = getCustomerSystemSetting($name, false, true, $custdb);
-	$name = DBSafe($name);
-	$value = DBSafe($value);
 	if($old === false && $value !== '' && $value !==NULL) {
-		QuickUpdate("insert into setting (name, value) values ('$name', '$value')", $custdb);
+		QuickUpdate("insert into setting (name, value) values (?, ?)", $custdb, array($name, $value));
 	} else {
 		if($value === '' || $value === NULL)
-			QuickUpdate("delete from setting where name = '$name'", $custdb);
+			QuickUpdate("delete from setting where name = ?", $custdb, array($name));
 		elseif($value != $old)
-			QuickUpdate("update setting set value = '$value' where name = '$name'", $custdb);
+			QuickUpdate("update setting set value = ? where name = ?", $custdb, array($value, $name));
 	}
 }
 
@@ -246,7 +245,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.75 $
+	    # $Revision: 1.76 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
@@ -442,8 +441,8 @@ function getDefaultContactPrefs(){
 //fetches contact preferences and builds multidimesional array
 // builds by type, sequence, jobtypeid
 function getContactPrefs($personid){
-	$query = "Select type, sequence, jobtypeid, enabled from contactpref where personid = '" . $personid . "'";
-	$res = Query($query);
+	$query = "Select type, sequence, jobtypeid, enabled from contactpref where personid = ?";
+	$res = Query($query, false, array($personid));
 	$contactprefs = array();
 	while($row = DBGetRow($res)){
 		if(!isset($contactprefs[$row[0]]))
@@ -497,7 +496,7 @@ function fetch_labels($type, $sequence, $refresh=false){
 	if(isset($labels[$type][$sequence]) && !$refresh)
 		return $labels[$type][$sequence];
 
-	$labels[$type][$sequence] = QuickQuery("select label from destlabel where type = '" . DBSafe($type) . "' and sequence = '" . DBSafe($sequence) . "'");
+	$labels[$type][$sequence] = QuickQuery("select label from destlabel where type = ? and sequence = ?", false, array($type, $sequence));
 	return $labels[$type][$sequence];
 }
 
@@ -594,11 +593,11 @@ function loadDisplaySettings(){
 						"colors" => array("_brandprimary" => "26477D"));
 	}
 	$userprefs = array();
-	$userprefs['_brandprimary'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandprimary'");
-	$userprefs['_brandtheme1'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme1'");
-	$userprefs['_brandtheme2'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme2'");
-	$userprefs['_brandratio'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandratio'");
-	$userprefs['_brandtheme'] = QuickQuery("select value from usersetting where userid=" . $USER->id . " and name = '_brandtheme'");
+	$userprefs['_brandprimary'] = QuickQuery("select value from usersetting where userid=? and name = '_brandprimary'", false, array($USER->id));
+	$userprefs['_brandtheme1'] = QuickQuery("select value from usersetting where userid=? and name = '_brandtheme1'", false, array($USER->id));
+	$userprefs['_brandtheme2'] = QuickQuery("select value from usersetting where userid=? and name = '_brandtheme2'", false, array($USER->id));
+	$userprefs['_brandratio'] = QuickQuery("select value from usersetting where userid=? and name = '_brandratio'", false, array($USER->id));
+	$userprefs['_brandtheme'] = QuickQuery("select value from usersetting where userid=? and name = '_brandtheme'", false, array($USER->id));
 
 	if($userprefs['_brandprimary']){
 		$_SESSION['colorscheme'] = $userprefs;

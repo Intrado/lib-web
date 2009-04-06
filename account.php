@@ -101,11 +101,11 @@ if(CheckFormSubmit($f,$s))
 		} elseif (User::checkDuplicateLogin($login, $USER->id)) {
 			error('This username already exists, please choose another');
 		} elseif (strlen($accesscode) > 0 && User::checkDuplicateAccesscode($accesscode, $USER->id)) {
-			$newcode = getNextAvailableAccessCode(DBSafe($accesscode), $USER->id);
+			$newcode = getNextAvailableAccessCode($accesscode, $USER->id);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif (empty($accesscode) && !ereg("^0*$", $pincode)) {
-			$newcode = getNextAvailableAccessCode(DBSafe($accesscode), $USER->id);
+			$newcode = getNextAvailableAccessCode($accesscode, $USER->id);
 			PutFormData($f, $s, 'accesscode', $newcode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
 			error('Your telephone user id number must be unique - one has been generated for you');
 		} elseif(!passwordcheck(GetFormData($f, $s, "password"))){

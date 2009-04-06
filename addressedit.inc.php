@@ -254,18 +254,20 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'saveanother') || CheckFormSubmi
 					if(!isset($types[$type])) continue;
 					foreach($types[$type] as $item){
 						foreach($jobtypes as $jobtype){
+							$jobtypeenabled = GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id);
 							if((!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
-											GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id))
+											$jobtypeenabled)
 								||
 								(!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
-											GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $defaultcontactprefs[$type][$item->sequence][$jobtype->id])){
+											$jobtypeenabled != $defaultcontactprefs[$type][$item->sequence][$jobtype->id])){
 									QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-												values ('" . $personid . "','" . $jobtype->id . "','$type','" . $item->sequence . "','"
-												. DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "')");
+												values (?, ?, ?, ?, ?)", false,
+												array($personid, $jobtype->id, $type, $item->sequence, $jobtypeenabled));
 								} else if(isset($contactprefs[$type][$item->sequence][$jobtype->id]) &&
-											GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id) != $contactprefs[$type][$item->sequence][$jobtype->id]){
-									QuickUpdate("update contactpref set enabled = '" . DBSafe(GetFormData($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id)) . "'
-													where personid = '" . $personid . "' and jobtypeid = '" . $jobtype->id . "' and sequence = '" . $item->sequence . "'");
+											$jobtypeenabled != $contactprefs[$type][$item->sequence][$jobtype->id]){
+									QuickUpdate("update contactpref set enabled = ?
+												where personid = ? and jobtypeid = ? and sequence = ?", false,
+												array($jobtypeenabled, $personid, $jobtype->id, $item->sequence));
 							}
 						}
 					}

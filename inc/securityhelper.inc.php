@@ -4,8 +4,8 @@
 
 function exists($table, $name) {
 	global $USER;
-	$name = DBSafe(strtolower($name));
-	return QuickQuery("select id from $table where userid = $USER->id and lower(name) = '$name'");
+	$lowername = strtolower($name);
+	return QuickQuery("select id from $table where userid = $USER->id and lower(name) = ?", false, array($lowername));
 }
 
 function userOwns ($type,$id) {
@@ -20,7 +20,7 @@ function userOwns ($type,$id) {
 		case "surveyquestionnaire":
 		case "voicereply":
 		case "message":
-			return QuickQuery("select count(*) from $type where userid='$USER->id' and id='$id'");
+			return QuickQuery("select count(*) from $type where userid=? and id=?", false, array($USER->id, $id));
 		default:
 			return false;
 	}
@@ -34,16 +34,14 @@ function customerOwns($type, $id) {
 	Function to see if a job is owned by a user with the same customerid as the job owner.
 */
 function customerOwnsJob($jobid) {
-	global $USER;
-	return QuickQuery("select count(*) from job, user where job.id = $jobid and user.id = job.userid");
+	return QuickQuery("select count(*) from job, user where job.id = ? and user.id = job.userid", false, array($jobid));
 }
 
 function setIfOwnsOrNew ($id,$name, $type, $checkcustomer = false) {
-	$newid = DBSafe($id);
 	if ($id == "new") {
 		$_SESSION[$name] = NULL;
 	} else {
-		if ($checkcustomer && customerOwns($type,$id)) {
+		if ($checkcustomer) {
 			$_SESSION[$name] = $newid;
 		} else if (userOwns($type,$newid)) {
 			$_SESSION[$name] = $newid;
