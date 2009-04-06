@@ -46,12 +46,12 @@ $scheme = getCustomerData($CUSTOMERURL);
 
 if ($reason == 'ok') {
 	// find the jobid
-	$query = "select jobid from surveyweb where code='" . DBSafe($code) . "'";
-	list($jobid) = QuickQueryRow($query);
+	$query = "select jobid from surveyweb where code=?";
+	list($jobid) = QuickQueryRow($query, false, false, array($code));
 
 	//find and load the questionnaire
-	$query = "select questionnaireid from job where id = $jobid";
-	list($questionnaireid) = QuickQueryRow($query);
+	$query = "select questionnaireid from job where id = ?";
+	list($questionnaireid) = QuickQueryRow($query, false, false, array($jobid));
 	$job = new Job($jobid);
 	$questionnaire = new SurveyQuestionnaire($questionnaireid);
 
@@ -90,10 +90,10 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 		$query = "insert into surveyresponse (jobid,questionnumber,answer,tally) values "
 				. implode(",",$resultsql) . " on duplicate key update tally=tally + values(tally)";
 		QuickUpdate($query);
-		$query = "update surveyweb set status='web', dateused=now(), loggedip='" . DBSafe($_SERVER["REMOTE_ADDR"]) . "'"
-				. ", resultdata='" . DBSafe(http_build_query($results,'','&')) . "'"
-				. " where code='" . DBSafe($code) . "'";
-		QuickUpdate($query);
+		$query = "update surveyweb set status='web', dateused=now(), loggedip=?"
+				. ", resultdata=?"
+				. " where code=?";
+		QuickUpdate($query, false, array($_SERVER["REMOTE_ADDR"], http_build_query($results,'','&'), $code));
 
 		//TODO  we should also try to cancel the phone call in case it has not already been sent. Just fail it out if it is queued.
 	}

@@ -42,9 +42,9 @@ function setIfOwnsOrNew ($id,$name, $type, $checkcustomer = false) {
 		$_SESSION[$name] = NULL;
 	} else {
 		if ($checkcustomer) {
-			$_SESSION[$name] = $newid;
-		} else if (userOwns($type,$newid)) {
-			$_SESSION[$name] = $newid;
+			$_SESSION[$name] = $id;
+		} else if (userOwns($type,$id)) {
+			$_SESSION[$name] = $id;
 		}
 	}
 }

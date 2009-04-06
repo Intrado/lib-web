@@ -133,16 +133,15 @@ class Message extends DBMappedObject {
 				switch ($type) {
 					case "A":
 						$part->sequence = $partcount++;
-						$audioname = DBSafe($token);
-						$query = "select id from audiofile where userid=$USER->id and name='$audioname' and deleted = 0";
+						$query = "select id from audiofile where userid=? and name=? and deleted = 0";
 
-						$audioid = QuickQuery($query);
+						$audioid = QuickQuery($query, false, array($USER->id, $token));
 						if ($audioid !== false) {
 							//find an audiofile with this name
 							$part->audiofileid = $audioid;
 							$parts[] = $part;
 						} else {
-							$errors[] = "Can't find audio file named '$audioname'";
+							$errors[] = "Can't find audio file named '$token'";
 						}
 
 						break;
@@ -154,10 +153,9 @@ class Message extends DBMappedObject {
 							$fieldname = $token;
 							$defvalue = "";
 						}
-						$fieldname = DBSafe($fieldname);
-						$query = "select fieldnum from fieldmap where name='$fieldname' and fieldnum like 'f%'";
+						$query = "select fieldnum from fieldmap where name=? and fieldnum like 'f%'";
 
-						$fieldnum = QuickQuery($query);
+						$fieldnum = QuickQuery($query, false, array($fieldname));
 
 						if ($fieldnum !== false) {
 							$part->fieldnum = $fieldnum;
@@ -171,7 +169,8 @@ class Message extends DBMappedObject {
 						break;
 					case "newlang":
 						if(isset($defaultvoice->gender)){
-							$currvoiceid = QuickQuery("select id from ttsvoice where language = '" . DBSafe(strtolower($token)) . "' and gender = '" . $defaultvoice->gender ."'");
+							$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",
+								false, array(strtolower($token), $defaultvoice->gender));
 							if($currvoiceid == false){
 								$errors[] = "Can't find that language: " . $token . ". Only English and Spanish are available";
 								$currvoiceid = null;

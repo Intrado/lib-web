@@ -30,16 +30,16 @@ class Import extends DBMappedObject {
 			$importid = $this->id;
 
 		QuickUpdate("call start_import($importid)");
-		QuickUpdate("update import set status='queued' where id=$importid and status != 'running'");
+		QuickUpdate("update import set status='queued' where id=? and status != 'running'", false, array($importid));
 	}
 
 
 	function upload ($data) {
-		return QuickUpdate("update import set data='" . DBSafe($data) . "', datamodifiedtime=now() where id=" . $this->id);
+		return QuickUpdate("update import set data=?, datamodifiedtime=now() where id=?", false, array($data, $this->id));
 	}
 
 	function download () {
-		return QuickQuery("select data from import where id=" . $this->id);
+		return QuickQuery("select data from import where id=?", false, array($this->id));
 	}
 
 }

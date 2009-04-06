@@ -11,7 +11,7 @@ class JobAutoReport extends ReportGenerator{
 		$rulesql = getRuleSql($this->params, "rp");
 
 		if(isset($params['jobid'])){
-			$this->params['joblist'] = DBSafe($params['jobid']);
+			$this->params['joblist'] = 0 + $params['jobid'];
 		} else {
 			if(isset($params['datestart']))
 				$datestart = date("Y-m-d", strtotime($params['datestart']));

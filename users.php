@@ -40,8 +40,8 @@ if (isset($_GET['resetpass'])) {
 	/*CSDELETEMARKER_END*/
 
 	if(!$maxreached){
-		$id = DBSafe($_GET['enable']);
-		QuickUpdate("update user set enabled = 1 where id = '$id'");
+		$id = 0 + $_GET['enable'];
+		QuickUpdate("update user set enabled = 1 where id = ?", false, array($id));
 
 		$usr = new User($id);
 		global $CUSTOMERURL;
@@ -51,20 +51,20 @@ if (isset($_GET['resetpass'])) {
 }
 
 if (isset($_GET['delete'])) {
-	$deleteid = DBSafe($_GET['delete']);
+	$deleteid = 0 + $_GET['delete'];
 	if (isset($_SESSION['userid']) && $_SESSION['userid'] == $deleteid)
 		$_SESSION['userid'] = NULL;
 
-	QuickUpdate("update user set enabled=0, deleted=1 where id='$deleteid'");
-	QuickUpdate("delete from schedule where id in (select scheduleid from job where status='repeating' and userid='$deleteid')");
-	QuickUpdate("delete from job where status='repeating' and userid='$deleteid'");
+	QuickUpdate("update user set enabled=0, deleted=1 where id=?", false, array($deleteid));
+	QuickUpdate("delete from schedule where id in (select scheduleid from job where status='repeating' and userid=?)", false, array($deleteid));
+	QuickUpdate("delete from job where status='repeating' and userid=?", false, array($deleteid));
 
 	redirect();
 }
 
 if (isset($_GET['disable'])) {
-	$id = DBSafe($_GET['disable']);
-	QuickUpdate("update user set enabled = 0 where id = '$id'");
+	$id = 0 + $_GET['disable'];
+	QuickUpdate("update user set enabled = 0 where id = ?", false, array($id));
 	redirect();
 }
 
@@ -79,8 +79,8 @@ if (isset($_GET['enable'])) {
 	/*CSDELETEMARKER_END*/
 
 	if(!$maxreached){
-		$id = DBSafe($_GET['enable']);
-		QuickUpdate("update user set enabled = 1 where id = '$id'");
+		$id = 0 + $_GET['enable'];
+		QuickUpdate("update user set enabled = 1 where id = ?", false, array($id));
 		redirect();
 	}
 }

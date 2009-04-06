@@ -150,12 +150,15 @@ class User extends DBMappedObject {
 		if ($old === false) {
 			$settings[$name] = $value;
 			if ($value)
-				QuickUpdate("insert into usersetting (userid,name,value) values ($this->id,'" . DBSafe($name) . "','" . DBSafe($value) . "')");
+				QuickUpdate("insert into usersetting (userid,name,value) values (?, ?, ?)",
+					false, array($this->id, $name, $value));
 		} else {
 			if ($value !== false && $value !== '' && $value !== null) {
-				QuickUpdate("update usersetting set value='" . DBSafe($value) . "' where userid=$this->id and name='" . DBSafe($name) . "'");
+				QuickUpdate("update usersetting set value=? where userid=? and name=?",
+					false, array($value, $this->id, $name));
 			} else {
-				QuickUpdate("delete from usersetting where userid=$this->id and name='" . DBSafe($name) . "'");
+				QuickUpdate("delete from usersetting where userid=? and name=?",
+					false, array($this->id, $name));
 
 			}
 		}

@@ -80,7 +80,7 @@ if($type == "subscription"){
 	$instance = new ReportInstance();
 	$job = new Job($id+0);
 	$options = array();
-	$count = QuickQuery("select sum(numcontacts) from reportperson where jobid = '" . DBSafe($id) . "'");
+	$count = QuickQuery("select sum(numcontacts) from reportperson where jobid = ?", false, array($id));
 	if($job->questionnaireid == null){
 		if($count > 33000){
 			$generator = new JobSummaryReport();
@@ -129,7 +129,7 @@ echo $result;
 // if success, and subscription, then update the lastrun field
 if("success" == $result) {
 	if ("subscription" == $type) {
-		QuickUpdate("update reportsubscription set lastrun=now() where id=" . DBSafe($id));
+		QuickUpdate("update reportsubscription set lastrun=now() where id=?", false, array($id));
 	}
 	exit(0);
 }

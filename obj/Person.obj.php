@@ -41,8 +41,8 @@ class Person extends DBMappedObject {
 	}
 
 	static function findPerson($custid,$key) {
-		$query = "select id from person where pkey='" . DBSafe($key) . "'  and not deleted";
-		$id = QuickQuery($query);
+		$query = "select id from person where pkey=? and not deleted";
+		$id = QuickQuery($query, false, array($key));
 
 		if ($id)
 			return new Person($id);
