@@ -27,6 +27,26 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 	return $hover;
 }
 
+function action_link ($title, $icon, $href = "#", $onclick = null) {
+	global $USER;
+	$actionlinkmode = $USER->getSetting("actionlinks","both");
+	$href = $href == null ? "#" : $href;
+	$onclick = $onclick == null ? "" : 'onclick="'.$onclick.'"';
+	$str = '<a href="'.$href.'" '.$onclick.' class="actionlink" title="'.escapehtml($title).'">';
+	if ($actionlinkmode == "both" || $actionlinkmode == "icons")
+		$str .= '<img src="img/icons/'.$icon.'.gif" alt="'.escapehtml($title).'">';
+	if ($actionlinkmode == "both" || $actionlinkmode == "text")
+		$str .= escapehtml($title);
+	$str .= '</a>';
+	return $str;
+}
+
+function action_links ($array) {
+	$links = is_array($array) ? $array : func_get_args();
+	return '<div class="actionlinks">' . implode("&nbsp;|&nbsp;",$links).'</div>';
+}
+
+
 function state($field, $set = false, $page = false) {
 	if (!isset($_SESSION['state']))
 		$_SESSION['state'] = array();

@@ -40,9 +40,11 @@ if (isset($_GET['delete'])) {
 
 
 function fmt_actions ($obj,$name) {
-	return '<a href="list.php?id=' . $obj->id . '">Edit</a>&nbsp;|'
-		. '&nbsp;<a href="showlist.php?id=' . $obj->id . '">Preview</a>&nbsp;|'
-		. '&nbsp;<a href="lists.php?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
+	return action_links (
+		action_link("Edit", "pencil", "list.php?id=$obj->id"),
+		action_link("Preview", "application_view_list", "showlist.php?id=$obj->id"),
+		action_link("Delete", "cross", "lists.php?delete=$obj->id", "return confirmDelete();")
+	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -524,3 +524,35 @@ div.scrollTableContainer {
 .voicereplyicon {
 	float: right;
 }
+
+
+
+.actionlink {
+	border: 0px; 
+	white-space: nowrap;
+	text-decoration: none;
+	zfont-size: 9pt;
+	zfont-weight: bold;
+	zfont-family: sans-serif;
+	cursor: pointer;
+	
+	color: <?=$primary?>;;
+}
+
+.actionlink:hover{
+	text-decoration: underline;
+}
+
+.actionlink img {
+	position: relative;
+	top: 0.2em;
+	border: 0px;
+	padding: 0px;
+	padding-left: 3px;
+	padding-right: 3px;
+	margin: 0px;
+}
+
+.actionlinks {
+	white-space: nowrap;
+}

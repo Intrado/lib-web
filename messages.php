@@ -63,7 +63,7 @@ $SIMPLEPHONEMESSAGES = QuickQueryList($query,true);
 
 function fmt_actions ($obj,$name) {
 	global $SIMPLEPHONEMESSAGES;
-
+/*
 	$advancedplaybtn = button("Play", "popup('previewmessage.php?close=1&id=$obj->id', 400, 500);");
 	$editbtn = '<a href="message' . $obj->type . '.php?id=' . $obj->id . '">Edit</a>';
 	$deletebtn = '<a href="messages.php?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
@@ -78,6 +78,23 @@ function fmt_actions ($obj,$name) {
 			return "$editbtn&nbsp;|&nbsp;$renamebtn&nbsp;|&nbsp;$deletebtn";
 		}
 	}
+*/
+	
+	$advancedplaybtn = action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$obj->id', 400, 500); return false;");
+	$editbtn = action_link("Edit", "pencil", 'message' . $obj->type . '.php?id=' . $obj->id);
+	$deletebtn = action_link("Delete", "cross", 'messages.php?delete=' . $obj->id, "return confirmDelete();");
+	$renamebtn = action_link("Rename", "textfield_rename", 'messagerename.php?id=' . $obj->id);
+	
+	if ($obj->type == "phone" && isset($SIMPLEPHONEMESSAGES[$obj->id])) {
+		return  action_links($advancedplaybtn,$renamebtn,$deletebtn);
+	} else {
+		if ($obj->type == "phone") {
+			return action_links($advancedplaybtn,$editbtn,$renamebtn,$deletebtn);
+		} else {
+			return action_links($editbtn,$renamebtn,$deletebtn);
+		}
+	}
+	
 }
 
 function fmt_phonetype ($obj,$name) {

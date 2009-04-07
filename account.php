@@ -213,6 +213,7 @@ if(CheckFormSubmit($f,$s))
 
 			}
 
+			$USER->setSetting("actionlinks", GetFormData($f,$s,"actionlinks"));
 
 			redirect("start.php");
 		}
@@ -297,6 +298,9 @@ if( $reloadform )
 		$themechecked = 1;
 	}
 	PutFormData($f, $s, "themeoverride", $themechecked, "bool", 0, 1);
+	
+	
+	PutFormData($f,$s,"actionlinks",$USER->getSetting("actionlinks","both"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -511,6 +515,10 @@ if ($USER->authorize('setcallerid')) {
 					<th valign="top" width="70" class="windowRowHeader" align="right" valign="top" style="padding-top: 6px;">Display Defaults:</th>
 					<td>
 						<table border="0" cellpadding="1" cellspacing="0">
+							<tr>
+								<td width="30%">Action links</td>
+								<td><? NewFormSelect($f, $s, "actionlinks", array("both" => "Icons and Text","icons" => "Icons Only", "text" => "Text Only")); ?></td>
+							</tr>
 							<tr>
 								<td width="30%">Customize Display</td>
 								<td><? NewFormItem($f, $s, "themeoverride", "checkbox", null, null, "id='themeoverride' onclick='disablethemes(this.checked)'"); ?></td>
