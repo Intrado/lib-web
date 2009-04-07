@@ -9,8 +9,9 @@ function DBDebug($query) {
 	if (!$SETTINGS['feature']['log_db_queries'])
 		return;
 
-	$temp = $_dbcon->query("select connection_id()");
-	$cid = $temp->fetchColumn();
+	$cid = 0;
+	if (isset($_SESSION['_dbcid']))
+		$cid = $_SESSION['_dbcid'];
 
 	if (!$initdblog) {
 		list($usec,$sec) = explode(" ", microtime());
@@ -36,7 +37,7 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 		$stmt = $dbcon->query($query);
 		if ($stmt == null) $queryok = false;
 	}
-		
+
 	if (!$queryok && $SETTINGS['feature']['log_db_errors']) {
 		if ($args)
 			$errInfo = $stmt->errorInfo();

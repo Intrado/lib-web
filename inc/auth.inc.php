@@ -213,6 +213,10 @@ function doDBConnect($result) {
 		$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
 		$_dbcon->query($setcharset);
 		
+		$temp = $_dbcon->query("select connection_id()");
+		$cid = $temp->fetchColumn();
+		$_SESSION['_dbcid'] = $cid;
+		
 		return true;
 	} catch (PDOException $e) {
 		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . $e->getMessage());
