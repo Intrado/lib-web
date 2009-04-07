@@ -16,6 +16,7 @@ form.newform {
 	float: left;
 	width: 75%; /* leave room for guide */
 	overflow: auto;
+	clear: both;
 }
 
 .helpicon {
