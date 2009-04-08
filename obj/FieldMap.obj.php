@@ -189,6 +189,29 @@ class FieldMap extends DBMappedObject {
 
 		return (in_array($name, $this->optionsarray));
 	}
+	
+	function addOption ($name) {
+		if ($this->isOptionEnabled($name))
+			return; // already added
+		
+		$this->options = $this->options . "," . $name;
+		$this->optionsarray = explode(",",$this->options);
+	}
+	
+	function removeOption ($name) {
+		if (!$this->isOptionEnabled($name))
+			return; // already removed
+		
+		$len = strlen($name);
+		$pos = strpos($this->options, $name);
+		if ($pos != 0) {
+			$pos = $pos -1; // the comma
+			$len = $len +1;
+		}
+			
+		$this->options = substr($this->options, 0, $pos) . substr($this->options, $pos+$len);
+		$this->optionsarray = explode(",",$this->options);
+	}
 }
 
 ?>
