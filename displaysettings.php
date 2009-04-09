@@ -108,7 +108,7 @@ startWindow('Defaults');
 			<td class="bottomBorder">
 				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 					<tr>
-						<td width="30%">Change Language</td>
+						<td width="30%"><?=_L("Default Language")?></td>
 						<td>
 							<?
 								NewFormItem($f, $s, '_locale', 'selectstart', null, null, "id='locale'");
