@@ -315,6 +315,9 @@ CREATE TABLE `authserver`.`webactivation` (
 `subscriberid` INT NULL ,
 `newusername` VARCHAR( 255 ) NULL ,
 `forgotpassword` TINYINT NOT NULL ,
-`options` TEXT NULL,
-PRIMARY KEY ( `activationtoken` ) ;
+`options` TEXT NULL ,
+PRIMARY KEY ( `activationtoken` )
+) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
 
