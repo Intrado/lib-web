@@ -55,7 +55,10 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 		}
 		list($usec,$sec) = explode(" ", microtime());
 		$temp = $dbcon->query("select connection_id()");
-		$cid = $temp->fetchColumn();
+
+		$cid = 0;
+		if ($temp != null)
+			$cid = $temp->fetchColumn();
 		$errorstr = "\n" . date("Y-m-d H:i:") . sprintf("%.3f",$usec + ($sec %60)) . " t:" . $cid . " e:" . $errInfo[0] . " " . $detail . " q:" . preg_replace('/\s\s+/', ' ',$query);
 
 		fwrite($logfp, $errorstr);
