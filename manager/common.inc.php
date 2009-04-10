@@ -8,6 +8,8 @@ $dsn = 'mysql:dbname='.$SETTINGS['db']['db'].';host='.$SETTINGS['db']['host'];
 global $_dbcon;
 try {
 	$_dbcon = new PDO($dsn, $SETTINGS['db']['user'], $SETTINGS['db']['pass']);
+	$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
+	$_dbcon->query($setcharset);
 } catch (PDOException $e) {
 	error_log("PDO Exception : ".$e->getMessage());
 }
