@@ -123,9 +123,9 @@ if (CheckFormSubmit($f,$s)){
 				createSMUserProfile($newdb);
 
 				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
-							('f01', 'First Name', 'searchable,text,firstname'),
-							('f02', 'Last Name', 'searchable,text,lastname'),
-							('f03', 'Language', 'searchable,multisearch,language'),
+							('f01', 'First Name', 'searchable,text,firstname,subscribe,dynamic'),
+							('f02', 'Last Name', 'searchable,text,lastname,subscribe,dynamic'),
+							('f03', 'Language', 'searchable,multisearch,language,subscribe,static'),
 							('c01', 'Staff ID', 'searchable,multisearch,staff')";
 				QuickUpdate($query, $newdb) or dieWithError("SQL:" . $query, $newdb);
 
