@@ -124,7 +124,7 @@ startWindow("Options", 'padding: 3px;');
 					}					
 					if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
 ?>
-						<tr><td><a href='dms.php'>Flex Appliance</a></td></tr>
+						<tr><td><a href='dms.php'><?=($IS_COMMSUITE)?_L("Telephony Settings"):_L("Flex Appliance")?></a></td></tr>
 <?
 					}
 ?>					
