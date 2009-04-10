@@ -49,7 +49,7 @@ $titles = array(	"name" => "Field Definition",
 					"Actions" => "Actions"
 					);
 
-$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and (options like '%text%' or options like '%multisearch%')", true);
+$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%')", true);
 
 $formdata = array(
     "addfield" => array(
