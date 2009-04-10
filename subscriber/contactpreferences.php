@@ -39,6 +39,13 @@ foreach ($subscribeFields as $fieldnum => $name) {
 }
 
 
+$fieldmaps = DBFindMany("FieldMap", "from fieldmap where options like '%subscribe%' order by fieldnum");
+
+
+
+
+
+/*
 $formdata = array(
     "firstname" => array(
         "label" => "First Name",
@@ -61,16 +68,65 @@ $formdata = array(
         "helpstep" => 1
     )
 );
+*/
+$formdata = array();
 
-foreach ($subscribeFields as $fieldnum => $name) {
+foreach ($fieldmaps as $fieldmap) {
+	$fieldnum = $fieldmap->fieldnum;
 	if ('f' == substr($fieldnum, 0, 1)) {
-		$formdata[$fieldnum] = array (
-    	    "label" => $name,
-        	"value" => $subscribeFieldValues[$fieldnum][$person->$fieldnum],
-        	"validators" => array(),
-        	"control" => array("RadioButton","values" => $subscribeFieldValues[$fieldnum]),
-        	"helpstep" => 2
-		);
+		if ($fieldmap->isOptionEnabled("static")) {
+			// static
+			
+			if ($fieldmap->isOptionEnabled("text")) {
+				// static text
+				
+			} else {
+				// static multi, subscriber must select one
+				
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+				if (count($values) > 0)
+					$formdata[$fieldnum] = array (
+    	    			"label" => $fieldmap->name,
+        				"value" => $person->$fieldnum,
+        				"validators" => array(),
+        				"control" => array("RadioButton","values" => $values),
+        				"helpstep" => 2
+					);
+			}
+		} else {
+			// dynamic
+			
+			if ($fieldmap->isOptionEnabled("text")) {
+				// dynamic text
+
+				$max = 255;
+				if ($fieldnum == $firstnameField || $fieldnum == $lastnameField)
+					$max = 50;
+				
+				$formdata[$fieldnum] = array (
+        			"label" => $fieldmap->name,
+        			"value" => $person->$fieldnum,
+        			"validators" => array(
+	            		array("ValRequired"),
+            			array("ValLength","min" => 1,"max" => $max)
+        			),
+        			"control" => array("TextField","maxlength" => $max),
+        			"helpstep" => 2
+    			);
+			} else {
+				// dynamic multi, subscriber must select one (data from imports)
+			
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
+				if (count($values) > 0)
+					$formdata[$fieldnum] = array (
+    	    			"label" => $fieldmap->name,
+        				"value" => $person->$fieldnum,
+        				"validators" => array(),
+        				"control" => array("RadioButton","values" => $values),
+        				"helpstep" => 2
+					);
+			}
+		}
 	} else { // Gfield
 		$gfield = substr($fieldnum, 1, 3);
 		$arr = QuickQueryList("select value, value from groupdata where personid=".$person->id." and fieldnum=".$gfield);
@@ -111,14 +167,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         
         //save data here
         
-        $person->$firstnameField = $postdata["firstname"];
-        $person->$lastnameField = $postdata["lastname"];
-        
-		foreach ($subscribeFields as $fieldnum => $name) {
+		foreach ($fieldmaps as $fieldmap) {
+			$fieldnum = $fieldmap->fieldnum;
 			$val = $postdata[$fieldnum];
-				
+			if ($val == null)
+				$val = "";
+
 			if ('f' == substr($fieldnum, 0, 1)) {
-				$person->$fieldnum = $subscribeFieldValues[$fieldnum][$val];
+				$person->$fieldnum = $val;
 			} else { // 'g'
 				$gfield = substr($fieldnum, 1, 3);
 				QuickUpdate("delete from groupdata where fieldnum=".$gfield." and personid=".$person->id);
