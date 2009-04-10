@@ -1366,3 +1366,7 @@ $$$
 
 ALTER TABLE `persondatavalues` ADD `editlock` TINYINT NOT NULL DEFAULT '0'
 $$$
+
+ALTER TABLE `subscriber` ADD `preferences` TEXT NOT NULL DEFAULT ''
+$$$
+
