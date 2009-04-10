@@ -29,7 +29,8 @@ $shard = 'shard1';
 $defaultbrand = 'SchoolMessenger';
 $logofile = @file_get_contents("../img/logo_small.gif");
 
-$timezones = array(	"US/Alaska",
+$timezones = array(	"America/Halifax",
+					"US/Alaska",
 					"US/Aleutian",
 					"US/Arizona",
 					"US/Central",
