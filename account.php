@@ -181,6 +181,8 @@ if(CheckFormSubmit($f,$s))
 
 			if (GetFormData($f, $s, "themeoverride")){
 				$USER->setSetting("_locale", GetFormData($f, $s, "_locale"));
+				$_SESSION['_locale'] = GetFormData($f, $s, "_locale");
+				
 				$USER->setSetting("_brandtheme", GetFormData($f, $s, "_brandtheme"));
 				$USER->setSetting("_brandtheme1", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme1"]);
 				$USER->setSetting("_brandtheme2", $COLORSCHEMES[GetFormData($f, $s, "_brandtheme")]["_brandtheme2"]);
