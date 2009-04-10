@@ -3,7 +3,9 @@
 function help($title, $extrahtml = NULL, $style = NULL) {
 	$theme = getBrandTheme();
 	global $LOCALE;
-	$hoverfolder = isset($LOCALE)?"locale/$LOCALE/hover/$title.txt":"hover/$title.txt";
+	$hoverfolder = "locale/$LOCALE/hover/$title.txt";
+	if (!file_exists($hoverfolder))
+		$hoverfolder = "locale/en_US/hover/$title.txt";
 	$contents = @file_get_contents($hoverfolder);
 	//$contents = nl2br(preg_replace('/($|\\r\\n\\r\\n)[^\\r\\n:]+?:/', '<span class="hovertitle">\\0</span>', $contents ));
 
