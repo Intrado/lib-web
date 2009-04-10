@@ -35,7 +35,8 @@ while($row = DBGetRow($result)){
 // index 0 is dmid
 // index 3 is telco type
 function fmt_dm_actions($row, $index){
-	$url = '<a href="dmschedule.php?dmid=' . $row[0] . '">Resource&nbsp;Schedule</a>';
+	$url = '<a href="dmstatus.php?dmid=' . $row[0] . '">Status</a>';
+	$url .= '&nbsp;|&nbsp;<a href="dmschedule.php?dmid=' . $row[0] . '">Resource&nbsp;Schedule</a>';
 	$url .= '&nbsp;|&nbsp;<a href="dmsettings.php?dmid=' . $row[0] . '">Route&nbsp;Plan</a>';
 	if($row[3] == "Jtapi"){
 		$url .= '&nbsp;|&nbsp;<a href="calleridroute.php?dmid=' . $row[0] . '">Caller&nbsp;ID&nbsp;Routes</a>';
@@ -44,7 +45,7 @@ function fmt_dm_actions($row, $index){
 	return $url;
 }
 
-function fmt_dm_status($row, $index){
+function fmt_dm_comment($row, $index){
 	if($row[2]){
 		return "Unsubmitted changes detected, requires reset";
 	} else {
@@ -53,11 +54,11 @@ function fmt_dm_status($row, $index){
 }
 
 $titles = array(1 => "Name",
-				2 => "Status",
+				2 => "Comment",
 				"actions" => "Actions");
 
 $formatters = array("actions" => "fmt_dm_actions",
-					2 => "fmt_dm_status");
+					2 => "fmt_dm_comment");
 
 $PAGE="admin:settings";
 $TITLE="Flex Appliance Manager";
