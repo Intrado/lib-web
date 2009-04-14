@@ -23,7 +23,8 @@ $NAVTREE = array (
 	array("Messages","start.php",NULL,$MAINTAB=="messages",array()),
 	array("Contact Info", "contactpreferences.php", array("personal","notifications"), $MAINTAB=="contacts", array(
 			array("Personal","contactpreferences.php","personal",$SUBTAB=="personal"),
-			array("Notification","notificationpreferences.php","notifications",$SUBTAB=="notifications")
+			array("Preferences","notificationpreferences.php","notificationprefs",$SUBTAB=="notificationprefs"),
+			array("Notification","notificationdestinations.php","notificationdests",$SUBTAB=="notificationdests")
 		)),
 	array("My Account", "account.php", array("accountpref", "changeemail", "changepass"), $MAINTAB=="account", array(
 			array("Preferences","account.php","accountpref",$SUBTAB=="preferences"),

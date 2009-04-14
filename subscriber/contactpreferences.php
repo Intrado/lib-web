@@ -42,33 +42,6 @@ foreach ($subscribeFields as $fieldnum => $name) {
 $fieldmaps = DBFindMany("FieldMap", "from fieldmap where options like '%subscribe%' order by fieldnum");
 
 
-
-
-
-/*
-$formdata = array(
-    "firstname" => array(
-        "label" => "First Name",
-        "value" => $_SESSION['subscriber.firstname'],
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 1,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    ),
-    "lastname" => array(
-        "label" => "Last Name",
-        "value" => $_SESSION['subscriber.lastname'],
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 1,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    )
-);
-*/
 $formdata = array();
 
 foreach ($fieldmaps as $fieldmap) {
@@ -128,15 +101,25 @@ foreach ($fieldmaps as $fieldmap) {
 			}
 		}
 	} else { // Gfield
+		if ($fieldmap->isOptionEnabled("static")) {
+				// static multi, subscriber must select one
+				
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+		} else {
+				// dynamic multi, subscriber must select one (data from imports)
+			
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
+		}
 		$gfield = substr($fieldnum, 1, 3);
 		$arr = QuickQueryList("select value, value from groupdata where personid=".$person->id." and fieldnum=".$gfield);
-		$formdata[$fieldnum] = array (
-    	    "label" => $name,
-        	"value" => $arr,
-        	"validators" => array(),
-        	"control" => array("MultiCheckbox", "values" => $subscribeFieldValues[$fieldnum]),
-        	"helpstep" => 3
-		);
+				if (count($values) > 0)
+					$formdata[$fieldnum] = array (
+    	    			"label" => $fieldmap->name,
+        				"value" => $arr,
+        				"validators" => array(),
+        				"control" => array("MultiCheckbox","values" => $values),
+        				"helpstep" => 3
+					);
 	}
 }
 
