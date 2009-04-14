@@ -49,15 +49,30 @@ foreach ($systemstats as $key => $value) {
 	}
 }
 
-$resourcedata = array();
+if (isset($_SESSION['completeresourcedata']))
+	$completeresourcedata = $_SESSION['completeresourcedata'];
+else
+	$completeresourcedata = array();
+
+$activeresourcedata = array();
 foreach ($status as $row) {
 	$row = (array) $row;
 	if ($row['name'] == 'system') continue;
-	$resourcedata[] = $row;
+	if ($row['rstatus'] == 'RESULT')
+		$completeresourcedata[$row['name']] = $row;
+	else
+		$activeresourcedata[] = $row;
 }
-$resourcetitles = array(	"name" => "Name",
-							"rtype" => "Type",
+$_SESSION['completeresourcedata'] = $completeresourcedata;
+
+$activeresourcetitles = array(	"name" => "ID",
+							"starttime" => "Start Time",
 							"rstatus" => "State",
+							"rtype" => "Type"
+						);
+
+
+$completeresourcetitles = array( "name" => "ID",
 							"starttime" => "Start Time",
 							"result" => "Result"
 						);
@@ -91,36 +106,37 @@ endWindow();
 */
 
 ?>
-<table width="100%"><tr><td>
+<table width="100%"><tr><td valign="top">
 <?
 startWindow("System Statistics");
 include_once("dmsysstats.inc.php");
 endWindow();
-
-startWindow("Completed Tasks");
-?>
-<table width="100%">
-	<tr><td width="20%">Answered: </td><td><?= "24" ?></td></tr>
-	<tr><td>Machine: </td><td><?= "11" ?></td></tr>
-	<tr><td>Busy: </td><td><?= "2" ?></td></tr>
-	<tr><td>No Answer: </td><td><?= "5" ?></td></tr>
-	<tr><td>Bad Number: </td><td><?= "1" ?></td></tr>
-	<tr><td>Failed: </td><td><?= "0" ?></td></tr>
-</table>
-<?
-endWindow();
 ?>
 </td><td valign="top">
 <?
-startWindow("Active Resources", 'padding: 3px;');
+startWindow("Active Resources");
 ?>
 <table>
 <?
 
-if (count($status) > 1) {
-	showTable($resourcedata, $resourcetitles);
+if (count($activeresourcedata) > 1) {
+	showTable($activeresourcedata, $activeresourcetitles);
 } else {
 	echo "There are no active resources at this time.  The system is idle.<br>";
+}
+
+?>
+</table>
+<?
+endWindow();
+
+startWindow("Completed Resources");
+?>
+<table>
+<?
+
+if (count($completeresourcedata) > 1) {
+	showTable($completeresourcedata, $completeresourcetitles);
 }
 
 ?>
