@@ -307,7 +307,7 @@ function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false) {
 	$many = array();
 
 	$query = "select " . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
-	if ($result = Query($query, $args)) {
+	if ($result = Query($query, false, $args)) {
 		while ($row = DBGetRow($result)) {
 			$newobj = new $classname();
 
