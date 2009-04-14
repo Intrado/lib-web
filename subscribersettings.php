@@ -40,7 +40,6 @@ if (isset($_GET['delete'])) {
 $firstnameField = FieldMap::getFirstNameField();
 $lastnameField = FieldMap::getLastNameField();
 
-
 $data = DBFindMany("FieldMap","from fieldmap where options like '%subscribe%'");
 
 $titles = array(	"name" => "Field Definition",
@@ -49,7 +48,7 @@ $titles = array(	"name" => "Field Definition",
 					"Actions" => "Actions"
 					);
 
-$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%')", true);
+$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%')", true);
 
 $formdata = array(
     "addfield" => array(
@@ -156,7 +155,11 @@ showObjects($data, $titles, array("valtype" => "fmt_valtype", "values" => "fmt_v
 endWindow();
 
 startWindow('Add Field', null, true);
-echo $form->render();
+if (count($addfields) > 0) {
+	echo $form->render();
+} else {
+	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
+}
 endWindow();
 
 include_once("navbottom.inc.php");
