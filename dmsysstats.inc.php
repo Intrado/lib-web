@@ -1,7 +1,28 @@
 <b>General</b>
 <table width="100%">
 	<tr><td width="20%">Active State: </td><td><? if ("true" == $systemstats['dmenabled']) echo "Enabled"; else echo "<font color=\"red\">Disabled</font>"  ?></td></tr>
-	<tr><td>Current System Time: </td><td><?= $systemstats['currenttime'] ?></td></tr>
+	<tr><td>System Startup Time: </td><td><?= date("F jS, Y h:i a", $systemstats['startuptime'] / 1000) ?></td></tr>
+	<tr><td>Current System Time: </td><td><?
+		$currenttime = time();
+		$syscurrenttime = $systemstats['currenttime'] / 1000;
+		
+		// if more than five minutes, then we probably lost connection
+		if (abs($currenttime - $syscurrenttime) > (5*60)) {
+			echo "<font color=\"red\">" . date("F jS, Y h:i a", $syscurrenttime) . "  (stale data, lost connection)</font>";
+		} else {
+			echo date("F jS, Y h:i a", $syscurrenttime);
+		}
+	?></td></tr>
+	<tr><td>System Has Been Running: </td><td><?
+		$diff = floor(($systemstats['currenttime'] - $systemstats['startuptime']) / 60000); // minutes running
+		$days = floor($diff / (60*24));
+		$remain = $diff % (60*24);
+		$hours = floor($remain / 60);
+		$mins = $remain % 60;
+		
+		echo $days . " days " . $hours . " hours " . $mins . " minutes";
+		
+		?></td></tr>
 	<tr><td>Total Clock Resets: </td><td><?= $systemstats['clockresetcount'] ?></td></tr>
 </table>
 
@@ -10,8 +31,9 @@ foreach ($dispatchers as $dname => $dispatcher) {
 ?>
 <b>Communication Activity <?= $dname ?></b>
 <table width="100%">
-	<tr><td width="20%">Failures: </td><td><?= $dispatcher['comerr'] ?></td></tr>
-	<tr><td>Timeouts: </td><td><?= $dispatcher['comtimeout'] ?></td></tr>
+	<tr><td width="20%">Connection Failures: </td><td><?= $dispatcher['comerr'] ?></td></tr>
+	<tr><td>Connection Timeouts: </td><td><?= $dispatcher['comtimeout'] ?></td></tr>
+	<tr><td>Read Timeouts: </td><td><?= $dispatcher['comreadtimeout'] ?></td></tr>
 </table>
 <?
 }
@@ -34,11 +56,12 @@ foreach ($dispatchers as $dname => $dispatcher) {
 	<tr><td>Machine: </td><td><?= $systemstats['M'] ?></td></tr>
 	<tr><td>Busy: </td><td><?= $systemstats['B'] ?></td></tr>
 	<tr><td>No Answer: </td><td><?= $systemstats['N'] ?></td></tr>
-	<tr><td>Bad Number: </td><td><?= $systemstats['X'] ?></td></tr>
-	<tr><td>Failed: </td><td><?= $systemstats['F'] ?></td></tr>
-	<tr><td>Not Attempted: </td><td><?= $systemstats['failures'] ?></td></tr>
-	<tr><td>Total Dial Time: </td><td><?= $systemstats['dialtime'] ?></td></tr>
-	<tr><td>Total Play Time: </td><td><?= $systemstats['playtime'] ?></td></tr>
+	<tr><td>Disconnect: </td><td><?= $systemstats['X'] /* bad number */?></td></tr>
+	<tr><td>Unknown: </td><td><?= $systemstats['F'] /* failures include trunk busy */ ?></td></tr>
+	<tr><td>Trunk Busy: </td><td><?= $systemstats['TB'] ?></td></tr>
+	<tr><td>Other: </td><td><?= $systemstats['failures'] /* not attempted resource failed before dial */ ?></td></tr>
+	<tr><td>Total Ring Time: </td><td><?= $systemstats['dialtime'] ?></td></tr>
+	<tr><td>Total Call Time: </td><td><?= $systemstats['billtime'] ?></td></tr>
 </table>
 
 <b>Cache Information</b>
@@ -54,35 +77,35 @@ foreach ($dispatchers as $dname => $dispatcher) {
 
 <b>Download Audio Content</b>
 <table width="100%">
-	<tr><td width="20%">Total Fetches: </td><td><?= $systemstats['getcontentapicount'] ?></td></tr>
+	<tr><td width="20%">Total Downloads: </td><td><?= $systemstats['getcontentapicount'] ?></td></tr>
 	<tr><td>Total Time: </td><td><?= $systemstats['getcontentapitime'] ?></td></tr>
-	<tr><td>Average Time: </td><td><? if ($systemstats['getcontentapicount'] == 0) echo "0"; else echo ($systemstats['getcontentapitime'] / $systemstats['contentapicount']) ?></td></tr>
+	<tr><td>Average Time: </td><td><? if ($systemstats['getcontentapicount'] == 0) echo "0"; else echo sprintf("%.2f", ($systemstats['getcontentapitime'] / $systemstats['contentapicount'])) ?></td></tr>
 </table>
 
 <b>Upload Audio Content</b>
 <table width="100%">
-	<tr><td width="20%">Total Fetches: </td><td><?= $systemstats['putcontentapicount'] ?></td></tr>
+	<tr><td width="20%">Total Uploads: </td><td><?= $systemstats['putcontentapicount'] ?></td></tr>
 	<tr><td>Total Time: </td><td><?= $systemstats['putcontentapitime'] ?></td></tr>
-	<tr><td>Average Time: </td><td><? if ($systemstats['putcontentapicount'] == 0) echo "0"; else echo ($systemstats['putcontentapitime'] / $systemstats['contentapicount']) ?></td></tr>
+	<tr><td>Average Time: </td><td><? if ($systemstats['putcontentapicount'] == 0) echo "0"; else echo sprintf("%.2f", ($systemstats['putcontentapitime'] / $systemstats['contentapicount'])) ?></td></tr>
 </table>
 
 <b>Text-to-Speech Content</b>
 <table width="100%">
-	<tr><td width="20%">Total Fetches: </td><td><?= $systemstats['ttsapicount'] ?></td></tr>
+	<tr><td width="20%">Total Downloads: </td><td><?= $systemstats['ttsapicount'] ?></td></tr>
 	<tr><td>Total Time: </td><td><?= $systemstats['ttsapitime'] ?></td></tr>
-	<tr><td>Average Time: </td><td><? if ($systemstats['ttsapicount'] == 0) echo "0"; else echo ($systemstats['ttsapitime'] / $systemstats['ttsapicount']) ?></td></tr>
+	<tr><td>Average Time: </td><td><? if ($systemstats['ttsapicount'] == 0) echo "0"; else echo sprintf("%.2f", ($systemstats['ttsapitime'] / $systemstats['ttsapicount'])) ?></td></tr>
 </table>
 
 <b>Continue Task Request</b>
 <table width="100%">
-	<tr><td width="20%">Total Fetches: </td><td><?= $systemstats['continueapicount'] ?></td></tr>
+	<tr><td width="20%">Total Requests: </td><td><?= $systemstats['continueapicount'] ?></td></tr>
 	<tr><td>Total Time: </td><td><?= $systemstats['continueapitime'] ?></td></tr>
-	<tr><td>Average Time: </td><td><? if ($systemstats['continueapicount'] == 0) echo "0"; else echo ($systemstats['continueapitime'] / $systemstats['ttsapicount']) ?></td></tr>
+	<tr><td>Average Time: </td><td><? if ($systemstats['continueapicount'] == 0) echo "0"; else echo sprintf("%.2f", ($systemstats['continueapitime'] / $systemstats['ttsapicount'])) ?></td></tr>
 </table>
 
 <b>System Details</b>
 <table width="100%">
-	<tr><td width="20%" valign="top">Uptime: </td><td><?= nl2br($systemstats['uptime']) ?></td></tr>
-	<tr><td valign="top">Disk Usage: </td><td><?= nl2br($systemstats['diskspace']) ?></td></tr>
-	<tr><td valign="top">Memory Usage: </td><td><?= nl2br($systemstats['memory']) ?></td></tr>
+	<tr><td width="20%" valign="top">Uptime: </td><td><?= "<pre>" . nl2br($systemstats['uptime']) . "</pre>" ?></td></tr>
+	<tr><td valign="top">Disk Usage: </td><td><?= "<pre>" . nl2br($systemstats['diskspace']) . "</pre>" ?></td></tr>
+	<tr><td valign="top">Memory Usage: </td><td><?= "<pre>" . nl2br($systemstats['memory']) . "</pre>" ?></td></tr>
 </table>

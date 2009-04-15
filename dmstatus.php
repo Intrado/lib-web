@@ -47,6 +47,10 @@ foreach ($systemstats as $key => $value) {
 		$dispatcher = substr($key, 11);
 		$dispatchers[$dispatcher]['comtimeout'] = $value;
 	}
+	if (strpos($key, "comreadtimeout") === 0) {
+		$dispatcher = substr($key, 15);
+		$dispatchers[$dispatcher]['comreadtimeout'] = $value;
+	}
 }
 
 if (isset($_SESSION['completeresourcedata']))
@@ -60,7 +64,7 @@ foreach ($status as $row) {
 	if ($row['name'] == 'system') continue;
 	if ($row['rstatus'] == 'RESULT')
 		$completeresourcedata[$row['name']] = $row;
-	else
+	else if (!($row['rtype'] == 'INBOUND' && $row['rstatus'] == 'IDLE'))
 		$activeresourcedata[] = $row;
 }
 $_SESSION['completeresourcedata'] = $completeresourcedata;
