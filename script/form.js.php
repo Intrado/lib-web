@@ -39,7 +39,7 @@ function form_get_value (form,targetname) {
 	
 	try {
 		value = $F(targetname) || "";
-		return value;
+		return value.strip();
 	} catch (e) {
 		
 		//prototype doesn't handle radio boxes or multicheckboxes so well, so try to handle them here
