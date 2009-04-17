@@ -35,6 +35,10 @@ $dmname = QuickQuery("select name from custdm where dmid=?", false, array($dmid)
 $status = json_decode(QuickQuery("select poststatus from custdm where dmid=?", false, array($dmid)));
 //var_dump($status);
 
+if ($status == NULL) {
+
+} else {
+
 $systemstats = (array) $status[0];
 $dispatchers = array();
 
@@ -53,12 +57,9 @@ foreach ($systemstats as $key => $value) {
 	}
 }
 
-if (isset($_SESSION['completeresourcedata']))
-	$completeresourcedata = $_SESSION['completeresourcedata'];
-else
-	$completeresourcedata = array();
-
 $activeresourcedata = array();
+$completeresourcedata = array();
+
 foreach ($status as $row) {
 	$row = (array) $row;
 	if ($row['name'] == 'system') continue;
@@ -67,7 +68,6 @@ foreach ($status as $row) {
 	else if (!($row['rtype'] == 'INBOUND' && $row['rstatus'] == 'IDLE'))
 		$activeresourcedata[] = $row;
 }
-$_SESSION['completeresourcedata'] = $completeresourcedata;
 
 $activeresourcetitles = array(	"name" => "ID",
 							"starttime" => "Start Time",
@@ -75,12 +75,11 @@ $activeresourcetitles = array(	"name" => "ID",
 							"rtype" => "Type"
 						);
 
-
 $completeresourcetitles = array( "name" => "ID",
 							"starttime" => "Start Time",
 							"result" => "Result"
 						);
-
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,24 +90,11 @@ $PAGE="admin:settings";
 $TITLE="Flex Appliance: ".escapehtml($dmname);
 
 include_once("nav.inc.php");
-buttons(submit("dmstatus", "section", 'Done'));
+buttons(icon_button("Done","tick",null,"dms.php"));
 
-/*
-startWindow("Raw System Stats");
-?>
-<table>
-<?
-foreach ($systemstats as $key => $value) {
-?>
-	<tr><td><?= $key ?></td><td><?= $value ?></td></tr>
-<?
-}
-?>
-</table>
-<?
-endWindow();
-*/
-
+if ($status == NULL) {
+	echo "There is no status available at this time.";
+} else {
 ?>
 <table width="100%"><tr><td valign="top">
 <?
@@ -150,6 +136,7 @@ endWindow();
 ?>
 </td></tr></table>
 <?
+} // end else status is not null
 buttons();
 include_once("navbottom.inc.php");
 ?>
