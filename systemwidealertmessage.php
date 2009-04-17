@@ -7,12 +7,11 @@ include_once("inc/securityhelper.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/Setting.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("inc/themes.inc.php");
+
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -25,75 +24,62 @@ if (!$USER->authorize('managesystem')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-/****************** main message section ******************/
+$formdata = array(
+	"alert" => array(
+		"label" => _L("Systemwide Alert Message:"),
+		"value" => getSystemSetting('alertmessage'),
+		"validators" => array(
+			array("ValLength","min" => 0,"max" => 255)
+		),
+		"control" => array("TextArea","maxlength" => 255),
+		"helpstep" => 1
+	)
+);
 
-$f = "systemwidealertmessage";
-$s = "main";
-$reloadform = 0;
+$helpsteps = array (
+	_L("The systemwide alert message appears at the top of every page for every user in a big red border."),
+	_L("Enter the text to display, or delete all text to remove the alert.")
+);
 
-if(CheckFormSubmit($f,$s))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
+$buttons = array(submit_button(_L("Submit"),"submit","tick"),
+				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
-		//do check
-		if( CheckFormSection($f, $s) )
-		{
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
-			//submit changes
-			setSystemSetting('alertmessage', trim(GetFormData($f, $s, 'alertmessage')));
+$form = new Form("alertform", $formdata, $helpsteps, $buttons);
+$form->ajaxsubmit = true;
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response        
+
+        //save data here
+		setSystemSetting('alertmessage', $postdata['alert']);
+
+		if ($ajax)
+			$form->sendTo("settings.php");
+		else
 			redirect("settings.php");
-		}
 	}
-} else {
-	$reloadform = 1;
 }
 
-if( $reloadform )
-{
-	ClearFormData($f);
-
-	//check for new setting name/desc from settings.php
-	PutFormData($f, $s, "alertmessage", getSystemSetting('alertmessage'), 'text',0,255);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Systemwide Alert Message';
+$TITLE = _L('Systemwide Alert Message');
 
 include_once("nav.inc.php");
 
-NewForm($f);
-buttons(submit($f, $s, 'Save'));
-startWindow('Settings');
-?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
-			<td class="bottomBorder">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-					<tr>
-						<td>Systemwide Alert Message<? print help('Settings_SystemwideAlert', NULL, "small"); ?></td>
-						<td><? NewFormItem($f, $s, 'alertmessage', 'textarea',44,4);  ?></td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-<?
+startWindow(_L("Settings"));
+echo $form->render();
 endWindow();
-buttons();
-EndForm();
+
 include_once("navbottom.inc.php");
 ?>
