@@ -193,7 +193,7 @@ function QuickQueryList ($query, $pair = false, $dbconnect = false, $args = fals
 	return $list;
 }
 
-function DBGetRow ($result, $assoc = false, $args = false) {
+function DBGetRow ($result, $assoc = false) {
 	if ($assoc)
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 	else
