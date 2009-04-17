@@ -88,6 +88,8 @@ function fmt_actions($row, $index) {
 		$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="img/s-priorities.png" border=0></a>&nbsp;';
 	if($row[11] != "asp" && $MANAGERUSER->authorized("editdm"))
 		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="img/s-rdms.png" border=0></a>';
+	if ($MANAGERUSER->authorized("editpriorities"))
+		$actions .= '<a href="advancedactions.php?id=' . $row[0] . '" title="Advanced"><img src="img/s-advanced.png" border=0></a>&nbsp;';
 
 	return $actions;
 }
