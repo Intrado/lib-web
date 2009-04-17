@@ -7,6 +7,15 @@ img {
 	margin: 3px;
 }
 
+span {
+	float: left;
+	position: relative;
+	display: block;
+	font-size: 6pt;
+	width: 22px;
+	overflow: auto;
+}
+
 .clear {
 	clear: both;
 	height: 1px;
@@ -104,7 +113,7 @@ foreach ($folders as $folder) {
 	$count = 0;
 	foreach ($icons as $entry) {
 		
-		echo '<img Title="'.$entry.'" src="'.$folder.DIRECTORY_SEPARATOR.$entry.'">';
+		echo '<img Title="'.$entry.'" src="'.$folder.DIRECTORY_SEPARATOR.$entry.'">'; //<span>'.$entry.'</span>
 		
 		if (++$count % 20 == 0)
 			echo '<div class="clear"></div>';
