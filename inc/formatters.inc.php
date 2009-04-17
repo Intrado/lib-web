@@ -18,6 +18,13 @@ function fmt_date ($row,$index) {
 	return "&nbsp;";
 }
 
+function fmt_number ($row,$index) {
+	if (isset($row[$index])) {
+		return number_format($row[$index]);
+	}
+	return "&nbsp;";
+}
+
 function fmt_phone ($row,$index) {
 	return Phone::format($row[$index]);
 }
