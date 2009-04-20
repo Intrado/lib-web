@@ -26,7 +26,7 @@ if (!$USER->authorize('managesystem')) {
 
 $formdata = array(
 	"alert" => array(
-		"label" => _L("Systemwide Alert Message:"),
+		"label" => _L("Systemwide Alert Message"),
 		"value" => getSystemSetting('alertmessage'),
 		"validators" => array(
 			array("ValLength","min" => 0,"max" => 255)
@@ -41,7 +41,7 @@ $helpsteps = array (
 	_L("Enter the text to display, or delete all text to remove the alert.")
 );
 
-$buttons = array(submit_button(_L("Submit"),"submit","tick"),
+$buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
 $form = new Form("alertform", $formdata, $helpsteps, $buttons);
