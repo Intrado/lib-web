@@ -1,5 +1,4 @@
 <?
-require_once("../inc/db.inc.php");
 
 function genpassword($digits = 15) {
 	$passwd = "";
@@ -264,6 +263,86 @@ function dieWithError($error, $pdo = false) {
 		$dberr = $e[2];
 	}
 	die ($error . " : " . $dberr);
+}
+
+
+$SHARDINFO = false;
+$CUSTOMERINFO = false;
+
+/* 
+ * Loads all shard and customer info, use when iterating over all/several customers.
+ * Only loads enabled customers.
+ */
+function loadManagerConnectionData () {
+	global $SHARDINFO, $CUSTOMERINFO, $_dbcon;
+	$SHARDINFO = array();
+	$CUSTOMERINFO = array();
+	
+	$res = Query("select id, dbhost, dbusername, dbpassword, name from shard order by id",$_dbcon);
+	while($row = DBGetRow($res,true)){
+		$SHARDINFO[$row['id']] = $row;
+	}
+	
+	$query = "select id, oem, oemid, nsid, shardid, urlcomponent, inboundnumber, notes, enabled from customer where enabled order by id";
+	$res = Query($query,$_dbcon);
+	while ($row = DBGetRow($res,true)) {
+		$CUSTOMERINFO[$row['id']] = $row;
+	}
+}
+
+/* 
+ * Connects to or uses an already esablished connection to the customer's shard, then switches to that DB. 
+ * Only use if you need to iterate over all/several customers. 
+ * Requires that loadManagerConnectionData() has already been called.
+ */
+function getPooledCustomerConnection ($cid,$readonly=false) {
+	global $SHARDINFO, $CUSTOMERINFO, $_dbcon, $SETTINGS;
+	$cid = 0 + $cid; //just in case
+		
+	if (!$SHARDINFO)
+		loadManagerConnectionData();
+	
+	$sid = $CUSTOMERINFO[$cid]['shardid'];
+
+	if ($readonly && !isset($SETTINGS["db"]["readonly"][$sid-1])) {
+		error_log("WARNING: readonly connection requested, but not found in config");
+		$readonly = false;
+	}
+	
+	$dbtype = $readonly ? "readonly" : "dbcon";
+	//see if we need to connect
+	if (!isset($SHARDINFO[$sid][$dbtype])) {
+		$host = $readonly ? $SETTINGS["db"]["readonly"][$sid-1] : $SHARDINFO[$sid]["dbhost"];
+		$dsn = "mysql:dbname=c_$cid;host=$host";
+		error_log("New PDO connection to $dsn");
+		$SHARDINFO[$sid][$dbtype] = new PDO($dsn, $SHARDINFO[$sid]["dbusername"], $SHARDINFO[$sid]["dbpassword"]);
+	}
+	//select this customer's db
+	$SHARDINFO[$sid][$dbtype]->query("use c_$cid");
+	
+	return $SHARDINFO[$sid][$dbtype];
+}
+
+/*
+ * Gets a connection to a single customer's DB. 
+ * Use when you need to connect to a single customer (eg customer edit or a customer specific page)
+ * DO NOT use when you need to iterate over several customers, use getPooledCustomerConnection() instead.
+ */
+function getSingleCustomerConnection ($cid,$readonly=false) {
+	global $_dbcon, $SETTINGS;
+	$cid = 0 + $cid; //just in case
+	
+	$connectinfo = QuickQueryRow("select s.id, s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = ?",true,$_dbcon,array($cid));
+
+	if ($readonly && !isset($SETTINGS["db"]["readonly"][$connectinfo["id"]-1])) {
+		error_log("WARNING: readonly connection requested, but not found in config");
+		$readonly = false;
+	}
+
+	$host = $readonly ? $SETTINGS["db"]["readonly"][$connectinfo["id"]-1] : $connectinfo["dbhost"];
+	
+	$dsn = "mysql:dbname=c_$cid;host=$host";
+	return new PDO($dsn, $connectinfo["dbusername"], $connectinfo["dbpassword"]);
 }
 
 ?>

@@ -25,6 +25,16 @@ class AspAdminUser extends DBMappedObject{
 			$this->permsarray = explode(",",$this->permissions);
 		return in_array($auth,$this->permsarray) ? true : false;
 	}
+	function authorizedAny($auths) {
+		if ($this->permsarray === false)
+			$this->permsarray = explode(",",$this->permissions);
+			
+		foreach ($auths as $auth)
+			if (in_array($auth,$this->permsarray))
+				return true;
+		
+		return false;
+	}
 	
 	function preference($pref) {
 		if ($this->prefsarray === false)

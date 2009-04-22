@@ -8,6 +8,11 @@ else
 <html>
 <head>
 <meta http-equiv="refresh" content="1800;url=index.php?logout=1&reason=timeout">
+<style media="print">
+.noprint {
+	display: none;
+}
+</style>
 </head>
 <body>
 <image src="manager.png">
@@ -62,7 +67,7 @@ table {
 
 </style>
 
-<table border=0 cellpadding=5 class=imagelink>
+<table border=0 cellpadding=5 class="imagelink noprint">
 	<tr>
 		<td><a href="customers.php" title="Customer&nbsp;List"><img src="img/custlist.png" border=0><div>Customer&nbsp;List</div></a></td>
 	<? if ($MANAGERUSER->authorized("imports")) { ?>
@@ -81,14 +86,17 @@ table {
 		<td><a href="customerdms.php?clear" title="Flex Appliances"><img src="img/rdms.png" border=0><div>Flex</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("systemdm")) { ?>
-		<td><a href="systemdms.php" title="System DMs"><img src="img/rdms.png" border=0><div>System&nbsp;DMs</div></a></td>
+		<td><a href="systemdms.php" title="System DMs"><img src="img/sysdm.png" border=0><div>System&nbsp;DMs</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("customercontacts")) { ?>
 		<td><a href="customercontactsearch.php" title="Contact Search"><img src="img/search.png" border=0><div>Contact&nbsp;Search</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("smsblock")) { ?>
-		<td><a href="smsblock.php" title="SMS Block"><img src="img/s-smsblock.png" border=0><div>SMS&nbsp;Block</div></a></td>
+		<td><a href="smsblock.php" title="SMS Block"><img src="img/smsblock.png" border=0><div>SMS&nbsp;Block</div></a></td>
 	<? } ?>
+	<? if ($MANAGERUSER->authorizedAny(array("billablecalls","passwordcheck","bouncedemailsearch"))) { ?>
+		<td><a href="advancedactions.php" title="Advanced Actions"><img src="img/config.png" border=0><div>Advanced</div></a></td>
+	<? } ?>	
 		<td><a href="./?logout=1&reason=request" title="Log&nbsp;Out"><img src="img/logout.png" border=0><div>Log&nbsp;Out</div></a></td>
 	</tr>
 </table>

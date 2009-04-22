@@ -23,8 +23,14 @@ $roles = array(
 	"smsblock" => "Manage SMS blocked numbers",
 	"activejobs" => "View active jobs",
 	"editdm" => "Edit Flex Appliances",
-	"systemdm" => "Manage System DMs",
-	"superuser" => "Edit Manager Roles (this page)"
+	
+	"ffield2gfield" => "ADVANCED - F field to G field migration",
+	"billablecalls" => "ADVANCED - Billable call information",
+	"bouncedemailsearch" => "ADVANCED - Bounced email search",
+	"passwordcheck" => "ADVANCED - Check for bad/similar passwords",
+
+	"systemdm" => "SUPER - Manage System DMs",
+	"superuser" => "SUPER - Edit Manager Roles (this page)"
 );
 
 

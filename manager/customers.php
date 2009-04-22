@@ -87,9 +87,9 @@ function fmt_actions($row, $index) {
 	if ($MANAGERUSER->authorized("editpriorities"))
 		$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="img/s-priorities.png" border=0></a>&nbsp;';
 	if($row[11] != "asp" && $MANAGERUSER->authorized("editdm"))
-		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="img/s-rdms.png" border=0></a>';
-	if ($MANAGERUSER->authorized("editpriorities"))
-		$actions .= '<a href="advancedactions.php?id=' . $row[0] . '" title="Advanced"><img src="img/s-advanced.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="img/s-rdms.png" border=0></a>&nbsp;';
+	if ($MANAGERUSER->authorizedAny(array("ffield2gfield","billablecalls")))
+		$actions .= '<a href="advancedcustomeractions.php?cid=' . $row[0] . '" title="Advanced Actions"><img src="img/s-config.png" border=0></a>&nbsp;';
 
 	return $actions;
 }
