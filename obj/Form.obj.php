@@ -123,9 +123,9 @@ class Form {
 			
 			$formclass = $control[0];
 			$item = new $formclass($name, $control);
-			
+
 			if ($formclass == "HiddenField") {
-				$str.= $item->render($this,$value);
+				$str.= $item->render($this,$itemdata['value']);
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 				continue;
 			}
@@ -142,21 +142,22 @@ class Form {
 			
 			$n = $this->name."_".$item->name;
 			$l = $itemdata['label'];
-			
+
 			if ($formclass == "FormHtml") {
 				$str.= '
 				<div>
 					<div class="prop"></div>
 					<label>'.$l.'</label>
-					<div class="formhtml">'.$item->render($this,$value).'</div>
+					<div class="formhtml">'.$item->render($this,'').'</div>
 					<div class="clear"></div>
 				</div>
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
+				$value = $itemdata['value'];
+				$requiredfields = isset($itemdata['requires']) ? $this->getFieldValues($itemdata['requires']) : array();
 				$t = $this->tindex++;
 				$i = "img/pixel.gif";
-				$value = $itemdata['value'];
 				$style = "";
 				$msg = "";
 			
@@ -170,14 +171,14 @@ class Form {
 				}
 				
 				//if not posted and required and value is blank
-				if (!$this->getSubmit() && $isrequired && ((is_array($value) && !count($value)) || mb_strlen($value) == 0)) {
+				if (!$this->getSubmit() && $isrequired && ((is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0))) {
 					//show required highlight
 					$i = "img/icons/error.gif";
 					$style = 'style="background: rgb(255,255,220);"' ;
 					$msg = "Required";
 				} else {
 					//otherwise, validate and show normally
-					$valresult = Validator::validate_item($this->formdata,$name,$value);
+					$valresult = Validator::validate_item($this->formdata,$name,$value,$requiredfields);
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
 						$style = 'style="background: rgb(225,255,225);"' ;
@@ -255,7 +256,8 @@ class Form {
 		foreach ($this->formdata as $name => $data) {
 			if (!isset($data['validators']))
 				continue;
-			$itemresult = Validator::validate_item($this->formdata,$name,$data['value']);
+			$requiredfields = isset($data['requires']) ? $this->getFieldValues($data['requires']) : array();
+			$itemresult = Validator::validate_item($this->formdata,$name,$data['value'],$requiredfields);
 			if ($itemresult === true) {
 				$this->validationresults[] = array("name" => $name,"vres" => true);
 			} else {
@@ -278,6 +280,16 @@ class Form {
 		foreach ($this->formdata as $name => $data) {
 			if (isset($data['value']))
 				$res[$name] = $data['value'];
+		}
+		return $res;
+	}
+	
+	//gets assoc array for just provided field names
+	function getFieldValues ($names) {
+		$res = array();
+		foreach ($names as $name) {
+			if (isset($this->formdata[$name]['value']))
+				$res[$name] = $this->formdata[$name]['value'];
 		}
 		return $res;
 	}
