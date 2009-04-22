@@ -6,12 +6,12 @@ host="localhost:8088"
 path="/xmlrpc"
 
 [feature]
-is_commsuite=true
+is_commsuite=false
 is_ldap=false
 has_ssl=true
 force_ssl=false
 log_dir="/usr/commsuite/logs/"
-log_db_errors=false
+log_db_errors=true
 log_db_queries=false
 log_dmapi=false
 has_print=false
@@ -23,13 +23,8 @@ warn_earliest=
 warn_latest=
 
 [content]
-tts="localhost,8123,/tts"
-;tts="10.25.25.16,8080,/tts/ttsserver"
+tts="localhost,8080,/tts/ttsserver"
 
-externalcontent=false
-; format is "host,port,path;host2,port2,path2;..." reserved chars= ';' and ','
-get="localhost,80,/foobar/xxx-get.php"
-put="localhost,80,/foobar/xxx-put.php"
 
 [translation]
 apikey="ABQIAAAAsHD6V_IqbLuYzx5sdmQ-TxQg47NEwCDk0BAJwz_RiAOR27B3BhRP2lCFovHb2pUntvaPoLjZtfK4gQ"
