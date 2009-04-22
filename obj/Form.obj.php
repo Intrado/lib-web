@@ -72,7 +72,7 @@ class Form {
 			//we need to set all checkboxes to false becasue if they are unchecked we won't see any 
 			//POST data for them if they are checked, the POST data will reset them to true
 			foreach ($this->formdata as $name => $data) {
-				if (isset($data['control']) && $data['control'][0] == "CheckBox") {
+				if (isset($data['control']) && strtolower($data['control'][0]) == "checkbox") {
 					$this->formdata[$name]['value'] = false;
 				}
 			}
