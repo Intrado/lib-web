@@ -1,5 +1,9 @@
 <?
 
+if (get_magic_quotes_gpc()) {
+	error_log("ERROR: Disable magic quotes: 'magic_quotes_gpc = Off'");
+	exit("ERROR: Disable magic quotes: 'magic_quotes_gpc = Off'");
+}
 
 /* use the 3 column fieldset layout, each form item on a line by itself*/
 class Form {
