@@ -184,7 +184,23 @@ function add($name, $file = 'add') {
 }
 
 
-
+function newform_time_select($inc = NULL, $start = NULL, $stop = NULL, $customtime = "") {
+	$values = array();
+	if (!$inc) $inc = 5;
+	if (!$start) $start = '12:00 am';
+	if (!$stop) $stop = '11:55 pm';
+	$current = strtotime($start);
+	$end = strtotime($stop);
+	$customtime = strtotime($customtime);
+	while($current <= $end) {
+		$values[date('g:i a', $current)] = date('g:i a', $current);
+		if( ($customtime > $current) && ($customtime < ($current+($inc *60))) ) {
+			$values[date('g:i a', $customtime)] = date('g:i a', $customtime);
+		}
+		$current += $inc *60;
+	}
+	return $values;
+}
 
 
 function time_select($form, $section, $field, $none = NULL, $inc = NULL, $start = NULL, $stop = NULL, $extraHtml = NULL) {
