@@ -225,6 +225,113 @@ class ValEmail extends Validator {
 	}
 }
 
+//
+// requires inc/utils.inc.php checkemails()
+//
+class ValEmailList extends Validator {
+	
+	function validate ($value, $args) {
+		
+		if ($bademaillist = checkemails($value)) {
+			$errmsg = "$this->label has invalid emails ";
+			foreach ($bademaillist as $bademail) {
+				$errmsg .= $bademail . ";";
+			}
+			return $errmsg;
+		}
+
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				var isbad = false;
+				var reg = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+				var emailsplit = value.split(";");
+				for (i=0; i<emailsplit.length; i++) {
+					var e = emailsplit[i];
+					if (!reg.test(e)) {
+						isbad = true;
+					}
+				}
+				if (isbad)
+					return label + " has invalid emails"; // TODO nice to return the bad email text
+
+				return true;
+			}';
+	}
+}
+
+//
+// requires obj/Phone.obj.php validate()
+//
+class ValPhone extends Validator {
+	
+	function validate ($value, $args) {
+		if ($err = Phone::validate($value)) {
+			$errmsg = "$this->label is invalid.  ";
+			foreach ($err as $e) {
+				$errmsg .= $e . " ";
+			}
+			return $errmsg;
+		}
+
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				var phone = value.replace("[^0-9]*","");
+				if (phone.length == 10) {
+			var areacode = phone.substring(0, 3);
+			var prefix = phone.substring(3, 6);
+			
+			// based on North American Numbering Plan
+			// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
+
+			if ((phone.charAt(0) == "0" || phone.charAt(0) == "1") || // areacode cannot start with 0 or 1
+				(phone.charAt(3) == "0" || phone.charAt(3) == "1") || // prefix cannot start with 0 or 1
+				(phone.charAt(1) == "1" && phone.charAt(2) == "1") || // areacode cannot be N11
+				(phone.charAt(4) == "1" && phone.charAt(5) == "1") || // prefix cannot be N11
+				("555" == areacode) || // areacode cannot be 555
+				("555" == prefix)    // prefix cannot be 555
+				) {
+				// check special case N11 prefix with toll-free area codes
+				// en.wikipedia.org/wiki/Toll-free_telephone_number
+				if ((phone.charAt(4) == "1" && phone.charAt(5) == "1") && (
+					("800" == areacode) ||
+					("888" == areacode) ||
+					("877" == areacode) ||
+					("866" == areacode) ||
+					("855" == areacode) ||
+					("844" == areacode) ||
+					("833" == areacode) ||
+					("822" == areacode) ||
+					("880" == areacode) ||
+					("881" == areacode) ||
+					("882" == areacode) ||
+					("883" == areacode) ||
+					("884" == areacode) ||
+					("885" == areacode) ||
+					("886" == areacode) ||
+					("887" == areacode) ||
+					("888" == areacode) ||
+					("889" == areacode)
+					)) {
+					return true; // OK special case
+				}
+				
+				return label + " seems to be invalid.";
+			}
+				}
+				return label + " is invalid. The phone number must be exactly 10 digits long (including area code).\nYou do not need to include a 1 for long distance.";
+			}';
+	}
+}
+
+
 /*
  * must set args[field] to the same as the formdata['requires'] field
  */
@@ -247,7 +354,6 @@ class ValFieldComfirmation extends Validator {
 
 //alpha
 //alphanumeric
-//phone
 //phoneeasycall ??
 //matches array
 
