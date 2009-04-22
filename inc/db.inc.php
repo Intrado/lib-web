@@ -76,10 +76,8 @@ function DBClose () {
 
 function DBSafe ($string, $dbconnect=false) {
 	global $_dbcon;
-	if ($dbconnect)
-		$connection = $dbconnect;
-	else
-		$connection = $_dbcon;
+	$connection = $dbconnect ? $dbconnect : $_dbcon;
+
 	$quoted = $connection->quote($string);
 	// remove quotes from start/end, we just need the escaped string
 	return substr($quoted, 1, strlen($quoted)-2);
@@ -88,20 +86,17 @@ function DBSafe ($string, $dbconnect=false) {
 function Query ($query, $dbconnect=false, $args=false) {
 	DBDebug($query);
 	global $_dbcon;
-	if ($dbconnect)
-		return DBQueryWrapper($dbconnect, $query, $args);
-	else
-		return DBQueryWrapper($_dbcon, $query, $args);
+	$connection = $dbconnect ? $dbconnect : $_dbcon;
+
+	return DBQueryWrapper($connection, $query, $args);
 }
 
 function QuickQuery ($query, $dbconnect=false, $args=false) {
 	DBDebug($query);
 	global $_dbcon;
 	$val = false;
-	if ($dbconnect)
-		$connection = $dbconnect;
-	else
-		$connection = $_dbcon;
+	$connection = $dbconnect ? $dbconnect : $_dbcon;
+
 	if ($result = DBQueryWrapper($connection, $query, $args)) {
 		if ($row = $result->fetch(PDO::FETCH_NUM)) {
 			$val = $row[0];
@@ -115,10 +110,8 @@ function QuickQuery ($query, $dbconnect=false, $args=false) {
 function QuickUpdate ($query, $dbconnect=false, $args=false) {
 	DBDebug($query);
 	global $_dbcon;
-	if ($dbconnect)
-		$connection = $dbconnect;
-	else
-		$connection = $_dbcon;
+	$connection = $dbconnect ? $dbconnect : $_dbcon;
+
 	if ($res = DBQueryWrapper($connection, $query, $args)) {
 		return $res->rowCount();
 	}
@@ -128,19 +121,11 @@ function QuickUpdate ($query, $dbconnect=false, $args=false) {
 function QuickQueryRow ($query, $assoc=false, $dbconnect = false, $args=false) {
 	DBDebug($query);
 	global $_dbcon;
-	if ($dbconnect)
-		$connection = $dbconnect;
-	else
-		$connection = $_dbcon;
-	$row = false;
-	if ($result = DBQueryWrapper($connection, $query, $args)) {
-		if ($assoc)
-			$row = $result->fetch(PDO::FETCH_ASSOC);
-		else
-			$row = $result->fetch(PDO::FETCH_NUM);
+	$connection = $dbconnect ? $dbconnect : $_dbcon;
 
-		$result = null;
-	}
+	$row = false;
+	if ($result = DBQueryWrapper($connection, $query, $args))
+		$row = $result->fetch($assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
 
 	return $row;
 }
@@ -148,26 +133,12 @@ function QuickQueryRow ($query, $assoc=false, $dbconnect = false, $args=false) {
 function QuickQueryMultiRow ($query, $assoc = false, $dbconnect = false, $args = false) {
 	DBDebug($query);
 	global $_dbcon;
+	$connection = $dbconnect ? $dbconnect : $_dbcon;
+
 	$list = array();
-	$i = 0;
-	if ($dbconnect)
-		$connection = $dbconnect;
-	else
-		$connection = $_dbcon;
-	$row = false;
 	if ($result = DBQueryWrapper($connection, $query, $args)) {
-		if ($assoc)
-			$row = $result->fetch(PDO::FETCH_ASSOC);
-		else
-			$row = $result->fetch(PDO::FETCH_NUM);
-		while ($row) {
-			$list[$i++] = $row;
-			if ($assoc)
-				$row = $result->fetch(PDO::FETCH_ASSOC);
-			else
-				$row = $result->fetch(PDO::FETCH_NUM);
-		}
-		$result = null;
+		while ($row = $result->fetch($assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM))
+			$list[] = $row;
 	}
 
 	return $list;
@@ -178,10 +149,8 @@ function QuickQueryList ($query, $pair = false, $dbconnect = false, $args = fals
 	global $_dbcon;
 	$list = array();
 
-	if ($dbconnect)
-		$connection = $dbconnect;
-	else
-		$connection = $_dbcon;
+	$connection = $dbconnect ? $dbconnect : $_dbcon;
+
 	if ($result = DBQueryWrapper($connection, $query, $args)) {
 		while ($row = $result->fetch(PDO::FETCH_NUM)) {
 			if ($pair)
@@ -194,11 +163,7 @@ function QuickQueryList ($query, $pair = false, $dbconnect = false, $args = fals
 }
 
 function DBGetRow ($result, $assoc = false) {
-	if ($assoc)
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-	else
-		$row = $result->fetch(PDO::FETCH_NUM);
-	return $row;
+	return $result->fetch($assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
 }
 
 function DBConnect($host, $user, $pass, $database) {
