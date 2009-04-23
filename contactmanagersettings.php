@@ -107,11 +107,17 @@ $form->ajaxsubmit = true;
 $form->handleRequest();
 
 
+$datachange = false;
+$errors = false;
+
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    if (($errors = $form->validate()) === false) { //checks all of the items in this form
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-        $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response        
         
         //save data here
         
@@ -159,6 +165,21 @@ $PAGE = "admin:settings";
 $TITLE = _L('Contact Manager Settings');
 
 include_once("nav.inc.php");
+
+?>
+<script type="text/javascript">
+
+<? if ($datachange) { ?>
+
+alert("data has changed on this form!");
+window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+
+<? } ?>
+
+</script>
+<?
+
+
 echo $form->render();
 include_once("navbottom.inc.php");
 ?>
