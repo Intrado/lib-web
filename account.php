@@ -25,15 +25,52 @@ if (!$USER->authorize('managemyaccount')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Validators
+////////////////////////////////////////////////////////////////////////////////
+
+class ValLogin extends Validator {
+    var $onlyserverside = true;
+    
+    function validate ($value, $args) {
+		global $USER;
+		if (User::checkDuplicateLogin($value, $USER->id))
+			return "$this->label already exists, please choose another.";
+		else
+			return true;
+    }
+}
+
+class ValPassword extends Validator {
+    var $onlyserverside = true;
+    
+    function validate ($value, $args, $requiredvalues) {
+		global $USER;
+		if ($USER->ldap) return true;
+
+		if ($detail = validateNewPassword($requiredvalues['login'], $value, $requiredvalues['firstname'], $requiredvalues['lastname']))
+			return "$this->label is invalid.  ".$detail;
+
+		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
+		if ($checkpassword && ($detail = isNotComplexPass($value)) && !ereg("^0*$", $value))
+			return "$this->label is invalid.  ".$detail;
+
+		return true;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
 $readonly = $USER->importid != null;
 
-$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
 $usernamelength = getSystemSetting("usernamelength", 5);
-$passwordlength = getSystemSetting("passwordlength", 5);
+if ($USER->ldap)
+	$usernamelength = 1;
 
+$passwordlength = getSystemSetting("passwordlength", 5);
+$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
 if ($checkpassword) {
 	if ($passwordlength < 6) {
 		$passwordlength = 6;
@@ -76,7 +113,8 @@ if ($readonly) {
         "value" => $USER->login,
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => $usernamelength,"max" => 20)
+            array("ValLength","min" => $usernamelength,"max" => 20),
+            array("ValLogin")
             // TODO unique in system
         ),
         "control" => array("TextField","maxlength" => 20),
@@ -88,8 +126,9 @@ if ($readonly) {
         "label" => "Password",
         "value" => $pass,
         "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => $passwordlength,"max" => 20)
+            array("ValRequired"),	// TODO not if ldap
+            array("ValLength","min" => $passwordlength,"max" => 20),
+            array("ValPassword")
             // TODO not like first/last/login
         ),
         "requires" => array("firstname", "lastname", "login"),
@@ -100,7 +139,7 @@ if ($readonly) {
         "label" => "Confirm Password",
         "value" => $pass,
         "validators" => array(
-            array("ValRequired"),
+            array("ValRequired"),	// TODO not if ldap
             array("ValLength","min" => $passwordlength,"max" => 20),
             array("ValFieldComfirmation", "field" => "password")
         ),
@@ -328,7 +367,7 @@ $helpsteps = array (
 );
 
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
-				icon_button(_L("Cancel"),"cross",null,"settings.php"));
+				icon_button(_L("Cancel"),"cross",null,"start.php"));
 
 $form = new Form("account", $formdata, $helpsteps, $buttons);
 $form->ajaxsubmit = true;
@@ -337,12 +376,17 @@ $form->ajaxsubmit = true;
 //or merge in related post data
 $form->handleRequest();
 
+$datachange = false;
+$errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    if (($errors = $form->validate()) === false) { //checks all of the items in this form
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-        $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response        
         
         //save data here
         
@@ -421,6 +465,21 @@ $PAGE = "start:account";
 $TITLE = "Account Information: " . escapehtml($USER->firstname) . " " . escapehtml($USER->lastname);
 
 include_once("nav.inc.php");
+
+?>
+<script type="text/javascript">
+
+<? Validator::load_validators(array("ValLogin", "ValPassword")); ?>
+
+<? if ($datachange) { ?>
+
+alert("data has changed on this form!");
+window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+
+<? } ?>
+
+</script>
+<?
 
 ?><script src="script/picker.js"></script><?
 
