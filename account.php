@@ -141,7 +141,7 @@ if ($readonly) {
         "validators" => array(
             array("ValRequired"),	// TODO not if ldap
             array("ValLength","min" => $passwordlength,"max" => 20),
-            array("ValFieldComfirmation", "field" => "password")
+            array("ValFieldConfirmation", "field" => "password")
         ),
         "requires" => array("password"),
         "control" => array("PasswordField","maxlength" => 20),
@@ -175,7 +175,7 @@ if ($readonly) {
         "value" => $pin,
         "validators" => array(
         	array("ValNumeric"),
-        	array("ValFieldComfirmation", "field" => "pin")
+        	array("ValFieldConfirmation", "field" => "pin")
         ),
         "requires" => array("pin"),
         "control" => array("PasswordField","maxlength" => 20),

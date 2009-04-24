@@ -335,7 +335,7 @@ class ValPhone extends Validator {
 /*
  * must set args[field] to the same as the formdata['requires'] field
  */
-class ValFieldComfirmation extends Validator {	
+class ValFieldConfirmation extends Validator {	
 	function validate ($value, $args, $requiredvalues) {	
 		if ($requiredvalues[$args['field']] != $value)
 			return "$this->label does not match!";	
