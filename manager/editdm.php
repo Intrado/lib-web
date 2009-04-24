@@ -128,7 +128,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 							('" . DBSafe($dmid) . "', 'telco_type', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'),
 							('" . DBSafe($dmid) . "', 'dm_enabled', '" . DBSafe(GetFormData($f, $s, 'dm_enabled')) . "'),
 							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "'),
-							('" . DBSafe($dmid) . "', 'testweightedresults','" . DBSafe(GetFormData($f, $s, 'testweightedresults'))."')
+							('" . DBSafe($dmid) . "', 'testweightedresults','" . DBSafe(GetFormData($f, $s, 'testweightedresults'))."'),
+							('" . DBSafe($dmid) . "', 'disable_congestion_throttle', '" . DBSafe(GetFormData($f, $s, 'disable_congestion_throttle')) . "')
 							");
 				$newcustomerid = GetFormData($f, $s, "customerid") +0;
 				QuickUpdate("update dm set
@@ -192,6 +193,9 @@ if( $reloadform )
 	PutFormData($f, $s, "dm_enabled", getDMSetting($dmid, "dm_enabled"), "bool", 0, 1);
 
 	PutFormData($f, $s, "test_has_delays", getDMSetting($dmid, "test_has_delays"), "bool", 0, 1);
+
+	// throttle capacity on trunkbusy call result
+	PutFormData($f, $s, "disable_congestion_throttle", getDMSetting($dmid, "disable_congestion_throttle"), "bool", 0, 1);
 
 	PutFormData($f, $s, "testweightedresults", getDMSetting($dmid, "testweightedresults"), "text");
 }
@@ -276,6 +280,10 @@ if ($dmType == 'customer') {?>
 	<tr>
 		<td><div id='hasdelay1' style='display:none'>Test Has Delays: </span></td>
 		<td><div id='hasdelay2' style='display:none'><? NewFormItem($f, $s, "test_has_delays", "checkbox", null, null, "id='test_has_delays'"); ?></span></td>
+	</tr>
+	<tr>
+		<td>Disable Congestion Throttle: </td>
+		<td><? NewFormItem($f, $s, "disable_congestion_throttle", "checkbox", null, null, "id='disable_congestion_throttle'"); ?></td>
 	</tr>
 
 	<tr>
