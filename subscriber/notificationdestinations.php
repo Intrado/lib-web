@@ -65,8 +65,8 @@ $helpsteps = array (
 	"blah blah blah..."
 );
 
-$buttons = array(submit_button("Submit","submit","tick"),
-                icon_button("Cancel","cross",null,"notificationdestinations.php"));
+$buttons = array(submit_button(_L("Save"),"submit","tick"),
+                icon_button(_L("Cancel"),"cross",null,"notificationdestinations.php"));
                 
 $form = new Form("notificationdestinations",$formdata,$helpsteps,$buttons);
 $form->ajaxsubmit = true;
@@ -102,9 +102,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:notificationdests";
-$TITLE = "Notification Destinations";
+$TITLE = _L("Notification Destinations");
 
 require_once("nav.inc.php");
+
+echo "<font color=\"red\">TODO DO NOT TEST YET, will have wizard to add and confirm phone, etc</font><BR><BR>";
 
 startWindow(_L('Destinations'));
 echo $form->render();

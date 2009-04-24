@@ -18,30 +18,35 @@ $error_badusername = _L("That username is already in use");
 
 $formdata = array(
     "newusername1" => array(
-        "label" => "New Email Address: ",
+        "label" => _L("New Email Address"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 255),
             array("ValEmail")
         ),
         "control" => array("TextField","maxlength" => 255),
         "helpstep" => 1
     ),
     "newusername2" => array(
-        "label" => "Confirm New Email: ",
+        "label" => _L("Confirm New Email"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValEmail")
+            array("ValLength","min" => 3,"max" => 255),
+            array("ValEmail"),
+            array("ValFieldConfirmation", "field" => "newusername1")
         ),
+        "requires" => array("newusername1"),
         "control" => array("TextField","maxlength" => 255),
         "helpstep" => 1
     ),
     "password" => array(
-        "label" => "Password: ",
+        "label" => _L("Password"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
+            array("ValLength","min" => 5,"max" => 50),
             array("ValSubscriberPassword")
         ),
         "control" => array("PasswordField","maxlength" => 50),
@@ -54,7 +59,7 @@ $helpsteps = array (
 	"Enter a new email address.  Then enter your account password."
 );
 
-$buttons = array(submit_button("Submit","submit","tick"),
+$buttons = array(submit_button("Save","submit","tick"),
                 icon_button("Cancel","cross",null,"account.php"));
                 
 $form = new Form("testform",$formdata,$helpsteps,$buttons);
@@ -117,7 +122,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "account:account";
-$TITLE = "Change Email";
+$TITLE = _L("Change Email");
 
 require_once("nav.inc.php");
 
@@ -140,7 +145,7 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 if (isset($_GET['thanks'])) {
 ?>
 	<div>
-	<h2>Thank you.  Your username has been changed.  Please check your email for the activation step.</h2>
+	<h2><?= _L("Thank you.  Your username has been changed.  Please check your email for the activation step.")?></h2>
 	</div>
 	<br>
 	<br>

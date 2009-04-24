@@ -59,7 +59,7 @@ foreach ($fieldmaps as $fieldmap) {
 				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
-    	    			"label" => $fieldmap->name,
+    	    			"label" => _L($fieldmap->name),
         				"value" => $person->$fieldnum,
         				"validators" => array(),
         				"control" => array("RadioButton","values" => $values),
@@ -77,7 +77,7 @@ foreach ($fieldmaps as $fieldmap) {
 					$max = 50;
 				
 				$formdata[$fieldnum] = array (
-        			"label" => $fieldmap->name,
+        			"label" => _L($fieldmap->name),
         			"value" => $person->$fieldnum,
         			"validators" => array(
 	            		array("ValRequired"),
@@ -92,7 +92,7 @@ foreach ($fieldmaps as $fieldmap) {
 				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
-    	    			"label" => $fieldmap->name,
+    	    			"label" => _L($fieldmap->name),
         				"value" => $person->$fieldnum,
         				"validators" => array(),
         				"control" => array("RadioButton","values" => $values),
@@ -114,7 +114,7 @@ foreach ($fieldmaps as $fieldmap) {
 		$arr = QuickQueryList("select value, value from groupdata where personid=".$person->id." and fieldnum=".$gfield);
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
-    	    			"label" => $fieldmap->name,
+    	    			"label" => _L($fieldmap->name),
         				"value" => $arr,
         				"validators" => array(),
         				"control" => array("MultiCheckbox","values" => $values),
@@ -124,14 +124,14 @@ foreach ($fieldmaps as $fieldmap) {
 }
 
 $helpsteps = array (
-    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
+    _L("Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section"),
     "Step 1, name please",
     "Ffields are defined by the admin",
     "Group fields are defined by the admin"
 );
 
-$buttons = array(submit_button("Save","save","tick"),
-                icon_button("Cancel","cross",null,"contactpreferences.php?cancel"));
+$buttons = array(submit_button(_L("Save"),"save","tick"),
+                icon_button(_L("Cancel"),"cross",null,"contactpreferences.php?cancel"));
 
 $formname = "contactinfo";                
 $_REQUEST['form'] = $formname;                
@@ -152,6 +152,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         
 		foreach ($fieldmaps as $fieldmap) {
 			$fieldnum = $fieldmap->fieldnum;
+			if (!isset($postdata[$fieldnum])) continue; // some had no data to display
+			
 			$val = $postdata[$fieldnum];
 			if ($val == null)
 				$val = "";
@@ -198,7 +200,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Contact Information";
+$TITLE = _L("Contact Information");
 
 require_once("nav.inc.php");
 

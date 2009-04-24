@@ -7,6 +7,8 @@ $isNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../inc/utils.inc.php");
+require_once("subscribervalidators.inc.php");
 require_once("../obj/Phone.obj.php");
 
 
@@ -32,77 +34,79 @@ $tos = file_get_contents("terms.html");
 
 
 $formdata = array(
-    "username" => array(
-        "label" => "Email:",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValEmail")
-        ),
-        "requires" => "confirmusername",
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    ),
-    "confirmusername" => array(
-        "label" => "Confirm Email:",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValEmail")
-        ),
-        "requires" => "username",
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    ),
-    "password" => array(
-        "label" => "Password:",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "requires" => "confirmpassword",
-        "control" => array("PasswordField","maxlength" => 50),
-        "helpstep" => 2
-    ),
-    "confirmpassword" => array(
-        "label" => "Confirm Password:",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "requires" => "password",
-        "control" => array("PasswordField","maxlength" => 50),
-        "helpstep" => 2
-    ),
     "firstname" => array(
-        "label" => "First Name:",
+        "label" => "First Name",
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
+            array("ValLength","min" => 1,"max" => 50)
         ),
         "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 3
+        "helpstep" => 1
     ),
     "lastname" => array(
-        "label" => "Last Name:",
+        "label" => "Last Name",
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
+            array("ValLength","min" => 1,"max" => 50)
         ),
         "control" => array("TextField","maxlength" => 50),
+        "helpstep" => 1
+    ),
+    "username" => array(
+        "label" => "Email",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValEmail")
+        ),
+        "control" => array("TextField","maxlength" => 50),
+        "helpstep" => 2
+    ),
+    "confirmusername" => array(
+        "label" => "Confirm Email",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValEmail"),
+            array("ValFieldConfirmation", "field" => "username")
+        ),
+        "requires" => array("username"),
+        "control" => array("TextField","maxlength" => 50),
+        "helpstep" => 2
+    ),
+    "password" => array(
+        "label" => "Password",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 5,"max" => 50),
+            array("ValPassword")
+        ),
+        "requires" => array("firstname", "lastname", "username"),
+        "control" => array("PasswordField","maxlength" => 50),
+        "helpstep" => 3
+    ),
+    "confirmpassword" => array(
+        "label" => "Confirm Password",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 5,"max" => 50),
+            array("ValFieldConfirmation", "field" => "password")
+        ),
+        "requires" => array("password"),
+        "control" => array("PasswordField","maxlength" => 50),
         "helpstep" => 3
     ),
     "terms" => array(
-        "label" => "Terms Of Service:",
+        "label" => "Terms Of Service",
         "control" => array("FormHtml","html" => '<div style="height: 200px; overflow:auto;">'.$tos.'</div>'),
         "helpstep" => 4
     ),
     "acceptterms" => array(
-        "label" => "Accept Terms:",
+        "label" => "Accept Terms",
         "value" => false,
         "validators" => array(
             array("ValRequired")
@@ -113,10 +117,10 @@ $formdata = array(
 );
 
 $helpsteps = array (
-    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
-	"Your email",
+    "This guide will help you complete the signup process.  Click the arrow to begin.",
+	"Provide your first and last name.",
+	"Your email will be used as your login username.  This must be a valid email address; your account is not activated until you confirm receipt of this email.",
 	"Your password",
-	"Your name",
 	"The terms"
 );
 
@@ -186,6 +190,18 @@ if (isset($_GET['err'])) {
 <?
 }
 ?>
+<script type="text/javascript">
+
+<? Validator::load_validators(array("ValPassword")); ?>
+
+<? if ($datachange) { ?>
+
+alert("data has changed on this form!");
+window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+
+<? } ?>
+
+</script>
 
 <script type="text/javascript">
 var errors = <?= json_encode($errors) ?>;

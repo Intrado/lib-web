@@ -47,11 +47,11 @@ require_once("../obj/Phone.obj.php");
 	}
 	
 	$titles = array("0" => "##",
-					"2" => "Date",
-					"3" => "#Job Name",
-					"SentBy" => "#Sent By",
-					"4" => "#Delivery Type",
-					"Actions" => "Actions"
+					"2" => _L("Date"),
+					"3" => "#" . _L("Job Name"),
+					"SentBy" => "#" . _L("Sent By"),
+					"4" => "#" . _L("Delivery Type"),
+					"Actions" => _L("Actions")
 				);
 
 	$formatters = array("2" => "format_date",
@@ -71,13 +71,13 @@ function message_action($row, $index){
 	//index 4 is type
 	$types = explode(",",$row[4]);
 	if(in_array("phone", $types)){
-		$buttons[] = button("Play", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500);",null);
+		$buttons[] = button(_L("Play"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500);",null);
 	}
 	if(in_array("email", $types)){
-		$buttons[] = button("Read Email", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500);",null);
+		$buttons[] = button(_L("Read Email"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500);",null);
 	}
 	if(in_array("sms", $types)){
-		$buttons[] = button("Read SMS", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500);",null);
+		$buttons[] = button(_L("Read SMS"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500);",null);
 	}
 	return "<table><tr><td>" . implode("</td><td>", $buttons) . "</td></tr></table>";
 }
@@ -106,14 +106,14 @@ function sender($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$TITLE="Welcome - " . escapehtml($_SESSION['subscriber.firstname']) . " " . escapehtml($_SESSION['subscriber.lastname']);
+$TITLE=_L('Welcome - %1$s %2$s', escapehtml($_SESSION['subscriber.firstname']), escapehtml($_SESSION['subscriber.lastname']));
 $PAGE = 'messages:messages';
 require_once("nav.inc.php");
-?>	<div><b>Messages from the last 30 days</b></div><br><?
+	?><div><b><?=_L("Messages from the last 30 days")?></b></div><br><?
 
 	// if customer has message callback feature, let the user know about it
 	if ($INBOUND_MSGCALLBACK) {
-		echo "You may call ".Phone::format($INBOUND_MSGCALLBACK)." at any time to listen to your phone messages.<BR><BR>";
+		echo _L('You may call %s at any time to listen to your phone messages.', Phone::format($INBOUND_MSGCALLBACK)) . "<BR><BR>";
 	}
 
 	$counter = 1000;
@@ -127,7 +127,7 @@ require_once("nav.inc.php");
 		startWindow(escapehtml($person->$firstnameField) . " " . escapehtml($person->$lastnameField), 'padding: 3px;', true);
 		if (count($data) == 0) {
 ?>
-			<div>No Messages</div>
+			<div><?= _L("No Messages") ?></div>
 <?
 		} else {
 			$scroll="";

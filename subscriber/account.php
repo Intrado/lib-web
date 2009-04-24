@@ -22,7 +22,7 @@ foreach ($subscribeFields as $fieldnum => $name) {
 
 $formdata = array(
     "locale" => array(
-        "label" => "Choose your display language:",
+        "label" => _L("Display Language"),
         "value" => $_SESSION['_locale'],
         "validators" => array(    
             array("ValRequired")
@@ -37,7 +37,7 @@ $helpsteps = array (
 	"Select a language"
 );
 
-$buttons = array(submit_button("Submit","submit","tick"),
+$buttons = array(submit_button("Save","submit","tick"),
                 icon_button("Cancel","cross",null,"account.php"));
 
 $form = new Form("accountform",$formdata,$helpsteps,$buttons);

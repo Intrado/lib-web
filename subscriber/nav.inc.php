@@ -20,16 +20,16 @@ if (isset($_GET['timer']))
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
 
 $NAVTREE = array (
-	array("Messages","start.php",NULL,$MAINTAB=="messages",array()),
-	array("Contact Info", "contactpreferences.php", array("personal","notifications"), $MAINTAB=="contacts", array(
-			array("Personal","contactpreferences.php","personal",$SUBTAB=="personal"),
-			array("Preferences","notificationpreferences.php","notificationprefs",$SUBTAB=="notificationprefs"),
-			array("Notification","notificationdestinations.php","notificationdests",$SUBTAB=="notificationdests")
+	array(_L("Messages"),"start.php",NULL,$MAINTAB=="messages",array()),
+	array(_L("Contact Info"), "contactpreferences.php", array("personal","notifications"), $MAINTAB=="contacts", array(
+			array(_L("Personal"),"contactpreferences.php","personal",$SUBTAB=="personal"),
+			array(_L("Preferences"),"notificationpreferences.php","notificationprefs",$SUBTAB=="notificationprefs"),
+			array(_L("Notification"),"notificationdestinations.php","notificationdests",$SUBTAB=="notificationdests")
 		)),
-	array("My Account", "account.php", array("accountpref", "changeemail", "changepass"), $MAINTAB=="account", array(
-			array("Preferences","account.php","accountpref",$SUBTAB=="preferences"),
-			array("Username","changeemail.php","changeemail",$SUBTAB=="username"),
-			array("Password","changepass.php","changepass",$SUBTAB=="password")
+	array(_L("My Account"), "account.php", array("accountpref", "changeemail", "changepass"), $MAINTAB=="account", array(
+			array(_L("Preferences"),"account.php","accountpref",$SUBTAB=="preferences"),
+			array(_L("Username"),"changeemail.php","changeemail",$SUBTAB=="username"),
+			array(_L("Password"),"changepass.php","changepass",$SUBTAB=="password")
 		)
 	)
 );

@@ -10,20 +10,23 @@ require_once("../obj/Email.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 $pid = $_SESSION['personid'];
-error_log("1");
-$jobtypes = QuickQueryList("select name from jobtype");
-error_log("2");
+$jobtypes = QuickQueryList("select id, name from jobtype where deleted=0", true);
+// TODO, should we localize the job type names? Emergency, Attendance, General...
+// TODO remove survey if not supported
+// TODO do we need the info field for more detail display
+
 $emails = DBFindMany("Email", "from email where personid=?", false, array($pid));
-error_log("3");
 
 $formdata = array();
 
 foreach ($emails as $email) {
 	if ($email->email == '') continue;
 	
+	$values = QuickQueryList("select jobtypeid from contactpref where personid=? and type='email' and sequence=? and enabled=1", false, false, array($pid, $email->sequence));
+
 	$formdata["email".$email->sequence] = array(
         "label" => $email->email,
-        "value" => array(),
+        "value" => $values,
         "validators" => array(),
         "control" => array("MultiCheckbox","values" => $jobtypes),
         "helpstep" => 1
@@ -32,12 +35,12 @@ foreach ($emails as $email) {
 
 
 $helpsteps = array (
-    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
+    _L("Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section"),
 	"blah blah blah..."
 );
 
-$buttons = array(submit_button("Submit","submit","tick"),
-                icon_button("Cancel","cross",null,"notificationpreferences.php"));
+$buttons = array(submit_button(_L("Save"),"submit","tick"),
+                icon_button(_L("Cancel"),"cross",null,"notificationpreferences.php"));
                 
 $form = new Form("notifyprefs",$formdata,$helpsteps,$buttons);
 $form->ajaxsubmit = true;
@@ -60,7 +63,28 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         
         //save data here
         
-        
+        // TODO more than just email0
+        $e0 = $postdata['email0'];
+        //foreach ($e0 as $k => $v) error_log($k . " => " . $v);
+
+		// new contactpref rows
+		$values = array();
+		
+		// TODO for each phone, email, sms
+		
+		foreach ($jobtypes as $jtid => $jtname) {
+			$enabled = 0;
+			foreach ($e0 as $k => $v) if ($v == $jtid) $enabled = 1;
+			$values[] = "(" . $pid . "," . $jtid . ",'email',0," . $enabled . ")";
+		}
+		
+		
+		QuickUpdate("Begin");
+		QuickUpdate("delete from contactpref where personid=?", false, array($pid));
+		QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
+							values " . implode(",",$values));
+        QuickUpdate("Commit");
+
         if ($ajax)
             $form->sendTo("notificationpreferences.php");
         else
@@ -73,7 +97,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:notificationprefs";
-$TITLE = "Notification Preferences";
+$TITLE = _L("Notification Preferences");
 
 require_once("nav.inc.php");
 

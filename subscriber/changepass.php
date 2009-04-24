@@ -17,27 +17,30 @@ $error_generalproblem = _L("There was a problem changing your password, please t
 
 $formdata = array(
     "newpassword1" => array(
-        "label" => "New Password: ",
+        "label" => _L("New Password"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
+            array("ValLength","min" => 5,"max" => 50),
+            array("ValChangePassword")
         ),
         "control" => array("PasswordField","maxlength" => 50),
         "helpstep" => 1
     ),
     "newpassword2" => array(
-        "label" => "Confirm Password: ",
+        "label" => _L("Confirm Password"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
+            array("ValLength","min" => 5,"max" => 50),
+            array("ValFieldConfirmation", "field" => "newpassword1")
         ),
+        "requires" => array("newpassword1"),
         "control" => array("PasswordField","maxlength" => 50),
         "helpstep" => 1
     ),
     "password" => array(
-        "label" => "Old Password: ",
+        "label" => _L("Old Password"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -53,7 +56,7 @@ $helpsteps = array (
 	"Enter a new password.  Then enter your account password."
 );
 
-$buttons = array(submit_button("Submit","submit","tick"),
+$buttons = array(submit_button("Save","submit","tick"),
                 icon_button("Cancel","cross",null,"account.php"));
                 
 $form = new Form("testform",$formdata,$helpsteps,$buttons);
@@ -97,7 +100,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "account:account";
-$TITLE = "Change Password";
+$TITLE = _L("Change Password");
 
 require_once("nav.inc.php");
 
@@ -105,7 +108,7 @@ require_once("nav.inc.php");
 <script type="text/javascript">
 Event.observe( document, 'unload', Event.unloadCache );
 
-<? Validator::load_validators(array("ValSubscriberPassword")); ?>
+<? Validator::load_validators(array("ValSubscriberPassword","ValChangePassword")); ?>
 
 <? if ($datachange) { ?>
 
@@ -120,7 +123,7 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 if (isset($_GET['thanks'])) {
 ?>
 	<div>
-	<h2>Thank you.  Your password has been changed.</h2>
+	<h2><?=_L("Thank you.  Your password has been changed.")?></h2>
 	</div>
 	<br>
 	<br>
@@ -130,7 +133,7 @@ if (isset($_GET['thanks'])) {
 	if (isset($_GET['err'])) {
 ?>
 	<div>
-	<h3>&nbsp;Sorry, an error has occurred.  Please try again.</h3>
+	<h3>&nbsp;<?=_L("Sorry, an error has occurred.  Please try again.")?></h3>
 	</div>
 	<br>
 <?
