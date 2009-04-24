@@ -114,7 +114,7 @@ function isAllSameDigit($number){
 
 /**
 	Function to test if the user, pass, firstname, and last name are
-	the same thing or similiar.
+	the same thing or similar.
 	The password cannot be a substring or superstring of first, last or user.
 */
 function validateNewPassword($user, $pass, $firstname, $lastname) {
@@ -123,13 +123,13 @@ function validateNewPassword($user, $pass, $firstname, $lastname) {
 	$firstname = strtolower($firstname);
 	$lastname = strtolower($lastname);
 	if(strlen($user)>=3 && (strpos($user, $pass)!==FALSE || strpos($pass,$user)!==FALSE)) {
-		return("Username and password are too similiar");
+		return("Username and password are too similar");
 	}
 	if(strlen($firstname)>=3 && (strpos($firstname,$pass)!==FALSE || strpos($pass,$firstname)!==FALSE)) {
-		return("Firstname and password are too similiar");
+		return("Firstname and password are too similar");
 	}
 	if(strlen($lastname) >=3 && (strpos($lastname,$pass)!==FALSE || strpos($pass,$lastname)!==FALSE)) {
-		return("Lastname and password are too similiar");
+		return("Lastname and password are too similar");
 	}
 	return false;
 }
@@ -245,7 +245,7 @@ function validEmail($email){
 	    # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	    # http://creativecommons.org/licenses/by-sa/2.5/
 	    #
-	    # $Revision: 1.76 $
+	    # $Revision: 1.77 $
 	    # http://www.iamcal.com/publish/articles/php/parsing_email/
 
 	    ##################################################################################
