@@ -2,6 +2,7 @@
 require_once("common.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
+require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
@@ -51,8 +52,15 @@ if(CheckFormSubmit($f,$s))
 			// verify data
 			echo "<pre>Verifying existing data is ok to move\n";
 
-			$query = "select count(*) from messagepart mp left join message m on (m.id = mp.messageid) where fieldnum='$ffield' and not m.deleted";
-			if (QuickQuery($query,$custdb) > 0) die ("FAILURE: messagepart exists with this ffield");
+			$query = "select m.name,m.userid,concat(u.login,if(u.deleted,' (deleted)',if(not u.enabled,' (disabled)',''))) from messagepart mp left join message m on (m.id = mp.messageid) left join user u on (m.userid=u.id) where fieldnum='$ffield' and not m.deleted";
+			$data = QuickQueryMultiRow($query,false,$custdb);
+			if (count($data) > 0) {
+				echo '<table border=1 cellspacing=0>';
+				
+				showTable($data,array("msg name","userid","login"));
+				echo '</table>';
+				exit("FAILURE: messagepart exists with this ffield");				
+			}
 			// verify ffield exists and is multisearch
 			$query = "select count(*) from fieldmap where fieldnum='$ffield' and options like '%multisearch%' and options like '%searchable%' and options not like '%grade%'";
 			if (QuickQuery($query,$custdb) != 1) die ("FAILURE: missing searchable multiselect field $ffield");
