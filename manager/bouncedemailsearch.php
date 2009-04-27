@@ -45,6 +45,7 @@ if (!isset($_POST['email'])) {
 	
 	// With the list of customers ready, connect to each customer's shard and retrieve a bunch of helpful information about the customer.
 	$data = array();
+	$count = 0;
 	foreach ($CUSTOMERINFO as $cid => $cust) {
 		
 		$custdb = getPooledCustomerConnection($cid,true);
@@ -76,7 +77,12 @@ if (!isset($_POST['email'])) {
 				'user',
 				''
 			);
-		}	
+		}
+		echo ".";
+		if (++$count % 20 == 0)
+			echo "<wbr></wbr>";
+		ob_flush();
+		flush();
 	}
 	
 

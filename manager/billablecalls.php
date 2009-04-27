@@ -68,6 +68,7 @@ if (!isset($_POST['startdate'])) {
 	loadManagerConnectionData();
 	
 	$data = array();
+	$count = 0;
 	foreach ($CUSTOMERINFO as $cid => $cust) {
 		
 		$custdb = getPooledCustomerConnection($cid,true);
@@ -107,7 +108,11 @@ if (!isset($_POST['startdate'])) {
 			$data[$cid][9] = $row[6]; //hasdm
 			
 		}
-		
+		echo ".";
+		if (++$count % 20 == 0)
+			echo "<wbr></wbr>";
+		ob_flush();
+		flush();
 	}
 	
 	$totalrow = array("Total",0,0,0,0,0,0,0,0,0);
