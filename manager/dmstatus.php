@@ -36,68 +36,59 @@ if ($dmType == "customer") {
 	if (!$custdb) {
 		exit("Connection failed for customer: $custinfo[0], db: c_$custid");
 	}
-	$status = json_decode(QuickQuery("select poststatus from custdm where dmid=?", $custdb, array($dmid)));
+	$jsonstats = QuickQuery("select poststatus from custdm where dmid=?", $custdb, array($dmid));
 	
 } else {
 	// system DM
 	
-	$status = json_decode(QuickQuery("select poststatus from dm where id=?", false, array($dmid)));
-	//var_dump($status);
-}
-
-$systemstats = (array) $status[0];
-$dispatchers = array();
-
-foreach ($systemstats as $key => $value) {
-	if (strpos($key, "comerr") === 0) {
-		$dispatcher = substr($key, 7);
-		$dispatchers[$dispatcher]['comerr'] = $value;
-	}
-	if (strpos($key, "comtimeout") === 0) {
-		$dispatcher = substr($key, 11);
-		$dispatchers[$dispatcher]['comtimeout'] = $value;
-	}
+	$jsonstats = QuickQuery("select poststatus from dm where id=?", false, array($dmid));
 }
 
 
-$resourcedata = array();
-foreach ($status as $row) {
-	$row = (array) $row;
-	if ($row['name'] == 'system') continue;
-	$resourcedata[] = $row;
-}
-$resourcetitles = array(	"name" => "Name",
-							"rtype" => "Type",
-							"rstatus" => "State",
-							"starttime" => "Start Time",
-							"result" => "Result"
-						);
+include_once("../dmstatusdata.inc.php");
+
 
 //////////////////////////////////////////////////////////////////////
 // DISPLAY
 
 include_once("nav.inc.php");
 
+?>
+<script type='text/javascript' src='../script/dmstatus.js'></script>
+<?
+
 echo "Current Status for: " . $dmName . "<BR>";
 
-?>
-<table width="100%"><tr><td>
-<? include_once("../dmsysstats.inc.php"); ?>
-</td><td valign="top">
-<table>
-<?
-
-if (count($status) > 1) {
-	showTable($resourcedata, $resourcetitles);
+if ($status == NULL) {
+	echo "There is no status available at this time.";
 } else {
-	echo "There are no active resources at this time.  The system is idle.<br>";
-}
-
 ?>
-</table>
-
-</td></tr></table>
-
+<table width="100%"><tr><td valign="top">
 <?
+echo "<BR><b>SYSTEM STATISTICS</b><BR><BR>";
+//startWindow("System Statistics");
+echo "<div id='systemstats'>";
+	foreach($statusgroups as $groupname => $groupdata) {
+		showStatusGroup($groupname, $groupdata);
+	}
+echo "</div>";
+//endWindow();
+?>
+</td><td valign="top">
+<?
+//startWindow("Active Resources");
+echo "<BR><b>ACTIVE RESOURCES</b><BR><BR>";
+echo "<div id='activeresources'></div>";
+//endWindow();
+
+//startWindow("Completed Resources");
+echo "<BR><b>COMPLTEED RESOURCES</b><BR><BR>";
+echo "<div id='completedresources'></div>";
+//endWindow();
+?>
+</td></tr></table>
+<?
+} // end else status is not null
+
 include_once("navbottom.inc.php");
 ?>
