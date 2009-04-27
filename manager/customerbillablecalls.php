@@ -54,7 +54,6 @@ if (!isset($_POST['startdate'])) {
 			inner join reportperson rp on (j.id = rp.jobid and rp.type='phone')
 			inner join reportcontact rc on (rc.jobid = j.id and rc.type='phone' and rc.personid = rp.personid)
 			where j.finishdate between ? and ? + interval 1 day
-			and rc.dispatchtype = 'system'
 			and rc.result in ('A','M')
 			group by day";
 	$costs = QuickQueryMultiRow($query,false,$custdb,array($_POST['startdate'],$_POST['enddate']));
