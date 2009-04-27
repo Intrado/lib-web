@@ -13,6 +13,9 @@ else
 	display: none;
 }
 </style>
+
+	<script src="../script/prototype.js" type="text/javascript"></script>
+	<script src="../script/scriptaculous.js" type="text/javascript"></script>
 </head>
 <body>
 <image src="manager.png">
