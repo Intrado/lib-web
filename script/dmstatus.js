@@ -1,119 +1,40 @@
-
-function nl2br (str, is_xhtml) {
-    // http://kevin.vanzonneveld.net
-    // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // +   improved by: Philip Peterson
-    // +   improved by: Onno Marsman
-    // +   improved by: Atli Þór
-    // +   bugfixed by: Onno Marsman
-    // +      input by: Brett Zamir (http://brettz9.blogspot.com)
-    // +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // *     example 1: nl2br('Kevin\nvan\nZonneveld');
-    // *     returns 1: 'Kevin<br />\nvan<br />\nZonneveld'
-    // *     example 2: nl2br("\nOne\nTwo\n\nThree\n", false);
-    // *     returns 2: '<br>\nOne<br>\nTwo<br>\n<br>\nThree<br>\n'
-    // *     example 3: nl2br("\nOne\nTwo\n\nThree\n", true);
-    // *     returns 3: '<br />\nOne<br />\nTwo<br />\n<br />\nThree<br />\n'
- 
-    var breakTag = '';
- 
-    breakTag = '<br />';
-    if (typeof is_xhtml != 'undefined' && !is_xhtml) {
-        breakTag = '<br>';
-    }
- 
-    return "<pre>" + (str + '').replace(/([^>]?)\n/g, '$1'+ breakTag +'\n') + "</pre>";
-}
-
 function dateDiff(startdate, enddate) {
-// modified from http://snippets.dzone.com/posts/show/623
+	var millis;
+	var days;
+	var hours;
+	var mins;
+	var strHowOld = "";
+	
+	millis = Math.abs(enddate - startdate); // odd if negative, but abs just in case?
+	
+	days = Math.floor(millis / 86400000);
+	millis = millis - (days * 86400000);
+	
+	hours = Math.floor(millis / 3600000);
+	millis = millis - (hours * 3600000);
+	
+	mins = Math.floor(millis / 60000);
+	// throw away seconds and remaining millis (who cares?)
 
-   var intSpan;
-   var intYears;
-   var intMonths;
-   var intWeeks;
-   var intDays;
-   var intHours;
-   var intMinutes;
-   var intSeconds;
-   var strHowOld;
+    if ( days > 0 )
+       if ( days > 1 )
+          strHowOld = strHowOld + ' ' + days.toString() + ' Days';
+       else
+          strHowOld = strHowOld + ' ' + days.toString() + ' Day';
 
-      // get time span between two dates in milliseconds
-      intSpan = enddate - startdate;
-
-      // get number of weeks
-      intWeeks = Math.floor(intSpan / 604800000);
-
-      // subtract weeks from time span
-      intSpan = intSpan - (intWeeks * 604800000);
-      
-      // get number of days
-      intDays = Math.floor(intSpan / 86400000);
-
-      // subtract days from time span
-      intSpan = intSpan - (intDays * 86400000);
-
-      // get number of hours
-      intHours = Math.floor(intSpan / 3600000);
-    
-      // subtract hours from time span
-      intSpan = intSpan - (intHours * 3600000);
-
-      // get number of minutes
-      intMinutes = Math.floor(intSpan / 60000);
-
-      // subtract minutes from time span
-      intSpan = intSpan - (intMinutes * 60000);
-
-      // get number of seconds
-      intSeconds = Math.floor(intSpan / 1000);
-
-      // create output string     
-      if ( intYears > 0 )
-         if ( intYears > 1 )
-            strHowOld = intYears.toString() + ' Years';
-         else
-            strHowOld = intYears.toString() + ' Year';
-      else
-         strHowOld = '';
-
-      if ( intMonths > 0 )
-         if ( intMonths > 1 )
-            strHowOld = strHowOld + ' ' + intMonths.toString() + ' Months';
-         else
-            strHowOld = strHowOld + ' ' + intMonths.toString() + ' Month';
-           
-      if ( intWeeks > 0 )
-         if ( intWeeks > 1 )
-            strHowOld = strHowOld + ' ' + intWeeks.toString() + ' Weeks';
-         else
-            strHowOld = strHowOld + ' ' + intWeeks.toString() + ' Week';
-
-      if ( intDays > 0 )
-         if ( intDays > 1 )
-            strHowOld = strHowOld + ' ' + intDays.toString() + ' Days';
-         else
-            strHowOld = strHowOld + ' ' + intDays.toString() + ' Day';
-
-      if ( intHours > 0 )
-         if ( intHours > 1 )
-            strHowOld = strHowOld + ' ' + intHours.toString() + ' Hours';
-         else
-            strHowOld = strHowOld + ' ' + intHours.toString() + ' Hour';
+    if ( hours > 0 )
+       if ( hours > 1 )
+          strHowOld = strHowOld + ' ' + hours.toString() + ' Hours';
+       else
+          strHowOld = strHowOld + ' ' + hours.toString() + ' Hour';
  
-      if ( intMinutes > 0 )
-         if ( intMinutes > 1 )
-            strHowOld = strHowOld + ' ' + intMinutes.toString() + ' Minutes';
-         else
-            strHowOld = strHowOld + ' ' + intMinutes.toString() + ' Minute';
-
-      if ( intSeconds > 0 )
-         if ( intSeconds > 1 )
-            strHowOld = strHowOld + ' ' + intSeconds.toString() + ' Seconds';
-         else
-            strHowOld = strHowOld + ' ' + intSeconds.toString() + ' Second';
-      
-      return strHowOld;
+    if ( mins > 0 )
+       if ( mins > 1 )
+          strHowOld = strHowOld + ' ' + mins.toString() + ' Minutes';
+       else
+          strHowOld = strHowOld + ' ' + mins.toString() + ' Minute';
+	
+	return strHowOld;
 }
 
 function doajax()
@@ -234,9 +155,9 @@ function doajax()
 			}
 
 			// system details
-			$('uptime').update(nl2br(status[0]['uptime']));
-			$('diskspace').update(nl2br(status[0]['diskspace']));
-			$('memory').update(nl2br(status[0]['memory']));
+			$('uptime').update("<pre>"+status[0]['uptime']+"<\pre>");
+			$('diskspace').update("<pre>"+status[0]['diskspace']+"<\pre>");
+			$('memory').update("<pre>"+status[0]['memory']+"<\pre>");
 						
 			var numactive = 0;
 			var numcompleted = 0;
