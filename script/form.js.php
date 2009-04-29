@@ -1,4 +1,5 @@
 <?
+require_once("../inc/utils.inc.php");
 require_once("../obj/Validator.obj.php");
 
 //set expire time to + 1 hour so browsers cache this file
@@ -28,7 +29,7 @@ function form_event_handler (event) {
 	formvars.keyupelement = e;
 	formvars.keyuptimer = window.setTimeout(function () { 
 			form_do_validation(form,e); formvars.keyuptimer = null;
-		}, 
+		},
 		event.type == "keyup" ? 750 : 200
 	);
 
