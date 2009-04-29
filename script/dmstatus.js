@@ -41,7 +41,7 @@ function doajax()
 {
 	new Ajax.Request('dmstatus.php?ajax', { method:'get',
 		onSuccess: function(result) {
-			var status = result.responseText.evalJSON();
+			var status = result.responseJSON;
 			var avg;
 			var fieldname;
 			var dispatchers = new Array();

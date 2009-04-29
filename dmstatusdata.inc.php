@@ -107,13 +107,7 @@ function showStatusGroup($grouptitle, $data) {
 // AJAX
 
 if (isset($_GET['ajax'])) {
-/*	
-	echo '<html><head>' .
-		'<meta http-equiv="Content-type" value="application/json; charset=UTF-8"/>' .
-		'</head><body>' .
-		$jsonstats .
-		'</body></html>';
-*/
+	header("Content-type: application/json");
 	echo $jsonstats;
 	exit;
 }
