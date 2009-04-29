@@ -109,7 +109,11 @@ function subscriberCreatePhoneActivation($customerid, $subscriberid, $pkeyList, 
 
 
 function subscriberUpdateUsername($username, $password) {
-	return array("result" => "");
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($username, 'string'), new XML_RPC_Value($password, 'string'));
+	$method = "SubscriberServer.subscriber_updateUsername";
+	$result = pearxmlrpc($method, $params);
+	return $result;
 }
 
 

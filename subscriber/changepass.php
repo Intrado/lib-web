@@ -10,11 +10,6 @@ require_once("subscribervalidators.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
-$error_badpass = _L("That password is incorrect");
-$error_generalproblem = _L("There was a problem changing your password, please try again later");
-
-
 $formdata = array(
     "newpassword1" => array(
         "label" => _L("New Password"),
@@ -79,14 +74,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
             
         $params = "?err";
         
-        // more validation
-        if ($postdata['newpassword1'] != $postdata['newpassword2'])
-        	$error = "passwords do not match";
-         else {
-        	// success
-        	QuickUpdate("update subscriber set `password`=password(?) where id=?", false, array($postdata['newpassword1'], $_SESSION['subscriberid']));
+        if (QuickUpdate("update subscriber set `password`=password(?) where id=?", false, array($postdata['newpassword1'], $_SESSION['subscriberid'])));
         	$params = "?thanks";
-        }
         
         if ($ajax)
             $form->sendTo("changepass.php".$params);

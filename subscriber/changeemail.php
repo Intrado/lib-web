@@ -10,12 +10,6 @@ require_once("subscribervalidators.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
-$error_badpass = _L("That password is incorrect");
-$error_generalproblem = _L("There was a problem changing your username, please try again later");
-$error_badusername = _L("That username is already in use");
-
-
 $formdata = array(
     "newusername1" => array(
         "label" => _L("New Email Address"),
@@ -82,30 +76,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
         $params = "?err";
         
-        // more validation
-        if ($postdata['newusername1'] != $postdata['newusername2'])
-        	$error = "new usernames do not match";
-         else {
-        	// success
-            
-        
-			$result = subscriberUpdateUsername($postdata['newusername1'], $postdata['password']);
-			if($result['result'] == ""){
-				$params = "?thanks";
+		$result = subscriberUpdateUsername($postdata['newusername1'], $postdata['password']);
+		$resultcode = $result['result'];
+		if ($resultcode == "") {
+			$params = "?thanks";
+		} else if ($resultcode == "invalid argument") {
+			if (strpos($result['resultdetail'], "username") !== false) {
+				$params = "?err=1"; // bad username
 			} else {
-				$resultcode = $result['result'];
-				if($resultcode == "invalid argument"){
-					if(strpos($result['resultdetail'], "username") !== false){
-						error($error_badusername);
-					} else {
-						error($error_badpass);
-					}
-				} else {
-					error($error_generalproblem);
-				}
+				$params = "?err=2"; // bad password
 			}
+		} else {
+			$params = "?err=3"; // general failure
 		}
-        
         
         if ($ajax)
             $form->sendTo("changeemail.php".$params);
@@ -116,13 +99,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "account:account";
-$TITLE = _L("Change Email");
+$TITLE = _L('Username - %1$s', escapehtml($_SESSION['subscriber.username']));
 
 require_once("nav.inc.php");
 
@@ -151,11 +132,17 @@ if (isset($_GET['thanks'])) {
 	<br>
 <?
 } else {
-	startWindow(_L('Change Email'));
+	startWindow(_L('Change Username'));
 	if (isset($_GET['err'])) {
+		$err = "Sorry, an error has occurred.  Please try again.";
+		if ($_GET['err'] == 1) {
+			$err = "Sorry, that username already exists in the system.  Please try again.";
+		} else if ($_GET['err'] == 2) {
+			$err = "Sorry, that password is invalid.  Please try again.";
+		}
 ?>
 	<div>
-	<h3>&nbsp;Sorry, an error has occurred.  Please try again.</h3>
+	<h3>&nbsp;<?=$err?></h3>
 	</div>
 	<br>
 <?
