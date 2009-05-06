@@ -15,8 +15,8 @@ require_once("XML/RPC.php");
 require_once("inc/auth.inc.php");
 
 
-$map = getCustomerData($CUSTOMERURL);
-if($map !== false){
+$map = getCustomerLoginPicture($CUSTOMERURL);
+if ($map !== false) {
 	$data = base64_decode($map['loginPicture']);
 	$contenttype = $map['loginPictureType'];
 	$ext = substr($contenttype, strpos($contenttype, "/")+1);

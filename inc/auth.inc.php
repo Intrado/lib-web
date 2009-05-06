@@ -249,6 +249,30 @@ function getCustomerData($url){
 	return false;
 }
 
+function getCustomerLogo($url) {
+
+	$params = array(new XML_RPC_Value($url, 'string'));
+	$method = "AuthServer.getCustomerLogo";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['schememap'];
+	}
+	return false;
+}
+
+function getCustomerLoginPicture($url) {
+
+	$params = array(new XML_RPC_Value($url, 'string'));
+	$method = "AuthServer.getCustomerLoginPicture";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['schememap'];
+	}
+	return false;
+}
+
 function auth_resetDM($dmid){
 	$sessionid = session_id();
 	$params =  array(new XML_RPC_Value($dmid, 'int'), new XML_RPC_Value($sessionid, 'string'));

@@ -1,15 +1,21 @@
 <?
 
 $scheme = getCustomerData($CUSTOMERURL);
-if($scheme == false){
+if ($scheme == false) {
 	$scheme = array("_brandtheme" => "3dblue",
-					"_supportemail" => "support@schoolmessenger.com",
-					"_supportphone" => "8009203897",
 					"colors" => array("_brandprimary" => "26477D"));
 }
-$CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "" ;
 $primary = $scheme['colors']['_brandprimary'];
-$custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
+
+$CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "";
+$custname = isset($scheme['customerName']) ? $scheme['customerName'] : "";
+
+if (!isset($scheme['_supportemail']))
+	$scheme['_supportemail'] = "support@schoolmessenger.com";
+	
+if (!isset($scheme['_supportphone']))
+	$scheme['_supportphone'] = "8009203897";
+	
 
 header('Content-type: text/html; charset=UTF-8') ;
 
