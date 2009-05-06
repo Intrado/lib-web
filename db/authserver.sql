@@ -319,5 +319,9 @@ CREATE TABLE `authserver`.`webactivation` (
 PRIMARY KEY ( `activationtoken` )
 ) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
+ALTER TABLE `webactivation` DROP `newusername`;
 
+ALTER TABLE `webactivation` DROP `forgotpassword`;
+
+drop table useractivation;
 
