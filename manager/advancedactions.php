@@ -26,6 +26,11 @@ include_once("nav.inc.php");
 <li><a href="passwordcheck.php">Check for bad/similar passwords</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("emergencyjobs")) { ?>
+<li><a href="emergencyjobs.php">List of Recent Jobs</a></li>
+<? } ?>
+
+
 <? if ($MANAGERUSER->authorized("superuser")) { ?>
 <li><a href="editroles.php">Edit Manager User Roles</a></li>
 <? } ?>

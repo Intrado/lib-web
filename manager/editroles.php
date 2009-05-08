@@ -28,6 +28,7 @@ $roles = array(
 	"billablecalls" => "ADVANCED - Billable call information",
 	"bouncedemailsearch" => "ADVANCED - Bounced email search",
 	"passwordcheck" => "ADVANCED - Check for bad/similar passwords",
+	"emergencyjobs" => "ADVANCED - List of Recent Emergency Jobs",
 
 	"systemdm" => "SUPER - Manage System DMs",
 	"superuser" => "SUPER - Edit Manager Roles (this page)"
