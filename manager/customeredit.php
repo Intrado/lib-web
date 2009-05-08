@@ -5,6 +5,9 @@ require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
+require_once("XML/RPC.php");
+require_once("authclient.inc.php");
+
 
 if (!$MANAGERUSER->authorized("editcustomer"))
 	exit("Not Authorized");
@@ -195,6 +198,9 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 						nsid='" . DBSafe(GetFormData($f, $s, "nsid")) . "',
 						notes='" . DBSafe($managernote) . "'
 						where id = '$currentid'");
+				
+				// notify authserver to refresh the customer cache
+				refreshCustomer($currentid);
 
 				// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
 				if ($timezone != getCustomerSystemSetting('timezone', false, true, $custdb)) {
