@@ -36,6 +36,13 @@ function first() {
 			return $val;
 }
 
+function firstset () {
+	foreach(func_get_args() as $val)
+		if(isset($val))
+			return $val;
+	return null;
+}
+
 /*
 	Function to find the next seuential access code in a phone system
 	@param currentCode The current access code for which we are trying to find a replacement
@@ -244,7 +251,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.78 $
+    # $Revision: 1.79 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
