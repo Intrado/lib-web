@@ -121,6 +121,12 @@ function button_bar() {
 
 }
 
+
+function hidden_submit_button($value = "submit") {
+	$btn = '<button style="position: absolute; left: -1000px; top: -1000px;" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"></button>';
+	return $btn;
+}
+
 function submit_button($name, $value = "submit", $icon = null) {
 	$theme = getBrandTheme();
 	$btn = '<button class="button" type="submit" name="submit" value="'.escapehtml($value).'" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);" onclick="return form_submit(event,\''.escapehtml($value).'\');"><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif"></td><td class="middle">';
