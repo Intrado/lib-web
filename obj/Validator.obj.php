@@ -289,7 +289,7 @@ class ValPhone extends Validator {
 	function getJSValidator () {
 		return 
 			'function (name, label, value, args) {
-				var phone = value.replace("[^0-9]*","");
+				var phone = value.replace(/[^0-9]/g,"");
 				if (phone.length == 10) {
 					var areacode = phone.substring(0, 3);
 					var prefix = phone.substring(3, 6);
