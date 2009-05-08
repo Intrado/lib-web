@@ -2,17 +2,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/Setting.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("inc/themes.inc.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("inc/text.inc.php");
+require_once("obj/JobType.obj.php");
+require_once("obj/Setting.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("inc/themes.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -25,72 +27,125 @@ if (!$USER->authorize('managesystem')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-/****************** main message section ******************/
+$formdata = array();
+$helpsteps = array(_L("Enter customer specific information on this page."));
 
-$f = "customerinfo";
-$s = "main";
-$reloadform = 0;
+$helpstepnum = 1;
 
-if(CheckFormSubmit($f,$s))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-		TrimFormData($f, $s, 'custdisplayname');
-		TrimFormData($f, $s, 'emaildomain');
-		TrimFormData($f, $s, 'defaultareacode');
-		//do check
-		if( CheckFormSection($f, $s) )
-		{
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
-			//submit changes
-			$custname= GetFormData($f, $s, 'custdisplayname');
-			if($custname != "" || $custname != $_SESSION['custname']){
-				setSystemSetting('displayname', $custname);
-				$_SESSION['custname']=$custname;
-			}
-			if($IS_COMMSUITE){
-				setSystemSetting('surveyurl', GetFormData($f, $s, 'surveyurl'));
-			}
+$formdata["displayname"] = array(
+	"label" => _L("Customer Display Name"),
+	"value" => getSystemSetting('displayname'),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","min" => 1,"max" => 50)
+	),
+	"control" => array("TextField","maxlength" => 50),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("Name that is displayed in the upper right corner goes here.");
 
-			setSystemSetting('emaildomain', trim(GetFormData($f, $s, 'emaildomain')));
-			setSystemSetting('defaultareacode', GetFormData($f, $s, 'defaultareacode'));
+$formdata["emaildomain"] = array(
+	"label" => _L("Email Domain"),
+	"value" => getSystemSetting('emaildomain'),
+	"validators" => array(
+		array("ValLength","max" => 50)
+	),
+	"control" => array("TextField","maxlength" => 50),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("Set this value to ensure emails sent by users are from this domain.");
 
-			if($IS_COMMSUITE){
-				setSystemSetting('_supportphone', Phone::parse(GetFormData($f, $s, 'supportphone')));
-				setSystemSetting('_supportemail', trim(GetFormData($f, $s, 'supportemail')));
-			}
-			redirect("settings.php");
-		}
-	}
-} else {
-	$reloadform = 1;
+$formdata["defaultareacode"] = array(
+	"label" => _L("Local Area Code"),
+	"value" => getSystemSetting('defaultareacode'),
+	"validators" => array(
+		array("ValLength","min" => 3,"max" => 3)
+	),
+	"control" => array("TextField","maxlength" => 3),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("Your default local area code. This gets appended to any phone numbers that do not have one.");
+
+if ($IS_COMMSUITE) {
+	$formdata["surveyurl"] = array(
+		"label" => _L("Survey URL"),
+		"value" => getSystemSetting('surveyurl'),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 100)
+		),
+		"control" => array("TextField","maxlength" => 3),
+		"helpstep" => $helpstepnum
+	);
+	$helpsteps[$helpstepnum++] = _L("URL to include as email survey links.");
+	
+	$formdata["supportphone"] = array(
+		"label" => _L("Local Area Code"),
+		"value" => getSystemSetting('_supportphone'),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 4,"max" => 14)
+		),
+		"control" => array("TextField","maxlength" => 14),
+		"helpstep" => $helpstepnum
+	);
+	$helpsteps[$helpstepnum++] = _L("Phone number that users should call for support.");
+	
+	$formdata["supportemail"] = array(
+		"label" => _L("Local Area Code"),
+		"value" => getSystemSetting('_supportemail'),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 250)
+		),
+		"control" => array("TextField","maxlength" => 250),
+		"helpstep" => $helpstepnum
+	);
+	$helpsteps[$helpstepnum++] = _L("Email address that users should use if they have questions about basic usage.");
 }
 
-if( $reloadform )
-{
-	ClearFormData($f);
+$buttons = array(submit_button(_L("Done"),"submit","accept"),
+				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
-	//check for new setting name/desc from settings.php
+$form = new Form("customerinfo", $formdata, $helpsteps, $buttons);
+$form->ajaxsubmit = true;
 
-	$custname = getSystemSetting('displayname');
-	PutFormData($f, $s,"custdisplayname", $custname, 'text', 0, 50);
-	if($IS_COMMSUITE)
-		PutFormData($f, $s, "surveyurl", getSystemSetting('surveyurl'), 'text', 0, 100);
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
 
-	PutFormData($f, $s, "emaildomain", getSystemSetting('emaildomain'), "text", 0, 255);
-	PutFormData($f, $s, "defaultareacode", getSystemSetting('defaultareacode'), 'number',200,999);
-	if($IS_COMMSUITE){
-		PutFormData($f, $s, "supportphone", Phone::format(getSystemSetting('_supportphone')), "phone", "10", "10", true);
-		PutFormData($f, $s, "supportemail", getSystemSetting('_supportemail'), "email", "nomin", "nomax", true);
-	}
+$datachange = false;
+$errors = false;
+
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+        
+        //save data here
+		$custname= $postdata['displayname'];
+		if($custname != "" || $custname != $_SESSION['custname']){
+			setSystemSetting('displayname', $custname);
+			$_SESSION['custname']=$custname;
+		}
+		
+		setSystemSetting('emaildomain', $postdata['emaildomain']);
+		setSystemSetting('defaultareacode', $postdata['defaultareacode']);
+
+		if($IS_COMMSUITE){
+			setSystemSetting('surveyurl', $postdata['surveyurl']);
+			setSystemSetting('_supportphone', Phone::parse($postdata['supportphone']));
+			setSystemSetting('_supportemail', $postdata['supportemail']);
+		}
+
+        if ($ajax)
+            $form->sendTo("settings.php");
+        else
+            redirect("settings.php");
+    }
 
 }
 
@@ -99,69 +154,24 @@ if( $reloadform )
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Customer Information';
+$TITLE = _L('Customer Information');
+
+?>
+<script)
+<? if ($datachange) { ?>
+
+alert("<?=_L("The data on this form has changed.\nYou're changes cannot be saved.")?>")";
+window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+
+<? } ?>
+
+</script>
+<?
 
 include_once("nav.inc.php");
-NewForm($f);
-buttons(submit($f, $s, 'Save'));
-startWindow('Settings');
-?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
-			<td class="bottomBorder">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
 
-				<tr>
-					<td width="30%">Customer Display Name<? print help('Settings_CustDisplayName', NULL, "small"); ?></td>
-					<td><? NewFormItem($f, $s, 'custdisplayname', 'text', 50, 50);  ?></td>
-				</tr>
-<?
-				if($IS_COMMSUITE){
-?>
-					<tr>
-						<td>
-							Survey URL<? print help('Settings_SurveyURL', NULL, "small"); ?>
-						</td>
-						<td><? NewFormItem($f, $s, 'surveyurl', 'text', 60, 100);  ?></td>
-					</tr>
-<?
-				}
-?>
-					<tr>
-						<td>Email Domain<? print help('Settings_EmailDomain', NULL, "small"); ?></td>
-						<td><? NewFormItem($f, $s, 'emaildomain', 'text', 30, 255);  ?></td>
-					</tr>
-					<tr>
-						<td width="30%">Local Area Code<? print help('Settings_DefaultLocalAreaCode', NULL, "small"); ?></td>
-						<td><? NewFormItem($f, $s, 'defaultareacode', 'text', 3,3);  ?></td>
-					</tr>
-<?
-				if($IS_COMMSUITE){
-?>
-					<tr>
-						<td>
-							Service & Support Phone<? print help('Settings_SupportPhone', NULL, "small"); ?>
-						</td>
-						<td><? NewFormItem($f, $s, 'supportphone', 'text', 14, 14);  ?></td>
-					</tr>
-					<tr>
-						<td>
-							Service & Support Email<? print help('Settings_SupportEmail', NULL, "small"); ?>
-						</td>
-						<td><? NewFormItem($f, $s, 'supportemail', 'text', 30, 250);  ?></td>
-					</tr>
-<?
-				}
-?>
-
-				</table>
-			</td>
-		</tr>
-	</table>
-<?
+startWindow(_L("Settings"));
+echo $form->render();
 endWindow();
-buttons();
-EndForm();
 include_once("navbottom.inc.php");
 ?>
