@@ -124,8 +124,7 @@ if (!isset($_POST['startdate'])) {
 				$totalrow[$index] += $val;
 		}
 	}
-	$data[] = $totalrow;
-	
+	array_unshift($data,$totalrow);	
 
 	$titles = array(
 		0 => "#ID",
