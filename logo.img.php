@@ -14,17 +14,28 @@ if ($IS_COMMSUITE) {
 require_once("XML/RPC.php");
 require_once("inc/auth.inc.php");
 
-
-$map = getCustomerLogo($CUSTOMERURL);
-if ($map !== false) {
-	$data = base64_decode($map['customerLogo']);
-	$contenttype = $map['contentType'];
+// if not logged in, get from authserver, else get from cust db
+$row = array();
+if (!isset($_SESSION['user']) || !isset($_SESSION['access'])) {
+	$map = getCustomerLogo($CUSTOMERURL);
+	if ($map !== false) {
+		$row[0] = $map['contentType'];
+		$row[1] = $map['customerLogo'];
+	}
+} else {
+	$row = DBQueryRow("select c.contenttype, c.data from setting s inner join content c on (c.id = s.value) where s.name = '_logocontentid'");
+}
+if (count($row) > 0) {
+	$data = base64_decode($row[1]);
+	$contenttype = $row[0];
 	$ext = substr($contenttype, strpos($contenttype, "/")+1);
 } else {
 	$data = file_get_contents("img/logo_small.gif");
 	$contenttype = "image/gif";
 	$ext = ".gif";
 }
+
+
 //header("Content-disposition: filename=logo." . $ext);
 //header("Cache-Control: private");
 header("Content-type: " . $contenttype);
