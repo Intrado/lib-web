@@ -59,7 +59,7 @@ abstract class Validator {
 
 	/* abstract */
 	function validate($value, $args) {
-		return false;
+		return "Unimplemented";
 	}
 	
 	/* abstract */

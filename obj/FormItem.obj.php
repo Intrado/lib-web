@@ -90,7 +90,6 @@ class TextArea extends FormItem {
 	}
 }
 
-//TODO
 class SelectMenu extends FormItem {
 	function SelectMenu ($name,$args) {
 		$this->name = $name;
@@ -167,6 +166,8 @@ class FormHtml extends FormItem {
 		return $this->args['html'];
 	}
 }
+
+
 
 
 ?>
