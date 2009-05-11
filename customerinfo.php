@@ -64,7 +64,7 @@ $formdata["defaultareacode"] = array(
 	"control" => array("TextField","maxlength" => 3),
 	"helpstep" => $helpstepnum
 );
-$helpsteps[$helpstepnum++] = _L("Your default local area code. This gets appended to any phone numbers that do not have one.");
+$helpsteps[$helpstepnum++] = _L("Your default local area code. This gets prepended to any phone numbers that do not have one.");
 
 if ($IS_COMMSUITE) {
 	$formdata["surveyurl"] = array(
@@ -72,9 +72,9 @@ if ($IS_COMMSUITE) {
 		"value" => getSystemSetting('surveyurl'),
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","min" => 1,"max" => 100)
+			array("ValLength","max" => 200)
 		),
-		"control" => array("TextField","maxlength" => 3),
+		"control" => array("TextField","maxlength" => 200),
 		"helpstep" => $helpstepnum
 	);
 	$helpsteps[$helpstepnum++] = _L("URL to include as email survey links.");
@@ -169,7 +169,6 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 <?
 
 include_once("nav.inc.php");
-
 startWindow(_L("Settings"));
 echo $form->render();
 endWindow();
