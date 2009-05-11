@@ -17,12 +17,13 @@ $_DBUSER = $argv[6];
 
 $params = array("filename" => $filename);
 
+require_once("../inc/db.inc.php");
+
 global $_dbcon;
 $_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME)
 	or die("Could not connect to database: ".$_DBNAME);
 
 
-require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
