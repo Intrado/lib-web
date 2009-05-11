@@ -2,17 +2,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/Setting.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("inc/themes.inc.php");
+require_once("inc/common.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -25,184 +21,139 @@ if (!$USER->authorize('managesystem')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$formdata = array();
+$helpsteps = array(_L("Security adjustments are made on this page."));
 
-/****************** main message section ******************/
+$helpstepnum = 1;
 
-$f = "jobsettings";
-$s = "main";
-$reloadform = 0;
+$formdata["retry"] = array(
+	"label" => _L("Retry Setting"),
+	"value" => getSystemSetting('retry'),
+	"validators" => array(),
+	"control" => array("SelectMenu", "values"=>array_combine(array(5,10,15,30,60,90,120),array(5,10,15,30,60,90,120))),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("The Retry Setting specifies the minimum number of minutes the system must wait prior to retrying any busy or unanswered phone number.");
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'addtype'))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-
-		TrimFormData($f, $s, 'alertmessage');
-		TrimFormData($f, $s, 'autoreport_replyemail');		
-		TrimFormData($f, $s, 'autoreport_replyname');
-		TrimFormData($f, $s, 'surveyurl');
-		TrimFormData($f, $s, 'callerid');
-		
-		//do check
-		if( CheckFormSection($f, $s) )
-		{
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if($IS_COMMSUITE && GetFormData($f, $s, "easycallmin") > GetFormData($f, $s, "easycallmax") && (GetFormData($f, $s, "easycallmax") != "")){
-			error('The minimum extensions length has to be less than or equal to the maximum');
-		} else {
-			//check the parsing
-
-			if (isset($errors) && count($errors) > 0) {
-				error('There was an error parsing the setting', implode("",$errors));
-			} else {
-				//submit changes
-
-				if($IS_COMMSUITE){
-					setSystemSetting('surveyurl', TrimFormData($f, $s, 'surveyurl'));
-				}
-				setSystemSetting('retry', GetFormData($f, $s, 'retry'));
-				setSystemSetting('callerid', Phone::parse(TrimFormData($f, $s, 'callerid')));
-
-				setSystemSetting('alertmessage', TrimFormData($f, $s, 'alertmessage'));
-
-				setSystemSetting('autoreport_replyemail', TrimFormData($f, $s, 'autoreport_replyemail'));
-				setSystemSetting('autoreport_replyname', TrimFormData($f, $s, 'autoreport_replyname'));
-
-				if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
-					setSystemSetting('easycallmin', GetFormData($f, $s, 'easycallmin'));
-					setSystemSetting('easycallmax', GetFormData($f, $s, 'easycallmax'));
-				}
-				redirect("settings.php");
-			}
-		}
-	}
-} else {
-	$reloadform = 1;
+// TODO: if (getSystemSetting('_hascallback', false)) {	echo Phone::format(getSystemSetting('callerid'));
+if (getSystemSetting('_hascallback', false)) {
+	$formdata["callerid"] = array(
+		"label" => _L("Default Caller ID Number"),
+		"control" => array("FormHtml","html"=>Phone::format(getSystemSetting('callerid'))),
+		"helpstep" => $helpstepnum
+	);
+} else {	
+		$formdata["callerid"] = array(
+		"label" => _L("Default Caller ID Number"),
+		"value" => Phone::format(getSystemSetting('callerid')),
+		"validators" => array(
+	            array("ValLength","min" => 2,"max" => 20),
+	            array("ValPhone")),
+		"control" => array("TextField","maxlength" => 20),
+		"helpstep" => $helpstepnum
+	);
 }
+$helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
 
-if( $reloadform )
-{
-	ClearFormData($f);
+$formdata["autoreportreplyemail"] = array(
+	"label" => _L("Autoreport Email Address"),
+	"value" => getSystemSetting('autoreport_replyemail'),
+	"validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 3,"max" => 255),
+            array("ValEmail")),
+	"control" => array("TextField","maxlength" => 255),
+	"helpstep" => $helpstepnum
+);
 
-	//check for new setting name/desc from settings.php
-	PutFormData($f,$s,"retry",getSystemSetting('retry'),"number",5,240);
-	PutFormData($f, $s, "callerid", Phone::format(getSystemSetting('callerid')), 'phone', 10, 10, true);
+$formdata["autoreportreplyname"] = array(
+	"label" => _L("Autoreport Email Name"),
+	"value" => getSystemSetting('autoreport_replyname'),
+	"validators" => array(
+            array("ValRequired"),
+            array("ValLength","min" => 1,"max" => 100)),
+	"control" => array("TextField","maxlength" => 100),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("Enter the reply-to email address and name for your auto reports.");
 
+if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
+				
+	$formdata["easycallmin"] = array(
+		"label" => _L("Minimum Extensions Length"),
+		"value" => getSystemSetting('easycallmin',10),
+		"validators" => array(
+	            array("ValRequired"),
+	            array("ValNumber","min" => 1,"max" => 10)),
+		"control" => array("SelectMenu","values"=>array_combine(range(1,10),range(1,10))),
+		"helpstep" => $helpstepnum
+	);
+	
+	$formdata["easycallmax"] = array(
+		"label" => _L("Maximum Estensions Length"),
+		"value" => getSystemSetting('easycallmax',10),
+		"validators" => array(
+	            array("ValRequired"),
+	            array("ValNumber","min" => 1,"max" => 10)),
+		"control" => array("SelectMenu","values"=>array_combine(range(1,10),range(1,10))),
+		"helpstep" => $helpstepnum
+	);
+	$helpsteps[$helpstepnum++] = _L("Indicates the maximum/minimum number of digits that must be entered when using the EasyCall or Call Me to Record features.");
 
-	if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
-		PutFormData($f, $s, "easycallmin", getSystemSetting('easycallmin', 10), "number", 0, 10);
-		PutFormData($f, $s, "easycallmax", getSystemSetting('easycallmax', 10), "number", 0, 10);
-	}
+}
+$buttons = array(submit_button(_L("Done"),"submit","accept"),
+				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
-	PutFormData($f, $s, "autoreport_replyemail", getSystemSetting('autoreport_replyemail'), 'email',0,100);
-	PutFormData($f, $s, "autoreport_replyname", getSystemSetting('autoreport_replyname'), 'text',0,100);
+$form = new Form("jobsettings", $formdata, $helpsteps, $buttons);
+$form->ajaxsubmit = true;
 
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		setSystemSetting('retry', $postdata['retry']);
+		if (isset($postdata['callerid']))
+			setSystemSetting('callerid', $postdata['callerid']);
+
+		setSystemSetting('autoreport_replyemail', $postdata['autoreportreplyemail']);
+		setSystemSetting('autoreport_replyname', $postdata['autoreportreplyname']);
+
+		if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
+			setSystemSetting('easycallmin', $postdata['easycallmin']);
+			setSystemSetting('easycallmax', $postdata['easycallmax']);
+		}		
+		
+		if ($ajax)
+			$form->sendTo("settings.php");
+		else
+			redirect("settings.php");
+
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "admin:settings";
-$TITLE = 'Systemwide Job Settings';
+$PAGE = _L("admin").":"._L("settings");
+$TITLE = _L('Systemwide Job Settings');
 
-include_once("nav.inc.php");
+echo dataChangeAlert($datachange, $_SERVER['REQUEST_URI']);
 
-NewForm($f);
-buttons(submit($f, $s, 'Save'));
-startWindow('Settings');
-		?>
-			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
-					<td class="bottomBorder">
-						<table border="0" cellpadding="2" cellspacing="0" width=100%>
-							<tr>
-								<td>Retry Setting<? print help('Settings_RetrySetting', NULL, "small"); ?></td>
-								<td>
-									<table border="0" cellpadding="2" cellspacing="0">
-										<tr>
-											<td>
-								<?
-									NewFormItem($f,$s,'retry','selectstart');
-									NewFormItem($f,$s,'retry','selectoption',5,5);
-									NewFormItem($f,$s,'retry','selectoption',10,10);
-									NewFormItem($f,$s,'retry','selectoption',15,15);
-									NewFormItem($f,$s,'retry','selectoption',30,30);
-									NewFormItem($f,$s,'retry','selectoption',60,60);
-									NewFormItem($f,$s,'retry','selectoption',90,90);
-									NewFormItem($f,$s,'retry','selectoption',120,120);
-									NewFormItem($f,$s,'retry','selectend');
-								?>
-											</td>
-											<td>
-												minutes to retry busy and unanswered phone numbers
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									Default Caller ID Number<? print help('Settings_CallerID', NULL, "small"); ?>
-								</td>
-								<td>
-								<?
-								if (getSystemSetting('_hascallback', false)) {
-									echo Phone::format(getSystemSetting('callerid'));
-								} else {
-									NewFormItem($f, $s, 'callerid', 'text', 20);
-								}
-								?>
-								</td>
-							</tr>
-							<tr>
-								<td  width="30%">Autoreport Email Address<? print help('Settings_AutoreportEmailAddress', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'autoreport_replyemail', 'text', 60,100);  ?></td>
-							</tr>
-							<tr>
-								<td>
-									Autoreport Email Name<? print help('Settings_AutoreportEmailName', NULL, "small"); ?>
-								</td>
-								<td>
-								<? NewFormItem($f, $s, 'autoreport_replyname', 'text', 60,100);  ?>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-<?
-				if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
-?>
-				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">EasyCall/<br>Call Me:</th>
-					<td class="bottomBorder">
-						<table border="0" cellpadding="2" cellspacing="0" width=100%>
-							<tr>
-								<td width="30%">Minimum Extensions Length<? print help('Settings_MinimumExtensions', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'easycallmin', 'text', 3,3);  ?></td>
-							</tr>
-							<tr>
-								<td width="30%">Maximum Extensions Length<? print help('Settings_MaximumExtensions', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'easycallmax', 'text', 3,3);  ?></td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-<?
-				}
-?>
-			</table>
-			<?
+require_once("nav.inc.php");
+startWindow(_L("Settings"));
+echo $form->render();
 endWindow();
-buttons();
-EndForm();
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>

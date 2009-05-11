@@ -166,12 +166,10 @@ $TITLE = _L('Systemwide Security');
 ?>
 <script>
 <? Validator::load_validators(array("Vallogindisableattempts")); ?>
-<? if ($datachange) { ?>
-	alert("<?=_L("The data on this form has changed.\nYou're changes cannot be saved.")?>")";
-	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
-<? } ?>
 </script>
 <?
+
+echo dataChangeAlert($datachange, $_SERVER['REQUEST_URI']);
 
 require_once("nav.inc.php");
 startWindow(_L("Settings"));

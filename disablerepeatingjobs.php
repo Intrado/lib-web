@@ -2,18 +2,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/Setting.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("inc/themes.inc.php");
-
+require_once("inc/common.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -25,84 +19,63 @@ if (!$USER->authorize('managesystem')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$formdata = array();
+$helpsteps = array(_L("Security adjustments are made on this page."));
 
-/****************** main message section ******************/
+$helpstepnum = 1;
 
-$f = "disablerepeatingjobs";
-$s = "main";
-$reloadform = 0;
+$formdata["disablerepeat"] = array(
+	"label" => _L("Disable Repeating Jobs"),
+	"value" => getSystemSetting('disablerepeat'),
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("This setting will prevent all repeating jobs from running. This is typically used to disable Attendance jobs during the summer.");
 
-if(CheckFormSubmit($f,$s))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
+$buttons = array(submit_button(_L("Done"),"submit","accept"),
+				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
-		//do check
-		if( CheckFormSection($f, $s) )
-		{
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
-			//submit changes
-			setSystemSetting('disablerepeat', GetFormData($f, $s, 'disablerepeat'));
+$form = new Form("disablerepeatingjobs", $formdata, $helpsteps, $buttons);
+$form->ajaxsubmit = true;
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		setSystemSetting('disablerepeat', $postdata['disablerepeat']);
+		
+		if ($ajax)
+			$form->sendTo("settings.php");
+		else
 			redirect("settings.php");
-		}
-	}
-} else {
-	$reloadform = 1;
-}
 
-if( $reloadform )
-{
-	ClearFormData($f);
-	//check for new setting name/desc from settings.php
-	PutFormData($f, $s, "disablerepeat", getSystemSetting('disablerepeat'), 'bool', 0, 1);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "admin:settings";
-$TITLE = 'Enable/Disable Repeating Jobs';
+$PAGE = _L("admin").":"._L("settings");
+$TITLE = _L('Enable/Disable Repeating Jobs');
 
-include_once("nav.inc.php");
+echo dataChangeAlert($datachange, $_SERVER['REQUEST_URI']);
 
-NewForm($f);
-buttons(submit($f, $s, 'Save'));
-startWindow('Settings');
-?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr>
-			<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
-			<td class="bottomBorder">
-				<table border="0" cellpadding="2" cellspacing="0" width=100%>
-					<tr>
-						<td>
-							Disable Repeating Jobs<? print help('Settings_DisableRepeat', NULL, "small"); ?>
-						</td>
-						<td>
-							<table border="0" cellpadding="2" cellspacing="0">
-								<tr>
-									<td><? NewFormItem($f, $s, 'disablerepeat', 'checkbox'); ?></td>
-									<td>This setting will prevent all scheduled repeating jobs from running.</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-<?
+require_once("nav.inc.php");
+startWindow(_L("Settings"));
+echo $form->render();
 endWindow();
-buttons();
-EndForm();
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>
