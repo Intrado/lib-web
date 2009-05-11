@@ -2,15 +2,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/Phone.obj.php");
-include_once("inc/themes.inc.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/text.inc.php");
+require_once("obj/Phone.obj.php");
+require_once("inc/themes.inc.php");
 
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
@@ -420,6 +420,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         
 		$USER->setSetting("actionlinks", $postdata['actionlinks']);
 		$USER->setSetting("_locale", $postdata['locale']);
+        $_SESSION['_locale'] = $postdata['locale'];
         
 		if ($postdata['customdisplay']) {
 			$USER->setSetting("_brandtheme", $postdata['brandtheme']);
