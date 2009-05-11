@@ -2,18 +2,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/Setting.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("inc/themes.inc.php");
-
+require_once("inc/common.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/table.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,125 +16,166 @@ if (!$USER->authorize('managesystem')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Validators
+////////////////////////////////////////////////////////////////////////////////
+
+class Vallogindisableattempts extends Validator {
+	
+	function validate ($value, $args, $requiredvalues) {
+		if ($requiredvalues[$args['field']] >= $value && $value !== "0")
+			return _L("%s must be greater than the invalid login lockout attempts", $this->label);
+		
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args, requiredvalues) {
+				if (parseInt(requiredvalues[args["field"]]) >= parseInt(value) && parseInt(value) !== 0)
+					return "' . _L("%s must be greater than the invalid login lockout attempts", $this->label) . '";
+
+				return true;
+			}';
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$formdata = array();
+$helpsteps = array(_L("Security adjustments are made on this page."));
 
-/****************** main message section ******************/
+$helpstepnum = 1;
 
-$f = "securitysettings";
-$s = "main";
-$reloadform = 0;
+$formdata["usernamelength"] = array(
+	"label" => _L("Minimum Username Length"),
+	"value" => getSystemSetting('usernamelength',5),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber","min" => 4,"max" => 10)
+	),
+	"control" => array("SelectMenu","values"=>array_combine(range(4,10),range(4,10))),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("Enter the Minimum number of characters acceptable for a username.")."<br>"._L("Allowed values are between 4 and 10 characters");
 
-if(CheckFormSubmit($f,$s))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
+$formdata["passwordlength"] = array(
+	"label" => _L("Minimum Password Length"),
+	"value" => getSystemSetting('passwordlength',5),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber","min" => 4,"max" => 10)
+	),
+	"control" => array("SelectMenu","values"=>array_combine(range(4,10),range(4,10))),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("Enter the Minimum number of characters acceptable for a password.")."<br>"._L("Allowed values are between 4 and 10 characters");
 
-		TrimFormData($f, $s, "usernamelength");
-		TrimFormData($f, $s, "passwordlength");
-		TrimFormData($f, $s, "loginlockoutattempts");
-		TrimFormData($f, $s, "loginlockouttime");
-		TrimFormData($f, $s, "logindisableattempts");
+$formdata["loginlockoutattempts"] = array(
+	"label" => _L("Invalid Login Lockout"),
+	"value" => getSystemSetting('loginlockoutattempts'),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber","min" => 0,"max" => 15)
+	),
+	"control" => array("SelectMenu","values"=>array_combine(range(0,15),range(0,15))),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("This setting controls the number of invalid attempts a user has before a temporary lock is placed on their account.")."<br>"._L("Select zero to disable.");
+
+$formdata["loginlockouttime"] = array(
+	"label" => _L("Invalid Login Lockout Period"),
+	"value" => getSystemSetting('loginlockouttime'),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber","min" => 1,"max" => 60)
+	),
+	"control" => array("SelectMenu","values"=>array_combine(range(1,60),range(1,60))),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("This setting controls the amount of time a user is temporarily locked out.");
+
+$formdata["logindisableattempts"] = array(
+	"label" => _L("Invalid Login Disable Account"),
+	"value" => getSystemSetting('logindisableattempts'),
+	"validators" => array(
+		array("ValRequired"),
+		array("Vallogindisableattempts","field" => "loginlockoutattempts"),
+		array("ValNumber","min" => 0,"max" => 15)
+	),
+	"requires" => array("loginlockoutattempts"),
+	"control" => array("SelectMenu","values"=>array_combine(range(0,15),range(0,15))),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("This setting controls the number of invalid attempts a user has before their account is disabled. This must be greater than the Invalid Login Lockout Attempts.")."<br>"._L("Select zero to disable.");
+
+$formdata["msgcallbackrequireid"] = array(
+	"label" => _L("Require Student ID on Call Back"),
+	"value" => getSystemSetting('msgcallbackrequireid'),
+	"validators" => array(
+	),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+$helpsteps[$helpstepnum++] = _L("This setting will require the entry of a valid student id when calling back to listen to messages.");
+
+$buttons = array(submit_button(_L("Done"),"submit","accept"),
+				icon_button(_L("Cancel"),"cross",null,"settings.php"));
+
+$form = new Form("securitysettings", $formdata, $helpsteps, $buttons);
+$form->ajaxsubmit = true;
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		setSystemSetting('usernamelength', $postdata['usernamelength']);
+		setSystemSetting('passwordlength', $postdata['passwordlength']);
+		setSystemSetting('loginlockoutattempts', $postdata['loginlockoutattempts']);
+		setSystemSetting('loginlockouttime', $postdata['loginlockouttime']);
+		setSystemSetting('logindisableattempts', $postdata['logindisableattempts']);
+		setSystemSetting('msgcallbackrequireid', $postdata['msgcallbackrequireid']);
 		
-		//do check
-		if( CheckFormSection($f, $s) )
-		{
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "loginlockoutattempts") != 0 && GetFormData($f, $s, "logindisableattempts") !=0 && GetFormData($f, $s, "logindisableattempts") <= GetFormData($f, $s, "loginlockoutattempts")){
-			error("The login disable attempts must be greater than the login lockout attempts");
-		} else {
-			setSystemSetting('usernamelength', GetFormData($f, $s, 'usernamelength'));
-			setSystemSetting('passwordlength', GetFormData($f, $s, 'passwordlength'));
-
-			setSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'));
-			setSystemSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'));
-			setSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'));
-
-			setSystemSetting('msgcallbackrequireid', GetFormData($f, $s, 'msgcallbackrequireid'));
-
+		if ($ajax)
+			$form->sendTo("settings.php");
+		else
 			redirect("settings.php");
-		}
-	}
-} else {
-	$reloadform = 1;
+
+    }
 }
-
-if( $reloadform )
-{
-	ClearFormData($f);
-
-	//check for new setting name/desc from settings.php
-	PutFormData($f, $s, "loginlockoutattempts", getSystemSetting('loginlockoutattempts', "5"), "number", 0, 15, true);
-	PutFormData($f, $s, "logindisableattempts", getSystemSetting('logindisableattempts', "0"), "number", 0, 15, true);
-	PutFormData($f, $s, "loginlockouttime", getSystemSetting('loginlockouttime', "5"), "number", 1, 60, true);
-
-	PutFormData($f, $s,"usernamelength", getSystemSetting('usernamelength', "5"), "number", 4, 10);
-	PutFormData($f, $s,"passwordlength", getSystemSetting('passwordlength', "5"), "number", 4, 10);
-
-	PutFormData($f, $s, "msgcallbackrequireid", getSystemSetting('msgcallbackrequireid'), 'bool', 0, 1);
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Systemwide Security';
+$TITLE = _L('Systemwide Security');
 
-include_once("nav.inc.php");
-
-NewForm($f);
-buttons(submit($f, $s, 'Save'));
-startWindow('Login Settings');
-		?>
-			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-				<tr>
-					<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Options:</th>
-					<td class="bottomBorder">
-						<table border="0" cellpadding="2" cellspacing="0" width=100%>
-							<tr>
-								<td width="30%">Minimum Username Length<? print help('Settings_MinimumUsername', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'usernamelength', 'text', 3,3);  ?> Must be between 4 and 10.</td>
-							</tr>
-							<tr>
-								<td>Minimum Password Length<? print help('Settings_MinimumPassword', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'passwordlength', 'text', 3,3);  ?> Must be between 4 and 10.</td>
-							</tr>
-							<tr>
-								<td>Invalid Login Lockout<? print help('Settings_InvalidLoginLockout', NULL, "small"); ?></td>
-								<td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
-							</tr>
-							<tr>
-								<td>Invalid Login Lockout Period<? print help('Settings_LoginLockoutTime', NULL, "small"); ?></td>
-								<td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td>
-							</tr>
-							<tr>
-								<td>Invalid Login Disable Account<? print help('Settings_LoginDisableAccount', NULL, "small"); ?></td>
-								<td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td>
-							</tr>
-<? if (getSystemSetting('_hascallback', false)) { ?>
-							<tr>
-								<td>Require Student ID on Call Back<? print help('Settings_MSGCallBackRequireID', NULL, "small"); ?></td>
-								<td><? NewFormItem($f, $s, 'msgcallbackrequireid', 'checkbox'); ?></td>
-							</tr>
+?>
+<script>
+<? Validator::load_validators(array("Vallogindisableattempts")); ?>
+<? if ($datachange) { ?>
+	alert("<?=_L("The data on this form has changed.\nYou're changes cannot be saved.")?>")";
+	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 <? } ?>
-						</table>
-					</td>
-				</tr>
+</script>
+<?
 
-			</table>
-			<?
+require_once("nav.inc.php");
+startWindow(_L("Settings"));
+echo $form->render();
 endWindow();
-buttons();
-EndForm();
-include_once("navbottom.inc.php");
+require_once("navbottom.inc.php");
 ?>
