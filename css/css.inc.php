@@ -379,6 +379,19 @@ a:hover {
 	padding: 0;
 }
 
+
+.regbutton {
+	text-decoration: none;
+	float: left;
+	background-color: transparent; 
+	border: 0px; 
+	width: auto; 
+	overflow: visible; 
+	vertical-align: middle; 
+	padding: 1px;
+}
+
+
 /* *********************************************** */
 
 
@@ -527,9 +540,6 @@ div.scrollTableContainer {
 	border: 0px; 
 	white-space: nowrap;
 	text-decoration: none;
-	zfont-size: 9pt;
-	zfont-weight: bold;
-	zfont-family: sans-serif;
 	cursor: pointer;
 	
 	color: <?=$primary?>;;

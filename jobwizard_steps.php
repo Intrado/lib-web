@@ -4,6 +4,22 @@
 
 class JobWiz_basic extends WizStep {
 	function getForm($postdata, $curstep) {
+		
+		$expresshtml = '
+			<table style="text-align: center; font-size: 8pt;" cellpadding="0" cellspacing="0">
+			<caption>ExpressCall:</caption>
+				<tr>
+					<th><img src="img/icon_phone.gif" alt="Phone"></th>
+					<th><img src="img/icon_email.gif" alt="Email"></th>
+					<th><img src="img/icon_sms.gif" alt="SMS"></th>
+				</tr>
+				<tr>
+					<td valign="top"><img src="img/textfield.png" alt=""><br>Text-to-speach Phone with Translate.</td>
+					<td valign="top"><img src="img/textfield.png" alt=""><br>Email with Translate.</td>
+					<td valign="top"><img src="img/textfield.png" alt=""><br>Text SMS.</td>
+				</tr>
+			</table>';
+		
 		$formdata = array(
 			"name" => array(
 				"label" => "Name",
@@ -50,9 +66,9 @@ class JobWiz_basic extends WizStep {
 					array("ValRequired")
 				),
 				"value" => "",
-				"control" => array("RadioButton", "values" => array(
-					"easycall" => "EasyCall (Record via Phone -> Automatic Email Recording -> Automatic SMS Message)",
-					"express" => "ExpressText (Text-to-speech Phone with Auto Translate -> Email -> SMS) ",
+				"control" => array("HtmlRadioButton", "values" => array(
+					"easycall" => " EasyCall <br>(Record via Phone -> Automatic Email Recording -> Automatic SMS Message)",
+					"express" => $expresshtml,
 					"personalized" => "Personalized (Record via Phone / Type Email -> SMS)",
 					"custom" => "Custom (Pick your own detailed options)"
 				)),

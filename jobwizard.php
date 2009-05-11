@@ -155,7 +155,7 @@ class Wizard {
 			$form->buttons[] = submit_button("Done","done","accept");
 		
 		//merge in any existing wizard post data
-		if (isset($_SESSION['wizards']['data'][$this->curstep])) {
+		if (isset($_SESSION['wizard']['data'][$this->curstep])) {
 			foreach ($_SESSION['wizard']['data'][$this->curstep] as $name => $value) {
 				if (isset($form->formdata[$name]))
 					$form->formdata[$name]['value'] = $value;

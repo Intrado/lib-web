@@ -36,6 +36,12 @@ function form_event_handler (event) {
 }
 
 function form_get_value (form,targetname) {
+	var formvars = document.formvars[form.name];
+	
+	return formvars.jsgetvalue[targetname](form,targetname);
+}
+
+function form_default_get_value (form,targetname) {
 	var value = "";
 	
 	try {
@@ -54,7 +60,6 @@ function form_get_value (form,targetname) {
 						break;
 					}
 				}
-				
 				break;
 			case "checkbox":
 				value = [];
@@ -71,6 +76,8 @@ function form_get_value (form,targetname) {
 }
 
 function form_do_validation (form, element) {
+	if (!element.name)
+		return;
 	var targetname = element.name;
 	var formvars = document.formvars[form.name];
 	targetname = targetname.replace("[]",""); //might need to strip off the some brackets from the name
@@ -142,8 +149,8 @@ function form_validation_display(element,style, msgtext) {
 		
 	//if radio button, get the id of the container div
 	var name;
-	if (e.up().match(".radiobox"))
-		name = e.up().id;
+	if (e.up(".radiobox"))
+		name = e.up(".radiobox").id;
 	else
 		name = e.id;
 	
@@ -181,9 +188,7 @@ function form_validation_display(element,style, msgtext) {
 	}
 }
 
-//exclamation.png - !
-//error.png - hazard
-//accept.png - check
+
 function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	var form = $(name);
 	//set up formvars to save data, avoid memleaks in IE by not attaching anything to dom elements
@@ -196,7 +201,8 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		helpsteps: helpsteps,
 		ajaxsubmit: ajaxsubmit,
 		currentstep: 0,
-		validators: {}	
+		validators: {},
+		jsgetvalue: {}
 	};
 		
 	//make appropriate validators for each field
@@ -215,9 +221,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 				obj.observe("change",form_event_handler);
 			}
 		} else {
-			if (e.type == "checkbox") {
-				e.observe("change",form_event_handler);
-			} else if (e.type.startsWith("select")) {
+			if (e.type == "checkbox" || e.type.startsWith("select")) {
 				e.observe("change",form_event_handler);
 			}
 			
@@ -249,6 +253,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		}
 		
 		formvars.validators[id] = validators;
+		formvars.jsgetvalue[id] = eval(formdata[fieldname].jsgetvalue);
 	}
 	
 	//install click handlers for (name + '_helper') hrefs

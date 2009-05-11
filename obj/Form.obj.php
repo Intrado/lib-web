@@ -126,10 +126,13 @@ class Form {
 			}
 			
 			$formclass = $control[0];
-			$item = new $formclass($name, $control);
+			$item = new $formclass($this,$name, $control);
+			
+			//inject which function to use for getting the value from this control
+			$this->formdata[$name]['jsgetvalue'] = $item->jsGetValue();
 
 			if ($formclass == "HiddenField") {
-				$str.= $item->render($this,$itemdata['value']);
+				$str.= $item->render($itemdata['value']);
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 				continue;
 			}
@@ -152,7 +155,7 @@ class Form {
 				<div>
 					<div class="prop"></div>
 					<label>'.$l.'</label>
-					<div class="formhtml">'.$item->render($this,'').'</div>
+					<div class="formhtml">'.$item->render('').'</div>
 					<div class="clear"></div>
 				</div>
 				';
@@ -198,7 +201,7 @@ class Form {
 				<div id="'.$n.'_fieldarea" '.$style.' >
 					<div class="prop"></div>
 					<label for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label>
-					'.$item->render($this,$value).'
+					'.$item->render($value).'
 					<div class="msgarea">
 						<img alt="" id="'.$n.'_icon" src="'.$i.'" />
 						<span id="'.$n.'_msg">'.$msg.'</span>
@@ -235,6 +238,10 @@ class Form {
 		<div style="clear: both;"></div>
 
 		<script type="text/javascript">
+	
+	//TODO spit out a var with all the getval fns
+	
+	
 		form_load("'.$this->name.'",
 			"'.$posturl.'",
 			'.json_encode($this->formdata).',
