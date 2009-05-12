@@ -80,7 +80,7 @@ if ($IS_COMMSUITE) {
 	$helpsteps[$helpstepnum++] = _L("URL to include as email survey links.");
 	
 	$formdata["supportphone"] = array(
-		"label" => _L("Local Area Code"),
+		"label" => _L("Support Phone Number"),
 		"value" => getSystemSetting('_supportphone'),
 		"validators" => array(
 			array("ValRequired"),
@@ -92,7 +92,7 @@ if ($IS_COMMSUITE) {
 	$helpsteps[$helpstepnum++] = _L("Phone number that users should call for support.");
 	
 	$formdata["supportemail"] = array(
-		"label" => _L("Local Area Code"),
+		"label" => _L("Support Email Address"),
 		"value" => getSystemSetting('_supportemail'),
 		"validators" => array(
 			array("ValRequired"),
