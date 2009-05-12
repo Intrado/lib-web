@@ -197,15 +197,15 @@ class Wizard {
 				if ($ajax) {			
 					if ($button == "next") {
 						if ($next = $this->getNextStep())
-							$form->sendTo("jobwizard.php?step=$next");
+							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
 						else
-							$form->sendTo("jobwizard.php?done");
+							$form->sendTo($_SERVER['SCRIPT_NAME']."?done");
 					} else if ($button == "prev") {
 						if ($next = $this->getPrevStep())
-							$form->sendTo("jobwizard.php?step=$next");
+							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
 						
 					} else if ($button == "done") {
-						$form->sendTo("jobwizard.php?done");
+						$form->sendTo($_SERVER['SCRIPT_NAME']."?done");
 					}
 				}
 			}
