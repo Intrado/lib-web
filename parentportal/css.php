@@ -330,12 +330,23 @@ a:hover {
 /* **** button **** */
 
 
+
 .button {
 	text-decoration: none;
-	height: 23px;
+	height: 24px;
 
 	float: left;
+	background-color: transparent; 
+	border: 0px; 
+	width: auto; 
+	overflow: visible; 
+	vertical-align: middle; 
+	padding: 0 .25em 3px .25em;
+}
 
+.button .middle img {
+		vertical-align: -3px;
+		padding-right: 3px;
 }
 
 .button td {
@@ -345,12 +356,14 @@ a:hover {
 .button a, .button td {
 	text-decoration: none;
 	color: <?=$primary?>;
-	font-size: 9px;
+	font-size: 10px;
 	font-weight: bold;
 	cursor: pointer;
 }
 
 .button .middle {
+	white-space: nowrap;
+	padding-right: 3px;
 	background: url('img/themes/<?=$theme?>/button_mid.gif') repeat-x;
 }
 
