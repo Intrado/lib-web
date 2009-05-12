@@ -1,11 +1,15 @@
 <?
 class Wizard {
+	var $name;
 	var $wizdata;
 	var $filteredwizdata;
 	var $steplist;
 	var $curstep;
+	var $datachange;
+	var $done;
 	
-	function Wizard ($wizdata, $curstep = false) {
+	function Wizard ($name, $wizdata, $curstep = false) {
+		$this->name = $name;
 		$this->wizdata = $wizdata;
 		$this->filteredwizdata = $this->filter();
 		$this->steplist = $this->getStepList();
@@ -106,7 +110,7 @@ class Wizard {
 				if (count($substeps) > 0)
 					$newwizdata[$wizstep] = $substeps;
 			} else {
-				if ($wizstepdata->isEnabled($_SESSION['wizard']['data'],$curstep . "/" . $wizstep))
+				if ($wizstepdata->isEnabled($_SESSION[$this->name]['data'],$curstep . "/" . $wizstep))
 					$newwizdata[$wizstep] = $wizstepdata;
 			}
 		}
@@ -115,7 +119,7 @@ class Wizard {
 	
 	function getForm() {
 		$stepdata = $this->getStepData();		
-		$form = $stepdata->getForm($_SESSION['wizard']['data'], $this->curstep);
+		$form = $stepdata->getForm($_SESSION[$this->name]['data'], $this->curstep);
 		$form->ajaxsubmit = true;
 		
 		$form->buttons = array();
@@ -134,8 +138,8 @@ class Wizard {
 			$form->buttons[] = submit_button("Done","done","accept");
 		
 		//merge in any existing wizard post data
-		if (isset($_SESSION['wizard']['data'][$this->curstep])) {
-			foreach ($_SESSION['wizard']['data'][$this->curstep] as $name => $value) {
+		if (isset($_SESSION[$this->name]['data'][$this->curstep])) {
+			foreach ($_SESSION[$this->name]['data'][$this->curstep] as $name => $value) {
 				if (isset($form->formdata[$name]))
 					$form->formdata[$name]['value'] = $value;
 			}
@@ -149,9 +153,65 @@ class Wizard {
 	}
 	
 	function handleRequest () {
-		$stepdata = $this->getStepData();
-		$form = $stepdata->getForm($_SESSION['wizard']['data'], $this->curstep);
+		if (isset($_GET['cancel']) || !isset($_SESSION[$this->name]['step'])) {
+			unset($_SESSION[$this->name]);
+			$_SESSION[$this->name]['data'] = array();
+			$_SESSION[$this->name]['step'] = $step = $this->getCurrentStep();
+			redirect("jobwizard.php?step=$step");
+		}
 		
+		if (isset($_GET['step'])) {
+			$_SESSION[$this->name]['step'] = $_GET['step'];
+		}
+		
+		if (isset($_GET['done'])) {
+			$this->done = true;
+		}
+		
+		$stepdata = $this->getStepData();
+		$step = $this->getCurrentStep();
+		$form = $stepdata->getForm($_SESSION[$this->name]['data'], $step);
+		$form->handleRequest();
+		
+		$this->datachange = false;
+		$errors = false;
+		//check for form submission
+		if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+			$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+			
+			if ($form->checkForDataChange()) {
+				$this->datachange = true;
+			} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+				$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+				
+				$_SESSION[$this->name]['data'][$step] = $postdata;
+				$this->filteredwizdata = $this->filter();
+				$this->steplist = $this->getStepList();
+				
+				if ($ajax) {			
+					if ($button == "next") {
+						if ($next = $this->getNextStep())
+							$form->sendTo("jobwizard.php?step=$next");
+						else
+							$form->sendTo("jobwizard.php?done");
+					} else if ($button == "prev") {
+						if ($next = $this->getPrevStep())
+							$form->sendTo("jobwizard.php?step=$next");
+						
+					} else if ($button == "done") {
+						$form->sendTo("jobwizard.php?done");
+					}
+				}
+			}
+		}
+	}
+	
+	function isDone() {
+		return $this->done;
+	}
+	
+	function dataChange() {
+		return $this->datachange;
 	}
 }
 
