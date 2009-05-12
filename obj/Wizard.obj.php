@@ -13,8 +13,13 @@ class Wizard {
 		$this->wizdata = $wizdata;
 		$this->filteredwizdata = $this->filter();
 		$this->steplist = $this->getStepList();
-		if (!$curstep)
-			$curstep = $this->steplist[0];
+		if (!$curstep) {
+			if (isset($_SESSION[$name]['step'])) {
+				$curstep = $_SESSION[$name]['step'];
+			} else {
+				$curstep = $this->steplist[0];
+			}
+		}
 		$this->curstep = $curstep;
 	}
 	
@@ -156,12 +161,13 @@ class Wizard {
 		if (isset($_GET['cancel']) || !isset($_SESSION[$this->name]['step'])) {
 			unset($_SESSION[$this->name]);
 			$_SESSION[$this->name]['data'] = array();
-			$_SESSION[$this->name]['step'] = $step = $this->getCurrentStep();
+			$_SESSION[$this->name]['step'] = $step = $this->steplist[0];
 			redirect("jobwizard.php?step=$step");
 		}
 		
 		if (isset($_GET['step'])) {
 			$_SESSION[$this->name]['step'] = $_GET['step'];
+			$this->setCurrentStep($_GET['step']);
 		}
 		
 		if (isset($_GET['done'])) {
