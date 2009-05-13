@@ -264,60 +264,57 @@ class Message extends DBMappedObject {
 		return $renderedparts;
 	}
 
-	static function playAudio($id, $fields){
+	static function playAudio($id, $fields) {
 
-	$message = new Message($id);
-	$renderedparts = Message::renderMessageParts($id, $fields);
-	$voices = DBFindMany("Voice","from ttsvoice");
+		$message = new Message($id);
+		$renderedparts = Message::renderMessageParts($id, $fields);
+		$voices = DBFindMany("Voice","from ttsvoice");
 
-	// -- get the wav files --
-	$wavfiles = array();
+		// -- get the wav files --
+		$wavfiles = array();
 
-	foreach ($renderedparts as $part) {
-		if ($part[0] == "a") {
-			list($contenttype,$data) = contentGet($part[1]);
-			$wavfiles[] = writeWav($data);
-		} else if ($part[0] == "t") {
-			$voice = $voices[$part[2]];
-			list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
-			$wavfiles[] = writeWav($data);
+		foreach ($renderedparts as $part) {
+			if ($part[0] == "a") {
+				list($contenttype,$data) = contentGet($part[1]);
+				$wavfiles[] = writeWav($data);
+			} else if ($part[0] == "t") {
+				$voice = $voices[$part[2]];
+				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
+				$wavfiles[] = writeWav($data);
+			}
 		}
-	}
 
-	//finally, merge the wav files
-	$outname = secure_tmpname("preview",".wav");
-	$cmd = 'sox "' . implode('" "',$wavfiles) . '" "' . $outname . '"';
+		//finally, merge the wav files
+		$outname = secure_tmpname("preview",".wav");
+		$cmd = 'sox "' . implode('" "',$wavfiles) . '" "' . $outname . '"';
 
-	$result = exec($cmd, $res1, $res2);
+		$result = exec($cmd, $res1, $res2);
 
+		foreach ($wavfiles as $file)
+			@unlink($file);
 
-	foreach ($wavfiles as $file)
-		@unlink($file);
+		if (!$res2 && file_exists($outname)) {
+			$data = file_get_contents ($outname); //readfile seems to cause problems
 
-	if(!$res2 && file_exists($outname)) {
+			header("HTTP/1.0 200 OK");
+			if (isset($_GET['download']))
+				header('Content-type: application/x-octet-stream');
+			else
+				header("Content-Type: audio/wav");
 
+			header("Content-disposition: attachment; filename=message.wav");
+			header('Pragma: private');
+			header('Cache-control: private, must-revalidate');
+			header("Content-Length: " . strlen($data));
+			header("Connection: close");
 
-		$data = file_get_contents ($outname); //readfile seems to cause problems
+			echo $data;
 
-		header("HTTP/1.0 200 OK");
-		if (isset($_GET['download']))
-			header('Content-type: application/x-octet-stream');
-		else
-			header("Content-Type: audio/wav");
+		} else {
+			echo _L("An error occurred trying to generate the preview file. Please try again.");
+		}
 
-		header("Content-disposition: attachment; filename=message.wav");
-		header('Pragma: private');
-		header('Cache-control: private, must-revalidate');
-		header("Content-Length: " . strlen($data));
-		header("Connection: close");
-
-		echo $data;
-
-	} else {
-		echo "An error occuring trying to generate the preview file. Please try again.";
-	}
-
-	@unlink($outname);
+		@unlink($outname);
 	}
 
 }
