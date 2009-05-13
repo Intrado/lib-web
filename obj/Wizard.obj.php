@@ -162,7 +162,7 @@ class Wizard {
 			unset($_SESSION[$this->name]);
 			$_SESSION[$this->name]['data'] = array();
 			$_SESSION[$this->name]['step'] = $step = $this->steplist[0];
-			redirect("jobwizard.php?step=$step");
+			redirect($_SERVER['SCRIPT_NAME']."?step=$step");
 		}
 		
 		if (isset($_GET['step'])) {
