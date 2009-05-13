@@ -114,10 +114,25 @@ class Form {
 		
 		$str = '
 		<div class="newform_container">
-		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
-		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">';
+		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'" style="width: 100%; /* TODO fix main css */">
+		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">
+		<table width="100%" cellspacing="0" table-layout="fixed"><tr><td valign=top> <!-- FORM CONTENT -->';
 		
 		foreach ($this->formdata as $name => $itemdata) {
+			//check for section titles
+			if (is_string($itemdata)) {
+				if ($lasthelpstep) {
+					$str .= '</table></fieldset>';
+					$lasthelpstep = false;
+				}
+				
+				$str .= '
+					<h2>'.$itemdata.'</h2>';
+				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
+				continue;
+			}
+			
+			
 			if (isset($itemdata['control'])) {
 				$control = $itemdata['control'];
 			} else {
@@ -139,12 +154,12 @@ class Form {
 
 			if ($lasthelpstep && $lasthelpstep != $itemdata['helpstep']) {
 				$str .= '
-			</fieldset>';
+			</table></fieldset>';
 			}
 			
 			if ($lasthelpstep != $itemdata['helpstep']) {
 				$lasthelpstep = $itemdata['helpstep'];
-				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'">';
+				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'"><legend>Step '.$lasthelpstep.'</legend><table width="100%" cellspacing="0" table-layout="fixed" class="formcontenttable">';
 			}
 			
 			$n = $this->name."_".$item->name;
@@ -152,12 +167,7 @@ class Form {
 
 			if ($formclass == "FormHtml") {
 				$str.= '
-				<div>
-					<div class="prop"></div>
-					<label>'.$l.'</label>
-					<div class="formhtml">'.$item->render('').'</div>
-					<div class="clear"></div>
-				</div>
+				<tr><th class="formtableheader formlabel">'.$l.': </th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
@@ -166,7 +176,7 @@ class Form {
 				$t = $this->tindex++;
 				$i = "img/pixel.gif";
 				$style = "";
-				$msg = "";
+				$msg = false;
 			
 				//see if valrequired is any of the validators
 				$isrequired = false;
@@ -189,7 +199,7 @@ class Form {
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
 						$style = 'style="background: rgb(225,255,225);"' ;
-						$msg = "OK";
+						$msg = false;
 					} else {
 						list($validator,$msg) =  $valresult;
 						$i = "img/icons/exclamation.gif";
@@ -198,23 +208,21 @@ class Form {
 				}
 				
 				$str.= '
-				<div id="'.$n.'_fieldarea" '.$style.' >
-					<div class="prop"></div>
-					<label for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label>
-					'.$item->render($value).'
-					<div class="msgarea">
-						<img alt="" id="'.$n.'_icon" src="'.$i.'" />
-						<span id="'.$n.'_msg">'.$msg.'</span>
-					</div>
-					<div class="clear"></div>
-				</div>
+				<tr id="'.$n.'_fieldarea" '.$style.'>
+					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.': </label></th>
+					<td class="formtableicon"><img alt="" id="'.$n.'_icon" src="'.$i.'" /></td>
+					<td class="formtablecontrol">
+						'.$item->render($value).'
+						<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>
+					</td>
+				</tr>
 				';
 			}
 		} //foreach
 		
 		if ($lasthelpstep)
 			$str .= '
-			</fieldset>';
+			</table></fieldset>';
 		
 		//submit buttons
 		foreach ($this->buttons as $code) {
@@ -222,25 +230,31 @@ class Form {
 		}
 		
 		$str .= '
+				<!-- END FORM CONTENT -->
+				</td>
+				<td width="200px" valign=top>
+				<!-- HELPER -->
+				<div id="'.$this->name.'_helper" class="helper" style="width: 100%; /* TODO fix main css */">
+					<div class="title">Guide</div>
+					<div class="content" id="'.$this->name.'_helpercontent" >'.$this->helpsteps[0].'</div>
+					<div class="toolbar" >
+						<a href="#" style="float:left;"><img style="opacity: 0.33;" src="img/icons/control_rewind.gif" border=0></a>
+						<a href="#" style="float:right;" ><img src="img/icons/control_fastforward_blue.gif" border=0></a>
+						<div id="'.$this->name.'_helperinfo" class="info">Click the arrow to begin</div>
+					</div>
+				</div>
+				<!-- END HELPER -->
+				</td>
+			</tr>
+		</table>
 		</form>
 		
-		<div id="'.$this->name.'_helper" class="helper">
-			<div class="title">Guide</div>
-			<div class="content" id="'.$this->name.'_helpercontent" >'.$this->helpsteps[0].'</div>
-			<div class="toolbar" >
-				<a href="#" style="float:left;"><img style="opacity: 0.33;" src="img/icons/control_rewind.gif" border=0></a>
-				<a href="#" style="float:right;" ><img src="img/icons/control_fastforward_blue.gif" border=0></a>
-				<div id="'.$this->name.'_helperinfo" class="info">Click the arrow to begin</div>
-			</div>
-		</div>
+		
 		
 		</div>
 		<div style="clear: both;"></div>
 
-		<script type="text/javascript">
-	
-	//TODO spit out a var with all the getval fns
-	
+		<script type="text/javascript">	
 	
 		form_load("'.$this->name.'",
 			"'.$posturl.'",

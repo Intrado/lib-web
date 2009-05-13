@@ -115,7 +115,7 @@ function form_do_validation (form, element) {
 					} else {
 						//checked out ok
 						if (value.length > 0)
-							form_validation_display(element,"valid","OK");
+							form_validation_display(element,"valid","");
 						else
 							form_validation_display(element,"blank","");
 					}
@@ -135,8 +135,8 @@ function form_do_validation (form, element) {
 					}
 				}
 			}
-			if (value.length > 0) 
-				form_validation_display(element,"valid","OK");
+			if (value.length > 0)
+				form_validation_display(element,"valid","");
 			else
 				form_validation_display(element,"blank","");
 		}
@@ -182,9 +182,10 @@ function form_validation_display(element,style, msgtext) {
 		fieldarea.bgeffect = new Effect.Morph(fieldarea,{style: css, duration: 0.5, afterFinish: function() {fieldarea.bgeffect = null;}});
 		
 		//set up 2 queued effects that will fade to new bg color, then swap text and fade in
+		msg.show();
 		Effect.Queues.get(msg.id).each(function(effect) { effect.cancel(); });
 		new Effect.Opacity(msg,{duration: 0.25, from:1, to:0, afterFinish: function () {msg.innerHTML = msgtext}, queue: { position: 'end', scope: msg.id }});
-		new Effect.Opacity(msg,{duration: 0.25, from:0, to:1, queue: { position: 'end', scope: msg.id }});
+		new Effect.Opacity(msg,{duration: 0.25, from:0, to:1, afterFinish: function () {if(msgtext == "") msg.hide();}, queue: { position: 'end', scope: msg.id }});
 	}
 }
 
@@ -269,6 +270,13 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		}
 	});
 		
+	//install click handlers for table form labels
+	form.select('.formlabel').map(function(e) {
+		e.observe("click",form_fieldset_handler);
+		e.style.cursor="help";
+	});
+	
+		
 	//submit handler
 	form.observe("submit",form_handle_submit.curry(name));
 }
@@ -334,15 +342,15 @@ function form_step_handler (form, direction, specificstep) {
 	//find the section of the form for this step, blink it, and scroll to it
 	var e;
 	for (var i = 1; e = $(form.id + '_helpsection_'+i); i++) {
-		e.style.border = 'none';
+		e.style.border = '';
 		
 		if (i == formvars.currentstep) {
 			formvars.scrolling = true;
 			var helper_y = e.offsetTop;
 			var viewport_offset = Math.max(0, document.viewport.getHeight() - e.getHeight());
 
-			//new Effect.Morph(e, {style: 'border-color: rgb(150,150,255);', duration: 0.8, transition: Effect.Transitions.pulse});
-			e.style.border = "2px solid rgb(150,150,255)";
+			e.style.border = "2px solid rgb(0,0,255)";
+			new Effect.Morph(e, {style: 'border-color: rgb(150,150,255)', duration: 0.8, transition: Effect.Transitions.spring});
 			
 			new Effect.Move(helper, { y:helper_y, mode:'absolute', duration: 0.8,
 				afterFinish: function() {
@@ -413,7 +421,7 @@ function form_handle_submit(form,event) {
 						} else {
 							//checked out ok
 							if (value.length > 0)
-								form_validation_display(element,"valid","OK");
+								form_validation_display(element,"valid","");
 							else
 								form_validation_display(element,"blank","");
 						}

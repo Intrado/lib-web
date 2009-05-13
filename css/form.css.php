@@ -69,104 +69,64 @@ form.newform {
 
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 .newform fieldset {
-	border: none;
+	padding: 5px;
+	margin-left: 15px;
+	margin-bottom: 3px;
+}
+
+.newform legend {
+	font-weight: bold;
+	font-size: 130%;
+	color: #333;
 	padding: 0px;
-}
-
-/* these 3 items share aprox 1/3 the space in the form */
-.newform label {
-	padding: 3px 0px 3px 1%;
-	width: 28%;
-	display: block;
-	float: left;
-	overflow: hidden;
-}
-
-.newform input {
-	display: block;
-	float: left;
-	width: 40%;
-	margin: 3px 1% 3px 0px;
-}
-input[type=hidden] {
-	display: none;
-}
-
-.newform textarea {
-	display: block;
-	float: left;
-	width: 40%;
-	margin: 3px 1% 3px 0px;
-}
-
-.newform select {
-	display: block;
-	float: left;
-	width: 40%;
-	margin: 3px 1% 3px 0px;
-}
-
-.newform fieldset .radiobox {
-	display: block;
-	float: left;
-	width: 40%;
-	margin: 3px 1% 3px 0px;
-	border: 1px dotted gray;
-}
-
-.newform .formhtml {
-	display: block;
-	float: left;
-	width: 70%;
-	margin: 3px 0px 3px 0px;
-}
-
-.newform .radiobox input {
-	margin-right: 10px;
-	width: auto;
-	display: inline;
-	float: none;
-}
-.newform .radiobox label {
-	width: auto;
-	display: inline;
-	float: none;
-	margin-right: 10px;
+	padding-left: 15px;
+	padding-right: 15px;
+	margin: 0px;
+	margin-left: 10px;
+	
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	background: repeat-x url('../img/chrome_light.png') ;
+	
 }
 
 
-.newform fieldset div .msgarea {
-	width: 25%;
-	display: block;
-	float: left;
+/* ----------------------------- */
+
+.newform .formcontenttable .formtableheader {
+	width: 120px;
+	text-align: right;
+	vertical-align: top;
+	padding-top: .3em; 
 }
 
-/* used to make a 1px spacer for min-height in ie */
-.newform fieldset div .prop {
-	height: 1.4em;
-	width: 1px;
-	float: right;
+.newform .formcontenttable .formtableicon {
+	width: 16px;
+	vertical-align: top;
+	padding-top: .3em; 
 }
 
-/* used to clear floats inside the field area */
-.newform fieldset div .clear {
-    clear:both;
-    height:1px;
-    overflow:hidden;
-}
 
-/* tweak for IE to get bg color in case of wrapping */
-.newform fieldset div {
-	width: 100%;
-}
-
-.newform fieldset div img {
-	margin-top: .3em;
+.newform .formcontenttable .formtablecontrol {
 	vertical-align: top;
 }
 
-.newform fieldset div span {
-	vertical-align: bottom;
-	font-style: italic;
-	font-size: 80%;
+
+.newform .formlabel {
+	width: 100%;	
 }
+
+.newform .underneathmsg {
+	clear: both;
+	font-style: italic;
+	font-size: 90%;
+}
+
+.newform .radiobox {
+	width: auto;
+	margin-top: 3px;
+	margin-right: 15px;
+	border: 1px dotted gray;
+}
+
+
