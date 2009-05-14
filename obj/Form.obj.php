@@ -71,6 +71,9 @@ class Form {
 			//we need to set all checkboxes to false because if they are unchecked we won't see any 
 			//POST data for them if they are checked, the POST data will reset them to true
 			foreach ($this->formdata as $name => $data) {
+				if (is_string($data))
+					continue;
+				
 				if (isset($data['control'])) {
 					$controltype = strtolower($data['control'][0]);
 					if ($controltype == "checkbox")
@@ -190,14 +193,11 @@ class Form {
 					}
 				}
 				
-				//if not posted and required and value is blank
-				if (!$this->getSubmit() && $isrequired && ((is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0))) {
-					//show required highlight
-					$i = "img/icons/error.gif";
-					$style = 'style="background: rgb(255,255,220);"' ;
-					$msg = "Required";
-				} else {
-					//otherwise, validate and show normally
+				
+				$isblank = (is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0);
+				
+				if ($this->getSubmit() || !$isblank) {
+					//validate and show normally
 					$valresult = Validator::validate_item($this->formdata,$name,$value,$requiredfields);
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
@@ -208,6 +208,11 @@ class Form {
 						$i = "img/icons/exclamation.gif";
 						$style = 'style="background: rgb(255,200,200);"' ;
 					}
+				} else if (!$this->getSubmit() && $isblank && $isrequired) {
+					//show required highlight
+					$i = "img/icons/error.gif";
+					$style = 'style="background: rgb(255,255,220);"' ;
+					$msg = "Required";
 				}
 				
 				$str.= '
@@ -282,6 +287,8 @@ class Form {
 		
 		$anyerrors = false;
 		foreach ($this->formdata as $name => $data) {
+			if (is_string($data))
+				continue;
 			if (!isset($data['validators']))
 				continue;
 			$requiredfields = isset($data['requires']) ? $this->getFieldValues($data['requires']) : array();
@@ -306,6 +313,8 @@ class Form {
 	function getData () {
 		$res = array();
 		foreach ($this->formdata as $name => $data) {
+			if (is_string($data))
+				continue;
 			if (isset($data['value']))
 				$res[$name] = $data['value'];
 		}

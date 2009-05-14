@@ -113,11 +113,7 @@ function form_do_validation (form, element) {
 					if (res.vres != true) {
 						form_validation_display(element,"error",res.vmsg);
 					} else {
-						//checked out ok
-						if (value.length > 0)
-							form_validation_display(element,"valid","");
-						else
-							form_validation_display(element,"blank","");
+						form_validation_display(element,"valid","");
 					}
 				},
 				onFailure: function(){ alert('Something went wrong...') } //TODO better error handling
@@ -135,10 +131,7 @@ function form_do_validation (form, element) {
 					}
 				}
 			}
-			if (value.length > 0)
-				form_validation_display(element,"valid","");
-			else
-				form_validation_display(element,"blank","");
+			form_validation_display(element,"valid","");
 		}
 	}
 
@@ -146,7 +139,7 @@ function form_do_validation (form, element) {
 
 function form_validation_display(element,style, msgtext) {
 	e = $(element);
-		
+			
 	//if radio button, get the id of the container div
 	var name;
 	if (e.up(".radiobox"))
@@ -166,23 +159,28 @@ function form_validation_display(element,style, msgtext) {
 		css = 'background: rgb(225,255,225);';
 		icon.src = "img/icons/accept.gif";
 	} else if (style == "blank") {
-		css = 'background: rgb(255,255,255);';
+		css = 'background: rgb(255,255,255); display: none';
 		icon.src = "img/pixel.gif";
 	}
 	
 	//set up the validation transition effects
 	
-	//dont refade anything unless the message has changed or is in process of changing
-	if (msgtext != msg.innerHTML || fieldarea.bgeffect) {
+	//for IE, make sure we dont fade between blank msgs or it will expand the msg box and move around
+	if (msgtext.length == 0)
+		msg.hide();
+	else
+		msg.show();
+	
+		//dont refade anything unless the message has changed or is in process of changing
+	if ((msgtext.length == 0 || msgtext != msg.innerHTML) || fieldarea.bgeffect) {
 		//set BG color
 		if (fieldarea.bgeffect) {
 			fieldarea.bgeffect.cancel();
 			fieldarea.bgeffect = null;
 		}
 		fieldarea.bgeffect = new Effect.Morph(fieldarea,{style: css, duration: 0.5, afterFinish: function() {fieldarea.bgeffect = null;}});
-		
+
 		//set up 2 queued effects that will fade to new bg color, then swap text and fade in
-		msg.show();
 		Effect.Queues.get(msg.id).each(function(effect) { effect.cancel(); });
 		new Effect.Opacity(msg,{duration: 0.25, from:1, to:0, afterFinish: function () {msg.innerHTML = msgtext}, queue: { position: 'end', scope: msg.id }});
 		new Effect.Opacity(msg,{duration: 0.25, from:0, to:1, afterFinish: function () {if(msgtext == "") msg.hide();}, queue: { position: 'end', scope: msg.id }});
@@ -420,10 +418,7 @@ function form_handle_submit(form,event) {
 							form_validation_display(element,"error",res.vmsg);
 						} else {
 							//checked out ok
-							if (value.length > 0)
-								form_validation_display(element,"valid","");
-							else
-								form_validation_display(element,"blank","");
+							form_validation_display(element,"valid","");
 						}
 						} catch (error) { alert(res.name + " " + error)};
 					});
