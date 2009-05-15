@@ -30,6 +30,14 @@ if (isset($_GET['ajax']) && isset($_GET['type'])) {
 			}
 			break;
 			
+		case 'hasmessage':
+			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || (!isset($_GET['messagetype']) || !isset($_GET['messageid'])))
+				break;
+			if (isset($_GET['messagetype']))
+				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".dbsafe($_GET['messagetype'])."'");
+			if (isset($_GET['messageid']))
+				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and messageid='".dbsafe($_GET['messageid'])."'");				
+			
 		default;
 			break;
 	}
