@@ -14,6 +14,50 @@ class Rule extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	// NOTE: Assumes arguments have been trimmed.
+	static function initFrom($fieldnum, $type, $logical, $op, $values) {
+		if (empty($fieldnum) || empty($type) || empty($logical) || empty($op) || empty($values))
+			return null;
+		
+		$rule = new Rule();
+		$rule->logical = $logical;
+		$rule->op = $op;
+		
+		if ($op == "num_range") //if its a range, we need to get the other value too
+			$rule->val = (ereg_replace("[^0-9\.-]*","",$values[0]) + 0.0) . "|" . (ereg_replace("[^0-9\.-]*","",$values[1]) + 0.0);
+		else if ($op == "date_range") { //if its a range, we need to get the other value too
+			$t1 = strtotime($values[1] == "" ? "today" : $values[1]);
+			$t2 = strtotime($values[2] == "" ? "today" : $values[2]);
+			if ($t1 > $t2) { //ensure between order
+				$tmp = $t1;
+				$t1 = $t2;
+				$t2 = $tmp;
+			}
+			$rule->val = date('m/d/Y', $t1) . "|" . date('m/d/Y', $t2);
+		} else if ($type == "reldate" && $op == "eq")
+			$rule->val = date('m/d/Y',strtotime($values[1] == "" ? "today" : $values[1]));
+		else if ($type == "reldate" && $op == "date_offset")
+			$rule->val = (int)ereg_replace("[^0-9\.-]*","",$values[3]);
+		else if ($type == "reldate" && $op == "reldate_range") {
+			$values[3] = (int)ereg_replace("[^0-9\.-]*","",$values[3]);
+			$values[4] = (int)ereg_replace("[^0-9\.-]*","",$values[4]);
+			if ($values[3] > $values[4]) { //ensure between order
+				$tmp = $values[3];
+				$values[3] = $values[4];
+				$values[4] = $tmp;
+			}
+			$rule->val = "{$values[3]}|{$values[4]}";
+		} else if (strpos($op,"num_") === 0)
+			$rule->val = ereg_replace("[^0-9\.-]*","",$values[0]) + 0.0;
+		else if ($type == 'multisearch' && is_array($values[0]))
+			$rule->val = implode("|",$values[0]);
+		else
+			$rule->val = $values[0];
+		$rule->fieldnum = $fieldnum;
+		
+		return $rule;
+	}
+	
 	function toSql ($alias = false, $fieldoverride = false, $isjobreport = false, $ignoreGfield = false) {
 		$val = DBSafe($this->val);
 		$f = ($alias ? "$alias.":"") . ($fieldoverride ? $fieldoverride : $this->fieldnum);
