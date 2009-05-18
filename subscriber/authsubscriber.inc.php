@@ -116,6 +116,31 @@ function subscriberUpdateUsername($username, $password) {
 	return $result;
 }
 
+// sends the token to the email for validation
+function subscriberPrepareNewEmail($newemail) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newemail, 'string'));
+	$method = "SubscriberServer.subscriber_prepareEmailValidation";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
+
+// generate phone activation code
+function subscriberPrepareNewPhone($phoneList) {
+	sleep(2); // slow down any DOS attack
+
+	$sessionid = session_id();
+	
+	$newphoneArray = array();
+	foreach ($phoneList as $phone) {
+		$newphoneArray[] = new XML_RPC_Value($phone, 'string');
+	}
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newphoneArray, 'array'));
+	$method = "SubscriberServer.subscriber_createPhoneActivation";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
+
 
 function subscriberGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));

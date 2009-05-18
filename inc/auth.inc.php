@@ -394,5 +394,13 @@ function inboundPortalPhoneActivation($callerid, $code) {
 	return $result;
 }
 
+function inboundSubscriberPhoneActivation($callerid, $code) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($callerid, 'string'), new XML_RPC_Value($code, 'string'));
+	$method = "SubscriberServer.subscriber_phoneActivation";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
+
 
 ?>

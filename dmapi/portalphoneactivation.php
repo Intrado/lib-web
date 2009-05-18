@@ -51,11 +51,15 @@ function calleridMissing() {
 }
 
 // successful to associate contacts
-function okGoodbye() {
+function okGoodbye($hassubscriber) {
+	$text = "Thank you, your contacts have been associated with your account.  You may now login to the web application to edit your contact information.  Goodbye.";
+	if ($hassubscriber) {
+		$text = "Thank you, this phone number has been associated with your account.  You may now login to the web application to edit your contact preferences.  Goodbye.";
+	}
 ?>
 <voice>
 	<message name="welcome">
-    	<tts gender="female" language="english">Thank you, your contacts have been associated with your account.  You may now login to the web application to edit your contact information.  Goodbye.</tts>
+    	<tts gender="female" language="english"><?=$text?></tts>
 		<hangup />
 	</message>
 </voice>
@@ -83,11 +87,26 @@ if ($REQUEST_TYPE == "new") {
 	<hangup />
 	<?
 } else if ($REQUEST_TYPE == "continue") {
+	$hassubscriber = QuickQuery("select value from setting where name='_hasselfsignup'");
+	if ($hassubscriber == "1") {
+		$hassubscriber = true;
+	} else {
+		$hassubscriber = false;
+	}
+	// if not subscriber, then must be contact manager to be here already
+	
 	if (isset($BFXML_VARS['code'])) {
-		$code = DBSafe($BFXML_VARS['code']);
+		$code = $BFXML_VARS['code'];
 		$callerid = $_SESSION['callerid'];
-		if (inboundPortalPhoneActivation($callerid, $code)) {
-			okGoodbye();
+		$ok = false;
+		if ($hassubscriber) {
+			$ok = inboundSubscriberPhoneActivation($callerid, $code);
+		} else {
+			$ok = inboundPortalPhoneActivation($callerid, $code);
+		}
+		
+		if ($ok) {
+			okGoodbye($hassubscriber);
 		} else {
 			$_SESSION['phoneattempts']++;
 			if ($_SESSION['phoneattempts'] >= 3) {
@@ -97,6 +116,7 @@ if ($REQUEST_TYPE == "new") {
 			}
 		}
 	} else if (isset($_SESSION['callerid'])) {
+		// inboundPortalFindCallerid works for both contact manager and subscriber features, simple lookup
 		if (inboundPortalFindCallerid($_SESSION['callerid'])) {
 			$_SESSION['phoneattempts'] = 0;
 			promptCode();

@@ -3,7 +3,8 @@ include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;
 
-function welcomemessage($hascallback, $hasphoneactivation, $displayname) {
+// press 2 for either subscriber or contact manager (customer has one or the other, never both)
+function welcomemessage($hassubscriber, $hascallback, $hasphoneactivation, $displayname) {
 ?>
 <voice>
 	<message name="welcome">
@@ -19,6 +20,9 @@ function welcomemessage($hascallback, $hasphoneactivation, $displayname) {
 <?				if ($hasphoneactivation) { ?>
 					<tts gender="female" language="english">If you are calling to enter a Contact  Manager Activation Code, press 2.</tts>
 <?				} ?>
+<?				if ($hassubscriber) { ?>
+					<tts gender="female" language="english">If you are calling to enter an Activation Code, press 2.</tts>
+<?				} ?>
 
 					<tts gender="female" language="english">If you have a user account, with an ID and PIN code, press 9. </tts>
 					<tts gender="female" language="english">To repeat this menu, press star. </tts>
@@ -27,7 +31,7 @@ function welcomemessage($hascallback, $hasphoneactivation, $displayname) {
 <?			if ($hascallback) { ?>
 				<choice digits="1" />
 <?			} ?>
-<?			if ($hasphoneactivation) { ?>
+<?			if ($hassubscriber || $hasphoneactivation) { ?>
 				<choice digits="2" />
 <?			} ?>
 
@@ -51,6 +55,12 @@ function welcomemessage($hascallback, $hasphoneactivation, $displayname) {
 
 if ($REQUEST_TYPE == "new") {
 	// determine inbound features available to this customer
+	$hassubscriber = QuickQuery("select value from setting where name='_hasselfsignup'");
+	if ($hassubscriber == "1") {
+		$hassubscriber = true;
+	} else {
+		$hassubscriber = false;
+	}
 	$hascallback = QuickQuery("select value from setting where name='_hascallback'");
 	if ($hascallback == "1") {
 		$hascallback = true;
@@ -64,10 +74,10 @@ if ($REQUEST_TYPE == "new") {
 	} else {
 		$hasphoneactivation = false;
 	}
-	// if customer _hascallback or _hasphoneactivation, give a choice, else inbound login only
-	if ($hascallback || $hasphoneactivation) {
+	// if customer _hassubscriber or _hascallback or _hasphoneactivation, give a choice, else inbound login only
+	if ($hassubscriber || $hascallback || $hasphoneactivation) {
 		$displayname = QuickQuery("select value from setting where name='displayname'");
-		welcomemessage($hascallback, $hasphoneactivation, $displayname);
+		welcomemessage($hassubscriber, $hascallback, $hasphoneactivation, $displayname);
 	} else {
 		forwardToPage("inboundlogin.php");
 	}

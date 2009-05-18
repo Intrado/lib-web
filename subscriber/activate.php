@@ -11,21 +11,39 @@ if (isset($_GET['u'])) {
 	$appendcustomerurl = "?u=".urlencode($_GET['u']);
 }
 
-$form = true;
-$forgotsuccess = false;
-$newusersuccess = false;
 $token = "";
-$success = false;
-$error = false;
-$result = null;
 if (isset($_GET['t'])) {
 	$token = $_GET['t'];
 }
 
+$forgot = false;
+if (isset($_GET['f'])) {
+	$forgot = true;
+}
+
+$changeuser = false;
+if (isset($_GET['c'])) {
+	$changeuser = true;
+}
+
+$addemail = false;
+if (isset($_GET['a'])) {
+	$addemail = true;
+}
+
+$form = true;
+$forgotsuccess = false;
+$newusersuccess = false;
+$addemailsuccess = false;
+$success = false;
+$error = false;
+$result = null;
+
+
 if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 
 	$token = get_magic_quotes_gpc() ? stripslashes($_POST['token']) : $_POST['token'];
-	if(isset($_POST['password1']) && isset($_POST['password2'])){
+	if (isset($_POST['password1']) && isset($_POST['password2'])) {
 		$password1 = get_magic_quotes_gpc() ? stripslashes($_POST['password1']) : $_POST['password1'];
 		$password2 = get_magic_quotes_gpc() ? stripslashes($_POST['password2']) : $_POST['password2'];
 		$result = subscriberPreactivateForgottenPassword($token);
@@ -59,15 +77,17 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 		$result = subscriberActivateAccount($token, $password);
 		if($result['result'] == ""){
 			$form = false;
-			if($result['functionCode'] == 'token_newsubscriber'){
+			if ($result['functionCode'] == 'token_newsubscriber') {
 				$success = true;
-			} else if ($result['functionCode'] == 'token_changeemail' && $changeuser){
+			} else if ($result['functionCode'] == 'token_changeemail' && $changeuser) {
 				$newusersuccess = true;
+			} else if ($result['functionCode'] == 'token_addemail' && $addemail) {
+				$addemailsuccess = true;
 			} else {
 				error("An unknown error occurred");
 				$error = true;
 			}
-			if(!$error){
+			if (!$error) {
 				doStartSession($result['userID']);
 			}
 		} else {
@@ -93,6 +113,13 @@ if ($forgot) {
 	else
 		$action = $appendcustomerurl."&c";
 	$text = "your password";
+} else if ($addemail) {
+	$TITLE = "Add Email to Account";
+	if ($appendcustomerurl == "")
+		$action = "?a";
+	else
+		$action = $appendcustomerurl."&a";
+	$text = "your password";
 } else {
 	$TITLE = "Activate Account";
 	if ($appendcustomerurl == "")
@@ -104,7 +131,7 @@ if ($forgot) {
 
 require_once("logintop.inc.php");
 
-if ($forgotsuccess || $success || $newusersuccess) {
+if ($forgotsuccess || $success || $newusersuccess || $addemailsuccess) {
 ?>
 	<table style="color: #365F8D;">
 		<tr>
@@ -136,8 +163,16 @@ if ($forgotsuccess) {
 	</div>
 	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
 	<?
+} else if ($addemailsuccess) {
+	?>
+	<div style="margin:5px">
+		Thank you, your email address has been added to your account.
+		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
+	</div>
+	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
+	<?
 }
-if ($forgotsuccess || $success || $newusersuccess) {
+if ($forgotsuccess || $success || $newusersuccess || $addemailsuccess) {
 ?>
 			</td>
 		</tr>

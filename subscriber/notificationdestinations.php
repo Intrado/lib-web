@@ -2,99 +2,69 @@
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../obj/Phone.obj.php");
+require_once("../obj/Email.obj.php");
+require_once("../obj/Sms.obj.php");
+
+
+class Destination {
+	var $id;
+	var $name;
+	var $nodelete;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$formdata = array(
-    "phone1" => array(
-        "label" => "Primary Phone: ",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    ),
-    "phone2" => array(
-        "label" => "Alternate Phone: ",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    ),
-    "email1" => array(
-        "label" => "Primary Email: ",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    ),
-    "email2" => array(
-        "label" => "Alternate Email: ",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    ),
-    "sms1" => array(
-        "label" => "SMS: ",
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    )
-);
+$pid = $_SESSION['personid'];
 
-$helpsteps = array (
-    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
-	"blah blah blah..."
-);
+if (isset($_GET['delete'])) {
+	$id = $_GET['delete'];
+	$sequence = substr($id, strlen($id)-1);
+	$type = substr($id, 0, strlen($id)-1);
+	 
+	QuickUpdate("update ".$type." set ".$type."='' where personid=? and sequence=?", false, array($pid, $sequence));
+	redirect();
+}
 
-$buttons = array(submit_button(_L("Save"),"submit","tick"),
-                icon_button(_L("Cancel"),"cross",null,"notificationdestinations.php"));
-                
-$form = new Form("notificationdestinations",$formdata,$helpsteps,$buttons);
-$form->ajaxsubmit = true;
 
-//check and handle an ajax request (will exit early)
-//or merge in related post data
-$form->handleRequest();
+$phoneList = DBFindMany("Phone", "from phone where personid=?", false, array($pid));
+$emailList = DBFindMany("Email", "from email where personid=?", false, array($pid));
+$smsList = DBFindMany("Sms", "from sms where personid=?", false, array($pid));
 
-$datachange = false;
+$destinations = array();
 
-//check for form submission
-if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-            
-        
-        //save data here
-        
-        
-        if ($ajax)
-            $form->sendTo("notificationpreferences.php");
-        else
-            redirect("notificationpreferences.php");
-    }
+foreach ($phoneList as $phone) {
+	if ($phone->phone == '') continue;
+	$dest = new Destination();
+	$dest->id = 'phone'.$phone->sequence;
+	$dest->name = Phone::format($phone->phone);
+	$dest->nodelete = false;
+	$destinations[] = $dest;
+}
+foreach ($emailList as $email) {
+	if ($email->email == '') continue;
+	$dest = new Destination();
+	$dest->id = 'email'.$email->sequence;
+	$dest->name = $email->email;
+	if ($_SESSION['subscriber.username'] == $email->email)
+		$dest->nodelete = true;
+	else
+		$dest->nodelete = false;
+	$destinations[] = $dest;
+}
+
+$titles = array(
+			"name" => "Destination",
+			"action" => "Actions"
+			);
+
+
+function fmt_actions ($obj, $name) {
+	if ($obj->nodelete)
+		return '';
+	return '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
 }
 
 
@@ -108,8 +78,11 @@ require_once("nav.inc.php");
 
 echo "<font color=\"red\">TODO DO NOT TEST YET, will have wizard to add and confirm phone, etc</font><BR><BR>";
 
-startWindow(_L('Destinations'));
-echo $form->render();
+startWindow(_L('Active Destinations'));
+echo "<table>";
+showObjects($destinations, $titles, array("action" => "fmt_actions"));
+echo "</table>";
 endWindow();
+buttons(icon_button("Add", "tick", null, "destinationwizard.php"));
 require_once("navbottom.inc.php");
 ?>
