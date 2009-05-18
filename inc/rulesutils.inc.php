@@ -20,6 +20,7 @@ function getRuleFromForm($f, $s){
 		$value4 = TrimFormData($f,$s,"newrulevalue4_" . $fieldnum);
 		$value5 = TrimFormData($f,$s,"newrulevalue5_" . $fieldnum);
 
+		// TODO: Why is this "if" check necessary?
 		if (count($value) > 0)
 			$rule = Rule::initFrom($fieldnum, $type, $logic, $op, array($value, $value2, $value3, $value4, $value5));
 	}
