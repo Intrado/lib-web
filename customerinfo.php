@@ -160,7 +160,7 @@ $TITLE = _L('Customer Information');
 <script)
 <? if ($datachange) { ?>
 
-alert("<?=_L("The data on this form has changed.\nYou're changes cannot be saved.")?>")";
+alert("<?=_L("The data on this form has changed.\nYour changes cannot be saved.")?>")";
 window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 
 <? } ?>

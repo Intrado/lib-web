@@ -427,7 +427,7 @@ function form_handle_submit(form,event) {
 				}
 				
 				if (res.datachange) {
-					alert("The data on this form has changed.\nYou're changes cannot be saved.");
+					alert("The data on this form has changed.\nYour changes cannot be saved.");
 					window.location=formvars.scriptname;
 				}
 				
