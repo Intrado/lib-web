@@ -7,8 +7,13 @@ require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/AudioFile.obj.php");
-require_once("obj/FieldMap.obj.php");
 require_once("obj/Voice.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/Rule.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("inc/date.inc.php");
+require_once("inc/securityhelper.inc.php");
 
 if (isset($_GET['ajax']) && isset($_GET['type'])) {
 	$type = $_GET['type'];
@@ -62,6 +67,53 @@ if (isset($_GET['ajax']) && isset($_GET['type'])) {
 			$return = FieldMap::getAuthorizedMapNames();
 			break;
 		
+		// NOTE: Should this be broken up into cases for Operators, ReldateOptions, and Fieldmaps? For now, it's clumped together for convenience 
+		// USED IN: RuleWidget.js
+		case 'fieldmapsdata':
+			if (!$USER->authorize('createlist'))
+				break;
+
+			$fFields = FieldMap::getAuthorizedFieldMapsLike("f%");
+			$gFields = FieldMap::getAuthorizedFieldMapsLike("g%");
+			$cFields = FieldMap::getAuthorizedFieldMapsLike("c%");
+
+			$return = array("operators" => $RULE_OPERATORS, "reldateOptions" => $RELDATE_OPTIONS, "fieldmaps" => $fFields + $gFields + $cFields);
+			
+			break;
+			
+		// USED IN: RuleWidget.js
+		case 'persondatavalues':
+			if (!$USER->authorize('createlist') || !isset($_GET['fieldnum']))
+				break;
+			
+			// Adapted from ruleeditform.inc.php
+			$fieldnum = dbsafe($_GET['fieldnum']);
+			
+			$limit = DBFind('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $USER->id and fieldnum = '$fieldnum'");
+			$limitsql = $limit ? $limit->toSQL(false, "value", false, true) : "";
+			$return = QuickQueryList("select value from persondatavalues where fieldnum='$fieldnum' $limitsql order by value");
+			if (empty($return)) {
+				$return = false;
+				break;
+			}
+
+			// Clean values, needs to be utf8 or will show up blank when json-encoded.
+			foreach ($return as &$value) {
+				// NOTE: Be careful of htmlentities() when displaying in web browser.
+				// TODO: Decide whether to add htmlentities() here or in javascript.
+				$value = utf8_encode($value);
+			}
+			break;
+			
+		// USED IN: ListForm.php
+		case 'lists':
+			if (!$USER->authorize('createlist'))
+				break;
+			
+			$disabled = isset($_GET['disabled']) ? '1' : '0';
+			$return = DBFindMany("PeopleList", "from list where userid='" . $USER->id . "' and disabled=$disabled order by name");
+			break;
+			
 		default;
 			break;
 	}
