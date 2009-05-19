@@ -2,10 +2,7 @@ var RuleWidget = Class.create({
 	// PUBLIC FUNCTION
 	// @param div, the DOM container for this widget.
 	// @param jsonValidFields, valid fields that the user can choose.
-	initialize: function(div, data) {
-		// CONSTANTS
-		this.actionColumn = 4;	
-	
+	initialize: function(div) {
 		this.div = div;
 		
 		// Toolbar.
@@ -21,11 +18,70 @@ var RuleWidget = Class.create({
 		this.rulesTable = new Element('tbody');
 		this.div.insert(new Element('table').insert(this.rulesTable));
 
-		this.reset(data);
+		new Ajax.Request('ajax.php?ajax&type=fieldmapsdata', {
+			onSuccess: this.handle_ajax_reset.bindAsEventListener(this)
+		});
 	},
 	
-	reset: function(data) {
-		alert("reseting");
+	// PUBLIC FUNCTION
+	clear_rules: function() {
+		// Keep track of the value column of each table row, indexed by fieldnum.
+		// Also keep track of the operator choices for each fieldnum.
+		this.valueTD = {};
+		this.operatorSelect = {};
+		this.rulesTable.update();
+		
+		this.refresh();
+	},
+	
+	// PUBLIC FUNCTION
+	// Returns json-encoded string of rules that the user chose.
+	toJSON: function() {
+		var data = [];
+		
+		for (var fieldnum in this.valueTD) {
+			var logical = 'and';
+			var op = this.operatorSelect[fieldnum].getValue();
+			if (op == 'not') {
+				logical = 'and not';
+				op = 'in';
+			}
+			var val = [];
+			
+			// MULTISEARCH
+			var multicheckbox = this.valueTD[fieldnum].down('ul');
+			if (multicheckbox) {
+				var multisearch = [];
+				var checkboxes = multicheckbox.select('input[type="checkbox"]');
+				for (var i = 0; i < checkboxes.length; i++) {
+					if (checkboxes[i].checked)
+						multisearch.push(checkboxes[i].getValue());
+				}
+				val.push(multisearch);
+			} else {
+				var reldateSelect = this.valueTD[fieldnum].down('select');
+				if (reldateSelect)
+					val.push(reldateSelect.getValue());
+					
+				var inputs = this.valueTD[fieldnum].select('input');
+				for (var i = 0; i < inputs.length; i++)
+					val.push(inputs[i].getValue());
+			}
+			
+			data.push({'fieldnum':fieldnum, 'type':this.fieldmaps[fieldnum]['type'], 'logical':logical, 'op':op, 'val':val});
+		}
+		alert(data.toJSON());
+		return data.toJSON();
+	},
+	
+	// PRIVATE FUNCTION
+	handle_ajax_reset: function(transport) {
+		var data = transport.responseJSON;
+		if (!data) {
+			alert('Sorry cannot get fieldmaps');
+			return;
+		}
+		
 		this.operators = data['operators'];
 		this.reldateOptions = data['reldateOptions'];
 		this.fieldmaps = {};
@@ -34,7 +90,6 @@ var RuleWidget = Class.create({
 		// TODO: what is the correct key for 'Is NOT'?
 		this.operators['multisearch']['not'] = 'is NOT';
 		this.operators['multisearch']['in'] = 'is';
-		//console.info(this.operators);
 		
 		// Check if there are any unsearchable fieldmaps.
 		// Also data['fieldmaps'] is indexed by a number, we prefer indexing by fieldnum.
@@ -44,50 +99,30 @@ var RuleWidget = Class.create({
 				this.fieldmaps[fieldnum] = data['fieldmaps'][i];
 		}
 		
-		//console.info(this.fieldmaps);
+		// Keep a cache (html) of list values so we don't have to use ajax each time someone changes the operator on a multisearch field.
+		this.multisearchSelectCache = {};
 		
-		// Keep track of the value column of each table row, indexed by fieldnum.
-		// Also keep track of the operator choices for each fieldnum.
-		// Also keep a cache of list values so we don't have to use ajax each time someone changes the operator on a multisearch field.
 		this.clear_rules();
-		
-		this.refresh();
 	},
 	
 	// PRIVATE FUNCTION
-	clear_rules: function() {
-		this.valueTD = {};
-		this.operatorChoice = {};
-		this.multisearchCache = {};
-		this.rulesTable.update();
-	},
-	
-	// PUBLIC FUNCTION
-	// Returns json-encoded string of rules that the user chose.
-	toJSON: function() {
-		return 'OK will do this later..';
-	},
-	
-	// PRIVATE FUNCTION
-	// Determines the appropriate rule to insert into the DOM based on this.fieldSelect.selectedIndex.
+	// Determines the appropriate rule to insert into the DOM based on this.fieldSelect
 	handle_event_add_rule: function() {
 		var selectedFieldnum = this.fieldSelect.getValue();
 		
 		for (var fieldnum in this.fieldmaps) {
-			if (fieldnum == selectedFieldnum) {
+			if (fieldnum == selectedFieldnum)
 				this.insert_rule(fieldnum);
-			}
 		}
 		
 		this.refresh();
 	},
 	
 	// PRIVATE FUNCTION
-	// TODO
 	handle_event_delete_rule: function(event) {
 		var button = Event.element(event);
 		
-		var actionFieldnum = button.up('tr').select('td')[this.actionColumn-1].down('input[type="hidden"]').getValue();
+		var actionFieldnum = button.up('tr').down('input[type="hidden"]').getValue();
 		
 		// Important: Get the value of actionFieldnum before deleting the table row.
 		var tr = button.up('tr');
@@ -95,7 +130,7 @@ var RuleWidget = Class.create({
 		
 		for (var fieldnum in this.fieldmaps) {
 			if (fieldnum == actionFieldnum) {
-				delete this.operatorChoice[fieldnum];
+				delete this.operatorSelect[fieldnum];
 				delete this.valueTD[fieldnum];
 			}
 		}
@@ -105,69 +140,26 @@ var RuleWidget = Class.create({
 	
 	// PRIVATE FUNCTION
 	handle_ajax_multisearch_values: function(transport, fieldnum) {
-		var optionsHTML = transport.responseText;
+		var data = transport.responseJSON;
 					
-		if (!optionsHTML) {
-			alert('You are not logged in!');
-			return;
+		if (!data) {
+			data = ' ';
 		}
 		
-		this.valueTD[fieldnum].update(optionsHTML);
+		var multicheckbox = util_multicheckbox(this.div.id + '_multisearch_' + fieldnum + '_', data);
+		this.valueTD[fieldnum].update(multicheckbox);
 		
-		// save to cache.
-		this.multisearchCache[fieldnum] = optionsHTML;
+		// cache in memory.
+		this.multisearchSelectCache[fieldnum] = multicheckbox;
 	},
 	
 	// PRIVATE FUNCTION
 	handle_event_change_operator: function(event) {
-		var selectBox = Event.element(event);
-		if (selectBox) {
-			var fieldnum = selectBox.up('tr').select('td')[this.actionColumn-1].down('input[type="hidden"]').getValue();
+		var selectbox = Event.element(event);
+		if (selectbox) {
+			var fieldnum = selectbox.up('tr').down('input[type="hidden"]').getValue();
 			this.show_value_column(fieldnum);
 		}
-	},
-	
-	// PRIVATE FUNCTION
-	handle_save_list: function() {
-		var data = [];
-		
-		for (var fieldnum in this.valueTD) {
-			var logical = 'and';
-			var op = this.operatorChoice[fieldnum].getValue();
-			if (op == 'not') {
-				logical = 'and not';
-				op = 'in';
-			}
-			var val = '';
-			
-			// MULTISEARCH
-			var selectBox = this.valueTD[fieldnum].down('select');
-			if (selectBox) {
-				val = selectBox.getValue();
-				if (val.join)
-					val = val.join('|');
-			} else {
-				var inputs = this.valueTD[fieldnum].select('input');
-				var values = [];
-				for (var i = 0; i < inputs.length; i++)
-					values.push(inputs[i].getValue());
-				val = values.join('|');
-			}
-			
-			data.push({'fieldnum':fieldnum, 'logical':logical, 'op':op, 'val':val});
-		}
-		
-		var getlistid='';
-		if (this.listid)
-			getlistid = '&listid=' + this.listid;
-		new Ajax.Request('ajax.php?ajax&type=listsubmit'+getlistid, {'method':'post',
-			'postBody': 'ruledata='+data.toJSON()
-		});
-	},
-	
-	// PRIVATE FUNCTION
-	transition_list_values: function(event, fieldnum, selectBox) {
-		this.valueTD[fieldnum].update(selectBox);
 	},
 	
 	// PRIVATE FUNCTION
@@ -179,12 +171,14 @@ var RuleWidget = Class.create({
 			return;
 		
 		var tr = new Element('tr');
-		this.rulesTable.insert({bottom:tr});
+		this.rulesTable.insert({top:tr});
 		
 		// FieldTD
 		var fieldTD = new Element('td', {'class':'FieldTD'});
 		tr.insert(fieldTD);
 		fieldTD.insert(this.fieldmaps[fieldnum]['name']);
+		// Keep track of the row's fieldnum by using a hidden input.
+		fieldTD.insert(new Element('input', {'type':'hidden', 'value':fieldnum}));
 		
 		// OperatorTD
 		var operatorTD = new Element('td', {'class':'OperatorTD'});
@@ -192,11 +186,11 @@ var RuleWidget = Class.create({
 		for (var type in this.operators) {
 			if (this.fieldmaps[fieldnum]['options'].match(type)) {
 				this.fieldmaps[fieldnum]['type'] = type;
-				this.operatorChoice[fieldnum] = util_selectbox(this.operators[type]);
+				this.operatorSelect[fieldnum] = util_selectbox(this.operators[type]);
 				// Don't bother handling onchange if type is "text" or "multisearch"
 				if (type != 'text' && type != 'multisearch')
-					this.operatorChoice[fieldnum].observe('change', this.handle_event_change_operator.bindAsEventListener(this));
-				operatorTD.insert(this.operatorChoice[fieldnum]);
+					this.operatorSelect[fieldnum].observe('change', this.handle_event_change_operator.bindAsEventListener(this));
+				operatorTD.insert(this.operatorSelect[fieldnum]);
 			}
 		}
 		
@@ -209,7 +203,6 @@ var RuleWidget = Class.create({
 		// ActionTD
 		var actionTD = new Element('td', {'class':'ActionTD'});
 		tr.insert(actionTD);
-		actionTD.insert(new Element('input', {'type':'hidden', 'value':fieldnum}));
 		var deleteButton = new Element('button', {'type':'button'});
 		actionTD.insert(deleteButton);
 		deleteButton.observe('click', this.handle_event_delete_rule.bindAsEventListener(this));
@@ -219,75 +212,50 @@ var RuleWidget = Class.create({
 	
 	// PRIVATE FUNCTION
 	show_value_column: function(fieldnum) {
-		var operator = this.operatorChoice[fieldnum].getValue();
+		var operator = this.operatorSelect[fieldnum].getValue();
 		
-		var currentValue = '';
-		var currentInput = this.valueTD[fieldnum].down('input[type="text"]');
-		if (currentInput)
-			currentValue = currentInput.getValue();
 		
-		// Final values.
-		var value1 = currentValue;
-		var value2 = currentValue;
-		
-		// Clear the value-column.
-		this.valueTD[fieldnum].update();
 		
 		// MULTISEARCH
 		if (this.fieldmaps[fieldnum]['type'] == 'multisearch') {
 			this.valueTD[fieldnum].update('Loading..');
-			if (this.multisearchCache[fieldnum]) {
-				this.valueTD[fieldnum].update(this.multisearchCache[fieldnum]);
+			if (this.multisearchSelectCache[fieldnum]) {
+				this.valueTD[fieldnum].update(this.multisearchSelectCache[fieldnum]);
 			} else {
-				new Ajax.Request('ajax.php?ajax&type=listvalues&fieldnum=' + fieldnum, {
+				new Ajax.Request('ajax.php?ajax&type=persondatavalues&fieldnum=' + fieldnum, {
 					onSuccess: this.handle_ajax_multisearch_values.bindAsEventListener(this, fieldnum)
 				});
 			}
 		// NUMERIC
 		} else if (this.fieldmaps[fieldnum]['type'] == 'numeric') {
-			switch(operator) {
-				case 'num_eq':
-				case 'num_ge':
-				case 'num_gt':
-				case 'num_le':
-				case 'num_lt':
-				case 'num_ne':
-					this.valueTD[fieldnum].update(util_textbox([value1]));
-					break;
-					
-				case 'num_range':
-					this.valueTD[fieldnum].update(util_textbox([value1,value2]));
-					break;
-			}
+			var current = this.valueTD[fieldnum].select('input[type="text"]');
+			var value1 = (current && current[0]) ? current[0].getValue() : '';
+			var value2 = (current && current[1]) ? current[1].getValue() : '';
+		
+			this.valueTD[fieldnum].update(util_textbox([value1]));
+			this.valueTD[fieldnum].insert(util_textbox([value2], operator != 'num_range'));
 		// DATE
 		} else if (this.fieldmaps[fieldnum]['type'] == 'reldate') {
-			switch(operator) {
-				case 'date_offset':
-					this.valueTD[fieldnum].update(util_textbox([value1]));
-					break;
-					
-				case 'date_range':
-					this.valueTD[fieldnum].update(util_datebox([value1,value2]));
-					break;
-					
-				case 'eq':
-					this.valueTD[fieldnum].update(util_datebox([value1]));
-					break;
-					
-				case 'reldate':
-					this.valueTD[fieldnum].update(util_selectbox(this.reldateOptions));
-					var valueOption = this.valueTD[fieldnum].down('option[value="'+value1+'"]');
-					if (valueOption)
-						valueOption.selected = true;
-					break;
-					
-				case 'reldate_range':
-					this.valueTD[fieldnum].update(util_textbox([value1,value2]));
-					break;
-			}
+			var current = this.valueTD[fieldnum].select('input[type="text"]');
+			var value2 = (current && current[0]) ? current[0].getValue() : '';
+			var value3 = (current && current[1]) ? current[1].getValue() : '';
+			var value4 = (current && current[2]) ? current[2].getValue() : '';
+			var value5 = (current && current[3]) ? current[3].getValue() : '';
+			
+			this.valueTD[fieldnum].update(util_selectbox(this.reldateOptions, operator != 'reldate'));
+			this.valueTD[fieldnum].insert(util_datebox([value2], operator != 'eq' && operator != 'date_range'));
+			this.valueTD[fieldnum].insert(util_datebox([value3], operator != 'date_range'));
+			this.valueTD[fieldnum].insert(util_textbox([value4], operator != 'date_offset' && operator != 'reldate_range'));
+			this.valueTD[fieldnum].insert(util_textbox([value5], operator != 'reldate_range'));
 		// TEXT
 		} else if (this.fieldmaps[fieldnum]['type'] == 'text') {
+			var current = this.valueTD[fieldnum].select('input[type="text"]');
+			var value1 = (current && current[0]) ? current[0].getValue() : '';
+			
 			this.valueTD[fieldnum].update(util_textbox([value1]));
+		} else {
+			// Clear the value-column.
+			this.valueTD[fieldnum].update();
 		}
 	},
 	
@@ -319,68 +287,122 @@ var RuleWidget = Class.create({
 		
 		if (this.fieldSelect.options.length < 2) {
 			this.fieldSelect.disabled = true;
-			//this.addRuleButton.disabled = true;
 		} else {
 			this.fieldSelect.disabled = false;
-			//this.addRuleButton.disabled = false;
 		}
-		
-		var clearRules = new Element('clearRules', {'type':'button'}).update('Clear Rules');
-		this.toolbar.insert(clearRules);
-		
-		var saveButton = new Element('button', {'type':'button'}).update('Save This List');
-		this.toolbar.insert(saveButton);
-		saveButton.observe('click', this.handle_save_list.bindAsEventListener(this));
 	}
 });
 
-function util_selectbox(values, multiple, selected) {
-	var selectBox = new Element('select');
-	if (multiple)
-		selectBox.setAttribute('multiple', 'true');
-		
-	if (values.length) {
-		for (var i = 0; i < values.length; i++) {
-			var option = new Element('option', {'value':values[i]});
-			option.insert(values[i]);
-			selectBox.insert(option);
-		}
-	} else {
-		for (var i in values) {
-			var option = new Element('option', {'value':i});
-			option.insert(values[i]);
-			selectBox.insert(option);
-		}
-	}
+function util_multicheckbox(uniquePrefix, values) {
+	div = new Element('div', {'style':'border: solid 1px blue;padding:2px'});
 	
-	return selectBox;
-}
-
-function util_datebox(values) {
-	if (!values)
-		values = [''];
+	if (values.length) {
+		var checkAll = new Element('a', {'href':'', 'style':'display:block;float:left'}).insert('Check All');
+		checkAll.observe('click', function(event) {
+			var checkboxes = event.element().up('div').select('input[type="checkbox"]');
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].checked = true;
+			}
+			event.stop();
+		});
+		var clearAll = new Element('a', {'href':'', 'style':'display:block;float:right'}).insert('Clear');
+		clearAll.observe('click', function(event) {
+			var checkboxes = event.element().up('div').select('input[type="checkbox"]');
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].checked = false;
+			}
+			event.stop();
+		});
 		
-	var div = new Element('span');
-	for (var i = 0; i < values.length; i++) {
-		if (i > 0)
-			div.insert(' and ');
-		var dateBox = new Element('input', {'type':'text', 'class':'DateBox', 'value':values[i]});
-		div.insert(dateBox);
+		div.insert(checkAll).insert(clearAll).insert('<br style="clear:both">');
+		
+		//var ul = new Element('ul', {'style':'width: 200px; border-top:solid 1px lightgray; height:100px; margin:2px; padding:0;list-style:none; overflow:auto;'});
+		var ul = '<ul style="width: 200px; border-top:solid 1px lightgray; height:100px; margin:2px; padding:0;list-style:none; overflow:auto;">';
+		for (var i = 0; i < values.length; i++) {
+			//var checkbox = new Element('input', {'type':'checkbox', 'value':values[i].escapeHTML(), 'id':uniquePrefix + i});
+			//var label = new Element('label', {'for':uniquePrefix + i}).update(values[i].escapeHTML());
+			//ul.insert(new Element('li', {'style':'white-space:nowrap'}).insert(checkbox).insert(label));
+			
+			var checkbox = '<input type="checkbox" value="'+values[i].escapeHTML()+'" id="'+uniquePrefix+i+'"/>';
+			var label = '<label for="'+uniquePrefix+i+'">'+values[i].escapeHTML()+'</label>';
+			ul += ('<li style="white-space:nowrap">' + checkbox + label + '</li>');
+		}
+		
+		div.insert(ul+'</ul>');
 	}
 	return div;
 }
 
-function util_textbox(values) {
+function util_selectbox(values, hidden) {
+	var selectbox = new Element('select');
+		
+	if (values.length) {
+		for (var i = 0; i < values.length; i++) {
+			var option = new Element('option', {'value':values[i]});
+			option.insert(values[i].escapeHTML());
+			if (i == 0)
+				option.selected = true;
+			
+			selectbox.insert(option);
+		}
+	} else {
+		for (var i in values) {
+			var option = new Element('option', {'value':i});
+			option.insert(values[i].escapeHTML());
+			selectbox.insert(option);
+		}
+	}
+	
+	if (hidden)
+		selectbox.hide();
+		
+	return selectbox;
+}
+
+function util_datebox(dates, hidden) {
+	if (!dates)
+		dates = [''];
+		
+	var div = new Element('div');
+	for (var i = 0; i < dates.length; i++) {
+		if (i > 0)
+			div.insert(' and ');
+		var datebox = new Element('input', {'type':'text', 'class':'DateBox', 'value':dates[i]});
+		datebox.observe('focus', function(event) {
+			this.select();
+			lcs(this,true,true);
+		});
+		// lcs() by default will disappear when you release the mouse button, so we need to override the click event.
+		datebox.observe('click', function(event) {
+			event.stop();
+			this.select();
+			lcs(this,true,true);
+		});
+		
+		div.insert(datebox);
+	}
+	
+	if (hidden)
+		div.hide();
+			
+	return div;
+}
+
+function util_textbox(values, hidden) {
 	if (!values)
 		values = [''];
 		
-	var div = new Element('span');
+	var div = new Element('div');
 	for (var i = 0; i < values.length; i++) {
 		if (i > 0)
 			div.insert(' and ');
 			
-		var dateBox = new Element('input', {'type':'text', 'value':values[i]});
-		div.insert(dateBox);
+		var textbox = new Element('input', {'type':'text', 'value':(values[i]+'').escapeHTML()});
+		div.insert(textbox);
 	}
+	
+	if (hidden)
+		div.hide();
+		
 	return div;
 }
