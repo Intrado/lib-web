@@ -4,14 +4,13 @@ if (isset($_GET['source'])) {
 	exit();
 }
 
-session_start();
-
+require_once("inc/common.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/html.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
-
+require_once("ListForm.php");
 
 //################ PAGE CODE ################
 
