@@ -85,7 +85,7 @@ foreach ($fieldmaps as $fieldmap) {
 				$formattedvalues = implode(", ",$values);
 				if ($formattedvalues == "")
 					$formattedvalues = "&nbsp;";
-				echo $formattedvalues;
+				echo escapehtml($formattedvalues);
 				echo '</td>';
 			} elseif(showmode("numeric")) {
 				//TODO
@@ -122,12 +122,12 @@ if (count($unusedrules) > 0) {
 
 echo "<tr><td valign=top>";
 
-$extrahtml = "onchange=\"hide(ruleselected);
+$extrahtml = "onchange=\"Element.hide(ruleselected);
 						ruleselected='rule_'+this.value;
-						show(ruleselected);
-						hide(typeselected);
+						Element.show(ruleselected);
+						Element.hide(typeselected);
 						typeselected = 'operator_'+ruletypes[this.selectedIndex];
-						show(typeselected);
+						Element.show(typeselected);
 						new getObj('newruletype').obj.value=ruletypes[this.selectedIndex];\"";
 
 PutFormData($f,$s,"newrulefieldnum", "-1");
