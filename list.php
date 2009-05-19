@@ -111,7 +111,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'a
 			$list->description = trim(GetFormData($f,$s,"description"));
 			
 			$list->userid = $USER->id;
-			$list->deleted = '0';
+			$list->deleted = 0;
 			$list->update();
 
 			$fieldaddsubmit = false;
