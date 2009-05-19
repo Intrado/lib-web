@@ -84,7 +84,7 @@ foreach ($fieldmaps as $fieldmap) {
 				$values = explode("|",$rule->val);
 				$formattedvalues = implode(", ",$values);
 				if ($formattedvalues == "")
-					$formattedvalues = "&nbsp;";
+					$formattedvalues = " ";
 				echo escapehtml($formattedvalues);
 				echo '</td>';
 			} elseif(showmode("numeric")) {
