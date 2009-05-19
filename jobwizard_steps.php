@@ -89,25 +89,7 @@ class JobWiz_basic extends WizStep {
 
 class JobWiz_list extends WizStep {
 	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array(
-			"fancylistbuilder" => array(
-				"label" => "Fancy List Builder",
-				"validators" => array(
-				),
-				"value" => "",
-				"control" => array("TextField"),
-				"helpstep" => 1
-			)
-		);
-
-		// Help Steps.
-		$helpsteps = array(
-			"List builder",
-			"Insert fancy list builder help here"
-		);
-
-		return new Form("list",$formdata,$helpsteps);
+		return new ListForm("list");
 	}
 }
 
