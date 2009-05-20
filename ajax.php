@@ -12,6 +12,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("obj/ListEntry.obj.php");
+require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 
@@ -112,6 +113,18 @@ if (isset($_GET['ajax']) && isset($_GET['type'])) {
 			
 			$disabled = isset($_GET['disabled']) ? '1' : '0';
 			$return = DBFindMany("PeopleList", "from list where userid='" . $USER->id . "' and disabled=$disabled order by name");
+			break;
+			
+		// USED IN: ListForm.php
+		case 'liststats':
+			if (!$USER->authorize('createlist') || !isset($_GET['listid']))
+				break;
+				
+			$list = new PeopleList($_GET['listid']);
+			$renderedlist = new RenderedList($list);
+			$renderedlist->calcStats();
+			
+			$return = array('id'=>$list->id, 'name'=>$list->name, 'total'=>$renderedlist->total);
 			break;
 			
 		default;
