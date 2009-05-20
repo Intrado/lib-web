@@ -111,8 +111,8 @@ if (isset($_GET['ajax']) && isset($_GET['type'])) {
 			if (!$USER->authorize('createlist'))
 				break;
 			
-			$disabled = isset($_GET['disabled']) ? '1' : '0';
-			$return = DBFindMany("PeopleList", "from list where userid='" . $USER->id . "' and disabled=$disabled order by name");
+			$deleted = isset($_GET['deleted']) ? '1' : '0';
+			$return = DBFindMany("PeopleList", "from list where userid='" . $USER->id . "' and deleted=$deleted order by name");
 			break;
 			
 		// USED IN: ListForm.php
