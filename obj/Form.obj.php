@@ -16,7 +16,7 @@ class Form {
 	var $validationresults = null;
 	var $ajaxsubmit = true;
 	
-	function Form ($name, $formdata, $helpsteps, $buttons = null) {
+	function Form ($name, $formdata, $helpsteps = null, $buttons = null) {
 		$this->name = $name;
 		$this->formdata = $formdata;
 		$this->helpsteps = $helpsteps;
@@ -122,7 +122,8 @@ class Form {
 		<div class="newform_container">
 		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'" style="width: 100%; /* TODO fix main css */">
 		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">
-		<table width="100%" cellspacing="0" table-layout="fixed"><tr><td valign=top> <!-- FORM CONTENT -->';
+		<div style="clear: both; margin-top: 5px;">'.($this->helpsteps ? icon_button("Start Guide","information","return form_enable_helper(event);") : "").'</div>
+		<table summary="Form" width="100%" cellspacing="0" table-layout="fixed" style="border: 0px; padding: 0px; margin: 0px;"><tr><td valign=top> <!-- FORM CONTENT -->';
 		
 		foreach ($this->formdata as $name => $itemdata) {
 			//check for section titles
@@ -165,7 +166,7 @@ class Form {
 			
 			if ($lasthelpstep != $itemdata['helpstep']) {
 				$lasthelpstep = $itemdata['helpstep'];
-				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'"><legend>Step '.$lasthelpstep.'</legend><table width="100%" cellspacing="0" table-layout="fixed" class="formcontenttable">';
+				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'"><legend>Step '.$lasthelpstep.'</legend><table summary="" width="100%" cellspacing="0" table-layout="fixed" class="formcontenttable">';
 			}
 			
 			$n = $this->name."_".$item->name;
@@ -173,7 +174,7 @@ class Form {
 
 			if ($formclass == "FormHtml") {
 				$str.= '
-				<tr><th class="formtableheader formlabel">'.$l.': </th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
+				<tr><th class="formtableheader formlabel">'.$l.'</th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
@@ -181,6 +182,7 @@ class Form {
 				$requiredfields = isset($itemdata['requires']) ? $this->getFieldValues($itemdata['requires']) : array();
 				$t = $this->tindex++;
 				$i = "img/pixel.gif";
+				$alt = "";
 				$style = "";
 				$msg = false;
 			
@@ -201,24 +203,26 @@ class Form {
 					$valresult = Validator::validate_item($this->formdata,$name,$value,$requiredfields);
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
+						$alt = "Valid";
 						$style = 'style="background: rgb(225,255,225);"' ;
 						$msg = false;
 					} else {
 						list($validator,$msg) =  $valresult;
 						$i = "img/icons/exclamation.gif";
+						$alt = "Validation Error";
 						$style = 'style="background: rgb(255,200,200);"' ;
 					}
 				} else if (!$this->getSubmit() && $isblank && $isrequired) {
 					//show required highlight
 					$i = "img/icons/error.gif";
+					$alt = "Required Field";
 					$style = 'style="background: rgb(255,255,220);"' ;
-					$msg = "Required";
 				}
 				
 				$str.= '
 				<tr id="'.$n.'_fieldarea" '.$style.'>
-					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.': </label></th>
-					<td class="formtableicon"><img alt="" id="'.$n.'_icon" src="'.$i.'" /></td>
+					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>
+					<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>
 					<td class="formtablecontrol">
 						'.$item->render($value).'
 						<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>
@@ -240,14 +244,14 @@ class Form {
 		$str .= '
 				<!-- END FORM CONTENT -->
 				</td>
-				<td width="200px" valign=top>
+				<td id="'.$this->name.'_helpercell" valign="top" style="width: 0px;">
 				<!-- HELPER -->
-				<div id="'.$this->name.'_helper" class="helper" style="width: 100%; /* TODO fix main css */">
-					<div class="title">Guide</div>
-					<div class="content" id="'.$this->name.'_helpercontent" >'.$this->helpsteps[0].'</div>
+				<div id="'.$this->name.'_helper" class="helper">
+					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="img/icons/cross.gif" alt="Close Guide" title="Close"></a><img src="img/icons/information.gif" alt="" style="float: left;">Guide</div>
+					<div class="helpercontent" id="'.$this->name.'_helpercontent" ></div>
 					<div class="toolbar" >
-						<a href="#" style="float:left;"><img style="opacity: 0.33;" src="img/icons/control_rewind.gif" border=0></a>
-						<a href="#" style="float:right;" ><img src="img/icons/control_fastforward_blue.gif" border=0></a>
+						<a href="#" style="float:left;" onclick="this.blur(); return form_step_handler(event,-1);"><img src="img/icons/fugue/arrow_090.gif" border="0" alt="Previous Step" title="Previous Step" width="16"></a>
+						<a href="#" style="float:left;" onclick="this.blur(); return form_step_handler(event,1);"><img src="img/icons/fugue/arrow_270.gif" border="0" alt="Next Step" title="Next Step" width="16"></a>
 						<div id="'.$this->name.'_helperinfo" class="info">Click the arrow to begin</div>
 					</div>
 				</div>

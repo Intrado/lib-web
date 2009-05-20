@@ -28,18 +28,20 @@ form.newform {
 	display: block;
 	overflow: hidden;
 	float: left;
-	width: 24%;
+	width: 200px;
 	margin: 0;
 	padding: 0;
 	
 	background-color: white;
 	border: 2px solid rgb(150,150,255);
+	
+	display: none;
 }
 
-.helper .content {
+.helper .helpercontent {
 	font-size: 9pt;
 	font-family: sans-serif;
-	padding: 3px;
+	padding: 5px;
 }
 
 .helper .toolbar {
@@ -63,15 +65,25 @@ form.newform {
 	background-color: rgb(240,240,255);
 }
 
+.helper .title img {
+	padding-top: .1em; 
+	padding-right: 3px; 
+	padding-left: 3px; 
+	vertical-align: top;
+}
+
 .helper .toolbar img {
 	padding: 3px 3px 0px 3px;
 }
 
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 .newform fieldset {
+	border: 1px outset;
 	padding: 5px;
 	margin-left: 15px;
-	margin-bottom: 3px;
+	
+	border: 0px;
+	padding: 0px;
 }
 
 .newform legend {
@@ -88,6 +100,7 @@ form.newform {
 	border-right: 1px solid gray;
 	background: repeat-x url('../img/chrome_light.png') ;
 	
+	display: none;
 }
 
 
@@ -120,6 +133,7 @@ form.newform {
 	clear: both;
 	font-style: italic;
 	font-size: 90%;
+	line-height: 120%;
 }
 
 .newform .radiobox {

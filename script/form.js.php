@@ -32,7 +32,11 @@ function form_event_handler (event) {
 		},
 		event.type == "keyup" ? 750 : 200
 	);
+	
+	
+			
 
+	
 }
 
 function form_get_value (form,targetname) {
@@ -87,6 +91,10 @@ function form_do_validation (form, element) {
 		var validators = formvars.validators[targetname];
 		var requiredfields = formvars.formdata[itemname].requires;
 		var value = form_get_value(form,targetname);
+		
+		//set progress animation
+		//if radio button, get the id of the container div		
+		$((element.up(".radiobox") || element).id + "_icon").src = "img/ajax-loader.gif";;
 		
 		//see if we need additional fields for validation
 		var requiredvalues = {};
@@ -155,12 +163,15 @@ function form_validation_display(element,style, msgtext) {
 	if (style == "error") {
 		css = 'background: rgb(255,200,200);';
 		icon.src = "img/icons/exclamation.gif";
+		icon.alt = icon.title = "Validation Error";
 	} else if (style == "valid") {
 		css = 'background: rgb(225,255,225);';
 		icon.src = "img/icons/accept.gif";
+		icon.alt = icon.title = "Valid";
 	} else if (style == "blank") {
 		css = 'background: rgb(255,255,255); display: none';
 		icon.src = "img/pixel.gif";
+		icon.alt = icon.title = "";
 	}
 	
 	//set up the validation transition effects
@@ -199,6 +210,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		scriptname: scriptname, //used for any ajax calls for this form
 		helpsteps: helpsteps,
 		ajaxsubmit: ajaxsubmit,
+		helperdisabled: true,
 		currentstep: 0,
 		validators: {},
 		jsgetvalue: {}
@@ -220,7 +232,10 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 				obj.observe("change",form_event_handler);
 			}
 		} else {
-			if (e.type == "checkbox" || e.type.startsWith("select")) {
+			if (e.type == "checkbox") {
+				e.observe("change",form_event_handler);
+				e.observe("click",form_event_handler);
+			} else if (e.type.startsWith("select")) {
 				e.observe("change",form_event_handler);
 			}
 			
@@ -254,23 +269,22 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		formvars.validators[id] = validators;
 		formvars.jsgetvalue[id] = eval(formdata[fieldname].jsgetvalue);
 	}
-	
-	//install click handlers for (name + '_helper') hrefs
-	$(form.id + "_helper").down("a",0).observe("click",function (event) {form_step_handler(form,-1,null); Event.stop(event);});
-	$(form.id + "_helper").down("a",1).observe("click",function (event) {form_step_handler(form,+1,null); Event.stop(event);});
-	
+
 	//install click handlers for fieldsets
-	form.select('label',"div.msgarea").map(function(e) {
+	form.select("legend").map(function(e) {
 		//only register on top level labels and msgareas
-		if (e.up(2).match("form")) {
-			e.observe("click",form_fieldset_handler);
-			e.style.cursor="help";
-		}
+		e.observe("click",form_fieldset_event_handler);
+		e.style.cursor="help";		
 	});
-		
+	
+	//install helper focus handler
+	form.select("input","textarea","select").map(function(e) {
+		e.observe("focus",form_fieldset_event_handler);
+	});
+	
 	//install click handlers for table form labels
 	form.select('.formlabel').map(function(e) {
-		e.observe("click",form_fieldset_handler);
+		e.observe("click",form_label_event_handler);
 		e.style.cursor="help";
 	});
 	
@@ -279,29 +293,46 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	form.observe("submit",form_handle_submit.curry(name));
 }
 
-function form_fieldset_handler (event) {
+function form_label_event_handler (event) {
+	//TODO show a popup for this form item
+}
+
+function form_fieldset_event_handler (event) {
+	event = Event.extend(event);
 	var form = event.findElement("form");
 	var formvars = document.formvars[form.name];
 	var e = event.element();
 	
 	var fieldset = e.up("fieldset");
 	var step = fieldset.id.substring(fieldset.id.lastIndexOf("_")+1);
-	form_step_handler(form,null,step);
+	form_go_step(form,null,step);
 }
 
-
-function form_step_handler (form, direction, specificstep) {
+function form_step_handler (event, direction) {
+	event = Event.extend(event);
+	var form = event.findElement("form");	
+	var helpercontent = $(form.id + "_helpercontent");
+	
+	//direct focus to helper for screen readers
+	helpercontent.onblur = function () {this.removeAttribute("title");};
+	helpercontent.tabIndex = -1;
+	form_go_step(form,direction,null);
+	helpercontent.focus();
+	return false;
+}
+function form_go_step (form, direction, specificstep) {
 	form = $(form);
-	var formvars = document.formvars[form.name];
 	if (!form || !form.id)
+		return false;
+	var formvars = document.formvars[form.name];
+	if (formvars.helperdisabled)
 		return false;
 	
 	var helper = $(form.id + '_helper');
 	var helperinfo = $(form.id + '_helperinfo');
+	var helpercontent = $(form.id + "_helpercontent");
 	
-	if (formvars.scrolling)
-		return false;
-		
+	var laststep = formvars.currentstep;
 	if (specificstep) {
 		formvars.currentstep = specificstep;
 	} else {
@@ -311,55 +342,110 @@ function form_step_handler (form, direction, specificstep) {
 	formvars.currentstep = Math.min(formvars.currentstep,formvars.helpsteps.length-1);
 	formvars.currentstep = Math.max(formvars.currentstep,1);
 	
+	if (laststep == formvars.currentstep)
+		return false;
 	
 	//show/hide the buttons
 	var leftarrow = helper.down(".toolbar img");
 	var rightarrow = helper.down(".toolbar img",1);
 	if (formvars.currentstep == 1) {
-		leftarrow.src="img/icons/control_rewind.gif";
-		leftarrow.style.opacity=0.33;
+		leftarrow.src="img/pixel.gif";
 	} else {
-		leftarrow.src="img/icons/control_rewind_blue.gif";
-		leftarrow.style.opacity=1;
+		leftarrow.src="img/icons/fugue/arrow_090.gif";
 	}
 	
 	if (formvars.currentstep == formvars.helpsteps.length-1) {		
-		rightarrow.src="img/icons/control_fastforward.gif";
-		rightarrow.style.opacity=0.33;
+		rightarrow.src="img/pixel.gif";
 	} else {
-		rightarrow.src="img/icons/control_fastforward_blue.gif";
-		rightarrow.style.opacity=1;
+		rightarrow.src="img/icons/fugue/arrow_270.gif";
 	}
 	
 	//info text
 	
-	helperinfo.innerHTML = 'Step ' + formvars.currentstep + " of " + (formvars.helpsteps.length-1);
+	helpercontent.title = helperinfo.innerHTML = 'Step ' + formvars.currentstep + " of " + (formvars.helpsteps.length-1);
+	helpercontent.innerHTML = formvars.helpsteps[formvars.currentstep];
 	
-	$(form.id + "_helpercontent").innerHTML = formvars.helpsteps[formvars.currentstep];
 	
 	//find the section of the form for this step, blink it, and scroll to it
 	var e;
 	for (var i = 1; e = $(form.id + '_helpsection_'+i); i++) {
-		e.style.border = '';
+		e.style.border = "1px outset";
 		
 		if (i == formvars.currentstep) {
-			formvars.scrolling = true;
+			//cancel any previous effects
+			Effect.Queues.get("helper").each(function(effect) { effect.cancel(); });
+			
 			var helper_y = e.offsetTop;
 			var viewport_offset = Math.max(0, document.viewport.getHeight() - e.getHeight());
 
 			e.style.border = "2px solid rgb(0,0,255)";
-			new Effect.Morph(e, {style: 'border-color: rgb(150,150,255)', duration: 0.8, transition: Effect.Transitions.spring});
+			new Effect.Morph(e, {style: 'border-color: rgb(150,150,255)', duration: 1.2, transition: Effect.Transitions.spring, queue: { scope: "helper"}});
 			
-			new Effect.Move(helper, { y:helper_y, mode:'absolute', duration: 0.8,
-				afterFinish: function() {
-					formvars.scrolling = false;
-				}
-			});
+			new Effect.Move(helper, { y:helper_y, mode:'absolute', duration: 0.8, queue: { scope: "helper"}});
+			
 			if (!specificstep)
-				new Effect.ScrollTo(e, {offset: -viewport_offset/2.0, duration: 0.6});
+				new Effect.ScrollTo(e, {offset: -viewport_offset/2.0, duration: 0.6, queue: { scope: "helper"}});
 		}
 	}
 	return false;
+}
+
+function form_enable_helper(event) {
+	event = Event.extend(event);
+	var form = event.findElement("form");
+	var formvars = document.formvars[form.name];
+	var helper = $(form.id + '_helper');
+	
+	//if user clicks start guide with it already open, just go to the first item //TODO go to a clicked (i) icon
+	if (!formvars.helperdisabled) {
+		form_go_step(form,null,1);
+		return;
+	}
+	
+	formvars.helperdisabled = false;
+	
+	new Effect.Morph(form.id + "_helpercell", {style: "width: 200px", 
+		afterFinish: function() {
+			helper.style.display = "block";
+			form_go_step(form,null,1);
+		}
+	});
+	
+	form.select("legend").map(function (e) {
+		e = $(e);
+		e.style.display = "inline";
+	});
+	
+	form.select("fieldset").map(function (e) {
+		e.style.border = "1px outset";
+		e.style.padding = "5px";
+		e.style.marginBottom = "3px";
+	});
+}
+
+function form_disable_helper(event) {
+	event = Event.extend(event);
+	var form = event.findElement("form");
+	var formvars = document.formvars[form.name];
+	var helper = $(form.id + '_helper');
+	
+	formvars.helperdisabled = true;
+	formvars.currentstep = 0;
+	
+	helper.style.display = "none";
+	
+	new Effect.Morph(form.id + "_helpercell", {style: "width: 0px", 
+		afterFinish: function () {
+			form.select("legend").map(function (e) {
+				e.style.display = "none";
+			});
+			form.select("fieldset").map(function (e) {
+				e.style.border = "0px";
+				e.style.padding = "0px";
+				e.style.marginBottom = "0px";
+			});
+		}
+	});
 }
 
 
