@@ -16,7 +16,10 @@ require_once("inc/securityhelper.inc.php");
 class ListForm extends Form {
 	function ListForm ($name) {
 		$this->name = $name;
-		$this->serialnum = md5(serialize($name)); // TODO: What to do with this? it used to be serialize($formdata).
+		$this->serialnum = md5(serialize($name));
+		$this->formdata = null;
+		$this->helpsteps = null;
+		$this->ajaxsubmit = true;
 	}
 	
 	function handleRequest() {
@@ -27,14 +30,21 @@ class ListForm extends Form {
 		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name)
 			return false; //nothing to do
 		
-		$ajaxReturn = false;
-		
 		// Wizard clicked Next.
 		if ($USER->authorize('createlist') && isset($_POST['submit'])) {
 			// TODO: submit.
-			error_log('wizard click next');
+			error_log('wizard button clicked');
+			return;
+		}
+
+		// Everything below is ajax.
+		if (!isset($_REQUEST['ajax']))
+			return;
+
+		$ajaxReturn = false;
+
 		// Save Rules
-		} else if ($USER->authorize('createlist') && isset($_POST['ruledata'])) {
+		if ($USER->authorize('createlist') && isset($_POST['ruledata'])) {
 			error_log('save rules');
 			
 			$ruledata = json_decode($_POST['ruledata']);
@@ -117,8 +127,10 @@ class ListForm extends Form {
 		// ListForm Stuff
 		$str.= "
 <style type='text/css'>
-td {
+td,th {
 	vertical-align: top;
+	padding: 2px;
+	text-align: left;
 }
 select {
 	min-width: 70px;
@@ -128,14 +140,20 @@ select {
 	<tr>
 		<td style='width:400px'>
 			<h2>Build Rules
-				<button id='SaveRules' type='button' style='display:block; float:right'>Save Rules</button>
+				<button id='SaveRules' type='button'>Save Rules</button>
 			</h2>
 			<div id='BuildRules' style='clear:both'></div>
 		</td>
 		
 		<td>
 			<h2>Lists To Use</h2>
-			<ul id='ListsToUse' style='border: solid 2px brown'></ul>
+			<table style='background: lightgray'><tbody id='ListsToUse'>
+				<tr>
+					<th>Name</th>
+					<th>Count</th>
+					<th> </th>
+				</tr>
+			</tbody></table>
 			
 			<h2>Premade Lists</h2>
 			<div id='PremadeLists'></div>
@@ -143,6 +161,11 @@ select {
 	</tr>
 </table>
 		";
+
+ 		//submit buttons
+                foreach ($this->buttons as $code) {
+                        $str .= $code;
+                }
 		
 		$str .= '
 				<!-- END FORM CONTENT -->
@@ -171,6 +194,7 @@ function show_premade_lists() {
 				return;
 			}
 
+			console.info(premadeListsCache);
 			refresh_premade_lists();
 		}
 	});
@@ -179,18 +203,17 @@ function show_premade_lists() {
 function refresh_premade_lists() {
 	var selectBox = new Element('select');
 	selectBox.insert(new Element('option', {'value':''}).insert('-- Select a List --'));
-	for (var i in premadeListsCache) {
+	for (var listid in premadeListsCache) {
 		var added = false;
-		if (premadeListsCache[i]['added'])
+		if (premadeListsCache[listid]['added'])
 			added = true;
-		console.info('List['+i+'], added='+added);
 		
 		// Don't bother if the list has already been added to $('ListsToUse').
 		if (!added)
-			selectBox.insert(new Element('option', {'value':data[i]['id']}).update(data[i]['name']));
+			selectBox.insert(new Element('option', {'value':listid}).update(premadeListsCache[listid]['name']));
 	}
 
-	var addButton = new Element('button', {'type':'button'});
+	var addButton = new Element('button', {'type':'button'}).update('Use List');
 	addButton.observe('click', function(event) {
 		var listid = $('PremadeLists').down('select').getValue();
 		use_list(listid);
@@ -209,20 +232,23 @@ function use_list(listid) {
 				return;
 			}
 			
-			var listName = new Element('span').update(data['name']);
-			var listTotal = new Element('span').update(data['total']);
+			var listName = new Element('td').update(data['name']).insert(new Element('input', {'type':'hidden', 'value':data['id']}));
+			var listTotal = new Element('td').update(data['total']);
 			
 			var removeButton = new Element('button', {'type':'button'}).update('Remove');
 			removeButton.observe('click', function(event) {
-				var li = event.element().up('li');
-				var listid = li.down('input[type=\"hidden\"]').getValue();
-				premadeListsCache[listid]['added'] = false;
-				li.remove();
+				var tr = event.element().up('tr');
+				var listid = tr.down('input[type=\"hidden\"]').getValue();
+				if (premadeListsCache[listid])
+					premadeListsCache[listid]['added'] = false;
+				tr.remove();
+				refresh_premade_lists();
 			});
 			
-			$('ListsToUse').insert(new Element('li').update(new Element('input', {'type':'hidden', 'value':data['id']})).insert(listName).insert(listTotal).insert(removeButton));
+			$('ListsToUse').insert(new Element('tr').update(listName).insert(listTotal).insert(new Element('td').update(removeButton)));
 			
 			premadeListsCache[listid]['added'] = true;
+			refresh_premade_lists();
 	}});
 }
 
@@ -238,20 +264,25 @@ function save_rules() {
 		}
 	});
 }
-</script>
 
-<script type='text/javascript'>
-	// Keep a cache of the JSON-decoded data.
-	var premadeListsCache;
-	show_premade_lists();
+// Keep a cache of the JSON-decoded data.
+var premadeListsCache;
+show_premade_lists();
 	
-	var ruleWidget = new RuleWidget($('BuildRules'));
-	$('SaveRules').observe('click', function(event) {
-		event.stop();
-		save_rules();
-	});
-	
-	// TODO: Load $('ListsToUse') from session-data.
+var ruleWidget = new RuleWidget($('BuildRules'));
+$('SaveRules').observe('click', function(event) {
+	event.stop();
+	save_rules();
+});
+
+// TODO: Load $('ListsToUse') from session-data.
+
+form_load('$this->name',
+	'$posturl',
+	".json_encode($this->formdata).",
+	".json_encode($this->helpsteps).",
+	".($this->ajaxsubmit ? "true" : "false")."
+);
 </script>
 		";
 		return $str;
