@@ -33,14 +33,6 @@ class ListForm extends Form {
 		if ($USER->authorize('createlist') && isset($_POST['submit'])) {
 			// TODO: submit.
 			error_log('wizard click next');
-		// Remove List.
-		} else if ($USER->authorize('createlist') && isset($_POST['removelist'])) {
-			// TODO: remove list.
-			error_log('remove list');
-		// Add Existing List.
-		} else if ($USER->authorize('createlist') && isset($_POST['addlist'])) {
-			// TODO: add list.
-			error_log('add existing list');
 		// Save Rules
 		} else if ($USER->authorize('createlist') && isset($_POST['ruledata'])) {
 			error_log('save rules');
@@ -96,8 +88,7 @@ class ListForm extends Form {
 						$le->create();
 					}
 					
-					$ajaxReturn = true;
-					// TODO: Add this list id to session data.
+					$ajaxReturn = $list->id;
 				}
 			} else {
 				error_log("EMPTY RULES, CANCLED");
@@ -136,17 +127,18 @@ select {
 <table>
 	<tr>
 		<td style='width:400px'>
-			<h2>Build Your List
-				<div>
-					<button onclick='save_rules(); return false;' type='button'>Save Rules</button>
-				</div>
+			<h2>Build Rules
+				<button id='SaveRules' type='button' style='display:block; float:right'>Save Rules</button>
 			</h2>
-			<div id='Rules'></div>
+			<div id='BuildRules' style='clear:both'></div>
 		</td>
 		
 		<td>
-			<h2>Select a List</h2>
-			<div id='Lists'></div>
+			<h2>Lists To Use</h2>
+			<ul id='ListsToUse' style='border: solid 2px brown'></ul>
+			
+			<h2>Premade Lists</h2>
+			<div id='PremadeLists'></div>
 		</td>
 	</tr>
 </table>
@@ -170,29 +162,68 @@ select {
 <script type='text/javascript' src='script/calendar.js'></script>
 <script type='text/javascript' src='script/RuleWidget.js'></script>
 <script type='text/javascript'>
-function show_lists() {
+function show_premade_lists() {
 	new Ajax.Request('ajax.php?ajax&type=lists', {
 		onSuccess: function(transport) {
-			var data = transport.responseJSON;
-			if (!data) {
+			premadeListsCache = transport.responseJSON;
+			if (!premadeListsCache) {
 				alert('you are not logged in');
 				return;
 			}
-			
-			listSelect = new Element('select');
-			$('Lists').update(listSelect);
-			listSelect.insert(new Element('option', {'value':''}).insert('-- Select a List --'));
-			//listSelect.observe('change', ajaxthing);
-	
-			for (var i in data) {
-				if (data[i]['id'] === undefined){
-					alert('sir goodbye'); 
-					break;
-				}
-				listSelect.insert(new Element('option', {'value':data[i]['id']}).update(data[i]['name']));
-			}
+
+			refresh_premade_lists();
 		}
 	});
+}
+
+function refresh_premade_lists() {
+	var selectBox = new Element('select');
+	selectBox.insert(new Element('option', {'value':''}).insert('-- Select a List --'));
+	for (var i in premadeListsCache) {
+		var added = false;
+		if (premadeListsCache[i]['added'])
+			added = true;
+		console.info('List['+i+'], added='+added);
+		
+		// Don't bother if the list has already been added to $('ListsToUse').
+		if (!added)
+			selectBox.insert(new Element('option', {'value':data[i]['id']}).update(data[i]['name']));
+	}
+
+	var addButton = new Element('button', {'type':'button'});
+	addButton.observe('click', function(event) {
+		var listid = $('PremadeLists').down('select').getValue();
+		use_list(listid);
+	});
+	
+	$('PremadeLists').update(selectBox);
+	$('PremadeLists').insert(addButton);
+}
+
+function use_list(listid) {
+	new Ajax.Request('ajax.php?ajax&type=liststats&listid='+listid, {
+		onSuccess: function (transport) {
+			var data = transport.responseJSON;
+			if (!data) {
+				alert('Sorry, this list cannot be added at the moment.');
+				return;
+			}
+			
+			var listName = new Element('span').update(data['name']);
+			var listTotal = new Element('span').update(data['total']);
+			
+			var removeButton = new Element('button', {'type':'button'}).update('Remove');
+			removeButton.observe('click', function(event) {
+				var li = event.element().up('li');
+				var listid = li.down('input[type=\"hidden\"]').getValue();
+				premadeListsCache[listid]['added'] = false;
+				li.remove();
+			});
+			
+			$('ListsToUse').insert(new Element('li').update(new Element('input', {'type':'hidden', 'value':data['id']})).insert(listName).insert(listTotal).insert(removeButton));
+			
+			premadeListsCache[listid]['added'] = true;
+	}});
 }
 
 function save_rules() {
@@ -201,18 +232,26 @@ function save_rules() {
 	new Ajax.Request('jobwizard.php?ajax&form=$this->name', {'method':'post',
 		'postBody': 'ruledata='+json,
 		onSuccess: function(transport) {
-			var data = transport.responseText;
+			var listid = transport.responseJSON;
 			ruleWidget.clear_rules();
+			use_list(listid);
 		}
 	});
 }
 </script>
 
 <script type='text/javascript'>
-	var listSelect;
-	//show_lists();
+	// Keep a cache of the JSON-decoded data.
+	var premadeListsCache;
+	show_premade_lists();
 	
-	var ruleWidget = new RuleWidget($('Rules'));
+	var ruleWidget = new RuleWidget($('BuildRules'));
+	$('SaveRules').observe('click', function(event) {
+		event.stop();
+		save_rules();
+	});
+	
+	// TODO: Load $('ListsToUse') from session-data.
 </script>
 		";
 		return $str;
