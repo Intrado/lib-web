@@ -115,7 +115,7 @@ class Wizard {
 				if (count($substeps) > 0)
 					$newwizdata[$wizstep] = $substeps;
 			} else {
-				if ($wizstepdata->isEnabled($_SESSION[$this->name]['data'],$curstep . "/" . $wizstep))
+				if (isset($_SESSION[$this->name]['data']) && $wizstepdata->isEnabled($_SESSION[$this->name]['data'],$curstep . "/" . $wizstep))
 					$newwizdata[$wizstep] = $wizstepdata;
 			}
 		}
