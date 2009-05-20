@@ -359,11 +359,29 @@ class ValFieldConfirmation extends Validator {
 	}
 }
 
+class ValInArray extends Validator {
+	function validate ($value, $args) {
+		if (!in_array($value, $args['values']))
+			return "$this->label must be an item from the list of available choices.";		
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				for (arg in args.values)
+					if (args.values[arg] == value)
+						return true;
+				
+				return label + " must be an item from the list of available choices.";
+				
+			}';
+	}
+}
 
 //alpha
 //alphanumeric
 //phoneeasycall ??
-//matches array
 
 
 
