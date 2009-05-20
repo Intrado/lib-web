@@ -47,7 +47,7 @@ if (isset($_GET['ajax']) && isset($_GET['type'])) {
 					"fromname"=>$message->fromname,
 					"fromemail"=>$message->fromemail,
 					"subject"=>$message->subject,
-					"attachment"=>$attachments,
+					"attachment"=>count($attachments)?$attachments:false,
 					"body"=>$body,);
 			}
 			break;
