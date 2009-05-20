@@ -129,4 +129,34 @@ form.newform {
 	border: 1px dotted gray;
 }
 
+.newform .msgbody {
+	clear: both;
+	font-style: normal;
+	font-size: 90%;
+	overflow: auto;
+	border: 1px solid gray;
+}
 
+.newform .msgdetails {
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: solid;
+	border-color: gray;
+	background-color: white;
+}
+.newform .msginfo {
+	clear: both;
+	font-style: normal;
+	font-size: 90%;
+}
+
+.newform .msgattachment {
+	clear: both;
+	font-style: italic;
+	font-size: 90%;
+}
+.newform .msglabel {
+	font-size: 110%;
+	width: 90px;
+	vertical-align: top;
+}
