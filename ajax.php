@@ -16,22 +16,17 @@ require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 
-function handleRequest($type) {
+function handleRequest() {
 	global $USER;
 	global $RULE_OPERATORS;
 	global $RELDATE_OPTIONS;
 	
-	switch($type) {
-		//--------------------------- SIMPLE OBJECTS -------------------------------
-		case 'fieldmap':
-			if (!isset($_GET['fieldnum']))
-				return false;
-			return FieldMap::getAuthorizedMapNames();
-		
+	switch($_GET['type']) {
+		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php -------------------------------
 		case 'lists':
 			if (!$USER->authorize('createlist'))
 				return false;
-			return DBFindMany('PeopleList', ', (name +0) as lettersfirst from list where userid=? and deleted=0 order by lettersfirst,name', false, array($USER->id));
+			return DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and deleted=0 order by lettersfirst,name', false, array($USER->id));
 			
 		case 'message':
 			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || !isset($_GET['messageid']))
@@ -40,6 +35,33 @@ function handleRequest($type) {
 			$message->readHeaders();
 			return $message;
 			
+		//--------------------------- COMPLEX OBJECTS -------------------------------
+
+		//--------------------------- RPC -------------------------------
+		case 'fieldmapnames':
+			if (!isset($_GET['fieldnum']))
+				return false;
+			return FieldMap::getAuthorizedMapNames();
+			
+		case 'hasmessage':
+			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || (!isset($_GET['messagetype']) || !isset($_GET['messageid'])))
+				return false;
+			if (isset($_GET['messagetype']))
+				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".dbsafe($_GET['messagetype'])."'");
+			if (isset($_GET['messageid']))
+				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and messageid='".dbsafe($_GET['messageid'])."'");
+			
+		case 'liststats':
+			if (!$USER->authorize('createlist') || !isset($_GET['listid']))
+				return false;
+			$list = new PeopleList($_GET['listid']);
+			$renderedlist = new RenderedList($list);
+			$renderedlist->calcStats();
+			return array(
+				'id' => $list->id,
+				'name' => $list->name,
+				'total' => $renderedlist->total);
+				
 		case 'persondatavalues':
 			if (!$USER->authorize('createlist') || !isset($_GET['fieldnum']))
 				return false;
@@ -47,25 +69,13 @@ function handleRequest($type) {
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 			return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
 			
-		//--------------------------- COMPLEX OBJECTS -------------------------------
-		case 'fieldmapsdata': // USED IN: RuleWidget.js
+		case 'rulewidgetsettings':
 			if (!$USER->authorize('createlist'))
 				return false;
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
-				'fieldmaps' => FieldMap::getAuthorizedFieldMapsLike('%'));
-
-		case 'liststats': // USED IN: ListForm.php
-			if (!$USER->authorize('createlist') || !isset($_GET['listid']))
-				return false;
-			$list = new PeopleList($_GET['listid']);
-			$renderedlist = new RenderedList($list);
-			$renderedlist->calcStats();
-			return array(
-				'id'=>$list->id,
-				'name'=>$list->name,
-				'total'=>$renderedlist->total);
+				'fieldmaps' => FieldMap::getAllAuthorizedFieldMaps());
 				
 		case 'wholemessage':
 			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || !isset($_GET['messageid']))
@@ -90,22 +100,13 @@ function handleRequest($type) {
 				"subject"=>$message->subject,
 				"attachment"=>count($attachments)?$attachments:false,
 				"body"=>$body);
-
-		//--------------------------- RPC -------------------------------
-		case 'hasmessage':
-			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || (!isset($_GET['messagetype']) || !isset($_GET['messageid'])))
-				return false;
-			if (isset($_GET['messagetype']))
-				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".dbsafe($_GET['messagetype'])."'");
-			if (isset($_GET['messageid']))
-				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and messageid='".dbsafe($_GET['messageid'])."'");
-			
+				
 		default:
 			return false;
 	}
 }
 
 header('Content-Type: application/json');
-$data = handleRequest($_GET['type']);
+$data = handleRequest();
 echo json_encode(!empty($data) ? $data : false);
 ?>
