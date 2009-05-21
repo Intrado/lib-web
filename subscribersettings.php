@@ -39,6 +39,7 @@ if (isset($_GET['delete'])) {
 
 $firstnameField = FieldMap::getFirstNameField();
 $lastnameField = FieldMap::getLastNameField();
+$languageField = FieldMap::getLanguageField();
 
 $data = DBFindMany("FieldMap","from fieldmap where options like '%subscribe%'");
 
@@ -48,28 +49,22 @@ $titles = array(	"name" => "Field Definition",
 					"Actions" => "Actions"
 					);
 
-$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%')", true);
+$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
 
 $formdata = array(
     "addfield" => array(
         "label" => "Field Definition:",
         "value" => "",
         "validators" => array(    
-            array("ValRequired")
         ),
         "control" => array("SelectMenu","values" => $addfields),
         "helpstep" => 1
     )
 );
 
-$helpsteps = array (
-    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
-	"Select a field to add"
-);
-
 $buttons = array(submit_button("Add","submit","tick"));
                 
-$form = new Form("addsubscriberfieldform",$formdata,$helpsteps,$buttons);
+$form = new Form("addsubscriberfieldform",$formdata,null,$buttons);
 $form->ajaxsubmit = true;
 
 //check and handle an ajax request (will exit early)
@@ -87,11 +82,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
         
-		$id = $postdata['addfield'][0];
-		
-        $query = "update fieldmap set options = concat(options, ',subscribe,dynamic') where id=?";
-        QuickUpdate($query, false, array($id));
-
+		$id = $postdata['addfield'];
 
         if ($ajax)
             $form->sendTo("subscriberfieldvalue.php?id=".$id);
@@ -106,11 +97,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_actions ($obj, $name) {
-	global $firstnameField, $lastnameField;
+	global $firstnameField, $lastnameField, $languageField;
 	
-	// first and last name fields have no actions
+	// first, last name, language fields have no actions
 	if ($obj->fieldnum == $firstnameField ||
-		$obj->fieldnum == $lastnameField)
+		$obj->fieldnum == $lastnameField ||
+		$obj->fieldnum == $languageField)
 			return '';
 			
 	return action_links (
@@ -127,15 +119,22 @@ function fmt_valtype ($obj, $name) {
 }
 
 function fmt_values ($obj, $name) {
+	global $languageField;
+	
 	if ($obj->isOptionEnabled('static')) {
-		$values = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($obj->fieldnum));
-		if (count($values) == 0)
-			return "";
-		$valcsv = implode(",", $values);
-		if (strlen($valcsv) > 25)
-			return substr($valcsv, 0, 25) . "...";
-		else
-			return $valcsv;
+		// TODO special case language
+		if ($obj->fieldnum == $languageField) {
+			return "English,Spanish,French"; // TODO
+		} else {
+			$values = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($obj->fieldnum));
+			if (count($values) == 0)
+				return "";
+			$valcsv = implode(",", $values);
+			if (strlen($valcsv) > 25)
+				return substr($valcsv, 0, 25) . "...";
+			else
+				return $valcsv;
+		}
 	} else
 		return "";
 }

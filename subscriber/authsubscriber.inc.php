@@ -116,29 +116,29 @@ function subscriberUpdateUsername($username, $password) {
 	return $result;
 }
 
-// sends the token to the email for validation
+// sends the token to the email for validation, return true or false
 function subscriberPrepareNewEmail($newemail) {
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newemail, 'string'));
 	$method = "SubscriberServer.subscriber_prepareEmailValidation";
 	$result = pearxmlrpc($method, $params);
-	return $result;
+	if ($result['result'] == "")
+		return true; // success
+	return false; // failure
 }
 
-// generate phone activation code
-function subscriberPrepareNewPhone($phoneList) {
+// generate phone activation code, return code or false
+function subscriberPrepareNewPhone($newphone, $options) {
 	sleep(2); // slow down any DOS attack
 
 	$sessionid = session_id();
 	
-	$newphoneArray = array();
-	foreach ($phoneList as $phone) {
-		$newphoneArray[] = new XML_RPC_Value($phone, 'string');
-	}
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newphoneArray, 'array'));
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newphone, 'string'), new XML_RPC_Value($options, 'string'));
 	$method = "SubscriberServer.subscriber_createPhoneActivation";
 	$result = pearxmlrpc($method, $params);
-	return $result;
+	if ($result['result'] == "" && isset($result['code']) && $result['code'] != "")
+		return $result['code']; // success
+	return false; // failure
 }
 
 

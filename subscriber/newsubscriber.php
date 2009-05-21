@@ -152,7 +152,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($result['result'] == "duplicate") {
 				$errordetails = "That email address is already in use";
 			} else {
-				$errordetails = "An unknown error occured, please try again";
+				$errordetails = "An unknown error occurred, please try again";
 			}
 			$errors .= "Your account was not created" . $errordetails;
 		} else {

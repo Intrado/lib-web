@@ -12,10 +12,10 @@ force_ssl=false
 log_dir="/usr/commsuite/logs/"
 log_db_errors=true
 log_db_queries=true
-tmp_dir="/tmp"
+tmp_dir="/usr/commsuite/tmp"
 
 [content]
-tts="localhost,8080,/tts/ttsserver"
+tts="jammer,8080,/tts/ttsserver"
 
 externalcontent=false
 

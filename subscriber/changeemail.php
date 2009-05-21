@@ -48,15 +48,11 @@ $formdata = array(
     )
 );
 
-$helpsteps = array (
-    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
-	"Enter a new email address.  Then enter your account password."
-);
 
 $buttons = array(submit_button("Save","submit","tick"),
                 icon_button("Cancel","cross",null,"account.php"));
                 
-$form = new Form("testform",$formdata,$helpsteps,$buttons);
+$form = new Form("testform",$formdata,null,$buttons);
 $form->ajaxsubmit = true;
 
 //check and handle an ajax request (will exit early)
@@ -126,7 +122,7 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 if (isset($_GET['thanks'])) {
 ?>
 	<div>
-	<h2><?= _L("Thank you.  Your username has been changed.  Please check your email for the activation step.")?></h2>
+	<h2><img src="img/icons/tick.gif"/>&nbsp;&nbsp;<?= _L("Your username has been changed.  Please check your email for the activation step.")?></h2>
 	</div>
 	<br>
 	<br>

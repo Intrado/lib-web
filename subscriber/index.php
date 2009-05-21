@@ -167,24 +167,6 @@ require_once("logintop.inc.php");
 <br>
 <?
 
-/*
-$formdata = array(
-	"firstname" => array(
-		"label" => "First Name",
-		"value" => "",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => 3,"max" => 50)
-		),
-		"requires" => "someotherfield",
-		"control" => array("TextField","maxlength" => 50),
-		"helpstep" => 1
-	));
-	
-$form = new Form($formdata, "gjbtest");
-$form->render();
-*/
-
 
 require_once("loginbottom.inc.php");
 ?>

@@ -6,40 +6,23 @@ require_once("../obj/Wizard.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
 require_once("../obj/Sms.obj.php");
+require_once("subscriberutils.inc.php");
 
 
-class DestWiz_howmany extends WizStep {
+class DestWiz_whattype extends WizStep {
 	function getForm($postdata, $curstep) {
 
-		// TODO maxphones minus phones already entered
-		$newphone = array_combine(range(0,4),range(0,4));
-		$newemail = array_combine(range(0,3),range(0,3));
-		$newsms = array_combine(range(0,2),range(0,2));
-
+		// TODO maxphones minus phones already entered to validate adding a new phone (email, sms)
+		
 		$formdata = array();
 
-		$formdata["numphone"] = array(
-        	"label" => "Phone",
-        	"value" => "0",
+		$formdata["whattype"] = array(
+        	"label" => "Communication Method",
+        	"value" => "",
         	"validators" => array(
+					array("ValRequired")
         	),
-        	"control" => array("SelectMenu", "values"=>$newphone),
-        	"helpstep" => 1
-		);
-		$formdata["numemail"] = array(
-        	"label" => "Email",
-        	"value" => "0",
-        	"validators" => array(
-        	),
-        	"control" => array("SelectMenu", "values"=>$newemail),
-        	"helpstep" => 1
-		);
-		$formdata["numsms"] = array(
-        	"label" => "SMS",
-        	"value" => "0",
-        	"validators" => array(
-        	),
-        	"control" => array("SelectMenu", "values"=>$newsms),
+        	"control" => array("RadioButton", "values"=>array("Phone","Email","Text")),
         	"helpstep" => 1
 		);
 		
@@ -48,31 +31,20 @@ class DestWiz_howmany extends WizStep {
 			"blah, blah"
 		);
 		
-		return new Form("howmany", $formdata, $helpsteps);
+		return new Form("whattype", $formdata, $helpsteps);
 	}
 }
 
 class DestWiz_collectdata extends WizStep {
 	function getForm($postdata, $curstep) {
 
+		$datatype = $postdata['/whattype']['whattype'];
+
 		$formdata = array();
 
-		for ($i=1; $i<=$postdata['/howmany']['numphone']; $i++) {		
-			$formdata["phone".$i] = array(
-				"label" => "Phone ".$i,
-				"value" => "",
-				"validators" => array(
-					array("ValRequired"),
-					array("ValLength","max" => 50),
-					array("ValPhone")
-				),
-				"control" => array("TextField","maxlength" => 50),
-				"helpstep" => 1
-			);
-		}
-		for ($i=1; $i<=$postdata['/howmany']['numemail']; $i++) {		
-			$formdata["email".$i] = array(
-				"label" => "Email ".$i,
+		if ($datatype == 1) {
+			$formdata['newdata'] = array(
+				"label" => _L("Email"),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -82,10 +54,13 @@ class DestWiz_collectdata extends WizStep {
 				"control" => array("TextField","maxlength" => 50),
 				"helpstep" => 1
 			);
-		}
-		for ($i=1; $i<=$postdata['/howmany']['numsms']; $i++) {		
-			$formdata["sms".$i] = array(
-				"label" => "SMS ".$i,
+		} else {
+			if ($datatype == 0)
+				$label = _L("Phone");
+			else
+				$label = _L("Text");
+			$formdata['newdata'] = array(
+				"label" => $label,
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -95,6 +70,18 @@ class DestWiz_collectdata extends WizStep {
 				"control" => array("TextField","maxlength" => 50),
 				"helpstep" => 1
 			);
+			// TODO if sequence available
+			if (true)
+				$formdata['phonetextoption'] = array(
+    	    		"label" => _L("Usage"),
+        			"value" => "",
+        			"validators" => array(
+							array("ValRequired")
+        			),
+        			"control" => array("RadioButton", "values"=>array("phone"=>"Only Phone", "text"=>"Only Text", "both"=>"Both Phone and Text")),
+        			"helpstep" => 1
+				);
+			
 		}
 		
 		$helpsteps = array (
@@ -109,16 +96,28 @@ class DestWiz_collectdata extends WizStep {
 class DestWiz_review extends WizStep {
 	function getForm($postdata, $curstep) {
 
+		// start with failure condition
+		$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("Sorry, an error occurred.  Please try again later.") . '</div>';
+	
+		// if code generation success, then generate form html
+		if ($postdata['/whattype']['whattype'] == 0 || $postdata['/whattype']['whattype'] == 2) {
+	        $options = json_encode(array('phonetextoption' => $postdata['/collectdata']['phonetextoption']));
+			if ($code = subscriberPrepareNewPhone($postdata['/collectdata']['newdata'], $options)) {
+				//$formhtml = '<div style="height: 200px; overflow:auto;">Your activation code is: ' . $code . '</div>';
+				$formhtml = getPhoneReview($postdata['/collectdata']['newdata'], $code);
+			}
+		} else {
+			if (subscriberPrepareNewEmail($postdata['/collectdata']['newdata'])) {
+				//$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("You must check your email for an activation code.  This code is required to complete the process.") . '</div>';
+				$formhtml = getEmailReview($postdata['/collectdata']['newdata']);
+			}
+		}
+	
 		$formdata = array();
 
-		$formdata["name"] = array(
-			"label" => "Name",
-			"value" => "",
-			"validators" => array(
-				array("ValRequired"),
-				array("ValLength","max" => 50)
-			),
-			"control" => array("TextField","maxlength" => 50),
+    	$formdata["review"] = array(
+        	"label" => "Confirmation",
+        	"control" => array("FormHtml","html" => $formhtml),
 			"helpstep" => 1
 		);
 		
@@ -134,7 +133,7 @@ class DestWiz_review extends WizStep {
 
 
 $wizdata = array(
-	"howmany" => new DestWiz_howmany(_L("Add Destination")),
+	"whattype" => new DestWiz_whattype(_L("Add Destination")),
 	"collectdata" => new DestWiz_collectdata(_L("Provide Information")),
 	"review" => new DestWiz_review(_L("Review"))
 	);
@@ -146,20 +145,8 @@ if ($wizard->isDone()) {
 	$postdata = $_SESSION['destwiz']['data'];
 	// TODO grab the data
 
-	// phone
-	$newPhones = array();
-	for ($i=1; $i<=$postdata['/howmany']['numphone']; $i++) {
-		$newPhones[] = $postdata['/collectdata']['phone'.$i];
-	}
-	subscriberPrepareNewPhone($newPhones);
 	
-	// email TODO prepare email list, not one at a time
-	for ($i=1; $i<=$postdata['/howmany']['numemail']; $i++) {
-		$newemail = $postdata['/collectdata']['email'.$i];
-		subscriberPrepareNewEmail($newemail);
-	}
-	
-	redirect("notificationdestinations.php");
+	redirect("notificationpreferences.php");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,11 +157,9 @@ $TITLE = _L("Destination Wizard");
 
 require_once("nav.inc.php");
 
-echo "<font color=\"red\">TODO DO NOT TEST YET, will have wizard to add and confirm phone, etc</font><BR><BR>";
-
 //echo dataChangeAlert($datachange, $_SERVER['REQUEST_URI']);
 
-startWindow($stepdata->title);
+startWindow("");
 echo $wizard->render();
 endWindow();
 

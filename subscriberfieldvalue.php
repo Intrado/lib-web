@@ -13,6 +13,7 @@ include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/FieldMap.obj.php");
 
+require_once("obj/Wizard.obj.php");
 
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
@@ -39,11 +40,96 @@ if (isset($_GET['id'])) {
 		$values = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($fieldmap->fieldnum));
 		$valtext = implode("\n", $values);
 		
-	} else
+	} else if ($fieldmap->isOptionEnabled('dynamic')) {
 		$value = 2;
+	} else
+		$value = 0;
 }
 // else TODO error handling
 
+
+class SubscriberWiz_whattype extends WizStep {
+	function getForm($postdata, $curstep) {
+		global $id, $value;
+
+		if (isset($id)) {
+			error_log('global id is set to '.$id);
+		} else {
+			$id = $postdata['/whattype']['id'];
+			error_log('postdata id already set to '.$id);
+		}
+		
+		$formdata = array();
+
+		$formdata["id"] = array(
+        	"label" => "hidden",
+        	"value" => $id,
+        	"validators" => array(    
+        	),
+        	"control" => array("HiddenField"),
+        	"helpstep" => 1
+		);
+		
+		$formdata["valtype"] = array(
+        	"label" => "Value Type",
+        	"value" => $value,
+        	"validators" => array(    
+	            array("ValRequired")
+        	),
+        	"control" => array("RadioButton","values" => array(1 => "Static", 2 => "Dynamic")),
+        	"helpstep" => 1
+		);
+		
+		$helpsteps = array (
+			"Welcome",
+			"blah, blah"
+		);
+		
+		return new Form("whattype", $formdata, $helpsteps);
+	}
+}
+
+$wizdata = array(
+	"whattype" => new SubscriberWiz_whattype(_L("Select Type"))
+	);
+
+$wizard = new Wizard("subscriberwiz", $wizdata);
+$wizard->handleRequest();
+
+if ($wizard->isDone()) {
+	$postdata = $_SESSION['subscriberwiz']['data'];
+
+	$id = $postdata['/whattype']['id'];
+	$fieldmap = new FieldMap($id);
+	
+error_log("DONE this is the field ".$fieldmap->name);
+
+	$fieldmap->addOption("subscribe");
+	
+	$fieldmap->removeOption("static");
+	$fieldmap->removeOption("dynamic");
+	if ($postdata['/whattype']['valtype'] == 1)
+		$fieldmap->addOption("static");
+	else
+		$fieldmap->addOption("dynamic");
+        	
+	$fieldmap->update();
+
+	/*        
+	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
+        
+	$datavalues = explode("\n", $postdata['values']);
+	foreach ($datavalues as $value) {
+		QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values (?, ?, 0, 1)", false, array($fieldmap->fieldnum, $value));
+	} 
+	*/
+	
+	$_SESSION['subscriberwiz'] = null; // clear out the old data
+	redirect("subscribersettings.php");
+}
+
+
+/*
 $formdata = array(
     "valtype" => array(
         "label" => "Value Type:",
@@ -64,26 +150,8 @@ $formdata = array(
         "helpstep" => 2
     )
 );
-
-$helpsteps = array (
-    "Welcome to the Guide system. You can use this guide to walk through the form, or access it as needed by clicking to the right of a section",
-	"Static textfield, defined list of values, or Dynamic subscriber entered or imported values",
-	"static values"
-);
-
-
-$buttons = array(submit_button("Submit","submit","tick"),
-                icon_button("Cancel","cross",null,"subscribersettings.php"));
-                
-$form = new Form("subscriberfieldvalueform",$formdata,$helpsteps,$buttons);
-$form->ajaxsubmit = true;
-
-//check and handle an ajax request (will exit early)
-//or merge in related post data
-$form->handleRequest();
-
-$datachange = false;
-
+*/
+/*
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
@@ -116,6 +184,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
             redirect("subscribersettings.php");
     }
 }
+*/
 
 
 
@@ -130,7 +199,7 @@ include_once("nav.inc.php");
 
 startWindow('Field Value', null, true);
 
-echo $form->render();
+echo $wizard->render();
 
 endWindow();
 

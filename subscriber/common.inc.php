@@ -54,7 +54,8 @@ if (!isset($isNotLoggedIn)) {
     
 	// store the customer's toll free inbound number
 	$n = QuickQuery("select value from setting where name='inboundnumber'");
-
+	$INBOUND_ACTIVATION = $n;
+	
     // find if this customer has message callback
     if (QuickQuery("select value from setting where name='_hascallback'") == "1") {
 	    	if ($n != false && $n != "")
