@@ -117,7 +117,7 @@ class FieldMap extends DBMappedObject {
 		global $USER;
 		$fieldmaps = DBFindMany("FieldMap", 'from fieldmap order by fieldnum');
 		foreach($fieldmaps as $key => $fieldmap)
-			if(!$USER->authorizeField($fieldmap->fieldnum) || ($onlysearchable && strpos($fieldmap->option, 'searchable') === false))
+			if(!$USER->authorizeField($fieldmap->fieldnum) || ($onlysearchable && strpos($fieldmap->options, 'searchable') === false))
 				unset($fieldmaps[$key]);
 		return $fieldmaps;
 	}
