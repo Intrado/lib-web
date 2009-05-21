@@ -41,7 +41,7 @@ function handleRequest($type) {
 			return $message;
 			
 		case 'persondatavalues':
-			if (!$USER->authorize('createlist') || empty(trim($_GET['fieldnum'])))
+			if (!$USER->authorize('createlist') || !isset($_GET['fieldnum']))
 				return false;
 			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
@@ -57,7 +57,7 @@ function handleRequest($type) {
 				'fieldmaps' => FieldMap::getAuthorizedFieldMapsLike('%'));
 
 		case 'liststats': // USED IN: ListForm.php
-			if (!$USER->authorize('createlist') || empty(trim($_GET['listid'])))
+			if (!$USER->authorize('createlist') || !isset($_GET['listid']))
 				return false;
 			$list = new PeopleList($_GET['listid']);
 			$renderedlist = new RenderedList($list);
