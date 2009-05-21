@@ -75,11 +75,9 @@ if ($wizard->isDone()) {
 $PAGE = _L("notifications").":"._L("jobs");
 $TITLE = _L('Job Wizard');
 
-echo dataChangeAlert($wizard->dataChange(), $_SERVER['REQUEST_URI']);
-
 ?>
 <script>
-<? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValEasycall")); ?>
+<? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValCallMePhone","ValEasycall"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 
