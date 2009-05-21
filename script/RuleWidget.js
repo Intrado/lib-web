@@ -15,8 +15,8 @@ var RuleWidget = Class.create({
 		this.div.insert(new Element('table').insert(this.rulesTable));
 		this.clear_rules();
 		
-		new Ajax.Request('ajax.php?ajax&type=fieldmapsdata', {
-			onSuccess: this.handle_ajax_load_fieldmapsdata.bindAsEventListener(this)
+		new Ajax.Request('ajax.php?type=rulewidgetsettings', {
+			onSuccess: this.handle_ajax_load_rulewidgetsettings.bindAsEventListener(this)
 		});
 	},
 	
@@ -70,7 +70,7 @@ var RuleWidget = Class.create({
 	
 	//----------------------------- PRIVATE FUNCTIONS --------------------------
 
-	handle_ajax_load_fieldmapsdata: function(transport) {
+	handle_ajax_load_rulewidgetsettings: function(transport) {
 		var data = transport.responseJSON;
 		if (!data) {
 			alert('Sorry cannot get fieldmaps');
@@ -79,19 +79,11 @@ var RuleWidget = Class.create({
 		
 		this.operators = data['operators'];
 		this.reldateOptions = data['reldateOptions'];
-		this.fieldmaps = {};
+		this.fieldmaps = data['fieldmaps'];
 		
 		// Add "is not" to the multisearch operators.
 		this.operators['multisearch']['not'] = 'is NOT';
 		this.operators['multisearch']['in'] = 'is';
-		
-		// Check if there are any unsearchable fieldmaps.
-		// Also data['fieldmaps'] is indexed by a number, we prefer indexing by fieldnum.
-		for (var i in data['fieldmaps']) {
-			var fieldnum = data['fieldmaps'][i]['fieldnum'];
-			if (data['fieldmaps'][i]['options'].match('searchable'))
-				this.fieldmaps[fieldnum] = data['fieldmaps'][i];
-		}
 		
 		// Keep a cache (html) of list values so we don't have to use ajax each time someone changes the operator on a multisearch field.
 		this.multisearchMulticheckboxCache = {};
@@ -103,7 +95,7 @@ var RuleWidget = Class.create({
 		var data = transport.responseJSON;
 					
 		if (!data)
-			data = ' ';
+			data = ' '; // Show the table row anyway.
 		
 		var multicheckbox = this.make_multicheckbox(this.div.id + '_multisearch_' + fieldnum + '_', data);
 		this.valueTD[fieldnum].update(multicheckbox);
@@ -203,7 +195,7 @@ var RuleWidget = Class.create({
 			if (this.multisearchMulticheckboxCache[fieldnum]) {
 				this.valueTD[fieldnum].update(this.multisearchMulticheckboxCache[fieldnum]);
 			} else {
-				new Ajax.Request('ajax.php?ajax&type=persondatavalues&fieldnum=' + fieldnum, {
+				new Ajax.Request('ajax.php?type=persondatavalues&fieldnum=' + fieldnum, {
 					onSuccess: this.handle_ajax_load_multisearch_values.bindAsEventListener(this, fieldnum)
 				});
 			}
