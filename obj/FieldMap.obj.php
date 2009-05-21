@@ -111,6 +111,16 @@ class FieldMap extends DBMappedObject {
 	static function getAuthorizedFieldMaps () {
 		return FieldMap::getAuthorizedFieldMapsLike("f%");
 	}
+	
+	// Gets F,G,C fields.
+	static function getAllAuthorizedFieldMaps () {
+		global $USER;
+		$fieldmaps = DBFindMany("FieldMap", 'from fieldmap order by fieldnum');
+		foreach($fieldmaps as $key => $fieldmap)
+			if(!$USER->authorizeField($fieldmap->fieldnum))
+				unset($fieldmaps[$key]);
+		return $fieldmaps;
+	}
 
 	static function getAuthorizedFieldMapsLike ($likewhat) {
 		global $USER;
