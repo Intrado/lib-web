@@ -79,7 +79,12 @@ var RuleWidget = Class.create({
 		
 		this.operators = data['operators'];
 		this.reldateOptions = data['reldateOptions'];
-		this.fieldmaps = data['fieldmaps'];
+		this.fieldmaps = {};
+		// data['fieldmaps'] is indexed by record id, we prefer indexing by fieldnum.
+		for (var i in data['fieldmaps']) {
+			var fieldnum = data['fieldmaps'][i]['fieldnum'];
+			this.fieldmaps[fieldnum] = data['fieldmaps'][i];
+		}
 		
 		// Add "is not" to the multisearch operators.
 		this.operators['multisearch']['not'] = 'is NOT';
