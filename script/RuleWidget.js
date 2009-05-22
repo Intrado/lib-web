@@ -277,7 +277,7 @@ var RuleWidget = Class.create({
 		div = new Element('div', {'style':'border: solid 1px blue;padding:2px'});
 		
 		if (values.length) {
-			var checkAllLink = new Element('a', {'href':'', 'style':'display:block;float:left'}).insert('Check All');
+			var checkAllLink = new Element('a', {'href':''}).insert('Check All');
 			checkAllLink.observe('click', function(event) {
 				event.stop();
 				var checkboxes = event.element().up('div').select('input[type="checkbox"]');
@@ -285,7 +285,7 @@ var RuleWidget = Class.create({
 					checkboxes[i].checked = true;
 			});
 
-			var clearLink = new Element('a', {'href':'', 'style':'display:block;float:right'}).insert('Clear');
+			var clearLink = new Element('a', {'href':'', 'style':'float:right'}).insert('Clear');
 			clearLink.observe('click', function(event) {
 				event.stop();
 				var checkboxes = event.element().up('div').select('input[type="checkbox"]');
@@ -297,7 +297,7 @@ var RuleWidget = Class.create({
 			
 			// TODO: Determine if it's faster to insert as html or use DOM methods.
 			//var ul = new Element('ul', {'style':'clear:both; width: 200px; border-top:solid 1px lightgray; height:100px; margin:2px; padding:0;list-style:none; overflow:auto;'});
-			var ul = '<ul style="width: 200px; border-top:solid 1px lightgray; height:100px; margin:2px; padding:0;list-style:none; overflow:auto;">';
+			var ul = '<ul style="clear:both; width: 200px; border-top:solid 1px rgb(220,220,220); height:100px; margin:2px; padding:0;list-style:none; overflow:auto;">';
 			for (var i = 0; i < values.length; i++) {
 				//var checkbox = new Element('input', {'type':'checkbox', 'value':values[i].escapeHTML(), 'id':uniquePrefix + i});
 				//var label = new Element('label', {'for':uniquePrefix + i}).update(values[i].escapeHTML());
