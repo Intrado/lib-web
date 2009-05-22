@@ -23,14 +23,24 @@ class ListForm extends Form {
 		// ListForm Stuff
 		$str.= "
 			<style type='text/css'>
-			td {
+			td,th {
 				vertical-align: top;
+				text-align: left;
 			}
 			select {
 				min-width: 70px;
 			}
+			#rulesDiv table {
+				border-collapse: collapse;
+				width: 100%;
+				border: solid 1px rgb(220,220,220);
+			}
 			#rulesDiv td {
 				padding: 4px;
+				border-top: solid 1px rgb(220,220,220);
+			}
+			td.FieldmapTD {
+				text-align: right;
 			}
 			td.ValueTD input[type='text'] {
 				width: 80px;
@@ -41,28 +51,55 @@ class ListForm extends Form {
 			</style>
 			<table>
 				<tr>
-					<td style='width:600px; padding: 20px; margin: 10px; border:solid 1px rgb(200,220,240)'>
-						<div id='helperWindow'>
-							<button id='buildRulesButton' type='button'>Build a list using rules</button> or <button id='chooseListButton' type='button'>Choose an existing list</button>
-						</div>
-						
-						<div id='buildRulesWindow'>
-							<h3>Build Rules</h3>
-							<div id='rulesDiv'></div>
-							<div><button id='buildRulesCancelButton' type='button'>Cancel</button><button id='buildRulesDoneButton' type='button'>Done</button></div>
-						</div>
-						
-						<div id='chooseListWindow'>
-							<h3>Choose a List</h3>
-							<div id='listSelectDiv'></div>
-							<div><button id='chooseListCancelButton' type='button'>Cancel</button><button id='chooseListDoneButton' type='button'>Done</button></div>
-						</div>
-					</td>
-					
-					<td style='width:400px'>
+					<td style='width:700px'>
 						<h3>Final Lists</h3>
-						<table><tbody id='finalListsTable'>
-						</tbody></table>
+						<table style='width:100%; border: solid 2px rgb(200,200,200); border-collapse:collapse;'>
+							<tbody id='finalListsTable'>
+								<tr>
+									<th>List Name</th>
+									<th>Count</th>
+									<th></th>
+								</tr>
+							</tbody>
+							<tbody style='border: solid 2px rgb(255,200,100); background:rgb(255,255,200);padding:10px;'>
+								<tr>
+									<td colspan=3>
+										<h3>Want to add a list?
+											
+												<!--
+												<select>
+													<option value=''>-- Select a Method --</option>
+													<option value='buildrules'>Build a list using rules</option>
+													<option value='chooselist'>Choose an existing list</option>
+												</select>
+												-->
+												<button id='buildRulesButton' type='button'>Build a list using rules</button> or <button id='chooseListButton' type='button'>Choose an existing list</button>
+										</h3>
+									</td>
+								</tr>
+								<tr>
+									<td colspan=3>
+										<center>
+										<div id='buildRulesWindow'>
+											<h3>Build Rules</h3>
+											<div id='rulesDiv'></div>
+											<button id='buildRulesDoneButton' type='button'>Save as a List</button>
+										</div>
+										
+										<div id='chooseListWindow'>
+											<h3>Choose a List</h3>
+											<div id='listSelectDiv'><button id='chooseListDoneButton' type='button'>Add List</button></div>
+										</div>
+										</center>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td style='padding: 20px; margin: 10px; border:solid 1px rgb(200,220,240)'>
+						
 					</td>
 				</tr>
 			</table>";
@@ -84,6 +121,39 @@ class ListForm extends Form {
 
 		// ListForm javascript
 		$str .= "
+			<script type='text/javascript'>
+				// Modified form load.
+				function listform_load(name,scriptname,formdata) {
+					var form = $(name);
+					//set up formvars to save data, avoid memleaks in IE by not attaching anything to dom elements
+					if (!document.formvars)
+						document.formvars = {};
+						
+					var formvars = document.formvars[name] = {
+						formdata: formdata,
+						scriptname: scriptname, //used for any ajax calls for this form
+						helpsteps: null,
+						ajaxsubmit: true,
+						helperdisabled: true,
+						currentstep: 0,
+						validators: {},
+						jsgetvalue: {}
+					};
+			
+					//make appropriate validators for each field
+					for (fieldname in formdata) {
+						var label = formdata[fieldname].label;
+						var id = form.id+'_'+fieldname;
+
+						formvars.validators[id] = 'ajax';
+						formvars.jsgetvalue[id] = eval(formdata[fieldname].jsgetvalue);
+					}
+			
+					//submit handler
+					form.observe('submit',form_handle_submit.curry(name));
+				}
+				listform_load('{$this->name}', '$posturl', '" . json_encode($this->formdata) . "');
+			</script>
 			<script type='text/javascript' src='script/calendar.js'></script>
 			<script type='text/javascript' src='script/RuleWidget.js'></script>
 			<script type='text/javascript'>
@@ -108,16 +178,12 @@ class ListForm extends Form {
 					}
 				});
 				
+				
 				// Build Rules Buttons
 				$('buildRulesButton').observe('click', function(event) {
 					event.stop();
 					$('buildRulesWindow').show();
 					$('chooseListWindow').hide();
-					$('helperWindow').hide();
-				});
-				$('buildRulesCancelButton').observe('click', function(event) {
-					event.stop();
-					reset_windows();
 				});
 				$('buildRulesDoneButton').observe('click', function(event) {
 					event.stop();
@@ -140,11 +206,6 @@ class ListForm extends Form {
 					event.stop();
 					$('buildRulesWindow').hide();
 					$('chooseListWindow').show();
-					$('helperWindow').hide();
-				});
-				$('chooseListCancelButton').observe('click', function(event) {
-					event.stop();
-					reset_windows();
 				});
 				$('chooseListDoneButton').observe('click', function(event) {
 					event.stop();
@@ -155,13 +216,16 @@ class ListForm extends Form {
 				function reset_windows() {
 					$('buildRulesWindow').hide();
 					$('chooseListWindow').hide();
-					$('helperWindow').show();
+					//$('helperWindow').show();
 				}
 				
 				function refresh_listSelectbox() {
+					var oldSelectbox = $('listSelectDiv').down('select');
+					if (oldSelectbox)
+						oldSelectbox.remove();
 					listSelectbox = new Element('select');
 					listSelectbox.insert(new Element('option', {'value':''}).insert('-- Select a List --'));
-					$('listSelectDiv').update(listSelectbox);
+					$('listSelectDiv').insert({top:listSelectbox});
 					if (!premadeLists)
 						return;
 					for (var id in premadeLists) {
@@ -203,7 +267,8 @@ class ListForm extends Form {
 								var totalTD = new Element('td').update(data['total']);
 								var actionsTD = new Element('td');
 								
-								var removeButton = new Element('button', {'type':'button'}).update('Remove');
+								actionsTD.update( '" . icon_button('Remove','information') . "');
+								var removeButton = actionsTD.down('button'); //new Element('button', {'type':'button'}).update('Remove');
 								removeButton.observe('click', function(event) {
 									var tr = Event.element(event).up('tr');
 									var id = tr.down('input[type=\"hidden\"]').getValue();
