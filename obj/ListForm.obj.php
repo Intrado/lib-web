@@ -29,10 +29,19 @@ class ListForm extends Form {
 			select {
 				min-width: 70px;
 			}
+			#rulesDiv td {
+				padding: 4px;
+			}
+			td.ValueTD input[type='text'] {
+				width: 80px;
+			}
+			input.Datebox {
+				border-bottom: solid 2px orange;
+			}
 			</style>
 			<table>
 				<tr>
-					<td style='width:400px'>
+					<td style='width:600px; padding: 20px; margin: 10px; border:solid 1px rgb(200,220,240)'>
 						<div id='helperWindow'>
 							<button id='buildRulesButton' type='button'>Build a list using rules</button> or <button id='chooseListButton' type='button'>Choose an existing list</button>
 						</div>
@@ -89,6 +98,8 @@ class ListForm extends Form {
 							alert('you are not logged in');
 							return;
 						}
+						
+						refresh_listSelectbox();
 						
 						// Load From Session Data.
 						if($('$listidsName').value) {
