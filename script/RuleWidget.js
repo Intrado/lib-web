@@ -6,13 +6,14 @@ var RuleWidget = Class.create({
 	initialize: function(div) {
 		this.div = div;
 		
-		// Toolbar.
-		this.toolbar = new Element('div');
-		this.div.insert(this.toolbar);
-		
 		// RULES TABLE
 		this.rulesTable = new Element('tbody');
 		this.div.insert(new Element('table').insert(this.rulesTable));
+		
+		// Toolbar.
+		this.toolbar = new Element('div', {'style':'text-align:center'});
+		this.div.insert(this.toolbar);
+		
 		this.clear_rules();
 		
 		new Ajax.Request('ajax.php?type=rulewidgetsettings', {
@@ -187,7 +188,7 @@ var RuleWidget = Class.create({
 		actionTD.insert(deleteButton);
 		tr.insert(actionTD);
 
-		this.rulesTable.insert({top:tr});
+		this.rulesTable.insert({bottom:tr});
 	},
 	
 	// Determines the appropriate input boxes to show, makes an ajax request for persondatavalues if necessary for multisearch.
@@ -248,8 +249,10 @@ var RuleWidget = Class.create({
 		this.toolbar.update();
 		
 		this.fieldmapSelectbox = new Element('select');
-		this.fieldmapSelectbox.observe('change', this.handle_event_add_rule.bindAsEventListener(this));
 		this.toolbar.insert(this.fieldmapSelectbox);
+		var addRuleButton = new Element('button', {'type':'button'}).update('Add Rule');
+		addRuleButton.observe('click', this.handle_event_add_rule.bindAsEventListener(this));
+		this.toolbar.insert(addRuleButton);
 		
 		this.fieldmapSelectbox.update(new Element('option', {'value':''}).insert('--Select a Field--'));
 		
@@ -273,31 +276,39 @@ var RuleWidget = Class.create({
 			this.fieldmapSelectbox.disabled = false;
 	},
 
-	make_multicheckbox: function(uniquePrefix, values) {
+	make_multicheckbox: function(uniquePrefix, values, needCheckAll) {
+		if (!needCheckAll)
+			needCheckAll = 6;
+		var heightCSS = '';
+			
 		div = new Element('div', {'style':'border: solid 1px blue;padding:2px'});
 		
 		if (values.length) {
-			var checkAllLink = new Element('a', {'href':''}).insert('Check All');
-			checkAllLink.observe('click', function(event) {
-				event.stop();
-				var checkboxes = event.element().up('div').select('input[type="checkbox"]');
-				for (var i = 0; i < checkboxes.length; i++)
-					checkboxes[i].checked = true;
-			});
+			if (values.length >= needCheckAll) {
+				var checkAllLink = new Element('a', {'href':'', 'style':'float:left'}).insert('Check All');
+				checkAllLink.observe('click', function(event) {
+					event.stop();
+					var checkboxes = event.element().up('div').select('input[type="checkbox"]');
+					for (var i = 0; i < checkboxes.length; i++)
+						checkboxes[i].checked = true;
+				});
 
-			var clearLink = new Element('a', {'href':'', 'style':'float:right'}).insert('Clear');
-			clearLink.observe('click', function(event) {
-				event.stop();
-				var checkboxes = event.element().up('div').select('input[type="checkbox"]');
-				for (var i = 0; i < checkboxes.length; i++)
-					checkboxes[i].checked = false;
-			});
-			
-			div.insert(checkAllLink).insert(clearLink);
+				var clearLink = new Element('a', {'href':'', 'style':'float:right'}).insert('Clear');
+				clearLink.observe('click', function(event) {
+					event.stop();
+					var checkboxes = event.element().up('div').select('input[type="checkbox"]');
+					for (var i = 0; i < checkboxes.length; i++)
+						checkboxes[i].checked = false;
+				});
+				
+				div.insert(new Element('div', {'style':'border-bottom: solid 1px rgb(220,220,220)'}).insert(checkAllLink).insert(clearLink).insert('<br style="clear:both"/>'));
+				
+				heightCSS = 'height:100px; ';
+			}
 			
 			// TODO: Determine if it's faster to insert as html or use DOM methods.
 			//var ul = new Element('ul', {'style':'clear:both; width: 200px; border-top:solid 1px lightgray; height:100px; margin:2px; padding:0;list-style:none; overflow:auto;'});
-			var ul = '<ul style="clear:both; width: 200px; border-top:solid 1px rgb(220,220,220); height:100px; margin:2px; padding:0;list-style:none; overflow:auto;">';
+			var ul = '<ul style="width: 200px; ' + heightCSS + 'margin:2px; padding:0;list-style:none; overflow:auto;">';
 			for (var i = 0; i < values.length; i++) {
 				//var checkbox = new Element('input', {'type':'checkbox', 'value':values[i].escapeHTML(), 'id':uniquePrefix + i});
 				//var label = new Element('label', {'for':uniquePrefix + i}).update(values[i].escapeHTML());
