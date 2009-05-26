@@ -508,8 +508,14 @@ function form_handle_submit(form,event) {
 						}
 						} catch (error) { alert(res.name + " " + error)};
 					});
-				
-					alert("There are some errors on this form.\nPlease correct them before trying again.");
+					
+					if (res.dontsaveurl) {
+						if (confirm("There are some errors on this form.\nDo you want to continue anyway without saving changes?")) {
+							window.location=res.dontsaveurl;
+						}
+					} else {
+						alert("There are some errors on this form.\nPlease correct them before trying again.");
+					}
 				}
 				
 				if (res.datachange) {
