@@ -26,9 +26,7 @@ require("jobwizard.inc.php");
 
 $wizdata = array(
 	"basic" => new JobWiz_basic(_L("New Job Wizard")),
-	"list" => array(
-		"pick" => new JobWiz_listChoose(_L("Select An Existing List"))
-	),
+	"list" => new JobWiz_listChoose(_L("Select An Existing List")),
 	"message" => array(
 		"pick" => new JobWiz_messageType(_L("Choose Destination Types")),
 		"select" => new JobWiz_messageSelect(_L("Select Message Types")),

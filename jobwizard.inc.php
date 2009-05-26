@@ -439,16 +439,6 @@ class JobWiz_listChoose extends WizStep {
 
 		return new Form("listChoose",$formdata,$helpsteps);
 	}
-	
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		if (isset($postdata['/basic']['listmethod']) && 
-			$postdata['/basic']['listmethod'] == "pick") {
-			return true;
-		} else {
-			return false;
-		}
-	}
 }
 
 class JobWiz_messageType extends WizStep {
