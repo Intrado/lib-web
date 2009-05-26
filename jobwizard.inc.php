@@ -416,28 +416,7 @@ class JobWiz_basic extends WizStep {
 
 class JobWiz_listChoose extends WizStep {
 	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
-		$helpstepnum = 1;
-		global $USER;
-		
-		$lists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name", true);
-		
-		$formdata["listSelect"] = array(
-			"label" => "Select A List",
-			"validators" => array(
-				array("ValRequired")
-			),
-			"value" => "",
-			"control" => array("MultiCheckBox", "height"=>100, "values"=>$lists),
-			"helpstep" => $helpstepnum
-		);
-		$helpsteps[$helpstepnum++] = _L("Select from list of existing lists");
-		
-		// TODO: Needs list preview/widget
-
-		return new Form("listChoose",$formdata,$helpsteps);
+		return new ListForm("listChoose");
 	}
 }
 
