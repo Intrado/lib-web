@@ -330,6 +330,18 @@ class ValEasycall extends Validator {
 	}
 }
 
+class ValLists extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		// TODO: Validate against empty $value
+		global $USER;
+		error_log('ValLists =========== $value=' . print_r($value,true));
+		return true;
+		return 'Testing testing testing testing testing, validate if any list has count == 0';
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
 ////////////////////////////////////////////////////////////////////////////////
