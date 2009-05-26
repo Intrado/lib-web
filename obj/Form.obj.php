@@ -27,7 +27,7 @@ class Form {
 		$this->serialnum = md5(serialize($formdata));
 	}
 	
-	function handleRequest() {
+	function handleRequest($dontexit = false) {
 		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name)
 			return false; //nothing to do
 		
@@ -50,11 +50,14 @@ class Form {
 				$result['vmsg'] = $msg;
 				$result['v'] = $validator;
 			}
-			
-			header("Content-Type: application/json");
-			echo json_encode($result);
-			
-			exit();
+
+			if ($dontexit) {
+				return $result;
+			} else {			
+				header("Content-Type: application/json");
+				echo json_encode($result);
+				exit();
+			}
 		}
 		
 		//ajax post form - merge in data, check validation, etc
@@ -63,9 +66,13 @@ class Form {
 			//check the form snum vs loaded formdata
 			if (isset($_REQUEST['ajax']) && $this->checkForDataChange()) {
 				$result = array("status" => "fail", "datachange" => true);
-				header("Content-Type: application/json");
-				echo json_encode($result);
-				exit();
+				if ($dontexit) {
+					return $result;
+				} else {	
+					header("Content-Type: application/json");
+					echo json_encode($result);
+					exit();
+				}
 			}
 			
 			//we need to set all checkboxes to false because if they are unchecked we won't see any 
@@ -103,11 +110,17 @@ class Form {
 			//if this is an ajax request, validate now and return json results for the form
 			if (isset($_REQUEST['ajax']) && $errors !== false) {
 				$result = array("status" => "fail", "validationerrors" => $errors);
-				header("Content-Type: application/json");
-				echo json_encode($result);
-				exit();
+				if ($dontexit) {
+					return $result;
+				} else {
+					header("Content-Type: application/json");
+					echo json_encode($result);
+					exit();
+				}
 			}
 		}
+		
+		return false;
 	}
 
 	function render () {
