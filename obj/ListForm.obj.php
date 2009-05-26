@@ -89,7 +89,8 @@ class ListForm extends Form {
 										
 										<div id='chooseListWindow'>
 											<h3>Choose a List</h3>
-											<div id='listSelectDiv'><button id='chooseListDoneButton' type='button'>Add List</button></div>
+											<div id='listSelectDiv'></div>
+											<button id='chooseListDoneButton' type='button'>Add List</button>
 										</div>
 										</center>
 									</td>
@@ -130,26 +131,11 @@ class ListForm extends Form {
 					if (!document.formvars)
 						document.formvars = {};
 						
-					var formvars = document.formvars[name] = {
+					document.formvars[name] = {
 						formdata: formdata,
 						scriptname: scriptname, //used for any ajax calls for this form
-						helpsteps: null,
 						ajaxsubmit: true,
-						helperdisabled: true,
-						currentstep: 0,
-						validators: {},
-						jsgetvalue: {}
 					};
-			
-					//make appropriate validators for each field
-					for (fieldname in formdata) {
-						var label = formdata[fieldname].label;
-						var id = form.id+'_'+fieldname;
-
-						formvars.validators[id] = 'ajax';
-						formvars.jsgetvalue[id] = eval(formdata[fieldname].jsgetvalue);
-					}
-			
 					//submit handler
 					form.observe('submit',form_handle_submit.curry(name));
 				}
@@ -222,18 +208,17 @@ class ListForm extends Form {
 				}
 				
 				function refresh_listSelectbox() {
-					var oldSelectbox = $('listSelectDiv').down('select');
-					if (oldSelectbox)
-						oldSelectbox.remove();
-					listSelectbox = new Element('select');
+					var listSelectbox = new Element('select');
 					listSelectbox.insert(new Element('option', {'value':''}).insert('-- Select a List --'));
-					$('listSelectDiv').insert({top:listSelectbox});
+					$('listSelectDiv').update();
 					if (!premadeLists)
 						return;
 					for (var id in premadeLists) {
+						console.info(premadeLists[id]);
 						if (!premadeLists[id]['added'])
 							listSelectbox.insert(new Element('option', {'value':id}).update(premadeLists[id]['name']));
 					}
+					$('listSelectDiv').update(listSelectbox);
 				}
 				
 				function add_list(id) {
@@ -250,7 +235,7 @@ class ListForm extends Form {
 				// @param json, json-encoded ARRAY of listids.
 				function get_liststats(json) {
 					var listids = json.evalJSON();
-					if (!listids.length)
+					if (!listids.join)
 						return;
 						
 					new Ajax.Request('ajax.php?type=liststats&listids='+json, {
@@ -266,11 +251,20 @@ class ListForm extends Form {
 								
 								// Keep a hidden input field to keep track of id for this table row.
 								var nameTD = new Element('td').update(new Element('input',{'type':'hidden','value':data['id']})).insert(data['name']);
-								var totalTD = new Element('td').update(data['total']);
+								var countTD = new Element('td').update(data.total + ' Total');
+								if (data.added > 0)
+									countTD.insert(', ' + data.added + ' Added, ');
+								if (data.removed > 0)
+									countTD.insert(', ' + data.removed + ' Skipped');
 								var actionsTD = new Element('td');
-								
-								actionsTD.update( '" . icon_button('Remove','information') . "');
-								var removeButton = actionsTD.down('button'); //new Element('button', {'type':'button'}).update('Remove');
+								actionsTD.insert( '" . icon_button('Preview','information') . "');
+								actionsTD.insert( '" . icon_button('Remove','information') . "');
+								var previewButton = actionsTD.down('button', 0);
+								previewButton.observe('click', function(event) {
+									var id = event.element().up('tr').down('input[type=\"hidden\"]').getValue();
+									window.open('showlist.php?id='+id, 'Preview List'+Math.random());
+								});
+								var removeButton = actionsTD.down('button', 1);
 								removeButton.observe('click', function(event) {
 									var tr = Event.element(event).up('tr');
 									var id = tr.down('input[type=\"hidden\"]').getValue();
@@ -281,14 +275,14 @@ class ListForm extends Form {
 									}
 									var listids = $('$listidsName').value;
 									if (listids) listids = listids.evalJSON();
-									if (listids.length) {
+									if (listids.join) {
 										listids = listids.without(id);
 										$('$listidsName').value = listids.toJSON();
 									}
+									alert($('$listidsName').value);
 								});
-								actionsTD.update(removeButton);
 								
-								$('finalListsTable').insert(new Element('tr').insert(nameTD).insert(totalTD).insert(actionsTD));
+								$('finalListsTable').insert(new Element('tr').insert(nameTD).insert(countTD).insert(actionsTD));
 							}
 						}
 					});
