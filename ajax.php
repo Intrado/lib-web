@@ -51,9 +51,20 @@ function handleRequest() {
 			if (isset($_GET['messageid']))
 				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and messageid='".dbsafe($_GET['messageid'])."'");
 			
+		case 'listrules':
+			// Assumes $_GET['listids'] is json-encoded array.
+			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
+				return false;
+			$listrules = array();
+			$listids = json_decode($_GET['listids']);
+			foreach ($listids as $id) {
+				$list = new PeopleList($id);
+				$listrules[$id] = $list->getListRules();
+			}
+			return $listrules;
+			
 		case 'liststats':
 			// Assumes $_GET['listids'] is json-encoded array.
-			
 			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
 				return false;
 			$stats = array();
@@ -65,10 +76,12 @@ function handleRequest() {
 				$stats[]= array(
 					'id' => $list->id,
 					'name' => $list->name,
+					'removed' => $renderedlist->totalremoved,
+					'added' => $renderedlist->totaladded,
 					'total' => $renderedlist->total);
 			}
 			return $stats;
-
+			
 		case 'persondatavalues':
 			if (!$USER->authorize('createlist') || !isset($_GET['fieldnum']))
 				return false;
