@@ -83,6 +83,7 @@ class ListForm extends Form {
 										<div id='buildRulesWindow'>
 											<h3>Build Rules</h3>
 											<div id='rulesDiv'></div>
+											<div id='rulesDiv2'></div>
 											<button id='buildRulesDoneButton' type='button'>Save as a List</button>
 										</div>
 										
@@ -182,6 +183,7 @@ class ListForm extends Form {
 				// Build Rules Buttons
 				$('buildRulesButton').observe('click', function(event) {
 					event.stop();
+					ruleWidget.clear_rules();
 					$('buildRulesWindow').show();
 					$('chooseListWindow').hide();
 				});
@@ -305,17 +307,6 @@ class ListForm extends Form {
 				}
 			</script>";
 		return $str;
-	}
-}
-
-class ValLists extends Validator {
-	var $onlyserverside = true;
-	
-	function validate ($value, $args) {
-		global $USER;
-		error_log('ValLists =========== $value=' . print_r($value,true));
-		return true;
-		return 'Testing testing testing testing testing, validate if any list has count == 0';
 	}
 }
 ?>
