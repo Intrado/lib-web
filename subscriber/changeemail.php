@@ -12,7 +12,7 @@ require_once("subscribervalidators.inc.php");
 
 $formdata = array(
     "newusername1" => array(
-        "label" => _L("New Email Address"),
+        "label" => _L("New Account Email"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -40,7 +40,6 @@ $formdata = array(
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 5,"max" => 50),
             array("ValSubscriberPassword")
         ),
         "control" => array("PasswordField","maxlength" => 50),
@@ -99,7 +98,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "account:account";
-$TITLE = _L('Username - %1$s', escapehtml($_SESSION['subscriber.username']));
+$TITLE = _L('Account Email - %1$s', escapehtml($_SESSION['subscriber.username']));
 
 require_once("nav.inc.php");
 
@@ -122,17 +121,18 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 if (isset($_GET['thanks'])) {
 ?>
 	<div>
-	<h2><img src="img/icons/tick.gif"/>&nbsp;&nbsp;<?= _L("Your username has been changed.  Please check your email for the activation step.")?></h2>
+	<h2><img src="img/icons/tick.gif"/>&nbsp;&nbsp;<?= _L("Your account email has been changed.  Please check your email for the activation step.")?></h2><BR>
+	<?=icon_button("Done","tick",null,"account.php")?>
 	</div>
 	<br>
 	<br>
 <?
 } else {
-	startWindow(_L('Change Username'));
+	startWindow(_L('Change Account Email'));
 	if (isset($_GET['err'])) {
 		$err = "Sorry, an error has occurred.  Please try again.";
 		if ($_GET['err'] == 1) {
-			$err = "Sorry, that username already exists in the system.  Please try again.";
+			$err = "Sorry, that account email already exists in the system.  Please try again.";
 		} else if ($_GET['err'] == 2) {
 			$err = "Sorry, that password is invalid.  Please try again.";
 		}

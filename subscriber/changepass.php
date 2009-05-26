@@ -107,7 +107,8 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 if (isset($_GET['thanks'])) {
 ?>
 	<div>
-	<h2><img src="img/icons/tick.gif"/>&nbsp;&nbsp;<?=_L("Your password has been changed.")?></h2>
+	<h2><img src="img/icons/tick.gif"/>&nbsp;&nbsp;<?=_L("Your password has been changed.")?></h2><BR>
+	<?=icon_button("Done","tick",null,"account.php")?>
 	</div>
 	<br>
 	<br>

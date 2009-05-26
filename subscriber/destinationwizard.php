@@ -16,13 +16,17 @@ class DestWiz_whattype extends WizStep {
 		
 		$formdata = array();
 
+		// TODO if sequence for phone or sms or email available, build the options
 		$formdata["whattype"] = array(
         	"label" => "Communication Method",
         	"value" => "",
         	"validators" => array(
 					array("ValRequired")
         	),
-        	"control" => array("RadioButton", "values"=>array("Phone","Email","Text")),
+        	"control" => array("RadioButton", "values"=>array("phone"=>"Phone Call",
+        								"both"=>"Phone Call and Text Message",
+        								"text"=>"Text Message",
+        								"email"=>"Email")),
         	"helpstep" => 1
 		);
 		
@@ -42,7 +46,7 @@ class DestWiz_collectdata extends WizStep {
 
 		$formdata = array();
 
-		if ($datatype == 1) {
+		if ($datatype == "email") {
 			$formdata['newdata'] = array(
 				"label" => _L("Email"),
 				"value" => "",
@@ -55,12 +59,8 @@ class DestWiz_collectdata extends WizStep {
 				"helpstep" => 1
 			);
 		} else {
-			if ($datatype == 0)
-				$label = _L("Phone");
-			else
-				$label = _L("Text");
 			$formdata['newdata'] = array(
-				"label" => $label,
+				"label" => _L("Phone"),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -70,18 +70,7 @@ class DestWiz_collectdata extends WizStep {
 				"control" => array("TextField","maxlength" => 50),
 				"helpstep" => 1
 			);
-			// TODO if sequence available
-			if (true)
-				$formdata['phonetextoption'] = array(
-    	    		"label" => _L("Usage"),
-        			"value" => "",
-        			"validators" => array(
-							array("ValRequired")
-        			),
-        			"control" => array("RadioButton", "values"=>array("phone"=>"Only Phone", "text"=>"Only Text", "both"=>"Both Phone and Text")),
-        			"helpstep" => 1
-				);
-			
+		
 		}
 		
 		$helpsteps = array (
@@ -96,22 +85,8 @@ class DestWiz_collectdata extends WizStep {
 class DestWiz_review extends WizStep {
 	function getForm($postdata, $curstep) {
 
-		// start with failure condition
-		$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("Sorry, an error occurred.  Please try again later.") . '</div>';
+		$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("Please review.  You are about to add this to your account...") . '</div>';
 	
-		// if code generation success, then generate form html
-		if ($postdata['/whattype']['whattype'] == 0 || $postdata['/whattype']['whattype'] == 2) {
-	        $options = json_encode(array('phonetextoption' => $postdata['/collectdata']['phonetextoption']));
-			if ($code = subscriberPrepareNewPhone($postdata['/collectdata']['newdata'], $options)) {
-				//$formhtml = '<div style="height: 200px; overflow:auto;">Your activation code is: ' . $code . '</div>';
-				$formhtml = getPhoneReview($postdata['/collectdata']['newdata'], $code);
-			}
-		} else {
-			if (subscriberPrepareNewEmail($postdata['/collectdata']['newdata'])) {
-				//$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("You must check your email for an activation code.  This code is required to complete the process.") . '</div>';
-				$formhtml = getEmailReview($postdata['/collectdata']['newdata']);
-			}
-		}
 	
 		$formdata = array();
 
@@ -130,12 +105,49 @@ class DestWiz_review extends WizStep {
 	}
 }
 
+class DestWiz_finish extends WizStep {
+	function getForm($postdata, $curstep) {
+
+		// start with failure condition
+		$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("Sorry, an error occurred.  Please try again later.") . '</div>';
+	
+		// if code generation success, then generate form html
+		if ($postdata['/whattype']['whattype'] == "email") {
+			if (subscriberPrepareNewEmail($postdata['/collectdata']['newdata'])) {
+				//$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("You must check your email for an activation code.  This code is required to complete the process.") . '</div>';
+				$formhtml = getEmailReview($postdata['/collectdata']['newdata']);
+			}
+		} else {
+	        $options = json_encode(array('phonetextoption' => $postdata['/whattype']['whattype']));
+			if ($code = subscriberPrepareNewPhone($postdata['/collectdata']['newdata'], $options)) {
+				//$formhtml = '<div style="height: 200px; overflow:auto;">Your activation code is: ' . $code . '</div>';
+				$formhtml = getPhoneReview($postdata['/collectdata']['newdata'], $code);
+			}
+		}
+	
+		$formdata = array();
+
+    	$formdata["review"] = array(
+        	"label" => "Final Info",
+        	"control" => array("FormHtml","html" => $formhtml),
+			"helpstep" => 1
+		);
+		
+		$helpsteps = array (
+			"Welcome",
+			"blah, blah"
+		);
+		
+		return new Form("finish", $formdata, $helpsteps);
+	}
+}
 
 
 $wizdata = array(
 	"whattype" => new DestWiz_whattype(_L("Add Destination")),
 	"collectdata" => new DestWiz_collectdata(_L("Provide Information")),
-	"review" => new DestWiz_review(_L("Review"))
+	"review" => new DestWiz_review(_L("Review")),
+	"finish" => new DestWiz_finish(_L("Finish"))
 	);
 
 $wizard = new Wizard("destwiz", $wizdata);

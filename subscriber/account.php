@@ -42,8 +42,23 @@ foreach ($subscribeFields as $fieldnum => $name) {
 
 $fieldmaps = DBFindMany("FieldMap", "from fieldmap where options like '%subscribe%' order by fieldnum");
 
+$formhtmlemail = escapehtml($_SESSION['subscriber.username']) . '<br>' .
+				'<a href="changeemail.php">Change Account Email</a><br>';
+
+$formhtmlpass = '<a href="changepass.php">Change Password</a><br>';
 
 $formdata = array();
+
+$formdata["changeemail"] = array(
+   	"label" => "Account Email",
+   	"control" => array("FormHtml","html" => $formhtmlemail),
+	"helpstep" => 1
+);
+$formdata["changepass"] = array(
+   	"label" => "Account Password",
+   	"control" => array("FormHtml","html" => $formhtmlpass),
+	"helpstep" => 1
+);
 
 foreach ($fieldmaps as $fieldmap) {
 	$fieldnum = $fieldmap->fieldnum;
@@ -223,27 +238,6 @@ $TITLE = _L("Account Information") . ": " . escapehtml($_SESSION['subscriber.fir
 require_once("nav.inc.php");
 
 startWindow(_L('User Information'));
-?>
-<table cellpadding="3" cellspacing="1">
-	<tr>
-		<td>
-		Username: <?=escapehtml($_SESSION['subscriber.username'])?>
-		</td>
-		<td>
-		<a href="changeemail.php">Change Username</a>
-		</td>
-	</tr>
-	<tr>
-		<td>
-		
-		</td>
-		<td>
-		<a href="changepass.php">Change Password</a>
-		</td>
-	</tr>
-</table>
-<BR>
-<?
 echo $form->render();
 endWindow();
 

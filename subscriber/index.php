@@ -121,7 +121,7 @@ require_once("logintop.inc.php");
 <?
 				if ($badlogin) {
 				?>
-					<div style="color: red;">Incorrect username/password. Please try again.</div><br>
+					<div style="color: red;">Incorrect account email or password. Please try again.</div><br>
 				<?
 				}
 ?>

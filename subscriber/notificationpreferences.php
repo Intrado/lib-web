@@ -47,7 +47,7 @@ $phoneList = DBFindMany("Phone", "from phone where personid=?", false, array($pi
 $emailList = DBFindMany("Email", "from email where personid=?", false, array($pid));
 $smsList = DBFindMany("Sms", "from sms where personid=?", false, array($pid));
 
-$jobtypes = QuickQueryList("select id, name from jobtype where deleted=0", true);
+$jobtypes = QuickQueryList("select id, name from jobtype where systempriority != 1 and deleted = 0", true);
 // TODO, should we localize the job type names? Emergency, Attendance, General...
 // TODO remove survey if not supported
 // TODO do we need the info field for more detail display
@@ -117,7 +117,7 @@ $titles = array(
 function fmt_actions ($obj, $name) {
 	global $STATUS_PENDING;
 	if ($obj->nodelete)
-		return _L("Username cannot be removed");
+		return _L("Account Email cannot be removed");
 	
 	$del = '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">' . _L("Delete") . '</a>';
 	$view = '';
@@ -161,26 +161,40 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
             
+        $emergencyjtid = QuickQueryList("select id from jobtype where systempriority = 1 and deleted = 0");
         
         //save data here
         
 		// new contactpref rows
 		$values = array();
 		
-		foreach ($postdata["jobtypes"] as $jtid) {
-			foreach ($phoneList as $phone) {
-				if ($phone->phone == '') continue;
+		foreach ($phoneList as $phone) {
+			if ($phone->phone == '') continue;
+			foreach ($postdata["jobtypes"] as $jtid) {
 				$values[] = "(" . $pid . "," . $jtid . ",'phone'," . $phone->sequence . ", 1)";
 			}
-			foreach ($emailList as $email) {
-				// email sequence 0 is special case, must always set because we read from it to load initial values
-				if ($email->sequence != 0 && $email->email == '') continue;
+			foreach ($emergencyjtid as $jtid) {
+				$values[] = "(" . $pid . "," . $jtid . ",'phone'," . $phone->sequence . ", 1)";
+			}
+		}
+		foreach ($emailList as $email) {
+			// email sequence 0 is special case, must always set because we read from it to load initial values
+			if ($email->sequence != 0 && $email->email == '') continue;
+			foreach ($postdata["jobtypes"] as $jtid) {
 				$values[] = "(" . $pid . "," . $jtid . ",'email'," . $email->sequence . ", 1)";
 			}
-			foreach ($smsList as $sms) {
-				if ($sms->sms == '') continue;
+			foreach ($emergencyjtid as $jtid) {
+				$values[] = "(" . $pid . "," . $jtid . ",'email'," . $email->sequence . ", 1)";
+			}
+		}
+		foreach ($smsList as $sms) {
+			if ($sms->sms == '') continue;
+			foreach ($postdata["jobtypes"] as $jtid) {
 				$values[] = "(" . $pid . "," . $jtid . ",'sms'," . $sms->sequence . ", 1)";
 			}
+			foreach ($emergencyjtid as $jtid) {
+				$values[] = "(" . $pid . "," . $jtid . ",'sms'," . $sms->sequence . ", 1)";
+			}	
 		}
 		
 		QuickUpdate("Begin");
@@ -207,6 +221,7 @@ $TITLE = _L("Notification Preferences");
 require_once("nav.inc.php");
 
 startWindow(_L('Destinations'));
+echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency, I would like to receive information about the following:") . '</td></tr></table>';
 echo $form->render();
 showObjects($destinations, $titles, array("action" => "fmt_actions"));
 ?>

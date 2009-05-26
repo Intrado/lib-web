@@ -55,7 +55,7 @@ $formdata = array(
         "helpstep" => 1
     ),
     "username" => array(
-        "label" => "Email",
+        "label" => "Account Email",
         "value" => "",
         "validators" => array(
             array("ValRequired"),
