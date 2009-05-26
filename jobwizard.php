@@ -77,7 +77,7 @@ $TITLE = _L('Job Wizard');
 
 ?>
 <script>
-<? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValCallMePhone","ValEasycall"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValCallMePhone","ValEasycall","ValLists"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 
