@@ -177,7 +177,22 @@ class Wizard {
 		$stepdata = $this->getStepData();
 		$step = $this->getCurrentStep();
 		$form = $stepdata->getForm($_SESSION[$this->name]['data'], $step);
-		$form->handleRequest();
+		//if they pressed the previous button, handle form submits slightly different
+		if ($form->getSubmit() == "prev") {	
+			$results = $form->handleRequest(true); //dont exit, return results so we can tweak them
+			if ($results !== false) {
+				if (isset($results['validationerrors'])) {
+					//add option to override default behavior
+					$results['dontsaveurl'] = "?step=" . $this->getPrevStep();
+				}
+				
+				header("Content-Type: application/json");
+				echo json_encode($results);
+				exit();
+			}
+		} else {
+			$form->handleRequest(false); //allow this to handle like normal
+		}
 		
 		$this->datachange = false;
 		$errors = false;
