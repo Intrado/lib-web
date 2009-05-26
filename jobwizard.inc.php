@@ -334,11 +334,18 @@ class ValLists extends Validator {
 	var $onlyserverside = true;
 	
 	function validate ($value, $args) {
-		// TODO: Validate against empty $value
 		global $USER;
-		error_log('ValLists =========== $value=' . print_r($value,true));
+		$listids = json_decode($value);
+		if (empty($listids))
+			return "Please specify a list";
+		// foreach ($listids as $id) {
+			// $list = new PeopleList($id);
+			// $renderedlist = new RenderedList($list);
+			// $renderedlist->calcStats();
+			// if ($renderedlist->total == 0)
+				// return "Sorry, lists are empty";
+		// }
 		return true;
-		return 'Testing testing testing testing testing, validate if any list has count == 0';
 	}
 }
 
