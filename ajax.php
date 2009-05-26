@@ -38,7 +38,7 @@ function handleRequest() {
 		//--------------------------- COMPLEX OBJECTS -------------------------------
 
 		//--------------------------- RPC -------------------------------
-		case 'fieldmapnames':
+		case 'authorizedmapnames':
 			if (!isset($_GET['fieldnum']))
 				return false;
 			return FieldMap::getAuthorizedMapNames();
@@ -84,7 +84,7 @@ function handleRequest() {
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => FieldMap::getAllAuthorizedFieldMaps());
 				
-		case 'wholemessage':
+		case 'previewmessage':
 			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || !isset($_GET['messageid']))
 				return false;
 			$message = DBFind("Message","from message where userid=" . $USER->id ." and deleted=0 and id='".dbsafe($_GET['messageid'])."' order by name");
