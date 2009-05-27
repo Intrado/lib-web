@@ -170,6 +170,7 @@ form.newform {
 	font-size: 90%;
 }
 .newform .msglabel {
+	margin-top: 3px;
 	font-size: 110%;
 	width: 90px;
 	vertical-align: top;
