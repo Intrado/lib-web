@@ -39,7 +39,7 @@ if (isset($_GET['delete'])) {
 	$fieldmap = new FieldMap($id);
 	$fieldmap->removeOption("subscribe");
 	$fieldmap->removeOption("static");
-	$fieldmap->removeOptions("dynamic");
+	$fieldmap->removeOption("dynamic");
 	$fieldmap->update();
 
 	// clear static subscriber values
