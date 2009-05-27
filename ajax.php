@@ -29,10 +29,10 @@ function handleRequest() {
 			return DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and deleted=0 order by lettersfirst,name', false, array($USER->id));
 			
 		case 'message':
-			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || !isset($_GET['messageid']))
+			$message = new Message($_GET['id']);
+			if ($message->userid !== $USER->id)
 				return false;
-			$message = DBFind("Message","from message where userid=" . $USER->id ." and deleted=0 and id='".dbsafe($_GET['messageid'])."' order by name");
-			$message->readHeaders();
+			$message->readheaders();
 			return $message;
 			
 		//--------------------------- COMPLEX OBJECTS -------------------------------
@@ -98,12 +98,9 @@ function handleRequest() {
 				'fieldmaps' => FieldMap::getAllAuthorizedFieldMaps());
 				
 		case 'previewmessage':
-			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || !isset($_GET['messageid']))
+			$message = new Message($_GET['id']);
+			if ($message->userid !== $USER->id)
 				return false;
-			$message = DBFind("Message","from message where userid=" . $USER->id ." and deleted=0 and id='".dbsafe($_GET['messageid'])."' order by name");
-			if (!$message)
-				return false;
-
 			$message->readHeaders();
 			$parts = DBFindMany("MessagePart","from messagepart where messageid='".dbsafe($_GET['messageid'])."' order by sequence");
 			$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid='" . DBSafe($_GET['messageid']) ."'");
