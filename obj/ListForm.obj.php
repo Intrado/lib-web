@@ -208,7 +208,7 @@ class ListForm extends Form {
 				}
 				
 				function refresh_listSelectbox() {
-					var listSelectbox = new Element('select');
+					listSelectbox = new Element('select');
 					listSelectbox.insert(new Element('option', {'value':''}).insert('-- Select a List --'));
 					$('listSelectDiv').update();
 					if (!premadeLists)
