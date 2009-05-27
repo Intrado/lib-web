@@ -10,105 +10,57 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/SpecialTask.obj.php");
 
 global $USER;
-$return = false;
 
-function getTaskLangs($reqlangs) {
-	global $task;
-	if ($task->id == "new") {
-		$langdata = array();
+// Check user authorization and bail out if not auth
+if (!$USER->authorize("starteasy"))
+	exit();
+
+function taskNew($phone,$language) {		
+	if (!$phone || !$language)
+		return false;
+	global $USER;
+	$task = new SpecialTask("new");
+	$task->status = "new";
+	$task->type = 'EasyCall';
+	$task->setData('phonenumber', dbsafe($phone));
+	$task->lastcheckin = date("Y-m-d H:i:s");
+	$task->setData('progress', _L("Creating Call"));
+	$task->setData('callerid', getSystemSetting('callerid'));
+	$task->setData('name', "JobWizard-" . date("M j, Y g:i a"));
+	$task->setData('origin', "start");
+	$task->setData('userid', $USER->id);
+	$task->setData('listid', 0);
+	$task->setData('jobtypeid', 0);
+	$task->setData('count', 0);
+	if (is_array($language)) {
+		$task->setData('totalamount', count($language));
+		$task->setData('currlang', $language[0]);
+		$count = 0;
+		foreach ($language as $lang)
+			$task->setData("language" . $count++, $lang);
 	} else {
-		$langdata = array();
-		for($x=0; $x<$task->getData('totalamount'); $x++) {
-			if ($task->getData("message$x") && in_array($task->getData("language$x"), $reqlangs))
-				$langdata[$task->getData("language$x")] = $task->getData("message$x");
-			
-			$task->delData("language$x");
-			$task->delData("message$x");
-		}
+		$task->setData('totalamount', 1);
+		$task->setData('currlang', $language);
+		$task->setData("language0", $language);
 	}
-	
-	foreach ($reqlangs as $language) {
-		if (!isset($langdata[$language]))
-			$langdata[$language] = "";
-	}
-	return $langdata;
+	$task->setData('progress', _L("Creating Call"));
+	$task->status = "queued";
+	$task->create();
+	QuickUpdate("call start_specialtask(" . $task->id . ")");
+	return array("id"=>$task->id);
 }
 
-if ($USER->authorize("starteasy") && isset($_GET['id'])) {
-	// Create a task object based on the requested ID
-	$task = new SpecialTask(dbsafe($_GET['id']));
-	error_log("Request ID: " . $_GET['id']);
-	//new tasks have to have all their defaults set up
-	if($task->id == "new") {
-		$task->status = "new";
-		$task->type = 'EasyCall';
-		$task->setData('phonenumber', dbsafe($_GET['phonenumber']));
-		$task->lastcheckin = date("Y-m-d H:i:s");
-		$task->setData('progress', _L("Creating Call"));
-		$task->setData('callerid', getSystemSetting('callerid'));
-		$task->setData('name', "JobWizard-" . date("M j, Y g:i a"));
-		$task->setData('origin', "start");
-		$task->setData('userid', $USER->id);
-		$task->setData('listid', 0);
-		$task->setData('jobtypeid', 0);
-	}
-	if (isset($_GET['language'])) {
-		$reqlangs = json_decode($_GET['language'],true);
-		$tasklangs = getTaskLangs($reqlangs);
-		$langs = array();
-		$totalamount = count($tasklangs);
-		$count = 0;
-		$langindex = 0;
-		
-		foreach ($tasklangs as $language => $message) {
-			$task->setData("language$langindex", $language);
-			if ($message) {
-				$task->setData("message$langindex", $message);
-				$count = $langindex + 1;
-			}
-			$langindex++;
-		}
-		
-		if ($task->getData("language$count")) {
-			$currlang = $task->getData("language$count");
-		} else {
-			$currlang = "";
-		}
-		$task->setData('count', $count);
-		$task->setData('totalamount', $totalamount);
-		$task->setData('currlang', $currlang);
-		if ($task->id !== "new")
-			$task->update();
-	}
+function taskStatus($id) {
+	if (!$id)
+		return false;
+	$task = new SpecialTask($id);
 	
-	if ($task->id == "new") {
-		$task->create();
-	}
-		
-	if (isset($_GET['phonenumber'])) {
-		$task->delData('error');		
-		$task->setData('phonenumber', dbsafe($_GET['phonenumber']));
-		$task->update();
-	}
-	
-	if (($task->status == "done" || $task->status == "new") 
-		&& isset($_GET['start']) 
-		&& (($task->getData('count') + 0) < ($task->getData('totalamount') + 0))) {
-		$task->delData('error');
-		$task->setData('progress', _L("Creating Call"));
-		$task->status = "queued";
-		$task->update();
-		QuickUpdate("call start_specialtask(" . $task->id . ")");
-	}
-
 	// Parse the task data
 	$langdata = array();
 	for($x=0; $x<$task->getData('totalamount'); $x++)
 		if ($task->getData("message$x"))
-			$langdata[$task->getData("language$x")] = $task->getData("message$x");
-	
-	// Return the task info
-	$return = array(
+			$langdata[$task->getData("language$x")] = $task->getData("message$x");	
+	return array(
 		"id"=>$task->id,
 		"status"=>$task->status,
 		"language"=>$langdata?$langdata:false,
@@ -117,10 +69,38 @@ if ($USER->authorize("starteasy") && isset($_GET['id'])) {
 		"error"=>$task->getData('error'),
 		"count"=>$task->getData('count'),
 		"totalamount"=>$task->getData('totalamount')
-	);
+		);
 }
 
+//////////////////////////////////////////////////////////
+// POST data is a request to start a new special task
+// GET data is request for task status
+//////////////////////////////////////////////////////////
+
+$id = false;
+
+if (isset($_POST['phone']) && isset($_POST['language'])) {
+	$id = "new";
+	$language = json_decode($_POST['language']);
+	$phone = $_POST['phone'];
+}
+
+if (isset($_GET['id'])) {
+	$id = $_GET['id'];
+}
+
+error_log("Request ID: $id");
+
+/////////////////////////////////////////////////////////
+// If it is a "new" task ID then create a new one
+// Otherwise, return the status of the task id
+/////////////////////////////////////////////////////////
+
 header("Content-Type: application/json");
-echo json_encode($return);
+if ($id == "new")
+	echo json_encode(taskNew($phone,$language));
+else
+	echo json_encode(taskStatus($id));
+
 exit();	
 ?>
