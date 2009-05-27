@@ -175,7 +175,7 @@ class ValLists extends Validator {
 		global $USER;
 		$listids = json_decode($value);
 		if (empty($listids))
-			return "Please specify a list";
+			return "Please add a list";
 		// foreach ($listids as $id) {
 			// $list = new PeopleList($id);
 			// $renderedlist = new RenderedList($list);
