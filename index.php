@@ -121,7 +121,7 @@ if ($IS_COMMSUITE) {
 					<div style="color: red;">Incorrect username/password. Please try again.</div>
 <? } else if ($softlock) { ?>
 					<div style="color: red;">You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.</div>
-<? } else if ($custname === false) { ?>
+<? } else if (!$custname) { ?>
 					<div style="color: red;">Invalid customer URL. Please check the URL and try again.</div>
 <? } else { ?>
 					Please log in here.
@@ -148,7 +148,7 @@ if ($IS_COMMSUITE) {
 
 	<form action="index.php" method="POST">
 
-<? if (!($custname === false)) { ?>
+<? if ($custname) { ?>
 	
 		<table width="100%" style="color: #<?=$primary?>; text-align: right; ">
 			<tr>
