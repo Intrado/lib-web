@@ -182,9 +182,7 @@ include_once("nav.inc.php");
 startWindow('Subscriber Field Values', null, true);
 showObjects($data, $titles, array("valtype" => "fmt_valtype", "values" => "fmt_values", "Actions" => "fmt_actions"), false, true);
 if (count($addfields) > 0) {
-?>
-	<table cellpadding="3"><tr><td><a href="subscriberfieldvalue.php"><?=_L("Add Another")?></a></td></tr></table>
-<?
+	buttons(icon_button("Add Another",null,null,"subscriberfieldvalue.php"));
 } else {
 	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
 }

@@ -224,9 +224,10 @@ startWindow(_L('Destinations'));
 echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency, I would like to receive information about the following:") . '</td></tr></table>';
 echo $form->render();
 showObjects($destinations, $titles, array("action" => "fmt_actions"));
-?>
-<table cellpadding="3"><tr><td><a href="destinationwizard.php"><?=_L("Add Another")?></a></td></tr></table>
-<?
+
+// TODO if room for another phone/email/sms
+	buttons(icon_button("Add Another",null,null,"destinationwizard.php"));
+
 endWindow();
 require_once("navbottom.inc.php");
 ?>
