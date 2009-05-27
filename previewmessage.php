@@ -25,22 +25,10 @@ if (!$USER->authorize("sendphone")) {
 ////////////////////////////////////////////////////////////////////////////////
 $_SESSION['textpreview'] = false;
 
-if (isset($_GET['embed']))
-	$embed = true;
-else
-	$embed = false;
-	
-if (isset($_GET['noplay']))
-	$noplay = true;
-else
-	$noplay = false;
-
 if (isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
 	if (userOwns("message", $id)) {
 		$_SESSION['previewmessageid'] = $id;
-		$_SESSION['previewmessageembed'] = $embed;
-		$_SESSION['previewmessagenoplay'] = $noplay;
 	}
 	$_SESSION['ttstext'] = NULL;
 	$_SESSION['ttslanguage'] = NULL;
@@ -137,10 +125,7 @@ if ($reloadform) {
 
 $TITLE = "Message Preview";
 
-if (isset($_SESSION['previewmessageembed']) && $_SESSION['previewmessageembed'])
-	require_once("embed.inc.php");
-else
-	require_once("popup.inc.php");
+include_once("popup.inc.php");
 
 NewForm($f);
 
