@@ -35,7 +35,6 @@ $wizdata = array(
 			"pick" => new JobWiz_messagePhoneChoose(_L("Select A Message")),
 			"text" =>	new JobWiz_messagePhoneText(_L("Type Phone Message")),
 			"translate" => new JobWiz_messagePhoneTranslate(_L("View and Edit Translations")),
-			"record" => new JobWiz_messagePhoneRecord(_L("Record Phone Message")),
 			"callme" => new JobWiz_messagePhoneCallMe(_L("Record Phone Message"))
 		),
 		"email"	=> array(
