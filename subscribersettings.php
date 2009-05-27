@@ -32,7 +32,37 @@ if (!$USER->authorize('metadata') && !getSystemSetting("_hasselfsignup", false))
 
 if (isset($_GET['delete'])) {
 	$id = 0 + $_GET['delete'];
-	QuickUpdate("update fieldmap set options = replace(options, ',subscribe', '') where id=?", false, array($id));
+	
+	QuickUpdate("begin");
+	
+	// get fieldmap obj to remove options
+	$fieldmap = new FieldMap($id);
+	$fieldmap->removeOption("subscribe");
+	$fieldmap->removeOption("static");
+	$fieldmap->removeOptions("dynamic");
+	$fieldmap->update();
+
+	// clear static subscriber values
+	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
+	
+	// TODO should we cleanup person ffield and groupdata?
+	// need to be certain to only clean subscriber persons (not imported)
+	/*
+	// clear person field values
+	if (strpos($fieldmap->fieldnum, "f") === 0) {
+		// TODO should we clean up person ffield values?
+	} else { // assume starts with "g"
+		// cleanup groupdata
+		if ($fieldmap->fieldnum === "g10") {
+			$gnum = "10"; // assume no g11, g12, ...
+		} else {
+			$gnum = substr($fieldmap->fieldnum, 2); // strip prepended 'g0'
+		}
+		QuickUpdate("delete from groupdata where fieldnum=? and importid=0", false, array($gnum));
+	}
+	*/
+	
+	QuickUpdate("commit");
 	redirect();
 }
 // else TODO error handling
@@ -43,7 +73,7 @@ $languageField = FieldMap::getLanguageField();
 
 $data = DBFindMany("FieldMap","from fieldmap where options like '%subscribe%'");
 
-$titles = array(	"name" => "Field Definition",
+$titles = array(	"name" => "Field",
 					"valtype" => "Value Type",
 					"values" => "Values",
 					"Actions" => "Actions"
@@ -151,8 +181,16 @@ include_once("nav.inc.php");
 
 startWindow('Subscriber Field Values', null, true);
 showObjects($data, $titles, array("valtype" => "fmt_valtype", "values" => "fmt_values", "Actions" => "fmt_actions"), false, true);
+if (count($addfields) > 0) {
+?>
+	<table cellpadding="3"><tr><td><a href="subscriberfieldvalue.php"><?=_L("Add Another")?></a></td></tr></table>
+<?
+} else {
+	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
+}
 endWindow();
 
+/*
 startWindow('Add Field', null, true);
 if (count($addfields) > 0) {
 	echo $form->render();
@@ -160,6 +198,7 @@ if (count($addfields) > 0) {
 	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
 }
 endWindow();
+*/
 
 include_once("navbottom.inc.php");
 ?>
