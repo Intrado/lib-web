@@ -62,13 +62,11 @@ if (isset($_GET['clear'])) {
 		redirect();
 	}
 
-	// NOTE only clear imported data (not subscriber)
 	if (ereg("^f[0-9]{2}$",$fieldnum)) {
-		QuickUpdate("update person use index (ownership) set `$fieldnum`='' where type='system' and importid is not null");
+		QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
 	}
 	if (ereg("^g[0-9]{2}$",$fieldnum)) {
-		$safenum = 0 + substr($fieldnum, 1);
-		QuickUpdate("delete from groupdata where fieldnum=".$safenum." and importid != 0");
+		QuickUpdate("delete from groupdata where fieldnum=".substr($fieldnum, 1));
 	}
 	redirect();
 }
