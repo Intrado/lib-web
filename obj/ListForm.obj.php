@@ -21,7 +21,7 @@ class ListForm extends Form {
 		
 		$listidsName = $this->name . '_listids';
 		// ListForm Stuff
-		$str.= "
+		$str = "
 			<style type='text/css'>
 			td,th {
 				vertical-align: top;
@@ -30,17 +30,47 @@ class ListForm extends Form {
 			select {
 				min-width: 70px;
 			}
-			#rulesDiv table {
+			#rulesDiv {
+				border: solid 1px rgb(220,220,220);
+				padding: 2px;
+			}
+			.RulesTable {
 				border-collapse: collapse;
 				width: 100%;
-				border: solid 1px rgb(220,220,220);
+				border: solid 2px rgb(130,170,220);
+				margin-top: 20px;
 			}
-			#rulesDiv td {
-				padding: 4px;
-				border-top: solid 1px rgb(220,220,220);
+			.RulesTable td {
+				padding: 1px;
+				background: rgb(210,230,255);
+				border-top: solid 1px rgb(150,180,220);
 			}
-			td.FieldmapTD {
+			.RulesTableLastTR td {
+				padding: 5px;
+				background: rgb(180,200,220);
+			}
+			.RuleEditorTable {
+				border-collapse: collapse;
+				width: 100%;
+			}
+			.RuleEditorTable td {
+				border: 0;
+			}
+			.RuleEditorTable .SectionTD {
+				font-weight: bold;
+				font-size: 115%;
 				text-align: right;
+				padding-right: 5px;
+			}
+			.RuleEditorTable .HelpTD {
+				width: 30%;
+			}
+			.RuleEditorTable .InputTD {
+				width: 50%;
+			}
+			h3 {
+				margin: 0;
+				margin-top: 10px;
 			}
 			td.ValueTD input[type='text'] {
 				width: 80px;
@@ -49,50 +79,57 @@ class ListForm extends Form {
 				border-bottom: solid 2px orange;
 			}
 			</style>
-			<table>
+			<table width='100%'>
 				<tr>
-					<td style='width:700px'>
-						<h3>Final Lists</h3>
+					<td'>
 						<table style='width:100%; border: solid 2px rgb(200,200,200); border-collapse:collapse;'>
 							<tbody id='finalListsTable'>
 								<tr>
-									<th>List Name</th>
+									<th>List</th>
 									<th>Count</th>
 									<th></th>
 								</tr>
 							</tbody>
-							<tbody style='border: solid 2px rgb(255,200,100); background:rgb(255,255,200);padding:10px;'>
+							<tbody>
+								<!-- For Validation Message -->
 								<tr>
-									<td colspan=3>
-										<h3>Want to add a list?
+									<td id='listChoose_listids_fieldarea' colspan=3 style='text-align:left; background: rgb(255,255,200);'>
+										<img id='listChoose_listids_icon' src='img/icons/error.gif'/> <span id='listChoose_listids_msg'>The lists you choose will appear in this table</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table style='width:700px; border-collapse:collapse;'>
+							<tbody style=''>
+								<tr>
+									<td colspan=3 style='padding-top:10px'>
+										Want to Add a List?
 											
 												<!--
 												<select>
 													<option value=''>-- Select a Method --</option>
-													<option value='buildrules'>Build a list using rules</option>
-													<option value='chooselist'>Choose an existing list</option>
+													<option value='buildrules'>Build a List Using Rules</option>
+													<option value='chooselist'>Choose an Existing List</option>
 												</select>
 												-->
-												<button id='buildRulesButton' type='button'>Build a list using rules</button> or <button id='chooseListButton' type='button'>Choose an existing list</button>
-										</h3>
+												<button id='buildRulesButton' type='button'>Build a List Using Rules</button> or <button id='chooseListButton' type='button'>Choose an Existing List</button>
+										
 									</td>
 								</tr>
+							</tbody>
+							<tbody>
 								<tr>
 									<td colspan=3>
-										<center>
 										<div id='buildRulesWindow'>
-											<h3>Build Rules</h3>
+											<h3>Build a List Using Rules</h3>
 											<div id='rulesDiv'></div>
-											<div id='rulesDiv2'></div>
-											<button id='buildRulesDoneButton' type='button'>Save as a List</button>
 										</div>
 										
 										<div id='chooseListWindow'>
-											<h3>Choose a List</h3>
+											<h3>Choose an Existing List</h3>
 											<div id='listSelectDiv'></div>
 											<button id='chooseListDoneButton' type='button'>Add List</button>
 										</div>
-										</center>
 									</td>
 								</tr>
 							</tbody>
@@ -131,15 +168,24 @@ class ListForm extends Form {
 					if (!document.formvars)
 						document.formvars = {};
 						
-					document.formvars[name] = {
+					var formvars = document.formvars[name] = {
 						formdata: formdata,
 						scriptname: scriptname, //used for any ajax calls for this form
 						ajaxsubmit: true,
+						validators: {},
+						jsgetvalue: {}
 					};
+					
+					for (fieldname in formdata) {
+						var id = form.id+'_'+fieldname;
+						formvars.validators[id] = 'ajax';
+						formvars.jsgetvalue[id] = form_default_get_value;
+					}
+					
 					//submit handler
 					form.observe('submit',form_handle_submit.curry(name));
 				}
-				listform_load('{$this->name}', '$posturl', '" . json_encode($this->formdata) . "');
+				listform_load('{$this->name}', '$posturl', " . json_encode($this->formdata) . ");
 			</script>
 			<script type='text/javascript' src='script/calendar.js'></script>
 			<script type='text/javascript' src='script/rulewidget.js'></script>
@@ -166,17 +212,24 @@ class ListForm extends Form {
 				});
 				
 				
-				// Build Rules Buttons
+				// Build a List Using Rules Buttons
 				$('buildRulesButton').observe('click', function(event) {
 					event.stop();
 					ruleWidget.clear_rules();
 					$('buildRulesWindow').show();
 					$('chooseListWindow').hide();
 				});
-				$('buildRulesDoneButton').observe('click', function(event) {
+				var buildRulesDoneButton = new Element('button', {'type':'button'}).update('Make These Rules Into a List');
+				buildRulesDoneButton.observe('click', function(event) {
 					event.stop();
+					var data = ruleWidget.toJSON();
+					console.info(data);
+					if (data == '{}') {
+						alert('Please add a rule');
+						return;
+					}
 					new Ajax.Request('ajaxlistform.php?type=saverules', { 'method':'post',
-						'postBody': 'ruledata='+ruleWidget.toJSON(),
+						'postBody': 'ruledata='+data,
 						onSuccess: function(transport) {
 							var id = transport.responseJSON;
 							if (!id) {
@@ -188,6 +241,7 @@ class ListForm extends Form {
 						}
 					});
 				});
+				ruleWidget.rulesTableLastTR.update(new Element('td', {'colspan':4}).update(buildRulesDoneButton));
 				
 				// Choose List Buttons
 				$('chooseListButton').observe('click', function(event) {
@@ -214,7 +268,6 @@ class ListForm extends Form {
 					if (!premadeLists)
 						return;
 					for (var id in premadeLists) {
-						console.info(premadeLists[id]);
 						if (!premadeLists[id]['added'])
 							listSelectbox.insert(new Element('option', {'value':id}).update(premadeLists[id]['name']));
 					}
@@ -227,7 +280,6 @@ class ListForm extends Form {
 					if (!listids.length) listids = [];
 					listids.push(id);
 					$('$listidsName').value = listids.toJSON();
-					alert($('$listidsName').value);
 					reset_windows();
 					get_liststats([id].toJSON());
 				}
@@ -253,9 +305,9 @@ class ListForm extends Form {
 								var nameTD = new Element('td').update(new Element('input',{'type':'hidden','value':data['id']})).insert(data['name']);
 								var countTD = new Element('td').update(data.total + ' Total');
 								if (data.added > 0)
-									countTD.insert(', ' + data.added + ' Added');
+									countTD.insert(', with ' + data.added + ' Added');
 								if (data.removed > 0)
-									countTD.insert(', ' + data.removed + ' Skipped');
+									countTD.insert(', with ' + data.removed + ' Skipped');
 								var actionsTD = new Element('td');
 								actionsTD.insert( '" . icon_button('Preview','information') . "');
 								actionsTD.insert( '" . icon_button('Remove','information') . "');
@@ -278,11 +330,22 @@ class ListForm extends Form {
 									if (listids.join) {
 										listids = listids.without(id);
 										$('$listidsName').value = listids.toJSON();
+										if (listids.length < 1) {
+											$('listChoose_listids_icon').src = 'img/icons/error.gif';
+											$('listChoose_listids_msg').update('The lists you choose will appear in this table');
+											$('listChoose_listids_fieldarea').morph('background: rgb(255,255,200)', {duration:0.4});
+										}
+									} else {
+										alert('Fatal ERROR??');
 									}
-									alert($('$listidsName').value);
 								});
 								
 								$('finalListsTable').insert(new Element('tr').insert(nameTD).insert(countTD).insert(actionsTD));
+								
+								// Validation effects.
+								$('listChoose_listids_fieldarea').morph('background:rgb(200,255,200)', {duration:0.4});
+								$('listChoose_listids_icon').src='img/icons/accept.gif';
+								$('listChoose_listids_msg').update('You may still add additional lists');
 							}
 						}
 					});
