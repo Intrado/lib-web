@@ -43,7 +43,7 @@ class SelectMessage extends FormItem {
 				var fieldmap = null;
 			
 
-				new Ajax.Request(\'ajax.php?ajax&type=wholemessage&messageid=\'+val, {
+				new Ajax.Request(\'ajax.php?ajax&type=previewmessage&id=\'+val, {
 					method:\'get\',
 					onSuccess: function(transport){
 						var response = transport.responseJSON;
@@ -148,108 +148,30 @@ class CallMe extends FormItem {
 			$language = array("Default");
 		
 		if (!$value)
-			$value = "{}";
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.$value.'" />';
-		$str .= '<table id="'.$n.'_details" class="msgdetails" width="'.$this->args['width'].'">';
-		$str .= '<tr><td colspan=2>'.icon_button(_L("Call Me to Record"), "stop", $n."Start();").'</td></tr>';
-		$str .= '<tr><td class="msglabel">Phone:</td><td><span class="msginfo">'.Phone::format($this->args['phone']).'</span></td></tr>';
-		$str .= '<tr><td class="msglabel">Progress:</td><td><span id="'.$n.'_progress" class="msginfo">Click the button to begin...</span></td></tr>';
-		$str .= '<tr><td class="msglabel">Language:</td><td><table id="'.$n.'_language">';
-		foreach ($language as $name) {
-			$str .= '<tr><td><div id="'.$n.'_languageicon_'.$name.'"><img src="img/icons/time_add.gif" /></div></td>';
-			$str .= '<td><div  id="'.$n.'_languagename_'.$name.'">'.$name.'</div></td></tr>';		
+			$value = '{"'.$language[0].'": ""}';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
+		$str .= '<table class="msgdetails" width="80%">';
+		$str .= '<tr><td class="msglabel">'._L("Language").':</td><td>';
+		if (count($language) <= 1) {
+			$str .= '<div id='.$n.'select style="background: white; border: 1px solid; padding: 2px; margin-right: 5px; margin-top: 2px;" value="'.$language[0].'">'.$language[0].'</div>';
+		} else {
+			$str .= '<select id='.$n.'select >';
+			foreach ($language as $langname) 
+				$str .= '<option id='.$n.'option_'.$langname.' value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
+			$str .= '</select>';
 		}
+		$str .= '</td></tr>';
+		$str .= '<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" />';
+		$str .= icon_button("Call To Record","/diagona/16/151","new Easycall('".$n."','".$language[0]."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>';
+		$str .= '<tr><td class="msglabel">'._L("Messages").':</td>';
+		$str .= '<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">';
+		$str .= '<tr><th colspan=2 class="windowRowHeader">'._L("Message Language").'</th><th class="windowRowHeader" width="30%">'._L("Actions").'</th></tr>';
+		
 		$str .= '</table></td></tr>';
 		$str .= '</table>';
-		$str .= '<script>
-			var sessionactive = null;
-			var langs = '.json_encode($language).';
-			var tmp = '.$value.';
-			var value = new Hash();
-			var args = \'&phonenumber='.$this->args['phone'].'&language='.json_encode($language).'\';
-			
-			if (!tmp[\'task\'])
-				value.set(\'task\', "new");
-			else
-				value.set(\'task\', tmp[\'task\']);
-			
-			value.set(\'messages\', $H({}));	
-			try {
-			var language = $A(langs);
-			language.each(function (lang) {
-					value.get(\'messages\').set(lang, "");
-			});
-			} catch (e) { alert(e) }
-			function '.$n.'Start() {
-				if (sessionactive)
-					return;
-				args = "&start";
-				sessionactive = new PeriodicalExecuter('.$n.'CallMe, 2);
-				$("'.$n.'_progress").innerHTML = \'Please wait, session in progress...\';
-			}
-			function '.$n.'CallMe() {
-				var val = value.get(\'task\');
-
-				new Ajax.Request(\'ajaxeasycall.php?id=\' + val + args, {
-					method:\'get\',
-					onSuccess: function(transport){
-						var response = transport.responseJSON;
-						//alert(transport.responseText);
-						if (response && !response[\'error\']) {
-							
-							value.set(\'task\', response[\'id\']);
-							if (!args) {
-								$("'.$n.'_progress").innerHTML = response[\'progress\'];
-							
-								if (response[\'currlang\'])
-									$(\''.$n.'_languageicon_\' + response[\'currlang\']).innerHTML = \'<img src="img/icons/loading.gif" />\';
-							}
-							if (response[\'language\']) {
-								var messages = $H(response[\'language\']);
-								messages.each(function (lang) {
-									if (lang.value) {
-										value.get(\'messages\').set(lang.key, lang.value);
-										$(\''.$n.'_languageicon_\' + lang.key).innerHTML = \'<img src="img/icons/accept.gif" />\';
-									}	
-								});
-							}
-							args = "";
-							$("'.$n.'").value = Object.toJSON(value);
-							if (response[\'status\'] == "done") {
-								try {
-								if (value.get(\'messages\').values().every(function (msg) { return (msg !== ""); }))
-									$("'.$n.'_progress").innerHTML = "All Messages Completed!";
-								else
-									$("'.$n.'_progress").innerHTML = "Missing messages, Click the button to continue...";
-								} catch (e) { alert(e) }
-								if (sessionactive) {
-									sessionactive.stop();
-									sessionactive = null;
-								}
-							}
-						} else {
-							args = "&start";
-							$("'.$n.'_progress").innerHTML = \'There was a problem. Click the button to continue...\';
-							if (sessionactive) {
-								sessionactive.stop();
-								sessionactive = null;
-							}
-						}
-					},
-					onFailure: function() {
-							args = "&start";
-							$("'.$n.'_progress").innerHTML = \'There was an error. Click the button to continue...\';
-							if (sessionactive) {
-								sessionactive.stop();
-								sessionactive = null;
-							}
-					}
-				});
-			}
-			
-			'.$n.'CallMe();
-			
-			</script>';
+		$str .= '<script type="text/javascript" src="script/easycall.js"></script><script>
+				new Easycall("'.$n.'","'.$language[0].'").load();
+				</script>';
 		return $str;
 	}
 }
@@ -323,7 +245,7 @@ class ValEasycall extends Validator {
 			return "$this->label is not allowed for this user account.";
 		$values = json_decode($value);
 		//return var_dump($values);
-		foreach ($values->messages as $lang => $message)
+		foreach ($values as $lang => $message)
 			if (!$message)
 				return "$this->label has messages that are not recorded.";
 		return true;
@@ -679,65 +601,6 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 	}
 }
 
-class JobWiz_messagePhoneRecord extends WizStep {
-	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
-		global $USER;
-		$helpstepnum = 1;
-		
-		$formdata["phonenumber"] = array(
-			"label" => _L("Call Me Number"),
-			"value" => $USER->phone,
-			"validators" => array(
-				array("ValRequired"),
-				array("ValCallMePhone")
-			),
-			"control" => array("TextField","max"=>getSystemSetting('easycallmax',10),"min"=>getSystemSetting('easycallmin',10)),
-			"helpstep" => $helpstepnum
-		);
-		$helpsteps[$helpstepnum++] = _L("c");
-		
-		if ($USER->authorize("sendmulti")) {
-			
-			$languages = DBFindMany("Language","from language order by name");
-			$values = array();
-			$langs = array();
-			foreach ($languages as $id => $language) {
-				$langs[$id] = $language->name;
-				$values[] = $id;
-			} 
-			$formdata["languages"] = array(
-				"label" => _L("Alternate Languages"),
-				"value" => "",
-				"validators" => array(),
-				"control" => array("MultiCheckBox", "height"=>"120px", "values"=>$langs),
-				"helpstep" => $helpstepnum
-			);
-			$helpsteps[$helpstepnum++] = _L("Select a method or methods for message delivery.");
-		
-		}
-		// TODO: Needs custom formItem with call me button and custom validator to check that entered number is valid, you have recorded a message
-
-		return new Form("messagePhoneRecord",$formdata,$helpsteps);
-	}
-	
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		if (isset($postdata['/basic']['package']) && 
-			($postdata['/basic']['package'] == "easycall" ||
-				$postdata['/basic']['package'] == "personalized") ||
-			(isset($postdata['/message/select']['phone']) &&
-				$postdata['/message/select']['phone'] == 'record')
-		) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
 class JobWiz_messagePhoneCallMe extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
@@ -746,12 +609,9 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 		global $USER;
 		$helpstepnum = 1;
 		$syslangs = DBFindMany("Language","from language order by name");
-		$reqlangs = isset($postdata['/message/phone/record']['languages'])?$postdata['/message/phone/record']['languages']:array();
 		$langs = array("Default");
-		if ($reqlangs)
-			foreach ($reqlangs as $langid)
-				if (isset($syslangs[$langid]))
-					$langs[] = $syslangs[$langid]->name;
+		foreach ($syslangs as $langid => $language)
+			$langs[] = $syslangs[$langid]->name;
 				
 		$formdata["callme"] = array(
 			"label" => _L("Call Me"),
@@ -760,7 +620,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 				array("ValRequired"),
 				array("ValEasycall")
 			),
-			"control" => array("CallMe", "width"=>"80%", "phone"=>Phone::parse($postdata['/message/phone/record']['phonenumber']), "language"=>$langs),
+			"control" => array("CallMe", "width"=>"80%", "phone"=>$USER->phone, "language"=>$langs),
 			"helpstep" => $helpstepnum
 		);
 		$helpsteps[$helpstepnum++] = _L("c");
@@ -774,8 +634,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 			($postdata['/basic']['package'] == "easycall" ||
 				$postdata['/basic']['package'] == "personalized") ||
 			(isset($postdata['/message/select']['phone']) &&
-				$postdata['/message/select']['phone'] == 'record')) &&
-			isset($postdata['/message/phone/record']['phonenumber'])
+				$postdata['/message/select']['phone'] == 'record'))
 		) {
 			return true;
 		} else {
