@@ -4,6 +4,7 @@
 class ListForm extends Form {
 	function ListForm ($name) {
 		$this->formdata['listids'] = array(
+			'label' => '',
 			'value' => '',
 			'validators' => array(
 				array('ValRequired'),
@@ -81,8 +82,8 @@ class ListForm extends Form {
 			</style>
 			<table width='100%'>
 				<tr>
-					<td'>
-						<table style='width:100%; border: solid 2px rgb(200,200,200); border-collapse:collapse;'>
+					<td>
+						<table width='100% style='border: solid 2px rgb(200,200,200); border-collapse:collapse;>
 							<tbody id='finalListsTable'>
 								<tr>
 									<th>List</th>
@@ -99,7 +100,20 @@ class ListForm extends Form {
 								</tr>
 							</tbody>
 						</table>
-						<table style='width:700px; border-collapse:collapse;'>
+					</td>
+					<td width=200>
+						<div>
+							<h3>Step 1</h3>
+							There are two ways to add a list:
+							<ul>
+								<li>Build a List Using Rules</li>
+								<li>Choose an Existing List</li>
+							</ul>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<table style='width:700px; border-collapse:collapse;'>
 							<tbody style=''>
 								<tr>
 									<td colspan=3 style='padding-top:10px'>
@@ -133,15 +147,7 @@ class ListForm extends Form {
 									</td>
 								</tr>
 							</tbody>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td style='padding: 20px; margin: 10px; border:solid 1px rgb(200,220,240)'>
-						
-					</td>
-				</tr>
-			</table>";
+				</table>";
 
 		// Taken from Form.obj.php, adapted to fit needs of ListForm.
 		$str .= "
@@ -223,7 +229,6 @@ class ListForm extends Form {
 				buildRulesDoneButton.observe('click', function(event) {
 					event.stop();
 					var data = ruleWidget.toJSON();
-					console.info(data);
 					if (data == '{}') {
 						alert('Please add a rule');
 						return;
@@ -275,9 +280,13 @@ class ListForm extends Form {
 				}
 				
 				function add_list(id) {
+					if (!id.strip()) {
+						alert('Please select a list');
+						return;
+					}
 					var listids = $('$listidsName').value;
 					if (listids) listids = listids.evalJSON();
-					if (!listids.length) listids = [];
+					if (!listids.join) listids = [];
 					listids.push(id);
 					$('$listidsName').value = listids.toJSON();
 					reset_windows();
