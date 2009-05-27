@@ -142,7 +142,7 @@ class ListForm extends Form {
 				listform_load('{$this->name}', '$posturl', '" . json_encode($this->formdata) . "');
 			</script>
 			<script type='text/javascript' src='script/calendar.js'></script>
-			<script type='text/javascript' src='script/RuleWidget.js'></script>
+			<script type='text/javascript' src='script/rulewidget.js'></script>
 			<script type='text/javascript'>
 				reset_windows();
 				var ruleWidget = new RuleWidget($('rulesDiv'));
@@ -253,7 +253,7 @@ class ListForm extends Form {
 								var nameTD = new Element('td').update(new Element('input',{'type':'hidden','value':data['id']})).insert(data['name']);
 								var countTD = new Element('td').update(data.total + ' Total');
 								if (data.added > 0)
-									countTD.insert(', ' + data.added + ' Added, ');
+									countTD.insert(', ' + data.added + ' Added');
 								if (data.removed > 0)
 									countTD.insert(', ' + data.removed + ' Skipped');
 								var actionsTD = new Element('td');
