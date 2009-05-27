@@ -68,7 +68,7 @@ if (isset($_GET['clear'])) {
 	}
 	if (ereg("^g[0-9]{2}$",$fieldnum)) {
 		$safenum = 0 + substr($fieldnum, 1);
-		QuickUpdate("delete from groupdata where fieldnum=".$safenum." and importid != 0);
+		QuickUpdate("delete from groupdata where fieldnum=".$safenum." and importid != 0");
 	}
 	redirect();
 }
