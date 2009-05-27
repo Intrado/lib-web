@@ -3,15 +3,16 @@ var RuleWidget = Class.create({
 
 	// @param div, the DOM container for this widget.
 	initialize: function(div) {
-		this.div = div;
+		this.container = div;
 		
 		// RULES TABLE
 		this.rulesTable = new Element('tbody');
-		this.div.insert(new Element('table').insert(this.rulesTable));
+		this.rulesTableLastTR = new Element('tr', {'class':'RulesTableLastTR'}); // For customization.
+		this.container.insert(new Element('table', {'class':'RulesTable'}).insert(new Element('tbody').insert('<tr><th>Field</th><th>Criteria</th><th>Value</th><th></th></tr>')).insert(this.rulesTable).insert(new Element('tbody').insert(this.rulesTableLastTR)));
 		
 		this.newRuleDiv = new Element('div');
 		this.newRuleEditor = new RuleEditor(this, this.newRuleDiv);
-		this.div.insert(this.newRuleDiv);
+		this.container.insert({top:this.newRuleDiv});
 		
 		this.clear_rules();
 	},
@@ -19,7 +20,7 @@ var RuleWidget = Class.create({
 	clear_rules: function() {
 		this.appliedRules = {};
 		this.additionalRuleEditors = {};
-		this.rulesTable.update(new Element('tr').insert('<th>Field</th><th>Criteria</th><th>Value</th><th></th>'));
+		this.rulesTable.update();
 	},
 	
 	// @param data, {fieldnum, type, logical, op, val}
@@ -44,35 +45,41 @@ var RuleWidget = Class.create({
 		criteriaTD.insert(criteria);
 
 		// ValueTD
-		var valueTD = new Element('td', {'class':'ValueTD'});
-		if (data.val[0].join)
-			valueTD.update(data.val[0].join(', ').escapeHTML());
-		else if (data.type != 'reldate')
-			valueTD.update(data.val.join(' and ').escapeHTML());
+		var value = '';
+		if (data.type == 'multisearch') {
+			value = data.val[0].join(', ');
+		} else if (data.type != 'reldate') {
+			if (data.op == 'num_range')
+				value = data.val.join(' and ');
+			else
+				value = data.val[0];
 		// RELDATE
-		else {
+		} else {
 			switch(data.op) {
 				case 'reldate':
-					valueTD.update(data.val[0]);
+					value = RuleEditor.reldateOptions[data.val[0]];
 					break;
 				
 				case 'eq':
-					valueTD.update(data.val[1]);
+					value = data.val[1];
 					break;
 					
 				case 'date_range':
-					valueTD.update(data.val[1] + ' and ' + data.val[2]);
+					value = data.val[1] + ' and ' + data.val[2];
 					break;
 					
 				case 'date_offset':
-					valueTD.update(data.val[3]);
+					value = data.val[3];
 					break;
 					
 				case 'reldate_range':
-					valueTD.update(data.val[3] + ' and ' + data.val[4]);
+					value = data.val[3] + ' and ' + data.val[4];
 					break;
 			}
 		}
+		if (value.length > 30)
+			value = value.substring(0,30) + '...';
+		var valueTD = new Element('td', {'class':'ValueTD'}).update(value.escapeHTML());
 
 		// ActionTD
 		var actionTD = new Element('td', {'class':'ActionTD'});
@@ -88,7 +95,7 @@ var RuleWidget = Class.create({
 			delete this.additionalRuleEditors[data.fieldnum];
 			tr.next('tr').remove();
 		} else {
-			this.rulesTable.insert(tr);
+			this.rulesTable.insert({top:tr});
 		}
 		
 		this.appliedRules[data.fieldnum] = data;
@@ -141,21 +148,21 @@ var RuleEditor = Class.create({
 	// @param data, optional data to make this prepopulate this editor.
 	initialize: function(ruleWidget, div, data) {
 		this.ruleWidget = ruleWidget;
-		this.div = div;
+		this.container = div;
 		if (data)
 			this.data = data;
 		
 		// EDITOR
 		this.editorTable = new Element('tbody');
-		this.editorFieldTR = new Element('tr').insert('<td>Field</td>').insert('<td></td>');
-		this.editorCriteriaTR = new Element('tr').insert('<td>Criteria</td>').insert('<td></td>');
-		this.editorValueTR = new Element('tr').insert('<td>Value</td>').insert('<td></td>');
-		this.editorActionTR = new Element('tr').insert('<td></td>').insert('<td></td>');
+		this.editorFieldTR = new Element('tr').insert('<td class="SectionTD">Field</td>').insert('<td class="InputTD"></td>').insert('<td class="HelpTD"></td>');
+		this.editorCriteriaTR = new Element('tr').insert('<td class="SectionTD">Criteria</td>').insert('<td class="InputTD"></td>').insert('<td class="HelpTD"></td>');
+		this.editorValueTR = new Element('tr').insert('<td class="SectionTD">Value</td>').insert('<td class="InputTD"></td>').insert('<td class="HelpTD"></td>');
+		this.editorActionTR = new Element('tr').insert('<td class="SectionTD"></td>').insert('<td class="InputTD"></td>').insert('<td class="HelpTD"></td>');
 		this.editorTable.insert(this.editorFieldTR).insert(this.editorCriteriaTR).insert(this.editorValueTR).insert(this.editorActionTR);
-		this.div.insert(new Element('table').insert(this.editorTable));
+		this.container.insert(new Element('table', {'class':'RuleEditorTable'}).insert(this.editorTable));
 		
-		// USE-RULE BUTTON
-		var button = new Element('button', {'type':'button'}).update('Use This Rule');
+		// ADD-RULE BUTTON
+		var button = new Element('button', {'type':'button'}).update('Add This Rule');
 		if (this.data)
 			button.update('Apply Changes');
 			
@@ -175,7 +182,12 @@ var RuleEditor = Class.create({
 	get_data: function() {
 		var fieldnum = this.get_fieldnum();
 		var logical = 'and';
-		var op = this.editorCriteriaTR.down('select').getValue();
+		
+		var selected = this.editorCriteriaTR.select('input').find(function(radio) { return radio.checked; });
+		if (!selected)
+			return false;
+		var op = selected.getValue();
+		
 		if (op == 'not') {
 			logical = 'and not';
 			op = 'in';
@@ -248,7 +260,7 @@ var RuleEditor = Class.create({
 		if (!data)
 			data = ' '; // Show the table row anyway.
 		
-		var multicheckbox = this.make_multicheckbox(this.div.id + '_multisearch_' + fieldnum + '_', data);
+		var multicheckbox = this.make_multicheckbox(this.container.id + '_multisearch_' + fieldnum + '_', data);
 		this.editorValueTR.down('td',1).update(multicheckbox);
 		
 		// cache in memory.
@@ -265,7 +277,12 @@ var RuleEditor = Class.create({
 	},
 	
 	handle_event_apply_rule: function(event) {
-		this.ruleWidget.apply_rule(this.get_data());
+		var data = this.get_data();
+		if (!data) {
+			alert('Please choose a field');
+			return;
+		}
+		this.ruleWidget.apply_rule(data);
 	},
 	
 	show_criteria_column: function(data) {
@@ -275,16 +292,20 @@ var RuleEditor = Class.create({
 			return;
 			
 		var type = RuleEditor.fieldmaps[data.fieldnum]['type'];
-		var selectbox = this.make_selectbox(RuleEditor.operators[type]);
+		var radiobox = this.make_radiobox(this.container.id + '_criteria_' + data.fieldnum + '_', RuleEditor.operators[type]);
 		if (data.op) {
 			var operator = data.op;
 			if (data.logical == 'and not')
 				operator = 'not';
-			selectbox.value = operator;
+			radiobox.down('input[value="'+operator+'"]').checked = true;
+		}
+		else {
+			// Default, select first radio box.
+			radiobox.down('input').checked = true;
 		}
 		if (type != 'text' && type != 'multisearch') // Don't bother handling onchange if type is "text" or "multisearch"
-			selectbox.observe('change', this.handle_event_change_criteria.bindAsEventListener(this));
-		this.editorCriteriaTR.down('td',1).update(selectbox);
+			radiobox.select('input').invoke('observe', 'click', this.handle_event_change_criteria.bindAsEventListener(this));
+		this.editorCriteriaTR.down('td',1).update(radiobox);
 	},
 	
 	// Determines the appropriate input boxes to show, makes an ajax request for persondatavalues if necessary for multisearch.
@@ -293,10 +314,16 @@ var RuleEditor = Class.create({
 		
 		if (!data.fieldnum)
 			return;
-			
-		var operator = this.editorCriteriaTR.down('select').getValue();
-		
-		
+		var type = RuleEditor.fieldmaps[data.fieldnum]['type'];
+		var operator = null;
+		if (type != 'multisearch' && type != 'text') {
+			var selected = this.editorCriteriaTR.select('input').find(function(radio) {
+				return radio.checked;
+			});
+			if (!selected)
+				return false;
+			operator = selected.getValue();
+		}
 		
 		// MULTISEARCH
 		if (RuleEditor.fieldmaps[data.fieldnum]['type'] == 'multisearch') {
@@ -368,7 +395,7 @@ var RuleEditor = Class.create({
 			this.editorValueTR.down('td',1).update();
 		}
 		
-		this.editorActionTR.down('button').disabled = false;
+		//this.editorActionTR.down('button').disabled = false;
 	},
 	
 	get_fieldnum: function() {
@@ -417,7 +444,7 @@ var RuleEditor = Class.create({
 		this.editorFieldTR.down('td',1).insert(selectbox);
 		this.editorCriteriaTR.down('td',1).update();
 		this.editorValueTR.down('td',1).update();
-		this.editorActionTR.down('button').disabled = true;
+		//this.editorActionTR.down('button').disabled = true;
 	},
 
 	make_multicheckbox: function(uniquePrefix, values, needCheckAll) {
@@ -480,6 +507,20 @@ var RuleEditor = Class.create({
 		if (hidden)
 			selectbox.hide();
 		return selectbox;
+	},
+	
+	make_radiobox: function(uniquePrefix, values, hidden) {
+		var container = new Element('ul', {'style':'margin:0;padding:0;list-style:none'});
+			
+		for (var i in values) {
+			var radio = new Element('input', {'type':'radio', 'name':uniquePrefix, 'id':uniquePrefix+i, 'value':i.escapeHTML()});
+			var label = '<label for="'+uniquePrefix+i+'">'+values[i].escapeHTML()+'</label>';
+			container.insert(new Element('li').insert(radio).insert(label));
+		}
+		
+		if (hidden)
+			container.hide();
+		return container;
 	},
 
 	make_datebox: function(value, hidden) {
