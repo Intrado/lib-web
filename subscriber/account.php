@@ -178,6 +178,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response        
         
         //save data here
+
+		// delete all groupdata for this person, rebuild from current selections
+		QuickUpdate("delete from groupdata where personid=".$person->id);
+		
+		// add all static text fields to this person
+		$staticList = QuickQueryList("select fieldnum from fieldmap where options like '%text%subscribe%static%'");
+		foreach ($staticList as $fieldnum) {
+			// TODO move query out of loop? not really worried since they likely will have zero or one, but potential for 17
+			$value = QuickQuery("select value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1");
+			if ($value) {
+				$person->$fieldnum = $value;
+			}
+		}
         
 		foreach ($fieldmaps as $fieldmap) {
 			$fieldnum = $fieldmap->fieldnum;
@@ -191,7 +204,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$person->$fieldnum = $val;
 			} else { // 'g'
 				$gfield = substr($fieldnum, 1, 3);
-				QuickUpdate("delete from groupdata where fieldnum=".$gfield." and personid=".$person->id);
+				//QuickUpdate("delete from groupdata where fieldnum=".$gfield." and personid=".$person->id);
 				
 				if (count($val) > 0) {
 					$query = "insert into groupdata (personid, fieldnum, value, importid) values ";
