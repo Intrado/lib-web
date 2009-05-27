@@ -20,23 +20,31 @@ function handleRequest() {
 	global $USER;
 	global $RULE_OPERATORS;
 	global $RELDATE_OPTIONS;
+	$type = isset($_GET['type'])?$_GET['type']:$_POST['type'];
+	error_log("AjaxRequest: ".$type);
 	
-	switch($_GET['type']) {
+	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php -------------------------------
 		case 'lists':
 			if (!$USER->authorize('createlist'))
 				return false;
 			return DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and deleted=0 order by lettersfirst,name', false, array($USER->id));
-			
-		case 'message':
+		
+		// Return a message object specified by it's ID
+		case 'Message':
 			$message = new Message($_GET['id']);
-			if ($message->userid !== $USER->id)
-				return false;
 			$message->readheaders();
 			return $message;
-			
+		
+		// Return a specific message part by it's ID
+		case "MessagePart":
+			return MessagePart($_GET['id']);
+		
 		//--------------------------- COMPLEX OBJECTS -------------------------------
-
+		// Return message parts belonging to a specific messageid
+		case "MessageParts":
+			return DBFindMany("MessagePart","from messagepart where messageid='".dbsafe($_GET['id'])."' order by sequence");
+		
 		//--------------------------- RPC -------------------------------
 		case 'authorizedmapnames':
 			if (!isset($_GET['fieldnum']))
@@ -83,7 +91,7 @@ function handleRequest() {
 			return $stats;
 			
 		case 'persondatavalues':
-			if (!$USER->authorize('createlist') || !isset($_GET['fieldnum']))
+			if (!isset($_GET['fieldnum']))
 				return false;
 			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
@@ -96,14 +104,13 @@ function handleRequest() {
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => FieldMap::getAllAuthorizedFieldMaps());
-				
+		
+		// Return a whole message including it's message parts formatted into body text and any attachments.
 		case 'previewmessage':
 			$message = new Message($_GET['id']);
-			if ($message->userid !== $USER->id)
-				return false;
 			$message->readHeaders();
-			$parts = DBFindMany("MessagePart","from messagepart where messageid='".dbsafe($_GET['messageid'])."' order by sequence");
-			$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid='" . DBSafe($_GET['messageid']) ."'");
+			$parts = DBFindMany("MessagePart","from messagepart where messageid='".dbsafe($_GET['id'])."' order by sequence");
+			$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid='" . DBSafe($_GET['id']) ."'");
 			if ($parts)
 				$body = $message->format($parts);
 			else
@@ -117,7 +124,29 @@ function handleRequest() {
 				"subject"=>$message->subject,
 				"attachment"=>count($attachments)?$attachments:false,
 				"body"=>$body);
-				
+		
+		case "messagefields":
+			$fields = array();
+			$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='".dbsafe($_GET['id'])."')");
+			if (count($messagefields) > 0) {
+				foreach ($messagefields as $fieldmap) {
+					$fields[$fieldmap->fieldnum] = $fieldmap;
+					$fields[$fieldmap->fieldnum]->optionsarray = explode(",",$fieldmap->options);
+				}
+			}
+			return count($fields)?$fields:false;
+		
+		// return an array of the requested fields and their person data values
+		case "fieldvalues":
+			$requestfields = json_decode($_POST['fields']);
+			$fielddata = array();
+			foreach ($requestfields as $field) {
+				$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $field));
+				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
+				$fielddata[$field] = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($field));
+			}
+			return $fielddata;
+			
 		default:
 			return false;
 	}

@@ -6,116 +6,31 @@
 class SelectMessage extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$str = '<script>'.
-			(($this->args['type'] == 'phone')?'
-				function '. $n .'Play() {
-					var val = $("'.$n.'").value;
-					if (val > 0)
-						$("'.$n.'_iframe").innerHTML = \'<iframe height="200px" width="'.$this->args['width'].'" frameborder=0 marginwidth=0 marginheight=0 src="previewmessage.php?embed&noplay&close=1&id=\' + val + \'">\';
-				}
-				':'').'
-			function updateDetails() {
-				$("'.$n.'_lastused").innerHTML = \'<blink>Loading...</blink>\';
-				$("'.$n.'_description").innerHTML = \'<blink>Loading...</blink>\';'.
-				(($this->args['type'] == 'email')?'
-					$("'.$n.'_from").innerHTML = \'<blink>Loading...</blink>\';
-					$("'.$n.'_subject").innerHTML = \'<blink>Loading...</blink>\';
-					$("'.$n.'_attachment").innerHTML = \'<blink>Loading...</blink>\';
-					':'').
-				(($this->args['type'] == 'email' || $this->args['type'] == 'sms')?'
-					$("'.$n.'_body").value = \'Loading...\';
-					':'').'
-				var val = $("'.$n.'").value;
-				if (parseInt(val) > 0) {
-					$("'.$n.'_details").show();'.
-					(($this->args['type'] == 'phone')?'
-						$("'.$n.'_iframe").show();
-						$("'.$n.'_iframe").innerHTML = \'<blink>Loading...</blink>\';
-					':'').'
-				} else {
-					$("'.$n.'_details").hide();'.
-					(($this->args['type'] == 'phone')?'
-						$("'.$n.'_iframe").hide();
-						$("'.$n.'_iframe").innerHTML = \'\';
-					':'').'
-					return false;
-				}
-				var fieldmap = null;
-			
-
-				new Ajax.Request(\'ajax.php?ajax&type=previewmessage&id=\'+val, {
-					method:\'get\',
-					onSuccess: function(transport){
-						var response = transport.responseJSON;
-						var text = "";
-						if (response) {
-							
-							$("'.$n.'_lastused").innerHTML = response[\'lastused\'] || \'Never\';
-							$("'.$n.'_description").innerHTML = response[\'description\'] || \'\';'.
-							(($this->args['type'] == 'email')?'
-								$("'.$n.'_from").innerHTML = response[\'fromemail\'] || \'\';
-								$("'.$n.'_subject").innerHTML = response[\'subject\'] || \'\';
-								if (response[\'attachment\'])						
-									for (id in response[\'attachment\'])
-										text = text + \'<a href="messageattachmentdownload.php?id=\' + id + \'">\' + response[\'attachment\'][id][\'filename\'] + \'&nbsp;&nbsp;(\' + parseInt(parseInt(response[\'attachment\'][id][\'size\']) / 1024) + \'K)</a><br>\';
-								$("'.$n.'_attachment").innerHTML = text;
-								text = "";
-								':'').
-							(($this->args['type'] == 'email' || $this->args['type'] == 'sms')?'
-								$("'.$n.'_body").value = response[\'body\'];
-								':'').'
-						} else {
-							$("'.$n.'_lastused").innerHTML = \'...\';
-							$("'.$n.'_description").innerHTML = \'...\';'.
-							(($this->args['type'] == 'email')?'
-								$("'.$n.'_from").innerHTML = \'...\';
-								$("'.$n.'_subject").innerHTML = \'...\';
-								$("'.$n.'_attachment").innerHTML = \'...\';
-								':'').
-							(($this->args['type'] == 'email' || $this->args['type'] == 'sms')?'
-								$("'.$n.'_body").value = \'...\';
-								':'').'
-						}
-					},
-					onFailure: function() {
-							$("'.$n.'_lastused").innerHTML = \'Error...\';
-							$("'.$n.'_description").innerHTML = \'Error...\';'.
-							(($this->args['type'] == 'email')?'
-								$("'.$n.'_from").innerHTML = \'Error...\';
-								$("'.$n.'_subject").innerHTML = \'Error...\';			
-								$("'.$n.'_attachment").innerHTML = \'Error...\';
-								':'').
-							(($this->args['type'] == 'email' || $this->args['type'] == 'sms')?'
-								$("'.$n.'_body").value = \'Error...\';
-								':'').'
-					}
-				});'.
-				(($this->args['type'] == 'phone')?'
-					'. $n .'Play();
-					':'').'
-			}
-			</script>';
-		$str .= '<select id="'.$n.'" name="'.$n.'" onchange="updateDetails();" >';
+		$str = '<select id="'.$n.'" name="'.$n.'" onchange="'.$n.'messageselect.getMessage();" >';
 		foreach ($this->args['values'] as $selectid => $selectvals) {
 			$checked = $value == $selectid;
 			$str .= '<option value="'.escapehtml($selectid).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectvals['name']).'</option>';
 		}
 		$str .= '</select>';
-		$str .= '<table id="'.$n.'_details" class="msgdetails" width="'.$this->args['width'].'">';
-		$str .= '<tr><td class="msglabel">Last Used:</td><td><span id="'.$n.'_lastused" class="msginfo">...</span></td></tr>';
-		$str .= '<tr><td class="msglabel">Description:</td><td><span id="'.$n.'_description" class="msginfo">...</span></td></tr>';
+		$str .= '<table id="'.$n.'details" class="msgdetails" width="'.$this->args['width'].'">';
+		$str .= '<tr><td class="msglabel">Last Used:</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>';
+		$str .= '<tr><td class="msglabel">Description:</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
 		if ($this->args['type'] == 'email') {
-			$str .= '<tr><td class="msglabel">From:</td><td><span id="'.$n.'_from" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">Subject:</td><td><span id="'.$n.'_subject" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">Attachment:</td><td><span id="'.$n.'_attachment" class="msgattachment">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">From:</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">Subject:</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">Attachment:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
 		}
 		if ($this->args['type'] == 'email' || $this->args['type'] == 'sms')
-			$str .= '<tr><td class="msglabel">Body:</td><td><textarea style="width:100%" rows="20" readonly id="'.$n.'_body" >...</textarea></td></tr>';
+			$str .= '<tr><td class="msglabel">Body:</td><td><textarea style="width:100%" rows="20" readonly id="'.$n.'body" >...</textarea></td></tr>';
+		if ($this->args['type'] == 'phone') {
+			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td><div id="'.$n.'preview" style="border: 1px solid gray; width: 80%"></div>';
+			$str .= '<div id="'.$n.'play" style="border: 1px solid gray; width: 80%"></div></td></tr>';
+		}
 		$str .= '</table>';
-		if ($this->args['type'] == 'phone')
-			$str .= '<div style="width:100%" id="'.$n.'_iframe"></div>';
-		$str .= '<script>updateDetails()</script>';
-		
+		$str .= '<script type="text/javascript" src="script/messageselect.js"></script>
+				<script type="text/javascript">
+				var '.$n.'messageselect = new MessageSelect("'.$n.'","'.$this->args['type'].'");
+				</script>';
 		return $str;
 	}
 }
@@ -169,7 +84,8 @@ class CallMe extends FormItem {
 		
 		$str .= '</table></td></tr>';
 		$str .= '</table>';
-		$str .= '<script type="text/javascript" src="script/easycall.js"></script><script>
+		$str .= '<script type="text/javascript" src="script/easycall.js"></script>
+				<script type="text/javascript">
 				new Easycall("'.$n.'","'.$language[0].'").load();
 				</script>';
 		return $str;
