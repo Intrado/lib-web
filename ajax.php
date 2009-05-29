@@ -48,15 +48,12 @@ function handleRequest() {
 		// Return messages for the current user or user(userid) if the current user has manager rights
 		case "Messages":
 			if(!isset($_GET['messagetype'])){
-				error_log("No messagetype");
 				return false;
 			}
 			if(!isset($_GET['userid'])){
-				error_log("No userid");
 				return QuickQueryList("select id,name from message where deleted=0 and userid='". $USER->id ."' and type='".dbsafe($_GET['messagetype'])."' order by id", true);		
 			}
 			if ($USER->id != $_GET['userid'] && !$USER->authorize(array('managesystem','manageaccount'))){
-				error_log("Not a manager");
 				return false;
 			}
 							
