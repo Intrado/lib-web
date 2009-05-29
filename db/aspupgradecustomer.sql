@@ -33,3 +33,14 @@ $$$
 update fieldmap set options = 'searchable,text,lastname,subscribe,dynamic' where options like '%lastname%'
 $$$
 
+CREATE TABLE `subscriberpending` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`subscriberid` INT NOT NULL ,
+`type` ENUM( 'phone', 'email', 'sms' ) NOT NULL ,
+`value` VARCHAR( 255 ) NOT NULL ,
+`token` VARCHAR( 255 ) NOT NULL
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_bin
+$$$
+
+insert into setting (name, value) select '_subscriberloginpicturecontentid', value from setting where name='_loginpicturecontentid'
+$$$
