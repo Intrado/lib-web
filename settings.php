@@ -62,7 +62,7 @@ startWindow("Options", 'padding: 3px;');
 ?>
 						<tr><td><a href='systemwidealertmessage.php'>Systemwide Alert Message</a></td></tr>
 						<tr><td><a href='customerinfo.php'>Customer Information</a></td></tr>
-						<tr><td><a href='messageintro.php'>Message Into</a></td></tr>	
+						<tr><td><a href='messageintro.php'>Message Intro</a></td></tr>	
 <?
 					}
 					if($USER->authorize('metadata')){
