@@ -22,6 +22,7 @@ require_once("obj/Validator.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
+// TODO show options, but show/hide metadata
 if (!$USER->authorize('metadata') && !getSystemSetting("_hasselfsignup", false)) {
 	redirect('unauthorized.php');
 }
@@ -45,27 +46,9 @@ if (isset($_GET['delete'])) {
 	// clear static subscriber values
 	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
 	
-	// TODO should we cleanup person ffield and groupdata?
-	// need to be certain to only clean subscriber persons (not imported)
-	/*
-	// clear person field values
-	if (strpos($fieldmap->fieldnum, "f") === 0) {
-		// TODO should we clean up person ffield values?
-	} else { // assume starts with "g"
-		// cleanup groupdata
-		if ($fieldmap->fieldnum === "g10") {
-			$gnum = "10"; // assume no g11, g12, ...
-		} else {
-			$gnum = substr($fieldmap->fieldnum, 2); // strip prepended 'g0'
-		}
-		QuickUpdate("delete from groupdata where fieldnum=? and importid=0", false, array($gnum));
-	}
-	*/
-	
 	QuickUpdate("commit");
 	redirect();
 }
-// else TODO error handling
 
 $firstnameField = FieldMap::getFirstNameField();
 $lastnameField = FieldMap::getLastNameField();
@@ -81,20 +64,49 @@ $titles = array(	"name" => "Field",
 
 $addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
 
-$formdata = array(
-    "addfield" => array(
-        "label" => "Field Definition:",
+$emaildomain = QuickQuery("select value from setting where name='emaildomain'");
+
+$formdata = array();
+
+$formdata["restrictdomain"] = array(
+        "label" => _L("Restrict Account Email to Domain"),
+        "value" => getSystemSetting("subscriberauthdomain", "0") ? true : false,
+        "validators" => array(    
+        ),
+        "control" => array("CheckBox"),
+        "helpstep" => 1
+    );
+$formdata["domain"] = array(
+        "label" => _L("Email Domain"),
         "value" => "",
         "validators" => array(    
         ),
-        "control" => array("SelectMenu","values" => $addfields),
+        "control" => array("FormHtml","html"=>"<div>".$emaildomain."</div>"),
         "helpstep" => 1
-    )
-);
+    );
+$formdata["requiresitecode"] = array(
+        "label" => _L("Require Site Access Code"),
+        "value" => getSystemSetting("subscriberauthcode", "0") ? true : false,
+        "validators" => array(    
+        ),
+        "control" => array("CheckBox"),
+        "helpstep" => 1
+    );
+$formdata["sitecode"] = array(
+        "label" => _L("Site Access Code"),
+        "value" => getSystemSetting("subscribersitecode", ""),
+        "validators" => array(
+            array("ValLength","min" => 3,"max" => 255)
+        ),
+        "control" => array("TextField","maxlength" => 255),
+        "helpstep" => 1
+    );
 
-$buttons = array(submit_button("Add","submit","tick"));
+
+$buttons = array(submit_button("Save","submit","tick"),
+                icon_button("Cancel","cross",null,"subscribersettings.php"));
                 
-$form = new Form("addsubscriberfieldform",$formdata,null,$buttons);
+$form = new Form("subscriberoptions",$formdata,null,$buttons);
 $form->ajaxsubmit = true;
 
 //check and handle an ajax request (will exit early)
@@ -112,12 +124,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
         
-		$id = $postdata['addfield'];
-
+		$postdata['restrictdomain'] ? setSystemSetting("subscriberauthdomain", "1") : setSystemSetting("subscriberauthdomain", "0");
+		$postdata['requiresitecode'] ? setSystemSetting("subscriberauthcode", "1") : setSystemSetting("subscriberauthcode", "0");
+		setSystemSetting("subscribersitecode", $postdata['sitecode']);
+				
         if ($ajax)
-            $form->sendTo("subscriberfieldvalue.php?id=".$id);
+            $form->sendTo("subscribersettings.php");
         else
-            redirect("subscriberfieldvalue.php?id=".$id);
+            redirect("subscribersettings.php");
     }
 }
 
@@ -179,6 +193,10 @@ $TITLE = 'Subscriber Self-Signup Settings';
 
 include_once("nav.inc.php");
 
+startWindow('Account Options', null, true);
+echo $form->render();
+endWindow();
+
 startWindow('Subscriber Field Values', null, true);
 showObjects($data, $titles, array("valtype" => "fmt_valtype", "values" => "fmt_values", "Actions" => "fmt_actions"), false, true);
 if (count($addfields) > 0) {
@@ -187,16 +205,6 @@ if (count($addfields) > 0) {
 	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
 }
 endWindow();
-
-/*
-startWindow('Add Field', null, true);
-if (count($addfields) > 0) {
-	echo $form->render();
-} else {
-	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
-}
-endWindow();
-*/
 
 include_once("navbottom.inc.php");
 ?>
