@@ -99,17 +99,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $datachange = true;
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-        error_log("intro message id :" . $postdata['intromessage']);
 		$msgid = $postdata['intromessage'] + 0;
-		
 		$introtype = $postdata['introtype'] + 0;
 		
-    	// copy the message to schoolmessanger account
 		$newmsg = new Message($msgid);
-		if($USER->id != $newmsg->userid)
-			exit(); // illigal request  
 		$newmsg->id = null;
-		//$newmsg->userid = 1;
 		$newmsg->deleted = 1;
 		
 		if($introtype == 1)
@@ -131,13 +125,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		
 		if($introtype == 1) {
-			setSystemSetting('introid_emergency', $newmsg->id);
-			error_log("introid_emergency :" . $newmsg->id);
-			
+			setSystemSetting('introid_emergency', $newmsg->id);			
 		}
 		else {
 			setSystemSetting('introid_default', $newmsg->id);
-			error_log("introid_default :" . $newmsg->id);
 		}
 		
 		// Delete old intro
