@@ -325,3 +325,4 @@ ALTER TABLE `webactivation` DROP `forgotpassword`;
 
 drop table useractivation;
 
+ALTER TABLE `portalphoneactivation` ADD `options` TEXT NULL;
