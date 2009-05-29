@@ -29,35 +29,59 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $messages = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
+$languages = QuickQueryList("select name from language");
 
 $values = array("" => "Select a Message");
 foreach($messages as $message)
 	$values[$message->id] = $message->name;
+	
+$selectvalues = array("" => "Select Language");
+$i = 1;
+foreach($languages as $language) {
+	$selectvalues[$i] = $language;
+	$i++;
+}
+	
+$mapvalues = array(0 => $selectvalues, 1 => $values);
 
-			
+if($IS_COMMSUITE)
+	$users = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
+/*CSDELETEMARKER_START*/
+else
+	$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");
+/*CSDELETEMARKER_END*/
+	
+$uservalues = array("" => "Select User");
+	
+foreach($users as $user) {
+	$uservalues[$user->id] = $user->firstname ." " . $user->lastname;
+}	
+
 $formdata = array(
-	"uploadmessage" => array(
-		"label" => _L("Upload intro message"),
+	"intromessage" => array(
+		"label" => _L("Intro Message"),
 		"value" => "none",
-		"validators" => array(
-			array("ValRequired")
-		),
+		"validators" => array(array("ValRequired")),
 		"control" => array("SelectMenu",
 			 "values"=>$values
+		),
+		"helpstep" => 1
+	),
+	"introtype" => array(
+		"label" => _L("Intro Type"),
+		"value" => "none",
+		"validators" => array(array("ValRequired")),
+		"control" => array("RadioButton",
+			 "values"=>array(0 => "Default", 1 => "Emergency")
 		),
 		"helpstep" => 1
 	)
 );
 
-$helpsteps = array (
-	_L("Select a message to upload as an intro message for all phone messages"),
-);
-
-$buttons = array(submit_button(_L("Done"),"submit","accept"),
+$buttons = array(submit_button(_L("Upload"),"submit","fugue/arrow_045"),
 		icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
-				
-$form = new Form("introform", $formdata, $helpsteps, $buttons);
+$form = new Form("introform", $formdata, null, $buttons);
 $form->ajaxsubmit = true;
 
 //check and handle an ajax request (will exit early)
@@ -75,16 +99,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $datachange = true;
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		$msgid = $postdata['uploadmessage'] + 0;
+        error_log("intro message id :" . $postdata['intromessage']);
+		$msgid = $postdata['intromessage'] + 0;
+		
+		$introtype = $postdata['introtype'] + 0;
 		
     	// copy the message to schoolmessanger account
 		$newmsg = new Message($msgid);
 		if($USER->id != $newmsg->userid)
 			exit(); // illigal request  
 		$newmsg->id = null;
-		$newmsg->userid = 1;
+		//$newmsg->userid = 1;
 		$newmsg->deleted = 1;
-		$newmsg->name = "intro_english";
+		
+		if($introtype == 1)
+			$newmsg->name = "emergency_intro";
+		else
+			$newmsg->name = "default_intro";
+			
 		$newmsg->description = "intro message. store in school messanger account";
 		$newmsg->create();
 
@@ -97,9 +129,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$newpart->create();
 		}
 		
+		
+		if($introtype == 1) {
+			setSystemSetting('introid_emergency', $newmsg->id);
+			error_log("introid_emergency :" . $newmsg->id);
+			
+		}
+		else {
+			setSystemSetting('introid_default', $newmsg->id);
+			error_log("introid_default :" . $newmsg->id);
+		}
+		
 		// Delete old intro
-		QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where m.name='intro_english' and m.id!=" . $newmsg->id . " and m.id = p.messageid");	
-											
+		//QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where m.name='intro_english' and m.id!=" . $newmsg->id . " and m.id = p.messageid");										
         //save data here
 		if ($ajax)
 			$form->sendTo("settings.php");
@@ -117,10 +159,91 @@ $TITLE = _L('Message Intro Manager');
 
 include_once("nav.inc.php");
 
+//startWindow(_L("Users"));
+//echo $loadform->render();
+//endWindow();
 
 startWindow(_L("Settings"));
+?>
+<table>
+<tr>
+<td>
+<form class="newform" id="loadusers" name="loadusers" method="POST" action="messageintro.php" style="width: 100%;">
+
+<table width="100%">
+<tr>
+<td width="30%"><label class="formlabel" >Load User Messages</label></td>
+<td>
+	<select id=loaduserselect name="loaduserselect" onchange="loaduser();">
+		<option value=""  >Select User</option>
+		<option value=""  >Current User</option>
+		
+<? 
+foreach($users as $user) {
+	echo "<option value=\"" . $user->id . "\"  >" . $user->firstname . " " . $user->lastname . "</option>";
+}
+?>
+	</select>
+	
+</td>
+</tr>
+
+
+
+</table>
+</form>
+</td>
+</tr>
+</table>
+
+
+
+<? 
+
+
 echo $form->render();
+
+
+
+
 endWindow();
 
+
+
 include_once("navbottom.inc.php");
+
 ?>
+
+<script type="text/javascript">
+
+function loaduser() {
+	var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
+	
+	if($('loaduserselect').getValue() != '')
+		request += '&userid=' + $('loaduserselect').getValue();
+		
+	new Ajax.Request(request, {
+		method:'get',
+		onSuccess: function(result) {
+			var response = result.responseJSON;
+			if (response) {	
+				var output = '<option value=\"\">Select a Message</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
+				for (var i in response) {
+					output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
+					//output = output + ' ' + response[i].escapeHTML();
+				}		
+				//output += '</select>';
+				$('introform_intromessage').innerHTML = output;
+			//	alert(output);
+			//	$('defaultmessage').innerHTML = output;
+			}
+		}	
+	});
+}
+
+loaduser();
+
+</script>
+
+
+
