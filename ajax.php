@@ -111,10 +111,10 @@ function handleRequest() {
 			$message->readHeaders();
 			$parts = DBFindMany("MessagePart","from messagepart where messageid='".dbsafe($_GET['id'])."' order by sequence");
 			$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid='" . DBSafe($_GET['id']) ."'");
-			if ($parts)
-				$body = $message->format($parts);
-			else
-				$body = "";
+			$simple = false;
+			if (count($parts) == 1) 
+				foreach ($parts as $id => $part)
+					if ($part->type == "A") $simple = true;
 			
 			return array(
 				"lastused"=>$message->lastused,
@@ -122,8 +122,11 @@ function handleRequest() {
 				"fromname"=>$message->fromname,
 				"fromemail"=>$message->fromemail,
 				"subject"=>$message->subject,
+				"type"=>$message->type,
+				"simple"=>$simple,
 				"attachment"=>count($attachments)?$attachments:false,
-				"body"=>$body);
+				"body"=>count($parts)?$message->format($parts):""
+			);
 		
 		case "messagefields":
 			$fields = array();
