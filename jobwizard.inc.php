@@ -20,12 +20,10 @@ class SelectMessage extends FormItem {
 			$str .= '<tr><td class="msglabel">Subject:</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>';
 			$str .= '<tr><td class="msglabel">Attachment:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
 		}
-		if ($this->args['type'] == 'email' || $this->args['type'] == 'sms')
-			$str .= '<tr><td class="msglabel">Body:</td><td><textarea style="width:100%" rows="20" readonly id="'.$n.'body" >...</textarea></td></tr>';
 		if ($this->args['type'] == 'phone') {
-			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td><div id="'.$n.'preview" style="border: 1px solid gray; width: 80%"></div>';
-			$str .= '<div id="'.$n.'play" style="border: 1px solid gray; width: 80%"></div></td></tr>';
+			$str .= '<tr><td class="msglabel">Preview:</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
 		}
+		$str .= '<tr><td class="msglabel">Body:</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>';
 		$str .= '</table>';
 		$str .= '<script type="text/javascript" src="script/messageselect.js"></script>
 				<script type="text/javascript">
