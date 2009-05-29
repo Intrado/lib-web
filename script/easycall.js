@@ -25,6 +25,8 @@ var Easycall = Class.create({
 			this.messageid = message.value;
 			this.displayMessage();
 			this.updateMessage();
+			if (this.language !== this.required)
+				$(this.formname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.required).del(this.language)}.bind(this));
 		}.bind(this));
 	},
 	
@@ -93,12 +95,12 @@ var Easycall = Class.create({
 		switch(error) {
 			case "done":
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" />Completed! "
-				$(this.formname+this.language+"_img").src = this.acceptedimg;
+				$(this.formname+this.language+"_img").src = this.playimg;
 				break;
 			
 			case "messageexists":
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />This message is already recorded "
-				$(this.formname+this.language+"_img").src = this.acceptedimg;
+				$(this.formname+this.language+"_img").src = this.playimg;
 				break;
 			
 			case "callended":
@@ -110,6 +112,9 @@ var Easycall = Class.create({
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />There was an error! ("+error+")";
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 		}
+		if (this.language !== this.required)
+			$(this.formname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.required).del(this.language)}.bind(this));
+		
 		$(this.formname+"recordbutton").show();
 	},
 	
@@ -140,22 +145,21 @@ var Easycall = Class.create({
 		$(this.formname+language+"_row").remove();
 	},
 	
-	displayMessage: function() {
-		var play = new Element("div",{id: this.formname+this.language+"_play", style: "float: left;"});
-		
+	displayMessage: function() {		
 		var remove =new Element("div",{id: this.formname+this.language+"_remove", style: "float: left;"});
 		
+		var newtbody = new Element("tbody",{})
 		var newlang = new Element("tr", {id: this.formname+this.language+"_row"});
 		newlang.insert(new Element("td",{style: "width: 18px"}).insert(new Element("img",{id: this.formname+this.language+"_img", src: "img/icons/time_add.gif"})));
 		newlang.insert(new Element("td",{}).insert(new Element("div",{style: "margin-right: 5px"}).update(this.language)));
 		
 		var actions = new Element("div",{});
-		actions.insert(play);
 		actions.insert(remove);
 		
 		newlang.insert(new Element("td",{}).insert(actions));
+		newtbody.insert(newlang);
 		
-		$(this.formname + "messages").insert(newlang);
+		$(this.formname + "messages").insert(newtbody);
 	},
 	
 	updateMessage: function () {
@@ -163,18 +167,17 @@ var Easycall = Class.create({
 			var messages = $(this.formname).value.evalJSON();
 			messages[this.language] = this.messageid;
 			$(this.formname).value = Object.toJSON(messages);
-			$(this.formname+this.language+"_img").src = this.acceptedimg;
-			$(this.formname+this.language+"_play").update("<img src=\""+this.playimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left\">Play</div>");
+			$(this.formname+this.language+"_img").src = this.playimg;
+			$(this.formname+this.language+"_img").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this)); // TODO: preview message popup
 		} else {
 			$(this.formname+this.language+"_img").src = this.exclamationimg;
-			$(this.formname+this.language+"_play").update();
 		}
 		
 		if (this.language !== this.required) {
 			$(this.formname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\">Remove</div>");
-			$(this.formname+this.language+"_remove").onclick = "new Easycall(\""+this.formname+"\",\""+this.required+"\").del(\""+this.language+"\")";
+			$(this.formname+this.language+"_remove").observe('click', function(event) {alert("Cannot remove a message while record session in progress.")});
 		} else {
-			$(this.formname+this.language+"_remove").update("<img src=\""+this.alertimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\">Required</div>");
+			$(this.formname+this.language+"_remove").update("<img src=\""+this.alertimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; float: left; margin-right: 5px\">Required</div>");
 		}
 	}
 });
