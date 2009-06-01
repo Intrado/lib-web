@@ -245,13 +245,13 @@ include("navbottom.inc.php");
 ?>
 <script>
 	function hidesurveytable(){
-		hide("survey");
-		show("nonsurvey");
+		$('survey').hide();
+		$('nonsurvey').show();
 	}
 
 	function displaysurveytable(){
-		hide("nonsurvey");
-		show("survey");
+		$('nonsurvey').hide();
+		$('survey').show();
 	}
 
 </script>
