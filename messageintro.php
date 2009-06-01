@@ -58,6 +58,7 @@ foreach($users as $user) {
 }	
 
 $formdata = array(
+	"Required Intro",
 	"intromessage" => array(
 		"label" => _L("Intro Message"),
 		"value" => "none",
@@ -75,6 +76,34 @@ $formdata = array(
 			 "values"=>array(0 => "Default", 1 => "Emergency")
 		),
 		"helpstep" => 1
+	),
+	"Language Options",
+	"language1" => array(
+		"label" => _L("Language 1"),
+		"value" => "none",
+		"validators" => array(),
+		"control" => array("SelectMenu",
+			 "values"=>$values
+		),
+		"helpstep" => 2
+	),
+	"language2" => array(
+		"label" => _L("Language 2"),
+		"value" => "none",
+		"validators" => array(),
+		"control" => array("SelectMenu",
+			 "values"=>$values
+		),
+		"helpstep" => 2
+	),
+	"language3" => array(
+		"label" => _L("Language 3"),
+		"value" => "none",
+		"validators" => array(),
+		"control" => array("SelectMenu",
+			 "values"=>$values
+		),
+		"helpstep" => 2
 	)
 );
 
@@ -205,35 +234,36 @@ include_once("navbottom.inc.php");
 
 ?>
 
+
+
 <script type="text/javascript">
+
+var cache = new AjaxCache();
+
+function setvalues(result) {
+	var response = result.responseJSON;
+	if (response) {	
+		var output = '<option value=\"\">Select a Message</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
+		for (var i in response) {
+			output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
+		}		
+		$('introform_intromessage').innerHTML = output;
+		$('introform_language1').innerHTML = output;
+		$('introform_language2').innerHTML = output;
+		$('introform_language3').innerHTML = output;
+	}
+}
 
 function loaduser() {
 	var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
 	
 	if($('loaduserselect').getValue() != '')
 		request += '&userid=' + $('loaduserselect').getValue();
-		
-	new Ajax.Request(request, {
-		method:'get',
-		onSuccess: function(result) {
-			var response = result.responseJSON;
-			if (response) {	
-				var output = '<option value=\"\">Select a Message</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
-				for (var i in response) {
-					output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
-					//output = output + ' ' + response[i].escapeHTML();
-				}		
-				//output += '</select>';
-				$('introform_intromessage').innerHTML = output;
-			//	alert(output);
-			//	$('defaultmessage').innerHTML = output;
-			}
-		}	
-	});
+
+	cache.request(request,setvalues);
 }
 
 loaduser();
-
 </script>
 
 
