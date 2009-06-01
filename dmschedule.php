@@ -225,9 +225,9 @@ startWindow("Schedule");
 function checkSelection(dropdown)
 {
    if(dropdown.selectedIndex > 0) {
-	   show('details');
+	   $('details').show();
    } else {
-	   hide('details');
+	   $('details').hide();
    }
 }
 </script>
