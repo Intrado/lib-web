@@ -53,7 +53,9 @@ function fmt_surveyactions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = 'start:start';
-$TITLE = 'Welcome ' . escapehtml($USER->firstname) . ' ' . escapehtml($USER->lastname);
+$TITLE = _L('Welcome %1$s %1$s',
+	escapehtml($USER->firstname),
+	escapehtml($USER->lastname));
 
 if($USER->authorize("leavemessage")){
 	if($count > 0){
@@ -72,7 +74,7 @@ if ($listsdata) {
 <?
 		  	if ($USER->getSetting("whatsnewversion") != $CURRENTVERSION) {
 			?><tr><td><?
-			  	$startCustomTitle = "What's New";
+			  	$startCustomTitle = _L("What's New");
 				startWindow($startCustomTitle,NULL);
 
 ?>				<div align="center" style="margin: 5px;">
@@ -85,7 +87,7 @@ if ($listsdata) {
 				</div>
 
 				<table align="center"><tr><td>
-<?				echo button('Close', null, 'start.php?closewhatsnew'); ?>
+<?				echo button(_L('Close'), null, 'start.php?closewhatsnew'); ?>
 				</td></tr></table>
 
 <?
@@ -100,7 +102,7 @@ if ($listsdata) {
 				|| $USER->authorize('createlist')) {
 				$theme = getBrandTheme();
 			?><tr><td><?
-				startWindow('Quick Start ' . help('Start_EasyCall'),NULL);
+				startWindow(_L('Quick Start ') . help('Start_EasyCall'),NULL);
 				?>
 				<table border="0" cellpadding="3" cellspacing="0" width=100%>
 				<?
@@ -120,7 +122,7 @@ if ($listsdata) {
 					?>
 					<tr>
 						<td align="right" valign="center" class="bottomBorder"><div NOWRAP class="destlabel">Advanced<?=help('Jobs_AddStandardJob', '', 'small')?></div></td>
-						<td class="bottomBorder" style="padding: 5px;" valign="center"><?=button_bar(button('Create New Job', NULL,"job.php?origin=start&id=new"))?></td>
+						<td class="bottomBorder" style="padding: 5px;" valign="center"><?=button_bar(button(_L('Create New Job'), NULL,"job.php?origin=start&id=new"))?></td>
 					</tr>
 					<?
 				}
@@ -128,7 +130,7 @@ if ($listsdata) {
 					?>
 					<tr>
 						<td align="right" valign="center"><div NOWRAP class="destlabel">List<?=help('Lists_AddList', '', 'small')?></div></td>
-						<td style="padding: 5px;" valign="center"><?=button_bar(button('Create New List', NULL,"list.php?origin=start&id=new"))?></td>
+						<td style="padding: 5px;" valign="center"><?=button_bar(button(_L('Create New List'), NULL,"list.php?origin=start&id=new"))?></td>
 					</tr>
 				<?
 				}
@@ -141,8 +143,8 @@ if ($listsdata) {
 			if ($USER->authorize("startstats")) {
 ?>
 			<tr><td><?
-				startWindow('My Active Calls',NULL);
-				button_bar(button('Refresh', 'window.location.reload()'));
+				startWindow(_L('My Active Calls'),NULL);
+				button_bar(button(_L('Refresh'), 'window.location.reload()'));
 				?><div align="center"><img src="graph_start_actrive_breakdown.png.php?junk=<?= rand() ?>" /></div><?
 				endWindow();
 ?>
@@ -155,7 +157,7 @@ if ($listsdata) {
 
 			$limit = 5; // Limit on max # of each type of job to show on the start page.
 
-			startWindow('My Jobs ' . help('Start_MyActiveJobs'),NULL,true);
+			startWindow(_L('My Jobs ') . help('Start_MyActiveJobs'),NULL,true);
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='scheduled' or status='procactive' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
 			$titles = array(	"name" => "Job Name",
@@ -170,7 +172,7 @@ if ($listsdata) {
 				unset($formatters["responses"]);
 			}
 			if (count($data)) {
-				button_bar(button('Refresh', 'window.location.reload()'));
+				button_bar(button(_L('Refresh'), 'window.location.reload()'));
 				showObjects($data, $titles, $formatters);
 			} else {
 				?><div style="font-size: xx-small; float:left; color: grey;" >You have no active jobs...</div><?
@@ -180,7 +182,7 @@ if ($listsdata) {
 
 
 
-			startWindow('My Completed Jobs ' . help('Start_MyCompletedJobs'),NULL,true);
+			startWindow(_L('My Completed Jobs ') . help('Start_MyCompletedJobs'),NULL,true);
 
 			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
 			$titles = array(	"name" => "Job Name",
@@ -206,7 +208,7 @@ if ($listsdata) {
 
 			if (getSystemSetting('_hassurvey', true) && $USER->authorize("survey")) {
 
-				startWindow('My Surveys ' . help('Start_MyActiveJobs'),NULL,true);
+				startWindow(_L('My Surveys ') . help('Start_MyActiveJobs'),NULL,true);
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='procactive' or status='processing' or status='scheduled') and type='survey' and deleted = 0 order by id desc limit $limit");
 				$titles = array(	"name" => "Job Name",
@@ -222,7 +224,7 @@ if ($listsdata) {
 				}
 
 				if (count($data)) {
-					button_bar(button('Refresh', 'window.location.reload()'));
+					button_bar(button(_L('Refresh'), 'window.location.reload()'));
 					showObjects($data, $titles, $formatters);
 				} else {
 					?><div style="font-size: xx-small; float:left; color: grey;" >You have no active surveys...</div><?
@@ -232,7 +234,7 @@ if ($listsdata) {
 
 
 
-				startWindow('My Completed Surveys ' . help('Start_MyCompletedJobs'),NULL,true);
+				startWindow(_L('My Completed Surveys ') . help('Start_MyCompletedJobs'),NULL,true);
 
 				$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type='survey' and deleted = 0 order by finishdate desc limit $limit");
 				$titles = array(	"name" => "Job Name",
@@ -267,18 +269,18 @@ if ($listsdata) {
 	}
 ?>
 	<table border=0 width="500px"><tr><td><?
-	startWindow('Getting Started ',NULL);
+	startWindow(_L('Getting Started '),NULL);
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width=100%>
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Help:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">Need Assistance? Try the comprehensive online help system by clicking the button to the right or by using the Help link in the top right of the page.</td>
-			<td class="bottomBorder"><?=button_bar(button('Go To Help', "window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"))?>
+			<td class="bottomBorder"><?=button_bar(button(_L('Go To Help'), "window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"))?>
 		</tr>
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">New User:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">This printable PDF training guide teaches product basics in an simple step-by-step format.</td>
-			<td class="bottomBorder"><?=button_bar(button('Training Guide', NULL, "help/getting_started_online.pdf"))?>
+			<td class="bottomBorder"><?=button_bar(button(_L('Training Guide'), NULL, "help/getting_started_online.pdf"))?>
 		</tr>
 	<?
 	if ($USER->authorize('createlist')) {
@@ -286,7 +288,7 @@ if ($listsdata) {
 		<tr>
 			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">List:&nbsp;&nbsp; </div></td>
 			<td class="bottomBorder">Ready to start? Before sending a job you'll need to create a list.</td>
-			<td class="bottomBorder"><?=button_bar(button('Create New List', NULL,"list.php?origin=start&id=new"))?>
+			<td class="bottomBorder"><?=button_bar(button(_L('Create New List'), NULL,"list.php?origin=start&id=new"))?>
 		</tr>
 	<?
 	}
