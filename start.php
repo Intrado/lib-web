@@ -53,7 +53,7 @@ function fmt_surveyactions ($obj,$name) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = 'start:start';
-$TITLE = _L('Welcome %1$s %1$s',
+$TITLE = _L('Welcome %1$s %2$s',
 	escapehtml($USER->firstname),
 	escapehtml($USER->lastname));
 
