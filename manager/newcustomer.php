@@ -213,6 +213,7 @@ if (CheckFormSubmit($f,$s)){
 					QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
 				}
 
+				// Login Picture
 				QuickUpdate("INSERT INTO content (contenttype, data) values
 							('image/gif', '" . base64_encode(file_get_contents("img/classroom_girl.jpg")) . "')",$newdb);
 				$loginpicturecontentid = $newdb->lastInsertId();
@@ -221,6 +222,16 @@ if (CheckFormSubmit($f,$s)){
 							('_loginpicturecontentid', '" . $loginpicturecontentid . "')";
 				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
 
+				// Subscriber Login Picture
+				QuickUpdate("INSERT INTO content (contenttype, data) values
+							('image/gif', '" . base64_encode(file_get_contents("img/header_highered3.gif")) . "')",$newdb);
+				$subscriberloginpicturecontentid = $newdb->lastInsertId();
+
+				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+							('_subscriberloginpicturecontentid', '" . $subscriberloginpicturecontentid . "')";
+				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
+
+				// Product Name
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 							('_productname', ?)";
 				QuickUpdate($query, $newdb, array($defaultproductname)) or dieWithError(" SQL: " . $query, $newdb);

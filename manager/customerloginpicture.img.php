@@ -12,8 +12,12 @@ if (isset($_GET['id'])) {
 	exit();
 }
 
+$setting = "_loginpicturecontentid";
+if (isset($_GET['subscriber'])) {
+	$setting = "_subscriberloginpicturecontentid";
+}
 
-$query = "select c.contenttype, c.data from content c inner join setting s on (s.value = c.id) where s.name = '_loginpicturecontentid'";
+$query = "select c.contenttype, c.data from content c inner join setting s on (s.value = c.id) where s.name = '".$setting."'";
 $row = QuickQueryRow($query, false, $custdb);
 if ($row) {
 	$data = base64_decode($row[1]);

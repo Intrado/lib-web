@@ -169,6 +169,17 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					$fileerror=true;
 				}
 			}
+			$subscriberloginpicturename = "";
+			if (isset($_FILES['uploadsubscriberloginpicture']) && $_FILES['uploadsubscriberloginpicture']['tmp_name']) {
+
+				$subscriberloginpicturename = secure_tmpname("uploadsubscriberloginpicture",".img");
+				if (!move_uploaded_file($_FILES['uploadsubscriberloginpicture']['tmp_name'], $subscriberloginpicturename)) {
+					$fileerror = true;
+				} else if (!is_file($subscriberloginpicturename) || !is_readable($subscriberloginpicturename)) {
+					$fileerror = true;
+				}
+			}
+			
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' AND id != $currentid")) {
@@ -293,6 +304,17 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 									('" . $_FILES['uploadloginpicture']['type'] . "', '" . base64_encode($newloginpicturefile) . "')", $custdb);
 						$loginpicturecontentid = $custdb->lastInsertId();
 						setCustomerSystemSetting('_loginpicturecontentid', $loginpicturecontentid, $custdb);
+					}
+				}
+
+				// Subscriber Login image
+				if ($subscriberloginpicturename) {
+					$newsubscriberloginpicturefile = file_get_contents($subscriberloginpicturename);
+					if($newsubscriberloginpicturefile){
+						QuickUpdate("INSERT INTO content (contenttype, data) values
+									('" . $_FILES['uploadsubscriberloginpicture']['type'] . "', '" . base64_encode($newsubscriberloginpicturefile) . "')", $custdb);
+						$subscriberloginpicturecontentid = $custdb->lastInsertId();
+						setCustomerSystemSetting('_subscriberloginpicturecontentid', $subscriberloginpicturecontentid, $custdb);
 					}
 				}
 
@@ -584,6 +606,15 @@ foreach($languages as $index => $language){
 <tr>
 	<td>New Login Picture:</td>
 	<td><input type='file' name='uploadloginpicture' size='30'></td>
+</tr>
+
+<tr>
+	<td>Subscriber Login Picture:</td>
+	<td><img width="100px" src='customerloginpicture.img.php?subscriber&id=<?=$currentid?>'></td>
+</tr>
+<tr>
+	<td>New Subscriber Login Picture:</td>
+	<td><input type='file' name='uploadsubscriberloginpicture' size='30'></td>
 </tr>
 
 <tr>
