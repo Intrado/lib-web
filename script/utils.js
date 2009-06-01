@@ -316,3 +316,36 @@ function submitForm (formname,section,value) {
 	}
 }
 
+//Ajax Request Class with Cache
+var AjaxCache = Class.create({
+	// Initialize Cache
+	initialize: function() {
+		this.cachedata = new Hash(); 
+	},	
+	// Request Data, if exists, take the cache value otherwise initiate with ajax	
+	request: function(uri,ajaxhandler,usecache) {
+		function setCacheValue(result) {
+			this.cachedata.set(uri,result);
+			ajaxhandler(result);
+		}
+		
+		usecache = typeof(usecache) != 'undefined' ? usecache : true;
+		if(usecache) {
+			var returnvalue = this.cachedata.get(uri);
+			if(returnvalue) {
+				ajaxhandler(returnvalue);
+				return;
+			}
+		}
+		new Ajax.Request(uri, {
+			method:'get',
+			onSuccess: setCacheValue.bindAsEventListener(this)
+		});
+		
+	
+	},
+	remove: function(uri) {
+		unset(uri);
+	}
+});
+
