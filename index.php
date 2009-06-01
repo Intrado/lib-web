@@ -108,7 +108,7 @@ if ($userid && $userid != -1) {
 
 $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
 
-$TITLE="Login";
+$TITLE=_L("Login");
 //primary colors are pulled in login top
 include_once("logintop.inc.php");
 if ($IS_COMMSUITE) {
