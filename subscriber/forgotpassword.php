@@ -48,7 +48,7 @@ if($generalerror){
 if(!$success){
 ?>
 <form method="POST" action="forgotpassword.php<?echo $appendcustomerurl;?>" name="forgotpassword">
-	<table width="100%" style="color: #365F8D;" >
+	<table width="100%" style="color: #<?=$primary?>;" >
 		<tr>
 			<td colspan="2""><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 		</tr>

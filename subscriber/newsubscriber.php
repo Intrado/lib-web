@@ -16,14 +16,6 @@ require_once("../obj/Phone.obj.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
-$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
-$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
-$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
-$_SESSION['colorscheme']['_brandprimary'] = "26477D";
-$_SESSION['colorscheme']['_brandratio']   = ".3";
-
-
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
 $appendcustomerurl = "";
 if (isset($_GET['u'])) {
@@ -213,7 +205,7 @@ if (errors)
 <h1><?= $errors ? "This form contains some errors" : "" ?></h1>
 </noscript>
 
-		<table width="100%" style="color: #365F8D;" >
+		<table width="100%" style="color: #<?=$primary?>;" >
 			<tr>
 				<td><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 			</tr>

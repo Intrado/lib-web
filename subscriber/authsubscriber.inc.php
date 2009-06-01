@@ -34,6 +34,39 @@ function pearxmlrpc($method, $params) {
 	return $data;
 }
 
+function getCustomerData($url) {
+	$params = array(new XML_RPC_Value($url, 'string'));
+	$method = "SubscriberServer.subscriber_getCustomerData";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['schememap'];
+	}
+	return false;
+}
+
+function getCustomerLogo($url) {
+	$params = array(new XML_RPC_Value($url, 'string'));
+	$method = "SubscriberServer.subscriber_getCustomerLogo";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['schememap'];
+	}
+	return false;
+}
+
+function getCustomerLoginPicture($url) {
+	$params = array(new XML_RPC_Value($url, 'string'));
+	$method = "SubscriberServer.subscriber_getCustomerLoginPicture";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['schememap'];
+	}
+	return false;
+}
+
 
 function subscriberCreateAccount($customerurl, $username, $password, $options) {
 //	$customerurl = "";
@@ -141,6 +174,15 @@ function subscriberPrepareNewPhone($newphone, $options) {
 	return false; // failure
 }
 
+// disable/close the active account then logout
+function subscriberCloseAccount($password) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'));
+	$method = "SubscriberServer.subscriber_closeAccount";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
+
 
 function subscriberGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));
@@ -188,7 +230,6 @@ function doDBConnect($result) {
 		// TODO set charset
 		$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
 		$_dbcon->query($setcharset);
-		
 		return true;
 	} catch (PDOException $e) {
 		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . $e->getMessage());
@@ -197,7 +238,7 @@ function doDBConnect($result) {
 }
 
 
-function doStartSession($subscriberID = false) {
+function doStartSession() {
 	$todo = "todo"; // TODO unique name, maybe use the subscriber name
 	session_name($todo . "_session");
 	session_start();
@@ -206,34 +247,6 @@ function doStartSession($subscriberID = false) {
 		@date_default_timezone_set($_SESSION['timezone']);
 		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 	}
-	
-	if ($subscriberID) {
-		$_SESSION['subscriberid'] = $subscriberID;
-		$_SESSION['personid'] = $pid = QuickQuery("select personid from subscriber where id=?", false, array($subscriberID));
-		$_SESSION['custname'] = QuickQuery("select value from setting where name='displayname'");		
-	
-		$firstnameField = FieldMap::getFirstNameField();
-		$lastnameField = FieldMap::getLastNameField();
-	
-		$_SESSION['subscriber.username'] = QuickQuery("select username from subscriber where id=?", false, array($subscriberID));
-		$_SESSION['subscriber.firstname'] = QuickQuery("select ".$firstnameField." from person where id=?", false, array($pid));
-		$_SESSION['subscriber.lastname'] = QuickQuery("select ".$lastnameField." from person where id=?", false, array($pid));
-	
-		$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
-		$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
-		$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
-		$_SESSION['colorscheme']['_brandprimary'] = "26477D";
-		$_SESSION['colorscheme']['_brandratio']   = ".3";
-		
-		$prefs = QuickQuery("select preferences from subscriber where id=?", false, array($subscriberID));
-		$preferences = json_decode($prefs, true);
-		if (isset($preferences['_locale']))
-			$_SESSION['_locale'] = $preferences['_locale'];
-		else
-			$_SESSION['_locale'] = "en_US"; // US English
-			
-	}
 }
-
 
 ?>

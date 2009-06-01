@@ -64,6 +64,15 @@ function doNavTabs ($navtree) {
 	}
 }
 
+function doLogo () {
+	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
+	$clickurl = getSystemSetting("_logoclickurl");
+	if($clickurl != "" && $clickurl != "http://")
+		echo '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php?hash=' . $logohash .'></a>';
+	else
+		echo '<img src="logo.img.php?hash=' . $logohash .'">';
+}
+
 doNavTabs($NAVTREE);
 
 
@@ -72,43 +81,50 @@ doNavTabs($NAVTREE);
 ////////////////////////////////////////////////////////////////////////////////
 header('Content-type: text/html; charset=UTF-8') ;
 ?>
-<script>
-	var _brandtheme = "<?=getBrandTheme();?>";
-</script>
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
-	<title><?=_L("SchoolMessenger SUBSCRIBER")?>: <?= $PAGETITLE ?></title>
+	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 	
 	<script src='../script/utils.js'></script>
 	<script src='../script/sorttable.js'></script>
 	<script src="../script/prototype.js" type="text/javascript"></script>
 	<script src="../script/scriptaculous.js" type="text/javascript"></script>
 	<script src="../script/form.js.php" type="text/javascript"></script>
-    
+
 	<link href="../css/form.css.php" type="text/css" rel="stylesheet">
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='css.php' type='text/css' rel='stylesheet' media='screen'>
+	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 </head>
 <body>
+	<script>
+		var _brandtheme = "<?=getBrandTheme();?>";
+	</script>
+
 	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
 
 <!-- ********************************************************************* -->
 
-	<div>
-		<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg2.gif">
-		<tr>
-		<td><img src="img/logo.gif"></td>
+<div>
+	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif" >
+		<tr><td style="font-size:8px;">&nbsp;</td></tr>
+	</table>
+</div>
+
+<div>
+	<table width="100%" border=0 cellpadding=0 cellspacing=0>
+	<tr>
+		<td><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
 <?
-		if(!isset($hidenav) || !$hidenav){
+		if (!isset($hidenav) || !$hidenav) {
 ?>
-		<td><div class="custname"><?= isset($_SESSION['custname']) ? escapehtml($_SESSION['custname']) : ""; ?></div></td>
+		<td><div class="custname"><?= escapehtml($_SESSION['custname']); ?></div></td>
 <?
 		}
 ?>
-		</tr>
-		</table>
-	</div>
+	</tr>
+	</table>
+</div>
 
 	<div class="navmenuspacer">
 	<div class="navmenu">
@@ -133,7 +149,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<?= $SUBTABS ?>
 </div>
 
-	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/3dblue/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
 	<div class="content">

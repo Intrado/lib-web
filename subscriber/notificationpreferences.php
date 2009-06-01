@@ -129,6 +129,7 @@ function fmt_actions ($obj, $name) {
 
 $formdata = array();
 
+// TODO what if email sequence0 is deleted? could have set up account, added email, changed account to use email1 then removed e0
 $values = QuickQueryList("select jobtypeid from contactpref where personid=? and type='email' and sequence=0 and enabled=1", false, false, array($pid));
 
 $formdata["jobtypes"] = array(
@@ -196,7 +197,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$values[] = "(" . $pid . "," . $jtid . ",'sms'," . $sms->sequence . ", 1)";
 			}	
 		}
-		
+// TODO may need to insert enabled=0 contactpref for those unselected jobtypes, or uses admin default jobtypepref
 		QuickUpdate("Begin");
 		QuickUpdate("delete from contactpref where personid=?", false, array($pid));
 		if (count($values))

@@ -47,6 +47,8 @@ $formhtmlemail = escapehtml($_SESSION['subscriber.username']) . '<br>' .
 
 $formhtmlpass = '<a href="changepass.php">Change Password</a><br>';
 
+$formhtmlclose = '<a href="closeaccount.php">Permanently close my account</a><br>';
+
 $formdata = array();
 
 $formdata["changeemail"] = array(
@@ -57,6 +59,11 @@ $formdata["changeemail"] = array(
 $formdata["changepass"] = array(
    	"label" => "Account Password",
    	"control" => array("FormHtml","html" => $formhtmlpass),
+	"helpstep" => 1
+);
+$formdata["closeaccount"] = array(
+   	"label" => "Account Status",
+   	"control" => array("FormHtml","html" => $formhtmlclose),
 	"helpstep" => 1
 );
 

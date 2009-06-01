@@ -1,42 +1,26 @@
 <?
 $isNotLoggedIn = 1;
 
-global $_SESSION;
-$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
-$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
-$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
-$_SESSION['colorscheme']['_brandprimary'] = "26477D";
-$_SESSION['colorscheme']['_brandratio']   = ".3";
-
-
+require_once("authsubscriber.inc.php");
 require_once("common.inc.php");
+require_once("subscriberutils.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/FieldMap.obj.php");
 
 
-
-
-
-// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "";
-if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".urlencode($_GET['u']);
-}
-
 $changeuser = false;
 $forgot = false;
 
-
-if(isset($_GET['c'])){
+if (isset($_GET['c'])) { // activate change username
 	$changeuser = true;
 	require_once("activate.php");
 	exit();
-} else if(isset($_GET['f'])){
+} else if (isset($_GET['f'])) { // activate reset password
 	$forgot = true;
 	require_once("activate.php");
 	exit();
-} else if(isset($_GET['n'])){
+} else if (isset($_GET['n'])) { // activate new account
 	require_once("activate.php");
 	exit();
 }
@@ -59,7 +43,7 @@ if (isset($_GET['logout'])) {
 
 if ($SETTINGS['feature']['has_ssl']) {
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
-		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php".$appendcustomerurl);
+		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php");
 	}
 }
 
@@ -86,7 +70,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
 	$sessionstarted = true;
 	if (isset($_SESSION['subscriberid'])) {
-		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php'.$appendcustomerurl;
+		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
 		unset($_SESSION['lasturi']);
 		redirect($redirpage);
     }
@@ -96,8 +80,9 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
 if ($id) {
 	if (!$sessionstarted)
-		doStartSession($id);
-
+		doStartSession();
+	$_SESSION['subscriberid'] = $id;
+	loadSubscriberDisplaySettings();
 	redirect("start.php");
 }
 
@@ -107,8 +92,8 @@ $TITLE= "Sign In";
 require_once("logintop.inc.php");
 
 ?>
-<form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
-	<table style="color: #365F8D;" >
+<form method="POST" action="index.php" name="login">
+	<table style="color: #<?=$primary?>;" >
 		<tr>
 			<td colspan="3">
 				<div style="font-size: 20px; font-weight: bold;">SchoolMessenger Self Signup</div>
@@ -135,7 +120,7 @@ require_once("logintop.inc.php");
 		<tr>
 			<td>Password&nbsp;(case&nbsp;sensitive):</td>
 			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
-			<td align="left"><a href="forgotpassword.php<?echo $appendcustomerurl;?>">Forgot your password? Click Here</a></td>
+			<td align="left"><a href="forgotpassword.php">Forgot your password? Click Here</a></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -156,7 +141,7 @@ require_once("logintop.inc.php");
 			<td colspan="3">First time accessing the SchoolMessenger Self Signup?</td>
 		</tr>
 		<tr>
-			<td colspan="3"><a href="newsubscriber.php<?echo $appendcustomerurl;?>"><b>Sign up now</b></a></td>
+			<td colspan="3"><a href="newsubscriber.php"><b>Sign up now</b></a></td>
 		</tr>
 	</table>
 </form>

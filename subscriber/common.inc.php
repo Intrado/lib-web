@@ -13,9 +13,6 @@ if ($IS_COMMSUITE) {
 	$BASEURL = "/$CUSTOMERURL";
 } /*CSDELETEMARKER_END*/
 
-$INBOUND_MSGCALLBACK = false; // set only when customer has callback feature
-
-
 require_once("XML/RPC.php");
 require_once("authsubscriber.inc.php");
 require_once("subscribersessionhandler.inc.php");
@@ -29,7 +26,6 @@ require_once("../obj/Form.obj.php");
 require_once("../obj/FormItem.obj.php");
 require_once("../obj/Validator.obj.php");
 
-
 if (!isset($isNotLoggedIn)) {
 	// we are logged in
 
@@ -41,25 +37,12 @@ if (!isset($isNotLoggedIn)) {
 		//index page will redirect to ssl
 		redirect("index.php".$logout);
 	}
-	$sid = false;
-	if (isset($_SESSION['subscriberid']))
-		$sid = $_SESSION['subscriberid'];
 		
-	doStartSession($sid);
+	doStartSession();
 	
 	if (!isset($_SESSION['subscriberid'])) {
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
 		redirect("./".$logout);
-    }
-    
-	// store the customer's toll free inbound number
-	$n = QuickQuery("select value from setting where name='inboundnumber'");
-	$INBOUND_ACTIVATION = $n;
-	
-    // find if this customer has message callback
-    if (QuickQuery("select value from setting where name='_hascallback'") == "1") {
-	    	if ($n != false && $n != "")
-   			$INBOUND_MSGCALLBACK = $n;
     }
 } // else we are not logged in
 

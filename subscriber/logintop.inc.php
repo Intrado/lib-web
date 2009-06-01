@@ -1,3 +1,15 @@
+<?
+$scheme = getCustomerData($CUSTOMERURL);
+if ($scheme == false) {
+	$scheme = array("_brandtheme" => "3dblue",
+					"colors" => array("_brandprimary" => "26477D"));
+}
+$primary = $scheme['colors']['_brandprimary'];
+
+$CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "";
+$custname = isset($scheme['customerName']) ? $scheme['customerName'] : "";
+?>
+
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
@@ -11,7 +23,7 @@
     
 	<link href="../css/form.css.php" type="text/css" rel="stylesheet">
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='css.php' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css.php?skipcommon' type='text/css' rel='stylesheet' media='screen'>
 </head>
 
 <?
@@ -52,17 +64,22 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 <?
 } else {
 ?>
-<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #365F8D;'>
+<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #<?=$primary?>;'>
 	<table border=0 cellpadding=0 cellspacing=0 width="100%">
-	<tr style="background-color: #365F8D;">
-		<td colspan="2"><div style="padding-left:5px; padding-bottom:5px;"><img src="img/school_messenger.gif" /></div></td>
+	<tr style="background-color: #FFFFFF;">
+		<td><div style="padding-left:5px; padding-bottom:5px;"><img src="logo.img.php" /></div></td>
+		<td>
+			<br>
+			<div style="padding-left:15px; font-size: 20px; font-weight: bold; color: #<?=$primary?>;"><?=$custname?></div>
+			<br>
+		</td>
 	</tr>
 	<tr style="background-color: #666666;">
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="img/header_highered3.gif"></td>
-		<td style="background-color: #D4DDE2; color: #365F8D;">
+		<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="loginpicture.img.php"></td>
+		<td style="background-color: #D4DDE2; color: #<?=$primary?>;">
 			<table>
 				<tr>
 					<td width="15px">&nbsp;</td>

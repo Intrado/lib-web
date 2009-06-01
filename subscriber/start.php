@@ -112,8 +112,8 @@ require_once("nav.inc.php");
 	?><div><b><?=_L("Messages from the last 30 days")?></b></div><br><?
 
 	// if customer has message callback feature, let the user know about it
-	if ($INBOUND_MSGCALLBACK) {
-		echo _L('You may call %s at any time to listen to your phone messages.', Phone::format($INBOUND_MSGCALLBACK)) . "<BR><BR>";
+	if (getCustomerSystemSetting("_hascallback", "0")) {
+		echo _L('You may call %s at any time to listen to your phone messages.', Phone::format(getCustomerSystemSetting("inboundnumber"))) . "<BR><BR>";
 	}
 
 	$counter = 1000;
