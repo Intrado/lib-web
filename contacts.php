@@ -227,8 +227,8 @@ startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 
 					<td>
 						<table>
 							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "criteria", "onclick='hide(\"singleperson\"); show(\"searchcriteria\")'");?> By Criteria</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "person", "onclick='hide(\"searchcriteria\"); show(\"singleperson\")'");?> By Person</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "criteria", "onclick='$(\"singleperson\").hide(); $(\"searchcriteria\").show()'");?> By Criteria</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "person", "onclick='$(\"searchcriteria\").hide(); $(\"singleperson\").show()'");?> By Person</td>
 							</tr>
 						</table>
 					</td>
@@ -281,9 +281,9 @@ startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 
 <script>
 	<?
 		if($searchby == "person"){
-			?>hide("searchcriteria");<?
+			?>$("searchcriteria").hide();<?
 		} else {
-			?>hide("singleperson");<?
+			?>$("singleperson").hide();<?
 		}
 	?>
 </script>
