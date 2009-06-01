@@ -161,7 +161,7 @@ startWindow("Labels" . help($hoverHelpLinkType));
 			<td><?=format_delivery_type($type)?>&nbsp;<?=$i+1?></td>
 			<td>
 				<?
-					NewFormItem($f, $s, $type . $i, "selectstart", NULL, NULL, "onchange='if(this.value == \"other\"){ show(\"otherlabel$i\") } else { hide(\"otherlabel$i\") }'");
+					NewFormItem($f, $s, $type . $i, "selectstart", NULL, NULL, "onchange='if(this.value == \"other\"){ $(\"otherlabel$i\").show() } else { $(\"otherlabel$i\").hide() }'");
 					NewFormItem($f, $s, $type . $i, 'selectoption'," -- None -- ", "");
 
 
