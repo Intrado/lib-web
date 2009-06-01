@@ -387,8 +387,8 @@ if ($noimportdata) { ?>
 	</tr>
 </table>
 <br>
-<a style="display:none"id="editmappinglink" href="#" onclick="hide('viewdata'); show('datamapping'); hide('editmappinglink'); show('viewdatalink'); return undefined;">Switch to Mapping Editor</a>
-<a id="viewdatalink" href="#" onclick="hide('datamapping'); show('viewdata'); show('editmappinglink'); hide('viewdatalink'); return undefined;">Switch to Data View</a>
+<a style="display:none"id="editmappinglink" href="#" onclick="$('viewdata').hide(); $('datamapping').show(); $('editmappinglink').hide(); $('viewdatalink').show(); return undefined;">Switch to Mapping Editor</a>
+<a id="viewdatalink" href="#" onclick="$('datamapping').hide(); $('viewdata').show(); $('editmappinglink').show(); $('viewdatalink').hide(); return undefined;">Switch to Data View</a>
 </div>
 
 <div id="datamapping">
@@ -519,18 +519,18 @@ if ($noimportdata) { ?>
 <script>
 
 function switchactiondata (num,newaction) {
-	hide("actiondata_" + num + "_lookup");
-	hide("actiondata_" + num + "_staticvalue");
-	hide("actiondata_" + num + "_date");
+	$("actiondata_" + num + "_lookup").hide();
+	$("actiondata_" + num + "_staticvalue").hide();
+	$("actiondata_" + num + "_date").hide();
 
-	show("actiondata_" + num + "_" + newaction);
+	$("actiondata_" + num + "_" + newaction).show();
 
 	var select = new getObj("select_" + num).obj;
 
 	if (newaction == 'staticvalue' || newaction == 'curdate') {
-		hide("filedata_" + num);
+		$("filedata_" + num).hide();
 	} else {
-		show("filedata_" + num);
+		$("filedata_" + num).show();
 		setdata(num);
 	}
 }
