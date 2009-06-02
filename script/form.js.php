@@ -395,6 +395,10 @@ function form_enable_helper(event) {
 	var form = event.findElement("form");
 	var formvars = document.formvars[form.name];
 	var helper = $(form.id + '_helper');
+	var startbtn = $(form.id + '_startguide');
+	
+	if (startbtn)
+		new Effect.Fade(startbtn,{duration: 0.5});
 	
 	//if user clicks start guide with it already open, just go to the first item //TODO go to a clicked (i) icon
 	if (!formvars.helperdisabled) {
@@ -413,7 +417,7 @@ function form_enable_helper(event) {
 	
 	form.select("legend").map(function (e) {
 		e = $(e);
-		e.style.display = "inline";
+		//e.style.display = "inline";
 	});
 	
 	form.select("fieldset").map(function (e) {
@@ -428,7 +432,11 @@ function form_disable_helper(event) {
 	var form = event.findElement("form");
 	var formvars = document.formvars[form.name];
 	var helper = $(form.id + '_helper');
+	var startbtn = $(form.id + '_startguide');
 	
+	if (startbtn)
+		new Effect.Appear(startbtn,{duration: 0.5});
+
 	formvars.helperdisabled = true;
 	formvars.currentstep = 0;
 	

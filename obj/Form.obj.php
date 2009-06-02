@@ -133,10 +133,10 @@ class Form {
 		
 		$str = '
 		<div class="newform_container">
-		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'" style="width: 100%; /* TODO fix main css */">
+		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
 		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">
-		<div style="clear: both; margin-top: 5px;">'.($this->helpsteps ? icon_button("Start Guide","information","return form_enable_helper(event);") : "").'</div>
-		<table summary="Form" width="100%" cellspacing="0" table-layout="fixed" style="border: 0px; padding: 0px; margin: 0px;"><tr><td valign=top> <!-- FORM CONTENT -->';
+		<div id="'.$this->name.'_startguide" style="float: right;  right: 0px; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
+		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign=top> <!-- FORM CONTENT -->';
 		
 		foreach ($this->formdata as $name => $itemdata) {
 			//check for section titles

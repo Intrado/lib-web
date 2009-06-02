@@ -26,37 +26,37 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 require("jobwizard.inc.php");
 
 $wizdata = array(
-	"basic" => new JobWiz_basic(_L("New Job Wizard")),
-	"list" => new JobWiz_listChoose(_L("Select An Existing List")),
-	"message" => array(
-		"pick" => new JobWiz_messageType(_L("Choose Destination Types")),
-		"select" => new JobWiz_messageSelect(_L("Select Message Types")),
-		"phone"	=> array(
-			"pick" => new JobWiz_messagePhoneChoose(_L("Select A Message")),
-			"text" =>	new JobWiz_messagePhoneText(_L("Type Phone Message")),
-			"translate" => new JobWiz_messagePhoneTranslate(_L("View and Edit Translations")),
-			"callme" => new JobWiz_messagePhoneCallMe(_L("Record Phone Message"))
-		),
-		"email"	=> array(
-			"pick" => new JobWiz_messageEmailChoose(_L("Select A Message")),
-			"text"	 => new JobWiz_messageEmailText(_L("Type Email Message")),
-			"translate" => new JobWiz_messageEmailTranslate(_L("View and Edit Translations")),
-			"attachment" => new JobWiz_messageEmailAttachment(_L("Select File Attachment"))
-		),
-		"sms" => array(
-			"pick" => new JobWiz_messageSmsChoose(_L("Select A Message")),
-			"text" => new JobWiz_messageSmsText(_L("SMS Message"))
-		)
+	"basic" => new JobWiz_basic(_L("Start")),
+	"list" => new JobWiz_listChoose(_L("List")),
+	"message" => new WizSection("Message"),array(
+		"pick" => new JobWiz_messageType(_L("Delivery Methods")),
+		"select" => new JobWiz_messageSelect(_L("Message Source")),
+		"phone"	=> new WizSection ("Phone",array(
+			"pick" => new JobWiz_messagePhoneChoose(_L("Existing Message")),
+			"text" =>	new JobWiz_messagePhoneText(_L("Text-to-speech")),
+			"translate" => new JobWiz_messagePhoneTranslate(_L("Translations")),
+			"callme" => new JobWiz_messagePhoneCallMe(_L("Record"))
+		)),
+		"email"	=> new WizSection ("Email",array(
+			"pick" => new JobWiz_messageEmailChoose(_L("Existing Message")),
+			"text"	 => new JobWiz_messageEmailText(_L("Compose Email")),
+			"translate" => new JobWiz_messageEmailTranslate(_L("Translations")),
+			"attachment" => new JobWiz_messageEmailAttachment(_L("Attachment"))
+		)),
+		"sms" => new WizSection ("Txt",array(
+			"pick" => new JobWiz_messageSmsChoose(_L("Existing Message")),
+			"text" => new JobWiz_messageSmsText(_L("Compose Txt"))
+		))
 	),
-	"schedule" => array(
-		"options" => new JobWiz_scheduleOptions(_L("Delivery Options")),
-		"date" => new JobWiz_scheduleDate(_L("Delivery Date")),
-		"template" => new JobWiz_scheduleTemplate(_L("Template Options"))
-	),
-	"submit" => array(
+	"schedule" => new WizSection ("Schedule",array(
+		"options" => new JobWiz_scheduleOptions(_L("Schedule Options")),
+		"date" => new JobWiz_scheduleDate(_L("Schedule Date")),
+		"template" => new JobWiz_scheduleTemplate(_L("Template"))
+	)),
+	"submit" => new WizSection ("Confirm",array(
 		"test" => new JobWiz_submitTest(_L("Test Notification")),
-		"confirm" => new JobWiz_submitConfirm(_L("Confirm and Submit"))
-	)	
+		"confirm" => new JobWiz_submitConfirm(_L("Review and Confirm"))
+	))
 );
 
 $wizard = new Wizard("wizard_job",$wizdata);
@@ -73,13 +73,15 @@ if ($wizard->isDone()) {
 $PAGE = _L("notifications").":"._L("jobs");
 $TITLE = _L('Job Wizard');
 
+
+require_once("nav.inc.php");
+
 ?>
 <script>
 <? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValCallMePhone","ValEasycall","ValLists"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 
-require_once("nav.inc.php");
 startWindow($wizard->getStepData()->title);
 echo $wizard->render();
 endWindow();

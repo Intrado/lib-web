@@ -7,20 +7,22 @@ class Wizard {
 	var $curstep;
 	var $datachange;
 	var $done;
+	var $finish;
 	
-	function Wizard ($name, $wizdata, $curstep = false) {
+	function Wizard ($name, $wizdata, $finish) {
 		$this->name = $name;
 		$this->wizdata = $wizdata;
 		$this->filteredwizdata = $this->filter();
 		$this->steplist = $this->getStepList();
-		if (!$curstep) {
-			if (isset($_SESSION[$name]['step'])) {
-				$curstep = $_SESSION[$name]['step'];
-			} else {
-				$curstep = $this->steplist[0];
-			}
+		if (isset($_SESSION[$name]['step'])) {
+			$curstep = $_SESSION[$name]['step'];
+		} else {
+			$curstep = $this->steplist[0];
 		}
 		$this->curstep = $curstep;
+		
+		$this->wizdata['finish'] = $finish;
+		$this->filteredwizdata['finish'] = $finish;
 	}
 	
 	function getStepData ($curstep = null) {
@@ -37,7 +39,7 @@ class Wizard {
 		if (($pos = strpos($curstep,"/")) !== false) {
 			$first = substr($curstep,0,$pos);
 			$tail = substr($curstep,$pos+1);
-			return $this->_getStepData($wizdata[$first],$tail);
+			return $this->_getStepData($wizdata[$first]->children,$tail);
 		} else {
 			return $wizdata[$curstep];
 		}
@@ -53,8 +55,8 @@ class Wizard {
 			$list = array();
 		
 		foreach ($wizdata as $wizstep => $wizstepdata) {
-			if (is_array($wizstepdata)) {
-				$this->_getStepList($wizstepdata,$curstep . "/" . $wizstep,false);
+			if ($wizstepdata instanceof WizSection) {
+				$this->_getStepList($wizstepdata->children,$curstep . "/" . $wizstep,false);
 			} else {
 				$list[] = $curstep . "/" . $wizstep;
 			}
@@ -68,7 +70,8 @@ class Wizard {
 	}
 	
 	function setCurrentStep ($curstep) {
-		$this->curstep = $curstep;
+		if (in_array($curstep,$this->steplist))
+			$this->curstep = $curstep;
 	}
 	
 	function getNextStep () {
@@ -110,11 +113,11 @@ class Wizard {
 	function _filter ($wizdata, $curstep = "") {
 		$newwizdata = array();
 		foreach ($wizdata as $wizstep => $wizstepdata) {
-			if (is_array($wizstepdata)) {
-				$substeps = $this->_filter($wizstepdata,$curstep . "/" . $wizstep);
+			if ($wizstepdata instanceof WizSection) {
+				$substeps = $this->_filter($wizstepdata->children,$curstep . "/" . $wizstep);
 				if (count($substeps) > 0)
-					$newwizdata[$wizstep] = $substeps;
-			} else {
+					$newwizdata[$wizstep] = new WizSection($wizstepdata->title,$substeps);
+			} else if ($wizstepdata instanceof WizStep) {
 				if (isset($_SESSION[$this->name]['data']) && $wizstepdata->isEnabled($_SESSION[$this->name]['data'],$curstep . "/" . $wizstep))
 					$newwizdata[$wizstep] = $wizstepdata;
 			}
@@ -136,11 +139,8 @@ class Wizard {
 		//real buttons		
 		if ($this->getPrevStep())
 			$form->buttons[] = submit_button("Previous","prev","arrow_left");
-		$form->buttons[] = icon_button("Cancel","cross","if(confirm('Are you sure you want to cancel?')) window.location='?cancel';");
-		if ($this->getNextStep())
-			$form->buttons[] = submit_button("Next","next","arrow_right");
-		else
-			$form->buttons[] = submit_button("Done","done","accept");
+		$form->buttons[] = icon_button("Cancel","cross","if(confirm('".addslashes(_L("Are you sure you want to cancel?"))."')) window.location='?cancel';");
+		$form->buttons[] = submit_button("Next","next","arrow_right");
 		
 		//merge in any existing wizard post data
 		if (isset($_SESSION[$this->name]['data'][$this->curstep])) {
@@ -153,8 +153,64 @@ class Wizard {
 		return $form;
 	}
 	
+	
+	function _renderNav ($wizdata,$curstep = "",$depth = 0) {
+		$res = "";
+		$itemcount = 0;
+		
+		$res .= str_repeat("\t",$depth) . '<ol class="wiznav_'.$depth.'">' . "\n";
+		foreach ($wizdata as $wizstep => $wizstepdata) {
+			$thisstep = $curstep . "/" . $wizstep;
+			if ($wizstepdata instanceof WizSection) {
+				$subres = $this->_renderNav($wizstepdata->children,$thisstep,$depth + 1,false);
+				if ($subres) {
+					$itemcount++;
+					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.'"><span class="wiznav_header">' . $wizstepdata->title . ":</span>\n";
+					$res .= $subres;
+					$res .= str_repeat("\t",$depth+1) . '</li>' . "\n";
+				}
+			} else {
+				$stepnum = array_search($thisstep,$this->steplist);
+				$curstepnum = array_search($this->curstep,$this->steplist);
+				
+				if ($stepnum === $curstepnum) {
+					$itemcount++;
+					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_active" ><img src="img/icons/diagona/10/131.gif" alt="">'.$this->getStepData($thisstep)->title.'</li>' . "\n";
+				} else if($stepnum !== false && $stepnum < $curstepnum) {
+					$itemcount++;
+					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_enabled"><a href="?step='.$thisstep.'"><img src="img/icons/diagona/10/102.gif" alt="">'.$this->getStepData($thisstep)->title.'</a></li>' . "\n";
+				} else if ($stepnum !== false) {
+					$itemcount++;
+					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_disabled"><img src="img/icons/diagona/10/159.gif" alt="">'.$this->getStepData($thisstep)->title.'</li>' . "\n";
+				}
+			}
+		}
+		
+		$res .= str_repeat("\t",$depth) . '</ol><div style="clear: both;"></div>' . "\n";
+		
+		if ($itemcount)
+			return $res;
+		else
+			return "";
+	}
 	function render() {
-		return $this->getForm()->render();
+		$stepdata = $this->getStepData();
+		$navhtml = $this->_renderNav($this->wizdata);
+		
+		
+		if ($stepdata instanceof WizStep)
+			$mainhtml = $this->getForm()->render();
+		else if ($stepdata instanceof WizFinish)
+			$mainhtml = $stepdata->getFinishPage($_SESSION[$this->name]['data']);
+		
+		$res = '<table border="0" cellpadding="0" cellspacing="0" width="100%">
+					  <tr>
+						  <td valign="top" width="150px"">'.$navhtml.'</td>
+						  <td valign="top" width="auto">'.$mainhtml.'</td>
+					  </tr>
+				  </table>';
+		
+		return $res;
 	}
 	
 	function handleRequest () {
@@ -166,6 +222,7 @@ class Wizard {
 		}
 		
 		if (isset($_GET['step'])) {
+			//TODO check that the step is less than current step
 			$_SESSION[$this->name]['step'] = $_GET['step'];
 			$this->setCurrentStep($_GET['step']);
 		}
@@ -173,6 +230,10 @@ class Wizard {
 		if (isset($_GET['done'])) {
 			$this->done = true;
 		}
+		
+		//TODO check for WizFinish, or ?step=/finish, or ???
+		//TODO validate each form again?
+		//TODO call $stepdata->finish();
 		
 		$stepdata = $this->getStepData();
 		$step = $this->getCurrentStep();
@@ -214,13 +275,10 @@ class Wizard {
 						if ($next = $this->getNextStep())
 							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
 						else
-							$form->sendTo($_SERVER['SCRIPT_NAME']."?done");
+							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=/finish");
 					} else if ($button == "prev") {
 						if ($next = $this->getPrevStep())
 							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
-						
-					} else if ($button == "done") {
-						$form->sendTo($_SERVER['SCRIPT_NAME']."?done");
 					}
 				}
 			}
@@ -251,4 +309,28 @@ abstract class WizStep {
 	//returns a populated Form object. use wizdata to prepopulate appropriate fields
 	abstract function getForm($postdata, $curstep);
 }
+
+class WizSection {
+	var $title;
+	var $children;
+	function WizSection($title,$children) {
+		$this->title = $title;
+		$this->children = $children;
+	}
+}
+
+abstract class WizFinish {
+	var $title;
+	
+	function WizFinish ($title) {
+		$this->title = $title;
+	}
+	
+	//called once
+	abstract function finish ($postdata);
+	
+	//may be called more than once
+	abstract function getFinishPage ($postdata);
+}
+
 ?>

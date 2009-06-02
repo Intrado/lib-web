@@ -14,7 +14,7 @@ header("Cache-Control: private");
 form.newform {
 	position: relative; /* allows offsetParent to be correct for helper*/
 	float: left;
-	width: 75%; /* leave room for guide */
+	width: 100%;
 	overflow: auto;
 	clear: both;
 }
@@ -42,6 +42,8 @@ form.newform {
 	font-size: 9pt;
 	font-family: sans-serif;
 	padding: 5px;
+	max-height: 125px;
+	overflow: auto;
 }
 
 .helper .toolbar {
@@ -80,7 +82,6 @@ form.newform {
 .newform fieldset {
 	border: 1px outset;
 	padding: 5px;
-	margin-left: 15px;
 	
 	border: 0px;
 	padding: 0px;
@@ -174,4 +175,76 @@ form.newform {
 	font-size: 110%;
 	width: 90px;
 	vertical-align: top;
+}
+
+.wiznav_disabled {
+	color: gray;
+}
+
+.wiznav_disabled img {
+	padding-right: 3px;
+	vertical-align: top;
+}
+
+.wiznav_active {
+	font-weight: bold;
+	background-color: #def;
+}
+
+.wiznav_active img {
+	padding-right: 3px;
+	vertical-align: top;
+}
+
+.wiznav_enabled a {
+	text-decoration: none;
+}
+.wiznav_enabled a:hover {
+	text-decoration: underline;
+}
+
+.wiznav_enabled img {
+	padding-right: 3px;
+	vertical-align: top;
+}
+
+
+ol.wiznav_0 {
+	padding: 3px;
+	margin: 0px;
+	margin: 3px;
+	border: 1px outset;
+		
+	list-style: none;
+
+}
+li.wiznav_0 {
+	padding: 0px;
+	margin: 0px;
+}
+
+ol.wiznav_1 {
+	padding: 0px;
+	margin: 0px;
+	padding-left: 1em;
+	
+	list-style: none;
+
+	font-size: 80%;
+
+}
+li.wiznav_1 {
+	padding: 0px;
+	margin: 0px;
+}
+ol.wiznav_2 {
+	padding: 0px;
+	margin: 0px;
+	padding-left: 1em;
+	
+	list-style: none;
+}
+li.wiznav_2 {
+	padding: 0px;
+	margin: 0px;
 }
