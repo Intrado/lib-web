@@ -743,16 +743,16 @@ startWindow('User Information');
 if (GetFormData($f, $s, "radioselect") == "bydata") {
 	?>hide("bystaff");<?
 	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-		?>show("ruleform"); hide("mustapply");<?
+		?>$("ruleform").show(); $("mustapply").hide();<?
 	} else {
-		?>hide("ruleform"); show("mustapply");<?
+		?>$("ruleform").hide(); $("mustapply").show();<?
 	}
 } else {
 	?>show("bystaff");<?
 	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-		?>hide("ruleform"); show("mustapply");<?
+		?>$("ruleform").hide(); $("mustapply").show();<?
 	} else {
-		?>show("ruleform"); hide("mustapply");<?
+		?>$("ruleform").show(); $("mustapply").hide();<?
 	}
 }
 ?>
@@ -760,21 +760,21 @@ if (GetFormData($f, $s, "radioselect") == "bydata") {
 
 function toggleDataViewRestriction(bytype) {
 	if (bytype == "bydata") {
-		hide("bystaff");
+		$("bystaff").hide();
 <?
 if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-	?>show("ruleform"); hide("mustapply");<?
+	?>$("ruleform").show(); $("mustapply").hide();<?
 } else {
-	?>hide("ruleform"); show("mustapply");<?
+	?>$("ruleform").hide(); $("mustapply").show();<?
 }
 ?>
 	} else {
-		show("bystaff");
+		$("bystaff").show();
 <?
 if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-	?>hide("ruleform"); show("mustapply");<?
+	?>$("ruleform").hide(); $("mustapply").show();<?
 } else {
-	?>show("ruleform"); hide("mustapply");<?
+	?>$("ruleform").show(); $("mustapply").hide();<?
 }
 ?>
 	}
