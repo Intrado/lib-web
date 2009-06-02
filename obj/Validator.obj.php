@@ -204,12 +204,19 @@ class ValNumeric extends Validator {
 //
 // requires inc/utils.inc.php validEmail()
 //
+// optional args.domain to validate the address matches this domain
+//
 class ValEmail extends Validator {
 	
 	function validate ($value, $args) {
 		if (!validEmail($value))
 			return "$this->label is not a valid email format";
-
+			
+		if (isset($args['domain'])) {
+			$emaildomain = substr($value, strpos($value, "@")+1);
+			if ($args['domain'] != $emaildomain)
+				return "$this->label must use domain ".$args['domain'];
+		}
 		return true;
 	}
 	
@@ -221,8 +228,13 @@ class ValEmail extends Validator {
 				var emailregexp = "' . addslashes($addr_spec) . '";
 				var reg = new RegExp(emailregexp);
 				if (!reg.test(value))
-					return label + " is an invalid email format";
-
+					return label + " is an invalid email format";' .
+							'
+				if (args.domain) {
+					var emaildomain = value.substr(value.indexOf("@")+1);
+					if (emaildomain.toLowerCase() != args.domain.toLowerCase())
+						return label + " must use domain " + args.domain;
+				}
 				return true;
 			}';
 	}
