@@ -94,12 +94,12 @@ var Easycall = Class.create({
 		this.updateMessage();
 		switch(error) {
 			case "done":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" />Completed! "
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" />Completed! ";
 				$(this.formname+this.language+"_img").src = this.playimg;
 				break;
 			
 			case "messageexists":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />This message is already recorded "
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />This message is already recorded ";
 				$(this.formname+this.language+"_img").src = this.playimg;
 				break;
 			
@@ -168,7 +168,7 @@ var Easycall = Class.create({
 			messages[this.language] = this.messageid;
 			$(this.formname).value = Object.toJSON(messages);
 			$(this.formname+this.language+"_img").src = this.playimg;
-			$(this.formname+this.language+"_img").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this)); // TODO: preview message popup
+			$(this.formname+this.language+"_img").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
 		} else {
 			$(this.formname+this.language+"_img").src = this.exclamationimg;
 		}
