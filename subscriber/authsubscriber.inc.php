@@ -38,7 +38,7 @@ function getCustomerData($url) {
 	$params = array(new XML_RPC_Value($url, 'string'));
 	$method = "SubscriberServer.subscriber_getCustomerData";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
+	if ($result['result'] == "") {
 		// success
 		return $result['schememap'];
 	}
@@ -49,7 +49,7 @@ function getCustomerLogo($url) {
 	$params = array(new XML_RPC_Value($url, 'string'));
 	$method = "SubscriberServer.subscriber_getCustomerLogo";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
+	if ($result['result'] == "") {
 		// success
 		return $result['schememap'];
 	}
@@ -60,7 +60,7 @@ function getCustomerLoginPicture($url) {
 	$params = array(new XML_RPC_Value($url, 'string'));
 	$method = "SubscriberServer.subscriber_getCustomerLoginPicture";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) {
+	if ($result['result'] == "") {
 		// success
 		return $result['schememap'];
 	}
