@@ -741,14 +741,14 @@ startWindow('User Information');
 
 <?
 if (GetFormData($f, $s, "radioselect") == "bydata") {
-	?>hide("bystaff");<?
+	?>$("bystaff").hide();<?
 	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
 		?>$("ruleform").show(); $("mustapply").hide();<?
 	} else {
 		?>$("ruleform").hide(); $("mustapply").show();<?
 	}
 } else {
-	?>show("bystaff");<?
+	?>$("bystaff").show();<?
 	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
 		?>$("ruleform").hide(); $("mustapply").show();<?
 	} else {
