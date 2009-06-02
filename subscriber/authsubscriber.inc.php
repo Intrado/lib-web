@@ -34,6 +34,13 @@ function pearxmlrpc($method, $params) {
 	return $data;
 }
 
+function getCustomerAuthOptions($url) {
+	$params = array(new XML_RPC_Value($url, 'string'));
+	$method = "SubscriberServer.subscriber_getCustomerAuthOptions";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
+
 function getCustomerData($url) {
 	$params = array(new XML_RPC_Value($url, 'string'));
 	$method = "SubscriberServer.subscriber_getCustomerData";
@@ -68,12 +75,8 @@ function getCustomerLoginPicture($url) {
 }
 
 
-function subscriberCreateAccount($customerurl, $username, $password, $options) {
-//	$customerurl = "";
-//	if (isset($_GET['u'])) {
-//		$customerurl = $_GET['u'];
-//	}
-	$params = array(new XML_RPC_Value($customerurl, 'string'), new XML_RPC_Value($username, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($options, 'string'));
+function subscriberCreateAccount($customerurl, $username, $password, $sitepass, $options) {
+	$params = array(new XML_RPC_Value($customerurl, 'string'), new XML_RPC_Value($username, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($sitepass, 'string'), new XML_RPC_Value($options, 'string'));
 	$method = "SubscriberServer.subscriber_createAccount";
 	$result = pearxmlrpc($method, $params);
 	return $result; // we do nothing for success/fail

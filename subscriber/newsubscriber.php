@@ -16,17 +16,27 @@ require_once("../obj/Phone.obj.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "";
-if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".urlencode($_GET['u']);
+$authdomain = "0";
+$emaildomain = "";
+$authcode = "0";
+$result = getCustomerAuthOptions($CUSTOMERURL);
+if ($result['result'] == "") {
+	// success
+	$authdomain = $result['authdomain'];
+	$emaildomain = $result['emaildomain'];
+	$authcode = $result['authcode'];
+}
+
+if ($authdomain == "1") {
+	$emailvalidator = array("ValEmail","domain"=>$emaildomain);
+} else {
+	$emailvalidator = array("ValEmail");	
 }
 
 $tos = file_get_contents("terms.html");
 
-
-$formdata = array(
-    "firstname" => array(
+$formdata = array();
+$formdata["firstname"] = array(
         "label" => "First Name",
         "value" => "",
         "validators" => array(
@@ -35,8 +45,8 @@ $formdata = array(
         ),
         "control" => array("TextField","maxlength" => 50),
         "helpstep" => 1
-    ),
-    "lastname" => array(
+    );
+$formdata["lastname"] = array(
         "label" => "Last Name",
         "value" => "",
         "validators" => array(
@@ -45,30 +55,29 @@ $formdata = array(
         ),
         "control" => array("TextField","maxlength" => 50),
         "helpstep" => 1
-    ),
-    "username" => array(
+    );
+$formdata["username"] = array(
         "label" => "Account Email",
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValEmail")
+            $emailvalidator
         ),
         "control" => array("TextField","maxlength" => 50),
         "helpstep" => 2
-    ),
-    "confirmusername" => array(
+    );
+$formdata["confirmusername"] = array(
         "label" => "Confirm Email",
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValEmail"),
             array("ValFieldConfirmation", "field" => "username")
         ),
         "requires" => array("username"),
         "control" => array("TextField","maxlength" => 50),
         "helpstep" => 2
-    ),
-    "password" => array(
+    );
+$formdata["password"] = array(
         "label" => "Password",
         "value" => "",
         "validators" => array(
@@ -79,8 +88,8 @@ $formdata = array(
         "requires" => array("firstname", "lastname", "username"),
         "control" => array("PasswordField","maxlength" => 50),
         "helpstep" => 3
-    ),
-    "confirmpassword" => array(
+    );
+$formdata["confirmpassword"] = array(
         "label" => "Confirm Password",
         "value" => "",
         "validators" => array(
@@ -91,13 +100,25 @@ $formdata = array(
         "requires" => array("password"),
         "control" => array("PasswordField","maxlength" => 50),
         "helpstep" => 3
-    ),
-    "terms" => array(
+    );
+if ($authcode == "1") {
+	$formdata["sitecode"] = array(
+        "label" => "Site Access Code",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","max" => 255)
+        ),
+        "control" => array("PasswordField","maxlength" => 255),
+        "helpstep" => 3
+	);
+}
+$formdata["terms"] = array(
         "label" => "Terms Of Service",
         "control" => array("FormHtml","html" => '<div style="height: 200px; overflow:auto;">'.$tos.'</div>'),
         "helpstep" => 4
-    ),
-    "acceptterms" => array(
+    );
+$formdata["acceptterms"] = array(
         "label" => "Accept Terms",
         "value" => false,
         "validators" => array(
@@ -105,8 +126,8 @@ $formdata = array(
         ),
         "control" => array("CheckBox"),
         "helpstep" => 4
-    )
-);
+    );
+
 
 $helpsteps = array (
     "This guide will help you complete the signup process.  Click the arrow to begin.",
@@ -136,10 +157,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $datachange = true;
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-            
+        
+        $sitecode = "";
+        if (isset($postdata['sitecode']))
+        	$sitecode = $postdata['sitecode'];
+        	
         $options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname']));
 		
-		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $options);
+		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $sitecode, $options);
 		if ($result['result'] != "") {
 			if ($result['result'] == "duplicate") {
 				$errordetails = "That email address is already in use";
@@ -223,7 +248,7 @@ if (errors)
 				</td>
 			</tr>
 			<tr>
-				<td><br><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
+				<td><br><a href="index.php">Return to Sign In</a></td>
 			</tr>
 		</table>
 			
