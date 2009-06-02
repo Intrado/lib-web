@@ -122,7 +122,7 @@ if ($IS_COMMSUITE) {
 <? } else if ($softlock) { ?>
 					<div style="color: red;"><?=_L("You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.")?></div>
 <? } else if (!$custname) { ?>
-					<div style="color: red;"><?=_L("Invalid customer URL. Please check the URL and try again.")?></div>
+					<div style="color: red;"><?=_L("Invalid customer URL. Please check the web address and try again.")?></div>
 <? } else { ?>
 					<?=_L("Please log in here.")?>
 <? } ?>
