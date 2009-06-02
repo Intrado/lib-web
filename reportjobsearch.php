@@ -222,8 +222,8 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 					<td>
 						<table>
 							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='hide(\"daterange\"); show(\"jobs\")'");?> Job</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='hide(\"jobs\"); show(\"daterange\")'");?> Date</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='$(\"daterange\").hide(); $(\"jobs\").show()'");?> Job</td>
+								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='$(\"jobs\").hide(); $(\"daterange\").show()'");?> Date</td>
 							</tr>
 						</table>
 					</td>
