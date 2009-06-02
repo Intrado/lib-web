@@ -88,6 +88,7 @@ $helpsteps = array();
 if ($readonly) {
 
 } else {
+	$formdata[] = "Account Information";
 	$formdata["firstname"] = array(
         "label" => "First Name",
         "value" => $USER->firstname,
@@ -215,6 +216,7 @@ if ($readonly) {
 }
 
 // Notification Defaults
+$formdata[] = "Notification Defaults";
 
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $formdata["callearly"] = array(
@@ -296,6 +298,8 @@ $formdata["callerid"] = array(
         "helpstep" => 2
 );
 
+$formdata[] = "Display Settings";
+
 // Display Defaults
 $formdata["actionlinks"] = array(
 		"label" => "Action Links",
@@ -356,20 +360,10 @@ $formdata["brandratio"] = array(
         "helpstep" => 3
 );
 
-
-
-
-$helpsteps = array (
-	"Enter your account information.",
-	"Access Credentials",
-	"Notification Defaults",
-	"Display Defaults"
-);
-
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"start.php"));
 
-$form = new Form("account", $formdata, $helpsteps, $buttons);
+$form = new Form("account", $formdata, null, $buttons);
 $form->ajaxsubmit = true;
 
 //check and handle an ajax request (will exit early)
