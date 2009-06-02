@@ -28,7 +28,7 @@ require("jobwizard.inc.php");
 $wizdata = array(
 	"basic" => new JobWiz_basic(_L("Start")),
 	"list" => new JobWiz_listChoose(_L("List")),
-	"message" => new WizSection("Message"),array(
+	"message" => new WizSection("Message",array(
 		"pick" => new JobWiz_messageType(_L("Delivery Methods")),
 		"select" => new JobWiz_messageSelect(_L("Message Source")),
 		"phone"	=> new WizSection ("Phone",array(
@@ -47,7 +47,7 @@ $wizdata = array(
 			"pick" => new JobWiz_messageSmsChoose(_L("Existing Message")),
 			"text" => new JobWiz_messageSmsText(_L("Compose Txt"))
 		))
-	),
+	)),
 	"schedule" => new WizSection ("Schedule",array(
 		"options" => new JobWiz_scheduleOptions(_L("Schedule Options")),
 		"date" => new JobWiz_scheduleDate(_L("Schedule Date")),
@@ -59,7 +59,7 @@ $wizdata = array(
 	))
 );
 
-$wizard = new Wizard("wizard_job",$wizdata);
+$wizard = new Wizard("wizard_job",$wizdata, "???");
 $wizard->handlerequest();
 
 if ($wizard->isDone()) {
