@@ -13,6 +13,10 @@ class Wizard {
 		$this->name = $name;
 		$this->wizdata = $wizdata;
 		$this->filteredwizdata = $this->filter();
+		//add finisher
+		$this->wizdata['finish'] = $finish;
+		$this->filteredwizdata['finish'] = $finish;
+		
 		$this->steplist = $this->getStepList();
 		if (isset($_SESSION[$name]['step'])) {
 			$curstep = $_SESSION[$name]['step'];
@@ -21,8 +25,7 @@ class Wizard {
 		}
 		$this->curstep = $curstep;
 		
-		$this->wizdata['finish'] = $finish;
-		$this->filteredwizdata['finish'] = $finish;
+		
 	}
 	
 	function getStepData ($curstep = null) {
@@ -70,6 +73,7 @@ class Wizard {
 	}
 	
 	function setCurrentStep ($curstep) {
+		//TODO validate this is a valid step to go to
 		if (in_array($curstep,$this->steplist))
 			$this->curstep = $curstep;
 	}
@@ -223,62 +227,73 @@ class Wizard {
 		
 		if (isset($_GET['step'])) {
 			//TODO check that the step is less than current step
-			$_SESSION[$this->name]['step'] = $_GET['step'];
-			$this->setCurrentStep($_GET['step']);
+			if (!isset($_SESSION[$this->name]['data']['finish'])) {
+				$_SESSION[$this->name]['step'] = $_GET['step'];
+				$this->setCurrentStep($_GET['step']);
+			} else {
+				$_SESSION[$this->name]['step'] = "/finish";
+				$this->setCurrentStep("/finish");
+			}
 		}
 		
 		if (isset($_GET['done'])) {
 			$this->done = true;
 		}
 		
-		//TODO check for WizFinish, or ?step=/finish, or ???
-		//TODO validate each form again?
-		//TODO call $stepdata->finish();
-		
 		$stepdata = $this->getStepData();
-		$step = $this->getCurrentStep();
-		$form = $stepdata->getForm($_SESSION[$this->name]['data'], $step);
-		//if they pressed the previous button, handle form submits slightly different
-		if ($form->getSubmit() == "prev") {	
-			$results = $form->handleRequest(true); //dont exit, return results so we can tweak them
-			if ($results !== false) {
-				if (isset($results['validationerrors'])) {
-					//add option to override default behavior
-					$results['dontsaveurl'] = "?step=" . $this->getPrevStep();
-				}
-				
-				header("Content-Type: application/json");
-				echo json_encode($results);
-				exit();
-			}
-		} else {
-			$form->handleRequest(false); //allow this to handle like normal
-		}
 		
-		$this->datachange = false;
-		$errors = false;
-		//check for form submission
-		if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-			$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+		if ($stepdata instanceof WizStep) {
+		
+			$step = $this->getCurrentStep();
+			$form = $stepdata->getForm($_SESSION[$this->name]['data'], $step);
+			//if they pressed the previous button, handle form submits slightly different
+			if ($form->getSubmit() == "prev") {	
+				$results = $form->handleRequest(true); //dont exit, return results so we can tweak them
+				if ($results !== false) {
+					if (isset($results['validationerrors'])) {
+						//add option to override default behavior
+						$results['dontsaveurl'] = "?step=" . $this->getPrevStep();
+					}
+					
+					header("Content-Type: application/json");
+					echo json_encode($results);
+					exit();
+				}
+			} else {
+				$form->handleRequest(false); //allow this to handle like normal
+			}
 			
-			if ($form->checkForDataChange()) {
-				$this->datachange = true;
-			} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-				$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+			$this->datachange = false;
+			$errors = false;
+			//check for form submission
+			if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+				$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
 				
-				$_SESSION[$this->name]['data'][$step] = $postdata;
-				$this->filteredwizdata = $this->filter();
-				$this->steplist = $this->getStepList();
-				
-				if ($ajax) {			
-					if ($button == "next") {
-						if ($next = $this->getNextStep())
-							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
-						else
-							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=/finish");
-					} else if ($button == "prev") {
-						if ($next = $this->getPrevStep())
-							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
+				if ($form->checkForDataChange()) {
+					$this->datachange = true;
+				} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+					$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+					
+					$_SESSION[$this->name]['data'][$step] = $postdata;
+					$this->filteredwizdata = $this->filter();
+					$this->steplist = $this->getStepList();
+					
+					if ($ajax) {			
+						if ($button == "next") {
+							if ($next = $this->getNextStep()) {
+								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
+							} else {
+								//wizard is all done, save the data, lock out the session data, and go to the finish page
+								if (!isset($_SESSION[$this->name]['data']['finish'])) {
+									$_SESSION[$this->name]['data']['finish'] = true;
+									$this->getStepData("finish")->finish($_SESSION[$this->name]['data']);
+								}
+								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=/finish");
+							}
+						} else if ($button == "prev") {
+							if ($next = $this->getPrevStep())
+								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
+						}
 					}
 				}
 			}

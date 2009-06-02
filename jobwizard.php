@@ -59,7 +59,20 @@ $wizdata = array(
 	))
 );
 
-$wizard = new Wizard("wizard_job",$wizdata, "???");
+class FinishJobWizard extends WizFinish {
+	
+	function finish ($postdata) {
+		//TODO save data
+		error_log("SAVING WIZARD DATA");
+	}
+	
+	function getFinishPage ($postdata) {
+		return "<h1>This is the finish page!</h1>";
+	}
+}
+
+
+$wizard = new Wizard("wizard_job",$wizdata, new FinishJobWizard("Finish"));
 $wizard->handlerequest();
 
 if ($wizard->isDone()) {
@@ -77,7 +90,7 @@ $TITLE = _L('Job Wizard');
 require_once("nav.inc.php");
 
 ?>
-<script>
+<script type="text/javascript">	
 <? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValCallMePhone","ValEasycall","ValLists"));// Included in jobwizard.inc.php ?>
 </script>
 <?
@@ -87,9 +100,10 @@ echo $wizard->render();
 endWindow();
 if (true) {
 	startWindow("Wizard Data");
+	echo "<pre>";
 	var_dump($_SESSION['wizard_job']['data']);
-	var_dump($_SESSION['wizard_job']['step']);
 	//var_dump($_SERVER);
+	echo "</pre>";
 	endWindow();
 }
 require_once("navbottom.inc.php");
