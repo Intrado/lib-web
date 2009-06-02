@@ -27,6 +27,8 @@ var MessageSelect = Class.create({
 			$(this.formname+"subject").update('<img src="'+this.loadingimg+'" />');
 			$(this.formname+"attachment").update('<img src="'+this.loadingimg+'" />');
 		}
+		if (this.type == "phone")
+			$(this.formname+"play").stopObserving();
 		$(this.formname+"body").value = "";
 		new Ajax.Request('ajax.php?ajax&type=previewmessage&id='+this.messageid, {
 			method:'get',
@@ -58,6 +60,7 @@ var MessageSelect = Class.create({
 				$(this.formname+"body").value = "Simple Recording";
 			else
 				$(this.formname+"body").value = response.body;
+			$(this.formname+"play").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
 		} else {
 			$(this.formname+"lastused").update();
 			$(this.formname+"description").update();
