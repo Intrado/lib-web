@@ -94,6 +94,15 @@ require_once("logintop.inc.php");
 ?>
 <form method="POST" action="index.php" name="login">
 	<table style="color: #<?=$primary?>;" >
+<?	if (!$custname) {
+?>
+		<tr>
+			<td colspan="3">
+				<div width="100%" style="font-size: 16px; font-weight: bold; color: red;">&nbsp;&nbsp;<?=_L("Invalid customer URL. Please check the web address and try again.")?></div>
+			</td>
+		</tr>
+<?	} else {
+?>
 		<tr>
 			<td colspan="3">
 				<div style="font-size: 20px; font-weight: bold;">SchoolMessenger Self Signup</div>
@@ -103,12 +112,10 @@ require_once("logintop.inc.php");
 		</tr>
 		<tr>
 			<td colspan="3">
-<?
-				if ($badlogin) {
-				?>
-					<div style="color: red;">Incorrect account email or password. Please try again.</div><br>
-				<?
-				}
+<?			if ($badlogin) {
+?>
+				<div style="color: red;"><?=_L("Incorrect account email or password. Please try again.")?></div><br>
+<?			}
 ?>
 			</td>
 		<tr>
@@ -143,6 +150,8 @@ require_once("logintop.inc.php");
 		<tr>
 			<td colspan="3"><a href="newsubscriber.php"><b>Sign up now</b></a></td>
 		</tr>
+<?	}
+?>
 	</table>
 </form>
 <br>
