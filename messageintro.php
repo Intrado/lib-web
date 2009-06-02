@@ -238,7 +238,6 @@ include_once("navbottom.inc.php");
 
 <script type="text/javascript">
 
-var cache = new AjaxCache();
 
 function setvalues(result) {
 	var response = result.responseJSON;
@@ -260,7 +259,7 @@ function loaduser() {
 	if($('loaduserselect').getValue() != '')
 		request += '&userid=' + $('loaduserselect').getValue();
 
-	cache.request(request,setvalues);
+	quickrequest(request,setvalues);
 }
 
 loaduser();
