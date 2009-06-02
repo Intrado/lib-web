@@ -24,12 +24,13 @@ if (!isset($_SESSION['subscriberid'])) {
 } else {
 	$row = DBQueryRow("select c.contenttype, c.data from setting s inner join content c on (c.id = s.value) where s.name = '_logocontentid'");
 }
+
 if (count($row) > 0) {
 	$data = base64_decode($row[1]);
 	$contenttype = $row[0];
 	$ext = substr($contenttype, strpos($contenttype, "/")+1);
 } else {
-	$data = file_get_contents("img/logo_small.gif");
+	$data = file_get_contents("../img/logo_small.gif"); // TODO why need the ../ should symlink be set?
 	$contenttype = "image/gif";
 	$ext = ".gif";
 }
