@@ -221,6 +221,8 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		var label = formdata[fieldname].label;
 		var id = form.id+"_"+fieldname;
 		var e = $(id);
+		if (!e)
+			continue;
 		
 		if (e.tagName.toLowerCase() == 'div' && e.hasClassName('radiobox')) {
 			//attach event listeners to each of the radio boxes
@@ -499,7 +501,7 @@ function form_handle_submit(form,event) {
 		parameters: form.serialize(true),
 		onSuccess: function(response) {
 			var res = response.responseJSON;
-			
+			try {
 			if ("fail" == res.status) {
 				//show the validation results
 				if (res.validationerrors) {
@@ -537,6 +539,7 @@ function form_handle_submit(form,event) {
 					window.location=res.nexturl;
 				
 			}
+			} catch (e) { alert(e.message + "\n" + response.responseText)}
 		},
 		onFailure: function(){ alert('Something went wrong...') } //TODO better error handling
 	});
