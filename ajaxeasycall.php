@@ -8,6 +8,7 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/SpecialTask.obj.php");
+require_once("obj/Phone.obj.php");
 
 global $USER;
 
@@ -82,14 +83,12 @@ $id = false;
 if (isset($_POST['phone']) && isset($_POST['language'])) {
 	$id = "new";
 	$language = json_decode($_POST['language']);
-	$phone = $_POST['phone'];
+	$phone = Phone::parse($_POST['phone']);
 }
 
 if (isset($_GET['id'])) {
 	$id = $_GET['id'];
 }
-
-error_log("Request ID: $id");
 
 /////////////////////////////////////////////////////////
 // If it is a "new" task ID then create a new one
