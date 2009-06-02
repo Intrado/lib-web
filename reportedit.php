@@ -227,10 +227,10 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 		<td>
 			<table  border="0" cellpadding="3" cellspacing="0">
 				<tr>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "none", "id=radio_none' onclick='hide(\"schedule\")'")?> None</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "runonce", "id='radio_date' onclick='show(\"schedule\");show(\"date\");show(\"date2\");hide(\"weekly\");hide(\"monthly\");hide(\"weekly2\");hide(\"monthly2\")'")?>Run Once</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dow", "id='radio_dow' onclick='show(\"schedule\");show(\"weekly\");show(\"weekly2\");hide(\"date\");hide(\"monthly\");hide(\"date2\");hide(\"monthly2\")'")?>Daily/Weekly</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dom", "id='radio_dom' onclick='show(\"schedule\");show(\"monthly\");show(\"monthly2\");hide(\"weekly\");hide(\"date\");hide(\"weekly2\");hide(\"date2\")'")?>Monthly</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "none", "id=radio_none' onclick='$(\"schedule\").hide()'")?> None</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "runonce", "id='radio_date' onclick='$(\"schedule\").show();$(\"date\").show();$(\"date2\").show();$(\"weekly\").hide();$(\"monthly\").hide();$(\"weekly2\").hide();$(\"monthly2\").hide()'")?>Run Once</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dow", "id='radio_dow' onclick='$(\"schedule\").show();$(\"weekly\").show();$(\"weekly2\").show();$(\"date\").hide();$(\"monthly\").hide();$(\"date2\").hide();$(\"monthly2\").hide()'")?>Daily/Weekly</td>
+					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dom", "id='radio_dom' onclick='$(\"schedule\").show();$(\"monthly\").show();$(\"monthly2\").show();$(\"weekly\").hide();$(\"date\").hide();$(\"weekly2\").hide();$(\"date2\").hide()'")?>Monthly</td>
 				</tr>
 			</table>
 			<table>
@@ -310,13 +310,13 @@ include("navbottom.inc.php");
 			?>hide("schedule");<?
 			break;
 		case 'runonce':
-			?>show("schedule");show("date");show("date2");hide("weekly");hide("monthly");hide("weekly2");hide("monthly2");<?
+			?>$("schedule").show();$("date").show();$("date2").show();$("weekly").hide();$("monthly").hide();$("weekly2").hide();$("monthly2").hide();<?
 			break;
 		case 'dow':
-			?>show("schedule");show("weekly");show("weekly2");hide("date");hide("monthly");hide("date2");hide("monthly2");<?
+			?>$("schedule").show();$("weekly").show();$("weekly2").show();$("date").hide();$("monthly").hide();$("date2").hide();$("monthly2").hide();<?
 			break;
 		case 'dom':
-			?>show("schedule");show("monthly");show("monthly2");hide("weekly");hide("date");hide("weekly2");hide("date2");<?
+			?>$("schedule").show();$("monthly").show();$("monthly2").show();$("weekly").hide();$("date").hide();$("weekly2").hide();$("date2").hide();<?
 			break;
 	}
 ?>
