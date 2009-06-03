@@ -391,6 +391,26 @@ class ValInArray extends Validator {
 	}
 }
 
+class ValStatic extends Validator {
+	
+	function validate ($value, $args) {
+		$val = isset($args['val']) ? $args['val'] : '';
+		if ($value != $val)
+			return "$this->label is not the correct value";
+		
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				if (args.val != value)
+					return label + " is not the correct value";
+				return true;
+			}';
+	}
+}
+
 //alpha
 //alphanumeric
 //phoneeasycall ??
