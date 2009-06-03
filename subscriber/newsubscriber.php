@@ -4,17 +4,29 @@ $isNotLoggedIn = 1;
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-require_once("common.inc.php");
+
+require_once("commonlogout.inc.php");
+
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("subscribervalidators.inc.php");
 require_once("../obj/Phone.obj.php");
-
+require_once("../jpgraph/jpgraph_antispam.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
+if (isset($_SESSION['captcha'])) {
+	$captcha_value = $_SESSION['captcha'];
+	error_log("captcha already set ".$captcha_value);
+} else {
+	$captcha = new AntiSpam();
+	$captcha_value = $captcha->Rand(5);
+	$_SESSION['captcha'] = $captcha_value;
+	error_log("captcha created ".$captcha_value);
+}
 
 $authdomain = "0";
 $emaildomain = "";
@@ -113,6 +125,16 @@ if ($authcode == "1") {
         "helpstep" => 3
 	);
 }
+$formdata["captcha"] = array(
+        "label" => "Captcha",
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValStatic","val" => $captcha_value)
+        ),
+        "control" => array("CaptchaField","iData" => $captcha_value),
+        "helpstep" => 3
+    );
 $formdata["terms"] = array(
         "label" => "Terms Of Service",
         "control" => array("FormHtml","html" => '<div style="height: 200px; overflow:auto;">'.$tos.'</div>'),
