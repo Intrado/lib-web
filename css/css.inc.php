@@ -2,18 +2,19 @@
 
 // hack for pages not logged in (no session)
 if (!isset($_SESSION['colorscheme'])) {
-	$_SESSION['colorscheme']['_brandtheme']   = "3dblue";
-	$_SESSION['colorscheme']['_brandtheme1']  = "89A3CE";
-	$_SESSION['colorscheme']['_brandtheme2']  = "89A3CE";
-	$_SESSION['colorscheme']['_brandprimary'] = "26477D";
-	$_SESSION['colorscheme']['_brandratio']   = ".3";
+	// TODO these should come from customer display data (still brand the login pages)
+	$theme = "3dblue";
+	$primary = "26477D";
+	$theme1 = "#89A3CE";
+	$theme2 = "#89A3CE";
+	$globalratio = ".3";
+} else {
+	$theme = $_SESSION['colorscheme']['_brandtheme'];
+	$primary = $_SESSION['colorscheme']['_brandprimary'];
+	$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
+	$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
+	$globalratio = $_SESSION['colorscheme']['_brandratio'];
 }
-
-$theme = $_SESSION['colorscheme']['_brandtheme'];
-$primary = $_SESSION['colorscheme']['_brandprimary'];
-$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
-$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
-$globalratio = $_SESSION['colorscheme']['_brandratio'];
 
 $fade1 = "E5E5E5";
 $fade2 = "999999";
