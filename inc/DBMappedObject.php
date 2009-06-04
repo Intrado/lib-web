@@ -292,22 +292,22 @@ function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = fals
 
 
 //query = from ... where ...
-function DBFindMany ($classname, $query, $alias = false, $args = false) {
-	return _DBFindPDO(true, $classname, $query, $alias, $args);
+function DBFindMany ($classname, $query, $alias = false, $args = false, $dbconnect = false) {
+	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect);
 }
 
-function DBFind ($classname, $query, $alias = false, $args = false) {
-	return _DBFindPDO(false, $classname, $query, $alias, $args);
+function DBFind ($classname, $query, $alias = false, $args = false, $dbconnect = false) {
+	return _DBFindPDO(false, $classname, $query, $alias, $args, $dbconnect);
 }
 
-function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false) {
+function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbconnect = false) {
 	//make a dummy object of this to get the field list
 	$dummy = new $classname();
 
 	$many = array();
 
 	$query = "select " . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
-	if ($result = Query($query, false, $args)) {
+	if ($result = Query($query, $dbconnect, $args)) {
 		while ($row = DBGetRow($result)) {
 			$newobj = new $classname();
 
