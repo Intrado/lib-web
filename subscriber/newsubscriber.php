@@ -5,7 +5,7 @@ $isNotLoggedIn = 1;
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 
-require_once("commonlogout.inc.php");
+require_once("common.inc.php");
 
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
@@ -18,14 +18,21 @@ require_once("../jpgraph/jpgraph_antispam.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_SESSION['captcha'])) {
-	$captcha_value = $_SESSION['captcha'];
-	error_log("captcha already set ".$captcha_value);
-} else {
+if ((strtolower($_SERVER['REQUEST_METHOD']) == 'get') ) {
+	subscriberCreateAnonymousSession();
+	doStartSession();
+	
 	$captcha = new AntiSpam();
 	$captcha_value = $captcha->Rand(5);
+	// NOTE captcha value is lowercase even when display shows uppercase letters, ValStatic made case-insensitive for this
 	$_SESSION['captcha'] = $captcha_value;
-	error_log("captcha created ".$captcha_value);
+} else {
+	doStartSession();
+	if (isset($_SESSION['captcha'])) {
+		$captcha_value = $_SESSION['captcha'];
+	} else {
+		error_log("??????????????? where is my session captcha?");
+	}
 }
 
 $authdomain = "0";

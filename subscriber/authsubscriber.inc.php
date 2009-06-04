@@ -109,6 +109,7 @@ function subscriberLogin($customerurl, $username, $password) {
 	$result = pearxmlrpc($method, $params);
 	if ($result['result'] == "") {
 		// login success
+		@session_destroy(); // destroy anonymous session before creating new one
 		session_id($result['sessionID']); // set the session id
 	}
 	return $result;
@@ -210,6 +211,18 @@ function subscriberPutSessionData($id, $sess_data) {
 	$method = "SubscriberServer.subscriber_putSessionData";
 	$result = pearxmlrpc($method, $params);
 	if ($result['result'] == "") return true;
+	return false;
+}
+
+
+function subscriberCreateAnonymousSession() {
+	$params = array();
+	$method = "AuthServer.createAnonymousSession";
+	$result = pearxmlrpc($method, $params);
+	if ($result && $result['result'] == "" && $result['sessionID']) {
+		session_id($result['sessionID']); // set the session id
+		return true;
+	}
 	return false;
 }
 

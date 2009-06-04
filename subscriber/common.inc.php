@@ -29,22 +29,19 @@ require_once("../obj/Validator.obj.php");
 if (!isset($isNotLoggedIn)) {
 	// we are logged in
 
-	$logout = "?logout=1";
-	if (isset($_SESSION['customerurl'])) {
-		$logout += "&u=".urlencode($_SESSION['customerurl']);
-	}
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		//index page will redirect to ssl
-		redirect("index.php".$logout);
+		redirect("index.php?logout=1");
 	}
-		
+
 	doStartSession();
 	
 	if (!isset($_SESSION['subscriberid'])) {
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
-		redirect("./".$logout);
+		redirect("./?logout=1");
     }
 } // else we are not logged in
+
 
 // load subscriber locale 
 require_once("../inc/locale.inc.php");
