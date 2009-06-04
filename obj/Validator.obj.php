@@ -391,11 +391,12 @@ class ValInArray extends Validator {
 	}
 }
 
+// case-insensitive
 class ValStatic extends Validator {
 	
 	function validate ($value, $args) {
 		$val = isset($args['val']) ? $args['val'] : '';
-		if ($value != $val)
+		if (strtolower($value) != strtolower($val))
 			return "$this->label is not the correct value";
 		
 		return true;
@@ -404,7 +405,7 @@ class ValStatic extends Validator {
 	function getJSValidator () {
 		return 
 			'function (name, label, value, args) {
-				if (args.val != value)
+				if (args.val && (args.val.toLowerCase() != value.toLowerCase()))
 					return label + " is not the correct value";
 				return true;
 			}';
