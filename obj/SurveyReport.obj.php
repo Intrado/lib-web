@@ -63,7 +63,7 @@ class SurveyReport extends ReportGenerator{
 			left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
 			where rp.jobid='$jobid' and rp.type ='phone'";
 			
-		$result = QuickQueryRow($query);
+		$result = QuickQueryRow($query, false, $this->_readonlyDB);
 		$phoneparticipants = 0;
 		$contacted = 0;
 		if($result[0] != 0){
@@ -81,7 +81,7 @@ class SurveyReport extends ReportGenerator{
 				inner join reportperson rp on (rp.personid = sw.personid and rp.jobid = sw.jobid)
 				where sw.jobid=$jobid";
 	
-		$result = QuickQueryRow($query);
+		$result = QuickQueryRow($query, false, $this->_readonlyDB);
 		$sentemails=0;
 		$emailparticipants = 0;
 		if($result[0] != 0){
@@ -92,7 +92,7 @@ class SurveyReport extends ReportGenerator{
 		$jobstats["email"]["sentemails"] = $sentemails;
 		$query = $this->query;
 		
-		$res = Query($query);
+		$res = Query($query, $this->_readonlyDB);
 	
 		$questions = array();
 		$questiontext = array();
@@ -303,7 +303,7 @@ class SurveyReport extends ReportGenerator{
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 		$job = new Job($jobid);
-		$maxquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
+		$maxquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid", $this->_readonlyDB);
 		// find the f-fields the same way as the query did
 		// strip off the f, use the field number as the index and
 		// it's position as the offset
@@ -331,7 +331,7 @@ class SurveyReport extends ReportGenerator{
 		echo $header;
 		echo "\r\n";
 
-		$result = Query($query);
+		$result = Query($query, $this->_readonlyDB);
 
 		while ($row = DBGetRow($result)) {
 			if($row[5] == "phone")

@@ -73,8 +73,8 @@ class PortalReport extends ReportGenerator{
 		}
 		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
 		$query = $this->query . " order by p.pkey" . " limit $pagestart, $max";
-		$result = Query($query);
-		$this->reporttotal = QuickQuery("select found_rows()");
+		$result = Query($query, $this->_readonlyDB);
+		$this->reporttotal = QuickQuery("select found_rows()", $this->_readonlyDB);
 		$data = array();
 		$personids = array();
 		$count = 0;
@@ -83,7 +83,7 @@ class PortalReport extends ReportGenerator{
 			$personids[] = $row[1];
 			$data[] = $row;
 		}
-		$result = Query("select personid, portaluserid from portalperson where personid in ('" . implode("','",$personids) . "') order by personid, portaluserid");
+		$result = Query("select personid, portaluserid from portalperson where personid in ('" . implode("','",$personids) . "') order by personid, portaluserid", $this->_readonlyDB);
 		$portaluserids = array();
 		$personportalusers = array();
 		while($row = DBGetRow($result)){
@@ -187,7 +187,7 @@ class PortalReport extends ReportGenerator{
 
 		$data = array();
 		$query = $this->query . " order by p.id";
-		$result = Query($query);
+		$result = Query($query, $this->_readonlyDB);
 		$count = 0;
 		while($row = DBGetRow($result)){
 			if($row[4]){

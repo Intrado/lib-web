@@ -10,13 +10,17 @@ class ReportGenerator {
 	var $testquery = "";
 	var $params;
 	var $reporttype;
+	var $_readonlyDB;
 
-
+	function ReportGenerator() {
+		$_readonlyDB = readonlyDBConnect();	
+	}
+	
 	function testSize(){
 		$result = "";
 		$this->generateQuery();
 		if($this->testquery != ""){
-			$count = QuickQuery($this->testquery);
+			$count = QuickQuery($this->testquery, $this->_readonlyDB);
 		}
 		if($count > 33000){
 			$result = "Report exceeds max page limit";
@@ -55,7 +59,7 @@ class ReportGenerator {
 		$xmlparams[] = new XML_RPC_Value($_DBPASS, 'string');
 		$xmlparams[] = new XML_RPC_Value($this->query, 'string');
 
-		$timeoffset = QuickQuery("select value from setting where name = 'timezone'");
+		$timeoffset = getSystemSetting("timezone");
 		$timeoffsetquery = "set time_zone = '$timeoffset'";
 		$xmlparams[] = new XML_RPC_Value($timeoffsetquery, 'string');
 
@@ -126,7 +130,7 @@ class ReportGenerator {
 		$params["reportname"] = new XML_RPC_VALUE($reportname, 'string');
 		$params["subname"] = new XML_RPC_VALUE($subname, 'string');
 		$params["username"] = new XML_RPC_VALUE($USER->login, 'string');
-		$customer = QuickQuery("select value from setting where name = 'displayname'");
+		$customer = getSystemSetting('displayname');
 		if(!$customer)
 			$customer = "";
 		$params["accountname"] = new XML_RPC_VALUE($customer, 'string');

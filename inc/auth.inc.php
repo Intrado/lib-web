@@ -331,6 +331,28 @@ function prefetchUserInfo($activationcode){
 	}
 	return false;
 }
+
+function readonlyDBConnect() {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'));
+	$method = "AuthServer.getReadonlyDBInfo";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false && $result['result'] == '') {
+		// success, now try to connect
+		try {
+			$dsn = 'mysql:dbname='.$result['dbname'].';host='.$result['dbhost'];
+			$_readonlyDB = new PDO($dsn, $result['dbuser'], $result['dbpass']);
+		
+			$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
+			$_readonlyDB->query($setcharset);
+			return $_readonlyDB;
+		} catch (PDOException $e) {
+			error_log("Problem connecting with readonly to MySQL server at " . $result['dbhost'] . " error:" . $e->getMessage());
+		}
+	}
+	return false;
+}
+
 ////////// parent portal methods
 
 function getPortalUsers($portaluserids) {

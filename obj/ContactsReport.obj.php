@@ -80,8 +80,8 @@ class ContactsReport extends ReportGenerator {
 
 		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
 		$query .= "limit $pagestart, $max";
-		$result = Query($query);
-		$total = QuickQuery("select found_rows()");
+		$result = Query($query, $this->_readonlyDB);
+		$total = QuickQuery("select found_rows()", $this->_readonlyDB);
 
 		//fetch data with main query and populate arrays using personid as the key
 		$personlist = array();
@@ -133,7 +133,7 @@ class ContactsReport extends ReportGenerator {
 		} else {
 			$phoneemailsmsquery = $phoneemailquery . $extraquery;
 		}
-		$result = Query($phoneemailsmsquery);
+		$result = Query($phoneemailsmsquery, $this->_readonlyDB);
 		$destinationdata = array();
 		while($row = DBGetRow($result)){
 			if(!isset($destinationdata[$row[0]])){
@@ -251,7 +251,7 @@ class ContactsReport extends ReportGenerator {
 		echo $header;
 		echo "\r\n";
 
-		$result = Query($this->query);
+		$result = Query($this->query, $this->_readonlyDB);
 
 		while ($row = DBGetRow($result)) {
 
@@ -264,11 +264,11 @@ class ContactsReport extends ReportGenerator {
 				}
 				$count++;
 			}
-			$phonelist = DBFindMany("Phone", "from phone where personid = '$row[1]'");
+			$phonelist = DBFindMany("Phone", "from phone where personid = '$row[1]'", false, false, $this->_readonlyDB);
 			foreach($phonelist as $phone){
 				$reportarray[] = $phone->phone;
 			}
-			$emaillist = DBFindMany("Email", "from email where personid = '$row[1]'");
+			$emaillist = DBFindMany("Email", "from email where personid = '$row[1]'", false, false, $this->_readonlyDB);
 			foreach($emaillist as $email){
 				$reportarray[] = $email->email;
 			}

@@ -21,7 +21,7 @@ class JobAutoReport extends ReportGenerator{
 				$dateend = date("Y-m-d", strtotime($params['dateend']));
 			else
 				$dateend = date("Y-m-d", strtotime("now"));
-			$joblist = QuickQueryList("select j.id from job j where j.startdate < '$dateend' and (j.finishdate > '$datestart' or j.enddate > '$datestart')");
+			$joblist = QuickQueryList("select j.id from job j where j.startdate < '$dateend' and (j.finishdate > '$datestart' or j.enddate > '$datestart')", false, $this->_readonlyDB);
 			$this->params['joblist'] = implode("','", $joblist);
 		}
 		$resultquery = "";
@@ -91,7 +91,7 @@ class JobAutoReport extends ReportGenerator{
 	}
 
 	function getReportSpecificParams(){
-		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
 		$params = array("jobId" => $this->params['jobid'],
 						"jobcount" => "1",
 						"hassms" => $sms);

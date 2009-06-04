@@ -25,7 +25,7 @@ function getRuleSql($params, $alias, $isjobreport=true){
 	return $rulesql;
 }
 
-function getJobSummary($joblist){
+function getJobSummary($joblist, $readonlyDB = false){
 	global $USER;
 
 	$jobinfoquery = "Select
@@ -48,7 +48,7 @@ function getJobSummary($joblist){
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							where j.id in ('" . $joblist . "')
 							group by j.id";
-	$jobinforesult = Query($jobinfoquery);
+	$jobinforesult = Query($jobinfoquery, $readonlyDB);
 	$jobinfo = array();
 	while($row = DBGetRow($jobinforesult)){
 		//combine start date and start time for formatter to output correctly
@@ -58,12 +58,12 @@ function getJobSummary($joblist){
 	return $jobinfo;
 }
 
-function displayJobSummary($joblist){
+function displayJobSummary($joblist, $readonlyDB = false){
 
-		$jobinfo = getJobSummary($joblist);
+		$jobinfo = getJobSummary($joblist, $readonlyDB);
 
 		//Check for any sms messages
-		$smscheck = QuickQuery("select count(smsmessageid) from job where id in ('" . $joblist . "')");
+		$smscheck = QuickQuery("select count(smsmessageid) from job where id in ('" . $joblist . "')", $readonlyDB);
 
 
 		startWindow("Summary ". help("ReportGeneratorUtils_Summary"), 'padding: 3px;');

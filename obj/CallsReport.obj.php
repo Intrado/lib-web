@@ -106,7 +106,7 @@ class CallsReport extends ReportGenerator{
 		//$queryfields = explode(",",generateFields("rp")) + explode(",",generateGFieldQuery("rp.personid", $joblist));
 
 //echo count($queryfields);
-		$result = Query($this->query);
+		$result = Query($this->query, $this->_readonlyDB);
 		$data = array();
 		// parse through data and seperate attempts.
 		// if no attempt made, look at rp.status for reason(index 5)
@@ -242,7 +242,7 @@ class CallsReport extends ReportGenerator{
 						" from reportperson rp
 						where rp.personid = '" . DBSafe($this->params['pid']) . "'
 						group by rp.personid";
-			list($pkey,$firstname, $lastname) = QuickQueryRow($query);
+			list($pkey,$firstname, $lastname) = QuickQueryRow($query, false, $this->_readonlyDB);
 ?>
 			<table  width="100%" cellpadding="3" cellspacing="1">
 				<tr><td>ID#: <?=escapehtml($pkey)?></td></tr>
@@ -302,12 +302,12 @@ class CallsReport extends ReportGenerator{
 		}
 		$activefields = $this->params['activefields'];
 		$query = $this->query;
-		$result = Query($query);
+		$result = Query($query, $this->_readonlyDB);
 		$persondata = array();
 		while($row = DBGetRow($result)){
 			$persondata[$row[3]] = $row;
 		}
-		$total = QuickQuery("select found_rows()");
+		$total = QuickQuery("select found_rows()", $this->_readonlyDB);
 
 		$fieldquery = generateFields("rp");
 		$personcalls = array();
@@ -323,7 +323,7 @@ class CallsReport extends ReportGenerator{
 					where rp.personid = '$info[3]'
 					$resultquery
 					group by j.id";
-			$result = Query($query);
+			$result = Query($query, $this->_readonlyDB);
 			$temparray = array();
 			while($row = DBGetRow($result)){
 				$temparray[] = $row;

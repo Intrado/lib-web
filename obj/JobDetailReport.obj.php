@@ -47,7 +47,7 @@ class JobDetailReport extends ReportGenerator{
 
 				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from reportperson rp
 											left join reportperson rp2 on (rp2.personid = rp.duplicateid and rp2.jobid = rp.jobid and rp2.type = rp.type)
-											where rp.jobid in ('" . $joblist . "') group by rp.jobid, rp.personid having cnt = 0 and (cnt2 = 0 or cnt2 is null)", true);
+											where rp.jobid in ('" . $joblist . "') group by rp.jobid, rp.personid having cnt = 0 and (cnt2 = 0 or cnt2 is null)", true, $this->_readonlyDB);
 				$undeliveredpersons = array_keys($undeliveredpersons);
 				$this->params['undeliveredcount'] = count($undeliveredpersons);
 				$resultquery = " and rp.personid in ('" . implode("','", $undeliveredpersons) . "') ";
@@ -221,12 +221,12 @@ class JobDetailReport extends ReportGenerator{
 		$query .= " limit $pagestart, 500";
 		$data = array();
 
-		$result = Query($query);
+		$result = Query($query, $this->_readonlyDB);
 		while ($row = DBGetRow($result)) {
 			$data[] = $row;
 		}
 		$query = "select found_rows()";
-		$total = QuickQuery($query);
+		$total = QuickQuery($query, $this->_readonlyDB);
 
 		$searchrules = array();
 		if(isset($this->params['rules']) && $this->params['rules']){
@@ -283,7 +283,7 @@ class JobDetailReport extends ReportGenerator{
 			?><br><?
 		}
 
-		displayJobSummary($this->params['joblist']);
+		displayJobSummary($this->params['joblist'], $this->_readonlyDB);
 
 		?><br><?
 		startWindow("Report Details ".help("JobDetailReport_ReportDetails"), 'padding: 3px;', false);
@@ -362,7 +362,7 @@ class JobDetailReport extends ReportGenerator{
 				$job = new Job($jobid);
 				if($job->questionnaireid != null){
 					$issurvey = true;
-					$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid");
+					$numquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid", $this->_readonlyDB);
 					if($numquestions > $maxquestions)
 						$maxquestions = $numquestions;
 				}
@@ -398,7 +398,7 @@ class JobDetailReport extends ReportGenerator{
 		echo $header;
 		echo "\r\n";
 
-		$result = Query($this->query);
+		$result = Query($this->query, $this->_readonlyDB);
 
 		while ($row = DBGetRow($result)) {
 			if($row[5] == "phone")
@@ -461,7 +461,7 @@ class JobDetailReport extends ReportGenerator{
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
 
-		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')") ? "1" : "0";
+		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
