@@ -329,3 +329,5 @@ ALTER TABLE `portalphoneactivation` ADD `options` TEXT NULL;
 
 ALTER TABLE `customer` ADD `limitedusername` VARCHAR( 50 ) NOT NULL DEFAULT '' AFTER `dbpassword` ,
 ADD `limitedpassword` VARCHAR( 50 ) NOT NULL DEFAULT '' AFTER `limitedusername`;
+
+ALTER TABLE `shard` ADD `readonlyhost` VARCHAR( 255 ) NOT NULL DEFAULT '' AFTER `dbpassword` ;
