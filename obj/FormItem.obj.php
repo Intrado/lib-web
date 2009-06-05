@@ -170,5 +170,33 @@ class HtmlRadioButton extends FormItem {
 	}
 }
 
+// Brand, Theme, color selector form item
+class BrandTheme extends FormItem {
+
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		if (!$value)
+			$value = "{}";
+		// Hidden input item to store values in
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml(json_encode($value)).'" />';
+		$str .= '<table class="msgdetails"><tr><td class="msglabel">'._L("Theme").':</td>';
+		$str .= '<td><select id="'.$n.'theme" name="'.$n.'theme" onchange="'.$n.'brandtheme.loadTheme();" >';
+		foreach ($this->args['values'] as $selectvalue => $selectname)
+			$str .= '<option value="'.escapehtml($selectvalue).'" '.(($value['theme'] == $selectvalue)? "selected" : "").' )>'.escapehtml($selectname['displayname']).'</option>';
+		$str .= '</select></td></tr>';
+		$str .= '<tr><td class="msglabel">'._L("Primary Color").':</td>';
+		$str .= '<td><input id="'.$n.'color" name="'.$n.'color" type="text" value="'.$value['color'].'" onchange="'.$n.'brandtheme.store();" />';
+		$str .= '<img src="img/sel.gif" type="image" onclick="TCP.popup($(\''.$n.'color\')); "/></td></tr>';
+		$str .= '<tr><td class="msglabel">'._L("Shader Ratio").':</td>';
+		$str .= '<td><input id="'.$n.'ratio" name="'.$n.'ratio" type="text" value="'.$value['ratio'].'" onchange="'.$n.'brandtheme.store();" /></td></tr>';
+		$str .= '</table>';
+		$str .= '<script type="text/javascript" src="script/brandtheme.js"></script>
+			<script type="text/javascript" src="script/picker.js"></script>
+			<script type="text/javascript">
+				var '.$n.'brandtheme = new BrandTheme("'.$n.'",'.json_encode($this->args['values']).');
+			</script>';
+		return $str;
+	}
+}
 
 ?>
