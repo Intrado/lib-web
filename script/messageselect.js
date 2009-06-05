@@ -30,10 +30,7 @@ var MessageSelect = Class.create({
 		if (this.type == "phone")
 			$(this.formname+"play").stopObserving();
 		$(this.formname+"body").value = "";
-		new Ajax.Request('ajax.php?ajax&type=previewmessage&id='+this.messageid, {
-			method:'get',
-			onSuccess: this.handleMessage.bindAsEventListener(this)
-		});
+		cachedAjaxGet('ajax.php?ajax&type=previewmessage&id='+this.messageid, this.handleMessage.bind(this));
 	},
 	
 	// handle the return data and populate it on the form
@@ -56,11 +53,14 @@ var MessageSelect = Class.create({
 					$(this.formname+"attachment").update("None");
 				}
 			}
-			if (this.type == "phone" && response.simple)
-				$(this.formname+"body").value = "Simple Recording";
-			else
-				$(this.formname+"body").value = response.body;
-			$(this.formname+"play").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
+			$(this.formname+"body").value = response.body;
+			if (this.type == "phone" ) {
+				$(this.formname+"play").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
+				if (response.simple)
+					$(this.formname+"body").hide();
+				else 
+					$(this.formname+"body").show();
+			}
 		} else {
 			$(this.formname+"lastused").update();
 			$(this.formname+"description").update();
