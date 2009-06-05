@@ -21,7 +21,7 @@ $formdata = array(
         "helpstep" => 1
     ),
     "password" => array(
-        "label" => _L("Old Password"),
+        "label" => _L("Password"),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
