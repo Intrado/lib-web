@@ -317,15 +317,11 @@ function submitForm (formname,section,value) {
 }
 
 // Ajax cache with request function
-var quickrequestcachedata = new Array();
-function quickrequest(uri,ajaxhandler,usecache) {
-	function setCacheValue(result) {
-		quickrequestcachedata[uri] = result;
-		ajaxhandler(result);
-	}
+var cachedajaxgetdata = new Array();
+function cachedAjaxGet(uri,ajaxhandler,usecache) {
 	usecache = typeof(usecache) != 'undefined' ? usecache : true;
 	if(usecache) {
-		var returnvalue = quickrequestcachedata[uri];
+		var returnvalue = cachedajaxgetdata[uri];
 		if(returnvalue) {
 			ajaxhandler(returnvalue);
 			return;
@@ -333,7 +329,10 @@ function quickrequest(uri,ajaxhandler,usecache) {
 	}
 	new Ajax.Request(uri, {
 		method:'get',
-		onSuccess: setCacheValue.bindAsEventListener(this)
+		onSuccess: function (result) {
+			cachedajaxgetdata[uri] = result;
+			ajaxhandler(result);
+		}
 	});
 }
 
