@@ -169,9 +169,17 @@ $TITLE = _L('Systemwide Security');
 </script>
 <?
 
-echo dataChangeAlert($datachange, $_SERVER['REQUEST_URI']);
-
 require_once("nav.inc.php");
+
+?>
+<script>
+<? if ($datachange) { ?>
+	alert("<?=_L("The data on this form has changed. You're changes cannot be saved.")?>")";
+	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+<? } ?>
+</script>
+<?
+
 startWindow(_L("Settings"));
 echo $form->render();
 endWindow();
