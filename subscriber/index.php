@@ -105,7 +105,9 @@ require_once("logintop.inc.php");
 ?>
 		<tr>
 			<td colspan="3">
-				<div style="font-size: 20px; font-weight: bold;">SchoolMessenger Self Signup</div>
+				<div style="font-size: 20px; font-weight: bold;">Phone, Email, and Text Messages</div>
+				<br>
+				<div style="font-size: 15px; font-weight: bold;">Get the latest communication from <?=$custname?>.</div>
 				<br>
 				<br>
 			</td>
