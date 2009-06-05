@@ -30,37 +30,43 @@ if ($REQUEST_TYPE == "new") {
 } else if ($REQUEST_TYPE == "continue") {
 
 	if (isset($_SESSION['contactphone'])) {
-		$query = "select j.id, j.userid, rp.messageid, rc.personid, rc.sequence
-		from job j
-		left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
-		left join reportcontact rc on (rc.jobid = j.id and rc.type='phone')
-		left join reportperson rp on (rp.jobid = j.id and rp.personid=rc.personid and rp.type='phone')
-		where
-		j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
-		and j.status in ('active', 'complete')
-		and j.questionnaireid is null
-		and rc.phone='".$_SESSION['contactphone']."'
-		and (js.value is null or js.value >= curdate())
-		order by j.startdate desc, j.starttime, j.id desc
-		limit 10";
+		$query = "select j.id, j.userid, rp.messageid, rc.personid, rc.sequence, rc.starttime
+			from job j
+			left join phone ph on 
+				(ph.phone=?)
+			left join jobsetting js on 
+				(js.jobid=j.id and js.name='translationexpire')
+			inner join reportcontact rc on 
+				(rc.jobid = j.id and rc.type='phone' and rc.personid = ph.personid and rc.phone=?)
+			inner join reportperson rp on 
+				(rp.jobid = j.id and rp.personid=rc.personid and rp.type='phone')
+			where
+				j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
+				and j.status in ('active', 'complete')
+				and j.questionnaireid is null
+				and (js.value is null or js.value >= curdate())
+			group by rc.jobid, rc.personid, rc.type, rc.sequence
+			order by rc.starttime desc
+			limit 10";
 
 //error_log($query);
-		$resultlist = QuickQueryMultiRow($query);
+		$resultlist = QuickQueryMultiRow($query,false,false,array($_SESSION['contactphone'],$_SESSION['contactphone']));
 		$messagelist = array();
 		foreach ($resultlist as $row) {
 			$msg = array();
 			$msg['jobid'] = $row[0];
 			$msg['userid'] = $row[1];
 			$msg['messageid'] = $row[2];
-			$msg['messageparts'] = DBFindMany("MessagePart", "from messagepart where messageid=$row[2]");
-			$reportpersonfields = QuickQueryRow("select f01, f02, f03, f04, f05, f06, f07, f08, f09, f10, " .
-					"f11, f12, f13, f14, f15, f16, f17, f18, f19, f20 from reportperson " .
-					"where jobid=$row[0] and personid=$row[3] and type='phone'", true);
+			$msg['messageparts'] = DBFindMany("MessagePart", "from messagepart where messageid=?",false,array($row[2]));
+			$query = "select f01, f02, f03, f04, f05, f06, f07, f08, f09, f10,f11, f12, f13, f14, f15, f16, f17, f18, f19, f20 from reportperson " 
+					."where jobid=? and personid=? and type='phone'";
+			$reportpersonfields = QuickQueryRow($query, true,false,array($row[0],$row[3]));
 			$msg['personid'] = $row[3];
 			$msg['personfields'] = $reportpersonfields;
 			$msg['sequence'] = $row[4];
-			$msg['leavemessage'] = QuickQuery("select value from jobsetting where jobid=$row[0] and name='leavemessage'");
-			$msg['messageconfirmation'] = QuickQuery("select value from jobsetting where jobid=$row[0] and name='messageconfirmation'");
+			$msg['starttime'] = $row[5];
+			$msg['leavemessage'] = QuickQuery("select value from jobsetting where jobid=? and name='leavemessage'",false,array($row[0]));
+			$msg['messageconfirmation'] = QuickQuery("select value from jobsetting where jobid= and name='messageconfirmation'",false,array($row[0]));
 
 			$messagelist[] = $msg;
 		}

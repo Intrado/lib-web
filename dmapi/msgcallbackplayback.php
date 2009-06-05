@@ -12,8 +12,7 @@ include_once("../obj/VoiceReply.obj.php");
 global $BFXML_VARS;
 
 
-function endoflist()
-{
+function endoflist() {
 ?>
 <voice>
 	<message name="endoflist">
@@ -43,10 +42,10 @@ function endoflist()
 }
 
 
-function renderMessageParts($playback) {
+function renderMessageParts($messagedata) {
 	$customerid = $_SESSION['customerid'];
-	$msgid = $playback['messageid'];
-	$fields = $playback['personfields'];
+	$msgid = $messagedata['messageid'];
+	$fields = $messagedata['personfields'];
 
 	$renderedparts = Message::renderMessageParts($msgid, $fields);
 	$voices = DBFindMany("Voice","from ttsvoice");
@@ -68,9 +67,9 @@ function renderMessageParts($playback) {
 }
 
 
-function playback($messageindex, $messagetotal, $playback, $playintro = false) {
-	$messageparts = $playback['messageparts'];
-	$fields = $playback['personfields'];
+function playback($messageindex, $messagetotal, $messagedata, $playintro = false) {
+	$messageparts = $messagedata['messageparts'];
+	$fields = $messagedata['personfields'];
 ?>
 <voice>
 	<message name="playback">
@@ -95,11 +94,10 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 				<?}?>
 				<tts gender="female"><?=escapehtml($fields['f01'])?></tts>
 				<tts gender="female"><?=escapehtml($fields['f02'])?></tts>
-				<tts> -- </tts>
-
-				<?renderMessageParts($playback);?>
-
-
+				<tts gender="female">,Last sent on,</tts>
+				<tts gender="female"><?= date("l, F jS. \a\\t g:i a.",$messagedata['starttime']/1000)?></tts>
+				<delay duration="250"/>
+				<?renderMessageParts($messagedata);?>
 				<tts gender="female">To repeat the message press the star key.</tts>
 				<delay duration="1000"/>
 			</prompt>
@@ -107,12 +105,12 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 			<choice digits="*" />
 			<choice digits="#" />
 
-			<?if ($playback['leavemessage'] === "1") {?>
+			<?if ($messagedata['leavemessage'] === "1") {?>
 				<choice digits="0">
 					<goto message="recordvoicereply" />
 				</choice>
 			<?}?>
-			<?if ($playback['messageconfirmation'] === "1") {?>
+			<?if ($messagedata['messageconfirmation'] === "1") {?>
 				<choice digits="1">
 					<goto message="messageconfirmyes" />
 				</choice>
@@ -130,7 +128,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 		</field>
 	</message>
 
-	<?if ($playback['leavemessage'] === "1") {?>
+	<?if ($messagedata['leavemessage'] === "1") {?>
 	<message name="recordvoicereply">
 		<field name="voicereply" type="record" max="60">
 			<prompt>
@@ -143,7 +141,7 @@ function playback($messageindex, $messagetotal, $playback, $playintro = false) {
 	</message>
 	<?}?>
 
-	<?if ($playback['messageconfirmation'] === "1") {?>
+	<?if ($messagedata['messageconfirmation'] === "1") {?>
 	<message name="messageconfirmyes">
 		<setvar name="messageconfirm" value="1"/>
 		<delay duration="1000"/>
@@ -191,30 +189,30 @@ if($REQUEST_TYPE == "new"){
 
 		if (isset($BFXML_VARS['voicereply'])) {
 			//error_log("voicereply cmid=".$BFXML_VARS['voicereply']);
-			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
-			$personid = $playback['personid'];
+			$messagedata = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
+			$personid = $messagedata['personid'];
 
 			$vr = new VoiceReply();
 			$vr->personid = $personid;
-			$vr->jobid = $playback['jobid'];
-			$vr->sequence = $playback['sequence'];
-			$vr->userid = $playback['userid'];
+			$vr->jobid = $messagedata['jobid'];
+			$vr->sequence = $messagedata['sequence'];
+			$vr->userid = $messagedata['userid'];
 			$vr->contentid = DBSafe($BFXML_VARS['voicereply']);
 			$vr->replytime = time()*1000;
 			$vr->listened = 0;
 			$vr->update();
 
-			$query = "update reportcontact set participated=1, voicereplyid=".$vr->id." where jobid=".$playback['jobid']." and personid=".$personid." and type='phone' and sequence=".$playback['sequence'];
-			QuickUpdate($query);
+			$query = "update reportcontact set participated=1, voicereplyid=? where jobid=? and personid=? and type='phone' and sequence=?";
+			QuickUpdate($query,false,array($vr->id,$messagedata['jobid'],$personid,$messagedata['sequence']));
 		}
 
 		if (isset($BFXML_VARS['messageconfirm'])) {
 			//error_log("messageconfirm ".$BFXML_VARS['messageconfirm']);
-			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
-			$personid = $playback['personid'];
+			$messagedata = $_SESSION['messagelist'][$_SESSION['messageindex']-1]; // get last message played
+			$personid = $messagedata['personid'];
 
-			$query = "update reportcontact set participated=1, response=".DBSafe($BFXML_VARS['messageconfirm'])." where jobid=".$playback['jobid']." and personid=".$personid." and type='phone' and sequence=".$playback['sequence'];
-			QuickUpdate($query);
+			$query = "update reportcontact set participated=1, response=? where jobid=? and personid=? and type='phone' and sequence=?";
+			QuickUpdate($query,false,array($BFXML_VARS['messageconfirm'],$messagedata['jobid'],$personid,$messagedata['sequence']));
 		}
 
 		$playintro = false;
@@ -266,9 +264,9 @@ if($REQUEST_TYPE == "new"){
 
 		// next message
 		} else {
-			$playback = $_SESSION['messagelist'][$_SESSION['messageindex']];
+			$messagedata = $_SESSION['messagelist'][$_SESSION['messageindex']];
 
-			playback($_SESSION['messageindex'], $_SESSION['messagetotal'], $playback, $playintro);
+			playback($_SESSION['messageindex'], $_SESSION['messagetotal'], $messagedata, $playintro);
 			$_SESSION['messageindex'] = $_SESSION['messageindex'] + 1; // increment to next message
 		}
 	} else {

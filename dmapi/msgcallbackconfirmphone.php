@@ -39,7 +39,7 @@ if ($REQUEST_TYPE == "new") {
 		if ($BFXML_VARS['callerid'] == 1) {
 			$_SESSION['contactphone'] = $_SESSION['callerid']; // set the phone number used to playback messages
 
-			$query = "select value from setting where name=\"msgcallbackrequireid\"";
+			$query = "select value from setting where name='msgcallbackrequireid'";
 			$requirestudentid = QuickQuery($query);
 
 			if($requirestudentid == 1){

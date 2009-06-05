@@ -3,7 +3,7 @@ include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;
 
-function enterstudentid($error, $studentids) {
+function enterstudentid($pkeys) {
 ?>
 <voice>
 	<message name="choosestudentid">
@@ -12,8 +12,8 @@ function enterstudentid($error, $studentids) {
 			    <tts gender="female" language="english">Using your  touch tone phone, please enter the ID number for any of your students. Then press the pound key.</tts>
 			</prompt>
 			<?
-				while($row = DBGetRow($studentids)) {
-					$numeric = makenumeric($row[0]);
+				foreach ($pkeys as $pkey) {
+					$numeric = makenumeric($pkey);
 					?>
 					<choice digits="<? echo $numeric; ?>">
 						<setvar name="success" value="1" />
@@ -28,18 +28,6 @@ function enterstudentid($error, $studentids) {
 				<hangup />
 			</timeout>
 		</field>
-	</message>
-</voice>
-<?
-}
-
-function errorhangup() {
-?>
-<voice>
-	<message name="hangup">
-	       	<tts gender="female">I'm sorry, but there was an error while processing your request. Please call back and try again. goodbye</tts>
-	       	<hangup />
-
 	</message>
 </voice>
 <?
@@ -72,15 +60,9 @@ if ($REQUEST_TYPE == "new") {
 		}
 	} else {
 		// first time through, gather valid studentids for this caller's phone
-		$phonenumber = $_SESSION['contactphone'];
-		$query = "select y.pkey as id from phone x, person y where x.phone=$phonenumber and x.personid=y.id and y.pkey is not null";
-		$results = Query($query);
-
-		if ($results) {
-			enterstudentid(0,$results);
-		} else {
-			errorhangup();
-		}
+		$query = "select p.pkey from phone ph, person p where ph.phone=? and ph.personid=p.id and p.pkey is not null";
+		$pkeys = QuickQueryList($query,false,false,array($_SESSION['contactphone']));
+		enterstudentid($pkeys);
 	}
 } else {
 	//huh, they must have hung up

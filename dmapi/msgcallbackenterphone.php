@@ -50,7 +50,7 @@ if($REQUEST_TYPE == "new") {
 			$phonenumber = substr($phonenumber,1);
 
 		if(strlen($phonenumber) == 7 && substr($phonenumber,0,1) != "0") {
-			$query = "select value as areacode from setting where name=\"defaultareacode\"";
+			$query = "select value as areacode from setting where name='defaultareacode'";
 
 			$areacode = QuickQuery($query);
 
@@ -61,7 +61,7 @@ if($REQUEST_TYPE == "new") {
 		if(strpos($phonenumber,'*') === false && strlen($phonenumber) == 10 && substr($phonenumber,0,1) != "1" && substr($phonenumber,0,1) != "0" ){
 			$_SESSION['contactphone'] = $phonenumber; // store the phone number used to playback messages
 
-			$query = "select value from setting where name=\"msgcallbackrequireid\"";
+			$query = "select value from setting where name='msgcallbackrequireid'";
 			$requirestudentid = QuickQuery($query);
 
 			if($requirestudentid == 1){
