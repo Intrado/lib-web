@@ -13,17 +13,17 @@ class SelectMessage extends FormItem {
 		}
 		$str .= '</select>';
 		$str .= '<table id="'.$n.'details" class="msgdetails" width="'.$this->args['width'].'">';
-		$str .= '<tr><td class="msglabel">Last Used:</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>';
-		$str .= '<tr><td class="msglabel">Description:</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
+		$str .= '<tr><td class="msglabel">'._L("Last Used").':</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>';
+		$str .= '<tr><td class="msglabel">'._L("Description").':</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
 		if ($this->args['type'] == 'email') {
-			$str .= '<tr><td class="msglabel">From:</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">Subject:</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">Attachment:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">'._L("From").':</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">'._L("Subject").':</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">'._L("Attachmen").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
 		}
 		if ($this->args['type'] == 'phone') {
-			$str .= '<tr><td class="msglabel">Preview:</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
+			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
 		}
-		$str .= '<tr><td class="msglabel">Body:</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>';
+		$str .= '<tr><td class="msglabel">'._L("Body").':</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>';
 		$str .= '</table>';
 		$str .= '<script type="text/javascript" src="script/messageselect.js"></script>
 				<script type="text/javascript">
@@ -62,6 +62,7 @@ class CallMe extends FormItem {
 		
 		if (!$value)
 			$value = '{"'.$language[0].'": ""}';
+		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
 		$str .= '<table class="msgdetails" width="80%">';
 		$str .= '<tr><td class="msglabel">'._L("Language").':</td><td>';
@@ -75,15 +76,27 @@ class CallMe extends FormItem {
 		}
 		$str .= '</td></tr>';
 		$str .= '<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" />';
-		$str .= icon_button("Call To Record","/diagona/16/151","new Easycall('".$n."','".$language[0]."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>';
+		$str .= icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$n."','".$language[0]."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>';
 		$str .= '<tr><td class="msglabel">'._L("Messages").':</td>';
 		$str .= '<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">';
 		$str .= '<tr><th colspan=2 class="windowRowHeader">'._L("Message Language").'</th><th class="windowRowHeader" width="30%">'._L("Actions").'</th></tr>';
 		
 		$str .= '</table></td></tr>';
 		$str .= '</table>';
+		// include the easycall javascript object and set up the localized version of the text it will use. then load existing values.
 		$str .= '<script type="text/javascript" src="script/easycall.js"></script>
 				<script type="text/javascript">
+				var callmetextlocale = {
+					"alreadyrecorded": "'._L("There is already a message recorded for this language. Do you want to over-write it?").'",
+					"completed": "'._L("Completed!").'",
+					"endedearly": "'._L("The call ended early!").'",
+					"genericerror": "'._L("There was an error!").'",
+					"alreadyrecorded": "'._L("There is already a message recorded for this language. Do you want to over-write it?").'",
+					"starting": "'._L("Starting session. Please wait...").'",
+					"sessioninprogress": "'._L("Cannot remove a message while record session in progress.").'",
+					"remove": "'._L("Remove").'",
+					"required": "'._L("Required").'",
+				}
 				new Easycall("'.$n.'","'.$language[0].'").load();
 				</script>';
 		return $str;
