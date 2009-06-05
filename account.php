@@ -329,35 +329,13 @@ $formdata["customdisplay"] = array(
         "control" => array("CheckBox"),
         "helpstep" => 3
 );
-$themevalues = array();
-foreach ($COLORSCHEMES as $theme => $scheme) {
-	$themevalues[$theme] = $scheme['displayname'];
-}
+
 $formdata["brandtheme"] = array(
-		"label" => "Color Theme",
-        "value" => $USER->getSetting('_brandtheme', getSystemSetting('_brandtheme')),
-        "validators" => array(
-        ),
-        "control" => array("SelectMenu", "values"=>$themevalues),
-        "helpstep" => 3
-);
-$formdata["brandprimary"] = array(
-        "label" => "Primary Color (in hex)",
-        "value" => $USER->getSetting('_brandprimary', getSystemSetting('_brandprimary')),
-        "validators" => array(
-            array("ValLength","min" => 0,"max" => 6)
-        ),
-        "control" => array("TextField","maxlength" => 6),
-        "helpstep" => 3
-); // TODO need color picker
-$formdata["brandratio"] = array(
-        "label" => "Ratio of Primary to Background",
-        "value" => $USER->getSetting('_brandratio', getSystemSetting('_brandratio')),
-        "validators" => array(
-            array("ValLength","min" => 0,"max" => 3)
-        ),
-        "control" => array("TextField","maxlength" => 3),
-        "helpstep" => 3
+	"label" => _L("Display Theme"),
+	"value" => array("theme"=>getSystemSetting('_brandtheme'), "color"=>getSystemSetting('_brandprimary'), "ratio"=>getSystemSetting('_brandratio')),
+	"validators" => array(),
+	"control" => array("BrandTheme","values"=>$COLORSCHEMES),
+	"helpstep" => 3
 );
 
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
