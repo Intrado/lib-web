@@ -149,9 +149,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 $PAGE = _L("admin").":"._L("settings");
 $TITLE = _L('Systemwide Job Settings');
 
-echo dataChangeAlert($datachange, $_SERVER['REQUEST_URI']);
-
 require_once("nav.inc.php");
+
+?>
+<script>
+<? if ($datachange) { ?>
+	alert("<?=_L("The data on this form has changed. You're changes cannot be saved.")?>")";
+	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+<? } ?>
+</script>
+<?
+
 startWindow(_L("Settings"));
 echo $form->render();
 endWindow();
