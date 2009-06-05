@@ -39,10 +39,7 @@ var Easycall = Class.create({
 				method:'post',
 				parameters: {"phone": this.phone,
 					"language": this.language},
-				onSuccess: this.handleStart.bindAsEventListener(this),
-				onFailure: function() {
-					alert("onFailure");
-				}
+				onSuccess: this.handleStart.bindAsEventListener(this)
 			});
 		} catch (e) { alert(e); }
 		return true;
@@ -55,7 +52,7 @@ var Easycall = Class.create({
 				this.update();
 			} catch (e) { alert(e) }
 		} else {
-			this.handleError();
+			this.handleEnd();
 		}
 	},
 	
@@ -76,7 +73,7 @@ var Easycall = Class.create({
 	handleUpdate: function(transport) {
 		var response = transport.responseJSON;
 		if (response && !response.error) {
-			// TODO: update icon and progress text
+			// update image and progress text for call status
 			$(this.formname+this.language+"_img").src = this.loadingimg;
 			$(this.formname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" />" + response.progress;
 			if (response.status == "done") {
@@ -88,28 +85,24 @@ var Easycall = Class.create({
 		}
 	},
 	
+	// update page based on how the task ended
 	handleEnd: function(error) {
 		if (this.pe)
 			this.pe.stop();
 		this.updateMessage();
 		switch(error) {
 			case "done":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" />Completed! ";
-				$(this.formname+this.language+"_img").src = this.playimg;
-				break;
-			
-			case "messageexists":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />This message is already recorded ";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" />"+callmetextlocale.completed;
 				$(this.formname+this.language+"_img").src = this.playimg;
 				break;
 			
 			case "callended":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />The call ended early!";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />"+callmetextlocale.endedearly;
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
 			
 			default:
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />There was an error! ("+error+")";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />"+callmetextlocale.genericerror;
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 		}
 		if (this.language !== this.required)
@@ -124,12 +117,13 @@ var Easycall = Class.create({
 		var messages = $(this.formname).value.evalJSON();
 		
 		if (messages[this.language]) {
-			this.handleEnd("messageexists");
-			return false;
+			if (!confirm(callmetextlocale.alreadyrecorded))
+				return false;
+			$(this.formname+this.language+"_img").stopObserving();
 		}
 		
 		$(this.formname+"recordbutton").hide();
-		$(this.formname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" />Starting session. Please wait...";
+		$(this.formname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" />"+callmetextlocale.starting;
 		
 		if ($H(messages).keys().every(function(lang) { return (lang !== this.language); }.bind(this))) {
 			this.displayMessage();
@@ -174,10 +168,10 @@ var Easycall = Class.create({
 		}
 		
 		if (this.language !== this.required) {
-			$(this.formname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\">Remove</div>");
-			$(this.formname+this.language+"_remove").observe('click', function(event) {alert("Cannot remove a message while record session in progress.")});
+			$(this.formname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\">"+callmetextlocale.remove+"</div>");
+			$(this.formname+this.language+"_remove").observe('click', function(event) {alert(callmetextlocale.sessioninprogress)});
 		} else {
-			$(this.formname+this.language+"_remove").update("<img src=\""+this.alertimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; float: left; margin-right: 5px\">Required</div>");
+			$(this.formname+this.language+"_remove").update("<img src=\""+this.alertimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; float: left; margin-right: 5px\">"+callmetextlocale.required+"</div>");
 		}
 	}
 });
