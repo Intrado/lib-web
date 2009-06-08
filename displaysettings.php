@@ -9,6 +9,7 @@ require_once("inc/themes.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("obj/FormBrandTheme.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -44,7 +45,7 @@ $formdata["brandtheme"] = array(
 		"ratio"=>getSystemSetting('_brandratio'),
 		"customize"=>true
 		)),
-	"validators" => array(array("ValTheme")),
+	"validators" => array(array("ValBrandTheme")),
 	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>false),
 	"helpstep" => $helpstepnum
 );
@@ -110,6 +111,7 @@ require_once("nav.inc.php");
 	alert("<?=_L("The data on this form has changed. You're changes cannot be saved.")?>")";
 	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 <? } ?>
+<? Validator::load_validators(array("ValBrandTheme"));?>
 </script>
 <?
 

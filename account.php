@@ -15,6 +15,7 @@ require_once("inc/themes.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("obj/FormBrandTheme.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -325,7 +326,7 @@ $formdata["brandtheme"] = array(
 		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')),
 		"customize"=>($USER->getSetting('_brandtheme'))?true:false
 		)),
-	"validators" => array(array("ValTheme")),
+	"validators" => array(array("ValBrandTheme")),
 	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>true),
 	"helpstep" => 3
 );
@@ -437,7 +438,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 
-<? Validator::load_validators(array("ValLogin", "ValPassword")); ?>
+<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme")); ?>
 
 <? if ($datachange) { ?>
 
