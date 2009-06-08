@@ -34,25 +34,21 @@ var Easycall = Class.create({
 	start: function () {
 		if (!this.add())
 			return;
-		try {
-			new Ajax.Request('ajaxeasycall.php', {
-				method:'post',
-				parameters: {"phone": this.phone,
-					"language": this.language},
-				onSuccess: this.handleStart.bindAsEventListener(this)
-			});
-		} catch (e) { alert(e); }
+		new Ajax.Request('ajaxeasycall.php', {
+			method:'post',
+			parameters: {"phone": this.phone, "language": this.language},
+			onSuccess: this.handleStart.bindAsEventListener(this),
+			onFailure: this.handleEnd.bindAsEventListener(this)
+		});
 		return true;
 	},
 	handleStart: function(transport) {
 		var response = transport.responseJSON;
-		if (response) {
+		if (response && !response.error) {
 			this.specialtask = response.id;
-			try {
-				this.update();
-			} catch (e) { alert(e) }
+			this.update();
 		} else {
-			this.handleEnd();
+			this.handleEnd(response.error);
 		}
 	},
 	
@@ -101,6 +97,12 @@ var Easycall = Class.create({
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
 			
+			case "missingparam":
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />"+callmetextlocale.missingparam;
+				$(this.formname+this.language+"_img").src = this.exclamationimg;
+
+				break;
+				
 			default:
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" />"+callmetextlocale.genericerror;
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
@@ -114,6 +116,9 @@ var Easycall = Class.create({
 	add: function () {
 		this.language = $(this.formname+"select").value;
 		this.phone = $(this.formname+"phone").value;
+		if (!this.phone || !this.language)
+			return false;
+		
 		var messages = $(this.formname).value.evalJSON();
 		
 		if (messages[this.language]) {
@@ -124,8 +129,7 @@ var Easycall = Class.create({
 		
 		$(this.formname+"recordbutton").hide();
 		$(this.formname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" />"+callmetextlocale.starting;
-		
-		if ($H(messages).keys().every(function(lang) { return (lang !== this.language); }.bind(this))) {
+		if (typeof(messages[this.language]) == "undefined") {
 			this.displayMessage();
 			this.updateMessage();
 		}
@@ -157,10 +161,11 @@ var Easycall = Class.create({
 	},
 	
 	updateMessage: function () {
+		var messages = $(this.formname).value.evalJSON();
+		messages[this.language] = this.messageid;
+		$(this.formname).value = Object.toJSON(messages);
+
 		if (this.messageid) {
-			var messages = $(this.formname).value.evalJSON();
-			messages[this.language] = this.messageid;
-			$(this.formname).value = Object.toJSON(messages);
 			$(this.formname+this.language+"_img").src = this.playimg;
 			$(this.formname+this.language+"_img").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
 		} else {
