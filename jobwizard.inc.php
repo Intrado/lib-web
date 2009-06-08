@@ -115,7 +115,7 @@ class ValHasMessage extends Validator {
 		if ($value == 'pick') {
 			$msgcount = (QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".$args['type']."'"));
 			if (!$msgcount)
-				return "$this->label doesnt appear to exist for this uer. Select another option or go create a message.";
+				return "$this->label doesnt appear to exist for this user. Select another option or go create a message.";
 		}
 		return true;
 	}
