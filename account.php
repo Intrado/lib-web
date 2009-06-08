@@ -317,26 +317,16 @@ $formdata["locale"] = array(
         "control" => array("SelectMenu", "values"=>$LOCALES),
         "helpstep" => 3
 );
-$themechecked = "false";
-if ($USER->getSetting('_brandtheme')) {
-	$themechecked = "true";
-}
-$formdata["customdisplay"] = array(
-		"label" => "Customize Display",
-        "value" => $themechecked,
-        "validators" => array(),
-        "control" => array("CheckBox"),
-        "helpstep" => 3
-);
 
 $formdata["brandtheme"] = array(
-	"label" => _L("Display Theme"),
+	"label" => _L("Customize Theme"),
 	"value" => json_encode(array("theme"=>$USER->getSetting('_brandtheme',getSystemSetting('_brandtheme')), 
 		"color"=>$USER->getSetting('_brandprimary',getSystemSetting('_brandprimary')), 
-		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')))
-		),
+		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')),
+		"customize"=>($USER->getSetting('_brandtheme'))?true:false
+		)),
 	"validators" => array(array("ValTheme")),
-	"control" => array("BrandTheme","values"=>$COLORSCHEMES),
+	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>true),
 	"helpstep" => 3
 );
 
@@ -394,11 +384,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         
 		$USER->setSetting("actionlinks", $postdata['actionlinks']);
 		$USER->setSetting("_locale", $postdata['locale']);
-        $_SESSION['_locale'] = $postdata['locale'];
-        
-		if ($postdata['customdisplay']) {
-			
-			$newTheme = json_decode($postdata['brandtheme']);
+		$_SESSION['_locale'] = $postdata['locale'];
+
+		$newTheme = json_decode($postdata['brandtheme']);
+		
+		if ($newTheme->customize) {
 
 			$USER->setSetting("_brandtheme", $newTheme->theme);
 			$USER->setSetting("_brandprimary", $newTheme->color);

@@ -38,9 +38,14 @@ $helpsteps[$helpstepnum++] = _L("User interface language and localization select
 
 $formdata["brandtheme"] = array(
 	"label" => _L("Default Theme"),
-	"value" => json_encode(array("theme"=>getSystemSetting('_brandtheme'), "color"=>getSystemSetting('_brandprimary'), "ratio"=>getSystemSetting('_brandratio'))),
+	"value" => json_encode(array(
+		"theme"=>getSystemSetting('_brandtheme'),
+		"color"=>getSystemSetting('_brandprimary'),
+		"ratio"=>getSystemSetting('_brandratio'),
+		"customize"=>true
+		)),
 	"validators" => array(array("ValTheme")),
-	"control" => array("BrandTheme","values"=>$COLORSCHEMES),
+	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>false),
 	"helpstep" => $helpstepnum
 );
 $helpsteps[$helpstepnum++] = _L("The Color Theme controls the systemwide color palette.");

@@ -180,7 +180,10 @@ class BrandTheme extends FormItem {
 		$phpvalue = json_decode($value);
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
-		$str .= '<table class="msgdetails"><tr><td class="msglabel">'._L("Theme").':</td>';
+		if ($this->args['toggle'])
+			$str .= '<input id="'.$n.'customize" name="'.$n.'customize" type="checkbox" value="true" '. ($phpvalue->customize ? 'checked' : '').' onchange="showTheme()" />';
+		$str .= '<table id="'.$n.'themetable" name="'.$n.'themetable" class="msgdetails">';
+		$str .= '<tr><td class="msglabel">'._L("Theme").':</td>';
 		$str .= '<td><select id="'.$n.'theme" name="'.$n.'theme" onchange="loadTheme();" >';
 		foreach ($this->args['values'] as $selectvalue => $selectname)
 			$str .= '<option value="'.escapehtml($selectvalue).'" '.(($phpvalue->theme == $selectvalue)? "selected" : "").' )>'.escapehtml($selectname['displayname']).'</option>';
@@ -197,6 +200,19 @@ class BrandTheme extends FormItem {
 			themeformname = "'.$this->form->name.'";
 			themeformitem = "'.$n.'";
 			themecolorschemes = '.json_encode($this->args['values']).';
+			themecustomize = "'.$this->args['toggle'].'";
+			
+			if (themecustomize && $(themeformitem+"customize").checked == false)
+				$(themeformitem+"themetable").hide();
+			
+			// When customization check box is checked. Show the theme table.
+			function showTheme() {
+				if ($(themeformitem+"customize").checked == true)
+					$(themeformitem+"themetable").show();
+				else
+					$(themeformitem+"themetable").hide();
+				storeTheme();
+			}
 			
 			// When a new theme is selected. Update the color and ratio fields with default values
 			function loadTheme() {
@@ -209,6 +225,7 @@ class BrandTheme extends FormItem {
 			// Save changes in the hidden field
 			function storeTheme() {
 				$(themeformitem).value = Object.toJSON({
+					"customize": themecustomize?$(themeformitem+"customize").checked:true,
 					"theme": $(themeformitem+"theme").value,
 					"color": $(themeformitem+"color").value,
 					"ratio": $(themeformitem+"ratio").value
