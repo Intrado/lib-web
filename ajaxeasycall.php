@@ -18,7 +18,7 @@ if (!$USER->authorize("starteasy"))
 
 function taskNew($phone,$language) {		
 	if (!$phone || !$language)
-		return false;
+		return array("error"=>"missingparam");
 	global $USER;
 	$task = new SpecialTask("new");
 	$task->status = "new";
@@ -82,7 +82,7 @@ $id = false;
 
 if (isset($_POST['phone']) && isset($_POST['language'])) {
 	$id = "new";
-	$language = json_decode($_POST['language']);
+	$language = $_POST['language'];
 	$phone = Phone::parse($_POST['phone']);
 }
 
