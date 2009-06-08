@@ -96,6 +96,7 @@ class CallMe extends FormItem {
 					"sessioninprogress": "'._L("Cannot remove a message while record session in progress.").'",
 					"remove": "'._L("Remove").'",
 					"required": "'._L("Required").'",
+					"missingparam": "'._L("One or more parameters missing").'"
 				}
 				new Easycall("'.$n.'","'.$language[0].'").load();
 				</script>';
