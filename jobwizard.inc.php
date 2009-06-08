@@ -214,6 +214,7 @@ class JobWiz_basic extends WizStep {
 		$formdata = array(
 			"name" => array(
 				"label" => "Name",
+				"fieldhelp" => "This field is used in reports, and used for email subjects, etc. It can be up to 50 characters long.",
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -224,6 +225,7 @@ class JobWiz_basic extends WizStep {
 			),
 			"jobtype" => array(
 				"label" => "Type/Category",
+				"fieldhelp" => "Determines how people recieve your message.",
 				"value" => "",
 				"validators" => array(
 					array("ValRequired")
@@ -233,6 +235,7 @@ class JobWiz_basic extends WizStep {
 			),
 			"listmethod" => array(
 				"label" => "Contact List",
+				"fieldhelp" => "This specifies who is contacted.",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValContactListMethod")
@@ -246,6 +249,7 @@ class JobWiz_basic extends WizStep {
 			),
 			"package" => array(
 				"label" => "Notification Method",
+				"fieldhelp" => "There are many common ways of packaging your message. Choose the one that best fits how you'd like to provide your message.",
 				"validators" => array(
 					array("ValRequired")
 				),
