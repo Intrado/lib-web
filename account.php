@@ -324,16 +324,18 @@ if ($USER->getSetting('_brandtheme')) {
 $formdata["customdisplay"] = array(
 		"label" => "Customize Display",
         "value" => $themechecked,
-        "validators" => array(
-        ),
+        "validators" => array(),
         "control" => array("CheckBox"),
         "helpstep" => 3
 );
 
 $formdata["brandtheme"] = array(
 	"label" => _L("Display Theme"),
-	"value" => array("theme"=>getSystemSetting('_brandtheme'), "color"=>getSystemSetting('_brandprimary'), "ratio"=>getSystemSetting('_brandratio')),
-	"validators" => array(),
+	"value" => json_encode(array("theme"=>$USER->getSetting('_brandtheme',getSystemSetting('_brandtheme')), 
+		"color"=>$USER->getSetting('_brandprimary',getSystemSetting('_brandprimary')), 
+		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')))
+		),
+	"validators" => array(array("ValTheme")),
 	"control" => array("BrandTheme","values"=>$COLORSCHEMES),
 	"helpstep" => 3
 );
@@ -395,18 +397,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $_SESSION['_locale'] = $postdata['locale'];
         
 		if ($postdata['customdisplay']) {
-			$USER->setSetting("_brandtheme", $postdata['brandtheme']);
-			$USER->setSetting("_brandtheme1", $COLORSCHEMES[$postdata['brandtheme']]["_brandtheme1"]);
-			$USER->setSetting("_brandtheme2", $COLORSCHEMES[$postdata['brandtheme']]["_brandtheme2"]);
-			$_SESSION['colorscheme']['_brandtheme'] = $postdata['brandtheme'];
-			$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[$postdata['brandtheme']]["_brandtheme1"];
-			$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[$postdata['brandtheme']]["_brandtheme2"];
+			
+			$newTheme = json_decode($postdata['brandtheme']);
 
-			$USER->setSetting("_brandprimary", $postdata['brandprimary']);
-			$_SESSION['colorscheme']['_brandprimary'] = $postdata['brandprimary'];
+			$USER->setSetting("_brandtheme", $newTheme->theme);
+			$USER->setSetting("_brandprimary", $newTheme->color);
+			$USER->setSetting("_brandratio", $newTheme->ratio);
+			$USER->setSetting("_brandtheme1", $COLORSCHEMES[$newTheme->theme]["_brandtheme1"]);
+			$USER->setSetting("_brandtheme2", $COLORSCHEMES[$newTheme->theme]["_brandtheme2"]);
 
-			$USER->setSetting("_brandratio", $postdata['brandratio']);
-			$_SESSION['colorscheme']['_brandratio'] = $postdata['brandratio'];
+			$_SESSION['colorscheme']['_brandtheme'] = $newTheme->theme;
+			$_SESSION['colorscheme']['_brandprimary'] = $newTheme->color;
+			$_SESSION['colorscheme']['_brandratio'] = $newTheme->ratio;
+			$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme1"];
+			$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme2"];
+			
 		} else {
 			$USER->setSetting("_brandtheme", "");
 			$USER->setSetting("_brandtheme1", "");
