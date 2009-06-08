@@ -10,7 +10,7 @@ header("Cache-Control: private");
 ?>
 
 /* ======= BEGIN VALIDATORS =======  */
-<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray","ValStatic")); ?>
+<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray")); ?>
 /* ======= END VALIDATORS =======  */
 
 
@@ -31,12 +31,7 @@ function form_event_handler (event) {
 			form_do_validation(form,e); formvars.keyuptimer = null;
 		},
 		event.type == "keyup" ? 750 : 200
-	);
-	
-	
-			
-
-	
+	);	
 }
 
 function form_get_value (form,targetname) {
@@ -204,7 +199,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	//set up formvars to save data, avoid memleaks in IE by not attaching anything to dom elements
 	if (!document.formvars)
 		document.formvars = {};
-		
+	
 	var formvars = document.formvars[name] = {
 		formdata: formdata,
 		scriptname: scriptname, //used for any ajax calls for this form
@@ -213,7 +208,8 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		helperdisabled: true,
 		currentstep: 0,
 		validators: {},
-		jsgetvalue: {}
+		jsgetvalue: {},
+		submitting: false
 	};
 		
 	//make appropriate validators for each field
@@ -487,7 +483,12 @@ function form_handle_submit(form,event) {
 		return;
 	
 	Event.stop(event); //we'll take it from here with ajax
-		
+
+	//don't allow more than one submit at a time
+	if (formvars.submitting)
+		return;
+	formvars.submitting = true;
+	
 	//prep an ajax call with entire form contents and post back to server
 	//server side will validate
 	//if successful, results with have some action to take and/or code
@@ -532,16 +533,17 @@ function form_handle_submit(form,event) {
 					alert("The data on this form has changed.\nYour changes cannot be saved.");
 					window.location=formvars.scriptname;
 				}
-				
 			} else if ("success" == res.status) {
-				
 				if (res.nexturl)
 					window.location=res.nexturl;
-				
 			}
 			} catch (e) { alert(e.message + "\n" + response.responseText)}
+			formvars.submitting = false;
 		},
-		onFailure: function(){ alert('Something went wrong...') } //TODO better error handling
+		onFailure: function(){ 
+			alert('There was a problem submitting the form. Please try again.'); //TODO better error handling
+			formvars.submitting = false;
+		} 
 	});
 	
 }
