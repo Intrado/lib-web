@@ -184,10 +184,16 @@ class Form {
 			
 			$n = $this->name."_".$item->name;
 			$l = $itemdata['label'];
+			
+			$labelhelp = "";
+			if (isset($itemdata['fieldhelp'])) {
+				$labelhelp = '<div class="fieldhelp" id="'.$n.'_fieldhelp" style="display: none;">'.$itemdata['fieldhelp'].'</div>';
+				$this->formdata[$name]['fieldhelp'] = true; //overwrite with bool
+			} 
 
 			if ($formclass == "FormHtml") {
 				$str.= '
-				<tr><th class="formtableheader formlabel">'.$l.'</th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
+				<tr><th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label>'.$labelhelp.'</th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
@@ -234,7 +240,7 @@ class Form {
 				
 				$str.= '
 				<tr id="'.$n.'_fieldarea" '.$style.'>
-					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>
+					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label>'.$labelhelp.'</th>
 					<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>
 					<td class="formtablecontrol">
 						'.$item->render($value).'
@@ -257,7 +263,7 @@ class Form {
 		$str .= '
 				<!-- END FORM CONTENT -->
 				</td>
-				<td id="'.$this->name.'_helpercell" valign="top" style="width: 0px;">
+				<td id="'.$this->name.'_helpercell" valign="top" style="width: 0px; overflow: visible;">
 				<!-- HELPER -->
 				<div id="'.$this->name.'_helper" class="helper">
 					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="img/icons/cross.gif" alt="Close Guide" title="Close"></a><img src="img/icons/information.gif" alt="" style="float: left;">Guide</div>

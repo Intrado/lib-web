@@ -9,13 +9,13 @@ header("Cache-Control: private");
 	width: 100%;
 	padding: 0;
 	margin: 0;
+	overflow: visible;
 }
 
 form.newform {
 	position: relative; /* allows offsetParent to be correct for helper*/
 	float: left;
 	width: 100%;
-	overflow: auto;
 	clear: both;
 }
 
@@ -24,6 +24,7 @@ form.newform {
 }
 
 .helper {
+	z-index: 999;
 	font-family: sans-serif;
 	display: block;
 	overflow: hidden;
@@ -42,7 +43,7 @@ form.newform {
 	font-size: 9pt;
 	font-family: sans-serif;
 	padding: 5px;
-	max-height: 125px;
+	height: 125px;
 	overflow: auto;
 }
 
@@ -128,6 +129,18 @@ form.newform {
 
 .newform .formlabel {
 	width: 100%;	
+}
+
+.newform .fieldhelp {
+	font-weight: normal;
+	font-style: italic;
+	border: 1px dashed black;
+	padding: 3px;
+	margin-left: 1px;
+	margin-right: 1px;
+	text-align: justify;
+	font-size: 80%;
+	background-color: #F0F0F0;
 }
 
 .newform .underneathmsg {

@@ -10,7 +10,7 @@ header("Cache-Control: private");
 ?>
 
 /* ======= BEGIN VALIDATORS =======  */
-<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray","ValStatic")); ?>
+<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray")); ?>
 /* ======= END VALIDATORS =======  */
 
 
@@ -281,18 +281,23 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	});
 	
 	//install click handlers for table form labels
-	form.select('.formlabel').map(function(e) {
-		e.observe("click",form_label_event_handler);
-		e.style.cursor="help";
+	form.select('label.formlabel').map(function(e) {		
+		if (e.htmlFor) {
+			var itemname = e.htmlFor.split("_")[1];
+			if (formdata[itemname] && formdata[itemname]['fieldhelp']) {			
+				e.observe("click",form_label_event_handler.curry(e.htmlFor));
+				e.style.cursor="help";
+			}
+		}
 	});
 	
-		
 	//submit handler
 	form.observe("submit",form_handle_submit.curry(name));
 }
 
-function form_label_event_handler (event) {
-	//TODO show a popup for this form item
+function form_label_event_handler (fieldname, event) {
+	var e = $(fieldname + "_fieldhelp");
+	Effect.toggle(e,'blind',{duration: 0.5});
 }
 
 function form_fieldset_event_handler (event) {
