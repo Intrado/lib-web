@@ -374,7 +374,7 @@ class ValFieldConfirmation extends Validator {
 class ValInArray extends Validator {
 	function validate ($value, $args) {
 		if (!in_array($value, $args['values']))
-			return "$this->label must be an item from the list of available choices.";		
+			return "$this->label must be an item from the list of available choices.";
 		return true;
 	}
 	
@@ -408,6 +408,40 @@ class ValStatic extends Validator {
 				if (args.val && (args.val.toLowerCase() != value.toLowerCase()))
 					return label + " is not the correct value";
 				return true;
+			}';
+	}
+}
+
+class ValTheme extends Validator {
+	function validate ($value, $args) {
+		$checkval = json_decode($value);
+		$errortext = "";
+		if (!$checkval->theme)
+			$errortext .= " " . _L("Theme must be a valid choice.");
+		if (!((strlen($checkval->color) == 6) && is_numeric('0x'.substr($checkval->color, 0, 2)) && is_numeric('0x'.substr($checkval->color, 2, 2)) && is_numeric('0x'.substr($checkval->color, 4, 2))))
+			$errortext .= " " . _L("Primary Color must be a valid Hex representation of your color choice.");
+		if (!is_numeric($checkval->ratio))
+			$errortext .= " " . _L("Ratio must be a number.");
+		if ($errortext)
+			return $this->label . $errortext;
+		else
+			return true;
+	}
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				vals = value.evalJSON();
+				var errortext = "";
+				if (!vals.theme)
+					errortext += " Theme must be a valid choice.";
+				if (!(vals.color.length == 6))
+					errortext += " Primary Color must be a valid Hex representation of your color choice.";
+				if (!parseFloat(vals.ratio))
+					errortext += " Ratio must be a number.";
+				if (errortext)
+					return errortext;
+				else
+					return true;
 			}';
 	}
 }
