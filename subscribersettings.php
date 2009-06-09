@@ -23,7 +23,7 @@ require_once("obj/Validator.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 // TODO show options, but show/hide metadata
-if (!$USER->authorize('metadata') && !getSystemSetting("_hasselfsignup", false)) {
+if (!$USER->authorize('managesystem') && !getSystemSetting("_hasselfsignup", false)) {
 	redirect('unauthorized.php');
 }
 
@@ -31,38 +31,6 @@ if (!$USER->authorize('metadata') && !getSystemSetting("_hasselfsignup", false))
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_GET['delete'])) {
-	$id = 0 + $_GET['delete'];
-	
-	QuickUpdate("begin");
-	
-	// get fieldmap obj to remove options
-	$fieldmap = new FieldMap($id);
-	$fieldmap->removeOption("subscribe");
-	$fieldmap->removeOption("static");
-	$fieldmap->removeOption("dynamic");
-	$fieldmap->update();
-
-	// clear static subscriber values
-	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
-	
-	QuickUpdate("commit");
-	redirect();
-}
-
-$firstnameField = FieldMap::getFirstNameField();
-$lastnameField = FieldMap::getLastNameField();
-$languageField = FieldMap::getLanguageField();
-
-$data = DBFindMany("FieldMap","from fieldmap where options like '%subscribe%'");
-
-$titles = array(	"name" => "Field",
-					"valtype" => "Value Type",
-					"values" => "Values",
-					"Actions" => "Actions"
-					);
-
-$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
 
 $emaildomain = QuickQuery("select value from setting where name='emaildomain'");
 
@@ -103,8 +71,8 @@ $formdata["sitecode"] = array(
     );
 
 
-$buttons = array(submit_button("Save","submit","tick"),
-                icon_button("Cancel","cross",null,"subscribersettings.php"));
+$buttons = array(submit_button("Done","submit","accept"),
+                icon_button("Cancel","cross",null,"settings.php"));
                 
 $form = new Form("subscriberoptions",$formdata,null,$buttons);
 $form->ajaxsubmit = true;
@@ -129,58 +97,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setSystemSetting("subscribersitecode", $postdata['sitecode']);
 				
         if ($ajax)
-            $form->sendTo("subscribersettings.php");
+            $form->sendTo("settings.php");
         else
-            redirect("subscribersettings.php");
+            redirect("settings.php");
     }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Display Functions
-////////////////////////////////////////////////////////////////////////////////
-
-function fmt_actions ($obj, $name) {
-	global $firstnameField, $lastnameField, $languageField;
-	
-	// first, last name, language fields have no actions
-	if ($obj->fieldnum == $firstnameField ||
-		$obj->fieldnum == $lastnameField ||
-		$obj->fieldnum == $languageField)
-			return '';
-			
-	return action_links (
-		action_link("Edit", "pencil", "subscriberfieldvalue.php?id=$obj->id"),
-		action_link("Delete", "cross", "subscribersettings.php?delete=$obj->id", "return confirmDelete();")
-	);
-}
-
-function fmt_valtype ($obj, $name) {
-	if ($obj->isOptionEnabled('static'))
-		return "Static";
-	else
-		return "Dynamic";
-}
-
-function fmt_values ($obj, $name) {
-	global $languageField;
-	
-	if ($obj->isOptionEnabled('static')) {
-		// TODO special case language
-		if ($obj->fieldnum == $languageField) {
-			return "English,Spanish,French"; // TODO
-		} else {
-			$values = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($obj->fieldnum));
-			if (count($values) == 0)
-				return "";
-			$valcsv = implode(",", $values);
-			if (strlen($valcsv) > 25)
-				return substr($valcsv, 0, 25) . "...";
-			else
-				return $valcsv;
-		}
-	} else
-		return "";
 }
 
 
@@ -189,21 +109,12 @@ function fmt_values ($obj, $name) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Subscriber Self-Signup Settings';
+$TITLE = 'Self-Signup Settings';
 
 include_once("nav.inc.php");
 
 startWindow('Account Options', null, true);
 echo $form->render();
-endWindow();
-
-startWindow('Subscriber Field Values', null, true);
-showObjects($data, $titles, array("valtype" => "fmt_valtype", "values" => "fmt_values", "Actions" => "fmt_actions"), false, true);
-if (count($addfields) > 0) {
-	buttons(icon_button("Add Another",null,null,"subscriberfieldvalue.php"));
-} else {
-	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
-}
 endWindow();
 
 include_once("navbottom.inc.php");

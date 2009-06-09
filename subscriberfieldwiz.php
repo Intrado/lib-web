@@ -193,45 +193,49 @@ class SubscriberWiz_staticvalues extends WizStep {
 	}
 }
 
-class SubscriberWiz_confirm extends WizStep {
-	function getForm($postdata, $curstep) {
-		$formhtml = "<div>Thanks your field will be added.</div>";
-		
-		$formdata = array();
+class FinishSubscriberFieldWizard extends WizFinish {
+	
+	function finish ($postdata) {
+		if (isset($postdata['/choosefield']['hiddenid'])) {
+			$id = $postdata['/choosefield']['hiddenid'];
+		} else {
+			$id = $postdata['/choosefield']['addfield'];
+		}
+		$fieldmap = new FieldMap($id);
+	
+		$fieldmap->addOption("subscribe");
+	
+		$fieldmap->removeOption("static");
+		$fieldmap->removeOption("dynamic");
+		if ($postdata['/choosevaltype']['valtype'] == 1)
+			$fieldmap->addOption("static");
+		else
+			$fieldmap->addOption("dynamic");
+        	
+		$fieldmap->update();
+	
+		QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
 
-    	$formdata["review"] = array(
-        	"label" => "Confirmation",
-        	"control" => array("FormHtml","html" => $formhtml),
-			"helpstep" => 1
-		);
-		
-		$helpsteps = array (
-			"Welcome",
-			"blah, blah"
-		);
-		
-		return new Form("confirm", $formdata, $helpsteps);
+		$insertstmt = "insert into persondatavalues (fieldnum, value, refcount, editlock) values ";
+		$insertvalues = array();
+	
+		if (isset($postdata['/staticvalues'])) {
+			$datavalues = explode("\n", $postdata['/staticvalues']['values']);
+			foreach ($datavalues as $value) {
+				if (strlen($value) == 0) continue; // skip blank lines
+				$insertstmt .= "(?, ?, 0, 1),";
+				$insertvalues[] = $fieldmap->fieldnum;
+				$insertvalues[] = $value;
+			}
+			if (count($insertvalues)) {
+				$insertstmt = substr($insertstmt, 0, strlen($insertstmt)-1); // strip trailing comma
+				QuickUpdate($insertstmt, false, $insertvalues);
+			} 
+		}
 	}
-}
-
-class SubscriberWiz_finish extends WizStep {
-	function getForm($postdata, $curstep) {
-		$formhtml = "<div>Thanks your field has been added.</div>";
-		
-		$formdata = array();
-
-    	$formdata["review"] = array(
-        	"label" => "Confirmation",
-        	"control" => array("FormHtml","html" => $formhtml),
-			"helpstep" => 1
-		);
-		
-		$helpsteps = array (
-			"Welcome",
-			"blah, blah"
-		);
-		
-		return new Form("finish", $formdata, $helpsteps);
+	
+	function getFinishPage ($postdata) {
+		return "<h1>Thanks your field has been added.</h1>" . icon_button("Return to Settings", "fugue/arrow_180", "", "subscriberfields.php");
 	}
 }
 
@@ -239,116 +243,11 @@ class SubscriberWiz_finish extends WizStep {
 $wizdata = array(
 	"choosefield" => new SubscriberWiz_choosefield(_L("Select Field")),
 	"choosevaltype" => new SubscriberWiz_choosevaltype(_L("Select Value Type")),
-	"staticvalues" => new SubscriberWiz_staticvalues(_L("Enter Static Values")),
-	"confirm" => new SubscriberWiz_confirm(_L("Confirm")),
-	"finish" => new SubscriberWiz_finish(_L("Final"))
+	"staticvalues" => new SubscriberWiz_staticvalues(_L("Enter Static Values"))
 	);
 
-$wizard = new Wizard("subscriberwiz", $wizdata);
+$wizard = new Wizard("subscriberwiz", $wizdata, new FinishSubscriberFieldWizard("Finish"));
 $wizard->handleRequest();
-
-if ($wizard->isDone()) {
-	$postdata = $_SESSION['subscriberwiz']['data'];
-
-	if (isset($postdata['/choosefield']['hiddenid'])) {
-		$id = $postdata['/choosefield']['hiddenid'];
-	} else {
-		$id = $postdata['/choosefield']['addfield'];
-	}
-	$fieldmap = new FieldMap($id);
-	
-	$fieldmap->addOption("subscribe");
-	
-	$fieldmap->removeOption("static");
-	$fieldmap->removeOption("dynamic");
-	if ($postdata['/choosevaltype']['valtype'] == 1)
-		$fieldmap->addOption("static");
-	else
-		$fieldmap->addOption("dynamic");
-        	
-	$fieldmap->update();
-
-	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
-
-	$insertstmt = "insert into persondatavalues (fieldnum, value, refcount, editlock) values ";
-	$insertvalues = array();
-	
-	if (isset($postdata['/staticvalues'])) {
-		$datavalues = explode("\n", $postdata['/staticvalues']['values']);
-		foreach ($datavalues as $value) {
-			if (strlen($value) == 0) continue; // skip blank lines
-			$insertstmt .= "(?, ?, 0, 1),";
-			$insertvalues[] = $fieldmap->fieldnum;
-			$insertvalues[] = $value;
-		}
-		if (count($insertvalues)) {
-			$insertstmt = substr($insertstmt, 0, strlen($insertstmt)-1); // strip trailing comma
-			QuickUpdate($insertstmt, false, $insertvalues);
-		} 
-	}
-	
-	$_SESSION['subscriberwiz'] = null; // clear out the old data
-	redirect("subscribersettings.php");
-}
-
-
-/*
-$formdata = array(
-    "valtype" => array(
-        "label" => "Value Type:",
-        "value" => $value,
-        "validators" => array(    
-            array("ValRequired")
-        ),
-        "control" => array("RadioButton","values" => array(1 => "Static", 2 => "Dynamic")),
-        "helpstep" => 1
-    ),
-    "values" => array(
-        "label" => "Static Value(s):",
-        "value" => $valtext,
-        "validators" => array(
-            array("ValLength","max" => 255)
-        ),
-        "control" => array("TextArea","rows" => 10),
-        "helpstep" => 2
-    )
-);
-*/
-/*
-//check for form submission
-if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-        
-        $fieldmap->removeOption("static");
-        $fieldmap->removeOption("dynamic");
-
-        if ($postdata['valtype'] == 1)
-        	$fieldmap->addOption("static");
-        else
-        	$fieldmap->addOption("dynamic");
-        	
-        $fieldmap->update();
-        
-        QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
-        
-        $datavalues = explode("\n", $postdata['values']);
-        foreach ($datavalues as $value) {
-			QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values (?, ?, 0, 1)", false, array($fieldmap->fieldnum, $value));
-        } 
-        
-        if ($ajax)
-            $form->sendTo("subscribersettings.php");
-        else
-            redirect("subscribersettings.php");
-    }
-}
-*/
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
