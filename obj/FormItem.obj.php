@@ -21,23 +21,6 @@ abstract class FormItem {
 
 // HiddenField | TextField | PasswordField | CheckBox | RadioButton | TextArea | MultiSelect | MultiCheckBox
 
-class CaptchaField extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		if (isset($this->args['iData'])) {
-			$iData = '?iData='.$this->args['iData'];
-			$max = 'maxlength="50"';
-			$size = 'size="14"';
-		} else {
-			// TODO what if no iData?
-			$iData = "";
-			$max = "";
-			$size = "";
-		}
-		return '<img src="captcha.png.php'.$iData.'" /><br><input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" '.$max.' '.$size.'/>';
-	}
-}
-
 class HiddenField extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
