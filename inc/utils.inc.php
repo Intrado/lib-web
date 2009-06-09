@@ -243,6 +243,36 @@ function base64url_decode($string) {
     return base64_decode($data);
 }
 
+
+function getDomainRegExp() {
+    ##################################################################################
+	# Beginning of Creative Commons Email Parser Code
+	##################################################################################
+
+	$qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
+
+	$dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';
+
+	$atom = '[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+';
+
+    $quoted_pair = '\\x5c[\\x00-\\x7f]';
+
+    $domain_literal = "\\x5b(?:$dtext|$quoted_pair)*\\x5d";
+
+    $quoted_string = "\\x22(?:$qtext|$quoted_pair)*\\x22";
+
+    $domain_ref = $atom;
+
+    $sub_domain = "(?:$domain_ref|$domain_literal)";
+
+    $word = "(?:$atom|$quoted_string)";
+	// original code allows a domain to only contain a single sub_domain.
+	// changed to require 2 domain parts ex.  "example.com"  instead of just "example"
+    $domain = "(?:$sub_domain(?:\\x2e$sub_domain)+)";
+
+	return $domain;
+}
+
 function getEmailRegExp() {
 	#
     # RFC822 Email Parser
@@ -251,7 +281,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.79 $
+    # $Revision: 1.80 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -267,22 +297,22 @@ function getEmailRegExp() {
 
     $quoted_pair = '\\x5c[\\x00-\\x7f]';
 
-    $domain_literal = "\\x5b($dtext|$quoted_pair)*\\x5d";
+    $domain_literal = "\\x5b(?:$dtext|$quoted_pair)*\\x5d";
 
-    $quoted_string = "\\x22($qtext|$quoted_pair)*\\x22";
+    $quoted_string = "\\x22(?:$qtext|$quoted_pair)*\\x22";
 
     $domain_ref = $atom;
 
-    $sub_domain = "($domain_ref|$domain_literal)";
+    $sub_domain = "(?:$domain_ref|$domain_literal)";
 
-    $word = "($atom|$quoted_string)";
-	// original code allows a domain to only contain a single sub_domain.  Code has been
+    $word = "(?:$atom|$quoted_string)";
+	// original code allows a domain to only contain a single sub_domain.
 	// changed to require 2 domain parts ex.  "example.com"  instead of just "example"
-    $domain = "$sub_domain\\x2e$sub_domain(\\x2e$sub_domain)*";
+    $domain = "(?:$sub_domain(?:\\x2e$sub_domain)+)";
 
-    $local_part = "$word(\\x2e$word)*";
+    $local_part = "$word(?:\\x2e$word)*";
 
-    $addr_spec = "$local_part\\x40$domain";
+    $addr_spec = "($local_part)(\\x40)($domain)";
 
 	##################################################################################
 	# End of Creative Commons Email Parser Code
