@@ -31,7 +31,11 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 
 function action_link ($title, $icon, $href = "#", $onclick = null) {
 	global $USER;
-	$actionlinkmode = $USER->getSetting("actionlinks","both");
+	if (isset($USER)) {
+		$actionlinkmode = $USER->getSetting("actionlinks","both");
+	} else {
+		$actionlinkmode = "both";
+	}
 	$href = $href == null ? "#" : $href;
 	$onclick = $onclick == null ? "" : 'onclick="'.$onclick.'"';
 	$str = '<a href="'.$href.'" '.$onclick.' class="actionlink" title="'.escapehtml($title).'">';
