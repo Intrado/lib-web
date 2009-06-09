@@ -1,11 +1,17 @@
 <?
+$isNotLoggedIn = 1;
+
+require_once("common.inc.php");
 require_once("../jpgraph/jpgraph_antispam.php");
 
-if (isset($_GET['iData'])) {
-	$spam = new AntiSpam($_GET['iData']);
-} else if (isset($_GET['len'])) {
+doStartSession();
+
+if (isset($_SESSION['captcha'])) {
+	$spam = new AntiSpam($_SESSION['captcha']);
+} else {
+	error_log("SESSION Captcha value not set");
 	$spam = new AntiSpam();
-	$spam->Rand($_GET['len']);
+	$spam->Rand(5);
 }
 
 $spam->Stroke();

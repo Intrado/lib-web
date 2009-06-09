@@ -12,28 +12,37 @@ require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("subscribervalidators.inc.php");
 require_once("../obj/Phone.obj.php");
-require_once("../jpgraph/jpgraph_antispam.php");
+
+doStartSession();
+
+//////////////////////////////
+
+class CaptchaField extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$max = 'maxlength="50"';
+		$size = 'size="14"';
+		// TODO mt_rand() on the captcha image
+		return '<img src="captcha.png.php" /><br><input id="'.$n.'" name="'.$n.'" type="text" value="" '.$max.' '.$size.'/>';
+	}
+}
+
+
+// case-insensitive
+class ValCaptcha extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		if (strtolower($value) != strtolower($_SESSION['captcha']))
+			return "$this->label is not the correct value";
+		
+		return true;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
-if ((strtolower($_SERVER['REQUEST_METHOD']) == 'get') ) {
-	subscriberCreateAnonymousSession();
-	doStartSession();
-	
-	$captcha = new AntiSpam();
-	$captcha_value = $captcha->Rand(5);
-	// NOTE captcha value is lowercase even when display shows uppercase letters, ValStatic made case-insensitive for this
-	$_SESSION['captcha'] = $captcha_value;
-} else {
-	doStartSession();
-	if (isset($_SESSION['captcha'])) {
-		$captcha_value = $_SESSION['captcha'];
-	} else {
-		error_log("??????????????? where is my session captcha?");
-	}
-}
 
 $authdomain = "0";
 $emaildomain = "";
@@ -47,7 +56,7 @@ if ($result['result'] == "") {
 }
 
 if ($authdomain == "1") {
-	$emailvalidator = array("ValEmail","domain"=>$emaildomain);
+	$emailvalidator = array("ValEmail","domain"=>$emaildomain,"subdomain"=>true);
 } else {
 	$emailvalidator = array("ValEmail");	
 }
@@ -137,9 +146,9 @@ $formdata["captcha"] = array(
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValStatic","val" => $captcha_value)
+            array("ValCaptcha",)
         ),
-        "control" => array("CaptchaField","iData" => $captcha_value),
+        "control" => array("CaptchaField"),
         "helpstep" => 3
     );
 $formdata["terms"] = array(
@@ -238,7 +247,7 @@ if (isset($_GET['err'])) {
 ?>
 <script type="text/javascript">
 
-<? Validator::load_validators(array("ValPassword")); ?>
+<? Validator::load_validators(array("ValPassword","ValCaptcha")); ?>
 
 <? if ($datachange) { ?>
 

@@ -82,32 +82,12 @@ class DestWiz_collectdata extends WizStep {
 	}
 }
 
-class DestWiz_review extends WizStep {
-	function getForm($postdata, $curstep) {
-
-		$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("Please review.  You are about to add this to your account...") . '</div>';
+class FinishDestWizard extends WizFinish {
 	
-	
-		$formdata = array();
-
-    	$formdata["review"] = array(
-        	"label" => "Confirmation",
-        	"control" => array("FormHtml","html" => $formhtml),
-			"helpstep" => 1
-		);
-		
-		$helpsteps = array (
-			"Welcome",
-			"blah, blah"
-		);
-		
-		return new Form("review", $formdata, $helpsteps);
+	function finish ($postdata) {
 	}
-}
-
-class DestWiz_finish extends WizStep {
-	function getForm($postdata, $curstep) {
-
+	
+	function getFinishPage ($postdata) {
 		// start with failure condition
 		$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("Sorry, an error occurred.  Please try again later.") . '</div>';
 	
@@ -124,42 +104,19 @@ class DestWiz_finish extends WizStep {
 				$formhtml = getPhoneReview($postdata['/collectdata']['newdata'], $code);
 			}
 		}
-	
-		$formdata = array();
-
-    	$formdata["review"] = array(
-        	"label" => "Final Info",
-        	"control" => array("FormHtml","html" => $formhtml),
-			"helpstep" => 1
-		);
-		
-		$helpsteps = array (
-			"Welcome",
-			"blah, blah"
-		);
-		
-		return new Form("finish", $formdata, $helpsteps);
+		return $formhtml . icon_button("Done", "tick", "", "destinationwizard.php?cancel");
 	}
 }
 
 
 $wizdata = array(
 	"whattype" => new DestWiz_whattype(_L("Add Destination")),
-	"collectdata" => new DestWiz_collectdata(_L("Provide Information")),
-	"review" => new DestWiz_review(_L("Review")),
-	"finish" => new DestWiz_finish(_L("Finish"))
+	"collectdata" => new DestWiz_collectdata(_L("Provide Information"))
 	);
 
-$wizard = new Wizard("destwiz", $wizdata);
+$wizard = new Wizard("destwiz", $wizdata, new FinishDestWizard("Finish"));
 $wizard->handleRequest();
 
-if ($wizard->isDone()) {
-	$postdata = $_SESSION['destwiz']['data'];
-	// TODO grab the data
-
-	
-	redirect("notificationpreferences.php");
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display

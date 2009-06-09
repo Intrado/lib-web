@@ -95,6 +95,8 @@ foreach ($pendingList as $p) {
 		$dest->name = Phone::format($p->value);
 		$dest->type = _L("Phone");
 	} else if ($p->type == 'email') {
+		$dest->name = $p->value;
+		$dest->type = _L("Email");
 	} else if ($p->type == 'sms') {
 		$dest->name = Phone::format($p->value);
 		$dest->type = _L("Text");
@@ -119,12 +121,10 @@ function fmt_actions ($obj, $name) {
 	if ($obj->nodelete)
 		return _L("Account Email cannot be removed");
 	
-	$del = '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">' . _L("Delete") . '</a>';
-	$view = '';
+	$action_links = action_link(_L("Delete"), "cross", "notificationpreferences?delete=$obj->id", "return confirmDelete();");
 	if ($obj->status == $STATUS_PENDING)
-		$view = '&nbsp;|&nbsp;<a href=viewpending.php?id='.$obj->id.'>View</a>';
-		
-	return $del . $view;
+		$action_links .= '&nbsp|&nbsp' . action_link(_L("Activation Info"), "pencil", "viewpending.php?id=$obj->id");		
+	return $action_links;
 }
 
 $formdata = array();

@@ -150,7 +150,7 @@ require_once("logintop.inc.php");
 			<td colspan="3">First time accessing the SchoolMessenger Self Signup?</td>
 		</tr>
 		<tr>
-			<td colspan="3"><a href="newsubscriber.php"><b>Sign up now</b></a></td>
+			<td colspan="3"><a href="newsubscribersession.php"><b>Sign up now</b></a></td>
 		</tr>
 <?	}
 ?>
