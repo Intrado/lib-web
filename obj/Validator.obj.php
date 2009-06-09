@@ -205,6 +205,7 @@ class ValNumeric extends Validator {
 // requires inc/utils.inc.php validEmail()
 //
 // optional args.domain to validate the address matches this domain
+// optional args.subdomain (default false) to allow subdomains
 //
 class ValEmail extends Validator {
 	
@@ -213,27 +214,43 @@ class ValEmail extends Validator {
 			return "$this->label is not a valid email format";
 			
 		if (isset($args['domain'])) {
-			$emaildomain = substr($value, strpos($value, "@")+1);
-			if ($args['domain'] != $emaildomain)
-				return "$this->label must use domain ".$args['domain'];
+			$emaildomain = strtolower(substr($value, strpos($value, "@")+1));
+			$domain = strtolower($args['domain']);
+			if (strcmp($emaildomain, $domain)) {
+				if (isset($args['subdomain']) && $args['subdomain']) {
+					$domainregexp = ""; //getSubDomainRegExp() . '\\x2e' . $domain;
+					if (!ereg($domainregexp, $value))
+						return "$this->label must use domain ".$args['domain'];
+				} else {
+					return "$this->label must use domain ".$args['domain'];
+				}
+			}
 		}
 		return true;
 	}
 	
 	function getJSValidator () {
-		$addr_spec = getEmailRegExp();
+		$addr_spec = addslashes(getEmailRegExp());
 		
 		return 
 			'function (name, label, value, args) {
-				var emailregexp = "' . addslashes($addr_spec) . '";
+				var emailregexp = "^' . $addr_spec . '$";
 				var reg = new RegExp(emailregexp);
-				if (!reg.test(value))
-					return label + " is an invalid email format";' .
-							'
+				var r = reg.exec(value);
+				// r is null, or [0] is match, [1] is username, [2] is @, [3] is domain
+				if (r == null)
+					return label + " is an invalid email format";
+				
+				var lowdomain = args.domain.toLowerCase();
+				var lowdomainvalue = r[3].toLowerCase();
 				if (args.domain) {
-					var emaildomain = value.substr(value.indexOf("@")+1);
-					if (emaildomain.toLowerCase() != args.domain.toLowerCase())
-						return label + " must use domain " + args.domain;
+					if (lowdomain != lowdomainvalue) {
+						if (args.subdomain) {
+							if (!lowdomainvalue.endsWith("."+lowdomain))
+								return label + " must use domain " + lowdomain;
+						} else
+							return label + " must use domain " + lowdomain;
+					}
 				}
 				return true;
 			}';
@@ -275,6 +292,32 @@ class ValEmailList extends Validator {
 				}
 				if (isbad)
 					return label + " has invalid emails"; // TODO nice to return the bad email text
+
+				return true;
+			}';
+	}
+}
+
+class ValDomain extends Validator {
+	
+	function validate ($value, $args) {
+		$domainregexp = getDomainRegExp();
+		
+		if (!preg_match("!^$domainregexp$!", $value))
+			return "$this->label is not a valid domain format";
+			
+		return true;
+	}
+	
+	function getJSValidator () {
+		$domainregexp = addslashes(getDomainRegExp());
+		
+		return 
+			'function (name, label, value, args) {
+				var domainregexp = "^' . $domainregexp . '$";
+				var reg = new RegExp(domainregexp);
+				if (!reg.test(value))
+					return label + " is not a valid domain format";
 
 				return true;
 			}';
@@ -391,26 +434,6 @@ class ValInArray extends Validator {
 	}
 }
 
-// case-insensitive
-class ValStatic extends Validator {
-	
-	function validate ($value, $args) {
-		$val = isset($args['val']) ? $args['val'] : '';
-		if (strtolower($value) != strtolower($val))
-			return "$this->label is not the correct value";
-		
-		return true;
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args) {
-				if (args.val && (args.val.toLowerCase() != value.toLowerCase()))
-					return label + " is not the correct value";
-				return true;
-			}';
-	}
-}
 
 //alpha
 //alphanumeric
