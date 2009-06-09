@@ -241,9 +241,9 @@ class ValEmail extends Validator {
 				if (r == null)
 					return label + " is an invalid email format";
 				
-				var lowdomain = args.domain.toLowerCase();
-				var lowdomainvalue = r[3].toLowerCase();
 				if (args.domain) {
+					var lowdomain = args.domain.toLowerCase();
+					var lowdomainvalue = r[3].toLowerCase();
 					if (lowdomain != lowdomainvalue) {
 						if (args.subdomain) {
 							if (!lowdomainvalue.endsWith("."+lowdomain))
