@@ -318,12 +318,12 @@ function submitForm (formname,section,value) {
 
 // Ajax cache with request function
 var cachedajaxgetdata = new Array();
-function cachedAjaxGet(uri,ajaxhandler,usecache) {
+function cachedAjaxGet(uri,ajaxhandler,ajaxhandlerarg,usecache) {
 	usecache = typeof(usecache) != 'undefined' ? usecache : true;
 	if(usecache) {
 		var returnvalue = cachedajaxgetdata[uri];
 		if(returnvalue) {
-			ajaxhandler(returnvalue);
+			ajaxhandler(returnvalue,ajaxhandlerarg);
 			return;
 		}
 	}
@@ -331,7 +331,7 @@ function cachedAjaxGet(uri,ajaxhandler,usecache) {
 		method:'get',
 		onSuccess: function (result) {
 			cachedajaxgetdata[uri] = result;
-			ajaxhandler(result);
+			ajaxhandler(result,ajaxhandlerarg);
 		}
 	});
 }
