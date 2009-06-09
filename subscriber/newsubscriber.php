@@ -55,7 +55,7 @@ if ($result['result'] == "") {
 	$authcode = $result['authcode'];
 }
 
-if ($authdomain == "1") {
+if ($authdomain == "1" && $emaildomain != "") {
 	$emailvalidator = array("ValEmail","domain"=>$emaildomain,"subdomain"=>true);
 } else {
 	$emailvalidator = array("ValEmail");	
