@@ -16,6 +16,85 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 
 
+class IntroSelect extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+
+		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
+		$str = "";
+		$count = 0;
+		$str .= '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		
+		$str .= '<div id="introwidgetedit'.$n.'" style="display:none;">';
+		foreach ($this->args['values'] as $key => $selectbox) {
+			if($key == "user")
+				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange=loaduser(\'' . $n .'user\',\'' . $n . 'message\');updatevalue(\''.$n.'\');>';
+			else
+				$str .= '<select  id="' . $n . $key .'"  '.$size .' onchange=updatevalue(\''.$n.'\');>';
+			foreach ($selectbox as $selectvalue => $selectname) {
+				$checked = $value == $selectvalue;
+				$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>';
+			}
+			$str .= '</select>&nbsp;';
+			$count++;
+		}		
+		$str .= icon_button(_L("Play"),"fugue/control","
+				var content = $('" . $n . "message').getValue();
+					if(content.message != '')
+						popup('previewmessage.php?id=' + content, 400, 400);") 
+			   . icon_button(_L("Ok"),"tick","updatevalue('$n');
+			  				form_do_validation($('" . $this->form->name . "'), $('" . $n . "'));
+			 				 $('introwidgetedit" .$n. "').hide();
+			 				 $('introwidgetblocked" .$n. "').show();
+			 				 return false;");
+			 				 
+		$str .= '</div>';
+		$str .= '<div id="introwidgetblocked'.$n.'">';
+		
+		
+		$str .= '<span id="introwidget'.$n.'"></span>';
+		
+		$str .= icon_button(_L("Play"),"fugue/control","
+				var content = $('" . $n . "').getValue().evalJSON();
+					if(content.message != '')
+						popup('previewmessage.php?id=' + content.message, 400, 400);") 
+			  . icon_button(_L("Load"),"fugue/arrow_045","$('introwidgetedit" .$n. "').show();$('introwidgetblocked" .$n. "').hide();return false;") ;
+		$str .= '</div>';
+		// ' . (isset($this->args['values']["language"])?"$(introitem+\"language\").value":"\"\"") . ';
+		$str .= '<script>showinfo(\'' .$n . '\');</script>';
+		return $str;
+	}
+}
+
+class ValIntroSelect extends Validator {
+	function validate ($value, $args) {
+		
+		if(is_numeric($value))
+			return true;
+		$checkval = json_decode($value);
+		$errortext = "";
+		if (!isset($checkval) || !isset($checkval->message))	
+			$errortext .= " is required ";
+		if ($errortext)
+			return $this->label . $errortext;
+		else
+			return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {			
+				vals = value.evalJSON();
+				var errortext = "";
+				if (vals.message == "")
+					errortext += " please pick a message";
+				if (errortext)
+					return errortext;
+					
+				return true;
+			}';
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -42,7 +121,6 @@ foreach($languages as $language) {
 	$i++;
 }
 	
-$mapvalues = array(0 => $selectvalues, 1 => $values);
 
 if($IS_COMMSUITE)
 	$users = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
@@ -52,67 +130,56 @@ else
 /*CSDELETEMARKER_END*/
 	
 $uservalues = array("" => "Select User");
-	
 foreach($users as $user) {
 	$uservalues[$user->id] = $user->firstname ." " . $user->lastname;
 }	
 
+$defaultvalues = array("user" => $uservalues, "message" => $values);
+
+$languagevalues = array("language" => $selectvalues,"user" => $uservalues, "message" => $values);
+
+
+
 $formdata = array(
 	"Required Intro",
-	"intromessage" => array(
-		"label" => _L("Intro Message"),
-		"value" => "none",
-		"validators" => array(array("ValRequired")),
-		"control" => array("SelectMenu",
-			 "values"=>$values
+	"defaultmessage" => array(
+		"label" => _L("Default Intro"),
+		"value" => '{"message":"' .getSystemSetting('introid_default'). '"}',
+		"validators" => array(array("ValIntroSelect")),
+		"control" => array("IntroSelect",
+			 "values"=>$defaultvalues
 		),
 		"helpstep" => 1
 	),
-	"introtype" => array(
-		"label" => _L("Intro Type"),
-		"value" => "none",
-		"validators" => array(array("ValRequired")),
-		"control" => array("RadioButton",
-			 "values"=>array(0 => "Default", 1 => "Emergency")
+	"emergencymessage" => array(
+		"label" => _L("Emergency Intro"),
+		"value" => '{"message":"' .getSystemSetting('introid_emergency'). '"}',
+		"validators" => array(array("ValIntroSelect")),
+		"control" => array("IntroSelect",
+			 "values"=>$defaultvalues
 		),
 		"helpstep" => 1
 	),
-	"Language Options",
-	"language1" => array(
-		"label" => _L("Language 1"),
-		"value" => "none",
-		"validators" => array(),
-		"control" => array("SelectMenu",
-			 "values"=>$values
-		),
-		"helpstep" => 2
-	),
-	"language2" => array(
-		"label" => _L("Language 2"),
-		"value" => "none",
-		"validators" => array(),
-		"control" => array("SelectMenu",
-			 "values"=>$values
-		),
-		"helpstep" => 2
-	),
-	"language3" => array(
-		"label" => _L("Language 3"),
-		"value" => "none",
-		"validators" => array(),
-		"control" => array("SelectMenu",
-			 "values"=>$values
-		),
-		"helpstep" => 2
-	)
+	"Language Options"
 );
 
-$buttons = array(submit_button(_L("Upload"),"submit","fugue/arrow_045"),
+for($i = 1; $i < 10; $i++) {
+	$formdata["digit$i"] = array(
+		"label" => _L("Digit $i"),
+		"value" => '{"message":""}',
+		"validators" => array(),
+		"control" => array("IntroSelect",
+			 "values"=>$languagevalues
+		),
+		"helpstep" => 2
+	);
+}
+
+$buttons = array(submit_button(_L("Done"),"submit","tick"),
 		icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
 $form = new Form("introform", $formdata, null, $buttons);
 $form->ajaxsubmit = true;
-
 //check and handle an ajax request (will exit early)
 //or merge in related post data
 $form->handleRequest();
@@ -128,43 +195,85 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $datachange = true;
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		$msgid = $postdata['intromessage'] + 0;
-		$introtype = $postdata['introtype'] + 0;
 		
+		$defaultvalues = json_decode($postdata['defaultmessage']);
+		$msgid = $defaultvalues->message + 0;
 		$newmsg = new Message($msgid);
-		$newmsg->id = null;
-		$newmsg->deleted = 1;
-		
-		if($introtype == 1)
-			$newmsg->name = "emergency_intro";
-		else
-			$newmsg->name = "default_intro";
+		if($newmsg->deleted) {// if deleted the old value is still the intro
+				//TODO chack to see if it is the same as it was before 
+				setSystemSetting('intromessageid_default', $newmsg->id);				
+		} else {
 			
-		$newmsg->description = "intro message. store in school messanger account";
-		$newmsg->create();
-
-		// copy the parts
-		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-		foreach ($parts as $part) {
-			$newpart = new MessagePart($part->id);
-			$newpart->id = null;
-			$newpart->messageid = $newmsg->id;
-			$newpart->create();
+			$newmsg->id = null;
+			$newmsg->deleted = 1;
+			$newmsg->name = "default_intro";	
+			$newmsg->create();
+			// copy the parts
+			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+			foreach ($parts as $part) {
+				$newpart = new MessagePart($part->id);
+				$newpart->id = null;
+				$newpart->messageid = $newmsg->id;
+				$newpart->create();
+			}
+			setSystemSetting('intromessageid_default', $newmsg->id);
 		}
 		
-		
-		if($introtype == 1) {
-			setSystemSetting('introid_emergency', $newmsg->id);			
+		$emergencyvalues = json_decode($postdata['emergencymessage']);
+		$msgid = $emergencyvalues->message + 0;
+		$newmsg = new Message($msgid);
+		if($newmsg->deleted) {// if deleted the old value is still the intro
+			//TODO chack to see if it is the same as it was before 		
+			setSystemSetting('intromessageid_emergency', $newmsg->id);
+		} else {
+			$newmsg->id = null;
+			$newmsg->deleted = 1;
+			$newmsg->name = "emergency_intro";	
+			$newmsg->create();
+			// copy the parts
+			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+			foreach ($parts as $part) {
+				$newpart = new MessagePart($part->id);
+				$newpart->id = null;
+				$newpart->messageid = $newmsg->id;
+				$newpart->create();
+			}			
+			setSystemSetting('intromessageid_emergency', $newmsg->id);
 		}
-		else {
-			setSystemSetting('introid_default', $newmsg->id);
+     			
+		for($i = 0; $i <= 9;$i++ ) {	
+			
+			if(isset($postdata['digit' . $i])) {				
+				$digitvalues = json_decode($postdata['digit' . $i]);
+				if(isset($digitvalues->message) && isset($digitvalues->language)) {
+					$msgid = $digitvalues->message + 0;
+					$languageid = $digitvalues->language + 0;
+					$newmsg = new Message($msgid);
+					if($newmsg->deleted)
+						//TODO Set db values
+						error_log("set digit value not implemented");
+					else {
+						$newmsg->id = null;
+						$newmsg->deleted = 1;
+						$newmsg->name = 'intro_digit_' . $i;	
+						$newmsg->create();
+						// copy the parts
+						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+						foreach ($parts as $part) {
+							$newpart = new MessagePart($part->id);
+							$newpart->id = null;
+							$newpart->messageid = $newmsg->id;
+							$newpart->create();
+						}
+						//TODO Set db values
+						error_log("set digit value not implemented");
+						
+					}
+				}
+			}		
 		}
-		
-		// Delete old intro
-		//QuickUpdate("delete message m, messagepart p FROM message m, messagepart p where m.name='intro_english' and m.id!=" . $newmsg->id . " and m.id = p.messageid");										
-        //save data here
 		if ($ajax)
-			$form->sendTo("settings.php");
+			$form->sendTo("settings.php");	
 		else
 			redirect("settings.php");
 	}
@@ -179,91 +288,58 @@ $TITLE = _L('Message Intro Manager');
 
 include_once("nav.inc.php");
 
-//startWindow(_L("Users"));
-//echo $loadform->render();
-//endWindow();
-
-startWindow(_L("Settings"));
 ?>
-<table>
-<tr>
-<td>
-<form class="newform" id="loadusers" name="loadusers" method="POST" action="messageintro.php" style="width: 100%;">
-
-<table width="100%">
-<tr>
-<td width="30%"><label class="formlabel" >Load User Messages</label></td>
-<td>
-	<select id=loaduserselect name="loaduserselect" onchange="loaduser();">
-		<option value=""  >Select User</option>
-		<option value=""  >Current User</option>
-		
-<? 
-foreach($users as $user) {
-	echo "<option value=\"" . $user->id . "\"  >" . $user->firstname . " " . $user->lastname . "</option>";
-}
-?>
-	</select>
-	
-</td>
-</tr>
-
-
-
-</table>
-</form>
-</td>
-</tr>
-</table>
-
-
-
-<? 
-
-
-echo $form->render();
-
-
-
-
-endWindow();
-
-
-
-include_once("navbottom.inc.php");
-
-?>
-
-
-
 <script type="text/javascript">
+<? Validator::load_validators(array("ValIntroSelect")); ?>
 
-
-function setvalues(result) {
+function setvalues(result,id) {
 	var response = result.responseJSON;
 	if (response) {	
 		var output = '<option value=\"\">Select a Message</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
 		for (var i in response) {
 			output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
-		}		
-		$('introform_intromessage').innerHTML = output;
-		$('introform_language1').innerHTML = output;
-		$('introform_language2').innerHTML = output;
-		$('introform_language3').innerHTML = output;
+		}	
+		$(id).innerHTML = output;
+	} else {
+		$(id).innerHTML = '<option value=\"\">Select a Message</option>';
 	}
 }
-
-function loaduser() {
+function loaduser(sourceid,targetid) {
 	var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
 	
-	if($('loaduserselect').getValue() != '')
-		request += '&userid=' + $('loaduserselect').getValue();
-
-	quickrequest(request,setvalues);
+	if($(sourceid).getValue() != '')
+		request += '&userid=' + $(sourceid).getValue();
+	cachedAjaxGet(request,setvalues,targetid);
+}	
+function showinfo(id) {
+		if($(id).value.evalJSON().message == "")
+			note = "Message is not";	
+		else
+			note = "Message is set";
+		$('introwidget' + id ).innerHTML = note; 		
+}
+function updatevalue(id) {
+		var language = "";
+		$(id).value = Object.toJSON({
+				"language": language,
+				"user": $(id+"user").value,
+				"message": $(id+"message").value
+		});
+		showinfo(id);		
 }
 
-loaduser();
 </script>
+<?
+startWindow(_L("Intro Settings"));
+echo $form->render();
+endWindow();
+
+include_once("navbottom.inc.php");
+?>
+
+
+
+
 
 
 
