@@ -48,7 +48,8 @@ $formdata["emaildomain"] = array(
 	"label" => _L("Email Domain"),
 	"value" => getSystemSetting('emaildomain'),
 	"validators" => array(
-		array("ValLength","max" => 50)
+		array("ValLength","max" => 50),
+		array("ValDomain")
 	),
 	"control" => array("TextField","maxlength" => 50),
 	"helpstep" => $helpstepnum
