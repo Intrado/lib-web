@@ -2106,7 +2106,7 @@ function setTranslations (html, langstring) {
 		return;
 	}
 	if(result instanceof Array) {
-		for ( i in result) {
+		for ( i = 0;i < result.length;i++) {
 			var language = trlanguages.shift();
 			if (result[i].responseStatus == 200){
 				var tr = new getObj(section + 'txt_' + language).obj;
@@ -2153,7 +2153,7 @@ function submitTranslations(section) {
 
 	var serialized = [];
 	var trlanguages = [];
-	for (l in languages) {
+	for (l = 0; l < languages.length; l++) {
 		if (isCheckboxChecked(section + '_' + languages[l])){
 			if(isCheckboxChecked(section + 'edit_' + languages[l])) {
 				var tr = new getObj(section + 'txt_' + languages[l]).obj;
@@ -2210,7 +2210,7 @@ function submitRetranslation(section,language) {
 	}
 	var urllang = encodeURIComponent(language);
 	callbacksection = section;
-	new AjaxRequest('translate.php',
+	new Ajax.Request('translate.php',
 		{ method:'post', postBody:"text=" + encodeURIComponent(text) + "&language=" + urllang, 
 			onSuccess: function(result) {
 				setRetranslation(result.responseText, urllang);
