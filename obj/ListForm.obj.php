@@ -287,7 +287,7 @@ class ListForm extends Form {
 											}
 											// Expects a single listid; loop finished in one iteration.
 											for (var listid in listRules) {
-												var viewRulesTD = $('listsTableBody').down('input[value=\"'+listid+'\"]').up('tr').next('tr').down('td');
+												var viewRulesTD = this.down('td');
 												if (!viewRulesTD) {
 													alert('".addslashes(_L('No td found'))."');
 													break;
@@ -308,7 +308,7 @@ class ListForm extends Form {
 												else
 													viewRulesTD.update(new Element('table').insert(thead).insert(tbody));
 											}
-										}
+										}.bindAsEventListener(rulesTR)
 									});
 								}.bindAsEventListener(actionsTD,data.id));
 								var removeButton = actionsTD.down('button', 2);
@@ -514,7 +514,7 @@ class ListForm extends Form {
 					
 					// allListsWindow: Choose List Selectbox and Button
 					$('chooseListButton').observe('click', function() {
-						var selectbox = $('listSelectboxContainer').down('select');
+						var selectbox = $('listSelectboxContainer').down();
 						if (listform_add_list(selectbox.getValue()))
 							listform_refresh_guide(true);
 					});
@@ -525,7 +525,7 @@ class ListForm extends Form {
 						$('buildListWindow').show().style.width = '50%';
 						$('buildListWindow').morph('width:100%', {duration:0.6});
 						$('allListsWindow').hide();
-						var listSelectbox = $('listSelectboxContainer').down('select');
+						var listSelectbox = $('listSelectboxContainer').down();
 						if (listSelectbox)
 							listSelectbox.selectedIndex = 0;
 						listform_set_mode_status('choosingList', false);
