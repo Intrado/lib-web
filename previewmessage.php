@@ -27,7 +27,7 @@ $_SESSION['textpreview'] = false;
 
 if (isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
-	if (userOwns("message", $id)) {
+	if (userOwns("message", $id) || $USER->authorize('managesystem')) {
 		$_SESSION['previewmessageid'] = $id;
 	}
 	$_SESSION['ttstext'] = NULL;
