@@ -13,17 +13,17 @@ class SelectMessage extends FormItem {
 		}
 		$str .= '</select>';
 		$str .= '<table id="'.$n.'details" class="msgdetails" width="'.$this->args['width'].'">';
-		$str .= '<tr><td class="msglabel">'._L("Last Used").':</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>';
-		$str .= '<tr><td class="msglabel">'._L("Description").':</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
+		$str .= '<tr><td class="msglabel">Last Used:</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>';
+		$str .= '<tr><td class="msglabel">Description:</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
 		if ($this->args['type'] == 'email') {
-			$str .= '<tr><td class="msglabel">'._L("From").':</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">'._L("Subject").':</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">'._L("Attachmen").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">From:</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">Subject:</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">Attachment:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
 		}
 		if ($this->args['type'] == 'phone') {
-			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
+			$str .= '<tr><td class="msglabel">Preview:</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
 		}
-		$str .= '<tr><td class="msglabel">'._L("Body").':</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>';
+		$str .= '<tr><td class="msglabel">Body:</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>';
 		$str .= '</table>';
 		$str .= '<script type="text/javascript" src="script/messageselect.js"></script>
 				<script type="text/javascript">
@@ -62,7 +62,6 @@ class CallMe extends FormItem {
 		
 		if (!$value)
 			$value = '{"'.$language[0].'": ""}';
-		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
 		$str .= '<table class="msgdetails" width="80%">';
 		$str .= '<tr><td class="msglabel">'._L("Language").':</td><td>';
@@ -76,28 +75,15 @@ class CallMe extends FormItem {
 		}
 		$str .= '</td></tr>';
 		$str .= '<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" />';
-		$str .= icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$n."','".$language[0]."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>';
+		$str .= icon_button("Call To Record","/diagona/16/151","new Easycall('".$n."','".$language[0]."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>';
 		$str .= '<tr><td class="msglabel">'._L("Messages").':</td>';
 		$str .= '<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">';
 		$str .= '<tr><th colspan=2 class="windowRowHeader">'._L("Message Language").'</th><th class="windowRowHeader" width="30%">'._L("Actions").'</th></tr>';
 		
 		$str .= '</table></td></tr>';
 		$str .= '</table>';
-		// include the easycall javascript object and set up the localized version of the text it will use. then load existing values.
 		$str .= '<script type="text/javascript" src="script/easycall.js"></script>
 				<script type="text/javascript">
-				var callmetextlocale = {
-					"alreadyrecorded": "'._L("There is already a message recorded for this language. Do you want to over-write it?").'",
-					"completed": "'._L("Completed!").'",
-					"endedearly": "'._L("The call ended early!").'",
-					"genericerror": "'._L("There was an error!").'",
-					"alreadyrecorded": "'._L("There is already a message recorded for this language. Do you want to over-write it?").'",
-					"starting": "'._L("Starting session. Please wait...").'",
-					"sessioninprogress": "'._L("Cannot remove a message while record session in progress.").'",
-					"remove": "'._L("Remove").'",
-					"required": "'._L("Required").'",
-					"missingparam": "'._L("One or more parameters missing").'"
-				}
 				new Easycall("'.$n.'","'.$language[0].'").load();
 				</script>';
 		return $str;
@@ -115,7 +101,7 @@ class ValHasMessage extends Validator {
 		if ($value == 'pick') {
 			$msgcount = (QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".$args['type']."'"));
 			if (!$msgcount)
-				return "$this->label doesnt appear to exist for this user. Select another option or go create a message.";
+				return "$this->label doesnt appear to exist for this uer. Select another option or go create a message.";
 		}
 		return true;
 	}
@@ -185,16 +171,19 @@ class ValLists extends Validator {
 	
 	function validate ($value, $args) {
 		global $USER;
+		
+		if (strpos($value, 'choosingList') !== false)
+			return _L('You are in the middle of choosing a list!');
+		else if (strpos($value, 'buildingList') !== false)
+			return _L('You are in the middle of building a list!');
+			
 		$listids = json_decode($value);
 		if (empty($listids))
-			return "Please add a list";
-		// foreach ($listids as $id) {
-			// $list = new PeopleList($id);
-			// $renderedlist = new RenderedList($list);
-			// $renderedlist->calcStats();
-			// if ($renderedlist->total == 0)
-				// return "Sorry, lists are empty";
-		// }
+			return _L("Please add a list");
+		foreach ($listids as $listid) {
+			if (!userOwns('list', $listid))
+				return _L('You have specified an invalid list!');
+		}
 		return true;
 	}
 }
@@ -214,7 +203,6 @@ class JobWiz_basic extends WizStep {
 		$formdata = array(
 			"name" => array(
 				"label" => "Name",
-				"fieldhelp" => "This field is used in reports, and used for email subjects, etc. It can be up to 50 characters long.",
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -225,7 +213,6 @@ class JobWiz_basic extends WizStep {
 			),
 			"jobtype" => array(
 				"label" => "Type/Category",
-				"fieldhelp" => "Determines how people recieve your message.",
 				"value" => "",
 				"validators" => array(
 					array("ValRequired")
@@ -235,7 +222,6 @@ class JobWiz_basic extends WizStep {
 			),
 			"listmethod" => array(
 				"label" => "Contact List",
-				"fieldhelp" => "This specifies who is contacted.",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValContactListMethod")
@@ -249,7 +235,6 @@ class JobWiz_basic extends WizStep {
 			),
 			"package" => array(
 				"label" => "Notification Method",
-				"fieldhelp" => "There are many common ways of packaging your message. Choose the one that best fits how you'd like to provide your message.",
 				"validators" => array(
 					array("ValRequired")
 				),
