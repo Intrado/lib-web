@@ -525,6 +525,10 @@ class ListForm extends Form {
 						$('buildListWindow').show().style.width = '50%';
 						$('buildListWindow').morph('width:100%', {duration:0.6});
 						$('allListsWindow').hide();
+						var listSelectbox = $('listSelectboxContainer').down('select');
+						if (listSelectbox)
+							listSelectbox.selectedIndex = 0;
+						listform_set_mode_status('choosingList', false);
 						listform_set_mode_status('buildingList', true);
 						listform_refresh_guide(true);
 						listform_show_validation_message();
