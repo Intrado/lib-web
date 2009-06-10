@@ -1378,3 +1378,17 @@ CREATE TABLE `subscriberpending` (
 `token` VARCHAR( 255 ) NOT NULL
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_bin
 $$$
+
+CREATE TABLE IF NOT EXISTS `prompt` (
+  `id` int(11) NOT NULL auto_increment,
+  `type` enum('intro','emergencyintro','langmenu') NOT NULL,
+  `messageid` int(11) NOT NULL,
+  `dtmf` tinyint(4) default NULL,
+  `language` varchar(50) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+$$$
+
+
