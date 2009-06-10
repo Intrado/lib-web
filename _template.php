@@ -21,7 +21,7 @@ if (!$USER->authorize('managesystem')) {
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-// Example of a custom for FormItem
+// Example of a custom form FormItem
 class TemplateItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
@@ -43,13 +43,13 @@ class TemplateItem extends FormItem {
 	}
 }
 
-// Example of a custom for Validator
+// Example of a custom form Validator
 class ValTemplateItem extends Validator {
 	function validate ($value, $args) {
 		if(!is_array($value)) {
 			$value = json_decode($value,true);
 		}
-		if (!($value["left"] || $value["right"]))	
+		if (!($value["left"] == "true" || $value["right"] == "true"))	
 			return "One item is required for " . $this->label;
 		else
 			return true;
