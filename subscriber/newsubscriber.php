@@ -13,6 +13,7 @@ require_once("../inc/utils.inc.php");
 require_once("subscribervalidators.inc.php");
 require_once("../obj/Phone.obj.php");
 
+// start the session for captcha value
 doStartSession();
 
 //////////////////////////////
@@ -20,10 +21,7 @@ doStartSession();
 class CaptchaField extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$max = 'maxlength="50"';
-		$size = 'size="14"';
-		// TODO mt_rand() on the captcha image
-		return '<img src="captcha.png.php" /><br><input id="'.$n.'" name="'.$n.'" type="text" value="" '.$max.' '.$size.'/>';
+		return '<img src="captcha.png.php?'.mt_rand().'" /><br><input id="'.$n.'" name="'.$n.'" type="text" value="" maxlength="50" size="14"/>';
 	}
 }
 
@@ -34,6 +32,18 @@ class ValCaptcha extends Validator {
 	
 	function validate ($value, $args) {
 		if (strtolower($value) != strtolower($_SESSION['captcha']))
+			return "$this->label is not the correct value";
+		
+		return true;
+	}
+}
+
+// case-insensitive
+class ValSiteCode extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		if (strtolower(trim($value)) != strtolower($_SESSION['sitecode']))
 			return "$this->label is not the correct value";
 		
 		return true;
@@ -53,6 +63,7 @@ if ($result['result'] == "") {
 	$authdomain = $result['authdomain'];
 	$emaildomain = $result['emaildomain'];
 	$authcode = $result['authcode'];
+	$_SESSION['sitecode'] = $result['sitecode'];
 }
 
 if ($authdomain == "1" && $emaildomain != "") {
@@ -129,15 +140,16 @@ $formdata["confirmpassword"] = array(
         "control" => array("PasswordField","maxlength" => 50),
         "helpstep" => 3
     );
-if ($authcode == "1") {
+if ($authcode == "1" && $_SESSION['sitecode'] != "") {
 	$formdata["sitecode"] = array(
         "label" => "Site Access Code",
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","max" => 255)
+            array("ValLength","max" => 255),
+            array("ValSiteCode")
         ),
-        "control" => array("PasswordField","maxlength" => 255),
+        "control" => array("TextField","maxlength" => 255),
         "helpstep" => 3
 	);
 }
@@ -247,7 +259,7 @@ if (isset($_GET['err'])) {
 ?>
 <script type="text/javascript">
 
-<? Validator::load_validators(array("ValPassword","ValCaptcha")); ?>
+<? Validator::load_validators(array("ValPassword","ValCaptcha","ValSiteCode")); ?>
 
 <? if ($datachange) { ?>
 
