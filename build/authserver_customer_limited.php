@@ -52,25 +52,15 @@ foreach ($data as $customer) {
 	$query = "drop user '$limitedusername'";
 	mysql_query($query, $shard);
 
-	$query = "drop user '$limitedusername'@'localhost'";
-	mysql_query($query, $shard);
-	
 	$query = "create user '$limitedusername' identified by '$limitedpassword'";
 	mysql_query($query, $shard)
 		or die("FAILURE on customer ".$cid." create : ". mysql_error($shard));
-
-	$query = "create user '$limitedusername'@'localhost' identified by '$limitedpassword'";
-	mysql_query($query, $shard)
-		or die("FAILURE on customer ".$cid." create local : ". mysql_error($shard));
 
 	$query = "grant select, insert, update, delete, create temporary tables, execute on $custdbname . * to '$limitedusername'";
 	mysql_query($query, $shard)
 		or die("FAILURE on customer ".$cid." grant : ". mysql_error($shard));
 
-	$query = "grant select, insert, update, delete, create temporary tables, execute on $custdbname . * to '$limitedusername'@'localhost'";
-	mysql_query($query, $shard)
-		or die("FAILURE on customer ".$cid." grant local : ". mysql_error($shard));
-	
+	// TODO must determine which subset of tables to grant access to
 }
 
 mysql_close($shard);

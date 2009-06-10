@@ -109,16 +109,12 @@ if (CheckFormSubmit($f,$s)){
 				// customer db user
 				QuickUpdate("drop user '$newdbname'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
 				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
-				QuickUpdate("create user '$newdbname'@'localhost' identified by '$dbpassword'", $newdb);
 				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
-				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'@'localhost'", $newdb);
 
 				// subscriber db user
 				QuickUpdate("drop user '$limitedusername'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
 				QuickUpdate("create user '$limitedusername' identified by '$limitedpassword'", $newdb);
-				QuickUpdate("create user '$limitedusername'@'localhost' identified by '$limitedpassword'", $newdb);
 				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$limitedusername'", $newdb);
-				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$limitedusername'@'localhost'", $newdb);
 
 				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
 				$tablequeries = array_merge($tablequeries, explode("$$$",file_get_contents("../db/createtriggers.sql")));
