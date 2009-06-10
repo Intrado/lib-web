@@ -8,8 +8,8 @@ require_once("../obj/Sms.obj.php");
 require_once("../obj/SubscriberPending.obj.php");
 
 
-$STATUS_ACTIVE = _L("Active");
-$STATUS_PENDING = _L("Pending");
+$STATUS_ACTIVE = "ACTIVE";
+$STATUS_PENDING = "PENDING";
 
 class Destination {
 	var $id;
@@ -115,6 +115,19 @@ $titles = array(
 			"action" => _L("Actions")
 			);
 
+function fmt_name ($obj, $name) {
+	global $STATUS_PENDING;
+	if ($obj->status == $STATUS_PENDING)
+		return "<i>".$obj->name."</i>";
+	else return $obj->name;
+}
+
+function fmt_status ($obj, $name) {
+	global $STATUS_PENDING;
+	if ($obj->status == $STATUS_PENDING)
+		return "<b>"._L("Pending")."</b>";
+	else return _L("Active");
+}
 
 function fmt_actions ($obj, $name) {
 	global $STATUS_PENDING;
@@ -224,7 +237,7 @@ require_once("nav.inc.php");
 startWindow(_L('Destinations'));
 echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency, I would like to receive information about the following:") . '</td></tr></table>';
 echo $form->render();
-showObjects($destinations, $titles, array("action" => "fmt_actions"));
+showObjects($destinations, $titles, array("name"=>"fmt_name", "status"=>"fmt_status", "action" => "fmt_actions"));
 
 // TODO if room for another phone/email/sms
 	buttons(icon_button("Add Another",null,null,"destinationwizard.php"));
