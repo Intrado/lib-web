@@ -454,7 +454,7 @@ class ListForm extends Form {
 						if (!document.formvars['{$this->name}'].guideDisabled)
 							return;
 						document.formvars['{$this->name}'].guideDisabled = false;
-						$('startGuideButton').fade({duration:0.5,});
+						$('startGuideButton').fade({duration:0.5});
 						$('guideTD').style.width = '0px';
 						$('guideTD').morph('width:200px', {afterFinish: function() {
 							$('guide').style.display = 'block';
@@ -595,14 +595,13 @@ class ListForm extends Form {
 					});
 				}
 				
-				document.observe('dom:loaded', function() {
-					listform_load();
-					$('pageLoadingWindow').show();
-					$('allListsWindow').hide();
-					$('buildListWindow').hide();
-					$('guide').hide();
-					listform_refresh_guide(true);
-				});
+				// Initiatiate Javascript.
+				listform_load();
+				$('pageLoadingWindow').show();
+				$('allListsWindow').hide();
+				$('buildListWindow').hide();
+				$('guide').hide();
+				listform_refresh_guide(true);
 			</script>";
 		return $str;
 	}
