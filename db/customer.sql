@@ -1388,7 +1388,10 @@ CREATE TABLE IF NOT EXISTS `prompt` (
   PRIMARY KEY  (`id`),
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-
 $$$
 
+ALTER TABLE `subscriber` ADD UNIQUE `username` ( `username` ) 
+$$$
 
+ALTER TABLE `subscriber` ADD `lastreminder` DATETIME NULL DEFAULT NULL AFTER `lastlogin`
+$$$
