@@ -166,6 +166,7 @@ if (CheckFormSubmit($f,$s)){
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+							('customerurl', ?),
 							('maxphones', '1'),
 							('maxemails', '1'),
 							('maxsms', '1'),
@@ -175,7 +176,7 @@ if (CheckFormSubmit($f,$s)){
 							('displayname', ?),
 							('timezone', ?)";
 
-				QuickUpdate($query, $newdb, array($surveyurl, $displayname, $timezone)) or dieWithError(" SQL:" . $query, $newdb);
+				QuickUpdate($query, $newdb, array($hostname, $surveyurl, $displayname, $timezone)) or dieWithError(" SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
 							('english', 'male'),
