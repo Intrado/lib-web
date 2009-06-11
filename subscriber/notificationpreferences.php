@@ -6,7 +6,7 @@ require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
 require_once("../obj/Sms.obj.php");
 require_once("../obj/SubscriberPending.obj.php");
-
+require_once("../obj/JobType.obj.php");
 
 $STATUS_ACTIVE = "ACTIVE";
 $STATUS_PENDING = "PENDING";
@@ -46,11 +46,6 @@ $pendingList = DBFindMany("SubscriberPending", "from subscriberpending where sub
 $phoneList = DBFindMany("Phone", "from phone where personid=?", false, array($pid));
 $emailList = DBFindMany("Email", "from email where personid=?", false, array($pid));
 $smsList = DBFindMany("Sms", "from sms where personid=?", false, array($pid));
-
-$jobtypes = QuickQueryList("select id, name from jobtype where systempriority != 1 and deleted = 0", true);
-// TODO, should we localize the job type names? Emergency, Attendance, General...
-// TODO remove survey if not supported
-// TODO do we need the info field for more detail display
 
 
 $destinations = array();
@@ -142,6 +137,16 @@ function fmt_actions ($obj, $name) {
 
 $formdata = array();
 
+// remove survey if not supported
+$survey = "";
+if (!getSystemSetting("_hassurvey","0"))
+	$survey = " and issurvey=0";
+$jobtypes = DBFindMany("JobType", "from jobtype where systempriority != 1 and deleted = 0".$survey);
+$jtvalues = array();
+foreach ($jobtypes as $jt) {
+	$jtvalues[$jt->id] = $jt->name . " (" . $jt->info . ")";
+}
+
 // TODO what if email sequence0 is deleted? could have set up account, added email, changed account to use email1 then removed e0
 $values = QuickQueryList("select jobtypeid from contactpref where personid=? and type='email' and sequence=0 and enabled=1", false, false, array($pid));
 
@@ -149,7 +154,7 @@ $formdata["jobtypes"] = array(
 	"label" => _L("Communication Interests"),
 	"value" => $values,
 	"validators" => array(),
-	"control" => array("MultiCheckbox","values" => $jobtypes),
+	"control" => array("MultiCheckbox","values" => $jtvalues),
 	"helpstep" => 1
 );
 
