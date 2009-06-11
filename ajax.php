@@ -50,13 +50,14 @@ function handleRequest() {
 			if(!isset($_GET['messagetype'])){
 				return false;
 			}
-			if(!isset($_GET['userid'])){
-				return QuickQueryList("select id,name from message where deleted=0 and userid=? and type=? order by id", true,false,array($USER->id, $_GET['messagetype']));		
-			}
-			if ($USER->id != $_GET['userid'] && !$USER->authorize(array('managesystem','manageaccount'))){
-				return false;
-			}
-			return QuickQueryList("select id,name from message where deleted=0 and userid=? and type=? order by id", true,false,array($_GET['userid'], $_GET['messagetype']));		
+			$userid = $USER->id;
+			if(isset($_GET['userid'])){
+				if($USER->authorize(array('managesystem','manageaccount')))
+					$userid = $_GET['userid'];
+				else
+					return false;
+			} 
+			return QuickQueryList("select id,name from message where deleted=0 and userid=? and type=? order by id", true,false,array($userid, $_GET['messagetype']));		
 		//--------------------------- RPC -------------------------------
 		case 'authorizedmapnames':
 			if (!isset($_GET['fieldnum']))
