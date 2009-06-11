@@ -134,7 +134,6 @@ var RuleWidget = Class.create({
 			}
 		}
 		var valueTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update(value.escapeHTML() + '&nbsp;');
-		// Smallest acceptable width for valueTD, browser will make larger if necessary. If style width is not set explicitly like this, Safari resizes dynamically and causes problems with guide morphs.
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
 		
 		return true;
