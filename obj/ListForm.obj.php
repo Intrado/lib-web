@@ -69,7 +69,7 @@ class ListForm extends Form {
 		$str = "
 			".icon_button(_L('Guide'),'information', null, null, ' id="startGuideButton" style="float:right"')."
 			
-			<table id='listFormWorkspace' width='100%'>
+			<table id='listFormWorkspace' width='100%' style='clear:both'>
 				<tr>
 					<!-- MAIN CONTENT AREA -->
 					<td valign=top>
@@ -90,10 +90,11 @@ class ListForm extends Form {
 								</tfoot>
 							</table>
 							
-							<fieldset id='AllLists'>
+							<fieldset id='AllLists' style='margin-top:10px; margin-bottom:10px; padding:5px'>
 								".icon_button(_L('Build List Using Rules'),'information', null, null, ' id="buildListButton" ')."
 								<div id='listSelectboxContainer' style='float:left'></div>
 								".icon_button(_L('Choose List'),'information', null, null, ' id="chooseListButton" ')."
+								<br style='clear:both'/>
 							</fieldset>
 						</div>
 						
@@ -131,7 +132,7 @@ class ListForm extends Form {
 					<input id='{$listidsName}' name='{$listidsName}' type='hidden' value='{$this->formdata['listids']['value']}'/>
 				</form>
 			</div>
-			<div style='clear: both;'></div>
+			<br style='clear: both'/>
 		";
 		
 		// JAVASCRIPT
@@ -139,11 +140,30 @@ class ListForm extends Form {
 			<script type='text/javascript' src='script/calendar.js'></script>
 			<script type='text/javascript' src='script/rulewidget.js.php'></script>
 			<script type='text/javascript'>
+				function listform_refresh_guide_arrow() {
+					var arrowImage = document.formvars['{$this->name}'].ruleWidget.rulesTableFootTR.down('img');
+					var arrowDiv = arrowImage.up('div');
+
+					if (!document.formvars['{$this->name}'].guideDisabled && document.formvars['{$this->name}'].guideFieldset && (document.formvars['{$this->name}'].guideFieldset.id == 'BuildListAddRuleChooseField' || document.formvars['{$this->name}'].guideSection == 'AddRule')) {
+						arrowDiv.show();
+						var firstColumnX = $('BuildListAddRuleChooseField') ? $('BuildListAddRuleChooseField').positionedOffset().left : 0;
+						var columnX = document.formvars['{$this->name}'].guideFieldset.positionedOffset().left - firstColumnX + 16;
+						arrowImage.src = 'img/icons/fugue/arrow_270.gif';
+						arrowDiv.style.borderTop = 'dashed 2px rgb(200,200,255)';
+						if (document.formvars['{$this->name}'].guideArrowMorphEffect)
+							document.formvars['{$this->name}'].guideArrowMorphEffect.cancel();
+						document.formvars['{$this->name}'].guideArrowMorphEffect = new Effect.Morph(arrowDiv, {'style': 'margin-left: ' + columnX + 'px', duration: 0.6});
+					} else {
+						arrowDiv.hide();
+					}
+				}
+
 				function listform_refresh_guide(reset, specificFieldset) {
 					if (document.formvars['{$this->name}'].guideMorphEffect) {
 						document.formvars['{$this->name}'].guideMorphEffect.cancel();
 						document.formvars['{$this->name}'].guideMorphEffect.element.style.borderColor = 'rgb(255,255,255)';
 					}
+
 					var sectionFieldsets = [];
 					$$('fieldset').each(function(fieldset) {
 						if (fieldset != specificFieldset)
@@ -154,10 +174,11 @@ class ListForm extends Form {
 								document.formvars['{$this->name}'].guideStepIndex = sectionFieldsets.length - 1;
 						}
 					});
-					if (sectionFieldsets.length < 1)
+					if (sectionFieldsets.length < 1 || document.formvars['{$this->name}'].guideDisabled) {
+						document.formvars['{$this->name}'].guideFieldset = null;
+						listform_refresh_guide_arrow();
 						return;
-					if (document.formvars['{$this->name}'].guideDisabled)
-						return;
+					}
 					document.formvars['{$this->name}'].guideStepIndex = (reset) ? 0 : Math.min(sectionFieldsets.length-1, Math.max(0, document.formvars['{$this->name}'].guideStepIndex));
 					var currentFieldset = sectionFieldsets[document.formvars['{$this->name}'].guideStepIndex];
 					// Visual effect.
@@ -167,6 +188,8 @@ class ListForm extends Form {
 							this.style.borderColor = 'rgb(255,255,255)';
 					}.bind(currentFieldset)});
 					document.formvars['{$this->name}'].guideFieldset = currentFieldset;
+					listform_refresh_guide_arrow();
+
 					// Guide Content
 					var helpContent = document.formvars['{$this->name}'].generalGuideContents[currentFieldset.id];
 					if (document.formvars['{$this->name}'].guideSection == 'AddRule') {
@@ -183,7 +206,7 @@ class ListForm extends Form {
 					if (!helpContent)
 						return;
 					$('guideContent').update(helpContent);
-					
+
 					// Guide Info
 					$('guideInfo').update('Step ' + (document.formvars['{$this->name}'].guideStepIndex + 1) + ' of ' + sectionFieldsets.length);
 					// Guide Navigation
@@ -191,14 +214,14 @@ class ListForm extends Form {
 					var imagePreviousStep = 'img/pixel.gif';
 					if (document.formvars['{$this->name}'].guideStepIndex > 0)
 						imagePreviousStep = 'img/icons/fugue/arrow_090.gif';
-					$('guideNavigation').insert(new Element('img', {'src':imagePreviousStep, 'width':16, 'alt':'".addslashes(_L('Previous Step'))."'}).observe('click', function() {
+					$('guideNavigation').insert(new Element('img', {'src':imagePreviousStep, 'width':16, 'alt':'".addslashes(_L('Previous Step'))."'}).observe('click', function(event) {
 						document.formvars['{$this->name}'].guideStepIndex--;
 						listform_refresh_guide();
 					}));
 					var imageNextStep = 'img/pixel.gif';
 					if (document.formvars['{$this->name}'].guideStepIndex < sectionFieldsets.length - 1)
 						imageNextStep = 'img/icons/fugue/arrow_270.gif';
-					$('guideNavigation').insert(new Element('img', {'src':imageNextStep, 'width':16, 'alt':'".addslashes(_L('Next Step'))."'}).observe('click', function() {
+					$('guideNavigation').insert(new Element('img', {'src':imageNextStep, 'width':16, 'alt':'".addslashes(_L('Next Step'))."'}).observe('click', function(event) {
 						document.formvars['{$this->name}'].guideStepIndex++;
 						listform_refresh_guide();
 					}));
@@ -260,6 +283,7 @@ class ListForm extends Form {
 								actionsTD.insert('".addslashes(icon_button(_L('Preview'),'information'))."');
 								actionsTD.insert('".addslashes(icon_button(_L('Show/Hide Rules'),'information'))."');
 								actionsTD.insert('".addslashes(icon_button(_L('Remove'),'information'))."');
+								actionsTD.insert('<br style=\"clear:both\"/>');
 								$('listsTableBody').insert(new Element('tr').insert(nameTD).insert(statisticsTD).insert(actionsTD));
 								// Add an extra row for viewing rules.
 								var rulesTR = new Element('tr', {'class':'ListRules'}).insert(new Element('td', {'class':'viewRulesTD',colspan:100}));
@@ -437,9 +461,11 @@ class ListForm extends Form {
 					document.formvars['{$this->name}'].ruleWidget.ruleEditor.criteriaTD.down('fieldset').id = 'AddRuleCriteria';
 					document.formvars['{$this->name}'].ruleWidget.ruleEditor.valueTD.down('fieldset').id = 'AddRuleValue';
 					document.formvars['{$this->name}'].ruleWidget.ruleEditor.actionTD.down('fieldset').id = 'AddRuleAction';
-					document.formvars['{$this->name}'].ruleWidget.container.insert(new Element('fieldset',{id:'BuildListSaveRules'}).update(
-						'".addslashes(icon_button(_L('Save Rules as a List'),'information',null,null, ' id="saveRulesButton" '))."'
-					).insert('".addslashes(icon_button(_L('Cancel List'),'information',null,null, ' id="cancelBuildListButton" '))."'));
+					var buildListFieldset = new Element('fieldset',{'id':'BuildListSaveRules', 'style':'margin-top:10px;margin-bottom:10px;padding:5px'});
+					buildListFieldset.insert('".addslashes(icon_button(_L('Don\'t Save'),'information',null,null, ' id="cancelBuildListButton" '))."');
+					buildListFieldset.insert('".addslashes(icon_button(_L('Save Rules as a List'),'information',null,null, ' id="saveRulesButton" '))."');
+					document.formvars['{$this->name}'].ruleWidget.container.insert(buildListFieldset);
+					document.formvars['{$this->name}'].ruleWidget.rulesTableFootTR.update(new Element('td', {'colspan':100}).update(new Element('div', {'style':'margin:0; padding:0; margin-top:8px'}).insert(new Element('img', {'src':'img/pixel.gif', 'style':'width:16px; height:16px; margin:0; padding:0; margin-left:-8px'}))));
 					
 					// Guide/Focus
 					document.formvars['{$this->name}'].guideDisabled = true;
@@ -450,7 +476,6 @@ class ListForm extends Form {
 					document.formvars['{$this->name}'].guideFieldset = null;
 					document.formvars['{$this->name}'].guideMorphEffect = null;
 					$('startGuideButton').observe('click', function(event) {
-						event.stop();
 						if (!document.formvars['{$this->name}'].guideDisabled)
 							return;
 						document.formvars['{$this->name}'].guideDisabled = false;
@@ -463,12 +488,10 @@ class ListForm extends Form {
 					});
 					// Close Guide Link
 					$('closeGuideLink').observe('click', function(event) {
-						event.stop();
 						document.formvars['{$this->name}'].guideDisabled = true;
 						$('startGuideButton').appear({duration:0.5});
 						$('guide').hide();
 						$('guideTD').morph('width:0px', {afterFinish: function() {
-							
 							listform_refresh_guide(true);
 						}});
 					});
@@ -481,7 +504,7 @@ class ListForm extends Form {
 					document.formvars['{$this->name}'].ruleWidget.container.observe('RuleWidget:ChangeCriteria', function() {
 						listform_refresh_guide();
 					});
-					$('BuildListSaveRules').observe('click', function() {
+					$('BuildListSaveRules').observe('click', function(event) {
 						listform_refresh_guide(false, $('BuildListSaveRules'));
 					});
 					$('saveRulesButton').observe('focus', function() {
@@ -489,14 +512,16 @@ class ListForm extends Form {
 						$('saveRulesButton').focus();
 					});
 					
-					// Tips
+					// Tips (and InColumn Guide)
 					document.formvars['{$this->name}'].ruleEditorTips = ".json_encode($this->ruleEditorTips).";
 					document.formvars['{$this->name}'].ruleWidget.container.observe('RuleWidget:InColumn', function(event) {
-						listform_refresh_guide(false, event.memo.td.down('fieldset'));
 						if ($('ruleEditorTip'))
 							$('ruleEditorTip').remove();
 						if (event.memo.column == 'field' || document.formvars['{$this->name}'].guideSection == 'AddRule')
 							event.memo.td.insert(new Element('div', {id:'ruleEditorTip', style:'clear:both'}).update(document.formvars['{$this->name}'].ruleEditorTips[event.memo.column]));
+						
+						var fieldset = event.memo.td.down('fieldset');
+						listform_refresh_guide(false, fieldset);
 					});
 					document.formvars['{$this->name}'].ruleWidget.container.observe('RuleWidget:AddRule', function() {
 						document.formvars['{$this->name}'].guideSection = 'BuildList';
@@ -508,18 +533,20 @@ class ListForm extends Form {
 					});
 					document.formvars['{$this->name}'].ruleWidget.container.observe('RuleWidget:DeleteRule', function() {
 						document.formvars['{$this->name}'].guideSection = 'BuildList';
+						if ($('ruleEditorTip'))
+							$('ruleEditorTip').remove();
 						listform_refresh_guide(true);
 						listform_show_validation_message();
 					});
 					
 					// allListsWindow: Choose List Selectbox and Button
-					$('chooseListButton').observe('click', function() {
+					$('chooseListButton').observe('click', function(event) {
 						var selectbox = $('listSelectboxContainer').down();
 						if (listform_add_list(selectbox.getValue()))
 							listform_refresh_guide(true);
 					});
 					// allListsWindow: Build a List Using Rules Buttons
-					$('buildListButton').observe('click', function() {
+					$('buildListButton').observe('click', function(event) {
 						document.formvars['{$this->name}'].guideSection = 'BuildList';
 						document.formvars['{$this->name}'].ruleWidget.clear_rules();
 						$('buildListWindow').show().style.width = '50%';
@@ -534,7 +561,7 @@ class ListForm extends Form {
 						listform_show_validation_message();
 					});
 					// buildListWindow: Save Rules Button
-					$('saveRulesButton').observe('click', function() {
+					$('saveRulesButton').observe('click', function(event) {
 						var data = document.formvars['{$this->name}'].ruleWidget.toJSON();
 						if (data == '{}') {
 							alert('".addslashes(_L('Please add a rule'))."');
@@ -562,7 +589,7 @@ class ListForm extends Form {
 						});
 					});
 					// buildListWindow: Cancel Build List Button
-					$('cancelBuildListButton').observe('click', function() {
+					$('cancelBuildListButton').observe('click', function(event) {
 						document.formvars['{$this->name}'].ruleWidget.clear_rules();
 						document.formvars['{$this->name}'].guideSection = 'AllLists';
 						$('buildListWindow').hide();
