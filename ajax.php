@@ -38,7 +38,7 @@ function handleRequest() {
 		
 		// Return a specific message part by it's ID
 		case "MessagePart":
-			return MessagePart($_GET['id']);
+			return new MessagePart($_GET['id']);
 		
 		//--------------------------- COMPLEX OBJECTS -------------------------------
 		// Return message parts belonging to a specific messageid
