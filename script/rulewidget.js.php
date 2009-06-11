@@ -23,17 +23,18 @@ var RuleWidget = Class.create({
 	initialize: function(container) {
 		this.container = container;
 		this.rulesTableLastTR = new Element('tr'); // For customization.
-		this.rulesTableFootTR = new Element('tr'); // For rule editor
+		this.rulesTableFootTR = new Element('tr'); // For customization, on top of rulesTableFootLastTR.
+		this.rulesTableFootLastTR = new Element('tr'); // For rule editor
 		this.rulesTableBody = new Element('tbody');
-		var thead = new Element('thead').insert('<tr><th class="windowRowHeader"><?=addslashes(_L('Field'))?></th><th class="windowRowHeader"><?=addslashes(_L('Criteria'))?></th><th class="windowRowHeader"><?=addslashes(_L('Value'))?></th><th class="windowRowHeader"><?=addslashes(_L('Actions'))?></th></tr>');
-		this.container.insert(new Element('table', {'class':'border', 'width':'100%'}).insert(thead).insert(this.rulesTableBody).insert(new Element('tfoot').insert(this.rulesTableFootTR)));
-		this.ruleEditor = new RuleEditor(this, this.rulesTableFootTR);
+		var thead = new Element('thead').insert('<tr><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Field'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Criteria'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Value'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Actions'))?></th></tr>');
+		this.container.insert(new Element('table', {'class':'border', 'width':'100%'}).insert(thead).insert(this.rulesTableBody).insert(new Element('tfoot').insert(this.rulesTableFootTR).insert(this.rulesTableFootLastTR)));
+		this.ruleEditor = new RuleEditor(this, this.rulesTableFootLastTR);
 		this.clear_rules();
 		
 		this.fieldmaps = null;
 		this.operators = null;
 		this.reldateOptions = null;
-		this.multisearchDOMCache = {}, // Cache of multisearch DOM, indexed by fieldnum.
+		this.multisearchHTMLCache = {}, // Cache of multisearch DOM, indexed by fieldnum.
 		new Ajax.Request('ajax.php?type=rulewidgetsettings', {
 			onSuccess: function(transport) {
 				var data = transport.responseJSON;
@@ -78,13 +79,13 @@ var RuleWidget = Class.create({
 			data.type = this.fieldmaps[data.fieldnum].type;
 		
 		// FieldmapTD
-		var fieldmapTD = new Element('td', {'class':'border', valign:'top'}).insert(this.fieldmaps[data.fieldnum].name);
+		var fieldmapTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
 		// Keep track of the row's data.fieldnum by using a hidden input.
 		if (addHiddenFieldnum)
 			fieldmapTD.insert(new Element('input', {'type':'hidden', 'value':data.fieldnum}));
 		
 		// CriteriaTD
-		var criteriaTD = new Element('td', {'class':'border', valign:'top'});
+		var criteriaTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'});
 		var criteria = this.operators[data.type][data.op];
 		if (data.op == 'in') {
 			criteria = '<?=addslashes(_L('is'))?>';
@@ -132,7 +133,8 @@ var RuleWidget = Class.create({
 					break;
 			}
 		}
-		var valueTD = new Element('td', {'class':'border', valign:'top'}).update(value.escapeHTML() + '&nbsp;');
+		var valueTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update(value.escapeHTML() + '&nbsp;');
+		// Smallest acceptable width for valueTD, browser will make larger if necessary. If style width is not set explicitly like this, Safari resizes dynamically and causes problems with guide morphs.
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
 		
 		return true;
@@ -151,18 +153,17 @@ var RuleWidget = Class.create({
 		}
 		
 		// Actions
-		var actionTD = new Element('td', {'class':'border', valign:'top'}).update('<?=addslashes(icon_button(_L('Delete'), 'information'))?>');
+		var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Delete'), 'information'))?>').insert('<br style=\"clear:both\"/>');
 		var deleteRuleButton = actionTD.down('button');
-		deleteRuleButton.observe('click', function(event) {
-			// Important: Get the value of fieldnum before deleting the table row.
-			var fieldnum = event.element().up('tr').down('input[type="hidden"]').getValue();
-			event.element().up('tr').remove();
+		this.rulesTableLastTR.insert({before:tr.insert(actionTD)});
+		deleteRuleButton.observe('click', function(event, tr, fieldnum) {
+			event.stop();
+			tr.remove();
 			delete this.appliedRules[fieldnum];
 			this.ruleEditor.reset();
 			this.container.fire('RuleWidget:DeleteRule');
-		}.bindAsEventListener(this));
+		}.bindAsEventListener(this, this.rulesTableLastTR.previous('tr'), data.fieldnum));
 		
-		this.rulesTableLastTR.insert({before:tr.insert(actionTD)});
 		this.appliedRules[data.fieldnum] = data;
 		this.ruleEditor.reset();
 		this.container.fire('RuleWidget:AddRule');
@@ -184,36 +185,42 @@ var RuleEditor = Class.create({
 		
 		var fieldsetCSS = 'padding:5px; margin:0;';
 		
-		this.fieldTD = new Element('td',{valign:'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
-		this.criteriaTD = new Element('td',{valign:'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
-		this.valueTD = new Element('td',{valign:'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
-		this.actionTD = new Element('td',{valign:'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
+		this.fieldTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
+		this.criteriaTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
+		this.valueTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
+		this.actionTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
 		containerTR.insert(this.fieldTD).insert(this.criteriaTD).insert(this.valueTD).insert(this.actionTD);
 
-		this.actionTD.down('fieldset').update('<?=addslashes(icon_button(_L('Add'), 'information'))?>');
+		this.actionTD.down('fieldset').update('<?=addslashes(icon_button(_L('Add'), 'information'))?>').insert('<br style="clear:both"/>');
 		var addRuleButton = this.actionTD.down('button');
 		
 		// Events
 		addRuleButton.observe('click', function(event) {
 			this.ruleWidget.insert_rule(this.get_data());
 		}.bindAsEventListener(this));
-		addRuleButton.observe('focus', function() {
-			this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.actionTD, column:'action'});
-		}.bindAsEventListener(this));
-		this.fieldTD.observe('click', function() {
-			this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.fieldTD, column:'field'});
-		}.bindAsEventListener(this));
-		this.criteriaTD.observe('click', function() {
-			this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.criteriaTD, column:'criteria'});
-		}.bindAsEventListener(this));
-		this.valueTD.observe('click', function() {
-			this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.valueTD, column:'value'});
-		}.bindAsEventListener(this));
-		this.actionTD.observe('click', function() {
-			this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.actionTD, column:'action'});
-		}.bindAsEventListener(this));
+		addRuleButton.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.actionTD));
+
+		this.fieldTD.observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.fieldTD));
+		this.criteriaTD.observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.criteriaTD));
+		this.valueTD.observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
+		this.actionTD.observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.actionTD));
 	},
 	
+	trigger_event_in_column: function(nullableEvent, td) {
+		var column = '';
+		if (td == this.fieldTD)
+			column = 'field';
+		else if (td == this.criteriaTD)
+			column = 'criteria';
+		else if (td == this.valueTD)
+			column = 'value';
+		else if (td == this.actionTD)
+			column = 'action';
+		else
+			return;
+		this.ruleWidget.container.fire('RuleWidget:InColumn', {'td':td, 'column':column});
+	},
+
 	// Returns data for the rule, {fieldnum, type, logical, op, val}
 	get_data: function() {
 		var fieldnum = this.fieldTD.down('select').getValue();
@@ -270,16 +277,15 @@ var RuleEditor = Class.create({
 		var type = this.ruleWidget.fieldmaps[fieldnum].type;
 		var criteriaSelectbox = this.make_selectbox(this.ruleWidget.operators[type]);
 		section.update(criteriaSelectbox);
-		criteriaSelectbox.observe('change', function() {
+		criteriaSelectbox.observe('change', function(event) {
 			var fieldnum = this.fieldTD.down('select').getValue();
 			var type = this.ruleWidget.fieldmaps[fieldnum].type;
 			if (type != 'multisearch')
 				this.show_value_column(fieldnum);
 			this.ruleWidget.container.fire('RuleWidget:ChangeCriteria');
+			this.trigger_event_in_column(this, this.criteriaTD);
 		}.bindAsEventListener(this));
-		criteriaSelectbox.observe('focus', function() {
-			this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.criteriaTD, column:'criteria'});
-		}.bindAsEventListener(this));
+		criteriaSelectbox.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.criteriaTD));
 	},
 	
 	// Determines the appropriate input boxes to show, makes an ajax request for persondatavalues if necessary for multisearch.
@@ -297,12 +303,15 @@ var RuleEditor = Class.create({
 			alert('<?=addslashes(_L('ASSERTION FAILED, op missing'))?>');
 		op = op.getValue();
 		
+		var container = new Element('div');
 		switch(type) {
 			case 'multisearch':
-				section.update('<img src="img/icons/loading.gif"/>Loading...');
-				if (this.ruleWidget.multisearchDOMCache[fieldnum]) {
-					section.update(this.ruleWidget.multisearchDOMCache[fieldnum]);
-					this.valueTD.select('input[type="checkbox"]').each(function(checkbox) {
+				container.update('<img src="img/icons/loading.gif"/>Loading...');
+				if (this.ruleWidget.multisearchHTMLCache[fieldnum]) {
+					var multicheckboxHTML = this.ruleWidget.multisearchHTMLCache[fieldnum];
+					container.update(multicheckboxHTML);
+					this.add_multicheckbox_toolbar(container);
+					container.select('input').each(function(checkbox) {
 						checkbox.checked = false;
 					});
 				} else {
@@ -310,15 +319,13 @@ var RuleEditor = Class.create({
 						onSuccess: function(transport, fieldnum) {
 							var section = this.valueTD.down('fieldset');
 							var data = transport.responseJSON;
-							var multicheckbox = this.make_multicheckbox(data);
-							section.update(multicheckbox);
-							this.ruleWidget.multisearchDOMCache[fieldnum] = multicheckbox;
-							
+							var multicheckboxHTML = this.make_multicheckboxHTML(data);
+							this.ruleWidget.multisearchHTMLCache[fieldnum] = multicheckboxHTML;
+							container = new Element('div').update(multicheckboxHTML);
+							section.update(this.add_multicheckbox_toolbar(container));
 							// TODO: optimize input[type="checkbox"] to first and last element?
-							section.select('input[type="checkbox"]').each(function(input) {
-								input.observe('focus', function() {
-									this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.valueTD, column:'value'});
-								}.bindAsEventListener(this));
+							container.select('input').each(function(input) {
+								input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
 							}.bind(this));
 						}.bindAsEventListener(this, fieldnum)
 					});
@@ -329,10 +336,10 @@ var RuleEditor = Class.create({
 				var current = this.valueTD.select('input[type="text"]');
 				var value1 = (current && current[0]) ? current[0].getValue() : '';
 				var value2 = (current && current[1]) ? current[1].getValue() : '';
-				section.update(this.make_textbox(value1));
+				container.update(this.make_textbox(value1));
 				if (op == 'num_range')
-					section.insert(' <?=addslashes(_L('and'))?> ');
-				section.insert(this.make_textbox(value2, op != 'num_range'));
+					container.insert(' <?=addslashes(_L('and'))?> ');
+				container.insert(this.make_textbox(value2, op != 'num_range'));
 				break;
 				
 			case 'reldate':
@@ -342,30 +349,33 @@ var RuleEditor = Class.create({
 				var value4 = (current && current[2]) ? current[2].getValue() : '';
 				var value5 = (current && current[3]) ? current[3].getValue() : '';
 				var selectbox = this.make_selectbox(this.ruleWidget.reldateOptions, op != 'reldate');
-				section.update(selectbox);
-				section.insert(this.make_datebox(value2, op != 'eq' && op != 'date_range'));
+				container.update(selectbox);
+				container.insert(this.make_datebox(value2, op != 'eq' && op != 'date_range'));
 				if (op == 'date_range')
-					section.insert(' <?=addslashes(_L('and'))?> ');
-				section.insert(this.make_datebox(value3, op != 'date_range'));
-				section.insert(this.make_textbox(value4, op != 'date_offset' && op != 'reldate_range'));
+					container.insert(' <?=addslashes(_L('and'))?> ');
+				container.insert(this.make_datebox(value3, op != 'date_range'));
+				container.insert(this.make_textbox(value4, op != 'date_offset' && op != 'reldate_range'));
 				if (op == 'reldate_range')
-					section.insert(' <?=addslashes(_L('and'))?> ');
-				section.insert(this.make_textbox(value5, op != 'reldate_range'));
+					container.insert(' <?=addslashes(_L('and'))?> ');
+				container.insert(this.make_textbox(value5, op != 'reldate_range'));
 				break;
 				
 			case 'text':
 				var current = this.valueTD.select('input[type="text"]');
 				var value1 = (current && current[0]) ? current[0].getValue() : '';
-				section.update(this.make_textbox(value1));
+				container.update(this.make_textbox(value1));
 				break;
 		}
 		// TODO: optimize input[type="checkbox"] to first and last element?
-		section.select('select, input').each(function(input) {
-			input.observe('focus', function() {
-				this.ruleWidget.container.fire('RuleWidget:InColumn', {td:this.valueTD, column:'value'});
-			}.bindAsEventListener(this));
+		container.select('input').each(function(input) {
+			input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
+		}.bind(this));
+		container.select('select').each(function(input) {
+			input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
 		}.bind(this));
 		
+		section.update(container);
+
 		// Show actions column also.
 		this.actionTD.down('button').show();
 	},
@@ -379,10 +389,9 @@ var RuleEditor = Class.create({
 			this.show_criteria_column(fieldnum);
 			this.show_value_column(fieldnum);
 			this.ruleWidget.container.fire('RuleWidget:ChangeField', {'fieldnum':fieldnum});
+			this.trigger_event_in_column(this, this.fieldTD);
 		}.bindAsEventListener(this));
-		fieldSelectbox.observe('focus', function() {
-			this.ruleWidget.container.fire('RuleWidget:InColumn', {'td':this.fieldTD, 'column':'field'});
-		}.bindAsEventListener(this));
+		fieldSelectbox.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.fieldTD));
 		
 		fieldSelectbox.update(new Element('option', {'value':''}).insert('--<?=addslashes(_L('Choose a Field'))?>--'));
 		for (var fieldnum in this.ruleWidget.fieldmaps) {
@@ -406,45 +415,54 @@ var RuleEditor = Class.create({
 		this.actionTD.down('button').hide();
 	},
 	
-	make_multicheckbox: function(values, threshold) {
-		multicheckbox = new Element('div', {'style':'border: solid 1px gray; background: white; width: 200px; overflow:hidden'});
-		if (!values || !values.join)
-			values = [''];
+	// Adds a toolbar only if the number of checkboxes exceeds threshold
+	add_multicheckbox_toolbar: function(multicheckboxContainer, threshold) {
 		if (!threshold)
-			threshold = 20;
-		var heightCSS = '';
+			threshold = 10;
+		var length = multicheckboxContainer.select('input[type="checkbox"]').length;
 		// If necessary, add CheckAll and Clear, and limit height
-		if (values.length > threshold) {
-			var checkAll = new Element('a', {'href':'', 'style':'float:left'}).insert('<?=addslashes(_L('Check All'))?>');
+		if (length > threshold) {
+			var checkAll = new Element('a', {'href':'#', 'style':'float:left'}).insert('<?=addslashes(_L('Check All'))?>');
 			checkAll.observe('click', function(event) {
-				event.stop();
-				var checkboxes = event.element().up().select('input[type="checkbox"]');
+				var checkboxes = this.select('input[type="checkbox"]');
 				for (var i = 0; i < checkboxes.length; ++i) {
 					checkboxes[i].checked = true;
 				}
-			});
-			var clear = new Element('a', {'href':'', 'style':'float:right'}).insert('<?=addslashes(_L('Clear'))?>');
+			}.bindAsEventListener(multicheckboxContainer));
+			var clear = new Element('a', {'href':'#', 'style':'float:right'}).insert('<?=addslashes(_L('Clear'))?>');
 			clear.observe('click', function(event) {
-				event.stop();
-				var checkboxes = event.element().up().select('input[type="checkbox"]');
+				var checkboxes = this.select('input[type="checkbox"]');
 				for (var i = 0; i < checkboxes.length; ++i) {
 					checkboxes[i].checked = false;
 				}
-			});
-			multicheckbox.insert(checkAll).insert(clear).insert('<br style="clear:both"/>');
-			heightCSS = 'height:300px;';
+			}.bindAsEventListener(multicheckboxContainer));
+			multicheckboxContainer.down('div').insert({top:new Element('div').insert(checkAll).insert(clear).insert('<br style="clear:both"/>')});
+			multicheckboxContainer.down('ul').style.height = '300px';
 		}
+		return multicheckboxContainer;
+	},
+
+	// NOTE: If you want add a toolbar, do add_multicheckbox_toolbar(new Element('div').update(make_multicheckboxHTML())); this function only returns HTML, not a real DOM object.
+	make_multicheckboxHTML: function(values) {
+		var tempContainer = new Element('div'); // Temporary container so that we can return tempContainer.innerHTML.
+		
+		multicheckbox = new Element('div', {'style':'border: solid 1px gray; background: white; overflow:hidden'});
+		if (!values || !values.join)
+			values = [''];
+
 		// TODO: Determine if it's faster to insert as html or use DOM methods.
 		// NOTE: So far it looks like DOM is faster, because Internet Explorer 6 seems to get very slow when concatenating long string in javascript.
-		var ul = new Element('ul', {'style':'clear:both; '+heightCSS+' margin:0; padding:0; list-style:none; overflow:auto;'});
+		var ul = new Element('ul', {'style':'clear:both; margin:0; padding:0; list-style:none; overflow:auto;'});
 		// TODO: max is temporary hack to stop browser from consuming too much memory! It needs to be removed when in production
 		var max = (values.length > 100) ? 100 : values.length;
 		for (var i = 0; i < max; ++i) {
 			var checkbox = new Element('input', {'type':'checkbox', 'value':values[i]});
 			var label = new Element('label', {'for':checkbox.identify()}).update(values[i].escapeHTML());
-			ul.insert(new Element('li', {'style':'white-space:nowrap'}).insert(checkbox).insert(label));
+			ul.insert(new Element('li', {'style':'white-space:nowrap; overflow: hidden'}).insert(checkbox).insert(label));
 		}
-		return multicheckbox.insert(ul);
+		multicheckbox.insert(ul);
+		
+		return tempContainer.update(multicheckbox).innerHTML;
 	},
 
 	make_selectbox: function(values, hidden) {
@@ -462,6 +480,7 @@ var RuleEditor = Class.create({
 			value = '';
 		var datebox = new Element('input', {'type':'text', 'value':value.escapeHTML()});
 		datebox.observe('focus', function(event) {
+			event.stop();
 			this.select();
 			lcs(this,true,true);
 		});
