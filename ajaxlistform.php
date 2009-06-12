@@ -9,6 +9,8 @@ require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 
 function handleRequest() {
+	if (!isset($_GET['type']))
+		return false;
 	global $USER;
 	
 	switch($_GET['type']) {
