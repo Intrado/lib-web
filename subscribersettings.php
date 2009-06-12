@@ -22,7 +22,7 @@ require_once("obj/Validator.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-// TODO show options, but show/hide metadata
+
 if (!$USER->authorize('managesystem') && !getSystemSetting("_hasselfsignup", false)) {
 	redirect('unauthorized.php');
 }
@@ -37,7 +37,7 @@ $emaildomain = QuickQuery("select value from setting where name='emaildomain'");
 $formdata = array();
 
 $formdata["restrictdomain"] = array(
-        "label" => _L("Restrict Account Email to Domain"),
+        "label" => _L("Restrict Account Email to Domain and Subdomains"),
         "value" => getSystemSetting("subscriberauthdomain", "0") ? true : false,
         "validators" => array(    
         ),
