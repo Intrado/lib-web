@@ -10,7 +10,9 @@ header("Cache-Control: private");
 ?>
 
 //----------- RuleWidget EVENTS (This example shows all custom events) ------------
+// NOTE: Your client should only allow rule-building if 'RuleWidget:Ready' is fired.
 //var ruleWidget = new RuleWidget($('ruleContainer'));
+//ruleWidget.container.observe('RuleWidget:Ready');
 //ruleWidget.container.observe('RuleWidget:DeleteRule');
 //ruleWidget.container.observe('RuleWidget:AddRule');
 //ruleWidget.container.observe('RuleWidget:BuildList');
@@ -39,7 +41,8 @@ var RuleWidget = Class.create({
 			onSuccess: function(transport) {
 				var data = transport.responseJSON;
 				if (!data) {
-					alert('<?=addslashes(_L('Sorry cannot get fieldmaps'))?>');
+					// Silent failure, client should not provide any rule-building tools unless the event RuleWidget:Ready is fired.
+					//alert('<?=addslashes(_L('Sorry cannot get fieldmaps'))?>');
 					return;
 				}
 				this.operators = data['operators'];
@@ -58,6 +61,7 @@ var RuleWidget = Class.create({
 				this.operators['multisearch']['not'] = '<?=addslashes(_L('is NOT'))?>';
 				this.operators['multisearch']['in'] = '<?=addslashes(_L('is'))?>';
 				this.ruleEditor.reset();
+				this.container.fire('RuleWidget:Ready');
 			}.bindAsEventListener(this)
 		});
 	},
