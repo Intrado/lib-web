@@ -205,7 +205,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			$val = $postdata[$fieldnum];
 			if ($val == null)
-				$val = "";
+				$val = array();
 
 			if ('f' == substr($fieldnum, 0, 1)) {
 				$person->$fieldnum = $val;
