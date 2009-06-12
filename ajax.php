@@ -106,8 +106,9 @@ function handleRequest() {
 			return $stats;
 			
 		case 'persondatavalues':
-			if (!isset($_GET['fieldnum']))
+			if (!isset($_GET['fieldnum']) || !array_key_exists($_GET['fieldnum'], FieldMap::getAuthorizedMapNames()))
 				return false;
+			
 			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 			return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
