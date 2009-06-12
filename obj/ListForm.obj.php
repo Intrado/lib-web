@@ -542,61 +542,71 @@ class ListForm extends Form {
 					// allListsWindow: Choose List Selectbox and Button
 					$('chooseListButton').observe('click', function(event) {
 						var selectbox = $('listSelectboxContainer').down();
+						if (selectbox.options.length < 2) {
+							alert('".addslashes(_L('Sorry, you do not have any existing lists.'))."');
+							return;
+						}
 						if (listform_add_list(selectbox.getValue()))
 							listform_refresh_guide(true);
 					});
 					// allListsWindow: Build a List Using Rules Buttons
-					$('buildListButton').observe('click', function(event) {
-						document.formvars['{$this->name}'].guideSection = 'BuildList';
-						document.formvars['{$this->name}'].ruleWidget.clear_rules();
-						$('buildListWindow').show().style.width = '50%';
-						$('buildListWindow').morph('width:100%', {duration:0.6});
-						$('allListsWindow').hide();
-						var listSelectbox = $('listSelectboxContainer').down();
-						if (listSelectbox)
-							listSelectbox.selectedIndex = 0;
-						listform_set_mode_status('choosingList', false);
-						listform_set_mode_status('buildingList', true);
-						listform_refresh_guide(true);
-						listform_show_validation_message();
-					});
-					// buildListWindow: Save Rules Button
-					$('saveRulesButton').observe('click', function(event) {
-						var data = document.formvars['{$this->name}'].ruleWidget.toJSON();
-						if (data == '{}') {
-							alert('".addslashes(_L('Please add a rule'))."');
-							return;
-						}
-						listform_set_mode_status('buildingList', false);
-						new Ajax.Request('ajaxlistform.php?type=saverules', { 'method':'post',
-							'postBody': 'ruledata='+data,
-							onSuccess: function(transport) {
-								var id = transport.responseJSON;
-								if (!id) {
-									alert('".addslashes(_L('sorry could not save these rules!'))."');
-									return;
-								}
-								if (listform_add_list(id)) {
-									document.formvars['{$this->name}'].ruleWidget.clear_rules();
-									document.formvars['{$this->name}'].guideSection = 'AllLists';
-									$('buildListWindow').hide();
-									$('allListsWindow').show();
-									listform_refresh_guide(true);
-									listform_set_mode_status('buildingList', false);
-									listform_show_validation_message();
-								}
-							}
+					$('buildListButton').hide();
+					document.formvars['{$this->name}'].ruleWidget.container.observe('RuleWidget:Ready', function() {
+						$('buildListButton').show();
+						
+						$('buildListButton').observe('click', function(event) {
+							document.formvars['{$this->name}'].guideSection = 'BuildList';
+							document.formvars['{$this->name}'].ruleWidget.clear_rules();
+							$('buildListWindow').show().style.width = '50%';
+							$('buildListWindow').morph('width:100%', {duration:0.6});
+							$('allListsWindow').hide();
+							var listSelectbox = $('listSelectboxContainer').down();
+							if (listSelectbox)
+								listSelectbox.selectedIndex = 0;
+							listform_set_mode_status('choosingList', false);
+							listform_set_mode_status('buildingList', true);
+							listform_refresh_guide(true);
+							listform_show_validation_message();
 						});
-					});
-					// buildListWindow: Cancel Build List Button
-					$('cancelBuildListButton').observe('click', function(event) {
-						document.formvars['{$this->name}'].ruleWidget.clear_rules();
-						document.formvars['{$this->name}'].guideSection = 'AllLists';
-						$('buildListWindow').hide();
-						$('allListsWindow').show();
-						listform_refresh_guide(true);
-						listform_set_mode_status('buildingList', false);
-						listform_show_validation_message();
+						
+						// buildListWindow: Save Rules Button
+						$('saveRulesButton').observe('click', function(event) {
+							var data = document.formvars['{$this->name}'].ruleWidget.toJSON();
+							if (data == '{}') {
+								alert('".addslashes(_L('Please add a rule'))."');
+								return;
+							}
+							listform_set_mode_status('buildingList', false);
+							new Ajax.Request('ajaxlistform.php?type=saverules', { 'method':'post',
+								'postBody': 'ruledata='+data,
+								onSuccess: function(transport) {
+									var id = transport.responseJSON;
+									if (!id) {
+										alert('".addslashes(_L('sorry could not save these rules!'))."');
+										return;
+									}
+									if (listform_add_list(id)) {
+										document.formvars['{$this->name}'].ruleWidget.clear_rules();
+										document.formvars['{$this->name}'].guideSection = 'AllLists';
+										$('buildListWindow').hide();
+										$('allListsWindow').show();
+										listform_refresh_guide(true);
+										listform_set_mode_status('buildingList', false);
+										listform_show_validation_message();
+									}
+								}
+							});
+						});
+						// buildListWindow: Cancel Build List Button
+						$('cancelBuildListButton').observe('click', function(event) {
+							document.formvars['{$this->name}'].ruleWidget.clear_rules();
+							document.formvars['{$this->name}'].guideSection = 'AllLists';
+							$('buildListWindow').hide();
+							$('allListsWindow').show();
+							listform_refresh_guide(true);
+							listform_set_mode_status('buildingList', false);
+							listform_show_validation_message();
+						});
 					});
 					
 					// Load Existing Lists
