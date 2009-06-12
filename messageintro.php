@@ -54,11 +54,11 @@ class IntroSelect extends FormItem {
 		
 		$str .= '<span id="introwidget'.$n.'"></span>';
 		
-		$str .= icon_button(_L("Play"),"fugue/control","
+		$str .= '<div id="introplay'.$n.'">' . icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "').getValue().evalJSON();
 					if(content.message != '')
 						popup('previewmessage.php?id=' + content.message, 400, 400);") 
-			  . icon_button(_L("Load"),"fugue/arrow_045","$('introwidgetedit" .$n. "').show();$('introwidgetblocked" .$n. "').hide();return false;") ;
+			  . '</div>'. icon_button(_L("Load"),"fugue/arrow_045","$('introwidgetedit" .$n. "').show();$('introwidgetblocked" .$n. "').hide();return false;") ;
 		$str .= '</div>';
 		// ' . (isset($this->args['values']["language"])?"$(introitem+\"language\").value":"\"\"") . ';
 		$str .= '<script>showinfo(\'' .$n . '\');</script>';
@@ -110,14 +110,14 @@ if (!$USER->authorize('managesystem')) {
 $messages = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 $languages = QuickQueryList("select name from language");
 
-$values = array("" => "Select a Message");
+$messageselect = array("" => "Select a Message");
 foreach($messages as $message)
-	$values[$message->id] = $message->name;
+	$messageselect[$message->id] = $message->name;
 	
-$selectvalues = array("" => "Select Language");
+$languageselect = array("" => "Select Language");
 $i = 1;
 foreach($languages as $language) {
-	$selectvalues[$i] = $language;
+	$languageselect[$language] = $language;
 	$i++;
 }
 	
@@ -129,14 +129,14 @@ else
 	$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");
 /*CSDELETEMARKER_END*/
 	
-$uservalues = array("" => "Select User");
+$userselect = array("" => "Select User");
 foreach($users as $user) {
-	$uservalues[$user->id] = $user->firstname ." " . $user->lastname;
+	$userselect[$user->id] = $user->firstname ." " . $user->lastname;
 }	
 
-$defaultvalues = array("user" => $uservalues, "message" => $values);
+$defaultvalues = array("user" => $userselect, "message" => $messageselect);
 
-$languagevalues = array("language" => $selectvalues,"user" => $uservalues, "message" => $values);
+$languagevalues = array("language" => $languageselect,"user" => $userselect, "message" => $messageselect);
 
 
 
@@ -144,7 +144,7 @@ $formdata = array(
 	"Required Intro",
 	"defaultmessage" => array(
 		"label" => _L("Default Intro"),
-		"value" => '{"message":"' .getSystemSetting('introid_default'). '"}',
+		"value" => '{"message":"' .getSystemSetting('intromessageid_default'). '"}',
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$defaultvalues
@@ -153,16 +153,17 @@ $formdata = array(
 	),
 	"emergencymessage" => array(
 		"label" => _L("Emergency Intro"),
-		"value" => '{"message":"' .getSystemSetting('introid_emergency'). '"}',
+		"value" => '{"message":"' .getSystemSetting('intromessageid_emergency'). '"}',
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$defaultvalues
 		),
 		"helpstep" => 1
-	),
-	"Language Options"
+	)
+//	,
+//	"Language Options"
 );
-
+/*
 for($i = 1; $i < 10; $i++) {
 	$formdata["digit$i"] = array(
 		"label" => _L("Digit $i"),
@@ -174,6 +175,7 @@ for($i = 1; $i < 10; $i++) {
 		"helpstep" => 2
 	);
 }
+*/
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
 		icon_button(_L("Cancel"),"cross",null,"settings.php"));
@@ -312,14 +314,22 @@ function loaduser(sourceid,targetid) {
 	cachedAjaxGet(request,setvalues,targetid);
 }	
 function showinfo(id) {
-		if($(id).value.evalJSON().message == "")
-			note = "Message is not";	
-		else
-			note = "Message is set";
+		var message = $(id).value.evalJSON();
+		if(message.message == "") {
+			note = "Message is not";
+			$('introplay' + id).hide();
+		} else {
+			note = "Message is set ";
+			if(!(message.language == undefined || message.language == ""))
+				note += " with language: " + message.language;
+			$('introplay' + id).show();
+		}
 		$('introwidget' + id ).innerHTML = note; 		
 }
 function updatevalue(id) {
 		var language = "";
+		if($(id+"language")!=null)
+			language = $(id+"language").value;
 		$(id).value = Object.toJSON({
 				"language": language,
 				"user": $(id+"user").value,
@@ -333,13 +343,5 @@ function updatevalue(id) {
 startWindow(_L("Intro Settings"));
 echo $form->render();
 endWindow();
-
 include_once("navbottom.inc.php");
 ?>
-
-
-
-
-
-
-
