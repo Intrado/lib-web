@@ -17,6 +17,8 @@ require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 
 function handleRequest() {
+	if (!isset($_GET['type']) && !isset($_POST['type']))
+		return false;
 	global $USER;
 	global $RULE_OPERATORS;
 	global $RELDATE_OPTIONS;
