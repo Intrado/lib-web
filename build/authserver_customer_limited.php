@@ -11,8 +11,8 @@ $authpass="";
 $authdb="authserver";
 ////////////////////////////////
 
+require_once("../inc/db.inc.php");
 require_once("../manager/managerutils.inc.php");
-
 
 // connect to authserver db
 $auth = mysql_connect($authhost, $authuser, $authpass)
@@ -32,12 +32,12 @@ $shardhost = 0; // unknown shard
 foreach ($data as $customer) {
 	$cid = $customer[0];
 	$custdbname = 'c_'.$cid;
+	$sharddb;
 	if ($shardhost !== $customer[1]) {
-		if (isset($shard))
-			mysql_close($shard);
+		$sharddb = DBConnect($customer[1], $customer[2], $customer[3], "aspshard")
+			or die("Could not connect to shard ".$customer[1]);
+			
 		$shardhost = $customer[1];
-		$shard = mysql_connect($customer[1], $customer[2], $customer[3])
-			or die("Could not connect to shard: " . mysql_error($shard));
 		echo "--- SHARD ".$shardhost." ---\n";
 	}
 	echo "Customer ".$cid."\n";
@@ -49,20 +49,8 @@ foreach ($data as $customer) {
 	mysql_query($query, $auth)
 		or die("FAILURE on customer ".$cid." update : ". mysql_error($auth));
 	
-	$query = "drop user '$limitedusername'";
-	mysql_query($query, $shard);
-
-	$query = "create user '$limitedusername' identified by '$limitedpassword'";
-	mysql_query($query, $shard)
-		or die("FAILURE on customer ".$cid." create : ". mysql_error($shard));
-
-	$query = "grant select, insert, update, delete, create temporary tables, execute on $custdbname . * to '$limitedusername'";
-	mysql_query($query, $shard)
-		or die("FAILURE on customer ".$cid." grant : ". mysql_error($shard));
-
-	// TODO must determine which subset of tables to grant access to
+	createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sharddb);
 }
 
-mysql_close($shard);
 mysql_close($auth);
 ?>

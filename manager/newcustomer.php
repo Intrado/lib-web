@@ -111,11 +111,7 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
 				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
 
-				// subscriber db user
-				QuickUpdate("drop user '$limitedusername'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
-				QuickUpdate("create user '$limitedusername' identified by '$limitedpassword'", $newdb);
-				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$limitedusername'", $newdb);
-
+				// create customer tables
 				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
 				$tablequeries = array_merge($tablequeries, explode("$$$",file_get_contents("../db/createtriggers.sql")));
 				foreach ($tablequeries as $tablequery) {
@@ -126,6 +122,10 @@ if (CheckFormSubmit($f,$s)){
 					}
 				}
 
+				// subscriber db user
+				createLimitedUser($limitedusername, $limitedpassword, $newdbname, $newdb);
+
+				// 'schoolmessenger' user
 				createSMUserProfile($newdb);
 
 				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
