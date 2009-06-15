@@ -70,10 +70,10 @@ function handleRequest() {
 			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || (!isset($_GET['messagetype']) && !isset($_GET['messageid'])))
 				return false;
 			if (isset($_GET['messagetype']))
-				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".dbsafe($_GET['messagetype'])."'");
-			if (isset($_GET['messageid']))
-				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and messageid='".dbsafe($_GET['messageid'])."'");
-			
+				return QuickQuery('select count(id) from message where userid=? and not deleted and type=?', false, array($USER->id, $_GET['messagetype']));
+			else if (isset($_GET['messageid']))
+				return QuickQuery('select count(id) from message where userid=? and not deleted and id=?', false, array($USER->id, $_GET['messageid']));
+			return false;
 		case 'listrules':
 			// Assumes $_GET['listids'] is json-encoded array.
 			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
