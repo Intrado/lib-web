@@ -49,7 +49,7 @@ function handleRequest() {
 			
 		// Return a message object specified by it's ID
 		case 'Message':
-			$message = new Message(DBSafe($_GET['id']));
+			$message = new Message($_GET['id'] + 0);
 			if ($message->userid !== $USER->id)
 				return false;
 			$message->readheaders();
@@ -57,13 +57,12 @@ function handleRequest() {
 		
 		// Return a specific message part by it's ID
 		case "MessagePart":
-			$mp =  new MessagePart(DBSafe($_GET['id']));
+			$mp =  new MessagePart($_GET['id'] + 0);
 			// if the message part doesn't belong to any message, return false
 			if (!$mp->messageid) 
 				return false;
-			// get the message this message part belongs to and check it's user ownership
-			$message = new Message($mp->messageid);
-			if ($message->userid !== $USER->id)
+			// if the message part doesn't belog to the current user, return false
+			if (!userOwns("message", $mp->messageid))
 				return false;
 			return cleanObj($mp);
 		
