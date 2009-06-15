@@ -67,7 +67,7 @@ function handleRequest() {
 			return FieldMap::getAuthorizedMapNames();
 			
 		case 'hasmessage':
-			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || (!isset($_GET['messagetype']) || !isset($_GET['messageid'])))
+			if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms')) || (!isset($_GET['messagetype']) && !isset($_GET['messageid'])))
 				return false;
 			if (isset($_GET['messagetype']))
 				return QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".dbsafe($_GET['messagetype'])."'");
