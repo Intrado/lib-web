@@ -78,8 +78,11 @@ function handleRequest() {
 			// Assumes $_GET['listids'] is json-encoded array.
 			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
 				return false;
-			$listrules = array();
+			
 			$listids = json_decode($_GET['listids']);
+			if (!is_array($listids))
+				return false;
+			$listrules = array();
 			foreach ($listids as $id) {
 				$list = new PeopleList($id);
 				$listrules[$id] = $list->getListRules();
