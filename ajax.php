@@ -74,37 +74,50 @@ function handleRequest() {
 			else if (isset($_GET['messageid']))
 				return QuickQuery('select count(id) from message where userid=? and not deleted and id=?', false, array($USER->id, $_GET['messageid']));
 			return false;
+		
 		case 'listrules':
-			// Assumes $_GET['listids'] is json-encoded array.
+			// $_GET['listids'] should be json-encoded array.
 			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
 				return false;
-			
 			$listids = json_decode($_GET['listids']);
 			if (!is_array($listids))
 				return false;
 			$listrules = array();
 			foreach ($listids as $id) {
+				// Check for bad ID and ownership
+				if (($id + 0 !== $id) || !userOwns('list', $id))
+					continue;
 				$list = new PeopleList($id);
-				$listrules[$id] = $list->getListRules();
+				if ($list) {
+					// TODO: Check rules against FieldMap::getAuthorizedNames(), set $listrules[$id][$fieldnum] = 'unauthorized', examine $list->getListRules() for details.
+					$listrules[$id] = $list->getListRules();
+				}
 			}
 			return $listrules;
 			
 		case 'liststats':
-			// Assumes $_GET['listids'] is json-encoded array.
+			// $_GET['listids'] should be json-encoded array.
 			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
 				return false;
-			$stats = array();
 			$listids = json_decode($_GET['listids']);
+			if (!is_array($listids))
+				return false;
+			$stats = array();
 			foreach ($listids as $id) {
+				// Check for bad ID and ownership
+				if (($id + 0 !== $id) || !userOwns('list', $id))
+					continue;
 				$list = new PeopleList($id);
-				$renderedlist = new RenderedList($list);
-				$renderedlist->calcStats();
-				$stats[]= array(
-					'id' => $list->id,
-					'name' => $list->name,
-					'removed' => $renderedlist->totalremoved,
-					'added' => $renderedlist->totaladded,
-					'total' => $renderedlist->total);
+				if ($list) {
+					$renderedlist = new RenderedList($list);
+					$renderedlist->calcStats();
+					$stats[]= array(
+						'id' => $list->id,
+						'name' => $list->name,
+						'removed' => $renderedlist->totalremoved,
+						'added' => $renderedlist->totaladded,
+						'total' => $renderedlist->total);
+				}
 			}
 			return $stats;
 			
