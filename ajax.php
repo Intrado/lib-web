@@ -41,7 +41,7 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-			$lists =  DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array(DBSafe($USER->id)));
+			$lists =  DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id));
 			$simpleLists = array();
 			foreach ($lists as $list)
 				$simpleLists[$list->id] = cleanObj($list);
@@ -70,10 +70,9 @@ function handleRequest() {
 		//--------------------------- COMPLEX OBJECTS -------------------------------
 		// Return message parts belonging to a specific messageid
 		case "MessageParts":
-			$message = new Message(DBSafe($_GET['id']));
-			if ($message->userid !== $USER->id)
+			if (!userOwns("message", $_GET['id']))
 				return false;
-			$mps = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array(DBSafe($_GET['id'])));
+			$mps = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id']));
 			$simpleMPs = array();
 			foreach ($mps as $mp)
 				$simpleMPs[$mp->id] = cleanObj($mp);
@@ -93,13 +92,14 @@ function handleRequest() {
 				else
 					return false;
 			} 
-			$messages = DBFindMany("Message", "from message where not deleted and userid=? and type=? order by id", false, array($userid, DBSafe($_GET['messagetype'])));
+			$messages = DBFindMany("Message", "from message where not deleted and userid=? and type=? order by id", false, array($userid, $_GET['messagetype']));
 			$simpleMessages = array();
 			foreach ($messages as $message)
 				$simpleMessages[$message->id] = cleanObj($message);
 			if (!$simpleMessages)
 				return false;
 			return $simpleMessages;
+			
 		//--------------------------- RPC -------------------------------
 		case 'authorizedmapnames':
 			if (!isset($_GET['fieldnum']))
@@ -110,9 +110,9 @@ function handleRequest() {
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))
 				return false;
 			if (isset($_GET['messagetype']))
-				return QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, DBSafe($_GET['messagetype'])))?true:false;
+				return QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, $_GET['messagetype']))?true:false;
 			if (isset($_GET['messageid']))
-				return QuickQuery("select count(id) from message where userid=? and not deleted and id=?", false, array($USER->id, DBSafe($_GET['messageid'])))?true:false;
+				return QuickQuery("select count(id) from message where userid=? and not deleted and id=?", false, array($USER->id, $_GET['messageid']))?true:false;
 			
 		case 'listrules':
 			// $_GET['listids'] should be json-encoded array.
@@ -182,8 +182,8 @@ function handleRequest() {
 			if ($message->userid !== $USER->id)
 				return false;
 			$message->readHeaders();
-			$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array(dbsafe($_GET['id'])));
-			$attachments = DBFindMany("MessageAttachment","from messageattachment where not deleted and messageid=?", false, array(DBSafe($_GET['id'])));
+			$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id']));
+			$attachments = DBFindMany("MessageAttachment","from messageattachment where not deleted and messageid=?", false, array($_GET['id']));
 			$simple = false;
 			if (count($parts) == 1) 
 				foreach ($parts as $id => $part)
@@ -203,7 +203,7 @@ function handleRequest() {
 		
 		case "messagefields":
 			$fields = array();
-			$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array(dbsafe($_GET['id'])));
+			$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($_GET['id']));
 			if (count($messagefields) > 0) {
 				foreach ($messagefields as $fieldmap) {
 					$fields[$fieldmap->fieldnum] = $fieldmap;
