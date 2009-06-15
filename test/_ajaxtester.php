@@ -6,157 +6,216 @@
 <script type='text/javascript' src='../script/prototype.js'></script>
 </head>
 <body>
-<table style='width:800px; margin: 0 auto'>
+<table style='width:900px; margin: 0 auto'>
 <tr>
-<td valign=top style='background: rgb(230,240,250)'>
-Test Cases
-<br/>
-<div id='testcasesContainer'></div>
-<br/>
+<td valign=top>
+<h1 style='margin:0;padding:0;font-size:16px;font-weight:normal;'>
+<span id='manualTab' style='margin-left:10px; background:rgb(180,220,240);padding:5px;padding-bottom:0'>Manual Testcases</span>
+<span id='automatedTab' style = 'margin-left:10px; background:rgb(180,240,220);padding:5px;padding-bottom:0'>Automated Testcases (ASSERT FALSE)</span>
+</h1>
+<div id='requestDiv' style='padding:10px;border:solid 1px rgb(150,150,150)'>
+<div id='automatedTestcasesContainer'></div>
+<div id='manualTestcasesConstainer'></div>
 GET
 <br/>
 <input id='dataGET' type='text' style='width:350px'/>
 <div>
+	<a href="#" id='clearLink' style='float:right'>Clear</a>
 	POST
-	<br/>
-	<a href="#" id='clearLink'>Clear</a>
-	<br/>
-	<textarea id='dataPOST' style='width:400px; height:550px'>
+	<br style='clear:both'/>
+	<textarea id='dataPOST' style='width:510px; height:550px'>
 	</textarea>
 </div>
+<div>
+<button id='runautomatedButton' style='float:right'>Run/Cancel All Automated Tests</button>
 <button id='sendButton'>Send Request</button>
+<br style='clear:both'/>
+</div>
+</div>
 </td>
 <td valign=top style='background: gray;'>
-	<textarea id='result' style='background: rgb(50,70,80); color: rgb(220,220,220); font-family: monospace; font-size:16px; width:500px; height:700px'>
+	<textarea id='result' style='background: rgb(50,70,80); color: rgb(220,220,220); font-family: monospace; font-size:10px; white-space:nowrap; width:600px; overflow:auto; height:700px'>
 	</textarea>
-	<input id='raw' style='background:black;color:white;width:500px' type='text'/>
+	<input id='raw' style='background:black;color:white;width:600px' type='text'/>
 </td>
 </tr>
 </table>
 
 <script type='text/javascript'>
 var testcaseData = {};
-testcaseData['ajax.php'] = '';
-testcaseData['ajax.php?type'] = '';
-testcaseData['ajax.php?type='] = '';
-testcaseData['ajax.php?type=sdjfkladjf'] = '';
-testcaseData['ajax.php?type=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=sdjfkladjf'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=\0'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=$_SESSION'] = '';
 testcaseData['ajax.php?type=lists'] = '';
-testcaseData['ajax.php?type=Message'] = '';
-testcaseData['ajax.php?type=Message&id'] = '';
-testcaseData['ajax.php?type=Message&id='] = '';
-testcaseData['ajax.php?type=Message&id=;;;'] = '';
-testcaseData['ajax.php?type=Message&id=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Message'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Message&id'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Message&id='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Message&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Message&id=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Message&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=Message&id=1'] = '';
-testcaseData['ajax.php?type=MessagePart'] = '';
-testcaseData['ajax.php?type=MessagePart&id'] = '';
-testcaseData['ajax.php?type=MessagePart&id='] = '';
-testcaseData['ajax.php?type=MessagePart&id=;;;'] = '';
-testcaseData['ajax.php?type=MessagePart&id=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessagePart'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=MessagePart&id=1'] = '';
-testcaseData['ajax.php?type=MessageParts'] = '';
-testcaseData['ajax.php?type=MessageParts&id'] = '';
-testcaseData['ajax.php?type=MessageParts&id='] = '';
-testcaseData['ajax.php?type=MessageParts&id=;;;'] = '';
-testcaseData['ajax.php?type=MessageParts&id=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessageParts'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=MessageParts&id=1'] = '';
-testcaseData['ajax.php?type=Messages'] = '';
-testcaseData['ajax.php?type=Messages&messagetype'] = '';
-testcaseData['ajax.php?type=Messages&messagetype='] = '';
-testcaseData['ajax.php?type=Messages&messagetype=;;;'] = '';
-testcaseData['ajax.php?type=Messages&messagetype=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype=$_SESSION'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=phone'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=email'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=sms'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=print'] = '';
 testcaseData['ajax.php?type=Messages&userid=3'] = '';
-testcaseData['ajax.php?type=Messages&userid'] = '';
-testcaseData['ajax.php?type=Messages&userid='] = '';
-testcaseData['ajax.php?type=Messages&userid=;;;'] = '';
-testcaseData['ajax.php?type=Messages&userid=$_SESSION'] = '';
-testcaseData['ajax.php?type=Messages&userid=3&messagetype'] = '';
-testcaseData['ajax.php?type=Messages&userid=3&messagetype='] = '';
-testcaseData['ajax.php?type=Messages&userid=3&messagetype=;;;'] = '';
-testcaseData['ajax.php?type=Messages&userid=3&messagetype=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype=$_SESSION'] = '';
 testcaseData['ajax.php?type=Messages&userid=3&messagetype=phone'] = '';
 testcaseData['ajax.php?type=Messages&userid=3&messagetype=email'] = '';
 testcaseData['ajax.php?type=Messages&userid=3&messagetype=sms'] = '';
 testcaseData['ajax.php?type=Messages&userid=3&messagetype=print'] = '';
 testcaseData['ajax.php?type=authorizedmapnames'] = '';
-testcaseData['ajax.php?type=hasmessage'] = '';
-testcaseData['ajax.php?type=hasmessage&messagetype'] = '';
-testcaseData['ajax.php?type=hasmessage&messagetype='] = '';
-testcaseData['ajax.php?type=hasmessage&messagetype=;;;'] = '';
-testcaseData['ajax.php?type=hasmessage&messagetype=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype=$_SESSION'] = '';
 testcaseData['ajax.php?type=hasmessage&messagetype=phone'] = '';
 testcaseData['ajax.php?type=hasmessage&messagetype=email'] = '';
 testcaseData['ajax.php?type=hasmessage&messagetype=sms'] = '';
 testcaseData['ajax.php?type=hasmessage&messagetype=print'] = '';
-testcaseData['ajax.php?type=hasmessage&messageid'] = '';
-testcaseData['ajax.php?type=hasmessage&messageid='] = '';
-testcaseData['ajax.php?type=hasmessage&messageid=;;;'] = '';
-testcaseData['ajax.php?type=hasmessage&messageid=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid=%'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid=$_SESSION'] = '';
 testcaseData['ajax.php?type=hasmessage&messageid=1'] = '';
-testcaseData['ajax.php?type=listrules'] = '';
-testcaseData['ajax.php?type=listrules&listids'] = '';
-testcaseData['ajax.php?type=listrules&listids='] = '';
-testcaseData['ajax.php?type=listrules&listids=;;;'] = '';
-testcaseData['ajax.php?type=listrules&listids=$_SESSION'] = '';
-testcaseData['ajax.php?type=listrules&listids=' + [].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=' + [].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=' + ["???;;;", "???;;;"].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=' + ["%", "%"].toJSON()] = '';
 testcaseData['ajax.php?type=listrules&listids=' + [1].toJSON()] = '';
 testcaseData['ajax.php?type=listrules&listids=' + [1,2,3].toJSON()] = '';
-testcaseData['ajax.php?type=liststats'] = '';
-testcaseData['ajax.php?type=liststats&listids'] = '';
-testcaseData['ajax.php?type=liststats&listids='] = '';
-testcaseData['ajax.php?type=liststats&listids=;;;'] = '';
-testcaseData['ajax.php?type=liststats&listids=$_SESSION'] = '';
-testcaseData['ajax.php?type=liststats&listids=' + [].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=' + [].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=' + ["???;;;", "???;;;"].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=' + ["%", "%"].toJSON()] = '';
 testcaseData['ajax.php?type=liststats&listids=' + [1].toJSON()] = '';
 testcaseData['ajax.php?type=liststats&listids=' + [1,2,3].toJSON()] = '';
-testcaseData['ajax.php?type=persondatavalues'] = '';
-testcaseData['ajax.php?type=persondatavalues&fieldnum'] = '';
-testcaseData['ajax.php?type=persondatavalues&fieldnum='] = '';
-testcaseData['ajax.php?type=persondatavalues&fieldnum=;;;'] = '';
-testcaseData['ajax.php?type=persondatavalues&fieldnum=$_SESSION'] = '';
+testcaseData['ajax.php?type=liststats&listids=' + [1,2,3,null].toJSON()] = '';
+testcaseData['ajax.php?type=liststats&listids=' + [1,"???;;;",3,null].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum=$_SESSION'] = '';
 testcaseData['ajax.php?type=persondatavalues&fieldnum=f01'] = '';
 testcaseData['ajax.php?type=persondatavalues&fieldnum=f06'] = '';
 testcaseData['ajax.php?type=rulewidgetsettings'] = '';
-testcaseData['ajax.php?type=previewmessage'] = '';
-testcaseData['ajax.php?type=previewmessage&id'] = '';
-testcaseData['ajax.php?type=previewmessage&id='] = '';
-testcaseData['ajax.php?type=previewmessage&id=;;;'] = '';
-testcaseData['ajax.php?type=previewmessage&id=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=previewmessage'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=previewmessage&id=1'] = '';
-testcaseData['ajax.php?type=messagefields'] = '';
-testcaseData['ajax.php?type=messagefields&id'] = '';
-testcaseData['ajax.php?type=messagefields&id='] = '';
-testcaseData['ajax.php?type=messagefields&id=;;;'] = '';
-testcaseData['ajax.php?type=messagefields&id=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=messagefields'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id='] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=messagefields&id=1'] = '';
-testcaseData['ajax.php?type=fieldvalues'] = '';
-testcaseData['ajax.php?type=fieldvalues*'] = 'fields=';
-testcaseData['ajax.php?type=fieldvalues**'] = 'fields=notAnArray';
-testcaseData['ajax.php?type=fieldvalues***'] = 'fields=$_SESSION';
-testcaseData['ajax.php?type=fieldvalues****'] = 'fields=' + [].toJSON();
-testcaseData['ajax.php?type=fieldvalues*****'] = 'fields=' + ['z01','z02','z01'].toJSON();
-testcaseData['ajax.php?type=fieldvalues******'] = 'fields=' + ['f06'].toJSON();
-testcaseData['ajax.php?type=fieldvalues*******'] = 'fields=' + ['f01','f02','g01'].toJSON();
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues*'] = 'fields=';
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues**'] = 'fields=???;;;';
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues***'] = 'fields=notAnArray';
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues****'] = 'fields=$_SESSION';
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues*****'] = 'fields=' + [].toJSON();
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues******'] = 'fields=' + ["???;;;", "???;;;"].toJSON();
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues*******'] = 'fields=' + ["%", "%"].toJSON();
+testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues********'] = 'fields=' + ['z01','z02','z01'].toJSON();
+testcaseData['ajax.php?type=fieldvalues*'] = 'fields=' + ['f06'].toJSON();
+testcaseData['ajax.php?type=fieldvalues**'] = 'fields=' + ['f01','f02','g01'].toJSON();
+testcaseData['ajax.php?type=fieldvalues***'] = 'fields=' + ['f01','f02','g01',null].toJSON();
+testcaseData['ajax.php?type=fieldvalues****'] = 'fields=' + ['f01','???;;;', 'f02','g01'].toJSON();
 
-var testcaseSelectbox = new Element('select');
-testcaseSelectbox.insert(new Element('option', {'value':''}).insert('-- Choose a Test Case --'));
-for (var url in testcaseData) {
-	testcaseSelectbox.insert(new Element('option', {'value':url}).insert(url));
-}
-$('testcasesContainer').update(testcaseSelectbox);
+$('automatedTestcasesContainer').hide();
+$('manualTestcasesConstainer').show();
+$('requestDiv').style.background = $('manualTab').style.background;
+$('runautomatedButton').hide();
 
-testcaseSelectbox.observe('change', function(event) {
-	$('dataPOST').value = '';
-	if (testcaseData[testcaseSelectbox.getValue()]) {
-		$('dataPOST').value = testcaseData[testcaseSelectbox.getValue()];
-	}
-	$('dataGET').value = testcaseSelectbox.getValue().replace(/\*/g, '');
+$('manualTab').observe('click', function() {
+	$('automatedTestcasesContainer').hide();
+	$('manualTestcasesConstainer').show();
+	$('requestDiv').style.background = $('manualTab').style.background;
+	$('runautomatedButton').hide();
+});
+$('automatedTab').observe('click', function() {
+	$('automatedTestcasesContainer').show();
+	$('manualTestcasesConstainer').hide();
+	$('requestDiv').style.background = $('automatedTab').style.background;
+	$('runautomatedButton').show();
 });
 
+var automatedTestcaseSelectbox = new Element('select');
+automatedTestcaseSelectbox.insert(new Element('option', {'value':''}).insert('-- Choose an automated Test Case --'));
+automatedTestcaseSelectbox.observe('change', function(event) {
+	$('dataPOST').value = '';
+	if (testcaseData[automatedTestcaseSelectbox.getValue()])
+		$('dataPOST').value = testcaseData[automatedTestcaseSelectbox.getValue()];
+	$('dataGET').value = automatedTestcaseSelectbox.getValue().replace(/\*/g, '');
+	$('dataGET').value = $('dataGET').value.replace(/ASSERT FALSE--/g, '');
+});
+var manualTestcaseSelectbox = new Element('select');
+manualTestcaseSelectbox.insert(new Element('option', {'value':''}).insert('-- Choose a Manual Test Case --'));
+manualTestcaseSelectbox.observe('change', function(event) {
+	$('dataPOST').value = '';
+	if (testcaseData[manualTestcaseSelectbox.getValue()])
+		$('dataPOST').value = testcaseData[manualTestcaseSelectbox.getValue()];
+	$('dataGET').value = manualTestcaseSelectbox.getValue().replace(/\*/g, '');
+});
+
+for (var url in testcaseData) {
+	var option = new Element('option', {'value':url}).insert(url);
+	if (url.startsWith('ASSERT FALSE--'))
+		automatedTestcaseSelectbox.insert(option);
+	else
+		manualTestcaseSelectbox.insert(option);
+}
+
+$('manualTestcasesConstainer').update(manualTestcaseSelectbox);
+$('automatedTestcasesContainer').update(automatedTestcaseSelectbox);
 $('clearLink').observe('click', function(event) {
 	event.stop();
 	$('dataPOST').value = '';
@@ -189,6 +248,65 @@ $('sendButton').observe('click', function() {
 		}
 	});
 });
+
+var runIndex = 0;
+var failCount = 0;
+$('runautomatedButton').observe('click', function() {
+	if (runIndex > 0)
+		runIndex = -1;
+	else {
+		runIndex = 1;
+		failCount = 0;
+		$('result').value = '';
+		$('raw').value = '--- Running ---';
+		ajax_assert_false();
+	}
+});
+function ajax_assert_false() {
+	if (runIndex <= 0) {
+		if (runIndex === 0)
+			$('raw').value = "--- Finished ---";
+		else
+			$('raw').value = "--- Cancelled ---";
+		if (failCount > 0)
+			$('raw').value += ' ' + failCount + ' Failed';
+		else
+			$('raw').value += ' None Failed';
+		return;
+	}
+	if (automatedTestcaseSelectbox.options.length <= 1) {
+		alert('There are no automated testcases to run');
+		$('result').value = '';
+		$('raw').value = '';
+		return;
+	}
+
+	var url= automatedTestcaseSelectbox.options[runIndex].value;
+	var postBody = testcaseData[url];
+	url = url.replace(/\*/g, '');
+	url = url.replace(/ASSERT FALSE--/g, '');
+	$('result').value += url + ", postBody: " + postBody;
+	new Ajax.Request('../' + url, {
+		'method': 'post',
+		'postBody': postBody,
+		onSuccess: function(transport) {
+			var data = transport.responseJSON;
+			if (data) {
+				$('result').value += "\n      !!! ASSERTION FAILED, Got Data !!!\n";
+				failCount++;
+			}
+			else {
+				$('result').value += " --- Assertion Success\n";
+			}
+			if (runIndex > 0)
+				runIndex++;
+			if (runIndex >= automatedTestcaseSelectbox.options.length)
+				runIndex = 0;
+			setTimeout('ajax_assert_false()', 10);
+		}
+	});
+}
+
 </script>
 </body>
 </html>
