@@ -32,8 +32,6 @@ class Message extends DBMappedObject {
 		$data = sane_parsestr($this->data);
 		foreach($data as $key => $value)
 		{
-			if (!in_array($this->$key, $this->_fieldlist))
-				$this->_fieldlist[] = $key;
 			$this->$key = $value;
 		}
 	}
