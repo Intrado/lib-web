@@ -55,7 +55,8 @@ function taskStatus($id) {
 	if (!$id)
 		return false;
 	$task = new SpecialTask($id);
-	
+	// TODO: Doublecheck if necessary to return false when $task->status
+
 	// Parse the task data
 	$langdata = array();
 	for($x=0; $x<$task->getData('totalamount'); $x++)
@@ -82,12 +83,12 @@ $id = false;
 
 if (isset($_POST['phone']) && isset($_POST['language'])) {
 	$id = "new";
-	$language = $_POST['language'];
+	$language = $_POST['language']; 
 	$phone = Phone::parse($_POST['phone']);
 }
 
 if (isset($_GET['id'])) {
-	$id = $_GET['id'];
+	$id = $_GET['id']+0;
 }
 
 /////////////////////////////////////////////////////////
@@ -96,10 +97,9 @@ if (isset($_GET['id'])) {
 /////////////////////////////////////////////////////////
 
 header("Content-Type: application/json");
-if ($id == "new")
+if ($id === "new")
 	echo json_encode(taskNew($phone,$language));
 else
 	echo json_encode(taskStatus($id));
-
-exit();	
+exit();
 ?>
