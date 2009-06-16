@@ -46,11 +46,7 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-			$lists =  DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id));
-			$simpleLists = array();
-			foreach ($lists as $list)
-				$simpleLists[$list->id] = cleanObj($list);
-			return $simpleLists;
+			return cleanObj(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
 			
 		// Return a message object specified by it's ID
 		case 'Message':
@@ -59,7 +55,6 @@ function handleRequest() {
 			$message = new Message($_GET['id'] + 0);
 			if ($message->userid !== $USER->id)
 				return false;
-			$message->readHeaders();
 			return cleanObj($message);
 		
 		// Return a specific message part by it's ID
@@ -96,10 +91,7 @@ function handleRequest() {
 				else
 					return false;
 			} 
-			$messages = DBFindMany("Message", "from message where not deleted and userid=? and type=? order by id", false, array($userid, $_GET['messagetype']));
-			foreach ($messages as $id => $message)
-				$messages[$id]->readHeaders();
-			return cleanObj($messages);
+			return cleanObj(DBFindMany("Message", "from message where not deleted and userid=? and type=? order by id", false, array($userid, $_GET['messagetype'])));
 			
 		//--------------------------- RPC -------------------------------
 		case 'hasmessage':
@@ -170,7 +162,7 @@ function handleRequest() {
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
-				'fieldmaps' => FieldMap::getAllAuthorizedFieldMaps());
+				'fieldmaps' => cleanObj(FieldMap::getAllAuthorizedFieldMaps()));
 		
 		// Return a whole message including it's message parts formatted into body text and any attachments.
 		case 'previewmessage':
@@ -183,7 +175,7 @@ function handleRequest() {
 			$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id']));
 			$attachments = DBFindMany("MessageAttachment","from messageattachment where not deleted and messageid=?", false, array($_GET['id']));
 			$simple = false;
-			if (count($parts) == 1) 
+			if (count($parts) == 1)
 				foreach ($parts as $id => $part)
 					if ($part->type == "A") $simple = true;
 			
@@ -195,7 +187,7 @@ function handleRequest() {
 				"subject"=>$message->subject,
 				"type"=>$message->type,
 				"simple"=>$simple,
-				"attachment"=>count($attachments)?$attachments:false,
+				"attachment"=>count($attachments)?cleanObj($attachments):false,
 				"body"=>count($parts)?$message->format($parts):""
 			);
 		
@@ -206,8 +198,8 @@ function handleRequest() {
 			$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($_GET['id']));
 			if (count($messagefields) > 0) {
 				foreach ($messagefields as $fieldmap) {
-					$fields[$fieldmap->fieldnum] = $fieldmap;
-					$fields[$fieldmap->fieldnum]->optionsarray = explode(",",$fieldmap->options);
+					$fields[$fieldmap->fieldnum] = cleanObj($fieldmap);
+					$fields[$fieldmap->fieldnum]['optionsarray'] = explode(",",$fieldmap->options);
 				}
 			}
 			return count($fields)?$fields:false;
