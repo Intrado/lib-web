@@ -279,12 +279,14 @@ $('sendButton').observe('click', function() {
 
 var runIndex = 0;
 var failCount = 0;
+var warningCount = 0;
 $('runautomatedButton').observe('click', function() {
 	if (runIndex > 0)
 		runIndex = -1;
 	else {
 		runIndex = 1;
 		failCount = 0;
+		warningCount = 0;
 		$('result').value = '';
 		$('raw').value = '--- Running ---';
 		ajax_assert_false();
@@ -300,6 +302,10 @@ function ajax_assert_false() {
 			$('raw').value += ' ' + failCount + ' Failed';
 		else
 			$('raw').value += ' None Failed';
+		if (warningCount > 0)
+			$('raw').value += ', ' + warningCount + ' Warnings';
+		else
+			$('raw').value += ', No Warnings';
 		return;
 	}
 	if (automatedTestcaseSelectbox.options.length <= 1) {
@@ -320,8 +326,13 @@ function ajax_assert_false() {
 		onSuccess: function(transport) {
 			var data = transport.responseJSON;
 			if (data) {
-				$('result').value += "\n      !!! ASSERTION FAILED, Got Data !!!\n";
-				failCount++;
+				if (data['error']) {
+					$('result').value += "\n      WARNING data['error']=" + data['error'] + " \n";
+					warningCount++;
+				} else {
+					$('result').value += "\n      !!! ASSERTION FAILED, Got Data !!!\n";
+					failCount++;
+				}
 			}
 			else {
 				$('result').value += " --- Assertion Success\n";
