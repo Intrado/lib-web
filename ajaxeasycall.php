@@ -35,17 +35,9 @@ function taskNew($phone,$language) {
 	$task->setData('listid', 0);
 	$task->setData('jobtypeid', 0);
 	$task->setData('count', 0);
-	if (is_array($language)) {
-		$task->setData('totalamount', count($language));
-		$task->setData('currlang', $language[0]);
-		$count = 0;
-		foreach ($language as $lang)
-			$task->setData("language" . $count++, $lang);
-	} else {
-		$task->setData('totalamount', 1);
-		$task->setData('currlang', $language);
-		$task->setData("language0", $language);
-	}
+	$task->setData('totalamount', 1);
+	$task->setData('currlang', $language);
+	$task->setData("language0", $language);
 	$task->setData('progress', _L("Creating Call"));
 	$task->status = "queued";
 	$task->create();
