@@ -16,9 +16,11 @@ global $USER;
 if (!$USER->authorize("starteasy"))
 	exit();
 
-function taskNew($phone,$language) {		
-	if (!$phone || !$language)
-		return array("error"=>"missingparam");
+function taskNew($phone,$language) {
+	if (!$phone)
+		return array("error"=>"badphone");
+	if (!$language)
+		return array("error"=>"badlanguage");
 	global $USER;
 	$task = new SpecialTask("new");
 	$task->status = "new";
@@ -55,8 +57,8 @@ function taskStatus($id) {
 	if (!$id)
 		return false;
 	$task = new SpecialTask($id);
-	// TODO: Doublecheck if necessary to return false when $task->status
-
+	if (!$task->status)
+		return array("error"=>"notask");
 	// Parse the task data
 	$langdata = array();
 	for($x=0; $x<$task->getData('totalamount'); $x++)

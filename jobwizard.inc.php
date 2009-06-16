@@ -84,20 +84,8 @@ class CallMe extends FormItem {
 		$str .= '</table></td></tr>';
 		$str .= '</table>';
 		// include the easycall javascript object and set up the localized version of the text it will use. then load existing values.
-		$str .= '<script type="text/javascript" src="script/easycall.js"></script>
+		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
 				<script type="text/javascript">
-				var callmetextlocale = {
-					"alreadyrecorded": "'._L("There is already a message recorded for this language. Do you want to over-write it?").'",
-					"completed": "'._L("Completed!").'",
-					"endedearly": "'._L("The call ended early!").'",
-					"genericerror": "'._L("There was an error!").'",
-					"alreadyrecorded": "'._L("There is already a message recorded for this language. Do you want to over-write it?").'",
-					"starting": "'._L("Starting session. Please wait...").'",
-					"sessioninprogress": "'._L("Cannot remove a message while record session in progress.").'",
-					"remove": "'._L("Remove").'",
-					"required": "'._L("Required").'",
-					"missingparam": "'._L("One or more parameters missing").'"
-				}
 				new Easycall("'.$n.'","'.$language[0].'").load();
 				</script>';
 		return $str;
