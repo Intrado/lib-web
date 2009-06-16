@@ -104,61 +104,52 @@ function handleRequest() {
 			
 		case 'listrules':
 			// $_GET['listids'] should be json-encoded array.
-			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
+			if (!isset($_GET['listids']))
 				return false;
 			$listids = json_decode($_GET['listids']);
 			if (!is_array($listids))
 				return false;
 			$listrules = array();
 			foreach ($listids as $id) {
-				// Check for bad ID and ownership
-				if (($id + 0 !== $id) || !userOwns('list', $id))
+				if (!userOwns('list', $id))
 					continue;
-				$list = new PeopleList($id);
-				if ($list) {
-					// TODO: Check rules against FieldMap::getAuthorizedNames(), set $listrules[$id][$fieldnum] = 'unauthorized', examine $list->getListRules() for details.
-					$listrules[$id] = $list->getListRules();
-				}
+				$list = new PeopleList($id+0);
+				// TODO: Check rules against FieldMap::getAuthorizedNames(), set $listrules[$id][$fieldnum] = 'unauthorized', examine $list->getListRules() for details.
+				$listrules[$id] = $list->getListRules();
 			}
 			return cleanObj($listrules);
 			
 		case 'liststats':
 			// $_GET['listids'] should be json-encoded array.
-			if (!$USER->authorize('createlist') || !isset($_GET['listids']))
+			if (!isset($_GET['listids']))
 				return false;
 			$listids = json_decode($_GET['listids']);
 			if (!is_array($listids))
 				return false;
 			$stats = array();
 			foreach ($listids as $id) {
-				// Check for bad ID and ownership
-				if (($id + 0 !== $id) || !userOwns('list', $id))
+				if (!userOwns('list', $id))
 					continue;
-				$list = new PeopleList($id);
-				if ($list) {
-					$renderedlist = new RenderedList($list);
-					$renderedlist->calcStats();
-					$stats[]= array(
-						'id' => $list->id,
-						'name' => $list->name,
-						'removed' => $renderedlist->totalremoved,
-						'added' => $renderedlist->totaladded,
-						'total' => $renderedlist->total);
-				}
+				$list = new PeopleList($id+0);
+				$renderedlist = new RenderedList($list);
+				$renderedlist->calcStats();
+				$stats[]= array(
+					'id' => $list->id,
+					'name' => $list->name,
+					'removed' => $renderedlist->totalremoved,
+					'added' => $renderedlist->totaladded,
+					'total' => $renderedlist->total);
 			}
 			return $stats;
 			
 		case 'persondatavalues':
 			if (!isset($_GET['fieldnum']) || !array_key_exists($_GET['fieldnum'], FieldMap::getAuthorizedMapNames()))
 				return false;
-			
 			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 			return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
 			
 		case 'rulewidgetsettings':
-			if (!$USER->authorize('createlist'))
-				return false;
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
