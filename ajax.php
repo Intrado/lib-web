@@ -114,7 +114,7 @@ function handleRequest() {
 				if (!userOwns('list', $id))
 					continue;
 				$list = new PeopleList($id+0);
-				// TODO: Check rules against FieldMap::getAuthorizedNames(), set $listrules[$id][$fieldnum] = 'unauthorized', examine $list->getListRules() for details.
+				// TODO: Check rules against FieldMap::getAllAuthorizedFieldMaps(), set $listrules[$id][$fieldnum] = 'unauthorized', examine $list->getListRules() for details.
 				$listrules[$id] = $list->getListRules();
 			}
 			return cleanObj($listrules);
@@ -143,7 +143,7 @@ function handleRequest() {
 			return $stats;
 			
 		case 'persondatavalues':
-			if (!isset($_GET['fieldnum']) || !array_key_exists($_GET['fieldnum'], FieldMap::getAuthorizedMapNames()))
+			if (!isset($_GET['fieldnum']) || !$USER->authorizeField($_GET['fieldnum']))
 				return false;
 			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
