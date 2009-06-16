@@ -98,32 +98,32 @@ var Easycall = Class.create({
 		this.updateMessage();
 		switch(error) {
 			case "done":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" /><?=_L("Completed!")?>";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" /><?=addslashes(_L("Completed!"))?>";
 				$(this.formname+this.language+"_img").src = this.playimg;
 				break;
 			
 			case "callended":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=_L("Call ended early.")?>";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Call ended early."))?>";
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
 			
 			case "badphone":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=_L("Missing or invalid phone.")?>";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Missing or invalid phone."))?>";
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
 
 			case "badlanguage":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=_L("Missing or invalid language.")?>";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Missing or invalid language."))?>";
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
 				
 			case "notask":
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=_L("Status unavailable. Please try again.")?>";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Status unavailable. Please try again."))?>";
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
 				
 			default:
-				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=_L("There was an error! Please try again.")?>";
+				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("There was an error! Please try again."))?>";
 				$(this.formname+this.language+"_img").src = this.exclamationimg;
 		}
 		if (this.language !== this.required)
@@ -141,13 +141,13 @@ var Easycall = Class.create({
 		var messages = $(this.formname).value.evalJSON();
 		
 		if (messages[this.language]) {
-			if (!confirm("<?=_L("There is already a message recorded for this language. Do you want to over-write it?")?>"))
+			if (!confirm("<?=addslashes(_L("There is already a message recorded for this language. Do you want to over-write it?"))?>"))
 				return false;
 			$(this.formname+this.language+"_img").stopObserving();
 		}
 		
 		$(this.formname+"recordbutton").hide();
-		$(this.formname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" /><?=_L("Starting session. Please wait.")?>";
+		$(this.formname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" /><?=addslashes(_L("Starting session. Please wait."))?>";
 		if (typeof(messages[this.language]) == "undefined") {
 			this.displayMessage();
 			this.updateMessage();
@@ -192,10 +192,10 @@ var Easycall = Class.create({
 		}
 		
 		if (this.language !== this.required) {
-			$(this.formname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\"><?=_L("Remove")?></div>");
-			$(this.formname+this.language+"_remove").observe('click', function(event) {alert("<?=_L("Cannot remove a message while record session in progress.")?>")});
+			$(this.formname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\"><?=addslashes(_L("Remove"))?></div>");
+			$(this.formname+this.language+"_remove").observe('click', function(event) {alert("<?=addslashes(_L("Cannot remove a message while record session in progress."))?>")});
 		} else {
-			$(this.formname+this.language+"_remove").update("<img src=\""+this.alertimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; float: left; margin-right: 5px\"><?=_L("Required")?></div>");
+			$(this.formname+this.language+"_remove").update("<img src=\""+this.alertimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; float: left; margin-right: 5px\"><?=addslashes(_L("Required"))?></div>");
 		}
 	}
 });
