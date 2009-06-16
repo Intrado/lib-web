@@ -113,12 +113,18 @@ class FieldMap extends DBMappedObject {
 	}
 	
 	// Gets F,G,C fields.
+	// Returns Associative Array, indexed by fieldnum
 	static function getAllAuthorizedFieldMaps ($onlysearchable = true) {
 		global $USER;
-		$fieldmaps = DBFindMany("FieldMap", 'from fieldmap order by fieldnum');
-		foreach($fieldmaps as $key => $fieldmap)
-			if(!$USER->authorizeField($fieldmap->fieldnum) || ($onlysearchable && strpos($fieldmap->options, 'searchable') === false))
-				unset($fieldmaps[$key]);
+		$results = DBFindMany("FieldMap", 'from fieldmap order by fieldnum');
+		$fieldmaps = array();
+		foreach($results as $key => $fieldmap) {
+			if($USER->authorizeField($fieldmap->fieldnum)) {
+				if ($onlysearchable && strpos($fieldmap->options, 'searchable') === false)
+					continue;
+				$fieldmaps[$fieldmap->fieldnum] = $fieldmap;
+			}
+		}
 		return $fieldmaps;
 	}
 
