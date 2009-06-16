@@ -17,14 +17,19 @@ require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 
 function cleanObj ($obj) {
-	if (!get_class($obj))
-		return false;
+	if (!get_class($obj) && !is_array($obj))
+		return $obj;
 	$simpleObj = array();
-	foreach ($obj->_fieldlist as $field) {
-		if (get_class($obj->$field))
-			$simpleObj[$field] = cleanObject($obj->$field);
-		else
-			$simpleObj[$field] = $obj->$field;
+	if (get_class($obj)) {
+		foreach ($obj->_fieldlist as $field) {
+			if (get_class($obj->$field))
+				$simpleObj[$field] = cleanObj($obj->$field);
+			else
+				$simpleObj[$field] = $obj->$field;
+		}
+	} else if (is_array($obj)) {
+		foreach ($obj as $id => $item)
+			$simpleObj[$id] = cleanObj($item);
 	}
 	return $simpleObj;
 }
@@ -132,7 +137,7 @@ function handleRequest() {
 					$listrules[$id] = $list->getListRules();
 				}
 			}
-			return $listrules;
+			return cleanObj($listrules);
 			
 		case 'liststats':
 			// $_GET['listids'] should be json-encoded array.
