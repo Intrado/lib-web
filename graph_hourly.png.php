@@ -34,7 +34,7 @@ $query = "select 	hour,
 		sum(failed)/28 as failed,
 		sum(disconnect)/28 as disconnect
 		from systemstats
-		where date > date_sub(now(),interval 4 week)
+		where date > date_sub(curdate(),interval 4 week)
 		and attempt = '0'
 		group by hour
 ";

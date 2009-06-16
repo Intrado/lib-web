@@ -35,7 +35,7 @@ select 	date as date,
 		sum(failed) as failed,
 		sum(disconnect) as disconnect
 		from systemstats
-		where date > date_sub(now(), interval 4 week)
+		where date > date_sub(curdate(), interval 4 week)
 		and attempt = '0'
 		group by date
 ";

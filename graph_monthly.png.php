@@ -35,7 +35,7 @@ select 	month(date) as month,
 		sum(failed) as failed,
 		sum(disconnect) as disconnect
 		from systemstats
-		where unix_timestamp(date) > unix_timestamp(date_sub(now(), interval 12 month))
+		where date > date_sub(curdate(), interval 12 month)
 		and attempt = '0'
 		group by month
 ";
