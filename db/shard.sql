@@ -243,3 +243,16 @@ CREATE TABLE `qjoblist` (
 KEY `jobid` (`customerid`,`jobid`,`listid`)
 ) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
+-- missing indexes
+
+ALTER TABLE `specialtaskqueue` ADD INDEX `dispatch` ( `status` , `dispatchtype` )  ;
+
+ALTER TABLE `qreportsubscription` DROP INDEX `nextrun` , ADD INDEX `nextrun` ( `nextrun` , `timezone` ) ; -- does this need to be swapped order? Does this help? Jammer refuses to use any index on nextrun unless you trim off seconds ex: left(...,16)
+
+ALTER TABLE `leasetask` ADD INDEX ( `leasetime` ) ;
+
+ALTER TABLE `qjob` ADD INDEX `sched_timezones` ( `timezone` , `status` ) ;
+
+ALTER TABLE `qreportsubscription` ADD INDEX ( `timezone` ) ;
+
+ALTER TABLE `specialtaskqueue` ADD INDEX `leasecheck` ( `status` , `leasetime` ) ;

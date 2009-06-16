@@ -331,3 +331,9 @@ ALTER TABLE `customer` ADD `limitedusername` VARCHAR( 50 ) NOT NULL DEFAULT '' A
 ADD `limitedpassword` VARCHAR( 50 ) NOT NULL DEFAULT '' AFTER `limitedusername`;
 
 ALTER TABLE `shard` ADD `readonlyhost` VARCHAR( 255 ) NOT NULL DEFAULT '' AFTER `dbpassword` ;
+
+-- missing indexes
+
+ALTER TABLE `customer` ADD INDEX ( `shardid` ) ;
+
+ALTER TABLE `webactivation` ADD INDEX ( `creation` ) ;

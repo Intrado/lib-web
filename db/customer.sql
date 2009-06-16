@@ -1395,3 +1395,45 @@ $$$
 
 ALTER TABLE `subscriber` ADD `lastreminder` DATETIME NULL DEFAULT NULL AFTER `lastlogin`
 $$$
+
+-- missing indexes
+
+ALTER TABLE `permission` ADD INDEX ( `accessid` )
+$$$
+
+ALTER TABLE `surveyquestionnaire` ADD INDEX ( `userid` ) 
+$$$
+
+ALTER TABLE `job` ADD INDEX `useraccess` ( `userid` , `status` , `deleted` ) 
+$$$
+
+ALTER TABLE `systemstats` ADD INDEX `graphs` ( `date` , `attempt` ) 
+$$$
+
+ALTER TABLE `person` DROP INDEX `pkeysortb` 
+$$$
+
+ALTER TABLE `person` DROP INDEX `pkeysort` ,
+ADD INDEX `pkeysort` ( `pkey` , `type` , `deleted` ) 
+$$$
+
+ALTER TABLE `blockednumber` ADD INDEX ( `userid` ) 
+$$$
+
+ALTER TABLE `person` DROP INDEX `namesort` 
+$$$
+
+ALTER TABLE `person` DROP INDEX `getbykey` 
+$$$
+
+ALTER TABLE `person` DROP INDEX `general` 
+$$$
+
+ALTER TABLE `person` ADD INDEX ( `f01` ) 
+$$$
+
+ALTER TABLE `person` ADD INDEX ( `f02` ) 
+$$$
+
+ALTER TABLE `listentry` ADD INDEX `listrule` ( `listid` , `type` , `personid` )
+$$$
