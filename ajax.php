@@ -181,19 +181,6 @@ function handleRequest() {
 				"attachment"=>count($attachments)?cleanObj($attachments):false,
 				"body"=>count($parts)?$message->format($parts):""
 			);
-		
-		case "messagefields":
-			if (!isset($_GET['id']))
-				return false;
-			$fields = array();
-			$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($_GET['id']));
-			if (count($messagefields) > 0) {
-				foreach ($messagefields as $fieldmap) {
-					$fields[$fieldmap->fieldnum] = cleanObj($fieldmap);
-					$fields[$fieldmap->fieldnum]['optionsarray'] = explode(",",$fieldmap->options);
-				}
-			}
-			return count($fields)?$fields:false;
 			
 		default:
 			error_log("No AJAX API for type=$type");
