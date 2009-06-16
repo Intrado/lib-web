@@ -15,23 +15,28 @@ function handleRequest() {
 	
 	switch($_GET['type']) {
 		case 'saverules': // returns $list->id
-			if (!$USER->authorize('createlist') && !isset($_POST['ruledata']))
+			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']))
 				return false;
+			$ruledata = json_decode($_POST['ruledata']);
+			if (!is_array($ruledata))
+				return false;
+			$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+			if (empty($fieldmaps))
+				return false;
+				
 			$summary = array();
 			$rules = array();
-			$ruledata = json_decode($_POST['ruledata']);
 			foreach ($ruledata as $data) {
-				if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
-					return false; // TODO: Should this add as many as possible, or break after the first error?
-				$rules[] = $rule;
-				
-				// SUMMARY
-				$fieldname = FieldMap::getName($rule->fieldnum);
-				$summary[] = $fieldname;
+				if (isset($rules[$data->fieldnum])) // Do not allow more than one rule per fieldnum
+					return false;
+				if (!isset($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+					return false;
+				if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val, $fieldmaps))
+					return false;
+				$rules[$data->fieldnum] = $rule;
+				$summary[] = $fieldmaps[$data->fieldnum]->name;
 			}
-			$summary = implode(',', $summary);
-			if (empty($summary))
-				return false;
+			$summary = implode(', ', $summary);
 			
 			// CREATE list
 			$list = new PeopleList(null);
