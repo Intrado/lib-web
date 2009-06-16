@@ -15,10 +15,23 @@ class Rule extends DBMappedObject {
 	}
 
 	// NOTE: Assumes arguments have been trimmed.
-	static function initFrom($fieldnum, $type, $logical, $op, $values) {
+	static function initFrom($fieldnum, $type, $logical, $op, $values, $fieldmaps = null) {
+		global $RULE_OPERATORS;
 		if (empty($fieldnum) || empty($type) || empty($logical) || empty($op) || empty($values))
 			return null;
-		
+		else if (empty($RULE_OPERATORS[$type][$op]))
+			return null;
+		else if ($type !== 'multisearch' && $logical !== 'and')
+			return null;
+		else if ($type === 'multisearch' && !in_array($logical, array('and', 'and not')))
+			return null;
+		else {
+			if (!$fieldmaps)
+				$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+			if (!array_key_exists($fieldnum, $fieldmaps) || strpos($fieldmaps[$fieldnum]->options, $type) === false)
+				return null;
+		}
+
 		$rule = new Rule();
 		$rule->logical = $logical;
 		$rule->op = $op;
