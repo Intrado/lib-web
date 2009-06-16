@@ -59,7 +59,7 @@ function handleRequest() {
 			$message = new Message($_GET['id'] + 0);
 			if ($message->userid !== $USER->id)
 				return false;
-			$message->readheaders();
+			$message->readHeaders();
 			return cleanObj($message);
 		
 		// Return a specific message part by it's ID
@@ -82,13 +82,7 @@ function handleRequest() {
 				return false;
 			if (!userOwns("message", $_GET['id']))
 				return false;
-			$mps = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id']));
-			$simpleMPs = array();
-			foreach ($mps as $mp)
-				$simpleMPs[$mp->id] = cleanObj($mp);
-			if (!$simpleMPs)
-				return false;
-			return $simpleMPs;
+			return cleanObj(DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id'])));
 		
 		// Return messages for the current user, if userid is specified return that user's messages
 		case "Messages":
@@ -103,12 +97,9 @@ function handleRequest() {
 					return false;
 			} 
 			$messages = DBFindMany("Message", "from message where not deleted and userid=? and type=? order by id", false, array($userid, $_GET['messagetype']));
-			$simpleMessages = array();
-			foreach ($messages as $message)
-				$simpleMessages[$message->id] = cleanObj($message);
-			if (!$simpleMessages)
-				return false;
-			return $simpleMessages;
+			foreach ($messages as $id => $message)
+				$messages[$id]->readHeaders();
+			return cleanObj($messages);
 			
 		//--------------------------- RPC -------------------------------
 		case 'hasmessage':
