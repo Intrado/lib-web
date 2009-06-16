@@ -60,6 +60,7 @@ class ListForm extends Form {
 	}
 	
 	function render () {
+		global $USER;
 		$posturl = $_SERVER['REQUEST_URI'];
 		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
 		$posturl .= "form=". $this->name;
@@ -552,6 +553,9 @@ class ListForm extends Form {
 					// allListsWindow: Build a List Using Rules Buttons
 					$('buildListButton').hide();
 					document.formvars['{$this->name}'].ruleWidget.container.observe('RuleWidget:Ready', function() {
+						
+						" . ($USER->authorize('createlist') ? '' : 'return;') . "
+						
 						$('buildListButton').show();
 						
 						$('buildListButton').observe('click', function(event) {
