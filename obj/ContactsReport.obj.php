@@ -1,5 +1,7 @@
 <?
 
+//TODO remove SQL_CALC_FOUND_ROWS, and use count(*) instead. with all the g field crap and whatnot, it's slowing it down
+
 class ContactsReport extends ReportGenerator {
 
 	function generateQuery(){
