@@ -174,7 +174,7 @@ var RuleWidget = Class.create({
 
 	// Returns json for rules that the user chose.
 	toJSON: function() {
-		return $H(this.appliedRules).toJSON();
+		return $H(this.appliedRules).values().toJSON();
 	}
 });
 

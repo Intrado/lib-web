@@ -576,7 +576,7 @@ class ListForm extends Form {
 						// buildListWindow: Save Rules Button
 						$('saveRulesButton').observe('click', function(event) {
 							var data = document.formvars['{$this->name}'].ruleWidget.toJSON();
-							if (data == '{}') {
+							if (data === '[]') {
 								alert('".addslashes(_L('Please add a rule'))."');
 								return;
 							}

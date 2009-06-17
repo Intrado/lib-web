@@ -31,6 +31,7 @@ function handleRequest() {
 				if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
 					return false;
 				$rules[$data->fieldnum] = $rule;
+				$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
 				$summary[] = $fieldmaps[$data->fieldnum]->name;
 			}
 			$summary = implode(', ', $summary);
