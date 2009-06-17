@@ -6,11 +6,11 @@ abstract class Validator {
 	var $onlyserverside = false; //set this if you don't have a JS validator
 	var $requiredfields = array();
 
-	/* static
+	/* 
 	 * spits out javascript required to install a validator in the form 
 	 * Takes a list of class names
 	 */
-	function load_validators ($validators) {
+	static function load_validators ($validators) {
 		
 		echo "if (!document.validators) document.validators = {};\n";
 		
@@ -33,10 +33,10 @@ abstract class Validator {
 		}
 	}
 	
-	/* static
+	/* 
 	 * works pre-merge 
 	 */
-	function validate_item ($formdata,$name,$value,$requiredvalues = array()) {
+	static function validate_item ($formdata,$name,$value,$requiredvalues = array()) {
 		$validators = $formdata[$name]['validators'];
 		
 		foreach ($validators as $validatordata) {
@@ -66,7 +66,7 @@ abstract class Validator {
 	function getJSValidator () {
 		return '
 			function (name, label, value, args) {
-				///...
+				//...
 				return true;
 			}
 		';
