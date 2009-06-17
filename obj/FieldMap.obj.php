@@ -15,10 +15,6 @@ class FieldMap extends DBMappedObject {
 	var $options;
 
 	var $optionsarray = false;
-	
-	// NOTE: Clients should not access FieldMap::fieldmapscache directly, must use FieldMap::retrieveFieldMaps().
-	// Cache fieldmaps per page request.
-	static $fieldmapscache = null;
 
 	function FieldMap ($id = NULL) {
 		$this->_tablename = "fieldmap";
@@ -174,18 +170,16 @@ class FieldMap extends DBMappedObject {
 
 	// Returns an associative array, indexed by fieldnum.
 	static function retrieveFieldMaps() {
-		if (FieldMap::$fieldmapscache) {
-			error_log('cache, there are: ' . count(FieldMap::$fieldmapscache) . ' fieldmaps'); // TODO: Remove error_log, this is just for debugging.
-			return FieldMap::$fieldmapscache;
+		static $fieldmapscache = false;
+		
+		if (!$fieldmapscache) {
+			$results = DBFindMany('FieldMap', 'from fieldmap order by fieldnum');
+			$fieldmapscache = array();			
+			foreach ($results as $fieldmap)
+				$fieldmapscache[$fieldmap->fieldnum] = $fieldmap;
 		}
-			
-		$results = DBFindMany('FieldMap', 'from fieldmap order by fieldnum');
-		FieldMap::$fieldmapscache = array();
-		foreach ($results as $fieldmap)
-			FieldMap::$fieldmapscache[$fieldmap->fieldnum] = $fieldmap;
-		error_log('------------------------------------------');
-		error_log('DBFND, there are: ' . count(FieldMap::$fieldmapscache) . ' fieldmaps'); // TODO: Remove error_log, this is just for debugging.
-		return FieldMap::$fieldmapscache;
+		
+		return $fieldmapscache
 	}
 	
 	function updatePersonDataValues () {
