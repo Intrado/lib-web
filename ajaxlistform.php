@@ -18,7 +18,7 @@ function handleRequest() {
 			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']))
 				return false;
 			$ruledata = json_decode($_POST['ruledata']);
-			if (!is_array($ruledata))
+			if (!is_array($ruledata) || empty($ruledata))
 				return false;
 				
 			$summary = array();
@@ -29,9 +29,6 @@ function handleRequest() {
 				if (isset($rules[$data->fieldnum])) // Do not allow more than one rule per fieldnum
 					return false;
 				if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
-					return false;
-				$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
-				if (empty($fieldmaps))
 					return false;
 				$rules[$data->fieldnum] = $rule;
 				$summary[] = $fieldmaps[$data->fieldnum]->name;
