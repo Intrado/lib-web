@@ -66,7 +66,7 @@ if ($REQUEST_TYPE == "new") {
 			$msg['sequence'] = $row[4];
 			$msg['starttime'] = $row[5];
 			$msg['leavemessage'] = QuickQuery("select value from jobsetting where jobid=? and name='leavemessage'",false,array($row[0]));
-			$msg['messageconfirmation'] = QuickQuery("select value from jobsetting where jobid= and name='messageconfirmation'",false,array($row[0]));
+			$msg['messageconfirmation'] = QuickQuery("select value from jobsetting where jobid=? and name='messageconfirmation'",false,array($row[0]));
 
 			$messagelist[] = $msg;
 		}
