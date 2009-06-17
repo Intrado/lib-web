@@ -15,7 +15,7 @@ class Rule extends DBMappedObject {
 	}
 
 	// NOTE: Assumes arguments have been trimmed.
-	static function initFrom($fieldnum, $type, $logical, $op, $values, $fieldmaps = null) {
+	static function initFrom($fieldnum, $type, $logical, $op, $values) {
 		global $RULE_OPERATORS;
 		if (empty($fieldnum) || empty($type) || empty($logical) || empty($op) || empty($values))
 			return null;
@@ -26,8 +26,7 @@ class Rule extends DBMappedObject {
 		else if ($type === 'multisearch' && !in_array($logical, array('and', 'and not')))
 			return null;
 		else {
-			if (!$fieldmaps)
-				$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+			$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
 			if (!array_key_exists($fieldnum, $fieldmaps) || strpos($fieldmaps[$fieldnum]->options, $type) === false)
 				return null;
 		}
