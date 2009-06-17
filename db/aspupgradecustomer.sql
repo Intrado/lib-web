@@ -106,3 +106,8 @@ $$$
 
 ALTER TABLE `listentry` ADD INDEX `listrule` ( `listid` , `type` , `personid` )
 $$$
+
+delete s2 from setting s1 left join setting s2 on (s1.name = s2.name and s1.id > s2.id) where s2.id is not null
+$$$
+ALTER TABLE `setting` DROP INDEX `lookup` , ADD UNIQUE `name` ( `name` ) 
+$$$
