@@ -20,18 +20,18 @@ function handleRequest() {
 			$ruledata = json_decode($_POST['ruledata']);
 			if (!is_array($ruledata))
 				return false;
-			$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
-			if (empty($fieldmaps))
-				return false;
 				
 			$summary = array();
 			$rules = array();
 			foreach ($ruledata as $data) {
-				if (isset($rules[$data->fieldnum])) // Do not allow more than one rule per fieldnum
-					return false;
 				if (!isset($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
 					return false;
-				if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val, $fieldmaps))
+				if (isset($rules[$data->fieldnum])) // Do not allow more than one rule per fieldnum
+					return false;
+				if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+					return false;
+				$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+				if (empty($fieldmaps))
 					return false;
 				$rules[$data->fieldnum] = $rule;
 				$summary[] = $fieldmaps[$data->fieldnum]->name;
