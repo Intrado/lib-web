@@ -73,6 +73,7 @@ function inboundtask($msg){
 	$_SESSION['inboundNumber'] = $msg->getParam(1)->scalarval();
 	$_SESSION['callerid'] = $msg->getParam(2)->scalarval();
 	$_SESSION['customerid'] = $msg->getParam(3)->scalarval();
+	$_SESSION['timezone'] = getSystemSetting("timezone");
 
 	ob_start();
 
