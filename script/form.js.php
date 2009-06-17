@@ -206,7 +206,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		helpsteps: helpsteps,
 		ajaxsubmit: ajaxsubmit,
 		helperdisabled: true,
-		currentstep: 0,
+		currentstep: null,
 		validators: {},
 		jsgetvalue: {},
 		submitting: false
@@ -307,7 +307,7 @@ function form_fieldset_event_handler (event) {
 	var e = event.element();
 	
 	var fieldset = e.up("fieldset");
-	var step = fieldset.id.substring(fieldset.id.lastIndexOf("_")+1);
+	var step = fieldset.id.substring(fieldset.id.lastIndexOf("_")+1)-1;
 	form_go_step(form,null,step);
 }
 
@@ -336,14 +336,14 @@ function form_go_step (form, direction, specificstep) {
 	var helpercontent = $(form.id + "_helpercontent");
 	
 	var laststep = formvars.currentstep;
-	if (specificstep) {
+	if (specificstep || specificstep == 0) {
 		formvars.currentstep = specificstep;
 	} else {
 		formvars.currentstep += direction;
 	}
 	
 	formvars.currentstep = Math.min(formvars.currentstep,formvars.helpsteps.length-1);
-	formvars.currentstep = Math.max(formvars.currentstep,1);
+	formvars.currentstep = Math.max(formvars.currentstep,0);
 	
 	if (laststep == formvars.currentstep)
 		return false;
@@ -351,7 +351,7 @@ function form_go_step (form, direction, specificstep) {
 	//show/hide the buttons
 	var leftarrow = helper.down(".toolbar img");
 	var rightarrow = helper.down(".toolbar img",1);
-	if (formvars.currentstep == 1) {
+	if (formvars.currentstep == 0) {
 		leftarrow.src="img/pixel.gif";
 	} else {
 		leftarrow.src="img/icons/fugue/arrow_090.gif";
@@ -365,7 +365,7 @@ function form_go_step (form, direction, specificstep) {
 	
 	//info text
 	
-	helpercontent.title = helperinfo.innerHTML = 'Step ' + formvars.currentstep + " of " + (formvars.helpsteps.length-1);
+	helpercontent.title = helperinfo.innerHTML = 'Step ' + (formvars.currentstep+1) + " of " + (formvars.helpsteps.length);
 	helpercontent.innerHTML = formvars.helpsteps[formvars.currentstep];
 	
 	
@@ -374,7 +374,7 @@ function form_go_step (form, direction, specificstep) {
 	for (var i = 1; e = $(form.id + '_helpsection_'+i); i++) {
 		e.style.border = "1px outset";
 		
-		if (i == formvars.currentstep) {
+		if (i == formvars.currentstep+1) {
 			//cancel any previous effects
 			Effect.Queues.get("helper").each(function(effect) { effect.cancel(); });
 			
@@ -386,7 +386,7 @@ function form_go_step (form, direction, specificstep) {
 			
 			new Effect.Move(helper, { y:helper_y, mode:'absolute', duration: 0.8, queue: { scope: "helper"}});
 			
-			if (!specificstep)
+			if (!(specificstep || specificstep == 0))
 				new Effect.ScrollTo(e, {offset: -viewport_offset/2.0, duration: 0.6, queue: { scope: "helper"}});
 		}
 	}
@@ -405,7 +405,7 @@ function form_enable_helper(event) {
 	
 	//if user clicks start guide with it already open, just go to the first item //TODO go to a clicked (i) icon
 	if (!formvars.helperdisabled) {
-		form_go_step(form,null,1);
+		form_go_step(form,null,0);
 		return;
 	}
 	
@@ -414,7 +414,7 @@ function form_enable_helper(event) {
 	new Effect.Morph(form.id + "_helpercell", {style: "width: 200px", 
 		afterFinish: function() {
 			helper.style.display = "block";
-			form_go_step(form,null,1);
+			form_go_step(form,null,0);
 		}
 	});
 	
@@ -441,7 +441,7 @@ function form_disable_helper(event) {
 		new Effect.Appear(startbtn,{duration: 0.5});
 
 	formvars.helperdisabled = true;
-	formvars.currentstep = 0;
+	formvars.currentstep = -1;
 	
 	helper.style.display = "none";
 	
