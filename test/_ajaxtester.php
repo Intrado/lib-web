@@ -54,48 +54,48 @@ testcaseData['ajax.php?type=lists'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Message'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Message&id'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Message&id='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=Message&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Message&id=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Message&id=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Message&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=Message&id=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessagePart'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessagePart&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=MessagePart&id=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessageParts'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=MessageParts&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=MessageParts&id=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&messagetype=$_SESSION'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=phone'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=email'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=sms'] = '';
 testcaseData['ajax.php?type=Messages&messagetype=print'] = '';
-testcaseData['ajax.php?type=Messages&userid=3'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=3&messagetype=$_SESSION'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid&messagetype=phone'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=&messagetype=phone'] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=???;;;&messagetype=phone'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=???\';;;&messagetype=phone'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=%&messagetype=phone'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=Messages&userid=\0\0&messagetype=phone'] = '';
 testcaseData['ajax.php?type=Messages&userid=3&messagetype=phone'] = '';
@@ -106,7 +106,7 @@ testcaseData['ASSERT FALSE--ajax.php?type=authorizedmapnames'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messagetype=$_SESSION'] = '';
 testcaseData['ajax.php?type=hasmessage&messagetype=phone'] = '';
@@ -115,36 +115,36 @@ testcaseData['ajax.php?type=hasmessage&messagetype=sms'] = '';
 testcaseData['ajax.php?type=hasmessage&messagetype=print'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid=%'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=hasmessage&messageid=$_SESSION'] = '';
 testcaseData['ajax.php?type=hasmessage&messageid=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=listrules'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=$_SESSION'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=' + [].toJSON()] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=' + ["???;;;", "???;;;"].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=' + ["???\';;;", "???\';;;"].toJSON()] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=listrules&listids=' + ["%", "%"].toJSON()] = '';
 testcaseData['ajax.php?type=listrules&listids=' + [1].toJSON()] = '';
 testcaseData['ajax.php?type=listrules&listids=' + [1,2,3].toJSON()] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=liststats'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=$_SESSION'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=' + [].toJSON()] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=' + ["???;;;", "???;;;"].toJSON()] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=' + ["???\';;;", "???\';;;"].toJSON()] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=liststats&listids=' + ["%", "%"].toJSON()] = '';
 testcaseData['ajax.php?type=liststats&listids=' + [1].toJSON()] = '';
 testcaseData['ajax.php?type=liststats&listids=' + [1,2,3].toJSON()] = '';
 testcaseData['ajax.php?type=liststats&listids=' + [1,2,3,null].toJSON()] = '';
-testcaseData['ajax.php?type=liststats&listids=' + [1,"???;;;",3,null].toJSON()] = '';
+testcaseData['ajax.php?type=liststats&listids=' + [1,"???\';;;",3,null].toJSON()] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum=$_SESSION'] = '';
 testcaseData['ajax.php?type=persondatavalues&fieldnum=f01'] = '';
 testcaseData['ajax.php?type=persondatavalues&fieldnum=f06'] = '';
@@ -152,13 +152,13 @@ testcaseData['ajax.php?type=rulewidgetsettings'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=previewmessage'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=previewmessage&id=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id=???;;;'] = '';
+testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=messagefields&id=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues'] = '';
@@ -166,37 +166,78 @@ testcaseData['ASSERT FALSE--ajaxeasycall.php?id'] = '';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id='] = '';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=$_SESSION'] = '';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=\0\0'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;*'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;**'] = 'phone';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;***'] = 'phone=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;****'] = 'phone=???;;;';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;*****'] = 'phone=$_SESSION';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;******'] = 'phone=\0\0';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;*******'] = 'language';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;********'] = 'language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;*********'] = 'language=???;;;';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;**********'] = 'language=$_SESSION';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;***********'] = 'language=\0\0';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;************'] = 'phone=8316001337&language';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;*************'] = 'phone=8316001337&language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???;;;****************'] = 'phone=8316001337&language=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*'] = '';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;**'] = 'phone';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;***'] = 'phone=';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;****'] = 'phone=???\';;;';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*****'] = 'phone=$_SESSION';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;******'] = 'phone=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*******'] = 'language';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;********'] = 'language=';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*********'] = 'language=???\';;;';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;**********'] = 'language=$_SESSION';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;***********'] = 'language=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;************'] = 'phone=8316001337&language';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*************'] = 'phone=8316001337&language=';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;****************'] = 'phone=8316001337&language=\0\0';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*'] = 'phone';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new**'] = 'phone=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new***'] = 'phone=???;;;';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new***'] = 'phone=???\';;;';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new****'] = 'phone=$_SESSION';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*****'] = 'phone=\0\0';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new******'] = 'language';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*******'] = 'language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new********'] = 'language=???;;;';
+testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new********'] = 'language=???\';;;';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*********'] = 'language=$_SESSION';
 testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new**********'] = 'language=\0\0';
 testcaseData['ASSERT FALSE--ajaxeasycall.php*'] = '';
 testcaseData['ASSERT FALSE--ajaxeasycall.php**'] = 'phone=8316001337&language';
 testcaseData['ASSERT FALSE--ajaxeasycall.php***'] = 'phone=8316001337&language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php*******'] = 'phone=???;;;&language=english';
-testcaseData['ASSERT FALSE--ajaxeasycall.php********'] = 'phone=junk&language=english';
+testcaseData['ASSERT FALSE--ajaxeasycall.php****'] = 'phone=???\';;;&language=english';
+testcaseData['ASSERT FALSE--ajaxeasycall.php*****'] = 'phone=junk&language=english';
 testcaseData['ajaxeasycall.php'] = 'phone=8316001337&language=english';
 testcaseData['ajaxeasycall.php?id=1'] = '';
+testcaseData['ajaxlistform.php?type=saverules*f01*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}].toJSON();
+testcaseData['ajaxlistform.php?type=saverules*f01,f02*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php???\';;;'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type='] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=asdf'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=???\';;;'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=\0\0'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*Blank postbody*'] = '';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*Bad postbody*'] = '$_SESSION';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*Bad postbody**'] = 'ruledata';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*Bad postbody***'] = 'ruledata=';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*ruledata=sql*'] = 'ruledata=???\';;;';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*ruledata=bad*'] = 'ruledata=$_SESSION';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*ruledata=bad**'] = 'ruledata=\0\0';
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*ruledata=empty array*'] = 'ruledata=' + [].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*ruledata=array of empty objects*'] = 'ruledata=' + [{}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*ruledata=array of empty objects**'] = 'ruledata=' + [{},{},{},{}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*fieldnum sql*'] = 'ruledata=' + [{fieldnum:'???\';;;', type:'text', logical:'and', op:'eq', val:'keeyip'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*text sql*'] = 'ruledata=' + [{fieldnum:'f01', type:'???\';;;', logical:'and', op:'eq', val:'keeyip'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*logical sql*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'???\';;;', op:'eq', val:'keeyip'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*op sql*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'???\';;;', val:'keeyip'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct,f02 type bad*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'multisearch', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct,f02 logical bad*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and not', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct,f02 op bad*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', op:'equator', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, next no fieldnum*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {type:'text', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, f02 no type*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, f02 no logical*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, f02 no op*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, f02 no val*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', op:'eq'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct,f21*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f21', type:'text', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, next fieldnum empty'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'', type:'text', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, next type empty'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, next logical empty'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'', op:'eq', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, next op empty'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', op:'', val:'chan'}].toJSON();
+testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, f01 again'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'chan'}].toJSON();
+testcaseData['ajaxlistform.php?type=saverules*f01 correct,f02 val empty'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', op:'eq', val:''}].toJSON();
+testcaseData['ajaxlistform.php?type=saverules*val sql*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'???\';;;'}].toJSON();
 
 $('automatedTestcasesContainer').hide();
 $('manualTestcasesConstainer').show();
@@ -217,21 +258,23 @@ $('automatedTab').observe('click', function() {
 });
 
 var automatedTestcaseSelectbox = new Element('select');
-automatedTestcaseSelectbox.insert(new Element('option', {'value':''}).insert('-- Choose an automated Test Case --'));
 automatedTestcaseSelectbox.observe('change', function(event) {
 	$('dataPOST').value = '';
 	if (testcaseData[automatedTestcaseSelectbox.getValue()])
 		$('dataPOST').value = testcaseData[automatedTestcaseSelectbox.getValue()];
-	$('dataGET').value = automatedTestcaseSelectbox.getValue().replace(/\*/g, '');
+	$('dataGET').value = automatedTestcaseSelectbox.getValue();
+	if ($('dataGET').value.indexOf('*') >= 0)
+		$('dataGET').value = $('dataGET').value.substring(0, $('dataGET').value.indexOf('*'));
 	$('dataGET').value = $('dataGET').value.replace(/ASSERT FALSE--/g, '');
 });
 var manualTestcaseSelectbox = new Element('select');
-manualTestcaseSelectbox.insert(new Element('option', {'value':''}).insert('-- Choose a Manual Test Case --'));
 manualTestcaseSelectbox.observe('change', function(event) {
 	$('dataPOST').value = '';
 	if (testcaseData[manualTestcaseSelectbox.getValue()])
 		$('dataPOST').value = testcaseData[manualTestcaseSelectbox.getValue()];
-	$('dataGET').value = manualTestcaseSelectbox.getValue().replace(/\*/g, '');
+	$('dataGET').value = manualTestcaseSelectbox.getValue();
+	if ($('dataGET').value.indexOf('*') >= 0)
+		$('dataGET').value = $('dataGET').value.substring(0, $('dataGET').value.indexOf('*'));
 });
 
 for (var url in testcaseData) {
@@ -241,6 +284,9 @@ for (var url in testcaseData) {
 	else
 		manualTestcaseSelectbox.insert(option);
 }
+
+automatedTestcaseSelectbox.insert({top:new Element('option', {'value':''}).insert('-- Choose from ' + automatedTestcaseSelectbox.options.length + ' automated Test Cases --')});
+manualTestcaseSelectbox.insert({top:new Element('option', {'value':''}).insert('-- Choose from ' + manualTestcaseSelectbox.options.length + ' manual Test Cases --')});
 
 $('manualTestcasesConstainer').update(manualTestcaseSelectbox);
 $('automatedTestcasesContainer').update(automatedTestcaseSelectbox);
@@ -280,6 +326,7 @@ $('sendButton').observe('click', function() {
 var runIndex = 0;
 var failCount = 0;
 var warningCount = 0;
+var testCount = 0;
 $('runautomatedButton').observe('click', function() {
 	if (runIndex > 0)
 		runIndex = -1;
@@ -287,6 +334,7 @@ $('runautomatedButton').observe('click', function() {
 		runIndex = 1;
 		failCount = 0;
 		warningCount = 0;
+		testCount = 0;
 		$('result').value = '';
 		$('raw').value = '--- Running ---';
 		ajax_assert_false();
@@ -306,6 +354,7 @@ function ajax_assert_false() {
 			$('raw').value += ', ' + warningCount + ' Warnings';
 		else
 			$('raw').value += ', No Warnings';
+		$('raw').value += '-- ' + testCount + ' Tests';
 		return;
 	}
 	if (automatedTestcaseSelectbox.options.length <= 1) {
@@ -315,11 +364,14 @@ function ajax_assert_false() {
 		return;
 	}
 
+	testCount++;
+	
 	var url= automatedTestcaseSelectbox.options[runIndex].value;
 	var postBody = testcaseData[url];
-	url = url.replace(/\*/g, '');
+	if (url.indexOf('*') >= 0)
+		url = url.substring(0, url.indexOf('*'));
 	url = url.replace(/ASSERT FALSE--/g, '');
-	$('result').value += url + ", postBody: " + postBody;
+	$('result').value += '            ' + automatedTestcaseSelectbox.options[runIndex].value;
 	new Ajax.Request('../' + url, {
 		'method': 'post',
 		'postBody': postBody,
@@ -327,10 +379,10 @@ function ajax_assert_false() {
 			var data = transport.responseJSON;
 			if (data) {
 				if (data['error']) {
-					$('result').value += "\n      WARNING data['error']=" + data['error'] + " \n";
+					$('result').value += "\nWARNING data['error']=" + data['error'] + " \n";
 					warningCount++;
 				} else {
-					$('result').value += "\n      !!! ASSERTION FAILED, Got Data !!!\n";
+					$('result').value += "\n!!! ASSERTION FAILED, Got Data !!!\n";
 					failCount++;
 				}
 			}
