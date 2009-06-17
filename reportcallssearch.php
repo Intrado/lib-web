@@ -37,7 +37,7 @@ if (!$USER->authorize('createreport')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 
 if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['reportid']);

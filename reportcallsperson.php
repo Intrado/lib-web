@@ -79,7 +79,7 @@ if(isset($_GET['pid'])){
 }
 
 $options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
-$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 $activefields = array();
 foreach($fields as $field){
 	// used in pdf,csv

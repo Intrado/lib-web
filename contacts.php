@@ -60,8 +60,8 @@ if(isset($options['rules']) && $options['rules']){
 $ordercount = 3;
 $ordering = ContactsReport::getOrdering();
 
-$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
-$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f');
+$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 $fields = $ffields + $gfields;
 
 $activefields = array();

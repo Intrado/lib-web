@@ -68,13 +68,11 @@ class FieldMap extends DBMappedObject {
 	}
 	
 	static function getMapNames () {
-		return FieldMap::getMapNamesLike("f%");
+		return FieldMap::getMapNamesLike('f');
 	}
 
-	static function getMapNamesLike ($likewhat, $authorized = false) {
+	static function getMapNamesLike ($firstletter, $authorized = false) {
 		global $USER;
-		
-		$firstletter = $likewhat[0]; // TODO: Require $likewhat to specify just the first letter, so that this step is unnecessary
 		
 		$results = FieldMap::retrieveFieldMaps();
 		
@@ -90,12 +88,12 @@ class FieldMap extends DBMappedObject {
 	}
 
 	static function getAuthorizedMapNames () {
-		return FieldMap::getAuthorizedMapNamesLike("f%");
+		return FieldMap::getAuthorizedMapNamesLike('f');
 	}
 
 	// Returns Associative Array of fieldnum => name
-	static function getAuthorizedMapNamesLike ($likewhat) {
-		return FieldMap::getMapNamesLike($likewhat, true);
+	static function getAuthorizedMapNamesLike ($firstletter) {
+		return FieldMap::getMapNamesLike($firstletter, true);
 	}
 	
 	// Returns Associative Array of fieldnum => name
@@ -113,7 +111,7 @@ class FieldMap extends DBMappedObject {
 	// Gets only F fields
 	// Returns Associative Array, indexed by fieldnum
 	static function getAuthorizedFieldMaps () {
-		return FieldMap::getAuthorizedFieldMapsLike("f%");
+		return FieldMap::getAuthorizedFieldMapsLike('f');
 	}
 	
 	// Gets F,G,C fields.
@@ -130,11 +128,9 @@ class FieldMap extends DBMappedObject {
 	}
 
 	// Returns an associative array, indexed by fieldnum.
-	static function getAuthorizedFieldMapsLike ($likewhat) {
+	static function getAuthorizedFieldMapsLike ($firstletter) {
 		global $USER;
-		
-		$firstletter = $likewhat[0]; // TODO: Require $likewhat to specify just the first letter, so that this step is unnecessary
-		
+	
 		$fieldmaps = FieldMap::retrieveFieldMaps();
 		foreach($fieldmaps as $fieldnum => $fieldmap)
 			if (!$USER->authorizeField($fieldnum) || $fieldnum[0] !== $firstletter)
@@ -144,10 +140,10 @@ class FieldMap extends DBMappedObject {
 
 	// only return F-fields other than first/last name (do not return C-fields)
 	static function getOptionalAuthorizedFieldMaps(){
-		return FieldMap::getOptionalAuthorizedFieldMapsLike("f%");
+		return FieldMap::getOptionalAuthorizedFieldMapsLike('f');
 	}
-	static function getOptionalAuthorizedFieldMapsLike($likewhat){
-		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike($likewhat);
+	static function getOptionalAuthorizedFieldMapsLike($firstletter){
+		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike($firstletter);
 		foreach($fieldmaps as $index => $fieldmap){
 			if($fieldmap->isOptionEnabled("firstname") || $fieldmap->isOptionEnabled("lastname")) {
 				unset($fieldmaps[$index]);
@@ -179,7 +175,7 @@ class FieldMap extends DBMappedObject {
 				$fieldmapscache[$fieldmap->fieldnum] = $fieldmap;
 		}
 		
-		return $fieldmapscache
+		return $fieldmapscache;
 	}
 	
 	function updatePersonDataValues () {

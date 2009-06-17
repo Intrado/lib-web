@@ -103,7 +103,7 @@ class ReportGenerator {
 			$params[$newindex] = new XML_RPC_VALUE($title, 'string');
 		}
 		// Gfields
-		$fields = FieldMap::getOptionalAuthorizedFieldMapsLike("g%");
+		$fields = FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;

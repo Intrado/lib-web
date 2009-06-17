@@ -89,8 +89,8 @@ class CallsReport extends ReportGenerator{
 
 	function runHtml(){
 
-		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f%');
-		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f');
+		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 		$fields = $ffields + $gfields;
 		$fieldlist = array();
 		foreach($fields as $field){

@@ -354,7 +354,7 @@ foreach ($fieldmaps as $map) {
 }
 
 // Gfields
-$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("g%");
+$fieldmaps = FieldMap::getAuthorizedFieldMapsLike('g');
 foreach ($fieldmaps as $map) {
 	$fname = $map->fieldnum;
 	$header = $map->name;
@@ -488,7 +488,7 @@ foreach ($fieldmaps as $map) {
 		$assocdata = QuickQueryMultiRow("select c01, c02, c03, c04, c05, c06, c07, c08, c09, c10 from enrollment where personid=".$personid, true);
 		//var_dump($assocdata);
 
-		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike("c%");
+		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike('c');
 ?>
 		<tr class="listHeader">
 <?

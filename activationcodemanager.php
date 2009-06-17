@@ -100,7 +100,7 @@ if(isset($options['rules']) && $options['rules']){
 	$RULES = $options['rules'];
 }
 
-$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike("g%");
+$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 
 $activefields = array();
 $fieldlist = array();

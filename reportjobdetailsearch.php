@@ -44,7 +44,7 @@ if (!$USER->authorize('viewsystemreports')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $clear = 0;
-$fieldlist = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g%');
+$fieldlist = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 
 if(isset($_GET['clear']) && $_GET['clear']){
 	unset($_SESSION['report']);

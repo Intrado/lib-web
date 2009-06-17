@@ -21,12 +21,12 @@ $sepval2 = array();
 $temp = FieldMap::getSeparatorFieldMap(2);
 $sepval2[$temp->fieldnum] = $temp;
 $ffields = array();
-if ($withffields) $ffields = FieldMap::getAuthorizedFieldMapsLike("f%");
+if ($withffields) $ffields = FieldMap::getAuthorizedFieldMapsLike('f');
 $gfields = array();
-if ($withgfields) $gfields = FieldMap::getAuthorizedFieldMapsLike("g%");
+if ($withgfields) $gfields = FieldMap::getAuthorizedFieldMapsLike('g');
 if (count($gfields) > 0) $gfields = $sepval + $gfields;
 $cfields = array();
-if ($withcfields) $cfields = FieldMap::getAuthorizedFieldMapsLike("c%");
+if ($withcfields) $cfields = FieldMap::getAuthorizedFieldMapsLike('c');
 if (count($cfields)) $cfields = $sepval2 + $cfields;
 $fieldmaps = $ffields + $gfields + $cfields; // GUI preffered order
 
