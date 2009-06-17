@@ -15,6 +15,10 @@ class FieldMap extends DBMappedObject {
 	var $options;
 
 	var $optionsarray = false;
+	
+	// NOTE: Clients should not access FieldMap::fieldmapscache directly, must use FieldMap::retrieveFieldMaps().
+	// Cache fieldmaps per page request.
+	static $fieldmapscache = null;
 
 	function FieldMap ($id = NULL) {
 		$this->_tablename = "fieldmap";
@@ -32,53 +36,58 @@ class FieldMap extends DBMappedObject {
 	}
 
 	static function getFirstNameField() {
-		$field = QuickQuery("select fieldnum from fieldmap where options like '%firstname%'");
-		if(!$field)
-			$field = "f01";
-		return $field;
+		return FieldMap::getFieldnumWithOption('firstname', 'f01');
 	}
 
 	static function getLastNameField() {
-		$field = QuickQuery("select fieldnum from fieldmap where options like '%lastname%'");
-		if(!$field)
-			$field = "f02";
-		return $field;
+		return FieldMap::getFieldnumWithOption('lastname', 'f02');
 	}
 
 	static function getLanguageField() {
-		$field = QuickQuery("select fieldnum from fieldmap where options like '%language%'");
-		if(!$field)
-			$field = "f03";
-		return $field;
+		return FieldMap::getFieldnumWithOption('language', 'f03');
 	}
 
 	static function getGradeField(){
-		return QuickQuery("select fieldnum from fieldmap where options like '%grade%'");
+		return FieldMap::getFieldnumWithOption('grade');
 	}
 
 	// NOTE 'school' moved from Ffield to Gfield in release 6.1
 	static function getSchoolField(){
-		return QuickQuery("select fieldnum from fieldmap where options like '%school%'");
+		return FieldMap::getFieldnumWithOption('school');
 	}
 
 	static function getStaffField(){
-		$field = QuickQuery("select fieldnum from fieldmap where options like '%staff%'");
-		if(!$field)
-			$field = "c01";
-		return $field;
+		return FieldMap::getFieldnumWithOption('staff', 'c01');
 	}
 
+	static function getFieldnumWithOption($option, $default = null) {
+		$results = FieldMap::retrieveFieldMaps();
+
+		foreach($results as $fieldnum => $fieldmap) {
+			if (strpos($fieldmap->options, $option) !== false)
+				return $fieldnum;
+		}
+		
+		return $default;
+	}
+	
 	static function getMapNames () {
 		return FieldMap::getMapNamesLike("f%");
 	}
 
-	static function getMapNamesLike ($likewhat) {
+	static function getMapNamesLike ($likewhat, $authorized = false) {
 		global $USER;
+		
+		$firstletter = $likewhat[0]; // TODO: Require $likewhat to specify just the first letter, so that this step is unnecessary
+		
+		$results = FieldMap::retrieveFieldMaps();
+		
 		$map = array();
-		$query = "select name, fieldnum from fieldmap where fieldnum like '".$likewhat."' order by fieldnum";
-		if ($result = Query($query)) {
-			while ($row = DBGetRow($result)) {
-				$map[$row[1]] = $row[0];
+		foreach($results as $fieldnum => $fieldmap) {
+			if ($fieldnum[0] === $firstletter) {
+				if ($authorized && !$USER->authorizeField($fieldnum))
+					continue;
+				$map[$fieldnum] = $fieldmap->name;
 			}
 		}
 		return $map;
@@ -88,26 +97,25 @@ class FieldMap extends DBMappedObject {
 		return FieldMap::getAuthorizedMapNamesLike("f%");
 	}
 
+	// Returns Associative Array of fieldnum => name
 	static function getAuthorizedMapNamesLike ($likewhat) {
-		global $USER;
+		return FieldMap::getMapNamesLike($likewhat, true);
+	}
+	
+	// Returns Associative Array of fieldnum => name
+	static function getSubscribeMapNames() {
+		$results = FieldMap::retrieveFieldMaps();
+		
 		$map = array();
-		$query = "select name, fieldnum from fieldmap where fieldnum like '".$likewhat."' order by fieldnum";
-		if ($result = Query($query)) {
-			while ($row = DBGetRow($result)) {
-				if($USER->authorizeField($row[1]))
-					$map[$row[1]] = $row[0];
-			}
+		foreach($results as $fieldnum => $fieldmap) {
+			if (strpos($fieldmap->options, 'subscribe') !== false)
+				$map[$fieldnum] = $fieldmap->name;
 		}
 		return $map;
 	}
 	
-	static function getSubscribeMapNames() {
-		$query = "select fieldnum, name from fieldmap where options like '%subscribe%' order by fieldnum";
-		$map = QuickQueryList($query, true);
-		return $map;
-	}
-	
-
+	// Gets only F fields
+	// Returns Associative Array, indexed by fieldnum
 	static function getAuthorizedFieldMaps () {
 		return FieldMap::getAuthorizedFieldMapsLike("f%");
 	}
@@ -116,25 +124,25 @@ class FieldMap extends DBMappedObject {
 	// Returns Associative Array, indexed by fieldnum
 	static function getAllAuthorizedFieldMaps ($onlysearchable = true) {
 		global $USER;
-		$results = DBFindMany("FieldMap", 'from fieldmap order by fieldnum');
-		$fieldmaps = array();
-		foreach($results as $key => $fieldmap) {
-			if($USER->authorizeField($fieldmap->fieldnum)) {
-				if ($onlysearchable && strpos($fieldmap->options, 'searchable') === false)
-					continue;
-				$fieldmaps[$fieldmap->fieldnum] = $fieldmap;
-			}
+		
+		$fieldmaps = FieldMap::retrieveFieldMaps();
+		foreach($fieldmaps as $fieldnum => $fieldmap) {
+			if (!$USER->authorizeField($fieldnum) || ($onlysearchable && strpos($fieldmap->options, 'searchable') === false))
+				unset($fieldmaps[$fieldnum]);
 		}
 		return $fieldmaps;
 	}
 
+	// Returns an associative array, indexed by fieldnum.
 	static function getAuthorizedFieldMapsLike ($likewhat) {
 		global $USER;
-		$query = "from fieldmap where fieldnum like '".$likewhat."' order by fieldnum";
-		$fieldmaps = DBFindMany("FieldMap", $query);
-		foreach($fieldmaps as $key => $fieldmap)
-			if(!$USER->authorizeField($fieldmap->fieldnum))
-				unset($fieldmaps[$key]);
+		
+		$firstletter = $likewhat[0]; // TODO: Require $likewhat to specify just the first letter, so that this step is unnecessary
+		
+		$fieldmaps = FieldMap::retrieveFieldMaps();
+		foreach($fieldmaps as $fieldnum => $fieldmap)
+			if (!$USER->authorizeField($fieldnum) || $fieldnum[0] !== $firstletter)
+				unset($fieldmaps[$fieldnum]);
 		return $fieldmaps;
 	}
 
@@ -152,13 +160,34 @@ class FieldMap extends DBMappedObject {
 		return $fieldmaps;
 	}
 
+	// Returns an indexed array
 	static function getName ($fieldnum) {
 		global $USER;
-		$query = "select name from fieldmap where "
-				." fieldnum = '$fieldnum'";
-		return QuickQuery($query);
+		
+		$results = FieldMap::retrieveFieldMaps();
+		
+		$names = array();
+		foreach ($results as $fieldmap)
+			$names[] = $fieldmap->name;
+		return $names;
 	}
 
+	// Returns an associative array, indexed by fieldnum.
+	static function retrieveFieldMaps() {
+		if (FieldMap::$fieldmapscache) {
+			error_log('cache, there are: ' . count(FieldMap::$fieldmapscache) . ' fieldmaps'); // TODO: Remove error_log, this is just for debugging.
+			return FieldMap::$fieldmapscache;
+		}
+			
+		$results = DBFindMany('FieldMap', 'from fieldmap order by fieldnum');
+		FieldMap::$fieldmapscache = array();
+		foreach ($results as $fieldmap)
+			FieldMap::$fieldmapscache[$fieldmap->fieldnum] = $fieldmap;
+		error_log('------------------------------------------');
+		error_log('DBFND, there are: ' . count(FieldMap::$fieldmapscache) . ' fieldmaps'); // TODO: Remove error_log, this is just for debugging.
+		return FieldMap::$fieldmapscache;
+	}
+	
 	function updatePersonDataValues () {
 
 		if ($this->isOptionEnabled("searchable") &&
