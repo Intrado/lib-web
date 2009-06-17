@@ -1437,3 +1437,6 @@ $$$
 
 ALTER TABLE `listentry` ADD INDEX `listrule` ( `listid` , `type` , `personid` )
 $$$
+
+ALTER TABLE `setting` DROP INDEX `lookup` , ADD UNIQUE `name` ( `name` ) 
+$$$
