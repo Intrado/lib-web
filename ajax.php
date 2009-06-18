@@ -90,8 +90,8 @@ function handleRequest() {
 					$userid = $_GET['userid'];
 				else
 					return false;
-			} 
-			return cleanObj(DBFindMany("Message", "from message where not deleted and userid=? and type=? order by id", false, array($userid, $_GET['messagetype'])));
+			}
+			return QuickQueryList('select id,name from message where not deleted and userid=? and type=? order by id', true, false, array($userid, $_GET['messagetype']));
 			
 		//--------------------------- RPC -------------------------------
 		case 'hasmessage':
