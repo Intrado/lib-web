@@ -184,10 +184,7 @@ class ListForm extends Form {
 					var currentFieldset = sectionFieldsets[document.formvars['{$this->name}'].guideStepIndex];
 					// Visual effect.
 					currentFieldset.style.borderColor = 'rgb(0,0,255)';
-					document.formvars['{$this->name}'].guideMorphEffect = new Effect.Morph(currentFieldset, {style: 'border-color: rgb(150,150,255)', duration: 1.2, transition: Effect.Transitions.spring, afterFinish: function() {
-						if (document.formvars['{$this->name}'].guideFieldset != this)
-							this.style.borderColor = 'rgb(255,255,255)';
-					}.bind(currentFieldset)});
+					document.formvars['{$this->name}'].guideMorphEffect = new Effect.Morph(currentFieldset, {style: 'border-color: rgb(150,150,255)', duration: 1.2, transition: Effect.Transitions.spring});
 					document.formvars['{$this->name}'].guideFieldset = currentFieldset;
 					listform_refresh_guide_arrow();
 
@@ -228,6 +225,7 @@ class ListForm extends Form {
 					}));
 				}
 				
+				// Adds listid to $('{$listidsName}')
 				function listform_add_list(listid) {
 					if (!listid.strip()) {
 						alert('".addslashes(_L('Please select a list'))."');
@@ -245,28 +243,19 @@ class ListForm extends Form {
 					return true;
 				}
 				
+				// Inserts specified lists into the Lists Table
 				// @param listidsJSON, json-encoded array of listids
 				function listform_load_lists(listidsJSON) {
 					var listids = listidsJSON.evalJSON();
 					if (!listids.join)
 						return;
 					
-					// Mark any existing lists that were inserted.
-					if (document.formvars['{$this->name}'].existingLists) {
-						listids.each(function(id) {
-							if (document.formvars['{$this->name}'].existingLists[id])
-								document.formvars['{$this->name}'].existingLists[id].added = true;
-						});
-					}
-					
-					listform_reset_list_selectbox();
-					
 					new Ajax.Request('ajax.php?type=liststats&listids='+listidsJSON, {
 						// Adds a row for this list to the Lists Table
 						onSuccess: function(transport) {
 							var stats = transport.responseJSON;
 							if (!stats) {
-								alert('".addslashes(_L('No data available for this list'))."');
+								alert('".addslashes(_L('No data available for this list, please check your internet connection and try again'))."');
 								return;
 							}
 							
@@ -274,7 +263,7 @@ class ListForm extends Form {
 								var data = stats[i];
 								
 								// Keep a hidden input field to keep track of id for this table row.
-								var nameTD = new Element('td', {'class':'List NameTD'}).update(new Element('input',{'type':'hidden','value':data['id']})).insert(data['name']);
+								var nameTD = new Element('td', {'class':'List NameTD'}).update(new Element('input',{'type':'hidden','value':data.id})).insert(data.name);
 								var statisticsTD = new Element('td', {'class':'List'}).update(data.total + ' ".addslashes(_L('Total'))."');
 								if (data.added > 0)
 									statisticsTD.insert(', ' + data.added + ' ".addslashes(_L('Added'))."');
@@ -293,8 +282,7 @@ class ListForm extends Form {
 								
 								var previewButton = actionsTD.down('button', 0);
 								previewButton.observe('click', function(event, listid) {
-									// Use Math.random() for generating a unique window name, so that each time you click Preview a new window will popup, instead of reusing the same window.
-									window.open('showlist.php?id='+listid, 'ListFormPreviewList'+Math.random());
+									window.open('showlist.php?id='+listid, '_blank');
 								}.bindAsEventListener(actionsTD,data.id));
 								var rulesButton = actionsTD.down('button', 1);
 								rulesButton.observe('click', function (event, listid) {
@@ -342,7 +330,7 @@ class ListForm extends Form {
 									tr.next('tr').remove(); // RulesTR
 									tr.remove();
 									if (document.formvars['{$this->name}'].existingLists && document.formvars['{$this->name}'].existingLists[listid]) {
-										document.formvars['{$this->name}'].existingLists[listid]['added'] = false;
+										document.formvars['{$this->name}'].existingLists[listid].added = false;
 										listform_reset_list_selectbox();
 									}
 									
@@ -352,10 +340,16 @@ class ListForm extends Form {
 										$('{$listidsName}').value = listids.toJSON();
 										listform_show_validation_message();
 									} else {
+										// Somehow listids is not an array, which should never happen.
 										alert('".addslashes(_L('Fatal ERROR??'))."');
 									}
 								}.bindAsEventListener(actionsTD,data.id));
+								
+								// Mark this list as 'added' so that the list selectbox no longer shows this list as an option.
+								if (document.formvars['{$this->name}'].existingLists && document.formvars['{$this->name}'].existingLists[id])
+									document.formvars['{$this->name}'].existingLists[id].added = true;
 							}
+							listform_reset_list_selectbox();
 							$('pageLoadingWindow').hide();
 							$('allListsWindow').show();
 							listform_refresh_guide(true);
@@ -383,6 +377,7 @@ class ListForm extends Form {
 					$('listSelectboxContainer').update(selectbox);
 				}
 				
+				// Updates $('{$listidsName}') according to the mode
 				//@param mode, enum {'choosingList', 'buildingList', etc..}
 				//@param enabled, boolean true to enable, false to disable
 				function listform_set_mode_status(mode, enabled) {
@@ -392,27 +387,24 @@ class ListForm extends Form {
 					listids = listids.without(mode);
 					if (enabled)
 						listids.push(mode);
-					if (!enabled)
-						delete listids[mode];
 					$('{$listidsName}').setValue(listids.toJSON());
 				}
 				
 				function listform_show_validation_message() {
+					// This TD gets placed in either $('listsTableFootTR') or ruleWidget.rulesTableLastTR, depending on the current mode.
 					var td = '<td id=\"listChoose_listids_fieldarea\" colspan=100><img id=\"listChoose_listids_icon\"/><span id=\"listChoose_listids_msg\"></span></td>';
-					
+					var status = 'warn'; // Default status
 					$('listsTableFootTR').update();
 					document.formvars['{$this->name}'].ruleWidget.rulesTableLastTR.update();
 					if ($('allListsWindow').visible()) {
 						$('listsTableFootTR').update(td);
-						status = $('listsTableBody').down('tr') ? 'success' : 'warn';
-					} else if ($('buildListWindow').visible()) {
+						if ($('listsTableBody').down('tr')) // Success if there is at least one list in the table.
+							status =  'success';
+					} else { // Assumes $('buildListWindow').visible()
 						document.formvars['{$this->name}'].ruleWidget.rulesTableLastTR.update(td);
-						if (document.formvars['{$this->name}'].ruleWidget.rulesTableBody.select('tr').length > 1)
+						if (document.formvars['{$this->name}'].ruleWidget.rulesTableBody.select('tr').length > 1) // Success if there's at least one rule in the table, not counting rulesTableLastTR.
 							status = 'success';
-						else
-							status = 'warn';
-					} else
-						return;
+					}
 
 					switch (status) {
 						case 'success':
@@ -430,7 +422,7 @@ class ListForm extends Form {
 							$('listChoose_listids_icon').src = 'img/icons/error.gif';
 							if ($('allListsWindow').visible())
 								$('listChoose_listids_msg').update('".addslashes(_L('The lists you add will appear in this table'))."');
-							else if ($('buildListWindow').visible())
+							else // Assumes $('buildListWindow').visible()
 								$('listChoose_listids_msg').update('".addslashes(_L('Rules will appear in this table'))."');
 					}
 				}
@@ -636,7 +628,7 @@ class ListForm extends Form {
 					});
 				}
 				
-				// Initiatiate Javascript.
+				// Initiatiate Page.
 				listform_load();
 				$('pageLoadingWindow').show();
 				$('allListsWindow').hide();
