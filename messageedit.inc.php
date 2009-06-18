@@ -547,9 +547,6 @@ switch($MESSAGETYPE)
 					<td>
 						<? NewFormItem($form, $section,"body","textarea",60,NULL,'id="bodytext" onkeydown="limit_chars(this);" onkeyup="limit_chars(this);"'); ?>
 					</td>
-					<?
-					/* TODO: Add message inserts later when supported, jjl */
-					?>
 				</tr>
 			</table>
 			<script>
