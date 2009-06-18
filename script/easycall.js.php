@@ -11,9 +11,11 @@ header("Cache-Control: private");
 var Easycall = Class.create({
 
 	// Initialize with empty specialtask id
-	initialize: function(formname,reqlang,origin) {
+	initialize: function(formname,reqlang,origin,minlength,maxlength) {
 		this.specialtask = null;
 		this.origin = origin;
+		this.minlength = minlength;
+		this.maxlength = maxlength;
 		this.language = "";
 		this.messageid = "";
 		this.phone = "";
@@ -94,50 +96,54 @@ var Easycall = Class.create({
 	
 	// update page based on how the task ended
 	handleEnd: function(error) {
-		if (this.pe)
-			this.pe.stop();
-		this.updateMessage();
+		if (this.pe) this.pe.stop();
 		switch(error) {
 			case "done":
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" /><?=addslashes(_L("Completed!"))?>";
-				$(this.formname+this.language+"_img").src = this.playimg;
 				break;
 			
 			case "callended":
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Call ended early."))?>";
-				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
 			
 			case "badphone":
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Missing or invalid phone."))?>";
-				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
-
+			
 			case "badlanguage":
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Missing or invalid language."))?>";
-				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
-				
+			
 			case "notask":
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("Status unavailable. Please try again."))?>";
-				$(this.formname+this.language+"_img").src = this.exclamationimg;
 				break;
-				
+			
 			default:
 				$(this.formname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("There was an error! Please try again."))?>";
-				$(this.formname+this.language+"_img").src = this.exclamationimg;
 		}
-		if (this.language !== this.required)
-			$(this.formname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.required).del(this.language)}.bind(this));
 		
+		if ($(this.formname+this.language+"_row") !== null) {
+			this.updateMessage();
+			if (this.language !== this.required)
+				$(this.formname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.required).del(this.language)}.bind(this));
+		}
 		$(this.formname+"recordbutton").show();
 	},
 	
 	add: function () {
 		this.language = $(this.formname+"select").value;
 		this.phone = $(this.formname+"phone").value;
-		if (!this.phone || !this.language)
+		
+		var validcheck = this.valPhone(this.phone,this.minlength,this.maxlength);
+		if (validcheck !== true) {
+			this.handleEnd(validcheck);
 			return false;
+		}
+		
+		if (!this.language) {
+			this.handleEnd("badlanguage");
+			return false;
+		}
 		
 		var messages = $(this.formname).value.evalJSON();
 		
@@ -198,5 +204,56 @@ var Easycall = Class.create({
 		} else {
 			$(this.formname+this.language+"_remove").update("<img src=\""+this.alertimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; float: left; margin-right: 5px\"><?=addslashes(_L("Required"))?></div>");
 		}
+	},
+	
+	valPhone: function (pnumber,minlength,maxlength) {
+		var phone = pnumber.replace(/[^0-9]/g,"");
+		if (minlength == maxlength && maxlength == 10 && phone.length == 10) {
+			var areacode = phone.substring(0, 3);
+			var prefix = phone.substring(3, 6);
+	
+			// based on North American Numbering Plan
+			// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
+
+			if ((phone.charAt(0) == "0" || phone.charAt(0) == "1") || // areacode cannot start with 0 or 1
+				(phone.charAt(3) == "0" || phone.charAt(3) == "1") || // prefix cannot start with 0 or 1
+				(phone.charAt(1) == "1" && phone.charAt(2) == "1") || // areacode cannot be N11
+				(phone.charAt(4) == "1" && phone.charAt(5) == "1") || // prefix cannot be N11
+				("555" == areacode) || // areacode cannot be 555
+				("555" == prefix)    // prefix cannot be 555
+				) {
+				// check special case N11 prefix with toll-free area codes
+				// en.wikipedia.org/wiki/Toll-free_telephone_number
+				if ((phone.charAt(4) == "1" && phone.charAt(5) == "1") && (
+					("800" == areacode) ||
+					("888" == areacode) ||
+					("877" == areacode) ||
+					("866" == areacode) ||
+					("855" == areacode) ||
+					("844" == areacode) ||
+					("833" == areacode) ||
+					("822" == areacode) ||
+					("880" == areacode) ||
+					("881" == areacode) ||
+					("882" == areacode) ||
+					("883" == areacode) ||
+					("884" == areacode) ||
+					("885" == areacode) ||
+					("886" == areacode) ||
+					("887" == areacode) ||
+					("888" == areacode) ||
+					("889" == areacode)
+					)) {
+					return true; // OK special case
+				}
+				return "badphone";
+			}
+			return true;
+		} else if (phone.length < minlength) {
+			return "badphone";
+		} else if (phone.length > maxlength) {
+			return "badphone";
+		}
+		return true
 	}
 });

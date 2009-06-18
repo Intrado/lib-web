@@ -11,10 +11,12 @@ header("Cache-Control: private");
 var CallMe = Class.create({
 
 	// Initialize with empty specialtask id
-	initialize: function(formname,origin,name) {
+	initialize: function(formname,origin,name,minlength,maxlength) {
 		this.specialtask = null;
 		this.origin = origin;
 		this.itemname = name;
+		this.minlength = minlength;
+		this.maxlength = maxlength;
 		this.phone = "";
 		this.formname = formname;
 		this.pe = null;
@@ -27,6 +29,11 @@ var CallMe = Class.create({
 	// Starts a callme session
 	start: function () {
 		this.phone = $(this.itemname+"phone").value;
+		var validcheck = this.valPhone(this.phone,this.minlength,this.maxlength);
+		if (validcheck !== true) {
+			this.handleEnd(validcheck);
+			return;
+		}
 		$(this.itemname+"recordbutton").hide();
 		$(this.itemname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" /><?=addslashes(_L("Starting session. Please wait."))?>";
 		new Ajax.Request('ajaxeasycall.php', {
@@ -82,6 +89,7 @@ var CallMe = Class.create({
 	handleEnd: function(error) {
 		if (this.pe)
 			this.pe.stop();
+		form_do_validation($(this.formname), $(this.itemname))
 		switch(error) {
 			case "done":
 				$(this.itemname+"progress").innerHTML = "<img src=\""+this.acceptedimg+"\" /><?=addslashes(_L("Completed!"))?>";
@@ -103,5 +111,56 @@ var CallMe = Class.create({
 				$(this.itemname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("There was an error! Please try again."))?>";
 		}
 		$(this.itemname+"recordbutton").show();
+	},
+	
+	valPhone: function (pnumber,minlength,maxlength) {
+		var phone = pnumber.replace(/[^0-9]/g,"");
+		if (minlength == maxlength && maxlength == 10 && phone.length == 10) {
+			var areacode = phone.substring(0, 3);
+			var prefix = phone.substring(3, 6);
+	
+			// based on North American Numbering Plan
+			// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
+
+			if ((phone.charAt(0) == "0" || phone.charAt(0) == "1") || // areacode cannot start with 0 or 1
+				(phone.charAt(3) == "0" || phone.charAt(3) == "1") || // prefix cannot start with 0 or 1
+				(phone.charAt(1) == "1" && phone.charAt(2) == "1") || // areacode cannot be N11
+				(phone.charAt(4) == "1" && phone.charAt(5) == "1") || // prefix cannot be N11
+				("555" == areacode) || // areacode cannot be 555
+				("555" == prefix)    // prefix cannot be 555
+				) {
+				// check special case N11 prefix with toll-free area codes
+				// en.wikipedia.org/wiki/Toll-free_telephone_number
+				if ((phone.charAt(4) == "1" && phone.charAt(5) == "1") && (
+					("800" == areacode) ||
+					("888" == areacode) ||
+					("877" == areacode) ||
+					("866" == areacode) ||
+					("855" == areacode) ||
+					("844" == areacode) ||
+					("833" == areacode) ||
+					("822" == areacode) ||
+					("880" == areacode) ||
+					("881" == areacode) ||
+					("882" == areacode) ||
+					("883" == areacode) ||
+					("884" == areacode) ||
+					("885" == areacode) ||
+					("886" == areacode) ||
+					("887" == areacode) ||
+					("888" == areacode) ||
+					("889" == areacode)
+					)) {
+					return true; // OK special case
+				}
+				return "badphone";
+			}
+			return true;
+		} else if (phone.length < minlength) {
+			return "badphone";
+		} else if (phone.length > maxlength) {
+			return "badphone";
+		}
+		return true
 	}
 });
