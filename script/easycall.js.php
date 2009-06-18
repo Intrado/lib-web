@@ -11,8 +11,9 @@ header("Cache-Control: private");
 var Easycall = Class.create({
 
 	// Initialize with empty specialtask id
-	initialize: function(formname,reqlang) {
+	initialize: function(formname,reqlang,origin) {
 		this.specialtask = null;
+		this.origin = origin;
 		this.language = "";
 		this.messageid = "";
 		this.phone = "";
@@ -46,7 +47,7 @@ var Easycall = Class.create({
 			return;
 		new Ajax.Request('ajaxeasycall.php', {
 			method:'post',
-			parameters: {"phone": this.phone, "language": this.language},
+			parameters: {"phone": this.phone, "language": this.language, "origin": this.origin},
 			onSuccess: this.handleStart.bindAsEventListener(this),
 			onFailure: this.handleEnd.bindAsEventListener(this)
 		});
@@ -162,7 +163,7 @@ var Easycall = Class.create({
 		$(this.formname+language+"_row").remove();
 	},
 	
-	displayMessage: function() {		
+	displayMessage: function() {
 		var remove =new Element("div",{id: this.formname+this.language+"_remove", style: "float: left;"});
 		
 		var newtbody = new Element("tbody",{})
