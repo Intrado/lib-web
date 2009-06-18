@@ -16,21 +16,23 @@ global $USER;
 if (!$USER->authorize("starteasy"))
 	exit();
 
-function taskNew($phone,$language) {
+function taskNew($phone,$language,$name,$origin) {
 	if (!$phone)
 		return array("error"=>"badphone");
 	if (!$language)
 		return array("error"=>"badlanguage");
 	global $USER;
 	$task = new SpecialTask("new");
-	$task->status = "new";
+	$task->status = 'new';
 	$task->type = 'EasyCall';
-	$task->setData('phonenumber', dbsafe($phone));
+	$task->setData('phonenumber', $phone);
 	$task->lastcheckin = date("Y-m-d H:i:s");
 	$task->setData('progress', _L("Creating Call"));
 	$task->setData('callerid', getSystemSetting('callerid'));
-	$task->setData('name', "JobWizard-" . date("M j, Y g:i a"));
-	$task->setData('origin', "start");
+	if (!$name)
+		$name = "Easy Call - " . date("M j, Y g:i a");
+	$task->setData('name', $name);
+	$task->setData('origin', $origin);
 	$task->setData('userid', $USER->id);
 	$task->setData('listid', 0);
 	$task->setData('jobtypeid', 0);
@@ -39,7 +41,7 @@ function taskNew($phone,$language) {
 	$task->setData('currlang', $language);
 	$task->setData("language0", $language);
 	$task->setData('progress', _L("Creating Call"));
-	$task->status = "queued";
+	$task->status = 'queued';
 	$task->create();
 	QuickUpdate("call start_specialtask(" . $task->id . ")");
 	return array("id"=>$task->id);
@@ -81,6 +83,16 @@ if (isset($_POST['phone']) && isset($_POST['language'])) {
 	$phone = Phone::parse($_POST['phone']);
 }
 
+if (isset($_POST['name']))
+	$name = $_POST['name'];
+else
+	$name = "";
+
+if (isset($_POST['origin']))
+	$origin = $_POST['origin'];
+else
+	$origin = "ajaxeasycall";
+
 if (isset($_GET['id'])) {
 	$id = $_GET['id']+0;
 }
@@ -92,7 +104,7 @@ if (isset($_GET['id'])) {
 
 header("Content-Type: application/json");
 if ($id === "new")
-	echo json_encode(taskNew($phone,$language));
+	echo json_encode(taskNew($phone,$language,$name,$origin));
 else
 	echo json_encode(taskStatus($id));
 exit();
