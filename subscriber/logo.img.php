@@ -30,7 +30,7 @@ if (count($row) > 0) {
 	$contenttype = $row[0];
 	$ext = substr($contenttype, strpos($contenttype, "/")+1);
 } else {
-	$data = file_get_contents("../img/logo_small.gif"); // TODO why need the ../ should symlink be set?
+	$data = file_get_contents("../img/logo_small.gif"); // TODO why need the ../ should symlink be set? - no, it is not a symlink, it's an apache alaismatch which only transforms http requests, not local file reads
 	$contenttype = "image/gif";
 	$ext = ".gif";
 }

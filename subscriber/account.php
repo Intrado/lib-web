@@ -190,9 +190,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		QuickUpdate("delete from groupdata where personid=".$person->id);
 		
 		// add all static text fields to this person
-		$staticList = QuickQueryList("select fieldnum from fieldmap where options like '%text%subscribe%static%'");
+		$staticList = QuickQueryList("select fieldnum from fieldmap where options like '%text%subscribe%static%'"); //TODO FIXME this breaks if the order of the options changes. 
 		foreach ($staticList as $fieldnum) {
-			// TODO move query out of loop? not really worried since they likely will have zero or one, but potential for 17
 			$value = QuickQuery("select value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1");
 			if ($value) {
 				$person->$fieldnum = $value;
