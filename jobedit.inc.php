@@ -1192,8 +1192,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.hide('phonecreatemessage');Element.show('phoneselectmessage'); Element.show('phonemultilingualoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('phone',false);automatictranslation('phone');":"") . "Element.show('phonecreatemessage');Element.hide('phoneselectmessage');Element.hide('phonemultilingualoption'); }\""));	?> Create a text-to-speech message
+<?					NewFormItem($f, $s, "phoneradio", "radio", NULL, "select","id='phoneselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.hide('phonecreatemessage');Element.show('phoneselectmessage'); if ($('phonemultilingualoption')) Element.show('phonemultilingualoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "phoneradio", "radio", NULL, "create","id='phonecreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('phone',false);automatictranslation('phone');":"") . "Element.show('phonecreatemessage');Element.hide('phoneselectmessage'); if ($('phonemultilingualoption')) Element.hide('phonemultilingualoption'); }\""));	?> Create a text-to-speech message
 				<div id='phoneselectmessage' style="display: block">
 <?					message_select('phone',$f, $s,"phonemessageid", "id='phonemessageid'");?>
 				</div>
@@ -1391,8 +1391,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
 				<td style="white-space:nowrap;">
-<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.hide('emailcreatemessage');Element.show('emailselectmessage'); Element.show('emailmultilingualoption');}\"")); ?> Select a message&nbsp;
-<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('email',false);automatictranslation('email');":"") . "Element.show('emailcreatemessage');Element.hide('emailselectmessage');Element.hide('emailmultilingualoption'); }\""));	?> Create a message
+<?					NewFormItem($f, $s, "emailradio", "radio", NULL, "select","id='emailselect' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {Element.hide('emailcreatemessage');Element.show('emailselectmessage'); if ($('emailmultilingualoption')) Element.show('emailmultilingualoption');}\"")); ?> Select a message&nbsp;
+<? 					NewFormItem($f, $s, "emailradio", "radio", NULL, "create","id='emailcreate' " . ($submittedmode ? "DISABLED" : " onclick=\"if(this.checked == true) {" . (($allowAutoTranslate)?"toggletranslations('email',false);automatictranslation('email');":"") . "Element.show('emailcreatemessage');Element.hide('emailselectmessage'); if ($('emailmultilingualoption')) Element.hide('emailmultilingualoption'); }\""));	?> Create a message
 				<div id='emailselectmessage' style="display: block">
 <?					message_select('email',$f, $s,"emailmessageid", "id='emailmessageid'");?>
 				</div>
@@ -1882,15 +1882,19 @@ function previewlanguage(language,female,male) {
 
 //Loading Message View
 var types=Array('phone','email','sms');
-for(var i=0;i<3;i++){
+for(var i=0;i<types.length;i++){
+	if (!$(types[i] + 'select'))
+		continue;
 	if(isCheckboxChecked(types[i] + 'select')) {
 		Element.hide(types[i] + 'createmessage');
 		Element.show(types[i] + 'selectmessage');
-		Element.show(types[i] + 'multilingualoption');
+		if ($(types[i] + 'multilingualoption'))
+			Element.show(types[i] + 'multilingualoption');
 	} else {
 		Element.show(types[i] + 'createmessage');
 		Element.hide(types[i] + 'selectmessage');
-		Element.hide(types[i] + 'multilingualoption');
+		if ($(types[i] + 'multilingualoption'))
+			Element.hide(types[i] + 'multilingualoption');
 	}
 }
 
