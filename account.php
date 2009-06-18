@@ -450,8 +450,6 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 </script>
 <?
 
-?><script src="script/picker.js"></script><?
-
 /*CSDELETEMARKER_START*/
 if($USER->authorize('loginphone') && !$IS_COMMSUITE) {
 	$tollfree = Phone::format(getSystemSetting("inboundnumber"));
