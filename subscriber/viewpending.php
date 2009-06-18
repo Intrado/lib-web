@@ -14,15 +14,14 @@ require_once("subscriberutils.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
-	$temp = $_GET['id'];
-	$id = substr($temp, 7);
-	$pending = new SubscriberPending($id);
+	$id = $_GET['id'] +0;
+	$pending = DBFind("SubscriberPending", "from subscriberpending where id=?", false, array($id));
 }
 
-// TODO what if id is bad?
-
-
-
+if (!isset($pending) || !$pending) {
+	error_log("viewpending with bad id, redirect to notificationprefs");
+	redirect("notificationpreferences.php");
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display

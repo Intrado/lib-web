@@ -12,7 +12,8 @@ $STATUS_ACTIVE = "ACTIVE";
 $STATUS_PENDING = "PENDING";
 
 class Destination {
-	var $id;
+	var $id; // sequence for phone, email, sms ------ subscriberpending id
+	var $tablename;
 	var $name;
 	var $type; // phone, email, sms
 	var $status; // active or pending
@@ -25,17 +26,16 @@ class Destination {
 
 $pid = $_SESSION['personid'];
 
-if (isset($_GET['delete'])) {
-	$id = $_GET['delete'];
-	$temp = substr($id, 0, 7);
-	if ($temp == 'pending') {
-		$temp = substr($id, 7);
-		QuickUpdate("delete from subscriberpending where id=?", false, array($temp));
-	} else {
-		$sequence = substr($id, strlen($id)-1);
-		$type = substr($id, 0, strlen($id)-1);
-	 
-		QuickUpdate("update ".$type." set ".$type."='' where personid=? and sequence=?", false, array($pid, $sequence));
+if (isset($_GET['delete']) && isset($_GET['tbl'])) {
+	$seq = $_GET['delete'] +0;
+	$tablename = $_GET['tbl'];
+	if ($tablename == 'subscriberpending') {
+		QuickUpdate("delete from subscriberpending where id=?", false, array($seq));
+	} else if ($tablename == 'phone' ||
+		$tablename == 'email' ||
+		$tablename == 'sms') {
+	 	$query = "update ".$tablename." set ".$tablename."='' where personid=? and sequence=?";
+		QuickUpdate($query, false, array($pid, $seq));
 	}
 	redirect();
 }
@@ -53,7 +53,8 @@ $destinations = array();
 foreach ($emailList as $email) {
 	if ($email->email == '') continue;
 	$dest = new Destination();
-	$dest->id = 'email'.$email->sequence;
+	$dest->id = $email->sequence;
+	$dest->tablename = "email";
 	$dest->name = $email->email;
 	$dest->type = _L("Email");
 	$dest->status = $STATUS_ACTIVE;
@@ -66,7 +67,8 @@ foreach ($emailList as $email) {
 foreach ($phoneList as $phone) {
 	if ($phone->phone == '') continue;
 	$dest = new Destination();
-	$dest->id = 'phone'.$phone->sequence;
+	$dest->id = $phone->sequence;
+	$dest->tablename = "phone";
 	$dest->name = Phone::format($phone->phone);
 	$dest->type = _L("Phone");
 	$dest->status = $STATUS_ACTIVE;
@@ -76,7 +78,8 @@ foreach ($phoneList as $phone) {
 foreach ($smsList as $sms) {
 	if ($sms->sms == '') continue;
 	$dest = new Destination();
-	$dest->id = 'sms'.$sms->sequence;
+	$dest->id = $sms->sequence;
+	$dest->tablename = "sms";
 	$dest->name = Phone::format($sms->sms);
 	$dest->type = _L("Text");
 	$dest->status = $STATUS_ACTIVE;
@@ -85,7 +88,8 @@ foreach ($smsList as $sms) {
 }
 foreach ($pendingList as $p) {
 	$dest = new Destination();
-	$dest->id = 'pending'.$p->id;
+	$dest->id = $p->id;
+	$dest->tablename = "subscriberpending";
 	if ($p->type == 'phone') {
 		$dest->name = Phone::format($p->value);
 		$dest->type = _L("Phone");
@@ -129,7 +133,7 @@ function fmt_actions ($obj, $name) {
 	if ($obj->nodelete)
 		return _L("Account Email cannot be removed");
 	
-	$action_links = action_link(_L("Delete"), "cross", "notificationpreferences?delete=$obj->id", "return confirmDelete();");
+	$action_links = action_link(_L("Delete"), "cross", "notificationpreferences.php?delete=$obj->id&tbl=$obj->tablename", "return confirmDelete();");
 	if ($obj->status == $STATUS_PENDING)
 		$action_links .= '&nbsp|&nbsp' . action_link(_L("Activation Info"), "pencil", "viewpending.php?id=$obj->id");		
 	return $action_links;
@@ -147,7 +151,8 @@ foreach ($jobtypes as $jt) {
 	$jtvalues[$jt->id] = $jt->name . " (" . $jt->info . ")";
 }
 
-// TODO what if email sequence0 is deleted? could have set up account, added email, changed account to use email1 then removed e0
+// NOTE: what if email sequence0 is deleted? could have set up account, added email, changed account to use email1 then removed e0
+// OK because e0 is never deleted, it is only set to empty email field
 $values = QuickQueryList("select jobtypeid from contactpref where personid=? and type='email' and sequence=0 and enabled=1", false, false, array($pid));
 
 $formdata["jobtypes"] = array(
@@ -196,6 +201,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$values[] = "(" . $pid . "," . $jtid . ",'phone'," . $phone->sequence . ", 1)";
 			}
 		}
+		// TODO be sure emaillist has e0 on it...
 		foreach ($emailList as $email) {
 			// email sequence 0 is special case, must always set because we read from it to load initial values
 			if ($email->sequence != 0 && $email->email == '') continue;
@@ -215,7 +221,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$values[] = "(" . $pid . "," . $jtid . ",'sms'," . $sms->sequence . ", 1)";
 			}	
 		}
-// TODO may need to insert enabled=0 contactpref for those unselected jobtypes, or uses admin default jobtypepref
+// TODO need to insert enabled=0 contactpref for those unselected jobtypes, or uses admin default jobtypepref
 		QuickUpdate("Begin");
 		QuickUpdate("delete from contactpref where personid=?", false, array($pid));
 		if (count($values))
