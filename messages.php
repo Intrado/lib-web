@@ -143,7 +143,7 @@ if($USER->authorize('sendphone')) {
 	startWindow('My Phone Messages ' . help('Messages_MyPhoneMessages'), 'padding: 3px;', true, true);
 
 	if ($USER->authorize('starteasy')) {
-		button_bar(button('Call Me To Record', "popup('callme.php?origin=message&id=new',500,450);") . help('AudioFileEditor_CallMeToRecord'),
+		button_bar(button('Call Me To Record', "document.location='callme.php?origin=messages'") . help('AudioFileEditor_CallMeToRecord'),
 			button('Create Advanced Message', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
 			button('Audio Library', "popup('audio.php',500,400);") . help('Messages_AudioFileEditor'));
 	} else {
