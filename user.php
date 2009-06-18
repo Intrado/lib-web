@@ -95,10 +95,8 @@ if($_SESSION['userid']=== NULL){
 
 if(isset($_GET['deleterule'])) {
 	$deleterule = DBSafe($_GET['deleterule']);
-	if (customerOwns("user",$_SESSION['userid'])) {
-		$query = "delete from userrule where userid = " . $_SESSION['userid'] . " and ruleid = '$deleterule'";
-		QuickUpdate($query);
-	}
+	$query = "delete from userrule where userid = " . $_SESSION['userid'] . " and ruleid = '$deleterule'";
+	QuickUpdate($query);
 
 	redirect();
 }

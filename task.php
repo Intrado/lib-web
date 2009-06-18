@@ -28,10 +28,8 @@ if (!$USER->authorize('managetasks')) {
 
 if (isset($_GET['run'])) {
 	$run = $_GET['run'] + 0;
-	if(customerOwns("import",$run)) {
-		$import = new Import($run);
-		$import->runNow();
-	}
+	$import = new Import($run);
+	$import->runNow();
 	redirectToReferrer();
 }
 

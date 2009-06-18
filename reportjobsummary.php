@@ -88,7 +88,7 @@ if(isset($_GET['reportid'])){
 	}
 	if(isset($jobid)){
 
-		//check userowns or customerowns and viewsystemreports
+		//check userowns and viewsystemreports
 		if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports'))) {
 			redirect('unauthorized.php');
 		}

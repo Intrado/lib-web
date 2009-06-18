@@ -26,14 +26,12 @@ if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
 	if ($_SESSION['accessid'] == $deleteid)
 		$_SESSION['accessid'] = NULL;
-	if (customerOwns("access",$deleteid)) {
-		$count = QuickQuery("select count(*) from user where accessid='$deleteid' and deleted=0");
-		if ($count == 0) {
-			QuickUpdate("delete from access where id='$deleteid'");
-			QuickUpdate("delete from permission where accessid='$deleteid'");
-		} else {
-			error("This access profile is being used by $count user account(s). Please reassign users to a different profile and try agian");
-		}
+	$count = QuickQuery("select count(*) from user where accessid='$deleteid' and deleted=0");
+	if ($count == 0) {
+		QuickUpdate("delete from access where id='$deleteid'");
+		QuickUpdate("delete from permission where accessid='$deleteid'");
+	} else {
+		error("This access profile is being used by $count user account(s). Please reassign users to a different profile and try agian");
 	}
 }
 

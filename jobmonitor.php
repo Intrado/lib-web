@@ -22,7 +22,7 @@ if (!$USER->authorize("sendphone")) {
 */
 
 $jobid = DBSafe($_GET['jobid']);
-if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
+if (!userOwns("job",$jobid) && !$USER->authorize('viewsystemreports')) {
 	redirect("unauthorized.php");
 }
 

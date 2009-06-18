@@ -29,11 +29,9 @@ if (!$USER->authorize('managetasks')) {
 
 if (isset($_GET['id'])) {
 	$id = $_GET['id'] + 0;
-	if (customerOwns("import",$id)) {
-		$_SESSION['importid'] = $id;
-		$_SESSION['importcols'] = NULL;
-		$_SESSION['importviewrows'] = 10;
-	}
+	$_SESSION['importid'] = $id;
+	$_SESSION['importcols'] = NULL;
+	$_SESSION['importviewrows'] = 10;
 	redirect();
 }
 

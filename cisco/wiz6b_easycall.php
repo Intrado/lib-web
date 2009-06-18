@@ -14,7 +14,6 @@ if (!$USER->authorize('sendphone')) {
 if (isset($_GET['dn'])) {
 
 	if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
-			customerOwns("jobtype",DBSafe($_SESSION['newjob']['jobtypeid'])) &&
 			($_SESSION['newjob']['message'] == "callme"))) {
 		exit();
 	}

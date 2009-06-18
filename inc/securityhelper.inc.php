@@ -25,17 +25,6 @@ function userOwns ($type,$id) {
 			return false;
 	}
 }
-//jjl
-function customerOwns($type, $id) {
-	return true; //TODO remove references
-}
-
-/*
-	Function to see if a job is owned by a user with the same customerid as the job owner.
-*/
-function customerOwnsJob($jobid) {
-	return QuickQuery("select count(*) from job, user where job.id = ? and user.id = job.userid", false, array($jobid));
-}
 
 function setIfOwnsOrNew ($id,$name, $type, $checkcustomer = false) {
 	if ($id == "new") {

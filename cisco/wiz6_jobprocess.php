@@ -30,8 +30,7 @@ function getSetting($name) {
 
 
 if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
-		userOwns("message",DBSafe($_SESSION['newjob']['message'])) &&
-		customerOwns("jobtype",DBSafe($_SESSION['newjob']['jobtypeid'])))) {
+		userOwns("message",DBSafe($_SESSION['newjob']['message'])) )) {
 	exit();
 }
 

@@ -12,8 +12,8 @@ include ("jpgraph/jpgraph_canvas.php");
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 $jobid = $_GET['jobid'] + 0;
-//check userowns or customerowns and viewsystemreports
-if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
+//check userowns and viewsystemreports
+if (!userOwns("job",$jobid) && !$USER->authorize('viewsystemreports')) {
 	redirect('unauthorized.php');
 }
 

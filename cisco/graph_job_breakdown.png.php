@@ -11,7 +11,7 @@ include ("../jpgraph/jpgraph_canvas.php");
 
 $jobid = $_GET['jobid'];
 
-if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports') && customerOwns("job",$jobid))) {
+if (!userOwns("job",$jobid) && !$USER->authorize('viewsystemreports')) {
 	header("Content-type: image/gif");
 	readfile("img/icon_logout.gif");
 	exit();

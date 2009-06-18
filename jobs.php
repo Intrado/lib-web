@@ -32,7 +32,7 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 
 if (isset($_GET['cancel'])) {
 	$cancelid = DBSafe($_GET['cancel']);
-	if (userOwns("job",$cancelid) || (customerOwnsJob($cancelid) && $USER->authorize('managesystemjobs'))) {
+	if (userOwns("job",$cancelid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($cancelid);
 		$job->cancelleduserid = $USER->id;
 
@@ -51,7 +51,7 @@ if (isset($_GET['cancel'])) {
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-	if (userOwns("job",$deleteid) || (customerOwnsJob($deleteid) && $USER->authorize('managesystemjobs'))) {
+	if (userOwns("job",$deleteid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($deleteid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 1;
@@ -74,7 +74,7 @@ if (isset($_GET['delete'])) {
 
 if (isset($_GET['archive'])) {
 	$archiveid = DBSafe($_GET['archive']);
-	if (userOwns("job",$archiveid) || (customerOwnsJob($archiveid) && $USER->authorize('managesystemjobs'))) {
+	if (userOwns("job",$archiveid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($archiveid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 2;
@@ -86,7 +86,7 @@ if (isset($_GET['archive'])) {
 
 if (isset($_GET['unarchive'])) {
 	$unarchiveid = DBSafe($_GET['unarchive']);
-	if (userOwns("job",$unarchiveid) || (customerOwnsJob($unarchiveid) && $USER->authorize('managesystemjobs'))) {
+	if (userOwns("job",$unarchiveid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($unarchiveid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 0;
@@ -98,7 +98,7 @@ if (isset($_GET['unarchive'])) {
 
 if (isset($_GET['runrepeating'])) {
 	$runnow = $_GET['runrepeating'] + 0;
-	if (userOwns("job",$runnow) || (customerOwnsJob($runnow) && $USER->authorize('managesystemjobs'))) {
+	if (userOwns("job",$runnow) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($runnow);
 		$job->runNow();
 	}
@@ -107,7 +107,7 @@ if (isset($_GET['runrepeating'])) {
 
 if (isset($_GET['copy'])) {
 	$copyid = DBSafe($_GET['copy']);
-	if (userOwns("job",$copyid) || (customerOwnsJob($copyid) && $USER->authorize('managesystemjobs'))) {
+	if (userOwns("job",$copyid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($copyid);
 		$newjob = $job->copyNew();
 		redirect('job.php?id='.$newjob->id);

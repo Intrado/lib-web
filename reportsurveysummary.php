@@ -87,7 +87,7 @@ if(isset($_GET['reportid'])){
 	$options['reporttype'] = "surveyreport";
 	if($jobid){
 
-		//check userowns or customerowns and viewsystemreports
+		//check userowns and viewsystemreports
 		if (!userOwns("job",$jobid) && !($USER->authorize('viewsystemreports'))) {
 			redirect('unauthorized.php');
 		}
