@@ -30,7 +30,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		if($result['result'] == ""){
 			$success = true;
 		} else {
-			if($result['result'] == "invalid argument"){
+			if ($result['result'] == "invalid argument") {
 				$success = true;
 			} else {
 				$generalerror = true;
@@ -41,11 +41,11 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
 $TITLE = _L("Password Assistance");
 require_once("logintop.inc.php");
-if($generalerror){
+if ($generalerror) {
 	error(_L("There was a problem with your request.  Please try again later"));
 }
 
-if(!$success){
+if (!$success) {
 ?>
 <form method="POST" action="forgotpassword.php<?echo $appendcustomerurl;?>" name="forgotpassword">
 	<table width="100%" style="color: #<?=$primary?>;" >
