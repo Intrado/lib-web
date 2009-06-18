@@ -11,24 +11,24 @@ class SelectMessage extends FormItem {
 			$checked = $value == $selectid;
 			$str .= '<option value="'.escapehtml($selectid).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectvals['name']).'</option>';
 		}
-		$str .= '</select>';
-		$str .= '<table id="'.$n.'details" class="msgdetails" width="'.$this->args['width'].'">';
-		$str .= '<tr><td class="msglabel">'._L("Last Used").':</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>';
-		$str .= '<tr><td class="msglabel">'._L("Description").':</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
+		$str .= '</select>
+		<table id="'.$n.'details" class="msgdetails" width="'.$this->args['width'].'">
+		<tr><td class="msglabel">'._L("Last Used").':</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>
+		<tr><td class="msglabel">'._L("Description").':</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
 		if ($this->args['type'] == 'email') {
-			$str .= '<tr><td class="msglabel">'._L("From").':</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">'._L("Subject").':</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>';
-			$str .= '<tr><td class="msglabel">'._L("Attachmen").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
+			$str .= '<tr><td class="msglabel">'._L("From").':</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>
+			<tr><td class="msglabel">'._L("Subject").':</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>
+			<tr><td class="msglabel">'._L("Attachmen").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
 		}
 		if ($this->args['type'] == 'phone') {
 			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
 		}
-		$str .= '<tr><td class="msglabel">'._L("Body").':</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>';
-		$str .= '</table>';
-		$str .= '<script type="text/javascript" src="script/messageselect.js"></script>
-				<script type="text/javascript">
-				var '.$n.'messageselect = new MessageSelect("'.$n.'","'.$this->args['type'].'");
-				</script>';
+		$str .= '<tr><td class="msglabel">'._L("Body").':</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>
+		</table>
+		<script type="text/javascript" src="script/messageselect.js"></script>
+			<script type="text/javascript">
+			var '.$n.'messageselect = new MessageSelect("'.$n.'","'.$this->args['type'].'");
+		</script>';
 		return $str;
 	}
 }
@@ -45,8 +45,8 @@ class TextAreaPhone extends FormItem {
 						popup(\'previewmessage.php?text=\' + encodedtext + \'&language='.urlencode($this->args['language']).'&gender='.urlencode($this->args['voice']).'\', 400, 400);
 					}
 				}
-				</script>';
-		$str .= '<textarea id="'.$n.'" style="width:'.$this->args['width'].'" name="'.$n.'" '.$rows.'/>'.escapehtml($value).'</textarea>';
+				</script>
+		<textarea id="'.$n.'" style="width:'.$this->args['width'].'" name="'.$n.'" '.$rows.'/>'.escapehtml($value).'</textarea>';
 		$str .= icon_button(_L("Play"),"play",$n."Play();");
 		return $str;
 	}
@@ -63,9 +63,9 @@ class CallMe extends FormItem {
 		if (!$value)
 			$value = '{"'.$language[0].'": ""}';
 		// Hidden input item to store values in
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
-		$str .= '<table class="msgdetails" width="80%">';
-		$str .= '<tr><td class="msglabel">'._L("Language").':</td><td>';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
+		<table class="msgdetails" width="80%">
+		<tr><td class="msglabel">'._L("Language").':</td><td>';
 		if (count($language) <= 1) {
 			$str .= '<div id='.$n.'select style="background: white; border: 1px solid; padding: 2px; margin-right: 5px; margin-top: 2px;" value="'.$language[0].'">'.$language[0].'</div>';
 		} else {
@@ -74,19 +74,19 @@ class CallMe extends FormItem {
 				$str .= '<option id='.$n.'option_'.$langname.' value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
 			$str .= '</select>';
 		}
-		$str .= '</td></tr>';
-		$str .= '<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" />';
-		$str .= icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$n."','".$language[0]."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>';
-		$str .= '<tr><td class="msglabel">'._L("Messages").':</td>';
-		$str .= '<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">';
-		$str .= '<tr><th colspan=2 class="windowRowHeader">'._L("Message Language").'</th><th class="windowRowHeader" width="30%">'._L("Actions").'</th></tr>';
+		$str .= '</td></tr>
+		<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" />
+		'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$n."','".$language[0]."','jobwizard').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>
+		<tr><td class="msglabel">'._L("Messages").':</td>
+		<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">
+		<tr><th colspan=2 class="windowRowHeader">'._L("Message Language").'</th><th class="windowRowHeader" width="30%">'._L("Actions").'</th></tr>
 		
-		$str .= '</table></td></tr>';
-		$str .= '</table>';
+		</table></td></tr>
+		</table>';
 		// include the easycall javascript object and set up the localized version of the text it will use. then load existing values.
 		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
 				<script type="text/javascript">
-				new Easycall("'.$n.'","'.$language[0].'").load();
+					new Easycall("'.$n.'","'.$language[0].'","jobwizard").load();
 				</script>';
 		return $str;
 	}
