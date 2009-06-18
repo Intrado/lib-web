@@ -39,7 +39,7 @@ class CallMe extends FormItem {
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="" />
 			<table class="msgdetails" width="80%">
 			<tr><td><input style="float: left; margin-top: 3px" type="text" id="'.$n.'phone" value="'.$this->args['phone'].'" /></td></tr>
-			<tr><td>'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new CallMe('".$this->form->name."','".$this->args['origin']."','".$n."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px;" id='.$n.'progress /></td></tr>
+			<tr><td>'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new CallMe('".$this->form->name."','".$this->args['origin']."','".$n."','".$this->args['min']."','".$this->args['max']."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px;" id='.$n.'progress /></td></tr>
 			</table>
 			<script type="text/javascript" src="script/callme.js.php"></script>';
 		return $str;
@@ -49,32 +49,6 @@ class CallMe extends FormItem {
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Validators
 ////////////////////////////////////////////////////////////////////////////////
-class ValCallMePhone extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		global $USER;
-		if (!$USER->authorize("starteasy"))
-			return "$this->label is not allowed for this user account.";
-		$max = getSystemSetting('easycallmax',10);
-		$min = getSystemSetting('easycallmin',10);
-		$value = ereg_replace("[^0-9]*","",$value);
-		if (!ereg("^-?[0-9]*\.?[0-9]+$",$value))
-			return "$this->label must be a number";
-		if ($min == $max && $min == 10 && $err = Phone::validate($value)) {
-			$errmsg = "$this->label appears incorrect.  ";
-			foreach ($err as $e) {
-				$errmsg .= $e . " ";
-			}
-			return $errmsg;
-		}
-		if (strlen($value) < $min)
-			return "$this->label ". _L("cannot be less than %s digits", $min);
-		if (strlen($value) > $max)
-			return "$this->label ". _L("cannot be greater than %s digits", $max);
-		return true;
-	}
-}
-
 class ValCallMeMessage extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
@@ -105,7 +79,13 @@ $formdata = array(
 			array("ValCallMeMessage"),
 			array("ValRequired")
 		),
-		"control" => array("CallMe", "phone" => Phone::format($USER->phone), "origin" => $origin),
+		"control" => array(
+			"CallMe", 
+			"phone" => Phone::format($USER->phone), 
+			"origin" => $origin, 
+			"max" => getSystemSetting('easycallmax',10), 
+			"min" => getSystemSetting('easycallmin',10)
+		),
 		"helpstep" => 1
 	)
 );
