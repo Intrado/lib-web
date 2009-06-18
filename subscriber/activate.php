@@ -1,15 +1,10 @@
 <?
 $isNotLoggedIn = 1;
 require_once("common.inc.php");
+require_once("subscriberutils.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/FieldMap.obj.php");
-
-// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "";
-if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".urlencode($_GET['u']);
-}
 
 $token = "";
 if (isset($_GET['t'])) {
@@ -56,14 +51,16 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 				error($passworderror);
 			} else {
 				$result = subscriberActivateAccount($token, $password1);
-				if($result['result'] == ""){
+				if ($result['result'] == "") {
 					if (!$forgot && $result['functionCode'] != 'token_forgotpassword') {
 						error("An unknown error occurred");
 						$error = true;
 					} else {
 						$form = false;
 						$forgotsuccess = true;
-						doStartSession($result['userID']);
+						doStartSession();
+						$_SESSION['subscriberid'] = $result['userID'];
+						loadSubscriberDisplaySettings();
 					}
 				} else {
 					$error = true;
@@ -75,7 +72,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 	} else if (isset($_POST['password'])) {
 		$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 		$result = subscriberActivateAccount($token, $password);
-		if($result['result'] == ""){
+		if ($result['result'] == "") {
 			$form = false;
 			if ($result['functionCode'] == 'token_newsubscriber') {
 				$success = true;
@@ -88,7 +85,9 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 				$error = true;
 			}
 			if (!$error) {
-				doStartSession($result['userID']);
+				doStartSession();
+				$_SESSION['subscriberid'] = $result['userID'];
+				loadSubscriberDisplaySettings();
 			}
 		} else {
 			$error = true;
@@ -101,31 +100,19 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 
 if ($forgot) {
 	$TITLE = "Password Assistance";
-	if ($appendcustomerurl == "")
-		$action = "?f";
-	else
-		$action = $appendcustomerurl."&f";
+	$action = "?f";
 	$text = "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address";
 } else if ($changeuser) {
 	$TITLE = "Change Email";
-	if ($appendcustomerurl == "")
-		$action = "?c";
-	else
-		$action = $appendcustomerurl."&c";
+	$action = "?c";
 	$text = "your password";
 } else if ($addemail) {
 	$TITLE = "Add Email to Account";
-	if ($appendcustomerurl == "")
-		$action = "?a";
-	else
-		$action = $appendcustomerurl."&a";
+	$action = "?a";
 	$text = "your password";
 } else {
 	$TITLE = "Activate Account";
-	if ($appendcustomerurl == "")
-		$action = "?n";
-	else
-		$action = $appendcustomerurl."&n";
+	$action = "?n";
 	$text = "your password";
 }
 
@@ -143,33 +130,33 @@ if ($forgotsuccess) {
 	?>
 	<div style="margin:5px">
 		Thank you, your password has been reset.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
+		<br>You will be redirected to the main page in 10 seconds or <a href="start.php">Click Here.</a>
 	</div>
-	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
+	<meta http-equiv="refresh" content="10;url=start.php">
 	<?
 } else if ($success) {
 	?>
 	<div style="margin:5px">
 		Thank you, your account has been activated.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
+		<br>You will be redirected to the main page in 5 seconds or <a href="start.php">Click Here.</a>
 	</div>
-	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
+	<meta http-equiv="refresh" content="5;url=start.php">
 	<?
 } else if ($newusersuccess) {
 	?>
 	<div style="margin:5px">
 		Thank you, your email address has been changed.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
+		<br>You will be redirected to the main page in 10 seconds or <a href="start.php">Click Here.</a>
 	</div>
-	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
+	<meta http-equiv="refresh" content="10;url=start.php">
 	<?
 } else if ($addemailsuccess) {
 	?>
 	<div style="margin:5px">
 		Thank you, your email address has been added to your account.
-		<br>You will be redirected to the main page in 10 seconds or <a href="index.php<?echo $appendcustomerurl;?>">Click Here.</a>
+		<br>You will be redirected to the main page in 10 seconds or <a href="start.php">Click Here.</a>
 	</div>
-	<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl;?>">
+	<meta http-equiv="refresh" content="10;url=start.php">
 	<?
 }
 if ($forgotsuccess || $success || $newusersuccess || $addemailsuccess) {
@@ -196,7 +183,7 @@ if ($form) {
 				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="35" /></td>
 			</tr>
 <?
-		if($forgot){
+		if ($forgot) {
 ?>
 			<tr>
 				<td>New Password:</td>
@@ -226,11 +213,11 @@ if ($form) {
 <?
 		if ($error && $forgot){
 ?>
-			<div style="color: red;">That code is invalid or has expired.</div>
+			<div style="color: red;"><?=_L("That code is invalid or has expired.")?></div>
 <?
 		} else if ($error){
 ?>
-			<div style="color: red;">That code is invalid or has expired or that is an incorrect password.</div>
+			<div style="color: red;"><?=_L("That code is invalid or has expired or that is an incorrect password.")?></div>
 <?
 		} else {
 			echo "&nbsp;";
@@ -240,7 +227,7 @@ if ($form) {
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><a href="index.php<?echo $appendcustomerurl;?>">Return to Sign In</a></td>
+			<td><a href="index.php"><?=_L("Return to Sign In")?></a></td>
 		</tr>
 		</table>
 	</form>
