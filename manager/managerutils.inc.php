@@ -76,51 +76,35 @@ function createSMUserProfile($newdb) {
 function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sharddb) {
 	QuickUpdate("drop user '$limitedusername'", $sharddb);
 	QuickUpdate("create user '$limitedusername' identified by '$limitedpassword'", $sharddb);
+
+	$tables = array();
+	$tables['audiofile'] 	= "select";
+	$tables['contactpref'] 	= "select, insert, update, delete";
+	$tables['email'] 		= "select, update";
+	$tables['fieldmap'] 	= "select";
+	$tables['groupdata'] 	= "select, insert, update, delete";
+	$tables['job'] 			= "select";
+	$tables['jobsetting'] 	= "select";
+	$tables['jobtype'] 		= "select";
+	$tables['message'] 		= "select";
+	$tables['messageattachment'] = "select";
+	$tables['messagepart'] 	= "select";
+	$tables['persondatavalues'] = "select";
+	$tables['person'] 		= "select, update";
+	$tables['phone'] 		= "select, update";
+	$tables['reportperson'] = "select";
+	$tables['setting'] 		= "select";
+	$tables['sms'] 			= "select, update";
+	$tables['subscriber'] 	= "select, update";
+	$tables['subscriberpending'] = "select, delete";
+	$tables['ttsvoice'] 	= "select";
+	$tables['user'] 		= "select";
+			
+	foreach ($tables as $tablename => $privs) {
+		if (QuickUpdate("grant ".$privs." on $custdbname . ".$tablename." to '$limitedusername'", $sharddb) === false)
+			dieWithError("Failed to grant ".$tablename." on ".$custdbname, $sharddb);
 		
-	if (QuickUpdate("grant select, insert, update, delete on $custdbname . address to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant address on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . audiofile to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant audiofile on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, insert, update, delete  on $custdbname . contactpref to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant contactpref on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, insert, update, delete  on $custdbname . email to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant email on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . fieldmap to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant fieldmap on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, insert, update, delete on $custdbname . groupdata to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant groupdata on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . jobtype to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant jobtype on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . message to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant message on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . messageattachment to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant messageattachment on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . messagepart to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant messagepart on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, insert, update, delete on $custdbname . persondatavalues to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant persondatavalues on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, update on $custdbname . person to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant person on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, insert, update, delete on $custdbname . phone to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant phone on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . setting to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant setting on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, insert, update, delete on $custdbname . sms to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant sms on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, update on $custdbname . subscriber to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant subscriber on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select, delete on $custdbname . subscriberpending to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant subscriberpending on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . ttsvoice to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant ttsvoice on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . job to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant job on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . user to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant user on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . jobsetting to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant jobsetting on ".$custdbname, $sharddb);
-	if (QuickUpdate("grant select on $custdbname . reportperson to '$limitedusername'", $sharddb) === false)
-		dieWithError("Failed to grant reportperson on ".$custdbname, $sharddb);
+	}
 }
 
 function show_column_selector($tablename=null, $fields, $lockedFields=array()){
