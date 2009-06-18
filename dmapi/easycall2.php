@@ -28,6 +28,8 @@ if($REQUEST_TYPE == "new") {
 			$audio->name = $name;
 			$audio->contentid = $contentid;
 			$audio->recorddate = date("Y-m-d G:i:s");
+			if ($specialtask->getData("origin") === "jobwizard")
+				$audio->deleted = true;
 			$audio->update();
 
 			$BFXML_VARS['audiofileid'] = $audio->id;
@@ -35,14 +37,20 @@ if($REQUEST_TYPE == "new") {
 			$BFXML_VARS['recordaudio']=NULL;
 
 			$message = new Message();
-			$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
-			if(QuickQuery("Select count(*) from message where userid=$user->id and deleted = '0'
-							and name = '" . DBSafe($messagename) . "'"))
+			if ($specialtask->getData("origin") == "cisco") {
+				$messagename = $specialtask->getData('name') . " - " . $specialtask->getData('currlang');
+			} else {
+				$messagename = $specialtask->getData('name');
+			}
+			if(QuickQuery("Select count(*) from message where userid=? and not deleted and name =?", false, array($user->id, $messagename))) {
 				$messagename = $messagename . " - " . date("M j, Y G:i:s");
+			}
 			$message->name = $messagename;
-			$message->description = "Easy Call - " . $messagename;
+			$message->description = $messagename;
 			$message->type = "phone";
 			$message->userid = $user->id;
+			if ($specialtask->getData("origin") === "jobwizard")
+				$message->deleted = true;
 			$message->create();
 
 			$part = new MessagePart();
