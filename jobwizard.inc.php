@@ -76,7 +76,7 @@ class CallMe extends FormItem {
 		}
 		$str .= '</td></tr>
 		<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" />
-		'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$n."','".$language[0]."','jobwizard').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>
+		'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$n."','".$language[0]."','jobwizard','".$this->args['min']."','".$this->args['max']."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px; margin-left:5px" id='.$n.'progress /></td></tr>
 		<tr><td class="msglabel">'._L("Messages").':</td>
 		<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">
 		<tr><th colspan=2 class="windowRowHeader">'._L("Message Language").'</th><th class="windowRowHeader" width="30%">'._L("Actions").'</th></tr>
@@ -124,32 +124,6 @@ class ValContactListMethod extends Validator {
 				
 				return label + " cannot be of a complex type for the wizard. If you would like to create one go to Notifications > Lists and then return here.";
 			}';
-	}
-}
-
-class ValCallMePhone extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		global $USER;
-		if (!$USER->authorize("starteasy"))
-			return "$this->label is not allowed for this user account.";
-		$max = getSystemSetting('easycallmax',10);
-		$min = getSystemSetting('easycallmin',10);
-		$value = ereg_replace("[^0-9]*","",$value);
-		if (!ereg("^-?[0-9]*\.?[0-9]+$",$value))
-			return "$this->label must be a number";
-		if ($min == $max && $min == 10 && $err = Phone::validate($value)) {
-			$errmsg = "$this->label appers incorrect.  ";
-			foreach ($err as $e) {
-				$errmsg .= $e . " ";
-			}
-			return $errmsg;
-		}
-		if (strlen($value) < $min)
-			return "$this->label cannot be less than $min digits";
-		if (strlen($value) > $max)
-			return "$this->label cannot be greater than $max digits";
-		return true;
 	}
 }
 
@@ -543,7 +517,14 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 				array("ValRequired"),
 				array("ValEasycall")
 			),
-			"control" => array("CallMe", "width"=>"80%", "phone"=>$USER->phone, "language"=>$langs),
+			"control" => array(
+				"CallMe", 
+				"width"=>"80%", 
+				"phone"=>$USER->phone, 
+				"language"=>$langs,
+				"max" => getSystemSetting('easycallmax',10), 
+				"min" => getSystemSetting('easycallmin',10)
+			),
 			"helpstep" => $helpstepnum
 		);
 		$helpsteps[$helpstepnum++] = _L("c");
