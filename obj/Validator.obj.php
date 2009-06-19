@@ -42,7 +42,7 @@ abstract class Validator {
 		foreach ($validators as $validatordata) {
 			$validator = $validatordata[0];
 			//only validate non empty values (unless its the ValRequired validator)
-			if ($validator == "ValRequired" || ((is_array($value) && count($value)) || mb_strlen($value) > 0)) {		
+			if ($validator == "ValRequired" || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {		
 				$obj = new $validator();
 				$obj->label = $formdata[$name]['label'];
 				$obj->name = $name;
@@ -430,13 +430,27 @@ class ValInArray extends Validator {
 		return 
 			'function (name, label, value, args) {
 				var values = args.values;
-				
+								
 				if (Object.isArray(value)) {
-					if (!value.every(function(item) {return values.indexOf(item) != -1})) {
-						return label + " must be items from the list of available choices.";
+					//find every value
+					for (var i = 0; i < value.length; i++) {
+						var item = value[i];
+						var found = false;
+						for (var j = 0; j < values.length; j++) {
+							if (item == values[j])
+								found = true;
+						}	
+						if (!found)
+							return label + " must be items from the list of available choices.";
 					}
-				} else if (args.values.indexOf(value) == -1) {
-					return label + " must be an item from the list of available choices.";
+				} else {
+					var found = false;
+					for (var j = 0; j < values.length; j++) {
+						if (value == values[j])
+							found = true;
+					}				
+					if (!found)
+						return label + " must be an item from the list of available choices.";
 				}
 				return true;
 			}';
