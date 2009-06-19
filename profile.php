@@ -22,8 +22,7 @@ if (!$USER->authorize('manageprofile')) {
 
 /*CSDELETEMARKER_START*/
 if(isset($_GET['id'])){
-	$id = $_GET['id']+0;
-	if(QuickQuery("select count(*) from access where name = 'SchoolMessenger Admin' and id = '$id'")){
+	if(QuickQuery("select count(*) from access where name = 'SchoolMessenger Admin' and id = ?",false,array($_GET['id']))){
 		redirect('unauthorized.php');
 	}
 }
