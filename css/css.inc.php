@@ -212,12 +212,12 @@ a:hover {
 
 	border: 2px outset;
 
-
-
 	text-align: left;
 	display: block;
 
 	font-size: 10px;
+	
+	z-index: 100;
 }
 
 .shortcutmenu img {

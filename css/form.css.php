@@ -24,7 +24,7 @@ form.newform {
 }
 
 .helper {
-	z-index: 999;
+	z-index: 99;
 	font-family: sans-serif;
 	display: block;
 	overflow: hidden;
@@ -133,14 +133,13 @@ form.newform {
 
 .newform .fieldhelp {
 	font-weight: normal;
-	font-style: italic;
-	border: 1px dashed black;
+	border: 1px solid blue;
 	padding: 3px;
 	margin-left: 1px;
 	margin-right: 1px;
 	text-align: justify;
 	font-size: 80%;
-	background-color: #F0F0F0;
+	background-color: #FFFFF0;
 }
 
 .newform .underneathmsg {
