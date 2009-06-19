@@ -23,7 +23,7 @@ class IntroSelect extends FormItem {
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		$str = "";
 		$count = 0;
-		$str .= '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		$str .= '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'"/>';
 		
 		$str .= '<div id="introwidgetedit'.$n.'" style="display:none;">';
 		foreach ($this->args['values'] as $key => $selectbox) {
@@ -74,8 +74,7 @@ class ValIntroSelect extends Validator {
 		$errortext = "";
 		if (!isset($checkval) || !isset($checkval->message) || $checkval->message == "") {
 			$errortext .= " is required ";
-		}
-		if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($checkval->message))) {
+		} else if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($checkval->message))) {
 			$errortext .= " message can not be found";
 		}
 		if ($errortext)
@@ -142,12 +141,15 @@ $defaultvalues = array("user" => $userselect, "message" => $messageselect);
 $languagevalues = array("language" => $languageselect,"user" => $userselect, "message" => $messageselect);
 
 
+$defaultintro = QuickQuery("select messageid from prompt where type='intro'");
+$emergencyintro = QuickQuery("select messageid from prompt where type='emergencyintro'");
+
 
 $formdata = array(
 	"Required Intro",
 	"defaultmessage" => array(
 		"label" => _L("Default Intro"),
-		"value" => '{"message":"' .getSystemSetting('intromessageid_default'). '"}',
+		"value" => '{"message":"' .  ($defaultintro === false?"":$defaultintro) . '"}',
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$defaultvalues
@@ -156,7 +158,7 @@ $formdata = array(
 	),
 	"emergencymessage" => array(
 		"label" => _L("Emergency Intro"),
-		"value" => '{"message":"' .getSystemSetting('intromessageid_emergency'). '"}',
+		"value" => '{"message":"' . ($emergencyintro === false?"":$emergencyintro) . '"}',
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$defaultvalues
@@ -204,11 +206,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$defaultvalues = json_decode($postdata['defaultmessage']);
 		$msgid = $defaultvalues->message + 0;
 		$newmsg = new Message($msgid);
-		if($newmsg->deleted) {// if deleted the old value is still the intro
-				//TODO chack to see if it is the same as it was before 
-				setSystemSetting('intromessageid_default', $newmsg->id);				
-		} else {
-			
+		if(!$newmsg->deleted) {// if deleted the old value is still the intro
 			$newmsg->id = null;
 			$newmsg->deleted = 1;
 			$newmsg->name = "default_intro";	
@@ -221,16 +219,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$newpart->messageid = $newmsg->id;
 				$newpart->create();
 			}
-			setSystemSetting('intromessageid_default', $newmsg->id);
 		}
-		
+		QuickUpdate("delete from prompt where type='intro';insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
+
 		$emergencyvalues = json_decode($postdata['emergencymessage']);
 		$msgid = $emergencyvalues->message + 0;
 		$newmsg = new Message($msgid);
-		if($newmsg->deleted) {// if deleted the old value is still the intro
-			//TODO chack to see if it is the same as it was before 		
-			setSystemSetting('intromessageid_emergency', $newmsg->id);
-		} else {
+		if(!$newmsg->deleted) {// if deleted the old value is still the intro
 			$newmsg->id = null;
 			$newmsg->deleted = 1;
 			$newmsg->name = "emergency_intro";	
@@ -243,9 +238,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$newpart->messageid = $newmsg->id;
 				$newpart->create();
 			}			
-			setSystemSetting('intromessageid_emergency', $newmsg->id);
 		}
-     			
+		QuickUpdate("delete from prompt where type='emergencyintro';insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
+		
+/*      Future Language implementation     			
 		for($i = 0; $i <= 9;$i++ ) {	
 			
 			if(isset($postdata['digit' . $i])) {				
@@ -277,6 +273,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				}
 			}		
 		}
+*/
 		if ($ajax)
 			$form->sendTo("settings.php");	
 		else
