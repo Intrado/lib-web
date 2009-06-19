@@ -416,7 +416,12 @@ class ValFieldConfirmation extends Validator {
 
 class ValInArray extends Validator {
 	function validate ($value, $args) {
-		if (!in_array($value, $args['values']))
+		if (is_array($value)) {
+			foreach ($value as $item) {
+				if (!in_array($item, $args['values']))
+					return "$this->label must be items from the list of available choices.";
+			}
+		} else if (!in_array($value, $args['values']))
 			return "$this->label must be an item from the list of available choices.";
 		return true;
 	}
@@ -424,12 +429,16 @@ class ValInArray extends Validator {
 	function getJSValidator () {
 		return 
 			'function (name, label, value, args) {
-				for (arg in args.values)
-					if (args.values[arg] == value)
-						return true;
+				var values = args.values;
 				
-				return label + " must be an item from the list of available choices.";
-				
+				if (Object.isArray(value)) {
+					if (!value.every(function(item) {return values.indexOf(item) != -1})) {
+						return label + " must be items from the list of available choices.";
+					}
+				} else if (args.values.indexOf(value) == -1) {
+					return label + " must be an item from the list of available choices.";
+				}
+				return true;
 			}';
 	}
 }
