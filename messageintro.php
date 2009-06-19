@@ -68,13 +68,16 @@ class IntroSelect extends FormItem {
 
 class ValIntroSelect extends Validator {
 	function validate ($value, $args) {
-		
 		if(is_numeric($value))
 			return true;
 		$checkval = json_decode($value);
 		$errortext = "";
-		if (!isset($checkval) || !isset($checkval->message))	
+		if (!isset($checkval) || !isset($checkval->message) || $checkval->message == "") {
 			$errortext .= " is required ";
+		}
+		if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($checkval->message))) {
+			$errortext .= " message can not be found";
+		}
 		if ($errortext)
 			return $this->label . $errortext;
 		else
