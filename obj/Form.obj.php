@@ -223,7 +223,7 @@ class Form {
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
 						$alt = "Valid";
-						$style = 'style="background: rgb(225,255,225);"' ;
+						$style = 'style="background: rgb(255,255,255);"' ; //rgb(225,255,225)
 						$msg = false;
 					} else {
 						list($validator,$msg) =  $valresult;

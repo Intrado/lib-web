@@ -160,7 +160,7 @@ function form_validation_display(element,style, msgtext) {
 		icon.src = "img/icons/exclamation.gif";
 		icon.alt = icon.title = "Validation Error";
 	} else if (style == "valid") {
-		css = 'background: rgb(225,255,225);';
+		css = 'background: rgb(255,255,255);'; //rgb(225,255,225)
 		icon.src = "img/icons/accept.gif";
 		icon.alt = icon.title = "Valid";
 	} else if (style == "blank") {
@@ -286,6 +286,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 			var itemname = e.htmlFor.split("_")[1];
 			if (formdata[itemname] && formdata[itemname]['fieldhelp']) {			
 				e.observe("click",form_label_event_handler.curry(e.htmlFor));
+				//maybe a mouseover mouseout effect would work? on a timer perhaps, so that it doesnt get crazy when mouse scans down field names
 				e.style.cursor="help";
 			}
 		}
