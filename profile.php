@@ -3,7 +3,6 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
@@ -34,7 +33,7 @@ if(isset($_GET['id'])){
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
-	setCurrentAccess($_GET['id']);
+	$_SESSION['editaccessid'] = $_GET['id'] + 0;
 	redirect();
 }
 
@@ -62,7 +61,7 @@ class ValDupeProfileName extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-$obj = new Access($_SESSION['accessid']);
+$obj = new Access($_SESSION['editaccessid']);
 
 $calltimes = newform_time_select(); //gets an array of times
 $calltimes = array_combine($calltimes,$calltimes); //makes assoc array of times to labels (needed by SelectMenu)
@@ -87,7 +86,7 @@ $formdata = array(
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLength","max" => 50),
-			array("ValDupeProfileName","accessid" => $_SESSION['accessid'])
+			array("ValDupeProfileName","accessid" => $_SESSION['editaccessid'])
 		),
 		"control" => array("TextField", "size" => "20", "maxsize" => 50),
 		"helpstep" => 1
@@ -531,7 +530,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		$obj = new Access($_SESSION['accessid']);
+		$obj = new Access($_SESSION['editaccessid']);
 		$obj->moduserid = $USER->id;
 		$obj->modified = date("Y-m-d g:i:s");
 		if(!$obj->id)
@@ -590,7 +589,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
 		}
 
-		$_SESSION['accessid'] = $obj->id;
+		$_SESSION['editaccessid'] = $obj->id;
 		
 		
         //save data here    
