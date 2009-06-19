@@ -33,7 +33,7 @@ if(isset($_GET['id'])){
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
-	$_SESSION['editaccessid'] = $_GET['id'] + 0;
+	$_SESSION['editaccessid'] = $_GET['id'] == "new" ? null : ($_GET['id'] + 0);
 	redirect();
 }
 
