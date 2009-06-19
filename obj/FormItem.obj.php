@@ -49,7 +49,7 @@ class PasswordField extends FormItem {
 class CheckBox extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		return '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value == "true" ? 'checked' : '').' />';
+		return '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value ? 'checked' : '').' />';
 	}
 }
 
