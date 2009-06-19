@@ -2,16 +2,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/form.inc.php");
-include_once("obj/Access.obj.php");
-include_once("obj/Permission.obj.php");
-include_once("obj/FieldMap.obj.php");
-
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("obj/Access.obj.php");
+require_once("obj/Permission.obj.php");
+require_once("obj/FieldMap.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,8 +28,10 @@ if(isset($_GET['id'])){
 	}
 }
 /*CSDELETEMARKER_END*/
+
+
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
@@ -36,201 +39,568 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
-/****************** main message section ******************/
+////////////////////////////////////////////////////////////////////////////////
+// Custom Form Controls And Validators
+////////////////////////////////////////////////////////////////////////////////
 
-$form = "security";
-$section = "main";
-$reloadform = 0;
+		//TODO add callearly calllate logic check
+		//TODO add duplicate profile name check
 
-if(CheckFormSubmit($form,$section))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($form))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
+class ValDupeProfileName extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		$query = "select count(*) from access where name = ? and id != ?";
+		$res = QuickQuery($query,false,array($value,$args['accessid']+0));
+		if ($res)
+			return _L('An access profile with that name already exists. Please choose another');
+		
+		return true;
 	}
-	else
-	{
-		MergeSectionFormData($form, $section);
+}
 
-		//do check
-		if( CheckFormSection($form, $section) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} elseif(GetFormData($form, $section, 'calllate') && GetFormData($form, $section, 'callearly') && (strtotime(GetFormData($form, $section, 'callearly')) >= strtotime(GetFormData($form, $section, 'calllate')))) {
-			error("The earliest call time must be before the latest call time");
-		} elseif(TrimFormData($form, $section, "name") == ""){
-			error("Profile names cannot be blank");
-		} elseif(QuickQuery("select count(*) from access where name = '"  . DBSafe(TrimFormData($form,$section,"name")) . "' and id != '" . $_SESSION['accessid'] . "'")){
-			error("This profile name already exists, please choose another");
-		} else {
-			//submit changes
+		
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
+$obj = new Access($_SESSION['accessid']);
 
-			$accss = new Access($_SESSION['accessid']);
-			$accss->moduserid = $USER->id;
-			$accss->modified = date("Y-m-d g:i:s");
-			if(!$accss->id)
-				$accss->created = date("Y-m-d g:i:s");
+$calltimes = newform_time_select(); //gets an array of times
+$calltimes = array_combine($calltimes,$calltimes); //makes assoc array of times to labels (needed by SelectMenu)
+$calltimes = array_merge(array("" => _L("No Restriction")),$calltimes); //prepend an item for no restrictions
 
-			//TODO set options
+$FIELDMAP = array_merge(FieldMap::getMapNamesLike('f'), FieldMap::getMapNamesLike('g'), FieldMap::getMapNamesLike('c'));
 
-			//only allow editing some fields
-			PopulateObject($form,$section,$accss,array("name", "description"));
-			$accss->update();
+$datafields = $obj->getValue('datafields') ? explode('|',$obj->getValue('datafields')) : array();
 
-			$allowedfields = GetFormData($form, $section, 'datafields');
-			$allowedfields = (isset($allowedfields) ? implode('|',$allowedfields) : "");
+$blockednumberoptions = array (
+	"none" => _L("No Access"),
+	"viewonly" => _L("View Numbers Only"),
+	"addonly" => _L("Add/Delete Own Numbers"),
+	"editall" => _L("Add/Delete All Numbners")
+);
 
-			$accss->setPermission("loginweb", (bool)GetFormData($form, $section, 'loginweb'));
-			$accss->setPermission("loginphone", (bool)GetFormData($form, $section, 'loginphone'));
-			$accss->setPermission("startstats", (bool)GetFormData($form, $section, 'startstats'));
-			$accss->setPermission("startshort", (bool)GetFormData($form, $section, 'startshort'));
-			$accss->setPermission("starteasy", (bool)GetFormData($form, $section, 'starteasy'));
-			$accss->setPermission("sendphone",(bool)GetFormData($form, $section, 'sendphone'));
-			$accss->setPermission("callearly", GetFormData($form, $section, 'callearly'));
-			$accss->setPermission("calllate", GetFormData($form, $section, 'calllate'));
-			$accss->setPermission("callmax", GetFormData($form, $section, 'callmax'));
-			$accss->setPermission("sendemail", (bool)GetFormData($form, $section, 'sendemail'));
-			$accss->setPermission("sendsms", (bool)GetFormData($form, $section, 'sendsms'));
-			$accss->setPermission("sendmulti", (bool)GetFormData($form, $section, 'sendmulti'));
-			$accss->setPermission("createlist", (bool)GetFormData($form, $section, 'createlist'));
-			$accss->setPermission("listuploadids", (bool)GetFormData($form, $section, 'listuploadids'));
-			$accss->setPermission("listuploadcontacts", (bool)GetFormData($form, $section, 'listuploadcontacts'));
-			$accss->setPermission("datafields", $allowedfields);
-			$accss->setPermission("createrepeat", (bool)GetFormData($form, $section, 'createrepeat'));
-			$accss->setPermission("setcallerid", (bool)GetFormData($form, $section, 'setcallerid'));
-			$accss->setPermission("maxjobdays", GetFormData($form, $section, 'maxjobdays'));
-			$accss->setPermission("blocknumbers", GetFormData($form, $section, 'blocknumbers'));
-			$accss->setPermission("callblockingperms", GetFormData($form, $section, 'callblockingperms'));
-			$accss->setPermission("createreport", (bool)GetFormData($form, $section, 'createreport'));
-			$accss->setPermission("viewsystemreports", (bool)GetFormData($form, $section, 'viewsystemreports'));
-			$accss->setPermission("viewusagestats", (bool)GetFormData($form, $section, 'viewusagestats'));
-			$accss->setPermission("viewcalldistribution", (bool)GetFormData($form, $section, 'viewcalldistribution'));
-			$accss->setPermission("managesystemjobs", (bool)GetFormData($form, $section, 'managesystemjobs'));
-			$accss->setPermission("managemyaccount", (bool)GetFormData($form, $section, 'managemyaccount'));
-			$accss->setPermission("manageaccount", (bool)GetFormData($form, $section, 'manageaccount'));
-			$accss->setPermission("manageprofile", (bool)GetFormData($form, $section, 'manageprofile'));
-			$accss->setPermission("managesystem", (bool)GetFormData($form, $section, 'managesystem'));
-			$accss->setPermission("viewcontacts", (bool)GetFormData($form, $section, 'viewcontacts'));
-			$accss->setPermission("managecontactdetailsettings", (bool)GetFormData($form, $section, 'managecontactdetailsettings'));
-			if ($SETTINGS['feature']['has_print']) {
-				$accss->setPermission("sendprint", (bool)GetFormData($form, $section, 'sendprint'));
-			}
-			$accss->setPermission("metadata", (bool)GetFormData($form, $section, 'metadata'));
-			$accss->setPermission("managetasks", (bool)GetFormData($form, $section, 'managetasks'));
-			$accss->setPermission("viewsystemactive", (bool)GetFormData($form, $section, 'viewsystemactive'));
-			$accss->setPermission("viewsystemrepeating", (bool)GetFormData($form, $section, 'viewsystemrepeating'));
-			$accss->setPermission("viewsystemcompleted", (bool)GetFormData($form, $section, 'viewsystemcompleted'));
-			$accss->setPermission("survey", (bool)GetFormData($form, $section, 'survey'));
-			$accss->setPermission("leavemessage", (bool)GetFormData($form, $section, 'leavemessage'));
-			$accss->setPermission("messageconfirmation", (bool)GetFormData($form, $section, 'messageconfirmation'));
-			if(getSystemSetting("_hasportal", false)){
-				$accss->setPermission("portalaccess", (bool)GetFormData($form, $section, 'portalaccess'));
-				$accss->setPermission("generatebulktokens", (bool)GetFormData($form, $section, 'generatebulktokens'));
-			}
+$formdata = array(
+	"name" => array(
+		"label" => _L('Name'),
+		"fieldhelp" => _L('The name for this access profile.'),
+		"value" => $obj->name,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","max" => 50),
+			array("ValDupeProfileName","accessid" => $_SESSION['accessid'])
+		),
+		"control" => array("TextField", "size" => "20", "maxsize" => 50),
+		"helpstep" => 1
+	),
+	"description" => array(
+		"label" => _L('Description'),
+		"fieldhelp" => _L('The description of this access profile.'),
+		"value" => $obj->description,
+		"validators" => array(
+			array("ValLength","max" => 50)
+		),
+		"control" => array("TextField", "size" => "30", "maxsize" => 50),
+		"helpstep" => 1
+	),
+_L('Login Options'),
+	"loginweb" => array(
+		"label" => _L('Log in via web'),
+		"fieldhelp" => _L('Allows basic access to this website.'),
+		"value" => $obj->getValue("loginweb"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 2
+	),
+	"loginphone" => array(
+		"label" => _L('Log in via phone'),
+		"fieldhelp" => _L('Allows users to call in to the inbound number using their access code and PIN.'),
+		"value" => $obj->getValue("loginphone"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 2
+	),
+	"managemyaccount" => array(
+		"label" => _L('Edit Personal Account'),
+		"fieldhelp" => _L('Allows a user to change their personal information, including username and email.'),
+		"value" => $obj->getValue("managemyaccount"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 2
+	),
+	
+_L('Start Page & Nav Options'),
+	"startstats" => array(
+		"label" => _L('View Job Statistics'),
+		"fieldhelp" => _L('Shows statistics of current jobs on the start page.'),
+		"value" => $obj->getValue("startstats"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 3
+	),
+	"startshort" => array(
+		"label" => _L('View Shortcuts'),
+		"fieldhelp" => _L('Shows the shortcuts navigation element'),
+		"value" => $obj->getValue("startshort"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 3
+	),	
+	"starteasy" => array(
+		"label" => _L('Outbound Recording'),
+		"fieldhelp" => _L('Allows users to call any phone number and record audio messages.'),
+		"value" => $obj->getValue("starteasy"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 3
+	),
 
-			$_SESSION['accessid'] = $accss->id;
-			ClearFormData($form);
-			redirect('profiles.php');
+_L('Messaging Options'),
+	"sendphone" => array(
+		"label" => _L('Send Phone Calls'),
+		"fieldhelp" => _L('Allows users to send jobs via phone calls and manage related messages.'),
+		"value" => $obj->getValue("sendphone"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
+	"callearly" => array(
+		"label" => _L('Don\'t Call Before'),
+		"fieldhelp" => _L('Restricts the earliest time that a user may schedule a job.'),
+		"value" => $obj->getValue("callearly"),
+		"validators" => array(
+			array("ValInArray","values" => array_keys($calltimes))
+		),
+		"control" => array("SelectMenu", "values" => $calltimes),
+		"helpstep" => 4
+	),
+	"calllate" => array(
+		"label" => _L('Don\'t Call After'),
+		"fieldhelp" => _L('Restricts the latest time that a user may schedule a job.'),
+		"value" => $obj->getValue("calllate"),
+		"validators" => array(
+			array("ValInArray","values" => array_keys($calltimes))
+		),
+		"control" => array("SelectMenu", "values" => $calltimes),
+		"helpstep" => 4
+	),
+	"callmax" => array(
+		"label" => _L('Max Call Attempts'),
+		"fieldhelp" => _L('Restricts the maximum number of call attempts a user may set for a job.'),
+		"value" => $obj->getValue("callmax") ? $obj->getValue("callmax") : 5,
+		"validators" => array(
+			array("ValInArray","values" => range(1,14))
+		),
+		"control" => array("SelectMenu", "values" => array_combine(range(1,14),range(1,14))),
+		"helpstep" => 4
+	),
+	"leavemessage" => array(
+		"label" => _L('Voice Responses'),
+		"fieldhelp" => _L('Allows users to accept voice Responses from contacts in reply to a job.'),
+		"value" => $obj->getValue("leavemessage"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
+	"messageconfirmation" => array(
+		"label" => _L('Message Confirmations'),
+		"fieldhelp" => _L('Allows users to request confirmation over the phone.'),
+		"value" => $obj->getValue("messageconfirmation"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
+	"sendemail" => array(
+		"label" => _L('Send Emails'),
+		"fieldhelp" => _L('Allows users to send jobs via email and manage related messages.'),
+		"value" => $obj->getValue("sendemail"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
+	"sendsms" => array(
+		"label" => _L('Send SMS txt messages'),
+		"fieldhelp" => _L('Allows users to send jobs via cell phone SMS txt and manage related messages.'),
+		"value" => $obj->getValue("sendsms"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
+	"sendmulti" => array(
+		"label" => _L('Multi-language Messages'),
+		"fieldhelp" => _L('Allows users to specify additional alternate languages for a message.'),
+		"value" => $obj->getValue("sendmulti"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
+	
+_L('Advanced Job Options'),
+	"createrepeat" => array(
+		"label" => _L('Create Repeating Jobs'),
+		"fieldhelp" => _L('Allows users to schedule regularly occuring jobs.'),
+		"value" => $obj->getValue("createrepeat"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 5
+	),
+	"survey" => array(
+		"label" => _L('Create Surveys'),
+		"fieldhelp" => _L('Allows users to send multi-question surveys and collect responses via phone and email/web.'),
+		"value" => $obj->getValue("survey"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 5
+	),
+	"setcallerid" => array(
+		"label" => _L('Override CallerID'),
+		"fieldhelp" => _L('Allows users to override CallerID on a job to be any phone number.'),
+		"value" => $obj->getValue("setcallerid"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 5
+	),
+	"maxjobdays" => array(
+		"label" => _L('Max Job Run Days'),
+		"fieldhelp" => _L('Restricts the maximum number of days a user can schedule a job to run.'),
+		"value" => $obj->getValue("maxjobdays") ? $obj->getValue("maxjobdays") : 2,
+		"validators" => array(
+			array("ValInArray","values" => range(1,7))
+		),
+		"control" => array("SelectMenu", "values" => array_combine(range(1,7),range(1,7))),
+		"helpstep" => 5
+	),
 
-			$reloadform = 1;
+	//repeating
+	//survey
+	//callerid
+	//days to run	
+
+_L('List Options'),
+	"createlist" => array(
+		"label" => _L('Create & Edit Lists'),
+		"fieldhelp" => _L('Allows users to create and edit lists used in jobs.'),
+		"value" => $obj->getValue("createlist"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 6
+	),
+	"listuploadids" => array(
+		"label" => _L('Upload Lists by ID#'),
+		"fieldhelp" => _L('Allows users to upload a file containing ID numbers to a list. Only people they would otherwise normally have access to see are added.'),
+		"value" => $obj->getValue("listuploadids"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 6
+	),
+	"listuploadcontacts" => array(
+		"label" => _L('Upload List by Contact Data'),
+		"fieldhelp" => _L('Allows users to upload a file containing arbitrary contact data.'),
+		"value" => $obj->getValue("listuploadcontacts"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 6
+	),
+	
+_L('Contact & Field Options'),
+	"datafields" => array(
+		"label" => _L('Allowed Fields'),
+		"fieldhelp" => _L('Restricts the fields that are visible to the user, and which fields may be used to create lists. Leave all fields unchecked for unlimited access.'),
+		"value" => $datafields,
+		"validators" => array(
+			array("ValInArray","values" => array_keys($FIELDMAP))
+		),
+		"control" => array("MultiCheckBox", "values" => $FIELDMAP), //TODO write a control similar to what was used on old form
+		"helpstep" => 7
+	),
+	"viewcontacts" => array(
+		"label" => _L('View Contacts'),
+		"fieldhelp" => _L('Shows visible contacts in the system on the Contacts Tab'),
+		"value" => $obj->getValue("viewcontacts"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 7
+	),	
+	"managecontactdetailsettings" => array(
+		"label" => _L('Edit Contact Details'),
+		"fieldhelp" => _L('Allows users to modify contact details such as phone numbers and email addresses.'),
+		"value" => $obj->getValue("managecontactdetailsettings"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 7
+	),
+	"portalaccess" => array(
+		"label" => _L('Contact Manager Administration'),
+		"fieldhelp" => _L('Allows users to to change settings and options related to the Contact Manager.'),
+		"value" => $obj->getValue("portalaccess"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 7
+	),
+	"generatebulktokens" => array(
+		"label" => _L('Generate Bulk Activation Codes'),
+		"fieldhelp" => _L('Allows users to general Contact Manager access codes in bulk.'),
+		"value" => $obj->getValue("generatebulktokens"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 7
+	),
+	
+	
+_L('Report Options'),
+	"createreport" => array(
+		"label" => _L('Create Reports'),
+		"fieldhelp" => _L('Allows users to create, save, and schedule reports.'),
+		"value" => $obj->getValue("createreport"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 8
+	),
+
+_L('Systemwide View Options'),
+	"viewsystemreports" => array(
+		"label" => _L('Systemwide Reports'),
+		"fieldhelp" => _L('Shows reports for other user\'s jobs.'),
+		"value" => $obj->getValue("viewsystemreports"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
+	"viewusagestats" => array(
+		"label" => _L('Usage Stats'),
+		"fieldhelp" => _L('Shows systemwide usage stats.'),
+		"value" => $obj->getValue("viewusagestats"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
+	"viewcalldistribution" => array(
+		"label" => _L('Call Distribution'),
+		"fieldhelp" => _L('Shows systemwide call distribution over time.'),
+		"value" => $obj->getValue("viewcalldistribution"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
+	"viewsystemactive" => array(
+		"label" => _L('Active Jobs'),
+		"fieldhelp" => _L('Shows active jobs across all users.'),
+		"value" => $obj->getValue("viewsystemactive"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
+	"viewsystemcompleted" => array(
+		"label" => _L('Completed Jobs'),
+		"fieldhelp" => _L('Shows completed jobs across all users.'),
+		"value" => $obj->getValue("viewsystemcompleted"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
+	"viewsystemrepeating" => array(
+		"label" => _L('Repeating Jobs'),
+		"fieldhelp" => _L('Shows repeating jobs across all users.'),
+		"value" => $obj->getValue("viewsystemrepeating"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
+	"callblockingperms" => array(
+		"label" => _L('Blocked Numbers Access'),
+		"fieldhelp" => _L('Controls access to the systemwide blocked numbers list.'),
+		"value" => $obj->getValue("blocknumbers") ? $obj->getValue("callblockingperms") : "none",
+		"validators" => array(
+			array("ValInArray","values" => array_keys($blockednumberoptions))
+		),
+		"control" => array("RadioButton", "values" => $blockednumberoptions),
+		"helpstep" => 9
+	),
+_L('Security & Top-level Controls'),
+	"securitywarning" => array (
+		"label" => _L('Security Notice'),
+		"control" => array("FormHtml", "html" => '<p style="border: 3px double red; font-weight: bold; width: 50%; padding: 5px;"><img src="img/icons/error.gif" alt="" style="vertical-align: top;">The following settings control top-level administration functions. Only top-level administrators should have these enabled.</p>'),
+		"helpstep" => 10
+	),
+	"manageaccount" => array(
+		"label" => _L('Manage Users'),
+		"fieldhelp" => _L('Allows users to create and edit other users.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
+		"value" => $obj->getValue("manageaccount"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+	"manageprofile" => array(
+		"label" => _L('Manage Users'),
+		"fieldhelp" => _L('Allows users to create and edit access profiles.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
+		"value" => $obj->getValue("manageprofile"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+	"managesystem" => array(
+		"label" => _L('Manage System Settings'),
+		"fieldhelp" => _L('Allows users to modify systemwide settings.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
+		"value" => $obj->getValue("managesystem"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+	"managesystemjobs" => array(
+		"label" => _L('Manage All Jobs'),
+		"fieldhelp" => _L('Allows users to cancel, archive, or delete any job sent by any user, or to run any repeating job.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
+		"value" => $obj->getValue("managesystemjobs"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+	"managetasks" => array(
+		"label" => _L('Manage Data Imports'),
+		"fieldhelp" => _L('Allows users to change the way data is imported into the system.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
+		"value" => $obj->getValue("managetasks"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+	"managetasks" => array(
+		"label" => _L('Manage Data Imports'),
+		"fieldhelp" => _L('Allows users to change the way data is imported into the system.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
+		"value" => $obj->getValue("managetasks"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+	"metadata" => array(
+		"label" => _L('Manage Field Defenitions'),
+		"fieldhelp" => _L('Allows users to add or delete fields used by imports and list rules.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
+		"value" => $obj->getValue("metadata"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+);
+
+//remove any formdata for features that are not enabled
+
+if(!getSystemSetting("_hasportal", false)) {
+	unset($formdata['portalaccess']);
+	unset($formdata['generatebulktokens']);
+}
+
+if (!getSystemSetting("_hassurvey", true)) {
+	unset($formdata['survey']);
+}
+
+if (!getSystemSetting("_hassms", false)) {
+	unset($formdata['sendsms']);
+}
+
+
+$helpsteps = array (
+	_L('Name & Desc'),
+	_L('Login'),
+	_L('Start Page & Nav'),
+	_L('Messages'),
+	_L('Advanced Job Options'),
+	_L('Lists'),
+	_L('Contacts & Fields'),
+	_L('Reports'),
+	_L('Systemwide View'),
+	_L('Security & Top-level Access'),
+);
+
+$buttons = array(submit_button(_L('Save'),"submit","tick"));
+$form = new Form("accessprofile",$formdata,$helpsteps,$buttons);
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+    
+    if ($form->checkForDataChange()) {
+        $datachange = true;
+    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		$obj = new Access($_SESSION['accessid']);
+		$obj->moduserid = $USER->id;
+		$obj->modified = date("Y-m-d g:i:s");
+		if(!$obj->id)
+			$obj->created = date("Y-m-d g:i:s");
+		
+		$obj->name = $postdata['name'];
+		$obj->description = $postdata['description'];
+		$obj->update();
+		
+		
+		$allowedfields = $postdata['datafields'];
+		$allowedfields = (isset($allowedfields) ? implode('|',$allowedfields) : "");
+
+		$obj->setPermission("loginweb", (bool)$postdata['loginweb']);
+		$obj->setPermission("loginphone", (bool)$postdata['loginphone']);
+		$obj->setPermission("startstats", (bool)$postdata['startstats']);
+		$obj->setPermission("startshort", (bool)$postdata['startshort']);
+		$obj->setPermission("starteasy", (bool)$postdata['starteasy']);
+		$obj->setPermission("sendphone",(bool)$postdata['sendphone']);
+		$obj->setPermission("callearly", $postdata['callearly']);
+		$obj->setPermission("calllate", $postdata['calllate']);
+		$obj->setPermission("callmax", $postdata['callmax']);
+		$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
+		$obj->setPermission("sendsms", (bool)$postdata['sendsms']);
+		$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
+		$obj->setPermission("createlist", (bool)$postdata['createlist']);
+		$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
+		$obj->setPermission("listuploadcontacts", (bool)$postdata['listuploadcontacts']);
+		$obj->setPermission("datafields", $allowedfields);
+		$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
+		$obj->setPermission("setcallerid", (bool)$postdata['setcallerid']);
+		$obj->setPermission("maxjobdays", $postdata['maxjobdays']);
+		$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
+		$obj->setPermission("callblockingperms", $postdata['callblockingperms']);
+		$obj->setPermission("createreport", (bool)$postdata['createreport']);
+		$obj->setPermission("viewsystemreports", (bool)$postdata['viewsystemreports']);
+		$obj->setPermission("viewusagestats", (bool)$postdata['viewusagestats']);
+		$obj->setPermission("viewcalldistribution", (bool)$postdata['viewcalldistribution']);
+		$obj->setPermission("managesystemjobs", (bool)$postdata['managesystemjobs']);
+		$obj->setPermission("managemyaccount", (bool)$postdata['managemyaccount']);
+		$obj->setPermission("manageaccount", (bool)$postdata['manageaccount']);
+		$obj->setPermission("manageprofile", (bool)$postdata['manageprofile']);
+		$obj->setPermission("managesystem", (bool)$postdata['managesystem']);
+		$obj->setPermission("viewcontacts", (bool)$postdata['viewcontacts']);
+		$obj->setPermission("managecontactdetailsettings", (bool)$postdata['managecontactdetailsettings']);
+		$obj->setPermission("metadata", (bool)$postdata['metadata']);
+		$obj->setPermission("managetasks", (bool)$postdata['managetasks']);
+		$obj->setPermission("viewsystemactive", (bool)$postdata['viewsystemactive']);
+		$obj->setPermission("viewsystemrepeating", (bool)$postdata['viewsystemrepeating']);
+		$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
+		$obj->setPermission("survey", (bool)$postdata['survey']);
+		$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
+		$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
+		if(getSystemSetting("_hasportal", false)){
+			$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
+			$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
 		}
-	}
-} else {
-	$reloadform = 1;
+
+		$_SESSION['accessid'] = $obj->id;
+		
+		
+        //save data here    
+        if ($ajax)
+            $form->sendTo("profiles.php");
+        else
+            redirect("profiles.php");
+    }
 }
-
-if( $reloadform )
-{
-	ClearFormData($form);
-
-	//check to see if the name & desc is prepopulated from another form
-
-	$accss = new Access($_SESSION['accessid']);
-
-	//TODO break out options
-
-	$fields = array(
-				array("name","text",1,50),
-				array("description","text",1,50));
-	PopulateForm($form,$section,$accss,$fields);
-
-	$datafields = explode('|',$accss->getValue('datafields'));
-	PutFormData($form, $section, 'datafield', $accss->getValue('datafields')? 1 : 0, "bool", 0, 1);
-	PutFormData($form, $section, 'datafields', $datafields, "text", "nomin", "nomax");
-
-	//FIXME just use PutFormData
-	$permissions = array(
-				array("loginweb","bool",0,1),
-				array("loginphone","bool",0,1),
-				array("startstats","bool",0,1),
-				array("startshort","bool",0,1),
-				array("starteasy","bool",0,1),
-				array("sendphone","bool",0,1),
-				array("callearly","text",1,50),
-				array("calllate","text",1,50),
-				array("sendemail","bool",0,1),
-				array("sendsms","bool",0,1),
-				array("sendprint","bool",0,1),
-				array("sendmulti","bool",0,1),
-				array("createlist","bool",0,1),
-				array("listuploadids","bool",0,1),
-				array("listuploadcontacts","bool",0,1),
-				array("createrepeat","bool",0,1),
-				array("setcallerid","bool",0,1),
-				array("blocknumbers","bool",0,1),
-				array("createreport","bool",0,1),
-				array("viewsystemreports","bool",0,1),
-				array("viewusagestats","bool",0,1),
-				array("viewcalldistribution","bool",0,1),
-				array("managesystemjobs","bool",0,1),
-				array("managemyaccount","bool",0,1),
-				array("manageaccount","bool",0,1),
-				array("manageprofile","bool",0,1),
-				array("managesystem","bool",0,1),
-				array("viewcontacts","bool",0,1),
-				array("managecontactdetailsettings","bool",0,1),
-				array("metadata","bool",0,1),
-				array("managetasks","bool",0,1),
-				array("viewsystemactive","bool",0,1),
-				array("viewsystemrepeating","bool",0,1),
-				array("viewsystemcompleted","bool",0,1),
-				array("survey","bool",0,1),
-				array("leavemessage","bool",0,1),
-				array("messageconfirmation", "bool", 0, 1),
-				array("portalaccess","bool",0,1),
-				array("generatebulktokens","bool",0,1));
-
-	foreach($permissions as $field) {
-		PutFormData($form, $section, $field[0], $accss->getValue($field[0]),$field[1],$field[2],$field[3]);
-	}
-
-	$callmax = $accss->getValue("callmax");
-	$callmax = $callmax === false ? 5 : $callmax ;
-	PutFormData($form, $section, "callmax", $callmax,"text",1,50);
-
-	$maxjobdays = $accss->getValue("maxjobdays");
-	$maxjobdays = $maxjobdays === false ? 2 : $maxjobdays ;
-
-	PutFormData($form, $section, "maxjobdays", $maxjobdays,"number",1,7);
-
-
-
-	// Only set the radio button values mapped to 'callblockingperms' if the master permission is enabled.
-	if ($accss->getValue('blocknumbers')) {
-		PutFormData($form, $section, 'callblockingperms', $accss->getValue('callblockingperms'));
-	} else {
-		PutFormData($form, $section, 'callblockingperms', 'viewonly');
-	}
-
-}
-
-
-$ffields = FieldMap::getMapNamesLike('f');
-$gfields = FieldMap::getMapNamesLike('g');
-$cfields = FieldMap::getMapNamesLike('c');
-
-$FIELDMAP = $ffields + $gfields + $cfields; // GUI preferred ordering
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -242,331 +612,29 @@ $FIELDMAP = $ffields + $gfields + $cfields; // GUI preferred ordering
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:profiles";
-$TITLE = "Edit Access Profile: " . (GetFormData($form, $section, 'name') == NULL ? "New Access Profile" : escapehtml(GetFormData($form, $section, 'name')));
-$DESCRIPTION = GetFormData($form, $section, 'description');
+$TITLE = "Edit Access Profile"; //TODO
+$DESCRIPTION = "stuff";//TODO
 
 include_once("nav.inc.php");
-NewForm($form);
 
-buttons(submit($form, $section, 'Save'), button("Check All", "checkAllCheckboxes()"));
+?>
 
-startWindow('Profile Information', 'padding: 3px;');
-print 'Name: ';
-NewFormItem($form,$section,"name","text", 30);
-print '&nbsp;&nbsp;Description: ';
-NewFormItem($form,$section,"description","text", 50);
-print '&nbsp;';
+<style>
+/* tweak normal form css so we have more room for all these checkbox labels */
+.newform .formcontenttable .formtableheader {
+	width: 200px;
+}
+</style>
+
+<script type="text/javascript">
+<? Validator::load_validators(array("ValDupeProfileName")); ?>
+</script>
+
+<?
+
+startWindow(_L('Profile Access Controls'));
+echo $form->render();
 endWindow();
 
-startWindow('Allowed Functions');
-?>
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Login:<br><? print help('Profile_Login'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"loginweb","checkbox"); ?></td>
-					<td>Log into the system via the web</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"loginphone","checkbox"); ?></td>
-					<td>Log into the system via the phone</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"managemyaccount","checkbox"); ?></td>
-					<td>Edit personal account information</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Start Page:<br><? print help('Profile_StartPage'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"startstats","checkbox"); ?></td>
-					<td>View Start Page Job Statistics</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"startshort","checkbox"); ?></td>
-					<td>View Start Page Shortcuts</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"starteasy","checkbox"); ?></td>
-					<td>Enable outbound recording</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Messages:<br><? print help('Profile_Messages'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"sendphone","checkbox"); ?></td>
-					<td>Send phone calls</td>
-					<td>Earliest Time to Call:</td>
-					<td><? time_select($form,$section,"callearly","No restriction"); ?></td>
-					<td>Latest Time to Call:</td>
-					<td><? time_select($form,$section,"calllate","No restriction"); ?></td>
-					<td>Maximum Attempts:</td>
-					<td>
-						<?
-						NewFormItem($form,$section,"callmax","selectstart",NULL,NULL,'id="callmax"');
-						//federal law requires that automatic dialing machines make no more than 14 calls to the same number
-						for($i = 1; $i <= 14; $i++)
-							NewFormItem($form,$section,"callmax","selectoption",$i,$i);
-						NewFormItem($form,$section,"callmax","selectend");
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form, $section, "leavemessage", "checkbox"); ?></td>
-					<td>Allow voice responses</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form, $section, "messageconfirmation", "checkbox"); ?></td>
-					<td>Allow message confirmations</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"sendemail","checkbox"); ?></td>
-					<td>Send emails</td>
-				</tr>
-
-<? if (getSystemSetting('_hassms', false)) { ?>
-				<tr>
-					<td><? NewFormItem($form,$section,"sendsms","checkbox"); ?></td>
-					<td>Send SMS messages</td>
-				</tr>
-<? } ?>
-
-
-<? if ($SETTINGS['feature']['has_print']) { ?>
-				<tr>
-					<td><? NewFormItem($form,$section,"sendprint","checkbox"); ?></td>
-					<td>Send printed letters</td>
-				</tr>
-<? } ?>
-				<tr>
-					<td><? NewFormItem($form,$section,"sendmulti","checkbox"); ?></td>
-					<td>Send multi-language messages</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Lists:<br><? print help('Profile_Lists'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"createlist","checkbox"); ?></td>
-					<td>Create/Edit Lists</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"listuploadids","checkbox"); ?></td>
-					<td>Upload Lists by ID# lookup</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"listuploadcontacts","checkbox"); ?></td>
-					<td>Upload Lists by contact data</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Data:<br><? print help('Profile_Data'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr valign="top">
-					<td><? NewFormItem($form,$section,"datafield","checkbox",NULL,NULL,'id="datafield" onclick="clearAllIfNotChecked(this,\'datafieldselect\');"'); ?></td>
-					<td>Restrict user access to only those fields that are selected:</td>
-					<td>
-						<?
-						// removed array_flip on $FIELDMAP; jjl
-						NewFormItem($form,$section,"datafields","selectmultiple",count($FIELDMAP),$FIELDMAP, 'id="datafieldselect" onmousedown="setChecked(\'datafield\');"');
-						?>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Jobs:<br><? print help('Profile_Jobs'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"createrepeat","checkbox"); ?></td>
-					<td>Create Repeating Jobs</td>
-				</tr>
-<?
-	if (getSystemSetting("_hassurvey", true)) {
-?>
-				<tr>
-					<td><? NewFormItem($form,$section,"survey","checkbox"); ?></td>
-					<td>Create Survey Jobs</td>
-				</tr>
-<?
-	}
-?>
-				<tr>
-					<td><? NewFormItem($form,$section,"setcallerid","checkbox"); ?></td>
-					<td>Set the job caller ID</td>
-				</tr>
-				<tr>
-					<td>
-					<?
-						NewFormItem($form, $section, "maxjobdays", "selectstart");
-						for ($i = 1; $i <= 7; $i++) {
-							NewFormItem($form, $section, 'maxjobdays', "selectoption", $i, $i);
-						}
-						NewFormItem($form, $section, "maxjobdays", "selectend");
-					?>
-					</td>
-					<td>Maximum number of days for which users can schedule a job to run</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Reports:<br><? print help('Profile_Reports'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"createreport","checkbox"); ?></td>
-					<td>Create Reports</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Security:<br><? print help('Profile_Security'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"manageaccount","checkbox"); ?></td>
-					<td>Manage User Accounts</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"manageprofile","checkbox"); ?></td>
-					<td>Manage Access Profiles</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"managesystem","checkbox"); ?></td>
-					<td>Manage Systemwide Settings</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Contacts:<br><? print help('Profile_Contacts'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"viewcontacts","checkbox", null, null, "id='viewcontacts'"); ?></td>
-					<td>View Contacts</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"managecontactdetailsettings","checkbox"); ?></td>
-					<td>Manage Contact Detail Settings</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-<?
-	if(getSystemSetting("_hasportal", false)){
-?>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Contact Manager:<br><?=help('Profile_ContactManager')?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form,$section,"portalaccess","checkbox", null, null, "onclick='if(this.checked){new getObj(\"viewcontacts\").obj.checked=true}'"); ?></td>
-					<td>Access Contact Manager Administration Options</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"generatebulktokens","checkbox"); ?></td>
-					<td>Generate Bulk Activation Codes</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-<?
-	}
-?>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Systemwide View:<br><? print help('Profile_SystemwideView'); ?></th>
-		<td class="bottomBorder" width="100%">
-			<table border="0" cellpadding="2" cellspacing="0">
-				<tr>
-					<td><? NewFormItem($form, $section, "viewsystemreports", "checkbox", 40, 'nopotion', 'id="viewsystemreports"' ); ?></td>
-					<td>View systemwide report data (controls access to report details on individual reports)</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"viewusagestats","checkbox", 40, 'nooption', "id='viewusagestats'"); ?></td>
-					<td>View systemwide usage stats</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"viewcalldistribution","checkbox", 40, 'nooption', "id='viewcalldistribution'"); ?></td>
-					<td>View systemwide call distribution</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form, $section, "viewsystemactive", "checkbox", 40, 'nooption', "id='viewsystemactive'"); ?></td>
-					<td>View all active jobs</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"viewsystemcompleted","checkbox", 40, 'nooption', "id='viewsystemcompleted'"); ?></td>
-					<td>View all completed jobs</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"viewsystemrepeating","checkbox", 40, 'nooption', "id='viewsystemrepeating'"); ?></td>
-					<td>View all repeating jobs</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form, $section, "managesystemjobs", "checkbox", 40, 'nopotion', 'id="managesystemjobs"'); ?></td>
-					<td>Manage systemwide jobs</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"metadata","checkbox"); ?></td>
-					<td>Manage Field Definitions</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"managetasks","checkbox"); ?></td>
-					<td>Manage Imports</td>
-				</tr>
-				<tr>
-					<td><? NewFormItem($form,$section,"blocknumbers","checkbox", null, null, "id='blocknumbers'"); ?></td>
-					<td>Access systemwide blocked numbers list
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>
-						<table border="0" cellpadding="2" cellspacing="0">
-						<tr>
-							<td valign="top">&nbsp;<? NewFormItem($form,$section,"callblockingperms","radio", null, 'viewonly', "id='callblockingperms1'" ); ?></td><td>View Numbers Only</td>
-							<td valign="top">&nbsp;<? NewFormItem($form,$section,"callblockingperms","radio", null, 'addonly', "id='callblockingperms2'"); ?></td><td>Add/Delete Own Numbers</td>
-							<td valign="top">&nbsp;<? NewFormItem($form,$section,"callblockingperms","radio", null, 'editall', "id='callblockingperms3'"); ?></td><td>Add/Delete All Numbers</td>
-						</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
-<?
-endWindow();
-buttons();
-EndForm();
 include_once("navbottom.inc.php");
 ?>
-<script>
-	function checkAllCheckboxes(){
-		var form = document.forms[0].elements;
-		for(var i = 0; i < form.length; i++){
-			if(form[i].type == "checkbox"){
-				form[i].checked = true;
-			}
-		}
-	}
-</script>
