@@ -5,7 +5,7 @@
 function exists($table, $name) {
 	global $USER;
 	$lowername = strtolower($name);
-	return QuickQuery("select id from $table where userid = $USER->id and lower(name) = ?", false, array($lowername));
+	return QuickQuery("select id from ? where userid = ? and lower(name) = ?", false, array($table, $USER->id, $lowername));
 }
 
 function userOwns ($type,$id) {
@@ -27,9 +27,10 @@ function userOwns ($type,$id) {
 }
 
 function setIfOwnsOrNew ($id,$name, $type, $checkcustomer = false) {
-	if ($id == "new") {
+	if ($id === "new") {
 		$_SESSION[$name] = NULL;
 	} else {
+		$id = $id + 0;
 		if ($checkcustomer) {
 			$_SESSION[$name] = $id;
 		} else if (userOwns($type,$id)) {
