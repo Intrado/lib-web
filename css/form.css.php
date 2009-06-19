@@ -88,6 +88,11 @@ form.newform {
 	padding: 0px;
 }
 
+.newform h2 {
+	padding-left: 5px;
+	background: repeat-x url('../img/header_bg.gif');
+}
+
 .newform legend {
 	font-weight: bold;
 	font-size: 130%;
