@@ -57,7 +57,6 @@ class ValDupeProfileName extends Validator {
 	}
 }
 
-		
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -429,7 +428,7 @@ _L('Security & Top-level Controls'),
 		"helpstep" => 10
 	),
 	"manageprofile" => array(
-		"label" => _L('Manage Users'),
+		"label" => _L('Manage Profiles'),
 		"fieldhelp" => _L('Allows users to create and edit access profiles.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
 		"value" => $obj->getValue("manageprofile"),
 		"validators" => array(),
@@ -554,7 +553,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$obj->setPermission("calllate", $postdata['calllate']);
 		$obj->setPermission("callmax", $postdata['callmax']);
 		$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
-		$obj->setPermission("sendsms", (bool)$postdata['sendsms']);
 		$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
 		$obj->setPermission("createlist", (bool)$postdata['createlist']);
 		$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
@@ -581,13 +579,25 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$obj->setPermission("viewsystemactive", (bool)$postdata['viewsystemactive']);
 		$obj->setPermission("viewsystemrepeating", (bool)$postdata['viewsystemrepeating']);
 		$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
-		$obj->setPermission("survey", (bool)$postdata['survey']);
 		$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 		$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
-		if(getSystemSetting("_hasportal", false)){
+
+		
+		if(getSystemSetting("_hasportal", false)) {
 			$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
 			$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
 		}
+
+		if (getSystemSetting("_hassurvey", true)) {
+			$obj->setPermission("survey", (bool)$postdata['survey']);
+		}
+
+		if (getSystemSetting("_hassms", false)) {
+			$obj->setPermission("sendsms", (bool)$postdata['sendsms']);
+		}
+
+		
+		
 
 		$_SESSION['editaccessid'] = $obj->id;
 		
@@ -610,8 +620,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:profiles";
-$TITLE = "Edit Access Profile"; //TODO
-$DESCRIPTION = "stuff";//TODO
+$TITLE = _L('Edit Access Profile: %1$s', ($obj->id ? $obj->name : "New Access Profile") );
+$DESCRIPTION = $obj->description;
 
 include_once("nav.inc.php");
 
