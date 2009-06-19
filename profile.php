@@ -468,7 +468,7 @@ _L('Security & Top-level Controls'),
 		"helpstep" => 10
 	),
 	"metadata" => array(
-		"label" => _L('Manage Field Defenitions'),
+		"label" => _L('Manage Field Definitions'),
 		"fieldhelp" => _L('Allows users to add or delete fields used by imports and list rules.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
 		"value" => $obj->getValue("metadata"),
 		"validators" => array(),
