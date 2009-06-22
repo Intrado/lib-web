@@ -3,15 +3,17 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-require_once("obj/FieldMap.obj.php");
-require_once("inc/form.inc.php");
-require_once("inc/html.inc.php");
-require_once("inc/table.inc.php");
-require_once("inc/utils.inc.php");
-require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
 require_once("inc/formatters.inc.php");
-
+require_once("obj/FieldMap.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/AudioFile.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -23,198 +25,194 @@ if (!$USER->authorize("sendphone")) {
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-$_SESSION['textpreview'] = false;
-
 if (isset($_GET['id'])) {
-	$id = DBSafe($_GET['id']);
-	if (userOwns("message", $id) || $USER->authorize('managesystem')) {
-		$_SESSION['previewmessageid'] = $id;
-	}
-	$_SESSION['ttstext'] = NULL;
-	$_SESSION['ttslanguage'] = NULL;
-	$_SESSION['ttsgender'] = NULL;
-	redirect();
-} else if (isset($_GET['text'])&&isset($_GET['language'])&&isset($_GET['gender'])) {
-	if(get_magic_quotes_gpc()) {
-		$_SESSION['ttstext'] = stripslashes($_GET['text']);
-		$_SESSION['ttslanguage'] = stripslashes($_GET['language']);
-		$_SESSION['ttsgender'] = stripslashes($_GET['gender']);
-	} else {
-		$_SESSION['ttstext'] = $_GET['text'];
-		$_SESSION['ttslanguage'] = $_GET['language'];
-		$_SESSION['ttsgender'] = $_GET['gender'];
-	}
-	$_SESSION['previewmessageid'] = NULL;
-	redirect();
-}
+	if (userOwns("message", $_GET['id'] + 0) || $USER->authorize('managesystem'))
+		$id = $_GET['id'] + 0;
+} else 
+	$id = false;
 
-$messageid = $_SESSION['previewmessageid'];
-
-$fields = array();
-$dopreview = 1; //go ahead and preview w/o submiting form if there are no fields in the message
-$previewdata = "&qt=";
-
-if($messageid) {	
-	//find all unique fields used in this message
-	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid='$messageid')");
-	if (count($messagefields) > 0) {
-		$dopreview = 0;
-		foreach ($messagefields as $fieldmap)
-			$fields[$fieldmap->fieldnum] = $fieldmap;
-	}
-}
-/****************** main message section ******************/
-
-$f = "messagepreview";
-$s = "preview";
-$reloadform = 0;
-
-if(CheckFormSubmit($f,$s)) {
-
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data.');
-		$reloadform = 1;
-	}
+if (isset($_GET['text'])) {
+	if(get_magic_quotes_gpc())
+		$ttstext = stripslashes($_GET['text']);
 	else
-	{
-		MergeSectionFormData($f, $s);
+		$ttstext = $_GET['text'];
+} else
+	$ttstext = false;
 
-		$previewdata = "";
-		foreach ($fields as $fieldmap) {
-			$previewdata .= "&$fieldmap->fieldnum=" . urlencode(GetFormData($f,$s,$fieldmap->fieldnum));
+if (isset($_GET['language'])) {
+	if(get_magic_quotes_gpc())
+		$ttslanguage = stripslashes($_GET['language']);
+	else
+		$ttslanguage = $_GET['language'];
+} else 
+	$ttslanguage = "english";
+
+if (isset($_GET['gender'])) {
+	if(get_magic_quotes_gpc())
+		$ttsgender = stripslashes($_GET['gender']);
+	else
+		$ttsgender = $_GET['gender'];
+} else
+	$ttsgender = "female";
+
+if (!$id && !$ttstext)
+	redirect("unauthorized.php");
+
+if ($id) {
+	//find all unique fields and values used in this message
+	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($id));
+	if (count($messagefields) > 0) {
+		$fields = array();
+		$fielddata = array();
+		foreach ($messagefields as $fieldmap) {
+			$fields[$fieldmap->fieldnum] = $fieldmap;
+			if ($fieldmap->isOptionEnabled("multisearch")) {
+				$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
+				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
+				$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($fieldmap->fieldnum));
+			}
 		}
-
-		//add something so that QT player doesn't barf if last char is a period
-		$previewdata .= "&qt=" . urlencode(" ");
-		$dopreview = 1;
+		// Get message parts so we can find the default values, if specified in the message
+		$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type = 'V'", false, array($id));
+		$fielddefaults = array();
+		foreach ($messageparts as $messagepart)
+			$fielddefaults[$messagepart->fieldnum] = $messagepart->defaultvalue;
 	}
-} else {
-	$reloadform = 1;
 }
 
-if ($reloadform) {
-	ClearFormData($f);
-
-	if (isset($fields['f01']))
-		PutFormData($f,$s,"f01",$USER->firstname);
-	if (isset($fields['f02']))
-		PutFormData($f,$s,"f02",$USER->lastname);
-	if (isset($fields['f03']))
-		PutFormData($f,$s,"f03","English");
-	for ($x = 4; $x <= 20; $x++)
-		if (isset($fields['f'.substr("0".$x, -2)]))
-			PutFormData($f,$s,'f'.substr("0".$x, -2),"");
-		
+class FormHtmlWithId extends FormItem {
+	function render ($value) {
+		return '<div id="'.$this->args['id'].'" name="'.$this->args['id'].'">'.$this->args['html'].'</div>';
+	}
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-// Display Functions
+// Form Data
 ////////////////////////////////////////////////////////////////////////////////
+$formdata = array();
+
+if ($id && isset($fields) && count($fields)) {
+	foreach ($fields as $field => $fieldmap) {
+		if ($fieldmap->isOptionEnabled("firstname")) {
+			$formdata[$field] = array (
+				"label" => $fieldmap->name,
+				"value" => $USER->firstname,
+				"validators" => array(),
+				"control" => array("TextField", "maxlength" => 50, "size"=>20),
+				"helpstep" => 1
+			);
+		} else if ($fieldmap->isOptionEnabled("lastname")) {
+			$formdata[$field] = array (
+				"label" => $fieldmap->name,
+				"value" => $USER->lastname,
+				"validators" => array(),
+				"control" => array("TextField", "maxlength" => 50, "size"=>20),
+				"helpstep" => 1
+			);
+		} else if ($fieldmap->isOptionEnabled("multisearch")) {
+			$formdata[$field] = array (
+				"label" => $fieldmap->name,
+				"value" => $fielddefaults[$field],
+				"validators" => array(),
+				"control" => array("SelectMenu", "values" => $fielddata[$fieldmap->fieldnum]),
+				"helpstep" => 1
+			);
+		} else if ($fieldmap->isOptionEnabled("reldate")) {
+			$formdata[$field] = array (
+				"label" => $fieldmap->name,
+				"value" => $fielddefaults[$field],
+				"validators" => array(),
+				"control" => array("TextDate", "maxlength" => 20, "size"=>20),
+				"helpstep" => 1
+			);
+		} else {
+			$formdata[$field] = array (
+				"label" => $fieldmap->name,
+				"value" => $fielddefaults[$field],
+				"validators" => array(),
+				"control" => array("TextField", "maxlength" => 20, "size"=>20),
+				"helpstep" => 1
+			);
+		}
+	}
+}
+
+$buttons = array(submit_button(_L('Play'),"submit","tick"), icon_button(_L('Done'),"cross","window.close()",null,null));
+
+// Only display and handle form elements if there are form elements.
+if (count($formdata)) {
+	$form = new Form("messagepreview",$formdata,array(),$buttons);
 
 
+	////////////////////////////////////////////////////////////////////////////////
+	// Data Handling
+	////////////////////////////////////////////////////////////////////////////////
 
+	//check and handle an ajax request (will exit early)
+	//or merge in related post data
+	$form->handleRequest();
 
-
+	$datachange = false;
+	$errors = false;
+	//check for form submission
+	if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+		if ($form->checkForDataChange()) {
+			$datachange = true;
+		} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+			$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+			$previewdata = "";
+			foreach ($postdata as $field => $value) {
+				$previewdata .= "&$field=" . urlencode($value);
+			}
+			$form->modifyElement("messagepreviewdiv", '
+				<div align="center">
+					<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
+					CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
+					STANDBY="Loading Windows Media Player components..."
+					TYPE="application/x-oleobject">
+					<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id='.$id.$previewdata.'">
+					<param name="controller" value="true">
+					<EMBED SRC="preview.wav.php/embed_preview.wav?id='.$id.$previewdata.'" AUTOSTART="TRUE"></EMBED>
+					</OBJECT>
+					<br><a href="preview.wav.php/download_preview.wav?id='.$id.$previewdata.'&download=true">'._L("Click here to download").'</a>
+				</div>'
+			);
+			</script>
+			<?
+			return;
+		}
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+//$TITLE = _L('Message preview');
 
-$TITLE = "Message Preview";
+require_once("popup.inc.php");
 
-include_once("popup.inc.php");
-
-NewForm($f);
-
-buttons(submit($f, $s, $dopreview ? 'Refresh' : 'Play'), button('Done', 'window.close()'));
-
-
-if (count($fields) > 0) {
-	startWindow('Preview Options', 'padding: 3px;');
-
-
-?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-<?
-	foreach ($fields as $fieldmap) {
-		$fieldnum = $fieldmap->fieldnum;
-?>
-		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?= $fieldmap->name ?></td>
-			<td class="bottomBorder">
-<?
-		if($fieldmap->isOptionEnabled("text") || $fieldmap->isOptionEnabled("numeric")) {
-
-			NewFormItem($f,$s,$fieldnum,"text",20,255);
-
-		} elseif($fieldmap->isOptionEnabled("reldate")) {
-			NewFormItem($f, $s,$fieldnum, "selectstart");
-			foreach($RELDATE_OPTIONS as $name => $value) {
-				NewFormItem($f, $s, $fieldnum, "selectoption",$value,reldate($name));
-			}
-			NewFormItem($f, $s, $fieldnum, "selectend");
-
-		} elseif($fieldmap->isOptionEnabled("multisearch")) {
-
-			$limit = DBFind('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $USER->id and fieldnum = '$fieldnum'");
-			//FIXME whats wrong with the SQL generating code in Rule.obj?
-			$limitsql = $limit ? "and value in ('" . implode("','", explode('|', $limit->val)) . "')" : NULL;
-			$query = "select value from persondatavalues
-						where fieldnum='$fieldnum' $limitsql order by value";
-			$values = QuickQueryList($query);
-			if (count($values) > 1) {
-				if (!GetFormData($f,$s,$fieldnum))
-					PutFormData($f,$s,$fieldnum,$values[0],"array");
-				NewFormSelect($f,$s, $fieldnum,@array_combine($values,$values));
-
-			} else {
-				NewFormSelect($f,$s, $fieldnum,@array_combine($values,$values));
-			}
-		}
-?>
-		</td></tr>
-<?
-	}
-?>
-	</table>
-<?
-	endWindow();
-}
-
-if ($dopreview) {
-	startWindow('Message Preview', 'padding: 3px;');
-?>
-
-	<div align="center">
-
-	<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-	CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-	STANDBY="Loading Windows Media Player components..."
-	TYPE="application/x-oleobject">
-
-	<? if ($_SESSION['ttstext']) { ?>
-		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?text=<?= urlencode($_SESSION['ttstext']) ?>&language=<?= $_SESSION['ttslanguage']  ?>&gender=<?=	$_SESSION['ttsgender'] ?><?= $previewdata ?>">
-		<param name="controller" value="true">
-		<EMBED SRC="preview.wav.php/embed_preview.wav?text=<?= urlencode($_SESSION['ttstext']) ?>&language=<?= $_SESSION['ttslanguage']  ?>&gender=<?=	$_SESSION['ttsgender'] ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>	
-		</OBJECT>
-		<br><a href="preview.wav.php/download_preview.wav?text=<?= urlencode($_SESSION['ttstext']) ?>&language=<?= $_SESSION['ttslanguage'] ?>&gender=<?= $_SESSION['ttsgender'] ?>&download=true<?= $previewdata ?>">Click here to download</a>	
-	<? } else {?>
-		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id=<?= $messageid ?><?= $previewdata ?>">
-		<param name="controller" value="true">
-		<EMBED SRC="preview.wav.php/embed_preview.wav?id=<?= $messageid ?><?= $previewdata ?>" AUTOSTART="TRUE"></EMBED>
-		</OBJECT>
-		<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>">Click here to download</a>
-	<? } ?>
+startWindow(_L("Message Preview"));
+if (count($formdata)) echo $form->render();
+?><div id="messagepreviewdiv" name="messagepreviewdiv"><?
+// If there is no formdata (no field inserts) then just play the message
+if (!count($formdata)) {?>
+	<div style="float:left">
+		<?=icon_button(_L('Done'),"cross","window.close()",null,null)?>
 	</div>
-<?
-	endWindow();
-}
+	<div align="center" style="clear:left">
+		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
+		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
+		STANDBY="Loading Windows Media Player components..."
+		TYPE="application/x-oleobject">
+		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>">
+		<param name="controller" value="true">
+		<EMBED SRC="preview.wav.php/embed_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>" AUTOSTART="TRUE"></EMBED>
+		</OBJECT>
+		<br><a href="preview.wav.php/download_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>&download=true"><?=_L("Click here to download")?></a>
+	</div>
+<?}
+?></div><?
+endWindow();
 
-
-
-EndForm($f);
-
-include_once("popupbottom.inc.php");
+require_once("popupbottom.inc.php");
+?>
