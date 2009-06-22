@@ -542,6 +542,8 @@ function form_handle_submit(form,event) {
 			} else if ("success" == res.status) {
 				if (res.nexturl)
 					window.location=res.nexturl;
+			} else if ("modify" == res.status) {
+				$(res.name).update(res.content);
 			}
 			} catch (e) { alert(e.message + "\n" + response.responseText)}
 			formvars.submitting = false;
