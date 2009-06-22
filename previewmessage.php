@@ -196,7 +196,7 @@ if (count($formdata)) echo $form->render();
 ?><div id="messagepreviewdiv" name="messagepreviewdiv"><?
 // If there is no formdata (no field inserts) then just play the message
 if (!count($formdata)) {?>
-	<div style="float:left">
+	<div style="float:left; margin: 5px">
 		<?=icon_button(_L('Done'),"cross","window.close()",null,null)?>
 	</div>
 	<div align="center" style="clear:left">
