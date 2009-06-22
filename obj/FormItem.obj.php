@@ -156,9 +156,9 @@ class HtmlRadioButton extends FormItem {
 class TextDate extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
-		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.date("n/j/Y").'" '.$max.' '.$size.' onfocus="lcs(this,true,true)" onclick="event.cancelBubble=true;lcs(this,true,true)"/><script SRC="script/calendar.js"></script>';
+		// TODO: Need to include the calender javascript here. Our current one breaks if it is included in the form item though so it must be included after nav.inc.php in the page Display section. We need a new calendar written for prototype or to fix the current one.
+		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.date("n/j/Y").'" maxlength="12" '.$size.' onfocus="lcs(this,true,true)" onclick="event.cancelBubble=true;lcs(this,true,true)"/>';
 	}
 }
 

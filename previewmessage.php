@@ -122,7 +122,7 @@ if ($id && isset($fields) && count($fields)) {
 				"label" => $fieldmap->name,
 				"value" => $fielddefaults[$field],
 				"validators" => array(),
-				"control" => array("TextDate", "maxlength" => 20, "size"=>20),
+				"control" => array("TextDate", "size"=>12),
 				"helpstep" => 1
 			);
 		} else {
@@ -137,7 +137,7 @@ if ($id && isset($fields) && count($fields)) {
 	}
 }
 
-$buttons = array(submit_button(_L('Play'),"submit","tick"), icon_button(_L('Done'),"cross","window.close()",null,null));
+$buttons = array(submit_button(_L('Play'),"submit","play"), icon_button(_L('Close'),"cross","window.close()",null,null));
 
 // Only display and handle form elements if there are form elements.
 if (count($formdata)) {
@@ -187,9 +187,9 @@ if (count($formdata)) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-//$TITLE = _L('Message preview');
-
 require_once("popup.inc.php");
+// TODO: This script should be included on the form item. Currently that breaks it though. We need a new calender, maybe one that is written in prototype syntax.
+?><script SRC="script/calendar.js"></script><?
 
 startWindow(_L("Message Preview"));
 if (count($formdata)) echo $form->render();
