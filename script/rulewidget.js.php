@@ -11,12 +11,12 @@ header("Cache-Control: private");
 
 //----------- RuleWidget EVENTS (This example shows all custom events) ------------
 // NOTE: Your client should only allow rule-building if 'RuleWidget:Ready' is fired.
-//var ruleWidget = new RuleWidget($('ruleContainer'));
-//ruleWidget.container.observe('RuleWidget:Ready');
-//ruleWidget.container.observe('RuleWidget:DeleteRule');
-//ruleWidget.container.observe('RuleWidget:AddRule');
-//ruleWidget.container.observe('RuleWidget:BuildList');
-//ruleWidget.container.observe('RuleWidget:InColumn');
+//var ruleWidget = new RuleWidget($('ruleWidgetContainer'));
+//ruleWidget.container.observe('RuleWidget:Ready',..);
+//ruleWidget.container.observe('RuleWidget:DeleteRule',..);
+//ruleWidget.container.observe('RuleWidget:AddRule',..);
+//ruleWidget.container.observe('RuleWidget:InColumn',..);
+//ruleWidget.startup(); // Required, must be called AFTER registering ruleWidget.container.observe('RuleWidget:Ready',..)
 
 var RuleWidget = Class.create({
 	//----------------------------- PUBLIC FUNCTIONS --------------------------
@@ -36,9 +36,17 @@ var RuleWidget = Class.create({
 		this.fieldmaps = null;
 		this.operators = null;
 		this.reldateOptions = null;
-		this.multisearchHTMLCache = {}, // Cache of multisearch DOM, indexed by fieldnum.
+		this.multisearchHTMLCache = {}; // Cache of multisearch DOM, indexed by fieldnum.
+	},
+	
+	// You must call startup() AFTER registering ruleWidget.container.observe('RuleWidget:Ready', ..);
+	// @param preloadedRules, optional array of rules to preload
+	startup: function(preloadedRules) {
+		if (preloadedRules && !preloadedRules.join)
+			preloadedRules = null;
+			
 		new Ajax.Request('ajax.php?type=rulewidgetsettings', {
-			onSuccess: function(transport) {
+			onSuccess: function(transport, rules) {
 				var data = transport.responseJSON;
 				if (!data) {
 					// Silent failure, client should not provide any rule-building tools unless the event RuleWidget:Ready is fired.
@@ -61,8 +69,19 @@ var RuleWidget = Class.create({
 				this.operators['multisearch']['not'] = '<?=addslashes(_L('is NOT'))?>';
 				this.operators['multisearch']['in'] = '<?=addslashes(_L('is'))?>';
 				this.ruleEditor.reset();
+				
+				if (rules) {
+					for (var i = 0; i < rules.length; ++i) {
+						if (rules[i].fieldnum && !this.fieldmaps[rules[i].fieldnum]) {
+							alert('no stuff for ');
+							continue;
+							// TODO: Inform that this field is unauthorized.
+						}
+						this.insert_rule(rules[i]);
+					}
+				}
 				this.container.fire('RuleWidget:Ready');
-			}.bindAsEventListener(this)
+			}.bindAsEventListener(this, preloadedRules)
 		});
 	},
 	
@@ -77,17 +96,17 @@ var RuleWidget = Class.create({
 	// @param tr, table row DOM element.
 	// @param addHiddenFieldnum, optional boolean specifying to add a hidden input with value=fieldnum
 	format_readable_rule: function(data, tr, addHiddenFieldnum) {
-		if (!data.fieldnum)
+		if (!data.fieldnum || !data.op || !data.logical || !data.val)
+			return false;
+		if (!this.fieldmaps[data.fieldnum])
 			return false;
 		if (!data.type)
 			data.type = this.fieldmaps[data.fieldnum].type;
-		
 		// FieldmapTD
 		var fieldmapTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
 		// Keep track of the row's data.fieldnum by using a hidden input.
 		if (addHiddenFieldnum)
 			fieldmapTD.insert(new Element('input', {'type':'hidden', 'value':data.fieldnum}));
-		
 		// CriteriaTD
 		var criteriaTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'});
 		var criteria = this.operators[data.type][data.op];
@@ -154,7 +173,6 @@ var RuleWidget = Class.create({
 			alert('<?=addslashes(_L('cannot add this rule'))?>');
 			return;
 		}
-		
 		// Actions
 		var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Delete'), 'information'))?>').insert('<br style=\"clear:both\"/>');
 		var deleteRuleButton = actionTD.down('button');
@@ -172,7 +190,8 @@ var RuleWidget = Class.create({
 		this.container.fire('RuleWidget:AddRule');
 	},
 
-	// Returns json for rules that the user chose.
+	// Returns json-encoded array of rules.
+	// Example: [{fieldnum:"f01", type:"text", logical:"and", op:"eq", val:"Kee-Yip"}]
 	toJSON: function() {
 		return $H(this.appliedRules).values().toJSON();
 	}
