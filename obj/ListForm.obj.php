@@ -345,9 +345,10 @@ class ListForm extends Form {
 									}
 								}.bindAsEventListener(actionsTD,data.id));
 								
+								
 								// Mark this list as 'added' so that the list selectbox no longer shows this list as an option.
-								if (document.formvars['{$this->name}'].existingLists && document.formvars['{$this->name}'].existingLists[id])
-									document.formvars['{$this->name}'].existingLists[id].added = true;
+								if (document.formvars['{$this->name}'].existingLists && document.formvars['{$this->name}'].existingLists[data.id])
+									document.formvars['{$this->name}'].existingLists[data.id].added = true;
 							}
 							listform_reset_list_selectbox();
 							$('pageLoadingWindow').hide();
@@ -635,6 +636,7 @@ class ListForm extends Form {
 				$('buildListWindow').hide();
 				$('guide').hide();
 				listform_refresh_guide(true);
+				document.formvars['{$this->name}'].ruleWidget.startup();
 			</script>";
 		return $str;
 	}
