@@ -62,7 +62,7 @@ class ValCallMeMessage extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-$helpsteps = array ("");
+$helpsteps = array ();
 
 $formdata = array(
 	"messagename" => array(
@@ -89,7 +89,7 @@ $formdata = array(
 		"helpstep" => 1
 	)
 );
-$helpsteps[1] = _L('Enter a message name and a phone number. Then click the Call Me To Record button. You will be prompted to record a new audio message over the phone. Once you complete this process, click the Save button');
+$helpsteps[0] = _L('Enter a message name and a phone number. Then click the Call Me To Record button. You will be prompted to record a new audio message over the phone. Once you complete this process, click the Save button');
 
 
 $buttons = array(submit_button(_L("Save"),"submit","tick"),icon_button(_L('Cancel'),"cross",null,"$origin.php"));
