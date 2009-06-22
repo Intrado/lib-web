@@ -371,7 +371,14 @@ class Form {
 		echo json_encode($result);
 		exit();
 	}
+	
+	//Send an element outside the form some new content
+	function modifyElement ($elementname, $htmlcontent) {
+		$result = array("status" => "modify", "name" => $elementname, "content" => $htmlcontent);
+		header("Content-Type: application/json");
+		echo json_encode($result);
+		exit();
+	}
 }
-
 
 ?>

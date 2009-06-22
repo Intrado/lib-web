@@ -153,4 +153,13 @@ class HtmlRadioButton extends FormItem {
 	}
 }
 
+class TextDate extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
+		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
+		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.date("n/j/Y").'" '.$max.' '.$size.' onfocus="lcs(this,true,true)" onclick="event.cancelBubble=true;lcs(this,true,true)"/><script SRC="script/calendar.js"></script>';
+	}
+}
+
 ?>
