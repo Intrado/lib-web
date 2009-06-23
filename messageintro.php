@@ -23,7 +23,7 @@ class IntroSelect extends FormItem {
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		$str = "";
 		$count = 0;
-		$str .= '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'"/>';
+		$str .= '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
 		
 		$str .= '<div id="introwidgetedit'.$n.'" style="display:none;">';
 		foreach ($this->args['values'] as $key => $selectbox) {
@@ -141,8 +141,9 @@ $defaultvalues = array("user" => $userselect, "message" => $messageselect);
 $languagevalues = array("language" => $languageselect,"user" => $userselect, "message" => $messageselect);
 
 
-$defaultintro = QuickQuery("select messageid from prompt where type='intro'");
-$emergencyintro = QuickQuery("select messageid from prompt where type='emergencyintro'");
+$defaultintro = QuickQuery("select messageid from prompt where type='intro' and language is null");
+$emergencyintro = QuickQuery("select messageid from prompt where type='emergencyintro' and language is null");
+
 
 
 $formdata = array(
@@ -165,13 +166,43 @@ $formdata = array(
 		),
 		"helpstep" => 1
 	)
-//	,
-//	"Language Options"
+	,
+	"Language Options"
 );
+
+
+$languageintro = QuickQueryList("select language, messageid from prompt where type='intro' and language is not null",true);
+$i = 1;
+foreach($languageintro as $language => $messageid) {
+		$formdata["default$i"] = array(
+		"label" => _L("Language Default") . " " .  $i,
+		"value" => '{"language":"' . $language . '",message":"' . $messageid . '"}',
+		"validators" => array(),
+		"control" => array("IntroSelect",
+			 "values"=>$languagevalues
+		),
+		"helpstep" => 2
+	);
+	$i++;
+}
+$languageintro = QuickQueryList("select language, messageid from prompt where type='emergencyintro' and language is not null",true);
+$i = 1;
+foreach($languageintro as $language => $messageid) {
+		$formdata["emergency$i"] = array(
+		"label" => _L("Language Emergency") . " " .  $i,
+		"value" => '{"language":"' . $language . '",message":"' . $messageid . '"}',
+		"validators" => array(),
+		"control" => array("IntroSelect",
+			 "values"=>$languagevalues
+		),
+		"helpstep" => 2
+	);
+	$i++;
+}
 /*
 for($i = 1; $i < 10; $i++) {
-	$formdata["digit$i"] = array(
-		"label" => _L("Digit $i"),
+	$formdata["default$i"] = array(
+		"label" => _L("Language Default") . " " .  $i,
 		"value" => '{"message":""}',
 		"validators" => array(),
 		"control" => array("IntroSelect",
@@ -179,6 +210,16 @@ for($i = 1; $i < 10; $i++) {
 		),
 		"helpstep" => 2
 	);
+	$formdata["emergency$i"] = array(
+		"label" => _L("Language Emergency") . " " .  $i,
+		"value" => '{"message":""}',
+		"validators" => array(),
+		"control" => array("IntroSelect",
+			 "values"=>$languagevalues
+		),
+		"helpstep" => 2
+	);
+	
 }
 */
 
@@ -220,7 +261,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$newpart->create();
 			}
 		}
-		QuickUpdate("delete from prompt where type='intro';insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
+		QuickUpdate("delete from prompt where type='intro' and language is null;insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
 
 		$emergencyvalues = json_decode($postdata['emergencymessage']);
 		$msgid = $emergencyvalues->message + 0;
@@ -239,20 +280,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$newpart->create();
 			}			
 		}
-		QuickUpdate("delete from prompt where type='emergencyintro';insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
+		QuickUpdate("delete from prompt where type='emergencyintro' and language is null;insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
 		
-/*      Future Language implementation     			
+		//Future Language implementation     			
 		for($i = 0; $i <= 9;$i++ ) {	
 			
-			if(isset($postdata['digit' . $i])) {				
-				$digitvalues = json_decode($postdata['digit' . $i]);
-				if(isset($digitvalues->message) && isset($digitvalues->language)) {
-					$msgid = $digitvalues->message + 0;
-					$languageid = $digitvalues->language + 0;
+			if(isset($postdata['default' . $i])) {				
+				$languagevalues = json_decode($postdata['default' . $i]);
+				if(isset($languagevalues->message) && isset($languagevalues->language)) {
+					$msgid = $languagevalues->message + 0;
+					$languageid = $languagevalues->language + 0;
 					$newmsg = new Message($msgid);
 					if($newmsg->deleted)
-						//TODO Set db values
-						error_log("set digit value not implemented");
+						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));			
+					
 					else {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
@@ -266,14 +307,39 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$newpart->messageid = $newmsg->id;
 							$newpart->create();
 						}
-						//TODO Set db values
-						error_log("set digit value not implemented");
-						
+						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));			
 					}
 				}
-			}		
+			}	
+
+			if(isset($postdata['emergency' . $i])) {				
+				$languagevalues = json_decode($postdata['emergency' . $i]);
+				if(isset($languagevalues->message) && isset($languagevalues->language)) {
+					$msgid = $languagevalues->message + 0;
+					$languageid = $languagevalues->language + 0;
+					$newmsg = new Message($msgid);
+					if($newmsg->deleted)
+						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));						
+										
+					else {
+						$newmsg->id = null;
+						$newmsg->deleted = 1;
+						$newmsg->name = 'intro_digit_' . $i;	
+						$newmsg->create();
+						// copy the parts
+						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+						foreach ($parts as $part) {
+							$newpart = new MessagePart($part->id);
+							$newpart->id = null;
+							$newpart->messageid = $newmsg->id;
+							$newpart->create();
+						}
+						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));						
+					}
+				}
+			}	
 		}
-*/
+
 		if ($ajax)
 			$form->sendTo("settings.php");	
 		else
