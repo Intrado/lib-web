@@ -642,8 +642,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:profiles";
-$TITLE = _L('Edit Access Profile: %1$s', ($obj->id ? $obj->name : "New Access Profile") );
-$DESCRIPTION = $obj->description;
+$TITLE = _L('Edit Access Profile: %1$s', escapehtml($obj->id ? $obj->name : "New Access Profile") );
+$DESCRIPTION = escapehtml($obj->description);
 
 include_once("nav.inc.php");
 
