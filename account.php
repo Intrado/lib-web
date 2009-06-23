@@ -24,6 +24,66 @@ require_once("obj/FormBrandTheme.obj.php");
 if (!$USER->authorize('managemyaccount')) {
 	redirect('unauthorized.php');
 }
+////////////////////////////////////////////////////////////////////////////////
+// Form Items
+////////////////////////////////////////////////////////////////////////////////
+class TextPasswordStrength extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
+		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
+		$str = '<table style="border-width:0px; border-spacing:0px; padding:0px;">
+					<tr>
+						<td style="padding:0px"><input id="'.$n.'" name="'.$n.'" type="password" value="'.escapehtml($value).'" '.$max.' '.$size.'/></td>
+						<td>&nbsp;'._L("Password Strength").':</td>
+						<td>
+							<table style="border-width:0px; border-spacing:0px; padding:0px; border-style:solid; border-color:black">
+								<tr>
+									<td style="padding:0px"><div id="'.$n.'0" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'1" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'2" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'3" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'4" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<script type="text/javascript">
+					var specialchars = ["\~","\`","\@","\#","\$","\%","\^","\&","\*","\(","\)","\_","\+","\-","\=","\;","\:","\{","\}","\[","\]","\|","\\\\","\/","\?","\>","\<"];
+					function checkPasswordStrength() {
+						var pass = $('.$n.').value;
+						var int = 0;
+						var spe = 0;
+						var len = 0;
+						var xlen = 0;
+						var xxlen = 0;
+						if (pass.length > 5)
+							len = 1;
+						if (pass.length > 10)
+							xlen = 1;
+						if (pass.length > 15)
+							xxlen = 1;
+						for (var i = 0; i < pass.length; i++) {
+							if (parseInt(pass[i]) > 0)
+								int = 1;
+							if ($A(specialchars).indexOf(pass[i]) > -1) {
+								spe = 1;
+							}
+						}
+						var strength = int + spe + len + xlen + xxlen;
+						for (var i = 0; i < 5; i++) {
+							if (i < strength)
+								$("'.$n.'"+ (i.toString())).setStyle({backgroundColor: "green"});
+							else
+								$("'.$n.'"+ (i.toString())).setStyle({backgroundColor: "lightgrey"});
+						}
+					}
+					$('.$n.').observe("keyup", checkPasswordStrength);
+				</script>';
+		return $str;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Validators
@@ -199,7 +259,7 @@ if (!$ldapuser) {
 				array("ValPassword")
 			),
 			"requires" => array("firstname", "lastname", "login"),
-			"control" => array("PasswordField","maxlength" => 20, "size" => 20),
+			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 20),
 			"helpstep" => 1
 		);
 	}
