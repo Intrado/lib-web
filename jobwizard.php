@@ -102,7 +102,7 @@ endWindow();
 if (true) {
 	startWindow("Wizard Data");
 	echo "<pre>";
-	var_dump($_SESSION['wizard_job']['data']);
+	var_dump($_SESSION['wizard_job']);
 	//var_dump($_SERVER);
 	echo "</pre>";
 	endWindow();
