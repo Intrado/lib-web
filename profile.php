@@ -42,7 +42,25 @@ if (isset($_GET['id'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 		//TODO add callearly calllate logic check
-		//TODO add duplicate profile name check
+
+class ValJobWindowTime extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args, $requiredvalues) {
+		$value = strtotime($value);
+		$value2 = strtotime($requiredvalues[$args['field']]);
+		
+		//only check if both times parse
+		if ($value != -1 && $value !== false && $value2 != -1 && $value2 !== false) {
+			if ($args['op'] == "later" && $value <= $value2)
+				return _L('%1$s must be later than %2$s',$this->label, $args['fieldlabel']);
+			if ($args['op'] == "earlier" && $value >= $value2)
+				return _L('%1$s must be earlier than %2$s',$this->label, $args['fieldlabel']);
+		}
+		
+		return true;
+	}
+}
 
 class ValDupeProfileName extends Validator {
 	var $onlyserverside = true;
@@ -165,8 +183,10 @@ _L('Messaging Options'),
 		"label" => _L('Don\'t Call Before'),
 		"fieldhelp" => _L('Restricts the earliest time that a user may schedule a job.'),
 		"value" => $obj->getValue("callearly"),
+		"requires" => array("calllate"),
 		"validators" => array(
-			array("ValInArray","values" => array_keys($calltimes))
+			array("ValInArray","values" => array_keys($calltimes)),
+			array("ValJobWindowTime","field" => "calllate", "fieldlabel" => _L('Don\'t Call After'), "op" => "earlier")
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4
@@ -175,8 +195,10 @@ _L('Messaging Options'),
 		"label" => _L('Don\'t Call After'),
 		"fieldhelp" => _L('Restricts the latest time that a user may schedule a job.'),
 		"value" => $obj->getValue("calllate"),
+		"requires" => array("callearly"),
 		"validators" => array(
-			array("ValInArray","values" => array_keys($calltimes))
+			array("ValInArray","values" => array_keys($calltimes)),
+			array("ValJobWindowTime","field" => "callearly", "fieldlabel" => _L('Don\'t Call Before'), "op" => "later")
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4
@@ -635,7 +657,7 @@ include_once("nav.inc.php");
 </style>
 
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDupeProfileName")); ?>
+<? Validator::load_validators(array("ValDupeProfileName","ValJobWindowTime")); ?>
 </script>
 
 <?
