@@ -229,9 +229,7 @@ class JobWiz_basic extends WizStep {
 			),
 		);
 		$helpsteps = array (
-			"Welcome to the Job Wizard. This is a guided 5 step process.",
-			"This is your Job's name and Type. Job names are important, and should be descriptive. 
-			A good example is 'Standardized testing reminder', or 'Early dismissal'.",
+			"This is your Job's name. <hr></hr>Job names are important<img src=\"img/icons/error.gif>, and should be descriptive. A good example is 'Standardized testing reminder', or 'Early dismissal'.",
 			"Job Types are used to determine which phones or emails we should notify. Choosing the appropriate Job Type is important for effective communication.",
 			"Adding contacts based on rules allows you to specify rules like 'Everyone from school XYZ'.<br><br>You may also have predefined Lists, and use them here.<br><br>If you need to use the list upload feature, manually enter contacts, or create a custom list of contacts, you will need to use the List Builder.",
 			"blah blah blah",
