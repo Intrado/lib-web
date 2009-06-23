@@ -28,43 +28,67 @@ if (!$USER->authorize('managemyaccount')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
-
 class ValLogin extends Validator {
-    var $onlyserverside = true;
-    
-    function validate ($value, $args) {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
 		global $USER;
 		if (User::checkDuplicateLogin($value, $USER->id))
-			return "$this->label already exists, please choose another.";
+			return "$this->label " . _L("already exists, please choose another.");
 		else
 			return true;
-    }
+	}
+}
+
+class ValAccesscode extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		global $USER;
+		if (User::checkDuplicateAccesscode($value, $USER->id))
+			return "$this->label " . _L("already exists, please choose another.");
+		else
+			return true;
+	}
 }
 
 class ValPassword extends Validator {
-    var $onlyserverside = true;
-    
-    function validate ($value, $args, $requiredvalues) {
+	var $onlyserverside = true;
+
+	function validate ($value, $args, $requiredvalues) {
 		global $USER;
 		if ($USER->ldap) return true;
 
 		if ($detail = validateNewPassword($requiredvalues['login'], $value, $requiredvalues['firstname'], $requiredvalues['lastname']))
-			return "$this->label is invalid.  ".$detail;
+			return "$this->label ". _L("is invalid") ." ".$detail;
 
 		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
 		if ($checkpassword && ($detail = isNotComplexPass($value)) && !ereg("^0*$", $value))
-			return "$this->label is invalid.  ".$detail;
+			return "$this->label ". _L("is invalid") ." ".$detail;
 
 		return true;
-    }
+	}
 }
 
+class ValPin extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args, $requiredvalues) {
+		global $USER;
+		$pin = ereg_replace("[^0-9]*","",$value);
+		if (mb_strlen($value) !== $pin)
+			return "$this->label ". _L("cannot contain letters.") ." ".$detail;
+		if ($pin + 0 < 1000)
+			return "$this->label ". _L("must be four digits or more. Must have a value greater than 1000.") ." ".$detail;
+		return true;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
 $readonly = $USER->importid != null;
+$ldapuser = $USER->ldap;
 
 $usernamelength = getSystemSetting("usernamelength", 5);
 if ($USER->ldap)
@@ -76,247 +100,303 @@ if ($checkpassword) {
 	if ($passwordlength < 6) {
 		$passwordlength = 6;
 	}
-	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = _L('The username must be at least %1$s characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least %2$s characters.  It must contain at least one letter and number', $usernamelength, $passwordlength);
 } else {
-	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least one letter and number";
+	$securityrules = _L('The username must be at least %1$s characters.  The password cannot be made from your username/firstname/lastname.  It must be at least %2$s characters.  It must contain at least one letter and number', $usernamelength, $passwordlength);
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
 $helpsteps = array();
 
-// readonly users have some data from imports, so not all of it goes into the form
-if ($readonly) {
+$formdata[] = _L("Account Information");
 
-} else {
-	$formdata[] = "Account Information";
+if ($readonly) {
 	$formdata["firstname"] = array(
-        "label" => "First Name",
-        "value" => $USER->firstname,
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 1,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    );
+		"label" => _L("First Name"),
+		"control" => array("FormHtml","html" => $USER->firstname),
+		"helpstep" => 1
+	);
 	$formdata["lastname"] = array(
-        "label" => "Last Name",
-        "value" => $USER->lastname,
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 1,"max" => 50)
-        ),
-        "control" => array("TextField","maxlength" => 50),
-        "helpstep" => 1
-    );
-	$formdata["login"] = array(
-        "label" => "Username",
-        "value" => $USER->login,
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => $usernamelength,"max" => 20),
-            array("ValLogin")
-            // TODO unique in system
-        ),
-        "control" => array("TextField","maxlength" => 20),
-        "helpstep" => 1
-    );
-    
-    $pass = $USER->id ? '00000000' : '';
-    $formdata["password"] = array(
-        "label" => "Password",
-        "value" => $pass,
-        "validators" => array(
-            array("ValRequired"),	// TODO not if ldap
-            array("ValLength","min" => $passwordlength,"max" => 20),
-            array("ValPassword")
-            // TODO not like first/last/login
-        ),
-        "requires" => array("firstname", "lastname", "login"),
-        "control" => array("PasswordField","maxlength" => 20),
-        "helpstep" => 1
-    );
-	$formdata["passwordconfirm"] = array(
-        "label" => "Confirm Password",
-        "value" => $pass,
-        "validators" => array(
-            array("ValRequired"),	// TODO not if ldap
-            array("ValLength","min" => $passwordlength,"max" => 20),
-            array("ValFieldConfirmation", "field" => "password")
-        ),
-        "requires" => array("password"),
-        "control" => array("PasswordField","maxlength" => 20),
-        "helpstep" => 1
-    );
-    
-	$formdata["accesscode"] = array(
-        "label" => "Telephone User ID#",
-        "value" => $USER->accesscode,
-        "validators" => array(
-        	array("ValNumeric")
-        	// unique in system
-        ),
-        "control" => array("TextField","maxlength" => 20),
-        "helpstep" => 1
-    );
-    $pin = $USER->accesscode ? '00000000' : '';
-    $formdata["pin"] = array(
-        "label" => "Telephone PIN Code#",
-        "value" => $pin,
-        "validators" => array(
-        	array("ValNumeric")
-        	//TODO
-        ),
-        "requires" => array("accesscode"),
-        "control" => array("PasswordField","maxlength" => 20),
-        "helpstep" => 1
-    );
-	$formdata["pinconfirm"] = array(
-        "label" => "Confirm Telephone PIN",
-        "value" => $pin,
-        "validators" => array(
-        	array("ValNumeric"),
-        	array("ValFieldConfirmation", "field" => "pin")
-        ),
-        "requires" => array("pin"),
-        "control" => array("PasswordField","maxlength" => 20),
-        "helpstep" => 1
-    );
-	$formdata["email"] = array(
-        "label" => "Email",
-        "value" => $USER->email,
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 255),
-            array("ValEmail")
-        ),
-        "control" => array("TextField","maxlength" => 255),
-        "helpstep" => 1
-    );
-	$formdata["aremail"] = array(
-        "label" => "Auto Report Email(s)",
-        "value" => $USER->aremail,
-        "validators" => array(
-            array("ValLength","min" => 3,"max" => 1024),
-            array("ValEmailList")
-        ),
-        "control" => array("TextField","maxlength" => 1024), // TODO maxlength for text
-        "helpstep" => 1
-    );
-	$formdata["phone"] = array(
-        "label" => "Phone",
-        "value" => Phone::format($USER->phone),
-        "validators" => array(
-            array("ValLength","min" => 2,"max" => 20),
-            array("ValPhone")
-        ),
-        "control" => array("TextField","maxlength" => 20),
-        "helpstep" => 1
-    );
+		"label" => _L("Last Name"),
+		"control" => array("FormHtml","html" => $USER->lastname),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["firstname"] = array(
+		"label" => _L("First Name"),
+		"value" => $USER->firstname,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50, "size" => 25),
+		"helpstep" => 1
+	);
+	$formdata["lastname"] = array(
+		"label" => _L("Last Name"),
+		"value" => $USER->lastname,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50, "size" => 25),
+		"helpstep" => 1
+	);
 }
 
+if ($ldapuser || $readonly) {
+	$formdata["login"] = array(
+		"label" => _L("Username"),
+		"control" => array("FormHtml","html" => $USER->login),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["login"] = array(
+		"label" => _L("Username"),
+		"value" => $USER->login,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => $usernamelength,"max" => 20),
+			array("ValLogin")
+		),
+		"control" => array("TextField","maxlength" => 20, "size" => 15),
+		"helpstep" => 1
+	);
+}
+
+if (!$ldapuser) {
+	$pass = $USER->id ? '00000000' : '';
+	$formdata["password"] = array(
+		"label" => _L("Password"),
+		"value" => $pass,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => $passwordlength,"max" => 20),
+			array("ValPassword")
+		),
+		"requires" => array("firstname", "lastname", "login"),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 20),
+		"helpstep" => 1
+	);
+
+	$formdata["passwordconfirm"] = array(
+		"label" => _L("Confirm Password"),
+		"value" => $pass,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => $passwordlength,"max" => 20),
+			array("ValFieldConfirmation", "field" => "password")
+		),
+		"requires" => array("password"),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 20),
+		"helpstep" => 1
+	);
+}
+
+if ($readonly) {
+	$formdata["accesscode"] = array(
+		"label" => _L("Phone User ID"),
+		"control" => array("FormHtml","html" => $USER->accesscode),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["accesscode"] = array(
+		"label" => _L("Phone User ID"),
+		"value" => $USER->accesscode,
+		"validators" => array(
+			array("ValNumeric"),
+			array("ValAccesscode")
+		),
+		"control" => array("TextField","maxlength" => 20, "size" => 8),
+		"helpstep" => 1
+	);
+}
+
+$pin = $USER->accesscode ? '00000000' : '';
+$formdata["pin"] = array(
+	"label" => _L("Phone PIN Code"),
+	"value" => $pin,
+	"validators" => array(
+		array("ValNumeric"),
+		array("ValPin")
+	),
+	"requires" => array("accesscode"),
+	"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+	"helpstep" => 1
+);
+
+$formdata["pinconfirm"] = array(
+	"label" => _L("Confirm PIN"),
+	"value" => $pin,
+	"validators" => array(
+		array("ValNumeric"),
+		array("ValFieldConfirmation", "field" => "pin")
+	),
+	"requires" => array("pin"),
+	"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+	"helpstep" => 1
+);
+
+if ($readonly) {
+	$formdata["email"] = array(
+		"label" => _L("Email"),
+		"control" => array("FormHtml","html" => $USER->email),
+		"helpstep" => 1
+	);
+
+	$formdata["aremail"] = array(
+		"label" => _L("Auto Report Emails"),
+		"control" => array("FormHtml","html" => $USER->aremail),
+		"helpstep" => 1
+	);
+
+	$formdata["phone"] = array(
+		"label" => _L("Phone"),
+		"control" => array("FormHtml","html" => Phone::format($USER->phone)),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["email"] = array(
+		"label" => _L("Email"),
+		"value" => $USER->email,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 3,"max" => 255),
+			array("ValEmail")
+		),
+		"control" => array("TextField","maxlength" => 255, "size" => 30),
+		"helpstep" => 1
+	);
+
+	$formdata["aremail"] = array(
+		"label" => _L("Auto Report Emails"),
+		"value" => $USER->aremail,
+		"validators" => array(
+			array("ValLength","min" => 3,"max" => 1024),
+			array("ValEmailList")
+		),
+		"control" => array("TextField","maxlength" => 1024, "size" => 45),
+		"helpstep" => 1
+	);
+
+	$formdata["phone"] = array(
+		"label" => _L("Phone"),
+		"value" => Phone::format($USER->phone),
+		"validators" => array(
+			array("ValLength","min" => 2,"max" => 20),
+			array("ValPhone")
+		),
+		"control" => array("TextField","maxlength" => 20, "size" => 15),
+		"helpstep" => 1
+	);
+}
 // Notification Defaults
-$formdata[] = "Notification Defaults";
+$formdata[] = _L("Notification Defaults");
 
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $formdata["callearly"] = array(
-        "label" => "Default Delivery Window (Earliest)",
-        "value" => $USER->getCallEarly(),
-        "validators" => array(
-        ),
-        "control" => array("SelectMenu", "values"=>$startvalues),
-        "helpstep" => 2
+	"label" => _L("Default Start Time"),
+	"value" => $USER->getCallEarly(),
+	"validators" => array(
+	),
+	"control" => array("SelectMenu", "values"=>$startvalues),
+	"helpstep" => 2
 );
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 $formdata["calllate"] = array(
-        "label" => "Default Delivery Window (Latest)",
-        "value" => $USER->getCallLate(),
-        "validators" => array(
-        ),
-        "control" => array("SelectMenu", "values"=>$endvalues),
-        "helpstep" => 2
-);
-if (($usercallmax = $USER->getSetting("callmax")) === false) {
-	$usercallmax = min(4,$ACCESS->getValue('callmax'));
-} else {
-	$usercallmax = min($USER->getSetting("callmax"), $ACCESS->getValue('callmax'));
-}
-$callmax = first($ACCESS->getValue('callmax'), 1);
-$callattemptvalues = array();
-for ($i=1; $i<=$callmax; $i++) {
-	$callattemptvalues[$i] = $i;
-}
-$formdata["callmax"] = array(
-        "label" => "Call Attempts",
-        "value" => $usercallmax,
-        "validators" => array(
-        ),
-        "control" => array("SelectMenu", "values"=>$callattemptvalues),
-        "helpstep" => 2
-);
-if (($maxjobdays = $USER->getSetting("maxjobdays")) === false) {
-	$maxjobdays = 1;
-} else {
-	$maxjobdays = min($USER->getSetting("maxjobdays"), $ACCESS->getValue('maxjobdays'));
-}
-$maxdays = $ACCESS->getValue('maxjobdays');
-if ($maxdays == null) {
-	$maxdays = 7; // Max out at 7 days if the permission is not set.
-}
-$jobdaysvalues = array();
-for ($i=1; $i<=$maxdays; $i++) {
-	$jobdaysvalues[$i] = $i;
-}
-$formdata["maxjobdays"] = array(
-        "label" => "Days to Run",
-        "value" => $maxjobdays,
-        "validators" => array(
-        ),
-        "control" => array("SelectMenu", "values"=>$jobdaysvalues),
-        "helpstep" => 2
-);
-$calleridvalues = array();
-$calleridvalues[] = "Use toll free " . Phone::format(getSystemSetting("inboundnumber"));
-$calleridvalues[] = "Use default " . Phone::format(getSystemSetting("callerid"));
-$calleridvalues[] = "Use personal " . Phone::format($USER->getSetting("callerid",""));
-$formdata["usecallerid"] = array(
-        "label" => "Caller ID Preference",
-        "value" => "",
-        "validators" => array(
-        ),
-        "control" => array("RadioButton", "values" => $calleridvalues),
-        "helpstep" => 2
-);
-$formdata["callerid"] = array(
-        "label" => "Personal Caller ID",
-        "value" => Phone::format($USER->getSetting("callerid","")),
-        "validators" => array(
-            array("ValLength","min" => 3,"max" => 20),
-            array("ValPhone")
-        ),
-        "control" => array("TextField","maxlength" => 20),
-        "helpstep" => 2
+	"label" => _L("Default End Time"),
+	"value" => $USER->getCallLate(),
+	"validators" => array(
+	),
+	"control" => array("SelectMenu", "values"=>$endvalues),
+	"helpstep" => 2
 );
 
-$formdata[] = "Display Settings";
+$usercallmax = $USER->getSetting("callmax", $ACCESS->getValue('callmax'));
+$formdata["callmax"] = array(
+	"label" => _L("Call Attempts"),
+	"value" => $usercallmax,
+	"validators" => array(
+		array("ValInArray", "values" => range(1,first($ACCESS->getValue('callmax'), 1)))
+	),
+	"control" => array("SelectMenu", "values"=>array_combine(range(1,first($ACCESS->getValue('callmax'), 1)),range(1,first($ACCESS->getValue('callmax'), 1)))),
+	"helpstep" => 2
+);
+
+$maxjobdays = $USER->getSetting("maxjobdays", $ACCESS->getValue('maxjobdays'));
+$maxdays = $ACCESS->getValue('maxjobdays', 7);
+$formdata["maxjobdays"] = array(
+	"label" => _L("Days to Run"),
+	"value" => $maxjobdays,
+	"validators" => array(
+		array("ValInArray", "values" => range(1,$maxdays))
+	),
+	"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
+	"helpstep" => 2
+);
+
+if ($USER->authorize('setcallerid')) {
+	/*CSDELETEMARKER_START*/
+	if (getSystemSetting('_hascallback', false)) {
+		$formdata["usecallerid"] = array(
+			"label" => _L("Caller ID Preference"),
+			"value" => "",
+			"validators" => array(
+				array("ValInArray", "values" => array(0,1,2))
+			),
+			"control" => array("RadioButton", "values" => 
+				array(
+					0 => _L("Use toll free"). " - ". Phone::format(getSystemSetting("inboundnumber")),
+					1 => _L("Use default"). " - ". Phone::format(getSystemSetting("callerid")),
+					2 => _L("Use personal"). " - ". Phone::format($USER->getSetting("callerid",""))
+				)
+			),
+			"helpstep" => 2
+		);
+	}
+	/*CSDELETEMARKER_END*/
+	if ($readonly) {
+		$formdata["callerid"] = array(
+			"label" => _L("Personal Caller ID"),
+			"control" => array("FormHtml","html" => Phone::format($USER->getSetting("callerid",""))),
+			"helpstep" => 1
+		);
+	} else {
+		$formdata["callerid"] = array(
+			"label" => _L("Personal Caller ID"),
+			"value" => Phone::format($USER->getSetting("callerid","")),
+			"validators" => array(
+				array("ValLength","min" => 3,"max" => 20),
+				array("ValPhone")
+			),
+			"control" => array("TextField","maxlength" => 20, "size" => 15),
+			"helpstep" => 2
+		);
+	}
+}
 
 // Display Defaults
+$formdata[] = _L("Display Settings");
+
 $formdata["actionlinks"] = array(
-		"label" => "Action Links",
-        "value" => $USER->getSetting("actionlinks","both"),
-        "validators" => array(
-        ),
-        "control" => array("SelectMenu", "values"=>array("both"=>"Icons and Text", "icons"=>"Icons Only", "text"=>"Text Only")),
-        "helpstep" => 3
+	"label" => _L("Action Links"),
+	"value" => $USER->getSetting("actionlinks","both"),
+	"validators" => array(
+	),
+	"control" => array("SelectMenu", "values"=>array("both"=>"Icons and Text", "icons"=>"Icons Only", "text"=>"Text Only")),
+	"helpstep" => 3
 );
+
 $formdata["locale"] = array(
-		"label" => "Display Language",
-        "value" => $USER->getSetting('_locale', getSystemSetting('_locale')),
-        "validators" => array(
-        ),
-        "control" => array("SelectMenu", "values"=>$LOCALES),
-        "helpstep" => 3
+	"label" => _L("Display Language"),
+	"value" => $USER->getSetting('_locale', getSystemSetting('_locale')),
+	"validators" => array(
+	),
+	"control" => array("SelectMenu", "values"=>$LOCALES),
+	"helpstep" => 3
 );
 
 $formdata["brandtheme"] = array(
@@ -346,17 +426,17 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-        
-        //save data here
-        
-        $USER->firstname = $postdata['firstname'];
-        $USER->lastname = $postdata['lastname'];
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		//save data here
+		
+		$USER->firstname = $postdata['firstname'];
+		$USER->lastname = $postdata['lastname'];
 		$USER->login = $postdata['login'];
 		$USER->accesscode = $postdata['accesscode'];
 		$USER->email = $postdata['email'];
@@ -381,8 +461,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$USER->setSetting("callmax", $postdata['callmax']);
 		$USER->setSetting("maxjobdays", $postdata['maxjobdays']);
 		
-        // TODO callerid
-        
+		// TODO callerid
+		
 		$USER->setSetting("actionlinks", $postdata['actionlinks']);
 		$USER->setSetting("_locale", $postdata['locale']);
 		$_SESSION['_locale'] = $postdata['locale'];
@@ -431,14 +511,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "start:account";
-$TITLE = "Account Information: " . escapehtml($USER->firstname) . " " . escapehtml($USER->lastname);
+$TITLE = _L("Account Information") . ": " . escapehtml($USER->firstname) . " " . escapehtml($USER->lastname);
 
 include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
 
-<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme")); ?>
+<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme", "ValAccesscode", "ValPin")); ?>
 
 <? if ($datachange) { ?>
 
@@ -457,7 +537,7 @@ if($USER->authorize('loginphone') && !$IS_COMMSUITE) {
 }
 /*CSDELETEMARKER_END*/
 
-startWindow("User Information");
+startWindow(_L("User Information"));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
