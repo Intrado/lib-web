@@ -457,6 +457,30 @@ class ValInArray extends Validator {
 	}
 }
 
+class ValTimeCheck extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args, $requiredvalues) {
+		$value = strtotime($value);
+		
+		$hasmin = isset($args['min']) && $args['min'] !== false;
+		if ($hasmin)
+			$min = strtotime($args['min']);
+		$hasmax = isset($args['max']) && $args['max'] !== false;
+		if ($hasmax)
+			$max = strtotime($args['max']);
+		
+		if ($value == -1 || $value === false)
+			return _L("%$1s is not a valid time format",$this->label);		
+		if ($hasmin && $value < $min)
+			return _L("%$1s cannot be earlier than %$2s", $this->label, $args['min']);
+		if ($hasmax && $value > $max)
+			return _L("%$1s cannot be later than %$2s", $this->label, $args['min']);
+
+		return true;
+	}
+}
+
 
 //alpha
 //alphanumeric
