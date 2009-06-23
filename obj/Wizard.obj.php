@@ -12,20 +12,24 @@ class Wizard {
 	function Wizard ($name, $wizdata, $finish) {
 		$this->name = $name;
 		$this->wizdata = $wizdata;
-		$this->filteredwizdata = $this->filter();
+
+		if (!isset($_SESSION[$name])) {
+			error_log("initializing wizard data for $name");
+			$_SESSION[$name] = array("data" => array());
+		}
+
+		$this->filteredwizdata = $this->filter();		
 		//add finisher
 		$this->wizdata['finish'] = $finish;
 		$this->filteredwizdata['finish'] = $finish;
 		
 		$this->steplist = $this->getStepList();
 		if (isset($_SESSION[$name]['step'])) {
-			$curstep = $_SESSION[$name]['step'];
+			$this->curstep = $_SESSION[$name]['step'];
 		} else {
-			$curstep = $this->steplist[0];
+			$_SESSION[$name]['step'] = $curstep = $this->steplist[0];
+			redirect($_SERVER['SCRIPT_NAME']."?step=$curstep"); //when initializing, redirect to first step
 		}
-		$this->curstep = $curstep;
-		
-		
 	}
 	
 	function getStepData ($curstep = null) {
@@ -218,9 +222,9 @@ class Wizard {
 	}
 	
 	function handleRequest () {
-		if (isset($_GET['cancel']) || !isset($_SESSION[$this->name]['step'])) {
+		if (isset($_GET['cancel'])) {
 			unset($_SESSION[$this->name]);
-			$_SESSION[$this->name]['data'] = array();
+			$_SESSION[$this->name] = array("data" => array());
 			$_SESSION[$this->name]['step'] = $step = $this->steplist[0];
 			redirect($_SERVER['SCRIPT_NAME']."?step=$step");
 		}
@@ -231,6 +235,7 @@ class Wizard {
 				$_SESSION[$this->name]['step'] = $_GET['step'];
 				$this->setCurrentStep($_GET['step']);
 			} else {
+				exit();
 				$_SESSION[$this->name]['step'] = "/finish";
 				$this->setCurrentStep("/finish");
 			}
