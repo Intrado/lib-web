@@ -1,7 +1,6 @@
 <?
-require_once("../inc/utils.inc.php");
+require_once("../inc/subdircommon.inc.php");
 require_once("../inc/html.inc.php");
-require_once("../inc/locale.inc.php");
 
 //set expire time to + 1 hour so browsers cache this file
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
@@ -45,8 +44,8 @@ var RuleWidget = Class.create({
 		if (preloadedRules && !preloadedRules.join)
 			preloadedRules = null;
 			
-		new Ajax.Request('ajax.php?type=rulewidgetsettings', {
-			onSuccess: function(transport, rules) {
+		cachedAjaxGet('ajax.php?type=rulewidgetsettings',
+			function(transport, rules) {
 				var data = transport.responseJSON;
 				if (!data) {
 					// Silent failure, client should not provide any rule-building tools unless the event RuleWidget:Ready is fired.
@@ -82,7 +81,7 @@ var RuleWidget = Class.create({
 				}
 				this.container.fire('RuleWidget:Ready');
 			}.bindAsEventListener(this, preloadedRules)
-		});
+		);
 	},
 	
 	clear_rules: function() {
@@ -96,7 +95,7 @@ var RuleWidget = Class.create({
 	// @param tr, table row DOM element.
 	// @param addHiddenFieldnum, optional boolean specifying to add a hidden input with value=fieldnum
 	format_readable_rule: function(data, tr, addHiddenFieldnum) {
-		if (!data.fieldnum || !data.op || !data.logical || !data.val)
+		if (!data.fieldnum || !data.op || !data.logical)
 			return false;
 		if (!this.fieldmaps[data.fieldnum])
 			return false;
@@ -174,8 +173,8 @@ var RuleWidget = Class.create({
 			return;
 		}
 		// Actions
-		var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Delete'), 'information'))?>').insert('<br style=\"clear:both\"/>');
-		var deleteRuleButton = actionTD.down('button');
+		var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(action_link(_L('Delete'), 'cross'))?>').insert('<br style=\"clear:both\"/>');
+		var deleteRuleButton = actionTD.down('a');
 		this.rulesTableLastTR.insert({before:tr.insert(actionTD)});
 		deleteRuleButton.observe('click', function(event, tr, fieldnum) {
 			event.stop();
@@ -213,8 +212,8 @@ var RuleEditor = Class.create({
 		this.actionTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}));
 		containerTR.insert(this.fieldTD).insert(this.criteriaTD).insert(this.valueTD).insert(this.actionTD);
 
-		this.actionTD.down('fieldset').update('<?=addslashes(icon_button(_L('Add'), 'information'))?>').insert('<br style="clear:both"/>');
-		var addRuleButton = this.actionTD.down('button');
+		this.actionTD.down('fieldset').update('<?=addslashes(action_link(_L('Add'), 'add'))?>').insert('<br style="clear:both"/>');
+		var addRuleButton = this.actionTD.down('a');
 		
 		// Events
 		addRuleButton.observe('click', function(event) {
@@ -315,7 +314,7 @@ var RuleEditor = Class.create({
 		var section = this.valueTD.down('fieldset');
 		if (!fieldnum) {
 			section.update();
-			this.actionTD.down('button').hide();
+			this.actionTD.down('a').hide();
 			return false;
 		}
 		
@@ -337,8 +336,8 @@ var RuleEditor = Class.create({
 						checkbox.checked = false;
 					});
 				} else {
-					new Ajax.Request('ajax.php?type=persondatavalues&fieldnum=' + fieldnum, {
-						onSuccess: function(transport, fieldnum) {
+					cachedAjaxGet('ajax.php?type=persondatavalues&fieldnum=' + fieldnum,
+						function(transport, fieldnum) {
 							var section = this.valueTD.down('fieldset');
 							var data = transport.responseJSON;
 							var multicheckboxHTML = this.make_multicheckboxHTML(data);
@@ -350,7 +349,7 @@ var RuleEditor = Class.create({
 								input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
 							}.bind(this));
 						}.bindAsEventListener(this, fieldnum)
-					});
+					);
 				}
 				break;
 				
@@ -399,7 +398,7 @@ var RuleEditor = Class.create({
 		section.update(container);
 
 		// Show actions column also.
-		this.actionTD.down('button').show();
+		this.actionTD.down('a').show();
 	},
 	
 	reset: function() {
@@ -434,7 +433,7 @@ var RuleEditor = Class.create({
 		this.fieldTD.down('fieldset').update(fieldSelectbox);
 		this.criteriaTD.down('fieldset').update();
 		this.valueTD.down('fieldset').update();
-		this.actionTD.down('button').hide();
+		this.actionTD.down('a').hide();
 	},
 	
 	// Adds a toolbar only if the number of checkboxes exceeds threshold
