@@ -59,7 +59,12 @@ class ValPassword extends Validator {
 		global $USER;
 		if ($USER->ldap) return true;
 
-		if ($detail = validateNewPassword($requiredvalues['login'], $value, $requiredvalues['firstname'], $requiredvalues['lastname']))
+		if ($detail = validateNewPassword(
+				isset($requiredvalues['login'])? $requiredvalues['login']: $USER->login, 
+				$value, 
+				isset($requiredvalues['firstname'])? $requiredvalues['firstname']: $USER->firstname, 
+				isset($requiredvalues['lastname'])? $requiredvalues['lastname']: $USER->lastname
+			))
 			return "$this->label ". _L("is invalid") ." ".$detail;
 
 		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
@@ -76,6 +81,9 @@ class ValPin extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		global $USER;
 		$pin = ereg_replace("[^0-9]*","",$value);
+		$accesscode = isset($requiredvalues['accesscode'])? $requiredvalues['accesscode']: $USER->accesscode;
+		if ($pin === $accesscode)
+			return "$this->label ". _L("cannot equal Phone User ID.") ." ".$detail;
 		if (mb_strlen($value) !== $pin)
 			return "$this->label ". _L("cannot contain letters.") ." ".$detail;
 		if ($pin + 0 < 1000)
@@ -169,19 +177,33 @@ if ($ldapuser || $readonly) {
 
 if (!$ldapuser) {
 	$pass = $USER->id ? '00000000' : '';
-	$formdata["password"] = array(
-		"label" => _L("Password"),
-		"value" => $pass,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => $passwordlength,"max" => 20),
-			array("ValPassword")
-		),
-		"requires" => array("firstname", "lastname", "login"),
-		"control" => array("PasswordField","maxlength" => 20, "size" => 20),
-		"helpstep" => 1
-	);
-
+	if ($readonly) {
+		$formdata["password"] = array(
+			"label" => _L("Password"),
+			"value" => $pass,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","min" => $passwordlength,"max" => 20),
+				array("ValPassword")
+			),
+			"control" => array("PasswordField","maxlength" => 20, "size" => 20),
+			"helpstep" => 1
+		);
+	} else {
+		$formdata["password"] = array(
+			"label" => _L("Password"),
+			"value" => $pass,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","min" => $passwordlength,"max" => 20),
+				array("ValPassword")
+			),
+			"requires" => array("firstname", "lastname", "login"),
+			"control" => array("PasswordField","maxlength" => 20, "size" => 20),
+			"helpstep" => 1
+		);
+	}
+	
 	$formdata["passwordconfirm"] = array(
 		"label" => _L("Confirm Password"),
 		"value" => $pass,
@@ -216,17 +238,30 @@ if ($readonly) {
 }
 
 $pin = $USER->accesscode ? '00000000' : '';
-$formdata["pin"] = array(
-	"label" => _L("Phone PIN Code"),
-	"value" => $pin,
-	"validators" => array(
-		array("ValNumeric"),
-		array("ValPin")
-	),
-	"requires" => array("accesscode"),
-	"control" => array("PasswordField","maxlength" => 20, "size" => 8),
-	"helpstep" => 1
-);
+if ($readonly) {
+	$formdata["pin"] = array(
+		"label" => _L("Phone PIN Code"),
+		"value" => $pin,
+		"validators" => array(
+			array("ValNumeric"),
+			array("ValPin")
+		),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["pin"] = array(
+		"label" => _L("Phone PIN Code"),
+		"value" => $pin,
+		"validators" => array(
+			array("ValNumeric"),
+			array("ValPin")
+		),
+		"requires" => array("accesscode"),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+		"helpstep" => 1
+	);
+}
 
 $formdata["pinconfirm"] = array(
 	"label" => _L("Confirm PIN"),
@@ -411,7 +446,7 @@ $formdata["brandtheme"] = array(
 	"helpstep" => 3
 );
 
-$buttons = array(submit_button(_L("Done"),"submit","accept"),
+$buttons = array(submit_button(_L("Done"),"submit","tick"),
 				icon_button(_L("Cancel"),"cross",null,"start.php"));
 
 $form = new Form("account", $formdata, null, $buttons);
@@ -435,14 +470,26 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		//save data here
 		
-		$USER->firstname = $postdata['firstname'];
-		$USER->lastname = $postdata['lastname'];
-		$USER->login = $postdata['login'];
-		$USER->accesscode = $postdata['accesscode'];
-		$USER->email = $postdata['email'];
-		$USER->aremail = $postdata['aremail'];
-		$USER->phone = $postdata['phone'];
-		$USER->update();
+		if (!$readonly) {
+			$USER->firstname = $postdata['firstname'];
+			$USER->lastname = $postdata['lastname'];
+			$USER->login = $postdata['login'];
+			$USER->accesscode = $postdata['accesscode'];
+			$USER->email = $postdata['email'];
+			$USER->aremail = $postdata['aremail'];
+			$USER->phone = $postdata['phone'];
+			$USER->update();
+			if ($USER->authorize('setcallerid')) {
+				$USER->setSetting("callerid",$postdata['callerid']);
+				/*CSDELETEMARKER_START*/
+				// if customer has callback feature
+				if (getSystemSetting('_hascallback', false)) {
+					// TODO: Something is missing here. We have three options but only two DB values?
+					$USER->setSetting('prefermycallerid', ($postdata['usecallerid'] == 2)? 1: 0);
+				}
+				/*CSDELETEMARKER_END*/
+			}
+		}
 
 		// If the password is all 0 characters then it was a default form value, so ignore it
 		if(!$USER->ldap) {
@@ -460,8 +507,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$USER->setSetting("calllate", $postdata['calllate']);
 		$USER->setSetting("callmax", $postdata['callmax']);
 		$USER->setSetting("maxjobdays", $postdata['maxjobdays']);
-		
-		// TODO callerid
 		
 		$USER->setSetting("actionlinks", $postdata['actionlinks']);
 		$USER->setSetting("_locale", $postdata['locale']);
