@@ -170,7 +170,7 @@ class ValBrandTheme extends Validator {
 						errortext += " Theme must be a valid choice.";
 					if (!(vals.color.length == 6))
 						errortext += " Primary Color must be a valid Hex representation of your color choice.";
-					if (!parseFloat(vals.ratio))
+					if (parseFloat(vals.ratio) === false)
 						errortext += " Ratio must be a number.";
 				}
 				if (errortext)
