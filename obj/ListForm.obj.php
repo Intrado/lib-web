@@ -1,9 +1,6 @@
 <?php
 /****** TODO *********************************************************************************************
-+ use new cached ajax function
-+ appropriate icons, use action_link() instead of icon_button() for Actions columns
 + Benchmark DOM manipulation speed/memory usage in various browsers, particularly for Multisearch persondatavalues.
-+ QUESTION: preliminary 'click here to begin' step necessary? currently not available.
 *********************************************************************************************************/
 class ListForm extends Form {
 	function ListForm ($name) {
@@ -92,9 +89,9 @@ class ListForm extends Form {
 							</table>
 							
 							<fieldset id='AllLists' style='margin-top:10px; margin-bottom:10px; padding:5px'>
-								".icon_button(_L('Build List Using Rules'),'information', null, null, ' id="buildListButton" ')."
+								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" ')."
 								<div id='listSelectboxContainer' style='float:left'></div>
-								".icon_button(_L('Choose List'),'information', null, null, ' id="chooseListButton" ')."
+								".icon_button(_L('Choose List'),'arrow_turn_left', null, null, ' id="chooseListButton" ')."
 								<br style='clear:both'/>
 							</fieldset>
 						</div>
@@ -126,6 +123,7 @@ class ListForm extends Form {
 			</table>
 			
 			<!-- FORM -->
+			<br style='clear: both'/>
 			<div class='newform_container'>
 				<form class='newform' id='{$this->name}' name='{$this->name}' method='POST' action='{$posturl}'>
 					".implode('', $this->buttons)."
@@ -250,9 +248,9 @@ class ListForm extends Form {
 					if (!listids.join)
 						return;
 					
-					new Ajax.Request('ajax.php?type=liststats&listids='+listidsJSON, {
-						// Adds a row for this list to the Lists Table
-						onSuccess: function(transport) {
+					// Adds a row for this list to the Lists Table only if the ajax request is successful.
+					cachedAjaxGet('ajax.php?type=liststats&listids='+listidsJSON,
+						function(transport) {
 							var stats = transport.responseJSON;
 							if (!stats) {
 								alert('".addslashes(_L('No data available for this list, please check your internet connection and try again'))."');
@@ -270,9 +268,11 @@ class ListForm extends Form {
 								if (data.removed > 0)
 									statisticsTD.insert(', ' + data.removed + ' ".addslashes(_L('Removed'))."');
 								var actionsTD = new Element('td', {'class':'List'});
-								actionsTD.insert('".addslashes(icon_button(_L('Preview'),'information'))."');
-								actionsTD.insert('".addslashes(icon_button(_L('Show/Hide Rules'),'information'))."');
-								actionsTD.insert('".addslashes(icon_button(_L('Remove'),'information'))."');
+								actionsTD.insert('".addslashes(action_links(array(
+									action_link(_L('Preview'),'application_view_list'),
+									action_link(_L('Show/Hide Rules'),'bullet_arrow_down'),
+									action_link(_L('Remove'),'cross')
+								)))."');
 								actionsTD.insert('<br style=\"clear:both\"/>');
 								$('listsTableBody').insert(new Element('tr').insert(nameTD).insert(statisticsTD).insert(actionsTD));
 								// Add an extra row for viewing rules.
@@ -280,19 +280,19 @@ class ListForm extends Form {
 								rulesTR.hide();
 								$('listsTableBody').insert(rulesTR);
 								
-								var previewButton = actionsTD.down('button', 0);
+								var previewButton = actionsTD.down('a', 0);
 								previewButton.observe('click', function(event, listid) {
 									window.open('showlist.php?id='+listid, '_blank');
 								}.bindAsEventListener(actionsTD,data.id));
-								var rulesButton = actionsTD.down('button', 1);
+								var rulesButton = actionsTD.down('a', 1);
 								rulesButton.observe('click', function (event, listid) {
 									var rulesTR = this.up('tr').next('tr');
 									rulesTR.toggle();
 									if (!rulesTR.visible())
 										return;
 									rulesTR.down('td').update('Loading..');
-									new Ajax.Request('ajax.php?type=listrules&listids='+[listid].toJSON(), {
-										onSuccess: function (transport) {
+									cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
+										function (transport) {
 											var listRules = transport.responseJSON;
 											if (!listRules) {
 												alert('".addslashes(_L('Sorry cannot get list rules'))."');
@@ -322,9 +322,9 @@ class ListForm extends Form {
 													viewRulesTD.update(new Element('table').insert(thead).insert(tbody));
 											}
 										}.bindAsEventListener(rulesTR)
-									});
+									);
 								}.bindAsEventListener(actionsTD,data.id));
-								var removeButton = actionsTD.down('button', 2);
+								var removeButton = actionsTD.down('a', 2);
 								removeButton.observe('click', function(event, listid) {
 									var tr = this.up('tr');
 									tr.next('tr').remove(); // RulesTR
@@ -356,7 +356,7 @@ class ListForm extends Form {
 							listform_refresh_guide(true);
 							listform_show_validation_message();
 						}
-					});
+					);
 				}
 				
 				function listform_reset_list_selectbox() {
@@ -456,8 +456,8 @@ class ListForm extends Form {
 					document.formvars['{$this->name}'].ruleWidget.ruleEditor.valueTD.down('fieldset').id = 'AddRuleValue';
 					document.formvars['{$this->name}'].ruleWidget.ruleEditor.actionTD.down('fieldset').id = 'AddRuleAction';
 					var buildListFieldset = new Element('fieldset',{'id':'BuildListSaveRules', 'style':'margin-top:10px;margin-bottom:10px;padding:5px'});
-					buildListFieldset.insert('".addslashes(icon_button(_L('Don\'t Save'),'information',null,null, ' id="cancelBuildListButton" '))."');
-					buildListFieldset.insert('".addslashes(icon_button(_L('Save Rules as a List'),'information',null,null, ' id="saveRulesButton" '))."');
+					buildListFieldset.insert('".addslashes(icon_button(_L('Don\'t Save'),'delete',null,null, ' id="cancelBuildListButton" '))."');
+					buildListFieldset.insert('".addslashes(icon_button(_L('Save Rules as a List'),'accept',null,null, ' id="saveRulesButton" '))."');
 					document.formvars['{$this->name}'].ruleWidget.container.insert(buildListFieldset);
 					document.formvars['{$this->name}'].ruleWidget.rulesTableFootTR.update(new Element('td', {'colspan':100}).update(new Element('div', {'style':'margin:0; padding:0; margin-top:8px'}).insert(new Element('img', {'src':'img/pixel.gif', 'style':'width:16px; height:16px; margin:0; padding:0; margin-left:-8px'}))));
 					
@@ -607,8 +607,8 @@ class ListForm extends Form {
 					});
 					
 					// Load Existing Lists
-					new Ajax.Request('ajax.php?type=lists', {
-						onSuccess: function(transport) {
+					cachedAjaxGet('ajax.php?type=lists',
+						function(transport) {
 							document.formvars['{$this->name}'].existingLists = transport.responseJSON;
 							if (!document.formvars['{$this->name}'].existingLists)
 								document.formvars['{$this->name}'].existingLists = {};
@@ -626,7 +626,7 @@ class ListForm extends Form {
 								listform_show_validation_message();
 							}
 						}
-					});
+					);
 				}
 				
 				// Initiatiate Page.
