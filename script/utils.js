@@ -48,7 +48,7 @@ function setVisibleIfChecked (checkbox, name) {
 	}
 }
 
-function insert(text, dest) {
+function textInsert(text, dest) {
 	if (document.selection) {
 		dest.focus();
 		dest.sel.text = text;
