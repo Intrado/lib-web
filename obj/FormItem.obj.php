@@ -153,12 +153,36 @@ class HtmlRadioButton extends FormItem {
 	}
 }
 
+// Text Field with calendar popup. you can pass in a date or a number of days relative to today to restrict dates displayed for selection
+// Example:
+// "control" => array("TextDate", "size"=>12, "nodatesafter" => 0, "nodatesbefore" => -2)    would allow selection of the two days previous to today and today's date only. 
 class TextDate extends FormItem {
 	function render ($value) {
+		global $LOCALE;
+		$dateFilter = "";
+		if (isset($this->args['nodatesafter']))
+			$dateFilter = "DatePickerUtils.noDatesAfter(".$this->args['nodatesafter'].")";
+		if (isset($this->args['nodatesbefore'])) {
+			if ($dateFilter)
+				$dateFilter .= ".append(DatePickerUtils.noDatesBefore(".$this->args['nodatesbefore']."))";
+			else
+				$dateFilter = "DatePickerUtils.noDatesBefore(".$this->args['nodatesbefore'].")";
+		}
 		$n = $this->form->name."_".$this->name;
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
-		// TODO: Need to include the calender javascript here. Our current one breaks if it is included in the form item though so it must be included after nav.inc.php in the page Display section. We need a new calendar written for prototype or to fix the current one.
-		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.date("n/j/Y").'" maxlength="12" '.$size.' onfocus="lcs(this,true,true)" onclick="event.cancelBubble=true;lcs(this,true,true)"/>';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.date("n/j/Y").'" maxlength="12" '.$size.'/>';
+		$str .= '<script type="text/javascript" src="script/datepicker.js"></script>
+			<script type="text/javascript">
+				var dpck_fieldname = new DatePicker({
+				relative:"'.$n.'",
+				keepFieldEmpty:true,
+				language:"'.substr($LOCALE,0,2).'",
+				enableCloseOnBlur:1,
+				topOffset:20,
+				'.(($dateFilter)?'dateFilter:'.$dateFilter:'').'
+				});
+			</script>';
+		return $str;
 	}
 }
 

@@ -188,11 +188,10 @@ if (count($formdata)) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 require_once("popup.inc.php");
-// TODO: This script should be included on the form item. Currently that breaks it though. We need a new calender, maybe one that is written in prototype syntax.
-?><script SRC="script/calendar.js"></script><?
 
 startWindow(_L("Message Preview"));
-if (count($formdata)) echo $form->render();
+if (count($formdata)) 
+	echo $form->render();
 ?><div id="messagepreviewdiv" name="messagepreviewdiv"><?
 // If there is no formdata (no field inserts) then just play the message
 if (!count($formdata)) {?>

@@ -207,7 +207,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	
 	
 	<script src="script/form.js.php" type="text/javascript"></script>
-	<link href="css/form.css.php" type="text/css" rel="stylesheet">	
+	<link href="css/form.css.php" type="text/css" rel="stylesheet">
+	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<script>
