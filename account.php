@@ -144,7 +144,7 @@ class ValPin extends Validator {
 		$accesscode = isset($requiredvalues['accesscode'])? $requiredvalues['accesscode']: $USER->accesscode;
 		if ($pin === $accesscode)
 			return "$this->label ". _L("cannot equal Phone User ID.") ." ".$detail;
-		if (mb_strlen($value) !== $pin)
+		if (mb_strlen($value) !== mb_strlen($pin))
 			return "$this->label ". _L("cannot contain letters.") ." ".$detail;
 		if ($pin + 0 < 1000)
 			return "$this->label ". _L("must be four digits or more. Must have a value greater than 1000.") ." ".$detail;
