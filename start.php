@@ -111,7 +111,7 @@ if ($listsdata) {
 					<tr>
 						<td align="right" valign="center" class="bottomBorder"><div NOWRAP class="destlabel">Basic<?=help('Start_EasyCall', '', 'small')?></div></td>
 						<td class="bottomBorder" style="padding: 5px;" valign="center">
-							<img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="popup('easycallstart.php?id=new',550,550);"
+							<img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="window.location = 'jobwizard.php'"
 							onmouseover="this.src='img/themes/<?=$theme?>/b2_easycall2.gif'"
 							onmouseout="this.src='img/themes/<?=$theme?>/b1_easycall2.gif'">
 						</td>
