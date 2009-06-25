@@ -19,62 +19,51 @@ require_once("obj/AudioFile.obj.php");
 class IntroSelect extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-
+		
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		$str = "";
 		$count = 0;
-		$str .= '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		$str .= '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml(json_encode($value)).'"/>';
 		
-		$str .= '<div id="introwidgetedit'.$n.'" style="display:none;">';
+		$str .= '<div id="introwidgetedit'.$n.'">';
+		
+		$str .= '<table><tr>';
 		foreach ($this->args['values'] as $key => $selectbox) {
+			$str .= '<td>';
 			if($key == "user")
-				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange=loaduser(\'' . $n .'user\',\'' . $n . 'message\');updatevalue(\''.$n.'\');>';
+				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n .'user\',\'' . $n . 'message\');updatevalue(\''.$n.'\');">';
+			else if($key == "message")
+				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="updatevalue(\''.$n.'\');form_do_validation($(\'' . $this->form->name . '\'),$(\'' . $n . '\'));">';
 			else
-				$str .= '<select  id="' . $n . $key .'"  '.$size .' onchange=updatevalue(\''.$n.'\');>';
+				$str .= '<select  id="' . $n . $key .'"  '.$size .' onchange="updatevalue(\''.$n.'\');">';
 			foreach ($selectbox as $selectvalue => $selectname) {
-				$checked = $value == $selectvalue;
+				$checked = (isset($value[$key]) && $value[$key] == $selectvalue);
 				$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>';
 			}
-			$str .= '</select>&nbsp;';
+			$str .= '</select></td>';
 			$count++;
-		}		
+		}	
+		$str .= '<td>';
 		$str .= icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
 					if(content.message != '')
-						popup('previewmessage.php?id=' + content, 400, 400);") 
-			   . icon_button(_L("Ok"),"tick","updatevalue('$n');
-			  				form_do_validation($('" . $this->form->name . "'), $('" . $n . "'));
-			 				 $('introwidgetedit" .$n. "').hide();
-			 				 $('introwidgetblocked" .$n. "').show();
-			 				 return false;");
-			 				 
+						popup('previewmessage.php?id=' + content, 400, 400);");
+		$str .= '</td></tr></table>';
 		$str .= '</div>';
-		$str .= '<div id="introwidgetblocked'.$n.'">';
-		
-		
-		$str .= '<span id="introwidget'.$n.'"></span>';
-		
-		$str .= '<div id="introplay'.$n.'">' . icon_button(_L("Play"),"fugue/control","
-				var content = $('" . $n . "').getValue().evalJSON();
-					if(content.message != '')
-						popup('previewmessage.php?id=' + content.message, 400, 400);") 
-			  . '</div>'. icon_button(_L("Load"),"fugue/arrow_045","$('introwidgetedit" .$n. "').show();$('introwidgetblocked" .$n. "').hide();return false;") ;
-		$str .= '</div>';
-		// ' . (isset($this->args['values']["language"])?"$(introitem+\"language\").value":"\"\"") . ';
-		$str .= '<script>showinfo(\'' .$n . '\');</script>';
+
 		return $str;
 	}
 }
 
 class ValIntroSelect extends Validator {
 	function validate ($value, $args) {
-		if(is_numeric($value))
-			return true;
-		$checkval = json_decode($value);
+		if(!is_array($value)) {
+			$value = json_decode($value,true);
+		}
 		$errortext = "";
-		if (!isset($checkval) || !isset($checkval->message) || $checkval->message == "") {
+		if (!isset($value["message"]) || $value["message"] == "")	
 			$errortext .= " is required ";
-		} else if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($checkval->message))) {
+		else if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($value["message"]))) {
 			$errortext .= " message can not be found";
 		}
 		if ($errortext)
@@ -110,20 +99,14 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $messages = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
-$languages = QuickQueryList("select name from language");
+
+$languages = QuickQueryList("select name from language where name != 'English'");
 
 $messageselect = array("" => "Select a Message");
 foreach($messages as $message)
 	$messageselect[$message->id] = $message->name;
-	
-$languageselect = array("" => "Select Language");
-$i = 1;
-foreach($languages as $language) {
-	$languageselect[$language] = $language;
-	$i++;
-}
-	
 
+	
 if($IS_COMMSUITE)
 	$users = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
 /*CSDELETEMARKER_START*/
@@ -131,97 +114,90 @@ else
 	$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");
 /*CSDELETEMARKER_END*/
 	
-$userselect = array("" => "Select User");
+$userselect = array("" => "Select Messages From User (Optional)");
 foreach($users as $user) {
 	$userselect[$user->id] = $user->firstname ." " . $user->lastname;
 }	
 
-$defaultvalues = array("user" => $userselect, "message" => $messageselect);
-
-$languagevalues = array("language" => $languageselect,"user" => $userselect, "message" => $messageselect);
-
-
-$defaultintro = QuickQuery("select messageid from prompt where type='intro' and language is null");
-$emergencyintro = QuickQuery("select messageid from prompt where type='emergencyintro' and language is null");
+$messagevalues = array("user" => $userselect, "message" => $messageselect);
+//$languagevalues = array("language" => $languageselect,"user" => $userselect, "message" => $messageselect);
 
 
+$defaultintro = DBFind("Message","from message m, prompt p where p.type='intro' and language is null and p.messageid = m.id and m.type='phone'","m");
+$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language is null and p.messageid = m.id and m.type='phone'","m");
+
+
+
+$defaultmessages = $messagevalues;
+if($defaultintro) {
+	$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
+}
+$emergencymessages = $messagevalues;
+if($emergencyintro) {
+	$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
+}
 
 $formdata = array(
 	"Required Intro",
 	"defaultmessage" => array(
 		"label" => _L("Default Intro"),
-		"value" => '{"message":"' .  ($defaultintro === false?"":$defaultintro) . '"}',
+		"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
-			 "values"=>$defaultvalues
+			 "values"=>$defaultmessages
 		),
 		"helpstep" => 1
 	),
 	"emergencymessage" => array(
 		"label" => _L("Emergency Intro"),
-		"value" => '{"message":"' . ($emergencyintro === false?"":$emergencyintro) . '"}',
+		"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
-			 "values"=>$defaultvalues
+			 "values"=>$emergencymessages
 		),
 		"helpstep" => 1
 	)
-	,
-	"Language Options"
 );
-
-
-$languageintro = QuickQueryList("select language, messageid from prompt where type='intro' and language is not null",true);
-$i = 1;
-foreach($languageintro as $language => $messageid) {
-		$formdata["default$i"] = array(
-		"label" => _L("Language Default") . " " .  $i,
-		"value" => '{"language":"' . $language . '",message":"' . $messageid . '"}',
+foreach($languages as $language) {	
+	$defaultintro = DBFind("Message","from message m, prompt p where p.type='intro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
+	
+	// TODO Fix a better way of adding the set message rather than copying the array in a for loop like this. 
+	$defaultmessages = $messagevalues;
+	$messageid = "";
+	if($defaultintro) {
+		$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
+		$messageid = $defaultintro->id;
+	}
+	$formdata[] = $language; // New section for each language
+	$formdata[$language . "default"] = array(
+		"label" => _L("Default"),
+		"value" => array("message" => $messageid),
 		"validators" => array(),
 		"control" => array("IntroSelect",
-			 "values"=>$languagevalues
+			 "values"=>$defaultmessages
 		),
 		"helpstep" => 2
 	);
-	$i++;
-}
-$languageintro = QuickQueryList("select language, messageid from prompt where type='emergencyintro' and language is not null",true);
-$i = 1;
-foreach($languageintro as $language => $messageid) {
-		$formdata["emergency$i"] = array(
-		"label" => _L("Language Emergency") . " " .  $i,
-		"value" => '{"language":"' . $language . '",message":"' . $messageid . '"}',
+	$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
+	$emergencymessages = $messagevalues;
+	$messageid = "";
+	if($emergencyintro) {
+		$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
+		$messageid = $emergencyintro->id;
+	}
+	$formdata[$language . "emergency"] = array(
+		"label" => _L("Emergency"),
+		"value" => array("message" => $messageid),
 		"validators" => array(),
 		"control" => array("IntroSelect",
-			 "values"=>$languagevalues
-		),
-		"helpstep" => 2
-	);
-	$i++;
-}
-/*
-for($i = 1; $i < 10; $i++) {
-	$formdata["default$i"] = array(
-		"label" => _L("Language Default") . " " .  $i,
-		"value" => '{"message":""}',
-		"validators" => array(),
-		"control" => array("IntroSelect",
-			 "values"=>$languagevalues
-		),
-		"helpstep" => 2
-	);
-	$formdata["emergency$i"] = array(
-		"label" => _L("Language Emergency") . " " .  $i,
-		"value" => '{"message":""}',
-		"validators" => array(),
-		"control" => array("IntroSelect",
-			 "values"=>$languagevalues
+			 "values"=>$emergencymessages
 		),
 		"helpstep" => 2
 	);
 	
+	
 }
-*/
+
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
 		icon_button(_L("Cancel"),"cross",null,"settings.php"));
@@ -244,13 +220,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		$defaultvalues = json_decode($postdata['defaultmessage']);
-		$msgid = $defaultvalues->message + 0;
+		$messagevalues = json_decode($postdata['defaultmessage']);
+		$msgid = $messagevalues->message + 0;
 		$newmsg = new Message($msgid);
 		if(!$newmsg->deleted) {// if deleted the old value is still the intro
 			$newmsg->id = null;
 			$newmsg->deleted = 1;
-			$newmsg->name = "default_intro";	
+			$newmsg->name = $newmsg->name . " (Default Intro Copy)";	
 			$newmsg->create();
 			// copy the parts
 			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -269,7 +245,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if(!$newmsg->deleted) {// if deleted the old value is still the intro
 			$newmsg->id = null;
 			$newmsg->deleted = 1;
-			$newmsg->name = "emergency_intro";	
+			$newmsg->name = $newmsg->name . " (Emergecny Intro Copy)";	
 			$newmsg->create();
 			// copy the parts
 			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -282,22 +258,22 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		QuickUpdate("delete from prompt where type='emergencyintro' and language is null;insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
 		
-		//Future Language implementation     			
-		for($i = 0; $i <= 9;$i++ ) {	
+		foreach($languages as $language) {	
 			
-			if(isset($postdata['default' . $i])) {				
-				$languagevalues = json_decode($postdata['default' . $i]);
+			
+			if(isset($postdata[$language . 'default'])) {				
+				$languagevalues = json_decode($postdata[$language . 'default']);
 				if(isset($languagevalues->message) && isset($languagevalues->language)) {
 					$msgid = $languagevalues->message + 0;
 					$languageid = $languagevalues->language + 0;
 					$newmsg = new Message($msgid);
 					if($newmsg->deleted)
-						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));			
+						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($language,$newmsg->id,$language));			
 					
 					else {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
-						$newmsg->name = 'intro_digit_' . $i;	
+						$newmsg->name = $newmsg->name . " ($language Default Intro Copy)";							
 						$newmsg->create();
 						// copy the parts
 						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -307,24 +283,23 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$newpart->messageid = $newmsg->id;
 							$newpart->create();
 						}
-						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));			
+						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($language,$newmsg->id,$language));			
 					}
 				}
 			}	
 
-			if(isset($postdata['emergency' . $i])) {				
-				$languagevalues = json_decode($postdata['emergency' . $i]);
-				if(isset($languagevalues->message) && isset($languagevalues->language)) {
+			if(isset($postdata[$language . 'emergency'])) {				
+				$languagevalues = json_decode($postdata[$language . 'emergency']);
+				if(isset($languagevalues->message)) {
 					$msgid = $languagevalues->message + 0;
-					$languageid = $languagevalues->language + 0;
 					$newmsg = new Message($msgid);
 					if($newmsg->deleted)
-						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));						
+						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($language,$newmsg->id,$language));						
 										
 					else {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
-						$newmsg->name = 'intro_digit_' . $i;	
+						$newmsg->name = $newmsg->name . " ($language Emergecny Intro Copy)";													
 						$newmsg->create();
 						// copy the parts
 						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -334,7 +309,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$newpart->messageid = $newmsg->id;
 							$newpart->create();
 						}
-						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($languagevalues->language,$newmsg->id,$languagevalues->language));						
+						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($language,$newmsg->id,$language));						
 					}
 				}
 			}	
@@ -379,19 +354,7 @@ function loaduser(sourceid,targetid) {
 		request += '&userid=' + $(sourceid).getValue();
 	cachedAjaxGet(request,setvalues,targetid);
 }	
-function showinfo(id) {
-		var message = $(id).value.evalJSON();
-		if(message.message == "") {
-			note = "Message is not";
-			$('introplay' + id).hide();
-		} else {
-			note = "Message is set ";
-			if(!(message.language == undefined || message.language == ""))
-				note += " with language: " + message.language;
-			$('introplay' + id).show();
-		}
-		$('introwidget' + id ).innerHTML = note; 		
-}
+
 function updatevalue(id) {
 		var language = "";
 		if($(id+"language")!=null)
@@ -401,7 +364,6 @@ function updatevalue(id) {
 				"user": $(id+"user").value,
 				"message": $(id+"message").value
 		});
-		showinfo(id);		
 }
 
 </script>
