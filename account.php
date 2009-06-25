@@ -136,19 +136,23 @@ class ValPassword extends Validator {
 }
 
 class ValPin extends Validator {
-	var $onlyserverside = true;
-
 	function validate ($value, $args, $requiredvalues) {
 		global $USER;
 		$pin = ereg_replace("[^0-9]*","",$value);
 		$accesscode = isset($requiredvalues['accesscode'])? $requiredvalues['accesscode']: $USER->accesscode;
 		if ($pin === $accesscode)
 			return "$this->label ". _L("cannot equal Phone User ID.") ." ".$detail;
-		if (mb_strlen($value) !== mb_strlen($pin))
-			return "$this->label ". _L("cannot contain letters.") ." ".$detail;
-		if ($pin + 0 < 1000)
-			return "$this->label ". _L("must be four digits or more. Must have a value greater than 1000.") ." ".$detail;
 		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args, requiredvalues) {
+				var pin = parseFloat(value);
+				if (pin == requiredvalues.accesscode)
+					return label + " '. addslashes(_L("cannot be equal to Phone User ID")). '";
+				return true;
+			}';
 	}
 }
 
@@ -200,7 +204,7 @@ if ($readonly) {
 			array("ValRequired"),
 			array("ValLength","min" => 1,"max" => 50)
 		),
-		"control" => array("TextField","maxlength" => 50, "size" => 25),
+		"control" => array("TextField","maxlength" => 50, "size" => 30),
 		"helpstep" => 1
 	);
 	$formdata["lastname"] = array(
@@ -210,7 +214,7 @@ if ($readonly) {
 			array("ValRequired"),
 			array("ValLength","min" => 1,"max" => 50)
 		),
-		"control" => array("TextField","maxlength" => 50, "size" => 25),
+		"control" => array("TextField","maxlength" => 50, "size" => 30),
 		"helpstep" => 1
 	);
 }
@@ -230,7 +234,7 @@ if ($ldapuser || $readonly) {
 			array("ValLength","min" => $usernamelength,"max" => 20),
 			array("ValLogin")
 		),
-		"control" => array("TextField","maxlength" => 20, "size" => 15),
+		"control" => array("TextField","maxlength" => 20, "size" => 20),
 		"helpstep" => 1
 	);
 }
@@ -246,7 +250,7 @@ if (!$ldapuser) {
 				array("ValLength","min" => $passwordlength,"max" => 20),
 				array("ValPassword")
 			),
-			"control" => array("PasswordField","maxlength" => 20, "size" => 20),
+			"control" => array("PasswordField","maxlength" => 20, "size" => 25),
 			"helpstep" => 1
 		);
 	} else {
@@ -259,7 +263,7 @@ if (!$ldapuser) {
 				array("ValPassword")
 			),
 			"requires" => array("firstname", "lastname", "login"),
-			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 20),
+			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25),
 			"helpstep" => 1
 		);
 	}
@@ -273,7 +277,7 @@ if (!$ldapuser) {
 			array("ValFieldConfirmation", "field" => "password")
 		),
 		"requires" => array("password"),
-		"control" => array("PasswordField","maxlength" => 20, "size" => 20),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 25),
 		"helpstep" => 1
 	);
 }
@@ -362,7 +366,7 @@ if ($readonly) {
 			array("ValLength","min" => 3,"max" => 255),
 			array("ValEmail")
 		),
-		"control" => array("TextField","maxlength" => 255, "size" => 30),
+		"control" => array("TextField","maxlength" => 255, "size" => 35),
 		"helpstep" => 1
 	);
 
@@ -373,7 +377,7 @@ if ($readonly) {
 			array("ValLength","min" => 3,"max" => 1024),
 			array("ValEmailList")
 		),
-		"control" => array("TextField","maxlength" => 1024, "size" => 45),
+		"control" => array("TextField","maxlength" => 1024, "size" => 50),
 		"helpstep" => 1
 	);
 
