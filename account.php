@@ -16,144 +16,13 @@ require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormBrandTheme.obj.php");
-
+require_once("obj/FormUserItems.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize('managemyaccount')) {
 	redirect('unauthorized.php');
-}
-////////////////////////////////////////////////////////////////////////////////
-// Form Items
-////////////////////////////////////////////////////////////////////////////////
-class TextPasswordStrength extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
-		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
-		$str = '<table style="border-width:0px; border-spacing:0px; padding:0px;">
-					<tr>
-						<td style="padding:0px"><input id="'.$n.'" name="'.$n.'" type="password" value="'.escapehtml($value).'" '.$max.' '.$size.'/></td>
-						<td>&nbsp;'._L("Password Strength").':</td>
-						<td>
-							<table style="border-width:0px; border-spacing:0px; padding:0px; border-style:solid; border-color:black">
-								<tr>
-									<td style="padding:0px"><div id="'.$n.'0" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'1" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'2" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'3" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'4" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<script type="text/javascript">
-					var specialchars = ["\~","\`","\@","\#","\$","\%","\^","\&","\*","\(","\)","\_","\+","\-","\=","\;","\:","\{","\}","\[","\]","\|","\\\\","\/","\?","\>","\<"];
-					function checkPasswordStrength() {
-						var pass = $('.$n.').value;
-						var int = 0;
-						var spe = 0;
-						var len = 0;
-						var xlen = 0;
-						var xxlen = 0;
-						if (pass.length > 5)
-							len = 1;
-						if (pass.length > 10)
-							xlen = 1;
-						if (pass.length > 15)
-							xxlen = 1;
-						for (var i = 0; i < pass.length; i++) {
-							if (parseInt(pass[i]) > 0)
-								int = 1;
-							if ($A(specialchars).indexOf(pass[i]) > -1) {
-								spe = 1;
-							}
-						}
-						var strength = int + spe + len + xlen + xxlen;
-						for (var i = 0; i < 5; i++) {
-							if (i < strength)
-								$("'.$n.'"+ (i.toString())).setStyle({backgroundColor: "green"});
-							else
-								$("'.$n.'"+ (i.toString())).setStyle({backgroundColor: "lightgrey"});
-						}
-					}
-					$('.$n.').observe("keyup", checkPasswordStrength);
-				</script>';
-		return $str;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Validators
-////////////////////////////////////////////////////////////////////////////////
-class ValLogin extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args) {
-		global $USER;
-		if (User::checkDuplicateLogin($value, $USER->id))
-			return "$this->label " . _L("already exists, please choose another.");
-		else
-			return true;
-	}
-}
-
-class ValAccesscode extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args) {
-		global $USER;
-		if (User::checkDuplicateAccesscode($value, $USER->id))
-			return "$this->label " . _L("already exists, please choose another.");
-		else
-			return true;
-	}
-}
-
-class ValPassword extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args, $requiredvalues) {
-		global $USER;
-		if ($USER->ldap) return true;
-
-		if ($detail = validateNewPassword(
-				isset($requiredvalues['login'])? $requiredvalues['login']: $USER->login, 
-				$value, 
-				isset($requiredvalues['firstname'])? $requiredvalues['firstname']: $USER->firstname, 
-				isset($requiredvalues['lastname'])? $requiredvalues['lastname']: $USER->lastname
-			))
-			return "$this->label ". _L("is invalid") ." ".$detail;
-
-		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
-		if ($checkpassword && ($detail = isNotComplexPass($value)) && !ereg("^0*$", $value))
-			return "$this->label ". _L("is invalid") ." ".$detail;
-
-		return true;
-	}
-}
-
-class ValPin extends Validator {
-	function validate ($value, $args, $requiredvalues) {
-		global $USER;
-		$pin = ereg_replace("[^0-9]*","",$value);
-		$accesscode = isset($requiredvalues['accesscode'])? $requiredvalues['accesscode']: $USER->accesscode;
-		if ($pin === $accesscode)
-			return "$this->label ". _L("cannot equal Phone User ID.") ." ".$detail;
-		return true;
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args, requiredvalues) {
-				var pin = parseFloat(value);
-				if (pin == requiredvalues.accesscode)
-					return label + " '. addslashes(_L("cannot be equal to Phone User ID")). '";
-				return true;
-			}';
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,8 +100,8 @@ if ($ldapuser || $readonly) {
 		"value" => $USER->login,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","min" => $usernamelength,"max" => 20),
-			array("ValLogin")
+			array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 20),
+			array("ValLogin", "userid" => $USER->id)
 		),
 		"control" => array("TextField","maxlength" => 20, "size" => 20),
 		"helpstep" => 1
@@ -241,16 +110,17 @@ if ($ldapuser || $readonly) {
 
 if (!$ldapuser) {
 	$pass = $USER->id ? '00000000' : '';
+	$passlength = getSystemSetting("passwordlength", 5);
 	if ($readonly) {
 		$formdata["password"] = array(
 			"label" => _L("Password"),
 			"value" => $pass,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","min" => $passwordlength,"max" => 20),
-				array("ValPassword")
+				array("ValLength","min" => $passlength,"max" => 20),
+				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname)
 			),
-			"control" => array("PasswordField","maxlength" => 20, "size" => 25),
+			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
 			"helpstep" => 1
 		);
 	} else {
@@ -259,11 +129,11 @@ if (!$ldapuser) {
 			"value" => $pass,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","min" => $passwordlength,"max" => 20),
-				array("ValPassword")
+				array("ValLength","min" => $passlength,"max" => 20),
+				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname)
 			),
 			"requires" => array("firstname", "lastname", "login"),
-			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25),
+			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
 			"helpstep" => 1
 		);
 	}
@@ -273,7 +143,7 @@ if (!$ldapuser) {
 		"value" => $pass,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","min" => $passwordlength,"max" => 20),
+			array("ValLength","min" => $passlength,"max" => 20),
 			array("ValFieldConfirmation", "field" => "password")
 		),
 		"requires" => array("password"),
@@ -294,7 +164,7 @@ if ($readonly) {
 		"value" => $USER->accesscode,
 		"validators" => array(
 			array("ValNumeric"),
-			array("ValAccesscode")
+			array("ValAccesscode", "userid" => $USER->id)
 		),
 		"control" => array("TextField","maxlength" => 20, "size" => 8),
 		"helpstep" => 1
@@ -308,7 +178,7 @@ if ($readonly) {
 		"value" => $pin,
 		"validators" => array(
 			array("ValNumeric"),
-			array("ValPin")
+			array("ValPin", "accesscode" => $USER->accesscode)
 		),
 		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
 		"helpstep" => 1
@@ -319,7 +189,7 @@ if ($readonly) {
 		"value" => $pin,
 		"validators" => array(
 			array("ValNumeric"),
-			array("ValPin")
+			array("ValPin", "accesscode" => $USER->accesscode)
 		),
 		"requires" => array("accesscode"),
 		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
@@ -626,16 +496,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-
 <? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme", "ValAccesscode", "ValPin")); ?>
-
-<? if ($datachange) { ?>
-
-alert("data has changed on this form!");
-window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
-
-<? } ?>
-
 </script>
 <?
 
