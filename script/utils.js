@@ -336,8 +336,51 @@ function cachedAjaxGet(uri,ajaxhandler,ajaxhandlerarg,usecache) {
 	});
 }
 
+function isSequential(number) {
+	var isseq = 0;
+	var neg = 0;
+	var diff = 0;
+	if (parseFloat(number) == 0)
+		return false;
+	diff = parseInt(number.substring(0,1)) - parseInt(number.substring(1,2));
+	if (diff == -1) {
+		isseq = 1;
+		neg = 0;
+	} else if (diff == 1) {
+		isseq = 1;
+		neg = 1;
+	} else {
+		return isseq;
+	}
+	for (i = 1; i < (number.length-1); i++) {
+		diff = parseInt(number.substring(i,i+1)) - parseInt(number.substring(i+1,i+2));
+		if(diff == -1 && neg==0) {
+			isseq = 1;
+		} else if (diff == 1 && neg == 1) {
+			isseq = 1;
+		} else {
+			isseq = 0;
+			break;
+		}
+	}
+	return isseq;
+}
 
-
+function isAllSameDigit(number){
+	var same = 0;
+	for(i =0; i < (number.length - 1); i++){
+		if(number.substring(i,i+1) == number.substring(i+1,i+2)){
+			same = 1;
+		} else {
+			same = 0;
+			break;
+		}
+	}
+	if(same == 1){
+		return true;
+	}
+	return false;
+}
 
 
 
