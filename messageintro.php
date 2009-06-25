@@ -215,7 +215,6 @@ $helpsteps = array (
 
 for($i = 2; $i < $helpstepindex;$i++) {
 	//TODO Wordsmith this guide text
-	error_log($helpsteptext[$i]);
 	$helpsteps[] = _L('(Optional), Set %1$s default and emergency intro to enhance the phone delivery for multilingual jobs. If this message is not set the %2$s messages will receive the intro in the Required Default message',
 						$helpsteptext[$i],$helpsteptext[$i] ,$helpsteptext[$i] );
 }
