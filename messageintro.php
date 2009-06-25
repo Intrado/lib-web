@@ -15,6 +15,17 @@ require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+if (!$USER->authorize('managesystem')) {
+	redirect('unauthorized.php');
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
 
 class IntroSelect extends FormItem {
 	function render ($value) {
@@ -87,17 +98,6 @@ class ValIntroSelect extends Validator {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Authorization
-////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('managesystem')) {
-	redirect('unauthorized.php');
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Data Handling
-////////////////////////////////////////////////////////////////////////////////
-
 $messages = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 
 $languages = QuickQueryList("select name from language where name != 'English'");
@@ -158,6 +158,10 @@ $formdata = array(
 		"helpstep" => 1
 	)
 );
+
+$helpsteplanguages = array();;
+$helpstepindex = 2;
+
 foreach($languages as $language) {	
 	$defaultintro = DBFind("Message","from message m, prompt p where p.type='intro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
 	
@@ -176,7 +180,7 @@ foreach($languages as $language) {
 		"control" => array("IntroSelect",
 			 "values"=>$defaultmessages
 		),
-		"helpstep" => 2
+		"helpstep" => $helpstepindex
 	);
 	$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
 	$emergencymessages = $messagevalues;
@@ -192,20 +196,36 @@ foreach($languages as $language) {
 		"control" => array("IntroSelect",
 			 "values"=>$emergencymessages
 		),
-		"helpstep" => 2
+		"helpstep" => $helpstepindex
 	);
 	
 	
+	$helpsteptext[$helpstepindex] = $language;
+	$helpstepindex++;
 }
 
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
 		icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
-$form = new Form("introform", $formdata, null, $buttons);
-$form->ajaxsubmit = true;
-//check and handle an ajax request (will exit early)
-//or merge in related post data
+$helpsteps = array (
+	//TODO Wordsmith this guide text
+    _L('By setting a clear Default and Emergency intro message each call will be delivered with a familiar voice and purpose.'),
+);
+
+for($i = 2; $i < $helpstepindex;$i++) {
+	//TODO Wordsmith this guide text
+	error_log($helpsteptext[$i]);
+	$helpsteps[] = _L('(Optional), Set %1$s default and emergency intro to enhance the phone delivery for multilingual jobs. If this message is not set the %2$s messages will receive the intro in the Required Default message',
+						$helpsteptext[$i],$helpsteptext[$i] ,$helpsteptext[$i] );
+}
+
+$form = new Form("introform", $formdata, $helpsteps, $buttons);
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
 $form->handleRequest();
 
 $datachange = false;
@@ -259,8 +279,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		QuickUpdate("delete from prompt where type='emergencyintro' and language is null;insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
 		
 		foreach($languages as $language) {	
-			
-			
 			if(isset($postdata[$language . 'default'])) {				
 				$languagevalues = json_decode($postdata[$language . 'default']);
 				if(isset($languagevalues->message) && isset($languagevalues->language)) {
