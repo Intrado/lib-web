@@ -150,11 +150,14 @@ class Wizard {
 		$form->buttons[] = icon_button("Cancel","cross","if(confirm('".addslashes(_L("Are you sure you want to cancel?"))."')) window.location='?cancel';");
 		$form->buttons[] = submit_button("Next","next","arrow_right");
 		
-		//merge in any existing wizard post data
+		//merge in any existing wizard post data, except transient fields
 		if (isset($_SESSION[$this->name]['data'][$this->curstep])) {
 			foreach ($_SESSION[$this->name]['data'][$this->curstep] as $name => $value) {
-				if (isset($form->formdata[$name]))
-					$form->formdata[$name]['value'] = $value;
+				if (isset($form->formdata[$name])) {
+					//only set the value if the field is not marked as transient, transient values reset to the provided values between steps.
+					if (!isset($form->formdata[$name]['transient']) || $form->formdata[$name]['transient'] == false)
+						$form->formdata[$name]['value'] = $value;
+				}
 			}
 		}
 		
