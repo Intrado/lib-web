@@ -334,6 +334,11 @@ function prefetchUserInfo($activationcode){
 
 function readonlyDBConnect() {
 	$sessionid = session_id();
+	// if no session, return false
+	// this will occur when running 'php runreport' from redialer for autoreport at end of job, or scheduled reports
+	if ($sessionid === "")
+		return false;
+		
 	$params = array(new XML_RPC_Value($sessionid, 'string'));
 	$method = "AuthServer.getReadonlyDBInfo";
 	$result = pearxmlrpc($method, $params);
