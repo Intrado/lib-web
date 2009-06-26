@@ -135,7 +135,6 @@ class Form {
 		<div class="newform_container">
 		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
 		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">
-		<div id="'.$this->name.'_startguide" style="float: right;  right: 0px; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign=top> <!-- FORM CONTENT -->';
 		
 		foreach ($this->formdata as $name => $itemdata) {
@@ -151,7 +150,6 @@ class Form {
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 				continue;
 			}
-			
 			
 			if (isset($itemdata['control'])) {
 				$control = $itemdata['control'];
@@ -214,7 +212,6 @@ class Form {
 					}
 				}
 				
-				
 				$isblank = (is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0);
 				
 				if ($this->getSubmit() || !$isblank) {
@@ -265,6 +262,7 @@ class Form {
 				</td>
 				<td id="'.$this->name.'_helpercell" valign="top" style="width: 0px; overflow: visible;">
 				<!-- HELPER -->
+				<div id="'.$this->name.'_startguide" style="float: right;  right: 0px; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 				<div id="'.$this->name.'_helper" class="helper">
 					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="img/icons/cross.gif" alt="Close Guide" title="Close"></a><img src="img/icons/information.gif" alt="" style="float: left;">Guide</div>
 					<div class="helpercontent" id="'.$this->name.'_helpercontent" ></div>
@@ -380,5 +378,6 @@ class Form {
 		exit();
 	}
 }
+
 
 ?>
