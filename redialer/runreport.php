@@ -19,11 +19,15 @@ $params = array("filename" => $filename);
 
 require_once("../inc/db.inc.php");
 
+// NOTE the global dbcon is read/write it may update the reportsubscription record
+// but the report generator will attempt open a readonly dbcon, which will fail due to no sessionid, this is ok because it then defaults back to the global read/write dbcon
+// OK for autoreport to use read/write dbcon because the job just completed and reportdata may not all be synced to the db slave
+
 global $_dbcon;
 $_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME)
 	or die("Could not connect to database: ".$_DBNAME);
 
-
+require_once("../inc/auth.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
