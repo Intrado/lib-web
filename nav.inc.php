@@ -260,10 +260,10 @@ if($USER->authorize('managemyaccount')){
 
 <? 	if ($USER->authorize("startshort")) { ?>
 	<div class="shortcutmenuholder">
-		<div class="shortcutmenu" onmouseover="document.getElementById('shortcuts').style.display='block';"
-								onmouseout="if (event.target || window.event.srcElement == this) document.getElementById('shortcuts').style.display='none';"
+		<div class="shortcutmenu" onmouseover="$('shortcuts').show(); "
+								onmouseout="$('shortcuts').hide();"
 		><img src="img/arrow_down.gif">Shortcuts
-			<div class="shortcuts hoverlinks" id="shortcuts">
+			<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;">
 				<? doShortcuts($SHORTCUTS) ?>
 			</div>
 		</div>
