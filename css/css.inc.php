@@ -194,42 +194,23 @@ a:hover {
 
 /* **** shortcuts **** */
 
-.shortcutmenuholder {
 
+
+.shortcutmenu {
 	float: right;
 	margin: 2px;
 	margin-right: 15px;
-	position:relative;
-	width: 160px;
-
-}
-
-.shortcutmenu {
-	position: absolute;
-	left: 0px;
-	top: 0px;
-	width: 160px;
-
 	border: 2px outset;
+	width: 100px;
 
 	text-align: left;
-	display: block;
 
 	font-size: 10px;
-	
-	z-index: 100;
-}
-
-.shortcutmenu img {
-	margin-right: 10px;
-	float: right;
 }
 
 .shortcuts {
 	font-size: 9px;
 	background: white;
-	padding: 5px;
-	display: none;
 }
 
 .shortcuts a , .shortcuts a:link, .shortcuts a:active, .shortcuts a:visited {
@@ -246,7 +227,7 @@ a:hover {
 
 /* **** content **** */
 
-.content {
+.maincontent {
 	margin-left: 15px;
 	margin-right: 15px;
 	margin-top: 5px;
