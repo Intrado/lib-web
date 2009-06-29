@@ -268,13 +268,6 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		formvars.jsgetvalue[id] = eval(formdata[fieldname].jsgetvalue);
 	}
 
-	//install click handlers for fieldsets
-	form.select("legend").map(function(e) {
-		//only register on top level labels and msgareas
-		e.observe("click",form_fieldset_event_handler);
-		e.style.cursor="help";		
-	});
-	
 	//install helper focus handler
 	form.select("input","textarea","select").map(function(e) {
 		e.observe("focus",form_fieldset_event_handler);
@@ -284,21 +277,21 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	form.select('label.formlabel').map(function(e) {		
 		if (e.htmlFor) {
 			var itemname = e.htmlFor.split("_")[1];
-			if (formdata[itemname] && formdata[itemname]['fieldhelp']) {			
-				e.observe("click",form_label_event_handler.curry(e.htmlFor));
-				//maybe a mouseover mouseout effect would work? on a timer perhaps, so that it doesnt get crazy when mouse scans down field names
-				e.style.cursor="help";
+			if (formdata[itemname] && formdata[itemname]['fieldhelp']) {
+				e.style.cursor="help";				
+				new Tip(e, formdata[itemname].fieldhelp, {
+					title: formdata[itemname].label,
+					style: 'protogrey',
+					stem: 'bottomLeft',
+					hook: { tip: 'bottomLeft', mouse: true },
+					offset: { x: 14, y: 0 }
+				});
 			}
 		}
 	});
 	
 	//submit handler
 	form.observe("submit",form_handle_submit.curry(name));
-}
-
-function form_label_event_handler (fieldname, event) {
-	var e = $(fieldname + "_fieldhelp");
-	Effect.toggle(e,'blind',{duration: 0.5});
 }
 
 function form_fieldset_event_handler (event) {
@@ -373,7 +366,7 @@ function form_go_step (form, direction, specificstep) {
 	//find the section of the form for this step, blink it, and scroll to it
 	var e;
 	for (var i = 1; e = $(form.id + '_helpsection_'+i); i++) {
-		e.style.border = "1px outset";
+		e.style.border = "none";
 		
 		if (i == formvars.currentstep+1) {
 			//cancel any previous effects
@@ -425,9 +418,9 @@ function form_enable_helper(event) {
 	});
 	
 	form.select("fieldset").map(function (e) {
-		e.style.border = "1px outset";
-		e.style.padding = "5px";
-		e.style.marginBottom = "3px";
+		e.style.border = "none";
+		//e.style.padding = "5px";
+		//e.style.marginBottom = "3px";
 	});
 }
 
