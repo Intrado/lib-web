@@ -38,8 +38,6 @@ if ($REQUEST_TYPE == "new") {
 				(js.jobid=j.id and js.name='translationexpire')
 			inner join reportcontact rc on 
 				(rc.jobid = j.id and rc.type='phone' and rc.personid = ph.personid and rc.phone=?)
-			inner join reportcontact rc2 on 
-				(rc2.jobid = j.id and rc2.type='phone' and rc2.personid = rc.duplicateid and rc2.phone=?)
 			inner join reportperson rp on 
 				(rp.jobid = j.id and rp.personid=rc.personid and rp.type='phone')
 			where
