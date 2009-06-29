@@ -81,7 +81,7 @@ form.newform {
 
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 .newform fieldset {
-	border: 1px outset;
+	border: none;
 	padding: 5px;
 	
 	border: 0px;
@@ -126,25 +126,12 @@ form.newform {
 	padding-top: .3em; 
 }
 
-
 .newform .formcontenttable .formtablecontrol {
 	vertical-align: top;
 }
 
-
 .newform .formlabel {
 	width: 100%;	
-}
-
-.newform .fieldhelp {
-	font-weight: normal;
-	border: 1px solid blue;
-	padding: 3px;
-	margin-left: 1px;
-	margin-right: 1px;
-	text-align: justify;
-	font-size: 80%;
-	background-color: #FFFFF0;
 }
 
 .newform .underneathmsg {
