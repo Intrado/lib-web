@@ -11,11 +11,11 @@ class TranslationItem extends FormItem {
 			$value == "";
 			
 		$language = "english";
-		$gender = "female";	
+		$voice = "Female";
 			
 		if(is_array($value)) {
 			$language = $value["language"];
-			$gender = $value["gender"];
+			$voice = (isset($value["voice"])?$value["voice"]:"Female");
 		}
 
 		$displaylanguage = ucfirst($language);
@@ -103,7 +103,7 @@ class TranslationItem extends FormItem {
 							. icon_button(_L("Play"),"fugue/control","
 									var content = $('" . $n . "text').getValue();
 										if(content != '')
-											popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=$gender', 400, 400);")
+											popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=$voice', 400, 400);")
 											
 							. '<div id="'. $n .'showenglish">'
 								. icon_button(_L("Show in English"),"fugue/magnifier","
