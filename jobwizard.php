@@ -18,6 +18,7 @@ require_once("obj/SpecialTask.obj.php");
 require_once("obj/ListForm.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/traslationitem.obj.php");
+require_once("obj/Voice.obj.php");
 
 
 
