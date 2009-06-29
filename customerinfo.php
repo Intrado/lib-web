@@ -157,18 +157,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 $PAGE = "admin:settings";
 $TITLE = _L('Customer Information');
 
-?>
-<script)
-<? if ($datachange) { ?>
-
-alert("<?=_L("The data on this form has changed.\nYour changes cannot be saved.")?>")";
-window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
-
-<? } ?>
-
-</script>
-<?
-
 include_once("nav.inc.php");
 startWindow(_L("Settings"));
 echo $form->render();
