@@ -178,7 +178,7 @@ class JobWiz_basic extends WizStep {
 			
 		$formdata = array(
 			"name" => array(
-				"label" => "Name",
+				"label" => "Job Name",
 				"fieldhelp" => "This field is used in reports, and used for email subjects, etc. It can be up to 50 characters long.",
 				"value" => "",
 				"validators" => array(
@@ -431,22 +431,30 @@ class JobWiz_messagePhoneText extends WizStep {
 		
 		$helpstepnum = 1;
 		
-		$formdata["message"] = array(
-			"label" => _L("Phone Message"),
-			"value" => "",
-			"validators" => array(
-				array("ValRequired")
-			),
-			"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"english","voice"=>"female"),
-			"helpstep" => $helpstepnum
-		);
-
-		$formdata["translate"] = array(
-			"label" => _L("Translate"),
-			"value" => ($postdata['/basic']['package'] == "express")?true:false,
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => $helpstepnum
+		$formdata = array(
+				"message" => array(
+					"label" => _L("Phone Message"),
+					"value" => "",
+					"validators" => array(
+						array("ValRequired")
+					),
+					"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"english","voice"=>"female"),
+					"helpstep" => $helpstepnum
+				),
+				"voice" => array(
+					"label" => _L("Voice"),
+					"value" => "female",
+					"validators" => array(),
+					"control" => array("RadioButton","values" => array("Female" => "Female","Male" => "Male")),
+					"helpstep" => $helpstepnum
+				),
+				"translate" => array(
+					"label" => _L("Translate"),
+					"value" => ($postdata['/basic']['package'] == "express")?true:false,
+					"validators" => array(),
+					"control" => array("CheckBox"),
+					"helpstep" => $helpstepnum
+				)
 		);
 		$helpsteps[$helpstepnum++] = _L("Automatically translate into alternate languages.");
 		
@@ -512,9 +520,15 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		if(is_array($translations)){
 				$i = 1;
 				foreach($translations as $obj){
-					$formdata["Language $i"] = array(
+					$formdata["Language$i"] = array(
 					"label" => ucfirst($translationlanguages[$i]),
-					"value" => array("value" => $obj->responseData->translatedText,"language" => $translationlanguages[$i],"gender" => "female"),
+					"value" => array(
+								"text" => $obj->responseData->translatedText,
+								"override" => false,
+								"enabled" => true,
+								"language" => $translationlanguages[$i],
+								"voice" => $postdata["/message/phone/text"]["voice"]
+								),
 					"validators" => array(),
 					"control" => array("TranslationItem","size" => 30, "maxlength" => 51),
 					"transient" => true,
@@ -531,18 +545,6 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 					"helpstep" => 2
 					);
 		}
-		
-		/*
-		foreach($ttslanguages as $ttslanguage) {
-				$formdata[$ttslanguage] = array(
-					"label" => _L("Language") . ": " . ucfirst($ttslanguage),
-					"value" => $ttslanguage,
-					"validators" => array(),
-					"control" => array("TextField","size" => 30, "maxlength" => 51, "Value" => $ttslanguage),
-					"helpstep" => 2
-					);
-		}
-		*/
 		
 		// TODO: Need translation review page
 
