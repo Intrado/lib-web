@@ -1,4 +1,6 @@
 <?
+header('Content-Type: application/json');
+
 require_once("inc/common.inc.php");
 
 	//$supportedlanguages = array("catalan"=>"ca", "chinese" =>"zh-TW","dutch"=>"nl", "english"=>"en", "finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "italian"=>"it", "polish"=>"pl", "portuguese"=>"pt-PT", "russian"=>"ru", "spanish"=>"es", "swedish"=>"sv");
@@ -52,6 +54,21 @@ require_once("inc/common.inc.php");
     		$lang_pairs = "&langpair=" . urlencode($supportedlanguages[$language] . "|en");
 		}
     }
+     elseif(isset($_GET['text']) && isset($_GET['language'])){
+        $language = $_GET['language'];
+    	$text = $_GET['text'];
+    	if(get_magic_quotes_gpc()) {
+    		$language = stripslashes($_POST['language']);
+    		$text = stripslashes($_POST['text']);
+    	}
+
+
+    	$language = strtolower($language);
+    	if(array_key_exists($language,$supportedlanguages)) {
+    		$text = "&q=" . urlencode($text);
+    		$lang_pairs = "&langpair=" . urlencode($supportedlanguages[$language] . "|en");
+		}
+    }
     if($text != "" && $lang_pairs != "") {
     	$context_options = array ('http' => array ('method' => 'POST','header'=> "Referer: $referer",'content' => $text . $lang_pairs));
 		$context = stream_context_create($context_options);
@@ -63,7 +80,7 @@ require_once("inc/common.inc.php");
     		$enc->responseStatus = 503;
     		echo json_encode($enc);
    			exit();
-}
+		}
         $response = @stream_get_contents($fp);
     	if ($response === false) {
     		error_log("Unable to read from $url");
