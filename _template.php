@@ -17,6 +17,15 @@ if (!$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Action/Request Processing
+////////////////////////////////////////////////////////////////////////////////
+
+if (isset($_GET['deleteid'])) {
+	//...
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,47 +80,46 @@ class ValTemplateItem extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 
 $formdata = array(
-    _L('Template Section 1'), // Optional
-    "textfield" => array(
-        "label" => _L('TextField'),
-        "value" => "",
-        "validators" => array(
-            array("ValLength","min" => 3,"max" => 50)
-        ),
-        "control" => array("TextField","size" => 30, "maxlength" => 51),
-        "helpstep" => 1
-    ),
-    _L('Template Section 2'), // Optional
-    "checkbox" => array(
-        "label" => _L('Checkbox'),
-        "value" => false,
-        "validators" => array(
-            array("ValRequired")
-        ),
-        "control" => array("CheckBox"),
-        "helpstep" => 2
-    ),
-    "templateitem" => array( 
-        "label" => _L('TemplateItem'),
-        "value" => "",//array("left" => "true","right" => "false"),
-        "validators" => array(array("ValRequired"),array("ValTemplateItem")),
-        "control" => array("TemplateItem"),
-        "helpstep" => 2
-    )
-    
+	_L('Template Section 1'), // Optional
+	"textfield" => array(
+		"label" => _L('TextField'),
+		"value" => "",
+		"validators" => array(
+			array("ValLength","min" => 3,"max" => 50)
+		),
+		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"helpstep" => 1
+	),
+	_L('Template Section 2'), // Optional
+	"checkbox" => array(
+		"label" => _L('Checkbox'),
+		"value" => false,
+		"validators" => array(
+			array("ValRequired")
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 2
+	),
+	"templateitem" => array( 
+		"label" => _L('TemplateItem'),
+		"value" => "",//array("left" => "true","right" => "false"),
+		"validators" => array(array("ValRequired"),array("ValTemplateItem")),
+		"control" => array("TemplateItem"),
+		"helpstep" => 2
+	)
 );
 
 $helpsteps = array (
-    _L('Templatehelpstep 1'),
-    _L('Templatehelpstep 2')
+	_L('Templatehelpstep 1'),
+	_L('Templatehelpstep 2')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-                icon_button(_L('Cancel'),"cross",null,"start.php"));
+				icon_button(_L('Cancel'),"cross",null,"start.php"));
 $form = new Form("templateform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Form Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
 //check and handle an ajax request (will exit early)
@@ -122,19 +130,27 @@ $datachange = false;
 $errors = false;
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-        
-        //save data here    
-        if ($ajax)
-            $form->sendTo("start.php");
-        else
-            redirect("start.php");
-    }
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		//save data here	
+		if ($ajax)
+			$form->sendTo("start.php");
+		else
+			redirect("start.php");
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Display Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function fmt_somefield ($obj, $field) {
+	return $obj->$field;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
