@@ -182,16 +182,10 @@ class Form {
 			
 			$n = $this->name."_".$item->name;
 			$l = $itemdata['label'];
-			
-			$labelhelp = "";
-			if (isset($itemdata['fieldhelp'])) {
-				$labelhelp = '<div class="fieldhelp" id="'.$n.'_fieldhelp" style="display: none;">'.$itemdata['fieldhelp'].'</div>';
-				$this->formdata[$name]['fieldhelp'] = true; //overwrite with bool
-			} 
 
 			if ($formclass == "FormHtml") {
 				$str.= '
-				<tr><th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label>'.$labelhelp.'</th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
+				<tr><th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label></th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
@@ -237,7 +231,7 @@ class Form {
 				
 				$str.= '
 				<tr id="'.$n.'_fieldarea" '.$style.'>
-					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label>'.$labelhelp.'</th>
+					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>
 					<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>
 					<td class="formtablecontrol">
 						'.$item->render($value).'
