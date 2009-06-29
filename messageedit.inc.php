@@ -195,8 +195,7 @@ if(CheckFormSubmit($form,$section) || CheckFormSubmit($form,"upload") || CheckFo
 					$deleteid = CheckFormSubmit($form,"delete");
 					if (isset($attachments[$deleteid])) {
 						$msgattachment = $attachments[$deleteid];
-						$msgattachment->deleted=1;
-						$msgattachment->update();
+						$msgattachment->destroy();
 						unset($attachments[$deleteid]);
 					} else {
 						error_log("trying to delete nonexistant messageattachment");
