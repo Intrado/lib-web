@@ -232,7 +232,7 @@ class JobWiz_basic extends WizStep {
 			"This is your Job's name. <hr></hr>Job names are important<img src=\"img/icons/error.gif>, and should be descriptive. A good example is 'Standardized testing reminder', or 'Early dismissal'.",
 			"Job Types are used to determine which phones or emails we should notify. Choosing the appropriate Job Type is important for effective communication.",
 			"Adding contacts based on rules allows you to specify rules like 'Everyone from school XYZ'.<br><br>You may also have predefined Lists, and use them here.<br><br>If you need to use the list upload feature, manually enter contacts, or create a custom list of contacts, you will need to use the List Builder.",
-			"blah blah blah",
+			"These options include common packages of notifications. <ul><li><em>EasyCall</em> allows personalized voice recording to also be delivered via email and txt message.</li><li><em>ExpressText</em> translates your written message into different languages, and is also sent via email and txt message.</li><li><em>Personalized</em> gives you the best of both worlds: personalized voice along with written emails and txt messages.</li><li><em>Custom</em> allows you to pick any combination.</li></ul>",
 		);
 		return new Form("basic",$formdata,$helpsteps);
 	}
