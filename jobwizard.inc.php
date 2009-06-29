@@ -469,21 +469,89 @@ class JobWiz_messagePhoneText extends WizStep {
 
 class JobWiz_messagePhoneTranslate extends WizStep {
 	function getForm($postdata, $curstep) {
+		static $translations = false;
+		static $translationlanguages = false;
+		
+		$englishtext = isset($postdata['/message/phone/text']['message'])?$postdata['/message/phone/text']['message']:"";
+		
+		if(!$translations) {
+			//Get available languages
+			$alllanguages = QuickQueryList("select name from language");
+			$emaillanguages = array_intersect($alllanguages,array("Arabic", "Bulgarian", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Indonesian", "Italian", "Japanese", "Korean", "Latvian", "Lithuanian", "Norwegian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Slovenian", "Spanish", "Swedish", "Ukrainian", "Vietnamese"));
+			$translationlanguages = Voice::getTTSLanguages();
+			$englishkey = array_search('english', $translationlanguages);
+			if($englishkey !== false)
+				unset($translationlanguages[$englishkey]);			
+	/*
+			$voicearray = array();
+			$voices = DBFindMany("Voice","from ttsvoice");
+			foreach ($voices as $voice) {
+				$voicearray[$voice->gender][$voice->language] = $voice->id;
+			}
+	*/
+			
+			$translations = translate_fromenglish($englishtext,$translationlanguages);
+		}
+
 		// Form Fields.
 		$formdata = array();
 		$helpsteps = array(_L("description."));
 		
 		$helpstepnum = 1;
 		
-		$formdata["a"] = array(
-			"label" => _L("Review Translations"),
-			"control" => array("FormHtml","html"=>"<h1>Wicked Awesome Translation Review Widget</h1>"),
+		$formdata[] = "Default Phone Message";
+		
+		$formdata["Englishtext"] = array(
+			"label" => _L("English:"),
+			"control" => array("FormHtml","html"=>"<h2>$englishtext</h2><br />"),
 			"helpstep" => $helpstepnum
 		);
-		$helpsteps[$helpstepnum++] = _L("c");
+		$formdata[] = "Traslations";
+		
 
+		if(is_array($translations)){
+				$i = 1;
+				foreach($translations as $obj){
+					$formdata["Language $i"] = array(
+					"label" => ucfirst($translationlanguages[$i]),
+					"value" => array("value" => $obj->responseData->translatedText,"language" => $translationlanguages[$i],"gender" => "female"),
+					"validators" => array(),
+					"control" => array("TranslationItem","size" => 30, "maxlength" => 51),
+					"transient" => true,
+					"helpstep" => 2
+					);
+					$i++;
+				}
+		} else {
+				$formdata["Language __"] = array(
+					"label" => _L("Language") . ": ",
+					"value" => "no Result",
+					"validators" => array(),
+					"control" => array("TextField","size" => 30, "maxlength" => 51),
+					"helpstep" => 2
+					);
+		}
+		
+		/*
+		foreach($ttslanguages as $ttslanguage) {
+				$formdata[$ttslanguage] = array(
+					"label" => _L("Language") . ": " . ucfirst($ttslanguage),
+					"value" => $ttslanguage,
+					"validators" => array(),
+					"control" => array("TextField","size" => 30, "maxlength" => 51, "Value" => $ttslanguage),
+					"helpstep" => 2
+					);
+		}
+		*/
+		
 		// TODO: Need translation review page
 
+		$helpsteps = array(
+				_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
+				_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
+				);
+		
+		
 		return new Form("messagePhoneTranslate",$formdata,$helpsteps);
 	}
 	

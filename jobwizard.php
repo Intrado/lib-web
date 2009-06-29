@@ -16,6 +16,11 @@ require_once("obj/JobType.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/SpecialTask.obj.php");
 require_once("obj/ListForm.obj.php");
+require_once("inc/translate.inc.php");
+require_once("obj/traslationitem.obj.php");
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +76,6 @@ class FinishJobWizard extends WizFinish {
 		return "<h1>This is the finish page!</h1>";
 	}
 }
-
 
 $wizard = new Wizard("wizard_job",$wizdata, new FinishJobWizard("Finish"));
 $wizard->handlerequest();
