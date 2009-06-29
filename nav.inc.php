@@ -191,6 +191,7 @@ doNavTabs($NAVTREE);
 //set the charset if we are spitting out html
 header('Content-type: text/html; charset=UTF-8') ;
 ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
@@ -198,17 +199,17 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 	<script src="script/prototype.js" type="text/javascript"></script>
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
-
+	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/utils.js"></script>
 	<script src="script/sorttable.js"></script>
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">
-
-	
-	
 	<script src="script/form.js.php" type="text/javascript"></script>
+
+	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">	
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
+	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
+	
 </head>
 <body>
 	<script>
@@ -259,20 +260,30 @@ if($USER->authorize('managemyaccount')){
 <div class="subnavmenu hoverlinks">
 
 <? 	if ($USER->authorize("startshort")) { ?>
-	<div class="shortcutmenuholder">
-		<div class="shortcutmenu" onmouseover="$('shortcuts').show(); "
-								onmouseout="$('shortcuts').hide();"
-		><img src="img/arrow_down.gif">Shortcuts
-			<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;">
-				<? doShortcuts($SHORTCUTS) ?>
-			</div>
-		</div>
+	<div id="shortcutmenu" class="shortcutmenu"><img src="img/arrow_down.gif" style="margin-right: 5px; margin-left: 5px; float: right;">Shortcuts</div>
+	<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;">
+		<? doShortcuts($SHORTCUTS) ?>
 	</div>
+<script type="text/javascript" language="javascript">
+Event.observe(window, 'load', function() {
+	new Tip('shortcutmenu', $('shortcuts'), {
+		style: 'default',
+		radius: 4,
+		border: 4,
+		target: 'shortcutmenu',
+		hideOn: false,
+		hideAfter: 0.5,
+		hook: { target: 'bottomRight', tip: 'topRight' },
+		offset: { x: 6, y: 0 },
+		width: 'auto'
+	});
+});
+</script>
+
 <? } ?>
 
 	<?= $SUBTABS ?>
 </div>
-
 
 <div class="crumbs hoverlinks">
 	<?= doCrumb($FIRSTACTIVETABLINK, $ACTIVEMAINTABTITLE, $TITLE) ?>
@@ -281,6 +292,6 @@ if($USER->authorize('managemyaccount')){
 <div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 <div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
-<div class="content">
+<div class="maincontent">
 
 	<?= $SYSTEMALERT ?>
