@@ -517,14 +517,17 @@ if ($noimportdata) { ?>
 <script>
 
 function switchactiondata (num,newaction) {
+	//hide any already showing action's div
 	$("actiondata_" + num + "_lookup").hide();
 	$("actiondata_" + num + "_staticvalue").hide();
 	$("actiondata_" + num + "_date").hide();
 
-	$("actiondata_" + num + "_" + newaction).show();
+	//see if a div exists for the new action
+	var newactiondiv = $("actiondata_" + num + "_" + newaction);
+	if (newactiondiv)
+		newactiondiv.show();
 
-	var select = new getObj("select_" + num).obj;
-
+	//show or hide the data mapping area
 	if (newaction == 'staticvalue' || newaction == 'curdate') {
 		$("filedata_" + num).hide();
 	} else {
