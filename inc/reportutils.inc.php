@@ -189,7 +189,7 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 	<table  border="0" cellpadding="3" cellspacing="0" id="<?=$tablename?>">
 		<tr>
 			<td><?
-				NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){hide(\"xdays\")} else { show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ hide(\"date\");} else { show(\"date\")}'");
+				NewFormItem($f, $s, 'relativedate', 'selectstart', null, null, "id='reldate' onchange='if(this.value!=\"xdays\"){Element.hide(\"xdays\")} else { Element.show(\"xdays\");} if(new getObj(\"reldate\").obj.value!=\"daterange\"){ Element.hide(\"date\");} else { Element.show(\"date\")}'");
 				if($infinite)
 					NewFormItem($f, $s, 'relativedate', 'selectoption', '-- Select Date Range --', "");
 				NewFormItem($f, $s, 'relativedate', 'selectoption', 'Today', 'today');
@@ -208,10 +208,10 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 		</tr>
 		<script>
 			if(new getObj("reldate").obj.value!="xdays"){
-				hide("xdays");
+				Element.hide("xdays");
 			}
 			if(new getObj("reldate").obj.value!="daterange"){
-				hide("date");
+				Element.hide("date");
 
 			}
 		</script>
