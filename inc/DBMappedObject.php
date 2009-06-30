@@ -86,9 +86,16 @@ class DBMappedObject {
 
 		$query = "insert into " . $this->_tablename . " ("
 				. $this->getFieldList(false, $specificfields) . ") "
-				."values (" . $this->getValueList($specificfields) . ")";
+				."values (";
+		
+		$values = $this->getValueArray(false, $specificfields);		
+		for ($i=0; $i<count($values)-1; $i++) {
+			$query .= "?,";
+		}
+		$query .= "?)";
+				
 		$this->_lastsql = $query;
-		if ($result = Query($query)) {
+		if ($result = Query($query, false, $values)) {
 			$this->id = $_dbcon->lastInsertId();
 		} else {
 			return false;
@@ -112,9 +119,9 @@ class DBMappedObject {
 
 		$query = "select " . $this->getFieldList(false, $specificfields)
 				." from " . $this->_tablename
-				." where id=".$this->id;
+				." where id=?";
 		$this->_lastsql = $query;
-		if ($result = Query($query)) {
+		if ($result = Query($query, false, array($this->id))) {
 			if ($row = DBGetRow($result)) {
 				foreach ($this->_fieldlist as $index => $name) {
 					if ($this->_allownulls && $row[$index] === NULL)
@@ -181,17 +188,16 @@ class DBMappedObject {
 			//make an array of name=value pairs
 			$list = array();
 			foreach ($specificfields as $name) {
-				if ($this->_allownulls && $this->$name === NULL)
-					$list[] = "`$name`=NULL";
-				else
-					$list[] = "`$name`='" . DBSafe($this->$name) . "'";
+					$list[] = "`$name`=?";
 			}
+			$values = $this->getValueArray(false, $specificfields);
+			$values[] = $this->id;
 
 			//put them into an update list
 			$query .= implode(",", $list);
-			$query .= " where id=".$this->id;
+			$query .= " where id=?";
 			$this->_lastsql = $query;
-			if ($result = Query($query)) {
+			if ($result = Query($query, false, $values)) {
 				if ($result->rowCount())
 					$isupdated = true;
 			}
@@ -227,9 +233,9 @@ class DBMappedObject {
 
 		if (isset($this->id)) {
 			$query = "delete from " . $this->_tablename
-					." where id=".$this->id;
+					." where id=?";
 			$this->_lastsql = $query;
-			Query($query);
+			Query($query, false, array($this->id));
 			$this->id = 0;
 		}
 	}
