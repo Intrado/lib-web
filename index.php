@@ -213,7 +213,7 @@ function capslockCheck(e){
 		keypressed = e.which;
 
 	if(e.shiftKey) {
-		shiftkey = e.shiftKey;
+		shiftkey = true;
 	} else {
 		if(keypressed == 16) {
 			shiftkey = true;
