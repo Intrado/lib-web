@@ -304,7 +304,7 @@ class ListForm extends Form {
 								// Keep a hidden input field to keep track of id for this table row.
 								var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':data.id})).hide();
 								var nameTD = new Element('td', {'class':'List NameTD'}).update(data.name);
-								var statisticsTD = new Element('td', {'class':'List'}).update(data.total + ' ".addslashes(_L('Total'))."');
+								var statisticsTD = new Element('td', {'class':'List'}).update(data.total);
 								//var detailsTD = new Element('td', {'class':'List'});
 								//detailsTD.insert('".addslashes(action_link(_L('Details'),'bullet_arrow_down'))."');
 								var actionsTD = new Element('td', {'class':'List'});
@@ -420,7 +420,7 @@ class ListForm extends Form {
 							}
 							
 							var data = stats[0];
-							$('listchooseTotal').update(data.total + ' ".addslashes(_L('Total'))."');
+							$('listchooseTotal').update(data.total);
 							
 							cachedAjaxGet('ajax.php?type=listrules&listids='+[data.id].toJSON(),
 								function (transport, listid) {
