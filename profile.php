@@ -118,6 +118,11 @@ $formdata = array(
 		"control" => array("TextField", "size" => "30", "maxsize" => 50),
 		"helpstep" => 1
 	),
+	"enableuseroptions" => array (
+		"label" => _L('Enable All'),
+		"control" => array("FormHtml", "html" => icon_button(_L('Enable All User-level Options'),"group",'checkAllCheckboxes(false);')),
+		"helpstep" => 1
+	),
 _L('Login Options'),
 	"loginweb" => array(
 		"label" => _L('Log in via web'),
@@ -428,18 +433,23 @@ _L('Systemwide View Options'),
 	"callblockingperms" => array(
 		"label" => _L('Blocked Numbers Access'),
 		"fieldhelp" => _L('Controls access to the systemwide blocked numbers list.'),
-		"value" => $obj->getValue("blocknumbers") ? $obj->getValue("callblockingperms") : "none",
+		"value" => $obj->id ? ($obj->getValue("blocknumbers") ? $obj->getValue("callblockingperms") : "none") : "viewonly",
 		"validators" => array(
 			array("ValInArray","values" => array_keys($blockednumberoptions))
 		),
 		"control" => array("RadioButton", "values" => $blockednumberoptions),
 		"helpstep" => 9
 	),
-_L('Security & Top-level Controls'),
+_L('Security & Administrator Controls'),
 	"securitywarning" => array (
 		"label" => _L('Security Notice'),
 		"control" => array("FormHtml", "html" => '<p style="border: 3px double red; font-weight: bold; width: 50%; padding: 5px;"><img src="img/icons/error.gif" alt="" style="vertical-align: top;">The following settings control top-level administration functions. Only top-level administrators should have these enabled.</p>'),
 		"helpstep" => 10
+	),
+	"enableadminoptions" => array (
+		"label" => _L('Enable All'),
+		"control" => array("FormHtml", "html" => icon_button(_L('Enable Administrator Options'),"key",'checkAllCheckboxes(true);')),
+		"helpstep" => 1
 	),
 	"manageaccount" => array(
 		"label" => _L('Manage Users'),
@@ -469,14 +479,6 @@ _L('Security & Top-level Controls'),
 		"label" => _L('Manage All Jobs'),
 		"fieldhelp" => _L('Allows users to cancel, archive, or delete any job sent by any user, or to run any repeating job.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
 		"value" => $obj->getValue("managesystemjobs"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 10
-	),
-	"managetasks" => array(
-		"label" => _L('Manage Data Imports'),
-		"fieldhelp" => _L('Allows users to change the way data is imported into the system.<p style="color:red;">Only top-level administrators should have this enabled.</p>'),
-		"value" => $obj->getValue("managetasks"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 10
@@ -603,7 +605,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
 		$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 		$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
-
 		
 		if(getSystemSetting("_hasportal", false)) {
 			$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
@@ -618,12 +619,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("sendsms", (bool)$postdata['sendsms']);
 		}
 
-		
-		
-
 		$_SESSION['editaccessid'] = $obj->id;
-		
-		
+				
         //save data here    
         if ($ajax)
             $form->sendTo("profiles.php");
@@ -665,6 +662,34 @@ include_once("nav.inc.php");
 startWindow(_L('Profile Access Controls'));
 echo $form->render();
 endWindow();
+
+?>
+<script>
+function checkAllCheckboxes(domanagement){
+	
+	var managementoptions = "manageaccount,manageprofile,managesystem,managesystemjobs,managetasks,metadata".split(",");
+	
+	var form = document.forms[0].elements;
+	for(var i = 0; i < form.length; i++){
+		if(form[i].type == "checkbox"){
+			
+			//see if it's a management checkbox
+			if (managementoptions.some(function(v) {return form[i].name.indexOf(v) != -1})) {
+				if (domanagement)
+					if (!form[i].checked)
+						form[i].click();
+			} else {
+				if (!domanagement)
+					if (!form[i].checked)
+						form[i].click();
+			}
+		}
+	}
+}
+</script>
+
+
+<?
 
 include_once("navbottom.inc.php");
 ?>
