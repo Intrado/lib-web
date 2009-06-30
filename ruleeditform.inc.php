@@ -123,7 +123,7 @@ if (count($unusedrules) > 0) {
 echo "<tr><td valign=top>";
 
 $extrahtml = "onchange=\"Element.hide(ruleselected);
-						ruleselected='rule_'+this.value;
+						ruleselected = (this.value == -1) ? 'rule_' : 'rule_'+this.value;
 						Element.show(ruleselected);
 						Element.hide(typeselected);
 						typeselected = 'operator_'+ruletypes[this.selectedIndex];
