@@ -1,6 +1,5 @@
 <? 
 
-
 // Translation widget
 class TranslationItem extends FormItem {
 	function render ($value) {
@@ -10,15 +9,9 @@ class TranslationItem extends FormItem {
 		if($value == null)
 			$value == "";
 			
-		$language = "english";
-		$voice = "Female";
-			
-		if(is_array($value)) {
-			$language = $value["language"];
-			$voice = (isset($value["voice"])?$value["voice"]:"Female");
-		}
+		$language = $this->name;
+		$isphone = isset($this->args['phone']);
 
-		$displaylanguage = ucfirst($language);
 		$str = "";
 		
 		if($renderscript) {
@@ -31,7 +24,7 @@ class TranslationItem extends FormItem {
 						return;
 					if(text != text.substring(0, 2000)){
 						text = text.substring(0, 2000);
-						alert("The message is too long. Only the first 2000 characters are submitted for translation.");
+						alert("' . _L('The message is too long. Only the first 2000 characters are submitted for translation.') . '");
 					}
 					var urllang = encodeURIComponent(language);
 					var request = "translate.php?text=" + encodeURIComponent(text) + "&language=" + urllang;
@@ -47,21 +40,49 @@ class TranslationItem extends FormItem {
 					);
 					return false;
 				}
+				function setTranslationValue(section) {
+					$(section).value = Object.toJSON({
+							"enabled": $(section + "translatecheck").checked,
+							"text": $(section + "text").value.toString(),
+							"override": $(section + "override").checked	
+					});
+					form_do_validation($(\'' . $this->form->name . '\'), $(section)); 
+				} 
+				function overrideTranslation(section) {
+					var langtext = $(section + "text");
+					if(langtext.disabled) {
+						$(section + "text").innerHTML = langtext.getValue();
+					} else {
+						if(langtext.value != $(section + "text").innerHTML && !confirm(\'' . _L('The edited text will be removed and set back to the generated translation.') . '\')) {
+							$(section + "override").checked = true;
+							return;
+						}
+						langtext.value = $(section + "text").innerHTML;													
+					}
+					langtext.disabled = !langtext.disabled;
+					$(section + "editlock").toggle();
+					setTranslationValue(section);
+				}
+				function toggleTranslation(section) {
+					$(section +"icons").toggle(); 
+					$(section +"textfields").toggle();
+					$(section +"disableinfo").toggle();				 			
+					$(section +"controls").toggle();
+					setTranslationValue(section);
+				}
+				
 			</script>';
 			$renderscript = false;
 		}
 		
 		$str .= '
-			<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml(json_encode($value)) . '"/>
-		
+			<input id="'.$n.'" name="'.$n.'" type="hidden" size="70" value="' . escapehtml(json_encode($value)) . '"/>
+			<hr>
 			<table>
 				<tr>
 					<td valign="top">
-						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox"
-							 onchange=" $(\''.$n.'icons\').toggle(); 
-							 			$(\''.$n.'textfields\').toggle();
-										$(\''.$n.'controls\').toggle();" 
-										checked /> 
+						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onchange="toggleTranslation(\''.$n.'\');" checked /> 
+						<b>Translate</b>
 					</td>
 					<td valign="top" align="right" width="40px">
 						<div id="'.$n.'icons">
@@ -72,21 +93,21 @@ class TranslationItem extends FormItem {
 						</div>
 					</td>
 					<td valign="top">
+						<div id="'.$n.'disableinfo" style="display: none;">
+							<ul><li> '  . _L('%1$s recipients will still receive the default Enslish message.',$language) . '<ul>
+						</div>
 						<div id="'.$n.'textfields">
-							<textarea id="'.$n.'text" name="'.$n.'text" rows="3" cols="50" disabled />'.escapehtml($value["text"]).'</textarea>	
+							<textarea id="'.$n.'text" name="'.$n.'text" rows="3" cols="50" onChange="setTranslationValue(\''.$n.'\');" disabled />'.escapehtml($value["text"]).'</textarea>	
 							<br />
+							<div id="'.$n.'overridesave" style="display:none;"></div>
 							<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox"
-												 onchange="$(\''.$n.'editlock\').toggle();
-												 			var langtext = $(\''.$n.'text\');
-												 			langtext.disabled = !langtext.disabled;
-												 "/>
-							Override Translation 
-							
-							<div id="'.$n.'retranslation" style="display: none;margin-top: 30px;">
+												 onchange="overrideTranslation(\''.$n.'\');"/>
+							' . _L('Override Translation') . 
+							'<div id="'.$n.'retranslation" style="display: none;margin-top: 30px;">
 								<table>
 									<tr>
 										<td>' 
-											. icon_button(_L('Refresh %1$s to English Translation', $displaylanguage),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')") . 
+											. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')") . 
 										'</td>
 									</tr>
 									<tr>							
@@ -100,11 +121,12 @@ class TranslationItem extends FormItem {
 					</td>
 					<td valign="top">
 						<div id="'.$n.'controls">'
-							. icon_button(_L("Play"),"fugue/control","
+							. ($isphone?icon_button(_L("Play"),"fugue/control","
 									var content = $('" . $n . "text').getValue();
 										if(content != '')
-											popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=$voice', 400, 400);")
-											
+											popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=" . 
+											 (isset($this->args['voice'])?$this->args['voice']:"Female") 
+											. "', 400, 400);"):"")
 							. '<div id="'. $n .'showenglish">'
 								. icon_button(_L("Show in English"),"fugue/magnifier","
 									$('" . $n . "retranslation').toggle();submitRetranslation('$n','$language');$('" . $n . "hideenglish').show();$('" . $n . "showenglish').hide();")
@@ -116,31 +138,32 @@ class TranslationItem extends FormItem {
 						</div>
 					</td>			
 				</tr>
-			</table>
-			<hr>
-		';				
-				
+			</table>';	
 		return $str;
 	}
 }
 
 class ValTranslation extends Validator {
 	function validate ($value, $args) {
-		if(is_array($value)) {
-			return true;
+		if(!is_array($value)) {
+			$value = json_decode($value,true);
 		}
-		if (!$value)	
-			return $this->label . " is Required";
-		else
+		if (!isset($value["enabled"]))
+			return _L('Validation error. Please check or uncheck ') . $this->label;
+		if($value["enabled"] == true && (!isset($value["text"]) || trim($value["text"] == ""))) {
+			return $this->label . " " . _L('message can not be empty if translation checkbox is checked');
+		}else
 			return true;
 
 	}
 	function getJSValidator () {
 		return 
-			'function (name, label, value, args) {			
+			'function (name, label, value, args) {	
+				if (value.strip() == "")
+					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";		
 				checkval = value.evalJSON();
-				if (value == "")
-					return label + " is Required";
+				if (checkval.enabled == true && (checkval.text == undefined || checkval.text.strip() == ""))
+					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";
 				return true;
 			}';
 	}
