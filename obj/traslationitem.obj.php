@@ -94,7 +94,7 @@ class TranslationItem extends FormItem {
 					</td>
 					<td valign="top">
 						<div id="'.$n.'disableinfo" style="display: none;">
-							<ul><li> '  . _L('%1$s recipients will still receive the default Enslish message.',$language) . '<ul>
+							<ul><li> '  . _L('%1$s recipients will now receive the default English message.',$language) . '<ul>
 						</div>
 						<div id="'.$n.'textfields">
 							<textarea id="'.$n.'text" name="'.$n.'text" rows="3" cols="50" onChange="setTranslationValue(\''.$n.'\');" disabled />'.escapehtml($value["text"]).'</textarea>	
