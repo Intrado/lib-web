@@ -127,7 +127,7 @@ class ListForm extends Form {
 						<div id='allListsWindow'>
 							<table width='100%' class='border'>
 								<thead>
-									<tr class='listHeader'><th>"._L('List Name')."</th><th>"._L('Stats')."</th><th></th></tr>
+									<tr class='listHeader'><th>"._L('List Name')."</th><th>"._L('Total')."</th><th></th></tr>
 									<tr><td colspan=100 id='listsTableStatus'></td></tr>
 								</thead>
 								<tbody id='listsTableBody'></tbody>
@@ -275,7 +275,7 @@ class ListForm extends Form {
 							var nameTD = hiddenTD.next('td');
 							var statisticsTD = nameTD.next('td');
 							nameTD.update(data.name);
-							statisticsTD.update(data.total + ' ".addslashes(_L('Total'))."');
+							statisticsTD.update(data.total);
 						},
 						null,
 						false
