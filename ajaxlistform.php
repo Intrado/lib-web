@@ -8,57 +8,91 @@ require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 
+// @param $listid, assumed to be a valid list id.
+function summarizeListName($listid) {
+	global $RULE_OPERATORS;
+	$list = new PeopleList($listid+0);
+	$rules = DBFindMany('Rule', 'FROM rule r, listentry le WHERE le.ruleid=r.id AND le.listid=?', 'r', array($list->id));
+	$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+	$summary = array();
+	foreach ($rules as $rule) {
+		$type = 'multisearch';
+		if (strpos($fieldmaps[$rule->fieldnum]->options, 'text') !== false)
+			$type = 'text';
+		else if (strpos($fieldmaps[$rule->fieldnum]->options, 'reldate') !== false)
+			$type = 'reldate';
+		else if (strpos($fieldmaps[$rule->fieldnum]->options, 'numeric') !== false)
+			$type = 'numeric';
+		$op = $RULE_OPERATORS[$type][$rule->op];
+		if ($type == 'multisearch')
+			$op = 'is';
+		if ($rule->logical == 'and not')
+			$op = 'is NOT';
+		$val = $rule->val;
+		if ($type == 'multisearch')
+			$val = str_replace('|', ', ', $val);
+		else if ($type == 'reldate')
+			$val = str_replace(',', ' and ', $val);
+		$summary[] = $fieldmaps[$rule->fieldnum]->name . ' ' . $op . ' ' . $val;
+	}
+	$list->name = implode('; ', $summary);
+	if (empty($rules))
+		$list->name = _L('Please Add Rules to This List');
+	$list->update();
+}
+
 function handleRequest() {
 	if (!isset($_GET['type']))
 		return false;
 	global $USER;
+	global $RULE_OPERATORS;
 	
 	switch($_GET['type']) {
-		case 'saverules': // returns $list->id
-			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']))
+		case 'createlist': // returns $list->id
+			if (!$USER->authorize('createlist'))
 				return false;
-			$ruledata = json_decode($_POST['ruledata']);
-			if (!is_array($ruledata) || empty($ruledata))
-				return false;
-				
-			$summary = array();
-			$rules = array();
-			foreach ($ruledata as $data) {
-				if (!isset($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
-					return false;
-				if (isset($rules[$data->fieldnum])) // Do not allow more than one rule per fieldnum
-					return false;
-				if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
-					return false;
-				$rules[$data->fieldnum] = $rule;
-				$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
-				$summary[] = $fieldmaps[$data->fieldnum]->name;
-			}
-			$summary = implode(', ', $summary);
-			
 			// CREATE list
 			$list = new PeopleList(null);
-			$list->name = $summary;
 			$list->description = 'JobWizard List ' . date('Y M d, H:i:s', time());
 			$list->userid = $USER->id;
+			$list->name = _L('Please Add Rules to This List');
 			$list->deleted = 1;
 			$list->update();
 			if (!$list->id)
 				return false;
-				
-			// CREATE rules.
+			return $list->id;
+			
+		case 'addrule':
+			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']) || !isset($_GET['listid']))
+				return false;
+			$data = json_decode($_POST['ruledata']);
+			if (empty($data) || !userOwns('list', $_GET['listid']))
+				return false;
+			if (!isset($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+				return false;
+			if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+				return false;
+			
+			// CREATE rule.
 			QuickUpdate('BEGIN');
-			foreach ($rules as $rule) {
 				$rule->create();
-				
 				$le = new ListEntry();
-				$le->listid = $list->id;
+				$le->listid = $_GET['listid']+0;
 				$le->type = "R";
 				$le->ruleid = $rule->id;
 				$le->create();
-			}
 			QuickUpdate('COMMIT');
-			return $list->id;
+			summarizeListName($_GET['listid']);
+			return $rule->id;
+		
+		case 'deleterule':
+			if (!$USER->authorize('createlist') || !isset($_POST['fieldnum']) || !isset($_GET['listid']))
+				return false;
+			if (empty($_POST['fieldnum']) || !userOwns('list', $_GET['listid']))
+				return false;
+			QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($_GET['listid'], $_POST['fieldnum']));
+			summarizeListName($_GET['listid']);
+			return true;
 			
 		default:
 			return false;
@@ -69,3 +103,4 @@ header('Content-Type: application/json');
 $data = handleRequest();
 echo json_encode(!empty($data) ? $data : false);
 ?>
+
