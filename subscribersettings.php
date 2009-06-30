@@ -28,9 +28,8 @@ if (!$USER->authorize('managesystem') && !getSystemSetting("_hasselfsignup", fal
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Form Data
 ////////////////////////////////////////////////////////////////////////////////
-
 
 $emaildomain = QuickQuery("select value from setting where name='emaildomain'");
 
@@ -75,22 +74,25 @@ $buttons = array(submit_button("Done","submit","accept"),
                 icon_button("Cancel","cross",null,"settings.php"));
                 
 $form = new Form("subscriberoptions",$formdata,null,$buttons);
-$form->ajaxsubmit = true;
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
 
 //check and handle an ajax request (will exit early)
 //or merge in related post data
 $form->handleRequest();
 
 $datachange = false;
-
+$errors = false;
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
         
 		$postdata['restrictdomain'] ? setSystemSetting("subscriberauthdomain", "1") : setSystemSetting("subscriberauthdomain", "0");
 		$postdata['requiresitecode'] ? setSystemSetting("subscriberauthcode", "1") : setSystemSetting("subscriberauthcode", "0");
