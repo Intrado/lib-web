@@ -518,7 +518,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 			"control" => array("FormHtml","html"=>"<h3>$englishtext</h3><br />"),
 			"helpstep" => 1
 		);
-		$formdata[] = "Traslations";
+		$formdata[] = "Translations";
 		
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
@@ -789,7 +789,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			"control" => array("FormHtml","html"=>"<h3>$englishtext</h3><br />"),
 			"helpstep" => 1
 		);
-		$formdata[] = "Traslations";
+		$formdata[] = "Translations";
 		
 		$emaillanguages = $translationlanguages; // since translation language is static
 		//$translations = false; // Debug output when no translation is available
