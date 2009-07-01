@@ -35,7 +35,7 @@ function summarizeListName($listid) {
 			$val = str_replace(',', ' and ', $val);
 		$summary[] = $fieldmaps[$rule->fieldnum]->name . ' ' . $op . ' ' . $val;
 	}
-	$list->name = implode('; ', $summary);
+	$list->name = SmartTruncate(implode('; ', $summary),50);
 	if (empty($rules))
 		$list->name = _L('Please Add Rules to This List');
 	$list->update();
