@@ -281,7 +281,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.81 $
+    # $Revision: 1.82 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -501,7 +501,7 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 	if($contents == ""){
 		$contents = "<br/>";
 	}
-
+	//TODO replace this with prototip
 	$hover = '<span ' . $extrahtml . '>';
 	$hover .= '<div style="color:#346799"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
@@ -554,6 +554,7 @@ function destination_label($type, $sequence){
 function destination_label_popup($type, $sequence, $f, $s, $itemname){
 	$label = fetch_labels($type, $sequence);
 
+	//TODO replace this with prototip
 	if (trim($label)) {
 		$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
 		$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
@@ -583,7 +584,8 @@ function destination_label_popup_paragraph($type){
 		$labels[] = escapehtml(destination_label($type, $i));
 	}
 	$labels = implode(",<br>", $labels);
-
+	
+	//TODO replace this with prototip
 	$hover = '<span>';
 	$hover .= '<div class="destlabel"';
 	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
