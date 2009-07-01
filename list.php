@@ -1,4 +1,8 @@
 <?
+// TODO
+//+ ajax validator for checking if list name already exists
+//+ fix rulewidget.js.php, onchange for the fieldnum should clear the value column.
+
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +25,10 @@ require_once("obj/ListEntry.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("ruleeditform.inc.php");
 require_once("inc/rulesutils.inc.php");
-
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("obj/FormRuleWidget.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -31,10 +38,8 @@ if (!$USER->authorize('createlist')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-
-$list = NULL;
 
 if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
@@ -45,316 +50,187 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
-if (isset($_GET['deleterule'])) {
-	$ruleid = DBSafe($_GET['deleterule']);
-	$listid = QuickQuery("select le.listid from listentry le where le.ruleid='$ruleid'");
-	if (userOwns("list",$listid)) {
-		QuickUpdate("delete from listentry where ruleid='$ruleid'");
-		QuickUpdate("delete from rule where id='$ruleid'");
-	}
-	redirect();
-}
+////////////////////////////////////////////////////////////////////////////////
+// Optional Form Items And Validators
+////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_GET['clearall'])) {
-	if (isset($_SESSION['listid'])) {
-		switch ($_GET['clearall']) {
-			case "skips":
-				QuickUpdate("delete from listentry where type='N' and listid='" . $_SESSION['listid'] . "'");
-				break;
-			case "adds":
-				QuickUpdate("delete from listentry where type='A' and listid='" . $_SESSION['listid'] . "'");
-				break;
-			case "rules":
-				QuickUpdate("delete from listentry where type='R' and listid='" . $_SESSION['listid'] . "'");
-				break;
+$list = new PeopleList(isset($_SESSION['listid']) ? $_SESSION['listid'] : null);
+$rulesjson = '[]';
+if ($list->id) {
+	$rules = $list->getListRules();
+	if (is_array($rules)) {
+		$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+		foreach ($rules as $ruleid => $rule) {
+			$rules[$ruleid] = cleanObjects($rule);
+			$rules[$ruleid]['ruleid'] = $ruleid;
+			$rules[$ruleid]['type'] = 'multisearch';
+			if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('text'))
+				$rules[$ruleid]['type'] = 'text';
+			else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('reldate'))
+				$rules[$ruleid]['type'] = 'reldate';
+			else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('numeric'))
+				$rules[$ruleid]['type'] = 'numeric';
 		}
+		$rulesjson = json_encode(array_values($rules));
+	} else {
+		unset($rules);
 	}
-	redirect();
 }
 
+$advancedtools = '';
+$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search','tick').'</td><td>'._L('Search for contacts in the database').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd','tick').'</td><td>'._L('Manually add new contacts').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Open Address Book'),'addressBookAdd','tick').'</td><td>'._L('Choose contacts from your address book').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 
-/****************** main message section ******************/
+$formdata = array(
+	"name" => array(
+		"label" => _L('List Name'),
+		"value" => $list->name,
+		"validators" => array(
+			array("ValLength","min" => 3,"max" => 50)
+		),
+		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"helpstep" => 1
+	),
+	"description" => array(
+		"label" => _L('Description'),
+		"value" => $list->description,
+		"validators" => array(
+			array("ValLength","min" => 3,"max" => 50)
+		),
+		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"helpstep" => 1
+	),
+	"ruledata" => array(
+		"label" => _L('List Rules'),
+		"value" => $rulesjson,
+		"validators" => array(
+			array("ValRules")
+		),
+		"control" => array("FormRuleWidget"),
+		"helpstep" => 2
+	),
+	"advancedtools" => array(
+		"label" => _L('Advanced Tools'),
+		"value" => null,
+		"validators" => array(),
+		"control" => array("FormHtml", 'html' => "<table>$advancedtools</table>"
+		),
+		"helpstep" => 3
+	)
+);
 
-$f = "list";
-$s = "main";
-$reloadform = 0;
+$helpsteps = array (
+	_L('Please enter descriptive information about this list.'), // 1
+	_L('You may enter some rules for this list.'), // 2
+	_L('These are advanced list tools.'), // 3
+);
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'save') || CheckFormSubmit($f,'add') || CheckFormSubmit($f,'refresh') || CheckFormSubmit($f,'search') || CheckFormSubmit($f,'preview') || CheckFormSubmit($f,'manualAdd') || CheckFormSubmit($f,'addressBookAdd') || CheckFormSubmit($f,'uploadList'))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data.');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
+$buttons = array(submit_button(_L('Save'),"submit","tick"),
+				icon_button(_L('Cancel'),"cross",null,"start.php"));
+				
+$form = new Form("list",$formdata,$helpsteps,$buttons);
+$form->ajaxsubmit = true;
 
-		$name = trim(GetFormData($f,$s,"name"));
-		if ( empty($name) ) {
-			PutFormData($f,$s,"name",'',"text",1,50,true);
-		}		
-		//do check
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (QuickQuery('select id from list where name = \'' . DBSafe($name) . "' and userid = $USER->id and deleted=0 and id != " . (0 + $_SESSION['listid']))) {
-			error('A list named \'' . $name . '\' already exists');
-		} else {
-			//submit changes
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
 
-			$list = new PeopleList($_SESSION['listid']);
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
 
-			$list->name = $name;
-			$list->description = trim(GetFormData($f,$s,"description"));
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		$list->name = $postdata['name'];
+		$list->description = $postdata['description'];
+		$list->userid = $USER->id;
+		$list->deleted = 0;
+		$list->update();
+		$_SESSION['listid'] = $list->id;
+		
+		// Save
+		if ($list->id) {
+			error_log('Rule data ------------------------');
+			error_log($postdata['ruledata']);
+			$ruledata = json_decode($postdata['ruledata']);
+			if (is_array($ruledata)) {
+				QuickUpdate('BEGIN');
+					foreach ($ruledata as $data) {
+						// Existing Rule to Keep
+						if (isset($data->ruleid)) {
+							if (isset($rules, $rules[$data->ruleid]))
+								unset($rules[$data->ruleid]); // Remove from $rules
+							continue;
+						}
+						
+						// CREATE rule.
+						if (!isset($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+							continue;
+						if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+							continue;
+						$rule->create();
+						$le = new ListEntry();
+						$le->listid = $list->id;
+						$le->type = "R";
+						$le->ruleid = $rule->id;
+						$le->create();
+					}
+					
+					// Existing Rules to Remove
+					if (isset($rules)) {
+						foreach ($rules as $rule)
+							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $rule->fieldnum));
+					}
+				QuickUpdate('COMMIT');
+			}
+			error_log('--Rule data ------------------------');
 			
-			$list->userid = $USER->id;
-			$list->deleted = 0;
-			$list->update();
-
-			$fieldaddsubmit = false;
-			if ($list->id) {
-				//now see if there is a new list rule
-				$rule = getRuleFromForm($f,$s);
-				if ($rule != null) {
-					$rule->create();
-
-					$le = new ListEntry();
-					$le->listid = $list->id;
-					$le->type = "R";
-					$le->ruleid = $rule->id;
-					$le->create();
-					$fieldaddsubmit = true;
-				}
-			}
-
-			$_SESSION['listid'] = $list->id;
-
-			if (CheckFormSubmit($f,'save')) {
-				if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
-					unset($_SESSION['origin']);
-					redirect('start.php');
-				} else {
-					unset($_SESSION['origin']);
-					redirect('lists.php');
-				}
-			} elseif (CheckFormSubmit($f,'preview')) {
-				redirect('showlist.php?id=' . $_SESSION['listid']);
-			} elseif (CheckFormSubmit($f,'search')) {
-				redirect('search.php');
-			} elseif (CheckFormSubmit($f,'manualAdd')) {
-				redirect('addressmanualadd.php?id=new');
-			} elseif (CheckFormSubmit($f,'addressBookAdd')) {
-				redirect('addressesmanualadd.php');
-			} elseif (CheckFormSubmit($f,'uploadList')) {
-				redirect('uploadlist.php');
-			}
-
-			//$reloadform = 1;
-			//instead of reloading the form here, redirect to this page so popup windows don't double post
-			redirect();
+			if ($ajax)
+				$form->sendTo("lists.php");
+			else
+				redirect("lists.php");
 		}
 	}
-} else {
-	$reloadform = 1;
 }
 
-if( $reloadform )
-{
-	ClearFormData($f);
-
-	$list = new PeopleList($_SESSION['listid']);
-
-
-	$fields = array(
-				array("name","text",1,50,true),
-				array("description","text",1,50,false)
-				);
-	PopulateForm($f,$s,$list,$fields);
-
-	putRuleFormData($f, $s);
-}
-//if we don't already have a list loaded, get one
-if ($list == NULL)
-	$list = new PeopleList($_SESSION['listid']);
-$renderedlist = new RenderedList($list);
+////////////////////////////////////////////////////////////////////////////////
+// Display Functions
+////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-
 $PAGE = "notifications:lists";
-$TITLE = 'List Editor: ' . ($_SESSION['listid'] == NULL ? "New List" : escapehtml($list->name));
+$TITLE = _L('List Editor: ') . 'TODO';
 
 include_once("nav.inc.php");
 
-$titles = array(	"id" => "ID",
-					"name" => "Name",
-					"phone" => "Phone",
-					"email" => "Email",
-					"address" => "Address"
-					);
-
-NewForm($f);
-if (!$list->id)
-	buttons(submit($f,'refresh','Save'));
-else
-	buttons(submit($f,'refresh','Refresh'),submit($f,'save','Done'));
-
-startWindow('List Information');
+// Next: Optional, Load Custom Form Validators
 ?>
-<table border="0" cellpadding="3" cellspacing="0" width=100%>
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">List Name:</th>
-		<td style="padding: 5px;" valign="bottom">
-			<?
-			NewFormItem($f,$s,"name","text", 20,50);
-			?>
-		</td>
-	</tr>
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">Description:</th>
-		<td style="padding: 5px;" valign="bottom">
-			<?
-			NewFormItem($f,$s,"description","text", 20,50);
-			?>
-		</td>
-	</tr>
-	<?
-	if ($list->id) {
-	?>
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader">People:</th>
-		<td style="padding: 5px;">
-			<?
-			$renderedlist->calcStats();
-			?>
-			<table border="0" cellspacing="3" cellpadding="2" width="150px">
-				<tr>
-					<td  class="border" valign="center" width="100px"><b><?=$renderedlist->total?></b></td>
-					<td align="right"><?=submit($f, 'preview','Preview')?></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<?
-	}
-	?>
-</table>
+<script type="text/javascript">
+	<? Validator::load_validators(array("ValRules")); ?>
+</script>
+
 <?
+startWindow(_L('List Editor'));
+
+echo $form->render();
 endWindow();
-
-if (!$list->id) {
-?>
-	<div style="margin-left: 10px;"><img src="img/bug_lightbulb.gif" > Tip: Choose a name that clearly describes which people are included on this list. Most lists automatically update and can be reused indefinitely.
-	</div><br>
-<?
-} else {
-
-startWindow("List Content");
-?>
-<table border="0" cellpadding="3" cellspacing="0" width=100%>
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader bottomBorder">Rules:<br><? print help('List_Rules'); ?></th>
-		<td class="bottomBorder" style="padding: 5px;" valign="bottom">
-		<a href="?clearall=rules" onclick="return confirm('Are you sure you want to clear all rules?');">Clear All</a>
-<?
-//ruleeditform expects $RULES to be set
-$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
-$RULES = DBFindMany("Rule", "from rule r,listentry le
-			where le.ruleid=r.id and le.listid='" . $_SESSION['listid'] . "'" ,"r");
-
-drawRuleTable($f, $s, false, true, true, true);
-
-?>
-		</td>
-	</tr>
-
-<?
-$numAdd = 0;
-$numSkip = 0;
-
-if ($list->id) {
-	$renderedlist->mode = "totals";
-	$renderedlist->hasstats = false;//reset the totals stats
-	$renderedlist->calcStats();
-	$numAdd = $renderedlist->totaladded;
-	$numSkip = $renderedlist->totalremoved;
-}
-
-// if list additions, then show them, otherwise hide section
-if ($numAdd > 0) {
-?>
-
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader bottomBorder">Additions:<br><? print help('List_Additions'); ?></th>
-		<td class="bottomBorder" style="padding: 5px;">
-		<a href="?clearall=adds" onclick="return confirm('Are you sure you want to clear all additions?');">Clear All</a>
-<?
-if ($list->id) {
-	$renderedlist->mode = "add";
-	$renderedlist->hasstats = false;//reset the totals stats
-	//$renderedlist->pagelimit = -1;
-	$doscrolling = true;
-	$showpagemenu = ($numAdd > $renderedlist->pagelimit);
-	include("list.inc.php"); //expects $renderedlist, $showpagemenu to be set
-}
-?>
-		</td>
-	</tr>
-<?
-// end of list additions
-}
-
-// if list skips, then show them, otherwise hide section
-if ($numSkip > 0) {
-?>
-
-	<tr>
-		<th align="right" valign="top" class="windowRowHeader bottomBorder">Skip:<br><? print help('List_Skip'); ?></th>
-		<td class="bottomBorder" style="padding: 5px;">
-		<a href="?clearall=skips" onclick="return confirm('Are you sure you want to clear all skips?');">Clear All</a>
-<?
-if ($list->id) {
-	$renderedlist->mode = "remove";
-	$renderedlist->pagelimit = -1;
-	$doscrolling = true;
-	$showpagemenu = false;
-	include("list.inc.php"); //expects $renderedlist, $showpagemenu to be set
-}
-?>
-		</td>
-	</tr>
-
-<?
-// end of list skips
-}
-?>
-</table>
-<?
-endWindow();
-
-startWindow("List Tools");
-if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts')) {
-	button_bar(submit($f,'search','Search Contacts') . help('List_SearchAndAdd'),
-			submit($f,'manualAdd',"Enter Contacts") . help('List_ManualAdd'),
-			submit($f,'addressBookAdd',"Open Address Book") . help('List_AddressBookAdd'),
-			submit($f,'uploadList',"Upload List") . help('List_UploadList'));
-} else {
-	button_bar(submit($f,'search','Search Contacts') . help('List_SearchAndAdd'),
-			submit($f,'manualAdd',"Enter Contacts") . help('List_ManualAdd'),
-			submit($f,'addressBookAdd',"Open Address Book") . help('List_AddressBookAdd'));
-}
-endWindow();
-
-}
-
-buttons();
-EndForm();
-?>
-<script SRC="script/calendar.js"></script>
-<?
 include_once("navbottom.inc.php");
 ?>
