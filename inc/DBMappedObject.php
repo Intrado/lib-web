@@ -347,13 +347,13 @@ function cleanObjects ($obj) {
 	if (get_class($obj)) {
 		foreach ($obj->_fieldlist as $field) {
 			if (get_class($obj->$field))
-				$simpleObj[$field] = cleanObj($obj->$field);
+				$simpleObj[$field] = cleanObjects($obj->$field);
 			else
 				$simpleObj[$field] = $obj->$field;
 		}
 	} else if (is_array($obj)) {
 		foreach ($obj as $id => $item)
-			$simpleObj[$id] = cleanObj($item);
+			$simpleObj[$id] = cleanObjects($item);
 	}
 	return $simpleObj;
 }
