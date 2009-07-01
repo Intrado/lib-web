@@ -56,7 +56,7 @@ class TextPasswordStrength extends FormItem {
 								$("'.$n.'"+ (i.toString())).setStyle({backgroundColor: "lightgrey"});
 						}
 					}
-					$('.$n.').observe("keyup", checkPasswordStrength);
+					$("'.$n.'").observe("keyup", checkPasswordStrength);
 				</script>';
 		return $str;
 	}
