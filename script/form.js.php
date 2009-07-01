@@ -30,7 +30,7 @@ function form_event_handler (event) {
 	formvars.keyuptimer = window.setTimeout(function () { 
 			form_do_validation(form,e); formvars.keyuptimer = null;
 		},
-		event.type == "keyup" ? 750 : 200
+		event.type == "keyup" ? 1000 : 200
 	);	
 }
 
@@ -278,7 +278,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		if (e.htmlFor) {
 			var itemname = e.htmlFor.split("_")[1];
 			if (formdata[itemname] && formdata[itemname]['fieldhelp']) {
-				e.style.cursor="help";				
+				e.style.cursor="help";
 				new Tip(e, formdata[itemname].fieldhelp, {
 					title: formdata[itemname].label,
 					style: 'protogrey',
