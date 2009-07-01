@@ -116,15 +116,41 @@ class MultiCheckBox extends FormItem {
 		
 		$str = '<div id='.$n.' class="radiobox" '.$style.'>';
 		
+		$hoverdata = array();
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
 			$id = $n.'-'.$counter;
 			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
 			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label for="'.$id.'">'.escapehtml($checkname).'</label><br />
 				';
+			
+			if (isset($this->args['hover']))
+				$hoverdata[$id] = $this->args['hover'][$checkvalue];
+			
 			$counter++;
 		}
 		$str .= '</div>';
+		
+		
+		if (isset($this->args['hover'])) {
+			$str .= '
+				<script>
+					var hovers = ' . json_encode($hoverdata) . ';
+					Object.keys(hovers).each(function(k) {
+						var l = $(k).next();
+						l.style.cursor="help";
+						new Tip(l,hovers[k] ,{
+							style: "protogrey",
+							stem: "bottomLeft",
+							hook: { tip: "bottomLeft", mouse: true },
+							offset: { x: 10, y: 0 }
+						});
+					});
+				
+				</script>
+			
+			';
+		}
 		
 		return $str;		
 	}
