@@ -437,16 +437,9 @@ div.scrollTableContainer {
 }
 
 .hoverhelp {
-	position: absolute;
-	background-color: #FFFFCC;
-	border: 1px solid <?=$theme2?>;
 	padding: 5px;
-	width: 200px;
 	font-size: 10px;
 	font-weight: normal;
-	display: none;
-	text-align: left;
-	color: <?=$primary?>;
 }
 
 .hoverhelpicon {

@@ -7,7 +7,6 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 	if (!file_exists($hoverfolder))
 		$hoverfolder = "locale/en_US/hover/$title.txt";
 	$contents = @file_get_contents($hoverfolder);
-	//$contents = nl2br(preg_replace('/($|\\r\\n\\r\\n)[^\\r\\n:]+?:/', '<span class="hovertitle">\\0</span>', $contents ));
 
 	if (substr($contents,0,1) == "@" && ($contentpos = strpos($contents,"\n")) !== false) {
 		$link = trim(substr($contents,1,$contentpos));
@@ -16,16 +15,19 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 		$link = "";
 	}
 
-	$contents = nl2br($contents);
+	$contents = '<div class="hoverhelp">' . nl2br($contents) . '</div>';
+	
+	if (!isset($GLOBALS['TIPS']))
+		$GLOBALS['TIPS'] = array();
+	$tipid = "tip_" . count($GLOBALS['TIPS']);
+	$GLOBALS['TIPS'][] = array($tipid,$contents); //navbotom.inc will load these for us
 
-	$hover = '<span class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
+	$hover = '<span id="'.$tipid.'" class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
 	$hover .= '<img align="absmiddle" src="img/themes/' . $theme . '/helpcenter' . ($style ? '_' . $style : "") . '.gif"';
-	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
 	if ($link != "")
 		$hover .= " onclick=\"window.open('$link', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');\"";
-	$hover .= '><div class="hoverhelp">' . $contents . '</div></span>';
-
+	$hover .= '></span>';	
+	
 	return $hover;
 }
 
