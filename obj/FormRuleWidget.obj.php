@@ -29,7 +29,7 @@ class ValRules extends Validator {
 	function validate ($valueJSON, $args) {
 		$ruledata = json_decode($valueJSON);
 		if (!is_array($ruledata) || empty($ruledata))
-			return _L('Please add rules');
+			return true; // Do not complain if no rules are specified
 
 		$rulesfor = array();
 		foreach ($ruledata as $data) {
@@ -41,7 +41,6 @@ class ValRules extends Validator {
 				return _L('Failed to create the rule for ' . $data->fieldnum);
 			$rulesfor[$data->fieldnum] = true;
 		}
-		
 		return true;
 	}
 	
@@ -50,7 +49,7 @@ class ValRules extends Validator {
 			'function (name, label, value, args) {
 				var ruledata = value.evalJSON();
 				if (!ruledata.join)
-					return "'.addslashes(_L("Please add a rule")).'";
+					return true; // Do not complain if no rules are specified
 				for (var i = 0; i < ruledata.length; ++i) {
 					if (!ruledata[i].fieldnum || !ruledata[i].type || !ruledata[i].logical || !ruledata[i].op || !ruledata[i].val)
 						return "'.addslashes(_L("Incomplete rule data")).'";
