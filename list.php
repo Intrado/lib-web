@@ -7,7 +7,6 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/form.inc.php");
-require_once("inc/text.inc.php");
 require_once("inc/date.inc.php");
 require_once("obj/Language.obj.php");
 require_once("obj/Person.obj.php");

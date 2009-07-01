@@ -8,7 +8,6 @@ require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/form.inc.php");
-require_once("inc/text.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/Import.obj.php");
 require_once("obj/ImportLogEntry.obj.php");

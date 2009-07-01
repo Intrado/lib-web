@@ -8,7 +8,6 @@ include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
-include_once("inc/text.inc.php");
 include_once("obj/Access.obj.php");
 include_once("obj/Permission.obj.php");
 include_once("obj/JobType.obj.php");

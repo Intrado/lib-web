@@ -7,7 +7,6 @@ include_once("inc/securityhelper.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
-include_once("inc/text.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////

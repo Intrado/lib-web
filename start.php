@@ -9,7 +9,6 @@ require_once("obj/JobType.obj.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/form.inc.php");
-require_once("inc/text.inc.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/AudioFile.obj.php");
