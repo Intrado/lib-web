@@ -17,11 +17,11 @@ function summarizeListName($listid) {
 	$summary = array();
 	foreach ($rules as $rule) {
 		$type = 'multisearch';
-		if (strpos($fieldmaps[$rule->fieldnum]->options, 'text') !== false)
+		if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('text'))
 			$type = 'text';
-		else if (strpos($fieldmaps[$rule->fieldnum]->options, 'reldate') !== false)
+		else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('reldate'))
 			$type = 'reldate';
-		else if (strpos($fieldmaps[$rule->fieldnum]->options, 'numeric') !== false)
+		else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('numeric'))
 			$type = 'numeric';
 		$op = $RULE_OPERATORS[$type][$rule->op];
 		if ($type == 'multisearch')
