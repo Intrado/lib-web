@@ -14,13 +14,34 @@ Use of this system is subject to the <a href="privacy.html" target="_blank">Priv
 <?
 print "<div id='logininfo' class='noprint' >Logged in as ".escapehtml($USER->firstname)." ".escapehtml($USER->lastname)." (".escapehtml($USER->login).") ($LOCALE) <br> Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
 
+?>
+<script language="javascript">
+<?
+
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {
 		$ERRORS[$key] = addslashes($value);
 	}
-	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
+	print 'window.alert(\'' . implode('.\n', $ERRORS) . '.\');';
+}
+
+if (isset($TIPS) && is_array($TIPS) ) {	
+?>
+	var tips = $A(<?= json_encode($TIPS) ?>);
+	tips.each(function (t) {
+		var e = $(t[0]);
+		new Tip(e, t[1], {
+			style: "protogrey",
+			radius: 3,
+			border: 3,
+			hook: { tip: 'leftTop', mouse: true },
+			offset: { x: 10, y: 0 }
+		});
+	});
+<?
 }
 ?>
+</script>
 <img id="state" src="img/spacer.gif" width="1" height="1">
 <? if (isset($PAGETIME)) printf("<!-- %0.2f -->", microtime(true) - $PAGETIME) ?>
 </body>
