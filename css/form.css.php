@@ -131,6 +131,7 @@ form.newform {
 }
 
 .newform .formlabel {
+	font-weight: normal;
 	width: 100%;	
 }
 
