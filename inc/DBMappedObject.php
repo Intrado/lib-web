@@ -340,5 +340,22 @@ function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbc
 	}
 }
 
+function cleanObjects ($obj) {
+	if (!get_class($obj) && !is_array($obj))
+		return $obj;
+	$simpleObj = array();
+	if (get_class($obj)) {
+		foreach ($obj->_fieldlist as $field) {
+			if (get_class($obj->$field))
+				$simpleObj[$field] = cleanObj($obj->$field);
+			else
+				$simpleObj[$field] = $obj->$field;
+		}
+	} else if (is_array($obj)) {
+		foreach ($obj as $id => $item)
+			$simpleObj[$id] = cleanObj($item);
+	}
+	return $simpleObj;
+}
 
 ?>
