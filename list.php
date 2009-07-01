@@ -2,6 +2,7 @@
 // TODO
 //+ ajax validator for checking if list name already exists
 //+ fix rulewidget.js.php, onchange for the fieldnum should clear the value column.
+//+ refactor ajaxlistform.php and list.php to use common functions for add a new list, rules, etc..
 
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
@@ -194,7 +195,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					// Existing Rules to Remove
 					if (isset($rules)) {
 						foreach ($rules as $rule)
-							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $rule->fieldnum));
+							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $rule['fieldnum']));
 					}
 				QuickUpdate('COMMIT');
 			}
