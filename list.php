@@ -80,13 +80,10 @@ if ($list->id) {
 	} else {
 		unset($rules);
 	}
+	
+	$renderedlist = new RenderedList($list);
+	$renderedlist->calcStats();
 }
-
-$advancedtools = '';
-$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search','tick').'</td><td>'._L('Search for contacts in the database').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd','tick').'</td><td>'._L('Manually add new contacts').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Open Address Book'),'addressBookAdd','tick').'</td><td>'._L('Choose contacts from your address book').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 
 $formdata = array(
 	"name" => array(
@@ -107,23 +104,61 @@ $formdata = array(
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
 	),
-	"ruledata" => array(
-		"label" => _L('List Rules'),
-		"value" => $rulesjson,
-		"validators" => array(
-			array("ValRules")
-		),
-		"control" => array("FormRuleWidget"),
-		"helpstep" => 2
-	),
-	"advancedtools" => array(
-		"label" => _L('Advanced Tools'),
+	"preview" => array(
+		"label" => 'Total',
 		"value" => null,
 		"validators" => array(),
-		"control" => array("FormHtml", 'html' => "<table>$advancedtools</table>"
-		),
-		"helpstep" => 3
+		"control" => array("FormHtml", 'html' => '<div style="float:left; padding:5px; margin-right: 10px;">' . (isset($renderedlist) ? $renderedlist->total : '0') . '</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
+		"helpstep" => 1
 	)
+);
+
+$formdata[] = _L('List Rules');
+$formdata["ruledata"] = array(
+	"label" => _L('List Rules'),
+	"value" => $rulesjson,
+	"validators" => array(
+		array("ValRules")
+	),
+	"control" => array("FormRuleWidget"),
+	"helpstep" => 2
+);
+
+if (isset($renderedlist) && $renderedlist->totaladded > 0) {
+	$formdata[] = _L('Additions');
+	$formdata["additions"] = array(
+		"label" => '',
+		"value" => '',
+		"validators" => array(),
+		"control" => array("FormHtml", 'html' => 'TODO: Show additions'),
+		"helpstep" => 2
+	);
+}
+
+if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
+	$formdata[] = _L('Skips');
+	$formdata["skips"] = array(
+		"label" => '',
+		"value" => '',
+		"validators" => array(),
+		"control" => array("FormHtml", 'html' => 'TODO: Show skips'),
+		"helpstep" => 2
+	);
+}
+
+$advancedtools = '';
+$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search','tick').'</td><td>'._L('Search for contacts in the database').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd','tick').'</td><td>'._L('Manually add new contacts').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Open Address Book'),'addressBookAdd','tick').'</td><td>'._L('Choose contacts from your address book').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
+$formdata[] = _L('Advanced List Tools');
+$formdata["advancedtools"] = array(
+	"label" => '',
+	"value" => null,
+	"validators" => array(),
+	"control" => array("FormHtml", 'html' => "<table>$advancedtools</table>"
+	),
+	"helpstep" => 3
 );
 
 $helpsteps = array (
@@ -166,8 +201,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// Save
 		if ($list->id) {
-			error_log('Rule data ------------------------');
-			error_log($postdata['ruledata']);
 			$ruledata = json_decode($postdata['ruledata']);
 			if (is_array($ruledata)) {
 				QuickUpdate('BEGIN');
@@ -199,11 +232,43 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 				QuickUpdate('COMMIT');
 			}
-			error_log('--Rule data ------------------------');
 			
-			if ($ajax)
-				$form->sendTo("lists.php");
-			else
+			if ($ajax) {
+				switch ($button) {
+					case 'save':
+						if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
+							unset($_SESSION['origin']);
+							$form->sendTo('start.php');
+						} else {
+							unset($_SESSION['origin']);
+							$form->sendTo('lists.php');
+						}
+						break;
+				
+					case 'preview':
+						$form->sendTo("showlist.php?id=" . $list->id);
+						break;
+						
+					case 'search':
+						$form->sendTo("search.php");
+						break;
+						
+					case 'manualAdd':
+						$form->sendTo("addressmanualadd.php?id=new");
+						break;
+						
+					case 'addressBookAdd':
+						$form->sendTo("addressesmanualadd.php?");
+						break;
+						
+					case 'uploadList':
+						$form->sendTo("uploadlist.php");
+						break;
+						
+					default:
+						$form->sendTo("lists.php");
+				}
+			} else
 				redirect("lists.php");
 		}
 	}
