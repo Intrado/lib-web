@@ -16,24 +16,6 @@ require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 
-function cleanObj ($obj) {
-	if (!get_class($obj) && !is_array($obj))
-		return $obj;
-	$simpleObj = array();
-	if (get_class($obj)) {
-		foreach ($obj->_fieldlist as $field) {
-			if (get_class($obj->$field))
-				$simpleObj[$field] = cleanObj($obj->$field);
-			else
-				$simpleObj[$field] = $obj->$field;
-		}
-	} else if (is_array($obj)) {
-		foreach ($obj as $id => $item)
-			$simpleObj[$id] = cleanObj($item);
-	}
-	return $simpleObj;
-}
-
 function handleRequest() {
 	if (!isset($_GET['type']) && !isset($_POST['type']))
 		return false;
@@ -46,7 +28,7 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-			return cleanObj(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
+			return cleanObjects(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
 			
 		// Return a message object specified by it's ID
 		case 'Message':
@@ -55,7 +37,7 @@ function handleRequest() {
 			$message = new Message($_GET['id'] + 0);
 			if ($message->userid !== $USER->id)
 				return false;
-			return cleanObj($message);
+			return cleanObjects($message);
 		
 		// Return a specific message part by it's ID
 		case "MessagePart":
@@ -68,7 +50,7 @@ function handleRequest() {
 			// if the message part doesn't belog to the current user, return false
 			if (!userOwns("message", $mp->messageid))
 				return false;
-			return cleanObj($mp);
+			return cleanObjects($mp);
 		
 		//--------------------------- COMPLEX OBJECTS -------------------------------
 		// Return message parts belonging to a specific messageid
@@ -77,7 +59,7 @@ function handleRequest() {
 				return false;
 			if (!userOwns("message", $_GET['id']))
 				return false;
-			return cleanObj(DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id'])));
+			return cleanObjects(DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id'])));
 		
 		// Return messages for the current user, if userid is specified return that user's messages
 		case "Messages":
@@ -117,7 +99,7 @@ function handleRequest() {
 				// TODO: Check rules against FieldMap::getAllAuthorizedFieldMaps(), set $listrules[$id][$fieldnum] = 'unauthorized', examine $list->getListRules() for details.
 				$listrules[$id] = $list->getListRules();
 			}
-			return cleanObj($listrules);
+			return cleanObjects($listrules);
 			
 		case 'liststats':
 			// $_GET['listids'] should be json-encoded array.
@@ -153,7 +135,7 @@ function handleRequest() {
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
-				'fieldmaps' => cleanObj(FieldMap::getAllAuthorizedFieldMaps()));
+				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()));
 		
 		// Return a whole message including it's message parts formatted into body text and any attachments.
 		case 'previewmessage':
@@ -178,7 +160,7 @@ function handleRequest() {
 				"subject"=>$message->subject,
 				"type"=>$message->type,
 				"simple"=>$simple,
-				"attachment"=>count($attachments)?cleanObj($attachments):false,
+				"attachment"=>count($attachments)?cleanObjects($attachments):false,
 				"body"=>count($parts)?$message->format($parts):""
 			);
 			
