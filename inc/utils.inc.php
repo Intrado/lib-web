@@ -281,7 +281,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.80 $
+    # $Revision: 1.81 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -654,6 +654,14 @@ function loadDisplaySettings(){
 	
 	// set locale
 	$_SESSION['_locale'] = $USER->getSetting('_locale', getSystemSetting('_locale'));
+}
+
+
+function SmartTruncate ($txt, $max) {
+	if (strlen($txt) > $max)
+		return substr($txt,0,$max-3) . "...";
+	else
+		return $txt;
 }
 
 ?>
