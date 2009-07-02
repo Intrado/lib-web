@@ -473,13 +473,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
 			$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
 		}
-        
-        
-        if ($ajax)
-            $form->sendTo("start.php");
-        else
-            redirect("start.php");
-    }
+		
+		
+		if ($ajax)
+			$form->sendTo("start.php");
+		else
+			redirect("start.php");
+	}
 }
 
 
