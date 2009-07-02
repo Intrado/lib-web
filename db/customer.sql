@@ -1440,3 +1440,7 @@ $$$
 
 ALTER TABLE `setting` DROP INDEX `lookup` , ADD UNIQUE `name` ( `name` ) 
 $$$
+
+-- missing id on DBMappedObject
+ALTER TABLE `userrule` ADD `id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST ;
+$$$
