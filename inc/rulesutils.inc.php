@@ -36,7 +36,12 @@ function prepareRuleVal($type, $op, $values) {
 		}
 		return implode("|",$values);
 	} else if (strpos($op,"num_") === 0 && !is_array($values)) {
-		return ereg_replace("[^0-9\.-]*","",$values) + 0.0;
+		$numbers = array($values);
+		if ($op == "num_range")
+			$numbers = explode('|', $values);
+		foreach ($numbers as $i => $num)
+			$numbers[$i] = ereg_replace("[^0-9\.-]*","",$num) + 0.0;
+		return implode('|', $numbers);
 	} else if ($type == 'multisearch' && is_array($values)) {
 		return implode("|",$values);
 	} else {
