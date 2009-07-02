@@ -61,11 +61,51 @@ else
 	$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin'", true);
 /*CSDELETEMARKER_END*/
 
-$userjobtypes = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and not issurvey order by systempriority, name asc", false, false, array($edituser->id));
+$userjobtypeids = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and not issurvey order by systempriority, name asc", false, false, array($edituser->id));
 $jobtypes = QuickQueryList("select id, name from jobtype where not deleted and not issurvey order by systempriority, name asc", true);
 
 $usersurveytypes = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and issurvey order by systempriority, name asc", false, false, array($edituser->id));
 $surveytypes = QuickQueryList("select id, name from jobtype where not deleted and issurvey order by systempriority, name asc", true);
+
+////////////////////////////////////////////////////////////////////////////////
+// Validators
+////////////////////////////////////////////////////////////////////////////////
+class ValDataRules extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		if (isset($requiredvalues['staffpkey']) && strlen(trim($requiredvalues['staffpkey'])) !== 0)
+			return "$this->label " . _L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.");
+		else
+			return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args, requiredvalues) {
+				if (requiredvalues.staffpkey.length != 0)
+					return label + " '. addslashes(_L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.")). '";
+				return true;
+			}';
+	}
+}
+
+class ValStaffPKey extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		if (isset($requiredvalues['datarules']) && strlen(trim($requiredvalues['datarules'])) !== 0)
+			return "$this->label " . _L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.");
+		else
+			return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args, requiredvalues) {
+				datarules = requiredvalues.datarules.evalJSON();
+				if (datarules.length != 0)
+					return label + " '. addslashes(_L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.")). '";
+				return true;
+			}';
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -337,8 +377,8 @@ if ($readonly) {
 if ($readonly) {
 	$displayjobtypes = "";
 	foreach ($jobtypes as $jobtypeid => $jobtypename) {
-		if (count($userjobtypes)) {
-			if (in_array($jobtypeid, $userjobtypes))
+		if (count($userjobtypeids)) {
+			if (in_array($jobtypeid, $userjobtypeids))
 				$displayjobtypes .= $jobtypename. "<br>";
 		} else
 			$displayjobtypes .= $jobtypename. "<br>";
@@ -364,7 +404,7 @@ if ($readonly) {
 } else {
 	$formdata["jobtypes"] = array(
 		"label" => _L("Job Type Restriction"),
-		"value" => $userjobtypes,
+		"value" => $userjobtypeids,
 		"validators" => array(),
 		"control" => array("MultiCheckBox", "values"=>$jobtypes),
 		"helpstep" => 2
@@ -399,27 +439,40 @@ if ($readonly) {
 			"label" => _L("Staff ID"),
 			"value" => $edituser->staffpkey,
 			"validators" => array(
+				array("ValStaffPKey")
 			),
 			"requires" => array("datarules"),
 			"control" => array("TextField","maxlength" => 20, "size" => 12),
 			"helpstep" => 1
 		);
+		$formdata["or"] = array(
+			"label" => _L("Or"),
+			"control" => array("FormHtml","html" => ""),
+			"helpstep" => 1
+		);
+		$rules = cleanObjects($edituser->rules());
+		$formdata["datarules"] = array(
+			"label" => _L("Data Restriction"),
+			"value" => json_encode(array_values($rules)),
+			"validators" => array(
+				array("ValDataRules")
+			),
+			"requires" => array("staffpkey"),
+			"control" => array("FormRuleWidget"),
+			"helpstep" => 1
+		);
+	} else {
+		$rules = cleanObjects($edituser->rules());
+		$formdata["datarules"] = array(
+			"label" => _L("Data Restriction"),
+			"value" => json_encode(array_values($rules)),
+			"validators" => array(
+				array("ValDataRules")
+			),
+			"control" => array("FormRuleWidget"),
+			"helpstep" => 1
+		);
 	}
-	$formdata["or"] = array(
-		"label" => _L("Or"),
-		"control" => array("FormHtml","html" => ""),
-		"helpstep" => 1
-	);
-	$rules = array();
-	foreach ($edituser->rules() as $rule)
-		$rules[] = cleanObj($rule);
-	$formdata["datarules"] = array(
-		"label" => _L("Data Restriction"),
-		"value" => json_encode($rules),
-		"validators" => array(),
-		"control" => array("FormRuleWidget"),
-		"helpstep" => 2
-	);
 }
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"), icon_button(_L("Email Password Reset"),"email"), icon_button(_L("Cancel"),"cross",null,"users.php"));
@@ -436,7 +489,7 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
 
 	if ($form->checkForDataChange()) {
 		$datachange = true;
@@ -482,8 +535,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			Query("BEGIN");
 			// Remove all existing user rules
 			foreach ($edituser->userRules() as $userrule)
-				$userrule->destroy(true);
+				$userrule->destroy();
+			foreach ($edituser->rules() as $rule)
+				$rule->destroy();
+			Query("COMMIT");
 			
+			Query("BEGIN");
 			$edituser->staffpkey = "";
 			if (isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
 				// create the c01 rule based on current staffid
@@ -499,17 +556,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$edituser->staffpkey = $postdata['staffpkey'];
 			}
 			
-			if (isset($postdata['datarules']) && strlen($postdata['datarules'])) {
+			if (isset($postdata['datarules'])) {
 				error_log($postdata['datarules']);
 				$datarules = json_decode($postdata['datarules']);
-				foreach ($datarules as $datarule) {
-					$rule = Rule::initFrom($datarule->fieldnum, $datarule->type, $datarule->logical, $datarule->op, $datarule->val);
-					$rule->create();
-					
-					$userrule = new UserRule();
-					$userrule->userid = $edituser->id;
-					$userrule->ruleid = $rule->id;
-					$userrule->create();
+				if (count($datarules)) {
+					foreach ($datarules as $datarule) {
+						$rule = Rule::initFrom($datarule->fieldnum, $datarule->type, $datarule->logical, $datarule->op, $datarule->val);
+						$rule->create();
+						
+						$userrule = new UserRule();
+						$userrule->userid = $edituser->id;
+						$userrule->ruleid = $rule->id;
+						$userrule->create();
+					}
 				}
 			}
 			Query("COMMIT");
@@ -518,13 +577,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$edituser->update();
 			
 			QuickUpdate("delete from userjobtypes where userid =?", false, array($edituser->id));
+			Query("BEGIN");
 			if(count($postdata['jobtypes']))
 				foreach($postdata['jobtypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 			if(count($postdata['surveytypes']))
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
-			
+			Query("COMMIT");
 		}
 
 		if((!$edituser->ldap && $IS_LDAP) || !$IS_LDAP){
@@ -554,7 +614,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin")); ?>
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValStaffPKey", "ValDataRules")); ?>
 </script>
 <?
 
@@ -562,5 +622,11 @@ startWindow(_L("User Information"));
 echo $form->render();
 endWindow();
 
+startWindow("debug");
+?><pre><?
+var_dump($edituser->userRules());
+var_dump($edituser->rules());
+?></pre><?
+endWindow();
 include_once("navbottom.inc.php");
 ?>
