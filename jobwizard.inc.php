@@ -585,7 +585,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		$formdata = array();
-		$helpsteps = array(_L("description."));
+		$helpsteps = array();
 		global $USER;
 		$helpstepnum = 1;
 		$syslangs = DBFindMany("Language","from language order by name");
@@ -610,7 +610,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 			),
 			"helpstep" => $helpstepnum
 		);
-		$helpsteps[$helpstepnum++] = _L("c");
+		$helpsteps[] = _L("<p>Call Me sessions will ring the phone number you specify to record a selected language.</p><p>The 'Default' message is always required and will be delivered to any contacts who do not have a language specified, or who's prefered language is not recorded.</p><p>When you are ready...</p><p>Select the desired language you wish to record (Or Default)</p><p>Enter the phone number you are reachable at</p><p>Click the 'Call Me To Record' button</p><p>Listen carefully to the prompts when you receive the call.</p><p>You may record as many different languages as you need.</p>");
 
 		return new Form("messagePhoneCallMe",$formdata,$helpsteps);
 	}
