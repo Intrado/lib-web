@@ -30,6 +30,7 @@ require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.obj.php");
+require_once("inc/rulesutils.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -64,19 +65,7 @@ $rulesjson = '[]';
 if ($list->id) {
 	$rules = $list->getListRules();
 	if (is_array($rules)) {
-		$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
-		foreach ($rules as $ruleid => $rule) {
-			$rules[$ruleid] = cleanObjects($rule);
-			$rules[$ruleid]['ruleid'] = $ruleid;
-			$rules[$ruleid]['type'] = 'multisearch';
-			if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('text'))
-				$rules[$ruleid]['type'] = 'text';
-			else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('reldate'))
-				$rules[$ruleid]['type'] = 'reldate';
-			else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('numeric'))
-				$rules[$ruleid]['type'] = 'numeric';
-		}
-		$rulesjson = json_encode(array_values($rules));
+		$rulesjson = json_encode(cleanObjects($rules));
 	} else {
 		unset($rules);
 	}
@@ -204,18 +193,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$ruledata = json_decode($postdata['ruledata']);
 			if (is_array($ruledata)) {
 				QuickUpdate('BEGIN');
+					QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
 					foreach ($ruledata as $data) {
-						// Existing Rule to Keep
-						if (isset($data->ruleid)) {
-							if (isset($rules, $rules[$data->ruleid]))
-								unset($rules[$data->ruleid]); // Remove from $rules
-							continue;
-						}
-						
 						// CREATE rule.
-						if (!isset($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+						if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
 							continue;
-						if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+						if (!$type = Rule::getType($data->fieldnum))
+							continue;
+						$data->val = prepareRuleVal($type, $data->op, $data->val);
+						if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
 							continue;
 						$rule->create();
 						$le = new ListEntry();
@@ -223,12 +209,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$le->type = "R";
 						$le->ruleid = $rule->id;
 						$le->create();
-					}
-					
-					// Existing Rules to Remove
-					if (isset($rules)) {
-						foreach ($rules as $rule)
-							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $rule['fieldnum']));
 					}
 				QuickUpdate('COMMIT');
 			}

@@ -130,34 +130,10 @@ var RuleWidget = Class.create({
 			} else {
 				value = data.val.replace(/\|/g, ' <?=addslashes(_L('and'))?> ');
 			}
-		} else if (!data.val[0]) {
-			value = '';
 		} else if (data.type == 'multisearch') {
-			value = data.val[0].join(', ');
-		} else if (data.type != 'reldate') {
-			value = (data.op == 'num_range') ? data.val.join(' <?=addslashes(_L('and'))?> ') : data.val[0];
-		} else if (data.type == 'reldate') {
-			switch(data.op) {
-				case 'reldate':
-					value = this.reldateOptions[data.val[0]];
-					break;
-				
-				case 'eq':
-					value = data.val[1];
-					break;
-					
-				case 'date_range':
-					value = data.val[1] + ' <?=addslashes(_L('and'))?> ' + data.val[2];
-					break;
-					
-				case 'date_offset':
-					value = data.val[3];
-					break;
-					
-				case 'reldate_range':
-					value = data.val[3] + ' <?=addslashes(_L('and'))?> ' + data.val[4];
-					break;
-			}
+			value = data.val.join(', ');
+		} else
+			value = data.val.join(' <?=addslashes(_L('and'))?> ');
 		}
 		var valueTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update(value.escapeHTML() + '&nbsp;');
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
@@ -274,17 +250,16 @@ var RuleEditor = Class.create({
 			}
 			if (multisearchValues.length < 1)
 				return false;
-			// Rule::initFrom() requires val[0] for multisearch.
-			val.push(multisearchValues);
+			val = multisearchValues;
 		} else {
 			// RELDATE_RELDATE
-			if (this.valueTD.down('select'))
-				val.push(this.valueTD.down('select').getValue());
-				
-			// TEXT, NUMERIC, RELDATE_*
-			var inputs = this.valueTD.select('input');
-			for (var i = 0; i < inputs.length; ++i) {
-				val.push(inputs[i].getValue());
+			if (this.valueTD.down('select')) {
+				val = this.valueTD.down('select').getValue();
+			} else {
+				// TEXT, NUMERIC, RELDATE_*
+				var inputs = this.valueTD.select('input');
+				for (var i = 0; i < inputs.length; ++i)
+					val.push(inputs[i].getValue());
 			}
 		}
 
@@ -364,37 +339,34 @@ var RuleEditor = Class.create({
 				break;
 				
 			case 'numeric':
-				var current = this.valueTD.select('input[type="text"]');
-				var value1 = (current && current[0]) ? current[0].getValue() : '';
-				var value2 = (current && current[1]) ? current[1].getValue() : '';
-				container.update(this.make_textbox(value1));
-				if (op == 'num_range')
+				container.update(this.make_textbox(''));
+				if (op == 'num_range') {
 					container.insert(' <?=addslashes(_L('and'))?> ');
-				container.insert(this.make_textbox(value2, op != 'num_range'));
+					container.insert(this.make_textbox(''));
+				}
 				break;
 				
 			case 'reldate':
-				var current = this.valueTD.select('input[type="text"]');
-				var value2 = (current && current[0]) ? current[0].getValue() : '';
-				var value3 = (current && current[1]) ? current[1].getValue() : '';
-				var value4 = (current && current[2]) ? current[2].getValue() : '';
-				var value5 = (current && current[3]) ? current[3].getValue() : '';
-				var selectbox = this.make_selectbox(this.ruleWidget.reldateOptions, op != 'reldate');
-				container.update(selectbox);
-				container.insert(this.make_datebox(value2, op != 'eq' && op != 'date_range'));
-				if (op == 'date_range')
-					container.insert(' <?=addslashes(_L('and'))?> ');
-				container.insert(this.make_datebox(value3, op != 'date_range'));
-				container.insert(this.make_textbox(value4, op != 'date_offset' && op != 'reldate_range'));
-				if (op == 'reldate_range')
-					container.insert(' <?=addslashes(_L('and'))?> ');
-				container.insert(this.make_textbox(value5, op != 'reldate_range'));
+				if (op == 'reldate') {
+					var selectbox = this.make_selectbox(this.ruleWidget.reldateOptions);
+					container.update(selectbox);
+				} else if (op == 'eq' || op == 'date_range') {
+					container.update(this.make_datebox(''));
+					if (op == 'date_range') {
+						container.insert(' <?=addslashes(_L('and'))?> ');
+						container.insert(this.make_datebox(''));
+					}
+				} else if (op == 'date_offset' || op == 'reldate_range') {
+					container.update(this.make_textbox(''));
+					if (op == 'reldate_range') {
+						container.insert(' <?=addslashes(_L('and'))?> ');
+						container.insert(this.make_textbox(''));
+					}
+				}
 				break;
 				
 			case 'text':
-				var current = this.valueTD.select('input[type="text"]');
-				var value1 = (current && current[0]) ? current[0].getValue() : '';
-				container.update(this.make_textbox(value1));
+				container.update(this.make_textbox(''));
 				break;
 		}
 		// TODO: optimize input[type="checkbox"] to first and last element?
