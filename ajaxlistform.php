@@ -71,7 +71,7 @@ function handleRequest() {
 
 			$data->val = prepareRuleVal($type, $data->op, $data->val);
 
-			if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+			if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
 				return false;
 			
 			// CREATE rule.

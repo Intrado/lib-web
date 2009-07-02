@@ -65,7 +65,7 @@ $rulesjson = '[]';
 if ($list->id) {
 	$rules = $list->getListRules();
 	if (is_array($rules)) {
-		$rulesjson = json_encode(cleanObjects($rules));
+		$rulesjson = json_encode(cleanObjects(array_values($rules)));
 	} else {
 		unset($rules);
 	}
