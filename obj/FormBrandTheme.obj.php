@@ -152,8 +152,8 @@ class ValBrandTheme extends Validator {
 				$errortext .= " " . _L("Theme must be a valid choice.");
 			if (!((strlen($checkval->color) == 6) && is_numeric('0x'.substr($checkval->color, 0, 2)) && is_numeric('0x'.substr($checkval->color, 2, 2)) && is_numeric('0x'.substr($checkval->color, 4, 2))))
 				$errortext .= " " . _L("Primary Color must be a valid Hex representation of your color choice.");
-			if (!is_numeric($checkval->ratio))
-				$errortext .= " " . _L("Ratio must be a number.");
+			if (!is_numeric($checkval->ratio) && $checkval->ratio + 0 > .5)
+				$errortext .= " " . _L("Ratio must be a number and greater than one-half.");
 		}
 		if ($errortext)
 			return $this->label . $errortext;
@@ -167,11 +167,11 @@ class ValBrandTheme extends Validator {
 				var errortext = "";
 				if (vals.customize) {
 					if (!vals.theme)
-						errortext += " Theme must be a valid choice.";
+						errortext += " "+ "<?=addslashes(_L("Theme must be a valid choice."))?>";
 					if (!(vals.color.length == 6))
-						errortext += " Primary Color must be a valid Hex representation of your color choice.";
-					if (parseFloat(vals.ratio) === false)
-						errortext += " Ratio must be a number.";
+						errortext += " "+ "<?=addslashes(_L("Primary Color must be a valid Hex representation of your color choice."))?>";
+					if (parseFloat(vals.ratio) === false && parseFloat(vals.ratio) > .5)
+						errortext += " "+ "<?=addslashes(_L("Ratio must be a number and greater than one-half."))?>";
 				}
 				if (errortext)
 					return label + errortext;
