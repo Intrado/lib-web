@@ -80,7 +80,7 @@ class User extends DBMappedObject {
 
 	function rules()
 	{
-		return DBFindMany("Rule","from rule inner join userrule on rule.id = userrule.ruleid where userid =?", false, array($this->id));
+		return DBFindMany("Rule","from rule r inner join userrule ur on r.id = ur.ruleid where ur.userid =?", "r", array($this->id));
 	}
 
 	function userRules() {
