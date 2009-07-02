@@ -7,6 +7,7 @@ require_once("obj/ListEntry.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
+require_once("inc/rulesutils.inc.php");
 
 // @param $listid, assumed to be a valid list id.
 function summarizeListName($listid) {
@@ -16,13 +17,8 @@ function summarizeListName($listid) {
 	$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
 	$summary = array();
 	foreach ($rules as $rule) {
-		$type = 'multisearch';
-		if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('text'))
-			$type = 'text';
-		else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('reldate'))
-			$type = 'reldate';
-		else if ($fieldmaps[$rule->fieldnum]->isOptionEnabled('numeric'))
-			$type = 'numeric';
+		if (!$type = Rule::getType($rule->fieldnum))
+			continue;
 		$op = $RULE_OPERATORS[$type][$rule->op];
 		if ($type == 'multisearch')
 			$op = 'is';
@@ -68,8 +64,13 @@ function handleRequest() {
 			$data = json_decode($_POST['ruledata']);
 			if (empty($data) || !userOwns('list', $_GET['listid']))
 				return false;
-			if (!isset($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
+			if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
 				return false;
+			if (!$type = Rule::getType($data->fieldnum))
+				return false;
+
+			$data->val = prepareRuleVal($type, $data->op, $data->val);
+
 			if (!$rule = Rule::initFrom($data->fieldnum, $data->type, $data->logical, $data->op, $data->val))
 				return false;
 			
@@ -81,8 +82,8 @@ function handleRequest() {
 				$le->type = "R";
 				$le->ruleid = $rule->id;
 				$le->create();
+				summarizeListName($_GET['listid']);
 			QuickUpdate('COMMIT');
-			summarizeListName($_GET['listid']);
 			return $rule->id;
 		
 		case 'deleterule':
