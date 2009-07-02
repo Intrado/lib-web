@@ -5,7 +5,7 @@ class Email extends DBMappedObject {
 	var $personid;
 	var $email;
 	var $sequence;
-	var $editlock;
+	var $editlock = 0;
 
 	function Email ($id = NULL) {
 		$this->_tablename = "email";

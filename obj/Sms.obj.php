@@ -5,7 +5,7 @@ class Sms extends DBMappedObject{
 	var $personid;
 	var $sms;
 	var $sequence;
-	var $editlock;
+	var $editlock = 0;
 
 	function Sms ($id = NULL) {
 		$this->_tablename = "sms";
