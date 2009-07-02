@@ -80,9 +80,13 @@ class User extends DBMappedObject {
 
 	function rules()
 	{
-		return DBFindMany("Rule","from rule inner join userrule on rule.id = userrule.ruleid where userid = $this->id");
+		return DBFindMany("Rule","from rule inner join userrule on rule.id = userrule.ruleid where userid =?", false, array($this->id));
 	}
 
+	function userRules() {
+		return DBFindMany("UserRule","from userrule where userid =?", false, array($this->id));
+	}
+	
 	function userSQL ($alias = false) {
 		$r = Rule::makeQuery($this->rules(), $alias);
 //echo "USERRULE ".$r;
@@ -96,7 +100,6 @@ class User extends DBMappedObject {
 
 		return $customer;
 	}
-
 
 	//see if the login is used
 	function checkDuplicateLogin ($newlogin, $id) {
