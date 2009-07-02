@@ -15,6 +15,7 @@ class FormRuleWidget extends FormItem {
 			var ruleWidget = new RuleWidget($('ruleWidgetContainer'));
 			function rulewidget_update_value() {
 				$('$inputname').value = ruleWidget.toJSON();
+				form_do_validation($('".$this->form->name."'), $('".$inputname."'));
 			}
 			ruleWidget.container.observe('RuleWidget::Ready', rulewidget_update_value);
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_update_value);
