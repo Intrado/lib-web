@@ -12,7 +12,7 @@ class FormRuleWidget extends FormItem {
 		$html .= '<script type="text/javascript" src="script/calendar.js"></script>';
 		// custom javascript
 		$html .= "<script type='text/javascript'>
-			var ruleWidget = new RuleWidget($('ruleWidgetContainer'));
+			var ruleWidget = new RuleWidget($('ruleWidgetContainer'".(!empty($this->args['readonly'] ? ',true' : '')."));
 			function rulewidget_update_value() {
 				$('$inputname').value = ruleWidget.toJSON();
 				form_do_validation($('".$this->form->name."'), $('".$inputname."'));

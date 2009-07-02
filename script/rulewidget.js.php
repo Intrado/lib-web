@@ -21,7 +21,7 @@ var RuleWidget = Class.create({
 	//----------------------------- PUBLIC FUNCTIONS --------------------------
 
 	// @param container, the DOM container for this widget.
-	initialize: function(container) {
+	initialize: function(container, readonly) {
 		this.container = container;
 		this.rulesTableLastTR = new Element('tr'); // For customization.
 		this.rulesTableFootTR = new Element('tr'); // For customization, on top of rulesTableFootLastTR.
@@ -29,7 +29,8 @@ var RuleWidget = Class.create({
 		this.rulesTableBody = new Element('tbody');
 		//var thead = new Element('thead').insert('<tr><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Field'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Criteria'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Value'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Actions'))?></th></tr>');
 		this.container.insert(new Element('table', {}).insert(this.rulesTableBody).insert(new Element('tfoot').insert(this.rulesTableFootTR).insert(this.rulesTableFootLastTR)));
-		this.ruleEditor = new RuleEditor(this, this.rulesTableFootLastTR);
+		if (!readonly)
+			this.ruleEditor = new RuleEditor(this, this.rulesTableFootLastTR);
 		this.clear_rules();
 		
 		this.fieldmaps = null;
@@ -67,8 +68,10 @@ var RuleWidget = Class.create({
 				// Add "is not" to the multisearch operators.
 				this.operators['multisearch']['not'] = '<?=addslashes(_L('is NOT'))?>';
 				this.operators['multisearch']['in'] = '<?=addslashes(_L('is'))?>';
-				this.ruleEditor.reset();
+				if (this.ruleEditor)
+					this.ruleEditor.reset();
 				
+				// preloaded rules
 				if (rules) {
 					for (var i = 0; i < rules.length; ++i) {
 						if (rules[i].fieldnum && !this.fieldmaps[rules[i].fieldnum]) {
@@ -87,7 +90,8 @@ var RuleWidget = Class.create({
 	clear_rules: function() {
 		this.appliedRules = {};
 		this.rulesTableBody.update(this.rulesTableLastTR);
-		this.ruleEditor.reset();
+		if (this.ruleEditor)
+			this.ruleEditor.reset();
 	},
 	
 	// Updates contents of tr with human-readable fieldmapTD, criteriaTD, and valueTD.
@@ -173,19 +177,23 @@ var RuleWidget = Class.create({
 			return;
 		}
 		// Actions
-		var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Delete This Rule'), 'cross'))?>').insert('<br style=\"clear:both\"/>');
-		var deleteRuleButton = actionTD.down('button');
-		this.rulesTableLastTR.insert({before:tr.insert(actionTD)});
-		deleteRuleButton.observe('click', function(event, tr, fieldnum) {
-			event.stop();
-			tr.remove();
-			delete this.appliedRules[fieldnum];
-			this.ruleEditor.reset();
-			this.container.fire('RuleWidget:DeleteRule', {'fieldnum':fieldnum});
-		}.bindAsEventListener(this, this.rulesTableLastTR.previous('tr'), data.fieldnum));
-		
+		if (this.ruleEditor) {
+			var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Delete This Rule'), 'cross'))?>').insert('<br style=\"clear:both\"/>');
+			var deleteRuleButton = actionTD.down('button');
+			tr.insert(actionTD);
+			deleteRuleButton.observe('click', function(event, tr, fieldnum) {
+				event.stop();
+				tr.remove();
+				delete this.appliedRules[fieldnum];
+				if (this.ruleEditor)
+					this.ruleEditor.reset();
+				this.container.fire('RuleWidget:DeleteRule', {'fieldnum':fieldnum});
+			}.bindAsEventListener(this, this.rulesTableLastTR.previous('tr'), data.fieldnum));
+		}
+		this.rulesTableLastTR.insert({before:tr});
 		this.appliedRules[data.fieldnum] = data;
-		this.ruleEditor.reset();
+		if (this.ruleEditor)
+			this.ruleEditor.reset();
 		this.container.fire('RuleWidget:AddRule', {'ruledata':$H(data)});
 	},
 
