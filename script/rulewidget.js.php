@@ -44,7 +44,6 @@ var RuleWidget = Class.create({
 	startup: function(preloadedRules) {
 		if (preloadedRules && !preloadedRules.join)
 			preloadedRules = null;
-			
 		cachedAjaxGet('ajax.php?type=rulewidgetsettings',
 			function(transport, rules) {
 				var data = transport.responseJSON;
@@ -74,6 +73,9 @@ var RuleWidget = Class.create({
 				// preloaded rules
 				if (rules) {
 					for (var i = 0; i < rules.length; ++i) {
+						if (!rules[i].fieldnum)
+							break; // Bad data.
+
 						if (rules[i].fieldnum && !this.fieldmaps[rules[i].fieldnum]) {
 							alert('no stuff for ');
 							continue;
@@ -132,7 +134,7 @@ var RuleWidget = Class.create({
 			}
 		} else if (data.type == 'multisearch') {
 			value = data.val.join(', ');
-		} else
+		} else {
 			value = data.val.join(' <?=addslashes(_L('and'))?> ');
 		}
 		var valueTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update(value.escapeHTML() + '&nbsp;');
@@ -164,7 +166,7 @@ var RuleWidget = Class.create({
 				if (this.ruleEditor)
 					this.ruleEditor.reset();
 				this.container.fire('RuleWidget:DeleteRule', {'fieldnum':fieldnum});
-			}.bindAsEventListener(this, this.rulesTableLastTR.previous('tr'), data.fieldnum));
+			}.bindAsEventListener(this, tr, data.fieldnum));
 		}
 		this.rulesTableLastTR.insert({before:tr});
 		this.appliedRules[data.fieldnum] = data;
@@ -258,8 +260,12 @@ var RuleEditor = Class.create({
 			} else {
 				// TEXT, NUMERIC, RELDATE_*
 				var inputs = this.valueTD.select('input');
-				for (var i = 0; i < inputs.length; ++i)
-					val.push(inputs[i].getValue());
+				if (inputs.length == 1) {
+					val = inputs[0].getValue();
+				} else if (inputs.length > 1) {
+					for (var i = 0; i < inputs.length; ++i)
+						val.push(inputs[i].getValue());
+				}
 			}
 		}
 
