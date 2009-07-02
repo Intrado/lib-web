@@ -2,788 +2,565 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("obj/Access.obj.php");
-include_once("obj/Permission.obj.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/User.obj.php");
-include_once("obj/FieldMap.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("ruleeditform.inc.php");
-require_once("inc/rulesutils.inc.php");
-
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Rule.obj.php");
+require_once("obj/UserRule.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/FormUserItems.obj.php");
+require_once("obj/FormRuleWidget.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-
 if (!$USER->authorize('manageaccount')) {
 	redirect('unauthorized.php');
 }
 
-
-if (isset($_GET['clearrules'])) {
-	if (isset($_SESSION['userid'])) {
-		$usr = new User($_SESSION['userid']);
-
-		// always remove Ffield and Gfield restrictions
-		// optionally remove Cfield restrictions, only if 'by data'
-		$query = "select id from rule r join userrule ur where ur.userid=$usr->id and r.id=ur.ruleid";
-		if ($usr->staffpkey != null && strlen($usr->staffpkey) > 0) {
-			$query = $query . " and (fieldnum like 'f%' or fieldnum like 'g%')";
-		}
-		$ruleids = QuickQueryList($query);
-		if (count($ruleids) > 0) {
-			$csv = implode("," , $ruleids);
-			QuickUpdate("delete from userrule where ruleid in ($csv)");
-			QuickUpdate("delete from rule where id in ($csv)");
-		}
-	}
-	redirect();
-}
+if (isset($_GET['id']))
+	$id = $_GET['id'] + 0;
+else
+	$id = "new";
 
 /*CSDELETEMARKER_START*/
-if(!$IS_COMMSUITE && isset($_GET['id'])){
-	$id = $_GET['id']+0;
-	if(QuickQuery("select count(*) from user where login = 'schoolmessenger' and id = '$id'")){
+if (!$IS_COMMSUITE && $id !== "new")
+	if (QuickQuery("select count(*) from user where login = 'schoolmessenger' and id =?", false, array($id)))
 		redirect('unauthorized.php');
-	}
+
+if ($id === "new") {
+	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
+	$maxusers = getSystemSetting("_maxusers", "unlimited");
+	if (($maxusers !== "unlimited") && $maxusers <= $usercount)
+		redirect('unauthorized.php');
 }
 /*CSDELETEMARKER_END*/
-
-////////////////////////////////////////////////////////////////////////////////
-// Functions
-////////////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+$edituser = new User($id);
 
-if (isset($_GET['resetpass'])) {
-	// NOTE: form is not saved by this button, uses existing email from database record
+$readonly = $edituser->importid != null;
+$ldapuser = $edituser->ldap;
+$profilename = QuickQuery("select name from access where id=?", false, array($edituser->accessid));
 
-	if (isset($_SESSION['userid'])) {
-		$usr = new User($_SESSION['userid']);
-		global $CUSTOMERURL;
-		forgotPassword($usr->login, $CUSTOMERURL);  // TODO this takes a few seconds...
-		redirect();
-	}
+$hasenrollment = QuickQuery("select count(id) from import where datatype = 'enrollment'")?true:false; 
+
+if($IS_COMMSUITE) {
+	$accessprofiles = QuickQueryList("select id, name from access", true);
 }
-
-if (isset($_GET['id'])) {
-	setCurrentUser($_GET['id']);
-	redirect();
-}
-$maxreached = false;
 /*CSDELETEMARKER_START*/
-if($_SESSION['userid']=== NULL){
-	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
-	$maxusers = getSystemSetting("_maxusers", "unlimited");
-	if(($maxusers != "unlimited") && $maxusers <= $usercount){
-		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
-		$maxreached=true;
-	}
-}
+else
+	$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin'", true);
 /*CSDELETEMARKER_END*/
 
-if(isset($_GET['deleterule'])) {
-	$deleterule = DBSafe($_GET['deleterule']);
-	$query = "delete from userrule where userid = " . $_SESSION['userid'] . " and ruleid = '$deleterule'";
-	QuickUpdate($query);
+$userjobtypes = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and not issurvey order by systempriority, name asc", false, false, array($edituser->id));
+$jobtypes = QuickQueryList("select id, name from jobtype where not deleted and not issurvey order by systempriority, name asc", true);
 
-	redirect();
-}
+$usersurveytypes = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and issurvey order by systempriority, name asc", false, false, array($edituser->id));
+$surveytypes = QuickQueryList("select id, name from jobtype where not deleted and issurvey order by systempriority, name asc", true);
 
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
+$formdata = array();
+$helpsteps = array();
 
-/****************** main message section ******************/
+$formdata[] = _L("Account Information");
 
-$f = "user";
-$s = "main";
-$reloadform = 0;
-
-
-//TODO: remove all "secure password" code, "checkpassword" setting
-$checkpassword = (getSystemSetting("checkpassword","",true)==0) ? getSystemSetting("checkpassword") : 1;
-$usernamelength = getSystemSetting("usernamelength",5);
-$passwordlength = getSystemSetting("passwordlength",5);
-
-if($checkpassword){
-	if($passwordlength < 6) {
-		$passwordlength = 6;
-	}
-	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least " . $passwordlength . " characters.  It must contain at least 2 of the following: a letter, a number or a symbol";
+if ($readonly) {
+	$formdata["firstname"] = array(
+		"label" => _L("First Name"),
+		"control" => array("FormHtml","html" => $edituser->firstname),
+		"helpstep" => 1
+	);
+	$formdata["lastname"] = array(
+		"label" => _L("Last Name"),
+		"control" => array("FormHtml","html" => $edituser->lastname),
+		"helpstep" => 1
+	);
 } else {
-	$securityrules = "The username must be at least " . $usernamelength . " characters.  The password cannot be made from your username/firstname/lastname.  It must be at least " . $passwordlength . " characters.  It must contain at least 2 of the following: a letter, a number or a symbol";
+	$formdata["firstname"] = array(
+		"label" => _L("First Name"),
+		"value" => $edituser->firstname,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50, "size" => 30),
+		"helpstep" => 1
+	);
+	$formdata["lastname"] = array(
+		"label" => _L("Last Name"),
+		"value" => $edituser->lastname,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50, "size" => 30),
+		"helpstep" => 1
+	);
 }
 
-if((CheckFormSubmit($f,$s) || CheckFormSubmit($f,'submitbutton') || CheckFormSubmit($f,'applybutton')) && !$maxreached) // A hack to be able to differentiate between a submit and an add button click
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
+$formdata["description"] = array(
+	"label" => _L("Description"),
+	"value" => $edituser->description,
+	"validators" => array(),
+	"control" => array("TextField","maxlength" => 50, "size" => 40),
+	"helpstep" => 1
+);
 
-		$usr = new User($_SESSION['userid']);
-
-		/* Trim fields that are not processed bellow. */
-		TrimFormData($f, $s,'firstname');
-		TrimFormData($f, $s,'lastname');
-		TrimFormData($f, $s,'description');
-
-		
-		/* Password should not be trimmed*/
-		$password = GetFormData($f, $s, "password");
-		$passwordconfirm = GetFormData($f, $s, "passwordconfirm");
-		
-		/* Trim and get data from fields that are processed.*/
-		$login = TrimFormData($f, $s, 'login');
-		$accesscode = TrimFormData($f, $s, 'accesscode');
-		$pincode = TrimFormData($f, $s, 'pincode');
-		$pincodeconfirm = TrimFormData($f, $s, 'pincodeconfirm');
-		$email = TrimFormData($f, $s, "email");
-		
-		/* Email list will need a special trim since the list could end with ; etc. 
-		 * There is no need to put the trimmed data back to the form since 
-		 * the email list form field does not check for errors.
-		 * */
-		$emaillist = GetFormData($f, $s, "aremail");
-		$emaillist = preg_replace('[,]' , ';', $emaillist);
-		$emaillist = trim($emaillist,"\t\n\r\0\x0B,; ");
-		
-		
-		$phone = Phone::parse(TrimFormData($f,$s,"phone"));
-		$callerid = Phone::parse(TrimFormData($f,$s, "callerid"));
-						
-		if (GetFormData($f, $s, "radioselect") == "bydata") {
-			$staffid = "";
-		} else {
-			$staffid = trim(GetFormData($f, $s, 'staffid'));
-		}
-
-		// If a user has also submitted dataview rules then prepare an error message in case
-		//	those rules get lost, which is what happens when there is an error() call below.
-		if (GetFormData($f, $s, "newrulefieldnum") != "" && GetFormData($f, $s, "newrulefieldnum") != -1) {
-			$extraMsg = " - You will also need to choose your data view rules again";
-		} else {
-			$extraMsg= "";
-		}
-		// do check
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly' . $extraMsg);
-		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($password=="") && ($passwordconfirm=="")) {
-			error('You must enter a password');
-		} elseif($IS_LDAP && !GetFormData($f,$s,'ldap') && $usr->ldap && ereg("^0*$", GetFormData($f,$s,'password'))) {
-			error('You must enter a password');
-		} elseif( $password != $passwordconfirm ) {
-			error('Password confirmation does not match' . $extraMsg);
-		} elseif( strlen($accesscode) > 0 && ( !$pincode || !$pincodeconfirm || $pincode != $pincodeconfirm )) {
-			error('Telephone Pin Code confirmation does not match, or is blank' . $extraMsg);
-		} elseif (($phone != "") && ($error = Phone::validate($phone))) {
-			error($error);
-		} elseif(GetFormData($f, $s, "callerid") && strlen($callerid) != 10){
-			error('Caller ID must be 10 digits long', 'You do not need to include a 1 for long distance');
-		} elseif ((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && strlen($login) < $usernamelength) {
-			error('Username must be at least ' . $usernamelength . ' characters', $securityrules);
-		} elseif((($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && !ereg("^0*$", GetFormData($f,$s,'password')) && (strlen($password) < $passwordlength)){
-			error('Password must be at least ' . $passwordlength . ' characters long', $securityrules);
-		} elseif (User::checkDuplicateLogin($login, $_SESSION['userid'])) {
-			error('This username already exists, please choose another' . $extraMsg);
-		} elseif (User::checkDuplicateStaffID($staffid, $_SESSION['userid'])) {
-			error('This staff ID already exists, please choose another' . $extraMsg);
-		} elseif(strlen($accesscode) > 0 && User::checkDuplicateAccesscode($accesscode, $_SESSION['userid'])) {
-			$accesscode = getNextAvailableAccessCode(DBSafe($accesscode), $_SESSION['userid']);
-			PutFormData($f, $s, 'accesscode', $accesscode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
-			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
-		} elseif (empty($accesscode) && !ereg("^0*$", $pincode)) {
-			$accesscode = getNextAvailableAccessCode("0000", $_SESSION['userid']);
-			PutFormData($f, $s, 'accesscode', $accesscode, 'number', 'nomin', 'nomax'); // Repopulate the form/session data with the generated code
-			error('Your telephone user id number must be unique - one has been generated for you' . $extraMsg);
-		} elseif (CheckFormSubmit($f,$s) && !GetFormData($f,$s,"newrulefieldnum")) {
-			error('Please select a field');
-		} elseif(!passwordcheck(GetFormData($f, $s,'password'))){
-			error('Your password must contain at least 2 of the following: a letter, a number or a symbol', $securityrules);
-		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && ($issame=validateNewPassword($login, GetFormData($f,$s,'password'), GetFormData($f,$s,'firstname'),GetFormData($f,$s,'lastname')))) {
-			error($issame, $securityrules);
-		} elseif( (($IS_LDAP && !GetFormData($f,$s,'ldap')) || !$IS_LDAP) && $checkpassword && ($iscomplex = isNotComplexPass(GetFormData($f,$s,'password'))) && !ereg("^0*$", GetFormData($f,$s,'password'))){
-			error($iscomplex, $securityrules);
-		} elseif($accesscode === $pincode && (($accesscode !== "" && $pincode!== ""))) {
-			error('User ID and Pin code cannot be the same');
-		} elseif((strlen($accesscode) < 4 || strlen($pincode) < 4) && (($accesscode !== "" && $pincode!== ""))) {
-			error('User ID and Pin code must have at least 4 digits');
-		} elseif ((!ereg("^[0-9]*$", $accesscode) || !ereg("^[0-9]*$", $pincode)) && (($accesscode !== "" && $pincode!== ""))) {
-			error('User ID and Pin code must all be numeric');
-		} elseif((isAllSameDigit($accesscode) || isAllSameDigit($pincode)) && (($accesscode !== "" && $pincode!== ""))
-					&& (!ereg("^0*$", $pincode)) ){
-			error('User ID and Pin code cannot have all the same digits');
-		} elseif(isSequential($pincode) && !$IS_COMMSUITE) {
-			error('Cannot have sequential numbers for Pin code');
-		} elseif($bademaillist = checkemails($emaillist)) {
-			error("These emails are invalid", $bademaillist);
-		} elseif(!GetFormData($f,$s,"accessid")){
-			error("No access profile was chosen");
-		} elseif((GetFormData($f, $s, "radioselect") == "bystaff") && strlen(GetFormData($f, $s, "staffid")) == 0) {
-			error("You must enter a Staff ID when 'By Staff ID' is selected");
-		} else {
-			// Submit changes
-			if ($usr->id == NULL) {
-				$usr->enabled = 1;
-			}
-
-			PopulateObject($f,$s,$usr,array("accessid","accesscode","firstname","lastname","description"));
-			$usr->email = $email;
-			$usr->aremail = $emaillist;
-			$usr->login = $login;
-
-
-			$usr->phone = Phone::parse(GetFormData($f,$s,"phone"));
-			if($IS_LDAP){
-				if(GetFormData($f, $s, "ldap")) {
-					$usr->ldap=1;
-				} else {
-					$usr->ldap=0;
-				}
-			}
-			$usr->update(); // create or update the user
-
-			// we need a user id for this
-			if (GetFormData($f, $s, "radioselect") == "bydata") {
-				if (strlen($usr->staffpkey) > 0) {
-					// if it was bystaff and now bydata, remove old c01 rule
-					$query = "delete r,ur from rule r inner join userrule ur on (ur.ruleid=r.id) where ur.userid=$usr->id and r.fieldnum='c01'";
-					Query($query);
-				}
-				$usr->staffpkey = "";
-			} else { // bystaff
-				// remove any existing c01 rule
-				$query = "delete r,ur from rule r inner join userrule ur on (ur.ruleid=r.id) where ur.userid=$usr->id and r.fieldnum='c01'";
-				Query($query);
-
-				// create the c01 rule based on current staffid
-				$rule = new Rule();
-				$rule->logical = "and";
-				$rule->op = "in";
-				$rule->val = $staffid;
-				$rule->fieldnum = "c01";
-				$rule->create();
-
-				$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
-				Query($query);
-
-				// set current staffid
-				$usr->staffpkey = $staffid;
-			}
-
-			// update again for staffid
-			$usr->update();
-
-			QuickUpdate("delete from userjobtypes where userid = $usr->id");
-			if(GetFormData($f,$s,"restricttypes") && count(GetFormData($f,$s,'jobtypes')) > 0)
-				foreach(GetFormData($f,$s,'jobtypes') as $type)
-					QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($type) . "')");
-			if(GetFormData($f,$s,"restrictsurveytypes") && count(GetFormData($f,$s,'surveyjobtypes')) > 0)
-				foreach(GetFormData($f,$s,'surveyjobtypes') as $surveytype)
-					QuickUpdate("insert into userjobtypes values ($usr->id, '" . DBSafe($surveytype) . "')");
-
-			$_SESSION['userid'] = $usr->id;
-
-			if((!$usr->ldap && $IS_LDAP) || !$IS_LDAP){
-				// If the password is all 0 characters then it was a default form value, so ignore it
-				if (!ereg("^0*$", $password)) {
-					$usr->setPassword($password);
-				}
-			}
-
-			// If the pincode is all 0 characters then it was a default form value, so ignore it
-			if (!ereg("^0*$", $pincode)) {
-				$usr->setPincode($pincode);
-			}
-
-			if (strlen($callerid) == 0 )
-				$callerid = false;
-			$usr->setSetting("callerid",$callerid);
-
-			$rule = getRuleFromForm($f,$s);			
-			if ($rule != null && $usr->id) {
-				$rule->create();
-				//FIXME use UserRule.obj
-				$query = "insert into userrule (userid, ruleid) values ($usr->id, $rule->id)";
-				Query($query);
-				$reloadform = 1;
-			} else if(CheckFormSubmit($f,'applybutton')) {
-				$reloadform = 1;
-			} else {
-				ClearFormData($f);
-				redirect('users.php#viewrecent');
-			}
-		}
-	}
+if ($readonly) {
+	$formdata["login"] = array(
+		"label" => _L("Username"),
+		"control" => array("FormHtml","html" => $edituser->login),
+		"helpstep" => 1
+	);
 } else {
-	$reloadform = 1;
+	$formdata["login"] = array(
+		"label" => _L("Username"),
+		"value" => $edituser->login,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 20),
+			array("ValLogin", "userid" => $edituser->id)
+		),
+		"control" => array("TextField","maxlength" => 20, "size" => 20),
+		"helpstep" => 1
+	);
 }
 
-$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => false, 'numeric' => true);
-if ($_SESSION['userid'])
-	$RULES = DBFindMany('Rule', "from rule inner join userrule on rule.id = userrule.ruleid where userid = $_SESSION[userid]");
-else
-	$RULES = array();
-
-if( $reloadform )
-{
-	ClearFormData($f);
-
-	$usr = new User($_SESSION['userid']);
-
-	$fields = array(
-			array("accessid","number","nomin","nomax"),
-			array("login","text",1,20,true),
-			array("accesscode","number","nomin","nomax"),
-			array("firstname","text",1,50,true),
-			array("lastname","text",1,50,true),
-			array("description","text",0,50),
-			array("email","email"),
-			array("aremail", "text")
-			);
-
-	PopulateForm($f,$s,$usr,$fields);
-	PutFormData($f,$s,"phone",Phone::format($usr->phone),"text",2, 20);
-
-	$checked = false;
-	$pass = $usr->id ? '00000000' : '';
-	PutFormData($f,$s,"password",$pass,"text");
-	PutFormData($f,$s,"passwordconfirm",$pass,"text");
-
-	$pass = $usr->accesscode ? '00000000' : '';
-	PutFormData($f,$s,"pincode",$pass,"number","nomin","nomax");
-	PutFormData($f,$s,"pincodeconfirm",$pass,"number","nomin","nomax");
-
-
-	if ($usr->id){
-		$surveytypes = array();
-		$types = QuickQueryList("select ujt.jobtypeid, issurvey from userjobtypes ujt inner join jobtype jt on (jt.id = ujt.jobtypeid) where userid = $usr->id", true);
-		foreach($types as $jtid => $issurvey){
-			if($issurvey){
-				$surveytypes[] = $jtid;
-				unset($types[$jtid]);
-			}
-		}
-		$types = array_keys($types);
-	}else {
-		$types = array();
-		$surveytypes = array();
-	}
-	PutFormData($f,$s,"jobtypes",$types,"array");
-	PutFormData($f,$s,"restricttypes",(bool)count($types),"bool",0,1);
-	PutFormData($f,$s,"surveyjobtypes",$surveytypes,"array");
-	PutFormData($f,$s,"restrictsurveytypes",(bool)count($surveytypes),"bool",0,1);
-	PutFormData($f,$s,"restrictpeople",(bool)count($RULES),"bool",0,1);
-
-	if($IS_LDAP) {
-		if($usr->ldap){
-			$checked = true;
-		}
-		PutFormData($f,$s,"ldap",(bool)$checked, "bool", 0, 1);
-	}
-	putRuleFormData($f, $s);
-
-	PutFormData($f,$s,"callerid", Phone::format($usr->getSetting("callerid","",true)), "text", 0, 20);
-	PutFormData($f,$s,"staffid",$usr->staffpkey,"text");
-
-	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-		$radio = "bydata";
+if($IS_LDAP){
+	if ($readonly) {
+		$formdata["ldap"] = array(
+			"label" => _L("Use LDAP Auth"),
+			"control" => array("FormHtml","html" => $ldapuser?"True":"False"),
+			"helpstep" => 1
+		);
 	} else {
-		$radio = "bystaff";
+		$formdata["ldap"] = array(
+			"label" => _L("Use LDAP Auth"),
+			"value" => $ldapuser,
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 1
+		);
 	}
-	PutFormData($f, $s, "radioselect", $radio);
+}
 
+$pass = ($edituser->id && $edituser->id !== "new") ? '00000000' : '';
+$passlength = getSystemSetting("passwordlength", 5);
+if ($readonly) {
+	$formdata["password"] = array(
+		"label" => _L("Password"),
+		"value" => $pass,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => $passlength,"max" => 20),
+			array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
+		),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 25),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["password"] = array(
+		"label" => _L("Password"),
+		"value" => $pass,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => $passlength,"max" => 20),
+			array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
+		),
+		"requires" => array("firstname", "lastname", "login"),
+		"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
+		"helpstep" => 1
+	);
+}
+
+$formdata["passwordconfirm"] = array(
+	"label" => _L("Confirm Password"),
+	"value" => $pass,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","min" => $passlength,"max" => 20),
+		array("ValFieldConfirmation", "field" => "password")
+	),
+	"requires" => array("password"),
+	"control" => array("PasswordField","maxlength" => 20, "size" => 25),
+	"helpstep" => 1
+);
+
+if ($readonly) {
+	$formdata["accesscode"] = array(
+		"label" => _L("Phone User ID"),
+		"control" => array("FormHtml","html" => $edituser->accesscode),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["accesscode"] = array(
+		"label" => _L("Phone User ID"),
+		"value" => $edituser->accesscode,
+		"validators" => array(
+			array("ValNumeric", "min" => 4),
+			array("ValAccesscode", "userid" => $edituser->id)
+		),
+		"control" => array("TextField","maxlength" => 20, "size" => 8),
+		"helpstep" => 1
+	);
+}
+
+$pin = $edituser->accesscode ? '00000000' : '';
+if ($readonly) {
+	$formdata["pin"] = array(
+		"label" => _L("Phone PIN Code"),
+		"value" => $pin,
+		"validators" => array(
+			array("ValNumeric", "min" => 4),
+			array("ValPin", "accesscode" => $edituser->accesscode)
+		),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["pin"] = array(
+		"label" => _L("Phone PIN Code"),
+		"value" => $pin,
+		"validators" => array(
+			array("ValNumeric", "min" => 4),
+			array("ValPin", "accesscode" => $edituser->accesscode)
+		),
+		"requires" => array("accesscode"),
+		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+		"helpstep" => 1
+	);
+}
+
+$formdata["pinconfirm"] = array(
+	"label" => _L("Confirm PIN"),
+	"value" => $pin,
+	"validators" => array(
+		array("ValNumeric"),
+		array("ValFieldConfirmation", "field" => "pin")
+	),
+	"requires" => array("pin"),
+	"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+	"helpstep" => 1
+);
+
+if ($readonly) {
+	$formdata["email"] = array(
+		"label" => _L("Email"),
+		"control" => array("FormHtml","html" => $edituser->email),
+		"helpstep" => 1
+	);
+
+	$formdata["aremail"] = array(
+		"label" => _L("Auto Report Emails"),
+		"control" => array("FormHtml","html" => $edituser->aremail),
+		"helpstep" => 1
+	);
+
+	$formdata["phone"] = array(
+		"label" => _L("Phone"),
+		"control" => array("FormHtml","html" => Phone::format($edituser->phone)),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["email"] = array(
+		"label" => _L("Email"),
+		"value" => $edituser->email,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 3,"max" => 255),
+			array("ValEmail")
+		),
+		"control" => array("TextField","maxlength" => 255, "size" => 35),
+		"helpstep" => 1
+	);
+
+	$formdata["aremail"] = array(
+		"label" => _L("Auto Report Emails"),
+		"value" => $edituser->aremail,
+		"validators" => array(
+			array("ValLength","min" => 3,"max" => 1024),
+			array("ValEmailList")
+		),
+		"control" => array("TextField","maxlength" => 1024, "size" => 50),
+		"helpstep" => 1
+	);
+
+	$formdata["phone"] = array(
+		"label" => _L("Phone"),
+		"value" => Phone::format($edituser->phone),
+		"validators" => array(
+			array("ValLength","min" => 2,"max" => 20),
+			array("ValPhone")
+		),
+		"control" => array("TextField","maxlength" => 20, "size" => 15),
+		"helpstep" => 1
+	);
+}
+
+$formdata[] = _L("Account Restrictions");
+
+if ($readonly) {
+	$formdata["accessid"] = array(
+		"label" => _L("Access Profile"),
+		"control" => array("FormHtml","html" => $profilename),
+		"helpstep" => 1
+	);
+} else if (!count($accessprofiles)) {
+	$formdata["accessid"] = array(
+		"label" => _L("Access Profile"),
+		"control" => array("FormHtml","html" => _L("You have no Aceess Profiles defined! Go to the Admin->Profiles tab and create one.")),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["accessid"] = array(
+		"label" => _L("Access Profile"),
+		"value" => $edituser->accessid,
+		"validators" => array(
+			array("ValRequired")
+		),
+		"control" => array("SelectMenu", "values"=>$accessprofiles),
+		"helpstep" => 2
+	);
+}
+
+if ($readonly) {
+	$displayjobtypes = "";
+	foreach ($jobtypes as $jobtypeid => $jobtypename) {
+		if (count($userjobtypes)) {
+			if (in_array($jobtypeid, $userjobtypes))
+				$displayjobtypes .= $jobtypename. "<br>";
+		} else
+			$displayjobtypes .= $jobtypename. "<br>";
+	}
+	$displaysurveytypes = "";
+	foreach ($surveytypes as $jobtypeid => $jobtypename) {
+		if (count($usersurveytypes)) {
+			if (in_array($jobtypeid, $usersurveytypes))
+				$displaysurveytypes .= $jobtypename. "<br>";
+		} else
+			$displaysurveytypes .= $jobtypename. "<br>";
+	}
+	$formdata["jobtypes"] = array(
+		"label" => _L("Job Type Restriction"),
+		"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>"),
+		"helpstep" => 1
+	);
+	$formdata["surveytypes"] = array(
+		"label" => _L("Survey Type Restriction"),
+		"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>"),
+		"helpstep" => 1
+	);
+} else {
+	$formdata["jobtypes"] = array(
+		"label" => _L("Job Type Restriction"),
+		"value" => $userjobtypes,
+		"validators" => array(),
+		"control" => array("MultiCheckBox", "values"=>$jobtypes),
+		"helpstep" => 2
+	);
+	$formdata["surveytypes"] = array(
+		"label" => _L("Survey Type Restriction"),
+		"value" => $usersurveytypes,
+		"validators" => array(),
+		"control" => array("MultiCheckBox", "values"=>$surveytypes),
+		"helpstep" => 2
+	);
+}
+
+$formdata[] = _L("Data View");
+if ($readonly) {
+	if ($edituser->staffpkey == null || strlen($edituser->staffpkey) == 0) {
+		$formdata["datarules"] = array(
+			"label" => _L("Data Restriction"),
+			"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>".Rules."</div>"),
+			"helpstep" => 1
+		);
+	} else {
+		$formdata["staffpkey"] = array(
+			"label" => _L("Staff ID"),
+			"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>".$edituser->staffpkey."</div>"),
+			"helpstep" => 1
+		);
+	}
+} else {
+	if ($hasenrollment) {
+		$formdata["staffpkey"] = array(
+			"label" => _L("Staff ID"),
+			"value" => $edituser->staffpkey,
+			"validators" => array(
+			),
+			"requires" => array("datarules"),
+			"control" => array("TextField","maxlength" => 20, "size" => 12),
+			"helpstep" => 1
+		);
+	}
+	$formdata["or"] = array(
+		"label" => _L("Or"),
+		"control" => array("FormHtml","html" => ""),
+		"helpstep" => 1
+	);
+	$rules = array();
+	foreach ($edituser->rules() as $rule)
+		$rules[] = cleanObj($rule);
+	$formdata["datarules"] = array(
+		"label" => _L("Data Restriction"),
+		"value" => json_encode($rules),
+		"validators" => array(),
+		"control" => array("FormRuleWidget"),
+		"helpstep" => 2
+	);
+}
+
+$buttons = array(submit_button(_L("Done"),"submit","tick"), icon_button(_L("Email Password Reset"),"email"), icon_button(_L("Cancel"),"cross",null,"users.php"));
+
+$form = new Form("account", $formdata, null, $buttons);
+$form->ajaxsubmit = true;
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		if ($edituser->id == NULL) {
+			$edituser->enabled = 1;
+		}
+		
+		if (!$readonly) {
+			$edituser->firstname = $postdata['firstname'];
+			$edituser->lastname = $postdata['lastname'];
+			$edituser->description = $postdata['description'];
+			$edituser->login = $postdata['login'];
+			$edituser->ldap = isset($postdata['ldap'])?$postdata['ldap']:false;
+			$edituser->accesscode = $postdata['accesscode'];
+			
+			$edituser->email = $postdata['email'];
+			$edituser->aremail = $postdata['aremail'];
+			
+			$userphone = Phone::parse($postdata['phone']);
+			$edituser->phone = $userphone;
+			
+			if (strlen($userphone) == 0 )
+				$userphone = false;
+			$edituser->setSetting("callerid",$userphone);
+			
+			if($IS_LDAP){
+				if(isset($postdata['ldap']) && $postdata['ldap'])
+					$edituser->ldap=1;
+				else
+					$edituser->ldap=0;
+			}
+			
+			$edituser->accessid = $postdata['accessid'];
+			
+			if ($edituser->id == "new") // create or update the user
+				$edituser->create();
+			else
+				$edituser->update(); 
+			
+			Query("BEGIN");
+			// Remove all existing user rules
+			foreach ($edituser->userRules() as $userrule)
+				$userrule->destroy(true);
+			
+			$edituser->staffpkey = "";
+			if (isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
+				// create the c01 rule based on current staffid
+				$rule = Rule::initFrom("c01", "multisearch", "and", "in", array(array($postdata['staffpkey'])));
+				$rule->create();
+				
+				$userrule = new UserRule();
+				$userrule->userid = $edituser-id;
+				$userrule->ruleid = $rule->id;
+				$userrule->create();
+				
+				// set current staffid
+				$edituser->staffpkey = $postdata['staffpkey'];
+			}
+			
+			if (isset($postdata['datarules']) && strlen($postdata['datarules'])) {
+				error_log($postdata['datarules']);
+				$datarules = json_decode($postdata['datarules']);
+				foreach ($datarules as $datarule) {
+					$rule = Rule::initFrom($datarule->fieldnum, $datarule->type, $datarule->logical, $datarule->op, $datarule->val);
+					$rule->create();
+					
+					$userrule = new UserRule();
+					$userrule->userid = $edituser->id;
+					$userrule->ruleid = $rule->id;
+					$userrule->create();
+				}
+			}
+			Query("COMMIT");
+			
+			// update again for staffid
+			$edituser->update();
+			
+			QuickUpdate("delete from userjobtypes where userid =?", false, array($edituser->id));
+			if(count($postdata['jobtypes']))
+				foreach($postdata['jobtypes'] as $type)
+					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
+			if(count($postdata['surveytypes']))
+				foreach($postdata['surveytypes'] as $type)
+					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
+			
+		}
+
+		if((!$edituser->ldap && $IS_LDAP) || !$IS_LDAP){
+			// If the password is all 0 characters then it was a default form value, so ignore it
+			if (!ereg("^0*$", $postdata['password']))
+				$edituser->setPassword($postdata['password']);
+		}
+
+		// If the pincode is all 0 characters then it was a default form value, so ignore it
+		if (!ereg("^0*$", $postdata['pin']))
+			$edituser->setPincode($postdata['pin']);
+		
+		if ($ajax)
+			$form->sendTo("users.php");
+		else
+			redirect("users.php");
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$usr = new User($_SESSION['userid']);
-$readonly = $usr->importid != null;
-$dis = "";
-if ($readonly) $dis = "disabled";
-
 $PAGE = "admin:users";
-$TITLE = 'User Editor: ' . ($_SESSION['userid'] == NULL ? "New User" : escapehtml(GetFormData($f,$s,"firstname")) . ' ' . escapehtml(GetFormData($f,$s,"lastname")));
+$TITLE = _L('User Editor: ') . ($id == "new" ? _L("New User") : escapehtml($edituser->firstname) . ' ' . escapehtml($edituser->lastname));
+
 include_once("nav.inc.php");
-NewForm($f);
-if ($_SESSION['userid'] == NULL || (isset($usr) && $usr->email === "") ) {
-	buttons(submit($f, 'submitbutton', 'Save'));
-} else {
-	buttons(submit($f, 'submitbutton', 'Save'), button('Email Password Reset', "if(confirm('Are you sure you want to Email this user to reset their password?')) window.location='?resetpass=1&id=$usr->id'"));
-}
-startWindow('User Information');
+
 ?>
-			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-				<tr>
-					<th valign="top" width="70" class="windowRowHeader<? if($USER->authorize('manageaccount')) print ' bottomBorder'; ?>" align="right" valign="top" style="padding-top: 6px;">Access Credentials:<br><? print help('User_AccessCredentials'); ?></th>
-					<td class="<? if($USER->authorize('manageaccount')) print 'bottomBorder'; ?>">
-						<table border="0" cellpadding="1" cellspacing="0">
-							<tr>
-								<td align="right">First Name:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->firstname;
-								} else {
-									NewFormItem($f,$s, 'firstname', 'text', 20, 50);
-								} ?>
-								</td>
-							</tr>
-							<tr>
-								<td align="right">Last Name:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->lastname;
-								} else {
-									NewFormItem($f,$s, 'lastname', 'text', 20, 50);
-								} ?>
-								</td>
-							</tr>
-							<tr>
-								<td align="right">Description:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->description;
-								} else {
-									NewFormItem($f,$s, 'description', 'text', 20, 50);
-								} ?>
-								</td>
-							</tr>							<tr>
-								<td align="right">Username:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->login;
-								} else {
-									NewFormItem($f,$s, 'login', 'text', 20);
-								} ?>
-								</td>
-							</tr>
-							<tr>
-								<td align="right">Password:</td>
-								<td><? NewFormItem($f,$s, 'password', 'password', 20,50, 'id="passwordfield1"'); ?></td>
-								<td>&nbsp;</td>
-								<td align="right">Confirm Password:</td>
-								<td><? NewFormItem($f,$s, 'passwordconfirm', 'password', 20,50, 'id="passwordfield2"'); ?></td>
-							</tr>
-							<? if($IS_LDAP && GetFormData($f,$s,'ldap')) { ?>
-								<script>
-								new getObj('passwordfield1').obj.disabled=1;
-								new getObj('passwordfield2').obj.disabled=1;
-								</script>
-							<? } ?>
-							<tr>
-								<td align="right">Telephone User ID#:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->accesscode;
-								} else {
-									NewFormItem($f,$s, 'accesscode', 'text', 10);
-								} ?>
-								</td>
-							</tr>
-							<tr>
-								<td align="right">Telephone Pin Code #:</td>
-								<td><? NewFormItem($f,$s, 'pincode', 'password', 20,100); ?></td>
-								<td>&nbsp;</td>
-								<td align="right">Telephone Pin Code #:</td>
-								<td><? NewFormItem($f,$s, 'pincodeconfirm', 'password', 20,100); ?></td>
-							</tr>
-							<tr>
-								<td align="right">Email:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->email;
-								} else {
-									NewFormItem($f,$s, 'email', 'text', 72, 10000);
-								} ?>
-								</td>
-							</tr>
-							<tr>
-								<td align="right">Auto Report Email(s):</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo $usr->aremail;
-								} else {
-									NewFormItem($f,$s, 'aremail', 'text', 72, 10000);
-								} ?>
-								</td>
-							</tr>
-							<tr>
-								<td align="right">Phone:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo Phone::format($usr->phone);
-								} else {
-									NewFormItem($f,$s, 'phone', 'text', 20);
-								} ?>
-								</td>
-							</tr>
-
-							<tr>
-								<td align="right">Caller&nbsp;ID:</td>
-								<td colspan="4">
-								<? if ($readonly) {
-									echo Phone::format($usr->getSetting("callerid","",true));
-								} else {
-									NewFormItem($f,$s, 'callerid', 'text', 20,20);
-								} ?>
-								</td>
-							</tr>
-
-							<?
-								if($IS_LDAP && $IS_COMMSUITE) {
-							?>
-								<tr>
-									<td> LDAP Enabled:</td>
-									<td><? NewFormItem($f,$s,'ldap','checkbox',NULL,NULL,"onclick=\"new getObj('passwordfield1').obj.disabled=this.checked; new getObj('passwordfield2').obj.disabled=this.checked\"" ); ?></td>
-								</tr>
-							<?
-								}
-							?>
-
-						</table>
-
-						<br>Please note: Username and password are case-sensitive. The username must be a minimum of <?=$usernamelength?> characters long and the password <?=$passwordlength?> characters long.
-						<br>Additionally, the telephone user ID and telephone PIN code must be all numeric.
-					</td>
-				</tr>
-				<? if($USER->authorize('manageaccount')) { ?>
-				<tr>
-					<th valign="top" align="right" class="windowRowHeader bottomBorder" width="70">Restrictions:<br><? print help('User_Restrictions'); ?></th>
-					<td class="bottomBorder">
-						<table border="0" cellpadding="1" cellspacing="0">
-							<tr>
-								<td align="right" valign="top" style="padding-top: 4px;">
-								 	Access Profile:
-								</td>
-								<td>
-								<? if ($readonly) {
-									$profilename = QuickQuery("select name from access where id=".$usr->accessid);
-									echo $profilename;
-								} else {
-									NewFormItem($f,$s,'accessid','selectstart');
-
-									if($IS_COMMSUITE)
-										$accss = DBFindMany('Access', "from access");
-									/*CSDELETEMARKER_START*/
-									else
-										$accss = DBFindMany('Access', "from access where name != 'SchoolMessenger Admin'");
-									/*CSDELETEMARKER_END*/
-
-									if(count($accss))
-										foreach($accss as $acc)
-											NewFormItem($f,$s,'accessid','selectoption',$acc->name,$acc->id);
-									else
-										NewFormItem($f,$s,'accessid','selectoption','No Access Profiles Defined',0);
-									NewFormItem($f,$s,'accessid','selectend');
-								}
-								?>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2">
-									<table>
-										<tr>
-											<td>
-												<? NewFormItem($f,$s,'restricttypes','checkbox',NULL,NULL,$dis.' id="restricttypes" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?>
-											</td>
-											<td>
-												Restrict this user to the following types of jobs
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-							<tr>
-								<td align="right" valign="top" style="padding-top: 4px;">Job Types:</td>
-								<td>
-								<?
-									if ($readonly) {
-										$userjobtypes = QuickQueryList("select name from jobtype where id in (select jobtypeid from userjobtypes where userid=".$usr->id.") and deleted=0 and not issurvey order by systempriority, name asc");
-										echo implode(", ",$userjobtypes);
-									} else {
-										// changed query from name, id to id, name; jjl
-										$options = QuickQueryList("select id, name from jobtype where deleted=0 and not issurvey order by systempriority, name asc", true);
-										if(!count($options))
-											$options['No Job Types Defined'] = 0;
-										NewFormItem($f,$s,'jobtypes','selectmultiple',3,$options,$dis.' id="jobtypeselect" onmousedown="setChecked(\'restricttypes\')"');
-									}
-								?>
-								</td>
-							</tr>
-
-<? if (getSystemSetting('_hassurvey', true)) { ?>
-
-							<tr>
-								<td colspan="2">
-									<table>
-										<tr>
-											<td>
-												<? NewFormItem($f,$s,'restrictsurveytypes','checkbox',NULL,NULL,$dis.' id="restrictsurveytypes" onclick="clearAllIfNotChecked(this,\'surveyjobtypeselect\'); "'); ?>
-											</td>
-											<td>
-												Restrict this user to the following types of survey jobs
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-							<tr>
-								<td align="right" valign="top" style="padding-top: 4px;">Survey Job Types:</td>
-								<td>
-								<?
-								if ($readonly) {
-									$userjobtypes = QuickQueryList("select name from jobtype where id in (select jobtypeid from userjobtypes where userid=".$usr->id.") and deleted=0 and issurvey=1 order by systempriority, name asc");
-									echo implode(", ",$userjobtypes);
-								} else {
-									// changed query from name, id to id, name; jjl
-									$surveyoptions = QuickQueryList("select id, name from jobtype where deleted=0 and issurvey=1 order by systempriority, name asc", true);
-									if(!count($surveyoptions))
-										$surveyoptions['No Job Types Defined'] = 0;
-									NewFormItem($f,$s,'surveyjobtypes','selectmultiple',3,$surveyoptions,$dis.' id="surveyjobtypeselect" onmousedown="setChecked(\'restrictsurveytypes\')"');
-								}
-								?>
-								</td>
-							</tr>
-<? } ?>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<th valign="top" align="right" class="windowRowHeader">Data View:<br><? print help('User_DataView'); ?></th>
-					<td>
-						<table>
-							<tr>
-								<td colspan="2">
-								Restrict this user's data access:
-								</td>
-							</tr>
-							<tr>
-								<td><? $extrahtml = "";
-									if ($readonly) $extrahtml = "disabled=\"disabled\"";
-									NewFormItem($f, $s, "radioselect", "radio", null, "bydata", "onclick='toggleDataViewRestriction(\"bydata\");' ".$extrahtml); ?> By Data</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "bystaff","onclick='toggleDataViewRestriction(\"bystaff\");' ".$extrahtml); ?> By Staff ID</td>
-								<td><? if (!$readonly) print submit($f, 'applybutton', 'Apply'); ?> </td>
-							</tr>
-							<tr></tr>
-						</table>
-
-						<div id="bystaff" style="width:100%;">
-						<table width="100%">
-							<tr>
-								<td>Staff&nbsp;ID:&nbsp;&nbsp;
-								<? if ($readonly) {
-									echo $usr->staffpkey;
-								} else {
-									NewFormItem($f,$s, 'staffid', 'text', 20, 255);
-								} ?>
-								</td>
-							</tr>
-						</table>
-						</div>
-
-						<div id="ruleform" style="width:100%;">
-						<table width="100%">
-							<tr>
-								<td>
-								<?
-								if ($readonly) {
-									echo "<BR>";
-								} else {
-									?>
-									<a href="?clearrules" onclick="return confirm('Are you sure you want to clear all data view restrictions?');">Clear All</a>
-									<?
-								}
-								if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-									$cfield = true;
-								} else {
-									$cfield = $readonly; // if readonly, display cfield restrictions otherwise do not
-								}
-
-								drawRuleTable($f, $s, $readonly, true, true, $cfield);
-								?>
-								</td>
-							</tr>
-						</table>
-						</div>
-
-						<div id="mustapply" style="width:100%;">
-						<table width="100%">
-							<tr>
-								<td>
-								Click 'Apply' to edit data view restrictions.
-								</td>
-							</tr>
-						</table>
-						</div>
-
-					</td>
-				</tr>
-				<? } ?>
-			</table>
-<script language="javascript">
-
-<?
-if (GetFormData($f, $s, "radioselect") == "bydata") {
-	?>$("bystaff").hide();<?
-	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-		?>$("ruleform").show(); $("mustapply").hide();<?
-	} else {
-		?>$("ruleform").hide(); $("mustapply").show();<?
-	}
-} else {
-	?>$("bystaff").show();<?
-	if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-		?>$("ruleform").hide(); $("mustapply").show();<?
-	} else {
-		?>$("ruleform").show(); $("mustapply").hide();<?
-	}
-}
-?>
-
-
-function toggleDataViewRestriction(bytype) {
-	if (bytype == "bydata") {
-		$("bystaff").hide();
-<?
-if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-	?>$("ruleform").show(); $("mustapply").hide();<?
-} else {
-	?>$("ruleform").hide(); $("mustapply").show();<?
-}
-?>
-	} else {
-		$("bystaff").show();
-<?
-if ($usr->staffpkey == null || strlen($usr->staffpkey) == 0) {
-	?>$("ruleform").hide(); $("mustapply").show();<?
-} else {
-	?>$("ruleform").show(); $("mustapply").hide();<?
-}
-?>
-	}
-}
-
+<script type="text/javascript">
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin")); ?>
 </script>
 <?
+
+startWindow(_L("User Information"));
+echo $form->render();
 endWindow();
-buttons();
-EndForm();
-?>
-<script SRC="script/calendar.js"></script>
-<?
+
 include_once("navbottom.inc.php");
 ?>
