@@ -28,7 +28,7 @@ class TextPasswordStrength extends FormItem {
 					var specialchars = ["\~","\`","\@","\#","\$","\%","\^","\&","\*","\(","\)","\_","\+","\-","\=","\;","\:","\{","\}","\[","\]","\|","\\\\","\/","\?","\>","\<"];
 					function checkPasswordStrength() {
 						var minlen = '. $this->args['minlength']. ';
-						var pass = $('.$n.').value;
+						var pass = $("'.$n.'").value;
 						var int = 0;
 						var spe = 0;
 						var len = 0;
@@ -109,25 +109,34 @@ class ValPassword extends Validator {
 
 class ValPin extends Validator {
 	function validate ($value, $args, $requiredvalues) {
-		if ($value === "00000000")
+		if ($value === "00000")
 			return true;
 		$pin = ereg_replace("[^0-9]*","",$value);
 		$accesscode = isset($requiredvalues['accesscode'])? $requiredvalues['accesscode']: $args['accesscode'];
+		if (!$accesscode)
+			return "$this->label ". _L("cannot have a PIN without a Phone User ID.");
 		if ($pin === $accesscode)
-			return "$this->label ". _L("cannot equal Phone User ID.") ." ".$detail;
+			return "$this->label ". _L("cannot equal Phone User ID.");
 		if (isSequential($pin))
-			return "$this->label ". _L("cannot have sequential numbers.") ." ".$detail;
+			return "$this->label ". _L("cannot have sequential numbers.");
 		if (isAllSameDigit($pin))
-			return "$this->label ". _L("all digits cannot be the same.") ." ".$detail;
+			return "$this->label ". _L("all digits cannot be the same.");
 		return true;
 	}
 	
 	function getJSValidator () {
 		return 
 			'function (name, label, value, args, requiredvalues) {
-				if (value == "00000000")
+				if (value == "00000")
 					return true;
-				if (value == requiredvalues.accesscode)
+				var accesscode = "";
+				if (typeof(requiredvalues.accesscode) !== "undefined")
+					accesscode = requiredvalues.accesscode;
+				else
+					accesscode = args.accesscode;
+				if (accesscode.length == 0)
+					return label + " '. addslashes(_L("cannot have a PIN without a Phone User ID.")). '";
+				if (value == accesscode)
 					return label + " '. addslashes(_L("cannot be equal to Phone User ID.")). '";
 				if (isSequential(value))
 					return label + " '. addslashes(_L("cannot have sequential numbers.")). '";
