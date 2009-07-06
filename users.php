@@ -107,6 +107,7 @@ function fmt_actions_en ($obj,$name) {
 
 	return $activeuseranchor . '<a href="user.php?id=' . $obj->id . '">'.$editviewaction.'</a>&nbsp;|&nbsp;'
 		. ($obj->enabled ? '<a href="./?login=' . $obj->login . '">Login&nbsp;as&nbsp;this&nbsp;user</a>' : NULL)
+		. '&nbsp;|&nbsp;<a href="?resetpass=1&enable='.$obj->id.'">Reset&nbsp;Password</a>'
 		. ($obj->id == $USER->id ? "" : '&nbsp;|&nbsp;<a href="?disable=' . $obj->id . '">Disable</a>&nbsp;');
 }
 
