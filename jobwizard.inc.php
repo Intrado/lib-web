@@ -463,10 +463,9 @@ class JobWiz_messagePhoneText extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if ((isset($postdata['/basic']['package']) && 
-			$postdata['/basic']['package'] == "express") ||
-			(isset($postdata['/message/select']['phone']) && 
-			$postdata['/message/select']['phone'] == "text")
+		if ((isset($postdata['/basic']['package']) && $postdata['/basic']['package'] == "express") ||
+			((isset($postdata['/basic']['package']) && $postdata['/basic']['package'] == "custom") &&
+				(isset($postdata['/message/select']['phone']) && $postdata['/message/select']['phone'] == "text"))
 		) {
 			return true;
 		} else {
