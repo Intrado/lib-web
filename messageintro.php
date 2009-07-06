@@ -7,7 +7,6 @@ include_once("inc/securityhelper.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
-
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
@@ -22,11 +21,9 @@ if (!$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-
 class IntroSelect extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
@@ -141,6 +138,7 @@ $formdata = array(
 	"Required Intro",
 	"defaultmessage" => array(
 		"label" => _L("Default Intro"),
+		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
 		"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
@@ -150,6 +148,7 @@ $formdata = array(
 	),
 	"emergencymessage" => array(
 		"label" => _L("Emergency Intro"),
+		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
 		"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
 		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
@@ -175,6 +174,7 @@ foreach($languages as $language) {
 	$formdata[] = $language; // New section for each language
 	$formdata[$language . "default"] = array(
 		"label" => _L("Default"),
+		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
 		"value" => array("message" => $messageid),
 		"validators" => array(),
 		"control" => array("IntroSelect",
@@ -191,6 +191,7 @@ foreach($languages as $language) {
 	}
 	$formdata[$language . "emergency"] = array(
 		"label" => _L("Emergency"),
+		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
 		"value" => array("message" => $messageid),
 		"validators" => array(),
 		"control" => array("IntroSelect",
@@ -199,32 +200,22 @@ foreach($languages as $language) {
 		"helpstep" => $helpstepindex
 	);
 	
-	
 	$helpsteptext[$helpstepindex] = $language;
 	$helpstepindex++;
 }
 
+$helpsteps = array (
+	_L('This message will play before all non-emergency messages.').'<br><br> '._L('The best intro messages include a brief greeting and notify the recipient that they can:').' <ul><li>'._L('Press pound to put the message on hold.').'</ul>'
+);
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
 		icon_button(_L("Cancel"),"cross",null,"settings.php"));
-
-$helpsteps = array (
-	//TODO Wordsmith this guide text
-    _L('By setting a clear Default and Emergency intro message each call will be delivered with a familiar voice and purpose.'),
-);
-
-for($i = 2; $i < $helpstepindex;$i++) {
-	//TODO Wordsmith this guide text
-	$helpsteps[] = _L('(Optional), Set %1$s default and emergency intro to enhance the phone delivery for multilingual jobs. If this message is not set the %2$s messages will receive the intro in the Required Default message',
-						$helpsteptext[$i],$helpsteptext[$i] ,$helpsteptext[$i] );
-}
 
 $form = new Form("introform", $formdata, $helpsteps, $buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
 $form->handleRequest();
 
 $datachange = false;
@@ -232,12 +223,12 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		$messagevalues = json_decode($postdata['defaultmessage']);
 		$msgid = $messagevalues->message + 0;

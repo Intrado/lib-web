@@ -20,85 +20,86 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
 $formdata = array();
-$helpsteps = array(_L("Security adjustments are made on this page."));
-
 $helpstepnum = 1;
 
+$helpsteps = array(_L("The Retry Setting specifies the minimum number of minutes the system must wait prior to retrying any busy or unanswered phone number."));
 $formdata["retry"] = array(
 	"label" => _L("Retry Setting"),
+	"fieldhelp" => _L("This setting indicates the number of minutes the system should wait between retrying phone calls."),
 	"value" => getSystemSetting('retry'),
 	"validators" => array(),
 	"control" => array("SelectMenu", "values"=>array_combine(array(5,10,15,30,60,90,120),array(5,10,15,30,60,90,120))),
 	"helpstep" => $helpstepnum
 );
-$helpsteps[$helpstepnum++] = _L("The Retry Setting specifies the minimum number of minutes the system must wait prior to retrying any busy or unanswered phone number.");
 
-// TODO: if (getSystemSetting('_hascallback', false)) {	echo Phone::format(getSystemSetting('callerid'));
+$helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
 if (getSystemSetting('_hascallback', false)) {
 	$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),
+		"fieldhelp" => _L("This is the default Caller ID for all jobs."),
 		"control" => array("FormHtml","html"=>Phone::format(getSystemSetting('callerid'))),
 		"helpstep" => $helpstepnum
 	);
-} else {	
+} else {
 		$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),
+		"fieldhelp" => _L("This is the default Caller ID for all jobs."),
 		"value" => Phone::format(getSystemSetting('callerid')),
 		"validators" => array(
-	            array("ValLength","min" => 2,"max" => 20),
-	            array("ValPhone")),
+			array("ValLength","min" => 2,"max" => 20),
+			array("ValPhone")),
 		"control" => array("TextField","maxlength" => 20),
 		"helpstep" => $helpstepnum
 	);
 }
-$helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
 
+$helpsteps[$helpstepnum++] = _L("The Autoreport email address and name is used by the system when sending Autoreports. The reports will come from this address and name.");
 $formdata["autoreportreplyemail"] = array(
 	"label" => _L("Autoreport Email Address"),
+	"fieldhelp" => "Autoreports will originate from this email address.",
 	"value" => getSystemSetting('autoreport_replyemail'),
 	"validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 255),
-            array("ValEmail")),
+		array("ValRequired"),
+		array("ValLength","min" => 3,"max" => 255),
+		array("ValEmail")),
 	"control" => array("TextField","maxlength" => 255),
 	"helpstep" => $helpstepnum
 );
 
 $formdata["autoreportreplyname"] = array(
 	"label" => _L("Autoreport Email Name"),
+	"fieldhelp" => "This is the name associated with the email address above.",
 	"value" => getSystemSetting('autoreport_replyname'),
 	"validators" => array(
-            array("ValRequired"),
-            array("ValLength","min" => 1,"max" => 100)),
+		array("ValRequired"),
+		array("ValLength","min" => 1,"max" => 100)),
 	"control" => array("TextField","maxlength" => 100),
 	"helpstep" => $helpstepnum
 );
-$helpsteps[$helpstepnum++] = _L("Enter the reply-to email address and name for your auto reports.");
 
 if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
-				
+
+	$helpsteps[$helpstepnum++] = _L("If you use a Flex appliance or have a licensed solution, enter the minimum and maximum length of extensions on your local network. For example, to have the system call  four digit extensions on your local network, set these values to 4.");
 	$formdata["easycallmin"] = array(
 		"label" => _L("Minimum Extensions Length"),
 		"value" => getSystemSetting('easycallmin',10),
 		"validators" => array(
-	            array("ValRequired"),
-	            array("ValNumber","min" => 1,"max" => 10)),
+			array("ValRequired"),
+			array("ValNumber","min" => 1,"max" => 10)),
 		"control" => array("SelectMenu","values"=>array_combine(range(1,10),range(1,10))),
 		"helpstep" => $helpstepnum
 	);
 	
 	$formdata["easycallmax"] = array(
-		"label" => _L("Maximum Estensions Length"),
+		"label" => _L("Maximum Extensions Length"),
 		"value" => getSystemSetting('easycallmax',10),
 		"validators" => array(
-	            array("ValRequired"),
-	            array("ValNumber","min" => 1,"max" => 10)),
+			array("ValRequired"),
+			array("ValNumber","min" => 1,"max" => 10)),
 		"control" => array("SelectMenu","values"=>array_combine(range(1,10),range(1,10))),
 		"helpstep" => $helpstepnum
 	);
-	$helpsteps[$helpstepnum++] = _L("Indicates the maximum/minimum number of digits that must be entered when using the EasyCall or Call Me to Record features.");
 
 }
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
@@ -115,12 +116,12 @@ $datachange = false;
 $errors = false;
 
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
 		setSystemSetting('retry', $postdata['retry']);
 		if (isset($postdata['callerid']))
@@ -139,7 +140,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		else
 			redirect("settings.php");
 
-    }
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

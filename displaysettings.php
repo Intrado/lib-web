@@ -23,22 +23,23 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $formdata = array();
-$helpsteps = array(_L("Global default display settings."));
-
 $helpstepnum = 1;
 
+$helpsteps = array(_L("Select the default language for the user interface."));
 $formdata["locale"] = array(
 	"label" => _L("Default Language"),
+	"fieldhelp" => _L("This is the default language for the user interface."),
 	"value" => getSystemSetting('_locale'),
 	"validators" => array(
 	),
 	"control" => array("SelectMenu","values"=>$LOCALES),
 	"helpstep" => $helpstepnum
 );
-$helpsteps[$helpstepnum++] = _L("User interface language and localization selection.");
 
+$helpsteps[$helpstepnum++] = _L("Choose a theme for the user interface.<br><br>Additionally, you can select a color which will be blended into the grey parts of certain interface components. The amount of tint is determined by the shader ratio.<br><br> Setting the theme will reset the color and ratio options to the theme defaults.");
 $formdata["brandtheme"] = array(
 	"label" => _L("Default Theme"),
+	"fieldhelp" => _L("Use this to select a different theme for the user interface. Themes can be customized with alternate primary colors (in hex) and primary to background color ratio settings."),
 	"value" => json_encode(array(
 		"theme"=>getSystemSetting('_brandtheme'),
 		"color"=>getSystemSetting('_brandprimary'),
@@ -49,7 +50,6 @@ $formdata["brandtheme"] = array(
 	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>false),
 	"helpstep" => $helpstepnum
 );
-$helpsteps[$helpstepnum++] = _L("The Color Theme controls the systemwide color palette.");
 
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
@@ -102,7 +102,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = _L('Systemwide Security');
+$TITLE = _L('Systemwide Display');
 
 require_once("nav.inc.php");
 ?>

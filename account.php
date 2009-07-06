@@ -55,17 +55,20 @@ $formdata[] = _L("Account Information");
 if ($readonly) {
 	$formdata["firstname"] = array(
 		"label" => _L("First Name"),
+		"fieldhelp" => _L("The user's first name."),
 		"control" => array("FormHtml","html" => $USER->firstname),
 		"helpstep" => 1
 	);
 	$formdata["lastname"] = array(
 		"label" => _L("Last Name"),
+		"fieldhelp" => _L("The user's last name."),
 		"control" => array("FormHtml","html" => $USER->lastname),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["firstname"] = array(
 		"label" => _L("First Name"),
+		"fieldhelp" => _L("The user's first name."),
 		"value" => $USER->firstname,
 		"validators" => array(
 			array("ValRequired"),
@@ -76,6 +79,7 @@ if ($readonly) {
 	);
 	$formdata["lastname"] = array(
 		"label" => _L("Last Name"),
+		"fieldhelp" => _L("The user's last name."),
 		"value" => $USER->lastname,
 		"validators" => array(
 			array("ValRequired"),
@@ -89,12 +93,14 @@ if ($readonly) {
 if ($ldapuser || $readonly) {
 	$formdata["login"] = array(
 		"label" => _L("Username"),
+		"fieldhelp" => _L("The username is used to log into the account online."),
 		"control" => array("FormHtml","html" => $USER->login),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["login"] = array(
 		"label" => _L("Username"),
+		"fieldhelp" => _L("The username is used to log into the account online."),
 		"value" => $USER->login,
 		"validators" => array(
 			array("ValRequired"),
@@ -112,6 +118,7 @@ if (!$ldapuser) {
 	if ($readonly) {
 		$formdata["password"] = array(
 			"label" => _L("Password"),
+			"fieldhelp" => _L("The password is used to log into this account online."),
 			"value" => $pass,
 			"validators" => array(
 				array("ValRequired"),
@@ -124,6 +131,7 @@ if (!$ldapuser) {
 	} else {
 		$formdata["password"] = array(
 			"label" => _L("Password"),
+			"fieldhelp" => _L("The password is used to log into this account online."),
 			"value" => $pass,
 			"validators" => array(
 				array("ValRequired"),
@@ -138,6 +146,7 @@ if (!$ldapuser) {
 	
 	$formdata["passwordconfirm"] = array(
 		"label" => _L("Confirm Password"),
+		"fieldhelp" => _L("Enter your password a second time to make sure it is correct."),
 		"value" => $pass,
 		"validators" => array(
 			array("ValRequired"),
@@ -153,12 +162,14 @@ if (!$ldapuser) {
 if ($readonly) {
 	$formdata["accesscode"] = array(
 		"label" => _L("Phone User ID"),
+		"fieldhelp" => _L("The telephone user ID is used to log into your account via phone."),
 		"control" => array("FormHtml","html" => $USER->accesscode),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["accesscode"] = array(
 		"label" => _L("Phone User ID"),
+		"fieldhelp" => _L("The telephone user ID is used to log into your account via phone."),
 		"value" => $USER->accesscode,
 		"validators" => array(
 			array("ValNumeric", "min" => 4),
@@ -173,6 +184,7 @@ $pin = $USER->accesscode ? '00000' : '';
 if ($readonly) {
 	$formdata["pin"] = array(
 		"label" => _L("Phone PIN Code"),
+		"fieldhelp" => _L("The PIN code is your password for logging into your account via phone."),
 		"value" => $pin,
 		"validators" => array(
 			array("ValNumeric", "min" => 4),
@@ -184,6 +196,7 @@ if ($readonly) {
 } else {
 	$formdata["pin"] = array(
 		"label" => _L("Phone PIN Code"),
+		"fieldhelp" => ("The PIN code is your password for logging into your account via phone."),
 		"value" => $pin,
 		"validators" => array(
 			array("ValNumeric", "min" => 4),
@@ -197,6 +210,7 @@ if ($readonly) {
 
 $formdata["pinconfirm"] = array(
 	"label" => _L("Confirm PIN"),
+	"fieldhelp" => ("Enter your PIN code a second time to make sure it's correct."),
 	"value" => $pin,
 	"validators" => array(
 		array("ValNumeric"),
@@ -210,24 +224,28 @@ $formdata["pinconfirm"] = array(
 if ($readonly) {
 	$formdata["email"] = array(
 		"label" => _L("Email"),
+		"fieldhelp" => ("Email is used for reporting, password resetting, and as the return address in email messages."),
 		"control" => array("FormHtml","html" => $USER->email),
 		"helpstep" => 1
 	);
 
 	$formdata["aremail"] = array(
 		"label" => _L("Auto Report Emails"),
+		"fieldhelp" => ("If reports should be sent to any additional email addresses, enter them here."),
 		"control" => array("FormHtml","html" => $USER->aremail),
 		"helpstep" => 1
 	);
 
 	$formdata["phone"] = array(
 		"label" => _L("Phone"),
+		"fieldhelp" => ("Enter your direct access phone number here."),
 		"control" => array("FormHtml","html" => Phone::format($USER->phone)),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["email"] = array(
 		"label" => _L("Email"),
+		"fieldhelp" => ("Email is used for reporting, password resetting, and as the return address in email messages."),
 		"value" => $USER->email,
 		"validators" => array(
 			array("ValRequired"),
@@ -240,6 +258,7 @@ if ($readonly) {
 
 	$formdata["aremail"] = array(
 		"label" => _L("Auto Report Emails"),
+		"fieldhelp" => ("If reports should be sent to any additional email addresses, enter them here."),
 		"value" => $USER->aremail,
 		"validators" => array(
 			array("ValLength","min" => 3,"max" => 1024),
@@ -251,6 +270,7 @@ if ($readonly) {
 
 	$formdata["phone"] = array(
 		"label" => _L("Phone"),
+		"fieldhelp" => ("Enter your direct access phone number here."),
 		"value" => Phone::format($USER->phone),
 		"validators" => array(
 			array("ValLength","min" => 2,"max" => 20),
@@ -266,6 +286,7 @@ $formdata[] = _L("Notification Defaults");
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $formdata["callearly"] = array(
 	"label" => _L("Default Start Time"),
+	"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
 	"value" => $USER->getCallEarly(),
 	"validators" => array(
 	),
@@ -275,6 +296,7 @@ $formdata["callearly"] = array(
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 $formdata["calllate"] = array(
 	"label" => _L("Default End Time"),
+	"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
 	"value" => $USER->getCallLate(),
 	"validators" => array(
 	),
@@ -285,6 +307,7 @@ $formdata["calllate"] = array(
 $usercallmax = $USER->getSetting("callmax", $ACCESS->getValue('callmax'));
 $formdata["callmax"] = array(
 	"label" => _L("Call Attempts"),
+	"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
 	"value" => $usercallmax,
 	"validators" => array(
 		array("ValInArray", "values" => range(1,first($ACCESS->getValue('callmax'), 1)))
@@ -297,6 +320,7 @@ $maxjobdays = $USER->getSetting("maxjobdays", $ACCESS->getValue('maxjobdays'));
 $maxdays = $ACCESS->getValue('maxjobdays', 7);
 $formdata["maxjobdays"] = array(
 	"label" => _L("Days to Run"),
+	"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
 	"value" => $maxjobdays,
 	"validators" => array(
 		array("ValInArray", "values" => range(1,$maxdays))
@@ -310,6 +334,7 @@ if ($USER->authorize('setcallerid')) {
 	if (getSystemSetting('_hascallback', false)) {
 		$formdata["usecallerid"] = array(
 			"label" => _L("Caller ID Preference"),
+			"fieldhelp" => ("You may select the default Caller ID recipients will see when they receive a call from your account."),
 			"value" => "",
 			"validators" => array(
 				array("ValInArray", "values" => array(0,1,2))
@@ -328,12 +353,14 @@ if ($USER->authorize('setcallerid')) {
 	if ($readonly) {
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
+			"fieldhelp" => ("Enter the personal phone number which will be used for Caller ID if the 'Use personal' option is selected."),
 			"control" => array("FormHtml","html" => Phone::format($USER->getSetting("callerid",""))),
 			"helpstep" => 1
 		);
 	} else {
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
+			"fieldhelp" => (""),
 			"value" => Phone::format($USER->getSetting("callerid","")),
 			"validators" => array(
 				array("ValLength","min" => 3,"max" => 20),
@@ -350,6 +377,7 @@ $formdata[] = _L("Display Settings");
 
 $formdata["actionlinks"] = array(
 	"label" => _L("Action Links"),
+	"fieldhelp" => ("This determines the appearance of the Actions column on all Builder pages. You can choose to have text, icons, or both."),
 	"value" => $USER->getSetting("actionlinks","both"),
 	"validators" => array(
 	),
@@ -359,6 +387,7 @@ $formdata["actionlinks"] = array(
 
 $formdata["locale"] = array(
 	"label" => _L("Display Language"),
+	"fieldhelp" => ("Use this menu to select the language for the user interface."),
 	"value" => $USER->getSetting('_locale', getSystemSetting('_locale')),
 	"validators" => array(
 	),
@@ -368,6 +397,7 @@ $formdata["locale"] = array(
 
 $formdata["brandtheme"] = array(
 	"label" => _L("Customize Theme"),
+	"fieldhelp" => ("Use this to select a different theme for the user interface. Themes can be customized with alternate primary colors (in hex) and primary to background color ratio settings."),
 	"value" => json_encode(array("theme"=>$USER->getSetting('_brandtheme',getSystemSetting('_brandtheme')), 
 		"color"=>$USER->getSetting('_brandprimary',getSystemSetting('_brandprimary')), 
 		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')),

@@ -20,18 +20,17 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $formdata = array();
-$helpsteps = array(_L("Security adjustments are made on this page."));
-
 $helpstepnum = 1;
 
+$helpsteps = array(_L("Click this option to disable all repeating jobs in the system. This feature can be used to prevent the system from running scheduled jobs during vacations."));
 $formdata["disablerepeat"] = array(
 	"label" => _L("Disable Repeating Jobs"),
+	"fieldhelp" => _L("Use this to disable all repeating jobs in the system."),
 	"value" => getSystemSetting('disablerepeat'),
 	"validators" => array(),
 	"control" => array("CheckBox"),
 	"helpstep" => $helpstepnum
 );
-$helpsteps[$helpstepnum++] = _L("This setting will prevent all repeating jobs from running. This is typically used to disable Attendance jobs during the summer.");
 
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
@@ -47,12 +46,12 @@ $datachange = false;
 $errors = false;
 
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
 		setSystemSetting('disablerepeat', $postdata['disablerepeat']);
 		
@@ -61,7 +60,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		else
 			redirect("settings.php");
 
-    }
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -2,6 +2,36 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Form Item Definitions
 ////////////////////////////////////////////////////////////////////////////////
+class RadioButtonWithTip extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<div id='.$n.' class="radiobox">';
+		$tips = '<script type="text/javascript">';
+		$counter = 1;
+		foreach ($this->args['values'] as $radiovalue => $radioname) {
+			$id = $n.'-'.$counter;
+			$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($radioname).'</label><br />
+				';
+			$tips .= 'new Tip($("'.$id.'"), "'.$this->args['tips'][$radiovalue].'", {
+				style: "protogrey",
+				stem: "bottomLeft",
+				hook: { tip: "bottomLeft", mouse: true },
+				offset: { x: 0, y: 0 }
+			});
+			new Tip($("'.$id.'-label"), "'.$this->args['tips'][$radiovalue].'", {
+				style: "protogrey",
+				stem: "bottomLeft",
+				hook: { tip: "bottomLeft", mouse: true },
+				offset: { x: 0, y: 0 }
+			});';
+			$counter++;
+		}
+		$str .= '</div>';
+		$tips .= '</script>';
+		return $str . $tips;
+	}
+}
+
 // Select message (phone, email, or sms)
 class SelectMessage extends FormItem {
 	function render ($value) {
@@ -18,7 +48,7 @@ class SelectMessage extends FormItem {
 		if ($this->args['type'] == 'email') {
 			$str .= '<tr><td class="msglabel">'._L("From").':</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>
 			<tr><td class="msglabel">'._L("Subject").':</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>
-			<tr><td class="msglabel">'._L("Attachmen").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
+			<tr><td class="msglabel">'._L("Attachment").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
 		}
 		if ($this->args['type'] == 'phone') {
 			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
@@ -172,14 +202,17 @@ class JobWiz_basic extends WizStep {
 		global $USER;
 		$userjobtypes = JobType::getUserJobTypes();
 		$jobtypes = array();
-		foreach ($userjobtypes as $id => $jobtype)
-			if (!$jobtype->issurvey)
-				$jobtypes[$id] = $jobtype->info;
-			
+		$jobtips = array();
+		foreach ($userjobtypes as $id => $jobtype) {
+			if (!$jobtype->issurvey) {
+				$jobtypes[$id] = $jobtype->name;
+				$jobtips[$id] = $jobtype->info;
+			}
+		}
 		$formdata = array(
 			"name" => array(
-				"label" => "Job Name",
-				"fieldhelp" => "This field is used in reports, and used for email subjects, etc. It can be up to 50 characters long.",
+				"label" => _L("Job Name"),
+				"fieldhelp" => _L("Name is used for the job's email subject and to create reports."),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -189,18 +222,18 @@ class JobWiz_basic extends WizStep {
 				"helpstep" => 1
 			),
 			"jobtype" => array(
-				"label" => "Type/Category",
-				"fieldhelp" => "Determines how people recieve your message.",
+				"label" => _L("Type/Category"),
+				"fieldhelp" => _L("These options determine how your message will be received."),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired")
 				),
-				"control" => array("RadioButton", "values" => $jobtypes),
+				"control" => array("RadioButtonWithTip", "values" => $jobtypes, "tips" => $jobtips),
 				"helpstep" => 2
 			),
 			"listmethod" => array(
-				"label" => "Contact List",
-				"fieldhelp" => "This specifies who is contacted.",
+				"label" => _L("Contact List"),
+				"fieldhelp" => _L("There are two methods to choose who to contact."),
 				"validators" => array(
 					array("ValRequired"),
 					array("ValContactListMethod")
@@ -213,8 +246,8 @@ class JobWiz_basic extends WizStep {
 				"helpstep" => 3
 			),
 			"package" => array(
-				"label" => "Notification Method",
-				"fieldhelp" => "There are many common ways of packaging your message. Choose the one that best fits how you'd like to provide your message.",
+				"label" => _L("Notification Method"),
+				"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
 				"validators" => array(
 					array("ValRequired")
 				),
@@ -229,10 +262,11 @@ class JobWiz_basic extends WizStep {
 			),
 		);
 		$helpsteps = array (
-			"This is your Job's name. <hr></hr>Job names are important<img src=\"img/icons/error.gif>, and should be descriptive. A good example is 'Standardized testing reminder', or 'Early dismissal'.",
-			"Job Types are used to determine which phones or emails we should notify. Choosing the appropriate Job Type is important for effective communication.",
-			"Adding contacts based on rules allows you to specify rules like 'Everyone from school XYZ'.<br><br>You may also have predefined Lists, and use them here.<br><br>If you need to use the list upload feature, manually enter contacts, or create a custom list of contacts, you will need to use the List Builder.",
-			"These options include common packages of notifications. <ul><li><em>EasyCall</em> allows personalized voice recording to also be delivered via email and txt message.</li><li><em>ExpressText</em> translates your written message into different languages, and is also sent via email and txt message.</li><li><em>Personalized</em> gives you the best of both worlds: personalized voice along with written emails and txt messages.</li><li><em>Custom</em> allows you to pick any combination.</li></ul>",
+			"Welcome to the Job Wizard. This is a guided 5 step process. <br><br>Enter your Job's name. Job names are used for email subjects and reporting, so they should be descriptive. 
+			Good examples include 'Standardized testing reminder', or 'Early dismissal'.",
+			"Job Types are used to determine which phones or emails will be contacted. Choosing the correct job type is important for effective communication.<br><br> <i><b>Note:</b> Emergency jobs include a notification that the message is regarding an emergency.</i><br><br>",
+			"Select the first option to use the QuickList Builder to combine existing lists and create rule-based lists. <br><br>If you need to use more advanced features to compose a list, you should use the List Builder found at Notifications>Lists. Once you've saved your advanced list, you may return to the wizard and choose it in the first option.",
+			"stuff"
 		);
 		return new Form("basic",$formdata,$helpsteps);
 	}
