@@ -12,7 +12,6 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Rule.obj.php");
-require_once("obj/UserRule.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
 require_once("obj/FormRuleWidget.obj.php");
@@ -81,7 +80,11 @@ class ValDataRules extends Validator {
 	function getJSValidator () {
 		return 
 			'function (name, label, value, args, requiredvalues) {
-				if (requiredvalues.staffpkey.length != 0)
+				var staffpkey = "";
+				var datarules = value.evalJSON();
+				if (typeof(requiredvalues.staffpkey) !== "undefined")
+					staffpkey = requiredvalues.staffpkey;
+				if (staffpkey.length != 0 && datarules.length != 0)
 					return label + " '. addslashes(_L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.")). '";
 				return true;
 			}';
@@ -90,10 +93,10 @@ class ValDataRules extends Validator {
 
 class ValStaffPKey extends Validator {
 	function validate ($value, $args, $requiredvalues) {
-		if (isset($requiredvalues['datarules']) && strlen(trim($requiredvalues['datarules'])) !== 0)
+		$datarules = json_decode($requiredvalues['datarules']);
+		if ($datarules)
 			return "$this->label " . _L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.");
-		else
-			return true;
+		return true;
 	}
 	
 	function getJSValidator () {
@@ -256,7 +259,7 @@ if ($readonly) {
 	);
 }
 
-$pin = $edituser->accesscode ? '00000000' : '';
+$pin = $edituser->accesscode ? '00000' : '';
 if ($readonly) {
 	$formdata["pin"] = array(
 		"label" => _L("Phone PIN Code"),
@@ -419,13 +422,19 @@ if ($readonly) {
 }
 
 $formdata[] = _L("Data View");
+$rules = cleanObjects($edituser->rules());
 if ($readonly) {
 	if ($edituser->staffpkey == null || strlen($edituser->staffpkey) == 0) {
-		$formdata["datarules"] = array(
-			"label" => _L("Data Restriction"),
-			"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>".Rules."</div>"),
-			"helpstep" => 1
-		);
+		if (count($rules)) {
+			$formdata["datarules"] = array(
+				"label" => _L("Data Restriction"),
+				"value" => json_encode(array_values($rules)),
+				"validators" => array(),
+				"requires" => array("staffpkey"),
+				"control" => array("FormRuleWidget", "readonly" => true),
+				"helpstep" => 1
+			);
+		}
 	} else {
 		$formdata["staffpkey"] = array(
 			"label" => _L("Staff ID"),
@@ -450,24 +459,23 @@ if ($readonly) {
 			"control" => array("FormHtml","html" => ""),
 			"helpstep" => 1
 		);
-		$rules = cleanObjects($edituser->rules());
 		$formdata["datarules"] = array(
 			"label" => _L("Data Restriction"),
 			"value" => json_encode(array_values($rules)),
 			"validators" => array(
-				array("ValDataRules")
+				array("ValDataRules"),
+				array("ValRules")
 			),
 			"requires" => array("staffpkey"),
 			"control" => array("FormRuleWidget"),
 			"helpstep" => 1
 		);
 	} else {
-		$rules = cleanObjects($edituser->rules());
 		$formdata["datarules"] = array(
 			"label" => _L("Data Restriction"),
 			"value" => json_encode(array_values($rules)),
 			"validators" => array(
-				array("ValDataRules")
+				array("ValRules")
 			),
 			"control" => array("FormRuleWidget"),
 			"helpstep" => 1
@@ -475,7 +483,7 @@ if ($readonly) {
 	}
 }
 
-$buttons = array(submit_button(_L("Done"),"submit","tick"), icon_button(_L("Email Password Reset"),"email"), icon_button(_L("Cancel"),"cross",null,"users.php"));
+$buttons = array(submit_button(_L("Done"),"submit","tick"), icon_button(_L("Cancel"),"cross",null,"users.php"));
 
 $form = new Form("account", $formdata, null, $buttons);
 $form->ajaxsubmit = true;
@@ -532,13 +540,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else
 				$edituser->update(); 
 			
-			Query("BEGIN");
 			// Remove all existing user rules
-			foreach ($edituser->userRules() as $userrule)
-				$userrule->destroy();
-			foreach ($edituser->rules() as $rule)
-				$rule->destroy();
-			Query("COMMIT");
+			$rules = $edituser->rules();
+			if (count($rules)) {
+				foreach ($rules as $rule)
+					$delrules[] = $rule->id;
+				Query("BEGIN");
+				Query("delete from rule where userid =? and id in (?)", false, array($edituser->id, implode(",", $delrules)));
+				Query("delete from userrule where userid =?", false, array($edituser->id));
+				Query("COMMIT");
+			}
 			
 			Query("BEGIN");
 			$edituser->staffpkey = "";
@@ -547,27 +558,25 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$rule = Rule::initFrom("c01", "multisearch", "and", "in", array(array($postdata['staffpkey'])));
 				$rule->create();
 				
-				$userrule = new UserRule();
-				$userrule->userid = $edituser-id;
-				$userrule->ruleid = $rule->id;
-				$userrule->create();
+				Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
 				
 				// set current staffid
 				$edituser->staffpkey = $postdata['staffpkey'];
 			}
 			
 			if (isset($postdata['datarules'])) {
-				error_log($postdata['datarules']);
 				$datarules = json_decode($postdata['datarules']);
 				if (count($datarules)) {
 					foreach ($datarules as $datarule) {
-						$rule = Rule::initFrom($datarule->fieldnum, $datarule->type, $datarule->logical, $datarule->op, $datarule->val);
+						$rule = new Rule();
+						$rule->fieldnum = $datarule->fieldnum;
+						$rule->type = $datarule->type;
+						$rule->logical = $datarule->logical;
+						$rule->op = $datarule->op;
+						$rule->val = is_array($datarule->val)?implode("|", $datarule->val):$datarule->val;
 						$rule->create();
 						
-						$userrule = new UserRule();
-						$userrule->userid = $edituser->id;
-						$userrule->ruleid = $rule->id;
-						$userrule->create();
+						Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
 					}
 				}
 			}
@@ -577,6 +586,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$edituser->update();
 			
 			QuickUpdate("delete from userjobtypes where userid =?", false, array($edituser->id));
+			
 			Query("BEGIN");
 			if(count($postdata['jobtypes']))
 				foreach($postdata['jobtypes'] as $type)
@@ -614,7 +624,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValStaffPKey", "ValDataRules")); ?>
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValStaffPKey", "ValDataRules", "ValRules")); ?>
 </script>
 <?
 
@@ -622,11 +632,5 @@ startWindow(_L("User Information"));
 echo $form->render();
 endWindow();
 
-startWindow("debug");
-?><pre><?
-var_dump($edituser->userRules());
-var_dump($edituser->rules());
-?></pre><?
-endWindow();
 include_once("navbottom.inc.php");
 ?>
