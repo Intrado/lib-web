@@ -31,13 +31,12 @@ class Voice extends DBMappedObject {
 	// return array of strings, all supported languages for tts, based on customer language table
 	static function getTTSLanguages() {
 		if (getSystemSetting("_dmmethod", "asp") == "asp") {
-			return QuickQueryList("select distinct t.language from ttsvoice t join language l where l.name = t.language order by t.id");
+			return QuickQueryList("select distinct l.name from ttsvoice t join language l where l.name = t.language order by t.id");
 		} else {
 			// if flex customer, limit to English and Spanish
-			return QuickQueryList("select distinct t.language from ttsvoice t join language l where l.name in ('English', 'Spanish') and l.name = t.language order by t.id");
+			return QuickQueryList("select distinct l.name from ttsvoice t join language l where l.name in ('English', 'Spanish') and l.name = t.language order by t.id");
 		}
 	}
-
 }
 
 ?>
