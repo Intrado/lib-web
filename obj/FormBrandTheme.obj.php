@@ -167,11 +167,11 @@ class ValBrandTheme extends Validator {
 				var errortext = "";
 				if (vals.customize) {
 					if (!vals.theme)
-						errortext += " "+ "<?=addslashes(_L("Theme must be a valid choice."))?>";
+						errortext += " "+ "'.addslashes(_L("Theme must be a valid choice.")).'";
 					if (!(vals.color.length == 6))
-						errortext += " "+ "<?=addslashes(_L("Primary Color must be a valid Hex representation of your color choice."))?>";
+						errortext += " "+ "'.addslashes(_L("Primary Color must be a valid Hex representation of your color choice.")).'";
 					if (parseFloat(vals.ratio) === false && parseFloat(vals.ratio) > .5)
-						errortext += " "+ "<?=addslashes(_L("Ratio must be a number and greater than one-half."))?>";
+						errortext += " "+ "'.addslashes(_L("Ratio must be a number and greater than one-half.")).'";
 				}
 				if (errortext)
 					return label + errortext;
