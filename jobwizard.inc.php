@@ -501,7 +501,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		if(!$translations) {
 			//Get available languages
 			$translationlanguages = Voice::getTTSLanguages();
-			$englishkey = array_search('english', $translationlanguages);
+			$englishkey = array_search('English', $translationlanguages);
 			if($englishkey !== false)
 				unset($translationlanguages[$englishkey]);			
 			$translations = translate_fromenglish($englishtext,$translationlanguages);
