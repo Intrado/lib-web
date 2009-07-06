@@ -161,7 +161,7 @@ if ($readonly) {
 		"label" => _L("Phone User ID"),
 		"value" => $USER->accesscode,
 		"validators" => array(
-			array("ValNumeric"),
+			array("ValNumeric", "min" => 4),
 			array("ValAccesscode", "userid" => $USER->id)
 		),
 		"control" => array("TextField","maxlength" => 20, "size" => 8),
@@ -169,13 +169,13 @@ if ($readonly) {
 	);
 }
 
-$pin = $USER->accesscode ? '00000000' : '';
+$pin = $USER->accesscode ? '00000' : '';
 if ($readonly) {
 	$formdata["pin"] = array(
 		"label" => _L("Phone PIN Code"),
 		"value" => $pin,
 		"validators" => array(
-			array("ValNumeric"),
+			array("ValNumeric", "min" => 4),
 			array("ValPin", "accesscode" => $USER->accesscode)
 		),
 		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
@@ -186,7 +186,7 @@ if ($readonly) {
 		"label" => _L("Phone PIN Code"),
 		"value" => $pin,
 		"validators" => array(
-			array("ValNumeric"),
+			array("ValNumeric", "min" => 4),
 			array("ValPin", "accesscode" => $USER->accesscode)
 		),
 		"requires" => array("accesscode"),
