@@ -23,6 +23,8 @@ var RuleWidget = Class.create({
 	// @param container, the DOM container for this widget.
 	initialize: function(container, readonly) {
 		this.container = container;
+		this.warningDiv = new Element('div', {'style':'color:red; padding:2px'});
+		this.container.insert(this.warningDiv);
 		this.rulesTableLastTR = new Element('tr'); // For customization.
 		this.rulesTableFootTR = new Element('tr'); // For customization, on top of rulesTableFootLastTR.
 		this.rulesTableFootLastTR = new Element('tr'); // For rule editor
@@ -71,19 +73,22 @@ var RuleWidget = Class.create({
 					this.ruleEditor.reset();
 				
 				// preloaded rules
+				var someUnused = false;
 				if (rules) {
 					for (var i = 0; i < rules.length; ++i) {
 						if (!rules[i].fieldnum)
 							break; // Bad data.
 
 						if (rules[i].fieldnum && !this.fieldmaps[rules[i].fieldnum]) {
-							alert('no stuff for ');
+							if (this.ruleEditor)
+								someUnused = true;
 							continue;
-							// TODO: Inform that this field is unauthorized.
 						}
 						this.insert_rule(rules[i]);
 					}
 				}
+				if (someUnused)
+					this.warningDiv.update('<?=addslashes(_L("WARNING: Some rules are not visible due to security restrictions or system configuration."))?>');
 				this.container.fire('RuleWidget:Ready');
 			}.bindAsEventListener(this, preloadedRules)
 		);
@@ -156,7 +161,7 @@ var RuleWidget = Class.create({
 		}
 		// Actions
 		if (this.ruleEditor) {
-			var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Delete This Rule'), 'cross'))?>').insert('<br style=\"clear:both\"/>');
+			var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?>').insert('<br style=\"clear:both\"/>');
 			var deleteRuleButton = actionTD.down('button');
 			tr.insert(actionTD);
 			deleteRuleButton.observe('click', function(event, tr, fieldnum) {
@@ -198,7 +203,7 @@ var RuleEditor = Class.create({
 		this.actionTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
 		containerTR.insert(this.fieldTD).insert(this.criteriaTD).insert(this.valueTD).insert(this.actionTD);
 
-		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add This Rule'), 'add'))?>').insert('<br style="clear:both"/>');
+		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add'), 'add'))?>').insert('<br style="clear:both"/>');
 		var addRuleButton = this.actionTD.down('button');
 		
 		// Events
@@ -410,9 +415,9 @@ var RuleEditor = Class.create({
 			// Different CSS classes for F,G,C fields.
 			// TODO: Reorder f,g,c fields. Currently ordered c,f,g due to ajax.php api call
 			var fgcClass = 'FField';
-			if (fieldnum.match('^g'))
+			if (fieldnum[0] === 'g')
 				fgcClass = 'GField';
-			else if (fieldnum.match('^c'))
+			else if (fieldnum[0] === 'c')
 				fgcClass = 'CField';
 			fieldSelectbox.insert(new Element('option', {'value':fieldnum, 'class':fgcClass}).insert(this.ruleWidget.fieldmaps[fieldnum].name));
 		}
@@ -493,14 +498,16 @@ var RuleEditor = Class.create({
 		datebox.observe('focus', function(event) {
 			event.stop();
 			this.select();
-			lcs(this,true,true);
-		});
+			
+			new DatePicker({
+				relative:this.identify(),
+				keepFieldEmpty:true,
+				enableCloseOnBlur:0,
+				topOffset:0
+			});
+			//lcs(this,true,true);
+		}.bindAsEventListener(datebox));
 		// lcs() by default will disappear when you release the mouse button, so we need to override the click event.
-		datebox.observe('click', function(event) {
-			event.stop();
-			this.select();
-			lcs(this,true,true);
-		});
 		if (hidden)
 			datebox.hide();
 		return datebox;
