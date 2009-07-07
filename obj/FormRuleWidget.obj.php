@@ -8,7 +8,7 @@ class FormRuleWidget extends FormItem {
 		// #ruleWidgetContainer
 		$html .= '<div id="ruleWidgetContainer"></div>';
 		$html .= '<script type="text/javascript" src="script/rulewidget.js.php"></script>';
-		$html .= '<script type="text/javascript" src="script/calendar.js"></script>';
+		$html .= '<script type="text/javascript" src="script/datepicker.js"></script>';
 		// custom javascript
 		$html .= "<script type='text/javascript'>
 			var ruleWidget = new RuleWidget($('ruleWidgetContainer'".(!empty($this->args['readonly']) ? ',true' : '')."));
@@ -16,7 +16,7 @@ class FormRuleWidget extends FormItem {
 				$('$inputname').value = ruleWidget.toJSON();
 				form_do_validation($('".$this->form->name."'), $('".$inputname."'));
 			}
-			ruleWidget.container.observe('RuleWidget::Ready', rulewidget_update_value);
+			ruleWidget.container.observe('RuleWidget:Ready', rulewidget_update_value);
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_update_value);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_update_value);
 			ruleWidget.startup($valueJSON);
