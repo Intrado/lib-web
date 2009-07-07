@@ -96,8 +96,13 @@ class ListForm extends Form {
 											<br style='clear:both'/>
 										</td>
 										<td valign=top>
-											<div id='listchooseTotal'></div>
-											<div id='listchooseRules'></div>
+											<div id='listchooseStatus'></div>
+											<table>
+												<tr><th valign=top style='text-align:left'>"._L('List Total')."</th><td valign=top id='listchooseTotal'></td></tr>
+												<tr><td valign=top style='text-align:left'>"._L('Matched by Rules')."</td><td valign=top id='listchooseTotalRule'></td></tr>
+												<tr><td valign=top style='text-align:left'>"._L('Additions')."</td><td valign=top id='listchooseTotalAdded'></td></tr>
+												<tr><td valign=top style='text-align:left'>"._L('Skips')."</td><td valign=top id='listchooseTotalRemoved'></td></tr>
+											</table>
 										</td>
 									</tr></table>
 								</div>
@@ -125,15 +130,14 @@ class ListForm extends Form {
 					</td>
 					<td valign=top>
 						<div id='allListsWindow'>
-							<table width='100%' class='border'>
+							<table width='100%' class='border' style='table-layout:fixed; border-collapse: collapse'>
 								<thead>
-									<tr class='listHeader'><th>"._L('List Name')."</th><th>"._L('Total')."</th><th></th></tr>
-									<tr><td colspan=100 id='listsTableStatus'></td></tr>
+									<tr class='listHeader'><th width='70%' style='overflow: hidden; white-space: nowrap; text-align:left'>"._L('List Name')."</th><th width='32px'></th><th width='30%' style='overflow: hidden; white-space: nowrap; text-align:left'>"._L('Total')."</th></tr>
+									<tr><td id='listsTableStatus'></td></tr>
 								</thead>
 								<tbody id='listsTableBody'></tbody>
 								<tfoot>
-									<!-- Validation Messages -->
-									<tr id='listsTableFootTR'></tr>
+									<tr><th colspan=2 style='text-align:right; padding: 2px; padding-top:10px'>Grand Total</th><td id='listGrandTotal' style='padding: 2px; padding-top:10px'></td></tr>
 								</tfoot>
 							</table>
 						</div>
@@ -144,6 +148,11 @@ class ListForm extends Form {
 			<!-- FORM -->
 			<br style='clear: both'/>
 			<div class='newform_container'>
+				<!-- Validation Message -->
+				<div id='listChoose_listids_fieldarea'>
+					<img id='listChoose_listids_icon' src='img/pixel.gif'/>
+					<span id='listChoose_listids_msg'></span>
+				</div>
 				<form class='newform' id='{$this->name}' name='{$this->name}' method='POST' action='{$posturl}'>
 					".implode('', $this->buttons)."
 					<input name='formsnum_{$this->name}' type='hidden' value='{$this->serialnum}'/>
@@ -155,7 +164,7 @@ class ListForm extends Form {
 		
 		// JAVASCRIPT
 		$str .= "
-			<script type='text/javascript' src='script/calendar.js'></script>
+			<script type='text/javascript' src='script/datepicker.js'></script>
 			<script type='text/javascript' src='script/rulewidget.js.php'></script>
 			<script type='text/javascript'>
 				function listform_refresh_guide_arrow() {
@@ -273,13 +282,23 @@ class ListForm extends Form {
 							
 							var hiddenTD = $('listsTableBody').down('input[value=\"'+data.id+'\"]').up('td');
 							var nameTD = hiddenTD.next('td');
-							var statisticsTD = nameTD.next('td');
+							var statisticsTD = nameTD.next('td',2);
 							nameTD.update(data.name);
 							statisticsTD.update(data.total);
-						},
+							
+							document.formvars['{$this->name}'].totals[data.id] = data.total;
+							listform_update_grand_total();
+						}.bindAsEventListener(this),
 						null,
 						false
 					);
+				}
+				
+				function listform_update_grand_total() {
+					var sum = 0;
+					for (var id in document.formvars['{$this->name}'].totals)
+						sum += document.formvars['{$this->name}'].totals[id];
+					$('listGrandTotal').update(sum);
 				}
 				
 				// Inserts specified lists into the Lists Table
@@ -300,62 +319,64 @@ class ListForm extends Form {
 							
 							for (var i = 0; i < stats.length; i++) {
 								var data = stats[i];
-								
+								document.formvars['{$this->name}'].totals[data.id] = data.total;
+								listform_update_grand_total();
+							
 								// Keep a hidden input field to keep track of id for this table row.
 								var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':data.id})).hide();
-								var nameTD = new Element('td', {'class':'List NameTD'}).update(data.name);
+								var nameTD = new Element('td', {'class':'List NameTD', 'style':'overflow: hidden; white-space: nowrap;'});
+								nameTD.insert(data.name);
+								var actionTD = new Element('td', {'class':'List ActionTD'});
+								actionTD.insert('".addslashes(action_link('','delete'))."');
 								var statisticsTD = new Element('td', {'class':'List'}).update(data.total);
-								//var detailsTD = new Element('td', {'class':'List'});
-								//detailsTD.insert('".addslashes(action_link(_L('Details'),'bullet_arrow_down'))."');
-								var actionsTD = new Element('td', {'class':'List'});
-								actionsTD.insert('".addslashes(icon_button(_L('Remove'),'cross'))."');
-								actionsTD.insert('<br style=\"clear:both\"/>');
-								$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(statisticsTD).insert(actionsTD));
+								$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(actionTD).insert(statisticsTD));
 								// Add an extra row for viewing rules.
 								var rulesTR = new Element('tr', {'class':'ListRules'}).insert(new Element('td', {'class':'viewRulesTD',colspan:100}));
 								rulesTR.hide();
 								$('listsTableBody').insert(rulesTR);
-								nameTD.style.cursor = 'pointer';
-								nameTD.observe('click', function (event, listid) {
-									var rulesTR = this.up('tr').next('tr');
-									rulesTR.toggle();
-									if (!rulesTR.visible())
-										return;
-									rulesTR.down('td').update('Loading..');
-									cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
-										function (transport) {
-											var listRules = transport.responseJSON;
-											if (!listRules) {
-												alert('".addslashes(_L('Sorry cannot get list rules'))."');
-												return;
-											}
-											// Expects a single listid; loop finished in one iteration.
-											for (var listid in listRules) {
-												var viewRulesTD = this.down('td');
-												if (!viewRulesTD) {
-													alert('".addslashes(_L('No td found'))."');
-													break;
+								if (!data.advancedlist) {
+									nameTD.style.cursor = 'pointer';
+									nameTD.observe('click', function (event, listid) {
+										var rulesTR = this.up('tr').next('tr');
+										rulesTR.toggle();
+										if (!rulesTR.visible())
+											return;
+										rulesTR.down('td').update('Loading..');
+										cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
+											function (transport) {
+												var listRules = transport.responseJSON;
+												if (!listRules) {
+													alert('".addslashes(_L('Sorry cannot get list rules'))."');
+													return;
 												}
-												var tbody = new Element('tbody');
-												for (var i in listRules[listid]) {
-													var rule = listRules[listid][i];
-													if (!rule.fieldnum)
+												// Expects a single listid; loop finished in one iteration.
+												for (var listid in listRules) {
+													var viewRulesTD = this.down('td');
+													if (!viewRulesTD) {
+														alert('".addslashes(_L('No td found'))."');
 														break;
-													var tr = new Element('tr');
-													document.formvars['{$this->name}'].ruleWidget.format_readable_rule(rule, tr);
-													tbody.insert(tr);
+													}
+													var tbody = new Element('tbody');
+													for (var i in listRules[listid]) {
+														var rule = listRules[listid][i];
+														if (!rule.fieldnum)
+															break;
+														var tr = new Element('tr');
+														document.formvars['{$this->name}'].ruleWidget.format_readable_rule(rule, tr);
+														tbody.insert(tr);
+													}
+													if (!tbody.down('td'))
+														viewRulesTD.update('".addslashes(_L('No Rules Found for This List'))."');
+													else
+														viewRulesTD.update(new Element('table').insert(tbody));
 												}
-												if (!tbody.down('td'))
-													viewRulesTD.update('".addslashes(_L('No Rules Found for This List'))."');
-												else
-													viewRulesTD.update(new Element('table').insert(tbody));
-											}
-										}.bindAsEventListener(rulesTR),
-										null,
-										false
-									);
-								}.bindAsEventListener(actionsTD,data.id));
-								var removeButton = actionsTD.down('button');
+											}.bindAsEventListener(rulesTR),
+											null,
+											false
+										);
+									}.bindAsEventListener(nameTD,data.id));
+								}
+								var removeButton = actionTD.down('a');
 								removeButton.observe('click', function(event, listid) {
 									var tr = this.up('tr');
 									tr.next('tr').remove(); // RulesTR
@@ -377,8 +398,9 @@ class ListForm extends Form {
 										// Somehow listids is not an array, which should never happen.
 										alert('".addslashes(_L('Fatal ERROR??'))."');
 									}
-								}.bindAsEventListener(actionsTD,data.id));
-								
+									document.formvars['{$this->name}'].totals[listid] = 0;
+									listform_update_grand_total();
+								}.bindAsEventListener(actionTD,data.id));
 								
 								// Mark this list as 'added' so that the list selectbox no longer shows this list as an option.
 								if (document.formvars['{$this->name}'].existingLists && document.formvars['{$this->name}'].existingLists[data.id])
@@ -403,16 +425,17 @@ class ListForm extends Form {
 					listform_set_mode_status('choosingList', false);
 					
 					selectbox.observe('change', function() {
-						$('listchooseRules').update();
-						if (!this.getValue()) {
-							$('listchooseTotal').update();
+						$('listchooseTotal').update();
+						$('listchooseTotalAdded').update();
+						$('listchooseTotalRemoved').update();
+						$('listchooseTotalRule').update();
 							
+						if (!this.getValue())
 							return;
-						}
 						
-						$('listchooseTotal').update('".addslashes(_L('Please wait, gathering statistics..'))."');
-						cachedAjaxGet('ajax.php?type=liststats&listids='+[this.getValue()].toJSON(), function(transport) {
-							$('listchooseTotal').update();
+						$('listchooseStatus').update('".addslashes(_L('Please wait, gathering statistics..'))."');
+						cachedAjaxGet('ajax.php?type=liststats&listids='+[this.getValue()].toJSON(), function(transport, id) {
+							$('listchooseStatus').update();
 							var stats = transport.responseJSON;
 							if (!stats) {
 								alert('".addslashes(_L('No data available for this list, please check your internet connection and try again'))."');
@@ -421,31 +444,10 @@ class ListForm extends Form {
 							
 							var data = stats[0];
 							$('listchooseTotal').update(data.total);
-							
-							cachedAjaxGet('ajax.php?type=listrules&listids='+[data.id].toJSON(),
-								function (transport, listid) {
-									var listRules = transport.responseJSON;
-									if (!listRules) {
-										alert('".addslashes(_L('Sorry cannot get list rules'))."');
-										return;
-									}
-									var tbody = new Element('tbody');
-									for (var i in listRules[listid]) {
-										var rule = listRules[listid][i];
-										if (!rule.fieldnum)
-											break;
-										var tr = new Element('tr');
-										document.formvars['{$this->name}'].ruleWidget.format_readable_rule(rule, tr);
-										tbody.insert(tr);
-									}
-									if (!tbody.down('td'))
-										$('listchooseRules').update('".addslashes(_L('No Rules Found for This List'))."');
-									else
-										$('listchooseRules').update(new Element('table').insert(tbody));
-								},
-								data.id
-							);
-						});
+							$('listchooseTotalAdded').update(data.totaladded);
+							$('listchooseTotalRemoved').update(data.totalremoved);
+							$('listchooseTotalRule').update(data.totalrule);
+						}, this.getValue());
 					}.bindAsEventListener(selectbox));
 					$('listSelectboxContainer').update(selectbox);
 				}
@@ -465,34 +467,6 @@ class ListForm extends Form {
 				}
 				
 				function listform_show_validation_message() {
-					// This TD gets placed in either $('listsTableFootTR') or ruleWidget.rulesTableLastTR, depending on the current mode.
-					var td = '<td id=\"listChoose_listids_fieldarea\" colspan=100><img id=\"listChoose_listids_icon\"/><span id=\"listChoose_listids_msg\"></span></td>';
-					var status = 'warn'; // Default status
-					$('listsTableFootTR').update();
-					document.formvars['{$this->name}'].ruleWidget.rulesTableLastTR.update();
-					if ($('allListsWindow').visible()) {
-						$('listsTableFootTR').update(td);
-						if ($('listsTableBody').down('tr')) // Success if there is at least one list in the table.
-							status =  'success';
-					} else { // Assumes $('buildListWindow').visible()
-						document.formvars['{$this->name}'].ruleWidget.rulesTableLastTR.update(td);
-						if (document.formvars['{$this->name}'].ruleWidget.rulesTableBody.select('tr').length > 1) // Success if there's at least one rule in the table, not counting rulesTableLastTR.
-							status = 'success';
-					}
-
-					switch (status) {
-						case 'success':
-							// Validation effects.
-							$('listChoose_listids_fieldarea').morph('background:rgb(200,255,200)', {duration:0.4});
-							$('listChoose_listids_icon').src='img/icons/accept.gif';
-							$('listChoose_listids_msg').update('".addslashes(_L('You may still add additional lists, when you are done click <b>Next</b>'))."');
-							break;
-							
-						default: // warning
-							$('listChoose_listids_fieldarea').morph('background: rgb(255,255,200)', {duration:0.4});
-							$('listChoose_listids_icon').src = 'img/pixel.gif';
-							$('listChoose_listids_msg').update();
-					}
 				}
 				
 				function listform_hide_build_list_window() {
@@ -648,6 +622,9 @@ class ListForm extends Form {
 						});
 					});
 					
+					// allListsWindow: Grand Total
+					document.formvars['{$this->name}'].totals = {};
+					
 					// allListsWindow: Choose List Selectbox and Button
 					$('chooseListButton').observe('click', function(event) {
 						var selectbox = $('listSelectboxContainer').down();
@@ -656,7 +633,9 @@ class ListForm extends Form {
 							return;
 						}
 						$('listchooseTotal').update();
-						$('listchooseRules').update();
+						$('listchooseTotalAdded').update();
+						$('listchooseTotalRemoved').update();
+						$('listchooseTotalRule').update();
 						if (listform_add_list(selectbox.getValue()))
 							listform_refresh_guide(true);
 					});
@@ -680,7 +659,9 @@ class ListForm extends Form {
 							listform_show_validation_message();
 							
 							$('listchooseTotal').update();
-							$('listchooseRules').update();
+							$('listchooseTotalAdded').update();
+							$('listchooseTotalRemoved').update();
+							$('listchooseTotalRule').update();
 							
 							$('buildListWindow').blindDown({duration:0.4});
 							$('chooseListWindow').blindUp({duration:0.4});
