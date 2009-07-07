@@ -1,6 +1,5 @@
 <?
 // TODO
-//+ ajax validator for checking if list name already exists
 //+ fix rulewidget.js.php, onchange for the fieldnum should clear the value column.
 //+ refactor ajaxlistform.php and list.php to use common functions for add a new list, rules, etc..
 
@@ -55,7 +54,15 @@ if (isset($_GET['id'])) {
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
-
+class ValListName extends Validator {
+	var $onlyserverside = true;
+	function validate($value) {
+		global $USER;
+		if (QuickQuery('select id from list where deleted=0 and id!=? and name=? and userid=?', false, array($_SESSION['listid'], $value, $USER->id)))
+			return _L('There is already a list with this name');
+		return true;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +86,9 @@ $formdata = array(
 		"label" => _L('List Name'),
 		"value" => $list->name,
 		"validators" => array(
-			array("ValLength","min" => 3,"max" => 50)
+			array("ValRequired"),
+			array("ValLength","min" => 3,"max" => 50),
+			array("ValListName")
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
@@ -95,9 +104,9 @@ $formdata = array(
 	),
 	"preview" => array(
 		"label" => 'Total',
-		"value" => null,
+		"value" => '',
 		"validators" => array(),
-		"control" => array("FormHtml", 'html' => '<div style="float:left; padding:5px; margin-right: 10px;">' . (isset($renderedlist) ? $renderedlist->total : '0') . '</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
+		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">' . (isset($renderedlist) ? $renderedlist->total : '0') . '</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
 		"helpstep" => 1
 	)
 );
@@ -143,7 +152,7 @@ $advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick'
 $formdata[] = _L('Advanced List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
-	"value" => null,
+	"value" => '',
 	"validators" => array(),
 	"control" => array("FormHtml", 'html' => "<table>$advancedtools</table>"
 	),
@@ -193,7 +202,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$ruledata = json_decode($postdata['ruledata']);
 			if (is_array($ruledata)) {
 				QuickUpdate('BEGIN');
-					QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
+					if (isset($rules)) {
+						foreach ($rules as $existingrule) {
+							if (!$USER->authorizeField($existingrule->fieldnum))
+								continue;
+							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.id=?", false, array($list->id, $existingrule->id));
+						}
+					}
 					foreach ($ruledata as $data) {
 						// CREATE rule.
 						if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
@@ -248,8 +263,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					default:
 						$form->sendTo("lists.php");
 				}
-			} else
+			} else {
 				redirect("lists.php");
+			}
 		}
 	}
 }
@@ -270,7 +286,7 @@ include_once("nav.inc.php");
 // Next: Optional, Load Custom Form Validators
 ?>
 <script type="text/javascript">
-	<? Validator::load_validators(array("ValRules")); ?>
+	<? Validator::load_validators(array("ValRules", "ValListName")); ?>
 </script>
 
 <?
@@ -278,5 +294,13 @@ startWindow(_L('List Editor'));
 
 echo $form->render();
 endWindow();
+?>
+<script type='text/javascript'>
+	function update_list_total() {
+	}
+	ruleWidget.container.observe('RuleWidget:AddRule', update_list_total);
+	ruleWidget.container.observe('RuleWidget:DeleteRule', update_list_total);
+</script>
+<?
 include_once("navbottom.inc.php");
 ?>
