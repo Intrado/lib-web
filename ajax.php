@@ -125,7 +125,7 @@ function handleRequest() {
 					'advancedlist' => !$list->deleted || $renderedlist->totalremoved || $renderedlist->totaladded,
 					'totalremoved' => $renderedlist->totalremoved,
 					'totaladded' => $renderedlist->totaladded,
-					'totalrule' => $renderedlist->total - $renderedlist->totaladded,
+					'totalrule' => $renderedlist->total - $renderedlist->totaladded + $renderedlist->totalremoved,
 					'total' => $renderedlist->total);
 			}
 			return $stats;
