@@ -7,11 +7,9 @@ include_once("inc/securityhelper.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
-
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -23,10 +21,10 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
 $formdata = array(
 	"alert" => array(
 		"label" => _L("Systemwide Alert Message"),
+		"fieldhelp" => _L('This message will be seen at the top of every screen throughout the system.'),
 		"value" => getSystemSetting('alertmessage'),
 		"validators" => array(
 			array("ValLength","min" => 0,"max" => 255)
@@ -37,7 +35,7 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L("The systemwide alert message appears at the top of every page for every user in a big red border."),
+	_L("The systemwide alert message appears at the top of every page for every user in a big red border.").'<br><br>'.
 	_L("Enter the text to display, or delete all text to remove the alert.")
 );
 
@@ -56,14 +54,14 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
-    if ($form->checkForDataChange()) {
-        $datachange = true;
-    } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-        $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
 
-        //save data here
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		//save data here
 		setSystemSetting('alertmessage', $postdata['alert']);
 
 		if ($ajax)
