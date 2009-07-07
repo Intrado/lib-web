@@ -186,10 +186,18 @@ class ValLists extends Validator {
 		$listids = json_decode($value);
 		if (empty($listids))
 			return _L("Please add a list");
+		$allempty = true;
 		foreach ($listids as $listid) {
 			if (!userOwns('list', $listid))
 				return _L('You have specified an invalid list!');
+			$list = new PeopleList($listid + 0);
+			$renderedlist = new RenderedList($list);
+			$renderedlist->calcStats();
+			if ($renderedlist->total >= 1)
+				$allempty = false;
 		}
+		if ($allempty)
+			return _L('All these lists are empty!');
 		return true;
 	}
 }
