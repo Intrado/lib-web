@@ -92,12 +92,16 @@ function handleRequest() {
 			if (!is_array($listids))
 				return false;
 			$listrules = array();
+			$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
 			foreach ($listids as $id) {
 				if (!userOwns('list', $id))
 					continue;
 				$list = new PeopleList($id+0);
-				// TODO: Check rules against FieldMap::getAllAuthorizedFieldMaps(), set $listrules[$id][$fieldnum] = 'unauthorized', examine $list->getListRules() for details.
 				$listrules[$id] = $list->getListRules();
+				foreach ($listrules[$id] as $ruleid => $rule) {
+					if (!$USER->authorizeField($rule->fieldnum))
+						unset($listrules[$id][$ruleid]);
+				}
 			}
 			return cleanObjects($listrules);
 			
@@ -118,8 +122,10 @@ function handleRequest() {
 				$stats[]= array(
 					'id' => $list->id,
 					'name' => $list->name,
-					'removed' => $renderedlist->totalremoved,
-					'added' => $renderedlist->totaladded,
+					'advancedlist' => !$list->deleted || $renderedlist->totalremoved || $renderedlist->totaladded,
+					'totalremoved' => $renderedlist->totalremoved,
+					'totaladded' => $renderedlist->totaladded,
+					'totalrule' => $renderedlist->total - $renderedlist->totaladded,
 					'total' => $renderedlist->total);
 			}
 			return $stats;
