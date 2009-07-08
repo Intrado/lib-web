@@ -47,11 +47,9 @@ if (isset($_GET['id'])) {
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-
 class EmailAttach extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		
 		$str = '
 			<input id="' . $n . '" name="' . $n . '" type="hidden"></ input>  
 			<table>
@@ -80,7 +78,7 @@ class EmailAttach extends FormItem {
 						$(\'upload_process\').show();	
  						return true;
 					}
-					function stopUpload(success,transport){
+					function stopUpload(success,transport,errormessage){
 						setTimeout ("$(\'upload_process\').hide();", 500 );
 						var result = transport.evalJSON();
 						var str = "";
@@ -94,6 +92,8 @@ class EmailAttach extends FormItem {
 						}
 						$("' . $n . '").value = contentids.toJSON();
 						$("uploadedfiles").innerHTML = str;	
+						$("uploaderror").innerHTML = errormessage;
+						form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
  						return true;
 					}
 					
@@ -112,12 +112,35 @@ class EmailAttach extends FormItem {
 									i++;
 								}
 								$("' . $n . '").value = contentids.toJSON();
-								$("uploadedfiles").innerHTML = str;								
+								$("uploadedfiles").innerHTML = str;			
+								form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));		
 							}
-						});	
+						});
 					}
 					</script>';
 		return $str;
+	}
+}
+
+class ValEmailAttach extends Validator {
+	function validate ($value, $args) {
+		if(!is_array($value)) {
+			$value = json_decode($value,true);
+		}				
+		if(count($value) > 3)
+			return "Max 3 attachments allowed. Please remove one attachment.";
+		else
+			return true;
+
+	}
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {			
+				checkval = value.evalJSON();
+				if(checkval.length > 3)
+					return "Max 3 attachments allowed. Please remove one attachment.";
+				return true;
+			}';
 	}
 }
 
@@ -157,6 +180,7 @@ $insertfields = FieldMap::getAuthorizedMapNames();
 $formdata = array(
 	"messagename" => array(
 		"label" => _L('Message Name'),
+		"fieldhelp" => "",
 		"value" => $message->name,
 		"validators" => array(
 			array("ValRequired","ValLength","min" => 3,"max" => 50),
@@ -190,6 +214,7 @@ $formdata = array(
 	),
 	"subject" => array(
 		"label" => _L('Subject'),
+		"fieldhelp" => "Enter the subject, the from name and from e-mail address as you wish them to appear to e-mail message recipients.",
 		"value" => $message->subject,
 		"validators" => array(array("ValRequired","ValLength","min" => 1,"max" => 50)),
 		"control" => array("TextField","size" => 50, "maxlength" => 100),
@@ -197,27 +222,31 @@ $formdata = array(
 	),	
 	"attachements" => array(
 		"label" => _L('Attachments'),
+		"fieldhelp" => "You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted.",
 		"value" => "",
-		"validators" => array(),
+		"validators" => array(array("ValEmailAttach")),
 		"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
-		"helpstep" => 2
+		"helpstep" => 3
 	),
 	"messagebody" => array(
-		"label" => _L('MessageBody'),
+		"label" => _L('Message Body'),
+		"fieldhelp" => "The body of your e-mail can contain text as well as dynamic data elements. Carriage returns and line feeds can be used for formatting. To insert data fields, place the cursor in the desired location, and then select from the available field options to the right.",
 		"value" => $messagebody,
 		"validators" => array(
 			array("ValRequired"),
 			array("ValMessageBody")
 		),
-		"control" => array("MessageBody","fields" => $insertfields),
-		"helpstep" => 3
+		"control" => array("MessageBody","fields" => $insertfields,"playbutton" => false),
+		"helpstep" => 4
 	)
 );
 
 $helpsteps = array (
 	_L('Set a discriptive name to be able to easaly find your message later.'),
-	_L('The text to speach voice will need to know what language is used'),
-	_L('Type your messge. You may use the included toos to construct an advanced message with field insersts')
+	'<ul><li>' . _L('Use your own name and email') . '<li>' . _L('Always set a discriptive Subject') . '</ul>',
+	'<ul><li>' . _L('Attach files up to 2 MB') . '<li>' . _L('Mention the  attachments in the Message body') . '</ul>',
+	_L('Type your message') . '<ul><li>' . _L('Introduce yourself') . '<li>' . _L('Keep it simple') . '<li>' . _L('Refer to attachments') . '</ul>'
+	//. _L('Insert Example') . '<ul><li>' . _L('Choose First Name field') . '<li>' . _L('Default field will be used when the field is not available') . '</ul>'  
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -242,7 +271,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-
 			
 		$message = new Message($_SESSION['messageid']);
 		$message->readHeaders();
@@ -271,8 +299,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 			//see if there is an uploaded file and add it to this email
 		if (isset($_SESSION['emailattachment'])) {
+			$attachmentcount = 0;
 			foreach($_SESSION['emailattachment'] as $emailattachments) {
-				if(!isset($emailattachments['exists'])) {	
+				if(!isset($emailattachments['exists']) && $attachmentcount < 3) {	
 					$msgattachment = new MessageAttachment();
 					$msgattachment->messageid = $message->id;
 					$msgattachment->contentid = $emailattachments['contentid'];
@@ -281,6 +310,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$msgattachment->create();	
 					error_log("created new attachment");
 				}
+				$attachmentcount++;
 			}
 			unset($_SESSION['emailattachment']);
 		}
@@ -295,9 +325,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_somefield ($obj, $field) {
-	return $obj->$field;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -309,7 +336,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValMessageBody","ValMessageName")); ?>
+<? Validator::load_validators(array("ValMessageBody","ValMessageName","ValEmailAttach")); ?>
 </script>
 <?
 
