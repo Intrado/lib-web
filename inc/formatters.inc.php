@@ -137,9 +137,9 @@ function fmt_idmagnify ($row,$index) {
 	// TODO must I load the person in order to get the person->userid ?
 	$person = new Person($row[1]);
 	if ($person->userid == NULL) {
-		$result = "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/magnify.gif\"></a>";
+		$result = "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/icons/diagona/16/049.gif\"></a>";
 	} else {
-		$result = "<a href=\"addressedit.php?id=$row[1]&origin=preview\">  <img src=\"img/pencil.png\"></a>";
+		$result = "<a href=\"addressedit.php?id=$row[1]&origin=preview\">  <img src=\"img/icons/pencil.png\"></a>";
 	}
 	$result .= "&nbsp;". escapehtml($row[$index]);
 	return $result;
@@ -148,46 +148,40 @@ function fmt_idmagnify ($row,$index) {
 
 
 function fmt_jobs_actions ($obj, $name) {
-	return fmt_jobs_generic($obj->id, $obj->status, $obj->deleted, $obj->type);
-}
-
-/**
-	Generalized formatting function handle formatting using the pertinent fields
-*/
-function fmt_jobs_generic ($id, $status, $deleted, $type) {
-	//return "$id, $status, $deleted";
 	global $USER;
 
+	$id = $obj->id;
+	$status = $obj->status;
+	$deleted = $obj->deleted;
+	$type = $obj->type;
+	
 	if ($type == "survey") {
-		$editbtn = '<a href="survey.php?id=' . $id . '">Edit</a>';
+		$editbtn = action_link(_L("Edit"),"pencil","survey.php?id=$id");
 		$copybtn = ''; // no copy survey feature
 	} else {
-		$editbtn = '<a href="job.php?id=' . $id . '">Edit</a>';
-		$copybtn = '<a href="jobs.php?copy=' . $id . '">Copy</a>';
+		$editbtn = action_link(_L("Edit"),"pencil","job.php?id=$id");
+		$copybtn = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
 	}
 
-	$editrepeatingbtn = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
+	$editrepeatingbtn = action_link(_L("Edit"),"pencil","jobrepeating.php?id=$id");
 
-	$cancelbtn = '<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
+	$cancelbtn = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this job?');");
 
-	if ($type == "survey")
-		$reportbtn = '<a href="reportsurveysummary.php?jobid=' . $id . '">Report</a>';
-	else
-		$reportbtn = '<a href="reportjobsummary.php?jobid=' . $id . '">Report</a>';
+	$reportbtn = action_link(_L("Report"),"layout", $type == "survey" ? "reportsurveysummary.php?jobid=$id" : "reportjobsummary.php?jobid=$id");
 
-	$monitorbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '\', 500, 450);" >Monitor</a>';
+	$monitorbtn = action_link(_L("Monitor"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id', 500, 450);");
 
-	$graphbtn = '<a href="#" onclick="popup(\'jobmonitor.php?jobid=' . $id . '&noupdate\', 500, 450);" >Graph</a>';
+	$graphbtn = action_link(_L("Graph"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id&noupdate', 500, 450);");
 
-	$deletebtn = '<a href="jobs.php?delete=' . $id . '" onclick="return confirmDelete();">Delete</a>';
+	$deletebtn = action_link(_L("Delete"),"cross","jobs.php?delete=$id","return confirmDelete();");
 
-	$archivebtn = '<a href="jobs.php?archive=' . $id . '">Archive</a>';
+	$archivebtn = action_link(_L("Archive"),"fugue/broom","jobs.php?archive=$id");
 
-	$runrepeatbtn = '<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
+	$runrepeatbtn = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id", "return confirm('Are you sure you want to run this job now?');");
 
-	$viewresponses = '<a href="replies.php?jobid=' . $id . '">Responses</a>';
+	$viewresponses = action_link(_L("Responses"),"comment","replies.php?jobid=$id");
 
-	$unarchivebtn = '<a href="jobs.php?unarchive=' . $id . '">Unarchive</a>';
+	$unarchivebtn = action_link(_L("Unarchive"),"fugue/broom__arrow","jobs.php?unarchive=$id");
 
 	switch ($status) {
 		case "new":
@@ -272,7 +266,7 @@ function fmt_jobs_generic ($id, $status, $deleted, $type) {
 			}
 			break;
 	}
-	return implode("&nbsp;|&nbsp;", $buttons);
+	return action_links($buttons);
 }
 
 function fmt_job_enddate ($obj,$name) {
@@ -331,38 +325,33 @@ function fmt_jobs_actions_customer($row, $index) {
 		if (isset($row[21]) && $row[21] == "survey") {
 			$type = "survey";
 		}
-
 	}
 
 	if ($USER->id == $jobownerid) {
-		$editLink = '<a href="job.php?id=' . $id . '">Edit</a>';
+		$editLink = action_link(_L("Edit"),"pencil","job.php?id=$id");
 		if ($type == 'survey') {
 			$copyLink = ''; // no copy survey feature
 		} else {
-			$copyLink = '&nbsp;|&nbsp;<a href="jobs.php?copy=' . $id . '">Copy</a>';
+			$copyLink = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
 		}
 	} elseif ($USER->authorize('manageaccount')) {
-		$editLink = '<a href="./?login=' . $jobownerlogin . '">Login&nbsp;as&nbsp;this&nbsp;user</a>';
+		$editLink = action_link(_L("Login as this user"),"key_go","./?login=$jobownerlogin");
 		$copyLink = '';
 	} else {
 		$editLink= '';
 		$copyLink= '';
 	}
 
-	if ($USER->authorize('viewsystemreports')) {
-		if ($type == 'survey') {
-			$reportLink = '&nbsp;|&nbsp;<a href="reportsurveysummary.php?jobid=' . $id . '">Report</a>';
-		} else {
-			$reportLink = '&nbsp;|&nbsp;<a href="reportjobsummary.php?jobid=' . $id . '">Report</a>';
-		}
+	if ($USER->authorize('viewsystemreports')) {		
+		$reportLink = action_link(_L("Report"),"layout", $type == "survey" ? "reportsurveysummary.php?jobid=$id" : "reportjobsummary.php?jobid=$id");
 	} else {
 		$reportLink = '';
 	}
 
 	if ($USER->authorize('managesystemjobs')) {
-		$cancelLink = '&nbsp;|&nbsp;<a href="jobs.php?cancel=' . $id . '" onclick="return confirm(\'Are you sure you want to cancel this job?\');">Cancel</a>';
-		$archiveLink = '&nbsp;|&nbsp;<a href="jobs.php?archive=' . $id . '">Archive</a>';
-		$deleteLink =  '&nbsp;|&nbsp;<a href="jobs.php?delete=' . $id . '" onclick="return confirmDelete();">Delete</a>';
+		$cancelLink = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this job?');");
+		$archiveLink = action_link(_L("Archive"),"fugue/broom","jobs.php?archive=$id");
+		$deleteLink =  action_link(_L("Delete"),"cross","jobs.php?delete=$id","return confirmDelete();");
 	} else {
 		$cancelLink = '';
 		$archiveLink = '';
@@ -370,32 +359,32 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->authorize('managesystemjobs') || $USER->id == $jobownerid) {
-		$runrepeatLink = '&nbsp;|&nbsp;<a href="jobs.php?runrepeating=' . $id . '" onclick="return confirm(\'Are you sure you want to run this job now?\');">Run&nbsp;Now</a>';
+		$runrepeatLink = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id", "return confirm('Are you sure you want to run this job now?');");
 	} else {
 		$runrepeatLink = "";
 	}
 
 	switch ($status) {
 		case "new":
-			return "$editLink$copyLink$cancelLink";
+			return action_links($editLink,$copyLink,$cancelLink);
 		case "active":
-			return "$editLink$copyLink$reportLink$cancelLink";
+			return action_links($editLink,$copyLink,$reportLink,$cancelLink);
 		case "complete":
 		case "cancelled":
 		case "cancelling":
 			if ($deleted == 2) {
-				return "$editLink$copyLink$reportLink$deleteLink";
+				return action_links($editLink,$copyLink,$reportLink,$deleteLink);
 			} else {
-				return "$editLink$copyLink$reportLink$archiveLink";
+				return action_links($editLink,$copyLink,$reportLink,$archiveLink);
 			}
 		case "repeating":
 			if ($USER->id == $jobownerid) {
-				$editLink = '<a href="jobrepeating.php?id=' . $id . '">Edit</a>';
-				$copyLink = '&nbsp;|&nbsp;<a href="jobs.php?copy=' . $id . '">Copy</a>';
+				$editLink = action_link(_L("Edit"),"pencil","jobrepeating.php?id=$id");
+				$copyLink = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
 			}
-			return "$editLink$copyLink$runrepeatLink$deleteLink";
+			return action_links($editLink,$copyLink,$runrepeatLink,$deleteLink);
 		default:
-			return "$editLink$copyLink$reportLink";
+			return action_links($editLink,$copyLink,$reportLink);
 	}
 }
 
