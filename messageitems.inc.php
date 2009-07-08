@@ -9,16 +9,19 @@ class MessageBody extends FormItem {
 			<table>
 				<tr>
 					<td valign="top" rowspan="5">
-						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50" />'.escapehtml($value).'</textarea>	'
-					 .  icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "').getValue();
+						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50" />'.escapehtml($value).'</textarea>	';
+	if(!isset($this->args['playbutton']) || $this->args['playbutton'] === true) {
+		$str .= 		icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "').getValue();
 																	var language = $('" . $this->form->name . "_language').getValue();
 																	var voice = 'Female';
 																	if($('" . $this->form->name . "_voice-2').checked) {
 																		voice = 'Male';
 																	}
 																	if(content != '')
-																		popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(voice), 400, 400);")
-				. '</td>
+																		popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(voice), 400, 400);");
+	}
+	
+	$str .= '	</td>
 				</tr>';
 				
 if(isset($this->args['audiofiles'])) {			
