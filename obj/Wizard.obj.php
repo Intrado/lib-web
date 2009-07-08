@@ -166,7 +166,7 @@ class Wizard {
 	
 	
 	function _renderNav ($wizdata,$curstep = "",$depth = 0) {
-		$res = "";
+		$res = '';
 		$itemcount = 0;
 		
 		$res .= str_repeat("\t",$depth) . '<ol class="wiznav_'.$depth.'">' . "\n";
@@ -198,7 +198,7 @@ class Wizard {
 		}
 		
 		$res .= str_repeat("\t",$depth) . '</ol><div style="clear: both;"></div>' . "\n";
-		
+				
 		if ($itemcount)
 			return $res;
 		else
@@ -206,7 +206,7 @@ class Wizard {
 	}
 	function render() {
 		$stepdata = $this->getStepData();
-		$navhtml = $this->_renderNav($this->wizdata);
+		$navhtml = '<div class="wiznavcontainer"><h4>Wizard Progress</h4>' . $this->_renderNav($this->wizdata) . '</div>';
 		
 		
 		if ($stepdata instanceof WizStep)
@@ -215,11 +215,11 @@ class Wizard {
 			$mainhtml = $stepdata->getFinishPage($_SESSION[$this->name]['data']);
 		
 		$res = '<table border="0" cellpadding="0" cellspacing="0" width="100%">
-					  <tr>
-						  <td valign="top" width="150px"">'.$navhtml.'</td>
-						  <td valign="top" width="auto">'.$mainhtml.'</td>
-					  </tr>
-				  </table>';
+					<tr>
+							<td valign="top" width="150px" style="border-right: 1px solid black;">'.$navhtml.'</td>
+							<td valign="top" width="auto" style="padding: 3px;">'.$mainhtml.'</td>
+					</tr>
+				</table>';
 		
 		return $res;
 	}
