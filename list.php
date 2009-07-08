@@ -104,8 +104,6 @@ $formdata = array(
 	),
 	"preview" => array(
 		"label" => 'Total',
-		"value" => '',
-		"validators" => array(),
 		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">' . (isset($renderedlist) ? $renderedlist->total : '0') . '</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
 		"helpstep" => 1
 	)
@@ -126,8 +124,6 @@ if (isset($renderedlist) && $renderedlist->totaladded > 0) {
 	$formdata[] = _L('Additions');
 	$formdata["additions"] = array(
 		"label" => '',
-		"value" => '',
-		"validators" => array(),
 		"control" => array("FormHtml", 'html' => 'TODO: Show additions'),
 		"helpstep" => 2
 	);
@@ -137,8 +133,6 @@ if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
 	$formdata[] = _L('Skips');
 	$formdata["skips"] = array(
 		"label" => '',
-		"value" => '',
-		"validators" => array(),
 		"control" => array("FormHtml", 'html' => 'TODO: Show skips'),
 		"helpstep" => 2
 	);
@@ -152,10 +146,7 @@ $advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick'
 $formdata[] = _L('Advanced List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
-	"value" => '',
-	"validators" => array(),
-	"control" => array("FormHtml", 'html' => "<table>$advancedtools</table>"
-	),
+	"control" => array("FormHtml", 'html' => "<table>$advancedtools</table>"),
 	"helpstep" => 3
 );
 
