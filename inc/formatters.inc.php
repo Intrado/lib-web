@@ -139,7 +139,7 @@ function fmt_idmagnify ($row,$index) {
 	if ($person->userid == NULL) {
 		$result = "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/magnify.gif\"></a>";
 	} else {
-		$result = "<a href=\"addresspreview.php?id=$row[1]\">  <img src=\"img/pencil.png\"></a>";
+		$result = "<a href=\"addressedit.php?id=$row[1]&origin=preview\">  <img src=\"img/pencil.png\"></a>";
 	}
 	$result .= "&nbsp;". escapehtml($row[$index]);
 	return $result;

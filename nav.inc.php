@@ -53,7 +53,7 @@ if ($USER->authorize("createlist")) {
 	$SHORTCUTS['New List'] = "list.php?id=new";
 	$SHORTCUTS['My Lists'] = "lists.php";
 }
-$SHORTCUTS['My Address Book'] = "addresses.php";
+$SHORTCUTS['My Address Book'] = "addresses.php?origin=nav";
 if ($USER->authorize("viewcontacts"))
 	$SHORTCUTS['System Contacts'] = "contacts.php?clear=1";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
@@ -241,7 +241,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<?= $MAINTABS ?>
 
 	<div class="applinks hoverlinks">
-		<a href="addresses.php">Address Book</a> |
+		<a href="addresses.php?origin=nav">Address Book</a> |
 <?
 if($USER->authorize('managemyaccount')){
 ?>
