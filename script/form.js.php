@@ -375,7 +375,7 @@ function form_go_step (form, direction, specificstep) {
 			var helper_y = e.offsetTop;
 			var viewport_offset = Math.max(0, document.viewport.getHeight() - e.getHeight());
 
-			e.style.border = "2px solid rgb(0,0,255)";
+			e.style.border = "4px solid rgb(0,0,255)";
 			new Effect.Morph(e, {style: 'border-color: rgb(150,150,255)', duration: 1.2, transition: Effect.Transitions.spring, queue: { scope: "helper"}});
 			
 			new Effect.Move(helper, { y:helper_y, mode:'absolute', duration: 0.8, queue: { scope: "helper"}});

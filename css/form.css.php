@@ -34,7 +34,7 @@ form.newform {
 	padding: 0;
 	
 	background-color: white;
-	border: 2px solid rgb(150,150,255);
+	border: 4px solid rgb(150,150,255);
 	
 	display: none;
 }
@@ -43,8 +43,13 @@ form.newform {
 	font-size: 9pt;
 	font-family: sans-serif;
 	padding: 5px;
-	height: 125px;
+	height: 150px;
 	overflow: auto;
+}
+
+.helper .helpercontent ul {
+	padding-left: 1.2em;
+	margin-left: 0px;
 }
 
 .helper .toolbar {
@@ -213,12 +218,19 @@ form.newform {
 	vertical-align: top;
 }
 
+.wiznavcontainer {
+	padding: 3px;
+	margin: 3px;
+	margin-top: 15px;
+	border: 1px outset;
+}
 
 ol.wiznav_0 {
 	padding: 3px;
 	margin: 0px;
 	margin: 3px;
-	border: 1px outset;
+	
+	border: none;
 		
 	list-style: none;
 
