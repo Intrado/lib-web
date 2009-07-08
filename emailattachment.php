@@ -119,5 +119,5 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	}
 	$transport = json_encode(!empty($result) ? $result : false);	
 	?>
-	window.top.window.stopUpload('1','<?= $transport ?>');
+	window.top.window.stopUpload('1','<?= $transport ?>','<?= $errormessage ?>');
 </script> 
