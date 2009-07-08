@@ -58,7 +58,7 @@ class ValListName extends Validator {
 	var $onlyserverside = true;
 	function validate($value) {
 		global $USER;
-		if (QuickQuery('select id from list where deleted=0 and id!=? and name=? and userid=?', false, array($_SESSION['listid'], $value, $USER->id)))
+		if (QuickQuery('select id from list where deleted=0 and id!=? and name=? and userid=?', false, array(!empty($_SESSION['listid']) ? $_SESSION['listid'] : 0, $value, $USER->id)))
 			return _L('There is already a list with this name');
 		return true;
 	}
