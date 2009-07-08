@@ -240,11 +240,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						break;
 						
 					case 'manualAdd':
-						$form->sendTo("addressmanualadd.php?id=new");
+						$form->sendTo("addressedit.php?id=new&origin=manualadd");
 						break;
 						
 					case 'addressBookAdd':
-						$form->sendTo("addressesmanualadd.php?");
+						$form->sendTo("addresses.php?origin=manualadd");
 						break;
 						
 					case 'uploadList':
