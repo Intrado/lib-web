@@ -258,7 +258,7 @@ class Form {
 				<!-- HELPER -->
 				<div id="'.$this->name.'_startguide" style="float: right;  right: 0px; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 				<div id="'.$this->name.'_helper" class="helper">
-					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="img/icons/cross.gif" alt="Close Guide" title="Close"></a><img src="img/icons/information.gif" alt="" style="float: left;">Guide</div>
+					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="img/icons/cross.gif" alt="Close Guide" title="Close"></a>Guide</div>
 					<div class="helpercontent" id="'.$this->name.'_helpercontent" ></div>
 					<div class="toolbar" >
 						<a href="#" style="float:left;" onclick="this.blur(); return form_step_handler(event,-1);"><img src="img/icons/fugue/arrow_090.gif" border="0" alt="Previous Step" title="Previous Step" width="16"></a>
