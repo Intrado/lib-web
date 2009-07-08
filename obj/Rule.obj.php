@@ -34,7 +34,7 @@ class Rule extends DBMappedObject {
 	// NOTE: Assumes arguments have been trimmed.
 	static function initFrom($fieldnum, $logical, $op, $val) {
 		global $RULE_OPERATORS;
-		if (empty($fieldnum) || empty($logical) || empty($op) || empty($val))
+		if (empty($fieldnum) || empty($logical) || empty($op) || !isset($val))
 			return null;
 		if (!$type = Rule::getType($fieldnum))
 			return null;
