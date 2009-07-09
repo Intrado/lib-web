@@ -145,10 +145,14 @@ startWindow("Confirmation &amp; Submit");
 					<td width="30%" class="bottomBorder" >Maximum attempts</td>
 					<td class="bottomBorder" ><?= escapehtml($job->getOptionValue("maxcallattempts")); ?></td>
 				</tr>
-<? if ($USER->authorize('setcallerid')) { ?>
+<? if ($USER->authorize('setcallerid')) {
+					$callerid = $job->getOptionValue('callerid');
+					if (!isset($callerid) || $callerid === "")
+						$callerid = getSystemSetting('callerid');
+?>
 					<tr>
 						<td>Caller&nbsp;ID</td>
-						<td><?= Phone::format($job->getOptionValue("callerid")) ?>&nbsp;</td>
+						<td><?= Phone::format($callerid) ?>&nbsp;</td>
 					</tr>
 <? } ?>
 			</table>

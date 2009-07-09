@@ -383,32 +383,28 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 				if($job->sendphone) {
 					$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 
+					// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
 					if ($USER->authorize('setcallerid')) {
-						$callerid = Phone::parse(GetFormData($f, $s, "callerid"));
-						if ($callerid == "") {
-							$callerid = getSystemSetting("callerid");
-						}
-						$job->setOptionValue("callerid",$callerid);
 						/*CSDELETEMARKER_START*/
-						// if customer has callback feature
-						if (getSystemSetting('_hascallback', false)) {
-							if (GetFormData($f, $s, "radiocallerid") == "byuser") {
-								$radio = "1";
-							} else {
-								$radio = "0";
-								// set to toll free number
-								$job->setOptionValue("callerid", getSystemSetting('inboundnumber'));
-							}
-							$job->setSetting('prefermycallerid', $radio);
+						if (!getSystemSetting('_hascallback', false) || $IS_COMMSUITE) {
+						/*CSDELETEMARKER_END*/
+							$callerid = Phone::parse(GetFormData($f, $s, "callerid"));
+							// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
+							$job->setOptionValue("callerid",$callerid);
+						/*CSDELETEMARKER_START*/
+						} else {
+							// set to blank so jobprocessor will assign the inboundnumber
+							$job->setOptionValue("callerid","");
 						}
 						/*CSDELETEMARKER_END*/
 					} else {
 						/*CSDELETEMARKER_START*/
 						if (getSystemSetting('_hascallback', false)) {
-							$callerid = getSystemSetting('inboundnumber');
+							$callerid = ""; // set blank and jobprocessor will set the inboundnumber
 						} else {
 						/*CSDELETEMARKER_END*/
-							$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
+							// take the user callerid or blank (jobprocessor will set to default customer callerid)
+							$callerid = $USER->getSetting("callerid","");
 						/*CSDELETEMARKER_START*/
  						}
 						/*CSDELETEMARKER_END*/
@@ -712,22 +708,7 @@ if( $reloadform )
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
 
-	// if job callerid is blank
-	if( !$job->getOptionValue("callerid") || 
-		(getSystemSetting('_hascallback', false) && $job->getSetting("prefermycallerid","0") == "0")) {
-		$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-		$radio = "bydefault"; // customer inboundnumber, aka toll free number
-	} else {
-		$callerid = $job->getOptionValue("callerid");
-		$radio = "byuser";
-	}
-
-	/*CSDELETEMARKER_START*/
-	if (getSystemSetting('_hascallback', false)) {
-		PutFormData($f, $s, "radiocallerid", $radio);
-	}
-	/*CSDELETEMARKER_END*/
-	PutFormData($f,$s,"callerid", Phone::format($callerid), "phone", 10, 10);
+	PutFormData($f,$s,"callerid", Phone::format($job->getSetting("callerid",getSystemSetting('callerid'))), "phone", 10, 10);
 
 	PutFormData($f,$s,"leavemessage",$job->isOption("leavemessage"), "bool", 0, 1);
 	PutFormData($f,$s,"messageconfirmation",$job->isOption("messageconfirmation"), "bool", 0, 1);
@@ -1314,20 +1295,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<?
 			if ($USER->authorize('setcallerid')) {
 				/*CSDELETEMARKER_START*/
-				if (getSystemSetting('_hascallback', false)) {
-					?>
-			<tr>
-				<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "bydefault",($submittedmode ? "DISABLED" : "")); ?>
-				Use toll free Caller ID</td>
-				<td><? echo Phone::format(getSystemSetting('inboundnumber')); ?></td>
-			</tr>
-			<tr>
-				<td><? NewFormItem($f, $s, "radiocallerid", "radio", null, "byuser",($submittedmode ? "DISABLED" : "")); ?>
-				Use my Caller ID</td>
-				<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
-			</tr>
-			<?
-				} else {
+				if (!getSystemSetting('_hascallback', false) || $IS_COMMSUITE) {
 				/*CSDELETEMARKER_END*/
 					?>
 			<tr>
@@ -1619,7 +1587,6 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		if (((isset($diffvalues['phonelang']) && $job->getSetting('jobcreatedphone') == "0")  ||
 			isset($diffvalues['maxcallattempts']) ||
 			isset($diffvalues['callerid']) ||
-			isset($diffvalues['radiocallerid']) ||
 			isset($diffvalues['skipduplicates']) ||
 			isset($diffvalues['leavemessage']) ||
 			isset($diffvalues['messageconfirmation'])) ||

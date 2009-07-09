@@ -310,12 +310,23 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" >Maximum attempts</td>
 					<td class="bottomBorder" ><?= escapehtml($job->getOptionValue('maxcallattempts')); ?></td>
 				</tr>
-				<? if ($USER->authorize('setcallerid')) { ?>
+				<? if ($USER->authorize('setcallerid')) {
+					$callerid = $job->getOptionValue('callerid');
+					if (!isset($callerid) || $callerid === "")
+						$callerid = getSystemSetting('callerid');
+/*CSDELETEMARKER_START*/
+				if (!getSystemSetting('_hascallback', false) || $IS_COMMSUITE) {
+/*CSDELETEMARKER_END*/
+				?>
 					<tr>
 						<td class="bottomBorder" >Caller&nbsp;ID</td>
-						<td class="bottomBorder" ><?= Phone::format($job->getOptionValue("callerid")) ?>&nbsp;</td>
+						<td class="bottomBorder" ><?= Phone::format($callerid) ?>&nbsp;</td>
 					</tr>
-				<? } ?>
+				<?
+/*CSDELETEMARKER_START*/
+				}
+/*CSDELETEMARKER_END*/
+				} ?>
 
 				<tr>
 					<td class="bottomBorder" >Skip duplicate phone numbers</td>

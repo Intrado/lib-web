@@ -34,7 +34,8 @@ $formdata["retry"] = array(
 );
 
 $helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
-if (getSystemSetting('_hascallback', false)) {
+/*CSDELETEMARKER_START*/
+if (getSystemSetting('_hascallback', false) && !$IS_COMMSUITE) {
 	$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),
 		"fieldhelp" => _L("This is the default Caller ID for all jobs."),
@@ -42,6 +43,7 @@ if (getSystemSetting('_hascallback', false)) {
 		"helpstep" => $helpstepnum
 	);
 } else {
+/*CSDELETEMARKER_END*/
 		$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),
 		"fieldhelp" => _L("This is the default Caller ID for all jobs."),
@@ -52,7 +54,9 @@ if (getSystemSetting('_hascallback', false)) {
 		"control" => array("TextField","maxlength" => 20),
 		"helpstep" => $helpstepnum
 	);
+/*CSDELETEMARKER_START*/
 }
+/*CSDELETEMARKER_END*/
 
 $helpsteps[$helpstepnum++] = _L("The Autoreport email address and name is used by the system when sending Autoreports. The reports will come from this address and name.");
 $formdata["autoreportreplyemail"] = array(

@@ -197,8 +197,11 @@ class Job extends DBMappedObject {
 		// remove the 'translationexpire' jobsetting to force retranslation
 		QuickUpdate("delete from jobsetting where jobid=$newjob->id and name='translationexpire'");
 
+		$a = "0";
+		/*CSDELETEMARKER_START*/
 		// if _hascallback and user profile does not allow job callerid, be sure the option is set to use the default callerid
-		$a = QuickQuery("select value from setting where name='_hascallback'");
+		$a = getSystemSetting('_hascallback', "0");
+		/*CSDELETEMARKER_END*/
 		$b = QuickQuery("select p.value from permission p join user u " .
 				"where p.name='setcallerid' and p.accessid=u.accessid and u.id=$newjob->userid");
 		if ($a == "1" && $b != "1") {

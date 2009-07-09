@@ -330,46 +330,34 @@ $formdata["maxjobdays"] = array(
 );
 
 if ($USER->authorize('setcallerid')) {
-	/*CSDELETEMARKER_START*/
-	if (getSystemSetting('_hascallback', false)) {
-		$formdata["usecallerid"] = array(
-			"label" => _L("Caller ID Preference"),
-			"fieldhelp" => ("You may select the default Caller ID recipients will see when they receive a call from your account."),
-			"value" => "",
-			"validators" => array(
-				array("ValInArray", "values" => array(0,1,2))
-			),
-			"control" => array("RadioButton", "values" => 
-				array(
-					0 => _L("Use toll free"). " - ". Phone::format(getSystemSetting("inboundnumber")),
-					1 => _L("Use default"). " - ". Phone::format(getSystemSetting("callerid")),
-					2 => _L("Use personal"). " - ". Phone::format($USER->getSetting("callerid",""))
-				)
-			),
-			"helpstep" => 2
-		);
+/*CSDELETEMARKER_START*/
+	// if _hascallback, do not display callerid, always uses inboundnumber
+	if (!getSystemSetting('_hascallback', false) || $IS_COMMSUITE) {
+		// has no callback, display the callerid field
+/*CSDELETEMARKER_END*/
+		if ($readonly) {
+			$formdata["callerid"] = array(
+				"label" => _L("Personal Caller ID"),
+				"fieldhelp" => ("Enter the personal phone number which will be used for Caller ID if the 'Use personal' option is selected."),
+				"control" => array("FormHtml","html" => Phone::format($USER->getSetting("callerid",""))),
+				"helpstep" => 1
+			);
+		} else {
+			$formdata["callerid"] = array(
+				"label" => _L("Personal Caller ID"),
+				"fieldhelp" => (""),
+				"value" => Phone::format($USER->getSetting("callerid","")),
+				"validators" => array(
+					array("ValLength","min" => 3,"max" => 20),
+					array("ValPhone")
+				),
+				"control" => array("TextField","maxlength" => 20, "size" => 15),
+				"helpstep" => 2
+			);
+		}
+/*CSDELETEMARKER_START*/
 	}
-	/*CSDELETEMARKER_END*/
-	if ($readonly) {
-		$formdata["callerid"] = array(
-			"label" => _L("Personal Caller ID"),
-			"fieldhelp" => ("Enter the personal phone number which will be used for Caller ID if the 'Use personal' option is selected."),
-			"control" => array("FormHtml","html" => Phone::format($USER->getSetting("callerid",""))),
-			"helpstep" => 1
-		);
-	} else {
-		$formdata["callerid"] = array(
-			"label" => _L("Personal Caller ID"),
-			"fieldhelp" => (""),
-			"value" => Phone::format($USER->getSetting("callerid","")),
-			"validators" => array(
-				array("ValLength","min" => 3,"max" => 20),
-				array("ValPhone")
-			),
-			"control" => array("TextField","maxlength" => 20, "size" => 15),
-			"helpstep" => 2
-		);
-	}
+/*CSDELETEMARKER_END*/
 }
 
 // Display Defaults
@@ -441,15 +429,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$USER->aremail = $postdata['aremail'];
 			$USER->phone = $postdata['phone'];
 			$USER->update();
-			if ($USER->authorize('setcallerid')) {
+			if ($USER->authorize('setcallerid') && isset($postdata['callerid'])) {
 				$USER->setSetting("callerid",$postdata['callerid']);
-				/*CSDELETEMARKER_START*/
-				// if customer has callback feature
-				if (getSystemSetting('_hascallback', false)) {
-					// TODO: Something is missing here. We have three options but only two DB values?
-					$USER->setSetting('prefermycallerid', ($postdata['usecallerid'] == 2)? 1: 0);
-				}
-				/*CSDELETEMARKER_END*/
 			}
 		}
 
