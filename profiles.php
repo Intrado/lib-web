@@ -41,8 +41,10 @@ if (isset($_GET['delete'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_actions ($obj,$name) {
-	return '<a href="profile.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
-		. '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
+	return action_links(
+		action_link(_L("Edit"),"pencil","profile.php?id=$obj->id"),
+		action_link(_L("Delete"),"cross","?delete=$obj->id","return confirmDelete()")
+	);			
 }
 
 ////////////////////////////////////////////////////////////////////////////////
