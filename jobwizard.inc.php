@@ -38,18 +38,41 @@ class SelectMessage extends FormItem {
 class TextAreaPhone extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
+		$vals = json_decode($value);
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
-		$str = '<script>
-				function '. $n .'Play() {
-					var val = $("'.$n.'").value;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>
+			<textarea id="'.$n.'-textarea" style="clear:both; width:'.$this->args['width'].'" name="'.$n.'-textarea" '.$rows.'/>'.escapehtml($vals->text).'</textarea>
+			<div>
+				<input id="'.$n.'-female" name="'.$n.'-gender" type="radio" value="female" '.($vals->gender == "female"?"checked":"").'/><label for="'.$n.'-female">'._L('Female').'</label><br />
+				<input id="'.$n.'-male" name="'.$n.'-gender" type="radio" value="male" '.($vals->gender == "male"?"checked":"").'/><label for="'.$n.'-male">'._L('Male').'</label><br />
+			</div>
+			<div>'.icon_button(_L("Play"),"play",null,null,"id=\"".$n."-play\"").'</div>
+			<script type="text/javascript">
+				$("'.$n.'-play").observe("click", function(e) {
+					var val = $("'.$n.'-textarea").value;
+					var gender = ($("'.$n.'-female").checked?"female":"male");
 					if (val) {
-						var encodedtext=encodeURIComponent(val);
-						popup(\'previewmessage.php?text=\' + encodedtext + \'&language='.urlencode($this->args['language']).'&gender='.urlencode($this->args['voice']).'\', 400, 400);
+						var encodedtext = encodeURIComponent(val);
+						popup(\'previewmessage.php?text=\' + encodedtext + \'&language='.urlencode($this->args['language']).'&gender=\'+ gender, 400, 400);
 					}
-				}
-				</script>
-		<textarea id="'.$n.'" style="width:'.$this->args['width'].'" name="'.$n.'" '.$rows.'/>'.escapehtml($value).'</textarea>';
-		$str .= icon_button(_L("Play"),"play",$n."Play();");
+				});
+				$("'.$n.'-textarea").observe("blur", function(e) {
+					var val = $("'.$n.'").value.evalJSON();
+					val.text = $("'.$n.'-textarea").value;
+					$("'.$n.'").value = Object.toJSON(val);
+				});
+				$("'.$n.'-female").observe("click", function(e) {
+					var val = $("'.$n.'").value.evalJSON();
+					val.gender = ($("'.$n.'-female").checked?"female":"male");
+					$("'.$n.'").value = Object.toJSON(val);
+				});
+				$("'.$n.'-male").observe("click", function(e) {
+					var val = $("'.$n.'").value.evalJSON();
+					val.gender = ($("'.$n.'-female").checked?"female":"male");
+					$("'.$n.'").value = Object.toJSON(val);
+				});
+			</script>
+		';
 		return $str;
 	}
 }
@@ -78,7 +101,7 @@ class CallMe extends FormItem {
 		}
 		$str .= '</td></tr>
 		<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" /></td></tr>
-		<tr><td></td><td><img id="'.$n.'progress_img" style="float:left" /><div id="'.$n.'progress" /></td></tr>
+		<tr><td></td><td><img id="'.$n.'progress_img" style="float:left" src="img/pixel.gif"/><div id="'.$n.'progress" /></td></tr>
 		<tr><td></td><td>'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$this->form->name."','".$n."','".$language[0]."','jobwizard','".$this->args['min']."','".$this->args['max']."').start();",null,'id="'.$n.'recordbutton"').'</td></tr>
 		<tr><td class="msglabel">'._L("Messages").':</td>
 		<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">
@@ -416,6 +439,9 @@ class JobWiz_messagePhoneChoose extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendphone"))
+			return false;
 		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
 			isset($postdata['/message/select']['phone']) && $postdata['/message/select']['phone'] == "pick") {
 			return true;
@@ -427,44 +453,42 @@ class JobWiz_messagePhoneChoose extends WizStep {
 
 class JobWiz_messagePhoneText extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER;
 		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
-		
-		$helpstepnum = 1;
-		
+		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
 		$formdata = array(
-				"message" => array(
-					"label" => _L("Phone Message"),
-					"value" => "",
-					"validators" => array(
-						array("ValRequired")
-					),
-					"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"english","voice"=>"female"),
-					"helpstep" => $helpstepnum
+			_L('Text-to-speech'),
+			"message" => array(
+				"label" => _L("Phone Message"),
+				"fieldhelp" => _L("This text will be converted to a voice and read over the phone."),
+				"value" => '{"gender": "female", "text": ""}',
+				"validators" => array(
+					array("ValRequired")
 				),
-				"voice" => array(
-					"label" => _L("Voice"),
-					"value" => "Female",
-					"validators" => array(array("ValRequired")),
-					"control" => array("RadioButton","values" => array("Female" => "Female","Male" => "Male")),
-					"helpstep" => $helpstepnum
-				),
-				"translate" => array(
-					"label" => _L("Translate"),
-					"value" => ($postdata['/start']['package'] == "express")?true:false,
-					"validators" => array(),
-					"control" => array("CheckBox"),
-					"helpstep" => $helpstepnum
-				)
+				"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"english","voice"=>"female"),
+				"helpstep" => 1
+			)
 		);
-		$helpsteps[$helpstepnum++] = _L("Automatically translate into alternate languages.");
+		
+		if ($USER->authorize('sendmulti')) {
+			$helpsteps[] = _L("Automatically translate into alternate languages.");
+			$formdata["translate"] = array(
+				"label" => _L("Translate"),
+				"value" => ($postdata['/start']['package'] == "express")?true:false,
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 2
+			);
+		}
 		
 		return new Form("messagePhoneText",$formdata,$helpsteps);
 	}
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendphone"))
+			return false;
 		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
 			((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom") &&
 				(isset($postdata['/message/select']['phone']) && $postdata['/message/select']['phone'] == "text"))
@@ -575,6 +599,9 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendphone" || !$USER->authorize("sendmulti")))
+			return false;
 		if (isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
 			return true;
 		else
@@ -587,11 +614,12 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 		// Form Fields.
 		global $USER;
 		$langs = array("English (Default)");
-		$syslangs = DBFindMany("Language","from language order by name");
-		foreach ($syslangs as $langid => $language)
-			if ($syslangs[$langid]->name !== "English")
-				$langs[] = $syslangs[$langid]->name;
-		
+		if ($USER->authorize("sendmulti")) {
+			$syslangs = DBFindMany("Language","from language order by name");
+			foreach ($syslangs as $langid => $language)
+				if ($syslangs[$langid]->name !== "English")
+					$langs[] = $syslangs[$langid]->name;
+		}
 		$formdata = array(_L("Record"));
 		$formdata["callme"] = array(
 			"label" => _L("Messages"),
@@ -617,6 +645,9 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendphone"))
+			return false;
 		if ((isset($postdata['/start']['package']) && 
 			($postdata['/start']['package'] == "easycall" ||
 				$postdata['/start']['package'] == "personalized") ||
@@ -662,6 +693,9 @@ class JobWiz_messageEmailChoose extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendemail"))
+			return false;
 		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
 			isset($postdata['/message/select']['email']) && $postdata['/message/select']['email'] == "pick") {
 			return true;
@@ -673,12 +707,13 @@ class JobWiz_messageEmailChoose extends WizStep {
 
 class JobWiz_messageEmailText extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER;
+		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):'{"text": ""}';
 		// Form Fields.
 		$formdata = array();
-		$helpsteps = array(_L("description."));
-		global $USER;
-		$helpstepnum = 1;
 		
+		$formdata = array(_L("Compose Email"));
+		$helpsteps = array(_L("Enter the address to which replies should be sent."));
 		$formdata["from"] = array(
 			"label" => _L("From"),
 			"value" => $USER->email,
@@ -687,11 +722,11 @@ class JobWiz_messageEmailText extends WizStep {
 				array("ValLength","min" => 3,"max" => 255),
 				array("ValEmail")
 				),
-			"control" => array("TextField","max"=>255,"min"=>3),
-			"helpstep" => $helpstepnum
+			"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
+			"helpstep" => 1
 		);
-		$helpsteps[$helpstepnum++] = _L("Enter the address to which replies should be sent.");
 		
+		$helpsteps[] = _L("Email Subject.");
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
 			"value" => $postdata['/start']['name'],
@@ -716,29 +751,33 @@ class JobWiz_messageEmailText extends WizStep {
 		
 		$formdata["message"] = array(
 			"label" => _L("Email Message"),
-			"value" => isset($postdata['/message/phone/text']['message'])?$postdata['/message/phone/text']['message']:"",
+			"value" => $msgdata->text,
 			"validators" => array(
 				array("ValRequired")
 			),
-			"control" => array("TextArea","rows"=>15),
-			"helpstep" => $helpstepnum
+			"control" => array("TextArea","rows"=>15,"cols"=>45),
+			"helpstep" => 3
 		);
-		$helpsteps[$helpstepnum++] = _L("Enter your message text here.");
 
-		$formdata["translate"] = array(
-			"label" => _L("Translate"),
-			"value" => ($postdata['/start']['package'] == "express")?true:false,
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => $helpstepnum
-		);
-		$helpsteps[$helpstepnum++] = _L("Automatically translate into alternate languages.");
+		if ($USER->authorize('sendmulti')) {
+			$helpsteps[] = _L("Automatically translate into alternate languages.");
+			$formdata["translate"] = array(
+				"label" => _L("Translate"),
+				"value" => ($postdata['/start']['package'] == "express")?true:false,
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 4
+			);
+		}
 		
 		return new Form("messageEmailText",$formdata,$helpsteps);
 	}
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendemail"))
+			return false;
 		if ((isset($postdata['/start']['package']) && ($postdata['/start']['package'] == "express" || $postdata['/start']['package'] == "personalized")) ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata['/message/select']['email']) && $postdata['/message/select']['email'] == "text")
 		) {
@@ -752,17 +791,17 @@ class JobWiz_messageEmailText extends WizStep {
 class JobWiz_messageEmailTranslate extends WizStep {
 	function getTranslationDataArray($language, $text) {
 		return array(
-				"label" => $language,
-				"value" => array(
-							"enabled" => true,
-							"text" => $text,
-							"override" => false
-							),
-				"validators" => array(array("ValTranslation")),
-				"control" => array("TranslationItem","email" => true),
-				"transient" => true,
-				"helpstep" => 2
-				);	
+			"label" => $language,
+			"value" => array(
+						"enabled" => true,
+						"text" => $text,
+						"override" => false
+						),
+			"validators" => array(array("ValTranslation")),
+			"control" => array("TranslationItem","email" => true),
+			"transient" => true,
+			"helpstep" => 2
+		);	
 	}
 	
 	function getForm($postdata, $curstep) {
@@ -790,9 +829,9 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
-					"label" => _L("Info") . ": ",
-					"control" => array("FormHtml","html"=>"<h3>No Translations Available</h3><br />"),
-					"helpstep" => 2
+				"label" => _L("Info") . ": ",
+				"control" => array("FormHtml","html"=>"<h3>No Translations Available</h3><br />"),
+				"helpstep" => 2
 			);
 		} else {
 			if(is_array($translations)){
@@ -807,20 +846,20 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		}
 		if(!isset($formdata["Translationinfo"])) {
 			$formdata["Translationinfo"] = array(
-					"label" => " ",
-					"control" => array("FormHtml","html"=>'
-						<div id="branding">
-							<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
-						</div>
-					'),
-					"helpstep" => 2
+				"label" => " ",
+				"control" => array("FormHtml","html"=>'
+					<div id="branding">
+						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
+					</div>
+				'),
+				"helpstep" => 2
 			);
 		}
 		
 		$helpsteps = array(
-				_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
-				_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
-				);
+			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
+			_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
+		);
 		
 
 		return new Form("messageEmailTranslate",$formdata,$helpsteps);
@@ -828,38 +867,10 @@ class JobWiz_messageEmailTranslate extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) {
-			return true;
-		} else {
+		global $USER;
+		if (!$USER->authorize("sendmulti") || !$USER->authorize("sendemail"))
 			return false;
-		}
-	}
-}
-
-class JobWiz_messageEmailAttachment extends WizStep {
-	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
-		
-		$helpstepnum = 1;
-		
-		$formdata["a"] = array(
-				"label" => "Attach Files",
-				"control" => array("FormHtml","html"=>"<h1>Wicked Awesome Email Attachment Widget</h1>"),
-				"helpstep" => $helpstepnum
-		);
-		$helpsteps[$helpstepnum++] = _L("c");
-
-		// TODO: Need email attachment formItem
-
-		return new Form("messageEmailAttachment",$formdata,$helpsteps);
-	}
-	
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		if (isset($postdata['/message/email/emailText']['attachFile']) && 
-			$postdata['/message/email/emailText']['attachFile'] == "true") {
+		if (isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) {
 			return true;
 		} else {
 			return false;
@@ -899,6 +910,9 @@ class JobWiz_messageSmsChoose extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendsms"))
+			return false;
 		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
 			isset($postdata['/message/select']['sms']) && $postdata['/message/select']['sms'] == "pick") {
 			return true;
@@ -941,6 +955,9 @@ class JobWiz_messageSmsText extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendsms"))
+			return false;
 		if ((isset($postdata['/start']['package']) && ($postdata['/start']['package'] == "express" || $postdata['/start']['package'] == "personalized")) ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata['/message/select']['sms']) && $postdata['/message/select']['sms'] == "text")
 		) {
@@ -955,8 +972,10 @@ class JobWiz_scheduleOptions extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		$formdata = array('Schedule Options');
+		$helpsteps = array(_L("Select when to send this message."));
 		$formdata["schedule"] = array(
 			"label" => _L("Delivery Schedule"),
+			"fieldhelp" => _L("Select when to send this message."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired")
@@ -968,38 +987,88 @@ class JobWiz_scheduleOptions extends WizStep {
 			)),
 			"helpstep" => 1
 		);
-		$helpsteps = array(_L("Select when to send this message. Earliest and latest delivery times may be restricted by system policy."));
 
+		$helpsteps[] = _L("Send a report with job results to the Auto Report Emails listed on your user account page.");
+		$formdata["report"] = array(
+			"label" => _L("Auto-Report"),
+			"fieldhelp" => _L("Email a report when the job completes."),
+			"value" => true,
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 2
+		);
+		
+		// TODO: Only for phone calls
+		$helpsteps[] = _L("Number of times to try un-answered or failed phone calls.");
+		$formdata["callmax"] = array(
+			"label" => _L("Call Attempts"),
+			"control" => array("FormHtml", "html" => "TODO: callmax"),
+			"helpstep" => 2
+		);
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
 }
 
 class JobWiz_scheduleDate extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER;
+		global $ACCESS;
+		$maxjobdays = $ACCESS->getValue("maxjobdays");
 		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
-		
-		$helpstepnum = 1;
-		
-		$formdata["a"] = array(
-			"label" => _L("b"),
-			"value" => "",
-			"validators" => array(
-			),
-			"control" => array("TextField","max"=>100),
-			"helpstep" => $helpstepnum
+		$formdata = array(_L('Schedule Date/Time'));
+		if ($postdata['/schedule/options']['schedule'] == "schedule") {
+			$helpsteps = array(_L("Choose a date for this notification to be delivered."));
+			$formdata["date"] = array(
+				"label" => _L("Start Date"),
+				"fieldhelp" => _L("Notification will begin on the selected date."),
+				"value" => "today",
+				"validators" => array(),
+				"control" => array("TextDate", "size"=>12, "nodatesbefore" => 0),
+				"helpstep" => 1
+			);
+		}  else {
+			$helpsteps = array();
+		}
+
+		// TODO: If a phone delivery is not included. don't do these
+		$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
+		$formdata["days"] = array(
+			"label" => _L("Days to run"),
+			"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
+			"validators" => array(),
+			"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
+			"helpstep" => 2
 		);
-		$helpsteps[$helpstepnum++] = _L("c");
-
-
+		
+		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
+		$formdata["deliverywindow"] = array(
+			"label" => _L("Delivery Window"),
+			"control" => array("FormHtml", "html" => ""),
+			"helpstep" => 2
+		);
+		$formdata["starttime"] = array(
+			"label" => _L("Earliest"),
+			"fieldhelp" => _L("Notification will begin at the selected time."),
+			"value" => "now",
+			"validators" => array(),
+			"control" => array("FormHtml", "html" => "NEED TIME PICKER"),
+			"helpstep" => 2
+		);
+		$formdata["endtime"] = array(
+			"label" => _L("Latest"),
+			"fieldhelp" => _L("Notification will end at the selected time."),
+			"value" => "now",
+			"validators" => array(),
+			"control" => array("FormHtml", "html" => "NEED TIME PICKER"),
+			"helpstep" => 2
+		);
 		return new Form("scheduleDate",$formdata,$helpsteps);
 	}
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		if (isset($postdata['/schedule/options']['schedule']) && 
-			$postdata['/schedule/options']['schedule'] == "later"
+			$postdata['/schedule/options']['schedule'] !== "template"
 		) {
 			return true;
 		} else {
@@ -1099,9 +1168,9 @@ class JobWiz_submitConfirm extends WizStep {
 		$helpstepnum = 1;
 		
 		$formdata["a"] = array(
-				"label" => "Confirm Settings",
-				"control" => array("FormHtml","html"=>"<h1>Wicked Awesome Confirm Settings Widget</h1>"),
-				"helpstep" => $helpstepnum
+			"label" => "Confirm Settings",
+			"control" => array("FormHtml","html"=>"<h1>Wicked Awesome Confirm Settings Widget</h1>"),
+			"helpstep" => $helpstepnum
 		);
 		$helpsteps[$helpstepnum++] = _L("c");
 
