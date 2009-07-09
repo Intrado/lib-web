@@ -15,7 +15,9 @@ require_once("obj/Voice.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/FieldMap.obj.php");
-require_once("messageitems.inc.php");
+require_once("obj/MessageBody.fi.php");
+require_once("obj/ValMessageBody.val.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +88,7 @@ $formdata = array(
 		"value" => $messagename,
 		"validators" => array(
 			array("ValRequired","ValLength","min" => 3,"max" => 50),
-			array("ValMessageName","type" => "phone")
+			array("ValDuplicateNameCheck","type" => "phone")
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
@@ -214,13 +216,14 @@ function fmt_somefield ($obj, $field) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = _L("notifications").":"._L("messages");
-$TITLE = _L('Phone Message Builder: New Message');
+$TITLE = _L('Phone Message Builder: ') . (isset($_SESSION['messageid'])? escapehtml($message->name) : _L("New Message") );
+$ICON = "phone.gif";
 
 include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValMessageBody","ValMessageName")); ?>
+<? Validator::load_validators(array("ValMessageBody","ValDuplicateNameCheck")); ?>
 </script>
 <?
 
