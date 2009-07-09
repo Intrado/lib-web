@@ -734,14 +734,14 @@ class JobWiz_messageEmailText extends WizStep {
 				array("ValRequired"),
 				array("ValLength","min" => 3,"max" => 255)
 			),
-			"control" => array("TextField","max"=>255,"min"=>3),
+			"control" => array("TextField","max"=>255,"min"=>3,"size"=>45),
 			"helpstep" => $helpstepnum
 		);
 		$helpsteps[$helpstepnum++] = _L("Email Subject.");
 
 		$formdata["attachements"] = array(
 			"label" => _L('Attachments'),
-			"fieldhelp" => "You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted.",
+			"fieldhelp" => _L("You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted."),
 			"value" => "",
 			"validators" => array(array("ValEmailAttach")),
 			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
