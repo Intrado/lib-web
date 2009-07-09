@@ -50,8 +50,7 @@ $wizdata = array(
 		"email"	=> new WizSection ("Email",array(
 			"pick" => new JobWiz_messageEmailChoose(_L("Existing Message")),
 			"text"	 => new JobWiz_messageEmailText(_L("Compose Email")),
-			"translate" => new JobWiz_messageEmailTranslate(_L("Translations")),
-			"attachment" => new JobWiz_messageEmailAttachment(_L("Attachment"))
+			"translate" => new JobWiz_messageEmailTranslate(_L("Translations"))
 		)),
 		"sms" => new WizSection ("Txt",array(
 			"pick" => new JobWiz_messageSmsChoose(_L("Existing Message")),
