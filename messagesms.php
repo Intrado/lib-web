@@ -13,7 +13,7 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
-require_once("messageitems.inc.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -40,30 +40,6 @@ if (isset($_GET['id'])) {
 // Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-class SMSTextArea extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
-		$cols = isset($this->args['cols']) ? 'rows="'.$this->args['cols'].'"' : "";
-		return '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' onkeydown="limit_chars(this);" onkeyup="limit_chars(this);" />'.escapehtml($value).'</textarea>
-				<span id="charsleft">' . ( 160 - strlen($value)) . ' characters remaining.</span>
-				<script>
-					function limit_chars(field) {
-						var status = $(\'charsleft\');
-						var remaining = 160 - field.value.length;
-						if (remaining < 0){
-							remaining = 0 - remaining;
-							status.innerHTML="<b style=\'color:red;\'>" + remaining + "</b> characters too many.";
-						} else if (remaining <= 20)
-							status.innerHTML="<b style=\'color:orange;\'>" + remaining + "</b> characters remaining.";
-						else
-							status.innerHTML=remaining + " characters remaining.";
-							
-						setTimeout("form_do_validation($(\'' . $this->form->name . '\'), $(\'' . $n . '\'))", 1000);	
-					}
-				</script>';		
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -88,7 +64,7 @@ $formdata = array(
 		"value" => $message->name,
 		"validators" => array(
 			array("ValRequired","ValLength","min" => 3,"max" => 50),
-			array("ValMessageName","type" => "sms")
+			array("ValDuplicateNameCheck","type" => "sms")
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
@@ -108,7 +84,7 @@ $formdata = array(
 			array("ValRequired"),
 			array("ValLength","max"=>160)
 		),
-		"control" => array("SMSTextArea","rows"=>10),
+		"control" => array("TextArea","rows"=>10,"counter"=>160),
 		"helpstep" => 2
 	)
 );
@@ -185,7 +161,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValMessageName")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck")); ?>
 </script>
 <?
 
