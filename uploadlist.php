@@ -159,7 +159,7 @@ if($USER->authorize("sendemail")){
 <? if ($USER->authorize('listuploadids')) { ?>
 				<tr>
 					<td>ID#&nbsp;lookup:</td>
-					<td><input type="radio" name="type" size="30" value="ids" <?= $ischecked ? "" : "checked" ?> onclick="if(this.checked){ $('mapping').hide(); }" ></td>
+					<td><input type="radio" name="type" size="30" value="ids" <?= $ischecked ? "" : "checked" ?> onclick="if(this.checked && $('mapping')){ $('mapping').hide(); }" ></td>
 					<td width="100%">File must be a list of ID#s only (one per line)</td>
 				</tr>
 <? } ?>
