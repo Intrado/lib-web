@@ -89,7 +89,7 @@ var RuleWidget = Class.create({
 				if (someUnused)
 					this.warningDiv.update('<?=addslashes(_L("WARNING: Some rules are not visible due to security restrictions or system configuration."))?>');
 				this.container.fire('RuleWidget:Ready');
-			}.bindAsEventListener(this, preloadedRules)
+			}.bindAsEventListener(this, preloadedRules ? preloadedRules : null)
 		);
 	},
 	
