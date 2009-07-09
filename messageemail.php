@@ -16,7 +16,9 @@ require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/FieldMap.obj.php");
-require_once("messageitems.inc.php");
+require_once("obj/MessageBody.fi.php");
+require_once("obj/ValMessageBody.val.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +186,7 @@ $formdata = array(
 		"value" => $message->name,
 		"validators" => array(
 			array("ValRequired","ValLength","min" => 3,"max" => 50),
-			array("ValMessageName","type" => "email")
+			array("ValDuplicateNameCheck","type" => "email")
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
@@ -330,13 +332,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = _L("notifications").":"._L("messages");
-$TITLE = _L('Email Message Builder: New Message');
+$TITLE = _L('Email Message Builder: ') . (isset($_SESSION['messageid'])? escapehtml($message->name) : _L("New Message") );
+$ICON = "email.gif";
 
 include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValMessageBody","ValMessageName","ValEmailAttach")); ?>
+<? Validator::load_validators(array("ValMessageBody","ValDuplicateNameCheck","ValEmailAttach")); ?>
 </script>
 <?
 
