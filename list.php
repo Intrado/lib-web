@@ -30,6 +30,8 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.obj.php");
 require_once("inc/rulesutils.inc.php");
+include_once("inc/formatters.inc.php");
+include_once("inc/ajaxtable.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -41,6 +43,54 @@ if (!$USER->authorize('createlist')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
+if (!isset($_SESSION['ajaxtablepagestart']))
+	$_SESSION['ajaxtablepagestart'] = array();
+
+function prepare_table($containerID, $renderedlist, $destinations = array()) {
+	global $USER;
+	switch ($containerID) {
+		case 'additionsContainer':
+			$renderedlist->mode = 'add';
+			$renderedlist->pagelimit = 500;
+			break;
+		default:
+			return false;
+	}
+	$renderedlist->hasstats = false;
+	$data = $renderedlist->getPage(isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0, $renderedlist->pagelimit);
+	$titles = array(//"0" => "In List",
+		2 => "",
+		3 => "First Name",
+		4 => "Last Name",
+		5 => "Language");
+	$formatters = array(//"0" => "fmt_checkbox",
+		2 => "fmt_idmagnify",
+		6 => "fmt_phone",
+		7 => "fmt_email",
+		8 => "fmt_phone",
+		9 => "fmt_null");
+	$sorting = array(
+		3 => $renderedlist->firstname,
+		4 => $renderedlist->lastname,
+		5 => $renderedlist->language
+	);
+	if (isset($destinations['phone'])) {
+		$sorting[6] = 'phone';
+		$titles[6] = destination_label("phone", 0);
+	}
+	if (isset($destinations['email'])) {
+		$sorting[7] = 'email';
+		$titles[7] = destination_label("email", 0);
+	}
+	if (isset($destinations['sms'])) {
+		$sorting[8] = 'sms';
+		$titles[8] = destination_label("sms", 0);
+	}
+	$sorting[9] = 'address';
+	$titles[9] = "Address";
+	
+	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting, true);
+}
 
 if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
@@ -49,6 +99,37 @@ if (isset($_GET['origin'])) {
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
 	redirect();
+}
+
+$list = new PeopleList(isset($_SESSION['listid']) ? $_SESSION['listid'] : null);
+if ($list->id) {
+	$renderedlist = new RenderedList($list);
+	$renderedlist->calcStats();
+}
+
+$destinations = array();
+if ($USER->authorize('sendphone'))
+	$destinations['phone'] = true;
+if ($USER->authorize('sendemail'))
+	$destinations['email'] = true;
+if (getSystemSetting("_hassms") && $USER->authorize('sendsms'))
+	$destinations['sms'] = true;
+
+if (!empty($_GET['ajax']) && isset($renderedlist) && isset($_GET['containerID']) && in_array($_GET['containerID'], array('additionsContainer'))) {
+	$ajaxdata = false;
+	switch ($_GET['ajax']) {
+		case 'orderby': // Handled same as case 'page'.
+		case 'page': // Order by what's in the user's setting.
+			if (isset($_GET['start']))
+				$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
+			$orderbySQL = ajax_table_get_orderby($_GET['containerID'], array_merge($destinations, array('address')));
+			if (!empty($orderbySQL))
+				$renderedlist->orderby = $orderbySQL;
+			$ajaxdata = array('html' => prepare_table($_GET['containerID'], $renderedlist, $destinations));
+			break;
+	}
+	header('Content-Type: application/json');
+	exit(json_encode($ajaxdata));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,18 +148,16 @@ class ValListName extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-$list = new PeopleList(isset($_SESSION['listid']) ? $_SESSION['listid'] : null);
+// Reset ajax tables' page menus.
+$_SESSION['ajaxtablepagestart']['additionsContainer'] = 0;
+
 $rulesjson = '[]';
 if ($list->id) {
 	$rules = $list->getListRules();
-	if (is_array($rules)) {
+	if (is_array($rules))
 		$rulesjson = json_encode(cleanObjects(array_values($rules)));
-	} else {
+	else
 		unset($rules);
-	}
-	
-	$renderedlist = new RenderedList($list);
-	$renderedlist->calcStats();
 }
 
 $formdata = array(
@@ -124,7 +203,7 @@ if (isset($renderedlist) && $renderedlist->totaladded > 0) {
 	$formdata[] = _L('Additions');
 	$formdata["additions"] = array(
 		"label" => '',
-		"control" => array("FormHtml", 'html' => 'TODO: Show additions'),
+		"control" => array("FormHtml", 'html' => "<div id='additionsContainer'>" . prepare_table('additionsContainer', $renderedlist, $destinations) . "</div>"),
 		"helpstep" => 2
 	);
 }
@@ -142,7 +221,8 @@ $advancedtools = '';
 $advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search','tick').'</td><td>'._L('Search for contacts in the database').'</td></tr>';
 $advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd','tick').'</td><td>'._L('Manually add new contacts').'</td></tr>';
 $advancedtools .= '<tr><td>'.submit_button(_L('Open Address Book'),'addressBookAdd','tick').'</td><td>'._L('Choose contacts from your address book').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
+if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
+	$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 $formdata[] = _L('Advanced List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
