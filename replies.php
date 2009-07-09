@@ -119,10 +119,10 @@ PutFormData($f, $s, "jobselect", isset($_SESSION['replies']['jobid']) ? $_SESSIO
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_replies_actions($row, $index) {
-	$play = '<a href="" onclick="repliesplay('. $row[8] .'); return false;">Play</a>';
-	$delete = '<a href="replies.php?delete=' . $row[8]. '" onclick="return confirm(\'Are you sure you want to delete this reply?\');">Delete</a>';
-	$buttons = array($play, $delete);
-	return implode("&nbsp;|&nbsp;", $buttons);
+	return action_links(
+		action_link(_L("Play"),"control_play","#","repliesplay($row[8]); return false;"),
+		action_link(_L("Delete"),"cross","replies.php?delete=$row[8]","return confirm('Are you sure you want to delete this reply?');")
+	);
 }
 
 function fmt_replies_status($row, $index){
