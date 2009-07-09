@@ -40,7 +40,7 @@ var Easycall = Class.create({
 			this.displayMessage();
 			this.updateMessage();
 			if (this.language !== this.required)
-				$(this.formitemname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formitemname,this.required).del(this.language)}.bind(this));
+				$(this.formitemname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.formitemname,this.required).del(this.language)}.bind(this));
 		}.bind(this));
 	},
 	
@@ -141,7 +141,7 @@ var Easycall = Class.create({
 		if ($(this.formitemname+this.language+"_row") !== null) {
 			this.updateMessage();
 			if (this.language !== this.required)
-				$(this.formitemname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formitemname,this.required).del(this.language)}.bind(this));
+				$(this.formitemname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.formitemname,this.required).del(this.language)}.bind(this));
 		}
 		$(this.formitemname+"recordbutton").show();
 		form_do_validation($(this.formname), $(this.formitemname));
