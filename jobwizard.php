@@ -18,6 +18,8 @@ require_once("obj/SpecialTask.obj.php");
 require_once("obj/ListForm.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/traslationitem.obj.php");
+require_once("obj/EmailAttach.fi.php");
+require_once("obj/EmailAttach.val.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/RenderedList.obj.php");
@@ -98,7 +100,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">	
-<? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValEasycall","ValLists","ValTranslation"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValEasycall","ValLists","ValTranslation","ValEmailAttach"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 

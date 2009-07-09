@@ -704,6 +704,16 @@ class JobWiz_messageEmailText extends WizStep {
 		);
 		$helpsteps[$helpstepnum++] = _L("Email Subject.");
 
+		$formdata["attachements"] = array(
+			"label" => _L('Attachments'),
+			"fieldhelp" => "You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted.",
+			"value" => "",
+			"validators" => array(array("ValEmailAttach")),
+			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
+			"helpstep" => $helpstepnum
+		);
+		$helpsteps[$helpstepnum++] = '<ul><li>' . _L('Attach files up to 2 MB') . '<li>' . _L('Mention the  attachments in the Message body') . '</ul>';
+		
 		$formdata["message"] = array(
 			"label" => _L("Email Message"),
 			"value" => isset($postdata['/message/phone/text']['message'])?$postdata['/message/phone/text']['message']:"",
@@ -919,7 +929,7 @@ class JobWiz_messageSmsText extends WizStep {
 				array("ValRequired"),
 				array("ValLength","max"=>160)
 			),
-			"control" => array("TextArea","rows"=>10),
+			"control" => array("TextArea","rows"=>10,"counter"=>160),
 			"helpstep" => $helpstepnum
 		);
 		$helpsteps[$helpstepnum++] = _L("Enter your message text here.");
