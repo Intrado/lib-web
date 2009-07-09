@@ -562,3 +562,16 @@ function form_do_hover(hovers) {
 		});
 	});
 }
+
+// Gives visual clue of how many characters are left 
+function form_count_field_characters(count,target,event) {
+	var e = event.element();
+	var status = $(target);
+	var remaining = count - e.value.length;
+	if (remaining < 0)
+		$(target).innerHTML="<b style='color:red;'>" + (0 - remaining) + "</b> characters too many.";
+	else if (remaining <= 20)
+		$(target).innerHTML="<b style='color:orange;'>" + remaining + "</b> characters remaining.";
+	else
+		$(target).innerHTML=remaining + " characters remaining.";
+}
