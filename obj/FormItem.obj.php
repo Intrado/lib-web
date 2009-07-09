@@ -88,7 +88,27 @@ class TextArea extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
 		$cols = isset($this->args['cols']) ? 'rows="'.$this->args['cols'].'"' : "";
-		return '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.'/>'.escapehtml($value).'</textarea>';
+		$counter = isset($this->args['counter']) ? 'onkeyup="' . $n . 'limit_chars(this);"' : "";
+		
+		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' ' . $counter . '/>'.escapehtml($value).'</textarea>';	
+		if(isset($this->args['counter'])) {
+			$str .= '&nbsp;<span id="' . $n . 'charsleft">' . ( $this->args['counter'] - strlen($value)) . ' characters remaining.</span>
+				<script>
+					function ' . $n . 'limit_chars(field) {
+						var status = $(\'' . $n . 'charsleft\');
+						var remaining = ' . $this->args['counter'] . ' - field.value.length;
+						if (remaining < 0){
+							remaining = 0 - remaining;
+							status.innerHTML="<b style=\'color:red;\'>" + remaining + "</b> characters too many.";
+						} else if (remaining <= 20)
+							status.innerHTML="<b style=\'color:orange;\'>" + remaining + "</b> characters remaining.";
+						else
+							status.innerHTML=remaining + " characters remaining.";
+						setTimeout("form_do_validation($(\'' . $this->form->name . '\'), $(\'' . $n . '\'))", 1000);	
+					}
+				</script>';	
+		}
+		return $str;
 	}
 }
 
