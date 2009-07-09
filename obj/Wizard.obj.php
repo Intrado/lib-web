@@ -238,7 +238,6 @@ class Wizard {
 				$_SESSION[$this->name]['step'] = $_GET['step'];
 				$this->setCurrentStep($_GET['step']);
 			} else {
-				exit();
 				$_SESSION[$this->name]['step'] = "/finish";
 				$this->setCurrentStep("/finish");
 			}
