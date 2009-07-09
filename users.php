@@ -102,13 +102,13 @@ function fmt_actions_en ($obj,$name) {
 
 	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $obj->id) ? '<a name="viewrecent">' : '';
 
-	$editviewaction = "Edit";
-	if ($obj->importid > 0) $editviewaction = "View";
-
-	return $activeuseranchor . '<a href="user.php?id=' . $obj->id . '">'.$editviewaction.'</a>&nbsp;|&nbsp;'
-		. ($obj->enabled ? '<a href="./?login=' . $obj->login . '">Login&nbsp;as&nbsp;this&nbsp;user</a>' : NULL)
-		. '&nbsp;|&nbsp;<a href="?resetpass=1&enable='.$obj->id.'">Reset&nbsp;Password</a>'
-		. ($obj->id == $USER->id ? "" : '&nbsp;|&nbsp;<a href="?disable=' . $obj->id . '">Disable</a>&nbsp;');
+	$links = array();
+	$links[] = action_link($obj->importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$obj->id");
+	$links[] = action_link(_L("Login as this user"),"key_go","./?login=$obj->login");
+	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","?resetpass=1&enable=$obj->id");
+	$links[] = action_link(_L("Disable"),"user_delete","?disable=$obj->id");
+	
+	return $activeuseranchor . action_links($links);
 }
 
 function fmt_actions_dis ($obj,$name) {
@@ -116,16 +116,16 @@ function fmt_actions_dis ($obj,$name) {
 	$editviewaction = "Edit";
 	if ($obj->importid > 0) $editviewaction = "View";
 
-	$resetpass = "";
-	
-	if(isset($newusers[$obj->id])) {
-		$resetpass = '<a href="?enable=' . $obj->id . '&resetpass=1">Enable &amp; Reset Password</a>&nbsp;|&nbsp;';
-	}
 
-	return '<a href="user.php?id=' . $obj->id . '">'.$editviewaction.'</a>&nbsp;|&nbsp;'
-		. '<a href="?enable=' . $obj->id . '">Enable</a>&nbsp;|&nbsp;'
-		. $resetpass
-		. '<a href="?delete=' . $obj->id . '" onclick="return confirmDelete();">Delete</a>';
+	$links = array();
+	$links[] = action_link($obj->importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$obj->id");
+	$links[] = action_link(_L("Enable"),"user_add","?enable=$obj->id");
+	if(isset($newusers[$obj->id]))
+		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?enable=$obj->id&resetpass=1");
+	
+	$links[] = action_link(_L("Delete"),"cross","?delete=$obj->id","return confirmDelete()");
+	
+	return action_links($links);
 }
 
 /*
