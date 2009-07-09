@@ -29,7 +29,6 @@ var RuleWidget = Class.create({
 		this.rulesTableFootTR = new Element('tr'); // For customization, on top of rulesTableFootLastTR.
 		this.rulesTableFootLastTR = new Element('tr'); // For rule editor
 		this.rulesTableBody = new Element('tbody');
-		//var thead = new Element('thead').insert('<tr><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Field'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Criteria'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Value'))?></th><th style="overflow:hidden" width="25%" class="windowRowHeader"><?=addslashes(_L('Actions'))?></th></tr>');
 		this.container.insert(new Element('table', {}).insert(this.rulesTableBody).insert(new Element('tfoot').insert(this.rulesTableFootTR).insert(this.rulesTableFootLastTR)));
 		if (!readonly)
 			this.ruleEditor = new RuleEditor(this, this.rulesTableFootLastTR);
@@ -113,12 +112,12 @@ var RuleWidget = Class.create({
 		if (!data.type)
 			data.type = this.fieldmaps[data.fieldnum].type;
 		// FieldmapTD
-		var fieldmapTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
+		var fieldmapTD = new Element('td', {'class':'border', 'style':'', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
 		// Keep track of the row's data.fieldnum by using a hidden input.
 		if (addHiddenFieldnum)
 			fieldmapTD.insert(new Element('input', {'type':'hidden', 'value':data.fieldnum}));
 		// CriteriaTD
-		var criteriaTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'});
+		var criteriaTD = new Element('td', {'class':'border', 'style':'', 'valign':'top'});
 		var criteria = this.operators[data.type][data.op];
 		if (data.op == 'in') {
 			criteria = '<?=addslashes(_L('is'))?>';
@@ -131,18 +130,20 @@ var RuleWidget = Class.create({
 		var value = '';
 		if (!data.val.join) {
 			if (data.type == 'multisearch') {
-				value = data.val.replace(/\|/g, ', ');
+				value = data.val.replace(/\|/g, ',');
 			} else if (data.op == 'reldate') {
 				value = this.reldateOptions[data.val];
 			} else {
 				value = data.val.replace(/\|/g, ' <?=addslashes(_L('and'))?> ');
 			}
 		} else if (data.type == 'multisearch') {
-			value = data.val.join(', ');
+			value = data.val.join(',');
 		} else {
 			value = data.val.join(' <?=addslashes(_L('and'))?> ');
 		}
-		var valueTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update(value.escapeHTML() + '&nbsp;');
+		var widthCSS = (addHiddenFieldnum) ? ' white-space: nowrap; width: 150px; ' : '';
+		var heightCSS = (value.length > 400) ? ' overflow: auto; height: 300px; ' : '';
+		var valueTD = new Element('td', {'class':'border', 'valign':'top'}).update(new Element('div', {'style':widthCSS + heightCSS}).update(value.escapeHTML().replace(/,/g, ',<br/>') + '&nbsp;'));
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
 		
 		return true;
@@ -161,7 +162,7 @@ var RuleWidget = Class.create({
 		}
 		// Actions
 		if (this.ruleEditor) {
-			var actionTD = new Element('td', {'class':'border', 'style':'overflow:hidden', 'width':'25%', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?>').insert('<br style=\"clear:both\"/>');
+			var actionTD = new Element('td', {'class':'border', 'style':'', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?>').insert('<br style=\"clear:both\"/>');
 			var deleteRuleButton = actionTD.down('button');
 			tr.insert(actionTD);
 			deleteRuleButton.observe('click', function(event, tr, fieldnum) {
@@ -197,10 +198,10 @@ var RuleEditor = Class.create({
 		
 		var fieldsetCSS = 'padding:5px; margin:0;';
 		
-		this.fieldTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
-		this.criteriaTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
-		this.valueTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
-		this.actionTD = new Element('td',{'width':'25%', 'style':'overflow:hidden', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
+		this.fieldTD = new Element('td',{'style':'', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
+		this.criteriaTD = new Element('td',{'style':'', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
+		this.valueTD = new Element('td',{'style':'', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
+		this.actionTD = new Element('td',{'style':'', 'valign':'top'}).insert(new Element('fieldset', {style:fieldsetCSS}).insert(new Element('div')));
 		containerTR.insert(this.fieldTD).insert(this.criteriaTD).insert(this.valueTD).insert(this.actionTD);
 
 		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add'), 'add'))?>').insert('<br style="clear:both"/>');
@@ -323,7 +324,7 @@ var RuleEditor = Class.create({
 		var container = new Element('div');
 		switch(type) {
 			case 'multisearch':
-				container.update('<img src="img/icons/loading.gif"/>Loading...');
+				container.update('<img src="img/icons/loading.gif"/>');
 				if (this.ruleWidget.multisearchHTMLCache[fieldnum]) {
 					var multicheckboxHTML = this.ruleWidget.multisearchHTMLCache[fieldnum];
 					container.update(multicheckboxHTML);
@@ -452,7 +453,7 @@ var RuleEditor = Class.create({
 					checkboxes[i].checked = false;
 				}
 			}.bindAsEventListener(multicheckboxContainer));
-			multicheckboxContainer.down('div').insert({top:new Element('div').insert(checkAll).insert(clear).insert('<div style="width:130px;height:1px"></div><br style="clear:both"/>')});
+			multicheckboxContainer.down('div').insert({top:new Element('div').insert(checkAll).insert(clear).insert('<div style="width:130px;height:1px;clear:both"></div>')});
 			multicheckboxContainer.down('ul').style.height = '300px';
 		}
 		return multicheckboxContainer;
@@ -468,13 +469,18 @@ var RuleEditor = Class.create({
 
 		// TODO: Determine if it's faster to insert as html or use DOM methods.
 		// NOTE: So far it looks like DOM is faster, because Internet Explorer 6 seems to get very slow when concatenating long string in javascript.
-		var ul = new Element('ul', {'style':'clear:both; margin:0; padding:0; list-style:none; overflow:auto;'});
+		var ul = new Element('ul', {'style':'clear:both; margin:0; padding:0; list-style:none; overflow:auto; width: 180px;'});
 		// TODO: max is temporary hack to stop browser from consuming too much memory! It needs to be removed when in production
-		var max = (values.length > 100) ? 100 : values.length;
-		for (var i = 0; i < max; ++i) {
-			var checkbox = new Element('input', {'type':'checkbox', 'value':values[i]});
-			var label = new Element('label', {'for':checkbox.identify()}).update(values[i].escapeHTML());
+		//var max = (values.length > 100) ? 100 : values.length;
+		var max = values.length;
+		//for (var i = 0; i < max; ++i) {
+		var i = max;
+		while (i) {
+			var value = values[max-i];
+			var checkbox = new Element('input', {'type':'checkbox', 'value':value});
+			var label = new Element('label', {'for':checkbox.identify()}).update(value.escapeHTML());
 			ul.insert(new Element('li', {'style':'white-space:nowrap; overflow: hidden'}).insert(checkbox).insert(label));
+			i--;
 		}
 		multicheckbox.insert(ul);
 		
