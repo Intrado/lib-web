@@ -83,7 +83,7 @@ class TextArea extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
-		$cols = isset($this->args['cols']) ? 'rows="'.$this->args['cols'].'"' : "";
+		$cols = isset($this->args['cols']) ? 'cols="'.$this->args['cols'].'"' : "";
 		$counter = isset($this->args['counter']) ? 'onkeyup="' . $n . 'limit_chars(this);"' : "";
 		
 		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' ' . $counter . '/>'.escapehtml($value).'</textarea>';	
