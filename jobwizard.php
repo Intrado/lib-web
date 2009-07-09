@@ -19,7 +19,8 @@ require_once("obj/ListForm.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/traslationitem.obj.php");
 require_once("obj/Voice.obj.php");
-
+// Job step form data
+require_once("jobwizard.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -29,11 +30,8 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 	redirect('unauthorized.php');
 }
 
-// Job step form data
-require("jobwizard.inc.php");
-
 $wizdata = array(
-	"basic" => new JobWiz_basic(_L("Start")),
+	"start" => new JobWiz_start(_L("Start")),
 	"list" => new JobWiz_listChoose(_L("List")),
 	"message" => new WizSection("Message",array(
 		"pick" => new JobWiz_messageType(_L("Delivery Methods")),
@@ -104,7 +102,7 @@ require_once("nav.inc.php");
 startWindow($wizard->getStepData()->title);
 echo $wizard->render();
 endWindow();
-if (true) {
+if (false) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['wizard_job']);
