@@ -198,6 +198,7 @@ $formdata = array(
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
 	),
+	"&nbsp;",
 	"fromname" => array(
 		"label" => _L('From Name'),
 		"value" => $message->fromname,
