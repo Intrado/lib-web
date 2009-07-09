@@ -19,6 +19,9 @@ require_once("obj/ListForm.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/traslationitem.obj.php");
 require_once("obj/Voice.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("obj/FieldMap.obj.php");
 // Job step form data
 require_once("jobwizard.inc.php");
 
