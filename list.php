@@ -31,7 +31,6 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.obj.php");
 require_once("inc/rulesutils.inc.php");
 include_once("inc/formatters.inc.php");
-include_once("inc/ajaxtable.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
