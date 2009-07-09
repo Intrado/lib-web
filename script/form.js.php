@@ -548,3 +548,17 @@ function form_handle_submit(form,event) {
 	});
 	
 }
+
+// Takes a json encoded object of id to hover text associations and adds protoTip hover helps
+function form_do_hover(hovers) {
+	Object.keys(hovers).each(function(k) {
+		var l = $(k);
+		l.style.cursor="help";
+		new Tip(l,hovers[k] ,{
+			style: "protogrey",
+			stem: "bottomLeft",
+			hook: { tip: "bottomLeft", mouse: true },
+			offset: { x: 10, y: 0 }
+		});
+	});
+}
