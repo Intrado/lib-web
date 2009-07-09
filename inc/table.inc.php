@@ -186,4 +186,134 @@ function showPageMenu ($total,$start, $perpage, $link = NULL) {
 <?
 }
 
+
+function ajax_table_get_orderby($containerID, $extravalidcolumns = array()) {
+	global $USER;
+	
+	$ajaxtablesort = json_decode($USER->getSetting('ajaxtablesort', false, true), true);
+	if (!is_array($ajaxtablesort))
+		$ajaxtablesort = array();
+	$validorderby = array();
+	if (isset($_GET['orderby'])) {
+		$orderby = json_decode($_GET['orderby']);
+		if (is_array($orderby)) {
+			foreach ($orderby as $column) {
+				if ($USER->authorizeField($column) || in_array($column, $extravalidcolumns))
+					$validorderby[$column] = (isset($_GET['descend']) ? 'descend' : 'ascend');
+			}
+		}
+	} else if ($ajaxtablesort[$containerID]) {
+		$validorderby = $ajaxtablesort[$containerID];
+	}
+	if (!empty($validorderby)) {
+		$orderbySQL = implode(",", array_keys($validorderby));
+		if (in_array('descend', $validorderby))
+			$descend = true;
+		if (isset($_GET['orderby']))
+			$descend = isset($_GET['descend']) ? true : false;
+	}
+	if (!empty($descend))
+		$orderbySQL .= ' desc ';
+	$ajaxtablesort[$containerID] = $validorderby;
+	$USER->setSetting('ajaxtablesort', json_encode($ajaxtablesort));
+	return $orderbySQL;
+}
+
+function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $sorting = array(), $scroll = true) {
+	global $USER;
+	$ajaxtablesort = json_decode($USER->getSetting('ajaxtablesort', false, true), true);
+	if (is_array($ajaxtablesort) && isset($ajaxtablesort[$containerID]))
+		$existingsort = $ajaxtablesort[$containerID];
+	if (isset($existingsort))
+		error_log('******   ' . json_encode($existingsort));
+	//use sparse array to use isset later
+	$hiddencolumns = array();
+	
+	$headerHtml = '<tr class="listHeader">';
+	foreach ($titles as $index => $title) {
+		$headerHtml .= '<th align="left" ';
+		
+		$style = ' white-space: nowrap; ';
+		// make column hidden
+		if (strpos($title,"@") !== false) {
+			$style .= ' display:none; ';
+			$hiddencolumns[$index] = true;
+		}
+		
+		// make sortable
+		if (isset($sorting[$index])) {
+			$style .= ' cursor:pointer; border-bottom: solid 2px darkblue; ';
+			$field = $sorting[$index];
+			$fieldsort = false;
+			if (isset($existingsort[$field]))
+				$fieldsort = $existingsort[$field];
+			$orderby = urlencode(json_encode(array($field)));
+			$onclick = "ajax_table_update('$containerID', '?ajax=orderby&orderby=$orderby&" . ($fieldsort == 'ascend' ? 'descend&' : '') . "');";
+			$headerHtml .= " onclick=\"$onclick\" ";
+		}
+		$headerHtml .= " style=\"$style\" >";
+
+		$displaytitle = $title;
+		if (strpos($title,"@#") === 0)
+			$displaytitle = substr($title,2);
+		else if (strpos($title,"@") === 0 || strpos($title,"#") === 0)
+			$displaytitle = substr($title,1);
+		$headerHtml .= escapehtml($displaytitle);
+		if (isset($fieldsort)) {
+			if ($fieldsort == 'ascend')
+				$headerHtml .= '<img src="img/icons/arrow_down.gif"/>';
+			else if ($fieldsort == 'descend')
+				$headerHtml .= '<img src="img/icons/arrow_up.gif"/>';
+		}
+		$headerHtml .= "</th>";
+	}
+	$headerHtml .= "</tr>";
+
+	$dataHtml = '';
+	if (!empty($data)) {
+		$alt = 0;
+		foreach ($data as $row) {
+			$alt++;
+			$dataTR = ($alt % 2) ? '<tr>' : '<tr class="listAlt">';
+			//only show cells with titles
+			foreach ($titles as $index => $title) {
+				//echo the td first so if fn outputs directly and returns empty string, it will still display correctly
+				$dataTD = "<td ";
+				if (isset($hiddencolumns[$index]))
+					$dataTD .= ' style="display:none"';
+				$dataTD .= ">";
+				
+				if (isset($formatters[$index]))
+					$dataTD .= $formatters[$index]($row,$index);
+				else
+					$dataTD .= escapehtml($row[$index]);
+				$dataTD .= "</td>";
+				$dataTR .= $dataTD;
+			}
+			$dataTR .= "</tr>";
+			$dataHtml .= $dataTR;
+		}
+	}
+	return ($scroll ? '<div class="scrollTableContainer">' : '') . '<table width="100%" cellpadding="3" cellspacing="1" class="list"><tbody>' . $headerHtml . $dataHtml . '</tbody></table>' . ($scroll ? '</div>' : '');
+}
+
+function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
+	$numpages = ceil($total/$perpage);
+	$curpage = ceil($start/$perpage) + 1;
+
+	$displayend = ($start + $perpage) > $total ? $total : ($start + $perpage);
+	$displaystart = ($total) ? $start +1 : 0;
+	
+	$onchange = "ajax_table_update('$containerID', '?ajax=page&start='+this.value);";
+	$info = "Showing $displaystart - $displayend of $total records<span class='noprint'> on $numpages pages</span>. ";
+	$selectbox = "<select class='noprint' onchange=\"$onchange\">";
+	for ($x = 0; $x < $numpages; $x++) {
+		$offset = $x * $perpage;
+		$selected = ($curpage == $x+1) ? "selected" : "";
+		$page = $x + 1;
+		$selectbox .= "<option value='$offset' $selected>Page $page</option>";
+	}
+	$selectbox .= "</select>";
+	return "<div class='pagenav' style='text-align:right;'>" . $info . $selectbox . "</div>";
+}
 ?>

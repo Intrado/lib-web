@@ -382,7 +382,21 @@ function isAllSameDigit(number){
 	return false;
 }
 
-
+function ajax_table_update(containerID, uri) {
+	if (!$(containerID))
+		return;
+	$(containerID).update('<img src="img/icons/loading.gif"/>');
+	cachedAjaxGet(uri + '&containerID=' + containerID, function(transport) {
+		if (!$(containerID))
+			return;
+		var data = transport.responseJSON;
+		if (!data || !data.html) {
+			$(containerID).update('Unable to load data');
+			return;
+		}
+		$(containerID).update(data.html);
+	}, null, false); // Do not cache this request.
+}
 
 
 
