@@ -74,7 +74,7 @@ class ListForm extends Form {
 				<tr>
 					<!-- MAIN CONTENT AREA -->
 					
-					<td valign=top width='50%'>
+					<td valign=top width='70%'>
 						<div id='pageLoadingWindow'>"._L('Please wait while the page is loaded')."</div>
 						
 						<fieldset id='AllLists' style='margin:0; padding:0; margin-bottom:10px;'>
@@ -132,12 +132,12 @@ class ListForm extends Form {
 						<div id='allListsWindow'>
 							<table width='100%' class='border' style='table-layout:fixed; border-collapse: collapse'>
 								<thead>
-									<tr class='listHeader'><th width='70%' style='overflow: hidden; white-space: nowrap; text-align:left'>"._L('List Name')."</th><th width='32px'></th><th width='30%' style='overflow: hidden; white-space: nowrap; text-align:left'>"._L('Total')."</th></tr>
-									<tr><td id='listsTableStatus'></td></tr>
+									<tr class='listHeader'><th width='120px' style='white-space: nowrap; text-align:left'>"._L('List Name')."</th><th width='32px'></th><th colspan=100 style='overflow: hidden; width: 60px; white-space: nowrap; text-align:left'>"._L('Total')."</th></tr>
+									<tr><td colspan=100 id='listsTableStatus'></td></tr>
 								</thead>
 								<tbody id='listsTableBody'></tbody>
 								<tfoot>
-									<tr><th colspan=2 style='text-align:right; padding: 2px; padding-top:10px'>Grand Total</th><td id='listGrandTotal' style='padding: 2px; padding-top:10px'></td></tr>
+									<tr><th colspan=2 style='text-align:left; white-space: nowrap; padding: 2px; padding-top:10px'>"._L('Grand Total')."</th><td id='listGrandTotal' colspan=100 style='padding: 2px; padding-top:10px'></td></tr>
 								</tfoot>
 							</table>
 						</div>
@@ -328,7 +328,7 @@ class ListForm extends Form {
 								nameTD.insert(data.name);
 								var actionTD = new Element('td', {'class':'List ActionTD'});
 								actionTD.insert('".addslashes(action_link('','delete'))."');
-								var statisticsTD = new Element('td', {'class':'List'}).update(data.total);
+								var statisticsTD = new Element('td', {'class':'List', 'colspan':100}).update(data.total);
 								$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(actionTD).insert(statisticsTD));
 								// Add an extra row for viewing rules.
 								var rulesTR = new Element('tr', {'class':'ListRules'}).insert(new Element('td', {'class':'viewRulesTD',colspan:100}));
