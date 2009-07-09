@@ -229,7 +229,7 @@ class Wizard {
 			unset($_SESSION[$this->name]);
 			$_SESSION[$this->name] = array("data" => array());
 			$_SESSION[$this->name]['step'] = $step = $this->steplist[0];
-			redirect($_SERVER['SCRIPT_NAME']."?step=$step");
+			redirect("start.php");
 		}
 		
 		if (isset($_GET['step'])) {
@@ -295,11 +295,11 @@ class Wizard {
 									$_SESSION[$this->name]['data']['finish'] = true;
 									$this->getStepData("finish")->finish($_SESSION[$this->name]['data']);
 								}
-								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=/finish");
+								$form->sendTo("?step=/finish");
 							}
 						} else if ($button == "prev") {
 							if ($next = $this->getPrevStep())
-								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
+								$form->sendTo("?step=$next");
 						}
 					}
 				}
