@@ -57,15 +57,29 @@ class RadioButton extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<div id='.$n.' class="radiobox">';
+		$hover = '<script type="text/javascript">';
 		$counter = 1;
 		foreach ($this->args['values'] as $radiovalue => $radioname) {
 			$id = $n.'-'.$counter;
-			$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /><label for="'.$id.'">'.escapehtml($radioname).'</label><br />
-				';
+			$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($radioname).'</label><br />';
+			if (isset($this->args['hover']))
+				$hover .= 'new Tip($("'.$id.'"), "'.$this->args['hover'][$radiovalue].'", {
+					style: "protogrey",
+					stem: "bottomLeft",
+					hook: { tip: "bottomLeft", mouse: true },
+					offset: { x: 10, y: 0 }
+				});
+				new Tip($("'.$id.'-label"), "'.$this->args['hover'][$radiovalue].'", {
+					style: "protogrey",
+					stem: "bottomLeft",
+					hook: { tip: "bottomLeft", mouse: true },
+					offset: { x: 10, y: 0 }
+				});';
 			$counter++;
 		}
 		$str .= '</div>';
-		return $str;		
+		$hover .= '</script>';
+		return $str . (isset($this->args['hover'])?$hover:"");
 	}
 }
 
@@ -101,8 +115,7 @@ class MultiSelect extends FormItem {
 		$str = '<select multiple id='.$n.' name="'.$n.'[]" '.$size .' >';
 		foreach ($this->args['values'] as $selectvalue => $selectname) {
 			$checked = $value == $selectvalue || (is_array($value) && in_array($selectvalue, $value));
-			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
-				';
+			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>';
 		}
 		$str .= '</select>';
 		return $str;
@@ -152,7 +165,7 @@ class MultiCheckBox extends FormItem {
 			';
 		}
 		
-		return $str;		
+		return $str;
 	}
 }
 
