@@ -197,15 +197,11 @@ class Job extends DBMappedObject {
 		// remove the 'translationexpire' jobsetting to force retranslation
 		QuickUpdate("delete from jobsetting where jobid=$newjob->id and name='translationexpire'");
 
-		$a = "0";
-		/*CSDELETEMARKER_START*/
 		// if _hascallback and user profile does not allow job callerid, be sure the option is set to use the default callerid
 		$a = getSystemSetting('_hascallback', "0");
-		/*CSDELETEMARKER_END*/
 		$b = QuickQuery("select p.value from permission p join user u " .
 				"where p.name='setcallerid' and p.accessid=u.accessid and u.id=$newjob->userid");
 		if ($a == "1" && $b != "1") {
-			QuickUpdate("delete from jobsetting where jobid=".$newjob->id." and name='prefermycallerid'");
 			QuickUpdate("delete from jobsetting where jobid=".$newjob->id." and name='callerid'");
 		}
 		$newjob->loadSettings(); // reload without the ones we deleted
@@ -309,7 +305,7 @@ class Job extends DBMappedObject {
 		$job->endtime = date("H:i", strtotime($USER->getCallLate()));
 
 		//callerid
-		$job->setOptionValue("callerid", $USER->getSetting("callerid",getSystemSetting('callerid')));
+		$job->setOptionValue("callerid", getDefaultCallerID());
 
 		return $job;
 	}
@@ -332,7 +328,6 @@ class Job extends DBMappedObject {
 		if ($phonelang) $fielddiffs['phonelang'] = 1;
 		if ($this->getOptionValue("maxcallattempts") != $defaultjob->getOptionValue("maxcallattempts")) $fielddiffs['maxcallattempts'] = 1;
 		if ($this->getOptionValue("callerid") != $defaultjob->getOptionValue("callerid")) $fielddiffs['callerid'] = 1;
-		if ($this->isOption("prefermycallerid") != $defaultjob->isOption("prefermycallerid")) $fielddiffs['radiocallerid'] = 1;
 		if ($this->isOption("skipduplicates") != $defaultjob->isOption("skipduplicates")) $fielddiffs['skipduplicates'] = 1;
 		if ($this->isOption("leavemessage") != $defaultjob->isOption("leavemessage")) $fielddiffs['leavemessage'] = 1;
 		if ($this->isOption("messageconfirmation") != $defaultjob->isOption("messageconfirmation")) $fielddiffs['messageconfirmation'] = 1;

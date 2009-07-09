@@ -265,6 +265,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hasportal', $hasportal, $custdb);
 				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
 				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
+				setCustomerSystemSetting('callbackdefault', GetFormData($f, $s, 'callbackdefault'), $custdb);
 				setCustomerSystemSetting('_hasselfsignup', $hasselfsignup, $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
 
@@ -388,11 +389,14 @@ if( $reloadform ) {
 		$maxusers = "";
 	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
 	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
+	
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', true, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hascallback", getCustomerSystemSetting('_hascallback', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasselfsignup", getCustomerSystemSetting('_hasselfsignup', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hascallback", getCustomerSystemSetting('_hascallback', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,'callbackdefault', getCustomerSystemSetting('callbackdefault', 'inboundnumber', true, $custdb), null, null, null);
+	
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 150, 900);
 
 	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
@@ -533,10 +537,18 @@ foreach($languages as $index => $language){
 		<? NewFormItem($f, "Save","Add", 'submit');?>
 </td></tr>
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
-<tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
 <tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?> Survey</td></tr>
-<tr><td> Has Callback </td><td><? NewFormItem($f, $s, 'hascallback', 'checkbox') ?> Callback</td></tr>
+<tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
 <tr><td> Has Self-Signup </td><td><? NewFormItem($f, $s, 'hasselfsignup', 'checkbox') ?> Self-Signup</td></tr>
+<tr><td> Has Callback </td><td><? NewFormItem($f, $s, 'hascallback', 'checkbox') ?> Callback</td></tr>
+<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Callback CallerID </td><td>
+<?
+	NewFormItem($f,$s,'callbackdefault','selectstart');
+		NewFormItem($f,$s,'callbackdefault','selectoption','Inbound Number','inboundnumber');
+		NewFormItem($f,$s,'callbackdefault','selectoption','Default CallerID','callerid');
+	NewFormItem($f,$s,'callbackdefault','selectend');
+?>
+</td></tr>
 
 <tr><td>Retry:</td><td>
 

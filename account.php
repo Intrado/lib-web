@@ -329,35 +329,27 @@ $formdata["maxjobdays"] = array(
 	"helpstep" => 2
 );
 
-if ($USER->authorize('setcallerid')) {
-/*CSDELETEMARKER_START*/
-	// if _hascallback, do not display callerid, always uses inboundnumber
-	if (!getSystemSetting('_hascallback', false) || $IS_COMMSUITE) {
-		// has no callback, display the callerid field
-/*CSDELETEMARKER_END*/
-		if ($readonly) {
-			$formdata["callerid"] = array(
-				"label" => _L("Personal Caller ID"),
-				"fieldhelp" => ("Enter the personal phone number which will be used for Caller ID if the 'Use personal' option is selected."),
-				"control" => array("FormHtml","html" => Phone::format($USER->getSetting("callerid",""))),
-				"helpstep" => 1
-			);
-		} else {
-			$formdata["callerid"] = array(
-				"label" => _L("Personal Caller ID"),
-				"fieldhelp" => (""),
-				"value" => Phone::format($USER->getSetting("callerid","")),
-				"validators" => array(
-					array("ValLength","min" => 3,"max" => 20),
-					array("ValPhone")
-				),
-				"control" => array("TextField","maxlength" => 20, "size" => 15),
-				"helpstep" => 2
-			);
-		}
-/*CSDELETEMARKER_START*/
+if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+	if ($readonly) {
+		$formdata["callerid"] = array(
+			"label" => _L("Personal Caller ID"),
+			"fieldhelp" => ("Enter the personal phone number which will be used for Caller ID if the 'Use personal' option is selected."),
+			"control" => array("FormHtml","html" => Phone::format($USER->getSetting("callerid",""))),
+			"helpstep" => 1
+		);
+	} else {
+		$formdata["callerid"] = array(
+			"label" => _L("Personal Caller ID"),
+			"fieldhelp" => (""),
+			"value" => Phone::format($USER->getSetting("callerid","")),
+			"validators" => array(
+				array("ValLength","min" => 3,"max" => 20),
+				array("ValPhone")
+			),
+			"control" => array("TextField","maxlength" => 20, "size" => 15),
+			"helpstep" => 2
+		);
 	}
-/*CSDELETEMARKER_END*/
 }
 
 // Display Defaults

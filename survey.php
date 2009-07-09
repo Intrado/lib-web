@@ -184,7 +184,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 			}
 
-			if ($questionnaire->hasphone && $USER->authorize('setcallerid') && GetFormData($f,$s,"callerid")) {
+			if ($questionnaire->hasphone && $USER->authorize('setcallerid')) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
 			} else if ($questionnaire->hasphone) {
 				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));

@@ -94,6 +94,17 @@ function setSystemSetting($name, $value) {
 	setCustomerSystemSetting($name, $value);
 }
 
+// get the default callerid based on user prefs, privs, customer settings, etc.
+function getDefaultCallerID() {
+	$hascallback = getSystemSetting('_hascallback', '0');
+	$callbackdefault = getSystemSetting('callbackdefault', 'inboundnumber');
+	if ($hascallback) {
+		return getSystemSetting($callbackdefault);
+	}
+	global $USER;
+	return $USER->getSetting('callerid', getSystemSetting('callerid'));
+}
+
 function isvalidtimestamp ($time) {
 	if ($time === -1 || $time === false)
 		return false;
@@ -281,7 +292,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.82 $
+    # $Revision: 1.83 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 

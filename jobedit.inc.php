@@ -384,31 +384,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$job->setOption("skipduplicates",GetFormData($f,$s,"skipduplicates"));
 
 					// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
-					if ($USER->authorize('setcallerid')) {
-						/*CSDELETEMARKER_START*/
-						if (!getSystemSetting('_hascallback', false) || $IS_COMMSUITE) {
-						/*CSDELETEMARKER_END*/
+					if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
 							$callerid = Phone::parse(GetFormData($f, $s, "callerid"));
 							// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
 							$job->setOptionValue("callerid",$callerid);
-						/*CSDELETEMARKER_START*/
-						} else {
-							// set to blank so jobprocessor will assign the inboundnumber
-							$job->setOptionValue("callerid","");
-						}
-						/*CSDELETEMARKER_END*/
 					} else {
-						/*CSDELETEMARKER_START*/
-						if (getSystemSetting('_hascallback', false)) {
-							$callerid = ""; // set blank and jobprocessor will set the inboundnumber
-						} else {
-						/*CSDELETEMARKER_END*/
-							// take the user callerid or blank (jobprocessor will set to default customer callerid)
-							$callerid = $USER->getSetting("callerid","");
-						/*CSDELETEMARKER_START*/
- 						}
-						/*CSDELETEMARKER_END*/
-						$job->setOptionValue("callerid", $callerid);
+						$job->setOptionValue("callerid", getDefaultCallerID());
 					}
 
 					if ($USER->authorize("leavemessage"))
@@ -708,7 +689,7 @@ if( $reloadform )
 	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
 	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"), true);
 
-	PutFormData($f,$s,"callerid", Phone::format($job->getSetting("callerid",getSystemSetting('callerid'))), "phone", 10, 10);
+	PutFormData($f,$s,"callerid", Phone::format($job->getSetting("callerid",getDefaultCallerID())), "phone", 10, 10);
 
 	PutFormData($f,$s,"leavemessage",$job->isOption("leavemessage"), "bool", 0, 1);
 	PutFormData($f,$s,"messageconfirmation",$job->isOption("messageconfirmation"), "bool", 0, 1);
@@ -1293,19 +1274,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 
 			<?
-			if ($USER->authorize('setcallerid')) {
-				/*CSDELETEMARKER_START*/
-				if (!getSystemSetting('_hascallback', false) || $IS_COMMSUITE) {
-				/*CSDELETEMARKER_END*/
-					?>
+			if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+			?>
 			<tr>
 				<td>Caller&nbsp;ID <?= help('Job_CallerID',NULL,"small"); ?></td>
 				<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($submittedmode ? "DISABLED" : "")); ?></td>
 			</tr>
 			<?
-				/*CSDELETEMARKER_START*/
-				}
-				/*CSDELETEMARKER_END*/
 			}
 			?>
 			<tr>
@@ -1595,7 +1570,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			displayphonedetailsstate = 'hidden';
 		<? } ?>
 		if (displayphonedetailsstate == 'visible') {
-				Element.show('displayphonedetails');
+			Element.show('displayphonedetails');
 		} else {
 			Element.show('phonedetails');
 			Element.show('displayphonebasic');
