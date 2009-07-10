@@ -67,7 +67,7 @@ if($USER->authorize('sendmulti') && $JOBTYPE != 'repeating') {
 $alllanguages = QuickQueryList("select name from language");
 $emaillanguages = array_intersect($alllanguages,array("Arabic", "Bulgarian", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Indonesian", "Italian", "Japanese", "Korean", "Latvian", "Lithuanian", "Norwegian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Slovenian", "Spanish", "Swedish", "Ukrainian", "Vietnamese"));
 $ttslanguages = Voice::getTTSLanguages();
-$englishkey = array_search('english', $ttslanguages);
+$englishkey = array_search('English', $ttslanguages);
 if($englishkey !== false)
 	unset($ttslanguages[$englishkey]);
 
