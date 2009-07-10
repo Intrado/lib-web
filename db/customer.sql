@@ -1440,3 +1440,37 @@ $$$
 
 ALTER TABLE `setting` DROP INDEX `lookup` , ADD UNIQUE `name` ( `name` ) 
 $$$
+
+ALTER TABLE `job` ADD `modifydate` datetime AFTER `createdate`
+$$$
+
+ALTER TABLE `job` ADD INDEX ( `modifydate` )
+$$$
+
+ALTER TABLE `message` ADD `modifydate` datetime AFTER `data`
+$$$
+
+ALTER TABLE `message` ADD INDEX ( `modifydate` )
+$$$
+
+ALTER TABLE `list` ADD `modifydate` datetime AFTER `description`
+$$$
+
+ALTER TABLE `list` ADD INDEX ( `modifydate` )
+$$$
+
+ALTER TABLE `reportsubscription` ADD `modifydate` datetime AFTER `time`
+$$$
+
+ALTER TABLE `reportsubscription` ADD INDEX ( `modifydate` )
+$$$
+
+CREATE TABLE IF NOT EXISTS `systemmessages` (
+  `id` int(11) NOT NULL auto_increment,
+  `message` VARCHAR( 1000 ) NOT NULL,
+  `icon` VARCHAR( 50 ),
+  `modifydate` datetime NOT NULL,
+  PRIMARY KEY  (`id`),
+  INDEX (`modifydate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
