@@ -13,6 +13,8 @@ class FormRuleWidget extends FormItem {
 		$html .= "<script type='text/javascript'>
 			var ruleWidget = new RuleWidget($('ruleWidgetContainer'".(!empty($this->args['readonly']) ? ',true' : '')."));
 			function rulewidget_update_value() {
+				if (!document.formvars)
+					return;
 				$('$inputname').value = ruleWidget.toJSON();
 				form_do_validation($('".$this->form->name."'), $('".$inputname."'));
 			}
