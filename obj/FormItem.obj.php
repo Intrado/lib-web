@@ -86,7 +86,7 @@ class TextArea extends FormItem {
 		$cols = isset($this->args['cols']) ? 'cols="'.$this->args['cols'].'"' : "";
 		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.'/>'.escapehtml($value).'</textarea>';	
 		if(isset($this->args['counter'])) {
-			$str .= '&nbsp;<span id="' . $n . 'charsleft">' . ( $this->args['counter'] - strlen($value)) . ' characters remaining.</span>
+			$str .= '&nbsp;<span id="' . $n . 'charsleft">' . ( $this->args['counter'] - mb_strlen($value)) . ' characters remaining.</span>
 				<script>
 					Event.observe(\'' . $n . '\', \'keyup\', form_count_field_characters.curry(' . $this->args['counter'] . ',\''  . $n . 'charsleft\'));
 				</script>';	
