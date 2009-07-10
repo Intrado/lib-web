@@ -320,7 +320,6 @@ if ($readonly) {
 		"label" => _L("Email"),
 		"value" => $edituser->email,
 		"validators" => array(
-			array("ValRequired"),
 			array("ValLength","min" => 3,"max" => 255),
 			array("ValEmail")
 		),

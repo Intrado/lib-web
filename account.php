@@ -248,7 +248,6 @@ if ($readonly) {
 		"fieldhelp" => ("Email is used for reporting, password resetting, and as the return address in email messages."),
 		"value" => $USER->email,
 		"validators" => array(
-			array("ValRequired"),
 			array("ValLength","min" => 3,"max" => 255),
 			array("ValEmail")
 		),
