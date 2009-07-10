@@ -521,7 +521,9 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		static $translationlanguages = false;
 		static $voicearray = false;
 		
-		$englishtext = isset($postdata['/message/phone/text']['message'])?$postdata['/message/phone/text']['message']:"";
+		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"gender": "female", "text": ""}');
+		$englishtext = $msgdata->text;
+		$preferredvoice = $msgdata->gender;
 		
 		if(!$translations) {
 			//Get available languages
@@ -553,7 +555,6 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 					"helpstep" => 2
 			);
 		} else {
-			$preferredvoice = isset($postdata["/message/phone/text"]["voice"])?$postdata["/message/phone/text"]["voice"]:"Female";
 			$i = 1;
 			if(is_array($translations)){
 				foreach($translations as $obj){
@@ -710,8 +711,6 @@ class JobWiz_messageEmailText extends WizStep {
 		global $USER;
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):'{"text": ""}';
 		// Form Fields.
-		$formdata = array();
-		
 		$formdata = array(_L("Compose Email"));
 		$helpsteps = array(_L("Enter the address to which replies should be sent."));
 		$formdata["from"] = array(
@@ -735,28 +734,28 @@ class JobWiz_messageEmailText extends WizStep {
 				array("ValLength","min" => 3,"max" => 255)
 			),
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>45),
-			"helpstep" => $helpstepnum
+			"helpstep" => 2
 		);
-		$helpsteps[$helpstepnum++] = _L("Email Subject.");
 
+		$helpsteps[] = '<ul><li>' . _L('Attach files up to 2 MB') . '<li>' . _L('Mention the attachments in the Message body') . '</ul>';
 		$formdata["attachements"] = array(
 			"label" => _L('Attachments'),
 			"fieldhelp" => _L("You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted."),
 			"value" => "",
 			"validators" => array(array("ValEmailAttach")),
 			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
-			"helpstep" => $helpstepnum
+			"helpstep" => 3
 		);
-		$helpsteps[$helpstepnum++] = '<ul><li>' . _L('Attach files up to 2 MB') . '<li>' . _L('Mention the  attachments in the Message body') . '</ul>';
 		
+		$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. Include a reply address or phone number if applicable.");
 		$formdata["message"] = array(
 			"label" => _L("Email Message"),
 			"value" => $msgdata->text,
 			"validators" => array(
 				array("ValRequired")
 			),
-			"control" => array("TextArea","rows"=>15,"cols"=>45),
-			"helpstep" => 3
+			"control" => array("TextArea","rows"=>10,"cols"=>45),
+			"helpstep" => 4
 		);
 
 		if ($USER->authorize('sendmulti')) {
@@ -766,7 +765,7 @@ class JobWiz_messageEmailText extends WizStep {
 				"value" => ($postdata['/start']['package'] == "express")?true:false,
 				"validators" => array(),
 				"control" => array("CheckBox"),
-				"helpstep" => 4
+				"helpstep" => 5
 			);
 		}
 		

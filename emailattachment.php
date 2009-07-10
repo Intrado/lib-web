@@ -41,11 +41,11 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	switch($_FILES['emailattachment']['error']) {
 	case UPLOAD_ERR_INI_SIZE:
 	case UPLOAD_ERR_FORM_SIZE:
-		$errormessage .= 'The file you uploaded exceeds the maximum email attachment limit of 2048K';
+		$errormessage .= _L('The file you uploaded exceeds the maximum email attachment limit of 2048K');
 		$uploaderror = true;
 		break;
 	case UPLOAD_ERR_PARTIAL:
-		$errormessage .= 'The file upload did not complete\nPlease try again\nIf the problem persists\nplease check your network settings';
+		$errormessage .= _L('The file upload did not complete').'\n'._L('Please try again').'\n'._L('If the problem persists').'\n'._L('please check your network settings');
 		$uploaderror = true;
 		break;
 	case UPLOAD_ERR_NO_FILE:
@@ -57,7 +57,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	case UPLOAD_ERR_NO_TMP_DIR:
 	case UPLOAD_ERR_CANT_WRITE:
 	case UPLOAD_ERR_EXTENSION:
-		$errormessage .= 'Unable to complete file upload. Please try again';
+		$errormessage .= _L('Unable to complete file upload. Please try again');
 		$uploaderror = true;
 		break;
 	}
@@ -72,17 +72,17 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	$mimetype = $_FILES['emailattachment']['type'];
 	$uploaderror = true;
 	if(!move_uploaded_file($_FILES['emailattachment']['tmp_name'],$newname)) {
-		$errormessage .= 'Unable to complete file upload. Please try again';
+		$errormessage .= _L('Unable to complete file upload. Please try again');
 	} else if (!is_file($newname) || !is_readable($newname)) {
-		$errormessage .= 'Unable to complete file upload. Please try again';
+		$errormessage .= _L('Unable to complete file upload. Please try again');
 	} else if (array_search(strtolower($ext),$unsafeext) !== false) {
-		$errormessage .= 'The file you uploaded may pose a security risk and is not allowed\nPlease check the help documentation for more information on safe and unsafe file types';
+		$errormessage .= _L('The file you uploaded may pose a security risk and is not allowed').'\n'._L('Please check the help documentation for more information on safe and unsafe file types');
 	} else if ($_FILES['emailattachment']['size'] >= $maxattachmentsize) {
-		$errormessage .= 'The file you uploaded exceeds the maximum email attachment limit of 2048K';
+		$errormessage .= _L('The file you uploaded exceeds the maximum email attachment limit of 2048K');
 	} else if ($_FILES['emailattachment']['size'] <= 0) {
-		$errormessage .= 'The file you uploaded apears to be empty\nPlease check the file and try again';
+		$errormessage .= _L('The file you uploaded apears to be empty\nPlease check the file and try again');
 	} else if ($extdotpos === false) {
-		$errormessage .= 'The file you uploaded does not have a file extension\nPlease make sure the file has the correct extension and try again';
+		$errormessage .= _L('The file you uploaded does not have a file extension\nPlease make sure the file has the correct extension and try again');
 	} else {
 		$contentid = contentPut($newname,$mimetype);
 		@unlink($dest);
@@ -96,15 +96,20 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 			$uploaderror = false;
 			$size = $_FILES['emailattachment']['size'];
 		} else {
-			$errormessage .= 'Unable to upload email attachment data, either the file was empty or there is a DB problem.';
-			$errormessage .= 'Unable to complete file upload. Please try again';
+			$errormessage .= _L('Unable to upload email attachment data, either the file was empty or there is a DB problem.');
+			$errormessage .= _L('Unable to complete file upload. Please try again');
 		}
 	}
 }
 
 ?>
 
+<html>
+<head>
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+</head>
 
+<body style="margin-left: 0px; margin-top: 1px; margin-bottom: 0px">
 <form id="uploadform" action="emailattachment.php" method="post" enctype="multipart/form-data" onsubmit="" >
 	<input id="emailattachment" name="emailattachment" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
 </form>
@@ -121,3 +126,5 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	?>
 	window.top.window.stopUpload('1','<?= $transport ?>','<?= $errormessage ?>');
 </script> 
+</body>
+</html>
