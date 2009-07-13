@@ -292,7 +292,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.83 $
+    # $Revision: 1.84 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -563,47 +563,16 @@ function destination_label($type, $sequence){
 //TODO: Create more generic functions for popup that would wrap around
 //code or text. ex startHover, endHover
 function destination_label_popup($type, $sequence, $f, $s, $itemname){
-	$label = fetch_labels($type, $sequence);
+	$label = destination_label($type, $sequence);
 
-	//TODO replace this with prototip
-	if (trim($label)) {
-		$hover = ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-		$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	} else {
-		$hover = "";
-	}
 
-	?><div <?=$hover?>><?
-	NewFormItem($f, $s, $itemname, "checkbox", 0, 1);
-	?></div><?
+	if (!isset($GLOBALS['TIPS']))
+		$GLOBALS['TIPS'] = array();
+	$tipid = "tip_" . count($GLOBALS['TIPS']);
 
-	if (trim($label))
-		echo '<div class="hoverhelp">' . escapehtml($label) . '</div>';
+	$GLOBALS['TIPS'][] = array($tipid,$label); //navbotom.inc will load these for us
 
-}
-
-function destination_label_popup_paragraph($type){
-	$maxphones = getSystemSetting("maxphones", 3);
-	$maxemails = getSystemSetting("maxemails", 2);
-	$maxsms = getSystemSetting("maxsms", 2);
-
-	$labels = array();
-	$max = "max" . $type;
-	if($type != "sms")
-		$max .= "s";
-	for($i = 0; $i < $$max; $i++){
-		$labels[] = escapehtml(destination_label($type, $i));
-	}
-	$labels = implode(",<br>", $labels);
-	
-	//TODO replace this with prototip
-	$hover = '<span>';
-	$hover .= '<div class="destlabel"';
-	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	$hover .= '>&nbsp;' . format_delivery_type($type) . '&nbsp;</div><div class="hoverhelp">' . $labels . '</div></span>';
-	return $hover;
-
+	NewFormItem($f, $s, $itemname, "checkbox", 0, 1, 'id="'.$tipid.'"');
 }
 
 function getBrand(){

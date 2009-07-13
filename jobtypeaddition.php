@@ -180,7 +180,7 @@ startWindow("Add a Job Type");
 								if($index == 'sms' && !getSystemSetting('_hassms', false)) continue;
 ?>
 								<tr>
-									<td class="bottomBorder"><?=destination_label_popup_paragraph($index)?></td>
+									<th class="bottomBorder"><?=format_delivery_type($index)?></th>
 <?
 										for($i=0; $i < $maxcolumns; $i++){
 											?><td class="bottomBorder" align="center"><?
@@ -212,7 +212,7 @@ startWindow("Add a Job Type");
 									continue;
 ?>
 								<tr>
-									<td class="bottomBorder"><?=destination_label_popup_paragraph($index)?></td>
+									<th class="bottomBorder"><?=format_delivery_type($index)?></th>
 <?
 									for($i=0; $i < $maxcolumns; $i++){
 										?><td class="bottomBorder" align="center"><?

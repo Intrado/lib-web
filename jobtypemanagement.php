@@ -308,7 +308,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 ?>
 				</tr>
 				<tr>
-					<td class="bottomBorder"><?=destination_label_popup_paragraph("phone")?></td>
+					<th class="bottomBorder">Phone</th>
 <?
 						for($i=0; $i < $maxcolumns; $i++){
 							?><td class="bottomBorder" align="center"><?
@@ -322,7 +322,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 ?>
 				</tr>
 				<tr>
-					<td class="bottomBorder"><?=destination_label_popup_paragraph("email")?></td>
+					<th class="bottomBorder">Email</th>
 <?
 						for($i=0; $i < $maxcolumns; $i++){
 							?><td class="bottomBorder" align="center"><?
@@ -340,7 +340,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 					if(!((isset($type) && $type->issurvey) || $jobtypeid == "_newsurvey_")){
 ?>
 					<tr>
-						<td class="bottomBorder"><?=destination_label_popup_paragraph("sms")?></td>
+						<th class="bottomBorder">SMS</th>
 <?
 							for($i=0; $i < $maxcolumns; $i++){
 								?><td class="bottomBorder" align="center"><?
