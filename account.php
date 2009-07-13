@@ -303,7 +303,8 @@ $formdata["calllate"] = array(
 	"helpstep" => 2
 );
 
-$usercallmax = $USER->getSetting("callmax", $ACCESS->getValue('callmax'));
+$callmax = $ACCESS->getValue('callmax');
+$usercallmax = $USER->getSetting("callmax", 3);
 $formdata["callmax"] = array(
 	"label" => _L("Call Attempts"),
 	"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
@@ -311,7 +312,7 @@ $formdata["callmax"] = array(
 	"validators" => array(
 		array("ValInArray", "values" => range(1,first($ACCESS->getValue('callmax'), 1)))
 	),
-	"control" => array("SelectMenu", "values"=>array_combine(range(1,first($ACCESS->getValue('callmax'), 1)),range(1,first($ACCESS->getValue('callmax'), 1)))),
+	"control" => array("SelectMenu", "values"=>array_combine(range(1,first($callmax, 1)),range(1,first($callmax, 1)))),
 	"helpstep" => 2
 );
 
