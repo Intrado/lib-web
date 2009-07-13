@@ -12,6 +12,10 @@ class MessageBody extends FormItem {
 						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50" />'.escapehtml($value).'</textarea>	';
 	if(!isset($this->args['playbutton']) || $this->args['playbutton'] === true) {
 		$str .= 		icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "').getValue();
+																	if(content.length > 4000) {
+																		alert('The preview will only render audio from the first 4000 characters.');
+																		content = content.substr(0,4000);
+																	}
 																	var language = $('" . $this->form->name . "_language').getValue();
 																	var voice = 'Female';
 																	if($('" . $this->form->name . "_voice-2').checked) {
