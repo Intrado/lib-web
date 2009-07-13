@@ -81,11 +81,8 @@ class FinishJobWizard extends WizFinish {
 }
 
 $wizard = new Wizard("wizard_job",$wizdata, new FinishJobWizard("Finish"));
+$wizard->doneurl = "start.php";
 $wizard->handlerequest();
-
-if ($wizard->isDone()) {
-	exit("All Done!");
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
