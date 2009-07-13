@@ -56,21 +56,32 @@ class TextAreaPhone extends FormItem {
 						popup(\'previewmessage.php?text=\' + encodedtext + \'&language='.urlencode($this->args['language']).'&gender=\'+ gender, 400, 400);
 					}
 				});
-				$("'.$n.'-textarea").observe("blur", function(e) {
-					var val = $("'.$n.'").value.evalJSON();
-					val.text = $("'.$n.'-textarea").value;
-					$("'.$n.'").value = Object.toJSON(val);
-				});
-				$("'.$n.'-female").observe("click", function(e) {
-					var val = $("'.$n.'").value.evalJSON();
-					val.gender = ($("'.$n.'-female").checked?"female":"male");
-					$("'.$n.'").value = Object.toJSON(val);
-				});
-				$("'.$n.'-male").observe("click", function(e) {
-					var val = $("'.$n.'").value.evalJSON();
-					val.gender = ($("'.$n.'-female").checked?"female":"male");
-					$("'.$n.'").value = Object.toJSON(val);
-				});
+				$("'.$n.'-textarea").observe("blur", '.$n.'_storedata);
+				$("'.$n.'-textarea").observe("keyup", '.$n.'_storedata);
+				$("'.$n.'-female").observe("click", '.$n.'_storedata);
+				$("'.$n.'-male").observe("click", '.$n.'_storedata);
+				
+				function '.$n.'_storedata(event) {
+					var form = event.findElement("form");
+					var formvars = document.formvars[form.name];
+					var e = event.element();
+					var formitem = $("'.$n.'");
+					if (formvars.keyuptimer) {
+						if (formvars.keyupelement == e)
+							window.clearTimeout(formvars.keyuptimer);
+					}
+					formvars.keyupelement = e;
+					formvars.keyuptimer = window.setTimeout(function () {
+							var val = formitem.value.evalJSON();
+							val.text = $("'.$n.'-textarea").value;
+							val.gender = ($("'.$n.'-female").checked?"female":"male");
+							formitem.value = Object.toJSON(val);
+							form_do_validation(form, formitem);
+							formvars.keyuptimer = null;
+						},
+						event.type == "keyup" ? 1000 : 200
+					);
+				}
 			</script>
 		';
 		return $str;
@@ -135,24 +146,6 @@ class ValHasMessage extends Validator {
 	}
 }
 
-class ValContactListMethod extends Validator {
-	function validate ($value, $args) {
-		if ($value == 'pick')
-			return true;
-		return "$this->label cannot be of a complex type for the wizard. If you would like to create one go to Notifications > Lists and then return here.";		
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args) {
-				if (value == "pick")
-						return true;
-				
-				return label + " cannot be of a complex type for the wizard. If you would like to create one go to Notifications > Lists and then return here.";
-			}';
-	}
-}
-
 class ValEasycall extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
@@ -197,6 +190,26 @@ class ValLists extends Validator {
 		return true;
 	}
 }
+
+class ValTextAreaPhone extends Validator {
+	function validate ($value, $args) {
+		$msgdata = json_decode($value);
+		if (!mb_strlen($msgdata->text))
+			return $this->label." "._L("cannot be blank.");
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				var msgdata = value.evalJSON();
+				if (!msgdata.text.length)
+					return label + " '.addslashes(_L('cannot be blank.')).'";
+				return true;
+			}';
+	}
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
@@ -463,7 +476,8 @@ class JobWiz_messagePhoneText extends WizStep {
 				"fieldhelp" => _L("This text will be converted to a voice and read over the phone."),
 				"value" => '{"gender": "female", "text": ""}',
 				"validators" => array(
-					array("ValRequired")
+					array("ValRequired"),
+					array("ValTextAreaPhone")
 				),
 				"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"english","voice"=>"female"),
 				"helpstep" => 1
@@ -603,7 +617,10 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		global $USER;
 		if (!$USER->authorize("sendphone" || !$USER->authorize("sendmulti")))
 			return false;
-		if (isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
+		if ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) && 
+				isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
+		) 
 			return true;
 		else
 			return false;
@@ -622,7 +639,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 					$langs[] = $syslangs[$langid]->name;
 		}
 		$formdata = array(_L("Record"));
-		$formdata["callme"] = array(
+		$formdata["message"] = array(
 			"label" => _L("Messages"),
 			"fieldhelp" => _L("Use the Language box to select the recorded language you wish to add to your notification. Enter a phone number and hit the Call Me To Record button to receive a phone call that will guide you through the process of attaching the selected language"),
 			"value" => "",
@@ -869,11 +886,14 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		global $USER;
 		if (!$USER->authorize("sendmulti") || !$USER->authorize("sendemail"))
 			return false;
-		if (isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) {
+		if ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) && 
+				isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
+		)
 			return true;
-		} else {
+		else
 			return false;
-		}
 	}
 }
 
@@ -923,31 +943,30 @@ class JobWiz_messageSmsChoose extends WizStep {
 
 class JobWiz_messageSmsText extends WizStep {
 	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
-		$text = "";
-		$helpstepnum = 1;
 		if (isset($postdata['/message/phone/text'])) {
-			if (isset($postdata['/message/phone/text']['message']))
-				$text = $postdata['/message/phone/text']['message'];
+			if (isset($postdata['/message/phone/text']['message'])) {
+				$msgdata = json_decode($postdata['/message/phone/text']['message']);
+				$text = $msgdata->text;
+			}
 		} else if (isset($postdata['/message/email/text'])) {
 			if (isset($postdata['/message/email/text']['message']))
 				$text = $postdata['/message/email/text']['message'];
-		}
+		} else 
+			$text = "";
+
+		// Form Fields.
+		$formdata = array(_L('Compose Txt'));
+		$helpsteps = array(_L("Enter the message you wish to deliver via Text Message."));
 		$formdata["message"] = array(
-			"label" => _L("SMS Message"),
+			"label" => _L("Text Message"),
 			"value" => $text,
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max"=>160)
 			),
-			"control" => array("TextArea","rows"=>10,"counter"=>160),
-			"helpstep" => $helpstepnum
+			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160),
+			"helpstep" => 1
 		);
-		$helpsteps[$helpstepnum++] = _L("Enter your message text here.");
-
-		// TODO: Need custom formItem for SMS message with character counter
 
 		return new Form("messageSmsText",$formdata,$helpsteps);
 	}
@@ -969,6 +988,8 @@ class JobWiz_messageSmsText extends WizStep {
 
 class JobWiz_scheduleOptions extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER;
+		global $ACCESS;
 		// Form Fields.
 		$formdata = array('Schedule Options');
 		$helpsteps = array(_L("Select when to send this message."));
@@ -997,13 +1018,26 @@ class JobWiz_scheduleOptions extends WizStep {
 			"helpstep" => 2
 		);
 		
-		// TODO: Only for phone calls
-		$helpsteps[] = _L("Number of times to try un-answered or failed phone calls.");
-		$formdata["callmax"] = array(
-			"label" => _L("Call Attempts"),
-			"control" => array("FormHtml", "html" => "TODO: callmax"),
-			"helpstep" => 2
-		);
+		// Only for phone calls
+		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/phone/callme"]["/message/pick"]) && in_array('phone', $postdata["/message/phone/callme"]["/message/pick"]))
+		) {
+			$helpsteps[] = _L("This indicates the default number of times the system should try to call an individual number before considering the message undelivered.");
+			$callmax = $ACCESS->getValue('callmax');
+			$usercallmax = $USER->getSetting("callmax", 3);
+			$formdata["callmax"] = array(
+				"label" => _L("Call Attempts"),
+				"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
+				"value" => $usercallmax,
+				"validators" => array(
+					array("ValInArray", "values" => range(1,first($ACCESS->getValue('callmax'), 1)))
+				),
+				"control" => array("SelectMenu", "values"=>array_combine(range(1,first($callmax, 1)),range(1,first($callmax, 1)))),
+				"helpstep" => 2
+			);
+		}
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
 }
@@ -1012,7 +1046,6 @@ class JobWiz_scheduleDate extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
-		$maxjobdays = $ACCESS->getValue("maxjobdays");
 		// Form Fields.
 		$formdata = array(_L('Schedule Date/Time'));
 		if ($postdata['/schedule/options']['schedule'] == "schedule") {
@@ -1029,38 +1062,44 @@ class JobWiz_scheduleDate extends WizStep {
 			$helpsteps = array();
 		}
 
-		// TODO: If a phone delivery is not included. don't do these
-		$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
-		$formdata["days"] = array(
-			"label" => _L("Days to run"),
-			"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
-			"validators" => array(),
-			"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
-			"helpstep" => 2
-		);
-		
 		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
-		$formdata["deliverywindow"] = array(
-			"label" => _L("Delivery Window"),
-			"control" => array("FormHtml", "html" => ""),
+		$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
+		$formdata["callearly"] = array(
+			"label" => _L("Start Time"),
+			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
+			"value" => $USER->getCallEarly(),
+			"validators" => array(
+			),
+			"control" => array("SelectMenu", "values"=>$startvalues),
 			"helpstep" => 2
 		);
-		$formdata["starttime"] = array(
-			"label" => _L("Earliest"),
-			"fieldhelp" => _L("Notification will begin at the selected time."),
-			"value" => "now",
-			"validators" => array(),
-			"control" => array("FormHtml", "html" => "NEED TIME PICKER"),
+		$endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
+		$formdata["calllate"] = array(
+			"label" => _L("End Time"),
+			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
+			"value" => $USER->getCallLate(),
+			"validators" => array(
+			),
+			"control" => array("SelectMenu", "values"=>$endvalues),
 			"helpstep" => 2
 		);
-		$formdata["endtime"] = array(
-			"label" => _L("Latest"),
-			"fieldhelp" => _L("Notification will end at the selected time."),
-			"value" => "now",
-			"validators" => array(),
-			"control" => array("FormHtml", "html" => "NEED TIME PICKER"),
-			"helpstep" => 2
-		);
+		// Only for phone calls
+		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/phone/callme"]["/message/pick"]) && in_array('phone', $postdata["/message/phone/callme"]["/message/pick"]))
+		) {
+			$maxjobdays = $ACCESS->getValue("maxjobdays");
+			$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
+			$formdata["days"] = array(
+				"label" => _L("Days to run"),
+				"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
+				"validators" => array(),
+				"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
+				"helpstep" => 2
+			);
+		}
+
 		return new Form("scheduleDate",$formdata,$helpsteps);
 	}
 	
