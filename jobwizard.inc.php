@@ -51,7 +51,7 @@ class TextAreaPhone extends FormItem {
 				$("'.$n.'-play").observe("click", function(e) {
 					var val = $("'.$n.'-textarea").value;
 					if(val.length > 4000) {
-						alert("The preview will only render audio from the first 4000 characters.")
+						alert("The preview will only render audio from the first 4000 characters.");
 						val = val.substr(0,4000);
 					}
 					var gender = ($("'.$n.'-female").checked?"female":"male");
