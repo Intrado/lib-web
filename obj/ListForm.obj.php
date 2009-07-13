@@ -72,11 +72,16 @@ class ListForm extends Form {
 			
 			<table id='listFormWorkspace' width='100%' style='clear:both'>
 				<tr>
+					<td colspan=3>
+						<h2 style=\"padding-left: 5px; background: repeat-x url('img/header_bg.gif')\">"._L('List')."</h2>
+					</td>
+				</tr>
+				<tr>
 					<!-- MAIN CONTENT AREA -->
 					
 					<td valign=top width='70%'>
-						<div id='pageLoadingWindow'>"._L('Please wait while the page is loaded')."</div>
 						
+						<div id='pageLoadingWindow'>"._L('Please wait while the page is loaded')."</div>
 						<fieldset id='AllLists' style='margin:0; padding:0; margin-bottom:10px;'>
 							<div style='border: solid 2px lightgray; padding: 5px; margin: 5px; margin-top: 0;'>
 								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" ')."
