@@ -436,11 +436,6 @@ div.scrollTableContainer {
 	border: 1px solid <?=$theme2?>;
 }
 
-.hoverhelp {
-	padding: 5px;
-	font-size: 10px;
-	font-weight: normal;
-}
 
 .hoverhelpicon {
 	margin-left: 5px;
