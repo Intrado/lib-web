@@ -81,7 +81,7 @@ class ValTemplateItem extends Validator {
 
 $formdata = array(
 	_L('Template Section 1'), // Optional
-	"textfield" => array(
+	"templatetextfield" => array(
 		"label" => _L('TextField'),
 		"value" => "",
 		"validators" => array(
@@ -91,7 +91,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	_L('Template Section 2'), // Optional
-	"checkbox" => array(
+	"templatecheckbox" => array(
 		"label" => _L('Checkbox'),
 		"value" => false,
 		"validators" => array(
@@ -136,8 +136,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN")
 		
 		//save data here	
+		
+		
+		Query("COMMIT");
 		if ($ajax)
 			$form->sendTo("start.php");
 		else
@@ -149,7 +153,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_somefield ($obj, $field) {
+function fmt_template ($obj, $field) {
 	return $obj->$field;
 }
 
