@@ -36,7 +36,7 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 }
 
 $wizdata = array(
-	"start" => new JobWiz_start(_L("Start")),
+	"start" => new JobWiz_start(_L("Welcome")),
 	"list" => new JobWiz_listChoose(_L("List")),
 	"message" => new WizSection("Message",array(
 		"pick" => new JobWiz_messageType(_L("Delivery Methods")),
@@ -59,7 +59,7 @@ $wizdata = array(
 	)),
 	"schedule" => new WizSection ("Schedule",array(
 		"options" => new JobWiz_scheduleOptions(_L("Schedule Options")),
-		"date" => new JobWiz_scheduleDate(_L("Schedule Date")),
+		"date" => new JobWiz_scheduleDate(_L("Schedule Date/Time")),
 		"template" => new JobWiz_scheduleTemplate(_L("Template"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
@@ -99,14 +99,14 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">	
-<? Validator::load_validators(array("ValInArray","ValHasMessage","ValContactListMethod","ValEasycall","ValLists","ValTranslation","ValEmailAttach"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray","ValHasMessage","ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 
 startWindow($wizard->getStepData()->title);
 echo $wizard->render();
 endWindow();
-if (false) {
+if (true) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['wizard_job']);
