@@ -135,22 +135,22 @@ if($emergencyintro) {
 }
 
 $formdata = array(
-	"Required Intro",
+	"Default Intro",
 	"defaultmessage" => array(
-		"label" => _L("Default Intro"),
+		"label" => _L("General"),
 		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
 		"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
-		"validators" => array(array("ValIntroSelect")),
+		"validators" => array(),
 		"control" => array("IntroSelect",
 			 "values"=>$defaultmessages
 		),
 		"helpstep" => 1
 	),
 	"emergencymessage" => array(
-		"label" => _L("Emergency Intro"),
+		"label" => _L("Emergency"),
 		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
 		"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
-		"validators" => array(array("ValIntroSelect")),
+		"validators" => array(),
 		"control" => array("IntroSelect",
 			 "values"=>$emergencymessages
 		),
@@ -171,9 +171,9 @@ foreach($languages as $language) {
 		$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
 		$messageid = $defaultintro->id;
 	}
-	$formdata[] = $language; // New section for each language
+	$formdata[] = $language . " " . _L("Intro"); // New section for each language
 	$formdata[$language . "default"] = array(
-		"label" => _L("Default"),
+		"label" => _L("General"),
 		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
 		"value" => array("message" => $messageid),
 		"validators" => array(),
@@ -205,7 +205,7 @@ foreach($languages as $language) {
 }
 
 $helpsteps = array (
-	_L('This message will play before all non-emergency messages.').'<br><br> '._L('The best intro messages include a brief greeting and notify the recipient that they can:').' <ul><li>'._L('Press pound to put the message on hold.').'</ul>'
+	_L('This message will play before all messages.').'<br><br> '._L('The best intro messages include a brief greeting and notify the recipient that they can:').' <ul><li>'._L('Press pound to put the message on hold.').'</ul>'
 );
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
@@ -231,57 +231,62 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		$messagevalues = json_decode($postdata['defaultmessage']);
-		$msgid = $messagevalues->message + 0;
-		$newmsg = new Message($msgid);
-		if(!$newmsg->deleted) {// if deleted the old value is still the intro
-			$newmsg->id = null;
-			$newmsg->deleted = 1;
-			$newmsg->name = $newmsg->name . " (Default Intro Copy)";	
-			$newmsg->create();
-			// copy the parts
-			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-			foreach ($parts as $part) {
-				$newpart = new MessagePart($part->id);
-				$newpart->id = null;
-				$newpart->messageid = $newmsg->id;
-				$newpart->create();
-			}
+		if(isset($messagevalues->message) && strlen($messagevalues->message) > 0) {
+			$msgid = $messagevalues->message + 0;
+			$newmsg = new Message($msgid);
+			if(!$newmsg->deleted) {		// if deleted the old value is still the intro
+				$newmsg->id = null;
+				$newmsg->deleted = 1;
+				$newmsg->name = $newmsg->name . " (Default General Intro Copy)";	
+				$newmsg->create();
+				// copy the parts
+				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+				foreach ($parts as $part) {
+					$newpart = new MessagePart($part->id);
+					$newpart->id = null;
+					$newpart->messageid = $newmsg->id;
+					$newpart->create();
+				}
+			} 
+			QuickUpdate("delete from prompt where type='intro' and language is null;insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
+		} else {
+			QuickUpdate("delete from prompt where type='intro' and language is null;");			
 		}
-		QuickUpdate("delete from prompt where type='intro' and language is null;insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
-
-		$emergencyvalues = json_decode($postdata['emergencymessage']);
-		$msgid = $emergencyvalues->message + 0;
-		$newmsg = new Message($msgid);
-		if(!$newmsg->deleted) {// if deleted the old value is still the intro
-			$newmsg->id = null;
-			$newmsg->deleted = 1;
-			$newmsg->name = $newmsg->name . " (Emergecny Intro Copy)";	
-			$newmsg->create();
-			// copy the parts
-			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-			foreach ($parts as $part) {
-				$newpart = new MessagePart($part->id);
-				$newpart->id = null;
-				$newpart->messageid = $newmsg->id;
-				$newpart->create();
-			}			
-		}
-		QuickUpdate("delete from prompt where type='emergencyintro' and language is null;insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
 		
-		foreach($languages as $language) {	
+		$emergencyvalues = json_decode($postdata['emergencymessage']);
+		if(isset($emergencyvalues->message) && strlen($emergencyvalues->message) > 0) {	
+			$msgid = $emergencyvalues->message + 0;
+			$newmsg = new Message($msgid);
+			if(!$newmsg->deleted) {// if deleted the old value is still the intro
+				$newmsg->id = null;
+				$newmsg->deleted = 1;
+				$newmsg->name = $newmsg->name . " (Default Emergecny Intro Copy)";	
+				$newmsg->create();
+				// copy the parts
+				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+				foreach ($parts as $part) {
+					$newpart = new MessagePart($part->id);
+					$newpart->id = null;
+					$newpart->messageid = $newmsg->id;
+					$newpart->create();
+				}			
+			}
+			QuickUpdate("delete from prompt where type='emergencyintro' and language is null;insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
+		} else {
+			QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
+		}
+		
+		foreach($languages as $language) {
+			$insertquery = "";
 			if(isset($postdata[$language . 'default'])) {				
 				$languagevalues = json_decode($postdata[$language . 'default']);
-				if(isset($languagevalues->message) && isset($languagevalues->language)) {
+				if(isset($languagevalues->message) && strlen($languagevalues->message) > 0) {
 					$msgid = $languagevalues->message + 0;
-					$languageid = $languagevalues->language + 0;
 					$newmsg = new Message($msgid);
-					if($newmsg->deleted)
-						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($language,$newmsg->id,$language));			
-					
-					else {
+					if(!$newmsg->deleted) {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
-						$newmsg->name = $newmsg->name . " ($language Default Intro Copy)";							
+						$newmsg->name = $newmsg->name . " ($language General Intro Copy)";							
 						$newmsg->create();
 						// copy the parts
 						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -291,20 +296,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$newpart->messageid = $newmsg->id;
 							$newpart->create();
 						}
-						QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($language,$newmsg->id,$language));			
 					}
+					QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($language,$newmsg->id,$language));
+				} else {
+					QuickUpdate("delete from prompt where type='intro' and language=?;",false,array($language));			
 				}
 			}	
-
+						
 			if(isset($postdata[$language . 'emergency'])) {				
 				$languagevalues = json_decode($postdata[$language . 'emergency']);
-				if(isset($languagevalues->message)) {
+				if(isset($languagevalues->message) && strlen($languagevalues->message) > 0) {
 					$msgid = $languagevalues->message + 0;
 					$newmsg = new Message($msgid);
-					if($newmsg->deleted)
-						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($language,$newmsg->id,$language));						
-										
-					else {
+					if(!$newmsg->deleted) {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
 						$newmsg->name = $newmsg->name . " ($language Emergecny Intro Copy)";													
@@ -317,8 +321,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$newpart->messageid = $newmsg->id;
 							$newpart->create();
 						}
-						QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($language,$newmsg->id,$language));						
 					}
+					QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($language,$newmsg->id,$language));
+				} else {
+					QuickUpdate("delete from prompt where type='emergencyintro' and language=?;",false,array($language));							
 				}
 			}	
 		}
