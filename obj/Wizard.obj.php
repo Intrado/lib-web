@@ -6,8 +6,8 @@ class Wizard {
 	var $steplist;
 	var $curstep;
 	var $datachange;
-	var $done;
 	var $finish;
+	var $doneurl = false;
 	
 	function Wizard ($name, $wizdata, $finish) {
 		$this->name = $name;
@@ -211,8 +211,11 @@ class Wizard {
 		
 		if ($stepdata instanceof WizStep)
 			$mainhtml = $this->getForm()->render();
-		else if ($stepdata instanceof WizFinish)
+		else if ($stepdata instanceof WizFinish) {
 			$mainhtml = $stepdata->getFinishPage($_SESSION[$this->name]['data']);
+			if ($this->doneurl)
+				$mainhtml .= icon_button(_L("Done"),"fugue/arrow_180",null, $this->doneurl);
+		}
 		
 		$res = '<table border="0" cellpadding="0" cellspacing="0" width="100%">
 					<tr>
@@ -225,11 +228,15 @@ class Wizard {
 	}
 	
 	function handleRequest () {
-		if (isset($_GET['cancel'])) {
+		if (isset($_GET['cancel']) || isset($_GET['new'])) {
 			unset($_SESSION[$this->name]);
-			$_SESSION[$this->name] = array("data" => array());
-			$_SESSION[$this->name]['step'] = $step = $this->steplist[0];
-			redirect("start.php");
+			if (isset($_GET['cancel']) && $this->doneurl) {
+				redirect($this->doneurl);
+			} else {
+				$_SESSION[$this->name] = array("data" => array());
+				$_SESSION[$this->name]['step'] = $step = $this->steplist[0];
+				redirect($_SERVER['SCRIPT_NAME']."?step=$step");
+			}
 		}
 		
 		if (isset($_GET['step'])) {
@@ -241,10 +248,6 @@ class Wizard {
 				$_SESSION[$this->name]['step'] = "/finish";
 				$this->setCurrentStep("/finish");
 			}
-		}
-		
-		if (isset($_GET['done'])) {
-			$this->done = true;
 		}
 		
 		$stepdata = $this->getStepData();
@@ -287,7 +290,11 @@ class Wizard {
 					
 					if ($ajax) {			
 						if ($button == "next") {
-							if ($next = $this->getNextStep()) {
+							$next = $this->getNextStep();
+							error_log("NEXT $next");
+							
+							
+							if ($next) {
 								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
 							} else {
 								//wizard is all done, save the data, lock out the session data, and go to the finish page
@@ -295,22 +302,18 @@ class Wizard {
 									$_SESSION[$this->name]['data']['finish'] = true;
 									$this->getStepData("finish")->finish($_SESSION[$this->name]['data']);
 								}
-								$form->sendTo("?step=/finish");
+								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=/finish");
 							}
 						} else if ($button == "prev") {
 							if ($next = $this->getPrevStep())
-								$form->sendTo("?step=$next");
+								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
 						}
 					}
 				}
 			}
 		}
 	}
-	
-	function isDone() {
-		return $this->done;
-	}
-	
+		
 	function dataChange() {
 		return $this->datachange;
 	}
