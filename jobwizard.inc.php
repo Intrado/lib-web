@@ -194,8 +194,12 @@ class ValLists extends Validator {
 class ValTextAreaPhone extends Validator {
 	function validate ($value, $args) {
 		$msgdata = json_decode($value);
-		if (!mb_strlen($msgdata->text))
+		$textlength = mb_strlen($msgdata->text);
+		if (!$textlength)
 			return $this->label." "._L("cannot be blank.");
+		else if ($textlength > 2000) {
+			return $this->label." "._L("cannot be more than 2000 characters.");		
+		}		
 		return true;
 	}
 	
@@ -203,8 +207,11 @@ class ValTextAreaPhone extends Validator {
 		return 
 			'function (name, label, value, args) {
 				var msgdata = value.evalJSON();
-				if (!msgdata.text.length)
+				var textlength = msgdata.text.length;
+				if (!textlength)
 					return label + " '.addslashes(_L('cannot be blank.')).'";
+				else if(textlength > 2000)
+					return label + " '.addslashes(_L('cannot be more than 2000 characters.')).'";			
 				return true;
 			}';
 	}
@@ -769,7 +776,8 @@ class JobWiz_messageEmailText extends WizStep {
 			"label" => _L("Email Message"),
 			"value" => $msgdata->text,
 			"validators" => array(
-				array("ValRequired")
+				array("ValRequired"),
+				array("ValLength","max" => 30000)
 			),
 			"control" => array("TextArea","rows"=>10,"cols"=>45),
 			"helpstep" => 4
@@ -826,6 +834,11 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		
 		$englishtext = isset($postdata['/message/email/text']['message'])?$postdata['/message/email/text']['message']:"";
 		
+		$warning = "";
+		if(mb_strlen($englishtext) > 4000) {
+			$warning = "<span style=\"color: red;\">Warning. Only the first 4000 characters are translated.</span><br />";
+		}
+			
 		if(!$translations) {
 			//Get available languages
 			$alllanguages = QuickQueryList("select name from language");
@@ -833,7 +846,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			$translations = translate_fromenglish($englishtext,$translationlanguages);
 		}
 		// Form Fields.
-		$formdata = array("Default Email Message");						
+		$formdata = array($warning . "Default Email Message");						
 		$formdata["Englishtext"] = array(
 			"label" => _L("English:"),
 			"control" => array("FormHtml","html"=>"<h3>$englishtext</h3><br />"),
