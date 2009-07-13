@@ -42,7 +42,7 @@ if (isset($_GET['delete'])) {
 function fmt_actions($row, $name) {
 	return action_links( array (
 		action_link ("Edit", "pencil", "addressedit.php?id=".$row[0]."&origin=".$_SESSION['addressesorigin']),
-		action_link ("Delete", "cross", "?delete=".$row[0]),
+		action_link ("Delete", "cross", "?delete=".$row[0],"return confirmDelete();"),
 	));
 }
 
