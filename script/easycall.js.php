@@ -58,12 +58,7 @@ var Easycall = Class.create({
 	},
 	handleStart: function(transport) {
 		var response = transport.responseJSON;
-		new Tip($(this.formitemname+this.language+"_img"), "<?=addslashes(_L("This message is currently recording via a phone session. Listen carefuly to the promts on your phone to save this message."))?>", {
-			style: "protogrey",
-			stem: "bottomLeft",
-			hook: { tip: "bottomLeft", mouse: true },
-			offset: { x: 10, y: 0 }
-		});
+		form_do_hover(("{\""+this.formitemname+this.language+"_img\": \"<?=addslashes(_L('This message is currently recording via a phone session. Listen carefuly to the promts on your phone to save this message.'))?>\"}").evalJSON());
 		if (response && !response.error) {
 			this.specialtask = response.id;
 			this.update();
@@ -110,7 +105,7 @@ var Easycall = Class.create({
 		switch(error) {
 			case "done":
 				$(this.formitemname+"progress_img").src = this.acceptedimg;
-				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Completed!"))?><br><p><?=addslashes(_L("If you would like to record in an additional language, select it above and click the Call Me To Record button."))?><p>";
+				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Completed!"))?><p><?=addslashes(_L("If you would like to record in an additional language, select it above and click the Call Me To Record button."))?><p>";
 				break;
 			
 			case "callended":
@@ -210,31 +205,16 @@ var Easycall = Class.create({
 		$(this.formitemname).value = Object.toJSON(messages);
 		if (this.messageid) {
 			$(this.formitemname+this.language+"_img").src = this.playimg;
-			new Tip($(this.formitemname+this.language+"_img"), "<?=addslashes(_L("Click here to preview this recording. If you want to re-record it, select the language above and click the Call Me To Record button."))?>", {
-				style: "protogrey",
-				stem: "bottomLeft",
-				hook: { tip: "bottomLeft", mouse: true },
-				offset: { x: 10, y: 0 }
-			});
+			form_do_hover(("{\""+this.formitemname+this.language+"_img\": \"<?=addslashes(_L('Click here to preview this recording. If you want to re-record it, select the language above and click the Call Me To Record button.'))?>\"}").evalJSON());
 			$(this.formitemname+this.language+"_img").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
 		} else {
 			$(this.formitemname+this.language+"_img").src = this.exclamationimg;
-			new Tip($(this.formitemname+this.language+"_img"), "<?=addslashes(_L("This message has not been recorded. Enter a phone number above and click the Call Me To Record button."))?>", {
-				style: "protogrey",
-				stem: "bottomLeft",
-				hook: { tip: "bottomLeft", mouse: true },
-				offset: { x: 10, y: 0 }
-			});
+			form_do_hover(("{\""+this.formitemname+this.language+"_img\": \"<?=addslashes(_L('This message has not been recorded. Enter a phone number above and click the Call Me To Record button.'))?>\"}").evalJSON());
 		}
 		
 		if (this.language !== this.required) {
 			$(this.formitemname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\"><?=addslashes(_L("Remove"))?></div>");
-			new Tip($(this.formitemname+this.language+"_remove"), "<?=addslashes(_L("Cannot remove a message while record session in progress."))?>", {
-				style: "protogrey",
-				stem: "bottomLeft",
-				hook: { tip: "bottomLeft", mouse: true },
-				offset: { x: 10, y: 0 }
-			});
+			form_do_hover(("{\""+this.formitemname+this.language+"_remove\": \"<?=addslashes(_L('Cannot remove a message while record session in progress.'))?>\"}").evalJSON());
 		} else {
 			$(this.formitemname+this.language+"_remove").update("");
 		}
