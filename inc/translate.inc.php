@@ -18,8 +18,13 @@ function googletranslate($text, $lang_pairs) {
 		} else {
 			$referer = $_SERVER["HTTP_REFERER"];
 		}
-				
-		$context_options = array ('http' => array ('method' => 'POST','header'=> "Referer: $referer",'content' => $text . $lang_pairs));
+		$content = $text . $lang_pairs;
+    	if(strlen($content) > 4800){
+    		error_log("Request is too large to send to Google");
+    		return false;
+    	}
+
+		$context_options = array ('http' => array ('method' => 'POST','header'=> "Referer: $referer",'content' => $content));
 		$context = stream_context_create($context_options);
 		$fp = @fopen($url, 'rb', false, $context);
 		if (!$fp) {
@@ -62,6 +67,11 @@ function translate_fromenglish($englishtext,$languagearray) {
 
 	$src_text = $englishtext;
 
+	if(mb_strlen($src_text) > 4000) {//Cap translation
+		error_log("Request is too large to send to Google, Cap at 4000");
+    	$src_text = mb_substr($src_text,0,4000);
+	}
+	
 	$destinationlanguages = array();
 	foreach($languagearray as $language) {
 		$destinationlanguages[] = $language;
@@ -93,6 +103,12 @@ function translate_toenglish($anytext,$anylanguage) {
 	$supportedlanguages = getSupportedLanguages();
 	$language = $anylanguage;
 	$text = $anytext;
+
+	if(mb_strlen($text) > 4000) {//Cap translation
+		error_log("Request is too large to send to Google, Cap at 4000");
+    	$text = mb_substr($text,0,4000);
+	}
+	
 	$language = strtolower($language);
 	if(array_key_exists($language,$supportedlanguages)) {
 		$text = "&q=" . urlencode($text);
