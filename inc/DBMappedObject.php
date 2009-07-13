@@ -87,15 +87,29 @@ class DBMappedObject {
 		$query = "insert into " . $this->_tablename . " ("
 				. $this->getFieldList(false, $specificfields) . ") "
 				."values (";
-		
-		$values = $this->getValueArray(false, $specificfields);		
-		for ($i=0; $i<count($values)-1; $i++) {
-			$query .= "?,";
+		$i = 0;
+		$vals = array();
+		foreach ($specificfields as $name) {
+			$i++;
+			if ($this->$name === NULL) {
+				if ($this->_allownulls) {
+					$query .= "NULL";
+				} else {
+					$query .= "''";
+				}
+			} else {
+				$query .= "?";
+				$vals[] = $this->$name;
+			}
+			if ($i == count($specificfields)) {
+				$query .= ")";
+			} else {
+				$query .= ",";
+			}
 		}
-		$query .= "?)";
 				
 		$this->_lastsql = $query;
-		if ($result = Query($query, false, $values)) {
+		if ($result = Query($query, false, $vals)) {
 			$this->id = $_dbcon->lastInsertId();
 		} else {
 			return false;
@@ -187,17 +201,26 @@ class DBMappedObject {
 
 			//make an array of name=value pairs
 			$list = array();
+			$vals = array();
 			foreach ($specificfields as $name) {
+				if ($this->$name === NULL) {
+					if ($this->_allownulls) {
+						$list[] = "`$name`=NULL";
+					} else {
+						$list[] = "`$name`=''";
+					}
+				} else {
+					$vals[] = $this->$name;
 					$list[] = "`$name`=?";
+				}
 			}
-			$values = $this->getValueArray(false, $specificfields);
-			$values[] = $this->id;
+			$vals[] = $this->id;
 
 			//put them into an update list
 			$query .= implode(",", $list);
 			$query .= " where id=?";
 			$this->_lastsql = $query;
-			if ($result = Query($query, false, $values)) {
+			if ($result = Query($query, false, $vals)) {
 				if ($result->rowCount())
 					$isupdated = true;
 			}
@@ -239,38 +262,7 @@ class DBMappedObject {
 			$this->id = 0;
 		}
 	}
-
-	//returns values (excluding id or not) optonally escaped and quoted
-	function getValueArray ($prepfordb = true, $specificfields = NULL, $includeid = false) {
-		$fieldlist = ($specificfields == NULL) ? $this->_fieldlist : $specificfields;
-
-		if ($includeid) {
-			$fieldlist = array_merge(array("id"),$fieldlist);
-		}
-
-		$values = array();
-		foreach ($fieldlist as $name) {
-			//check add this name if we have no specificfields
-			//or it is in the specific fields
-
-			if ($prepfordb) {
-				if ($this->_allownulls && $this->$name === NULL)
-					$values[] = "NULL";
-				else
-					$values[] = "'" . DBSafe($this->$name) . "'";
-			} else {
-				$values[] = $this->$name;
-			}
-
-		}
-
-		return $values;
-	}
-
-	function getValueList ($specificfields = NULL) {
-		return implode(",", $this->getValueArray(true, $specificfields));
-	}
-
+	
 	function getFieldList ($includeid = false, $specificfields = NULL, $alias = false) {
 		$fieldlist = ($specificfields == NULL) ? $this->_fieldlist : $specificfields;
 		return generateFieldList($includeid, $fieldlist, $alias);

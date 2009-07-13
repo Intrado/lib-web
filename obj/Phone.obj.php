@@ -5,7 +5,7 @@ class Phone extends DBMappedObject {
 	var $personid;
 	var $phone;
 	var $sequence;
-	var $editlock = 0;
+	var $editlock;
 
 	function Phone ($id = NULL) {
 		$this->_tablename = "phone";
