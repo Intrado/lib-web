@@ -23,7 +23,10 @@ require_once("inc/common.inc.php");
     		$src_text = stripslashes($_POST['english']);
     	}
 
-	    $languagearray = explode(";",$languages);
+    	if(mb_strlen($src_text) > 4000) //Cap translation
+    		$src_text = mb_substr($src_text,0,4000);
+    	
+	    $languaarray = explode(";",$languages);
 
 		$destinationlanguages = array();
 		foreach($languagearray as $language) {
@@ -42,12 +45,14 @@ require_once("inc/common.inc.php");
     } elseif(isset($_POST['text']) && isset($_POST['language'])){
         $language = $_POST['language'];
     	$text = $_POST['text'];
+    	    	
     	if(get_magic_quotes_gpc()) {
     		$language = stripslashes($_POST['language']);
     		$text = stripslashes($_POST['text']);
     	}
-
-
+    	if(mb_strlen($text) > 4000) //Cap translation
+    		$text = mb_substr($text,0,4000);
+   
     	$language = strtolower($language);
     	if(array_key_exists($language,$supportedlanguages)) {
     		$text = "&q=" . urlencode($text);
@@ -70,7 +75,17 @@ require_once("inc/common.inc.php");
 		}
     }
     if($text != "" && $lang_pairs != "") {
-    	$context_options = array ('http' => array ('method' => 'POST','header'=> "Referer: $referer",'content' => $text . $lang_pairs));
+    	$content = $text . $lang_pairs;
+    	if(strlen($content) > 4800){
+    		error_log("Request is too large to send to Google");
+			$enc->responseData = "";
+    		$enc->responseDetails = NULL;
+    		$enc->responseStatus = 503;
+    		echo json_encode($enc);
+   			exit();
+    	}
+
+    	$context_options = array ('http' => array ('method' => 'POST','header'=> "Referer: $referer",'content' => $content));
 		$context = stream_context_create($context_options);
     	$fp = @fopen($url, 'rb', false, $context);
 		if (!$fp) {
