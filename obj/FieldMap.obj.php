@@ -185,7 +185,7 @@ class FieldMap extends DBMappedObject {
 
 			$fieldnum = $this->fieldnum;
 
-			$query = "delete from persondatavalues where fieldnum='$fieldnum '";
+			$query = "delete from persondatavalues where fieldnum='$fieldnum'";
 			QuickUpdate($query);
 
 			switch ($fieldnum[0]) {
