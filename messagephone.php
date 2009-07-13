@@ -121,6 +121,7 @@ $formdata = array(
 		"value" => $messagebody,
 		"validators" => array(
 			array("ValRequired"),
+			array("ValLength","max" => 4000),
 			array("ValMessageBody")
 		),
 		"control" => array("MessageBody", "audiofiles" => $audiofiles,"fields" => $insertfields),
