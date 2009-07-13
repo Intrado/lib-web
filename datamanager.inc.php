@@ -152,7 +152,6 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 				if ($isadd) {
 					$newfield = new FieldMap();
 					// Submit new item
-					$specialtype = GetFormData($form, $section, "newfield_specialtype");
 					$newfield->name = cleanedname(DBSafe(GetFormData($form, $section, "newfield_name")));
 					switch ($DATATYPE) {
 					case "person" :
@@ -166,10 +165,9 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 					break;
 					}
 					$newfield->fieldnum = $temp . GetFormData($form,$section,"newfield_fieldnum");
-					$newfield->options = (GetFormData($form, $section, "newfield_searchable") ? 'searchable,' : '') .
-										DBSafe(GetFormData($form, $section, "newfield_type") .
-										($specialtype ? ',' . DBSafe($specialtype) : ''));
-
+					if (GetFormData($form, $section, "newfield_searchable"))
+						$newfield->addOption('searchable');
+					$newfield->addOption(GetFormData($form, $section, "newfield_type"));
 					$newfield->update();
 				}
 
@@ -191,7 +189,9 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 							$fieldnum != FieldMap::getStaffField() ) {
 
 							// only update options for non-specialfield
-							$updatefield->options = ($searchable ? 'searchable,' : '') . $type;
+							$updatefield->addOption($type);
+							if ($searchable)
+								$updatefield->addOption('searchable');
 						}
 						$updatefield->update();
 					}
