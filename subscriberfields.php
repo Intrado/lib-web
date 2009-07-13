@@ -122,12 +122,16 @@ $TITLE = 'Self-Signup Fields';
 
 include_once("nav.inc.php");
 
-startWindow('Self-Signup Fields', null, true);
+startWindow('Subscriber Available Fields');
 showObjects($data, $titles, array("valtype" => "fmt_valtype", "values" => "fmt_values", "Actions" => "fmt_actions"), false, true);
 if (count($addfields) > 0) {
 	buttons(icon_button("Add Field",null,null,"subscriberfieldwiz.php"));
 } else {
-	echo "<BR>There are no remaining 'text' or 'list' field definitions.  To create more, return to the Admin Settings page.<BR><BR>";
+?>
+<div style="margin: 5px;">
+	<img src="img/bug_lightbulb.gif" > To configure additional self-signup fields you must first define a new 'Text' or 'List' system field from the Admin->Settings page.
+</div>
+<?
 }
 endWindow();
 

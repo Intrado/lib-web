@@ -37,9 +37,9 @@ if (isset($_GET['id'])) { // edit mode
 	$id = 0 + $_GET['id'];
 	$fieldmap = new FieldMap($id);
 			
-   	$formhtml = "<div>Editing Field ID ".$id."</div>";
+   	$formhtml = "<div>".$fieldmap->name."</div>";
    	$formdata["formhtml"] = array(
-   		"label" => "Field",
+   		"label" => _L("Field Name"),
    		"value" => "",
    		"validators" => array(    
    		),
@@ -55,7 +55,7 @@ $value = implode("\n", $staticvalues);
 if ($fieldmap->isOptionEnabled("multisearch")) {
 	// text area
 	$formdata["values"] = array(
-   		"label" => "Static Value(s)",
+   		"label" => _L("Field Value(s)"),
    		"value" => $value,
    		"validators" => array(
    			// TODO each line item separated by comma, max 255
@@ -66,7 +66,7 @@ if ($fieldmap->isOptionEnabled("multisearch")) {
 } else {
 	// text field
 	$formdata["values"] = array(
-   		"label" => "Static Value",
+   		"label" => _L("Field Value"),
    		"value" => $value,
    		"validators" => array(
             array("ValLength","max" => 255)
@@ -128,7 +128,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Self-Signup Field Value : ' . $fieldmap->name;
+$TITLE = 'Subscriber Field Value : ' . $fieldmap->name;
 
 include_once("nav.inc.php");
 

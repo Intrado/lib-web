@@ -31,7 +31,10 @@ if (!$USER->authorize('managesystem') && !getSystemSetting("_hasselfsignup", fal
 ////////////////////////////////////////////////////////////////////////////////
 
 $emaildomain = QuickQuery("select value from setting where name='emaildomain'");
-
+if ($emaildomain == "")
+	$emaildomain = "(no domain configured)";
+	
+	
 $formdata = array();
 
 $formdata["restrictdomain"] = array(
@@ -51,7 +54,7 @@ $formdata["domain"] = array(
         "helpstep" => 1
     );
 $formdata["requiresitecode"] = array(
-        "label" => _L("Require Site Access Code"),
+        "label" => _L("Require Site Access Code to Register"),
         "value" => getSystemSetting("subscriberauthcode", "0") ? true : false,
         "validators" => array(    
         ),
@@ -114,8 +117,13 @@ $TITLE = 'Self-Signup Settings';
 
 include_once("nav.inc.php");
 
-startWindow('Account Options', null, true);
+startWindow('Subscriber Options');
 echo $form->render();
+?>
+<div style="margin: 5px;">
+	<img src="img/bug_lightbulb.gif" > Contact Support to configure email domain.
+</div>
+<?
 endWindow();
 
 include_once("navbottom.inc.php");
