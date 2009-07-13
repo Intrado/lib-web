@@ -26,13 +26,21 @@ if (!$USER->authorize('manageaccount')) {
 /*CSDELETEMARKER_START*/
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
 $maxusers = getSystemSetting("_maxusers","unlimited");
+
+function is_sm_user($id) {
+	return QuickQuery("select count(*) from user where login='schoolmessenger' and id=?",false,array($id));
+}
 /*CSDELETEMARKER_END*/
 
 
 if (isset($_GET['resetpass'])) {
 	$maxreached = false;
-
+	$id = 0 + $_GET['enable'];
+	
 	/*CSDELETEMARKER_START*/
+	if (is_sm_user($id))
+		redirect();
+	
 	if(($maxusers != "unlimited") && $maxusers <= $usercount){
 		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
 		$maxreached = true;
@@ -40,7 +48,6 @@ if (isset($_GET['resetpass'])) {
 	/*CSDELETEMARKER_END*/
 
 	if(!$maxreached){
-		$id = 0 + $_GET['enable'];
 		QuickUpdate("update user set enabled = 1 where id = ?", false, array($id));
 
 		$usr = new User($id);
@@ -52,6 +59,11 @@ if (isset($_GET['resetpass'])) {
 
 if (isset($_GET['delete'])) {
 	$deleteid = 0 + $_GET['delete'];
+	/*CSDELETEMARKER_START*/
+	if (is_sm_user($deleteid))
+		redirect();
+	/*CSDELETEMARKER_END*/
+
 	if (isset($_SESSION['userid']) && $_SESSION['userid'] == $deleteid)
 		$_SESSION['userid'] = NULL;
 
@@ -64,6 +76,10 @@ if (isset($_GET['delete'])) {
 
 if (isset($_GET['disable'])) {
 	$id = 0 + $_GET['disable'];
+	/*CSDELETEMARKER_START*/
+	if (is_sm_user($id))
+		redirect();
+	/*CSDELETEMARKER_END*/
 	QuickUpdate("update user set enabled = 0 where id = ?", false, array($id));
 	redirect();
 }
