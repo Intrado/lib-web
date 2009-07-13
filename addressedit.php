@@ -511,8 +511,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "template:template";
-$TITLE = _L('template') . $_SESSION['addresseditid'];
+$PAGE = ($_SESSION['addresseditorigin'] == "nav") ? "start:addressbook" : "notifications:lists";
+$TITLE = escapehtml(_L('Address Book: %1$s %2$s', $personid ? $person->$fnamefield : _L("New Contact"), $personid ? $person->$lnamefield : ""));
 
 include_once("nav.inc.php");
 
@@ -523,7 +523,7 @@ include_once("nav.inc.php");
 </script>
 <?
 
-startWindow(_L('template'));
+startWindow(_L('Address Book Editor'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
