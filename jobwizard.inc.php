@@ -50,6 +50,10 @@ class TextAreaPhone extends FormItem {
 			<script type="text/javascript">
 				$("'.$n.'-play").observe("click", function(e) {
 					var val = $("'.$n.'-textarea").value;
+					if(val.length > 4000) {
+						alert("The preview will only render audio from the first 4000 characters.")
+						val = val.substr(0,4000);
+					}
 					var gender = ($("'.$n.'-female").checked?"female":"male");
 					if (val) {
 						var encodedtext = encodeURIComponent(val);
@@ -197,8 +201,8 @@ class ValTextAreaPhone extends Validator {
 		$textlength = mb_strlen($msgdata->text);
 		if (!$textlength)
 			return $this->label." "._L("cannot be blank.");
-		else if ($textlength > 2000) {
-			return $this->label." "._L("cannot be more than 2000 characters.");		
+		else if ($textlength > 4000) {
+			return $this->label." "._L("cannot be more than 4000 characters.");		
 		}		
 		return true;
 	}
@@ -210,8 +214,8 @@ class ValTextAreaPhone extends Validator {
 				var textlength = msgdata.text.length;
 				if (!textlength)
 					return label + " '.addslashes(_L('cannot be blank.')).'";
-				else if(textlength > 2000)
-					return label + " '.addslashes(_L('cannot be more than 2000 characters.')).'";			
+				else if(textlength > 4000)
+					return label + " '.addslashes(_L('cannot be more than 4000 characters.')).'";			
 				return true;
 			}';
 	}
