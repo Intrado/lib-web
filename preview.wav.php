@@ -13,7 +13,7 @@ include_once("obj/FieldMap.obj.php");
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 if(isset($_GET['id'])) {
-	$id = DBSafe($_GET['id']);
+	$id = $_GET['id'] + 0;
 	if (userOwns("message",$id) || $USER->authorize('managesystem')) {
 		$fields=array();
 		for($i=1; $i <= 20; $i++){
