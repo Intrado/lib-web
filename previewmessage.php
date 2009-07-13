@@ -177,8 +177,6 @@ if (count($formdata)) {
 					<br><a href="preview.wav.php/download_preview.wav?id='.$id.$previewdata.'&download=true">'._L("Click here to download").'</a>
 				</div>'
 			);
-			</script>
-			<?
 			return;
 		}
 	}
