@@ -15,7 +15,7 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 		$link = "";
 	}
 
-	$contents = '<div class="hoverhelp">' . nl2br($contents) . '</div>';
+	$contents = nl2br($contents);
 	
 	if (!isset($GLOBALS['TIPS']))
 		$GLOBALS['TIPS'] = array();
