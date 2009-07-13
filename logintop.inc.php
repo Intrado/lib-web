@@ -52,6 +52,52 @@ if (file_exists($logofilename) ) {
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title><?=$CustomBrand?> <?=$TITLE?></title>
+<script langauge="javascript">
+
+function capslockCheck(e){
+	var keypressed;
+	var shiftkey;
+
+	if(e.keyCode)
+		keypressed = e.keyCode;
+	else
+		keypressed = e.which;
+
+	if(e.shiftKey) {
+		shiftkey = true;
+	} else {
+		if(keypressed == 16) {
+			shiftkey = true;
+		} else {
+			shiftkey = false;
+		}
+	}
+	if(((keypressed >= 65 && keypressed <= 90) && !shiftkey) || ((keypressed >= 97 && keypressed <= 122) && shiftkey)){
+		new getObj('capslockwarning').style.display = 'block';
+	} else {
+		new getObj('capslockwarning').style.display = 'none';
+	}
+}
+
+function getObj(name)
+{
+  if (document.getElementById)
+  {
+	this.obj = document.getElementById(name);
+  }
+  else if (document.all)
+  {
+	this.obj = document.all[name];
+  }
+  else if (document.layers)
+  {
+	this.obj = document.layers[name];
+  }
+  if(this.obj)
+	this.style = this.obj.style;
+}
+
+</script>
 </head>
 <body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #<?=$primary?>;'>
 
