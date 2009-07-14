@@ -18,7 +18,7 @@ class DestWiz_whattype extends WizStep {
 
 		// TODO if sequence for phone or sms or email available, build the options
 		$formdata["whattype"] = array(
-        	"label" => "Communication Method",
+        	"label" => _L("Type"),
         	"value" => "",
         	"validators" => array(
 					array("ValRequired")
@@ -29,13 +29,8 @@ class DestWiz_whattype extends WizStep {
         								"email"=>"Email")),
         	"helpstep" => 1
 		);
-		
-		$helpsteps = array (
-			"Welcome",
-			"blah, blah"
-		);
-		
-		return new Form("whattype", $formdata, $helpsteps);
+// TODO why cannot remove "helpstep"		
+		return new Form("whattype", $formdata, null);
 	}
 }
 
@@ -73,12 +68,7 @@ class DestWiz_collectdata extends WizStep {
 		
 		}
 		
-		$helpsteps = array (
-			"Welcome",
-			"blah, blah"
-		);
-		
-		return new Form("collectdata", $formdata, $helpsteps);
+		return new Form("collectdata", $formdata, null);
 	}
 }
 
@@ -110,11 +100,11 @@ class FinishDestWizard extends WizFinish {
 
 
 $wizdata = array(
-	"whattype" => new DestWiz_whattype(_L("Add Destination")),
-	"collectdata" => new DestWiz_collectdata(_L("Provide Information"))
+	"whattype" => new DestWiz_whattype(_L("Select Type")),
+	"collectdata" => new DestWiz_collectdata(_L("Enter Contact Info"))
 	);
 
-$wizard = new Wizard("destwiz", $wizdata, new FinishDestWizard("Finish"));
+$wizard = new Wizard("destwiz", $wizdata, new FinishDestWizard("Activate"));
 $wizard->handleRequest();
 
 
@@ -122,7 +112,7 @@ $wizard->handleRequest();
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:notificationdests";
-$TITLE = _L("Destination Wizard");
+$TITLE = _L("Add Contact Information");
 
 require_once("nav.inc.php");
 

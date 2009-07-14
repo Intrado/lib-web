@@ -285,7 +285,7 @@ if (errors)
 				<td><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 			</tr>
 			<tr>
-				<td>Please complete this form to create your SUBSCRIBER account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
+				<td>Please complete this form to create your account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>

@@ -70,8 +70,6 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 		<td><div style="padding-left:5px; padding-bottom:5px;"><img src="logo.img.php" /></div></td>
 		<td>
 			<br>
-			<div style="padding-left:15px; font-size: 20px; font-weight: bold; color: #<?=$primary?>;"><?=$custname?></div>
-			<br>
 		</td>
 	</tr>
 	<tr style="background-color: #666666;">

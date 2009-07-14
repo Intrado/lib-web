@@ -108,7 +108,7 @@ foreach ($pendingList as $p) {
 }
 
 $titles = array(
-			"name" => _L("Destination"),
+			"name" => _L("Contact Information"),
 			"type" => _L("Type"),
 			"status" => _L("Status"),
 			"action" => _L("Actions")
@@ -156,7 +156,7 @@ foreach ($jobtypes as $jt) {
 $values = QuickQueryList("select jobtypeid from contactpref where personid=? and type='email' and sequence=0 and enabled=1", false, false, array($pid));
 
 $formdata["jobtypes"] = array(
-	"label" => _L("Communication Interests"),
+	"label" => _L(""),
 	"value" => $values,
 	"validators" => array(),
 	"control" => array("MultiCheckbox","values" => $jtvalues),
@@ -245,13 +245,13 @@ $TITLE = _L("Notification Preferences");
 
 require_once("nav.inc.php");
 
-startWindow(_L('Destinations'));
-echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency, I would like to receive information about the following:") . '</td></tr></table>';
+startWindow(_L('Interests'));
+echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency notifications, I would like to receive the following types of announcements:") . '</td></tr></table>';
 echo $form->render();
 showObjects($destinations, $titles, array("name"=>"fmt_name", "status"=>"fmt_status", "action" => "fmt_actions"));
 
 // TODO if room for another phone/email/sms
-	buttons(icon_button("Add Another",null,null,"destinationwizard.php"));
+	buttons(icon_button("Add More",null,null,"destinationwizard.php"));
 
 endWindow();
 require_once("navbottom.inc.php");
