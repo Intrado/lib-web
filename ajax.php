@@ -119,8 +119,7 @@ function handleRequest() {
 				$list = new PeopleList($id+0);
 				$renderedlist = new RenderedList($list);
 				$renderedlist->calcStats();
-				$stats[]= array(
-					'id' => $list->id,
+				$stats[$list->id]= array(
 					'name' => $list->name,
 					'advancedlist' => !$list->deleted || $renderedlist->totalremoved || $renderedlist->totaladded,
 					'totalremoved' => $renderedlist->totalremoved,

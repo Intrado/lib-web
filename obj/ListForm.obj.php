@@ -283,7 +283,7 @@ class ListForm extends Form {
 								return;
 							}
 							
-							var data = stats[0];
+							var data = stats[listID];
 							
 							var hiddenTD = $('listsTableBody').down('input[value=\"'+data.id+'\"]').up('td');
 							var nameTD = hiddenTD.next('td');
@@ -321,14 +321,13 @@ class ListForm extends Form {
 								alert('".addslashes(_L('No data available for this list, please check your internet connection and try again'))."');
 								return;
 							}
-							
-							for (var i = 0; i < stats.length; i++) {
-								var data = stats[i];
-								document.formvars['{$this->name}'].totals[data.id] = data.total;
+							Object.keys(stats).each(function (id) {
+								var data = stats[id];
+								document.formvars['{$this->name}'].totals[id] = data.total;
 								listform_update_grand_total();
 							
 								// Keep a hidden input field to keep track of id for this table row.
-								var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':data.id})).hide();
+								var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':id})).hide();
 								var nameTD = new Element('td', {'class':'List NameTD', 'style':'overflow: hidden; white-space: nowrap;'});
 								nameTD.insert(data.name);
 								var actionTD = new Element('td', {'class':'List ActionTD'});
@@ -379,7 +378,7 @@ class ListForm extends Form {
 											null,
 											false
 										);
-									}.bindAsEventListener(nameTD,data.id));
+									}.bindAsEventListener(nameTD,id));
 								}
 								var removeButton = actionTD.down('a');
 								removeButton.observe('click', function(event, listid) {
@@ -405,12 +404,12 @@ class ListForm extends Form {
 									}
 									document.formvars['{$this->name}'].totals[listid] = 0;
 									listform_update_grand_total();
-								}.bindAsEventListener(actionTD,data.id));
+								}.bindAsEventListener(actionTD,id));
 								
 								// Mark this list as 'added' so that the list selectbox no longer shows this list as an option.
-								if (document.formvars['{$this->name}'].existingLists && document.formvars['{$this->name}'].existingLists[data.id])
-									document.formvars['{$this->name}'].existingLists[data.id].added = true;
-							}
+								if (document.formvars['{$this->name}'].existingLists && document.formvars['{$this->name}'].existingLists[id])
+									document.formvars['{$this->name}'].existingLists[id].added = true;
+							}.bind(this));
 							listform_reset_list_selectbox();
 							$('pageLoadingWindow').hide();
 							listform_refresh_guide(true);
