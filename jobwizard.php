@@ -36,7 +36,7 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 }
 
 $wizdata = array(
-	"start" => new JobWiz_start(_L("Welcome")),
+	"start" => new JobWiz_start(_L("Job Type")),
 	"list" => new JobWiz_listChoose(_L("List")),
 	"message" => new WizSection("Message",array(
 		"pick" => new JobWiz_messageType(_L("Delivery Methods")),
@@ -63,7 +63,6 @@ $wizdata = array(
 		"template" => new JobWiz_scheduleTemplate(_L("Template"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
-		"test" => new JobWiz_submitTest(_L("Test Notification")),
 		"confirm" => new JobWiz_submitConfirm(_L("Review and Confirm"))
 	))
 );
