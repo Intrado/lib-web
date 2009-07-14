@@ -507,6 +507,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$edituser->enabled = 1;
 		}
 		
+		Query("BEGIN");
+
 		if (!$readonly) {
 			$edituser->firstname = $postdata['firstname'];
 			$edituser->lastname = $postdata['lastname'];
@@ -523,7 +525,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			if (strlen($userphone) == 0 )
 				$userphone = false;
-			$edituser->setSetting("callerid",$userphone);
 			
 			if($IS_LDAP){
 				if(isset($postdata['ldap']) && $postdata['ldap'])
@@ -539,18 +540,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else
 				$edituser->update(); 
 			
+			$edituser->setSetting("callerid",$userphone);
+
 			// Remove all existing user rules
 			$rules = $edituser->rules();
 			if (count($rules)) {
 				foreach ($rules as $rule)
 					$delrules[] = $rule->id;
-				Query("BEGIN");
 				Query("delete from rule where userid =? and id in (?)", false, array($edituser->id, implode(",", $delrules)));
 				Query("delete from userrule where userid =?", false, array($edituser->id));
-				Query("COMMIT");
 			}
 			
-			Query("BEGIN");
 			$edituser->staffpkey = "";
 			if (isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
 				// create the c01 rule based on current staffid
@@ -579,21 +579,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 				}
 			}
-			Query("COMMIT");
 			
 			// update again for staffid
 			$edituser->update();
 			
 			QuickUpdate("delete from userjobtypes where userid =?", false, array($edituser->id));
 			
-			Query("BEGIN");
 			if(count($postdata['jobtypes']))
 				foreach($postdata['jobtypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 			if(count($postdata['surveytypes']))
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
-			Query("COMMIT");
 		}
 
 		if((!$edituser->ldap && $IS_LDAP) || !$IS_LDAP){
@@ -606,6 +603,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (!ereg("^0*$", $postdata['pin']))
 			$edituser->setPincode($postdata['pin']);
 		
+		Query("COMMIT");
+
 		if ($ajax)
 			$form->sendTo("users.php");
 		else
