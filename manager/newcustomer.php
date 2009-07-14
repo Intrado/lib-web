@@ -170,7 +170,6 @@ if (CheckFormSubmit($f,$s)){
 							('maxphones', '1'),
 							('maxemails', '1'),
 							('maxsms', '1'),
-							('retry', '15'),
 							('disablerepeat', '0'),
 							('surveyurl', ?),
 							('displayname', ?),

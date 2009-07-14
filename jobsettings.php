@@ -22,17 +22,7 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
 $helpstepnum = 1;
-
-$helpsteps = array(_L("The Retry Setting specifies the minimum number of minutes the system must wait prior to retrying any busy or unanswered phone number."));
-$formdata["retry"] = array(
-	"label" => _L("Retry Setting"),
-	"fieldhelp" => _L("This setting indicates the number of minutes the system should wait between retrying phone calls."),
-	"value" => getSystemSetting('retry'),
-	"validators" => array(),
-	"control" => array("SelectMenu", "values"=>array_combine(array(5,10,15,30,60,90,120),array(5,10,15,30,60,90,120))),
-	"helpstep" => $helpstepnum
-);
-
+5
 $helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
 if (getSystemSetting('_hascallback', false)) {
 	$formdata["callerid"] = array(
@@ -123,7 +113,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
-		setSystemSetting('retry', $postdata['retry']);
 		if (isset($postdata['callerid']))
 			setSystemSetting('callerid', $postdata['callerid']);
 

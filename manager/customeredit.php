@@ -135,7 +135,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$maxemails = GetFormData($f, $s, "maxemails");
 			$callerid = GetFormData($f, $s, "callerid");
 			$areacode = GetFormData($f, $s, "areacode");
-			$retry = GetFormData($f, $s, "retry");
 			$autoname = GetFormData($f, $s, 'autoname');
 			$autoemail = GetFormData($f, $s, 'autoemail');
 			$renewaldate = GetFormData($f, $s, 'renewaldate');
@@ -246,7 +245,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				update_jobtypeprefs(getCustomerSystemSetting('maxsms', 1, true, $custdb), $maxsms, "sms", $custdb);
 				setCustomerSystemSetting('maxsms', $maxsms, $custdb);
 
-				setCustomerSystemSetting('retry', $retry, $custdb);
 				setCustomerSystemSetting('callerid', Phone::parse($callerid), $custdb);
 				setCustomerSystemSetting('defaultareacode', $areacode, $custdb);
 				setCustomerSystemSetting('autoreport_replyname', $autoname, $custdb);
@@ -385,23 +383,19 @@ if( $reloadform ) {
 	PutFormData($f,$s,'renewaldate', getCustomerSystemSetting('_renewaldate', false, true, $custdb), "text", 1, 255);
 	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', false, true, $custdb), "text");
 
-	PutFormData($f,$s,"retry", getCustomerSystemSetting('retry', false, true, $custdb),"number",5,240);
 	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
 	$maxusers = getCustomerSystemSetting('_maxusers', false, true, $custdb);
 	if($maxusers == "unlimited")
 		$maxusers = "";
 	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
 	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
-	
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', true, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasselfsignup", getCustomerSystemSetting('_hasselfsignup', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hascallback", getCustomerSystemSetting('_hascallback', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,'callbackdefault', getCustomerSystemSetting('callbackdefault', 'inboundnumber', true, $custdb), null, null, null);
-	
-	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 150, 900);
-
+	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 60, 1800);
 	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
 	PutFormData($f, $s, "logindisableattempts", getCustomerSystemSetting('logindisableattempts', 0, true, $custdb), "number", 0);
 	PutFormData($f, $s, "loginlockouttime", getCustomerSystemSetting('loginlockouttime', 5, true, $custdb), "number", 0);
@@ -496,7 +490,7 @@ NewForm($f);
 <tr><td>Max Phones: </td><td> <? NewFormItem($f, $s, 'maxphones', 'text', 3) ?></td></tr>
 <tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 3) ?></td></tr>
 <tr><td>Max SMS: </td><td> <? NewFormItem($f, $s, 'maxsms', 'text', 3) ?></td></tr>
-<tr><td>Timeslice(Min 150): </td><td> <? NewFormItem($f, $s, 'timeslice', 'text', 3) ?></td></tr>
+<tr><td>Timeslice(between 60-1800): </td><td> <? NewFormItem($f, $s, 'timeslice', 'text', 3) ?> This is multiplied by 2 to get the number of seconds per job. timelice of 450 = 900 seconds = 15 minutes.</td></tr>
 <tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
 <tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
 <tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
@@ -552,23 +546,6 @@ foreach($languages as $index => $language){
 	NewFormItem($f,$s,'callbackdefault','selectend');
 ?>
 </td></tr>
-
-<tr><td>Retry:</td><td>
-
-<?
-	NewFormItem($f,$s,'retry','selectstart');
-		NewFormItem($f,$s,'retry','selectoption',5,5);
-		NewFormItem($f,$s,'retry','selectoption',10,10);
-		NewFormItem($f,$s,'retry','selectoption',15,15);
-		NewFormItem($f,$s,'retry','selectoption',30,30);
-		NewFormItem($f,$s,'retry','selectoption',60,60);
-		NewFormItem($f,$s,'retry','selectoption',90,90);
-		NewFormItem($f,$s,'retry','selectoption',120,120);
-	NewFormItem($f,$s,'retry','selectend');
-
-
-?>
-<td></tr>
 
 <tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
 <tr><td>OEM: </td><td><? NewFormitem($f, $s, 'oem', 'text', 10, 50) ?></td></tr>
