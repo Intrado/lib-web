@@ -38,6 +38,8 @@ class SelectMessage extends FormItem {
 class TextAreaPhone extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
+		if (!$value)
+			$value = '{"gender": "female", "text": ""}';
 		$vals = json_decode($value);
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>
@@ -239,7 +241,7 @@ class JobWiz_start extends WizStep {
 		}
 		
 		$formdata = array(
-			_L('Welcome to the Job Wizard'),
+			$this->title,
 			"name" => array(
 				"label" => _L("Job Name"),
 				"fieldhelp" => _L("Name is used for the job's email subject and to create reports."),
@@ -317,7 +319,7 @@ class JobWiz_messageType extends WizStep {
 			if ($USER->authorize($checkname[0]))
 				$values[$checkvalue] = $checkname[1];
 				
-		$formdata[] = 'Delivery Methods';
+		$formdata[] = $this->title;
 		$helpsteps = array(_L("Select a method or methods for message delivery."));
 		$formdata["type"] = array(
 			"label" => _L("Message Type"),
@@ -353,7 +355,7 @@ class JobWiz_messageSelect extends WizStep {
 		$values["text"] =_L("Type A Message");
 		$values["pick"] =_L("Select Saved Message");
 
-		$formdata[] = 'Message Source';
+		$formdata[] = $this->title;
 		$helpsteps = array(_L("Select the desired content source for the message delivery options listed."));
 		if ($USER->authorize("sendphone") && in_array('phone',$postdata['/message/pick']['type'])) {
 			$formdata["phone"] = array(
@@ -433,19 +435,17 @@ class JobWiz_messagePhoneChoose extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		$formdata = array();
-		$phonemessage = array(array("name"=>"--- Select One ---","lastused"=>"","description"=>""));
+		$phonemessage = array(array("name"=>"--- "._L('Select One')." ---"));
 		$values = array();
 		global $USER;
 		
 		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 		foreach ($messagelist as $id => $message) {
 			$phonemessage[$id]['name'] = $message->name;
-			$phonemessage[$id]['lastused'] = ($message->lastused)?$message->lastused:"Never";
-			$phonemessage[$id]['description'] = $message->description;
 			$values[] = $id;
 		}
 
-		$formdata[] = _L('Phone: Existing Message');
+		$formdata[] = $this->title;
 		$formdata["message"] = array(
 			"label" => "Select A Message",
 			"value" => "",
@@ -481,11 +481,11 @@ class JobWiz_messagePhoneText extends WizStep {
 		// Form Fields.
 		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
 		$formdata = array(
-			_L('Text-to-speech'),
+			$this->title,
 			"message" => array(
 				"label" => _L("Phone Message"),
 				"fieldhelp" => _L("This text will be converted to a voice and read over the phone."),
-				"value" => '{"gender": "female", "text": ""}',
+				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValTextAreaPhone")
@@ -526,98 +526,88 @@ class JobWiz_messagePhoneText extends WizStep {
 }
 
 class JobWiz_messagePhoneTranslate extends WizStep {
-	function getTranslationDataArray($language, $text, $voice = "Female") {
+	function getTranslationDataArray($language, $text, $gender = "female") {
 		return array(
-				"label" => $language,
-				"value" => array(
-							"enabled" => true,
-							"text" => $text,
-							"override" => false
-							),
-				"validators" => array(array("ValTranslation")),
-				"control" => array("TranslationItem","phone" => true,"voice" => $voice),
-				"transient" => true,
-				"helpstep" => 2
-				);	
+			"label" => ucfirst($language),
+			"value" => json_encode(array(
+				"enabled" => true,
+				"text" => $text,
+				"override" => false,
+				"gender" => $gender
+			)),
+			"validators" => array(array("ValTranslation")),
+			"control" => array("TranslationItem",
+				"phone" => true,
+				"language" => strtolower($language)
+			),
+			"transient" => true,
+			"helpstep" => 2
+		);
 	}
 	
 	function getForm($postdata, $curstep) {
 		static $translations = false;
 		static $translationlanguages = false;
-		static $voicearray = false;
 		
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"gender": "female", "text": ""}');
-		$englishtext = $msgdata->text;
-		$preferredvoice = $msgdata->gender;
 		
-		if(!$translations) {
-			//Get available languages
-			$translationlanguages = Voice::getTTSLanguages();
-			$englishkey = array_search('English', $translationlanguages);
-			if($englishkey !== false)
-				unset($translationlanguages[$englishkey]);
-			$translations = translate_fromenglish($englishtext,$translationlanguages);
-			$voices = DBFindMany("Voice","from ttsvoice");
-			foreach ($voices as $voice) {
-				$voicearray[ucfirst($voice->language)][ucfirst($voice->gender)] = true;
-			}
-		}
+		//Get available languages
+		$translationlanguages = Voice::getTTSLanguages();
+		$englishkey = array_search('English', $translationlanguages);
+		if($englishkey !== false)
+			unset($translationlanguages[$englishkey]);
+			
+		$translations = translate_fromenglish($msgdata->text,$translationlanguages);
+		$voices = Voice::getTTSVoices();
 
 		// Form Fields.
-		$formdata = array("Default Phone Message");
-		$formdata["Englishtext"] = array(
-			"label" => _L("English:"),
-			"control" => array("FormHtml","html"=>"<h3>$englishtext</h3><br />"),
+		$formdata = array(_L("Default Phone Message"));
+
+		$formdata["englishtext"] = array(
+			"label" => _L("English"),
+			"control" => array("FormHtml","html"=>"<h3>$msgdata->text</h3><br />"),
 			"helpstep" => 1
 		);
-		$formdata[] = "Translations";
+		$formdata[] = $this->title;
 		
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
-					"label" => _L("Info") . ": ",
-					"control" => array("FormHtml","html"=>"<h3>No Translations Available</h3><br />"),
-					"helpstep" => 2
+				"label" => _L("Info"),
+				"control" => array("FormHtml","html"=>"<h3>"._L('No Translations Available')."</h3><br />"),
+				"helpstep" => 2
 			);
 		} else {
 			$i = 1;
 			if(is_array($translations)){
 				foreach($translations as $obj){
-					$displaylanguage = ucfirst($translationlanguages[$i]);
-					if(isset($voicearray[$displaylanguage][$preferredvoice])) {
-						$voice = $preferredvoice;
-					}else {
-						if($preferredvoice == "Male")
-							$voice = "Female";
-						else
-							$voice = "Male";
-					}
-					
-					$formdata["$displaylanguage"] = $this->getTranslationDataArray($displaylanguage,$obj->responseData->translatedText,$voice);
+					if(!isset($voices[strtolower($translationlanguages[$i]).":".$msgdata->gender]))
+						$gender = ($msgdata->gender == "male")?"female":"male";
+					else
+						$gender = $msgdata->gender;
+					$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i],$obj->responseData->translatedText,$gender);
 					$i++;
 				}
 			} else {
-				$displaylanguage = ucfirst($translationlanguages[$i]);	
-				$formdata["$displaylanguage"] = $this->getTranslationDataArray($displaylanguage,$translations->translatedText,$voice);
+				$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i],$translations->translatedText,$msgdata->gender);
 			}
 		}
 		if(!isset($formdata["Translationinfo"])) {
 			$formdata["Translationinfo"] = array(
-					"label" => " ",
-					"control" => array("FormHtml","html"=>'
-						<div id="branding">
-							<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
-						</div>
-					'),
-					"helpstep" => 2
+				"label" => " ",
+				"control" => array("FormHtml","html"=>'
+					<div id="branding">
+						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">'._L('Translation powered by').'<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
+					</div>
+				'),
+				"helpstep" => 2
 			);
 		}
 		
-		
 		$helpsteps = array(
-				_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
-				_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
-				);
+			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
+			_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
+		);
 		
 		
 		return new Form("messagePhoneTranslate",$formdata,$helpsteps);
@@ -649,7 +639,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 				if ($syslangs[$langid]->name !== "English")
 					$langs[] = $syslangs[$langid]->name;
 		}
-		$formdata = array(_L("Record"));
+		$formdata = array($this->title);
 		$formdata["message"] = array(
 			"label" => _L("Messages"),
 			"fieldhelp" => _L("Use the Language box to select the recorded language you wish to add to your notification. Enter a phone number and hit the Call Me To Record button to receive a phone call that will guide you through the process of attaching the selected language"),
@@ -692,9 +682,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 
 class JobWiz_messageEmailChoose extends WizStep {
 	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$messages = array(array("name"=>"--- Select One ---"));
+		$messages = array(array("name"=>"--- "._L('Select One')." ---"));
 		$values = array();
 		global $USER;
 		
@@ -703,8 +691,10 @@ class JobWiz_messageEmailChoose extends WizStep {
 			$messages[$id]['name'] = $message->name;
 			$values[] = $id;
 		}
-
-		$formdata[] = 'Email: Existing Message';
+		
+		// Form Fields.
+		$formdata = array($this->title);
+		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
 		$formdata["phoneSelect"] = array(
 			"label" => "Select A Message",
 			"validators" => array(
@@ -715,7 +705,6 @@ class JobWiz_messageEmailChoose extends WizStep {
 			"control" => array("SelectMessage","type"=>"email", "width"=>"80%", "values"=>$messages),
 			"helpstep" => 1
 		);
-		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
 		
 		return new Form("messageEmailChoose",$formdata,$helpsteps);
 	}
@@ -739,7 +728,7 @@ class JobWiz_messageEmailText extends WizStep {
 		global $USER;
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):'{"text": ""}';
 		// Form Fields.
-		$formdata = array(_L("Compose Email"));
+		$formdata = array($this->title);
 		$helpsteps = array(_L("Enter the address to which replies should be sent."));
 		$formdata["from"] = array(
 			"label" => _L("From"),
@@ -817,19 +806,23 @@ class JobWiz_messageEmailText extends WizStep {
 }
 
 class JobWiz_messageEmailTranslate extends WizStep {
-	function getTranslationDataArray($language, $text) {
+	function getTranslationDataArray($language, $text, $gender = "female") {
 		return array(
-			"label" => $language,
-			"value" => array(
-						"enabled" => true,
-						"text" => $text,
-						"override" => false
-						),
+			"label" => ucfirst($language),
+			"value" => json_encode(array(
+				"enabled" => true,
+				"text" => $text,
+				"override" => false,
+				"gender" => false
+			)),
 			"validators" => array(array("ValTranslation")),
-			"control" => array("TranslationItem","email" => true),
+			"control" => array("TranslationItem",
+				"email" => true,
+				"language" => strtolower($language)
+			),
 			"transient" => true,
 			"helpstep" => 2
-		);	
+		);
 	}
 	
 	function getForm($postdata, $curstep) {
@@ -856,33 +849,33 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			"control" => array("FormHtml","html"=>"<h3>$englishtext</h3><br />"),
 			"helpstep" => 1
 		);
-		$formdata[] = "Translations";
+		$formdata[] = $this->title;
 		
-		$emaillanguages = $translationlanguages; // since translation language is static
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
-				"label" => _L("Info") . ": ",
-				"control" => array("FormHtml","html"=>"<h3>No Translations Available</h3><br />"),
+				"label" => _L("Info"),
+				"control" => array("FormHtml","html"=>"<h3>"._L('No Translations Available')."</h3><br />"),
 				"helpstep" => 2
 			);
 		} else {
-			if(is_array($translations)){
+			$i = 1;
+			if(is_array($translations)) {
 				foreach($translations as $obj){
-					$displaylanguage = ucfirst(array_shift($emaillanguages));
-					$formdata["$displaylanguage"] = $this->getTranslationDataArray($displaylanguage,$obj->responseData->translatedText);
+					$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i],$obj->responseData->translatedText);
+					$i++;
 				}
 			} else {
-				$displaylanguage = ucfirst(array_shift($emaillanguages));
-				$formdata["$displaylanguage"] = $this->getTranslationDataArray($displaylanguage,$translations->translatedText);
+				$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i],$translations->translatedText);
 			}
 		}
+		
 		if(!isset($formdata["Translationinfo"])) {
 			$formdata["Translationinfo"] = array(
 				"label" => " ",
 				"control" => array("FormHtml","html"=>'
 					<div id="branding">
-						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
+						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">'._L('Translation powered by').'<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
 					</div>
 				'),
 				"helpstep" => 2
@@ -893,7 +886,6 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
 			_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
 		);
-		
 
 		return new Form("messageEmailTranslate",$formdata,$helpsteps);
 	}
@@ -918,7 +910,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		$formdata = array();
-		$messages = array(array("name"=>"--- Select One ---"));
+		$messages = array(array("name"=>"--- "._L('Select One')." ---"));
 		$values = array();
 		global $USER;
 		
@@ -928,7 +920,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 			$values[] = $id;
 		}
 
-		$formdata[] = 'Txt: Existing Message';
+		$formdata[] = $this->title;
 		$formdata["phoneSelect"] = array(
 			"label" => "Select A Message",
 			"validators" => array(
@@ -972,7 +964,7 @@ class JobWiz_messageSmsText extends WizStep {
 			$text = "";
 
 		// Form Fields.
-		$formdata = array(_L('Compose Txt'));
+		$formdata = array($this->title);
 		$helpsteps = array(_L("Enter the message you wish to deliver via Text Message."));
 		$formdata["message"] = array(
 			"label" => _L("Text Message"),
@@ -1008,7 +1000,7 @@ class JobWiz_scheduleOptions extends WizStep {
 		global $USER;
 		global $ACCESS;
 		// Form Fields.
-		$formdata = array('Schedule Options');
+		$formdata = array($this->title);
 		$helpsteps = array(_L("Select when to send this message."));
 		$formdata["schedule"] = array(
 			"label" => _L("Delivery Schedule"),
@@ -1025,22 +1017,22 @@ class JobWiz_scheduleOptions extends WizStep {
 			"helpstep" => 1
 		);
 
-		$helpsteps[] = _L("Send a report with job results to the Auto Report Emails listed on your user account page.");
-		$formdata["report"] = array(
-			"label" => _L("Auto-Report"),
-			"fieldhelp" => _L("Email a report when the job completes."),
-			"value" => true,
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 2
-		);
-		
 		// Only for phone calls
 		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/phone/callme"]["/message/pick"]) && in_array('phone', $postdata["/message/phone/callme"]["/message/pick"]))
 		) {
+			$maxjobdays = $ACCESS->getValue("maxjobdays");
+			$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
+			$formdata["days"] = array(
+				"label" => _L("Days to run"),
+				"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
+				"validators" => array(),
+				"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
+				"helpstep" => 2
+			);
+			
 			$helpsteps[] = _L("This indicates the default number of times the system should try to call an individual number before considering the message undelivered.");
 			$callmax = $ACCESS->getValue('callmax');
 			$usercallmax = $USER->getSetting("callmax", 3);
@@ -1055,6 +1047,17 @@ class JobWiz_scheduleOptions extends WizStep {
 				"helpstep" => 2
 			);
 		}
+		
+		$helpsteps[] = _L("Send a report with job results to the Auto Report Emails listed on your user account page.");
+		$formdata["report"] = array(
+			"label" => _L("Auto-Report"),
+			"fieldhelp" => _L("Email a report when the job completes."),
+			"value" => true,
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 2
+		);
+		
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
 }
@@ -1064,7 +1067,7 @@ class JobWiz_scheduleDate extends WizStep {
 		global $USER;
 		global $ACCESS;
 		// Form Fields.
-		$formdata = array(_L('Schedule Date/Time'));
+		$formdata = array($this->title);
 		if ($postdata['/schedule/options']['schedule'] == "schedule") {
 			$helpsteps = array(_L("Choose a date for this notification to be delivered."));
 			$formdata["date"] = array(
@@ -1100,22 +1103,6 @@ class JobWiz_scheduleDate extends WizStep {
 			"control" => array("SelectMenu", "values"=>$endvalues),
 			"helpstep" => 2
 		);
-		// Only for phone calls
-		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/phone/callme"]["/message/pick"]) && in_array('phone', $postdata["/message/phone/callme"]["/message/pick"]))
-		) {
-			$maxjobdays = $ACCESS->getValue("maxjobdays");
-			$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
-			$formdata["days"] = array(
-				"label" => _L("Days to run"),
-				"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
-				"validators" => array(),
-				"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
-				"helpstep" => 2
-			);
-		}
 
 		return new Form("scheduleDate",$formdata,$helpsteps);
 	}
@@ -1134,13 +1121,12 @@ class JobWiz_scheduleDate extends WizStep {
 
 class JobWiz_scheduleTemplate extends WizStep {
 	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
 		global $USER;
 		global $ACCESS;
-		$helpstepnum = 1;
 		
+		// Form Fields.
+		$formdata = array($this->title);
+		$helpsteps = array(_L("Days of the week."));
 		$formdata["daysofweek"] = array(
 			"label" => _L("Days of the Week"),
 			"value" => "",
@@ -1154,19 +1140,18 @@ class JobWiz_scheduleTemplate extends WizStep {
 				"5"=>"Friday",
 				"6"=>"Saturday"
 			)),
-			"helpstep" => $helpstepnum
+			"helpstep" => 1
 		);
-		$helpsteps[$helpstepnum++] = _L("Days of the week.");
 
 		$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
+		$helpsteps[] = _L("Time to start.");
 		$formdata["calltime"] = array(
 			"label" => "Default Delivery Window (Earliest)",
 			"value" => $USER->getCallEarly(),
 			"validators" => array(),
 			"control" => array("SelectMenu", "values"=>$startvalues),
-			"helpstep" => $helpstepnum
+			"helpstep" => 2
 		);
-		$helpsteps[$helpstepnum++] = _L("Time to start.");
 
 		return new Form("scheduleTemplate",$formdata,$helpsteps);
 	}
@@ -1183,54 +1168,120 @@ class JobWiz_scheduleTemplate extends WizStep {
 	}
 }
 
-class JobWiz_submitTest extends WizStep {
-	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
-		
-		$helpstepnum = 1;
-		
-		$formdata["a"] = array(
-				"label" => "Submit Test",
-				"control" => array("FormHtml","html"=>"<h1>Wicked Awesome Test Notification Widget</h1>"),
-				"helpstep" => $helpstepnum
-		);
-		$helpsteps[$helpstepnum++] = _L("c");
-
-
-		return new Form("submitTest",$formdata,$helpsteps);
-	}
-	
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		if (isset($postdata['/schedule/options']['test']) && 
-			$postdata['/schedule/options']['test']
-		) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
 class JobWiz_submitConfirm extends WizStep {
 	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$helpsteps = array(_L("description."));
 		
-		$helpstepnum = 1;
+		$phonemessages = array();
+		switch ($postdata["/start"]["package"]) {
+			//If package is easycall then 
+			case "easycall":
+				foreach (json_decode($postdata["/message/phone/callme"]["message"]) as $lang => $data)
+					$phonemessages[$lang] = array(
+						"id" => $data,
+						"enabled" => 1,
+						"text" => "",
+						"gender" => "",
+						"language" => ($lang == "English (Default)")?"english":strtolower($lang)
+					);
+				break;
+				
+			case "express":
+				$msgdata = json_decode($postdata["/message/phone/text"]["message"]);
+				$phonemessages["English"] = array(
+						"id" => "",
+						"enabled" => 1,
+						"text" => $msgdata->text,
+						"gender" => $msgdata->gender,
+						"language" => "english"
+				);
+				foreach ($postdata["/message/phone/translate"] as $lang => $data) {
+					$msgdata = json_decode($data);
+					$phonemessages[$lang] = array(
+						"id" => "",
+						"enabled" => $msgdata->enabled,
+						"text" => $msgdata->text,
+						"gender" => "",
+						"language" => strtolower($lang)
+					);
+				}
+				break;
+			}
+
+		$formdata = array($this->title);
 		
-		$formdata["a"] = array(
-			"label" => "Confirm Settings",
-			"control" => array("FormHtml","html"=>"<h1>Wicked Awesome Confirm Settings Widget</h1>"),
-			"helpstep" => $helpstepnum
+		$jobtype = DBFind("JobType", "from jobtype where id=?", false, array($postdata["/start"]["jobtype"]));
+		$html = '<div style="font-size: large">'.$postdata["/start"]["name"].'</div>
+			'.$jobtype->name.'
+		';
+		
+		$formdata["jobtype"] = array(
+			"label" => _L('Job Type'),
+			"control" => array("FormHtml", "html" => $html),
+			"helpstep" => 1,
 		);
-		$helpsteps[$helpstepnum++] = _L("c");
 
+		$lists = json_decode($postdata["/list"]["listids"]);
+		$calctotal = 0;
+		$html = '<table style="border: 1px solid gray;">
+			<tr><th class="windowRowHeader">'._L("List Name").'</th><th class="windowRowHeader" width="30%">'._L("People").'</th></tr>
+		';
+		foreach ($lists as $id) {
+			$list = new PeopleList($id+0);
+			$renderedlist = new RenderedList($list);
+			$renderedlist->calcStats();
+			$calctotal = $calctotal + $renderedlist->total;
+			$html .='<tr><td style="border-bottom: 1px solid">'.$list->name.'</td><td style="border-bottom: 1px solid">'.$renderedlist->total.'</td></tr>
+			';
+		}
+		$html .='<tr><td style="border-top: 2px solid">'._L('Total').'</td><td style="border-top: 2px solid">'.$calctotal.'</td></tr>
+			</table>
+		';
+		$formdata["list"] = array(
+			"label" => _L('List'),
+			"control" => array("FormHtml", "html" => $html),
+			"helpstep" => 1,
+		);
+		
 
-		return new Form("submitConfirm",$formdata,$helpsteps);
+		
+		
+		
+		
+		$html = '
+			<table style="border: 1px solid gray;">
+			<tr><th class="windowRowHeader">'._L("Language").'</th><th class="windowRowHeader" width="30%">'._L("Action").'</th></tr>
+				<tr>
+					<td style="border-bottom: 1px solid">English (Default):</td>
+					<td style="border-bottom: 1px solid">'.icon_button("Preview","play").'</td>
+				</tr>
+		';
+		foreach ($postdata["/message/phone/translate"] as $lang => $text)
+			$html .='<tr><td style="border-bottom: 1px solid">'.$lang.':</td><td style="border-bottom: 1px solid">'.icon_button("Preview","play").'</td></tr>
+			';
+		$html .= '</table>
+		';
+		$formdata["message"] = array(
+			"label" => _L('Message'),
+			"control" => array("FormHtml", "html" => $html),
+			"helpstep" => 1,
+		);
+/*		$formdata[""] = array(
+			"label" => _L(''),
+			"control" => array("FormHtml", "html" => ""),
+			"helpstep" => 0,
+		);
+		$formdata[""] = array(
+			"label" => _L(''),
+			"control" => array("FormHtml", "html" => ""),
+			"helpstep" => 1,
+		);
+		$formdata[""] = array(
+			"label" => _L(''),
+			"control" => array("FormHtml", "html" => ""),
+			"helpstep" => 0,
+		);*/
+
+		return new Form("confirm",$formdata,array());
 	}
 }
 ?>
