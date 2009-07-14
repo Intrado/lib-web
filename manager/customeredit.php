@@ -147,7 +147,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$maxsms = GetFormData($f, $s, 'maxsms');
 			$hasportal = GetFormData($f, $s, 'hasportal');
 			$hasselfsignup = GetFormData($f, $s, 'hasselfsignup');
-			
+			$emaildomain = trim(GetFormData($f, $s, 'emaildomain'));
+			$emaildomainerror = validateDomainList($emaildomain);
 			$fileerror = false;
 			$logoname = "";
 			$loginpicturename ="";
@@ -198,6 +199,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error('Unable to complete file upload. Please try again');
 			} else if ($hasportal && $hasselfsignup) {
 				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
+			} else if ($emaildomainerror !== true) {
+				error($emaildomainerror);
 			} else {
 
 				QuickUpdate("update customer set
@@ -333,7 +336,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_supportemail', DBSafe(GetFormData($f, $s, "_supportemail")), $custdb);
 				setCustomerSystemSetting('_supportphone', Phone::parse(GetFormData($f, $s, "_supportphone")), $custdb);
 
-				setCustomerSystemSetting('emaildomain', DBSafe(trim(GetFormData($f, $s, "emaildomain"))), $custdb);
+				setCustomerSystemSetting('emaildomain', DBSafe($emaildomain), $custdb);
 
 				if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && GetFormData($f, $s, "_dmmethod") == 'asp'){
 					$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");

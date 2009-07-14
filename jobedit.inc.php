@@ -132,7 +132,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			SetRequired($f, $s, "fromname",1);
 			SetRequired($f, $s, "emailsubject",1);
 			$emaildomain = getSystemSetting('emaildomain');
-			$fromemaildomain = substr(GetFormData($f, $s, "fromemail"), strpos(GetFormData($f, $s, "fromemail"), "@")+1);
+			$fromemail = GetFormData($f, $s, "fromemail");
 		} else {
 			SetRequired($f, $s, "fromemail",0);
 			SetRequired($f, $s, "fromname",0);
@@ -200,7 +200,9 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if ($sendphone && $callerid != "" && strlen($callerid) != 10) {
 			$hasphonedetailerror = true;
 			error('The Caller ID must be exactly 10 digits long (including area code)');
-		} else if($sendemail && GetFormData($f, $s,"emailradio") == "create" && $emaildomain && (strtolower($emaildomain) != strtolower($fromemaildomain))){
+		} else if($sendemail && GetFormData($f, $s,"emailradio") == "create" && !validEmail($fromemail)){
+			error('The From Email address is not valid');
+		} else if($sendemail && GetFormData($f, $s,"emailradio") == "create" && $emaildomain && !checkEmailDomain($fromemail, $emaildomain)){
 			error('The From Email address is not valid', 'You must use an email address at ' . $emaildomain);
 		} else if((bool)GetFormData($f,"phone","newlangphone") XOR (bool)GetFormData($f,"phone","newmessphone")) {
 			error('Select both a language and a message');

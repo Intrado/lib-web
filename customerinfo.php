@@ -22,9 +22,50 @@ if (!$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////
+// Custom Validators
+
+
+class ValAreaCode extends Validator {
+	function validate ($value, $args) {
+		if ($value == "")
+			return true;
+		if (strlen($value) <> 3)
+			return "$this->label must be a 333 digit area code";
+		
+		if (($value[0] < 2) || // areacode cannot start with 0 or 1
+			($value[1] == 1 && $value[2] == 1) || // areacode cannot be N11
+			($value == 555) // areacode cannot be 555
+		) {
+			return "$this->label is not a valid area code";
+		}		
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				if (value.length != 3)
+					return label + " must be a 3 digit area code";
+				if ((value.charAt(0) == "0" || value.charAt(0) == "1") || // areacode cannot start with 0 or 1
+					(value.charAt(1) == "1" && value.charAt(2) == "1") || // areacode cannot be N11
+					("555" == value)  // areacode cannot be 555
+					) {
+					return label + " is not a valid area code";
+				}
+				return true;
+			}';
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
+$emaildomain = getSystemSetting('emaildomain');
+if ($emaildomain == "")
+	$emaildomain = "(no domain configured)";
 
 $formdata = array();
 $helpstepnum = 1;
@@ -42,6 +83,7 @@ $formdata["displayname"] = array(
 	"helpstep" => $helpstepnum
 );
 
+if ($IS_COMMSUITE) {
 $helpsteps[$helpstepnum++] = _L("Enter an email domain to ensure that all emails use this domain.");
 $formdata["emaildomain"] = array(
 	"label" => _L("Email Domain"),
@@ -49,11 +91,24 @@ $formdata["emaildomain"] = array(
 	"value" => getSystemSetting('emaildomain'),
 	"validators" => array(
 		array("ValLength","max" => 50),
-		array("ValDomain")
+		array("ValDomainList")
 	),
 	"control" => array("TextField","maxlength" => 50),
 	"helpstep" => $helpstepnum
 );
+} else {
+$helpsteps[$helpstepnum++] = _L("Enter an email domain to ensure that all emails use this domain.");
+$formdata["emaildomain"] = array(
+	"label" => _L("Email Domain"),
+	"fieldhelp" => _L('All user emails must come from this domain.'),
+	"value" => getSystemSetting('emaildomain'),
+	"validators" => array(
+	),
+	"control" => array("FormHtml","html"=>"<div>".$emaildomain."</div>"),
+	"helpstep" => $helpstepnum
+);
+}
+
 
 $helpsteps[$helpstepnum++] = _L("Set your local area code in this field. If a phone number is entered into the system without an area code, this area code will be used.");
 $formdata["defaultareacode"] = array(
@@ -61,7 +116,9 @@ $formdata["defaultareacode"] = array(
 	"value" => getSystemSetting('defaultareacode'),
 	"fieldhelp" => _L('Your local area code which will be prepended to any phone number entered without an area code.'),
 	"validators" => array(
-		array("ValLength","min" => 3,"max" => 3)
+		array("ValLength","min" => 3,"max" => 3),
+		array("ValNumeric"),
+		array("ValAreaCode")
 	),
 	"control" => array("TextField","maxlength" => 3),
 	"helpstep" => $helpstepnum
@@ -129,15 +186,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		//save data here
 		$custname= $postdata['displayname'];
-		if($custname != "" || $custname != $_SESSION['custname']){
+		if ($custname != "" || $custname != $_SESSION['custname']) {
 			setSystemSetting('displayname', $custname);
-			$_SESSION['custname']=$custname;
+			$_SESSION['custname'] = $custname;
 		}
 		
-		setSystemSetting('emaildomain', $postdata['emaildomain']);
 		setSystemSetting('defaultareacode', $postdata['defaultareacode']);
 
-		if($IS_COMMSUITE){
+		if ($IS_COMMSUITE) {
+			setSystemSetting('emaildomain', $postdata['emaildomain']);
 			setSystemSetting('surveyurl', $postdata['surveyurl']);
 			setSystemSetting('_supportphone', Phone::parse($postdata['supportphone']));
 			setSystemSetting('_supportemail', $postdata['supportemail']);
@@ -159,8 +216,25 @@ $PAGE = "admin:settings";
 $TITLE = _L('Customer Information');
 
 include_once("nav.inc.php");
+?>
+<script type="text/javascript">
+<? Validator::load_validators(array("ValAreaCode")); ?>
+<? if ($datachange) { ?>
+	alert("<?=_L("The data on this form has changed. Your changes cannot be saved.")?>")";
+	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
+<? } ?>
+</script>
+<?
+
 startWindow(_L("Settings"));
 echo $form->render();
+if (!$IS_COMMSUITE) {
+?>
+<div style="margin: 5px;">
+	<img src="img/bug_lightbulb.gif" > Contact Support to configure email domain.
+</div>
+<?
+}
 endWindow();
 include_once("navbottom.inc.php");
 ?>

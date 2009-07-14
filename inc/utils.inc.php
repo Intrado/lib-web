@@ -292,7 +292,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.84 $
+    # $Revision: 1.85 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -356,6 +356,40 @@ function checkemails($emaillist) {
 		}
 	}
 	return $bademaillist;
+}
+
+// validate the email is from one of these domains, optionally subdomain
+function checkEmailDomain($email, $domains, $subdomain=false) {
+	if ($domains == "") return true;
+	$emaildomain = strtolower(substr($email, strpos($email, "@")+1));
+	$domains = explode(";", strtolower($domains));
+	foreach ($domains as $domain) {
+		if (strcmp($emaildomain, $domain)) {
+			if ($subdomain && substr( $emaildomain, strlen( $emaildomain ) - strlen( $domain ) ) == $domain)
+				return true;
+		} else
+			return true;
+	}
+	return false;
+}
+
+// return true if valid, otherwise error string
+// validate the customer system setting for 'emaildomain' list of domains separated by semi-colon
+function validateDomainList($emaildomain) {
+		if ($emaildomain == "") return true;
+		
+		$domainregexp = getDomainRegExp();
+
+		$domains = explode(";", $emaildomain);
+		foreach ($domains as $domain) {
+			if (!preg_match("!^$domainregexp$!", $domain))
+				$errmsg .= $domain . ";";
+		}
+		if (isset($errmsg)) {
+			$errmsg = substr($errmsg, 0, strlen($errmsg)-1);
+			return "Each domain must be separated by a semi-colon. Invalid domains found are: " . $errmsg;
+		}
+		return true;
 }
 
 //from php.net comments

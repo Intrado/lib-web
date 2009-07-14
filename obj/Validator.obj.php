@@ -202,7 +202,7 @@ class ValNumeric extends Validator {
 }
 
 //
-// requires inc/utils.inc.php validEmail()
+// requires inc/utils.inc.php validEmail() and checkEmailDomain()
 //
 // optional args.domain to validate the address matches this domain
 // optional args.subdomain (default false) to allow subdomains
@@ -214,17 +214,13 @@ class ValEmail extends Validator {
 			return "$this->label is not a valid email format";
 			
 		if (isset($args['domain'])) {
-			$emaildomain = strtolower(substr($value, strpos($value, "@")+1));
-			$domain = strtolower($args['domain']);
-			if (strcmp($emaildomain, $domain)) {
-				if (isset($args['subdomain']) && $args['subdomain']) {
-					$domainregexp = ""; //getSubDomainRegExp() . '\\x2e' . $domain;
-					if (!ereg($domainregexp, $value))
-						return "$this->label must use domain ".$args['domain'];
-				} else {
-					return "$this->label must use domain ".$args['domain'];
-				}
-			}
+			$subdomain = false;
+			if (isset($args['subdomain']))
+				$subdomain = $args['subdomain'];
+			$result = checkEmailDomain($value, $args['domain'], $subdomain);
+			if ($result)
+				return true;
+			return "$this->label must use domain ".$args['domain'];
 		}
 		return true;
 	}
@@ -242,15 +238,21 @@ class ValEmail extends Validator {
 					return label + " is an invalid email format";
 				
 				if (args.domain) {
-					var lowdomain = args.domain.toLowerCase();
+					var matched = false;
 					var lowdomainvalue = r[3].toLowerCase();
-					if (lowdomain != lowdomainvalue) {
-						if (args.subdomain) {
-							if (!lowdomainvalue.endsWith("."+lowdomain))
-								return label + " must use domain " + lowdomain;
-						} else
-							return label + " must use domain " + lowdomain;
+					var domains = args.domain.toLowerCase().split(";");
+					for (i=0; i<domains.length; i++) {
+						var domain = domains[i];
+						if (domain != lowdomainvalue) {
+							if (args.subdomain && lowdomainvalue.endsWith("."+domain))
+								matched = true;
+						} else {
+							matched = true;
+						}
 					}
+					if (matched)
+						return true;
+					return label + " must use domain " + args.domain;
 				}
 				return true;
 			}';
@@ -265,10 +267,11 @@ class ValEmailList extends Validator {
 	function validate ($value, $args) {
 		
 		if ($bademaillist = checkemails($value)) {
-			$errmsg = "$this->label has invalid emails ";
+			$errmsg = "$this->label has invalid emails.  Each email must be separated by a semi-colon. Invalid emails found are: ";
 			foreach ($bademaillist as $bademail) {
 				$errmsg .= $bademail . ";";
 			}
+			$errmsg = substr($errmsg, 0, strlen($errmsg)-1);
 			return $errmsg;
 		}
 
@@ -281,6 +284,7 @@ class ValEmailList extends Validator {
 		return 
 			'function (name, label, value, args) {
 				var isbad = false;
+				var badnames = "";
 				var emailregexp = "' . addslashes($addr_spec) . '";
 				var reg = new RegExp(emailregexp);
 				var emailsplit = value.split(";");
@@ -288,11 +292,13 @@ class ValEmailList extends Validator {
 					var e = emailsplit[i];
 					if (!reg.test(e)) {
 						isbad = true;
+						badnames += e + ";";
 					}
 				}
-				if (isbad)
-					return label + " has invalid emails"; // TODO nice to return the bad email text
-
+				if (isbad) {
+					badnames = badnames.substr(0,badnames.length-1);
+					return label + " has invalid emails.  Each email must be separated by a semi-colon. Invalid emails found are: " + badnames;
+				}
 				return true;
 			}';
 	}
@@ -319,6 +325,41 @@ class ValDomain extends Validator {
 				if (!reg.test(value))
 					return label + " is not a valid domain format";
 
+				return true;
+			}';
+	}
+}
+
+class ValDomainList extends Validator {
+	
+	function validate ($value, $args) {
+		$errmsg = validateDomainList($value);
+		if ($errmsg !== true)
+			return "$this->label has invalid domains.  ".$errmsg;
+		return true;
+	}
+	
+	function getJSValidator () {
+		$domainregexp = addslashes(getDomainRegExp());
+		
+		return 
+			'function (name, label, value, args) {
+				var domainregexp = "^' . $domainregexp . '$";
+				var reg = new RegExp(domainregexp);
+				var isbad = false;
+				var badnames = "";
+				var domainsplit = value.split(";");
+				for (i=0; i<domainsplit.length; i++) {
+					var d = domainsplit[i];
+					if (!reg.test(d)) {
+						isbad = true;
+						badnames += d + ";";
+					}
+				}
+				if (isbad) {
+					badnames = badnames.substr(0,badnames.length-1);
+					return label + " has invalid domains.  Each domain must be separated by a semi-colon.  Invalid domains found are: " + badnames;
+				}
 				return true;
 			}';
 	}

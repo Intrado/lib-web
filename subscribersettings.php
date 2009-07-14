@@ -30,7 +30,7 @@ if (!$USER->authorize('managesystem') && !getSystemSetting("_hasselfsignup", fal
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-$emaildomain = QuickQuery("select value from setting where name='emaildomain'");
+$emaildomain = getSystemSetting('emaildomain');
 if ($emaildomain == "")
 	$emaildomain = "(no domain configured)";
 	
