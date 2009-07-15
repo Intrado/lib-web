@@ -58,7 +58,9 @@ var Easycall = Class.create({
 	},
 	handleStart: function(transport) {
 		var response = transport.responseJSON;
-		form_do_hover(("{\""+this.formitemname+this.language+"_img\": \"<?=addslashes(_L('This message is currently recording via a phone session. Listen carefuly to the promts on your phone to save this message.'))?>\"}").evalJSON());
+		var hover = {};
+		hover[this.formitemname+this.language+"_img"] = "<?=addslashes(_L('This message is currently recording via a phone session. Listen carefuly to the promts on your phone to save this message.'))?>";
+		form_do_hover(hover);
 		if (response && !response.error) {
 			this.specialtask = response.id;
 			this.update();
@@ -205,7 +207,9 @@ var Easycall = Class.create({
 		$(this.formitemname).value = Object.toJSON(messages);
 		if (this.messageid) {
 			$(this.formitemname+this.language+"_img").src = this.playimg;
-			form_do_hover(("{\""+this.formitemname+this.language+"_img\": \"<?=addslashes(_L('Click here to preview this recording. If you want to re-record it, select the language above and click the Call Me To Record button.'))?>\"}").evalJSON());
+			var hover = {};
+			hover[this.formitemname+this.language+"_img"] = "<?=addslashes(_L('Click here to preview this recording. If you want to re-record it, select the language above and click the Call Me To Record button.'))?>";
+			form_do_hover(hover);
 			$(this.formitemname+this.language+"_img").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
 		} else {
 			$(this.formitemname+this.language+"_img").src = this.exclamationimg;
@@ -214,7 +218,9 @@ var Easycall = Class.create({
 		
 		if (this.language !== this.required) {
 			$(this.formitemname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\"><?=addslashes(_L("Remove"))?></div>");
-			form_do_hover(("{\""+this.formitemname+this.language+"_remove\": \"<?=addslashes(_L('Cannot remove a message while record session in progress.'))?>\"}").evalJSON());
+			var hover = {};
+			hover[this.formitemname+this.language+"_remove"] = "<?=addslashes(_L('Cannot remove a message while record session in progress.'))?>";
+			form_do_hover(hover);
 		} else {
 			$(this.formitemname+this.language+"_remove").update("");
 		}
