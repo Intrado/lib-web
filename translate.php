@@ -26,7 +26,7 @@ require_once("inc/common.inc.php");
     	if(mb_strlen($src_text) > 4000) //Cap translation
     		$src_text = mb_substr($src_text,0,4000);
     	
-	    $languaarray = explode(";",$languages);
+	    $languagearray = explode(";",$languages);
 
 		$destinationlanguages = array();
 		foreach($languagearray as $language) {
