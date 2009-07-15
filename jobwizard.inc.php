@@ -3,38 +3,6 @@
 // Custom Form Item Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-
-// Select message (phone, email, or sms)
-class SelectMessage extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$str = '<select id="'.$n.'" name="'.$n.'" onchange="'.$n.'messageselect.getMessage();" >';
-		foreach ($this->args['values'] as $selectid => $selectvals) {
-			$checked = $value == $selectid;
-			$str .= '<option value="'.escapehtml($selectid).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectvals['name']).'</option>';
-		}
-		$str .= '</select>
-		<table id="'.$n.'details" class="msgdetails" width="'.$this->args['width'].'">
-		<tr><td class="msglabel">'._L("Last Used").':</td><td><span id="'.$n.'lastused" class="msginfo">...</span></td></tr>
-		<tr><td class="msglabel">'._L("Description").':</td><td><span id="'.$n.'description" class="msginfo">...</span></td></tr>';
-		if ($this->args['type'] == 'email') {
-			$str .= '<tr><td class="msglabel">'._L("From").':</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>
-			<tr><td class="msglabel">'._L("Subject").':</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>
-			<tr><td class="msglabel">'._L("Attachment").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
-		}
-		if ($this->args['type'] == 'phone') {
-			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
-		}
-		$str .= '<tr><td class="msglabel">'._L("Body").':</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>
-		</table>
-		<script type="text/javascript" src="script/messageselect.js"></script>
-			<script type="text/javascript">
-			var '.$n.'messageselect = new MessageSelect("'.$n.'","'.$this->args['type'].'");
-		</script>';
-		return $str;
-	}
-}
-
 class TextAreaPhone extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
@@ -695,7 +663,7 @@ class JobWiz_messageEmailChoose extends WizStep {
 		// Form Fields.
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
-		$formdata["phoneSelect"] = array(
+		$formdata["message"] = array(
 			"label" => "Select A Message",
 			"validators" => array(
 				array("ValRequired"),
@@ -755,7 +723,7 @@ class JobWiz_messageEmailText extends WizStep {
 		);
 
 		$helpsteps[] = '<ul><li>' . _L('Attach files up to 2 MB') . '<li>' . _L('Mention the attachments in the Message body') . '</ul>';
-		$formdata["attachements"] = array(
+		$formdata["attachments"] = array(
 			"label" => _L('Attachments'),
 			"fieldhelp" => _L("You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted."),
 			"value" => "",
@@ -921,7 +889,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 		}
 
 		$formdata[] = $this->title;
-		$formdata["phoneSelect"] = array(
+		$formdata["message"] = array(
 			"label" => "Select A Message",
 			"validators" => array(
 				array("ValRequired"),
@@ -1021,7 +989,7 @@ class JobWiz_scheduleOptions extends WizStep {
 		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/phone/callme"]["/message/pick"]) && in_array('phone', $postdata["/message/phone/callme"]["/message/pick"]))
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]))
 		) {
 			$maxjobdays = $ACCESS->getValue("maxjobdays");
 			$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
@@ -1030,20 +998,6 @@ class JobWiz_scheduleOptions extends WizStep {
 				"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
 				"validators" => array(),
 				"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
-				"helpstep" => 2
-			);
-			
-			$helpsteps[] = _L("This indicates the default number of times the system should try to call an individual number before considering the message undelivered.");
-			$callmax = $ACCESS->getValue('callmax');
-			$usercallmax = $USER->getSetting("callmax", 3);
-			$formdata["callmax"] = array(
-				"label" => _L("Call Attempts"),
-				"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
-				"value" => $usercallmax,
-				"validators" => array(
-					array("ValInArray", "values" => range(1,first($ACCESS->getValue('callmax'), 1)))
-				),
-				"control" => array("SelectMenu", "values"=>array_combine(range(1,first($callmax, 1)),range(1,first($callmax, 1)))),
 				"helpstep" => 2
 			);
 		}
@@ -1169,43 +1123,184 @@ class JobWiz_scheduleTemplate extends WizStep {
 }
 
 class JobWiz_submitConfirm extends WizStep {
+	function phoneRecordedMessage($msgdata) {
+		$retval = array();
+		foreach ($msgdata as $lang => $data)
+			$retval[$lang] = array(
+				"id" => $data,
+				"enabled" => 1,
+				"text" => "",
+				"gender" => "",
+				"language" => ($lang == "English (Default)")?"english":strtolower($lang)
+			);
+		return $retval;
+	}
+	
+	function phoneTextMessage($msgdata) {
+		return array("English (Default)" => array(
+			"id" => "",
+			"enabled" => 1,
+			"text" => $msgdata->text,
+			"gender" => $msgdata->gender,
+			"language" => 'english'
+		));
+	}
+	
+	function phoneTextTranslation($msgdata) {
+		$retval = array();
+		foreach ($msgdata as $lang => $data) {
+			$newmsgdata = json_decode($data);
+			$retval[$lang] = array(
+				"id" => "",
+				"enabled" => $newmsgdata->enabled,
+				"text" => $newmsgdata->text,
+				"gender" => $newmsgdata->gender,
+				"language" => strtolower($lang)
+			);
+		}
+		return $retval;
+	}
+	
+	function emailTextMessage($msgdata) {
+		return array("English (Default)" => array(
+			"id" => "",
+			"enabled" => 1,
+			"from" => $msgdata["from"],
+			"subject" => $msgdata["subject"],
+			"attachments" => json_decode($msgdata["attachments"]),
+			"message" => $msgdata["message"],
+			"language" => "english"
+		));
+	}
+
+	function emailTextTranslation($msgdata, $translationdata) {
+		$retval = array();
+		foreach ($translationdata as $lang => $data) {
+			$newmsgdata = json_decode($data);
+			$retval[$lang] = array(
+				"id" => "",
+				"enabled" => $newmsgdata->enabled,
+				"from" => $msgdata["from"],
+				"subject" => $msgdata["subject"],
+				"attachments" => json_decode($msgdata["attachments"]),
+				"message" => $newmsgdata->text,
+				"language" => strtolower($lang)
+			);
+		}
+		return $retval;
+	}
+	
 	function getForm($postdata, $curstep) {
-		
-		$phonemessages = array();
+		global $USER;
+		$phoneMsg = array();
+		$emailMsg = array();
+		$smsMsg = array();
 		switch ($postdata["/start"]["package"]) {
-			//If package is easycall then 
+			//If package is Easycall
 			case "easycall":
-				foreach (json_decode($postdata["/message/phone/callme"]["message"]) as $lang => $data)
-					$phonemessages[$lang] = array(
-						"id" => $data,
-						"enabled" => 1,
-						"text" => "",
-						"gender" => "",
-						"language" => ($lang == "English (Default)")?"english":strtolower($lang)
-					);
+				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+				$emailMsg = array("English (Default)" => array(
+					"id" => "",
+					"enabled" => 1,
+					"from" => $USER->email,
+					"subject" => $postdata["/start"]["name"],
+					"attachments" => array(),
+					"message" => "// TODO: Insert link to customer portal login here? Maybe we want to attach the audio file, but that feels like a bad idea.",
+					"language" => "english"
+				));
+				$smsMsg = array("Default" => array(
+					"id" => false,
+					"message" => "// TODO: Put call back number to customer perhaps?"
+				));
 				break;
-				
+			//Express Text
 			case "express":
-				$msgdata = json_decode($postdata["/message/phone/text"]["message"]);
-				$phonemessages["English"] = array(
-						"id" => "",
-						"enabled" => 1,
-						"text" => $msgdata->text,
-						"gender" => $msgdata->gender,
-						"language" => "english"
-				);
-				foreach ($postdata["/message/phone/translate"] as $lang => $data) {
-					$msgdata = json_decode($data);
-					$phonemessages[$lang] = array(
-						"id" => "",
-						"enabled" => $msgdata->enabled,
-						"text" => $msgdata->text,
-						"gender" => "",
-						"language" => strtolower($lang)
-					);
+				$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
+				if ($postdata["/message/phone/text"]["translate"] == 'true')
+					$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
+				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+				if ($postdata["/message/email/text"]["translate"] == 'true')
+					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+				$smsMsg = array("Default" => array(
+					"id" => false,
+					"message" => $postdata["/message/sms/text"]["message"]
+				));
+				break;
+			//Personalized
+			case "personalized":
+				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+				if ($postdata["/message/email/text"]["translate"] == 'true')
+					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+				$smsMsg = array("Default" => array(
+					"id" => false,
+					"message" => $postdata["/message/sms/text"]["message"]
+				));
+				break;
+			//Custom
+			case "custom":
+				if (in_array('phone', $postdata["/message/pick"]["type"])) {
+					switch ($postdata["/message/select"]["phone"]) {
+						case "record":
+							$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+							break;
+						case "text":
+							if ($postdata["/message/select"]["phone"] == "text") {
+								$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
+								if ($postdata["/message/phone/text"]["translate"] == 'true')
+									$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
+							}
+							break;
+						case "pick":
+							$phoneMsg = $this->phoneRecordedMessage(array("English (Default)" => $postdata["/message/phone/pick"]["message"]));
+							break;
+						default:
+							error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
+					}
+				}
+				if (in_array('email', $postdata["/message/pick"]["type"])) {
+					switch ($postdata["/message/select"]["email"]) {
+						case "record":
+							break;
+						case "text":
+							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+							if ($postdata["/message/email/text"]["translate"] == 'true')
+								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+							break;
+						case "pick":
+							$emailMsg = $this->phoneRecordedMessage(array("English (Default)" => $postdata["/message/email/pick"]["message"]));
+							break;
+						default:
+							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
+					}
+				}
+				if (in_array('sms', $postdata["/message/pick"]["type"])) {
+					switch ($postdata["/message/select"]["sms"]) {
+						case "record":
+							break;
+						case "text":
+							$smsMsg = array("Default" => array(
+								"id" => false,
+								"message" => $postdata["/message/sms/text"]["message"]
+							));
+							break;
+						case "pick":
+							$smsMsg = array("Default" => array(
+								"id" => $postdata["/message/sms/pick"]["message"],
+								"message" => false
+							));
+							break;
+						default:
+							error_log($postdata["/message/select"]["sms"] . " is an unknown value for ['/message/select']['sms']");
+					}
 				}
 				break;
-			}
+			
+			default:
+				error_log($postdata["/start"]["package"] . "is an unknown value for 'package'");
+		}
+		
+		
 
 		$formdata = array($this->title);
 		
@@ -1222,7 +1317,7 @@ class JobWiz_submitConfirm extends WizStep {
 
 		$lists = json_decode($postdata["/list"]["listids"]);
 		$calctotal = 0;
-		$html = '<table style="border: 1px solid gray;">
+		$html = '<table style="border: 1px solid gray; width: 100%">
 			<tr><th class="windowRowHeader">'._L("List Name").'</th><th class="windowRowHeader" width="30%">'._L("People").'</th></tr>
 		';
 		foreach ($lists as $id) {
@@ -1230,7 +1325,7 @@ class JobWiz_submitConfirm extends WizStep {
 			$renderedlist = new RenderedList($list);
 			$renderedlist->calcStats();
 			$calctotal = $calctotal + $renderedlist->total;
-			$html .='<tr><td style="border-bottom: 1px solid">'.$list->name.'</td><td style="border-bottom: 1px solid">'.$renderedlist->total.'</td></tr>
+			$html .='<tr><td>'.$list->name.'</td><td>'.$renderedlist->total.'</td></tr>
 			';
 		}
 		$html .='<tr><td style="border-top: 2px solid">'._L('Total').'</td><td style="border-top: 2px solid">'.$calctotal.'</td></tr>
@@ -1242,22 +1337,52 @@ class JobWiz_submitConfirm extends WizStep {
 			"helpstep" => 1,
 		);
 		
-
-		
-		
-		
-		
-		$html = '
-			<table style="border: 1px solid gray;">
-			<tr><th class="windowRowHeader">'._L("Language").'</th><th class="windowRowHeader" width="30%">'._L("Action").'</th></tr>
-				<tr>
-					<td style="border-bottom: 1px solid">English (Default):</td>
-					<td style="border-bottom: 1px solid">'.icon_button("Preview","play").'</td>
-				</tr>
+		// Message Preview
+		$html = '<table style="border: 1px solid gray; width: 100%">
+			<tr><th colspan=2 class="windowRowHeader">'._L("Message Preview").'</th></tr>
 		';
-		foreach ($postdata["/message/phone/translate"] as $lang => $text)
-			$html .='<tr><td style="border-bottom: 1px solid">'.$lang.':</td><td style="border-bottom: 1px solid">'.icon_button("Preview","play").'</td></tr>
+		// Phone Message Preview
+		if ($phoneMsg) {
+			$html .= '<tr><td>'._L("Phone").'</td><td>
 			';
+			foreach ($phoneMsg as $label => $data)
+				if ($data['id'])
+					$html .= icon_button($label, "play", "popup('previewmessage.php?id=".$data['id']."', 400, 500)");
+				else
+					$html .= icon_button($label, "play", "popup('previewmessage.php?language=".$data['language']."&gender=".$data['gender']."&text=".$data['text']."', 400, 500)");
+			$html .= '
+				</td></tr>
+			';
+		}
+		// Email Message Preview
+		if ($emailMsg) {
+			$html .= '<tr><td>'._L("Email").'</td><td>
+			';
+			foreach ($emailMsg as $label => $data) {
+				if ($data['id'])
+					$html .= icon_button($label, "email", "popup('previewmessage.php?close=1&id=".$data['id']."', 600, 500)");
+				else
+					$html .= $label . ", ";
+			}
+			$html .= '
+				</td></tr>
+			';
+		}
+		// SMS Message Preview
+		if ($smsMsg) {
+			$html .= '<tr><td>'._L("Text").'</td><td>
+			';
+			foreach ($smsMsg as $label => $data) {
+				if ($data['id'])
+					$html .= icon_button($label, "phone", "popup('previewmessage.php?close=1&id=".$data['id']."', 600, 500)");
+				else
+					$html .= $label . ", ";
+			}
+			$html .= '
+				</td></tr>
+			';
+		}
+		
 		$html .= '</table>
 		';
 		$formdata["message"] = array(
@@ -1265,6 +1390,15 @@ class JobWiz_submitConfirm extends WizStep {
 			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 1,
 		);
+		
+		$html = '
+			';
+		$formdata["schedule"] = array(
+			"label" => _L('Schedule'),
+			"control" => array("FormHtml", "html" => $html),
+			"helpstep" => 1,
+		);
+		
 /*		$formdata[""] = array(
 			"label" => _L(''),
 			"control" => array("FormHtml", "html" => ""),

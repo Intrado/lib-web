@@ -24,6 +24,7 @@ require_once("obj/Voice.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/FormSelectMessage.fi.php");
 // Job step form data
 require_once("jobwizard.inc.php");
 
@@ -99,9 +100,9 @@ require_once("nav.inc.php");
 </script>
 <?
 
-startWindow($wizard->getStepData()->title);
+//startWindow($wizard->getStepData()->title);
 echo $wizard->render();
-endWindow();
+//endWindow();
 if (true) {
 	startWindow("Wizard Data");
 	echo "<pre>";
