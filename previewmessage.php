@@ -14,6 +14,7 @@ require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
+require_once("obj/FormSelectMessage.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -80,6 +81,11 @@ if ($id) {
 	}
 }
 
+$msgType = QuickQuery("select type from message where id=?", false, array($id));
+
+if (!$msgType)
+	$msgType = 'phone';
+	
 class FormHtmlWithId extends FormItem {
 	function render ($value) {
 		return '<div id="'.$this->args['id'].'" name="'.$this->args['id'].'">'.$this->args['html'].'</div>';
@@ -91,7 +97,7 @@ class FormHtmlWithId extends FormItem {
 ////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
 
-if ($id && isset($fields) && count($fields)) {
+if ($id && isset($fields) && count($fields) && $msgType == 'phone') {
 	foreach ($fields as $field => $fieldmap) {
 		if ($fieldmap->isOptionEnabled("firstname")) {
 			$formdata[$field] = array (
@@ -137,7 +143,20 @@ if ($id && isset($fields) && count($fields)) {
 	}
 }
 
-$buttons = array(submit_button(_L('Play'),"submit","play"), icon_button(_L('Close'),"cross","window.close()",null,null));
+if ($msgType == 'email' || $msgType == 'sms')
+	$formdata['preview'] = array(
+		"label" => 'Preview',
+		"value" => $id,
+		"validators" => array(),
+		"control" => array("SelectMessage", "type"=>$msgType, "width"=>"100%", "readonly"=>true, "values"=>array($id => array("name" => ""))),
+		"helpstep" => 1
+	);
+
+$buttons = array();
+if ($msgType == 'phone')
+	$buttons[] = submit_button(_L('Preview'),"submit","play");
+	
+$buttons[] = icon_button(_L('Close'),"cross","window.close()",null,null);
 
 // Only display and handle form elements if there are form elements.
 if (count($formdata)) {
@@ -164,19 +183,21 @@ if (count($formdata)) {
 			foreach ($postdata as $field => $value) {
 				$previewdata .= "&$field=" . urlencode($value);
 			}
-			$form->modifyElement("messagepreviewdiv", '
-				<div align="center">
-					<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-					CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-					STANDBY="Loading Windows Media Player components..."
-					TYPE="application/x-oleobject">
-					<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id='.$id.$previewdata.'">
-					<param name="controller" value="true">
-					<EMBED SRC="preview.wav.php/embed_preview.wav?id='.$id.$previewdata.'" AUTOSTART="TRUE"></EMBED>
-					</OBJECT>
-					<br><a href="preview.wav.php/download_preview.wav?id='.$id.$previewdata.'&download=true">'._L("Click here to download").'</a>
-				</div>'
-			);
+			if ($msgType == 'phone') {
+				$form->modifyElement("messagepreviewdiv", '
+					<div align="center">
+						<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
+						CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
+						STANDBY="Loading Windows Media Player components..."
+						TYPE="application/x-oleobject">
+						<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id='.$id.$previewdata.'">
+						<param name="controller" value="true">
+						<EMBED SRC="preview.wav.php/embed_preview.wav?id='.$id.$previewdata.'" AUTOSTART="TRUE"></EMBED>
+						</OBJECT>
+						<br><a href="preview.wav.php/download_preview.wav?id='.$id.$previewdata.'&download=true">'._L("Click here to download").'</a>
+					</div>'
+				);
+			}
 			return;
 		}
 	}
@@ -190,24 +211,26 @@ require_once("popup.inc.php");
 startWindow(_L("Message Preview"));
 if (count($formdata)) 
 	echo $form->render();
-?><div id="messagepreviewdiv" name="messagepreviewdiv"><?
-// If there is no formdata (no field inserts) then just play the message
-if (!count($formdata)) {?>
-	<div style="float:left; margin: 5px">
-		<?=icon_button(_L('Close'),"cross","window.close()",null,null)?>
-	</div>
-	<div align="center" style="clear:left">
-		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-		STANDBY="Loading Windows Media Player components..."
-		TYPE="application/x-oleobject">
-		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>">
-		<param name="controller" value="true">
-		<EMBED SRC="preview.wav.php/embed_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>" AUTOSTART="TRUE"></EMBED>
-		</OBJECT>
-		<br><a href="preview.wav.php/download_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>&download=true"><?=_L("Click here to download")?></a>
-	</div>
-<?}
+	if ($msgType == 'phone') {
+		?><div id="messagepreviewdiv" name="messagepreviewdiv"><?
+		// If there is no formdata (no field inserts) then just play the message
+		if (!count($formdata)) {?>
+		<div style="float:left; margin: 5px">
+			<?=icon_button(_L('Close'),"cross","window.close()",null,null)?>
+		</div>
+		<div align="center" style="clear:left">
+			<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
+			CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
+			STANDBY="Loading Windows Media Player components..."
+			TYPE="application/x-oleobject">
+			<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>">
+			<param name="controller" value="true">
+			<EMBED SRC="preview.wav.php/embed_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>" AUTOSTART="TRUE"></EMBED>
+			</OBJECT>
+			<br><a href="preview.wav.php/download_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>&download=true"><?=_L("Click here to download")?></a>
+		</div>
+	<?}
+}
 ?></div><?
 endWindow();
 
