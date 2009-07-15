@@ -9,14 +9,18 @@ class TranslationItem extends FormItem {
 		if($value == null)
 			$value == "";
 			
-		$language = $this->name;
+		$msgdata = json_decode($value);
+		
+		$language = $this->args['language'];
+		$gender = isset($msgdata->gender)?$msgdata->gender:"female";
+		
 		$isphone = isset($this->args['phone']);
 
 		$str = "";
 		
 		if($renderscript) {
 			$str .= '
-			<script>		
+			<script>
 				function submitRetranslation(section,language) {
 					var srcbox = section + "text";
 					var text = $(srcbox).getValue();
@@ -31,11 +35,11 @@ class TranslationItem extends FormItem {
 					cachedAjaxGet(
 							request,
 							function(result) {	
-									var data = result.responseJSON;																		
+									var data = result.responseJSON;
 									if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 										return;
-									var dstbox = section + "retranslationtext";								
-									$(dstbox).value = data.responseData.translatedText;										
+									var dstbox = section + "retranslationtext";
+									$(dstbox).value = data.responseData.translatedText;
 							}
 					);
 					return false;
@@ -57,7 +61,7 @@ class TranslationItem extends FormItem {
 							$(section + "override").checked = true;
 							return;
 						}
-						langtext.value = $(section + "text").innerHTML;													
+						langtext.value = $(section + "text").innerHTML;
 					}
 					langtext.disabled = !langtext.disabled;
 					$(section + "editlock").toggle();
@@ -66,7 +70,7 @@ class TranslationItem extends FormItem {
 				function toggleTranslation(section) {
 					$(section +"icons").toggle(); 
 					$(section +"textfields").toggle();
-					$(section +"disableinfo").toggle();				 			
+					$(section +"disableinfo").toggle();
 					$(section +"controls").toggle();
 					setTranslationValue(section);
 				}
@@ -76,7 +80,7 @@ class TranslationItem extends FormItem {
 		}
 		
 		$str .= '
-			<input id="'.$n.'" name="'.$n.'" type="hidden" size="70" value="' . escapehtml(json_encode($value)) . '"/>
+			<input id="'.$n.'" name="'.$n.'" type="hidden" size="70" value="' . escapehtml($value) . '"/>
 			<hr>
 			<table>
 				<tr>
@@ -97,7 +101,7 @@ class TranslationItem extends FormItem {
 							<ul><li> '  . _L('%1$s recipients will now receive the default English message.',$language) . '<ul>
 						</div>
 						<div id="'.$n.'textfields">
-							<textarea id="'.$n.'text" name="'.$n.'text" rows="3" cols="50" onChange="setTranslationValue(\''.$n.'\');" disabled />'.escapehtml($value["text"]).'</textarea>	
+							<textarea id="'.$n.'text" name="'.$n.'text" rows="3" cols="50" onChange="setTranslationValue(\''.$n.'\');" disabled />'.escapehtml($msgdata->text).'</textarea>	
 							<br />
 							<div id="'.$n.'overridesave" style="display:none;"></div>
 							<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox"
@@ -110,12 +114,12 @@ class TranslationItem extends FormItem {
 											. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')") . 
 										'</td>
 									</tr>
-									<tr>							
+									<tr>
 										<td>
 											<textarea id="'.$n.'retranslationtext" name="'.$n.'retranslation" rows="3" cols="50"/></textarea>
 										</td>
 									</tr>
-								</table>	
+								</table>
 							</div>
 						</div>
 					</td>
@@ -124,21 +128,19 @@ class TranslationItem extends FormItem {
 							. ($isphone?icon_button(_L("Play"),"fugue/control","
 									var content = $('" . $n . "text').getValue();
 										if(content != '')
-											popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=" . 
-											 (isset($this->args['voice'])?$this->args['voice']:"Female") 
-											. "', 400, 400);"):"")
+											popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=$gender" . "', 400, 400);"):"")
 							. '<div id="'. $n .'showenglish">'
 								. icon_button(_L("Show in English"),"fugue/magnifier","
 									$('" . $n . "retranslation').toggle();submitRetranslation('$n','$language');$('" . $n . "hideenglish').show();$('" . $n . "showenglish').hide();")
 							. '</div>
-							    <div id="'. $n .'hideenglish" style="display: none;">'				
+							    <div id="'. $n .'hideenglish" style="display: none;">'
 								. icon_button(_L("Hide English"),"fugue/magnifier__minus","
 									$('" . $n . "retranslation').toggle();$('" . $n . "hideenglish').hide();$('" . $n . "showenglish').show();") 
 							. '</div>
 						</div>
-					</td>			
+					</td>
 				</tr>
-			</table>';	
+			</table>';
 		return $str;
 	}
 }
@@ -160,7 +162,7 @@ class ValTranslation extends Validator {
 		return 
 			'function (name, label, value, args) {	
 				if (value.strip() == "")
-					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";		
+					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";
 				checkval = value.evalJSON();
 				if (checkval.enabled == true && (checkval.text == undefined || checkval.text.strip() == ""))
 					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";
