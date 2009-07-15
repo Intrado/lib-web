@@ -519,6 +519,11 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"gender": "female", "text": ""}');
 		
+		$warning = "";
+		if(mb_strlen($msgdata->text) > 4000) {
+			$warning = _L('Warning. Only the first 4000 characters are translated.');
+		}
+
 		//Get available languages
 		$translationlanguages = Voice::getTTSLanguages();
 		$englishkey = array_search('English', $translationlanguages);
@@ -529,20 +534,26 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		$voices = Voice::getTTSVoices();
 
 		// Form Fields.
-		$formdata = array(_L("Default Phone Message"));
-
+		$formdata = array($this->title);
+		
+		if ($warning)
+			$formdata["warning"] = array(
+				"label" => _L("Warning"),
+				"control" => array("FormHtml","html"=>'<div style="font-size: medium; color: red">'.escapehtml($warning).'</div><br>'),
+				"helpstep" => 1
+			);
+		
 		$formdata["englishtext"] = array(
 			"label" => _L("English"),
-			"control" => array("FormHtml","html"=>"<h3>$msgdata->text</h3><br />"),
+			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.escapehtml($msgdata->text).'</div><br>'),
 			"helpstep" => 1
 		);
-		$formdata[] = $this->title;
 		
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
 				"label" => _L("Info"),
-				"control" => array("FormHtml","html"=>"<h3>"._L('No Translations Available')."</h3><br />"),
+				"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'._L('No Translations Available').'</div><br>'),
 				"helpstep" => 2
 			);
 		} else {
@@ -801,7 +812,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		
 		$warning = "";
 		if(mb_strlen($englishtext) > 4000) {
-			$warning = "<span style=\"color: red;\">Warning. Only the first 4000 characters are translated.</span><br />";
+			$warning = _L('Warning. Only the first 4000 characters are translated.');
 		}
 			
 		if(!$translations) {
@@ -811,19 +822,26 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			$translations = translate_fromenglish($englishtext,$translationlanguages);
 		}
 		// Form Fields.
-		$formdata = array($warning . "Default Email Message");						
+		$formdata = array($this->title);
+		
+		if ($warning)
+			$formdata["warning"] = array(
+				"label" => _L("Warning"),
+				"control" => array("FormHtml","html"=>'<div style="font-size: medium; color: red">'.escapehtml($warning).'</div><br>'),
+				"helpstep" => 1
+			);
+
 		$formdata["Englishtext"] = array(
-			"label" => _L("English:"),
-			"control" => array("FormHtml","html"=>"<h3>$englishtext</h3><br />"),
+			"label" => _L("English"),
+			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.escapehtml($englishtext).'</div><br>'),
 			"helpstep" => 1
 		);
-		$formdata[] = $this->title;
 		
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
 				"label" => _L("Info"),
-				"control" => array("FormHtml","html"=>"<h3>"._L('No Translations Available')."</h3><br />"),
+				"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'._L('No Translations Available').'</div><br>'),
 				"helpstep" => 2
 			);
 		} else {
@@ -1002,16 +1020,6 @@ class JobWiz_scheduleOptions extends WizStep {
 			);
 		}
 		
-		$helpsteps[] = _L("Send a report with job results to the Auto Report Emails listed on your user account page.");
-		$formdata["report"] = array(
-			"label" => _L("Auto-Report"),
-			"fieldhelp" => _L("Email a report when the job completes."),
-			"value" => true,
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 2
-		);
-		
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
 }
@@ -1128,7 +1136,6 @@ class JobWiz_submitConfirm extends WizStep {
 		foreach ($msgdata as $lang => $data)
 			$retval[$lang] = array(
 				"id" => $data,
-				"enabled" => 1,
 				"text" => "",
 				"gender" => "",
 				"language" => ($lang == "English (Default)")?"english":strtolower($lang)
@@ -1139,7 +1146,6 @@ class JobWiz_submitConfirm extends WizStep {
 	function phoneTextMessage($msgdata) {
 		return array("English (Default)" => array(
 			"id" => "",
-			"enabled" => 1,
 			"text" => $msgdata->text,
 			"gender" => $msgdata->gender,
 			"language" => 'english'
@@ -1150,13 +1156,13 @@ class JobWiz_submitConfirm extends WizStep {
 		$retval = array();
 		foreach ($msgdata as $lang => $data) {
 			$newmsgdata = json_decode($data);
-			$retval[$lang] = array(
-				"id" => "",
-				"enabled" => $newmsgdata->enabled,
-				"text" => $newmsgdata->text,
-				"gender" => $newmsgdata->gender,
-				"language" => strtolower($lang)
-			);
+			if ($newmsgdata->enabled)
+				$retval[$lang] = array(
+					"id" => "",
+					"text" => $newmsgdata->text,
+					"gender" => $newmsgdata->gender,
+					"language" => strtolower($lang)
+				);
 		}
 		return $retval;
 	}
@@ -1164,7 +1170,6 @@ class JobWiz_submitConfirm extends WizStep {
 	function emailTextMessage($msgdata) {
 		return array("English (Default)" => array(
 			"id" => "",
-			"enabled" => 1,
 			"from" => $msgdata["from"],
 			"subject" => $msgdata["subject"],
 			"attachments" => json_decode($msgdata["attachments"]),
@@ -1177,15 +1182,15 @@ class JobWiz_submitConfirm extends WizStep {
 		$retval = array();
 		foreach ($translationdata as $lang => $data) {
 			$newmsgdata = json_decode($data);
-			$retval[$lang] = array(
-				"id" => "",
-				"enabled" => $newmsgdata->enabled,
-				"from" => $msgdata["from"],
-				"subject" => $msgdata["subject"],
-				"attachments" => json_decode($msgdata["attachments"]),
-				"message" => $newmsgdata->text,
-				"language" => strtolower($lang)
-			);
+			if ($newmsgdata->enabled)
+				$retval[$lang] = array(
+					"id" => "",
+					"from" => $msgdata["from"],
+					"subject" => $msgdata["subject"],
+					"attachments" => json_decode($msgdata["attachments"]),
+					"message" => $newmsgdata->text,
+					"language" => strtolower($lang)
+				);
 		}
 		return $retval;
 	}
@@ -1201,7 +1206,6 @@ class JobWiz_submitConfirm extends WizStep {
 				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
 				$emailMsg = array("English (Default)" => array(
 					"id" => "",
-					"enabled" => 1,
 					"from" => $USER->email,
 					"subject" => $postdata["/start"]["name"],
 					"attachments" => array(),
@@ -1300,7 +1304,35 @@ class JobWiz_submitConfirm extends WizStep {
 				error_log($postdata["/start"]["package"] . "is an unknown value for 'package'");
 		}
 		
-		
+		$schedule = array();
+		switch ($postdata["/schedule/options"]["schedule"]) {
+			case "now":
+				$schedule = array(
+					"date" => date('m/d/Y'),
+					"callearly" => $postdata["/schedule/date"]["callearly"],
+					"calllate" => $postdata["/schedule/date"]["calllate"],
+					"days" => $postdata["/schedule/options"]["days"]
+				);
+				break;
+			case "schedule":
+				$schedule = array(
+					"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
+					"callearly" => $postdata["/schedule/date"]["callearly"],
+					"calllate" => $postdata["/schedule/date"]["calllate"],
+					"days" => $postdata["/schedule/options"]["days"]
+				);
+				break;
+			case "template": 
+				$schedule = array(
+					"date" => false,
+					"callearly" => false,
+					"calllate" => false,
+					"days" => false
+				);
+				break;
+			default:
+				break;
+		}
 
 		$formdata = array($this->title);
 		
@@ -1328,7 +1360,7 @@ class JobWiz_submitConfirm extends WizStep {
 			$html .='<tr><td>'.$list->name.'</td><td>'.$renderedlist->total.'</td></tr>
 			';
 		}
-		$html .='<tr><td style="border-top: 2px solid">'._L('Total').'</td><td style="border-top: 2px solid">'.$calctotal.'</td></tr>
+		$html .='<tr><td style="border-top: 2px solid; font-weight:900">'._L('Total').'</td><td style="border-top: 2px solid; font-weight:900">'.$calctotal.'</td></tr>
 			</table>
 		';
 		$formdata["list"] = array(
@@ -1382,7 +1414,6 @@ class JobWiz_submitConfirm extends WizStep {
 				</td></tr>
 			';
 		}
-		
 		$html .= '</table>
 		';
 		$formdata["message"] = array(
@@ -1391,30 +1422,27 @@ class JobWiz_submitConfirm extends WizStep {
 			"helpstep" => 1,
 		);
 		
-		$html = '
-			';
+		$html = '<table style="border: 1px solid gray; width: 100%">
+			<tr><th class="windowRowHeader">'._L("Start Date").'</th><th class="windowRowHeader">'._L("Delivery Window").'</th><th class="windowRowHeader">'._L("Days to Run").'</th></tr>
+			<tr><td>'. ($schedule["date"]?$schedule["date"]:_L('Not Scheduled')). '</td><td>'. $schedule["callearly"]. ' -- '. $schedule["calllate"]. '</td><td>'. $schedule["days"]. '</td></tr>
+			</table>
+		';
 		$formdata["schedule"] = array(
 			"label" => _L('Schedule'),
 			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 1,
 		);
 		
-/*		$formdata[""] = array(
-			"label" => _L(''),
-			"control" => array("FormHtml", "html" => ""),
-			"helpstep" => 0,
+		if (isset($_SESSION['confirmedJob']))
+			unset($_SESSION['confirmedJob']);
+		$_SESSION['confirmedJob'] = array(
+			"lists" => $lists,
+			"phoneMsg" => $phoneMsg,
+			"emailMsg" => $emailMsg,
+			"smsMsg" => $smsMsg,
+			"schedule" => $schedule
 		);
-		$formdata[""] = array(
-			"label" => _L(''),
-			"control" => array("FormHtml", "html" => ""),
-			"helpstep" => 1,
-		);
-		$formdata[""] = array(
-			"label" => _L(''),
-			"control" => array("FormHtml", "html" => ""),
-			"helpstep" => 0,
-		);*/
-
+		
 		return new Form("confirm",$formdata,array());
 	}
 }
