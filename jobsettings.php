@@ -22,7 +22,7 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
 $helpstepnum = 1;
-5
+
 $helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
 if (getSystemSetting('_hascallback', false)) {
 	$formdata["callerid"] = array(
