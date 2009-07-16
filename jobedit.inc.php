@@ -376,6 +376,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->starttime = date("H:i", strtotime($job->starttime));
 			$job->endtime = date("H:i", strtotime($job->endtime));
 			$job->userid = $USER->id;
+			$job->modifydate = QuickQuery("select now()");
 
 			// make sure we don't resave these options on an already submitted or completed job
 			if(!$submittedmode && !$completedmode) {
