@@ -5,13 +5,14 @@ class PeopleList extends DBMappedObject {
 	var $userid;
 	var $name;
 	var $description;
+	var $modifydate;
 	var $lastused;
 	var $deleted;
 
 	function PeopleList ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "list";
-		$this->_fieldlist = array("userid", "name", "description", "lastused", "deleted");
+		$this->_fieldlist = array("userid", "name", "description","modifydate","lastused", "deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

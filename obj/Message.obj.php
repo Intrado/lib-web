@@ -6,6 +6,7 @@ class Message extends DBMappedObject {
 	var $description;
 	var $data = ""; //for headers
 	var $type;
+	var $modifydate;
 	var $lastused;
 	var $deleted = 0;
 
@@ -22,7 +23,7 @@ class Message extends DBMappedObject {
 	function Message ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "message";
-		$this->_fieldlist = array("userid", "name", "description", "type", "data", "deleted", "lastused");
+		$this->_fieldlist = array("userid", "name", "description", "type", "data", "deleted","modifydate", "lastused");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

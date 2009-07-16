@@ -11,6 +11,7 @@ class ReportSubscription extends DBMappedObject {
 	var $lastrun;
 	var $nextrun;
 	var $time;
+	var $modifydate;
 	var $email;
 
 
@@ -21,7 +22,7 @@ class ReportSubscription extends DBMappedObject {
 	function ReportSubscription ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "reportsubscription";
-		$this->_fieldlist = array("userid", "name", "description", "reportinstanceid","type","daysofweek","dayofmonth", "lastrun", "nextrun", "time", "email");
+		$this->_fieldlist = array("userid", "name", "description", "reportinstanceid","type","daysofweek","dayofmonth", "lastrun", "nextrun", "time", "modifydate", "email");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);

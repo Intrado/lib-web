@@ -16,6 +16,7 @@ class Job extends DBMappedObject {
 	var $smsmessageid;
 	var $questionnaireid;
 	var $type;
+	var $modifydate;
 	var $createdate;
 	var $startdate;
 	var $enddate;
@@ -42,7 +43,7 @@ class Job extends DBMappedObject {
 		$this->_tablename = "job";
 		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description", "listid",
 				"phonemessageid", "emailmessageid", "printmessageid", "smsmessageid", "questionnaireid",
-				"type", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
+				"type", "modifydate", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
 				"status", "percentprocessed", "deleted", "cancelleduserid", "thesql");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
