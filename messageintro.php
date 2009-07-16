@@ -248,7 +248,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$newpart->create();
 				}
 			} 
-			QuickUpdate("delete from prompt where type='intro' and language is null;insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
+			QuickUpdate("delete from prompt where type='intro' and language is null;");	
+			QuickUpdate("insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
 		} else {
 			QuickUpdate("delete from prompt where type='intro' and language is null;");			
 		}
@@ -271,7 +272,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$newpart->create();
 				}			
 			}
-			QuickUpdate("delete from prompt where type='emergencyintro' and language is null;insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
+			QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
+			QuickUpdate("insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
 		} else {
 			QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
 		}
@@ -297,7 +299,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$newpart->create();
 						}
 					}
-					QuickUpdate("delete from prompt where type='intro' and language=?;insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($language,$newmsg->id,$language));
+					QuickUpdate("delete from prompt where type='intro' and language=?;",false,array($language));
+					QuickUpdate("insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($newmsg->id,$language));
 				} else {
 					QuickUpdate("delete from prompt where type='intro' and language=?;",false,array($language));			
 				}
@@ -322,7 +325,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$newpart->create();
 						}
 					}
-					QuickUpdate("delete from prompt where type='emergencyintro' and language=?;insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($language,$newmsg->id,$language));
+					QuickUpdate("delete from prompt where type='emergencyintro' and language=?;",false,array($language));								
+					QuickUpdate("insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($newmsg->id,$language));
 				} else {
 					QuickUpdate("delete from prompt where type='emergencyintro' and language=?;",false,array($language));							
 				}
