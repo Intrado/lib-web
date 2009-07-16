@@ -20,7 +20,7 @@ class SelectMessage extends FormItem {
 		if ($this->args['type'] == 'phone') {
 			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
 		}
-		$str .= '<tr><td class="msglabel">'._L("Body").':</td><td><textarea style="width:100%" rows="15" readonly id="'.$n.'body" >...</textarea></td></tr>
+		$str .= '<tr><td class="msglabel">'._L("Body").':</td><td><textarea style="width:100%" rows="12" readonly id="'.$n.'body" >...</textarea></td></tr>
 		</table>
 		<script type="text/javascript" src="script/messageselect.js"></script>
 			<script type="text/javascript">
