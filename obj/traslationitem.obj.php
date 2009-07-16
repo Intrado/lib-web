@@ -20,66 +20,47 @@ class TranslationItem extends FormItem {
 		
 		$str .= '
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml($value) . '"/>
+			<input id="'.$n.'englishText" name="'.$n.'englishText" type="hidden" value="' . escapehtml($this->args["englishText"]) . '"/>
+			<input id="'.$n.'overridesave" type="hidden" value=""></div>
 			<hr>
-			<table>
+			<table width="100%">
 				<tr>
-					<td valign="top" width="10%">
-						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onchange="toggleTranslation(\''.$n.'\');" checked /> 
-						<b>Translate</b>
+					<td valign="top" width="80px">
+						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\');" '.(($msgdata->enabled)?"checked":"").' /> 
+						<b>'._L('Translate').'</b>
 					</td>
-					<td valign="top" align="right" width="16px">
-						<div id="'.$n.'icons">
-							<div id="'.$n.'editlock" style="display: none;">
-								<img src="img/padlock.gif">
-							</div>
+					<td valign="top" align="right" width="18px">
+						<div id="'.$n.'icons" style="display: '.(($msgdata->enabled)?"block":"none").'">
+							<img id="'.$n.'editlock" style="display: '.(($msgdata->override)?"block":"none").';" src="img/padlock.gif">
 						</div>
 					</td>
 					<td valign="top" width="70%">
-						<div id="'.$n.'disableinfo" style="display: none;">
+						<div id="'.$n.'disableinfo" style="display: '.(($msgdata->enabled)?"none":"block").'; width: 100%;">
 							<ul><li> '  . _L('%1$s recipients will now receive the default English message.',$language) . '</li></ul>
 						</div>
-						<div id="'.$n.'textfields">
+						<div id="'.$n.'textfields" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
 							<fieldset>
-								<div>
-									<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.escapehtml($msgdata->text).'</div>
-									<textarea id="'.$n.'text" name="'.$n.'text" style="width: 99%; display:none" rows="3" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
+								<div style="width: 100%;">
+									<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.escapehtml($msgdata->text).'</div>
+									<textarea id="'.$n.'text" name="'.$n.'text" style="display: '.(($msgdata->override)?"block":"none").'; width: 99%;" rows="3" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
 									<br>
 								</div>
 							</fieldset>
-							<input id="'.$n.'overridesave" type="hidden" value=""></div>
-							<div id="'. $n .'retranslationcontrols" style="float:left">
-								<div id="'. $n .'showenglish" style="float:left">'
-									. icon_button(_L("Show in English"),"fugue/magnifier","$('" . $n . "retranslation').toggle();submitRetranslation('$n','$language');$('" . $n . "hideenglish').show();$('" . $n . "showenglish').hide();").'
-								</div>
-								<div id="'. $n .'hideenglish" style="display: none; float:left">'.
-									icon_button(_L("Hide English"),"fugue/magnifier__minus","$('" . $n . "retranslation').toggle();$('" . $n . "hideenglish').hide();$('" . $n . "showenglish').show();").'
-								</div>
-								<div style="float:right">
-									<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" onclick="overrideTranslation(\''.$n.'\');"/>' . _L('Override Translation') . '
-								</div>
-								<div id="'.$n.'retranslation" style="display: none;margin-top: 30px;">
-									<table  border="0" cellpadding="1" width="100%" style="clear: both">
-										<tr>
-											<td>' 
-												. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')") . 
-											'</td>
-										</tr>
-										<tr>
-											<td>
-												<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="height: 50px; border: 1px solid gray; color: gray; overflow:auto"></div>
-											</td>
-										</tr>
-									</table>
+							<div id="'. $n .'retranslationcontrols" style="width: 100%">
+								'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n','$language')", null, 'id="'. $n .'showenglish"').'
+								'. icon_button(_L("Hide English"), "fugue/magnifier__minus", "toEnglishButton('$n','$language')", null, 'id="'. $n .'hideenglish" style="display:none"').'
+								<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\');"/>' . _L('Override Translation') . '
+								
+								<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
+									'. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')", null, 'style="margin-bottom: 12px"') . '
+									<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 100%; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
 								</div>
 							</div>
 						</div>
 					</td>
-					<td valign="top">
-						<div id="'.$n.'controls" style="clear:both">'
-							.($isphone?icon_button(_L("Play"),"fugue/control","
-									var content = $('" . $n . "text').getValue();
-										if(content != '')
-											popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=$gender" . "', 400, 400);"):"").'
+					<td valign="top" width="100px">
+						<div id="'.$n.'controls" style="display: '.(($msgdata->enabled)?"block":"none").'">
+							'.($isphone?icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "text').getValue(); if(content != '') popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=$language&gender=$gender" . "', 400, 400);"):"").'
 						</div>
 					</td>
 				</tr>
@@ -88,6 +69,18 @@ class TranslationItem extends FormItem {
 		if($renderscript) {
 			$str .= '
 			<script>
+				function toEnglishButton(section,language) {
+					if ($(section+"showenglish").visible()) {
+						$(section+"retranslation").show();
+						$(section+"showenglish").hide();
+						$(section+"hideenglish").show();
+						submitRetranslation(section,language);
+					} else {
+						$(section+"retranslation").hide();
+						$(section+"hideenglish").hide();
+						$(section+"showenglish").show();
+					}
+				}
 				function submitRetranslation(section,language) {
 					var srcbox = section + "text";
 					var text = $(srcbox).getValue();
@@ -112,43 +105,82 @@ class TranslationItem extends FormItem {
 					);
 					return false;
 				}
+				function getTranslation(section, language) {
+					var englishText = $(section+"englishText");
+					var langtext = $(section + "text");
+					var overridesave = $(section + "overridesave");
+					if (!englishText.value) {
+						langtext.value = overridesave.value;
+						return;
+					}
+					$(section + "textdiv").innerHTML = "<img src=\"img/icons/loading.gif\" />";
+					new Ajax.Request("translate.php", {
+						method:"post",
+						parameters: {"english": englishText.value, "languages": language},
+						onSuccess: function(transport) {
+							var data = transport.responseJSON;
+							if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
+								return;
+							$(section+"textdiv").innerHTML = data.responseData.translatedText.escapeHTML();
+							$(section+"text").value = data.responseData.translatedText.escapeHTML();
+							englishText.value = "";
+							setTranslationValue(section);
+						}
+					});
+				}
 				function setTranslationValue(section) {
+					var curVal = $(section).value.evalJSON();
 					$(section).value = Object.toJSON({
 						"enabled": $(section + "translatecheck").checked,
-						"text": $(section + "text").value.toString(),
-						"override": $(section + "override").checked
+						"text": (($(section + "translatecheck").checked)?$(section + "text").value.toString():""),
+						"override": $(section + "override").checked,
+						"gender": curVal.gender
 					});
 					form_do_validation($(\'' . $this->form->name . '\'), $(section)); 
 				} 
 				
-				function overrideTranslation(section) {
+				function overrideTranslation(section,language) {
 					var langtext = $(section + "text");
-					if(langtext.visible()) {
-						if(langtext.value != $(section + "overridesave").value && !confirm(\'' . _L('The edited text will be removed and set back to the generated translation.') . '\')) {
+					var overridesave = $(section + "overridesave");
+					if ($(section+"override").checked) {
+						if (!overridesave.value)
+							overridesave.value = langtext.value;
+						langtext.show();
+						$(section + "editlock").show();
+						$(section + "textdiv").hide()
+					} else {
+						if(langtext.value != overridesave.value && !confirm(\'' . _L('The edited text will be removed and set back to the previous translation.') . '\')) {
 							$(section + "override").checked = true;
 							return;
 						}
-						langtext.value = $(section + "overridesave").value;
-					} else {
-						$(section + "overridesave").value = langtext.value;
+						getTranslation(section,language);
+						overridesave.value = "";
+						langtext.hide();
+						$(section + "editlock").hide();
+						$(section + "textdiv").show()
 					}
-					$(section + "editlock").toggle();
-					$(section + "text").toggle();
-					$(section + "textdiv").toggle();
 					setTranslationValue(section);
 				}
-				function toggleTranslation(section) {
-					$(section +"icons").toggle(); 
-					$(section +"textfields").toggle();
-					$(section +"disableinfo").toggle();
-					$(section +"controls").toggle();
-					$(section +"retranslationcontrols").toggle();
+				function toggleTranslation(section,language) {
+					if ($(section+"translatecheck").checked) {
+						if ($(section+"text").value == "")
+							getTranslation(section, language);
+						$(section +"icons").show(); 
+						$(section +"textfields").show();
+						$(section +"disableinfo").hide();
+						$(section +"controls").show();
+					} else {
+						$(section +"icons").hide(); 
+						$(section +"textfields").hide();
+						$(section +"disableinfo").show();
+						$(section +"controls").hide();
+					}
 					setTranslationValue(section);
 				}
+				
 			</script>';
 			$renderscript = false;
 		}
-		
 		return $str;
 	}
 }
