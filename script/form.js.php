@@ -13,6 +13,7 @@ header("Cache-Control: private");
 <? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray","ValDomain","ValTimeCheck","ValDomainList")); ?>
 /* ======= END VALIDATORS =======  */
 
+// TODO: Need to localize text
 
 function form_event_handler (event) {
 	var form = event.findElement("form");
@@ -569,9 +570,9 @@ function form_count_field_characters(count,target,event) {
 	var status = $(target);
 	var remaining = count - e.value.length;
 	if (remaining < 0)
-		$(target).innerHTML="<b style='color:red;'>" + (0 - remaining) + "</b> characters too many.";
+		$(target).innerHTML="Too many characters:&nbsp;<b style='color:red;'>" + (0 - remaining) + "</b>";
 	else if (remaining <= 20)
-		$(target).innerHTML="<b style='color:orange;'>" + remaining + "</b> characters remaining.";
+		$(target).innerHTML="Characters remaining:&nbsp;<b style='color:orange;'>" + remaining + "</b>";
 	else
-		$(target).innerHTML=remaining + " characters remaining.";
+		$(target).innerHTML="Characters remaining:&nbsp;" + remaining;
 }
