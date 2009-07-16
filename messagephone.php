@@ -186,7 +186,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$message->name = trim($postdata["messagename"]);
 		$message->description = trim($postdata["description"]);
 		$message->userid = $USER->id;
-
+		$message->modifydate = QuickQuery("select now()");
 		$message->stuffHeaders();
 		$message->update();
 		

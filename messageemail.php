@@ -287,6 +287,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$message->name = trim($postdata["messagename"]);
 		$message->description = trim($postdata["description"]);
+		$message->modifydate = QuickQuery("select now()");
 		$message->subject = trim($postdata["subject"]);
 		$message->fromname = trim($postdata["fromname"]);
 		$message->fromemail = trim($postdata["fromemail"]);
