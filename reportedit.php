@@ -93,6 +93,7 @@ if(CheckFormSubmit($f, $s))
 			error("The day of the month must be set");
 		} else {
 			$subscription->time = date("H:i", strtotime(GetFormData($f, $s, "time")));
+			$subscription->modifydate = QuickQuery("select now()");
 			$subscription->type = 'notscheduled';
 			$subscription->email = $emaillist;
 
