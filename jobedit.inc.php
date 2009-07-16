@@ -1819,8 +1819,12 @@ function previewlanguage(language,female,male) {
 		text = new getObj('phonetextarea').obj;
 	else
 		text = new getObj('phoneexpand_' + language).obj;
-	var encodedtext=encodeURIComponent(text.value);
-
+	var textstr = text.value;
+	if(textstr.length > 4000) {
+		alert("The preview will only render audio from the first 4000 characters.");
+		textstr = textstr.substr(0,4000);
+	}
+	var encodedtext=encodeURIComponent(textstr);
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
 
