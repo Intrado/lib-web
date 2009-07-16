@@ -262,6 +262,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$list->name = $postdata['name'];
 		$list->description = $postdata['description'];
+		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
 		$list->update();
