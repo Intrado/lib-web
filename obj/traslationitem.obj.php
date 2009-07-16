@@ -133,7 +133,7 @@ class TranslationItem extends FormItem {
 					$(section).value = Object.toJSON({
 						"enabled": $(section + "translatecheck").checked,
 						"text": (($(section + "translatecheck").checked)?$(section + "text").value.toString():""),
-						"override": $(section + "override").checked,
+						"override": (($(section + "translatecheck").checked)?$(section + "override").checked:false),
 						"gender": curVal.gender
 					});
 					form_do_validation($(\'' . $this->form->name . '\'), $(section)); 
