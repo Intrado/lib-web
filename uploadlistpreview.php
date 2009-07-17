@@ -72,8 +72,9 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 					$phone = Phone::parse($defaultareacode . $phone);
 				$errors = Phone::validate($phone);
 				$phone = count($errors) == 0 ? Phone::format($phone) : implode(". ",$errors);
-
-				$listpreviewdata[] = array($row[0],$row[1],$phone,$row[3]) ;
+				$email = $row[3] && !validEmail(trim($row[3])) ? "Invalid" : trim($row[3]);
+				
+				$listpreviewdata[] = array($row[0],$row[1],$phone,$email) ;
 				$colcount = max($colcount,count($row));
 			}
 			fclose($fp);
