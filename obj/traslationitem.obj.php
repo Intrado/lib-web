@@ -36,7 +36,7 @@ class TranslationItem extends FormItem {
 					</td>
 					<td valign="top" width="70%">
 						<div id="'.$n.'disableinfo" style="display: '.(($msgdata->enabled)?"none":"block").'; width: 100%;">
-							<ul><li> '  . _L('%1$s recipients will now receive the default English message.',$language) . '</li></ul>
+							<ul><li> '  . _L('%1$s recipients will now receive the default English message.',ucfirst($language)) . '</li></ul>
 						</div>
 						<div id="'.$n.'textfields" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
 							<fieldset>
