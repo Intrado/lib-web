@@ -503,7 +503,14 @@ function form_handle_submit(form,event) {
 		onSuccess: function(response) {
 			var res = response.responseJSON;
 			try {
-			if ("fail" == res.status) {
+			if (res == null) {
+				if (response.responseText.indexOf("<title>SchoolMessenger Login") != -1) {
+					alert('Your changes cannot be saved because your session has expired or logged out.');
+					window.location="index.php?logout=1";
+				} else {
+					alert('There was a problem submitting the form. Please try again.');
+				}
+			} else if ("fail" == res.status) {
 				//show the validation results
 				if (res.validationerrors) {
 					res.validationerrors.each(function(res) {
