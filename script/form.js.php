@@ -504,7 +504,7 @@ function form_handle_submit(form,event) {
 			var res = response.responseJSON;
 			try {
 			if (res == null) {
-				if (response.responseText.indexOf("<title>SchoolMessenger Login") != -1) {
+				if (response.responseText.indexOf(" Login</title>") != -1) {
 					alert('Your changes cannot be saved because your session has expired or logged out.');
 					window.location="index.php?logout=1";
 				} else {
