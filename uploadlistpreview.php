@@ -70,7 +70,8 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 				$phone = Phone::parse($row[2]);
 				if ($defaultareacode && strlen($phone) == 7)
 					$phone = Phone::parse($defaultareacode . $phone);
-				$phone = strlen($phone) == 10 ? Phone::format($phone) : "Invalid";
+				$errors = Phone::validate($phone);
+				$phone = count($errors) == 0 ? Phone::format($phone) : implode(". ",$errors);
 
 				$listpreviewdata[] = array($row[0],$row[1],$phone,$row[3]) ;
 				$colcount = max($colcount,count($row));
