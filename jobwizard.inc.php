@@ -90,7 +90,7 @@ class CallMe extends FormItem {
 		<tr><td></td><td>'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$this->form->name."','".$n."','".$language[0]."','jobwizard','".$this->args['min']."','".$this->args['max']."').start();",null,'id="'.$n.'recordbutton"').'</td></tr>
 		<tr><td class="msglabel">'._L("Messages").':</td>
 		<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">
-		<tr><th colspan=2 class="windowRowHeader">'._L("Message Language").'</th><th class="windowRowHeader" width="30%">'._L("Actions").'</th></tr>
+		<tr class="listHeader" align="left"><th colspan=2>'._L("Message Language").'</th><th width="30%">'._L("Actions").'</th></tr>
 		
 		</table></td></tr>
 		</table>';
@@ -515,12 +515,12 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 	}
 	
 	function isTransient ($postdata, $language) {
-		if (isset($postdata["/message/phone/translate"][$language]))
+		if (isset($postdata["/message/phone/translate"][$language])) {
 			$postmsgdata = json_decode($postdata["/message/phone/translate"][$language]);
-		if ($postmsgdata)
-			return !(!$postmsgdata->enabled || $postmsgdata->override);
-		else
-			return true;
+			if ($postmsgdata)
+				return !(!$postmsgdata->enabled || $postmsgdata->override);
+		}
+		return true;
 	}
 	
 	function getForm($postdata, $curstep) {
@@ -818,12 +818,12 @@ class JobWiz_messageEmailTranslate extends WizStep {
 	}
 	
 	function isTransient ($postdata, $language) {
-		if (isset($postdata["/message/email/translate"][$language]))
+		if (isset($postdata["/message/email/translate"][$language])) {
 			$postmsgdata = json_decode($postdata["/message/email/translate"][$language]);
-		if ($postmsgdata)
-			return !(!$postmsgdata->enabled || $postmsgdata->override);
-		else
-			return true;
+			if ($postmsgdata)
+				return !(!$postmsgdata->enabled || $postmsgdata->override);
+		}
+		return true;
 	}
 
 	function getForm($postdata, $curstep) {
@@ -1020,30 +1020,11 @@ class JobWiz_scheduleOptions extends WizStep {
 				array("ValRequired")
 			),
 			"control" => array("RadioButton","values"=>array(
-				"now"=>_L("Now"),
-				"schedule"=>_L("Later"),
-				"template"=>_L("Save as template")
+				"schedule"=>_L("Schedule and Send"),
+				"template"=>_L("Save for Later")
 			)),
 			"helpstep" => 1
 		);
-
-		// Only for phone calls
-		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]))
-		) {
-			$maxjobdays = $ACCESS->getValue("maxjobdays");
-			$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
-			$formdata["days"] = array(
-				"label" => _L("Days to run"),
-				"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
-				"validators" => array(),
-				"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
-				"helpstep" => 2
-			);
-		}
-		
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
 }
@@ -1067,7 +1048,24 @@ class JobWiz_scheduleDate extends WizStep {
 		}  else {
 			$helpsteps = array();
 		}
-
+		// Only for phone calls
+		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
+			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]))
+		) {
+			$maxjobdays = $ACCESS->getValue("maxjobdays");
+			$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
+			$formdata["days"] = array(
+				"label" => _L("Days to run"),
+				"fieldhelp" => ("Number of total days this notification may run for."),
+				"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
+				"validators" => array(),
+				"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
+				"helpstep" => 2
+			);
+		}
+		
 		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
 		$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 		$formdata["callearly"] = array(
@@ -1077,7 +1075,7 @@ class JobWiz_scheduleDate extends WizStep {
 			"validators" => array(
 			),
 			"control" => array("SelectMenu", "values"=>$startvalues),
-			"helpstep" => 2
+			"helpstep" => 3
 		);
 		$endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 		$formdata["calllate"] = array(
@@ -1087,7 +1085,7 @@ class JobWiz_scheduleDate extends WizStep {
 			"validators" => array(
 			),
 			"control" => array("SelectMenu", "values"=>$endvalues),
-			"helpstep" => 2
+			"helpstep" => 3
 		);
 
 		return new Form("scheduleDate",$formdata,$helpsteps);
@@ -1105,55 +1103,6 @@ class JobWiz_scheduleDate extends WizStep {
 	}
 }
 
-class JobWiz_scheduleTemplate extends WizStep {
-	function getForm($postdata, $curstep) {
-		global $USER;
-		global $ACCESS;
-		
-		// Form Fields.
-		$formdata = array($this->title);
-		$helpsteps = array(_L("Days of the week."));
-		$formdata["daysofweek"] = array(
-			"label" => _L("Days of the Week"),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("MultiCheckBox","values"=>array(
-				"0"=>"Sunday",
-				"1"=>"Monday",
-				"2"=>"Tuesday",
-				"3"=>"Wednesday",
-				"4"=>"Thursday",
-				"5"=>"Friday",
-				"6"=>"Saturday"
-			)),
-			"helpstep" => 1
-		);
-
-		$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
-		$helpsteps[] = _L("Time to start.");
-		$formdata["calltime"] = array(
-			"label" => "Default Delivery Window (Earliest)",
-			"value" => $USER->getCallEarly(),
-			"validators" => array(),
-			"control" => array("SelectMenu", "values"=>$startvalues),
-			"helpstep" => 2
-		);
-
-		return new Form("scheduleTemplate",$formdata,$helpsteps);
-	}
-	
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		if (isset($postdata['/schedule/options']['schedule']) && 
-			$postdata['/schedule/options']['schedule'] == "template"
-		) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
 class JobWiz_submitConfirm extends WizStep {
 	function phoneRecordedMessage($msgdata) {
 		$retval = array();
@@ -1162,7 +1111,8 @@ class JobWiz_submitConfirm extends WizStep {
 				"id" => $data,
 				"text" => "",
 				"gender" => "",
-				"language" => ($lang == "English (Default)")?"english":strtolower($lang)
+				"language" => ($lang == "English (Default)")?"english":strtolower($lang),
+				"override" => true
 			);
 		return $retval;
 	}
@@ -1172,7 +1122,8 @@ class JobWiz_submitConfirm extends WizStep {
 			"id" => "",
 			"text" => $msgdata->text,
 			"gender" => $msgdata->gender,
-			"language" => 'english'
+			"language" => 'english',
+			"override" => true
 		));
 	}
 	
@@ -1185,20 +1136,39 @@ class JobWiz_submitConfirm extends WizStep {
 					"id" => "",
 					"text" => $newmsgdata->text,
 					"gender" => $newmsgdata->gender,
-					"language" => strtolower($lang)
+					"language" => strtolower($lang),
+					"override" => $newmsgdata->override
 				);
 		}
 		return $retval;
 	}
 	
+	function emailSavedMessage($msgdata) {
+		$retval = array();
+		foreach ($msgdata as $lang => $data)
+			$retval[$lang] = array(
+				"id" => $data,
+				"from" => "",
+				"fromname" => "",
+				"subject" => "",
+				"attachments" => "",
+				"text" => "",
+				"language" => ($lang == "English (Default)")?"english":strtolower($lang),
+				"override" => true
+			);
+		return $retval;
+	}
+
 	function emailTextMessage($msgdata) {
 		return array("English (Default)" => array(
 			"id" => "",
+			"fromname" => "",
 			"from" => $msgdata["from"],
 			"subject" => $msgdata["subject"],
 			"attachments" => json_decode($msgdata["attachments"]),
-			"message" => $msgdata["message"],
-			"language" => "english"
+			"text" => $msgdata["message"],
+			"language" => "english",
+			"override" => true
 		));
 	}
 
@@ -1210,10 +1180,12 @@ class JobWiz_submitConfirm extends WizStep {
 				$retval[$lang] = array(
 					"id" => "",
 					"from" => $msgdata["from"],
+					"fromname" => "",
 					"subject" => $msgdata["subject"],
 					"attachments" => json_decode($msgdata["attachments"]),
-					"message" => $newmsgdata->text,
-					"language" => strtolower($lang)
+					"text" => $newmsgdata->text,
+					"language" => strtolower($lang),
+					"override" => $newmsgdata->override
 				);
 		}
 		return $retval;
@@ -1234,14 +1206,17 @@ class JobWiz_submitConfirm extends WizStep {
 				$emailMsg = array("English (Default)" => array(
 					"id" => "",
 					"from" => $USER->email,
+					"fromname" => "",
 					"subject" => $postdata["/start"]["name"],
 					"attachments" => array(),
-					"message" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
-					"language" => "english"
+					"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
+					"language" => "english",
+					"override" => true
 				));
 				$smsMsg = array("Default" => array(
 					"id" => false,
-					"message" => "// TODO: Put call back number to customer perhaps?"
+					"text" => "// TODO: Put call back number to customer perhaps?",
+					"language" => "english"
 				));
 				break;
 			//Express Text
@@ -1254,7 +1229,8 @@ class JobWiz_submitConfirm extends WizStep {
 					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 				$smsMsg = array("Default" => array(
 					"id" => false,
-					"message" => $postdata["/message/sms/text"]["message"]
+					"text" => $postdata["/message/sms/text"]["message"],
+					"language" => "english"
 				));
 				break;
 			//Personalized
@@ -1265,7 +1241,8 @@ class JobWiz_submitConfirm extends WizStep {
 					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 				$smsMsg = array("Default" => array(
 					"id" => false,
-					"message" => $postdata["/message/sms/text"]["message"]
+					"text" => $postdata["/message/sms/text"]["message"],
+					"language" => "english"
 				));
 				break;
 			//Custom
@@ -1295,10 +1272,12 @@ class JobWiz_submitConfirm extends WizStep {
 							$emailMsg = array("English (Default)" => array(
 								"id" => "",
 								"from" => $USER->email,
+								"fromname" => "",
 								"subject" => $postdata["/start"]["name"],
 								"attachments" => array(),
-								"message" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
-								"language" => "english"
+								"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
+								"language" => "english",
+								"override" => true
 							));
 							break;
 						case "text":
@@ -1307,7 +1286,7 @@ class JobWiz_submitConfirm extends WizStep {
 								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 							break;
 						case "pick":
-							$emailMsg = $this->phoneRecordedMessage(array("English (Default)" => $postdata["/message/email/pick"]["message"]));
+							$emailMsg = $this->emailSavedMessage(array("English (Default)" => $postdata["/message/email/pick"]["message"]));
 							break;
 						default:
 							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
@@ -1318,19 +1297,22 @@ class JobWiz_submitConfirm extends WizStep {
 						case "record":
 							$smsMsg = array("Default" => array(
 								"id" => false,
-								"message" => $postdata["/message/sms/text"]["message"]
+								"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
+								"language" => "english"
 							));
 							break;
 						case "text":
 							$smsMsg = array("Default" => array(
 								"id" => false,
-								"message" => $postdata["/message/sms/text"]["message"]
+								"text" => $postdata["/message/sms/text"]["message"],
+								"language" => "english"
 							));
 							break;
 						case "pick":
 							$smsMsg = array("Default" => array(
 								"id" => $postdata["/message/sms/pick"]["message"],
-								"message" => false
+								"text" => false,
+								"language" => "english"
 							));
 							break;
 						default:
@@ -1350,7 +1332,7 @@ class JobWiz_submitConfirm extends WizStep {
 					"date" => date('m/d/Y'),
 					"callearly" => $postdata["/schedule/date"]["callearly"],
 					"calllate" => $postdata["/schedule/date"]["calllate"],
-					"days" => isset($postdata["/schedule/options"]["days"])?$postdata["/schedule/options"]["days"]:false
+					"days" => isset($postdata["/schedule/date"]["days"])?$postdata["/schedule/date"]["days"]:false
 				);
 				break;
 			case "schedule":
@@ -1358,7 +1340,7 @@ class JobWiz_submitConfirm extends WizStep {
 					"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
 					"callearly" => $postdata["/schedule/date"]["callearly"],
 					"calllate" => $postdata["/schedule/date"]["calllate"],
-					"days" => isset($postdata["/schedule/options"]["days"])?$postdata["/schedule/options"]["days"]:false
+					"days" => isset($postdata["/schedule/date"]["days"])?$postdata["/schedule/date"]["days"]:false
 				);
 				break;
 			case "template": 
@@ -1376,7 +1358,7 @@ class JobWiz_submitConfirm extends WizStep {
 		$formdata = array($this->title);
 		
 		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr><th class="windowRowHeader">'._L("Job Name").'</th><th class="windowRowHeader" width="30%">'._L("Type").'</th></tr>
+			<tr class="listHeader" align="left"><th width="50%">'._L("Job Name").'</th><th width="50%">'._L("Type").'</th></tr>
 			<tr><td>
 				<div style="font-size: large"><img src="img/icons/comment.gif"/>&nbsp;'.$jobname.'</div>
 			</td>
@@ -1400,7 +1382,7 @@ class JobWiz_submitConfirm extends WizStep {
 		$lists = json_decode($postdata["/list"]["listids"]);
 		$calctotal = 0;
 		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr><th class="windowRowHeader">'._L("List Name").'</th><th class="windowRowHeader" width="30%">'._L("People").'</th></tr>
+			<tr class="listHeader" align="left"><th width="50%">'._L("List Name").'</th><th width="50%">'._L("People").'</th></tr>
 		';
 		
 		foreach ($lists as $id) {
@@ -1422,11 +1404,11 @@ class JobWiz_submitConfirm extends WizStep {
 		
 		// Message Preview
 		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr><th colspan=2 class="windowRowHeader">'._L("Message Languages").'</th></tr>
+			<tr class="listHeader" align="left"><th colspan=2>'._L("Message Languages").'</th></tr>
 		';
 		// Phone Message Preview
 		if ($phoneMsg) {
-			$html .= '<tr><td><img src="img/icons/group.gif"/>&nbsp;'._L("Phone").'</td><td>
+			$html .= '<tr><td width="10%"><img src="img/icons/group.gif"/>&nbsp;'._L("Phone").'</td><td>
 			';
 			foreach ($phoneMsg as $label => $data)
 				if ($data['id'])
@@ -1480,7 +1462,7 @@ class JobWiz_submitConfirm extends WizStep {
 		);
 		
 		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr><th class="windowRowHeader">'._L("Start Date").'</th><th class="windowRowHeader">'._L("Delivery Window").'</th><th class="windowRowHeader">'._L("Days to Run").'</th></tr>
+			<tr class="listHeader" align="left"><th width="33%">'._L("Start Date").'</th><th width="33%">'._L("Delivery Window").'</th><th width="33%">'._L("Days to Run").'</th></tr>
 			<tr><td><img src="img/icons/calendar.gif"/>&nbsp;'. ($schedule["date"]?$schedule["date"]:_L('Not Scheduled')). '</td><td><img src="img/icons/clock.gif"/>&nbsp;'. $schedule["callearly"]. ' -- '. $schedule["calllate"]. '</td><td><img src="img/icons/calendar_add.gif"/>&nbsp;'. ($schedule["days"]?$schedule["days"]:_L('N/A')). '</td></tr>
 			</table>
 		';
@@ -1496,13 +1478,17 @@ class JobWiz_submitConfirm extends WizStep {
 			"helpstep" => 1,
 		);
 
-		if (isset($_SESSION['confirmedJob']))
-			unset($_SESSION['confirmedJob']);
-		$_SESSION['confirmedJob'] = array(
+		if (isset($_SESSION['confirmedJobWizard']))
+			unset($_SESSION['confirmedJobWizard']);
+		
+		$_SESSION['confirmedJobWizard'] = array(
+			"jobtype" => $jobtype->id,
+			"jobname" => $jobname,
 			"lists" => $lists,
-			"phoneMsg" => $phoneMsg,
-			"emailMsg" => $emailMsg,
-			"smsMsg" => $smsMsg,
+			"phone" => $phoneMsg,
+			"email" => $emailMsg,
+			"sms" => $smsMsg,
+			"print" => array(),
 			"schedule" => $schedule
 		);
 		
