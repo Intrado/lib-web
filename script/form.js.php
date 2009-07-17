@@ -440,7 +440,7 @@ function form_disable_helper(event) {
 	
 	helper.style.display = "none";
 	
-	new Effect.Morph(form.id + "_helpercell", {style: "width: 0px", 
+	new Effect.Morph(form.id + "_helpercell", {style: "width: 100px", 
 		afterFinish: function () {
 			form.select("legend").map(function (e) {
 				e.style.display = "none";

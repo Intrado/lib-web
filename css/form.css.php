@@ -26,9 +26,7 @@ form.newform {
 .helper {
 	z-index: 99;
 	font-family: sans-serif;
-	display: block;
 	overflow: hidden;
-	float: left;
 	width: 200px;
 	margin: 0;
 	padding: 0;
@@ -87,9 +85,6 @@ form.newform {
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 .newform fieldset {
 	border: none;
-	padding: 5px;
-	
-	border: 0px;
 	padding: 0px;
 }
 
@@ -97,24 +92,6 @@ form.newform {
 	padding-left: 5px;
 	background: repeat-x url('../img/header_bg.gif');
 }
-
-.newform legend {
-	font-weight: bold;
-	font-size: 130%;
-	color: #333;
-	padding: 0px;
-	padding-left: 15px;
-	padding-right: 15px;
-	margin: 0px;
-	margin-left: 10px;
-	
-	border-left: 1px solid gray;
-	border-right: 1px solid gray;
-	background: repeat-x url('../img/chrome_light.png') ;
-	
-	display: none;
-}
-
 
 /* ----------------------------- */
 

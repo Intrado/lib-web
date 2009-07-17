@@ -135,7 +135,7 @@ class Form {
 		<div class="newform_container">
 		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
 		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">
-		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign=top> <!-- FORM CONTENT -->';
+		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign="top"> <!-- FORM CONTENT -->';
 		
 		foreach ($this->formdata as $name => $itemdata) {
 			//check for section titles
@@ -177,7 +177,7 @@ class Form {
 			
 			if ($lasthelpstep != $itemdata['helpstep']) {
 				$lasthelpstep = $itemdata['helpstep'];
-				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'"><legend>Step '.$lasthelpstep.'</legend><table summary="" width="100%" cellspacing="0" table-layout="fixed" class="formcontenttable">';
+				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'"><table summary="" width="100%" cellspacing="0" table-layout="fixed" class="formcontenttable">';
 			}
 			
 			$n = $this->name."_".$item->name;
@@ -254,9 +254,9 @@ class Form {
 		$str .= '
 				<!-- END FORM CONTENT -->
 				</td>
-				<td id="'.$this->name.'_helpercell" valign="top" style="width: 0px; overflow: visible;">
+				<td id="'.$this->name.'_helpercell" valign="top" width="100px">
 				<!-- HELPER -->
-				<div id="'.$this->name.'_startguide" style="float: right;  right: 0px; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
+				<div id="'.$this->name.'_startguide" style="float: right; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 				<div id="'.$this->name.'_helper" class="helper">
 					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="img/icons/cross.gif" alt="Close Guide" title="Close"></a>Guide</div>
 					<div class="helpercontent" id="'.$this->name.'_helpercontent" ></div>
