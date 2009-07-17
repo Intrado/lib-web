@@ -256,3 +256,22 @@ ALTER TABLE `qjob` ADD INDEX `sched_timezones` ( `timezone` , `status` ) ;
 ALTER TABLE `qreportsubscription` ADD INDEX ( `timezone` ) ;
 
 ALTER TABLE `specialtaskqueue` ADD INDEX `leasecheck` ( `status` , `leasetime` ) ;
+
+-- simplify the qjobtask table
+ALTER TABLE `qjobtask` CHANGE `lastresultdata` `lastresultdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+-- table to move renderedmessage out of qjobtask
+ CREATE TABLE `aspshard`.`renderedmessage` (
+`id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`renderedmessage` TEXT NOT NULL
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+ALTER TABLE `qjobtask` DROP `renderedmessage`  ;
+ALTER TABLE `qjobtask` ADD `renderedmessageid` BIGINT NULL AFTER `attempts` ;
+
+-- view for dispatcher
+create sql security invoker view qjobtask_dispatchview as
+select `customerid`, `jobid`, `type`, `personid`, `sequence`, `contactsequence`, `status`, `attempts`, `renderedmessage`, `leasetime`, `phone`, `uuid`
+from qjobtask left join renderedmessage on (qjobtask.renderedmessageid = renderedmessage.id);
+
+
