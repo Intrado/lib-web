@@ -16,6 +16,10 @@ require_once("../obj/Phone.obj.php");
 // start the session for captcha value
 doStartSession();
 
+if (!isset($_SESSION['captcha'])) {
+	redirect("newsubscribersession.php");
+}
+
 //////////////////////////////
 
 class CaptchaField extends FormItem {
@@ -25,6 +29,18 @@ class CaptchaField extends FormItem {
 	}
 }
 
+// case-insensitive even though the username part before the at sign can be (ABC@example.com and abc@example.com are valid, but we will not allow)
+class ValUsernameUnique extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		global $CUSTOMERURL;
+		if (!isUsernameUnique($CUSTOMERURL, $value))
+			return "$this->label already exists, please Return to Sign In";
+		
+		return true;
+	}
+}
 
 // case-insensitive
 class ValCaptcha extends Validator {
@@ -67,12 +83,12 @@ if ($result['result'] == "") {
 }
 
 if ($authdomain == "1" && $emaildomain != "") {
-	$emailvalidator = array("ValEmail","domain"=>$emaildomain,"subdomain"=>true);
+	$emailvalidator = array("ValUsernameUnique","ValEmail","domain"=>$emaildomain,"subdomain"=>true);
 } else {
-	$emailvalidator = array("ValEmail");	
+	$emailvalidator = array("ValUsernameUnique","ValEmail");	
 }
 
-$tos = file_get_contents("terms.html");
+$tos = file_get_contents("locale/en_US/terms.html");
 
 $formdata = array();
 $formdata["firstname"] = array(
@@ -217,7 +233,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $sitecode, $options);
 		if ($result['result'] != "") {
 			if ($result['result'] == "duplicate") {
-				$errordetails = "That email address is already in use";
+				$errordetails = "That email address is already in use, please Return to Sign In";
 			} else {
 				$errordetails = "An unknown error occurred, please try again";
 			}
@@ -259,7 +275,7 @@ if (isset($_GET['err'])) {
 ?>
 <script type="text/javascript">
 
-<? Validator::load_validators(array("ValPassword","ValCaptcha","ValSiteCode")); ?>
+<? Validator::load_validators(array("ValPassword","ValCaptcha","ValSiteCode","ValUsernameUnique")); ?>
 
 <? if ($datachange) { ?>
 

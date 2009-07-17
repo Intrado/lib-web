@@ -9,27 +9,68 @@ require_once("../obj/Sms.obj.php");
 require_once("subscriberutils.inc.php");
 
 
+class ValEmailUnique extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		if (0 == QuickQueryInt("select count(*) from email where personid=? and email=?", false, array($_SESSION['personid'], $value)) &&
+			0 == QuickQueryInt("select count(*) from subscriberpending where subscriberid=? and type='email' and value=?", false, array($_SESSION['subscriberid'], $value)))
+			return true;
+		return "$this->label is not unique.  You have already added this Contact Information.";
+    }
+}
+
+class ValPhoneUnique extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		if (0 == QuickQueryInt("select count(*) from phone where personid=? and phone=?", false, array($_SESSION['personid'], $value)) &&
+			0 == QuickQueryInt("select count(*) from subscriberpending where subscriberid=? and type='phone' and value=?", false, array($_SESSION['subscriberid'], $value)))
+			return true;
+		return "$this->label is not unique.  You have already added this Contact Information.";
+    }
+}
+
+class ValSmsUnique extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		if (0 == QuickQueryInt("select count(*) from sms where personid=? and sms=?", false, array($_SESSION['personid'], $value)) &&
+			0 == QuickQueryInt("select count(*) from subscriberpending where subscriberid=? and type='sms' and value=?", false, array($_SESSION['subscriberid'], $value)))
+			return true;
+		return "$this->label is not unique.  You have already added this Contact Information.";
+    }
+}
+
 class DestWiz_whattype extends WizStep {
 	function getForm($postdata, $curstep) {
 
-		// TODO maxphones minus phones already entered to validate adding a new phone (email, sms)
+		// find remaining phone/email/sms available (some already active and pending)
+		$available = findAvailableDestinationTypes();
+				
+		//  if sequence for phone or sms or email available, build the options
+		$values = array();
+		if (isset($available['phone']))
+			$values["phone"] = _L("Phone Call");
+		if (isset($available['phone']) && isset($available['sms']))
+			$values["both"] = _L("Phone Call and Text Message");
+		if (isset($available['sms']))
+			$values["text"] = _L("Text Message");
+		if (isset($available['email']))
+			$values["email"] = _L("Email");
 		
 		$formdata = array();
 
-		// TODO if sequence for phone or sms or email available, build the options
 		$formdata["whattype"] = array(
         	"label" => _L("Type"),
         	"value" => "",
         	"validators" => array(
 					array("ValRequired")
         	),
-        	"control" => array("RadioButton", "values"=>array("phone"=>"Phone Call",
-        								"both"=>"Phone Call and Text Message",
-        								"text"=>"Text Message",
-        								"email"=>"Email")),
+        	"control" => array("RadioButton", "values"=>$values),
         	"helpstep" => 1
 		);
-// TODO why cannot remove "helpstep"		
+
 		return new Form("whattype", $formdata, null);
 	}
 }
@@ -48,20 +89,29 @@ class DestWiz_collectdata extends WizStep {
 				"validators" => array(
 					array("ValRequired"),
 					array("ValLength","max" => 50),
-					array("ValEmail")
+					array("ValEmail"),
+					array("ValEmailUnique")
 				),
 				"control" => array("TextField","maxlength" => 50),
 				"helpstep" => 1
 			);
 		} else {
-			$formdata['newdata'] = array(
-				"label" => _L("Phone"),
-				"value" => "",
-				"validators" => array(
+			$valarray = array(
 					array("ValRequired"),
 					array("ValLength","max" => 50),
 					array("ValPhone")
-				),
+			);
+			if ($datatype == "phone" || $datatype == "both") {
+				$valarray[] = array("ValPhoneUnique");
+			}
+			if ($datatype == "text" || $datatype == "both") {
+				$valarray[] = array("ValSmsUnique");
+			}
+			
+			$formdata['newdata'] = array(
+				"label" => _L("Phone"),
+				"value" => "",
+				"validators" => $valarray,
 				"control" => array("TextField","maxlength" => 50),
 				"helpstep" => 1
 			);
@@ -116,7 +166,13 @@ $TITLE = _L("Add Contact Information");
 
 require_once("nav.inc.php");
 
-//echo dataChangeAlert($datachange, $_SERVER['REQUEST_URI']);
+?>
+<script type="text/javascript">
+<?
+Validator::load_validators(array("ValEmailUnique","ValPhoneUnique","ValSmsUnique"));
+?>
+</script>
+<?
 
 startWindow("");
 echo $wizard->render();

@@ -68,4 +68,28 @@ function loadSubscriberDisplaySettings() {
 		$_SESSION['_locale'] = "en_US"; // US English
 }
 
+// return array of available tyeps phone/email/sms (remaining sequence available)
+function findAvailableDestinationTypes() {
+	$maxphone = getSystemSetting("maxphones", "0");
+	$maxemail = getSystemSetting("maxemails", "0");
+	$maxsms = getSystemSetting("maxsms", "0");
+	$countphone = QuickQuery("select count(*) from phone where personid=? and phone != ''", false, array($_SESSION['personid']));
+	$countemail = QuickQuery("select count(*) from email where personid=? and email != ''", false, array($_SESSION['personid']));
+	$countsms = QuickQuery("select count(*) from sms where personid=? and sms != ''", false, array($_SESSION['personid']));
+	$countpendingphone = QuickQuery("select count(*) from subscriberpending where subscriberid=? and type='phone'", false, array($_SESSION['subscriberid']));
+	$countpendingemail = QuickQuery("select count(*) from subscriberpending where subscriberid=? and type='email'", false, array($_SESSION['subscriberid']));
+	$countpendingsms = QuickQuery("select count(*) from subscriberpending where subscriberid=? and type='sms'", false, array($_SESSION['subscriberid']));
+	$remainingphone = $maxphone - $countphone - $countpendingphone;
+	$remainingemail = $maxemail - $countemail - $countpendingemail;
+	$remainingsms = $maxsms - $countsms - $countpendingsms;
+	$available = array();
+	if ($remainingphone > 0)
+		$available['phone'] = 'phone';
+	if ($remainingsms > 0)
+		$available['sms'] = 'sms';
+	if ($remainingemail > 0)
+		$available['email'] = 'email';
+	return $available;
+}
+
 ?>

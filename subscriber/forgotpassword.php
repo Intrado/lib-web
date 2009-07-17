@@ -27,11 +27,15 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error(_L("That is not a valid email address"));
 	} else {
 		$result = subscriberForgotPassword($email1);
-		if($result['result'] == ""){
+		if ($result['result'] == "") {
 			$success = true;
 		} else {
 			if ($result['result'] == "invalid argument") {
-				$success = true;
+				if ($result['resultdetail'] == "unknown username" ||
+					$result['resultdetail'] == "deactivated subscriber account") {
+					error(_L("This user does not exist, please Create an Account."));
+				} else
+					$success = true;
 			} else {
 				$generalerror = true;
 			}

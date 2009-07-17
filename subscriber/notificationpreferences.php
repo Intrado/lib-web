@@ -7,6 +7,7 @@ require_once("../obj/Email.obj.php");
 require_once("../obj/Sms.obj.php");
 require_once("../obj/SubscriberPending.obj.php");
 require_once("../obj/JobType.obj.php");
+require_once("subscriberutils.inc.php");
 
 $STATUS_ACTIVE = "ACTIVE";
 $STATUS_PENDING = "PENDING";
@@ -250,9 +251,20 @@ echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif
 echo $form->render();
 showObjects($destinations, $titles, array("name"=>"fmt_name", "status"=>"fmt_status", "action" => "fmt_actions"));
 
-// TODO if room for another phone/email/sms
+// find remaining phone/email/sms available (some already active and pending)
+$available = findAvailableDestinationTypes();
+error_log("count".count($available));
+if (count($available) > 0)
 	buttons(icon_button("Add More",null,null,"destinationwizard.php"));
+else {
+?>
+<div style="margin: 5px;">
+	<img src="img/bug_lightbulb.gif" > All available contacts have been added.  Delete one of the above contacts before you add more.
+</div>
+<?
+}
 
 endWindow();
+
 require_once("navbottom.inc.php");
 ?>

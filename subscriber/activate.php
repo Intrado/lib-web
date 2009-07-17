@@ -87,6 +87,9 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 			if (!$error) {
 				doStartSession();
 				$_SESSION['subscriberid'] = $result['userID'];
+				if ($result['functionCode'] == 'token_newsubscriber') {
+					$_SESSION['firstlogin'] = true;
+				}
 				loadSubscriberDisplaySettings();
 			}
 		} else {

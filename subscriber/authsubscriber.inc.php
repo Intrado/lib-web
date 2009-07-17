@@ -34,6 +34,18 @@ function pearxmlrpc($method, $params) {
 	return $data;
 }
 
+function isUsernameUnique($url, $username) {
+	$params = array(new XML_RPC_Value($url, 'string'), new XML_RPC_Value($username, 'string'));
+	$method = "SubscriberServer.subscriber_isUsernameUnique";
+	$result = pearxmlrpc($method, $params);
+error_log("unique ".$result['unique']);	
+	if ($result['result'] == "" && $result['unique'] == "true") {
+		return true;
+	}
+	
+	return false;
+}
+
 function getCustomerAuthOptions($url) {
 	$params = array(new XML_RPC_Value($url, 'string'));
 	$method = "SubscriberServer.subscriber_getCustomerAuthOptions";

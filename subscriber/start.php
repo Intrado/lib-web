@@ -10,6 +10,13 @@ require_once("../obj/Message.obj.php");
 require_once("../obj/Phone.obj.php");
 
 
+if (isset($_SESSION['firstlogin'])) {
+	unset($_SESSION['firstlogin']);
+	redirect("notificationpreferences.php");
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
