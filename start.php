@@ -37,6 +37,49 @@ if (isset($_GET['closewhatsnew'])) {
 
 $listsdata = DBFindMany("PeopleList"," from list where userid=$USER->id and deleted=0");
 
+
+function itemcmp($a, $b) {
+    if ($a["date"] == $b["date"]) {
+        return 0;
+    }
+    return ($a["date"] > $b["date"]) ? -1 : 1;
+}
+
+
+$mergeditems = array();
+$modlists = QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where deleted != 1 and modifydate is not null order by modifydate desc limit 10",true);
+foreach($modlists as $item) {
+	$mergeditems[] = $item;
+}
+
+$modmessages = QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where deleted != 1 and modifydate is not null order by modifydate desc limit 10",true);
+foreach($modmessages as $item) {
+	$mergeditems[] = $item;
+}
+
+$modjobs = QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date, type as jobtype, deleted from job where deleted != 1 and finishdate is null and modifydate is not null order by modifydate desc limit 10",true);
+foreach($modjobs as $item) {
+	$mergeditems[] = $item;
+}
+
+$compjobs = QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,type as jobtype from job where deleted != 1 and finishdate is not null order by finishdate desc limit 10",true);
+foreach($compjobs as $item) {
+	$mergeditems[] = $item;
+}
+
+$modreports = QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where modifydate is not null order by modifydate desc limit 10",true);
+foreach($modreports as $item) {
+	$mergeditems[] = $item;
+}
+
+$sentreports = QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where lastrun is not null order by lastrun desc limit 10",true);
+foreach($sentreports as $item) {
+	$mergeditems[] = $item;
+}
+
+uasort($mergeditems, 'itemcmp');
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,108 +197,94 @@ if ($listsdata) {
 		<td width="100%" valign="top">
 <?
 
-			$limit = 5; // Limit on max # of each type of job to show on the start page.
-
-			startWindow(_L('My Jobs ') . help('Start_MyActiveJobs'),NULL,true);
-
-			$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='scheduled' or status='procactive' or status='processing') and type != 'survey' and deleted = 0 order by id desc limit $limit");
-			$titles = array(	"name" => "Job Name",
-								"type" => "Deliver by",
-								"Status" => "Status",
-								"responses" => "Responses (Unplayed/Total)",
-								"Actions" => "Actions"
-								);
-			$formatters = array("type" => "fmt_obj_delivery_type_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', 'responses' => 'fmt_response_count');
-			if(!$USER->authorize('leavemessage')){
-				unset($titles["responses"]);
-				unset($formatters["responses"]);
-			}
-			if (count($data)) {
-				button_bar(button(_L('Refresh'), 'window.location.reload()'));
-				showObjects($data, $titles, $formatters);
-			} else {
-				?><div style="font-size: xx-small; float:left; color: grey;" >You have no active jobs...</div><?
-			}
-			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
+			startWindow(_L('Recent Activity'),NULL,true);
+			
+				$limit = 5;
+				
+				$duplicatejob = array(); 
+				
+				$activityfeed = '<table width="100%" style="border: none;">';	
+				
+				while(!empty($mergeditems) && $limit > 0) {
+					$item = array_shift($mergeditems);
+					$time = date("M j, g:i a",strtotime($item["date"]));	
+					$title = $item["status"];
+					$content = "";
+					$actions = "";
+					$itemid = $item["id"];
+					$icon = "";
+					
+					
+					if($item["type"] == "job" ) {
+						if(array_search($itemid,$duplicatejob) !== false) {
+							continue;
+						} 
+						$status = $item["status"];
+						if($status == "completed" || $status == "cancelled") {
+							$title = _L("Completed Job");
+							$duplicatejob[] = $itemid;
+						}
+						else if($status == "new")
+							$title = _L("Edited Job");
+						else
+							$title = _L("Submitted Job");
+						$content = $time .  ' - ' .  $item["name"];
+						
+						$job = new Job();
+						$job->id = $itemid;
+						$job->status = $status;
+						$job->deleted = $item["deleted"];
+						$job->type = $item["jobtype"];
+						
+						$actions = fmt_jobs_actions ($job,$item["name"]);
+						
+						$jobtypes = explode(",",$item["jobtype"]);
+						$icon = "";
+						foreach($jobtypes as $jobtype) {
+							$icon .= '<img src="img/themes/' . getBrandTheme() . '/icon_' . $jobtype . '.gif".gif" alt="'.escapehtml($title).'">';
+						}
+						
+						//$icon = '<img src="img/themes/' . getBrandTheme() . '/icon_' . $job->type . '.gif".gif" alt="'.escapehtml($title).'">';
+					} else if($item["type"] == "list" ) {
+						$title = "List " . $title;
+						$content = $time .  ' - ' .  $item["name"];
+						if(isset($item["lastused"]))
+							$content .= ' - Last used: ' . date("M j, g:i a",strtotime($item["lastused"]));
+						else
+							$content .= ' - Never used';
+						
+						$actions = action_links (
+						action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid")
+							);
+						$icon = '<img src="img/icons/application_view_list.gif".gif" alt="'.escapehtml($title).'">';			
+					} else if($item["type"] == "message" ) {
+						$title = "Message " . $title;
+						$content = $time .  ' - ' .  $item["name"];
+						$actions = action_links (
+							action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
+							action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
+							);	
+						$icon = '<img src="img/icons/application_view_list.gif".gif" alt="'.escapehtml($title).'">';					
+					} else if($item["type"] == "report" ) {
+						$title = "Report " . $title;				
+						$content = $time .  ' - ' .  $item["name"];
+						$icon = '<img src="img/icons/application_view_list.gif".gif" alt="'.escapehtml($title).'">';
+					} 
+					
+					$tdstyle = $limit>1?'class="bottomBorder"':"";
+					$activityfeed .= '<tr>	
+											<td ' . $tdstyle. ' width="15%">' . $icon . '</td>
+											<td ' . $tdstyle. ' width="100%">';
+					$activityfeed .= 			'<h3>' . $title . '</h3>
+												<span>' . $content . '</ spam>';
+					$activityfeed .= 		'</td>
+											<td ' . $tdstyle. '>' . $actions  . '</td></tr>';
+					$limit--;
+				}
+				$activityfeed .= '	</table>';
+				echo $activityfeed;
 			endWindow();
-
-
-
-			startWindow(_L('My Completed Jobs ') . help('Start_MyCompletedJobs'),NULL,true);
-
-			$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $limit");
-			$titles = array(	"name" => "Job Name",
-								"type" => "Deliver by",
-								"Status" => "Status",
-								"enddate" => "End Date",
-								"responses" => "Responses (Unplayed/Total)",
-								"Actions" => "Actions"
-								);
-			$formatters = array("type" => "fmt_obj_delivery_type_list", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
-			if(!$USER->authorize('leavemessage')){
-				unset($titles["responses"]);
-				unset($formatters["responses"]);
-			}
-			if (count($data)) {
-				showObjects($data, $titles, $formatters);
-			} else {
-				?><div style="font-size: xx-small; float:left; color: grey;" >You have no completed jobs...</div><?
-			}
-			?><div style="text-align:right; white-space:nowrap"><a href="jobs.php" style="font-size: xx-small;">More...</a></div><?
-			endWindow();
-
-
-			if (getSystemSetting('_hassurvey', true) && $USER->authorize("survey")) {
-
-				startWindow(_L('My Surveys ') . help('Start_MyActiveJobs'),NULL,true);
-
-				$data = DBFindMany("Job","from job where userid=$USER->id and (status='active' or status = 'new' or status='cancelling' or status='procactive' or status='processing' or status='scheduled') and type='survey' and deleted = 0 order by id desc limit $limit");
-				$titles = array(	"name" => "Job Name",
-									"type" => "Deliver by",
-									"Status" => "Status",
-									"responses" => "Responses (Unplayed/Total)",
-									"Actions" => "Actions"
-									);
-				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "responses" => "fmt_response_count");
-				if(!$USER->authorize('leavemessage')){
-					unset($titles["responses"]);
-					unset($formatters["responses"]);
-				}
-
-				if (count($data)) {
-					button_bar(button(_L('Refresh'), 'window.location.reload()'));
-					showObjects($data, $titles, $formatters);
-				} else {
-					?><div style="font-size: xx-small; float:left; color: grey;" >You have no active surveys...</div><?
-				}
-				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
-				endWindow();
-
-
-
-				startWindow(_L('My Completed Surveys ') . help('Start_MyCompletedJobs'),NULL,true);
-
-				$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type='survey' and deleted = 0 order by finishdate desc limit $limit");
-				$titles = array(	"name" => "Job Name",
-									"type" => "Deliver by",
-									"Status" => "Status",
-									"enddate" => "End Date",
-									"responses" => "Responses (Unplayed/Total)",
-									"Actions" => "Actions"
-									);
-				$formatters = array("type" => "fmt_surveytype", "Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status',"enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
-				if(!$USER->authorize('leavemessage')){
-					unset($titles["responses"]);
-					unset($formatters["responses"]);
-				}
-				if (count($data)) {
-					showObjects($data, $titles, $formatters);
-				} else {
-					?><div style="font-size: xx-small; float:left; color: grey;" >You have no completed surveys...</div><?
-				}
-				?><div style="text-align:right; white-space:nowrap"><a href="surveys.php" style="font-size: xx-small;">More...</a></div><?
-				endWindow();
-			}
+			
 			}
 
 
