@@ -109,10 +109,15 @@ class FinishJobWizard extends WizFinish {
 		$job->modifydate = QuickQuery("select now()");
 		$job->createdate = QuickQuery("select now()");
 		$job->scheduleid = null;
-		$job->startdate = date("Y-m-d", strtotime($schedule['date']));
-		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($schedule['days'] - 1) * 86400));
-		$job->starttime = date("H:i", strtotime($schedule['callearly']));
-		$job->endtime = date("H:i", strtotime($schedule['calllate']));
+		if ($schedule['date']) {
+			$job->startdate = date("Y-m-d", strtotime($schedule['date']));
+			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($schedule['days'] - 1) * 86400));
+		} else {
+			$job->startdate = date("Y-m-d", 86400);
+			$job->enddate = date("Y-m-d", (7 * 86400));
+		}
+		$job->starttime = isset($schedule['callearly'])?date("H:i", strtotime($schedule['callearly'])):date("H:i", strtotime($USER->getSetting("callearly")));
+		$job->endtime = isset($schedule['calllate'])?date("H:i", strtotime($schedule['calllate'])):date("H:i", strtotime($USER->getSetting("calllate")));
 		$job->finishdate = null;
 		$job->status = "new";
 		$job->create();
