@@ -14,7 +14,7 @@ if(isset($_GET["delete"])) {
 	if(isset($_SESSION['emailattachment']) && isset($_SESSION['emailattachment'][$cmid])) {
 		unset($_SESSION['emailattachment'][$cmid]);
 		foreach($_SESSION['emailattachment'] as $attachment) {			
-			$result[$attachment["contentid"]] = array($attachment["size"],$attachment["filename"]);
+			$result[$attachment["contentid"]] = array("size" => $attachment["size"],"name" => $attachment["filename"]);
 		}
 	}
 	header('Content-Type: application/json');
