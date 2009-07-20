@@ -1327,14 +1327,6 @@ class JobWiz_submitConfirm extends WizStep {
 		
 		$schedule = array();
 		switch ($postdata["/schedule/options"]["schedule"]) {
-			case "now":
-				$schedule = array(
-					"date" => date('m/d/Y'),
-					"callearly" => $postdata["/schedule/date"]["callearly"],
-					"calllate" => $postdata["/schedule/date"]["calllate"],
-					"days" => isset($postdata["/schedule/date"]["days"])?$postdata["/schedule/date"]["days"]:false
-				);
-				break;
 			case "schedule":
 				$schedule = array(
 					"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),

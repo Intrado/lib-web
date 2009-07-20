@@ -189,7 +189,9 @@ class FinishJobWizard extends WizFinish {
 		}
 		
 		$job->setSetting('translationexpire', date("Y-m-d", strtotime("+15 days"))); // now plus 15 days
-		$job->runNow();
+		$job->update();
+		if ($schedule['date'])
+			$job->runNow();
 		
 		//Query("COMMIT");
 		
@@ -221,10 +223,10 @@ require_once("nav.inc.php");
 </script>
 <?
 
-//startWindow($wizard->getStepData()->title);
+startWindow("");
 echo $wizard->render();
-//endWindow();
-if (1) {
+endWindow();
+if (0) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['wizard_job']);
