@@ -90,7 +90,7 @@ startWindow('Upload Import File');
 <?
 endWindow();
 
-?><br><div style="margin-left: 10px;"><img src="img/bug_important.gif"> Please select a file to upload and then click Upload to continue.</div><?
+?><br><div style="margin-left: 10px;"><img src="img/bug_important.gif"> Please select a file to upload and then click Upload to continue.<br>NOTE: if uploading a ZIP file, please be sure you only have one CSV file in the zip archive.</div><?
 
 buttons();
 EndForm();
