@@ -170,11 +170,71 @@ $actions = array('copy' => "Copy",
 				'currencyleadingzero' => "Currency with leading zero",
 				'date' => "Date",
 				'lookup' => "Data Lookup");
+
+
+//helper function to scan a zip file for likely import files
+function scan_zip($zip,$mode) {
+	$max = 0;
+	$foundentry = false;
+	for ($x = 0; $x < $zip->numFiles; $x++) {
+		$entry = $zip->statIndex($x);
+		$name = $entry["name"];
+		$basename = basename($entry["name"]);
+		
+		//skip all hidden files that start with '.'
+		if (strpos($basename,".") === 0)
+			continue;	
+		//skip maxosx stuff
+		if (strpos($name,"__MACOSX") !== false)
+			continue;
+		//skip directories
+		if ($name[strlen($name)-1] == "/")
+			continue;
+		//skip empty files
+		if ($entry['size'] == 0)
+			continue;
+		
+		switch ($mode) {
+			case "largest":
+				if ($entry['size'] > $max) {
+					$max = $entry['size'];
+					$foundentry = $entry;
+				}
+				break;
+			case "extension":
+				$bits = explode(".",$basename);				
+				if (($count = count($bits)) > 1) {
+					$ext = strtolower($bits[$count-1]);
+					if ($ext == "csv" || $ext == "txt") {
+						$foundentry = $entry;
+					}
+				}
+				break;
+		}
+	}
+	
+	return $foundentry;
+}
+
 //scan the file
-$importfile = secure_tmpname("taskmap",".csv");
+$importfile = secure_tmpname("taskmap",".dat");
 file_put_contents($importfile,$import->download());
 
-$fp = @fopen($importfile , "r");
+//see if this will open with zip
+$fp = false;
+$zip = new ZipArchive();
+$res = $zip->open($importfile);
+if ($res === true) {
+	//try to find best file match
+	$entry = scan_zip($zip,"extension");
+	if ($entry === false)
+		$entry = scan_zip($zip,"largest");
+	//see if we found a file, and open a stream for it
+	if ($entry !== false)
+		$fp = $zip->getStream($entry["name"]);
+} else {
+	$fp = @fopen($importfile , "r");
+}
 $colcount = 0;
 if ($fp && filesize($importfile) > 0 ) {
 	$count = $previewrows;
