@@ -83,9 +83,17 @@ if ($result['result'] == "") {
 }
 
 if ($authdomain == "1" && $emaildomain != "") {
-	$emailvalidator = array("ValUsernameUnique","ValEmail","domain"=>$emaildomain,"subdomain"=>true);
+	$emailvalidators = array(
+						array("ValRequired"),
+						array("ValUsernameUnique"),
+						array("ValEmail","domain"=>$emaildomain,"subdomain"=>true)
+					);
 } else {
-	$emailvalidator = array("ValUsernameUnique","ValEmail");	
+	$emailvalidators = array(
+						array("ValRequired"),
+						array("ValUsernameUnique"),
+						array("ValEmail")
+					);
 }
 
 $tos = file_get_contents("locale/en_US/terms.html");
@@ -114,10 +122,7 @@ $formdata["lastname"] = array(
 $formdata["username"] = array(
         "label" => "Account Email",
         "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            $emailvalidator
-        ),
+        "validators" => $emailvalidators,
         "control" => array("TextField","maxlength" => 50),
         "helpstep" => 2
     );
