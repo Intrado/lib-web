@@ -13,13 +13,10 @@ if(isset($_GET["delete"])) {
 	$result = array();
 	if(isset($_SESSION['emailattachment']) && isset($_SESSION['emailattachment'][$cmid])) {
 		unset($_SESSION['emailattachment'][$cmid]);
-		QuickUpdate("delete from content where id=?",false,array($cmid));
-		foreach($_SESSION['emailattachment'] as $attachment) {			
-			$result[$attachment["contentid"]] = array($attachment["size"],$attachment["filename"]);
-		}
 	}
 	header('Content-Type: application/json');
-	echo json_encode(!empty($result) ? $result : false);	
+	$transport = json_encode(!empty($result) ? $result : false);	
+	echo $transport;
 	exit();
 }
 
@@ -111,6 +108,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 
 <body style="margin-left: 0px; margin-top: 1px; margin-bottom: 0px">
 <form id="uploadform" action="emailattachment.php" method="post" enctype="multipart/form-data" onsubmit="" >
+	<input type="hidden" name="MAX_FILE_SIZE" value="<?= $maxattachmentsize ?>">
 	<input id="emailattachment" name="emailattachment" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
 </form>
 <script src="script/prototype.js" type="text/javascript"></script>
@@ -119,7 +117,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	$result = array();
 	if(isset($_SESSION['emailattachment'])) {
 		foreach($_SESSION['emailattachment'] as $attachment) {			
-			$result[$attachment["contentid"]] = array($attachment["size"],$attachment["filename"]);
+			$result[$attachment["contentid"]] = array("size" => $attachment["size"],"name" => $attachment["filename"]);
 		}
 	}
 	$transport = json_encode(!empty($result) ? $result : false);	
