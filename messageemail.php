@@ -19,7 +19,8 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/MessageBody.fi.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
-
+require_once("obj/EmailAttach.fi.php");
+require_once("obj/EmailAttach.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -49,102 +50,6 @@ if (isset($_GET['id'])) {
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-class EmailAttach extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$str = '
-			<input id="' . $n . '" name="' . $n . '" type="hidden"></ input>  
-			<table>
-			<tr>
-				<td></td>
-				<td valign="top">
-					<div id="uploadedfiles"></div>
-				</td>
-				</tr>
-				<tr><td valign="top">
-					<div id="upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
-				</td>
-					<td align="top">
-						<iframe id="my_attach" src="emailattachment.php" style="width:100%;height:60px;border:0px;"></iframe>	
-					</td>
-				</tr>
-				<tr><td>
-				</td>
-					<td align="top">
-						<div id="uploaderror"></div>
-					</td>
-				</tr>	
-			</table>	';
-		$str .= '<script>	
-			     	function startUpload(){
-						$(\'upload_process\').show();	
- 						return true;
-					}
-					function stopUpload(success,transport,errormessage){
-						setTimeout ("$(\'upload_process\').hide();", 500 );
-						var result = transport.evalJSON();
-						var str = "";
-						var contentids = Array();
-						var i = 0;
-						for(var contentid in result) {
-							var onclick = "removeAttachment(" + contentid + ");";	
-							str += result[contentid][1] + "&nbsp;(Size: " + Math.round(result[contentid][0]/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";
-							contentids[i] = contentid;
-							i++;
-						}
-						$("' . $n . '").value = contentids.toJSON();
-						$("uploadedfiles").innerHTML = str;	
-						$("uploaderror").innerHTML = errormessage;
-						form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
- 						return true;
-					}
-					
-					function removeAttachment(contentid) {
-						new Ajax.Request(\'emailattachment.php?delete=\' + contentid, {
-							method:\'get\',
-							onSuccess: function (transport) {
-								var result = transport.responseJSON;
-								var str = "";
-								var contentids = Array();
-								var i = 0;
-								for(var contentid in result) {
-									var onclick = "removeAttachment(" + contentid + ");";
-									str += result[contentid][1] + "&nbsp;(Size: " + Math.round(result[contentid][0]/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";
-									contentids[i] = contentid;
-									i++;
-								}
-								$("' . $n . '").value = contentids.toJSON();
-								$("uploadedfiles").innerHTML = str;			
-								form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));		
-							}
-						});
-					}
-					</script>';
-		return $str;
-	}
-}
-
-class ValEmailAttach extends Validator {
-	function validate ($value, $args) {
-		if(!is_array($value)) {
-			$value = json_decode($value,true);
-		}				
-		if(count($value) > 3)
-			return "Max 3 attachments allowed. Please remove one attachment.";
-		else
-			return true;
-
-	}
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args) {			
-				checkval = value.evalJSON();
-				if(checkval.length > 3)
-					return "Max 3 attachments allowed. Please remove one attachment.";
-				return true;
-			}';
-	}
-}
 
 
 
@@ -295,13 +200,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$message->stuffHeaders();
 		$message->update();
 		
+		Query("BEGIN");		
 		//update the parts
 		QuickUpdate("delete from messagepart where messageid=$message->id");
 		foreach ($parts as $part) {
 			$part->messageid = $message->id;
 			$part->create();
 		}
-			//see if there is an uploaded file and add it to this email
+
+		QuickUpdate("delete from messageattachment where messageid=?",false,array($_SESSION['messageid']));	
+		//see if there is an uploaded file and add it to this email
 		if (isset($_SESSION['emailattachment'])) {
 			$attachmentcount = 0;
 			foreach($_SESSION['emailattachment'] as $emailattachments) {
@@ -318,6 +226,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 			unset($_SESSION['emailattachment']);
 		}
+		Query("COMMIT");
+		
 		if ($ajax)
 			$form->sendTo("messages.php");
 		else
