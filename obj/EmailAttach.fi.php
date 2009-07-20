@@ -19,15 +19,13 @@ class EmailAttach extends FormItem {
 					setTimeout ("$(\'upload_process\').hide();", 500 );
 					var result = transport.evalJSON();
 					var str = "";
-					var contentids = Array();
-					var i = 0;
-					for(var contentid in result) {
-						var onclick = "removeAttachment(" + contentid + ");";	
-						str += result[contentid][1] + "&nbsp;('.addslashes(_L('Size')).': " + Math.round(result[contentid][0]/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>'.addslashes(_L('Remove')).'</a><br />";
-						contentids[i] = contentid;
-						i++;
-					}
-					$("' . $n . '").value = contentids.toJSON();
+					Object.keys(result).each(function (contentid) {
+						var onclick = "removeAttachment(" + contentid + ");";
+				 		str += result[contentid][\'name\'] + "&nbsp;(Size: " + Math.round(result[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";
+						
+					});
+					
+					$("' . $n . '").value = transport;							
 					$("uploadedfiles").innerHTML = str;	
 					$("uploaderror").innerHTML = errormessage;
 					form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
@@ -40,15 +38,11 @@ class EmailAttach extends FormItem {
 						onSuccess: function (transport) {
 							var result = transport.responseJSON;
 							var str = "";
-							var contentids = Array();
-							var i = 0;
-							for(var contentid in result) {
+							Object.keys(result).each(function (contentid) {
 								var onclick = "removeAttachment(" + contentid + ");";
-								str += result[contentid][1] + "&nbsp;(Size: " + Math.round(result[contentid][0]/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";
-								contentids[i] = contentid;
-								i++;
-							}
-							$("' . $n . '").value = contentids.toJSON();
+								str += result[contentid][\'name\'] + "&nbsp;(Size: " + Math.round(result[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";
+							});
+							$("' . $n . '").value = Object.toJSON(result);							
 							$("uploadedfiles").innerHTML = str;			
 							form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
 						}
