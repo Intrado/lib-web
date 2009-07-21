@@ -97,6 +97,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
+			// if static text field
+			if ($fieldmap->isOptionEnabled('text')) {
+				$value = $postdata['values'];
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
+			}
+
 		QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
 
 		$insertstmt = "insert into persondatavalues (fieldnum, value, refcount, editlock) values ";

@@ -48,12 +48,7 @@ class SubscriberWiz_choosefield extends WizStep {
        		"helpstep" => 1
    		);
 		
-		$helpsteps = array (
-			"Welcome",
-			"blah blah"
-		);
-		
-		return new Form("choosefield", $formdata, $helpsteps);
+		return new Form("choosefield", $formdata, null);
 	}
 }
 
@@ -95,15 +90,7 @@ class SubscriberWiz_choosevaltype extends WizStep {
         	"helpstep" => 1
 		);
 		
-		$helpsteps = array (
-			"Welcome",
-			"Static Text field is not displayed to subscriber.<br>" .
-			"Dynamic Text field is for subscriber to enter their name.<br>" .
-			"Static List field is a list defined here.<br>" .
-			"Dynamic List field is list values from imports.<br>"
-		);
-		
-		return new Form("choosevaltype", $formdata, $helpsteps);
+		return new Form("choosevaltype", $formdata, null);
 	}
 }
 
@@ -149,12 +136,7 @@ class SubscriberWiz_staticvalues extends WizStep {
     		);
 		}
 
-		$helpsteps = array (
-			"Welcome",
-			"blah, blah"
-		);
-		
-		return new Form("staticvalues", $formdata, $helpsteps);
+		return new Form("staticvalues", $formdata, null);
 	}
 	
 	//returns true if this step is enabled
@@ -192,6 +174,12 @@ class FinishSubscriberFieldWizard extends WizFinish {
 		$insertvalues = array();
 	
 		if (isset($postdata['/staticvalues'])) {
+			// if static text field
+			if ($fieldmap->isOptionEnabled('text')) {
+				$value = $postdata['/staticvalues']['values'];
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
+			}
+			//
 			$datavalues = explode("\n", $postdata['/staticvalues']['values']);
 			foreach ($datavalues as $value) {
 				if (strlen($value) == 0) continue; // skip blank lines
