@@ -114,7 +114,7 @@ class ValJobName extends Validator {
 	
 	function validate ($value, $args) {
 		global $USER;
-		$jobcount = QuickQuery("select count(id) from job where userid=? and name=? and not deleted and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
+		$jobcount = QuickQuery("select count(id) from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
 		if ($jobcount)
 			return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
 		return true;
@@ -1241,6 +1241,9 @@ class JobWiz_submitConfirm extends WizStep {
 		$phoneMsg = array();
 		$emailMsg = array();
 		$smsMsg = array();
+		$emailmessagelink = false;
+		$smsmessagelink = false;
+		
 		switch ($postdata["/start"]["package"]) {
 			//If package is Easycall
 			case "easycall":
@@ -1311,16 +1314,7 @@ class JobWiz_submitConfirm extends WizStep {
 				if (in_array('email', $postdata["/message/pick"]["type"])) {
 					switch ($postdata["/message/select"]["email"]) {
 						case "record":
-							$emailMsg = array("English (Default)" => array(
-								"id" => "",
-								"from" => $USER->email,
-								"fromname" => "",
-								"subject" => $postdata["/start"]["name"],
-								"attachments" => array(),
-								"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
-								"language" => "english",
-								"override" => true
-							));
+							$emailmessagelink = true;
 							break;
 						case "text":
 							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
@@ -1337,11 +1331,7 @@ class JobWiz_submitConfirm extends WizStep {
 				if (in_array('sms', $postdata["/message/pick"]["type"])) {
 					switch ($postdata["/message/select"]["sms"]) {
 						case "record":
-							$smsMsg = array("Default" => array(
-								"id" => false,
-								"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
-								"language" => "english"
-							));
+							$smsmessagelink = true;
 							break;
 						case "text":
 							$smsMsg = array("Default" => array(
@@ -1523,6 +1513,8 @@ class JobWiz_submitConfirm extends WizStep {
 			"email" => $emailMsg,
 			"sms" => $smsMsg,
 			"print" => array(),
+			"emailmessagelink" => $emailmessagelink,
+			"smsmessagelink" => $smsmessagelink,
 			"schedule" => $schedule
 		);
 		

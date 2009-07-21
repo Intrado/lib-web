@@ -79,13 +79,14 @@ class FinishJobWizard extends WizFinish {
 	
 	function finish ($postdata) {
 		global $USER;
-		error_log("SAVING WIZARD DATA");
 		
+		if (!isset($_SESSION['confirmedJobWizard']))
+			return;
 		$jobsettings = $_SESSION['confirmedJobWizard'];
 		unset($_SESSION['confirmedJobWizard']);
 		$schedule = $jobsettings['schedule'];
 		
-		//Query("BEGIN");
+		Query("BEGIN");
 		$job = Job::jobWithDefaults();
 		
 		// Attach lists
@@ -161,12 +162,12 @@ class FinishJobWizard extends WizFinish {
 						
 						// TODO: need correct attachment values.
 						if (isset($message['attachments']) && $message['attachments']) {
-							foreach ($message['attachments'] as $attachment) {
+							foreach ($message['attachments'] as $cid => $details) {
 								$msgattachment = new MessageAttachment();
 								$msgattachment->messageid = $newmessage->id;
-								$msgattachment->contentid = $attachment;
-								$msgattachment->filename = "filename";
-								$msgattachment->size = 0;
+								$msgattachment->contentid = $cid;
+								$msgattachment->filename = $details->name;
+								$msgattachment->size = $details->size;
 								$msgattachment->deleted = 1;
 								$msgattachment->create();
 							}
@@ -194,11 +195,17 @@ class FinishJobWizard extends WizFinish {
 		}
 		
 		$job->setSetting('translationexpire', date("Y-m-d", strtotime("+15 days"))); // now plus 15 days
+		if ($jobsettings['emailmessagelink'])
+			$job->setSetting('emailmessagelink', "1");
+		
+		if ($jobsettings['smsmessagelink'])
+			$job->setSetting('smsmessagelink', "1");
+		
 		$job->update();
 		if ($schedule['date'])
 			$job->runNow();
 		
-		//Query("COMMIT");
+		Query("COMMIT");
 		
 	}
 	
@@ -231,7 +238,7 @@ require_once("nav.inc.php");
 startWindow("");
 echo $wizard->render();
 endWindow();
-if (0) {
+if (1) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['wizard_job']);
