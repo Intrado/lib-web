@@ -83,7 +83,7 @@ $insertfields = FieldMap::getAuthorizedMapNames();
 $formdata = array(
 	"messagename" => array(
 		"label" => _L('Message Name'),
-		"fieldhelp" => "",
+		"fieldhelp" => _L('The name of your message goes here. The best names describe the message content.'),
 		"value" => $message->name,
 		"validators" => array(
 			array("ValRequired","ValLength","min" => 3,"max" => 50),
@@ -94,6 +94,7 @@ $formdata = array(
 	),
 	"description" => array(
 		"label" => _L('Description'),
+		"fieldhelp" => _L('Enter an optional description.'),
 		"value" => $message->description,
 		"validators" => array(),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
@@ -102,6 +103,7 @@ $formdata = array(
 	"&nbsp;",
 	"fromname" => array(
 		"label" => _L('From Name'),
+		"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
 		"value" => $message->fromname,
 		"validators" => array(array("ValRequired","ValLength","min" => 3,"max" => 50)),
 		"control" => array("TextField","size" => 25, "maxlength" => 51),
@@ -109,6 +111,7 @@ $formdata = array(
 	),
 	"fromemail" => array(
 		"label" => _L('From Email'),
+		"fieldhelp" => _L('This is the address the email will appear to originate from. Recipients may reply to this message at this email address.'),
 		"value" => $message->fromemail,
 		"validators" => array(
 					array("ValRequired"),
@@ -118,7 +121,7 @@ $formdata = array(
 	),
 	"subject" => array(
 		"label" => _L('Subject'),
-		"fieldhelp" => "Enter the subject, the from name and from e-mail address as you wish them to appear to e-mail message recipients.",
+		"fieldhelp" => _L("The subject will be the first thing an email recipient sees. It should be brief and descriptive."),
 		"value" => $message->subject,
 		"validators" => array(array("ValRequired","ValLength","min" => 1,"max" => 50)),
 		"control" => array("TextField","size" => 50, "maxlength" => 100),
@@ -126,7 +129,7 @@ $formdata = array(
 	),	
 	"attachements" => array(
 		"label" => _L('Attachments'),
-		"fieldhelp" => "You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted.",
+		"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
 		"value" => $attachvalues,
 		"validators" => array(array("ValEmailAttach")),
 		"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
@@ -134,7 +137,7 @@ $formdata = array(
 	),
 	"messagebody" => array(
 		"label" => _L('Message Body'),
-		"fieldhelp" => "The body of your e-mail can contain text as well as dynamic data elements. Carriage returns and line feeds can be used for formatting. To insert data fields, place the cursor in the desired location, and then select from the available field options to the right.",
+		"fieldhelp" => _L("The body of your e-mail can contain text as well as dynamic data elements."),
 		"value" => $messagebody,
 		"validators" => array(
 			array("ValRequired"),
@@ -146,11 +149,10 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('Set a discriptive name to be able to easaly find your message later.'),
-	'<ul><li>' . _L('Use your own name and email') . '<li>' . _L('Always set a discriptive Subject') . '</ul>',
-	'<ul><li>' . _L('Attach files up to 2 MB') . '<li>' . _L('Mention the  attachments in the Message body') . '</ul>',
-	_L('Type your message') . '<ul><li>' . _L('Introduce yourself') . '<li>' . _L('Keep it simple') . '<li>' . _L('Refer to attachments') . '</ul>'
-	//. _L('Insert Example') . '<ul><li>' . _L('Choose First Name field') . '<li>' . _L('Default field will be used when the field is not available') . '</ul>'  
+	_L('Enter a name for your message. The best names are descriptive and allow the message to be easily reused later. You can also optionally enter a description for your message.'),
+	_L('You can specify who the email is coming from in this section. Then enter the subject line for the email which recipients will see in their inboxes.'),
+	_L('You may attach files up to 2Mb in size. You should mention the attachment in the body of the email.'). "<br><br><b>". _L('Note'). ":</b>". _L('Some recipients may have size restrictions on incoming emails and may not receive emails with large attachments.'),
+	_L('Type your message in the Message Body field. Additional tips for successful messages can be found at the Help link in the upper right corner.'). "<br><br>". _L("If you would like to personalize your message with the recipient's data, set the cursor at the point in the message where the data should be inserted, choose the field you would like to use, and click enter. You should also enter a default value for any contacts who are missing data for the field you have selected.")
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),

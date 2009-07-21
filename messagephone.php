@@ -85,6 +85,7 @@ $insertfields = FieldMap::getAuthorizedMapNames();
 $formdata = array(
 	"messagename" => array(
 		"label" => _L('Message Name'),
+		"fieldhelp" => _L('The name of your message goes here. The best names describe the message content.'),
 		"value" => $messagename,
 		"validators" => array(
 			array("ValRequired","ValLength","min" => 3,"max" => 50),
@@ -95,6 +96,7 @@ $formdata = array(
 	),
 	"description" => array(
 		"label" => _L('Description'),
+		"fieldhelp" => _L('Enter an optional description.'),
 		"value" => $messagedescription,
 		"validators" => array(),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
@@ -104,6 +106,7 @@ $formdata = array(
 	,
 	"language" => array(
 		"label" => _L('Language'),
+		"fieldhelp" => _L('Select the appropriate text-to-speech language for the language in your message. Note: This is not for message translation.'),
 		"value" => ucfirst($messagevoice["language"]),
 		"validators" => array(array("ValRequired")),
 		"control" => array("SelectMenu","values" => $languages),
@@ -111,6 +114,7 @@ $formdata = array(
 	),
 	"voice" => array(
 		"label" => _L('Preferred Voice'),
+		"fieldhelp" => _L('Choose the gender of the text-to-speech voice.'),
 		"value" => ucfirst($messagevoice["gender"]),
 		"validators" => array(array("ValRequired")),
 		"control" => array("RadioButton","values" => array ("Female" => "Female","Male" => "Male")),
@@ -118,6 +122,7 @@ $formdata = array(
 	),
 	"messagebody" => array(
 		"label" => _L('Message Content'),
+		"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 		"value" => $messagebody,
 		"validators" => array(
 			array("ValRequired"),
@@ -130,9 +135,9 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('Set a discriptive name to be able to easaly find your message later.'),
-	_L('The text to speach voice will need to know what language is used'),
-	_L('Type your messge. You may use the included toos to construct an advanced message with field insersts')
+	_L('Enter a name for your message. The best names are descriptive and allow the message to be easily reused later. You can also optionally enter a description for your message.'),
+	_L('Select the language and gender of the text-to-speech voice.'). "<br><br> <b>". _L('Note'). ":</b> ". _L('The text-to-speech voice you choose should match the language of the message. This is not for translation.'),
+	_L('Type your message in the Message Content field. Additional tips for successful messages can be found at the Help link in the upper right corner.'). "<br><br>". _L("If you would like to personalize your message with the recipient's data, set the cursor at the point in the message where the data should be inserted, choose the field you would like to use, and click enter. You should also enter a default value for any contacts who are missing data for the field you have selected."). "<br><br>". _L('Tip'). ": ". _L('For the best sounding text-to-speech, use good punctuation and simple sentences where possible.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),

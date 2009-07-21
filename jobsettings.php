@@ -21,7 +21,7 @@ if (!$USER->authorize('managesystem')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
-$helpstepnum = 1;
+$helpstepnum = 0;
 
 $helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
 if (getSystemSetting('_hascallback', false)) {
@@ -73,6 +73,7 @@ if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 	$helpsteps[$helpstepnum++] = _L("If you use a Flex appliance or have a licensed solution, enter the minimum and maximum length of extensions on your local network. For example, to have the system call  four digit extensions on your local network, set these values to 4.");
 	$formdata["easycallmin"] = array(
 		"label" => _L("Minimum Extensions Length"),
+		"fieldhelp" => _L("This is the minimum length of an extension on your local network which your Flex appliance or licensed solution may call."),
 		"value" => getSystemSetting('easycallmin',10),
 		"validators" => array(
 			array("ValRequired"),
@@ -83,7 +84,9 @@ if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 	
 	$formdata["easycallmax"] = array(
 		"label" => _L("Maximum Extensions Length"),
+		"fieldhelp" => _L("This is the maximum length of an extension on your local network which your Flex appliance or licensed solution may call."),
 		"value" => getSystemSetting('easycallmax',10),
+		"fieldhelp" => _L("This is the maximum length of an extension on your local network which your Flex appliance or licensed solution may call."),
 		"validators" => array(
 			array("ValRequired"),
 			array("ValNumber","min" => 1,"max" => 10)),

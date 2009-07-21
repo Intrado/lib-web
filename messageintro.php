@@ -205,7 +205,7 @@ foreach($languages as $language) {
 }
 
 $helpsteps = array (
-	_L('This message will play before all messages.').'<br><br> '._L('The best intro messages include a brief greeting and notify the recipient that they can:').' <ul><li>'._L('Press pound to put the message on hold.').'</ul>'
+	_L('These intro messages will play before all phone messages. The best intro messages contain a brief greeting and let recipients know that they can press pound to repeat the message. Additionally, the Emergency intro message should state that the message is an emergency.'),
 );
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),

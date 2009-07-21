@@ -121,17 +121,20 @@ $formdata[] = _L("Account Information");
 if ($readonly) {
 	$formdata["firstname"] = array(
 		"label" => _L("First Name"),
+		"fieldhelp" => _L("The user's first name."),
 		"control" => array("FormHtml","html" => $edituser->firstname),
 		"helpstep" => 1
 	);
 	$formdata["lastname"] = array(
 		"label" => _L("Last Name"),
+		"fieldhelp" => _L("The user's last name."),
 		"control" => array("FormHtml","html" => $edituser->lastname),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["firstname"] = array(
 		"label" => _L("First Name"),
+		"fieldhelp" => _L("The user's first name."),
 		"value" => $edituser->firstname,
 		"validators" => array(
 			array("ValRequired"),
@@ -142,6 +145,7 @@ if ($readonly) {
 	);
 	$formdata["lastname"] = array(
 		"label" => _L("Last Name"),
+		"fieldhelp" => _L("The user's last name."),
 		"value" => $edituser->lastname,
 		"validators" => array(
 			array("ValRequired"),
@@ -154,6 +158,7 @@ if ($readonly) {
 
 $formdata["description"] = array(
 	"label" => _L("Description"),
+	"fieldhelp" => _L('An optional description of the user.'),
 	"value" => $edituser->description,
 	"validators" => array(),
 	"control" => array("TextField","maxlength" => 50, "size" => 40),
@@ -163,12 +168,14 @@ $formdata["description"] = array(
 if ($readonly) {
 	$formdata["login"] = array(
 		"label" => _L("Username"),
+		"fieldhelp" => _L('The username that the user will use to log into the system.'),
 		"control" => array("FormHtml","html" => $edituser->login),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["login"] = array(
 		"label" => _L("Username"),
+		"fieldhelp" => _L('The username that the user will use to log into the system.'),
 		"value" => $edituser->login,
 		"validators" => array(
 			array("ValRequired"),
@@ -203,6 +210,7 @@ $passlength = getSystemSetting("passwordlength", 5);
 if ($readonly) {
 	$formdata["password"] = array(
 		"label" => _L("Password"),
+		"fieldhelp" => _L('The password is used to log into the web interface.'),
 		"value" => $pass,
 		"validators" => array(
 			array("ValRequired"),
@@ -215,6 +223,7 @@ if ($readonly) {
 } else {
 	$formdata["password"] = array(
 		"label" => _L("Password"),
+		"fieldhelp" => _L('The password is used to log into the web interface.'),
 		"value" => $pass,
 		"validators" => array(
 			array("ValRequired"),
@@ -229,6 +238,7 @@ if ($readonly) {
 
 $formdata["passwordconfirm"] = array(
 	"label" => _L("Confirm Password"),
+	"fieldhelp" => _L('This field is used used to confirm a new password.'),
 	"value" => $pass,
 	"validators" => array(
 		array("ValRequired"),
@@ -243,12 +253,14 @@ $formdata["passwordconfirm"] = array(
 if ($readonly) {
 	$formdata["accesscode"] = array(
 		"label" => _L("Phone User ID"),
+		"fieldhelp" => _L('The number in this field is like a username for logging into the system by phone.'),
 		"control" => array("FormHtml","html" => $edituser->accesscode),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["accesscode"] = array(
 		"label" => _L("Phone User ID"),
+		"fieldhelp" => _L('The number in this field is like a username for logging into the system by phone.'),
 		"value" => $edituser->accesscode,
 		"validators" => array(
 			array("ValNumeric", "min" => 4),
@@ -263,6 +275,7 @@ $pin = $edituser->accesscode ? '00000' : '';
 if ($readonly) {
 	$formdata["pin"] = array(
 		"label" => _L("Phone PIN Code"),
+		"fieldhelp" => _L('The number in this field is like a password for logging into the system by phone.'),
 		"value" => $pin,
 		"validators" => array(
 			array("ValNumeric", "min" => 4),
@@ -274,6 +287,7 @@ if ($readonly) {
 } else {
 	$formdata["pin"] = array(
 		"label" => _L("Phone PIN Code"),
+		"fieldhelp" => _L('The number in this field is like a password for logging into the system by phone.'),
 		"value" => $pin,
 		"validators" => array(
 			array("ValNumeric", "min" => 4),
@@ -287,6 +301,7 @@ if ($readonly) {
 
 $formdata["pinconfirm"] = array(
 	"label" => _L("Confirm PIN"),
+	"fieldhelp" => _L('This field is used to confirm a new PIN number.'),
 	"value" => $pin,
 	"validators" => array(
 		array("ValNumeric"),
@@ -300,24 +315,28 @@ $formdata["pinconfirm"] = array(
 if ($readonly) {
 	$formdata["email"] = array(
 		"label" => _L("Email"),
+		"fieldhelp" => _L("This is the user's email address."),
 		"control" => array("FormHtml","html" => $edituser->email),
 		"helpstep" => 1
 	);
 
 	$formdata["aremail"] = array(
 		"label" => _L("Auto Report Emails"),
+		"fieldhelp" => _L("Email addresses entered here will receive copies of any autoreports associated with this user. The user's email address will automatically receive reports and should not be entered here."),
 		"control" => array("FormHtml","html" => $edituser->aremail),
 		"helpstep" => 1
 	);
 
 	$formdata["phone"] = array(
 		"label" => _L("Phone"),
+		"fieldhelp" => _L('This is the direct access phone number for the user.'),
 		"control" => array("FormHtml","html" => Phone::format($edituser->phone)),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["email"] = array(
 		"label" => _L("Email"),
+		"fieldhelp" => _L("This is the user's email address."),
 		"value" => $edituser->email,
 		"validators" => array(
 			array("ValLength","min" => 3,"max" => 255),
@@ -329,6 +348,7 @@ if ($readonly) {
 
 	$formdata["aremail"] = array(
 		"label" => _L("Auto Report Emails"),
+		"fieldhelp" => _L("Email addresses entered here will receive copies of any autoreports associated with this user. The user's email address will automatically receive reports and should not be entered here."),
 		"value" => $edituser->aremail,
 		"validators" => array(
 			array("ValLength","min" => 3,"max" => 1024),
@@ -340,6 +360,7 @@ if ($readonly) {
 
 	$formdata["phone"] = array(
 		"label" => _L("Phone"),
+		"fieldhelp" => _L('This is the direct access phone number for the user.'),
 		"value" => Phone::format($edituser->phone),
 		"validators" => array(
 			array("ValLength","min" => 2,"max" => 20),
@@ -355,18 +376,21 @@ $formdata[] = _L("Account Restrictions");
 if ($readonly) {
 	$formdata["accessid"] = array(
 		"label" => _L("Access Profile"),
+		"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
 		"control" => array("FormHtml","html" => $profilename),
 		"helpstep" => 1
 	);
 } else if (!count($accessprofiles)) {
 	$formdata["accessid"] = array(
 		"label" => _L("Access Profile"),
+		"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
 		"control" => array("FormHtml","html" => _L("You have no Aceess Profiles defined! Go to the Admin->Profiles tab and create one.")),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["accessid"] = array(
 		"label" => _L("Access Profile"),
+		"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
 		"value" => $edituser->accessid,
 		"validators" => array(
 			array("ValRequired")
@@ -395,17 +419,20 @@ if ($readonly) {
 	}
 	$formdata["jobtypes"] = array(
 		"label" => _L("Job Type Restriction"),
+		"fieldhelp" => _L('If the user should only be able to send certain types of jobs, check the job types here. Checking nothing will allow the user to send any job type.'),
 		"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>"),
 		"helpstep" => 1
 	);
 	$formdata["surveytypes"] = array(
 		"label" => _L("Survey Type Restriction"),
+		"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
 		"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>"),
 		"helpstep" => 1
 	);
 } else {
 	$formdata["jobtypes"] = array(
 		"label" => _L("Job Type Restriction"),
+		"fieldhelp" => _L('If the user should only be able to send certain types of jobs, check the job types here. Checking nothing will allow the user to send any job type.'),
 		"value" => $userjobtypeids,
 		"validators" => array(),
 		"control" => array("MultiCheckBox", "values"=>$jobtypes),
@@ -413,6 +440,7 @@ if ($readonly) {
 	);
 	$formdata["surveytypes"] = array(
 		"label" => _L("Survey Type Restriction"),
+		"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
 		"value" => $usersurveytypes,
 		"validators" => array(),
 		"control" => array("MultiCheckBox", "values"=>$surveytypes),
@@ -427,6 +455,7 @@ if ($readonly) {
 		if (count($rules)) {
 			$formdata["datarules"] = array(
 				"label" => _L("Data Restriction"),
+				"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
 				"value" => json_encode(array_values($rules)),
 				"validators" => array(),
 				"requires" => array("staffpkey"),
@@ -472,6 +501,7 @@ if ($readonly) {
 	} else {
 		$formdata["datarules"] = array(
 			"label" => _L("Data Restriction"),
+			"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
 			"value" => json_encode(array_values($rules)),
 			"validators" => array(
 				array("ValRules")
