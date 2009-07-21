@@ -9,7 +9,7 @@ class EmailAttach extends FormItem {
 		}
 		
 		$str = '
-			<input id="' . $n . '" name="' . $n . '" type="text" value="' . escapehtml($value) . '"/>
+			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
 			<div id="uploadedfiles"></div>
 			<div id="upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
 			<iframe id="'.$n.'my_attach" src="emailattachment.php" style="width:100%;height:26px;border:0px;" FRAMEBORDER="0" MARGINWIDTH="0px" MARGINHEIGHT="0px"></iframe>
