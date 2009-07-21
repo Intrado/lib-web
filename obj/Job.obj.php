@@ -285,8 +285,9 @@ class Job extends DBMappedObject {
 		//basic job info -- not used/visible on forms, these need to set this again after post data
 		$job->status = "new";
 		$job->userid = $USER->id;
-		$job->createdate = QuickQuery("select now()");
-
+		$job->createdate = date("Y-m-d H:i:s", time());
+		$job->modifydate = date("Y-m-d H:i:s", time());
+		
 		//call settings
 		$job->setOptionValue("maxcallattempts", min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4")));
 
