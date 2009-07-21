@@ -8,21 +8,6 @@ if ($USER->authorize("sendemail") === false) {
 	redirect('./');
 }
 
-if(isset($_GET["delete"])) {
-	$cmid = $_GET["delete"] + 0;
-	$result = array();
-	if(isset($_SESSION['emailattachment']) && isset($_SESSION['emailattachment'][$cmid])) {
-		unset($_SESSION['emailattachment'][$cmid]);
-		foreach($_SESSION['emailattachment'] as $attachment) {			
-			$result[$attachment["contentid"]] = array("size" => $attachment["size"],"name" => $attachment["filename"]);
-		}
-	}
-	header('Content-Type: application/json');
-	$transport = json_encode(!empty($result) ? $result : false);	
-	echo $transport;
-	exit();
-}
-
 $filename = '';
 $contentid = '';
 $size = 0;
@@ -65,6 +50,8 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	$newname = secure_tmpname("emailattachment",".dat");
 
 	$filename = $_FILES['emailattachment']['name'];
+	$size = $_FILES['emailattachment']['size'];
+	
 	$extdotpos = strrpos($filename,".");
 	if ($extdotpos !== false)
 		$ext = substr($filename,$extdotpos);
@@ -87,14 +74,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 		$contentid = contentPut($newname,$mimetype);
 		@unlink($dest);
 		if ($contentid) {
-			$_SESSION['emailattachment'][$contentid] =array(
-					"contentid" => $contentid,
-					"filename" => $filename,
-					"size" => $_FILES['emailattachment']['size'],
-					"mimetype" => $_FILES['emailattachment']['type']
-				);
 			$uploaderror = false;
-			$size = $_FILES['emailattachment']['size'];
 		} else {
 			$errormessage .= _L('Unable to upload email attachment data, either the file was empty or there is a DB problem.');
 			$errormessage .= _L('Unable to complete file upload. Please try again');
@@ -116,16 +96,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 </form>
 <script src="script/prototype.js" type="text/javascript"></script>
 <script language="javascript" type="text/javascript">
-	<?
-	$result = array();
-	if(isset($_SESSION['emailattachment'])) {
-		foreach($_SESSION['emailattachment'] as $attachment) {			
-			$result[$attachment["contentid"]] = array("size" => $attachment["size"],"name" => $attachment["filename"]);
-		}
-	}
-	$transport = json_encode(!empty($result) ? $result : false);	
-	?>
-	window.top.window.stopUpload('1','<?= $transport ?>','<?= $errormessage ?>');
+	window.top.window.stopUpload('<?= $contentid ?>','<?= $filename ?>','<?= $size ?>','<?= $errormessage ?>');
 </script> 
 </body>
 </html>
