@@ -253,7 +253,6 @@ showObjects($destinations, $titles, array("name"=>"fmt_name", "status"=>"fmt_sta
 
 // find remaining phone/email/sms available (some already active and pending)
 $available = findAvailableDestinationTypes();
-error_log("count".count($available));
 if (count($available) > 0)
 	buttons(icon_button("Add More",null,null,"destinationwizard.php"));
 else {
