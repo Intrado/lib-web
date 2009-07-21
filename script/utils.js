@@ -398,5 +398,25 @@ function ajax_table_update(containerID, uri) {
 	}, null, false); // Do not cache this request.
 }
 
-
-
+function icon_button(name,icon,id) {
+	var newbutton = new Element("button",{class: "button", type: "button"});
+	newbutton.id = id;
+	
+	buttonrecord = new Element("tr", {});
+	buttonrecord.insert(new Element("td",{}).insert(new Element("img",{class: "left", src: "img/themes/"+_brandtheme+"/button_left.gif"})));
+	
+	var buttonface = new Element("td",{class: "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
+	buttonrecord.insert(buttonface);
+	
+	buttonrecord.insert(new Element("td",{}).insert(new Element("img",{class: "right", src: "img/themes/"+_brandtheme+"/button_right.gif"})));
+	
+	var buttonbody = new Element("table",{})
+	buttonbody.insert(new Element("tbody",{}).insert(buttonrecord));
+	
+	newbutton.insert(buttonbody);
+	
+	newbutton.observe("mouseover", btn_rollover.bind(this,newbutton));
+	newbutton.observe("mouseout", btn_rollout.bind(this,newbutton));
+	
+	return newbutton;
+}
