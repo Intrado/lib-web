@@ -283,15 +283,30 @@ function fmt_job_startdate ($obj,$name) {
 function fmt_status($obj, $name) {
 	global $USER;
 	if ($obj->status == 'new') {
-		return "Not Submitted";
+		return _L("Not Submitted");
 	} else if ($obj->status == 'procactive') {
-			return "Processing (" . $obj->percentprocessed . "%)";
+			return _L('Processing (%1$s%%)',$obj->percentprocessed);
 	} else {
 		if ($obj->cancelleduserid && $obj->cancelleduserid != $USER->id) {
 			$usr = new User($obj->cancelleduserid);
-			return "Cancelled (" . $usr->login . ")";
+			return L('Cancelled (%1$s)', $usr->login);
 		} else {
-			return ucfirst($obj->status);
+			switch($obj->status) {
+				case "scheduled":
+					return _L("Scheduled");
+				case "active":
+					return _L("Active");
+				case "complete":
+					return _L("Complete");	
+				case "cancelled":
+					return _L("Cancelled");
+				case "cancelling":
+					return _L("Cancelling");
+				case "repeating":
+					return _L("Repeating");
+				default:
+					return ucfirst($obj->status);
+			}
 		}
 	}
 }
