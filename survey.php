@@ -143,6 +143,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$job->emailmessageid = NULL;
 			$job->sendprint = false;
 			$job->printmessageid = NULL;
+			$job->modifydate = date("Y-m-d H:i:s", time());
 
 			//always skip dupes
 			$job->setOption("skipduplicates",true);
