@@ -200,17 +200,10 @@ $formdata["acceptterms"] = array(
     );
 
 
-$helpsteps = array (
-    "This guide will help you complete the signup process.  Click the arrow to begin.",
-	"Provide your first and last name.",
-	"Your email will be used as your login username.  This must be a valid email address; your account is not activated until you confirm receipt of this email.",
-	"Your password",
-	"The terms"
-);
 
 $buttons = array(submit_button("Create Account","save","tick"));
 
-$form = new Form("createaccount",$formdata,$helpsteps,$buttons);
+$form = new Form("createaccount",$formdata,null,$buttons);
 $form->ajaxsubmit = true;
 
 //check and handle an ajax request (will exit early)
