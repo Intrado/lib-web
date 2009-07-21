@@ -65,13 +65,9 @@ if(isset($_SESSION['messageid'])) {
 	$messagebody = $message->format($parts);
 	
 	$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid=" . DBSafe($_SESSION['messageid']));
+	$attachvalues = array();
 	foreach ($attachments as $attachment) {
-		$_SESSION['emailattachment'][$attachment->contentid] = array(
-					"contentid" => $attachment->contentid,
-					"filename" => $attachment->filename,
-					"size" => $attachment->size,
-					"exists" => true
-		);
+		$attachvalues[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
 	}
 } else {
 	$message = new Message();
@@ -131,7 +127,7 @@ $formdata = array(
 	"attachements" => array(
 		"label" => _L('Attachments'),
 		"fieldhelp" => "You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted.",
-		"value" => "",
+		"value" => $attachvalues,
 		"validators" => array(array("ValEmailAttach")),
 		"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
 		"helpstep" => 3
@@ -210,21 +206,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		QuickUpdate("delete from messageattachment where messageid=?",false,array($_SESSION['messageid']));	
 		//see if there is an uploaded file and add it to this email
-		if (isset($_SESSION['emailattachment'])) {
-			$attachmentcount = 0;
-			foreach($_SESSION['emailattachment'] as $emailattachments) {
-				if(!isset($emailattachments['exists']) && $attachmentcount < 3) {	
-					$msgattachment = new MessageAttachment();
-					$msgattachment->messageid = $message->id;
-					$msgattachment->contentid = $emailattachments['contentid'];
-					$msgattachment->filename = $emailattachments['filename'];
-					$msgattachment->size = $emailattachments['size'];
-					$msgattachment->create();	
-					error_log("created new attachment");
-				}
-				$attachmentcount++;
+		if (isset($postdata["attachements"])) {
+			$emailattachments = json_decode($postdata["attachements"],true);
+			
+			foreach($emailattachments as $contentid => $attachment) {
+				$msgattachment = new MessageAttachment();
+				$msgattachment->messageid = $message->id;
+				$msgattachment->contentid = $contentid;
+				$msgattachment->filename = $attachment['name'];
+				$msgattachment->size = $attachment['size'];
+				$msgattachment->create();	
 			}
-			unset($_SESSION['emailattachment']);
 		}
 		Query("COMMIT");
 		
