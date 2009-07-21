@@ -144,7 +144,7 @@ class FinishDestWizard extends WizFinish {
 				$formhtml = getPhoneReview($postdata['/collectdata']['newdata'], $code);
 			}
 		}
-		return $formhtml . icon_button("Done", "tick", "", "destinationwizard.php?cancel");
+		return $formhtml;
 	}
 }
 
@@ -155,6 +155,7 @@ $wizdata = array(
 	);
 
 $wizard = new Wizard("destwiz", $wizdata, new FinishDestWizard("Activate"));
+$wizard->doneurl = "notificationpreferences.php";
 $wizard->handleRequest();
 
 

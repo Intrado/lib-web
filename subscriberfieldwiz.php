@@ -207,7 +207,7 @@ class FinishSubscriberFieldWizard extends WizFinish {
 	}
 	
 	function getFinishPage ($postdata) {
-		return "<h1>Success. Your new field has been added.</h1>" . icon_button("Return to Settings", "fugue/arrow_180", "", "subscriberfields.php");
+		return "<h1>Success. Your new field has been added.</h1>";
 	}
 }
 
@@ -219,6 +219,7 @@ $wizdata = array(
 	);
 
 $wizard = new Wizard("subscriberwiz", $wizdata, new FinishSubscriberFieldWizard(_L("Finish")));
+$wizard->doneurl = "subscriberfields.php";
 $wizard->handleRequest();
 
 
