@@ -50,15 +50,15 @@ $wizdata = array(
 	"message" => new WizSection("Message",array(
 		"pick" => new JobWiz_messageType(_L("Delivery Methods")),
 		"select" => new JobWiz_messageSelect(_L("Message Source")),
-		"phone"	=> new WizSection ("Phone",array(
+		"phone" => new WizSection ("Phone",array(
 			"pick" => new JobWiz_messagePhoneChoose(_L("Phone: Message")),
-			"text" =>	new JobWiz_messagePhoneText(_L("Text-to-speech")),
+			"text" => new JobWiz_messagePhoneText(_L("Text-to-speech")),
 			"translate" => new JobWiz_messagePhoneTranslate(_L("Translations")),
 			"callme" => new JobWiz_messagePhoneCallMe(_L("Record"))
 		)),
 		"email"	=> new WizSection ("Email",array(
 			"pick" => new JobWiz_messageEmailChoose(_L("Email: Message")),
-			"text"	 => new JobWiz_messageEmailText(_L("Compose Email")),
+			"text" => new JobWiz_messageEmailText(_L("Compose Email")),
 			"translate" => new JobWiz_messageEmailTranslate(_L("Translations"))
 		)),
 		"sms" => new WizSection ("Txt",array(
@@ -116,8 +116,8 @@ class FinishJobWizard extends WizFinish {
 			$job->startdate = date("Y-m-d", 86400);
 			$job->enddate = date("Y-m-d", (7 * 86400));
 		}
-		$job->starttime = isset($schedule['callearly'])?date("H:i", strtotime($schedule['callearly'])):date("H:i", strtotime($USER->getSetting("callearly")));
-		$job->endtime = isset($schedule['calllate'])?date("H:i", strtotime($schedule['calllate'])):date("H:i", strtotime($USER->getSetting("calllate")));
+		$job->starttime = ($schedule['callearly'])?date("H:i", strtotime($schedule['callearly'])):date("H:i", strtotime($USER->getCallEarly()));
+		$job->endtime = ($schedule['calllate'])?date("H:i", strtotime($schedule['calllate'])):date("H:i", strtotime($USER->getCallLate()));
 		$job->finishdate = null;
 		$job->status = "new";
 		$job->create();
@@ -224,7 +224,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">	
-<? Validator::load_validators(array("ValInArray","ValHasMessage","ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValPhoneRecordSelected", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 

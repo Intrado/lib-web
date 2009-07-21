@@ -30,8 +30,11 @@ class TextAreaPhone extends FormItem {
 						popup(\'previewmessage.php?text=\' + encodedtext + \'&language='.urlencode($this->args['language']).'&gender=\'+ gender, 400, 400);
 					}
 				});
+				$("'.$n.'-textarea").observe("change", '.$n.'_storedata);
 				$("'.$n.'-textarea").observe("blur", '.$n.'_storedata);
 				$("'.$n.'-textarea").observe("keyup", '.$n.'_storedata);
+				$("'.$n.'-textarea").observe("focus", '.$n.'_storedata);
+				$("'.$n.'-textarea").observe("click", '.$n.'_storedata);
 				$("'.$n.'-female").observe("click", '.$n.'_storedata);
 				$("'.$n.'-male").observe("click", '.$n.'_storedata);
 				
@@ -106,17 +109,47 @@ class CallMe extends FormItem {
 ////////////////////////////////////////////////////////////////////////////////
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
+class ValJobName extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		global $USER;
+		$jobcount = QuickQuery("select count(id) from job where userid=? and name=? and not deleted and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
+		if ($jobcount)
+			return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
+		return true;
+	}
+}
+
 class ValHasMessage extends Validator {
 	var $onlyserverside = true;
 	
 	function validate ($value, $args) {
 		global $USER;
 		if ($value == 'pick') {
-			$msgcount = (QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".$args['type']."'"));
+			$msgcount = (QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, $args['type'])));
 			if (!$msgcount)
-				return "$this->label doesnt appear to exist for this user. Select another option or go create a message.";
+				return "$this->label: ". _L('There are no saved messages of this type.');
 		}
 		return true;
+	}
+}
+
+class ValPhoneRecordSelected extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		if ($requiredvalues['phone'] !== "record" && $value == "record")
+			return "$this->label " . _L("Cannot attach recorded message if Phone is not a Call Me to Record.");
+		else
+			return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args, requiredvalues) {
+				if (requiredvalues.phone !== "record" && value == "record")
+					return label + " '. addslashes(_L("Cannot attach recorded message if Phone is not a Call Me to Record.")). '";
+				return true;
+			}';
 	}
 }
 
@@ -216,6 +249,7 @@ class JobWiz_start extends WizStep {
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
+					array("ValJobName"),
 					array("ValLength","max" => 50)
 				),
 				"control" => array("TextField","maxlength" => 50, "size" => 50),
@@ -352,6 +386,10 @@ class JobWiz_messageSelect extends WizStep {
 				"control" => array("RadioButton","values"=>$values),
 				"helpstep" => 1
 			);
+			if (isset($values["record"])) {
+				$formdata["email"]["validators"][] = array("ValPhoneRecordSelected");
+				$formdata["email"]["requires"] = array("phone");
+			}
 		}
 		
 		if (isset($values["record"]))
@@ -368,6 +406,10 @@ class JobWiz_messageSelect extends WizStep {
 				"control" => array("RadioButton","values"=>$values),
 				"helpstep" => 1
 			);
+			if (isset($values["record"])) {
+				$formdata["sms"]["validators"][] = array("ValPhoneRecordSelected");
+				$formdata["sms"]["requires"] = array("phone");
+			}
 		}
 
 		if ($USER->authorize("sendmessage") && in_array('print',$postdata['/message/pick']['type'])) {
