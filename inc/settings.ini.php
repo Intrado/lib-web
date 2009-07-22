@@ -31,4 +31,23 @@ apikey="ABQIAAAAsHD6V_IqbLuYzx5sdmQ-TxQg47NEwCDk0BAJwz_RiAOR27B3BhRP2lCFovHb2pUn
 referer="http://asp.schoolmessenger.com"
 disableAutoTranslate=false
 
+
+;/*CSDELETEMARKER_START*/
+
+[txtpostback]
+txt_username=
+txt_password=
+;txt_shortcode=
+txt_logfile="/usr/commsuite/logs/txtpostback.log"
+txt_throttlefile="/tmp/txtpostback_sourceday.dat"
+
+txt_javadir="/usr/commsuite/java/j2sdk/bin/java"
+txt_emailjar="/usr/commsuite/server/simpleemail/simpleemail.jar"
+
+;txt_email[]=bhencke@schoolmessenger.com
+;txt_email[]=hwood@schoolmessenger.com
+;txt_email[]=gbaumgartner@schoolmessenger.com
+
+;/*CSDELETEMARKER_END*/
+
 ;*/?>
