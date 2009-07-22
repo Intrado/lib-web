@@ -133,21 +133,21 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 	<div id="maincanvas"  style="height:<? echo $minhight ?>px;">
 		<div style="position: absolute;top: <? echo (($minhight - 60) /2) ?>px; left: 0px">
 			<a id="_backward" href="start.php?day=<? echo ($day - 1) . "&range=$range" ?>">
-				<img  src="img/timeline/_arrowleft.gif"  alt="Backward" border="0"/>
+				<img  src="img/timeline/arrowleft.gif"  alt="Backward" border="0"/>
 			</a>
 		</div>
 		<div id="box_backward" style="display:none;">Move the timeline backward one day</div>
 		
 		<div style="position: absolute; top: <? echo (($minhight - 60) /2) ?>px; right: 0px">
 			<a id="_forward" href="start.php?day=<? echo ($day + 1) . "&range=$range" ?>">
-				<img  src="img/timeline/_arrowright.gif"  alt="Forward" border="0"/>
+				<img  src="img/timeline/arrowright.gif"  alt="Forward" border="0"/>
 			</a>
 		</div>
 		<div id="box_forward" style="display:none;">Move the timeline forward one day</div>
 	
 		<div id="canvas" style="height:<? echo $minhight ?>px;"> 
-			<img class="left" src="img/timeline/_canvasleft.gif"  alt=""  width="2%" height="100%"/>
-			<img class="right" src="img/timeline/_canvasright.gif" alt="" width="2%" height="100%"/>
+			<img class="left" src="img/timeline/canvasleft.gif"  alt=""  width="2%" height="100%"/>
+			<img class="right" src="img/timeline/canvasright.gif" alt="" width="2%" height="100%"/>
 		
 			<div class="daylineend" style="left: 0%;"></div>
 			
