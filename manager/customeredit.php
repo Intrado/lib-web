@@ -231,7 +231,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				if (!GetFormData($f,$s,"enabled"))
 					setCustomerSystemSetting("disablerepeat", "1", $custdb);
 
-				setCustomerSystemSetting("customerurl", $hostname, $custdb);
+				setCustomerSystemSetting("urlcomponent", $hostname, $custdb);
 				setCustomerSystemSetting("displayname", $displayname, $custdb);
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);

@@ -166,7 +166,7 @@ if (CheckFormSubmit($f,$s)){
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
-							('customerurl', ?),
+							('urlcomponent', ?),
 							('maxphones', '1'),
 							('maxemails', '1'),
 							('maxsms', '1'),
