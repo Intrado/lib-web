@@ -1,0 +1,146 @@
+
+
+
+
+	#canvas {
+			position: relative;
+			left: 12%;
+			top: 0px;
+			width: 76%;
+			height: 100%;
+			padding: 0px;
+			margin: 0px;			
+			background-color: #c9c9c9;	
+	}
+	
+	#maincanvas {
+			position: relative;
+			display: block;
+			left: 10%;
+			top: 50px;
+			width: 80%;
+			height: 100%;
+			background-color: #fff;	
+			border: 0px;
+			margin-bottom: 0px;
+			
+	}
+	
+	a.toggle:link {text-decoration: none; color: #404040;}
+	a.toggle:visited {text-decoration: none; color: #404040;}
+	a.toggle:active {text-decoration: none; color: #404040;}
+	a.toggle:hover {text-decoration: none; color: #404040;}
+	a.job:link {text-decoration: none; color: #000;}
+	a.job:visited {text-decoration: none; color: #000;}
+	a.job:active {text-decoration: none; color: #000;}
+	a.job:hover {text-decoration: none; color: #000;}
+	
+
+	
+	.jobcontainer {
+		position:absolute;
+		height: 20px;
+		border: 1px solid #000;
+		background-color: #fffbdb;	
+		font-family: arial, sans-serif;
+        font-size: 12px; 
+		font-weight: normal;
+		overflow: hidden;   
+        white-space: nowrap;
+	}
+	
+	.jobbar {
+		position:absolute;
+		height: 3px;
+		left: -1px;
+		top: 17px;
+		width: 100%;
+		border: 1px solid #000;
+		background-color: #00FF00; 
+        overflow: hidden;
+        white-space: nowrap;
+	}
+	
+	.box {
+		padding-top: 2px;
+	}
+
+	
+	.dayline {
+		position:absolute;	
+		top: 0%;
+		height: 100%;
+		width: 1px;	
+		background-color: #707070;
+	}
+	.daylineend {
+		position:absolute;	
+		top: 0%;
+		height: 100%;
+		width: 1px;	
+		background-color: #707070;
+	}
+	.daylabel {
+		position:absolute;	
+		text-align: center;
+		width: 20%;
+		top: 100%;
+		margin-top: 20px;
+		color: #8c8c8c;
+		background-color: #FFF;
+	}
+	.daylabeltoday {
+		position:absolute;	
+		text-align: center;
+		width: 20%;
+		top: 100%;
+		margin-top: 20px;
+		background-color: #FFF;
+	}
+	
+	#now {
+		position:absolute;	
+		top: 0%;
+		height: 100%;
+		width: 2px;	
+		background-color: #000;
+	}
+	#nowtop {
+		position:absolute;	
+		top: -10px;
+		height: 10px;
+		width: 2px;	
+		background-color: #000;
+	}
+	#nowbottom {
+		position:absolute;	
+		top: 100%;
+		height: 10px;
+		width: 2px;	
+		background-color: #000;
+	}
+	#nowlabel {
+		position:absolute;
+		text-align: center;
+		font-weight: bold;   
+		top: -30px;
+		width: 20%;	
+		color: #000;
+		background-color: #FFF;
+		white-space: nowrap;	
+	}
+	
+	
+
+
+	
+	img.right {	position:absolute; left: 100%;border:0px;}
+	img.left { position:absolute; right: 100%;border:0px;}
+
+
+	.bl {background: url(bl.gif) 0 100% no-repeat}
+	.br {background: url(br.gif) 100% 100% no-repeat}
+	.tl {background: url(tl.gif) 0 0 no-repeat}
+	.tr {background: url(tr.gif) 100% 0 no-repeat; padding:10px} 
+
+
