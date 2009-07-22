@@ -314,8 +314,8 @@ $formdata["pinconfirm"] = array(
 
 if ($readonly) {
 	$formdata["email"] = array(
-		"label" => _L("Email"),
-		"fieldhelp" => _L("This is the user's email address."),
+		"label" => _L("Account Email"),
+		"fieldhelp" => ("This is used for forgot passwords, reporting, and as the return address in email messages."),
 		"control" => array("FormHtml","html" => $edituser->email),
 		"helpstep" => 1
 	);
@@ -335,8 +335,8 @@ if ($readonly) {
 	);
 } else {
 	$formdata["email"] = array(
-		"label" => _L("Email"),
-		"fieldhelp" => _L("This is the user's email address."),
+		"label" => _L("Account Email"),
+		"fieldhelp" => ("This is used for forgot passwords, reporting, and as the return address in email messages."),
 		"value" => $edituser->email,
 		"validators" => array(
 			array("ValLength","min" => 3,"max" => 255),
