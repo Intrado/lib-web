@@ -41,7 +41,60 @@ if (isset($_GET['id'])) {
 // Custom Form Controls And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-		//TODO add callearly calllate logic check
+
+class RestrictedFields extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		
+		$restrictchecked = count($value) > 0 ? "checked" : "";
+		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .'>Restrict to these fields:';
+		
+		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;">';
+		
+		$hoverdata = array();
+		$counter = 1;
+		foreach ($this->args['values'] as $checkvalue => $checkname) {
+			$id = $n.'-'.$counter;
+			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
+			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
+				';
+			if (isset($this->args['hover'])) {
+				$hoverdata[$id] = $this->args['hover'][$checkvalue];
+				$hoverdata[$id.'-label'] = $this->args['hover'][$checkvalue];
+			}
+			$counter++;
+		}
+		$str .= '</div>
+		';
+		if (isset($this->args['hover']))
+			$str .= '<script type="text/javascript">form_do_hover(' . json_encode($hoverdata) .');</script>
+			';
+		
+		$str .= '<script type="text/javascript">
+		//if we uncheck the restrict box, uncheck each field
+		var restrictcheckbox = $("'.$n.'-restrict");
+		var datafieldcheckboxes = restrictcheckbox.next().select("input");
+		restrictcheckbox.observe("click", function (event) {
+			if (!restrictcheckbox.checked) {
+				datafieldcheckboxes.each(function(e) {
+					e.checked = false;
+				});
+			}
+		});
+		
+		datafieldcheckboxes.each(function(checkbox) {
+			checkbox.observe("click",function(e) {
+				if (e.element().checked)
+					restrictcheckbox.checked = true;
+			});
+		});
+		</script>';
+		
+		return $str;
+	}
+}
+
+
 
 class ValJobWindowTime extends Validator {
 	var $onlyserverside = true;
@@ -328,13 +381,13 @@ _L('List Options'),
 	
 _L('Contact & Field Options'),
 	"datafields" => array(
-		"label" => _L('Allowed Fields'),
+		"label" => _L('Field Restriction'),
 		"fieldhelp" => _L('Restricts the data fields that are visible to the user to create lists or personalized messages. Leave all fields unchecked for unlimited access.'),
 		"value" => $datafields,
 		"validators" => array(
 			array("ValInArray","values" => array_keys($FIELDMAP))
 		),
-		"control" => array("MultiCheckBox", "values" => $FIELDMAP), //TODO write a control similar to what was used on old form
+		"control" => array("RestrictedFields", "values" => $FIELDMAP), //TODO write a control similar to what was used on old form
 		"helpstep" => 7
 	),
 	"viewcontacts" => array(
@@ -672,6 +725,10 @@ function checkAllCheckboxes(domanagement){
 	var form = document.forms[0].elements;
 	for(var i = 0; i < form.length; i++){
 		if(form[i].type == "checkbox"){
+			
+			//skip datafields
+			if (form[i].name.indexOf("datafields") != -1)
+				continue;
 			
 			//see if it's a management checkbox
 			if (managementoptions.some(function(v) {return form[i].name.indexOf(v) != -1})) {
