@@ -274,4 +274,16 @@ create sql security invoker view qjobtask_dispatchview as
 select `customerid`, `jobid`, `type`, `personid`, `sequence`, `contactsequence`, `status`, `attempts`, `renderedmessage`, `leasetime`, `phone`, `uuid`
 from qjobtask left join renderedmessage on (qjobtask.renderedmessageid = renderedmessage.id);
 
+CREATE TABLE `aspshard`.`messagelink` (
+`customerid` INT NOT NULL ,
+`jobid` INT NOT NULL ,
+`personid` INT NOT NULL ,
+`createtime` BIGINT NOT NULL ,
+`code` VARCHAR( 22 ) CHARACTER SET ascii COLLATE ascii_bin NOT NULL ,
+PRIMARY KEY ( `customerid` , `jobid` , `personid` ) ,
+INDEX (`createtime`),
+UNIQUE (`code` )
+) ENGINE = InnoDB ;
+
+
 
