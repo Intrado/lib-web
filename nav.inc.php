@@ -210,6 +210,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	
+	<? if( isset($TIMELINE) && $TIMELINE === true ) {?>
+	<link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
+	<? } ?>
 </head>
 <body>
 	<script>
