@@ -125,7 +125,7 @@ include_once("nav.inc.php");
 startWindow('Subscriber Available Fields');
 showObjects($data, $titles, array("valtype" => "fmt_valtype", "values" => "fmt_values", "Actions" => "fmt_actions"), false, true);
 if (count($addfields) > 0) {
-	buttons(icon_button("Add Field",null,null,"subscriberfieldwiz.php?new"));
+	buttons(button("Add Field",null,"subscriberfieldwiz.php?new"));
 } else {
 ?>
 <div style="margin: 5px;">
