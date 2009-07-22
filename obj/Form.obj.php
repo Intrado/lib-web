@@ -93,7 +93,10 @@ class Form {
 			foreach ($_POST as $name => $value) {
 				if ($name == "submit")
 					continue;
-				list($form,$item) = explode("_",$name);
+				$itemparts = explode("_",$name);
+				if (count($itemparts) != 2)
+					continue;
+				list($form,$item) = $itemparts;
 				if (isset($this->formdata[$item])) {
 					if (is_array($value)) {
 						foreach ($value as $k => $v)
@@ -134,7 +137,7 @@ class Form {
 		$str = '
 		<div class="newform_container">
 		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
-		<input name="formsnum_' . $this->name . '" type="hidden" value="' . $this->serialnum . '">
+		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">
 		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign="top"> <!-- FORM CONTENT -->';
 		
 		foreach ($this->formdata as $name => $itemdata) {
@@ -291,7 +294,7 @@ class Form {
 	}
 	
 	function checkForDataChange() {
-		return $this->serialnum != $_POST['formsnum_' . $this->name];
+		return $this->serialnum != $_POST[$this->name.'-formsnum'];
 	}
 
 	function validate () {
