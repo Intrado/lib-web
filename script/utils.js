@@ -416,6 +416,16 @@ function icon_button(name,icon,id) {
 	return newbutton;
 }
 
+function action_link(name,icon,id) {
+	var newaction = new Element("a", {href: "#", "class": "actionlink", title: name, style: "margin-left: 3px;"});
+	newaction.id = id;
+	
+	// TODO: actionlinkmode needs to be checked to display icons and/or titles
+	newaction.insert(new Element("img", {src: "img/icons/"+icon+".gif"})).insert(name);
+	
+	return newaction;
+}
+
 function blankFieldValue(element, value) {
 	element = $(element);
 	element.observe("focus", setDefaultFieldValue.curry(value));
