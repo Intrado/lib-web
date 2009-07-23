@@ -3,8 +3,7 @@
 // Supported locales
 
 $LOCALES = array("en_US" => "English",
-				"es_US" => "Español",
-				"fr_CA" => "Français");
+				"es_US" => "Español");
 
 if (isset($_SESSION['_locale']))
 	$LOCALE = $_SESSION['_locale'];
