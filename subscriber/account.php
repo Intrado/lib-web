@@ -91,21 +91,31 @@ foreach ($fieldmaps as $fieldmap) {
 					$formdata['locale'] = array (
    	    				"label" => _L($fieldmap->name),
        					"value" => $value,
-       					"validators" => array(),
+       					"validators" => array(
+       						array("ValRequired")
+       					),
        					"control" => array("RadioButton","values" => $LOCALES),
        					"helpstep" => 1
 					);
 				
 				} else {
 					$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
-					if (count($values) > 0)
+					if (count($values) > 0) {
+						$v = $person->$fieldnum;
+						if (count($values) == 1) {
+							$a = array_values($values);
+							$v = $a[0];
+						}
 						$formdata[$fieldnum] = array (
     	    				"label" => _L($fieldmap->name),
-        					"value" => $person->$fieldnum,
-        					"validators" => array(),
+        					"value" => $v,
+        					"validators" => array(
+        						array("ValRequired")
+        					),
         					"control" => array("RadioButton","values" => $values),
         					"helpstep" => 1
 						);
+					}
 				}
 			}
 		} else {
@@ -136,7 +146,9 @@ foreach ($fieldmaps as $fieldmap) {
 					$formdata[$fieldnum] = array (
     	    			"label" => _L($fieldmap->name),
         				"value" => $person->$fieldnum,
-        				"validators" => array(),
+        				"validators" => array(
+        					array("ValRequired")
+        				),
         				"control" => array("RadioButton","values" => $values),
         				"helpstep" => 1
 					);
