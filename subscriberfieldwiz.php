@@ -43,6 +43,7 @@ class SubscriberWiz_choosefield extends WizStep {
 	
    		$formdata["addfield"] = array(
        		"label" => _L("Available Fields"),
+       		"fieldhelp" => _L('Use the menu to select an additional field new subscribers will need to use when signing up. Additional fields can be created using Field Definitions on the Admin>Settings page. They must be of the list or text type.'),
        		"value" => "",
        		"validators" => array(    
             	array("ValRequired")
@@ -85,6 +86,7 @@ class SubscriberWiz_choosevaltype extends WizStep {
 
 		$formdata["valtype"] = array(
         	"label" => _L("Data Source"),
+        	"fieldhelp" => _L('If the field type is a list, a Manually Entered List of Values contains values which you can enter in the following screen. Dynamically generated values are determined by imported data.<br><br>If the field is a text type, you may set the value in the following screen by choosing Set by Admin, or select Set by Subscriber, to allow new subscribers to enter any value.'),
         	"value" => $value,
         	"validators" => array(    
 	            array("ValRequired")
@@ -119,6 +121,7 @@ class SubscriberWiz_staticvalues extends WizStep {
 			// text field
     		$formdata["values"] = array(
         		"label" => _L("Field Value"),
+        		"fieldhelp" => _L('Enter a value which will be associated with all subscribers.'),
         		"value" => $value,
         		"validators" => array(
 		            array("ValLength","max" => 255)
@@ -130,6 +133,7 @@ class SubscriberWiz_staticvalues extends WizStep {
 			// text area
     		$formdata["values"] = array(
         		"label" => _L("Field Value(s)"),
+        		"fieldhelp" => _L('Enter a list of values, with a line return after each entry. New subscribers will have these options to choose from after they sign up.'),
         		"value" => $value,
         		"validators" => array(
         			// TODO each line item separated by comma, max 255

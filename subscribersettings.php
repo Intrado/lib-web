@@ -39,6 +39,7 @@ $formdata = array();
 
 $formdata["restrictdomain"] = array(
         "label" => _L("Restrict Account Email to Domain and Subdomains"),
+        "fieldhelp" => _L('Select this option to restrict which email domains a new subscriber may use.'),
         "value" => getSystemSetting("subscriberauthdomain", "0") ? true : false,
         "validators" => array(    
         ),
@@ -47,6 +48,7 @@ $formdata["restrictdomain"] = array(
     );
 $formdata["domain"] = array(
         "label" => _L("Email Domain"),
+        "fieldhelp" => _L('Displays the permitted email domains for new subscribers.'),
         "value" => "",
         "validators" => array(    
         ),
@@ -55,6 +57,7 @@ $formdata["domain"] = array(
     );
 $formdata["requiresitecode"] = array(
         "label" => _L("Require Site Access Code to Register"),
+        "fieldhelp" => _L('Requires new subscribers to enter a special code when subscribing.'),
         "value" => getSystemSetting("subscriberauthcode", "0") ? true : false,
         "validators" => array(    
         ),
@@ -63,6 +66,7 @@ $formdata["requiresitecode"] = array(
     );
 $formdata["sitecode"] = array(
         "label" => _L("Site Access Code"),
+        "fieldhelp" => _L('A special code that new subscribers will need to enter to sign up for the system if required to do so.'),
         "value" => getSystemSetting("subscribersitecode", ""),
         "validators" => array(
             array("ValLength","min" => 3,"max" => 255)
