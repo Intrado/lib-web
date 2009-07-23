@@ -399,19 +399,14 @@ function ajax_table_update(containerID, uri) {
 }
 
 function icon_button(name,icon,id) {
-	var newbutton = new Element("button",{class: "button", type: "button"});
+	var newbutton = new Element("button",{"class": "button", type: "button"});
 	newbutton.id = id;
 	
-	buttonrecord = new Element("tr", {});
-	buttonrecord.insert(new Element("td",{}).insert(new Element("img",{class: "left", src: "img/themes/"+_brandtheme+"/button_left.gif"})));
+	var buttonface = new Element("td",{"class": "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
 	
-	var buttonface = new Element("td",{class: "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
-	buttonrecord.insert(buttonface);
+	var buttonrecord = new Element("tr", {}).insert(new Element("td",{}).insert(new Element("img",{"class": "left", src: "img/themes/"+_brandtheme+"/button_left.gif"}))).insert(buttonface).insert(new Element("td",{}).insert(new Element("img",{"class": "right", src: "img/themes/"+_brandtheme+"/button_right.gif"})));
 	
-	buttonrecord.insert(new Element("td",{}).insert(new Element("img",{class: "right", src: "img/themes/"+_brandtheme+"/button_right.gif"})));
-	
-	var buttonbody = new Element("table",{})
-	buttonbody.insert(new Element("tbody",{}).insert(buttonrecord));
+	var buttonbody = new Element("table",{}).insert(new Element("tbody",{}).insert(buttonrecord));
 	
 	newbutton.insert(buttonbody);
 	
@@ -419,4 +414,28 @@ function icon_button(name,icon,id) {
 	newbutton.observe("mouseout", btn_rollout.bind(this,newbutton));
 	
 	return newbutton;
+}
+
+function blankFieldValue(element, value) {
+	element = $(element);
+	element.observe("focus", setDefaultFieldValue.curry(value));
+	element.observe("blur", setDefaultFieldValue.curry(value));
+}
+
+function setDefaultFieldValue(value, event) {
+	var element = event.element();
+	if (event.type == "focus" && element.value == value) {
+		element.value = "";
+		element.setStyle({
+			color: "black"
+		});
+	}
+	
+	if (event.type == "blur" && element.value == "") {
+		element.value = value;
+		element.setStyle({
+			color: "gray"
+		});
+	}
+	
 }
