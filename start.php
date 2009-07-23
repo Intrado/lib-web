@@ -37,7 +37,6 @@ if (isset($_GET['closewhatsnew'])) {
 
 $listsdata = DBFindMany("PeopleList"," from list where userid=$USER->id and deleted=0");
 
-
 function itemcmp($a, $b) {
 	if ($a["date"] == $b["date"]) {
         return 0;
@@ -76,10 +75,10 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,type as jobtype, deleted from job where userid=? and deleted != 1 and finishdate is not null and status = 'complete' order by finishdate desc limit 10",true,false,array($USER->id)));
 		break;	
 	case "savedreports":
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,array($USER->id)));
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 		break;
 	case "emailedreports":
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,array($USER->id)));
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
 		break;
 	default:
 		
@@ -91,7 +90,6 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
 		break;	
 } 
-
 
 uasort($mergeditems, 'itemcmp');
 
@@ -202,15 +200,14 @@ if ($listsdata) {
 			}
 			?></tr>
 			</table><?
-			
-			
+		
 			if ($USER->authorize("startstats")) {
 ?>
 			</td>
 			<td width="100%" valign="top">
 <?
 			startWindow('Job Timeline ',NULL,true);
-				button_bar(button('Refresh', 'window.location.reload()'));
+			//	button_bar(button('Refresh', 'window.location.reload()'));
 				include_once("inc/timeline.inc.php");
 			endWindow();
 ?>

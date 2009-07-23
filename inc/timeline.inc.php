@@ -47,6 +47,8 @@ $placments = array();
 $jobcount = count($jobs);
 
 $jobcolor = array("scheduled" => "#3399FF","active" => "#D0AA0D","complete" => "#00FF00","cancelled" => "#00FF00");
+$jobids = array();
+$jobstatus = array();
 
 
 foreach($jobs as $job) {
@@ -95,24 +97,51 @@ foreach($jobs as $job) {
 			$extracontent .= '<img style="position:absolute;border:0px;top: 0px;right: 0px" src="img/timeline/_' . $job->status . 'rightspecial' . $jobtypes[$job->jobtypeid]->systempriority . '.gif" alt=""/>';
 			
 				
-			$content .= '<a class="job" id="_$i" href="job.php?id=' . $job->id. '">';
+			//$content .= '<a class="job" id="_' . $i . '" href="job.php?id=' . $job->id. '">';
+			
+			$jobids[$i] = $job->id;
+			$jobstatus[$i] = "'" . ucfirst($job->status) . "'";
 			
 			//$content .= "<div id="__$i" class="" . $job->status . "job" style="left: " . $startlocation . "%;top: " . (($j*$jobhight) + ($j*$jobspacing)) . "px;height: " . $jobhight . "px;width: " . $width . "%;" . (($endday >= $rangedays)?"border-right:0px;":";") . ((!$leftborder)?"border-left:0px;":";") . "">\n";				
 			//$content .= "<div id="__$i" class="" . $job->status . "job" style="background: url(img/timeline/_" . $job->status . $jobtypes[$job->jobtypeid]->systempriority .  ".gif);left: " . $startlocation . "%;top: " . (($j*$jobhight) + ($j*$jobspacing)) . "px;height: " . $jobhight . "px;width: " . $width . "%;" . (($endday >= $rangedays)?"border-right:0px;":";") . ((!$leftborder)?"border-left:0px;":";") . "">\n";				
 			
 			$content .= '<div id="__' . $i. '" class="jobcontainer" style="left: ' . $startlocation . '%;top: ' . (($j*$jobhight) + ($j*$jobspacing)) . 'px;height: ' . $jobhight . 'px;width: ' . $width . '%;">';				
-			$content .= '<div id="box_' . $i . '" class="box">&nbsp;';
-			$content .= $job->name;
+			$content .= '<div id="box_' . $i . '" class="box">';
+				$content .= $job->name;
 			//$content .= "\n<br /><hr>" . $jobtypes[$job->jobtypeid]->name . "\n<br /><hr>";
 			//$content .=  "Start Time: $job->startdate $job->starttime\n<br />End Time: $job->enddate $job->endtime\n\n";
-			$content .= "</div>";
+			$content .= "</div>";			
+			
 			$content .= '<div class="jobbar" style="left: -1px;background-color: ' . (isset($jobcolor[$job->status])?$jobcolor[$job->status]:"#000") . ';">&nbsp;</div>';				
 			
 	
-			$content .=  "</div></a>\n";
+			$content .=  "</div>";//</a>\n";
 			
 		//	$content .=  "$extracontent</div></a>\n";
+			/*
 			
+			new Tip(e, formdata[itemname].fieldhelp, {
+					title: formdata[itemname].label,
+					style: 'protogrey',
+					stem: 'bottomLeft',
+					hook: { tip: 'bottomLeft', mouse: true },
+					offset: { x: 14, y: 0 }
+				});
+				
+			Event.observe(window, 'load', function() {
+				new Tip('shortcutmenu', $('shortcuts'), {
+					style: 'default',
+					radius: 4,
+					border: 4,
+					target: 'shortcutmenu',
+					hideOn: false,
+					hideAfter: 0.5,
+					hook: { target: 'bottomRight', tip: 'topRight' },
+					offset: { x: 6, y: 0 },
+					width: 'auto'
+				});
+			});
+			*/
 			$i++;
 			if($minhight <= $j )
 				$minhight = $j + 1;
@@ -129,22 +158,19 @@ foreach($jobs as $job) {
 $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 
 ?>
-<div style="height: <? echo (130 + $minhight) ?>px;">
+<div style="height: <? echo (70 + $minhight) ?>px;">
 	<div id="maincanvas"  style="height:<? echo $minhight ?>px;">
-		<div style="position: absolute;top: <? echo (($minhight - 60) /2) ?>px; left: 0px">
-			<a id="_backward" href="start.php?day=<? echo ($day - 1) . "&range=$range" ?>">
-				<img  src="img/timeline/arrowleft.gif"  alt="Backward" border="0"/>
-			</a>
-		</div>
-		<div id="box_backward" style="display:none;">Move the timeline backward one day</div>
-		
-		<div style="position: absolute; top: <? echo (($minhight - 60) /2) ?>px; right: 0px">
-			<a id="_forward" href="start.php?day=<? echo ($day + 1) . "&range=$range" ?>">
-				<img  src="img/timeline/arrowright.gif"  alt="Forward" border="0"/>
-			</a>
-		</div>
-		<div id="box_forward" style="display:none;">Move the timeline forward one day</div>
 	
+	<table>
+		<tr>
+			<td width="80px">
+			<a id="_backward" href="start.php?day=<? echo ($day - 1) . "&range=$range" ?>">
+				<img style"align: right;" src="img/timeline/arrowleft.gif"  alt="Backward" border="0"/>
+			</a>
+			</td>
+			
+			<td width="100%">&nbsp;
+				
 		<div id="canvas" style="height:<? echo $minhight ?>px;"> 
 			<img class="left" src="img/timeline/canvasleft.gif"  alt=""  width="2%" height="100%"/>
 			<img class="right" src="img/timeline/canvasright.gif" alt="" width="2%" height="100%"/>
@@ -160,7 +186,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			 ?>
 			<div class="daylineend" style="left: 100%;"></div>
 		
-		<? if($day>=-$range && $day<=$range) { ?>
+		<? if(0 && $day>=-$range && $day<=$range) { ?>
 			<div id="now" style="left: <? echo $timeposition ?>%;"></div>
 			<div id="nowtop" style="left: <? echo $timeposition ?>%;"></div>	
 			<div id="nowbottom" style="left: <? echo $timeposition ?>%;"></div>
@@ -181,10 +207,22 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		?>
 		
 		</div>
+		
+			</td>
+			<td width="80px">	
+				<a id="_forward" href="start.php?day=<? echo ($day + 1) . "&range=$range" ?>">
+					<img  src="img/timeline/arrowright.gif"  alt="Forward" border="0"/>
+				</a>
+			</td>
+		</tr>
+		</table>
 	</div>
 </div>
 
 <script>
+	var jobids=new Array(<?= implode(",",$jobids) ?>);
+	var jobstatus=new Array(<?= implode(",",$jobstatus) ?>);
+
 	$('canvas').blindDown({duration: 0.4});
 	var cw = $('canvas').getWidth();
 	if(cw) { <!-- IE can not handle getwidth in some locations -->
@@ -194,7 +232,36 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			$('__' + i).style.width = "0%";
 			
 			$('__' + i).morph('width:' + ((w/cw)*100) + '%;',{duration: 1.5});
+			$('__' + i).tip = new Tip('__' + i, getcontent(i), {
+				style: 'protogrey',
+				radius: 4,
+				border: 4,
+				showOn: 'click',
+				hideOn: false,
+				hideAfter: 0.5,
+				stem: 'topLeft',
+				hook: {  target: 'bottomLeft', tip: 'topLeft'  },
+				width: '220px',
+				offset: { x: 25, y: -5 },
+			});
+			$('__' + i).observe('prototip:shown', function() {
+				//	this.tip.wrapper.shake();
+				//Effect.BlindDown(this.tip.wrapper, { duration: 0.3 });
+				//this.pulsate({ pulses: 1, duration: 0.5 });
+			});
+
+
+
 		}
 	}
+	function getcontent(id) {
+		var content = $("box_" + id).innerHTML;
+		content += '<br /><a href="job.php?id=' + jobids[id] + '">Edit</a><br />';
+		if(jobstatus[id] == "Active")
+			content += '<img width="200px" src="graph_job.png.php?jobid=' + jobids[id] + '&junk=" />';		
+		return content;
+	}
+	
+	
 	
 </script>
