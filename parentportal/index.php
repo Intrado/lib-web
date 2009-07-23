@@ -9,7 +9,7 @@ require_once("../inc/table.inc.php");
 require_once("../inc/form.inc.php");
 
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "";
+$appendcustomerurl = "?";
 if (isset($_GET['u'])) {
 	$appendcustomerurl = "?u=".urlencode($_GET['u']);
 }
@@ -109,7 +109,7 @@ include_once("cmlogintop.inc.php");
 				<div><div style="font-size: 20px; font-weight: bold; float: left"><?=_L("SchoolMessenger Contact Manager")?></div>
 				<div style="float:right;"> 
 				<?
-					NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"index.php?locale=\"+this.options[this.selectedIndex].value'");
+					NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"index.php".$appendcustomerurl."&locale=\"+this.options[this.selectedIndex].value'");
 					foreach($LOCALES as $loc => $lang){
 						NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
 					}

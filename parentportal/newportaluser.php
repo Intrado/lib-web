@@ -1,5 +1,6 @@
 <?
-$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+if (!isset($_SESSION['_locale']))
+	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
 
 $ppNotLoggedIn = 1;
 
@@ -9,6 +10,7 @@ $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../inc/form.inc.php");
 require_once("../obj/Phone.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,7 +18,7 @@ require_once("../obj/Phone.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "";
+$appendcustomerurl = "?";
 if (isset($_GET['u'])) {
 	$appendcustomerurl = "?u=".urlencode($_GET['u']);
 }
@@ -112,6 +114,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+PutFormData("login", "main", "_locale", isset($LOCALE)?$LOCALE:"en_US", "text", "nomin", "nomax");
 
 $TITLE = _L("Create a New Account");
 include_once("cmlogintop.inc.php");
@@ -122,12 +125,14 @@ if(!$success){
 			<tr>
 				<td colspan="2">
 					<div style="font-size: 20px; font-weight: bold; text-align: left; float: left;"><?=$TITLE?></div>
-					<div style="float:right;">
-						<select id="locale" onchange='window.location.href="newportaluser.php?locale="+this.options[this.selectedIndex].value'>
-						<?foreach ($LOCALES as $loc => $lang){?>
-							<option value="<?=$loc?>" <?=($loc == $_SESSION['_locale'])?"selected":""?>><?=$lang?></option>
-						<?}?>
-						</select>
+					<div style="float:right;"> 
+					<?
+						NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"newportaluser.php".$appendcustomerurl."&locale=\"+this.options[this.selectedIndex].value'");
+						foreach($LOCALES as $loc => $lang){
+							NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
+						}
+						NewFormItem("login", "main", '_locale', 'selectend');
+					?>
 					</div>
 				</td>
 			</tr>
