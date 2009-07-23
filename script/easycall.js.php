@@ -8,92 +8,119 @@ header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire
 header("Content-Type: text/javascript");
 header("Cache-Control: private");
 ?>
+var easycallRecordings = 0;
+
 var Easycall = Class.create({
 
 	// Initialize with empty specialtask id
-	initialize: function(formname,formitemname,reqlang,origin,minlength,maxlength) {
-		this.specialtask = null;
-		this.origin = origin;
-		this.minlength = minlength;
-		this.maxlength = maxlength;
-		this.language = "";
-		this.messageid = "";
-		this.phone = "";
+	initialize: function(formname, formitemname, language, minlength, maxlength, defaultphoneval, nophoneval) {
 		this.formname = formname;
 		this.formitemname = formitemname;
-		this.required = reqlang;
-		this.pe = null;
-		this.acceptedimg = "img/icons/accept.gif";
-		this.loadingimg = "img/icons/loading.gif";
-		this.exclamationimg = "img/icons/exclamation.gif";
-		this.deleteimg = "img/icons/delete.gif";
-		this.playimg = "img/icons/play.gif";
-		this.alertimg = "img/icons/error.gif";
+		this.language = language;
+		this.minlength = minlength;
+		this.maxlength = maxlength;
+		this.specialtask = null;
+		this.messageid = null;
+		this.defaultphone = defaultphoneval;
+		this.nophone = nophoneval;
+		this.num = 0;
 	},
 	
 	// Load initial form values
 	load: function() {
 		var messages = $(this.formitemname).value.evalJSON();
-		$H(messages).each(function (message) {
-			this.language = message.key;
-			this.messageid = message.value;
-			this.displayMessage();
-			this.updateMessage();
-			if (this.language !== this.required)
-				$(this.formitemname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.formitemname,this.required).del(this.language)}.bind(this));
-		}.bind(this));
+		
+		if (typeof(messages[this.language]) !== "undefined") {
+			this.messageid = messages[this.language];
+			this.setupRecord();
+			// remove input and button
+			$(this.formitemname+"_"+this.language+"_callcontrol").remove();
+			this.createFormItem();
+		} else if (this.language == "Default") {
+			this.setupRecord();
+		}
 	},
 	
 	// Starts an easycall
-	start: function () {
-		if (!this.add())
+	record: function () {
+		// get value of phone
+		var phone = $(this.formitemname+"_"+this.language+"_phone").value;
+
+		// remove input and button
+		$(this.formitemname+"_"+this.language+"_callcontrol").remove();
+		
+		// load up a call progress div with new controls
+		$(this.formitemname+"_"+this.language).insert(
+			new Element("div",{id: this.formitemname+"_"+this.language+"_progress"}).insert(
+				new Element("img",{id: this.formitemname+"_"+this.language+"_progress_img", src: "img/ajax-loader.gif", style: "float:left"})
+			).insert(
+				new Element("div",{id: this.formitemname+"_"+this.language+"_progress_text"})
+			).insert(
+				new Element("div", {"id": this.formitemname+"langlock"})
+			).insert(
+				new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"})
+			)
+		);
+
+		if (!this.valPhone(phone,this.minlength,this.maxlength)) {
+			this.handleEnd("badphone");
 			return;
+		}
+
+		$(this.formitemname+"_"+this.language+"_progress_text").update("<?=escapehtml(_L('Starting up call... Please wait.'))?>");
+		// do ajax to start the specialtask
 		new Ajax.Request('ajaxeasycall.php', {
 			method:'post',
-			parameters: {"phone": this.phone, "language": this.language, "origin": this.origin},
-			onSuccess: this.handleStart.bindAsEventListener(this),
+			parameters: {
+				"phone": phone, 
+				"language": "Default",
+				"name": "Call Me",
+				"origin": "JobWizard"
+			},
+			// hand result off to handleRecord
+			onSuccess: this.handleRecord.bindAsEventListener(this),
 			onFailure: this.handleEnd.bindAsEventListener(this)
 		});
-		return true;
 	},
-	handleStart: function(transport) {
+	
+	handleRecord: function(transport) {
+		// update progress
+		$(this.formitemname+"_"+this.language+"_progress_text").update("<?=escapehtml(_L('Call started... Your phone should ring shortly.'))?>");
 		var response = transport.responseJSON;
-		var hover = {};
-		hover[this.formitemname+this.language+"_img"] = "<?=addslashes(_L('This message is currently recording via a phone session. Listen carefuly to the promts on your phone to save this message.'))?>";
-		form_do_hover(hover);
 		if (response && !response.error) {
+			// if successful start, hand off to update
 			this.specialtask = response.id;
 			this.update();
 		} else {
+			// error hand off to handleEnd
 			this.handleEnd(response.error);
 		}
 	},
 	
 	// gets task status by getting the id
 	update: function () {
-		try {
-			this.pe = new PeriodicalExecuter(function(pe) {
-				new Ajax.Request('ajaxeasycall.php?id=' + this.specialtask, {
-					method:'get',
-					onSuccess: this.handleUpdate.bindAsEventListener(this),
-					onFailure: function() {
-						this.handleEnd("startupfail");
-					}
-				});
-			}.bind(this), 2);
-		} catch (e) { alert(e); }
+		// start a periodical executor to check call status
+		this.pe = new PeriodicalExecuter(function(pe) {
+			new Ajax.Request('ajaxeasycall.php?id=' + this.specialtask, {
+				method:'get',
+				onSuccess: this.handleUpdate.bindAsEventListener(this),
+				onFailure: function() {
+					this.handleEnd("startupfail");
+				}
+			});
+		}.bind(this), 2);
 	},
+	
 	handleUpdate: function(transport) {
 		var response = transport.responseJSON;
 		if (response && !response.error) {
-			// update image and progress text for call status
-			if ($(this.formitemname+this.language+"_img").src !== this.loadingimg)
-				$(this.formitemname+this.language+"_img").src = this.loadingimg;
-			if ($(this.formitemname+"progress_img").src !== this.loadingimg)
-				$(this.formitemname+"progress_img").src = this.loadingimg;
-			$(this.formitemname+"progress").innerHTML = response.progress;
+			// update progress
+			$(this.formitemname+"_"+this.language+"_progress_text").update(response.progress);
 			if (response.status == "done") {
-				this.messageid = response.language[this.language];
+				// if special task completes. Store the message and
+				this.messageid = response.language["Default"];
+				this.updateMessage();
+				// hand off to handleEnd
 				this.handleEnd("done");
 			}
 		} else {
@@ -103,127 +130,148 @@ var Easycall = Class.create({
 	
 	// update page based on how the task ended
 	handleEnd: function(error) {
-		if (this.pe) this.pe.stop();
+		if (this.pe)
+			this.pe.stop();
 		switch(error) {
 			case "done":
-				$(this.formitemname+"progress_img").src = this.acceptedimg;
-				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Completed!"))?><p><?=addslashes(_L("If you would like to record in an additional language, select it above and click the Call Me To Record button."))?><p>";
-				break;
+				$(this.formitemname+"_"+this.language+"_progress").remove();
+				// create the play and re-record buttons
+				this.createFormItem();
+				return;
 			
 			case "callended":
-				$(this.formitemname+"progress_img").src = this.exclamationimg;
-				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Call ended early. Check your number and please try again."))?>";
+				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Call ended early. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 				break;
 			
 			case "badphone":
-				$(this.formitemname+"progress_img").src = this.exclamationimg;
-				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Check your number and please try again."))?>";
+				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Missing or invalid phone. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 				break;
-			
-			case "badlanguage":
-				$(this.formitemname+"progress_img").src = this.exclamationimg;
-				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Missing or invalid language."))?>";
-				break;
-			
+				
 			case "notask":
-				$(this.formitemname+"progress_img").src = this.exclamationimg;
-				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Status unavailable. Check your number and please try again."))?>";
+				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Status unavailable. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 				break;
-			
+				
+			case "startupfail":
+				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Session start failed. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
+				break;
+
 			default:
-				$(this.formitemname+"progress_img").src = this.exclamationimg;
-				$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("There was an error! Check your number and please try again."))?>";
+				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("There was an error! Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 		}
 		
-		if ($(this.formitemname+this.language+"_row") !== null) {
-			this.updateMessage();
-			if (this.language !== this.required)
-				$(this.formitemname+this.language+"_remove").stopObserving().observe('click', function(event) {new Easycall(this.formname,this.formitemname,this.required).del(this.language)}.bind(this));
+		if ($(this.formitemname+"_"+this.language+"_progress")) {
+			if (this.language == "Default") {
+				$(this.formitemname+"_"+this.language+"_progress").observe("click", this.setupRecord.bind(this));
+			} else {
+				$(this.formitemname+"_"+this.language+"_progress").observe("click", this.removeMessage.bind(this));
+			}
 		}
-		$(this.formitemname+"recordbutton").show();
-		form_do_validation($(this.formname), $(this.formitemname));
 	},
 	
-	add: function () {
-		this.language = $(this.formitemname+"select").value;
-		this.phone = $(this.formitemname+"phone").value;
+	createFormItem: function () {
+		$(this.formitemname+"_"+this.language+"_lang").update(this.language);
 		
-		var validcheck = this.valPhone(this.phone,this.minlength,this.maxlength);
-		if (validcheck !== true) {
-			this.handleEnd(validcheck);
-			return false;
+		if ($(this.formitemname+"_"+this.language+"_delete")) {
+			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": action_link("<?=_L('Preview')?>", "control_play_blue", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}) });
+			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": action_link("<?=_L('Re-record')?>", "control_repeat_blue", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}) });
+		} else {
+			$(this.formitemname+"_"+this.language+"_action").insert(action_link("<?=_L('Preview')?>", "control_play_blue", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}));
+			$(this.formitemname+"_"+this.language+"_action").insert(action_link("<?=_L('Re-record')?>", "control_repeat_blue", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}));
 		}
+		$(this.formitemname+"_"+this.language).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
+
+		$(this.formitemname+"_"+this.language+"_rerecord").observe("click", function (event) {
+			if (confirm("<?=_L('This will delete the current recording. Are you sure you want to do this?')?>"))
+				this.setupRecord();
+		}.bind(this));
+		$(this.formitemname+"_"+this.language+"_play").observe('click', function (event) {
+			popup("previewmessage.php?close=1&id="+this.messageid, 400, 500);
+		}.bind(this)); 
 		
-		if (!this.language) {
-			this.handleEnd("badlanguage");
-			return false;
+		if (!$(this.formitemname+"langlock"))
+			$(this.formitemname+"_altlangs").show();
+	},
+	
+	setupRecord: function () {
+		if ($(this.formitemname+'_select_'+this.language)) {
+			$(this.formitemname+'_select_'+this.language).hide();
 		}
+		$(this.formitemname+'_select').value = 0;
+
+		if (!$(this.formitemname+"_"+this.language))
+			$(this.formitemname+"_messages").insert(new Element("div",{id: this.formitemname+"_"+this.language}));
 		
+		$(this.formitemname+"_"+this.language).update().insert(
+			new Element("div",{id: this.formitemname+"_"+this.language+"_lang", style: "font-size: large; float: left;"}).update(((easycallRecordings > 0)?this.language:''))
+		).insert(
+			new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "width: 80%; float: right;"})
+		).insert(
+			new Element("div",{style: "clear: both;"})
+		);
+		
+		if (this.language !== "Default") {
+			$(this.formitemname+"_"+this.language+"_action").insert(action_link("<?=addslashes(_L("Remove"))?>", "delete", this.formitemname+"_"+this.language+"_delete").setStyle({float:"left"}));
+			$(this.formitemname+"_"+this.language+"_delete").observe("click", this.removeMessage.bind(this));
+		}
+
+		$(this.formitemname+"_"+this.language).insert(
+			new Element("div", {"id": this.formitemname+"_"+this.language+"_callcontrol"}).insert(
+				new Element("input", {"id": this.formitemname+"_"+this.language+"_phone", "class": "callmeinputphone", type: "text", style: "margin-bottom: 5px; border: 1px solid gray; "+((this.defaultphone == this.nophone)?"color: gray;":"")})
+			).insert(
+				new Element("div", {style: "clear:both"})
+			).insert(
+				icon_button("<?=_L("Call Me to Record")?>", "/diagona/16/151", this.formitemname+"_"+this.language+"_callme").setStyle({float: "left"})
+			).insert(
+				new Element("div", {style: "clear:both"})
+			).insert(
+				new Element("div", {"id": this.formitemname+"langlock"})
+			)
+		);
+		
+		$(this.formitemname+"_"+this.language+"_phone").value = this.defaultphone;
+		blankFieldValue($(this.formitemname+"_"+this.language+"_phone"), this.nophone);
+		
+		$(this.formitemname+"_"+this.language+"_phone").observe("keyup", function (event) {
+			var e = event.element();
+			if (!this.valPhone(e.value, this.minlength, this.maxlength))
+				e.setStyle({"background": "pink"});
+			else
+				e.setStyle({"background": "lightgreen"});
+		}.bind(this));
+		$(this.formitemname+"_"+this.language+"_callme").observe("click", this.record.bind(this));
+		
+		$(this.formitemname+"_altlangs").hide();
+	},
+	
+	removeMessage: function (event) {
 		var messages = $(this.formitemname).value.evalJSON();
-		
-		if (messages[this.language]) {
-			if (!confirm("<?=addslashes(_L("There is already a message recorded for this language. Do you want to over-write it?"))?>"))
+		if (typeof(messages[this.language]) !== "undefined") {
+			if (!confirm("<?=_L('This will delete the current recording. Are you sure you want to do this?')?>"))
 				return false;
-			$(this.formitemname+this.language+"_img").stopObserving();
+			delete messages[this.language];
+			$(this.formitemname).value = Object.toJSON(messages);
+			easycallRecordings--;
 		}
 		
-		$(this.formitemname+"recordbutton").hide();
-		$(this.formitemname+"progress_img").src = this.loadingimg;
-		$(this.formitemname+"progress").innerHTML = "<?=addslashes(_L("Starting session. Please wait."))?>";
-		if (typeof(messages[this.language]) == "undefined") {
-			this.displayMessage();
-			this.updateMessage();
-		}
-		return true;
-	},
-	
-	del: function (language) {
-		var messages = $(this.formitemname).value.evalJSON();
-		delete messages[language];
-		$(this.formitemname).value = Object.toJSON(messages);
-		$(this.formitemname+language+"_row").remove();
-	},
-	
-	displayMessage: function() {
-		var remove =new Element("div",{id: this.formitemname+this.language+"_remove", style: "float: left;"});
-		
-		var newtbody = new Element("tbody",{})
-		var newlang = new Element("tr", {id: this.formitemname+this.language+"_row"});
-		newlang.insert(new Element("td",{style: "width: 18px"}).insert(new Element("img",{id: this.formitemname+this.language+"_img", src: "img/icons/time_add.gif"})));
-		newlang.insert(new Element("td",{}).insert(new Element("div",{style: "margin-right: 5px"}).update(this.language)));
-		
-		var actions = new Element("div",{});
-		actions.insert(remove);
-		
-		newlang.insert(new Element("td",{}).insert(actions));
-		newtbody.insert(newlang);
-		
-		$(this.formitemname + "messages").insert(newtbody);
+		$(this.formitemname+'_select_'+this.language).show();
+		$(this.formitemname+"_"+this.language).remove();
+		if (this.pe)
+			this.pe.stop();
+		if (!$(this.formitemname+"langlock"))
+			$(this.formitemname+"_altlangs").show();
+			
+		form_do_validation(this.formname, this.formitemname);
 	},
 	
 	updateMessage: function () {
+		easycallRecordings++;
+		//Save message information in hidden form field
 		var messages = $(this.formitemname).value.evalJSON();
 		messages[this.language] = this.messageid;
 		$(this.formitemname).value = Object.toJSON(messages);
-		if (this.messageid) {
-			$(this.formitemname+this.language+"_img").src = this.playimg;
-			var hover = {};
-			hover[this.formitemname+this.language+"_img"] = "<?=addslashes(_L('Click here to preview this recording. If you want to re-record it, select the language above and click the Call Me To Record button.'))?>";
-			form_do_hover(hover);
-			$(this.formitemname+this.language+"_img").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
-		} else {
-			$(this.formitemname+this.language+"_img").src = this.exclamationimg;
-			form_do_hover(("{\""+this.formitemname+this.language+"_img\": \"<?=addslashes(_L('This message has not been recorded. Enter a phone number above and click the Call Me To Record button.'))?>\"}").evalJSON());
-		}
-		
-		if (this.language !== this.required) {
-			$(this.formitemname+this.language+"_remove").update("<img src=\""+this.deleteimg+"\" style=\"float: left; margin-right: 1px\" ><div style=\"font-size: 90%; text-decoration: underline; float: left; margin-right: 5px\"><?=addslashes(_L("Remove"))?></div>");
-			var hover = {};
-			hover[this.formitemname+this.language+"_remove"] = "<?=addslashes(_L('Cannot remove a message while record session in progress.'))?>";
-			form_do_hover(hover);
-		} else {
-			$(this.formitemname+this.language+"_remove").update("");
-		}
+		try {
+			form_do_validation(this.formname, this.formitemname);
+		} catch (e) { alert(e); }
 	},
 	
 	valPhone: function (pnumber,minlength,maxlength) {
@@ -266,13 +314,13 @@ var Easycall = Class.create({
 					)) {
 					return true; // OK special case
 				}
-				return "badphone";
+				return false;
 			}
 			return true;
 		} else if (phone.length < minlength) {
-			return "badphone";
+			return false;
 		} else if (phone.length > maxlength) {
-			return "badphone";
+			return false;
 		}
 		return true
 	}

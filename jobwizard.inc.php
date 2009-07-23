@@ -73,35 +73,69 @@ class CallMe extends FormItem {
 		else
 			$language = array("English (Default)");
 		
+		$nophone = _L("Phone Number");
+		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
 		if (!$value)
-			$value = '{"'.$language[0].'": ""}';
+			$value = '{}';
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
-		<table class="msgdetails" width="100%">
-		<tr><td class="msglabel">'._L("Language").':</td><td>';
-		if (count($language) <= 1) {
-			$str .= '<div id='.$n.'select style="background: white; border: 1px solid; padding: 2px; margin-right: 5px; margin-top: 2px;" value="'.$language[0].'">'.$language[0].'</div>';
-		} else {
-			$str .= '<select id='.$n.'select >';
+		<div>
+			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap">
+			</div>
+			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none">';
+		if (count($language) > 1) {
+			$str .= '
+				<div style="margin-bottom: 3px;">'._L("Add an alternate language?").'</div>
+				<select id="'.$n.'_select" ><option value="0">-- '._L("Select One").' --</option>';
 			foreach ($language as $langname) 
-				$str .= '<option id='.$n.'option_'.$langname.' value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
+				$str .= '<option id="'.$n.'_select_'.$langname.'" value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
 			$str .= '</select>';
 		}
-		$str .= '</td></tr>
-		<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" /></td></tr>
-		<tr><td></td><td><img id="'.$n.'progress_img" style="float:left" src="img/pixel.gif"/><div id="'.$n.'progress" /></td></tr>
-		<tr><td></td><td>'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$this->form->name."','".$n."','".$language[0]."','jobwizard','".$this->args['min']."','".$this->args['max']."').start();",null,'id="'.$n.'recordbutton"').'</td></tr>
-		<tr><td class="msglabel">'._L("Messages").':</td>
-		<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">
-		<tr class="listHeader" align="left"><th colspan=2>'._L("Message Language").'</th><th width="30%">'._L("Actions").'</th></tr>
-		
-		</table></td></tr>
-		</table>';
-		// include the easycall javascript object and set up the localized version of the text it will use. then load existing values.
+		$str .= '
+			</div>
+		</div>
+		';
+
+		// include the easycall javascript object. then load existing values.
 		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
-				<script type="text/javascript">
-					new Easycall("'.$this->form->name.'","'.$n.'","'.$language[0].'","jobwizard").load();
-				</script>';
+			<script type="text/javascript">
+				var msgs = '.$value.';
+				// Load default. it is a special case
+				new Easycall(
+					"'.$this->form->name.'",
+					"'.$n.'",
+					"Default",
+					"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
+					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+					"'.$defaultphone.'",
+					"'.$nophone.'"
+				).load();
+				easycallRecordings++;
+				Object.keys(msgs).each(function(lang) {
+					new Easycall(
+						"'.$this->form->name.'",
+						"'.$n.'",
+						lang,
+						"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
+						"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+						"'.$defaultphone.'",
+						"'.$nophone.'"
+					).load();
+					easycallRecordings++;
+				});
+				
+				$("'.$n.'_select").observe("change", function (event) {
+					new Easycall(
+						"'.$this->form->name.'",
+						"'.$n.'",
+						$("'.$n.'_select").value,
+						"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
+						"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+						"'.$defaultphone.'",
+						"'.$nophone.'"
+					).setupRecord();
+				});
+			</script>';
 		return $str;
 	}
 }
@@ -158,12 +192,16 @@ class ValEasycall extends Validator {
 	function validate ($value, $args) {
 		global $USER;
 		if (!$USER->authorize("starteasy"))
-			return "$this->label is not allowed for this user account.";
+			return "$this->label "._L("is not allowed for this user account");
 		$values = json_decode($value);
-		//return var_dump($values);
+		if (count($values) < 1)
+			return "$this->label "._L("has messages that are not recorded");
 		foreach ($values as $lang => $message)
+			$msg = new Message($message+0);
+			if ($msg->userid !== $USER->id)
+				return "$this->label "._L("has invalid message values");
 			if (!$message)
-				return "$this->label has messages that are not recorded.";
+				return "$this->label "._L("has messages that are not recorded");
 		return true;
 	}
 }
@@ -665,7 +703,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		global $USER;
-		$langs = array("English (Default)");
+		$langs = array();
 		if ($USER->authorize("sendmulti")) {
 			$syslangs = DBFindMany("Language","from language order by name");
 			foreach ($syslangs as $langid => $language)
@@ -674,7 +712,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 		}
 		$formdata = array($this->title);
 		$formdata["message"] = array(
-			"label" => _L("Messages"),
+			"label" => _L("Voice Recordings"),
 			"fieldhelp" => _L("Use the Language box to select the recorded language you wish to add to your notification. Enter a phone number and hit the Call Me To Record button to receive a phone call that will guide you through the process of attaching the selected language"),
 			"value" => "",
 			"validators" => array(
