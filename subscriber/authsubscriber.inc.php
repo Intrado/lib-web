@@ -266,8 +266,8 @@ function doDBConnect($result) {
 
 
 function doStartSession() {
-	$todo = "todo"; // TODO unique name, maybe use the subscriber name
-	session_name($todo . "_session");
+	global $CUSTOMERURL;
+	session_name($CUSTOMERURL . "_session");
 	session_start();
 
 	if (isset($_SESSION['timezone'])) {
