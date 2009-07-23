@@ -85,8 +85,6 @@ foreach ($fieldmaps as $fieldmap) {
 					$value = "en_US";
 					if ($person->$fieldnum == "Spanish")
 						$value = "es_US";
-					if ($person->$fieldnum == "French")
-						$value = "fr_CA";
 				
 					$formdata['locale'] = array (
    	    				"label" => _L($fieldmap->name),
@@ -249,8 +247,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$person->$languageField = "English";
 		if ($postdata['locale'] == "es_US")
 			$person->$languageField = "Spanish";
-		if ($postdata['locale'] == "fr_CA")
-			$person->$languageField = "French";
         
         $person->update();
         $_SESSION['subscriber.firstname'] = $person->$firstnameField;

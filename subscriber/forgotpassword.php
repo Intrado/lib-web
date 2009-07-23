@@ -7,6 +7,16 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
+if (isset($_GET['locale'])) {
+	setcookie('locale', $_GET['locale']);
+	redirect();
+}
+
+if (isset($_GET['deletelocale'])) {
+	setcookie('locale', '');
+	redirect();
+}
+
 // pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
 $appendcustomerurl = "";
 if (isset($_GET['u'])) {
@@ -53,8 +63,22 @@ if (!$success) {
 ?>
 <form method="POST" action="forgotpassword.php<?echo $appendcustomerurl;?>" name="forgotpassword">
 	<table width="100%" style="color: #<?=$primary?>;" >
+			<tr>
+				<td colspan="2">
+					<div style="float:right;">
+						<select id="locale" onchange='window.location.href="forgotpassword.php?locale="+this.options[this.selectedIndex].value'>
+						<?foreach ($LOCALES as $loc => $lang){?>
+							<option value="<?=$loc?>" <?=($loc == $_SESSION['_locale'])?"selected":""?>><?=$lang?></option>
+						<?}?>
+						</select>
+					</div>
+				</td>
+			</tr>
+
 		<tr>
-			<td colspan="2""><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+			<td colspan="2"">
+				<div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div>
+			</td>
 		</tr>
 		<tr>
 			<td colspan="2"><?=_L("To begin the password reset process, enter your email address.")?></td>

@@ -63,6 +63,7 @@ class DestWiz_whattype extends WizStep {
 
 		$formdata["whattype"] = array(
         	"label" => _L("Type"),
+        	"fieldhelp" => _L('Select the type of messages to be received. For example, a new phone number may be for calls and text messages.'),
         	"value" => "",
         	"validators" => array(
 					array("ValRequired")
@@ -85,6 +86,7 @@ class DestWiz_collectdata extends WizStep {
 		if ($datatype == "email") {
 			$formdata['newdata'] = array(
 				"label" => _L("Email"),
+				"fieldhelp" => _L('Enter your new email address.'),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -110,6 +112,7 @@ class DestWiz_collectdata extends WizStep {
 			
 			$formdata['newdata'] = array(
 				"label" => _L("Phone"),
+				"fieldhelp" => _L('Enter your new phone number, area code first.'),
 				"value" => "",
 				"validators" => $valarray,
 				"control" => array("TextField","maxlength" => 50),

@@ -13,6 +13,7 @@ require_once("subscribervalidators.inc.php");
 $formdata = array(
 	"radioselect" => array(
 		"label" => _L("Close Account"),
+		"fieldhelp" => _L('Selecting \'Yes\' will cancel your account and cause you to not receive any more messages.'),
         "value" => 1,
         "validators" => array(
             array("ValRequired")
@@ -22,6 +23,7 @@ $formdata = array(
     ),
     "password" => array(
         "label" => _L("Password"),
+        "fieldhelp" => _L('Enter your password to confirm your selection.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),

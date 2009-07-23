@@ -1,6 +1,8 @@
 <?
 $isNotLoggedIn = 1;
 
+$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -18,6 +20,16 @@ doStartSession();
 
 if (!isset($_SESSION['captcha'])) {
 	redirect("newsubscribersession.php");
+}
+
+if (isset($_GET['locale'])) {
+	setcookie('locale', $_GET['locale']);
+	redirect();
+}
+
+if (isset($_GET['deletelocale'])) {
+	setcookie('locale', '');
+	redirect();
 }
 
 //////////////////////////////
@@ -96,11 +108,12 @@ if ($authdomain == "1" && $emaildomain != "") {
 					);
 }
 
-$tos = file_get_contents("locale/en_US/terms.html");
+$tos = file_get_contents(isset($LOCALE)?"./locale/$LOCALE/terms.html":"./locale/en_US/terms.html");
 
 $formdata = array();
 $formdata["firstname"] = array(
         "label" => "First Name",
+        "fieldhelp" => _L('Enter your first name.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -111,6 +124,7 @@ $formdata["firstname"] = array(
     );
 $formdata["lastname"] = array(
         "label" => "Last Name",
+        "fieldhelp" => _L('Enter your last name.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -121,6 +135,7 @@ $formdata["lastname"] = array(
     );
 $formdata["username"] = array(
         "label" => "Account Email",
+        "fieldhelp" => _L('Enter your email address.'),
         "value" => "",
         "validators" => $emailvalidators,
         "control" => array("TextField","maxlength" => 50),
@@ -128,6 +143,7 @@ $formdata["username"] = array(
     );
 $formdata["confirmusername"] = array(
         "label" => "Confirm Email",
+        "fieldhelp" => _L('Use this space to confirm the email address you entered above.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -139,6 +155,7 @@ $formdata["confirmusername"] = array(
     );
 $formdata["password"] = array(
         "label" => "Password",
+        "fieldhelp" => _L('Create a password for logging into your account.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -151,6 +168,7 @@ $formdata["password"] = array(
     );
 $formdata["confirmpassword"] = array(
         "label" => "Confirm Password",
+        "fieldhelp" => _L('Confirm your password by entering it again.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -164,6 +182,7 @@ $formdata["confirmpassword"] = array(
 if ($authcode == "1" && $_SESSION['sitecode'] != "") {
 	$formdata["sitecode"] = array(
         "label" => "Site Access Code",
+        "fieldhelp" => _L('The site access code is a special code you should have received that will allow you to sign up for this service.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -176,6 +195,7 @@ if ($authcode == "1" && $_SESSION['sitecode'] != "") {
 }
 $formdata["captcha"] = array(
         "label" => "Captcha",
+        "fieldhelp" => _L('Enter the characters in the captcha in the field below.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -186,11 +206,13 @@ $formdata["captcha"] = array(
     );
 $formdata["terms"] = array(
         "label" => "Terms Of Service",
+        "fieldhelp" => _L('Please read the rules governing your interaction with our service.'),
         "control" => array("FormHtml","html" => '<div style="height: 200px; overflow:auto;">'.$tos.'</div>'),
         "helpstep" => 4
     );
 $formdata["acceptterms"] = array(
         "label" => "Accept Terms",
+        "fieldhelp" => _L('Check this box to agree to the Terms of Service.'),
         "value" => false,
         "validators" => array(
             array("ValRequired")
@@ -226,7 +248,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         if (isset($postdata['sitecode']))
         	$sitecode = $postdata['sitecode'];
         	
-        $options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname']));
+        $options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname'], '_locale' => $LOCALE));
 		
 		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $sitecode, $options);
 		if ($result['result'] != "") {
@@ -296,7 +318,20 @@ if (errors)
 
 		<table width="100%" style="color: #<?=$primary?>;" >
 			<tr>
-				<td><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+				<td>
+					<div style="float:right;">
+						<select id="locale" onchange='window.location.href="newsubscriber.php?locale="+this.options[this.selectedIndex].value'>
+						<?foreach ($LOCALES as $loc => $lang){?>
+							<option value="<?=$loc?>" <?=($loc == $_SESSION['_locale'])?"selected":""?>><?=$lang?></option>
+						<?}?>
+						</select>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div>
+				</td>
 			</tr>
 			<tr>
 				<td>Please complete this form to create your account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.</td>

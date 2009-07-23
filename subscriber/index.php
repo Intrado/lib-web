@@ -1,13 +1,16 @@
 <?
 $isNotLoggedIn = 1;
 
+if (!isset($_SESSION['_locale']))
+	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+
 require_once("authsubscriber.inc.php");
 require_once("common.inc.php");
 require_once("subscriberutils.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../inc/form.inc.php");
 require_once("../obj/FieldMap.obj.php");
-
 
 $changeuser = false;
 $forgot = false;
@@ -39,6 +42,16 @@ if (isset($_GET['logout'])) {
 	subscriberPutSessionData(session_id(), ""); // write empty data to flush the user
 
 	@session_destroy();
+}
+
+if (isset($_GET['locale'])) {
+	setcookie('locale', $_GET['locale']);
+	redirect();
+}
+
+if (isset($_GET['deletelocale'])) {
+	setcookie('locale', '');
+	redirect();
 }
 
 if ($SETTINGS['feature']['has_ssl']) {
@@ -86,6 +99,7 @@ if ($id) {
 	redirect("start.php");
 }
 
+//PutFormData("login", "main", "_locale", isset($LOCALE)?$LOCALE:"en_US", "text", "nomin", "nomax");
 
 $TITLE= "Sign In";
 
@@ -94,6 +108,18 @@ require_once("logintop.inc.php");
 ?>
 <form method="POST" action="index.php" name="login">
 	<table style="color: #<?=$primary?>;" >
+			<tr>
+				<td colspan="3">
+					<div style="float:right;">
+						<select id="locale" onchange='window.location.href="index.php?locale="+this.options[this.selectedIndex].value'>
+						<?foreach ($LOCALES as $loc => $lang){?>
+							<option value="<?=$loc?>" <?=($loc == $_SESSION['_locale'])?"selected":""?>><?=$lang?></option>
+						<?}?>
+						</select>
+					</div>
+				</td>
+			</tr>
+
 <?	if (!$custname) {
 ?>
 		<tr>
@@ -105,9 +131,9 @@ require_once("logintop.inc.php");
 ?>
 		<tr>
 			<td colspan="3">
-				<div style="font-size: 20px; font-weight: bold;">Phone, Email, and Text Messages</div>
+				<div style="font-size: 20px; font-weight: bold;"><?=_L("Phone, Email, and Text Messages")?></div>
 				<br>
-				<div style="font-size: 15px; font-weight: bold;">Get the latest communication from <?=$custname?>.</div>
+				<div style="font-size: 15px; font-weight: bold;"><?=_L("Get the latest communication from %s", $custname)?>.</div>
 				<br>
 				<br>
 			</td>
@@ -129,28 +155,28 @@ require_once("logintop.inc.php");
 		<tr>
 			<td>Password&nbsp;(case&nbsp;sensitive):</td>
 			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
-			<td align="left"><a href="forgotpassword.php">Forgot your password? Click Here</a></td>
+			<td align="left"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;">Warning! Your Caps Lock key is on.</div></td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td align="right"><?= submit_button("Sign In","save","tick") ?></td>
+			<td><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div></td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
+			<td align="right"><?= submit_button(_L("Sign In"),"save","tick") ?></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan="3">First time user?</td>
+			<td colspan="3"><?=_L("First time user?")?></td>
 		</tr>
 		<tr>
-			<td colspan="3"><a href="newsubscribersession.php"><b>Sign up now</b></a></td>
+			<td colspan="3"><a href="newsubscribersession.php"><b><?=_L("Sign up now")?></b></a></td>
 		</tr>
 <?	}
 ?>

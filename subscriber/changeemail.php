@@ -13,6 +13,7 @@ require_once("subscribervalidators.inc.php");
 $formdata = array(
     "newusername1" => array(
         "label" => _L("New Account Email"),
+        "fieldhelp" => _L('Enter the new email you would like to use as the primary email for this account. <br><br><b>Note:</b> This will become the email address that you use when logging into the system.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -24,6 +25,7 @@ $formdata = array(
     ),
     "newusername2" => array(
         "label" => _L("Confirm New Email"),
+        "fieldhelp" => _L('Enter the new email again to confirm.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -37,6 +39,7 @@ $formdata = array(
     ),
     "password" => array(
         "label" => _L("Password"),
+        "fieldhelp" => _L('Enter your password.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),

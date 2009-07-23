@@ -13,6 +13,7 @@ require_once("subscribervalidators.inc.php");
 $formdata = array(
     "newpassword1" => array(
         "label" => _L("New Password"),
+        "fieldhelp" => _L('Enter the new password you would like to use when logging into the system.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -24,6 +25,7 @@ $formdata = array(
     ),
     "newpassword2" => array(
         "label" => _L("Confirm Password"),
+        "fieldhelp" => _L('Enter the new password to confirm.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
@@ -36,6 +38,7 @@ $formdata = array(
     ),
     "password" => array(
         "label" => _L("Old Password"),
+        "fieldhelp" => _L('Enter your old password.'),
         "value" => "",
         "validators" => array(
             array("ValRequired"),
