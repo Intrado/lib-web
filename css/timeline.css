@@ -9,7 +9,7 @@
 			width: 96%;
 			height: 100%;
 			padding: 0px;
-			margin: 0px;			
+			margin: 0px;
 			background-color: #c9c9c9;	
 	}
 	
@@ -46,6 +46,7 @@
 		font-weight: normal;
 		overflow: hidden;   
         white-space: nowrap;
+        cursor:pointer;
 	}
 	
 	.jobbar {
