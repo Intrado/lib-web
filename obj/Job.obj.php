@@ -125,8 +125,9 @@ class Job extends DBMappedObject {
 		$newjob->cancelleduserid = NULL;
 		$newjob->percentprocessed = 0;
 		
-		$newjob->createdate = QuickQuery("select now()");
-
+		$newjob->createdate = date("Y-m-d H:i:s", time());
+		$newjob->modifydate = $newjob->createdate;
+		
 		//refresh the dates to present
 		$daydiff = strtotime($newjob->enddate) - strtotime($newjob->startdate);
 
