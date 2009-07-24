@@ -18,12 +18,6 @@ if (isset($_GET['deletelocale'])) {
 	redirect();
 }
 
-// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "";
-if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".urlencode($_GET['u']);
-}
-
 $success = false;
 $emailnotfound = false;
 $generalerror = false;
@@ -62,7 +56,7 @@ if ($generalerror) {
 
 if (!$success) {
 ?>
-<form method="POST" action="forgotpassword.php<?echo $appendcustomerurl;?>" name="forgotpassword">
+<form method="POST" action="forgotpassword.php" name="forgotpassword">
 	<table width="100%" style="color: #<?=$primary?>;" >
 			<tr>
 				<td colspan="2">
@@ -98,7 +92,7 @@ if (!$success) {
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><br><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></td>
+			<td><br><a href="index.php"><?=_L("Return to Sign In")?></a></td>
 		</tr>
 	</table>
 </form>
@@ -112,9 +106,9 @@ if (!$success) {
 			<td>
 				<div style="margin:5px">
 					<?=_L("Check your email to receive the password reset link.")?>
-					<br><?=_L("You will be redirected to the Activation page in 10 seconds, or you can")?> <a href="index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?f"; else echo "&f"; ?>"><?=_L("Click Here to continue.")?></a>
+					<br><?=_L("You will be redirected to the Activation page in 10 seconds, or you can")?> <a href="index.php?f"><?=_L("Click Here to continue.")?></a>
 				</div>
-				<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?f"; else echo "&f"; ?>">
+				<meta http-equiv="refresh" content="10;url=index.php?f"; ?>">
 			</td>
 		</tr>
 	</table>
