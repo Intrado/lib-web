@@ -2,11 +2,13 @@
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
+require_once("../obj/Person.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
 require_once("../obj/Sms.obj.php");
 require_once("../obj/SubscriberPending.obj.php");
 require_once("../obj/JobType.obj.php");
+require_once("../obj/FieldMap.obj.php");
 require_once("subscriberutils.inc.php");
 
 $STATUS_ACTIVE = "ACTIVE";
@@ -40,6 +42,25 @@ if (isset($_GET['delete']) && isset($_GET['tbl'])) {
 	}
 	redirect();
 }
+
+$person = new Person($_SESSION['personid']);
+
+$firstnameField = FieldMap::getFirstNameField();
+$lastnameField = FieldMap::getLastNameField();
+$languageField = FieldMap::getLanguageField();
+$subscribeFields = FieldMap::getSubscribeMapNames();
+
+$subscribeFieldValues = array();
+foreach ($subscribeFields as $fieldnum => $name) {
+	if ('f' == substr($fieldnum, 0, 1)) {
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+	} else {
+		$gfield = substr($fieldnum, 1, 3);
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from groupdata where fieldnum='".$gfield."' and personid=0 and importid=0", true);
+	}
+}
+
+$fieldmaps = DBFindMany("FieldMap", "from fieldmap where options like '%subscribe%' order by fieldnum");
 
 $subscriberid = $_SESSION['subscriberid'];
 $pendingList = DBFindMany("SubscriberPending", "from subscriberpending where subscriberid=?", false, array($subscriberid));
@@ -164,6 +185,117 @@ $formdata["jobtypes"] = array(
 	"helpstep" => 1
 );
 
+foreach ($fieldmaps as $fieldmap) {
+	$fieldnum = $fieldmap->fieldnum;
+	if ($fieldnum == 'f01' || $fieldnum == 'f02')
+		continue; // first and lastname set on account page
+		
+	if ('f' == substr($fieldnum, 0, 1)) {
+		if ($fieldmap->isOptionEnabled("static")) {
+			// static
+			
+			if ($fieldmap->isOptionEnabled("text")) {
+				// static text
+				
+			} else {
+				// static multi, subscriber must select one
+				
+				if ($fieldnum == $languageField) {
+				
+					// map locale to customer language
+					$value = "en_US";
+					if ($person->$fieldnum == "Spanish")
+						$value = "es_US";
+				
+					$formdata['locale'] = array (
+   	    				"label" => _L($fieldmap->name),
+       					"value" => $value,
+       					"validators" => array(
+       						array("ValRequired")
+       					),
+       					"control" => array("RadioButton","values" => $LOCALES),
+       					"helpstep" => 1
+					);
+				
+				} else {
+					$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+					if (count($values) > 0) {
+						$v = $person->$fieldnum;
+						if (count($values) == 1) {
+							$a = array_values($values);
+							$v = $a[0];
+						}
+						$formdata[$fieldnum] = array (
+    	    				"label" => _L($fieldmap->name),
+        					"value" => $v,
+        					"validators" => array(
+        						array("ValRequired")
+        					),
+        					"control" => array("RadioButton","values" => $values),
+        					"helpstep" => 1
+						);
+					}
+				}
+			}
+		} else {
+			// dynamic
+			
+			if ($fieldmap->isOptionEnabled("text")) {
+				// dynamic text
+
+				$max = 255;
+				if ($fieldnum == $firstnameField || $fieldnum == $lastnameField)
+					$max = 50;
+				
+				$formdata[$fieldnum] = array (
+        			"label" => _L($fieldmap->name),
+        			"value" => $person->$fieldnum,
+        			"validators" => array(
+	            		array("ValRequired"),
+            			array("ValLength","min" => 1,"max" => $max)
+        			),
+        			"control" => array("TextField","maxlength" => $max),
+        			"helpstep" => 1
+    			);
+			} else {
+				// dynamic multi, subscriber must select one (data from imports)
+			
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
+				if (count($values) > 0)
+					$formdata[$fieldnum] = array (
+    	    			"label" => _L($fieldmap->name),
+        				"value" => $person->$fieldnum,
+        				"validators" => array(
+        					array("ValRequired")
+        				),
+        				"control" => array("RadioButton","values" => $values),
+        				"helpstep" => 1
+					);
+			}
+		}
+	} else { // Gfield
+		if ($fieldmap->isOptionEnabled("static")) {
+				// static multi, subscriber must select one
+				
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+		} else {
+				// dynamic multi, subscriber must select one (data from imports)
+			
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
+		}
+		$gfield = substr($fieldnum, 1, 3);
+		$arr = QuickQueryList("select value, value from groupdata where personid=".$person->id." and fieldnum=".$gfield);
+				if (count($values) > 0)
+					$formdata[$fieldnum] = array (
+    	    			"label" => _L($fieldmap->name),
+        				"value" => $arr,
+        				"validators" => array(),
+        				"control" => array("MultiCheckbox","values" => $values),
+        				"helpstep" => 1
+					);
+	}
+}
+
 
 $buttons = array(submit_button(_L("Save"),"submit","tick"),
                 icon_button(_L("Cancel"),"cross",null,"notificationpreferences.php"));
@@ -230,6 +362,63 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							values " . implode(",",$values));
         QuickUpdate("Commit");
 
+
+		// delete all groupdata for this person, rebuild from current selections
+		QuickUpdate("delete from groupdata where personid=".$person->id);
+		
+		// add all static text fields to this person
+		$staticList = QuickQueryList("select fieldnum from fieldmap where options like '%text%subscribe%static%'"); //TODO FIXME this breaks if the order of the options changes. 
+		foreach ($staticList as $fieldnum) {
+			$value = QuickQuery("select value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1");
+			if ($value) {
+				$person->$fieldnum = $value;
+			}
+		}
+        
+		foreach ($fieldmaps as $fieldmap) {
+			$fieldnum = $fieldmap->fieldnum;
+			if (!isset($postdata[$fieldnum])) continue; // some had no data to display
+			
+			$val = $postdata[$fieldnum];
+			if ($val == null)
+				$val = array();
+
+			if ('f' == substr($fieldnum, 0, 1)) {
+				$person->$fieldnum = $val;
+			} else { // 'g'
+				$gfield = substr($fieldnum, 1, 3);
+				//QuickUpdate("delete from groupdata where fieldnum=".$gfield." and personid=".$person->id);
+				
+				if (count($val) > 0) {
+					$query = "insert into groupdata (personid, fieldnum, value, importid) values ";
+					$args = array();
+					foreach ($val as $v) {
+						$query .= "(?, ?, ?, 0), ";
+						$args[] = $person->id;
+						$args[] = $gfield;
+						$args[] = $v;
+					}
+					$query = substr($query, 0, strlen($query)-2); // remove trailing comma
+					QuickUpdate($query, false, $args);
+				}
+			}
+		}
+
+        $preferences = array();
+        $preferences['_locale'] = $postdata['locale'];
+        $prefs = json_encode($preferences);
+
+		QuickUpdate("update subscriber set preferences=? where id=?", false, array($prefs, $_SESSION['subscriberid']));
+		$_SESSION['_locale'] = $postdata['locale'];        
+
+		$person->$languageField = "English";
+		if ($postdata['locale'] == "es_US")
+			$person->$languageField = "Spanish";
+        
+        $person->update();
+        $_SESSION['subscriber.firstname'] = $person->$firstnameField;
+        $_SESSION['subscriber.lastname'] = $person->$lastnameField;
+
         if ($ajax)
             $form->sendTo("notificationpreferences.php");
         else
@@ -246,22 +435,30 @@ $TITLE = _L("Notification Preferences");
 
 require_once("nav.inc.php");
 
-startWindow(_L('Interests'));
-echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency notifications, I would like to receive the following types of announcements:") . '</td></tr></table>';
-echo $form->render();
+startWindow(_L('Contacts'));
+
+// table of destinations
 showObjects($destinations, $titles, array("name"=>"fmt_name", "status"=>"fmt_status", "action" => "fmt_actions"));
 
 // find remaining phone/email/sms available (some already active and pending)
 $available = findAvailableDestinationTypes();
 if (count($available) > 0)
-	buttons(button("Add More",null,"destinationwizard.php?new"));
+	buttons(button(_L("Add More"),null,"destinationwizard.php?new"));
 else {
 ?>
 <div style="margin: 5px;">
-	<img src="img/bug_lightbulb.gif" > All available contacts have been added.  Delete one of the above contacts before you add more.
+	<img src="img/bug_lightbulb.gif" ><?=_L("All available contacts have been added.  Delete one of the above contacts before you add more.")?>
 </div>
 <?
 }
+endWindow();
+echo "<br>";
+
+// form data
+startWindow(_L('Interests'));
+
+echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency notifications, I would like to receive the following types of announcements:") . '</td></tr></table>';
+echo $form->render();
 
 endWindow();
 
