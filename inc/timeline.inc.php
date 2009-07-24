@@ -26,8 +26,7 @@ $rangeslice = 100 / $rangedays;
 $jobtypes = DBFindMany("JobType","from jobtype");
 $jobs = DBFindMany("Job","from job where
 	userid=? and 
-	(status='cancelled' or status='complete' or status='active' or status='scheduled') and
-	type != 'survey' and 
+	(status='cancelled' or status='complete' or status='active' or status='scheduled') and 
 	deleted = 0 and 
 	(
 		DATE_SUB(CURDATE(),INTERVAL ? DAY) <= enddate and 
@@ -158,7 +157,7 @@ foreach($jobs as $job) {
 $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 
 ?>
-<div style="height: <? echo (70 + $minhight) ?>px;">
+<div style="height: 180px;overflow: auto">
 	<div id="maincanvas"  style="height:<? echo $minhight ?>px;">
 	
 	<table>
@@ -239,10 +238,10 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				showOn: 'click',
 				hideOn: false,
 				hideAfter: 0.5,
-				stem: 'topLeft',
-				hook: {  target: 'bottomLeft', tip: 'topLeft'  },
+				stem: 'topRight',
+				hook: {  target: 'bottomMiddle', tip: 'topRight'  },
 				width: '220px',
-				offset: { x: 25, y: -5 },
+				offset: { x: 0, y: -5 }
 			});
 			$('__' + i).observe('prototip:shown', function() {
 				//	this.tip.wrapper.shake();
