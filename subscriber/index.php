@@ -1,8 +1,7 @@
 <?
 $isNotLoggedIn = 1;
 
-if (!isset($_SESSION['_locale']))
-	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
 
 require_once("authsubscriber.inc.php");
 require_once("common.inc.php");
@@ -60,13 +59,10 @@ if ($SETTINGS['feature']['has_ssl']) {
 	}
 }
 
-
-
 $login="";
 $badlogin=false;
 $id = false;
 $sessionstarted = false;
-
 
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
@@ -89,8 +85,6 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
     }
 }
 
-
-
 if ($id) {
 	if (!$sessionstarted)
 		doStartSession();
@@ -99,9 +93,10 @@ if ($id) {
 	redirect("start.php");
 }
 
-//PutFormData("login", "main", "_locale", isset($LOCALE)?$LOCALE:"en_US", "text", "nomin", "nomax");
+// set again here after session started
+$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
 
-$TITLE= "Sign In";
+$TITLE= _L("Sign In");
 
 require_once("logintop.inc.php");
 

@@ -1,8 +1,9 @@
 <?
+$isNotLoggedIn = 1;
+
 if (!isset($_SESSION['_locale']))
 	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
 
-$isNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");

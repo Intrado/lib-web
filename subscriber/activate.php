@@ -1,5 +1,9 @@
 <?
 $isNotLoggedIn = 1;
+
+if (!isset($_SESSION['_locale']))
+	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+
 require_once("common.inc.php");
 require_once("subscriberutils.inc.php");
 require_once("../inc/html.inc.php");
@@ -44,16 +48,16 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 		$result = subscriberPreactivateForgottenPassword($token);
 		if($result['result'] == ""){
 			if ($password1 !== $password2) {
-				error("The passwords do not match");
+				error(_L("The passwords do not match"));
 			} else if (strlen($password1) < 5) {
-				error("Passwords must be at least 5 characters long");
+				error(_L("Passwords must be at least 5 characters long"));
 			} else if($password1 && $passworderror = validateNewPassword($result['subscriber.username'], $password1, $result['subscriber.firstname'], $result['subscriber.lastname'])) {
 				error($passworderror);
 			} else {
 				$result = subscriberActivateAccount($token, $password1);
 				if ($result['result'] == "") {
 					if (!$forgot && $result['functionCode'] != 'token_forgotpassword') {
-						error("An unknown error occurred");
+						error(_L("An unknown error occurred"));
 						$error = true;
 					} else {
 						$form = false;
@@ -81,7 +85,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 			} else if ($result['functionCode'] == 'token_addemail' && $addemail) {
 				$addemailsuccess = true;
 			} else {
-				error("An unknown error occurred");
+				error(_L("An unknown error occurred"));
 				$error = true;
 			}
 			if (!$error) {
@@ -97,26 +101,26 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 		}
 
 	} else {
-		error("You are missing required fields");
+		error(_L("You are missing required fields"));
 	}
 }
 
 if ($forgot) {
-	$TITLE = "Password Assistance";
+	$TITLE = _L("Password Assistance");
 	$action = "?f";
-	$text = "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address";
+	$text = _L("your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address");
 } else if ($changeuser) {
-	$TITLE = "Change Email";
+	$TITLE = _L("Change Email");
 	$action = "?c";
-	$text = "your password";
+	$text = _L("your password");
 } else if ($addemail) {
-	$TITLE = "Add Email to Account";
+	$TITLE = _L("Add Email to Account");
 	$action = "?a";
-	$text = "your password";
+	$text = _L("your password");
 } else {
-	$TITLE = "Activate Account";
+	$TITLE = _L("Activate Account");
 	$action = "?n";
-	$text = "your password";
+	$text = _L("your password");
 }
 
 require_once("logintop.inc.php");
@@ -132,32 +136,32 @@ if ($forgotsuccess || $success || $newusersuccess || $addemailsuccess) {
 if ($forgotsuccess) {
 	?>
 	<div style="margin:5px">
-		Thank you, your password has been reset.
-		<br>You will be redirected to the main page in 10 seconds or <a href="start.php">Click Here.</a>
+		<?=_L("Thank you, your password has been reset.")?>
+		<br><?=_L("You will be redirected to the main page in 10 seconds or ")?><a href="start.php"><?=_L("Click Here.")?></a>
 	</div>
 	<meta http-equiv="refresh" content="10;url=start.php">
 	<?
 } else if ($success) {
 	?>
 	<div style="margin:5px">
-		Thank you, your account has been activated.
-		<br>You will be redirected to the main page in 5 seconds or <a href="start.php">Click Here.</a>
+		<?=_L("Thank you, your account has been activated.")?>
+		<br><?=_L("You will be redirected to the main page in 5 seconds or ")?><a href="start.php"><?=_L("Click Here.")?></a>
 	</div>
 	<meta http-equiv="refresh" content="5;url=start.php">
 	<?
 } else if ($newusersuccess) {
 	?>
 	<div style="margin:5px">
-		Thank you, your email address has been changed.
-		<br>You will be redirected to the main page in 10 seconds or <a href="start.php">Click Here.</a>
+		<?=_L("Thank you, your email address has been changed.")?>
+		<br><?=_L("You will be redirected to the main page in 10 seconds or ")?><a href="start.php"><?=_L("Click Here.")?></a>
 	</div>
 	<meta http-equiv="refresh" content="10;url=start.php">
 	<?
 } else if ($addemailsuccess) {
 	?>
 	<div style="margin:5px">
-		Thank you, your email address has been added to your account.
-		<br>You will be redirected to the main page in 10 seconds or <a href="start.php">Click Here.</a>
+		<?=_L("Thank you, your email address has been added to your account.")?>
+		<br><?=_L("You will be redirected to the main page in 10 seconds or ")?> <a href="start.php"><?=_L("Click Here.")?></a>
 	</div>
 	<meta http-equiv="refresh" content="10;url=start.php">
 	<?
@@ -178,29 +182,29 @@ if ($form) {
 				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
 			</tr>
 			<tr>
-				<td colspan="2">You should have received an email containing a confirmation code. Please enter it below along with <?=$text?>.<br></td>
+				<td colspan="2"><?=_L("You should have received an email containing a confirmation code. Please enter it below along with")?> <?=$text?>.<br></td>
 			</tr>
 
 			<tr>
-				<td>Confirmation Code: </td>
+				<td><?=_L("Confirmation Code:")?></td>
 				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="35" /></td>
 			</tr>
 <?
 		if ($forgot) {
 ?>
 			<tr>
-				<td>New Password:</td>
+				<td><?=_L("New Password:")?></td>
 				<td><input type="password" name="password1"  size="35" maxlength="50" /></td>
 			</tr>
 			<tr>
-				<td>Confirm Password:</td>
+				<td><?=_L("Confirm Password:")?></td>
 				<td><input type="password" name="password2"  size="35" maxlength="50" /></td>
 			</tr>
 <?
 		} else {
 ?>
 			<tr>
-				<td>Password:</td>
+				<td><?=_L("Password:")?></td>
 				<td><input type="password" name="password"  size="35" maxlength="50"/></td>
 			</tr>
 <?

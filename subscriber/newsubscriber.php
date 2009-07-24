@@ -248,7 +248,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         if (isset($postdata['sitecode']))
         	$sitecode = $postdata['sitecode'];
         	
-        $options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname'], '_locale' => $LOCALE));
+        $options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname'], 'locale' => $_SESSION['_locale']));
 		
 		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $sitecode, $options);
 		if ($result['result'] != "") {
@@ -284,12 +284,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$TITLE = "Create a New Account";
+// set again here after session started
+$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+
+$TITLE = _L("Create a New Account");
 require_once("logintop.inc.php");
 
 if (isset($_GET['err'])) {
 ?>
-    <h2>Sorry, an error has occurred.  Please try again.</h2>
+    <h2><?=_L("Sorry, an error has occurred.  Please try again.")?></h2>
 <?
 }
 ?>
@@ -313,7 +316,7 @@ if (errors)
 </script>
 
 <noscript>
-<h1><?= $errors ? "This form contains some errors" : "" ?></h1>
+<h1><?= $errors ? _L("This form contains some errors") : "" ?></h1>
 </noscript>
 
 		<table width="100%" style="color: #<?=$primary?>;" >
@@ -334,7 +337,7 @@ if (errors)
 				</td>
 			</tr>
 			<tr>
-				<td>Please complete this form to create your account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.</td>
+				<td><?=_L("Please complete this form to create your account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.")?></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
@@ -347,7 +350,7 @@ if (errors)
 				</td>
 			</tr>
 			<tr>
-				<td><br><a href="index.php">Return to Sign In</a></td>
+				<td><br><a href="index.php"><?=_L("Return to Sign In")?></a></td>
 			</tr>
 		</table>
 			
