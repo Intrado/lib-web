@@ -5,11 +5,11 @@ echo "Hello World, TXTPOSTBACK";
 // Air2Web
 
 if (!isset($_POST['message'])) {
-//	error_log("OK for now, no message, this must be a postback status");
-	exit;
+//	error_log("txtpostback OK for now, no message, this must be a postback status");
+	exit();
 }
 
-error_log("postback recieved: ".http_build_query($_POST));
+error_log("txtpostback recieved: ".http_build_query($_POST));
 
 $keywords_optout = array("end","stop","quit","cancel","unsubscribe");
 
@@ -51,7 +51,7 @@ if ($fp) {
 	fclose($fp);
 }
 else {
-	error_log("Unable to log SMS message from $sourceaddress in $logfile");
+	error_log("txtpostback Unable to log SMS message from $sourceaddress in $logfile");
 }
 
 // Check if message starts with help
@@ -60,6 +60,7 @@ $splitmessage = explode(" ",$message,2);
 if ($splitmessage[0] === "help") {
 	$body = "School Messenger Alerts approx 3msg/mo. Visit www.schoolmessenger.com/txtmsg or email support@schoolmessenger.com 4info. Txt STOP 2quit.  Std msg charges apply.";
 	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
+	error_log("txtpostback done with help, exit now");
 	exit();
 }
 
@@ -85,7 +86,7 @@ if (!$hasoptout) {
 	}
 
 	if (!$throttlefp) {
-		error_log("Unable to open $throttlefile for writing, will not be able to check duplicate same-day replys");
+		error_log("txtpostback Unable to open $throttlefile for writing, will not be able to check duplicate same-day replys");
 	}
 	//do we need to check for this number?
 	if (!$newfile) {
@@ -93,6 +94,7 @@ if (!$hasoptout) {
 			if(trim(fgets($throttlefp)) === $sourceaddress){
 				//echo "Source found, exit. \n";// For testing
 				fclose ($throttlefp);
+				error_log("txtpostback done with throttle, exit now");
 				exit();
 			}
 		}
@@ -112,88 +114,75 @@ if (!$hasoptout) {
 	// Send a email to support
 	//echo "Emailing. ";// For testing
 
+	$emaillist = "";
 	foreach ($emails as $email) {
-		simpleemail($subject ,http_build_query($_POST), $email, "noreply@schoolmessenger.com:SMS Listener");
+		$emaillist .= " ".$email;
 	}
+	simpleemail($subject ,http_build_query($_POST), $emaillist, "noreply@schoolmessenger.com:SMS Listener");
 }
 
 
 function sendtxt($username, $password, $shortcode, $sourceaddress, $replybody) {
-	error_log("sending txt : ".$replybody." to ".$sourceaddress);
+	error_log("txtpostback sending txt : ".$replybody." to ".$sourceaddress);
 	
 	// build the xml
-	$sendrequest = ''.
-'<?xml version="1.0" encoding="UTF-8"?>'.
-'<router-api client_id="2notify" version="2.0" customer_id="2920">'.
-'      <request request_id="2notify">'.
-'                <send_message return_ids="true" priority="bulk">'.
-'                <carrier_message carrier="default">'.
-'                      <message_content>'.
-'                              <body type="text">'.$replybody.'</body>'.
-'                                <subject/>'.
-'                        <reply_to>'.$shortcode.'</reply_to>'.
-'                        </message_content>'.
-'                        <modifications>'.
-'                                <shorten type="truncate"/>'.
-'                                <globalization us_only="false"/>'.
-'                        </modifications>'.
-'                                <client_data>'.
-'                                        <context_id>contextId</context_id>'.
-'                                        <reporting_key1>RK1</reporting_key1>'.
-'                                        <reporting_key2>RK2</reporting_key2>'.
-'                                </client_data>'.
-'                                <billing service_level="standard">'.
-'                                      <billing_id>billId</billing_id>'.
-'                                      <description>desc</description>'.
-'                                </billing>'.
-'                   </carrier_message>'.
-'                        <recipient_list>'.
-'                                <recipient>'.$sourceaddress.'</recipient>'.
-'                        </recipient_list>'.
-'                </send_message>'.
-'        </request>'.
-'</router-api>';
+	$sendrequest =
+'<?xml version="1.0" encoding="UTF-8"?>
+<router-api client_id="2notify" version="2.0" customer_id="2920">
+      <request request_id="2notify">
+                <send_message return_ids="true" priority="bulk">
+                <carrier_message carrier="default">
+                      <message_content>
+                              <body type="text">'.$replybody.'</body>
+                                <subject/>
+                        <reply_to>'.$shortcode.'</reply_to>
+                        </message_content>
+                        <modifications>
+                                <shorten type="truncate"/>
+                                <globalization us_only="false"/>
+                        </modifications>
+                                <client_data>
+                                        <context_id>contextId</context_id>
+                                        <reporting_key1>RK1</reporting_key1>
+                                        <reporting_key2>RK2</reporting_key2>
+                                </client_data>
+                                <billing service_level="standard">
+                                      <billing_id>billId</billing_id>
+                                      <description>desc</description>
+                                </billing>
+                   </carrier_message>
+                        <recipient_list>
+                                <recipient>'.$sourceaddress.'</recipient>
+                        </recipient_list>
+                </send_message>
+        </request>
+</router-api>';
 	
 	//now send the sms
 	$host = "mrr.air2web.com";
-	$uri = 'http://mrr.air2web.com/a2w_preRouter/xmlApiRouter';
+	$url = 'http://mrr.air2web.com/a2w_preRouter/xmlApiRouter';
 	$auth = 'Basic '.base64_encode($username.":".$password);
 
-
-	$contentlength = strlen($sendrequest);
-
-	$reqheader =  "POST $uri HTTP/1.1\r\n".
-		"Host: $host\r\n".
-		"Authorization: ".$auth."\r\n".
-		"Content-Type: text/xml\r\n".
-		"Content-Length: $contentlength\r\n\r\n".
-		"$sendrequest\r\n";
-
-	$socket = fsockopen($host, 80, $errno, $errstr, 0.5);
-
-	if (!$socket) {
-   		$result["errno"] = $errno;
-   		$result["errstr"] = $errstr;
-   		error_log("ERROR failure to send reply txt".$errno.$errstr);
-   		exit;
+	$context_options = array ('http' => array ('method' => 'POST', 'header' => "Authorization: $auth\r\nContent-Type: text/xml\r\n", 'content' => $sendrequest));
+	$context = stream_context_create($context_options);
+	$fp = @fopen($url, 'r', false, $context);
+	if (!$fp) {
+		error_log("txtpostback Unable to send to $url");
+		exit();
+	}
+	$response = @stream_get_contents($fp);
+	if ($response === false) {
+		error_log("txtpostback Unable to read from $url");
+		exit();
 	}
 
-	fputs($socket, $reqheader);
-
-	while (!feof($socket)) {
-   		$result[] = fgets($socket, 4096);
-	}
-
-	fclose($socket);
-
-	if (!stripos($result[0], "200 OK")) {
-		error_log("ERROR sending txt reply : ".http_build_query($result));
-	}
+error_log("txtpostback response ".$response);
 }
 
 
 //requires $javadir, $emailjar to be set in order to use simple email
 function simpleemail ($subject, $body, $to, $from) {
+	error_log("txtpostback simpleemail ".$to);
 	global $javadir, $emailjar;
 	$cmd = "$javadir -jar $emailjar";
 	$cmd .= " -s " . escapeshellarg($subject);
@@ -204,9 +193,11 @@ function simpleemail ($subject, $body, $to, $from) {
 		fwrite($process, $body);
 		fclose($process);
 	} else {
-		error_log("Unable to simpleemail from txtpostback.php to $to from $from");
+		error_log("txtpostback Unable to simpleemail from txtpostback.php to $to from $from");
 	}
+	error_log("txtpostback done simpleemail");
 }
 
+error_log("txtpostback done");
 /*CSDELETEMARKER_END*/
 ?>
