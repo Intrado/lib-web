@@ -195,21 +195,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			}
 		});
 		
-		$('chooseListChoiceButton').observe('click', function(event) {
-			Tips.hideAll();
-			
-			$('chooseListChoiceButton').hide();
-			//ruleWidget.clear_rules();
-			$('chooseListWindow').blindDown({duration:0.4});
-			listform_hide_build_list_window();
-			var listSelectbox = $('listSelectboxContainer').down();
-			if (listSelectbox)
-				listSelectbox.selectedIndex = 0;
-			listform_refresh_guide(true);
-			listformVars.pendingList = null;
-			listform_refresh_guide();
-		});
-		
 		// buildListWindow: Save Rules Button
 		$('saveRulesButton').observe('click', function(event) {
 			Tips.hideAll();
@@ -222,6 +207,20 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			listform_hide_build_list_window();
 			listform_refresh_guide();
 		});
+	});
+	
+	$('chooseListChoiceButton').observe('click', function(event) {
+		Tips.hideAll();
+		
+		$('chooseListChoiceButton').hide();
+		$('chooseListWindow').blindDown({duration:0.4});
+		listform_hide_build_list_window();
+		var listSelectbox = $('listSelectboxContainer').down();
+		if (listSelectbox)
+			listSelectbox.selectedIndex = 0;
+		listform_refresh_guide(true);
+		listformVars.pendingList = null;
+		listform_refresh_guide();
 	});
 	
 	// Load Existing Lists
