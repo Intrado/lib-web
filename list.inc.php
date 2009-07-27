@@ -1,72 +1,206 @@
 <?
-include_once("inc/common.inc.php");
-include_once("inc/formatters.inc.php");
 
-
-?>
-<script langauge="javascript">
-
-function dolistbox (img, type, init, id) {
-	if (!img.toggleset) {
-		img.toggleset = true;
-		img.toggle = init;
+function list_clear_search_session($keep = false) {
+	if ($keep != 'listsearchshowall')
+		$_SESSION['listsearchshowall'] = false;
+		
+	if ($keep != 'listsearchperson') {
+		$_SESSION['listsearchperson'] = false;
+		$_SESSION['listsearchpkey'] = false;
+		$_SESSION['listsearchphone'] = false;
+		$_SESSION['listsearchemail'] = false;
+		$_SESSION['listsearchsms'] = false;
 	}
-	img.toggle = !img.toggle;
-	img.src = "checkbox.png.php?type=" + type + "&toggle=" + img.toggle + "&id=" + id + "&foo=" + new Date();
-}
-</script>
-<?
-
-if (!$showpagemenu)
-	$renderedlist->pagelimit = -1;
-$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
-
-$data = $renderedlist->getPage($pagestart, $renderedlist->pagelimit);
-
-if ($showpagemenu)
-	showPageMenu($renderedlist->total,$renderedlist->pageoffset,$renderedlist->pagelimit);
-
-
-if (isset($doscrolling) && $doscrolling && count($data) > 8) {
-	echo '<div class="scrollTableContainer">';
+	
+	if ($keep != 'listsearchrules')
+		$_SESSION['listsearchrules'] = array();
 }
 
-echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
-
-$titles = array("0" => "In List",
-				"2" => "ID#",
-				"3" => "First Name",
-				"4" => "Last Name",
-				"5" => "Language");
-$formatters = array("0" => "fmt_checkbox",
-					"2" => "fmt_idmagnify",
-					"6" => "fmt_phone",
-					"7" => "fmt_email",
-					"8" => "fmt_phone",
-					"9" => "fmt_null");
-
-if($USER->authorize('sendphone')){
-	$titles[6] = destination_label("phone", 0);
-}
-if($USER->authorize('sendemail')){
-	$titles[7] = destination_label("email", 0);
-}
-if(getSystemSetting("_hassms") && $USER->authorize('sendsms')){
-	$titles[8] = destination_label("sms", 0);
-}
-$titles["9"] = "Address";
-
-
-showTable($data, $titles,$formatters);
-
-echo "</table>";
-
-if (isset($doscrolling) && $doscrolling && count($data) > 8) {
-	echo '</div>';
+function listentry_get_type($personid) {
+	return QuickQuery("SELECT type FROM listentry WHERE personid=? AND listid=?", false, array($personid, $_SESSION['listid']));
 }
 
-if ($showpagemenu)
-	showPageMenu($renderedlist->total,$renderedlist->pageoffset,$renderedlist->pagelimit);
+function listentry_delete($personid) {
+	QuickUpdate("delete from listentry where listid=? and personid=?", false, array($_SESSION['listid'], $personid));
+}
 
+function listentry_insert($personid, $type) {
+	QuickUpdate("INSERT INTO listentry (listid, type, personid) VALUES(?,?,?)", false, array($_SESSION['listid'], $type, $personid));
+}
 
+function list_add_person($personid) {
+	if ($type = listentry_get_type($personid)) {
+		if ($type == 'A') // Already in the additions section.
+			return;
+		else if ($type == 'N') // Already in the skips section.
+			listentry_delete($personid);
+	} else {
+		listentry_insert($personid, 'A');
+	}
+}
+
+function list_remove_person($personid) {
+	if ($type = listentry_get_type($personid)) {
+		if ($type == 'N') // Already in the skips section.
+			return;
+		else if ($type == 'A') // Already in the additions section.
+			listentry_delete($personid);
+	} else {
+		listentry_insert($personid, 'N');
+	}
+}
+
+function fmt_list_destination_sequence($row, $index){
+	if($row[$index] != "" || $row[$index] != false){
+		// index 8 is the type of destination: phone, email, or sms.
+		return destination_label($row[8], $row[$index]);
+	} else {
+		return "";
+	}
+}
+		
+function list_handle_ajax_table($renderedlist, $validContainers) {
+	global $USER;
+	
+	if (!isset($_GET['ajax']))
+		return;
+	if (empty($_GET['addpersonid']) && empty($_GET['removepersonid']) && empty($_GET['containerID']) && empty($_GET['persontip']) && empty($_GET['addtoggler']) && empty($_GET['removetoggler']))
+		return;
+
+	// Handle PersonTip.
+	if (!empty($_GET['persontip'])) {
+		$person = new Person($_GET['persontip']+0);
+		if (!$person->id || $person->deleted)
+			exit(_L('Nothing found!'));
+		
+		// Global $USER is needed by kcontact.inc.php
+		include("kcontact.inc.php");
+		exit();
+	}
+		
+	header('Content-Type: application/json');
+		$ajaxdata = false;
+		QuickUpdate("BEGIN");
+			if (!empty($_GET['addpersonid'])) {
+				$restrictUserSQL = $USER->userSQL("P");
+				if ($validPerson = QuickQuery("SELECT P.id FROM person P WHERE P.id=? AND (P.userid=0 OR P.userid=? OR (1 $restrictUserSQL))", false, array($_GET['addpersonid'], $USER->id))) {
+					$ajaxdata = true;
+					list_add_person($validPerson);
+				}
+			} else if (!empty($_GET['removepersonid'])) {
+				$ajaxdata = true;
+				list_remove_person($_GET['removepersonid']);
+			} else if (isset($_GET['containerID']) && in_array($_GET['containerID'], $validContainers)) {
+				$ajaxdata = array('html' => list_prepare_ajax_table($_GET['containerID'], $renderedlist));
+			}
+		QuickUpdate("COMMIT");
+	exit(json_encode($ajaxdata));
+}
+
+function list_prepare_ajax_table($containerID, $renderedlist) {
+	global $USER;
+	ajax_table_handle_togglers($containerID);
+
+	switch ($containerID) {
+		case 'listAdditionsContainer':
+			$renderedlist->prepareAdditionsMode(100);
+			break;
+		case 'listSkipsContainer':
+			$renderedlist->prepareSkipsMode(100);
+			break;
+		case 'listPreviewContainer':
+		case 'listSearchContainer':
+			if (!empty($_SESSION['listsearchshowall']))
+				$renderedlist->prepareRulesMode(100, false);
+			else if (!empty($_SESSION['listsearchperson']))
+				$renderedlist->preparePeopleMode(100, $_SESSION['listsearchpkey'], $_SESSION['listsearchphone'], $_SESSION['listsearchemail'], $_SESSION['listsearchsms']);
+			else if (!empty($_SESSION['listsearchrules']))
+				$renderedlist->prepareRulesMode(100, $_SESSION['listsearchrules']);
+			else {
+				if ($containerID == 'listPreviewContainer')
+					$renderedlist->prepareRulesMode(100, false);
+				else
+					return _L('No search criteria');
+			}
+			break;
+		default:
+			return false;
+	}
+	
+	$allFieldmaps = FieldMap::getMapNames();
+	$titles = array(
+		0 => "In List",
+		2 => "ID #",
+		3 => $allFieldmaps[$renderedlist->firstname],
+		4 => $allFieldmaps[$renderedlist->lastname]
+	);
+	$sorting = array(
+		2 => "pkey",
+		3 => $renderedlist->firstname,
+		4 => $renderedlist->lastname
+	);
+	$formatters = array(
+		0 => "fmt_checkbox",
+		2 => "fmt_persontip"
+	);
+	$searchable = in_array($renderedlist->mode, array("rules", "people"));
+	if ($searchable) {
+		$titles[5] = "Address";
+		$titles[6] = "Sequence";
+		$titles[7] = "Destination";
+		
+		$formatters[6] = "fmt_list_destination_sequence";
+		$formatters[7] = "fmt_destination";
+		
+		$sorting[5] = "address";
+		
+		$fieldmaps = FieldMap::getOptionalAuthorizedFieldMapsLike('f') + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
+		// Reserve index 8, destination type, for formatter
+		$i = 9;
+		// NOTE: $row[8] indicates the destination's type, which is phone, email or sms.
+		foreach ($fieldmaps as $fieldmap) {
+			$titles[$i] = '@' . $fieldmap->name;
+			
+			// NOTE: Only allow sorting by f-fields.
+			if ($fieldmap->fieldnum[0] == 'f')
+				$sorting[$i] = $fieldmap->fieldnum;
+			$i++;
+		}
+		
+		// Sequence and Destination Columns are repeated.
+		$repeatedColumns = array(6,7);
+		// Group by Person ID.
+		$groupBy = 2;
+	} else {
+		$authorizedFieldmaps = FieldMap::getAuthorizedMapNames();
+		if (isset($authorizedFieldmaps[$renderedlist->language])) {
+			$titles[5] = $authorizedFieldmaps[$renderedlist->language];
+			$sorting[5] = $renderedlist->language;
+		}
+	}
+	
+	$orderbySQL = ajax_table_get_orderby($containerID, $sorting);
+	if (!empty($orderbySQL))
+		$renderedlist->orderby = $orderbySQL;
+
+	$renderedlist->hasstats = false;
+	$data = $renderedlist->getPage(isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0, $renderedlist->pagelimit);
+	
+	if (empty($data)) {
+		if ($containerID == 'listSearchContainer')
+			return _L('Searched, but found no results');
+		else if ($containerID == 'listPreviewContainer')
+			return _L('Nobody in your list!');
+	}
+	
+	
+	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting, isset($repeatedColumns) ? $repeatedColumns : false, isset($groupBy) ? $groupBy : false, ($searchable ? 3 : 0), ($searchable ? true : false));
+}
+
+function list_get_results_html($containerID, $renderedlist) {
+	$resultsHtml = list_prepare_ajax_table($containerID, $renderedlist);
+	if (empty($renderedlist->pageids))
+		return _L("No results");
+	return $resultsHtml;
+}
 ?>
