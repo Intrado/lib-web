@@ -102,16 +102,14 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 				$('listsTableStatus').update();
 				var ruleid = transport.responseJSON;
 				if (!ruleid) {
-					alert('Sorry, cannot save this rule');
+					alert('<?=addslashse(_L("Sorry, cannot save this rule"))?>');
 					return;
 				}
 				
 				var listid = listformVars.pendingList;
 				if (!$('listsTableBody').down('input[value='+listid+']')) { // Add to the lists table if the pending list hasn't already been added.
-					alert('pendinglist not found');
 					listform_add_list(listid);
 				} else {
-					alert('pending list found');
 					listform_refresh_liststats(listid);
 				}
 			}
@@ -129,12 +127,11 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			postBody: 'fieldnum='+event.memo.fieldnum,
 			onSuccess: function(transport) {
 				if (!transport.responseJSON) {
-					alert('Sorry, there was an error when deleting this rule');
+					alert('<?=addslashes(_L("Sorry, there was an error when deleting this rule"))?>');
 					return;
 				}
 				
 				if ($H(ruleWidget.appliedRules).keys().length <= 0) {
-					alert('removing!');
 					listform_remove_list(null, listformVars.pendingList);
 				} else {
 					listform_refresh_liststats(listformVars.pendingList);
@@ -379,7 +376,6 @@ function listform_update_grand_total() {
 // @param listidsJSON, json-encoded array of listids
 function listform_load_lists(listidsJSON) {
 	var listids = listidsJSON.evalJSON();
-	alert(listids);
 	if (!listids.join)
 		return;
 	$('listsTableStatus').update('<?=addslashes(_L('Loading..'))?>');
@@ -401,7 +397,6 @@ function listform_load_lists(listidsJSON) {
 				var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':listid})).hide();
 				var nameTD = new Element('td', {'class':'List NameTD', 'width':'10%','style':'overflow: hidden; white-space: nowrap;'});
 				nameTD.insert(data.name);
-				alert(data.name);
 				var actionTD = new Element('td', {'class':'List ActionTD'});
 				actionTD.insert('<img src="img/icons/delete.gif"/>');
 				var statisticsTD = new Element('td', {'class':'List', 'colspan':100}).update(format_thousands_separator(data.total));
@@ -436,14 +431,12 @@ function listform_load_lists(listidsJSON) {
 										tbody.insert(tr);
 									}
 									if (!tbody.down('td')) {
-										alert('nothing in here');
 										previewBox.update('<?=addslashes(_L('No Rules Found for This List'))?>');
 									}
 									else {
 										previewBox.update(new Element('table').insert(tbody));
 									}
 									// Add an extra row for viewing rules.
-									alert(this);
 									new Tip(this,previewBox, { hideOthers:true});
 								}
 							}.bindAsEventListener(nameTD),
