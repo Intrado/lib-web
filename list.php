@@ -98,7 +98,6 @@ if ($list->id) {
 $formdata = array(
 	"name" => array(
 		"label" => _L('List Name'),
-		"fieldhelp" => _L('This is the name of your list. The best names describe the list contents.'),
 		"value" => $list->name,
 		"validators" => array(
 			array("ValRequired"),
@@ -110,7 +109,6 @@ $formdata = array(
 	),
 	"description" => array(
 		"label" => _L('Description'),
-		"fieldhelp" => _L('This field is for an optional description of your list, viewable in the List Builder screen.'),
 		"value" => $list->description,
 		"validators" => array(
 			array("ValLength","max" => 50)
@@ -120,7 +118,6 @@ $formdata = array(
 	),
 	"preview" => array(
 		"label" => 'Total',
-		"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
 		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">' . (isset($renderedlist) ? $renderedlist->total : '0') . '</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
 		"helpstep" => 1
 	)
@@ -133,7 +130,6 @@ $formdata["ruledelete"] = array(
 );
 $formdata["newrule"] = array(
 	"label" => _L('List Rules'),
-	"fieldhelp" => _L('Use rules to select groups of contacts from the data available to your account.'),
 	"value" => $rulesjson,
 	"validators" => array(
 		array("ValRules")
@@ -172,9 +168,9 @@ $formdata["advancedtools"] = array(
 );
 
 $helpsteps = array (
-	_L('Enter a name for your list. The best names describe the list\'s content, making the list easy to reuse.'), // 1
-	_L('Rules are used to select groups of contacts from the data available to your account. For example, if you wanted to make a list of 6th graders from Springfield Elementary, you would create two rules: "Grade equals 6" and "School equals Springfield Elementary".'), // 2
-	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 3
+	_L('Please enter descriptive information about this list.'), // 1
+	_L('You may enter some rules for this list.'), // 2
+	_L('These are advanced list tools.'), // 3
 );
 
 $buttons = array(submit_button(_L('Refresh'),"refresh","arrow_refresh"),
@@ -204,7 +200,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$list->name = $postdata['name'];
 		$list->description = $postdata['description'];
-		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
 		$list->update();
@@ -215,7 +210,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($ajax) {
 				switch ($button) {
 					case 'addrule':
-						error_log($postdata['newrule']);
 						QuickUpdate('BEGIN');
 							$ruledata = json_decode($postdata['newrule']);
 							$data = $ruledata[0];
@@ -239,7 +233,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						
 					case 'deleterule':
 						$fieldnum = $postdata['ruledelete'];
-						error_log('delete rule: ' . $fieldnum);
 						if ($USER->authorizeField($fieldnum))
 							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
 						$form->sendTo('list.php');

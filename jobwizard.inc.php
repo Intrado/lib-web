@@ -30,11 +30,8 @@ class TextAreaPhone extends FormItem {
 						popup(\'previewmessage.php?text=\' + encodedtext + \'&language='.urlencode($this->args['language']).'&gender=\'+ gender, 400, 400);
 					}
 				});
-				$("'.$n.'-textarea").observe("change", '.$n.'_storedata);
 				$("'.$n.'-textarea").observe("blur", '.$n.'_storedata);
 				$("'.$n.'-textarea").observe("keyup", '.$n.'_storedata);
-				$("'.$n.'-textarea").observe("focus", '.$n.'_storedata);
-				$("'.$n.'-textarea").observe("click", '.$n.'_storedata);
 				$("'.$n.'-female").observe("click", '.$n.'_storedata);
 				$("'.$n.'-male").observe("click", '.$n.'_storedata);
 				
@@ -73,69 +70,35 @@ class CallMe extends FormItem {
 		else
 			$language = array("English (Default)");
 		
-		$nophone = _L("Phone Number");
-		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
 		if (!$value)
-			$value = '{}';
+			$value = '{"'.$language[0].'": ""}';
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
-		<div>
-			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap">
-			</div>
-			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none">';
-		if (count($language) > 1) {
-			$str .= '
-				<div style="margin-bottom: 3px;">'._L("Add an alternate language?").'</div>
-				<select id="'.$n.'_select" ><option value="0">-- '._L("Select One").' --</option>';
+		<table class="msgdetails" width="100%">
+		<tr><td class="msglabel">'._L("Language").':</td><td>';
+		if (count($language) <= 1) {
+			$str .= '<div id='.$n.'select style="background: white; border: 1px solid; padding: 2px; margin-right: 5px; margin-top: 2px;" value="'.$language[0].'">'.$language[0].'</div>';
+		} else {
+			$str .= '<select id='.$n.'select >';
 			foreach ($language as $langname) 
-				$str .= '<option id="'.$n.'_select_'.$langname.'" value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
+				$str .= '<option id='.$n.'option_'.$langname.' value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
 			$str .= '</select>';
 		}
-		$str .= '
-			</div>
-		</div>
-		';
-
-		// include the easycall javascript object. then load existing values.
+		$str .= '</td></tr>
+		<tr><td class="msglabel">'._L("Phone").':</td><td><input style="float: left; margin-top: 3px" type="text" id='.$n.'phone value="'.$this->args['phone'].'" /></td></tr>
+		<tr><td></td><td><img id="'.$n.'progress_img" style="float:left" src="img/pixel.gif"/><div id="'.$n.'progress" /></td></tr>
+		<tr><td></td><td>'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new Easycall('".$this->form->name."','".$n."','".$language[0]."','jobwizard','".$this->args['min']."','".$this->args['max']."').start();",null,'id="'.$n.'recordbutton"').'</td></tr>
+		<tr><td class="msglabel">'._L("Messages").':</td>
+		<td><table id="'.$n.'messages" style="border: 1px solid gray; width: 80%">
+		<tr class="listHeader" align="left"><th colspan=2>'._L("Message Language").'</th><th width="30%">'._L("Actions").'</th></tr>
+		
+		</table></td></tr>
+		</table>';
+		// include the easycall javascript object and set up the localized version of the text it will use. then load existing values.
 		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
-			<script type="text/javascript">
-				var msgs = '.$value.';
-				// Load default. it is a special case
-				new Easycall(
-					"'.$this->form->name.'",
-					"'.$n.'",
-					"Default",
-					"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
-					"'.$defaultphone.'",
-					"'.$nophone.'"
-				).load();
-				easycallRecordings++;
-				Object.keys(msgs).each(function(lang) {
-					new Easycall(
-						"'.$this->form->name.'",
-						"'.$n.'",
-						lang,
-						"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-						"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
-						"'.$defaultphone.'",
-						"'.$nophone.'"
-					).load();
-					easycallRecordings++;
-				});
-				
-				$("'.$n.'_select").observe("change", function (event) {
-					new Easycall(
-						"'.$this->form->name.'",
-						"'.$n.'",
-						$("'.$n.'_select").value,
-						"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-						"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
-						"'.$defaultphone.'",
-						"'.$nophone.'"
-					).setupRecord();
-				});
-			</script>';
+				<script type="text/javascript">
+					new Easycall("'.$this->form->name.'","'.$n.'","'.$language[0].'","jobwizard").load();
+				</script>';
 		return $str;
 	}
 }
@@ -143,47 +106,17 @@ class CallMe extends FormItem {
 ////////////////////////////////////////////////////////////////////////////////
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
-class ValJobName extends Validator {
-	var $onlyserverside = true;
-	
-	function validate ($value, $args) {
-		global $USER;
-		$jobcount = QuickQuery("select count(id) from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
-		if ($jobcount)
-			return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
-		return true;
-	}
-}
-
 class ValHasMessage extends Validator {
 	var $onlyserverside = true;
 	
 	function validate ($value, $args) {
 		global $USER;
 		if ($value == 'pick') {
-			$msgcount = (QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, $args['type'])));
+			$msgcount = (QuickQuery("select count(id) from message where userid=" . $USER->id ." and not deleted and type='".$args['type']."'"));
 			if (!$msgcount)
-				return "$this->label: ". _L('There are no saved messages of this type.');
+				return "$this->label doesnt appear to exist for this user. Select another option or go create a message.";
 		}
 		return true;
-	}
-}
-
-class ValPhoneRecordSelected extends Validator {
-	function validate ($value, $args, $requiredvalues) {
-		if ($requiredvalues['phone'] !== "record" && $value == "record")
-			return "$this->label " . _L("Cannot attach recorded message if Phone is not a Call Me to Record.");
-		else
-			return true;
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args, requiredvalues) {
-				if (requiredvalues.phone !== "record" && value == "record")
-					return label + " '. addslashes(_L("Cannot attach recorded message if Phone is not a Call Me to Record.")). '";
-				return true;
-			}';
 	}
 }
 
@@ -192,16 +125,12 @@ class ValEasycall extends Validator {
 	function validate ($value, $args) {
 		global $USER;
 		if (!$USER->authorize("starteasy"))
-			return "$this->label "._L("is not allowed for this user account");
+			return "$this->label is not allowed for this user account.";
 		$values = json_decode($value);
-		if (count($values) < 1)
-			return "$this->label "._L("has messages that are not recorded");
+		//return var_dump($values);
 		foreach ($values as $lang => $message)
-			$msg = new Message($message+0);
-			if ($msg->userid !== $USER->id)
-				return "$this->label "._L("has invalid message values");
 			if (!$message)
-				return "$this->label "._L("has messages that are not recorded");
+				return "$this->label has messages that are not recorded.";
 		return true;
 	}
 }
@@ -212,10 +141,9 @@ class ValLists extends Validator {
 	function validate ($value, $args) {
 		global $USER;
 		
-		if (strpos($value, 'choosingList') !== false)
-			return _L('You are in the middle of choosing a list!');
-		else if (strpos($value, 'buildingList') !== false)
-			return _L('You are in the middle of building a list!');
+		
+		if (strpos($value, 'pending') !== false)
+			return _L('Please finish adding a rule!');
 			
 		$listids = json_decode($value);
 		if (empty($listids))
@@ -279,89 +207,52 @@ class JobWiz_start extends WizStep {
 			}
 		}
 		
-		$formdata = array($this->title);
-		$formdata["name"] = array(
-			"label" => _L("Job Name"),
-			"fieldhelp" => _L("Name is used for the job's email subject and to create reports."),
-			"value" => "",
-			"validators" => array(
-				array("ValRequired"),
-				array("ValJobName"),
-				array("ValLength","max" => 50)
+		$formdata = array(
+			$this->title,
+			"name" => array(
+				"label" => _L("Job Name"),
+				"fieldhelp" => _L("Name is used for the job's email subject and to create reports."),
+				"value" => "",
+				"validators" => array(
+					array("ValRequired"),
+					array("ValLength","max" => 50)
+				),
+				"control" => array("TextField","maxlength" => 50, "size" => 50),
+				"helpstep" => 1
 			),
-			"control" => array("TextField","maxlength" => 50, "size" => 50),
-			"helpstep" => 1
-		);
-		$formdata["jobtype"] = array(
-			"label" => _L("Type/Category"),
-			"fieldhelp" => _L("These options determine how your message will be received."),
-			"value" => "",
-			"validators" => array(
-				array("ValRequired")
+			"jobtype" => array(
+				"label" => _L("Type/Category"),
+				"fieldhelp" => _L("These options determine how your message will be received."),
+				"value" => "",
+				"validators" => array(
+					array("ValRequired")
+				),
+				"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
+				"helpstep" => 2
 			),
-			"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
-			"helpstep" => 2
-		);
-		
-		$package = array(
-			'easycall' => '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/mic.jpg"/><div>'.escapehtml(_L('Record')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message/ EasyCall')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Auto Email and Text Alerts')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>',
-			'express' => '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/writescript.jpg"/><div>'.escapehtml(_L('Write')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type, Phone, Email and Text Message / Text-To-Speech')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>',
-			'personalized' => '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/micwrite.jpg"/><div>'.escapehtml(_L('Record & Write')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type Email, and Text Messages with Automatic Translation')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>',
-			'custom' => '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/tools.jpg"/><div>'.escapehtml(_L('Customize')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Select combination of message types')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>'
-		);
-		$formdata["package"] = array(
-			"label" => _L("Notification Method"),
-			"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
-			"validators" => array(
-				array("ValRequired")
-			),
-			"value" => "",
-			"control" => array("HtmlRadioButton", "values" => $package),
-			"helpstep" => 3
+			"package" => array(
+				"label" => _L("Notification Method"),
+				"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
+				"validators" => array(
+					array("ValRequired")
+				),
+				"value" => "",
+				"control" => array("RadioButton", 
+					"values" => array(
+						"easycall" => _L("EasyCall"),
+						"express" => _L("ExpressText"),
+						"personalized" => _L("Personalized"),
+						"custom" => _L("Custom")
+					),
+					"hover" => array(
+						"easycall" => _L("Record your voice via Phone. Message is delivered via phone, automatically generated Email with link to recording and automatically generated Text Message to cell phones."),
+						"express" => _L("Text-to-Speach message. Automatically translated into altnernate languages. Text is delivered by Phone, Email and Text Message."),
+						"personalized" => _L("Record your voice via Phone. Enter text for an Email and Text Message."),
+						"custom" => _L("Choose any combination of options to customize your message delivery.")
+					)
+				),
+				"helpstep" => 3
+			)
 		);
 		$helpsteps = array (
 			_L("Welcome to the Job Wizard. This is a guided 5 step process. <br><br>Enter your Job's name. Job names are used for email subjects and reporting, so they should be descriptive.").'<br>'._L("Good examples include 'Standardized testing reminder', or 'Early dismissal'."),
@@ -460,10 +351,6 @@ class JobWiz_messageSelect extends WizStep {
 				"control" => array("RadioButton","values"=>$values),
 				"helpstep" => 1
 			);
-			if (isset($values["record"])) {
-				$formdata["email"]["validators"][] = array("ValPhoneRecordSelected");
-				$formdata["email"]["requires"] = array("phone");
-			}
 		}
 		
 		if (isset($values["record"]))
@@ -480,10 +367,6 @@ class JobWiz_messageSelect extends WizStep {
 				"control" => array("RadioButton","values"=>$values),
 				"helpstep" => 1
 			);
-			if (isset($values["record"])) {
-				$formdata["sms"]["validators"][] = array("ValPhoneRecordSelected");
-				$formdata["sms"]["requires"] = array("phone");
-			}
 		}
 
 		if ($USER->authorize("sendmessage") && in_array('print',$postdata['/message/pick']['type'])) {
@@ -739,7 +622,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		global $USER;
-		$langs = array();
+		$langs = array("English (Default)");
 		if ($USER->authorize("sendmulti")) {
 			$syslangs = DBFindMany("Language","from language order by name");
 			foreach ($syslangs as $langid => $language)
@@ -748,7 +631,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 		}
 		$formdata = array($this->title);
 		$formdata["message"] = array(
-			"label" => _L("Voice Recordings"),
+			"label" => _L("Messages"),
 			"fieldhelp" => _L("Use the Language box to select the recorded language you wish to add to your notification. Enter a phone number and hit the Call Me To Record button to receive a phone call that will guide you through the process of attaching the selected language"),
 			"value" => "",
 			"validators" => array(
@@ -1315,9 +1198,6 @@ class JobWiz_submitConfirm extends WizStep {
 		$phoneMsg = array();
 		$emailMsg = array();
 		$smsMsg = array();
-		$emailmessagelink = false;
-		$smsmessagelink = false;
-		
 		switch ($postdata["/start"]["package"]) {
 			//If package is Easycall
 			case "easycall":
@@ -1388,7 +1268,16 @@ class JobWiz_submitConfirm extends WizStep {
 				if (in_array('email', $postdata["/message/pick"]["type"])) {
 					switch ($postdata["/message/select"]["email"]) {
 						case "record":
-							$emailmessagelink = true;
+							$emailMsg = array("English (Default)" => array(
+								"id" => "",
+								"from" => $USER->email,
+								"fromname" => "",
+								"subject" => $postdata["/start"]["name"],
+								"attachments" => array(),
+								"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
+								"language" => "english",
+								"override" => true
+							));
 							break;
 						case "text":
 							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
@@ -1405,7 +1294,11 @@ class JobWiz_submitConfirm extends WizStep {
 				if (in_array('sms', $postdata["/message/pick"]["type"])) {
 					switch ($postdata["/message/select"]["sms"]) {
 						case "record":
-							$smsmessagelink = true;
+							$smsMsg = array("Default" => array(
+								"id" => false,
+								"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
+								"language" => "english"
+							));
 							break;
 						case "text":
 							$smsMsg = array("Default" => array(
@@ -1587,8 +1480,6 @@ class JobWiz_submitConfirm extends WizStep {
 			"email" => $emailMsg,
 			"sms" => $smsMsg,
 			"print" => array(),
-			"emailmessagelink" => $emailmessagelink,
-			"smsmessagelink" => $smsmessagelink,
 			"schedule" => $schedule
 		);
 		

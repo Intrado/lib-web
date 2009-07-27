@@ -28,7 +28,8 @@ if (isset($_GET['id'])) {
 		redirect('unauthorized.php');
 	}
 	$_SESSION['currentpid'] = $personid;
-	redirect();
+	if (!isset($_GET['ajax']))
+		redirect();
 } else if(isset($_SESSION['currentpid'])){
 	$personid = $_SESSION['currentpid'];
 } else {
@@ -298,17 +299,19 @@ $contactFullName .= " ".$data->$lastnamefield;
 
 $TITLE = "View Contact Information: " . escapehtml($contactFullName);
 
-include_once("nav.inc.php");
-NewForm($f);
-if($method == "edit"){
-	buttons(submit($f, $s, "Done"));
-} else {
-	buttons(button("Done", null, $_SESSION['contact_referer']),
-
-		$USER->authorize('managecontactdetailsettings') ? button("Edit", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php'") : "");
+if (!isset($_GET['ajax'])) {
+	include_once("nav.inc.php");
+	NewForm($f);
+	if($method == "edit"){
+		buttons(submit($f, $s, "Done"));
+	} else {
+		buttons(button("Done", null, $_SESSION['contact_referer']),
+	
+			$USER->authorize('managecontactdetailsettings') ? button("Edit", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php'") : "");
+	}
+	startWindow('Contact');
 }
 
-startWindow('Contact');
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -650,8 +653,11 @@ foreach ($fieldmaps as $map) {
 <?
 
 
-endWindow();
-buttons();
-EndForm();
-include_once("navbottom.inc.php");
+if (!isset($_GET['ajax'])) {
+	endWindow();
+	buttons();
+	EndForm();
+
+	include_once("navbottom.inc.php");
+}
 ?>

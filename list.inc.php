@@ -64,17 +64,19 @@ function list_handle_ajax_table($renderedlist, $validContainers) {
 	
 	if (!isset($_GET['ajax']))
 		return;
-	if (empty($_GET['addpersonid']) && empty($_GET['removepersonid']) && empty($_GET['containerID']) && empty($_GET['persontip']) && empty($_GET['addtoggler']) && empty($_GET['removetoggler']))
+	if (empty($_GET['addpersonid']) && empty($_GET['removepersonid']) && empty($_GET['containerID']) && empty($_GET['id']) && empty($_GET['addtoggler']) && empty($_GET['removetoggler']))
 		return;
 
 	// Handle PersonTip.
-	if (!empty($_GET['persontip'])) {
-		$person = new Person($_GET['persontip']+0);
+	if (!empty($_GET['id'])) {
+		$person = new Person($_GET['id']+0);
 		if (!$person->id || $person->deleted)
 			exit(_L('Nothing found!'));
 		
-		// Global $USER is needed by kcontact.inc.php
-		include("kcontact.inc.php");
+		// Global $USER is needed by viewcontact
+		echo "<div style='height:240px;overflow:auto'>";
+		include("viewcontact.php");
+		echo "</div>";
 		exit();
 	}
 		

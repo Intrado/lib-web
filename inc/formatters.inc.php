@@ -97,41 +97,32 @@ function fmt_checkbox_addrbook($row,$index) {
 		$result .= '<img src="img/checkbox-clear.png"';
 		$checked = false;
 	}
+	
 	$result .= " onclick=\"dolistbox(this,'add',";
 
 	$result .=  (($checked) ? "true":"false") . "," . $row[0] . ');" />';
 	return $result . '</div>';
 }
 
-function fmt_checkbox($row,$index) {
+
+
+function fmt_checkbox($row, $index) {
 	global $renderedlist;
 
-	$result = '<div align="center">';
-	if (in_array($row[1],$renderedlist->pageruleids)) {
-		//see if it is in remove show -, otherwise show R
-		if (in_array($row[1],$renderedlist->pageremoveids)) {
-			$result .= '<img src="img/checkbox-remove.png"';
-			$checked = true;
-		} else {
-			$result .= '<img src="img/checkbox-rule.png"';
-			$checked = false;
-		}
-		$result .= " onclick=\"dolistbox(this,'remove',";
-	} else {
-		//see if it is in add show +, otherwise show blank
-		if (in_array($row[1],$renderedlist->pageaddids)) {
-			$result .= '<img src="img/checkbox-add.png"';
-			$checked = true;
-		} else {
-			$result .= '<img src="img/checkbox-clear.png"';
-			$checked = false;
-		}
-		$result .= " onclick=\"dolistbox(this,'add',";
-	}
-	$result .=  (($checked) ? "true":"false") . "," . $row[1] . ');" />';
+	$personid = $row[1];
+	
+	$checked = '';
+	if (in_array($row[0], array(1, 'A', 'R')) || in_array($personid, $renderedlist->pageaddids))
+		$checked = 'checked';
+	if (in_array($personid, $renderedlist->pageremoveids))
+		$checked = '';
 
-	return $result . '</div>';
+	$onclick = "do_ajax_listbox(this, $personid);";
+	return "<input type=\"checkbox\" onclick=\"$onclick\" $checked />";
 }
+
+
+
 
 function fmt_idmagnify ($row,$index) {
 	// TODO must I load the person in order to get the person->userid ?
@@ -145,7 +136,22 @@ function fmt_idmagnify ($row,$index) {
 	return $result;
 }
 
-
+function fmt_persontip ($row, $index) {
+	global $USER;
+	
+	$person = new Person($row[1]);
+	if (!$person->id || $person->deleted)
+		return 'BAD PERSON!';
+		
+	$pkey = escapehtml($person->pkey);
+	
+	if ($person->userid)
+		return "<a href=\"addressedit.php?id=$person->id&origin=preview\">  <img src=\"img/icons/pencil.png\"></a> $pkey";
+	
+	$onmouseover = "make_person_tip('$person->id', '');";
+	$icon = "<img id=\"persontip_$person->id\" style=\"cursor:pointer\" src=\"img/icons/diagona/16/049.gif\" onmouseover=\"$onmouseover\"/> $pkey ";
+	return $icon;
+}
 
 function fmt_jobs_actions ($obj, $name) {
 	global $USER;
@@ -283,30 +289,15 @@ function fmt_job_startdate ($obj,$name) {
 function fmt_status($obj, $name) {
 	global $USER;
 	if ($obj->status == 'new') {
-		return _L("Not Submitted");
+		return "Not Submitted";
 	} else if ($obj->status == 'procactive') {
-			return _L('Processing (%1$s%%)',$obj->percentprocessed);
+			return "Processing (" . $obj->percentprocessed . "%)";
 	} else {
 		if ($obj->cancelleduserid && $obj->cancelleduserid != $USER->id) {
 			$usr = new User($obj->cancelleduserid);
-			return L('Cancelled (%1$s)', $usr->login);
+			return "Cancelled (" . $usr->login . ")";
 		} else {
-			switch($obj->status) {
-				case "scheduled":
-					return _L("Scheduled");
-				case "active":
-					return _L("Active");
-				case "complete":
-					return _L("Complete");	
-				case "cancelled":
-					return _L("Cancelled");
-				case "cancelling":
-					return _L("Cancelling");
-				case "repeating":
-					return _L("Repeating");
-				default:
-					return ucfirst($obj->status);
-			}
+			return ucfirst($obj->status);
 		}
 	}
 }

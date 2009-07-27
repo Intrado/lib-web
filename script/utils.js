@@ -433,17 +433,15 @@ function do_ajax_listbox(checkbox, personid) {
 
 var personTips = [];
 function make_person_tip(personid, tiptitle){
-	
 	if (personTips[personid])
 		return;
 		
 	personTips[personid] = new Tip('persontip_'+personid,
 		{
 			ajax: {
-				url:'?ajax&persontip='+personid,
+				url:'?ajax&id='+personid,
 				options: {
 					onComplete:function(transport) {
-						console.info(transport);
 					}
 				}
 			},
@@ -451,10 +449,12 @@ function make_person_tip(personid, tiptitle){
 			title : tiptitle,
 			style: "protogrey",
 			stem: "bottomLeft",
-			hook: { tip: "bottomLeft", mouse: false },
+			hook: { tip: "bottomLeft", mouse: true },
 			offset: { x: 10, y: 0 },
 			showOn: 'click',
 			hideOn: 'click',
+			fixed: true,
+			hideOthers: true,
 			closeButton: true
 		}
 	);
@@ -467,65 +467,15 @@ function json_input_values(inputs) {
 	return values.toJSON();
 }
 
-function toggle_class_display(cssClass, showhide) {
-	console.info(showhide);
-	console.info($$('.' + cssClass).length);
-	if (showhide === undefined)
-		$$('.' + cssClass).invoke('toggle');
-	else if (showhide)
-		$$('.' + cssClass).invoke('show');
-	else
-		$$('.' + cssClass).invoke('hide');
-}
 
-function icon_button(name,icon,id) {
-	var newbutton = new Element("button",{"class": "button", type: "button"});
-	newbutton.id = id;
-	
-	var buttonface = new Element("td",{"class": "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
-	
-	var buttonrecord = new Element("tr", {}).insert(new Element("td",{}).insert(new Element("img",{"class": "left", src: "img/themes/"+_brandtheme+"/button_left.gif"}))).insert(buttonface).insert(new Element("td",{}).insert(new Element("img",{"class": "right", src: "img/themes/"+_brandtheme+"/button_right.gif"})));
-	
-	var buttonbody = new Element("table",{}).insert(new Element("tbody",{}).insert(buttonrecord));
-	
-	newbutton.insert(buttonbody);
-	
-	newbutton.observe("mouseover", btn_rollover.bind(this,newbutton));
-	newbutton.observe("mouseout", btn_rollout.bind(this,newbutton));
-	
-	return newbutton;
-}
-
-function action_link(name,icon,id) {
-	var newaction = new Element("a", {href: "#", "class": "actionlink", title: name, style: "margin-left: 3px;"});
-	newaction.id = id;
-	
-	// TODO: actionlinkmode needs to be checked to display icons and/or titles
-	newaction.insert(new Element("img", {src: "img/icons/"+icon+".gif"})).insert(name);
-	
-	return newaction;
-}
-
-function blankFieldValue(element, value) {
-	element = $(element);
-	element.observe("focus", setDefaultFieldValue.curry(value));
-	element.observe("blur", setDefaultFieldValue.curry(value));
-}
-
-function setDefaultFieldValue(value, event) {
-	var element = event.element();
-	if (event.type == "focus" && element.value == value) {
-		element.value = "";
-		element.setStyle({
-			color: "black"
-		});
+function format_thousands_separator(num) {
+	var digits = String(num).toArray().reverse();
+	var formatted = [];
+	for (var i = 0, len = digits.length; i < len; i++) {
+		if (i > 0 && i % 3 == 0) {
+			formatted.push(',');
+		}
+		formatted.push(digits[i]);
 	}
-	
-	if (event.type == "blur" && element.value == "") {
-		element.value = value;
-		element.setStyle({
-			color: "gray"
-		});
-	}
-	
+	return formatted.reverse().join("");
 }

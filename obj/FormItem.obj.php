@@ -170,7 +170,7 @@ class HtmlRadioButton extends FormItem {
 		$counter = 1;
 		foreach ($this->args['values'] as $radiovalue => $radiohtml) {
 			$id = $n.'-'.$counter;
-			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><button type="button" class="regbutton" style=" width: 100%; border: 2px outset; -moz-border-radius: 12px; -webkit-border-radius: 12px; background-color: white; color: black; margin-left: 0px;" onclick="$(\''.$id.'\').click();">'.($radiohtml).'</button></label></td></tr>
+			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><button type="button" class="regbutton" style="border: 2px outset; background-color: white; color: black; margin-left: 0px;" onclick="$(\''.$id.'\').click();">'.($radiohtml).'</button></label></td></tr>
 				';
 			$counter++;
 		}
@@ -209,6 +209,37 @@ class TextDate extends FormItem {
 				});
 			</script>';
 		return $str;
+	}
+}
+
+
+// Clones the same select menu several times
+// $this->args = array("count" => "3", "values" => array($value1 => $html1, $value2 => $html2, ...))
+class MultipleOrderBy extends FormItem {
+	// @param $value, array()
+	function render ($value) {
+		if (!is_array($value))
+			$value = array();
+			
+		$n = $this->form->name."_".$this->name;
+		$final = "<div id='$n' class='radiobox'>";
+		
+		for ($i = 0; $i < $this->args['count']; $i++) {
+			$select = "<select name='{$n}[]'>";
+			$select .= '<option value=""> -- ' . _L("Not Selected") . ' -- </option>';
+			foreach ($this->args['values'] as $txt => $val) {
+				$preset = '';
+				if (!empty($value[$i]) && $val ==  $value[$i])
+					$preset = 'selected';
+				$val = escapehtml($val);
+				$txt = escapehtml($txt);
+				
+				$select .= "<option value='$val' $preset>$txt</option>";
+			}
+			$final .= $select . "</select>";
+		}
+			
+		return "$final</div>";
 	}
 }
 
