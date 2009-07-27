@@ -532,3 +532,26 @@ div.scrollTableContainer {
 .actionlinks {
 	white-space: nowrap;
 }
+
+.feed h1 {
+	margin-top: 3px;
+	margin-bottom: 4px;
+	font-size: 14px;
+	font-weight: bold;
+	color: <?=$primary?>;
+}
+.feed span {
+	font-size: 10px;
+	text-decoration: none;
+}
+.feed a {
+	text-decoration: none;
+}
+.feed table {
+	width: 100%;
+	border: none;
+	border-collapse: collapse;
+}
+.feed td {
+	padding-bottom:5px;
+}
