@@ -70,43 +70,32 @@ $surveytypes = QuickQueryList("select id, name from jobtype where not deleted an
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
 class ValDataRules extends Validator {
+	var $onlyserverside = true;
 	function validate ($value, $args, $requiredvalues) {
-		if (isset($requiredvalues['staffpkey']) && strlen(trim($requiredvalues['staffpkey'])) !== 0)
-			return "$this->label " . _L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.");
-		else
+		$datarules = json_decode($value);
+		if (!$datarules)
 			return true;
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args, requiredvalues) {
-				var staffpkey = "";
-				var datarules = value.evalJSON();
-				if (typeof(requiredvalues.staffpkey) !== "undefined")
-					staffpkey = requiredvalues.staffpkey;
-				if (staffpkey.length != 0 && datarules.length != 0)
-					return label + " '. addslashes(_L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.")). '";
-				return true;
-			}';
+		if (isset($requiredvalues['staffpkey']) && strlen(trim($requiredvalues['staffpkey'])) !== 0) {
+			foreach ($datarules as $datarule) {
+				if (substr($datarule->fieldnum, 0, 1) == "c")
+					return "$this->label " . _L("Cannot have both Staff ID and Enrollment field data restriction rules. Delete one or the other.");
+			}
+		}
+		return true;
 	}
 }
 
 class ValStaffPKey extends Validator {
+	var $onlyserverside = true;
 	function validate ($value, $args, $requiredvalues) {
 		$datarules = json_decode($requiredvalues['datarules']);
-		if ($datarules)
-			return "$this->label " . _L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.");
+		if (strlen(trim($value)) && $datarules) {
+			foreach ($datarules as $datarule) {
+				if (substr($datarule->fieldnum, 0, 1) == "c")
+					return "$this->label " . _L("Cannot have both Staff ID and Enrollment field data restriction rules. Delete one or the other.");
+			}
+		}
 		return true;
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args, requiredvalues) {
-				datarules = requiredvalues.datarules.evalJSON();
-				if (datarules.length != 0)
-					return label + " '. addslashes(_L("Cannot have both Staff ID and Data Restriction rules. Delete the contents of one or the other.")). '";
-				return true;
-			}';
 	}
 }
 
