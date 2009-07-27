@@ -75,7 +75,7 @@ var Easycall = Class.create({
 				"phone": phone, 
 				"language": "Default",
 				"name": "Call Me",
-				"origin": "JobWizard"
+				"origin": "jobwizard"
 			},
 			// hand result off to handleRecord
 			onSuccess: this.handleRecord.bindAsEventListener(this),
@@ -193,11 +193,12 @@ var Easycall = Class.create({
 	},
 	
 	setupRecord: function () {
-		if ($(this.formitemname+'_select_'+this.language)) {
-			$(this.formitemname+'_select_'+this.language).hide();
+		if ($("'.$n.'_select")) {
+			if ($(this.formitemname+'_select_'+this.language)) {
+				$(this.formitemname+'_select_'+this.language).hide();
+			}
+			$(this.formitemname+'_select').value = 0;
 		}
-		$(this.formitemname+'_select').value = 0;
-
 		if (!$(this.formitemname+"_"+this.language))
 			$(this.formitemname+"_messages").insert(new Element("div",{id: this.formitemname+"_"+this.language}));
 		
@@ -253,7 +254,8 @@ var Easycall = Class.create({
 			easycallRecordings--;
 		}
 		
-		$(this.formitemname+'_select_'+this.language).show();
+		if ($("'.$n.'_select")) 
+			$(this.formitemname+'_select_'+this.language).show();
 		$(this.formitemname+"_"+this.language).remove();
 		if (this.pe)
 			this.pe.stop();
