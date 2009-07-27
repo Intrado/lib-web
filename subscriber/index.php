@@ -128,7 +128,7 @@ require_once("logintop.inc.php");
 			<td colspan="3">
 				<div style="font-size: 20px; font-weight: bold;"><?=_L("Phone, Email, and Text Messages")?></div>
 				<br>
-				<div style="font-size: 15px; font-weight: bold;"><?=_L("Get the latest communication from %s", $custname)?>.</div>
+				<div style="font-size: 15px; font-weight: bold;"><?=_L("Get the latest communication from %1$s", $custname)?>.</div>
 				<br>
 				<br>
 			</td>
@@ -142,13 +142,13 @@ require_once("logintop.inc.php");
 ?>
 			</td>
 		<tr>
-			<td>Email:</td>
+			<td><?=_L("Email:")?></td>
 			<td><input type="text" id="logintext" name="login" size="50" maxlength="255" value="<?=escapehtml($login)?>"/></td>
 			<td>&nbsp;</td>
 
 		</tr>
 		<tr>
-			<td>Password&nbsp;(case&nbsp;sensitive):</td>
+			<td><?=_L("Password&nbsp;(case&nbsp;sensitive):")?></td>
 			<td><input type="password" name="password" size = "50" maxlength="50" onkeypress="capslockCheck(event)"/></td>
 			<td align="left"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a></td>
 		</tr>

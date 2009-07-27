@@ -48,7 +48,7 @@ class ValUsernameUnique extends Validator {
 	function validate ($value, $args) {
 		global $CUSTOMERURL;
 		if (!isUsernameUnique($CUSTOMERURL, $value))
-			return "$this->label already exists, please Return to Sign In";
+			return _L("%1$s already exists, please Return to Sign In", $this->label);
 		
 		return true;
 	}
@@ -60,7 +60,7 @@ class ValCaptcha extends Validator {
 	
 	function validate ($value, $args) {
 		if (strtolower($value) != strtolower($_SESSION['captcha']))
-			return "$this->label is not the correct value";
+			return _L("%1$s is not the correct value", $this->label);
 		
 		return true;
 	}
@@ -72,7 +72,7 @@ class ValSiteCode extends Validator {
 	
 	function validate ($value, $args) {
 		if (strtolower(trim($value)) != strtolower($_SESSION['sitecode']))
-			return "$this->label is not the correct value";
+			return _L("%1$s is not the correct value", $this->label);
 		
 		return true;
 	}
@@ -112,7 +112,7 @@ $tos = file_get_contents(isset($LOCALE)?"./locale/$LOCALE/terms.html":"./locale/
 
 $formdata = array();
 $formdata["firstname"] = array(
-        "label" => "First Name",
+        "label" => _L("First Name"),
         "fieldhelp" => _L('Enter your first name.'),
         "value" => "",
         "validators" => array(
@@ -123,7 +123,7 @@ $formdata["firstname"] = array(
         "helpstep" => 1
     );
 $formdata["lastname"] = array(
-        "label" => "Last Name",
+        "label" => _L("Last Name"),
         "fieldhelp" => _L('Enter your last name.'),
         "value" => "",
         "validators" => array(
@@ -134,7 +134,7 @@ $formdata["lastname"] = array(
         "helpstep" => 1
     );
 $formdata["username"] = array(
-        "label" => "Account Email",
+        "label" => _L("Account Email"),
         "fieldhelp" => _L('Enter your email address.'),
         "value" => "",
         "validators" => $emailvalidators,
@@ -142,7 +142,7 @@ $formdata["username"] = array(
         "helpstep" => 2
     );
 $formdata["confirmusername"] = array(
-        "label" => "Confirm Email",
+        "label" => _L("Confirm Email"),
         "fieldhelp" => _L('Use this space to confirm the email address you entered above.'),
         "value" => "",
         "validators" => array(
@@ -154,7 +154,7 @@ $formdata["confirmusername"] = array(
         "helpstep" => 2
     );
 $formdata["password"] = array(
-        "label" => "Password",
+        "label" => _L("Password"),
         "fieldhelp" => _L('Create a password for logging into your account.'),
         "value" => "",
         "validators" => array(
@@ -167,7 +167,7 @@ $formdata["password"] = array(
         "helpstep" => 3
     );
 $formdata["confirmpassword"] = array(
-        "label" => "Confirm Password",
+        "label" => _L("Confirm Password"),
         "fieldhelp" => _L('Confirm your password by entering it again.'),
         "value" => "",
         "validators" => array(
@@ -181,7 +181,7 @@ $formdata["confirmpassword"] = array(
     );
 if ($authcode == "1" && $_SESSION['sitecode'] != "") {
 	$formdata["sitecode"] = array(
-        "label" => "Site Access Code",
+        "label" => _L("Site Access Code"),
         "fieldhelp" => _L('The site access code is a special code you should have received that will allow you to sign up for this service.'),
         "value" => "",
         "validators" => array(
@@ -194,7 +194,7 @@ if ($authcode == "1" && $_SESSION['sitecode'] != "") {
 	);
 }
 $formdata["captcha"] = array(
-        "label" => "Captcha",
+        "label" => _L("Captcha"),
         "fieldhelp" => _L('Enter the characters in the captcha in the field below.'),
         "value" => "",
         "validators" => array(
@@ -205,13 +205,13 @@ $formdata["captcha"] = array(
         "helpstep" => 3
     );
 $formdata["terms"] = array(
-        "label" => "Terms Of Service",
+        "label" => _L("Terms Of Service"),
         "fieldhelp" => _L('Please read the rules governing your interaction with our service.'),
         "control" => array("FormHtml","html" => '<div style="height: 200px; overflow:auto;">'.$tos.'</div>'),
         "helpstep" => 4
     );
 $formdata["acceptterms"] = array(
-        "label" => "Accept Terms",
+        "label" => _L("Accept Terms"),
         "fieldhelp" => _L('Check this box to agree to the Terms of Service.'),
         "value" => false,
         "validators" => array(
@@ -223,7 +223,7 @@ $formdata["acceptterms"] = array(
 
 
 
-$buttons = array(submit_button("Create Account","save","tick"));
+$buttons = array(submit_button(_L("Create Account"),"save","tick"));
 
 $form = new Form("createaccount",$formdata,null,$buttons);
 $form->ajaxsubmit = true;
@@ -253,11 +253,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $sitecode, $options);
 		if ($result['result'] != "") {
 			if ($result['result'] == "duplicate") {
-				$errordetails = "That email address is already in use, please Return to Sign In";
+				$errordetails = _L("That email address is already in use, please Return to Sign In");
 			} else {
-				$errordetails = "An unknown error occurred, please try again";
+				$errordetails = _L("An unknown error occurred, please try again");
 			}
-			$errors .= "Your account was not created" . $errordetails;
+			$errors .= _L("Your account was not created") . $errordetails;
 		} else {
 			// success
         	if ($ajax)
@@ -299,20 +299,12 @@ if (isset($_GET['err'])) {
 <script type="text/javascript">
 
 <? Validator::load_validators(array("ValPassword","ValCaptcha","ValSiteCode","ValUsernameUnique")); ?>
-
-<? if ($datachange) { ?>
-
-alert("data has changed on this form!");
-window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
-
-<? } ?>
-
 </script>
 
 <script type="text/javascript">
 var errors = <?= json_encode($errors) ?>;
 if (errors)
-    alert("This form contains some errors");
+    alert('<?= addslashes(_L('This form contains some errors')) ?>');
 </script>
 
 <noscript>

@@ -47,17 +47,17 @@ $formdata['f02'] = array (
 );
 
 $formdata["changeemail"] = array(
-   	"label" => "Account Email",
+   	"label" => _L("Account Email"),
    	"control" => array("FormHtml","html" => $formhtmlemail),
 	"helpstep" => 1
 );
 $formdata["changepass"] = array(
-   	"label" => "Account Password",
+   	"label" => _L("Account Password"),
    	"control" => array("FormHtml","html" => $formhtmlpass),
 	"helpstep" => 1
 );
 $formdata["closeaccount"] = array(
-   	"label" => "Account Status",
+   	"label" => _L("Account Status"),
    	"control" => array("FormHtml","html" => $formhtmlclose),
 	"helpstep" => 1
 );

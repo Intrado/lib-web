@@ -37,7 +37,7 @@ if ($pending->type == 'email') {
 } else {
 	echo getPhoneReview($pending->value, $pending->token);
 }
-buttons(icon_button("Done", "tick", null, "notificationpreferences.php"));
+buttons(icon_button(_L("Done"), "tick", null, "notificationpreferences.php"));
 endWindow();
 require_once("navbottom.inc.php");
 ?>

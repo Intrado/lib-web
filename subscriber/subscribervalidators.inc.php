@@ -6,7 +6,7 @@ class ValSubscriberPassword extends Validator {
     
     function validate ($value, $args) {
 		if (0 == QuickQuery("select count(*) from subscriber where id=? and `password`=password(?)", false, array($_SESSION['subscriberid'], $value)))
-            return "$this->label is not the correct password";
+            return _L("%1$s is not the correct password", $this->label);
         
         return true;
     }
@@ -18,7 +18,7 @@ class ValPassword extends Validator {
     
     function validate ($value, $args, $requiredvalues) {
 		if ($detail = validateNewPassword($requiredvalues['username'], $value, $requiredvalues['firstname'], $requiredvalues['lastname']))
-			return "$this->label is invalid.  ".$detail;
+			return _L("%1$s is invalid.  ", $this->label) . $detail;
 
 		return true;
     }
@@ -30,7 +30,7 @@ class ValChangePassword extends Validator {
     
     function validate ($value, $args) {
 		if ($detail = validateNewPassword($_SESSION['subscriber.username'], $value, $_SESSION['subscriber.firstname'], $_SESSION['subscriber.lastname']))
-			return "$this->label is invalid.  ".$detail;
+			return _L("%1$s is invalid.  ", $this->label) . $detail;
 
 		return true;
     }

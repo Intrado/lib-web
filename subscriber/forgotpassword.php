@@ -88,7 +88,7 @@ if (!$success) {
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td align="right"><?= submit_button("Submit","save","tick") ?></td>
+			<td align="right"><?= submit_button(_L("Submit"),"save","tick") ?></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>

@@ -49,8 +49,8 @@ $formdata = array(
     )
 );
 
-$buttons = array(submit_button("Save","submit","tick"),
-                icon_button("Cancel","cross",null,"account.php"));
+$buttons = array(submit_button(_L("Save"),"submit","tick"),
+                icon_button(_L("Cancel"),"cross",null,"account.php"));
                 
 $form = new Form("testform",$formdata,null,$buttons);
 $form->ajaxsubmit = true;
@@ -94,16 +94,7 @@ require_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 Event.observe( document, 'unload', Event.unloadCache );
-
 <? Validator::load_validators(array("ValSubscriberPassword","ValChangePassword")); ?>
-
-<? if ($datachange) { ?>
-
-alert("data has changed on this form!");
-window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
-
-<? } ?>
-
 </script>
 
 <?
@@ -111,7 +102,7 @@ if (isset($_GET['thanks'])) {
 ?>
 	<div>
 	<h2><img src="img/icons/tick.gif"/>&nbsp;&nbsp;<?=_L("Your password has been changed.")?></h2><BR>
-	<?=icon_button("Done","tick",null,"account.php")?>
+	<?=icon_button(_L("Done"),"tick",null,"account.php")?>
 	</div>
 	<br>
 	<br>

@@ -208,7 +208,7 @@ foreach ($fieldmaps as $fieldmap) {
 						$value = "es_US";
 				
 					$formdata['locale'] = array (
-   	    				"label" => _L($fieldmap->name),
+   	    				"label" => _L("Language"),
        					"value" => $value,
        					"validators" => array(
        						array("ValRequired")
@@ -226,7 +226,7 @@ foreach ($fieldmaps as $fieldmap) {
 							$v = $a[0];
 						}
 						$formdata[$fieldnum] = array (
-    	    				"label" => _L($fieldmap->name),
+    	    				"label" => $fieldmap->name,
         					"value" => $v,
         					"validators" => array(
         						array("ValRequired")
@@ -248,7 +248,7 @@ foreach ($fieldmaps as $fieldmap) {
 					$max = 50;
 				
 				$formdata[$fieldnum] = array (
-        			"label" => _L($fieldmap->name),
+        			"label" => $fieldmap->name,
         			"value" => $person->$fieldnum,
         			"validators" => array(
 	            		array("ValRequired"),
@@ -263,7 +263,7 @@ foreach ($fieldmaps as $fieldmap) {
 				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
-    	    			"label" => _L($fieldmap->name),
+    	    			"label" => $fieldmap->name,
         				"value" => $person->$fieldnum,
         				"validators" => array(
         					array("ValRequired")

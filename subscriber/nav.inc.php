@@ -134,14 +134,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<? echo $MAINTABS ?>
 
 		<div class="applinks hoverlinks">
-			<a href="#" onclick="window.open('<?=isset($LOCALE)?"locale/$LOCALE/help/index.html":"help/index.html"?>', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"><?=_L("Help")?></a> |
-<?
-	$logout = "index.php?logout=1";
-	if (isset($_SESSION['customerurl'])) {
-		$logout .= "&u=".urlencode($_SESSION['customerurl']);
-	}
-?>
-			<a href="<?=$logout?>"><?=_L("Logout")?></a>
+			<a href="index.php?logout=1"><?=_L("Logout")?></a>
 		</div>
 
 	</div>

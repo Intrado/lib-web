@@ -254,7 +254,6 @@ function doDBConnect($result) {
 		$dsn = 'mysql:dbname='.$_DBNAME.';host='.$_DBHOST;
 		$_dbcon = new PDO($dsn, $_DBUSER, $_DBPASS);
 		
-		// TODO set charset
 		$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
 		$_dbcon->query($setcharset);
 		return true;
