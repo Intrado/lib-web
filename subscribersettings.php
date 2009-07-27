@@ -38,8 +38,8 @@ if ($emaildomain == "")
 $formdata = array();
 
 $formdata["restrictdomain"] = array(
-        "label" => _L("Restrict Account Email to Domain and Subdomains"),
-        "fieldhelp" => _L('Select this option to restrict which email domains a new subscriber may use.'),
+        "label" => _L("Restrict to Domain"),
+        "fieldhelp" => _L('Select this option to restrict which email domains a new subscriber may use.  Account may only be created with an email in one of the domains or subdomains listed.'),
         "value" => getSystemSetting("subscriberauthdomain", "0") ? true : false,
         "validators" => array(    
         ),
@@ -48,7 +48,7 @@ $formdata["restrictdomain"] = array(
     );
 $formdata["domain"] = array(
         "label" => _L("Email Domain"),
-        "fieldhelp" => _L('Displays the permitted email domains for new subscribers.'),
+        "fieldhelp" => _L('Displays the permitted email domains for new subscribers.  Subdomains are also allowed.'),
         "value" => "",
         "validators" => array(    
         ),
@@ -56,8 +56,8 @@ $formdata["domain"] = array(
         "helpstep" => 1
     );
 $formdata["requiresitecode"] = array(
-        "label" => _L("Require Site Access Code to Register"),
-        "fieldhelp" => _L('Requires new subscribers to enter a special code when subscribing.'),
+        "label" => _L("Require Site Code"),
+        "fieldhelp" => _L('Requires new subscribers to enter a special code when subscribing.  You must provide this code to create a new subscriber account.'),
         "value" => getSystemSetting("subscriberauthcode", "0") ? true : false,
         "validators" => array(    
         ),
