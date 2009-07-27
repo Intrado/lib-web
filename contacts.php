@@ -2,31 +2,43 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-require_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-require_once("inc/table.inc.php");
-require_once("inc/html.inc.php");
-require_once("inc/form.inc.php");
-require_once("inc/utils.inc.php");
-require_once("inc/reportutils.inc.php");
-require_once("inc/reportgeneratorutils.inc.php");
-require_once("inc/formatters.inc.php");
-require_once("obj/FieldMap.obj.php");
+include_once("inc/common.inc.php");
+include_once("inc/form.inc.php");
+include_once("inc/table.inc.php");
+include_once("inc/html.inc.php");
+include_once("inc/formatters.inc.php");
+include_once("inc/date.inc.php");
+include_once("obj/Person.obj.php");
+include_once("obj/PeopleList.obj.php");
+include_once("obj/ListEntry.obj.php");
+include_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+include_once("obj/Rule.obj.php");
+include_once("obj/FieldMap.obj.php");
+require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Email.obj.php");
+require_once("obj/Sms.obj.php");
+require_once("inc/securityhelper.inc.php");
+include_once("ruleeditform.inc.php");
+require_once("inc/rulesutils.inc.php");
+require_once("obj/FormRuleWidget.fi.php");
+require_once("inc/reportutils.inc.php");
+include_once("obj/Address.obj.php");
+include_once("obj/Language.obj.php");
+include_once("obj/JobType.obj.php");
+require_once("inc/utils.inc.php");
+require_once("inc/reportgeneratorutils.inc.php");
+require_once("obj/FieldMap.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/UserSetting.obj.php");
-require_once("obj/Rule.obj.php");
-require_once("inc/date.inc.php");
 require_once("obj/ContactsReport.obj.php");
-require_once("obj/Person.obj.php");
-require_once("inc/rulesutils.inc.php");
-include_once("ruleeditform.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
+
 if (!$USER->authorize('viewcontacts')) {
 	redirect('unauthorized.php');
 }
@@ -35,270 +47,295 @@ if (!$USER->authorize('viewcontacts')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_GET['clear']) && $_GET['clear']){
-	unset($_SESSION['contacts']['options']);
-	$_SESSION['saved_report'] = false;
-	redirect();
-}
-$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array("reporttype" => "contacts");
-
-if(isset($_GET['deleterule'])) {
-	if(isset($options['rules'])){
-		unset($options['rules'][$_GET['deleterule']]);
-		if(!count($options['rules']))
-			unset($options['rules']);
-	}
-	$_SESSION['contacts']['options'] = $options;
-	redirect();
+if (!empty($_GET['clear'])) {
+	$_SESSION['systemcontact_orderby'] = array();
+	systemcontact_clear_search_session();
 }
 
-$RULES = false;
-if(isset($options['rules']) && $options['rules']){
-	$RULES = $options['rules'];
+////////////////////////////////////////////////////////////////////////////////
+// Action/Request Processing
+////////////////////////////////////////////////////////////////////////////////
+
+$rulesjson = '';
+if (isset($_GET['showall'])) {
+	systemcontact_clear_search_session();
+	$_SESSION['systemcontact_showall'] = true;
+} else if (!empty($_SESSION['systemcontact_rules'])) {
+	$rules = $_SESSION['systemcontact_rules'];
+	if (is_array($rules))
+		$rulesjson = json_encode(cleanObjects(array_values($rules)));
 }
 
-$ordercount = 3;
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
+
+$fields = FieldMap::getOptionalAuthorizedFieldMapsLike('f') + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 $ordering = ContactsReport::getOrdering();
+$manageActivationCodes = getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess');
 
-$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f');
-$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g');
-$fields = $ffields + $gfields;
+$formdata = array();
 
-$activefields = array();
-$fieldlist = array();
-foreach($fields as $field){
-	// used in pdf
-	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
-		$activefields[] = $field->fieldnum;
+$formdata["miscbuttons"] = array(
+	"label" => _L(""),
+	"control" => array("FormHtml", "html"=>
+		submit_button(_L('Refresh'),"refresh","arrow_refresh") 
+		. icon_button(_L('Show All Contacts'),"tick",null,"contacts.php?showall")
+		. ($manageActivationCodes ? icon_button("Manage Activation Codes", "tick", null, "activationcodemanager.php") : '')
+	),
+	"helpstep" => 1
+);
+
+$formdata[] = _L("Search by Rules");
+
+$formdata["ruledata"] = array(
+	"label" => _L('Rules'),
+	"value" => $rulesjson,
+	"control" => array("FormRuleWidget"),
+	"validators" => array(array('ValRules')),
+	"helpstep" => 2
+);
+
+$formdata[] = _L("Search by Person");
+$formdata["pkey"] = array(
+	"label" => _L('Person ID'),
+	"value" => !empty($_SESSION['systemcontact_pkey']) ? $_SESSION['systemcontact_pkey'] : '',
+	"validators" => array(),
+	"control" => array("TextField"),
+	"helpstep" => 3
+);
+$formdata["phone"] = array(
+	"label" => _L('Phone Number'),
+	"value" => !empty($_SESSION['systemcontact_phone']) ? $_SESSION['systemcontact_phone'] : '',
+	"validators" => array(array("ValPhone")),
+	"control" => array("TextField"),
+	"helpstep" => 3
+);
+$formdata["email"] = array(
+	"label" => _L('Email Address'),
+	"value" => !empty($_SESSION['systemcontact_email']) ? $_SESSION['systemcontact_email'] : '',
+	"validators" => array(array("ValEmail")),
+	"control" => array("TextField"),
+	"helpstep" => 3
+);
+
+$formdata["searchbutton"] = array(
+	"label" => _L(''),
+	"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search by Person'),"search","magnifier") . "</div>"),
+	"helpstep" => 3
+);
+
+$formdata[] = _L("Results");
+
+$formdata["multipleorderby"] = array(
+	"label" => _L('Sort By'),
+	"value" => !empty($_SESSION['systemcontact_orderby']) ? $_SESSION['systemcontact_orderby'] : '',
+	"control" => array("MultipleOrderBy", "count" => 3, "values" => $ordering),
+	"validators" => array(),
+	"helpstep" => 1
+);
+
+$helpsteps = array (
+	_L('You may search by list rules.'), // 1
+	_L('You may search by person.'), // 2
+	_L('Search results, sorting, and column toggling.'), // 3
+);
+
+$form = new Form('systemcontact',$formdata,$helpsteps,array());
+$form->ajaxsubmit = true;
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		if (isset($postdata['multipleorderby'])) {
+			$multipleorderby = $postdata['multipleorderby'];
+			if (is_array($multipleorderby)) {
+				$_SESSION['systemcontact_orderby'] = array();
+				foreach ($multipleorderby as $i=>$orderby) {
+					if (in_array($orderby, $ordering))
+						$_SESSION['systemcontact_orderby'][] = $orderby;
+				}
+			}
+		}
+		
+		if ($ajax) {
+			switch ($button) {
+				case 'addrule':
+					systemcontact_clear_search_session('systemcontact_rules');
+					$data = json_decode($postdata['ruledata']);
+					if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
+						$data->val = prepareRuleVal($type, $data->op, $data->val);
+						if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+							if (!isset($_SESSION['systemcontact_rules']))
+								$_SESSION['systemcontact_rules'] = array();
+							$_SESSION['systemcontact_rules'][$data->fieldnum] = $rule;
+						}
+					}
+					$form->sendTo("contacts.php");
+					break;
+					
+				case 'deleterule':
+					systemcontact_clear_search_session('systemcontact_rules');
+					if (!empty($_SESSION['systemcontact_rules'])) {
+						$fieldnum = $postdata['ruledata'];
+						unset($_SESSION['systemcontact_rules'][$fieldnum]);
+					}
+					$form->sendTo("contacts.php");
+					break;
+					
+				case 'search':
+					systemcontact_clear_search_session();
+					$_SESSION['systemcontact_person'] = true;
+					$_SESSION['systemcontact_pkey'] = isset($postdata['pkey']) ? $postdata['pkey'] : false;
+					$_SESSION['systemcontact_phone'] = isset($postdata['phone']) ? Phone::parse($postdata['phone']) : false;
+					$_SESSION['systemcontact_email'] = isset($postdata['email']) ? $postdata['email'] : false;	
+					$form->sendTo("contacts.php");
+					break;
+					
+				case 'refresh':
+					$form->sendTo("contacts.php");
+					break;
+
+				case 'showAll':			
+					systemcontact_clear_search_session();
+					$_SESSION['systemcontact_showall'] = true;
+					$form->sendTo("contacts.php");
+					break;
+			}
+		} else {
+			redirect("contacts.php");
+		}
 	}
 }
-$options['activefields'] = implode(",",$activefields);
+
 $reportinstance = new ReportInstance();
-
-$pagestart = 0;
-if(isset($_GET['pagestart'])){
-	$pagestart = $_GET['pagestart'];
-}
-$options['pagestart'] = $pagestart;
-
-$reportinstance->setParameters($options);
+$reportinstance->setParameters(systemcontact_make_report_options());
 $reportgenerator = new ContactsReport();
 $reportgenerator->reportinstance = $reportinstance;
 $reportgenerator->userid = $USER->id;
 $reportgenerator->format = "html";
 
-$searchby = "criteria";
 
-
-$f = "person";
-$s = "all";
-$reloadform = 0;
-
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($f, 'search') || CheckFormSubmit($f, 'refresh')){
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-		
-		TrimFormData($f, $s, 'personid');
-		TrimFormData($f, $s, 'phone');
-		TrimFormData($f, $s, 'email');
-		
-		$radio = GetFormData($f, $s, "radioselect");
-		if ($radio == "criteria" || GetFormData($f, $s, "showall") || GetFormData($f, $s, "refresh")) {
-			$searchby = "criteria";
-			PutFormData($f, $s, 'personid',"", 'text');
-			PutFormData($f, $s, 'phone',"", 'phone', "7", "10");
-			PutFormData($f, $s, 'email',"", 'email');				
-		} elseif ($radio == "person"){
-			$searchby = "person";
-		}
-		
-		if( CheckFormSection($f, $s) ) {
-			error('The search field could not be processed', 'Please verify that all required field information has been entered properly');					
-		} else {
-
-			if(CheckFormSubmit($f, "showall")){
-				$options = array('reporttype' => "contacts");
-				for($i=1; $i<=$ordercount; $i++){
-					$options["order$i"] = GetFormData($f, $s, "order$i");
-				}
-				$options['showall'] = true;
-				$_SESSION['contacts']['options'] = $options;
-				redirect();
-			} else {
-				$options['reporttype']="contacts";
-				if(CheckFormSubmit($f, 'search') || CheckFormSubmit($f, $s))
-					unset($options['showall']);
-				if($radio == "person"){
-					unset($options['rules']);
-					$options['personid'] = GetFormData($f, $s, 'personid');
-					$options['phone']= Phone::parse(GetFormData($f, $s, 'phone'));
-					$options['email'] = GetFormData($f, $s, 'email');
-				} else {
-					unset($options['personid']);
-					unset($options['phone']);
-					unset($options['email']);
-					PutFormData($f, $s, 'personid',"", 'text');
-					PutFormData($f, $s, 'phone',"", 'phone', "7", "10");
-					PutFormData($f, $s, 'email',"", 'email');
-					
-					if($rule = getRuleFromForm($f, $s)){
-						if(!isset($options['rules']))
-							$options['rules'] = array();
-						$options['rules'][] = $rule;
-						$rule->id = array_search($rule, $options['rules']);
-						$options['rules'][$rule->id] = $rule;
-					}
-					$reloadform = 1;
-				}
-				for($i=1; $i<=$ordercount; $i++){
-					$options["order$i"] = GetFormData($f, $s, "order$i");
-				}
-				foreach($options as $index => $option){
-					if($option == "")
-						unset($options[$index]);
-				}
-				$_SESSION['contacts']['options'] = $options;
-				redirect();
-			}			
-		}
-	}
-} else {
-	$reloadform = 1;
-}
-
-if($reloadform){
-	ClearFormData($f);
-	$options = isset($_SESSION['contacts']['options']) ? $_SESSION['contacts']['options'] : array();
-
-	if(isset($options['personid']) || isset($options['phone']) || isset($options['email'])) {
-		$radio = "person";
-		$searchby = "person";
-	} else {
-		$radio = "criteria";
-		$searchby = "criteria";
-		
-	}
-	PutFormData($f, $s, "radioselect", $radio);
-	PutFormData($f, $s, 'personid', isset($options['personid']) ? $options['personid'] : "", 'text');
-	PutFormData($f, $s, 'phone', isset($options['phone']) ? Phone::format($options['phone']) : "", 'phone', "7", "10");
-	PutFormData($f, $s, 'email', isset($options['email']) ? $options['email'] : "", 'email');
-	for($i=1;$i<=$ordercount;$i++){
-		$order="order$i";
-		if($i==1){
-			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "p.pkey");
-		} else {
-			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
-		}
-	}
-
-	putRuleFormData($f, $s);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+function systemcontact_clear_search_session($keep = false) {
+	$_SESSION['saved_report'] = false;
+		
+	if ($keep != 'systemcontact_showall')
+		$_SESSION['systemcontact_showall'] = false;
+		
+	if ($keep != 'systemcontact_person') {
+		$_SESSION['systemcontact_person'] = false;
+		$_SESSION['systemcontact_pkey'] = false;
+		$_SESSION['systemcontact_phone'] = false;
+		$_SESSION['systemcontact_email'] = false;
+	}
+	
+	if ($keep != 'systemcontact_rules')
+		$_SESSION['systemcontact_rules'] = array();
+}
+
+function systemcontact_make_report_options() {
+	global $fields;
+	
+	$options = array("reporttype" => "contacts");
+	
+	if (!empty($_SESSION['systemcontact_showall'])) {
+		$options['showall'] = true;
+	} else if (!empty($_SESSION['systemcontact_person'])) {
+		if (!empty($_SESSION['systemcontact_pkey']))
+			$options['personid'] = $_SESSION['systemcontact_pkey'];
+		if (!empty($_SESSION['systemcontact_phone']))
+			$options['phone'] = $_SESSION['systemcontact_phone'];
+		if (!empty($_SESSION['systemcontact_email']))
+			$options['email'] = $_SESSION['systemcontact_email'];
+	} else if (!empty($_SESSION['systemcontact_rules'])) {
+		$options['rules'] = $_SESSION['systemcontact_rules'];
+	}
+	
+	if (!empty($_SESSION['systemcontact_orderby'])) {
+		foreach ($_SESSION['systemcontact_orderby'] as $i => $orderby) {
+			$options["order" . ($i+1)] = $orderby;
+		}
+	}
+	
+	$activefields = array();
+	foreach ($fields as $field){
+		// used in pdf
+		if (isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
+			$activefields[] = $field->fieldnum;
+		}
+	}
+	$options['activefields'] = implode(",",$activefields);
+	
+	$options['pagestart'] = isset($_GET['pagestart']) ? $_GET['pagestart'] : 0;
+	
+	return $options;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
+
 $PAGE = "system:contacts";
 $TITLE = "Contact Database";
 
 include_once("nav.inc.php");
-
-NewForm($f);
-buttons(submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), (getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess') ? button("Manage Activation Codes", null, "activationcodemanager.php") : null) );
-startWindow("Contact Search" . help('ContactDatabase_ContactSearch'), "padding: 3px;");
 ?>
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search:</th>
-		<td class="bottomBorder">
-			<table border="0" cellpadding="3" cellspacing="0" width="100%">
-				<tr>
-					<td>
-						<table>
-							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "criteria", "onclick='$(\"singleperson\").hide(); $(\"searchcriteria\").show()'");?> By Criteria</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "person", "onclick='$(\"searchcriteria\").hide(); $(\"singleperson\").show()'");?> By Person</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
-							<tr>
-								<td>
-								<?
-									//$RULES is declared above
-									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
 
-									drawRuleTable($f, $s, false, true, true, true);
+<script type="text/javascript">
+	<? Validator::load_validators(array("ValRules")); ?>
 
-								?>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<table id="singleperson">
-							<tr><td>Person ID: </td><td><? NewFormItem($f, $s, 'personid', 'text', 15, 255); ?></td></tr>
-							<tr><td>Phone Number: </td><td><? NewFormItem($f, $s, 'phone', 'text', '15'); ?></td></tr>
-							<tr><td>Email Address: </td><td><? NewFormItem($f, $s, 'email', 'text', '100'); ?></td></tr>
-							<tr><td><?=submit($f,'search', 'Search')?></td></tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
-		<td class="bottomBorder">
-	<?
-			select_metadata('searchresultstable', 5, $fields);
-	?>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort By:</th>
-		<td class="bottomBorder">
-<?
-			selectOrderBy($f, $s, $ordercount, $ordering);
-?>
-		</td>
-	</tr>
-</table>
-<script>
-	<?
-		if($searchby == "person"){
-			?>$("searchcriteria").hide();<?
-		} else {
-			?>$("singleperson").hide();<?
-		}
-	?>
+	document.observe('dom:loaded', function() {
+		ruleWidget.delayActions = true;
+		ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+		ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+	});
+
+	function systemcontact_clear_person() {
+		$('systemcontact_pkey').value = '';
+		$('systemcontact_phone').value = '';
+		$('systemcontact_email').value = '';
+	}
+	
+	function rulewidget_add_rule(event) {
+		$('systemcontact_ruledata').value = event.memo.ruledata.toJSON();
+		systemcontact_clear_person();
+		form_submit(event, 'addrule');
+	}
+
+	function rulewidget_delete_rule(event) {
+		$('systemcontact_ruledata').value = event.memo.fieldnum;
+		systemcontact_clear_person();
+		form_submit(event, 'deleterule');
+	}
 </script>
 <?
-endWindow();
 
-if(isset($options['personid']) || isset($options['phone']) || isset($options['email']) || (isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
+echo $form->render();
+
+if (!empty($_SESSION['systemcontact_showall']) || !empty($_SESSION['systemcontact_person']) || !empty($_SESSION['systemcontact_rules'])) {
+	echo "<div style='margin-top:10px'>";
+		select_metadata("$('searchresults')", 5, $fields);
+	echo "</div>";
 	$reportgenerator->generate();
 }
-buttons();
-EndForm();
-
-?>
-<script SRC="script/calendar.js"></script>
-<?
 
 include_once("navbottom.inc.php");
 ?>
