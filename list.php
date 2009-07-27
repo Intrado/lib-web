@@ -17,6 +17,7 @@ require_once("obj/Person.obj.php");
 require_once("obj/Address.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Email.obj.php");
+require_once("obj/Sms.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FieldMap.obj.php");
@@ -30,7 +31,9 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.obj.php");
 require_once("inc/rulesutils.inc.php");
-include_once("inc/formatters.inc.php");
+require_once("inc/formatters.inc.php");
+require_once("obj/JobType.obj.php");
+require_once('list.inc.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -39,57 +42,13 @@ if (!$USER->authorize('createlist')) {
 	redirect('unauthorized.php');
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-if (!isset($_SESSION['ajaxtablepagestart']))
-	$_SESSION['ajaxtablepagestart'] = array();
 
-function prepare_table($containerID, $renderedlist, $destinations = array()) {
-	global $USER;
-	switch ($containerID) {
-		case 'additionsContainer':
-			$renderedlist->mode = 'add';
-			$renderedlist->pagelimit = 500;
-			break;
-		default:
-			return false;
-	}
-	$renderedlist->hasstats = false;
-	$data = $renderedlist->getPage(isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0, $renderedlist->pagelimit);
-	$titles = array(//"0" => "In List",
-		2 => "",
-		3 => "First Name",
-		4 => "Last Name",
-		5 => "Language");
-	$formatters = array(//"0" => "fmt_checkbox",
-		2 => "fmt_idmagnify",
-		6 => "fmt_phone",
-		7 => "fmt_email",
-		8 => "fmt_phone",
-		9 => "fmt_null");
-	$sorting = array(
-		3 => $renderedlist->firstname,
-		4 => $renderedlist->lastname,
-		5 => $renderedlist->language
-	);
-	if (isset($destinations['phone'])) {
-		$sorting[6] = 'phone';
-		$titles[6] = destination_label("phone", 0);
-	}
-	if (isset($destinations['email'])) {
-		$sorting[7] = 'email';
-		$titles[7] = destination_label("email", 0);
-	}
-	if (isset($destinations['sms'])) {
-		$sorting[8] = 'sms';
-		$titles[8] = destination_label("sms", 0);
-	}
-	$sorting[9] = 'address';
-	$titles[9] = "Address";
-	
-	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting, true);
-}
+unset($_SESSION['listsearchpreview']);
+list_clear_search_session();
 
 if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
@@ -106,34 +65,13 @@ if ($list->id) {
 	$renderedlist->calcStats();
 }
 
-$destinations = array();
-if ($USER->authorize('sendphone'))
-	$destinations['phone'] = true;
-if ($USER->authorize('sendemail'))
-	$destinations['email'] = true;
-if (getSystemSetting("_hassms") && $USER->authorize('sendsms'))
-	$destinations['sms'] = true;
-
-if (!empty($_GET['ajax']) && isset($renderedlist) && isset($_GET['containerID']) && in_array($_GET['containerID'], array('additionsContainer'))) {
-	$ajaxdata = false;
-	switch ($_GET['ajax']) {
-		case 'orderby': // Handled same as case 'page'.
-		case 'page': // Order by what's in the user's setting.
-			if (isset($_GET['start']))
-				$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
-			$orderbySQL = ajax_table_get_orderby($_GET['containerID'], array_merge($destinations, array('address')));
-			if (!empty($orderbySQL))
-				$renderedlist->orderby = $orderbySQL;
-			$ajaxdata = array('html' => prepare_table($_GET['containerID'], $renderedlist, $destinations));
-			break;
-	}
-	header('Content-Type: application/json');
-	exit(json_encode($ajaxdata));
-}
+if (isset($renderedlist))
+	list_handle_ajax_table($renderedlist, array('listAdditionsContainer','listSkipsContainer'));
 
 ////////////////////////////////////////////////////////////////////////////////
-// Optional Form Items And Validators
+// Validators
 ////////////////////////////////////////////////////////////////////////////////
+
 class ValListName extends Validator {
 	var $onlyserverside = true;
 	function validate($value) {
@@ -143,14 +81,12 @@ class ValListName extends Validator {
 		return true;
 	}
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-// Reset ajax tables' page menus.
-$_SESSION['ajaxtablepagestart']['additionsContainer'] = 0;
-
-$rulesjson = '[]';
+$rulesjson = '';
 if ($list->id) {
 	$rules = $list->getListRules();
 	if (is_array($rules))
@@ -166,7 +102,7 @@ $formdata = array(
 		"value" => $list->name,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","min" => 3,"max" => 50),
+			array("ValLength","max" => 50),
 			array("ValListName")
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
@@ -177,7 +113,7 @@ $formdata = array(
 		"fieldhelp" => _L('This field is for an optional description of your list, viewable in the List Builder screen.'),
 		"value" => $list->description,
 		"validators" => array(
-			array("ValLength","min" => 3,"max" => 50)
+			array("ValLength","max" => 50)
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
@@ -190,8 +126,12 @@ $formdata = array(
 	)
 );
 
-$formdata[] = _L('List Rules');
-$formdata["ruledata"] = array(
+$formdata[] = _L('List Content');
+$formdata["ruledelete"] = array(
+	"value" => "",
+	"control" => array("HiddenField")
+);
+$formdata["newrule"] = array(
 	"label" => _L('List Rules'),
 	"fieldhelp" => _L('Use rules to select groups of contacts from the data available to your account.'),
 	"value" => $rulesjson,
@@ -203,19 +143,17 @@ $formdata["ruledata"] = array(
 );
 
 if (isset($renderedlist) && $renderedlist->totaladded > 0) {
-	$formdata[] = _L('Additions');
 	$formdata["additions"] = array(
-		"label" => '',
-		"control" => array("FormHtml", 'html' => "<div id='additionsContainer'>" . prepare_table('additionsContainer', $renderedlist, $destinations) . "</div>"),
+		"label" => _L('Additions'),
+		"control" => array("FormHtml", 'html' => submit_button(_L('Clear Additions'),'clearadditions','tick') .  "<div id='listAdditionsContainer' style='clear:both;margin:0; padding:0'></div>"),
 		"helpstep" => 2
 	);
 }
 
 if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
-	$formdata[] = _L('Skips');
 	$formdata["skips"] = array(
-		"label" => '',
-		"control" => array("FormHtml", 'html' => 'TODO: Show skips'),
+		"label" => _L('Skips'),
+		"control" => array("FormHtml", 'html' => submit_button(_L('Clear Skips'),'clearskips','tick') . "<div id='listSkipsContainer' style='clear:both;margin:0;padding:0'></div>"),
 		"helpstep" => 2
 	);
 }
@@ -239,8 +177,8 @@ $helpsteps = array (
 	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 3
 );
 
-$buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"start.php"));
+$buttons = array(submit_button(_L('Refresh'),"refresh","arrow_refresh"),
+	submit_button(_L('Done'),"done","tick"));
 				
 $form = new Form("list",$formdata,$helpsteps,$buttons);
 $form->ajaxsubmit = true;
@@ -274,52 +212,69 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// Save
 		if ($list->id) {
-			$ruledata = json_decode($postdata['ruledata']);
-			if (is_array($ruledata)) {
-				QuickUpdate('BEGIN');
-					if (isset($rules)) {
-						foreach ($rules as $existingrule) {
-							if (!$USER->authorizeField($existingrule->fieldnum))
-								continue;
-							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.id=?", false, array($list->id, $existingrule->id));
-						}
-					}
-					foreach ($ruledata as $data) {
-						// CREATE rule.
-						if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
-							continue;
-						if (!$type = Rule::getType($data->fieldnum))
-							continue;
-						$data->val = prepareRuleVal($type, $data->op, $data->val);
-						if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
-							continue;
-						$rule->create();
-						$le = new ListEntry();
-						$le->listid = $list->id;
-						$le->type = "R";
-						$le->ruleid = $rule->id;
-						$le->create();
-					}
-				QuickUpdate('COMMIT');
-			}
-			
 			if ($ajax) {
 				switch ($button) {
-					case 'save':
+					case 'addrule':
+						error_log($postdata['newrule']);
+						QuickUpdate('BEGIN');
+							$ruledata = json_decode($postdata['newrule']);
+							$data = $ruledata[0];
+							// CREATE rule.
+							if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
+								continue;
+							if (!$type = Rule::getType($data->fieldnum))
+								continue;
+							$data->val = prepareRuleVal($type, $data->op, $data->val);
+							if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
+								continue;
+							$rule->create();
+							$le = new ListEntry();
+							$le->listid = $list->id;
+							$le->type = "R";
+							$le->ruleid = $rule->id;
+							$le->create();
+						QuickUpdate('COMMIT');
+						$form->sendTo('list.php');
+						break;
+						
+					case 'deleterule':
+						$fieldnum = $postdata['ruledelete'];
+						error_log('delete rule: ' . $fieldnum);
+						if ($USER->authorizeField($fieldnum))
+							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
+						$form->sendTo('list.php');
+						break;
+						
+					case 'clearadditions':
+						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='A' AND le.listid=?", false, array($list->id));
+						$form->sendTo('list.php');
+						break;
+						
+					case 'clearskips':
+						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='N' AND le.listid=?", false, array($list->id));
+						$form->sendTo('list.php');
+						break;
+						
+					case 'refresh': // handled same as case 'done'.
+					case 'done':
 						if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
 							unset($_SESSION['origin']);
 							$form->sendTo('start.php');
 						} else {
 							unset($_SESSION['origin']);
+							if ($button == 'refresh')
+								$form->sendTo('list.php');
 							$form->sendTo('lists.php');
 						}
 						break;
 				
 					case 'preview':
+						$_SESSION['listsearchpreview'] = true;
 						$form->sendTo("showlist.php?id=" . $list->id);
 						break;
 						
 					case 'search':
+						unset($_SESSION['listsearchpreview']);
 						$form->sendTo("search.php");
 						break;
 						
@@ -346,15 +301,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Display Functions
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:lists";
-$TITLE = _L('List Editor: ') . 'TODO';
+$TITLE = _L('List Editor: ') . escapehtml($list->name);
 
 include_once("nav.inc.php");
 
@@ -363,7 +313,6 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 	<? Validator::load_validators(array("ValRules", "ValListName")); ?>
 </script>
-
 <?
 startWindow(_L('List Editor'));
 
@@ -371,10 +320,27 @@ echo $form->render();
 endWindow();
 ?>
 <script type='text/javascript'>
-	function update_list_total() {
+	document.observe('dom:loaded', function() {
+		ruleWidget.delayActions = true;
+		ruleWidget.container.observe('RuleWidget:AddRule', list_add_rule);
+		ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
+		
+		<?php if (isset($renderedlist)) { ?>
+			if ($('listAdditionsContainer'))
+				$('listAdditionsContainer').update('<?=addslashes(list_get_results_html('listAdditionsContainer', $renderedlist))?>');
+			if ($('listSkipsContainer'))
+				$('listSkipsContainer').update('<?=addslashes(list_get_results_html('listSkipsContainer', $renderedlist))?>');
+		<?php } ?>
+	});
+
+	function list_add_rule(event) {
+		$('list_newrule').value = [event.memo.ruledata].toJSON();
+		form_submit(event, 'addrule');
 	}
-	ruleWidget.container.observe('RuleWidget:AddRule', update_list_total);
-	ruleWidget.container.observe('RuleWidget:DeleteRule', update_list_total);
+	function list_delete_rule(event) {
+		$('list_ruledelete').value = event.memo.fieldnum;
+		form_submit(event, 'deleterule');
+	}
 </script>
 <?
 include_once("navbottom.inc.php");
