@@ -322,12 +322,25 @@ function resetPassword($activationcode, $password, $ipaddr){
 	return false;
 }
 
-function prefetchUserInfo($activationcode){
+function prefetchUserInfo($activationcode) {
 	$params = array(new XML_RPC_Value($activationcode, 'string'));
 	$method = "AuthServer.prefetchUserInfo";
 	$result = pearxmlrpc($method, $params);
-	if($result !== false){
+	if ($result !== false) {
 		return $result;
+	}
+	return false;
+}
+
+// given a messagelink code, authserver to provide customer db, jobid, personid
+// then lookup the messageid to return
+function loginMessageLink($code) {
+	$params = array(new XML_RPC_Value($code, 'string'));
+	$method = "AuthServer.loginMessageLink";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false && $result['result'] == "") {
+		doDBConnect($result);
+		return QuickQuery("select messageid from reportperson where jobid=? and personid=? and type='phone'", false, array($result['jobid'], $result['personid']));
 	}
 	return false;
 }
