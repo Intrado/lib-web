@@ -479,3 +479,56 @@ function format_thousands_separator(num) {
 	}
 	return formatted.reverse().join("");
 }
+
+
+function icon_button(name,icon,id) {
+	var newbutton = new Element("button",{"class": "button", type: "button"});
+	newbutton.id = id;
+	
+	var buttonface = new Element("td",{"class": "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
+	
+	var buttonrecord = new Element("tr", {}).insert(new Element("td",{}).insert(new Element("img",{"class": "left", src: "img/themes/"+_brandtheme+"/button_left.gif"}))).insert(buttonface).insert(new Element("td",{}).insert(new Element("img",{"class": "right", src: "img/themes/"+_brandtheme+"/button_right.gif"})));
+	
+	var buttonbody = new Element("table",{}).insert(new Element("tbody",{}).insert(buttonrecord));
+	
+	newbutton.insert(buttonbody);
+	
+	newbutton.observe("mouseover", btn_rollover.bind(this,newbutton));
+	newbutton.observe("mouseout", btn_rollout.bind(this,newbutton));
+	
+	return newbutton;
+}
+
+function action_link(name,icon,id) {
+	var newaction = new Element("a", {href: "#", "class": "actionlink", title: name, style: "margin-left: 3px;"});
+	newaction.id = id;
+	
+	// TODO: actionlinkmode needs to be checked to display icons and/or titles
+	newaction.insert(new Element("img", {src: "img/icons/"+icon+".gif"})).insert(name);
+	
+	return newaction;
+}
+
+function blankFieldValue(element, value) {
+	element = $(element);
+	element.observe("focus", setDefaultFieldValue.curry(value));
+	element.observe("blur", setDefaultFieldValue.curry(value));
+}
+
+function setDefaultFieldValue(value, event) {
+	var element = event.element();
+	if (event.type == "focus" && element.value == value) {
+		element.value = "";
+		element.setStyle({
+			color: "black"
+		});
+	}
+	
+	if (event.type == "blur" && element.value == "") {
+		element.value = value;
+		element.setStyle({
+			color: "gray"
+		});
+	}
+	
+}
