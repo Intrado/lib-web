@@ -81,6 +81,9 @@ switch ($filter) {
 	case "emailedreports":
 		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
 		break;
+	case "systemmessages":
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
+		break;	
 	default:
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted != 1 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where userid=? and deleted != 1 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -88,6 +91,7 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,type as jobtype, deleted from job where userid=? and deleted != 1 and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
 		break;	
 } 
 
@@ -127,80 +131,12 @@ if ($listsdata) {
 ?>
 	<table border=0 cellpadding=0 cellspacing=5>
 	<tr>
-		<td valign="top">
-			<table width="300px" border=0 cellpadding=0 cellspacing=0>
-<?
-		  	if ($USER->getSetting("whatsnewversion") != $CURRENTVERSION) {
-			?><tr><td><?
-			  	$startCustomTitle = _L("What's New");
-				startWindow($startCustomTitle,NULL);
-
-?>				<div align="center" style="margin: 5px;">
-					<div style="text-align: left; padding: 5px;">
-					<p>Update 6.2</p>
-					<a href="#" onclick="window.open('help/schoolmessenger_help.htm#getting_started/new_features.htm', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">
-					<img src="img/bug_lightbulb.gif" >Click here to see what's new.</a>
-					</div>
-					<BR>
-				</div>
-
-				<table align="center"><tr><td>
-<?				echo button(_L('Close'), null, 'start.php?closewhatsnew'); ?>
-				</td></tr></table>
-
-<?
-				endWindow();
-			?><br></td></tr><?
-			}
-			if ( (( ($USER->authorize("starteasy") && $USER->authorize('sendphone'))
-				|| $USER->authorize('sendphone')
-				|| $USER->authorize('sendemail')
-				|| $USER->authorize('sendprint')
-				|| $USER->authorize('sendsms')) && $listsdata)
-				|| $USER->authorize('createlist')) {
-				$theme = getBrandTheme();
-			?><tr><td><?
-				startWindow(_L('Quick Start ') . help('Start_EasyCall'),NULL);
-				?>
-				<table border="0" cellpadding="3" cellspacing="0" width=100%>
-				<?
-				if ($USER->authorize("starteasy") && $USER->authorize('sendphone')) {
-					?>
-					<tr>
-						<td align="right" valign="center" class="bottomBorder"><div NOWRAP class="destlabel">Basic<?=help('Start_EasyCall', '', 'small')?></div></td>
-						<td class="bottomBorder" style="padding: 5px;" valign="center">
-							<img src="img/themes/<?=$theme?>/b1_easycall2.gif" onclick="window.location = 'jobwizard.php?new'"
-							onmouseover="this.src='img/themes/<?=$theme?>/b2_easycall2.gif'"
-							onmouseout="this.src='img/themes/<?=$theme?>/b1_easycall2.gif'">
-						</td>
-					</tr>
-					<?
-				}
-				if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendprint') || $USER->authorize('sendsms')) {
-					?>
-					<tr>
-						<td align="right" valign="center" class="bottomBorder"><div NOWRAP class="destlabel">Advanced<?=help('Jobs_AddStandardJob', '', 'small')?></div></td>
-						<td class="bottomBorder" style="padding: 5px;" valign="center"><?=button_bar(button(_L('Create New Job'), NULL,"job.php?origin=start&id=new"))?></td>
-					</tr>
-					<?
-				}
-				if ($USER->authorize('createlist')) {
-					?>
-					<tr>
-						<td align="right" valign="center"><div NOWRAP class="destlabel">List<?=help('Lists_AddList', '', 'small')?></div></td>
-						<td style="padding: 5px;" valign="center"><?=button_bar(button(_L('Create New List'), NULL,"list.php?origin=start&id=new"))?></td>
-					</tr>
-				<?
-				}
-				?>
-				</table>
-				<?
-				endWindow();
-			?><br></td><?
-			}
-			?></tr>
-			</table><?
-		
+		<td>
+			<div style="width:250px;top:0px;text-align:center;">
+			<a href="jobwizard.php?new"><img src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" ></a><br />		
+			<a href="jobwizard.php?new"><img src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new job" ></a>			
+			</div>
+<?		
 			if ($USER->authorize("startstats")) {
 ?>
 			</td>
@@ -224,21 +160,23 @@ if ($listsdata) {
 				//style="border: none;border-collapse: collapse;">
 				$activityfeed = '<table width="100%">
 				<tr>
-					<td valign="top" width="180px" >
+					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;font-weight: bold;" >
 					&nbsp;&nbsp;<a href="start.php?filter=none"><img src="img/largeicons/globe.jpg" align="middle" >Show&nbsp;All</a><br />
-					<h3>Filter By:</h3>
+					<h1>Filter By:</h1>
 					&nbsp;&nbsp;<a href="start.php?filter=activejob"><img src="img/largeicons/ping.jpg" align="middle" >Active&nbsp;Jobs</a><br />
 					&nbsp;&nbsp;<a href="start.php?filter=completedjob"><img src="img/largeicons/checkedgreen.jpg" align="middle" >Completed&nbsp;Jobs</a><br />
 					&nbsp;&nbsp;<a href="start.php?filter=scheduledjob"><img src="img/largeicons/clock.jpg" align="middle" >Scheduled&nbsp;Jobs</a><br />
 					&nbsp;&nbsp;<a href="start.php?filter=savedreports"><img src="img/largeicons/savedreport.jpg" align="middle" >Saved&nbsp;Reports</a><br />
+					&nbsp;&nbsp;<a href="start.php?filter=systemmessages"><img src="img/largeicons/news.jpg" align="middle" >System&nbsp;Messages</a><br />
 					</td>
 					<td width="50px">&nbsp;</td>
-					<td valign="top">
-						<table width="100%" style="border: none;border-collapse: collapse;">
+					<td class="feed" valign="top" >
+						<table>
 					
 				
 				';	
-				
+				//"border="1"
+				//style="border: none;border-collapse: collapse;">
 				$actionids = array();
 				
 				if(empty($mergeditems)) {
@@ -268,7 +206,7 @@ if ($listsdata) {
 							//else
 							//	$title = _L("Submitted Job");
 	
-							$content = $time .  ' - ' .  $item["name"];
+							$content = $time .  ' - <b>' .  $item["name"] . '</b>';
 							
 							$job = new Job();
 							$job->id = $itemid;
@@ -288,7 +226,7 @@ if ($listsdata) {
 								case "repeating":
 									$title = _L('Repeating Job Saved');
 									$tools = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$itemid", "return confirm('Are you sure you want to run this job now?');");						
-									$icon = '<img src="img/largeicons/floppy.jpg" />';
+									$icon = '<img src="img/largeicons/calendar.jpg" />';
 									$defaultlink = "jobrepeating.php?id=$itemid";					
 									break;
 								case "complete":
@@ -330,23 +268,35 @@ if ($listsdata) {
 							//$icon = '<img src="img/themes/' . getBrandTheme() . '/icon_' . $job->type . '.gif".gif" alt="'.escapehtml($title).'">';
 						} else if($item["type"] == "list" ) {
 							$title = "List " . $title;
-							$content = $time .  ' - ' .  $item["name"];
+							$content = $time .  ' - <b>' .  $item["name"];
 							if(isset($item["lastused"]))
-								$content .= ' - Last used: ' . date("M j, g:i a",strtotime($item["lastused"]));
+								$content .= ' (Last used: ' . date("M j, g:i a",strtotime($item["lastused"]));
 							else
-								$content .= ' - Never used';
-							
+								$content .= ' (Never used';
+							$content .= ')</b>';
 							$defaultlink = "list.php?id=$itemid";
 							$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 							$icon = '<img src="img/largeicons/addrbook.jpg">';			
 						} else if($item["type"] == "message" ) {
-							$title = "Message " . $title;
-							$content = $time .  ' - ' .  $item["name"];
+							$messagetype = $item["messagetype"];
+							$title = _L('%1$s message %2$s',escapehtml(ucfirst($messagetype)),escapehtml($title));
+							$content = $time .  ' - <b>' .  $item["name"] . '</b>';
 							$tools = action_links (
 								action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
 								action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
 								);	
-							$icon = '<img src="img/largeicons/floppy.jpg">';
+							$defaultlink = "message$messagetype.php?id=$itemid";
+							switch($messagetype) {
+								case "phone":
+									$icon = '<img src="img/largeicons/phonehandset.jpg">';
+									break;
+								case "email":
+									$icon = '<img src="img/largeicons/email.jpg">';
+									break;
+								case "sms":
+									$icon = '<img src="img/largeicons/smschat.jpg">';
+									break;
+							}
 						} else if($item["type"] == "report" ) {
 							$title = "Report " . $title;				
 							$content = $time .  ' - ' .  $item["name"];
@@ -358,14 +308,13 @@ if ($listsdata) {
 						
 						$tdstyle = $limit>1?'class="bottomBorder"':"";
 						$activityfeed .= '<tr>	
-												<td ' . $tdstyle. ' valign="top">' . $icon . '</td>
-												<td ' . $tdstyle. ' width="30px">&nbsp;</td>
+												<td ' . $tdstyle. ' valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $icon . '</a></td>
 												<td ' . $tdstyle. ' valign="top">';
 													
-						$activityfeed .= 			'<a href="' . $defaultlink . '" ' . $defaultonclick . '><h3>' . $title . '</h3>
-													<span>' . $content . '</span></a>';
+						$activityfeed .= 			'<a href="' . $defaultlink . '" ' . $defaultonclick . '><h1>' . $title . '</h1>
+													<span >' . $content . '</span></a>';
 						$activityfeed .= 		'</td>
-												<td ' . $tdstyle. ' valign="top">
+												<td ' . $tdstyle. ' valign="middle">
 													<div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg".gif"/>&nbsp;Tools</div>
 													<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>
 												</td></tr>';
@@ -386,7 +335,6 @@ if ($listsdata) {
 						style: 'protogrey',
 						radius: 4,
 						border: 4,
-						showOn: 'click',
 						hideOn: false,
 						hideAfter: 0.5,
 						stem: 'rightTop',
