@@ -279,53 +279,89 @@ class JobWiz_start extends WizStep {
 			}
 		}
 		
-		$formdata = array(
-			$this->title,
-			"name" => array(
-				"label" => _L("Job Name"),
-				"fieldhelp" => _L("Name is used for the job's email subject and to create reports."),
-				"value" => "",
-				"validators" => array(
-					array("ValRequired"),
-					array("ValJobName"),
-					array("ValLength","max" => 50)
-				),
-				"control" => array("TextField","maxlength" => 50, "size" => 50),
-				"helpstep" => 1
+		$formdata = array($this->title);
+		$formdata["name"] = array(
+			"label" => _L("Job Name"),
+			"fieldhelp" => _L("Name is used for the job's email subject and to create reports."),
+			"value" => "",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValJobName"),
+				array("ValLength","max" => 50)
 			),
-			"jobtype" => array(
-				"label" => _L("Type/Category"),
-				"fieldhelp" => _L("These options determine how your message will be received."),
-				"value" => "",
-				"validators" => array(
-					array("ValRequired")
-				),
-				"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
-				"helpstep" => 2
+			"control" => array("TextField","maxlength" => 50, "size" => 50),
+			"helpstep" => 1
+		);
+		$formdata["jobtype"] = array(
+			"label" => _L("Type/Category"),
+			"fieldhelp" => _L("These options determine how your message will be received."),
+			"value" => "",
+			"validators" => array(
+				array("ValRequired")
 			),
-			"package" => array(
-				"label" => _L("Notification Method"),
-				"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
-				"validators" => array(
-					array("ValRequired")
-				),
-				"value" => "",
-				"control" => array("RadioButton", 
-					"values" => array(
-						"easycall" => _L("EasyCall"),
-						"express" => _L("ExpressText"),
-						"personalized" => _L("Personalized"),
-						"custom" => _L("Custom")
-					),
-					"hover" => array(
-						"easycall" => _L("Record your voice via Phone. Message is delivered via phone, automatically generated Email with link to recording and automatically generated Text Message to cell phones."),
-						"express" => _L("Text-to-Speach message. Automatically translated into altnernate languages. Text is delivered by Phone, Email and Text Message."),
-						"personalized" => _L("Record your voice via Phone. Enter text for an Email and Text Message."),
-						"custom" => _L("Choose any combination of options to customize your message delivery.")
-					)
-				),
-				"helpstep" => 3
-			)
+			"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
+			"helpstep" => 2
+		);
+		
+		$package = array(
+			'easycall' => '
+				<table align="left">
+					<tr>
+						<td align="center" width="70px"><img src="img/largeicons/mic.jpg"/><div>'.escapehtml(_L('Record')).'</div></td>
+						<td align="left" valign="center">
+							<div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message/ EasyCall')).'</div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Auto Email and Text Alerts')).'</div>
+							</div>
+						</td>
+					</tr>
+				</table>',
+			'express' => '
+				<table align="left">
+					<tr>
+						<td align="center" width="70px"><img src="img/largeicons/writescript.jpg"/><div>'.escapehtml(_L('Write')).'</div></td>
+						<td align="left" valign="center">
+							<div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type, Phone, Email and Text Message / Text-To-Speech')).'</div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
+							</div>
+						</td>
+					</tr>
+				</table>',
+			'personalized' => '
+				<table align="left">
+					<tr>
+						<td align="center" width="70px"><img src="img/largeicons/micwrite.jpg"/><div>'.escapehtml(_L('Record & Write')).'</div></td>
+						<td align="left" valign="center">
+							<div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message')).'</div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type Email, and Text Messages with Automatic Translation')).'</div>
+							</div>
+						</td>
+					</tr>
+				</table>',
+			'custom' => '
+				<table align="left">
+					<tr>
+						<td align="center" width="70px"><img src="img/largeicons/tools.jpg"/><div>'.escapehtml(_L('Customize')).'</div></td>
+						<td align="left" valign="center">
+							<div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Select combination of message types')).'</div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
+							</div>
+						</td>
+					</tr>
+				</table>'
+		);
+		$formdata["package"] = array(
+			"label" => _L("Notification Method"),
+			"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
+			"validators" => array(
+				array("ValRequired")
+			),
+			"value" => "",
+			"control" => array("HtmlRadioButton", "values" => $package),
+			"helpstep" => 3
 		);
 		$helpsteps = array (
 			_L("Welcome to the Job Wizard. This is a guided 5 step process. <br><br>Enter your Job's name. Job names are used for email subjects and reporting, so they should be descriptive.").'<br>'._L("Good examples include 'Standardized testing reminder', or 'Early dismissal'."),
