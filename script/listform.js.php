@@ -102,7 +102,7 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 				$('listsTableStatus').update();
 				var ruleid = transport.responseJSON;
 				if (!ruleid) {
-					alert('<?=addslashse(_L("Sorry, cannot save this rule"))?>');
+					alert('<?=addslashes(_L("Sorry, cannot save this rule"))?>');
 					return;
 				}
 				
