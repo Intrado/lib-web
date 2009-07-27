@@ -19,6 +19,34 @@ require_once("inc/formatters.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+function gettingStarted() {
+	return array("type" => "systemmessage","id" => '',
+								"icon" => "",
+								"date" => date("Y-m-d H:i:s", time()),
+								"status" => "Getting Started",
+								"message" => '
+	<table border="0" cellpadding="3" cellspacing="0" width=100%>
+		<tr>
+			<td NOWRAP align="right" valign="top" class="bottomBorder"><b>Help:&nbsp;&nbsp; </b></td>
+			<td class="bottomBorder">Need Assistance? View the quick video guides.
+				<ul style="list-style-image: url(img/icons/control_play_blue.png)">
+				<li><a href="">Creating a new notification</a>
+				<li><a href="">Making a clear message</a>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td NOWRAP align="right" valign="top"><b>New User:&nbsp;&nbsp; </b></td>
+			<td >This printable PDF training guide teaches product basics in an simple step-by-step format.
+			<ul style="list-style-image: url(img/icons/page_white_acrobat.png)">
+				<li><a href="help/getting_started_online.pdf"> Training Guide</a>
+			</ul>
+			</td>
+		</tr>
+	</table>
+								'
+			);
+}
 
 $CURRENTVERSION = "6.2";
 
@@ -35,7 +63,6 @@ if (isset($_GET['closewhatsnew'])) {
 	QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'whatsnewversion', $CURRENTVERSION)");
 }
 
-$listsdata = DBFindMany("PeopleList"," from list where userid=$USER->id and deleted=0");
 
 function itemcmp($a, $b) {
 	if ($a["date"] == $b["date"]) {
@@ -49,6 +76,7 @@ if (isset($_GET['filter'])) {
 }
 
 $mergeditems = array();
+
 
 switch ($filter) {
 	case "list":
@@ -82,7 +110,8 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
 		break;
 	case "systemmessages":
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
+		$mergeditems[] = gettingStarted();	
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 9",true));
 		break;	
 	default:
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted != 1 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -91,11 +120,18 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,type as jobtype, deleted from job where userid=? and deleted != 1 and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 9",true));
+		if(QuickQuery("select count(*) from job where status='complete' and userid=?",false,array($USER->id)) == 0) {
+			$mergeditems[] = gettingStarted();	
+		}
 		break;	
 } 
 
 uasort($mergeditems, 'itemcmp');
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,25 +163,23 @@ $TIMELINE = true;
 
 include_once("nav.inc.php");
 
-if ($listsdata) {
+
 ?>
 	<table border=0 cellpadding=0 cellspacing=5>
 	<tr>
 		<td>
 			<div style="width:250px;top:0px;text-align:center;">
-			<a href="jobwizard.php?new"><img src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" ></a><br />		
-			<a href="jobwizard.php?new"><img src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new job" ></a>			
+			<a href="jobwizard.php?new"><img src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job" /></a><br />		
+			<a href="jobwizard.php?new"><img src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new emergency job" title="Start a new emergency job"  /></a>			
 			</div>
 <?		
 			if ($USER->authorize("startstats")) {
 ?>
 			</td>
-			<td width="100%" valign="top">
+			<td width="100%" valign="middle">
+				<div>
 <?
-			startWindow('Job Timeline ',NULL,true);
-			//	button_bar(button('Refresh', 'window.location.reload()'));
 				include_once("inc/timeline.inc.php");
-			endWindow();
 ?>
 			</td>
 			</tr>
@@ -302,23 +336,30 @@ if ($listsdata) {
 							$content = $time .  ' - ' .  $item["name"];
 							$icon = '<img src="img/largeicons/savedreport.jpg">';
 							$defaultlink = "reportjobsummary.php?id=$itemid";
-						} 
+						} else if($item["type"] == "systemmessage" ) {
+							$content = $item["message"];
+							$icon = '<img src="img/largeicons/notepad.jpg">';
+						}
+						
 						
 						$defaultonclick = !isset($defaultonclick) ? "" : 'onclick="'. $defaultonclick. '"';
 						
 						$tdstyle = $limit>1?'class="bottomBorder"':"";
 						$activityfeed .= '<tr>	
 												<td ' . $tdstyle. ' valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $icon . '</a></td>
-												<td ' . $tdstyle. ' valign="top">';
-													
-						$activityfeed .= 			'<a href="' . $defaultlink . '" ' . $defaultonclick . '><h1>' . $title . '</h1>
-													<span >' . $content . '</span></a>';
-						$activityfeed .= 		'</td>
-												<td ' . $tdstyle. ' valign="middle">
+												<td ' . $tdstyle. ' valign="top">
+													<a href="' . $defaultlink . '" ' . $defaultonclick . '><h1>' . $title . '</h1>
+													<span >' . $content . '</span></a>
+												</td>';
+						if($tools) {
+							$activityfeed .= '	<td ' . $tdstyle. ' valign="middle">
 													<div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg".gif"/>&nbsp;Tools</div>
 													<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>
-												</td></tr>';
-						$actionids[] = "'$itemid'";
+												</td>';
+							$actionids[] = "'$itemid'";
+						
+						}
+						$activityfeed .= 	'	</tr>';
 						$limit--;
 					}
 				} 
@@ -348,43 +389,6 @@ if ($listsdata) {
 
 
 	?></td></tr></table><?
-
-} else {
-	if ($USER->getSetting("whatsnewversion") != $CURRENTVERSION) {
-		QuickUpdate("delete from usersetting where userid=$USER->id and name='whatsnewversion'");
-		QuickUpdate("insert into usersetting (userid, name, value) values ($USER->id, 'whatsnewversion', $CURRENTVERSION)");
-	}
-?>
-	<table border=0 width="500px"><tr><td><?
-	startWindow(_L('Getting Started '),NULL);
-	?>
-	<table border="0" cellpadding="3" cellspacing="0" width=100%>
-		<tr>
-			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">Help:&nbsp;&nbsp; </div></td>
-			<td class="bottomBorder">Need Assistance? Try the comprehensive online help system by clicking the button to the right or by using the Help link in the top right of the page.</td>
-			<td class="bottomBorder"><?=button_bar(button(_L('Go To Help'), "window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"))?>
-		</tr>
-		<tr>
-			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">New User:&nbsp;&nbsp; </div></td>
-			<td class="bottomBorder">This printable PDF training guide teaches product basics in an simple step-by-step format.</td>
-			<td class="bottomBorder"><?=button_bar(button(_L('Training Guide'), NULL, "help/getting_started_online.pdf"))?>
-		</tr>
-	<?
-	if ($USER->authorize('createlist')) {
-	?>
-		<tr>
-			<td NOWRAP align="right" valign="center" class="bottomBorder"><div class="destlabel">List:&nbsp;&nbsp; </div></td>
-			<td class="bottomBorder">Ready to start? Before sending a job you'll need to create a list.</td>
-			<td class="bottomBorder"><?=button_bar(button(_L('Create New List'), NULL,"list.php?origin=start&id=new"))?>
-		</tr>
-	<?
-	}
-	?>
-	</table>
-	<?
-	endWindow();
-	?></td></tr></table><?
-}
 
 include_once("navbottom.inc.php");
 ?>
