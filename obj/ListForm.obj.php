@@ -141,9 +141,6 @@ class ListForm extends Form {
 		
 		// JAVASCRIPT
 		$str .= "
-			
-<script type='text/javascript' 
-        src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
 			<script type='text/javascript' src='script/datepicker.js'></script>
 			<script type='text/javascript' src='script/rulewidget.js.php'></script>
 			<script type='text/javascript' src='script/listform.js.php'></script>
