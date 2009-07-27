@@ -77,15 +77,261 @@ $wizdata = array(
 );
 
 class FinishJobWizard extends WizFinish {
+	function phoneRecordedMessage($msgdata) {
+		$retval = array();
+		foreach ($msgdata as $lang => $data)
+			$retval[$lang] = array(
+				"id" => $data,
+				"text" => "",
+				"gender" => "",
+				"language" => ($lang == "Default")?"english":strtolower($lang),
+				"override" => true
+			);
+		return $retval;
+	}
+	
+	function phoneTextMessage($msgdata) {
+		return array("Default" => array(
+			"id" => "",
+			"text" => $msgdata->text,
+			"gender" => $msgdata->gender,
+			"language" => 'english',
+			"override" => true
+		));
+	}
+	
+	function phoneTextTranslation($msgdata) {
+		$retval = array();
+		foreach ($msgdata as $lang => $data) {
+			$newmsgdata = json_decode($data);
+			if ($newmsgdata->enabled)
+				$retval[$lang] = array(
+					"id" => "",
+					"text" => $newmsgdata->text,
+					"gender" => $newmsgdata->gender,
+					"language" => strtolower($lang),
+					"override" => $newmsgdata->override
+				);
+		}
+		return $retval;
+	}
+	
+	function emailSavedMessage($msgdata) {
+		$retval = array();
+		foreach ($msgdata as $lang => $data)
+			$retval[$lang] = array(
+				"id" => $data,
+				"from" => "",
+				"fromname" => "",
+				"subject" => "",
+				"attachments" => "",
+				"text" => "",
+				"language" => ($lang == "Default")?"english":strtolower($lang),
+				"override" => true
+			);
+		return $retval;
+	}
+
+	function emailTextMessage($msgdata) {
+		return array("Default" => array(
+			"id" => "",
+			"fromname" => "",
+			"from" => $msgdata["from"],
+			"subject" => $msgdata["subject"],
+			"attachments" => json_decode($msgdata["attachments"]),
+			"text" => $msgdata["message"],
+			"language" => "english",
+			"override" => true
+		));
+	}
+
+	function emailTextTranslation($msgdata, $translationdata) {
+		$retval = array();
+		foreach ($translationdata as $lang => $data) {
+			$newmsgdata = json_decode($data);
+			if ($newmsgdata->enabled)
+				$retval[$lang] = array(
+					"id" => "",
+					"from" => $msgdata["from"],
+					"fromname" => "",
+					"subject" => $msgdata["subject"],
+					"attachments" => json_decode($msgdata["attachments"]),
+					"text" => $newmsgdata->text,
+					"language" => strtolower($lang),
+					"override" => $newmsgdata->override
+				);
+		}
+		return $retval;
+	}
 	
 	function finish ($postdata) {
 		global $USER;
+		$jobtype = DBFind("JobType", "from jobtype where id=?", false, array($postdata["/start"]["jobtype"]));
+		$jobname = $postdata["/start"]["name"];
+
+		$phoneMsg = array();
+		$emailMsg = array();
+		$smsMsg = array();
+		$emailmessagelink = false;
+		$smsmessagelink = false;
 		
-		if (!isset($_SESSION['confirmedJobWizard']))
-			return;
-		$jobsettings = $_SESSION['confirmedJobWizard'];
-		unset($_SESSION['confirmedJobWizard']);
-		$schedule = $jobsettings['schedule'];
+		switch ($postdata["/start"]["package"]) {
+			//If package is Easycall
+			case "easycall":
+				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+				$emailMsg = array("Default" => array(
+					"id" => "",
+					"from" => $USER->email,
+					"fromname" => "",
+					"subject" => $postdata["/start"]["name"],
+					"attachments" => array(),
+					"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
+					"language" => "english",
+					"override" => true
+				));
+				$smsMsg = array("Default" => array(
+					"id" => false,
+					"text" => "// TODO: Put call back number to customer perhaps?",
+					"language" => "english"
+				));
+				break;
+			//Express Text
+			case "express":
+				$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
+				if ($postdata["/message/phone/text"]["translate"] == 'true')
+					$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
+				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+				if ($postdata["/message/email/text"]["translate"] == 'true')
+					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+				$smsMsg = array("Default" => array(
+					"id" => false,
+					"text" => $postdata["/message/sms/text"]["message"],
+					"language" => "english"
+				));
+				break;
+			//Personalized
+			case "personalized":
+				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+				if ($postdata["/message/email/text"]["translate"] == 'true')
+					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+				$smsMsg = array("Default" => array(
+					"id" => false,
+					"text" => $postdata["/message/sms/text"]["message"],
+					"language" => "english"
+				));
+				break;
+			//Custom
+			case "custom":
+				if (in_array('phone', $postdata["/message/pick"]["type"])) {
+					switch ($postdata["/message/select"]["phone"]) {
+						case "record":
+							$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+							break;
+						case "text":
+							if ($postdata["/message/select"]["phone"] == "text") {
+								$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
+								if ($postdata["/message/phone/text"]["translate"] == 'true')
+									$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
+							}
+							break;
+						case "pick":
+							$phoneMsg = $this->phoneRecordedMessage(array("Default" => $postdata["/message/phone/pick"]["message"]));
+							break;
+						default:
+							error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
+					}
+				}
+				if (in_array('email', $postdata["/message/pick"]["type"])) {
+					switch ($postdata["/message/select"]["email"]) {
+						case "record":
+							$emailmessagelink = true;
+							break;
+						case "text":
+							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+							if ($postdata["/message/email/text"]["translate"] == 'true')
+								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+							break;
+						case "pick":
+							$emailMsg = $this->emailSavedMessage(array("Default" => $postdata["/message/email/pick"]["message"]));
+							break;
+						default:
+							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
+					}
+				}
+				if (in_array('sms', $postdata["/message/pick"]["type"])) {
+					switch ($postdata["/message/select"]["sms"]) {
+						case "record":
+							$smsmessagelink = true;
+							break;
+						case "text":
+							$smsMsg = array("Default" => array(
+								"id" => false,
+								"text" => $postdata["/message/sms/text"]["message"],
+								"language" => "english"
+							));
+							break;
+						case "pick":
+							$smsMsg = array("Default" => array(
+								"id" => $postdata["/message/sms/pick"]["message"],
+								"text" => false,
+								"language" => "english"
+							));
+							break;
+						default:
+							error_log($postdata["/message/select"]["sms"] . " is an unknown value for ['/message/select']['sms']");
+					}
+				}
+				break;
+			
+			default:
+				error_log($postdata["/start"]["package"] . "is an unknown value for 'package'");
+		}
+		
+		$schedule = array();
+		switch ($postdata["/schedule/options"]["schedule"]) {
+			case "now":
+				$callearly = date("g:i a");
+				if (strtotime($callearly) < strtotime($USER->getCallEarly()))
+					$callearly = $USER->getCallEarly();
+				$calllate = $USER->getCallLate();
+				if (strtotime($callearly) + 3600 > strtotime($calllate))
+					 $calllate = date("g:i a", strtotime(strtotime($callearly) + 3600));
+				$schedule = array(
+					"date" => date('m/d/Y'),
+					"callearly" => date("g:i a"),
+					"calllate" => $USER->getCallLate()
+				);
+				break;
+			case "schedule":
+				$schedule = array(
+					"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
+					"callearly" => $postdata["/schedule/date"]["callearly"],
+					"calllate" => $postdata["/schedule/date"]["calllate"]
+				);
+				break;
+			case "template": 
+				$schedule = array(
+					"date" => false,
+					"callearly" => false,
+					"calllate" => false
+				);
+				break;
+			default:
+				break;
+		}
+
+		$jobsettings = array(
+			"jobtype" => $jobtype->id,
+			"jobname" => $jobname,
+			"lists" => json_decode($postdata["/list"]["listids"]),
+			"phone" => $phoneMsg,
+			"email" => $emailMsg,
+			"sms" => $smsMsg,
+			"print" => array(),
+			"emailmessagelink" => $emailmessagelink,
+			"smsmessagelink" => $smsmessagelink
+		);
 		
 		Query("BEGIN");
 		$job = Job::jobWithDefaults();
@@ -113,10 +359,10 @@ class FinishJobWizard extends WizFinish {
 		$job->scheduleid = null;
 		if ($schedule['date']) {
 			$job->startdate = date("Y-m-d", strtotime($schedule['date']));
-			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($schedule['days'] - 1) * 86400));
+			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($USER->getSetting("maxjobdays", 1) - 1) * 86400));
 		} else {
-			$job->startdate = date("Y-m-d", 86400);
-			$job->enddate = date("Y-m-d", (7 * 86400));
+			$job->startdate = date("Y-m-d");
+			$job->enddate = date("Y-m-d", strtotime("today") + (1 * 86400));
 		}
 		$job->starttime = ($schedule['callearly'])?date("H:i", strtotime($schedule['callearly'])):date("H:i", strtotime($USER->getCallEarly()));
 		$job->endtime = ($schedule['calllate'])?date("H:i", strtotime($schedule['calllate'])):date("H:i", strtotime($USER->getCallLate()));
@@ -161,7 +407,6 @@ class FinishJobWizard extends WizFinish {
 							$part->create();
 						}
 						
-						// TODO: need correct attachment values.
 						if (isset($message['attachments']) && $message['attachments']) {
 							foreach ($message['attachments'] as $cid => $details) {
 								$msgattachment = new MessageAttachment();
@@ -177,7 +422,6 @@ class FinishJobWizard extends WizFinish {
 					} else {
 						$messageid = $message['id'];
 					}
-					error_log("message $type, with id ".$messageid.", for jobid ".$job->id);
 					
 					$joblang = new JobLanguage();
 					$joblang->jobid = $job->id;
@@ -212,7 +456,6 @@ class FinishJobWizard extends WizFinish {
 	
 	function getFinishPage ($postdata) {
 		return "<h1>Job submitted</h1>";
-
 	}
 }
 
@@ -239,7 +482,7 @@ require_once("nav.inc.php");
 startWindow("");
 echo $wizard->render();
 endWindow();
-if (1) {
+if (0) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['wizard_job']);
