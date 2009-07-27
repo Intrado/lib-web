@@ -385,7 +385,9 @@ function isAllSameDigit(number){
 function ajax_table_update(containerID, uri) {
 	if (!$(containerID))
 		return;
-	$(containerID).update('<img src="img/icons/loading.gif"/>');
+	$(containerID).update('<img src="img/progressbar.gif"/>');
+	if (!uri)
+		return;
 	cachedAjaxGet(uri + '&containerID=' + containerID, function(transport) {
 		if (!$(containerID))
 			return;
@@ -396,6 +398,84 @@ function ajax_table_update(containerID, uri) {
 		}
 		$(containerID).update(data.html);
 	}, null, false); // Do not cache this request.
+}
+
+
+
+function do_ajax_listbox(checkbox, personid) {
+	// NOTE: No need to manually toggle the checkbox because the browser will do that automatically.
+	
+	if (checkbox.checked) {
+		// Add.
+		cachedAjaxGet('?ajax&addpersonid='+personid, function(transport) {
+			var data = transport.responseJSON;
+			if (!data) {
+				this.checked = false;
+				alert('Sorry, error when trying to add to list');
+				return;
+			}
+		}.bindAsEventListener(checkbox), null, false);
+	} else {
+		// Remove.
+		cachedAjaxGet('?ajax&removepersonid='+personid, function(transport) {
+			var data = transport.responseJSON;
+			if (!data) {
+				this.checked = true;
+				alert('Sorry, error when trying to remove from list');
+				return;
+			}
+		}.bindAsEventListener(checkbox), null, false);
+	}
+}
+
+
+
+
+var personTips = [];
+function make_person_tip(personid, tiptitle){
+	
+	if (personTips[personid])
+		return;
+		
+	personTips[personid] = new Tip('persontip_'+personid,
+		{
+			ajax: {
+				url:'?ajax&persontip='+personid,
+				options: {
+					onComplete:function(transport) {
+						console.info(transport);
+					}
+				}
+			},
+			
+			title : tiptitle,
+			style: "protogrey",
+			stem: "bottomLeft",
+			hook: { tip: "bottomLeft", mouse: false },
+			offset: { x: 10, y: 0 },
+			showOn: 'click',
+			hideOn: 'click',
+			closeButton: true
+		}
+	);
+}
+
+function json_input_values(inputs) {
+	var values = [];
+	for (var i = 0; i < inputs.length; i++)
+		values.push(inputs[i].getValue());
+	return values.toJSON();
+}
+
+function toggle_class_display(cssClass, showhide) {
+	console.info(showhide);
+	console.info($$('.' + cssClass).length);
+	if (showhide === undefined)
+		$$('.' + cssClass).invoke('toggle');
+	else if (showhide)
+		$$('.' + cssClass).invoke('show');
+	else
+		$$('.' + cssClass).invoke('hide');
 }
 
 function icon_button(name,icon,id) {
