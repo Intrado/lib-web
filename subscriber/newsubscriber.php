@@ -48,7 +48,7 @@ class ValUsernameUnique extends Validator {
 	function validate ($value, $args) {
 		global $CUSTOMERURL;
 		if (!isUsernameUnique($CUSTOMERURL, $value))
-			return _L("%1$s already exists, please Return to Sign In", $this->label);
+			return _L('%1$s already exists, please Return to Sign In', $this->label);
 		
 		return true;
 	}
@@ -60,7 +60,7 @@ class ValCaptcha extends Validator {
 	
 	function validate ($value, $args) {
 		if (strtolower($value) != strtolower($_SESSION['captcha']))
-			return _L("%1$s is not the correct value", $this->label);
+			return _L('%1$s is not the correct value', $this->label);
 		
 		return true;
 	}
@@ -72,7 +72,7 @@ class ValSiteCode extends Validator {
 	
 	function validate ($value, $args) {
 		if (strtolower(trim($value)) != strtolower($_SESSION['sitecode']))
-			return _L("%1$s is not the correct value", $this->label);
+			return _L('%1$s is not the correct value', $this->label);
 		
 		return true;
 	}

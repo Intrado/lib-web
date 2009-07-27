@@ -128,7 +128,7 @@ require_once("logintop.inc.php");
 			<td colspan="3">
 				<div style="font-size: 20px; font-weight: bold;"><?=_L("Phone, Email, and Text Messages")?></div>
 				<br>
-				<div style="font-size: 15px; font-weight: bold;"><?=_L("Get the latest communication from %1$s", $custname)?>.</div>
+				<div style="font-size: 15px; font-weight: bold;"><?=_L('Get the latest communication from %1$s.', $custname)?></div>
 				<br>
 				<br>
 			</td>

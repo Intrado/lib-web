@@ -16,7 +16,7 @@ class ValEmailUnique extends Validator {
 		if (0 == QuickQuery("select count(*) from email where personid=? and email=?", false, array($_SESSION['personid'], $value)) &&
 			0 == QuickQuery("select count(*) from subscriberpending where subscriberid=? and type='email' and value=?", false, array($_SESSION['subscriberid'], $value)))
 			return true;
-		return _L("%1$s is not unique.  You have already added this Contact Information.", $this->label);
+		return _L('%1$s is not unique.  You have already added this Contact Information.', $this->label);
     }
 }
 
@@ -27,7 +27,7 @@ class ValPhoneUnique extends Validator {
 		if (0 == QuickQuery("select count(*) from phone where personid=? and phone=?", false, array($_SESSION['personid'], $value)) &&
 			0 == QuickQuery("select count(*) from subscriberpending where subscriberid=? and type='phone' and value=?", false, array($_SESSION['subscriberid'], $value)))
 			return true;
-		return _L("%1$s is not unique.  You have already added this Contact Information.", $this->label);
+		return _L('%1$s is not unique.  You have already added this Contact Information.', $this->label);
     }
 }
 
@@ -38,7 +38,7 @@ class ValSmsUnique extends Validator {
 		if (0 == QuickQuery("select count(*) from sms where personid=? and sms=?", false, array($_SESSION['personid'], $value)) &&
 			0 == QuickQuery("select count(*) from subscriberpending where subscriberid=? and type='sms' and value=?", false, array($_SESSION['subscriberid'], $value)))
 			return true;
-		return _L("%1$s is not unique.  You have already added this Contact Information.", $this->label);
+		return _L('%1$s is not unique.  You have already added this Contact Information.', $this->label);
     }
 }
 
