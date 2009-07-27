@@ -72,22 +72,18 @@ class ListForm extends Form {
 					
 					<td valign=top width='70%' style='overflow:hidden; padding:0;margin:0;'>
 							<div>
-								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" ')."
-								<br style='clear:both'/>
-								<div id='buildListWindow' style='overflow:hidden; border: solid 1px rgb(200,200,200);padding:0;margin:0;display:none'>
+								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" style="display:none;margin-bottom:10px; "')."
+								<div id='buildListWindow' style='clear:both; overflow:hidden; border: solid 1px rgb(200,200,200);padding:0;margin:0;display:none'>
 									<div id='ruleWidgetContainer' style='overflow: auto'></div>
 								</div>
 							</div>
-							<hr style='border: solid 2px rgb(200,200,200);' />
-							<div>
-								".icon_button(_L('Choose an Existing List'),'arrow_turn_left', null, null, ' id="chooseListChoiceButton" ')."
-								<br style='clear:both'/>
-								<div id='chooseListWindow' style='display:none'>
+							<hr style='clear:both; border: solid 2px rgb(200,200,200); display:none' id='divider' />
+							<div style='clear:both'>
+								".icon_button(_L('Choose an Existing List'),'arrow_turn_left', null, null, ' id="chooseListChoiceButton" style="display:none" ')."
+								<div id='chooseListWindow' style='display:none; clear:both'>
 									<table><tr>
 										<td valign=top>
 											<div id='listSelectboxContainer'></div>
-											<!--".icon_button(_L('Choose This List'),'accept', null, null, ' id="chooseListButton" ')."-->
-											<!--<br style='clear:both'/>-->
 										</td>
 										<td valign=top>
 											<div id='listchooseStatus'></div>
@@ -115,7 +111,7 @@ class ListForm extends Form {
 								</thead>
 								<tbody id='listsTableBody'></tbody>
 							</table>
-							<div white-space: nowrap; padding: 2px; padding-top:10px'><b>"._L('Grand Total')."</b> <span id='listGrandTotal'  style='padding: 2px; padding-top:10px'>0</span></div>
+							<div style='white-space: nowrap; padding: 2px; padding-top:10px'><b>"._L('Grand Total')."</b> <span id='listGrandTotal'  style='padding: 2px; padding-top:10px'>0</span></div>
 						</div>
 						<div id='listRulesPreview'></div>
 					</td>
@@ -123,8 +119,7 @@ class ListForm extends Form {
 			</table>
 			
 			<!-- FORM -->
-			<br style='clear: both'/>
-			<div class='newform_container'>
+			<div class='newform_container' style='clear:both; margin-top: 10px'>
 				<!-- Validation Message -->
 				<div id='listChoose_listids_fieldarea'>
 					<img id='listChoose_listids_icon' src='img/pixel.gif'/>
@@ -145,6 +140,7 @@ class ListForm extends Form {
 			<script type='text/javascript' src='script/rulewidget.js.php'></script>
 			<script type='text/javascript' src='script/listform.js.php'></script>
 			<script type='text/javascript'>
+					
 				document.observe('dom:loaded', function() {
 					// Initiatiate Page.
 					listform_load('{$this->name}', {$formdataJSON}, {$posturlJSON}, {$ruleEditorJSON});

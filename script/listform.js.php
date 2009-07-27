@@ -149,12 +149,19 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 	ruleWidget.container.observe('RuleWidget:Ready', function() {
 		Tips.hideAll();
 		 
-		<?php
-		 	if (!$USER->authorize('createlist'))
-				echo 'return;';
-		?>
-		
+			<?
+			if (!$USER->authorize('createlist')) {
+		 		echo "
+		 			$('chooseListChoiceButton').hide();
+					$('chooseListWindow').show();
+					return;
+				";
+			}
+			?>
+			
+		$('chooseListChoiceButton').show();
 		$('buildListButton').show();
+		$('divider').show();
 		
 		$('buildListButton').observe('click', function(event) {
 			Tips.hideAll();
@@ -170,15 +177,13 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			$('listchooseTotalRemoved').update();
 			$('listchooseTotalRule').update();
 			
-			$('buildListWindow').blindDown({duration:0.2});
-			$('chooseListWindow').blindUp({duration:0.2});
+			$('buildListWindow').show();
+			$('chooseListWindow').hide();
 			$('buildListButton').hide();
 			$('chooseListChoiceButton').show();
 			
 			
 			if (!listformVars.pendingList) {
-				
-				
 				ruleWidget.clear_rules();
 				new Ajax.Request('ajaxlistform.php?type=createlist', {
 					onSuccess: function(transport) {
@@ -213,12 +218,11 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 		Tips.hideAll();
 		
 		$('chooseListChoiceButton').hide();
-		$('chooseListWindow').blindDown({duration:0.4});
+		$('chooseListWindow').show();
 		listform_hide_build_list_window();
 		var listSelectbox = $('listSelectboxContainer').down();
 		if (listSelectbox)
 			listSelectbox.selectedIndex = 0;
-		listform_refresh_guide(true);
 		listformVars.pendingList = null;
 		listform_refresh_guide();
 	});
@@ -563,7 +567,6 @@ function listform_set_rule_editor_status(addingRule) {
 }
 
 function listform_hide_build_list_window() {
-	$('buildListWindow').blindUp({duration:0.2});
+	$('buildListWindow').hide();
 	$('buildListButton').show();
 }
-

@@ -1,7 +1,6 @@
 <?
 
 class RenderedList {
-
 	var $list;
 	var $data = array();
 
@@ -10,18 +9,18 @@ class RenderedList {
 	var $language;
 
 	var $searchrules = array();
+	var $searchpeople;
 
-	var $mode = "preview"; //add,remove,totals
+	var $mode = "rules"; // possible modes: add,remove,rules,people
 	var $pageoffset = 0;
 	var $pagelimit = 100;
 	var $orderby = "";
 
 	var $hasstats = false;
-	var	$total = 0;
+	var $total = 0;
 	var $totalrule = 0;
 	var $totalremoved = 0;
 	var $totaladded = 0;
-	var $getflexfields = false;
 
 	var $pageids = array();
 	var $pageruleids = array();
@@ -37,289 +36,321 @@ class RenderedList {
 		$this->orderby =  $this->lastname . "," . $this->firstname;
 	}
 
-	function setSearch ($rules) {
+	function preparePeopleMode ($pagelimit, $pkey=false, $phone=false, $email=false, $sms=false) {
+		$this->searchpeople = array('pkey' => $pkey, 'phone' => $phone, 'email' => $email, 'sms' => $sms);
+		$this->mode = "people";
+		$this->pagelimit = $pagelimit;
+	}
+	// $rules, an array of rules; can be set to false to retrieve all contacts
+	function prepareRulesMode ($pagelimit, $rules) {
 		$this->searchrules = $rules;
-		$this->mode = "search";
+		$this->mode = "rules";
+		$this->pagelimit = $pagelimit;
 	}
 
-	function getPage ($offset, $limit, $getflexfields = false) {
+	function prepareAdditionsMode ($pagelimit) {
+		$this->mode = "add";
+		$this->pagelimit = $pagelimit;
+	}
+	
+	function prepareSkipsMode ($pagelimit) {
+		$this->mode = "remove";
+		$this->pagelimit = $pagelimit;
+	}
+
+	function getPage ($offset, $limit) {
 		$this->pageoffset = $offset;
 		$this->pagelimit = $limit;
-		$this->getflexfields = $getflexfields;
 		$this->render();
 
 		return $this->data;
 	}
 
 	//generates the data
-	function render ($getdata = true) {
-		if ($this->mode == "search" || $this->mode == 'contacts')
-			return $this->renderSearch($getdata);
-		else
-			return $this->renderList($getdata);
-	}
-
-	//handles preview,add,remove modes
-	function renderList($getdata = true) {
-		global $USER;
-
-		// if there are list rules, combine with the user rules for enrollment data integration
-		if (count($this->list->getListRules()) > 0) {
-			$allrules = array_merge($USER->rules(), $this->list->getListRules());
-			$rulesql = Rule::makeQuery($allrules, "p");
-		} else {
-			$rulesql = "and 0"; // no list rules, no persons to render
-		}
-
-		$pagesql = "limit $this->pageoffset,$this->pagelimit";
-		if ($this->pagelimit == -1)
-			$pagesql = "";
-
-		$listid = $this->list->id;
-		$orderby = $this->orderby ? "order by " . $this->orderby : "";
-
-		$pfields = "p.id";
-		$contactfields = "";
-		$sms = "";
-		$smsquery = "";
-		if(getSystemSetting("_hassms", false)){
-			$sms = "s.sms,";
-			$smsquery = " left join sms s on (s.personid = p.id and s.sequence=0) ";
-		}
-		if ($getdata) {
-			$pfields .= ", p.pkey";
-			$pfields .= ", p.$this->firstname, p.$this->lastname, p.$this->language";
-			$contactfields = ",ph.phone,
-								e.email,
-								s.sms,
-								concat(
-									coalesce(a.addr1,''), ' ',
-									coalesce(a.addr2,''), ' ',
-									coalesce(a.city,''), ' ',
-									coalesce(a.state,''), ' ',
-									coalesce(a.zip,'')
-								) as address";
-		}
-
-		//calc the stats
-		if (!$this->hasstats) {
-			$this->calcStats();
-		}
-
-
-		if ($this->mode == "preview") {
-			$modesql1 = "and le.type is null"; //don't include removed items
-			$modesql2 = "and le.type='A'";
-		}
-		if ($this->mode == "add") {
-			$modesql1 = "and 0"; //don't include any rule or removed items
-			$modesql2 = "and le.type='A'";
-		}
-		if ($this->mode == "remove") {
-			$modesql1 = "and 0"; //only get the removed items
-			$modesql2 = "and le.type = 'N'"; //and ignore adds
-		}
-
-		$query = "
-			(select ifnull(le.type,'R') as entrytype,
-			$pfields
-			$contactfields
-			from 		person p
-			left join	listentry le on
-								(p.id=le.personid and le.listid = $listid)
-			";
-		if ($getdata) {
-			$query .="
-			left join	phone ph on
-								(ph.personid=p.id and ph.sequence=0)
-			left join	email e on
-								(e.personid=p.id  and e.sequence=0)
-			left join sms s on
-								(s.personid = p.id and s.sequence=0)
-			left join	address a on
-								(a.personid=p.id)
-			";
-		}
-		$query .="
-			where not p.deleted and p.userid is null $modesql1 $rulesql)
-
-			union all
-
-			(select (le.type) as entrytype,
-			$pfields
-			$contactfields
-			from 		person p
-			left join	listentry le on
-								(le.listid = $listid and p.id=le.personid)
-			";
-		if ($getdata) {
-			$query .="
-			left join	phone ph on
-								(ph.personid=p.id and ph.sequence=0)
-			left join	email e on
-								(e.personid=p.id  and e.sequence=0)
-			left join sms s on
-								(s.personid = p.id and s.sequence=0)
-			left join	address a on
-								(a.personid=p.id)
-			";
-		}
-		$query .="
-			where not p.deleted $modesql2 )
-
-			$orderby
-			$pagesql
-			";
-
-//echo "<br>renderList ". $query;
-
-		//load page to memory
+	function render () {
 		$this->pageids = array();
 		$this->pageruleids = array();
 		$this->pageaddids = array();
 		$this->pageremoveids = array();
-		$data = array();
-		if ($result = Query($query)) {
-			while ($row = DBGetRow($result)) {
-				$data[] = $row;
-				$this->pageids[] = $row[1];
-				if ($row[0] == "R")
-					$this->pageruleids[] = $row[1];
-				else if ($row[0] == 'A')
-					$this->pageaddids[] = $row[1];
-				else {
-					$this->pageruleids[] = $row[1];
-					$this->pageremoveids[] = $row[1];
-				}
-			}
-		}
-
-		$this->data = $data;
-	}
-
-	function renderSearch ($getdata = true) {
-		global $USER;
-
-		// NOTE usersql and listsql are used separately, thus we do not combine rules to form rulesql (as in renderList above)
-		$usersql = $USER->userSQL("p");
-
-		$pagesql = "limit $this->pageoffset,$this->pagelimit";
-		if ($this->pagelimit == -1)
-			$pagesql = "";
-
-		$listid = $this->list->id;
-		$orderby = $this->orderby ? "order by " . $this->orderby : "";
-
-		$listsql = $this->list->getListRuleSQL();
-
-		//compose rules for search
-		if($this->searchrules === false)
-			$searchsql = "and 0";
-		elseif (count($this->searchrules) > 0)
-			$searchsql = Rule::makeQuery($this->searchrules, "p");
-		else
-			$searchsql = "";
-
-		//should we calc the stats?
-		if (!$this->hasstats)
-			$statssql = "SQL_CALC_FOUND_ROWS";
-		else
-			$statssql = "";
-
-		$pfields = "p.id";
-		$contactfields = "";
-		if ($getdata) {
-			$pfields .= ", p.pkey";
-			$pfields .= ", p.$this->firstname,p.$this->lastname, p.$this->language";
-
-			$contactfields = ",ph.phone,
-								e.email,
-								s.sms,
-								concat(
-									coalesce(a.addr1,''), ' ',
-									coalesce(a.addr2,''), ' ',
-									coalesce(a.city,''), ' ',
-									coalesce(a.state,''), ' ',
-									coalesce(a.zip,'')
-								) as address";
-
-			// Get ALL the flex fields when in 'contacts' mode
-			if ($this->getflexfields) {
-				$extraFields = FieldMap::getAuthorizedMapNames();
-				// Start at the 3rd index since we already got the first 2 field names directly above
-				$start = 0;
-				foreach ($extraFields as $key => $value) {
-					if ($key == $this->firstname || $key == $this->lastname || $key == $this->language) { // Ignore these since they are in the query already
-						continue;
-					}
-
-					$contactfields .= ", p.$key ";
-				}
-			}
-		}
-
-		$query = "
-			select $statssql ($listsql) as isinlist,
-			$pfields
-			$contactfields
-			from person p
-		";
-		if ($getdata) {
-			$query .="
-			left join	phone ph on
-								(ph.personid=p.id and ph.sequence=0)
-			left join	email e on
-								(e.personid=p.id  and e.sequence=0)
-			left join sms s on
-								(s.personid = p.id and s.sequence=0)
-			left join	address a on
-								(a.personid=p.id)
-			";
-		}
-		$query .="
-			where p.userid is null and not p.deleted
-			$usersql
-			$searchsql
-			$orderby
-			$pagesql
-		";
-
-//echo "<br>renderSearch ". $query;
-
-		//load page to memory
-		$this->pageids = array();
-		$this->pageruleids = array();
-		$this->pageaddids = array();
-		$this->pageremoveids = array();
-		$data = array();
-
-		$result = Query($query);
-		while ($row = DBGetRow($result)) {
-			$data[] = $row;
-			$this->pageids[] = $row[1];
-			if ($row[0])
-				$this->pageruleids[] = $row[1];
-		}
-
+		$this->data = array();
 		if (!$this->hasstats) {
-			$query = "select found_rows()";
-			$this->total = QuickQuery($query);
+			$this->total = 0;
 			$this->totalrule = 0;
 			$this->totalremoved = 0;
 			$this->totaladded = 0;
-			$this->hasstats = true;
 		}
-		//now get a list of the people in the manual list entries
-		if (count($this->pageids) > 0) {
-			$query = "select personid from listentry where listid='$listid' and type='A' and personid in (" . implode(",",$this->pageids) . ")";
-			$this->pageaddids = QuickQueryList($query);
-			$query = "select personid from listentry where listid='$listid' and type='N' and personid in (" . implode(",",$this->pageids) . ")";
-			$this->pageremoveids = QuickQueryList($query);
+		
+		if ($this->mode == "rules") {
+			$result = $this->renderSearch(false, $this->searchrules);
+			if (!empty($result) && !$this->hasstats)
+				$this->total = QuickQuery("SELECT FOUND_ROWS()");
+		} else if ($this->mode == "people") {
+			$personids = false;
+			if (!empty($this->searchpeople['pkey'])) {
+				$id = QuickQuery("SELECT id from person where not deleted and pkey=?", false, array($this->searchpeople['pkey']));
+				if ($id)
+					$personids = array($id);
+			}
+			if (!empty($this->searchpeople['phone']))
+				$personids = $this->peopleWithDestination('phone', $personids);
+			if (!empty($this->searchpeople['email']))
+				$personids = $this->peopleWithDestination('email', $personids);
+			if (!empty($this->searchpeople['sms']) && getSystemSetting('_hassms', false))
+				$personids = $this->peopleWithDestination('sms', $personids);
+			
+			if (!empty($personids))
+				$result = $this->renderSearch($personids);
+			if (!empty($result) && !$this->hasstats)
+				$this->total = QuickQuery("SELECT FOUND_ROWS()");
+		} else if ($this->mode == "add" || $this->mode == "remove") {
+			if (!$this->hasstats)
+				$this->calcStats();
+			$result = $this->renderManualEntries();
 		}
-		$this->data = $data;
+			
+		if (empty($result))
+			return;
+		
+		while ($row = DBGetRow($result)) {
+			$this->data[] = $row;
+			$this->pageids[] = $row[1];
+			
+			if ($row[0] == "R")
+				$this->pageruleids[] = $row[1];
+			else if ($row[0] == 'A')
+				$this->pageaddids[] = $row[1];
+			else {
+				$this->pageruleids[] = $row[1];
+				$this->pageremoveids[] = $row[1];
+			}
+		}
+		$this->hasstats = true;
+		
+		
+		// Get a list of the people in the manual list entries, necessary for fmt_checkbox to determine if people are in the list.
+		if (in_array($this->mode, array("rules","people")) && count($this->pageids) > 0) {
+			if (!isset($_SESSION['listsearchpreview'])) {
+				$peopleSQL = " AND personid IN (" . implode(',', $this->pageids) . ")";
+				$additionsSQL = "SELECT personid FROM listentry WHERE listid=? AND type='A' $peopleSQL";
+				$skipsSQL = "SELECT personid FROM listentry WHERE listid=? AND type='N' $peopleSQL";
+				$this->pageaddids = QuickQueryList($additionsSQL, false, false, array($this->list->id));
+				$this->pageremoveids = QuickQueryList($skipsSQL, false, false, array($this->list->id));
+			}
+			// DESTINATION DATA
+			// Select static value "ordering" in order to order results as phone, email, sms
+			$peopleCSV = implode(",", $this->pageids);
+			$destinationQuery =
+				"(select personid as pid,
+					phone as destination,
+					sequence as sequence,
+					'phone' as type,
+					'1' as ordering
+					from phone ph
+					where
+					personid in ($peopleCSV)
+					)
+				union
+				(select personid as pid2,
+					email as destination,
+					sequence as sequence,
+					'email' as type,
+					'2' as ordering
+					from email
+					where
+					personid in ($peopleCSV)
+					)";
+			if (getSystemSetting("_hassms", false)) {
+				$destinationQuery .= " union
+					(select personid as pid3,
+						sms as destination,
+						sequence as sequence,
+						'sms' as type,
+						'3' as ordering
+						from sms
+						where
+						personid in ($peopleCSV)
+						) ";
+			}
+			$result = Query($destinationQuery . " order by pid, ordering, sequence");
+			$destinationData = array();
+			while ($row = DBGetRow($result)) {
+				$personid = $row[0];
+				if (!isset($destinationData[$personid]))
+					$destinationData[$personid] = array();
+				$destinationData[$personid][] = $row;
+			}
+			
+			//error_log(json_encode($destinationData));
+			//foreach ($destinationData as $thing)
+			//	error_log(json_encode($thing));
+			
+			// Reference from list.inc.php
+			// Reference: $titles[5] = "Address";
+			// Reference: $titles[6] = "Sequence";
+			// Reference: $titles[7] = "Destination";
+			// Use the placeholders from $this->generateCommonFields()
+			// destination index 1 is destination value
+			// destination index 2 is sequence
+			// $destination index 3 i s it's type: phone, email, sms.
+			$fullData = array();
+			foreach ($this->data as $person) {
+				$id = $person[1];
+				$allBlank = true;
+				if (isset($destinationData[$id])) {
+					//error_log("Destination for Person $id >> ");//" . json_encode($destinationData[$id]));
+					foreach($destinationData[$id] as $destination) {
+						//error_log('Person ' . $id . '>>'.json_encode($destination));
+						if (!empty($destination[1])) {
+							$person[6] = $destination[2];
+							$person[7] = $destination[1];
+							$person[8] = $destination[3];
+							$fullData[] = $person;
+							$allBlank = false;
+						}
+					}
+				}
+				if ($allBlank) {
+					$person[6] = _L("--None--");
+					$person[7] = "";
+					$person[8] = "";
+					$fullData[] = $person;
+				}
+			}
+			$this->data = $fullData;
+		}
+		$this->hasstats = true;
 	}
 
+	// @param $type: either 'phone', 'email', or 'sms'.
+	// @param $specificPeople: limit search to just these people, an array of person IDs.
+	function peopleWithDestination($type, $specificPeople = false) {
+		$peopleSQL = "";
+		if (is_array($specificPeople)) {
+			if (empty($specificPeople))
+				return array();
+			$peopleSQL = "AND personid IN (" . implode(",", $specificPeople) . ")";
+		}
+		$search = $this->searchpeople[$type];
+		return QuickQueryList("SELECT personid from $type where $type like ? $peopleSQL group by personid", false, false, array("%$search%"));
+	}
 
+		
+	function generateCommonFieldsSQL() {
+		$fields = FieldMap::getOptionalAuthorizedFieldMapsLike('f') + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
+		$fieldnumsAliased = array();
+		foreach ($fields as $field) {
+			if ($field->fieldnum[0] == 'f')
+				$fieldnumsAliased[] = "p.$field->fieldnum";
+			else {
+				$i = substr($field->fieldnum, 1) + 0;
+				$fieldnumsAliased[] = "(select group_concat(value separator ', ') from groupdata where fieldnum=$i and personid=p.id) as $field->fieldnum";
+			}
+		}
+		$fieldsSQL = implode(',', $fieldnumsAliased);
+		
+		// NOTE: sequence and destination are placeholders to be filled when querying for destination data, which is in $this->render().
+		return "
+			p.id, pkey, $this->firstname, $this->lastname,
+			concat(
+				coalesce(a.addr1,''), ' ',
+				coalesce(a.addr2,''), ' ',
+				coalesce(a.city,''), ' ',
+				coalesce(a.state,''), ' ',
+				coalesce(a.zip,'')
+			) as address,
+			0 as sequence,
+			0 as destination,
+			0 as destinationtype,
+			$fieldsSQL
+		";
+	}
+	
+	//handles add,remove modes
+	function renderManualEntries() {
+		global $USER;
+		$orderSQL = $this->orderby ? "order by " . $this->orderby : "";
+		$limitSQL = $this->pagelimit >= 0 ? "limit $this->pageoffset,$this->pagelimit" : "";
+		$leTypeSQL = $this->mode == "add" ? "AND le.type='A'" : "AND le.type='N'";
+
+		return Query("SELECT (le.type) AS entrytype,
+				p.id, pkey, $this->firstname, $this->lastname, $this->language
+			FROM person p
+			LEFT JOIN listentry le ON (le.listid=? AND p.id=le.personid)
+			WHERE
+				NOT p.deleted
+				$leTypeSQL
+			$orderSQL
+			$limitSQL
+		", false, array($this->list->id));
+	}
+
+	function renderSearch($specificPeople = false, $searchRules = false) {
+		global $USER;
+		global $list;
+		
+		if (is_array($specificPeople) && empty($specificPeople))
+			return false;
+		
+		$listrulesSQL = $list->getListRuleSQL();
+		$userDataViewRestrictionsSQL = $USER->userSQL("p");
+		$commonfieldsSQL = $this->generateCommonFieldsSQL();
+		$addressJoinSQL = "LEFT JOIN address a ON (a.personid = p.id)";
+		$searchRulesSQL = $searchRules ? Rule::makeQuery($searchRules, "p") : "";
+		$peopleSQL = is_array($specificPeople) ? "AND p.id IN (" . implode(",", $specificPeople) . ")" : "";
+		$orderSQL = $this->orderby ? "order by " . $this->orderby : "";
+	
+		$limitSQL = $this->pagelimit >= 0 ? "limit $this->pageoffset,$this->pagelimit" : "";
+	
+		if (isset($_SESSION['listsearchpreview'])) {
+			$leJoinSQL = "LEFT JOIN listentry le ON (le.listid=? AND p.id = le.personid)";
+			// Performs union between list rules and list additions.
+			return Query("
+					(SELECT SQL_CALC_FOUND_ROWS IFNULL(le.type,'R') AS entrytype,
+						$commonfieldsSQL
+					FROM person p
+						$leJoinSQL
+						$addressJoinSQL
+					WHERE
+						NOT p.deleted
+						AND p.userid IS NULL
+						AND le.type IS NULL
+						$userDataViewRestrictionsSQL
+						AND $listrulesSQL
+						$searchRulesSQL
+						$peopleSQL)
+				UNION ALL
+					(SELECT (le.type) as entrytype,
+						$commonfieldsSQL
+					FROM person p
+						$leJoinSQL
+						$addressJoinSQL
+					WHERE
+						NOT p.deleted
+						AND le.type='A'
+						$searchRulesSQL
+						$peopleSQL)
+				$orderSQL
+				$limitSQL
+			", false, array($this->list->id, $this->list->id));
+		} else {
+			error_log('DOING SEARCH');
+			return Query("
+				SELECT SQL_CALC_FOUND_ROWS ($listrulesSQL) as isinlist,
+					$commonfieldsSQL
+				FROM person p
+					$addressJoinSQL
+				WHERE
+					p.userid IS null
+					AND NOT p.deleted
+					$userDataViewRestrictionsSQL
+					$searchRulesSQL
+					$peopleSQL
+				$orderSQL
+				$limitSQL
+			");
+		}
+	}
+	
 	function calcStats () {
 		global $USER;
 
@@ -344,28 +375,21 @@ class RenderedList {
 
 		$this->hasstats = true;
 	}
-
+	
 	function countEffectiveRule ($rulesql) {
-		$query = "select count(*)
-				from person p
-				left join listentry le on (le.personid=p.id and le.listid = " . $this->list->id . ")
-				where le.type is null and p.userid is null and not p.deleted $rulesql
-		";
-//echo "<br>count ".$query;
-		return QuickQuery($query);
+		$query = "select count(*) from person p left join listentry le on (le.personid=p.id and le.listid=?) where le.type is null and p.userid is null and not p.deleted $rulesql";
+		return QuickQuery($query, false, array($this->list->id));
 	}
-
+	
 	function countRemoved () {
-		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where le.type='N' and le.listid = " . $this->list->id;
-		return QuickQuery($query);
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where le.type='N' and le.listid = ?";
+		return QuickQuery($query, false, array($this->list->id));
 	}
 
 	function countAdded () {
-		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid and not p.deleted) where  le.type='A' and le.listid = " . $this->list->id;
-		return QuickQuery($query);
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid and not p.deleted) where  le.type='A' and le.listid = ?";
+		return QuickQuery($query, false, array($this->list->id));
 	}
-
-
 }
 
 ?>
