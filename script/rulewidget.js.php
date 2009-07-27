@@ -399,7 +399,8 @@ var RuleEditor = Class.create({
 					this.add_multicheckbox_toolbar(container);
 					var boxes = container.select('input');
 					if (boxes.length == 1) {
-						boxes[0].checked = true;
+						boxes[0].checked = true; // Does not work in Internet Explorer.
+						boxes[0].setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
 					} else {
 						boxes.each(function(checkbox) {
 							checkbox.checked = false;
