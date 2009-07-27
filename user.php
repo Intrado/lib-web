@@ -14,7 +14,7 @@ require_once("obj/Phone.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
-require_once("obj/FormRuleWidget.obj.php");
+require_once("obj/FormRuleWidget.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
