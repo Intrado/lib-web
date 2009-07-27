@@ -30,6 +30,8 @@ class TextAreaPhone extends FormItem {
 						popup(\'previewmessage.php?text=\' + encodedtext + \'&language='.urlencode($this->args['language']).'&gender=\'+ gender, 400, 400);
 					}
 				});
+				
+				// TODO: Make this less crummy
 				$("'.$n.'-textarea").observe("change", '.$n.'_storedata);
 				$("'.$n.'-textarea").observe("blur", '.$n.'_storedata);
 				$("'.$n.'-textarea").observe("keyup", '.$n.'_storedata);
@@ -71,7 +73,7 @@ class CallMe extends FormItem {
 		if (isset($this->args['language']) && $this->args['language'])
 			$language = $this->args['language'];
 		else
-			$language = array("English (Default)");
+			$language = array();
 		
 		$nophone = _L("Phone Number");
 		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
@@ -123,18 +125,19 @@ class CallMe extends FormItem {
 					).load();
 					easycallRecordings++;
 				});
-				
-				$("'.$n.'_select").observe("change", function (event) {
-					new Easycall(
-						"'.$this->form->name.'",
-						"'.$n.'",
-						$("'.$n.'_select").value,
-						"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-						"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
-						"'.$defaultphone.'",
-						"'.$nophone.'"
-					).setupRecord();
-				});
+				if ($("'.$n.'_select")) {
+					$("'.$n.'_select").observe("change", function (event) {
+						new Easycall(
+							"'.$this->form->name.'",
+							"'.$n.'",
+							$("'.$n.'_select").value,
+							"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
+							"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+							"'.$defaultphone.'",
+							"'.$nophone.'"
+						).setupRecord();
+					});
+				}
 			</script>';
 		return $str;
 	}
@@ -286,7 +289,7 @@ class JobWiz_start extends WizStep {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValJobName"),
-				array("ValLength","max" => 50)
+				array("ValLength","max" => 30)
 			),
 			"control" => array("TextField","maxlength" => 50, "size" => 50),
 			"helpstep" => 1
@@ -302,8 +305,9 @@ class JobWiz_start extends WizStep {
 			"helpstep" => 2
 		);
 		
-		$package = array(
-			'easycall' => '
+		$package = array();
+		if ($USER->authorize("starteasy"))
+			$package['easycall'] = '
 				<table align="left">
 					<tr>
 						<td align="center" width="70px"><img src="img/largeicons/mic.jpg"/><div>'.escapehtml(_L('Record')).'</div></td>
@@ -314,44 +318,43 @@ class JobWiz_start extends WizStep {
 							</div>
 						</td>
 					</tr>
-				</table>',
-			'express' => '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/writescript.jpg"/><div>'.escapehtml(_L('Write')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type, Phone, Email and Text Message / Text-To-Speech')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>',
-			'personalized' => '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/micwrite.jpg"/><div>'.escapehtml(_L('Record & Write')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type Email, and Text Messages with Automatic Translation')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>',
-			'custom' => '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/tools.jpg"/><div>'.escapehtml(_L('Customize')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Select combination of message types')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>'
-		);
+				</table>';
+		$package['express'] = '
+			<table align="left">
+				<tr>
+					<td align="center" width="70px"><img src="img/largeicons/writescript.jpg"/><div>'.escapehtml(_L('Write')).'</div></td>
+					<td align="left" valign="center">
+						<div>
+							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type, Phone, Email and Text Message / Text-To-Speech')).'</div>
+							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
+						</div>
+					</td>
+				</tr>
+			</table>';
+		$package['personalized'] = '
+			<table align="left">
+				<tr>
+					<td align="center" width="70px"><img src="img/largeicons/micwrite.jpg"/><div>'.escapehtml(_L('Record & Write')).'</div></td>
+					<td align="left" valign="center">
+						<div>
+							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message')).'</div>
+							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type Email, and Text Messages with Automatic Translation')).'</div>
+						</div>
+					</td>
+				</tr>
+			</table>';
+		$package['custom'] = '
+			<table align="left">
+				<tr>
+					<td align="center" width="70px"><img src="img/largeicons/tools.jpg"/><div>'.escapehtml(_L('Customize')).'</div></td>
+					<td align="left" valign="center">
+						<div>
+							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Select combination of message types')).'</div>
+							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
+						</div>
+					</td>
+				</tr>
+			</table>';
 		$formdata["package"] = array(
 			"label" => _L("Notification Method"),
 			"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
@@ -1125,6 +1128,25 @@ class JobWiz_scheduleOptions extends WizStep {
 		global $USER;
 		global $ACCESS;
 		// Form Fields.
+		$callearly = date("g:i a");
+		$accessCallearly = $ACCESS->getValue("callearly");
+		if (!$accessCallearly)
+			$accessCallearly = "12:00 am";
+		$calllate = $USER->getCallLate();
+		if ((strtotime($callearly) + 3600) > strtotime($calllate))
+			$calllate = date("g:i a", strtotime($callearly) + 3600);
+		$accessCalllate = $ACCESS->getValue("calllate");
+		if (!$accessCalllate)
+			$accessCalllate = "11:59 pm";
+		if (strtotime($callearly) + 3600 > strtotime($calllate))
+			$calllate = date("g:i a", strtotime(strtotime($callearly) + 3600));
+
+		$menu = array();
+		if ((strtotime($callearly) >= strtotime($accessCallearly)) && (strtotime($calllate) <= strtotime($accessCalllate)))
+			$menu["now"] = _L("Now");
+		$menu["schedule"] = _L("Schedule and Send");
+		$menu["template"] = _L("Save for Later");
+		
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Select when to send this message."));
 		$formdata["schedule"] = array(
@@ -1134,10 +1156,7 @@ class JobWiz_scheduleOptions extends WizStep {
 			"validators" => array(
 				array("ValRequired")
 			),
-			"control" => array("RadioButton","values"=>array(
-				"schedule"=>_L("Schedule and Send"),
-				"template"=>_L("Save for Later")
-			)),
+			"control" => array("RadioButton","values"=>$menu),
 			"helpstep" => 1
 		);
 		return new Form("scheduleOptions",$formdata,$helpsteps);
@@ -1150,6 +1169,7 @@ class JobWiz_scheduleDate extends WizStep {
 		global $ACCESS;
 		// Form Fields.
 		$formdata = array($this->title);
+		// TODO: Validator based on translation information. Don't allow schedule more than 7 days out on translated messages.
 		if ($postdata['/schedule/options']['schedule'] == "schedule") {
 			$helpsteps = array(_L("Choose a date for this notification to be delivered."));
 			$formdata["date"] = array(
@@ -1163,24 +1183,7 @@ class JobWiz_scheduleDate extends WizStep {
 		}  else {
 			$helpsteps = array();
 		}
-		// Only for phone calls
-		if ((isset($postdata['/start']['package']) && $postdata['/start']['package'] == "easycall") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "express") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "personalized") ||
-			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]))
-		) {
-			$maxjobdays = $ACCESS->getValue("maxjobdays");
-			$helpsteps[] = _L("The number of days your job will run for if it is unable to complete before the end of it's delivery window.");
-			$formdata["days"] = array(
-				"label" => _L("Days to run"),
-				"fieldhelp" => ("Number of total days this notification may run for."),
-				"value" => $USER->getDefaultAccessPref("maxjobdays", 1),
-				"validators" => array(),
-				"control" => array("SelectMenu", "values" => array_combine(range(1,$maxjobdays),range(1,$maxjobdays))),
-				"helpstep" => 2
-			);
-		}
-		
+		// TODO: Validators to make sure the call window is at least one hour
 		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
 		$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 		$formdata["callearly"] = array(
@@ -1209,7 +1212,7 @@ class JobWiz_scheduleDate extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		if (isset($postdata['/schedule/options']['schedule']) && 
-			$postdata['/schedule/options']['schedule'] !== "template"
+			$postdata['/schedule/options']['schedule'] == "schedule"
 		) {
 			return true;
 		} else {
@@ -1219,378 +1222,37 @@ class JobWiz_scheduleDate extends WizStep {
 }
 
 class JobWiz_submitConfirm extends WizStep {
-	function phoneRecordedMessage($msgdata) {
-		$retval = array();
-		foreach ($msgdata as $lang => $data)
-			$retval[$lang] = array(
-				"id" => $data,
-				"text" => "",
-				"gender" => "",
-				"language" => ($lang == "English (Default)")?"english":strtolower($lang),
-				"override" => true
-			);
-		return $retval;
-	}
-	
-	function phoneTextMessage($msgdata) {
-		return array("English (Default)" => array(
-			"id" => "",
-			"text" => $msgdata->text,
-			"gender" => $msgdata->gender,
-			"language" => 'english',
-			"override" => true
-		));
-	}
-	
-	function phoneTextTranslation($msgdata) {
-		$retval = array();
-		foreach ($msgdata as $lang => $data) {
-			$newmsgdata = json_decode($data);
-			if ($newmsgdata->enabled)
-				$retval[$lang] = array(
-					"id" => "",
-					"text" => $newmsgdata->text,
-					"gender" => $newmsgdata->gender,
-					"language" => strtolower($lang),
-					"override" => $newmsgdata->override
-				);
-		}
-		return $retval;
-	}
-	
-	function emailSavedMessage($msgdata) {
-		$retval = array();
-		foreach ($msgdata as $lang => $data)
-			$retval[$lang] = array(
-				"id" => $data,
-				"from" => "",
-				"fromname" => "",
-				"subject" => "",
-				"attachments" => "",
-				"text" => "",
-				"language" => ($lang == "English (Default)")?"english":strtolower($lang),
-				"override" => true
-			);
-		return $retval;
-	}
 
-	function emailTextMessage($msgdata) {
-		return array("English (Default)" => array(
-			"id" => "",
-			"fromname" => "",
-			"from" => $msgdata["from"],
-			"subject" => $msgdata["subject"],
-			"attachments" => json_decode($msgdata["attachments"]),
-			"text" => $msgdata["message"],
-			"language" => "english",
-			"override" => true
-		));
-	}
-
-	function emailTextTranslation($msgdata, $translationdata) {
-		$retval = array();
-		foreach ($translationdata as $lang => $data) {
-			$newmsgdata = json_decode($data);
-			if ($newmsgdata->enabled)
-				$retval[$lang] = array(
-					"id" => "",
-					"from" => $msgdata["from"],
-					"fromname" => "",
-					"subject" => $msgdata["subject"],
-					"attachments" => json_decode($msgdata["attachments"]),
-					"text" => $newmsgdata->text,
-					"language" => strtolower($lang),
-					"override" => $newmsgdata->override
-				);
-		}
-		return $retval;
-	}
 	
 	function getForm($postdata, $curstep) {
-		global $USER;
-		$jobtype = DBFind("JobType", "from jobtype where id=?", false, array($postdata["/start"]["jobtype"]));
-		$jobname = $postdata["/start"]["name"];
-
-		$phoneMsg = array();
-		$emailMsg = array();
-		$smsMsg = array();
-		$emailmessagelink = false;
-		$smsmessagelink = false;
-		
-		switch ($postdata["/start"]["package"]) {
-			//If package is Easycall
-			case "easycall":
-				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-				$emailMsg = array("English (Default)" => array(
-					"id" => "",
-					"from" => $USER->email,
-					"fromname" => "",
-					"subject" => $postdata["/start"]["name"],
-					"attachments" => array(),
-					"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
-					"language" => "english",
-					"override" => true
-				));
-				$smsMsg = array("Default" => array(
-					"id" => false,
-					"text" => "// TODO: Put call back number to customer perhaps?",
-					"language" => "english"
-				));
-				break;
-			//Express Text
-			case "express":
-				$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-				if ($postdata["/message/phone/text"]["translate"] == 'true')
-					$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
-				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-				if ($postdata["/message/email/text"]["translate"] == 'true')
-					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-				$smsMsg = array("Default" => array(
-					"id" => false,
-					"text" => $postdata["/message/sms/text"]["message"],
-					"language" => "english"
-				));
-				break;
-			//Personalized
-			case "personalized":
-				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-				if ($postdata["/message/email/text"]["translate"] == 'true')
-					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-				$smsMsg = array("Default" => array(
-					"id" => false,
-					"text" => $postdata["/message/sms/text"]["message"],
-					"language" => "english"
-				));
-				break;
-			//Custom
-			case "custom":
-				if (in_array('phone', $postdata["/message/pick"]["type"])) {
-					switch ($postdata["/message/select"]["phone"]) {
-						case "record":
-							$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-							break;
-						case "text":
-							if ($postdata["/message/select"]["phone"] == "text") {
-								$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-								if ($postdata["/message/phone/text"]["translate"] == 'true')
-									$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
-							}
-							break;
-						case "pick":
-							$phoneMsg = $this->phoneRecordedMessage(array("English (Default)" => $postdata["/message/phone/pick"]["message"]));
-							break;
-						default:
-							error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
-					}
-				}
-				if (in_array('email', $postdata["/message/pick"]["type"])) {
-					switch ($postdata["/message/select"]["email"]) {
-						case "record":
-							$emailmessagelink = true;
-							break;
-						case "text":
-							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-							if ($postdata["/message/email/text"]["translate"] == 'true')
-								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-							break;
-						case "pick":
-							$emailMsg = $this->emailSavedMessage(array("English (Default)" => $postdata["/message/email/pick"]["message"]));
-							break;
-						default:
-							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
-					}
-				}
-				if (in_array('sms', $postdata["/message/pick"]["type"])) {
-					switch ($postdata["/message/select"]["sms"]) {
-						case "record":
-							$smsmessagelink = true;
-							break;
-						case "text":
-							$smsMsg = array("Default" => array(
-								"id" => false,
-								"text" => $postdata["/message/sms/text"]["message"],
-								"language" => "english"
-							));
-							break;
-						case "pick":
-							$smsMsg = array("Default" => array(
-								"id" => $postdata["/message/sms/pick"]["message"],
-								"text" => false,
-								"language" => "english"
-							));
-							break;
-						default:
-							error_log($postdata["/message/select"]["sms"] . " is an unknown value for ['/message/select']['sms']");
-					}
-				}
-				break;
-			
-			default:
-				error_log($postdata["/start"]["package"] . "is an unknown value for 'package'");
-		}
-		
-		$schedule = array();
-		switch ($postdata["/schedule/options"]["schedule"]) {
-			case "schedule":
-				$schedule = array(
-					"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
-					"callearly" => $postdata["/schedule/date"]["callearly"],
-					"calllate" => $postdata["/schedule/date"]["calllate"],
-					"days" => isset($postdata["/schedule/date"]["days"])?$postdata["/schedule/date"]["days"]:false
-				);
-				break;
-			case "template": 
-				$schedule = array(
-					"date" => false,
-					"callearly" => false,
-					"calllate" => false,
-					"days" => false
-				);
-				break;
-			default:
-				break;
-		}
-
-		$formdata = array($this->title);
-		
-		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr class="listHeader" align="left"><th width="50%">'._L("Job Name").'</th><th width="50%">'._L("Type").'</th></tr>
-			<tr><td>
-				<div style="font-size: large"><img src="img/icons/comment.gif"/>&nbsp;'.$jobname.'</div>
-			</td>
-			<td>
-				<div id="jobtype"><img src="img/icons/cog.gif"/>&nbsp;'.$jobtype->name.'</div>
-			</td></tr>
-			</table>
-			<script>
-				var hover = {};
-				hover["jobtype"] = "'.$jobtype->info.'";
-				form_do_hover(hover);
-			</script>
-		';
-		
-		$formdata["jobtype"] = array(
-			"label" => _L('Job Type'),
-			"control" => array("FormHtml", "html" => $html),
-			"helpstep" => 1,
-		);
-
 		$lists = json_decode($postdata["/list"]["listids"]);
 		$calctotal = 0;
-		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr class="listHeader" align="left"><th width="50%">'._L("List Name").'</th><th width="50%">'._L("People").'</th></tr>
-		';
-		
 		foreach ($lists as $id) {
 			$list = new PeopleList($id+0);
 			$renderedlist = new RenderedList($list);
 			$renderedlist->calcStats();
 			$calctotal = $calctotal + $renderedlist->total;
-			$html .='<tr><td><img src="img/icons/group_add.gif"/>&nbsp;'.$list->name.'</td><td>'.$renderedlist->total.'</td></tr>
-			';
 		}
-		$html .='<tr><td style="border-top: 2px solid gray; font-weight:900"><img src="img/icons/group_go.gif"/>&nbsp;'._L('Total').'</td><td style="border-top: 2px solid gray; font-weight:900">'.$calctotal.'</td></tr>
-			</table>
-		';
-		$formdata["list"] = array(
-			"label" => _L('List'),
+		if ($postdata['/schedule/options']['schedule'] == 'template')
+			$html = '<div style="font-size: medium">'._L('You are about to save a notification. If submitted now it would reach %1$s people useing %2$s list(s). This total may change if you sumit the job at a later date.', $calctotal, count($lists)).'</div>';
+		else
+			$html = '<div style="font-size: medium">'._L('You are about to send a notification to %1$s people useing %2$s list(s).', $calctotal, count($lists)).'</div>';
+		$formdata = array($this->title);
+		$formdata["jobinfo"] = array(
+			"label" => _L("Job Info"),
 			"control" => array("FormHtml", "html" => $html),
-			"helpstep" => 1,
+			"helpstep" => 1
 		);
-		
-		// Message Preview
-		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr class="listHeader" align="left"><th colspan=2>'._L("Message Languages").'</th></tr>
-		';
-		// Phone Message Preview
-		if ($phoneMsg) {
-			$html .= '<tr><td width="10%"><img src="img/icons/group.gif"/>&nbsp;'._L("Phone").'</td><td>
-			';
-			foreach ($phoneMsg as $label => $data)
-				if ($data['id'])
-					$html .= icon_button($label, "play", "popup('previewmessage.php?id=".$data['id']."', 400, 500)");
-				else
-					$html .= icon_button($label, "play", "popup('previewmessage.php?language=".$data['language']."&gender=".$data['gender']."&text=".$data['text']."', 400, 500)");
-			$html .= '
-				</td></tr>
-			';
-		}
-		// Email Message Preview
-		if ($emailMsg) {
-			$html .= '<tr><td><img src="img/icons/email.gif"/>&nbsp;'._L("Email").'</td><td>
-			';
-			$langsText = '';
-			foreach ($emailMsg as $label => $data) {
-				if ($data['id'])
-					$html .= icon_button($label, "email", "popup('previewmessage.php?close=1&id=".$data['id']."', 600, 500)");
-				else
-					$langsText .= $label . ", ";
-			}
-			if ($langsText)
-				$langsText = substr($langsText, 0, -2);
-			$html .= $langsText. '
-				</td></tr>
-			';
-		}
-		// SMS Message Preview
-		if ($smsMsg) {
-			$html .= '<tr><td><img src="img/icons/phone.gif"/>&nbsp;'._L("Text").'</td><td>
-			';
-			$langsText = '';
-			foreach ($smsMsg as $label => $data) {
-				if ($data['id'])
-					$html .= icon_button($label, "phone", "popup('previewmessage.php?close=1&id=".$data['id']."', 600, 500)");
-				else
-					$langsText .= $label . ", ";
-			}
-			if ($langsText)
-				$langsText = substr($langsText, 0, -2);
-			$html .= $langsText. '
-				</td></tr>
-			';
-		}
-		$html .= '</table>
-		';
-		$formdata["message"] = array(
-			"label" => _L('Message'),
-			"control" => array("FormHtml", "html" => $html),
-			"helpstep" => 1,
-		);
-		
-		$html = '<table style="border: 1px solid gray; width: 100%">
-			<tr class="listHeader" align="left"><th width="33%">'._L("Start Date").'</th><th width="33%">'._L("Delivery Window").'</th><th width="33%">'._L("Days to Run").'</th></tr>
-			<tr><td><img src="img/icons/calendar.gif"/>&nbsp;'. ($schedule["date"]?$schedule["date"]:_L('Not Scheduled')). '</td><td><img src="img/icons/clock.gif"/>&nbsp;'. $schedule["callearly"]. ' -- '. $schedule["calllate"]. '</td><td><img src="img/icons/calendar_add.gif"/>&nbsp;'. ($schedule["days"]?$schedule["days"]:_L('N/A')). '</td></tr>
-			</table>
-		';
-		$formdata["schedule"] = array(
-			"label" => _L('Schedule'),
-			"control" => array("FormHtml", "html" => $html),
-			"helpstep" => 1,
-		);
-		
-		$formdata["note"] = array(
-			"label" => _L('Note'),
-			"control" => array("FormHtml", "html" => '<div style="font-size: medium">'._L('Clicking Next will submit this job and schedule your notification to begin.').'</div>'),
-			"helpstep" => 1,
+		$formdata["jobconfirm"] = array(
+			"label" => _L("Confirm"),
+			"value" => "",
+			"validators" => array(
+				array("ValRequired")
+			),
+			"control" => array("CheckBox"),
+			"helpstep" => 1
 		);
 
-		if (isset($_SESSION['confirmedJobWizard']))
-			unset($_SESSION['confirmedJobWizard']);
-		
-		$_SESSION['confirmedJobWizard'] = array(
-			"jobtype" => $jobtype->id,
-			"jobname" => $jobname,
-			"lists" => $lists,
-			"phone" => $phoneMsg,
-			"email" => $emailMsg,
-			"sms" => $smsMsg,
-			"print" => array(),
-			"emailmessagelink" => $emailmessagelink,
-			"smsmessagelink" => $smsmessagelink,
-			"schedule" => $schedule
-		);
-		
 		return new Form("confirm",$formdata,array());
 	}
 }
