@@ -132,7 +132,7 @@ class ListForm extends Form {
 				</div>
 				<form class='newform' id='{$this->name}' name='{$this->name}' method='POST' action='{$posturl}'>
 					".implode('', $this->buttons)."
-					<input name='formsnum_{$this->name}' type='hidden' value='{$this->serialnum}'/>
+					<input name='{$this->name}-formsnum' type='hidden' value='{$this->serialnum}'/>
 					<input id='{$listidsName}' name='{$listidsName}' type='hidden' value='{$this->formdata['listids']['value']}'/>
 				</form>
 			</div>
