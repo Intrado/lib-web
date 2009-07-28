@@ -31,34 +31,28 @@ class TextAreaPhone extends FormItem {
 					}
 				});
 				
-				// TODO: Make this less crummy
-				$("'.$n.'-textarea").observe("change", '.$n.'_storedata);
-				$("'.$n.'-textarea").observe("blur", '.$n.'_storedata);
-				$("'.$n.'-textarea").observe("keyup", '.$n.'_storedata);
-				$("'.$n.'-textarea").observe("focus", '.$n.'_storedata);
-				$("'.$n.'-textarea").observe("click", '.$n.'_storedata);
-				$("'.$n.'-female").observe("click", '.$n.'_storedata);
-				$("'.$n.'-male").observe("click", '.$n.'_storedata);
+				$("'.$n.'-textarea").observe("change", textAreaPhone_storedata.curry("'.$n.'"));
+				$("'.$n.'-textarea").observe("blur", textAreaPhone_storedata.curry("'.$n.'"));
+				$("'.$n.'-textarea").observe("keyup", textAreaPhone_storedata.curry("'.$n.'"));
+				$("'.$n.'-textarea").observe("focus", textAreaPhone_storedata.curry("'.$n.'"));
+				$("'.$n.'-textarea").observe("click", textAreaPhone_storedata.curry("'.$n.'"));
+				$("'.$n.'-female").observe("click", textAreaPhone_storedata.curry("'.$n.'"));
+				$("'.$n.'-male").observe("click", textAreaPhone_storedata.curry("'.$n.'"));
 				
-				function '.$n.'_storedata(event) {
+				var textAreaPhone_keyupTimer = null;
+				function textAreaPhone_storedata(formitem, event) {
 					var form = event.findElement("form");
-					var formvars = document.formvars[form.name];
-					var e = event.element();
-					var formitem = $("'.$n.'");
-					if (formvars.keyuptimer) {
-						if (formvars.keyupelement == e)
-							window.clearTimeout(formvars.keyuptimer);
+					if (textAreaPhone_keyupTimer) {
+						window.clearTimeout(textAreaPhone_keyupTimer);
 					}
-					formvars.keyupelement = e;
-					formvars.keyuptimer = window.setTimeout(function () {
-							var val = formitem.value.evalJSON();
-							val.text = $("'.$n.'-textarea").value;
-							val.gender = ($("'.$n.'-female").checked?"female":"male");
-							formitem.value = Object.toJSON(val);
-							form_do_validation(form, formitem);
-							formvars.keyuptimer = null;
+					textAreaPhone_keyupTimer = window.setTimeout(function () {
+							var val = $(formitem).value.evalJSON();
+							val.text = $(formitem+"-textarea").value;
+							val.gender = ($(formitem+"-female").checked?"female":"male");
+							$(formitem).value = Object.toJSON(val);
+							form_do_validation(form, $(formitem));
 						},
-						event.type == "keyup" ? 1000 : 200
+						event.type == "keyup" ? 500 : 100
 					);
 				}
 			</script>
@@ -85,7 +79,7 @@ class CallMe extends FormItem {
 			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap">
 			</div>
 			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none">';
-		if (count($language) > 1) {
+		if (count($language)) {
 			$str .= '
 				<div style="margin-bottom: 3px;">'._L("Add an alternate language?").'</div>
 				<select id="'.$n.'_select" ><option value="0">-- '._L("Select One").' --</option>';
@@ -127,6 +121,9 @@ class CallMe extends FormItem {
 				});
 				if ($("'.$n.'_select")) {
 					$("'.$n.'_select").observe("change", function (event) {
+						e = event.element();
+						if (e.value == 0)
+							return;
 						new Easycall(
 							"'.$this->form->name.'",
 							"'.$n.'",
@@ -1265,9 +1262,9 @@ class JobWiz_submitConfirm extends WizStep {
 			$calctotal = $calctotal + $renderedlist->total;
 		}
 		if ($postdata['/schedule/options']['schedule'] == 'template')
-			$html = '<div style="font-size: medium">'._L('You are about to save a notification. If submitted now it would reach %1$s people useing %2$s list(s). This total may change if you sumit the job at a later date.', $calctotal, count($lists)).'</div>';
+			$html = '<div style="font-size: medium">'._L('You are about to save a notification. If submitted now it would reach %1$s people using %2$s list(s). This total may change if you sumit the job at a later date.', $calctotal, count($lists)).'</div>';
 		else
-			$html = '<div style="font-size: medium">'._L('You are about to send a notification to %1$s people useing %2$s list(s).', $calctotal, count($lists)).'</div>';
+			$html = '<div style="font-size: medium">'._L('You are about to send a notification to %1$s people using %2$s list(s).', $calctotal, count($lists)).'</div>';
 		$formdata = array($this->title);
 		$formdata["jobinfo"] = array(
 			"label" => _L("Job Info"),
