@@ -3,6 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
+require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
