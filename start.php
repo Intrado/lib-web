@@ -221,7 +221,7 @@ include_once("nav.inc.php");
 	<table border=0 cellpadding=0 cellspacing=5>
 	<tr>
 		<td>
-			<div style="width:250px;top:0px;text-align:center;">
+			<div style="width:170px;top:0px;text-align:center;">
 					<img style="cursor:pointer;" src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job" 
 							onclick="window.location = 'jobwizard.php?new'"
 							onmouseover="this.src='img/largeicons/newjob_over.jpg'"
@@ -237,9 +237,10 @@ include_once("nav.inc.php");
 ?>
 			</td>
 			<td width="100%" valign="middle">
-				<div>
 <?
+	startWindow("Jobs Timeline");
 				include_once("inc/timeline.inc.php");
+	endWindow();
 ?>
 			</td>
 			</tr>

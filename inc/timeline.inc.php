@@ -157,7 +157,7 @@ foreach($jobs as $job) {
 $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 
 ?>
-<div style="height: 180px;overflow: auto">
+<div style="height: 150px;overflow: auto">
 	<div id="maincanvas"  style="height:<? echo $minhight ?>px;">
 	
 	<table>
