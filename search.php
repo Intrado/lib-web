@@ -104,7 +104,7 @@ if (!isset($_SESSION['listsearchpreview'])) {
 		"helpstep" => 2
 	);
 	$formdata["phone"] = array(
-		"label" => _L('Phone Number'),
+		"label" => _L('Phone or SMS Number'),
 		"value" => !empty($_SESSION['listsearchphone']) ? $_SESSION['listsearchphone'] : '',
 		"validators" => array(array("ValPhone")),
 		"control" => array("TextField"),
@@ -114,13 +114,6 @@ if (!isset($_SESSION['listsearchpreview'])) {
 		"label" => _L('Email Address'),
 		"value" => !empty($_SESSION['listsearchemail']) ? $_SESSION['listsearchemail'] : '',
 		"validators" => array(array("ValEmail")),
-		"control" => array("TextField"),
-		"helpstep" => 2
-	);
-	$formdata["sms"] = array(
-		"label" => _L('SMS Number'),
-		"value" => !empty($_SESSION['listsearchsms']) ? $_SESSION['listsearchsms'] : '',
-		"validators" => array(array("ValPhone")),
 		"control" => array("TextField"),
 		"helpstep" => 2
 	);
@@ -193,7 +186,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$_SESSION['listsearchperson'] = true;
 					$_SESSION['listsearchpkey'] = isset($postdata['pkey']) ? $postdata['pkey'] : false;
 					$_SESSION['listsearchphone'] = isset($postdata['phone']) ? Phone::parse($postdata['phone']) : false;
-					$_SESSION['listsearchsms'] = isset($postdata['sms']) ? Phone::parse($postdata['sms']) : false;
 					$_SESSION['listsearchemail'] = isset($postdata['email']) ? $postdata['email'] : false;	
 					$form->sendTo("search.php");
 					break;

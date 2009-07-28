@@ -115,7 +115,7 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 			if (!empty($_SESSION['listsearchshowall']))
 				$renderedlist->prepareRulesMode(100, false);
 			else if (!empty($_SESSION['listsearchperson']))
-				$renderedlist->preparePeopleMode(100, $_SESSION['listsearchpkey'], $_SESSION['listsearchphone'], $_SESSION['listsearchemail'], $_SESSION['listsearchsms']);
+				$renderedlist->preparePeopleMode(100, $_SESSION['listsearchpkey'], $_SESSION['listsearchphone'], $_SESSION['listsearchemail']);
 			else if (!empty($_SESSION['listsearchrules']))
 				$renderedlist->prepareRulesMode(100, $_SESSION['listsearchrules']);
 			else {
@@ -186,6 +186,12 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 		$renderedlist->orderby = $orderbySQL;
 
 	$renderedlist->hasstats = false;
+	
+	if (!isset($_SESSION['ajaxtablepagestart']) || !isset($_GET['ajax']))
+		$_SESSION['ajaxtablepagestart'] = array();
+	if (isset($_GET['start']) && isset($_GET['containerID']))
+		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
+	
 	$data = $renderedlist->getPage(isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0, $renderedlist->pagelimit);
 	
 	if (empty($data)) {
@@ -196,7 +202,7 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 	}
 	
 	
-	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting, isset($repeatedColumns) ? $repeatedColumns : false, isset($groupBy) ? $groupBy : false, ($searchable ? 3 : 0), ($searchable ? true : false));
+	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting, isset($repeatedColumns) ? $repeatedColumns : false, isset($groupBy) ? $groupBy : false, ($searchable ? 3 : 0), ($searchable ? true : false), ($searchable ? false : true));
 }
 
 function list_get_results_html($containerID, $renderedlist) {

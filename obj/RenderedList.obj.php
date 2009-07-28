@@ -36,8 +36,8 @@ class RenderedList {
 		$this->orderby =  $this->lastname . "," . $this->firstname;
 	}
 
-	function preparePeopleMode ($pagelimit, $pkey=false, $phone=false, $email=false, $sms=false) {
-		$this->searchpeople = array('pkey' => $pkey, 'phone' => $phone, 'email' => $email, 'sms' => $sms);
+	function preparePeopleMode ($pagelimit, $pkey=false, $phone=false, $email=false) {
+		$this->searchpeople = array('pkey' => $pkey, 'phone' => $phone, 'email' => $email, 'sms' => $phone);
 		$this->mode = "people";
 		$this->pagelimit = $pagelimit;
 	}
@@ -91,12 +91,16 @@ class RenderedList {
 				if ($id)
 					$personids = array($id);
 			}
-			if (!empty($this->searchpeople['phone']))
-				$personids = $this->peopleWithDestination('phone', $personids);
+			if (!empty($this->searchpeople['phone'])) {
+				$phoneids = $this->peopleWithDestination('phone', $personids);
+				
+				if (!empty($this->searchpeople['sms']) && getSystemSetting('_hassms', false))
+					$smsids = $this->peopleWithDestination('sms', $personids);
+					
+				$personids = isset($smsids) ? array_merge($phoneids, $smsids) : $phoneids;
+			}
 			if (!empty($this->searchpeople['email']))
 				$personids = $this->peopleWithDestination('email', $personids);
-			if (!empty($this->searchpeople['sms']) && getSystemSetting('_hassms', false))
-				$personids = $this->peopleWithDestination('sms', $personids);
 			
 			if (!empty($personids))
 				$result = $this->renderSearch($personids);
@@ -180,10 +184,6 @@ class RenderedList {
 				$destinationData[$personid][] = $row;
 			}
 			
-			//error_log(json_encode($destinationData));
-			//foreach ($destinationData as $thing)
-			//	error_log(json_encode($thing));
-			
 			// Reference from list.inc.php
 			// Reference: $titles[5] = "Address";
 			// Reference: $titles[6] = "Sequence";
@@ -197,9 +197,7 @@ class RenderedList {
 				$id = $person[1];
 				$allBlank = true;
 				if (isset($destinationData[$id])) {
-					//error_log("Destination for Person $id >> ");//" . json_encode($destinationData[$id]));
 					foreach($destinationData[$id] as $destination) {
-						//error_log('Person ' . $id . '>>'.json_encode($destination));
 						if (!empty($destination[1])) {
 							$person[6] = $destination[2];
 							$person[7] = $destination[1];
@@ -333,7 +331,6 @@ class RenderedList {
 				$limitSQL
 			", false, array($this->list->id, $this->list->id));
 		} else {
-			error_log('DOING SEARCH');
 			return Query("
 				SELECT SQL_CALC_FOUND_ROWS ($listrulesSQL) as isinlist,
 					$commonfieldsSQL
