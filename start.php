@@ -200,8 +200,15 @@ include_once("nav.inc.php");
 	<tr>
 		<td>
 			<div style="width:250px;top:0px;text-align:center;">
-			<a href="jobwizard.php?new"><img src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job" /></a><br />		
-			<a href="jobwizard.php?new"><img src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new emergency job" title="Start a new emergency job"  /></a>			
+					<img style="cursor:pointer;" src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job" 
+							onclick="window.location = 'jobwizard.php?new'"
+							onmouseover="this.src='img/largeicons/newjob_over.jpg'"
+							onmouseout="this.src='img/largeicons/newjob.jpg'" />
+			<br />		
+					<img style="cursor:pointer;" src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new job" title="Start a new job" 
+							onclick="window.location = 'jobwizard.php?new'"
+							onmouseover="this.src='img/largeicons/newemergency_over.jpg'"
+							onmouseout="this.src='img/largeicons/newemergency.jpg'" />			
 			</div>
 <?		
 			if ($USER->authorize("startstats")) {
@@ -216,8 +223,7 @@ include_once("nav.inc.php");
 			</tr>
 			<tr>
 			<td colspan="2">
-<? 
-			
+<? 		
 			startWindow(_L('Recent Activity'));
 			
 				$limit = 10;
@@ -231,20 +237,44 @@ include_once("nav.inc.php");
 					</div>
 					<br />		
 					<h1>Filter By:</h1>
-					<div class="feedfilter">					
+					<div class="feedfilter">	
+						<a href="start.php?filter=job"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
+					</div>
+					<div id="jobfilters" class="feedsubfilter">	
+							<a href="start.php?filter=scheduledjob"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a><br />	
+							<a href="start.php?filter=activejob"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a><br />
+							<a href="start.php?filter=completedjob"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a><br />
+					</div>
+					<div class="feedfilter">	
+						<a href="start.php?filter=messages"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
+					</div>
+					<div class="feedsubfilter">	
+							<a href="start.php?filter=phonemessage"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />	
+							<a href="start.php?filter=emailmessage"><img src="img/largeicons/tiny20x20/email.jpg">Email</a><br />
+							<a href="start.php?filter=smsmessage"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
+					</div>
+					<div class="feedfilter">	
+						<a href="start.php?filter=list"><img src="img/largeicons/tiny20x20/addrbook.jpg">Contacts</a><br />
+						<a href="start.php?filter=savedreports"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
+						<a href="start.php?filter=systemmessages"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
+						
+					</div>
+					
+					</td>
+					<td width="30px">&nbsp;</td>
+					<td class="feed" valign="top" >
+						<table>
+				
+				';	
+				
+				/*
+										
 						<a href="start.php?filter=activejob"><img src="img/largeicons/tiny20x20/ping.jpg">Active&nbsp;Jobs</a><br />
 						<a href="start.php?filter=completedjob"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed&nbsp;Jobs</a><br />
 						<a href="start.php?filter=scheduledjob"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled&nbsp;Jobs</a><br />
 						<a href="start.php?filter=savedreports"><img src="img/largeicons/tiny20x20/savedreport.jpg">Saved&nbsp;Reports</a><br />
 						<a href="start.php?filter=systemmessages"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
-					</div>
-					</td>
-					<td width="30px">&nbsp;</td>
-					<td class="feed" valign="top" >
-						<table>
-					
-				
-				';	
+					*/
 				//"border="1"
 				//style="border: none;border-collapse: collapse;">
 				$actionids = array();
