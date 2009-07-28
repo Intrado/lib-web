@@ -193,7 +193,7 @@ var Easycall = Class.create({
 	},
 	
 	setupRecord: function () {
-		if ($("'.$n.'_select")) {
+		if ($(this.formitemname+'_select_'+this.language)) {
 			if ($(this.formitemname+'_select_'+this.language)) {
 				$(this.formitemname+'_select_'+this.language).hide();
 			}
@@ -254,7 +254,7 @@ var Easycall = Class.create({
 			easycallRecordings--;
 		}
 		
-		if ($("'.$n.'_select")) 
+		if ($(this.formitemname+'_select_'+this.language)) 
 			$(this.formitemname+'_select_'+this.language).show();
 		$(this.formitemname+"_"+this.language).remove();
 		if (this.pe)
