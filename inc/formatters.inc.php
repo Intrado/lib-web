@@ -153,7 +153,7 @@ function fmt_persontip ($row, $index) {
 	return $icon;
 }
 
-function fmt_jobs_actions ($obj, $name) {
+function fmt_jobs_actions ($obj, $name, $vertical=false) {
 	global $USER;
 
 	$id = $obj->id;
@@ -272,7 +272,7 @@ function fmt_jobs_actions ($obj, $name) {
 			}
 			break;
 	}
-	return action_links($buttons);
+	return action_links($buttons,$vertical);
 }
 
 function fmt_job_enddate ($obj,$name) {

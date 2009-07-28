@@ -49,12 +49,13 @@ function action_link ($title, $icon, $href = "#", $onclick = null) {
 	return $str;
 }
 
-function action_links ($array) {
+function action_links ($array,$vertical=false) {
 	$links = is_array($array) ? $array : func_get_args();
 	foreach ($links as $key => $link)
 		if ($link == "")
 			unset($links[$key]);
-	return '<div class="actionlinks">' . implode("&nbsp;|&nbsp;",$links).'</div>';
+			
+	return '<div class="actionlinks">' . implode(($vertical?"<br>":"&nbsp;|&nbsp;"),$links).'</div>';
 }
 
 
