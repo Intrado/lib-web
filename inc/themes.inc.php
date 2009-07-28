@@ -2,6 +2,11 @@
 //Color schemes.inc.php
 
 $COLORSCHEMES =  array(
+					"classroom" => array("displayname" => "Classroom",
+											"_brandprimary" => "3e693f",
+											"_brandtheme1" => "3e693f",
+											"_brandtheme2" => "b47727",
+											"_brandratio" => ".2"),
 					"3dblue" => array("displayname" => "3D - Blue",
 											"_brandprimary" => "26477D",
 											"_brandtheme1" => "89A3CE",

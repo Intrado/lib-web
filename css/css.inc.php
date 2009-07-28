@@ -5,14 +5,14 @@ if (!isset($_SESSION['colorscheme'])) {
 	// TODO these should come from customer display data (still brand the login pages)
 	$theme = "3dblue";
 	$primary = "26477D";
-	$theme1 = "#89A3CE";
-	$theme2 = "#89A3CE";
+	$theme1 = "89A3CE";
+	$theme2 = "89A3CE";
 	$globalratio = ".3";
 } else {
 	$theme = $_SESSION['colorscheme']['_brandtheme'];
 	$primary = $_SESSION['colorscheme']['_brandprimary'];
-	$theme1 = "#" . $_SESSION['colorscheme']['_brandtheme1'];
-	$theme2 = "#" . $_SESSION['colorscheme']['_brandtheme2'];
+	$theme1 = $_SESSION['colorscheme']['_brandtheme1'];
+	$theme2 = $_SESSION['colorscheme']['_brandtheme2'];
 	$globalratio = $_SESSION['colorscheme']['_brandratio'];
 }
 
@@ -24,7 +24,11 @@ $newfade1 = fadecolor($primary, $fade1, $globalratio);
 $newfade2 = fadecolor($primary, $fade2, $globalratio);
 $newfade3 = fadecolor($primary, $fade3, $globalratio);
 
+$topbg = fadecolor($theme2, "FFFFFF", $globalratio/2);
+
 $primary = "#" . $primary;
+$theme1 = "#" . $theme1;
+$theme2 = "#" . $theme2;
 
 //Takes 2 hex color strings and 1 ratio to apply to to the primary:original
 function fadecolor($primary, $fade, $ratio){
@@ -97,7 +101,6 @@ a:hover {
 }
 
 .navtab {
-	width: 100px;
 	height: 23px;
 	position:relative;
 	float: left;
@@ -148,13 +151,27 @@ a:hover {
 
 
 .applinks {
-	padding-top:5px;
-	padding-right: 15px;
-	text-align: right;
+	padding-top:2px;
+	padding-left: 5px;
+	padding-right: 5px;
 	font-size: 10px;
-	white-space: nowrap
+	white-space: nowrap;
 }
 
+.navlogoarea {
+	background-color: <?=$topbg?>;
+}
+
+.navband1 {
+	height: 6px; 
+	background: <?=$primary?>;
+}
+
+.navband2 {
+	height: 2px; 
+	background: <?=$theme2?>;
+	margin-bottom: 3px;
+}
 
 /* **** subnav **** */
 
@@ -200,7 +217,7 @@ a:hover {
 	float: right;
 	margin: 2px;
 	margin-right: 15px;
-	border: 2px outset;
+	border: 1px outset;
 	width: 100px;
 
 	text-align: left;
@@ -283,19 +300,6 @@ a:hover {
 	width: 100%;
 }
 
-
-.windowbar {
-	background: url('img/themes/<?=$theme?>/chrome_light.png') repeat-x;
-	border-bottom: 1px solid <?=$theme2?> ;
-	height: 22px;
-}
-
-.windowborder {
-	border: 2px solid <?=$theme1?>;
-	border-top: 0px;
-	border-left: 1px solid <?=$theme1?>;
-}
-
 .windowtitle {
 	font-size: 12px;
 	font-weight: bold;
@@ -305,6 +309,7 @@ a:hover {
 }
 
 .windowbody {
+	padding-top: 5px;
 	display: block;
 }
 
@@ -570,3 +575,26 @@ div.scrollTableContainer {
 .feed td {
 	padding-bottom:5px;
 }
+
+
+<? if ($theme == "classroom") { ?>
+
+.navmenuspacer {
+	margin-left: 0px;
+	padding-left: 10px;
+	background: url(img/themes/<?=$theme?>/main_nav_tab_bg.gif);
+}
+
+.subnavmenu .active {
+	background: white;
+	font-weight: bold;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+}
+
+.navband2 {
+	margin-bottom: 0px;
+}
+
+
+<? } ?>

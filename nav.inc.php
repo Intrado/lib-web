@@ -219,45 +219,41 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <!-- ********************************************************************* -->
 
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif" >
-		<tr><td style="font-size:8px;">&nbsp;</td></tr>
-	</table>
-</div>
-
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0>
+<table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr>
-		<td><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
-		<td><div class="custname"><?= escapehtml($_SESSION['custname']); ?></div></td>
-	</tr>
-	</table>
-</div>
-
-<div class="navmenuspacer">
-<div class="navmenu">
-
-	<?= $MAINTABS ?>
-
-	<div class="applinks hoverlinks">
-		<a href="addresses.php?origin=nav">Address Book</a> |
+		<td bgcolor="white"><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
+		<td><img src="img2/shwoosh.gif"></td>
+		<td width="100%" align="right" style="padding-right: 10px;">
+			<div><img src="img/supporticon.gif" style="vertical-align: middle;"> Support: <a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?></div>
+			<table border=0 cellspacing=0 cellpadding=0>
+				<tr>
+					<td><img src="img2/accountlinksbg_left.gif"></td>
+					<td background="img2/accountlinksbg_mid.gif">
+						<div class="applinks hoverlinks">
+							<a href="addresses.php?origin=nav">Address Book</a> |
 <?
 if($USER->authorize('managemyaccount')){
 ?>
-		<a href="account.php">Account</a> |
+							<a href="account.php">Account</a> |
 <?
 }
 ?>
-		<a href="#" onclick="window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
-		<a href="index.php?logout=1">Logout</a>
-	</div>
+							<a href="#" onclick="window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
+							<a href="index.php?logout=1">Logout</a>
+						</div>
+					</td>
+					<td><img src="img2/accountlinksbg_right.gif"></td>				
+				</tr>		
+			</table>
+		</td>
+	</tr>
+</table>
+<div class="navband1"><img src="img/pixel.gif"></div>
+<div class="navband2"><img src="img/pixel.gif"></div>
 
-</div>
-</div>
-
-
-<div class="subnavmenu hoverlinks">
-
+<!-- =================================================== -->
+<div class="navmenuspacer">
+<div class="navmenu">
 <? 	if ($USER->authorize("startshort")) { ?>
 	<div id="shortcutmenu" class="shortcutmenu"><img src="img/arrow_down.gif" style="margin-right: 5px; margin-left: 5px; float: right;">Shortcuts</div>
 	<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;">
@@ -281,11 +277,12 @@ Event.observe(window, 'load', function() {
 
 <? } ?>
 
-	<?= $SUBTABS ?>
+	<?= $MAINTABS ?>
+</div>
 </div>
 
-<div class="crumbs hoverlinks">
-	<?= doCrumb($FIRSTACTIVETABLINK, $ACTIVEMAINTABTITLE, $TITLE) ?>
+<div class="subnavmenu hoverlinks">
+	<?= $SUBTABS ?>
 </div>
 
 <div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>

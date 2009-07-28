@@ -123,10 +123,11 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 	}
 }
 
-function startWindow($title, $style = "", $minimize = false, $usestate = true)
-{
+function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 	static $id = 0;
 	$id++;
+	
+	$theme = getBrandTheme();
 
 	$visible = !$usestate || state("window_$id") != "closed";
 
@@ -136,36 +137,41 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true)
 ?>
 <div class="window">
 <table width="100%" border=0 cellpadding=0 cellspacing=0>
-<tr>
-	<td width="100%">
-		<div class="windowborder">
+	<tr>
+		<td><img src="img/themes/<?=$theme?>/win_tl.gif" alt=""></td>
+		<td background="img/themes/<?=$theme?>/win_t.gif" width="100%">
 			<div class="windowbar">
 <?	if ($minimize) { ?>
 				<div class="menucollapse" onclick="windowHide(<?=$id?>);" ><img id="window_colapseimg_<?= $id ?>" src="img/arrow_<?=  $visible ? "down" : "right" ?>.gif"></div>
 <? } ?>
 				<div class="windowtitle"><?= $title ?></div>
 			</div>
-			<div id="window_<?= $id ?>" class="windowbody" style="<?=$style?>"><div style="width: 100%;">
-<?
-}
-
-function endWindow()
-{
-?>
-				</div></div>
-			</div>
 		</td>
-		<td width="6" valign="top" background="img/window_shadow_right.gif"><img src="img/window_shadow_topright.gif"></td>
+		<td><img src="img/themes/<?=$theme?>/win_tr.gif" alt=""></td>
 	</tr>
 	<tr>
-		<td background="img/window_shadow_bot.gif"><img src="img/window_shadow_botleft.gif"></td>
-		<td><img src="img/window_shadow_botright.gif"></td>
-	</tr>
-	</table>
-</div>
+		<td background="img/themes/<?=$theme?>/win_l.gif"></td>
+		<td><div id="window_<?= $id ?>" class="windowbody" style="<?=$style?>"><div style="width: 100%;">
 <?
-
 }
+
+function endWindow() {
+	$theme = getBrandTheme();
+
+?>		
+		</div></div></td>
+		<td background="img/themes/<?=$theme?>/win_r.gif"></td>
+	</tr>
+	<tr>
+		<td><img src="img/themes/<?=$theme?>/win_bl.gif" alt=""></td>
+		<td background="img/themes/<?=$theme?>/win_b.gif"></td>
+		<td><img src="img/themes/<?=$theme?>/win_br.gif" alt=""></td>
+	</tr>
+</table>
+<?
+}
+
+
 
 function showPageMenu ($total,$start, $perpage, $link = NULL) {
 	$numpages = ceil($total/$perpage);
