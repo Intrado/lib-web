@@ -432,13 +432,14 @@ function listform_load_lists(listidsJSON) {
 									}
 
 									new Tip (this, previewBox, {
-										style: "protogrey",
-										delay: 0.2,
-										hideOthers:true,
-										hook:{target:"bottomLeft",tip:"topRight"},
-										offset:{x:0,y:0},
-										stem:"bottomLeft",
-									});
+					                    style: "protogrey",
+					                    delay: 0.2,
+					                    hideOthers:true,
+					                    hook:{target:"bottomLeft",tip:"topRight"},
+					                    offset:{x:0,y:0},
+					                    stem:"topRight"
+				                  	});
+				                  	
 									this.prototip.show();
 								}
 							}.bindAsEventListener(nameTD),
