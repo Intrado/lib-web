@@ -541,9 +541,24 @@ div.scrollTableContainer {
 	color: <?=$primary?>;
 }
 .feed span {
-	font-size: 10px;
+	font-size: 12px;
 	text-decoration: none;
 }
+.feedtitle a {
+	font-size: 14px;
+	font-weight: bold;
+	color: <?=$primary?>;
+}
+.feedfilter img{
+	position: relative;
+	top: 6px;
+	border: 0px;
+	padding: 0px;
+	padding-left: 20px;
+	padding-right: 4px;
+	margin: 0px;
+}
+
 .feed a {
 	text-decoration: none;
 }
