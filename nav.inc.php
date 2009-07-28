@@ -222,13 +222,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 <table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr>
 		<td bgcolor="white"><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
-		<td><img src="img2/shwoosh.gif"></td>
+		<td><img src="img/shwoosh.gif"></td>
 		<td width="100%" align="right" style="padding-right: 10px;">
 			<div><img src="img/supporticon.gif" style="vertical-align: middle;"> Support: <a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?></div>
 			<table border=0 cellspacing=0 cellpadding=0>
 				<tr>
-					<td><img src="img2/accountlinksbg_left.gif"></td>
-					<td background="img2/accountlinksbg_mid.gif">
+					<td><img src="img/accountlinksbg_left.gif"></td>
+					<td background="img/accountlinksbg_mid.gif">
 						<div class="applinks hoverlinks">
 							<a href="addresses.php?origin=nav">Address Book</a> |
 <?
@@ -242,7 +242,7 @@ if($USER->authorize('managemyaccount')){
 							<a href="index.php?logout=1">Logout</a>
 						</div>
 					</td>
-					<td><img src="img2/accountlinksbg_right.gif"></td>				
+					<td><img src="img/accountlinksbg_right.gif"></td>				
 				</tr>		
 			</table>
 		</td>
