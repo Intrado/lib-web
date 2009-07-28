@@ -89,7 +89,7 @@ while($row = DBGetRow($res)){
 	$dsn = 'mysql:dbname=aspshard;host='.$row[1];
 	$db = new PDO($dsn, $row[2], $row[3]);
 	$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-	$shards[$row[0]] = db;
+	$shards[$row[0]] = $db;
 }
 
 $calldata = array();
