@@ -31,9 +31,9 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		if($result['result'] == ""){
 			$user = $result['portaluser'];
 			if($password1 !== $password2){
-				error("The passwords do not match");
+				error(_L("The passwords do not match"));
 			} else if(strlen($password1) < 5){
-				error("Passwords must be at least 5 characters long");
+				error(_L("Passwords must be at least 5 characters long"));
 			} else if($password1 && $passworderror = validateNewPassword($user['portaluser.username'], $password1, $user['portaluser.firstname'], $user['portaluser.lastname'])){
 				error($passworderror);
 			} else {
