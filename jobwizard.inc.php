@@ -172,24 +172,6 @@ class ValHasMessage extends Validator {
 	}
 }
 
-class ValPhoneRecordSelected extends Validator {
-	function validate ($value, $args, $requiredvalues) {
-		if ($requiredvalues['phone'] !== "record" && $value == "record")
-			return "$this->label " . _L("Cannot attach recorded message if Phone is not a Call Me to Record.");
-		else
-			return true;
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args, requiredvalues) {
-				if (requiredvalues.phone !== "record" && value == "record")
-					return label + " '. addslashes(_L("Cannot attach recorded message if Phone is not a Call Me to Record.")). '";
-				return true;
-			}';
-	}
-}
-
 class ValEasycall extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
@@ -479,7 +461,7 @@ class JobWiz_messageSelect extends WizStep {
 		}
 		
 		if (isset($values["record"]))
-			$values["record"] = _L("Attach Recorded Message");
+			$values["record"] = _L("Automatic Email Notification");
 		
 		if ($USER->authorize("sendemail") && in_array('email',$postdata['/message/pick']['type'])) {
 			$formdata["email"] = array(
@@ -492,14 +474,10 @@ class JobWiz_messageSelect extends WizStep {
 				"control" => array("RadioButton","values"=>$values),
 				"helpstep" => 1
 			);
-			if (isset($values["record"])) {
-				$formdata["email"]["validators"][] = array("ValPhoneRecordSelected");
-				$formdata["email"]["requires"] = array("phone");
-			}
 		}
 		
 		if (isset($values["record"]))
-			$values["record"] = _L("Notify of Recorded Message");
+			$values["record"] = _L("Automatic Text Notification");
 
 		if ($USER->authorize("sendsms") && in_array('sms',$postdata['/message/pick']['type'])) {
 			$formdata["sms"] = array(
@@ -512,10 +490,6 @@ class JobWiz_messageSelect extends WizStep {
 				"control" => array("RadioButton","values"=>$values),
 				"helpstep" => 1
 			);
-			if (isset($values["record"])) {
-				$formdata["sms"]["validators"][] = array("ValPhoneRecordSelected");
-				$formdata["sms"]["requires"] = array("phone");
-			}
 		}
 
 		if ($USER->authorize("sendmessage") && in_array('print',$postdata['/message/pick']['type'])) {

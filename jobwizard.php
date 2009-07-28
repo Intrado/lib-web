@@ -180,22 +180,22 @@ class FinishJobWizard extends WizFinish {
 			case "easycall":
 				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
 				$emailmessagelink = true;
-				/*$emailMsg = array("Default" => array(
+				$emailMsg = array("Default" => array(
 					"id" => "",
-					"from" => $USER->email,
-					"fromname" => "",
+					"from" => "contactme@schoolmessenger.com",
+					"fromname" => "SchoolMessenger",
 					"subject" => $postdata["/start"]["name"],
 					"attachments" => array(),
-					"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
+					"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
 					"language" => "english",
 					"override" => true
-				));*/
+				));
 				$smsmessagelink = true;
-				/*$smsMsg = array("Default" => array(
+				$smsMsg = array("Default" => array(
 					"id" => false,
-					"text" => "// TODO: Put call back number to customer perhaps?",
+					"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
 					"language" => "english"
-				));*/
+				));
 				break;
 			//Express Text
 			case "express":
@@ -248,6 +248,16 @@ class FinishJobWizard extends WizFinish {
 					switch ($postdata["/message/select"]["email"]) {
 						case "record":
 							$emailmessagelink = true;
+							$emailMsg = array("Default" => array(
+								"id" => "",
+								"from" => "contactme@schoolmessenger.com",
+								"fromname" => "SchoolMessenger",
+								"subject" => $postdata["/start"]["name"],
+								"attachments" => array(),
+								"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
+								"language" => "english",
+								"override" => true
+							));
 							break;
 						case "text":
 							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
@@ -265,6 +275,11 @@ class FinishJobWizard extends WizFinish {
 					switch ($postdata["/message/select"]["sms"]) {
 						case "record":
 							$smsmessagelink = true;
+							$smsMsg = array("Default" => array(
+								"id" => false,
+								"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
+								"language" => "english"
+							));
 							break;
 						case "text":
 							$smsMsg = array("Default" => array(
@@ -477,7 +492,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">	
-<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValPhoneRecordSelected", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValDate"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValDate"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 
