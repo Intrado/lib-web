@@ -170,12 +170,12 @@ class HtmlRadioButton extends FormItem {
 		$counter = 1;
 		foreach ($this->args['values'] as $radiovalue => $radiohtml) {
 			$id = $n.'-'.$counter;
-			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><button type="button" class="regbutton" style=" width: 100%; border: 2px outset; -moz-border-radius: 12px; -webkit-border-radius: 12px; background-color: white; color: black; margin-left: 0px;" onclick="$(\''.$id.'\').click();">'.($radiohtml).'</button></label></td></tr>
+			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><button type="button" class="regbutton" style=" width: 100%; border: 2px outset; background-color: white; color: black; margin-left: 0px;" onclick="$(\''.$id.'\').click();">'.($radiohtml).'</button></label></td></tr>
 				';
 			$counter++;
 		}
 		$str .= '</table></div>';
-		return $str;		
+		return $str;
 	}
 }
 
