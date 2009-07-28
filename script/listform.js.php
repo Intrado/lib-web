@@ -55,8 +55,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 	listformVars.guideMorphEffect = null;
 	
 	ruleWidget.container.observe('RuleWidget:ChangeField', function(event) {
-		Tips.hideAll();
-		
 		listformVars.guideSection = 'AddRule';
 		
 		if (event.memo.fieldnum)
@@ -67,12 +65,10 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 		listform_refresh_guide(true);
 	});
 	ruleWidget.container.observe('RuleWidget:ChangeCriteria', function() {
-		Tips.hideAll();
 		listform_refresh_guide();
 	});
 
 	$('saveRulesButton').observe('focus', function() {
-		Tips.hideAll();
 		$('saveRulesButton').focus();
 	});
 	
@@ -88,7 +84,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 	});
 					
 	ruleWidget.container.observe('RuleWidget:AddRule', function(event) {
-		Tips.hideAll();
 		listformVars.guideSection = 'AddRule';
 		listform_refresh_guide();
 		$('saveRulesButton').focus();
@@ -116,7 +111,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 		});
 	});
 	ruleWidget.container.observe('RuleWidget:DeleteRule', function(event) {
-		Tips.hideAll();
 		listformVars.guideSection = 'AddRule';
 		listform_refresh_guide(true);
 		
@@ -146,9 +140,7 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 	
 	// allListsWindow: Build a List Using Rules Buttons
 	$('buildListButton').hide();
-	ruleWidget.container.observe('RuleWidget:Ready', function() {
-		Tips.hideAll();
-		 
+	ruleWidget.container.observe('RuleWidget:Ready', function() { 
 			<?
 			if (!$USER->authorize('createlist')) {
 		 		echo "
@@ -216,7 +208,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 	
 	$('chooseListChoiceButton').observe('click', function(event) {
 		Tips.hideAll();
-		
 		$('chooseListChoiceButton').hide();
 		$('chooseListWindow').show();
 		listform_hide_build_list_window();
@@ -401,7 +392,7 @@ function listform_load_lists(listidsJSON) {
 				var nameTD = new Element('td', {'class':'List NameTD', 'width':'10%','style':'overflow: hidden; white-space: nowrap;'});
 				nameTD.insert(data.name);
 				var actionTD = new Element('td', {'class':'List ActionTD'});
-				actionTD.insert('<img src="img/icons/delete.gif"/>');
+				actionTD.insert('<img src="img/icons/delete.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
 				var statisticsTD = new Element('td', {'class':'List', 'colspan':100}).update(format_thousands_separator(data.total));
 				
 				
@@ -411,14 +402,14 @@ function listform_load_lists(listidsJSON) {
 				
 				
 				if (!data.advancedlist) {
-					nameTD.style.cursor = 'pointer';
-					nameTD.observe('click', function (event, listid) {
+					nameTD.observe('mouseover', function (event, listid) {
 						$('listRulesPreview').update('Loading..');
 						cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
 							function (transport) {
 								var listRules = transport.responseJSON;
 								if (!listRules) {
 									alert('<?=addslashes(_L('Sorry cannot get list rules'))?>');
+									Tips.hideAll();
 									return;
 								}
 								// Expects a single listid; loop finished in one iteration.
@@ -439,15 +430,23 @@ function listform_load_lists(listidsJSON) {
 									else {
 										previewBox.update(new Element('table').insert(tbody));
 									}
-									// Add an extra row for viewing rules.
-									new Tip(this,previewBox, { hideOthers:true});
+
+									new Tip (this, previewBox, {
+										style: "protogrey",
+										delay: 0.2,
+										hideOthers:true,
+										hook:{target:"bottomLeft",tip:"topRight"},
+										offset:{x:0,y:0},
+										stem:"bottomLeft",
+									});
+									this.prototip.show();
 								}
 							}.bindAsEventListener(nameTD),
 						null, false );
 					}.bindAsEventListener(nameTD,listid));
 				}
 				var removeButton = actionTD.down('img');
-				removeButton.observe('click', listform_remove_list.bindAsEventListener(actionTD,listid));
+				removeButton.observe('click', listform_remove_list.bindAsEventListener(actionTD,listid,true));
 				
 				// Mark this list as 'added' so that the list selectbox no longer shows this list as an option.
 				if (listformVars.existingLists && listformVars.existingLists[listid])
@@ -461,7 +460,6 @@ function listform_load_lists(listidsJSON) {
 }
 
 function listform_hover_existing_list(event, listid) {
-	event.stop();
 	$('listchooseTotal').update();
 	$('listchooseTotalAdded').update();
 	$('listchooseTotalRemoved').update();
@@ -471,6 +469,7 @@ function listform_hover_existing_list(event, listid) {
 		var stats = transport.responseJSON;
 		if (!stats) {
 			alert('<?=addslashes(_L('No data available for this list, please check your internet connection and try again'))?>');
+			Tips.hideAll();
 			return;
 		}
 		var data = stats[listid];
@@ -479,23 +478,20 @@ function listform_hover_existing_list(event, listid) {
 			$('listchooseTotalRemoved').update(format_thousands_separator(data.totalremoved));
 			$('listchooseTotalRule').update(format_thousands_separator(data.totalrule));
 
-		Tips.hideAll();
-		new Tip ($('listSelectboxContainer'), $('listchooseTotalsContainer').innerHTML, {
+		new Tip (this, $('listchooseTotalsContainer').innerHTML, {
 			style: "protogrey",
-			delay: 0.4,
-			hook:{target:"topMiddel",tip:"bottomLeft"},
-			offset:{x:20,y:0},
+			delay: 0.2,
+			hideOthers:true,
+			hook:{target:"topMiddle",tip:"bottomLeft"},
+			offset:{x:0,y:0},
 			stem:"bottomLeft",
-			hideOn:'click',
-			closeButton:true,
-			target:this,
-			hideAfter:3
 		});
-		$('listSelectboxContainer').prototip.show();
+		this.prototip.show();
 	}.bindAsEventListener(this, listid));
 }
 
 function listform_onclick_existing_list(event, listid) {
+	Tips.hideAll();
 	if (this.checked) {
 		if (listform_add_list(listid))
 			listform_refresh_guide(true);
@@ -504,8 +500,10 @@ function listform_onclick_existing_list(event, listid) {
 	}
 }
 
-function listform_remove_list(event, listid) {
+function listform_remove_list(event, listid, doconfirm) {
 	Tips.hideAll();
+	if (doconfirm && !confirm('<?=addslashes(_L("Are you sure you want to remove this list?"))?>'))
+		return;
 	var hiddenInput = $('listsTableBody').down('input[value='+listid+']');
 	if (hiddenInput) {
 		var tr = hiddenInput.up('tr');
