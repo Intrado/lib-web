@@ -258,12 +258,42 @@ class ValTextAreaPhone extends Validator {
 				if (!textlength)
 					return label + " '.addslashes(_L('cannot be blank.')).'";
 				else if(textlength > 4000)
-					return label + " '.addslashes(_L('cannot be more than 4000 characters.')).'";			
+					return label + " '.addslashes(_L('cannot be more than 4000 characters.')).'";
 				return true;
 			}';
 	}
 }
 
+class ValTimeWindowCallEarly extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		if ((strtotime($value) + 3600) > strtotime($requiredvalues['calllate']))
+			return $this->label. " ". _L('There must be a minimum of one hour between start and end time');
+		return true;
+	}
+}
+
+class ValTimeWindowCallLate extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		if ((strtotime($value) - 3600) < strtotime($requiredvalues['callearly']))
+			return $this->label. " ". _L('There must be a minimum of one hour between start and end time');
+		return true;
+	}
+}
+
+class ValDate extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		if (strtotime($value) < strtotime($args['min']))
+			return $this->label. " ". _L('cannot be a date earlier than %s', $args['min']);
+		if (isset($args['max']))
+			if (strtotime($value) > strtotime($args['max']))
+				return $this->label. " ". _L('cannot be a date later than %s', $args['max']);
+			
+		return true;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
@@ -1167,23 +1197,42 @@ class JobWiz_scheduleDate extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
+		
+		// Check to see if translation is used anywhere in the wizard. If it is, the job cannot be scheduled out more than 7 days.
+		if (((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) && 
+				isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
+			) || ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) && 
+				isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
+			)
+		)
+			$translated = true;
+		else
+			$translated = false;
+			
 		// Form Fields.
 		$formdata = array($this->title);
-		// TODO: Validator based on translation information. Don't allow schedule more than 7 days out on translated messages.
-		if ($postdata['/schedule/options']['schedule'] == "schedule") {
-			$helpsteps = array(_L("Choose a date for this notification to be delivered."));
-			$formdata["date"] = array(
-				"label" => _L("Start Date"),
-				"fieldhelp" => _L("Notification will begin on the selected date."),
-				"value" => "today",
-				"validators" => array(),
-				"control" => array("TextDate", "size"=>12, "nodatesbefore" => 0),
-				"helpstep" => 1
-			);
-		}  else {
-			$helpsteps = array();
+		
+		$helpsteps = array(_L("Choose a date for this notification to be delivered."));
+		$formdata["date"] = array(
+			"label" => _L("Start Date"),
+			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"value" => "today",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValDate", "min" => date("m/d/Y"))
+			),
+			"control" => array("TextDate", "size"=>12, "nodatesbefore" => 0),
+			"helpstep" => 1
+		);
+		// If translation is used. don't show any dates in the calendar past 7 days from now.
+		if ($translated) {
+			$formdata["date"]["control"]["nodatesafter"] = 7;
+			$formdata["date"]["validators"][1]["max"] = date("m/d/Y", strtotime("+ 7 days"));
 		}
-		// TODO: Validators to make sure the call window is at least one hour
+
 		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
 		$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 		$formdata["callearly"] = array(
@@ -1191,7 +1240,11 @@ class JobWiz_scheduleDate extends WizStep {
 			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
 			"value" => $USER->getCallEarly(),
 			"validators" => array(
+				array("ValRequired"),
+				array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+				array("ValTimeWindowCallEarly")
 			),
+			"requires" => array("calllate"),
 			"control" => array("SelectMenu", "values"=>$startvalues),
 			"helpstep" => 3
 		);
@@ -1201,7 +1254,11 @@ class JobWiz_scheduleDate extends WizStep {
 			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
 			"value" => $USER->getCallLate(),
 			"validators" => array(
+				array("ValRequired"),
+				array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+				array("ValTimeWindowCallLate")
 			),
+			"requires" => array("callearly"),
 			"control" => array("SelectMenu", "values"=>$endvalues),
 			"helpstep" => 3
 		);

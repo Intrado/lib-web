@@ -179,7 +179,8 @@ class FinishJobWizard extends WizFinish {
 			//If package is Easycall
 			case "easycall":
 				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-				$emailMsg = array("Default" => array(
+				$emailmessagelink = true;
+				/*$emailMsg = array("Default" => array(
 					"id" => "",
 					"from" => $USER->email,
 					"fromname" => "",
@@ -188,12 +189,13 @@ class FinishJobWizard extends WizFinish {
 					"text" => "// TODO: Insert link to customer page with job message preview? Maybe we want to attach the audio file, but that feels like a bad idea.",
 					"language" => "english",
 					"override" => true
-				));
-				$smsMsg = array("Default" => array(
+				));*/
+				$smsmessagelink = true;
+				/*$smsMsg = array("Default" => array(
 					"id" => false,
 					"text" => "// TODO: Put call back number to customer perhaps?",
 					"language" => "english"
-				));
+				));*/
 				break;
 			//Express Text
 			case "express":
@@ -475,7 +477,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">	
-<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValPhoneRecordSelected", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValPhoneRecordSelected", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValDate"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 
