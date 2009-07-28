@@ -186,16 +186,21 @@ class FinishJobWizard extends WizFinish {
 					"fromname" => "SchoolMessenger",
 					"subject" => $postdata["/start"]["name"],
 					"attachments" => array(),
-					"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
+					"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
 					"language" => "english",
 					"override" => true
 				));
+				if (getSystemSetting("_hascallback"))
+					$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
+				$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\nTo be removed from these alerts please contact ". $_SESSION['custname']. ".\n";
 				$smsmessagelink = true;
 				$smsMsg = array("Default" => array(
 					"id" => false,
-					"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
+					"text" => "Phone message from ". $_SESSION['custname']. "\n",
 					"language" => "english"
 				));
+				if (getSystemSetting("_hascallback"))
+					$smsMsg["Default"]["text"] .= "To listen dial ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
 				break;
 			//Express Text
 			case "express":
@@ -254,10 +259,13 @@ class FinishJobWizard extends WizFinish {
 								"fromname" => "SchoolMessenger",
 								"subject" => $postdata["/start"]["name"],
 								"attachments" => array(),
-								"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
+								"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
 								"language" => "english",
 								"override" => true
 							));
+							if (getSystemSetting("_hascallback"))
+								$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
+							$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\nTo be removed from these alerts please contact ". $_SESSION['custname']. ".\n";
 							break;
 						case "text":
 							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
@@ -277,9 +285,11 @@ class FinishJobWizard extends WizFinish {
 							$smsmessagelink = true;
 							$smsMsg = array("Default" => array(
 								"id" => false,
-								"text" => "// TODO: Insert link to customer page with job message preview. Call back number if customer has callback.",
+								"text" => "Phone message from ". $_SESSION['custname']. "\n",
 								"language" => "english"
 							));
+							if (getSystemSetting("_hascallback"))
+								$smsMsg["Default"]["text"] .= "To listen dial ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
 							break;
 						case "text":
 							$smsMsg = array("Default" => array(
