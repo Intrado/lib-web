@@ -98,7 +98,7 @@ foreach($jobs as $job) {
 				
 			//$content .= '<a class="job" id="_' . $i . '" href="job.php?id=' . $job->id. '">';
 			
-			$jobids[$i] = $job->id;
+			$jobids[$i] = "'$job->id'";
 			$jobstatus[$i] = "'" . ucfirst($job->status) . "'";
 			
 			//$content .= "<div id="__$i" class="" . $job->status . "job" style="left: " . $startlocation . "%;top: " . (($j*$jobhight) + ($j*$jobspacing)) . "px;height: " . $jobhight . "px;width: " . $width . "%;" . (($endday >= $rangedays)?"border-right:0px;":";") . ((!$leftborder)?"border-left:0px;":";") . "">\n";				
