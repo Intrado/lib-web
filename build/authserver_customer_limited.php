@@ -2,6 +2,8 @@
 // REQUIRED for 6.2 to 7.0 upgrade
 
 // Creates new limited database user/pass for every customer in the system
+// Also, creates 'urlcomponent' in customer settings table
+
 
 ////////////////////////////////
 // authserver variables must be set!!!
@@ -21,7 +23,7 @@ mysql_select_db($authdb, $auth);
 
 // find all customers
 $data = array();
-$query = "select c.id, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)  order by s.id, c.id";
+$query = "select c.id, s.dbhost, s.dbusername, s.dbpassword, c.urlcomponent from shard s inner join customer c on (c.shardid = s.id)  order by s.id, c.id";
 $res = mysql_query($query, $auth);
 while($row = mysql_fetch_row($res)){
 	$data[] = $row;
@@ -36,7 +38,7 @@ foreach ($data as $customer) {
 	if ($shardhost !== $customer[1]) {
 		$sharddb = DBConnect($customer[1], $customer[2], $customer[3], "aspshard")
 			or die("Could not connect to shard ".$customer[1]);
-			
+		
 		$shardhost = $customer[1];
 		echo "--- SHARD ".$shardhost." ---\n";
 	}
@@ -50,6 +52,16 @@ foreach ($data as $customer) {
 		or die("FAILURE on customer ".$cid." update : ". mysql_error($auth));
 	
 	createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sharddb);
+	
+	// now create customer setting 'urlcomponent'
+	$customerdb = mysql_connect($customer[1], $customer[2], $customer[3])
+		or die("FAILURE on customer ".$cid." connect to customer db to create setting urlcomponent");
+	mysql_select_db($custdbname, $customerdb);
+	
+	$query = "insert into setting (name, value) values ('urlcomponent', '" . $customer[4] . "')";
+	mysql_query($query, $customerdb)
+		or die("FAILURE on customer ".$cid." to insert urlcomponent" . mysql_error($customerdb));
+		
 }
 
 mysql_close($auth);
