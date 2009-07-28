@@ -159,12 +159,11 @@ if($USER->authorize("leavemessage")){
 				"<a href=\"replies.php?jobid=all&showonlyunheard=true\">click to view</a>";
 	}
 }
-$TIMELINE = true;
 
 include_once("nav.inc.php");
 
-
 ?>
+	<link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
 	<table border=0 cellpadding=0 cellspacing=5>
 	<tr>
 		<td>
