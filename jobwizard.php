@@ -367,7 +367,7 @@ class FinishJobWizard extends WizFinish {
 		
 		$jobtypes = array();
 		foreach (array("phone","email","sms","print") as $type)
-			if (isset($jobsettings[$type]))
+			if (isset($jobsettings[$type]) && $jobsettings[$type])
 				$jobtypes[] = $type;
 		
 		$job->type = implode(",",$jobtypes);
