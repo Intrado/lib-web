@@ -15,6 +15,10 @@ require_once("obj/AudioFile.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/SurveyQuestionnaire.obj.php");
 require_once("inc/formatters.inc.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/RenderedList.obj.php");
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -37,7 +41,7 @@ function gettingStarted() {
 		</tr>
 		<tr>
 			<td NOWRAP align="right" valign="top"><b>New User:&nbsp;&nbsp; </b></td>
-			<td >This printable PDF training guide teaches product basics in an simple step-by-step format.
+			<td >This printable PDF training guide teaches product basics in a simple step-by-step format.
 			<ul style="list-style-image: url(img/icons/page_white_acrobat.png)">
 				<li><a href="help/getting_started_online.pdf"> Training Guide</a>
 			</ul>
@@ -145,6 +149,34 @@ function fmt_surveyactions ($obj,$name) {
 			. '<a href="surveys.php?deletetemplate=' . $obj->id . '">Delete</a>';
 }
 
+function job_responses ($obj,$name) {
+		$played = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id' and listened = '0'");
+		$total = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id'");
+		if($played > 0)
+			return '&nbsp;-<a style="display:inline;font-weight:bold; color: #000;" href="replies.php?jobid=' . $obj->id . '">&nbsp;'. $played . ' Unplayed Response(s)</a>';
+		else if($total != 0) {
+			return '&nbps;-<a style="display:inline;color: #000;" href="replies.php?jobid=' . $obj->id . '">&nbps' . $total . ' Response(s)</a>';
+		}
+		
+		
+		
+}
+function job_lists ($obj,$name) {
+		$lists = array();
+		$lists[] = QuickQuery("select listid from job where id=?",false, array($obj->id));
+		$lists = array_merge($lists, QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id)));
+		$calctotal = 0;
+		foreach ($lists as $id) {
+			$list = new PeopleList($id);
+			$renderedlist = new RenderedList($list);
+			$renderedlist->calcStats();
+			$calctotal = $calctotal + $renderedlist->total;
+		}
+		return $calctotal;
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +218,7 @@ include_once("nav.inc.php");
 			<td colspan="2">
 <? 
 			
-			startWindow(_L('Recent Activity'),NULL,true);
+			startWindow(_L('Recent Activity'));
 			
 				$limit = 10;
 				$duplicatejob = array(); 
@@ -194,15 +226,20 @@ include_once("nav.inc.php");
 				$activityfeed = '<table width="100%">
 				<tr>
 					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;font-weight: bold;" >
-					&nbsp;&nbsp;<a href="start.php?filter=none"><img src="img/largeicons/globe.jpg" align="middle" >Show&nbsp;All</a><br />
+					<div class="feedfilter">					
+						<a href="start.php?filter=none"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
+					</div>
+					<br />		
 					<h1>Filter By:</h1>
-					&nbsp;&nbsp;<a href="start.php?filter=activejob"><img src="img/largeicons/ping.jpg" align="middle" >Active&nbsp;Jobs</a><br />
-					&nbsp;&nbsp;<a href="start.php?filter=completedjob"><img src="img/largeicons/checkedgreen.jpg" align="middle" >Completed&nbsp;Jobs</a><br />
-					&nbsp;&nbsp;<a href="start.php?filter=scheduledjob"><img src="img/largeicons/clock.jpg" align="middle" >Scheduled&nbsp;Jobs</a><br />
-					&nbsp;&nbsp;<a href="start.php?filter=savedreports"><img src="img/largeicons/savedreport.jpg" align="middle" >Saved&nbsp;Reports</a><br />
-					&nbsp;&nbsp;<a href="start.php?filter=systemmessages"><img src="img/largeicons/news.jpg" align="middle" >System&nbsp;Messages</a><br />
+					<div class="feedfilter">					
+						<a href="start.php?filter=activejob"><img src="img/largeicons/tiny20x20/ping.jpg">Active&nbsp;Jobs</a><br />
+						<a href="start.php?filter=completedjob"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed&nbsp;Jobs</a><br />
+						<a href="start.php?filter=scheduledjob"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled&nbsp;Jobs</a><br />
+						<a href="start.php?filter=savedreports"><img src="img/largeicons/tiny20x20/savedreport.jpg">Saved&nbsp;Reports</a><br />
+						<a href="start.php?filter=systemmessages"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
+					</div>
 					</td>
-					<td width="50px">&nbsp;</td>
+					<td width="30px">&nbsp;</td>
 					<td class="feed" valign="top" >
 						<table>
 					
@@ -238,8 +275,8 @@ include_once("nav.inc.php");
 							//	$title = _L("Edited Job");
 							//else
 							//	$title = _L("Submitted Job");
-	
-							$content = $time .  ' - <b>' .  $item["name"] . '</b>';
+							$content = $time .  '&nbsp;-&nbsp;<b>' .  $item["name"] . '</b>&nbsp;';
+							
 							
 							$job = new Job();
 							$job->id = $itemid;
@@ -247,7 +284,8 @@ include_once("nav.inc.php");
 							$job->deleted = $item["deleted"];
 							$job->type = $item["jobtype"];
 							
-							$tools = fmt_jobs_actions ($job,$item["name"]);
+							
+							$tools = fmt_jobs_actions ($job,$item["name"],true);
 							
 							$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : _L("Job");
 							switch($status) {
@@ -258,14 +296,15 @@ include_once("nav.inc.php");
 									break;
 								case "repeating":
 									$title = _L('Repeating Job Saved');
-									$tools = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$itemid", "return confirm('Are you sure you want to run this job now?');");						
+									//$tools = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$itemid", "return confirm('Are you sure you want to run this job now?');");						
 									$icon = '<img src="img/largeicons/calendar.jpg" />';
 									$defaultlink = "jobrepeating.php?id=$itemid";					
 									break;
 								case "complete":
 									$title = _L('%1$s Completed Successfully',$jobtype);
 									$icon = '<img src="img/largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '">';
-									$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
+									$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
+
 									break;
 								case "cancelled":
 									$title = _L('%1$s Cancelled',$jobtype);
@@ -293,12 +332,34 @@ include_once("nav.inc.php");
 									$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
 									break;
 							}
-							$jobtypes = explode(",",$item["jobtype"]);
-						//	$icon = "";
-						//	foreach($jobtypes as $jobtype) {
-						//	}
+							//$title .= job_responses($job,Null);
 							
-							//$icon = '<img src="img/themes/' . getBrandTheme() . '/icon_' . $job->type . '.gif".gif" alt="'.escapehtml($title).'">';
+							$jobtypes = explode(",",$item["jobtype"]);
+							$content .= '<div style="margin-right:10px;margin-top:10px;">';
+							$typelength = count($jobtypes) - 1;
+							$typecount = 1;
+							foreach($jobtypes as $jobtype) {
+								if($jobtype == "sms")
+									$alt = strtoupper($jobtype);
+								else
+									$alt = escapehtml(ucfirst($jobtype));
+									
+								if($typecount == $typelength)
+									$content .= $alt . "&nbsp;and&nbsp;";
+								else if($typecount > $typelength)
+									$content .= $alt . "&nbsp;";
+								else
+									$content .= $alt . ",&nbsp;";
+								$typecount++;
+								//$content .= '<img height="20px" src="img/themes/' . getBrandTheme() . '/icon_' . $jobtype . '.gif".gif" alt="'. $alt .' " title="'. $alt .'" />';
+							}
+							$contacts = job_lists($job,Null);
+							
+							$content .= "message&nbsp;with&nbsp;" . ($contacts!=1?$contacts . "&nbsp;contacts":"one contact");
+							$content .= job_responses($job,Null);
+							$content .= '</div>';
+							
+							
 						} else if($item["type"] == "list" ) {
 							$title = "List " . $title;
 							$content = $time .  ' - <b>' .  $item["name"];
@@ -346,9 +407,14 @@ include_once("nav.inc.php");
 						$tdstyle = $limit>1?'class="bottomBorder"':"";
 						$activityfeed .= '<tr>	
 												<td ' . $tdstyle. ' valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $icon . '</a></td>
-												<td ' . $tdstyle. ' valign="top">
-													<a href="' . $defaultlink . '" ' . $defaultonclick . '><h1>' . $title . '</h1>
-													<span >' . $content . '</span></a>
+												<td  ' . $tdstyle. '>
+													<div class="feedtitle">
+														<a href="' . $defaultlink . '" ' . $defaultonclick . '>	
+														' . $title . '</a>
+													</div>
+													<a href="' . $defaultlink . '" ' . $defaultonclick . '>
+														<span>' . $content . '</span>
+													</a>
 												</td>';
 						if($tools) {
 							$activityfeed .= '	<td ' . $tdstyle. ' valign="middle">
@@ -385,7 +451,6 @@ include_once("nav.inc.php");
 				}
 			</script><? 
 			}
-
 
 	?></td></tr></table><?
 
