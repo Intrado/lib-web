@@ -403,7 +403,7 @@ function listform_load_lists(listidsJSON) {
 				
 				if (!data.advancedlist) {
 					nameTD.observe('mouseover', function (event, listid) {
-						$('listRulesPreview').update('Loading..');
+						//$('listRulesPreview').update('Loading..');
 						cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
 							function (transport) {
 								var listRules = transport.responseJSON;
@@ -414,7 +414,7 @@ function listform_load_lists(listidsJSON) {
 								}
 								// Expects a single listid; loop finished in one iteration.
 								for (var listid in listRules) {
-									var previewBox = $('listRulesPreview');
+									var previewBox = new Element('div');//$('listRulesPreview');
 									var tbody = new Element('tbody');
 									for (var i in listRules[listid]) {
 										var rule = listRules[listid][i];
@@ -431,15 +431,15 @@ function listform_load_lists(listidsJSON) {
 										previewBox.update(new Element('table').insert(tbody));
 									}
 
-									new Tip (this, previewBox, {
-					                    style: "protogrey",
-					                    delay: 0.2,
-					                    hideOthers:true,
-					                    hook:{target:"bottomLeft",tip:"topRight"},
-					                    offset:{x:0,y:0},
-					                    stem:"topRight"
-				                  	});
-				                  	
+									new Tip (this, previewBox.innerHTML, {
+					        	style: "protogrey",
+					          delay: 0.2,
+					          hideOthers:true,
+					          hook:{target:"bottomLeft",tip:"topRight"},
+					          offset:{x:0,y:0},
+					          stem:"topRight"
+				          });
+
 									this.prototip.show();
 								}
 							}.bindAsEventListener(nameTD),
