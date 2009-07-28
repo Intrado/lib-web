@@ -439,7 +439,7 @@ function make_person_tip(personid, tiptitle){
 	personTips[personid] = new Tip('persontip_'+personid,
 		{
 			ajax: {
-				url:'?ajax&id='+personid,
+				url:'viewcontact.php?ajax&id='+personid,
 				options: {
 					onComplete:function(transport) {
 					}
