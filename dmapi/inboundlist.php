@@ -215,8 +215,7 @@ if($REQUEST_TYPE == "new"){
 			global $USER, $ACCESS;
 			$list = new PeopleList($_SESSION['listid']);
 			$renderedlist = new RenderedList($list);
-			$renderedlist->mode = "preview";
-			$renderedlist->renderList();
+			$renderedlist->calcStats();
 			$listsize = $renderedlist->total;
 			//error_log("number of people in list: ".$listsize);
 
