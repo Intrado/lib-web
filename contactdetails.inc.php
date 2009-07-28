@@ -310,8 +310,9 @@ if (!isset($_GET['ajax'])) {
 			$USER->authorize('managecontactdetailsettings') ? button("Edit", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php'") : "");
 	}
 	startWindow('Contact');
+} else {
+	echo "<div style='width:240px; height:200px; overflow:auto'>";
 }
-
 
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -592,9 +593,9 @@ foreach ($fieldmaps as $map) {
 				<tr>
 					<td>
 <?
-					if($tokendata['token'] && strtotime($tokendata['expirationdate']) > strtotime("now"))
+					if(!isset($_GET['ajax']) && $tokendata['token'] && strtotime($tokendata['expirationdate']) > strtotime("now"))
 						echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1'");
-					else
+					else if(!isset($_GET['ajax']))
 						echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1'");
 ?>
 					</td>
@@ -603,7 +604,8 @@ foreach ($fieldmaps as $map) {
 ?>
 						<td>
 <?
-							echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
+							if (!isset($_GET['ajax']))
+								echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
 ?>
 						</td>
 <?
@@ -659,5 +661,8 @@ if (!isset($_GET['ajax'])) {
 	EndForm();
 
 	include_once("navbottom.inc.php");
+} else {
+        echo "</div>";
 }
+
 ?>
