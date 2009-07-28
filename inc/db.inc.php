@@ -170,6 +170,7 @@ function DBConnect($host, $user, $pass, $database) {
 	$dsn = 'mysql:dbname='.$database.';host='.$host;
 	try {
 		$custdb = new PDO($dsn, $user, $pass);
+		$custdb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 		$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
 		$custdb->query($setcharset);
 		return $custdb;
