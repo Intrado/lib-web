@@ -1,10 +1,4 @@
 <?
-if (!isset($_SESSION['ajaxtabletogglers']))
-	$_SESSION['ajaxtabletogglers'] = array();
-if (!isset($_SESSION['ajaxtablepagestart']) || !isset($_GET['ajax']))
-	$_SESSION['ajaxtablepagestart'] = array();
-if (isset($_GET['start']) && isset($_GET['containerID']))
-	$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
 
 function showObjects ($data, $titles, $formatters = array(), $scrolling = false, $sorttable = false) {
 	static $tablecounter = 100;
@@ -193,19 +187,14 @@ function showPageMenu ($total,$start, $perpage, $link = NULL) {
 <?
 }
 
-
-
-
-
-
-	
-	
-	
 function ajax_table_handle_togglers($containerID) {
 	global $USER;
 	
-	if (!isset($_SESSION['ajaxtabletogglers'][$containerID]))
+	if (!isset($_SESSION['ajaxtabletogglers'])) {
+		$_SESSION['ajaxtabletogglers'] = array();
+	} else if (!isset($_SESSION['ajaxtabletogglers'][$containerID])) {
 		$_SESSION['ajaxtabletogglers'][$containerID] = array();
+	}
 		
 	$togglers = $_SESSION['ajaxtabletogglers'][$containerID];
 	
@@ -220,8 +209,8 @@ function ajax_table_handle_togglers($containerID) {
 	$_SESSION['ajaxtabletogglers'][$containerID] = $togglers;
 	
 	return true;
-}
-
+}	
+	
 function ajax_table_get_orderby($containerID, $validaliases) {
 	global $USER;
 	
@@ -399,7 +388,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 	}
 	$multisortHtml .= "</div>";
 	
-	$scrollClass = (count($data) > 10) ? "class=\"scrollTableContainer\"" : "";
+	$scrollClass = (count($data) > 10 && $scroll) ? "class=\"scrollTableContainer\"" : "";
 	return "<div style='clear:both'>$togglersHtml $multisortHtml<div $scrollClass>"
 		. '<table width="99%"  cellpadding="3" cellspacing="1" class="list"><tbody>'
 		. "$headerHtml $dataHtml </tbody></table></div></div>";
