@@ -208,6 +208,7 @@ function doDBConnect($result) {
 	try {
 		$dsn = 'mysql:dbname='.$_DBNAME.';host='.$_DBHOST;
 		$_dbcon = new PDO($dsn, $_DBUSER, $_DBPASS);
+		$_dbcon->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 		
 		// TODO set charset
 		$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
@@ -339,8 +340,13 @@ function loginMessageLink($code) {
 	$method = "AuthServer.loginMessageLink";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false && $result['result'] == "") {
+		$retval = array();
 		doDBConnect($result);
-		return QuickQuery("select messageid from reportperson where jobid=? and personid=? and type='phone'", false, array($result['jobid'], $result['personid']));
+		$msgid = QuickQuery("select messageid from reportperson where jobid=? and personid=? and type='phone'", false, array($result['jobid'], $result['personid']));
+		$retval['jobid'] = $result['jobid'];
+		$retval['personid'] = $result['personid'];
+		$retval['messageid'] = $msgid;
+		return $retval;
 	}
 	return false;
 }
@@ -360,6 +366,7 @@ function readonlyDBConnect() {
 		try {
 			$dsn = 'mysql:dbname='.$result['dbname'].';host='.$result['dbhost'];
 			$_readonlyDB = new PDO($dsn, $result['dbuser'], $result['dbpass']);
+			$_readonlyDB->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 		
 			$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
 			$_readonlyDB->query($setcharset);

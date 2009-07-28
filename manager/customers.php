@@ -188,6 +188,7 @@ foreach ($customers as $cust) {
 	if ($currhost != $cust[1]) {
 		$dsn = 'mysql:dbname=c_'.$cust[0].';host='.$shardinfo[$cust[1]][0];
 		$custdb = new PDO($dsn, $shardinfo[$cust[1]][1], $shardinfo[$cust[1]][2]);
+		$custdb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 		$currhost = $cust[1];
 	}
 	

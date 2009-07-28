@@ -212,6 +212,7 @@ if ($data) {
 			try {
 				$dsn = 'mysql:dbname=c_'.$cust[1].';host='.$shardinfo[$cust[15]][0];
 				$custdb = new PDO($dsn, $shardinfo[$cust[15]][1], $shardinfo[$cust[15]][2]);
+				$custdb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 			} catch (PDOException $e) {
 				die("Could not connect to customer database: ".$e->getMessage());
 			}

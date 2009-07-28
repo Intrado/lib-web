@@ -351,6 +351,7 @@ function getPooledCustomerConnection ($cid,$readonly=false) {
 		$dsn = "mysql:dbname=c_$cid;host=$host";
 		error_log("New PDO connection to $dsn");
 		$SHARDINFO[$sid][$dbtype] = new PDO($dsn, $SHARDINFO[$sid]["dbusername"], $SHARDINFO[$sid]["dbpassword"]);
+		$SHARDINFO[$sid][$dbtype]->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 	}
 	//select this customer's db
 	$SHARDINFO[$sid][$dbtype]->query("use c_$cid");
@@ -377,7 +378,9 @@ function getSingleCustomerConnection ($cid,$readonly=false) {
 	$host = $readonly ? $SETTINGS["db"]["readonly"][$connectinfo["id"]-1] : $connectinfo["dbhost"];
 	
 	$dsn = "mysql:dbname=c_$cid;host=$host";
-	return new PDO($dsn, $connectinfo["dbusername"], $connectinfo["dbpassword"]);
+	$db = new PDO($dsn, $connectinfo["dbusername"], $connectinfo["dbpassword"]);
+	$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+	return $db;
 }
 
 ?>
