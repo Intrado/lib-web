@@ -372,7 +372,9 @@ function readonlyDBConnect() {
 			$_readonlyDB->query($setcharset);
 			return $_readonlyDB;
 		} catch (PDOException $e) {
-			error_log("Problem connecting with readonly to MySQL server at " . $result['dbhost'] . " error:" . $e->getMessage());
+			error_log("Problem connecting with readonly to MySQL server at " . $result['dbhost'] . " error:" . $e->getMessage() . " now retry primary db");
+			global $_dbcon;
+			return $_dbcon;
 		}
 	}
 	return false;
