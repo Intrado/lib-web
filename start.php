@@ -132,7 +132,7 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
 		break;
 	case "systemmessages":
-		$mergeditems[] = gettingStarted();	
+		//$mergeditems[] = gettingStarted();	
 		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 9",true));
 		break;	
 	default:
@@ -143,17 +143,13 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 9",true));
-		if(QuickQuery("select count(*) from job where status='complete' and userid=?",false,array($USER->id)) == 0) {
-			$mergeditems[] = gettingStarted();	
-		}
+		//if(QuickQuery("select count(*) from job where status='complete' and userid=?",false,array($USER->id)) == 0) {
+		//	$mergeditems[] = gettingStarted();	
+		//}
 		break;	
 } 
 
 uasort($mergeditems, 'itemcmp');
-
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +193,271 @@ function listcontacts ($obj,$name) {
 	return $calctotal;
 }
 
+function activityfeed($mergeditems,$ajax = false) {
+	$actionids = array();
+	$activityfeed = $ajax===true?array():"";
+	$limit = 10;
+	$duplicatejob = array(); 
+	
+	if(empty($mergeditems)) {
+		$activityfeed .= '<tr><td><h3><img src="img/icons/information.gif" />&nbsp;' . _L("No Recent Items.") . '</h3></td></tr>';
+	} else {
+		while(!empty($mergeditems) && $limit > 0) {
+			$item = array_shift($mergeditems);
+			$time = date("M j, g:i a",strtotime($item["date"]));	
+			$title = $item["status"];
+			$content = "";
+			$tools = "";
+			$itemid = $item["id"];
+			$icon = "";
+			$defaultlink = "";
+			$defaultonclick = null;
+			if($item["type"] == "job" ) {
+				if(array_search($itemid,$duplicatejob) !== false) {
+					continue;
+				} 
+				$status = $item["status"];
+				if($status == "completed" || $status == "cancelled") {
+					//$title = _L("Completed Job");
+					$duplicatejob[] = $itemid;
+				}
 
+				//	$title = _L("Edited Job");
+				//else
+				//	$title = _L("Submitted Job");
+
+				
+				$job = new Job();
+				$job->id = $itemid;
+				$job->status = $status;
+				$job->deleted = $item["deleted"];
+				$job->type = $item["jobtype"];
+				$tools = fmt_jobs_actions ($job,$item["name"]);
+				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+				
+				$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : _L("Job");
+				switch($status) {
+					case "new":
+						$title = _L('%1$s Saved',$jobtype);
+						$defaultlink = "job.php?id=$itemid";
+						$icon = '<img src="img/largeicons/folderandfiles.jpg" />';
+						break;
+					case "repeating":
+						$title = _L('Repeating Job Saved');
+						//$tools = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$itemid", "return confirm('Are you sure you want to run this job now?');");						
+						$icon = '<img src="img/largeicons/calendar.jpg" />';
+						$defaultlink = "jobrepeating.php?id=$itemid";					
+						break;
+					case "complete":
+						$title = _L('%1$s Completed Successfully',$jobtype);
+						$icon = '<img src="img/largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '">';
+						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
+
+						break;
+					case "cancelled":
+						$title = _L('%1$s Cancelled',$jobtype);
+						$icon = '<img src="img/largeicons/checkedgreen.jpg" />';
+						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
+						break;
+					case "active":
+						$title = _L('%1$s Submitted, Status: Active',$jobtype);
+						$icon = '<img src="img/largeicons/ping.jpg" />';
+						$defaultlink = "#";
+						$defaultonclick = "popup('jobmonitor.php?jobid=$id', 500, 450);";
+						break;
+					case "scheduled":
+						$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
+						$icon = '<img src="img/largeicons/clock.jpg" />';
+						$defaultlink = "job.php?id=$itemid";
+						break;
+					case "procactive":
+						$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
+				//		$title = _L('%1$s Submitted, Status: %1$s',$jobtype,fmt_status($job,$item["name"]));
+						$icon = '<img src="img/largeicons/gear.jpg" />';
+						$defaultlink = "job.php?id=$itemid";
+						break;								
+					default:
+						$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
+						break;
+				}
+				
+				//$title .= job_responses($job,Null);
+				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
+								$time .  '&nbsp;-&nbsp;<b>' .  $item["name"] . '</b>&nbsp;';
+				
+				$jobtypes = explode(",",$item["jobtype"]);
+				$content .= '</a><div style="margin-right:10px;margin-top:10px;">
+							<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
+				$typelength = count($jobtypes) - 1;
+				$typecount = 1;
+				foreach($jobtypes as $jobtype) {
+					if($jobtype == "sms")
+						$alt = strtoupper($jobtype);
+					else
+						$alt = escapehtml(ucfirst($jobtype));
+						
+					if($typecount == $typelength)
+						$content .= $alt . "&nbsp;and&nbsp;";
+					else if($typecount > $typelength)
+						$content .= $alt . "&nbsp;";
+					else
+						$content .= $alt . ",&nbsp;";
+					$typecount++;
+					//$content .= '<img height="20px" src="img/themes/' . getBrandTheme() . '/icon_' . $jobtype . '.gif".gif" alt="'. $alt .' " title="'. $alt .'" />';
+				}
+				$contacts = listcontacts($job,"job");
+				
+				$content .= "message&nbsp;with&nbsp;" . ($contacts!=1?$contacts . "&nbsp;contacts":"one contact") . '</a>';
+				$content .= job_responses($job,Null);
+				$content .= '</div>';
+				
+				
+			} else if($item["type"] == "list" ) {
+				$title = "Contact List " . $title;
+				$defaultlink = "list.php?id=$itemid";
+				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . "</b>";
+				
+				$contacts = listcontacts($itemid,"list");
+				
+				$content .= 										'&nbsp;-&nbsp;This list ';
+				if(isset($item["lastused"]))
+					$content .= ' was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
+				else
+					$content .= ' is never used';
+				$content .= " and have <b>" . ($contacts!=1?$contacts . "&nbsp;</b>contacts":"one</b>&nbsp;contact") . '</a>';
+
+				$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
+				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+				$icon = '<img src="img/largeicons/addrbook.jpg">';			
+			} else if($item["type"] == "message" ) {
+				$messagetype = $item["messagetype"];
+				$title = _L('%1$s message %2$s',escapehtml(ucfirst($messagetype)),escapehtml($title));
+				$tools = action_links (
+					action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
+					action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
+					);	
+				$defaultlink = "message$messagetype.php?id=$itemid";
+				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . '</b>' . '</a>';
+				switch($messagetype) {
+					case "phone":
+						$icon = '<img src="img/largeicons/phonehandset.jpg">';
+						break;
+					case "email":
+						$icon = '<img src="img/largeicons/email.jpg">';
+						break;
+					case "sms":
+						$icon = '<img src="img/largeicons/smschat.jpg">';
+						break;
+				}
+			} else if($item["type"] == "report" ) {
+				$title = "Report " . $title;				
+				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
+								$time .  ' - ' .  $item["name"] . '</a>';
+				$icon = '<img src="img/largeicons/savedreport.jpg">';
+				$defaultlink = "reportjobsummary.php?id=$itemid";
+			} else if($item["type"] == "systemmessage" ) {
+				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $item["message"] . '</a>';
+				$icon = '<img src="img/largeicons/notepad.jpg">';
+			}
+			
+			$defaultonclick = !isset($defaultonclick) ? "" : 'onclick="'. $defaultonclick. '"';
+			
+			if($ajax===true) {
+				$activityfeed[] = array("itemid" => $itemid,
+										"defaultlink" => $defaultlink,
+										"defaultonclick" => $defaultonclick,
+										"icon" => $icon,
+										"title" => $title,
+										"content" => $content,
+										"tools" => $tools);
+			} else {	
+				
+				$activityfeed .= '<tr>	
+										<td valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $icon . '</a></td>
+										<td >
+											<div class="feedtitle">
+												<a href="' . $defaultlink . '" ' . $defaultonclick . '>	
+												' . $title . '</a>
+											</div>
+											<span>' . $content . '</span>
+											
+										</td>';
+				if($tools) {
+					$activityfeed .= '	<td valign="middle">
+											<div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
+											<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>
+										</td>';
+					$actionids[] = "'$itemid'";
+				
+				}
+				$activityfeed .= 	'	</tr>';
+			}
+			$limit--;
+		}
+	} 
+	if($ajax!==true) {
+		$activityfeed .= "
+				<script>
+				var actionids = Array(" . implode(",",$actionids) . ");
+				function addfeedtools() {	
+					for(i=0;i<actionids.length;i++){
+						var id = actionids[i];
+						$('actionlink_' + id).tip = new Tip('actionlink_' + id, $('actions_' + id).innerHTML, {
+							style: 'protogrey',
+							radius: 4,
+							border: 4,
+							hideOn: false,
+							hideAfter: 0.5,
+							stem: 'rightTop',
+							hook: {  target: 'leftMiddle', tip: 'topRight'  },
+							width: 'auto',
+							offset: { x: 0, y: 0 }
+						});
+					}
+				}
+				function removefeedtools() {
+					for(i=0;i<actionids.length;i++){
+						Tips.remove('actionlink_' + actionids[i]);
+					}
+				}
+				function applyfilter(filter) {
+						new Ajax.Request('start.php?ajax=true&filter=' + filter, {
+							method:'get',
+							onSuccess: function (response) {
+								var result = response.responseJSON;
+								var html = '';
+								var size = result.length;
+								removefeedtools();
+								actionids = Array();
+								//alert('jobs returned ' + result[0].defaultlink + result[0]['itemid']);
+								for(i=0;i<size;i++){
+									var item = result[i];	
+									html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.icon + '</a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
+									if(item.tools) {
+										html += '<td valign=\"middle\"><div id=\"actionlink_' + item.itemid + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + item.itemid + '\" style=\"display:none;\">' + item.tools + '</div></td>';
+									}
+									actionids[i] = item.itemid;
+									html += '</tr>';
+								}
+								$('feeditems').innerHTML = html;
+								addfeedtools();
+							}
+						});
+	
+				}
+				
+				addfeedtools();				
+				</script>";
+	}
+	return $activityfeed;
+}
+
+if (isset($_GET['ajax'])) {
+	header('Content-Type: application/json');
+	$data = activityfeed($mergeditems,true);
+	echo json_encode(!empty($data) ? $data : false);
+	exit();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -249,19 +509,18 @@ include_once("nav.inc.php");
 <? 		
 			startWindow(_L('Recent Activity'));
 			
-				$limit = 10;
-				$duplicatejob = array(); 
+
 				//style="border: none;border-collapse: collapse;">
-				$activityfeed = '<table width="100%">
+				$activityfeed = '<table width="100%" name="recentactivity">
 				<tr>
 					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;font-weight: bold;" >
 					<div class="feedfilter">					
-						<a href="start.php?filter=none"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
+						<a href="start.php?filter=none" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
 					</div>
 					<br />		
 					<h1>Filter By:</h1>
 					<div id="jobfilters" class="feedfilter">	
-						<a href="start.php?filter=jobs"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
+						<a href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
 					</div>
 					<div id="jobsubfilters" style="display:none;">	
 							<a href="start.php?filter=savedjobs"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a><br />	
@@ -272,7 +531,7 @@ include_once("nav.inc.php");
 							
 					</div>
 					<div class="feedfilter">	
-						<a href="start.php?filter=messages"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
+						<a href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
 					</div>
 					<div id="jobsubfilters" style="display:none;">	
 							<a href="start.php?filter=phonemessages"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />	
@@ -280,240 +539,26 @@ include_once("nav.inc.php");
 							<a href="start.php?filter=smsmessages"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
 					</div>
 					<div class="feedfilter">	
-						<a href="start.php?filter=lists"><img src="img/largeicons/tiny20x20/addrbook.jpg">Contacts</a><br />
-						<a href="start.php?filter=savedreports"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
-						<a href="start.php?filter=systemmessages"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
+						<a href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Contacts</a><br />
+						<a href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
+						<a href="start.php?filter=systemmessages" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
 						
 					</div>
 					
 					</td>
 					<td width="30px">&nbsp;</td>
 					<td class="feed" valign="top" >
-						<table>
+					<table id="feeditems">	
 				
 				';	
 				
-				/*
-										
-						<a href="start.php?filter=activejob"><img src="img/largeicons/tiny20x20/ping.jpg">Active&nbsp;Jobs</a><br />
-						<a href="start.php?filter=completedjob"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed&nbsp;Jobs</a><br />
-						<a href="start.php?filter=scheduledjob"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled&nbsp;Jobs</a><br />
-						<a href="start.php?filter=savedreports"><img src="img/largeicons/tiny20x20/savedreport.jpg">Saved&nbsp;Reports</a><br />
-						<a href="start.php?filter=systemmessages"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
-					*/
-				//"border="1"
-				//style="border: none;border-collapse: collapse;">
-				$actionids = array();
-				
-				if(empty($mergeditems)) {
-					$activityfeed .= '<tr><td><h3><img src="img/icons/information.gif" />&nbsp;' . _L("No Recent Items.") . '</h3></td></tr>';
-				} else {
-					while(!empty($mergeditems) && $limit > 0) {
-						$item = array_shift($mergeditems);
-						$time = date("M j, g:i a",strtotime($item["date"]));	
-						$title = $item["status"];
-						$content = "";
-						$tools = "";
-						$itemid = $item["id"];
-						$icon = "";
-						$defaultlink = "";
-						$defaultonclick = null;
-						if($item["type"] == "job" ) {
-							if(array_search($itemid,$duplicatejob) !== false) {
-								continue;
-							} 
-							$status = $item["status"];
-							if($status == "completed" || $status == "cancelled") {
-								//$title = _L("Completed Job");
-								$duplicatejob[] = $itemid;
-							}
-	
-							//	$title = _L("Edited Job");
-							//else
-							//	$title = _L("Submitted Job");
-
-							
-							$job = new Job();
-							$job->id = $itemid;
-							$job->status = $status;
-							$job->deleted = $item["deleted"];
-							$job->type = $item["jobtype"];
-							$tools = fmt_jobs_actions ($job,$item["name"]);
-							$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-							
-							$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : _L("Job");
-							switch($status) {
-								case "new":
-									$title = _L('%1$s Saved',$jobtype);
-									$defaultlink = "job.php?id=$itemid";
-									$icon = '<img src="img/largeicons/folderandfiles.jpg" />';
-									break;
-								case "repeating":
-									$title = _L('Repeating Job Saved');
-									//$tools = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$itemid", "return confirm('Are you sure you want to run this job now?');");						
-									$icon = '<img src="img/largeicons/calendar.jpg" />';
-									$defaultlink = "jobrepeating.php?id=$itemid";					
-									break;
-								case "complete":
-									$title = _L('%1$s Completed Successfully',$jobtype);
-									$icon = '<img src="img/largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '">';
-									$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
-
-									break;
-								case "cancelled":
-									$title = _L('%1$s Cancelled',$jobtype);
-									$icon = '<img src="img/largeicons/checkedgreen.jpg" />';
-									$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
-									break;
-								case "active":
-									$title = _L('%1$s Submitted, Status: Active',$jobtype);
-									$icon = '<img src="img/largeicons/ping.jpg" />';
-									$defaultlink = "#";
-									$defaultonclick = "popup('jobmonitor.php?jobid=$id', 500, 450);";
-									break;
-								case "scheduled":
-									$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
-									$icon = '<img src="img/largeicons/clock.jpg" />';
-									$defaultlink = "job.php?id=$itemid";
-									break;
-								case "procactive":
-									$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
-							//		$title = _L('%1$s Submitted, Status: %1$s',$jobtype,fmt_status($job,$item["name"]));
-									$icon = '<img src="img/largeicons/gear.jpg" />';
-									$defaultlink = "job.php?id=$itemid";
-									break;								
-								default:
-									$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
-									break;
-							}
-							
-							//$title .= job_responses($job,Null);
-							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
-											$time .  '&nbsp;-&nbsp;<b>' .  $item["name"] . '</b>&nbsp;';
-							
-							$jobtypes = explode(",",$item["jobtype"]);
-							$content .= '</a><div style="margin-right:10px;margin-top:10px;">
-										<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
-							$typelength = count($jobtypes) - 1;
-							$typecount = 1;
-							foreach($jobtypes as $jobtype) {
-								if($jobtype == "sms")
-									$alt = strtoupper($jobtype);
-								else
-									$alt = escapehtml(ucfirst($jobtype));
-									
-								if($typecount == $typelength)
-									$content .= $alt . "&nbsp;and&nbsp;";
-								else if($typecount > $typelength)
-									$content .= $alt . "&nbsp;";
-								else
-									$content .= $alt . ",&nbsp;";
-								$typecount++;
-								//$content .= '<img height="20px" src="img/themes/' . getBrandTheme() . '/icon_' . $jobtype . '.gif".gif" alt="'. $alt .' " title="'. $alt .'" />';
-							}
-							$contacts = listcontacts($job,"job");
-							
-							$content .= "message&nbsp;with&nbsp;" . ($contacts!=1?$contacts . "&nbsp;contacts":"one contact") . '</a>';
-							$content .= job_responses($job,Null);
-							$content .= '</div>';
-							
-							
-						} else if($item["type"] == "list" ) {
-							$title = "Contact List " . $title;
-							$defaultlink = "list.php?id=$itemid";
-							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . "</b>";
-							
-							$contacts = listcontacts($itemid,"list");
-							
-							$content .= 										'&nbsp;-&nbsp;This list ';
-							if(isset($item["lastused"]))
-								$content .= ' was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
-							else
-								$content .= ' is never used';
-							$content .= " and have <b>" . ($contacts!=1?$contacts . "&nbsp;</b>contacts":"one</b>&nbsp;contact") . '</a>';
-
-							$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
-							$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-							$icon = '<img src="img/largeicons/addrbook.jpg">';			
-						} else if($item["type"] == "message" ) {
-							$messagetype = $item["messagetype"];
-							$title = _L('%1$s message %2$s',escapehtml(ucfirst($messagetype)),escapehtml($title));
-							$tools = action_links (
-								action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
-								action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
-								);	
-							$defaultlink = "message$messagetype.php?id=$itemid";
-							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . '</b>' . '</a>';
-							switch($messagetype) {
-								case "phone":
-									$icon = '<img src="img/largeicons/phonehandset.jpg">';
-									break;
-								case "email":
-									$icon = '<img src="img/largeicons/email.jpg">';
-									break;
-								case "sms":
-									$icon = '<img src="img/largeicons/smschat.jpg">';
-									break;
-							}
-						} else if($item["type"] == "report" ) {
-							$title = "Report " . $title;				
-							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
-											$time .  ' - ' .  $item["name"] . '</a>';
-							$icon = '<img src="img/largeicons/savedreport.jpg">';
-							$defaultlink = "reportjobsummary.php?id=$itemid";
-						} else if($item["type"] == "systemmessage" ) {
-							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $item["message"] . '</a>';
-							$icon = '<img src="img/largeicons/notepad.jpg">';
-						}
-						
-						
-						$defaultonclick = !isset($defaultonclick) ? "" : 'onclick="'. $defaultonclick. '"';
-						
-						$tdstyle = $limit>1?'class="bottomBorder"':"";
-						$activityfeed .= '<tr>	
-												<td ' . $tdstyle. ' valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $icon . '</a></td>
-												<td  ' . $tdstyle. '>
-													<div class="feedtitle">
-														<a href="' . $defaultlink . '" ' . $defaultonclick . '>	
-														' . $title . '</a>
-													</div>
-													<span>' . $content . '</span>
-													
-												</td>';
-						if($tools) {
-							$activityfeed .= '	<td ' . $tdstyle. ' valign="middle">
-													<div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg".gif"/>&nbsp;Tools</div>
-													<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>
-												</td>';
-							$actionids[] = "'$itemid'";
-						
-						}
-						$activityfeed .= 	'	</tr>';
-						$limit--;
-					}
-				} 
+				$activityfeed .= activityfeed($mergeditems,false);
 				
 				$activityfeed .= '</table></td></tr>	</table>';
 				echo $activityfeed;
 			endWindow();
 			
-			?> <script>
-				var actionids = Array(<?= implode(",",$actionids)?>);
-				for(i=0;i<<?= count($actionids) ?>;i++){
-					var id = actionids[i];
-					$('actionlink_' + id).tip = new Tip('actionlink_' + id, $('actions_' + id).innerHTML, {
-						style: 'protogrey',
-						radius: 4,
-						border: 4,
-						hideOn: false,
-						hideAfter: 0.5,
-						stem: 'rightTop',
-						hook: {  target: 'leftMiddle', tip: 'topRight'  },
-						width: 'auto',
-						offset: { x: 0, y: 0 }
-					});
-				}
-			</script><? 
+			?> <? 
 			}
 
 	?></td></tr></table><?
