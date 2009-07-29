@@ -387,20 +387,16 @@ function listform_load_lists(listidsJSON) {
 				listformVars.totals[listid] = data.total;
 				listform_update_grand_total();
 			
-				// Keep a hidden input field to keep track of id for this table row.
 				var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':listid})).hide();
-				var nameTD = new Element('td', {'class':'List NameTD', 'width':'10%','style':'overflow: hidden; white-space: nowrap;'});
-				nameTD.insert(data.name);
-				var actionTD = new Element('td', {'class':'List ActionTD'});
-				actionTD.insert('<img src="img/icons/delete.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
-				var statisticsTD = new Element('td', {'class':'List', 'colspan':100}).update(format_thousands_separator(data.total));
-				
-				
-				
+    			var commonStyle = 'border-bottom: solid 2px rgb(220,220,220)';
+			    var nameTD = new Element('td', {'class':'List NameTD', 'width':'10%','style':'cursor:pointer; overflow: hidden; white-space: nowrap;' + commonStyle});
+			    nameTD.insert(data.name);
+			    var actionTD = new Element('td', {'class':'List ActionTD', 'style':commonStyle});
+			    actionTD.insert('<img src="img/icons/delete.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
+			    var statisticsTD = new Element('td', {'class':'List', 'colspan':100, 'style':commonStyle}).update(format_thousands_separator(data.total));
+
 				$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(actionTD).insert(statisticsTD));
-				
-				
-				
+
 				if (!data.advancedlist) {
 					nameTD.observe('mouseover', function (event, listid) {
 						//$('listRulesPreview').update('Loading..');
@@ -431,16 +427,22 @@ function listform_load_lists(listidsJSON) {
 										previewBox.update(new Element('table').insert(tbody));
 									}
 
-									new Tip (this, previewBox.innerHTML, {
+									var row = this.up('tr');
+									
+									new Tip (row, previewBox.innerHTML, {
 							        	style: "protogrey",
 							        	delay: 0.2,
-							        	hideOthers:true,
+							        	hideOthers:true,,
+							        	closeButton: true,
+							        	hideOn: 'close',
+							        	showOn: 'click',
 							        	hook:{target:"bottomLeft",tip:"topRight"},
 							        	offset:{x:0,y:0},
-							        	stem:"topRight"
+							        	stem:"topRight",
+							        	title: this.innerHTML
 						          	});
 
-									this.prototip.show();
+									row.prototip.show();
 								}
 							}.bindAsEventListener(nameTD),
 						null, false );
@@ -503,8 +505,13 @@ function listform_onclick_existing_list(event, listid) {
 
 function listform_remove_list(event, listid, doconfirm) {
 	Tips.hideAll();
-	if (doconfirm && !confirm('<?=addslashes(_L("Are you sure you want to remove this list?"))?>'))
-		return;
+
+	if (doconfirm) {
+		event.stop();
+		if (!confirm('<?=addslashes(_L("Are you sure you want to remove this list?"))?>'))
+			return;
+	}
+	
 	var hiddenInput = $('listsTableBody').down('input[value='+listid+']');
 	if (hiddenInput) {
 		var tr = hiddenInput.up('tr');
