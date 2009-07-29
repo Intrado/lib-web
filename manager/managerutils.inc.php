@@ -79,6 +79,7 @@ function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sha
 
 	$tables = array();
 	$tables['audiofile'] 	= "select";
+	$tables['content'] 		= "select";
 	$tables['contactpref'] 	= "select, insert, update, delete";
 	$tables['email'] 		= "select, update";
 	$tables['fieldmap'] 	= "select";
