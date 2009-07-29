@@ -432,13 +432,13 @@ function listform_load_lists(listidsJSON) {
 									}
 
 									new Tip (this, previewBox.innerHTML, {
-					        	style: "protogrey",
-					          delay: 0.2,
-					          hideOthers:true,
-					          hook:{target:"bottomLeft",tip:"topRight"},
-					          offset:{x:0,y:0},
-					          stem:"topRight"
-				          });
+							        	style: "protogrey",
+							        	delay: 0.2,
+							        	hideOthers:true,
+							        	hook:{target:"bottomLeft",tip:"topRight"},
+							        	offset:{x:0,y:0},
+							        	stem:"topRight"
+						          	});
 
 									this.prototip.show();
 								}
@@ -485,7 +485,7 @@ function listform_hover_existing_list(event, listid) {
 			hideOthers:true,
 			hook:{target:"topMiddle",tip:"bottomLeft"},
 			offset:{x:0,y:0},
-			stem:"bottomLeft",
+			stem:"bottomLeft"
 		});
 		this.prototip.show();
 	}.bindAsEventListener(this, listid));
