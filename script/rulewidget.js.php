@@ -23,7 +23,7 @@ var RuleWidget = Class.create({
 
 	// @param container, the DOM container for this widget.
 	initialize: function(container, readonly, allowedFields) {
-		if (allowedFields)
+		if (!allowedFields)
 			this.allowedFields = ['f','g','c'];
 		else
 			this.allowedFields = allowedFields;
