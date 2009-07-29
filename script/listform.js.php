@@ -432,7 +432,7 @@ function listform_load_lists(listidsJSON) {
 									new Tip (row, previewBox.innerHTML, {
 							        	style: "protogrey",
 							        	delay: 0.2,
-							        	hideOthers:true,,
+							        	hideOthers:true,
 							        	closeButton: true,
 							        	hideOn: 'close',
 							        	showOn: 'click',
