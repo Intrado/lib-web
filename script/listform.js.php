@@ -347,7 +347,7 @@ function listform_refresh_liststats(listID) {
 				var data = stats[listID];
 				var hiddenTD = $('listsTableBody').down('input[value='+listID+']').up('td');
 				var nameTD = hiddenTD.next('td');
-				var statisticsTD = nameTD.next('td',2);
+				var statisticsTD = nameTD.next('td',1);
 				nameTD.update(data.name);
 				statisticsTD.update(format_thousands_separator(data.total));
 				
