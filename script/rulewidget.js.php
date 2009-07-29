@@ -86,7 +86,7 @@ var RuleWidget = Class.create({
 				// data['fieldmaps'] is indexed by record id, we prefer indexing by fieldnum.
 				for (var i in data['fieldmaps']) {
 					var fieldnum = data['fieldmaps'][i].fieldnum;
-					if (this.allowedFields.indexOf(fieldnum.charAt(0)) >= 0)
+					if (this.allowedFields.indexOf(fieldnum.charAt(0)) < 0)
 						continue;
 					this.fieldmaps[fieldnum] = data['fieldmaps'][i];
 					for (var type in this.operators) {
