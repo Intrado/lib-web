@@ -439,6 +439,7 @@ function listform_load_lists(listidsJSON) {
 							        	hook:{target:"bottomLeft",tip:"topRight"},
 							        	offset:{x:0,y:0},
 							        	stem:"topRight",
+							        	hideAfter:2,
 							        	title: this.innerHTML
 						          	});
 
