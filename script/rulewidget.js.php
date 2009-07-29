@@ -317,12 +317,18 @@ var RuleEditor = Class.create({
 		
 		var val = [];
 		// MULTISEARCH
-		if (this.valueTD.down('ul')) {
+		if (fieldmap.type == 'multisearch') {
 			var multisearchValues = [];
-			var checkboxes = this.valueTD.select('input');
-			for (var i = 0; i < checkboxes.length; ++i) {
-				if (checkboxes[i].checked)
-					multisearchValues.push(checkboxes[i].getValue());
+			if (this.valueTD.down('input')) {
+				var checkboxes = this.valueTD.select('input');
+				for (var i = 0; i < checkboxes.length; ++i) {
+					if (checkboxes[i].checked)
+						multisearchValues.push(checkboxes[i].getValue());
+				}
+			} else {
+				var select = this.valueTD.down('select');
+				if (select)
+					multisearchValues.push(select.getValue());
 			}
 			if (multisearchValues.length < 1)
 				return false;
@@ -372,7 +378,7 @@ var RuleEditor = Class.create({
 		// Invoke onclick for each radiobox.
 		criteriaSelectbox.select('input').invoke('observe', 'click', function(event) {
 			var fieldmap = this.get_selected_fieldmap();
-			if (fieldmap.type != 'multisearch' || !this.valueTD.down('input')) {
+			if (fieldmap.type != 'multisearch' || (!this.valueTD.down('input') && !this.valueTD.down('select'))) {
 				this.show_value_column(fieldmap.fieldnum);
 			}
 			this.trigger_event_in_column(null, this.valueTD);
@@ -404,11 +410,9 @@ var RuleEditor = Class.create({
 					var multicheckboxHTML = this.ruleWidget.multisearchHTMLCache[fieldnum];
 					container.update(multicheckboxHTML);
 					this.add_multicheckbox_toolbar(container);
-					var boxes = container.select('input');
-					if (boxes.length == 1) {
-						boxes[0].checked = true; // Does not work in Internet Explorer.
-						boxes[0].setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
-					} else {
+					
+					if (container.down('input')) {
+						var boxes = container.select('input');
 						boxes.each(function(checkbox) {
 							checkbox.checked = false;
 						});
@@ -427,12 +431,11 @@ var RuleEditor = Class.create({
 							container = new Element('div').update(multicheckboxHTML);
 							section.update(this.add_multicheckbox_toolbar(container));
 							// TODO: optimize input[type="checkbox"] to first and last element?
-							var boxes = container.select('input');
-							boxes.each(function(input) {
-								input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
-							}.bind(this));
-							if (boxes.length == 1) {
-								boxes[0].checked = true;
+							if (container.down('input')) {
+								var boxes = container.select('input');
+								boxes.each(function(input) {
+									input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
+								}.bind(this));
 							}
 						}.bindAsEventListener(this, fieldnum)
 					);
@@ -606,9 +609,7 @@ var RuleEditor = Class.create({
 			var value = paired ? data.value: data;
 			var checkbox = new Element('input', {'type':'checkbox', 'value':value, 'style':'font-size:90%'});
 			if (max == 1) {
-				checkbox = new Element('input', {'type':'radio', 'value':value, 'style':'font-size:90%'});
-				checkbox.checked = true;
-				checkbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
+				return "<select><option value='"+value+"'>" +text+"</option></select>";
 			}
 			var label = new Element('label', {'style':'margin:0;padding:1px; font-size:90%;', 'for':checkbox.identify()}).update(text.escapeHTML());
 			var li = new Element('li', {'style':'white-space:nowrap; font-size:90%; margin:0;margin:1px;overflow: hidden; vertical-align:middle'}).insert(checkbox).insert(label);
