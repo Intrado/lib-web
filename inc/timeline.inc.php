@@ -155,10 +155,8 @@ foreach($jobs as $job) {
 
 
 $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
-
 ?>
-<div style="height: 150px;overflow: auto">
-	<div id="maincanvas"  style="height:<? echo $minhight ?>px;">
+	<div id="maincanvas"  style="height:<? echo $minhight + 78 ?>px;">
 	
 	<table>
 		<tr>
@@ -216,21 +214,15 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		</tr>
 		</table>
 	</div>
-</div>
 
 <script>
 	var jobids=new Array(<?= implode(",",$jobids) ?>);
 	var jobstatus=new Array(<?= implode(",",$jobstatus) ?>);
 
-	$('canvas').blindDown({duration: 0.4});
-	var cw = $('canvas').getWidth();
-	if(cw) { <!-- IE can not handle getwidth in some locations -->
+	document.observe('dom:loaded', function() {
+		$('canvas').blindDown({duration: 0.4});
+		var cw = $('canvas').getWidth();
 		for(i=0;i<<? echo $i ?>;i++){
-			var w = $('__' + i).getWidth();
-			if(!w) {break;}
-			$('__' + i).style.width = "0%";
-			
-			$('__' + i).morph('width:' + ((w/cw)*100) + '%;',{duration: 1.5});
 			$('__' + i).tip = new Tip('__' + i, getcontent(i), {
 				style: 'protogrey',
 				radius: 4,
@@ -243,16 +235,12 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				width: '220px',
 				offset: { x: 0, y: -5 }
 			});
-			$('__' + i).observe('prototip:shown', function() {
-				//	this.tip.wrapper.shake();
-				//Effect.BlindDown(this.tip.wrapper, { duration: 0.3 });
-				//this.pulsate({ pulses: 1, duration: 0.5 });
-			});
-
-
-
+			var w = $('__' + i).getWidth();
+			if(!w || cw) {continue;}
+			$('__' + i).style.width = "0%";
+			$('__' + i).morph('width:' + ((w/cw)*100) + '%;',{duration: 1.5});
 		}
-	}
+	});
 	function getcontent(id) {
 		var content = $("box_" + id).innerHTML;
 		content += '<br /><a href="job.php?id=' + jobids[id] + '">Edit</a><br />';
