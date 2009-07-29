@@ -543,6 +543,9 @@ function listform_remove_list(event, listid, doconfirm) {
 }
 
 function listform_reset_list_selectbox() {
+	if ($('listSelectboxContainer').down('input'))
+		return;
+		
 	var values = [];
 	for (var listid in listformVars.existingLists) {
 		var data = {text:listformVars.existingLists[listid].name, value:listid, checked: false, onclick:listform_onclick_existing_list, onhover:listform_hover_existing_list};
