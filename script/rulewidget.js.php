@@ -608,12 +608,15 @@ var RuleEditor = Class.create({
 			if (max == 1) {
 				checkbox = new Element('input', {'type':'radio', 'value':value, 'style':'font-size:90%'});
 				checkbox.checked = true;
+				checkbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
 			}
 			var label = new Element('label', {'style':'margin:0;padding:1px; font-size:90%;', 'for':checkbox.identify()}).update(text.escapeHTML());
 			var li = new Element('li', {'style':'white-space:nowrap; font-size:90%; margin:0;margin:1px;overflow: hidden; vertical-align:middle'}).insert(checkbox).insert(label);
 			if (paired && !returnHTML) {
-				if (data.checked)
+				if (data.checked) {
 					checkbox.checked = true;
+					checkbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
+				}
 				if (data.onclick)
 					checkbox.observe('click', data.onclick.bindAsEventListener(checkbox, value));
 				if (data.onhover)
