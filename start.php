@@ -263,7 +263,7 @@ include_once("nav.inc.php");
 					<div id="jobfilters" class="feedfilter">	
 						<a href="start.php?filter=jobs"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
 					</div>
-					<div id="jobsubfilters" class="feedsubfilter">	
+					<div id="jobsubfilters" style="display:none;">	
 							<a href="start.php?filter=savedjobs"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a><br />	
 							<a href="start.php?filter=scheduledjobs"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a><br />	
 							<a href="start.php?filter=activejobs"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a><br />
@@ -274,7 +274,7 @@ include_once("nav.inc.php");
 					<div class="feedfilter">	
 						<a href="start.php?filter=messages"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
 					</div>
-					<div class="feedsubfilter">	
+					<div id="jobsubfilters" style="display:none;">	
 							<a href="start.php?filter=phonemessages"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />	
 							<a href="start.php?filter=emailmessages"><img src="img/largeicons/tiny20x20/email.jpg">Email</a><br />
 							<a href="start.php?filter=smsmessages"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
@@ -331,8 +331,7 @@ include_once("nav.inc.php");
 							//	$title = _L("Edited Job");
 							//else
 							//	$title = _L("Submitted Job");
-							$content = $time .  '&nbsp;-&nbsp;<b>' .  $item["name"] . '</b>&nbsp;';
-							
+
 							
 							$job = new Job();
 							$job->id = $itemid;
@@ -387,10 +386,14 @@ include_once("nav.inc.php");
 									$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
 									break;
 							}
+							
 							//$title .= job_responses($job,Null);
+							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
+											$time .  '&nbsp;-&nbsp;<b>' .  $item["name"] . '</b>&nbsp;';
 							
 							$jobtypes = explode(",",$item["jobtype"]);
-							$content .= '<div style="margin-right:10px;margin-top:10px;">';
+							$content .= '</a><div style="margin-right:10px;margin-top:10px;">
+										<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
 							$typelength = count($jobtypes) - 1;
 							$typecount = 1;
 							foreach($jobtypes as $jobtype) {
@@ -410,38 +413,37 @@ include_once("nav.inc.php");
 							}
 							$contacts = listcontacts($job,"job");
 							
-							$content .= "message&nbsp;with&nbsp;" . ($contacts!=1?$contacts . "&nbsp;contacts":"one contact");
+							$content .= "message&nbsp;with&nbsp;" . ($contacts!=1?$contacts . "&nbsp;contacts":"one contact") . '</a>';
 							$content .= job_responses($job,Null);
 							$content .= '</div>';
 							
 							
 						} else if($item["type"] == "list" ) {
 							$title = "Contact List " . $title;
-							$content = $time .  ' - <b>' .  $item["name"] . "</b>";
+							$defaultlink = "list.php?id=$itemid";
+							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . "</b>";
 							
 							$contacts = listcontacts($itemid,"list");
 							
-							$content .= '&nbsp;-&nbsp;This list ';
+							$content .= 										'&nbsp;-&nbsp;This list ';
 							if(isset($item["lastused"]))
 								$content .= ' was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 							else
 								$content .= ' is never used';
-							$content .= " and have <b>" . ($contacts!=1?$contacts . "&nbsp;</b>contacts":"one</b>&nbsp;contact");
+							$content .= " and have <b>" . ($contacts!=1?$contacts . "&nbsp;</b>contacts":"one</b>&nbsp;contact") . '</a>';
 
-							$defaultlink = "list.php?id=$itemid";
-							
 							$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 							$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 							$icon = '<img src="img/largeicons/addrbook.jpg">';			
 						} else if($item["type"] == "message" ) {
 							$messagetype = $item["messagetype"];
 							$title = _L('%1$s message %2$s',escapehtml(ucfirst($messagetype)),escapehtml($title));
-							$content = $time .  ' - <b>' .  $item["name"] . '</b>';
 							$tools = action_links (
 								action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
 								action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
 								);	
 							$defaultlink = "message$messagetype.php?id=$itemid";
+							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . '</b>' . '</a>';
 							switch($messagetype) {
 								case "phone":
 									$icon = '<img src="img/largeicons/phonehandset.jpg">';
@@ -455,11 +457,12 @@ include_once("nav.inc.php");
 							}
 						} else if($item["type"] == "report" ) {
 							$title = "Report " . $title;				
-							$content = $time .  ' - ' .  $item["name"];
+							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
+											$time .  ' - ' .  $item["name"] . '</a>';
 							$icon = '<img src="img/largeicons/savedreport.jpg">';
 							$defaultlink = "reportjobsummary.php?id=$itemid";
 						} else if($item["type"] == "systemmessage" ) {
-							$content = $item["message"];
+							$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $item["message"] . '</a>';
 							$icon = '<img src="img/largeicons/notepad.jpg">';
 						}
 						
@@ -474,9 +477,8 @@ include_once("nav.inc.php");
 														<a href="' . $defaultlink . '" ' . $defaultonclick . '>	
 														' . $title . '</a>
 													</div>
-													<a href="' . $defaultlink . '" ' . $defaultonclick . '>
-														<span>' . $content . '</span>
-													</a>
+													<span>' . $content . '</span>
+													
 												</td>';
 						if($tools) {
 							$activityfeed .= '	<td ' . $tdstyle. ' valign="middle">
