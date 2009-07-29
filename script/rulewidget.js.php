@@ -421,7 +421,7 @@ var RuleEditor = Class.create({
 							if (!data) {
 								container.update('<?=addslashes(_L("No data found"))?>');
 							}
-														//console.info(data);
+							
 							var multicheckboxHTML = this.make_multicheckbox(data,false,true,true);
 							this.ruleWidget.multisearchHTMLCache[fieldnum] = multicheckboxHTML;
 							container = new Element('div').update(multicheckboxHTML);
@@ -509,19 +509,31 @@ var RuleEditor = Class.create({
 		var fieldSelectbox = new Element('select');
 		
 		fieldSelectbox.update(new Element('option', {'value':''}).insert('--<?=addslashes(_L('Choose a Field'))?>--'));
+		
+		var f = new Element('optgroup');
+		var g = new Element('optgroup', {'label':'-----------------------'});
+		var c = new Element('optgroup', {'label':'-----------------------'});
 		for (var fieldnum in this.ruleWidget.fieldmaps) {
 			// Don't allow adding the same rule twice.
 			if (this.ruleWidget.appliedRules[fieldnum])
 				continue;
-			// Different CSS classes for F,G,C fields.
-			// TODO: Reorder f,g,c fields. Currently ordered c,f,g due to ajax.php api call
-			var fgcClass = 'FField';
-			if (fieldnum[0] === 'g')
-				fgcClass = 'GField';
-			else if (fieldnum[0] === 'c')
-				fgcClass = 'CField';
-			fieldSelectbox.insert(new Element('option', {'value':fieldnum, 'class':fgcClass}).insert(this.ruleWidget.fieldmaps[fieldnum].name));
+				
+			var option = new Element('option', {'value':fieldnum}).update(this.ruleWidget.fieldmaps[fieldnum].name);
+			
+			if (fieldnum.charAt(0) == 'f')
+				f.insert(option);
+			else if (fieldnum.charAt(0) == 'g')
+				g.insert(option);
+			else if (fieldnum.charAt(0) == 'c')
+				c.insert(option);
 		}
+		if (f.down('option'))
+			fieldSelectbox.insert(f);
+		if (g.down('option'))
+			fieldSelectbox.insert(g);
+		if (c.down('option'))
+			fieldSelectbox.insert(c);
+			
 		fieldSelectbox.disabled = fieldSelectbox.options.length < 2;
 		fieldSelectbox.observe('change', function(event) {
 			var fieldnum = this.fieldTD.down('select').getValue();
@@ -668,4 +680,3 @@ var RuleEditor = Class.create({
 		return textbox;
 	}
 });
-
