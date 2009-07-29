@@ -1,6 +1,19 @@
 <?
+
+// optional $this->args["readonly"], example: true or false.
+// optional $this->args["allowedFields"], example: array('f','g','c')
 class FormRuleWidget extends FormItem {
 	function render ($rulesJSON) {
+		if (!empty($this->args["allowedFields"]))
+			$allowedFields = json_encode($this->args["allowedFields"]);
+		else
+			$allowedFields = json_encode(array('f','g','c'));
+			
+		if (!empty($this->args["readonly"]))
+			$readonly = json_encode(true);
+		else
+			$readonly = json_encode(false);
+			
 		$inputname = $this->form->name."_".$this->name;
 		if (!$rulesJSON || !is_array(json_decode($rulesJSON)))
 			$rulesJSON = '[]';//'[{fieldnum:"f01", type:"text", logical:"and", op:"eq", val:"Kee-Yip"}, {fieldnum:"f02", type:"text", logical:"and", op:"eq", val:"Chan"}]';
@@ -11,7 +24,7 @@ class FormRuleWidget extends FormItem {
 		$html .= '<script type="text/javascript" src="script/datepicker.js"></script>';
 		// custom javascript
 		$html .= "<script type='text/javascript'>
-			var ruleWidget = new RuleWidget($('ruleWidgetContainer'".(!empty($this->args['readonly']) ? ',true' : '')."));
+			var ruleWidget = new RuleWidget($('ruleWidgetContainer'), $readonly, $allowedFields);
 			function rulewidget_update_value(event, pending, deleterule) {
 				$('$inputname').value = '';
 				if (!document.formvars) {
@@ -39,6 +52,7 @@ class FormRuleWidget extends FormItem {
 	}
 }
 
+// @param optional $args["allowedFields"], example: array('f','g','c')
 class ValRules extends Validator {
 	function validate ($valueJSON, $args) {
 		$msgPleaseFinish = addslashes(_L("Please finish adding your rule"));
@@ -59,6 +73,8 @@ class ValRules extends Validator {
 				return $msgIncompleteRule;
 			if (isset($rulesfor[$data->fieldnum])) // Do not allow more than one rule per fieldnum
 				return $msgRuleAlreadyExists;
+			if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields']))
+				return $msgUnauthorizedFieldmap;
 			if (!Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
 				return $msgUnauthorizedFieldmap;
 			$rulesfor[$data->fieldnum] = true;
