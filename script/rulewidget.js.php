@@ -22,7 +22,12 @@ var RuleWidget = Class.create({
 	//----------------------------- PUBLIC FUNCTIONS --------------------------
 
 	// @param container, the DOM container for this widget.
-	initialize: function(container, readonly) {
+	initialize: function(container, readonly, allowedFields) {
+		if (allowedFields)
+			this.allowedFields = ['f','g','c'];
+		else
+			this.allowedFields = allowedFields;
+			
 		this.container = container;
 		this.warningDiv = new Element('div', {'style':'color:red; padding:2px'});
 				this.warningDiv.hide();
@@ -81,6 +86,8 @@ var RuleWidget = Class.create({
 				// data['fieldmaps'] is indexed by record id, we prefer indexing by fieldnum.
 				for (var i in data['fieldmaps']) {
 					var fieldnum = data['fieldmaps'][i].fieldnum;
+					if (this.allowedFields.indexOf(fieldnum.charAt(0)) >= 0)
+						continue;
 					this.fieldmaps[fieldnum] = data['fieldmaps'][i];
 					for (var type in this.operators) {
 						if (this.fieldmaps[fieldnum].options.match(type))
