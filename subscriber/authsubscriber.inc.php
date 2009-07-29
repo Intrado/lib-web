@@ -267,7 +267,7 @@ function doDBConnect($result) {
 
 function doStartSession() {
 	global $CUSTOMERURL;
-	session_name($CUSTOMERURL . "_session");
+	session_name($CUSTOMERURL . "_subscriber");
 	session_start();
 
 	if (isset($_SESSION['timezone'])) {
