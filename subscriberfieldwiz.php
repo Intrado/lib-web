@@ -22,7 +22,7 @@ require_once("obj/Validator.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('metadata') && !getSystemSetting("_hasselfsignup", false)) {
+if (!$USER->authorize('metadata') || !getSystemSetting("_hasselfsignup", false)) {
 	redirect('unauthorized.php');
 }
 

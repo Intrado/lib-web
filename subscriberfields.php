@@ -21,8 +21,8 @@ require_once("obj/Validator.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-// TODO show options, but show/hide metadata
-if (!$USER->authorize('metadata') && !getSystemSetting("_hasselfsignup", false)) {
+
+if (!$USER->authorize('metadata') || !getSystemSetting("_hasselfsignup", false)) {
 	redirect('unauthorized.php');
 }
 
