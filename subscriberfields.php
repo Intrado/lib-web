@@ -104,9 +104,9 @@ function fmt_values ($obj, $name) {
 				return "";
 			$valcsv = implode(",", $values);
 			if (strlen($valcsv) > 25)
-				return htmlentities(substr($valcsv, 0, 25) . "...");
+				return escapehtml(substr($valcsv, 0, 25) . "...");
 			else
-				return htmlentities($valcsv);
+				return escapehtml($valcsv);
 		}
 	} else
 		return "";
